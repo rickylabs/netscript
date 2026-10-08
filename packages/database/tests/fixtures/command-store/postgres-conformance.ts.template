@@ -1,0 +1,177 @@
+import { PrismaClient } from './.generated/client.ts';
+import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
+import { createPostgresCommandStore } from '../../../commands-postgres.ts';
+import { transactionClient } from './command-store.ts';
+import { CommandStoreError } from '../../../commands.ts';
+import type { ReceiptClaim } from '../../../commands.ts';
+
+const socket = Deno.env.get('COMMAND_POSTGRES_SOCKET');
+if (!socket) throw new Error('real PostgreSQL socket required');
+const root = new PrismaClient({ adapter: new PrismaPg({ host: socket, database: 'postgres', user: Deno.env.get('PGUSER'), port: Number(Deno.env.get('PGPORT')) }) });
+const store = createPostgresCommandStore(transactionClient(root), { transactionTimeoutMs: 5000 });
+const base = { scope: 'provider.test', commandName: 'project.rename', commandVersion: 1,
+  keyHash: 'a'.repeat(64), requestHash: 'b'.repeat(64), actorKind: 'system' as const,
+  actorSubject: 'test', correlationId: 'test', createdAt: new Date(0) };
+function claim(key: string): ReceiptClaim { return { ...base, id: crypto.randomUUID(), keyHash: key.repeat(64) }; }
+function latch() { return Promise.withResolvers<void>(); }
+const request = { receiptClaimWaitMs: 1000 };
+async function reset() {
+  for (const table of ['netscript_command_receipt', 'netscript_command_audit', 'netscript_command_outbox', 'project']) {
+    await root.$executeRawUnsafe(`DELETE FROM ${table}`);
+  }
+}
+async function waitForReceiptLock() {
+  const until = performance.now() + 2000;
+  while (performance.now() < until) {
+    const waiting = await root.$queryRawUnsafe<{ count: bigint }[]>(
+      "SELECT count(*) FROM pg_stat_activity WHERE wait_event_type='Lock' AND query LIKE 'INSERT INTO netscript_command_receipt%'",
+    );
+    if (waiting[0].count > 0n) return;
+    await new Promise(resolve => setTimeout(resolve, 5));
+  }
+  throw new Error('follower did not reach the provider lock');
+}
+async function complete(tx: Parameters<Parameters<typeof store.transaction>[1]>[0], receiptId: string) {
+  await tx.completeReceipt({ receiptId, responseJson: '{"ok":true}', completedAt: new Date(1) });
+}
+
+Deno.test('PostgreSQL leader commit replays one winner and follower remains usable', async () => {
+  await reset();
+  const acquired = latch(), release = latch(), followerStarted = latch();
+  const leaderClaim = claim('a'); let leaderCalls = 0, followerCalls = 0;
+  const leader = store.transaction(request, async tx => {
+    leaderCalls++;
+    const decision = await tx.claimReceipt(leaderClaim); assertEquals(decision.kind, 'execute');
+    await tx.business.project.create({ data: { id: 'p', name: 'winner' } });
+    acquired.resolve(); await release.promise; await complete(tx, leaderClaim.id);
+  });
+  await acquired.promise;
+  const follower = store.transaction(request, async tx => {
+    followerCalls++; followerStarted.resolve();
+    const result = await tx.claimReceipt({ ...leaderClaim, id: crypto.randomUUID() });
+    assertEquals(result.kind, 'replay');
+    if (result.kind === 'replay') assertEquals(result.receipt.responseJson, '{"ok":true}');
+    assertEquals((await tx.business.project.findMany()).length, 1);
+    assertEquals(await tx.business.$queryRawUnsafe("SELECT current_setting('lock_timeout') AS value"), [{ value: '0' }]);
+  });
+  await followerStarted.promise;
+  await waitForReceiptLock();
+  release.resolve(); await Promise.all([leader,follower]);
+  assertEquals([leaderCalls,followerCalls], [1,1]);
+  assertEquals(await root.netScriptCommandReceipt.count(), 1);
+  const mismatch = await store.transaction(request, tx => tx.claimReceipt({ ...leaderClaim, requestHash:'c'.repeat(64) }));
+  assertEquals(mismatch.kind, 'mismatch');
+});
+
+Deno.test('PostgreSQL leader rollback lets waiting follower execute without replaying callbacks', async () => {
+  await reset(); const acquired=latch(), release=latch(), followerStarted=latch(); const input=claim('d');
+  const fault = new Error('rollback'); let calls=0;
+  const leader=store.transaction(request, async tx=>{
+    await tx.claimReceipt(input); acquired.resolve(); await release.promise; throw fault;
+  });
+  const leaderRejected=assertRejects(()=>leader,Error,'rollback');
+  await acquired.promise;
+  const follower=store.transaction(request,async tx=>{
+    calls++;followerStarted.resolve();const result=await tx.claimReceipt({...input,id:crypto.randomUUID()});
+    assertEquals(result.kind,'execute'); if(result.kind==='execute')await complete(tx,result.receiptId);
+  });
+  await followerStarted.promise; await waitForReceiptLock(); release.resolve(); await Promise.all([leaderRejected,follower]);
+  assertEquals(calls,1);assertEquals(await root.netScriptCommandReceipt.count(),1);
+});
+
+Deno.test('PostgreSQL busy aborts the whole callback and leaves a clean next transaction',async()=>{
+  await reset();const acquired=latch(),release=latch();const input=claim('e');
+  const leader=store.transaction(request,async tx=>{await tx.claimReceipt(input);acquired.resolve();await release.promise;await complete(tx,input.id);});
+  await acquired.promise; let calls=0;
+  try {
+    const started=performance.now();
+    const result=await store.transaction({receiptClaimWaitMs:25},async tx=>{
+      calls++; const decision=await tx.claimReceipt({...input,id:crypto.randomUUID()});
+      assertEquals(decision.kind,'busy');
+      await assertRejects(()=>tx.appendAudit([]),CommandStoreError);
+      return decision;
+    });
+    assertEquals(result.kind,'busy');assert(performance.now()-started<3000);assertEquals(calls,1);
+    const clean=await store.transaction(request,async tx=>await tx.business.$queryRawUnsafe("SELECT 1 AS value, current_setting('lock_timeout') AS timeout"));
+    assertEquals(clean,[{value:1,timeout:'0'}]);
+    const next=claim('f');
+    await store.transaction(request,async tx=>{const d=await tx.claimReceipt(next);assertEquals(d.kind,'execute');await complete(tx,next.id);});
+  } finally {release.resolve();await leader;}
+});
+
+Deno.test('PostgreSQL all command rows share commit and rollback and incomplete claims cannot commit',async()=>{
+  await reset();const input=claim('1');
+  const audit={ id:'audit',executionId:'execution',commandName:base.commandName,commandVersion:1,action:'rename',subjectType:'project',subjectId:'p',actorKind:'system' as const,actorSubject:'test',correlationId:'test',occurredAt:new Date(0) };
+  const outbox={ id:'outbox',executionId:'execution',commandName:base.commandName,commandVersion:1,destination:'worker',topic:'project.v1',payloadJson:'{}',dedupeKey:'stable',correlationId:'test',availableAt:new Date(0) };
+  for(const seam of ['business','audit','outbox','complete','commit']){
+    const fault=new Error(seam);
+    await assertRejects(()=>store.transaction(request,async tx=>{
+      await tx.claimReceipt(input);await tx.business.project.create({data:{id:'p',name:'value'}});
+      if(seam==='business')throw fault; await tx.appendAudit([audit]);
+      if(seam==='audit')throw fault;await tx.appendOutbox([outbox]);
+      if(seam==='outbox')throw fault;await complete(tx,input.id);
+      if(seam==='complete'||seam==='commit')throw fault;
+    }),Error,seam);
+    assertEquals(await Promise.all([root.project.count(),root.netScriptCommandReceipt.count(),root.netScriptCommandAudit.count(),root.netScriptCommandOutbox.count()]),[0,0,0,0]);
+  }
+  await assertRejects(()=>store.transaction(request,async tx=>{await tx.claimReceipt(input);}),CommandStoreError);
+  assertEquals(await root.netScriptCommandReceipt.count(),0);
+  await store.transaction(request,async tx=>{
+    await tx.claimReceipt(input);await tx.business.project.create({data:{id:'p',name:'value'}});
+    await tx.appendAudit([audit]);await tx.appendOutbox([outbox]);await complete(tx,input.id);
+  });
+  assertEquals(await Promise.all([root.project.count(),root.netScriptCommandReceipt.count(),root.netScriptCommandAudit.count(),root.netScriptCommandOutbox.count()]),[1,1,1,1]);
+});
+
+Deno.test('PostgreSQL serialization and deadlock surface retryable failures with one callback',async()=>{
+  await reset();
+  await root.project.createMany({data:[{id:'a',name:'start-a'},{id:'b',name:'start-b'}]});
+  const ready=latch(); let entered=0,calls=0;
+  const writer=(name:string)=>store.transaction({receiptClaimWaitMs:1000,options:{isolationLevel:'Serializable'}},async tx=>{
+    calls++; await tx.business.project.findUniqueOrThrow({where:{id:'a'}});
+    if(++entered===2)ready.resolve(); await ready.promise;
+    await tx.business.project.update({where:{id:'a'},data:{name}});
+  });
+  const results=await Promise.allSettled([writer('one'),writer('two')]);
+  assertEquals(results.filter(r=>r.status==='fulfilled').length,1);assertEquals(calls,2);
+  const rejected=results.find(r=>r.status==='rejected');
+  assert(rejected?.status==='rejected');assert(rejected.reason instanceof CommandStoreError);
+  assertEquals(rejected.reason.failure,{kind:'store_failure',retryable:true,phase:'business'});
+  const first=latch(),second=latch();calls=0;
+  const deadlockWriter=(id:string,other:string,held:ReturnType<typeof latch>,peer:ReturnType<typeof latch>)=>store.transaction(request,async tx=>{
+    calls++; await tx.business.project.update({where:{id},data:{name:'locked'}});held.resolve();await peer.promise;
+    await tx.business.project.update({where:{id:other},data:{name:'other'}});
+  });
+  const deadlocks=await Promise.allSettled([deadlockWriter('a','b',first,second),deadlockWriter('b','a',second,first)]);
+  assertEquals(deadlocks.filter(r=>r.status==='fulfilled').length,1);assertEquals(calls,2);
+  const victim=deadlocks.find(r=>r.status==='rejected');assert(victim?.status==='rejected');
+  assert(victim.reason instanceof CommandStoreError);assertEquals(victim.reason.failure.retryable,true);
+  await store.transaction(request,async tx=>{assertEquals((await tx.business.project.findMany()).length,2);});
+});
+
+Deno.test('PostgreSQL physical commit failure rolls back all rows and preserves business error identity',async()=>{
+  await reset();const input=claim('3');let calls=0;
+  const failure=await assertRejects(()=>store.transaction(request,async tx=>{
+    calls++;await tx.claimReceipt(input);
+    await tx.business.project.createMany({data:[{id:'a',name:'duplicate'},{id:'b',name:'duplicate'}]});
+    await complete(tx,input.id);
+  }),CommandStoreError);
+  assertEquals(failure.failure,{kind:'store_failure',retryable:false,phase:'commit'});
+  assertEquals(calls,1);
+  assertEquals(await Promise.all([root.project.count(),root.netScriptCommandReceipt.count()]),[0,0]);
+  const businessError=Object.assign(new Error('business'),{code:'40001',name:'PrismaClientKnownRequestError',meta:{code:'40001'}});
+  const caught=await store.transaction(request,async()=>{throw businessError;}).catch(error=>error);
+  assertEquals(caught,businessError);
+});
+
+Deno.test('PostgreSQL actual root write negative control survives a callback rollback',async()=>{
+  await reset();const input=claim('2');
+  await assertRejects(()=>store.transaction(request,async tx=>{
+    await tx.claimReceipt(input);
+    await root.project.create({data:{id:'escaped',name:'outside'}});
+    throw new Error('negative control');
+  }),Error,'negative control');
+  assertEquals(await root.project.count(),1);assertEquals(await root.netScriptCommandReceipt.count(),0);
+  await reset();await root.$disconnect();
+});

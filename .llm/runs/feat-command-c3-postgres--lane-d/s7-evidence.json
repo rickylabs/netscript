@@ -1,0 +1,35 @@
+{
+  "slice": "S7",
+  "redExit": 1,
+  "sourceCheck": 0,
+  "sourceLint": 0,
+  "sourceFormat": 0,
+  "runtimeRestoredExit": 0,
+  "mutations": [
+    {
+      "mutation": "replace-callback-handle",
+      "test": "transaction helper preserves the true callback handle and one invocation",
+      "mutantExit": 1,
+      "failedTests": [
+        "transaction helper preserves the true callback handle and one invocation"
+      ]
+    },
+    {
+      "mutation": "erase-callback-type",
+      "test": "transaction helper publishes type negatives for root and nested operations",
+      "mutantExit": 1,
+      "failedTests": [
+        "transaction helper publishes type negatives for root and nested operations"
+      ]
+    },
+    {
+      "mutation": "nested-transaction-exclusion-removed",
+      "test": "generated Prisma bridge retains model delegates and excludes all root operations",
+      "mutantExit": 1,
+      "restoredExit": 0,
+      "failedTests": [
+        "generated Prisma bridge retains model delegates and excludes all root operations"
+      ]
+    }
+  ]
+}
