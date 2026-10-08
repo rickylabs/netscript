@@ -442,6 +442,13 @@ jobs:
           .llm/tools/gates/run-gate.ts --gate publish-dry-run --id quality-publish-dry-run
           --output .llm/tmp/gate-receipts/quality/publish-dry-run.json
 
+      - name: Cold AI peer compatibility
+        if: env.RUN_DENO == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate ai-peer-resolution --id quality-ai-peer-resolution
+          --output .llm/tmp/gate-receipts/quality/ai-peer-resolution.json
+
       - name: Critical advisory audit
         if: env.RUN_DENO == 'true'
         run: >-

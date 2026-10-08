@@ -18,12 +18,16 @@ describe('resolveNetScriptImports', () => {
         expected: {
           '@netscript/config': 'jsr:@netscript/config',
           '@netscript/service': 'jsr:@netscript/service',
-          '@netscript/plugin-auth-core/contracts/v1':
-            netscriptJsrSpecifier('plugin-auth-core', '/contracts/v1'),
-          'jsr:@netscript/plugin-workers/jobs/health-check.ts':
-            netscriptJsrSpecifier('plugin-workers', '/jobs/health-check.ts'),
+          '@netscript/plugin-auth-core/contracts/v1': netscriptJsrSpecifier(
+            'plugin-auth-core',
+            '/contracts/v1',
+          ),
+          'jsr:@netscript/plugin-workers/jobs/health-check.ts': netscriptJsrSpecifier(
+            'plugin-workers',
+            '/jobs/health-check.ts',
+          ),
           '@netscript/auth-kv-oauth': netscriptJsrSpecifier('auth-kv-oauth'),
-          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@^0.3.8',
+          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@0.8.0',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
         },
@@ -39,7 +43,7 @@ describe('resolveNetScriptImports', () => {
           'jsr:@netscript/plugin-workers/jobs/health-check.ts':
             '../../../monorepo/plugins/workers/jobs/health-check.ts',
           '@netscript/auth-kv-oauth': '../../../monorepo/packages/auth-kv-oauth/mod.ts',
-          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@^0.3.8',
+          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@0.8.0',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
         },
@@ -48,7 +52,9 @@ describe('resolveNetScriptImports', () => {
 
     for (const testCase of cases) {
       const imports = resolveNetScriptImports(testCase.mode, testCase.base);
-      for (const [specifier, expectedPrefix] of Object.entries(testCase.expected)) {
+      for (
+        const [specifier, expectedPrefix] of Object.entries(testCase.expected)
+      ) {
         assertStringIncludes(imports[specifier], expectedPrefix);
       }
     }
@@ -57,8 +63,11 @@ describe('resolveNetScriptImports', () => {
   it('should resolve JSR mode imports', () => {
     const imports = resolveNetScriptImports('jsr');
     assertStringIncludes(imports['@netscript/config'], 'jsr:@netscript/config');
-    assertStringIncludes(imports['@netscript/service'], 'jsr:@netscript/service');
-    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@^0.3.8');
+    assertStringIncludes(
+      imports['@netscript/service'],
+      'jsr:@netscript/service',
+    );
+    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@0.8.0');
     assertStringIncludes(imports['@std/path'], 'jsr:@std/path');
     assertStringIncludes(imports['zod'], 'npm:zod');
   });
@@ -66,7 +75,10 @@ describe('resolveNetScriptImports', () => {
   it('should resolve local mode imports with default base', () => {
     const imports = resolveNetScriptImports('local');
     assertEquals(imports['@netscript/config'], '../../packages/config/mod.ts');
-    assertEquals(imports['@netscript/service'], '../../packages/service/mod.ts');
+    assertEquals(
+      imports['@netscript/service'],
+      '../../packages/service/mod.ts',
+    );
     assertEquals(
       imports['@netscript/plugin-auth-core/contracts/v1'],
       '../../packages/plugin-auth-core/src/contracts/v1/mod.ts',
@@ -75,9 +87,12 @@ describe('resolveNetScriptImports', () => {
       imports['jsr:@netscript/plugin-workers/jobs/health-check.ts'],
       '../../plugins/workers/jobs/health-check.ts',
     );
-    assertEquals(imports['@netscript/auth-kv-oauth'], '../../packages/auth-kv-oauth/mod.ts');
+    assertEquals(
+      imports['@netscript/auth-kv-oauth'],
+      '../../packages/auth-kv-oauth/mod.ts',
+    );
     // External deps still use registry
-    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@^0.3.8');
+    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@0.8.0');
     assertStringIncludes(imports['@std/path'], 'jsr:@std/path');
     assertStringIncludes(imports['zod'], 'npm:zod');
   });

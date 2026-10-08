@@ -113,6 +113,7 @@ export const GATE_CATALOG = {
   'aspire-version-parity': ['deno', 'task', 'check:aspire-version-parity'],
   'publish-dry-run': ['deno', 'task', 'publish:dry-run'],
   'audit-critical': ['deno', 'task', 'audit:critical'],
+  'ai-peer-resolution': ['deno', 'task', 'deps:check:ai-peers'],
   'clean-worktree': [
     'deno',
     'run',
