@@ -149,3 +149,7 @@ Concurrent Worker.stop callers now share drain completion; the actual shutdown s
 Gate `worker-drain-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file plugins/workers/worker/worker.ts --file plugins/workers/worker/job-dispatcher_test.ts --deno-arg --frozen`. Full raw output retained privately.
 
 S2a core source `81589373f2ef91bcc4bed6d10189b14f8fbe815d`; S2b final plugin source `da438b2f90abf95d7d9cbe39a3bc57c2bb7989b2`. S3 independent IMPL-EVAL brief locked; no source edit while evaluator runs.
+
+## Independent implementation verdict
+
+GLM max IMPL-EVAL PASS for final source da438b2f90abf95d7d9cbe39a3bc57c2bb7989b2, actual evaluated head cb66a3f13642e5581aef13d82f203533e814b439. Reviewer independently reran 16 runner/actual Worker/dispatcher cases, zero failures. F-7 unchanged baseline, F-JSR-2 unchanged doctor finding and F-16 bounded required adapter folder all explicitly DEBT_ACCEPTED; F-13 PENDING_SCRIPT with manual invariant evidence. Source phases complete, ready for review. Publication and released-consumer condition remain owner work; no merge.
