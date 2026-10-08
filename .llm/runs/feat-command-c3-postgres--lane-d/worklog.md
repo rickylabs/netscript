@@ -83,3 +83,20 @@ private workspace membership line, identical versions/integrities, frozen packag
 generated freshness checks, all documentation entrypoints and exact source manifest. Prior round-2
 provider/type/mutation/publish qualification remains applicable. Final follow-up changes harness
 artifacts only; full native current-head CI and final handoff still pending.
+
+## Current-main reconciliation and native workflow inventory
+
+Normal merge preserves upstream native chat repair f257f9627. Only MCP corpus conflicts; take main
+then regenerate with Deno 2.9.5. C3/database/service/contracts/root/private lock source remains
+byte-identical to round-3 PASS. At e40472b7c all root/local/freshness/docs/publish gates pass again;
+21 affected upstream chat tests and frozen Fresh UI package checks pass.
+
+Prior ready-state native repository test reports 5540 pass and one failure: workflow concurrency
+inventory lacked new command-postgres.yml. Added per-ref cancel-in-progress concurrency and
+registered the workflow/expected block in the existing complete inventory test. Local RED 1, full
+release workflow suite GREEN 0. Production cancel-in-progress mutant fails the named assertion;
+restored 0 with exact bytes. Targeted type/lint/format pass. Repository lint/fmt selects
+package/plugin roots and excludes .llm tools, so explicit tool-file verification uses no-config lint
+and the same single-quote/100-column format policy. Initial no-target/default-style diagnostic
+failures are retained privately, not counted green. Same-session reconciliation review and final
+current-head CI are next; no readiness claim.

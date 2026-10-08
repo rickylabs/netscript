@@ -20,3 +20,9 @@ repairs must pass each entrypoint and a same-session independent review. Main ad
 Ready-state CI exposed one missing private workspace dependency entry. Native lock update, semantic
 review and frozen package check repair it without dependency upgrades. Independent same-session
 delta review and current-head CI required.
+
+Upstream main advanced with independently qualified native chat repair; normal reconciliation
+preserves it. Native full-suite failure exposed existing workflow inventory registration
+requirement. Register new provider workflow and a bounded per-ref concurrency group, retaining all
+complete-coverage assertions; semantic mutant/restored evidence added. No new C3
+architecture/dependency debt.
