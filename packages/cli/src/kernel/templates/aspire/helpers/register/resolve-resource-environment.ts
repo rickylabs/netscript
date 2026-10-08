@@ -32,6 +32,8 @@
  * rather than emitted and hoped to lose: the generated block names it in a
  * comment and does not apply it, which makes the documented rule true by
  * construction instead of true by race. Consumers pin ports with `HostPort`.
+ * Credential-shaped names are also refused: values must come from process
+ * environment, never tracked generated literals. Refusal comments name keys only.
  */
 
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
@@ -64,7 +66,7 @@ export const ENDPOINT_OWNED_ENVIRONMENT_KEYS: readonly string[] = [
 export interface DeclaredEnvironmentPartition {
   /** Entries applied to the resource, in declaration order. */
   readonly applied: Readonly<Record<string, string>>;
-  /** Declared keys refused because Aspire's endpoint allocation owns them. */
+  /** Declared keys refused because endpoints own them or credentials must stay out of source. */
   readonly refused: readonly string[];
 }
 
@@ -90,9 +92,17 @@ export function resolveResourceEnvironment(
   return declared && Object.keys(declared).length > 0 ? declared : undefined;
 }
 
+/** Classify credential-shaped environment names before persisting or rendering literals. */
+export function isCredentialEnvironmentKey(key: string): boolean {
+  const normalized = key.replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2').replace(/[^A-Za-z0-9_]/g, '_');
+  return /(?:^|_)(?:SECRET|PASSWORD|TOKEN|CREDENTIALS?|(?:API|OAUTH|PRIVATE|SIGNING|ENCRYPTION|ACCESS)_KEY)(?:_|$)/i
+    .test(normalized);
+}
+
 /**
  * Splits a declared environment into the entries the resource receives and the
- * keys Aspire's endpoint allocation owns.
+ * endpoint-owned or credential-shaped keys.
  *
  * @param entry - Config entry that may carry `Environment` or the `Env` alias
  * @returns Applied entries and refused keys; both empty when nothing is declared
@@ -106,7 +116,7 @@ export function partitionDeclaredEnvironment(
   const applied: Record<string, string> = {};
   const refused: string[] = [];
   for (const [key, value] of Object.entries(declared)) {
-    if (ENDPOINT_OWNED_ENVIRONMENT_KEYS.includes(key)) {
+    if (ENDPOINT_OWNED_ENVIRONMENT_KEYS.includes(key) || isCredentialEnvironmentKey(key)) {
       refused.push(key);
       continue;
     }
@@ -131,6 +141,14 @@ export function renderDeclaredEnvironmentLines(entry: ResourceEnvironmentEntry):
   const lines: string[] = [];
 
   for (const key of refused) {
+    if (isCredentialEnvironmentKey(key)) {
+      lines.push(
+        `${BLOCK_INDENT}// Declared ${
+          JSON.stringify(key).replaceAll('\u2028', '\\u2028').replaceAll('\u2029', '\\u2029')
+        } is not applied: supply credentials through process environment.`,
+      );
+      continue;
+    }
     lines.push(
       `${BLOCK_INDENT}// Declared \`${key}\` is not applied: Aspire's endpoint allocation owns it.`,
     );

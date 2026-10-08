@@ -245,9 +245,115 @@ The following entrypoints are published alongside the root export:
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/service` | `./mod.ts` | Full service surface (documented above). |
+| `@netscript/service/commands/testing` | `./commands-testing.ts` | Atomic memory store and explicit test controls. |
+| `@netscript/service/commands` | `./commands.ts` | Opaque command definitions, once-only executor and codecs. |
 | `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
 | `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
+
+## Command definitions and codecs
+
+`@netscript/service/commands` defines immutable command policies and bounded canonical codecs
+without executing handlers. Importing, defining and encoding require no permissions; execution
+uses the explicitly supplied store/business operations and their permissions. JSON uses `jcs-v1`
+with RFC 8785 ordering and numeric/string serialization. Default limits are depth 64, 10,000
+aggregate values/keys and 1 MiB UTF-8 bytes; options may only tighten these bounds. Stored text must
+match canonical serialization exactly. Synchronous schema validation must preserve canonical JSON
+identity to keep replay stable.
+
+| Symbol                      | Kind             | Description                                                       |
+| --------------------------- | ---------------- | ----------------------------------------------------------------- |
+| `defineCommand`             | function         | Validates durable identity and freezes an opaque definition.      |
+| `jsonCodec`                 | function         | Synchronous Standard Schema validation with stable bounded JSON.  |
+| `canonicalCommandJson`      | function         | Produces bounded canonical JSON text.                             |
+| `parseCanonicalCommandJson` | function         | Accepts only bounded canonical stored text.                       |
+| `CommandCodec`              | type alias       | Typed response/payload encoding and decoding boundary.            |
+| `CommandJsonLimits`         | type alias       | Tighten-only depth, item and byte safeguards.                     |
+| `CommandJson`               | type alias       | Readonly recursive I-JSON values.                                 |
+| `CommandActor`              | type alias       | Principal or system identity, excluding roles and claims.         |
+| `CommandEnvelope`           | type alias       | Input, actor and transport fields with string version tokens.     |
+| `CommandTraceContext`       | type alias       | Validated W3C traceparent and optional tracestate.                               |
+| `CommandAuditInput`         | type alias       | Redacted audit intent.                                            |
+| `CommandContext`            | interface        | Transaction handle and synchronous side-record operations.        |
+| `CommandDefinition`         | interface        | Opaque immutable identity, replay policy and record requirements. |
+| `CommandDefinitionSpec`     | type alias       | Construction specification with privately bound handler.          |
+| `commandDefinitionBinding`  | type-only symbol | Opaque marker; unavailable as a runtime export.                   |
+| `commandExecutorCapability` | type-only symbol | Private binding capability; unavailable as a runtime export.      |
+| `CommandIdempotency`        | type alias       | Frozen semantic scope, fingerprint and replay codec.              |
+| `CommandIdempotencyMode`    | type alias       | Required or optional key policy.                                  |
+| `CommandIdempotencySpec`    | type alias       | Construction policy defaulting to required keys.                  |
+| `CommandOutboxInput`        | type alias       | Delivery intent with typed codec.                                 |
+| `CommandRecordRequirement`  | type alias       | Required, optional or forbidden side-record policy.               |
+| `CommandError`              | class            | Frozen redacted failure with a trusted nonserialized cause.       |
+| `CommandFailure`            | type alias       | Bounded discriminated failure and retry vocabulary.               |
+| `IsolationLevel` | type alias | Database-owned transaction isolation vocabulary, re-exported as a type. |
 
 ---
 
 Back to the [reference overview](/reference/).
+
+## Command testing
+
+`@netscript/service/commands/testing` exports `createMemoryCommandStore`, `MemoryCommandStore`,
+`MemoryCommandBusiness`, `MemoryCommandSnapshot`, `MemoryCommandStoreOptions` and
+`CommandStoreBarrier`. The store atomically commits business, receipt, audit and outbox drafts and
+exposes frozen detached snapshots. A one-use before-commit barrier controls concurrency. Explicit
+receipt seeding and outside-transaction business writes support corruption and rollback negative
+controls. These helpers require no permissions and certify no real provider. The fake supports
+Serializable isolation, zero claim wait, a bounded cooperative timeout, terminal busy and one
+callback attempt; it may reject disjoint concurrent drafts because it uses a global state revision.
+
+## Command executor
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createCommandExecutor` | function | Compose once-only execution over a bound same-commit store. |
+| `CommandExecutor` | interface | Execute a genuine definition and await the store boundary. |
+| `CommandExecution` | type alias | Decoded value, applied/replayed outcome, idempotency state and original correlation. |
+| `CommandExecutorOptions` | type alias | Store, optional clock/IDs/telemetry, claim wait and tighten-only record limits. |
+| `CommandRecordLimits` | type alias | 64 audit/64 outbox defaults; aggregate canonical side-row byte default 64 KiB. |
+| `CommandClock` | interface | Injected valid Date source, detached by the executor. |
+| `CommandIdSource` | interface | Fresh bounded identifiers. |
+| `CommandTelemetryPort` | interface | Once-only tracing extension preserving values and errors. |
+| `CommandTelemetrySpan` | interface | Finish with finite outcome/count vocabulary after the boundary. |
+| `CommandTelemetryStart` | type alias | Name/version, requested or default isolation, provider and keyed state. |
+| `CommandTelemetryResult` | type alias | Finite outcome/idempotency/counts and optional bounded failure kind. |
+
+The executor freezes detached bounded I-JSON input before the two identity callbacks, each called
+once. Required keys are 16–256 UTF-8 bytes; scope and other identity/header strings are bounded to
+1–256 bytes. Identity uses exact canonical semantic material and a separate key digest, excluding
+scheme, correlation and W3C transport fields. Buffers include full side-row metadata in their shared
+byte budget; limits only tighten published defaults. Transactions receive a five-second timeout.
+
+Replay validates receipt material without handler/side writes. Busy and cancellation surface only
+after rollback; arbitrary business errors retain identity. Provider failures use the database-owned
+`CommandStoreError` contract. Audit, outbox and receipt completion share the winning receipt ID and
+flush in that order. Optional unkeyed attempts skip receipts. The telemetry port prepares the later
+adapter; no transport, hidden retry or production fault option is provided.
+
+### Command conformance fixtures
+
+The focused `@netscript/service/commands/testing` subpath provides an instance-bound
+`CommandFaultController`, `createTestingCommandExecutor()` and a generic
+`CommandConformanceFixture<TTx>`. Production executor options contain no fault controls. The testing
+factory uses the production algorithm and the exact seven command boundaries, including a
+postcommit response-loss boundary whose same-key retry must replay the original receipt.
+
+`runCommandConformance(createFixture)` checks atomic rollback and recovery, ordered side writes,
+replay/mismatch and namespace/version changes, corrupt replay, CAS, cancellation, busy, callback
+counts and retry refusal. `createMemoryCommandConformanceFixture()` supplies a simulated fixture.
+An outside-transaction business write is an explicit negative control: the shared suite must detect
+its surviving effect after rollback. Database-owned store/row types and the generic business handle
+allow provider adapters to supply their own inspection and fixture operations. This finite suite
+certifies no real driver, locking strategy or pooled session settings.
+
+`assertCommandDeterminism()` samples actual scope/fingerprint identity logic over equivalent frozen
+inputs and actor material, without a transaction or handler. Its bounded 2–32 samples (default four)
+can detect changing closure state in those invocations; `sampled_equivalence` is no universal purity
+proof. Supplied provider operations need their own permissions; imports and simulated fixtures do
+not.
+
+Future traceparent fields remain opaque after known W3C prefix validation, with a bounded HTTP
+field-value guard rejecting CR, LF, NUL and other ASCII control bytes except HTAB. SP, HTAB and
+obs-text remain accepted in the opaque suffix; empty tracestate positives are preserved. This follows
+[RFC9110 field values](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.5) and
+[W3C traceparent versioning](https://www.w3.org/TR/trace-context/#versioning-of-traceparent).

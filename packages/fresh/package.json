@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@durable-streams/client": "catalog:",
     "@durable-streams/state": "catalog:",
     "@preact/signals": "catalog:",
     "@tanstack/preact-query": "catalog:",

@@ -1,0 +1,3 @@
+# Lane C Anthropic close record
+
+PR https://github.com/rickylabs/netscript/pull/2078 . Run `.llm/runs/fix-anthropic-forward-compatible-2063--urgent-canary/`. Exact-ID scoped correction rejects defined top_k including zero and permits null effort; independent source PASS and matching mutation controls recorded. Review threads answered with pushed source and evidence. Current-source test and close-gate jobs passed; CI quality still blocked by shared critical audit. Released-version adoption acceptance remains unpublished and is not claimed. Owner dependency maintenance and later release validation remain; no merge or publication. This session record adds no runtime source change.

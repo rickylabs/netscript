@@ -1,0 +1,1 @@
+{"source":{"mode":"selection","cwd":"<worktree>"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":142,"batches":2,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}

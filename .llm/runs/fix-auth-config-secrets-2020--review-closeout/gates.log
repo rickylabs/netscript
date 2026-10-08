@@ -1,0 +1,23 @@
+EXIT deno task gen:agent-docs-prose 0
+EXIT deno task gen:assets-barrel 0
+EXIT deno task gen:publish-assets 0
+EXIT deno run --allow-read --allow-run=git --allow-write=.llm/tools/validation/fixtures .llm/tools/validation/aspire-surface-manifest.ts 0
+EXIT deno task check 0
+EXIT deno task lint 0
+EXIT deno task fmt:check 0
+EXIT deno task test packages/cli 1
+EXIT deno task audit:critical 0
+EXIT deno task quality:gate 0
+EXIT deno task check:aspire-version-parity 0
+EXIT deno task check:agent-docs-prose 0
+EXIT deno task check:assets-barrel 0
+EXIT deno task check:publish-assets 0
+EXIT deno task check:emitted-samples 0
+EXIT deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-lint.ts --config .llm/runs/fix-auth-config-secrets-2020--review-closeout/cli-quality-config.json --file packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts --file packages/cli/e2e/tests/application/builders/runtime-auth-env_test.ts --file packages/cli/e2e/tests/application/builders/runtime-gates_test.ts --file packages/cli/src/kernel/templates/aspire/helpers/register/resolve-resource-environment.ts --file packages/cli/src/public/features/plugins/auth/auth-config-security_test.ts --file packages/cli/src/public/features/plugins/auth/auth-env.ts --file packages/cli/src/public/features/plugins/auth/auth-env_test.ts --file packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts 0
+EXIT deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --config .llm/runs/fix-auth-config-secrets-2020--review-closeout/cli-quality-config.json --file packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts --file packages/cli/e2e/tests/application/builders/runtime-auth-env_test.ts --file packages/cli/e2e/tests/application/builders/runtime-gates_test.ts --file packages/cli/src/kernel/templates/aspire/helpers/register/resolve-resource-environment.ts --file packages/cli/src/public/features/plugins/auth/auth-config-security_test.ts --file packages/cli/src/public/features/plugins/auth/auth-env.ts --file packages/cli/src/public/features/plugins/auth/auth-env_test.ts --file packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts 0
+EXIT deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli --out runs/2026-10-08-review-closeout/jsr-audit.json 1
+EXIT deno task doc:lint --root packages/cli --pretty 0
+EXIT deno task docs:links 0
+EXIT deno task e2e:cli run scaffold.runtime --cleanup --format pretty 1
+EXIT deno task test packages/cli 0
+EXIT deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli 0

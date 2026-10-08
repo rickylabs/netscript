@@ -1,0 +1,7 @@
+# Bounded independent IMPL-EVAL
+
+Read owner HARNESS directive, repo AGENTS/harness evaluator protocol and this run supervisor/plan/research/worklog. Evaluate current HEAD PR2078 continuation against baseline 6f6cbdf, focusing ONLY the two guards and expanded assertions in the latest product slice. Earlier independent source evaluations remain in the prior run. Record independent verdict and exact HEAD in this run evaluate.md. Use opencode-go/glm-5.3-flash max in this independent session; no self-certification.
+
+Verify null effort reaches native wire through request providerOptions and per-call modelOptions; supplied top_k zero rejected pre-IO on each exact current model. Run focused structured regression wrapper. Assess isolated mutations already recorded; reproduce if needed, always restore byte-identically. Record shared main audit as pre-existing separate owner blocker, not request unrelated dependency maintenance in this source slice. Do not claim stable publication or released consumer acceptance.
+
+No source/config/lock changes, no worktrees/branch switching/pushing/PR changes. All writes restricted to this checkout or provided TMPDIR. No repo-wide forensic reruns, live inference or CI waiting. Product-only audit: API/export graph unchanged, carriers already pass pinned Deno freshness. Pinned Deno on PATH. Keep public evaluate.md free of operator locations, endpoints, credential values and usage counts. Retain truthful failures and distinguish baseline from introduced findings.

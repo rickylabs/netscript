@@ -1,3 +1,13 @@
+/**
+ * Prisma SQL JSON serialization extensions and field registration contracts.
+ *
+ * @example
+ * ```ts
+ * import { registerJsonFields } from '@netscript/database/extensions';
+ * registerJsonFields('Example', ['metadata']);
+ * ```
+ * @module
+ */
 // SQL JSON Extension - handles JSON serialization for databases that store JSON as text
 // (MSSQL stores as NVARCHAR(MAX), MySQL can use TEXT/VARCHAR instead of native JSON)
 export {

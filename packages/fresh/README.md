@@ -233,9 +233,9 @@ The always-current symbol list is
 ### Preserve server cache age during hydration
 
 When a loader supplies `initialData` to an island query, also pass the timestamp at which that
-snapshot was loaded as `initialDataUpdatedAt`. The public `useQuery` wrapper seeds both the value and
-that timestamp into the shared client, so `staleTime` is measured from the server load instead of
-from browser hydration:
+snapshot was loaded as `initialDataUpdatedAt`. The public `useQuery` wrapper seeds both the value
+and that timestamp into the shared client, so `staleTime` is measured from the server load instead
+of from browser hydration:
 
 ```tsx
 import { useQuery } from '@netscript/fresh/query';
@@ -293,13 +293,28 @@ JSR with cryptographically verified provenance.
 
 SDK query collections and Fresh live queries share TanStack DB **0.6.17** with
 `@tanstack/query-db-collection` **1.2.1**, `@tanstack/react-db` **0.1.95**, and
-`@durable-streams/state` **0.3.1**. These exact declarations are intentional:
-compatible version ranges alone can admit different Collection constructors.
-Upgrade the family together and run `deno task deps:check:db`, which resolves
-both a mixed SDK/Fresh consumer and a Fresh-only consumer without a workspace
-lock or warm cache and rejects multiple complete DB identities, including peer
+`@durable-streams/state` **0.3.1**. These exact declarations are intentional: compatible version
+ranges alone can admit different Collection constructors. Upgrade the family together and run
+`deno task deps:check:db`, which resolves both a mixed SDK/Fresh consumer and a Fresh-only consumer
+without a workspace lock or warm cache and rejects multiple complete DB identities, including peer
 resolution suffixes. The guard also rejects unresolved modules.
 
-After coordinated publication, qualify a fresh consumer of the fixed published
-SDK and Fresh versions with no application dependency overrides before removing
-downstream DB pins. Source qualification does not prove published resolution.
+After coordinated publication, qualify a fresh consumer of the fixed published SDK and Fresh
+versions with no application dependency overrides before removing downstream DB pins. Source
+qualification does not prove published resolution.
+
+Desktop RPC keeps one native binding per window. With the matching SDK desktop adapter, a new
+browser document automatically retires its previous MessagePort before opening a new oRPC channel.
+Older document callbacks cannot close the replacement. Application shutdown still calls the
+binding's idempotent `close()` method. Custom two-argument invoke adapters keep their existing
+lifecycle; automatic document reconnection requires the coordinated SDK and Fresh release.
+
+### StreamDB recovery
+
+The default `createNetScriptStreamDB` handle starts with `await db.preload?.()`. Its finite
+reconnect policy resumes the last consumed batch and retains the same reactive collections.
+`db.status` exposes liveness and terminal failure. Configure `reconnect.maxRetries`,
+`initialDelayMs`, and `maxDelayMs` to bound an outage; zero retries disables recovery.
+Authentication, malformed data, subscriber errors and invalid retained offsets fail without silently
+replaying the log. Stop or dispose cancels reads and backoff and is idempotent. Alternate factory
+adapters may omit these optional lifecycle hooks.

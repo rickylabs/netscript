@@ -1,0 +1,7 @@
+# Research
+
+MCP find_guidance and search_docs consulted before implementation; broad retrieval did not cover release machinery, so netscript-release and direct existing release code are load-bearing authority. fetchClosedIssues requests a single search page and silently returns empty on failure. GitHub Search supports page/per_page and caps each query at 1000 results; incomplete_results may indicate timeout. Primary authority: https://docs.github.com/en/rest/search/search . Existing merged-PR generation uses native releases/generate-notes, with no client-side page/item limit; inspect and prove long body pass-through, rather than invent another collector.
+
+Current canary await directly invokes gh run watch --exit-status. Failed-pair handler equates watcher failure to failed child even if still running. Native gh run view supports status/conclusion JSON fields; terminal observation is authority, not watch process exit. Primary references: https://cli.github.com/manual/gh_run_watch and https://cli.github.com/manual/gh_run_view . Existing immutable tag/version dispatch and original source SHA pair must remain unchanged.
+
+Read-only credential scope check confirms workflow capability is available now, unlike older issue text. No publication or release dispatch needed to implement and validate. No package/plugin public exports, dependency/version or published CLI shapes change. Release-gate class is no-op for this repair, per harness release-gates; shared critical dependency advisory remains separate owner maintenance.

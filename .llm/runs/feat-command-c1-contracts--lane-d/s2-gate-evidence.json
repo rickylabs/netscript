@@ -1,0 +1,706 @@
+[
+  {
+    "gate": "check",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/run-deno-check.ts",
+      "--root",
+      "packages/service",
+      "--ext",
+      "ts"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 3.504,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":61,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "test",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      ".llm/tools/run-deno-test.ts",
+      "--output",
+      "<private-runtime>/s2-test-final.json",
+      "--",
+      "packages/service/tests/commands-codec_test.ts",
+      "packages/contracts/tests/commands-type_test.ts"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 1.804,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"report\":\"<private-runtime>/s2-test-final.json\",\"summary\":{\"passed\":14,\"failed\":0,\"ignored\":0,\"totalResults\":14,\"uniqueFailures\":0}}",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "lint",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/run-deno-lint.ts",
+      "--root",
+      "packages/service",
+      "--ext",
+      "ts"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 0.465,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"source\":{\"mode\":\"command\",\"cwd\":\"<checkout>\",\"exitCode\":1},\"selection\":{\"filesSelected\":61,\"batches\":1,\"failedBatches\":1},\"coverage\":{\"filesSelected\":61,\"filesProcessed\":61,\"droppedFiles\":[],\"refusals\":[]},\"summary\":{\"totalOccurrences\":3,\"uniqueOccurrences\":3,\"uniqueRules\":1,\"uniquePaths\":1},\"groups\":[{\"rule\":\"require-await\",\"message\":\"Async arrow function has no 'await' expression or 'await using' declaration.\",\"count\":3,\"paths\":[{\"path\":\"<checkout>/packages/service/tests/commands-codec_test.ts\",\"count\":3,\"locations\":[{\"line\":216,\"column\":61},{\"line\":277,\"column\":13},{\"line\":320,\"column\":20}]}]}]}",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "fmt",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/run-deno-fmt.ts",
+      "--root",
+      "packages/service",
+      "--ext",
+      "ts"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 0.335,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"command\":\"deno fmt --check\",\"cwd\":\"<checkout>\",\"mode\":\"check\",\"summary\":{\"filesSelected\":61,\"batches\":1,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"coverage\":{\"filesSelected\":61,\"filesProcessed\":61,\"droppedFiles\":[],\"refusals\":[]},\"findings\":[]}",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "docs-format",
+    "command": [
+      "deno",
+      "fmt",
+      "--check",
+      "docs/site/reference/contracts/index.md",
+      "docs/site/reference/service/index.md",
+      "packages/service/README.md",
+      "packages/service/deno.json"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 0.069,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "Warning: config file file://<checkout>/docs/site/deno.json is not a member of the workspace at file://<checkout>/. Ignoring the parent workspace config.\nChecked 2 files",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "doc-lint-service",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "doc-lint",
+      "--id",
+      "c1-s2-service-doc-lint",
+      "--output",
+      "<private-runtime>/s2-service-doc-receipt.json",
+      "--",
+      "--root",
+      "packages/service"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 1.087,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"gateId\":\"doc-lint\",\"invocationId\":\"c1-s2-service-doc-lint\",\"argv\":[\"deno\",\"task\",\"doc:lint\",\"--root\",\"packages/service\"],\"cwd\":\"<checkout>\",\"gitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"actualGitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"timeoutMs\":1800000,\"runnerIdentity\":\"worker:3310740\",\"attempt\":1,\"schemaVersion\":1,\"requestHash\":\"573d1596b38ac9e09c8735e5f241d500e6c2fad95e2caaaadf7580ac8f253667\",\"lifecycleId\":\"worker:3310740:c1-s2-service-doc-lint:1\",\"outcome\":\"FAIL\",\"claimedAt\":\"2026-10-07T20:57:20.533Z\",\"startedAt\":\"2026-10-07T20:57:20.541Z\",\"finishedAt\":\"2026-10-07T20:57:21.493Z\",\"durationMs\":952,\"exitCode\":1,\"stdout\":{\"bytes\":1081,\"sha256\":\"149875a520bbe00a61b10adc500d58ee0bd95230ded1d949af1e7b7f725e1bd2\",\"tail\":\"{\\\"source\\\":{\\\"mode\\\":\\\"auto\\\",\\\"root\\\":\\\"packages/service\\\",\\\"entrypoints\\\":[\\\"./commands.ts\\\",\\\"./mod.ts\\\",\\\"./src/auth/mod.ts\\\",\\\"./src/primitives/rpc-path.ts\\\"],\\\"exitCode\\\":1},\\\"summary\\\":{\\\"totalPackages\\\":1,\\\"totalErrors\\\":2,\\\"totalPrivateTypeRef\\\":2,\\\"totalMissingJSDoc\\\":0,\\\"totalOther\\\":0},\\\"packages\\\":[{\\\"name\\\":\\\"@netscript/service\\\",\\\"dir\\\":\\\"packages/service\\\",\\\"entrypoints\\\":[{\\\"path\\\":\\\"./commands.ts\\\",\\\"privateTypeRef\\\":2,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":2},{\\\"path\\\":\\\"./mod.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0},{\\\"path\\\":\\\"./src/auth/mod.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0},{\\\"path\\\":\\\"./src/primitives/rpc-path.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0}],\\\"files\\\":[{\\\"path\\\":\\\"<checkout>/packages/service/src/commands/domain/definition.ts\\\",\\\"privateTypeRef\\\":2,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":2}],\\\"combinedTotal\\\":2,\\\"combinedPrivateTypeRef\\\":2,\\\"combinedMissingJSDoc\\\":0,\\\"combinedOther\\\":0,\\\"combinedExitCode\\\":1,\\\"entrypointExitCodes\\\":{\\\"./commands.ts\\\":1,\\\"./mod.ts\\\":0,\\\"./src/auth/mod.ts\\\":0,\\\"./src/primitives/rpc-path.ts\\\":0}}]}\\n\",\"truncated\":false},\"stderr\":{\"bytes\":122,\"sha256\":\"b80c96ea9ec041fc23e0fce86b7d0c1fdeb2d8e0da001b59fc0aaa2727c7fea5\",\"tail\":\"Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/service'\\n\",\"truncated\":false}}",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "doc-lint-contracts",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "doc-lint",
+      "--id",
+      "c1-s2-contracts-doc-lint",
+      "--output",
+      "<private-runtime>/s2-contracts-doc-receipt.json",
+      "--",
+      "--root",
+      "packages/contracts"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 0.825,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"gateId\":\"doc-lint\",\"invocationId\":\"c1-s2-contracts-doc-lint\",\"argv\":[\"deno\",\"task\",\"doc:lint\",\"--root\",\"packages/contracts\"],\"cwd\":\"<checkout>\",\"gitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"actualGitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"timeoutMs\":1800000,\"runnerIdentity\":\"worker:3311076\",\"attempt\":1,\"schemaVersion\":1,\"requestHash\":\"154a7470796939ce384ac3fe863a6a699e6d755c71b45e0aa696ff26ad4aa2e5\",\"lifecycleId\":\"worker:3311076:c1-s2-contracts-doc-lint:1\",\"outcome\":\"FAIL\",\"claimedAt\":\"2026-10-07T20:57:21.604Z\",\"startedAt\":\"2026-10-07T20:57:21.606Z\",\"finishedAt\":\"2026-10-07T20:57:22.321Z\",\"durationMs\":714,\"exitCode\":1,\"stdout\":{\"bytes\":1469,\"sha256\":\"a54487b5aa3251c17bfac3fe5b3a5505de37c1dab1c94b2b3a0c45001d35c64a\",\"tail\":\"{\\\"source\\\":{\\\"mode\\\":\\\"auto\\\",\\\"root\\\":\\\"packages/contracts\\\",\\\"entrypoints\\\":[\\\"./commands.ts\\\",\\\"./crud.ts\\\",\\\"./mod.ts\\\",\\\"./query.ts\\\",\\\"./transform.ts\\\"],\\\"exitCode\\\":1},\\\"summary\\\":{\\\"totalPackages\\\":1,\\\"totalErrors\\\":17,\\\"totalPrivateTypeRef\\\":17,\\\"totalMissingJSDoc\\\":0,\\\"totalOther\\\":0},\\\"packages\\\":[{\\\"name\\\":\\\"@netscript/contracts\\\",\\\"dir\\\":\\\"packages/contracts\\\",\\\"entrypoints\\\":[{\\\"path\\\":\\\"./commands.ts\\\",\\\"privateTypeRef\\\":16,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":16},{\\\"path\\\":\\\"./crud.ts\\\",\\\"privateTypeRef\\\":14,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":14},{\\\"path\\\":\\\"./mod.ts\\\",\\\"privateTypeRef\\\":8,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":8},{\\\"path\\\":\\\"./query.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0},{\\\"path\\\":\\\"./transform.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0}],\\\"files\\\":[{\\\"path\\\":\\\"<checkout>/packages/contracts/src/application/command-contract.ts\\\",\\\"privateTypeRef\\\":8,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":8},{\\\"path\\\":\\\"<checkout>/packages/contracts/src/application/contract-primitives.ts\\\",\\\"privateTypeRef\\\":8,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":8},{\\\"path\\\":\\\"<checkout>/packages/contracts/crud/create-crud-contract.ts\\\",\\\"privateTypeRef\\\":1,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":1}],\\\"combinedTotal\\\":17,\\\"combinedPrivateTypeRef\\\":17,\\\"combinedMissingJSDoc\\\":0,\\\"combinedOther\\\":0,\\\"combinedExitCode\\\":1,\\\"entrypointExitCodes\\\":{\\\"./commands.ts\\\":1,\\\"./crud.ts\\\":1,\\\"./mod.ts\\\":1,\\\"./query.ts\\\":0,\\\"./transform.ts\\\":0}}]}\\n\",\"truncated\":false},\"stderr\":{\"bytes\":124,\"sha256\":\"25cbdb472fe92b4e3fbef41d9870c9e6acdc919268a1214ce42b4fb6afb7d5ca\",\"tail\":\"Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/contracts'\\n\",\"truncated\":false}}",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "quality-scan",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "quality-scan",
+      "--id",
+      "c1-s2-quality-scan",
+      "--output",
+      "<private-runtime>/s2-quality-receipt.json"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 3.329,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "arch-check",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "arch-check",
+      "--id",
+      "c1-s2-arch-check",
+      "--output",
+      "<private-runtime>/s2-arch-receipt.json"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 7.517,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"gateId\":\"arch-check\",\"invocationId\":\"c1-s2-arch-check\",\"argv\":[\"deno\",\"task\",\"arch:check\"],\"cwd\":\"<checkout>\",\"gitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"actualGitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"timeoutMs\":1800000,\"runnerIdentity\":\"worker:3312694\",\"attempt\":1,\"schemaVersion\":1,\"requestHash\":\"2a0ab3d8fed1934ef02e07bc77f20d949c45832388e7c999b29b9a6491950a55\",\"lifecycleId\":\"worker:3312694:c1-s2-arch-check:1\",\"outcome\":\"PASS\",\"claimedAt\":\"2026-10-07T20:57:25.777Z\",\"startedAt\":\"2026-10-07T20:57:25.780Z\",\"finishedAt\":\"2026-10-07T20:57:33.176Z\",\"durationMs\":7396,\"exitCode\":0,\"stdout\":{\"bytes\":42607,\"sha256\":\"acf0b15b1a7b71abaf354e40566b7504d43fce816575e7626d4b07b0efccab2b\",\"tail\":\"pare-flow-b-fixture.ts:238)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/kernel/adapters/database/scaffolder.ts:44)\\n# Doctrine readiness \u2014 config\\n  FAIL=0 WARN=2 INFO=1\\n  WARN A8/AP-1/F-1: file is 635 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/config-section-types.ts)\\n  WARN A8/AP-1/F-1: file is 317 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/schemas/deploy-schema.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 contracts\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A1/A2/A7: exports Result/Either/Option-style contract \u2014 keep it package-specific, documented, and inline unless multiple real consumers justify a shared contract (src/domain/result.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 cron\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 database\\n  FAIL=0 WARN=7 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN A8/AP-1/F-1: file is 642 lines (cap 500) \u2014 split into smaller single-reason files (extensions/sql-json.extension.ts)\\n  WARN A8/AP-1/F-1: file is 530 lines (cap 500) \u2014 split into smaller single-reason files (adapters/mssql.adapter.ts)\\n  WARN A8/AP-1/F-1: file is 555 lines (cap 500) \u2014 split into smaller single-reason files (scripts/fix-zod-imports.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (scripts/migrate.ts)\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (scripts/generate-zod.ts)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (extensions/sql-json.extension.ts:641)\\n# Doctrine readiness \u2014 fresh\\n  FAIL=0 WARN=4 INFO=1\\n  WARN A8/AP-1/F-1: file is 604 lines (cap 500) \u2014 split into smaller single-reason files (src/application/route/manifest.ts)\\n  WARN A8/AP-1/F-1: file is 501 lines (cap 500) \u2014 split into smaller single-reason files (src/runtime/navigation/coordinator.ts)\\n  WARN A8/AP-1/F-1: file is 621 lines (cap 500) \u2014 split into smaller single-reason files (src/runtime/ai/create-chat-connection.ts)\\n  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/runtime/ai)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 fresh-ui\\n  FAIL=0 WARN=5 INFO=1\\n  WARN AP-16/F-11: forbidden folder name 'lib' \u2014 split into domain/, application/, or adapters/ aligned to a real concern (registry/lib)\\n  WARN A8/AP-1/F-1: file is 1512 lines (cap 500) \u2014 split into smaller single-reason files (registry.manifest.ts)\\n  WARN A8/AP-1/F-1: file is 669 lines (cap 500) \u2014 split into smaller single-reason files (src/chat/parse-blocks.ts)\\n  WARN F-16: directory has 16 immediate children; doctrine cap is 12\\n  WARN F-16: directory has 99 immediate children; doctrine cap is 12 (registry/components/ui)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 kv\\n  FAIL=0 WARN=5 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN A8/AP-1/F-1: file is 541 lines (cap 500) \u2014 split into smaller single-reason files (adapters/memory.adapter.ts)\\n  WARN A8/AP-1/F-1: file is 827 lines (cap 500) \u2014 split into smaller single-reason files (adapters/redis.adapter.ts)\\n  WARN A8/AP-1/F-1: file is 674 lines (cap 500) \u2014 split into smaller single-reason files (adapters/denokv-bridge.ts)\\n  WARN A8/AP-1/F-1: file is 592 lines (cap 500) \u2014 split into smaller single-reason files (adapters/deno-kv.adapter.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 logger\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 mcp\\n  FAIL=0 WARN=3 INFO=1\\n  WARN A8/AP-1/F-1: file is 401 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/tool-contracts.ts)\\n  WARN F-16: directory has 16 immediate children; doctrine cap is 12 (src/application/flows)\\n  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/domain)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 plugin\\n  FAIL=0 WARN=2 INFO=1\\n  WARN F-16: directory has 17 immediate children; doctrine cap is 12 (src)\\n  WARN F-16: directory has 16 immediate children; doctrine cap is 12 (src/config/domain)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 plugin-ai-core\\n  FAIL=0 WARN=1 INFO=0\\n  WARN A8/AP-1/F-1: file is 310 lines (cap 300) \u2014 split into smaller single-reason files (src/contracts/v1/ai.contract-schemas.ts)\\n# Doctrine readiness \u2014 plugin-auth-core\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A8/AP-1/F-1: file is 546 lines (cap 500) \u2014 split into smaller single-reason files (src/contracts/v1/auth.contract.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 plugin-sagas-core\\n  FAIL=0 WARN=3 INFO=2\\n  WARN A8/AP-1/F-1: file is 739 lines (cap 500) \u2014 split into smaller single-reason files (src/contracts/v1/sagas.contract.ts)\\n  WARN A8/AP-1/F-1: file is 550 lines (cap 500) \u2014 split into smaller single-reason files (src/runtime/saga-engine.ts)\\n  WARN F-16: directory has 19 immediate children; doctrine cap is 12 (src)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n# Doctrine readiness \u2014 plugin-streams-core\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A8/AP-1/F-1: file is 515 lines (cap 500) \u2014 split into smaller single-reason files (src/application/durable-stream-producer-supervisor.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 plugin-triggers-core\\n  FAIL=0 WARN=3 INFO=2\\n  WARN A8/AP-1/F-1: file is 722 lines (cap 500) \u2014 split into smaller single-reason files (src/contracts/v1/triggers.contract.ts)\\n  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/ports)\\n  WARN F-16: directory has 15 immediate children; doctrine cap is 12 (src/runtime)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n# Doctrine readiness \u2014 plugin-workers-core\\n  FAIL=0 WARN=5 INFO=2\\n  WARN A8/AP-1/F-1: file is 611 lines (cap 500) \u2014 split into smaller single-reason files (src/contracts/v1/workers.contract-definition.ts)\\n  WARN A8/AP-1/F-1: file is 426 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/task.ts)\\n  WARN A8/AP-1/F-1: file is 308 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/job-spec.ts)\\n  WARN F-16: directory has 18 immediate children; doctrine cap is 12 (src)\\n  WARN F-16: directory has 15 immediate children; doctrine cap is 12 (src/executor/adapters)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n# Doctrine readiness \u2014 prisma-adapter-mysql\\n  FAIL=0 WARN=2 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN A8/AP-1/F-1: file is 816 lines (cap 500) \u2014 split into smaller single-reason files (src/adapter.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 queue\\n  FAIL=0 WARN=2 INFO=1\\n  WARN A8/AP-1/F-1: file is 582 lines (cap 500) \u2014 split into smaller single-reason files (adapters/postgres.adapter.ts)\\n  WARN A8/AP-1/F-1: file is 785 lines (cap 500) \u2014 split into smaller single-reason files (adapters/kv-polling.adapter.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 runtime-config\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 sdk\\n  FAIL=0 WARN=1 INFO=1\\n  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 service\\n  FAIL=0 WARN=3 INFO=1\\n  WARN A5/AP-5/F-4: class Gq sits 3+ levels deep in inheritance chain \u2014 prefer composition\\n  WARN A5/AP-5/F-4: class dW sits 3+ levels deep in inheritance chain \u2014 prefer composition\\n  WARN A8/AP-1/F-1: file is 577 lines (cap 500) \u2014 split into smaller single-reason files (src/builder/service-builder-impl.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 telemetry\\n  FAIL=0 WARN=5 INFO=1\\n  WARN A8/AP-1/F-1: file is 539 lines (cap 500) \u2014 split into smaller single-reason files (src/instrumentation/scheduler.ts)\\n  WARN A8/AP-1/F-1: file is 672 lines (cap 500) \u2014 split into smaller single-reason files (src/instrumentation/worker.ts)\\n  WARN F-16: directory has 15 immediate children; doctrine cap is 12\\n  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/attributes)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (src/adapters/otel/otel-sdk.ts)\\n# Doctrine readiness \u2014 watchers\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 ai\\n  FAIL=0 WARN=5 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (cli.ts)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:40)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/chat-route/chat-route.stub.ts:41)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:25)\\n# Doctrine readiness \u2014 auth\\n  FAIL=0 WARN=4 INFO=1\\n  WARN F-16: directory has 13 immediate children; doctrine cap is 12\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (services/src/main.ts:54)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n# Doctrine readiness \u2014 sagas\\n  FAIL=0 WARN=8 INFO=2\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN A8/AP-1/F-1: file is 374 lines (cap 300) \u2014 split into smaller single-reason files (services/src/routers/v1-types.ts)\\n  WARN F-16: directory has 15 immediate children; doctrine cap is 12\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/saga/saga.stub.ts:60)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/saga/saga.stub.ts:95)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (services/src/main.ts:46)\\n# Doctrine readiness \u2014 streams\\n  FAIL=0 WARN=5 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/consumer/consumer.stub.ts:78)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/stream/stream.stub.ts:84)\\n# Doctrine readiness \u2014 triggers\\n  FAIL=0 WARN=13 INFO=2\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN F-16: directory has 17 immediate children; doctrine cap is 12\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (generic-webhook.ts:40)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (webhook-validate-data.ts:35)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/webhook/webhook.stub.ts:46)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/webhook/webhook.stub.ts:109)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/file-watch/file-watch.stub.ts:43)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/scheduled/scheduled.stub.ts:43)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (jobs/staged-cleanup.ts:78)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (jobs/file-import.ts:187)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (jobs/file-relay.ts:189)\\n# Doctrine readiness \u2014 workers\\n  FAIL=0 WARN=10 INFO=2\\n  WARN A8/AP-1/F-1: file is 571 lines (cap 500) \u2014 split into smaller single-reason files (src/cli/runtime-registry-generator.ts)\\n  WARN F-16: directory has 19 immediate children; doctrine cap is 12\\n  WARN F-16: directory has 19 immediate children; doctrine cap is 12 (worker)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (test-api.ts)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (services/src/main.ts:45)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (jobs/health-check.ts:282)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/job/job.stub.ts:33)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/cli/official-sample-configuration.ts:416)\\n\",\"truncated\":true},\"stderr\":{\"bytes\":485,\"sha256\":\"d383a582d1a3ab53409417a624b04062624331ae3ada6bd36a8fb15ed8e33cc6\",\"tail\":\"Task arch:check deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots\\nTask deps:check deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod\\nTask deps:check:zod deno run --allow-read .llm/tools/deps/check-zod-alignment.ts\\n\",\"truncated\":false}}",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "exports-drift",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "exports-drift",
+      "--id",
+      "c1-s2-exports-drift",
+      "--output",
+      "<private-runtime>/s2-exports-receipt.json"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 8.858,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"gateId\":\"exports-drift\",\"invocationId\":\"c1-s2-exports-drift\",\"argv\":[\"deno\",\"task\",\"docs:exports-drift\"],\"cwd\":\"<checkout>\",\"gitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"actualGitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"timeoutMs\":1800000,\"runnerIdentity\":\"worker:3317094\",\"attempt\":1,\"schemaVersion\":1,\"requestHash\":\"9d4103724100520fde1f8a08bcd10b95db13b7fba4291731f2aee3ad2fcf90b4\",\"lifecycleId\":\"worker:3317094:c1-s2-exports-drift:1\",\"outcome\":\"FAIL\",\"claimedAt\":\"2026-10-07T20:57:33.286Z\",\"startedAt\":\"2026-10-07T20:57:33.288Z\",\"finishedAt\":\"2026-10-07T20:57:42.035Z\",\"durationMs\":8748,\"exitCode\":1,\"stdout\":{\"bytes\":13292,\"sha256\":\"56325603e731042fdf6f0591bc21dca393460841c7c12bd900e564b935295ad1\",\"tail\":\"Reference page coverage: PASS (36/36; mapped=35; excluded=1)\\nCoverage [fresh]: mode=entrypoints-only; reason=\\\"The page guarantees all seventeen entrypoints, but four have no per-symbol tables and the server, builders, route, form, streams, query, and Vite sections omit query-cache invalidation, routed-partial and schema, form-navigation, SSE protocol, and Vite hook contracts.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-workers-core]: mode=entrypoints-only; reason=\\\"The page guarantees all seventeen entrypoints and inventories all 32 root exports, but omits subpath-only APIs including JobBuilderState, WorkersRuntime, PublicDefinitionSchema, WorkersContractV1, WorkersConfig, WorkerInstrumentation, and TestWorkersRuntime.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-sagas-core]: mode=entrypoints-only; reason=\\\"The page documents every entrypoint and the complete root and agent surfaces, but omits substantial subpath contracts such as transport codecs, store adapters, telemetry contracts, and config schemas.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-sagas]: mode=entrypoints-only; reason=\\\"All fourteen entrypoints were checked with deno doc; the page documents 56 of 236 exported symbols and omits broad CLI command/backend contracts, runtime delivery/projection/scheduler/publisher details, contract schemas, E2E and scaffold protocols, and server-side stream wiring.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-triggers]: mode=entrypoints-only; reason=\\\"All eleven entrypoints were checked with deno doc; the page documents 17 of 150 exported symbols and omits broad trigger CLI command/backend contracts, runtime definitions and action/durability/port contracts, scaffold protocols, service helpers, and stream database/server wiring.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-workers]: mode=entrypoints-only; reason=\\\"All thirteen entrypoints were checked with deno doc; the page documents 125 of 175 exported symbols and omits CLI job/task/workflow commands and runtime API clients, adapter and doctor contracts, health-check job contracts, generated-registry/runtime helpers, scaffold protocols, and project-file utilities.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [ai]: mode=entrypoints-only; reason=\\\"The page guarantees all thirteen entrypoints but does not yet inventory every symbol: /skills has no dedicated symbol section; the root prompt APIs, OpenAI-compatible vision exports, Ollama HttpReachabilityConfig, MCP pool/resource APIs, AgentLoop, newer contract/reasoning symbols, vector-memory and provider-factory ports, and retrieval testing helpers remain incomplete.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [auth-kv-oauth]: mode=entrypoints-only; reason=\\\"All eight entrypoints were checked with deno doc; the page omits AUTH_SESSION_STATES, AtomicCheck, AtomicMutation, AtomicResult, AuthBackendPort, AuthPrincipalMapperPort, AuthProviderCapability, AuthProviderDescriptor, AuthProviderRegistryPort, AuthSession, AuthSessionCreateInput, AuthSessionCryptoPort, AuthSessionLookup, AuthSessionPrincipalMapping, AuthSessionState, AuthSessionStorePort, AuthenticatorPort, AuthnRequest, AuthnResult, ClientAuthMethod, InteractiveCallbackResult, InteractiveFlowPort, KvEntry, KvKey, KvListOptions, KvOAuthCookieOptions, KvOAuthEncryptedTokens, KvOAuthErrorCode, KvOAuthFetch, KvOAuthJsonValidator, KvOAuthKeyMaterial, KvOAuthPrincipal, KvOAuthRefreshMode, KvOAuthSessionRecord, KvOAuthStoreOptions, KvOAuthTxn, KvSetOptions, KvStore, NormalizePrincipalContext, OAuthCustomFetch, OAuthEndpointProviderConfig, OAuthIssuerProviderConfig, OAuthProviderBaseConfig, OAuthProviderClientAuthConfig, OAuthTokenCustomFetch, Principal, TenantOAuthProviderOptions, WatchEvent, WatchOptions, WatchPrefixOptions, WatchableKv, clientAuth, describeProvider, discoveryRequestOptions, hashToken, and requestOptions.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-triggers-core]: mode=entrypoints-only; reason=\\\"The page guarantees all twelve entrypoints and completely inventories the root/public/builders surface, while omitting substantial domain defaults/errors, port defer/clock contracts, adapter/store implementations, config and v1 contract schemas, telemetry types, and testing doubles reported by deno doc.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-auth-core]: mode=entrypoints-only; reason=\\\"All nine entrypoints were checked with deno doc; the page omits AUTH_PRESET_KINDS, Account, AccountState, AttributeValue, Attributes, AuthAttributeName, AuthAttributes, AuthAttributesMap, AuthBackendPreset, AuthCapabilities, AuthConfigInput, AuthContract, AuthContractDefinition, AuthContractV1, AuthErrorCode, AuthErrorCodeMap, AuthErrorCodeValue, AuthOperationInput, AuthOperationRecorder, AuthOutcome, AuthOutcomeMap, AuthOutcomeValue, AuthPresetDefinition, AuthPresetKind, AuthPresetRegistry, AuthProviderConfig, AuthProviderPreset, AuthRouter, AuthSchema, AuthSchemaResult, AuthSessionPolicy, AuthSessionPrincipalMapping, AuthSessionResponse, AuthSessionResponseSchema, AuthSpanEventName, AuthSpanEvents, AuthSpanEventsMap, AuthSpanName, AuthSpanNames, AuthSpanNamesMap, AuthStreamDefinition, AuthStreamEventSchema, AuthStreamEventType, AuthStreamSessionSchema, AuthTelemetry, AuthTelemetryAttributeValue, AuthTelemetryAttributes, AuthTelemetryOperation, AuthTelemetryOptions, AuthUserResponse, AuthUserResponseSchema, AuthenticatorPort, AuthnRequest, AuthnResult, BuildAuthSessionOptions, BuildAuthUserOptions, CallbackInput, CallbackInputSchema, CallbackResponse, CallbackResponseSchema, CollectionDefinition, CollectionEventHelpers, Context, Exception, InteractiveCallbackResult, Link, MeResponse, MeResponseSchema, Principal, RedactedAuthPrincipal, SerializedTraceContext, SessionInput, SessionInputSchema, SessionResponse, SessionResponseSchema, SigninInput, SigninInputSchema, SigninResponse, SigninResponseSchema, SignoutInput, SignoutInputSchema, SignoutResponse, SignoutResponseSchema, Span, SpanContext, SpanKind, SpanOptions, SpanStatus, SpanStatusCode, StateSchema, StreamStateDefinition, TimeInput, TraceState, Tracer, ValidationErrorData, buildAuthSession, and buildAuthUser.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-auth]: mode=entrypoints-only; reason=\\\"All nine entrypoints were checked with deno doc; the page documents 5 of 84 exported symbols and omits versioned auth contracts, schemas, router and session/user inputs and responses, service runtime types, stream event/schema/producer/database helpers, and scaffold and adapter CLI protocols.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [mcp]: mode=entrypoints-only; reason=\\\"The page guarantees all three entrypoints while curating selected root and CLI APIs: root/CLI exports such as createServiceEndpointDirectory, EndpointSourcePort, and MCP_AGENT_INSTRUCTIONS are omitted, and the OpenAPI projection symbols including indexOpenApiOperations, resolveCanonicalOperation, and projectOperationSchemaViews have no per-symbol section.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-streams-core]: mode=entrypoints-only; reason=\\\"The root table inventories all 51 exports, but the SSE table omits BindStreamEventSourceOptionsV1, Operation, the shared schema contracts, and 16 StreamSse* contract types; telemetry and testing are prose-only and therefore omit all 33 telemetry exports plus MemoryStreamEvent, MemoryStreamProducer, StreamTopicFixtureSchema, and createStreamTopicFixture from symbol tables.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-streams]: mode=entrypoints-only; reason=\\\"All seven entrypoints were checked with deno doc; the page documents 33 of 55 exported symbols and omits adapter CLI and scaffold protocol types, shared CLI and E2E contracts, the unsupportedStreamOperation helper, and Aspire contribution contracts.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [aspire]: mode=entrypoints-only; reason=\\\"The page maps the diagnostics root and eight typed config/composition subpaths while curating their primary APIs rather than every exported contract.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [cli]: mode=entrypoints-only; reason=\\\"The page guarantees the embeddable root plus scaffolding and testing entrypoints, with selected command and fixture tables rather than every CLI option type.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [watchers]: mode=entrypoints-only; reason=\\\"The page guarantees the root entrypoint and inventories the supported watcher APIs while deliberately classifying exported strategy implementations as internal.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [runtime-config]: mode=complete; reason=\\\"The single-entrypoint reference inventories every exported loader, accessor, diagnostic, type, constant, and alias reported by deno doc.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [prisma-adapter-mysql]: mode=entrypoints-only; reason=\\\"The page guarantees the root entrypoint and inventories primary adapter contracts while omitting the lower-level transaction options contract.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [auth-workos]: mode=entrypoints-only; reason=\\\"The page guarantees the root entrypoint and inventories WorkOS APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [auth-better-auth]: mode=entrypoints-only; reason=\\\"The page guarantees the root entrypoint and inventories Better Auth APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [cron]: mode=complete; reason=\\\"The page inventories every exported symbol across the root, ports, adapters, and testing entrypoints.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [database]: mode=entrypoints-only; reason=\\\"The page guarantees all ten driver, extension, script, tracing, and testing entrypoints while its tables focus on primary contracts and runners.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [fresh-ui]: mode=complete; reason=\\\"All six published entrypoints are maintained as one complete reference surface.\\\"; omitted-symbol-groups=0; documented-non-export-groups=1\\nCoverage [kv]: mode=entrypoints-only; reason=\\\"The page guarantees the root, Redis, kvdex, and testing entrypoints while summarizing kvdex compatibility re-exports in prose instead of a complete symbol table.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [logger]: mode=entrypoints-only; reason=\\\"The page guarantees the core, Hono middleware, and oRPC entrypoints, but inventories selected root primitives rather than both integration symbol surfaces.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin]: mode=entrypoints-only; reason=\\\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-ai-core]: mode=entrypoints-only; reason=\\\"The page inventories every root export and both entrypoints, but its contracts/v1 tables omit AiContractSchema, AiContractSchemaResult, JsonSchema, ReasoningChunk, and ToolParameters.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-ai]: mode=entrypoints-only; reason=\\\"All seven entrypoints were checked with deno doc; the page documents 24 of 88 exported symbols and omits adapter CLI and scaffold protocol types, adapter contracts, and much of the versioned AI contract vocabulary including message/content/chunk, model, tool, usage, and schema types.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [config]: mode=complete; reason=\\\"The config reference is maintained as a complete published-symbol inventory.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [contracts]: mode=complete; reason=\\\"The contracts reference is maintained as a complete published-symbol inventory.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [queue]: mode=entrypoints-only; reason=\\\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [sdk]: mode=entrypoints-only; reason=\\\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [service]: mode=entrypoints-only; reason=\\\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [telemetry]: mode=complete; reason=\\\"The telemetry reference curates stable entrypoints and primary APIs while classifying lower-level contracts explicitly.\\\"; omitted-symbol-groups=1; documented-non-export-groups=0\\n\",\"truncated\":false},\"stderr\":{\"bytes\":4605,\"sha256\":\"f7d5c9eedf703ca05029a36f88309c0ff33be724ede6e12b1f3a0769bbef1814\",\"tail\":\"Task docs:exports-drift deno run --no-lock --allow-read --allow-run=deno .llm/tools/docs/check-exports-drift.ts\\nDownload <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> <dependency-reference> Error [contracts]: Document at docs/site/reference/contracts/index.md OMITS exported entrypoint '@netscript/contracts/commands' (./commands.ts)\\nDrift Error [service]: Document at docs/site/reference/service/index.md OMITS exported entrypoint '@netscript/service/commands' (./commands.ts)\\n\",\"truncated\":false}}",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "gate": "deps-standard-schema",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/deps/why.ts",
+      "@standard-schema/spec"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 0.407,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "attemptLabel": "initial before owned lint/docs repairs",
+    "report": {
+      "package": "@standard-schema/spec",
+      "sourceUsed": true,
+      "sourceHitCount": 2,
+      "transitivelyPresent": false,
+      "likelyDeadImport": false,
+      "fullyRemovable": false,
+      "sourceHits": [
+        {
+          "file": "packages/service/src/commands/application/json-codec.ts",
+          "line": 1,
+          "text": "import type { StandardSchemaV1 } from '@standard-schema/spec';"
+        },
+        {
+          "file": "packages/service/tests/commands-codec_test.ts",
+          "line": 2,
+          "text": "import type { StandardSchemaV1 } from '@standard-schema/spec';"
+        }
+      ],
+      "why": "",
+      "sourceHitScope": "Follow-up direct service source references shown; full native report retained privately."
+    }
+  },
+  {
+    "gate": "deps-database",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/deps/why.ts",
+      "@netscript/database"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 0.456,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "attemptLabel": "initial before owned lint/docs repairs",
+    "report": {
+      "package": "@netscript/database",
+      "sourceUsed": true,
+      "sourceHitCount": 2,
+      "transitivelyPresent": false,
+      "likelyDeadImport": false,
+      "fullyRemovable": false,
+      "sourceHits": [
+        {
+          "file": "packages/service/src/commands/domain/definition.ts",
+          "line": 1,
+          "text": "import type { IsolationLevel } from '@netscript/database';"
+        },
+        {
+          "file": "packages/service/commands.ts",
+          "line": 44,
+          "text": "export type { IsolationLevel } from '@netscript/database';"
+        }
+      ],
+      "why": "",
+      "sourceHitScope": "Follow-up direct service source references shown; full native report retained privately."
+    }
+  },
+  {
+    "gate": "publish-service",
+    "command": [
+      "deno",
+      "run",
+      "--allow-all",
+      ".llm/tools/release/run-publish-dry-run.ts",
+      "--member",
+      "packages/service"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 5.35,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "\u256d Warning\n\u2502\n\u2502  Ignored build scripts for packages:\n\u2502  npm:lmdb@3.5.5\n\u2502  npm:msgpackr-extract@3.0.4\n\u2502\n\u2502  Lifecycle scripts are only supported when using a `node_modules` directory.\n\u2502  Enable it in your deno config file:\n\u2502  \"nodeModulesDir\": \"auto\"\n\u2570\u2500\nCheck mod.ts\nCheck src/auth/mod.ts\nCheck src/primitives/rpc-path.ts\nCheck commands.ts\nChecking for slow types in the public API...\nCheck mod.ts\nCheck src/auth/mod.ts\nCheck src/primitives/rpc-path.ts\nCheck commands.ts\nSimulating publish of @netscript/service@0.0.7 with files:\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/README.md (17.44KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/commands.ts (1.41KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/deno.json (1.33KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/mod.ts (5.05KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/adapters/runtime-host-budget-timer.ts (1.04KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/auth-middleware.ts (8.61KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/contract-authorizer.ts (9.58KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/contract-policy.ts (3.51KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/hono-context.ts (1.07KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/mod.ts (2.07KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/options.ts (2.57KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/scope-authorizer.ts (3KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/service-auth-policy.ts (2.55KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/static-credential-authenticator.ts (3.69KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/trusted-header-authenticator.ts (2.54KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/auth/types.ts (3.82KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/builder/service-builder-impl.ts (17.06KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/builder/service-builder.ts (5.74KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/builder/service-listener.ts (8.82KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/builder/service-rpc.ts (4.27KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/builder/service-shutdown.ts (4.98KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/commands/application/canonical-json.ts (7.04KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/commands/application/define-command.ts (4.49KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/commands/application/json-codec.ts (2.19KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/commands/domain/codec.ts (788B)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/commands/domain/definition.ts (4.13KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/commands/domain/failure.ts (4.27KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/commands/domain/values.ts (908B)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/diagnostics/database-connectivity.ts (14.94KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/presets/define-service.ts (8.32KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/primitives/handlers.ts (5.81KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/primitives/health.ts (7.09KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/primitives/openapi.ts (7.32KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/primitives/orpc-router.ts (393B)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/primitives/rpc-path.ts (1.62KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/primitives/scalar.generated.ts (3.31MB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/runtime/runtime-host.ts (6.64KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-9a520716dfea95d3/packages/service/src/types.ts (8.24KB)\nSuccess Dry run complete",
+    "attemptLabel": "initial before owned lint/docs repairs"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "check",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/run-deno-check.ts",
+      "--root",
+      "packages/service",
+      "--ext",
+      "ts"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 3.649,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":61,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "test",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      ".llm/tools/run-deno-test.ts",
+      "--output",
+      "<private-runtime>/s2-test-final.json",
+      "--",
+      "packages/service/tests/commands-codec_test.ts",
+      "packages/contracts/tests/commands-type_test.ts"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 2.026,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"report\":\"<private-runtime>/s2-test-final.json\",\"summary\":{\"passed\":14,\"failed\":0,\"ignored\":0,\"totalResults\":14,\"uniqueFailures\":0}}"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "lint",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/run-deno-lint.ts",
+      "--root",
+      "packages/service",
+      "--ext",
+      "ts"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 0.312,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"source\":{\"mode\":\"command\",\"cwd\":\"<checkout>\",\"exitCode\":0},\"selection\":{\"filesSelected\":61,\"batches\":1,\"failedBatches\":0},\"coverage\":{\"filesSelected\":61,\"filesProcessed\":61,\"droppedFiles\":[],\"refusals\":[]},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0},\"groups\":[]}"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "fmt",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/run-deno-fmt.ts",
+      "--root",
+      "packages/service",
+      "--ext",
+      "ts"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 0.183,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"command\":\"deno fmt --check\",\"cwd\":\"<checkout>\",\"mode\":\"check\",\"summary\":{\"filesSelected\":61,\"batches\":1,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"coverage\":{\"filesSelected\":61,\"filesProcessed\":61,\"droppedFiles\":[],\"refusals\":[]},\"findings\":[]}"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "manifest-readme-format",
+    "command": [
+      "deno",
+      "fmt",
+      "--check",
+      "packages/service/README.md",
+      "packages/service/deno.json"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 0.055,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "Checked 2 files"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "doc-lint-service",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "doc-lint",
+      "--id",
+      "c1-s2-service-doc-lint",
+      "--output",
+      "<private-runtime>/s2-service-doc-receipt.json",
+      "--",
+      "--root",
+      "packages/service"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 1.136,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"gateId\":\"doc-lint\",\"invocationId\":\"c1-s2-service-doc-lint\",\"argv\":[\"deno\",\"task\",\"doc:lint\",\"--root\",\"packages/service\"],\"cwd\":\"<checkout>\",\"gitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"actualGitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"timeoutMs\":1800000,\"runnerIdentity\":\"worker:3354569\",\"attempt\":1,\"schemaVersion\":1,\"requestHash\":\"6f3ef8aad73061a6f224fb8de847c5df69aa855e46daba71600e4c1ed6be2695\",\"lifecycleId\":\"worker:3354569:c1-s2-service-doc-lint:1\",\"outcome\":\"PASS\",\"claimedAt\":\"2026-10-07T20:59:12.502Z\",\"startedAt\":\"2026-10-07T20:59:12.504Z\",\"finishedAt\":\"2026-10-07T20:59:13.517Z\",\"durationMs\":1013,\"exitCode\":0,\"stdout\":{\"bytes\":919,\"sha256\":\"043da125d31c320ef7d5a8d21afe7361dac39cedced32ebdb7d042e58b9ab089\",\"tail\":\"{\\\"source\\\":{\\\"mode\\\":\\\"auto\\\",\\\"root\\\":\\\"packages/service\\\",\\\"entrypoints\\\":[\\\"./commands.ts\\\",\\\"./mod.ts\\\",\\\"./src/auth/mod.ts\\\",\\\"./src/primitives/rpc-path.ts\\\"],\\\"exitCode\\\":0},\\\"summary\\\":{\\\"totalPackages\\\":1,\\\"totalErrors\\\":0,\\\"totalPrivateTypeRef\\\":0,\\\"totalMissingJSDoc\\\":0,\\\"totalOther\\\":0},\\\"packages\\\":[{\\\"name\\\":\\\"@netscript/service\\\",\\\"dir\\\":\\\"packages/service\\\",\\\"entrypoints\\\":[{\\\"path\\\":\\\"./commands.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0},{\\\"path\\\":\\\"./mod.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0},{\\\"path\\\":\\\"./src/auth/mod.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0},{\\\"path\\\":\\\"./src/primitives/rpc-path.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0}],\\\"files\\\":[],\\\"combinedTotal\\\":0,\\\"combinedPrivateTypeRef\\\":0,\\\"combinedMissingJSDoc\\\":0,\\\"combinedOther\\\":0,\\\"combinedExitCode\\\":0,\\\"entrypointExitCodes\\\":{\\\"./commands.ts\\\":0,\\\"./mod.ts\\\":0,\\\"./src/auth/mod.ts\\\":0,\\\"./src/primitives/rpc-path.ts\\\":0}}]}\\n\",\"truncated\":false},\"stderr\":{\"bytes\":122,\"sha256\":\"b80c96ea9ec041fc23e0fce86b7d0c1fdeb2d8e0da001b59fc0aaa2727c7fea5\",\"tail\":\"Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/service'\\n\",\"truncated\":false}}"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "doc-lint-contracts",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "doc-lint",
+      "--id",
+      "c1-s2-contracts-doc-lint",
+      "--output",
+      "<private-runtime>/s2-contracts-doc-receipt.json",
+      "--",
+      "--root",
+      "packages/contracts"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 1.01,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"gateId\":\"doc-lint\",\"invocationId\":\"c1-s2-contracts-doc-lint\",\"argv\":[\"deno\",\"task\",\"doc:lint\",\"--root\",\"packages/contracts\"],\"cwd\":\"<checkout>\",\"gitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"actualGitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"timeoutMs\":1800000,\"runnerIdentity\":\"worker:3355328\",\"attempt\":1,\"schemaVersion\":1,\"requestHash\":\"3125d41d4770d344e844ce0c77793581c57163a8359fe02f1b7910675d52e406\",\"lifecycleId\":\"worker:3355328:c1-s2-contracts-doc-lint:1\",\"outcome\":\"FAIL\",\"claimedAt\":\"2026-10-07T20:59:13.659Z\",\"startedAt\":\"2026-10-07T20:59:13.661Z\",\"finishedAt\":\"2026-10-07T20:59:14.532Z\",\"durationMs\":871,\"exitCode\":1,\"stdout\":{\"bytes\":1469,\"sha256\":\"a54487b5aa3251c17bfac3fe5b3a5505de37c1dab1c94b2b3a0c45001d35c64a\",\"tail\":\"{\\\"source\\\":{\\\"mode\\\":\\\"auto\\\",\\\"root\\\":\\\"packages/contracts\\\",\\\"entrypoints\\\":[\\\"./commands.ts\\\",\\\"./crud.ts\\\",\\\"./mod.ts\\\",\\\"./query.ts\\\",\\\"./transform.ts\\\"],\\\"exitCode\\\":1},\\\"summary\\\":{\\\"totalPackages\\\":1,\\\"totalErrors\\\":17,\\\"totalPrivateTypeRef\\\":17,\\\"totalMissingJSDoc\\\":0,\\\"totalOther\\\":0},\\\"packages\\\":[{\\\"name\\\":\\\"@netscript/contracts\\\",\\\"dir\\\":\\\"packages/contracts\\\",\\\"entrypoints\\\":[{\\\"path\\\":\\\"./commands.ts\\\",\\\"privateTypeRef\\\":16,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":16},{\\\"path\\\":\\\"./crud.ts\\\",\\\"privateTypeRef\\\":14,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":14},{\\\"path\\\":\\\"./mod.ts\\\",\\\"privateTypeRef\\\":8,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":8},{\\\"path\\\":\\\"./query.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0},{\\\"path\\\":\\\"./transform.ts\\\",\\\"privateTypeRef\\\":0,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":0}],\\\"files\\\":[{\\\"path\\\":\\\"<checkout>/packages/contracts/src/application/command-contract.ts\\\",\\\"privateTypeRef\\\":8,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":8},{\\\"path\\\":\\\"<checkout>/packages/contracts/src/application/contract-primitives.ts\\\",\\\"privateTypeRef\\\":8,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":8},{\\\"path\\\":\\\"<checkout>/packages/contracts/crud/create-crud-contract.ts\\\",\\\"privateTypeRef\\\":1,\\\"missingJSDoc\\\":0,\\\"other\\\":0,\\\"total\\\":1}],\\\"combinedTotal\\\":17,\\\"combinedPrivateTypeRef\\\":17,\\\"combinedMissingJSDoc\\\":0,\\\"combinedOther\\\":0,\\\"combinedExitCode\\\":1,\\\"entrypointExitCodes\\\":{\\\"./commands.ts\\\":1,\\\"./crud.ts\\\":1,\\\"./mod.ts\\\":1,\\\"./query.ts\\\":0,\\\"./transform.ts\\\":0}}]}\\n\",\"truncated\":false},\"stderr\":{\"bytes\":124,\"sha256\":\"25cbdb472fe92b4e3fbef41d9870c9e6acdc919268a1214ce42b4fb6afb7d5ca\",\"tail\":\"Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/contracts'\\n\",\"truncated\":false}}"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "quality-scan",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "quality-scan",
+      "--id",
+      "c1-s2-quality-scan",
+      "--output",
+      "<private-runtime>/s2-quality-receipt.json"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 3.415,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": ""
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "arch-check",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "arch-check",
+      "--id",
+      "c1-s2-arch-check",
+      "--output",
+      "<private-runtime>/s2-arch-receipt.json"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 7.594,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"gateId\":\"arch-check\",\"invocationId\":\"c1-s2-arch-check\",\"argv\":[\"deno\",\"task\",\"arch:check\"],\"cwd\":\"<checkout>\",\"gitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"actualGitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"timeoutMs\":1800000,\"runnerIdentity\":\"worker:3357447\",\"attempt\":1,\"schemaVersion\":1,\"requestHash\":\"b665b582d4097dd4f5faa3ae2bcb749874ee9c1299fa85ae8d5874c5d598f811\",\"lifecycleId\":\"worker:3357447:c1-s2-arch-check:1\",\"outcome\":\"PASS\",\"claimedAt\":\"2026-10-07T20:59:18.059Z\",\"startedAt\":\"2026-10-07T20:59:18.062Z\",\"finishedAt\":\"2026-10-07T20:59:25.551Z\",\"durationMs\":7489,\"exitCode\":0,\"stdout\":{\"bytes\":42607,\"sha256\":\"acf0b15b1a7b71abaf354e40566b7504d43fce816575e7626d4b07b0efccab2b\",\"tail\":\"pare-flow-b-fixture.ts:238)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/kernel/adapters/database/scaffolder.ts:44)\\n# Doctrine readiness \u2014 config\\n  FAIL=0 WARN=2 INFO=1\\n  WARN A8/AP-1/F-1: file is 635 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/config-section-types.ts)\\n  WARN A8/AP-1/F-1: file is 317 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/schemas/deploy-schema.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 contracts\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A1/A2/A7: exports Result/Either/Option-style contract \u2014 keep it package-specific, documented, and inline unless multiple real consumers justify a shared contract (src/domain/result.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 cron\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 database\\n  FAIL=0 WARN=7 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN A8/AP-1/F-1: file is 642 lines (cap 500) \u2014 split into smaller single-reason files (extensions/sql-json.extension.ts)\\n  WARN A8/AP-1/F-1: file is 530 lines (cap 500) \u2014 split into smaller single-reason files (adapters/mssql.adapter.ts)\\n  WARN A8/AP-1/F-1: file is 555 lines (cap 500) \u2014 split into smaller single-reason files (scripts/fix-zod-imports.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (scripts/migrate.ts)\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (scripts/generate-zod.ts)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (extensions/sql-json.extension.ts:641)\\n# Doctrine readiness \u2014 fresh\\n  FAIL=0 WARN=4 INFO=1\\n  WARN A8/AP-1/F-1: file is 604 lines (cap 500) \u2014 split into smaller single-reason files (src/application/route/manifest.ts)\\n  WARN A8/AP-1/F-1: file is 501 lines (cap 500) \u2014 split into smaller single-reason files (src/runtime/navigation/coordinator.ts)\\n  WARN A8/AP-1/F-1: file is 621 lines (cap 500) \u2014 split into smaller single-reason files (src/runtime/ai/create-chat-connection.ts)\\n  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/runtime/ai)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 fresh-ui\\n  FAIL=0 WARN=5 INFO=1\\n  WARN AP-16/F-11: forbidden folder name 'lib' \u2014 split into domain/, application/, or adapters/ aligned to a real concern (registry/lib)\\n  WARN A8/AP-1/F-1: file is 1512 lines (cap 500) \u2014 split into smaller single-reason files (registry.manifest.ts)\\n  WARN A8/AP-1/F-1: file is 669 lines (cap 500) \u2014 split into smaller single-reason files (src/chat/parse-blocks.ts)\\n  WARN F-16: directory has 16 immediate children; doctrine cap is 12\\n  WARN F-16: directory has 99 immediate children; doctrine cap is 12 (registry/components/ui)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 kv\\n  FAIL=0 WARN=5 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN A8/AP-1/F-1: file is 541 lines (cap 500) \u2014 split into smaller single-reason files (adapters/memory.adapter.ts)\\n  WARN A8/AP-1/F-1: file is 827 lines (cap 500) \u2014 split into smaller single-reason files (adapters/redis.adapter.ts)\\n  WARN A8/AP-1/F-1: file is 674 lines (cap 500) \u2014 split into smaller single-reason files (adapters/denokv-bridge.ts)\\n  WARN A8/AP-1/F-1: file is 592 lines (cap 500) \u2014 split into smaller single-reason files (adapters/deno-kv.adapter.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 logger\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 mcp\\n  FAIL=0 WARN=3 INFO=1\\n  WARN A8/AP-1/F-1: file is 401 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/tool-contracts.ts)\\n  WARN F-16: directory has 16 immediate children; doctrine cap is 12 (src/application/flows)\\n  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/domain)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 plugin\\n  FAIL=0 WARN=2 INFO=1\\n  WARN F-16: directory has 17 immediate children; doctrine cap is 12 (src)\\n  WARN F-16: directory has 16 immediate children; doctrine cap is 12 (src/config/domain)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 plugin-ai-core\\n  FAIL=0 WARN=1 INFO=0\\n  WARN A8/AP-1/F-1: file is 310 lines (cap 300) \u2014 split into smaller single-reason files (src/contracts/v1/ai.contract-schemas.ts)\\n# Doctrine readiness \u2014 plugin-auth-core\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A8/AP-1/F-1: file is 546 lines (cap 500) \u2014 split into smaller single-reason files (src/contracts/v1/auth.contract.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 plugin-sagas-core\\n  FAIL=0 WARN=3 INFO=2\\n  WARN A8/AP-1/F-1: file is 739 lines (cap 500) \u2014 split into smaller single-reason files (src/contracts/v1/sagas.contract.ts)\\n  WARN A8/AP-1/F-1: file is 550 lines (cap 500) \u2014 split into smaller single-reason files (src/runtime/saga-engine.ts)\\n  WARN F-16: directory has 19 immediate children; doctrine cap is 12 (src)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n# Doctrine readiness \u2014 plugin-streams-core\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A8/AP-1/F-1: file is 515 lines (cap 500) \u2014 split into smaller single-reason files (src/application/durable-stream-producer-supervisor.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 plugin-triggers-core\\n  FAIL=0 WARN=3 INFO=2\\n  WARN A8/AP-1/F-1: file is 722 lines (cap 500) \u2014 split into smaller single-reason files (src/contracts/v1/triggers.contract.ts)\\n  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/ports)\\n  WARN F-16: directory has 15 immediate children; doctrine cap is 12 (src/runtime)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n# Doctrine readiness \u2014 plugin-workers-core\\n  FAIL=0 WARN=5 INFO=2\\n  WARN A8/AP-1/F-1: file is 611 lines (cap 500) \u2014 split into smaller single-reason files (src/contracts/v1/workers.contract-definition.ts)\\n  WARN A8/AP-1/F-1: file is 426 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/task.ts)\\n  WARN A8/AP-1/F-1: file is 308 lines (cap 300) \u2014 split into smaller single-reason files (src/domain/job-spec.ts)\\n  WARN F-16: directory has 18 immediate children; doctrine cap is 12 (src)\\n  WARN F-16: directory has 15 immediate children; doctrine cap is 12 (src/executor/adapters)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n# Doctrine readiness \u2014 prisma-adapter-mysql\\n  FAIL=0 WARN=2 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN A8/AP-1/F-1: file is 816 lines (cap 500) \u2014 split into smaller single-reason files (src/adapter.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 queue\\n  FAIL=0 WARN=2 INFO=1\\n  WARN A8/AP-1/F-1: file is 582 lines (cap 500) \u2014 split into smaller single-reason files (adapters/postgres.adapter.ts)\\n  WARN A8/AP-1/F-1: file is 785 lines (cap 500) \u2014 split into smaller single-reason files (adapters/kv-polling.adapter.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 runtime-config\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 sdk\\n  FAIL=0 WARN=1 INFO=1\\n  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 service\\n  FAIL=0 WARN=3 INFO=1\\n  WARN A5/AP-5/F-4: class Gq sits 3+ levels deep in inheritance chain \u2014 prefer composition\\n  WARN A5/AP-5/F-4: class dW sits 3+ levels deep in inheritance chain \u2014 prefer composition\\n  WARN A8/AP-1/F-1: file is 577 lines (cap 500) \u2014 split into smaller single-reason files (src/builder/service-builder-impl.ts)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 telemetry\\n  FAIL=0 WARN=5 INFO=1\\n  WARN A8/AP-1/F-1: file is 539 lines (cap 500) \u2014 split into smaller single-reason files (src/instrumentation/scheduler.ts)\\n  WARN A8/AP-1/F-1: file is 672 lines (cap 500) \u2014 split into smaller single-reason files (src/instrumentation/worker.ts)\\n  WARN F-16: directory has 15 immediate children; doctrine cap is 12\\n  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/attributes)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (src/adapters/otel/otel-sdk.ts)\\n# Doctrine readiness \u2014 watchers\\n  FAIL=0 WARN=1 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n# Doctrine readiness \u2014 ai\\n  FAIL=0 WARN=5 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (cli.ts)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:40)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/chat-route/chat-route.stub.ts:41)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:25)\\n# Doctrine readiness \u2014 auth\\n  FAIL=0 WARN=4 INFO=1\\n  WARN F-16: directory has 13 immediate children; doctrine cap is 12\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (services/src/main.ts:54)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n# Doctrine readiness \u2014 sagas\\n  FAIL=0 WARN=8 INFO=2\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN A8/AP-1/F-1: file is 374 lines (cap 300) \u2014 split into smaller single-reason files (services/src/routers/v1-types.ts)\\n  WARN F-16: directory has 15 immediate children; doctrine cap is 12\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/saga/saga.stub.ts:60)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/saga/saga.stub.ts:95)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (services/src/main.ts:46)\\n# Doctrine readiness \u2014 streams\\n  FAIL=0 WARN=5 INFO=1\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/consumer/consumer.stub.ts:78)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/stream/stream.stub.ts:84)\\n# Doctrine readiness \u2014 triggers\\n  FAIL=0 WARN=13 INFO=2\\n  WARN A3: README has only 1 TS code fences \u2014 needs \u2265 2 (basic + advanced) for the 80% path\\n  WARN F-16: directory has 17 immediate children; doctrine cap is 12\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (generic-webhook.ts:40)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (webhook-validate-data.ts:35)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/webhook/webhook.stub.ts:46)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/webhook/webhook.stub.ts:109)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/file-watch/file-watch.stub.ts:43)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/scheduled/scheduled.stub.ts:43)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (jobs/staged-cleanup.ts:78)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (jobs/file-import.ts:187)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (jobs/file-relay.ts:189)\\n# Doctrine readiness \u2014 workers\\n  FAIL=0 WARN=10 INFO=2\\n  WARN A8/AP-1/F-1: file is 571 lines (cap 500) \u2014 split into smaller single-reason files (src/cli/runtime-registry-generator.ts)\\n  WARN F-16: directory has 19 immediate children; doctrine cap is 12\\n  WARN F-16: directory has 19 immediate children; doctrine cap is 12 (worker)\\n  INFO A9: docs/architecture.md missing \u2014 required when public symbols > 25\\n  INFO A12: package implements durable workflow concepts \u2014 verify state machine model is documented in docs/architecture.md\\n  WARN A13: Deno.exit/process.exit outside bin/ \u2014 crash boundaries must be explicit, throw a typed error instead (test-api.ts)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (services/src/main.ts:45)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (scaffold.ts:23)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (cli.ts:18)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (jobs/health-check.ts:282)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/adapter/resources/job/job.stub.ts:33)\\n  WARN F-5/F-6: `export default` \u2014 JSR penalises (no auto-doc); use named exports (src/cli/official-sample-configuration.ts:416)\\n\",\"truncated\":true},\"stderr\":{\"bytes\":485,\"sha256\":\"d383a582d1a3ab53409417a624b04062624331ae3ada6bd36a8fb15ed8e33cc6\",\"tail\":\"Task arch:check deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots\\nTask deps:check deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod\\nTask deps:check:zod deno run --allow-read .llm/tools/deps/check-zod-alignment.ts\\n\",\"truncated\":false}}"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "exports-drift",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "exports-drift",
+      "--id",
+      "c1-s2-exports-drift",
+      "--output",
+      "<private-runtime>/s2-exports-receipt.json"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 4.482,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "{\"gateId\":\"exports-drift\",\"invocationId\":\"c1-s2-exports-drift\",\"argv\":[\"deno\",\"task\",\"docs:exports-drift\"],\"cwd\":\"<checkout>\",\"gitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"actualGitHead\":\"5023427004b37a561570a1a23bb4b7e21faf0c51\",\"timeoutMs\":1800000,\"runnerIdentity\":\"worker:3359173\",\"attempt\":1,\"schemaVersion\":1,\"requestHash\":\"18a28cb1f33acc7efc061599a4fb820dbc6674542094bb10ff8379619c4d9d0a\",\"lifecycleId\":\"worker:3359173:c1-s2-exports-drift:1\",\"outcome\":\"PASS\",\"claimedAt\":\"2026-10-07T20:59:25.666Z\",\"startedAt\":\"2026-10-07T20:59:25.669Z\",\"finishedAt\":\"2026-10-07T20:59:30.037Z\",\"durationMs\":4368,\"exitCode\":0,\"stdout\":{\"bytes\":13328,\"sha256\":\"6e9c2704cbe94255a4b477c0c29ba64f83e53bd1c45edc1c62340a043485d547\",\"tail\":\"Reference page coverage: PASS (36/36; mapped=35; excluded=1)\\nCoverage [fresh]: mode=entrypoints-only; reason=\\\"The page guarantees all seventeen entrypoints, but four have no per-symbol tables and the server, builders, route, form, streams, query, and Vite sections omit query-cache invalidation, routed-partial and schema, form-navigation, SSE protocol, and Vite hook contracts.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-workers-core]: mode=entrypoints-only; reason=\\\"The page guarantees all seventeen entrypoints and inventories all 32 root exports, but omits subpath-only APIs including JobBuilderState, WorkersRuntime, PublicDefinitionSchema, WorkersContractV1, WorkersConfig, WorkerInstrumentation, and TestWorkersRuntime.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-sagas-core]: mode=entrypoints-only; reason=\\\"The page documents every entrypoint and the complete root and agent surfaces, but omits substantial subpath contracts such as transport codecs, store adapters, telemetry contracts, and config schemas.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-sagas]: mode=entrypoints-only; reason=\\\"All fourteen entrypoints were checked with deno doc; the page documents 56 of 236 exported symbols and omits broad CLI command/backend contracts, runtime delivery/projection/scheduler/publisher details, contract schemas, E2E and scaffold protocols, and server-side stream wiring.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-triggers]: mode=entrypoints-only; reason=\\\"All eleven entrypoints were checked with deno doc; the page documents 17 of 150 exported symbols and omits broad trigger CLI command/backend contracts, runtime definitions and action/durability/port contracts, scaffold protocols, service helpers, and stream database/server wiring.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-workers]: mode=entrypoints-only; reason=\\\"All thirteen entrypoints were checked with deno doc; the page documents 125 of 175 exported symbols and omits CLI job/task/workflow commands and runtime API clients, adapter and doctor contracts, health-check job contracts, generated-registry/runtime helpers, scaffold protocols, and project-file utilities.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [ai]: mode=entrypoints-only; reason=\\\"The page guarantees all thirteen entrypoints but does not yet inventory every symbol: /skills has no dedicated symbol section; the root prompt APIs, OpenAI-compatible vision exports, Ollama HttpReachabilityConfig, MCP pool/resource APIs, AgentLoop, newer contract/reasoning symbols, vector-memory and provider-factory ports, and retrieval testing helpers remain incomplete.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [auth-kv-oauth]: mode=entrypoints-only; reason=\\\"All eight entrypoints were checked with deno doc; the page omits AUTH_SESSION_STATES, AtomicCheck, AtomicMutation, AtomicResult, AuthBackendPort, AuthPrincipalMapperPort, AuthProviderCapability, AuthProviderDescriptor, AuthProviderRegistryPort, AuthSession, AuthSessionCreateInput, AuthSessionCryptoPort, AuthSessionLookup, AuthSessionPrincipalMapping, AuthSessionState, AuthSessionStorePort, AuthenticatorPort, AuthnRequest, AuthnResult, ClientAuthMethod, InteractiveCallbackResult, InteractiveFlowPort, KvEntry, KvKey, KvListOptions, KvOAuthCookieOptions, KvOAuthEncryptedTokens, KvOAuthErrorCode, KvOAuthFetch, KvOAuthJsonValidator, KvOAuthKeyMaterial, KvOAuthPrincipal, KvOAuthRefreshMode, KvOAuthSessionRecord, KvOAuthStoreOptions, KvOAuthTxn, KvSetOptions, KvStore, NormalizePrincipalContext, OAuthCustomFetch, OAuthEndpointProviderConfig, OAuthIssuerProviderConfig, OAuthProviderBaseConfig, OAuthProviderClientAuthConfig, OAuthTokenCustomFetch, Principal, TenantOAuthProviderOptions, WatchEvent, WatchOptions, WatchPrefixOptions, WatchableKv, clientAuth, describeProvider, discoveryRequestOptions, hashToken, and requestOptions.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-triggers-core]: mode=entrypoints-only; reason=\\\"The page guarantees all twelve entrypoints and completely inventories the root/public/builders surface, while omitting substantial domain defaults/errors, port defer/clock contracts, adapter/store implementations, config and v1 contract schemas, telemetry types, and testing doubles reported by deno doc.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-auth-core]: mode=entrypoints-only; reason=\\\"All nine entrypoints were checked with deno doc; the page omits AUTH_PRESET_KINDS, Account, AccountState, AttributeValue, Attributes, AuthAttributeName, AuthAttributes, AuthAttributesMap, AuthBackendPreset, AuthCapabilities, AuthConfigInput, AuthContract, AuthContractDefinition, AuthContractV1, AuthErrorCode, AuthErrorCodeMap, AuthErrorCodeValue, AuthOperationInput, AuthOperationRecorder, AuthOutcome, AuthOutcomeMap, AuthOutcomeValue, AuthPresetDefinition, AuthPresetKind, AuthPresetRegistry, AuthProviderConfig, AuthProviderPreset, AuthRouter, AuthSchema, AuthSchemaResult, AuthSessionPolicy, AuthSessionPrincipalMapping, AuthSessionResponse, AuthSessionResponseSchema, AuthSpanEventName, AuthSpanEvents, AuthSpanEventsMap, AuthSpanName, AuthSpanNames, AuthSpanNamesMap, AuthStreamDefinition, AuthStreamEventSchema, AuthStreamEventType, AuthStreamSessionSchema, AuthTelemetry, AuthTelemetryAttributeValue, AuthTelemetryAttributes, AuthTelemetryOperation, AuthTelemetryOptions, AuthUserResponse, AuthUserResponseSchema, AuthenticatorPort, AuthnRequest, AuthnResult, BuildAuthSessionOptions, BuildAuthUserOptions, CallbackInput, CallbackInputSchema, CallbackResponse, CallbackResponseSchema, CollectionDefinition, CollectionEventHelpers, Context, Exception, InteractiveCallbackResult, Link, MeResponse, MeResponseSchema, Principal, RedactedAuthPrincipal, SerializedTraceContext, SessionInput, SessionInputSchema, SessionResponse, SessionResponseSchema, SigninInput, SigninInputSchema, SigninResponse, SigninResponseSchema, SignoutInput, SignoutInputSchema, SignoutResponse, SignoutResponseSchema, Span, SpanContext, SpanKind, SpanOptions, SpanStatus, SpanStatusCode, StateSchema, StreamStateDefinition, TimeInput, TraceState, Tracer, ValidationErrorData, buildAuthSession, and buildAuthUser.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-auth]: mode=entrypoints-only; reason=\\\"All nine entrypoints were checked with deno doc; the page documents 5 of 84 exported symbols and omits versioned auth contracts, schemas, router and session/user inputs and responses, service runtime types, stream event/schema/producer/database helpers, and scaffold and adapter CLI protocols.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [mcp]: mode=entrypoints-only; reason=\\\"The page guarantees all three entrypoints while curating selected root and CLI APIs: root/CLI exports such as createServiceEndpointDirectory, EndpointSourcePort, and MCP_AGENT_INSTRUCTIONS are omitted, and the OpenAPI projection symbols including indexOpenApiOperations, resolveCanonicalOperation, and projectOperationSchemaViews have no per-symbol section.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-streams-core]: mode=entrypoints-only; reason=\\\"The root table inventories all 51 exports, but the SSE table omits BindStreamEventSourceOptionsV1, Operation, the shared schema contracts, and 16 StreamSse* contract types; telemetry and testing are prose-only and therefore omit all 33 telemetry exports plus MemoryStreamEvent, MemoryStreamProducer, StreamTopicFixtureSchema, and createStreamTopicFixture from symbol tables.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-streams]: mode=entrypoints-only; reason=\\\"All seven entrypoints were checked with deno doc; the page documents 33 of 55 exported symbols and omits adapter CLI and scaffold protocol types, shared CLI and E2E contracts, the unsupportedStreamOperation helper, and Aspire contribution contracts.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [aspire]: mode=entrypoints-only; reason=\\\"The page maps the diagnostics root and eight typed config/composition subpaths while curating their primary APIs rather than every exported contract.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [cli]: mode=entrypoints-only; reason=\\\"The page guarantees the embeddable root plus scaffolding and testing entrypoints, with selected command and fixture tables rather than every CLI option type.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [watchers]: mode=entrypoints-only; reason=\\\"The page guarantees the root entrypoint and inventories the supported watcher APIs while deliberately classifying exported strategy implementations as internal.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [runtime-config]: mode=complete; reason=\\\"The single-entrypoint reference inventories every exported loader, accessor, diagnostic, type, constant, and alias reported by deno doc.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [prisma-adapter-mysql]: mode=entrypoints-only; reason=\\\"The page guarantees the root entrypoint and inventories primary adapter contracts while omitting the lower-level transaction options contract.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [auth-workos]: mode=entrypoints-only; reason=\\\"The page guarantees the root entrypoint and inventories WorkOS APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [auth-better-auth]: mode=entrypoints-only; reason=\\\"The page guarantees the root entrypoint and inventories Better Auth APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [cron]: mode=complete; reason=\\\"The page inventories every exported symbol across the root, ports, adapters, and testing entrypoints.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [database]: mode=entrypoints-only; reason=\\\"The page guarantees all ten driver, extension, script, tracing, and testing entrypoints while its tables focus on primary contracts and runners.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [fresh-ui]: mode=complete; reason=\\\"All six published entrypoints are maintained as one complete reference surface.\\\"; omitted-symbol-groups=0; documented-non-export-groups=1\\nCoverage [kv]: mode=entrypoints-only; reason=\\\"The page guarantees the root, Redis, kvdex, and testing entrypoints while summarizing kvdex compatibility re-exports in prose instead of a complete symbol table.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [logger]: mode=entrypoints-only; reason=\\\"The page guarantees the core, Hono middleware, and oRPC entrypoints, but inventories selected root primitives rather than both integration symbol surfaces.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin]: mode=entrypoints-only; reason=\\\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-ai-core]: mode=entrypoints-only; reason=\\\"The page inventories every root export and both entrypoints, but its contracts/v1 tables omit AiContractSchema, AiContractSchemaResult, JsonSchema, ReasoningChunk, and ToolParameters.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [plugin-ai]: mode=entrypoints-only; reason=\\\"All seven entrypoints were checked with deno doc; the page documents 24 of 88 exported symbols and omits adapter CLI and scaffold protocol types, adapter contracts, and much of the versioned AI contract vocabulary including message/content/chunk, model, tool, usage, and schema types.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [config]: mode=complete; reason=\\\"The config reference is maintained as a complete published-symbol inventory.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [contracts]: mode=complete; reason=\\\"The contracts reference is maintained as a complete published-symbol inventory.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [queue]: mode=entrypoints-only; reason=\\\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [sdk]: mode=entrypoints-only; reason=\\\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [service]: mode=entrypoints-only; reason=\\\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\\\"; omitted-symbol-groups=0; documented-non-export-groups=0\\nCoverage [telemetry]: mode=complete; reason=\\\"The telemetry reference curates stable entrypoints and primary APIs while classifying lower-level contracts explicitly.\\\"; omitted-symbol-groups=1; documented-non-export-groups=0\\nExports & Symbols drift check: PASS\\n\",\"truncated\":false},\"stderr\":{\"bytes\":112,\"sha256\":\"6b3227ef695597fbc2c2bf0c3350f5ee5251e894020513f33412a26568c1294f\",\"tail\":\"Task docs:exports-drift deno run --no-lock --allow-read --allow-run=deno .llm/tools/docs/check-exports-drift.ts\\n\",\"truncated\":false}}"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "deps-standard-schema",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/deps/why.ts",
+      "@standard-schema/spec"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 0.398,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "report": {
+      "package": "@standard-schema/spec",
+      "sourceUsed": true,
+      "sourceHitCount": 2,
+      "transitivelyPresent": false,
+      "likelyDeadImport": false,
+      "fullyRemovable": false,
+      "sourceHits": [
+        {
+          "file": "packages/service/src/commands/application/json-codec.ts",
+          "line": 1,
+          "text": "import type { StandardSchemaV1 } from '@standard-schema/spec';"
+        },
+        {
+          "file": "packages/service/tests/commands-codec_test.ts",
+          "line": 2,
+          "text": "import type { StandardSchemaV1 } from '@standard-schema/spec';"
+        }
+      ],
+      "why": "",
+      "sourceHitScope": "Follow-up direct service source references shown; full native report retained privately."
+    }
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "deps-database",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/deps/why.ts",
+      "@netscript/database"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 0.488,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "report": {
+      "package": "@netscript/database",
+      "sourceUsed": true,
+      "sourceHitCount": 2,
+      "transitivelyPresent": false,
+      "likelyDeadImport": false,
+      "fullyRemovable": false,
+      "sourceHits": [
+        {
+          "file": "packages/service/src/commands/domain/definition.ts",
+          "line": 1,
+          "text": "import type { IsolationLevel } from '@netscript/database';"
+        },
+        {
+          "file": "packages/service/commands.ts",
+          "line": 44,
+          "text": "export type { IsolationLevel } from '@netscript/database';"
+        }
+      ],
+      "why": "",
+      "sourceHitScope": "Follow-up direct service source references shown; full native report retained privately."
+    }
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "publish-service",
+    "command": [
+      "deno",
+      "run",
+      "--allow-all",
+      ".llm/tools/release/run-publish-dry-run.ts",
+      "--member",
+      "packages/service"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 5.438,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": "\u256d Warning\n\u2502\n\u2502  Ignored build scripts for packages:\n\u2502  npm:lmdb@3.5.5\n\u2502  npm:msgpackr-extract@3.0.4\n\u2502\n\u2502  Lifecycle scripts are only supported when using a `node_modules` directory.\n\u2502  Enable it in your deno config file:\n\u2502  \"nodeModulesDir\": \"auto\"\n\u2570\u2500\nCheck mod.ts\nCheck src/auth/mod.ts\nCheck src/primitives/rpc-path.ts\nCheck commands.ts\nChecking for slow types in the public API...\nCheck mod.ts\nCheck src/auth/mod.ts\nCheck src/primitives/rpc-path.ts\nCheck commands.ts\nSimulating publish of @netscript/service@0.0.7 with files:\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/README.md (17.44KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/commands.ts (1.47KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/deno.json (1.33KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/mod.ts (5.05KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/adapters/runtime-host-budget-timer.ts (1.04KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/auth-middleware.ts (8.61KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/contract-authorizer.ts (9.58KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/contract-policy.ts (3.51KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/hono-context.ts (1.07KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/mod.ts (2.07KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/options.ts (2.57KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/scope-authorizer.ts (3KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/service-auth-policy.ts (2.55KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/static-credential-authenticator.ts (3.69KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/trusted-header-authenticator.ts (2.54KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/auth/types.ts (3.82KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/builder/service-builder-impl.ts (17.06KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/builder/service-builder.ts (5.74KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/builder/service-listener.ts (8.82KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/builder/service-rpc.ts (4.27KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/builder/service-shutdown.ts (4.98KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/commands/application/canonical-json.ts (7.13KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/commands/application/define-command.ts (4.49KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/commands/application/json-codec.ts (2.19KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/commands/domain/codec.ts (788B)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/commands/domain/definition.ts (4.13KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/commands/domain/failure.ts (4.27KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/commands/domain/values.ts (908B)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/diagnostics/database-connectivity.ts (14.94KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/presets/define-service.ts (8.32KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/primitives/handlers.ts (5.81KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/primitives/health.ts (7.09KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/primitives/openapi.ts (7.32KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/primitives/orpc-router.ts (393B)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/primitives/rpc-path.ts (1.62KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/primitives/scalar.generated.ts (3.31MB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/runtime/runtime-host.ts (6.64KB)\n   file://<private-runtime>/tmp/netscript-publish-dry-run-74132f731825a194/packages/service/src/types.ts (8.24KB)\nSuccess Dry run complete"
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "deps-latest-standard-schema",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-net",
+      ".llm/tools/deps/latest.ts",
+      "--filter",
+      "@standard-schema/spec"
+    ],
+    "exitCode": 0,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "report": {
+      "generatedAt": "2026-10-07T21:00:26.055Z",
+      "behind": 0,
+      "entries": [
+        {
+          "name": "@standard-schema/spec",
+          "registry": "jsr",
+          "pinned": "1.1.0",
+          "pinnedIsPrerelease": false,
+          "latestStable": "1.1.0",
+          "behind": false,
+          "sources": [
+            "packages/ai/deno.json",
+            "packages/mcp/deno.json",
+            "packages/plugin-workers-core/deno.json",
+            "packages/plugin/deno.json",
+            "packages/sdk/deno.json",
+            "packages/service/deno.json",
+            "packages/telemetry/deno.json",
+            "plugins/streams/deno.json",
+            "plugins/workers/deno.json"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "attemptLabel": "native provenance follow-up",
+    "gate": "native-why-standard-schema",
+    "command": [
+      "deno",
+      "why",
+      "jsr:@standard-schema/spec@1.1.0"
+    ],
+    "exitCode": 0,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "stdout": "",
+    "stderr": "@standard-schema/spec@1.1.0\n  jsr:@standard-schema/spec@1.1.0\n\n",
+    "limitation": "The repository why wrapper omits native stderr and reports transitivelyPresent=false despite native provenance. Direct source usage is separately present; no wrapper changes."
+  },
+  {
+    "attemptLabel": "final stable S2",
+    "gate": "diff-whitespace",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+    "sourceManifest": "s2-source-manifest.json",
+    "output": ""
+  }
+]

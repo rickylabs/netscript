@@ -1,0 +1,8 @@
+Task docs:accuracy deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts
+Warning The following peer dependency issues were found:
+└─┬ @tanstack/ai-anthropic@0.18.13
+  └── peer @tanstack/ai@^0.59.0: resolved to 0.52.3
+
+These packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an "overrides" entry to your package.json or deno.json.
+Learn more: https://docs.deno.com/go/peer-deps
+docs accuracy: PASS (4 saga pages checked for stale claims, live Aspire scaffold pins, 200 published source pages, 182 shipped corpus files, one query dialect exception page, mutation-map columns, 92/92 root/direct public commands from 157 recursive paths, 6 valid @netscript/fresh root imports checked)

@@ -2439,3 +2439,34 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open, DEBT_ACCEPTED by independent IMPL-EVAL PASS at 51d074443efa241af0d24153a6de608f78ef429b.
 - **Gate:** All-export doc lint must reach zero with existing types preserved. This change introduces no additional diagnostic or private reference at any entrypoint. Release requires qualified published consumer resolution; source qualification does not fulfill publication.
 - **Evidence:** Private baseline/current structured doc reports and complete per-entrypoint comparison; run worklog records both raw failing exits and unchanged baseline, never false green. Raw dry-run publication analysis gates the changed owning packages.
+
+
+## desktop-doc-baseline-2041 — unchanged SDK/Fresh documentation baseline
+
+- **Owner:** SDK, Fresh and MCP maintainers.
+- **Target:** 2026-10-15.
+- **Status:** open, DEBT_ACCEPTED by independent Google IMPL-EVAL at
+  `510856423f270333499f7e8e3639a117c6d7a6ff` (desktop-doc-baseline-2041).
+- **Scope:** The all-export documentation reports at baseline
+  `8aad14940c52cd3a4db7efa57d56d50ae131df6c` and completed desktop source are byte-identical,
+  including every entrypoint diagnostic and exit. SDK combined diagnostics: 3 private type
+  references; Fresh: 28 private type references and 17 missing JSDoc. Both raw gates exit one.
+  MCP combined diagnostics are zero, but cli.ts/mod.ts each retain three private references
+  and raw entrypoint exits one, making the wrapper raw exit one. The pristine baseline
+  MCP structured report is byte-identical, including all three entrypoints.
+  The optional native document epoch handler parameter is documented; no new diagnostic or
+  slow type is introduced. Owning JSR audit and actual publication dry-runs pass.
+- **Evidence:** `.llm/runs/fix-desktop-document-reconnect--c2/worklog.md`; complete raw structured
+  baseline and final reports retained for independent comparison. No suppression or baseline
+  reset. Publication/final release qualification remains separate.
+- **Closing gate:** Repair the pre-existing all-export documentation findings and obtain raw
+  documentation exit zero; receipt equivalence does not close this debt.
+
+### Fresh rich send all-entrypoint documentation baseline (#2068)
+
+- **ID:** `chat-send-doc-baseline-2068`
+- **Reason:** Pristine current main retains 45 combined documentation findings (28 private-type references,17 missing JSDoc) across Fresh exports. Full structured reports, every entrypoint count and raw exit are unchanged after rich send; the new owned type is fully documented. MCP corpus ownership additionally retains an identical pristine-main report: combined zero, two entrypoints with three private-type diagnostics each and raw task exit one. Raw doc gates remain failed, no suppression.
+- **Owner:** Fresh and MCP package public-surface maintainers.
+- **Target:** Before the next stable Fresh release, no later than 2026-10-15.
+- **Closing gate:** F-7 full Fresh and MCP doc-lint has zero diagnostics across every export entrypoint.
+- **Status:** open; DEBT_ACCEPTED by independent Google Gemini IMPL-EVAL at `ffdb32a7d0bef56a8ecc37749d87e689beda6625`. Both complete documentation reports and raw exits match pristine main; closing gate remains owner work.

@@ -1,4 +1,8 @@
 import {
+  nativeModelMessage,
+  nativeUiMessage,
+} from '../../../tests/type-fixtures/chat-send-consumer_type.ts';
+import {
   assert,
   assertEquals,
   assertRejects,
@@ -8,6 +12,7 @@ import {
 import {
   createNetScriptChatConnection,
   type NetScriptChatMessage,
+  type NetScriptChatSendMessage,
   projectChatSnapshot,
   resolveChatSnapshot,
   toNetScriptChatResponse,
@@ -784,4 +789,69 @@ Deno.test('projectChatSnapshot tolerates malformed / partial messages', () => {
   assertEquals(result.messages.length, 4);
   assertEquals(result.messages[0].role, 'assistant'); // unknown role defaults
   assertStringIncludes(result.messages[3].content, 'flat');
+});
+
+Deno.test('rich native send preserves identity data and linked cancellation with one subscription', async () => {
+  const probe = createHeldSubscriptionProbe();
+  const calls: { messages: readonly unknown[]; data: unknown; signal: AbortSignal | undefined }[] =
+    [];
+  const connection = createNetScriptChatConnection({
+    target: baseTarget,
+    createConnection: () => ({
+      ...probe.connection,
+      send: (messages, data, signal) => {
+        calls.push({ messages, data, signal });
+        return Promise.resolve();
+      },
+    }),
+  });
+  const ui = { ...nativeUiMessage, futureMessageField: { opaque: true } };
+  const future: NetScriptChatSendMessage = {
+    id: 'future',
+    role: 'user',
+    parts: [{ type: 'future-attachment', nativeField: { keep: true } }],
+    metadata: { keep: true },
+  };
+  const messages: readonly NetScriptChatSendMessage[] = [ui, nativeModelMessage, future];
+  const data = { attachments: { labels: ['original', 'opaque'] }, options: { preserved: true } };
+  const caller = new AbortController();
+  assertEquals(probe.stats.subscribeCalls, 0);
+  const first = connection.subscribe()[Symbol.asyncIterator]();
+  const second = connection.subscribe()[Symbol.asyncIterator]();
+  const pendingFirst = first.next();
+  const pendingSecond = second.next();
+  try {
+    await waitFor(() => probe.stats.openRequests === 1, 'native subscription did not open');
+    await connection.send(messages, data, caller.signal);
+    assertStrictEquals(calls[0].messages, messages);
+    assertStrictEquals(calls[0].messages[0], ui);
+    assertStrictEquals(calls[0].messages[1], nativeModelMessage);
+    assertStrictEquals(calls[0].messages[2], future);
+    assertStrictEquals(calls[0].data, data);
+    assert(calls[0].signal instanceof AbortSignal);
+    const reason = new DOMException('Caller cancelled send.', 'AbortError');
+    caller.abort(reason);
+    assertStrictEquals(calls[0].signal.reason, reason);
+    await connection.send(messages, data);
+    assert(calls[1].signal instanceof AbortSignal);
+    assertEquals(calls[1].signal.aborted, false);
+    assertEquals(probe.stats.subscribeCalls, 1);
+    assertEquals(probe.stats.maxOpenRequests, 1);
+    connection.dispose();
+    connection.close();
+    connection.stop();
+    assertEquals(calls[1].signal.aborted, true);
+    assertEquals((await pendingFirst).done, true);
+    assertEquals((await pendingSecond).done, true);
+    await waitFor(
+      () => probe.stats.openRequests === 0,
+      'disposed native subscription remained open',
+    );
+    assertEquals(probe.stats.abortedRequests, 1);
+    await assertRejects(() => connection.send(messages, data), Error, 'already disposed');
+  } finally {
+    connection.dispose();
+    await pendingFirst;
+    await pendingSecond;
+  }
 });
