@@ -134,3 +134,9 @@ classification. Adapters classify acquisition, driver and boundary failures them
 codes/messages stay solely in the trusted cause. The service translates this class and preserves
 arbitrary callback business errors. `busy` remains a terminal receipt-claim result requiring
 rollback, rather than a retry of the transaction callback.
+
+### True callback client and schema ownership
+
+`withTransaction(root, work)` preserves a separate callback type through `TransactionClientPort<TTx>`. Bind Prisma through its actual callback; never assert a root client into the business handle. Consumers generate `CommandTransactionClient = Omit<Prisma.TransactionClient, '$transaction' | '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>`.
+
+The reviewed schema, migration and bridge samples in `tests/fixtures/command-store/` show the consumer-owned receipt unique key, completion check, audit fields and initial outbox lease fields. Generate a Prisma client and bind the callback explicitly. Apply the migration through the application's normal review workflow. CLI generation is deferred to RFC 0003 stage 8; importing the framework never creates tables or runs a migration.

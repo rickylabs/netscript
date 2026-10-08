@@ -36,3 +36,5 @@ export type {
 } from './ports/database-client.ts';
 
 export { CommandStoreError, type CommandStoreFailure } from './ports/command-store-error.ts';
+
+export type { TransactionClientPort } from './ports/transaction-client.ts';

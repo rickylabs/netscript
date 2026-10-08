@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client"
+  output = ".generated"
+  runtime = "deno"
+}
+datasource db {
+  provider = "postgresql"
+}
+model Project {
+  id String @id
+  version Int @default(0)
+  name String
+  @@map("project")
+}
+model NetScriptCommandReceipt {
+  id String @id
+  scope String @db.VarChar(256)
+  commandName String @map("command_name") @db.VarChar(128)
+  commandVersion Int @map("command_version")
+  keyHash String @map("key_hash") @db.VarChar(64)
+  requestHash String @map("request_hash") @db.VarChar(64)
+  actorKind String @map("actor_kind") @db.VarChar(16)
+  actorSubject String @map("actor_subject") @db.VarChar(256)
+  correlationId String @map("correlation_id") @db.VarChar(256)
+  responseJson String? @map("response_json")
+  createdAt DateTime @map("created_at") @db.Timestamptz(3)
+  completedAt DateTime? @map("completed_at") @db.Timestamptz(3)
+  @@unique([scope, commandName, keyHash], map: "command_receipt_identity")
+  @@map("netscript_command_receipt")
+}
+model NetScriptCommandAudit {
+  id String @id
+  executionId String @map("execution_id")
+  commandName String @map("command_name")
+  commandVersion Int @map("command_version")
+  action String
+  subjectType String @map("subject_type")
+  subjectId String @map("subject_id")
+  actorKind String @map("actor_kind")
+  actorSubject String @map("actor_subject")
+  actorScheme String? @map("actor_scheme")
+  correlationId String @map("correlation_id")
+  dataJson String? @map("data_json")
+  occurredAt DateTime @map("occurred_at") @db.Timestamptz(3)
+  @@map("netscript_command_audit")
+}
+model NetScriptCommandOutbox {
+  id String @id
+  executionId String @map("execution_id")
+  commandName String @map("command_name")
+  commandVersion Int @map("command_version")
+  destination String
+  topic String
+  payloadJson String @map("payload_json")
+  dedupeKey String @map("dedupe_key")
+  correlationId String @map("correlation_id")
+  traceparent String?
+  tracestate String?
+  availableAt DateTime @map("available_at") @db.Timestamptz(3)
+  attemptCount Int @default(0) @map("attempt_count")
+  claimToken String? @map("claim_token")
+  claimUntil DateTime? @map("claim_until") @db.Timestamptz(3)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
+  terminalAt DateTime? @map("terminal_at") @db.Timestamptz(3)
+  lastFailure String? @map("last_failure")
+  @@index([availableAt], map: "command_outbox_due")
+  @@map("netscript_command_outbox")
+}

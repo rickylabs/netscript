@@ -16,3 +16,5 @@ Contributor path: implement the same callback-bound port and real-provider confo
 | Evaluate | Pending independent IMPL-EVAL |
 | Release | Pending CI; no merge authorized |
 | Close | Pending evidence |
+
+S7: RED exit 1; scoped check/lint/fmt exit 0; true callback and generated type tests pass. Three semantic mutants fail their named tests, restored source passes. Schema/bridge/migration manually reviewed. Transient Prisma probes use separate consumer config because generated declarations do not support isolatedDeclarations. See s7-evidence.json.

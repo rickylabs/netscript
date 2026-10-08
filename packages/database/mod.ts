@@ -109,6 +109,7 @@ export { jsonUtils, registerJsonFields } from './extensions/mod.ts';
 // ============================================================================
 
 import type { TransactionOptions } from './ports/mod.ts';
+import type { TransactionClientPort } from './ports/transaction-client.ts';
 
 /**
  * Execute operations within a transaction
@@ -129,18 +130,12 @@ import type { TransactionOptions } from './ports/mod.ts';
  * });
  * ```
  */
-export function withTransaction<T, Client extends { $transaction: unknown }>(
-  client: Client,
-  fn: (tx: Client) => Promise<T>,
+export function withTransaction<T, TTx>(
+  client: TransactionClientPort<TTx>,
+  fn: (tx: TTx) => Promise<T>,
   options?: TransactionOptions,
 ): Promise<T> {
-  // Type assertion needed due to Prisma's generic transaction type
-  const $transaction = client.$transaction as (
-    fn: (tx: Client) => Promise<T>,
-    options?: TransactionOptions,
-  ) => Promise<T>;
-
-  return $transaction(fn, options);
+  return client.$transaction(fn, options);
 }
 
 // ============================================================================
