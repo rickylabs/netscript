@@ -79,3 +79,17 @@ reconciliation preserves all C4 implementation/tests and main lock/dependency ch
 regenerates all four consumers with Deno 2.9.5. Combined-tree qualification must precede the third
 and final allowed independent review; previous native evidence is not mislabeled as execution on
 this new head.
+
+## Final independent acceptance
+
+Same-context opposite-family round 3 PASS at exact product
+`0b089e607dbc4284a5d4d29e32a37dbb89ba1e49`. Canonical full scaffold.runtime passed 104 local steps
+with owned cleanup; current-product native PostgreSQL 104 and SQLite 98 steps pass, plus native
+static/desktop and core functional CI. All root/static/scoped/publication/generated gates qualify
+this reconciled product. Seven pre-existing telemetry doc diagnostics remain explicitly raw EXIT 1;
+both new command doc graphs are clean. No new debt or unrun gate is claimed passing.
+
+Commit only sanitized run artifacts after review. Frozen qualification compares all 4717 tracked
+non-run files byte-for-byte to the evaluated product: no source/test/tool/lock/workflow/generated
+change. Final current-head native CI, five linked issue acceptance boxes, review threads and
+close-gate must finish before READY; never merge or force push.

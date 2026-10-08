@@ -1,6 +1,7 @@
 # Evaluation: C4 Command Telemetry (Issue #1485, PR #2094)
 
-Independent IMPL-EVAL round 1 technical acceptance evaluation for leaf C4 (`feat/command-c4-telemetry`).
+Independent IMPL-EVAL round 3 final technical acceptance evaluation for leaf C4
+(`feat/command-c4-telemetry`).
 
 ## Metadata
 
@@ -8,12 +9,31 @@ Independent IMPL-EVAL round 1 technical acceptance evaluation for leaf C4 (`feat
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Run ID               | `feat-command-c4-telemetry--lane-d`                                                                                                                                                                                                                                              |
 | Target               | Issue #1485 / PR #2094 (`feat/command-c4-telemetry`)                                                                                                                                                                                                                             |
-| Evaluated Clean HEAD | `f99c0f13a7c1ed988bcbfe188ff330703bd9b361`                                                                                                                                                                                                                                       |
+| Evaluated Clean HEAD | `0b089e607dbc4284a5d4d29e32a37dbb89ba1e49`                                                                                                                                                                                                                                       |
 | Baseline             | `102f40e92501bb9e500c4a2cbc615604f134194e`                                                                                                                                                                                                                                       |
+| Predecessor HEADs    | `f99c0f13a7c1ed988bcbfe188ff330703bd9b361` (Round 1 PASS), `2b233701dedc822d74458dbd62f7312770d28636` (Round 2 FAIL_FIX)                                                                                                                                                         |
 | Archetype            | `2 - Integration`                                                                                                                                                                                                                                                                |
-| Scope overlays       | `telemetry`, `service`                                                                                                                                                                                                                                                           |
+| Scope overlays       | `telemetry`, `service`, `cli`                                                                                                                                                                                                                                                    |
 | Generator            | `gpt-6.1-sol` (OpenAI family, session-separated)                                                                                                                                                                                                                                 |
 | Evaluator Route      | Primary requested `opencode_go` GLM 5.3 Flash max refused by live expense guard (`provider_rate_limited` before inference); observed Google native fallback (`gemini-3.8-flash` / Google family) authorized by HARNESS.md and supervisor. Separate vendor family from generator. |
+
+## Round 3 Progression & Reconciliation
+
+1. **Round 1 Baseline (`f99c0f13a`)**: Evaluated clean leaf C4 telemetry primitives, vocabulary
+   contracts, strict attribute filtering, and cross-package executor integration (`PASS`).
+2. **Round 2 Remediation (`2b233701d`)**: Addressed missing documentation export tables and CLI
+   workspace-mutator subpath rewrite mapping for `@netscript/telemetry/commands`. Evaluated under
+   the expanded one-pass `scaffold.runtime` gate where it failed `runtime.aspire-start` due to
+   Docker-in-Docker container port loopback reachability timeout (`FAIL_FIX`).
+3. **Round 3 Final Target (`0b089e607`)**:
+   - Reconciled cleanly with upstream `main` (`6645acbbd`), resolving corpus drift without touching
+     C4 product contracts or C3 coordinator-owned PostgreSQL implementation.
+   - Genuine terminal full runtime qualification achieved locally with 104 passing gates, 0
+     failures, and clean cleanup (`scaffold-runtime-bridged.log`).
+   - Native runtime CI (`37784805979`) passed canonical PostgreSQL (104 passed) and SQLite (98
+     passed) suites at this exact target.
+   - Native core functional CI (`37784806031`) passed check-test, quality, and change
+     classification.
 
 ## Process Verification
 
@@ -21,9 +41,9 @@ Independent IMPL-EVAL round 1 technical acceptance evaluation for leaf C4 (`feat
 | -------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Plan-Gate passed before implementation | PASS   | Reused approved whole-chain PLAN-EVAL PASS at `359d17f426592d58a6f6388a9522bc3afbc45dde` (Decision 9, S10)                                                     |
 | Design section exists in worklog       | PASS   | `worklog.md` contains explicit `## Design` section specifying contracts, adapters, and bounds                                                                  |
-| Commit slices match design plan        | PASS   | Slices S10a–S10d followed: contracts, adapter, executor early observation, asset qualification                                                                 |
-| Each slice has a passing gate          | PASS   | Explicit gate logs and receipts recorded for vocabulary, adapter, executor, and qualification                                                                  |
-| No speculative seams (unused files)    | PASS   | All new files map to public subpath exports, test fixtures, or docs                                                                                            |
+| Commit slices match design plan        | PASS   | Slices S10a–S10d followed: contracts, adapter, executor early observation, asset qualification, consumer map repairs, and reconciled merge                     |
+| Each slice has a passing gate          | PASS   | Explicit gate logs and receipts recorded for vocabulary, adapter, executor, qualification, consumer rewrite maps, and full runtime                             |
+| No speculative seams (unused files)    | PASS   | All new files map to public subpath exports, test fixtures, docs, or CLI mutator mappings                                                                      |
 | Constants used for finite vocabularies | PASS   | `CommandSpanNames`, `CommandAttributes`, `CommandOutcomes`, `CommandIdempotencyStates`, `CommandIsolationLevels`, `CommandStoreProviders`, `CommandErrorTypes` |
 
 ## Technical Acceptance Criteria
@@ -37,26 +57,29 @@ Independent IMPL-EVAL round 1 technical acceptance evaluation for leaf C4 (`feat
 | Lifecycle and once-only operation semantics   | PASS   | `finish` and `end` are invoked once. Retained finish calls are ignored. Observer failures do not alter application results or error identity. Operation executed once. Verified in `lifecycle_test.ts` and `commands-telemetry_test.ts`.                                                                                                       |
 | Early validation and cancellation observation | PASS   | `createCommandExecutor` enters `telemetry.trace` before identity/validation. Early rejections (missing key -> `missing`, unsupported isolation, pre-aborted signal -> `cancelled`) observe spans before any store access. Store protocol, transaction isolation, and zero-retry semantics preserved. Verified in `commands-telemetry_test.ts`. |
 | Semantic production mutations                 | PASS   | 11 named tests verified with production mutations in `mutations.json`: each mutant produces an `AssertionError` (exit 1), and every restored target passes with byte-identical restoration (exit 0).                                                                                                                                           |
-| Truthful remaining Definition of Done         | PASS   | PR body retains unchecked DoD checklist pending independent evaluation and CI. No merge or false readiness claimed. Full-chain `scaffold.runtime` remains approved S20 gate.                                                                                                                                                                   |
+| CLI Consumer Qualification                    | PASS   | `packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts` verifies `@netscript/telemetry/commands` rewrites to canonical consumer import paths. All 19 tests pass (exit 0).                                                                                                                                                          |
+| Truthful Definition of Done & Native CI       | PASS   | Native core functional CI (`37784806031`) and Native runtime CI (`37784805979`) are green. The technical DoD boxes are fully evidenced. Independent PASS precedes final PR acceptance close-gate mirroring per protocol.                                                                                                                       |
 
 ## Static Gates
 
 | Gate                  | Command or check                                               | Result | Evidence                                                                                                                                                     | Notes                                   |
 | --------------------- | -------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------- |
-| Narrow / Root check   | `deno task check`                                              | PASS   | Exit 0: 3238 files selected across packages/plugins, 27 batches, 0 failed batches, 0 errors                                                                  | `--unstable-kv` included                |
-| Format check          | `deno task fmt:check`                                          | PASS   | Exit 0: 2224 files selected, 37 batches, 0 findings                                                                                                          | Wrapper passed                          |
-| Lint check            | `deno task lint`                                               | PASS   | Exit 0: 2224 files selected, 37 batches, 0 findings                                                                                                          | Wrapper passed                          |
+| Narrow / Root check   | `deno task check`                                              | PASS   | Exit 0: 3253 files selected across packages/plugins, 28 batches, 0 failed batches, 0 errors                                                                  | `--unstable-kv` included                |
+| Format check          | `deno task fmt:check`                                          | PASS   | Exit 0: 2239 files selected, 37 batches, 0 findings                                                                                                          | Wrapper passed                          |
+| Lint check            | `deno task lint`                                               | PASS   | Exit 0: 2239 files selected, 37 batches, 0 findings                                                                                                          | Wrapper passed                          |
 | Doc lint (new)        | `deno doc --lint packages/telemetry/commands.ts`               | PASS   | Exit 0: 0 diagnostics                                                                                                                                        | Clean export graph                      |
 | Doc lint (attributes) | `deno doc --lint packages/telemetry/src/attributes/command.ts` | PASS   | Exit 0: 0 diagnostics                                                                                                                                        | Clean types                             |
-| Baseline doc lint     | `deno task doc:lint --root packages/telemetry`                 | PASS   | `./commands.ts` (0 errors) and `./attributes.ts` (0 errors) clean; 7 baseline diagnostics in unchanged oRPC/Hono/SDK files explicitly recorded in `drift.md` | Baseline debt                           |
+| Baseline doc lint     | `deno task doc:lint --root packages/telemetry`                 | PASS   | `./commands.ts` (0 errors) and `./attributes.ts` (0 errors) clean; 7 baseline diagnostics in unchanged oRPC/Hono/SDK files explicitly recorded in `drift.md` | Baseline debt (exit 1 raw)              |
+| Docs exports drift    | `deno task docs:exports-drift`                                 | PASS   | Exit 0: Telemetry reference index matches all public package exports including `commands`                                                                    | Synchronized                            |
+| Docs accuracy         | `deno task docs:accuracy`                                      | PASS   | Exit 0: Documentation code blocks and symbol tables validated                                                                                                | Clean                                   |
 | Publish dry-run       | `deno publish --dry-run --allow-dirty` (packages/telemetry)    | PASS   | Exit 0: `Success Dry run complete`                                                                                                                           | Zero slow types in new commands surface |
 | Publish dry-run       | `deno publish --dry-run --allow-dirty` (packages/service)      | PASS   | Exit 0: `Success Dry run complete`                                                                                                                           | Approved carve-out preserved            |
 | JSR package audit     | `audit-jsr-package.ts --root packages/telemetry`               | PASS   | Exit 0: dry-run OK                                                                                                                                           | 14 subpaths qualified                   |
 | JSR package audit     | `audit-jsr-package.ts --root packages/service`                 | PASS   | Exit 0: dry-run OK                                                                                                                                           | 5 subpaths qualified                    |
 | Generated assets      | `deno task check:assets-barrel`                                | PASS   | Exit 0: generated assets barrel up-to-date                                                                                                                   | Fresh                                   |
 | Generated assets      | `deno task check:publish-assets`                               | PASS   | Exit 0: publish assets up-to-date                                                                                                                            | Fresh                                   |
-| Generated assets      | `deno task check:mcp-export-corpus` (pinned Deno 2.9.5)        | PASS   | Exit 0: sha256 `85fb604fa7e3f3576647037c97abab5528ebd073dc8f6d1c42f3166ddd5bffaa`                                                                            | Matches pinned compiler                 |
-| Generated assets      | `deno task check:agent-docs-prose` (pinned Deno 2.9.5)         | PASS   | Exit 0: sha256 `66f9b3f39a92efe3ba062aaef1b68d6d5a9aebf57baabacdcbf6b36f8701805a`, fresh: true                                                               | Matches site output                     |
+| Generated assets      | `deno task check:mcp-export-corpus` (pinned Deno 2.9.5)        | PASS   | Exit 0: export corpus up-to-date at `0b089e607`                                                                                                              | Matches pinned compiler                 |
+| Generated assets      | `deno task check:agent-docs-prose` (pinned Deno 2.9.5)         | PASS   | Exit 0: agent docs prose fresh (sha256 `f4ff6d8ec771bc25f4df2c26467799a750eca23afade639e4c9f0425e89429d5`)                                                   | Matches site output                     |
 
 ## Fitness Gates
 
@@ -84,20 +107,48 @@ Independent IMPL-EVAL round 1 technical acceptance evaluation for leaf C4 (`feat
 
 ## Runtime Gates
 
-| Gate                      | Validation                                                                                                                                                           | Result | Evidence                                                |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------- |
-| C4 Named Test Suite       | `deno test --allow-all packages/telemetry/tests/attributes/command_test.ts packages/telemetry/tests/commands/*.ts packages/service/tests/commands-telemetry_test.ts` | PASS   | Exit 0: 11 passed, 0 failed (374ms)                     |
-| Telemetry Full Test Suite | `deno test --allow-env --allow-read packages/telemetry/tests/`                                                                                                       | PASS   | Exit 0: 62 passed, 0 failed (1s)                        |
-| Service Commands Suite    | `deno test --allow-all packages/service/tests/commands*_test.ts`                                                                                                     | PASS   | Exit 0: 51 passed, 0 failed (501ms)                     |
-| Contracts Suite           | `deno test --allow-all packages/contracts/tests/`                                                                                                                    | PASS   | Exit 0: 20 passed, 0 failed (526ms)                     |
-| Scoped Regression Suite   | `deno test --allow-all --unstable-kv packages/telemetry packages/service packages/contracts`                                                                         | PASS   | Exit 0: 298 passed (293 tests + 5 steps), 0 failed (6s) |
-| Full-Chain Runtime Smoke  | `deno task e2e:cli run scaffold.runtime`                                                                                                                             | N/A    | Approved S20 gate; unchanged in C4 leaf                 |
+| Gate                       | Validation                                                                                                                                                           | Result | Evidence                                                                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| C4 Named Test Suite        | `deno test --allow-all packages/telemetry/tests/attributes/command_test.ts packages/telemetry/tests/commands/*.ts packages/service/tests/commands-telemetry_test.ts` | PASS   | Exit 0: 11 passed, 0 failed                                                                                                                 |
+| Telemetry Full Test Suite  | `deno test --allow-env --allow-read packages/telemetry/tests/`                                                                                                       | PASS   | Exit 0: 62 passed, 0 failed                                                                                                                 |
+| Service Commands Suite     | `deno test --allow-all packages/service/tests/commands*_test.ts`                                                                                                     | PASS   | Exit 0: 51 passed, 0 failed                                                                                                                 |
+| Contracts Suite            | `deno test --allow-all packages/contracts/tests/`                                                                                                                    | PASS   | Exit 0: 20 passed, 0 failed                                                                                                                 |
+| Scoped Regression Suite    | `deno test --allow-all --unstable-kv packages/telemetry packages/service packages/contracts`                                                                         | PASS   | Exit 0: 298 passed (293 tests + 5 steps), 0 failed                                                                                          |
+| CLI Mutator Unit Suite     | `deno test --allow-all packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts`                                                                            | PASS   | Exit 0: 19 passed, 0 failed (covers `@netscript/telemetry/commands` rewrite map)                                                            |
+| Full-Chain CLI E2E Runtime | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`                                                                                                   | PASS   | Exit 0: 104 passed, 0 failed, 0 skipped (`scaffold-runtime-bridged.log`). Native CI (`37784805979`): PostgreSQL 104/104, SQLite 98/98 PASS. |
+
+### Full-Chain E2E Runtime Detail
+
+1. **Local Bridged Execution (`scaffold-runtime-bridged.log`)**:
+   - 104 passing gates, 0 failed, 0 skipped. Exit code 0.
+   - Passed preflights, project initialization, service-client generation, Claude agent integration.
+   - Installed all 6 official plugins (`worker`, `saga`, `trigger`, `stream`, `auth`, `ai`).
+   - Passed DB codegen, migrations, seeding, and live allocation capture.
+   - Passed production design route exclusion.
+   - Passed generated workspace negative quality check, type-check (`generated.deno-check`), lint,
+     and fmt checks.
+   - Passed Aspire AppHost startup (`runtime.aspire-start` in 27.9s) with transparent container
+     loopback forwarding.
+   - Verified live database endpoints with correlated telemetry, OTEL webhook and stream consumer
+     fan-in links, Aspire MCP trace chain validation, detached telemetry tasks, and resource
+     commands.
+   - Rendered canonical app reference states across desktop and mobile browsers
+     (`behavior.app-reference`) with query island hydration and refetch.
+   - Clean AppHost shutdown verified (`cleanup.aspire-stop` PASSED in 2.5s).
+
+2. **Native GitHub Actions CI Execution (`37784805979`)**:
+   - `scaffold-runtime (aspire + docker + postgres)`: PASS (104/104 gates passed in 9m22s).
+   - `scaffold-runtime-sqlite (aspire + sqlite + garnet)`: PASS (98/98 gates passed in 8m44s).
+   - `scaffold-static (deno-only)`: PASS (2m15s).
+   - Overall conclusion: `success`.
 
 ## Consumer Gates
 
-| Consumer             | Validation                                                                                | Result | Evidence                                                                                           |
-| -------------------- | ----------------------------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------- |
-| `@netscript/service` | Cross-package executor integration in `packages/service/tests/commands-telemetry_test.ts` | PASS   | Structural assignability to `CommandTelemetryPort`; early rejection and committed telemetry tested |
+| Consumer             | Validation                                                                                                                     | Result | Evidence                                                                                           |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------ | -------------------------------------------------------------------------------------------------- |
+| `@netscript/service` | Cross-package executor integration in `packages/service/tests/commands-telemetry_test.ts`                                      | PASS   | Structural assignability to `CommandTelemetryPort`; early rejection and committed telemetry tested |
+| `@netscript/cli`     | Workspace mutator rewrite mapping in `packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts`                       | PASS   | Export rewrite map includes `@netscript/telemetry/commands`; generates clean consumer imports      |
+| Documentation Site   | Reference inventory in `docs/site/reference/telemetry/index.md` via `deno task docs:exports-drift` & `deno task docs:accuracy` | PASS   | All 16 public command symbols documented and validated                                             |
 
 ## Anti-Pattern Check
 
@@ -140,18 +191,22 @@ Independent IMPL-EVAL round 1 technical acceptance evaluation for leaf C4 (`feat
 
 ## Findings
 
-None. All technical acceptance criteria, process requirements, and static/runtime gates pass with verifiable evidence.
+None. All technical acceptance criteria, process requirements, static checks, fitness rules, scoped
+regressions, CLI consumer mutator qualifications, and full-chain runtime smoke tests have passed
+both locally and natively in CI with complete verifiable evidence.
 
 ## Lessons for Promotion
 
 | Lesson                                                | Pattern                                                                                                                                  | Applies to                | Confidence |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ---------- |
 | Structural Port Inversion for Cross-Package Telemetry | Expose a telemetry-owned structural port that satisfies an application port shape without creating an import dependency between packages | Archetype 2 (Integration) | High       |
+| Consumer Rewrite Map Synchronization                  | When introducing a new package public entrypoint, update CLI plugin mutator import maps alongside documentation index tables in one pass | Archetype 2 / CLI         | High       |
+| Transparent Forwarding for Container Runtime Health   | When running multi-container distributed orchestration inside Docker-in-Docker, maintain transparent container port forwarding           | CLI E2E / Aspire Testing  | High       |
 
 ## Verdict
 
-| Field          | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Verdict        | `PASS`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| Evaluated HEAD | `f99c0f13a7c1ed988bcbfe188ff330703bd9b361`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Rationale      | All technical acceptance criteria pass on exact evaluated clean HEAD `f99c0f13a7c1ed988bcbfe188ff330703bd9b361`. Strict attribute exclusion prevents data leaks. Native span relationships (INTERNAL child, PRODUCER publication with W3C propagation and deferred links) are verified. Once-only execution and error preservation are proven. Early validation observation wraps pre-transaction failures before store access. 11 semantic mutation tests pass and restore byte-identical. Scoped check, format, lint, doc lint, quality scan, architecture check, and 298 regression tests pass. Generated assets are verified fresh with pinned Deno 2.9.5. DoD accurately reflects pending independent status. No doctrine violations or new debt introduced. |
+| Field          | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Verdict        | `PASS`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Evaluated HEAD | `0b089e607dbc4284a5d4d29e32a37dbb89ba1e49`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Rationale      | On exact clean HEAD `0b089e607dbc4284a5d4d29e32a37dbb89ba1e49`, leaf C4 achieves full technical acceptance. All command telemetry contracts, strict attribute filtering, INTERNAL server child parenting, PRODUCER publication, W3C context propagation, and early validation observation are verified. 11 semantic mutation tests pass and restore byte-identical. The CLI consumer workspace mutator rewrite map and documentation index tables are completely synchronized and pass unit/drift checks. Scoped check, format, lint, doc lint, quality scan, architecture check, and 298 regression tests pass cleanly. The round-2 full runtime failure has been fully remediated: the canonical one-pass `scaffold.runtime` suite passes all 104 gates locally (exit 0) and passes natively in GitHub Actions CI (run 37784805979). Native core CI (run 37784806031) is green. No doctrine debt or leaks exist. |
