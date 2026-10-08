@@ -2433,7 +2433,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 - **Owner:** SDK, Fresh and MCP maintainers.
 - **Target:** 2026-10-15.
-- **Status:** proposed; independent IMPL-EVAL adjudication required.
+- **Status:** open, DEBT_ACCEPTED by independent Google IMPL-EVAL at
+  `510856423f270333499f7e8e3639a117c6d7a6ff` (desktop-doc-baseline-2041).
 - **Scope:** The all-export documentation reports at baseline
   `8aad14940c52cd3a4db7efa57d56d50ae131df6c` and completed desktop source are byte-identical,
   including every entrypoint diagnostic and exit. SDK combined diagnostics: 3 private type
