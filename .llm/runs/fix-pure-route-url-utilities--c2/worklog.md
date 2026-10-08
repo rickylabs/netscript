@@ -101,3 +101,23 @@ S5 independent Zhipu GLM max IMPL-EVAL PASS at exact evaluated head dd452c4b1330
 ## S6 generated documentation CI amendment
 
 CI quality at b1adc4d94ea0a950212b10818f5c1a318bab0c53 reports check:agent-docs-prose stale prose.json.gz/provenance.json after the approved route migration docs changed. Regenerate owning agent prose using canonical gen:agent-docs-prose from clean committed source; check canonical freshness, owning generator tests, embedded carrier and export corpus. No handwritten generated edits, route code or public contract changes, new tests or releases. Original production/browser/full-source independent PASS and accepted doc baseline remain unchanged. PLAN-EVAL amendment N/A: mechanical generated-document freshness under already approved documentation migration. S6 commit generated assets plus gates, then mandatory separate bounded amendment IMPL-EVAL (retain original evaluate.md). Quality gate failure is real until corrected; no false green. Same PR #2090, no merge/publication.
+
+Gate `route-ci-prose-generate`: raw exit `0`. Command: `deno task gen:agent-docs-prose`. Full raw output retained privately.
+
+Gate `route-ci-carrier`: raw exit `1`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+Gate `route-ci-prose-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/docs/build-agent-docs-bundle_test.ts`. Full raw output retained privately.
+
+Gate `route-ci-corpus`: raw exit `0`. Command: `deno task check:mcp-export-corpus`. Full raw output retained privately.
+
+Gate `route-ci-prose-fresh`: raw exit `0`. Command: `deno task check:agent-docs-prose`. Full raw output retained privately.
+
+Gate `route-ci-embedded-prose-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/mcp/tests/release-embedded-docs-corpus_test.ts`. Full raw output retained privately.
+
+Gate `route-ci-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `route-ci-cli-doc`: raw exit `0`. Command: `deno task doc:lint --root packages/cli`. Full raw output retained privately.
+
+Gate `route-ci-cli-jsr`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli --text`. Full raw output retained privately.
+
+S6 substantive generated-data review: canonical gen:agent-docs-prose at clean committed 74c0a17b4 changes only route page prose and its llms-full aggregate; all other extracted pages byte-unchanged, no added/removed files. Bundle hash 03fcbe65897f5f8613886efe276088daedc46932908f440d429d9bc13c591071. Canonical generator also updates existing CLI embedded agent-docs carrier/provenance (same exports/shape). No handwritten generated data, runtime source, lock or dependency change. Canonical prose freshness and generator four tests + embedded consumer four tests pass; full quality/architecture and export corpus freshness pass. Initial check:assets-barrel generates the required carrier then reports raw exit one on its uncommitted expected delta; commit that canonical output, then require committed carrier/freshness pass. Additional owning CLI doc/JSR/publication dry-run gates selected for changed carrier. No command/scaffold/packaging output or public API change; release-class runtime gates remain N/A. Original route browser/source PASS and documentation debt unchanged; independent bounded generated amendment review required.
