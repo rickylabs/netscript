@@ -148,7 +148,53 @@ export function createHealthHandler(options?: HealthHandlerOptions): ServiceHand
 /**
  * Pre-built health checks for common dependencies.
  */
-export const healthChecks = {
+export const healthChecks: {
+  /**
+   * Database health check using Prisma.
+   *
+   * @example
+   * ```typescript
+   * healthChecks.database(db)
+   * ```
+   */
+  database: (
+    db: { $queryRaw: (query: TemplateStringsArray) => Promise<unknown> },
+    options?: HealthCheckAdapterOptions,
+  ) => HealthCheck;
+  /**
+   * Deno KV health check.
+   *
+   * @example
+   * ```typescript
+   * healthChecks.kv()
+   * ```
+   */
+  kv: (options?: HealthCheckAdapterOptions) => HealthCheck;
+  /**
+   * External service health check via HTTP.
+   *
+   * @example
+   * ```typescript
+   * healthChecks.service('users', baseUrl)
+   * ```
+   */
+  service: (name: string, baseUrl: string, options?: HealthCheckAdapterOptions) => HealthCheck;
+  /**
+   * Custom health check with a simple boolean function.
+   *
+   * @example
+   * ```typescript
+   * healthChecks.custom('redis', async () => {
+   *   return await redis.ping() === 'PONG';
+   * })
+   * ```
+   */
+  custom: (
+    name: string,
+    fn: () => Promise<boolean>,
+    options?: HealthCheckAdapterOptions,
+  ) => HealthCheck;
+} = {
   /**
    * Database health check using Prisma.
    *

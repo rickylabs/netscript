@@ -1,0 +1,70 @@
+{
+  "verdict": "SUPERVISOR_APPROVED",
+  "verifiedFreeze": {
+    "observedAt": "2026-10-08T00:32:36.866528+00:00",
+    "generationHead": "2df7d9b393af7180bd318da6c6926d212e6344d6",
+    "productSourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+    "freezeSha256": "5946115bdb0f4a55f6390cd1d82edf5bbf234e215e700f9db850a107e93cf0f5",
+    "frozenFilesVerified": 10,
+    "rawEvidenceFilesVerified": 87,
+    "allNonWaveTrackedFilesUnchanged": true,
+    "historicalRunBodiesVerbatim": true,
+    "nativeAssets": [
+      {
+        "path": "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+        "sha256": "be5231ae171367ae34eb917a813013ae07a973baa1f85810b03ea7dc5ef51acd"
+      },
+      {
+        "path": "packages/mcp/src/publish-assets.generated.ts",
+        "sha256": "e34f53c84c537b09dac902827586cab38fa74bfa64f7c0fa4f70136b083a714e"
+      }
+    ],
+    "nativeAssetAggregateSha256": "2cc6d09df60688fbd095a747ca6e60dd5caa22b15106dd6a489c9129d78964bf",
+    "nativeAssetAggregateIndependentlyRecomputed": true,
+    "nativeOutputReceiptHashesVerified": true,
+    "standaloneFullNativeLintAndFormatRulesVerified": true,
+    "twoAssetSelectionAndProcessingCoverageVerified": true,
+    "semanticReconciliationIndependentlyExecuted": true,
+    "rootSemanticLogSha256": "3fdf0adbacb28dd00859dd74b033b4889beda0c29b1d420226561d3f8de5e6f0",
+    "committedBarrelExitBeforeCommit": 1,
+    "committedBarrelPassClaimed": false,
+    "newNamedTests": 0
+  },
+  "independentFinalGates": {
+    "observedAt": "2026-10-08T00:32:56.285180+00:00",
+    "nativeAssetAggregateSha256": "2cc6d09df60688fbd095a747ca6e60dd5caa22b15106dd6a489c9129d78964bf",
+    "freezeRecordSha256": "5946115bdb0f4a55f6390cd1d82edf5bbf234e215e700f9db850a107e93cf0f5",
+    "sourceStableThroughout": true,
+    "gates": [
+      {
+        "gate": "quality-scan",
+        "exitCode": 0,
+        "outcome": "PASS",
+        "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "baselineHead": "2df7d9b393af7180bd318da6c6926d212e6344d6",
+        "invocationId": "c2-downstream-final-supervisor-quality-scan",
+        "rawLogSha256": "7ef99e2fa6e12353d00bd4f3989051588b890e49c4e7fe846eb603d50d6edd4e",
+        "rawReceiptSha256": "2e3068f0f2ecae4d3f826970f9549371269843ac241685ee198cab08150f58c3"
+      },
+      {
+        "gate": "arch-check",
+        "exitCode": 0,
+        "outcome": "PASS",
+        "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "baselineHead": "2df7d9b393af7180bd318da6c6926d212e6344d6",
+        "invocationId": "c2-downstream-final-supervisor-arch-check",
+        "rawLogSha256": "5f9efe767a0d6deb4dd734cf1cda269f60d5a3fd47818410ab7b35d3358f2e53",
+        "rawReceiptSha256": "fd751a54bb49486d4a953e7270243c021fbbb2996e427a81ad9dd3df22385446"
+      }
+    ]
+  },
+  "signedSliceFiles": 12,
+  "assetBytesStable": true,
+  "committedBarrelPassBeforeCommit": false,
+  "remaining": [
+    "Final committed-tree native qualification",
+    "Executed technical CI including worktree fixtures",
+    "Independent C2 IMPL-EVAL",
+    "Final acceptance/DoD/live close-gate reconciliation"
+  ]
+}

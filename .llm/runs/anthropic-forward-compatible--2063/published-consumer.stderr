@@ -1,0 +1,10 @@
+Download https://jsr.io/@netscript/ai/0.0.7/anthropic.ts
+Download https://jsr.io/@netscript/ai/0.0.7/src/ports/model-provider.ts
+Download https://jsr.io/@netscript/ai/0.0.7/src/adapters/anthropic.adapter.ts
+Download https://jsr.io/@netscript/ai/0.0.7/src/adapters/tanstack-chat-client.ts
+Warning The following peer dependency issues were found:
+└─┬ @tanstack/ai-anthropic@0.18.13 (imported by https://jsr.io/@netscript/ai/0.0.7/src/adapters/anthropic.adapter.ts)
+  └── peer @tanstack/ai@^0.59.0: resolved to 0.52.3
+
+These packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an "overrides" entry to your package.json or deno.json.
+Learn more: https://docs.deno.com/go/peer-deps

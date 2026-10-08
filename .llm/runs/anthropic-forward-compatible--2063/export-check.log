@@ -1,0 +1,2 @@
+Task check:mcp-export-corpus deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check
+{"schemaVersion":1,"frameworkVersion":"0.0.7","sha256":"cfecd534f2f3d32b21b4cf504fd0569c43143da8ed5bce790742058ee5f61045","uncompressedBytes":2223359,"compressedBytes":324236,"packageCount":35,"subpathCount":275,"symbolCount":7908}

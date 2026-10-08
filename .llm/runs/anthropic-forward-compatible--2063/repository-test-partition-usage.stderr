@@ -1,0 +1,1 @@
+Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '--no-lock' '--ignore=.llm/tools/maint/claude/claude-hook-log_test.ts' '--report-output' '.llm/runs/anthropic-forward-compatible--2063/repository-test-partition-usage.json'

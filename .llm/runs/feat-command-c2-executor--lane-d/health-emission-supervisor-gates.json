@@ -1,0 +1,22 @@
+{
+  "appliedC2BaselineHead": "0af020a4e8eef6fb95827b6ebd773e5f53e7d201",
+  "healthSourceSha256": "1ac94a31b16498192a41f66521418613663ccef78c34b545856b80dc63bc872e",
+  "gates": [
+    {
+      "gate": "quality-scan",
+      "exitCode": 0,
+      "runtime": "2.9.5",
+      "healthSourceSha256": "1ac94a31b16498192a41f66521418613663ccef78c34b545856b80dc63bc872e",
+      "rawLogSha256": "591f17f09b92dd74633221b4fabfeb5a855d0255b654998d2f5fee537d59116f"
+    },
+    {
+      "gate": "arch-check",
+      "exitCode": 0,
+      "runtime": "2.9.5",
+      "healthSourceSha256": "1ac94a31b16498192a41f66521418613663ccef78c34b545856b80dc63bc872e",
+      "rawLogSha256": "55a6b92fbf79e5e70a91af4c907227f55b5c89d19409ef9a9350424af8064431"
+    }
+  ],
+  "s4All20ProductHashesUnchanged": true,
+  "newReviewedDependencyLockBytesUnchanged": true
+}

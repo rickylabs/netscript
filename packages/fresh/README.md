@@ -295,3 +295,14 @@ browser document automatically retires its previous MessagePort before opening a
 Older document callbacks cannot close the replacement. Application shutdown still calls the binding's
 idempotent `close()` method. Custom two-argument invoke adapters keep their existing lifecycle;
 automatic document reconnection requires the coordinated SDK and Fresh release.
+
+### StreamDB recovery
+
+The default `createNetScriptStreamDB` handle starts with `await db.preload?.()`.
+Its finite reconnect policy resumes the last consumed batch and retains the same
+reactive collections. `db.status` exposes liveness and terminal failure. Configure
+`reconnect.maxRetries`, `initialDelayMs`, and `maxDelayMs` to bound an outage;
+zero retries disables recovery. Authentication, malformed data, subscriber errors
+and invalid retained offsets fail without silently replaying the log. Stop or
+dispose cancels reads and backoff and is idempotent. Alternate factory adapters
+may omit these optional lifecycle hooks.
