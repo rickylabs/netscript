@@ -168,3 +168,75 @@ Scoped check 204 files, regression 356 PASS/0 FAIL/3 provider-dependent ignored,
   }
 ]
 ```
+
+## S18 implementation and Tier-A slice review
+
+Two named contract RED AssertionErrors before the adapter. Database-owned bindPostgresCommandOutbox reuses C3's reviewed append SQL; root/lifecycle handles refused. Named createPrismaSagaTransitionStore preserves the true callback type and commits hashed replay marker, state CAS, owned correlation, append-only history and all outbox rows under one physical transaction/deadline. Cancellation after each actual row seam rolls back all five; same inbound key retries. Initial absence and stale/concurrent/replay races prove one command set. Shared conformance runs on memory and generated-client PostgreSQL. Actual root-write negative control survives rollback, and intentional root-bound outbox production mutation is caught by a named provider assertion. Read hydration revives only framework dates, preserving business state strings. Reviewed shipped replay model and migration fixtures; construction has no DDL. Existing general Prisma idempotency parity remains deferred. Saga-id bound matches the shipped schema.
+
+Static check, scoped regression, lint/format/quality/architecture and complete owned stores/database-postgres doc entrypoints pass. Five semantic mutation controls restore exact bytes and PASS; provider controls verify inner named AssertionError, not wrapper compilation failure. Native provider gate runs both current C3 command-store and C6 generated-client physical suites without ignored tests; raw exits retained privately. S18 native gate EXIT 0 (both provider wrappers, zero ignored); regression 381 PASS/0 FAIL/5 provider-dependent ignored separately certified. S18 signoff: PASS for slice only. S19/S20, final evaluator/CI remain pending.
+
+```json
+[
+  {
+    "name": "s18-bound-root",
+    "test": "bound outbox rejects lifecycle and root clients before any write",
+    "innerTest": null,
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "bytesIdentical": true,
+    "restoredSha256": {
+      "packages/database/src/commands/adapters/bind-postgres-command-outbox.ts": "bc989620a4939a76c69e0a6daa4d95a58c2e8fd99b15d0ee5b3fa50e34b1f567"
+    }
+  },
+  {
+    "name": "s18-atomic-root",
+    "test": "Prisma atomic adapter refuses root callback handles before writes",
+    "innerTest": null,
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "bytesIdentical": true,
+    "restoredSha256": {
+      "packages/database/src/commands/adapters/bind-postgres-command-outbox.ts": "bc989620a4939a76c69e0a6daa4d95a58c2e8fd99b15d0ee5b3fa50e34b1f567"
+    }
+  },
+  {
+    "name": "s18-provider-cancel",
+    "test": "real PostgreSQL generated-client atomic saga transition conformance",
+    "innerTest": "PostgreSQL whole transition rolls back each row seam and retries the same inbound identity",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "bytesIdentical": true,
+    "restoredSha256": {
+      "packages/plugin-sagas-core/src/stores/prisma-saga-transition-store.ts": "dfb5d3271b3e67e3775c6b658e89985f355397d62be570a1068f65987d0fbcf5"
+    }
+  },
+  {
+    "name": "s18-provider-replay",
+    "test": "real PostgreSQL generated-client atomic saga transition conformance",
+    "innerTest": "PostgreSQL stale saga writers and replay races commit one command set",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "bytesIdentical": true,
+    "restoredSha256": {
+      "packages/plugin-sagas-core/src/stores/prisma-saga-transition-store.ts": "dfb5d3271b3e67e3775c6b658e89985f355397d62be570a1068f65987d0fbcf5"
+    }
+  },
+  {
+    "name": "s18-provider-root-escape",
+    "test": "real PostgreSQL generated-client atomic saga transition conformance",
+    "innerTest": "PostgreSQL whole transition rolls back each row seam and retries the same inbound identity",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "bytesIdentical": true,
+    "restoredSha256": {
+      "packages/database/src/commands/adapters/bind-postgres-command-outbox.ts": "bc989620a4939a76c69e0a6daa4d95a58c2e8fd99b15d0ee5b3fa50e34b1f567",
+      "packages/plugin-sagas-core/src/stores/prisma-saga-transition-store.ts": "dfb5d3271b3e67e3775c6b658e89985f355397d62be570a1068f65987d0fbcf5"
+    }
+  }
+]
+```

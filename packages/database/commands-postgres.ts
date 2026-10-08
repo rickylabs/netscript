@@ -35,3 +35,8 @@ export type {
   TransactionClientPort,
   TransactionOptions,
 } from './commands.ts';
+
+export {
+  bindPostgresCommandOutbox,
+  type PostgresCommandOutboxWriter,
+} from './src/commands/adapters/bind-postgres-command-outbox.ts';

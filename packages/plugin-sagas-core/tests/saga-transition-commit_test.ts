@@ -1,3 +1,4 @@
+import { assertAtomicTransitionConformance } from './transition-conformance.ts';
 import { assertEquals, assertRejects } from '@std/assert';
 import { MemoryKvAdapter } from '@netscript/kv';
 import { defineSaga } from '../mod.ts';
@@ -60,6 +61,7 @@ function outbox(store: MemorySagaStore) {
 }
 
 Deno.test('memory atomic transition commits all rows once and rolls back invalid stale or duplicate work', async () => {
+  await assertAtomicTransitionConformance(new MemorySagaStore());
   const store = new MemorySagaStore();
   assertEquals(typeof Reflect.get(store, 'commitTransition'), 'function');
   await assertRejects(() =>

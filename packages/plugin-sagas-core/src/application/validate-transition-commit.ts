@@ -41,6 +41,9 @@ export function snapshotTransitionCommit(
       throw new TypeError('Atomic saga transition identifiers must be bounded.');
     }
   }
+  if (new TextEncoder().encode(correlation.sagaId).length > 100) {
+    throw new TypeError('Atomic saga definition id exceeds the shipped schema bound.');
+  }
   const ids = new Set<string>();
   let bytes = 0;
   for (const command of commands) {

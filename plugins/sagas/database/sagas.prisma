@@ -74,6 +74,17 @@ model SagaRuntimeCorrelation {
   @@map("saga_runtime_correlation")
 }
 
+/// Hashed inbound marker committed only by the transition/command protocol.
+/// This is not the general SagaIdempotencyPort adapter.
+model SagaRuntimeCommandAppliedKey {
+  instanceId String @map("instance_id") @db.VarChar(200)
+  keyHash String @map("key_hash") @db.VarChar(64)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([instanceId, keyHash], name: "saga_runtime_command_applied_key_identity")
+  @@map("saga_runtime_command_applied_key")
+}
+
 // ============================================================================
 // SAGA INSTANCE
 // ============================================================================

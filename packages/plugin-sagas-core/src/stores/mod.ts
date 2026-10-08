@@ -15,6 +15,8 @@ export type {
   SagaId,
   SagaInstanceId,
   SagaInstanceStatus,
+  SagaMessage,
+  SagaMessageId,
   SagaState,
   SagaStateEnvelope,
   SagaStateMetadata,
@@ -46,7 +48,7 @@ export type {
 export { MemorySagaAppliedKeyStore } from '../runtime/mod.ts';
 export { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
 export { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
-export { PrismaSagaStore } from './prisma-saga-store.ts';
+export { PrismaSagaStore, SAGA_RUNTIME_CORRELATION_SELECTOR } from './prisma-saga-store.ts';
 export {
   resolveSagaStoreBackend,
   SAGA_STORE_BACKEND_ENV,
@@ -77,3 +79,23 @@ export type {
   DurableSagaStoreBackend,
   SagaStoreBackendResolutionInput,
 } from './saga-store-backend.ts';
+
+export {
+  createPrismaSagaTransitionStore,
+  type PrismaSagaTransitionStore,
+  type PrismaSagaTransitionStoreOptions,
+} from './prisma-saga-transition-store.ts';
+export type {
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+  SagaTransitionStore,
+} from '../ports/saga-transition-commit-port.ts';
+export type {
+  DatabaseProvider,
+  IsolationLevel,
+  PostgresCommandClient,
+  StoredCommandOutbox,
+  TransactionClientPort,
+  TransactionOptions,
+} from '@netscript/database/commands/postgres';
