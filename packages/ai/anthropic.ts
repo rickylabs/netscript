@@ -23,6 +23,7 @@
 
 import type { ModelProviderConfig } from './src/ports/model-provider.ts';
 import { registerModelProvider } from './src/ports/model-provider.ts';
+import { AiError } from './src/contracts/errors.ts';
 import {
   ANTHROPIC_PROVIDER_ID,
   AnthropicModelProvider,
@@ -31,9 +32,17 @@ import {
 
 /** Narrow an opaque registry config bag to the Anthropic provider config. */
 function readAnthropicConfig(config?: ModelProviderConfig): AnthropicModelProviderConfig {
+  const models = config?.models;
+  if (
+    models !== undefined &&
+    (!Array.isArray(models) || !models.every((id): id is string => typeof id === 'string'))
+  ) {
+    throw new AiError('Anthropic models must be an array of API model IDs.');
+  }
   return {
     apiKey: typeof config?.apiKey === 'string' ? config.apiKey : undefined,
     baseURL: typeof config?.baseURL === 'string' ? config.baseURL : undefined,
+    models,
   };
 }
 

@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "npm:@tanstack/ai@^0.52.0": "npm:@tanstack/ai@0.52.3",
+    "npm:@tanstack/ai-anthropic@^0.18.3": "npm:@tanstack/ai-anthropic@0.18.3"
+  }
+}
