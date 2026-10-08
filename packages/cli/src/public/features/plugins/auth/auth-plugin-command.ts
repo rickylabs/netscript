@@ -78,6 +78,29 @@ export function createAuthPluginCommand(
         .option('--cookie-password <value:string>', 'WorkOS cookie password')
         .option('--secret <value:string>', 'better-auth secret')
         .option('--kv-oauth-key <value:string>', 'Generated KV OAuth encryption key')
+        .env(
+          'NETSCRIPT_AUTH_CLIENT_SECRET=<value:string>',
+          'OAuth client secret from environment',
+          {
+            prefix: 'NETSCRIPT_AUTH_',
+          },
+        )
+        .env(
+          'NETSCRIPT_AUTH_KV_OAUTH_KEY=<value:string>',
+          'KV OAuth encryption key from environment',
+          {
+            prefix: 'NETSCRIPT_AUTH_',
+          },
+        )
+        .env('WORKOS_API_KEY=<value:string>', 'WorkOS API key from environment', {
+          prefix: 'WORKOS_',
+        })
+        .env('WORKOS_COOKIE_PASSWORD=<value:string>', 'WorkOS cookie password from environment', {
+          prefix: 'WORKOS_',
+        })
+        .env('BETTER_AUTH_SECRET=<value:string>', 'better-auth secret from environment', {
+          prefix: 'BETTER_AUTH_',
+        })
         .option('--project-root <path:string>', 'Project root directory')
         .action(async (options: Record<string, string | undefined>) => {
           const projectRoot = await requireProjectRoot(

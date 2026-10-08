@@ -147,6 +147,7 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'run',
+        `--env-file=${context.project.projectRoot}/.env`,
         '--allow-env',
         '--allow-read',
         '--allow-write',
@@ -194,6 +195,7 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'eval',
+        `--env-file=${context.project.projectRoot}/.env`,
         ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT,
         context.project.appHost,
         context.project.projectRoot,
