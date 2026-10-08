@@ -1,8 +1,8 @@
 import { assertAtomicTransitionConformance } from './transition-conformance.ts';
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertStrictEquals, assertThrows } from '@std/assert';
 import { MemoryKvAdapter } from '@netscript/kv';
 import { defineSaga } from '../mod.ts';
-import { SagaEngine } from '../src/runtime/saga-engine.ts';
+import { registeredSagaDefinition, SagaEngine } from '../src/runtime/saga-engine.ts';
 import { MemorySagaStore } from '../src/testing/memory-saga-store.ts';
 import { KvSagaStore } from '../src/stores/kv-saga-store.ts';
 import { PrismaSagaStore, type PrismaSagaStoreClient } from '../src/stores/prisma-saga-store.ts';
@@ -131,6 +131,28 @@ Deno.test('memory atomic transition commits all rows once and rolls back invalid
 });
 
 Deno.test('atomic saga composition refuses KV and unbound Prisma before handler or storage work', async () => {
+  const legacy = {
+    id: 'legacy-registry',
+    durability: 't1',
+    initialState: {},
+    handledMessageTypes: [],
+    handlers: new Map(),
+  };
+  let registrationFailure: unknown;
+  let normalized: ReturnType<typeof registeredSagaDefinition> | undefined;
+  try {
+    normalized = registeredSagaDefinition(legacy);
+  } catch (error) {
+    registrationFailure = error;
+  }
+  assertEquals(registrationFailure, undefined);
+  assertEquals(normalized?.correlations, []);
+  for (const field of ['compensations', 'signalHandlers', 'queryHandlers']) {
+    assertEquals(Reflect.get(normalized ?? {}, field), new Map());
+  }
+  for (const field of ['correlations', 'compensations', 'signalHandlers', 'queryHandlers']) {
+    assertThrows(() => registeredSagaDefinition({ ...legacy, [field]: null }), TypeError);
+  }
   let calls = 0;
   const kv = new KvSagaStore({ kv: new MemoryKvAdapter() });
   const prisma = new PrismaSagaStore({
@@ -150,6 +172,7 @@ Deno.test('atomic saga composition refuses KV and unbound Prisma before handler 
       },
     ).build(),
   };
+  assertStrictEquals(registeredSagaDefinition(definition), definition);
   for (const store of [kv, prisma]) {
     const engine = new SagaEngine({ store });
     await assertRejects(

@@ -1,5 +1,7 @@
 {
-  "protocol": "semantic production mutant; focused named AssertionError; exact-byte restore and PASS",
+  "protocol": "semantic production mutant; focused named AssertionError; exact-byte restore/PASS",
+  "newNamedTests": 17,
+  "additionalExistingConsumerRegression": 1,
   "rows": [
     {
       "name": "s15-tags",
@@ -128,7 +130,7 @@
       "mutantExit": 1,
       "namedAssertion": true,
       "restoredExit": 0,
-      "restoredSha256": "3c9496d1b518ea9ed22966ca40f9851527c17fb3b0cbbe192d07889435c6a273",
+      "restoredSha256": "1d6c7f96ce8254f23150b6d9c5b53bfbeddef5274af7841de04cf3bcef3bf9ba",
       "bytesIdentical": true
     },
     {
@@ -138,7 +140,7 @@
       "mutantExit": 1,
       "namedAssertion": true,
       "restoredExit": 0,
-      "restoredSha256": "3c9496d1b518ea9ed22966ca40f9851527c17fb3b0cbbe192d07889435c6a273",
+      "restoredSha256": "1d6c7f96ce8254f23150b6d9c5b53bfbeddef5274af7841de04cf3bcef3bf9ba",
       "bytesIdentical": true
     },
     {
@@ -178,7 +180,7 @@
       "mutantExit": 1,
       "namedAssertion": true,
       "restoredExit": 0,
-      "restoredSha256": "3c9496d1b518ea9ed22966ca40f9851527c17fb3b0cbbe192d07889435c6a273",
+      "restoredSha256": "1d6c7f96ce8254f23150b6d9c5b53bfbeddef5274af7841de04cf3bcef3bf9ba",
       "bytesIdentical": true
     },
     {
@@ -308,6 +310,36 @@
       "namedAssertion": true,
       "restoredExit": 0,
       "restoredSha256": "9d75c1e68b0ff59c0d71f7fcd4be6b594f18ba20a46dd431e1055001a0e5791e",
+      "bytesIdentical": true
+    },
+    {
+      "name": "repair-legacy-defaults",
+      "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+      "test": "atomic saga composition refuses KV and unbound Prisma before handler or storage work",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "1d6c7f96ce8254f23150b6d9c5b53bfbeddef5274af7841de04cf3bcef3bf9ba",
+      "bytesIdentical": true
+    },
+    {
+      "name": "repair-packaged-registry",
+      "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+      "test": "packaged runtime export starts a saga runtime with a project-owned non-empty registry",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "1d6c7f96ce8254f23150b6d9c5b53bfbeddef5274af7841de04cf3bcef3bf9ba",
+      "bytesIdentical": true
+    },
+    {
+      "name": "repair-explicit-null",
+      "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+      "test": "atomic saga composition refuses KV and unbound Prisma before handler or storage work",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "1d6c7f96ce8254f23150b6d9c5b53bfbeddef5274af7841de04cf3bcef3bf9ba",
       "bytesIdentical": true
     }
   ]

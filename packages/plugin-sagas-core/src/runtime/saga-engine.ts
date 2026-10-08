@@ -608,10 +608,27 @@ function telemetryOutcomeFromStatus(status: SagaInstanceStatus): SagaTelemetryOu
 
 /** Validate the heterogeneous registry boundary while retaining the selected definition callbacks. */
 export function registeredSagaDefinition(value: unknown): SagaDefinition {
-  if (!isRegisteredSagaDefinition(value)) {
+  if (isRegisteredSagaDefinition(value)) return value;
+  if (!value || typeof value !== 'object') {
     throw new TypeError('Invalid saga definition registration.');
   }
-  return value;
+  // Older registry artifacts omit unused collections. Complete those defaults at
+  // the boundary while retaining validation of every explicitly supplied value.
+  const collection = (name: string, fallback: unknown): unknown => {
+    const supplied = Reflect.get(value, name);
+    return supplied === undefined ? fallback : supplied;
+  };
+  const complete = {
+    ...value,
+    correlations: collection('correlations', []),
+    compensations: collection('compensations', new Map()),
+    signalHandlers: collection('signalHandlers', new Map()),
+    queryHandlers: collection('queryHandlers', new Map()),
+  };
+  if (!isRegisteredSagaDefinition(complete)) {
+    throw new TypeError('Invalid saga definition registration.');
+  }
+  return complete;
 }
 
 function isRegisteredSagaDefinition(value: unknown): value is SagaDefinition {
