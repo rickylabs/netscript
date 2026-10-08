@@ -131,3 +131,23 @@ Gate `route-ci-committed-prose`: raw exit `0`. Command: `deno task check:agent-d
 S6 independent generated-document amendment IMPL-EVAL PASS at d412159803cb71321047d2ef393934c51db213ef, generated source 1cb73eb36420220dc1ab62de43f0de7ca9581b86. Evaluator independently verifies all 182 extracted page keys, only route and llms-full delta, byte-equal committed carrier, bundle/provenance hash, canonical freshness, generator four/embedded four tests, committed carrier/export freshness and CLI doc/JSR gates; raw publication/quality receipts corroborated. Original route full runtime/source PASS and accepted documentation baseline retained unchanged. No findings. Evaluator exited zero before closeout. Phase 7 amendment complete, phase 9 source delivery complete; no runtime source change in this report/context commit. Final exact-head CI and publication/published consumer remain qualification gates, no merge/release/Fixes claim.
 
 S7 docs review amendment Design checkpoint: PLAN-EVAL N/A, one remaining migration sentence now names the already approved public page.hooks.useRoute().getLinkProps capability instead of inaccessible internal usePageRoute. No runtime/public signature/dependency/test delta. Original source/browser and prior carrier independent PASS retained. One-sentence substantive review completed; canonical clean-source prose/CLI carrier S8 then mandatory independent bounded doc-review-evaluate.md S9.
+
+Gate `doc-review-generate`: raw exit `0`. Command: `deno task gen:agent-docs-prose`. Full raw output retained privately.
+
+Gate `doc-review-carrier-uncommitted`: raw exit `1`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+Gate `doc-review-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/docs/build-agent-docs-bundle_test.ts packages/mcp/tests/release-embedded-docs-corpus_test.ts`. Full raw output retained privately.
+
+Gate `doc-review-prose`: raw exit `0`. Command: `deno task check:agent-docs-prose`. Full raw output retained privately.
+
+Gate `doc-review-corpus`: raw exit `0`. Command: `deno task check:mcp-export-corpus`. Full raw output retained privately.
+
+Gate `doc-review-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `doc-review-cli-doc`: raw exit `0`. Command: `deno task doc:lint --root packages/cli`. Full raw output retained privately.
+
+Gate `doc-review-cli-jsr`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli --text`. Full raw output retained privately.
+
+Gate `doc-review-cli-publish`: raw exit `0`. Command: `deno task --cwd packages/cli publish:dry-run`. Full raw output retained privately.
+
+S8 canonical source qualification: gen:agent-docs-prose from clean committed S7 and existing CLI carrier generation change exactly route page plus llms-full aggregate; all182 keys retained, every other page byte-identical. Canonical freshness,8existing generator/embedded tests, export freshness, quality/architecture and owning CLI doc/JSR/raw dry publication pass. Initial carrier rawexit1 reflects expected uncommitted canonical delta and is retained; require committed carrier next. No new tests or runtime/export/dependency/source behavior change. Mandatory independent bounded amendment IMPL next.
