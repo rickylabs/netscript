@@ -2436,6 +2436,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Target:** 2026-10-15.
 - **Linked plan:** `.llm/runs/fix-pure-route-url-utilities--c2/plan.md`; NetScript #2040.
 - **Created:** 2026-10-08.
-- **Status:** open, proposed DEBT pending independent IMPL-EVAL adjudication.
+- **Status:** open, DEBT_ACCEPTED by independent IMPL-EVAL at dd452c4b1330044cfe12ebabef1a8bb345cb71d7.
 - **Gate:** All-export doc lint reaches zero with existing public types preserved. This repair introduces no additional entrypoint diagnostic. Publication and qualified published consumer remain owner release gates.
 - **Evidence:** Complete private baseline/current reports and entrypoint comparison; worklog retains both failing raw doc exits, passing owning JSR audit and actual publish dry-run.
