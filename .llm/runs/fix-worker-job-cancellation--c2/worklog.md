@@ -279,3 +279,5 @@ Public surface and domain vocabulary remain those of the reviewed feature. Exist
 Conflict resolution: main now uses real workers core and includes configured/unconfigured plugin-dir payloads. Retained writeWorkersManifest(projectRoot, true) and real core type imports; retained PR signal arguments on valid and invalid handler calls and both negative payload assertions. Removed obsolete duplicate local fixture block, consistent with main helper signature. Both debt sections retained. No worker runtime source changed by conflict resolution.
 
 Resolved registry test wrapper exit 0: 10 passed, no failures/ignored. Supervisor reviewed conflict delta; cancellation runtime untouched and both payload/cancellation assertions preserved.
+
+Canonical gen:agent-docs-prose exit 0. Generated carrier reviewed; no hand edits.
