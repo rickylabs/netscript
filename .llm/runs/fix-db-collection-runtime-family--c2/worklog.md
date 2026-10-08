@@ -280,3 +280,8 @@ Additional required gates (raw evidence retained privately):
 | carrier-tests | 0 | 21 passed/0 failed/0 ignored |
 
 Documentation debt retained under db-doc-baseline-2039 and inherited desktop/MCP baseline. Fresh combined 28 private references/17 missing docs; streams entrypoint 11 private references/0 missing docs. SDK combined 3 private references, with individual entrypoint failures unchanged. MCP combined zero but cli/mod individually 3 private references each; raw wrapper exit 1 retained. No new public source contract documentation diagnostic. JSR/publication checks remain zero. Original catalog/generator source is unchanged versus independently reviewed and CI-qualified source; final core CI remains owner qualification.
+
+Supervisor citation reconciliation: independent report correctly identifies canonical generated corpus commit and digest, but its narrative shortens the path; actual carrier is packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts. Raw 15-result stream receipt governs counts. These narrative corrections do not alter the independent exact-head PASS or any source.
+
+## Evaluate / Release / Close — review repair
+Independent evaluator PASS at 9b25aea44e5c00a40221b7a8f1a7dbc851f96efb in repair-evaluate.md. Release N/A. Supervisor reviewed result and reconciled: Kept main bounded checkpoint recovery and PR exact Collection alignment, combined both test groups and manifest tasks, preserved every main lock graph record with exact DB aliases, and exposed close through the existing shutdown function. Source unchanged by evidence-only closeout. Final CI/publication remain owner gates.
