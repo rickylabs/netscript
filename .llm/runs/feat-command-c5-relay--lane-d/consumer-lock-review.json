@@ -1,0 +1,24 @@
+{
+  "nativeFailureHead": "ccdb9836e871d1a1b5b2890154572382b0431917",
+  "baselineLockUnchangedFromMain": true,
+  "nativeLockUpdateExit": 0,
+  "frozenCheckExit": 0,
+  "lintExit": 0,
+  "lockRegressionExit": 0,
+  "filesChecked": 150,
+  "specifierChanges": [
+    {
+      "specifier": "npm:jose@^6.2.3",
+      "before": "6.2.3",
+      "after": "6.2.12",
+      "targetAlreadyLocked": true
+    }
+  ],
+  "addedNpmPackages": [],
+  "removedRedundantNpmEntries": [
+    "jose@6.2.3",
+    "@tanstack/ai-utils@0.4.0"
+  ],
+  "workspaceChanges": "Five explicit C5 dependency lines for service and checked cores.",
+  "allFourGeneratedFreshnessExits": 0
+}
