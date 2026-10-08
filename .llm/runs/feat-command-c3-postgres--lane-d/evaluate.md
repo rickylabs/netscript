@@ -1,125 +1,117 @@
-# IMPL-EVAL Round 3 Verdict: PASS
+# IMPL-EVAL Round 4 Verdict: PASS
 
 ## 1. Evaluation Identity & Commit Lineage
 
 - **Verdict**: `PASS`
-- **Product HEAD**: `5138748194002ef1afdb95edfb798ddd7f08bb1f`
-- **Evaluation HEAD**: `0691575ce7eceffc7b25b9355af19972b665466e`
-- **Prior Qualified Product HEAD**: `10286a1efe4d1574ad9d4b22a17f9a7082657e85` (Round 2 `PASS`)
-- **Baseline Git Identity**: `72cb3c9d706c6e6a02035c7d9ab124cb945155da` (`main`)
-- **Reconciled Upstream Main**: `6d1eaf5a221ce29fa55c0bfd10e3b5c7d66101e3` (`origin/main`)
-- **Evaluation Context**: Focused dependency-metadata delta verification pursuant to
-  `.llm/runs/feat-command-c3-postgres--lane-d/impl-eval-lock-resteer.md` using the authorized Google
-  fallback evaluator route.
+- **Product HEAD**: `b4be6a282544dda2ca9161a4e1b00b78fb787eeb`
+- **Evaluation HEAD**: `e29b0043a5286eec92cd748b8c931f0d50495463`
+- **Prior Qualified Product HEAD**: `5138748194002ef1afdb95edfb798ddd7f08bb1f` (Round 3 `PASS`)
+- **Reconciled Upstream Main**: `f257f9627756e2794e3c876f444809757b263ec0` (`origin/main`, PR #2092)
+- **Evaluation Context**: Focused verification of current-main reconciliation and workflow
+  concurrency inventory repair pursuant to
+  `.llm/runs/feat-command-c3-postgres--lane-d/impl-eval-main-resteer.md`.
 
 ---
 
-## 2. Dependency Metadata Delta & Semantic Review
+## 2. Exact-Head Delta & Reconciliation Verification
 
-### 2.1 Git Delta Inspection
+### 2.1 Upstream Main Reconciliation
 
-Across the entire repository, the exact diff between prior qualified product
-`10286a1efe4d1574ad9d4b22a17f9a7082657e85` and product HEAD
-`5138748194002ef1afdb95edfb798ddd7f08bb1f` outside harness artifacts (`.llm/`) is strictly confined
-to `packages/fresh-ui/deno.lock`:
+- **Integration**: Upstream main commit `f257f9627` (Fresh chat rich message send repair #2092) was
+  merged cleanly via merge commit `b5656099b`.
+- **Carrier Reconciliation**: The generated export surface carrier
+  (`packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`) took main
+  and was regenerated cleanly under pinned Deno 2.9.5 in commit `e40472b7c` (`symbolCount: 8085`,
+  `subpathCount: 280`).
+- **C3 Core Invariance**: Outside the MCP export corpus and workflow files, all C3 command
+  persistence source and test code under `packages/database/**`, root `deno.lock`, and
+  `packages/fresh-ui/deno.lock` remain 100% byte-for-byte identical to the Round 3 PASS head
+  (`5138748194002ef1afdb95edfb798ddd7f08bb1f`).
+- **Product Head vs. Current Checkout**: Non-harness product code between product HEAD
+  `b4be6a282544dda2ca9161a4e1b00b78fb787eeb` and current checkout HEAD
+  `e29b0043a5286eec92cd748b8c931f0d50495463` is completely identical (`git diff` is empty).
 
-- **Files Changed**: `packages/fresh-ui/deno.lock` (+1 insertion, 0 deletions)
-- **Inserted Entry**:
-  ```diff
-  diff --git a/packages/fresh-ui/deno.lock b/packages/fresh-ui/deno.lock
-  index 3ce37b8c0..d7a1e00f3 100644
-  --- a/packages/fresh-ui/deno.lock
-  +++ b/packages/fresh-ui/deno.lock
-  @@ -3772,6 +3772,7 @@
-               "npm:@prisma/adapter-mssql@^7.8.0",
-               "npm:@prisma/adapter-pg@^7.8.0",
-               "npm:@prisma/client@^7.8.0",
-  +            "npm:@prisma/driver-adapter-utils@^7.8.0",
-               "npm:@prisma/instrumentation-contract@^7.8.0",
-               "npm:pg@^8.21.0"
-             ]
-  ```
-- **Product Code Invariance**: Between product HEAD `5138748194002ef1afdb95edfb798ddd7f08bb1f` and
-  current evaluation HEAD `0691575ce7eceffc7b25b9355af19972b665466e`, non-harness product code is
-  100% byte-for-byte identical (`git diff` is empty).
+### 2.2 Workflow Concurrency Group & Inventory Repair
 
-### 2.2 Semantic Equality of Lockfile
+In product commit `b4be6a282544dda2ca9161a4e1b00b78fb787eeb`:
 
-Semantic comparison of `packages/fresh-ui/deno.lock` confirms:
-
-1. **Top-Level Structural Invariance**: The top-level keys `packages`, `remote`, and `npm` are
-   identical.
-2. **Resolution Invariance**: Zero package versions, remote descriptors, or integrity checksums were
-   added, updated, or removed.
-3. **Workspace Record Alignment**: `@prisma/driver-adapter-utils@7.8.0` was already pinned and
-   resolved transitively in `packages/fresh-ui/deno.lock`. The change strictly adds the missing
-   direct workspace membership declaration to
-   `workspace.members["packages/database"].packageJson.dependencies`, reconciling the package with
-   `packages/database/package.json`.
-4. **Lock Convergence**: Executing `deno task --cwd packages/fresh-ui lock:update` produces zero
-   subsequent modifications, confirming lockfile stability.
+1. **Workflow Concurrency Added**:
+   - `.github/workflows/command-postgres.yml` adds:
+     ```yaml
+     concurrency:
+       group: command-postgres-${{ github.workflow }}-${{ github.ref }}
+       cancel-in-progress: true
+     ```
+2. **Workflow Inventory Classification**:
+   - Registered in `.llm/tools/release/release-canary-workflow_test.ts` as `ref-templated` with
+     `cancelInProgress: true`.
+3. **Mutation Proof**:
+   - RED: Missing registration in workflow inventory failed with exit code `1`.
+   - GREEN: Restored complete suite passes all 8 tests with exit code `0`.
+   - MUTANT: Flipping `cancel-in-progress` to `false` failed the named assertion
+     (`cancelInProgress: false` vs expected `true`).
+   - RESTORED: Restored exact file bytes passed all assertions.
 
 ---
 
 ## 3. Independent Verification & Gate Evidence
 
-### 3.1 Frozen Package Type-Check
+### 3.1 Release Workflow Test Suite
 
-- **Command**: `deno task --cwd packages/fresh-ui check`
-- **Execution Arguments**: `--lock=deno.lock --frozen`
-- **Result**: Exit code `0`
-- **Summary**: 150 files selected across 2 batches, 0 failed batches, 0 type errors.
+- **Command**: `deno test --allow-all .llm/tools/release/release-canary-workflow_test.ts`
+- **Result**: Exit code `0` (8 passed, 0 failed).
 
-### 3.2 Generated Asset Freshness
+### 3.2 Upstream Chat Conformance
 
-All four repository-level generated asset checks were independently verified at current HEAD:
+- **Command**:
+  `deno test --allow-all packages/fresh/src/runtime/ai/create-chat-connection_test.ts packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts`
+- **Result**: Exit code `0` (21 passed, 0 failed).
 
-- `deno task check:agent-docs-prose`: Exit code `0` (`"fresh": true`, `0` stale paths).
+### 3.3 Generated Asset Freshness
+
+Independently verified under pinned toolchain Deno 2.9.5:
+
+- `deno task check:agent-docs-prose`: Exit code `0` (`fresh: true`, 0 stale paths).
 - `deno task check:assets-barrel`: Exit code `0` (clean git status).
 - `deno task check:publish-assets`: Exit code `0` (clean git status).
-- `deno task check:mcp-export-corpus`: Exit code `0` (`35` packages, `280` subpaths, `8084` symbols
-  clean).
+- `deno task check:mcp-export-corpus`: Exit code `0` (`sha256: 82b7b5a6...`, 35 packages, 280
+  subpaths, 8085 symbols).
 
-### 3.3 Documentation Linting
+### 3.4 Isolated Package & Documentation Checks
 
-- **Command**: `deno task doc:lint --root packages/database --pretty`
-- **Result**: Exit code `0`
-- **Coverage**: All 12 entrypoints verified clean (`0` private type references, `0` missing JSDocs,
-  `0` documentation errors).
+- `deno task --cwd packages/fresh-ui check`: Exit code `0` (150 files checked with
+  `--lock=deno.lock --frozen`, 0 errors).
+- `deno task doc:lint --root packages/database --pretty`: Exit code `0` (all 12 entrypoints clean, 0
+  private-type-ref errors).
 
-### 3.4 Source Manifest Invariance
+### 3.5 Source Manifest Invariance
 
-Verification against `.llm/runs/feat-command-c3-postgres--lane-d/final-qualification.json`:
-
-- All 33 tracked source, test, fixture, and generated artifact paths match their exact recorded
-  SHA-256 hashes.
-- All product framework source files, test fixtures, and conformance templates are unchanged from
-  Round 2.
+- Verification against
+  `.llm/runs/feat-command-c3-postgres--lane-d/main-reconciliation-qualification.json`: All 34
+  source, test, fixture, and generated artifact entries match their exact recorded SHA-256 hashes.
 
 ---
 
 ## 4. Conformance & Regression Assessment
 
-1. **Prior Conformance Status**:
-   - The 10 semantic mutation probes (3 in S7, 6 in S8, 1 in S9) and the 7 physical PostgreSQL
-     provider test cases qualified in Round 2 remain fully applicable and unchanged.
-   - Adding workspace metadata for an already-pinned dependency in an isolated package lockfile
-     introduces zero functional drift or regression risk to `@netscript/database` command
-     persistence.
-2. **Current-Head Readiness**:
-   - The dependency metadata synchronization resolves the CI lock mismatch cleanly without
-     dependency upgrades.
-   - Native current-head full CI remains scheduled to run against this exact product commit.
+1. **Prior Conformance Preservation**:
+   - The 7 physical PostgreSQL provider cases, 10 semantic mutation probes, and 256 scoped
+     database/service/contracts test cases remain source-identical and fully applicable.
+   - Reconciling upstream main native chat fixes and registering CI concurrency boundaries introduce
+     zero behavioral drift or architectural debt to C3 command persistence.
+2. **CI Readiness**:
+   - Workflow concurrency prevents redundant provider CI executions on rapid pushes.
+   - Full native CI remains scheduled to run against this exact product commit.
 
 ---
 
 ## 5. Summary Finding
 
-The exact-head dependency metadata delta in `packages/fresh-ui/deno.lock` is minimal (+1 line),
-semantically sound, and preserves all resolved package versions and integrity checksums. Frozen
-package checks and generated asset freshness suites pass unconditionally. Round 3 evaluation verdict
+Current-main reconciliation preserves both upstream chat functionality and all C3 invariants.
+Workflow concurrency is correctly bounded, fully classified, and verified via semantic mutation. All
+generated assets and type checks pass cleanly under the pinned toolchain. Round 4 evaluation verdict
 is **PASS**.
 
-Requested native route: Google gemini-3.8-flash-high, high effort. Runtime model/effort are not
-independently attested. Raw native metadata remains private. Final pushed follow-up changes harness
-artifacts only; current-head CI follows this verdict.
+Native requested route: Google gemini-3.8-flash-high, high effort. Runtime model/effort are not
+independently attested. Raw native metadata remains private. Final follow-up changes run artifacts
+only; current-head native CI and readiness follow this verdict.
