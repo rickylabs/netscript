@@ -186,13 +186,16 @@ export type JobPayloadMap<TRegistry extends Readonly<Record<string, unknown>>> =
 >;
 
 /** Root-surface task definition derived from the thin public schema. */
-export type TaskDefinition<TId extends string = string> = Readonly<{
-  id: TaskId<TId>;
-  entrypoint?: string;
-  name?: string;
-  topic?: string;
-  type?: string;
-}>;
+export type TaskDefinition<TId extends string = string, TPayload = unknown, TResult = unknown> =
+  Readonly<{
+    id: TaskId<TId>;
+    entrypoint?: string;
+    name?: string;
+    topic?: string;
+    type?: string;
+    payloadSchema?: JobPayloadSchema<TPayload>;
+    handler?: (context: Readonly<{ id: string; payload: TPayload }>) => TResult | Promise<TResult>;
+  }>;
 
 /** Root-surface workflow definition derived from the thin public schema. */
 export type WorkflowDefinition<TId extends string = string> = Readonly<{
@@ -288,25 +291,61 @@ export interface JobBuilder<
 /** Root-surface task builder typestate API. */
 export interface TaskBuilder<
   TId extends string,
-  TConfigured extends 'initial' | 'entrypoint-set' | 'handler-set',
+  TConfigured extends
+    | 'initial'
+    | 'entrypoint-set'
+    | 'payload-set'
+    | 'payload-entrypoint-set'
+    | 'handler-set',
   TPayload,
   TResult,
 > {
   /** Set the task runtime. */
   runtime(type: string): this;
   /** Set the module, script, or executable entrypoint. */
-  entrypoint(path: string): TaskBuilder<TId, 'entrypoint-set', TPayload, TResult>;
+  entrypoint(
+    path: string,
+  ): TaskBuilder<
+    TId,
+    TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+      : 'entrypoint-set',
+    TPayload,
+    TResult
+  >;
   /** Set an in-process task handler. */
   handler<TNextPayload = TPayload, TNextResult = TResult>(
     fn: (
-      context: Readonly<{ id: string; payload: TNextPayload }>,
+      context: Readonly<
+        {
+          id: string;
+          payload: TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload
+            : TNextPayload;
+        }
+      >,
     ) => TNextResult | Promise<TNextResult>,
-  ): TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
+  ): TaskBuilder<
+    TId,
+    'handler-set',
+    TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload : TNextPayload,
+    TNextResult
+  >;
   /** Narrow the payload type carried by this task definition. */
   payload<TNextPayload>(
     this: TConfigured extends 'handler-set' ? never
       : TaskBuilder<TId, TConfigured, TPayload, TResult>,
   ): TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
+  /** Select a runtime payload schema; durable effects require this overload. */
+  payload<TNextPayload>(
+    this: TConfigured extends 'handler-set' ? never
+      : TaskBuilder<TId, TConfigured, TPayload, TResult>,
+    schema: JobPayloadSchema<TNextPayload>,
+  ): TaskBuilder<
+    TId,
+    TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+      : 'payload-set',
+    TNextPayload,
+    TResult
+  >;
   /** Set the task timeout in milliseconds. */
   timeout(ms: number): this;
   /** Set the maximum retry count. */
@@ -327,10 +366,10 @@ export interface TaskBuilder<
   enabled(value: boolean): this;
   /** Build the task definition after an entrypoint or handler has been configured. */
   build(
-    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+    this: TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' | 'handler-set'
       ? TaskBuilder<TId, TConfigured, TPayload, TResult>
       : never,
-  ): TaskDefinition<TId>;
+  ): TaskDefinition<TId, TPayload, TResult>;
 }
 
 /** Root-surface workflow builder typestate API. */

@@ -17,3 +17,7 @@ Deferred: broader Prisma SagaIdempotencyPort parity, other providers, KV command
 ## Bootstrap / Research / Plan / Plan-Gate
 
 Fresh baseline 881d25e8c; C5 READY at 1a93a6acb. Issue/comments and native guidance consulted, doctrine/gate profiles and existing debt reviewed. Research/Design complete before product work. Approved whole-chain PLAN-EVAL PASS reused; no new evaluator run. No product/test file changed, no implementation verdict or readiness claim. Actual raw gates and operational receipts stay in private project runs.
+
+## S15 implementation and Tier-A slice review
+
+RED-first explicit effect test EXIT 1 with named AssertionError; task handler validation assertion separately RED before its wrapper. Three new named tests PASS and five semantic production mutants fail named assertions, restore exact bytes and PASS. Selected-schema NoInfer job/task fixtures, immutable private payload/schema snapshot, async validation and C1 bounded JSON proven. Scoped worker/saga check 234 files, regression 138 PASS/0 FAIL/3 provider-dependent ignored, lint/format/quality/architecture and owned public doc graphs EXIT 0. Native lock normalization retains pinned Deno 2.9.5; no version upgrade or lock deletion/reload. Existing export-map diagnostics remain explicitly non-green; observed resolution difference recorded, no new effect graph debt waived. Full publication/runtime/CI and final independent evaluation pending. S15 signoff: PASS for this slice only.

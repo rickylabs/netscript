@@ -1,0 +1,33 @@
+{
+  "redExit": 1,
+  "redNamedAssertion": true,
+  "typedFixtures": "Wrong selected job/task payloads require @ts-expect-error and fail selected runtime schema. Generic inference originates only in selected definition; payload is NoInfer. Missing schemas refused. Async selected validation completes before C1 bounded JSON.",
+  "newNamedTests": 3,
+  "semanticProofRows": 5,
+  "allMutationRestorationsExact": true,
+  "scopedRegression": {
+    "exit": 0,
+    "passed": 138,
+    "failed": 0,
+    "providerIgnored": 3
+  },
+  "scopedCheck": {
+    "exit": 0,
+    "selectedFiles": 234
+  },
+  "lint": 0,
+  "format": 0,
+  "quality": 0,
+  "architecture": 0,
+  "ownedPublicDocGraphs": 0,
+  "legacyDocBaselines": {
+    "workersBefore": 8,
+    "workersAfter": 7,
+    "sagasBefore": 8,
+    "sagasAfter": 9,
+    "note": "Expanded resolution exposes an additional existing implement reference on unchanged saga contract source. New effect/root surfaces have zero lint findings. Existing full maps are not claimed green. Worker stream annotations now use the already-owned structural schema surface, reducing private Zod leakage."
+  },
+  "deno": "2.9.5",
+  "rootLockSha256": "9ee641e3125f3f2f1aa0e8bfebbc754e1fcbc4aa727bbf6abfa7c0ed5e61607a",
+  "lockReview": "Native normalization only plus three declared saga dependencies. No lock deletion/reload/version upgrade."
+}

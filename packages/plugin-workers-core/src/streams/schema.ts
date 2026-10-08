@@ -193,12 +193,12 @@ export const WorkerJobSchema: WorkerStreamEntitySchema<WorkerJob> = WorkerJobZod
 /** Durable stream definition for worker execution and job entities. */
 export type WorkersStreamDefinition = Readonly<{
   execution: Readonly<{
-    schema: typeof WorkerExecutionZodSchema;
+    schema: WorkerStreamEntitySchema<WorkerExecution>;
     type: 'execution';
     primaryKey: 'id';
   }>;
   job: Readonly<{
-    schema: typeof WorkerJobZodSchema;
+    schema: WorkerStreamEntitySchema<WorkerJob>;
     type: 'job';
     primaryKey: 'id';
   }>;

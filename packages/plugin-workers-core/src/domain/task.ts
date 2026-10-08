@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { DEFAULT_TOPIC, TaskSourceSchema, TaskStatusSchema, TaskTypeSchema } from './constants.ts';
 import type { TaskType } from './constants.ts';
+import type { JobPayloadSchema } from './public-schema.ts';
 import { TaskDefinitionPublicBaseSchema } from './public-schema.ts';
 
 /** Branded worker task identifier. */
@@ -233,6 +234,7 @@ export type TaskDefinition<
     type: TaskType;
     entrypoint?: string;
     handler?: TaskHandler<TPayload, TResult>;
+    payloadSchema?: JobPayloadSchema<TPayload>;
   }
 >;
 
