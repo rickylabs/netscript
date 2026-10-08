@@ -15,7 +15,7 @@ import { JSR_SPECIFIERS } from '../../constants/jsr-specifiers.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.ts';
 
-const TANSTACK_AI_MCP_SPECIFIER = 'npm:@tanstack/ai-mcp@^0.3.8';
+const TANSTACK_AI_MCP_SPECIFIER = 'npm:@tanstack/ai-mcp@0.8.0';
 
 /**
  * Maps all scaffold package specifiers to their JSR/npm specifiers.
@@ -243,7 +243,10 @@ export function resolveNetScriptImports(
 
   const imports: Record<string, string> = {};
   for (const specifier of Object.keys(PACKAGE_TO_LOCAL_PATH)) {
-    imports[specifier] = resolveLocalImportSpecifier(localBase, PACKAGE_TO_LOCAL_PATH[specifier]);
+    imports[specifier] = resolveLocalImportSpecifier(
+      localBase,
+      PACKAGE_TO_LOCAL_PATH[specifier],
+    );
   }
   for (const specifier of Object.keys(EXTERNAL_DEPS)) {
     imports[specifier] = EXTERNAL_DEPS[specifier];
@@ -252,9 +255,13 @@ export function resolveNetScriptImports(
 }
 
 /** Resolve a local import target while preserving import-map-safe URL syntax. */
-export function resolveLocalImportSpecifier(localBase: string, localPath: string): string {
+export function resolveLocalImportSpecifier(
+  localBase: string,
+  localPath: string,
+): string {
   const combined = normalizePosix(`${localBase}/${localPath}`);
-  return combined.startsWith('./') || combined.startsWith('../') || combined.startsWith('/')
+  return combined.startsWith('./') || combined.startsWith('../') ||
+      combined.startsWith('/')
     ? combined
     : `./${combined}`;
 }

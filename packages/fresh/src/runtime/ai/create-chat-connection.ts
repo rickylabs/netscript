@@ -28,6 +28,7 @@ import {
   toDurableChatSessionResponse,
 } from '@durable-streams/tanstack-ai-transport';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
+import type { ModelMessage, UIMessage } from '@tanstack/ai';
 import { createChatSubscriptionHub } from '../../internal/chat-subscription-hub.ts';
 
 // ---------------------------------------------------------------------------
@@ -72,7 +73,7 @@ export function resolveChatHeaders(target: NetScriptChatSessionTarget): Record<s
 }
 
 // ---------------------------------------------------------------------------
-// Public NetScript-owned surface types (no upstream types leak here).
+// Public NetScript surface types.
 // ---------------------------------------------------------------------------
 
 /**
@@ -107,46 +108,29 @@ export interface NetScriptChatMessage {
  * Parts, content, metadata and additional native fields are forwarded unchanged.
  * This opaque transport boundary is separate from the reduced rendering projection
  * {@link NetScriptChatMessage}; it does not validate or reconstruct native parts.
+ * Roles and optional fields follow the installed TanStack message contracts;
+ * payload arrays remain opaque so future native parts can pass through.
+ * The existing reduced-message roles remain accepted for compatibility.
  */
 export type NetScriptChatSendMessage =
-  | Readonly<{
-    /** Stable UI message identity. */
-    id: string;
-    /** Author role, including the existing tool-message compatibility. */
-    role: 'system' | 'user' | 'assistant' | 'tool';
-    /** Complete native parts, including attachments and tool fields. */
-    parts: readonly unknown[];
-    /** Optional native author name. */
-    name?: string;
-    /** Opaque native and application metadata. */
-    metadata?: unknown;
-    /** Native creation timestamp, forwarded without conversion. */
-    createdAt?: unknown;
-  }>
-  | Readonly<{
-    /** Optional stable Model message identity. */
-    id?: string;
-    /** Author role of the Model message. */
-    role: 'system' | 'user' | 'assistant' | 'tool';
-    /** Original text, null content or multimodal content parts. */
-    content: string | null | readonly unknown[];
-    /** Optional native author name. */
-    name?: string;
-    /** Complete native tool calls. */
-    toolCalls?: readonly unknown[];
-    /** Identity of the corresponding tool call. */
-    toolCallId?: string;
-    /** Opaque native reasoning content and signatures. */
-    thinking?: unknown;
-    /** Opaque native error information. */
-    error?: unknown;
-    /** Opaque native and application metadata. */
-    metadata?: unknown;
-    /** Complete native structured output. */
-    structuredOutput?: unknown;
-    /** Native creation timestamp, forwarded without conversion. */
-    createdAt?: unknown;
-  }>;
+  | Readonly<
+    Omit<UIMessage, 'role' | 'parts'> & {
+      /** Native UI roles plus the existing reduced-message compatibility. */
+      role: UIMessage['role'] | NetScriptChatMessage['role'];
+      /** Complete native parts, including attachments and tool fields. */
+      parts: readonly unknown[];
+    }
+  >
+  | Readonly<
+    Omit<ModelMessage, 'role' | 'content' | 'toolCalls'> & {
+      /** Native Model roles plus the existing reduced-message compatibility. */
+      role: ModelMessage['role'] | NetScriptChatMessage['role'];
+      /** Original text, null content or multimodal content parts. */
+      content: string | null | readonly unknown[];
+      /** Complete native tool calls. */
+      toolCalls?: readonly unknown[];
+    }
+  >;
 
 /**
  * A minimal, NetScript-owned renderable unit emitted by the one-projection
