@@ -163,3 +163,6 @@ Baseline 136e14ea4586c90d5f4a281ff57edac675e98b8e; read owner HARNESS and indepe
 
 ## Design — review repair
 Public surface and domain vocabulary remain those of the reviewed feature. Existing ports/constants retained. No new abstraction. Preserve both branch and main behavior, tests and debt records. Main generated assets precede canonical regeneration commits. Contributor path: focused existing test and its owning source. Commit slices follow repair plan. Owner acceptance of published consumer remains deferred.
+
+## Implement — F1/F2 documentation repair
+Shortened duplicate migration prose, retained explicit top-level useSearch example, pure helper/default semantics, contextual Link/useRoute closure capabilities and paired search guidance. Existing MCP budget/path selection unchanged. Updated both public preserveSearchParams JSDoc mirrors and paired partial flag comments. No implementation, public signature, test or dependency changes. Supervisor source-alignment review compares existing getBoundLinkProps, Link and useRoute hook; contract unchanged. Canonical carrier regeneration follows committed documentation source.

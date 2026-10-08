@@ -77,7 +77,10 @@ export type PageRouteHrefInput<TPath extends object, TSearch extends object> =
   & {
     /** Partial search update applied before generating the href. */
     readonly search?: Partial<TSearch> | ((prev: TSearch) => Partial<TSearch>);
-    /** Preserve the current route search state before applying `search`. */
+    /**
+     * Preserve current search in bound `Link` and `page.hooks.useRoute().getLinkProps` only.
+     * Pure `href`/`getLinkProps`/`nav.makeHref` ignore this flag; pass current `search` explicitly.
+     */
     readonly preserveSearchParams?: boolean;
   };
 
@@ -125,7 +128,7 @@ export type PagePairedRouteHrefInput<
     readonly partialSearch?:
       | Partial<TPartialSearch>
       | ((prev: TPartialSearch) => Partial<TPartialSearch>);
-    /** Preserve the partial route search params before applying `partialSearch`. */
+    /** Ignored by pure paired helpers; pass current `partialSearch` explicitly. */
     readonly partialPreserveSearchParams?: boolean;
   };
 
