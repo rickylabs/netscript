@@ -1,6 +1,6 @@
 {
   "repository": "rickylabs/harness",
-  "checkout": "/home/agent/projects/harness/worktrees/validate-600",
+  "checkout": "<operator-path>",
   "head": "8e8d39a",
   "install": {
     "command": "pnpm install --frozen-lockfile",

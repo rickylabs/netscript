@@ -5,7 +5,7 @@
 Evaluated HEAD `9e375a1765234d179c4945480d68e69ac2f6c906` ("fix(ai/anthropic): retain usage
 across standard Messages frames"); diff scope `00bc2e2d2..9e375a176`; all work confined to the
 detached evaluation worktree
-`/home/agent/projects/netscript/worktrees/eval-anthropic-2063` (worktree state clean apart from
+`<worktree> (worktree state clean apart from
 untracked run artifacts; neither file restoration needed an exception path — both restores were
 verified byte-identical). This is the standard-release-acceptance repair for the known Normalized
 usage loss (message_start `input_tokens` lost because the SDK's normalized usage takes
@@ -48,7 +48,7 @@ Sources at `9e375a176` checked out; the two source files temporarily restored wi
 `git restore --source=00bc2e2d2 -- packages/ai/src/adapters/anthropic.adapter.ts
 packages/ai/src/adapters/tanstack-chat-client.ts` **while keeping the HEAD test file** (fixture
 `message_start` input 3/output 1, final `message_delta` output-only 8). Everything below runs the
-CI binary `/home/agent/.local/share/mise/installs/deno/2.9.5/bin/deno` (which the structured
+CI binary `<operator-path> (which the structured
 wrapper inherits via `Deno.execPath()`):
 
 - Exact-name filter read from HEAD line 213:

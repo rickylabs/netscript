@@ -5,7 +5,7 @@
 Corrections supersedes the first drafted report, which was written in the wrong checkout
 (see §1). This corrected report and all receipts in this file are located in and written from
 the detached evaluation worktree
-`/home/agent/projects/netscript/worktrees/eval-anthropic-2063` (detached HEAD
+`<worktree> (detached HEAD
 `51d8e10d5b69df3d75edbdd227c614481616518a`, clean source tree, untracked evaluation
 receipts/launch logs only). Source review scope remains exactly `51d8e10d5` against baseline
 `6f6cbdf`; no code repair was requested.
@@ -14,7 +14,7 @@ receipts/launch logs only). Source review scope remains exactly `51d8e10d5` agai
 
 The first evaluation pass violated the explicit evaluation cwd. Despite the contract assigning a
 detached evaluation worktree, the pass ran in the **author checkout**
-`/home/agent/projects/netscript/worktrees/fix-anthropic-2063`: its transport events show bash
+`<worktree> its transport events show bash
 calls with the author worktree as `workdir`, restoration of the three source files there via
 `git restore --source=6f6cbdf --` / `git restore --source=51d8e10d5 --`, a temporary
 two-test subset file created and deleted there (`packages/ai/tests/eval-2063-baseline-subset.test.ts`,
