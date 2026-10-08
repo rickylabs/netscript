@@ -1,3 +1,7 @@
+# Resumed C2 current checkpoint
+
+Ordinary main reconciliation and native generated refresh complete. Fresh static, service/contracts/database tests, generated freshness, quality/architecture/docs/JSR checks are running. Current-head review and CI remain pending. See resume-reconciliation.md. No merge or later-leaf implementation.
+
 # Current C2 checkpoint — independent evaluation PASS
 
 Independent Google PASS evaluates exact head `c177087fa175e51f19290150801da1db7d6812de`; actual conversation `61390913-370d-41e0-a133-50881e888cef`. Three actual turns retain the same verdict; later turns correct report facts only. Original reports are byte-exact, all evaluated tracked bytes unchanged, no product repair. Requested model/effort remain unattested exact runtime settings. Read `evaluate.md`, `evaluation-provenance.json`, `evaluated-head-ci-evidence.json` and `evaluation-supervisor-review.md`.

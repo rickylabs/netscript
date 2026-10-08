@@ -491,3 +491,5 @@ actual CI/evaluation/acceptance remain pending. No PR merge/rebase/force push or
 Ordinary merge of main 8aad14940c52cd3a4db7efa57d56d50ae131df6c; see resume-reconciliation.md. C1 run records use main. Generated assets will be refreshed with Deno 2.9.5.
 
 Native Deno 2.9.5 prose, assets-barrel and publish-assets generation pass. MCP corpus correctly refuses the uncommitted generated read set; commit the generated inputs before retrying. Existing source remains unchanged after reconciliation.
+
+Clean-tree gen:mcp-export-corpus passes with Deno 2.9.5. The resumed merge changes no C2 command implementation or tests. Native regeneration contains both merged C1 and C2 public surfaces.
