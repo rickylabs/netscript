@@ -122,7 +122,7 @@ Deno.test('command executor traces early missing-key unsupported-isolation and c
       isolationLevel: unsupported.isolationLevel,
       idempotency: command().idempotency,
       records: command().records,
-      handle: async () => 'value',
+      handle: () => Promise.resolve('value'),
     });
     const attempts = [
       () => executor.execute(command(), { ...envelope, idempotencyKey: undefined }),
