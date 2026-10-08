@@ -158,6 +158,7 @@ export interface ServiceTlsOptions {
  *   .withHealth()
  *   .serve({
  *     port: 3000,
+ *     hostname: '127.0.0.1', // loopback-only; omit to bind all interfaces
  *     drainTimeoutMs: 10_000,
  *     handleSignals: true,
  *   });
@@ -168,6 +169,14 @@ export interface ServiceTlsOptions {
 export interface ServeOptions {
   /** Preferred listener port; use `0` for an ephemeral port. */
   port?: number;
+
+  /**
+   * Interface the listener binds to, forwarded unchanged to `Deno.serve` on both
+   * the plain and the TLS branch. Pass `'127.0.0.1'` to keep the listener
+   * loopback-only. When omitted, Deno's default applies and the listener binds
+   * all IPv4 interfaces (`0.0.0.0`).
+   */
+  hostname?: string;
 
   /** External signal that stops the listener when aborted. */
   signal?: AbortSignal;

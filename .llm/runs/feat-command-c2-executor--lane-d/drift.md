@@ -177,3 +177,7 @@ unchanged. No tests or runtime gates are required for identical candidate produc
 native qualification/failures remain retained. Root ordinary local predecessor integration is
 stack maintenance, not PR merge or acceptance. Actual CI, seven unchanged worktree cases and
 independent Google fallback evaluation remain pending; no release/ready-merge/later-leaf claim.
+
+## Resume reconciliation
+
+Ordinary merge of main 8aad14940c52cd3a4db7efa57d56d50ae131df6c; see resume-reconciliation.md. C1 run records use main. Generated assets will be refreshed with Deno 2.9.5.

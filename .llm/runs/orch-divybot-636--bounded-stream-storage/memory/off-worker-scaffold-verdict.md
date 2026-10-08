@@ -1,0 +1,7 @@
+# Full scaffold runtime when local worker lacks prerequisites
+
+Local one-pass scaffold.runtime can fail at Aspire doctor because .NET SDK and Docker daemon are absent. Record that attempt honestly; do not call it passing or replace it with text scans. Existing GitHub workflow e2e-cli.yml and e2e-cli-gate PR label supply .NET10 + Aspire13.5.3 + Docker. Apply opt-in after source/test commit. Workflow uses bounded repo-wide runtime queue; pending workflow can already have static completed and runtime lanes running.
+
+Current source/test48aa35f run37681694541, canonical Postgres job112999350273: full one-pass104passed/0failed/0skipped, exit0, cleanup included,20:30:49-20:40:10UTC. Parent workflow completedsuccess at exact48aa35f. Download e2e-cli-scaffold-runtime-report via gh run download; successful completed job logs can be obtained via gh api --allow-escape-sequences .../actions/jobs/<id>/logs even if other workflow jobs remain active. gh run view --log-failed refuses logs until whole run ends; BlobNotFound means job log not published yet, not a suite failure.
+
+Keep raw originals in $TMPDIR for independent reviewer inspection. Commit only curated verdicts/step attempt exitCodes + SHA256 of original report/log and immutable public job link; avoid copying generated payload output/credentials into run artifacts. Do not re-run a successful expensive runtime suite when only evidence changes.

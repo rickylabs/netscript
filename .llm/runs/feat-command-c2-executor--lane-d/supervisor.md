@@ -80,3 +80,7 @@ Fresh main 6f6cbdf030d7595d1730272d0a74aedd66225069; implementation starts from 
 ## C1 prerequisite reconciliation
 
 C1 owned downstream lock repair and its same-session PASS were propagated verbatim after this leaf started, using an ordinary fast-forward prerequisite commit. No merge or force push. C2 originally began at108b6930f455a2023e3abb7dbb2c91ab46380e6d; current predecessor review target isb4ee0c34399cad78ef75aaf3f71fd6d5ac38196a. All framework/product and C1-run trees now match that predecessor exactly; only this C2 planning run differs. GitHub three-dot history can show propagated prerequisite commits, so incremental product review uses the current predecessor tree and the explicit commit trail.
+
+## Resume reconciliation
+
+Ordinary merge of main 8aad14940c52cd3a4db7efa57d56d50ae131df6c; see resume-reconciliation.md. C1 run records use main. Generated assets will be refreshed with Deno 2.9.5.

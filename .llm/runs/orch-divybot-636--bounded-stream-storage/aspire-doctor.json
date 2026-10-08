@@ -1,0 +1,111 @@
+{
+  "checks": [
+    {
+      "category": "aspire",
+      "name": "cli-version",
+      "status": "warning",
+      "message": "Aspire CLI version 13.5.3 (channel: stable) is out of date. Latest version is 13.6.1 (channel: stable)",
+      "fix": "Run 'aspire update' to update Aspire CLI.",
+      "metadata": {
+        "currentVersion": "13.5.3",
+        "latestVersion": "13.6.1",
+        "updateCommand": "aspire update",
+        "identityChannel": "stable",
+        "latestVersionChannel": "stable"
+      }
+    },
+    {
+      "category": "environment",
+      "name": "operating-system",
+      "status": "pass",
+      "message": "Operating system: Linux Debian 12",
+      "metadata": {
+        "osType": "Linux",
+        "displayName": "Linux Debian",
+        "version": "12",
+        "description": "Debian GNU/Linux 12 (bookworm)"
+      }
+    },
+    {
+      "category": "sdk",
+      "name": "dotnet-sdk",
+      "status": "fail",
+      "message": ".NET SDK not found",
+      "fix": "Download .NET SDK from: https://dotnet.microsoft.com/download/dotnet/10.0",
+      "link": "https://dotnet.microsoft.com/download/dotnet/10.0"
+    },
+    {
+      "category": "environment",
+      "name": "dev-certs",
+      "status": "warning",
+      "message": "HTTPS development certificate is only partially trusted",
+      "fix": "Set SSL_CERT_DIR in your shell profile: export SSL_CERT_DIR=\"$SSL_CERT_DIR:/usr/lib/ssl/certs:<operator-home>/.aspnet/dev-certs/trust\"",
+      "link": "https://aka.ms/aspire-prerequisites#dev-certs",
+      "details": "The certificate is in the trusted store, but SSL_CERT_DIR is not configured to include '<operator-home>/.aspnet/dev-certs/trust'. Some applications may not trust the certificate. 'aspire run' will configure this automatically.",
+      "metadata": {
+        "certificates": [
+          {
+            "thumbprint": "B61BC460D594D5C0EF406F52A03D4577A49D1DFC",
+            "version": 6,
+            "trustLevel": "partial",
+            "notBefore": "2026-08-30T10:39:55.0000000+02:00",
+            "notAfter": "2027-08-30T10:39:55.0000000+02:00"
+          }
+        ]
+      }
+    },
+    {
+      "category": "environment",
+      "name": "dev-certs-certutil",
+      "status": "warning",
+      "message": "certutil is not available; browser certificate trust may be incomplete",
+      "fix": "Install certutil from your distribution's NSS tools package (for example, libnss3-tools).",
+      "link": "https://aka.ms/aspire-prerequisites#dev-certs",
+      "details": "Aspire uses certutil to query and update NSS certificate databases used by Firefox and Chromium browsers on Linux."
+    },
+    {
+      "category": "container",
+      "name": "docker",
+      "status": "warning",
+      "message": "Docker: installed but not running ← active",
+      "fix": "Start Docker daemon"
+    },
+    {
+      "category": "aspire",
+      "name": "dcp-ephemeral-certificate",
+      "status": "pass",
+      "message": "Developer Control Plane (DCP) connection using an ephemeral DCP-managed certificate succeeded"
+    },
+    {
+      "category": "aspire",
+      "name": "dcp-developer-certificate",
+      "status": "warning",
+      "message": "No trusted developer certificate was available for the Developer Control Plane (DCP) developer certificate connection check",
+      "fix": "Run `aspire certs trust` to create and trust a developer certificate.",
+      "details": "No fully trusted exportable developer certificate with a private key was found."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "warnings": 5,
+    "failed": 1
+  },
+  "installations": [
+    {
+      "path": "<operator-home>/.local/aspire/aspire",
+      "canonicalPath": "<operator-home>/.local/aspire/aspire",
+      "version": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+      "channel": "stable",
+      "route": "script",
+      "pathStatus": "active",
+      "status": "ok"
+    },
+    {
+      "path": "<operator-home>/.local/share/mise/shims/aspire",
+      "canonicalPath": "<operator-home>/.local/bin/mise",
+      "pathStatus": "shadowed",
+      "status": "notProbed",
+      "statusReason": "No install-route sidecar found at <operator-home>/.local/bin/.aspire-install.json; peer was not probed."
+    }
+  ]
+}

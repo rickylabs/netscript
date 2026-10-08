@@ -1,0 +1,72 @@
+running 4 tests from ../../tmp/streams-review-controls-wrh_bq8h/fabricated-reset/tests/bounded-file-store_test.ts
+bounded native store: unreadable recovery preserves metadata instead of fabricating zero ...
+------- output -------
+[info] [FileBackedStreamStore] Starting recovery...
+[info] [FileBackedStreamStore] Recovery complete: 0 streams, 0 reconciled, 0 errors
+[info] [FileBackedStreamStore] Starting recovery...
+[warn] [FileBackedStreamStore] Recovery: Offset mismatch for /protected: LMDB says 0000000000000000_0000000000000014, file says 0000000000000000_0000000000000000. Reconciling to file.
+[info] [FileBackedStreamStore] Recovery complete: 1 streams, 1 reconciled, 0 errors
+----- output end -----
+bounded native store: unreadable recovery preserves metadata instead of fabricating zero ... FAILED (16ms)
+bounded native store: recovery reconciles incomplete frames without changing fork offsets ...
+------- output -------
+[info] [FileBackedStreamStore] Starting recovery...
+[info] [FileBackedStreamStore] Recovery complete: 0 streams, 0 reconciled, 0 errors
+[info] [FileBackedStreamStore] Starting recovery...
+[warn] [FileBackedStreamStore] Recovery: Offset mismatch for /truncated: LMDB says 0000000000000000_0000000000000027, file says 0000000000000000_0000000000000009. Reconciling to file.
+[info] [FileBackedStreamStore] Recovery complete: 4 streams, 1 reconciled, 0 errors
+----- output end -----
+bounded native store: recovery reconciles incomplete frames without changing fork offsets ... ok (8ms)
+bounded native store: native JSON formatting, sub-offset forks and producer state survive restart ...
+------- output -------
+[info] [FileBackedStreamStore] Starting recovery...
+[info] [FileBackedStreamStore] Recovery complete: 0 streams, 0 reconciled, 0 errors
+[info] [FileBackedStreamStore] Starting recovery...
+[info] [FileBackedStreamStore] Recovery complete: 3 streams, 0 reconciled, 0 errors
+----- output end -----
+bounded native store: native JSON formatting, sub-offset forks and producer state survive restart ... ok (6ms)
+streams server seam: native HTTP append, tail and durable restart use an isolated bounded store ...
+------- output -------
+[info] [FileBackedStreamStore] Starting recovery...
+[info] [FileBackedStreamStore] Recovery complete: 0 streams, 0 reconciled, 0 errors
+[info] [FileBackedStreamStore] Starting recovery...
+[info] [FileBackedStreamStore] Recovery complete: 1 streams, 0 reconciled, 0 errors
+----- output end -----
+streams server seam: native HTTP append, tail and durable restart use an isolated bounded store ... ok (27ms)
+
+ ERRORS 
+
+bounded native store: unreadable recovery preserves metadata instead of fabricating zero => ../../tmp/streams-review-controls-wrh_bq8h/fabricated-reset/tests/bounded-file-store_test.ts:13:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+-   0000000000000000_0000000000000000
++   0000000000000000_0000000000000014
+
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at fn (file://<ephemeral>/tmp/streams-review-controls-wrh_bq8h/fabricated-reset/tests/bounded-file-store_test.ts:35:7)
+
+ FAILURES 
+
+bounded native store: unreadable recovery preserves metadata instead of fabricating zero => ../../tmp/streams-review-controls-wrh_bq8h/fabricated-reset/tests/bounded-file-store_test.ts:13:6
+
+FAILED | 3 passed | 1 failed (61ms)
+
+╭ Warning
+│
+│  Ignored build scripts for packages:
+│  npm:lmdb@3.5.7
+│  npm:msgpackr-extract@3.0.4
+│
+│  Lifecycle scripts are only supported when using a `node_modules` directory.
+│  Enable it in your deno config file:
+│  "nodeModulesDir": "auto"
+╰─
+Check ../../tmp/streams-review-controls-wrh_bq8h/fabricated-reset/tests/bounded-file-store_test.ts
+error: Test failed

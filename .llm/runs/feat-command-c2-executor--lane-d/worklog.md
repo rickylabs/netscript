@@ -485,3 +485,7 @@ retained; current candidate index follows root's TMPDIR instruction. No commit o
 mutation, output regeneration, source/tool/lock/workflow change, test edit or new named test.
 Six run-only files frozen for root substantive review and ordinary local predecessor integration;
 actual CI/evaluation/acceptance remain pending. No PR merge/rebase/force push or later leaf.
+
+## Resume reconciliation
+
+Ordinary merge of main 8aad14940c52cd3a4db7efa57d56d50ae131df6c; see resume-reconciliation.md. C1 run records use main. Generated assets will be refreshed with Deno 2.9.5.

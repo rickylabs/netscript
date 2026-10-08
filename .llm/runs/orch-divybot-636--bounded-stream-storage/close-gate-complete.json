@@ -1,0 +1,43 @@
+{
+  "gate": "close-gate",
+  "ok": true,
+  "repo": "rickylabs/netscript",
+  "pr": 2081,
+  "headSha": "51c5db9d15d2e3bf73dadaee3e16889d0404c519",
+  "evaluatedAt": "2026-10-07T20:57:48.042Z",
+  "overrideLabel": "status:close-gate-override",
+  "overrideActive": false,
+  "closingIssues": [
+    636,
+    2080
+  ],
+  "closingIssueReferences": [
+    {
+      "issue": 636,
+      "sources": [
+        "manual link"
+      ]
+    },
+    {
+      "issue": 2080,
+      "sources": [
+        "body keyword"
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "number": 636,
+      "updatedAt": "2026-08-13T13:52:54Z",
+      "bodySha256": "c08d2cc7e536b53ecc14b497b4708f6da6f1c181a7e555770ebd5636d7914560"
+    },
+    {
+      "number": 2080,
+      "updatedAt": "2026-10-07T12:35:24Z",
+      "bodySha256": "3603490b9a481653dbc0f2d0db63d03cbc7b369157d5c04503640bcbe6079089"
+    }
+  ],
+  "findings": [],
+  "prFindings": [],
+  "notes": []
+}

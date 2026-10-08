@@ -4,7 +4,7 @@
   "verdict": "PASS",
   "evaluatedProductHead": "e09a5692360d7c157032e04f97b51c81d43d16f8",
   "evaluatorRoute": {
-    "session": "ses_ee7c10f05ffeRL0hBLJncQXoUR",
+    "session": "<session>",
     "requestedModel": "opencode-go/glm-5.3-flash",
     "requestedVariant": "max",
     "observed": [
