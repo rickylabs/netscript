@@ -1,3 +1,11 @@
+# Current supervisor checkpoint — predecessor ancestry APPROVED
+
+Root independently verifies6frozen files/95raw hashes/2temporary indexes and reproduces the exact candidate tree `a448793af72b9c5ee103a544003a35acc51775f9`, identical to signed65b C2 across6,245entries. Current predecessor8b is incorporated by ordinary local integration with the five exact already signed C2 asset blobs. The8file run-only signoff changes no product/source/generated/tool/lock/workflow bytes; prior native qualification remains applicable. No PR merge, rebase or force push.
+
+Root commit/push/comment must precede actual current technical CI and independent Google fallback evaluation. Acceptance/ready and later leaves remain locked.
+
+## Previous checkpoints retained
+
 # Current supervisor checkpoint — C2 final native qualification APPROVED
 
 At qualification343f38c5/signed product4b8b7cb99, root verifies10frozen files/346raw hashes,6,233 unchanged non-evidence tracked files,133archive members/75published source files and all20S6restoration hashes. Native244tests0,107file static0,16export source/exact-declaration fresh/frozen consumers0 and all scoped docs/generated/publication/audit gates pass. Fresh root quality/arch PASS0, frozen bytes stable. See final-qualification-supervisor-review.md/evidence.json. Signed evidence-only slice12files.
@@ -441,3 +449,19 @@ transport canary for owner-authorized catalog-confirmed Google fallback passed0;
 evaluation, runtime model/effort attestation and final acceptance remain pending. Evidence-only
 10-file slice frozen for supervisor review before root commit/push/comment; no later leaf or
 whole-chain scaffold.runtime claim.
+
+## Task-private predecessor ancestry verification at signed65b4b27f
+
+Read the ancestry brief and explicit six-skill chapter. Captured clean6245tracked baseline hashes,
+active index/ref/HEAD identities and exact current/old predecessor parent/tree IDs. Native
+merge-base/current-is-ancestor confirms old108bshared ancestry and current8bmissing ancestry.
+Native merge-tree actually exits1: exactly five staged conflicts and five unresolved-tree path
+differences. Task-private Git object directory reads active objects only through alternates.
+Private TMPDIR index retains exact signed C2 blob IDs for five native assets; write-tree resolves
+toa448793af72b9c5ee103a544003a35acc51775f9, identical to signed current HEAD tree. Raw diff empty,
+all6245recursive entries/modes/blob IDs and listings identical; active index/refs/HEAD and every
+tracked byte stayed unchanged through candidate verification. Initial private placement proof
+retained; current candidate index follows root's TMPDIR instruction. No commit or history/remote
+mutation, output regeneration, source/tool/lock/workflow change, test edit or new named test.
+Six run-only files frozen for root substantive review and ordinary local predecessor integration;
+actual CI/evaluation/acceptance remain pending. No PR merge/rebase/force push or later leaf.

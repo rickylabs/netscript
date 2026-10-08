@@ -162,3 +162,18 @@ Google agy fallback; exact gemini-3.8-flash-high is catalog-confirmed and its se
 transport canary passed0. Independent evaluation has not launched; high is requested after actual
 technical CI, while exact runtime effort/model needs actual evaluation attestation. No usage
 numbers or private operational detail in public metadata; independent evaluation/acceptance pending.
+
+## Predecessor ancestry blocker and exact product-preserving candidate
+
+Live conflict/absent actual pull_request CI is reported by root. Git ancestry independently proves
+common ancestor108b6930 remains, while current C1 head8b6e89e9 was never incorporated into C2
+history despite signed byte-exact prerequisite propagation. Native merge-tree conflict exit1 is
+retained, with exactly five signed generated assets and no other differing path. Private index
+replaces those entries only with exact current C2 blob IDs; no handpatch or regeneration. Resolved
+treea448793af72b9c5ee103a544003a35acc51775f9 equals signed current C2 tree, including every source,
+asset, tool, lock, workflow and historical run byte. The actual current index is now in task-private
+TMPDIR; initial private-index placement evidence is preserved privately. Active index/refs/HEAD
+unchanged. No tests or runtime gates are required for identical candidate product bytes; all prior
+native qualification/failures remain retained. Root ordinary local predecessor integration is
+stack maintenance, not PR merge or acceptance. Actual CI, seven unchanged worktree cases and
+independent Google fallback evaluation remain pending; no release/ready-merge/later-leaf claim.

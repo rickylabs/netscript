@@ -1,3 +1,30 @@
+# Current supervisor checkpoint — predecessor ancestry APPROVED
+
+Root independently verifies6frozen files/95raw hashes/2temporary indexes and reproduces the exact candidate tree `a448793af72b9c5ee103a544003a35acc51775f9`, identical to signed65b C2 across6,245entries. Current predecessor8b is incorporated by ordinary local integration with the five exact already signed C2 asset blobs. The8file run-only signoff changes no product/source/generated/tool/lock/workflow bytes; prior native qualification remains applicable. No PR merge, rebase or force push.
+
+Root commit/push/comment must precede actual current technical CI and independent Google fallback evaluation. Acceptance/ready and later leaves remain locked.
+
+## Previous checkpoints retained
+
+# Current checkpoint — predecessor ancestry candidate FROZEN
+
+Final C2 qualification is signed at65b4b27fc3fb73cf04c461414005a821fe545a8b. Root reports the
+non-draft stacked PR remains CONFLICTING against current C1 predecessor8b6e89e9, so actual
+pull_request technical CI has not started. Prior propagation preserved C1 bytes without ancestry:
+old common ancestor108b6930 is an ancestor, current8b6e89e9 is not yet an ancestor of C2.
+Independent task-private native merge-tree analysis returns conflict1 at exactly five already
+signed generated assets. Retaining their exact current C2 blob IDs resolves to tree
+`a448793af72b9c5ee103a544003a35acc51775f9`, byte-exact signed C2 HEAD across6245recursive entries.
+No other path differs. Candidate Git objects and TMPDIR index are private; active index/refs/HEAD
+unchanged. Six run-only evidence files are frozen for substantive root review; read
+predecessor-ancestry-evidence.json. Root alone owns ordinary local predecessor integration and
+signoff/commit/push; no PR merge, rebase, force push or output regeneration. This maintenance does
+not satisfy actual CI, independent evaluation or acceptance. Google fallback preparation remains
+qualified transport only, independent evaluation pending; seven unchanged worktree fixtures are
+actual-CI-only. No runtime/release/ready-merge claim, C3 or later leaf.
+
+## Previous checkpoints retained
+
 # Current supervisor checkpoint — C2 final native qualification APPROVED
 
 At qualification343f38c5/signed product4b8b7cb99, root verifies10frozen files/346raw hashes,6,233 unchanged non-evidence tracked files,133archive members/75published source files and all20S6restoration hashes. Native244tests0,107file static0,16export source/exact-declaration fresh/frozen consumers0 and all scoped docs/generated/publication/audit gates pass. Fresh root quality/arch PASS0, frozen bytes stable. See final-qualification-supervisor-review.md/evidence.json. Signed evidence-only slice12files.

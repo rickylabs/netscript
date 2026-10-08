@@ -1,3 +1,17 @@
+# Current supervisor boundary — predecessor ancestry review pending
+
+Root reports actual technical CI absent because the non-draft stacked C2 PR conflicts against
+current C1 predecessor8b6e89e9. Byte propagation did not incorporate that predecessor ancestry.
+The independent private-index/object candidate retains all five signed C2 assets and exactly
+matches current C2 treea448793af72b9c5ee103a544003a35acc51775f9. Active Git index/refs/HEAD are
+unchanged; no history/remote/CI/evaluator mutation by the implementation lane. Root alone owns
+ordinary local predecessor branch integration and substantive signoff/commit/push. Neither PR is
+merged; no rebase/force push. Independent owner-authorized Google evaluation remains pending;
+transport canary preparation does not constitute evaluation or acceptance. Earlier model/route
+attestation limits remain in force.
+
+## Previous supervisor checkpoints retained
+
 # Current C2 prerequisite and technical checkpoint
 
 Current predecessor C1 is `8b6e89e9dfe786edf062e64228c8bb14fc45a110`, independent PASS at reviewed productE09 with artifact-only reconciliation and current native CI SUCCESS. C2 remains stacked because main lacks C1. Final native technical qualification is supervisor APPROVED at343f38c5/signed source4b8b7cb99; evidence-only slice12files, ordinary commit/push/comment then actual CI and independent Google fallback evaluation required. No C2 independent PASS/ready or later-leaf authorization is claimed.
