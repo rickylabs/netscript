@@ -205,8 +205,18 @@ const secondPage = { page: 2 };
 <ordersRoute.Link path={openOrders} search={secondPage}>Page 2</ordersRoute.Link>;
 ```
 
-The `search` argument accepts an object *or* a function of the base state, which is what makes
-relative moves (`page + 1`) expressible without threading the current page into the call.
+`href()` and `getLinkProps()` are pure utilities: they read only their arguments and schema defaults.
+They are safe in a memo factory, an event callback, server code, conditional JSX, or a variable-length
+list. The `search` argument accepts an object or a function of the schema-default base state.
+For a move relative to the current page, read current search through an explicit hook and supply it:
+
+```tsx
+const current = useCurrentSearch(ordersRoute);
+const nextPage = ordersRoute.href({
+  path: { status: 'open' },
+  search: { ...current, page: current.page + 1 },
+});
+```
 
 Two behaviours here surprise people, and both follow from the schema being authoritative:
 
@@ -217,10 +227,16 @@ Two behaviours here surprise people, and both follow from the schema being autho
 including the derived `offset` and an empty `sortBy`. A contract whose schema is small produces
 short URLs; that is the lever.
 
-**`preserveSearchParams: true` only preserves inside the matching route.** It substitutes the current
-request's parsed search for the defaults, but only when the rendering page's route pattern equals
-the target's. Linking to a *different* route with the flag set falls back to that route's defaults —
-which is correct, since the two routes' search schemas need not share a single field.
+**Current-search preservation is an explicit hook or component capability.** A bound `Link` with
+`preserveSearchParams: true` reads the matching route's parsed current search during its render.
+`usePageRoute().getLinkProps(...)` captures that context in an explicit hook and can also preserve it.
+A `Link` targeting a different route uses that route's schema defaults.
+
+Migration: calls to `route.href()` or `route.getLinkProps()` with `preserveSearchParams` now use
+schema defaults plus explicit `search`; the flag remains accepted but these utilities never read
+context. Use `useCurrentSearch(route)` and pass the returned values explicitly, or call the link-props
+closure returned by `usePageRoute()`. Call those hooks at the component's top level. Bound `Link`
+remains available for contextual rendering.
 
 Link props also default `f-client-nav` to `true`, so a reference-built anchor participates in Fresh
 client navigation unless you opt out.
@@ -329,7 +345,10 @@ returning both plus the `f-partial` attribute Fresh uses to drive partial naviga
 params are supplied once and applied to both sides, with `partialPath`, `partialSearch`, and
 `partialPreserveSearchParams` for the cases where the partial's params legitimately differ.
 
-The partial on the other end of that link is [Partials](/web-layer/partials/).
+Both URL helpers and paired `getLinkProps()` are pure. `preserveSearchParams` and
+`partialPreserveSearchParams` do not read context here; pass current search explicitly through
+`search` and `partialSearch` when needed. The partial on the other end of that link is
+[Partials](/web-layer/partials/).
 
 ## What to watch for
 

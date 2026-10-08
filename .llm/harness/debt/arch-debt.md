@@ -2427,3 +2427,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
   RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
   storage migration or persistent index.
+
+## Fresh — unchanged documentation baseline during pure route utility repair
+
+- **ID:** `route-doc-baseline-2040`
+- **Reason:** Existing all-export public documentation diagnostics predate the URL purity repair. Combined Fresh sweep reports 28 private references and 17 missing docs. Every export entrypoint diagnostic and exit code exactly matches current-main baseline; complete structured stdout is byte-identical.
+- **Owner:** Fresh maintainers.
+- **Target:** 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-pure-route-url-utilities--c2/plan.md`; NetScript #2040.
+- **Created:** 2026-10-08.
+- **Status:** open, proposed DEBT pending independent IMPL-EVAL adjudication.
+- **Gate:** All-export doc lint reaches zero with existing public types preserved. This repair introduces no additional entrypoint diagnostic. Publication and qualified published consumer remain owner release gates.
+- **Evidence:** Complete private baseline/current reports and entrypoint comparison; worklog retains both failing raw doc exits, passing owning JSR audit and actual publish dry-run.

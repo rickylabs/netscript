@@ -22,6 +22,8 @@ import {
 } from '../navigation/mod.ts';
 import { render as renderToString } from 'preact-render-to-string';
 import { z } from 'zod';
+import { options } from 'preact';
+import { useCallback, useMemo, useState } from 'preact/hooks';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -333,4 +335,107 @@ Deno.test('useCurrentRoute fails loudly when the bound route does not match the 
     message.includes('Current route context mismatch'),
     `Unexpected error message: ${message}`,
   );
+});
+
+Deno.test('route URL helpers consume no hooks while explicit search hooks and Link preserve context', async () => {
+  const contract = defineRouteContract({
+    pathSchema: z.object({ id: z.string().min(1) }),
+    searchSchema: paginationSearchSchema({ defaultLimit: 3 }),
+  });
+  const target = bindRoutePattern(contract, '/orders/[id]');
+  const partial = bindRoutePattern(contract, '/partials/orders/[id]');
+  const paired = target.withPartial(partial);
+  const previousHook = Reflect.get(options, '__h');
+  let hookCalls = 0;
+  Reflect.set(options, '__h', (...args: unknown[]) => {
+    hookCalls++;
+    if (typeof previousHook === 'function') Reflect.apply(previousHook, options, args);
+  });
+  let snapshot: readonly string[] = [];
+
+  function Snapshot() {
+    const beforeExplicit = hookCalls;
+    const currentSearch = useCurrentSearch(target);
+    const currentRoute = usePageRoute<typeof page>();
+    assert(
+      hookCalls > beforeExplicit,
+      'Expected real explicit hooks to exercise the hook observer',
+    );
+    const beforePure = hookCalls;
+    const input = { path: { id: 'a/b ü' }, search: { page: 2 }, preserveSearchParams: true };
+    const pureHref = target.href(input);
+    const pureProps = target.getLinkProps(input);
+    const pairedInput = { ...input, partialSearch: { page: 3 }, partialPreserveSearchParams: true };
+    const pageHref = paired.href(pairedInput);
+    const partialHref = paired.partialHref(pairedInput);
+    const pairedProps = paired.getLinkProps(pairedInput);
+    const explicitHref = target.href({
+      path: input.path,
+      search: { ...currentSearch, page: currentSearch.page + 1 },
+    });
+    const capturedHref = currentRoute.getLinkProps({
+      path: input.path,
+      search: { page: currentSearch.page + 1 },
+      preserveSearchParams: true,
+    }).href;
+    assert(
+      hookCalls === beforePure,
+      'URL utilities and captured hook callbacks must consume no hooks',
+    );
+    assert(
+      pureProps.href === pureHref && pageHref === pureHref,
+      'Single and paired page href agree',
+    );
+    assert(pairedProps['f-partial'] === partialHref, 'Paired props use the same partial href');
+    assert(pairedProps.href === pageHref, 'Paired props use the same page href');
+    const memoHref = useMemo(() => target.href(input), []);
+    const [state] = useState({ value: 'state' });
+    const callback = useCallback(() => target.href(input), []);
+    assert(
+      state.value === 'state' && callback() === memoHref,
+      'Later hooks retain state and callbacks',
+    );
+    snapshot = [pureHref, partialHref, explicitHref, capturedHref];
+    return (
+      <target.Link path={input.path} preserveSearchParams search={{ page: 5 }}>Current</target.Link>
+    );
+  }
+
+  const page = definePage<{ requestId: string }>()
+    .withRoute(target)
+    .withLayout(() => <Snapshot />)
+    .build();
+  try {
+    const ctx = createRequestContext();
+    const rendered = await page.page({
+      ...ctx,
+      params: { id: 'A' },
+      url: new URL('/orders/A?page=4&limit=2', ctx.url),
+    });
+    const html = renderToString(rendered);
+    const queries = snapshot.map((href) => new URLSearchParams(href.split('?')[1]));
+    assert(snapshot[0]?.startsWith('/orders/a%2Fb%20%C3%BC?'), 'Pure href preserves path encoding');
+    assert(
+      queries[0]?.get('page') === '2' && queries[0]?.get('limit') === '3',
+      'Pure flag uses defaults',
+    );
+    assert(
+      queries[1]?.get('page') === '3' && queries[1]?.get('limit') === '3',
+      'Pure partial flag uses defaults',
+    );
+    assert(
+      queries[2]?.get('page') === '5' && queries[2]?.get('limit') === '2',
+      'Explicit search preserves current values',
+    );
+    assert(
+      snapshot[2] === snapshot[3],
+      'Captured hook link props agree with explicit current search',
+    );
+    assert(
+      html.includes('page=5&amp;limit=2'),
+      'Link component preserves current search at its render boundary',
+    );
+  } finally {
+    Reflect.set(options, '__h', previousHook);
+  }
 });

@@ -25,3 +25,31 @@ PLAN-EVAL: Selected: implicit-search migration, paired helpers and production ho
 Design refinement: public surface unchanged (route href/getLinkProps/paired helpers, existing hooks and Link). Vocabulary: typed route/path/search plus existing nullable navigation context. Ports: no new port, existing Preact/Fresh/route adapters. Constants: fixture channels A/B and native chat event IDs scoped to test protocol; production finite vocabularies unchanged. Ordered S1-S5 and budgets in plan. Contributor path: URL construction in link.tsx, context hooks in context.ts, reference delegation in contract-runtime.ts; add cases to adjacent test or production fixture. Opening docs-only PR has ci:skip-e2e/ci:skip-scaffold intentionally; remove both for source/browser wave.
 
 Independent PLAN-EVAL PASS at exact docs-only 82e7f5ca61f6a7a600db20436f6a125dddf02096; all eight Plan-Gate boxes checked. Evaluator exited before implementation. Phase 4 complete, S2 next. Baseline doc lint collected privately, raw exit 1 (first launch used task root and refused; corrected owning checkout launch exit 1 retains real baseline diagnostics). No source implementation yet.
+
+Gate `route-focused`: raw exit `0`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/fresh/src/application/builders/define-page/tests/navigation.test.tsx packages/fresh/src/application/route/contract.test.ts`. Full raw output retained privately.
+
+Gate `route-hidden-hook-mutation-unit`: raw exit `1`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/fresh/src/application/builders/define-page/tests/navigation.test.tsx`. Full raw output retained privately.
+
+Gate `route-hidden-hook-restored-unit`: raw exit `0`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/fresh/src/application/builders/define-page/tests/navigation.test.tsx`. Full raw output retained privately.
+
+Gate `route-scoped-check`: raw exit `0`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/src/application/builders/define-page/navigation --file packages/fresh/src/application/builders/define-page/tests/navigation.test.tsx --ext ts,tsx --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `route-fmt-write`: raw exit `0`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/fresh/src/application/builders/define-page/navigation/context.ts --file packages/fresh/src/application/builders/define-page/navigation/link.tsx --file packages/fresh/src/application/builders/define-page/tests/navigation.test.tsx --ext ts,tsx --write`. Full raw output retained privately.
+
+Gate `route-fmt`: raw exit `0`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/fresh/src/application/builders/define-page/navigation/context.ts --file packages/fresh/src/application/builders/define-page/navigation/link.tsx --file packages/fresh/src/application/builders/define-page/tests/navigation.test.tsx --ext ts,tsx`. Full raw output retained privately.
+
+Gate `route-lint`: raw exit `0`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file packages/fresh/src/application/builders/define-page/navigation/context.ts --file packages/fresh/src/application/builders/define-page/navigation/link.tsx --file packages/fresh/src/application/builders/define-page/tests/navigation.test.tsx --ext ts,tsx`. Full raw output retained privately.
+
+Gate `route-final-check`: raw exit `0`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/src/application/builders/define-page/navigation --file packages/fresh/src/application/builders/define-page/tests/navigation.test.tsx --ext ts,tsx --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `route-s2-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `route-s2-doc`: raw exit `1`. Command: `deno task doc:lint --root packages/fresh`. Full raw output retained privately.
+
+Gate `route-s2-jsr`: raw exit `1`. Command: `deno run -A .llm/tools/fitness/audit-jsr-package.ts packages/fresh`. Full raw output retained privately.
+
+Gate `route-s2-publish`: raw exit `0`. Command: `deno run -A .llm/tools/release/run-publish-dry-run.ts --member packages/fresh`. Full raw output retained privately.
+
+Gate `route-s2-jsr-corrected`: raw exit `0`. Command: `deno run -A .llm/tools/fitness/audit-jsr-package.ts --root packages/fresh --text`. Full raw output retained privately.
+
+S2 substantive slice review: shared getBoundLinkProps has no context read, all reference delegates remain unchanged and pure; Link now calls directly named useNavigationContext at its render boundary, removes former cast and try/catch hook detection. Existing explicit hooks retain captured context. Adjacent regression observes actual Preact hooks, checks single and paired helper purity, explicit/current context semantics, path encoding, memo followed by state/callback and SSR Link. Source mutation adding useNavigationContext back to the utility fails only the intended new regression, restored seven navigation tests pass; focused contract/navigation 18 pass. Frozen final check, lint/fmt, quality/architecture and owning JSR audit pass. First JSR invocation lacked --root and evaluated the root instead; retained non-verdict failure, corrected owning audit exits zero. First scoped check overlapped mutation (not a clean-source verdict); corrected route-final-check after restoration/fmt exits zero. Actual Fresh publish dry-run exit zero. All-export doc raw exit one, complete per-entrypoint structured reports byte-identical to main baseline; proposed route-doc-baseline-2040 for independent adjudication. Migration docs explain explicit search and pure preserve flags, including paired partial flag. No new public exported type or port, no dependency/lock change. S2 reconciled: Refs #2040, no closure without publication; public lifecycle is impl, CI skip labels removed. S3 production browser/native chat acceptance next.
