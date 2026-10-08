@@ -89,7 +89,7 @@
     "jsr:@std/uuid@^1.0.9": "1.1.1",
     "npm:@durable-streams/client@~0.2.6": "0.2.6",
     "npm:@durable-streams/server@~0.3.7": "0.3.7_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2",
-    "npm:@durable-streams/state@~0.3.1": "0.3.1_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2",
+    "npm:@durable-streams/state@0.3.1": "0.3.1_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2",
     "npm:@durable-streams/tanstack-ai-transport@^0.0.8": "0.0.8",
     "npm:@multiformats/base-x@^4.0.1": "4.0.1",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
@@ -120,11 +120,11 @@
     "npm:@tanstack/ai-openai@~0.22.3": "0.22.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
     "npm:@tanstack/ai-preact@~0.14.4": "0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2_@opentelemetry+api@1.9.1_zod@4.4.3",
     "npm:@tanstack/ai@0.52": "0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/db@~0.6.8": "0.6.17_typescript@7.0.2",
+    "npm:@tanstack/db@0.6.17": "0.6.17_typescript@7.0.2",
     "npm:@tanstack/preact-query@^5.101.0": "5.101.1_preact@10.29.2",
     "npm:@tanstack/query-core@^5.101.0": "5.101.1",
-    "npm:@tanstack/query-db-collection@^1.2.1": "1.2.1_@tanstack+query-core@5.101.1_typescript@7.0.2",
-    "npm:@tanstack/react-db@~0.1.95": "0.1.95_react@19.2.8_typescript@7.0.2",
+    "npm:@tanstack/query-db-collection@1.2.1": "1.2.1_@tanstack+query-core@5.101.1_typescript@7.0.2",
+    "npm:@tanstack/react-db@0.1.95": "0.1.95_react@19.2.8_typescript@7.0.2",
     "npm:@types/amqplib@~0.10.7": "0.10.8",
     "npm:@workos-inc/node@^10.4.0": "10.6.0",
     "npm:amqplib@^2.0.1": "2.0.1",
@@ -3789,7 +3789,7 @@
           "jsr:@std/http@1",
           "jsr:@std/path@1",
           "jsr:@std/text@1",
-          "npm:@durable-streams/state@~0.3.1",
+          "npm:@durable-streams/state@0.3.1",
           "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
           "npm:@orpc/server@^1.15.0",
           "npm:@preact/signals@2.9.2",
@@ -3797,7 +3797,7 @@
           "npm:@tanstack/ai@0.52",
           "npm:@tanstack/preact-query@^5.101.0",
           "npm:@tanstack/query-core@^5.101.0",
-          "npm:@tanstack/react-db@~0.1.95",
+          "npm:@tanstack/react-db@0.1.95",
           "npm:preact-render-to-string@^6.7.0",
           "npm:preact@^10.29.2",
           "npm:vite@7.2.2",
@@ -3805,11 +3805,11 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@preact/signals@2.9.2",
             "npm:@tanstack/preact-query@^5.101.0",
             "npm:@tanstack/query-core@^5.101.0",
-            "npm:@tanstack/react-db@~0.1.95",
+            "npm:@tanstack/react-db@0.1.95",
             "npm:preact-render-to-string@^6.7.0",
             "npm:preact@^10.29.2",
             "npm:vite@7.2.2"
@@ -3920,7 +3920,7 @@
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/client@~0.2.6",
-            "npm:@durable-streams/state@~0.3.1"
+            "npm:@durable-streams/state@0.3.1"
           ]
         }
       },
@@ -4002,9 +4002,9 @@
           "npm:@orpc/server@^1.15.0",
           "npm:@orpc/tanstack-query@^1.15.0",
           "npm:@orpc/zod@^1.15.0",
-          "npm:@tanstack/db@~0.6.8",
+          "npm:@tanstack/db@0.6.17",
           "npm:@tanstack/query-core@^5.101.0",
-          "npm:@tanstack/query-db-collection@^1.2.1"
+          "npm:@tanstack/query-db-collection@1.2.1"
         ],
         "packageJson": {
           "dependencies": [
@@ -4014,9 +4014,9 @@
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/tanstack-query@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
-            "npm:@tanstack/db@~0.6.8",
+            "npm:@tanstack/db@0.6.17",
             "npm:@tanstack/query-core@^5.101.0",
-            "npm:@tanstack/query-db-collection@^1.2.1"
+            "npm:@tanstack/query-db-collection@1.2.1"
           ]
         }
       },
@@ -4084,7 +4084,7 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
@@ -4109,12 +4109,12 @@
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/client@~0.2.6",
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/openapi@^1.15.0",
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
-            "npm:@tanstack/db@~0.6.8"
+            "npm:@tanstack/db@0.6.17"
           ]
         }
       },
@@ -4156,7 +4156,7 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/server@^1.15.0"
           ]
@@ -4183,12 +4183,12 @@
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/client@~0.2.6",
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/openapi@^1.15.0",
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
-            "npm:@tanstack/db@~0.6.8"
+            "npm:@tanstack/db@0.6.17"
           ]
         }
       }

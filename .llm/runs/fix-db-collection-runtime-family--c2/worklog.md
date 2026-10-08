@@ -167,3 +167,47 @@ Gate `db-corpus-tests-corrected`: raw exit `0`. Command: `deno run --allow-read 
 S4 finalized: corpus generated at source 93fa1add4 and committed at 868a3586d; exact-source --check exit 0. Generator + embedded corpus regression suite passes after correcting one nonexistent test path (initial launch refusal retained, no test skip). Test-scoped WT_ENFORCE=0 confines legitimate fixture worktrees to task TMPDIR without global shim changes. Carrier freshness exit 0. Source/carrier/inventory/public publish qualification complete. Phase 5 Implement complete, phase 6 Gate complete with explicit baseline doc DEBT; phase 7 independent IMPL-EVAL next. Phase 8 release N/A, no merge/publication authorized. Phase 9 pending evaluator and owner handoff.
 
 S5 independent Zhipu GLM implementation review PASS at exact head 51d074443efa241af0d24153a6de608f78ef429b; evaluator independently reran focused production three, full SDK/Fresh 524 tests, cold guard, quality, frozen/scoped gates, corpus and JSR audits. db-doc-baseline-2039 explicitly adjudicated DEBT_ACCEPTED; owning row marked open with that assessment. Evaluator requested missing SKILL chapters in review briefs; appended governing skill list as a text-only close-out, retaining original private report and public verdict. Phase 7 complete; phase 8 N/A (no merge/release); phase 9 source delivery complete with owner publication/published-consumer qualification and downstream pin removal outstanding. No Fixes claim.
+
+## S6 bounded CI alignment amendment
+
+Exact head c9a2005ca1ab7ccf260ff09d9995a460bf09069d CI: repository check/test fails the existing scaffold runtime catalog consistency test (5464 pass/1 fail/14 ignored); Fresh UI frozen check refuses stale four family specifier keys. Adopt owning CLI Archetype 6 catalog overlay: existing scaffolder constants must match D1 exact pins, and Fresh UI private consumer lock must reflect current catalog/owning manifests. Change only three existing scalar dependency constants and four family lock specifier/workspace aliases, preserving every resolved npm/JSR identity. No command/flow/spine/composition/registry/permissions changes; existing kernel constants own this correction. No new type/port/test required: actual existing catalog test is already causal FAIL and must restore PASS. PLAN-EVAL amendment N/A: mechanical completion of approved D1 exact-family/generated consumers, no material contract/lifecycle decision. S6 gates: owning frozen Fresh UI check+test/lint; existing scaffold catalog unit tests, scoped check/lint/fmt; quality/architecture, CLI JSR/doc/raw dry publication, carrier and clean-source corpus generation if catalog inventory content requires refresh. CLI literal change requires actual scaffold.runtime even without release: record raw local attempt and require qualified exact-source CI receipt when local infrastructure cannot complete. Label e2e-cli-gate opts owning CI qualification in. Independent bounded amendment IMPL-EVAL mandatory, retain original PASS report and qualify new head before final source handoff. No second PR, no merge/publication; original real Collection/SSR/browser behavior unchanged.
+
+Gate `db-ci-static-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog_test.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `db-ci-catalog-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog_test.ts`. Full raw output retained privately.
+
+Gate `db-ci-fresh-ui-check`: raw exit `0`. Command: `deno task --cwd packages/fresh-ui check`. Full raw output retained privately.
+
+Gate `db-ci-scaffold-runtime`: raw exit `1`. Command: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`. Full raw output retained privately.
+
+Gate `db-ci-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `db-ci-fmt`: raw exit `2`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts --file packages/fresh-ui/deno.lock`. Full raw output retained privately.
+
+Gate `db-ci-lint`: raw exit `2`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts`. Full raw output retained privately.
+
+Gate `db-ci-fresh-ui-lint`: raw exit `0`. Command: `deno task --cwd packages/fresh-ui lint`. Full raw output retained privately.
+
+Gate `db-ci-carrier`: raw exit `0`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+Gate `db-ci-cli-doc`: raw exit `0`. Command: `deno task doc:lint --root packages/cli`. Full raw output retained privately.
+
+Gate `db-ci-cli-jsr`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli --text`. Full raw output retained privately.
+
+Gate `db-ci-cli-publish`: raw exit `0`. Command: `deno task --cwd packages/cli publish:dry-run`. Full raw output retained privately.
+
+Gate `db-ci-lint-corrected`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts --config <private-evidence-config>`. Full raw output retained privately.
+
+Gate `db-ci-fmt-corrected`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts --file packages/fresh-ui/deno.lock --config <private-evidence-config>`. Full raw output retained privately.
+
+Gate `db-ci-fresh-ui-tests`: raw exit `0`. Command: `deno task --cwd packages/fresh-ui test`. Full raw output retained privately.
+
+Gate `db-ci-fmt-write`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts --file packages/fresh-ui/deno.lock --config <private-evidence-config> --write`. Full raw output retained privately.
+
+Gate `db-ci-fmt-final`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts --config <private-evidence-config>`. Full raw output retained privately.
+
+Gate `db-ci-owning-fmt-write`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts --config <private-evidence-config> --write`. Full raw output retained privately.
+
+Gate `db-ci-owning-fmt-final`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts --config <private-evidence-config>`. Full raw output retained privately.
+
+S6 substantive source review: only three exact dependency pins in existing scaffold catalog (plus owning-format line wrapping) and four private lock specifier/workspace aliases changed; all 570 resolved npm identities and complete JSR graph preserved byte-for-byte by semantic comparison. Frozen Fresh UI 150-file check and 172 tests pass, existing scaffold catalog three tests pass, scoped static/lint/fmt and quality/architecture pass. CLI all-export docs/JSR and actual publication dry-run pass; carrier pass. Initial root lint/fmt selection refused excluded CLI; explicit owning private config restores coverage. Initial generic fmt config default quotes was discarded, correct owning single-quote formatting applied; no protocol or other-source changes. Actual one-pass scaffold.runtime attempted, raw exit one: Aspire doctor and Docker cleanup infrastructure failures, 1 pass/2 fail/0 skipped. Require exact-source qualified CI runtime receipt before merge readiness; retain failure rather than bypass it. Independent amendment review pending.
