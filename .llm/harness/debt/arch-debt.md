@@ -2411,10 +2411,10 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 - **ID:** `STREAMS-BOUNDED-NATIVE-IO-HOOKS`
 - **Reason:** `AP-4` cross-package implementation inheritance / `A11` dependency coupling. Native
-  durable-streams/server buffers full append logs during recovery and suffix reads,
-  but exposes neither protected segment I/O hooks nor store injection. The NetScript adapter replaces
-  exactly two TS-private virtual hooks on its own subclass before native constructor recovery. No
-  upstream prototype is modified. Retaining the native store preserves LMDB/protocol/fork semantics.
+  durable-streams/server buffers full append logs during recovery and suffix reads, but exposes
+  neither protected segment I/O hooks nor store injection. The NetScript adapter replaces exactly
+  two TS-private virtual hooks on its own subclass before native constructor recovery. No upstream
+  prototype is modified. Retaining the native store preserves LMDB/protocol/fork semantics.
 - **Owner:** NetScript streams maintainers.
 - **Target:** The upstream bounded-I/O/store-injection release tracked by
   https://github.com/durable-streams/durable-streams/issues/420.
@@ -2422,25 +2422,52 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Created:** 2026-10-07
 - **Status:** open, DEBT_ACCEPTED.
 - **Gate:** Remove the compatibility bridge when a native supported seam passes complete-frame,
-  fork/cap/sub-offset, restart/producer-state and >=1 GiB RSS regressions at the same memory ceiling.
+  fork/cap/sub-offset, restart/producer-state and >=1 GiB RSS regressions at the same memory
+  ceiling.
 - **Cost:** Dependency upgrades require hook-shape and semantic compatibility verification. Runtime
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
-  RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
-  storage migration or persistent index.
+  RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades
+  cold historical framing scans for fixed memory without a storage migration or persistent index.
+
+## Fresh — unchanged documentation baseline during pure route utility repair
+
+- **ID:** `route-doc-baseline-2040`
+- **Reason:** Existing all-export public documentation diagnostics predate the URL purity repair.
+  Combined Fresh sweep reports 28 private references and 17 missing docs. Every export entrypoint
+  diagnostic and exit code exactly matches current-main baseline; complete structured stdout is
+  byte-identical.
+- **Owner:** Fresh maintainers.
+- **Target:** 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-pure-route-url-utilities--c2/plan.md`; NetScript #2040.
+- **Created:** 2026-10-08.
+- **Status:** open, DEBT_ACCEPTED by independent IMPL-EVAL at
+  dd452c4b1330044cfe12ebabef1a8bb345cb71d7.
+- **Gate:** All-export doc lint reaches zero with existing public types preserved. This repair
+  introduces no additional entrypoint diagnostic. Publication and qualified published consumer
+  remain owner release gates.
+- **Evidence:** Complete private baseline/current reports and entrypoint comparison; worklog retains
+  both failing raw doc exits, passing owning JSR audit and actual publish dry-run.
 
 ## workers packages — unchanged doc baseline (`workers-doc-baseline-2066`)
 
-- **Reason:** Main baseline retains public private-type references across plugin-workers-core and workers exports; cancellation source removes every newly introduced diagnostic. Corrected per-entry counts and exit codes match baseline exactly (core combined 9, plugin combined 22; combined summaries alone are insufficient). Existing workers-private-type-ref-1655 row has an older narrower baseline and is not treated as approval for growth.
+- **Reason:** Main baseline retains public private-type references across plugin-workers-core and
+  workers exports; cancellation source removes every newly introduced diagnostic. Corrected
+  per-entry counts and exit codes match baseline exactly (core combined 9, plugin combined 22;
+  combined summaries alone are insufficient). Existing workers-private-type-ref-1655 row has an
+  older narrower baseline and is not treated as approval for growth.
 - **Owner:** Workers package public-surface maintainers.
 - **Target:** Before the next stable workers release, no later than 2026-10-15.
 - **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`.
 - **Created:** 2026-10-08.
-- **Status:** open; independent evaluator must adjudicate DEBT_ACCEPTED for this unchanged source baseline.
+- **Status:** open; independent evaluator must adjudicate DEBT_ACCEPTED for this unchanged source
+  baseline.
 - **Gate:** F-7: all worker export doc-lint diagnostics zero.
 
 ## workers doctor export — unchanged module tag (`workers-doctor-module-baseline-2066`)
 
-- **Reason:** Existing public doctor.ts export lacks @module JSDoc; JSR audit FAIL F-JSR-2 is identical on current main archive and this branch. No doctor source or publish shape changed in the cancellation slice.
+- **Reason:** Existing public doctor.ts export lacks @module JSDoc; JSR audit FAIL F-JSR-2 is
+  identical on current main archive and this branch. No doctor source or publish shape changed in
+  the cancellation slice.
 - **Owner:** Workers plugin public-surface maintainers.
 - **Target:** Before the next stable workers release, no later than 2026-10-15.
 - **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`.
@@ -2450,14 +2477,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## workers-core source layout — required adapter directory (`workers-core-layout-2066`)
 
-- **Reason:** Pre-existing src cardinality exceeds the doctrine cap; source now has 19 immediate children versus main's 18 because the approved native clock adapter belongs in adapters/. Moving the clock into runtime would violate adapter placement. No unrelated source expansion; restructuring existing worker core is deferred.
+- **Reason:** Pre-existing src cardinality exceeds the doctrine cap; source now has 19 immediate
+  children versus main's 18 because the approved native clock adapter belongs in adapters/. Moving
+  the clock into runtime would violate adapter placement. No unrelated source expansion;
+  restructuring existing worker core is deferred.
 - **Owner:** Workers core maintainers.
-- **Target:** Existing source layout consolidation before the next stable workers release, no later than 2026-10-15.
-- **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`; original PLAN-EVAL advisory A3 approves adapter placement.
+- **Target:** Existing source layout consolidation before the next stable workers release, no later
+  than 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`; original PLAN-EVAL advisory
+  A3 approves adapter placement.
 - **Created:** 2026-10-08.
 - **Status:** open; evaluator adjudication required.
 - **Gate:** F-16 source cardinality at or below 12, preserving domain/port/adapter ownership.
-
 
 ## desktop-doc-baseline-2041 — unchanged SDK/Fresh documentation baseline
 
@@ -2468,23 +2499,31 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Scope:** The all-export documentation reports at baseline
   `8aad14940c52cd3a4db7efa57d56d50ae131df6c` and completed desktop source are byte-identical,
   including every entrypoint diagnostic and exit. SDK combined diagnostics: 3 private type
-  references; Fresh: 28 private type references and 17 missing JSDoc. Both raw gates exit one.
-  MCP combined diagnostics are zero, but cli.ts/mod.ts each retain three private references
-  and raw entrypoint exits one, making the wrapper raw exit one. The pristine baseline
-  MCP structured report is byte-identical, including all three entrypoints.
-  The optional native document epoch handler parameter is documented; no new diagnostic or
-  slow type is introduced. Owning JSR audit and actual publication dry-runs pass.
+  references; Fresh: 28 private type references and 17 missing JSDoc. Both raw gates exit one. MCP
+  combined diagnostics are zero, but cli.ts/mod.ts each retain three private references and raw
+  entrypoint exits one, making the wrapper raw exit one. The pristine baseline MCP structured report
+  is byte-identical, including all three entrypoints. The optional native document epoch handler
+  parameter is documented; no new diagnostic or slow type is introduced. Owning JSR audit and actual
+  publication dry-runs pass.
 - **Evidence:** `.llm/runs/fix-desktop-document-reconnect--c2/worklog.md`; complete raw structured
-  baseline and final reports retained for independent comparison. No suppression or baseline
-  reset. Publication/final release qualification remains separate.
+  baseline and final reports retained for independent comparison. No suppression or baseline reset.
+  Publication/final release qualification remains separate.
 - **Closing gate:** Repair the pre-existing all-export documentation findings and obtain raw
   documentation exit zero; receipt equivalence does not close this debt.
 
 ### Fresh rich send all-entrypoint documentation baseline (#2068)
 
 - **ID:** `chat-send-doc-baseline-2068`
-- **Reason:** Pristine current main retains 45 combined documentation findings (28 private-type references,17 missing JSDoc) across Fresh exports. Full structured reports, every entrypoint count and raw exit are unchanged after rich send; the new owned type is fully documented. MCP corpus ownership additionally retains an identical pristine-main report: combined zero, two entrypoints with three private-type diagnostics each and raw task exit one. Raw doc gates remain failed, no suppression.
+- **Reason:** Pristine current main retains 45 combined documentation findings (28 private-type
+  references,17 missing JSDoc) across Fresh exports. Full structured reports, every entrypoint count
+  and raw exit are unchanged after rich send; the new owned type is fully documented. MCP corpus
+  ownership additionally retains an identical pristine-main report: combined zero, two entrypoints
+  with three private-type diagnostics each and raw task exit one. Raw doc gates remain failed, no
+  suppression.
 - **Owner:** Fresh and MCP package public-surface maintainers.
 - **Target:** Before the next stable Fresh release, no later than 2026-10-15.
-- **Closing gate:** F-7 full Fresh and MCP doc-lint has zero diagnostics across every export entrypoint.
-- **Status:** open; DEBT_ACCEPTED by independent Google Gemini IMPL-EVAL at `ffdb32a7d0bef56a8ecc37749d87e689beda6625`. Both complete documentation reports and raw exits match pristine main; closing gate remains owner work.
+- **Closing gate:** F-7 full Fresh and MCP doc-lint has zero diagnostics across every export
+  entrypoint.
+- **Status:** open; DEBT_ACCEPTED by independent Google Gemini IMPL-EVAL at
+  `ffdb32a7d0bef56a8ecc37749d87e689beda6625`. Both complete documentation reports and raw exits
+  match pristine main; closing gate remains owner work.

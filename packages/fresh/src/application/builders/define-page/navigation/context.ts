@@ -41,21 +41,7 @@ export function useRequiredNavigationContext(): DefinePageNavigationContextValue
   return navigationContext;
 }
 
-/** Read the navigation context when hooks are available, otherwise return null. */
-export function readNavigationContext(): DefinePageNavigationContextValue | null {
-  try {
-    return useContext(DefinePageNavigationContext) as DefinePageNavigationContextValue | null;
-  } catch (error: unknown) {
-    if (
-      error instanceof Error &&
-      (
-        error.message.includes('Hook can only be invoked') ||
-        error.message.includes("reading 'context'")
-      )
-    ) {
-      return null;
-    }
-
-    throw error;
-  }
+/** Read optional navigation context during a component render. */
+export function useNavigationContext(): DefinePageNavigationContextValue | null {
+  return useContext(DefinePageNavigationContext);
 }
