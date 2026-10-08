@@ -181,3 +181,5 @@ independent Google fallback evaluation remain pending; no release/ready-merge/la
 ## Resume reconciliation
 
 Ordinary merge of main 8aad14940c52cd3a4db7efa57d56d50ae131df6c; see resume-reconciliation.md. C1 run records use main. Generated assets will be refreshed with Deno 2.9.5.
+
+MCP clean-read-set guard requires an intermediate generated-input commit. No dirty-tree override is used.
