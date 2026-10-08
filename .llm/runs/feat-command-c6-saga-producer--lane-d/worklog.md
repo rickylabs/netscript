@@ -298,3 +298,7 @@ Root check EXIT 0 (3261 files, zero failed batches); regression EXIT 0, 535 pass
 Owned saga root/effect/port/testing/store and worker root documentation graphs EXIT 0; database/service command graphs already qualified. Entire saga export map EXIT 1 with eight legacy private-type diagnostics (original baseline eight, normalization temporarily nine; store curation removes one). Entire worker map EXIT 1 with seven (original baseline eight). Neither full-map run is claimed green. Public inventory uses native Deno doc JSON v2 and includes all new typed effects/capabilities/factory/bound writer/trace helper.
 
 S20a slice signoff PASS for consumer, validation and publication inputs only. Four generated assets/freshness, canonical full runtime, final current-head CI and independent IMPL-EVAL remain pending.
+
+## S20b pinned generated-input checkpoint
+
+Deno 2.9.5 gen:agent-docs-prose, gen:assets-barrel and gen:publish-assets all EXIT 0. Commit their inputs before native MCP export corpus generation to satisfy its clean read set. Fresh correctly authorized GLM primary canary EXIT 2: native expense guard provider_rate_limited before inference. No primary review verdict; authorized native Google separate-family fallback will use a fresh C6 context. Initial canary invocation was rejected for the missing exact owner-override worklog entry and was corrected before the genuine availability probe; that preflight failure is not provider-unavailability evidence.
