@@ -288,3 +288,14 @@ types.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+### StreamDB recovery
+
+The default `createNetScriptStreamDB` handle starts with `await db.preload?.()`.
+Its finite reconnect policy resumes the last consumed batch and retains the same
+reactive collections. `db.status` exposes liveness and terminal failure. Configure
+`reconnect.maxRetries`, `initialDelayMs`, and `maxDelayMs` to bound an outage;
+zero retries disables recovery. Authentication, malformed data, subscriber errors
+and invalid retained offsets fail without silently replaying the log. Stop or
+dispose cancels reads and backoff and is idempotent. Alternate factory adapters
+may omit these optional lifecycle hooks.

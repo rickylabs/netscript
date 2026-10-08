@@ -1,0 +1,10 @@
+{
+  "head": "4d6d87f8aefd462576cbf7517fe584a6762cdf47",
+  "files": {
+    "packages/fresh/src/runtime/streams/stream-db-recovery-adapter.ts": "7f5899f42640c7dae36d43aac2c31eee010daf9dde7990d6ec03efd201bd4791",
+    "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts": "1547142cfecf64c086725cb2a870a88e7ca1860189e4ab66f741143f0b05af47",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts": "cb898b92ae52a96e27af4039731c66cf12710a26b56725d9c8ddc0384fd11e78",
+    "packages/fresh/src/runtime/streams/create-stream-db_test.ts": "92de24e7b9b90e3ce8238f567516148719420653f69163c5732fab8d36afe4bc",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts": "0ffac48fd68db02a6f338f354ddd08624b3cf0878b9909d0ace9d9398c640fff"
+  }
+}
