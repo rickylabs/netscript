@@ -9,7 +9,7 @@
 | Evaluated Current HEAD | `ffdb32a7d0bef56a8ecc37749d87e689beda6625` |
 | Baseline SHA | `8aad14940c52cd3a4db7efa57d56d50ae131df6c` (current main) |
 | Transitive Commits Evaluated | `12df198d6`, `b8f5a288b`, `5a8571436`, `4f429df3a`, `04bd92161`, `ffdb32a7d` |
-| Evaluator Session | Independent Google Gemini evaluator (`gemini-3.8-flash-high`), session ID `74542e15-2e64-41dc-9653-be9ba2cff7f4` |
+| Evaluator Session | Independent Google Gemini evaluator (`gemini-3.8-flash-high`), session ID `<redacted-session-id>` |
 | Session History & Scoping | Initial relative-brief lookup was interrupted before verdict or source mutation; the same independent evaluator session resumed using the task-scoped absolute brief without operator paths or private commands in public artifacts |
 | Vendor Separation | Independent vendor family from OpenAI generator/implementer (`gpt-6.1-sol` lane record); authorized owner fallback under `HARNESS.md` after primary GLM provider requests stalled without verdict (`evaluator-provider-fallback.json`) |
 | Prior Plan Evaluation | Selected PLAN-EVAL PASS against immutable current main `8aad14940c52cd3a4db7efa57d56d50ae131df6c` preserved in `plan-eval.md` |
