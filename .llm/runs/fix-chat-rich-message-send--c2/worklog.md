@@ -16,11 +16,11 @@ PLAN-EVAL: Selected independent PLAN-EVAL PASS against immutable current main 8a
 2. Research: issue, MCP, selected skills/doctrine and existing implementation examined.
 3. Plan & Design: locked design recorded above.
 4. Plan-Gate: Selected independent PLAN-EVAL PASS against immutable current main 8aad14940c52cd3a4db7efa57d56d50ae131df6c; verify fresh main equality before implementation, feature capped
-5. Implement: pending.
-6. Gate: pending; raw exit codes to be recorded.
-7. Evaluate: pending; independent different-vendor session mandatory.
+5. Implement: complete; rich owned input, direct forwarding, native consumers and actual default transport covered.
+6. Gate: complete; raw exits recorded below, unchanged documentation baseline independently DEBT_ACCEPTED.
+7. Evaluate: independent Google Gemini PASS at `ffdb32a7d0bef56a8ecc37749d87e689beda6625`; exact report in evaluate.md.
 8. Release: N/A, owner explicitly requires unmerged PRs.
-9. Close: pending source delivery and handoff; publication remains owner work.
+9. Close: unmerged source delivery and review handoff complete; coordinated publication, published native consumer and live one-SSE-per-pane remain owner work.
 
 S1 Design checkpoint: D1-D4 locked in plan.md. Independent Google Gemini selected PLAN-EVAL PASS at immutable main8aad14940c52cd3a4db7efa57d56d50ae131df6c, all8boxes. Fresh fetch baseline equality confirmed before implementation. Model/session/vendor separated; owner-authorized fallback after primary provider stalled. Actual native data/signal already forwarded; only message mapper drops parts/metadata. Planned2runtime regressions plus native compile consumer, eachdistinctcausalmutant. Full owning doc baseline to be recorded before source and compared at everyentrypoint; proposed existing-debt acceptance requires independent IMPL ifrawfailed. S2 source stillpending.
 
@@ -95,3 +95,7 @@ S4 canonical corpus generated from clean committed S3 source4f429df3a. A pristin
 Gate `chat-corpus-tests`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/docs/generate-export-surface-corpus_test.ts packages/mcp/tests/embedded-export-surface-corpus_test.ts`. Full raw output retained privately.
 
 S4 committed-source proof complete: all14canonical generator/embedded tests pass at04bd92161, with test-scoped WT_ENFORCE=0 and task-local TMPDIR. Source/gates complete; S5 mandatory fresh independent Google Gemini evaluation next via recorded owner-authorized fallback. Final implementation head04bd92161 includes all runtime/type/test/corpus/debt source; subsequent launch record has no production delta. Source and branch frozen until reviewer process exits. Publication, published consumer and EIS live one-SSE-per-pane/removable singleSubscriberConnection remain owner work, Refs2068.
+
+S5 independent evaluation complete. Google Gemini session `74542e15-2e64-41dc-9653-be9ba2cff7f4` returned PASS at exact frozen head `ffdb32a7d0bef56a8ecc37749d87e689beda6625`. The reviewer independently reran 285 Fresh tests, 21 focused tests, the actual native case, 225-file static/lint/fmt, quality, Fresh/MCP JSR and publication dry-runs, canonical corpus/carrier and 14 corpus tests. All three causal mutation records were inspected. Full Fresh/MCP documentation reports remain byte-identical to pristine baseline, raw exits one, explicitly DEBT_ACCEPTED with owner/target/closing gate. No source or branch mutation occurred during evaluation. The same evaluator performed report-only factual reconciliation: parsed JSON equality, dry-run rather than release publication, and source PASS rather than full published-consumer acceptance. Initial launch lookup recovery is recorded in drift.md. Original selected PLAN report remains intact.
+
+Final record commit contains only the evaluator report, accepted debt status and run close-out. Production/source/corpus/test files remain identical to the independently evaluated head. PR2092 is delivered for review without merge or publication; final-head CI is audited separately. Owner must publish the coordinated capability, qualify a published native consumer and verify one live SSE per pane before removing EIS singleSubscriberConnection or closing #2068.

@@ -2436,4 +2436,4 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Owner:** Fresh and MCP package public-surface maintainers.
 - **Target:** Before the next stable Fresh release, no later than 2026-10-15.
 - **Closing gate:** F-7 full Fresh and MCP doc-lint has zero diagnostics across every export entrypoint.
-- **Status:** open; independent evaluator must adjudicate DEBT_ACCEPTED for this unchanged baseline.
+- **Status:** open; DEBT_ACCEPTED by independent Google Gemini IMPL-EVAL at `ffdb32a7d0bef56a8ecc37749d87e689beda6625`. Both complete documentation reports and raw exits match pristine main; closing gate remains owner work.
