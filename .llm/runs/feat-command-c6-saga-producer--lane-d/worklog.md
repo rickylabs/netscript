@@ -302,3 +302,5 @@ S20a slice signoff PASS for consumer, validation and publication inputs only. Fo
 ## S20b pinned generated-input checkpoint
 
 Deno 2.9.5 gen:agent-docs-prose, gen:assets-barrel and gen:publish-assets all EXIT 0. Commit their inputs before native MCP export corpus generation to satisfy its clean read set. Fresh correctly authorized GLM primary canary EXIT 2: native expense guard provider_rate_limited before inference. No primary review verdict; authorized native Google separate-family fallback will use a fresh C6 context. Initial canary invocation was rejected for the missing exact owner-override worklog entry and was corrected before the genuine availability probe; that preflight failure is not provider-unavailability evidence.
+
+Native gen:mcp-export-corpus EXIT 0 after clean generated-input checkpoint 0768d501a. All four generation tasks use pinned Deno 2.9.5. Canonical full-runtime qualification is active on these generated consumers; no PASS until terminal receipt.
