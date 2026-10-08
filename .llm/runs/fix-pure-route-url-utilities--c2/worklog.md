@@ -170,3 +170,5 @@ Shortened duplicate migration prose, retained explicit top-level useSearch examp
 Canonical gen:agent-docs-prose exit 0. Generated carrier reviewed; no hand edits.
 
 Canonical gen:assets-barrel exit 0. Generated carrier reviewed; no hand edits.
+
+Canonical gen:publish-assets exit 0. Generated carrier reviewed; no hand edits.
