@@ -205,3 +205,65 @@ Gate `amendment-published-negative`: raw exit `1`. Command: `deno run --frozen -
 Independent GLM max IMPL-EVAL PASS at source `f413a1f612683f054d44d74297627129987feff9`, actual evaluation head `d5c07c0874eb561f130957d1867bd84ff2c5dd6d`. Report `amendment-evaluate.md` supersedes the original source verdict. Reviewer independently reran both regressions (2 pass) and the live cold resolution guard (one core 0.65.0). Both unchanged doc baseline rows explicitly DEBT_ACCEPTED. Source phases 5–7 complete; review phase ready. No merge/publication; fixed published-consumer receipt remains owner work. Report-record commit reused the prior brief message after unavailable python alias; this follow-up correctly records completion.
 
 Final B1–B3 independent PLAN-EVAL PASS at f9ba4e3515000c45f2ac7ec0456fe06ad8fe4590; fresh GLM max report review-plan-evaluate.md. Earlier reused-session review produced no applicable verdict and is discarded; no source implementation preceded this PASS. All bounded fixes and required one-pass scaffold gate obligations retained.
+
+Gate `review-fmt-write`: raw exit `2`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --file packages/cli/src/kernel/adapters/scaffold/import-resolver.ts --file packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts --write`. Full raw output retained privately.
+
+Gate `review-guard-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `review-mutation-equals`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `review-mutation-mixed-peers`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-guard-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `review-lint`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --file packages/cli/src/kernel/adapters/scaffold/import-resolver.ts --file packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts --config <private-evidence>`. Full raw output retained privately.
+
+Gate `review-guard-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `review-live-cold`: raw exit `1`. Command: `deno task deps:check:ai-peers`. Full raw output retained privately.
+
+Gate `review-cli-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts`. Full raw output retained privately.
+
+Gate `review-fmt-final`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --file packages/cli/src/kernel/adapters/scaffold/import-resolver.ts --file packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts --config <private-evidence> --write`. Full raw output retained privately.
+
+Gate `review-mutation-equals`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `review-mutation-mixed-peers`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `review-fmt-final`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --file packages/cli/src/kernel/adapters/scaffold/import-resolver.ts --file packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts --config <private-evidence> --write`. Full raw output retained privately.
+
+Gate `review-mutation-equals`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `review-mutation-mixed-peers`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-guard-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `review-cli-doc`: raw exit `0`. Command: `deno task doc:lint --root packages/cli`. Full raw output retained privately.
+
+Gate `review-cli-jsr`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli --text`. Full raw output retained privately.
+
+Gate `review-scaffold-runtime`: raw exit `1`. Command: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`. Full raw output retained privately.
+
+Gate `review-cli-publish`: raw exit `0`. Command: `deno task --cwd packages/cli publish:dry-run`. Full raw output retained privately.
+
+Gate `review-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `review-live-cold-final`: raw exit `0`. Command: `deno task deps:check:ai-peers`. Full raw output retained privately.
+
+Gate `review-final-lint`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --file packages/cli/src/kernel/adapters/scaffold/import-resolver.ts --file packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts --config <private-evidence>`. Full raw output retained privately.
+
+Gate `review-final-fmt`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --file packages/cli/src/kernel/adapters/scaffold/import-resolver.ts --file packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts --config <private-evidence>`. Full raw output retained privately.
+
+Gate `review-final-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --file packages/cli/src/kernel/adapters/scaffold/import-resolver.ts --file packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `review-published-negative-equals`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run --allow-env .llm/tools/deps/check-ai-peers.ts --published-version=0.0.7`. Full raw output retained privately.
+
+Gate `review-published-negative-space`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run --allow-env .llm/tools/deps/check-ai-peers.ts --published-version 0.0.7`. Full raw output retained privately.
+
+Gate `review-carrier`: raw exit `0`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+B1–B3 slice review: strict std parser now accepts both exact-version forms and rejects missing, duplicate, unknown or invalid inputs before workspace reads. Registry loader enumerates versions then queries every exact release's peer metadata, bounds concurrency, accepts peer-less blank output and npm's singleton exact-result array. Fixture has a peer-less first, incompatible intermediate and compatible last release. Both new regressions fail under causal source mutation and pass restored (4/4). A first metadata mutation did not apply after formatting; its zero exit is invalid evidence, superseded by verified applied mutation/exit 1. Initial fmt coverage refusal corrected with explicit scoped config; subsequent coverage is complete.
+
+CLI sole MCP pin and adjacent existing assertions now match exact owning 0.8.0; existing workspace-mutator plus resolver suites pass both modes. Frozen selected check, lint/fmt, quality scan/architecture, carrier freshness, CLI JSR audit, all-export docs and publish dry-run pass. Live lock-free guard passes one core 0.65.0. Both genuine published 0.0.7 argument forms fail on the same actual Anthropic/OpenAI/openai-base peer conflicts; no publication claim.
+
+Required one-pass scaffold.runtime actually ran, raw exit 1: preflight.aspire and cleanup.aspire-stop failed because required runtime infrastructure is unavailable. Deno preflight passed; no skipped suite is reported green. Merge readiness remains blocked pending successful qualified CI receipt (e2e-cli-gate opt-in retained). CLI source pin cannot ship independently of coordinated AI family. Existing AI/Fresh documentation baseline debt remains unchanged. Fresh independent IMPL-EVAL required for B delta.
