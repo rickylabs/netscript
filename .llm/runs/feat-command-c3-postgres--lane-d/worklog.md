@@ -50,3 +50,11 @@ combined documentation exit 0. Original public claims corrected. Normal merge of
 6d1eaf5a221ce29fa55c0bfd10e3b5c7d66101e3 preserves merged authentication and stream repairs.
 Conflicting generated carriers take main then regenerate with Deno 2.9.5. Requalification and
 same-session re-evaluation remain pending.
+
+## Repair qualification
+
+Exact product 10286a1efe4d1574ad9d4b22a17f9a7082657e85: repository
+check/lint/format/quality/architecture, targeted tests, all four pinned generated freshness checks,
+full export documentation (every entrypoint), JSR audit, native publish, production install and
+seven-case native provider gate all exit 0. See repair-qualification.json and gates.log.
+Same-session independent round 2 is next; no native CI or readiness claim.
