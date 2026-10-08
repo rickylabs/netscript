@@ -2428,6 +2428,36 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
   storage migration or persistent index.
 
+## workers packages — unchanged doc baseline (`workers-doc-baseline-2066`)
+
+- **Reason:** Main baseline retains public private-type references across plugin-workers-core and workers exports; cancellation source removes every newly introduced diagnostic. Corrected per-entry counts and exit codes match baseline exactly (core combined 9, plugin combined 22; combined summaries alone are insufficient). Existing workers-private-type-ref-1655 row has an older narrower baseline and is not treated as approval for growth.
+- **Owner:** Workers package public-surface maintainers.
+- **Target:** Before the next stable workers release, no later than 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`.
+- **Created:** 2026-10-08.
+- **Status:** open; independent evaluator must adjudicate DEBT_ACCEPTED for this unchanged source baseline.
+- **Gate:** F-7: all worker export doc-lint diagnostics zero.
+
+## workers doctor export — unchanged module tag (`workers-doctor-module-baseline-2066`)
+
+- **Reason:** Existing public doctor.ts export lacks @module JSDoc; JSR audit FAIL F-JSR-2 is identical on current main archive and this branch. No doctor source or publish shape changed in the cancellation slice.
+- **Owner:** Workers plugin public-surface maintainers.
+- **Target:** Before the next stable workers release, no later than 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`.
+- **Created:** 2026-10-08.
+- **Status:** open; independent evaluator must adjudicate unchanged baseline debt.
+- **Gate:** F-JSR-2 module tag present and plugin JSR audit passes.
+
+## workers-core source layout — required adapter directory (`workers-core-layout-2066`)
+
+- **Reason:** Pre-existing src cardinality exceeds the doctrine cap; source now has 19 immediate children versus main's 18 because the approved native clock adapter belongs in adapters/. Moving the clock into runtime would violate adapter placement. No unrelated source expansion; restructuring existing worker core is deferred.
+- **Owner:** Workers core maintainers.
+- **Target:** Existing source layout consolidation before the next stable workers release, no later than 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`; original PLAN-EVAL advisory A3 approves adapter placement.
+- **Created:** 2026-10-08.
+- **Status:** open; evaluator adjudication required.
+- **Gate:** F-16 source cardinality at or below 12, preserving domain/port/adapter ownership.
+
 
 ## desktop-doc-baseline-2041 — unchanged SDK/Fresh documentation baseline
 

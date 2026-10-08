@@ -4,6 +4,7 @@ import { MemoryJobRegistry } from '../registry/mod.ts';
 import { ShutdownManager } from '../shutdown/mod.ts';
 import { WorkflowExecutor } from '../workflow/mod.ts';
 import { InProcessJobRunner } from './in-process-job-runner.ts';
+import { WebPlatformJobRunnerClock } from '../adapters/web-platform-job-runner-clock.ts';
 import type {
   RuntimeJobStoragePort,
   RuntimeSchedulerPort,
@@ -96,6 +97,7 @@ export function createWorkersRuntime(options: WorkersRuntimeOptions = {}): Worke
   const worker = options.worker ?? new InProcessJobRunner({
     fallbackToDynamicImport: options.fallbackToDynamicImport,
     registry: options.staticJobRegistry,
+    clock: new WebPlatformJobRunnerClock(() => (options.clock ?? systemClock).now().getTime()),
   });
   const workflowExecutor = options.workflowExecutor ?? new WorkflowExecutor({
     clock: options.workflow?.clock ?? options.clock,

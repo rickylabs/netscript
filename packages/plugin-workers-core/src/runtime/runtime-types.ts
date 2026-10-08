@@ -24,11 +24,23 @@ export type JobContext<TPayload = unknown, TResult = unknown> = Readonly<{
   readonly id: string;
   readonly job: JobDefinition<string, TPayload, TResult>;
   readonly payload: TPayload;
+  /** Executor-owned cancellation; reason names distinguish timeout, shutdown and cancel. */
+  readonly signal: AbortSignal;
+  /** Effective execution deadline in epoch milliseconds, when configured. */
+  readonly deadlineAt?: number;
   readonly correlationId?: string;
   readonly traceparent?: string;
   readonly tracestate?: string;
   readonly reportProgress?: (percent: number, message?: string) => void | Promise<void>;
 }>;
+
+/** Compatible dispatch input; the runner supplies its own required handler signal. */
+export type JobDispatchContext<TPayload = unknown, TResult = unknown> =
+  & Omit<JobContext<TPayload, TResult>, 'signal'>
+  & Readonly<{
+    /** Optional caller cancellation linked to the owned handler signal. */
+    signal?: AbortSignal;
+  }>;
 
 /** Function that executes a runtime job. */
 export type JobHandler<TPayload = unknown, TResult = unknown> = (
@@ -241,7 +253,7 @@ export type RuntimeWorkerPort = Readonly<{
   readonly id: string;
   dispatch<TPayload, TResult>(
     job: JobDefinition<string, TPayload, TResult>,
-    context: JobContext<TPayload, TResult>,
+    context: JobDispatchContext<TPayload, TResult>,
   ): Promise<JobResult<TResult>>;
   stop(reason?: string): Promise<void>;
 }>;

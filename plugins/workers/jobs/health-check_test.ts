@@ -12,6 +12,7 @@ Deno.test('health-check contribution keeps its id and executes through payload v
   );
 
   const result = await healthCheckJob({
+    signal: new AbortController().signal,
     id: 'health-check-regression',
     payload: { verbose: false },
     reportProgress: (percent) => {
