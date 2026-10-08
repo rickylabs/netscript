@@ -26,6 +26,7 @@
         "lint",
         "fmt:check",
         "deps:check",
+        "deps:check:ai-peers",
         "check:netscript-jsr-specifiers",
         "check:aspire-host-ports"
       ]

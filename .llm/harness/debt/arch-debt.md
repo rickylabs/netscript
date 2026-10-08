@@ -2455,6 +2455,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** All-export `deno task doc:lint --root packages/fresh` must pass at resolution. RSS
   negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold
   historical framing scans for fixed memory without a storage migration or persistent index.
+
 ## SDK/Fresh — unchanged public documentation baseline during Collection-family qualification
 
 - **ID:** `db-doc-baseline-2039`
