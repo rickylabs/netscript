@@ -51,8 +51,8 @@ preflight.
 ## Final evaluation and reconcile
 
 Independent GLM IMPL-EVAL: PASS (evaluate.md); fresh-ai-native-send-doc-2087 DEBT_ACCEPTED for
-CI-repair scope. Separate session ses_ee462dd76ffeiDVh6A4OufVilU independently reran the focused
-check and all 42 AI tests, both exit 0. Two LOW findings are non-blocking: existing debt formatting
+CI-repair scope. Separate session <session id redacted> independently reran the focused check and
+all 42 AI tests, both exit 0. Two LOW findings are non-blocking: existing debt formatting
 normalized; reduced-role narrative clarified. Source diff unchanged after evaluation (SHA256
 a546d76ca95621589a80b8c15b4f34c3de4ae75aa14824c50b9f372b4e667b84). Reconcile: PR #2087 remains OPEN
 on the authorized branch at original baseline; current main ancestor 7726065 confirmed. No issue
