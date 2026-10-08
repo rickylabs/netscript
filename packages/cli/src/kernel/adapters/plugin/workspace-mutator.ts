@@ -257,6 +257,7 @@ const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
   ),
   '@netscript/queue': netscriptJsrSpecifier('queue'),
   '@netscript/service': netscriptJsrSpecifier('service'),
+  '@netscript/service/commands/relay': netscriptJsrSpecifier('service', '/commands/relay'),
   '@netscript/telemetry': netscriptJsrSpecifier('telemetry'),
   '@netscript/telemetry/ai': netscriptJsrSpecifier('telemetry', '/ai'),
   '@netscript/telemetry/attributes': netscriptJsrSpecifier('telemetry', '/attributes'),

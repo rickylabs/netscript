@@ -40,5 +40,65 @@
     "sourceSha256": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969",
     "sharedMutation": "due-only",
     "wrapperAssertsNativeChildExit": true
+  },
+  {
+    "test": "relay decodes canonical payload and W3C before publication and refuses corrupt rows or missing sinks",
+    "productionFile": "packages/service/src/commands/relay/relay-delivery.ts",
+    "mutation": "trace-validation",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "7c37fd2deebf3ab4c0f7947dcac16748a1ac3ad6dbe736663804ff34b7a31329"
+  },
+  {
+    "test": "relay publishes before settlement with copied registry fresh generations and normalized acceptance",
+    "productionFile": "packages/service/src/commands/relay/relay-delivery.ts",
+    "mutation": "normalized-receipt",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "7c37fd2deebf3ab4c0f7947dcac16748a1ac3ad6dbe736663804ff34b7a31329"
+  },
+  {
+    "test": "relay publication then settlement crash redelivers stable key with explicitly idempotent downstream persistence",
+    "productionFile": "packages/service/src/commands/relay/create-command-outbox-relay.ts",
+    "mutation": "uncertain-settlement",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "09276e5e050f69e390254c2cd1db5aeb2d11c9fa03bee2fd089a81c4b29c431d"
+  },
+  {
+    "test": "relay bounds retry attempts failure classes malformed receipts and invalid backoff without losing ownership",
+    "productionFile": "packages/service/src/commands/relay/create-command-outbox-relay.ts",
+    "mutation": "attempt-bound",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "09276e5e050f69e390254c2cd1db5aeb2d11c9fa03bee2fd089a81c4b29c431d"
+  },
+  {
+    "test": "relay stop aborts publishers and awaits all overlapping drains under one concurrency ceiling",
+    "productionFile": "packages/service/src/commands/relay/create-command-outbox-relay.ts",
+    "mutation": "global-concurrency",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "09276e5e050f69e390254c2cd1db5aeb2d11c9fa03bee2fd089a81c4b29c431d"
+  },
+  {
+    "test": "relay observer failures preserve exactly one publication and finite privacy-safe tracing inputs",
+    "productionFile": "packages/service/src/commands/relay/relay-observer.ts",
+    "mutation": "private-tracing-start",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "303114dab177963479adba1220ea9438c495e50ddf11f431202ec40f480171d7"
   }
 ]

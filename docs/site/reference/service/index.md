@@ -245,6 +245,7 @@ The following entrypoints are published alongside the root export:
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/service` | `./mod.ts` | Full service surface (documented above). |
+| `@netscript/service/commands/relay` | `./commands-relay.ts` | Decoded bounded relay and checked sink lifecycle. |
 | `@netscript/service/commands/testing` | `./commands-testing.ts` | Atomic memory store and explicit test controls. |
 | `@netscript/service/commands` | `./commands.ts` | Opaque command definitions, once-only executor and codecs. |
 | `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
@@ -357,3 +358,33 @@ field-value guard rejecting CR, LF, NUL and other ASCII control bytes except HTA
 obs-text remain accepted in the opaque suffix; empty tracestate positives are preserved. This follows
 [RFC9110 field values](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.5) and
 [W3C traceparent versioning](https://www.w3.org/TR/trace-context/#versioning-of-traceparent).
+
+## Command outbox relay
+
+`createCommandOutboxRelay` starts no resource: existing scheduling calls `drainOnce` and shutdown
+awaits `stop`. It decodes canonical bounded payload and W3C fields, snapshots sink registration,
+publishes before settlement and preserves stable identities across retries/crashes. All drains
+share one bounded concurrency ceiling; stopping prevents claims and awaits every active/queued
+drain. Invalid classifier/backoff cannot write arbitrary failure text or lose leases. Worker
+acceptance is checked and normalized before the database writes it together with publication.
+Uncertain settlement errors surface without a speculative release. Optional C4-compatible tracing
+selects finite command attributes and preserves deferred/producer propagation without raw identity
+attributes. The database owns leases; no second relay, queue or runtime DDL is introduced.
+
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createCommandOutboxRelay` | function | `function createCommandOutboxRelay(options): RunningCommandOutboxRelay` | Compose the one bounded decoded relay. |
+| `CommandOutboxDelivery` | type alias | `type CommandOutboxDelivery` | Frozen decoded delivery and transport context. |
+| `CommandOutboxRelayOptions` | type alias | `type CommandOutboxRelayOptions` | Explicit finite lifecycle/retry policy and supplied ports. |
+| `CommandOutboxSink` | interface | `interface CommandOutboxSink` | Documented acceptance boundary. |
+| `CommandRelayTelemetryPort` | interface | `interface CommandRelayTelemetryPort` | Privacy-safe structural C4 observer extension. |
+| `RunningCommandOutboxRelay` | interface | `interface RunningCommandOutboxRelay` | Drain/stop lifecycle. |
+| `CommandRelayError` | class | `class CommandRelayError` | Closed sink/decode diagnostic. |
+| `COMMAND_RELAY_FAILURE_CLASSES` | const | `readonly tuple` | Closed persisted relay failure vocabulary. |
+| `CommandRelayFailureClass` | type alias | `type CommandRelayFailureClass` | One of six finite failures. |
+| `ClaimedCommandOutboxRow` | type alias | `type ClaimedCommandOutboxRow` | Database-owned raw leased row. |
+| `CommandOutboxAcceptance` | type alias | `type CommandOutboxAcceptance` | Checked normalized receipt identity/time. |
+| `CommandOutboxClaim` | type alias | `type CommandOutboxClaim` | Bounded clock/generation request. |
+| `CommandOutboxPublication` | type alias | `type CommandOutboxPublication` | One publication/acceptance settlement. |
+| `CommandOutboxRelayStore` | interface | `interface CommandOutboxRelayStore` | Raw claim/mark/release port. |
+| `CommandOutboxRelease` | type alias | `type CommandOutboxRelease` | Retried or retained terminal row. |

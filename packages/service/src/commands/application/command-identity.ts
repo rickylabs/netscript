@@ -32,7 +32,8 @@ function httpFieldValue(value: string): boolean {
   return true;
 }
 
-function traceContext(trace: CommandTraceContext): CommandTraceContext {
+/** Validate and detach command W3C fields for executor and relay boundaries. */
+export function commandTraceContext(trace: CommandTraceContext): CommandTraceContext {
   if (!trace || typeof trace !== 'object') invalid('trace_context');
   const parent = trace.traceparent;
   if (
@@ -129,7 +130,7 @@ export async function commandIdentity<TName extends string, TInput, TOutput, TTx
     (key === undefined && command.idempotency.mode === 'required') ||
     (key !== undefined && !commandString(key, 256, 16))
   ) invalid('idempotency_required');
-  const trace = input.trace === undefined ? undefined : traceContext(input.trace);
+  const trace = input.trace === undefined ? undefined : commandTraceContext(input.trace);
   try {
     const envelope: CommandEnvelope<TInput> = Object.freeze({
       input: frozenCommandInput(input.input),
