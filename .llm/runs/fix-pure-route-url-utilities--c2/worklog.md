@@ -21,3 +21,5 @@ PLAN-EVAL: Selected: implicit-search migration, paired helpers and production ho
 7. Evaluate: pending; independent different-vendor session mandatory.
 8. Release: N/A, owner explicitly requires unmerged PRs.
 9. Close: pending source delivery and handoff; publication remains owner work.
+
+Design refinement: public surface unchanged (route href/getLinkProps/paired helpers, existing hooks and Link). Vocabulary: typed route/path/search plus existing nullable navigation context. Ports: no new port, existing Preact/Fresh/route adapters. Constants: fixture channels A/B and native chat event IDs scoped to test protocol; production finite vocabularies unchanged. Ordered S1-S5 and budgets in plan. Contributor path: URL construction in link.tsx, context hooks in context.ts, reference delegation in contract-runtime.ts; add cases to adjacent test or production fixture. Opening docs-only PR has ci:skip-e2e/ci:skip-scaffold intentionally; remove both for source/browser wave.
