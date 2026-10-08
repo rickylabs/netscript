@@ -614,6 +614,8 @@ packages/cli/src/public/features/generate/runtime-schemas/generate-runtime-schem
 packages/cli/src/public/features/init/init-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-input.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/auth/auth-config-security_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/auth/auth-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
