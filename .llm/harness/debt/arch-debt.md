@@ -2427,3 +2427,21 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
   RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
   storage migration or persistent index.
+
+
+## desktop-doc-baseline-2041 — unchanged SDK/Fresh documentation baseline
+
+- **Owner:** SDK and Fresh maintainers.
+- **Target:** 2026-10-15.
+- **Status:** proposed; independent IMPL-EVAL adjudication required.
+- **Scope:** The all-export documentation reports at baseline
+  `8aad14940c52cd3a4db7efa57d56d50ae131df6c` and completed desktop source are byte-identical,
+  including every entrypoint diagnostic and exit. SDK combined diagnostics: 3 private type
+  references; Fresh: 28 private type references and 17 missing JSDoc. Both raw gates exit one.
+  The optional native document epoch handler parameter is documented; no new diagnostic or
+  slow type is introduced. Owning JSR audit and actual publication dry-runs pass.
+- **Evidence:** `.llm/runs/fix-desktop-document-reconnect--c2/worklog.md`; complete raw structured
+  baseline and final reports retained for independent comparison. No suppression or baseline
+  reset. Publication/final release qualification remains separate.
+- **Closing gate:** Repair the pre-existing all-export documentation findings and obtain raw
+  documentation exit zero; receipt equivalence does not close this debt.

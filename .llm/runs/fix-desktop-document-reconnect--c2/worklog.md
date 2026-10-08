@@ -51,3 +51,35 @@ Gate `s2-check`: raw exit `1`. Command: `deno run --frozen --allow-all .llm/tool
 Gate `s2-check-final`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-check.ts --root packages/sdk --root packages/fresh --ext ts,tsx --deno-arg --frozen`. Full raw output retained privately.
 
 S2 supervisor review: native default alone captures validated document identity; explicit invoke remains two-argument. Fresh preserves the existing SDK MessagePorts/oRPC serializers/context, synchronously closes before upgrading, captures each dispatched slot before awaiting and closes admission before shared cleanup. Stale operations do not touch the new slot; invalid epochs do not change it. No dependency changes, casting, suppression or auth-policy invention. Both new regressions produce one parsed causal mutation FAIL and restored PASS; adjacent suite passes. Initial mechanical import edit and ambient timer check failures retained, corrected owning check passes. Source slice is inside locked D1-D3. Native acceptance remains S3, not asserted from units.
+
+Gate `s3-check`: raw exit `1`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-check.ts --root packages/fresh/tests/desktop-reload --file packages/fresh/tests/desktop-reload_native.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `s3-check-contract`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-check.ts --root packages/fresh/tests/desktop-reload --file packages/fresh/tests/desktop-reload_native.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `native-mutation-reset`: raw exit `1`. Command: `deno task test:desktop-reload-native`. Actual CEF native display, production SDK/Fresh typed RPC and separate strict receipt; raw private output retained.
+
+Gate `native-restored`: raw exit `0`. Command: `deno task test:desktop-reload-native`. Actual CEF native display, production SDK/Fresh typed RPC and separate strict receipt; raw private output retained.
+
+Gate `s3-lint`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-lint.ts --root packages/sdk --root packages/fresh --ext ts,tsx`. Full raw output retained privately.
+
+Gate `s3-fmt`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-fmt.ts --root packages/sdk --root packages/fresh --ext ts,tsx`. Full raw output retained privately.
+
+Gate `s3-check-full`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-check.ts --root packages/sdk --root packages/fresh --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `s3-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `sdk-jsr`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/fitness/audit-jsr-package.ts --root packages/sdk --text`. Full raw output retained privately.
+
+Gate `fresh-jsr`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/fitness/audit-jsr-package.ts --root packages/fresh --text`. Full raw output retained privately.
+
+Gate `sdk-doc-final`: raw exit `1`. Command: `deno task doc:lint --root packages/sdk`. Full raw output retained privately.
+
+Gate `fresh-doc-final`: raw exit `1`. Command: `deno task doc:lint --root packages/fresh`. Full raw output retained privately.
+
+Gate `full-sdk-fresh`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/sdk packages/fresh`. Full raw output retained privately.
+
+Gate `sdk-publish`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/release/run-publish-dry-run.ts --member packages/sdk`. Full raw output retained privately.
+
+Gate `fresh-publish`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/release/run-publish-dry-run.ts --member packages/fresh`. Full raw output retained privately.
+
+S3 supervisor review: seven owning source/config files add a mandatory actual native regression and strict existing native CI step before bounded packaging exception; packaging and CLI sources unchanged. Frozen production renderer/default SDK/native Fresh/oRPC host perform typed RPC, park old receive, real BrowserWindow.reload, typed RPC in new epoch, old CLOSED and idempotent teardown, one physical bind. Runner requires receipt independently of exit, uses compile/launch deadlines and finally removes only its scratch output. Actual native task passes; suppression of replacement produces one parsed native timeout FAIL then restored PASS. Native fixture initial isolated-declaration annotation failure retained and corrected using explicit actual oRPC Procedure/Schema types, no erasure/cast/suppression. Dedicated case avoids default discovery and is excluded with fixtures from Fresh publication; owning Fresh alias delegates to root strict task. Full SDK/Fresh suite 525 pass, zero failures/ignored; all scoped frozen static/quality/architecture/JSR/raw dry publication gates pass. Full SDK/Fresh doc reports byte-identical to baseline with raw exit one, every entrypoint preserved; proposed desktop-doc-baseline-2041 requires independent adjudication. S3 acceptance source behavior complete, S4 clean-source generated export corpus next.
