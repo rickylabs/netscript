@@ -183,3 +183,5 @@ independent Google fallback evaluation remain pending; no release/ready-merge/la
 Ordinary merge of main 8aad14940c52cd3a4db7efa57d56d50ae131df6c; see resume-reconciliation.md. C1 run records use main. Generated assets will be refreshed with Deno 2.9.5.
 
 MCP clean-read-set guard requires an intermediate generated-input commit. No dirty-tree override is used.
+
+Primary GLM provider limit blocked completed review. HARNESS-authorized Google fallback returns PASS at the reconciled head; same-conversation report correction changes facts only, no implementation. Exact requested runtime model/effort remains independently unattested.

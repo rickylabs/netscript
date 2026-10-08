@@ -1,3 +1,7 @@
+# Resumed C2 handoff checkpoint
+
+Evaluated product head ee58d8276c6ff11c10552c7abbdec8618034ed81 passes all local gates and separate-family Google review. This attestation adds run artifacts only. Read resume-evaluate.md, resume-gates.json, resume-source-proof.json and gates.log. Current pushed-head CI and STOP-POINT A remain to observe. Coordinator merges #2084; the agent never merges. Later leaves wait for merge.
+
 # Resumed C2 current checkpoint
 
 Ordinary main reconciliation and native generated refresh complete. Fresh static, service/contracts/database tests, generated freshness, quality/architecture/docs/JSR checks are running. Current-head review and CI remain pending. See resume-reconciliation.md. No merge or later-leaf implementation.

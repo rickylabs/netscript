@@ -493,3 +493,11 @@ Ordinary merge of main 8aad14940c52cd3a4db7efa57d56d50ae131df6c; see resume-reco
 Native Deno 2.9.5 prose, assets-barrel and publish-assets generation pass. MCP corpus correctly refuses the uncommitted generated read set; commit the generated inputs before retrying. Existing source remains unchanged after reconciliation.
 
 Clean-tree gen:mcp-export-corpus passes with Deno 2.9.5. The resumed merge changes no C2 command implementation or tests. Native regeneration contains both merged C1 and C2 public surfaces.
+
+## Resumed Gate / Evaluate / Close checkpoint
+
+All required gates pass at ee58d8276c6ff11c10552c7abbdec8618034ed81 with Deno 2.9.5: check, lint, fmt:check, service/contracts/database tests (253 passed), four generated freshness checks, quality/architecture, docs and JSR audits. Extra native database publish dry-run also passes with typecheck. EXIT lines are in gates.log and raw-output hashes in resume-gates.json.
+
+Separate-family Google fallback review PASS at that exact head; primary GLM hit the provider limit before review. Same-conversation correction clarifies report facts only. No product/test repairs. See resume-evaluate.md and provenance. C2 source and tests remain unchanged; unrelated main listener tests are preserved.
+
+Bootstrap, research, design and passed whole-chain plan-gate reused; implementation reconciliation, gate and evaluation complete. Release not applicable. Close awaits pushed-head CI and coordinator merge; no merge, rebase or force push.
