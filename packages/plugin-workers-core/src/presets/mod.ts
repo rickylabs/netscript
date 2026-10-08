@@ -10,6 +10,7 @@ export type {
   ExecutionRecord,
   JobContext,
   JobDefinition,
+  JobDispatchContext,
   JobHandler,
   JobMessage,
   JobResult,

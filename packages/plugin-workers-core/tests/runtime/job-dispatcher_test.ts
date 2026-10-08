@@ -32,6 +32,7 @@ Deno.test('InProcessJobDispatcher imports sourceUrl before entrypoint for plugin
     id: job.id,
     job,
     payload: {},
+    signal: new AbortController().signal,
   });
 
   assertEquals(result, { success: true, data: { ok: true } });

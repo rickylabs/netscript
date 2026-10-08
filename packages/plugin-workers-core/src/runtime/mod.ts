@@ -132,6 +132,7 @@ export type {
   ExecutionRecord,
   JobContext,
   JobDefinition,
+  JobDispatchContext,
   JobDispatcherOptions,
   JobHandler,
   JobId,
@@ -171,6 +172,7 @@ export const JobKvKeys: RuntimeJobKvKeyFactories = DomainJobKvKeys;
 export { InProcessJobDispatcher } from './job-dispatcher.ts';
 export { InProcessJobRunner } from './in-process-job-runner.ts';
 export type { InProcessJobRunnerOptions } from './in-process-job-runner.ts';
+export type { JobRunnerClock } from '../ports/job-runner-clock.ts';
 export { JOB_STATE_CHANNEL } from './messages.ts';
 export type {
   ExecuteJobMessage,

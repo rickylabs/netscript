@@ -37,6 +37,7 @@ Deno.test('a malformed payload is rejected before the application job handler ru
     async () =>
       await job.handler!({
         id: 'execution-1',
+        signal: new AbortController().signal,
         job,
         payload: { imageUrl: 'https://example.test/image.png' } as unknown as EmbedDocumentPayload,
       }),
