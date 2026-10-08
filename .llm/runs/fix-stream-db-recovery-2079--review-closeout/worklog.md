@@ -63,3 +63,7 @@ Independent slice review PASS; exact S2 snapshot focused tests, quality:scan and
 ### S3 sign-off
 
 Independent slice review PASS; exact S3 snapshot focused tests, quality:scan and arch:check exit 0. Public preloads observe shutdown independently of upstream waiter installation; late native sessions are canceled before subscription. Immediate stop/dispose against a healthy HTTP server and concurrent preloads blocked on headers settle before deadlines. Source reversal produces two assertion failures. Existing persistent-server restart test's preload/readiness waits now have deadlines. Reconcile: S2 pushed; no unrelated source, lock, or issue changes.
+
+### S4 sign-off
+
+Independent slice review PASS; exact S4 snapshot focused tests, quality:scan and arch:check exit 0. Read entry checks cancellation before assigning connecting, preserving stopped status and suppressing I/O after stop. Reverting just this guard fails the status assertion. Reconcile: S3 pushed with passing slice evidence; all four source repairs now match the independently reviewed final snapshots.

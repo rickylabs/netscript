@@ -75,6 +75,7 @@ export function createStreamDBRecoveryAdapter(
     const signal = readOptions.signal
       ? AbortSignal.any([lifetime.signal, readOptions.signal])
       : lifetime.signal;
+    signal.throwIfAborted();
     state = {
       status: 'connecting',
       retries: 0,

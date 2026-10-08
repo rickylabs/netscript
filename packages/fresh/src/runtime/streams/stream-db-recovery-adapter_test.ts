@@ -276,3 +276,15 @@ Deno.test('StreamDB recovery consumes 200000 ordered catch-up events and resumes
     recovery.stop();
   }
 });
+
+Deno.test('StreamDB recovery rejects reads after stop without changing terminal status', async () => {
+  let requests = 0;
+  const recovery = createStreamDBRecoveryAdapter(native(() => {
+    requests++;
+    return Promise.resolve(closedBatch('end'));
+  }));
+  recovery.stop();
+  await assertRejects(() => deadline(recovery.stream.stream()), DOMException);
+  assertEquals(recovery.status, 'stopped');
+  assertEquals(requests, 0);
+});

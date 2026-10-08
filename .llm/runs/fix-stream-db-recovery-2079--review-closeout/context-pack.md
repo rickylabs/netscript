@@ -7,3 +7,5 @@ S1 signed off after independent review and exact-snapshot gates; S2-S4 source st
 S2 signed off and ready for normal push; shutdown and terminal-state slices follow.
 
 S3 shutdown sign-off complete; S4 direct stopped-read guard follows.
+
+S1-S4 complete. S5 generated corpus refresh then exact-head IMPL-EVAL pending.
