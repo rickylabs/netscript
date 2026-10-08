@@ -5,7 +5,7 @@
 3 Design: slices and gates locked in plan.md.
 4 PLAN-EVAL: required; hard stop until external PASS before implementation.
 
-4 PLAN-EVAL PASS at bootstrap 299dbeecb91d04c70530b0874cefe3d4f3d51a7f; external GLM session ses_ee784563bffeKNbwbSo0hEWQLW, command exit 0. Source implementation permitted.
+4 PLAN-EVAL PASS at bootstrap 299dbeecb91d04c70530b0874cefe3d4f3d51a7f; external GLM session <session>, command exit 0. Source implementation permitted.
 
 5 Implement S1: existing tool-local collector pages raw search results, guards PRs and preserves first-seen order, rejects explicit ceiling and incomplete/error metadata. Native merged-PR notes path audited without a replacement collector. Six focused collector/native-note regressions pass and each has an isolated source mutant that makes its matching test red, then exact bytes restored. Reconcile S1: no package public exports/dependencies changed.
 
@@ -15,7 +15,7 @@
 
 All four carrier freshness gates exit 0 at source 35408e2b6c4217810e1eb3a616d49785c67d3bba, carriers unchanged. Actual durable critical audit exit 1: shared pre-existing dependency advisory remains outside release-repair scope and requires owner maintenance.
 
-7 Evaluate: independent opencode-go/glm-5.3-flash max, session ses_ee77a1ae5ffeJZYbqzQvHgjv6U, source PASS at da7943381b496a1c1adc63f19732f2bc56d5d28f, actual command exit 0. Evaluator independently ran focused regressions and existing workflow consumer through canonical wrapper, exit 0; mutation receipts independently reviewed. Initial report contained unrelated prose; evaluator detected and rewrote it in the same session before returning final clean report. Raw supervisor log retained externally, final artifact inspected for factual owned-scope evidence and hygiene.
+7 Evaluate: independent opencode-go/glm-5.3-flash max, session <session>, source PASS at da7943381b496a1c1adc63f19732f2bc56d5d28f, actual command exit 0. Evaluator independently ran focused regressions and existing workflow consumer through canonical wrapper, exit 0; mutation receipts independently reviewed. Initial report contained unrelated prose; evaluator detected and rewrote it in the same session before returning final clean report. Raw supervisor log retained externally, final artifact inspected for factual owned-scope evidence and hygiene.
 
 | Gate | Actual result |
 | --- | --- |
