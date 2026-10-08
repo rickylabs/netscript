@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertExists } from '@std/assert';
+import { assert, assertEquals, assertExists, assertRejects } from '@std/assert';
 import { DurableStream } from '@durable-streams/client';
 import { fromFileUrl } from '@std/path';
 import { TextLineStream } from 'jsr:@std/streams@^1/text-line-stream';
@@ -101,7 +101,16 @@ async function startReferenceServer(dataDir: string, port = 0) {
   })();
   try {
     return {
-      url: await ready,
+      url: await Promise.race([
+        ready,
+        new Promise<never>((_, reject) => {
+          const timer = setTimeout(
+            () => reject(new Error('Reference server readiness deadline exceeded.')),
+            10_000,
+          );
+          void ready.finally(() => clearTimeout(timer)).catch(() => {});
+        }),
+      ]),
       async kill() {
         child.kill('SIGKILL');
         await child.status;
@@ -109,6 +118,9 @@ async function startReferenceServer(dataDir: string, port = 0) {
       },
     };
   } catch (error) {
+    try {
+      child.kill('SIGKILL');
+    } catch { /* Child may already have exited. */ }
     await child.status;
     await Promise.all([output, errors]);
     throw error;
@@ -149,7 +161,7 @@ Deno.test('createNetScriptStreamDB recovers after the persistent stream server i
     });
     const collection = db.collections.events;
     assertExists(db.preload);
-    await db.preload();
+    await preloadDeadline(db.preload());
     await eventually(() => reads.some((read) => read.live === 'long-poll'));
     const checkpoint = reads.at(-1)!.offset;
     assert(checkpoint !== '-1');
@@ -175,5 +187,99 @@ Deno.test('createNetScriptStreamDB recovers after the persistent stream server i
     globalThis.fetch = originalFetch;
     await server?.kill();
     await Deno.remove(dataDir, { recursive: true });
+  }
+});
+
+async function preloadDeadline(pending: Promise<void>): Promise<void> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      pending,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('Preload deadline exceeded.')), 1_000);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+Deno.test('createNetScriptStreamDB immediate stop and dispose settle pending preload on a healthy server', async () => {
+  const server = Deno.serve(
+    { port: 0, hostname: '127.0.0.1', onListen() {} },
+    () =>
+      new Response('[]', {
+        headers: {
+          'content-type': 'application/json',
+          'stream-next-offset': 'end',
+          'stream-up-to-date': 'true',
+        },
+      }),
+  );
+  try {
+    for (const stop of ['stop', 'dispose'] as const) {
+      const db = createNetScriptStreamDB({
+        baseUrl: `http://127.0.0.1:${server.addr.port}`,
+        streamPath: '/shutdown',
+        schema: createStateSchema(stateDefinition),
+      });
+      try {
+        const pending = db.preload!();
+        db[stop]!();
+        await assertRejects(() => preloadDeadline(pending), DOMException, 'aborted');
+        assertEquals(db.status, 'stopped');
+        await assertRejects(() => preloadDeadline(db.preload!()), DOMException);
+        assertEquals(db.status, 'stopped');
+      } finally {
+        db.stop!();
+      }
+    }
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('createNetScriptStreamDB stop settles concurrent preloads while response headers are pending', async () => {
+  const originalFetch = globalThis.fetch;
+  let release!: () => void;
+  const blocked = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let started!: () => void;
+  const requestStarted = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  globalThis.fetch = async () => {
+    started();
+    await blocked;
+    return new Response('[]', {
+      headers: {
+        'content-type': 'application/json',
+        'stream-next-offset': 'end',
+        'stream-up-to-date': 'true',
+      },
+    });
+  };
+  const db = createNetScriptStreamDB({
+    baseUrl: 'https://streams.example.test',
+    streamPath: '/pending-headers',
+    schema: createStateSchema(stateDefinition),
+  });
+  try {
+    const first = db.preload!();
+    await preloadDeadline(requestStarted);
+    const second = db.preload!();
+    const results = [first, second].map((pending) =>
+      assertRejects(() => preloadDeadline(pending), DOMException)
+    );
+    db.stop!();
+    await Promise.all(results);
+    assertEquals(db.status, 'stopped');
+  } finally {
+    release();
+    db.stop!();
+    globalThis.fetch = originalFetch;
+    // Let the delayed upstream connection cancel before this test exits.
+    await new Promise((resolve) => setTimeout(resolve, 0));
   }
 });

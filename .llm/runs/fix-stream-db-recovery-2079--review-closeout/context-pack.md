@@ -5,3 +5,5 @@ PR #2083; all four claims real, fixed with baseline-red and independent reversal
 S1 signed off after independent review and exact-snapshot gates; S2-S4 source staged sequentially next; S5 regenerates corpus after source sign-offs.
 
 S2 signed off and ready for normal push; shutdown and terminal-state slices follow.
+
+S3 shutdown sign-off complete; S4 direct stopped-read guard follows.

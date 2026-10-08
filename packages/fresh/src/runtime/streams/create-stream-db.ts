@@ -13,6 +13,7 @@
  * @module
  */
 
+import { abortable } from 'jsr:@std/async@^1/abortable';
 import { createStreamDB } from '@durable-streams/state/db';
 import type { StateSchema, StreamStateDefinition } from '@durable-streams/state';
 import type { StreamDB } from '@durable-streams/state/db';
@@ -168,13 +169,18 @@ function defaultCreateStreamDB<TDef extends NetScriptStreamStateDefinition>(
     input.reconnect,
   );
   const db = createStreamDB({ stream: recovery.stream, state: input.state });
+  const lifetime = new AbortController();
   const stop = () => {
+    lifetime.abort();
     recovery.stop();
     db.close();
   };
   return {
     collections: db.collections,
-    preload: db.preload,
+    async preload() {
+      lifetime.signal.throwIfAborted();
+      await abortable(db.preload(), lifetime.signal);
+    },
     get status() {
       return recovery.status;
     },

@@ -126,6 +126,10 @@ export function createStreamDBRecoveryAdapter(
           // Native closed may settle before consumption. Observe its rejection
           // without using it to decide whether a batch was parsed or committed.
           void session.closed.catch(() => {});
+          if (signal.aborted) {
+            session.cancel();
+            signal.throwIfAborted();
+          }
           return { session, release };
         } catch (error) {
           release();

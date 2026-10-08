@@ -59,3 +59,7 @@ Independent slice review PASS; exact S1 snapshot focused tests exit 0, quality:s
 ### S2 sign-off
 
 Independent slice review PASS; exact S2 snapshot focused tests, quality:scan and arch:check exit 0. Finite text parse avoids V8 array spread limits; 200,000 events stay ordered and next request resumes large-checkpoint. Reversal mutation fails with RangeError. Malformed JSON remains terminal (SyntaxError rather than upstream PARSE_ERROR); network TypeError recovery unchanged. Reconcile: S1 pushed with phase evidence; threads remain pending final replies.
+
+### S3 sign-off
+
+Independent slice review PASS; exact S3 snapshot focused tests, quality:scan and arch:check exit 0. Public preloads observe shutdown independently of upstream waiter installation; late native sessions are canceled before subscription. Immediate stop/dispose against a healthy HTTP server and concurrent preloads blocked on headers settle before deadlines. Source reversal produces two assertion failures. Existing persistent-server restart test's preload/readiness waits now have deadlines. Reconcile: S2 pushed; no unrelated source, lock, or issue changes.
