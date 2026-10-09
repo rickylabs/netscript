@@ -78,6 +78,7 @@ async function createCompileProject(): Promise<string> {
     '@netscript/plugin-workers',
     '@netscript/plugin-sagas',
     '@netscript/plugin-triggers',
+    '@netscript/plugin-streams',
   ],
 };
 `,

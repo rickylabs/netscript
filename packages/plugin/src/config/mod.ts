@@ -21,7 +21,7 @@ export type { ContributionAxis, PluginContext, PluginLogger } from '../domain/mo
 export type { PluginType } from '../domain/mod.ts';
 export type { PluginManifest } from './domain/plugin-manifest.ts';
 export type { PluginComposition, PluginCompositionResult } from './domain/plugin-composition.ts';
-export { PluginCompositionError } from '../domain/mod.ts';
+export { PluginCompositionError, PluginError, PluginValidationError } from '../domain/mod.ts';
 export type {
   PluginCompositionDiagnostic,
   PluginCompositionDiagnosticCode,

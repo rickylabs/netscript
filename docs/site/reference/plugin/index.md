@@ -170,7 +170,7 @@ This entrypoint also re-exports `PluginBuilder`, `ContributionInput`, `Dependenc
 `PluginDependencies`, `PluginLifecycleHooks`, `ContributionAxis`, `PluginContext`, `PluginLogger`,
 `PluginType`, `PluginManifest`, `PluginMetadata`, `PluginMetadataValue`, `PluginManifestParser`,
 `PluginComposition`, `PluginCompositionResult`, `PluginCompositionDiagnostic`,
-`PluginCompositionDiagnosticCode`,
+`PluginCompositionDiagnosticCode`, `PluginError`, `PluginValidationError`,
 `RuntimeConfigTopicContribution`, `ServiceContribution`, `StreamTopicContribution`, and
 `TelemetryContribution`, documented in the root sections above.
 
