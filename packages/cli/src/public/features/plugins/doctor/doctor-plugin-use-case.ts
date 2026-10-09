@@ -209,7 +209,10 @@ async function diagnoseRuntimeRegistries(
 }
 
 /** AppHost snapshot, or the error that prevented one. */
-type AppHostObservation = AppHostInspection | { readonly status: 'failed'; readonly error: unknown };
+type AppHostObservation = AppHostInspection | {
+  readonly status: 'failed';
+  readonly error: unknown;
+};
 
 async function inspectAppHost(
   projectRoot: string,
