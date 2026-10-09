@@ -27,7 +27,8 @@ into HTTP and RPC handling automatically.
   request-scoped logger and request ID and logging start, completion, and failure with
   sensitive-field redaction.
 - **oRPC integration** — `@netscript/logger/orpc` exposes `LoggingPlugin` and `createLoggingPlugin`
-  to log oRPC handler and client interceptions.
+  to log oRPC handler and client interceptions, correlated per request by `requestId` even under
+  concurrent traffic. Debug-mode input logs redact sensitive fields, extensible with `redactFields`.
 - **LogTape contract re-exported** — `getLogger`, `getConsoleSink`, `withContext`, and the `Logger`,
   `LogRecord`, `LogLevel`, and `Sink` types pass through unchanged, so anything LogTape can do stays
   available.
