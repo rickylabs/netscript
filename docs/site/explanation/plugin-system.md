@@ -214,6 +214,63 @@ manifest and the plugin's Aspire contribution. See
 <a href="/explanation/aspire/">orchestration with Aspire</a> for how the AppHost assembles them.
 {{ /comp }}
 
+## Guarding a plugin's API
+
+A plugin's HTTP API is assembled by `createPluginService(router, config)` from
+`@netscript/plugin/service`, and that factory refuses to build a service without an explicit `auth`
+posture. Omit `auth` and the call fails to type-check; pass a malformed or mixed posture and it
+throws before construction. The factory installs the guard after context and before RPC, so no
+REST, RPC, or raw route can be registered outside it, and `/health` stays anonymous.
+
+The guarded form is what `netscript plugin new <name>` generates. Here is a non-auth plugin,
+`billing`, that verifies the caller's session through the auth plugin's service:
+
+```ts
+// plugins/billing/services/src/main.ts
+import { createPluginService } from '@netscript/plugin/service';
+import { mountPluginContract } from '@netscript/plugin/contract-base';
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
+import { createContractAuthorizer } from '@netscript/service/auth';
+import { billingContractDefinition } from '@netscript/plugin-billing-core/contracts/v1';
+import { billingContractMount, billingRouter } from './handlers.ts';
+
+export const billingService = createPluginService(billingRouter, {
+  name: 'billing',
+  auth: {
+    // Verify the bearer session by calling the auth service's typed `session` procedure.
+    authn: {
+      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
+    },
+    // Enforce the scopes each contract procedure declares in `meta.access`.
+    authz: {
+      authorizer: createContractAuthorizer(
+        mountPluginContract(billingContractDefinition, billingContractMount),
+      ),
+    },
+  },
+});
+```
+
+`billing` does not embed the auth backend. `createAuthServiceAuthenticator` discovers the `auth`
+service by name and asks it about each request, so the billing service holds no backend instance,
+no KV handle, and no provider secret. A missing or rejected session returns `401`, a session
+without the procedure's scope returns `403`, and an unreachable auth service returns `503`. A
+plugin that is meant to be public says so with a recorded reason,
+`auth: { public: true, reason: '…' }`, rather than by leaving the field out.
+
+{{ comp callout { type: "important", title: "Background work never needs an app session" } }}
+Workers, sagas, and triggers run under a service identity. They must never depend on an app being
+open or on a user staying signed in. <code>createAuthServiceAuthenticator</code> accepts only
+sessions that the auth service issued, so a guarded API that background processes call over HTTP
+must also accept a credential those processes hold. For an API that only machines call,
+<code>createStaticCredentialAuthenticator</code> from <code>@netscript/service/auth</code> maps an
+injected service credential to a principal. Each service takes a single authenticator, and
+NetScript does not yet ship one that accepts both a user session and a service credential.
+{{ /comp }}
+
+See the [plugin authentication reference](/reference/plugin/#plugin-service-authentication-posture)
+for the exact posture types.
+
 ## Auth: the model at its richest
 
 The **auth** plugin is the clearest single exemplar of every idea on this page, because it
