@@ -194,11 +194,53 @@ and reference names for <code>&lt;processor&gt;</code> and <code>&lt;ref&gt;</co
 <li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and
 OTLP <code>:4318</code>; services and plugin APIs claim their assigned high-range ports (49152–65535) allocated at scaffold time. A stale prior run holding a port blocks boot — check the dashboard
 resource list (or your process table) and free it.</li>
+<li><strong>Docker daemon on another machine.</strong> Everything provisions and reports
+healthy, yet services that wait on a database never become ready. See the remote Docker daemon
+section below.</li>
 <li><strong>The AppHost is Node, your app is Deno.</strong> The two runtimes are isolated on
 purpose; an <code>aspire restore</code> failure is a Node/SDK problem in <code>aspire/</code>, not
 a Deno workspace problem.</li>
 </ul>
 {{ /comp }}
+
+## Services never become ready: a remote Docker daemon
+
+The local workflow assumes the Docker daemon runs on the same machine as the AppHost. If the
+Docker CLI points at another machine, through `DOCKER_HOST` (for example `ssh://…` or
+`tcp://<host>:2376`) or through the active `docker context`, Aspire still provisions every
+container, and every container reports healthy. The services that wait on them never become
+ready, and nothing prints an error.
+
+- **Symptom.** Containers are running and healthy, `pg_isready` passes inside the database
+  container, and the AppHost is up. Every service with a database health wait stays waiting.
+- **Cause.** The generated AppHost is a *host service*. Host services do not join container
+  networks; they reach containers through ports the daemon publishes, addressed as `localhost`.
+  Aspire publishes those ports on the daemon host's loopback (`5432/tcp -> 127.0.0.1:<port>`),
+  so `localhost:<port>` on the AppHost machine points at nothing.
+- **No setting fixes it.** Aspire's network identifiers (`LocalhostNetwork`,
+  `DefaultAspireContainerNetwork`, `PublicInternet`) are the right lever conceptually, but upstream
+  Aspire does not support resolving endpoints by network identifier from a TypeScript AppHost
+  yet. NetScript generates a TypeScript AppHost, so that lever is closed for now. The container
+  tunnel handles container-to-host traffic, which is the opposite direction. Proxyless endpoints
+  and `ASPIRE_PROXYLESS_ENDPOINT_PORT_RANGE` do not change which address the daemon binds.
+- **Remedy shape.** Fix this in your environment, not in project code: run the daemon locally,
+  or make each published port reachable at the same `localhost:<port>` on the AppHost machine
+  (for example a forwarder on the daemon host plus a local relay on the AppHost machine). Do not
+  change project defaults to work around it.
+
+`netscript plugin doctor` checks this topology. Its `docker` report classifies the daemon
+endpoint (`DOCKER_HOST` first, then the active context) as local, remote, or unknown. When the
+AppHost is running, it also lists the published bindings of that AppHost's Aspire containers and
+compares them with the `localhost` address the AppHost uses:
+
+| Result | Status | Meaning |
+| --- | --- | --- |
+| Local | `healthy` | The endpoint is a socket, a named pipe, or loopback, and every binding is reachable through `localhost`. |
+| Mismatch | `warning` | The daemon is remote, or a port is bound to a non-loopback interface. The message names each container, port and bind address. |
+| Inconclusive | `warning` | The endpoint, the AppHost, or the bindings could not be inspected. Doctor never reports this as a pass. |
+
+If you run a relay, the mismatch warning stays: doctor checks where the daemon publishes ports,
+not whether your relay forwards them.
 
 ## See also
 
