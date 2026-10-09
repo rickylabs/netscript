@@ -12,7 +12,7 @@
 
 import { assert, assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 import { Hono } from 'hono';
-import { toDurableChatSessionResponse } from 'npm:@durable-streams/tanstack-ai-transport@^0.0.8';
+import { toDurableChatSessionResponse } from '../../../../packages/fresh/tests/_fixtures/durable-chat-transport.ts';
 import { createStreamsServer } from '../../services/src/bounded-file-store.ts';
 import { createStreamsProxyHandler } from '../../services/src/proxy.ts';
 import {
