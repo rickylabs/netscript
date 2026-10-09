@@ -1,9 +1,8 @@
 import { CommandStoreError } from '../../../ports/command-store-error.ts';
 
-import { isDriverAdapterError } from '@prisma/driver-adapter-utils';
-
-// Prisma errors are matched by shape, never `instanceof`: a consumer's generated client may
-// load its own `@prisma/client` / driver-adapter instance, whose classes differ from ours.
+// Prisma errors are matched by shape, never `instanceof`, and nothing is imported from Prisma:
+// a consumer's generated client may load its own `@prisma/client` / driver-adapter instance,
+// whose classes differ from any copy this package could resolve.
 type KnownRequestError = Readonly<{ code: string; meta?: Readonly<Record<string, unknown>> }>;
 
 function isKnownRequestError(error: object): error is KnownRequestError {
@@ -11,9 +10,13 @@ function isKnownRequestError(error: object): error is KnownRequestError {
     typeof Reflect.get(error, 'code') === 'string';
 }
 
+/** Same predicate as `isDriverAdapterError` in `@prisma/driver-adapter-utils`, null-safe. */
 function driverAdapterCode(error: unknown): string | undefined {
-  if (typeof error !== 'object' || error === null || !isDriverAdapterError(error)) return;
-  const code = error.cause?.originalCode;
+  if (typeof error !== 'object' || error === null) return;
+  if (Reflect.get(error, 'name') !== 'DriverAdapterError') return;
+  const cause: unknown = Reflect.get(error, 'cause');
+  if (typeof cause !== 'object' || cause === null) return;
+  const code: unknown = Reflect.get(cause, 'originalCode');
   return typeof code === 'string' ? code : undefined;
 }
 
