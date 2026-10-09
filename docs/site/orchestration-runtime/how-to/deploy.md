@@ -128,7 +128,7 @@ first-party plugins installed, the graph looks like this:
 {{ comp callout { type: "note", title: "Auth service is opt-in (on its assigned port)" } }}
 If you add the auth plugin, a fifth API service — <code>auth-api</code> (on its assigned port)
 — joins the graph. It is an oRPC service exposing five endpoints under
-<code>/api/v1/auth/{signin,callback,signout,session,me}</code>, backed by one active backend
+<code>/api/v1/auth/{signin,callback,signout,sessions/revoke,session,me}</code>, backed by one active backend
 selected via <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). Treat it as
 just another deployable unit: it has an entrypoint, a port, and a permission set in
 <code>appsettings.json</code> like every other process.
