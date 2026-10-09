@@ -126,9 +126,17 @@ for (const projection of PROJECTIONS) {
   });
 
   Deno.test(`defineService bodyLimit rejects ${projection.name} bodies over a real listener`, async () => {
+    const framing: { contentLength?: string; transferEncoding?: string }[] = [];
     const running = await defineService(router, {
       name: `body-limit-${projection.name.toLowerCase()}`,
       port: 0,
+      middleware: [async (c, next) => {
+        framing.push({
+          contentLength: c.req.header('content-length'),
+          transferEncoding: c.req.header('transfer-encoding'),
+        });
+        await next();
+      }],
       bodyLimit: { maxBytes: LIMIT },
     });
 
@@ -160,6 +168,8 @@ for (const projection of PROJECTIONS) {
       });
       assertEquals(chunked.status, 413);
       assertEquals(await chunked.json(), PAYLOAD_TOO_LARGE);
+      // The chunked request reached the service without a Content-Length header.
+      assertEquals(framing.at(-1), { contentLength: undefined, transferEncoding: 'chunked' });
     } finally {
       await running.stop();
     }
