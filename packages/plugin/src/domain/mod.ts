@@ -8,7 +8,16 @@ export type {
   PluginType,
   PluginVersion,
 } from './core-types.ts';
-export { DuplicatePluginError, PluginError, PluginValidationError } from './errors.ts';
+export {
+  DuplicatePluginError,
+  PluginCompositionError,
+  PluginError,
+  PluginValidationError,
+} from './errors.ts';
+export type {
+  PluginCompositionDiagnostic,
+  PluginCompositionDiagnosticCode,
+} from './plugin-composition.ts';
 export type { InstalledPluginVersion } from './installed-version.ts';
 export type {
   PluginManifestParser,
