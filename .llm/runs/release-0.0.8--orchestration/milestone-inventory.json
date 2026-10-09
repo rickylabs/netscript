@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.8",
-  "capturedAt": "2026-10-09T20:30:14.000Z",
+  "capturedAt": "2026-10-09T20:53:47.000Z",
   "baselineMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
   "ownerRatifiedAt": "2026-10-09T19:18:42.000Z",
-  "targetIssueCount": 78,
+  "targetIssueCount": 79,
   "issues": [
     {
       "number": 1362,
@@ -560,6 +560,13 @@
       "disposition": "active",
       "lane": "fixes",
       "group": "F07"
+    },
+    {
+      "number": 2120,
+      "title": "bug(auth): me ignores bearer credentials that /session honors on kv-oauth",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F03"
     }
   ]
 }

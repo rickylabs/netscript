@@ -534,6 +534,13 @@
       "issueNumber": 2111,
       "lane": "fixes",
       "title": "sdk: createQueryFactories rejects a client whose bearer contribution context is required"
+    },
+    {
+      "id": "issue:2120",
+      "kind": "issue",
+      "issueNumber": 2120,
+      "lane": "fixes",
+      "title": "bug(auth): me ignores bearer credentials that /session honors on kv-oauth"
     }
   ],
   "edges": [
@@ -596,6 +603,12 @@
       "to": "issue:2018",
       "kind": "requires",
       "reason": "serialize: sdk ports/service-client.ts"
+    },
+    {
+      "from": "issue:1999",
+      "to": "issue:2120",
+      "kind": "requires",
+      "reason": "serialize: me route + auth contract; bearer me after empty-input me"
     },
     {
       "from": "issue:2018",
@@ -847,7 +860,8 @@
         "issue:2032",
         "issue:2018",
         "issue:1384",
-        "issue:2064"
+        "issue:2064",
+        "issue:2120"
       ]
     },
     {

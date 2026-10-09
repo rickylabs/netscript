@@ -153,3 +153,138 @@ Generated from the coordinator's append-only event stream; newest last.
 - `2026-10-09T20:29:35Z` **review.launch** — leaf: W15-2013; pr: 2130; head: 0b646d7b33bf964be72b117be772572eb431a3b5; requested: {"model": "gpt-6.1-sol", "effort": "high"}
 - `2026-10-09T20:29:58Z` **inventory.relane** — issue: 1383; from: fixes; to: internals; reason: remaining acceptance = scaffold.runtime conformance gate (box 12) + docs reconciliation = product conformance rails (plan definition of internals; Step 0 audit classified R1 internals)
 - `2026-10-09T20:30:01Z` **leaf.launch** — leaf: W1-1383; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/guarded-plugin-runtime-gate; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:30:44Z` **review.exit** — leaf: W11-1893; pr: 2129; head: 4d465866be6660665008e244d960ca878028f0e1; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; observedModelHints: 
+- `2026-10-09T20:30:55Z` **review.exit** — leaf: W2-1688; pr: 2127; head: 2f956e242f2af4b1e408bf9802703562e964e998; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; observedModelHints: 
+- `2026-10-09T20:31:02Z` **review.verdict** — leaf: W11-1893; pr: 2129; head: 4d465866b; verdict: CHANGES_REQUESTED; findings: {"major": 1}; queued: fix turn
+- `2026-10-09T20:31:05Z` **review.confirm.launch** — leaf: W5-1388-L1; pr: 2121; head: 0797b76763117705b151920e20eb51820a14cce8; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T20:31:22Z` **review.verdict** — leaf: W2-1688; pr: 2127; head: 2f956e242; verdict: CHANGES_REQUESTED; findings: {"major": 1, "minor": 1}; queued: fix turn
+- `2026-10-09T20:31:22Z` **queue** — next: ["W11-1893 fix (internals)", "W2-1688 fix (fixes)"]; reviewQueue: ["#2123 confirm (fixes)", "#2116/#2122 confirm after e2e (features/internals)", "#2128 e2e + confirm"]
+- `2026-10-09T20:31:46.549150+00:00` **leaf.exit** — leaf: W11-1896; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 189; costUsd: 11.723455400000004
+- `2026-10-09T20:31:48.644127+00:00` **leaf.exit** — leaf: W2-1999; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 9; costUsd: 6.631378600000001
+- `2026-10-09T20:31:59Z` **leaf.ready** — leaf: W11-1896; pr: 2125; head: b8d05ab2d; closes: [1896]; notes: ["install flows don't validate (only generateAspire)", "needs scaffold.runtime"]
+- `2026-10-09T20:31:59Z` **leaf.dispatch.check** — leaves: ["W11-1893 fix (internals)", "W2-1688 fix (fixes)"]; lanes: {"fixes": 2, "internals": 2}; liveAfter: 5
+- `2026-10-09T20:32:00Z` **leaf.launch** — leaf: W11-1893; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/aspire-host-ports-runtime-urls; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:32:02Z` **leaf.launch** — leaf: W2-1688; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/fresh-ui-modal-dialog; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:32:07Z` **review.confirm.launch** — leaf: W2-1999; pr: 2119; head: a04832e5fc974d6135f6fa39e3d6014e12599305; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T20:32:11Z` **review.exit** — leaf: W2-1999; pr: 2119; head: a04832e5fc974d6135f6fa39e3d6014e12599305; exitCode: 143; verdict: ; mode: confirm
+- `2026-10-09T20:32:13Z` **pipeline** — pr: 2119; action: confirm stopped; update-branch with main (#2126) before e2e + final confirm
+- `2026-10-09T20:32:30.552933+00:00` **leaf.exit** — leaf: W2-2102; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 23; costUsd: 9.638030800000003
+- `2026-10-09T20:32:42Z` **leaf.ready** — leaf: W2-2102; pr: 2124; head: 7baa38e37; note: Sol findings fixed; needs main merge + e2e + confirm
+- `2026-10-09T20:33:04Z` **leaf.dispatch.check** — leaf: W3-2032; surface: ["packages/auth-kv-oauth/src/{flow,providers,backend}.ts", "plugins/auth/services/src/backend-registry.ts", "plugins/auth config types", "docs/site/identity-access/**"]; live: ["W15-1670 (docs sdk)", "W1-1383 fix (docs identity-access/{auth.md,add-authentication.md} + cli e2e)", "W11-1893 fix", "W2-1688 fix"]; overlap: docs/site/identity-access/** with #2117 — different pages/sections; merge main before ready; lanes: {"fixes": 2}; liveAfter: 5
+- `2026-10-09T20:33:06Z` **leaf.launch** — leaf: W3-2032; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/auth-stable-non-oidc-subject; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:33:08.509622+00:00` **leaf.exit** — leaf: W15-1670; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 77; costUsd: 3.409776799999998
+- `2026-10-09T20:33:21Z` **pipeline** — updateBranch: [2124, 2125]
+- `2026-10-09T20:33:45Z` **leaf.ready** — leaf: W15-1670; pr: 2131; head: 6e55b2ed8; closes: [1670]; note: docs-only ci:skip-e2e
+- `2026-10-09T20:33:48Z` **review.launch** — leaf: W15-1670; pr: 2131; head: 6e55b2ed8c6043a36eb676062abd7c03d8318981; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T20:33:58Z` **review.exit** — leaf: W15-2013; pr: 2130; head: 0b646d7b33bf964be72b117be772572eb431a3b5; exitCode: 0; verdict: VERDICT: PASS; observedModelHints: 
+- `2026-10-09T20:34:01Z` **leaf.dispatch.check** — leaf: W15-1708; surface: ["packages/mcp/mod.ts", "packages/mcp tests (doc-surface)", "docs/site/reference/mcp/index.md", ".llm/tools/release/baselines/public-surfaces.json"]; overlap: none live (#2124 code-complete); lanes: {"docs": 1}; liveAfter: 5
+- `2026-10-09T20:34:01Z` **leaf.launch** — leaf: W15-1708; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/mcp-export-map-private-type-refs; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:34:13.335899+00:00` **leaf.exit** — leaf: W1-1383; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 22; costUsd: 11.833902999999996
+- `2026-10-09T20:34:20Z` **review.verdict** — leaf: W15-2013; pr: 2130; head: 0b646d7b3; verdict: PASS; note: MERGE at pre-#2126 head; update-branch -> e2e -> confirm
+- `2026-10-09T20:34:22Z` **review.launch** — leaf: W11-1896; pr: 2125; head: 9ff254be3486212f912e105a383c7b57e6548186; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T20:34:35Z` **leaf.ready** — leaf: W1-1383; pr: 2117; head: 230120060; note: fix turn done; queued first for next CI e2e slot (P0)
+- `2026-10-09T20:34:36.301111+00:00` **leaf.exit** — leaf: W15-1708; exitCode: 1; observedModels: ["claude-opus-5-5"]; isError: true; numTurns: 8; costUsd: 0.45757539999999997
+- `2026-10-09T20:34:37.425870+00:00` **leaf.exit** — leaf: W2-1688; exitCode: 1; observedModels: ["claude-opus-5-5"]; isError: true; numTurns: 6; costUsd: 4.6338958
+- `2026-10-09T20:34:52Z` **leaf.dispatch.check** — leaf: W15-1939; surface: [".llm/tools/docs/snippet-supports.ts", ".llm/tools/docs/readme-fence-policy.ts", "tests"]; overlap: false; lanes: {"docs": 2}; liveAfter: 5
+- `2026-10-09T20:34:54Z` **leaf.launch** — leaf: W15-1939; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/readme-fence-router-stub; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:34:58.869944+00:00` **leaf.exit** — leaf: W15-1939; exitCode: 1; observedModels: []; isError: true; numTurns: 1; costUsd: 0
+- `2026-10-09T20:35:27.838022+00:00` **leaf.exit** — leaf: W3-2032; exitCode: 1; observedModels: ["claude-opus-5-5"]; isError: true; numTurns: 19; costUsd: 1.0279989999999999
+- `2026-10-09T20:36:07Z` **review.exit** — leaf: W5-1388-L1; pr: 2121; head: 0797b76763117705b151920e20eb51820a14cce8; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; mode: confirm
+- `2026-10-09T20:36:12.609104+00:00` **leaf.exit** — leaf: W11-1893; exitCode: 1; observedModels: ["claude-opus-5-5"]; isError: true; numTurns: 1; costUsd: 3.0771870000000003
+- `2026-10-09T20:37:38Z` **review.exit** — leaf: W15-1670; pr: 2131; head: 6e55b2ed8c6043a36eb676062abd7c03d8318981; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; observedModelHints: 
+- `2026-10-09T20:39:08Z` **review.exit** — leaf: W11-1896; pr: 2125; head: 9ff254be3486212f912e105a383c7b57e6548186; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; observedModelHints: 
+- `2026-10-09T20:39:37Z` **owner.decisions** — items: [{"issue": 1386, "decision": "BFF topology ratified"}, {"issue": 2120, "decision": "admitted to 0.0.8, release-critical, F03 canary .3 after #1999"}]
+- `2026-10-09T20:50:45Z` **ci.rerun** — pr: 2116; head: 31858fdf5; job: scaffold-runtime-sqlite; reason: runtime.aspire-start: aspire describe --follow did not converge (300s timeout); postgres tier green at same head; sqlite tier green on #2117/#2126 heads; single rerun before treating as real
+- `2026-10-09T20:51:22Z` **review.verdict** — leaf: W5-1388-L1; pr: 2121; verdict: CHANGES_REQUESTED
+- `2026-10-09T20:51:26Z` **review.verdict** — leaf: W11-1896; pr: 2125; verdict: CHANGES_REQUESTED
+- `2026-10-09T20:51:31Z` **review.verdict** — leaf: W15-1670; pr: 2131; verdict: CHANGES_REQUESTED
+- `2026-10-09T20:52:43Z` **capacity.raised** — cap: 10; perLaneLimit: lifted where leaves independent; instrument: owner order 20:50Z via operator; until: weekly reset 21:59Z and continue at that level after
+- `2026-10-09T20:52:43Z` **leaf.dispatch.check** — batch: ["W5-1388 fix (cli/e2e http)", "W11-1896 fix (packages/plugin, cli plugins host)", "W15-1670 fix (docs/site sdk tutorials)", "W2-2105 (service contract-authorizer)", "W9-KV (packages/kv adapters)", "W9-1682 (packages/queue)", "W9-1681 (plugin-workers-core queue dispatch)", "W9-1990 (plugin-sagas-core stores/saga runner)", "W9-1825 (plugins/sagas publish path)", "W9-2067 (fresh ai chat connection / streams producer)"]; overlap: none known; #1990/#1825 both sagas but disjoint files per intake; held back #2095/#2104 (database CHANGELOG), #1369 (workers-core overlap with #1681); liveAfter: 10
+- `2026-10-09T20:52:45Z` **leaf.launch** — leaf: W5-1388; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: test/e2e-http-gate-expected-status; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:52:46Z` **leaf.launch** — leaf: W11-1896; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: feat/plugin-composition-validation; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:52:48Z` **leaf.launch** — leaf: W15-1670; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: docs/sdk-cache-first-loader-alignment; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:52:49Z` **leaf.launch** — leaf: W2-2105; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/service-contract-authorizer-raw-routes; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:52:51Z` **leaf.launch** — leaf: W9-KV; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/kv-adapter-atomic-watch-conformance; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:52:52Z` **leaf.launch** — leaf: W9-1682; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/queue-named-kv-isolation; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:52:54Z` **leaf.launch** — leaf: W9-1681; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/workers-queue-trace-env; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:52:55Z` **leaf.launch** — leaf: W9-1990; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/sagas-persist-compensation; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:52:56Z` **leaf.launch** — leaf: W9-1825; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/sagas-actionable-no-endpoint; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:52:58Z` **leaf.launch** — leaf: W9-2067; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: feat/chat-producer-fencing; resume: false; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T20:53:12Z` **gate.receipt** — pr: 2122; head: 706a6e31e; gate: e2e scaffold.runtime both tiers; result: scaffold.runtime True 104 0 0;scaffold.runtime.sqlite True 99 0 0; run 37987081549
+- `2026-10-09T20:53:21Z` **expensive-gate.acquired** — pr: 2117; head: 230120060
+- `2026-10-09T20:53:23Z` **review.confirm.launch** — leaf: W2-1688; pr: 2127; head: 2f956e242f2af4b1e408bf9802703562e964e998; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T20:53:23Z` **review.confirm.launch** — leaf: W11-1893; pr: 2129; head: 4d465866be6660665008e244d960ca878028f0e1; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T20:53:25Z` **review.launch** — leaf: W15-1708; pr: 2134; head: b0ef2c10c08d7bffd5aa8f3ed720b466a95d8bf6; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T20:53:43Z` **reintake** — issue: 2120; decision: include; predicate: release-critical; lane: fixes; group: F03; canary: .3; edge: #1999 -> #2120; instrument: owner approval 2026-10-09 ~20:40Z
+- `2026-10-09T20:54:14Z` **correction** — pr: 2134; what: marked ready + review launched while implementer had stopped at the account session limit (8 turns); review stopped, PR back to draft; pending: ["resume W15-1708", "resume W3-2032 (19 turns, draft #2133)", "resume W15-1939 (no work)"]
+- `2026-10-09T20:54:41Z` **review.exit** — leaf: W11-1893; pr: 2129; head: 4d465866be6660665008e244d960ca878028f0e1; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; mode: confirm
+- `2026-10-09T20:54:58Z` **queue** — resumes: ["W2-1688 fix (fix-2127-1.md)", "W11-1893 fix (fix-2129-1.md)", "W15-1708 (resume)", "W3-2032 (resume)", "W15-1939 (resume)"]; reason: session-limit interrupted turns ~20:40-20:50Z
+- `2026-10-09T20:54:58Z` **review.exit** — leaf: W2-1688; pr: 2127; head: 2f956e242f2af4b1e408bf9802703562e964e998; exitCode: 143; verdict: ; mode: confirm
+- `2026-10-09T20:55:07Z` **review.confirm.launch** — leaf: W9-1786; pr: 2122; head: 706a6e31ef7f23860ff6d3d740b66aab70bbf2d2; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T20:57:39Z` **review.exit** — leaf: W9-1786; pr: 2122; head: 706a6e31ef7f23860ff6d3d740b66aab70bbf2d2; exitCode: 0; verdict: VERDICT: PASS; mode: confirm
+- `2026-10-09T20:59:09Z` **merged** — leaf: W9-1786; pr: 2122; head: 706a6e31ef7f23860ff6d3d740b66aab70bbf2d2
+- `2026-10-09T20:59:42Z` **capacity.scheduled** — cap: 5; from: 2026-10-09T22:00:00Z; rule: no new starts while live>=5; running leaves finish current slice; instrument: owner order via operator
+- `2026-10-09T21:01:21Z` **pipeline** — note: operator: close-gate red = unticked issue boxes; tick with evidence after Sol MERGE (or mirror via ready-merge). quality/check-test reds = missing #2126; #2123 update-branch; 2121/2127/2129/2134 sync main in their (re)turns
+- `2026-10-09T21:01:35Z` **queue** — add: W2-2031 conflict-resolution turn (fix-2123-2.md); reason: #2123 CONFLICTING with main after #2126/#2122
+- `2026-10-09T21:16:50.551917+00:00` **leaf.exit** — leaf: W9-1681; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 92; costUsd: 4.452388599999998
+- `2026-10-09T21:17:05Z` **leaf.ready** — leaf: W9-1681; pr: 2136; head: 2f8bcbb11; closes: [1681]
+- `2026-10-09T21:17:06Z` **leaf.launch** — leaf: W2-1688; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/fresh-ui-modal-dialog; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T21:17:11Z` **review.launch** — leaf: W9-1681; pr: 2136; head: 2f8bcbb119c3f262b0f451274169e24e91658126; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T21:23:26Z` **review.exit** — leaf: W9-1681; pr: 2136; head: 2f8bcbb119c3f262b0f451274169e24e91658126; exitCode: 0; verdict: VERDICT: PASS; observedModelHints: 
+- `2026-10-09T21:23:47Z` **review.verdict** — leaf: W9-1681; pr: 2136; head: 2f8bcbb11; verdict: PASS; next: e2e queue: #2117, #2119, #2136, #2128, #2124, #2130
+- `2026-10-09T21:24:38.778473+00:00` **leaf.exit** — leaf: W9-KV; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 93; costUsd: 5.373713800000002
+- `2026-10-09T21:24:42Z` **gate.receipt** — pr: 2116; head: 31858fdf5; gate: e2e scaffold.runtime both tiers; result: scaffold.runtime True 104 0 0;scaffold.runtime.sqlite True 99 0 0; run 37987076534 (sqlite tier passed on rerun after a convergence-timeout flake)
+- `2026-10-09T21:24:51Z` **ci.rerun** — pr: 2117; head: 230120060; job: scaffold-runtime (postgres); reason: aspire describe --follow did not converge (300s) — same flake class as #2116 sqlite; same suite passed both tiers at 836ee3b61; flakeCount: 2
+- `2026-10-09T21:24:53Z` **review.confirm.launch** — leaf: W1-2065; pr: 2116; head: 31858fdf55edcd54a54239d7e2dde1a0e8991a39; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T21:24:53Z` **leaf.launch** — leaf: W11-1893; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/aspire-host-ports-runtime-urls; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T21:24:59Z` **leaf.ready** — leaf: W9-KV; pr: 2135; head: ce41f09cf; closes: [2099, 2101]
+- `2026-10-09T21:25:07Z` **review.launch** — leaf: W9-KV; pr: 2135; head: ce41f09cf585bc20a3bb8bb5a3d255ca7930fe3b; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T21:25:09Z` **expensive-gate.acquired** — pr: 2119; head: 0aa667eeb
+- `2026-10-09T21:26:35.091767+00:00` **leaf.exit** — leaf: W11-1893; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 6; costUsd: 3.4042322000000005
+- `2026-10-09T21:26:53Z` **leaf.launch** — leaf: W2-2031; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/sdk-orpc-defined-error-narrowing; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T21:27:11Z` **review.confirm.launch** — leaf: W11-1893; pr: 2129; head: 4c1f98945e4288d7cb0fbf63ce806528a9883ed8; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T21:30:43Z` **review.exit** — leaf: W11-1893; pr: 2129; head: 4c1f98945e4288d7cb0fbf63ce806528a9883ed8; exitCode: 0; verdict: VERDICT: PASS; mode: confirm
+- `2026-10-09T21:31:05Z` **review.exit** — leaf: W1-2065; pr: 2116; head: 31858fdf55edcd54a54239d7e2dde1a0e8991a39; exitCode: 0; verdict: VERDICT: PASS; mode: confirm
+- `2026-10-09T21:31:06Z` **review.verdict** — leaf: W11-1893; pr: 2129; head: 4c1f98945; verdict: PASS; next: e2e queue after #2117/#2119
+- `2026-10-09T21:31:23.546820+00:00` **leaf.exit** — leaf: W9-1990; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 10; costUsd: 7.529743800000002
+- `2026-10-09T21:31:46Z` **merge.blocked** — pr: 2116; reason: CONFLICTING with main after #2122 (packages/service + carriers); next: conflict turn, then e2e + Sol confirm
+- `2026-10-09T21:31:48Z` **leaf.launch** — leaf: W1-2065; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: feat/service-middleware-body-limit; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T21:32:02Z` **leaf.ready** — leaf: W9-1990; pr: 2139; head: 0479900b0; closes: [1990]
+- `2026-10-09T21:33:30Z` **review.exit** — leaf: W9-KV; pr: 2135; head: ce41f09cf585bc20a3bb8bb5a3d255ca7930fe3b; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; observedModelHints: 
+- `2026-10-09T21:33:54Z` **review.verdict** — leaf: W9-KV; pr: 2135; verdict: CHANGES_REQUESTED; findings: {"major": 2, "minor": 2}; queued: fix turn
+- `2026-10-09T21:34:00Z` **review.launch** — leaf: W9-1990; pr: 2139; head: 0479900b0eabd4af1abedd467bea3693efbda9f9; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T21:34:48.273954+00:00` **leaf.exit** — leaf: W9-1825; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 91; costUsd: 4.070572
+- `2026-10-09T21:34:55.284260+00:00` **leaf.exit** — leaf: W9-1682; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 89; costUsd: 5.376971
+- `2026-10-09T21:35:02Z` **leaf.ready** — leaf: W9-1825; pr: 2141; head: b2181c3fa; closes: [1825]
+- `2026-10-09T21:35:04Z` **leaf.launch** — leaf: W3-2032; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/auth-stable-non-oidc-subject; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T21:35:05Z` **leaf.launch** — leaf: W9-KV; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/kv-adapter-atomic-watch-conformance; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T21:35:18Z` **leaf.ready** — leaf: W9-1682; pr: 2140; head: 015f67be1; closes: [1682]; note: cross-process routing limit recorded as debt
+- `2026-10-09T21:35:26.539316+00:00` **leaf.exit** — leaf: W2-2105; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 19; costUsd: 4.058397000000001
+- `2026-10-09T21:37:26Z` **ci.rerun** — pr: 2117; attempt: 3; reason: aspire convergence timeout x2 at 230120060; code diff vs passing 836ee3b61 = main(#2126)+test file only; flake count rising (also #2116 sqlite)
+- `2026-10-09T21:38:11Z` **review.exit** — leaf: W9-1990; pr: 2139; head: 0479900b0eabd4af1abedd467bea3693efbda9f9; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; observedModelHints: 
+- `2026-10-09T21:43:14Z` **review.verdict** — leaf: W9-1990; pr: 2139; verdict: CHANGES_REQUESTED; findings: {"major": 2}; queued: fix turn
+- `2026-10-09T21:43:14Z` **merge-train** — pr: 2119; head: 4c7a8a554; tool: merge_train_v2.sh; result: merged main; generated carriers regenerated; mergeable
+- `2026-10-09T21:43:42Z` **leaf.launch** — leaf: W9-1990; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/sagas-persist-compensation; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T21:46:54.712950+00:00` **leaf.exit** — leaf: W9-2067; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 6; costUsd: 7.612810600000003
+- `2026-10-09T21:47:19Z` **merge-train** — pr: 2130; result: merged; generated conflicts taken from main: 4 check check:publish-assets FAILED 
+- `2026-10-09T21:49:04.792775+00:00` **leaf.exit** — leaf: W1-2065; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 16; costUsd: 11.106794200000001
+- `2026-10-09T21:49:06Z` **review.launch** — leaf: W9-1682; pr: 2140; head: 015f67be197e6a0dcd8bd6e401b6335799914e24; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T21:49:32.777927+00:00` **leaf.exit** — leaf: W2-1688; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 20; costUsd: 5.924896200000001
+- `2026-10-09T21:52:45Z` **expensive-gate.acquired** — pr: 2116; head: 4a243294d; concurrentCiE2e: 3; note: C3 critical path; CI-hosted
+- `2026-10-09T21:52:45Z` **leaf.ready** — items: [{"pr": 2116, "head": "4a243294d", "note": "conflict resolved"}, {"pr": 2127, "head": "df0cf1e69", "note": "Sol fix + main merged; confirm queued (fixes evaluator)"}]; host: load ~77/16 cores reported by #1688 implementer
+- `2026-10-09T21:52:54Z` **capacity.throttle** — reason: host load 63-76 on 16 cores (shared with other fleets); no new implementer starts; cap 5 from 22:00Z applies; queued: ["W15-1708 resume", "W15-1939 resume", "merge-train #2130 (regen failed under load)"]
+- `2026-10-09T21:54:44Z` **review.exit** — leaf: W9-1682; pr: 2140; head: 015f67be197e6a0dcd8bd6e401b6335799914e24; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; observedModelHints: 
+- `2026-10-09T21:55:05Z` **review.verdict** — leaf: W9-1682; pr: 2140; verdict: CHANGES_REQUESTED; findings: {"major": 2, "minor": 2}; queued: fix turn
+- `2026-10-09T21:55:16Z` **review.confirm.launch** — leaf: W2-1688; pr: 2127; head: df0cf1e69e2636ae08e594696d51ce41c460cfc6; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T21:55:37Z` **leaf.ready** — items: [{"leaf": "W2-2105", "pr": 2137, "head": "455b13e60", "closes": [2105]}, {"leaf": "W9-2067", "pr": 2138, "head": "faa2ea107", "closes": [2067]}]; reviewQueue: {"fixes": ["#2127 confirm (running)", "#2141", "#2137", "#2138"], "internals": [], "features": [], "docs": []}
+- `2026-10-09T21:56:00.760282+00:00` **leaf.exit** — leaf: W9-KV; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 35; costUsd: 8.411015800000003
+- `2026-10-09T21:56:21Z` **report.posted** — kind: status-22:00Z
+- `2026-10-09T21:57:33.708370+00:00` **leaf.exit** — leaf: W2-2031; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 8; costUsd: 6.4127073999999995
+- `2026-10-09T22:00:28.966911+00:00` **leaf.exit** — leaf: W5-1388; exitCode: 0; observedModels: ["claude-opus-5-5"]; isError: false; numTurns: 9; costUsd: 9.9423294
+- `2026-10-09T22:00:42Z` **leaf.dispatch.check** — leaf: W9-1682 fix; live: 4; cap: 5; load: 47.63
+- `2026-10-09T22:00:42Z` **leaf.launch** — leaf: W9-1682; requested: {"model": "claude-opus-5-5", "effort": "high"}; branch: fix/queue-named-kv-isolation; resume: true; env: {"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "2", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}
+- `2026-10-09T22:00:45Z` **review.confirm.launch** — leaf: W5-1388-L1; pr: 2121; head: 77566072902bb94a0c74034e9da8b05d09349952; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T22:01:15Z` **review.exit** — leaf: W2-1688; pr: 2127; head: df0cf1e69e2636ae08e594696d51ce41c460cfc6; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; mode: confirm
+- `2026-10-09T22:01:39Z` **hygiene.fix** — pr: 2127; what: removed committed vite.config.ts.timestamp-*.mjs (absolute machine paths)
+- `2026-10-09T22:02:03Z` **review.launch** — leaf: W2-2105; pr: 2137; head: 455b13e6076719f7958a8a0d8c192c81a977bf13; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-09T22:02:36Z` **blocker.found** — id: B-ci-image-pulls; category: infrastructure; evidence: ["#2119 check-test redis pull timeout", "#2127 check-test redis pull timeout", "#2117 postgres tier aspire convergence x3", "#2116 sqlite tier convergence x1"]; ownerDecisionRequired: true; recommendation: internals leaf: registry mirror / pre-pull with retry + longer convergence window

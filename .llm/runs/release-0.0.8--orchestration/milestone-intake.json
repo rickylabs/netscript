@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.8",
-  "capturedAt": "2026-10-09T20:30:14.000Z",
+  "capturedAt": "2026-10-09T20:53:47.000Z",
   "baselineMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
   "ownerRatifiedAt": "2026-10-09T19:18:42.000Z",
   "ownerRatification": {
@@ -734,6 +734,21 @@
         "https://github.com/rickylabs/netscript/issues/2068"
       ],
       "ownerRatified": true
+    },
+    {
+      "number": 2120,
+      "title": "bug(auth): me ignores bearer credentials that /session honors on kv-oauth",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate release-critical; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2120",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T20:41:00.000Z"
     },
     {
       "number": 2095,

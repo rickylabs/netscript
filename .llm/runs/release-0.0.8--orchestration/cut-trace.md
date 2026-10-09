@@ -23,3 +23,4 @@ Baseline main 39cb712 (2026-10-09). Published: v0.0.8-canary.2 = f62a56c (2026-1
 | Time | Commit | PR | Closes | Wave/leaf |
 |---|---|---|---|---|
 | 2026-10-09T20:26:28Z | 9d8dfb3 | #2126 | — (Refs #2036) | X-2036 priority repair: AI-peer CI blocker |
+| 2026-10-09T20:59:07Z | 09567c5 | #2122 | #1786, #2107 | W9-1786 LoggingPlugin correlation + redaction |

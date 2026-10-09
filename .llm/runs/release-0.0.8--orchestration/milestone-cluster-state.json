@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.8",
   "baselineMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
-  "currentMainSha": "9d8dfb36595d067faf6b3ab6a94637e17fcf839b",
+  "currentMainSha": "09567c5c35334fe3e91a4f1e449f0bb5afd066c9",
   "coordinator": {
     "agentId": "coord-0.0.8@claude-opus-5-5-xhigh/divybot-6086943080"
   },
@@ -86,7 +86,8 @@
         2104,
         2105,
         2109,
-        2111
+        2111,
+        2120
       ]
     },
     {
@@ -419,102 +420,13 @@
     {
       "number": 2111,
       "state": "open"
+    },
+    {
+      "number": 2120,
+      "state": "open"
     }
   ],
   "leaves": [
-    {
-      "id": "W1-2065",
-      "lane": "features",
-      "phase": "ready",
-      "baseBranch": "main",
-      "prNumber": 2116,
-      "headSha": "31858fdf5",
-      "issueNumbers": [
-        2065
-      ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-w1-2065",
-      "receiptRefs": [
-        "receipts/W1-2065.review.20be01dc.md"
-      ],
-      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2116",
-      "note": "main merged; e2e-cli running; then Sol confirm"
-    },
-    {
-      "id": "W1-1383",
-      "lane": "internals",
-      "phase": "implementing",
-      "baseBranch": "main",
-      "prNumber": 2117,
-      "headSha": "836ee3b61",
-      "issueNumbers": [
-        1383
-      ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-w1-1383",
-      "receiptRefs": [
-        "receipts/W1-1383.e2e.836ee3b6.md"
-      ],
-      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2117",
-      "note": "fix turn: fromFileUrl minor + merge main; then e2e at final head"
-    },
-    {
-      "id": "W2-1999",
-      "lane": "fixes",
-      "phase": "implementing",
-      "baseBranch": "main",
-      "prNumber": 2119,
-      "headSha": "9515a7a8f",
-      "issueNumbers": [
-        1999
-      ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-w2-1999",
-      "receiptRefs": [],
-      "note": "fix turn: doc-lint private-type-ref",
-      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2119"
-    },
-    {
-      "id": "W5-1388-L1",
-      "lane": "internals",
-      "phase": "ready",
-      "baseBranch": "main",
-      "prNumber": 2121,
-      "headSha": "0797b7676",
-      "issueNumbers": [
-        1388
-      ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-l-1388",
-      "receiptRefs": [],
-      "note": "fixed; confirm review queued (internals evaluator)"
-    },
-    {
-      "id": "W9-1786",
-      "lane": "internals",
-      "phase": "ready",
-      "baseBranch": "main",
-      "prNumber": 2122,
-      "headSha": "706a6e31e",
-      "issueNumbers": [
-        1786,
-        2107
-      ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-l-1786",
-      "receiptRefs": [],
-      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2122",
-      "note": "main merged; e2e-cli running; then Sol confirm"
-    },
-    {
-      "id": "W2-2031",
-      "lane": "fixes",
-      "phase": "ready",
-      "baseBranch": "main",
-      "prNumber": 2123,
-      "headSha": "e94e8f60d",
-      "issueNumbers": [
-        2031
-      ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-w2-2031",
-      "receiptRefs": [],
-      "note": "fixes pushed; confirm review queued; merges after #2119"
-    },
     {
       "id": "X-2036",
       "lane": "internals",
@@ -526,9 +438,125 @@
         2036
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-x-2036",
-      "receiptRefs": [],
-      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2126",
-      "note": "merged 9d8dfb3 (AI-peer CI blocker repaired)"
+      "receiptRefs": []
+    },
+    {
+      "id": "W9-1786",
+      "lane": "internals",
+      "phase": "merged",
+      "baseBranch": "main",
+      "prNumber": 2122,
+      "headSha": "706a6e31e",
+      "issueNumbers": [
+        1786,
+        2107
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w9-1786",
+      "receiptRefs": []
+    },
+    {
+      "id": "W1-2065",
+      "lane": "features",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2116,
+      "headSha": "4a243294d",
+      "issueNumbers": [
+        2065
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w1-2065",
+      "receiptRefs": []
+    },
+    {
+      "id": "W1-1383",
+      "lane": "internals",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2117,
+      "headSha": "230120060",
+      "issueNumbers": [
+        1383
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w1-1383",
+      "receiptRefs": []
+    },
+    {
+      "id": "W2-1999",
+      "lane": "fixes",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2119,
+      "headSha": "4c7a8a554",
+      "issueNumbers": [
+        1999
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w2-1999",
+      "receiptRefs": []
+    },
+    {
+      "id": "W5-1388-L1",
+      "lane": "internals",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2121,
+      "headSha": "775660729",
+      "issueNumbers": [
+        1388
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w5-1388-l1",
+      "receiptRefs": []
+    },
+    {
+      "id": "W2-2031",
+      "lane": "fixes",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2123,
+      "headSha": "a664a6bdc",
+      "issueNumbers": [
+        2031
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w2-2031",
+      "receiptRefs": []
+    },
+    {
+      "id": "W2-2102",
+      "lane": "fixes",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2124,
+      "headSha": "7baa38e37",
+      "issueNumbers": [
+        2102
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w2-2102",
+      "receiptRefs": []
+    },
+    {
+      "id": "W11-1896",
+      "lane": "features",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2125,
+      "headSha": "49e574a78",
+      "issueNumbers": [
+        1896
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w11-1896",
+      "receiptRefs": []
+    },
+    {
+      "id": "W2-1688",
+      "lane": "fixes",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2127,
+      "headSha": "4b84c97e0",
+      "issueNumbers": [
+        1688
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w2-1688",
+      "receiptRefs": []
     },
     {
       "id": "W9-1767",
@@ -540,78 +568,165 @@
       "issueNumbers": [
         1767
       ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-l-1767",
-      "receiptRefs": [],
-      "note": "main merged; e2e queued; close-gate pipeline; Sol confirm"
-    },
-    {
-      "id": "W2-2102",
-      "lane": "fixes",
-      "phase": "implementing",
-      "baseBranch": "main",
-      "prNumber": 2124,
-      "headSha": "5beaad825",
-      "issueNumbers": [
-        2102
-      ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-w2-2102",
-      "receiptRefs": [],
-      "note": "fix turn: concept stop-words + DoD"
-    },
-    {
-      "id": "W2-1688",
-      "lane": "fixes",
-      "phase": "evaluating",
-      "baseBranch": "main",
-      "prNumber": 2127,
-      "headSha": "d5606cc84",
-      "issueNumbers": [
-        1688
-      ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-w2-1688",
-      "receiptRefs": [],
-      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2127"
-    },
-    {
-      "id": "W11-1896",
-      "lane": "features",
-      "phase": "implementing",
-      "baseBranch": "main",
-      "prNumber": 2125,
-      "headSha": "cb874866d",
-      "issueNumbers": [
-        1896
-      ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-w11-1896",
+      "implementerAgentId": "claude-opus-5-5-high/m008-w9-1767",
       "receiptRefs": []
     },
     {
       "id": "W11-1893",
       "lane": "internals",
-      "phase": "evaluating",
+      "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2129,
-      "headSha": "f58a9e865",
+      "headSha": "4c1f98945",
       "issueNumbers": [
         1893
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-w11-1893",
-      "receiptRefs": [],
-      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2129"
+      "receiptRefs": []
     },
     {
       "id": "W15-2013",
       "lane": "features",
-      "phase": "evaluating",
+      "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2130,
-      "headSha": "0b646d7b3",
+      "headSha": "b991a17f4",
       "issueNumbers": [
         2013
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-w15-2013",
-      "receiptRefs": [],
-      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2130"
+      "receiptRefs": []
+    },
+    {
+      "id": "W15-1670",
+      "lane": "docs",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2131,
+      "headSha": "312038554",
+      "issueNumbers": [
+        1670
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w15-1670",
+      "receiptRefs": []
+    },
+    {
+      "id": "W3-2032",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2133,
+      "headSha": "f3bc798df",
+      "issueNumbers": [
+        2032
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w3-2032",
+      "receiptRefs": []
+    },
+    {
+      "id": "W15-1708",
+      "lane": "docs",
+      "phase": "planned",
+      "baseBranch": "main",
+      "prNumber": 2134,
+      "headSha": "b0ef2c10c",
+      "issueNumbers": [
+        1708
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w15-1708",
+      "receiptRefs": []
+    },
+    {
+      "id": "W9-KV",
+      "lane": "fixes",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2135,
+      "headSha": "6a4e80d86",
+      "issueNumbers": [
+        2099,
+        2101
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w9-kv",
+      "receiptRefs": []
+    },
+    {
+      "id": "W9-1681",
+      "lane": "fixes",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2136,
+      "headSha": "2f8bcbb11",
+      "issueNumbers": [
+        1681
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w9-1681",
+      "receiptRefs": []
+    },
+    {
+      "id": "W2-2105",
+      "lane": "fixes",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2137,
+      "headSha": "455b13e60",
+      "issueNumbers": [
+        2105
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w2-2105",
+      "receiptRefs": []
+    },
+    {
+      "id": "W9-2067",
+      "lane": "fixes",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2138,
+      "headSha": "faa2ea107",
+      "issueNumbers": [
+        2067
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w9-2067",
+      "receiptRefs": []
+    },
+    {
+      "id": "W9-1990",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2139,
+      "headSha": "f153a83c7",
+      "issueNumbers": [
+        1990
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w9-1990",
+      "receiptRefs": []
+    },
+    {
+      "id": "W9-1682",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2140,
+      "headSha": "015f67be1",
+      "issueNumbers": [
+        1682
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w9-1682",
+      "receiptRefs": []
+    },
+    {
+      "id": "W9-1825",
+      "lane": "fixes",
+      "phase": "ready",
+      "baseBranch": "main",
+      "prNumber": 2141,
+      "headSha": "b2181c3fa",
+      "issueNumbers": [
+        1825
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w9-1825",
+      "receiptRefs": []
     }
   ],
   "expensiveGates": [],
@@ -639,11 +754,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-09T20:30:14.000Z",
-    "nextReportDueAt": "2026-10-09T21:30:14.000Z",
+    "lastReportAt": "2026-10-09T22:03:12.000Z",
+    "nextReportDueAt": "2026-10-09T23:03:12.000Z",
     "lastReportRef": "https://github.com/rickylabs/netscript/issues/2103#issuecomment-6087689487",
-    "headline": "1 merged (#2126); 13 leaf PRs open; 5 implementers live (cap 5 until 22:00Z).",
-    "currentMainSha": "9d8dfb36595d067faf6b3ab6a94637e17fcf839b",
+    "headline": "2 merged (#2126, #2122); 21 leaf PRs open; CI image-pull flakes are the merge bottleneck; cap 5 implementers from 22:00Z.",
+    "currentMainSha": "09567c5c35334fe3e91a4f1e449f0bb5afd066c9",
     "canary": {
       "target": "0.0.8-canary.3",
       "state": "planned",
@@ -675,12 +790,14 @@
     },
     "progress": {
       "mergedPullRequests": [
-        2126
+        2126,
+        2122
       ],
       "closedIssues": [
         2025
       ],
       "newIssues": [
+        2120,
         2095,
         2098,
         2099,
@@ -696,64 +813,127 @@
         2110,
         2111
       ],
-      "queueDeltaExplanation": "First merge #2126 (AI-peer repair) at 9d8dfb3; ready PRs updated with main; 2 CI runtime runs active (#2116, #2122)."
+      "queueDeltaExplanation": "Since 20:30Z: #2122 merged; 10 PRs ready awaiting CI runtime + Sol confirm; 4 Sol REVISE findings being fixed; CI image-pull infrastructure blocker escalated."
     },
     "scope": {
-      "openIssueCount": 76,
-      "ownedIssueCount": 76,
-      "scheduledIssueCount": 76,
+      "openIssueCount": 77,
+      "ownedIssueCount": 77,
+      "scheduledIssueCount": 77,
       "unscheduledIssueNumbers": [],
-      "openPullRequestCount": 7
+      "openPullRequestCount": 16
     },
     "mergeQueue": [
       {
         "prNumber": 2116,
         "lane": "features",
-        "state": "gating",
-        "nextGate": "CI quality (blocked by AI-peer drift) + scaffold.runtime at final head",
-        "nextAction": "merge main after deps repair; e2e-cli-gate; Sol confirm"
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
       },
       {
         "prNumber": 2117,
         "lane": "internals",
-        "state": "gating",
-        "nextGate": "CI scaffold.runtime both tiers + Sol re-review",
-        "nextAction": "fix turn after deps repair merges; fill box-12 evidence"
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
       },
       {
         "prNumber": 2119,
         "lane": "fixes",
-        "state": "planned",
-        "nextGate": "Sol IMPL-EVAL",
-        "nextAction": "merge after deps repair (main merge)"
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
       },
       {
         "prNumber": 2121,
         "lane": "internals",
-        "state": "gating",
-        "nextGate": "Sol IMPL-EVAL (queued)",
-        "nextAction": "review after #2122"
-      },
-      {
-        "prNumber": 2122,
-        "lane": "internals",
-        "state": "evaluating",
-        "nextGate": "Sol IMPL-EVAL",
-        "nextAction": "merge after deps repair"
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
       },
       {
         "prNumber": 2123,
         "lane": "fixes",
-        "state": "planned",
-        "nextGate": "Sol IMPL-EVAL (queued)",
-        "nextAction": "review after #2119; merge after #2119"
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2124,
+        "lane": "fixes",
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2127,
+        "lane": "fixes",
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
       },
       {
         "prNumber": 2128,
         "lane": "internals",
-        "state": "gating",
-        "nextGate": "Sol IMPL-EVAL",
-        "nextAction": "review after #2126"
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2129,
+        "lane": "internals",
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2130,
+        "lane": "features",
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2134,
+        "lane": "docs",
+        "state": "planned",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2135,
+        "lane": "fixes",
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2136,
+        "lane": "fixes",
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2137,
+        "lane": "fixes",
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2138,
+        "lane": "fixes",
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
+      },
+      {
+        "prNumber": 2141,
+        "lane": "fixes",
+        "state": "ready",
+        "nextGate": "CI scaffold.runtime at head + Sol MERGE at head",
+        "nextAction": "merge-train if conflicting; e2e; confirm"
       }
     ],
     "orchestratorMatrix": [
@@ -798,9 +978,19 @@
         "nextAction": "merge #2116 on green CI + Sol MERGE; then W3 #2064"
       }
     ],
-    "blockers": [],
+    "blockers": [
+      {
+        "id": "B-ci-image-pulls",
+        "category": "infrastructure",
+        "summary": "CI container image pulls time out (redis, postgres tier)",
+        "impact": "check-test and scaffold-runtime jobs fail before tests run; merges stall",
+        "owner": "owner decision (workflow change) + coordinator reruns",
+        "nextAction": "owner: approve registry-mirror/pre-pull CI leaf",
+        "ownerDecisionRequired": true
+      }
+    ],
     "environment": {
-      "checkedAt": "2026-10-09T20:30:14.000Z",
+      "checkedAt": "2026-10-09T22:03:12.000Z",
       "aspireApplications": 0,
       "dockerContainers": 0,
       "dockerCustomNetworks": 0
@@ -819,7 +1009,7 @@
     ]
   },
   "exactMainEvidence": {
-    "gitHead": "9d8dfb36595d067faf6b3ab6a94637e17fcf839b",
+    "gitHead": "09567c5c35334fe3e91a4f1e449f0bb5afd066c9",
     "surface": "repository",
     "expectedGateIds": [
       "ci.check-test",
@@ -839,5 +1029,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-09T20:30:14.000Z"
+  "updatedAt": "2026-10-09T22:03:12.000Z"
 }
