@@ -84,6 +84,10 @@ function addDatabaseSteps(steps: string[], dbCommand: string): void {
   steps.push(`${dbCommand} seed`);
 }
 
+function engineLabel(dbEngine: ValidatedInitOptions['dbEngine']): string {
+  return dbEngine.charAt(0).toUpperCase() + dbEngine.slice(1);
+}
+
 function databaseEnvVar(dbEngine: ValidatedInitOptions['dbEngine']): string {
   if (dbEngine === 'postgres') return 'POSTGRES_URI';
   if (dbEngine === 'mysql') return 'MYSQL_URI';
@@ -107,8 +111,16 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
     }
   } else {
     if (options.dbEngine !== 'none') {
-      steps.push(`${dbCommand} generate  # generate database client after configuring DATABASE_URL`);
-      steps.push(`${dbCommand} seed  # seed after the generated client exists`);
+      // No AppHost: the db commands run the database workspace tasks against
+      // the connection the developer provides, so that comes first.
+      if (options.dbEngine !== 'sqlite') {
+        steps.push(
+          `# Provision ${engineLabel(options.dbEngine)} yourself and set ${
+            databaseEnvVar(options.dbEngine)
+          } or DATABASE_URL`,
+        );
+      }
+      addDatabaseSteps(steps, dbCommand);
     }
     steps.push(`deno task --cwd apps/${options.appName} dev  # start Fresh dev server`);
   }
@@ -125,14 +137,10 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
       );
     }
   }
-  if (options.dbEngine !== 'none') {
-    const engineLabel = options.dbEngine.charAt(0).toUpperCase() + options.dbEngine.slice(1);
-    if (options.noAspire) {
-      const envVar = databaseEnvVar(options.dbEngine);
-      steps.push(`# Provision ${engineLabel} yourself and set ${envVar} or DATABASE_URL`);
-    } else {
-      steps.push(`# ${engineLabel} provisioned by Aspire (see "Databases" in appsettings.json)`);
-    }
+  if (options.dbEngine !== 'none' && !options.noAspire) {
+    steps.push(
+      `# ${engineLabel(options.dbEngine)} provisioned by Aspire (see "Databases" in appsettings.json)`,
+    );
   }
   return steps;
 }
