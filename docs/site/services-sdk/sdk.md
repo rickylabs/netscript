@@ -330,6 +330,44 @@ setCacheProvider(cacheQuery);
   }
 ] }) }}
 
+### When a stale refresh cannot persist
+
+Cache writes are non-fatal. If the action refetches over a stale entry and the fetch succeeds but
+the KV write fails, the action still returns the fetched `data`, and KV keeps the older entry.
+`getCachedEntry` then returns that older entry, so the `??` fallback does not fire and the loader
+returns the persisted `{ data, cachedAt }`: internally consistent, but older than `data`.
+
+That is the intended contract. The returned `data` and `cachedAt` always describe the same persisted
+value, so the freshness stamp never vouches for data the cache did not record. On a cold cache the
+same failure leaves no entry, and the fallback returns `data` with the current time. A loader that
+needs the freshest value rather than a consistent pair returns `data` itself.
+
+```ts
+import type { CachedEntry } from '@netscript/sdk/cache';
+import { createServiceClient } from '@netscript/sdk/client';
+import { createQueryFactories } from '@netscript/sdk/query';
+import { ordersContract } from '@my-app/contracts';
+
+const ordersClient = createServiceClient({ contract: ordersContract, serviceName: 'orders' });
+const ordersQueries = createQueryFactories({
+  orders: { contract: ordersContract, client: ordersClient },
+}).orders;
+type OrdersInput = { offset: number; limit: number };
+type Orders = Awaited<ReturnType<typeof ordersQueries.list>>;
+
+/** Consistent pair: `cachedAt` stamps exactly the `data` beside it, and may lag the refresh. */
+export async function loadPersistedOrders(input: OrdersInput): Promise<CachedEntry<Orders>> {
+  const data = await ordersQueries.list(input, { preferFreshOnStale: true });
+  const entry = await ordersQueries.list.getCachedEntry(input);
+  return entry ?? { data, cachedAt: Date.now() };
+}
+
+/** Freshest value: what this call returned, whether or not the KV write landed. */
+export async function loadFreshestOrders(input: OrdersInput): Promise<Orders> {
+  return await ordersQueries.list(input, { preferFreshOnStale: true });
+}
+```
+
 ## Safe error narrowing
 
 For a route built from `baseContract`, the defined channel is exactly `NOT_FOUND`,
