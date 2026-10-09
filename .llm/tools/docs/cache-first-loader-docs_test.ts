@@ -93,8 +93,8 @@ Deno.test('the retracted first-paint guarantee in chapter 4 is rejected', async 
   const path = 'tutorials/live-dashboard/04-definePage-QueryIsland.md';
   const evaluatedHead = withPage(sources, path, (source) =>
     source.replace(
-      'loader: the\n`list` layer renders whatever KV holds',
-      'loader, so\nfirst paint never waits on `orders`',
+      'action-then-metadata loader:',
+      'action-then-metadata loader, so first paint never waits on `orders`:',
     ));
   assertThrows(
     () => checkCacheFirstLoaderDocs(evaluatedHead),

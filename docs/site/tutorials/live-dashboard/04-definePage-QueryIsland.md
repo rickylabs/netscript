@@ -117,7 +117,7 @@ export const ordersListPage = definePage()
   .withRoute(routes.dashboard.orders.$route)
   .withPolicy('balanced')
   .withTelemetry({ enabled: true, spanName: 'dashboard.orders.list' })
-  // Read once per request; the list layer and the island layer both consume this.
+  // Read once per request; the list and island layers share it.
   .withResource('ordersData', async (ctx) => {
     return await ordersQueries.list.getCachedEntry({
       limit: ctx.search.limit,
@@ -136,10 +136,10 @@ export const ordersListPage = definePage()
   })
 ```
 
-`ordersData` is a bare `getCachedEntry()` read, not chapter 3's action-then-metadata loader: the
-`list` layer renders whatever KV holds, and on a miss or stale entry the runtime prewarms its
-`partial` route, whose loader runs the callable action. The page still waits on `orders` when the
-cache is cold or expired: it awaits the island's `dehydratedQuery` prefetch, which runs that action.
+`ordersData` is a bare `getCachedEntry()` read, not chapter 3's action-then-metadata loader: on a
+miss or stale entry the runtime prewarms the `list` layer's `partial` route, whose loader runs the
+callable action. On a cold or expired cache the page still waits on `orders`, because it awaits the
+island's `dehydratedQuery` prefetch, which runs that action.
 
 `definePage` comes from `@app/utils.ts`, not straight from `@netscript/fresh/builders`. Your scaffold
 wrote that module in chapter 1 — a thin wrapper that calls the package builder with the app's `State`
