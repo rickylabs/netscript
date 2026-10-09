@@ -234,6 +234,7 @@ export class ServiceBuilderImpl<
    * @param options.rpcPath - Path for RPC endpoint (default: '/api/rpc')
    * @param options.apiPath - Path for OpenAPI endpoint (default: '/api')
    * @param options.debug - Enable debug mode for verbose oRPC logging (default: NETSCRIPT_DEBUG env var)
+   * @param options.redactFields - Extra field-name fragments redacted from debug-mode RPC input logs
    * @param options.traceContext - Enable trace context propagation (default: true)
    * @param options.rpcAliases - Deprecated RPC prefixes serving the same router
    */
@@ -242,6 +243,7 @@ export class ServiceBuilderImpl<
       rpcPath?: string;
       apiPath?: string;
       debug?: boolean;
+      redactFields?: readonly string[];
       traceContext?: boolean;
       rpcAliases?: readonly string[];
       deprecatedRpcRoutes?: readonly {

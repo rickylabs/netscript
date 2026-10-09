@@ -55,6 +55,8 @@ export interface RPCHandlerConfig {
   logging?: boolean;
   /** Enable debug mode for verbose logging (default: NETSCRIPT_DEBUG env var) */
   debug?: boolean;
+  /** Extra field-name fragments redacted from debug-mode RPC input logs (`LoggingPlugin`). */
+  redactFields?: readonly string[];
 }
 
 /**
@@ -98,6 +100,7 @@ export function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin
       new LoggingPlugin({
         serviceName: config.serviceName,
         debug: config.debug,
+        redactFields: config.redactFields,
       }),
     );
   }

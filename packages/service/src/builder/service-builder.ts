@@ -97,6 +97,7 @@ export interface ServiceBuilder<
       rpcPath?: string;
       apiPath?: string;
       debug?: boolean;
+      redactFields?: readonly string[];
       traceContext?: boolean;
       rpcAliases?: readonly string[];
       deprecatedRpcRoutes?: readonly {
