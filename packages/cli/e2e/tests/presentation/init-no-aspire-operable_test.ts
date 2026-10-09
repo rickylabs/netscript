@@ -79,12 +79,6 @@ Deno.test({
         '--force',
       ]);
       assertEquals(init.code, 0, init.output);
-      // Every advertised db step is preceded by the connection it needs.
-      assert(
-        init.output.indexOf('set POSTGRES_URI or DATABASE_URL') <
-          init.output.indexOf('db generate'),
-        init.output,
-      );
 
       const project = await locateProjectRoot(targetPath);
 
@@ -119,6 +113,13 @@ Deno.test({
       assertEquals(unreadable.code, CONFIG_NOT_FOUND_EXIT, unreadable.output);
       assertStringIncludes(unreadable.output, 'NetScript config not found');
       assertEquals(unreadable.output.includes('No services configured.'), false);
+
+      // Every advertised db step is preceded by the connection it needs.
+      assert(
+        init.output.indexOf('set POSTGRES_URI or DATABASE_URL') <
+          init.output.indexOf('db generate'),
+        init.output,
+      );
     } finally {
       await Deno.remove(targetPath, { recursive: true }).catch(() => {});
     }
