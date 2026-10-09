@@ -4,7 +4,7 @@
  * @module
  */
 
-import type { ContractAuthorizerOptions } from './options.ts';
+import type { ContractAuthorizerOptions, ContractAuthorizerRawRoute } from './options.ts';
 import type {
   ContractPolicyAuthorizerPort,
   ContractPolicyBindingOptions,
@@ -19,11 +19,22 @@ import type { AuthzDecision, AuthzRequest } from './types.ts';
 
 const OPTIONAL_AUTHENTICATION_ERROR =
   '[netscript.service.contract-policy] optional authentication is unsupported';
+const INVALID_RAW_ROUTE_ERROR = '[netscript.service.contract-policy] invalid raw route';
+const RAW_ROUTE_OVERLAP_ERROR =
+  '[netscript.service.contract-policy] raw route overlaps the contract projection';
+const NON_EXACT_PATH_SYNTAX = /[*:{}?#]/;
 
 type ContractProcedure = Extract<
   ContractPolicyContract,
   { readonly '~orpc': { readonly meta: { readonly access?: object } } }
 >;
+
+interface ProcedureIndex {
+  /** Resolves a request against the bound contract procedures only. */
+  resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution;
+  /** Reports whether the bound REST or RPC projection already serves a path. */
+  claims(path: string): boolean;
+}
 
 interface CompiledProcedure {
   readonly routerPath: readonly string[];
@@ -36,9 +47,11 @@ interface CompiledProcedure {
  * Creates an opt-in authorizer whose decisions come from procedure-local contract metadata.
  *
  * @param contract - Metadata-bearing contract router to traverse at construction.
- * @param options - Optional match-aware legacy fallback.
+ * @param options - Optional match-aware legacy fallback and declared raw routes.
  * @returns An authorizer that binds to the service builder's actual REST and RPC paths.
- * @throws {Error} When a procedure declares unsupported optional authentication.
+ * @throws {Error} When a procedure declares unsupported optional authentication, or a raw route
+ * is not an exact absolute path, is declared twice, or does not require authentication.
+ * The bound resolver also throws when a raw route overlaps the REST or RPC projection.
  *
  * @example
  * ```ts
@@ -55,11 +68,15 @@ interface CompiledProcedure {
  * declare const router: ServiceRouter;
  * declare const authenticator: AuthenticatorPort;
  *
- * const authorizer = createContractAuthorizer(contract, { fallback: legacyAuthorizer });
+ * const authorizer = createContractAuthorizer(contract, {
+ *   fallback: legacyAuthorizer,
+ *   rawRoutes: [{ path: '/api/tools/mcp', authentication: 'required' }],
+ * });
  * createService(router, { name: 'orders' })
  *   .withAuthn({ authenticator })
  *   .withAuthz({ authorizer })
- *   .withRPC();
+ *   .withRPC()
+ *   .route('all', '/api/tools/mcp', () => new Response('ok'));
  * ```
  */
 export function createContractAuthorizer<TContract extends ContractPolicyContract>(
@@ -67,11 +84,12 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
   options: ContractAuthorizerOptions = {},
 ): ContractPolicyAuthorizerPort {
   const procedures = compileProcedures(contract);
+  const rawRoutes = compileRawRoutes(options.rawRoutes ?? []);
   let resolver: ProcedurePolicyResolver | undefined;
 
   return {
     bind(binding: ContractPolicyBindingOptions): ProcedurePolicyResolver {
-      resolver = createResolver(procedures, binding);
+      resolver = createResolver(createProcedureIndex(procedures, binding), rawRoutes);
       return resolver;
     },
 
@@ -164,10 +182,60 @@ function normalizePolicy(
   });
 }
 
+function compileRawRoutes(
+  routes: readonly ContractAuthorizerRawRoute[],
+): ReadonlyMap<string, ProcedureAccessPolicy> {
+  const compiled = new Map<string, ProcedureAccessPolicy>();
+  for (const route of routes) {
+    const path = readRawRoutePath(route);
+    if (route.authentication !== 'required') {
+      throw new Error(`${INVALID_RAW_ROUTE_ERROR}: ${path} must require authentication`);
+    }
+    if (compiled.has(path)) {
+      throw new Error(`${INVALID_RAW_ROUTE_ERROR}: ${path} is declared more than once`);
+    }
+    compiled.set(
+      path,
+      Object.freeze({
+        authentication: 'required',
+        requiredScopes: readStringList(route.authorization?.scopes),
+        requiredRoles: readStringList(route.authorization?.roles),
+      }),
+    );
+  }
+  return compiled;
+}
+
+function readRawRoutePath(route: ContractAuthorizerRawRoute): string {
+  const path = route.path;
+  if (typeof path !== 'string' || !path.startsWith('/') || NON_EXACT_PATH_SYNTAX.test(path)) {
+    throw new Error(`${INVALID_RAW_ROUTE_ERROR}: ${String(path)} is not an exact absolute path`);
+  }
+  return normalizePath(path);
+}
+
 function createResolver(
+  procedures: ProcedureIndex,
+  rawRoutes: ReadonlyMap<string, ProcedureAccessPolicy>,
+): ProcedurePolicyResolver {
+  for (const path of rawRoutes.keys()) {
+    if (procedures.claims(path)) {
+      throw new Error(`${RAW_ROUTE_OVERLAP_ERROR}: ${path}`);
+    }
+  }
+
+  return Object.freeze({
+    resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
+      const rawPolicy = rawRoutes.get(normalizePath(request.path));
+      return rawPolicy ? matched(rawPolicy) : procedures.resolve(request);
+    },
+  });
+}
+
+function createProcedureIndex(
   procedures: readonly CompiledProcedure[],
   binding: ContractPolicyBindingOptions,
-): ProcedurePolicyResolver {
+): ProcedureIndex {
   const rpcPrefixes = uniquePaths([binding.rpcPath, ...(binding.rpcAliases ?? [])])
     .sort((left, right) => right.length - left.length);
   const rpcProcedures = new Map(
@@ -182,13 +250,23 @@ function createResolver(
     }];
   });
 
+  const projectRpcPath = (path: string) => {
+    const rpcPath = remapDeprecatedRpcPath(path, binding);
+    const prefix = rpcPrefixes.find((candidate) => isWithinPrefix(rpcPath, candidate));
+    return prefix ? relativePath(rpcPath, prefix) : undefined;
+  };
+
   return Object.freeze({
+    claims(path: string): boolean {
+      return projectRpcPath(path) !== undefined ||
+        restProcedures.some((candidate) => candidate.pattern.test(path));
+    },
+
     resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
       const originalPath = normalizePath(request.path);
-      const rpcPath = remapDeprecatedRpcPath(originalPath, binding);
-      const rpcPrefix = rpcPrefixes.find((prefix) => isWithinPrefix(rpcPath, prefix));
-      if (rpcPrefix) {
-        const procedure = rpcProcedures.get(relativePath(rpcPath, rpcPrefix));
+      const rpcRouterPath = projectRpcPath(originalPath);
+      if (rpcRouterPath !== undefined) {
+        const procedure = rpcProcedures.get(rpcRouterPath);
         return procedure ? matched(procedure.policy) : { matched: false };
       }
 
