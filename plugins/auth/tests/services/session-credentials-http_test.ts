@@ -16,7 +16,11 @@ import { createAuthServiceBackendRegistry } from '../../services/src/backend-reg
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
 import { router } from '../../services/src/router.ts';
 import { currentAuthRequest, withAuthRequest } from '../../services/src/request-context.ts';
-import { authTestUrl } from '../testing/auth-fixtures.ts';
+import {
+  AUTH_TEST_USERINFO_SUBJECT_ENV,
+  authTestUrl,
+  syntheticProviderFetch,
+} from '../testing/auth-fixtures.ts';
 
 Deno.test('native auth service verifies bearer sessions through the SDK and preserves cookies', async () => {
   await using kv = new MemoryKvAdapter();
@@ -32,20 +36,9 @@ Deno.test('native auth service verifies bearer sessions through the SDK and pres
       NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
       NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
       NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
+      ...AUTH_TEST_USERINFO_SUBJECT_ENV,
     },
-    fetch: () =>
-      Promise.resolve(
-        new Response(
-          JSON.stringify({
-            access_token: 'access_test',
-            refresh_token: 'refresh_test',
-            token_type: 'Bearer',
-            expires_in: 3600,
-            scope: 'profile email',
-          }),
-          { headers: { 'content-type': 'application/json' } },
-        ),
-      ),
+    fetch: syntheticProviderFetch(),
   });
   async function mintSession(): Promise<string> {
     const started = await signin({ redirectTo: '/d' }, {

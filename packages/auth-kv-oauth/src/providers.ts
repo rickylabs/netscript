@@ -23,6 +23,23 @@ export type { AuthProviderCapability, AuthProviderDescriptor } from '@netscript/
 /** Client authentication method used at the token endpoint. */
 export type ClientAuthMethod = 'client_secret_basic' | 'client_secret_post' | 'none';
 
+/**
+ * Where the flow reads a stable principal subject from after a successful callback.
+ *
+ * - `id_token`: the named claim of the validated ID token, used verbatim (OIDC `sub`).
+ * - `userinfo`: the named field of the provider's userinfo response, namespaced by provider id
+ *   (`github:<id>`). `claim` may be a dot path (`data.id`). `headers` are sent with the request.
+ *
+ * Sign-in is refused with `subject_missing` when the configured value is absent.
+ */
+export type OAuthSubjectSource =
+  | Readonly<{ source: 'id_token'; claim: string }>
+  | Readonly<{
+    source: 'userinfo';
+    claim: string;
+    headers?: Readonly<Record<string, string>>;
+  }>;
+
 /** Shared fields present on every normalized OAuth provider. */
 export type OAuthProviderBaseConfig = Readonly<{
   id: string;
@@ -30,6 +47,11 @@ export type OAuthProviderBaseConfig = Readonly<{
   kind: 'oauth' | 'oidc';
   clientId: string;
   userInfoEndpoint?: string;
+  /**
+   * Stable subject source. When omitted, the subject is the ID token `sub` and otherwise falls
+   * back to the per-sign-in session id, which is not stable and only suits local stubs.
+   */
+  subject?: OAuthSubjectSource;
   redirectUri: string;
   scopes: readonly string[];
   extraAuthParams: Readonly<Record<string, string>>;
@@ -80,6 +102,7 @@ export type OAuthProviderInput = Readonly<{
   authorizationEndpoint?: string;
   tokenEndpoint?: string;
   userInfoEndpoint?: string;
+  subject?: OAuthSubjectSource;
   redirectUri: string;
   scopes?: string | readonly string[];
   clientAuthMethod?: ClientAuthMethod;
@@ -94,6 +117,7 @@ export type PresetOAuthProviderOptions = Readonly<{
   scopes?: string | readonly string[];
   clientAuthMethod?: ClientAuthMethod;
   extraAuthParams?: Readonly<Record<string, string>>;
+  subject?: OAuthSubjectSource;
 }>;
 
 /** Options shared by issuer or tenant based presets. */
@@ -144,6 +168,7 @@ export function defineOAuthProvider(input: OAuthProviderInput): OAuthProviderCon
     kind: input.kind ?? (input.issuer ? 'oidc' : 'oauth'),
     clientId: input.clientId,
     userInfoEndpoint: input.userInfoEndpoint,
+    subject: normalizeSubjectSource(input),
     redirectUri: input.redirectUri,
     scopes,
     clientAuthMethod,
@@ -210,6 +235,82 @@ export function defineOAuthProvider(input: OAuthProviderInput): OAuthProviderCon
   });
 }
 
+function normalizeSubjectSource(input: OAuthProviderInput): OAuthSubjectSource | undefined {
+  const subject = input.subject;
+  if (subject === undefined) {
+    return undefined;
+  }
+  if (subject.claim.trim() === '') {
+    throw new KvOAuthError(
+      'configuration_error',
+      `Provider ${input.id} subject source requires a claim name.`,
+    );
+  }
+  if (subject.source === 'id_token') {
+    return Object.freeze({ source: subject.source, claim: subject.claim });
+  }
+  if (subject.source !== 'userinfo') {
+    throw new KvOAuthError(
+      'configuration_error',
+      `Provider ${input.id} subject source must be "id_token" or "userinfo".`,
+    );
+  }
+  if (input.userInfoEndpoint === undefined) {
+    throw new KvOAuthError(
+      'configuration_error',
+      `Provider ${input.id} reads its subject from userinfo but has no userInfoEndpoint.`,
+    );
+  }
+  return Object.freeze({
+    source: subject.source,
+    claim: subject.claim,
+    headers: Object.freeze({ ...(subject.headers ?? {}) }),
+  });
+}
+
+const OIDC_SUBJECT: OAuthSubjectSource = Object.freeze({ source: 'id_token', claim: 'sub' });
+
+const userInfoId = (
+  claim = 'id',
+  headers: Readonly<Record<string, string>> = {},
+): OAuthSubjectSource =>
+  Object.freeze({ source: 'userinfo', claim, headers: Object.freeze(headers) });
+
+const PRESET_SUBJECT_SOURCES: Readonly<Record<string, OAuthSubjectSource>> = Object.freeze({
+  // GitHub has no `sub`: the numeric `id` is immutable, `login` is renamable. The REST API
+  // rejects requests without a User-Agent.
+  github: userInfoId('id', { 'user-agent': 'netscript-auth-kv-oauth' }),
+  google: OIDC_SUBJECT,
+  gitlab: OIDC_SUBJECT,
+  discord: userInfoId(),
+  slack: OIDC_SUBJECT,
+  spotify: userInfoId(),
+  facebook: userInfoId(),
+  twitter: userInfoId('data.id'),
+  auth0: OIDC_SUBJECT,
+  okta: OIDC_SUBJECT,
+  'aws-cognito': OIDC_SUBJECT,
+  'azure-ad': OIDC_SUBJECT,
+  logto: OIDC_SUBJECT,
+  clerk: OIDC_SUBJECT,
+});
+
+/**
+ * Returns the stable subject source a shipped preset uses, keyed by preset provider id.
+ *
+ * @example
+ * ```ts
+ * import { presetSubjectSource } from "@netscript/auth-kv-oauth/providers";
+ *
+ * presetSubjectSource("github"); // { source: "userinfo", claim: "id", headers: { ... } }
+ * ```
+ */
+export function presetSubjectSource(providerId: string): OAuthSubjectSource | undefined {
+  return Object.hasOwn(PRESET_SUBJECT_SOURCES, providerId)
+    ? PRESET_SUBJECT_SOURCES[providerId]
+    : undefined;
+}
+
 /** Returns true when a provider is resolved through issuer discovery. */
 export function hasIssuerDiscovery(
   provider: OAuthProviderConfig,
@@ -228,6 +329,11 @@ export function describeProvider(provider: OAuthProviderConfig): AuthProviderDes
       : ['signin', 'callback', 'signout', 'session'],
   };
 }
+
+const withSubject = (
+  options: PresetOAuthProviderOptions,
+  providerId: string,
+): OAuthSubjectSource | undefined => options.subject ?? presetSubjectSource(providerId);
 
 const withScopes = (
   options: PresetOAuthProviderOptions,
@@ -261,6 +367,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'github',
+      subject: withSubject(options, 'github'),
       displayName: 'GitHub',
       authorizationEndpoint: 'https://github.com/login/oauth/authorize',
       tokenEndpoint: 'https://github.com/login/oauth/access_token',
@@ -271,6 +378,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'google',
+      subject: withSubject(options, 'google'),
       displayName: 'Google',
       issuer: 'https://accounts.google.com',
       scopes: withScopes(options, ['openid', 'profile', 'email']),
@@ -279,6 +387,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'gitlab',
+      subject: withSubject(options, 'gitlab'),
       displayName: 'GitLab',
       issuer: 'https://gitlab.com',
       scopes: withScopes(options, ['openid', 'profile', 'email']),
@@ -287,6 +396,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'discord',
+      subject: withSubject(options, 'discord'),
       displayName: 'Discord',
       authorizationEndpoint: 'https://discord.com/oauth2/authorize',
       tokenEndpoint: 'https://discord.com/api/oauth2/token',
@@ -297,6 +407,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'slack',
+      subject: withSubject(options, 'slack'),
       displayName: 'Slack',
       authorizationEndpoint: 'https://slack.com/openid/connect/authorize',
       tokenEndpoint: 'https://slack.com/api/openid.connect.token',
@@ -307,6 +418,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'spotify',
+      subject: withSubject(options, 'spotify'),
       displayName: 'Spotify',
       authorizationEndpoint: 'https://accounts.spotify.com/authorize',
       tokenEndpoint: 'https://accounts.spotify.com/api/token',
@@ -317,6 +429,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'facebook',
+      subject: withSubject(options, 'facebook'),
       displayName: 'Facebook',
       authorizationEndpoint: 'https://www.facebook.com/dialog/oauth',
       tokenEndpoint: 'https://graph.facebook.com/oauth/access_token',
@@ -327,6 +440,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'twitter',
+      subject: withSubject(options, 'twitter'),
       displayName: 'X',
       authorizationEndpoint: 'https://x.com/i/oauth2/authorize',
       tokenEndpoint: 'https://api.x.com/2/oauth2/token',
@@ -337,6 +451,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'auth0',
+      subject: withSubject(options, 'auth0'),
       displayName: 'Auth0',
       issuer: options.issuer ?? (options.domain ? withDomain(options.domain) : undefined),
     }),
@@ -344,6 +459,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'okta',
+      subject: withSubject(options, 'okta'),
       displayName: 'Okta',
       issuer: options.issuer ?? (options.domain ? withDomain(options.domain) : undefined),
     }),
@@ -351,6 +467,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'aws-cognito',
+      subject: withSubject(options, 'aws-cognito'),
       displayName: 'AWS Cognito',
       issuer: options.issuer ??
         (options.region && options.userPoolId
@@ -361,6 +478,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'azure-ad',
+      subject: withSubject(options, 'azure-ad'),
       displayName: 'Azure AD',
       issuer: options.issuer ??
         `https://login.microsoftonline.com/${options.tenantId ?? 'common'}/v2.0`,
@@ -369,6 +487,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'logto',
+      subject: withSubject(options, 'logto'),
       displayName: 'Logto',
       issuer: options.issuer ?? (options.domain ? withDomain(options.domain) : undefined),
     }),
@@ -376,6 +495,7 @@ export const providers: Readonly<{
     defineOAuthProvider({
       ...options,
       id: 'clerk',
+      subject: withSubject(options, 'clerk'),
       displayName: 'Clerk',
       issuer: options.issuer ?? (options.domain ? withDomain(options.domain) : undefined),
     }),
