@@ -153,9 +153,12 @@ async function resolvePluginConfigSnapshot(
  */
 export async function validateConfiguredPluginComposition(
   projectRoot: string,
-  config: NetScriptConfig,
+  config?: NetScriptConfig,
 ): Promise<void> {
-  const manifests = await loadConfiguredPluginManifests(projectRoot, resolvePluginSpecs(config));
+  const resolvedConfig = config ??
+    await loadProjectConfig({ cwd: projectRoot }, { process: new DenoProcess() });
+  const specs = resolvePluginSpecs(resolvedConfig);
+  const manifests = await loadConfiguredPluginManifests(projectRoot, specs);
   requireValidPluginComposition(manifests);
 }
 
