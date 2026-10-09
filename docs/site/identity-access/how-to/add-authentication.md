@@ -64,13 +64,28 @@ The `auth` plugin is a first-class official plugin installed the same way as `wo
 `triggers`, and `streams`. Add it with `plugin install`:
 
 ```sh
-netscript plugin install @netscript/plugin-auth
+netscript plugin install @netscript/plugin-auth --port 8094
 ```
 
 This installs the unified `@netscript/plugin-auth` dependency, emits the user-owned `auth/mod.ts`
 glue barrel, and registers it. The plugin package composes **one active backend** behind the
 `auth-api` oRPC service and contributes the Prisma schema (`auth.prisma`), service entry, and
 `/api/v1/auth/*` routes.
+
+{{ comp callout { type: "important", title: "Pin the port your OAuth callback is registered on" } }}
+An identity provider matches the redirect URI exactly, port included, so the <code>auth-api</code>
+address in <code>NETSCRIPT_AUTH_REDIRECT_URI</code> must not move between runs. <code>--port 8094</code>
+pins it: the installer writes <code>"HostPort": 8094</code> on the plugin's
+<code>NetScript.Plugins</code> entry in <code>appsettings.json</code>, and the generated AppHost
+registers the plugin with <code>withHttpEndpoint({ port: 8094, env: 'PORT' })</code>. You can also set
+or change <code>HostPort</code> on that entry by hand and regenerate with
+<code>netscript service generate</code>. The pin is operator-owned: <code>netscript plugin update</code>
+and a forced re-install without <code>--port</code> keep it; only a new <code>--port</code> replaces it.
+Without a pin, Aspire allocates a fresh host port at every start, which is right for a plugin nobody
+outside the graph calls — and wrong for a callback. The cost of pinning: the port is a machine-global
+reservation, so <code>aspire start --isolated</code> cannot randomise it and a second workspace pinning
+the same port collides. Nothing is pinned unless you ask.
+{{ /comp }}
 
 {{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
 <code>@netscript/plugin-auth</code> is designed as a single-backend runtime composition layer. The active implementation (selected from <code>@netscript/auth-kv-oauth</code>, <code>@netscript/auth-workos</code>, or <code>@netscript/auth-better-auth</code>) is resolved statically at startup. This boundary ensures session isolation and keeps the validation path predictable, meaning that multi-active routing, cross-backend account linking, and global multi-store logout are not supported in the core runtime. Complex multi-tenant scenarios must be coordinated via an upstream identity router or external identity aggregator.
@@ -260,7 +275,8 @@ architecture behind this, read [the authentication model](/explanation/auth-mode
 
 ## Step 6 — Start the service and the auth endpoints
 
-With Aspire running, the `auth-api` service binds **port 8094** and mounts five endpoints under the
+With Aspire running, the `auth-api` service answers on host port **8094** (pinned in Step 1) and
+mounts five endpoints under the
 public REST prefix **`/api/v1/auth/*`** (the oRPC surface is mirrored at `/api/rpc/v1/auth/*`):
 
 {{ comp.apiTable({
