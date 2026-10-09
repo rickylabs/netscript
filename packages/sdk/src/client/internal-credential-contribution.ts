@@ -8,13 +8,15 @@ import {
   deriveInternalCredential,
   type InstallationSecret,
   loadInstallationSecret,
-} from '@netscript/service/auth';
+} from '@netscript/service/internal-credential';
 import { defineSdkClientContribution } from './sdk-client-contribution.ts';
 import type {
   SdkClientContextDeclaration,
   SdkClientContribution,
   SdkClientTransportDescriptor,
 } from '../ports/sdk-client-contribution.ts';
+
+export type { InstallationSecret } from '@netscript/service/internal-credential';
 
 const INTERNAL_CREDENTIAL_CONTRIBUTION_ID = '@netscript/sdk:internal-credential' as const;
 const INTERNAL_CREDENTIAL_HEADER_KEYS = ['authorization'] as const;

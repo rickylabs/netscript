@@ -15,7 +15,7 @@
  * @module
  */
 
-import type { InternalCallerPredicate } from './contract-policy.ts';
+import type { InternalCallerPredicate } from './contract/contract-policy.ts';
 import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from './types.ts';
 
 /** Authentication middleware options for `withAuthn()` and `defineService({ auth })`. */

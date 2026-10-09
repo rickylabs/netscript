@@ -22,6 +22,7 @@ export { createLocaleSdkClientContribution } from './locale-contribution.ts';
 export type { LocaleSdkClientContext, LocaleSdkClientContribution } from './locale-contribution.ts';
 export { createInternalCredentialSdkClientContribution } from './internal-credential-contribution.ts';
 export type {
+  InstallationSecret,
   InternalCredentialSdkClientContribution,
   InternalCredentialSdkClientContributionOptions,
 } from './internal-credential-contribution.ts';

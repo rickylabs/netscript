@@ -5,7 +5,7 @@ import { createScopeAuthorizer } from '../../src/auth/scope-authorizer.ts';
 import type {
   ContractPolicyContract,
   ProcedurePolicyResolution,
-} from '../../src/auth/contract-policy.ts';
+} from '../../src/auth/contract/contract-policy.ts';
 import type { AuthzRequest, MatchAwareAuthorizerPort, Principal } from '../../src/auth/types.ts';
 
 const principal: Principal = {

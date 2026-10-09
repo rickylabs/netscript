@@ -23,7 +23,10 @@
 import type { Context, MiddlewareHandler } from 'hono';
 import { createLogger, type Logger } from '@netscript/logger';
 import type { AuthnOptions, AuthzOptions } from './options.ts';
-import type { ProcedurePolicyResolution, ProcedurePolicyResolver } from './contract-policy.ts';
+import type {
+  ProcedurePolicyResolution,
+  ProcedurePolicyResolver,
+} from './contract/contract-policy.ts';
 import type { AuthnRequest, AuthnResult, Principal } from './types.ts';
 
 /** Default path prefixes guarded by auth middleware. */

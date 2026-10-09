@@ -7,12 +7,13 @@
     ".": "./mod.ts",
     "./auth": "./src/auth/mod.ts",
     "./rpc-path": "./src/primitives/rpc-path.ts",
+    "./internal-credential": "./src/auth/internal-credential/mod.ts",
     "./commands": "./commands.ts",
     "./commands/testing": "./commands-testing.ts",
     "./commands/relay": "./commands-relay.ts"
   },
   "tasks": {
-    "check": "deno check --unstable-kv ./mod.ts commands.ts commands-testing.ts commands-relay.ts",
+    "check": "deno check --unstable-kv ./mod.ts commands.ts commands-testing.ts commands-relay.ts ./src/auth/internal-credential/mod.ts",
     "test": "deno test --allow-all ./tests/",
     "lint": "deno lint",
     "fmt": "deno fmt --check",

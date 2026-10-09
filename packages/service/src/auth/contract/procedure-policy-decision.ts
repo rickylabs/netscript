@@ -5,8 +5,8 @@
  */
 
 import type { InternalCallerPredicate, ProcedureAccessPolicy } from './contract-policy.ts';
-import { authorizeRequirements } from './scope-authorizer.ts';
-import type { AuthzDecision, AuthzRequest } from './types.ts';
+import { authorizeRequirements } from '../scope-authorizer.ts';
+import type { AuthzDecision, AuthzRequest } from '../types.ts';
 
 /** Applies audience, scope, and role requirements declared by a procedure contract. */
 export function authorizeProcedurePolicy(

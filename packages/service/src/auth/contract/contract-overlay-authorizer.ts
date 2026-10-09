@@ -4,7 +4,7 @@
  * @module
  */
 
-import type { ContractOverlayAuthorizerOptions } from './options.ts';
+import type { ContractOverlayAuthorizerOptions } from '../options.ts';
 import type {
   ContractPolicyAuthorizerPort,
   ContractPolicyBindingOptions,
@@ -14,9 +14,9 @@ import type {
   ProcedurePolicyResolver,
 } from './contract-policy.ts';
 import { bindProcedureIndex, compileProcedures } from './contract-procedure-index.ts';
-import { isInternalServicePrincipal } from './internal-credential-authenticator.ts';
+import { isInternalServicePrincipal } from '../internal-credential/internal-credential-authenticator.ts';
 import { authorizeProcedurePolicy } from './procedure-policy-decision.ts';
-import type { AuthzDecision, AuthzRequest } from './types.ts';
+import type { AuthzDecision, AuthzRequest } from '../types.ts';
 
 /**
  * Creates an authorizer that overlays procedure access metadata on the service's own policy.

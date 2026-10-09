@@ -54,9 +54,9 @@ export type {
   ProcedurePolicyRequest,
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
-} from './contract-policy.ts';
-export { createContractAuthorizer } from './contract-authorizer.ts';
-export { createContractOverlayAuthorizer } from './contract-overlay-authorizer.ts';
+} from './contract/contract-policy.ts';
+export { createContractAuthorizer } from './contract/contract-authorizer.ts';
+export { createContractOverlayAuthorizer } from './contract/contract-overlay-authorizer.ts';
 export { createCompositeAuthenticator } from './composite-authenticator.ts';
 export {
   createInstallationSecret,
@@ -64,14 +64,14 @@ export {
   type InstallationSecret,
   loadInstallationSecret,
   type LoadInstallationSecretOptions,
-} from './installation-secret.ts';
-export { deriveInternalCredential } from './internal-credential.ts';
+} from './internal-credential/installation-secret.ts';
+export { deriveInternalCredential } from './internal-credential/internal-credential.ts';
 export {
   createInternalCredentialAuthenticator,
   INTERNAL_SERVICE_SUBJECT,
   type InternalCredentialAuthenticatorOptions,
   isInternalServicePrincipal,
-} from './internal-credential-authenticator.ts';
+} from './internal-credential/internal-credential-authenticator.ts';
 export {
   createScopeAuthorizer,
   type ScopeAuthorizationRule,

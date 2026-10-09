@@ -4,8 +4,8 @@
  * @module
  */
 
-import type { ContractAuthorizerOptions } from './options.ts';
-import type { AuthorizerPort, Principal } from './types.ts';
+import type { ContractAuthorizerOptions } from '../options.ts';
+import type { AuthorizerPort, Principal } from '../types.ts';
 
 /**
  * Decides whether an authenticated principal is an internal service caller.

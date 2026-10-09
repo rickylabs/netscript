@@ -99,9 +99,9 @@ export type {
   ProcedurePolicyRequest,
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
-} from './src/auth/contract-policy.ts';
-export { createContractAuthorizer } from './src/auth/contract-authorizer.ts';
-export { createContractOverlayAuthorizer } from './src/auth/contract-overlay-authorizer.ts';
+} from './src/auth/contract/contract-policy.ts';
+export { createContractAuthorizer } from './src/auth/contract/contract-authorizer.ts';
+export { createContractOverlayAuthorizer } from './src/auth/contract/contract-overlay-authorizer.ts';
 export type {
   AuthenticatorPort,
   AuthnRequest,

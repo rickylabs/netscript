@@ -6,8 +6,8 @@
 
 import type { InstallationSecret } from './installation-secret.ts';
 import { assertServiceName, deriveInternalCredential } from './internal-credential.ts';
-import { createStaticCredentialAuthenticator } from './static-credential-authenticator.ts';
-import type { AuthenticatorPort, AuthnRequest, AuthnResult, Principal } from './types.ts';
+import { createStaticCredentialAuthenticator } from '../static-credential-authenticator.ts';
+import type { AuthenticatorPort, AuthnRequest, AuthnResult, Principal } from '../types.ts';
 
 /** Subject carried by every internal service principal. */
 export const INTERNAL_SERVICE_SUBJECT = 'netscript:internal';
