@@ -256,9 +256,9 @@ immutable numeric `id`; `login` can be renamed.
 
 When a configured source yields no identifier, `handleCallback` throws `KvOAuthError` with code
 `subject_missing` and no session is created. A failed or oversized userinfo response throws
-`userinfo_failed`. A provider defined *without* `subject` keeps the legacy mapping (ID-token `sub`,
-else the per-sign-in session id). That fallback is not stable across sign-ins, so use it only for
-local stubs.
+`userinfo_failed`. A provider defined *without* `subject` uses the ID-token `sub` and is refused the
+same way when the token response carries none. There is no fallback to the per-sign-in session id,
+because a subject that changes on every sign-in cannot carry authorization.
 
 The `auth` plugin configures this from its environment, including the auth environment block of
 `appsettings.json`:
@@ -270,8 +270,10 @@ The `auth` plugin configures this from its environment, including the auth envir
 | `NETSCRIPT_AUTH_PROVIDER_ID` | Names the provider and namespaces userinfo subjects. A preset name (`github`) supplies that preset's defaults. |
 
 Unset variables fall back to the preset named by `NETSCRIPT_AUTH_PROVIDER_ID`, then to the ID-token
-`sub`. Only the local-defaults stub (no client id, redirect URI or endpoints configured) keeps the
-session-id fallback.
+`sub`. The settings are read and validated even when the provider is only partly configured, and an
+invalid `NETSCRIPT_AUTH_SUBJECT_SOURCE` stops the service at startup. The local-defaults stub (no
+provider configured) points at placeholder endpoints and cannot complete a sign-in; it never issues a
+session-id subject either.
 
 ---
 

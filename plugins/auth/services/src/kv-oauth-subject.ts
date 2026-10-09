@@ -17,17 +17,13 @@ type SubjectSourceName = (typeof SUBJECT_SOURCES)[number];
 /**
  * Resolve the kv-oauth subject source from the auth environment.
  *
- * Returns `undefined` only for the local-defaults stub, which keeps the per-sign-in session-id
- * subject. Every configured provider gets a source, so a provider without a stable identifier
- * refuses sign-in instead of minting a new subject on each one.
+ * Always returns a source, whether or not the provider itself is fully configured, and validates
+ * `NETSCRIPT_AUTH_SUBJECT_SOURCE` at startup. There is no session-id subject: a provider without a
+ * stable identifier refuses sign-in instead of minting a new subject on each one.
  */
 export function resolveKvOAuthSubjectSource(
   env: Readonly<Record<string, string | undefined>>,
-  usesLocalDefaults: boolean,
-): OAuthSubjectSource | undefined {
-  if (usesLocalDefaults) {
-    return undefined;
-  }
+): OAuthSubjectSource {
   const preset = presetSubjectSource(env.NETSCRIPT_AUTH_PROVIDER_ID ?? '');
   const source = parseSubjectSource(env.NETSCRIPT_AUTH_SUBJECT_SOURCE) ?? preset?.source ??
     'id_token';

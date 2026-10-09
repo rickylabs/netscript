@@ -143,7 +143,7 @@ async function createActiveBackend(
         authorizationEndpoint: provider.authorizationEndpoint,
         tokenEndpoint: provider.tokenEndpoint,
         userInfoEndpoint: env.NETSCRIPT_AUTH_USERINFO_ENDPOINT,
-        subject: resolveKvOAuthSubjectSource(env, provider.usesLocalDefaults),
+        subject: resolveKvOAuthSubjectSource(env),
         redirectUri: provider.redirectUri,
         scopes: env.NETSCRIPT_AUTH_SCOPES?.split(/\s+/).filter(Boolean),
       }),

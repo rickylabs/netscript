@@ -17,28 +17,18 @@
 
 import type { AuthProviderDescriptor } from '@netscript/plugin-auth-core';
 import { KvOAuthError } from './errors.ts';
+import {
+  normalizeSubjectSource,
+  type OAuthSubjectSource,
+  presetSubjectSource,
+} from './subject-source.ts';
 
 export type { AuthProviderCapability, AuthProviderDescriptor } from '@netscript/plugin-auth-core';
+export type { OAuthSubjectSource } from './subject-source.ts';
+export { presetSubjectSource } from './subject-source.ts';
 
 /** Client authentication method used at the token endpoint. */
 export type ClientAuthMethod = 'client_secret_basic' | 'client_secret_post' | 'none';
-
-/**
- * Where the flow reads a stable principal subject from after a successful callback.
- *
- * - `id_token`: the named claim of the validated ID token, used verbatim (OIDC `sub`).
- * - `userinfo`: the named field of the provider's userinfo response, namespaced by provider id
- *   (`github:<id>`). `claim` may be a dot path (`data.id`). `headers` are sent with the request.
- *
- * Sign-in is refused with `subject_missing` when the configured value is absent.
- */
-export type OAuthSubjectSource =
-  | Readonly<{ source: 'id_token'; claim: string }>
-  | Readonly<{
-    source: 'userinfo';
-    claim: string;
-    headers?: Readonly<Record<string, string>>;
-  }>;
 
 /** Shared fields present on every normalized OAuth provider. */
 export type OAuthProviderBaseConfig = Readonly<{
@@ -48,8 +38,8 @@ export type OAuthProviderBaseConfig = Readonly<{
   clientId: string;
   userInfoEndpoint?: string;
   /**
-   * Stable subject source. When omitted, the subject is the ID token `sub` and otherwise falls
-   * back to the per-sign-in session id, which is not stable and only suits local stubs.
+   * Stable subject source. {@link defineOAuthProvider} always sets it; when omitted on input it is
+   * the ID-token `sub`, and a sign-in without one is refused with `subject_missing`.
    */
   subject?: OAuthSubjectSource;
   redirectUri: string;
@@ -168,7 +158,7 @@ export function defineOAuthProvider(input: OAuthProviderInput): OAuthProviderCon
     kind: input.kind ?? (input.issuer ? 'oidc' : 'oauth'),
     clientId: input.clientId,
     userInfoEndpoint: input.userInfoEndpoint,
-    subject: normalizeSubjectSource(input),
+    subject: normalizeSubjectSource(input.id, input.subject, input.userInfoEndpoint),
     redirectUri: input.redirectUri,
     scopes,
     clientAuthMethod,
@@ -233,82 +223,6 @@ export function defineOAuthProvider(input: OAuthProviderInput): OAuthProviderCon
     authorizationEndpoint,
     tokenEndpoint,
   });
-}
-
-function normalizeSubjectSource(input: OAuthProviderInput): OAuthSubjectSource | undefined {
-  const subject = input.subject;
-  if (subject === undefined) {
-    return undefined;
-  }
-  if (subject.claim.trim() === '') {
-    throw new KvOAuthError(
-      'configuration_error',
-      `Provider ${input.id} subject source requires a claim name.`,
-    );
-  }
-  if (subject.source === 'id_token') {
-    return Object.freeze({ source: subject.source, claim: subject.claim });
-  }
-  if (subject.source !== 'userinfo') {
-    throw new KvOAuthError(
-      'configuration_error',
-      `Provider ${input.id} subject source must be "id_token" or "userinfo".`,
-    );
-  }
-  if (input.userInfoEndpoint === undefined) {
-    throw new KvOAuthError(
-      'configuration_error',
-      `Provider ${input.id} reads its subject from userinfo but has no userInfoEndpoint.`,
-    );
-  }
-  return Object.freeze({
-    source: subject.source,
-    claim: subject.claim,
-    headers: Object.freeze({ ...(subject.headers ?? {}) }),
-  });
-}
-
-const OIDC_SUBJECT: OAuthSubjectSource = Object.freeze({ source: 'id_token', claim: 'sub' });
-
-const userInfoId = (
-  claim = 'id',
-  headers: Readonly<Record<string, string>> = {},
-): OAuthSubjectSource =>
-  Object.freeze({ source: 'userinfo', claim, headers: Object.freeze(headers) });
-
-const PRESET_SUBJECT_SOURCES: Readonly<Record<string, OAuthSubjectSource>> = Object.freeze({
-  // GitHub has no `sub`: the numeric `id` is immutable, `login` is renamable. The REST API
-  // rejects requests without a User-Agent.
-  github: userInfoId('id', { 'user-agent': 'netscript-auth-kv-oauth' }),
-  google: OIDC_SUBJECT,
-  gitlab: OIDC_SUBJECT,
-  discord: userInfoId(),
-  slack: OIDC_SUBJECT,
-  spotify: userInfoId(),
-  facebook: userInfoId(),
-  twitter: userInfoId('data.id'),
-  auth0: OIDC_SUBJECT,
-  okta: OIDC_SUBJECT,
-  'aws-cognito': OIDC_SUBJECT,
-  'azure-ad': OIDC_SUBJECT,
-  logto: OIDC_SUBJECT,
-  clerk: OIDC_SUBJECT,
-});
-
-/**
- * Returns the stable subject source a shipped preset uses, keyed by preset provider id.
- *
- * @example
- * ```ts
- * import { presetSubjectSource } from "@netscript/auth-kv-oauth/providers";
- *
- * presetSubjectSource("github"); // { source: "userinfo", claim: "id", headers: { ... } }
- * ```
- */
-export function presetSubjectSource(providerId: string): OAuthSubjectSource | undefined {
-  return Object.hasOwn(PRESET_SUBJECT_SOURCES, providerId)
-    ? PRESET_SUBJECT_SOURCES[providerId]
-    : undefined;
 }
 
 /** Returns true when a provider is resolved through issuer discovery. */

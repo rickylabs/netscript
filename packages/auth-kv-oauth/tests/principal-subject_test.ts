@@ -216,20 +216,18 @@ Deno.test('OIDC providers keep the ID-token sub as subject without a userinfo re
   assertEquals(requests, [`${issuer}/token`]);
 });
 
-Deno.test('subject resolution keeps the legacy fallback only when no source is configured', async () => {
+Deno.test('a provider defined without subject requires the ID-token sub, never the session id', async () => {
   const unconfigured = defineOAuthProvider({
-    id: 'stub',
+    id: 'custom',
     clientId: 'client_test',
+    clientSecret: 'secret_test',
     authorizationEndpoint: 'https://issuer.example.test/authorize',
     tokenEndpoint: 'https://issuer.example.test/token',
     redirectUri: 'https://app.example.test/auth/callback',
   });
-  const context = {
-    sessionId: 'sess_test',
-    tokenSet: { accessToken: 'access_test' },
-    claims: {},
-  };
-  assertEquals(await resolvePrincipalSubject({ ...context, provider: unconfigured }), 'sess_test');
+  assertEquals(unconfigured.subject, { source: 'id_token', claim: 'sub' });
+
+  const context = { tokenSet: { accessToken: 'access_test' }, claims: {} };
   assertEquals(
     await resolvePrincipalSubject({
       ...context,
@@ -238,15 +236,20 @@ Deno.test('subject resolution keeps the legacy fallback only when no source is c
     }),
     'oidc-user-1',
   );
+  // A hand-built config that omits `subject` gets the same strict default.
+  const handBuilt: OAuthProviderConfig = { ...unconfigured, subject: undefined };
+  for (const provider of [unconfigured, handBuilt]) {
+    const error = await assertRejects(
+      () => resolvePrincipalSubject({ ...context, provider }),
+      KvOAuthError,
+    );
+    assertEquals(error.code, 'subject_missing');
+  }
 
-  const strict = defineOAuthProvider({
-    ...unconfigured,
-    subject: { source: 'id_token', claim: 'sub' },
-  });
-  const error = await assertRejects(
-    () => resolvePrincipalSubject({ ...context, provider: strict }),
-    KvOAuthError,
-  );
+  // Full callback: a plain OAuth token response (no ID token) refuses sign-in and writes no session.
+  const { fetch } = providerFetch(() => Response.json({ id: 1 }));
+  const { flow } = await flowFor(unconfigured, fetch);
+  const error = await assertRejects(() => signInOnce(flow), KvOAuthError);
   assertEquals(error.code, 'subject_missing');
 });
 
@@ -257,7 +260,6 @@ Deno.test('userinfo subjects support dot paths and refuse non-scalar identifiers
   });
   const context = {
     provider: twitter,
-    sessionId: 'sess_test',
     tokenSet: { accessToken: 'access_test' },
     claims: {},
   };

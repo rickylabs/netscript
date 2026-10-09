@@ -1,5 +1,9 @@
 import { assert, assertEquals, assertRejects, assertThrows } from 'jsr:@std/assert@^1';
-import { createInMemoryKvOAuthRegistry } from '../../services/src/backend-registry.ts';
+import { MemoryKvAdapter } from '@netscript/kv';
+import {
+  createAuthServiceBackendRegistry,
+  createInMemoryKvOAuthRegistry,
+} from '../../services/src/backend-registry.ts';
 import { resolveKvOAuthSubjectSource } from '../../services/src/kv-oauth-subject.ts';
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
 import { AuthServiceHandlerError } from '../../services/src/routers/v1-types.ts';
@@ -34,9 +38,8 @@ async function completeSignIn(registry: ResolvedAuthBackendRegistry) {
 }
 
 Deno.test('subject source resolves from env, then the named preset, then the ID-token sub', () => {
-  assertEquals(resolveKvOAuthSubjectSource({}, true), undefined);
-  assertEquals(resolveKvOAuthSubjectSource({}, false), { source: 'id_token', claim: 'sub' });
-  assertEquals(resolveKvOAuthSubjectSource({ NETSCRIPT_AUTH_PROVIDER_ID: 'github' }, false), {
+  assertEquals(resolveKvOAuthSubjectSource({}), { source: 'id_token', claim: 'sub' });
+  assertEquals(resolveKvOAuthSubjectSource({ NETSCRIPT_AUTH_PROVIDER_ID: 'github' }), {
     source: 'userinfo',
     claim: 'id',
     headers: { 'user-agent': 'netscript-auth-kv-oauth' },
@@ -45,18 +48,18 @@ Deno.test('subject source resolves from env, then the named preset, then the ID-
     resolveKvOAuthSubjectSource({
       NETSCRIPT_AUTH_PROVIDER_ID: 'github',
       NETSCRIPT_AUTH_SUBJECT_SOURCE: 'id_token',
-    }, false),
+    }),
     { source: 'id_token', claim: 'sub' },
   );
   assertEquals(
     resolveKvOAuthSubjectSource({
       NETSCRIPT_AUTH_SUBJECT_SOURCE: 'userinfo',
       NETSCRIPT_AUTH_SUBJECT_CLAIM: 'user_id',
-    }, false),
+    }),
     { source: 'userinfo', claim: 'user_id', headers: undefined },
   );
   assertThrows(
-    () => resolveKvOAuthSubjectSource({ NETSCRIPT_AUTH_SUBJECT_SOURCE: 'session' }, false),
+    () => resolveKvOAuthSubjectSource({ NETSCRIPT_AUTH_SUBJECT_SOURCE: 'session' }),
     Error,
     'NETSCRIPT_AUTH_SUBJECT_SOURCE must be one of id_token, userinfo',
   );
@@ -94,4 +97,69 @@ Deno.test('a configured provider without a stable subject refuses sign-in', asyn
   const error = await assertRejects(() => completeSignIn(registry), AuthServiceHandlerError);
   assertEquals(error.code, 'AUTH_PROVIDER_ERROR');
   assert(error.message.includes('no stable subject'));
+});
+
+const KV_KEY = 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=';
+
+Deno.test('a partially configured provider honours explicit subject settings', async () => {
+  // Redirect URI is left to its local default, so the registry's local-defaults transport applies;
+  // the explicit userinfo subject must still be used, and refuse when the id is missing.
+  const env = {
+    NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
+    NETSCRIPT_AUTH_CLIENT_ID: 'client_test',
+    NETSCRIPT_AUTH_CLIENT_SECRET: 'secret_test',
+    NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: 'https://issuer.example.test/oauth/authorize',
+    NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
+    NETSCRIPT_AUTH_USERINFO_ENDPOINT: AUTH_TEST_USERINFO_ENDPOINT,
+    NETSCRIPT_AUTH_SUBJECT_SOURCE: 'userinfo',
+    NETSCRIPT_AUTH_SUBJECT_CLAIM: 'id',
+    NETSCRIPT_AUTH_KV_OAUTH_KEY: KV_KEY,
+    PORT: '8094',
+  };
+  const stable = await createAuthServiceBackendRegistry({
+    kv: new MemoryKvAdapter(),
+    env,
+    fetch: syntheticProviderFetch(),
+  });
+  const completed = await completeSignIn(stable);
+  assertEquals(completed.subject, `default:${AUTH_TEST_PROVIDER_USER_ID}`);
+  assert(completed.subject !== completed.sessionId);
+
+  const missingId = await createAuthServiceBackendRegistry({
+    kv: new MemoryKvAdapter(),
+    env,
+    fetch: (input, init) =>
+      String(input) === AUTH_TEST_USERINFO_ENDPOINT
+        ? Promise.resolve(Response.json({ login: 'renamable' }))
+        : syntheticProviderFetch()(input, init),
+  });
+  const error = await assertRejects(() => completeSignIn(missingId), AuthServiceHandlerError);
+  assertEquals(error.code, 'AUTH_PROVIDER_ERROR');
+  assert(error.message.includes('no stable subject'));
+});
+
+Deno.test('the local-defaults stub never issues a session-id subject', async () => {
+  const env = {
+    NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
+    NETSCRIPT_AUTH_KV_OAUTH_KEY: KV_KEY,
+    PORT: '8094',
+  };
+  // Even if the stub's placeholder token endpoint answered, the subject is still required.
+  const registry = await createAuthServiceBackendRegistry({
+    kv: new MemoryKvAdapter(),
+    env,
+    fetch: syntheticProviderFetch(),
+  });
+  const error = await assertRejects(() => completeSignIn(registry), AuthServiceHandlerError);
+  assert(error.message.includes('no stable subject'));
+
+  await assertRejects(
+    () =>
+      createAuthServiceBackendRegistry({
+        kv: new MemoryKvAdapter(),
+        env: { ...env, NETSCRIPT_AUTH_SUBJECT_SOURCE: 'session' },
+      }),
+    Error,
+    'NETSCRIPT_AUTH_SUBJECT_SOURCE must be one of id_token, userinfo',
+  );
 });

@@ -378,7 +378,7 @@ by provider (<code>github:&lt;numeric id&gt;</code>). Keep <code>NETSCRIPT_AUTH_
 to the preset name, or set <code>NETSCRIPT_AUTH_SUBJECT_SOURCE</code>/<code>NETSCRIPT_AUTH_SUBJECT_CLAIM</code>.
 A provider with no stable identifier refuses sign-in (<code>subject_missing</code>) instead of
 issuing a new subject per sign-in. See
-<a href="../session-lifecycles/#stable-subjects-for-non-oidc-providers">stable subjects</a>.</li>
+<a href="../../session-lifecycles/#stable-subjects-for-non-oidc-providers">stable subjects</a>.</li>
 <li><strong>Aspire down</strong> — a 404 on <code>:8094</code> or a DB error during
 <code>netscript db</code> almost always means orchestration is not running. <code>cd aspire &amp;&amp;
 aspire start</code> first.</li>

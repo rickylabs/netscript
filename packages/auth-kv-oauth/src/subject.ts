@@ -3,8 +3,9 @@
  *
  * The provider's {@link OAuthSubjectSource} decides where the subject comes from: a validated
  * ID-token claim, or a field of the provider's userinfo response namespaced by provider id
- * (`github:<id>`). A configured source that yields no identifier refuses the sign-in with
- * `subject_missing` instead of falling back to the per-sign-in session id.
+ * (`github:<id>`). A provider without a declared source uses the ID-token `sub`. A source that
+ * yields no identifier refuses the sign-in with `subject_missing`; there is no fallback to the
+ * per-sign-in session id.
  *
  * @example
  * ```ts
@@ -17,7 +18,6 @@
  *     clientSecret: "secret_test",
  *     redirectUri: "https://app.example.test/auth/callback",
  *   }),
- *   sessionId: "sess_test",
  *   tokenSet: { accessToken: "access_test" },
  *   claims: {},
  *   fetch: () => Promise.resolve(Response.json({ id: 42, login: "octocat" })),
@@ -30,7 +30,8 @@
 
 import * as oauth from '@panva/oauth4webapi';
 import { KvOAuthError } from './errors.ts';
-import type { OAuthProviderConfig, OAuthSubjectSource } from './providers.ts';
+import type { OAuthProviderConfig } from './providers.ts';
+import { DEFAULT_SUBJECT_SOURCE, type OAuthSubjectSource } from './subject-source.ts';
 import type { KvOAuthTokenSet } from './store.ts';
 
 export type {
@@ -51,7 +52,6 @@ export type KvOAuthUserInfoFetch = NonNullable<
 /** Input accepted by {@link resolvePrincipalSubject}; a `NormalizePrincipalContext` satisfies it. */
 export type PrincipalSubjectContext = Readonly<{
   provider: OAuthProviderConfig;
-  sessionId: string;
   tokenSet: Pick<KvOAuthTokenSet, 'accessToken'>;
   claims: Readonly<Record<string, unknown>>;
   /** Fetch used for the userinfo request. Defaults to the global `fetch`. */
@@ -65,14 +65,11 @@ const MAX_USERINFO_BYTES = 64 * 1024;
 /**
  * Resolves the principal subject for a completed callback.
  *
- * Without a configured `provider.subject`, the ID-token `sub` is used and the per-sign-in session
- * id is the fallback. That fallback is unstable across sign-ins and only suits local stubs.
+ * Uses `provider.subject`, or the ID-token `sub` when none is declared. Throws `KvOAuthError`
+ * `subject_missing` when the source yields no identifier.
  */
 export async function resolvePrincipalSubject(context: PrincipalSubjectContext): Promise<string> {
-  const source = context.provider.subject;
-  if (source === undefined) {
-    return typeof context.claims.sub === 'string' ? context.claims.sub : context.sessionId;
-  }
+  const source = context.provider.subject ?? DEFAULT_SUBJECT_SOURCE;
   if (source.source === 'id_token') {
     return requireSubject(context.claims[source.claim], context.provider, source);
   }
