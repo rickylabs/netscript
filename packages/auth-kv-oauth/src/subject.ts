@@ -160,12 +160,12 @@ async function readJsonBounded(response: Response, providerId: string): Promise<
 }
 
 function readPath(value: unknown, path: string): unknown {
-  let current = value;
+  let current: unknown = value;
   for (const segment of path.split('.')) {
-    if (typeof current !== 'object' || current === null || !Object.hasOwn(current, segment)) {
+    if (typeof current !== 'object' || current === null) {
       return undefined;
     }
-    current = (current as Record<string, unknown>)[segment];
+    current = Object.getOwnPropertyDescriptor(current, segment)?.value;
   }
   return current;
 }
