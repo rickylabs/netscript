@@ -21,6 +21,8 @@ export interface RpcWiringOptions {
   apiPath?: string;
   /** Enables verbose oRPC logging. */
   debug?: boolean;
+  /** Extra field-name fragments redacted from debug-mode RPC input logs. */
+  redactFields?: readonly string[];
   /** Deprecated RPC prefixes that continue to serve the same router. */
   rpcAliases?: readonly string[];
   /** Deprecated procedure prefixes already present inside the mounted router. */
@@ -51,7 +53,7 @@ export function resolveRpcWiringPaths(
  * @param router - The service router exposed through both endpoints.
  * @param serviceName - Service name used for handler diagnostics.
  * @param buildContext - Per-request oRPC context factory.
- * @param options - Endpoint paths and debug flag.
+ * @param options - Endpoint paths, debug flag, and debug redaction fields.
  */
 export function wireRpc(
   app: Hono,
@@ -61,10 +63,10 @@ export function wireRpc(
   options?: RpcWiringOptions,
 ): void {
   const { rpcPath, apiPath } = resolveRpcWiringPaths(options);
-  const debug = options?.debug;
+  const logging = { serviceName, debug: options?.debug, redactFields: options?.redactFields };
 
-  const rpcHandler = createRPCHandler(options?.rpcRouter ?? router, { serviceName, debug });
-  const openApiHandler = createOpenAPIHandler(router, { serviceName, debug });
+  const rpcHandler = createRPCHandler(options?.rpcRouter ?? router, logging);
+  const openApiHandler = createOpenAPIHandler(router, logging);
 
   registerRpcPath(app, rpcHandler, rpcPath, buildContext, (c) => {
     for (const route of options?.deprecatedRpcRoutes ?? []) {
