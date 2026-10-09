@@ -125,6 +125,14 @@ describe('generateRegisterPlugins host ports', () => {
     });
     assertStringIncludes(output, ".withHttpEndpoint({ port: 4400, env: 'PORT' });");
   });
+
+  it('should pin the host port a plugin opts into via HostPort', () => {
+    const output = generateRegisterPlugins({
+      ...pluginOptions,
+      plugins: { auth: { ...fixtures.UNPINNED_PLUGIN, HostPort: 8094 } },
+    });
+    assertStringIncludes(output, ".withHttpEndpoint({ port: 8094, env: 'PORT' });");
+  });
 });
 
 describe('generateRegisterApps host ports', () => {
