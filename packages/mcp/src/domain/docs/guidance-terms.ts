@@ -9,20 +9,21 @@ export interface GuidanceTerm {
 }
 
 /** Derivational suffixes folded onto one stem so `verify` meets `verification`. */
-const GUIDANCE_DERIVATIONAL_SUFFIXES: readonly (readonly [suffix: string, replacement: string])[] = [
-  ['ification', 'if'],
-  ['ifiers', 'if'],
-  ['ifier', 'if'],
-  ['ified', 'if'],
-  ['ifies', 'if'],
-  ['ify', 'if'],
-  ['ations', ''],
-  ['ation', ''],
-  ['ating', ''],
-  ['ated', ''],
-  ['ates', ''],
-  ['ate', ''],
-];
+const GUIDANCE_DERIVATIONAL_SUFFIXES: readonly (readonly [suffix: string, replacement: string])[] =
+  [
+    ['ification', 'if'],
+    ['ifiers', 'if'],
+    ['ifier', 'if'],
+    ['ified', 'if'],
+    ['ifies', 'if'],
+    ['ify', 'if'],
+    ['ations', ''],
+    ['ation', ''],
+    ['ating', ''],
+    ['ated', ''],
+    ['ates', ''],
+    ['ate', ''],
+  ];
 
 /** Shortest stem a derivational suffix may leave, so `state` and `create` stay whole. */
 const GUIDANCE_MIN_DERIVED_STEM = 5;
@@ -49,7 +50,11 @@ export function normalizeGuidanceToken(value: string): string {
 /** Split text into words carrying their literal and stemmed forms. */
 export function guidanceTerms(value: string): GuidanceTerm[] {
   return (value.toLocaleLowerCase().match(/[\p{Letter}\p{Number}]+/gu) ?? [])
-    .map((text) => ({ text, literal: literalGuidanceToken(text), stem: normalizeGuidanceToken(text) }))
+    .map((text) => ({
+      text,
+      literal: literalGuidanceToken(text),
+      stem: normalizeGuidanceToken(text),
+    }))
     .filter((term) => term.stem.length > 1);
 }
 
@@ -60,8 +65,9 @@ export function tokenizeGuidance(value: string): string[] {
 
 /** Keep the first term for each stem. */
 export function uniqueGuidanceTerms(terms: readonly GuidanceTerm[]): GuidanceTerm[] {
-  const seen = new Set<string>();
-  return terms.filter((term) => !seen.has(term.stem) && seen.add(term.stem));
+  const byStem = new Map<string, GuidanceTerm>();
+  for (const term of terms) if (!byStem.has(term.stem)) byStem.set(term.stem, term);
+  return [...byStem.values()];
 }
 
 /**

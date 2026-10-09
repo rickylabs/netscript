@@ -6,7 +6,8 @@ import {
   type GuidanceStage,
 } from './guidance-contract.ts';
 import { GUIDANCE_CONCEPTS, type GuidanceConcept } from './guidance-concepts.ts';
-import type { RankedGuidanceSection, ResolvedGuidanceLink } from './guidance-index.ts';
+import type { RankedGuidanceSection } from './guidance-index.ts';
+import type { ResolvedGuidanceLink } from './guidance-links.ts';
 import type { IndexedGuidanceSection } from './guidance-parser.ts';
 import { type GuidanceTerm, isGuidanceStopWord } from './guidance-terms.ts';
 

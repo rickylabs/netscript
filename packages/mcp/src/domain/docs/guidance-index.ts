@@ -1,12 +1,8 @@
-import type {
-  GuidanceConfidence,
-  GuidanceLinkRelation,
-  GuidanceResult,
-} from './guidance-contract.ts';
+import type { GuidanceConfidence, GuidanceResult } from './guidance-contract.ts';
 import type { DocsDocument } from './docs-corpus-port.ts';
 import type { GuidanceConcept } from './guidance-concepts.ts';
+import { type ResolvedGuidanceLink, resolveGuidanceLinks } from './guidance-links.ts';
 import {
-  type GuidanceLinkEdge,
   type GuidanceSectionIdentity,
   type IndexedGuidanceSection,
   indexGuidanceDocuments,
@@ -70,12 +66,6 @@ export interface RankedGuidanceSection {
   readonly entry: IndexedGuidanceSection;
   score: number;
   readonly matchedTerms: readonly GuidanceTerm[];
-}
-
-/** One internal link resolved to its target section once, at index time. */
-export interface ResolvedGuidanceLink {
-  readonly relation: GuidanceLinkRelation;
-  readonly target: IndexedGuidanceSection;
 }
 
 /** Immutable section-level parser, link graph, and deterministic ranker. */
@@ -285,34 +275,4 @@ function routeIndex(
     offset += concept.routeHints.length;
   }
   return Number.MAX_SAFE_INTEGER;
-}
-
-/** Resolve every section's internal links once; the graph is fixed per corpus load. */
-function resolveGuidanceLinks(
-  sections: readonly IndexedGuidanceSection[],
-): ReadonlyMap<string, readonly ResolvedGuidanceLink[]> {
-  const byId = new Map(sections.map((entry) => [entry.id, entry]));
-  const firstBySlug = new Map<string, IndexedGuidanceSection>();
-  for (const entry of sections) {
-    if (!firstBySlug.has(entry.slug)) firstBySlug.set(entry.slug, entry);
-  }
-  return new Map(sections.map((entry) => {
-    const links = new Map<string, ResolvedGuidanceLink>();
-    for (const edge of entry.links) {
-      const target = resolveEdge(edge, firstBySlug, byId);
-      if (target && !links.has(target.id)) {
-        links.set(target.id, { relation: edge.relation, target });
-      }
-    }
-    return [entry.id, [...links.values()]];
-  }));
-}
-
-function resolveEdge(
-  edge: GuidanceLinkEdge,
-  firstBySlug: ReadonlyMap<string, IndexedGuidanceSection>,
-  byId: ReadonlyMap<string, IndexedGuidanceSection>,
-): IndexedGuidanceSection | undefined {
-  if (edge.targetSection) return byId.get(`${edge.targetSlug}#${edge.targetSection}`);
-  return firstBySlug.get(edge.targetSlug);
 }
