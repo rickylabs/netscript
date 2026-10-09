@@ -86,23 +86,20 @@ export function parseHttpExchangeContract(raw: string): HttpExchangeContract {
   if (method !== 'GET' && method !== 'POST') {
     throw new Error(`HTTP exchange contract has unsupported method: ${String(method)}`);
   }
-  if (!Number.isInteger(expectStatus) || (expectStatus as number) < 100) {
+  if (typeof expectStatus !== 'number' || !Number.isInteger(expectStatus) || expectStatus < 100) {
     throw new Error('HTTP exchange contract requires an integer expectStatus');
   }
   if (headers !== undefined && !isStringRecord(headers)) {
     throw new Error('HTTP exchange contract headers must map names to strings');
   }
-  if (
-    expectBody !== undefined &&
-    (!isRecord(expectBody) || expectBody.kind !== 'json-equals' || !('value' in expectBody))
-  ) {
+  if (expectBody !== undefined && !isBodyPredicate(expectBody)) {
     throw new Error("HTTP exchange contract expectBody must be { kind: 'json-equals', value }");
   }
   return {
     method,
-    expectStatus: expectStatus as number,
+    expectStatus,
     ...(headers === undefined ? {} : { headers }),
-    ...(expectBody === undefined ? {} : { expectBody: expectBody as unknown as HttpBodyPredicate }),
+    ...(expectBody === undefined ? {} : { expectBody }),
   };
 }
 
@@ -137,7 +134,8 @@ function evaluateBody(
   if (response.bodyTruncated) {
     return {
       kind: 'mismatch',
-      reason: `body exceeds ${HTTP_CONTRACT_BODY_LIMIT_BYTES} bytes; cannot match ${predicate.kind}`,
+      reason:
+        `body exceeds ${HTTP_CONTRACT_BODY_LIMIT_BYTES} bytes; cannot match ${predicate.kind}`,
     };
   }
   let actual: unknown;
@@ -159,6 +157,11 @@ function evaluateBody(
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/** Values reaching this guard come from `JSON.parse`, so `value` is already a JSON value. */
+function isBodyPredicate(value: unknown): value is HttpBodyPredicate {
+  return isRecord(value) && value.kind === 'json-equals' && 'value' in value;
 }
 
 function isStringRecord(value: unknown): value is Record<string, string> {

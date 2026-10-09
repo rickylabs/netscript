@@ -432,7 +432,13 @@ class FakeHttpClient implements HttpClient {
   requests: HttpRequest[] = [];
   request(request: HttpRequest): Promise<HttpResult> {
     this.requests.push(request);
-    return Promise.resolve({ status: 200, ok: true, bodyPreview: '' });
+    return Promise.resolve({
+      status: 200,
+      ok: true,
+      bodyPreview: '',
+      body: '',
+      bodyTruncated: false,
+    });
   }
 }
 

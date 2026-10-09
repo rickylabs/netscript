@@ -75,7 +75,10 @@ export function commandGate(
 }
 
 /** The exchange an HTTP gate asserts when the caller states none: `GET` served exactly 200. */
-export const HTTP_GATE_DEFAULT_EXCHANGE: HttpExchangeContract = { method: 'GET', expectStatus: 200 };
+export const HTTP_GATE_DEFAULT_EXCHANGE: HttpExchangeContract = {
+  method: 'GET',
+  expectStatus: 200,
+};
 
 /** Create an HTTP gate definition that asserts one exact exchange against a local runtime URL. */
 export function httpGate(

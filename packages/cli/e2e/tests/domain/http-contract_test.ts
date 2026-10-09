@@ -74,7 +74,9 @@ Deno.test('exchange contract parses from its command-line JSON form', () => {
   assertEquals(parsed, { ...INTROSPECTION, headers });
   assertThrows(() => parseHttpExchangeContract('{"method":"PUT","expectStatus":200}'));
   assertThrows(() => parseHttpExchangeContract('{"method":"GET"}'));
-  assertThrows(() => parseHttpExchangeContract('{"method":"GET","expectStatus":200,"headers":{"a":1}}'));
+  assertThrows(() =>
+    parseHttpExchangeContract('{"method":"GET","expectStatus":200,"headers":{"a":1}}')
+  );
   assertThrows(() =>
     parseHttpExchangeContract('{"method":"GET","expectStatus":200,"expectBody":{"kind":"x"}}')
   );
