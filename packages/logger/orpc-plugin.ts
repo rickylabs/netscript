@@ -5,20 +5,33 @@
  */
 
 import { getLogger, type Logger } from '@logtape/logtape';
-import { DEFAULT_RPC_SKIP_PATHS, SENSITIVE_FIELD_FRAGMENTS } from './constants.ts';
+import { DEFAULT_RPC_SKIP_PATHS } from './constants.ts';
+import { createFieldRedactor, type FieldRedactor, REDACTED_VALUE } from './redaction.ts';
+
+/**
+ * Request-scoped oRPC context as seen by the logging interceptors.
+ *
+ * oRPC forwards the context a root interceptor passes to `next({ context })` to every procedure
+ * interceptor of the same request, which is how the plugin keeps request state per request.
+ */
+export type LoggingInterceptorContext = Record<PropertyKey, unknown>;
 
 /**
  * Minimal root-level interceptor contract used by the logger plugin.
  */
 export interface RootLoggingInterceptorOptions {
-  /** Continue to the next interceptor or handler. */
-  next: () => Promise<unknown>;
+  /** Request-scoped oRPC context, forwarded to procedure interceptors. */
+  context?: LoggingInterceptorContext;
+  /** Continue to the next interceptor or handler, optionally with replaced options. */
+  next: (options?: RootLoggingInterceptorOptions) => Promise<unknown>;
 }
 
 /**
  * Procedure-level interceptor contract used by the logger plugin.
  */
 export interface ClientLoggingInterceptorOptions {
+  /** Request-scoped oRPC context received from the root interceptors. */
+  context?: LoggingInterceptorContext;
   /** Procedure input passed to the client interceptor. */
   input: unknown;
   /** Procedure path segments or dot-joined path. */
@@ -112,6 +125,29 @@ export interface LoggingPluginOptions {
   skipPaths?: string[];
 
   /**
+   * Extra field-name fragments to redact from debug-mode `input` and `inputSummary` logs.
+   *
+   * Matching is case-insensitive and by substring, so `'brief'` also redacts `briefing`. These
+   * extend, and never replace, the defaults: fragments such as `password`, `token`, `secret`,
+   * `key`, and `auth`, plus the exact names `handle` and `prompt` (exact so that `handler` stays
+   * visible). Pass `'prompt'` here to also redact keys like `systemPrompt`.
+   *
+   * @default []
+   *
+   * @example
+   * ```ts
+   * import { LoggingPlugin } from '@netscript/logger/orpc';
+   *
+   * const plugin = new LoggingPlugin({
+   *   serviceName: 'cockpit',
+   *   debug: true,
+   *   redactFields: ['brief', 'prompt'],
+   * });
+   * ```
+   */
+  redactFields?: readonly string[];
+
+  /**
    * Custom logger instance.
    */
   logger?: Logger;
@@ -119,6 +155,11 @@ export interface LoggingPluginOptions {
 
 /**
  * LoggingPlugin for oRPC handlers.
+ *
+ * Every log line carries the `requestId` of the request it belongs to, including under concurrent
+ * traffic: the root interceptor passes the request ID to procedure interceptors through the
+ * request's own oRPC context and times the request locally, so no state is shared across
+ * requests. Procedures in one batched request share that request's ID.
  *
  * @example
  * ```ts
@@ -132,7 +173,10 @@ export interface LoggingPluginOptions {
  */
 export class LoggingPlugin {
   private readonly logger: Logger;
-  private readonly options: Required<Omit<LoggingPluginOptions, 'logger'>> & { logger?: Logger };
+  private readonly options:
+    & Required<Omit<LoggingPluginOptions, 'logger' | 'redactFields'>>
+    & { logger?: Logger };
+  private readonly redactor: FieldRedactor;
 
   /**
    * Plugin order. Runs after tracing and before error handling.
@@ -163,6 +207,7 @@ export class LoggingPlugin {
     };
 
     this.logger = options.logger ?? getLogger(['netscript', 'services', serviceName, 'rpc']);
+    this.redactor = createFieldRedactor(options.redactFields);
   }
 
   /**
@@ -173,30 +218,34 @@ export class LoggingPlugin {
   init(handlerOptions: LoggingHandlerOptions, _router?: unknown): void {
     const { debug, levels, logInputKeys, maxInputKeys, skipPaths, serviceName } = this.options;
     const logger = this.logger;
+    const redactor = this.redactor;
     const startLevel = levels.start ?? 'debug';
     const successLevel = levels.success ?? 'debug';
     const clientErrorLevel = levels.clientError ?? 'warn';
     const serverErrorLevel = levels.serverError ?? 'error';
-    let currentRequestId: string | null = null;
-    let requestStartTime: number | null = null;
+    // One key per plugin instance, so two LoggingPlugins on one handler never share state.
+    const requestIdKey = Symbol('netscript.logger.orpc.requestId');
 
     const rootInterceptor: RootLoggingInterceptor = async (
       options: RootLoggingInterceptorOptions,
     ) => {
-      requestStartTime = performance.now();
-      currentRequestId = crypto.randomUUID().split('-')[0];
-      const requestLogger = logger.with({ requestId: currentRequestId, service: serviceName });
+      const startTime = performance.now();
+      const requestId = createRequestId();
+      const requestLogger = logger.with({ requestId, service: serviceName });
 
       if (debug) {
         requestLogger.debug('RPC request started');
       }
 
       try {
-        const result = await options.next();
+        const result = await options.next({
+          ...options,
+          context: { ...options.context, [requestIdKey]: requestId },
+        });
 
         if (debug && hasMatchedResult(result)) {
           requestLogger.debug('RPC request completed', {
-            duration: Math.round(performance.now() - (requestStartTime ?? 0)),
+            duration: Math.round(performance.now() - startTime),
           });
         }
 
@@ -206,7 +255,7 @@ export class LoggingPlugin {
 
         requestLogger[serverErrorLevel]('RPC request failed', {
           code: err.code ?? 'UNKNOWN',
-          duration: Math.round(performance.now() - (requestStartTime ?? 0)),
+          duration: Math.round(performance.now() - startTime),
           error: err.message,
         });
 
@@ -226,7 +275,7 @@ export class LoggingPlugin {
         return await options.next();
       }
 
-      const requestId = currentRequestId ?? 'unknown';
+      const requestId = readRequestId(options.context, requestIdKey);
       const procedureLogger = logger.with({
         procedure: procedurePath,
         requestId,
@@ -235,9 +284,9 @@ export class LoggingPlugin {
 
       if (debug || startLevel === 'info') {
         procedureLogger[startLevel]('RPC procedure started', {
-          inputSummary: formatInputSummary(options.input, debug, maxInputKeys),
+          inputSummary: formatInputSummary(options.input, debug, maxInputKeys, redactor),
           ...(logInputKeys ? { inputKeys: extractInputKeys(options.input, maxInputKeys) } : {}),
-          ...(debug && options.input ? { input: redactSensitiveFields(options.input) } : {}),
+          ...(debug && options.input ? { input: redactor.redact(options.input) } : {}),
         });
       }
 
@@ -307,12 +356,22 @@ export interface LoggerContext {
  * @returns Logger context with logger and request ID.
  */
 export function createLoggerContext(serviceName: string): LoggerContext {
-  const requestId = crypto.randomUUID().split('-')[0];
+  const requestId = createRequestId();
 
   return {
     logger: getLogger(['netscript', 'services', serviceName]).with({ requestId }),
     requestId,
   };
+}
+
+function createRequestId(): string {
+  return crypto.randomUUID().split('-')[0];
+}
+
+/** Reads the request ID the root interceptor stored in this request's oRPC context. */
+function readRequestId(context: LoggingInterceptorContext | undefined, key: symbol): string {
+  const requestId = context?.[key];
+  return typeof requestId === 'string' ? requestId : 'unknown';
 }
 
 function shouldSkipPath(path: string, skipPaths: readonly string[]): boolean {
@@ -332,7 +391,12 @@ function extractInputKeys(input: unknown, maxKeys: number): string[] {
     : keys;
 }
 
-function formatInputSummary(input: unknown, debug: boolean, maxKeys: number): string {
+function formatInputSummary(
+  input: unknown,
+  debug: boolean,
+  maxKeys: number,
+  redactor: FieldRedactor,
+): string {
   if (!input || typeof input !== 'object') {
     return '';
   }
@@ -343,7 +407,10 @@ function formatInputSummary(input: unknown, debug: boolean, maxKeys: number): st
   }
 
   if (debug) {
-    const formatted = entries.slice(0, 5).map(([key, value]) => `${key}=${formatValue(key, value)}`)
+    const formatted = entries.slice(0, 5)
+      .map(([key, value]) =>
+        `${key}=${redactor.isSensitiveKey(key) ? REDACTED_VALUE : formatValue(value)}`
+      )
       .join(', ');
     return entries.length > 5 ? `${formatted}, ...+${entries.length - 5} more` : formatted;
   }
@@ -354,11 +421,7 @@ function formatInputSummary(input: unknown, debug: boolean, maxKeys: number): st
     : keys.join(', ');
 }
 
-function formatValue(key: string, value: unknown): string {
-  if (isSensitiveKey(key)) {
-    return '[REDACTED]';
-  }
-
+function formatValue(value: unknown): string {
   if (value === null) return 'null';
   if (value === undefined) return 'undefined';
   if (typeof value === 'string') {
@@ -368,26 +431,6 @@ function formatValue(key: string, value: unknown): string {
   if (Array.isArray(value)) return `[${value.length} items]`;
   if (typeof value === 'object') return `{${Object.keys(value).length} keys}`;
   return String(value);
-}
-
-function redactSensitiveFields(obj: unknown): unknown {
-  if (!obj || typeof obj !== 'object') {
-    return obj;
-  }
-
-  const result: Record<string, unknown> = {};
-
-  for (const [key, value] of Object.entries(obj)) {
-    if (isSensitiveKey(key)) {
-      result[key] = '[REDACTED]';
-    } else if (typeof value === 'object' && value !== null) {
-      result[key] = redactSensitiveFields(value);
-    } else {
-      result[key] = value;
-    }
-  }
-
-  return result;
 }
 
 function formatResultSummary(result: unknown): string {
@@ -417,11 +460,6 @@ function formatResultSummary(result: unknown): string {
 
   const keys = Object.keys(obj);
   return keys.length <= 3 ? `{${keys.join(', ')}}` : `{${keys.length} fields}`;
-}
-
-function isSensitiveKey(key: string): boolean {
-  const normalized = key.toLowerCase();
-  return SENSITIVE_FIELD_FRAGMENTS.some((fragment) => normalized.includes(fragment));
 }
 
 function toLoggableError(error: unknown): Error & {

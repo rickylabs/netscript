@@ -10,6 +10,7 @@ import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
 import { StringTemplateAdapter } from '../../adapters/scaffold/template-adapter.ts';
 import { generateServiceDenoJson } from './generate-service-deno-json.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
 const serviceMainTemplate =
   "/**\r\n * {{serviceName | pascalCase}} Service\r\n *\r\n * Type-safe {{serviceName}} API with oRPC.\r\n */\r\n\r\nimport { defineService } from '@netscript/service';\r\nimport { router } from './router.ts';\r\n\r\nawait defineService(router, {\r\n  name: '{{serviceName}}',\r\n  version: '1.0.0',\r\n  port: parseInt(Deno.env.get('PORT') || '{{servicePort}}'),\r\n  openapi: {\r\n    title: '{{serviceName | pascalCase}} API',\r\n    description: '{{serviceName}} service',\r\n  },\r\n  debug: true,\r\n});\r\n";
 const serviceRouterTemplate =
@@ -102,6 +103,15 @@ describe('service template rendering', () => {
           output.indexOf("description: 'team-members service'") &&
         output.indexOf("description: 'team-members service'") < output.indexOf('debug: true'),
     );
+  });
+
+  it('new service entrypoints opt into a bounded request-body limit', async () => {
+    const adapter = makeAdapter();
+    for (const key of ['service/main.ts.template', 'service/main.memory.ts.template'] as const) {
+      const output = await adapter.render(EMBEDDED_TEMPLATE_CONTENT[key], SAMPLE_SERVICE_VARS);
+
+      assertStringIncludes(output, 'bodyLimit: { maxBytes: 1024 * 1024 },', key);
+    }
   });
 
   it('router.ts preserves the validated service-local health contract shape', async () => {
