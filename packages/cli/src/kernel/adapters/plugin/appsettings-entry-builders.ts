@@ -7,6 +7,7 @@ import type {
   SagaStoreBackend,
 } from '../../domain/plugin-kind.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import { resolveHostPort } from '../../templates/aspire/helpers/register/render-http-endpoint.ts';
 
 const PROJECT_ROOT_WORKDIR = '.';
 
@@ -35,6 +36,23 @@ export function buildPluginEntry(
     entry.Description = options.description;
   }
   return entry;
+}
+
+/**
+ * Carry the host-port pin of the plugin entry being replaced into its rebuilt successor.
+ *
+ * `HostPort` is operator-owned: it comes from `--port` or a hand edit, never from the plugin
+ * itself, and it usually backs an address registered elsewhere (an OAuth callback). A re-run
+ * without `--port` (`plugins update`, a forced re-add) must not silently un-pin it. A pin on
+ * `next` wins; the deprecated `Port` alias is carried as `HostPort`; an unpinned predecessor
+ * leaves `next` unpinned, so nothing is ever pinned by default.
+ */
+export function carryHostPortPin(next: PluginEntry, previous: PluginEntry | undefined): PluginEntry {
+  if (previous === undefined || resolveHostPort(next) !== undefined) {
+    return next;
+  }
+  const hostPort = resolveHostPort(previous);
+  return hostPort === undefined ? next : { ...next, HostPort: hostPort };
 }
 
 /** Build an appsettings API service entry for a background plugin. */
