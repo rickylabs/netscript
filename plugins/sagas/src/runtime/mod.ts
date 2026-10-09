@@ -63,6 +63,7 @@ export type {
 } from '@netscript/plugin-sagas-core/domain';
 export type {
   SagaPublisherBatchMode,
+  SagaPublisherEndpointDiagnostic,
   SagaPublisherPort,
   SagaPublisherPublishManyOptions,
   SagaPublisherPublishOptions,
