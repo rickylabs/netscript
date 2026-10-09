@@ -27,7 +27,7 @@ describe('resolveNetScriptImports', () => {
             '/jobs/health-check.ts',
           ),
           '@netscript/auth-kv-oauth': netscriptJsrSpecifier('auth-kv-oauth'),
-          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@0.8.0',
+          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@0.8.1',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
         },
@@ -43,7 +43,7 @@ describe('resolveNetScriptImports', () => {
           'jsr:@netscript/plugin-workers/jobs/health-check.ts':
             '../../../monorepo/plugins/workers/jobs/health-check.ts',
           '@netscript/auth-kv-oauth': '../../../monorepo/packages/auth-kv-oauth/mod.ts',
-          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@0.8.0',
+          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@0.8.1',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
         },
@@ -67,7 +67,7 @@ describe('resolveNetScriptImports', () => {
       imports['@netscript/service'],
       'jsr:@netscript/service',
     );
-    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@0.8.0');
+    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@0.8.1');
     assertStringIncludes(imports['@std/path'], 'jsr:@std/path');
     assertStringIncludes(imports['zod'], 'npm:zod');
   });
@@ -92,7 +92,7 @@ describe('resolveNetScriptImports', () => {
       '../../packages/auth-kv-oauth/mod.ts',
     );
     // External deps still use registry
-    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@0.8.0');
+    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@0.8.1');
     assertStringIncludes(imports['@std/path'], 'jsr:@std/path');
     assertStringIncludes(imports['zod'], 'npm:zod');
   });
