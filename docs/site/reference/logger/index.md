@@ -96,18 +96,51 @@ documented here from each entrypoint's own `deno doc` surface.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `Logger` | interface | Re-export of the root `Logger` type for consumers that import only the oRPC sub-path. |
-| `RootLoggingInterceptorOptions` | interface | Root-interceptor input containing the `next` callback. Consumers meet it when implementing or testing a root logging interceptor. |
-| `ClientLoggingInterceptorOptions` | interface | Procedure-interceptor input containing the procedure input, path, and `next` callback. Consumers meet it when implementing or testing a client interceptor. |
+| `LoggingInterceptorContext` | type alias | Request-scoped oRPC context seen by the logging interceptors; the root interceptor forwards it to every procedure interceptor of the same request. |
+| `RootLoggingInterceptorOptions` | interface | Root-interceptor input containing the request-scoped `context` and a `next` callback that accepts replacement options. Consumers meet it when implementing or testing a root logging interceptor. |
+| `ClientLoggingInterceptorOptions` | interface | Procedure-interceptor input containing the request-scoped `context`, the procedure input, path, and `next` callback. Consumers meet it when implementing or testing a client interceptor. |
 | `RootLoggingInterceptor` | type alias | Root-level interceptor signature that wraps the next interceptor or handler and resolves to its result. |
 | `ClientLoggingInterceptor` | type alias | Procedure-level interceptor signature that can inspect the procedure input and path before delegating. |
 | `LoggingInterceptor` | type alias | Union accepted by the plugin's root and client interceptor arrays. |
 | `LoggingHandlerOptions` | interface | Mutable handler options whose interceptor arrays `LoggingPlugin.init` creates or appends to. Consumers meet it when initializing the plugin outside the concrete oRPC handler type. |
 | `LogLevelConfig` | interface | Optional log levels for procedure start, success, client-error, and server-error events. |
-| `LoggingPluginOptions` | interface | Plugin configuration for service identity, debug behavior, levels, input summaries, skipped paths, and an optional custom logger. |
-| `LoggingPlugin` | class | oRPC handler plugin that installs a root request interceptor and a procedure interceptor to log request start, completion, and failure. |
+| `LoggingPluginOptions` | interface | Plugin configuration for service identity, debug behavior, levels, input summaries, skipped paths, extra debug redaction fields (`redactFields`), and an optional custom logger. |
+| `LoggingPlugin` | class | oRPC handler plugin that installs a root request interceptor and a procedure interceptor to log request start, completion, and failure, with every line correlated to its own request by `requestId`. |
 | `createLoggingPlugin` | function | Constructs a `LoggingPlugin`; use it as the factory alternative to calling the class constructor directly. |
 | `LoggerContext` | interface | Logger and generated request ID returned for injection into an oRPC handler context. |
 | `createLoggerContext` | function | Creates a service-scoped logger with a generated request ID and returns both as a `LoggerContext`. |
+
+### Request correlation and debug redaction
+
+`LoggingPlugin` logs are correlated: every request and procedure line carries the `requestId` of
+the request it belongs to, and request durations are measured from that request's own start, also
+under concurrent traffic. The root interceptor passes the ID to procedure interceptors through the
+request's own oRPC context (`next({ context })`) rather than through state shared across requests.
+Procedures inside one batched request share that request's ID.
+
+In debug mode the plugin logs the procedure `input` and an `inputSummary` of top-level values. Both
+apply the same case-insensitive redaction, replacing sensitive values with `[REDACTED]`:
+
+- **Default fragments** match by substring: `password`, `token`, `secret`, `key`, `auth`,
+  `credential`, `apikey`, `sessionid`, `accesstoken`, `refreshtoken`, `jwttoken`.
+- **Default exact names** match the whole key only: `handle` and `prompt`. Exact matching keeps keys
+  such as `handler` visible; a key like `systemPrompt` is not covered by default.
+- **`redactFields`** adds substring fragments on top of the defaults. Pass `'prompt'` to also redact
+  `systemPrompt`, or a domain field such as `'brief'` (which also matches `briefing`).
+
+```ts
+import { LoggingPlugin } from '@netscript/logger/orpc';
+
+const plugin = new LoggingPlugin({
+  serviceName: 'cockpit',
+  debug: true,
+  redactFields: ['brief', 'prompt'],
+});
+```
+
+Services built with `@netscript/service` pass the same option through `.withRPC({ debug: true,
+redactFields: ['brief'] })`. Redaction runs inside the service's RPC handler, so it covers
+service-to-service traffic made under a service identity exactly as it covers browser calls.
 
 ---
 
