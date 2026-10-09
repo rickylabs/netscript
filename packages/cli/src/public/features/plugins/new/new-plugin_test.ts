@@ -1,4 +1,5 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
+import { walk } from 'jsr:@std/fs@^1/walk';
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
@@ -7,8 +8,7 @@ import { createNewPluginCommand } from './new-plugin-command.ts';
 import { z } from 'zod';
 import { JSR_SPECIFIERS } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
-import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
-import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
+import { generateDenoJson } from '../../../../kernel/templates/workspace/deno-json.ts';
 
 describe('plugin new use case', () => {
   it('registers a generated plugin by default', async () => {
@@ -125,18 +125,50 @@ describe('plugin new use case', () => {
 });
 
 describe('plugin new formatting', () => {
-  it('writes TypeScript that is already canonical for the generated format gate', async () => {
-    const fs = new MemoryFileSystemAdapter();
-    const formatter = new DenoGeneratedSourceFormatter(new DenoProcess());
-    const result = await createNewPlugin(
-      { name: 'guarded-fixture', projectRoot: '/workspace/app' },
-      { fs, formatter },
-    );
-    const sources = result.filesCreated.filter((path) => path.endsWith('.ts'));
-    assertEquals(sources.length > 0, true);
-    for (const path of sources) {
-      const written = await fs.readFile(path);
-      assertEquals(await formatter.formatContent(path, written), written, path);
+  it('passes the generated workspace format check through the public CLI', async () => {
+    const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-plugin-new-fmt-' });
+    try {
+      const workspace = z.object({ fmt: z.record(z.string(), z.unknown()) }).parse(
+        JSON.parse(generateDenoJson({
+          name: 'fmt-probe',
+          appName: 'web',
+          workspaceMembers: [],
+          importMode: 'jsr',
+        })),
+      );
+      await Deno.writeTextFile(`${projectRoot}/deno.json`, '{}\n');
+      // The generated root deno.json fmt policy, isolated from its registered workspace members.
+      const fmtConfig = `${projectRoot}/fmt-policy.json`;
+      await Deno.writeTextFile(fmtConfig, JSON.stringify({ fmt: workspace.fmt }));
+      await Deno.writeTextFile(
+        `${projectRoot}/netscript.config.ts`,
+        "import { defineConfig } from '@netscript/config';\nexport default defineConfig({\n  plugins: [],\n});\n",
+      );
+      const cli = new URL('../../../../../bin/netscript.ts', import.meta.url).pathname;
+      const generated = await new Deno.Command(Deno.execPath(), {
+        args: ['run', '-A', cli, 'plugin', 'new', 'guarded-fixture', '--project-root', projectRoot],
+        stdout: 'null',
+        stderr: 'piped',
+      }).output();
+      assertEquals(generated.code, 0, new TextDecoder().decode(generated.stderr));
+      const sources: string[] = [];
+      for (const root of ['packages/plugin-guarded-fixture-core', 'plugins/guarded-fixture']) {
+        for await (const entry of walk(`${projectRoot}/${root}`, { exts: ['.ts'] })) {
+          sources.push(entry.path);
+        }
+      }
+      const checked = await new Deno.Command(Deno.execPath(), {
+        args: ['fmt', '--check', '--config', fmtConfig, ...sources],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      assertEquals(
+        checked.code,
+        0,
+        new TextDecoder().decode(checked.stdout) + new TextDecoder().decode(checked.stderr),
+      );
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
     }
   });
 
