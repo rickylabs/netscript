@@ -47,7 +47,10 @@ export function buildPluginEntry(
  * `next` wins; the deprecated `Port` alias is carried as `HostPort`; an unpinned predecessor
  * leaves `next` unpinned, so nothing is ever pinned by default.
  */
-export function carryHostPortPin(next: PluginEntry, previous: PluginEntry | undefined): PluginEntry {
+export function carryHostPortPin(
+  next: PluginEntry,
+  previous: PluginEntry | undefined,
+): PluginEntry {
   if (previous === undefined || resolveHostPort(next) !== undefined) {
     return next;
   }
