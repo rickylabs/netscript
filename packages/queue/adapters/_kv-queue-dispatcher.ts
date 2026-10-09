@@ -256,12 +256,23 @@ export class KvQueueDispatcher {
       resolve();
       return promise;
     }
-    const route: KvQueueRoute = { handler, end: resolve, fail: reject };
-    signal.addEventListener('abort', () => {
+    const leave = () => {
       this.#routes.remove(queueName, route);
       this.#stopLoopWhenIdle();
       resolve();
-    }, { once: true });
+    };
+    const route: KvQueueRoute = {
+      handler,
+      end: () => {
+        signal.removeEventListener('abort', leave);
+        resolve();
+      },
+      fail: (error) => {
+        signal.removeEventListener('abort', leave);
+        reject(error);
+      },
+    };
+    signal.addEventListener('abort', leave, { once: true });
     this.#routes.add(queueName, route);
     this.#startLoop();
     return promise;
@@ -359,7 +370,7 @@ export class KvQueueDispatcher {
     }
     const store = new KvDeadLetterStore({ queueName: envelope.queueName, denoKv: await this.kv() });
     await store.append(toDeadLetterRecord(
-      { ...envelope, queueName: envelope.queueName },
+      envelope,
       'unroutable',
       {
         errorMessage:
