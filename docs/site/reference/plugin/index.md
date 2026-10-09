@@ -40,6 +40,8 @@ and template assets live on the sub-path exports listed at the end of this page.
 | `PluginError` | class | Base error for plugin package failures. |
 | `PluginValidationError` | class | Error thrown when a plugin definition is invalid. |
 | `PluginCompositionError` | class | Error thrown when manifests cannot be composed into one root host; carries structured `diagnostics`. |
+| `PluginCompositionDiagnostic` | interface | One structured composition failure: `code`, `plugin`, `message`, and optional `axis`, `identity`, `conflictsWith`. |
+| `PluginCompositionDiagnosticCode` | type alias | Stable composition failure codes. |
 | `DuplicatePluginError` | class | Error thrown when a plugin name is registered more than once. |
 
 ## Contributions

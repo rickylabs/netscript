@@ -53,6 +53,10 @@ export {
   PluginError,
   PluginValidationError,
 } from './src/domain/mod.ts';
+export type {
+  PluginCompositionDiagnostic,
+  PluginCompositionDiagnosticCode,
+} from './src/domain/mod.ts';
 export { PluginContribution } from './src/abstracts/mod.ts';
 export type { ContributionAxis } from './src/abstracts/mod.ts';
 export {
