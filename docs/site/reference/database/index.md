@@ -248,3 +248,25 @@ The isolated native provider command is `bash .llm/tools/command-postgres-confor
 Its dedicated CI workflow runs Deno 2.9.5 and exercises the real generated-client lock/fault matrix.
 A skipped provider suite is not provider conformance evidence. Package import/construction runs no
 DDL and has no queue dependency.
+
+### Command outbox relay
+
+The raw `CommandOutboxRelayStore` contains no decoded payload, service, worker or queue type.
+`createPostgresCommandOutboxRelayStore` uses the consumer-owned migration and true transaction
+callback. It claims due unpublished/nonterminal rows with bounded SKIP LOCKED leases; publication
+and release fence the live token and expiry. Publication and normalized acceptance identity/time
+share one CAS write. The consumer must apply the reviewed incremental acceptance migration;
+framework code never runs DDL. Retry/terminal rows retain stable IDs. Sink acceptance precedes
+settlement, so crashes redeliver and downstream operations must remain idempotent.
+
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `COMMAND_RELAY_FAILURE_CLASSES` | const | `readonly tuple` | Six closed persistence failure classes. |
+| `CommandRelayFailureClass` | type alias | `type CommandRelayFailureClass` | Finite failure vocabulary. |
+| `ClaimedCommandOutboxRow` | type alias | `type ClaimedCommandOutboxRow` | Raw leased outbox row. |
+| `CommandOutboxAcceptance` | type alias | `type CommandOutboxAcceptance` | Checked normalized identity and time. |
+| `CommandOutboxClaim` | type alias | `type CommandOutboxClaim` | Bounded explicit clock and generation request. |
+| `CommandOutboxPublication` | type alias | `type CommandOutboxPublication` | One live-token publication and receipt write. |
+| `CommandOutboxRelease` | type alias | `type CommandOutboxRelease` | Retry or retained terminal state. |
+| `CommandOutboxRelayStore` | interface | `interface CommandOutboxRelayStore` | Raw claim/mark/release port. |
+| `createPostgresCommandOutboxRelayStore` | function | `function createPostgresCommandOutboxRelayStore(root, options): CommandOutboxRelayStore` | Callback-bound PostgreSQL lease and settlement adapter. |

@@ -1,0 +1,184 @@
+[
+  {
+    "test": "PostgreSQL relay claims are bounded disjoint due-only and preserve stable identity",
+    "productionFile": "packages/database/src/commands/adapters/create-postgres-command-outbox-relay-store.ts",
+    "mutation": "due-only",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969"
+  },
+  {
+    "test": "PostgreSQL relay live-token publication atomically stores checked acceptance and refuses stale expiry",
+    "productionFile": "packages/database/src/commands/adapters/create-postgres-command-outbox-relay-store.ts",
+    "mutation": "acceptance",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969"
+  },
+  {
+    "test": "PostgreSQL relay retries clear leases retain ids and terminal release fences every generation",
+    "productionFile": "packages/database/src/commands/adapters/create-postgres-command-outbox-relay-store.ts",
+    "mutation": "retry-instant",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969"
+  },
+  {
+    "test": "real PostgreSQL generated-client relay-store conformance",
+    "productionFile": "packages/database/src/commands/adapters/create-postgres-command-outbox-relay-store.ts",
+    "mutation": "due-only",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969",
+    "sharedMutation": "due-only",
+    "wrapperAssertsNativeChildExit": true
+  },
+  {
+    "test": "relay decodes canonical payload and W3C before publication and refuses corrupt rows or missing sinks",
+    "productionFile": "packages/service/src/commands/relay/relay-delivery.ts",
+    "mutation": "trace-validation",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "7c37fd2deebf3ab4c0f7947dcac16748a1ac3ad6dbe736663804ff34b7a31329"
+  },
+  {
+    "test": "relay publishes before settlement with copied registry fresh generations and normalized acceptance",
+    "productionFile": "packages/service/src/commands/relay/relay-delivery.ts",
+    "mutation": "normalized-receipt",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "7c37fd2deebf3ab4c0f7947dcac16748a1ac3ad6dbe736663804ff34b7a31329"
+  },
+  {
+    "test": "relay publication then settlement crash redelivers stable key with explicitly idempotent downstream persistence",
+    "productionFile": "packages/service/src/commands/relay/create-command-outbox-relay.ts",
+    "mutation": "uncertain-settlement",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "09276e5e050f69e390254c2cd1db5aeb2d11c9fa03bee2fd089a81c4b29c431d"
+  },
+  {
+    "test": "relay bounds retry attempts failure classes malformed receipts and invalid backoff without losing ownership",
+    "productionFile": "packages/service/src/commands/relay/create-command-outbox-relay.ts",
+    "mutation": "attempt-bound",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "09276e5e050f69e390254c2cd1db5aeb2d11c9fa03bee2fd089a81c4b29c431d"
+  },
+  {
+    "test": "relay stop aborts publishers and awaits all overlapping drains under one concurrency ceiling",
+    "productionFile": "packages/service/src/commands/relay/create-command-outbox-relay.ts",
+    "mutation": "global-concurrency",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "09276e5e050f69e390254c2cd1db5aeb2d11c9fa03bee2fd089a81c4b29c431d"
+  },
+  {
+    "test": "relay observer failures preserve exactly one publication and finite privacy-safe tracing inputs",
+    "productionFile": "packages/service/src/commands/relay/relay-observer.ts",
+    "mutation": "private-tracing-start",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "303114dab177963479adba1220ea9438c495e50ddf11f431202ec40f480171d7"
+  },
+  {
+    "test": "worker command sink checks job and task acceptance and forwards stable key correlation and W3C",
+    "productionFile": "packages/plugin-workers-core/src/integration/commands/worker-command-sink.ts",
+    "mutation": "worker-stable-key",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "c3d91f5253d52fde539e3ebee7413a14968c7c801b349d2bba640d13d314adf6"
+  },
+  {
+    "test": "worker command sink refuses absent malformed mismatched or unchecked receipt and aborted delivery",
+    "productionFile": "packages/plugin-workers-core/src/integration/commands/worker-command-sink.ts",
+    "mutation": "worker-target-check",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "c3d91f5253d52fde539e3ebee7413a14968c7c801b349d2bba640d13d314adf6"
+  },
+  {
+    "test": "stream command sink waits delivered completion and forwards stable identity and correlation for upsert delete",
+    "productionFile": "packages/plugin-streams-core/src/integration/commands/stream-command-sink.ts",
+    "mutation": "stream-waits-delivery",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "d4eb66e1e03b322f845587725876af51119ffb1a8a6d1ed1adb2a2115286d53f"
+  },
+  {
+    "test": "stream command sink refuses rejected unknown cancelled malformed acceptance and invalid payload before publication",
+    "productionFile": "packages/plugin-streams-core/src/integration/commands/stream-command-sink.ts",
+    "mutation": "stream-refuses-rejection",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "d4eb66e1e03b322f845587725876af51119ffb1a8a6d1ed1adb2a2115286d53f"
+  },
+  {
+    "test": "stream command identity is serialized with correlation and stable producer tuple through native retry and duplicate acknowledgement",
+    "productionFile": "packages/plugin-streams-core/src/application/create-durable-stream.ts",
+    "mutation": "stream-wire-identity",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "f6118c4af1c3532a86f3dec7f5196fc9cb39479fc3dd550faccafdac11e6b449"
+  },
+  {
+    "test": "saga command sink uses checked publisher and stable outbox identity correlation and W3C",
+    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
+    "mutation": "saga-stable-key",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "db76e9c2b8f12cbc8a8b97e7f03d07c842ceda20ba1319267c6ce21266a1e336"
+  },
+  {
+    "test": "saga command sink refuses checked rejection unavailable malformed or mismatched receipt and aborted delivery",
+    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
+    "mutation": "saga-checked-receipt",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "db76e9c2b8f12cbc8a8b97e7f03d07c842ceda20ba1319267c6ce21266a1e336"
+  },
+  {
+    "test": "saga command sink refuses checked rejection unavailable malformed or mismatched receipt and aborted delivery",
+    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
+    "mutation": "saga-message-match",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "db76e9c2b8f12cbc8a8b97e7f03d07c842ceda20ba1319267c6ce21266a1e336"
+  }
+]

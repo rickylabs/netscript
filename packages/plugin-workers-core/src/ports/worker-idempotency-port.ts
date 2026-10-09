@@ -27,7 +27,11 @@ export type WorkerIdempotencyClaim = Readonly<{
   alreadyApplied: boolean;
 }>;
 
-/** Durable applied-keys store used to make worker effects exactly-once-effective. */
+/**
+ * At-least-once worker delivery with an applied-key guard window.
+ * A crash after a remote effect and before markApplied can repeat that effect;
+ * one effective application requires independently idempotent downstream persistence.
+ */
 export interface WorkerIdempotencyPort {
   /** Atomically claim this delivery before running effects. */
   claim(input: WorkerIdempotencyInput): Promise<WorkerIdempotencyClaim>;

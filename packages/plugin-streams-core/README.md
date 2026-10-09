@@ -159,3 +159,24 @@ zero permissions.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## Checked command relay sink
+
+`./integration/commands` exports `createStreamCommandOutboxSink`. Supply an existing
+`StreamProducerPort`; topic selects a collection and payload is either
+`{ operation: 'upsert', value: { id: 'entity', ... } }` or
+`{ operation: 'delete', key: 'entity' }`. The adapter forwards the stable outbox id as
+`StreamWriteContextV1.messageId` and the command correlation. The existing producer serializes
+both into State Protocol headers and owns W3C producer context, buffering and bounded retries.
+Only eventual `delivered` completion acknowledges the relay, including native duplicate-tuple
+acknowledgements. Local FIFO acceptance alone, rejection, cancellation or delivery-unknown cannot
+settle the outbox. Cancellation is cooperative around completion; this sink never stops the
+consumer-owned producer. Native transport retries retain their producer tuple; relay redelivery
+is a new producer operation with the same message id. Downstream processing must be idempotent.
+No producer, queue or resource starts on sink construction.
+
+```ts
+import { createStreamCommandOutboxSink, type StreamProducerPort } from '@netscript/plugin-streams-core/integration/commands';
+declare const producer: StreamProducerPort;
+const sink = createStreamCommandOutboxSink({ id: 'streams', producer });
+```

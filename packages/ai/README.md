@@ -205,7 +205,7 @@ per-turn spans and tool-call events.
 
 Some state belongs to one run but must stay invisible to the model — the ids of documents just
 ingested, the tenant or auth subject, a correlation id. `AgentLoopInput.context` is the supported
-channel for it. Anything else you might reach for is a path *to* the provider:
+channel for it. Anything else you might reach for is a path _to_ the provider:
 `GenerationOptions.providerOptions` merges verbatim into the adapter's `modelOptions`, and message
 text is, of course, exactly what the model reads.
 
@@ -232,10 +232,10 @@ for await (
 The bag is opaque to the engine — it reads no key and serializes it nowhere. It is delivered to
 exactly two places:
 
-| Consumer                | How it arrives                                                                      |
-| ----------------------- | ----------------------------------------------------------------------------------- |
-| TanStack AI middleware  | `chat({ context, metadata })` — `metadata` is documented as never forwarded onto the provider wire request |
-| Tool handlers           | `ToolInvocationOptions.context` on a `ToolHandler`; `AiToolInvocationContext.metadata` on a `defineAiTool(...).server()` definition |
+| Consumer               | How it arrives                                                                                                                      |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| TanStack AI middleware | `chat({ context, metadata })` — `metadata` is documented as never forwarded onto the provider wire request                          |
+| Tool handlers          | `ToolInvocationOptions.context` on a `ToolHandler`; `AiToolInvocationContext.metadata` on a `defineAiTool(...).server()` definition |
 
 ```typescript
 import { createToolRegistry, defineAiTool } from '@netscript/ai/tools';
@@ -308,10 +308,10 @@ if (search) {
 }
 ```
 
-When registering pooled tools, the optional signal passed to `registerMcpTools` bounds discovery
-and later automatic re-sync operations for that registration. It is not reused by registered tool
-calls. Use a registration-lifetime signal rather than a one-shot startup timeout; individual
-transport calls accept their own operation-specific signal.
+When registering pooled tools, the optional signal passed to `registerMcpTools` bounds discovery and
+later automatic re-sync operations for that registration. It is not reused by registered tool calls.
+Use a registration-lifetime signal rather than a one-shot startup timeout; individual transport
+calls accept their own operation-specific signal.
 
 Retry only the degraded server instead of rebuilding healthy peers:
 
@@ -334,21 +334,21 @@ connection is closed rather than inserted into `readyClients`.
 
 ## Public surface
 
-| Entry                 | What it gives you                                                                                 |
-| --------------------- | ------------------------------------------------------------------------------------------------- |
-| `.`                   | `createAiRuntime` / `getAiRuntime`, model + embeddings + vision registries, `composeSystemPrompt` |
+| Entry                 | What it gives you                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------------ |
+| `.`                   | `createAiRuntime` / `getAiRuntime`, model + embeddings + vision registries, `composeSystemPrompt`      |
 | `./contracts`         | Domain types (`Message`, `ToolDescriptor`, `Usage`, `RequestContext`, …) and the typed error hierarchy |
-| `./ports`             | Capability seams (`TelemetryPort`, `AgentMemoryPort`, `McpTransportPort`, …) with safe defaults   |
-| `./tools`             | `defineAiTool`, `createToolRegistry`, the `renderUiTool` wire contract                            |
-| `./agent`             | `createAgentLoop`, `slidingWindowHistory`, the loop's port seams                                  |
-| `./skills`            | `SKILL.md` loader: metadata-only discovery, tag/embedding matching, on-demand load                |
-| `./mcp`               | MCP transports, transport pool, `ui://` resource extraction, tool bridging                        |
-| `./testing`           | Deterministic fake ports for downstream unit tests                                                |
-| `./anthropic`         | Self-registering Anthropic provider (wraps `@tanstack/ai-anthropic`)                              |
-| `./openai-compatible` | Self-registering OpenAI-compatible chat + vision provider                                         |
-| `./openrouter`        | Self-registering OpenRouter provider + reasoning-model options                                    |
-| `./ollama`            | Self-registering Ollama provider with injectable reachability port                                |
-| `./openai-embeddings` | Self-registering OpenAI-compatible embeddings provider                                            |
+| `./ports`             | Capability seams (`TelemetryPort`, `AgentMemoryPort`, `McpTransportPort`, …) with safe defaults        |
+| `./tools`             | `defineAiTool`, `createToolRegistry`, the `renderUiTool` wire contract                                 |
+| `./agent`             | `createAgentLoop`, `slidingWindowHistory`, the loop's port seams                                       |
+| `./skills`            | `SKILL.md` loader: metadata-only discovery, tag/embedding matching, on-demand load                     |
+| `./mcp`               | MCP transports, transport pool, `ui://` resource extraction, tool bridging                             |
+| `./testing`           | Deterministic fake ports for downstream unit tests                                                     |
+| `./anthropic`         | Self-registering Anthropic provider (wraps `@tanstack/ai-anthropic`)                                   |
+| `./openai-compatible` | Self-registering OpenAI-compatible chat + vision provider                                              |
+| `./openrouter`        | Self-registering OpenRouter provider + reasoning-model options                                         |
+| `./ollama`            | Self-registering Ollama provider with injectable reachability port                                     |
+| `./openai-embeddings` | Self-registering OpenAI-compatible embeddings provider                                                 |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/ai@<version>`](https://jsr.io/@netscript/ai/doc) (pin `<version>` on the
@@ -375,3 +375,25 @@ the environment when not passed explicitly (`--allow-env`). The real telemetry a
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+### Qualified TanStack dependency family
+
+The provider bridge and Fresh AI client are qualified together on AI core `0.65.0`, Anthropic
+adapter `0.19.5`, OpenAI adapter `0.27.0`, MCP adapter `0.8.0`, and Preact adapter `0.19.5`. Adapter
+patch releases can change their AI core peer requirements, so these imports use exact versions.
+Update the family together.
+
+Run `deno task deps:check:ai-peers` before changing these declarations. The guard checks every
+currently admitted adapter version against admitted core versions, then resolves a consumer without
+the workspace lock or configuration and checks the resolved peers. CI includes this gate in
+`ci:quality`. To qualify a released artifact, append `--published-version <exact-version>`; this
+resolves the public Anthropic and OpenAI provider exports without consumer dependency overrides.
+
+This framework repair makes EIS-Chat's application-level TanStack AI compatibility pins removable
+once the coordinated framework release passes published-consumer qualification. A source PR or
+dry-run alone does not establish that release.
+
+The cold guard inventories every resolved npm release, including `openai-base` and external peer
+holders; it checks metadata without an adapter-name assumption. Fresh UI maintains a separate frozen
+consumer lock and must be updated when this family changes. The qualified versions respect the
+default dependency-age policy.

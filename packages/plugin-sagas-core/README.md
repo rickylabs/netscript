@@ -225,3 +225,21 @@ testing surface run with zero permissions.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## Checked command relay sink
+
+`./integration/commands` exports `createSagaCommandOutboxSink`. Supply an existing
+`SagaPublisherPort` at composition and register the returned sink with the service relay.
+It calls `publishSagaOrThrow` after the local command commit, forwards the stable outbox id as
+message/idempotency identity, and propagates correlation and W3C fields. Only a checked accepted
+receipt with matching message type and valid time settles the relay; rejected, unavailable or
+malformed responses leave the row unpublished. No queue or relay is added. Cancellation is
+cooperative before/after the awaited publisher because this port has no signal parameter;
+the supplied publisher owns its transport timeout. Publication followed by a crash before local
+settlement permits redelivery; downstream processing must be idempotent.
+
+```ts
+import { createSagaCommandOutboxSink, type SagaPublisherPort } from '@netscript/plugin-sagas-core/integration/commands';
+declare const publisher: SagaPublisherPort;
+const sink = createSagaCommandOutboxSink({ id: 'sagas', publisher });
+```

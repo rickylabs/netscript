@@ -467,6 +467,59 @@ scope or fingerprint closure changes that affect sampled identity, without execu
 or store. Its `sampled_equivalence` report is finite evidence, not a universal purity guarantee;
 command authors remain responsible for excluding clocks, randomness, mutable globals and IO.
 
+## Durable command outbox relay
+
+Import `createCommandOutboxRelay` and its options from `@netscript/service/commands/relay`.
+Database owns raw persistence; service decodes bounded canonical I-JSON, validates W3C fields,
+resolves a copied sink registry and supervises a bounded drain. Construction starts no timer,
+resource or queue. Schedule `drainOnce` with your existing scheduler and await `stop` on shutdown.
+
+```ts
+import { createCommandOutboxRelay } from '@netscript/service/commands/relay';
+import type { CommandOutboxRelayStore, CommandOutboxSink } from '@netscript/service/commands/relay';
+
+declare const store: CommandOutboxRelayStore;
+declare const sink: CommandOutboxSink;
+const relay = createCommandOutboxRelay({
+  store, sinks: new Map([[sink.id, sink]]),
+  clock: { now: () => new Date() }, ids: { next: () => crypto.randomUUID() },
+  batchSize: 16, concurrency: 4, leaseMs: 30000,
+  maxAttempts: 10, maxRetryDelayMs: 60000,
+  classify: () => 'unavailable',
+  retryAt: (attempt, now) => new Date(now.getTime() + Math.min(1000 * attempt, 60000)),
+});
+await relay.drainOnce();
+await relay.stop();
+```
+
+Overlapping drains serialize under one concurrency ceiling. Stop prevents new claims, signals
+active publishers and waits for all active and queued drains, including publishers that ignore
+cancellation. Aborted claimed rows are released only through their owned token; expired ownership
+remains for a later claim. Caller cancellation is cooperative and passed to provider/sink operations.
+Finite provider timeouts and sink timeouts belong to their supplied boundaries.
+
+A generic sink may resolve void at its documented acceptance boundary. Checked worker sinks return
+only normalized `{ identity, acceptedAt }`; service validates and snapshots both before database
+settlement. Payload/trace corruption or missing sinks become `misconfigured`; unchecked acceptance
+becomes `invalid_response`. The six closed failure classes are persisted without exception text.
+Invalid retry policies retain terminal `misconfigured` state rather than losing ownership. Claim or
+uncertain settlement failures surface to your scheduler; an uncertain settlement is not repaired by
+releasing a possibly committed lease.
+
+Publish always precedes settlement. A crash after acceptance and before durable publication marking
+redelivers the stable outbox ID/dedupe key. This is at-least-once delivery. One effective operation
+requires an independently idempotent downstream persistence boundary. The semantic fixture proves
+its own applied-key persistence explicitly; it does not certify a remote transport.
+
+Supply optional `telemetry` and explicit `provider` for the structurally compatible C4 relay/publish
+adapter. Start inputs select only command name/version, provider, isolation and finite idempotency;
+raw identities, topic, payload and errors are excluded. Deferred publication restores the validated
+persisted parent; the active producer context is injected for downstream consumers. Observer setup,
+finish and end errors do not change the once-only operation result. Import/construction needs no
+permissions; supplied provider/sinks need their consumer-owned permissions.
+
+## Command telemetry
+
 Command execution can use `createOtelCommandTelemetryPort` from `@netscript/telemetry/commands`,
 configured with the registered command definitions. Its structural port traces early rejected and
 cancelled attempts as well as committed/replayed attempts. Definitions are verified before tracing;

@@ -2,7 +2,7 @@
 export interface StreamWriteContextV1 {
   /** Stable correlation identity; the entity key is used when absent or empty. */
   readonly correlationId?: string;
-  /** Stable message identity; the entity key is used when absent or empty. */
+  /** Stable message identity in telemetry and State Protocol headers; entity key is the fallback. */
   readonly messageId?: string;
 }
 
