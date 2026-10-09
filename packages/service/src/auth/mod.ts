@@ -54,7 +54,7 @@ export type {
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
 } from './contract-policy.ts';
-export { createContractAuthorizer } from './contract-authorizer.ts';
+export { createContractAuthorizer } from './contract/contract-authorizer.ts';
 export {
   createScopeAuthorizer,
   type ScopeAuthorizationRule,

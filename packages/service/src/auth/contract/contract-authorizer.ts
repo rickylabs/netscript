@@ -4,7 +4,7 @@
  * @module
  */
 
-import type { ContractAuthorizerOptions } from './options.ts';
+import type { ContractAuthorizerOptions } from '../options.ts';
 import type {
   ContractPolicyAuthorizerPort,
   ContractPolicyBindingOptions,
@@ -13,7 +13,7 @@ import type {
   ProcedurePolicyRequest,
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
-} from './contract-policy.ts';
+} from '../contract-policy.ts';
 import {
   compilePathPattern,
   isWithinPrefix,
@@ -24,8 +24,8 @@ import {
   uniquePaths,
 } from './contract-path.ts';
 import { compileRawRoutes } from './contract-raw-routes.ts';
-import { authorizeRequirements } from './scope-authorizer.ts';
-import type { AuthzDecision, AuthzRequest } from './types.ts';
+import { authorizeRequirements } from '../scope-authorizer.ts';
+import type { AuthzDecision, AuthzRequest } from '../types.ts';
 
 const OPTIONAL_AUTHENTICATION_ERROR =
   '[netscript.service.contract-policy] optional authentication is unsupported';

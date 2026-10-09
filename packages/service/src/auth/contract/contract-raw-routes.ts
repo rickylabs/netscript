@@ -5,8 +5,8 @@
  */
 
 import { normalizePath } from './contract-path.ts';
-import type { ProcedureAccessPolicy } from './contract-policy.ts';
-import type { ContractAuthorizerRawRoute } from './options.ts';
+import type { ProcedureAccessPolicy } from '../contract-policy.ts';
+import type { ContractAuthorizerRawRoute } from '../options.ts';
 
 const INVALID_RAW_ROUTE_ERROR = '[netscript.service.contract-policy] invalid raw route';
 const NON_EXACT_PATH_SYNTAX = /[*:{}?#]/;
