@@ -8,6 +8,7 @@ import {
   type CascadedMessage,
   DEFAULT_RETRY_POLICY,
   type RetryPolicy,
+  type SagaCompensationError,
   type SagaContext,
   type SagaCorrelationKey,
   type SagaDefinition,
@@ -19,6 +20,7 @@ import {
   type SagaState,
   type SagaStateEnvelope,
 } from '../domain/mod.ts';
+import { resolveCompensationStatus, resolveTransitionStatus } from '../domain/saga-status.ts';
 import type {
   SagaAppliedKeyStore,
   SagaBusPort,
@@ -55,6 +57,34 @@ export type SagaEngineHandleResult<TState extends SagaState = SagaState> = Reado
   spanContext?: SagaTraceParent;
   completed: boolean;
   alreadyApplied: boolean;
+  /** Persisted version this transition left the instance at; absent without a store. */
+  version?: number;
+}>;
+
+/** Outcome of one `.compensate()` branch, ready to persist as the instance's next transition. */
+export type SagaCompensationOutcome<TState extends SagaState = SagaState> = Readonly<{
+  sagaId: SagaId;
+  instanceId: SagaInstanceId;
+  correlationKey: SagaCorrelationKey;
+  /** Message the compensation branch handled. */
+  message: SagaMessage;
+  /** Persisted version the compensation ran against; the commit expects exactly this version. */
+  version: number;
+  /** State after the branch ran, or the pre-compensation state when it threw. */
+  state: TState;
+  /** Effects the branch returned; empty when it threw. */
+  cascaded: readonly CascadedMessage[];
+  /** Error thrown by the branch; persists the instance as `failed`. */
+  error?: unknown;
+}>;
+
+/** Result of persisting a compensation outcome. */
+export type SagaCompensationCommit = Readonly<{
+  /** False when this outcome was already committed (replay); nothing new was written. */
+  committed: boolean;
+  status: SagaInstanceStatus;
+  /** Version the outcome is committed at; absent without a store. */
+  version?: number;
 }>;
 
 /** Retry classification used by the native engine before DLQ handoff. */
@@ -191,6 +221,53 @@ export class SagaEngine implements SagaBusPort {
     return Object.freeze(results);
   }
 
+  /**
+   * Persist the outcome of a `.compensate()` branch as the next transition of its instance.
+   *
+   * The commit takes the same path as an `.on()` transition: it expects the version the
+   * compensation ran against, bumps it, and carries a replay identity derived from that version,
+   * so a redelivered outcome reports `committed: false` instead of being applied twice.
+   */
+  async commitCompensation(outcome: SagaCompensationOutcome): Promise<SagaCompensationCommit> {
+    if (!this.#running) {
+      throw SagasError.validationFailed('SagaEngine must be started before committing outcomes.');
+    }
+    const definition = this.#definitions.get(outcome.sagaId);
+    if (!definition) throw SagasError.sagaNotFound(outcome.sagaId);
+    const status = outcome.error === undefined
+      ? resolveCompensationStatus(outcome.cascaded)
+      : 'failed';
+    if (!this.#store) return Object.freeze({ committed: true, status });
+
+    const version = outcome.version + 1;
+    const replayKey = `saga-compensation-v1:${outcome.version}`;
+    if (!definition.durableWorkerCommands) {
+      const replay = await this.#appliedKeys.recordApplied(outcome.instanceId, replayKey);
+      if (!replay.applied) return Object.freeze({ committed: false, status, version });
+    }
+    const loaded = await this.#store.load(outcome.instanceId);
+    if (!loaded) throw SagasError.sagaInstanceNotFound(outcome.instanceId);
+    const committed = await this.#persistTransition({
+      definition,
+      commands: [],
+      instanceId: outcome.instanceId,
+      correlationKey: outcome.correlationKey,
+      loaded,
+      expectedVersion: outcome.version,
+      previousState: loaded.state,
+      state: cloneState(outcome.state),
+      message: outcome.message,
+      completed: status === 'completed',
+      status,
+      now: new Date(),
+      replayIdentity: [definition.id, outcome.instanceId, replayKey],
+      compensationError: outcome.error === undefined
+        ? undefined
+        : toCompensationError(outcome.error),
+    });
+    return Object.freeze({ committed, status, version });
+  }
+
   /** Classify an error against a retry policy without mutating runtime state. */
   classifyRetry(
     error: unknown,
@@ -259,6 +336,7 @@ export class SagaEngine implements SagaBusPort {
             correlationKey,
             completed: false,
             alreadyApplied: true,
+            version: loaded?.metadata.version,
           });
         }
       }
@@ -324,7 +402,7 @@ export class SagaEngine implements SagaBusPort {
         );
         const completed = completion !== undefined;
         const state = cloneState(saga.state);
-        const status = resolvePersistedStatus(cascaded, loaded?.metadata.status);
+        const status = resolveTransitionStatus(cascaded, loaded?.metadata.status);
         const outcome = telemetryOutcomeFromStatus(status);
         const completeSpan = completion
           ? this.#instrumentation.startCascadeCompleteSpan({
@@ -345,12 +423,16 @@ export class SagaEngine implements SagaBusPort {
             correlationKey,
             commands,
             loaded,
+            expectedVersion: loaded?.metadata.version,
             previousState,
             state,
             message,
             completed,
             status,
             now: context.now,
+            replayIdentity: message.idempotencyKey === undefined
+              ? undefined
+              : ['saga-inbound-v1', entry.sagaId, instanceId, message.idempotencyKey],
           });
           if (!committed) {
             if (completeSpan) this.#instrumentation.finishSpan(completeSpan, outcome);
@@ -366,6 +448,7 @@ export class SagaEngine implements SagaBusPort {
               spanContext,
               completed: loaded?.metadata.status === 'completed',
               alreadyApplied: true,
+              version: loaded?.metadata.version,
             });
           }
           if (completeSpan) {
@@ -403,6 +486,7 @@ export class SagaEngine implements SagaBusPort {
           spanContext,
           completed,
           alreadyApplied: false,
+          version: this.#store ? (loaded?.metadata.version ?? 0) + 1 : undefined,
         });
       } catch (error) {
         this.#instrumentation.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);
@@ -431,18 +515,25 @@ export class SagaEngine implements SagaBusPort {
       instanceId: SagaInstanceId;
       correlationKey: SagaCorrelationKey;
       loaded?: SagaStateEnvelope;
+      /** Version the store must hold; absent when the instance is new. */
+      expectedVersion?: number;
       previousState: SagaState;
       state: SagaState;
       message: SagaMessage;
       completed: boolean;
       status: SagaInstanceStatus;
       now: Date;
+      /** Digest parts identifying this transition across redelivery, for atomic stores. */
+      replayIdentity?: readonly string[];
+      compensationError?: SagaCompensationError;
     }>,
   ): Promise<boolean> {
     if (!this.#store) return true;
 
-    const previousVersion = input.loaded?.metadata.version ?? 0;
+    const previousVersion = input.expectedVersion ?? 0;
     const nextVersion = previousVersion + 1;
+    const compensationError = input.compensationError ??
+      input.loaded?.metadata.compensationError;
     const envelope: SagaStateEnvelope = Object.freeze({
       metadata: Object.freeze({
         instanceId: input.instanceId,
@@ -454,6 +545,7 @@ export class SagaEngine implements SagaBusPort {
         completedAt: input.completed ? input.now : input.loaded?.metadata.completedAt,
         traceparent: input.message.traceparent ?? input.loaded?.metadata.traceparent,
         tracestate: input.message.tracestate ?? input.loaded?.metadata.tracestate,
+        ...(compensationError === undefined ? {} : { compensationError }),
       }),
       state: input.state,
     });
@@ -474,14 +566,9 @@ export class SagaEngine implements SagaBusPort {
       },
     };
     if (input.definition.durableWorkerCommands) {
-      const appliedKeyHash = input.message.idempotencyKey === undefined
+      const appliedKeyHash = input.replayIdentity === undefined
         ? undefined
-        : await sagaCommandDigest([
-          'saga-inbound-v1',
-          input.definition.id,
-          input.instanceId,
-          input.message.idempotencyKey,
-        ]);
+        : await sagaCommandDigest(input.replayIdentity);
       return (await requireSagaTransitionStore(this.#store).commitTransition({
         expectedVersion: previousVersion,
         envelope,
@@ -491,7 +578,7 @@ export class SagaEngine implements SagaBusPort {
         ...(appliedKeyHash === undefined ? {} : { appliedKeyHash }),
       })).committed;
     }
-    await this.#store.save(envelope, { expectedVersion: input.loaded?.metadata.version });
+    await this.#store.save(envelope, { expectedVersion: input.expectedVersion });
     await this.#store.saveCorrelation(correlation);
     await this.#store.appendTransition(input.instanceId, record);
     return true;
@@ -576,28 +663,14 @@ function cloneState<TState extends SagaState>(state: TState): TState {
   return structuredClone(state);
 }
 
-function resolvePersistedStatus(
-  cascaded: readonly CascadedMessage[],
-  previousStatus?: SagaInstanceStatus,
-): SagaInstanceStatus {
-  if (cascaded.some((item) => item.kind === 'fail')) {
-    return 'failed';
-  }
-  if (cascaded.some((item) => item.kind === 'compensate')) {
-    return 'compensating';
-  }
-  if (cascaded.some((item) => item.kind === 'complete')) {
-    return 'completed';
-  }
-  if (previousStatus && isTerminalStatus(previousStatus)) {
-    return previousStatus;
-  }
-  return 'running';
-}
+const MAX_COMPENSATION_ERROR_MESSAGE_LENGTH = 1_024;
 
-function isTerminalStatus(status: SagaInstanceStatus): boolean {
-  return status === 'completed' || status === 'failed' || status === 'compensating' ||
-    status === 'cancelled';
+function toCompensationError(error: unknown): SagaCompensationError {
+  const message = error instanceof Error ? error.message : String(error);
+  return Object.freeze({
+    name: error instanceof Error ? error.name : typeof error,
+    message: message.slice(0, MAX_COMPENSATION_ERROR_MESSAGE_LENGTH),
+  });
 }
 
 function telemetryOutcomeFromStatus(status: SagaInstanceStatus): SagaTelemetryOutcome {

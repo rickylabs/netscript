@@ -5,6 +5,7 @@ import type {
   CascadedMessage,
   SagaCorrelationKey,
   SagaDefinition,
+  SagaId,
   SagaInstanceId,
   SagaMessage,
   SagaState,
@@ -28,11 +29,11 @@ const INSTANCE_ID = `${SAGA_ID}:${CORRELATION_KEY}` as SagaInstanceId;
 
 function refundSaga(
   mode: StoreMode,
-  compensation: (saga: { state: Ledger }) => readonly CascadedMessage[],
+  compensation: (saga: { state: SagaState }) => readonly CascadedMessage[],
 ): SagaDefinition {
   // Before #1990 a sagaFail returned here was routed back into this same branch without end.
   let runs = 0;
-  const builder = defineSaga(SAGA_ID).state<Ledger>({ payment: 'captured' });
+  const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
   return (mode.atomic ? builder.durableWorkerCommands() : builder)
     .on('FulfillmentFailed', () => [
       sagaCompensate({ type: 'RefundPayment', payload: {} }, 'out of stock'),
@@ -40,7 +41,7 @@ function refundSaga(
     .compensate('RefundPayment', (saga) => {
       runs += 1;
       if (runs > 1) throw new Error('compensation branch re-entered');
-      return compensation(saga as { state: Ledger });
+      return compensation(saga);
     })
     .build() as SagaDefinition;
 }
@@ -140,7 +141,7 @@ for (const mode of STORE_MODES) {
   });
 
   Deno.test(`${mode.name}: sagaFail from .on() persists the outcome of its compensate branch`, async () => {
-    const builder = defineSaga(SAGA_ID).state<Ledger>({ payment: 'captured' });
+    const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
     const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
       .on('PaymentDisputed', () => [sagaFail('disputed')])
       .compensate('PaymentDisputed', (saga) => {
@@ -164,7 +165,7 @@ for (const mode of STORE_MODES) {
     // The documented order-saga shape: the compensate branch is keyed on the failing message type
     // and returns sagaFail. Before #1990 the bridge routed that sagaFail back into the same branch.
     let runs = 0;
-    const builder = defineSaga(SAGA_ID).state<Ledger>({ payment: 'captured' });
+    const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
     const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
       .on('FulfillmentFailed', (_saga, message) => [sagaCompensate(message, 'out of stock')])
       .compensate('FulfillmentFailed', (saga) => {
@@ -222,7 +223,7 @@ for (const mode of STORE_MODES) {
   });
 
   Deno.test(`${mode.name}: a legacy compensating row is non-terminal but never silently reopened`, async () => {
-    const builder = defineSaga(SAGA_ID).state<Ledger>({ payment: 'captured' });
+    const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
     const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
       .on('Heartbeat', () => [])
       .on('RefundSettled', (saga) => {
@@ -244,7 +245,7 @@ for (const mode of STORE_MODES) {
       state: { payment: 'captured' },
     });
     await store.saveCorrelation({
-      sagaId: SAGA_ID,
+      sagaId: SAGA_ID as SagaId,
       correlationKey: CORRELATION_KEY,
       instanceId: INSTANCE_ID,
     });
@@ -262,7 +263,7 @@ for (const mode of STORE_MODES) {
 Deno.test('compensation cascades still dispatch send effects after the outcome is persisted', async () => {
   const observed: string[] = [];
   const definition = defineSaga(SAGA_ID)
-    .state<Ledger>({ payment: 'captured' })
+    .state<SagaState>({ payment: 'captured' })
     .on('FulfillmentFailed', () => [sagaCompensate({ type: 'RefundPayment', payload: {} })])
     .on('RefundRecorded', () => {
       observed.push('RefundRecorded');

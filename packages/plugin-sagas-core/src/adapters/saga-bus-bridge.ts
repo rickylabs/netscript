@@ -26,7 +26,11 @@ import type {
   SagaCompensationResult,
   SagaCompensator,
 } from '../runtime/saga-compensator.ts';
-import type { SagaEngine } from '../runtime/saga-engine.ts';
+import type {
+  SagaCompensationCommit,
+  SagaCompensationOutcome,
+  SagaEngine,
+} from '../runtime/saga-engine.ts';
 import type { SagaSchedulerPort } from '../runtime/saga-scheduler.ts';
 import {
   type SagaInstrumentation,
@@ -186,6 +190,7 @@ export class SagaBusBridge implements SagaBusPort {
         correlationKey: result.correlationKey,
         parent: result.spanContext,
         instrumentation: this.#instrumentation,
+        version: result.version,
       };
       for (const cascaded of result.cascaded) {
         await this.#dispatchOne(cascaded, request);
@@ -232,17 +237,37 @@ export class SagaBusBridge implements SagaBusPort {
       instrumentation: this.#instrumentation ?? request.instrumentation,
     };
     let result: SagaCompensationResult;
-    if (message.kind === 'fail') {
-      result = await this.#compensator.compensateFailure(executionRequest, message);
-    } else {
-      result = await this.#compensator.compensateCascaded(
-        executionRequest.definition,
-        executionRequest.instanceId,
-        executionRequest.state,
-        message,
-        executionRequest,
-      );
+    try {
+      if (message.kind === 'fail') {
+        result = await this.#compensator.compensateFailure(executionRequest, message);
+      } else {
+        result = await this.#compensator.compensateCascaded(
+          executionRequest.definition,
+          executionRequest.instanceId,
+          executionRequest.state,
+          message,
+          executionRequest,
+        );
+      }
+    } catch (error) {
+      await this.#commitCompensation(request, {
+        message: compensationMessage(message, request),
+        state: request.state,
+        cascaded: [],
+        error,
+      });
+      throw error;
     }
+    // A sagaFail without a matching branch ran nothing; its `failed` status is already persisted.
+    if (!result.compensated) return;
+
+    const commit = await this.#commitCompensation(request, {
+      message: result.message,
+      state: result.state,
+      cascaded: result.cascaded,
+    });
+    // A replayed outcome was dispatched when it was first committed.
+    if (commit?.committed === false) return;
 
     const nextRequest: SagaCompensationRequest = {
       ...request,
@@ -252,10 +277,29 @@ export class SagaBusBridge implements SagaBusPort {
       correlationKey: result.correlationKey,
       parent: result.spanContext,
       instrumentation: executionRequest.instrumentation,
+      version: commit?.version,
     };
     for (const cascaded of result.cascaded) {
+      // The branch's sagaFail is its persisted outcome; dispatching it would re-enter the branch.
+      if (cascaded.kind === 'fail') continue;
       await this.#dispatchOne(cascaded, nextRequest);
     }
+  }
+
+  /** Persist a compensation outcome through the engine; undefined when there is no version. */
+  async #commitCompensation(
+    request: SagaCompensationRequest,
+    outcome: Pick<SagaCompensationOutcome, 'message' | 'state' | 'cascaded' | 'error'>,
+  ): Promise<SagaCompensationCommit | undefined> {
+    // Storeless engines, and resolver-supplied requests without a version, have nothing to commit.
+    if (request.version === undefined || request.correlationKey === undefined) return undefined;
+    return await this.#engine.commitCompensation({
+      ...outcome,
+      sagaId: request.definition.id,
+      instanceId: request.instanceId,
+      correlationKey: request.correlationKey,
+      version: request.version,
+    });
   }
 
   async #dispatchSend(
@@ -344,6 +388,15 @@ function withPublishOptions(message: SagaMessage, options: SagaPublishOptions): 
     traceparent: options.traceparent ?? message.traceparent,
     tracestate: options.tracestate ?? message.tracestate,
   });
+}
+
+function compensationMessage(
+  message: CascadedMessage<'fail' | 'compensate'>,
+  request: SagaCompensationRequest,
+): SagaMessage {
+  return message.kind === 'compensate' && 'type' in message.message
+    ? message.message
+    : request.message;
 }
 
 function cascadeContext(request?: SagaCompensationRequest): Readonly<{
