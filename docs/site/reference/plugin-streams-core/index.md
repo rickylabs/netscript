@@ -28,6 +28,7 @@ instances, sessions — into durable topics.
 | `@netscript/plugin-streams-core/sse` | `./src/sse/mod.ts` | 33 | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. |
 | `@netscript/plugin-streams-core/telemetry` | `./src/telemetry/mod.ts` | 33 | Telemetry registration, span names, attribute keys, and the meter/counter/gauge ports used by reconnect metrics. |
 | `@netscript/plugin-streams-core/testing` | `./src/testing/mod.ts` | 4 | An in-memory producer and a small schema fixture for tests that must not open network sockets. |
+| `@netscript/plugin-streams-core/integration/commands` | `./commands.ts` | 18 | Checked producer-delivery sink for the service command relay. |
 
 Export counts are the symbol counts `deno doc` reports for each entrypoint; a few domain types are
 re-exported through more than one subpath.
@@ -178,3 +179,24 @@ one `execution` collection). Tests written against these run without network per
 ---
 
 Back to the [reference overview](/reference/).
+
+## Checked command sink
+
+`createStreamCommandOutboxSink` uses the existing `StreamProducerPort` with an explicit
+upsert/delete payload envelope. Stable outbox message identity and correlation are passed through
+the supported context and serialized in State Protocol headers. Existing producer instrumentation
+owns W3C context and the producer owns all buffering/retries. The sink awaits `delivered` completion;
+FIFO acceptance, rejection, cancellation and delivery-unknown cannot settle. Native duplicate
+acknowledgements count as delivery. Relay redelivery starts a new producer operation with the same
+message identity, so downstream processing must be independently idempotent. Cancellation is
+cooperative around completion; the supplied producer retains lifecycle and permission ownership.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createStreamCommandOutboxSink` | function | Compose a checked existing-producer delivery sink. |
+| `StreamCommandSinkOptions` | type alias | Relay registry identity and consumer-owned producer. |
+| `CommandJson` | type alias | Service-owned canonical decoded payload. |
+| `CommandTraceContext` | type alias | Service-owned validated W3C fields. |
+| `CommandOutboxDelivery` | type alias | Service-owned decoded delivery. |
+| `CommandOutboxSink` | interface | Service-owned documented acceptance boundary. |
+| `CommandOutboxAcceptance` | type alias | Service-owned normalized identity/time. |

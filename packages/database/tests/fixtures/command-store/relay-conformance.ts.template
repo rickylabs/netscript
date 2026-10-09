@@ -1,0 +1,67 @@
+import { PrismaClient } from './.generated/client.ts';
+import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
+import { createPostgresCommandOutboxRelayStore } from '../../../commands-postgres.ts';
+import { transactionClient } from './command-store.ts';
+const socket = Deno.env.get('COMMAND_POSTGRES_SOCKET');
+if (!socket) throw new Error('real PostgreSQL socket required');
+const root = new PrismaClient({ adapter: new PrismaPg({ host: socket, database: 'postgres', user: Deno.env.get('PGUSER'), port: Number(Deno.env.get('PGPORT')) }) });
+const store = createPostgresCommandOutboxRelayStore(transactionClient(root), { transactionTimeoutMs: 5000 });
+const now = new Date(1000);
+const base = {executionId:'execution',commandName:'project.rename',commandVersion:1,destination:'worker',topic:'job.rename',payloadJson:'{}',dedupeKey:'stable',correlationId:'correlation',availableAt:new Date(0)};
+async function reset() { await root.netScriptCommandOutbox.deleteMany(); }
+function claim(claimToken:string,at=now,limit=2) { return store.claim({claimToken,now:at,leaseMs:100,limit}); }
+Deno.test('PostgreSQL relay claims are bounded disjoint due-only and preserve stable identity', async () => {
+ await reset();
+ await root.netScriptCommandOutbox.createMany({data:[
+ {id:'a',...base},{id:'b',...base},{id:'c',...base},
+ {id:'future',...base,availableAt:new Date(5000)},
+ {id:'published',...base,publishedAt:new Date(0)},
+ {id:'terminal',...base,terminalAt:new Date(0)},
+ {id:'held',...base,claimToken:'other',claimUntil:new Date(5000)},
+ ]});
+ const batches=await Promise.all([claim('one'),claim('two')]);
+ const rows=batches.flat(); assertEquals(rows.length,3); assertEquals(new Set(rows.map(r=>r.id)).size,3);
+ assert(batches.every(rows=>rows.length<=2)); assertEquals(rows.map(r=>r.id).sort(),['a','b','c']);
+ for(const row of rows){assertEquals(row.dedupeKey,'stable');assertEquals(row.attemptCount,1);assertEquals(row.claimUntil,new Date(1100));assertEquals(row.commandName,'project.rename');}
+ assertEquals((await claim('three')).length,0);
+ await reset();
+});
+Deno.test('PostgreSQL relay live-token publication atomically stores checked acceptance and refuses stale expiry', async () => {
+ await reset(); await root.netScriptCommandOutbox.create({data:{id:'a',...base}});
+ const [first]=await claim('first'); assert(first);
+ const expired={id:first.id,claimToken:first.claimToken,publishedAt:new Date(1100)};
+ assertEquals(await store.markPublished(expired),false);
+ const [replacement]=await claim('replacement',new Date(1100)); assertEquals(replacement.attemptCount,2);
+ assertEquals(await store.markPublished({...expired,publishedAt:new Date(1101)}),false);
+ const valid={id:'a',claimToken:'replacement',publishedAt:new Date(1101),acceptance:{identity:'run-accepted',acceptedAt:new Date(1100)}};
+ await assertRejects(()=>store.markPublished({...valid,acceptance:{identity:'',acceptedAt:new Date(1100)}}),TypeError);
+ await assertRejects(()=>store.markPublished({...valid,acceptance:{identity:'run-accepted',acceptedAt:new Date(NaN)}}),TypeError);
+ assertEquals((await root.netScriptCommandOutbox.findUniqueOrThrow({where:{id:'a'}})).publishedAt,null);
+ assertEquals(await store.markPublished(valid),true);
+ const row=await root.netScriptCommandOutbox.findUniqueOrThrow({where:{id:'a'}});
+ assertEquals([row.publishedAt,row.acceptanceIdentity,row.acceptedAt,row.claimToken,row.claimUntil],[new Date(1101),'run-accepted',new Date(1100),null,null]);
+ assertEquals(await store.markPublished(valid),false); assertEquals((await claim('again',new Date(2000))).length,0);
+ await reset();
+});
+Deno.test('PostgreSQL relay retries clear leases retain ids and terminal release fences every generation', async () => {
+ await reset(); await root.netScriptCommandOutbox.create({data:{id:'a',...base}});
+ await claim('first');
+ const release={id:'a',claimToken:'first',now:new Date(1001),failure:'unavailable' as const,disposition:'retry' as const,retryAt:new Date(1500)};
+ assertEquals(await store.release({...release,claimToken:'wrong'}),false);
+ assertEquals(await store.release({...release,now:new Date(1100)}),false);
+ assertEquals(await store.release(release),true);
+ const retry=await root.netScriptCommandOutbox.findUniqueOrThrow({where:{id:'a'}});
+ assertEquals([retry.id,retry.dedupeKey,retry.availableAt,retry.claimToken,retry.claimUntil,retry.lastFailure],['a','stable',new Date(1500),null,null,'unavailable']);
+ assertEquals((await claim('early',new Date(1499))).length,0);
+ const [second]=await claim('second',new Date(1500));assertEquals(second.attemptCount,2);
+ assertEquals(await store.release(release),false);
+ assertEquals(await store.release({id:'a',claimToken:'second',now:new Date(1501),failure:'rejected',disposition:'terminal',terminalAt:new Date(1501)}),true);
+ const terminal=await root.netScriptCommandOutbox.findUniqueOrThrow({where:{id:'a'}});
+ assertEquals([terminal.terminalAt,terminal.claimToken,terminal.claimUntil,terminal.lastFailure],[new Date(1501),null,null,'rejected']);
+ assertEquals((await claim('after',new Date(2000))).length,0);
+ await assertRejects(()=>claim('',now),TypeError);
+ await assertRejects(()=>store.claim({limit:65,leaseMs:100,now,claimToken:'bounded'}),TypeError);
+ const signal=AbortSignal.abort();await assertRejects(()=>store.claim({limit:1,leaseMs:100,now,claimToken:'aborted'},signal));
+ await reset();await root.$disconnect();
+});

@@ -1,0 +1,3 @@
+# C5 qualified context
+
+S11–S14 complete. Independent opposite-family round 1 PASS at product `a2af12d90f569786f3668e35ad87a8527531f9a2`. Seventeen named tests/eighteen assertion mutation/restoration rows; root/static/quality/architecture, 442 scoped regressions, physical PostgreSQL, all owned public/publish/dependency graphs and four pinned generated consumers qualify. Native product core and PostgreSQL 104/SQLite 99 full-runtime steps pass. Canonical committed locks equal retained actual gate inputs. Artifact-only follow-up preserves all 4736 non-run files. Live final-head CI/acceptance/review-thread closure remains pending; never merge or force push. C6 not implemented in this branch.

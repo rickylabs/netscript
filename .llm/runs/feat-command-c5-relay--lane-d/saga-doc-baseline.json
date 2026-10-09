@@ -1,0 +1,20 @@
+{
+  "baselineExit": 1,
+  "currentFullMapExit": 1,
+  "newEntrypointExit": 0,
+  "unchangedCombinedDiagnostics": 9,
+  "unchangedDiagnosticFiles": [
+    {
+      "file": "packages/plugin-sagas-core/src/telemetry/otel-saga-telemetry.ts",
+      "sha256": "2f9c9b65590d29fecc8db4fc6f70e64df1313cbb9c57adc734c66bb06abbff9c"
+    },
+    {
+      "file": "packages/plugin-sagas-core/src/contracts/v1/sagas.contract.ts",
+      "sha256": "b5bc97ee1deaf0e85eee85aa46e462813d2e839ef2d3898ffc34a76c1d9d88ab"
+    },
+    {
+      "file": "packages/plugin-sagas-core/src/stores/prisma-saga-store.ts",
+      "sha256": "3d47824b0ff2da3fed05f0f9f57f1ddf87ab50618cecf6f7b2175f5fffe74bf9"
+    }
+  ]
+}

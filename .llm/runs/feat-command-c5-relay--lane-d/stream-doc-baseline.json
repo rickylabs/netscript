@@ -1,0 +1,12 @@
+{
+  "baselineFullMapExit": 1,
+  "currentCombinedExit": 0,
+  "newEntrypointExit": 0,
+  "unchangedLegacyEntrypointExitCodes": {
+    "./mod.ts": 1,
+    "./src/sse/mod.ts": 0,
+    "./src/telemetry/mod.ts": 1,
+    "./src/testing/mod.ts": 1
+  },
+  "legacyCombinedDiagnostics": 0
+}

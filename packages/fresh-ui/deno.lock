@@ -146,7 +146,7 @@
     "npm:esbuild@~0.25.5": "0.25.7",
     "npm:ioredis@^5.11.1": "5.11.1",
     "npm:ioredis@^5.8.2": "5.11.1",
-    "npm:jose@^6.2.3": "6.2.3",
+    "npm:jose@^6.2.3": "6.2.12",
     "npm:json-canon@^1.0.1": "1.0.1",
     "npm:jsonld@9": "9.0.0",
     "npm:mysql2@^3.22.5": "3.22.5_@types+node@26.0.1",
@@ -710,7 +710,6 @@
         "@opentelemetry/semantic-conventions",
         "@standard-schema/spec",
         "better-call",
-        "jose@6.2.3",
         "kysely",
         "nanostores",
         "zod@4.4.3"
@@ -1209,7 +1208,7 @@
         "cross-spawn",
         "eventsource",
         "eventsource-parser",
-        "jose@6.2.12",
+        "jose",
         "pkce-challenge",
         "zod@4.4.3"
       ]
@@ -1234,7 +1233,7 @@
         "express",
         "express-rate-limit",
         "hono",
-        "jose@6.2.3",
+        "jose",
         "json-schema-typed",
         "pkce-challenge",
         "raw-body",
@@ -1725,7 +1724,7 @@
       "dependencies": [
         "@anthropic-ai/sdk",
         "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-utils@0.4.0"
+        "@tanstack/ai-utils"
       ]
     },
     "@tanstack/ai-anthropic@0.19.5_@tanstack+ai@0.65.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
@@ -1733,7 +1732,7 @@
       "dependencies": [
         "@anthropic-ai/sdk",
         "@tanstack/ai@0.65.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-utils@0.4.1"
+        "@tanstack/ai-utils"
       ]
     },
     "@tanstack/ai-client@0.29.2_@opentelemetry+api@1.9.1_zod@4.4.3": {
@@ -1741,7 +1740,7 @@
       "dependencies": [
         "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
         "@tanstack/ai-event-client@0.11.2",
-        "@tanstack/ai-utils@0.4.0"
+        "@tanstack/ai-utils"
       ]
     },
     "@tanstack/ai-client@0.37.0_@opentelemetry+api@1.9.1_zod@4.4.3": {
@@ -1749,7 +1748,7 @@
       "dependencies": [
         "@tanstack/ai@0.65.0_@opentelemetry+api@1.9.1_zod@4.4.3",
         "@tanstack/ai-event-client@0.13.1",
-        "@tanstack/ai-utils@0.4.1"
+        "@tanstack/ai-utils"
       ]
     },
     "@tanstack/ai-event-client@0.11.2": {
@@ -1778,7 +1777,7 @@
         "@modelcontextprotocol/client",
         "@modelcontextprotocol/server",
         "@tanstack/ai@0.65.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "jose@6.2.12"
+        "jose"
       ],
       "bin": true
     },
@@ -1786,7 +1785,7 @@
       "integrity": "sha512-h/pIG+O1JZdrXq2AmCLLyf4Kr3VF8K8Hycj4yN23JIwJ+6HTp8LoAG9w8CRcL8wTGhWpuzDbMgdBExRNg9ZORQ==",
       "dependencies": [
         "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-utils@0.4.0",
+        "@tanstack/ai-utils",
         "@tanstack/openai-base@0.10.8_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
         "openai"
       ]
@@ -1795,7 +1794,7 @@
       "integrity": "sha512-LNNdld4q8ztpbuWWLznlErF7KX5HBZhDfC3UlzDIsMVMA56RRJZiW2i8RSH0weoIajoAeAWUjQLAo3c6RsC9EQ==",
       "dependencies": [
         "@tanstack/ai@0.65.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-utils@0.4.1",
+        "@tanstack/ai-utils",
         "@tanstack/openai-base@0.12.4_@tanstack+ai@0.65.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
         "openai"
       ]
@@ -1816,9 +1815,6 @@
         "preact"
       ]
     },
-    "@tanstack/ai-utils@0.4.0": {
-      "integrity": "sha512-xqvAgPJkIuGk1m+jZKyb7vBTQIaBmUD9EVzlPkDWWMp80n69uwL0TnBZCVk+OwL9goTQiFy648dnBfLsiJgl6A=="
-    },
     "@tanstack/ai-utils@0.4.1": {
       "integrity": "sha512-B3PGn2WYiRtivZCt7MUN2iXeoK9fwZhgdbrPIz5hPqVR8r8sNDZMmMqtiOkp7sxzPvVlCBItFVHw7QpZ9g6e9w=="
     },
@@ -1829,7 +1825,7 @@
         "@opentelemetry/api",
         "@standard-schema/spec",
         "@tanstack/ai-event-client@0.11.2",
-        "@tanstack/ai-utils@0.4.0",
+        "@tanstack/ai-utils",
         "partial-json"
       ],
       "optionalPeers": [
@@ -1843,7 +1839,7 @@
         "@opentelemetry/api",
         "@standard-schema/spec",
         "@tanstack/ai-event-client@0.13.1",
-        "@tanstack/ai-utils@0.4.1",
+        "@tanstack/ai-utils",
         "fast-json-patch",
         "partial-json"
       ],
@@ -1876,7 +1872,7 @@
       "integrity": "sha512-fNEKKuve6IJmAEzaGwRNwa8ypXSvjgbyezUZG0VRs8HUXfrdfSwoCVDpDeIEVIfP+a3UiiMUTa7uNyKUkgkVzw==",
       "dependencies": [
         "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-utils@0.4.0",
+        "@tanstack/ai-utils",
         "openai"
       ]
     },
@@ -1884,7 +1880,7 @@
       "integrity": "sha512-Z82PgFWyTmcsVHPuAcFTnbwfXtlh4/0PK8NDFACUBZm+ekSsQTzInzOLL7enW49vgEmbUrvH/V/jtWeKaE6pcw==",
       "dependencies": [
         "@tanstack/ai@0.65.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-utils@0.4.1",
+        "@tanstack/ai-utils",
         "openai"
       ]
     },
@@ -2157,7 +2153,7 @@
         "@prisma/client",
         "better-call",
         "defu",
-        "jose@6.2.3",
+        "jose",
         "kysely",
         "mysql2",
         "nanostores",
@@ -2790,9 +2786,6 @@
     },
     "jose@6.2.12": {
       "integrity": "sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw=="
-    },
-    "jose@6.2.3": {
-      "integrity": "sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw=="
     },
     "js-md4@0.3.2": {
       "integrity": "sha512-/GDnfQYsltsjRswQhN9fhv3EMw2sCpUdrdxyWDOUK7eyD++r3gRhzgiQgc/x4MAv2i1iuQ4lxO5mvqM3vj4bwA=="
@@ -4026,6 +4019,7 @@
           "jsr:@hono/hono@4.12.24",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
+          "jsr:@netscript/service@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@std/assert@1",
           "npm:zod@^4.4.3"
@@ -4041,6 +4035,7 @@
       },
       "packages/plugin-streams-core": {
         "dependencies": [
+          "jsr:@netscript/service@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@std/assert@1"
         ],
@@ -4072,6 +4067,7 @@
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
           "jsr:@netscript/plugin@0.0.7",
+          "jsr:@netscript/service@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
@@ -4151,6 +4147,7 @@
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
           "jsr:@netscript/database@0.0.7",
+          "jsr:@netscript/telemetry@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "npm:@orpc/client@^1.15.0",

@@ -95,7 +95,7 @@ form above is for custom hosts and tests.
 | `./extensions`        | JSON field registry and serialization utilities                                                 |
 | `./tracing`           | `enableInstrumentation` for Prisma OpenTelemetry spans                                          |
 | `./commands` | Bound command port, logical rows, store errors and true callback-client boundary |
-| `./commands/postgres` | `createPostgresCommandStore` over the consumer-owned schema and callback bridge |
+| `./commands/postgres` | `createPostgresCommandStore` and `createPostgresCommandOutboxRelayStore` over the consumer-owned schema and callback bridge |
 | `./testing`           | `runDatabaseAdapterContract`, `createMockDatabaseAdapter`                                       |
 
 The always-current symbol list is
@@ -152,3 +152,11 @@ Claims use the reviewed unique key with `INSERT ... ON CONFLICT DO NOTHING RETUR
 Prisma currently exposes nested transactions on its callback proxy. The consumer bridge sample hides root operations at runtime as well as in the generated alias. It preserves model delegates and uses the actual provider transaction for every side record. Table mappings match the reviewed sample migration; explicit mapping changes require a reviewed adapter/bridge migration.
 
 `bash .llm/tools/command-postgres-conformance.sh` runs the native generated-client provider gate with an isolated temporary Unix socket. The dedicated CI workflow uses Deno 2.9.5. A suite skipped without provider configuration never certifies PostgreSQL support. No database credentials, connection addresses or operational evidence belong in the public run artifacts.
+
+### PostgreSQL command outbox relay
+
+`createPostgresCommandOutboxRelayStore` from `@netscript/database/commands/postgres` binds the same true generated callback bridge, with an explicit finite transaction timeout. `CommandOutboxRelayStore` from `@netscript/database/commands` is raw storage: it owns bounded due-row claims, live generation/expiry fencing, retry/terminal retention, and one atomic publication plus normalized acceptance write. It imports no queue, service or worker package and runs no migration on construction or invocation.
+
+Apply the reviewed `tests/fixtures/command-store/relay-acceptance-migration.sql` through your consumer's migration workflow when upgrading the C3 table. The complete schema/migration fixture already contains paired `acceptanceIdentity`/`acceptedAt` columns. Claims require an explicit clock instant, opaque fresh `claimToken`, 1–64 rows and a 1–60,000 millisecond lease. Publication and release compare row identity, current token, unexpired lease, unpublished and nonterminal state. Release's `now` is the actual current instant, distinct from `retryAt`. Retry clears ownership and advances availability; terminal retains the row; neither changes message ID or dedupe key. Worker receipts persist only normalized identity/time, never raw transport responses.
+
+The generic relay acknowledges after the sink's documented acceptance boundary. A crash after acceptance and before settlement redelivers the same stable key. A lease expiration fences settlement even if nobody has claimed the row again. Consumer operations must remain idempotent; this is at-least-once delivery. The native PostgreSQL gate runs both command-store and relay-store generated-client conformance and owns its provider cleanup. Supplied provider operations need consumer-owned network permissions; framework construction needs none.
