@@ -4,7 +4,7 @@
  * @module
  */
 
-import type { ContractAuthorizerOptions, ContractAuthorizerRawRoute } from './options.ts';
+import type { ContractAuthorizerOptions } from './options.ts';
 import type {
   ContractPolicyAuthorizerPort,
   ContractPolicyBindingOptions,
@@ -14,15 +14,23 @@ import type {
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
 } from './contract-policy.ts';
+import {
+  compilePathPattern,
+  isWithinPrefix,
+  joinPath,
+  normalizePath,
+  relativePath,
+  toRouterPath,
+  uniquePaths,
+} from './contract-path.ts';
+import { compileRawRoutes } from './contract-raw-routes.ts';
 import { authorizeRequirements } from './scope-authorizer.ts';
 import type { AuthzDecision, AuthzRequest } from './types.ts';
 
 const OPTIONAL_AUTHENTICATION_ERROR =
   '[netscript.service.contract-policy] optional authentication is unsupported';
-const INVALID_RAW_ROUTE_ERROR = '[netscript.service.contract-policy] invalid raw route';
 const RAW_ROUTE_OVERLAP_ERROR =
   '[netscript.service.contract-policy] raw route overlaps the contract projection';
-const NON_EXACT_PATH_SYNTAX = /[*:{}?#]/;
 
 type ContractProcedure = Extract<
   ContractPolicyContract,
@@ -182,38 +190,6 @@ function normalizePolicy(
   });
 }
 
-function compileRawRoutes(
-  routes: readonly ContractAuthorizerRawRoute[],
-): ReadonlyMap<string, ProcedureAccessPolicy> {
-  const compiled = new Map<string, ProcedureAccessPolicy>();
-  for (const route of routes) {
-    const path = readRawRoutePath(route);
-    if (route.authentication !== 'required') {
-      throw new Error(`${INVALID_RAW_ROUTE_ERROR}: ${path} must require authentication`);
-    }
-    if (compiled.has(path)) {
-      throw new Error(`${INVALID_RAW_ROUTE_ERROR}: ${path} is declared more than once`);
-    }
-    compiled.set(
-      path,
-      Object.freeze({
-        authentication: 'required',
-        requiredScopes: readStringList(route.authorization?.scopes),
-        requiredRoles: readStringList(route.authorization?.roles),
-      }),
-    );
-  }
-  return compiled;
-}
-
-function readRawRoutePath(route: ContractAuthorizerRawRoute): string {
-  const path = route.path;
-  if (typeof path !== 'string' || !path.startsWith('/') || NON_EXACT_PATH_SYNTAX.test(path)) {
-    throw new Error(`${INVALID_RAW_ROUTE_ERROR}: ${String(path)} is not an exact absolute path`);
-  }
-  return normalizePath(path);
-}
-
 function createResolver(
   procedures: ProcedureIndex,
   rawRoutes: ReadonlyMap<string, ProcedureAccessPolicy>,
@@ -294,52 +270,6 @@ function remapDeprecatedRpcPath(
     }
   }
   return path;
-}
-
-function compilePathPattern(path: string): RegExp {
-  let source = '';
-  let index = 0;
-  for (const match of path.matchAll(/\{[^{}]+\}/g)) {
-    source += escapeRegExp(path.slice(index, match.index));
-    source += '[^/]+';
-    index = match.index + match[0].length;
-  }
-  source += escapeRegExp(path.slice(index));
-  return new RegExp(`^${source}/?$`);
-}
-
-function joinPath(prefix: string, path: string): string {
-  const normalizedPrefix = normalizePath(prefix);
-  const normalizedPath = normalizePath(path);
-  if (normalizedPrefix === '/') return normalizedPath;
-  if (normalizedPath === '/') return normalizedPrefix;
-  return `${normalizedPrefix}${normalizedPath}`;
-}
-
-function toRouterPath(segments: readonly string[]): string {
-  return normalizePath(`/${segments.join('/')}`);
-}
-
-function relativePath(path: string, prefix: string): string {
-  return normalizePath(path.slice(prefix.length));
-}
-
-function uniquePaths(paths: readonly string[]): string[] {
-  return [...new Set(paths.map(normalizePath))];
-}
-
-function normalizePath(path: string): string {
-  const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
-  const withoutTrailingSlash = withLeadingSlash.replace(/\/+$/, '');
-  return withoutTrailingSlash || '/';
-}
-
-function isWithinPrefix(path: string, prefix: string): boolean {
-  return path === prefix || path.startsWith(prefix === '/' ? '/' : `${prefix}/`);
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function readProperty(value: unknown, property: string): unknown {
