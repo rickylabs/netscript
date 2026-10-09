@@ -130,6 +130,13 @@ export {
 } from './src/primitives/handlers.ts';
 
 export {
+  createBodyLimitMiddleware,
+  PAYLOAD_TOO_LARGE_ERROR,
+  type PayloadTooLargeResponse,
+  type ServiceBodyLimitOptions,
+} from './src/primitives/body-limit.ts';
+
+export {
   buildServiceRpcPath,
   DEFAULT_RPC_API_PATH,
   DEFAULT_RPC_API_VERSION,
