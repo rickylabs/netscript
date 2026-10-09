@@ -1,9 +1,9 @@
-import type { JSX } from 'preact';
+import type { ComponentChildren, JSX } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { Dialog, Drawer, Sheet } from '../../../../fresh-ui/interactive.ts';
 
 /** Which page of the fixture the island renders. */
-export type ModalScenario = 'interactive' | 'initial';
+export type ModalScenario = 'interactive' | 'initial' | 'late';
 
 function DialogParts(props: { readonly kind: string }): JSX.Element {
   return (
@@ -76,13 +76,85 @@ function Initial(): JSX.Element {
   );
 }
 
+type LateContent = (generation: number, remount: () => void) => ComponentChildren;
+
+// Mounts Content only after its already-open Root, then remounts it under a new key: the
+// state lives below the Root, so the Root itself never re-renders for either attachment.
+function LateSlot(props: { readonly kind: string; readonly content: LateContent }): JSX.Element {
+  const [mounted, setMounted] = useState(false);
+  const [generation, setGeneration] = useState(0);
+  return (
+    <>
+      <button id={`late-${props.kind}-mount`} type='button' onClick={() => setMounted(true)}>
+        Mount {props.kind}
+      </button>
+      {mounted ? props.content(generation, () => setGeneration((value) => value + 1)) : null}
+    </>
+  );
+}
+
+function RemountButton(props: { readonly kind: string; readonly remount: () => void }) {
+  return (
+    <button id={`late-${props.kind}-remount`} type='button' onClick={props.remount}>
+      Remount {props.kind}
+    </button>
+  );
+}
+
+function Late(): JSX.Element {
+  return (
+    <>
+      <Dialog.Root id='late-dialog' defaultOpen>
+        <LateSlot
+          kind='dialog'
+          content={(generation, remount) => (
+            <Dialog.Content key={generation} data-generation={String(generation)}>
+              <Dialog.Title>late dialog</Dialog.Title>
+              <RemountButton kind='dialog' remount={remount} />
+            </Dialog.Content>
+          )}
+        />
+      </Dialog.Root>
+      <Sheet.Root id='late-sheet' defaultOpen>
+        <LateSlot
+          kind='sheet'
+          content={(generation, remount) => (
+            <Sheet.Content key={generation} data-generation={String(generation)}>
+              <Sheet.Title>late sheet</Sheet.Title>
+              <RemountButton kind='sheet' remount={remount} />
+            </Sheet.Content>
+          )}
+        />
+      </Sheet.Root>
+      <Drawer.Root id='late-drawer' defaultOpen>
+        <LateSlot
+          kind='drawer'
+          content={(generation, remount) => (
+            <Drawer.Content key={generation} data-generation={String(generation)}>
+              <Drawer.Title>late drawer</Drawer.Title>
+              <RemountButton kind='drawer' remount={remount} />
+            </Drawer.Content>
+          )}
+        />
+      </Drawer.Root>
+    </>
+  );
+}
+
+const SCENARIOS: Readonly<Record<ModalScenario, () => JSX.Element>> = {
+  initial: Initial,
+  interactive: Interactive,
+  late: Late,
+};
+
 /** Fresh island rendering fresh-ui overlays inside a sticky, translucent ancestor. */
 export default function ModalHarness(props: { readonly scenario: ModalScenario }): JSX.Element {
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => setHydrated(true), []);
+  const Scenario = SCENARIOS[props.scenario];
   return (
     <header data-hydrated={String(hydrated)}>
-      {props.scenario === 'initial' ? <Initial /> : <Interactive />}
+      <Scenario />
     </header>
   );
 }

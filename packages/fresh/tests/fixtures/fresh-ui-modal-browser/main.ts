@@ -26,5 +26,6 @@ app.use(staticFiles());
 app.get('/favicon.ico', () => new Response(null, { status: 204 }));
 app.get('/', (ctx) => ctx.render(page('interactive')));
 app.get('/initial', (ctx) => ctx.render(page('initial')));
+app.get('/late', (ctx) => ctx.render(page('late')));
 export { app };
 export default app;

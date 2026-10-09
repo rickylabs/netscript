@@ -1,5 +1,4 @@
-import type { RefObject } from 'preact';
-import { useLayoutEffect } from 'preact/hooks';
+import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
 
 /** The slice of `HTMLDialogElement` the open-state synchronizer drives. */
 export interface NativeDialogElement {
@@ -83,23 +82,38 @@ export function syncNativeDialog(
 }
 
 /**
- * Keep a native `<dialog>` in sync with hook state.
+ * Keep a native `<dialog>` in sync with hook state; returns the ref callback for the element.
  *
- * Runs as a layout effect so a modal dialog is in the top layer, with focus
- * inside it, before the browser paints or the next keystroke is dispatched.
+ * Synchronizes when `open`/`modal` change and whenever a new element attaches, so
+ * content mounted (or remounted) under an already-open root still enters the top
+ * layer. Runs as a layout effect, and an attachment re-render is microtask-scheduled,
+ * so a modal dialog holds focus in the top layer before the browser paints.
  */
 export function useNativeDialogSync(
-  ref: RefObject<NativeDialogElement | null>,
   open: boolean,
   modal: boolean,
-): void {
+): (element: NativeDialogElement | null) => void {
+  const elementRef = useRef<NativeDialogElement | null>(null);
+  // Only the identity of the last attached element matters: it re-runs the effect.
+  const [attached, setAttached] = useState<NativeDialogElement | null>(null);
+
+  const attach = useCallback((element: NativeDialogElement | null) => {
+    elementRef.current = element;
+
+    if (element) {
+      setAttached(element);
+    }
+  }, []);
+
   useLayoutEffect(() => {
-    const element = ref.current;
+    const element = elementRef.current;
 
     if (element) {
       syncNativeDialog(element, open, modal);
     }
-  }, [modal, open]);
+  }, [attached, modal, open]);
+
+  return attach;
 }
 
 /**

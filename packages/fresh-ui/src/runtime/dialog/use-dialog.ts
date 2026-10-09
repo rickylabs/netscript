@@ -1,6 +1,6 @@
 import type { JSX } from 'preact';
 import { useSignal } from '@preact/signals';
-import { useCallback, useId, useRef } from 'preact/hooks';
+import { useCallback, useId } from 'preact/hooks';
 import { composeEventHandlers } from '../_internal/compose-event-handlers.ts';
 import { composeRefs } from '../_internal/compose-refs.ts';
 import {
@@ -33,7 +33,6 @@ export function useDialog({
   open: controlledOpen,
 }: UseDialogOptions = {}): UseDialogReturn {
   const generatedId = useId();
-  const contentRef = useRef<HTMLDialogElement | null>(null);
   const uncontrolledOpen = useSignal(defaultOpen);
   const open = controlledOpen === undefined ? uncontrolledOpen.value : controlledOpen;
   const contentId = id ?? `ns-dialog-${generatedId}`;
@@ -52,7 +51,7 @@ export function useDialog({
     [controlledOpen, onOpenChange, uncontrolledOpen],
   );
 
-  useNativeDialogSync(contentRef, open, modal);
+  const attachContent = useNativeDialogSync(open, modal);
 
   const getTriggerProps = useCallback(
     (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): DialogTriggerElementProps => ({
@@ -108,7 +107,7 @@ export function useDialog({
         },
       ),
       open: getNativeDialogOpenAttribute(open, modal),
-      ref: composeRefs(props.ref, contentRef),
+      ref: composeRefs(props.ref, attachContent),
       role: props.role ?? 'dialog',
     }),
     [

@@ -154,6 +154,26 @@ Deno.test({
             await page.keyboard.press('Escape');
             await waitOpen('initial-modal', false);
 
+            // Content attached after its Root is already open, then remounted while it stays open.
+            await page.goto('${origin}/late');
+            await page.locator('header[data-hydrated="true"]').waitFor();
+            observed.late = {};
+            const settle = (id) => waitOpen(id, true).catch(() => undefined);
+            for (const kind of ['dialog', 'sheet', 'drawer']) {
+              const id = 'late-' + kind;
+              await page.locator('#late-' + kind + '-mount').click();
+              await page.locator('#' + id + '[data-generation="0"]').waitFor({ state: 'attached' });
+              await settle(id);
+              observed.late[kind] = { mounted: await probe(id) };
+              await page.locator('#late-' + kind + '-remount').click();
+              await page.locator('#' + id + '[data-generation="1"]').waitFor({ state: 'attached' });
+              await settle(id);
+              observed.late[kind].remounted = await probe(id);
+              await page.keyboard.press('Escape');
+              await waitOpen(id, false);
+              observed.late[kind].closed = true;
+            }
+
             return { ...observed, errors };
           } catch (error) {
             return { ...observed, failure: error.message.split('\\n')[0], errors };
@@ -170,6 +190,11 @@ Deno.test({
           nonModal: { open: true, modal: false, reopened: true },
           initial: MODAL,
           initialNonModal: { open: true, modal: false },
+          late: {
+            dialog: { mounted: MODAL, remounted: MODAL, closed: true },
+            sheet: { mounted: MODAL, remounted: MODAL, closed: true },
+            drawer: { mounted: MODAL, remounted: MODAL, closed: true },
+          },
           errors: [],
         });
         // SSR: a modal dialog waits for showModal(); a non-modal one is visible before hydration.
