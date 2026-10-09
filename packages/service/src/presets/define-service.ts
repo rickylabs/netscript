@@ -14,6 +14,8 @@
  * This creates a fully-configured service with:
  * - CORS enabled
  * - Request logging
+ * - Optional caller middleware (after CORS and logging, before auth)
+ * - Optional request-body size limit (typed JSON 413)
  * - OpenAPI spec at /api/openapi.json
  * - Scalar docs at /api/docs
  * - oRPC RPC endpoint at /api/rpc/*
@@ -28,11 +30,13 @@
 import { createService, type ServiceConfig } from '../builder/service-builder.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import { createDatabaseConnectivityStartupHook } from '../diagnostics/database-connectivity.ts';
+import type { ServiceBodyLimitOptions } from '../primitives/body-limit.ts';
 import { healthChecks } from '../primitives/health.ts';
 import type {
   Database,
   DbContext,
   RunningService,
+  ServiceMiddleware,
   ServiceRouter,
   ServiceTlsOptions,
 } from '../types.ts';
@@ -147,6 +151,24 @@ export interface DefineServiceOptions extends ServiceConfig {
     /** Optional authorization middleware options. */
     readonly authz?: AuthzOptions;
   };
+  /**
+   * Caller middleware applied in order via `ServiceBuilder.use()`.
+   *
+   * Installed after CORS and request logging, so a rejection returned here keeps
+   * CORS headers and is logged. It runs before authentication, authorization,
+   * and the body limit, so it sees unauthenticated requests and has no
+   * `principal` yet. Middleware that reads the request body runs before
+   * `bodyLimit` is enforced.
+   */
+  readonly middleware?: readonly ServiceMiddleware[];
+  /**
+   * Opt-in request-body size limit. Bodies larger than `maxBytes` are rejected
+   * with a typed JSON `413` (`PAYLOAD_TOO_LARGE`) on both the RPC and OpenAPI
+   * projections before they are parsed, including chunked bodies sent without
+   * `Content-Length`. Enforced after authentication. When omitted, no limit is
+   * applied.
+   */
+  readonly bodyLimit?: ServiceBodyLimitOptions;
 }
 
 /**
@@ -219,6 +241,23 @@ export interface DefineServiceOptions extends ServiceConfig {
  * });
  * ```
  *
+ * @example
+ * ```typescript
+ * // With caller middleware and a 1 MiB request-body limit
+ * import { defineService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ *
+ * await defineService(router, {
+ *   name: 'documents',
+ *   middleware: [async (c, next) => {
+ *     c.header('x-served-by', 'documents');
+ *     await next();
+ *   }],
+ *   bodyLimit: { maxBytes: 1024 * 1024 },
+ * });
+ * ```
+ *
  * @param router - oRPC router with contract handlers
  * @param options - Service configuration options
  */
@@ -232,7 +271,13 @@ export async function defineService<T extends ServiceRouter>(
     port: options.port,
   })
     .withCors()
-    .withLogger()
+    .withLogger();
+
+  for (const middleware of options.middleware ?? []) {
+    builder.use(middleware);
+  }
+
+  builder
     .withOpenAPI(options.openapi)
     .withDocs()
     .withRPC({ debug: options.debug })
@@ -279,6 +324,10 @@ export async function defineService<T extends ServiceRouter>(
     if (options.auth.authz) {
       builder.withAuthz(options.auth.authz);
     }
+  }
+
+  if (options.bodyLimit) {
+    builder.withBodyLimit(options.bodyLimit);
   }
 
   return await builder.withHealth().serve({ hostname: options.hostname, tls: options.tls });
