@@ -48,8 +48,8 @@ function parseSubjectSource(value: string | undefined): SubjectSourceName | unde
   if (!trimmed) {
     return undefined;
   }
-  if ((SUBJECT_SOURCES as readonly string[]).includes(trimmed)) {
-    return trimmed as SubjectSourceName;
+  if (trimmed === 'id_token' || trimmed === 'userinfo') {
+    return trimmed;
   }
   throw new Error(
     `NETSCRIPT_AUTH_SUBJECT_SOURCE must be one of ${SUBJECT_SOURCES.join(', ')}; got "${trimmed}".`,
