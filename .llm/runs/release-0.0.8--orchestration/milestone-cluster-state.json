@@ -425,40 +425,89 @@
     {
       "id": "W1-2065",
       "lane": "features",
-      "phase": "evaluating",
+      "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2116,
-      "headSha": "20be01dcb",
+      "headSha": "32e62b36c",
       "issueNumbers": [
         2065
       ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-w1-2065-10",
-      "receiptRefs": [],
-      "surface": [
-        "packages/service/**",
-        "docs/site/reference/service/**",
-        "scaffold service template"
+      "implementerAgentId": "claude-opus-5-5-high/m008-w1-2065",
+      "receiptRefs": [
+        "receipts/W1-2065.review.20be01dc.md"
       ],
-      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2116"
+      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2116",
+      "note": "Sol REVISE at 20be01dcb (jsdoc ratchet, bodyless test); fix pushed"
     },
     {
       "id": "W1-1383",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "evaluating",
       "baseBranch": "main",
       "prNumber": 2117,
-      "headSha": "e49f25e2c",
+      "headSha": "836ee3b61",
       "issueNumbers": [
         1383
       ],
-      "implementerAgentId": "claude-opus-5-5-high/m008-w1-1383-92",
+      "implementerAgentId": "claude-opus-5-5-high/m008-w1-1383",
       "receiptRefs": [],
-      "surface": [
-        "packages/cli/e2e/**",
-        "packages/cli plugin-new formatter path",
-        "docs/site/explanation/plugin-system.md",
-        "docs/site/identity-access/**"
-      ]
+      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2117",
+      "note": "CI e2e-cli scaffold.runtime both tiers running (global expensive gate)"
+    },
+    {
+      "id": "W2-1999",
+      "lane": "fixes",
+      "phase": "gating",
+      "baseBranch": "main",
+      "prNumber": 2119,
+      "headSha": "9515a7a8f",
+      "issueNumbers": [
+        1999
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w2-1999",
+      "receiptRefs": [],
+      "note": "queued for fixes-lane evaluator; merges before #2123 (service-client.ts)"
+    },
+    {
+      "id": "W5-1388-L1",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2121,
+      "headSha": "435754a60",
+      "issueNumbers": [
+        1388
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-l-1388",
+      "receiptRefs": [],
+      "note": "Refs #1388 (L1 gate infra)"
+    },
+    {
+      "id": "W9-1786",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2122,
+      "headSha": "af0803a38",
+      "issueNumbers": [
+        1786,
+        2107
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-l-1786",
+      "receiptRefs": []
+    },
+    {
+      "id": "W2-2031",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2123,
+      "headSha": "b703d39f8",
+      "issueNumbers": [
+        2031
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w2-2031",
+      "receiptRefs": []
     }
   ],
   "expensiveGates": [],
@@ -486,8 +535,8 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-09T19:32:45.000Z",
-    "nextReportDueAt": "2026-10-09T20:32:45.000Z",
+    "lastReportAt": "2026-10-09T19:48:47.000Z",
+    "nextReportDueAt": "2026-10-09T20:48:47.000Z",
     "lastReportRef": "https://github.com/rickylabs/netscript/issues/2103#issuecomment-6087689487",
     "headline": "Wave 1 implementing (#2065, #1383); plan PLAN-EVAL-approved; 76 active issues in 16 waves toward canary .3.",
     "currentMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
@@ -548,15 +597,29 @@
       "ownedIssueCount": 76,
       "scheduledIssueCount": 76,
       "unscheduledIssueNumbers": [],
-      "openPullRequestCount": 1
+      "openPullRequestCount": 3
     },
     "mergeQueue": [
       {
+        "prNumber": 2117,
+        "lane": "fixes",
+        "state": "evaluating",
+        "nextGate": "Sol IMPL-EVAL + CI scaffold.runtime both tiers at 836ee3b61",
+        "nextAction": "fill box-12 CI evidence; merge on MERGE+green"
+      },
+      {
+        "prNumber": 2119,
+        "lane": "fixes",
+        "state": "gating",
+        "nextGate": "Sol IMPL-EVAL (after #2117 review frees the fixes evaluator)",
+        "nextAction": "review then merge before #2123"
+      },
+      {
         "prNumber": 2116,
         "lane": "features",
-        "state": "evaluating",
-        "nextGate": "Sol IMPL-EVAL at 20be01dcb + CI on exact head",
-        "nextAction": "await Sol verdict; CI scaffold.runtime must run (scaffold output changed)"
+        "state": "implementing",
+        "nextGate": "Sol re-review at new head + e2e-cli-gate after #2117",
+        "nextAction": "await fix-turn report"
       }
     ],
     "orchestratorMatrix": [
@@ -570,8 +633,11 @@
       },
       {
         "lane": "internals",
-        "state": "queued",
-        "activeItems": [],
+        "state": "active",
+        "activeItems": [
+          "W5-1388-L1 (#2121)",
+          "W9-1786 (#2122)"
+        ],
         "lastConcreteProgressAt": "2026-10-09T19:18:42.000Z",
         "blocker": null,
         "nextAction": "W5 #1388-L1 HttpGate primitive; W8 canary .3 qualification after owner cut"
@@ -580,8 +646,10 @@
         "lane": "fixes",
         "state": "active",
         "activeItems": [
-          "W1-1383 (#2117)",
-          "W2-1999 launching"
+          "W1-1383 (#2117) evaluating",
+          "W2-1999 (#2119) gating",
+          "W2-2031 (#2123)",
+          "W2-2102 (draft pending)"
         ],
         "lastConcreteProgressAt": "2026-10-09T19:18:42.000Z",
         "blocker": null,
@@ -591,7 +659,7 @@
         "lane": "features",
         "state": "active",
         "activeItems": [
-          "W1-2065 (#2116) evaluating"
+          "W1-2065 (#2116) fix turn"
         ],
         "lastConcreteProgressAt": "2026-10-09T19:18:42.000Z",
         "blocker": null,
@@ -600,7 +668,7 @@
     ],
     "blockers": [],
     "environment": {
-      "checkedAt": "2026-10-09T19:32:45.000Z",
+      "checkedAt": "2026-10-09T19:48:47.000Z",
       "aspireApplications": 0,
       "dockerContainers": 0,
       "dockerCustomNetworks": 0
@@ -639,5 +707,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-09T19:32:45.000Z"
+  "updatedAt": "2026-10-09T19:48:47.000Z"
 }
