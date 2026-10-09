@@ -1,0 +1,102 @@
+import { PrismaClient, type Prisma } from './.generated/client.ts';
+import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
+import { createPrismaSagaTransitionStore } from '@netscript/plugin-sagas-core/stores';
+import type { PostgresCommandClient, TransactionClientPort } from '@netscript/database/commands/postgres';
+import { assertAtomicTransitionConformance, transitionRequest } from 'REPO_URLpackages/plugin-sagas-core/tests/transition-conformance.ts';
+
+type Tx = Omit<Prisma.TransactionClient, '$transaction'|'$connect'|'$disconnect'|'$on'|'$use'|'$extends'>;
+const root = new PrismaClient({ adapter: new PrismaPg({ host: Deno.env.get('COMMAND_POSTGRES_SOCKET'), database: 'postgres', user: Deno.env.get('PGUSER'), port: Number(Deno.env.get('PGPORT')) }) });
+let callbacks = 0;
+let faultAfter: string | undefined;
+let controller: AbortController | undefined;
+const observedTxIds: string[] = [];
+const bridge: PostgresCommandClient & TransactionClientPort<Tx> = {
+  $queryRawUnsafe: root.$queryRawUnsafe.bind(root),
+  $executeRawUnsafe: root.$executeRawUnsafe.bind(root),
+  $transaction(work, options) {
+    if (options?.isolationLevel === 'Snapshot') throw new TypeError('unsupported isolation');
+    return root.$transaction(async native => {
+      callbacks++;
+      const tx = new Proxy(native, {
+        get(target, key, receiver) {
+          if (typeof key === 'string' && ['$transaction','$connect','$disconnect','$on','$use','$extends'].includes(key)) return undefined;
+          if (key === '$queryRawUnsafe' || key === '$executeRawUnsafe') {
+            return async (query: string, ...values: unknown[]) => {
+              const ids = await target.$queryRawUnsafe<{ identity: string }[]>('SELECT txid_current()::text AS identity');
+              observedTxIds.push(ids[0].identity);
+              const result = await Reflect.apply(Reflect.get(target, key), target, [query,...values]);
+              if (faultAfter && query.includes(faultAfter)) controller?.abort(new Error('fault after actual row write'));
+              return result;
+            };
+          }
+          return Reflect.get(target,key,receiver);
+        },
+      });
+      return await work(tx);
+    }, { ...options, isolationLevel: options?.isolationLevel });
+  },
+};
+const store = createPrismaSagaTransitionStore(bridge, { transactionTimeoutMs: 5000 });
+const tables = ['saga_runtime_command_applied_key','netscript_command_outbox','saga_runtime_transition','saga_runtime_correlation','saga_runtime_state'] as const;
+async function reset() {
+  for (const table of tables) await root.$executeRawUnsafe(`DELETE FROM ${table}`);
+  callbacks=0; observedTxIds.length=0; faultAfter=undefined; controller=undefined;
+}
+async function counts() {
+  const out: number[] = [];
+  for (const table of tables) {
+    const rows = await root.$queryRawUnsafe<{ count: bigint }[]>(`SELECT count(*) AS count FROM ${table}`);
+    out.push(Number(rows[0].count));
+  }
+  return out;
+}
+Deno.test('PostgreSQL whole transition rolls back each row seam and retries the same inbound identity', async () => {
+  try {
+  await reset();
+  await assertAtomicTransitionConformance(store);
+  assertEquals(await counts(), [2,2,2,1,1]);
+  assertEquals((await store.transitions(transitionRequest().correlation.instanceId))[0].transition.message.occurredAt, new Date(0));
+  for (const table of tables) {
+    await reset();
+    controller=new AbortController(); faultAfter=table;
+    await assertRejects(() => store.commitTransition(transitionRequest(), controller!.signal));
+    assertEquals(await counts(), [0,0,0,0,0], `rollback after ${table}`);
+    assertEquals(callbacks, 1);
+    assertEquals(new Set(observedTxIds).size, 1);
+    faultAfter=undefined;
+    assertEquals(await store.commitTransition(transitionRequest()), { committed:true });
+    assertEquals(await counts(), [1,1,1,1,1]);
+    const history = await store.transitions(transitionRequest().correlation.instanceId);
+    assertEquals(history.length,1);
+    assertEquals(history[0].transition.occurredAt,new Date(0));
+  }
+  await reset();
+  await assertRejects(() => root.$transaction(async () => {
+    const request = transitionRequest();
+    await root.$executeRawUnsafe('INSERT INTO saga_runtime_state (instance_id,saga_id,version,envelope,updated_at) VALUES ($1,$2,$3,$4::jsonb,NOW())', request.correlation.instanceId, request.correlation.sagaId, 1, JSON.stringify(request.envelope));
+    throw new Error('root negative control');
+  }), Error, 'root negative control');
+  assertEquals(await counts(), [0,0,0,0,1]);
+  await reset();
+  } finally { await root.$disconnect(); }
+});
+Deno.test('PostgreSQL stale saga writers and replay races commit one command set', async () => {
+  try {
+  await reset();
+  const first=transitionRequest();
+  const second=transitionRequest(1,'other-command','b'.repeat(64));
+  const results=await Promise.allSettled([store.commitTransition(first),store.commitTransition(second)]);
+  assertEquals(results.filter(r => r.status==='fulfilled').length,1);
+  assertEquals(await counts(),[1,1,1,1,1]);
+  assertEquals(callbacks,2);
+  const state=await store.load(first.correlation.instanceId);
+  assertEquals(state?.metadata.version,1);
+  await reset();
+  const replay=await Promise.all([store.commitTransition(first),store.commitTransition(first)]);
+  assertEquals(replay.filter(r => r.committed).length,1);
+  assertEquals(await counts(),[1,1,1,1,1]);
+  assertEquals(callbacks,2);
+  assert((await store.entries())[0].metadata.createdAt instanceof Date);
+  } finally { await root.$disconnect(); }
+});

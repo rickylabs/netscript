@@ -1,4 +1,10 @@
 import {
+  produceWorkerCommands,
+  sagaCommandDigest,
+} from '../application/produce-worker-commands.ts';
+import type { StoredCommandOutbox } from '@netscript/database/commands';
+import { requireSagaTransitionStore } from '../ports/saga-transition-commit-port.ts';
+import {
   type CascadedMessage,
   DEFAULT_RETRY_POLICY,
   type RetryPolicy,
@@ -110,9 +116,14 @@ export class SagaEngine implements SagaBusPort {
   }
 
   /** Register saga definitions and rebuild the dispatch index. */
-  register(definitions: readonly SagaDefinition[]): Promise<void> {
+  register<TId extends string, TState extends SagaState, TMessage extends SagaMessage>(
+    definitions: readonly SagaDefinition<TId, TState, TMessage>[],
+  ): Promise<void> {
     for (const definition of definitions) {
-      this.#definitions.set(definition.id, definition);
+      if (definition.durableWorkerCommands) requireSagaTransitionStore(this.#store);
+    }
+    for (const definition of definitions) {
+      this.#definitions.set(definition.id, registeredSagaDefinition(definition));
     }
     this.#rebuildDispatchIndex();
     return Promise.resolve();
@@ -235,7 +246,7 @@ export class SagaEngine implements SagaBusPort {
       const instanceId = await this.#resolveInstanceId(entry.sagaId, correlationKey);
       const loaded = await this.#store?.load(instanceId);
       const baseState = loaded?.state ?? entry.definition.initialState;
-      if (message.idempotencyKey) {
+      if (message.idempotencyKey && !entry.definition.durableWorkerCommands) {
         const outcome = await this.#appliedKeys.recordApplied(instanceId, message.idempotencyKey);
         if (!outcome.applied) {
           return Object.freeze({
@@ -297,7 +308,17 @@ export class SagaEngine implements SagaBusPort {
       });
 
       try {
-        const cascaded = handler(saga, message, context);
+        const effects = handler(saga, message, context);
+        const { cascaded, commands } = await produceWorkerCommands(effects, {
+          durable: entry.definition.durableWorkerCommands === true,
+          sagaId: entry.sagaId,
+          instanceId,
+          version: (loaded?.metadata.version ?? 0) + 1,
+          correlationId,
+          now: context.now,
+          traceparent: message.traceparent,
+          tracestate: message.tracestate,
+        });
         const completion = cascaded.find(
           (item): item is CascadedMessage<'complete'> => item.kind === 'complete',
         );
@@ -318,10 +339,11 @@ export class SagaEngine implements SagaBusPort {
           : undefined;
 
         try {
-          await this.#persistTransition({
+          const committed = await this.#persistTransition({
             definition: entry.definition,
             instanceId,
             correlationKey,
+            commands,
             loaded,
             previousState,
             state,
@@ -330,6 +352,22 @@ export class SagaEngine implements SagaBusPort {
             status,
             now: context.now,
           });
+          if (!committed) {
+            if (completeSpan) this.#instrumentation.finishSpan(completeSpan, outcome);
+            this.#instrumentation.finishSpan(span, outcome);
+            return Object.freeze({
+              sagaId: entry.sagaId,
+              instanceId,
+              message,
+              state: cloneState(baseState),
+              cascaded: Object.freeze([]),
+              correlationId,
+              correlationKey,
+              spanContext,
+              completed: loaded?.metadata.status === 'completed',
+              alreadyApplied: true,
+            });
+          }
           if (completeSpan) {
             this.#instrumentation.finishSpan(completeSpan, outcome);
           }
@@ -389,6 +427,7 @@ export class SagaEngine implements SagaBusPort {
   async #persistTransition(
     input: Readonly<{
       definition: SagaDefinition<string, SagaState, SagaMessage>;
+      commands: readonly StoredCommandOutbox[];
       instanceId: SagaInstanceId;
       correlationKey: SagaCorrelationKey;
       loaded?: SagaStateEnvelope;
@@ -399,8 +438,8 @@ export class SagaEngine implements SagaBusPort {
       status: SagaInstanceStatus;
       now: Date;
     }>,
-  ): Promise<void> {
-    if (!this.#store) return;
+  ): Promise<boolean> {
+    if (!this.#store) return true;
 
     const previousVersion = input.loaded?.metadata.version ?? 0;
     const nextVersion = previousVersion + 1;
@@ -419,15 +458,12 @@ export class SagaEngine implements SagaBusPort {
       state: input.state,
     });
 
-    await this.#store.save(envelope, {
-      expectedVersion: input.loaded?.metadata.version,
-    });
-    await this.#store.saveCorrelation({
+    const correlation = {
       sagaId: input.definition.id,
       correlationKey: input.correlationKey,
       instanceId: input.instanceId,
-    });
-    await this.#store.appendTransition(input.instanceId, {
+    };
+    const record = {
       version: nextVersion,
       transition: {
         from: input.previousState,
@@ -436,7 +472,29 @@ export class SagaEngine implements SagaBusPort {
         message: input.message,
         occurredAt: input.message.occurredAt ?? input.now,
       },
-    });
+    };
+    if (input.definition.durableWorkerCommands) {
+      const appliedKeyHash = input.message.idempotencyKey === undefined
+        ? undefined
+        : await sagaCommandDigest([
+          'saga-inbound-v1',
+          input.definition.id,
+          input.instanceId,
+          input.message.idempotencyKey,
+        ]);
+      return (await requireSagaTransitionStore(this.#store).commitTransition({
+        expectedVersion: previousVersion,
+        envelope,
+        correlation,
+        record,
+        commands: input.commands,
+        ...(appliedKeyHash === undefined ? {} : { appliedKeyHash }),
+      })).committed;
+    }
+    await this.#store.save(envelope, { expectedVersion: input.loaded?.metadata.version });
+    await this.#store.saveCorrelation(correlation);
+    await this.#store.appendTransition(input.instanceId, record);
+    return true;
   }
 
   async #withConcurrency<TResult>(
@@ -546,4 +604,65 @@ function telemetryOutcomeFromStatus(status: SagaInstanceStatus): SagaTelemetryOu
   if (status === 'failed') return SagaTelemetryOutcomes.ERROR;
   if (status === 'compensating') return SagaTelemetryOutcomes.COMPENSATED;
   return SagaTelemetryOutcomes.SUCCESS;
+}
+
+/** Validate the heterogeneous registry boundary while retaining the selected definition callbacks. */
+export function registeredSagaDefinition(value: unknown): SagaDefinition {
+  if (isRegisteredSagaDefinition(value)) return value;
+  if (!value || typeof value !== 'object') {
+    throw new TypeError('Invalid saga definition registration.');
+  }
+  // Older registry artifacts omit unused collections. Complete those defaults at
+  // the boundary while retaining validation of every explicitly supplied value.
+  const collection = (name: string, fallback: unknown): unknown => {
+    const supplied = Reflect.get(value, name);
+    return supplied === undefined ? fallback : supplied;
+  };
+  const complete = {
+    ...value,
+    correlations: collection('correlations', []),
+    compensations: collection('compensations', new Map()),
+    signalHandlers: collection('signalHandlers', new Map()),
+    queryHandlers: collection('queryHandlers', new Map()),
+  };
+  if (!isRegisteredSagaDefinition(complete)) {
+    throw new TypeError('Invalid saga definition registration.');
+  }
+  return complete;
+}
+
+function isRegisteredSagaDefinition(value: unknown): value is SagaDefinition {
+  if (!value || typeof value !== 'object') return false;
+  const field = (key: string): unknown => Reflect.get(value, key);
+  if (
+    typeof field('id') !== 'string' || !field('id') ||
+    !['t1', 't2', 't3'].includes(String(field('durability'))) ||
+    (field('durableWorkerCommands') !== undefined &&
+      typeof field('durableWorkerCommands') !== 'boolean') ||
+    !field('initialState') || typeof field('initialState') !== 'object'
+  ) return false;
+  const types = field('handledMessageTypes'), correlations = field('correlations');
+  if (
+    !Array.isArray(types) || types.some((type) => typeof type !== 'string') ||
+    !Array.isArray(correlations) || correlations.some((rule) =>
+      !rule || typeof rule !== 'object' ||
+      typeof rule.eventType !== 'string' || typeof rule.canStart !== 'boolean' ||
+      typeof rule.correlate !== 'function'
+    )
+  ) return false;
+  for (const name of ['handlers', 'compensations', 'signalHandlers', 'queryHandlers']) {
+    const handlers = field(name);
+    if (
+      !(handlers instanceof Map) ||
+      [...handlers].some(([key, handler]) =>
+        typeof key !== 'string' || typeof handler !== 'function'
+      )
+    ) return false;
+  }
+  const concurrency = field('concurrency');
+  return (field('schedule') === undefined || typeof field('schedule') === 'string') &&
+    (concurrency === undefined || (!!concurrency && typeof concurrency === 'object' &&
+      typeof Reflect.get(concurrency, 'limit') === 'number' &&
+      (Reflect.get(concurrency, 'key') === undefined ||
+        typeof Reflect.get(concurrency, 'key') === 'function')));
 }

@@ -1,0 +1,52 @@
+[
+  {
+    "name": "s15-tags",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "worker effects expose distinct explicit job and task constructors",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "1d387b1aee8f8af49bec659b06e7f31e206d879336a15ed71ffe13b2ab65b687",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s15-snapshot",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "worker effects validate the selected schema and privately snapshot payload",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "1d387b1aee8f8af49bec659b06e7f31e206d879336a15ed71ffe13b2ab65b687",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s15-schema-required",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "durable worker effects refuse legacy type-only definitions and non-JSON output",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "1d387b1aee8f8af49bec659b06e7f31e206d879336a15ed71ffe13b2ab65b687",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s15-json-required",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "durable worker effects refuse legacy type-only definitions and non-JSON output",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "1d387b1aee8f8af49bec659b06e7f31e206d879336a15ed71ffe13b2ab65b687",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s15-task-handler-schema",
+    "file": "packages/plugin-workers-core/src/builders/task-builder.ts",
+    "test": "worker effects validate the selected schema and privately snapshot payload",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "52f888e5e56f71a7a77c49b9bee816aa66fafdecfeba3b61f2bc97d04f71a933",
+    "bytesIdentical": true
+  }
+]

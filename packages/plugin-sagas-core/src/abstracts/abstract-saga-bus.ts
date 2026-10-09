@@ -1,3 +1,4 @@
+import type { SagaState } from '../domain/mod.ts';
 import type {
   SagaBusPort,
   SagaPublishOptions,
@@ -18,7 +19,9 @@ export abstract class AbstractSagaBus implements SagaBusPort {
   abstract stop(reason?: string): Promise<void>;
 
   /** Register saga definitions before message handling. */
-  abstract register(definitions: readonly SagaDefinition[]): Promise<void>;
+  abstract register<TId extends string, TState extends SagaState, TMessage extends SagaMessage>(
+    definitions: readonly SagaDefinition<TId, TState, TMessage>[],
+  ): Promise<void>;
 
   /** Publish a saga message. */
   abstract publish(

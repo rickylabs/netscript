@@ -1,4 +1,6 @@
+import { validateJobPayload } from '../domain/job-handler.ts';
 import type {
+  JobPayloadSchema,
   TaskDefinition as DomainTaskDefinition,
   TaskHandler as DomainTaskHandler,
   TaskId as DomainTaskId,
@@ -12,7 +14,19 @@ import type {
 } from './builder-types.ts';
 
 /** Task builder state used to gate `build()`. */
-export type TaskBuilderState = 'initial' | 'entrypoint-set' | 'handler-set';
+export type TaskBuilderState =
+  | 'initial'
+  | 'entrypoint-set'
+  | 'payload-set'
+  | 'payload-entrypoint-set'
+  | 'handler-set';
+
+type AfterEntrypoint<T extends TaskBuilderState> = T extends
+  'payload-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set' : 'entrypoint-set';
+type AfterPayload<T extends TaskBuilderState> = T extends
+  'entrypoint-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set' : 'payload-set';
+type HandlerPayload<T extends TaskBuilderState, P, N> = T extends
+  'payload-set' | 'payload-entrypoint-set' ? P : N;
 
 /** Typestate builder interface for task definitions. */
 export interface TaskBuilder<
@@ -24,16 +38,44 @@ export interface TaskBuilder<
   /** Set the task runtime. */
   runtime(type: BuilderTaskType): this;
   /** Set the module, script, or executable entrypoint. */
-  entrypoint(path: string): TaskBuilder<TId, 'entrypoint-set', TPayload, TResult>;
+  entrypoint(
+    path: string,
+  ): TaskBuilder<
+    TId,
+    TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+      : 'entrypoint-set',
+    TPayload,
+    TResult
+  >;
   /** Set an in-process task handler. */
   handler<TNextPayload = TPayload, TNextResult = TResult>(
-    fn: TaskHandler<TNextPayload, TNextResult>,
-  ): TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
+    fn: TaskHandler<
+      TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload : TNextPayload,
+      TNextResult
+    >,
+  ): TaskBuilder<
+    TId,
+    'handler-set',
+    TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload : TNextPayload,
+    TNextResult
+  >;
   /** Narrow the payload type carried by this task definition. */
   payload<TNextPayload>(
     this: TConfigured extends 'handler-set' ? never
       : TaskBuilder<TId, TConfigured, TPayload, TResult>,
   ): TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
+  /** Select a runtime payload schema; durable effects require this overload. */
+  payload<TNextPayload>(
+    this: TConfigured extends 'handler-set' ? never
+      : TaskBuilder<TId, TConfigured, TPayload, TResult>,
+    schema: JobPayloadSchema<TNextPayload>,
+  ): TaskBuilder<
+    TId,
+    TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+      : 'payload-set',
+    TNextPayload,
+    TResult
+  >;
   /** Set the task timeout in milliseconds. */
   timeout(ms: number): this;
   /** Set the maximum retry count. */
@@ -54,7 +96,7 @@ export interface TaskBuilder<
   enabled(value: boolean): this;
   /** Build the task definition after an entrypoint or handler has been configured. */
   build(
-    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+    this: TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' | 'handler-set'
       ? TaskBuilder<TId, TConfigured, TPayload, TResult>
       : never,
   ): TaskDefinition<TId, TPayload, TResult>;
@@ -87,6 +129,7 @@ type TaskBuilderData<TId extends string, TPayload, TResult> = Readonly<{
   runtime: BuilderTaskType;
   entrypoint?: string;
   handler?: DomainTaskHandler<TPayload, TResult>;
+  payloadSchema?: JobPayloadSchema<TPayload>;
   timeout: number;
   maxRetries: number;
   permissions?: BuilderPermissions;
@@ -114,29 +157,61 @@ class TaskBuilderImpl<
     return new TaskBuilderImpl({ ...this.#data, runtime: type });
   }
 
-  entrypoint(path: string): TaskBuilder<TId, 'entrypoint-set', TPayload, TResult> {
-    return new TaskBuilderImpl<TId, 'entrypoint-set', TPayload, TResult>({
+  entrypoint(path: string): TaskBuilder<TId, AfterEntrypoint<TConfigured>, TPayload, TResult> {
+    return new TaskBuilderImpl<TId, AfterEntrypoint<TConfigured>, TPayload, TResult>({
       ...this.#data,
       entrypoint: path,
     });
   }
 
   handler<TNextPayload = TPayload, TNextResult = TResult>(
-    fn: TaskHandler<TNextPayload, TNextResult>,
-  ): TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult> {
+    fn: TaskHandler<HandlerPayload<TConfigured, TPayload, TNextPayload>, TNextResult>,
+  ): TaskBuilder<
+    TId,
+    'handler-set',
+    HandlerPayload<TConfigured, TPayload, TNextPayload>,
+    TNextResult
+  > {
     const { handler: _previousHandler, ...data } = this.#data;
-    return new TaskBuilderImpl<TId, 'handler-set', TNextPayload, TNextResult>({
+    type P = HandlerPayload<TConfigured, TPayload, TNextPayload>;
+    const payloadSchema = this.#data.payloadSchema as JobPayloadSchema<P> | undefined;
+    const handler: TaskHandler<P, TNextResult> = payloadSchema
+      ? async (context) =>
+        await fn({
+          ...context,
+          payload: await validateJobPayload(payloadSchema, context.payload, this.#data.id),
+        })
+      : fn;
+    return new TaskBuilderImpl<
+      TId,
+      'handler-set',
+      HandlerPayload<TConfigured, TPayload, TNextPayload>,
+      TNextResult
+    >({
       ...data,
-      handler: fn,
+      handler,
+      payloadSchema: this.#data.payloadSchema as
+        | JobPayloadSchema<HandlerPayload<TConfigured, TPayload, TNextPayload>>
+        | undefined,
     });
   }
 
   payload<TNextPayload>(
     this: TConfigured extends 'handler-set' ? never
       : TaskBuilderImpl<TId, TConfigured, TPayload, TResult>,
-  ): TaskBuilder<TId, TConfigured, TNextPayload, TResult> {
-    const { handler: _handler, ...data } = this.#data;
-    return new TaskBuilderImpl<TId, TConfigured, TNextPayload, TResult>(data);
+  ): TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
+  payload<TNextPayload>(
+    this: TConfigured extends 'handler-set' ? never
+      : TaskBuilderImpl<TId, TConfigured, TPayload, TResult>,
+    schema: JobPayloadSchema<TNextPayload>,
+  ): TaskBuilder<TId, AfterPayload<TConfigured>, TNextPayload, TResult>;
+  payload<TNextPayload>(
+    schema?: JobPayloadSchema<TNextPayload>,
+  ): unknown {
+    const { handler: _handler, payloadSchema: _schema, ...data } = this.#data;
+    return new TaskBuilderImpl<TId, TConfigured, TNextPayload, TResult>(
+      { ...data, payloadSchema: schema },
+    );
   }
 
   timeout(ms: number): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
@@ -182,7 +257,7 @@ class TaskBuilderImpl<
   }
 
   build(
-    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+    this: TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' | 'handler-set'
       ? TaskBuilderImpl<TId, TConfigured, TPayload, TResult>
       : never,
   ): TaskDefinition<TId, TPayload, TResult> {
@@ -212,6 +287,7 @@ class TaskBuilderImpl<
       maxConcurrency: 1,
       persist: true,
       handler: this.#data.handler,
+      payloadSchema: this.#data.payloadSchema,
     });
 
     return definition;

@@ -1,3 +1,5 @@
+import { registeredSagaDefinition } from '../runtime/saga-engine.ts';
+import type { SagaState } from '../domain/mod.ts';
 import type {
   CascadedMessage,
   SagaCorrelationKey,
@@ -84,10 +86,12 @@ export class SagaBusBridge implements SagaBusPort {
   }
 
   /** Register saga definitions with the engine. */
-  async register(definitions: readonly SagaDefinition[]): Promise<void> {
+  async register<TId extends string, TState extends SagaState, TMessage extends SagaMessage>(
+    definitions: readonly SagaDefinition<TId, TState, TMessage>[],
+  ): Promise<void> {
     await this.#engine.register(definitions);
     for (const definition of definitions) {
-      this.#definitions.set(definition.id, definition);
+      this.#definitions.set(definition.id, registeredSagaDefinition(definition));
     }
   }
 
@@ -96,6 +100,7 @@ export class SagaBusBridge implements SagaBusPort {
     const idempotencyKey = options.idempotencyKey ?? message.idempotencyKey;
     if (
       idempotencyKey &&
+      !this.#usesAtomicReplay(message.type) &&
       !await this.#reserve(sagaMessageIdempotencyTarget(message), idempotencyKey)
     ) {
       return;
@@ -107,7 +112,10 @@ export class SagaBusBridge implements SagaBusPort {
   /** Dispatch cascaded messages through engine, scheduler, or compensator. */
   async dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void> {
     for (const message of messages) {
-      if (message.idempotencyKey) {
+      if (
+        message.idempotencyKey &&
+        !(message.kind === 'send' && this.#usesAtomicReplay(message.target.id))
+      ) {
         const target = cascadedMessageIdempotencyTarget(message);
         if (!await this.#reserve(target, message.idempotencyKey)) {
           continue;
@@ -183,6 +191,12 @@ export class SagaBusBridge implements SagaBusPort {
         await this.#dispatchOne(cascaded, request);
       }
     }
+  }
+
+  #usesAtomicReplay(messageType: string): boolean {
+    return [...this.#definitions.values()].some((definition) =>
+      definition.durableWorkerCommands && definition.handledMessageTypes.includes(messageType)
+    );
   }
 
   async #reserve(target: SagaIdempotencyTarget, idempotencyKey: string): Promise<boolean> {

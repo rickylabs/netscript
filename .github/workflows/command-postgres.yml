@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'packages/database/**'
+      - 'packages/plugin-sagas-core/**'
+      - 'plugins/sagas/database/**'
       - '.llm/tools/command-postgres-conformance.sh'
       - '.github/workflows/command-postgres.yml'
   workflow_dispatch:

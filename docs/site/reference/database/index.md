@@ -270,3 +270,14 @@ settlement, so crashes redeliver and downstream operations must remain idempoten
 | `CommandOutboxRelease` | type alias | `type CommandOutboxRelease` | Retry or retained terminal state. |
 | `CommandOutboxRelayStore` | interface | `interface CommandOutboxRelayStore` | Raw claim/mark/release port. |
 | `createPostgresCommandOutboxRelayStore` | function | `function createPostgresCommandOutboxRelayStore(root, options): CommandOutboxRelayStore` | Callback-bound PostgreSQL lease and settlement adapter. |
+
+### Bound PostgreSQL command writer
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `bindPostgresCommandOutbox` | function | Binds the existing reviewed outbox append SQL to a live callback client without a nested transaction. |
+| `PostgresCommandOutboxWriter` | interface | Detached outbox-only append boundary. |
+
+Atomic producers such as the saga transition store bind this writer inside their existing physical
+transaction. Root/lifecycle handles are refused. The consumer owns the callback lifetime and
+migration; import and construction perform no I/O or DDL.

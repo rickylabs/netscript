@@ -47,3 +47,8 @@ export type {
   CommandRelayFailureClass,
 } from './commands.ts';
 export { COMMAND_RELAY_FAILURE_CLASSES } from './commands.ts';
+
+export {
+  bindPostgresCommandOutbox,
+  type PostgresCommandOutboxWriter,
+} from './src/commands/adapters/bind-postgres-command-outbox.ts';

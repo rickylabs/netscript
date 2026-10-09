@@ -1,5 +1,6 @@
 /**
- * Explicit workers-port helpers that trigger jobs and tasks outside synchronous saga handlers.
+ * Schema-bound pure worker effects for atomic saga transitions, plus explicit
+ * workers-port trigger helpers for callers outside synchronous handlers.
  *
  * @module
  */
@@ -7,6 +8,14 @@
 export { createWorkerTriggers } from './triggers.ts';
 export { triggerJob } from './trigger-job.ts';
 export { triggerTask } from './trigger-task.ts';
+export { workerJobEffect, workerTaskEffect } from './worker-effects.ts';
+export type {
+  WorkerCommandEffect,
+  WorkerCommandEffectOptions,
+  WorkerJobEffectDefinition,
+  WorkerTaskEffectDefinition,
+} from './worker-effects.ts';
+export type { JobPayloadSchema, PublicStandardSchema } from '@netscript/plugin-workers-core';
 export type { JobId, TaskId } from '@netscript/plugin-workers-core';
 export type {
   SagaJobTriggerReceipt,
@@ -19,3 +28,5 @@ export type {
   SagaWorkerTriggerOptions,
 } from './types.ts';
 export type { SagaWorkerTriggers } from './triggers.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from '../../domain/saga-transition-effect.ts';

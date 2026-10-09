@@ -48,6 +48,11 @@ export type {
   SagaStorePort,
   SagaStoreWriteOptions,
   SagaTransition,
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+  SagaTransitionEffect,
+  SagaTransitionHandler,
   SagaTransitionRecord,
   SagaTransportAck,
   SagaTransportHandler,
@@ -55,6 +60,8 @@ export type {
   SagaTransportPort,
   SagaTransportSubscription,
   SignalDefinition,
+  StoredCommandOutbox,
+  WorkerCommandEffect,
 } from '../ports/mod.ts';
 export type { SagaRuntime, SagaRuntimeAdapter } from '../runtime/mod.ts';
 export { createTestSagaRuntime } from './create-test-saga-runtime.ts';
@@ -65,3 +72,5 @@ export { TestSagaClock } from './test-saga-clock.ts';
 export type { TestSagaRuntime, TestSagaRuntimeOptions } from './create-test-saga-runtime.ts';
 export type { MemorySagaPublishRecord } from './memory-saga-bus.ts';
 export type { RecordingSagaStoreOperation } from './recording-saga-store.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from '../domain/mod.ts';

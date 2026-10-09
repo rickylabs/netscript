@@ -243,3 +243,40 @@ import { createSagaCommandOutboxSink, type SagaPublisherPort } from '@netscript/
 declare const publisher: SagaPublisherPort;
 const sink = createSagaCommandOutboxSink({ id: 'sagas', publisher });
 ```
+
+## Atomic saga-to-worker commands
+
+Ordinary transition handlers can return `workerJobEffect(selectedJob, payload, route)` or
+`workerTaskEffect(selectedTask, payload, route)` from `./integration/workers`. Select
+`.durableWorkerCommands()` on the saga definition. These effects are pure declarations; existing
+`send()` remains an internal saga-message cascade. Worker effects are unavailable in compensation
+or nested scheduled cascades. A task used here requires `.payload(selectedRuntimeSchema)`; the
+legacy type-only task overload remains available for ordinary task execution.
+
+The selected schema validates detached bounded JSON before any transition write. Schema
+transformations that change canonical payload identity are refused. Command identities use the
+saga id, instance id, next version and original handler-effect ordinal. The producer forwards
+correlation and W3C context into the existing command outbox. Configure C5's worker sink topic map
+with the same selected job/task id as the effect; destination/topic are host-owned routing policy.
+
+`MemorySagaStore` supplies the atomic transition/replay contract for deterministic tests.
+`createPrismaSagaTransitionStore(root, { transactionTimeoutMs: 5000 })` from `./stores` supplies
+physical PostgreSQL persistence. The root must preserve the actual generated interactive callback
+type, excluding root/lifecycle operations from that callback. The database-owned bound writer appends
+outbox rows on that same callback. State, correlation, history, command intents and the hashed inbound
+marker commit or roll back together. A failed transition can retry its inbound key; a committed
+replay writes nothing. Existing KV and unbound `PrismaSagaStore` refuse this opt-in before handler
+or store work; they retain their ordinary saga behavior.
+
+Migrate the shipped `plugins/sagas/database/sagas.prisma` runtime models, including
+`SagaRuntimeCommandAppliedKey`, and the command outbox schema before selecting this adapter. The
+reviewed PostgreSQL fixture migrations under `tests/fixtures/transition-store/` show the incremental
+replay addition and existing runtime layout; production construction performs no DDL. The marker
+covers this command-transition protocol only and does not implement general Prisma idempotency
+parity. Deleting a saga instance retains committed outbox commands and replay markers for their
+independent delivery lifetime. The host owns provider connections and shutdown.
+
+Use the C5 command relay and its checked worker receipt sink for delivery. Delivery is at least once;
+exactly once effective application additionally requires durable downstream idempotency. The saga
+package adds no relay timer, leasing, retry or settlement loop. Worker progress continues through the
+native durable execution stream; worker completion uses `publishSagaOrThrow()`.

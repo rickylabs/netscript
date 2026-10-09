@@ -1,0 +1,9 @@
+# C6 drift
+
+- Sequencing: BRIEF-D4 replaces old approved predecessor-stack clause with direct current-main branching; no predecessor product copy. Actual immutable C5 consumer test cohort is an integration dependency while main lacks the qualified relay, and prerequisite landing remains required before release.
+- Validation wording: handler depends on loaded state; dynamic selected-schema/codec validation occurs after read-only lookup/load and before every write/commit. Capability registration refusal precedes all handler/store calls. The run will not claim payload validation before reads. Issue acceptance explicitly says before commit.
+- Atomic replay: existing bridge and engine eagerly reserve inbound keys independently. The durable transition adds its replay marker to the one commit; general Prisma SagaIdempotencyPort parity/debt remains open. No second relay or remote transaction is introduced.
+
+S15 public graph curation: worker stream definition fields use the already-owned structural entity schema, avoiding private Zod annotations; runtime schemas/output remain unchanged. Declared saga worker/service/database dependencies expose an additional pre-existing private implement reference on unchanged saga contract source. Initial full-map counts were workers 8/sagas 8; current workers 7/sagas 9. No full-map green claim; raw baselines retained. New effect/root public documentation graphs have zero findings.
+
+S20 full-map observation: saga current combined private-type diagnostics eight, equal to original baseline; normalized intermediate nine reduced by explicit owned store curation. Worker seven versus original eight. All new root/effect/atomic-store graphs clean. No full-map green claim or new debt authorization. Native Fresh UI peer lock normalization resolves already-locked identities with no new npm versions/integrity values.

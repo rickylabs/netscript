@@ -4464,8 +4464,10 @@
       "packages/plugin-sagas-core": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/database@0.0.7",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
+          "jsr:@netscript/plugin-workers-core@0.0.7",
           "jsr:@netscript/service@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@std/assert@1",

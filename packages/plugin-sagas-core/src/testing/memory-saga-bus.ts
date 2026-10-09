@@ -1,3 +1,5 @@
+import { registeredSagaDefinition } from '../runtime/saga-engine.ts';
+import type { SagaState } from '../domain/mod.ts';
 import type { CascadedMessage, SagaDefinition, SagaMessage } from '../domain/mod.ts';
 import { SagasError } from '../domain/mod.ts';
 import type {
@@ -40,8 +42,10 @@ export class MemorySagaBus implements SagaBusPort {
   }
 
   /** Register saga definitions for later inspection. */
-  register(definitions: readonly SagaDefinition[]): Promise<void> {
-    this.#definitions.push(...definitions);
+  register<TId extends string, TState extends SagaState, TMessage extends SagaMessage>(
+    definitions: readonly SagaDefinition<TId, TState, TMessage>[],
+  ): Promise<void> {
+    this.#definitions.push(...definitions.map(registeredSagaDefinition));
     return Promise.resolve();
   }
 

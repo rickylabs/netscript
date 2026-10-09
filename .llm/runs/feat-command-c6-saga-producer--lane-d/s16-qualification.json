@@ -1,0 +1,28 @@
+{
+  "newNamedTests": 2,
+  "red": {
+    "exit": 1,
+    "namedAssertionFailures": 2
+  },
+  "semanticProofRows": 6,
+  "allRestorationsExact": true,
+  "check": {
+    "exit": 0,
+    "files": 119
+  },
+  "regression": {
+    "exit": 0,
+    "passed": 92,
+    "failed": 0,
+    "providerIgnored": 3
+  },
+  "lint": 0,
+  "format": 0,
+  "quality": 0,
+  "architecture": 0,
+  "ownedPublicDocumentationGraphs": 0,
+  "explicitCapability": "same_commit transition/outbox and replay; optimisticVersion true",
+  "memoryProof": "one condition; invalid/history/duplicate-intent/correlation conflicts and cancellation mutate none; stale concurrent writers commit one set; replay returns false; detached snapshots",
+  "unsupportedStores": "actual first-party KV and unbound Prisma reject registration before any handler/storage I/O",
+  "engineProductionPath": "S17 still pending; no complete engine producer or final acceptance claim"
+}

@@ -1,0 +1,192 @@
+{
+  "sourceHead": "25fc8a04652762dc8f6575426a98dc435d647db2",
+  "deno": "2.9.5",
+  "provider": "PostgreSQL 15; native generated Prisma client 7.8.0; true callback, dedicated zero-ignored gate",
+  "cohort": "1a93a6acb127f58cb5bb622223180ca5e5e9925e",
+  "gates": [
+    {
+      "gate": "s20-final-native-provider",
+      "exit": 0
+    },
+    {
+      "gate": "s20-final-quality",
+      "exit": 0
+    },
+    {
+      "gate": "s20-final-lint",
+      "exit": 0
+    },
+    {
+      "gate": "s20-final-format",
+      "exit": 0
+    },
+    {
+      "gate": "s20-generated-final-check",
+      "exit": 0
+    },
+    {
+      "gate": "s20-generated-final-inventory",
+      "exit": 0
+    },
+    {
+      "gate": "s20-regression",
+      "exit": 0
+    },
+    {
+      "gate": "s20-publish-saga",
+      "exit": 0
+    },
+    {
+      "gate": "s20-publish-workers",
+      "exit": 0
+    },
+    {
+      "gate": "s20-publish-db",
+      "exit": 0
+    },
+    {
+      "gate": "s20-publish-service",
+      "exit": 0
+    },
+    {
+      "gate": "s20-publish-plugin",
+      "exit": 0
+    },
+    {
+      "gate": "s20-production-deps",
+      "exit": 0
+    },
+    {
+      "gate": "s20-ui-frozen-restored",
+      "exit": 0
+    },
+    {
+      "gate": "check-agent-docs-prose",
+      "exit": 0
+    },
+    {
+      "gate": "check-assets-barrel",
+      "exit": 0
+    },
+    {
+      "gate": "check-publish-assets",
+      "exit": 0
+    },
+    {
+      "gate": "check-mcp-export-corpus",
+      "exit": 0
+    },
+    {
+      "gate": "s20-reference-final-root-check",
+      "exit": 0
+    },
+    {
+      "gate": "s20-doc-links",
+      "exit": 0
+    }
+  ],
+  "mutationProofRows": 29,
+  "uniqueNewNamedTests": 17,
+  "tests": [
+    "PostgreSQL stale saga writers and replay races commit one command set",
+    "PostgreSQL whole transition rolls back each row seam and retries the same inbound identity",
+    "Prisma atomic adapter refuses root callback handles before writes",
+    "atomic saga composition refuses KV and unbound Prisma before handler or storage work",
+    "bound outbox rejects lifecycle and root clients before any write",
+    "durable bridge and engine replay remain retryable after failed commit and dedupe after restart",
+    "durable producer rejects selected payload and canonical JSON faults before writes without consuming replay",
+    "durable saga commits pure worker effects once with stable original ordinal and context",
+    "durable worker effects refuse legacy type-only definitions and non-JSON output",
+    "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+    "real PostgreSQL generated-client atomic saga transition conformance",
+    "real PostgreSQL saga commands consume the pinned C5 relay cohort",
+    "saga command restart and acceptance crash reuse C5 checked relay and worker sink",
+    "saga commands reuse C5 lease ownership malformed receipt retry and shutdown drain",
+    "saga worker recovery observes native durable progress and checked completion",
+    "worker effects expose distinct explicit job and task constructors",
+    "worker effects validate the selected schema and privately snapshot payload"
+  ],
+  "regression": {
+    "passed": 535,
+    "failed": 0,
+    "ignored": 7,
+    "dedicatedProviderCertification": "PASS; zero ignored"
+  },
+  "documentation": {
+    "ownedPublicGraphs": "PASS; zero diagnostics",
+    "sagaFullMap": {
+      "exit": 1,
+      "privateTypeRef": 8,
+      "originalBaseline": 8,
+      "normalizedIntermediateBaseline": 9
+    },
+    "workerFullMap": {
+      "exit": 1,
+      "privateTypeRef": 7,
+      "originalBaseline": 8
+    },
+    "fullMapGreenClaim": false
+  },
+  "canonicalRuntime": {
+    "exit": 0,
+    "passed": 105,
+    "failed": 0,
+    "skipped": 0,
+    "cleanup": "PASS; exact owned AppHost",
+    "initialAttempt": {
+      "exit": 1,
+      "passed": 103,
+      "failed": 1,
+      "failure": "transient forced persistent network removal; zero owned survivors; recovery stop EXIT 0"
+    },
+    "environment": "Real owned provider containers; scoped transport forwarding, no mock services",
+    "inputContinuity": "Runtime started at 2bfab9551; subsequent changes only public prose/run records/derived doc assets, never producer/store/worker/test/lock bytes. Final source head 25fc8a046; final native CI still required."
+  },
+  "nativeCurrentHeadCI": "PENDING current repaired-head zero-failure native suite",
+  "independentEvaluation": "Round1 FAIL_FIX on 5d96eae8722c708371529ae3b89a243a91e86c2a; repaired, round2 pending in same native Google context; max3",
+  "release": "N/A; no merge/publication requested; C5 prerequisite not yet landed",
+  "providerMigrationDigests": {
+    "packages/plugin-sagas-core/tests/fixtures/transition-store/command-replay-migration.sql": "00390bc18d0ecdb13a6e98908bd6d7cd931dad9fd62d7eaa3b125b9565820db8",
+    "packages/plugin-sagas-core/tests/fixtures/transition-store/runtime-migration.sql": "b43d2d08db904035fdeefb2b3c0c4a9d21dc3c05a33d17a5edfe28bb44374d95"
+  },
+  "priorNativeRuntimeCI": {
+    "url": "https://github.com/rickylabs/netscript/actions/runs/37828846468",
+    "head": "2bfab95514e018eecb1dcffe01c35dbe19012507",
+    "conclusion": "SUCCESS",
+    "postgres": 104,
+    "sqlite": 99
+  },
+  "route": {
+    "primaryRequested": "opencode-go/glm-5.3-flash@max",
+    "primaryProbeExit": 2,
+    "primaryFailure": "provider_rate_limited before inference",
+    "fallbackRequested": "gemini-3.8-flash-high@high via native agy",
+    "fallbackObserved": "Gemini 3.8 Flash / Google",
+    "fallbackCanaryExit": 0,
+    "context": "fresh C6 native context, independent of generator and earlier leaves",
+    "reviewRoundsMaximum": 3
+  },
+  "repair": {
+    "inputHead": "2026303db",
+    "focusedPackagedRegistryAndAtomicSuite": {
+      "exit": 0
+    },
+    "redBeforeProduction": {
+      "exit": 1,
+      "namedAssertion": true
+    },
+    "mutationProofRows": 32,
+    "newNamedTests": 17,
+    "additionalExistingConsumerRegression": 1,
+    "nativeProviderExit": 0,
+    "staticQualityLintFormatExit": 0,
+    "localFullSuite": {
+      "exit": 1,
+      "passed": 5570,
+      "failed": 15,
+      "ignored": 22,
+      "classification": "unchanged executable temporary script/username/temporary worktree fixture prerequisites; configured native CI required, not relabeled green"
+    },
+    "fourPinnedGenerationExit": 0
+  }
+}

@@ -1,3 +1,4 @@
+import type { SagaState } from '../domain/mod.ts';
 import type {
   CascadedMessage,
   QueryDefinition,
@@ -38,7 +39,9 @@ export interface SagaBusPort {
   /** Stop the bus and release resources, optionally recording a shutdown reason. */
   stop(reason?: string): Promise<void>;
   /** Register saga definitions that the bus may route and execute. */
-  register(definitions: readonly SagaDefinition[]): Promise<void>;
+  register<TId extends string, TState extends SagaState, TMessage extends SagaMessage>(
+    definitions: readonly SagaDefinition<TId, TState, TMessage>[],
+  ): Promise<void>;
   /** Publish a message into saga dispatch with optional idempotency and tracing metadata. */
   publish(message: SagaMessage, options?: SagaPublishOptions): Promise<void>;
   /** Dispatch cascaded messages produced by saga handlers. */

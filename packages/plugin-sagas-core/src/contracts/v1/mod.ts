@@ -4,6 +4,8 @@
  * @module
  */
 
+export { SAGA_DURABILITY_TIERS, SAGA_INSTANCE_STATUSES } from '../../domain/constants.ts';
+
 export {
   InstanceFiltersSchema,
   OffsetPaginationQuerySchema,

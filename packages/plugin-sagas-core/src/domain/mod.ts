@@ -51,3 +51,10 @@ export type {
   SagaSignalHandler,
   SignalDefinition,
 } from './saga-definition.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from './saga-transition-effect.ts';
+export type {
+  SagaTransitionEffect,
+  SagaTransitionHandler,
+  WorkerCommandEffect,
+} from './saga-transition-effect.ts';

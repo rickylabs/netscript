@@ -36,8 +36,11 @@ export type {
   SagaStateEnvelope,
   SagaStateMetadata,
   SagaTransition,
+  SagaTransitionEffect,
+  SagaTransitionHandler,
   SagaTransitionRecord,
   SignalDefinition,
+  WorkerCommandEffect,
 } from '../domain/mod.ts';
 export type {
   SagaBusPort,
@@ -101,3 +104,5 @@ export type {
   SagaSchedulerPort,
   SagaSchedulerStorePort,
 } from './saga-scheduler.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from '../domain/mod.ts';

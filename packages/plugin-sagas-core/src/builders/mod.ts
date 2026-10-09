@@ -32,5 +32,10 @@ export type {
   SagaQueryHandler,
   SagaSignalHandler,
   SagaState,
+  SagaTransitionEffect,
+  SagaTransitionHandler,
   SignalDefinition,
+  WorkerCommandEffect,
 } from '../domain/mod.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from '../domain/mod.ts';

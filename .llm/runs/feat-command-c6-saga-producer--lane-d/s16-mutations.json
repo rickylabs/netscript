@@ -1,0 +1,62 @@
+[
+  {
+    "name": "s16-version",
+    "file": "packages/plugin-sagas-core/src/testing/memory-saga-store.ts",
+    "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "87b1f4cefac5ecf16eccb696d2089909339d4b25a76677c2f573311b79a0c124",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s16-replay",
+    "file": "packages/plugin-sagas-core/src/testing/memory-saga-store.ts",
+    "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "87b1f4cefac5ecf16eccb696d2089909339d4b25a76677c2f573311b79a0c124",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s16-history",
+    "file": "packages/plugin-sagas-core/src/application/validate-transition-commit.ts",
+    "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "01e81b612b9a00b4f0a4baa3cf55d071f2a3c55b4159d4523358ad05a4cdb881",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s16-capability-refusal",
+    "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+    "test": "atomic saga composition refuses KV and unbound Prisma before handler or storage work",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "5669a40f09a1cbc90494bafe29fcf3e357c206e65481b3142c4b2e7ae9f0781a",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s16-correlation",
+    "file": "packages/plugin-sagas-core/src/testing/memory-saga-store.ts",
+    "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "87b1f4cefac5ecf16eccb696d2089909339d4b25a76677c2f573311b79a0c124",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s16-intent-collision",
+    "file": "packages/plugin-sagas-core/src/testing/memory-saga-store.ts",
+    "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "87b1f4cefac5ecf16eccb696d2089909339d4b25a76677c2f573311b79a0c124",
+    "bytesIdentical": true
+  }
+]

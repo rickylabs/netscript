@@ -172,3 +172,10 @@ independently idempotent. Construction needs no permissions; supplied clients ow
 | `CommandOutboxDelivery` | type alias | Service-owned decoded delivery. |
 | `CommandOutboxSink` | interface | Service-owned documented acceptance boundary. |
 | `CommandOutboxAcceptance` | type alias | Service-owned normalized checked identity/time. |
+
+### Runtime-schema tasks
+
+`defineTask(id).payload(selectedSchema).handler(...).build()` preserves the selected schema's
+payload type and validates input before the task handler. The legacy `.payload<T>()` overload keeps
+ordinary task compatibility but provides no runtime schema; durable saga worker-task effects refuse
+it. These task effects use the same selected-definition payload validation as job effects.
