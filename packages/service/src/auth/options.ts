@@ -15,6 +15,7 @@
  * @module
  */
 
+import type { InternalCallerPredicate } from './contract-policy.ts';
 import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from './types.ts';
 
 /** Authentication middleware options for `withAuthn()` and `defineService({ auth })`. */
@@ -39,6 +40,25 @@ export interface AuthzOptions {
 export interface ContractAuthorizerOptions {
   /** Match-aware legacy authorizer consulted only when matched procedure metadata is absent. */
   readonly fallback?: MatchAwareAuthorizerPort;
+  /**
+   * Decides which principals satisfy `access.audience: 'internal'`. Defaults to
+   * `isInternalServicePrincipal`, which accepts only internal-credential principals.
+   */
+  readonly isInternalCaller?: InternalCallerPredicate;
+}
+
+/** Options for constructing the contract-overlay authorizer. */
+export interface ContractOverlayAuthorizerOptions {
+  /**
+   * Authorizer applied to guarded requests that reach no access-marked procedure. When omitted,
+   * an authenticated principal is sufficient, exactly as with authentication alone.
+   */
+  readonly fallback?: AuthorizerPort;
+  /**
+   * Decides which principals satisfy `access.audience: 'internal'`. Defaults to
+   * `isInternalServicePrincipal`, which accepts only internal-credential principals.
+   */
+  readonly isInternalCaller?: InternalCallerPredicate;
 }
 
 /** Explicit service posture using the native authentication and authorization stages. */

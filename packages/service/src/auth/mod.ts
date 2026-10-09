@@ -37,6 +37,7 @@ export type {
   AuthnOptions,
   AuthzOptions,
   ContractAuthorizerOptions,
+  ContractOverlayAuthorizerOptions,
   ServiceAuthPolicy,
   ServiceGuardedAuthPolicy,
   ServicePublicAuthPolicy,
@@ -48,12 +49,29 @@ export type {
   ContractPolicyBindingOptions,
   ContractPolicyContract,
   ContractPolicyRpcRouteAlias,
+  InternalCallerPredicate,
   ProcedureAccessPolicy,
   ProcedurePolicyRequest,
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
 } from './contract-policy.ts';
 export { createContractAuthorizer } from './contract-authorizer.ts';
+export { createContractOverlayAuthorizer } from './contract-overlay-authorizer.ts';
+export { createCompositeAuthenticator } from './composite-authenticator.ts';
+export {
+  createInstallationSecret,
+  INSTALLATION_SECRET_FILE_ENV,
+  type InstallationSecret,
+  loadInstallationSecret,
+  type LoadInstallationSecretOptions,
+} from './installation-secret.ts';
+export { deriveInternalCredential } from './internal-credential.ts';
+export {
+  createInternalCredentialAuthenticator,
+  INTERNAL_SERVICE_SUBJECT,
+  type InternalCredentialAuthenticatorOptions,
+  isInternalServicePrincipal,
+} from './internal-credential-authenticator.ts';
 export {
   createScopeAuthorizer,
   type ScopeAuthorizationRule,

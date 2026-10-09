@@ -9,36 +9,29 @@ import type {
   ContractPolicyAuthorizerPort,
   ContractPolicyBindingOptions,
   ContractPolicyContract,
-  ProcedureAccessPolicy,
   ProcedurePolicyRequest,
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
 } from './contract-policy.ts';
-import { authorizeRequirements } from './scope-authorizer.ts';
+import { bindProcedureIndex, compileProcedures } from './contract-procedure-index.ts';
+import { isInternalServicePrincipal } from './internal-credential-authenticator.ts';
+import { authorizeProcedurePolicy } from './procedure-policy-decision.ts';
 import type { AuthzDecision, AuthzRequest } from './types.ts';
-
-const OPTIONAL_AUTHENTICATION_ERROR =
-  '[netscript.service.contract-policy] optional authentication is unsupported';
-
-type ContractProcedure = Extract<
-  ContractPolicyContract,
-  { readonly '~orpc': { readonly meta: { readonly access?: object } } }
->;
-
-interface CompiledProcedure {
-  readonly routerPath: readonly string[];
-  readonly restMethod?: string;
-  readonly restPath?: string;
-  readonly policy: ProcedureAccessPolicy | undefined;
-}
 
 /**
  * Creates an opt-in authorizer whose decisions come from procedure-local contract metadata.
  *
+ * Every procedure the contract declares is governed by it on both the RPC and OpenAPI
+ * projections: procedures without `meta.access` require authentication and go to the fallback,
+ * and `access.audience: 'internal'` admits only internal service callers. To guard a few marked
+ * procedures in an otherwise-public or session-guarded service, use
+ * `createContractOverlayAuthorizer` instead.
+ *
  * @param contract - Metadata-bearing contract router to traverse at construction.
- * @param options - Optional match-aware legacy fallback.
+ * @param options - Optional match-aware legacy fallback and internal-caller predicate.
  * @returns An authorizer that binds to the service builder's actual REST and RPC paths.
- * @throws {Error} When a procedure declares unsupported optional authentication.
+ * @throws {Error} When a procedure declares optional authentication, an unknown audience, or an
+ *   anonymous internal audience.
  *
  * @example
  * ```ts
@@ -67,11 +60,18 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
   options: ContractAuthorizerOptions = {},
 ): ContractPolicyAuthorizerPort {
   const procedures = compileProcedures(contract);
+  const isInternalCaller = options.isInternalCaller ?? isInternalServicePrincipal;
   let resolver: ProcedurePolicyResolver | undefined;
 
   return {
     bind(binding: ContractPolicyBindingOptions): ProcedurePolicyResolver {
-      resolver = createResolver(procedures, binding);
+      const index = bindProcedureIndex(procedures, binding);
+      resolver = Object.freeze({
+        resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
+          const procedure = index.find(request);
+          return procedure ? { matched: true, policy: procedure.policy } : { matched: false };
+        },
+      });
       return resolver;
     },
 
@@ -95,191 +95,9 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
         return fallbackResult.matched ? fallbackResult.decision : deny('authz.no-matching-rule');
       }
 
-      if (resolution.policy.authentication === 'none') {
-        return { allow: true };
-      }
-
-      return authorizeRequirements(
-        request,
-        resolution.policy.requiredScopes,
-        resolution.policy.requiredRoles,
-      );
+      return authorizeProcedurePolicy(request, resolution.policy, isInternalCaller);
     },
   };
-}
-
-function compileProcedures(contract: ContractPolicyContract): readonly CompiledProcedure[] {
-  const procedures: CompiledProcedure[] = [];
-  traverseContract(contract, [], (procedure, routerPath) => {
-    const route = readProperty(procedure['~orpc'], 'route');
-    const method = readStringProperty(route, 'method');
-    const path = readStringProperty(route, 'path');
-    procedures.push({
-      routerPath,
-      ...(method ? { restMethod: method.toUpperCase() } : {}),
-      ...(path ? { restPath: path } : {}),
-      policy: normalizePolicy(procedure, routerPath),
-    });
-  });
-  return Object.freeze(procedures);
-}
-
-function traverseContract(
-  contract: ContractPolicyContract,
-  routerPath: readonly string[],
-  visit: (procedure: ContractProcedure, path: readonly string[]) => void,
-): void {
-  if (isContractProcedure(contract)) {
-    visit(contract, routerPath);
-    return;
-  }
-
-  for (const [segment, child] of Object.entries(contract)) {
-    traverseContract(child, [...routerPath, segment], visit);
-  }
-}
-
-function isContractProcedure(contract: ContractPolicyContract): contract is ContractProcedure {
-  return Object.hasOwn(contract, '~orpc');
-}
-
-function normalizePolicy(
-  procedure: ContractProcedure,
-  routerPath: readonly string[],
-): ProcedureAccessPolicy | undefined {
-  const access = procedure['~orpc'].meta.access;
-  if (!access) return undefined;
-
-  const authentication = readProperty(access, 'authentication');
-  if (authentication === 'optional') {
-    const procedureName = routerPath.length ? routerPath.join('.') : '<root>';
-    throw new Error(`${OPTIONAL_AUTHENTICATION_ERROR}: ${procedureName}`);
-  }
-
-  const authorization = readProperty(access, 'authorization');
-  return Object.freeze({
-    authentication: authentication === 'none' ? 'none' : 'required',
-    requiredScopes: readStringList(readProperty(authorization, 'scopes')),
-    requiredRoles: readStringList(readProperty(authorization, 'roles')),
-  });
-}
-
-function createResolver(
-  procedures: readonly CompiledProcedure[],
-  binding: ContractPolicyBindingOptions,
-): ProcedurePolicyResolver {
-  const rpcPrefixes = uniquePaths([binding.rpcPath, ...(binding.rpcAliases ?? [])])
-    .sort((left, right) => right.length - left.length);
-  const rpcProcedures = new Map(
-    procedures.map((procedure) => [toRouterPath(procedure.routerPath), procedure]),
-  );
-  const restProcedures = procedures.flatMap((procedure) => {
-    if (!procedure.restMethod || !procedure.restPath) return [];
-    return [{
-      procedure,
-      method: procedure.restMethod,
-      pattern: compilePathPattern(joinPath(binding.apiPath, procedure.restPath)),
-    }];
-  });
-
-  return Object.freeze({
-    resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
-      const originalPath = normalizePath(request.path);
-      const rpcPath = remapDeprecatedRpcPath(originalPath, binding);
-      const rpcPrefix = rpcPrefixes.find((prefix) => isWithinPrefix(rpcPath, prefix));
-      if (rpcPrefix) {
-        const procedure = rpcProcedures.get(relativePath(rpcPath, rpcPrefix));
-        return procedure ? matched(procedure.policy) : { matched: false };
-      }
-
-      const requestMethod = request.method.toUpperCase();
-      const restMatch = restProcedures.find((candidate) =>
-        candidate.method === requestMethod && candidate.pattern.test(originalPath)
-      );
-      return restMatch ? matched(restMatch.procedure.policy) : { matched: false };
-    },
-  });
-}
-
-function remapDeprecatedRpcPath(
-  path: string,
-  binding: ContractPolicyBindingOptions,
-): string {
-  for (const alias of binding.deprecatedRpcRoutes ?? []) {
-    const pathPrefix = normalizePath(alias.pathPrefix);
-    const replacementPrefix = normalizePath(alias.replacementPrefix);
-    // The canonical destination may be nested beneath the deprecated prefix.
-    // Match the RPC transport's distinction between canonical and legacy paths.
-    if (isWithinPrefix(path, replacementPrefix)) continue;
-    if (path === pathPrefix || path.startsWith(`${pathPrefix}/`)) {
-      return `${replacementPrefix}${path.slice(pathPrefix.length)}`;
-    }
-  }
-  return path;
-}
-
-function compilePathPattern(path: string): RegExp {
-  let source = '';
-  let index = 0;
-  for (const match of path.matchAll(/\{[^{}]+\}/g)) {
-    source += escapeRegExp(path.slice(index, match.index));
-    source += '[^/]+';
-    index = match.index + match[0].length;
-  }
-  source += escapeRegExp(path.slice(index));
-  return new RegExp(`^${source}/?$`);
-}
-
-function joinPath(prefix: string, path: string): string {
-  const normalizedPrefix = normalizePath(prefix);
-  const normalizedPath = normalizePath(path);
-  if (normalizedPrefix === '/') return normalizedPath;
-  if (normalizedPath === '/') return normalizedPrefix;
-  return `${normalizedPrefix}${normalizedPath}`;
-}
-
-function toRouterPath(segments: readonly string[]): string {
-  return normalizePath(`/${segments.join('/')}`);
-}
-
-function relativePath(path: string, prefix: string): string {
-  return normalizePath(path.slice(prefix.length));
-}
-
-function uniquePaths(paths: readonly string[]): string[] {
-  return [...new Set(paths.map(normalizePath))];
-}
-
-function normalizePath(path: string): string {
-  const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
-  const withoutTrailingSlash = withLeadingSlash.replace(/\/+$/, '');
-  return withoutTrailingSlash || '/';
-}
-
-function isWithinPrefix(path: string, prefix: string): boolean {
-  return path === prefix || path.startsWith(prefix === '/' ? '/' : `${prefix}/`);
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function readProperty(value: unknown, property: string): unknown {
-  return typeof value === 'object' && value !== null ? Reflect.get(value, property) : undefined;
-}
-
-function readStringProperty(value: unknown, property: string): string | undefined {
-  const result = readProperty(value, property);
-  return typeof result === 'string' ? result : undefined;
-}
-
-function readStringList(value: unknown): readonly string[] {
-  if (!Array.isArray(value)) return [];
-  return Object.freeze(value.filter((item): item is string => typeof item === 'string'));
-}
-
-function matched(policy: ProcedureAccessPolicy | undefined): ProcedurePolicyResolution {
-  return { matched: true, policy };
 }
 
 function deny(reason: string): AuthzDecision {
