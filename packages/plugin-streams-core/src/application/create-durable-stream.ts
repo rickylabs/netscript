@@ -236,7 +236,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
       correlationId,
     });
     return {
-      headers: { operation, correlationId, ...publish.headers },
+      headers: { operation, correlationId, messageId, ...publish.headers },
       event: (name, attributes) => publish.event(name, attributes),
       finish: (outcome) => publish.finish(outcome),
     };

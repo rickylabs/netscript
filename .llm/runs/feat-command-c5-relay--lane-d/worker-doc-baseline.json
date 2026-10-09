@@ -1,0 +1,24 @@
+{
+  "baselineExit": 1,
+  "currentFullMapExit": 1,
+  "newEntrypointExit": 0,
+  "unchangedCombinedDiagnostics": 9,
+  "unchangedDiagnosticFiles": [
+    {
+      "file": "packages/plugin-workers-core/src/streams/schema.ts",
+      "sha256": "1765ff67d7c16759f778c849497f855e2b941efb5877fe20d140ed14524abc39"
+    },
+    {
+      "file": "packages/plugin-workers-core/src/contracts/v1/workers.contract-definition.ts",
+      "sha256": "5142b247f552f74ff3206af4cdefdfe9ae45b7c7d805ad100fd4c8ca92bef7e0"
+    },
+    {
+      "file": "packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts",
+      "sha256": "1b1e65f066b289eda3f85d372387fa7b9bcb87cf69f93d32bc8654831ba8cd61"
+    },
+    {
+      "file": "packages/plugin-workers-core/src/streams/producer.ts",
+      "sha256": "53bb6419d967e406bb178719a1d0161077cd4bf6ffe1160e486a1a1fdab3fec7"
+    }
+  ]
+}

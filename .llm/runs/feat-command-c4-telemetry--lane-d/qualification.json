@@ -1,0 +1,161 @@
+{
+  "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+  "mainBaseline": "6645acbbd",
+  "structuredStaticGates": [
+    {
+      "gate": "check",
+      "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+      "exitCode": 0,
+      "stdoutSha256": "1abcb9acf5b313bc208afe5911d9e86471a094e89686c5f3dac9ab866a792f7d",
+      "stderrSha256": "5d63df857f418f27382b068fe28e5a7c4ee85cc2e8e230c871aa0b82fc421970"
+    },
+    {
+      "gate": "lint",
+      "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+      "exitCode": 0,
+      "stdoutSha256": "ef4f4d3dc8b913dfa5b345d9c550e5db3b4cb923708d83158f80925d51bfc2ab",
+      "stderrSha256": "54d0a1b64174af0ded121a2c54bbc25e1cc9ee60a505eec2ce4bae8da320ab8c"
+    },
+    {
+      "gate": "fmt-check",
+      "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+      "exitCode": 0,
+      "stdoutSha256": "9b002641225589bdb359dad0ef1af44bfa3a59f60c6c7bd3db5d6f424f14821a",
+      "stderrSha256": "08f3e7cfb1d83f57b2cc1b3ae21e91f08d4305ce2e5a30b4e9a584029fc6364d"
+    },
+    {
+      "gate": "quality-scan",
+      "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+      "exitCode": 0,
+      "stdoutSha256": "dce970190ae072970570b713c6947e32c1562c8b906239c14abd13809699bab7",
+      "stderrSha256": "96006aba8e6f570d749f2b97c6fad5b678a80c510372ce7583dc0166e746886b"
+    },
+    {
+      "gate": "arch-check",
+      "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+      "exitCode": 0,
+      "stdoutSha256": "9fb30a66cb14e5b330c0ecbdb1b7cc2bd70a8a75270bc43d65a139c0ea12ad10",
+      "stderrSha256": "d6aab6a6205c6dde04e908090e430fc1ab9621755ab26eb3f7c904c6e63143bd"
+    }
+  ],
+  "gates": {
+    "scopedRegression": {
+      "exitCode": 0,
+      "passed": 298,
+      "failed": 0
+    },
+    "cliImportMapExistingTest": {
+      "exitCode": 0
+    },
+    "documentationAccuracy": {
+      "exitCode": 0
+    },
+    "commandsEntrypointDocLint": {
+      "exitCode": 0
+    },
+    "commandAttributesDocLint": {
+      "exitCode": 0
+    },
+    "serviceFullExportDocLint": {
+      "exitCode": 0
+    },
+    "telemetryFullExportDocLint": {
+      "exitCode": 1,
+      "unchangedBaselineDiagnostics": 7,
+      "newCommandDiagnostics": 0,
+      "files": [
+        "src/orpc/tracing-plugin.ts",
+        "src/hono/otel-middleware.ts",
+        "src/adapters/otel/otel-sdk.ts"
+      ]
+    },
+    "nativePackageAudit": {
+      "telemetryExitCode": 0,
+      "serviceExitCode": 0
+    },
+    "nativePublishDryRun": {
+      "telemetryExitCode": 0,
+      "serviceExitCode": 0
+    },
+    "pinnedGeneratedFreshness": {
+      "denoVersion": "2.9.5",
+      "agentDocsProseExitCode": 0,
+      "assetsBarrelExitCode": 0,
+      "publishAssetsExitCode": 0,
+      "mcpCorpusExitCode": 0
+    }
+  },
+  "semanticMutationEvidence": {
+    "namedTests": 11,
+    "allMutantsAssertionFailed": true,
+    "allRestoredPassed": true,
+    "allRestoredByteIdentical": true,
+    "record": "mutations.json",
+    "productionSourcesUnchangedSinceMutationQualification": true
+  },
+  "localFullRuntime": {
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+    "exitCode": 0,
+    "passed": 104,
+    "failed": 0,
+    "ownedCleanupPassed": true,
+    "actualProviderAndBrowser": true,
+    "transparentRunOwnedConnectionForwarding": true,
+    "rawLogSha256": "e8f30eb1b5fb9890a440a20ed5991bd18f3d7b82019c78af2365d1fb901f81e9",
+    "previousEnvironmentFailuresRetained": true
+  },
+  "nativeFullRuntime": [
+    {
+      "suite": "scaffold.runtime",
+      "summary": {
+        "passed": 104,
+        "failed": 0,
+        "skipped": 0
+      },
+      "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+      "runUrl": "https://github.com/rickylabs/netscript/actions/runs/37784805979",
+      "rawReportSha256": "e47190abcc137143e802285a2b0c3975529cad6ae42f5f69c5068ab34fd1bde9"
+    },
+    {
+      "suite": "scaffold.runtime.sqlite",
+      "summary": {
+        "passed": 98,
+        "failed": 0,
+        "skipped": 0
+      },
+      "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+      "runUrl": "https://github.com/rickylabs/netscript/actions/runs/37784805979",
+      "rawReportSha256": "7f2e184b7f9d3efb956f298d37296bfefb2761fb0ece643030dcb9cd640228f6"
+    }
+  ],
+  "nativeCoreFunctionalCI": {
+    "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+    "runUrl": "https://github.com/rickylabs/netscript/actions/runs/37784806031",
+    "functionalJobsPassed": true,
+    "acceptanceCloseGatePendingUntilFinalMirroring": true
+  },
+  "independentEvaluation": {
+    "round": 3,
+    "verdict": "PASS",
+    "productHead": "0b089e607dbc4284a5d4d29e32a37dbb89ba1e49",
+    "generatorFamily": "OpenAI",
+    "evaluatorFamily": "Google",
+    "requestedFallbackModel": "gemini-3.8-flash-high",
+    "observedModel": "gemini-3.8-flash",
+    "sameContextRepairs": true,
+    "primaryRefusedBeforeInference": "provider_rate_limited",
+    "record": "evaluate.md"
+  },
+  "artifactOnlyFollowup": {
+    "trackedNonRunFiles": 4717,
+    "allBytesIdentical": true,
+    "sourceAggregateSha256": "0cd7b9268b7b8c141278d2af7089ce4bb702e893ed25cb55a829d158699dabc2",
+    "noProductTestToolLockWorkflowOrGeneratedChanges": true
+  },
+  "release": {
+    "noMerge": true,
+    "noForcePush": true,
+    "currentHeadCIAndAcceptanceClosurePending": true
+  }
+}

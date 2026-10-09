@@ -233,6 +233,18 @@ const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
     'plugin-triggers-core',
     '/telemetry',
   ),
+  '@netscript/plugin-streams-core/integration/commands': netscriptJsrSpecifier(
+    'plugin-streams-core',
+    '/integration/commands',
+  ),
+  '@netscript/plugin-sagas-core/integration/commands': netscriptJsrSpecifier(
+    'plugin-sagas-core',
+    '/integration/commands',
+  ),
+  '@netscript/plugin-workers-core/integration/commands': netscriptJsrSpecifier(
+    'plugin-workers-core',
+    '/integration/commands',
+  ),
   '@netscript/plugin-workers-core/executor': netscriptJsrSpecifier(
     'plugin-workers-core',
     '/executor',
@@ -257,8 +269,10 @@ const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
   ),
   '@netscript/queue': netscriptJsrSpecifier('queue'),
   '@netscript/service': netscriptJsrSpecifier('service'),
+  '@netscript/service/commands/relay': netscriptJsrSpecifier('service', '/commands/relay'),
   '@netscript/telemetry': netscriptJsrSpecifier('telemetry'),
   '@netscript/telemetry/ai': netscriptJsrSpecifier('telemetry', '/ai'),
+  '@netscript/telemetry/commands': netscriptJsrSpecifier('telemetry', '/commands'),
   '@netscript/telemetry/attributes': netscriptJsrSpecifier('telemetry', '/attributes'),
   '@netscript/telemetry/config': netscriptJsrSpecifier('telemetry', '/config'),
   '@netscript/telemetry/context': netscriptJsrSpecifier('telemetry', '/context'),

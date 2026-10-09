@@ -20,7 +20,7 @@ NetScript host. Use it directly for custom hosts, libraries, and tests.
 
 ## Exports
 
-The package publishes nineteen entrypoints. The root path carries the userland DSL; the remaining
+The package publishes twenty entrypoints. The root path carries the userland DSL; the remaining
 subpaths expose the layers a host, adapter author, or test harness composes.
 
 | Export specifier | Module | Exports | Purpose |
@@ -36,6 +36,7 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 | `@netscript/plugin-sagas-core/middleware` | `./src/middleware/mod.ts` | 30 | Host middleware — `createSagaMiddleware`, `createSSEEventsMiddleware`, `emitSagaEvent`. |
 | `@netscript/plugin-sagas-core/integration/workers` | `./src/integration/workers/mod.ts` | 23 | Selected-schema pure worker effect constructors plus explicit trigger helpers for callers outside synchronous handlers. |
 | `@netscript/plugin-sagas-core/integration/publisher` | `./src/integration/publisher/mod.ts` | 11 | Non-throwing publisher contracts plus `publishSagaOrThrow` for an explicit exception boundary. |
+| `@netscript/plugin-sagas-core/integration/commands` | `./commands.ts` | 17 | Checked existing-publisher sink for the service command relay. |
 | `@netscript/plugin-sagas-core/telemetry` | `./src/telemetry/mod.ts` | 43 | Telemetry attributes and instrumentation helpers, including an OpenTelemetry tracer factory. |
 | `@netscript/plugin-sagas-core/config` | `./src/config/mod.ts` | 24 | `defineSagaConfig` and the saga runtime configuration schemas. |
 | `@netscript/plugin-sagas-core/contracts/v1` | `./src/contracts/v1/mod.ts` | 31 | Version 1 saga API schemas and contract route types (`sagasContract`, `sagasContractV1`). |
@@ -155,6 +156,26 @@ starts it, and `startSagaHandlers` binds a definition set to an already-composed
 ---
 
 Back to the [reference overview](/reference/).
+
+## Checked command sink
+
+`createSagaCommandOutboxSink` adapts the existing `SagaPublisherPort` through
+`publishSagaOrThrow`. It forwards stable outbox message/idempotency identity, correlation and
+W3C context, checks type and acceptance time, and returns only normalized identity/time.
+Rejected, unavailable, mismatched and malformed results cannot settle. The supplied publisher
+owns transport timeout; cancellation is cooperative around its awaited call. A post-publication
+crash can redeliver the same identity, so consumer side effects require independent idempotency.
+Construction starts no work and requires no permissions; supplied publishers own their permissions.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createSagaCommandOutboxSink` | function | Compose a checked existing saga publisher sink. |
+| `SagaCommandSinkOptions` | type alias | Registry identity and supplied checked publisher. |
+| `CommandJson` | type alias | Service-owned decoded canonical payload. |
+| `CommandTraceContext` | type alias | Service-owned validated W3C fields. |
+| `CommandOutboxDelivery` | type alias | Service-owned decoded delivery. |
+| `CommandOutboxSink` | interface | Service-owned documented acceptance boundary. |
+| `CommandOutboxAcceptance` | type alias | Service-owned normalized checked identity/time. |
 
 ## Atomic worker-command effects
 

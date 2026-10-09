@@ -1,5 +1,5 @@
 import type { StoredCommandOutbox } from '@netscript/database/commands';
-import { canonicalCommandJson, validateCommandTraceContext } from '@netscript/service/commands';
+import { canonicalCommandJson, commandTraceContext } from '@netscript/service/commands';
 import { encodeWorkerEffect } from '../integration/workers/worker-effects.ts';
 import {
   CASCADED_MESSAGE_KINDS,
@@ -52,7 +52,7 @@ export async function produceWorkerCommands(
   const commands: StoredCommandOutbox[] = [];
   const trace = !input.durable || input.traceparent === undefined
     ? undefined
-    : validateCommandTraceContext({
+    : commandTraceContext({
       traceparent: input.traceparent,
       ...(input.tracestate === undefined ? {} : { tracestate: input.tracestate }),
     });

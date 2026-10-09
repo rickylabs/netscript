@@ -30,6 +30,8 @@ CREATE TABLE netscript_command_outbox (
  attempt_count integer NOT NULL DEFAULT 0 CHECK (attempt_count >= 0),
  claim_token text, claim_until timestamptz(3), published_at timestamptz(3),
  terminal_at timestamptz(3), last_failure text,
+ acceptance_identity varchar(256), accepted_at timestamptz(3),
+ CONSTRAINT command_outbox_acceptance CHECK ((acceptance_identity IS NULL) = (accepted_at IS NULL)),
  CONSTRAINT command_outbox_lease CHECK ((claim_token IS NULL) = (claim_until IS NULL))
 );
 CREATE INDEX command_outbox_due ON netscript_command_outbox(available_at);

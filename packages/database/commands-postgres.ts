@@ -36,6 +36,18 @@ export type {
   TransactionOptions,
 } from './commands.ts';
 
+export { createPostgresCommandOutboxRelayStore } from './src/commands/adapters/create-postgres-command-outbox-relay-store.ts';
+export type {
+  ClaimedCommandOutboxRow,
+  CommandOutboxAcceptance,
+  CommandOutboxClaim,
+  CommandOutboxPublication,
+  CommandOutboxRelayStore,
+  CommandOutboxRelease,
+  CommandRelayFailureClass,
+} from './commands.ts';
+export { COMMAND_RELAY_FAILURE_CLASSES } from './commands.ts';
+
 export {
   bindPostgresCommandOutbox,
   type PostgresCommandOutboxWriter,

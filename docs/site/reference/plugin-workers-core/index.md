@@ -22,11 +22,12 @@ to a NetScript host. Use it directly for custom hosts, libraries, and tests.
 
 ## Exports
 
-The package publishes seventeen entrypoints. The root path carries the authoring surface; the
+The package publishes eighteen entrypoints. The root path carries the authoring surface; the
 subpaths expose the runtime layers a host composes.
 
 | Export specifier | Module | Exports | Purpose |
 | --- | --- | --- | --- |
+| `@netscript/plugin-workers-core/integration/commands` | `./commands.ts` | 14 | Thin checked command sink and its supplied worker boundary. |
 | `@netscript/plugin-workers-core` | `./mod.ts` | 32 | The authoring surface — the three typestate builders, handler results and tools, schedule and permission presets, inspection, and the runtime entry points (documented below). |
 | `@netscript/plugin-workers-core/builders` | `./src/builders/mod.ts` | 28 | The builder layer behind the DSL, including the builder-state types tooling needs. |
 | `@netscript/plugin-workers-core/runtime` | `./src/runtime/mod.ts` | 132 | The full runtime: `createWorkersRuntime`, the in-process dispatcher and runner, execution records, and `resolveWorkerIdempotencyKey`. |
@@ -123,12 +124,12 @@ starting a runtime or touching storage.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `WorkerIdempotencyPort` | interface | Durable applied-keys store used to make worker effects exactly-once-effective. |
+| `WorkerIdempotencyPort` | interface | At-least-once applied-key guard window; downstream persistence must be independently idempotent. |
 | `WorkerIdempotencyInput` | type alias | Input used to resolve and claim an applied key for one worker delivery. |
 | `WorkerIdempotencyClaim` | type alias | Result returned when a worker delivery attempts to claim an applied key. |
 | `WorkerIdempotencySource` | type alias | How a worker delivery idempotency key was resolved. |
 
-Delivery is at-least-once; effects are exactly-once-effective. A key is resolved from a caller-supplied
+Delivery is at-least-once with an applied-key guard window. A crash after an external effect and before marking it applied can repeat that effect; one effective application requires independently idempotent downstream persistence. A key is resolved from a caller-supplied
 key, the message id, or a payload hash — `WorkerIdempotencySource` records which — and then claimed
 against the port before the effect runs.
 
@@ -146,6 +147,31 @@ against the port before the effect runs.
 ---
 
 Back to the [reference overview](/reference/).
+
+## Checked command sink
+
+Register branded job/task targets with `createWorkerCommandOutboxSink`; delivery topic selects the
+copied allowlist entry. The existing supplied trigger receives the stable dedupe key, correlation
+and W3C. A receipt is checked for the selected kind/id, nonempty run identity and valid acceptance
+time before normalization. Missing, malformed, mismatched and bare status responses cannot settle.
+No queue or progress protocol is added. Cancellation is cooperative. The relay publication-to-mark
+window and worker effect-to-applied-marker window both permit redelivery; downstream work must be
+independently idempotent. Construction needs no permissions; supplied clients own theirs.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createWorkerCommandOutboxSink` | function | Compose a checked existing-worker boundary sink. |
+| `WorkerCommandTarget` | type alias | Registered branded job/task target. |
+| `WorkerCommandMetadata` | type alias | Stable dedupe, correlation and W3C propagation. |
+| `WorkerJobCommandRequest` | type alias | Selected branded job and decoded payload. |
+| `WorkerTaskCommandRequest` | type alias | Selected branded task and decoded payload. |
+| `WorkerCommandClientPort` | interface | Existing explicit trigger boundary returning raw acceptance for checking. |
+| `WorkerCommandSinkOptions` | type alias | Copied topic target registry and supplied client. |
+| `CommandJson` | type alias | Service-owned canonical decoded data. |
+| `CommandTraceContext` | type alias | Service-owned validated W3C fields. |
+| `CommandOutboxDelivery` | type alias | Service-owned decoded delivery. |
+| `CommandOutboxSink` | interface | Service-owned documented acceptance boundary. |
+| `CommandOutboxAcceptance` | type alias | Service-owned normalized checked identity/time. |
 
 ### Runtime-schema tasks
 

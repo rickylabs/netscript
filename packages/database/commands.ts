@@ -38,3 +38,14 @@ export type {
 export { CommandStoreError, type CommandStoreFailure } from './ports/command-store-error.ts';
 
 export type { TransactionClientPort } from './ports/transaction-client.ts';
+
+export { COMMAND_RELAY_FAILURE_CLASSES } from './ports/command-outbox-relay.ts';
+export type {
+  ClaimedCommandOutboxRow,
+  CommandOutboxAcceptance,
+  CommandOutboxClaim,
+  CommandOutboxPublication,
+  CommandOutboxRelayStore,
+  CommandOutboxRelease,
+  CommandRelayFailureClass,
+} from './ports/command-outbox-relay.ts';
