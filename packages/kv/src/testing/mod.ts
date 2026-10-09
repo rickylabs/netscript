@@ -6,9 +6,17 @@
  *
  * @example
  * ```ts
- * import { createMemoryKvAdapter, runKvStoreContract } from "@netscript/kv/testing";
+ * import {
+ *   createMemoryKvAdapter,
+ *   runKvStoreContract,
+ *   runWatchableKvContract,
+ * } from "@netscript/kv/testing";
  *
  * runKvStoreContract({
+ *   name: "memory",
+ *   make: () => createMemoryKvAdapter(),
+ * });
+ * runWatchableKvContract({
  *   name: "memory",
  *   make: () => createMemoryKvAdapter(),
  * });
@@ -22,6 +30,10 @@ export {
   type KvStoreContractOptions,
   runKvStoreContract,
 } from './memory-kv.ts';
+export {
+  runWatchableKvContract,
+  type WatchableKvContractOptions,
+} from './watchable-kv-contract.ts';
 export { MemoryKvAdapter } from '../../adapters/memory.adapter.ts';
 export type { KvStore } from '../../types/kv-store.ts';
 export type { WatchableKv } from '../../types/watchable-kv.ts';
