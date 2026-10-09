@@ -96,6 +96,21 @@ Deno.test('HTTP gate fails an unexpected served 502/503/504 at once (negative co
   }
 });
 
+Deno.test('HTTP gate keeps a decided mismatch when cancelling its body rejects (negative control)', async () => {
+  const http = new SequenceHttpClient(
+    [() => erroredBodyResponse(503)],
+    () => new Response('denied', { status: 401 }),
+  );
+  const gate = new HttpGate(definition({ method: 'GET', expectStatus: 401 }), http);
+
+  const result = await gate.execute(createContext(60_000));
+
+  assertEquals(result.verdict, 'failed');
+  assertEquals(http.requests.length, 1);
+  assertEquals(result.attempts[0].failureClass, 'assertion');
+  assertStringIncludes(result.error ?? '', 'expected HTTP 401, served 503');
+});
+
 Deno.test('HTTP gate body predicate fails when the served body differs (negative control)', async () => {
   const http = new SequenceHttpClient([() => Response.json({ authenticated: true })]);
   const gate = new HttpGate(definition(INTROSPECTION), http);
@@ -213,6 +228,14 @@ function createContext(httpTimeoutMs = 30_000): RunContext {
       appHost: '.llm/tmp/cli-e2e/http-gate-test/aspire/apphost.mts',
     } satisfies SmokeProject,
   };
+}
+
+/** A served response whose body stream already errored, so cancelling it rejects. */
+function erroredBodyResponse(status: number): Response {
+  const body = new ReadableStream<Uint8Array>({
+    start: (controller) => controller.error(new Error('connection reset mid-body')),
+  });
+  return new Response(body, { status });
 }
 
 type FakeReply = Error | (() => Response);

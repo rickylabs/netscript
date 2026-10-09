@@ -85,7 +85,7 @@ export async function judgeHttpResponse(
 ): Promise<HttpExchangeOutcome> {
   const status = response.status;
   if (status !== contract.expectStatus) {
-    await response.body?.cancel();
+    discardBody(response);
     return {
       kind: 'mismatch',
       status,
@@ -94,7 +94,7 @@ export async function judgeHttpResponse(
     };
   }
   if (!contract.expectBody) {
-    await response.body?.cancel();
+    discardBody(response);
     return { kind: 'matched', status, bodyPreview: '' };
   }
   const { body, bodyTruncated } = await readBoundedBody(response);
@@ -146,7 +146,7 @@ export async function readBoundedBody(
     const remaining = limitBytes - received;
     if (value.byteLength > remaining) {
       body += decoder.decode(value.subarray(0, remaining));
-      await reader.cancel();
+      settleQuietly(reader.cancel());
       return { body, bodyTruncated: true };
     }
     received += value.byteLength;
@@ -171,6 +171,19 @@ function bodyMismatch(
   return equal(actual, predicate.value)
     ? undefined
     : `expected body ${JSON.stringify(predicate.value)}, served: ${body.slice(0, 200)}`;
+}
+
+/**
+ * Release a body the verdict does not need. Cleanup runs after the verdict is decided and is
+ * never awaited: a cancel that rejects (an already-errored stream) or never settles must not
+ * alter or delay that verdict.
+ */
+function discardBody(response: Response): void {
+  if (response.body) settleQuietly(response.body.cancel());
+}
+
+function settleQuietly(cleanup: Promise<unknown>): void {
+  cleanup.catch(() => {});
 }
 
 function location(response: Response): string {

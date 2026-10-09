@@ -7,7 +7,8 @@ import {
 import { AUTH_SESSION_UNAUTHENTICATED_CONTRACT } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
 import { startContractTestServer } from './contract-test-server.ts';
 
-const BASE_URLS = ['http://localhost:8094', 'https://localhost:8095'] as const;
+/** Neutral synthetic resource addresses (RFC 6761 `.test`); the fake fetch never resolves them. */
+const BASE_URLS = ['http://auth.resource.test', 'https://auth.resource.test'] as const;
 const SESSION_PATH = '/api/v1/auth/session';
 
 Deno.test('exchange probe passes on the exact introspection contract', async () => {
@@ -20,9 +21,9 @@ Deno.test('exchange probe passes on the exact introspection contract', async () 
     effects,
   );
 
-  assertEquals(baseUrl, 'http://localhost:8094');
+  assertEquals(baseUrl, 'http://auth.resource.test');
   assertEquals(effects.requests, [{
-    url: 'http://localhost:8094/api/v1/auth/session',
+    url: 'http://auth.resource.test/api/v1/auth/session',
     method: 'GET',
     headers: undefined,
     redirect: 'manual',
@@ -62,6 +63,25 @@ Deno.test('exchange probe fails an unexpected served 502/503/504 at once (negati
   }
 });
 
+Deno.test('exchange probe keeps a decided mismatch when cancelling its body rejects (negative control)', async () => {
+  const effects = new FakeEffects(
+    [() => erroredBodyResponse(503)],
+    () => new Response('denied', { status: 401 }),
+  );
+
+  await assertRejects(
+    () =>
+      probeExchange(BASE_URLS, '/api/v1/auth/signout', {
+        method: 'POST',
+        expectStatus: 401,
+      }, effects),
+    HttpExchangeMismatchError,
+    'expected HTTP 401, served 503',
+  );
+  assertEquals(effects.requests.length, 1);
+  assertEquals(effects.delays, []);
+});
+
 Deno.test('exchange probe fails when the introspection body differs (negative control)', async () => {
   const effects = new FakeEffects([
     () => Response.json({ authenticated: true, session: { id: 'leaked' } }),
@@ -90,7 +110,7 @@ Deno.test('exchange probe retries connection failures only', async () => {
     effects,
   );
 
-  assertEquals(baseUrl, 'https://localhost:8095');
+  assertEquals(baseUrl, 'https://auth.resource.test');
   assertEquals(effects.requests.length, 4);
   assertEquals(effects.delays, [1_000]);
 });
@@ -172,6 +192,14 @@ Deno.test('exchange probe over real fetch does not follow a redirect to a matchi
     await server.close();
   }
 });
+
+/** A served response whose body stream already errored, so cancelling it rejects. */
+function erroredBodyResponse(status: number): Response {
+  const body = new ReadableStream<Uint8Array>({
+    start: (controller) => controller.error(new Error('connection reset mid-body')),
+  });
+  return new Response(body, { status });
+}
 
 interface RecordedRequest {
   readonly url: string;

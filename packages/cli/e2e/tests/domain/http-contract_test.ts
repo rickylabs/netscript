@@ -68,6 +68,23 @@ Deno.test('exchange judges the status from headers and cancels a body it never n
   }
 });
 
+Deno.test('body cleanup cannot alter or delay a decided mismatch', async () => {
+  const errored = new ReadableStream<Uint8Array>({
+    start: (controller) => controller.error(new Error('connection reset mid-body')),
+  });
+  const neverSettles = new ReadableStream<Uint8Array>({ cancel: () => new Promise(() => {}) });
+  const contract: HttpExchangeContract = { method: 'GET', expectStatus: 401 };
+
+  const rejected = await judgeHttpResponse(contract, new Response(errored, { status: 503 }));
+  const hanging = await withinMs(
+    judgeHttpResponse(contract, new Response(neverSettles, { status: 503 })),
+    1_000,
+  );
+
+  assertEquals(rejected.kind, 'mismatch');
+  assertEquals(hanging.kind, 'mismatch');
+});
+
 Deno.test('exchange judges a redirect as served, never its target', async () => {
   const outcome = await judgeHttpResponse(
     INTROSPECTION,
@@ -121,3 +138,15 @@ Deno.test('bounded body read stops at the limit instead of buffering the whole r
   assertEquals(large.body.length, HTTP_CONTRACT_BODY_LIMIT_BYTES);
   assertEquals(empty, { body: '', bodyTruncated: false });
 });
+
+async function withinMs<T>(work: Promise<T>, ms: number): Promise<T> {
+  let timer: number | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`verdict not decided within ${ms}ms`)), ms);
+  });
+  try {
+    return await Promise.race([work, timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
