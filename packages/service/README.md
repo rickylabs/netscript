@@ -194,6 +194,27 @@ const authorizer = createContractAuthorizer(OrdersContractV1, {
 `[netscript.service.contract-policy] optional authentication is unsupported: <procedure>`; the error
 is raised while the contract is traversed, not on the first request.
 
+A raw route added with `.route(method, path, handler)` under the guarded prefix matches no
+procedure, so it is denied with `authz.no-contract-procedure` until it is declared. Declare it with
+`rawRoutes`:
+
+```ts
+import { createContractAuthorizer } from '@netscript/service/auth';
+import type { ContractPolicyContract } from '@netscript/service/auth';
+
+declare const OrdersContractV1: ContractPolicyContract;
+
+const authorizer = createContractAuthorizer(OrdersContractV1, {
+  rawRoutes: [{ path: '/api/tools/mcp', authentication: 'required' }],
+});
+```
+
+A declared raw route always requires authentication, even outside `protect`. It is never a public
+bypass. It may add `authorization: { scopes?, roles? }`. Matching is exact: `/api/tools/mcp` does
+not cover `/api/tools/mcp-admin` or `/api/tools/mcp/nested`. Construction rejects wildcard or
+parameter paths, a non-`'required'` authentication and duplicates. `.build()` rejects a raw path
+that overlaps the REST or RPC projection.
+
 The `defineService()` preset accepts the same ports through its `auth` option. The following legacy
 path-prefix form remains valid and behavior-compatible; new services should prefer contract metadata
 plus `createContractAuthorizer()` as shown above:
