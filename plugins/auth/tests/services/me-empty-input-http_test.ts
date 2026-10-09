@@ -104,23 +104,26 @@ Deno.test('auth me accepts an empty request over OpenAPI and RPC (#1999)', async
     await unknown.body?.cancel();
   });
 
-  await t.step('a bearer-authenticated service client reaches me without input', async () => {
-    const bearerClient = createServiceClient({
-      contract: authContract,
-      serviceName: service.serviceName,
-      routerName: 'auth',
-      propagateTraceContext: false,
-      contributions: [
-        createBearerSdkClientContribution<{ accessToken: string }>({
-          context: { accessToken: 'required' },
-          resolveCredential: ({ context }) => context.accessToken,
-          responseCache: { mode: 'direct-only' },
-        }),
-      ] as const,
-    });
-    assertEquals(
-      await bearerClient.me(undefined, { context: { accessToken: 'not-a-session' } }),
-      SIGNED_OUT,
-    );
-  });
+  await t.step(
+    'a bearer client with an invalid bearer credential reaches me as signed-out',
+    async () => {
+      const bearerClient = createServiceClient({
+        contract: authContract,
+        serviceName: service.serviceName,
+        routerName: 'auth',
+        propagateTraceContext: false,
+        contributions: [
+          createBearerSdkClientContribution<{ accessToken: string }>({
+            context: { accessToken: 'required' },
+            resolveCredential: ({ context }) => context.accessToken,
+            responseCache: { mode: 'direct-only' },
+          }),
+        ] as const,
+      });
+      assertEquals(
+        await bearerClient.me(undefined, { context: { accessToken: 'not-a-session' } }),
+        SIGNED_OUT,
+      );
+    },
+  );
 });
