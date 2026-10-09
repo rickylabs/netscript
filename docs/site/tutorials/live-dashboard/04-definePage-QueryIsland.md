@@ -136,9 +136,10 @@ export const ordersListPage = definePage()
   })
 ```
 
-`ordersData` is a bare `getCachedEntry()` read, not chapter 3's action-then-metadata loader, so
-first paint never waits on `orders`. Refresh is the `list` layer's job: on a miss or stale entry the
-runtime prewarms its `partial` route, whose loader runs the callable action to fetch and re-cache.
+`ordersData` is a bare `getCachedEntry()` read, not chapter 3's action-then-metadata loader: the
+`list` layer renders whatever KV holds, and on a miss or stale entry the runtime prewarms its
+`partial` route, whose loader runs the callable action. The page still waits on `orders` when the
+cache is cold or expired: it awaits the island's `dehydratedQuery` prefetch, which runs that action.
 
 `definePage` comes from `@app/utils.ts`, not straight from `@netscript/fresh/builders`. Your scaffold
 wrote that module in chapter 1 — a thin wrapper that calls the package builder with the app's `State`

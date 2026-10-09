@@ -342,6 +342,32 @@ value, so the freshness stamp never vouches for data the cache did not record. O
 same failure leaves no entry, and the fallback returns `data` with the current time. A loader that
 needs the freshest value rather than a consistent pair returns `data` itself.
 
+```ts
+import type { CachedEntry } from '@netscript/sdk/cache';
+import { createServiceClient } from '@netscript/sdk/client';
+import { createQueryFactories } from '@netscript/sdk/query';
+import { ordersContract } from '@my-app/contracts';
+
+const ordersClient = createServiceClient({ contract: ordersContract, serviceName: 'orders' });
+const ordersQueries = createQueryFactories({
+  orders: { contract: ordersContract, client: ordersClient },
+}).orders;
+type OrdersInput = { offset: number; limit: number };
+type Orders = Awaited<ReturnType<typeof ordersQueries.list>>;
+
+/** Consistent pair: `cachedAt` stamps exactly the `data` beside it, and may lag the refresh. */
+export async function loadPersistedOrders(input: OrdersInput): Promise<CachedEntry<Orders>> {
+  const data = await ordersQueries.list(input, { preferFreshOnStale: true });
+  const entry = await ordersQueries.list.getCachedEntry(input);
+  return entry ?? { data, cachedAt: Date.now() };
+}
+
+/** Freshest value: what this call returned, whether or not the KV write landed. */
+export async function loadFreshestOrders(input: OrdersInput): Promise<Orders> {
+  return await ordersQueries.list(input, { preferFreshOnStale: true });
+}
+```
+
 ## Safe error narrowing
 
 For a route built from `baseContract`, the defined channel is exactly `NOT_FOUND`,
