@@ -33,6 +33,14 @@ import { type NetScriptChatProducer, NetScriptChatProducerError } from './chat-p
  */
 const MAX_IN_FLIGHT_BATCHES = 5;
 
+/** Compile-time guard: the chat error kinds stay identical to the State Protocol producer kinds. */
+type SameKinds<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never;
+const KINDS_MATCH: SameKinds<
+  NetScriptChatProducerError['kind'],
+  StreamProducerTransportFailureKindV1
+> = true;
+void KINDS_MATCH;
+
 /** Input of {@link toFencedChatSessionResponse}; the default `toResponse` seam shape plus a producer. */
 export interface FencedChatSessionResponseInput {
   readonly writeUrl: string;

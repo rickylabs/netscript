@@ -11,8 +11,6 @@
  * @module
  */
 
-import type { StreamProducerTransportFailureKindV1 } from '@netscript/plugin-streams-core';
-
 /**
  * Caller-supplied writer identity for one fenced durable chat turn.
  *
@@ -34,7 +32,7 @@ export interface NetScriptChatProducer {
 
 /** Construction input for {@link NetScriptChatProducerError}. */
 interface NetScriptChatProducerErrorInit {
-  readonly kind: StreamProducerTransportFailureKindV1;
+  readonly kind: NetScriptChatProducerError['kind'];
   readonly producer: NetScriptChatProducer;
   readonly message: string;
   readonly currentEpoch?: number;
@@ -61,8 +59,17 @@ interface NetScriptChatProducerErrorInit {
  * ```
  */
 export class NetScriptChatProducerError extends Error {
-  /** Stable failure category shared with State Protocol producers. */
-  readonly kind: StreamProducerTransportFailureKindV1;
+  /**
+   * Stable failure category; the same set as `StreamProducerTransportFailureKindV1`
+   * in `@netscript/plugin-streams-core` (a compile-time check keeps them equal).
+   */
+  readonly kind:
+    | 'retryable'
+    | 'stale-epoch'
+    | 'sequence-gap'
+    | 'stream-closed'
+    | 'non-retryable'
+    | 'aborted';
   /** Writer id whose append failed. */
   readonly producerId: string;
   /** Epoch the failed append was made under. */
