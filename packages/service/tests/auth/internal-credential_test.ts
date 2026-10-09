@@ -145,6 +145,15 @@ Deno.test('internal credential authenticator mints branded internal principals o
     () => createInternalCredentialAuthenticator({ secret, service: '' }),
     TypeError,
   );
+  assertThrows(
+    () =>
+      createInternalCredentialAuthenticator({
+        secret: { kind: 'netscript.installation-secret' },
+        service: 'orders',
+      }),
+    TypeError,
+    'was not created by',
+  );
 });
 
 Deno.test('composite authenticator returns the first success and the most specific rejection', async () => {
@@ -238,6 +247,8 @@ Deno.test('contract index covers OpenAPI defaults under the RPC mount and wildca
   assertEquals(resolver.resolve({ method: 'POST', path: '/api/rpc/flush' }), internal);
   assertEquals(resolver.resolve({ method: 'POST', path: '/api/rpc/rpc/flush' }), internal);
   assertEquals(resolver.resolve({ method: 'GET', path: '/api/files/a/b/c.txt' }), internal);
+  // The empty wildcard remainder is guarded too (fail closed), independent of router version.
+  assertEquals(resolver.resolve({ method: 'GET', path: '/api/files' }), internal);
   // Unmarked procedures stay unmatched so the service's own policy applies.
   assertEquals(resolver.resolve({ method: 'GET', path: '/api/ping' }), { matched: false });
 });

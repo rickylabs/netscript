@@ -179,9 +179,13 @@ function compilePathPattern(path: string): RegExp {
   let source = '';
   let index = 0;
   for (const match of path.matchAll(/\{(\+?)[^{}]+\}/g)) {
-    source += escapeRegExp(path.slice(index, match.index));
-    // `{+name}` is oRPC's multi-segment wildcard; `{name}` is one segment.
-    source += match[1] ? '.+' : '[^/]+';
+    const literal = escapeRegExp(path.slice(index, match.index));
+    // `{+name}` is oRPC's multi-segment wildcard. It also absorbs its leading slash so the empty
+    // remainder matches too: that only widens the guard, whatever the router version does.
+    // `{name}` is exactly one segment.
+    source += match[1] && literal.endsWith('/')
+      ? `${literal.slice(0, -1)}(?:/.*)?`
+      : `${literal}${match[1] ? '.*' : '[^/]+'}`;
     index = match.index + match[0].length;
   }
   source += escapeRegExp(path.slice(index));

@@ -4,7 +4,7 @@
  * @module
  */
 
-import type { InstallationSecret } from './installation-secret.ts';
+import { type InstallationSecret, installationSecretKey } from './installation-secret.ts';
 import { assertServiceName, deriveInternalCredential } from './internal-credential.ts';
 import { createStaticCredentialAuthenticator } from '../static-credential-authenticator.ts';
 import type { AuthenticatorPort, AuthnRequest, AuthnResult, Principal } from '../types.ts';
@@ -36,7 +36,7 @@ export interface InternalCredentialAuthenticatorOptions {
  *
  * @param options - Installation secret, service name, and grants for internal callers.
  * @returns An authenticator yielding internal service principals.
- * @throws {TypeError} When the service name is invalid.
+ * @throws {TypeError} When the service name is invalid or the secret handle is foreign.
  *
  * @example
  * ```ts
@@ -53,6 +53,7 @@ export function createInternalCredentialAuthenticator(
   options: InternalCredentialAuthenticatorOptions,
 ): AuthenticatorPort {
   assertServiceName(options.service);
+  installationSecretKey(options.secret);
   let delegate: Promise<AuthenticatorPort> | undefined;
 
   const resolveDelegate = (): Promise<AuthenticatorPort> => {
