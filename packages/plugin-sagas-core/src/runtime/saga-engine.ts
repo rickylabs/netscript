@@ -240,7 +240,7 @@ export class SagaEngine implements SagaBusPort {
     if (!this.#store) return Object.freeze({ committed: true, status });
 
     const version = outcome.version + 1;
-    const replayKey = `saga-compensation-v1:${outcome.version}`;
+    const replayKey = `${COMPENSATION_REPLAY_NAMESPACE}:${outcome.version}`;
     if (!definition.durableWorkerCommands) {
       const replay = await this.#appliedKeys.recordApplied(outcome.instanceId, replayKey);
       if (!replay.applied) return Object.freeze({ committed: false, status, version });
@@ -260,7 +260,12 @@ export class SagaEngine implements SagaBusPort {
       completed: status === 'completed',
       status,
       now: new Date(),
-      replayIdentity: [definition.id, outcome.instanceId, replayKey],
+      replayIdentity: [
+        COMPENSATION_REPLAY_NAMESPACE,
+        definition.id,
+        outcome.instanceId,
+        String(outcome.version),
+      ],
       compensationError: outcome.error === undefined
         ? undefined
         : toCompensationError(outcome.error),
@@ -663,6 +668,7 @@ function cloneState<TState extends SagaState>(state: TState): TState {
   return structuredClone(state);
 }
 
+const COMPENSATION_REPLAY_NAMESPACE = 'saga-compensation-v1';
 const MAX_COMPENSATION_ERROR_MESSAGE_LENGTH = 1_024;
 
 function toCompensationError(error: unknown): SagaCompensationError {
