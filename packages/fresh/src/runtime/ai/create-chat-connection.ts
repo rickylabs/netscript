@@ -30,6 +30,8 @@ import {
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 import type { ModelMessage, UIMessage } from '@tanstack/ai';
 import { createChatSubscriptionHub } from '../../internal/chat-subscription-hub.ts';
+import type { NetScriptChatProducer } from './chat-producer.ts';
+import { assertChatProducer, toFencedChatSessionResponse } from './fenced-chat-session-writer.ts';
 
 // ---------------------------------------------------------------------------
 // Session addressing (internal — not part of the public `./ai` surface).
@@ -287,8 +289,21 @@ export interface NetScriptChatResponseOptions {
    */
   readonly authorize?: NetScriptChatAuthorize;
   /**
+   * Opt-in writer fencing for an executor that may be reclaimed (a worker or
+   * saga holding a lease). When supplied, the new-message echo and every
+   * assistant chunk are appended under one idempotent-producer sequence
+   * `(id, epoch, seq)`: a writer whose epoch is older than the newest one that
+   * has written is rejected by the streams runtime with a
+   * `NetScriptChatProducerError` (`kind: 'stale-epoch'`), and nothing from the
+   * rejected appends is stored. The epoch is never claimed or bumped
+   * automatically; see {@link NetScriptChatProducer}. Omitted: appends are
+   * unfenced, exactly as before.
+   */
+  readonly producer?: NetScriptChatProducer;
+  /**
    * Test/adapter seam: build the durable session `Response`. Defaults to
-   * `toDurableChatSessionResponse` from the transport.
+   * `toDurableChatSessionResponse` from the transport, or the fenced
+   * idempotent-producer writer when `producer` is present.
    */
   readonly toResponse?: (input: {
     readonly writeUrl: string;
@@ -297,6 +312,8 @@ export interface NetScriptChatResponseOptions {
     readonly source: AsyncIterable<unknown>;
     readonly mode?: 'immediate' | 'await';
     readonly waitUntil?: (task: Promise<unknown>) => void;
+    /** Writer identity, present only when the caller supplied `producer`. */
+    readonly producer?: NetScriptChatProducer;
   }) => Promise<Response>;
 }
 
@@ -477,12 +494,33 @@ export function createNetScriptChatConnection(
  * is enforced against `request` (see {@link NetScriptChatAuthorize}); a denial
  * yields `403 Forbidden` and the session stream is never touched. Supplying
  * `authorize` without `request` is a programming error and throws.
+ *
+ * With `producer`, appends are fenced: a stale epoch rejects (in `'await'`
+ * mode, or while echoing `newMessages`) with a `NetScriptChatProducerError`.
+ *
+ * @example Fence a worker-hosted chat turn
+ * ```ts
+ * import { toNetScriptChatResponse } from '@netscript/fresh/ai';
+ *
+ * declare const turn: { sessionId: string; turnId: string; claimGeneration: number };
+ * declare const source: AsyncIterable<unknown>;
+ *
+ * // The id names the turn; the epoch is the executor's claim generation.
+ * const response = await toNetScriptChatResponse({
+ *   target: { sessionId: turn.sessionId },
+ *   source,
+ *   mode: 'await',
+ *   producer: { id: `chat-turn:${turn.sessionId}:${turn.turnId}`, epoch: turn.claimGeneration },
+ * });
+ * console.log(response.status);
+ * ```
  */
 export async function toNetScriptChatResponse(
   options: NetScriptChatResponseOptions,
 ): Promise<Response> {
-  const { target, source, newMessages, request, authorize } = options;
+  const { target, source, newMessages, request, authorize, producer } = options;
 
+  if (producer) assertChatProducer(producer);
   if (authorize) {
     if (!request) {
       throw new Error(
@@ -503,6 +541,7 @@ export async function toNetScriptChatResponse(
     source,
     mode: options.mode,
     waitUntil: options.waitUntil,
+    ...(producer ? { producer } : {}),
   });
 }
 
@@ -584,7 +623,11 @@ function defaultToResponse(input: {
   readonly source: AsyncIterable<unknown>;
   readonly mode?: 'immediate' | 'await';
   readonly waitUntil?: (task: Promise<unknown>) => void;
+  readonly producer?: NetScriptChatProducer;
 }): Promise<Response> {
+  if (input.producer) {
+    return toFencedChatSessionResponse({ ...input, producer: input.producer });
+  }
   return toDurableChatSessionResponse({
     stream: { writeUrl: input.writeUrl, headers: input.headers, createIfMissing: true },
     newMessages: input.newMessages as Parameters<
