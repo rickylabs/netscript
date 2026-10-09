@@ -122,6 +122,7 @@ Deno.test('an envelope for a name with no local listener is re-enqueued until th
       maxHops: 20,
       baseDelayMs: 20,
       maxDelayMs: 20,
+      parkDelayMs: 20,
     });
     const jobs: MessageEnvelope<unknown>[] = [];
     const tasks: MessageEnvelope<unknown>[] = [];
@@ -158,6 +159,7 @@ Deno.test('an envelope whose listener never appears is dead-lettered as unroutab
       maxHops: 3,
       baseDelayMs: 10,
       maxDelayMs: 40,
+      parkDelayMs: 40,
     });
     const jobs: MessageEnvelope<unknown>[] = [];
     const controller = new AbortController();
@@ -215,4 +217,39 @@ Deno.test('stopping one named listener leaves the other names on the database li
     }
     assertEquals(received, ['after-jobs-stopped']);
   });
+});
+
+Deno.test('with no listener registered at all, envelopes are parked rather than dead-lettered', async () => {
+  const dispatcher = new KvQueueDispatcher(createKvQueueConnection({ path: ':memory:' }), {
+    maxHops: 1,
+    baseDelayMs: 10,
+    maxDelayMs: 10,
+    parkDelayMs: 20,
+  });
+  const received: MessageEnvelope<unknown>[] = [];
+  const first = new AbortController();
+  const firstListening = dispatcher.listen('jobs', () => Promise.resolve(), first.signal);
+  const kv = await dispatcher.kv();
+  const dlq = new KvDeadLetterStore<unknown>({ queueName: 'jobs', denoKv: kv });
+  try {
+    first.abort();
+    await firstListening;
+    await dispatcher.enqueue(createEnvelope({ parked: true }, undefined, 'jobs'));
+    // Well past maxHops worth of re-enqueues: parking spends no hops.
+    await delay(200);
+    assertEquals(await dlq.depth(), 0);
+
+    const second = new AbortController();
+    const secondListening = dispatcher.listen('jobs', (envelope) => {
+      received.push(envelope);
+      return Promise.resolve();
+    }, second.signal);
+    await until(() => received.length === 1);
+    second.abort();
+    await secondListening;
+  } finally {
+    await dispatcher.close();
+  }
+  assertEquals(received[0].payload, { parked: true });
+  assertEquals(received[0].routingHops ?? 0, 0);
 });

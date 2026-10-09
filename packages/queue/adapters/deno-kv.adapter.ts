@@ -76,14 +76,17 @@ function getKvConnectionFromAspire(): string | undefined {
  * listen loop that routes each message to the listener for the message's queue name, so named
  * queues on one database never consume each other's messages. A message whose queue name has no
  * listener in the receiving process is re-enqueued a bounded number of times, then dead-lettered
- * with reason `unroutable`. Listen to every queue of one local database from one process: a local
- * database wakes other processes only on a periodic poll.
+ * with reason `unroutable`; while no listener is registered at all, messages stay queued. Listen to
+ * every queue of one local database from one process: a local database wakes other processes only
+ * on a periodic poll. `stop()` waits for this adapter's in-flight handlers.
  *
  * @template T - Message payload type
  */
 export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   private lease: KvQueueDispatcherLease | null = null;
-  private listenController: AbortController | null = null;
+  private activeListener:
+    | { readonly controller: AbortController; readonly done: Promise<void> }
+    | null = null;
   private readonly queueName: string;
   private readonly path?: string;
   private readonly useShared: boolean;
@@ -113,6 +116,10 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
 
   /**
    * Create an adapter around a caller-owned KV instance.
+   *
+   * The queue never closes the instance. Deno KV stops a queue listener only by closing its
+   * connection, so once an adapter on it has listened, its queue stays consumed until the caller
+   * closes it; messages that arrive while no adapter listens are held by delayed re-enqueue.
    *
    * @param kv - KV instance whose lifecycle is owned by the caller.
    * @param queueName - Queue name used for routing, diagnostics, and message metadata.
@@ -241,25 +248,27 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   ): Promise<void> {
     const dispatcher = await this.ensureDispatcher();
 
-    if (this.listenController) {
+    if (this.activeListener) {
       throw new QueueError('Queue is already listening', QueueErrorCode.CONFIGURATION_ERROR);
     }
 
     const controller = new AbortController();
-    this.listenController = controller;
     const signal = options?.signal;
     const stopListening = () => controller.abort();
     signal?.addEventListener('abort', stopListening, { once: true });
     if (signal?.aborted) {
       controller.abort();
     }
+    const done = dispatcher.listen(
+      this.queueName,
+      (envelope) => this.deliver(envelope, handler),
+      controller.signal,
+    );
+    const listener = { controller, done };
+    this.activeListener = listener;
 
     try {
-      await dispatcher.listen(
-        this.queueName,
-        (envelope) => this.deliver(envelope, handler),
-        controller.signal,
-      );
+      await done;
     } catch (error) {
       throw new QueueError(
         `Queue listener failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -271,19 +280,24 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
       );
     } finally {
       signal?.removeEventListener('abort', stopListening);
-      if (this.listenController === controller) {
-        this.listenController = null;
+      if (this.activeListener === listener) {
+        this.activeListener = null;
       }
       this.log('stopped');
     }
   }
 
   /**
-   * Stop the active listener and release this adapter's claim on the shared database connection.
+   * Stop the active listener, wait for its in-flight handlers to finish, and release this
+   * adapter's claim on the shared database connection.
    */
   async stop(): Promise<void> {
-    this.listenController?.abort();
-    this.listenController = null;
+    const listener = this.activeListener;
+    this.activeListener = null;
+    if (listener) {
+      listener.controller.abort();
+      await listener.done.catch(() => undefined);
+    }
     const lease = this.lease;
     this.lease = null;
     if (!this.explicitDeadLetterStore) {
@@ -306,7 +320,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
    * Whether the adapter currently has an active listener.
    */
   get isListening(): boolean {
-    return this.listenController !== null;
+    return this.activeListener !== null;
   }
 
   /**
