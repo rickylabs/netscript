@@ -4,10 +4,13 @@
  *
  * The router source is the CLI's shipped `app/router.ts.template`, rendered by the CLI's template
  * renderer. Its `.generated/{manifest,routes}.ts` siblings come from the Fresh route-manifest
- * generator the scaffold runs at `netscript init`, run over every app route asset the CLI ships plus the reader-authored
- * routes the documentation itself describes. Nothing here restates a route reference, so the
- * support cannot drift from what `netscript init` emits: a template or generator change flows
- * straight into the checked examples, and a change that breaks the wiring fails loudly.
+ * generator the scaffold runs at `netscript init`, over every app route asset the CLI ships plus
+ * the reader-authored routes the documentation itself describes. No route reference is restated, so
+ * a template or generator change flows straight into the checked examples.
+ *
+ * The one local input is {@link APP_ROUTER_TEMPLATE_VARS}. `app-router-support_test.ts` holds it to
+ * the scaffold by running the real app writer in memory and comparing the rendered router byte for
+ * byte, so a wrong placeholder value fails there rather than passing as a still-valid route.
  *
  * @module
  */
@@ -35,7 +38,7 @@ const TEMPLATE_SUFFIX = '.template';
 /**
  * Router placeholders for an app scaffolded without the example service: the only variant whose
  * routes are fully determined by shipped assets. `renderTemplate` throws on any placeholder missing
- * here, so a new router placeholder cannot slip through unrendered.
+ * here; the values are verified against the scaffold writer's own output by the drift test.
  */
 export const APP_ROUTER_TEMPLATE_VARS: Readonly<Record<string, string>> = {
   serviceResourceRouteAlias: '',
@@ -58,6 +61,8 @@ export interface AppRouterSupportOptions {
   readonly routeAssets?: readonly TemplateKey[];
   /** Reader-authored route files, keyed by path under `routes/`. */
   readonly readerRoutes?: Readonly<Record<string, string>>;
+  /** Router template placeholders. Defaults to {@link APP_ROUTER_TEMPLATE_VARS}. */
+  readonly routerTemplateVars?: Readonly<Record<string, string>>;
 }
 
 /** Every route-tree template asset the CLI ships for a scaffolded app. */
@@ -100,7 +105,10 @@ export async function materializeAppRouterSupport(
   const routerPath = join(appRoot, 'router.ts');
   await writeFile(
     routerPath,
-    renderTemplateAssetSync(TEMPLATE_KEYS.appRouter, APP_ROUTER_TEMPLATE_VARS),
+    renderTemplateAssetSync(
+      TEMPLATE_KEYS.appRouter,
+      options.routerTemplateVars ?? APP_ROUTER_TEMPLATE_VARS,
+    ),
   );
   return routerPath;
 }

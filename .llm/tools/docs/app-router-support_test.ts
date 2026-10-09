@@ -1,8 +1,20 @@
-import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
-import { fromFileUrl, join, toFileUrl } from '@std/path';
-import { renderTemplate } from '../../../packages/cli/src/kernel/adapters/scaffold/template-adapter.ts';
+import {
+  assert,
+  assertEquals,
+  assertNotEquals,
+  assertStringIncludes,
+  assertThrows,
+} from '@std/assert';
+import { fromFileUrl, join, relative, toFileUrl } from '@std/path';
+import { MemoryFileSystemAdapter } from '../../../packages/cli/src/kernel/adapters/scaffold/memory-fs.ts';
+import { Scaffolder } from '../../../packages/cli/src/kernel/adapters/scaffold/scaffolder.ts';
+import {
+  renderTemplate,
+  StringTemplateAdapter,
+} from '../../../packages/cli/src/kernel/adapters/scaffold/template-adapter.ts';
 import { readTemplateAssetSync } from '../../../packages/cli/src/kernel/adapters/templates/template-asset.ts';
 import { TEMPLATE_KEYS } from '../../../packages/cli/src/kernel/assets/manifest.ts';
+import type { ProcessPort } from '../../../packages/cli/src/kernel/ports/process-port.ts';
 import {
   APP_ROUTER_TEMPLATE_VARS,
   DOCUMENTED_READER_ROUTES,
@@ -12,6 +24,91 @@ import {
 import { resolveWorkspaceSurface } from './snippet-workspace.ts';
 
 const repositoryRoot = fromFileUrl(new URL('../../../', import.meta.url));
+const SCAFFOLD_APP_DIR = '/workspace/docs-app/apps/dashboard';
+
+/**
+ * The scaffold app writer, loaded by URL as `check-accuracy-and-discoverability.ts` loads the CLI
+ * command tree. The computed import keeps its module graph out of this test's type check, where the
+ * root `isolatedDeclarations` setting would reject it; `packages/cli` checks it under its own
+ * compiler options.
+ */
+interface AppWriterModule {
+  readonly writeNormalizedAppFiles: (
+    context: unknown,
+    options: unknown,
+    appDir: string,
+    overwrite: boolean,
+    filesCreated: string[],
+    filesSkipped: string[],
+    directoriesCreated: string[],
+  ) => Promise<void>;
+}
+const appWriterUrl = new URL(
+  '../../../packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts',
+  import.meta.url,
+).href;
+
+/** Pin `@netscript/*` imports to one exact release, as the writer's closure check requires. */
+function pinNetScriptImport(specifier: string): string {
+  return specifier.replace(/^@netscript\/([^/]+)(.*)$/, 'jsr:@netscript/$1@0.0.0$2');
+}
+
+/**
+ * The files the real scaffold app writer emits for an app without the example service, written to
+ * an in-memory filesystem. This is the independent oracle: it computes its own router placeholders,
+ * sharing no input with `app-router-support.ts`.
+ */
+async function scaffoldAppWithoutExampleService(): Promise<ReadonlyMap<string, string>> {
+  const fs = new MemoryFileSystemAdapter();
+  const templateAdapter = new StringTemplateAdapter(fs);
+  const process: ProcessPort = {
+    exec: () => Promise.reject(new Error('the app writer must not spawn processes')),
+  };
+  const context = {
+    fs,
+    process,
+    templateAdapter,
+    scaffolder: new Scaffolder(templateAdapter, fs),
+    jsrResolver: {
+      resolveImport: pinNetScriptImport,
+      resolveImports: (specifiers: readonly string[]) =>
+        Object.fromEntries(
+          specifiers.map((specifier) => [specifier, pinNetScriptImport(specifier)]),
+        ),
+    },
+    cwd: () => '/workspace',
+    resolveModeFields: () => ({}),
+    packagesAsWorkspaceMembers: () => false,
+    scaffoldWorkspacePackages: () => Promise.reject(new Error('not part of the app writer')),
+  };
+  const options = {
+    name: 'docs-app',
+    appName: 'dashboard',
+    targetPath: '/workspace/docs-app',
+    importMode: 'jsr',
+    editor: 'none',
+    force: false,
+    ci: true,
+    // Dry run keeps the writer off the real disk; it still renders every file into `fs`.
+    dryRun: true,
+    noGit: true,
+    noAspire: false,
+    dbEngine: 'none',
+    cache: false,
+    cacheBackend: 'redis',
+    includeExampleService: false,
+    modelName: 'User',
+  };
+  const { writeNormalizedAppFiles } = await import(appWriterUrl) as AppWriterModule;
+  await writeNormalizedAppFiles(context, options, SCAFFOLD_APP_DIR, true, [], [], []);
+  return fs.getFiles();
+}
+
+async function scaffoldRouter(): Promise<string> {
+  const router = (await scaffoldAppWithoutExampleService()).get(`${SCAFFOLD_APP_DIR}/router.ts`);
+  assert(router !== undefined, 'expected the scaffold writer to emit router.ts');
+  return router;
+}
 
 /** Type-check a probe that consumes the materialized router the way README fences do. */
 async function checkRouterProbe(tempRoot: string, routerPath: string): Promise<Deno.CommandOutput> {
@@ -54,16 +151,44 @@ async function withTempRoot(run: (tempRoot: string) => Promise<void>): Promise<v
   }
 }
 
-Deno.test('the support router is byte-identical to the scaffold router template render', async () => {
+Deno.test('the support router is byte-identical to the router the scaffold writer emits', async () => {
   await withTempRoot(async (tempRoot) => {
     const routerPath = await materializeAppRouterSupport(join(tempRoot, 'app'));
 
-    assertEquals(
-      await Deno.readTextFile(routerPath),
-      renderTemplate(readTemplateAssetSync(TEMPLATE_KEYS.appRouter), {
+    assertEquals(await Deno.readTextFile(routerPath), await scaffoldRouter());
+  });
+});
+
+Deno.test('negative control: a valid but wrong placeholder value fails the scaffold comparison', async () => {
+  await withTempRoot(async (tempRoot) => {
+    // Still a real route, so the type-check probe alone accepts it; only the scaffold oracle catches it.
+    const routerPath = await materializeAppRouterSupport(join(tempRoot, 'app'), {
+      routerTemplateVars: {
         ...APP_ROUTER_TEMPLATE_VARS,
-      }),
-    );
+        serviceExampleRouteReference: 'routes.dashboard.$route',
+      },
+    });
+    const output = await checkRouterProbe(tempRoot, routerPath);
+
+    assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+    assertNotEquals(await Deno.readTextFile(routerPath), await scaffoldRouter());
+  });
+});
+
+Deno.test('every route file the scaffold writer emits is in the support route tree', async () => {
+  await withTempRoot(async (tempRoot) => {
+    const appRoot = join(tempRoot, 'app');
+    await materializeAppRouterSupport(appRoot);
+    const scaffoldRoutesDir = `${SCAFFOLD_APP_DIR}/routes`;
+    const scaffoldRouteFiles = [...(await scaffoldAppWithoutExampleService()).keys()]
+      .filter((path) => path.startsWith(`${scaffoldRoutesDir}/`))
+      .map((path) => relative(scaffoldRoutesDir, path));
+
+    assert(scaffoldRouteFiles.includes('examples/orders/[id].tsx'));
+    for (const routeFile of scaffoldRouteFiles) {
+      const info = await Deno.stat(join(appRoot, 'routes', routeFile)).catch(() => undefined);
+      assert(info?.isFile, `scaffold route ${routeFile} is missing from the support route tree`);
+    }
   });
 });
 
