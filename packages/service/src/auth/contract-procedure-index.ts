@@ -89,9 +89,7 @@ export function bindProcedureIndex(
       const originalPath = normalizePath(request.path);
       const rpcPath = remapDeprecatedRpcPath(originalPath, binding);
       const rpcPrefix = rpcPrefixes.find((prefix) => isWithinPrefix(rpcPath, prefix));
-      const rpcMatch = rpcPrefix
-        ? rpcProcedures.get(relativePath(rpcPath, rpcPrefix))
-        : undefined;
+      const rpcMatch = rpcPrefix ? rpcProcedures.get(relativePath(rpcPath, rpcPrefix)) : undefined;
       if (rpcMatch) return rpcMatch;
 
       // The OpenAPI mount usually encloses the RPC mount, so an RPC miss can still be a REST hit.
