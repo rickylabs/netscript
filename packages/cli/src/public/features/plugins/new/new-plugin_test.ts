@@ -1,5 +1,6 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { walk } from 'jsr:@std/fs@^1/walk';
+import { fromFileUrl } from '@std/path';
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
@@ -144,7 +145,7 @@ describe('plugin new formatting', () => {
         `${projectRoot}/netscript.config.ts`,
         "import { defineConfig } from '@netscript/config';\nexport default defineConfig({\n  plugins: [],\n});\n",
       );
-      const cli = new URL('../../../../../bin/netscript.ts', import.meta.url).pathname;
+      const cli = fromFileUrl(new URL('../../../../../bin/netscript.ts', import.meta.url));
       const generated = await new Deno.Command(Deno.execPath(), {
         args: ['run', '-A', cli, 'plugin', 'new', 'guarded-fixture', '--project-root', projectRoot],
         stdout: 'null',
