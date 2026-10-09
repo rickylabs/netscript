@@ -4,7 +4,7 @@
  * @module
  */
 
-import type { MessageEnvelope } from './_envelope.ts';
+import type { MessageEnvelope } from '../_envelope.ts';
 
 /** Handler that receives envelopes addressed to one queue name. */
 export type KvEnvelopeHandler = (envelope: MessageEnvelope<unknown>) => Promise<void>;

@@ -18,23 +18,18 @@
  */
 
 import { DenoKvMessageQueue } from '@fedify/denokv';
-import { type MessageEnvelope, toAddressedEnvelope, toDeadLetterRecord } from './_envelope.ts';
+import { type MessageEnvelope, toAddressedEnvelope, toDeadLetterRecord } from '../_envelope.ts';
 import {
   closeQuietly,
   createKvQueueConnection,
   type KvDatabaseTarget,
   type KvQueueConnection,
-} from './_kv-queue-connection.ts';
-import {
-  type KvEnvelopeHandler,
-  KvQueueRegistration,
-  KvQueueRouteTable,
-  track,
-} from './_kv-queue-routes.ts';
-import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
+} from './connection.ts';
+import { type KvEnvelopeHandler, KvQueueRegistration, KvQueueRouteTable, track } from './routes.ts';
+import { KvDeadLetterStore } from '../kv-dead-letter-store.ts';
 
-export type { KvDatabaseTarget } from './_kv-queue-connection.ts';
-export type { KvEnvelopeHandler } from './_kv-queue-routes.ts';
+export type { KvDatabaseTarget } from './connection.ts';
+export type { KvEnvelopeHandler } from './routes.ts';
 
 /** Re-enqueue policy for envelopes that no local listener receives. */
 export interface UnroutablePolicy {

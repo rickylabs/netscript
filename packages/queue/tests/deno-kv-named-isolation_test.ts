@@ -4,8 +4,8 @@ import { DenoKvMessageQueue } from '@fedify/denokv';
 import { createQueue } from '../factory/create-queue.ts';
 import { DenoKvAdapter } from '../adapters/deno-kv.adapter.ts';
 import { KvDeadLetterStore } from '../adapters/kv-dead-letter-store.ts';
-import { createKvQueueConnection } from '../adapters/_kv-queue-connection.ts';
-import { KvQueueDispatcher } from '../adapters/_kv-queue-dispatcher.ts';
+import { createKvQueueConnection } from '../adapters/_kv-queue/connection.ts';
+import { KvQueueDispatcher } from '../adapters/_kv-queue/dispatcher.ts';
 import { createEnvelope, type MessageEnvelope } from '../adapters/_envelope.ts';
 import { type MessageQueue, QueueProvider } from '../ports/mod.ts';
 

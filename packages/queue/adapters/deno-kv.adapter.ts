@@ -26,7 +26,7 @@ import {
   type KvDatabaseTarget,
   type KvQueueDispatcher,
   type KvQueueDispatcherLease,
-} from './_kv-queue-dispatcher.ts';
+} from './_kv-queue/dispatcher.ts';
 import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
