@@ -78,8 +78,11 @@ Deno.test({
     try {
       const outcomes = await withTimeout(
         Promise.all(
-          Array.from({ length: 12 }, (_, index) =>
-            writers[index % 2].atomic([], [{ type: 'sum', key: ['hits'], value: 1n }])),
+          Array.from(
+            { length: 12 },
+            (_, index) =>
+              writers[index % 2].atomic([], [{ type: 'sum', key: ['hits'], value: 1n }]),
+          ),
         ),
         5_000,
       );
