@@ -8,11 +8,16 @@
  * ```ts
  * import {
  *   createMemoryKvAdapter,
+ *   runAtomicKvStoreContract,
  *   runKvStoreContract,
  *   runWatchableKvContract,
  * } from "@netscript/kv/testing";
  *
  * runKvStoreContract({
+ *   name: "memory",
+ *   make: () => createMemoryKvAdapter(),
+ * });
+ * runAtomicKvStoreContract({
  *   name: "memory",
  *   make: () => createMemoryKvAdapter(),
  * });
@@ -30,6 +35,7 @@ export {
   type KvStoreContractOptions,
   runKvStoreContract,
 } from './memory-kv.ts';
+export { runAtomicKvStoreContract } from './atomic-contract.ts';
 export {
   runWatchableKvContract,
   type WatchableKvContractOptions,

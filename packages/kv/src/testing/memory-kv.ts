@@ -7,7 +7,8 @@
 import { assert, assertEquals } from '@std/assert';
 import { MemoryKvAdapter } from '../../adapters/memory.adapter.ts';
 import type { KvStore } from '../../types/kv-store.ts';
-import { ATOMIC_SCENARIOS, type StoreScenario } from './atomic-contract.ts';
+import { registerScenarios, type Scenario } from './scenario.ts';
+import { MARKER_SHAPED_VALUES } from './values.ts';
 
 /**
  * Factory used by downstream tests when they need a clean in-memory KV adapter.
@@ -30,7 +31,7 @@ export interface KvStoreContractOptions {
   readonly ignore?: boolean;
 }
 
-const CRUD_SCENARIO: StoreScenario = {
+const CRUD_SCENARIO: Scenario<KvStore> = {
   title: 'stores, reads, lists, and deletes entries',
   async run(store) {
     await store.set(['contract', 'one'], { value: 1 });
@@ -51,29 +52,32 @@ const CRUD_SCENARIO: StoreScenario = {
   },
 };
 
+const VALUE_FIDELITY_SCENARIO: Scenario<KvStore> = {
+  title: 'stores and lists marker-shaped JSON values unchanged',
+  async run(store) {
+    for (const [index, value] of MARKER_SHAPED_VALUES.entries()) {
+      await store.set(['contract', 'values', index], value);
+      assertEquals((await store.get(['contract', 'values', index]))?.value, value);
+    }
+
+    const listed: unknown[] = [];
+    for await (const entry of store.list({ prefix: ['contract', 'values'] })) {
+      listed.push(entry.value);
+    }
+    assertEquals(listed, MARKER_SHAPED_VALUES);
+  },
+};
+
 /**
  * Registers the canonical KV store contract tests for an adapter.
  *
- * Besides CRUD and listing, the contract requires Deno KV `atomic()` parity:
- * one versionstamp per commit shared by every mutated entry and returned,
- * `sum`/`min`/`max` combining with the stored value, and serializable
- * concurrent commits.
+ * Covers CRUD, listing, and value fidelity: plain-JSON values, including
+ * objects shaped like encoding markers, must read back unchanged. `atomic()`
+ * is optional on `KvStore`; adapters that implement it should also run
+ * {@linkcode runAtomicKvStoreContract}.
  *
  * @param options - Adapter factory and display name.
  */
 export function runKvStoreContract(options: KvStoreContractOptions): void {
-  for (const scenario of [CRUD_SCENARIO, ...ATOMIC_SCENARIOS]) {
-    Deno.test({
-      name: `${options.name}: ${scenario.title}`,
-      ignore: options.ignore,
-      async fn() {
-        const store = await options.make();
-        try {
-          await scenario.run(store);
-        } finally {
-          await store.close();
-        }
-      },
-    });
-  }
+  registerScenarios(options, [CRUD_SCENARIO, VALUE_FIDELITY_SCENARIO]);
 }

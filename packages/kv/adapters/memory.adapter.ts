@@ -294,8 +294,8 @@ export class MemoryKvAdapter implements WatchableKv {
         const events = [...eventQueue];
         eventQueue.length = 0;
 
-        if (options?.debounce) {
-          await delay(options.debounce);
+        if (options?.debounce && !(await this.debounce(options.debounce, options.signal))) {
+          break;
         }
 
         yield events;
@@ -375,8 +375,8 @@ export class MemoryKvAdapter implements WatchableKv {
 
         while (eventQueue.length > 0) {
           const event = eventQueue.shift()!;
-          if (options?.debounce) {
-            await delay(options.debounce);
+          if (options?.debounce && !(await this.debounce(options.debounce, options.signal))) {
+            return;
           }
           yield event;
         }
@@ -413,6 +413,23 @@ export class MemoryKvAdapter implements WatchableKv {
    */
   keys(): KvKey[] {
     return Array.from(this.storage.values(), (entry) => entry.key);
+  }
+
+  /**
+   * Wait out a watch debounce window, ending early when the watch is aborted.
+   *
+   * @param ms - Debounce window in milliseconds
+   * @param signal - Watch abort signal
+   * @returns `true` when the window elapsed, `false` when the watch was aborted
+   */
+  private async debounce(ms: number, signal?: AbortSignal): Promise<boolean> {
+    try {
+      await delay(ms, { signal });
+      return true;
+    } catch (error: unknown) {
+      if (signal?.aborted) return false;
+      throw error;
+    }
   }
 
   /**

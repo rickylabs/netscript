@@ -1,5 +1,5 @@
 /**
- * `KvStore.atomic()` scenarios of the shared KV port contract.
+ * `KvStore.atomic()` parity contract for adapters that implement it.
  *
  * Deno KV is the reference: one commit has one versionstamp, written to every
  * mutated entry and returned; `sum`/`min`/`max` combine with the stored value;
@@ -10,14 +10,11 @@
 
 import { assert, assertEquals } from '@std/assert';
 import type { KvStore } from '../../types/kv-store.ts';
+import type { KvStoreContractOptions } from './memory-kv.ts';
+import { registerScenarios, type Scenario } from './scenario.ts';
+import { BIGINT_VALUES, MARKER_SHAPED_VALUES } from './values.ts';
 
-/** A contract scenario run against a fresh store. */
-export interface StoreScenario {
-  /** Scenario title appended to the adapter name. */
-  readonly title: string;
-  /** Scenario body. */
-  readonly run: (store: KvStore) => Promise<void>;
-}
+type StoreScenario = Scenario<KvStore>;
 
 /**
  * Resolve the optional `atomic()` capability or fail the scenario.
@@ -106,9 +103,48 @@ const serializableCommits: StoreScenario = {
   },
 };
 
-/** Atomic scenarios registered by `runKvStoreContract`. */
-export const ATOMIC_SCENARIOS: readonly StoreScenario[] = [
-  commitVersionstamp,
-  combineMutations,
-  serializableCommits,
-];
+const valueFidelity: StoreScenario = {
+  title: 'bigint and marker-shaped values round-trip through set and atomic',
+  async run(store) {
+    const atomic = requireAtomic(store);
+    const values = [...BIGINT_VALUES, ...MARKER_SHAPED_VALUES];
+
+    for (const [index, value] of values.entries()) {
+      await store.set(['contract', 'set', index], value);
+      const result = await atomic([], [{ type: 'set', key: ['contract', 'atomic', index], value }]);
+      assert(result.ok);
+      assertEquals((await store.get(['contract', 'set', index]))?.value, value);
+      assertEquals((await store.get(['contract', 'atomic', index]))?.value, value);
+    }
+  },
+};
+
+/**
+ * Registers the Deno KV `atomic()` parity contract for an adapter that
+ * implements the optional `KvStore.atomic()` capability.
+ *
+ * Requires one versionstamp per commit, written to every mutated entry and
+ * returned (so a compare-and-set on it succeeds); `sum`/`min`/`max` combining
+ * with the stored value; serializable concurrent commits; and lossless
+ * `bigint` values at any depth.
+ *
+ * @example
+ * ```ts
+ * import { createMemoryKvAdapter, runAtomicKvStoreContract } from "@netscript/kv/testing";
+ *
+ * runAtomicKvStoreContract({
+ *   name: "memory",
+ *   make: () => createMemoryKvAdapter(),
+ * });
+ * ```
+ *
+ * @param options - Adapter factory and display name.
+ */
+export function runAtomicKvStoreContract(options: KvStoreContractOptions): void {
+  registerScenarios(options, [
+    commitVersionstamp,
+    combineMutations,
+    serializableCommits,
+    valueFidelity,
+  ]);
+}

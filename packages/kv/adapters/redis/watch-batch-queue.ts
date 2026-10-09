@@ -39,17 +39,20 @@ export class WatchBatchQueue<T> {
    * the first are coalesced into the same batch.
    *
    * @param debounceMs - Coalescing window in milliseconds.
-   * @param signal - Aborting resolves a pending wait with an empty batch.
-   * @returns Every queued event, oldest first; empty only when aborted.
+   * @param signal - Aborting ends a pending wait or debounce window at once.
+   * @returns Every queued event, oldest first; empty when aborted.
    */
   async next(debounceMs?: number, signal?: AbortSignal): Promise<T[]> {
     if (this.#events.length === 0) {
       await this.#arrival(signal);
     }
     if (debounceMs && this.#events.length > 0 && !signal?.aborted) {
-      await delay(debounceMs);
+      await delay(debounceMs, { signal }).catch((error: unknown) => {
+        // Aborted mid-window: the stream is ending, not failing.
+        if (!signal?.aborted) throw error;
+      });
     }
-    return this.#events.splice(0);
+    return signal?.aborted ? [] : this.#events.splice(0);
   }
 
   #arrival(signal?: AbortSignal): Promise<void> {

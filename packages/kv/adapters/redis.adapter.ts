@@ -33,8 +33,8 @@ import type {
 } from '../types/common.ts';
 
 import {
-  decodeRedisJson,
-  encodeRedisJson,
+  decodeEnvelope,
+  encodeEnvelope,
   encodeStoredValue,
   type WatchMessage,
 } from './redis/codec.ts';
@@ -323,7 +323,7 @@ export class RedisKvAdapter implements WatchableKv {
           if (data === null) continue;
 
           try {
-            const stored = decodeRedisJson<StoredValue<T>>(data);
+            const stored = decodeEnvelope<StoredValue<T>>(data);
             const key = redisKeyToKey(batchKeys[i], this.namespace);
 
             if (startStr && keyToString(key) < startStr) continue;
@@ -417,7 +417,7 @@ export class RedisKvAdapter implements WatchableKv {
         if (data === null) continue;
 
         try {
-          const stored = decodeRedisJson<StoredValue<T>>(data);
+          const stored = decodeEnvelope<StoredValue<T>>(data);
           const key = redisKeyToKey(batchKeys[i], this.namespace);
 
           yield { key, value: stored.value, versionstamp: stored.versionstamp };
@@ -845,7 +845,7 @@ export class RedisKvAdapter implements WatchableKv {
       const timestamp = Date.now();
       for (const change of changes) {
         const message: WatchMessage = { ...change, timestamp, versionstamp };
-        pipeline.publish(this.getWatchChannel(), encodeRedisJson(message));
+        pipeline.publish(this.getWatchChannel(), encodeEnvelope({ ...message }));
       }
       await pipeline.exec();
     } catch (error: unknown) {
@@ -863,7 +863,7 @@ export class RedisKvAdapter implements WatchableKv {
    */
   private parseWatchMessage<T>(message: string): WatchMessage<T> | null {
     try {
-      return decodeRedisJson<WatchMessage<T>>(message);
+      return decodeEnvelope<WatchMessage<T>>(message);
     } catch {
       logger.warn('Ignoring malformed Redis watch message');
       return null;
@@ -874,12 +874,16 @@ export class RedisKvAdapter implements WatchableKv {
    * Decode a stored envelope, tolerating values written without one.
    *
    * @param data - Raw Redis value
-   * @returns The envelope; legacy raw values get a fresh versionstamp
+   * @returns The envelope; legacy raw (non-JSON) values get a fresh versionstamp
+   * @throws {TypeError} When the envelope's bigint metadata is malformed
    */
   private decodeStored<T = unknown>(data: string): StoredValue<T> {
     try {
-      return decodeRedisJson<StoredValue<T>>(data);
-    } catch {
+      return decodeEnvelope<StoredValue<T>>(data);
+    } catch (error: unknown) {
+      if (!(error instanceof SyntaxError)) {
+        throw error;
+      }
       return { value: data as T, versionstamp: generateVersionstamp() };
     }
   }
