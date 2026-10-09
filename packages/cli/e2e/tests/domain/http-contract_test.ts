@@ -140,7 +140,7 @@ Deno.test('bounded body read stops at the limit instead of buffering the whole r
 });
 
 async function withinMs<T>(work: Promise<T>, ms: number): Promise<T> {
-  let timer: number | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error(`verdict not decided within ${ms}ms`)), ms);
   });
