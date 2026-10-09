@@ -136,21 +136,18 @@ export const ordersListPage = definePage()
   })
 ```
 
-`ordersData` is a bare `getCachedEntry()` read, not
-[chapter 3](/tutorials/live-dashboard/03-sdk-cache-first-query/)'s action-then-metadata loader, on
-purpose: first paint never waits on `orders`. Refreshing is the `list` layer's job — on a miss or a
-stale entry the runtime prewarms its `partial` route (step 3), whose loader runs the callable action
-that fetches and re-caches.
+`ordersData` is a bare `getCachedEntry()` read, not chapter 3's action-then-metadata loader, so
+first paint never waits on `orders`. Refresh is the `list` layer's job: on a miss or stale entry the
+runtime prewarms its `partial` route, whose loader runs the callable action to fetch and re-cache.
 
 `definePage` comes from `@app/utils.ts`, not straight from `@netscript/fresh/builders`. Your scaffold
 wrote that module in chapter 1 — a thin wrapper that calls the package builder with the app's `State`
 type applied (`export function definePage() { return createDefinePage<State>(); }`), so every page in
 the app shares one typed context. Import the package builder directly and you lose that binding.
 
-`spanName: 'dashboard.orders.list'` is not decoration: every render of this page emits a span under
-that name, and it shows up in the Aspire dashboard's traces view alongside the service call the
-loader made. When the table feels slow, that trace is where you find out whether the time went to KV,
-to the orders service, or to the render itself.
+`spanName: 'dashboard.orders.list'` is not decoration: every render emits a span under that name in
+the Aspire dashboard's traces view, next to the service calls it made. When the table feels slow,
+that trace shows whether the time went to KV, the orders service, or the render.
 
 `dehydratedQuery` prefetches orders on the server and serialises the cache into the initial HTML, so
 the island does not refetch on hydrate.
