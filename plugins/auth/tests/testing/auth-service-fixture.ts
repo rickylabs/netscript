@@ -3,6 +3,7 @@
 import { assert } from '@std/assert';
 import type { MemoryKvAdapter } from '@netscript/kv';
 import type { Principal } from '@netscript/plugin-auth-core/domain';
+import type { AuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import { createPluginService } from '../../../../packages/plugin/src/service/mod.ts';
 import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
@@ -78,8 +79,17 @@ export async function mintTestSession(registry: AuthTestRegistry): Promise<strin
   return completed.sessionId;
 }
 
+/** Optional collaborators for {@link serveAuthTestService}. */
+export interface AuthTestServiceOptions {
+  /** Auth telemetry captured by handlers, for audit assertions. */
+  readonly telemetry?: AuthTelemetry;
+}
+
 /** Serve the real auth router (RPC + OpenAPI) on an ephemeral port, as `main.ts` wires it. */
-export async function serveAuthTestService(registry: AuthTestRegistry): Promise<AuthTestService> {
+export async function serveAuthTestService(
+  registry: AuthTestRegistry,
+  options: AuthTestServiceOptions = {},
+): Promise<AuthTestService> {
   const running = await createPluginService(router, {
     auth: createAuthServiceGuard(registry),
     name: 'auth',
@@ -87,7 +97,7 @@ export async function serveAuthTestService(registry: AuthTestRegistry): Promise<
     port: 0,
     openApi: { title: 'Auth API', description: 'Auth service test fixture' },
     middleware: [withAuthRequest],
-    context: () => ({ registry, request: currentAuthRequest() }),
+    context: () => ({ registry, telemetry: options.telemetry, request: currentAuthRequest() }),
     traceContext: false,
   }).serve({ port: 0 });
   const baseUrl = `http://127.0.0.1:${running.addr.port}`;
