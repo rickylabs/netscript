@@ -425,10 +425,10 @@
     {
       "id": "W1-2065",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "evaluating",
       "baseBranch": "main",
       "prNumber": 2116,
-      "headSha": "fe5bbea57",
+      "headSha": "20be01dcb",
       "issueNumbers": [
         2065
       ],
@@ -438,7 +438,8 @@
         "packages/service/**",
         "docs/site/reference/service/**",
         "scaffold service template"
-      ]
+      ],
+      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2116"
     },
     {
       "id": "W1-1383",
@@ -485,8 +486,8 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-09T19:21:08.000Z",
-    "nextReportDueAt": "2026-10-09T20:21:08.000Z",
+    "lastReportAt": "2026-10-09T19:32:45.000Z",
+    "nextReportDueAt": "2026-10-09T20:32:45.000Z",
     "lastReportRef": "https://github.com/rickylabs/netscript/issues/2103#issuecomment-6087689487",
     "headline": "Wave 1 implementing (#2065, #1383); plan PLAN-EVAL-approved; 76 active issues in 16 waves toward canary .3.",
     "currentMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
@@ -501,9 +502,9 @@
       "criticalPath": [
         {
           "id": "#2065",
-          "state": "implementing",
+          "state": "evaluating",
           "impact": "middleware/body-limit seam gates #1386, #2064, #2106",
-          "nextAction": "implementer W1-2065 to ready PR; then Sol IMPL-EVAL"
+          "nextAction": "Sol IMPL-EVAL on #2116 at 20be01dcb; CI incl. scaffold.runtime"
         },
         {
           "id": "#1383",
@@ -547,9 +548,17 @@
       "ownedIssueCount": 76,
       "scheduledIssueCount": 76,
       "unscheduledIssueNumbers": [],
-      "openPullRequestCount": 0
+      "openPullRequestCount": 1
     },
-    "mergeQueue": [],
+    "mergeQueue": [
+      {
+        "prNumber": 2116,
+        "lane": "features",
+        "state": "evaluating",
+        "nextGate": "Sol IMPL-EVAL at 20be01dcb + CI on exact head",
+        "nextAction": "await Sol verdict; CI scaffold.runtime must run (scaffold output changed)"
+      }
+    ],
     "orchestratorMatrix": [
       {
         "lane": "docs",
@@ -571,26 +580,27 @@
         "lane": "fixes",
         "state": "active",
         "activeItems": [
-          "W1-1383 (#2117)"
+          "W1-1383 (#2117)",
+          "W2-1999 launching"
         ],
         "lastConcreteProgressAt": "2026-10-09T19:18:42.000Z",
         "blocker": null,
-        "nextAction": "W1-1383 ready PR; then W2 #1999/#2031/#2102/#1688/#2105"
+        "nextAction": "W1-1383 ready; W2-1999 implementing"
       },
       {
         "lane": "features",
         "state": "active",
         "activeItems": [
-          "W1-2065 (#2116)"
+          "W1-2065 (#2116) evaluating"
         ],
         "lastConcreteProgressAt": "2026-10-09T19:18:42.000Z",
         "blocker": null,
-        "nextAction": "W1-2065 ready PR; then W3 #2064"
+        "nextAction": "merge #2116 on green CI + Sol MERGE; then W3 #2064"
       }
     ],
     "blockers": [],
     "environment": {
-      "checkedAt": "2026-10-09T19:21:08.000Z",
+      "checkedAt": "2026-10-09T19:32:45.000Z",
       "aspireApplications": 0,
       "dockerContainers": 0,
       "dockerCustomNetworks": 0
@@ -629,5 +639,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-09T19:21:08.000Z"
+  "updatedAt": "2026-10-09T19:32:45.000Z"
 }
