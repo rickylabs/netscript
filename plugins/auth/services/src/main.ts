@@ -15,6 +15,7 @@ import { AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
 import { router } from './router.ts';
 import { type AuthPluginServiceContext, initializeAuthService } from './init.ts';
 import { currentAuthRequest, withAuthRequest } from './request-context.ts';
+import { createAuthServiceGuard } from './auth-guard.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
@@ -72,11 +73,9 @@ export default async function createAuthService(
   // is preserved. The registry is resolved above (via `initializeAuthService`)
   // and captured by the context closure; no startup work is deferred.
   return await createPluginService(router, {
-    auth: {
-      public: true,
-      reason:
-        'Unauthenticated session discovery is public; guarded adoption and signout authorization remain in #1383/#1384.',
-    },
+    // Only signout and operator revocation are guarded; the guard authenticates in-process
+    // because the auth service cannot verify sessions by calling itself.
+    auth: createAuthServiceGuard(registry),
     name: 'auth',
     version: AUTH_PLUGIN_VERSION,
     port,

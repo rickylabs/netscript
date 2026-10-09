@@ -56,10 +56,20 @@ export type CallbackResponse = Readonly<{
   subject?: string;
 }>;
 
-/** Input accepted by the signout endpoint. */
+/**
+ * Input accepted by the signout endpoint.
+ *
+ * Signout always acts for the authenticated principal. `sessionId` selects one of the principal's
+ * own sessions (default: the session behind the presented credential); a session id that is
+ * unknown or owned by another subject is refused with the same `UNAUTHORIZED` error.
+ * `everywhere: true` revokes every session owned by the principal's subject and no other.
+ */
 export type SignoutInput = Readonly<{
+  /** Same-subject session selector; defaults to the session behind the presented credential. */
   sessionId?: string;
+  /** Revoke every session owned by the authenticated subject. */
   everywhere?: boolean;
+  /** Post-signout redirect target echoed in the response. */
   redirectTo?: string;
 }>;
 
@@ -68,6 +78,21 @@ export type SignoutResponse = Readonly<{
   signedOut: boolean;
   sessionId?: string;
   redirectTo?: string;
+}>;
+
+/** Scope an operator principal needs to revoke any session through `revokeSession`. */
+export const AUTH_SESSIONS_REVOKE_SCOPE = 'auth:sessions:revoke';
+
+/** Input accepted by the operator `revokeSession` endpoint. */
+export type RevokeSessionInput = Readonly<{
+  /** Session to revoke, regardless of its owner. */
+  sessionId: string;
+}>;
+
+/** Response returned by the operator `revokeSession` endpoint. */
+export type RevokeSessionResponse = Readonly<{
+  revoked: boolean;
+  sessionId: string;
 }>;
 
 /** Input accepted by the session endpoint. */
@@ -155,6 +180,7 @@ const validationErrorDataSchema: z.ZodObject<{
 /** Auth-specific oRPC error entries merged onto the base plugin vocabulary. */
 const AUTH_SPECIFIC_ERRORS: Readonly<{
   UNAUTHORIZED: { status: number; message: string; data: z.ZodType<{ reason: string }> };
+  FORBIDDEN: { status: number; message: string; data: z.ZodType<{ reason: string }> };
   AUTH_PROVIDER_ERROR: {
     status: number;
     message: string;
@@ -165,6 +191,11 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
   UNAUTHORIZED: {
     status: 401,
     message: 'Authentication required',
+    data: z.object({ reason: z.string() }),
+  },
+  FORBIDDEN: {
+    status: 403,
+    message: 'Forbidden',
     data: z.object({ reason: z.string() }),
   },
   AUTH_PROVIDER_ERROR: {
@@ -214,6 +245,13 @@ const AUTHENTICATION_NONE_META = {
 
 const AUTHENTICATION_REQUIRED_META = {
   access: { authentication: 'required' },
+} as const satisfies NetScriptProcedureMeta;
+
+const SESSIONS_REVOKE_META = {
+  access: {
+    authentication: 'required',
+    authorization: { scopes: [AUTH_SESSIONS_REVOKE_SCOPE] },
+  },
 } as const satisfies NetScriptProcedureMeta;
 
 type AuthDescribeRoute = ContractProcedureBuilderWithOutput<
@@ -324,6 +362,27 @@ const SignoutResponseZodSchema: z.ZodObject<{
 
 /** Schema for signout endpoint responses. */
 export const SignoutResponseSchema: AuthSchema<SignoutResponse> = SignoutResponseZodSchema;
+
+const RevokeSessionInputZodSchema: z.ZodObject<{
+  sessionId: z.ZodString;
+}> = z.object({
+  sessionId: z.string().min(1),
+});
+
+/** Schema for operator `revokeSession` endpoint input. */
+export const RevokeSessionInputSchema: AuthSchema<RevokeSessionInput> = RevokeSessionInputZodSchema;
+
+const RevokeSessionResponseZodSchema: z.ZodObject<{
+  revoked: z.ZodBoolean;
+  sessionId: z.ZodString;
+}> = z.object({
+  revoked: z.boolean(),
+  sessionId: z.string(),
+});
+
+/** Schema for operator `revokeSession` endpoint responses. */
+export const RevokeSessionResponseSchema: AuthSchema<RevokeSessionResponse> =
+  RevokeSessionResponseZodSchema;
 
 const SessionInputZodSchema: z.ZodObject<{
   sessionId: z.ZodOptional<z.ZodString>;
@@ -436,6 +495,10 @@ interface AuthContractDefinitionShape extends Omit<BasePluginContract, 'describe
   readonly signin: Route<typeof SigninInputZodSchema, typeof SigninResponseZodSchema>;
   readonly callback: Route<typeof CallbackInputZodSchema, typeof CallbackResponseZodSchema>;
   readonly signout: Route<typeof SignoutInputZodSchema, typeof SignoutResponseZodSchema>;
+  readonly revokeSession: Route<
+    typeof RevokeSessionInputZodSchema,
+    typeof RevokeSessionResponseZodSchema
+  >;
   readonly session: Route<typeof sessionRouteInput, typeof SessionResponseZodSchema>;
   readonly me: Route<typeof meRouteInput, typeof MeResponseZodSchema>;
 }
@@ -443,7 +506,7 @@ interface AuthContractDefinitionShape extends Omit<BasePluginContract, 'describe
 /**
  * The auth v1 contract definition object.
  *
- * Spreads the mandatory base seam `describe` route and layers the 5
+ * Spreads the mandatory base seam `describe` route and layers the 6
  * plugin-specific routes. The explicit {@link AuthContractDefinitionShape}
  * annotation makes the precise contract type available to
  * `--isolatedDeclarations` without erasing it; because the base seam `describe`
@@ -474,6 +537,12 @@ const authContractDefinition: AuthContractDefinitionShape = {
     .meta(AUTHENTICATION_REQUIRED_META)
     .input(SignoutInputZodSchema)
     .output(SignoutResponseZodSchema),
+
+  revokeSession: baseContract
+    .route({ method: 'POST', path: '/sessions/revoke' })
+    .meta(SESSIONS_REVOKE_META)
+    .input(RevokeSessionInputZodSchema)
+    .output(RevokeSessionResponseZodSchema),
 
   session: baseContract
     .route({ method: 'GET', path: '/session' })

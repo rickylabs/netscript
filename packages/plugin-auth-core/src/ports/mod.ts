@@ -91,6 +91,13 @@ export interface AuthSessionStorePort {
   refreshSession(sessionId: string): Promise<AuthSession> | AuthSession;
   /** Revokes a session and returns the revoked normalized session. */
   revokeSession(sessionId: string): Promise<AuthSession> | AuthSession;
+  /**
+   * Revokes every session owned by `subject` and returns the sessions this call revoked.
+   *
+   * Sessions owned by any other subject must stay untouched. Adapters whose upstream cannot
+   * enumerate a subject's sessions throw {@link AuthBackendOperationUnsupportedError}.
+   */
+  revokeSubjectSessions(subject: string): Promise<readonly AuthSession[]> | readonly AuthSession[];
 }
 
 /** Crypto contract exposed by pure auth backends for token lifecycle work. */

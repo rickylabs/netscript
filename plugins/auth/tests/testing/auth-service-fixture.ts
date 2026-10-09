@@ -2,11 +2,13 @@
 
 import { assert } from '@std/assert';
 import type { MemoryKvAdapter } from '@netscript/kv';
+import type { Principal } from '@netscript/plugin-auth-core/domain';
 import { createPluginService } from '../../../../packages/plugin/src/service/mod.ts';
 import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
 import { router } from '../../services/src/router.ts';
 import { currentAuthRequest, withAuthRequest } from '../../services/src/request-context.ts';
+import { createAuthServiceGuard } from '../../services/src/auth-guard.ts';
 import { authTestUrl } from './auth-fixtures.ts';
 
 /** Backend registry type returned by the auth service composition root. */
@@ -79,7 +81,7 @@ export async function mintTestSession(registry: AuthTestRegistry): Promise<strin
 /** Serve the real auth router (RPC + OpenAPI) on an ephemeral port, as `main.ts` wires it. */
 export async function serveAuthTestService(registry: AuthTestRegistry): Promise<AuthTestService> {
   const running = await createPluginService(router, {
-    auth: { public: true, reason: 'Fixture for existing public service behavior' },
+    auth: createAuthServiceGuard(registry),
     name: 'auth',
     version: '0.0.0',
     port: 0,
@@ -99,4 +101,15 @@ export async function serveAuthTestService(registry: AuthTestRegistry): Promise<
       Deno.env.delete(`services__${serviceName}__http__0`);
     },
   };
+}
+
+/** Resolve the principal the service guard would authenticate for `sessionId`. */
+export async function principalForSession(
+  registry: AuthTestRegistry,
+  sessionId: string,
+): Promise<Principal> {
+  const backend = registry.resolveBackend();
+  const authSession = await backend.sessions.getSession({ sessionId });
+  assert(authSession, `fixture session ${sessionId} must exist`);
+  return backend.principalMapper.mapSessionToPrincipal(authSession).principal;
 }

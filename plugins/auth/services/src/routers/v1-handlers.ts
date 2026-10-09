@@ -5,6 +5,8 @@ import type {
   CallbackInput,
   CallbackResponse,
   MeResponse,
+  RevokeSessionInput,
+  RevokeSessionResponse,
   SessionInput,
   SessionResponse,
   SigninInput,
@@ -33,8 +35,13 @@ import {
   unsupportedOperation,
 } from './v1-helpers.ts';
 import { type AuthServiceContext, AuthServiceHandlerError } from './v1-types.ts';
+import {
+  requirePrincipal,
+  requireRevokeScope,
+  revokeSignoutSessions,
+} from './v1-session-ownership.ts';
 import { type AuthHandlers, router } from './router-context.ts';
-import type { AuthSession } from '@netscript/plugin-auth-core/domain';
+import type { AuthSession, Principal } from '@netscript/plugin-auth-core/domain';
 import type { AuthBackendPort, InteractiveFlowPort } from '@netscript/plugin-auth-core/ports';
 import {
   emitOidcCompleted,
@@ -56,7 +63,7 @@ const FALLBACK_AUTH_TELEMETRY = createAuthTelemetry({ enabled: false });
 const authCapabilities: PluginCapabilities = {
   pluginName: '@netscript/plugin-auth',
   contractVersions: ['v1'],
-  routeGroups: ['signin', 'callback', 'signout', 'session', 'me'],
+  routeGroups: ['signin', 'callback', 'signout', 'revokeSession', 'session', 'me'],
   capabilities: [
     'interactive-signin',
     'oidc-callback',
@@ -67,7 +74,14 @@ const authCapabilities: PluginCapabilities = {
 };
 
 /** Every v1 route key the auth contract exposes (incl. the base `describe`). */
-type AuthV1RouteKey = 'describe' | 'signin' | 'callback' | 'signout' | 'session' | 'me';
+type AuthV1RouteKey =
+  | 'describe'
+  | 'signin'
+  | 'callback'
+  | 'signout'
+  | 'revokeSession'
+  | 'session'
+  | 'me';
 
 /** V1 auth contract handlers, contract-bound and precisely typed per route. */
 export const authV1: AuthHandlers<AuthV1RouteKey> = {
@@ -76,6 +90,9 @@ export const authV1: AuthHandlers<AuthV1RouteKey> = {
   signin: router.signin.handler(async ({ input, context }) => await signin(input, context)),
   callback: router.callback.handler(async ({ input, context }) => await callback(input, context)),
   signout: router.signout.handler(async ({ input, context }) => await signout(input, context)),
+  revokeSession: router.revokeSession.handler(async ({ input, context }) =>
+    await revokeSession(input, context)
+  ),
   session: router.session.handler(async ({ input, context }) => await session(input, context)),
   me: router.me.handler(async ({ context }) => await me(context)),
 };
@@ -186,53 +203,81 @@ export async function callback(
   );
 }
 
-/** Revoke the active session where the backend supports direct revocation. */
+/**
+ * Sign the authenticated principal out of its own session, or of every session with `everywhere`.
+ *
+ * A refused call revokes nothing and records no `session.revoked` audit event.
+ */
 export async function signout(
   input: SignoutInput,
   context: AuthServiceContext,
 ): Promise<SignoutResponse> {
   const backend = context.registry.resolveBackend();
   return await traceAuth(context, 'signout', backend, undefined, input.sessionId, async (audit) => {
-    const sessionId = input.sessionId ?? await backend.interactive?.getSessionId(
-      toRequest(context.request, '/v1/auth/signout', new URLSearchParams()),
-    );
-
+    const principal = await requireAuditedPrincipal(context, audit);
     try {
-      let revokedSession: AuthSession | undefined;
-      if (sessionId) {
-        revokedSession = await backend.sessions.revokeSession(sessionId);
-      } else if (!backend.interactive) {
-        throw new AuthServiceHandlerError('UNAUTHORIZED', 'No active auth session was found.');
-      }
-      if (backend.interactive) {
-        await backend.interactive.signOut(
-          toRequest(context.request, '/v1/auth/signout', new URLSearchParams()),
-          {
-            revoke: !sessionId,
-          },
-        );
-      }
-      const output = {
-        signedOut: true,
-        sessionId,
-        redirectTo: input.redirectTo,
-      };
+      const { sessionId, revoked } = await revokeSignoutSessions(backend, principal, input);
+      await endInteractiveSession(backend, context, revoked);
       await audit.setOutcome({
         outcome: AuthOutcome.SUCCESS,
         sessionId,
-        subject: revokedSession?.subject,
+        subject: principal.subject,
       });
-      await audit.recordSessionRevoked(sessionId, revokedSession?.subject);
-      if (revokedSession) {
-        emitSessionRevoked(revokedSession, { traceContext: audit.traceContext() });
-      }
-      return output;
+      await recordRevokedSessions(audit, revoked);
+      return { signedOut: true, sessionId, redirectTo: input.redirectTo };
     } catch (error) {
       const authError = providerFailure(error, backend.name);
       await recordAuthFailure(audit, authError.message);
       throw authError;
     }
   });
+}
+
+/** Revoke any session on behalf of an operator holding the session-revocation scope. */
+export async function revokeSession(
+  input: RevokeSessionInput,
+  context: AuthServiceContext,
+): Promise<RevokeSessionResponse> {
+  const backend = context.registry.resolveBackend();
+  return await traceAuth(
+    context,
+    'revokeSession',
+    backend,
+    undefined,
+    input.sessionId,
+    async (audit) => {
+      const principal = await requireAuditedPrincipal(context, audit);
+      try {
+        requireRevokeScope(principal);
+      } catch (error) {
+        await audit.setOutcome({
+          outcome: AuthOutcome.FAILED_FORBIDDEN,
+          errorCode: AuthErrorCode.FORBIDDEN,
+          subject: principal.subject,
+        });
+        throw error;
+      }
+      try {
+        const existing = await backend.sessions.getSession({ sessionId: input.sessionId });
+        if (existing?.id !== input.sessionId) {
+          await audit.setOutcome({ outcome: AuthOutcome.SUCCESS, sessionId: input.sessionId });
+          return { revoked: false, sessionId: input.sessionId };
+        }
+        const revoked = await backend.sessions.revokeSession(input.sessionId);
+        await audit.setOutcome({
+          outcome: AuthOutcome.SUCCESS,
+          sessionId: revoked.id,
+          subject: principal.subject,
+        });
+        await recordRevokedSessions(audit, [revoked]);
+        return { revoked: true, sessionId: revoked.id };
+      } catch (error) {
+        const authError = providerFailure(error, backend.name);
+        await recordAuthFailure(audit, authError.message);
+        throw authError;
+      }
+    },
+  );
 }
 
 /** Resolve the current session through the active backend. */
@@ -359,6 +404,44 @@ async function emitCallbackSessionCompleted(
     }
   } catch (error) {
     console.warn('[Auth Stream] Callback completion stream emit skipped:', error);
+  }
+}
+
+async function requireAuditedPrincipal(
+  context: AuthServiceContext,
+  audit: AuthOperationRecorder,
+): Promise<Principal> {
+  try {
+    const principal = requirePrincipal(context);
+    await audit.recordPrincipal(principal);
+    return principal;
+  } catch (error) {
+    await audit.setOutcome({ outcome: AuthOutcome.UNAUTHENTICATED });
+    throw error;
+  }
+}
+
+async function recordRevokedSessions(
+  audit: AuthOperationRecorder,
+  revoked: readonly AuthSession[],
+): Promise<void> {
+  for (const revokedSession of revoked) {
+    await audit.recordSessionRevoked(revokedSession.id, revokedSession.subject);
+    emitSessionRevoked(revokedSession, { traceContext: audit.traceContext() });
+  }
+}
+
+/** Clears backend cookie state only when the request's own cookie session was just revoked. */
+async function endInteractiveSession(
+  backend: AuthBackendPort,
+  context: AuthServiceContext,
+  revoked: readonly AuthSession[],
+): Promise<void> {
+  if (!backend.interactive || !context.request) return;
+  const request = toRequest(context.request, '/v1/auth/signout', new URLSearchParams());
+  const cookieSessionId = await backend.interactive.getSessionId(request);
+  if (cookieSessionId && revoked.some((session) => session.id === cookieSessionId)) {
+    await backend.interactive.signOut(request, { revoke: false });
   }
 }
 

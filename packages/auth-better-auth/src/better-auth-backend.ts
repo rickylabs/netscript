@@ -101,6 +101,12 @@ export function createBetterAuthBackend(options: BetterAuthBackendOptions): Auth
           `better-auth revocation is exposed through its request API surface, not this backend session id "${sessionId}" port.`,
         );
       },
+      revokeSubjectSessions(_subject: string): readonly AuthSession[] {
+        throw unsupportedBetterAuthOperation(
+          'sessions.revokeSubjectSessions',
+          'better-auth subject-wide revocation is exposed through its request API surface, not this backend port.',
+        );
+      },
     },
     crypto: {
       async sealSessionToken(session: AuthSession): Promise<string> {

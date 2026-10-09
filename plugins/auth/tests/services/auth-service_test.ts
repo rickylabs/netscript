@@ -38,6 +38,7 @@ import { MemoryKvAdapter } from '@netscript/kv';
 import { callback, me, session, signin, signout } from '../../services/src/routers/v1-handlers.ts';
 import { AuthServiceHandlerError } from '../../services/src/routers/v1-types.ts';
 import { authTestUrl } from '../testing/auth-fixtures.ts';
+import { principalForSession } from '../testing/auth-service-fixture.ts';
 
 Deno.test('kv-oauth handlers complete signin callback session me signout round-trip', async () => {
   const registry = await createInMemoryKvOAuthRegistry({
@@ -98,6 +99,7 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
 
   const signedOut = await signout({ sessionId: completed.sessionId }, {
     registry,
+    principal: await principalForSession(registry, completed.sessionId!),
     request: {
       url: authTestUrl('/v1/auth/signout'),
       headers: new Headers({ cookie: `__Host-ns_session=${completed.sessionId}` }),
@@ -167,6 +169,7 @@ Deno.test('auth handlers emit audit-safe telemetry attributes per operation', as
   await signout({ sessionId: completed.sessionId }, {
     registry,
     telemetry,
+    principal: await principalForSession(registry, completed.sessionId!),
     request: {
       url: authTestUrl('/v1/auth/signout'),
       method: 'GET',
@@ -336,7 +339,7 @@ Deno.test('auth handler errors keep observable central oRPC envelopes', async ()
     {
       code: 'UNAUTHORIZED',
       status: 401,
-      data: { reason: 'No active auth session was found.' },
+      data: { reason: 'Authentication required.' },
     },
   );
   await assertProcedureEnvelope(
@@ -454,6 +457,20 @@ function fakeBackend(name = 'kv-oauth'): AuthBackendPort {
           revokedAt: new Date().toISOString(),
         };
         stored.set(sessionId, revoked);
+        return revoked;
+      },
+      revokeSubjectSessions: (subject) => {
+        const revoked = [];
+        for (const current of stored.values()) {
+          if (current.subject !== subject || current.state === 'revoked') continue;
+          const next = {
+            ...current,
+            state: 'revoked' as const,
+            revokedAt: new Date().toISOString(),
+          };
+          stored.set(current.id, next);
+          revoked.push(next);
+        }
         return revoked;
       },
     },

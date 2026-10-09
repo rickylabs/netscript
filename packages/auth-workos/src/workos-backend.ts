@@ -106,6 +106,12 @@ export function createWorkosBackend(options: WorkosBackendOptions): AuthBackendP
           `WorkOS session revocation is owned by WorkOS APIs outside this request-local backend port for "${sessionId}".`,
         );
       },
+      revokeSubjectSessions(_subject: string): readonly AuthSession[] {
+        throw unsupportedWorkosOperation(
+          'sessions.revokeSubjectSessions',
+          'WorkOS subject-wide session revocation is owned by WorkOS APIs outside this request-local backend port.',
+        );
+      },
     },
     crypto: {
       async sealSessionToken(session: AuthSession): Promise<string> {

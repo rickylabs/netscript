@@ -112,8 +112,15 @@ export interface KvOAuthStore {
     next: KvOAuthSessionRecord,
     expectedVersionstamp?: string | null,
   ): Promise<boolean>;
-  /** Deletes a session record. */
+  /** Deletes a session record and its subject index entry. */
   deleteSession(id: string): Promise<void>;
+  /**
+   * Streams the ids of sessions indexed under `subject`.
+   *
+   * The index is written with every session put or rotation; an id may outlive its session
+   * record, so callers re-read each record before acting on it.
+   */
+  listSubjectSessionIds(subject: string): AsyncIterable<string>;
   /** Seals an OAuth token set for KV persistence. */
   sealTokens(tokens: KvOAuthTokenSet): Promise<KvOAuthEncryptedTokens>;
   /** Opens an encrypted token set from KV persistence. */
@@ -130,6 +137,15 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
 
   const txnKey = (id: string): readonly Deno.KvKeyPart[] => [...namespace, 'txn', id];
   const sessionKey = (id: string): readonly Deno.KvKeyPart[] => [...namespace, 'session', id];
+  const subjectPrefix = (subject: string): readonly Deno.KvKeyPart[] => [
+    ...namespace,
+    'subject',
+    subject,
+  ];
+  const subjectSessionKey = (subject: string, id: string): readonly Deno.KvKeyPart[] => [
+    ...subjectPrefix(subject),
+    id,
+  ];
 
   return {
     crypto: oauthCrypto,
@@ -163,7 +179,14 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
           ? await hashToken(input.tokens.refreshToken)
           : undefined,
       };
-      await kv.set(sessionKey(record.session.id), record, { expireIn: sessionTtlMs });
+      const { id, subject } = record.session;
+      const result = await requireAtomic(kv).call(kv, [], [
+        { type: 'set', key: sessionKey(id), value: record, expireIn: sessionTtlMs },
+        { type: 'set', key: subjectSessionKey(subject, id), value: id, expireIn: sessionTtlMs },
+      ]);
+      if (!result.ok) {
+        throw new KvOAuthError('configuration_error', `Session ${id} could not be persisted.`);
+      }
       return record;
     },
     async getSession(id): Promise<KvOAuthSessionRecord | null> {
@@ -187,11 +210,27 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
         : expectedVersionstamp;
       const result = await requireAtomic(kv).call(kv, [{ key, versionstamp }], [
         { type: 'set', key, value: next, expireIn: sessionTtlMs },
+        // Rotation extends the session TTL, so the subject index entry moves with it.
+        {
+          type: 'set',
+          key: subjectSessionKey(next.session.subject, id),
+          value: id,
+          expireIn: sessionTtlMs,
+        },
       ]);
       return result.ok;
     },
     async deleteSession(id): Promise<void> {
+      const entry = await kv.get<KvOAuthSessionRecord>(sessionKey(id));
       await kv.delete(sessionKey(id));
+      if (entry?.value) {
+        await kv.delete(subjectSessionKey(entry.value.session.subject, id));
+      }
+    },
+    async *listSubjectSessionIds(subject): AsyncIterable<string> {
+      for await (const entry of kv.list<string>({ prefix: subjectPrefix(subject) })) {
+        if (typeof entry.value === 'string') yield entry.value;
+      }
     },
     async sealTokens(tokens): Promise<KvOAuthEncryptedTokens> {
       return { keyId: oauthCrypto.keyId, sealed: await oauthCrypto.seal(tokens) };

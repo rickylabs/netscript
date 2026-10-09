@@ -196,6 +196,10 @@ Deno.test('createWorkosBackend throws typed errors for unsupported managed-sessi
       operation: 'sessions.revokeSession',
       run: () => backend.sessions.revokeSession('sess_123'),
     },
+    {
+      operation: 'sessions.revokeSubjectSessions',
+      run: () => backend.sessions.revokeSubjectSessions('user_123'),
+    },
   ];
 
   for (const { operation, run } of unsupportedCases) {
