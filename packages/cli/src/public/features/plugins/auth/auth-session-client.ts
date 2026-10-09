@@ -14,6 +14,11 @@ const bearer = createBearerSdkClientContribution<AuthSessionClientContext>({
   unmarked: 'optional',
 });
 
+type ProcedureAccessMeta = Readonly<{ access?: { authentication: 'required' } }>;
+
+/** Operator revocation mirrors the auth contract: it never runs without a credential. */
+const CREDENTIAL_REQUIRED: ProcedureAccessMeta = { access: { authentication: 'required' } };
+
 /** Fetch-backed auth session projection and revocation adapter. */
 export class FetchAuthSessionHttp implements AuthSessionHttpPort {
   constructor(private readonly request: typeof fetch = fetch) {}
@@ -41,22 +46,23 @@ export class FetchAuthSessionHttp implements AuthSessionHttpPort {
     options?: AuthSessionRequestOptions,
   ): Promise<string> {
     const input = { sessionId };
-    const endpoint = new URL(`${authUrl.replace(/\/$/, '')}/signout`);
+    const endpoint = new URL(`${authUrl.replace(/\/$/, '')}/sessions/revoke`);
     const headers = await prepareHeaders(
       endpoint,
-      ['signout'],
+      ['revokeSession'],
       input,
       options,
       { 'content-type': 'application/json' },
+      CREDENTIAL_REQUIRED,
     );
     const response = await this.request(endpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify(input),
     });
-    if (!response.ok) throw new Error(`Auth signout returned HTTP ${response.status}.`);
-    const value = await response.json() as { sessionId?: unknown; signedOut?: unknown };
-    if (value.signedOut !== true) throw new Error('Auth signout did not confirm revocation.');
+    if (!response.ok) throw new Error(`Auth session revocation returned HTTP ${response.status}.`);
+    const value = await response.json() as { sessionId?: unknown; revoked?: unknown };
+    if (value.revoked !== true) throw new Error(`Auth session ${sessionId} was not found.`);
     return typeof value.sessionId === 'string' ? value.sessionId : sessionId;
   }
 }
@@ -67,10 +73,11 @@ async function prepareHeaders(
   input: unknown,
   options: AuthSessionRequestOptions | undefined,
   initialHeaders: HeadersInit,
+  meta: ProcedureAccessMeta = {},
 ): Promise<Headers> {
   const patch = await bearer.prepare({
     context: options?.context ?? {},
-    procedure: { path, meta: {} },
+    procedure: { path, meta },
     transport: {
       kind: 'http',
       origin: new URL(endpoint.origin),

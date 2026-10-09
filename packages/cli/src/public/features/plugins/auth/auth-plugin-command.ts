@@ -145,7 +145,8 @@ export function createAuthPluginCommand(
           'Auth durable stream URL (find the streams HTTP endpoint with ' +
             '`aspire describe streams --format Json`, then append `/auth/sessions`)',
         )
-        .action(async (options: { streamUrl?: string }) => {
+        .env(AUTH_TOKEN_ENV, AUTH_TOKEN_ENV_DESCRIPTION, { prefix: 'NETSCRIPT_AUTH_' })
+        .action(async (options: { streamUrl?: string; token?: string }) => {
           if (!options.streamUrl) {
             throw new Error(
               'The legacy fixed stream URL is no longer inferred. ' +
@@ -155,7 +156,7 @@ export function createAuthPluginCommand(
           }
           const active = (await dependencies.sessions.list(
             options.streamUrl,
-            await resolveSessionRequestOptions(dependencies),
+            await resolveSessionRequestOptions(dependencies, options.token),
           ))
             .filter((item) => item.state === 'active');
           print('Session\tUser\tProvider\tState\tExpires');
@@ -174,11 +175,19 @@ export function createAuthPluginCommand(
         .option('--auth-url <url:string>', 'Aspire-discovered Auth REST base URL', {
           required: true,
         })
-        .action(async (options: { authUrl: string }, id: string) => {
+        .env(AUTH_TOKEN_ENV, AUTH_TOKEN_ENV_DESCRIPTION, { prefix: 'NETSCRIPT_AUTH_' })
+        .action(async (options: { authUrl: string; token?: string }, id: string) => {
+          const requestOptions = await resolveSessionRequestOptions(dependencies, options.token);
+          if (requestOptions === undefined) {
+            throw new Error(
+              'Revoking a session needs an operator credential whose principal holds the ' +
+                `${AUTH_SESSIONS_REVOKE_SCOPE} scope. Set NETSCRIPT_AUTH_TOKEN.`,
+            );
+          }
           print(`Revoked ${await dependencies.sessions.revoke(
             options.authUrl,
             id,
-            await resolveSessionRequestOptions(dependencies),
+            requestOptions,
           )}.`);
         }),
     );
@@ -193,9 +202,19 @@ export function createAuthPluginCommand(
     .command('session', session);
 }
 
+const AUTH_TOKEN_ENV = 'NETSCRIPT_AUTH_TOKEN=<value:string>';
+const AUTH_TOKEN_ENV_DESCRIPTION = 'Bearer credential sent to the auth session endpoints';
+const AUTH_SESSIONS_REVOKE_SCOPE = 'auth:sessions:revoke';
+
+/** Application-owned context wins; otherwise the `NETSCRIPT_AUTH_TOKEN` credential is used. */
 async function resolveSessionRequestOptions(
   dependencies: AuthPluginCommandDependencies,
+  token: string | undefined,
 ): Promise<AuthSessionRequestOptions | undefined> {
-  const context = await dependencies.resolveSessionContext?.();
+  const context = await dependencies.resolveSessionContext?.() ?? tokenContext(token);
   return context === undefined ? undefined : { context };
+}
+
+function tokenContext(token: string | undefined): AuthSessionClientContext | undefined {
+  return token ? { auth: { getAccessToken: () => token } } : undefined;
 }
