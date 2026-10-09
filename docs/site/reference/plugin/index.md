@@ -39,6 +39,7 @@ and template assets live on the sub-path exports listed at the end of this page.
 | --- | --- | --- |
 | `PluginError` | class | Base error for plugin package failures. |
 | `PluginValidationError` | class | Error thrown when a plugin definition is invalid. |
+| `PluginCompositionError` | class | Error thrown when manifests cannot be composed into one root host; carries structured `diagnostics`. |
 | `DuplicatePluginError` | class | Error thrown when a plugin name is registered more than once. |
 
 ## Contributions
@@ -58,6 +59,54 @@ and template assets live on the sub-path exports listed at the end of this page.
 | `ServiceContribution` | interface | Service contributed by a plugin. |
 | `StreamTopicContribution` | interface | Stream topic contributed by a plugin. |
 | `TelemetryContribution` | interface | Telemetry instrumentation contribution. |
+
+## Root composition validation
+
+`validatePluginComposition(plugins)` (from `@netscript/plugin/config`) is the one check a root
+host runs over its plugin manifests. It returns `{ ok: true, composition }` or
+`{ ok: false, diagnostics }` and reports every failure in one pass. `createPluginHostBootstrap`,
+the CLI host loader, `loadRegisteredPlugins`, and `generate aspire` all call it, so runtime
+bootstrap and generation agree.
+
+| Diagnostic `code` | Rejected when |
+| --- | --- |
+| `duplicate-plugin` | Two manifests share a `name`. |
+| `unknown-contribution-key` | `contributions` holds a key that `PluginContributions` does not define. |
+| `invalid-contribution` | A known contribution key holds a value of the wrong shape. |
+| `duplicate-contribution` | An identity repeats within one plugin, or across plugins on a root-owned axis. |
+| `missing-dependency` | A declared dependency that contributes to the host is not composed. |
+| `dependency-version-mismatch` | The composed dependency version does not satisfy the declared semver range. |
+| `invalid-version` | A plugin version or dependency range is not valid semver. |
+
+Each contribution key has one identity and scope:
+
+| Key | Identity | Scope |
+| --- | --- | --- |
+| `services` | `name` | root |
+| `sdkClients` | `id` | root |
+| `backgroundProcessors` | `name` | root |
+| `streamTopics` | `name` | root |
+| `runtimeConfigTopics` | `name` | root |
+| `e2e` | `name` | root |
+| `telemetry` | `name` | root |
+| `cli` | each `doctorChecks` entry | root |
+| `contractVersions` | `version` | plugin |
+| `databaseSchemas` | `path` | plugin |
+| `migrations` | `name` | plugin |
+| `aspire`, `doctor` | the module path | one per plugin |
+
+Root-scoped identities must be unique across the whole composition. Plugin-scoped identities only
+need to be unique within their plugin, so every plugin can contribute contract version `v1`. The
+composition's merged `contributions` covers the collection keys. `aspire` and `doctor` stay on each
+plugin's manifest, and `mergeContributions` throws instead of silently keeping the last value when
+both inputs set one of them.
+
+A dependency's `version` is read as a semver range, so an exact version matches only itself. A
+dependency that declares no contributions is a library dependency and need not be composed.
+
+**Migration (breaking).** `PluginManifestSchema`, `definePlugin(...).build()`, and the composition
+check now reject unknown contribution keys. A misspelled key such as `servces` used to be ignored;
+now it fails with the plugin name and the key. Rename it to the documented key, or remove it.
 
 ## Manifest types
 
@@ -106,10 +155,12 @@ instead of described twice.
 | Symbol | Signature | Description |
 | --- | --- | --- |
 | `definePlugin` | `function definePlugin<TName, TVersion>(name, version): PluginBuilder` | Start a new plugin manifest builder chain. |
-| `mergeContributions` | `function mergeContributions(base, overrides): PluginContributions` | Merge plugin contribution groups without mutating inputs. |
+| `validatePluginComposition` | `function validatePluginComposition(plugins): PluginCompositionResult` | Validate that plugin manifests compose into one root host. See [Root composition validation](#root-composition-validation). |
+| `mergeContributions` | `function mergeContributions(base, overrides): PluginContributions` | Merge plugin contribution groups without mutating inputs; throws when both set `aspire` or `doctor`. |
 | `isContributionAxis` | `function isContributionAxis(value: string): boolean` | Check whether a value is a supported contribution axis. |
 | `isReservedPluginName` | `function isReservedPluginName(name: string): boolean` | Return true when a plugin name is reserved by NetScript. |
-| `PluginManifestSchema` | `variable PluginManifestSchema` | Zod schema for plugin manifests. |
+| `PluginManifestSchema` | `variable PluginManifestSchema` | Zod schema for plugin manifests; contribution keys are closed. |
+| `PluginCompositionError` | class | Error thrown when manifests cannot be composed into one root host. |
 | `CONTRIBUTION_AXES` | `variable CONTRIBUTION_AXES` | Supported plugin contribution axes. |
 | `PLUGIN_TYPES` | `variable PLUGIN_TYPES` | Supported plugin categories. |
 
@@ -118,6 +169,8 @@ This entrypoint also re-exports `PluginBuilder`, `ContributionInput`, `Dependenc
 `DbSchemaContribution`, `E2eContribution`, `MigrationContribution`, `PluginContributions`,
 `PluginDependencies`, `PluginLifecycleHooks`, `ContributionAxis`, `PluginContext`, `PluginLogger`,
 `PluginType`, `PluginManifest`, `PluginMetadata`, `PluginMetadataValue`, `PluginManifestParser`,
+`PluginComposition`, `PluginCompositionResult`, `PluginCompositionDiagnostic`,
+`PluginCompositionDiagnosticCode`,
 `RuntimeConfigTopicContribution`, `ServiceContribution`, `StreamTopicContribution`, and
 `TelemetryContribution`, documented in the root sections above.
 
@@ -237,7 +290,7 @@ documented in their owning sections below.
 | `createWatcherHandle` | `function createWatcherHandle(): WatcherHandle` | Create a no-op watcher handle for alpha SDK discovery. |
 | `createInstrumentationBridge` | `function createInstrumentationBridge()` | Create a recording instrumentation bridge. |
 | `createPluginContext` | `function createPluginContext(projectRoot: string): PluginContext` | Create a minimal plugin context for SDK runtime helpers. |
-| `createPluginHostBootstrap` | `function createPluginHostBootstrap(plugins): PluginHostBootstrap` | Create a plugin host bootstrap snapshot. |
+| `createPluginHostBootstrap` | `function createPluginHostBootstrap(plugins): PluginHostBootstrap` | Create a plugin host bootstrap snapshot from a validated composition; throws `PluginCompositionError`. |
 | `runDoctorReport` | `function runDoctorReport(plugin: string, checks): DoctorReport` | Run plugin doctor checks and return an aggregate report. |
 | `AstExtractor` | class | Extractor for exported plugin contribution builder call sites. |
 | `FilesystemWalker` | class | Filesystem walker for plugin source discovery. |
