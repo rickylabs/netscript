@@ -149,16 +149,22 @@ function toChatProducerError(
   error: Error,
   producer: NetScriptChatProducer,
 ): NetScriptChatProducerError {
-  const currentEpoch = error instanceof StaleEpochError ? error.currentEpoch : undefined;
+  if (error instanceof StaleEpochError) {
+    const message = `toNetScriptChatResponse: producer "${producer.id}" epoch ${producer.epoch} ` +
+      `is stale; a newer writer holds epoch ${error.currentEpoch}.`;
+    return new NetScriptChatProducerError(
+      { kind: 'stale-epoch', producer, message, currentEpoch: error.currentEpoch },
+      { cause: error },
+    );
+  }
   return new NetScriptChatProducerError(
-    { kind: classifyFailure(error), producer, message: error.message, currentEpoch },
+    { kind: classifyFailure(error), producer, message: error.message },
     { cause: error },
   );
 }
 
 /** Same categories as the State Protocol producer transport in `@netscript/plugin-streams-core`. */
 function classifyFailure(error: Error): StreamProducerTransportFailureKindV1 {
-  if (error instanceof StaleEpochError) return 'stale-epoch';
   if (error instanceof SequenceGapError) return 'sequence-gap';
   if (error instanceof FetchError) {
     if (error.status === 409 && error.headers[STREAM_CLOSED_HEADER.toLowerCase()] === 'true') {
