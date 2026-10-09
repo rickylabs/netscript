@@ -42,6 +42,14 @@ export function generatePrismaConfig(
   });
 }
 
+/**
+ * Name of the engine-specific connection variable `prisma.config.ts` reads
+ * before `DATABASE_URL`, e.g. `postgres` → `POSTGRES_URI`.
+ */
+export function databaseUrlEnvKey(configKey: string): string {
+  return `${toEnvPrefix(configKey)}_URI`;
+}
+
 function toEnvPrefix(configKey: string): string {
   return configKey.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '').toUpperCase();
 }
