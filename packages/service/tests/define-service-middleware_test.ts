@@ -92,7 +92,11 @@ Deno.test('defineService middleware rejections keep CORS headers and run before 
     // No credential: the middleware still answers first, so the caller sees 429, not 401.
     const blocked = await fetch(`${origin}/api/ping`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', origin: 'https://app.example', 'x-block': 'yes' },
+      headers: {
+        'content-type': 'application/json',
+        origin: 'https://app.example',
+        'x-block': 'yes',
+      },
       body: JSON.stringify({ value: 'x' }),
     });
     assertEquals(blocked.status, 429);
