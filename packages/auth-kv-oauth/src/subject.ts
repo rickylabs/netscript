@@ -33,7 +33,15 @@ import { KvOAuthError } from './errors.ts';
 import type { OAuthProviderConfig, OAuthSubjectSource } from './providers.ts';
 import type { KvOAuthTokenSet } from './store.ts';
 
-export type { OAuthSubjectSource } from './providers.ts';
+export type {
+  OAuthEndpointProviderConfig,
+  OAuthIssuerProviderConfig,
+  OAuthProviderBaseConfig,
+  OAuthProviderClientAuthConfig,
+  OAuthProviderConfig,
+  OAuthSubjectSource,
+} from './providers.ts';
+export type { KvOAuthTokenSet } from './store.ts';
 
 /** Fetch replacement compatible with oauth4webapi userinfo requests. */
 export type KvOAuthUserInfoFetch = NonNullable<
