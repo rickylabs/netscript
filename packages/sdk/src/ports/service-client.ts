@@ -271,6 +271,14 @@ export type ServiceClientShape<
                 readonly code: K;
                 readonly status: number;
                 readonly data: ContractSchemaOutput<TDataSchema>;
+                // Mirrors ORPCError#toJSON so oRPC's native safe()/isDefinedError narrow too.
+                toJSON(): {
+                  readonly defined: boolean;
+                  readonly code: K;
+                  readonly status: number;
+                  readonly message: string;
+                  readonly data: ContractSchemaOutput<TDataSchema>;
+                };
               }
             : never
             : never;
