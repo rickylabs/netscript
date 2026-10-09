@@ -206,6 +206,36 @@ for (const mode of STORE_MODES) {
     );
   });
 
+  Deno.test(`${mode.name}: a send sibling that moves the same instance is threaded into the next compensation`, async () => {
+    const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
+    const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
+      .correlate(() => CORRELATION_KEY)
+      .on('FulfillmentFailed', () => [
+        send('StockReleased', {}),
+        sagaCompensate({ type: 'RefundPayment', payload: {} }),
+      ])
+      .on('StockReleased', (saga) => {
+        saga.state = { ...saga.state, stock: 'released' };
+        return [];
+      })
+      .compensate('RefundPayment', (saga) => {
+        saga.state = { ...saga.state, payment: 'refunded' };
+        return [];
+      })
+      .build() as SagaDefinition;
+
+    const store = await runSaga(definition, [fulfillmentFailed]);
+
+    const loaded = await store.load(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'compensated');
+    assertEquals(loaded?.metadata.version, 3);
+    assertEquals(loaded?.state, { payment: 'refunded', stock: 'released' });
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['compensating', 'compensating', 'compensated'],
+    );
+  });
+
   Deno.test(`${mode.name}: sagaFail from .on() persists the outcome of its compensate branch`, async () => {
     const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
     const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
