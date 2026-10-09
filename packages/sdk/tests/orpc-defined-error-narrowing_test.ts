@@ -121,13 +121,18 @@ function definedNotFoundResponse(): Response {
 async function withDefinedErrorTransport(run: () => Promise<void>): Promise<void> {
   const envKey = createServerServiceEnvKey(serviceName);
   const originalFetch = globalThis.fetch;
+  const originalAddress = Deno.env.get(envKey);
   Deno.env.set(envKey, 'http://127.0.0.1:9');
   globalThis.fetch = () => Promise.resolve(definedNotFoundResponse());
   try {
     await run();
   } finally {
     globalThis.fetch = originalFetch;
-    Deno.env.delete(envKey);
+    if (originalAddress === undefined) {
+      Deno.env.delete(envKey);
+    } else {
+      Deno.env.set(envKey, originalAddress);
+    }
   }
 }
 
