@@ -1,0 +1,633 @@
+{
+  "schemaVersion": 2,
+  "milestone": "0.0.8",
+  "baselineMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
+  "currentMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
+  "coordinator": {
+    "agentId": "coord-0.0.8@claude-opus-5-5-xhigh/divybot-6086943080"
+  },
+  "limits": {
+    "activeImplementationSlicesPerLane": 2,
+    "activeEvaluatorsPerLane": 1,
+    "globalExpensiveGates": 1,
+    "releaseWriters": 1
+  },
+  "lanes": [
+    {
+      "id": "docs",
+      "orchestratorAgentId": "coord-0.0.8/docs-lane@claude-opus-5-5-xhigh/divybot-6086943080",
+      "issueNumbers": [
+        1655,
+        1670,
+        1684,
+        1690,
+        1708,
+        1765,
+        1766,
+        1939,
+        2028,
+        2066
+      ]
+    },
+    {
+      "id": "internals",
+      "orchestratorAgentId": "coord-0.0.8/internals-lane@claude-opus-5-5-xhigh/divybot-6086943080",
+      "issueNumbers": [
+        1366,
+        1372,
+        1388,
+        1767,
+        1786,
+        2036,
+        2039,
+        2040,
+        2041,
+        2063,
+        2107
+      ]
+    },
+    {
+      "id": "fixes",
+      "orchestratorAgentId": "coord-0.0.8/fixes-lane@claude-opus-5-5-xhigh/divybot-6086943080",
+      "issueNumbers": [
+        1367,
+        1369,
+        1382,
+        1383,
+        1384,
+        1385,
+        1386,
+        1667,
+        1681,
+        1682,
+        1688,
+        1726,
+        1742,
+        1825,
+        1826,
+        1849,
+        1893,
+        1990,
+        1996,
+        1999,
+        2018,
+        2021,
+        2024,
+        2026,
+        2029,
+        2030,
+        2031,
+        2032,
+        2067,
+        2095,
+        2099,
+        2101,
+        2102,
+        2104,
+        2105,
+        2109,
+        2111
+      ]
+    },
+    {
+      "id": "features",
+      "orchestratorAgentId": "coord-0.0.8/features-lane@claude-opus-5-5-xhigh/divybot-6086943080",
+      "issueNumbers": [
+        1362,
+        1364,
+        1896,
+        1912,
+        2007,
+        2008,
+        2009,
+        2010,
+        2013,
+        2027,
+        2064,
+        2065,
+        2068,
+        2098,
+        2100,
+        2106,
+        2108,
+        2110
+      ]
+    }
+  ],
+  "watchers": [],
+  "committedIssues": [
+    {
+      "number": 1362,
+      "state": "open"
+    },
+    {
+      "number": 1364,
+      "state": "open"
+    },
+    {
+      "number": 1366,
+      "state": "open"
+    },
+    {
+      "number": 1367,
+      "state": "open"
+    },
+    {
+      "number": 1369,
+      "state": "open"
+    },
+    {
+      "number": 1372,
+      "state": "open"
+    },
+    {
+      "number": 1382,
+      "state": "open"
+    },
+    {
+      "number": 1383,
+      "state": "open"
+    },
+    {
+      "number": 1384,
+      "state": "open"
+    },
+    {
+      "number": 1385,
+      "state": "open"
+    },
+    {
+      "number": 1386,
+      "state": "open"
+    },
+    {
+      "number": 1388,
+      "state": "open"
+    },
+    {
+      "number": 1655,
+      "state": "open"
+    },
+    {
+      "number": 1667,
+      "state": "open"
+    },
+    {
+      "number": 1670,
+      "state": "open"
+    },
+    {
+      "number": 1681,
+      "state": "open"
+    },
+    {
+      "number": 1682,
+      "state": "open"
+    },
+    {
+      "number": 1684,
+      "state": "open"
+    },
+    {
+      "number": 1688,
+      "state": "open"
+    },
+    {
+      "number": 1690,
+      "state": "open"
+    },
+    {
+      "number": 1708,
+      "state": "open"
+    },
+    {
+      "number": 1726,
+      "state": "open"
+    },
+    {
+      "number": 1742,
+      "state": "open"
+    },
+    {
+      "number": 1765,
+      "state": "open"
+    },
+    {
+      "number": 1766,
+      "state": "open"
+    },
+    {
+      "number": 1767,
+      "state": "open"
+    },
+    {
+      "number": 1786,
+      "state": "open"
+    },
+    {
+      "number": 1825,
+      "state": "open"
+    },
+    {
+      "number": 1826,
+      "state": "open"
+    },
+    {
+      "number": 1849,
+      "state": "open"
+    },
+    {
+      "number": 1893,
+      "state": "open"
+    },
+    {
+      "number": 1896,
+      "state": "open"
+    },
+    {
+      "number": 1912,
+      "state": "open"
+    },
+    {
+      "number": 1939,
+      "state": "open"
+    },
+    {
+      "number": 1990,
+      "state": "open"
+    },
+    {
+      "number": 1996,
+      "state": "open"
+    },
+    {
+      "number": 1999,
+      "state": "open"
+    },
+    {
+      "number": 2007,
+      "state": "open"
+    },
+    {
+      "number": 2008,
+      "state": "open"
+    },
+    {
+      "number": 2009,
+      "state": "open"
+    },
+    {
+      "number": 2010,
+      "state": "open"
+    },
+    {
+      "number": 2013,
+      "state": "open"
+    },
+    {
+      "number": 2018,
+      "state": "open"
+    },
+    {
+      "number": 2021,
+      "state": "open"
+    },
+    {
+      "number": 2024,
+      "state": "open"
+    },
+    {
+      "number": 2026,
+      "state": "open"
+    },
+    {
+      "number": 2027,
+      "state": "open"
+    },
+    {
+      "number": 2028,
+      "state": "open"
+    },
+    {
+      "number": 2029,
+      "state": "open"
+    },
+    {
+      "number": 2030,
+      "state": "open"
+    },
+    {
+      "number": 2031,
+      "state": "open"
+    },
+    {
+      "number": 2032,
+      "state": "open"
+    },
+    {
+      "number": 2036,
+      "state": "open"
+    },
+    {
+      "number": 2039,
+      "state": "open"
+    },
+    {
+      "number": 2040,
+      "state": "open"
+    },
+    {
+      "number": 2041,
+      "state": "open"
+    },
+    {
+      "number": 2063,
+      "state": "open"
+    },
+    {
+      "number": 2064,
+      "state": "open"
+    },
+    {
+      "number": 2065,
+      "state": "open"
+    },
+    {
+      "number": 2066,
+      "state": "open"
+    },
+    {
+      "number": 2067,
+      "state": "open"
+    },
+    {
+      "number": 2068,
+      "state": "open"
+    },
+    {
+      "number": 2095,
+      "state": "open"
+    },
+    {
+      "number": 2098,
+      "state": "open"
+    },
+    {
+      "number": 2099,
+      "state": "open"
+    },
+    {
+      "number": 2100,
+      "state": "open"
+    },
+    {
+      "number": 2101,
+      "state": "open"
+    },
+    {
+      "number": 2102,
+      "state": "open"
+    },
+    {
+      "number": 2104,
+      "state": "open"
+    },
+    {
+      "number": 2105,
+      "state": "open"
+    },
+    {
+      "number": 2106,
+      "state": "open"
+    },
+    {
+      "number": 2107,
+      "state": "open"
+    },
+    {
+      "number": 2108,
+      "state": "open"
+    },
+    {
+      "number": 2109,
+      "state": "open"
+    },
+    {
+      "number": 2110,
+      "state": "open"
+    },
+    {
+      "number": 2111,
+      "state": "open"
+    }
+  ],
+  "leaves": [
+    {
+      "id": "W1-2065",
+      "lane": "features",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2116,
+      "headSha": "fe5bbea57",
+      "issueNumbers": [
+        2065
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w1-2065-10",
+      "receiptRefs": [],
+      "surface": [
+        "packages/service/**",
+        "docs/site/reference/service/**",
+        "scaffold service template"
+      ]
+    },
+    {
+      "id": "W1-1383",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "prNumber": 2117,
+      "headSha": "e49f25e2c",
+      "issueNumbers": [
+        1383
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w1-1383-92",
+      "receiptRefs": [],
+      "surface": [
+        "packages/cli/e2e/**",
+        "packages/cli plugin-new formatter path",
+        "docs/site/explanation/plugin-system.md",
+        "docs/site/identity-access/**"
+      ]
+    }
+  ],
+  "expensiveGates": [],
+  "canaryCheckpoints": [
+    {
+      "id": "0.0.8-canary.3",
+      "state": "planned",
+      "rationale": "Consumer browser/auth/SDK/SSR closure, body-size bounds, KV-free C3 fixes (waves 1-7)."
+    },
+    {
+      "id": "0.0.8-canary.4",
+      "state": "planned",
+      "rationale": "Queue/KV correctness, compensation, fencing, runtime auth proof (waves 8-9)."
+    },
+    {
+      "id": "0.0.8-canary.5",
+      "state": "planned",
+      "rationale": "Background health, scaffold parity, provisioned-runtime readiness (waves 10-12)."
+    },
+    {
+      "id": "0.0.8-canary.6",
+      "state": "planned",
+      "rationale": "Consumer DX/docs accurate against public signatures (waves 13-14)."
+    }
+  ],
+  "reporting": {
+    "cadenceMinutes": 60,
+    "lastReportAt": "2026-10-09T19:21:08.000Z",
+    "nextReportDueAt": "2026-10-09T20:21:08.000Z",
+    "lastReportRef": "https://github.com/rickylabs/netscript/issues/2103#issuecomment-6087689487",
+    "headline": "Wave 1 implementing (#2065, #1383); plan PLAN-EVAL-approved; 76 active issues in 16 waves toward canary .3.",
+    "currentMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
+    "canary": {
+      "target": "0.0.8-canary.3",
+      "state": "planned",
+      "eta": {
+        "window": "2026-10-15 18:00 Europe/Paris (proposed)",
+        "confidence": "low",
+        "basis": "21 C3 issues, 2 implementers, independent Sol review per PR; owner cuts the canary."
+      },
+      "criticalPath": [
+        {
+          "id": "#2065",
+          "state": "implementing",
+          "impact": "middleware/body-limit seam gates #1386, #2064, #2106",
+          "nextAction": "implementer W1-2065 to ready PR; then Sol IMPL-EVAL"
+        },
+        {
+          "id": "#1383",
+          "state": "implementing",
+          "impact": "P0 guarded plugin services; runtime gate + docs",
+          "nextAction": "implementer W1-1383 to ready PR; CI full scaffold.runtime both tiers"
+        },
+        {
+          "id": "#1386",
+          "state": "blocked",
+          "impact": "browser topology gates #1386/#1382/#1388",
+          "nextAction": "owner ratifies topology (rec. A, BFF) before W6"
+        }
+      ]
+    },
+    "progress": {
+      "mergedPullRequests": [],
+      "closedIssues": [
+        2025
+      ],
+      "newIssues": [
+        2095,
+        2098,
+        2099,
+        2100,
+        2101,
+        2102,
+        2104,
+        2105,
+        2106,
+        2107,
+        2108,
+        2109,
+        2110,
+        2111
+      ],
+      "queueDeltaExplanation": "Step 0 closed: PLAN-EVAL approved; +14 admissions; #2025 closed dup; #2033 moved; #2010/#1362/#1367 decisions with follow-ups #2112-#2114; wave 1 dispatched 19:14Z."
+    },
+    "scope": {
+      "openIssueCount": 76,
+      "ownedIssueCount": 76,
+      "scheduledIssueCount": 76,
+      "unscheduledIssueNumbers": [],
+      "openPullRequestCount": 0
+    },
+    "mergeQueue": [],
+    "orchestratorMatrix": [
+      {
+        "lane": "docs",
+        "state": "queued",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-10-09T19:18:42.000Z",
+        "blocker": null,
+        "nextAction": "queued behind C4/C6 prerequisites (#2066 W10)"
+      },
+      {
+        "lane": "internals",
+        "state": "queued",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-10-09T19:18:42.000Z",
+        "blocker": null,
+        "nextAction": "W5 #1388-L1 HttpGate primitive; W8 canary .3 qualification after owner cut"
+      },
+      {
+        "lane": "fixes",
+        "state": "active",
+        "activeItems": [
+          "W1-1383 (#2117)"
+        ],
+        "lastConcreteProgressAt": "2026-10-09T19:18:42.000Z",
+        "blocker": null,
+        "nextAction": "W1-1383 ready PR; then W2 #1999/#2031/#2102/#1688/#2105"
+      },
+      {
+        "lane": "features",
+        "state": "active",
+        "activeItems": [
+          "W1-2065 (#2116)"
+        ],
+        "lastConcreteProgressAt": "2026-10-09T19:18:42.000Z",
+        "blocker": null,
+        "nextAction": "W1-2065 ready PR; then W3 #2064"
+      }
+    ],
+    "blockers": [],
+    "environment": {
+      "checkedAt": "2026-10-09T19:21:08.000Z",
+      "aspireApplications": 0,
+      "dockerContainers": 0,
+      "dockerCustomNetworks": 0
+    },
+    "ownerDecisions": [
+      {
+        "id": "D-1386-topology",
+        "question": "Ratify the default browser auth topology for generated apps (recommended: A \u2014 BFF: the Fresh app owns signin/callback and the first-party session cookie; the app server forwards a bearer to services through the SDK bearer contribution).",
+        "whyOwnerOnly": "The plan reserves topology ratification to the owner; it is a locked architecture decision with public-surface impact.",
+        "blockedItems": [
+          1386,
+          1382,
+          1388
+        ]
+      }
+    ]
+  },
+  "exactMainEvidence": {
+    "gitHead": "39cb712b631a0922e0674f40e75224cffcc70549",
+    "surface": "repository",
+    "expectedGateIds": [
+      "ci.check-test",
+      "ci.quality",
+      "code-quality",
+      "e2e-cli.scaffold.runtime",
+      "publish.dry-run"
+    ],
+    "receipts": []
+  },
+  "existingReleaseLease": false,
+  "releaseWriters": [],
+  "releaseCaptain": {
+    "state": "inactive",
+    "agentId": null,
+    "leaseId": null,
+    "contentSha": null,
+    "evidence": []
+  },
+  "updatedAt": "2026-10-09T19:21:08.000Z"
+}
