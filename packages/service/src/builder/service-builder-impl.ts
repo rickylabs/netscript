@@ -22,6 +22,10 @@ import type {
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import type { AuthorizerPort } from '../auth/types.ts';
 import {
+  createBodyLimitMiddleware,
+  type ServiceBodyLimitOptions,
+} from '../primitives/body-limit.ts';
+import {
   createHealthHandler,
   createLivenessHandler,
   createReadinessHandler,
@@ -83,6 +87,8 @@ export class ServiceBuilderImpl<
   private authnOptions: AuthnOptions | null = null;
   private authzOptions: AuthzOptions | null = null;
   private authInstalled = false;
+  private bodyLimitMiddleware: ServiceMiddleware | null = null;
+  private bodyLimitInstalled = false;
   private rpcOptions: (RpcWiringOptions & { traceContext?: boolean }) | null = null;
   private openApiOptions: { title?: string; description?: string } | null = null;
   private docsOptions: { specUrl?: string } | null = null;
@@ -228,6 +234,7 @@ export class ServiceBuilderImpl<
    * @param options.rpcPath - Path for RPC endpoint (default: '/api/rpc')
    * @param options.apiPath - Path for OpenAPI endpoint (default: '/api')
    * @param options.debug - Enable debug mode for verbose oRPC logging (default: NETSCRIPT_DEBUG env var)
+   * @param options.redactFields - Extra field-name fragments redacted from debug-mode RPC input logs
    * @param options.traceContext - Enable trace context propagation (default: true)
    * @param options.rpcAliases - Deprecated RPC prefixes serving the same router
    */
@@ -236,6 +243,7 @@ export class ServiceBuilderImpl<
       rpcPath?: string;
       apiPath?: string;
       debug?: boolean;
+      redactFields?: readonly string[];
       traceContext?: boolean;
       rpcAliases?: readonly string[];
       deprecatedRpcRoutes?: readonly {
@@ -261,6 +269,23 @@ export class ServiceBuilderImpl<
   /** Enables authorization middleware for guarded paths. */
   withAuthz(options: AuthzOptions): ServiceBuilder<TRouter, TCustom> {
     this.authzOptions = options;
+    return this;
+  }
+
+  /**
+   * Limits request bodies to `options.maxBytes`, answering larger ones with a
+   * typed JSON `413` before any route or oRPC handler parses them.
+   *
+   * The limit is installed by `build()` after authentication and authorization,
+   * so unauthenticated callers are rejected before their body is read, and it
+   * covers the RPC projection, the OpenAPI projection, and custom `route()`s.
+   * Calling it again replaces the previous limit.
+   *
+   * @param options - Body limit configuration
+   * @throws {RangeError} When `maxBytes` is not a positive safe integer.
+   */
+  withBodyLimit(options: ServiceBodyLimitOptions): ServiceBuilder<TRouter, TCustom> {
+    this.bodyLimitMiddleware = createBodyLimitMiddleware(options);
     return this;
   }
 
@@ -397,6 +422,10 @@ export class ServiceBuilderImpl<
   /**
    * Adds custom middleware to the service.
    *
+   * Middleware is registered immediately, in call order, so it runs before the
+   * authentication, authorization, and body-limit stages that `build()`
+   * installs, and after any `withCors()` / `withLogger()` called earlier.
+   *
    * @param middleware - Service middleware handler
    */
   use(middleware: ServiceMiddleware): ServiceBuilder<TRouter, TCustom> {
@@ -458,6 +487,7 @@ export class ServiceBuilderImpl<
    */
   build(): ServiceApp {
     this.installAuth();
+    this.installBodyLimit();
     this.installDeferredRoutes();
     this.app.notFound(createNotFoundHandler(this.config.name));
     this.app.onError(createErrorHandler(this.config.name));
@@ -483,6 +513,14 @@ export class ServiceBuilderImpl<
           policyResolver,
         }),
       );
+    }
+  }
+
+  private installBodyLimit(): void {
+    if (this.bodyLimitInstalled) return;
+    this.bodyLimitInstalled = true;
+    if (this.bodyLimitMiddleware) {
+      this.app.use('*', this.bodyLimitMiddleware);
     }
   }
 
