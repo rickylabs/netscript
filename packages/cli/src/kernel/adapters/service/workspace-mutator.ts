@@ -18,6 +18,7 @@ import { reconcilePluginReferences } from '../plugin/plugin-reference-reconciler
 import {
   getPluginServiceLookupName,
   loadRegisteredPluginMetadata,
+  validateConfiguredPluginComposition,
 } from '../config/plugin-registry.ts';
 import { loadProjectConfig } from '../config/project-config-loader.ts';
 import { DenoProcess } from '../runtime/process/deno-process.ts';
@@ -176,6 +177,7 @@ export async function regenerateAspireHelpers(
   const projectConfig = await loadProjectConfig({ cwd: projectRoot }, {
     process: new DenoProcess(),
   });
+  await validateConfiguredPluginComposition(projectRoot, projectConfig);
   const registeredPlugins = await loadRegisteredPluginMetadata(projectRoot, projectConfig);
   const config = applyRegisteredPluginPermissions(
     preservePluginEnvironment(parsed.config, rawAppsettings),

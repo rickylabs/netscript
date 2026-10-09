@@ -2,6 +2,9 @@ import { dirname, resolve, toFileUrl } from '@std/path';
 import { defineConfig, loadConfig } from '@netscript/config';
 import { artifactText, collectInstallArtifacts } from '@netscript/plugin/adapter';
 import { aiAdapterPlugin } from '@netscript/plugin-ai/adapter';
+import { assertEquals, assertRejects } from '@std/assert';
+import { ConfigError } from '../../domain/errors/cli-exit-error.ts';
+import { PLUGIN_COMPOSITION_INVALID_EXIT_CODE } from '../../application/plugin/plugin-composition.ts';
 import { loadRegisteredPluginMetadata, loadRegisteredPlugins } from './plugin-registry.ts';
 
 Deno.test('loadRegisteredPlugins returns normalized background processor metadata', async () => {
@@ -312,6 +315,56 @@ Deno.test('loadRegisteredPluginMetadata falls back when userland scaffold manife
     throw new Error(
       'Expected workers fallback source to retain the local workers workdir',
     );
+  }
+});
+
+Deno.test('loadRegisteredPlugins rejects version-mismatched and unknown-key compositions', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(
+      resolve(projectRoot, 'netscript.config.ts'),
+      `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: ['./plugins/streams.ts', './plugins/workers.ts'],
+};
+`,
+    );
+    await Deno.mkdir(resolve(projectRoot, 'plugins'));
+    await Deno.writeTextFile(
+      resolve(projectRoot, 'plugins/streams.ts'),
+      `export const plugin = {
+  name: '@fixture/streams',
+  version: '2.0.0',
+  contributions: { streamTopcs: [] },
+};
+`,
+    );
+    await Deno.writeTextFile(
+      resolve(projectRoot, 'plugins/workers.ts'),
+      `export const plugin = {
+  name: '@fixture/workers',
+  version: '1.0.0',
+  contributions: {},
+  dependencies: {
+    streams: { name: '@fixture/streams', version: '^1.0.0', contributions: { e2e: [] } },
+  },
+};
+`,
+    );
+
+    const config = await loadConfig({ cwd: projectRoot });
+    const error = await assertRejects(
+      () => loadRegisteredPlugins(projectRoot, config),
+      ConfigError,
+    );
+    assertEquals(error.exitCode, PLUGIN_COMPOSITION_INVALID_EXIT_CODE);
+    assertEquals(
+      (error.context?.diagnostics as { code: string }[]).map((diagnostic) => diagnostic.code),
+      ['unknown-contribution-key', 'dependency-version-mismatch'],
+    );
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
   }
 });
 
