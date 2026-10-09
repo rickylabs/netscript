@@ -36,6 +36,8 @@ import {
 } from './v1-helpers.ts';
 import { type AuthServiceContext, AuthServiceHandlerError } from './v1-types.ts';
 import {
+  endInteractiveSession,
+  recordRevokedSessions,
   requirePrincipal,
   requireRevokeScope,
   revokeSignoutSessions,
@@ -45,7 +47,6 @@ import type { AuthSession, Principal } from '@netscript/plugin-auth-core/domain'
 import type { AuthBackendPort, InteractiveFlowPort } from '@netscript/plugin-auth-core/ports';
 import {
   emitOidcCompleted,
-  emitSessionRevoked,
   emitSigninFailed,
   emitSigninStarted,
   emitTokenRefreshed,
@@ -418,30 +419,6 @@ async function requireAuditedPrincipal(
   } catch (error) {
     await audit.setOutcome({ outcome: AuthOutcome.UNAUTHENTICATED });
     throw error;
-  }
-}
-
-async function recordRevokedSessions(
-  audit: AuthOperationRecorder,
-  revoked: readonly AuthSession[],
-): Promise<void> {
-  for (const revokedSession of revoked) {
-    await audit.recordSessionRevoked(revokedSession.id, revokedSession.subject);
-    emitSessionRevoked(revokedSession, { traceContext: audit.traceContext() });
-  }
-}
-
-/** Clears backend cookie state only when the request's own cookie session was just revoked. */
-async function endInteractiveSession(
-  backend: AuthBackendPort,
-  context: AuthServiceContext,
-  revoked: readonly AuthSession[],
-): Promise<void> {
-  if (!backend.interactive || !context.request) return;
-  const request = toRequest(context.request, '/v1/auth/signout', new URLSearchParams());
-  const cookieSessionId = await backend.interactive.getSessionId(request);
-  if (cookieSessionId && revoked.some((session) => session.id === cookieSessionId)) {
-    await backend.interactive.signOut(request, { revoke: false });
   }
 }
 

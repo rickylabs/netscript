@@ -11,6 +11,9 @@
 import { AUTH_SESSIONS_REVOKE_SCOPE } from '@netscript/plugin-auth-core/contracts/v1';
 import type { AuthSession, Principal } from '@netscript/plugin-auth-core/domain';
 import type { AuthBackendPort } from '@netscript/plugin-auth-core/ports';
+import type { AuthOperationRecorder } from '@netscript/plugin-auth-core/telemetry';
+import { emitSessionRevoked } from '../../../streams/server.ts';
+import { toRequest } from './v1-helpers.ts';
 import { type AuthServiceContext, AuthServiceHandlerError } from './v1-types.ts';
 
 /** Refusal shared by unknown and foreign session ids; the wording must never tell them apart. */
@@ -92,4 +95,29 @@ async function requireOwnedSession(
 function credentialSessionId(principal: Principal): string | undefined {
   const sessionId = principal.claims.sessionId;
   return typeof sessionId === 'string' && sessionId.length > 0 ? sessionId : undefined;
+}
+
+/** Records the audit event and the durable `session.revoked` stream event for each revocation. */
+export async function recordRevokedSessions(
+  audit: AuthOperationRecorder,
+  revoked: readonly AuthSession[],
+): Promise<void> {
+  for (const revokedSession of revoked) {
+    await audit.recordSessionRevoked(revokedSession.id, revokedSession.subject);
+    emitSessionRevoked(revokedSession, { traceContext: audit.traceContext() });
+  }
+}
+
+/** Clears backend cookie state only when the request's own cookie session was just revoked. */
+export async function endInteractiveSession(
+  backend: AuthBackendPort,
+  context: AuthServiceContext,
+  revoked: readonly AuthSession[],
+): Promise<void> {
+  if (!backend.interactive || !context.request) return;
+  const request = toRequest(context.request, '/v1/auth/signout', new URLSearchParams());
+  const cookieSessionId = await backend.interactive.getSessionId(request);
+  if (cookieSessionId && revoked.some((session) => session.id === cookieSessionId)) {
+    await backend.interactive.signOut(request, { revoke: false });
+  }
 }
