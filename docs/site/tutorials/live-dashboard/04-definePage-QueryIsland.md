@@ -96,13 +96,11 @@ and `offset` through it rather than reading `searchParams` by hand.
 
 ## Step 2 — Define the page and cache-first resource pipeline
 
-The page reads data through request-scoped **resource factories**. `.withResource(name, factory)`
-registers a value that is computed once while the page renders, no matter how many layers ask for it.
-That matters here because two layers want the same cached orders slice: the server-rendered `list`
-table and the `ordersQuery` island seed. Declared as a resource, the KV read happens once and both
-layers share it. Downstream resources may await upstream ones, so the prefetch step below builds on
-the same typed search input — the resolution order, the shared store, and the dedup spans behind that
-are in [Request-scoped resources](/web-layer/resources/):
+The page reads data through request-scoped **resource factories**: `.withResource(name, factory)`
+computes a value once per render, however many layers ask for it. Two layers want the same cached
+orders slice — the server-rendered `list` table and the `ordersQuery` island seed — so the KV read
+happens once and both share it. Resolution order, the shared store, and dedup spans are in
+[Request-scoped resources](/web-layer/resources/):
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx
@@ -138,6 +136,12 @@ export const ordersListPage = definePage()
   })
 ```
 
+`ordersData` is a bare `getCachedEntry()` read, not
+[chapter 3](/tutorials/live-dashboard/03-sdk-cache-first-query/)'s action-then-metadata loader, on
+purpose: first paint never waits on `orders`. Refreshing is the `list` layer's job — on a miss or a
+stale entry the runtime prewarms its `partial` route (step 3), whose loader runs the callable action
+that fetches and re-caches.
+
 `definePage` comes from `@app/utils.ts`, not straight from `@netscript/fresh/builders`. Your scaffold
 wrote that module in chapter 1 — a thin wrapper that calls the package builder with the app's `State`
 type applied (`export function definePage() { return createDefinePage<State>(); }`), so every page in
@@ -148,8 +152,8 @@ that name, and it shows up in the Aspire dashboard's traces view alongside the s
 loader made. When the table feels slow, that trace is where you find out whether the time went to KV,
 to the orders service, or to the render itself.
 
-By defining `dehydratedQuery` as a shared resource, you prefetch orders on the server and serialise
-the cache. It is sent to the client alongside the initial HTML, eliminating the browser refetch flash.
+`dehydratedQuery` prefetches orders on the server and serialises the cache into the initial HTML, so
+the island does not refetch on hydrate.
 
 ## Step 3 — Add layers and partials
 

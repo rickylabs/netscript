@@ -330,6 +330,18 @@ setCacheProvider(cacheQuery);
   }
 ] }) }}
 
+### When a stale refresh cannot persist
+
+Cache writes are non-fatal. If the action refetches over a stale entry and the fetch succeeds but
+the KV write fails, the action still returns the fetched `data`, and KV keeps the older entry.
+`getCachedEntry` then returns that older entry, so the `??` fallback does not fire and the loader
+returns the persisted `{ data, cachedAt }`: internally consistent, but older than `data`.
+
+That is the intended contract. The returned `data` and `cachedAt` always describe the same persisted
+value, so the freshness stamp never vouches for data the cache did not record. On a cold cache the
+same failure leaves no entry, and the fallback returns `data` with the current time. A loader that
+needs the freshest value rather than a consistent pair returns `data` itself.
+
 ## Safe error narrowing
 
 For a route built from `baseContract`, the defined channel is exactly `NOT_FOUND`,
