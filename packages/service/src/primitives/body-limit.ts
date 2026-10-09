@@ -10,8 +10,10 @@
  *
  * @example
  * ```typescript
+ * import { Hono } from 'hono';
  * import { createBodyLimitMiddleware } from '@netscript/service';
  *
+ * const app = new Hono();
  * app.use('/api/*', createBodyLimitMiddleware({ maxBytes: 1024 * 1024 }));
  * ```
  *
@@ -75,7 +77,13 @@ export interface PayloadTooLargeResponse {
  *
  * @example
  * ```typescript
- * import { createBodyLimitMiddleware, createService } from '@netscript/service';
+ * import {
+ *   createBodyLimitMiddleware,
+ *   createService,
+ *   type ServiceRouter,
+ * } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
  *
  * createService(router, { name: 'uploads' })
  *   .use(createBodyLimitMiddleware({ maxBytes: 8 * 1024 * 1024 }))

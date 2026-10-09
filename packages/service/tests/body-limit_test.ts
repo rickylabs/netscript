@@ -196,15 +196,21 @@ Deno.test('defineService without bodyLimit keeps accepting large bodies', async 
   }
 });
 
-Deno.test('body limit lets bodyless requests through', async () => {
+Deno.test('body limit lets bodyless requests through a deferred route it guards', async () => {
   const app = createService(router, { name: 'body-limit-get' })
     .withBodyLimit({ maxBytes: 1 })
-    .withHealth()
+    .route('all', '/probe', (c: unknown) => (c as { text(body: string): Response }).text('ok'))
     .build();
 
-  const response = await app.request('/health/live');
+  // The deferred route is mounted after the limit, so a body on it is rejected...
+  const withBody = await app.request('/probe', { method: 'POST', body: 'ab' });
+  assertEquals(withBody.status, 413);
+  await withBody.body?.cancel();
 
-  assertEquals(response.status, 200);
+  // ...while a bodyless GET traverses the same stage untouched.
+  const bodyless = await app.request('/probe');
+  assertEquals(bodyless.status, 200);
+  assertEquals(await bodyless.text(), 'ok');
 });
 
 Deno.test('body limit runs after authentication so anonymous callers get 401 first', async () => {

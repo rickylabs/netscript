@@ -140,6 +140,10 @@ export interface ServiceBuilder<
    *
    * @example
    * ```typescript
+   * import { createService, type ServiceRouter } from '@netscript/service';
+   *
+   * declare const router: ServiceRouter;
+   *
    * createService(router, { name: 'uploads' })
    *   .withBodyLimit({ maxBytes: 8 * 1024 * 1024 })
    *   .withRPC();
