@@ -21,3 +21,12 @@ export const SENSITIVE_FIELD_FRAGMENTS = [
   'refreshtoken',
   'jwttoken',
 ] as const;
+
+/**
+ * Field names redacted from oRPC debug logs only on an exact, case-insensitive key match.
+ *
+ * Substring matching would make `handle` also redact `handler`, so these names stay exact.
+ * `handle` covers re-issuable credentials such as OAuth device-flow handles; `prompt` covers
+ * private user content.
+ */
+export const SENSITIVE_RPC_FIELD_NAMES = ['handle', 'prompt'] as const;
