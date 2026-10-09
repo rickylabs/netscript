@@ -143,28 +143,30 @@ export class SagaBusBridge implements SagaBusPort {
     return this.#engine.query(dispatch);
   }
 
+  /**
+   * Dispatch one cascade and return the instance context the next sibling must run against.
+   * Only a compensation step changes it: each commit moves the instance to a new state and version.
+   */
   async #dispatchOne(
     message: CascadedMessage,
     compensation?: SagaCompensationRequest,
-  ): Promise<void> {
+  ): Promise<SagaCompensationRequest | undefined> {
     switch (message.kind) {
       case 'send':
         await this.#dispatchSend(message, compensation);
-        return;
+        return compensation;
       case 'scheduled':
         await this.#dispatchScheduled(message, compensation);
-        return;
+        return compensation;
       case 'complete':
-        return;
+        return compensation;
       case 'fail':
-        await this.#compensate(message, compensation);
-        return;
+        return await this.#compensate(message, compensation);
       case 'compensate':
-        await this.#compensate(message, compensation);
-        return;
+        return await this.#compensate(message, compensation);
       case 'spawn':
         await this.#dispatchSpawn(message, compensation);
-        return;
+        return compensation;
       default:
         throw SagasError.notImplemented(
           `Unhandled saga cascade effect kind "${
@@ -192,10 +194,24 @@ export class SagaBusBridge implements SagaBusPort {
         instrumentation: this.#instrumentation,
         version: result.version,
       };
-      for (const cascaded of result.cascaded) {
-        await this.#dispatchOne(cascaded, request);
-      }
+      await this.#dispatchSequence(result.cascaded, request);
     }
+  }
+
+  /**
+   * Dispatch sibling cascades in order, threading the latest committed state and version so each
+   * compensation step commits against the instance its predecessor left (and so carries its own
+   * version-derived replay identity).
+   */
+  async #dispatchSequence(
+    messages: readonly CascadedMessage[],
+    context: SagaCompensationRequest,
+  ): Promise<SagaCompensationRequest> {
+    let current = context;
+    for (const message of messages) {
+      current = await this.#dispatchOne(message, current) ?? current;
+    }
+    return current;
   }
 
   #usesAtomicReplay(messageType: string): boolean {
@@ -218,7 +234,7 @@ export class SagaBusBridge implements SagaBusPort {
   async #compensate(
     message: CascadedMessage<'fail' | 'compensate'>,
     context?: SagaCompensationRequest,
-  ): Promise<void> {
+  ): Promise<SagaCompensationRequest> {
     if (!this.#compensator) {
       throw SagasError.notImplemented(
         'compensation cascades require the compensator option.',
@@ -259,15 +275,18 @@ export class SagaBusBridge implements SagaBusPort {
       throw error;
     }
     // A sagaFail without a matching branch ran nothing; its `failed` status is already persisted.
-    if (!result.compensated) return;
+    if (!result.compensated) return request;
 
     const commit = await this.#commitCompensation(request, {
       message: result.message,
       state: result.state,
       cascaded: result.cascaded,
     });
-    // A replayed outcome was dispatched when it was first committed.
-    if (commit?.committed === false) return;
+    // A replayed outcome was dispatched when it was first committed; later siblings still advance
+    // past its version so their own replay identities line up with the original run.
+    if (commit?.committed === false) {
+      return { ...request, state: result.state, version: commit.version };
+    }
 
     const nextRequest: SagaCompensationRequest = {
       ...request,
@@ -279,11 +298,12 @@ export class SagaBusBridge implements SagaBusPort {
       instrumentation: executionRequest.instrumentation,
       version: commit?.version,
     };
-    for (const cascaded of result.cascaded) {
-      // The branch's sagaFail is its persisted outcome; dispatching it would re-enter the branch.
-      if (cascaded.kind === 'fail') continue;
-      await this.#dispatchOne(cascaded, nextRequest);
-    }
+    // The branch's sagaFail is its persisted outcome; dispatching it would re-enter the branch.
+    const settled = await this.#dispatchSequence(
+      result.cascaded.filter((cascaded) => cascaded.kind !== 'fail'),
+      nextRequest,
+    );
+    return { ...request, state: settled.state, version: settled.version };
   }
 
   /** Persist a compensation outcome through the engine; undefined when there is no version. */

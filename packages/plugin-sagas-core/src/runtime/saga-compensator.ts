@@ -112,12 +112,15 @@ export class SagaCompensator {
           'Compensation execution requires an engine-resolved correlationKey.',
         );
       }
-      const saga = { state: request.state };
+      // The handler works on a private copy, so a branch that mutates in place and then throws
+      // leaves the caller's pre-compensation snapshot untouched.
+      const state = structuredClone(request.state);
+      const saga = { state };
       const context: SagaContext<TState, SagaMessage> = {
         sagaId: request.definition.id,
         instanceId: request.instanceId,
         correlationKey: request.correlationKey,
-        state: request.state,
+        state,
         message: request.message,
         attempt: request.attempt ?? 1,
         now: this.#clock.now(),

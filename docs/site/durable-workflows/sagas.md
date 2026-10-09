@@ -183,7 +183,15 @@ atomic stores alike:
 | returns `[sagaFail(reason)]`       | `failed` (terminal)                                     |
 | returns `[sagaComplete(result)]`   | `completed` (terminal)                                  |
 | returns `[sagaCompensate(...)]`    | stays `compensating` until the nested branch finishes   |
-| throws                             | `failed`, with `metadata.compensationError` set; the branch's partial state change is discarded and the error is rethrown |
+| throws                             | `failed`, with `metadata.compensationError` set; every partial state change (including in-place edits of nested objects) is discarded and the error is rethrown |
+
+A branch runs on its own copy of the state, so editing `saga.state` in place is safe: nothing is
+saved unless the branch returns.
+
+When one handler returns several effects, they run in order. Each `sagaCompensate(...)` runs against
+the state and version the previous compensation saved, and saves its own outcome as the next
+version. So for `[sagaCompensate(releaseStock), sagaCompensate(refundPayment)]`, both branches'
+state changes are kept, and the last outcome sets the final status.
 
 A `sagaFail(...)` returned from `.on()` saves `failed` first. If a `.compensate()` branch is
 registered for that message type, it then runs, and its outcome is saved by the same table. A
