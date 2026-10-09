@@ -19,15 +19,22 @@
 
 import { DenoKvMessageQueue } from '@fedify/denokv';
 import { type MessageEnvelope, toAddressedEnvelope, toDeadLetterRecord } from './_envelope.ts';
+import {
+  closeQuietly,
+  createKvQueueConnection,
+  type KvDatabaseTarget,
+  type KvQueueConnection,
+} from './_kv-queue-connection.ts';
+import {
+  type KvEnvelopeHandler,
+  KvQueueRegistration,
+  KvQueueRouteTable,
+  track,
+} from './_kv-queue-routes.ts';
 import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 
-/** Handler that receives envelopes addressed to one queue name. */
-export type KvEnvelopeHandler = (envelope: MessageEnvelope<unknown>) => Promise<void>;
-
-/** Identifies one Deno KV database: a caller-owned instance, or a path or URL to open. */
-export type KvDatabaseTarget =
-  | { readonly kv: Deno.Kv }
-  | { readonly path?: string };
+export type { KvDatabaseTarget } from './_kv-queue-connection.ts';
+export type { KvEnvelopeHandler } from './_kv-queue-routes.ts';
 
 /** Re-enqueue policy for envelopes that no local listener receives. */
 export interface UnroutablePolicy {
@@ -62,174 +69,6 @@ export const DEFAULT_UNROUTABLE_POLICY: UnroutablePolicy = {
  */
 export function unroutableDelayMs(policy: UnroutablePolicy, hop: number): number {
   return Math.min(policy.baseDelayMs * 2 ** hop, policy.maxDelayMs);
-}
-
-/** Connections a dispatcher uses for writes and for its listen loop. */
-export interface KvQueueConnection {
-  /** Whether each listen loop gets its own connection, so stopping it leaves writes untouched. */
-  readonly dedicatedListener: boolean;
-  /** Connection used for enqueue and dead-letter writes. */
-  shared(): Promise<Deno.Kv>;
-  /** Connection consumed by one listen loop. */
-  listener(): Promise<Deno.Kv>;
-  /**
-   * Close connections this object opened. Caller-owned instances are left open.
-   *
-   * @returns Whether a listen loop on the shared connection was closed with it.
-   */
-  close(): Promise<boolean>;
-}
-
-const IN_MEMORY_PATH = ':memory:';
-
-/**
- * Create the connection source for a KV database target.
- *
- * @param target - Caller-owned instance or path to open.
- * @returns Connection source for a dispatcher.
- */
-export function createKvQueueConnection(target: KvDatabaseTarget): KvQueueConnection {
-  if ('kv' in target) {
-    return new SingleKvConnection(() => Promise.resolve(target.kv), false);
-  }
-  if (target.path === IN_MEMORY_PATH) {
-    return new SingleKvConnection(() => Deno.openKv(IN_MEMORY_PATH), true);
-  }
-  return new PathKvConnection(target.path);
-}
-
-/**
- * One connection for writes and listening: a caller-owned instance, or an in-memory database,
- * which a second `openKv` call could not reach.
- */
-class SingleKvConnection implements KvQueueConnection {
-  readonly dedicatedListener = false;
-  #kv: Promise<Deno.Kv> | null = null;
-
-  constructor(
-    private readonly open: () => Promise<Deno.Kv>,
-    private readonly owned: boolean,
-  ) {}
-
-  shared(): Promise<Deno.Kv> {
-    this.#kv ??= this.open();
-    return this.#kv;
-  }
-
-  listener(): Promise<Deno.Kv> {
-    return this.shared();
-  }
-
-  async close(): Promise<boolean> {
-    const kv = this.#kv;
-    if (!kv || !this.owned) {
-      return false;
-    }
-    this.#kv = null;
-    await closeOpened(kv);
-    return true;
-  }
-}
-
-/** Opens a database by path: one shared write connection, and a fresh one per listen loop. */
-class PathKvConnection implements KvQueueConnection {
-  readonly dedicatedListener = true;
-  #shared: Promise<Deno.Kv> | null = null;
-
-  constructor(private readonly path: string | undefined) {}
-
-  shared(): Promise<Deno.Kv> {
-    this.#shared ??= Deno.openKv(this.path);
-    return this.#shared;
-  }
-
-  listener(): Promise<Deno.Kv> {
-    return Deno.openKv(this.path);
-  }
-
-  async close(): Promise<boolean> {
-    const shared = this.#shared;
-    this.#shared = null;
-    if (shared) {
-      await closeOpened(shared);
-    }
-    return false;
-  }
-}
-
-/** One listener registration for a queue name, tracking the deliveries it has in flight. */
-class KvQueueRegistration {
-  readonly #inFlight = new Set<Promise<void>>();
-
-  constructor(
-    private readonly handler: KvEnvelopeHandler,
-    readonly end: () => void,
-    readonly fail: (error: unknown) => void,
-  ) {}
-
-  deliver(envelope: MessageEnvelope<unknown>): Promise<void> {
-    return track(this.#inFlight, this.handler(envelope));
-  }
-
-  /** Wait until every delivery already handed to this registration has settled. */
-  async settle(): Promise<void> {
-    await Promise.allSettled([...this.#inFlight]);
-  }
-}
-
-/** Registrations of one queue name and its round-robin cursor. */
-interface KvQueueRoute {
-  readonly registrations: KvQueueRegistration[];
-  cursor: number;
-}
-
-/** Registrations by queue name, chosen round-robin per name when a name has several. */
-class KvQueueRouteTable {
-  readonly #routes = new Map<string, KvQueueRoute>();
-
-  get isEmpty(): boolean {
-    return this.#routes.size === 0;
-  }
-
-  add(queueName: string, registration: KvQueueRegistration): void {
-    const route = this.#routes.get(queueName);
-    if (route) {
-      route.registrations.push(registration);
-    } else {
-      this.#routes.set(queueName, { registrations: [registration], cursor: 0 });
-    }
-  }
-
-  remove(queueName: string, registration: KvQueueRegistration): void {
-    const route = this.#routes.get(queueName);
-    if (!route) {
-      return;
-    }
-    const index = route.registrations.indexOf(registration);
-    if (index >= 0) {
-      route.registrations.splice(index, 1);
-    }
-    if (route.registrations.length === 0) {
-      this.#routes.delete(queueName);
-    }
-  }
-
-  next(queueName: string): KvQueueRegistration | undefined {
-    const route = this.#routes.get(queueName);
-    if (!route) {
-      return undefined;
-    }
-    route.cursor %= route.registrations.length;
-    const registration = route.registrations[route.cursor];
-    route.cursor += 1;
-    return registration;
-  }
-
-  drain(): KvQueueRegistration[] {
-    const registrations = [...this.#routes.values()].flatMap((route) => route.registrations);
-    this.#routes.clear();
-    return registrations;
-  }
 }
 
 /** A running listen loop. */
@@ -530,33 +369,7 @@ function acquire<K>(
   };
 }
 
-/** Add a promise to an in-flight set until it settles; the returned promise keeps its outcome. */
-function track(inFlight: Set<Promise<void>>, work: Promise<void>): Promise<void> {
-  inFlight.add(work);
-  const forget = () => inFlight.delete(work);
-  work.then(forget, forget);
-  return work;
-}
-
 /** Let Deno acknowledge deliveries whose handlers just settled before their connection closes. */
 function yieldToAcks(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
-}
-
-async function closeOpened(kv: Promise<Deno.Kv>): Promise<void> {
-  try {
-    closeQuietly(await kv);
-  } catch {
-    // The connection never opened; there is nothing to release.
-  }
-}
-
-function closeQuietly(kv: Deno.Kv): void {
-  try {
-    kv.close();
-  } catch (error) {
-    if (!(error instanceof Deno.errors.BadResource)) {
-      throw error;
-    }
-  }
 }
