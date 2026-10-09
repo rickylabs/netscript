@@ -189,7 +189,8 @@ Deno.test('a client module that fails to load is reported as a load failure, not
     await Deno.writeTextFile(join(appRoot, 'lib', 'catalog.ts'), 'throw new Error("boom");\n');
 
     await assertRejects(
-      () => resolveQueryProcedure({ appRoot, client: CLIENT, procedure: 'alpha.listItems' }, runtime),
+      () =>
+        resolveQueryProcedure({ appRoot, client: CLIENT, procedure: 'alpha.listItems' }, runtime),
       Error,
       "Could not load client module @app/lib/catalog.ts to resolve query procedure 'alpha.listItems'",
     );
