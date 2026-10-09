@@ -16,4 +16,6 @@ await defineService(router, {
     description: '{{serviceName}} service',
   },
   debug: true,
+  // Reject request bodies over 1 MiB with a typed 413. Raise it for upload-heavy services.
+  bodyLimit: { maxBytes: 1024 * 1024 },
 });
