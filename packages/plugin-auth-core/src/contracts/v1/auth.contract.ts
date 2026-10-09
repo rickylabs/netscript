@@ -337,7 +337,8 @@ export const SessionInputSchema: AuthSchema<SessionInput> = SessionInputZodSchem
 const sessionRouteInput: z.ZodOptional<typeof SessionInputZodSchema> = SessionInputZodSchema
   .optional();
 
-const meRouteInput: z.ZodOptional<z.ZodUndefined> = z.undefined().optional();
+// OpenAPI GET decodes an empty query as `{}`, so a no-input route takes an optional empty object.
+const meRouteInput: z.ZodOptional<z.ZodObject<Record<never, never>>> = z.object({}).optional();
 
 const AuthSessionResponseZodSchema: z.ZodObject<{
   id: z.ZodString;
