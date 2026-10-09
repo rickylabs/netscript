@@ -1,4 +1,14 @@
+import {
+  type HttpExchangeContract,
+  httpExchangeInit,
+  type HttpExchangeOutcome,
+  judgeHttpResponse,
+  parseHttpExchangeContract,
+} from '../../../../domain/http-contract.ts';
 import { resolveResourceUrlsFromAppHost } from '../generated-app-endpoint.ts';
+
+/** CLI action that asserts one exact {@link HttpExchangeContract}: `exchange <path> <contract-json>`. */
+export const EXCHANGE_ACTION = 'exchange';
 
 type ProbeAction =
   | 'get'
@@ -12,6 +22,89 @@ type ProbeAction =
 const ATTEMPTS = 30;
 /** Application-effect retry delay; it is not an Aspire observation cadence. */
 const RETRY_DELAY_MS = 1_000;
+/** Per-request transport cap for an exchange probe attempt. */
+const EXCHANGE_ATTEMPT_TIMEOUT_MS = 5_000;
+
+/** Effects an exchange probe depends on, injectable so its retry policy is testable offline. */
+export interface ExchangeProbeEffects {
+  readonly fetch: typeof fetch;
+  readonly delay: (milliseconds: number) => Promise<void>;
+  readonly attempts: number;
+  readonly retryDelayMs: number;
+  /** Cap on one attempt, headers and any body the contract needs. */
+  readonly attemptTimeoutMs: number;
+}
+
+const DEFAULT_EXCHANGE_EFFECTS: ExchangeProbeEffects = {
+  fetch: (input, init) => fetch(input, init),
+  delay,
+  attempts: ATTEMPTS,
+  retryDelayMs: RETRY_DELAY_MS,
+  attemptTimeoutMs: EXCHANGE_ATTEMPT_TIMEOUT_MS,
+};
+
+/** A served response broke the exchange contract; the probe stops instead of retrying. */
+export class HttpExchangeMismatchError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'HttpExchangeMismatchError';
+  }
+}
+
+/** Assert one exact HTTP exchange against a plugin resource allocated by the running AppHost. */
+export async function probePluginExchange(
+  appHost: string,
+  resourceName: string,
+  path: string,
+  contract: HttpExchangeContract,
+): Promise<void> {
+  const baseUrls = await resolveResourceUrlsFromAppHost(appHost, resourceName);
+  const baseUrl = await probeExchange(baseUrls, path, contract);
+  console.info(
+    `${resourceName} ${contract.method} ${path} served ${contract.expectStatus} via ${baseUrl}`,
+  );
+}
+
+/**
+ * Probe `path` on each base URL until one serves the contract. Only connection-level failures
+ * retry; any served response decides the probe, and a served mismatch throws at once — judged
+ * from the headers of the original (unredirected) response, with its body cancelled unread.
+ *
+ * @returns The base URL that served the contract.
+ * @throws {HttpExchangeMismatchError} When an endpoint serves a response that breaks the contract.
+ */
+export async function probeExchange(
+  baseUrls: readonly string[],
+  path: string,
+  contract: HttpExchangeContract,
+  effects: ExchangeProbeEffects = DEFAULT_EXCHANGE_EFFECTS,
+): Promise<string> {
+  let lastFailure = 'no base URL was probed';
+  for (let attempt = 1; attempt <= effects.attempts; attempt++) {
+    for (const baseUrl of baseUrls) {
+      const url = resourceUrl(baseUrl, path);
+      let outcome: HttpExchangeOutcome;
+      try {
+        const response = await effects.fetch(
+          url,
+          httpExchangeInit(contract, AbortSignal.timeout(effects.attemptTimeoutMs)),
+        );
+        outcome = await judgeHttpResponse(contract, response);
+      } catch (error) {
+        lastFailure = `${url}: ${error instanceof Error ? error.message : String(error)}`;
+        continue;
+      }
+      if (outcome.kind === 'matched') return baseUrl;
+      throw new HttpExchangeMismatchError(
+        `${contract.method} ${url} broke its contract on attempt ${attempt}: ${outcome.reason}`,
+      );
+    }
+    if (attempt < effects.attempts) await effects.delay(effects.retryDelayMs);
+  }
+  throw new Error(
+    `${contract.method} ${path} was not served after ${effects.attempts} attempts: ${lastFailure}`,
+  );
+}
 
 /** Probe a plugin resource through URLs allocated by the running Aspire AppHost. */
 export async function probePluginResource(
@@ -170,10 +263,20 @@ if (import.meta.main) {
   const path = Deno.args[3];
   if (!appHost) throw new Error('apphost argument is required');
   if (!resourceName) throw new Error('resource name argument is required');
-  if (!isProbeAction(action)) {
+  if (action === EXCHANGE_ACTION) {
+    const contract = Deno.args[4];
+    if (!contract) throw new Error('exchange contract argument is required');
+    await probePluginExchange(
+      appHost,
+      resourceName,
+      requiredPath(path),
+      parseHttpExchangeContract(contract),
+    );
+  } else if (isProbeAction(action)) {
+    await probePluginResource(appHost, resourceName, action, path);
+  } else {
     throw new Error(`unsupported plugin probe action: ${action}`);
   }
-  await probePluginResource(appHost, resourceName, action, path);
 }
 
 function isProbeAction(value: string | undefined): value is ProbeAction {
