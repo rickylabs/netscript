@@ -14,7 +14,10 @@ import { generateQualityRunner } from '../../templates/workspace/quality-runner.
 import { generatePackageJson } from '../../templates/workspace/package-json.ts';
 import { generateEditorConfigFiles } from '../../adapters/scaffold/editor-config.ts';
 import { loadRootScaffoldTemplateAssets } from '../../adapters/templates/scaffold-template-assets.ts';
-import { generateAppsettings } from '../../templates/aspire/generate-appsettings.ts';
+import {
+  generateAppsettings,
+  generateStandaloneAppsettings,
+} from '../../templates/aspire/generate-appsettings.ts';
 import type { InitPipelineContext } from './context.ts';
 import { createScaffoldPlan } from '../../domain/scaffold/scaffold-plan.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
@@ -276,8 +279,10 @@ export async function scaffoldRoot(
   }
 
   // 7. appsettings.json (Tier 1 — NetScript infrastructure config)
-  //    Always generated at project root — consumed by helpers generator
-  //    regardless of C# vs TS AppHost mode.
+  //    Always generated at project root: it is the config authority the
+  //    service, database and config commands read in both modes. Under Aspire
+  //    it also feeds the helpers generator; under --no-aspire it carries the
+  //    inventory only, with developer-provisioned (External) infrastructure.
   //    No host port is pinned for the app or the example service: `env: 'PORT'`
   //    in register-apps/register-services lets Aspire allocate both the proxy
   //    port and the target port, which is what `aspire start --isolated` needs
@@ -295,8 +300,17 @@ export async function scaffoldRoot(
     } else {
       filesSkipped.push(aspireCliTaskPath);
     }
+  }
 
-    const appsettingsContent = generateAppsettings({
+  const appsettingsContent = options.noAspire
+    ? generateStandaloneAppsettings({
+      name: options.name,
+      dbEngine: options.dbEngine,
+      cache: options.cache,
+      cacheBackend: options.cacheBackend,
+      service: plan.service ? { name: plan.service.name, port: plan.service.port } : undefined,
+    })
+    : generateAppsettings({
       name: options.name,
       appName: options.appName,
       dbEngine: options.dbEngine,
@@ -304,18 +318,17 @@ export async function scaffoldRoot(
       cacheBackend: options.cacheBackend,
       service: plan.service,
     });
-    const appsettingsPath = join(targetPath, SCAFFOLD_FILES.APPSETTINGS);
-    if (
-      await context.scaffolder.writeFile(
-        appsettingsPath,
-        appsettingsContent,
-        options.force,
-      )
-    ) {
-      filesCreated.push(appsettingsPath);
-    } else {
-      filesSkipped.push(appsettingsPath);
-    }
+  const appsettingsPath = join(targetPath, SCAFFOLD_FILES.APPSETTINGS);
+  if (
+    await context.scaffolder.writeFile(
+      appsettingsPath,
+      appsettingsContent,
+      options.force,
+    )
+  ) {
+    filesCreated.push(appsettingsPath);
+  } else {
+    filesSkipped.push(appsettingsPath);
   }
 
   const testsDir = join(targetPath, 'tests');
