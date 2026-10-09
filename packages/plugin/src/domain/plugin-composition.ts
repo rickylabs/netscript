@@ -6,7 +6,7 @@
  * - `invalid-contribution`: a known contribution axis holds a value of the wrong shape.
  * - `duplicate-contribution`: one contribution identity is declared twice, within a plugin or across
  *   plugins on a root-owned axis.
- * - `missing-dependency`: a declared dependency that contributes to the host is not in the composition.
+ * - `missing-dependency`: a declared dependency is not in the composition.
  * - `dependency-version-mismatch`: the composed dependency version does not satisfy the declared range.
  * - `invalid-version`: a plugin version or dependency range is not valid semver.
  */

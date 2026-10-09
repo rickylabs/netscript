@@ -1,11 +1,9 @@
 import type { PluginCompositionDiagnostic } from '../../domain/mod.ts';
-import { SINGLETON_CONTRIBUTION_KEYS } from '../domain/contribution-identity.ts';
 import type { PluginCompositionResult } from '../domain/plugin-composition.ts';
-import type { PluginContributions } from '../domain/plugin-contributions.ts';
 import type { PluginManifest } from '../domain/plugin-manifest.ts';
 import { checkContributionIdentities } from './composition/contribution-identity-check.ts';
 import { checkDependencyClosure } from './composition/dependency-closure-check.ts';
-import { mergeContributions } from './contribution-merger.ts';
+import { accumulateCollections } from './contribution-merger.ts';
 
 /**
  * Validate that plugin manifests compose into one root host.
@@ -40,7 +38,10 @@ export function validatePluginComposition(
 
   return {
     ok: true,
-    composition: { plugins: [...plugins], contributions: mergeCollectionAxes(plugins) },
+    composition: {
+      plugins: [...plugins],
+      contributions: accumulateCollections(plugins.map((plugin) => plugin.contributions)),
+    },
   };
 }
 
@@ -65,17 +66,4 @@ function partitionByName(plugins: readonly PluginManifest[]): {
     unique.push(plugin);
   }
   return { unique, diagnostics };
-}
-
-function mergeCollectionAxes(plugins: readonly PluginManifest[]): PluginContributions {
-  return plugins.reduce<PluginContributions>(
-    (merged, plugin) => mergeContributions(merged, withoutSingletonAxes(plugin.contributions)),
-    {},
-  );
-}
-
-function withoutSingletonAxes(contributions: PluginContributions): PluginContributions {
-  const collection: Record<string, unknown> = { ...contributions };
-  for (const axis of SINGLETON_CONTRIBUTION_KEYS) delete collection[axis];
-  return collection as PluginContributions;
 }

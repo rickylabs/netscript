@@ -29,7 +29,6 @@ export function checkContributionIdentities(
     }
 
     for (const [axis, value] of Object.entries(contributions)) {
-      if (value === undefined) continue;
       if (!isContributionKey(axis)) {
         diagnostics.push({
           code: 'unknown-contribution-key',
@@ -39,6 +38,7 @@ export function checkContributionIdentities(
         });
         continue;
       }
+      if (value === undefined) continue;
 
       const rule = CONTRIBUTION_IDENTITY_RULES[axis];
       const identities = rule.identities(value);

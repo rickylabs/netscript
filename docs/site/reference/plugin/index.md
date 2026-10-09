@@ -76,7 +76,7 @@ bootstrap and generation agree.
 | `unknown-contribution-key` | `contributions` holds a key that `PluginContributions` does not define. |
 | `invalid-contribution` | A known contribution key holds a value of the wrong shape. |
 | `duplicate-contribution` | An identity repeats within one plugin, or across plugins on a root-owned axis. |
-| `missing-dependency` | A declared dependency that contributes to the host is not composed. |
+| `missing-dependency` | A declared dependency is not composed. |
 | `dependency-version-mismatch` | The composed dependency version does not satisfy the declared semver range. |
 | `invalid-version` | A plugin version or dependency range is not valid semver. |
 
@@ -99,12 +99,14 @@ Each contribution key has one identity and scope:
 
 Root-scoped identities must be unique across the whole composition. Plugin-scoped identities only
 need to be unique within their plugin, so every plugin can contribute contract version `v1`. The
-composition's merged `contributions` covers the collection keys. `aspire` and `doctor` stay on each
+composition's merged `contributions` holds every collection key, including `cli.doctorChecks`, in one
+linear pass. `aspire` and `doctor` stay on each
 plugin's manifest, and `mergeContributions` throws instead of silently keeping the last value when
 both inputs set one of them.
 
-A dependency's `version` is read as a semver range, so an exact version matches only itself. A
-dependency that declares no contributions is a library dependency and need not be composed.
+Every declared dependency must be composed. Its `version` is read as a semver range, so an exact
+version matches only itself. Library packages that are not plugins belong in `deno.json` imports,
+not in a manifest's `dependencies`.
 
 **Migration (breaking).** `PluginManifestSchema`, `definePlugin(...).build()`, and the composition
 check now reject unknown contribution keys. A misspelled key such as `servces` used to be ignored;

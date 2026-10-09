@@ -5,9 +5,9 @@ import type { PluginManifest } from '../../domain/plugin-manifest.ts';
 /**
  * Check that every declared plugin dependency is composed at a satisfying version.
  *
- * A dependency's `version` is read as a semver range (an exact version is the range that matches
- * only itself). A dependency that declares no contributions is a library dependency: it has nothing
- * to compose, so its absence is not an error, but a composed copy must still satisfy the range.
+ * Every declared dependency must be composed. Its `version` is read as a semver range (an exact
+ * version is the range that matches only itself) that the composed plugin's version must satisfy.
+ * Library packages that are not plugins belong in `deno.json` imports, not in `dependencies`.
  */
 export function checkDependencyClosure(
   plugins: readonly PluginManifest[],
@@ -19,16 +19,13 @@ export function checkDependencyClosure(
     for (const [alias, dependency] of Object.entries(plugin.dependencies ?? {})) {
       const target = composed.get(dependency.name);
       if (target === undefined) {
-        if (declaresContributions(dependency)) {
-          diagnostics.push({
-            code: 'missing-dependency',
-            plugin: plugin.name,
-            identity: dependency.name,
-            message:
-              `Plugin "${plugin.name}" depends on "${dependency.name}" (alias "${alias}"), ` +
-              'which is not in the composition.',
-          });
-        }
+        diagnostics.push({
+          code: 'missing-dependency',
+          plugin: plugin.name,
+          identity: dependency.name,
+          message: `Plugin "${plugin.name}" depends on "${dependency.name}" (alias "${alias}"), ` +
+            'which is not in the composition.',
+        });
         continue;
       }
 
@@ -83,10 +80,4 @@ function tryParse<T>(parser: () => T): T | undefined {
   } catch {
     return undefined;
   }
-}
-
-function declaresContributions(manifest: PluginManifest): boolean {
-  return Object.values(manifest.contributions ?? {}).some((contribution) =>
-    Array.isArray(contribution) ? contribution.length > 0 : contribution !== undefined
-  );
 }

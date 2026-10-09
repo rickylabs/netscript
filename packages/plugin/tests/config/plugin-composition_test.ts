@@ -28,6 +28,19 @@ function codesOf(plugins: readonly PluginManifest[]): string[] {
 
 const service = (name: string) => ({ name, entrypoint: `./${name}.ts` });
 
+const COLLECTION_AXES = [
+  'services',
+  'sdkClients',
+  'backgroundProcessors',
+  'streamTopics',
+  'databaseSchemas',
+  'runtimeConfigTopics',
+  'contractVersions',
+  'e2e',
+  'telemetry',
+  'migrations',
+] as const;
+
 Deno.test('validatePluginComposition accepts a valid composition and merges collection axes', () => {
   const result = validatePluginComposition([
     manifest('@example/a', {
@@ -49,6 +62,40 @@ Deno.test('validatePluginComposition accepts a valid composition and merges coll
     'b-api',
   ]);
   assertEquals(result.composition.contributions.aspire, undefined);
+});
+
+Deno.test('the validated composition merges every collection axis, including cli', () => {
+  const contributions = (suffix: string): PluginManifest['contributions'] => ({
+    cli: { doctorChecks: suffix === 'a' ? ['auth-backend'] : [] },
+    services: [service(`api-${suffix}`)],
+    sdkClients: [sdkClient(`@example/${suffix}:bearer`)],
+    backgroundProcessors: [{ name: `worker-${suffix}`, entrypoint: './w.ts' }],
+    streamTopics: [{ name: `jobs-${suffix}`, subject: `${suffix}.jobs` }],
+    databaseSchemas: [{ path: './db.prisma' }],
+    runtimeConfigTopics: [{ name: `topic-${suffix}` }],
+    contractVersions: [{ version: 'v1', loader: './v1.ts' }],
+    e2e: [{ name: `health-${suffix}`, command: suffix }],
+    telemetry: [{ name: `otel-${suffix}`, module: './otel.ts' }],
+    migrations: [{ name: '0001_init', path: './0001.sql' }],
+    aspire: `./${suffix}/aspire.ts`,
+    doctor: `./${suffix}/doctor.ts`,
+  });
+  const a = manifest('@example/a', { contributions: contributions('a') });
+  const b = manifest('@example/b', { contributions: contributions('b') });
+
+  const result = validatePluginComposition([a, b]);
+  if (!result.ok) throw new Error(JSON.stringify(result.diagnostics));
+  const merged = result.composition.contributions;
+
+  assertEquals(merged.cli, { doctorChecks: ['auth-backend'] });
+  for (const axis of COLLECTION_AXES) {
+    assertEquals<unknown>(merged[axis], [
+      ...a.contributions[axis] ?? [],
+      ...b.contributions[axis] ?? [],
+    ]);
+  }
+  assertEquals([merged.aspire, merged.doctor], [undefined, undefined]);
+  assertEquals(mergeContributions(a.contributions, {}).cli, { doctorChecks: ['auth-backend'] });
 });
 
 Deno.test('duplicate manifest names fail', () => {
@@ -180,7 +227,7 @@ Deno.test('single-valued axes are a collision when merged, not last-wins', () =>
   assertEquals(mergeContributions({}, { aspire: './b/aspire.ts' }).aspire, './b/aspire.ts');
 });
 
-Deno.test('missing contributing dependencies fail; library-only dependencies may be absent', () => {
+Deno.test('every missing declared dependency fails, including one that contributes nothing', () => {
   const library = definePlugin('@example/core', '1.0.0').build();
   const contributing = manifest('@example/streams', {
     contributions: { services: [service('s')] },
@@ -190,13 +237,29 @@ Deno.test('missing contributing dependencies fail; library-only dependencies may
     manifest('@example/workers', { dependencies: { streams: contributing, core: library } }),
   ]);
 
-  assertEquals(diagnostics, [{
-    code: 'missing-dependency',
-    plugin: '@example/workers',
-    identity: '@example/streams',
-    message:
-      'Plugin "@example/workers" depends on "@example/streams" (alias "streams"), which is not in the composition.',
-  }]);
+  assertEquals(diagnostics, [
+    {
+      code: 'missing-dependency',
+      plugin: '@example/workers',
+      identity: '@example/streams',
+      message:
+        'Plugin "@example/workers" depends on "@example/streams" (alias "streams"), which is not in the composition.',
+    },
+    {
+      code: 'missing-dependency',
+      plugin: '@example/workers',
+      identity: '@example/core',
+      message:
+        'Plugin "@example/workers" depends on "@example/core" (alias "core"), which is not in the composition.',
+    },
+  ]);
+  assertEquals(
+    validatePluginComposition([
+      manifest('@example/workers', { dependencies: { core: library } }),
+      library,
+    ]).ok,
+    true,
+  );
 });
 
 Deno.test('dependency versions must satisfy the declared semver range', () => {
@@ -254,30 +317,46 @@ Deno.test('invalid dependency ranges and plugin versions fail', () => {
   );
 });
 
-Deno.test('unknown contribution keys fail with the plugin and key named', () => {
-  const typo = { servces: [service('api')] } as unknown as PluginManifest['contributions'];
+/** Build a manifest whose contributions carry a key/value the public type cannot express. */
+function withRawContribution(key: string, value: unknown): PluginManifest {
+  const plugin = manifest('@example/a');
+  Reflect.set(plugin.contributions, key, value);
+  return plugin;
+}
 
-  assertEquals(diagnosticsOf([manifest('@example/a', { contributions: typo })]), [{
+Deno.test('unknown contribution keys fail with the plugin and key named', () => {
+  const plugin = withRawContribution('servces', [service('api')]);
+
+  assertEquals(diagnosticsOf([plugin]), [{
     code: 'unknown-contribution-key',
     plugin: '@example/a',
     axis: 'servces',
     message: 'Plugin "@example/a" declares unknown contribution key "servces".',
   }]);
-  assertThrows(() =>
-    PluginManifestSchema.parse({ name: '@example/a', version: '1.0.0', contributions: typo })
-  );
+  assertThrows(() => PluginManifestSchema.parse(plugin));
+});
+
+Deno.test('an unknown contribution key fails even when its value is undefined', () => {
+  const plugin = withRawContribution('servces', undefined);
+
+  assertThrows(() => PluginManifestSchema.parse(plugin));
+  assertEquals(codesOf([plugin]), ['unknown-contribution-key']);
+  assertThrows(() => createPluginHostBootstrap([plugin]), PluginCompositionError);
+});
+
+Deno.test('a known contribution key with an undefined value is accepted everywhere', () => {
+  const plugin = withRawContribution('services', undefined);
+
+  PluginManifestSchema.parse(plugin);
+  assertEquals(validatePluginComposition([plugin]).ok, true);
+  assertEquals(createPluginHostBootstrap([plugin]).plugins, [plugin]);
 });
 
 Deno.test('malformed contribution values fail', () => {
-  const malformed = {
-    services: [{ entrypoint: './api.ts' }],
-    aspire: 42,
-  } as unknown as PluginManifest['contributions'];
+  const plugin = withRawContribution('services', [{ entrypoint: './api.ts' }]);
+  Reflect.set(plugin.contributions, 'aspire', 42);
 
-  assertEquals(codesOf([manifest('@example/a', { contributions: malformed })]), [
-    'invalid-contribution',
-    'invalid-contribution',
-  ]);
+  assertEquals(codesOf([plugin]), ['invalid-contribution', 'invalid-contribution']);
 });
 
 Deno.test('validatePluginComposition reports every failure in one pass', () => {
