@@ -27,7 +27,10 @@ export class DockerCliTopologyInspector implements DockerTopologyInspector {
   private readonly readEnv: (name: string) => string | undefined;
   private readonly timeoutMs: number;
 
-  constructor(private readonly process: ProcessPort, options: DockerCliTopologyInspectorOptions = {}) {
+  constructor(
+    private readonly process: ProcessPort,
+    options: DockerCliTopologyInspectorOptions = {},
+  ) {
     this.readEnv = options.readEnv ?? ((name) => Deno.env.get(name));
     this.timeoutMs = options.timeoutMs ?? DOCKER_TIMEOUT_MS;
   }
@@ -47,7 +50,9 @@ export class DockerCliTopologyInspector implements DockerTopologyInspector {
     try {
       return classifyDockerEndpoint(readContextHost(JSON.parse(result.stdout)), 'docker-context');
     } catch (error) {
-      return unknownEndpoint(`docker context inspect returned unreadable JSON: ${errorMessage(error)}`);
+      return unknownEndpoint(
+        `docker context inspect returned unreadable JSON: ${errorMessage(error)}`,
+      );
     }
   }
 

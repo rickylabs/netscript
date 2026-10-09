@@ -327,7 +327,8 @@ async function observeAppHostBindings(
   if (appHost?.status === 'not-running') return undefined;
   return {
     status: 'unavailable',
-    reason: 'the AppHost could not be inspected, so published container bindings were not compared.',
+    reason: 'the AppHost could not be inspected, so published container bindings were not ' +
+      'compared.',
   };
 }
 

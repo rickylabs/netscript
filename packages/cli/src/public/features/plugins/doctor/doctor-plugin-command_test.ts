@@ -16,6 +16,12 @@ import { generateRuntimeRegistries } from '../../../../../../../plugins/workers/
 import { PLUGIN_PACKAGE_VERSION as WORKERS_PACKAGE_VERSION } from '../../../../../../../plugins/workers/src/package-metadata.generated.ts';
 import { generateSagaRegistry } from '../../../../../../../plugins/sagas/src/cli/registry-generator.ts';
 import { AspireAppHostDoctorInspector } from '../../../../kernel/adapters/aspire/apphost-doctor-inspector.ts';
+import { DockerCliTopologyInspector } from '../../../../kernel/adapters/aspire/docker-topology-inspector.ts';
+import {
+  ASPIRE_CONTAINERS_INSPECT_JSON,
+  LOCAL_CONTEXT_JSON,
+  REMOTE_CONTEXT_JSON,
+} from '../../../../kernel/adapters/aspire/docker-topology-fixtures_test.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
 
@@ -391,6 +397,66 @@ Deno.test('plugin doctor maps realistic database config names without inventing 
   ]);
 });
 
+Deno.test("plugin doctor reports a remote daemon's loopback-published containers as a mismatch", async () => {
+  const output: string[] = [];
+  const command = createDoctorPluginCommand({
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+    print: (line) => output.push(line),
+    diagnosticEvidence: () => NOOP_EVIDENCE,
+    doctor: (input) =>
+      doctorPlugin(input, {
+        fs: new MemoryFileSystemAdapter(),
+        process: HEALTHY_MODULE_PROCESS,
+        loadConfig: () => Promise.resolve(configWithResources()),
+        inspectAppHost: runningAppHost(),
+        inspectDockerTopology: recordedDockerTopology(REMOTE_CONTEXT_JSON),
+      }),
+  });
+
+  await command.parse(['--project-root', '/workspace']);
+  const rendered = output.join('\n');
+  assertStringIncludes(rendered, 'docker\twarning\tDocker daemon endpoint\tDocker daemon is remote');
+  assertStringIncludes(
+    rendered,
+    "main-db-xkcdabcd 5432/tcp -> 127.0.0.1:55001 (daemon host's loopback)",
+  );
+  assertEquals(rendered.includes('other-cache'), false);
+});
+
+Deno.test('plugin doctor passes Docker topology only for a provably local daemon', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: runningAppHost(),
+    inspectDockerTopology: recordedDockerTopology(LOCAL_CONTEXT_JSON),
+  });
+  const docker = reports.find((report) => report.pluginName === 'docker');
+  assertEquals(docker?.status, 'healthy');
+  assertEquals(docker?.checks.map((check) => [check.id, check.status]), [
+    ['docker:endpoint', 'healthy'],
+    ['docker:published-bindings', 'healthy'],
+  ]);
+});
+
+Deno.test('plugin doctor reports undeterminable Docker topology as inconclusive, not healthy', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: { inspect: () => Promise.resolve({ status: 'not-running' }) },
+    inspectDockerTopology: new DockerCliTopologyInspector(new MissingAspireProcess(), {
+      readEnv: () => undefined,
+    }),
+  });
+  const docker = reports.find((report) => report.pluginName === 'docker');
+  assertEquals(docker?.status, 'warning');
+  for (const check of docker?.checks ?? []) {
+    assertEquals(check.status, 'warning');
+    assertStringIncludes(check.message ?? '', 'Inconclusive:');
+  }
+});
+
 Deno.test('plugin manifest import failures degrade to an error report', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
@@ -502,6 +568,34 @@ function configWithResources() {
       config: [{ name: 'main-db', provider: 'postgres', schema: 'database/postgres/prisma' }],
     },
   } as never;
+}
+
+function runningAppHost() {
+  return {
+    inspect: () =>
+      Promise.resolve({
+        status: 'running' as const,
+        resources: [
+          { name: 'api', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+          { name: 'web', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+          { name: 'main-db', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+        ],
+      }),
+  };
+}
+
+/** Docker CLI replay: context inspect, ps (Aspire label), inspect — from recorded output. */
+function recordedDockerTopology(contextJson: string): DockerCliTopologyInspector {
+  const replies: Readonly<Record<string, string>> = {
+    context: contextJson,
+    ps: '3f1c0e9a\n9b2d7c41\n',
+    inspect: ASPIRE_CONTAINERS_INSPECT_JSON,
+  };
+  const process: ProcessPort = {
+    exec: (_command, args) =>
+      Promise.resolve({ code: 0, stdout: replies[args[0]] ?? '', stderr: '' }),
+  };
+  return new DockerCliTopologyInspector(process, { readEnv: () => undefined });
 }
 
 class MissingAspireProcess implements ProcessPort {
