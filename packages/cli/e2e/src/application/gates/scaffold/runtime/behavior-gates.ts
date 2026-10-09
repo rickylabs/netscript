@@ -77,7 +77,11 @@ function pluginExchangeCommand(
   ];
 }
 
-/** Health routes serve exactly 200 once up; readiness serves 503 (retried) while warming. */
+/**
+ * Health routes serve exactly 200 once the service is up. Waiting for a warming service is not
+ * this contract's job: `runtime.wait.auth` already gated on Aspire's `/health` check, so a
+ * served 503 here is a failure, not a retry.
+ */
 const SERVED_OK: HttpExchangeContract = { method: 'GET', expectStatus: 200 };
 
 /**

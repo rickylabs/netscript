@@ -1,8 +1,9 @@
 import {
-  evaluateHttpExchange,
   type HttpExchangeContract,
+  httpExchangeInit,
+  type HttpExchangeOutcome,
+  judgeHttpResponse,
   parseHttpExchangeContract,
-  readBoundedBody,
 } from '../../../../domain/http-contract.ts';
 import { resolveResourceUrlsFromAppHost } from '../generated-app-endpoint.ts';
 
@@ -30,6 +31,8 @@ export interface ExchangeProbeEffects {
   readonly delay: (milliseconds: number) => Promise<void>;
   readonly attempts: number;
   readonly retryDelayMs: number;
+  /** Cap on one attempt, headers and any body the contract needs. */
+  readonly attemptTimeoutMs: number;
 }
 
 const DEFAULT_EXCHANGE_EFFECTS: ExchangeProbeEffects = {
@@ -37,6 +40,7 @@ const DEFAULT_EXCHANGE_EFFECTS: ExchangeProbeEffects = {
   delay,
   attempts: ATTEMPTS,
   retryDelayMs: RETRY_DELAY_MS,
+  attemptTimeoutMs: EXCHANGE_ATTEMPT_TIMEOUT_MS,
 };
 
 /** A served response broke the exchange contract; the probe stops instead of retrying. */
@@ -62,8 +66,9 @@ export async function probePluginExchange(
 }
 
 /**
- * Probe `path` on each base URL until one serves the contract. Connection failures and
- * not-yet-up statuses retry; a served response that breaks the contract throws at once.
+ * Probe `path` on each base URL until one serves the contract. Only connection-level failures
+ * retry; any served response decides the probe, and a served mismatch throws at once — judged
+ * from the headers of the original (unredirected) response, with its body cancelled unread.
  *
  * @returns The base URL that served the contract.
  * @throws {HttpExchangeMismatchError} When an endpoint serves a response that breaks the contract.
@@ -78,28 +83,21 @@ export async function probeExchange(
   for (let attempt = 1; attempt <= effects.attempts; attempt++) {
     for (const baseUrl of baseUrls) {
       const url = resourceUrl(baseUrl, path);
-      let response: Response;
+      let outcome: HttpExchangeOutcome;
       try {
-        response = await effects.fetch(url, {
-          method: contract.method,
-          headers: contract.headers,
-          signal: AbortSignal.timeout(EXCHANGE_ATTEMPT_TIMEOUT_MS),
-        });
+        const response = await effects.fetch(
+          url,
+          httpExchangeInit(contract, AbortSignal.timeout(effects.attemptTimeoutMs)),
+        );
+        outcome = await judgeHttpResponse(contract, response);
       } catch (error) {
         lastFailure = `${url}: ${error instanceof Error ? error.message : String(error)}`;
         continue;
       }
-      const outcome = evaluateHttpExchange(contract, {
-        status: response.status,
-        ...await readBoundedBody(response),
-      });
       if (outcome.kind === 'matched') return baseUrl;
-      if (outcome.kind === 'mismatch') {
-        throw new HttpExchangeMismatchError(
-          `${contract.method} ${url} broke its contract on attempt ${attempt}: ${outcome.reason}`,
-        );
-      }
-      lastFailure = `${url}: ${outcome.reason}`;
+      throw new HttpExchangeMismatchError(
+        `${contract.method} ${url} broke its contract on attempt ${attempt}: ${outcome.reason}`,
+      );
     }
     if (attempt < effects.attempts) await effects.delay(effects.retryDelayMs);
   }

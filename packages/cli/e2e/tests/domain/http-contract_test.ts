@@ -1,8 +1,8 @@
-import { assertEquals, assertThrows } from '@std/assert';
+import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 import {
-  evaluateHttpExchange,
   HTTP_CONTRACT_BODY_LIMIT_BYTES,
   type HttpExchangeContract,
+  judgeHttpResponse,
   parseHttpExchangeContract,
   readBoundedBody,
 } from '../../src/domain/http-contract.ts';
@@ -13,58 +13,85 @@ const INTROSPECTION: HttpExchangeContract = {
   expectBody: { kind: 'json-equals', value: { authenticated: false } },
 };
 
-function served(status: number, body = '', bodyTruncated = false) {
-  return { status, body, bodyTruncated };
-}
+Deno.test('exchange matches only the exact expected status and body', async () => {
+  const introspection = await judgeHttpResponse(
+    INTROSPECTION,
+    Response.json({ authenticated: false }),
+  );
+  const refusal = await judgeHttpResponse(
+    { method: 'GET', expectStatus: 401 },
+    new Response('denied', { status: 401 }),
+  );
 
-Deno.test('exchange matches only the exact expected status and body', () => {
-  assertEquals(
-    evaluateHttpExchange(INTROSPECTION, served(200, '{"authenticated":false}')).kind,
-    'matched',
-  );
-  assertEquals(
-    evaluateHttpExchange({ method: 'GET', expectStatus: 401 }, served(401, 'denied')).kind,
-    'matched',
-  );
+  assertEquals(introspection.kind, 'matched');
+  assertEquals(introspection.bodyPreview, '{"authenticated":false}');
+  assertEquals(refusal.kind, 'matched');
 });
 
-Deno.test('exchange rejects a different 2xx instead of accepting any success', () => {
-  const outcome = evaluateHttpExchange({ method: 'GET', expectStatus: 200 }, served(204));
+Deno.test('exchange rejects a different 2xx instead of accepting any success', async () => {
+  const outcome = await judgeHttpResponse(
+    { method: 'GET', expectStatus: 200 },
+    new Response(null, { status: 204 }),
+  );
 
   assertEquals(outcome.kind, 'mismatch');
 });
 
-Deno.test('exchange treats a served wrong status as final and a gateway status as not up yet', () => {
+Deno.test('exchange treats every unexpected served status as a mismatch, 502/503/504 included', async () => {
   const contract: HttpExchangeContract = { method: 'GET', expectStatus: 401 };
 
-  assertEquals(evaluateHttpExchange(contract, served(200, '{}')).kind, 'mismatch');
-  assertEquals(evaluateHttpExchange(contract, served(500)).kind, 'mismatch');
-  assertEquals(evaluateHttpExchange(contract, served(404)).kind, 'mismatch');
-  for (const status of [502, 503, 504]) {
-    assertEquals(evaluateHttpExchange(contract, served(status)).kind, 'pending');
+  for (const status of [200, 302, 404, 500, 502, 503, 504]) {
+    const outcome = await judgeHttpResponse(contract, new Response('served', { status }));
+    assertEquals(outcome.kind, 'mismatch', `served ${status} must not be retryable`);
   }
-  assertEquals(
-    evaluateHttpExchange({ method: 'GET', expectStatus: 503 }, served(503)).kind,
-    'matched',
+  const expectedUnavailable = await judgeHttpResponse(
+    { method: 'GET', expectStatus: 503 },
+    new Response(null, { status: 503 }),
   );
+  assertEquals(expectedUnavailable.kind, 'matched');
 });
 
-Deno.test('exchange body predicate fails when the served body differs (negative control)', () => {
-  const extraField = evaluateHttpExchange(
+Deno.test('exchange judges the status from headers and cancels a body it never needed', async () => {
+  let cancelled = false;
+  const stalled = new ReadableStream<Uint8Array>({
+    cancel: () => {
+      cancelled = true;
+    },
+  });
+
+  const outcome = await judgeHttpResponse(INTROSPECTION, new Response(stalled, { status: 401 }));
+
+  assertEquals(outcome.kind, 'mismatch');
+  assertEquals(cancelled, true);
+  if (outcome.kind === 'mismatch') {
+    assertStringIncludes(outcome.reason, 'expected HTTP 200, served 401');
+  }
+});
+
+Deno.test('exchange judges a redirect as served, never its target', async () => {
+  const outcome = await judgeHttpResponse(
     INTROSPECTION,
-    served(200, '{"authenticated":false,"user":null}'),
-  );
-  const authenticated = evaluateHttpExchange(INTROSPECTION, served(200, '{"authenticated":true}'));
-  const notJson = evaluateHttpExchange(INTROSPECTION, served(200, '<html></html>'));
-  const truncated = evaluateHttpExchange(
-    INTROSPECTION,
-    served(200, '{"authenticated":false}', true),
+    new Response(null, { status: 302, headers: { location: '/session' } }),
   );
 
-  assertEquals(extraField.kind, 'mismatch');
-  assertEquals(authenticated.kind, 'mismatch');
-  assertEquals(notJson.kind, 'mismatch');
-  assertEquals(truncated.kind, 'mismatch');
+  assertEquals(outcome.kind, 'mismatch');
+  if (outcome.kind === 'mismatch') {
+    assertStringIncludes(outcome.reason, 'served 302 (redirect to /session not followed)');
+  }
+});
+
+Deno.test('exchange body predicate fails when the served body differs (negative control)', async () => {
+  const bodies = [
+    JSON.stringify({ authenticated: false, user: null }),
+    JSON.stringify({ authenticated: true }),
+    '<html></html>',
+    'x'.repeat(HTTP_CONTRACT_BODY_LIMIT_BYTES + 1),
+  ];
+
+  for (const body of bodies) {
+    const outcome = await judgeHttpResponse(INTROSPECTION, new Response(body, { status: 200 }));
+    assertEquals(outcome.kind, 'mismatch', body.slice(0, 40));
+  }
 });
 
 Deno.test('exchange contract parses from its command-line JSON form', () => {

@@ -3,21 +3,15 @@ export interface HttpRequest {
   readonly method: 'GET' | 'POST';
   readonly url: string;
   readonly headers?: Readonly<Record<string, string>>;
+  /** Cap on the whole exchange, including any body the caller goes on to read. */
   readonly timeoutMs: number;
 }
 
-/** HTTP probe response. */
-export interface HttpResult {
-  readonly status: number;
-  readonly ok: boolean;
-  readonly bodyPreview: string;
-  /** Body text, read up to the contract body limit. */
-  readonly body: string;
-  /** Whether `body` stopped at the contract body limit. */
-  readonly bodyTruncated: boolean;
-}
-
-/** Port for local runtime HTTP probes. */
+/**
+ * Port for local runtime HTTP probes. It resolves with the original Web `Response` as soon as
+ * headers arrive — redirects are not followed — so the caller judges the status before, and
+ * independently of, the body.
+ */
 export interface HttpClient {
-  request(request: HttpRequest): Promise<HttpResult>;
+  request(request: HttpRequest): Promise<Response>;
 }

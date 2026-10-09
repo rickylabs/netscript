@@ -6,9 +6,15 @@
  * plugin-resource probe subprocess, so a gate states "expect 401" or "send this header" once
  * and both probe paths judge the response the same way.
  *
- * A served response that breaks the contract is final: the endpoint is up and answered wrong,
- * so retrying only burns the deadline. Retries are reserved for an endpoint that is not up
- * yet — a connection failure, or a gateway/unavailable status it did not promise.
+ * Any served response that breaks the contract is final — including 502/503/504: the endpoint
+ * answered, so retrying only burns the deadline. Only a connection-level failure (refused,
+ * reset, timed out, aborted mid-body) is retried. Waiting for a warming service is a separate
+ * readiness contract — the `runtime.wait.<resource>` gate on Aspire's health check — never an
+ * exception folded into an exact exchange.
+ *
+ * The status is judged as soon as headers arrive, on the original response: redirects are
+ * not followed (`redirect: 'manual'`), and a wrong status cancels the body unread, so a slow or
+ * stalled body can never turn a served mismatch into a timeout.
  */
 
 import { equal } from '@std/assert/equal';
@@ -40,42 +46,63 @@ export interface HttpExchangeContract {
   readonly expectBody?: HttpBodyPredicate;
 }
 
-/** A served response, with its body read up to {@link HTTP_CONTRACT_BODY_LIMIT_BYTES}. */
-export interface ServedHttpResponse {
-  readonly status: number;
-  readonly body: string;
-  readonly bodyTruncated: boolean;
-}
-
 /** Verdict for one served response against an exchange contract. */
 export type HttpExchangeOutcome =
-  | { readonly kind: 'matched' }
-  /** The endpoint is not up yet; the attempt may be retried within the deadline. */
-  | { readonly kind: 'pending'; readonly reason: string }
+  | { readonly kind: 'matched'; readonly status: number; readonly bodyPreview: string }
   /** The endpoint answered and broke the contract; the gate fails without retrying. */
-  | { readonly kind: 'mismatch'; readonly reason: string };
+  | {
+    readonly kind: 'mismatch';
+    readonly status: number;
+    readonly bodyPreview: string;
+    readonly reason: string;
+  };
 
 /** Upper bound on body bytes read for a contract; contract bodies are small by design. */
 export const HTTP_CONTRACT_BODY_LIMIT_BYTES = 65_536;
 
-/** Statuses meaning "not up yet" when the contract did not ask for them. */
-const NOT_YET_UP_STATUSES: ReadonlySet<number> = new Set([502, 503, 504]);
+/** Body characters kept as gate evidence. */
+const BODY_PREVIEW_CHARS = 1_000;
 
-/** Judge one served response against the exchange contract. */
-export function evaluateHttpExchange(
+/** Fetch options every contract probe uses: the original response is judged, never a redirect target. */
+export function httpExchangeInit(
+  contract: Pick<HttpExchangeContract, 'method' | 'headers'>,
+  signal: AbortSignal,
+): RequestInit {
+  return { method: contract.method, headers: contract.headers, redirect: 'manual', signal };
+}
+
+/**
+ * Judge one served response against the exchange contract. The status is decided from the
+ * headers alone; on a mismatch the body is cancelled unread. The body is read (bounded) only
+ * when the contract has a body predicate to check.
+ *
+ * @throws When reading a body the contract needs fails at the transport level; callers treat
+ * that as a connection failure.
+ */
+export async function judgeHttpResponse(
   contract: HttpExchangeContract,
-  response: ServedHttpResponse,
-): HttpExchangeOutcome {
-  if (response.status !== contract.expectStatus) {
-    const reason = `expected HTTP ${contract.expectStatus}, served ${response.status}: ${
-      response.body.slice(0, 200)
-    }`;
-    return NOT_YET_UP_STATUSES.has(response.status)
-      ? { kind: 'pending', reason }
-      : { kind: 'mismatch', reason };
+  response: Response,
+): Promise<HttpExchangeOutcome> {
+  const status = response.status;
+  if (status !== contract.expectStatus) {
+    await response.body?.cancel();
+    return {
+      kind: 'mismatch',
+      status,
+      bodyPreview: '',
+      reason: `expected HTTP ${contract.expectStatus}, served ${status}${location(response)}`,
+    };
   }
-  if (!contract.expectBody) return { kind: 'matched' };
-  return evaluateBody(contract.expectBody, response);
+  if (!contract.expectBody) {
+    await response.body?.cancel();
+    return { kind: 'matched', status, bodyPreview: '' };
+  }
+  const { body, bodyTruncated } = await readBoundedBody(response);
+  const bodyPreview = body.slice(0, BODY_PREVIEW_CHARS);
+  const reason = bodyMismatch(contract.expectBody, body, bodyTruncated);
+  return reason === undefined
+    ? { kind: 'matched', status, bodyPreview }
+    : { kind: 'mismatch', status, bodyPreview, reason };
 }
 
 /** Parse an exchange contract received as JSON, for example on a probe command line. */
@@ -127,32 +154,28 @@ export async function readBoundedBody(
   }
 }
 
-function evaluateBody(
+function bodyMismatch(
   predicate: HttpBodyPredicate,
-  response: ServedHttpResponse,
-): HttpExchangeOutcome {
-  if (response.bodyTruncated) {
-    return {
-      kind: 'mismatch',
-      reason:
-        `body exceeds ${HTTP_CONTRACT_BODY_LIMIT_BYTES} bytes; cannot match ${predicate.kind}`,
-    };
+  body: string,
+  bodyTruncated: boolean,
+): string | undefined {
+  if (bodyTruncated) {
+    return `body exceeds ${HTTP_CONTRACT_BODY_LIMIT_BYTES} bytes; cannot match ${predicate.kind}`;
   }
   let actual: unknown;
   try {
-    actual = JSON.parse(response.body);
+    actual = JSON.parse(body);
   } catch {
-    return {
-      kind: 'mismatch',
-      reason: `expected a JSON body, served: ${response.body.slice(0, 200)}`,
-    };
+    return `expected a JSON body, served: ${body.slice(0, 200)}`;
   }
-  return equal(actual, predicate.value) ? { kind: 'matched' } : {
-    kind: 'mismatch',
-    reason: `expected body ${JSON.stringify(predicate.value)}, served: ${
-      response.body.slice(0, 200)
-    }`,
-  };
+  return equal(actual, predicate.value)
+    ? undefined
+    : `expected body ${JSON.stringify(predicate.value)}, served: ${body.slice(0, 200)}`;
+}
+
+function location(response: Response): string {
+  const target = response.headers.get('location');
+  return target === null ? '' : ` (redirect to ${target} not followed)`;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

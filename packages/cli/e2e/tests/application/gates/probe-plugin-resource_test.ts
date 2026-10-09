@@ -1,16 +1,17 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import {
   type ExchangeProbeEffects,
   HttpExchangeMismatchError,
   probeExchange,
 } from '../../../src/application/gates/scaffold/runtime/probe-plugin-resource.ts';
 import { AUTH_SESSION_UNAUTHENTICATED_CONTRACT } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
+import { startContractTestServer } from './contract-test-server.ts';
 
 const BASE_URLS = ['http://localhost:8094', 'https://localhost:8095'] as const;
 const SESSION_PATH = '/api/v1/auth/session';
 
 Deno.test('exchange probe passes on the exact introspection contract', async () => {
-  const effects = new FakeEffects([jsonResponse(200, { authenticated: false })]);
+  const effects = new FakeEffects([() => Response.json({ authenticated: false })]);
 
   const baseUrl = await probeExchange(
     BASE_URLS,
@@ -24,11 +25,12 @@ Deno.test('exchange probe passes on the exact introspection contract', async () 
     url: 'http://localhost:8094/api/v1/auth/session',
     method: 'GET',
     headers: undefined,
+    redirect: 'manual',
   }]);
 });
 
 Deno.test('exchange probe fails a served wrong status at once without spending retries', async () => {
-  const effects = new FakeEffects([new Response('boom', { status: 500 })]);
+  const effects = new FakeEffects([() => new Response('boom', { status: 500 })]);
 
   await assertRejects(
     () => probeExchange(BASE_URLS, SESSION_PATH, AUTH_SESSION_UNAUTHENTICATED_CONTRACT, effects),
@@ -39,9 +41,30 @@ Deno.test('exchange probe fails a served wrong status at once without spending r
   assertEquals(effects.delays, []);
 });
 
+Deno.test('exchange probe fails an unexpected served 502/503/504 at once (negative control)', async () => {
+  for (const status of [502, 503, 504]) {
+    const effects = new FakeEffects(
+      [() => new Response('warming', { status })],
+      () => new Response('denied', { status: 401 }),
+    );
+
+    await assertRejects(
+      () =>
+        probeExchange(BASE_URLS, '/api/v1/auth/signout', {
+          method: 'POST',
+          expectStatus: 401,
+        }, effects),
+      HttpExchangeMismatchError,
+      `served ${status}`,
+    );
+    assertEquals(effects.requests.length, 1, `served ${status} must not be retried`);
+    assertEquals(effects.delays, []);
+  }
+});
+
 Deno.test('exchange probe fails when the introspection body differs (negative control)', async () => {
   const effects = new FakeEffects([
-    jsonResponse(200, { authenticated: true, session: { id: 'leaked' } }),
+    () => Response.json({ authenticated: true, session: { id: 'leaked' } }),
   ]);
 
   await assertRejects(
@@ -52,13 +75,12 @@ Deno.test('exchange probe fails when the introspection body differs (negative co
   assertEquals(effects.requests.length, 1);
 });
 
-Deno.test('exchange probe retries connection failures and not-yet-up statuses', async () => {
+Deno.test('exchange probe retries connection failures only', async () => {
   const effects = new FakeEffects([
     new TypeError('error sending request: Connection refused'),
     new TypeError('error sending request: Connection refused'),
-    new Response('warming', { status: 503 }),
-    new Response('warming', { status: 503 }),
-    jsonResponse(200, { authenticated: false }),
+    new TypeError('error sending request: Connection reset by peer'),
+    () => Response.json({ authenticated: false }),
   ]);
 
   const baseUrl = await probeExchange(
@@ -68,9 +90,9 @@ Deno.test('exchange probe retries connection failures and not-yet-up statuses', 
     effects,
   );
 
-  assertEquals(baseUrl, 'http://localhost:8094');
-  assertEquals(effects.requests.length, 5);
-  assertEquals(effects.delays, [1_000, 1_000]);
+  assertEquals(baseUrl, 'https://localhost:8095');
+  assertEquals(effects.requests.length, 4);
+  assertEquals(effects.delays, [1_000]);
 });
 
 Deno.test('exchange probe gives up after its attempt budget when nothing is served', async () => {
@@ -86,7 +108,7 @@ Deno.test('exchange probe gives up after its attempt budget when nothing is serv
 });
 
 Deno.test('exchange probe sends the contract request headers', async () => {
-  const effects = new FakeEffects([new Response('denied', { status: 401 })]);
+  const effects = new FakeEffects([() => new Response('denied', { status: 401 })]);
 
   await probeExchange(BASE_URLS, '/api/v1/auth/signout', {
     method: 'POST',
@@ -98,36 +120,109 @@ Deno.test('exchange probe sends the contract request headers', async () => {
   assertEquals(effects.requests[0].headers, { cookie: 'session=foreign' });
 });
 
-function jsonResponse(status: number, body: unknown): Response {
-  return Response.json(body, { status });
-}
+Deno.test('exchange probe over real fetch fails a 401 with a stalled body as a mismatch, not a timeout', async () => {
+  const server = startContractTestServer();
+  try {
+    const effects = realFetchEffects(500);
+
+    const started = performance.now();
+    await assertRejects(
+      () =>
+        probeExchange(
+          [server.baseUrl],
+          '/stalled-401',
+          AUTH_SESSION_UNAUTHENTICATED_CONTRACT,
+          effects,
+        ),
+      HttpExchangeMismatchError,
+      'expected HTTP 200, served 401',
+    );
+    const elapsedMs = performance.now() - started;
+
+    assert(elapsedMs < effects.attemptTimeoutMs, `probe waited ${elapsedMs}ms on the body`);
+    assertEquals(effects.delays, []);
+  } finally {
+    await server.close();
+  }
+});
+
+Deno.test('exchange probe over real fetch does not follow a redirect to a matching route', async () => {
+  const server = startContractTestServer();
+  try {
+    const target = await probeExchange(
+      [server.baseUrl],
+      '/session',
+      AUTH_SESSION_UNAUTHENTICATED_CONTRACT,
+      realFetchEffects(2_000),
+    );
+    assertEquals(target, server.baseUrl);
+
+    await assertRejects(
+      () =>
+        probeExchange(
+          [server.baseUrl],
+          '/redirect-to-session',
+          AUTH_SESSION_UNAUTHENTICATED_CONTRACT,
+          realFetchEffects(2_000),
+        ),
+      HttpExchangeMismatchError,
+      'served 302 (redirect to /session not followed)',
+    );
+  } finally {
+    await server.close();
+  }
+});
 
 interface RecordedRequest {
   readonly url: string;
   readonly method: string | undefined;
   readonly headers: HeadersInit | undefined;
+  readonly redirect: RequestRedirect | undefined;
 }
+
+type FakeReply = Error | (() => Response);
 
 class FakeEffects implements ExchangeProbeEffects {
   readonly requests: RecordedRequest[] = [];
   readonly delays: number[] = [];
   readonly retryDelayMs = 1_000;
+  readonly attemptTimeoutMs = 5_000;
 
   constructor(
-    private readonly responses: readonly (Response | Error)[],
-    private readonly fallback?: Response | Error,
+    private readonly replies: readonly FakeReply[],
+    private readonly fallback?: FakeReply,
     readonly attempts = 30,
   ) {}
 
   fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    this.requests.push({ url: String(input), method: init?.method, headers: init?.headers });
-    const next = this.responses[this.requests.length - 1] ?? this.fallback;
-    if (!next) return Promise.reject(new Error('No fake response configured.'));
-    return next instanceof Error ? Promise.reject(next) : Promise.resolve(next);
+    this.requests.push({
+      url: String(input),
+      method: init?.method,
+      headers: init?.headers,
+      redirect: init?.redirect,
+    });
+    const reply = this.replies[this.requests.length - 1] ?? this.fallback;
+    if (!reply) return Promise.reject(new Error('No fake response configured.'));
+    return reply instanceof Error ? Promise.reject(reply) : Promise.resolve(reply());
   };
 
   delay = (milliseconds: number): Promise<void> => {
     this.delays.push(milliseconds);
     return Promise.resolve();
   };
+}
+
+function realFetchEffects(attemptTimeoutMs: number) {
+  const delays: number[] = [];
+  return {
+    fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, init),
+    delay: (milliseconds: number) => {
+      delays.push(milliseconds);
+      return Promise.resolve();
+    },
+    delays,
+    attempts: 30,
+    retryDelayMs: 1_000,
+    attemptTimeoutMs,
+  } satisfies ExchangeProbeEffects & { readonly delays: number[] };
 }

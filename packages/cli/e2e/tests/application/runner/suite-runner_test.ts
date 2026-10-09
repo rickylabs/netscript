@@ -9,7 +9,7 @@ import type {
   DockerResourceCleaner,
   DockerResourceSnapshot,
 } from '../../../src/ports/docker-resource-cleaner.ts';
-import type { HttpClient, HttpRequest, HttpResult } from '../../../src/ports/http-client.ts';
+import type { HttpClient, HttpRequest } from '../../../src/ports/http-client.ts';
 import type { Reporter, ReportEvent } from '../../../src/ports/reporter.ts';
 import type { PlatformPort } from '../../../src/ports/platform.ts';
 import { createSuiteRunner } from '../../../src/application/runner/suite-runner.ts';
@@ -430,15 +430,9 @@ class RecordingSuiteLeaseManager implements SuiteLeaseManager {
 
 class FakeHttpClient implements HttpClient {
   requests: HttpRequest[] = [];
-  request(request: HttpRequest): Promise<HttpResult> {
+  request(request: HttpRequest): Promise<Response> {
     this.requests.push(request);
-    return Promise.resolve({
-      status: 200,
-      ok: true,
-      bodyPreview: '',
-      body: '',
-      bodyTruncated: false,
-    });
+    return Promise.resolve(new Response(null, { status: 200 }));
   }
 }
 

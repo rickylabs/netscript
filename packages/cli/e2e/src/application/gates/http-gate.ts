@@ -3,19 +3,19 @@ import type {
   GateResult,
   HttpGateDefinition,
 } from '../../domain/gate-definition.ts';
-import { evaluateHttpExchange } from '../../domain/http-contract.ts';
+import { type HttpExchangeOutcome, judgeHttpResponse } from '../../domain/http-contract.ts';
 import type { RunContext } from '../../domain/run-context.ts';
-import type { HttpClient, HttpResult } from '../../ports/http-client.ts';
+import type { HttpClient } from '../../ports/http-client.ts';
 
 /** Per-request HTTP transport cap; this probes application responses, not managed resource state. */
 const HTTP_ATTEMPT_TIMEOUT_MS = 5_000;
-/** Delay between application HTTP attempts; it is not a resource-readiness interval. */
+/** Delay between connection attempts; it is not a resource-readiness interval. */
 const HTTP_RETRY_DELAY_MS = 250;
 
 /**
  * Gate that succeeds when an HTTP endpoint serves the exact status (and body) its definition
- * expects. Only a not-yet-up endpoint is retried within the deadline; a served response that
- * breaks the contract fails the gate at once.
+ * expects. Any served response decides the gate at once; only a connection-level failure is
+ * retried within the deadline.
  */
 export class HttpGate {
   constructor(
@@ -28,57 +28,46 @@ export class HttpGate {
     const started = performance.now();
     const url = this.definition.url(context);
     const deadline = Date.now() + context.request.options.httpTimeoutMs;
-    let lastResult: HttpResult | undefined;
-    let lastFailure: string | undefined;
+    let lastFailure = 'HTTP probe deadline elapsed before a request completed.';
 
     while (Date.now() < deadline) {
-      const remainingMs = deadline - Date.now();
       try {
-        const result = await this.http.request({
+        const response = await this.http.request({
           method: this.definition.method,
           url,
           headers: this.definition.headers,
-          timeoutMs: Math.min(HTTP_ATTEMPT_TIMEOUT_MS, remainingMs),
+          timeoutMs: Math.min(HTTP_ATTEMPT_TIMEOUT_MS, deadline - Date.now()),
         });
-        lastResult = result;
-        const outcome = evaluateHttpExchange(this.definition, result);
-        if (outcome.kind === 'matched') return this.result('passed', started, result);
-        lastFailure = outcome.reason;
-        if (outcome.kind === 'mismatch') {
-          return this.result('failed', started, result, 'assertion', this.failure(url, outcome));
-        }
+        const outcome = await judgeHttpResponse(this.definition, response);
+        return outcome.kind === 'matched' ? this.result(started, outcome) : this.result(
+          started,
+          outcome,
+          'assertion',
+          `HTTP ${this.definition.method} ${url} broke its contract: ${outcome.reason}.`,
+        );
       } catch (error) {
         lastFailure = error instanceof Error ? error.message : String(error);
-        lastResult = undefined;
       }
 
       const delayMs = Math.min(HTTP_RETRY_DELAY_MS, deadline - Date.now());
       if (delayMs > 0) await delay(delayMs);
     }
 
-    const reason = lastFailure ?? 'HTTP probe deadline elapsed before a request completed.';
     return this.result(
-      'failed',
       started,
-      lastResult,
+      undefined,
       'timeout',
-      `HTTP ${this.definition.method} ${url} was not served before the deadline: ${reason}.`,
-      reason,
+      `HTTP ${this.definition.method} ${url} was not served before the deadline: ${lastFailure}.`,
     );
   }
 
-  private failure(url: string, outcome: { readonly reason: string }): string {
-    return `HTTP ${this.definition.method} ${url} broke its contract: ${outcome.reason}.`;
-  }
-
   private result(
-    verdict: 'passed' | 'failed',
     started: number,
-    result: HttpResult | undefined,
+    outcome: HttpExchangeOutcome | undefined,
     failureClass?: GateFailureClass,
     error?: string,
-    transportError?: string,
   ): GateResult {
+    const verdict = failureClass ? 'failed' : 'passed';
     return {
       id: this.definition.id,
       title: this.definition.title,
@@ -89,9 +78,9 @@ export class HttpGate {
         label: this.definition.id,
         data: {
           expectStatus: this.definition.expectStatus,
-          status: result?.status ?? 0,
-          ok: result?.ok ?? false,
-          bodyPreview: result?.bodyPreview ?? transportError ?? '',
+          status: outcome?.status ?? 0,
+          bodyPreview: outcome?.bodyPreview ?? '',
+          ...(error ? { error } : {}),
         },
       }],
       attempts: [{
