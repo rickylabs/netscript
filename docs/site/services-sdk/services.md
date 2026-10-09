@@ -163,23 +163,22 @@ fallback default — set the port there rather than editing this line.
 ### `defineService(router, options)` — the preset options
 
 `DefineServiceOptions` extends the base `ServiceConfig` (`name`, `version`, `port`) and adds
-the preset-only keys below. These are the **complete** option keys confirmed against the
-package surface — nothing is omitted.
+the preset-only keys below. This is the complete option list.
 
 {{ comp.apiTable({
   caption: "DefineServiceOptions (extends ServiceConfig)",
   rows: [
     { name: "name", type: "string (required)", desc: "Service name used for logging, telemetry, and health-check labels." },
     { name: "version", type: "string?", desc: "Service version (e.g. '1.0.0'); surfaced on /health and the OpenAPI spec." },
-    { name: "port", type: "number?", desc: "Default listener port if serve() is not passed an explicit port. The generated entrypoint reads Deno.env.get('PORT') (allocated dynamically per project at scaffold time)." },
-    { name: "db", type: "DbContext?", desc: "Database context injected as context.db. Accepts a single Prisma client (with $queryRaw) or a multi-db record like { netscript, mdb, prosco, prev }; the first value exposing $queryRaw is auto-wired as the /health and /health/ready probe client." },
+    { name: "port", type: "number?", desc: "Default listener port; the generated entrypoint reads Deno.env.get('PORT') first." },
+    { name: "db", type: "DbContext?", desc: "Database context injected as context.db: one Prisma client or a multi-db record. The configured $queryRaw client backs /health/ready." },
     { name: "openapi", type: "{ title?; description? }?", desc: "Turns on the generated OpenAPI spec endpoint and the Scalar docs UI with this title/description." },
     { name: "debug", type: "boolean?", desc: "Enables verbose oRPC logging. Defaults to the NETSCRIPT_DEBUG env var." },
     { name: "auth", type: "{ authn: AuthnOptions; authz?: AuthzOptions }?", desc: "Installs the authentication (and optional authorization) gate on guarded paths — the preset form of .withAuthn()/.withAuthz()." },
-    { name: "hostname", type: "string?", desc: "Interface the listener binds, forwarded to serve({ hostname }). Defaults to all IPv4 interfaces (0.0.0.0); pass '127.0.0.1' for a loopback-only listener." },
-    { name: "middleware", type: "readonly ServiceMiddleware[]?", desc: "Caller middleware applied in order via .use(). Installed after CORS and request logging, so a rejection keeps CORS headers and is logged; it runs before authentication, authorization, and the body limit, so no principal is set yet. Same shape as createPluginService({ middleware })." },
-    { name: "bodyLimit", type: "{ maxBytes: number }?", desc: "Opt-in request-body limit. Larger bodies get a typed JSON 413 (PAYLOAD_TOO_LARGE) on both the RPC and OpenAPI projections before they are parsed, including chunked bodies without Content-Length. Enforced after authentication. Omitted means no limit. See Middleware & request-body limit below." },
-    { name: "tls", type: "ServiceTlsOptions?", desc: "Opt-in TLS: { cert, key } as PEM strings. When set, the listener serves HTTPS and negotiates HTTP/2 via ALPN automatically. Forwarded to serve() as .serve({ tls }). See TLS & HTTP/2 below." }
+    { name: "tls", type: "ServiceTlsOptions?", desc: "Opt-in TLS { cert, key } (PEM): HTTPS with HTTP/2 via ALPN. See TLS & HTTP/2 below." },
+    { name: "hostname", type: "string?", desc: "Listener bind interface; default 0.0.0.0." },
+    { name: "middleware", type: "ServiceMiddleware[]?", desc: "Runs in order after CORS and logging, before auth." },
+    { name: "bodyLimit", type: "{ maxBytes }?", desc: "Opt-in: typed JSON 413 for larger bodies on RPC and OpenAPI, after auth. See reference/service." }
   ]
 }) }}
 
@@ -390,59 +389,6 @@ required; one alone is ignored.
     { name: "NETSCRIPT_TLS_KEY_FILE", type: "env (path)", desc: "Fallback when tls is omitted: file path to the PEM private key. Both env vars must be set together." }
   ]
 }) }}
-
-## Middleware & request-body limit
-
-`defineService` accepts caller middleware and an opt-in request-body limit. Both are also
-available on the fluent builder as `.use(middleware)` and `.withBodyLimit({ maxBytes })`. Every
-request passes the stages in this order:
-
-1. tracing (always outermost)
-2. CORS
-3. request logging
-4. `middleware[]`, in array order
-5. authentication, then authorization (when `auth` is set)
-6. the body limit (when `bodyLimit` is set)
-7. the route: OpenAPI spec and docs, the RPC projection (`/api/rpc/*`), the OpenAPI projection
-   (`/api/*`), and custom routes
-
-So a rejection from your middleware or from the body limit still carries CORS headers and a log
-line. Your middleware sees unauthenticated requests and has no `principal` yet. Rate limiting and
-request filtering fit here. Unauthenticated callers get `401` before their body is read, and only
-then is the body limit enforced.
-
-```ts
-import { defineService, type ServiceMiddleware } from '@netscript/service';
-import { router } from './router.ts';
-
-const tagResponse: ServiceMiddleware = async (c, next) => {
-  await next();
-  c.header('x-served-by', 'documents');
-};
-
-await defineService(router, {
-  name: 'documents',
-  middleware: [tagResponse],
-  bodyLimit: { maxBytes: 8 * 1024 * 1024 }, // 8 MiB for base64 document uploads
-});
-```
-
-An oversized body is answered with:
-
-```json
-{ "error": "PAYLOAD_TOO_LARGE", "message": "Request body exceeds 8388608 bytes", "maxBytes": 8388608 }
-```
-
-A request that declares `Content-Length` is rejected from the header alone, because `Deno.serve`
-already bounds the body to the declared length. A chunked request with no `Content-Length` is
-counted as it streams in. It is rejected as soon as it passes `maxBytes`, so the service never
-holds more than the limit plus one chunk in memory. The limit is per service and applies equally
-to every caller: browsers, other services, and workers or sagas that call under a service
-identity. `bodyLimit` has no read timeout. A slow client is bounded by the platform's listener
-timeouts.
-
-`bodyLimit` is opt-in: a service without it accepts bodies of any size, as before. Services
-scaffolded by `netscript service add` set `bodyLimit: { maxBytes: 1024 * 1024 }`.
 
 ## Service-layer authn / authz middleware
 
