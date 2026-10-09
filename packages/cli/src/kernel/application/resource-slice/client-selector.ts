@@ -1,12 +1,50 @@
-import { resolve } from '@std/path';
+import { relative, resolve } from '@std/path';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
+import type { SelectedResourceClient } from './resource-slice-contract.ts';
 
 const PREREQUISITE = 'netscript service add --name <service> --with-client';
 
 /** Describes the generated query client selected for a data-bound web slice. */
 export type ClientBinding = Readonly<{ path: string; queries: string; input: string }>;
 
+/** One conventional query client module: its path, declared service, and query factory export. */
+export type QueryClientModule = Readonly<{ path: string; service: string; queries: string }>;
+
 type BindingCandidate = Readonly<{ path: string; source: string; service: string | undefined }>;
+
+type QueryClientSelection = Readonly<{
+  module: QueryClientModule;
+  candidates: readonly string[];
+}>;
+
+/**
+ * Selects exactly one conventional query client module by its `<name>Name` and
+ * `<name>Queries = createQueryFactories(` exports.
+ *
+ * The contract behind the client is not read: a module may front several
+ * contract namespaces, and the procedure is validated against the module itself.
+ */
+export async function selectQueryClient(
+  root: string,
+  fs: FileSystemPort,
+  client?: string,
+): Promise<QueryClientModule> {
+  return (await selectQueryClientCandidate(root, fs, client)).module;
+}
+
+/** Selects the query client a generated resource slice imports from (`@app/...`). */
+export async function selectResourceClient(
+  appRoot: string,
+  fs: FileSystemPort,
+  client?: string,
+): Promise<SelectedResourceClient> {
+  const module = await selectQueryClient(appRoot, fs, client);
+  return {
+    serviceName: module.service,
+    moduleSpecifier: `@app/${relative(appRoot, module.path).replaceAll('\\', '/')}`,
+    queryFactoryName: module.queries,
+  };
+}
 
 /** Selects exactly one conventional generated query client and its list input. */
 export async function selectClientBinding(
@@ -14,25 +52,30 @@ export async function selectClientBinding(
   fs: FileSystemPort,
   client?: string,
 ): Promise<ClientBinding> {
-  const candidates: string[] = [];
-  const lib = resolve(root, 'lib');
-  if (await fs.exists(lib)) {
-    for (const entry of await fs.readDir(lib)) {
-      const path = resolve(lib, entry.name);
-      if (
-        entry.isFile && entry.name.endsWith('.ts') &&
-        (await fs.readFile(path)).includes('createQueryFactories(')
-      ) candidates.push(path);
-    }
+  const { module, candidates } = await selectQueryClientCandidate(root, fs, client);
+  const contracts = resolve(root, '..', '..', 'contracts', 'versions', 'v1');
+  const contractPath = resolve(contracts, `${module.service}.contract.ts`);
+  if (!await fs.exists(contractPath)) {
+    bindingError(`missing contract ${contractPath}`, candidates);
   }
-  const examples = resolve(root, 'routes', 'examples');
-  if (!candidates.length && await fs.exists(examples)) {
-    for (const entry of await fs.readDir(examples)) {
-      if (!entry.isDirectory) continue;
-      const fallback = resolve(examples, entry.name, '(_lib)', 'service-query.ts');
-      if (await fs.exists(fallback)) candidates.push(fallback);
-    }
+  const contract = await fs.readFile(contractPath);
+  const input = contract.includes('createCrudContract(')
+    ? `{ limit: 20, page: 1, sortBy: 'id', sortOrder: 'asc' } as const`
+    : /ListInputSchemaV1[\s\S]*offset\s*:/.test(contract)
+    ? `{ limit: 20, offset: 0 } as const`
+    : undefined;
+  if (!input) {
+    bindingError(`unsupported list contract ${contractPath}`, candidates);
   }
+  return { path: module.path, queries: module.queries, input };
+}
+
+async function selectQueryClientCandidate(
+  root: string,
+  fs: FileSystemPort,
+  client: string | undefined,
+): Promise<QueryClientSelection> {
+  const candidates = await discoverCandidates(root, fs);
   let path: string;
   let source: string;
   if (client !== undefined) {
@@ -74,21 +117,30 @@ export async function selectClientBinding(
   if (!service || !queries) {
     bindingError('unsupported query client', candidates);
   }
-  const contracts = resolve(root, '..', '..', 'contracts', 'versions', 'v1');
-  const contractPath = resolve(contracts, `${service}.contract.ts`);
-  if (!await fs.exists(contractPath)) {
-    bindingError(`missing contract ${contractPath}`, candidates);
+  return { module: { path, service, queries }, candidates };
+}
+
+async function discoverCandidates(root: string, fs: FileSystemPort): Promise<string[]> {
+  const candidates: string[] = [];
+  const lib = resolve(root, 'lib');
+  if (await fs.exists(lib)) {
+    for (const entry of await fs.readDir(lib)) {
+      const path = resolve(lib, entry.name);
+      if (
+        entry.isFile && entry.name.endsWith('.ts') &&
+        (await fs.readFile(path)).includes('createQueryFactories(')
+      ) candidates.push(path);
+    }
   }
-  const contract = await fs.readFile(contractPath);
-  const input = contract.includes('createCrudContract(')
-    ? `{ limit: 20, page: 1, sortBy: 'id', sortOrder: 'asc' } as const`
-    : /ListInputSchemaV1[\s\S]*offset\s*:/.test(contract)
-    ? `{ limit: 20, offset: 0 } as const`
-    : undefined;
-  if (!input) {
-    bindingError(`unsupported list contract ${contractPath}`, candidates);
+  const examples = resolve(root, 'routes', 'examples');
+  if (!candidates.length && await fs.exists(examples)) {
+    for (const entry of await fs.readDir(examples)) {
+      if (!entry.isDirectory) continue;
+      const fallback = resolve(examples, entry.name, '(_lib)', 'service-query.ts');
+      if (await fs.exists(fallback)) candidates.push(fallback);
+    }
   }
-  return { path, queries, input };
+  return candidates;
 }
 
 async function identifyCandidates(
