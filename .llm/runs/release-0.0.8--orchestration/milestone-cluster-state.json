@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.8",
   "baselineMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
-  "currentMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
+  "currentMainSha": "9d8dfb36595d067faf6b3ab6a94637e17fcf839b",
   "coordinator": {
     "agentId": "coord-0.0.8@claude-opus-5-5-xhigh/divybot-6086943080"
   },
@@ -35,6 +35,7 @@
       "issueNumbers": [
         1366,
         1372,
+        1383,
         1388,
         1767,
         1786,
@@ -54,7 +55,6 @@
         1367,
         1369,
         1382,
-        1383,
         1384,
         1385,
         1386,
@@ -428,7 +428,7 @@
       "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2116,
-      "headSha": "32e62b36c",
+      "headSha": "31858fdf5",
       "issueNumbers": [
         2065
       ],
@@ -437,12 +437,12 @@
         "receipts/W1-2065.review.20be01dc.md"
       ],
       "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2116",
-      "note": "Sol: code clean; needs scaffold.runtime at final head (after deps repair + main merge)"
+      "note": "main merged; e2e-cli running; then Sol confirm"
     },
     {
       "id": "W1-1383",
-      "lane": "fixes",
-      "phase": "ready",
+      "lane": "internals",
+      "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2117,
       "headSha": "836ee3b61",
@@ -454,12 +454,12 @@
         "receipts/W1-1383.e2e.836ee3b6.md"
       ],
       "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2117",
-      "note": "scaffold.runtime both tiers PASS at 836ee3b61 (guarded gate passed); fix turn after #2126 merges"
+      "note": "fix turn: fromFileUrl minor + merge main; then e2e at final head"
     },
     {
       "id": "W2-1999",
       "lane": "fixes",
-      "phase": "planned",
+      "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2119,
       "headSha": "9515a7a8f",
@@ -468,22 +468,22 @@
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-w2-1999",
       "receiptRefs": [],
-      "note": "Sol REVISE (doc-lint private-type-ref +1); fix turn queued for fixes slot",
+      "note": "fix turn: doc-lint private-type-ref",
       "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2119"
     },
     {
       "id": "W5-1388-L1",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2121,
-      "headSha": "2830f102f",
+      "headSha": "0797b7676",
       "issueNumbers": [
         1388
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-l-1388",
       "receiptRefs": [],
-      "note": "Sol REVISE x3 (5xx retry, status-at-headers, redirects); fix turn live"
+      "note": "fixed; confirm review queued (internals evaluator)"
     },
     {
       "id": "W9-1786",
@@ -491,7 +491,7 @@
       "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2122,
-      "headSha": "201fbced9",
+      "headSha": "706a6e31e",
       "issueNumbers": [
         1786,
         2107
@@ -499,12 +499,12 @@
       "implementerAgentId": "claude-opus-5-5-high/m008-l-1786",
       "receiptRefs": [],
       "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2122",
-      "note": "Sol: code clean; needs scaffold.runtime at final head"
+      "note": "main merged; e2e-cli running; then Sol confirm"
     },
     {
       "id": "W2-2031",
       "lane": "fixes",
-      "phase": "planned",
+      "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2123,
       "headSha": "e94e8f60d",
@@ -513,12 +513,12 @@
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-w2-2031",
       "receiptRefs": [],
-      "note": "Sol REVISE (PR-body evidence block/DoD + env restore); fix turn queued"
+      "note": "fixes pushed; confirm review queued; merges after #2119"
     },
     {
       "id": "X-2036",
       "lane": "internals",
-      "phase": "evaluating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2126,
       "headSha": "b648041be",
@@ -528,7 +528,7 @@
       "implementerAgentId": "claude-opus-5-5-high/m008-x-2036",
       "receiptRefs": [],
       "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2126",
-      "note": "PRIORITY: AI-peer CI blocker repair (Refs #2036); e2e-cli running"
+      "note": "merged 9d8dfb3 (AI-peer CI blocker repaired)"
     },
     {
       "id": "W9-1767",
@@ -536,13 +536,13 @@
       "phase": "ready",
       "baseBranch": "main",
       "prNumber": 2128,
-      "headSha": "c8ad4ce6e",
+      "headSha": "76785755b",
       "issueNumbers": [
         1767
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-l-1767",
       "receiptRefs": [],
-      "note": "review queued (internals evaluator on #2126)"
+      "note": "main merged; e2e queued; close-gate pipeline; Sol confirm"
     },
     {
       "id": "W2-2102",
@@ -555,12 +555,13 @@
         2102
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-w2-2102",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "fix turn: concept stop-words + DoD"
     },
     {
       "id": "W2-1688",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "evaluating",
       "baseBranch": "main",
       "prNumber": 2127,
       "headSha": "d5606cc84",
@@ -568,7 +569,8 @@
         1688
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-w2-1688",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2127"
     },
     {
       "id": "W11-1896",
@@ -586,7 +588,7 @@
     {
       "id": "W11-1893",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "evaluating",
       "baseBranch": "main",
       "prNumber": 2129,
       "headSha": "f58a9e865",
@@ -594,7 +596,22 @@
         1893
       ],
       "implementerAgentId": "claude-opus-5-5-high/m008-w11-1893",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2129"
+    },
+    {
+      "id": "W15-2013",
+      "lane": "features",
+      "phase": "evaluating",
+      "baseBranch": "main",
+      "prNumber": 2130,
+      "headSha": "0b646d7b3",
+      "issueNumbers": [
+        2013
+      ],
+      "implementerAgentId": "claude-opus-5-5-high/m008-w15-2013",
+      "receiptRefs": [],
+      "evaluatorAgentId": "gpt-6.1-sol-high/codex-review-2130"
     }
   ],
   "expensiveGates": [],
@@ -622,11 +639,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-09T20:10:24.000Z",
-    "nextReportDueAt": "2026-10-09T21:10:24.000Z",
+    "lastReportAt": "2026-10-09T20:30:14.000Z",
+    "nextReportDueAt": "2026-10-09T21:30:14.000Z",
     "lastReportRef": "https://github.com/rickylabs/netscript/issues/2103#issuecomment-6087689487",
-    "headline": "Wave 1 implementing (#2065, #1383); plan PLAN-EVAL-approved; 76 active issues in 16 waves toward canary .3.",
-    "currentMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
+    "headline": "1 merged (#2126); 13 leaf PRs open; 5 implementers live (cap 5 until 22:00Z).",
+    "currentMainSha": "9d8dfb36595d067faf6b3ab6a94637e17fcf839b",
     "canary": {
       "target": "0.0.8-canary.3",
       "state": "planned",
@@ -657,7 +674,9 @@
       ]
     },
     "progress": {
-      "mergedPullRequests": [],
+      "mergedPullRequests": [
+        2126
+      ],
       "closedIssues": [
         2025
       ],
@@ -677,23 +696,16 @@
         2110,
         2111
       ],
-      "queueDeltaExplanation": "Step 0 closed: PLAN-EVAL approved; +14 admissions; #2025 closed dup; #2033 moved; #2010/#1362/#1367 decisions with follow-ups #2112-#2114; wave 1 dispatched 19:14Z."
+      "queueDeltaExplanation": "First merge #2126 (AI-peer repair) at 9d8dfb3; ready PRs updated with main; 2 CI runtime runs active (#2116, #2122)."
     },
     "scope": {
       "openIssueCount": 76,
       "ownedIssueCount": 76,
       "scheduledIssueCount": 76,
       "unscheduledIssueNumbers": [],
-      "openPullRequestCount": 8
+      "openPullRequestCount": 7
     },
     "mergeQueue": [
-      {
-        "prNumber": 2126,
-        "lane": "internals",
-        "state": "evaluating",
-        "nextGate": "Sol IMPL-EVAL + CI incl. quality + scaffold.runtime",
-        "nextAction": "MERGE FIRST (unblocks all)"
-      },
       {
         "prNumber": 2116,
         "lane": "features",
@@ -703,7 +715,7 @@
       },
       {
         "prNumber": 2117,
-        "lane": "fixes",
+        "lane": "internals",
         "state": "gating",
         "nextGate": "CI scaffold.runtime both tiers + Sol re-review",
         "nextAction": "fix turn after deps repair merges; fill box-12 evidence"
@@ -786,19 +798,9 @@
         "nextAction": "merge #2116 on green CI + Sol MERGE; then W3 #2064"
       }
     ],
-    "blockers": [
-      {
-        "id": "B-ai-peers",
-        "category": "infrastructure",
-        "summary": "CI quality red on every PR (cold AI peer check)",
-        "impact": "@tanstack/openai-base@0.12.6 needs @tanstack/ai ^0.66 while we pin 0.65.0; no PR can merge until repaired",
-        "owner": "coordinator (repair leaf X-2036 under #2036)",
-        "nextAction": "merge the repair PR first, then merge main into each ready leaf",
-        "ownerDecisionRequired": false
-      }
-    ],
+    "blockers": [],
     "environment": {
-      "checkedAt": "2026-10-09T20:10:24.000Z",
+      "checkedAt": "2026-10-09T20:30:14.000Z",
       "aspireApplications": 0,
       "dockerContainers": 0,
       "dockerCustomNetworks": 0
@@ -817,7 +819,7 @@
     ]
   },
   "exactMainEvidence": {
-    "gitHead": "39cb712b631a0922e0674f40e75224cffcc70549",
+    "gitHead": "9d8dfb36595d067faf6b3ab6a94637e17fcf839b",
     "surface": "repository",
     "expectedGateIds": [
       "ci.check-test",
@@ -837,5 +839,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-09T20:10:24.000Z"
+  "updatedAt": "2026-10-09T20:30:14.000Z"
 }

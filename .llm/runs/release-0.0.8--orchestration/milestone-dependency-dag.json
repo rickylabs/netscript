@@ -56,7 +56,7 @@
       "id": "issue:1383",
       "kind": "issue",
       "issueNumber": 1383,
-      "lane": "fixes",
+      "lane": "internals",
       "title": "fix(plugin): `createPluginService` has no auth seam, so every first-party plugin API is unguardable by construction"
     },
     {
