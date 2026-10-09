@@ -10,6 +10,7 @@ import type {
   HttpGateDefinition,
 } from '../../../domain/gate-definition.ts';
 import type { UrlFactory } from '../../../domain/gate-definition.ts';
+import type { HttpExchangeContract } from '../../../domain/http-contract.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import type { CommandOutputMode } from '../../../ports/command-executor.ts';
 
@@ -73,20 +74,23 @@ export function commandGate(
   };
 }
 
-/** Create an HTTP gate definition for a fixed local runtime URL. */
+/** The exchange an HTTP gate asserts when the caller states none: `GET` served exactly 200. */
+export const HTTP_GATE_DEFAULT_EXCHANGE: HttpExchangeContract = { method: 'GET', expectStatus: 200 };
+
+/** Create an HTTP gate definition that asserts one exact exchange against a local runtime URL. */
 export function httpGate(
   id: GateId,
   title: string,
   url: string | UrlFactory,
-  method: 'GET' | 'POST' = 'GET',
+  exchange: HttpExchangeContract = HTTP_GATE_DEFAULT_EXCHANGE,
 ): HttpGateDefinition {
   return {
+    ...exchange,
     id,
     title,
     phase: GATE_PHASE.BEHAVIOR,
     kind: 'http',
     critical: true,
-    method,
     url: typeof url === 'string' ? () => url : url,
   };
 }

@@ -6,6 +6,8 @@ import type { RunContext } from '../../../../domain/run-context.ts';
 import { commandGate, denoCommand } from '../gate-factory.ts';
 import { generatedAppName } from './generated-app-name.ts';
 import { PROBE_SERVICE_HEALTH_SCRIPT, VALIDATE_AI_CHAT_ROUTE_SCRIPT } from './behavior-scripts.ts';
+import type { HttpExchangeContract } from '../../../../domain/http-contract.ts';
+import { EXCHANGE_ACTION } from './probe-plugin-resource.ts';
 
 /**
  * Why the probe takes a project root and an AppHost instead of a URL: since #952 the pristine
@@ -61,6 +63,33 @@ function pluginProbeCommand(
     ...(path === undefined ? [] : [path]),
   ];
 }
+
+/** Probe one exact HTTP exchange on a plugin resource; a served mismatch fails without retry. */
+function pluginExchangeCommand(
+  context: RunContext,
+  resourceName: string,
+  path: string,
+  contract: HttpExchangeContract,
+): readonly string[] {
+  return [
+    ...pluginProbeCommand(context, resourceName, EXCHANGE_ACTION, path),
+    JSON.stringify(contract),
+  ];
+}
+
+/** Health routes serve exactly 200 once up; readiness serves 503 (retried) while warming. */
+const SERVED_OK: HttpExchangeContract = { method: 'GET', expectStatus: 200 };
+
+/**
+ * The designed public introspection contract for a caller without a session (#2002): `/session`
+ * stays public and answers exactly 200 `{ "authenticated": false }`. Any non-browser caller can
+ * read it; no app session is involved.
+ */
+export const AUTH_SESSION_UNAUTHENTICATED_CONTRACT: HttpExchangeContract = {
+  method: 'GET',
+  expectStatus: 200,
+  expectBody: { kind: 'json-equals', value: { authenticated: false } },
+};
 
 /** Create behavior gates that probe the running generated application. */
 export function createRuntimeBehaviorGates(
@@ -241,19 +270,25 @@ export function createRuntimeBehaviorGates(
       GATE.BEHAVIOR_AUTH_LIVE,
       'Auth API liveness',
       GATE_PHASE.BEHAVIOR,
-      (context) => pluginProbeCommand(context, 'auth', 'get', '/health/live'),
+      (context) => pluginExchangeCommand(context, 'auth', '/health/live', SERVED_OK),
     ),
     commandGate(
       GATE.BEHAVIOR_AUTH_READY,
       'Auth API readiness',
       GATE_PHASE.BEHAVIOR,
-      (context) => pluginProbeCommand(context, 'auth', 'get', '/health/ready'),
+      (context) => pluginExchangeCommand(context, 'auth', '/health/ready', SERVED_OK),
     ),
     commandGate(
-      GATE.BEHAVIOR_AUTH_SESSION,
-      'Read auth session route',
+      GATE.BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED,
+      'Auth session introspection serves exactly 200 { authenticated: false } without a session',
       GATE_PHASE.BEHAVIOR,
-      (context) => pluginProbeCommand(context, 'auth', 'get', '/api/v1/auth/session'),
+      (context) =>
+        pluginExchangeCommand(
+          context,
+          'auth',
+          '/api/v1/auth/session',
+          AUTH_SESSION_UNAUTHENTICATED_CONTRACT,
+        ),
     ),
     commandGate(
       GATE.BEHAVIOR_APP_HOME,
