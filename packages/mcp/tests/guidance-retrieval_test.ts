@@ -137,6 +137,7 @@ function rankedSection(slug: string, section: string, score: number): RankedGuid
     content: '',
     tokens: [],
     tokenCounts: new Map(),
+    identity: { title: [], heading: [], slug: [] },
     code: [],
     links: [],
   };
