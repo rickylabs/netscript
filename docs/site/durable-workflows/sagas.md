@@ -169,6 +169,36 @@ cascades also require `native.resolveCompensation` so the runtime can recover th
 instance, and state. Missing compensators, resolvers, matching branches, and unknown effect kinds
 fail with a named `SAGA_NOT_IMPLEMENTED` error instead of being discarded.
 
+### What a compensation persists
+
+A compensation is two persisted transitions, and neither needs a follow-up message. The `.on()`
+transition that returns `sagaCompensate(...)` saves the instance as `compensating`. When the
+`.compensate()` branch finishes, the runtime saves the branch's state change and its outcome as the
+next version of the instance. It uses the same versioned transition commit as `.on()`, on plain and
+atomic stores alike:
+
+| `.compensate()` branch outcome     | Persisted status                                        |
+| ---------------------------------- | ------------------------------------------------------- |
+| returns `[]` (or only `send`s)     | `compensated`: the undo finished (terminal)             |
+| returns `[sagaFail(reason)]`       | `failed` (terminal)                                     |
+| returns `[sagaComplete(result)]`   | `completed` (terminal)                                  |
+| returns `[sagaCompensate(...)]`    | stays `compensating` until the nested branch finishes   |
+| throws                             | `failed`, with `metadata.compensationError` set; the branch's partial state change is discarded and the error is rethrown |
+
+A `sagaFail(...)` returned from `.on()` saves `failed` first. If a `.compensate()` branch is
+registered for that message type, it then runs, and its outcome is saved by the same table. A
+branch's own `sagaFail` ends the instance. It is never routed back into the branch.
+
+`compensating` means the undo is still running. It is not a final status. An ordinary `.on()`
+handler that returns no terminal effect leaves a `compensating` instance as `compensating`; it never
+returns it to `running`. This applies to rows written by runtimes before 0.0.8, which left an
+instance at `compensating` permanently: they still load. To end one, deliver a message whose `.on()`
+handler returns `sagaFail(...)` or `sagaComplete(...)`.
+
+Each outcome commit expects the version the compensation ran against. Its replay identity comes from
+that version. So a redelivered outcome is not applied twice: `SagaEngine.commitCompensation(...)`
+reports `committed: false`, and the branch's cascades are not dispatched again.
+
 ## Key types first
 
 Before the options, the primary interfaces the DSL works in. `SagaState` is the base
