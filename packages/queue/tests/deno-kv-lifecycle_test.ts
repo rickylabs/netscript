@@ -158,9 +158,14 @@ Deno.test('round-robin is per queue name under interleaved traffic', async () =>
     );
     try {
       await delay(20);
+      // Strictly alternate names, one delivery at a time, so dispatch order is deterministic.
+      const total = () => counts.a1 + counts.a2 + counts.b1 + counts.b2;
       for (let index = 0; index < 4; index++) {
-        await producers.a.enqueue(`a-${index}`);
-        await producers.b.enqueue(`b-${index}`);
+        for (const name of ['a', 'b'] as const) {
+          const before = total();
+          await producers[name].enqueue(`${name}-${index}`);
+          await until(() => total() === before + 1);
+        }
       }
       await until(() => counts.a1 + counts.a2 + counts.b1 + counts.b2 === 8);
     } finally {
