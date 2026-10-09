@@ -1,7 +1,8 @@
 import { inspectConfig, type NetScriptConfig } from '@netscript/config';
 import { join } from '@std/path';
 
-import { ConfigInvalidError, ConfigNotFoundError } from '../../../../kernel/domain/errors.ts';
+import { appsettingsNotFound } from '../../../../kernel/adapters/config/appsettings-file.ts';
+import { ConfigInvalidError } from '../../../../kernel/domain/errors.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import { isObject, step } from './read-appsettings-schema.ts';
 import {
@@ -57,7 +58,7 @@ export async function setProjectConfigValue(
 ): Promise<SetProjectConfigResult> {
   const path = join(projectRoot, APPSETTINGS_FILE);
   const document = await readAppsettingsDocument(fs, path);
-  if (!document) throw new ConfigNotFoundError([path]);
+  if (!document) throw appsettingsNotFound(path);
 
   const resolved = resolveAppsettingsPath(dottedPath, document);
   const forced = options?.force === true;
