@@ -106,3 +106,34 @@ Deno.test('confidence is low when the top match rests only on common words', asy
   assertEquals(distinctive.recommendations[0]?.slug, 'guides/cron');
   assert(distinctive.confidence !== 'low');
 });
+
+Deno.test('an activated concept scores on its content terms, never on its stop words', async () => {
+  // `build a real ui` activates the service-backed-ui concept, whose terms include `what` and
+  // `will`. Both sections carry the concept's required `dashboard`; only the second shares a
+  // content term (`build`), so stop words must not let the first outrank it.
+  const corpus = new EmbeddedDocsCorpus({
+    documents: [
+      { slug: 'guides/stop-words', source: '# Stop\n\n## Notes\n\nWhat will dashboard.' },
+      { slug: 'guides/content', source: '# Content\n\n## Panels\n\nDashboard build.' },
+    ],
+  });
+  const result = await corpus.findGuidance('build a real ui');
+  assertEquals(result.recommendations[0]?.slug, 'guides/content');
+  for (const { why } of result.recommendations) {
+    assert(!/\b(?:what|will)\b/.test(why), why);
+  }
+});
+
+Deno.test('an activated concept still reports low confidence when it matched only common words', async () => {
+  const corpus = new EmbeddedDocsCorpus({
+    documents: Array.from({ length: 10 }, (_, index) => ({
+      slug: `guides/${index}`,
+      source:
+        '# Guide\n\n## Task router\n\ntask router what will build service backed ui dashboard',
+    })),
+  });
+  const result = await corpus.findGuidance('build a real ui');
+  assert(result.recommendations.length > 0);
+  assertEquals(result.confidence, 'low');
+  assert(result.fallback?.includes('search_docs'));
+});

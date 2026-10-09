@@ -10,7 +10,6 @@ import {
 import {
   guidanceContentTerms,
   type GuidanceTerm,
-  guidanceTerms,
   GuidanceTermWeights,
   normalizeGuidanceToken,
   tokenizeGuidance,
@@ -61,6 +60,9 @@ export const GUIDANCE_RANKING_POLICY: GuidanceRankingPolicy = Object.freeze({
   graphDepth: 1,
 });
 
+/** Each activated concept with its stop-word-free content terms, resolved once per query. */
+type ConceptTerms = ReadonlyMap<GuidanceConcept, readonly GuidanceTerm[]>;
+
 /** One section scored for an intent, with the intent words that matched it. */
 export interface RankedGuidanceSection {
   readonly entry: IndexedGuidanceSection;
@@ -98,11 +100,16 @@ export class GuidanceIndex {
   find(intent: string): GuidanceResult {
     const normalizedIntent = guidanceOneLine(intent).toLocaleLowerCase();
     const concepts = activatedGuidanceConcepts(normalizedIntent);
+    // A concept's expansion obeys the same content-term rule as the intent: stop words such as
+    // `what` and `will` in a concept's vocabulary neither score nor earn a concept bonus.
+    const conceptTerms: ConceptTerms = new Map(
+      concepts.map((concept) => [concept, guidanceContentTerms(concept.terms.join(' '))]),
+    );
     const queryTerms = concepts.length > 0
-      ? uniqueGuidanceTerms(concepts.flatMap((concept) => concept.terms.flatMap(guidanceTerms)))
+      ? uniqueGuidanceTerms([...conceptTerms.values()].flat())
       : guidanceContentTerms(normalizedIntent);
     const ranked = this.#sections.map((entry) =>
-      this.#rank(entry, normalizedIntent, queryTerms, concepts)
+      this.#rank(entry, normalizedIntent, queryTerms, conceptTerms)
     ).filter((entry): entry is RankedGuidanceSection => entry !== undefined);
     this.#applyLinkBoosts(ranked);
     orderGuidanceSections(ranked, concepts);
@@ -123,7 +130,7 @@ export class GuidanceIndex {
       toGuidanceRecommendation(entry, matchedTerms)
     );
     const related = collectGuidanceRelated(ranked, (entry) => this.#links.get(entry.id) ?? []);
-    const confidence = this.#confidence(top, concepts);
+    const confidence = this.#confidence(top);
     return {
       intent: guidanceOneLine(intent),
       confidence,
@@ -136,14 +143,14 @@ export class GuidanceIndex {
     };
   }
 
-  /** Score confidence, capped at low when the top match rests only on common words. */
-  #confidence(
-    top: RankedGuidanceSection,
-    concepts: readonly GuidanceConcept[],
-  ): GuidanceConfidence {
-    const commonOnly = concepts.length === 0 &&
-      top.matchedTerms.every((term) => this.#weights.isCommon(term.stem));
-    if (commonOnly) return 'low';
+  /**
+   * Score confidence, capped at low when the top match rests only on common words.
+   *
+   * The cap applies with or without an activated concept: a curated route that matched nothing
+   * distinctive is still weak evidence.
+   */
+  #confidence(top: RankedGuidanceSection): GuidanceConfidence {
+    if (top.matchedTerms.every((term) => this.#weights.isCommon(term.stem))) return 'low';
     return top.score >= 24 ? 'high' : top.score >= 8 ? 'medium' : 'low';
   }
 
@@ -151,8 +158,9 @@ export class GuidanceIndex {
     entry: IndexedGuidanceSection,
     intent: string,
     queryTerms: readonly GuidanceTerm[],
-    concepts: readonly GuidanceConcept[],
+    conceptTerms: ConceptTerms,
   ): RankedGuidanceSection | undefined {
+    const concepts = [...conceptTerms.keys()];
     if (concepts.length > 0 && entry.level === 1) return undefined;
     const supportedConcepts = concepts.filter((concept) =>
       concept.requiredAnyTerms.some((term) => entry.tokenCounts.has(normalizeGuidanceToken(term)))
@@ -174,8 +182,8 @@ export class GuidanceIndex {
       score += GUIDANCE_RANKING_POLICY.exactPhraseBoost;
     }
     for (const concept of supportedConcepts) {
-      const matchedConceptTerms = concept.terms.filter((term) =>
-        entry.tokenCounts.has(normalizeGuidanceToken(term))
+      const matchedConceptTerms = (conceptTerms.get(concept) ?? []).filter((term) =>
+        entry.tokenCounts.has(term.stem)
       ).length;
       score += matchedConceptTerms * GUIDANCE_RANKING_POLICY.conceptBoost;
     }

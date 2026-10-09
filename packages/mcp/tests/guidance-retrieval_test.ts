@@ -106,7 +106,7 @@ Deno.test('guidance confidence follows a route-promoted lower scorer', async () 
         source:
           '# Global scorer\n\n## Plugin Thin Layer Core Scaffold Skeleton Dashboard\n\nPlugin dashboard thin layer core scaffold skeleton.',
       },
-      // Shared terms keep the route winner below the high-confidence threshold.
+      // Shared terms keep the route winner on common words only, so its confidence is capped.
       ...Array.from({ length: 20 }, (_, index) => ({
         slug: `noise/${index}`,
         source: '# Noise\n\n## Noise\n\nTask router plugin.',
@@ -123,7 +123,10 @@ Deno.test('guidance confidence follows a route-promoted lower scorer', async () 
   );
   assertEquals(routeOrdered.recommendations[0]?.slug, 'guides/route-winner');
   assertEquals(routeOrdered.recommendations[1]?.slug, 'guides/global-scorer');
-  assertEquals(routeOrdered.confidence, 'medium');
+  // Confidence follows the route-promoted top, not the global scorer: the route winner matched
+  // only `task`, `router`, and `plugin`, each in at least 21 of 22 sections, so it is low (#2102).
+  assertEquals(routeOrdered.confidence, 'low');
+  assert(routeOrdered.fallback?.includes('search_docs'));
 });
 
 function rankedSection(slug: string, section: string, score: number): RankedGuidanceSection {
