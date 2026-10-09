@@ -1,8 +1,13 @@
 import type { JSX } from 'preact';
 import { useSignal } from '@preact/signals';
-import { useCallback, useEffect, useId, useRef } from 'preact/hooks';
+import { useCallback, useId, useRef } from 'preact/hooks';
 import { composeEventHandlers } from '../_internal/compose-event-handlers.ts';
 import { composeRefs } from '../_internal/compose-refs.ts';
+import {
+  getNativeDialogOpenAttribute,
+  isNativeDialogClosed,
+  useNativeDialogSync,
+} from '../_internal/native-dialog.ts';
 import type {
   SheetCloseElementProps,
   SheetContentElementProps,
@@ -54,39 +59,7 @@ export function useSheet({
     [controlledOpen, onOpenChange, uncontrolledOpen],
   );
 
-  useEffect(() => {
-    const element = contentRef.current;
-
-    if (!element) {
-      return;
-    }
-
-    if (open) {
-      if (modal && typeof element.showModal === 'function') {
-        if (!element.open) {
-          try {
-            element.showModal();
-          } catch {
-            if (typeof element.show === 'function' && !element.open) {
-              element.show();
-            }
-          }
-        }
-
-        return;
-      }
-
-      if (typeof element.show === 'function' && !element.open) {
-        element.show();
-      }
-
-      return;
-    }
-
-    if (element.open) {
-      element.close();
-    }
-  }, [modal, open]);
+  useNativeDialogSync(contentRef, open, modal);
 
   const getTriggerProps = useCallback(
     (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): SheetTriggerElementProps => ({
@@ -134,8 +107,15 @@ export function useSheet({
           }
         },
       ),
-      onClose: composeEventHandlers(props.onClose, () => setOpen(false, 'native-close')),
-      open: open ? true : undefined,
+      onClose: composeEventHandlers(
+        props.onClose,
+        (event: JSX.TargetedEvent<HTMLDialogElement, Event>) => {
+          if (isNativeDialogClosed(event.currentTarget)) {
+            setOpen(false, 'native-close');
+          }
+        },
+      ),
+      open: getNativeDialogOpenAttribute(open, modal),
       ref: composeRefs(props.ref, contentRef),
       role: props.role ?? 'dialog',
     }),
