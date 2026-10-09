@@ -118,6 +118,7 @@ export type {
 } from './saga-instance-projection.ts';
 export type {
   HttpSagaPublisherOptions,
+  SagaPublisherEnvKeyLister,
   SagaPublisherEnvReader,
   SagaPublisherFetch,
   SagaPublisherJsonObject,
