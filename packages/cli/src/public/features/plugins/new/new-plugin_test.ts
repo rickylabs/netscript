@@ -7,6 +7,8 @@ import { createNewPluginCommand } from './new-plugin-command.ts';
 import { z } from 'zod';
 import { JSR_SPECIFIERS } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 
 describe('plugin new use case', () => {
   it('registers a generated plugin by default', async () => {
@@ -119,6 +121,45 @@ describe('plugin new use case', () => {
       ),
       true,
     );
+  });
+});
+
+describe('plugin new formatting', () => {
+  it('writes TypeScript that is already canonical for the generated format gate', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    const formatter = new DenoGeneratedSourceFormatter(new DenoProcess());
+    const result = await createNewPlugin(
+      { name: 'guarded-fixture', projectRoot: '/workspace/app' },
+      { fs, formatter },
+    );
+    const sources = result.filesCreated.filter((path) => path.endsWith('.ts'));
+    assertEquals(sources.length > 0, true);
+    for (const path of sources) {
+      const written = await fs.readFile(path);
+      assertEquals(await formatter.formatContent(path, written), written, path);
+    }
+  });
+
+  it('formats only TypeScript artifacts', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    const formatted: string[] = [];
+    const result = await createNewPlugin(
+      { name: 'billing', projectRoot: '/workspace/app' },
+      {
+        fs,
+        formatter: {
+          formatContent: (path, content) => {
+            formatted.push(path);
+            return Promise.resolve(content);
+          },
+          formatFiles: () => Promise.reject(new Error('plugin new formats rendered content only')),
+        },
+      },
+    );
+    const expected = result.filesCreated
+      .map((path) => path.replace(/\\/g, '/').replace('/workspace/app/', ''))
+      .filter((path) => path.endsWith('.ts'));
+    assertEquals(formatted, expected);
   });
 });
 
