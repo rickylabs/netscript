@@ -29,6 +29,7 @@
 
 import type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
+import type { ServiceBodyLimitOptions } from '../primitives/body-limit.ts';
 import type { HealthCheck, HealthCheckAdapterOptions } from '../primitives/health.ts';
 import type {
   ContextFactory,
@@ -131,6 +132,21 @@ export interface ServiceBuilder<
    */
   withAuthz(options: AuthzOptions): ServiceBuilder<TRouter, TCustom>;
 
+  /**
+   * Rejects request bodies larger than `maxBytes` with a typed JSON `413`
+   * before any handler parses them. Installed by `build()` after
+   * authentication and authorization; applies to the RPC and OpenAPI
+   * projections and to custom routes.
+   *
+   * @example
+   * ```typescript
+   * createService(router, { name: 'uploads' })
+   *   .withBodyLimit({ maxBytes: 8 * 1024 * 1024 })
+   *   .withRPC();
+   * ```
+   */
+  withBodyLimit(options: ServiceBodyLimitOptions): ServiceBuilder<TRouter, TCustom>;
+
   /** Sets the per-request oRPC context factory. */
   withContext<TNext extends object>(
     factory: ContextFactory<TNext>,
@@ -160,7 +176,12 @@ export interface ServiceBuilder<
     options?: { checks?: HealthCheck[]; includeDetails?: boolean },
   ): ServiceBuilder<TRouter, TCustom>;
 
-  /** Adds custom middleware to the service. */
+  /**
+   * Adds custom middleware to the service. Middleware runs in call order,
+   * after earlier `withCors()` / `withLogger()` calls and before the
+   * authentication, authorization, and body-limit stages installed by
+   * `build()`.
+   */
   use(middleware: ServiceMiddleware): ServiceBuilder<TRouter, TCustom>;
 
   /** Adds a custom (raw, non-oRPC) route to the service. `'all'` matches every method. */
