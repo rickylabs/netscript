@@ -217,7 +217,7 @@
       "id": "issue:1893",
       "kind": "issue",
       "issueNumber": 1893,
-      "lane": "fixes",
+      "lane": "internals",
       "title": "fix(tooling): check:aspire-host-ports passes on runtime literal service URLs its own S5 test rejects"
     },
     {

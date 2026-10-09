@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.8",
-  "capturedAt": "2026-10-09T19:15:09.000Z",
+  "capturedAt": "2026-10-09T20:10:24.000Z",
   "baselineMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
   "ownerRatifiedAt": "2026-10-09T19:18:42.000Z",
   "targetIssueCount": 78,
@@ -221,7 +221,7 @@
       "number": 1893,
       "title": "fix(tooling): check:aspire-host-ports passes on runtime literal service URLs its own S5 test rejects",
       "disposition": "active",
-      "lane": "fixes",
+      "lane": "internals",
       "group": "F17"
     },
     {
