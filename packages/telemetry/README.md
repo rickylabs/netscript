@@ -190,3 +190,42 @@ environment-driven configuration needs `--allow-env`.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+### Privacy-first command tracing
+
+Import `createOtelCommandTelemetryPort` from `@netscript/telemetry/commands` and pass the
+result as the executor's `telemetry` option. Supply the static command definitions at construction:
+
+```ts
+import { createOtelCommandTelemetryPort } from '@netscript/telemetry/commands';
+const telemetry = createOtelCommandTelemetryPort({
+  definitions: [{ name: 'values.update', definitionVersion: 1 }],
+});
+```
+
+The adapter copies 1–1024 unique name/version pairs. Names follow command definition syntax and
+are at most 120 characters; versions are positive safe integers. `CommandSpanNames`,
+`CommandAttributes`, `commandStartAttributes`, and `commandResultAttributes` are exported by
+`@netscript/telemetry/attributes`. Closed provider/isolation/outcome/idempotency/failure vocabularies
+are validated at runtime. Audit/outbox counts range from zero to 64 and appear only for applied or
+replayed completions. Malformed observations and throwing telemetry observers preserve operation
+result/error identity and never retry an operation.
+
+`command.execute` is INTERNAL beneath the active request. `traceRelay` records the fixed INTERNAL
+`command.outbox.relay` lifecycle; `tracePublish` records PRODUCER `command.outbox.publish` and makes
+that span active for the existing W3C propagation helpers. The consumer owns its normal consumer
+span or a deferred/batch root span linked to the publication. These wrappers perform no relay or
+queue work.
+
+Command spans expose only the eight RFC command attributes plus optional stable `error.type`.
+There are no exception events, error messages/stacks, metric instruments, or arbitrary attribute
+spreads. Raw actors, scope, keys/digests, hashes, row identities, payloads/responses, version tokens,
+correlation IDs, and topic/destination strings are excluded. Configured static definition versions
+are distinct from private optimistic version tokens.
+
+This deliberate RFC 0003 ownership decision is stricter than neighboring messaging and saga
+conventions. Existing `netscript.correlation.id` and `netscript.idempotency.key` remain owned by
+those domains. Their presence does not authorize command emission; command traces join through
+span context. Command policy also overrides the general correlation-floor and exception-recording
+checklist for this domain. No additional permissions are needed by the adapter; the selected
+exporter retains its own documented requirements.

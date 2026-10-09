@@ -272,6 +272,7 @@ const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
   '@netscript/service/commands/relay': netscriptJsrSpecifier('service', '/commands/relay'),
   '@netscript/telemetry': netscriptJsrSpecifier('telemetry'),
   '@netscript/telemetry/ai': netscriptJsrSpecifier('telemetry', '/ai'),
+  '@netscript/telemetry/commands': netscriptJsrSpecifier('telemetry', '/commands'),
   '@netscript/telemetry/attributes': netscriptJsrSpecifier('telemetry', '/attributes'),
   '@netscript/telemetry/config': netscriptJsrSpecifier('telemetry', '/config'),
   '@netscript/telemetry/context': netscriptJsrSpecifier('telemetry', '/context'),

@@ -13,7 +13,7 @@ import type { CommandEnvelope } from '../domain/values.ts';
 import type { CommandExecutorOptions, CommandTelemetrySpan } from '../ports/executor-ports.ts';
 import { canonicalCommandJson, parseCanonicalCommandJson } from './canonical-json.ts';
 import { commandHandler } from './define-command.ts';
-import { commandIdentity, commandString } from './command-identity.ts';
+import { type CommandIdentity, commandIdentity, commandString } from './command-identity.ts';
 import { commandRecordBuffer } from './command-record-buffer.ts';
 
 const DEFAULT_LIMITS: CommandRecordLimits = Object.freeze({
@@ -126,7 +126,9 @@ function failed(error: unknown, keyed: boolean): CommandTelemetryResult {
           kind === 'codec_failure' || kind === 'idempotency_key_reuse'
       ? 'rejected'
       : 'failed',
-    idempotency: kind === 'in_progress'
+    idempotency: failure?.kind === 'invalid_envelope' && failure.reason === 'idempotency_required'
+      ? 'missing'
+      : kind === 'in_progress'
       ? 'busy'
       : kind === 'idempotency_key_reuse'
       ? 'mismatch'
@@ -185,27 +187,35 @@ export function constructCommandExecutor<TTx>(
       executionOptions?: Readonly<{ signal?: AbortSignal }>,
     ): Promise<CommandExecution<TOutput>> {
       const signal = executionOptions?.signal ?? new AbortController().signal;
-      checkpoint(signal);
       const handle = commandHandler(command);
-      capabilities(store.capabilities);
-      if (
-        command.isolationLevel !== undefined &&
-        !declared.selectableIsolationLevels.includes(command.isolationLevel)
-      ) {
-        throw new CommandError({
-          kind: 'unsupported_capability',
-          retryable: false,
-          capability: 'isolation',
-        });
-      }
-      const identity = await commandIdentity(command, incoming);
-      checkpoint(signal);
       let invoked = false;
       const operation = async (span?: CommandTelemetrySpan): Promise<CommandExecution<TOutput>> => {
         if (invoked) {
           throw new CommandError({ kind: 'store_failure', retryable: false, phase: 'begin' });
         }
         invoked = true;
+        let identity: CommandIdentity<TInput>;
+        try {
+          checkpoint(signal);
+          capabilities(store.capabilities);
+          if (
+            command.isolationLevel !== undefined &&
+            !declared.selectableIsolationLevels.includes(command.isolationLevel)
+          ) {
+            throw new CommandError({
+              kind: 'unsupported_capability',
+              retryable: false,
+              capability: 'isolation',
+            });
+          }
+          identity = await commandIdentity(command, incoming);
+          checkpoint(signal);
+        } catch (error) {
+          try {
+            span?.finish(failed(error, command.idempotency.mode === 'required'));
+          } catch { /* Early telemetry errors cannot replace validation failures. */ }
+          throw error;
+        }
         const issued = new Set<string>();
         const newId = (): string => {
           try {
@@ -425,9 +435,11 @@ export function constructCommandExecutor<TTx>(
           throw error;
         }
         boundary?.('after_commit_before_return');
-        span?.finish(
-          Object.freeze({ outcome: result.outcome, idempotency: result.idempotency, ...counts }),
-        );
+        try {
+          span?.finish(
+            Object.freeze({ outcome: result.outcome, idempotency: result.idempotency, ...counts }),
+          );
+        } catch { /* Committed success survives completion observer failure. */ }
         return result;
       };
       return telemetry === undefined ? await operation() : await telemetry.trace(
@@ -436,7 +448,7 @@ export function constructCommandExecutor<TTx>(
           definitionVersion: command.definitionVersion,
           isolation: command.isolationLevel ?? 'default',
           provider: declared.provider,
-          idempotency: identity.keyHash === undefined ? 'not_requested' : 'claimed',
+          idempotency: command.idempotency.mode === 'required' ? 'claimed' : 'not_requested',
         }),
         operation,
       );

@@ -517,3 +517,12 @@ raw identities, topic, payload and errors are excluded. Deferred publication res
 persisted parent; the active producer context is injected for downstream consumers. Observer setup,
 finish and end errors do not change the once-only operation result. Import/construction needs no
 permissions; supplied provider/sinks need their consumer-owned permissions.
+
+## Command telemetry
+
+Command execution can use `createOtelCommandTelemetryPort` from `@netscript/telemetry/commands`,
+configured with the registered command definitions. Its structural port traces early rejected and
+cancelled attempts as well as committed/replayed attempts. Definitions are verified before tracing;
+validation and identity occur once within the observed operation. Completion observer failures do
+not replace committed results. Command spans join through native span context and deliberately
+exclude envelope identities, keys, hashes, payloads and correlation IDs.

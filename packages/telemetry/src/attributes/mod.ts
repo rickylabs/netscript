@@ -16,3 +16,5 @@ export * from './cache.ts';
 export * from './spans.ts';
 export * from './helpers.ts';
 export * from '../domain/mod.ts';
+
+export * from './command.ts';

@@ -28,6 +28,7 @@ export const NETSCRIPT_ATTRIBUTE_ALIAS_MODE = 'dup' as const;
  * Attribute domains whose proprietary keys must live below `netscript.*`.
  */
 export const NetScriptAttributeDomains = {
+  COMMAND: 'netscript.command',
   JOB: 'netscript.job',
   EXECUTION: 'netscript.execution',
   SAGA: 'netscript.saga',
