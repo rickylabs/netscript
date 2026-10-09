@@ -3,6 +3,10 @@
 import { resolve } from '@std/path';
 import { SCAFFOLD_ASPIRE_INTEGRATIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
+import {
+  CACHE_FIRST_LOADER_DOC_PATHS,
+  checkCacheFirstLoaderDocs,
+} from './cache-first-loader-docs.ts';
 
 const root = new URL('../../../', import.meta.url);
 
@@ -376,6 +380,13 @@ export async function runAccuracyCheck(): Promise<void> {
   const publicDocs = await Promise.all(sagaPagePaths.map((p) => read(p)));
   checkSagaVocabulary(publicDocs, sagaPagePaths);
   await checkAspireReadinessContract();
+  const cacheFirstLoaderPages = checkCacheFirstLoaderDocs(
+    Object.fromEntries(
+      await Promise.all(
+        CACHE_FIRST_LOADER_DOC_PATHS.map(async (path) => [path, await read(`docs/site/${path}`)]),
+      ),
+    ),
+  );
 
   const [aspireExplanation, deployLocalAspire] = await Promise.all([
     read('docs/site/explanation/aspire.md'),
@@ -416,7 +427,7 @@ export async function runAccuracyCheck(): Promise<void> {
   console.log(
     `docs accuracy: PASS (${publicDocs.length} saga pages checked for stale claims, live Aspire scaffold pins, ${goldenPathDocs.pageCount} published source pages, ${
       Object.keys(shippedCorpus.files).length
-    } shipped corpus files, one query dialect exception page, mutation-map columns, ${commandReference.documentedCount}/${commandReference.auditedCount} root/direct public commands from ${commandReference.recursiveCount} recursive paths, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
+    } shipped corpus files, one query dialect exception page, ${cacheFirstLoaderPages} cache-first loader pages, mutation-map columns, ${commandReference.documentedCount}/${commandReference.auditedCount} root/direct public commands from ${commandReference.recursiveCount} recursive paths, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
   );
 }
 
