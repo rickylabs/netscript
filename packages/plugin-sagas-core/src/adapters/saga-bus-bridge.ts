@@ -145,7 +145,8 @@ export class SagaBusBridge implements SagaBusPort {
 
   /**
    * Dispatch one cascade and return the instance context the next sibling must run against.
-   * Only a compensation step changes it: each commit moves the instance to a new state and version.
+   * A compensation step, or a send handled by the same instance, moves it to a new state and
+   * version; every other cascade leaves it unchanged.
    */
   async #dispatchOne(
     message: CascadedMessage,
@@ -153,8 +154,7 @@ export class SagaBusBridge implements SagaBusPort {
   ): Promise<SagaCompensationRequest | undefined> {
     switch (message.kind) {
       case 'send':
-        await this.#dispatchSend(message, compensation);
-        return compensation;
+        return await this.#dispatchSend(message, compensation);
       case 'scheduled':
         await this.#dispatchScheduled(message, compensation);
         return compensation;
@@ -176,8 +176,13 @@ export class SagaBusBridge implements SagaBusPort {
     }
   }
 
-  async #handleAndDispatch(message: SagaMessage, correlationId?: string): Promise<void> {
+  /** Handle one message and its cascades; returns each touched instance's settled context. */
+  async #handleAndDispatch(
+    message: SagaMessage,
+    correlationId?: string,
+  ): Promise<readonly SagaCompensationRequest[]> {
     const results = await this.#engine.handle(message, { correlationId });
+    const settled: SagaCompensationRequest[] = [];
     for (const result of results) {
       const definition = this.#definitions.get(result.sagaId);
       if (!definition) {
@@ -194,8 +199,9 @@ export class SagaBusBridge implements SagaBusPort {
         instrumentation: this.#instrumentation,
         version: result.version,
       };
-      await this.#dispatchSequence(result.cascaded, request);
+      settled.push(await this.#dispatchSequence(result.cascaded, request));
     }
+    return settled;
   }
 
   /**
@@ -325,7 +331,7 @@ export class SagaBusBridge implements SagaBusPort {
   async #dispatchSend(
     message: CascadedMessage<'send'>,
     execution?: SagaCompensationRequest,
-  ): Promise<void> {
+  ): Promise<SagaCompensationRequest | undefined> {
     const span = this.#instrumentation?.startCascadeSendSpan({
       ...cascadeContext(execution),
       targetJobId: message.target.id,
@@ -336,7 +342,7 @@ export class SagaBusBridge implements SagaBusPort {
     });
     try {
       const child = span && this.#instrumentation?.spanContext(span);
-      await this.#handleAndDispatch({
+      const settled = await this.#handleAndDispatch({
         type: message.target.id,
         payload: message.payload,
         idempotencyKey: message.idempotencyKey,
@@ -345,6 +351,7 @@ export class SagaBusBridge implements SagaBusPort {
         tracestate: child?.tracestate,
       }, execution?.correlationId);
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.SUCCESS);
+      return advanceContext(execution, settled);
     } catch (error) {
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);
       throw error;
@@ -408,6 +415,16 @@ function withPublishOptions(message: SagaMessage, options: SagaPublishOptions): 
     traceparent: options.traceparent ?? message.traceparent,
     tracestate: options.tracestate ?? message.tracestate,
   });
+}
+
+/** Move a context to its instance's latest settled state when a dispatch touched that instance. */
+function advanceContext(
+  context: SagaCompensationRequest | undefined,
+  settled: readonly SagaCompensationRequest[],
+): SagaCompensationRequest | undefined {
+  if (!context) return undefined;
+  const latest = settled.findLast((item) => item.instanceId === context.instanceId);
+  return latest ? { ...context, state: latest.state, version: latest.version } : context;
 }
 
 function compensationMessage(
