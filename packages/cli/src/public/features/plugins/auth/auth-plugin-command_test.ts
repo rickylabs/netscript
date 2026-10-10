@@ -193,7 +193,12 @@ for (const issuer of [undefined, 'https://github.com']) {
 }
 
 Deno.test('GitHub preset docs describe explicit OAuth endpoints without an issuer', async () => {
-  const docs = await Deno.readTextFile('docs/site/identity-access/how-to/add-authentication.md');
+  const docs = await Deno.readTextFile(
+    new URL(
+      '../../../../../../../docs/site/identity-access/how-to/add-authentication.md',
+      import.meta.url,
+    ),
+  );
   assert(docs.includes('GitHub is OAuth 2.0, so the preset emits no `NETSCRIPT_AUTH_ISSUER`'));
   const fs = new MemoryFileSystemAdapter();
   await setAuthProvider({
