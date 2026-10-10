@@ -20,6 +20,7 @@ import {
   createTypedDbPhaseBGate,
 } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
+import { parseHttpExchangeContract } from '../../../src/domain/http-contract.ts';
 import { formatCommandFailure } from '../../../src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts';
 
 Deno.test('runtime behavior gates register the dynamic route probe id', () => {
@@ -529,6 +530,55 @@ Deno.test('plugin behavior gates resolve live resource URLs through Aspire descr
     'get',
     '/health/live',
   ]);
+});
+
+Deno.test('auth gates assert exact exchanges and name only the coverage they provide', () => {
+  const gates = createRuntimeBehaviorGates();
+  const ids = gates.map((entry) => String(entry.id));
+  const context = {
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+    request: { options: { projectName: 'runtime-gates-test' } },
+  } as RunContext;
+  const exchangeOf = (id: string) => {
+    const gate = gates.find((entry) => entry.id === id);
+    if (gate?.kind !== 'command') throw new Error(`Expected ${id} to be a command gate.`);
+    const command = gate.command(context);
+    assertEquals(command.slice(0, 8), [
+      'deno',
+      'run',
+      '--allow-run=aspire',
+      '--allow-net=localhost,127.0.0.1',
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-plugin-resource.ts',
+      '/workspace/app/aspire/apphost.mts',
+      'auth',
+      'exchange',
+    ]);
+    return { path: command[8], contract: parseHttpExchangeContract(command[9]) };
+  };
+
+  assertEquals(ids.includes('behavior.auth-session'), false);
+  assertEquals((Object.values(GATE) as readonly string[]).includes('behavior.auth-session'), false);
+  assertEquals(GATE.BEHAVIOR_AUTH_SESSION, GATE.BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED);
+  assertEquals(exchangeOf('behavior.auth-session-unauthenticated'), {
+    path: '/api/v1/auth/session',
+    contract: {
+      method: 'GET',
+      expectStatus: 200,
+      expectBody: { kind: 'json-equals', value: { authenticated: false } },
+    },
+  });
+  assertEquals(exchangeOf(GATE.BEHAVIOR_AUTH_LIVE), {
+    path: '/health/live',
+    contract: { method: 'GET', expectStatus: 200 },
+  });
+  assertEquals(exchangeOf(GATE.BEHAVIOR_AUTH_READY), {
+    path: '/health/ready',
+    contract: { method: 'GET', expectStatus: 200 },
+  });
 });
 
 Deno.test('runtime gates prove MCP Aspire endpoint discovery against the live AppHost', () => {

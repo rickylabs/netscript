@@ -14,6 +14,7 @@ export {
   type LoggerContext,
   type LoggingHandlerOptions,
   type LoggingInterceptor,
+  type LoggingInterceptorContext,
   LoggingPlugin,
   type LoggingPluginOptions,
   type LogLevelConfig,
