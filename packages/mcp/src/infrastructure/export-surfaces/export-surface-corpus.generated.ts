@@ -2,7 +2,7 @@
 // Do not edit by hand. Run `deno task gen:mcp-export-corpus`.
 
 /** Release identity of the independently verifiable entrypoints. */
-export const EXPORT_SURFACE_FRAMEWORK_VERSION: string = '0.0.7';
+export const EXPORT_SURFACE_FRAMEWORK_VERSION: string = '0.0.8-canary.4';
 
 /** Package, subpath, deflate/base64 declaration columns, SHA-256, decoded size, symbol count. */
 // deno-fmt-ignore

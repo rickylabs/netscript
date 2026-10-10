@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-sagas-core",
-  "version": "0.0.7",
+  "version": "0.0.8-canary.4",
   "description": "Saga DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript sagas plugins.",
   "license": "Apache-2.0",
   "exports": {
@@ -28,13 +28,13 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",
     "hono": "jsr:@hono/hono@4.13.13",
-    "@netscript/kv": "jsr:@netscript/kv@0.0.7",
-    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.7",
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.8-canary.4",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.8-canary.4",
     "zod": "catalog:",
-    "@netscript/plugin-workers-core": "jsr:@netscript/plugin-workers-core@0.0.7",
-    "@netscript/service": "jsr:@netscript/service@0.0.7",
-    "@netscript/database": "jsr:@netscript/database@0.0.7"
+    "@netscript/plugin-workers-core": "jsr:@netscript/plugin-workers-core@0.0.8-canary.4",
+    "@netscript/service": "jsr:@netscript/service@0.0.8-canary.4",
+    "@netscript/database": "jsr:@netscript/database@0.0.8-canary.4"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/builders/mod.ts src/domain/mod.ts src/ports/mod.ts src/runtime/mod.ts src/adapters/mod.ts src/transports/mod.ts src/stores/mod.ts src/middleware/mod.ts src/integration/workers/mod.ts src/integration/publisher/mod.ts src/telemetry/mod.ts src/config/mod.ts src/contracts/v1/mod.ts src/streams/mod.ts src/presets/mod.ts src/abstracts/mod.ts src/testing/mod.ts src/agent/mod.ts commands.ts",

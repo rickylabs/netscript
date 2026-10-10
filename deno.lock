@@ -4371,13 +4371,13 @@
           "jsr:@cliffy/command@^1.3.1",
           "jsr:@cliffy/prompt@^1.3.1",
           "jsr:@david/dax@0.48",
-          "jsr:@netscript/aspire@0.0.7",
-          "jsr:@netscript/config@0.0.7",
-          "jsr:@netscript/fresh-ui@0.0.7",
-          "jsr:@netscript/fresh@0.0.7",
-          "jsr:@netscript/mcp@0.0.7",
-          "jsr:@netscript/plugin@0.0.7",
-          "jsr:@netscript/sdk@0.0.7",
+          "jsr:@netscript/aspire@0.0.8-canary.4",
+          "jsr:@netscript/config@0.0.8-canary.4",
+          "jsr:@netscript/fresh-ui@0.0.8-canary.4",
+          "jsr:@netscript/fresh@0.0.8-canary.4",
+          "jsr:@netscript/mcp@0.0.8-canary.4",
+          "jsr:@netscript/plugin@0.0.8-canary.4",
+          "jsr:@netscript/sdk@0.0.8-canary.4",
           "jsr:@std/async@1",
           "jsr:@std/cli@1",
           "jsr:@std/collections@1",
@@ -4396,7 +4396,7 @@
       "packages/cli/e2e": {
         "dependencies": [
           "jsr:@cliffy/command@^1.3.1",
-          "jsr:@netscript/plugin-streams-core@0.0.7",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
@@ -4444,10 +4444,10 @@
         "dependencies": [
           "jsr:@fresh/core@^2.3.3",
           "jsr:@fresh/plugin-vite@^1.1.2",
-          "jsr:@netscript/ai@0.0.7",
-          "jsr:@netscript/plugin-streams-core@0.0.7",
-          "jsr:@netscript/sdk@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/ai@0.0.8-canary.4",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+          "jsr:@netscript/sdk@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "jsr:@std/assert@1",
           "jsr:@std/http@1",
           "jsr:@std/path@1",
@@ -4484,7 +4484,7 @@
       },
       "packages/fresh-ui": {
         "dependencies": [
-          "jsr:@netscript/sdk@0.0.7",
+          "jsr:@netscript/sdk@0.0.8-canary.4",
           "jsr:@std/assert@1",
           "npm:preact@^10.29.2"
         ],
@@ -4522,8 +4522,8 @@
       },
       "packages/mcp": {
         "dependencies": [
-          "jsr:@netscript/aspire@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/aspire@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1"
@@ -4531,8 +4531,8 @@
       },
       "packages/plugin": {
         "dependencies": [
-          "jsr:@netscript/contracts@0.0.7",
-          "jsr:@netscript/service@0.0.7",
+          "jsr:@netscript/contracts@0.0.8-canary.4",
+          "jsr:@netscript/service@0.0.8-canary.4",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
@@ -4544,8 +4544,8 @@
       },
       "packages/plugin-ai-core": {
         "dependencies": [
-          "jsr:@netscript/ai@0.0.7",
-          "jsr:@netscript/plugin@0.0.7",
+          "jsr:@netscript/ai@0.0.8-canary.4",
+          "jsr:@netscript/plugin@0.0.8-canary.4",
           "jsr:@std/assert@1",
           "npm:@orpc/contract@^1.15.5",
           "npm:@orpc/server@^1.15.5",
@@ -4554,7 +4554,7 @@
       },
       "packages/plugin-auth-core": {
         "dependencies": [
-          "jsr:@netscript/plugin-streams-core@0.0.7",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
           "jsr:@std/assert@1",
           "npm:@orpc/contract@^1.15.5",
           "npm:@orpc/server@^1.15.5",
@@ -4564,12 +4564,12 @@
       "packages/plugin-sagas-core": {
         "dependencies": [
           "jsr:@hono/hono@4.13.13",
-          "jsr:@netscript/database@0.0.7",
-          "jsr:@netscript/kv@0.0.7",
-          "jsr:@netscript/plugin-streams-core@0.0.7",
-          "jsr:@netscript/plugin-workers-core@0.0.7",
-          "jsr:@netscript/service@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/database@0.0.8-canary.4",
+          "jsr:@netscript/kv@0.0.8-canary.4",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin-workers-core@0.0.8-canary.4",
+          "jsr:@netscript/service@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "jsr:@std/assert@1",
           "npm:zod@^4.6.5"
         ],
@@ -4584,8 +4584,8 @@
       },
       "packages/plugin-streams-core": {
         "dependencies": [
-          "jsr:@netscript/service@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/service@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "jsr:@std/assert@1"
         ],
         "packageJson": {
@@ -4597,9 +4597,9 @@
       },
       "packages/plugin-triggers-core": {
         "dependencies": [
-          "jsr:@netscript/cron@0.0.7",
-          "jsr:@netscript/kv@0.0.7",
-          "jsr:@netscript/watchers@0.0.7",
+          "jsr:@netscript/cron@0.0.8-canary.4",
+          "jsr:@netscript/kv@0.0.8-canary.4",
+          "jsr:@netscript/watchers@0.0.8-canary.4",
           "jsr:@std/assert@1",
           "npm:zod@^4.6.5"
         ],
@@ -4612,11 +4612,11 @@
       },
       "packages/plugin-workers-core": {
         "dependencies": [
-          "jsr:@netscript/kv@0.0.7",
-          "jsr:@netscript/plugin-streams-core@0.0.7",
-          "jsr:@netscript/plugin@0.0.7",
-          "jsr:@netscript/service@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/kv@0.0.8-canary.4",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin@0.0.8-canary.4",
+          "jsr:@netscript/service@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
@@ -4663,8 +4663,8 @@
       },
       "packages/sdk": {
         "dependencies": [
-          "jsr:@netscript/plugin-streams-core@0.0.7",
-          "jsr:@netscript/service@0.0.7",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+          "jsr:@netscript/service@0.0.8-canary.4",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "npm:@orpc/client@^1.15.5",
@@ -4696,9 +4696,9 @@
       "packages/service": {
         "dependencies": [
           "jsr:@hono/hono@4.13.13",
-          "jsr:@netscript/database@0.0.7",
-          "jsr:@netscript/kv@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/database@0.0.8-canary.4",
+          "jsr:@netscript/kv@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "npm:@orpc/client@^1.15.5",
@@ -4742,23 +4742,23 @@
       },
       "plugins/ai": {
         "dependencies": [
-          "jsr:@netscript/plugin-ai-core@0.0.7",
-          "jsr:@netscript/plugin@0.0.7",
+          "jsr:@netscript/plugin-ai-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin@0.0.8-canary.4",
           "jsr:@std/assert@1"
         ]
       },
       "plugins/auth": {
         "dependencies": [
-          "jsr:@netscript/auth-better-auth@0.0.7",
-          "jsr:@netscript/auth-kv-oauth@0.0.7",
-          "jsr:@netscript/auth-workos@0.0.7",
-          "jsr:@netscript/contracts@0.0.7",
-          "jsr:@netscript/kv@0.0.7",
-          "jsr:@netscript/plugin-auth-core@0.0.7",
-          "jsr:@netscript/plugin-streams-core@0.0.7",
-          "jsr:@netscript/plugin@0.0.7",
-          "jsr:@netscript/service@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/auth-better-auth@0.0.8-canary.4",
+          "jsr:@netscript/auth-kv-oauth@0.0.8-canary.4",
+          "jsr:@netscript/auth-workos@0.0.8-canary.4",
+          "jsr:@netscript/contracts@0.0.8-canary.4",
+          "jsr:@netscript/kv@0.0.8-canary.4",
+          "jsr:@netscript/plugin-auth-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin@0.0.8-canary.4",
+          "jsr:@netscript/service@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "npm:zod@^4.6.5"
         ],
         "packageJson": {
@@ -4774,15 +4774,15 @@
       "plugins/sagas": {
         "dependencies": [
           "jsr:@hono/hono@4.13.13",
-          "jsr:@netscript/config@0.0.7",
-          "jsr:@netscript/contracts@0.0.7",
-          "jsr:@netscript/kv@0.0.7",
-          "jsr:@netscript/plugin-sagas-core@0.0.7",
-          "jsr:@netscript/plugin-streams-core@0.0.7",
-          "jsr:@netscript/plugin@0.0.7",
-          "jsr:@netscript/queue@0.0.7",
-          "jsr:@netscript/service@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/config@0.0.8-canary.4",
+          "jsr:@netscript/contracts@0.0.8-canary.4",
+          "jsr:@netscript/kv@0.0.8-canary.4",
+          "jsr:@netscript/plugin-sagas-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin@0.0.8-canary.4",
+          "jsr:@netscript/queue@0.0.8-canary.4",
+          "jsr:@netscript/service@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "jsr:@std/async@1",
           "npm:zod@^4.6.5"
         ],
@@ -4801,11 +4801,11 @@
       "plugins/streams": {
         "dependencies": [
           "jsr:@hono/hono@4.13.13",
-          "jsr:@netscript/aspire@0.0.7",
-          "jsr:@netscript/contracts@0.0.7",
-          "jsr:@netscript/plugin-streams-core@0.0.7",
-          "jsr:@netscript/plugin@0.0.7",
-          "jsr:@netscript/service@0.0.7",
+          "jsr:@netscript/aspire@0.0.8-canary.4",
+          "jsr:@netscript/contracts@0.0.8-canary.4",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin@0.0.8-canary.4",
+          "jsr:@netscript/service@0.0.8-canary.4",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/net@1",
           "npm:zod@^4.6.5"
@@ -4821,16 +4821,16 @@
       "plugins/triggers": {
         "dependencies": [
           "jsr:@hono/hono@4.13.13",
-          "jsr:@netscript/config@0.0.7",
-          "jsr:@netscript/contracts@0.0.7",
-          "jsr:@netscript/kv@0.0.7",
-          "jsr:@netscript/plugin-streams-core@0.0.7",
-          "jsr:@netscript/plugin-triggers-core@0.0.7",
-          "jsr:@netscript/plugin-workers-core@0.0.7",
-          "jsr:@netscript/plugin@0.0.7",
-          "jsr:@netscript/queue@0.0.7",
-          "jsr:@netscript/service@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/config@0.0.8-canary.4",
+          "jsr:@netscript/contracts@0.0.8-canary.4",
+          "jsr:@netscript/kv@0.0.8-canary.4",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin-triggers-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin-workers-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin@0.0.8-canary.4",
+          "jsr:@netscript/queue@0.0.8-canary.4",
+          "jsr:@netscript/service@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
           "npm:zod@^4.6.5"
@@ -4846,16 +4846,16 @@
       "plugins/workers": {
         "dependencies": [
           "jsr:@hono/hono@4.13.13",
-          "jsr:@netscript/config@0.0.7",
-          "jsr:@netscript/contracts@0.0.7",
-          "jsr:@netscript/cron@0.0.7",
-          "jsr:@netscript/kv@0.0.7",
-          "jsr:@netscript/plugin-streams-core@0.0.7",
-          "jsr:@netscript/plugin-workers-core@0.0.7",
-          "jsr:@netscript/plugin@0.0.7",
-          "jsr:@netscript/queue@0.0.7",
-          "jsr:@netscript/service@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@netscript/config@0.0.8-canary.4",
+          "jsr:@netscript/contracts@0.0.8-canary.4",
+          "jsr:@netscript/cron@0.0.8-canary.4",
+          "jsr:@netscript/kv@0.0.8-canary.4",
+          "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin-workers-core@0.0.8-canary.4",
+          "jsr:@netscript/plugin@0.0.8-canary.4",
+          "jsr:@netscript/queue@0.0.8-canary.4",
+          "jsr:@netscript/service@0.0.8-canary.4",
+          "jsr:@netscript/telemetry@0.0.8-canary.4",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/async@1",
           "jsr:@std/path@1",

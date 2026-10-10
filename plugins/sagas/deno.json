@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-sagas",
-  "version": "0.0.7",
+  "version": "0.0.8-canary.4",
   "description": "NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.",
   "license": "Apache-2.0",
   "exports": {
@@ -20,16 +20,16 @@
     "./streams/server": "./streams/server.ts"
   },
   "imports": {
-    "@netscript/config": "jsr:@netscript/config@0.0.7",
+    "@netscript/config": "jsr:@netscript/config@0.0.8-canary.4",
     "@std/async": "jsr:@std/async@^1",
-    "@netscript/contracts": "jsr:@netscript/contracts@0.0.7",
-    "@netscript/kv": "jsr:@netscript/kv@0.0.7",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.7",
-    "@netscript/plugin-sagas-core": "jsr:@netscript/plugin-sagas-core@0.0.7",
-    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.7",
-    "@netscript/queue": "jsr:@netscript/queue@0.0.7",
-    "@netscript/service": "jsr:@netscript/service@0.0.7",
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.8-canary.4",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.8-canary.4",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.8-canary.4",
+    "@netscript/plugin-sagas-core": "jsr:@netscript/plugin-sagas-core@0.0.8-canary.4",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.8-canary.4",
+    "@netscript/queue": "jsr:@netscript/queue@0.0.8-canary.4",
+    "@netscript/service": "jsr:@netscript/service@0.0.8-canary.4",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.8-canary.4",
     "hono": "jsr:@hono/hono@4.13.13",
     "zod": "catalog:"
   },

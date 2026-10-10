@@ -4,7 +4,10 @@
 export { EMBEDDED_AGENT_DOCS_PAGES } from './agent-docs-prose.generated.ts';
 
 /** Release identity; entry integrity and aggregate counts are derived from page rows. */
-export const EMBEDDED_AGENT_DOCS_PROVENANCE = { schemaVersion: 1, version: '0.0.7' } as const;
+export const EMBEDDED_AGENT_DOCS_PROVENANCE = {
+  schemaVersion: 1,
+  version: '0.0.8-canary.4',
+} as const;
 
 /** Same-release package export subpaths used for exact installed-version API generation. */
 // deno-fmt-ignore

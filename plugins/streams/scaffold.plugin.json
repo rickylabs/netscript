@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-streams",
-  "version": "0.0.7",
+  "version": "0.0.8-canary.4",
   "displayName": "Streams (ephemeral by default)",
   "description": "Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.7"
+    "@netscript/plugin": "0.0.8-canary.4"
   },
   "capabilities": {
     "hasDatabaseMigrations": false,
