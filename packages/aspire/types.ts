@@ -10,9 +10,10 @@
  *
  * @example
  * ```ts
- * import type { NetScriptConfig, KnownServices } from '@netscript/aspire/types';
+ * import type { KnownServices, ServiceEntry } from '@netscript/aspire/types';
  *
  * // With a narrowed config type:
+ * declare const myConfig: { Services: Record<'users' | 'products' | 'orders', ServiceEntry> };
  * type MyServices = KnownServices<typeof myConfig>; // "users" | "products" | "orders"
  * ```
  */
@@ -105,6 +106,10 @@ export type SagaResourceConfig = SagaResourceConfigValue;
  *
  * @example
  * ```ts
+ * import type { KnownServices, ServiceEntry } from '@netscript/aspire/types';
+ *
+ * declare const myConfig: { Services: Record<'users' | 'products' | 'orders', ServiceEntry> };
+ *
  * type Services = KnownServices<typeof myConfig>; // "users" | "products" | "orders"
  * ```
  */

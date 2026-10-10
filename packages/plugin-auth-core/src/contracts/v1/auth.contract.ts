@@ -16,125 +16,40 @@ import {
   type BasePluginContract,
   type BasePluginDescribeRoute,
 } from '@netscript/plugin/contract-base';
-import { AUTH_SESSION_STATES, type AuthSchema } from '../../domain/mod.ts';
 import { toContractErrorDefinition } from './base-error-adapter.ts';
+import { AUTH_SESSIONS_REVOKE_SCOPE } from './auth.contract-types.ts';
+import {
+  CallbackInputZodSchema,
+  CallbackResponseZodSchema,
+  MeResponseZodSchema,
+  meRouteInput,
+  RevokeSessionInputZodSchema,
+  RevokeSessionResponseZodSchema,
+  SessionResponseZodSchema,
+  sessionRouteInput,
+  SigninInputZodSchema,
+  SigninResponseZodSchema,
+  SignoutInputZodSchema,
+  SignoutResponseZodSchema,
+} from './auth.contract-schemas.ts';
 export { AUTH_SESSION_STATES } from '../../domain/mod.ts';
 export type { AuthSchema, AuthSchemaResult } from '../../domain/mod.ts';
-
-/** Input accepted by the signin endpoint. */
-export type SigninInput = Readonly<{
-  providerId?: string;
-  redirectTo?: string;
-  loginHint?: string;
-  scopes?: string[];
-  state?: string;
-}>;
-
-/** Response returned by the signin endpoint. */
-export type SigninResponse = Readonly<{
-  started: boolean;
-  providerId?: string;
-  redirectUrl?: string;
-  state?: string;
-}>;
-
-/** Input accepted by the callback endpoint. */
-export type CallbackInput = Readonly<{
-  providerId?: string;
-  code?: string;
-  state?: string;
-  /** Explicit OAuth transaction id for callers without a transaction cookie. */
-  txn?: string;
-  error?: string;
-  errorDescription?: string;
-  redirectTo?: string;
-}>;
-
-/** Response returned by the callback endpoint. */
-export type CallbackResponse = Readonly<{
-  completed: boolean;
-  sessionId?: string;
-  redirectTo?: string;
-  subject?: string;
-}>;
-
-/** Input accepted by the signout endpoint. */
-export type SignoutInput = Readonly<{
-  sessionId?: string;
-  everywhere?: boolean;
-  redirectTo?: string;
-}>;
-
-/** Response returned by the signout endpoint. */
-export type SignoutResponse = Readonly<{
-  signedOut: boolean;
-  sessionId?: string;
-  redirectTo?: string;
-}>;
-
-/** Input accepted by the session endpoint. */
-export type SessionInput = Readonly<{
-  sessionId?: string;
-}>;
-
-/** Public auth session response returned by v1 endpoints. */
-export type AuthSessionResponse = Readonly<{
-  id: string;
-  userId: string;
-  providerId?: string;
-  state: (typeof AUTH_SESSION_STATES)[keyof typeof AUTH_SESSION_STATES];
-  subject: string;
-  scopes: string[];
-  roles: string[];
-  claims: Record<string, unknown>;
-  issuedAt: string;
-  expiresAt: string;
-  refreshedAt?: string;
-  revokedAt?: string;
-}>;
-
-/** Response returned by the session endpoint. */
-export type SessionResponse = Readonly<{
-  authenticated: boolean;
-  session?: AuthSessionResponse;
-}>;
-
-/** Public user response returned by the me endpoint. */
-export type AuthUserResponse = Readonly<{
-  id: string;
-  displayName?: string;
-  email?: string;
-  emailVerified?: boolean;
-  imageUrl?: string;
-  claims?: Record<string, unknown>;
-}>;
-
-/** Response returned by the me endpoint. */
-export type MeResponse = Readonly<{
-  authenticated: boolean;
-  user?: AuthUserResponse;
-  session?: AuthSessionResponse;
-}>;
-
-/** Validation error payload returned by auth contract errors. */
-export type ValidationErrorData = Readonly<{
-  formErrors: string[];
-  fieldErrors: Record<string, string[] | undefined>;
-}>;
-
-/**
- * Public, capability-document shape returned by the mandatory `describe` route.
- */
-export interface AuthCapabilities {
-  /** Canonical plugin package name, for example `@netscript/plugin-auth`. */
-  readonly pluginName: string;
-  /** Contract version identifiers served by the plugin. */
-  readonly contractVersions: readonly string[];
-  /** Route group names exposed by the plugin. */
-  readonly routeGroups: readonly string[];
-  /** Capability tags advertised by the plugin. */
-  readonly capabilities: readonly string[];
-}
+export * from './auth.contract-types.ts';
+export {
+  AuthSessionResponseSchema,
+  AuthUserResponseSchema,
+  CallbackInputSchema,
+  CallbackResponseSchema,
+  MeResponseSchema,
+  RevokeSessionInputSchema,
+  RevokeSessionResponseSchema,
+  SessionInputSchema,
+  SessionResponseSchema,
+  SigninInputSchema,
+  SigninResponseSchema,
+  SignoutInputSchema,
+  SignoutResponseSchema,
+} from './auth.contract-schemas.ts';
 
 // Auth extends the shared errors with provider failures and authorization; its
 // final VALIDATION_ERROR retains the 422 spelling. Shared `unknown` data crosses
@@ -157,6 +72,17 @@ const validationErrorDataSchema: z.ZodObject<{
 /** Auth-specific oRPC error entries merged onto the base plugin vocabulary. */
 const AUTH_SPECIFIC_ERRORS: Readonly<{
   UNAUTHORIZED: { status: number; message: string; data: z.ZodType<{ reason: string }> };
+  FORBIDDEN: { status: number; message: string; data: z.ZodType<{ reason: string }> };
+  AUTH_TRANSPORT_ERROR: {
+    status: number;
+    message: string;
+    data: z.ZodType<{ providerId?: string; reason: string }>;
+  };
+  AUTH_CONFIGURATION_ERROR: {
+    status: number;
+    message: string;
+    data: z.ZodType<{ providerId?: string; reason: string }>;
+  };
   AUTH_PROVIDER_ERROR: {
     status: number;
     message: string;
@@ -168,6 +94,21 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
     status: 401,
     message: 'Authentication required',
     data: z.object({ reason: z.string() }),
+  },
+  FORBIDDEN: {
+    status: 403,
+    message: 'Forbidden',
+    data: z.object({ reason: z.string() }),
+  },
+  AUTH_TRANSPORT_ERROR: {
+    status: 400,
+    message: 'Auth request requires secure transport',
+    data: z.object({ providerId: z.string().optional(), reason: z.string() }),
+  },
+  AUTH_CONFIGURATION_ERROR: {
+    status: 400,
+    message: 'Auth configuration refused',
+    data: z.object({ providerId: z.string().optional(), reason: z.string() }),
   },
   AUTH_PROVIDER_ERROR: {
     status: 502,
@@ -218,6 +159,13 @@ const AUTHENTICATION_REQUIRED_META = {
   access: { authentication: 'required' },
 } as const satisfies NetScriptProcedureMeta;
 
+const SESSIONS_REVOKE_META = {
+  access: {
+    authentication: 'required',
+    authorization: { scopes: [AUTH_SESSIONS_REVOKE_SCOPE] },
+  },
+} as const satisfies NetScriptProcedureMeta;
+
 type AuthDescribeRoute = ContractProcedureBuilderWithOutput<
   Schema<unknown, unknown>,
   NonNullable<BasePluginDescribeRoute['~orpc']['outputSchema']>,
@@ -228,200 +176,6 @@ type AuthDescribeRoute = ContractProcedureBuilderWithOutput<
 const authDescribeRoute: AuthDescribeRoute = BASE_PLUGIN_CONTRACT_ROUTES.describe.meta(
   AUTHENTICATION_NONE_META,
 );
-
-// --- Route input/output schemas ----------------------------------------------
-// Every inline `z.object(...)` is named and explicitly annotated with concrete
-// Zod constructor types so its `typeof` can feed the `Route<...>` alias under
-// `--isolatedDeclarations` and never upcasts to `z.ZodType<T>` (which erases
-// `_output` and reopens the soundness hole).
-
-const SigninInputZodSchema: z.ZodObject<{
-  providerId: z.ZodOptional<z.ZodString>;
-  redirectTo: z.ZodOptional<z.ZodString>;
-  loginHint: z.ZodOptional<z.ZodString>;
-  scopes: z.ZodOptional<z.ZodArray<z.ZodString>>;
-  state: z.ZodOptional<z.ZodString>;
-}> = z.object({
-  providerId: z.string().min(1).optional(),
-  redirectTo: z.string().optional(),
-  loginHint: z.string().optional(),
-  scopes: z.array(z.string()).optional(),
-  state: z.string().optional(),
-});
-
-/** Schema for signin endpoint input. */
-export const SigninInputSchema: AuthSchema<SigninInput> = SigninInputZodSchema;
-
-const SigninResponseZodSchema: z.ZodObject<{
-  started: z.ZodBoolean;
-  providerId: z.ZodOptional<z.ZodString>;
-  redirectUrl: z.ZodOptional<z.ZodString>;
-  state: z.ZodOptional<z.ZodString>;
-}> = z.object({
-  started: z.boolean(),
-  providerId: z.string().optional(),
-  redirectUrl: z.string().url().optional(),
-  state: z.string().optional(),
-});
-
-/** Schema for signin endpoint responses. */
-export const SigninResponseSchema: AuthSchema<SigninResponse> = SigninResponseZodSchema;
-
-const CallbackInputZodSchema: z.ZodObject<{
-  providerId: z.ZodOptional<z.ZodString>;
-  code: z.ZodOptional<z.ZodString>;
-  state: z.ZodOptional<z.ZodString>;
-  txn: z.ZodOptional<z.ZodString>;
-  error: z.ZodOptional<z.ZodString>;
-  errorDescription: z.ZodOptional<z.ZodString>;
-  redirectTo: z.ZodOptional<z.ZodString>;
-}> = z.object({
-  providerId: z.string().min(1).optional(),
-  code: z.string().optional(),
-  state: z.string().optional(),
-  txn: z.string().min(1).optional(),
-  error: z.string().optional(),
-  errorDescription: z.string().optional(),
-  redirectTo: z.string().optional(),
-});
-
-/** Schema for callback endpoint input. */
-export const CallbackInputSchema: AuthSchema<CallbackInput> = CallbackInputZodSchema;
-
-const CallbackResponseZodSchema: z.ZodObject<{
-  completed: z.ZodBoolean;
-  sessionId: z.ZodOptional<z.ZodString>;
-  redirectTo: z.ZodOptional<z.ZodString>;
-  subject: z.ZodOptional<z.ZodString>;
-}> = z.object({
-  completed: z.boolean(),
-  sessionId: z.string().optional(),
-  redirectTo: z.string().optional(),
-  subject: z.string().optional(),
-});
-
-/** Schema for callback endpoint responses. */
-export const CallbackResponseSchema: AuthSchema<CallbackResponse> = CallbackResponseZodSchema;
-
-const SignoutInputZodSchema: z.ZodObject<{
-  sessionId: z.ZodOptional<z.ZodString>;
-  everywhere: z.ZodOptional<z.ZodBoolean>;
-  redirectTo: z.ZodOptional<z.ZodString>;
-}> = z.object({
-  sessionId: z.string().optional(),
-  everywhere: z.boolean().optional(),
-  redirectTo: z.string().optional(),
-});
-
-/** Schema for signout endpoint input. */
-export const SignoutInputSchema: AuthSchema<SignoutInput> = SignoutInputZodSchema;
-
-const SignoutResponseZodSchema: z.ZodObject<{
-  signedOut: z.ZodBoolean;
-  sessionId: z.ZodOptional<z.ZodString>;
-  redirectTo: z.ZodOptional<z.ZodString>;
-}> = z.object({
-  signedOut: z.boolean(),
-  sessionId: z.string().optional(),
-  redirectTo: z.string().optional(),
-});
-
-/** Schema for signout endpoint responses. */
-export const SignoutResponseSchema: AuthSchema<SignoutResponse> = SignoutResponseZodSchema;
-
-const SessionInputZodSchema: z.ZodObject<{
-  sessionId: z.ZodOptional<z.ZodString>;
-}> = z.object({
-  sessionId: z.string().optional(),
-});
-
-/** Schema for session endpoint input. */
-export const SessionInputSchema: AuthSchema<SessionInput> = SessionInputZodSchema;
-
-const sessionRouteInput: z.ZodOptional<typeof SessionInputZodSchema> = SessionInputZodSchema
-  .optional();
-
-// OpenAPI GET decodes an empty query as `{}`, so a no-input route takes an optional empty object.
-const meRouteInput: z.ZodOptional<z.ZodObject<Record<never, never>>> = z.object({}).optional();
-
-const AuthSessionResponseZodSchema: z.ZodObject<{
-  id: z.ZodString;
-  userId: z.ZodString;
-  providerId: z.ZodOptional<z.ZodString>;
-  state: z.ZodEnum<{ active: 'active'; expired: 'expired'; revoked: 'revoked' }>;
-  subject: z.ZodString;
-  scopes: z.ZodArray<z.ZodString>;
-  roles: z.ZodArray<z.ZodString>;
-  claims: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
-  issuedAt: z.ZodString;
-  expiresAt: z.ZodString;
-  refreshedAt: z.ZodOptional<z.ZodString>;
-  revokedAt: z.ZodOptional<z.ZodString>;
-}> = z.object({
-  id: z.string(),
-  userId: z.string(),
-  providerId: z.string().optional(),
-  state: z.enum([
-    AUTH_SESSION_STATES.active,
-    AUTH_SESSION_STATES.expired,
-    AUTH_SESSION_STATES.revoked,
-  ]),
-  subject: z.string(),
-  scopes: z.array(z.string()),
-  roles: z.array(z.string()),
-  claims: z.record(z.string(), z.unknown()).default({}),
-  issuedAt: z.string().datetime(),
-  expiresAt: z.string().datetime(),
-  refreshedAt: z.string().datetime().optional(),
-  revokedAt: z.string().datetime().optional(),
-});
-
-/** Schema for public auth session responses. */
-export const AuthSessionResponseSchema: AuthSchema<AuthSessionResponse> =
-  AuthSessionResponseZodSchema;
-
-const SessionResponseZodSchema: z.ZodObject<{
-  authenticated: z.ZodBoolean;
-  session: z.ZodOptional<typeof AuthSessionResponseZodSchema>;
-}> = z.object({
-  authenticated: z.boolean(),
-  session: AuthSessionResponseZodSchema.optional(),
-});
-
-/** Schema for session endpoint responses. */
-export const SessionResponseSchema: AuthSchema<SessionResponse> = SessionResponseZodSchema;
-
-const AuthUserResponseZodSchema: z.ZodObject<{
-  id: z.ZodString;
-  displayName: z.ZodOptional<z.ZodString>;
-  email: z.ZodOptional<z.ZodString>;
-  emailVerified: z.ZodOptional<z.ZodBoolean>;
-  imageUrl: z.ZodOptional<z.ZodString>;
-  claims: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
-}> = z.object({
-  id: z.string(),
-  displayName: z.string().optional(),
-  email: z.string().email().optional(),
-  emailVerified: z.boolean().optional(),
-  imageUrl: z.string().url().optional(),
-  claims: z.record(z.string(), z.unknown()).optional(),
-});
-
-/** Schema for public auth user responses. */
-export const AuthUserResponseSchema: AuthSchema<AuthUserResponse> = AuthUserResponseZodSchema;
-
-const MeResponseZodSchema: z.ZodObject<{
-  authenticated: z.ZodBoolean;
-  user: z.ZodOptional<typeof AuthUserResponseZodSchema>;
-  session: z.ZodOptional<typeof AuthSessionResponseZodSchema>;
-}> = z.object({
-  authenticated: z.boolean(),
-  user: AuthUserResponseZodSchema.optional(),
-  session: AuthSessionResponseZodSchema.optional(),
-});
-
-/** Schema for me endpoint responses. */
-export const MeResponseSchema: AuthSchema<MeResponse> = MeResponseZodSchema;
 
 /**
  * Explicit, precise type of the auth v1 contract definition.
@@ -440,6 +194,10 @@ interface AuthContractDefinitionShape extends Omit<BasePluginContract, 'describe
   readonly signin: Route<typeof SigninInputZodSchema, typeof SigninResponseZodSchema>;
   readonly callback: Route<typeof CallbackInputZodSchema, typeof CallbackResponseZodSchema>;
   readonly signout: Route<typeof SignoutInputZodSchema, typeof SignoutResponseZodSchema>;
+  readonly revokeSession: Route<
+    typeof RevokeSessionInputZodSchema,
+    typeof RevokeSessionResponseZodSchema
+  >;
   readonly session: Route<typeof sessionRouteInput, typeof SessionResponseZodSchema>;
   readonly me: Route<typeof meRouteInput, typeof MeResponseZodSchema>;
 }
@@ -447,7 +205,7 @@ interface AuthContractDefinitionShape extends Omit<BasePluginContract, 'describe
 /**
  * The auth v1 contract definition object.
  *
- * Spreads the mandatory base seam `describe` route and layers the 5
+ * Spreads the mandatory base seam `describe` route and layers the 6
  * plugin-specific routes. The explicit {@link AuthContractDefinitionShape}
  * annotation makes the precise contract type available to
  * `--isolatedDeclarations` without erasing it; because the base seam `describe`
@@ -478,6 +236,12 @@ const authContractDefinition: AuthContractDefinitionShape = {
     .meta(AUTHENTICATION_REQUIRED_META)
     .input(SignoutInputZodSchema)
     .output(SignoutResponseZodSchema),
+
+  revokeSession: baseContract
+    .route({ method: 'POST', path: '/sessions/revoke' })
+    .meta(SESSIONS_REVOKE_META)
+    .input(RevokeSessionInputZodSchema)
+    .output(RevokeSessionResponseZodSchema),
 
   session: baseContract
     .route({ method: 'GET', path: '/session' })

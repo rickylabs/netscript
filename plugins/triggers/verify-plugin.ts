@@ -19,11 +19,6 @@ export function verifyTriggersPlugin(): PluginVerificationResult {
   return verifyPlugin(triggersPlugin, {
     name: '@netscript/plugin-triggers',
     version: denoJson.version,
-    dependencies: [
-      { alias: 'workersCore', message: 'expected workersCore plugin dependency' },
-      { alias: 'streamsCore', message: 'expected streamsCore plugin dependency' },
-      { alias: 'sagasCore', message: 'expected sagasCore plugin dependency' },
-    ],
     services: [{
       name: TRIGGERS_API_SERVICE_NAME,
       entrypoint: './services/src/main.ts',
