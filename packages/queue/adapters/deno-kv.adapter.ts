@@ -6,7 +6,6 @@
  * @module
  */
 
-import { DenoKvMessageQueue } from '@fedify/denokv';
 import type {
   DeadLetterStorePort,
   EnqueueOptions,
@@ -19,9 +18,15 @@ import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.t
 import {
   createEnvelope,
   createMessageContext,
-  isMessageEnvelope,
+  type MessageEnvelope,
   toDeadLetterRecord,
 } from './_envelope.ts';
+import {
+  acquireKvQueueDispatcher,
+  type KvDatabaseTarget,
+  type KvQueueDispatcher,
+  type KvQueueDispatcherLease,
+} from './_kv-queue/dispatcher.ts';
 import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
@@ -31,9 +36,14 @@ export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from
  */
 export interface DenoKvAdapterOptions {
   /**
-   * Queue name used for diagnostics and message metadata.
+   * Queue name. Envelopes carry it, and only listeners for the same name receive them.
    */
   queueName?: string;
+  /**
+   * Deno KV path or URL to open when no explicit `kv` is given. Takes precedence over
+   * environment discovery.
+   */
+  path?: string;
   /**
    * Whether to discover a shared KV instance from the environment before opening the default KV.
    */
@@ -62,15 +72,23 @@ function getKvConnectionFromAspire(): string | undefined {
 /**
  * Deno KV queue adapter implementation.
  *
+ * Deno KV has one queue per database. Every adapter on the same database in a process shares one
+ * listen loop that routes each message to the listener for the message's queue name, so named
+ * queues on one database never consume each other's messages. A message whose queue name has no
+ * listener in the receiving process is re-enqueued a bounded number of times, then dead-lettered
+ * with reason `unroutable`; while no listener is registered at all, messages stay queued. Listen to
+ * every queue of one local database from one process: a local database wakes other processes only
+ * on a periodic poll. `stop()` waits for this adapter's in-flight handlers.
+ *
  * @template T - Message payload type
  */
 export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
-  private queue!: DenoKvMessageQueue;
-  private kvInstance: Deno.Kv | null = null;
-  private kvPromise: Promise<Deno.Kv> | null = null;
-  private listening = false;
-  private abortController?: AbortController;
+  private lease: KvQueueDispatcherLease | null = null;
+  private activeListener:
+    | { readonly controller: AbortController; readonly done: Promise<void> }
+    | null = null;
   private readonly queueName: string;
+  private readonly path?: string;
   private readonly useShared: boolean;
   private readonly explicitKv?: Deno.Kv;
   private readonly verbose: boolean;
@@ -89,6 +107,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
    */
   constructor(options: DenoKvAdapterOptions = {}) {
     this.queueName = options.queueName ?? 'default';
+    this.path = options.path;
     this.useShared = options.useShared ?? true;
     this.explicitKv = options.kv;
     this.verbose = options.verbose ?? false;
@@ -98,8 +117,12 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   /**
    * Create an adapter around a caller-owned KV instance.
    *
+   * The queue never closes the instance. Deno KV stops a queue listener only by closing its
+   * connection, so once an adapter on it has listened, its queue stays consumed until the caller
+   * closes it; messages that arrive while no adapter listens are held by delayed re-enqueue.
+   *
    * @param kv - KV instance whose lifecycle is owned by the caller.
-   * @param queueName - Queue name used for diagnostics and message metadata.
+   * @param queueName - Queue name used for routing, diagnostics, and message metadata.
    * @returns Adapter bound to the provided KV instance.
    */
   static withKv<T>(kv: Deno.Kv, queueName = 'default'): DenoKvAdapter<T> {
@@ -107,40 +130,19 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   }
 
   /**
-   * Return the initialized KV instance, creating it on first use.
+   * Claim the shared dispatcher for this adapter's database and open its connection.
    */
-  private async ensureKv(): Promise<Deno.Kv> {
-    if (this.kvInstance) {
-      return this.kvInstance;
-    }
-
-    if (!this.kvPromise) {
-      this.kvPromise = this.initializeKv();
-    }
-
-    this.kvInstance = await this.kvPromise;
-    this.queue = new DenoKvMessageQueue(this.kvInstance);
-    return this.kvInstance;
-  }
-
-  /**
-   * Open the explicit, discovered, or default Deno KV connection.
-   */
-  private async initializeKv(): Promise<Deno.Kv> {
+  private async ensureDispatcher(): Promise<KvQueueDispatcher> {
+    this.lease ??= acquireKvQueueDispatcher(this.resolveTarget());
+    const lease = this.lease;
     try {
-      if (this.explicitKv) {
-        return this.explicitKv;
-      }
-
-      if (this.useShared) {
-        const kvPath = getKvConnectionFromAspire();
-        if (kvPath) {
-          return await Deno.openKv(kvPath);
-        }
-      }
-
-      return await Deno.openKv();
+      await lease.dispatcher.kv();
+      return lease.dispatcher;
     } catch (error) {
+      if (this.lease === lease) {
+        this.lease = null;
+      }
+      await lease.release();
       throw new QueueConnectionError(
         `Failed to initialize Deno KV queue: ${
           error instanceof Error ? error.message : String(error)
@@ -148,6 +150,16 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
         error instanceof Error ? error : undefined,
       );
     }
+  }
+
+  /**
+   * Identify the database: the explicit instance, the configured path, or the discovered one.
+   */
+  private resolveTarget(): KvDatabaseTarget {
+    if (this.explicitKv) {
+      return { kv: this.explicitKv };
+    }
+    return { path: this.path ?? (this.useShared ? getKvConnectionFromAspire() : undefined) };
   }
 
   /**
@@ -161,9 +173,10 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
       this.deadLetterStore = this.explicitDeadLetterStore;
       return this.deadLetterStore;
     }
+    const dispatcher = await this.ensureDispatcher();
     this.deadLetterStore = new KvDeadLetterStore<T>({
       queueName: this.queueName,
-      denoKv: await this.ensureKv(),
+      denoKv: await dispatcher.kv(),
     });
     return this.deadLetterStore;
   }
@@ -185,11 +198,8 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
    */
   async enqueue(message: T, options?: EnqueueOptions): Promise<void> {
     try {
-      await this.ensureKv();
-      const envelope = createEnvelope(message, options);
-      await this.queue.enqueue(envelope, {
-        delay: options?.delay ? Temporal.Duration.from({ milliseconds: options.delay }) : undefined,
-      });
+      const dispatcher = await this.ensureDispatcher();
+      await dispatcher.enqueue(createEnvelope(message, options, this.queueName), options?.delay);
     } catch (error) {
       throw new QueueError(
         `Failed to enqueue message: ${error instanceof Error ? error.message : String(error)}`,
@@ -210,7 +220,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
    */
   async enqueueMany(messages: T[], options?: EnqueueOptions): Promise<void> {
     try {
-      await this.ensureKv();
+      await this.ensureDispatcher();
       for (const message of messages) {
         await this.enqueue(message, options);
       }
@@ -227,7 +237,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   }
 
   /**
-   * Listen for queued messages until stopped or aborted.
+   * Listen for messages addressed to this queue name until stopped or aborted.
    *
    * @param handler - Async callback invoked for each message.
    * @param options - Listener concurrency and cancellation options.
@@ -236,50 +246,30 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     handler: (message: T, context: MessageContext) => Promise<void>,
     options?: ListenOptions,
   ): Promise<void> {
-    await this.ensureKv();
+    const dispatcher = await this.ensureDispatcher();
 
-    if (this.listening) {
+    if (this.activeListener) {
       throw new QueueError('Queue is already listening', QueueErrorCode.CONFIGURATION_ERROR);
     }
 
-    this.listening = true;
-    this.abortController = new AbortController();
-
+    const controller = new AbortController();
     const signal = options?.signal;
-    if (signal) {
-      signal.addEventListener('abort', () => {
-        this.abortController?.abort();
-      });
+    const stopListening = () => controller.abort();
+    signal?.addEventListener('abort', stopListening, { once: true });
+    if (signal?.aborted) {
+      controller.abort();
     }
+    const done = dispatcher.listen(
+      this.queueName,
+      (envelope) => this.deliver(envelope, handler),
+      controller.signal,
+    );
+    const listener = { controller, done };
+    this.activeListener = listener;
 
     try {
-      await this.queue.listen(async (rawMessage) => {
-        let payload: T;
-        let headers: Record<string, string> = {};
-        let messageId: string;
-        let enqueuedAt: Date;
-        let deliveryCount: number;
-
-        if (isMessageEnvelope<T>(rawMessage)) {
-          payload = rawMessage.payload;
-          headers = rawMessage.headers;
-          messageId = rawMessage.messageId;
-          enqueuedAt = new Date(rawMessage.enqueuedAt);
-          deliveryCount = rawMessage.deliveryCount + 1;
-        } else {
-          payload = rawMessage as T;
-          messageId = crypto.randomUUID();
-          enqueuedAt = new Date();
-          deliveryCount = 1;
-        }
-
-        const context = this.createContext(messageId, payload, enqueuedAt, headers, deliveryCount);
-        await handler(payload, context);
-      }, { signal: this.abortController.signal });
+      await done;
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        return;
-      }
       throw new QueueError(
         `Queue listener failed: ${error instanceof Error ? error.message : String(error)}`,
         QueueErrorCode.DEQUEUE_FAILED,
@@ -289,22 +279,31 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
         },
       );
     } finally {
-      this.listening = false;
+      signal?.removeEventListener('abort', stopListening);
+      if (this.activeListener === listener) {
+        this.activeListener = null;
+      }
       this.log('stopped');
     }
   }
 
   /**
-   * Stop the active listener and wait briefly for Fedify to observe cancellation.
+   * Stop the active listener, wait for its in-flight handlers to finish, and release this
+   * adapter's claim on the shared database connection.
    */
   async stop(): Promise<void> {
-    if (!this.listening) {
-      return;
+    const listener = this.activeListener;
+    this.activeListener = null;
+    if (listener) {
+      listener.controller.abort();
+      await listener.done.catch(() => undefined);
     }
-
-    this.abortController?.abort();
-    this.listening = false;
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    const lease = this.lease;
+    this.lease = null;
+    if (!this.explicitDeadLetterStore) {
+      this.deadLetterStore = null;
+    }
+    await lease?.release();
   }
 
   /**
@@ -312,15 +311,34 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
    *
    * @returns The Deno KV instance used by this adapter.
    */
-  getKv(): Promise<Deno.Kv> {
-    return this.ensureKv();
+  async getKv(): Promise<Deno.Kv> {
+    const dispatcher = await this.ensureDispatcher();
+    return dispatcher.kv();
   }
 
   /**
    * Whether the adapter currently has an active listener.
    */
   get isListening(): boolean {
-    return this.listening;
+    return this.activeListener !== null;
+  }
+
+  /**
+   * Hand one routed envelope to the caller's handler.
+   */
+  private async deliver(
+    envelope: MessageEnvelope<unknown>,
+    handler: (message: T, context: MessageContext) => Promise<void>,
+  ): Promise<void> {
+    const payload = envelope.payload as T;
+    const context = this.createContext(
+      envelope.messageId,
+      payload,
+      new Date(envelope.enqueuedAt),
+      envelope.headers,
+      envelope.deliveryCount + 1,
+    );
+    await handler(payload, context);
   }
 
   /**

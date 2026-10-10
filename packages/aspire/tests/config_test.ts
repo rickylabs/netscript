@@ -202,7 +202,7 @@ Deno.test('config', async (t) => {
     const workers = config.BackgroundProcessors['workers'];
     assertExists(workers);
     assertEquals(workers.Concurrency, 2);
-    assertEquals(workers.ConcurrencyEnvVar, 'WORKER_CONCURRENCY');
+    assertEquals(workers.ConcurrencyEnvVar, 'WORKERS_CONCURRENCY');
   });
 
   for (

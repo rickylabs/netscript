@@ -107,18 +107,8 @@ For per-topic control — a hot `imports` topic at concurrency 10 while a heavy 
 at 1 — use a `WorkerGroup` with its own `scaling: { mode, concurrency }`. The full per-topic and
 runner-mode knobs are in [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
 
-{{ comp callout { type: "warning", title: "Set scaling.concurrency in config — the Aspire env var is silently ignored" } }}
-There are <strong>two</strong> concurrency env names in play and they are <em>not</em> the same
-variable. The worker entrypoint reads <code>WORKERS_CONCURRENCY</code> (note the <strong>S</strong>)
-and defaults it to <code>1</code>. The Aspire contribution, however, declares and injects
-<code>WORKER_CONCURRENCY</code> (no S). Under <code>aspire start</code> today the injected
-<code>WORKER_CONCURRENCY</code> does <em>not</em> feed the entrypoint's <code>WORKERS_CONCURRENCY</code>
-read, so the Aspire value is silently ignored and the process pool falls back to its default. Treat
-the config-driven <code>concurrency</code> (and per-topic <code>scaling.concurrency</code>) above as
-the durable control, and if you must override the pool by env, set <code>WORKERS_CONCURRENCY</code>
-explicitly on the background resource. This naming seam is a known rough edge, tracked for a
-framework-side fix.
-{{ /comp }}
+The running process pool is sized by `WORKERS_CONCURRENCY`. Aspire injects it on the workers
+background resource with the plugin's declared default, so you only set it to override that value.
 
 ## Step 3 — Add a cron schedule
 
@@ -223,7 +213,7 @@ schedule, not a file event, enqueued it. Set the cron back to `0 6 * * *` when y
 - [ ] `deno task check` is clean.
 - [ ] `daily-resync-schedule` is registered (after `netscript generate plugins` + Aspire restart).
 - [ ] A scheduled `import-products` execution appears on the cron cadence with no file dropped.
-- [ ] You set `WORKERS_CONCURRENCY` explicitly (or rely on config `concurrency`) rather than the ignored Aspire `WORKER_CONCURRENCY`.
+- [ ] The workers background resource shows `WORKERS_CONCURRENCY` in the Aspire dashboard, and you changed it only to override the declared default.
 
 {{ comp callout { type: "important", title: "Make handlers idempotent before you scale concurrency" } }}
 Raising <code>concurrency</code> means more jobs run at once, and every queue backend can redeliver a
