@@ -17,8 +17,8 @@ the two non-interactive backends (`workos`, `better-auth`) do and do not provide
 
 This is the task-oriented companion to the [authentication capability hub](/capabilities/auth/)
 (the headline API and endpoint map) and the [authentication model explanation](/explanation/auth-model/)
-(why the backend is a pure adapter behind a port). If you want the *why*, read those; if you want
-the *how*, stay here.
+(why the backend is a pure adapter behind a port). If you want the _why_, read those; if you want
+the _how_, stay here.
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — configure it before starting" } }}
 The <code>auth-api</code> service and its database/KV dependencies run as resources in the Aspire
@@ -47,13 +47,13 @@ scaffold time with `netscript init --db <engine>`. (Postgres/MySQL/SQL Server ru
 container resource; SQLite is file-backed with no container.)
 
 {{ comp.apiTable({
-  caption: "Prerequisites",
-  rows: [
-    { name: "Workspace", type: "netscript init", desc: "An existing project. If you have none, scaffold one first — see the tutorials." },
-    { name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + ". Confirm with netscript --help." },
-    { name: "Aspire", type: "aspire start", desc: "Configure/export auth environment, then start the AppHost before any db command or endpoint call." },
-    { name: "OAuth credentials", type: "client id / secret", desc: "For the default kv-oauth backend you need a real OAuth/OIDC app (e.g. a Google client id + secret + redirect URI). Without provider env, signin/callback are non-functional stubs." }
-  ]
+caption: "Prerequisites",
+rows: [
+{ name: "Workspace", type: "netscript init", desc: "An existing project. If you have none, scaffold one first — see the tutorials." },
+{ name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + ". Confirm with netscript --help." },
+{ name: "Aspire", type: "aspire start", desc: "Configure/export auth environment, then start the AppHost before any db command or endpoint call." },
+{ name: "OAuth credentials", type: "client id / secret", desc: "For the default kv-oauth backend you need a real OAuth/OIDC app (e.g. a Google client id + secret + redirect URI). Without provider env, signin/callback are non-functional stubs." }
+]
 }) }}
 
 Throughout, run commands from your workspace root.
@@ -74,7 +74,9 @@ glue barrel, and registers it. The plugin package composes **one active backend*
 
 {{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
 <code>@netscript/plugin-auth</code> is designed as a single-backend runtime composition layer. The active implementation (selected from <code>@netscript/auth-kv-oauth</code>, <code>@netscript/auth-workos</code>, or <code>@netscript/auth-better-auth</code>) is resolved statically at startup. This boundary ensures session isolation and keeps the validation path predictable, meaning that multi-active routing, cross-backend account linking, and global multi-store logout are not supported in the core runtime. Complex multi-tenant scenarios must be coordinated via an upstream identity router or external identity aggregator.
+
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
+
 {{ /comp }}
 
 ## Step 2 — Choose a backend with the auth CLI
@@ -83,17 +85,19 @@ The active backend is selected by the `NETSCRIPT_AUTH_BACKEND` environment varia
 `auth.backend` appsettings key). Three backends are valid; the default is **`kv-oauth`**.
 
 {{ comp.apiTable({
-  caption: "Auth backends — capability matrix (NETSCRIPT_AUTH_BACKEND)",
-  rows: [
-    { name: "kv-oauth", type: "interactive (default)", desc: "Full OAuth/OIDC redirect flow. Real signin + callback, KV-backed sessions with refresh-on-read, signout. The only backend that implements InteractiveFlowPort. Package @netscript/auth-kv-oauth." },
-    { name: "workos", type: "non-interactive", desc: "WorkOS AuthKit sealed wos-session cookie. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR (no interactive flow). Package @netscript/auth-workos." },
-    { name: "better-auth", type: "non-interactive", desc: "better-auth over Prisma. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-better-auth." }
-  ]
+caption: "Auth backends — capability matrix (NETSCRIPT_AUTH_BACKEND)",
+rows: [
+{ name: "kv-oauth", type: "interactive (default)", desc: "Full OAuth/OIDC redirect flow. Real signin + callback, KV-backed sessions with refresh-on-read, signout. The only backend that implements InteractiveFlowPort. Package @netscript/auth-kv-oauth." },
+{ name: "workos", type: "non-interactive", desc: "WorkOS AuthKit sealed wos-session cookie. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR (no interactive flow). Package @netscript/auth-workos." },
+{ name: "better-auth", type: "non-interactive", desc: "better-auth over Prisma. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-better-auth." }
+]
 }) }}
 
 {{ comp callout { type: "important", title: "Interactive Authentication Boundary" } }}
 Only the <code>kv-oauth</code> backend implements the <code>InteractiveFlowPort</code> required to drive login redirects directly via NetScript's <code>signin</code> and <code>callback</code> endpoints. Under <code>workos</code> and <code>better-auth</code>, these routes intentionally return a <code>AUTH_PROVIDER_ERROR</code> (502). This boundary exists because these backends are designed for external verification models where authentication is completed by a frontend client or parent application. In this architecture, you must initiate the authentication flow using the provider's direct SDK or login page, using NetScript to validate the resulting session tokens. Implementing a native <code>InteractiveFlowPort</code> for <code>better-auth</code> is tracked under roadmap item R2.
+
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
+
 {{ /comp }}
 
 For the rest of this recipe we use `kv-oauth`. Persist the choice in the workspace boot seam and
@@ -154,26 +158,25 @@ export BETTER_AUTH_SECRET="$(netscript plugin auth secret generate better-auth)"
 netscript plugin auth provider set --preset better-auth
 ```
 
-
 The explicit exports below are the escape hatch for CI/deployment systems that inject environment
 variables themselves. Ordinary workspace setup uses the source/export step above.
 
 {{ comp.tabbedCode({ tabs: [
-  {
-    label: "kv-oauth (default, interactive)",
-    lang: "sh",
-    code: "# Selects the interactive OAuth/OIDC backend\nexport NETSCRIPT_AUTH_BACKEND=kv-oauth\n\n# Provider credentials (e.g. a Google OAuth app)\nexport NETSCRIPT_AUTH_CLIENT_ID=your-client-id\nexport NETSCRIPT_AUTH_CLIENT_SECRET=your-client-secret\nexport NETSCRIPT_AUTH_REDIRECT_URI=http://localhost:8094/api/v1/auth/callback\n\n# OIDC discovery / endpoints (preset providers fill these for you)\nexport NETSCRIPT_AUTH_ISSUER=https://accounts.google.com\nexport NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://accounts.google.com/o/oauth2/v2/auth\nexport NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token\nexport NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://openidconnect.googleapis.com/v1/userinfo\nexport NETSCRIPT_AUTH_SCOPES=openid email profile\n\n# Optional: cookie + KV tuning\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\nexport NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret>  # required for kv-oauth: missing key material is a startup error\n# export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=false\n\nexport PORT=8094"
-  },
-  {
-    label: "workos (non-interactive)",
-    lang: "sh",
-    code: "export NETSCRIPT_AUTH_BACKEND=workos\n\nexport WORKOS_API_KEY=sk_...\nexport WORKOS_CLIENT_ID=client_...\nexport WORKOS_COOKIE_PASSWORD=at-least-32-characters-of-entropy\n\n# signin/callback return AUTH_PROVIDER_ERROR on this backend.\n# It validates an existing WorkOS AuthKit session (session/me).\nexport PORT=8094"
-  },
-  {
-    label: "better-auth (non-interactive)",
-    lang: "sh",
-    code: "export NETSCRIPT_AUTH_BACKEND=better-auth\n\nexport BETTER_AUTH_SECRET=at-least-32-characters-of-entropy\nexport DB_PROVIDER=postgres\n\n# Persists users/sessions/accounts via auth.prisma (Step 3).\n# signin/callback return AUTH_PROVIDER_ERROR — validate-only.\nexport PORT=8094"
-  }
+{
+label: "kv-oauth (default, interactive)",
+lang: "sh",
+code: "# Selects the interactive OAuth/OIDC backend\nexport NETSCRIPT_AUTH_BACKEND=kv-oauth\n\n# Provider credentials (e.g. a Google OAuth app)\nexport NETSCRIPT_AUTH_CLIENT_ID=your-client-id\nexport NETSCRIPT_AUTH_CLIENT_SECRET=your-client-secret\nexport NETSCRIPT_AUTH_REDIRECT_URI=http://localhost:8094/api/v1/auth/callback\n\n# OIDC discovery / endpoints (preset providers fill these for you)\nexport NETSCRIPT_AUTH_ISSUER=https://accounts.google.com\nexport NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://accounts.google.com/o/oauth2/v2/auth\nexport NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token\nexport NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://openidconnect.googleapis.com/v1/userinfo\nexport NETSCRIPT_AUTH_SCOPES=openid email profile\n\n# Optional: cookie + KV tuning\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\nexport NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret> # required for kv-oauth: missing key material is a startup error\n# Local HTTP only: export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true\n# TLS proxy only: export NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true\n# Outbound HTTP provider tests only: export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true\n\nexport PORT=8094"
+},
+{
+label: "workos (non-interactive)",
+lang: "sh",
+code: "export NETSCRIPT_AUTH_BACKEND=workos\n\nexport WORKOS_API_KEY=sk_...\nexport WORKOS_CLIENT_ID=client_...\nexport WORKOS_COOKIE_PASSWORD=at-least-32-characters-of-entropy\n\n# signin/callback return AUTH_PROVIDER_ERROR on this backend.\n# It validates an existing WorkOS AuthKit session (session/me).\nexport PORT=8094"
+},
+{
+label: "better-auth (non-interactive)",
+lang: "sh",
+code: "export NETSCRIPT_AUTH_BACKEND=better-auth\n\nexport BETTER_AUTH_SECRET=at-least-32-characters-of-entropy\nexport DB_PROVIDER=postgres\n\n# Persists users/sessions/accounts via auth.prisma (Step 3).\n# signin/callback return AUTH_PROVIDER_ERROR — validate-only.\nexport PORT=8094"
+}
 ] }) }}
 
 {{ comp callout { type: "note", title: "Provider presets fill the OIDC endpoints for you" } }}
@@ -194,13 +197,13 @@ aggregated into your project's database schema at `db generate` (Postgres is the
 scaffolded with `--db`). It defines four better-auth-shaped models mapped to these tables:
 
 {{ comp.apiTable({
-  caption: "auth.prisma models → your database tables",
-  rows: [
-    { name: "AuthUser", type: "auth_users", desc: "Authenticated principals. Populated by backends that persist users (better-auth)." },
-    { name: "AuthSession", type: "auth_sessions", desc: "Server-side session records. kv-oauth keeps sessions in KV; this table backs the Prisma-persisting backend." },
-    { name: "AuthAccount", type: "auth_accounts", desc: "Linked provider accounts (the OAuth/OIDC identities behind a user)." },
-    { name: "AuthVerification", type: "auth_verifications", desc: "Verification / challenge records used during account flows." }
-  ]
+caption: "auth.prisma models → your database tables",
+rows: [
+{ name: "AuthUser", type: "auth_users", desc: "Authenticated principals. Populated by backends that persist users (better-auth)." },
+{ name: "AuthSession", type: "auth_sessions", desc: "Server-side session records. kv-oauth keeps sessions in KV; this table backs the Prisma-persisting backend." },
+{ name: "AuthAccount", type: "auth_accounts", desc: "Linked provider accounts (the OAuth/OIDC identities behind a user)." },
+{ name: "AuthVerification", type: "auth_verifications", desc: "Verification / challenge records used during account flows." }
+]
 }) }}
 
 {{ comp callout { type: "note", title: "Which backends actually use these tables" } }}
@@ -241,16 +244,16 @@ When you compose the backend in code (for a custom service entry, a test, or a n
 the interactive `kv-oauth` backend is one `await` call. Pass a provider preset from `providers.*`:
 
 {{ comp.tabbedCode({ tabs: [
-  {
-    label: "Compose the kv-oauth backend",
-    lang: "ts",
-    code: "import { createKvOAuthBackend, providers } from \"@netscript/auth-kv-oauth\";\n\n// providers.google(...) is a preset that fills the OIDC endpoints for you.\nconst backend = await createKvOAuthBackend({\n  provider: providers.google({\n    clientId: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_ID\")!,\n    clientSecret: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_SECRET\")!,\n    redirectUri: \"http://localhost:8094/api/v1/auth/callback\",\n  }),\n});\n\n// backend implements AuthBackendPort AND the optional InteractiveFlowPort\n// (signIn / handleCallback / getSessionId / signOut), so the auth-api\n// signin + callback endpoints are live on this backend.\nconsole.log(backend.name); // \"kv-oauth\""
-  },
-  {
-    label: "Swap the provider preset",
-    lang: "ts",
-    code: "import { createKvOAuthBackend, providers } from \"@netscript/auth-kv-oauth\";\n\n// GitHub instead of Google — same shape, different preset.\nconst github = await createKvOAuthBackend({\n  provider: providers.github({\n    clientId: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_ID\")!,\n    clientSecret: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_SECRET\")!,\n    redirectUri: \"http://localhost:8094/api/v1/auth/callback\",\n  }),\n});\n\n// Tenant providers (auth0, okta, azureAd, awsCognito, logto, clerk) take\n// a tenant/domain in addition to the client credentials."
-  }
+{
+label: "Compose the kv-oauth backend",
+lang: "ts",
+code: "import { createKvOAuthBackend, providers } from \"@netscript/auth-kv-oauth\";\n\n// providers.google(...) is a preset that fills the OIDC endpoints for you.\nconst backend = await createKvOAuthBackend({\n provider: providers.google({\n clientId: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_ID\")!,\n clientSecret: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_SECRET\")!,\n redirectUri: \"http://localhost:8094/api/v1/auth/callback\",\n }),\n});\n\n// backend implements AuthBackendPort AND the optional InteractiveFlowPort\n// (signIn / handleCallback / getSessionId / signOut), so the auth-api\n// signin + callback endpoints are live on this backend.\nconsole.log(backend.name); // \"kv-oauth\""
+},
+{
+label: "Swap the provider preset",
+lang: "ts",
+code: "import { createKvOAuthBackend, providers } from \"@netscript/auth-kv-oauth\";\n\n// GitHub instead of Google — same shape, different preset.\nconst github = await createKvOAuthBackend({\n provider: providers.github({\n clientId: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_ID\")!,\n clientSecret: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_SECRET\")!,\n redirectUri: \"http://localhost:8094/api/v1/auth/callback\",\n }),\n});\n\n// Tenant providers (auth0, okta, azureAd, awsCognito, logto, clerk) take\n// a tenant/domain in addition to the client credentials."
+}
 ] }) }}
 
 The returned `backend` satisfies the `AuthBackendPort` seam that `@netscript/plugin-auth-core`
@@ -264,14 +267,14 @@ With Aspire running, the `auth-api` service binds **port 8094** and mounts five 
 public REST prefix **`/api/v1/auth/*`** (the oRPC surface is mirrored at `/api/rpc/v1/auth/*`):
 
 {{ comp.apiTable({
-  caption: "auth-api endpoints (:8094, /api/v1/auth/*)",
-  rows: [
-    { name: "POST /api/v1/auth/signin", type: "interactive only", desc: "Begin the OAuth/OIDC redirect flow. Live on kv-oauth; returns AUTH_PROVIDER_ERROR on workos/better-auth." },
-    { name: "POST /api/v1/auth/callback", type: "interactive only", desc: "Complete the provider redirect, mint a session. Live on kv-oauth; AUTH_PROVIDER_ERROR on the others." },
-    { name: "POST /api/v1/auth/signout", type: "session", desc: "Revoke the current session and clear the session cookie." },
-    { name: "GET /api/v1/auth/session", type: "session", desc: "Return the current session if one is present and valid. Works on all backends." },
-    { name: "GET /api/v1/auth/me", type: "identity", desc: "Return the authenticated principal (the resolved user). Works on all backends." }
-  ]
+caption: "auth-api endpoints (:8094, /api/v1/auth/*)",
+rows: [
+{ name: "POST /api/v1/auth/signin", type: "interactive only", desc: "Begin the OAuth/OIDC redirect flow. Live on kv-oauth; returns AUTH_PROVIDER_ERROR on workos/better-auth." },
+{ name: "POST /api/v1/auth/callback", type: "interactive only", desc: "Complete the provider redirect, mint a session. Live on kv-oauth; AUTH_PROVIDER_ERROR on the others." },
+{ name: "POST /api/v1/auth/signout", type: "session", desc: "Revoke the current session and clear the session cookie." },
+{ name: "GET /api/v1/auth/session", type: "session", desc: "Return the current session if one is present and valid. Works on all backends." },
+{ name: "GET /api/v1/auth/me", type: "identity", desc: "Return the authenticated principal (the resolved user). Works on all backends." }
+]
 }) }}
 
 The service also exposes liveness/readiness probes at `/health/live` and `/health/ready`, plus
@@ -350,11 +353,23 @@ require genuine provider credentials — the fallback is a stub path, not a work
 ## Production pitfalls
 
 {{ comp callout { type: "warning", title: "Read before you ship authentication" } }}
+
 <ul>
 <li><strong>Wrong backend for the job</strong> — <code>signin</code>/<code>callback</code> only work
 on <code>kv-oauth</code>. If those endpoints return <code>AUTH_PROVIDER_ERROR</code>, you are on
 <code>workos</code> or <code>better-auth</code>, which validate sessions but do not drive the login
 redirect. Set <code>NETSCRIPT_AUTH_BACKEND=kv-oauth</code> for an interactive flow.</li>
+<li><strong>TLS termination and transport migration</strong> — forwarded protocol headers are
+ignored by default. Behind a TLS-terminating proxy set
+<code>NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true</code> only when that proxy replaces incoming
+protocol headers and blocks direct service access. The flow gate and cookie Secure derivation use
+one policy. Proxied TLS does not need <code>NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS</code>;
+that switch now controls outbound OAuth HTTP only. For local HTTP development use the separate
+<code>NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true</code>. Missing or partial provider
+config never enables insecure transport automatically. Transport/config refusals return
+<code>AUTH_TRANSPORT_ERROR</code>/<code>AUTH_CONFIGURATION_ERROR</code> (400), with distinct
+flow/cookie reasons; upstream failures remain 502. Hop/CIDR verification is deferred to
+<a href="https://github.com/rickylabs/netscript/issues/2191">#2191</a>.</li>
 <li><strong>Single active backend</strong> — there is exactly one backend at a time. No multi-active
 routing, cross-backend account linking, global logout, historical replay, or paged session mirror in
 v1. Plan your identity model around one provider path.</li>
@@ -383,31 +398,31 @@ aspire start</code> first.</li>
 <div class="ns-card-grid">
 
 {{ comp.card({
-  title: "Authentication capability",
-  body: "The auth-api service, the five endpoints, and the three-backend capability matrix in one hub.",
-  href: "/capabilities/auth/",
-  icon: "◆"
+title: "Authentication capability",
+body: "The auth-api service, the five endpoints, and the three-backend capability matrix in one hub.",
+href: "/capabilities/auth/",
+icon: "◆"
 }) }}
 
 {{ comp.card({
-  title: "The authentication model",
-  body: "Why the backend is a pure adapter behind AuthBackendPort, and how the plugin composes one active backend.",
-  href: "/explanation/auth-model/",
-  icon: "▣"
+title: "The authentication model",
+body: "Why the backend is a pure adapter behind AuthBackendPort, and how the plugin composes one active backend.",
+href: "/explanation/auth-model/",
+icon: "▣"
 }) }}
 
 {{ comp.card({
-  title: "service reference",
-  body: "The @netscript/service builder that auth-api is built on — RPC mount, health, OpenAPI, service info.",
-  href: "/reference/service/",
-  icon: "§"
+title: "service reference",
+body: "The @netscript/service builder that auth-api is built on — RPC mount, health, OpenAPI, service info.",
+href: "/reference/service/",
+icon: "§"
 }) }}
 
 {{ comp.card({
-  title: "Run a database migration",
-  body: "The full db init / generate / seed / status workflow that applies auth.prisma.",
-  href: "/data-persistence/how-to/database-migration/",
-  icon: "+"
+title: "Run a database migration",
+body: "The full db init / generate / seed / status workflow that applies auth.prisma.",
+href: "/data-persistence/how-to/database-migration/",
+icon: "+"
 }) }}
 
 </div>

@@ -1,6 +1,6 @@
 ---
 layout: layouts/base.vto
-title: "@netscript/auth-kv-oauth"
+title: '@netscript/auth-kv-oauth'
 ---
 
 # `@netscript/auth-kv-oauth`
@@ -10,54 +10,83 @@ package's public surface reported by `deno doc`.
 
 ## Backend and flow factories
 
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `createKvOAuthBackend` | function | Create a KV-backed OAuth backend. |
-| `createKvOAuthFlow` | function | Create the OAuth sign-in and callback flow. |
-| `createKvOAuthStore` | function | Create the KV-backed OAuth store. |
-| `createKvOAuthCrypto` | function | Create crypto helpers for OAuth state and token storage. |
-| `defineOAuthProvider` | function | Normalize generic OAuth provider input into an `OAuthProviderConfig`. |
-| `providers` | constant | Provider preset collection including GitHub, Google, GitLab, Discord, Slack, Spotify, Facebook, Twitter, Auth0, Okta, AWS Cognito, Azure AD, Logto, and Clerk. |
+| Symbol                 | Kind     | Description                                                                                                                                                    |
+| ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `createKvOAuthBackend` | function | Create a KV-backed OAuth backend.                                                                                                                              |
+| `createKvOAuthFlow`    | function | Create the OAuth sign-in and callback flow.                                                                                                                    |
+| `createKvOAuthStore`   | function | Create the KV-backed OAuth store.                                                                                                                              |
+| `createKvOAuthCrypto`  | function | Create crypto helpers for OAuth state and token storage.                                                                                                       |
+| `defineOAuthProvider`  | function | Normalize generic OAuth provider input into an `OAuthProviderConfig`.                                                                                          |
+| `providers`            | constant | Provider preset collection including GitHub, Google, GitLab, Discord, Slack, Spotify, Facebook, Twitter, Auth0, Okta, AWS Cognito, Azure AD, Logto, and Clerk. |
 
 ## Cookie, environment, and discovery helpers
 
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `buildCookieHeader` | function | Build a `Set-Cookie` header value. |
-| `clearCookieHeader` | function | Build a cookie-clearing header value. |
-| `parseCookieHeader` | function | Parse an incoming cookie header. |
-| `getRequiredEnv` | function | Read a required environment variable. |
-| `deriveHttps` | function | Derive HTTPS defaults for provider configuration. |
-| `hasIssuerDiscovery` | function | Check whether provider config includes issuer discovery. |
-| `KvOAuthError` | class | OAuth backend error class. |
+| Symbol               | Kind     | Description                                                                  |
+| -------------------- | -------- | ---------------------------------------------------------------------------- |
+| `buildCookieHeader`  | function | Build a `Set-Cookie` header value.                                           |
+| `clearCookieHeader`  | function | Build a cookie-clearing header value.                                        |
+| `parseCookieHeader`  | function | Parse an incoming cookie header.                                             |
+| `getRequiredEnv`     | function | Read a required environment variable.                                        |
+| `deriveHttps`        | function | Shared inbound HTTPS policy; forwarded headers require explicit proxy trust. |
+| `hasIssuerDiscovery` | function | Check whether provider config includes issuer discovery.                     |
+| `KvOAuthError`       | class    | OAuth backend error class.                                                   |
 
 ## Main types
 
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `KvOAuthBackend` | interface | Backend object returned by `createKvOAuthBackend`. |
-| `KvOAuthFlow` | interface | OAuth flow object returned by `createKvOAuthFlow`. |
-| `KvOAuthStore` | interface | KV store port used by the OAuth backend. |
-| `KvOAuthCrypto` | interface | Crypto port used by the OAuth backend. |
-| `CreateKvOAuthBackendOptions` | type alias | Options for `createKvOAuthBackend`. |
-| `CreateKvOAuthFlowOptions` | type alias | Options for `createKvOAuthFlow`. |
-| `OAuthProviderInput` | type alias | Generic provider input accepted by `defineOAuthProvider`. |
-| `OAuthProviderConfig` | type alias | Normalized provider config. |
-| `PresetOAuthProviderOptions` | type alias | Options accepted by provider presets. |
-| `KvOAuthCallbackResult` | type alias | Callback result returned by the OAuth flow. |
-| `KvOAuthTokenSet` | type alias | Token set stored by the KV OAuth backend. |
+| Symbol                        | Kind       | Description                                               |
+| ----------------------------- | ---------- | --------------------------------------------------------- |
+| `KvOAuthBackend`              | interface  | Backend object returned by `createKvOAuthBackend`.        |
+| `KvOAuthFlow`                 | interface  | OAuth flow object returned by `createKvOAuthFlow`.        |
+| `KvOAuthStore`                | interface  | KV store port used by the OAuth backend.                  |
+| `KvOAuthCrypto`               | interface  | Crypto port used by the OAuth backend.                    |
+| `CreateKvOAuthBackendOptions` | type alias | Options for `createKvOAuthBackend`.                       |
+| `CreateKvOAuthFlowOptions`    | type alias | Options for `createKvOAuthFlow`.                          |
+| `OAuthProviderInput`          | type alias | Generic provider input accepted by `defineOAuthProvider`. |
+| `OAuthProviderConfig`         | type alias | Normalized provider config.                               |
+| `PresetOAuthProviderOptions`  | type alias | Options accepted by provider presets.                     |
+| `KvOAuthCallbackResult`       | type alias | Callback result returned by the OAuth flow.               |
+| `KvOAuthTokenSet`             | type alias | Token set stored by the KV OAuth backend.                 |
 
 ## Sub-path exports
 
-| Export | Path | Purpose |
-| --- | --- | --- |
-| `@netscript/auth-kv-oauth` | `./mod.ts` | Root KV OAuth backend surface. |
+| Export                               | Path                 | Purpose                                              |
+| ------------------------------------ | -------------------- | ---------------------------------------------------- |
+| `@netscript/auth-kv-oauth`           | `./mod.ts`           | Root KV OAuth backend surface.                       |
 | `@netscript/auth-kv-oauth/providers` | `./src/providers.ts` | Provider presets and the defineOAuthProvider helper. |
-| `@netscript/auth-kv-oauth/store` | `./src/store.ts` | KV OAuth store implementation. |
-| `@netscript/auth-kv-oauth/crypto` | `./src/crypto.ts` | KV OAuth crypto helpers. |
-| `@netscript/auth-kv-oauth/cookies` | `./src/cookies.ts` | Cookie parsing and header helpers. |
-| `@netscript/auth-kv-oauth/flow` | `./src/flow.ts` | OAuth sign-in and callback flow. |
-| `@netscript/auth-kv-oauth/backend` | `./src/backend.ts` | Backend adapter factory. |
-| `@netscript/auth-kv-oauth/errors` | `./src/errors.ts` | KV OAuth error class and codes. |
+| `@netscript/auth-kv-oauth/store`     | `./src/store.ts`     | KV OAuth store implementation.                       |
+| `@netscript/auth-kv-oauth/crypto`    | `./src/crypto.ts`    | KV OAuth crypto helpers.                             |
+| `@netscript/auth-kv-oauth/cookies`   | `./src/cookies.ts`   | Cookie parsing and header helpers.                   |
+| `@netscript/auth-kv-oauth/flow`      | `./src/flow.ts`      | OAuth sign-in and callback flow.                     |
+| `@netscript/auth-kv-oauth/backend`   | `./src/backend.ts`   | Backend adapter factory.                             |
+| `@netscript/auth-kv-oauth/errors`    | `./src/errors.ts`    | KV OAuth error class and codes.                      |
 
 Back to the [auth reference hub](/reference/auth/).
+
+## HTTPS and trusted proxies
+
+The flow and cookie helpers share `deriveHttps`. Direct HTTPS works without proxy configuration.
+Forwarded protocol headers are ignored by default. Behind a TLS-terminating proxy, set top-level
+`trustProxyHeaders: true` on `createKvOAuthBackend` or `createKvOAuthFlow`; the same option reaches
+sign-in, callback, sign-out cookies, and refreshed session cookies. Enable it only when the proxy
+replaces client-supplied protocol headers and direct access to the service is blocked.
+
+`X-Forwarded-Proto` takes precedence over `Forwarded`; the first value/hop is used. Quoted
+`Forwarded: proto="https"` is supported. Hop/CIDR verification is deferred to
+[#2191](https://github.com/rickylabs/netscript/issues/2191).
+
+- `allowInsecureHttpRequests` permits inbound plain HTTP for development; it defaults to false.
+- `cookie.allowInsecureDev` separately permits the development cookie gate. Both are needed for a
+  plain HTTP development flow using the default `__Host-` cookie; production requires HTTPS.
+- `allowInsecureRequests` only relaxes outbound OAuth discovery/token transport. It defaults to
+  false and is unnecessary for proxied TLS. It does not disable certificate validation.
+- Standalone cookie helpers accept `trustProxyHeaders` in `KvOAuthCookieOptions`.
+  `deriveHttps(request, undefined, true)` explicitly trusts protocol headers. Its existing boolean
+  override remains available. Backend/flow top-level trust governs their cookie operations.
+- `AuthnRequest` carries no URL. For refresh cookies, supply trusted proxy headers with explicit
+  trust, or set `cookie.secure: true` when the host guarantees HTTPS.
+
+**Migration:** previously cookie helpers trusted protocol headers unconditionally and
+`allowInsecureRequests` also opened the inbound flow gate. Existing proxied deployments must opt
+into `trustProxyHeaders`; development HTTP callers must explicitly set `allowInsecureHttpRequests`
+and `cookie.allowInsecureDev`. The flow now throws `flow_https_required`, while the cookie gate
+throws `cookie_https_required`. Invalid cookie settings retain `configuration_error`.

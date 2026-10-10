@@ -2596,3 +2596,33 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   check, all 42 AI tests, peer guard, frozen install, Fresh lint and touched-source formatting
   exit 0. Focused doc lint exit 1 with only the two named references. Project
   runs/2026-10-08-fix-ai-peer-types/ai-doc-lint.log retains the raw failure.
+
+## auth-kv-oauth — explicit boolean proxy trust (`auth-trusted-proxy-hops-2026`)
+
+- **Reason:** #2026 adopts a default-off boolean `trustProxyHeaders` opt-in for one shared inbound
+  HTTPS/cookie policy. It requires a perimeter that replaces protocol headers and blocks direct
+  access; it cannot authenticate a chain of proxy hops or source CIDRs.
+- **Owner:** Auth package and plugin maintainers.
+- **Target:** Backlog / Triage; before recommending trust in multi-hop deployments.
+- **Linked plan:** #2026 option A decision; follow-up #2191.
+- **Created:** 2026-10-10.
+- **Status:** open; option B deferred by coordinator, option C rejected as spoofable.
+- **Gate:** F-2/F-3 trusted-hop/CIDR contract and spoofing regression tests covering both flow and
+  cookie derivation, with documented migration from boolean trust. Outbound OAuth transport stays
+  independent.
+
+## Auth integration — unchanged raw documentation lint baseline (`auth-doc-baseline-2026`)
+
+- **Reason:** The #2026 transport fix preserves the complete raw doc-lint reports from pristine
+  baseline `e876d98847298ee8a902a6ab95942ec912e1e3aa`: plugin-auth-core has four combined private
+  type references; plugins/auth has thirteen. Every entrypoint count and exit is identical.
+  auth-kv-oauth has zero findings. The findings include the existing private contract shape and
+  upstream oRPC implementer plus stream types. No type erasure, lint suppression, gate relaxation,
+  or additional slow-types flag is introduced.
+- **Owner:** Auth and streams public-surface maintainers; coordinator adjudicates readiness.
+- **Target:** Before raw all-export documentation gates are claimed green.
+- **Linked plan:** #2026; PR #2188. Raw baseline/final reports kept in the run record.
+- **Created:** 2026-10-10.
+- **Status:** open; raw doc-lint remains exit 1, no evaluator acceptance claimed.
+- **Gate:** F-7 raw all-export doc-lint exits zero with sound public contracts and no vendor
+  re-export or erased types.
