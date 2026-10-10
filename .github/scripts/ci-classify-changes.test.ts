@@ -922,7 +922,9 @@ Deno.test('workflow: sqlite runtime uses sibling diff guard and fails closed', a
     true,
   );
   assertEquals(
-    sqliteJob!.includes('group: e2e-scaffold-runtime-sqlite-global-v2\n'),
+    sqliteJob!.includes(
+      'group: e2e-scaffold-runtime-sqlite-v3-${{ github.event.pull_request.number || github.ref }}\n',
+    ),
     true,
   );
   assertEquals(
@@ -943,7 +945,9 @@ Deno.test('workflow: sqlite runtime uses sibling diff guard and fails closed', a
   const postgresJob = workflowJob(workflow, 'scaffold-runtime');
   assertEquals(typeof postgresJob, 'string');
   assertEquals(
-    postgresJob!.includes('group: e2e-scaffold-runtime-global-v2\n'),
+    postgresJob!.includes(
+      'group: e2e-scaffold-runtime-v3-${{ github.event.pull_request.number || github.ref }}\n',
+    ),
     true,
   );
   assertEquals(
