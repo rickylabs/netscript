@@ -69,6 +69,38 @@ The generated `bearerAuth` component uses HTTP bearer authentication. Optional a
 visible in the generated specification even though the current contract authorizer rejects it at
 construction.
 
+## Request-body limit
+
+| Symbol | Signature | Description |
+| --- | --- | --- |
+| `createBodyLimitMiddleware` | `function createBodyLimitMiddleware(options: ServiceBodyLimitOptions): ServiceMiddleware` | Creates middleware that rejects request bodies larger than `maxBytes` with a typed JSON `413` before any handler parses them. Throws `RangeError` unless `maxBytes` is a positive safe integer. |
+| `PAYLOAD_TOO_LARGE_ERROR` | `const PAYLOAD_TOO_LARGE_ERROR: 'PAYLOAD_TOO_LARGE'` | Error code carried by the JSON body of a `413` body-limit rejection. |
+
+The builder form is `createService(...).withBodyLimit({ maxBytes })` and the preset form is
+`defineService(router, { bodyLimit: { maxBytes } })`. A request that declares `Content-Length` is
+rejected from the header. A chunked request is counted as it streams and rejected once it passes
+the limit, so at most `maxBytes` plus one chunk is buffered. The rejection body is a
+`PayloadTooLargeResponse`: `{ error: 'PAYLOAD_TOO_LARGE', message, maxBytes }`. There is no read
+timeout.
+
+### Pipeline order
+
+`defineService` and a builder chain installed in the same order produce this request pipeline:
+
+| Order | Stage | Installed by |
+| --- | --- | --- |
+| 1 | Tracing | always, at construction |
+| 2 | CORS | `withCors()` |
+| 3 | Request logging | `withLogger()` |
+| 4 | Caller middleware, in order | `use()` / `DefineServiceOptions.middleware` |
+| 5 | Authentication, then authorization | `withAuthn()` / `withAuthz()`, installed by `build()` |
+| 6 | Request-body limit | `withBodyLimit()` / `DefineServiceOptions.bodyLimit`, installed by `build()` |
+| 7 | OpenAPI spec, docs, RPC and OpenAPI projections, custom routes | `build()` |
+
+`use()` registers middleware immediately, so builder middleware runs in call order relative to
+`withCors()` and `withLogger()`. It always runs before the stages that `build()` installs. A
+rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
+
 ## Error and routing handlers
 
 | Symbol | Signature | Description |
@@ -81,7 +113,9 @@ construction.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `ServiceConfig` | interface | Service configuration options (input to `createService`). |
-| `DefineServiceOptions` | interface | Options for the `defineService` preset. |
+| `DefineServiceOptions` | interface | Options for the `defineService` preset, including `middleware` (caller middleware after CORS and logging, before auth) and the opt-in `bodyLimit`. |
+| `ServiceBodyLimitOptions` | interface | `{ maxBytes }` request-body limit accepted by `withBodyLimit()` and `DefineServiceOptions.bodyLimit`. |
+| `PayloadTooLargeResponse` | interface | JSON body of a `413` body-limit rejection: `{ error: 'PAYLOAD_TOO_LARGE', message, maxBytes }`. |
 | `ServeOptions` | interface | Options for starting a service listener. |
 | `CorsOptions` | interface | CORS options supported by `withCors()`. |
 | `OpenAPIConfig` | interface | Configuration for OpenAPI spec generation. |
