@@ -440,6 +440,7 @@ decision (403 when denied). Authorized calls succeed. Without enabled auth, the 
 records a greppable public opt-out with a reason explaining how to protect it. Lifecycle commands
 reconcile scaffold-owned opt-outs; authored policies remain authoritative, and `generate aspire`
 leaves authored inputs unchanged.
+
 This policy requirement applies to the preset; lower-level `createService()` callers still compose
 their middleware explicitly.
 
