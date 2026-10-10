@@ -1,3 +1,8 @@
+import {
+  resolveSagaStoreBackend,
+  SAGA_STORE_BACKEND_ENV,
+} from '@netscript/plugin-sagas-core/stores';
+import { loadSagaRetention } from './load-saga-retention.ts';
 import type { SagaDefinition } from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
@@ -58,6 +63,10 @@ type SagaRunnerBootstrap = Readonly<{
   createPluginServiceContext(pluginName: string): Promise<
     Readonly<{
       db: Readonly<{ getClient(): Promise<unknown> }>;
+      env?: Readonly<Record<string, string | undefined>>;
+      appsettings?: unknown;
+      settings?: unknown;
+      config?: unknown;
     }>
   >;
 }>;
@@ -174,9 +183,27 @@ async function resolveProjection(
   const imported = await import(bootstrapModule) as SagaRunnerBootstrap;
   const context = await imported.createPluginServiceContext('sagas');
   const client = await context.db.getClient();
+  const retention = await loadSagaRetention();
+  const configuredBackend = context.env?.[SAGA_STORE_BACKEND_ENV] ??
+    readEnv(SAGA_STORE_BACKEND_ENV);
+  const appsettings = context.appsettings ?? context.settings ?? context.config;
+  const querySource = configuredBackend === undefined && appsettings === undefined
+    ? 'kv'
+    : resolveSagaStoreBackend({
+      env: { [SAGA_STORE_BACKEND_ENV]: configuredBackend },
+      appsettings,
+    });
+  const kvProjection = new KvSagaInstanceProjection(undefined, retention.completedDays);
   const readModelProjection = isProjectionClient(client)
-    ? new PrismaSagaInstanceProjection(client)
-    : new KvSagaInstanceProjection();
+    ? new CompositeSagaInstanceProjection([
+      kvProjection,
+      new PrismaSagaInstanceProjection(
+        client,
+        retention.archiveToDb,
+        querySource,
+      ),
+    ])
+    : kvProjection;
   return withStreamProjection(readModelProjection);
 }
 

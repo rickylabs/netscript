@@ -21,6 +21,8 @@ export type TriggerRuntimeKvStoreOptions = Readonly<{
   kv: KvStore;
   prefix?: KvKey;
   now?: () => Date;
+  /** Terminal event and DLQ retention, in days; defaults to seven days. */
+  kvRetentionDays?: number | ((triggerId: string) => number);
 }>;
 
 /** Open the shared KV adapter used by production trigger runtime stores. */
@@ -33,20 +35,29 @@ export class KvTriggerEventStore implements TriggerEventStorePort {
   readonly #kv: KvStore;
   readonly #prefix: KvKey;
   readonly #now: () => Date;
+  readonly #retention: number | ((triggerId: string) => number);
 
   /** Create an event store over the supplied KV adapter. */
   constructor(options: TriggerRuntimeKvStoreOptions) {
     this.#kv = options.kv;
     this.#prefix = options.prefix ?? DEFAULT_TRIGGER_KV_PREFIX;
     this.#now = options.now ?? (() => new Date());
+    this.#retention = options.kvRetentionDays ?? 7;
   }
 
   /** Persist or replace a trigger event. */
   async save(event: TriggerEvent): Promise<void> {
-    await requireAtomic(this.#kv)([], [
-      { type: 'set', key: this.#eventKey(event.id), value: event },
-      { type: 'set', key: this.#triggerEventKey(event.triggerId, event.id), value: event.id },
-    ]);
+    const expireIn = ['completed', 'failed', 'dlq'].includes(event.status)
+      ? remainingRetention(this.#retention, event.triggerId, event.updatedAt, this.#now())
+      : undefined;
+    const keys = [this.#eventKey(event.id), this.#triggerEventKey(event.triggerId, event.id)];
+    const mutations: AtomicMutation[] = expireIn !== undefined && expireIn <= 0
+      ? keys.map((key) => ({ type: 'delete', key }))
+      : [
+        { type: 'set', key: keys[0]!, value: event, expireIn },
+        { type: 'set', key: keys[1]!, value: event.id, expireIn },
+      ];
+    await requireAtomic(this.#kv)([], mutations);
   }
 
   /** Load a trigger event by id. */
@@ -175,19 +186,33 @@ export class KvTriggerIdempotencyStore implements TriggerIdempotencyPort {
 export class KvTriggerDlqStore implements TriggerDlqPort {
   readonly #kv: KvStore;
   readonly #prefix: KvKey;
+  readonly #now: () => Date;
+  readonly #retention: number | ((triggerId: string) => number);
 
   /** Create a DLQ store over the supplied KV adapter. */
   constructor(options: TriggerRuntimeKvStoreOptions) {
     this.#kv = options.kv;
     this.#prefix = options.prefix ?? DEFAULT_TRIGGER_KV_PREFIX;
+    this.#now = options.now ?? (() => new Date());
+    this.#retention = options.kvRetentionDays ?? 7;
   }
 
   /** Enqueue a failed trigger event into the DLQ. */
   async enqueue(entry: TriggerDlqEntry): Promise<void> {
-    await requireAtomic(this.#kv)([], [
-      { type: 'set', key: this.#entryKey(entry.id), value: entry },
-      { type: 'set', key: this.#triggerEntryKey(entry.triggerId, entry.id), value: entry.id },
-    ]);
+    const expireIn = remainingRetention(
+      this.#retention,
+      entry.triggerId,
+      entry.failedAt,
+      this.#now(),
+    );
+    const keys = [this.#entryKey(entry.id), this.#triggerEntryKey(entry.triggerId, entry.id)];
+    const mutations: AtomicMutation[] = expireIn <= 0
+      ? keys.map((key) => ({ type: 'delete', key }))
+      : [
+        { type: 'set', key: keys[0]!, value: entry, expireIn },
+        { type: 'set', key: keys[1]!, value: entry.id, expireIn },
+      ];
+    await requireAtomic(this.#kv)([], mutations);
   }
 
   /** List DLQ entries matching the supplied filter. */
@@ -265,4 +290,19 @@ async function payloadHash(payload: unknown): Promise<string> {
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('');
   return `sha256:${hex}`;
+}
+
+function remainingRetention(
+  retention: number | ((triggerId: string) => number),
+  triggerId: string,
+  settledAt: string,
+  now: Date,
+): number {
+  const days = typeof retention === 'number' ? retention : retention(triggerId);
+  if (!Number.isFinite(days) || days <= 0) {
+    throw new RangeError('Trigger kvRetentionDays must be positive and finite.');
+  }
+  const settled = Date.parse(settledAt);
+  if (!Number.isFinite(settled)) throw new TypeError('Trigger settled timestamp must be valid.');
+  return settled + days * 86_400_000 - now.getTime();
 }
