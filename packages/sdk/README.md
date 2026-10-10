@@ -341,7 +341,7 @@ and Linux apply on relaunch.
 | `.`              | Side-effect-free `defineServices` plus common non-cache surfaces                  |
 | `./presets`      | Browser-safe `defineServices` and its package-owned type closure                  |
 | `./client`       | service clients, contribution definitions, redacted errors                        |
-| `./discovery`    | `getServiceUrl`, `getServiceInfo`, `getPostgresConnection`, `getKvConnection`, …  |
+| `./discovery`    | `getServiceUrl`, `resolveServiceUrlFromSources`, `getPostgresConnection`, …       |
 | `./query`        | `createQueryFactory`, `createQueryFactories`, `createCompositeQuery`              |
 | `./query-client` | `createNetScriptQueryClient`, `createServiceQueryUtils`, `createKvCachePersister` |
 | `./cache`        | `KvCacheStore`, `cacheQuery`, explicit cache-provider wiring                      |
@@ -364,10 +364,37 @@ POST-only transport. Request contributions receive procedure path, metadata, inp
 projection, signal, and the resolved destination; they never receive the HTTP method or control
 retry, deduplication, tracing, fetch, or link plugins.
 
+## Service URL resolution
+
+By default a service client resolves its origin on each call through `getServiceUrl`, which reads
+Vite `import.meta.env` and then `Deno.env`. A runtime with neither, such as React Native, passes its
+own `resolveServiceUrl(serviceName, protocol)` callback. The client keeps only the origin of the
+returned URL and appends its RPC path. To keep Aspire's key names, compose the pure
+`resolveServiceUrlFromSources` from `./discovery` over an explicit environment bag; it reads no
+runtime global and returns `undefined` instead of throwing.
+
+```ts
+import { createServiceClient } from '@netscript/sdk/client';
+import { resolveServiceUrlFromSources } from '@netscript/sdk/discovery';
+import { ordersContract } from './contracts/orders.ts';
+
+const browserEnv = { VITE_ORDERS_URL: 'https://api.example.com' };
+
+const orders = createServiceClient({
+  contract: ordersContract,
+  serviceName: 'orders',
+  resolveServiceUrl: (serviceName, protocol) => {
+    const url = resolveServiceUrlFromSources(serviceName, protocol, 0, { browserEnv });
+    if (url === undefined) throw new Error(`No URL configured for "${serviceName}"`);
+    return url;
+  },
+});
+```
+
 The deprecated client-level `port` and `timeout` options remain accepted for source compatibility
-but are intentional no-ops. Configure explicit addresses through service discovery instead of
-`port`, and pass a per-call `AbortSignal` instead of `timeout`. Neither option changes discovery,
-dispatch, or cancellation behavior.
+but are intentional no-ops. Configure explicit addresses through service discovery instead of `port`
+(or `resolveServiceUrl` where no environment exists), and pass a per-call `AbortSignal` instead of
+`timeout`. Neither option changes discovery, dispatch, or cancellation behavior.
 
 ## Docs
 
