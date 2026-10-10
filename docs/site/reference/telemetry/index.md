@@ -165,6 +165,11 @@ published in [`convention.md`](./convention/).
 
 Span builders and recorders for workers, queues, schedulers, SSE, and job dispatch.
 
+`TracedQueue.listen` delivers a `TracedQueueMessageContext`, which extends `TracedMessageContext`
+with a required consumer `span`. Use `ctx.span.setAttribute('job.id', message.jobId)` inside the
+callback to annotate that active span. Plain `MessageQueue` handlers remain compatible, and the
+shared `TracedMessageContext` retains its optional span for other consumers.
+
 | Symbol                                                | Signature                                                                        | Description                                        |
 | ----------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------- |
 | `startWorkerSpan`                                     | `function startWorkerSpan(config): Span`                                         | Start a worker span.                               |
