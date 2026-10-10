@@ -8,66 +8,64 @@ oldUrl: /how-to/add-a-service/
 
 # Add a service
 
-**Goal:** add a new typed oRPC service to an existing NetScript workspace — define
-its contract, implement the handlers, serve it with `defineService`, and confirm it
-answers on its own port over both its OpenAPI surface and the `/api/rpc/*` RPC endpoint
-that typed clients call.
+**Goal:** add a new typed oRPC service to an existing NetScript workspace — define its contract,
+implement the handlers, serve it with `defineService`, and confirm it answers on its own port over
+both its OpenAPI surface and the `/api/rpc/*` RPC endpoint that typed clients call.
 
-This is a task-oriented recipe. It assumes you already have a NetScript workspace
-(created with `netscript init`) and that the `netscript` command is on your path. If
-you want the guided, build-up-from-scratch version that explains _why_ each piece
-exists — contract to typed client to a Fresh island — follow the
-[Build a service tutorial](/tutorials/storefront/02-catalog-service/) instead. For the full generated
-API of the service runtime, see the [`@netscript/service` reference](/reference/service/);
-for the concept behind contract-first wiring, read
-[Contracts, explained](/explanation/contracts/).
+This is a task-oriented recipe. It assumes you already have a NetScript workspace (created with
+`netscript init`) and that the `netscript` command is on your path. If you want the guided,
+build-up-from-scratch version that explains _why_ each piece exists — contract to typed client to a
+Fresh island — follow the [Build a service tutorial](/tutorials/storefront/02-catalog-service/)
+instead. For the full generated API of the service runtime, see the
+[`@netscript/service` reference](/reference/service/); for the concept behind contract-first wiring,
+read [Contracts, explained](/explanation/contracts/).
 
 A NetScript service is contract-first: a service is the runtime that _implements_ an
-`@orpc/contract` definition. You author the contract once (route + zod input/output),
-`implement()` it, bind `.handler()`s, then hand the resulting router to
-`defineService(...)`. The same contract object is what a typed client imports, so the
-service and its callers cannot drift.
+`@orpc/contract` definition. You author the contract once (route + zod input/output), `implement()`
+it, bind `.handler()`s, then hand the resulting router to `defineService(...)`. The same contract
+object is what a typed client imports, so the service and its callers cannot drift.
 
-{{ comp callout { type: "note", title: "Two ways to construct a service" } }}
-Workspace services use <code>defineService(router, options)</code> — one call, an options
-object, the right default for the 80% case. NetScript <strong>plugin</strong> API services
-(workers, sagas, triggers, auth) instead use the fluent
+{{ comp callout { type: "note", title: "Two ways to construct a service" } }} Workspace services use
+<code>defineService(router, options)</code> — one call, an options object, the right default for the
+80% case. NetScript <strong>plugin</strong> API services (workers, sagas, triggers, auth) instead
+use the fluent
 <code>createService(router, options).withCors().withDatabase(db).withRPC().serve({ port })</code>
-builder when they need to layer CORS, OpenAPI, a database client, authn/authz, or custom
-context step by step. Both stand up the same Hono + oRPC runtime and advertise the identical
-<code>/api/rpc/*</code> endpoint; this recipe uses <code>defineService</code>.
-{{ /comp }}
+builder when they need to layer CORS, OpenAPI, a database client, authn/authz, or custom context
+step by step. Both stand up the same Hono + oRPC runtime and advertise the identical
+<code>/api/rpc/*</code> endpoint; this recipe uses <code>defineService</code>. {{ /comp }}
 
 ## Before you start
 
-{{ comp.apiTable({
-caption: "Prerequisites",
-rows: [
-{ name: "A NetScript workspace", type: "netscript init", desc: "An existing project on disk. If you do not have one, scaffold it first — see the tutorials. Run commands from the workspace root." },
-{ name: "The netscript CLI", type: "on your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + " — then confirm with netscript --help." },
-{ name: "A contracts workspace", type: "contracts/", desc: "The init scaffold ships a shared contracts/ workspace exposed as the @<project>/contracts import alias. New services add their contract here so clients can import it." },
-{ name: "A free port", type: "Randomized by default", desc: "Standalone services, plugin APIs, and apps are allocated stable high-range ports (>= 49152) at scaffold time to avoid collision. The exact ports are written to your appsettings.json." }
-]
-}) }}
+{{ comp.apiTable({ caption: "Prerequisites", rows: [ { name: "A NetScript workspace", type:
+"netscript init", desc: "An existing project on disk. If you do not have one, scaffold it first —
+see the tutorials. Run commands from the workspace root." }, { name: "The netscript CLI", type: "on
+your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript
+jsr:@netscript/cli" + releaseSpecifier + " — then confirm with netscript --help." }, { name: "A
+contracts workspace", type: "contracts/", desc: "The init scaffold ships a shared contracts/
+workspace exposed as the @<project>/contracts import alias. New services add their contract here so
+clients can import it." }, { name: "A free port", type: "Randomized by default", desc: "Standalone
+services, plugin APIs, and apps are allocated stable high-range ports (>= 49152) at scaffold time to
+avoid collision. The exact ports are written to your appsettings.json." } ] }) }}
 
-This recipe adds a service named `users` on its assigned port, mirroring the example the
-scaffold ships, so every path and code shape below matches a real generated workspace.
-Substitute your own name and port where you see them.
+This recipe adds a service named `users` on its assigned port, mirroring the example the scaffold
+ships, so every path and code shape below matches a real generated workspace. Substitute your own
+name and port where you see them.
 
 ## Step 1 — Scaffold the service (or add one at init time)
 
-The fastest path is to let the CLI scaffold a service workspace for you. If you are
-creating a brand-new project, pass the service flags straight to `netscript init`:
+The fastest path is to let the CLI scaffold a service workspace for you. If you are creating a
+brand-new project, pass the service flags straight to `netscript init`:
 
 ```bash
 netscript init my-app --db postgres --service --service-name users --yes
 ```
 
-`--db postgres` is the recommended default; swap it for `mysql`, `mssql`, or `sqlite` to scaffold a different Prisma-backed engine (`sqlite` is file-backed and runs without an Aspire container).
+`--db postgres` is the recommended default; swap it for `mysql`, `mssql`, or `sqlite` to scaffold a
+different Prisma-backed engine (`sqlite` is file-backed and runs without an Aspire container).
 
-To add a service to a workspace that already exists, use the `netscript service add`
-subcommand with the `--name` and `--port` flags (the `service` group also has `list` and
-`generate` subcommands; `service generate` only regenerates Aspire helper files):
+To add a service to a workspace that already exists, use the `netscript service add` subcommand with
+the `--name` and `--port` flags (the `service` group also has `list` and `generate` subcommands;
+`service generate` only regenerates Aspire helper files):
 
 ```bash
 # from the workspace root
@@ -96,12 +94,13 @@ The generated service includes a colocated `*_test.ts` module; `deno task test` 
 running database. See [Service layout](/services-sdk/service-layout/) for exact filenames, the
 collapse decision table, and migration from an existing service.
 
-{{ comp callout { type: "tip", title: "Naming and the import alias" } }}
-The service name (<code>users</code>) becomes the workspace folder under <code>services/</code> and the
-service's reported <code>name</code>. Its contract lives in the shared <code>contracts/</code> workspace and is
-imported through the <code>@&lt;project&gt;/contracts</code> alias (for the example project that is
-<code>@my-app/contracts</code>) — never via a relative <code>../../contracts</code> path.
-{{ /comp }}
+{{ comp callout { type: "tip", title: "Naming and the import alias" } }} The service name
+(<code>users</code>) becomes the workspace folder under <code>services/</code> and the service's
+reported <code>name</code>. Its contract lives in the shared <code>contracts/</code> workspace and
+is imported through the <code>@&lt;project&gt;/contracts</code> alias (for the example project that
+is
+<code>@my-app/contracts</code>) — never via a relative <code>../../contracts</code> path. {{ /comp
+}}
 
 ## Step 2 — Define the contract
 
@@ -121,9 +120,9 @@ netscript contract inspect users --json
 ```
 
 The command appends an `@orpc/contract` + Zod route to the existing
-`contracts/versions/v1/users.contract.ts`; retain its generated schemas, types and procedures.
-The module calls `implement()` so each procedure is ready for `.handler()` binding. The equivalent
-new procedure declaration is:
+`contracts/versions/v1/users.contract.ts`; retain its generated schemas, types and procedures. The
+module calls `implement()` so each procedure is ready for `.handler()` binding. The equivalent new
+procedure declaration is:
 
 ```ts
 import { z } from 'zod';
@@ -149,15 +148,14 @@ export { UsersContractV1, UsersV1 };
 export const v1 = { users: UsersV1 };
 ```
 
-{{ comp callout { type: "important", title: "Contract is the source of truth" } }}
-Each route is <code>oc.route({ method }).input(zod).output(zod)</code>. Calling
-<code>implement(UsersContractV1)</code> produces the object whose <code>.handler()</code> the service
-binds — and the very same contract is what a typed client imports. Change the schema in one
-place and both the service handler and every caller fail to type-check until they agree.
-{{ /comp }}
+{{ comp callout { type: "important", title: "Contract is the source of truth" } }} Each route is
+<code>oc.route({ method }).input(zod).output(zod)</code>. Calling
+<code>implement(UsersContractV1)</code> produces the object whose <code>.handler()</code> the
+service binds — and the very same contract is what a typed client imports. Change the schema in one
+place and both the service handler and every caller fail to type-check until they agree. {{ /comp }}
 
-For a breaking schema change, promote the contract instead of editing v1 in place. This creates
-the v2 aggregate and updates the root contract exports:
+For a breaking schema change, promote the contract instead of editing v1 in place. This creates the
+v2 aggregate and updates the root contract exports:
 
 ```bash
 netscript contract version add users --from v1 --to v2
@@ -219,9 +217,9 @@ use-case. Generation of the use-case alongside its thin binding is tracked in
 ## Step 4 — Serve it with `defineService`
 
 `netscript service add` already creates this entry point and registers it in appsettings and the
-Deno workspace; `netscript service generate` can regenerate Aspire helpers after later config
-edits. The service entry point passes the router to `defineService(...)`. The port reads from
-the `PORT` env var with a literal fallback so the same code runs locally and under Aspire.
+Deno workspace; `netscript service generate` can regenerate Aspire helpers after later config edits.
+The service entry point passes the router to `defineService(...)`. The port reads from the `PORT`
+env var with a literal fallback so the same code runs locally and under Aspire.
 
 With auth installed, the shared verifier lives at the workspace root:
 
@@ -271,17 +269,18 @@ scaffold policy through the generated `auth/service.ts` browser authenticator an
 `createContractAuthorizer(router)`. `generate aspire` only regenerates helpers and leaves authored
 source and appsettings unchanged.
 
-`/health`, `/api/openapi.json` and `/api/docs` remain anonymous. Generated demo procedures explicitly
-declare `access: { authentication: 'none' }` in their contracts, so their REST and RPC calls stay
-public. A contract-protected procedure declaring `authentication: 'required'` returns 401 without a
-bearer session; a session denied by its contract authorization returns 403, and an authorized call
-returns 200. Declare the procedure's permissions in its contract; there is no service-wide
-`<service>:access` scope requirement. Authored policies remain authoritative.
+`/health`, `/api/openapi.json` and `/api/docs` remain anonymous. Generated demo procedures
+explicitly declare `access: { authentication: 'none' }` in their contracts, so their REST and RPC
+calls stay public. A contract-protected procedure declaring `authentication: 'required'` returns 401
+without a bearer session; a session denied by its contract authorization returns 403, and an
+authorized call returns 200. Declare the procedure's permissions in its contract; there is no
+service-wide `<service>:access` scope requirement. Authored policies remain authoritative.
 
 The browser authenticator uses the existing bearer-only remote verifier through the auth service's
 SDK; the guarded service holds no backend or provider secret. Fresh forwards the session bearer
-through an SDK contribution on the server. See the [auth model](/explanation/auth-model/#generated-browser-topology)
-and [authentication guide](/identity-access/how-to/add-authentication/) for the BFF topology.
+through an SDK contribution on the server. See the
+[auth model](/explanation/auth-model/#generated-browser-topology) and
+[authentication guide](/identity-access/how-to/add-authentication/) for the BFF topology.
 
 Renamed auth keys are not supported by `service add`; an inconsistent installed auth manifest
 produces a configuration error.
@@ -310,26 +309,26 @@ After installing auth, add a guarded service or update an existing public entryp
 guarded policy above. An authored service entrypoint is preserved unless you explicitly overwrite
 it.
 
-New services scaffolded by `netscript service add` opt into a 1 MiB `bodyLimit`. Raise
-`maxBytes` for a service that accepts larger payloads, such as base64 document uploads. Remove the
-line to accept unbounded bodies, which is how services created before this option behave.
+New services scaffolded by `netscript service add` opt into a 1 MiB `bodyLimit`. Raise `maxBytes`
+for a service that accepts larger payloads, such as base64 document uploads. Remove the line to
+accept unbounded bodies, which is how services created before this option behave.
 
 Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
 of truth is your `netscript.config.ts` `services.<name>.port` field, which the scaffold wires as the
 fallback default — set the port there rather than editing this line.
 
-`defineService` stands up the Hono + oRPC runtime, mounting your router under both an
-OpenAPI surface (`/api/v1/users/*`) and the RPC surface (`/api/rpc/v1/...`). The default
-RPC mount point is `/api/rpc` and the OpenAPI mount point is `/api`; both are overridable
-via the builder's `rpcPath` / `apiPath` options if you reach for `createService`.
+`defineService` stands up the Hono + oRPC runtime, mounting your router under both an OpenAPI
+surface (`/api/v1/users/*`) and the RPC surface (`/api/rpc/v1/...`). The default RPC mount point is
+`/api/rpc` and the OpenAPI mount point is `/api`; both are overridable via the builder's `rpcPath` /
+`apiPath` options if you reach for `createService`.
 
 To reverse this lifecycle, `netscript service remove users` removes the service workspace,
 appsettings/workspace registrations, paired contracts, and regenerated helpers. Pass
 `--keep-contract` when the API definition must remain published after the runtime is retired.
 
-{{ comp callout { type: "note", title: "Need CORS, a database, or auth? Use createService" } }}
-When a service must layer cross-cutting concerns, swap <code>defineService</code> for the fluent
-builder. Each step returns the builder, so you compose only what you need before
+{{ comp callout { type: "note", title: "Need CORS, a database, or auth? Use createService" } }} When
+a service must layer cross-cutting concerns, swap <code>defineService</code> for the fluent builder.
+Each step returns the builder, so you compose only what you need before
 <code>.serve({ port })</code>:
 
 <pre><code>const app = createService(router, { name: 'users', version: '1.0.0' })
@@ -341,14 +340,14 @@ builder. Each step returns the builder, so you compose only what you need before
 await app.serve({ port: 3001 }); // note: your scaffold's port will differ</code></pre>
 
 The authn/authz seam (<code>@netscript/service/auth</code>) is provider-agnostic — static-credential
-and trusted-header authenticators plus a scope authorizer ship built in. It is distinct from
-the auth <strong>plugin</strong> backends; see <a href="/capabilities/auth/">Authentication</a>.
-{{ /comp }}
+and trusted-header authenticators plus a scope authorizer ship built in. It is distinct from the
+auth <strong>plugin</strong> backends; see <a href="/capabilities/auth/">Authentication</a>. {{
+/comp }}
 
 ## Step 5 — Run and verify
 
-Start just this service workspace directly, or let `aspire start` orchestrate it alongside
-the rest of your resources:
+Start just this service workspace directly, or let `aspire start` orchestrate it alongside the rest
+of your resources:
 
 ```bash
 # run only the users service
@@ -367,35 +366,40 @@ curl -X POST http://localhost:<port>/api/rpc/v1/users/list \
   -H 'content-type: application/json' -d '{"limit":10}'
 ```
 
-A healthy service returns `{"status":"healthy","service":"users"}` from the health route
-and the seeded `items` array from `list`. A typed client imports `UsersContractV1` from
-`@my-app/contracts` and calls `.list(...)` with full input/output inference — no codegen,
-no drift.
+A healthy service returns `{"status":"healthy","service":"users"}` from the health route and the
+seeded `items` array from `list`. A typed client imports `UsersContractV1` from `@my-app/contracts`
+and calls `.list(...)` with full input/output inference — no codegen, no drift.
 
 {{ comp callout { type: "warning", title: "Production pitfalls" } }}
-<strong>Port collisions.</strong> Every service needs a distinct port. The scaffolder automatically allocates unique, high-range ports (>= 49152) at scaffold time. Read the port from <code>PORT</code> and let Aspire resolve it dynamically in orchestrated runs rather than hard-coding.<br>
+<strong>Port collisions.</strong> Every service needs a distinct port. The scaffolder automatically
+allocates unique, high-range ports (>= 49152) at scaffold time. Read the port from <code>PORT</code>
+and let Aspire resolve it dynamically in orchestrated runs rather than hard-coding.<br>
 <strong>RPC lives under <code>/api/rpc/&#42;</code>.</strong> The typed-client surface is
-<code>/api/rpc/&lt;version&gt;/&lt;router&gt;/&lt;procedure&gt;</code>, not a bare <code>/rpc</code>.
-The REST/OpenAPI surface is <code>/api/&#42;</code>. Point clients and smoke tests at the right one.<br>
-<strong>Contracts before handlers.</strong> Edit the contract first, then the handler — never
-the reverse. The contract is the shared truth; a handler that out-runs its contract silently
-breaks every client.<br>
+<code>/api/rpc/&lt;version&gt;/&lt;router&gt;/&lt;procedure&gt;</code>, not a bare
+<code>/rpc</code>. The REST/OpenAPI surface is <code>/api/&#42;</code>. Point clients and smoke
+tests at the right one.<br>
+<strong>Contracts before handlers.</strong> Edit the contract first, then the handler — never the
+reverse. The contract is the shared truth; a handler that out-runs its contract silently breaks
+every client.<br>
 <strong>Use the import alias.</strong> Import contracts via <code>@&lt;project&gt;/contracts</code>,
 not a relative path, so the service and its clients resolve the identical type.<br>
-<strong>No DB yet at this step.</strong> The scaffold handlers return seeded in-memory records.
-Wire persistence with the database recipe before you depend on durability.
-{{ /comp }}
+<strong>No DB yet at this step.</strong> The scaffold handlers return seeded in-memory records. Wire
+persistence with the database recipe before you depend on durability. {{ /comp }}
 
 ## See also
 
-{{ comp.featureGrid({ items: [
-{ title: "Tutorial: Build a service", body: "The guided, learning-oriented version — contract to typed client to a Fresh island, explained step by step.", href: "/tutorials/storefront/02-catalog-service/", icon: "→" },
-{ title: "Service API reference", body: "The full generated surface of defineService and createService — every option, builder method, and return type.", href: "/reference/service/", icon: "◆" },
-{ title: "Contracts, explained", body: "How an oRPC contract flows from service to typed client to UI without a codegen step.", href: "/explanation/contracts/", icon: "◎" },
-{ title: "Database & migration", body: "Replace the seeded in-memory records with real Prisma-backed persistence — Postgres is the recommended engine, or mysql / mssql / sqlite via --db — init, generate, seed (Aspire up first).", href: "/data-persistence/how-to/database-migration/", icon: "▣" }
-] }) }}
+{{ comp.featureGrid({ items: [ { title: "Tutorial: Build a service", body: "The guided,
+learning-oriented version — contract to typed client to a Fresh island, explained step by step.",
+href: "/tutorials/storefront/02-catalog-service/", icon: "→" }, { title: "Service API reference",
+body: "The full generated surface of defineService and createService — every option, builder method,
+and return type.", href: "/reference/service/", icon: "◆" }, { title: "Contracts, explained", body:
+"How an oRPC contract flows from service to typed client to UI without a codegen step.", href:
+"/explanation/contracts/", icon: "◎" }, { title: "Database & migration", body: "Replace the seeded
+in-memory records with real Prisma-backed persistence — Postgres is the recommended engine, or mysql
+/ mssql / sqlite via --db — init, generate, seed (Aspire up first).", href:
+"/data-persistence/how-to/database-migration/", icon: "▣" } ] }) }}
 
-Manage the service over its lifetime by editing its contract under `contracts/versions/`
-and re-running your workspace gates (`deno task check`). For the concepts behind
-contract-first services, read the [contracts explanation](/explanation/contracts/); for
-the capability overview, see [Services](/capabilities/services/).
+Manage the service over its lifetime by editing its contract under `contracts/versions/` and
+re-running your workspace gates (`deno task check`). For the concepts behind contract-first
+services, read the [contracts explanation](/explanation/contracts/); for the capability overview,
+see [Services](/capabilities/services/).
