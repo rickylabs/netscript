@@ -2783,3 +2783,31 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open; verification deferred because the implementation host is Linux.
 - **Closing gate:** Windows-backed tests prove stdin isolation/EOF, `.cmd`/`.bat` lookup with
   arguments, and that cancellation/timeout stop a cmd wrapper and its pipe-holding grandchild.
+
+## SDK/Fresh stream materializer convergence (#2100)
+
+- **ID:** `sdk-fresh-stream-materializer-convergence-2100`
+- **Reason:** `@netscript/sdk/streams/collections` materializes one State Protocol entity type with
+  `parse` and `getKey`, while `@netscript/fresh` `createNetScriptStreamDB` uses multi-type
+  `StateSchema` and `@durable-streams/state`. They share TanStack DB but duplicate the materializer
+  seam, with different URL/auth resolution, retry policy, readiness, failure, and disposal
+  contracts.
+- **Why deferred:** The injected Expo transport must remain DOM-independent. Replacing either
+  adapter without reconciling its schema and recovery semantics would change an existing consumer
+  contract; PR #2244 preserves both and documents their differences.
+- **Owner:** SDK and Fresh architecture maintainers / #2100.
+- **Target:** Before the 0.0.9 stable SDK release, no later than 2026-11-15.
+- **Plan:** Specify one platform-neutral entity/schema and lifecycle contract; reconcile auth/URL
+  resolution, replay, readiness, fatal failure, and finite retry policy explicitly. Move shared
+  materialization into one core seam with thin injected-transport SDK and Fresh adapters, preserving
+  the published single-type and multi-type entrypoints through compatibility adapters and migration
+  documentation. Do not make native consumers import Fresh or server telemetry.
+- **Linked change:** [PR #2244](https://github.com/rickylabs/netscript/pull/2244).
+- **Created:** 2026-10-10.
+- **Status:** Open; recorded for independent evaluator adjudication, no convergence claimed here.
+- **Closing gate:** Both adapters use the shared materializer and pass the same conformance matrix
+  for inserts/updates/deletes, schema/key validation, filtered live queries, control-committed
+  replay, reconnect without gaps/duplicates, preload/fatal errors, cancellation, and disposal.
+  Preserve the SDK non-DOM import-graph guard, Fresh schema/recovery tests, and Expo-pinned React
+  lifecycle tests; verify native Hermes/Expo acceptance separately before claiming cross-runtime
+  equivalence.

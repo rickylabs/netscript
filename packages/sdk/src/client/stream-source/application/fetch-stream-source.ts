@@ -5,6 +5,7 @@ import type {
 import type {
   FetchStreamEventSourceOptionsV1,
   FetchStreamEventSourceV1,
+  StreamFetchResponseV1,
 } from '../ports/fetch-stream-source.ts';
 import {
   createHeartbeatDeadline,
@@ -71,7 +72,7 @@ export class FetchStreamSource implements FetchStreamEventSourceV1 {
     }
   }
 
-  private async request(signal: AbortSignal): Promise<Response> {
+  private async request(signal: AbortSignal): Promise<StreamFetchResponseV1> {
     const auth = this.options.authHeaders
       ? await untilAborted(Promise.resolve(this.options.authHeaders(signal)), signal)
       : undefined;
