@@ -77,7 +77,11 @@ export const TRIGGER_TYPES = [
   'plugin',
 ] as const;
 
-/** Runtime modes used by worker runners. */
+/**
+ * Job-runner vocabulary retained for compatibility, not a runtime selector.
+ * Only `in-process` is implemented; `web-worker` and `subprocess` are reserved
+ * job-runner modes. Task executors support subprocess execution separately.
+ */
 export const WORKER_RUNTIMES = [
   'in-process',
   'web-worker',
@@ -119,7 +123,7 @@ export type JobExecutionType = (typeof JOB_EXECUTION_TYPES)[number];
 /** Source that triggered a job or task execution. */
 export type TriggerType = 'cron' | 'manual' | 'api' | 'event' | 'retry' | 'queue' | 'plugin';
 
-/** Runtime mode used by worker runners. */
+/** Job-runner vocabulary; only in-process is implemented, other values are reserved. */
 export type WorkerRuntime = (typeof WORKER_RUNTIMES)[number];
 
 /** Runtime enum value map backing {@link TaskTypeSchema}. */
