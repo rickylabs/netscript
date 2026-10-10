@@ -1,3 +1,4 @@
+import { loadSagaRetention } from './load-saga-retention.ts';
 import type { SagaDefinition } from '@netscript/plugin-sagas-core/domain';
 import {
   createSagaRuntime,
@@ -158,16 +159,19 @@ async function createDefaultRuntime(
 
   const native = withDefaultTelemetry(options.native);
   const kv = await openSagaRuntimeKv();
+  const retention = await loadSagaRetention();
   const durable = await createDurableSagaRuntime({
     backend: 'kv',
     kv,
+    completedRetentionDays: retention.completedDays,
     projection,
     native: {
       ...native,
       idempotency: native.idempotency ?? new KvSagaIdempotencyStore({ kv }),
       engineOptions: {
         ...native.engineOptions,
-        appliedKeys: native.engineOptions?.appliedKeys ?? new KvSagaAppliedKeyStore({ kv }),
+        appliedKeys: native.engineOptions?.appliedKeys ??
+          new KvSagaAppliedKeyStore({ kv, completedRetentionDays: retention.completedDays }),
       },
     },
   });

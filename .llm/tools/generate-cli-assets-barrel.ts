@@ -15,6 +15,7 @@ import { TEMPLATE_MANIFEST } from '../../packages/cli/src/kernel/assets/manifest
 import { freshUiRegistryManifest } from '../../packages/fresh-ui/registry.manifest.ts';
 import { PLUGIN_SKELETON_TEMPLATES } from '../../packages/plugin/src/kernel/assets/template-registry.ts';
 import { AGENT_DOCS_PAGE_CARRIER, readAgentDocsPages } from './docs/agent-docs-page-carrier.ts';
+import { renderPostgresConnectionTemplate } from './generate-postgres-connection-template.ts';
 
 const CLI_OUTPUT_URL = new URL(
   '../../packages/cli/src/kernel/assets/embedded.generated.ts',
@@ -486,6 +487,14 @@ if (import.meta.main) {
   const unknownArgs = Deno.args.filter((arg) => arg !== '--check');
   if (unknownArgs.length > 0) throw new Error(`Unknown argument: ${unknownArgs[0]}`);
 
+  await writeOrCheckGeneratedAsset(
+    new URL(
+      '../../packages/cli/src/kernel/assets/generated/database/postgres-connection-string.ts.template',
+      import.meta.url,
+    ),
+    await formatTypeScript(await renderPostgresConnectionTemplate()),
+    check,
+  );
   await writeOrCheckGeneratedAsset(
     CLI_OUTPUT_URL,
     await formatTypeScript(await renderCliEmbeddedContent()),

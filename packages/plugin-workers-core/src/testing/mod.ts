@@ -58,3 +58,5 @@ export type {
   WorkersRuntimeOptions,
   WorkflowId,
 } from '../runtime/mod.ts';
+
+export type { JobFailure, JobSuccess } from '../domain/job-result.ts';

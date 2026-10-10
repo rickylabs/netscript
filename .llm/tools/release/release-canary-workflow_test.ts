@@ -157,9 +157,9 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
     '.llm/tools/release/run-publish.ts --dry-run',
     '.llm/tools/release/run-publish.ts --preflight',
     '.llm/tools/release/run-publish.ts\n',
-    'deno task release:canary-label',
     'return_run_details=true',
     'bash .llm/tools/release/watch-canary-e2e.sh "$E2E_RUN_ID"',
+    'deno task release:canary-label',
     '-f state=success',
   ];
   let previous = -1;
@@ -205,6 +205,13 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
   assertStringIncludes(source, 'test "$version" != "null"');
   assertStringIncludes(source, '--published-version "$CANARY_VERSION"');
   assertStringIncludes(source, '--head "$SOURCE_SHA"');
+  const notesStep = source.slice(
+    source.indexOf('- name: Label published canary'),
+    source.indexOf('- name: Delete ephemeral'),
+  );
+  assertStringIncludes(notesStep, "if: always() && steps.publish.outcome == 'success'");
+  assertStringIncludes(notesStep, '--production-e2e-outcome "$E2E_OUTCOME"');
+
   const cutStep = source.slice(
     source.indexOf('- name: Cut ephemeral canary branch and tag'),
     source.indexOf('- name: Verify same-semver canary republish'),
@@ -247,6 +254,7 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
     'openhands-agent.yml',
     'openhands-phase-eval.yml',
     'pages.yml',
+    'pr-metadata-gates.yml',
     'publish.yml',
     'release-canary.yml',
     'surface-diff.yml',
@@ -343,6 +351,13 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
       classification: 'ref-templated / repo-wide literal',
       cancelInProgress: false,
       queue: 'max',
+    },
+    {
+      workflow: 'pr-metadata-gates.yml',
+      scope: 'workflow',
+      group: 'pr-metadata-gates-${{ github.event.pull_request.number }}',
+      classification: 'entity-keyed',
+      cancelInProgress: true,
     },
     {
       workflow: 'release-canary.yml',

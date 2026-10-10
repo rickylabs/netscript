@@ -44,6 +44,7 @@ export const PUBLISH_ASSET_OUTPUTS: readonly string[] = [
   'packages/cli/src/kernel/assets/agent-tools.generated.ts',
   'packages/cli/src/kernel/assets/agent-docs.generated.ts',
   'packages/cli/src/kernel/assets/embedded.generated.ts',
+  'packages/cli/src/kernel/assets/generated/database/postgres-connection-string.ts.template',
   'packages/cli/src/kernel/assets/skills.generated.ts',
   'packages/plugin/src/kernel/assets/embedded.generated.ts',
   'packages/fresh-ui/registry.generated.ts',

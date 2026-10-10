@@ -241,7 +241,14 @@ function appBlock(generated: string, name: string): string {
   const blockStart = generated.lastIndexOf('  // --- app ', registrationIndex);
   const nextBlock = generated.indexOf('\n\n  // --- app ', registrationIndex);
   const returnIndex = generated.indexOf(RETURN_APPS_MARKER, blockStart);
-  const blockEnd = nextBlock >= 0 && nextBlock < returnIndex ? nextBlock + 2 : returnIndex;
+  // The final app block ends before workspace-wide environment wiring. Copying that
+  // epilogue would reapply the CORS policy for each fixture and duplicate local bindings.
+  const workspaceIndex = generated.indexOf('  // Workspace web origins', blockStart);
+  const blockEnd = Math.min(
+    nextBlock >= 0 ? nextBlock + 2 : returnIndex,
+    workspaceIndex >= 0 ? workspaceIndex : returnIndex,
+    returnIndex,
+  );
   if (blockStart < 0 || blockEnd < 0) {
     throw new Error(`generator did not emit ${name} fixture block`);
   }

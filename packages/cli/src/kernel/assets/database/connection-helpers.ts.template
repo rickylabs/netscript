@@ -5,50 +5,10 @@ function normalizeDatabaseUrl(value: string): string {
 /* @netscript-provider:end */
 
 /* @netscript-provider:postgres */
+/* @netscript-inline:postgres-connection-string */
+
 function normalizeDatabaseUrl(value: string): string {
-  return normalizePostgresUrl(value.trim());
-}
-
-function normalizePostgresUrl(value: string): string {
-  if (/^(postgres|postgresql):\/\//i.test(value)) {
-    return value;
-  }
-
-  const parts = parseConnectionParts(value);
-  const username = encodeURIComponent(
-    readConnectionPart(parts, ['username', 'user id', 'uid'], 'postgres'),
-  );
-  const password = encodeURIComponent(readConnectionPart(parts, ['password', 'pwd'], ''));
-  const host = readConnectionPart(parts, ['host', 'server'], 'localhost');
-  const port = readConnectionPart(parts, ['port'], '5432');
-  const database = readConnectionPart(parts, ['database'], 'postgres');
-  return `postgres://${username}:${password}@${host}:${port}/${database}`;
-}
-
-function parseConnectionParts(value: string): Record<string, string> {
-  const parts: Record<string, string> = {};
-  for (const segment of value.split(';')) {
-    const trimmed = segment.trim();
-    if (!trimmed) continue;
-    const separatorIndex = trimmed.indexOf('=');
-    if (separatorIndex < 0) continue;
-    parts[trimmed.slice(0, separatorIndex).trim().toLowerCase()] = trimmed
-      .slice(separatorIndex + 1)
-      .trim();
-  }
-  return parts;
-}
-
-function readConnectionPart(
-  parts: Record<string, string>,
-  keys: readonly string[],
-  fallback: string,
-): string {
-  for (const key of keys) {
-    const value = parts[key];
-    if (value) return value;
-  }
-  return fallback;
+  return normalizePostgresConnectionString(value.trim());
 }
 /* @netscript-provider:end */
 
