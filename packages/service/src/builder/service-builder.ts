@@ -9,7 +9,10 @@
  *
  * @example
  * ```typescript
- * import { createService } from '@netscript/service';
+ * import { createService, type Database, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ * declare const db: Database;
  *
  * const running = await createService(router, { name: 'users', version: '1.0.0' })
  *   .withCors()
@@ -236,6 +239,10 @@ export interface ServiceBuilder<
  *
  * @example
  * ```typescript
+ * import type { ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ *
  * const running = await createService(router, { name: 'users', version: '1.0.0' })
  *   .withCors()
  *   .withLogger()

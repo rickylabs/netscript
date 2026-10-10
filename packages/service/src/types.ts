@@ -69,6 +69,11 @@ export type ShutdownReason = 'signal' | 'manual' | 'startup-failure';
  *
  * @example
  * ```typescript
+ * import { createService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ * declare const audit: { record(entry: ShutdownContext): void };
+ *
  * createService(router, { name: 'users' })
  *   .onShutdown(({ reason, signal }) => {
  *     audit.record({ reason, signal });
@@ -88,6 +93,8 @@ export interface ShutdownContext {
  *
  * @example
  * ```typescript
+ * declare const db: { $disconnect(): Promise<void> };
+ *
  * const closeDatabase: ShutdownHook = async () => {
  *   await db.$disconnect();
  * };
@@ -164,6 +171,10 @@ export interface ServiceTlsOptions {
  *
  * @example
  * ```typescript
+ * import { createService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ *
  * const running = await createService(router, { name: 'users' })
  *   .withHealth()
  *   .serve({

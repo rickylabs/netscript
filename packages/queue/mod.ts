@@ -16,6 +16,9 @@
  * import { createQueue, createTypedQueue } from '@netscript/queue';
  * import { z } from 'zod';
  *
+ * interface MyMessage { type: 'email' | 'sms'; to: string }
+ * declare function processMessage(message: MyMessage): Promise<void>;
+ *
  * // Simple queue (auto-discovers backend)
  * const queue = createQueue<MyMessage>('notifications');
  * await queue.enqueue({ type: 'email', to: 'user@example.com' });

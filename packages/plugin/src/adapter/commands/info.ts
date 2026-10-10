@@ -30,6 +30,10 @@ export interface RunInfoCommandOptions {
  *
  * @example
  * ```ts
+ * import type { NetScriptPlugin } from '@netscript/plugin/adapter';
+ *
+ * declare const plugin: NetScriptPlugin;
+ *
  * const info = runInfoCommand({ plugin });
  * console.log(info.kind);
  * ```

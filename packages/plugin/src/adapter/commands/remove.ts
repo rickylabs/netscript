@@ -15,6 +15,10 @@ export interface RunRemoveCommandOptions {
  *
  * @example
  * ```ts
+ * import type { NetScriptPlugin } from '@netscript/plugin/adapter';
+ *
+ * declare const plugin: NetScriptPlugin;
+ *
  * const result = runRemoveCommand({ plugin });
  * console.log(result.message);
  * ```

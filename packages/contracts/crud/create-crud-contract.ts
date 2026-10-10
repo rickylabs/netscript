@@ -416,6 +416,11 @@ export function createCrudContract<
  *
  * @example
  * ```typescript
+ * import { createReadOnlyContract } from '@netscript/contracts/crud';
+ * import { z } from 'zod';
+ *
+ * const AuditLogSchema = z.object({ id: z.number(), action: z.string() });
+ *
  * const auditLogsContract = createReadOnlyContract({
  *   resource: 'audit-logs',
  *   entitySchema: AuditLogSchema,
@@ -460,6 +465,11 @@ export function createReadOnlyContract<TEntity extends ContractSchemaLike<unknow
  *
  * @example
  * ```typescript
+ * import { createListOnlyContract } from '@netscript/contracts/crud';
+ * import { z } from 'zod';
+ *
+ * const StatsSchema = z.object({ metric: z.string(), value: z.number() });
+ *
  * const statsContract = createListOnlyContract({
  *   resource: 'stats',
  *   entitySchema: StatsSchema,

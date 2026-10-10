@@ -40,7 +40,9 @@
  *
  * @example Customize the builder before serving.
  * ```typescript
- * import { createService } from '@netscript/service';
+ * import { createService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
  *
  * const service = await createService(router, { name: 'custom' })
  *   .withCors({ origin: 'https://example.com' })
@@ -56,7 +58,11 @@
  *
  * @example Use health primitives directly in a host app.
  * ```typescript
- * import { createHealthHandler, healthChecks } from '@netscript/service';
+ * import type { Hono } from 'hono';
+ * import { createHealthHandler, type Database, healthChecks } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const db: Database;
  *
  * app.get('/health', createHealthHandler({
  *   checks: [healthChecks.database(db)],
