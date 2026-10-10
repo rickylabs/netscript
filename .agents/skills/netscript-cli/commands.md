@@ -40,7 +40,10 @@ Adds a versioned service contract to the workspace.
 
 ### `netscript contract list`
 
-Lists available contracts.
+Lists available contracts. Each contract is labelled `service directory present` or
+`no service directory`. That label comes from a `services/<name>/` filesystem check only: it is not
+evidence that a handler is registered or served. An unresolvable workspace, a missing contracts
+workspace, or a missing `--version` fails with an error rather than an empty listing.
 
 ## Databases
 

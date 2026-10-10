@@ -1,7 +1,11 @@
 import { assertEquals } from '@std/assert';
 import { implement, os } from '@orpc/server';
 import { baseContract, SuccessSchema } from '@netscript/contracts';
-import { createContractAuthorizer, createService } from '../../mod.ts';
+import {
+  type ContractAuthorizerRawRoute,
+  createContractAuthorizer,
+  createService,
+} from '../../mod.ts';
 import { createScopeAuthorizer } from '../../src/auth/scope-authorizer.ts';
 import { createStaticCredentialAuthenticator } from '../../src/auth/static-credential-authenticator.ts';
 import type { Principal } from '../../src/auth/types.ts';
@@ -167,4 +171,125 @@ Deno.test('builder binds one contract policy resolver to actual REST and RPC mou
     message: 'authz.missing-scope:users:read',
   });
   assertEquals(allowed.status, 200);
+});
+
+const rawRouteAuthenticator = createStaticCredentialAuthenticator({
+  credentials: {
+    user: { subject: 'user:operator', scopes: [], roles: ['operator'] },
+    worker: { subject: 'service:hermes-worker', scopes: [], roles: ['service'] },
+  },
+});
+
+function rawRouteApp(rawRoutes: readonly ContractAuthorizerRawRoute[]) {
+  const contract = {
+    readItem: baseContract
+      .route({ method: 'GET', path: '/items/{id}' })
+      .output(SuccessSchema)
+      .meta({ access: { authentication: 'required' } }),
+  };
+  const router = os.router({
+    readItem: implement(contract).readItem.handler(() => ({ success: true })),
+  });
+  const echoSubject = (c: unknown) => {
+    const ctx = c as { get(key: string): unknown; json(data: unknown): Response };
+    return ctx.json({ subject: (ctx.get('principal') as Principal).subject });
+  };
+  return createService(router, { name: 'raw-route-policy' })
+    .withRPC()
+    .withAuthn({ authenticator: rawRouteAuthenticator })
+    .withAuthz({ authorizer: createContractAuthorizer(contract, { rawRoutes }) })
+    .route('all', '/api/tools/mcp', echoSubject)
+    .route('all', '/api/tools/other', echoSubject)
+    .route('all', '/api/tools/mcp-admin', echoSubject)
+    .route('all', '/api/tools/mcp/nested', echoSubject)
+    .route('all', '/hooks/mcp', echoSubject)
+    .build();
+}
+
+const DECLARED_MCP: readonly ContractAuthorizerRawRoute[] = [
+  { path: '/api/tools/mcp', authentication: 'required' },
+];
+
+Deno.test('declared raw route under the contract authorizer serves an authenticated caller', async () => {
+  const app = rawRouteApp(DECLARED_MCP);
+
+  const response = await app.request('/api/tools/mcp', {
+    method: 'POST',
+    headers: { authorization: 'Bearer user' },
+  });
+
+  assertEquals(response.status, 200);
+  assertEquals(await response.json(), { subject: 'user:operator' });
+});
+
+Deno.test('declared raw route rejects an unauthenticated caller with 401', async () => {
+  const app = rawRouteApp([
+    ...DECLARED_MCP,
+    { path: '/hooks/mcp', authentication: 'required' },
+  ]);
+
+  for (const path of ['/api/tools/mcp', '/hooks/mcp']) {
+    const response = await app.request(path, { method: 'POST' });
+    assertEquals(response.status, 401, path);
+    assertEquals(await response.json(), {
+      error: 'UNAUTHORIZED',
+      message: 'missing-credential',
+    });
+  }
+});
+
+Deno.test('undeclared raw sibling stays denied with authz.no-contract-procedure', async () => {
+  const app = rawRouteApp(DECLARED_MCP);
+
+  const response = await app.request('/api/tools/other', {
+    method: 'POST',
+    headers: { authorization: 'Bearer user' },
+  });
+
+  assertEquals(response.status, 403);
+  assertEquals(await response.json(), {
+    error: 'FORBIDDEN',
+    message: 'authz.no-contract-procedure',
+  });
+});
+
+Deno.test('raw route declaration matches exactly, without prefix confusion', async () => {
+  const app = rawRouteApp(DECLARED_MCP);
+
+  for (const path of ['/api/tools/mcp-admin', '/api/tools/mcp/nested', '/api/tools']) {
+    const response = await app.request(path, {
+      method: 'POST',
+      headers: { authorization: 'Bearer user' },
+    });
+    assertEquals(response.status, 403, path);
+    assertEquals(await response.json(), {
+      error: 'FORBIDDEN',
+      message: 'authz.no-contract-procedure',
+    }, path);
+  }
+});
+
+Deno.test('declared raw route admits a service-identity bearer and enforces declared roles', async () => {
+  const app = rawRouteApp([{
+    path: '/api/tools/mcp',
+    authentication: 'required',
+    authorization: { roles: ['service'] },
+  }]);
+
+  const worker = await app.request('/api/tools/mcp', {
+    method: 'POST',
+    headers: { authorization: 'Bearer worker' },
+  });
+  const user = await app.request('/api/tools/mcp', {
+    method: 'POST',
+    headers: { authorization: 'Bearer user' },
+  });
+
+  assertEquals(worker.status, 200);
+  assertEquals(await worker.json(), { subject: 'service:hermes-worker' });
+  assertEquals(user.status, 403);
+  assertEquals(await user.json(), {
+    error: 'FORBIDDEN',
+    message: 'authz.missing-role:service',
+  });
 });

@@ -48,6 +48,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
   #documents = new Map<string, DocsDocument>();
   #aliases = new Map<string, string>();
   #guidance = new GuidanceIndex([]);
+  #fingerprint: string | undefined;
 
   /** Configure a corpus rooted at a public Markdown directory. */
   constructor(options: FilesystemDocsCorpusOptions) {
@@ -104,6 +105,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
     }
     const seen = new Set<string>();
     const sources: RawDocsSource[] = [];
+    const versions: string[] = [];
     for await (const path of walkDocsSources(rootReal)) {
       const relativePath = relative(rootReal, path);
       if (!isPublicDocsSource(relativePath) || !isPublicDocsPath(relativePath)) continue;
@@ -118,15 +120,18 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
         cached = { mtime, source };
         this.#cache.set(realPath, cached);
       }
-      sources.push({
-        slug: docsSlugFromPath(relativePath),
-        source: cached.source,
-      });
+      const slug = docsSlugFromPath(relativePath);
+      sources.push({ slug, source: cached.source });
+      versions.push(`${slug}\0${realPath}\0${mtime}`);
     }
     for (const path of this.#cache.keys()) if (!seen.has(path)) this.#cache.delete(path);
     if (sources.length === 0) {
       throw new DocsCorpusUnavailableError(this.#root);
     }
+    // Re-index only when a source was added, removed, renamed, or modified: parsing documents and
+    // building the guidance index (IDF table, link graph) is per corpus load, not per request.
+    const fingerprint = versions.join('\n');
+    if (fingerprint === this.#fingerprint) return;
     const { documents, aliases } = processDocsSources(sources, this.#maxDocumentLength);
     if (documents.size === 0) {
       throw new DocsCorpusUnavailableError(this.#root);
@@ -134,6 +139,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
     this.#documents = documents;
     this.#aliases = aliases;
     this.#guidance = new GuidanceIndex(documents.values());
+    this.#fingerprint = fingerprint;
   }
 }
 

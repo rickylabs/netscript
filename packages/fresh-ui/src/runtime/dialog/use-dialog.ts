@@ -1,8 +1,13 @@
 import type { JSX } from 'preact';
 import { useSignal } from '@preact/signals';
-import { useCallback, useEffect, useId, useRef } from 'preact/hooks';
+import { useCallback, useId } from 'preact/hooks';
 import { composeEventHandlers } from '../_internal/compose-event-handlers.ts';
 import { composeRefs } from '../_internal/compose-refs.ts';
+import {
+  getNativeDialogOpenAttribute,
+  isNativeDialogClosed,
+  useNativeDialogSync,
+} from '../_internal/native-dialog.ts';
 import type {
   DialogCloseElementProps,
   DialogContentElementProps,
@@ -28,7 +33,6 @@ export function useDialog({
   open: controlledOpen,
 }: UseDialogOptions = {}): UseDialogReturn {
   const generatedId = useId();
-  const contentRef = useRef<HTMLDialogElement | null>(null);
   const uncontrolledOpen = useSignal(defaultOpen);
   const open = controlledOpen === undefined ? uncontrolledOpen.value : controlledOpen;
   const contentId = id ?? `ns-dialog-${generatedId}`;
@@ -47,39 +51,7 @@ export function useDialog({
     [controlledOpen, onOpenChange, uncontrolledOpen],
   );
 
-  useEffect(() => {
-    const element = contentRef.current;
-
-    if (!element) {
-      return;
-    }
-
-    if (open) {
-      if (modal && typeof element.showModal === 'function') {
-        if (!element.open) {
-          try {
-            element.showModal();
-          } catch {
-            if (typeof element.show === 'function' && !element.open) {
-              element.show();
-            }
-          }
-        }
-
-        return;
-      }
-
-      if (typeof element.show === 'function' && !element.open) {
-        element.show();
-      }
-
-      return;
-    }
-
-    if (element.open) {
-      element.close();
-    }
-  }, [modal, open]);
+  const attachContent = useNativeDialogSync(open, modal);
 
   const getTriggerProps = useCallback(
     (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): DialogTriggerElementProps => ({
@@ -126,9 +98,16 @@ export function useDialog({
           }
         },
       ),
-      onClose: composeEventHandlers(props.onClose, () => setOpen(false, 'native-close')),
-      open: open ? true : undefined,
-      ref: composeRefs(props.ref, contentRef),
+      onClose: composeEventHandlers(
+        props.onClose,
+        (event: JSX.TargetedEvent<HTMLDialogElement, Event>) => {
+          if (isNativeDialogClosed(event.currentTarget)) {
+            setOpen(false, 'native-close');
+          }
+        },
+      ),
+      open: getNativeDialogOpenAttribute(open, modal),
+      ref: composeRefs(props.ref, attachContent),
       role: props.role ?? 'dialog',
     }),
     [
