@@ -2770,8 +2770,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## packages/plugin-workers-core — WINDOWS-PROCESS-RUNNER-PARITY
 
 - **ID:** `WINDOWS-PROCESS-RUNNER-PARITY`
-- **Reason:** Deno.Command replaced Dax for bounded stdin/stream control. Windows PATHEXT lookup
-  for bare `.cmd`/`.bat` shims and `taskkill /PID <owned-pid> /T /F` termination lack Windows-host
+- **Reason:** Deno.Command replaced Dax for bounded stdin/stream control. Windows PATHEXT lookup for
+  bare `.cmd`/`.bat` shims and `taskkill /PID <owned-pid> /T /F` termination lack Windows-host
   execution evidence; Linux results do not establish Windows parity.
 - **Owner:** Workers maintainers, coordinated through #2103.
 - **Target:** Windows verification by 2026-10-27, before the 0.0.8 stable cut.
