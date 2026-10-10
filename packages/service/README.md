@@ -110,11 +110,15 @@ the existing `/api` protection and anonymous `/health` defaults; custom `protect
 `allowAnonymous` options keep their existing semantics. `createService()` remains the lower-level
 composition API; it installs guards through `.withAuthn()` and `.withAuthz()`.
 
-`netscript service add` generates remote session authentication and a `<service>:access` scope rule
-when an enabled auth plugin is installed. Otherwise it records an explicit public opt-out explaining
-how to install authentication. Existing authored entrypoints retain their policy; migrate public
-services explicitly when adding auth. Public examples below are demonstrations; choose guards before
-using them for private operations.
+`netscript service add` and auth installation share the BFF composition: `browserAuthenticator`
+verifies remote sessions and `createContractAuthorizer(router)` enforces procedure-local access.
+`/health`, `/api/openapi.json`, `/api/docs` and contract-declared public demo procedures remain
+anonymous. Contract-protected procedures return 401 without a session and 403 when authorization
+denies it; authorized calls succeed. Without an enabled auth plugin, generation records an explicit
+public opt-out explaining how to install authentication. Authored entrypoints retain their policy;
+only scaffold-owned opt-outs are reconciled by service add or plugin installation. `generate aspire`
+leaves authored inputs unchanged. Public examples below are demonstrations; declare contract access
+before using them for private operations.
 
 ## CORS migration (breaking in 0.0.8)
 

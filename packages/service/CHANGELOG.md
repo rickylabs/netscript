@@ -17,11 +17,13 @@
   ```
 
   Reasons must be nonblank; public and guarded fields cannot be mixed. `netscript service add`
-  generates remote auth-session verification and a `<service>:access` scope rule when an enabled
-  auth plugin is installed. `/api`, including OpenAPI and RPC, requires that scope; `/health`
-  remains anonymous. Without auth installed, the generated public reason explains how to protect the
-  API. Existing authored services retain their policy and must be migrated explicitly. See the
-  README auth policy migration.
+  and auth installation now share the BFF policy: `browserAuthenticator` with
+  `createContractAuthorizer(router)`. Discovery (`/api/openapi.json`, `/api/docs`), `/health` and
+  contract-declared public demo procedures stay anonymous. Contract-protected REST/RPC procedures
+  return 401 without a session, 403 when contract authorization denies it, and 200 when authorized.
+  Without enabled auth, the generated public reason explains how to protect the API. Lifecycle
+  commands reconcile scaffold-owned opt-outs; existing authored policies remain authoritative.
+  `generate aspire` leaves authored inputs unchanged. See the README auth policy migration.
 
 - **Breaking (0.0.8):** CORS no longer defaults to wildcard access. Configure
   `NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'` for services and plugins, or

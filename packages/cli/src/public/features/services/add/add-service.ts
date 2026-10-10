@@ -5,15 +5,15 @@ import {
   regenerateAspireHelpers,
   upsertServiceAppsettingsEntry,
 } from '../../../../kernel/adapters/service/workspace-mutator.ts';
-import { PortAllocator } from '../../../../kernel/adapters/service/port-allocator.ts';
-import { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/workspace-resolver.ts';
+import type { PortAllocator } from '../../../../kernel/adapters/service/port-allocator.ts';
+import type { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/workspace-resolver.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import type { AddServiceResult } from '../../../domain/service-add-plan.ts';
 import type { AddServiceInput } from './add-service-input.ts';
 import { planServiceAdd } from './plan-service-add.ts';
 import { renderService, type RenderServiceDependencies } from './render-service.ts';
-import { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
+import type { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
 import {
   generateServiceClients,
   validateServiceClientContracts,

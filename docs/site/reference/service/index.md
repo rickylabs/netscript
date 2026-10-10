@@ -432,10 +432,14 @@ record a public service's reason. The exact public migration is:
 +});
 ```
 
-`netscript service add` generates a guarded policy when an enabled auth plugin is installed, using
-remote session verification and a `<service>:access` scope rule. `/api`, including OpenAPI and RPC,
-requires a bearer session with that scope; `/health` remains anonymous. Without auth installed, the
-generated entrypoint records a greppable public opt-out with a reason explaining how to protect it.
+`netscript service add` uses the same BFF composition as auth installation: `browserAuthenticator`
+plus `createContractAuthorizer(router)`. `/health`, `/api/openapi.json`, `/api/docs` and
+contract-declared public demo procedures remain anonymous. A contract-protected REST or RPC
+procedure requires a bearer session (401 when absent) and a successful contract authorization
+decision (403 when denied). Authorized calls succeed. Without enabled auth, the generated entrypoint
+records a greppable public opt-out with a reason explaining how to protect it. Lifecycle commands
+reconcile scaffold-owned opt-outs; authored policies remain authoritative, and `generate aspire`
+leaves authored inputs unchanged.
 This policy requirement applies to the preset; lower-level `createService()` callers still compose
 their middleware explicitly.
 

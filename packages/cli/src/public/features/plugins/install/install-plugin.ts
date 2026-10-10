@@ -7,7 +7,7 @@ import { join, resolve } from '@std/path';
 import { toFileUrl } from '@std/path/to-file-url';
 import { copyPluginSchemasToRootDb } from '../../../../kernel/adapters/plugin/db-integration.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
-import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
+import type { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
@@ -281,7 +281,7 @@ export async function installPlugin(
 export async function persistPluginMetadata(
   plan: PluginInstallPlan,
   resolvedPlugin: ResolvedPluginBeforePlanning,
-  scaffold: PluginOwnedScaffoldResult,
+  _scaffold: PluginOwnedScaffoldResult,
   fs: FileSystemPort,
   installState: {
     readonly managedFilesBefore?: Readonly<Record<string, string | null>>;
@@ -487,7 +487,7 @@ export async function runPluginOwnedScaffold(
 export function createDryRunInstallResult(
   plan: PluginInstallPlan,
   descriptor: ValidatedPluginDescriptor,
-  scaffold: PluginOwnedScaffoldResult,
+  _scaffold: PluginOwnedScaffoldResult,
 ): InstallPluginResult {
   const filesCreated = scaffold.createdFiles.map((path) => join(plan.projectRoot, path));
   const pluginDir = resolvePluginRuntimeDirectory(plan);
@@ -524,7 +524,7 @@ export function createDryRunInstallResult(
 export async function createPluginOwnedPluginResult(
   plan: PluginInstallPlan,
   descriptor: ValidatedPluginDescriptor,
-  scaffold: PluginOwnedScaffoldResult,
+  _scaffold: PluginOwnedScaffoldResult,
   fs: FileSystemPort,
 ): Promise<PluginScaffoldResult> {
   const officialSource = descriptor.manifest.officialSource;
