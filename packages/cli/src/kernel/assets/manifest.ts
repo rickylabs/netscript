@@ -1,5 +1,8 @@
 /** Typed manifest for checked-in CLI template assets. */
 export const TEMPLATE_KEYS = {
+  authBff: 'auth/bff.ts.template',
+  authRoute: 'auth/route.ts.template',
+  authService: 'auth/service.ts.template',
   generatedAspireEmptyRegistration: 'generated/aspire/helpers/empty-registration.ts.template',
   appClient: 'app/client.ts.template',
   appAssetsDesignCss: 'app/assets/design.css.template',
@@ -76,6 +79,7 @@ export const TEMPLATE_KEYS = {
     'generated/aspire/helpers/generate-register-tools-1.ts.template',
   generatedDatabaseGenerateEngineMod1: 'generated/database/generate-engine-mod-1.ts.template',
   generatedDatabaseGeneratePrismaConfig1: 'generated/database/generate-prisma-config-1.ts.template',
+  databasePostgresConnectionString: 'generated/database/postgres-connection-string.ts.template',
   generatedPluginsGeneratePluginContracts1:
     'generated/plugins/generate-plugin-contracts-1.ts.template',
   generatedPluginsGeneratePluginDbSchema1:

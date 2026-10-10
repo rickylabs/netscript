@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "285a34d77",
-  "extractionTimestamp": "2026-10-10T16:00:48.554Z",
+  "sourceCommit": "3ebb5f2a8",
+  "extractionTimestamp": "2026-10-10T16:56:06.866Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -128,7 +128,6 @@
     "pages/services-sdk/how-to/index.md",
     "pages/services-sdk/index.md",
     "pages/services-sdk/sdk/index.md",
-    "pages/services-sdk/service-layout/index.md",
     "pages/services-sdk/services/index.md",
     "pages/tutorials/chat/01-scaffold/index.md",
     "pages/tutorials/chat/02-durable-chat-route/index.md",
@@ -172,6 +171,7 @@
     "pages/web-layer/examples/index.md",
     "pages/web-layer/form/index.md",
     "pages/web-layer/fresh-ui/index.md",
+    "pages/web-layer/generated-surface/index.md",
     "pages/web-layer/how-to/build-a-desktop-frontend/index.md",
     "pages/web-layer/how-to/build-a-server-validated-form/index.md",
     "pages/web-layer/how-to/customize-fresh-ui/index.md",
@@ -190,7 +190,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5217314,
-  "compressedBytes": 1515060,
-  "sha256": "56226f8bd9ada8154b3c3eb158991ad357601a3c59a308e13e531ff98bdd97a5"
+  "uncompressedBytes": 5242733,
+  "compressedBytes": 1524559,
+  "sha256": "4d4820829d0bd4f800ef3f17ec089ec1149c6b945ae83c6d7c283f3cf9fc48d4"
 }

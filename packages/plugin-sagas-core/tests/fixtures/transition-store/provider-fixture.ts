@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { retryPrismaGenerate } from './provider-process.ts';
 
 type ProviderFixtureProfile = Readonly<
   { repo: URL; source: string; filterEnv: string; evidenceEnv: string }
@@ -15,20 +16,22 @@ export async function runSagaProviderFixture(profile: ProviderFixtureProfile): P
     );
     const sagaSchema = await Deno.readTextFile('plugins/sagas/database/sagas.prisma');
     await Deno.writeTextFile(temp + '/schema.prisma', commandSchema + '\n' + sagaSchema);
-    const generated = await new Deno.Command(Deno.execPath(), {
-      args: [
-        'run',
-        '--no-lock',
-        '-A',
-        'npm:prisma@7.8.0',
-        'generate',
-        '--schema',
-        temp + '/schema.prisma',
-      ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
-    assertEquals(generated.code, 0, new TextDecoder().decode(generated.stderr));
+    await retryPrismaGenerate(() =>
+      new Deno.Command(Deno.execPath(), {
+        args: [
+          'run',
+          '--no-lock',
+          '-A',
+          'npm:prisma@7.8.0',
+          'generate',
+          '--schema',
+          temp + '/schema.prisma',
+        ],
+        signal: AbortSignal.timeout(120_000),
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output()
+    );
     const source = await Deno.readTextFile(profile.source);
     await Deno.writeTextFile(
       temp + '/postgres-conformance_test.ts',

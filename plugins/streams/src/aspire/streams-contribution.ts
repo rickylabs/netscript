@@ -7,12 +7,12 @@ import {
   type HealthCheckSpec,
 } from '@netscript/aspire/public';
 
-/** Aspire contribution for the Durable Streams development service. */
+/** Aspire contribution for the ephemeral-by-default Durable Streams protocol service. */
 export class StreamsAspireContribution extends AspireNSPluginContribution {
   /** Plugin package name owning this contribution. */
   readonly pluginName = '@netscript/plugin-streams';
 
-  /** Register the streams Deno service resource with the AppHost builder. */
+  /** Register the ephemeral streams resource; file mode is an explicit host environment opt-in. */
   contribute(
     builder: AspireBuilder,
     ctx: ContributionContext,
