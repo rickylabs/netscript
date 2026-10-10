@@ -27,9 +27,12 @@ async function useLocalConfigWorkspace(projectRoot: string): Promise<void> {
   const config = JSON.parse(await Deno.readTextFile(configPath)) as {
     workspace: string[];
     imports: Record<string, string>;
+    minimumDependencyAge?: number;
   };
   config.workspace.push('./packages/config');
   config.imports = { '@netscript/config': 'workspace:*' };
+  // The copied source workspace qualifies pins before their default age window.
+  config.minimumDependencyAge = 0;
   await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
 }
 

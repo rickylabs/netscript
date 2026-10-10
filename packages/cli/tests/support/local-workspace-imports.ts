@@ -67,9 +67,13 @@ async function collectLocalWorkspaceImports(
         const targetPath = resolve(dirname(manifestPath), target);
         const stat = await Deno.stat(targetPath);
         if (!stat.isFile) {
-          throw new Error(`${manifest.name}${exportName} does not resolve to a file: ${targetPath}`);
+          throw new Error(
+            `${manifest.name}${exportName} does not resolve to a file: ${targetPath}`,
+          );
         }
-        const specifier = exportName === '.' ? manifest.name : `${manifest.name}${exportName.slice(1)}`;
+        const specifier = exportName === '.'
+          ? manifest.name
+          : `${manifest.name}${exportName.slice(1)}`;
         imports[specifier] = toFileUrl(targetPath).href;
       }
     }
