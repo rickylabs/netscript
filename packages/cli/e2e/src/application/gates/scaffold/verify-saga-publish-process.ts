@@ -29,8 +29,8 @@ if (import.meta.main) {
     throw new Error(`Saga process topology discovery failed (${describe.code})`);
   }
   const databaseUrl = sagaProcessDatabaseUrl(new TextDecoder().decode(describe.stdout));
-  // The consumer fixture uses the allocated real provider, but owns a unique schema and
-  // service PIDs. It never stops the generated project's shared resources.
+  // Provider-borrowing conformance: repository saga/router fixtures run against the users
+  // allocation in an owned schema and service PIDs; this does not exercise generated sagas-api.
   const proof = await new Deno.Command(Deno.execPath(), {
     args: [
       'run',

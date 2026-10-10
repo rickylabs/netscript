@@ -241,6 +241,15 @@ const RULES: readonly Rule[] = [
     disposition: 'aspire agent init delegation flags',
   },
   {
+    test: re(
+      /^packages\/cli\/e2e\/src\/application\/gates\/scaffold\/verify-saga-publish-process\.ts$/,
+    ),
+    cls: 'e2e:provider-conformance',
+    owner: 'X-1826-2',
+    disposition:
+      'PR #2213; repository saga HTTP process proof borrows the described users PostgreSQL allocation; owned schema/PIDs; not generated sagas-api coverage',
+  },
+  {
     test: starts('packages/cli/e2e/'),
     cls: 'e2e',
     owner: 'S2/S3/S10',

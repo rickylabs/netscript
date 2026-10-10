@@ -2,10 +2,10 @@ import { assertEquals, assertThrows } from '@std/assert';
 import { createRuntimeBehaviorGates } from '../../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
 import { sagaProcessDatabaseUrl } from '../../../../src/application/gates/scaffold/verify-saga-publish-process.ts';
 
-Deno.test('saga process proof is required in the PostgreSQL runtime tier and absent from SQLite', () => {
-  const id = 'behavior.sagas-publish-process';
+Deno.test('saga provider-borrowing conformance is noncritical in the PostgreSQL runtime tier and absent from SQLite', () => {
+  const id = 'behavior.sagas-provider-conformance';
   const postgres = createRuntimeBehaviorGates('postgres').find((gate) => String(gate.id) === id);
-  assertEquals(postgres?.critical, true);
+  assertEquals(postgres?.critical, false);
   assertEquals(postgres?.kind, 'command');
   assertEquals(createRuntimeBehaviorGates('sqlite').some((gate) => String(gate.id) === id), false);
 });

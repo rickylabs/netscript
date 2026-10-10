@@ -12,6 +12,7 @@ import type {
 import type { SagaCorrelationKey, SagaInstanceId } from '@netscript/plugin-sagas-core/domain';
 import type { SagaTransitionCommitRequest } from '@netscript/plugin-sagas-core/ports';
 import { createSagaPublisher } from '@netscript/plugin-sagas/runtime';
+import { stderrTail } from 'REPO_URLpackages/plugin-sagas-core/tests/fixtures/transition-store/provider-process.ts';
 import { router } from 'REPO_URLplugins/sagas/services/src/router.ts';
 import { applyPublishOrderEffect } from 'REPO_URLplugins/sagas/tests/runtime/fixtures/apply-publish-order-effect.ts';
 import { publishOrderSaga } from 'REPO_URLplugins/sagas/tests/runtime/fixtures/publish-order-saga.ts';
@@ -73,6 +74,12 @@ const unusedReadModel: SagaServiceDatabaseClient = {
 
 async function serve() {
   const [schema, readyFile, crashKey] = Deno.args;
+  if (crashKey === '__startup_failure__') {
+    await Deno.stderr.write(
+      new TextEncoder().encode('discarded-prefix' + 'x'.repeat(9000) + 'startup-tail-sentinel'),
+    );
+    Deno.exit(87);
+  }
   assert(/^saga_publish_[a-f0-9]+$/.test(schema));
   const root = client(schema);
   const store = createPrismaSagaTransitionStore(bridge(root), { transactionTimeoutMs: 5000 });
@@ -158,11 +165,14 @@ async function start(schema: string, temp: string, crashKey = '') {
       crashKey,
     ],
     stdout: 'null',
-    stderr: 'null',
+    stderr: 'piped',
   }).spawn();
+  const stderr = stderrTail(child.stderr);
   let exited = false;
-  const status = child.status.then((value) => {
+  const status = child.status.then(async (value) => {
     exited = true;
+    const tail = await stderr;
+    console.error(`Saga child exit ${value.code}; stderr tail (at most 8 KiB):\n${tail}`);
     return value;
   });
   const stop = async () => {
@@ -171,7 +181,13 @@ async function start(schema: string, temp: string, crashKey = '') {
   };
   try {
     for (let attempt = 0; attempt < 1200; attempt++) {
-      if (exited) throw new Error(`Saga service exited before listening (${(await status).code})`);
+      if (exited) {
+        throw new Error(
+          `Saga service exited before listening (${
+            (await status).code
+          }); stderr tail:\n${await stderr}`,
+        );
+      }
       try {
         const ready = JSON.parse(await Deno.readTextFile(readyFile));
         assertEquals(ready.pid, child.pid);
@@ -186,7 +202,10 @@ async function start(schema: string, temp: string, crashKey = '') {
       }
       await delay(50);
     }
-    throw new Error('Saga service did not listen within the 60-second failure ceiling');
+    await stop();
+    throw new Error(
+      `Saga service did not listen within the 60-second failure ceiling; stderr tail:\n${await stderr}`,
+    );
   } catch (error) {
     await stop();
     throw error;
@@ -227,6 +246,18 @@ async function commands(root: PrismaClient) {
   );
 }
 const control = Deno.env.get('SAGA_PROCESS_NEGATIVE_CONTROL');
+
+Deno.test('startup failure retains bounded child stderr in the error and process evidence', async () => {
+  await ownedFixture(async (_root, schema, temp) => {
+    const error = await assertRejects(
+      () => start(schema, temp, '__startup_failure__'),
+      Error,
+      'Saga service exited before listening (87)',
+    );
+    assert(error.message.includes('startup-tail-sentinel'));
+    assert(!error.message.includes('discarded-prefix'));
+  });
+});
 
 Deno.test('HTTP publish recovers commit-before-acceptance process crash without lost or duplicate worker intent', async () => {
   await ownedFixture(async (root, schema, temp) => {

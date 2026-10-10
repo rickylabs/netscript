@@ -12,6 +12,7 @@ import { KvExecutionState } from '@netscript/plugin-workers-core/state';
 import { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';
 import { createWorkerCommandOutboxSink } from '@netscript/plugin-workers-core/integration/commands';
 import type { JobDefinition } from '@netscript/plugin-workers-core/runtime';
+// Test debt SAGAS-WORKER-DISPATCH-FIXTURE: these dispatcher seams have no public workers subpath.
 import { processWorkerJob } from '../../../../workers/worker/job-dispatcher.ts';
 import { createWorkerPool } from '../../../../workers/worker/job-runner-pool.ts';
 import type { WorkerDispatchContext } from '../../../../workers/worker/worker-options.ts';
