@@ -1,7 +1,8 @@
 import { assert, assertEquals } from '@std/assert';
+import { netscriptJsrSpecifier } from '../../../../../kernel/constants/jsr-specifiers.ts';
 import { OPENCODE_MCP_TIMEOUT_MS, renderOpenCodeConfig } from './opencode-config.ts';
 
-const NETSCRIPT_COMMAND = ['deno', 'run', '-A', 'jsr:@netscript/cli@0.0.0', 'agent', 'mcp'];
+const NETSCRIPT_COMMAND = ['deno', 'run', '-A', netscriptJsrSpecifier('cli'), 'agent', 'mcp'];
 /** OpenCode's documented per-server default when `timeout` is omitted. */
 const OPENCODE_DEFAULT_TIMEOUT_MS = 5_000;
 
