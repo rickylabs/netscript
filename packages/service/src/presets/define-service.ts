@@ -217,11 +217,13 @@ export interface DefineServiceOptions extends ServiceConfig {
  * @example
  * ```typescript
  * // With auth enabled for /api paths
- * import { defineService } from '@netscript/service';
+ * import { defineService, type ServiceRouter } from '@netscript/service';
  * import {
  *   createScopeAuthorizer,
  *   createStaticCredentialAuthenticator,
  * } from '@netscript/service/auth';
+ *
+ * declare const router: ServiceRouter;
  *
  * await defineService(router, {
  *   name: 'users',

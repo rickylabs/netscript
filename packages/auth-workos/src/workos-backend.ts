@@ -54,6 +54,11 @@ const WORKOS_BACKEND_NAME = 'workos';
  *
  * @example
  * ```ts
+ * import { createWorkosBackend, type WorkosSessionClient } from "@netscript/auth-workos";
+ *
+ * declare const workos: WorkosSessionClient;
+ * declare const cookiePassword: string;
+ *
  * const backend = createWorkosBackend({
  *   workos,
  *   cookiePassword,

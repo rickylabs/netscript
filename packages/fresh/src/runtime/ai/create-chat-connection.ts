@@ -405,13 +405,19 @@ export function projectChatSnapshot(
  *
  * @example
  * ```ts
+ * import { createNetScriptChatConnection, type NetScriptChatAuthorize } from '@netscript/fresh/ai';
+ *
+ * declare const sessionId: string;
+ * declare const sessionBelongsToUser: NetScriptChatAuthorize;
+ * declare const signal: AbortSignal;
+ *
  * const chat = createNetScriptChatConnection({
  *   target: { sessionId },
  *   streamPath: ({ sessionId }) => `/eischat/sessions/${sessionId}/messages`,
  *   authorize: (req, id) => sessionBelongsToUser(req, id), // REQUIRED in prod
  * });
  * try {
- *   for await (const chunk of chat.subscribe(signal)) render(chunk);
+ *   for await (const chunk of chat.subscribe(signal)) console.log(chunk);
  * } finally {
  *   chat.dispose();
  * }

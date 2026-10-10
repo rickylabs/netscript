@@ -67,12 +67,18 @@ This scaffolds the unified `@netscript/plugin-auth` plugin into `plugins/`, regi
 contributes three things to your workspace: a Prisma schema (`auth.prisma`), a service entry that
 becomes the `auth-api` service, and the `/api/v1/auth/*` routes.
 
-`--port 8094` is what makes the rest of this chapter's `curl`s work. Without it the installer picks a
-port for you and writes it as the resource's `HostPort`, so `auth-api` would answer on some number
-this page cannot print. Pinning has a cost — a pinned host port is a machine-global reservation, so
-`aspire start --isolated` can no longer randomise it away and a second workspace pinning 8094 will
-collide. That is an acceptable trade for a tutorial; for real work, omit `--port` and read the
-endpoint off the dashboard. Confirm it landed:
+`--port 8094` is what makes the rest of this chapter's `curl`s work, and it is what a real OAuth
+callback needs: the provider compares the redirect URI you register against the one the service
+sends, port included. The flag writes `"HostPort": 8094` on the plugin's entry in `appsettings.json`,
+and the generated AppHost passes it to `withHttpEndpoint`. Without it the installer writes no
+`HostPort` and Aspire allocates a host port at every start, so `auth-api` would answer on a number
+this page cannot print — and a different one after each restart. The pin belongs to you, not the
+installer: `netscript plugin update` and a forced re-install without `--port` keep it, and only a new
+`--port` (or editing `HostPort` by hand) changes it. Pinning has a cost — a pinned host port is a
+machine-global reservation, so `aspire start --isolated` can no longer randomise it away and a second
+workspace pinning 8094 will collide. Pin a plugin only when something outside the graph has written
+its address down, as an identity provider does here; otherwise omit `--port` and read the endpoint
+off the dashboard. Confirm it landed:
 
 ```sh
 netscript plugin list

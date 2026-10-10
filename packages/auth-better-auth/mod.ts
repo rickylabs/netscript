@@ -3,7 +3,13 @@
  *
  * @example
  * ```ts
- * import { createBetterAuthBackend, createNetscriptBetterAuth } from '@netscript/auth-better-auth';
+ * import {
+ *   type BetterAuthPrismaClient,
+ *   createBetterAuthBackend,
+ *   createNetscriptBetterAuth,
+ * } from '@netscript/auth-better-auth';
+ *
+ * declare const prisma: BetterAuthPrismaClient;
  *
  * const auth = createNetscriptBetterAuth({
  *   prisma,

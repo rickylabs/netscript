@@ -13,6 +13,10 @@ import { runPluginCliCommand } from './runner/plugin-cli-runner.ts';
  *
  * @example
  * ```ts
+ * import type { NetScriptPlugin } from '@netscript/plugin/adapter';
+ *
+ * declare const plugin: NetScriptPlugin;
+ *
  * const adapter = createPluginAdapter(plugin);
  * export default adapter.toCli();
  * ```

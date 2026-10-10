@@ -104,12 +104,8 @@ graph your complete app stands up:
 Two host ports here are predictable because <em>you</em> pinned them: <code>workspace</code> on
 <code>:3001</code> (chapter 1's <code>--service-port</code>) and <code>auth-api</code> on
 <code>:8094</code> (chapter 2's <code>--port</code>). The Workers API you installed without a
-<code>--port</code>, so the installer chose its host port for you — deterministically, from a hash of
-your project name over the IANA dynamic range <code>49152–65535</code>, then probing upward past
-ports already taken <em>in this workspace</em>. That spreads projects apart well enough to be
-practical, but it is not a guarantee: the range is finite, workspaces do not see each other's
-allocations, and any pin can land on top of one. Read the actual number from the dashboard's resource
-list rather than assuming.
+<code>--port</code>, so its entry carries no <code>HostPort</code> and Aspire allocates its host port
+at every start. Read the actual number from the dashboard's resource list rather than assuming.
 {{ /comp }}
 
 ## Step 3 — Use the dashboard

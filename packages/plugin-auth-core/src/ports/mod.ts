@@ -144,6 +144,10 @@ export type InteractiveCallbackResult = Readonly<{
  *
  * @example
  * ```ts
+ * import type { ResolvedAuthBackendRegistry } from "@netscript/plugin-auth-core/ports";
+ *
+ * declare const registry: ResolvedAuthBackendRegistry;
+ *
  * const backend = registry.resolveBackend();
  * if (backend.interactive) {
  *   const response = await backend.interactive.signIn(
@@ -203,6 +207,10 @@ const HMAC_SESSION_TOKEN_ERROR_MESSAGE = 'Invalid auth backend session token.';
  *
  * @example
  * ```ts
+ * import { type AuthSession, createHmacSessionTokenCrypto } from "@netscript/plugin-auth-core/ports";
+ *
+ * declare const session: AuthSession;
+ *
  * const cryptoPort = createHmacSessionTokenCrypto(
  *   Deno.env.get("AUTH_SESSION_TOKEN_SECRET")!,
  * );

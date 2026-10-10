@@ -4,12 +4,16 @@
  * @example
  * ```typescript
  * import { createCrudContract } from "@netscript/contracts/crud";
+ * import { z } from "zod";
+ *
+ * const UserSchema = z.object({ id: z.number(), name: z.string() });
+ * const CreateUserSchema = UserSchema.omit({ id: true });
  *
  * const usersContract = createCrudContract({
  *   resource: "users",
  *   entitySchema: UserSchema,
  *   createSchema: CreateUserSchema,
- *   updateSchema: UpdateUserSchema.partial(),
+ *   updateSchema: CreateUserSchema.partial(),
  * });
  * ```
  *
