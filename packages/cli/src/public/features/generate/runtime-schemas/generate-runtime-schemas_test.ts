@@ -1,3 +1,5 @@
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 
@@ -16,6 +18,7 @@ describe('public generate application flows', () => {
       fs,
       scaffolder: {} as ScaffolderPort,
       templateAdapter: {} as TemplatePort,
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       regenerateHelpers: (projectRoot) =>
         Promise.resolve([
           `${projectRoot}/.aspire/apphost.mts`,
