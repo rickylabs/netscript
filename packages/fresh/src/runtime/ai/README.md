@@ -34,14 +34,14 @@ const chat = createNetScriptChatConnection({
 `@netscript/fresh/streams` and `@netscript/fresh/ai` look adjacent but model two
 different things — conflating them is the doctrinal root of #219:
 
-| Axis          | StreamDB _shapes_ (`./streams`)     | Durable _Sessions_ (`./ai`)                         |
-| ------------- | ----------------------------------- | --------------------------------------------------- |
-| Unit          | A collection/row shape (TanStack DB) | One chat session stream (append-only chunk log)     |
-| Identity      | Row id inside a named shape         | `sessionId` (one durable stream per chat)           |
-| Write model   | CRUD mutations reconciled into rows | Append-only sanitized chunks                        |
-| Ordering      | Last-writer-wins per row            | Total order of chunks == the transcript             |
-| What survives | The current materialized rows       | The full replayable event log (messages + tools)    |
-| Read primitive | `useLiveQuery` over a shape        | `resolveChatSnapshot` + live `useChat` subscription |
+| Axis           | StreamDB _shapes_ (`./streams`)      | Durable _Sessions_ (`./ai`)                         |
+| -------------- | ------------------------------------ | --------------------------------------------------- |
+| Unit           | A collection/row shape (TanStack DB) | One chat session stream (append-only chunk log)     |
+| Identity       | Row id inside a named shape          | `sessionId` (one durable stream per chat)           |
+| Write model    | CRUD mutations reconciled into rows  | Append-only sanitized chunks                        |
+| Ordering       | Last-writer-wins per row             | Total order of chunks == the transcript             |
+| What survives  | The current materialized rows        | The full replayable event log (messages + tools)    |
+| Read primitive | `useLiveQuery` over a shape          | `resolveChatSnapshot` + live `useChat` subscription |
 
 A tool call is a multi-chunk, mid-stream event — it cannot be expressed as a
 single reconciled row without losing the streaming/tool-card intermediate
@@ -68,20 +68,20 @@ same `projectChatSnapshot` applied to the same session log.
 
 ### FA1 — connection, response, snapshot (implemented)
 
-| Export                          | Kind     | Role                                                                                          |
-| ------------------------------- | -------- | --------------------------------------------------------------------------------------------- |
-| `createNetScriptChatConnection` | function | Live handle to one session: `subscribe` / `send`, SR2-tolerant, F-13 `close`/`stop`/`dispose`. |
-| `toNetScriptChatResponse`       | function | Turn a server chat stream into a durable session `Response`; `authorize`-gated (→ `403`).      |
-| `resolveChatSnapshot`           | function | Seed snapshot for SSR / first paint; routes through `projectChatSnapshot`.                     |
-| `projectChatSnapshot`           | function | The single projection reducer (`messages → { messages, renderParts }`). FB2 imports this.      |
-| `NetScriptChatSessionTarget`    | type     | Addresses one session: `{ sessionId, baseUrl?, headers? }`.                                    |
-| `NetScriptChatSendMessage`      | type     | Complete native UI parts or Model content, forwarded unchanged by `send`. |
-| `NetScriptChatMessage`          | type     | Projected message: `{ id, role, content }`.                                                    |
-| `RenderPart`                    | type     | Minimal renderable unit (`text` \| `tool` card) emitted by the reducer. FB2 widens it.         |
-| `NetScriptChatSnapshot`         | type     | `{ messages, renderParts, offset }` — the reducer's output plus the replay cursor.             |
-| `NetScriptChatAuthorize`        | type     | `(request, sessionId) => boolean \| Promise<boolean>`.                                         |
-| `NetScriptChatStreamPath`       | type     | Static prefix or per-session subpath resolver for durable chat streams.                        |
-| `NetScriptChatConnectionOptions`, `NetScriptChatResponseOptions`, `NetScriptChatSnapshotOptions` | type | Option bags for the three functions. |
+| Export                                                                                           | Kind     | Role                                                                                           |
+| ------------------------------------------------------------------------------------------------ | -------- | ---------------------------------------------------------------------------------------------- |
+| `createNetScriptChatConnection`                                                                  | function | Live handle to one session: `subscribe` / `send`, SR2-tolerant, F-13 `close`/`stop`/`dispose`. |
+| `toNetScriptChatResponse`                                                                        | function | Turn a server chat stream into a durable session `Response`; `authorize`-gated (→ `403`).      |
+| `resolveChatSnapshot`                                                                            | function | Seed snapshot for SSR / first paint; routes through `projectChatSnapshot`.                     |
+| `projectChatSnapshot`                                                                            | function | The single projection reducer (`messages → { messages, renderParts }`). FB2 imports this.      |
+| `NetScriptChatSessionTarget`                                                                     | type     | Addresses one session: `{ sessionId, baseUrl?, headers? }`.                                    |
+| `NetScriptChatSendMessage`                                                                       | type     | Complete native UI parts or Model content, forwarded unchanged by `send`.                      |
+| `NetScriptChatMessage`                                                                           | type     | Projected message: `{ id, role, content }`.                                                    |
+| `RenderPart`                                                                                     | type     | Minimal renderable unit (`text` \| `tool` card) emitted by the reducer. FB2 widens it.         |
+| `NetScriptChatSnapshot`                                                                          | type     | `{ messages, renderParts, offset }` — the reducer's output plus the replay cursor.             |
+| `NetScriptChatAuthorize`                                                                         | type     | `(request, sessionId) => boolean \| Promise<boolean>`.                                         |
+| `NetScriptChatStreamPath`                                                                        | type     | Static prefix or per-session subpath resolver for durable chat streams.                        |
+| `NetScriptChatConnectionOptions`, `NetScriptChatResponseOptions`, `NetScriptChatSnapshotOptions` | type     | Option bags for the three functions.                                                           |
 
 **SR2 tolerance.** `createNetScriptChatConnection(...).subscribe()` complements
 the service-side SR2 fix (204/bridge): a first-subscribe that races a
@@ -226,8 +226,8 @@ export const streamHandler = createNetScriptChatStreamProxy({
 
 Seed (`resolveChatSnapshot`) and live (`createNetScriptChatConnection.subscribe`)
 share `projectChatSnapshot`, so tool cards rendered on first paint survive the
-first live chunk unchanged — the ONE-PROJECTION LAW in practice.
-
+first live chunk unchanged for ordinary assistant chunks — the ONE-PROJECTION LAW
+in practice. See the native-batch exception below.
 
 ## Complete client sends
 
@@ -240,4 +240,30 @@ one physical stream through the existing subscription hub.
 
 `NetScriptChatSendMessage` owns the structural transport boundary, with opaque native
 parts. `NetScriptChatMessage` remains the reduced snapshot/rendering projection;
-`toNetScriptChatResponse` still converts its intentional reduced `newMessages` input.
+`toNetScriptChatResponse({ newMessages })` accepts the same native UI/Model input.
+
+Server-trusted UI parts are stored unchanged; Model content and tool calls remain
+present, with content also exposed as replay parts. The content-string form remains
+supported. Native batches are persisted as `CUSTOM` events named
+`netscript.chat.messages`, alongside standard text echoes for upstream readers.
+NetScript seed replay restores complete batches through TanStack's `StreamProcessor`
+before applying the rendering projection.
+
+No public API returns persisted native parts. `resolveChatSnapshot` exposes only
+reduced text and tool cards; attachments and other native fields remain in storage.
+The public native-parts reader is remaining scope for #2068, alongside publication,
+a published-consumer check and the downstream EIS one-SSE-per-pane confirmation.
+
+Native batch tool cards appear on seed/reload but not on live subscribers.
+The upstream live reducer ignores the native `CUSTOM` batch and consumes its text
+echoes only. Both paths use `projectChatSnapshot`, but their input messages differ;
+this is a known exception to the one-projection law until native live replay lands.
+Tool-call chunks from the assistant stream continue through the upstream live reducer.
+
+Only pass server-trusted `newMessages` after validating roles and parts and giving
+that same prompt to the model. The plugin-AI scaffold builds its own user message
+from `message.text`; it ignores client transcript fields, including `newMessages`.
+
+Storage includes both text echoes and one complete native batch; inline attachments
+increase that append's size, and this seam has no size guard, so callers must enforce
+request/batch limits appropriate to their durable-stream service.
