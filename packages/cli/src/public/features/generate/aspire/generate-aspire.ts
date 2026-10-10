@@ -25,8 +25,8 @@ export interface GenerateAspireDependencies {
   /** Template renderer. */
   readonly templateAdapter: TemplatePort;
 
-  /** Optional pre-write canonicalizer for service-generation flows. */
-  readonly formatter?: GeneratedSourceFormatterPort;
+  /** Injected pre-write canonicalizer for service-generation flows. */
+  readonly formatter: GeneratedSourceFormatterPort;
 
   /** Optional helper regeneration override for tests. */
   readonly regenerateHelpers?: (
@@ -34,10 +34,10 @@ export interface GenerateAspireDependencies {
     fs: FileSystemPort,
     scaffolder: ScaffolderPort,
     templateAdapter: TemplatePort,
-    options?: {
+    options: {
       readonly dryRun?: boolean;
       readonly force?: boolean;
-      readonly formatter?: GeneratedSourceFormatterPort;
+      readonly formatter: GeneratedSourceFormatterPort;
     },
   ) => Promise<readonly string[]>;
 }

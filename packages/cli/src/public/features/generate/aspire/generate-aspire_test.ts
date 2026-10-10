@@ -7,6 +7,7 @@ import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/gene
 Deno.test('generateAspire applies dry-run and force to helper regeneration', async () => {
   const calls: unknown[] = [];
   const formatter: GeneratedSourceFormatterPort = {
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (_path, content) => Promise.resolve(content),
     formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
   };

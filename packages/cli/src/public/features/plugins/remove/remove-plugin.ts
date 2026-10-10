@@ -2,8 +2,8 @@ import { join } from '@std/path';
 
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
-import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { IoError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
@@ -59,6 +59,8 @@ export interface RemovePluginDependencies {
   readonly scaffolder?: ScaffolderPort;
   /** Template renderer used to regenerate shared wiring. */
   readonly templateAdapter?: TemplatePort;
+  /** Injected canonical formatter for shared Aspire outputs. */
+  readonly formatter: GeneratedSourceFormatterPort;
   /** Optional regeneration override for contract tests. */
   readonly regenerateHelpers?: typeof regenerateAspireHelpers;
 }
@@ -158,12 +160,7 @@ async function regenerateRemovalHelpers(
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
-  );
-  await formatGeneratedFiles(
-    dependencies.processRunner,
-    projectRoot,
-    helperFiles,
-    (path) => dependencies.fs.exists(path),
+    { formatter: dependencies.formatter },
   );
   return helperFiles;
 }
@@ -179,9 +176,9 @@ async function reverseManagedRootDenoJson(
   const before = JSON.parse(state.rootDenoJsonBefore) as DenoConfigShape;
   const after = JSON.parse(state.rootDenoJsonAfter) as DenoConfigShape;
   const current = JSON.parse(await fs.readFile(path)) as DenoConfigShape;
-  const addedMembers = new Set((after.workspace ?? []).filter((member) =>
-    !(before.workspace ?? []).includes(member)
-  ));
+  const addedMembers = new Set(
+    (after.workspace ?? []).filter((member) => !(before.workspace ?? []).includes(member)),
+  );
   current.workspace = (current.workspace ?? []).filter((member) => !addedMembers.has(member));
   current.imports ??= {};
   for (const [key, installedValue] of Object.entries(after.imports ?? {})) {
@@ -225,7 +222,9 @@ async function reverseManagedInstallFiles(
     if (priorContent === null || priorContent === undefined) await fs.remove(path);
     else await fs.writeFile(path, priorContent);
   }
-  for (const directory of [join(projectRoot, 'plugins'), join(projectRoot, 'services', '_shared')]) {
+  for (
+    const directory of [join(projectRoot, 'plugins'), join(projectRoot, 'services', '_shared')]
+  ) {
     if (await fs.exists(directory) && (await fs.readDir(directory)).length === 0) {
       await fs.remove(directory);
     }
@@ -233,10 +232,12 @@ async function reverseManagedInstallFiles(
 }
 
 async function pruneEmptyGeneratedParents(projectRoot: string, fs: FileSystemPort): Promise<void> {
-  for (const directory of [
-    join(projectRoot, '.netscript', 'generated'),
-    join(projectRoot, '.netscript'),
-  ]) {
+  for (
+    const directory of [
+      join(projectRoot, '.netscript', 'generated'),
+      join(projectRoot, '.netscript'),
+    ]
+  ) {
     if (await fs.exists(directory) && (await fs.readDir(directory)).length === 0) {
       await fs.remove(directory);
     }

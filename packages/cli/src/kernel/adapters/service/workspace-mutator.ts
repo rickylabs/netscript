@@ -140,7 +140,7 @@ export async function regenerateAspireHelpers(
   options: AspireSurfaceRenderOptions & {
     readonly dryRun?: boolean;
     readonly force?: boolean;
-  } = {},
+  },
 ): Promise<readonly string[]> {
   const files = await renderAspireSurface(projectRoot, fs, templateAdapter, options);
   const written: string[] = [];

@@ -13,6 +13,7 @@ import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { generateTsAspireConfig } from '../../templates/aspire/generate-aspire-config.ts';
 import { regenerateAspireHelpers } from '../service/workspace-mutator.ts';
 import type { DbEngineChoice } from '../../domain/db-engine.ts';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { DbEngine } from '../../domain/db-engine.ts';
@@ -34,6 +35,7 @@ export class DatabaseWorkspaceMutator {
     private readonly fs: FileSystemPort,
     private readonly scaffolder: ScaffolderPort,
     private readonly templateAdapter: TemplatePort,
+    private readonly formatter: GeneratedSourceFormatterPort,
   ) {}
 
   /** Add a database entry to root `appsettings.json`. */
@@ -196,6 +198,7 @@ export class DatabaseWorkspaceMutator {
       this.fs,
       this.scaffolder,
       this.templateAdapter,
+      { formatter: this.formatter },
     );
   }
 }

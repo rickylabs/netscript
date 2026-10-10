@@ -24,8 +24,8 @@ import type { GeneratedFile } from '../../templates/aspire/helpers/types.ts';
 
 /** Process and canonical formatting boundaries shared by the Aspire selectors. */
 export interface AspireSurfaceRenderOptions {
-  /** Generated content formatter; the canonical Deno policy is the default. */
-  readonly formatter?: GeneratedSourceFormatterPort;
+  /** Injected canonical generated content formatter. */
+  readonly formatter: GeneratedSourceFormatterPort;
   /** Configuration and plugin probe process boundary. */
   readonly process?: ProcessPort;
 }
@@ -35,7 +35,7 @@ export function renderAspireSurface(
   projectRoot: string,
   fs: FileSystemPort,
   templateAdapter: TemplatePort,
-  options: AspireSurfaceRenderOptions = {},
+  options: AspireSurfaceRenderOptions,
 ): Promise<readonly GeneratedFile[]> {
   return renderWithSelectors(projectRoot, fs, templateAdapter, options, {
     loadConfig: loadProjectConfig,
@@ -48,7 +48,7 @@ export function renderAspireSurfaceForInspection(
   projectRoot: string,
   fs: FileSystemPort,
   templateAdapter: TemplatePort,
-  options: AspireSurfaceRenderOptions = {},
+  options: AspireSurfaceRenderOptions,
 ): Promise<readonly GeneratedFile[]> {
   return renderWithSelectors(projectRoot, fs, templateAdapter, options, {
     loadConfig: loadProjectConfigForInspection,

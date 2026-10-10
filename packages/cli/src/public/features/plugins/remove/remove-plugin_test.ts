@@ -1,3 +1,4 @@
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { assert, assertEquals, assertRejects } from '@std/assert';
 import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { defineConfig } from '@netscript/config';
@@ -23,12 +24,16 @@ const REPOSITORY_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../..
 Deno.test('plugin remove resolves a configured bare name before dispatch and preserves state on failure', async () => {
   const projectRoot = '/workspace/app';
   const fs = new MemoryFileSystemAdapter();
-  const appsettings = JSON.stringify({
-    NetScript: {
-      Plugins: { 'sagas-api': { Enabled: true } },
-      BackgroundProcessors: { sagas: { Enabled: true } },
+  const appsettings = JSON.stringify(
+    {
+      NetScript: {
+        Plugins: { 'sagas-api': { Enabled: true } },
+        BackgroundProcessors: { sagas: { Enabled: true } },
+      },
     },
-  }, null, 2) + '\n';
+    null,
+    2,
+  ) + '\n';
   const netscriptConfig = [
     "import { defineConfig } from '@netscript/config';",
     'export default defineConfig({',
@@ -50,6 +55,7 @@ Deno.test('plugin remove resolves a configured bare name before dispatch and pre
     resolveProjectRoot: () => Promise.resolve(projectRoot),
     print: () => {},
     removePluginDependencies: {
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       fs,
       workspaceMutator: new PluginWorkspaceMutator(fs),
       processRunner: {
@@ -81,24 +87,39 @@ Deno.test('plugin remove rolls back every owned path when regeneration fails aft
   const fs = new MemoryFileSystemAdapter();
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
-  const denoBefore = JSON.stringify({ workspace: ['./apps/web'], imports: { keep: './keep.ts' } }, null, 2) + '\n';
-  const denoAfter = JSON.stringify({
-    workspace: ['./apps/web', './plugins', './plugins/*'],
-    imports: { keep: './keep.ts', managed: netscriptJsrSpecifier('plugin-sagas') },
-  }, null, 2) + '\n';
+  const denoBefore =
+    JSON.stringify({ workspace: ['./apps/web'], imports: { keep: './keep.ts' } }, null, 2) + '\n';
+  const denoAfter = JSON.stringify(
+    {
+      workspace: ['./apps/web', './plugins', './plugins/*'],
+      imports: { keep: './keep.ts', managed: netscriptJsrSpecifier('plugin-sagas') },
+    },
+    null,
+    2,
+  ) + '\n';
   const files = new Map<string, string>([
-    [`${projectRoot}/appsettings.json`, JSON.stringify({
-      NetScript: {
-        Plugins: { 'sagas-api': { Enabled: true } },
-        BackgroundProcessors: { sagas: { Enabled: true } },
-      },
-    }, null, 2) + '\n'],
+    [
+      `${projectRoot}/appsettings.json`,
+      JSON.stringify(
+        {
+          NetScript: {
+            Plugins: { 'sagas-api': { Enabled: true } },
+            BackgroundProcessors: { sagas: { Enabled: true } },
+          },
+        },
+        null,
+        2,
+      ) + '\n',
+    ],
     [`${projectRoot}/netscript.config.ts`, "export default { plugins: ['./sagas/mod.ts'] };\n"],
     [`${projectRoot}/deno.json`, denoAfter],
-    [`${projectRoot}/sagas/scaffold.plugin.json`, JSON.stringify({
-      name: '@netscript/plugin-sagas',
-      netscriptInstall: { rootDenoJsonBefore: denoBefore, rootDenoJsonAfter: denoAfter },
-    })],
+    [
+      `${projectRoot}/sagas/scaffold.plugin.json`,
+      JSON.stringify({
+        name: '@netscript/plugin-sagas',
+        netscriptInstall: { rootDenoJsonBefore: denoBefore, rootDenoJsonAfter: denoAfter },
+      }),
+    ],
     [`${projectRoot}/sagas/mod.ts`, 'export {};\n'],
     [`${projectRoot}/.netscript/generated/plugin-sagas/sagas.registry.ts`, 'export {};\n'],
     [`${projectRoot}/database/postgres/schema/plugins/sagas/sagas.prisma`, 'model Saga {}\n'],
@@ -107,21 +128,23 @@ Deno.test('plugin remove rolls back every owned path when regeneration fails aft
   for (const [path, content] of files) await fs.writeFile(path, content);
 
   const error = await assertRejects(
-    () => createRemovePluginCommand({
-      resolveProjectRoot: () => Promise.resolve(projectRoot),
-      print: () => {},
-      removePluginDependencies: {
-        fs,
-        scaffolder,
-        templateAdapter,
-        workspaceMutator: new PluginWorkspaceMutator(fs),
-        processRunner: { exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }) },
-        dispatchPort: {
-          dispatch: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+    () =>
+      createRemovePluginCommand({
+        resolveProjectRoot: () => Promise.resolve(projectRoot),
+        print: () => {},
+        removePluginDependencies: {
+          formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
+          fs,
+          scaffolder,
+          templateAdapter,
+          workspaceMutator: new PluginWorkspaceMutator(fs),
+          processRunner: { exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }) },
+          dispatchPort: {
+            dispatch: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+          },
+          regenerateHelpers: () => Promise.reject(new Error('injected regeneration failure')),
         },
-        regenerateHelpers: () => Promise.reject(new Error('injected regeneration failure')),
-      },
-    }).parse(['sagas', '--project-root', projectRoot]),
+      }).parse(['sagas', '--project-root', projectRoot]),
     IoError,
     'Project state was rolled back',
   );
@@ -138,14 +161,18 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
   const process = new DenoProcess();
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
-  const appsettings = JSON.stringify({
-    NetScript: {
-      Name: 'fixture-app',
-      Services: {},
-      Plugins: {},
-      BackgroundProcessors: {},
+  const appsettings = JSON.stringify(
+    {
+      NetScript: {
+        Name: 'fixture-app',
+        Services: {},
+        Plugins: {},
+        BackgroundProcessors: {},
+      },
     },
-  }, null, 2) + '\n';
+    null,
+    2,
+  ) + '\n';
   const denoJson = JSON.stringify({ workspace: [], imports: {} }, null, 2) + '\n';
   const netscriptConfig = [
     "import { defineConfig } from '@netscript/config';",
@@ -166,6 +193,7 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
       resolveProjectRoot: () => Promise.resolve(projectRoot),
       print: () => {},
       installPluginDependencies: {
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         fs,
         scaffolder,
         templateAdapter,
@@ -201,6 +229,7 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
       resolveProjectRoot: () => Promise.resolve(projectRoot),
       print: () => {},
       removePluginDependencies: {
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         fs,
         scaffolder,
         templateAdapter,
@@ -232,17 +261,19 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
         read: () => Promise.resolve(undefined),
         write: () => Promise.resolve(),
       }),
-      doctor: (input) => doctorPlugin(input, {
-        fs,
-        process: {
-          exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
-        },
-        loadConfig: () => Promise.resolve(defineConfig({
-          name: 'fixture-app',
-          databases: { config: [] },
-          plugins: [],
-        })),
-      }),
+      doctor: (input) =>
+        doctorPlugin(input, {
+          fs,
+          process: {
+            exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+          },
+          loadConfig: () =>
+            Promise.resolve(defineConfig({
+              name: 'fixture-app',
+              databases: { config: [] },
+              plugins: [],
+            })),
+        }),
     }).parse(['--project-root', projectRoot]);
   } finally {
     await Deno.remove(projectRoot, { recursive: true });

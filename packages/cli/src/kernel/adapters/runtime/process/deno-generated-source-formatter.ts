@@ -1,6 +1,7 @@
-import { extname } from '@std/path';
+import { extname, join } from '@std/path';
 import type {
   GeneratedFileFormatPolicy,
+  GeneratedSourceContent,
   GeneratedSourceFormatterPort,
 } from '../../../ports/generated-source-formatter-port.ts';
 import type { ProcessPort, ProcessResult } from '../../../ports/process-port.ts';
@@ -66,6 +67,40 @@ export class DenoGeneratedSourceFormatter implements GeneratedSourceFormatterPor
       throw new Error(`Unable to format generated source for ${targetPath}: ${detail}`);
     }
     return result.stdout;
+  }
+
+  /** Format a source batch in one process without touching consumer paths. */
+  async formatContents(files: readonly GeneratedSourceContent[]): Promise<readonly string[]> {
+    if (files.length > 256 || files.some((file) => file.content.length > 16 * 1024 * 1024)) {
+      throw new Error('Generated source batch exceeds its bounded capacity.');
+    }
+    for (const file of files) {
+      if (!SUPPORTED_EXTENSIONS.has(extname(file.targetPath).slice(1).toLowerCase())) {
+        throw new Error(
+          `Unable to format generated source for ${file.targetPath}: unsupported or missing target extension.`,
+        );
+      }
+    }
+    if (files.length === 0) return [];
+    const stagingRoot = await Deno.makeTempDir();
+    try {
+      const paths = files.map((file, index) =>
+        join(stagingRoot, `${index}${extname(file.targetPath).toLowerCase()}`)
+      );
+      for (let index = 0; index < files.length; index++) {
+        await Deno.writeTextFile(paths[index], files[index].content);
+      }
+      const result = await this.formatFiles(stagingRoot, paths, 'generated');
+      if (result.code !== 0) {
+        const detail = result.stderr.trim() || result.stdout.trim() || `exit ${result.code}`;
+        throw new Error(`Unable to format generated source batch: ${detail}`);
+      }
+      const contents: string[] = [];
+      for (const path of paths) contents.push(await Deno.readTextFile(path));
+      return contents;
+    } finally {
+      await Deno.remove(stagingRoot, { recursive: true });
+    }
   }
 
   /** Format exact generated paths using either generated or project policy. */

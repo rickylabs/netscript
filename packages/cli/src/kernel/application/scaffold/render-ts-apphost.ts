@@ -1,7 +1,6 @@
-import { canonicalizeAspireOutputs } from '../../adapters/service/aspire-surface-inventory.ts';
-import { DenoGeneratedSourceFormatter } from '../../adapters/runtime/process/deno-generated-source-formatter.ts';
 import { join } from '@std/path';
 import type { NetScriptConfig } from '@netscript/aspire/types';
+import { canonicalizeAspireOutputs } from '../../adapters/service/aspire-surface-inventory.ts';
 import { PORT_RANGES } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
@@ -254,7 +253,7 @@ export async function scaffoldTsAppHost(
   const canonicalFiles = await canonicalizeAspireOutputs(
     targetPath,
     generatedFiles,
-    new DenoGeneratedSourceFormatter(context.process),
+    context.formatter,
   );
   for (const file of canonicalFiles) {
     const filePath = join(targetPath, file.path);

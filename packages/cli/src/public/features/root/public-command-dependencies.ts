@@ -143,6 +143,7 @@ export interface PublicCommandDependencies {
   };
   /** Dependencies for plugin install. */
   readonly pluginInstallDependencies: {
+    readonly formatter: GeneratedSourceFormatterPort;
     readonly fs: DenoFileSystem;
     readonly scaffolder: Scaffolder;
     readonly templateAdapter: StringTemplateAdapter;
@@ -300,6 +301,7 @@ export function createPublicCommandDependencies(
       scaffolder: initScaffolder,
       fs: initFs,
       templateAdapter: initTemplateAdapter,
+      formatter: generatedSourceFormatter,
       process,
       jsrResolver: new JsrImportResolver(),
       cwd: host.cwd,
@@ -313,6 +315,7 @@ export function createPublicCommandDependencies(
     fs,
     scaffolder,
     templateAdapter,
+    generatedSourceFormatter,
   );
 
   return {
@@ -350,6 +353,7 @@ export function createPublicCommandDependencies(
     },
     serviceAddDependencies,
     pluginInstallDependencies: {
+      formatter: generatedSourceFormatter,
       fs,
       scaffolder,
       templateAdapter,
@@ -369,6 +373,7 @@ export function createPublicCommandDependencies(
       dispatchPort: createPluginDispatchPort(process),
     },
     pluginRemoveDependencies: {
+      formatter: generatedSourceFormatter,
       fs,
       scaffolder,
       templateAdapter,
@@ -390,6 +395,7 @@ export function createPublicCommandDependencies(
     authSessionHttp: new FetchAuthSessionHttp(),
     authRegenerateAspire: async (projectRoot) => {
       const result = await generateAspire({ projectRoot }, {
+        formatter: generatedSourceFormatter,
         fs,
         scaffolder,
         templateAdapter,

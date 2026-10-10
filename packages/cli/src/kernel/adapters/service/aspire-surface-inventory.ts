@@ -1,6 +1,4 @@
 import { basename, join } from '@std/path';
-import { DenoGeneratedSourceFormatter } from '../runtime/process/deno-generated-source-formatter.ts';
-import { DenoProcess } from '../runtime/process/deno-process.ts';
 import { normalize } from '@std/path/posix';
 import {
   ASPIRE_SURFACE_GENERATOR,
@@ -16,7 +14,7 @@ import type { GeneratedFile } from '../../templates/aspire/helpers/types.ts';
 export async function canonicalizeAspireOutputs(
   projectRoot: string,
   files: readonly GeneratedFile[],
-  formatter: GeneratedSourceFormatterPort = new DenoGeneratedSourceFormatter(new DenoProcess()),
+  formatter: GeneratedSourceFormatterPort,
 ): Promise<readonly GeneratedFile[]> {
   if (files.length > 256) throw new Error('Aspire output inventory exceeds its bounded capacity.');
   const seen = new Set<string>();
@@ -31,10 +29,15 @@ export async function canonicalizeAspireOutputs(
     const content = ASPIRE_SURFACE_MARKER + file.content;
     canonical.push({
       path,
-      content: await formatter.formatContent(join(projectRoot, path), content),
+      content,
     });
   }
-  return canonical;
+  const contents = await formatter.formatContents(canonical.map((file) => ({
+    targetPath: join(projectRoot, file.path),
+    content: file.content,
+  })));
+  if (contents.length !== canonical.length) throw new Error('Incomplete Aspire formatting batch.');
+  return canonical.map((file, index) => ({ path: file.path, content: contents[index] }));
 }
 
 /** Reserved generation scope; authored config and Aspire SDK modules cannot be claimed. */

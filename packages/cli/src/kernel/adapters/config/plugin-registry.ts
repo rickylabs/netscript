@@ -4,10 +4,10 @@
  * Helpers for loading and normalizing the local plugin registry.
  */
 
-import type { ProcessPort } from '../../ports/process-port.ts';
 import { dirname, join, relative, resolve } from '@std/path';
 import type { NetScriptConfig, PathsConfig } from '@netscript/config';
 import type { PluginManifest } from '@netscript/plugin';
+import type { ProcessPort } from '../../ports/process-port.ts';
 import type {
   RegisteredPluginConfig,
   RegisteredPluginEnvironmentVariableValue,

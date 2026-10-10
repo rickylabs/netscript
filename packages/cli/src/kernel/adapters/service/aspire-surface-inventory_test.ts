@@ -1,3 +1,5 @@
+import { DenoGeneratedSourceFormatter } from '../runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../runtime/process/deno-process.ts';
 import { assertRejects } from '@std/assert';
 import { canonicalizeAspireOutputs } from './aspire-surface-inventory.ts';
 
@@ -14,7 +16,11 @@ Deno.test('Aspire rendering rejects producer overlap and authored appsettings ou
     ]
   ) {
     await assertRejects(() =>
-      canonicalizeAspireOutputs('.', paths.map((path) => ({ path, content: '' })))
+      canonicalizeAspireOutputs(
+        '.',
+        paths.map((path) => ({ path, content: '' })),
+        new DenoGeneratedSourceFormatter(new DenoProcess()),
+      )
     );
   }
 });

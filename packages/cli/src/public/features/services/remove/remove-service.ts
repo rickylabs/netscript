@@ -1,4 +1,3 @@
-import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import { join } from '@std/path';
 import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/version-registry.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
@@ -11,6 +10,7 @@ import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-di
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import { findServiceClientPath } from '../../../../kernel/adapters/service/client-scaffolder.ts';
 import { validateResourceName } from '../../../../kernel/adapters/scaffold/workspace-writer.ts';
 
@@ -26,7 +26,7 @@ export interface RemoveServiceDependencies {
   readonly fs: FileSystemPort;
   readonly scaffolder: ScaffolderPort;
   readonly templateAdapter: TemplatePort;
-  readonly formatter?: GeneratedSourceFormatterPort;
+  readonly formatter: GeneratedSourceFormatterPort;
   readonly regenerateHelpers?: typeof regenerateAspireHelpers;
 }
 

@@ -10,7 +10,7 @@ import { removeService } from './remove-service.ts';
 
 /** Dependencies for the public `service remove` command. */
 export interface RemoveServiceCommandDependencies {
-  readonly formatter?: GeneratedSourceFormatterPort;
+  readonly formatter: GeneratedSourceFormatterPort;
   readonly fs: FileSystemPort;
   readonly scaffolder: ScaffolderPort;
   readonly templateAdapter: TemplatePort;

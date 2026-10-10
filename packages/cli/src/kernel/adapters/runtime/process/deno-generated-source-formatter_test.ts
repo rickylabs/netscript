@@ -96,3 +96,21 @@ Deno.test('generated source formatter failure names the target and preserves std
   assertStringIncludes(error.message, '/workspace/broken.ts');
   assertStringIncludes(error.message, 'parse failed');
 });
+
+Deno.test('generated batch formatter cleans staging on failure and never writes consumer paths', async () => {
+  const process = new RecordingProcess({ code: 1, stdout: '', stderr: 'parse failed' });
+  const formatter = new DenoGeneratedSourceFormatter(process);
+  await assertRejects(
+    () =>
+      formatter.formatContents([
+        { targetPath: '/consumer/aspire/apphost.mts', content: 'invalid source' },
+      ]),
+    Error,
+    'parse failed',
+  );
+  assertEquals(process.calls.length, 1);
+  assertEquals(process.calls[0].args.includes('/consumer/aspire/apphost.mts'), false);
+  const staging = process.calls[0].cwd;
+  if (!staging) throw new Error('Expected a staging directory.');
+  await assertRejects(() => Deno.stat(staging), Deno.errors.NotFound);
+});
