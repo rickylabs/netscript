@@ -415,6 +415,71 @@ and <code>me</code> answer. The default is suitable for scaffold smoke tests. Re
 require genuine provider credentials — the fallback is a stub path, not a working login.
 {{ /comp }}
 
+## Protect a plugin API
+
+Every plugin service built with `createPluginService` from `@netscript/plugin/service` must choose
+a posture in its `auth` field. Leaving the field out does not type-check, and a malformed posture
+throws before the service starts. `netscript plugin new <name>` generates the guarded posture, and
+it is the one to keep for any API that returns user data:
+
+```ts
+// plugins/billing/services/src/main.ts
+import { createPluginService } from '@netscript/plugin/service';
+import { mountPluginContract } from '@netscript/plugin/contract-base';
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
+import { createContractAuthorizer } from '@netscript/service/auth';
+import { billingContractDefinition } from '@netscript/plugin-billing-core/contracts/v1';
+import { billingContractMount, billingRouter } from './handlers.ts';
+
+export const billingService = createPluginService(billingRouter, {
+  name: 'billing',
+  auth: {
+    authn: {
+      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
+    },
+    authz: {
+      authorizer: createContractAuthorizer(
+        mountPluginContract(billingContractDefinition, billingContractMount),
+      ),
+    },
+  },
+});
+```
+
+- **Authentication.** `createAuthServiceAuthenticator` verifies the request's bearer session
+  against the `auth` service found through discovery. The plugin needs no auth backend, KV handle,
+  or provider secret. A missing or rejected session returns `401`. If the auth service cannot be
+  reached, the request returns `503`.
+- **Authorization.** `createContractAuthorizer` reads the scopes each procedure declares, for
+  example `.meta({ access: { authentication: 'required', authorization: { scopes: ['billing:read'] } } })`
+  on the contract route. A session without that scope returns `403`. Pass the same
+  `PluginContractMount` to router assembly and to `mountPluginContract` so REST paths and RPC keys
+  line up.
+- **Health.** `/health` stays anonymous. A healthy plugin does not prove that reads are authorized.
+
+To publish an API on purpose without a guard, record the decision instead of omitting it:
+
+```ts
+export const statusService = createPluginService(statusRouter, {
+  name: 'status',
+  auth: { public: true, reason: 'Unauthenticated status API for the load balancer' },
+});
+```
+
+The reason must not be blank, and a public posture cannot also carry `authn` or `authz`.
+
+{{ comp callout { type: "warning", title: "Background callers do not have an app session" } }}
+Workers, sagas, and triggers run under a service identity. Nothing they do may depend on an app
+being open or a user session staying alive. <code>createAuthServiceAuthenticator</code> accepts
+only sessions that the auth service issued. If background processes call a plugin API over HTTP,
+guard that API with a credential they hold, for example
+<code>createStaticCredentialAuthenticator</code> from <code>@netscript/service/auth</code> with a
+service credential the AppHost injects. A service takes exactly one authenticator.
+{{ /comp }}
+
+The exact posture types and validation rules are in the
+[plugin authentication reference](/reference/plugin/#plugin-service-authentication-posture).
+
 ## Production pitfalls
 
 {{ comp callout { type: "warning", title: "Read before you ship authentication" } }}

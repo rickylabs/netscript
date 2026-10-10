@@ -264,7 +264,20 @@ export type ServiceNotFoundHandler = NotFoundHandler;
 /** Error handler used by service applications. */
 export type ServiceErrorHandler = ErrorHandler;
 
-/** CORS options supported by `withCors()`. */
+/**
+ * CORS options supported by `withCors()`.
+ *
+ * `origin` accepts an exact origin, an allowlist array, or an upstream resolver.
+ * When omitted, `NETSCRIPT_CORS_ORIGINS` supplies a comma-separated allowlist;
+ * an unset or blank value denies cross-origin access. Only an explicit
+ * `origin: '*'` opts into wildcard access, and it cannot enable credentials.
+ *
+ * @example
+ * ```ts
+ * import type { CorsOptions } from '@netscript/service';
+ * const cors: CorsOptions = { origin: ['https://app.example'] };
+ * ```
+ */
 export type CorsOptions = Parameters<typeof cors>[0];
 
 /** Database client capable of a health-check query. */

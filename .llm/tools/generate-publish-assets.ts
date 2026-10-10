@@ -27,8 +27,12 @@ export const MCP_EMBEDDED_DOC_PATHS = [
   'pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md',
 ] as const;
 
-/** Maximum UTF-8 source bytes accepted for the generated MCP fallback prose. */
-export const MCP_EMBEDDED_DOCS_MAX_BYTES = 262_144;
+/**
+ * Maximum UTF-8 source bytes accepted for the generated MCP fallback prose.
+ * 258 KiB: #1383 required the guarded plugin-service example on the embedded
+ * plugin-system page when the corpus had 44 bytes of headroom under 256 KiB.
+ */
+export const MCP_EMBEDDED_DOCS_MAX_BYTES = 264_192;
 
 export const PUBLISH_ASSET_OUTPUTS = [
   '.llm/assets/agent-docs/prose.json.gz',
