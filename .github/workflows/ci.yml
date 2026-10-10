@@ -223,9 +223,10 @@ jobs:
         with:
           deno-version: ${{ env.DENO_VERSION }}
           cache: ${{ env.RUN == 'true' && matrix.index == 0 }}
-          cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
+          cache-hash: ${{ env.RUN == 'true' && matrix.index == 0 && format('{0}-{1}', env.DENO_VERSION, hashFiles('deno.lock')) || '' }}
 
-      # setup-deno owns the shared key and saves only in the check lane.
+      # A nonempty cache-hash enables caching even when cache is false. Gate both
+      # inputs so setup-deno owns the shared key and saves only in the check lane.
       # The action has no read-only input, so the remaining lanes restore that
       # upstream key through the read-only cache action without creating more copies.
       - name: Locate Deno module cache
@@ -395,7 +396,7 @@ jobs:
         with:
           deno-version: ${{ env.DENO_VERSION }}
           cache: ${{ env.RUN == 'true' }}
-          cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
+          cache-hash: ${{ env.RUN == 'true' && format('{0}-{1}', env.DENO_VERSION, hashFiles('deno.lock')) || '' }}
 
       - name: Record skipped quality receipt
         if: env.RUN != 'true'

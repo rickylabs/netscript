@@ -58,9 +58,12 @@ Deno.test('upstream Deno caches include version and lock hash and skip unused br
     const block = job(source, name);
     assertStringIncludes(block, 'uses: denoland/setup-deno@v2');
     assertStringIncludes(block, 'cache:');
+    const writer = name === 'check-test-shard' ? ' && matrix.index == 0' : '';
     assertStringIncludes(
       block,
-      "cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}",
+      name === 'deps-report'
+        ? "cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}"
+        : `cache-hash: \${{ env.RUN == 'true'${writer} && format('{0}-{1}', env.DENO_VERSION, hashFiles('deno.lock')) || '' }}`,
     );
     assertEquals(block.includes('path: ${{ env.DENO_DIR }}'), false);
   }
@@ -123,7 +126,7 @@ Deno.test('regression: matrix Deno cache has one shared key and a single writer'
   assertStringIncludes(block, "cache: ${{ env.RUN == 'true' && matrix.index == 0 }}");
   assertStringIncludes(
     block,
-    "cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}\n",
+    "cache-hash: ${{ env.RUN == 'true' && matrix.index == 0 && format('{0}-{1}', env.DENO_VERSION, hashFiles('deno.lock')) || '' }}\n",
   );
   assertEquals(block.includes("hashFiles('deno.lock') }}-${{ matrix.lane }}"), false);
   const restore = block.match(
@@ -139,5 +142,7 @@ Deno.test('regression: matrix Deno cache has one shared key and a single writer'
     restore,
     "key: deno-cache-${{ runner.os }}-${{ runner.arch }}-check-test-shard-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}",
   );
+  // setup-deno also enables caching for any nonempty hash, irrespective of cache=false.
+  // Requiring an empty reader hash prevents a second restore and competing post-job saves.
   assertEquals(block.includes('actions/cache/save'), false);
 });
