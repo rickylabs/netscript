@@ -349,7 +349,7 @@ Deno.test("copyOfficialPlugin rewrites fallback plugin source imports for top-le
     "deno.json",
     JSON.stringify({
       catalog: {
-        "@orpc/server": "^1.14.6",
+        "@orpc/server": "^1.15.5",
       },
     }),
   );
