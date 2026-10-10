@@ -37,6 +37,8 @@ export {
   OPENAPI_CURL_AUTH_NOTE,
 } from './src/application/flows/get-operation-schema-flow.ts';
 export type { GetOperationSchemaResult } from './src/application/flows/get-operation-schema-flow.ts';
+export type { OperationAccessSummary } from './src/domain/openapi/operation-access.ts';
+export type { SchemaViewName } from './src/domain/openapi/schema-views.ts';
 export type {
   DiagnosticEvidencePort,
   DiagnosticEvidenceReceipt,
@@ -141,6 +143,7 @@ export type {
 } from './src/infrastructure/aspire-ps-dashboard-reader.ts';
 export {
   DocsCorpusUnavailableError,
+  DocsDocumentTooLargeError,
   MAX_INDEXED_DOC_LENGTH,
   slugifyDocsHeading,
 } from './src/domain/docs/docs-corpus-port.ts';

@@ -52,6 +52,7 @@ function dependenciesFor(generated: string[]) {
     fs: new DenoFileSystem(),
     scaffolder: {} as ScaffolderPort,
     templateAdapter: {} as TemplatePort,
+    validateComposition: () => Promise.resolve(),
     regenerateHelpers: (root: string) => {
       generated.push(root);
       return Promise.resolve<readonly string[]>(['aspire/apphost.mts']);

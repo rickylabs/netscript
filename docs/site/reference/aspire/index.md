@@ -42,6 +42,21 @@ config, schema, type, adapter, and testing APIs live on typed sub-path exports:
 - [`@netscript/aspire/testing`](#sub-path-exports) — in-memory builder, contribution base class, and test fixtures.
 - [`@netscript/aspire/public`](#sub-path-exports) — production aggregate re-exporting all public surfaces.
 
+## Generated Garnet version
+
+The CLI scaffold pins both the `ghcr.io/microsoft/garnet:2.2.1` container and the Docker-less
+`garnet-server` dotnet tool to Garnet **2.2.1**. The shared cache-image definition derives its tag
+from `SCAFFOLD_VERSIONS.GARNET_TOOL`; generator tests enforce the same default in `Container`,
+`Executable`, and both branches of `Auto` mode. Explicit `ImageTag` and `ToolVersion` configuration
+can override those defaults independently.
+
+NetScript registers Garnet through the generic `builder.addContainer(...)` and
+`builder.addExecutable(...)` paths. It does not call Aspire's `AddGarnet`, whose default image tag
+is **1.0** in `Aspire.Hosting.Garnet 13.5.3`. That package remains in the generated Aspire package
+list, but its default does not select NetScript's image. When upgrading Aspire or changing the
+registration path, preserve the shared version pin and verify both runtime arms with the RESP
+readiness check at their published endpoints.
+
 ## Readiness contract
 
 `healthStatus` for backing infrastructure answers one question: **is this resource reachable at the

@@ -1,4 +1,5 @@
-import type { StreamProducerTransportFailureV1 } from '../domain/producer-contract-v1.ts';
+import type { StreamRetentionPolicyV1 } from '../domain/retention-contract-v1.ts';
+import type { StreamProducerTransportResultV1 } from '../domain/producer-contract-v1.ts';
 
 /** Exact producer identity retained across an append retry. */
 export interface StreamProducerIdentityV1 {
@@ -18,6 +19,8 @@ export interface StreamProducerConnectInputV1 {
   readonly headers: Readonly<Record<string, string>>;
   /** Finite timeout for this individual transport request. */
   readonly requestTimeoutMs: number;
+  /** Server retention applied only when creating the stream. */
+  readonly retention?: StreamRetentionPolicyV1;
   /** Optional cancellation. */
   readonly signal?: AbortSignal;
 }
@@ -42,10 +45,7 @@ export interface StreamProducerAcknowledgementV1 {
   readonly duplicate: boolean;
 }
 
-/** Result of one transport operation without policy or retry decisions. */
-export type StreamProducerTransportResultV1<T> =
-  | Readonly<{ ok: true; value: T }>
-  | Readonly<{ ok: false; failure: StreamProducerTransportFailureV1 }>;
+export type { StreamProducerTransportResultV1 } from '../domain/producer-contract-v1.ts';
 
 /** Durable-stream protocol edge consumed by the producer supervisor. */
 export interface StreamProducerTransportPort {

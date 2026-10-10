@@ -22,9 +22,9 @@ them to a NetScript host.
 ## Why teams use it
 
 - **One auth API, swappable backends** — the `auth-api` service uses an Aspire-allocated endpoint
-  and exposes `signin`, `callback`, `signout`, `session`, and `me` over a versioned v1 contract,
-  backed by a single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth` (interactive
-  OAuth/OIDC), `workos`, or `better-auth`.
+  and exposes `signin`, `callback`, `signout`, `revokeSession`, `session`, and `me` over a versioned
+  v1 contract, backed by a single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth`
+  (interactive OAuth/OIDC), `workos`, or `better-auth`.
 - **Stable user subjects** — on `kv-oauth`, `NETSCRIPT_AUTH_SUBJECT_SOURCE` (`id_token` |
   `userinfo`) and `NETSCRIPT_AUTH_SUBJECT_CLAIM` choose where the subject comes from. A preset named
   by `NETSCRIPT_AUTH_PROVIDER_ID` supplies its default (GitHub: userinfo `id`, as `github:<id>`). A
@@ -46,7 +46,7 @@ them to a NetScript host.
 ```mermaid
 flowchart LR
     M["authPlugin manifest"] --> H["NetScript host<br/>(plugin install + sync)"]
-    H --> A["auth-api<br/>Aspire-allocated endpoint<br/>signin · callback · session · me · signout"]
+    H --> A["auth-api<br/>Aspire-allocated endpoint<br/>signin · callback · session · me · signout · revokeSession"]
     A --> B["Active backend<br/>(NETSCRIPT_AUTH_BACKEND)"]
     B --> K["kv-oauth"]
     B --> W["workos"]
@@ -67,6 +67,19 @@ The plugin owns its setup — the CLI ships no embedded templates. The scaffolde
 service, the auth database schema, session streams, and Aspire resources into your workspace, then
 pins the matching `@netscript/*` versions.
 
+By default Aspire allocates the `auth-api` host port at every start. An OAuth callback registered
+with an identity provider must keep its port, so pin it when you use the interactive `kv-oauth`
+backend:
+
+```bash
+netscript plugin install auth --name auth --port 7100
+```
+
+`--port` writes `HostPort` on the plugin's `appsettings.json` entry; `netscript plugin update` and a
+forced re-install without `--port` keep it. A pinned host port is a machine-global reservation, so
+`aspire start --isolated` cannot randomise it and two workspaces pinning the same port collide. See
+[Add authentication](https://rickylabs.github.io/netscript/how-to/add-authentication/).
+
 To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
 ```bash
@@ -82,7 +95,7 @@ Install the plugin:
 
 ```bash
 $ netscript plugin install auth --name auth
-Installed auth plugin "auth" on port <allocated-port>.
+Installed auth plugin "auth". View its endpoint in the Aspire dashboard.
 Created 1 plugin files.
 Regenerated 12 Aspire helper files.
 ```

@@ -1,3 +1,4 @@
+import type { StreamRetentionPolicyV1 } from '../domain/retention-contract-v1.ts';
 import type {
   StreamProducerReadinessOptionsV1,
   StreamProducerReconnectPolicyV1,
@@ -37,6 +38,7 @@ interface ReadyWaiter extends ProducerDeferred<void> {
 /** Finite FIFO supervisor for durable stream producer delivery. */
 export class DurableStreamProducerSupervisor {
   readonly #url: string;
+  readonly #retention?: StreamRetentionPolicyV1;
   readonly #headers: Readonly<Record<string, string>>;
   readonly #producerId: string;
   readonly #transport: StreamProducerTransportPort;
@@ -70,6 +72,7 @@ export class DurableStreamProducerSupervisor {
   constructor(options: DurableStreamProducerSupervisorOptions) {
     this.#url = options.url;
     this.#headers = options.headers;
+    this.#retention = options.retention;
     this.#producerId = options.producerId;
     this.#transport = options.transport;
     this.#clock = options.clock;
@@ -300,6 +303,7 @@ export class DurableStreamProducerSupervisor {
         this.#transition('reconnecting', attempt);
         const connected = await this.#transport.connect({
           ...this.#requestInput(),
+          retention: this.#retention,
         });
         if (!connected.ok) {
           if (this.#abort.signal.aborted) {
@@ -379,6 +383,7 @@ export class DurableStreamProducerSupervisor {
       this.#transition(initial && attempt === 1 ? 'connecting' : 'reconnecting', attempt);
       const result = await this.#transport.connect({
         ...this.#requestInput(),
+        retention: this.#retention,
       });
       if (result.ok) {
         if (attempt > 1) {

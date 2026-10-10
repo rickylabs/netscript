@@ -113,6 +113,15 @@ describe('service template rendering', () => {
     }
   });
 
+  it('both shipped service entrypoints record a greppable public opt-out pending #1382 L2', async () => {
+    const adapter = makeAdapter();
+    for (const key of ['service/main.ts.template', 'service/main.memory.ts.template'] as const) {
+      const output = await adapter.render(EMBEDDED_TEMPLATE_CONTENT[key], SAMPLE_SERVICE_VARS);
+      assertStringIncludes(output, 'auth: { public: true, reason:', key);
+      assertStringIncludes(output, '#1382 L2 will wire the guarded auth policy', key);
+    }
+  });
+
   it('router.ts preserves the validated service-local health contract shape', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(serviceRouterTemplate, SAMPLE_SERVICE_VARS);
