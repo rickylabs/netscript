@@ -33,12 +33,13 @@ export interface LoadInstallationSecretOptions {
 /**
  * Imports installation secret material held in memory.
  *
- * Surrounding whitespace is trimmed so a file written with a trailing newline yields the same
- * secret. Use {@link loadInstallationSecret} for the carrier-delivered file reference.
+ * Binary material is used verbatim, byte for byte. Textual material has surrounding whitespace
+ * trimmed, so a secret written with a trailing newline yields the same credential. Use
+ * {@link loadInstallationSecret} for the carrier-delivered file reference.
  *
- * @param material - At least 32 bytes of high-entropy secret material.
+ * @param material - At least 32 bytes of high-entropy secret material (bytes, or UTF-8 text).
  * @returns An opaque handle used to derive internal service credentials.
- * @throws {TypeError} When the trimmed material is shorter than 32 bytes.
+ * @throws {TypeError} When the material (trimmed, for text) is shorter than 32 bytes.
  *
  * @example
  * ```ts
@@ -51,7 +52,9 @@ export interface LoadInstallationSecretOptions {
 export async function createInstallationSecret(
   material: string | Uint8Array,
 ): Promise<InstallationSecret> {
-  const bytes = trimMaterial(material);
+  const bytes = typeof material === 'string'
+    ? new TextEncoder().encode(material.trim())
+    : material.slice();
   if (bytes.byteLength < MIN_SECRET_BYTES) {
     throw new TypeError(
       `Installation secret must hold at least ${MIN_SECRET_BYTES} bytes of secret material.`,
@@ -67,12 +70,14 @@ export async function createInstallationSecret(
 /**
  * Loads the installation secret from the file the carrier references.
  *
- * Reads at most 4 KiB. Load once at startup and share the handle; deriving credentials from it
- * performs no further file I/O.
+ * The file holds a textual secret, such as 32 random bytes in base64 or hex; surrounding
+ * whitespace is trimmed. Reads at most 4 KiB. Load once at startup and share the handle; deriving
+ * credentials from it performs no further file I/O.
  *
  * @param options - Optional explicit file path.
  * @returns An opaque handle used to derive internal service credentials.
- * @throws {Error} When no path is configured, or the file is missing, oversized, or too short.
+ * @throws {Error} When no path is configured, or the file is missing, oversized, not UTF-8 text,
+ *   or too short.
  *
  * @example
  * ```ts
@@ -91,7 +96,7 @@ export async function loadInstallationSecret(
       `Installation secret file is not configured; set ${INSTALLATION_SECRET_FILE_ENV}.`,
     );
   }
-  return await createInstallationSecret(await readBoundedFile(path));
+  return await createInstallationSecret(decodeSecretText(await readBoundedFile(path)));
 }
 
 /** Returns the private HKDF key behind a handle created by this module. */
@@ -123,16 +128,10 @@ async function readBoundedFile(path: string): Promise<Uint8Array> {
   return buffer.slice(0, length);
 }
 
-function trimMaterial(material: string | Uint8Array): Uint8Array<ArrayBuffer> {
-  if (typeof material === 'string') return new TextEncoder().encode(material.trim());
-
-  let start = 0;
-  let end = material.byteLength;
-  while (start < end && isAsciiWhitespace(material[start])) start += 1;
-  while (end > start && isAsciiWhitespace(material[end - 1])) end -= 1;
-  return material.slice(start, end);
-}
-
-function isAsciiWhitespace(byte: number | undefined): boolean {
-  return byte === 0x20 || byte === 0x09 || byte === 0x0a || byte === 0x0d;
+function decodeSecretText(bytes: Uint8Array): string {
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    throw new TypeError('Installation secret file must contain UTF-8 text, such as base64 or hex.');
+  }
 }

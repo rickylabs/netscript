@@ -242,10 +242,13 @@ construction, before any request.
 of the same installation: workers, sagas and triggers presenting the internal service credential.
 Both contract authorizers enforce it on the RPC projection and on the OpenAPI projection, including
 oRPC's default OpenAPI path (`POST <apiPath>/<router>/<procedure>`) when the contract declares no
-`route.path`. A request using a method no procedure declares on an internal procedure's OpenAPI
-path fails closed toward that procedure. A user session never satisfies the audience, and the
-check uses the principal's identity, not its claims or roles. An `'internal'` audience combined
-with `authentication: 'none'`, or any other audience value, throws at construction.
+`route.path`. Requests resolve to the procedure oRPC executes: the undecoded pathname is matched
+with oRPC's own route patterns and `rou3` precedence (static before parameter before wildcard),
+not contract declaration order. A request using a method no procedure declares on an internal
+procedure's OpenAPI path fails closed toward that procedure. A user session never satisfies the
+audience, and the check uses the principal's identity, not its claims or roles. Construction
+throws for an `'internal'` audience combined with `authentication: 'none'`, for any other audience
+value, and for procedures with different access that share one OpenAPI route.
 
 `createContractOverlayAuthorizer(contract, { fallback?, isInternalCaller? })` governs only
 procedures that declare `meta.access`. Every other request keeps the service's own policy: the
@@ -257,7 +260,9 @@ still governs every procedure in the contract.
 
 The credential is derived from one per-installation secret. Carriers deliver
 `NETSCRIPT_INSTALLATION_SECRET_FILE`, a file reference, never the value. `loadInstallationSecret()`
-reads it once at startup (4 KiB maximum, 32 bytes minimum). Each service accepts only the bearer
+reads it once at startup. The file holds a textual secret, such as base64 or hex, with surrounding
+whitespace trimmed (4 KiB maximum, 32 bytes minimum). In-memory `Uint8Array` material passed to
+`createInstallationSecret()` is used verbatim. Each service accepts only the bearer
 derived for its own name (HKDF-SHA-256), so a credential cannot be replayed across services. A
 credential expires by rotation: once the secret changes, every credential derived from the old one
 is rejected. `createCompositeAuthenticator([...])` lets one guarded service accept the internal

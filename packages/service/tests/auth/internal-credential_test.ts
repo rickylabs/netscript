@@ -96,6 +96,40 @@ Deno.test('installation secret rejects absent, short, and oversized material', a
   );
 });
 
+Deno.test('binary installation secrets keep their edge bytes; only text is trimmed', async () => {
+  // 32 random-looking bytes whose first and last bytes are ASCII whitespace.
+  const edged = new Uint8Array(32).fill(0x41);
+  edged[0] = 0x20;
+  edged[31] = 0x0a;
+  const verbatim = await deriveInternalCredential(await createInstallationSecret(edged), 'orders');
+
+  const spaces = await createInstallationSecret(new Uint8Array(32).fill(0x20));
+  assert((await deriveInternalCredential(spaces, 'orders')).startsWith('nsi1_'));
+
+  // The same bytes as text are trimmed to 30 bytes, which is too short.
+  await assertRejects(
+    () => createInstallationSecret(new TextDecoder().decode(edged)),
+    TypeError,
+    'at least 32 bytes',
+  );
+  const longer = new Uint8Array(40).fill(0x41);
+  longer[0] = 0x20;
+  longer[39] = 0x0a;
+  assertNotEquals(
+    await deriveInternalCredential(await createInstallationSecret(longer), 'orders'),
+    await deriveInternalCredential(
+      await createInstallationSecret(new TextDecoder().decode(longer)),
+      'orders',
+    ),
+  );
+  assert(verbatim.startsWith('nsi1_'));
+
+  // The carrier-delivered file is textual; binary content is refused rather than reinterpreted.
+  await withSecretFile(new Uint8Array(40).fill(0xff), async (path) => {
+    await assertRejects(() => loadInstallationSecret({ path }), TypeError, 'UTF-8 text');
+  });
+});
+
 Deno.test('internal credentials are derived per service and per installation', async () => {
   const secret = await createInstallationSecret(MATERIAL);
   const orders = await deriveInternalCredential(secret, 'orders');
@@ -247,18 +281,19 @@ Deno.test('contract index covers OpenAPI defaults under the RPC mount and wildca
   assertEquals(resolver.resolve({ method: 'POST', path: '/api/rpc/flush' }), internal);
   assertEquals(resolver.resolve({ method: 'POST', path: '/api/rpc/rpc/flush' }), internal);
   assertEquals(resolver.resolve({ method: 'GET', path: '/api/files/a/b/c.txt' }), internal);
-  // The empty wildcard remainder is guarded too (fail closed), independent of router version.
-  assertEquals(resolver.resolve({ method: 'GET', path: '/api/files' }), internal);
+  // oRPC serves nothing for an empty wildcard remainder; the index agrees with it.
+  assertEquals(resolver.resolve({ method: 'GET', path: '/api/files' }), { matched: false });
   // Unmarked procedures stay unmatched so the service's own policy applies.
   assertEquals(resolver.resolve({ method: 'GET', path: '/api/ping' }), { matched: false });
 });
 
 Deno.test('contract authorizers reject unknown and anonymous internal audiences', () => {
   const unknown = {
-    odd: baseContract.output(SuccessSchema).meta({
-      access: { audience: 'partners' as unknown as 'internal' },
-    }),
+    odd: baseContract.output(SuccessSchema).meta({ access: { audience: 'internal' } }),
   };
+  // Malformed runtime metadata, as an untyped or older contract could carry it.
+  assert(Reflect.set(unknown.odd['~orpc'].meta.access ?? {}, 'audience', 'partners'));
+  assertEquals(unknown.odd['~orpc'].meta.access?.audience, 'partners');
   const anonymous = {
     open: baseContract.output(SuccessSchema).meta({
       access: { audience: 'internal', authentication: 'none' },

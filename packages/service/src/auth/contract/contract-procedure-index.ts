@@ -3,12 +3,22 @@
  *
  * A procedure is served on two projections: the RPC mount (by router path) and the OpenAPI mount
  * (by `route.path`, or by the router path when the contract declares none, with oRPC's default
- * `POST` method). The index matches both, so a policy declared on a procedure cannot be bypassed
- * by calling the projection that was not considered.
+ * method). The index selects the procedure the same way oRPC's handlers do, so a policy declared
+ * on a procedure cannot be bypassed through the projection or route that was not considered:
+ *
+ * - it matches the undecoded request pathname and strips mounts exactly as the oRPC handlers do;
+ * - RPC keys are oRPC's `toHttpPath()` of the router path;
+ * - OpenAPI routes are registered in a `rou3` router (the router oRPC's OpenAPI matcher uses) with
+ *   oRPC's `toRou3Pattern()` and default method, so static, parameter, and wildcard precedence is
+ *   the upstream precedence rather than declaration order.
  *
  * @module
  */
 
+import { toHttpPath } from '@orpc/client/standard';
+import { fallbackContractConfig, type HTTPMethod } from '@orpc/contract';
+import { toRou3Pattern } from '@orpc/openapi/standard';
+import { addRoute, createRouter, findRoute } from 'rou3';
 import type {
   ContractPolicyBindingOptions,
   ContractPolicyContract,
@@ -21,9 +31,8 @@ const OPTIONAL_AUTHENTICATION_ERROR =
 const UNKNOWN_AUDIENCE_ERROR = '[netscript.service.contract-policy] unsupported audience';
 const PUBLIC_INTERNAL_ERROR =
   '[netscript.service.contract-policy] an internal audience cannot be anonymous';
-
-/** oRPC's OpenAPI method for procedures whose contract declares no `route.method`. */
-const OPENAPI_DEFAULT_METHOD = 'POST';
+const AMBIGUOUS_ROUTE_ERROR =
+  '[netscript.service.contract-policy] procedures with different access share an OpenAPI route';
 
 type ContractProcedure = Extract<
   ContractPolicyContract,
@@ -36,8 +45,8 @@ export interface IndexedProcedure {
   readonly routerPath: readonly string[];
   /** OpenAPI method, defaulted exactly as oRPC does. */
   readonly restMethod: string;
-  /** OpenAPI path relative to the API mount, defaulted exactly as oRPC does. */
-  readonly restPath: string;
+  /** OpenAPI `rou3` route pattern relative to the API mount, derived exactly as oRPC does. */
+  readonly restPattern: string;
   /** Normalized access policy, or undefined when the procedure declares no access metadata. */
   readonly policy: ProcedureAccessPolicy | undefined;
 }
@@ -52,7 +61,8 @@ export interface ProcedureIndex {
  * Traverses a contract once and normalizes every procedure's access metadata.
  *
  * @throws {Error} When a procedure declares optional authentication, an unknown audience, or an
- *   anonymous internal audience.
+ *   anonymous internal audience, or when procedures with different access share one OpenAPI route
+ *   (oRPC would then select by router key order, which the contract cannot see).
  */
 export function compileProcedures(contract: ContractPolicyContract): readonly IndexedProcedure[] {
   const procedures: IndexedProcedure[] = [];
@@ -60,11 +70,12 @@ export function compileProcedures(contract: ContractPolicyContract): readonly In
     const route = readProperty(procedure['~orpc'], 'route');
     procedures.push({
       routerPath,
-      restMethod: (readStringProperty(route, 'method') ?? OPENAPI_DEFAULT_METHOD).toUpperCase(),
-      restPath: readStringProperty(route, 'path') ?? toRouterPath(routerPath),
+      restMethod: fallbackContractConfig('defaultMethod', readHttpMethod(route)),
+      restPattern: toRou3Pattern(readHttpPath(route) ?? toHttpPath(routerPath)),
       policy: normalizePolicy(procedure, routerPath),
     });
   });
+  assertUnambiguousRoutes(procedures);
   return Object.freeze(procedures);
 }
 
@@ -73,39 +84,83 @@ export function bindProcedureIndex(
   procedures: readonly IndexedProcedure[],
   binding: ContractPolicyBindingOptions,
 ): ProcedureIndex {
-  const rpcPrefixes = uniquePaths([binding.rpcPath, ...(binding.rpcAliases ?? [])])
-    .sort((left, right) => right.length - left.length);
-  const rpcProcedures = new Map(
-    procedures.map((procedure) => [toRouterPath(procedure.routerPath), procedure]),
+  // The RPC handlers are registered for the primary mount first, then each distinct alias.
+  const rpcMounts = [...new Set([binding.rpcPath, ...(binding.rpcAliases ?? [])])]
+    .map(toMountPrefix);
+  const apiMount = toMountPrefix(binding.apiPath);
+  const rpcProcedures = new Map<string, IndexedProcedure>(
+    procedures.map((procedure) => [toHttpPath(procedure.routerPath), procedure]),
   );
-  const restProcedures = procedures.map((procedure) => ({
-    procedure,
-    method: procedure.restMethod,
-    pattern: compilePathPattern(joinPath(binding.apiPath, procedure.restPath)),
-  }));
+  const restRoutes = createRouter<IndexedProcedure>();
+  const internalRoutes = createRouter<IndexedProcedure>();
+  for (const procedure of procedures) {
+    addRoute(restRoutes, procedure.restMethod, procedure.restPattern, procedure);
+    if (procedure.policy?.audience === 'internal') {
+      addRoute(internalRoutes, '', procedure.restPattern, procedure);
+    }
+  }
 
   return Object.freeze({
     find(request: ProcedurePolicyRequest): IndexedProcedure | undefined {
-      const originalPath = normalizePath(request.path);
-      const rpcPath = remapDeprecatedRpcPath(originalPath, binding);
-      const rpcPrefix = rpcPrefixes.find((prefix) => isWithinPrefix(rpcPath, prefix));
-      const rpcMatch = rpcPrefix ? rpcProcedures.get(relativePath(rpcPath, rpcPrefix)) : undefined;
-      if (rpcMatch) return rpcMatch;
+      const rpcPathname = remapDeprecatedRpcPath(request.path, binding);
+      for (const mount of rpcMounts) {
+        const relative = stripMount(rpcPathname, mount);
+        const procedure = relative === undefined ? undefined : rpcProcedures.get(relative);
+        if (procedure) return procedure;
+      }
 
-      // The OpenAPI mount usually encloses the RPC mount, so an RPC miss can still be a REST hit.
-      const pathMatches = restProcedures.filter((candidate) =>
-        candidate.pattern.test(originalPath)
-      );
-      const requestMethod = request.method.toUpperCase();
-      const exact = pathMatches.find((candidate) => candidate.method === requestMethod);
-      if (exact) return exact.procedure;
-
-      // A method no procedure declares on this path (HEAD, a lower-case extension method) is not
-      // served as a public procedure. Fail closed toward any internal procedure on the path.
-      return pathMatches.find((candidate) => candidate.procedure.policy?.audience === 'internal')
-        ?.procedure;
+      // An RPC miss falls through to the OpenAPI handler, whose mount usually encloses RPC.
+      const relative = stripMount(request.path, apiMount);
+      if (relative === undefined) return undefined;
+      return findRoute(restRoutes, request.method, relative)?.data ??
+        // oRPC serves nothing for a method no procedure declares on this path (HEAD, extension
+        // methods). Fail closed toward an internal procedure on the path all the same.
+        findRoute(internalRoutes, '', relative)?.data;
     },
   });
+}
+
+/** Rejects contracts where oRPC's choice between same-route procedures would decide access. */
+function assertUnambiguousRoutes(procedures: readonly IndexedProcedure[]): void {
+  const routes = new Map<string, IndexedProcedure>();
+  for (const procedure of procedures) {
+    // Parameter names do not affect matching: `/items/:id` and `/items/:slug` are one route.
+    const key = `${procedure.restMethod} ${
+      procedure.restPattern.replace(/\/(\*\*)?:[^/]+/g, '/$1:')
+    }`;
+    const existing = routes.get(key);
+    if (existing && !samePolicy(existing.policy, procedure.policy)) {
+      throw new Error(
+        `${AMBIGUOUS_ROUTE_ERROR}: ${existing.routerPath.join('.')}, ${
+          procedure.routerPath.join('.')
+        }`,
+      );
+    }
+    routes.set(key, existing ?? procedure);
+  }
+}
+
+function samePolicy(
+  left: ProcedureAccessPolicy | undefined,
+  right: ProcedureAccessPolicy | undefined,
+): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+/** Normalizes a mount path the way the oRPC handlers normalize their `prefix` option. */
+function toMountPrefix(path: string): string {
+  return path.replace(/\/$/, '');
+}
+
+/**
+ * Returns the handler-relative path oRPC matches for a mount, or undefined outside the mount.
+ * Mirrors the oRPC standard handlers: a prefix check on the undecoded pathname, removal of the
+ * prefix, then one leading and one trailing slash trimmed.
+ */
+function stripMount(pathname: string, mount: string): `/${string}` | undefined {
+  if (mount && !pathname.startsWith(`${mount}/`) && pathname !== mount) return undefined;
+  const remainder = mount ? pathname.replace(mount, '') : pathname;
+  return `/${remainder.replace(/^\/|\/$/g, '')}`;
 }
 
 function traverseContract(
@@ -174,44 +229,6 @@ function remapDeprecatedRpcPath(
   return path;
 }
 
-/** Compiles an OpenAPI path template the way oRPC's matcher reads it. */
-function compilePathPattern(path: string): RegExp {
-  let source = '';
-  let index = 0;
-  for (const match of path.matchAll(/\{(\+?)[^{}]+\}/g)) {
-    const literal = escapeRegExp(path.slice(index, match.index));
-    // `{+name}` is oRPC's multi-segment wildcard. It also absorbs its leading slash so the empty
-    // remainder matches too: that only widens the guard, whatever the router version does.
-    // `{name}` is exactly one segment.
-    source += match[1] && literal.endsWith('/')
-      ? `${literal.slice(0, -1)}(?:/.*)?`
-      : `${literal}${match[1] ? '.*' : '[^/]+'}`;
-    index = match.index + match[0].length;
-  }
-  source += escapeRegExp(path.slice(index));
-  return new RegExp(`^${source}/?$`);
-}
-
-function joinPath(prefix: string, path: string): string {
-  const normalizedPrefix = normalizePath(prefix);
-  const normalizedPath = normalizePath(path.replace(/\/{2,}/g, '/'));
-  if (normalizedPrefix === '/') return normalizedPath;
-  if (normalizedPath === '/') return normalizedPrefix;
-  return `${normalizedPrefix}${normalizedPath}`;
-}
-
-function toRouterPath(segments: readonly string[]): string {
-  return normalizePath(`/${segments.join('/')}`);
-}
-
-function relativePath(path: string, prefix: string): string {
-  return normalizePath(path.slice(prefix.length));
-}
-
-function uniquePaths(paths: readonly string[]): string[] {
-  return [...new Set(paths.map(normalizePath))];
-}
-
 function normalizePath(path: string): string {
   const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
   const withoutTrailingSlash = withLeadingSlash.replace(/\/+$/, '');
@@ -222,10 +239,6 @@ function isWithinPrefix(path: string, prefix: string): boolean {
   return path === prefix || path.startsWith(prefix === '/' ? '/' : `${prefix}/`);
 }
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function readProperty(value: unknown, property: string): unknown {
   return typeof value === 'object' && value !== null ? Reflect.get(value, property) : undefined;
 }
@@ -233,6 +246,20 @@ function readProperty(value: unknown, property: string): unknown {
 function readStringProperty(value: unknown, property: string): string | undefined {
   const result = readProperty(value, property);
   return typeof result === 'string' ? result : undefined;
+}
+
+const HTTP_METHODS: readonly HTTPMethod[] = ['HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
+
+function readHttpPath(route: unknown): `/${string}` | undefined {
+  const path = readStringProperty(route, 'path');
+  if (path === undefined) return undefined;
+  // `toRou3Pattern()` standardizes slashes; only the leading slash must be present for its type.
+  return path.startsWith('/') ? `/${path.slice(1)}` : `/${path}`;
+}
+
+function readHttpMethod(route: unknown): HTTPMethod | undefined {
+  const method = readStringProperty(route, 'method');
+  return HTTP_METHODS.find((candidate) => candidate === method);
 }
 
 function readStringList(value: unknown): readonly string[] {

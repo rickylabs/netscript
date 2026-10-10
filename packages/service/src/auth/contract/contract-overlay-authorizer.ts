@@ -87,7 +87,10 @@ export function createContractOverlayAuthorizer<TContract extends ContractPolicy
         return { allow: false, reason: 'authz.contract-policy-unbound' };
       }
 
-      const resolution = resolver.resolve(request);
+      const resolution = resolver.resolve({
+        method: request.method,
+        path: request.rawPath ?? request.path,
+      });
       if (resolution.matched && resolution.policy) {
         return authorizeProcedurePolicy(request, resolution.policy, isInternalCaller);
       }

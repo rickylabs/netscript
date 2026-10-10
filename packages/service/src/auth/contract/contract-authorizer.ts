@@ -80,7 +80,10 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
         return deny('authz.contract-policy-unbound');
       }
 
-      const resolution = resolver.resolve(request);
+      const resolution = resolver.resolve({
+        method: request.method,
+        path: request.rawPath ?? request.path,
+      });
       if (!resolution.matched) {
         return deny('authz.no-contract-procedure');
       }

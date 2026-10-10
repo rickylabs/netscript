@@ -41,7 +41,10 @@ export interface ProcedureAccessPolicy {
 export interface ProcedurePolicyRequest {
   /** Request method used by REST procedure matching. */
   readonly method: string;
-  /** Request path projected through the bound REST or RPC mount. */
+  /**
+   * Undecoded request pathname (as the oRPC handlers match it), including the REST or RPC mount.
+   * Pass the raw pathname, not a percent-decoded one: decoding can select a different route.
+   */
   readonly path: string;
 }
 
