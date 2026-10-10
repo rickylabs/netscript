@@ -29,7 +29,8 @@ Deno.test('create-chat-connection.ts stays within its recorded debt ceiling', as
   const ceiling = Number(/from \*\*\d+ to (\d+) lines\*\*/.exec(entry)?.[1]);
   assert(Number.isSafeInteger(ceiling), 'debt entry does not record the line ceiling');
 
-  const lines = (await Deno.readTextFile(MODULE)).split('\n').length - 1;
+  // Counted exactly as `arch:check` counts (check-doctrine.ts), so the WARN and the entry agree.
+  const lines = (await Deno.readTextFile(MODULE)).split(/\r?\n/).length;
   assert(
     lines <= ceiling,
     `create-chat-connection.ts is ${lines} lines, above the ${ceiling} recorded in ${DEBT_ID}; ` +
