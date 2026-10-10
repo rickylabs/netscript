@@ -6,8 +6,9 @@ templateEngine: [vento, md]
 
 # `@netscript/plugin-streams`
 
-Durable Streams development plugin for NetScript: a plugin manifest plus CLI, scaffolding,
-end-to-end gate, and Aspire integration surfaces for a durable, change-data stream service. This
+Durable Streams protocol plugin for NetScript: a plugin manifest plus CLI, scaffolding,
+end-to-end gate, and Aspire integration surfaces for an ephemeral change-data stream service
+with startup-probed file storage as an explicit opt-in supporting orderly process restart. This
 page is written against the plugin public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
@@ -129,11 +130,13 @@ re-exported from [`@netscript/plugin`](/reference/plugin/) and document the base
 
 ### `@netscript/plugin-streams/aspire` {#sub-path-aspire}
 
-The Aspire entrypoint contributes the Durable Streams development service to an Aspire AppHost.
+The Aspire entrypoint contributes the ephemeral-by-default Durable Streams protocol service to
+an Aspire AppHost. File storage requires an explicit, existing writable directory and a successful
+startup write/read probe; invalid opt-ins fail startup.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `StreamsAspireContribution` | class | `class StreamsAspireContribution` | Aspire contribution for the Durable Streams development service. |
+| `StreamsAspireContribution` | class | `class StreamsAspireContribution` | Aspire contribution for the ephemeral-by-default Durable Streams protocol service. |
 
 The remaining symbols on this entrypoint (`AspireBuilder`, `AspireResource`, `AspireResourceKind`,
 `AspireNSPluginContribution`, `ContributionContext`, `CacheSpec`, `ContainerSpec`, `DatabaseSpec`,

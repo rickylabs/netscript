@@ -11,9 +11,11 @@
  * Streams is the one plugin with no oRPC contract, so the service is built
  * with an empty router and `serveRpc: false` (no `withRPC` wiring).
  *
- * When `STREAMS_DATA_DIR` is set the server uses file-backed storage so
- * events survive process restarts.  Omitting the env var uses in-memory
- * storage (suitable for development).
+ * Storage defaults to ephemeral memory; all events are lost on process restart.
+ * An explicit `STREAMS_DATA_DIR` selects file storage only after a startup
+ * write/read probe succeeds. Empty, missing, non-directory or unwritable opt-ins
+ * fail startup without falling back to memory. File mode supports replay after
+ * an orderly process restart; it does not claim power-loss durability.
  *
  * @module
  */
@@ -24,7 +26,7 @@ import { createPluginService } from '@netscript/plugin/service';
 import { createStreamsServer } from './bounded-file-store.ts';
 import { PLUGIN_PACKAGE_VERSION } from '../../src/package-metadata.generated.ts';
 import { createStreamsProxyHandler } from './proxy.ts';
-import { describeStorageDurability } from './durability.ts';
+import { createStorageHealthCheck, describeStorageDurability } from './durability.ts';
 
 /** Connector version, single-sourced from the streams package `deno.json`. */
 const VERSION: string = PLUGIN_PACKAGE_VERSION;
@@ -35,7 +37,7 @@ if (portValue === undefined) {
 }
 const port = Number.parseInt(portValue, 10);
 const dataDir = Deno.env.get('STREAMS_DATA_DIR');
-const durability = describeStorageDurability(dataDir);
+const durability = await describeStorageDurability(dataDir);
 if (!durability.durable) {
   console.warn(`[streams] Warning: ${durability.message}`);
 }
@@ -64,6 +66,7 @@ const upstreamCheck = healthChecks.custom('durable-streams-server', async () => 
     const res = await fetch(`http://127.0.0.1:${internalPort}/`, {
       signal: controller.signal,
     });
+    await res.body?.cancel();
     return res.status < 500;
   } finally {
     clearTimeout(timeout);
@@ -124,7 +127,7 @@ const running = await createPluginService({}, {
       'vary',
     ],
   },
-  healthChecks: [upstreamCheck],
+  healthChecks: [upstreamCheck, createStorageHealthCheck(durability)],
   rawRoutes: [{ method: 'all', path: '/*', handler: proxyHandler }],
   onShutdown: [async () => {
     await server.stop();

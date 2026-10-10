@@ -32,6 +32,19 @@ function isEnvironmentTarget(resource: unknown): resource is EnvironmentTarget {
     'withEnvironment' in resource && typeof resource.withEnvironment === 'function';
 }
 
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) &&
+    Object.values(value).every((entry) => typeof entry === 'string');
+}
+
+function declaredCorsOrigins(entry: unknown): string | undefined {
+  if (entry === null || typeof entry !== 'object') return undefined;
+  const environment = 'Environment' in entry ? entry.Environment : undefined;
+  const legacy = 'Env' in entry ? entry.Env : undefined;
+  const values = environment ?? legacy;
+  return isStringRecord(values) ? values.NETSCRIPT_CORS_ORIGINS?.trim() : undefined;
+}
+
 /**
  * Registers application resources (web apps, Tauri desktop apps, and tasks)
  * with the Aspire SDK builder.
@@ -66,14 +79,18 @@ export async function registerApps(
 
 {{__slot4__}}
 
-  // Workspace web origins own this generated value, after declared service/plugin environment.
+  // Workspace web origins extend explicitly declared service/plugin origins.
   // Keep endpoint expressions deferred: ports are allocated by Aspire at start/publish time.
-  for (const resources of [_services, _plugins]) {
-    for (const resource of resources.values()) {
+  for (const [resources, entries] of [[_services, config.Services], [_plugins, config.Plugins]] as const) {
+    for (const [name, resource] of resources) {
       if (!isEnvironmentTarget(resource)) {
         throw new TypeError('Service/plugin resource cannot receive the workspace CORS allowlist');
       }
-      await resource.withEnvironment('NETSCRIPT_CORS_ORIGINS', corsOrigins ?? '');
+      const extra = declaredCorsOrigins(entries[name]);
+      const origins = extra && corsOrigins
+        ? ReferenceExpression.create`${corsOrigins},${extra}`
+        : corsOrigins ?? extra ?? '';
+      await resource.withEnvironment('NETSCRIPT_CORS_ORIGINS', origins);
     }
   }
 
