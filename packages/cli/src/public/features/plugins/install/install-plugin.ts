@@ -488,7 +488,7 @@ export async function runPluginOwnedScaffold(
 export function createDryRunInstallResult(
   plan: PluginInstallPlan,
   descriptor: ValidatedPluginDescriptor,
-  _scaffold: PluginOwnedScaffoldResult,
+  scaffold: PluginOwnedScaffoldResult,
 ): InstallPluginResult {
   const filesCreated = scaffold.createdFiles.map((path) => join(plan.projectRoot, path));
   const pluginDir = resolvePluginRuntimeDirectory(plan);
@@ -525,7 +525,7 @@ export function createDryRunInstallResult(
 export async function createPluginOwnedPluginResult(
   plan: PluginInstallPlan,
   descriptor: ValidatedPluginDescriptor,
-  _scaffold: PluginOwnedScaffoldResult,
+  scaffold: PluginOwnedScaffoldResult,
   fs: FileSystemPort,
 ): Promise<PluginScaffoldResult> {
   const officialSource = descriptor.manifest.officialSource;
