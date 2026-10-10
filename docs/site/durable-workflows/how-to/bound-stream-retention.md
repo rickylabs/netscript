@@ -158,5 +158,5 @@ segment expires.
 See
 [Bounded streams: retention and trim](/reference/plugin-streams-core/#bounded-streams-retention-and-trim)
 for the public contract and
-[scheduled triggers](/durable-workflows/triggers/#scheduled-triggers-cron-without-a-daemon) for the background
-scheduler.
+[scheduled triggers](/durable-workflows/triggers/#scheduled-triggers-cron-without-a-daemon) for the
+background scheduler.
