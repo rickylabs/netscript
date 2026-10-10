@@ -367,8 +367,8 @@ retry, deduplication, tracing, fetch, or link plugins.
 ## Service URL resolution
 
 By default a service client resolves its origin on each call through `getServiceUrl`, which reads
-Vite `import.meta.env` and then `Deno.env`. A runtime with neither, such as React Native, passes
-its own `resolveServiceUrl(serviceName, protocol)` callback. The client keeps only the origin of the
+Vite `import.meta.env` and then `Deno.env`. A runtime with neither, such as React Native, passes its
+own `resolveServiceUrl(serviceName, protocol)` callback. The client keeps only the origin of the
 returned URL and appends its RPC path. To keep Aspire's key names, compose the pure
 `resolveServiceUrlFromSources` from `./discovery` over an explicit environment bag; it reads no
 runtime global and returns `undefined` instead of throwing.
@@ -392,10 +392,9 @@ const orders = createServiceClient({
 ```
 
 The deprecated client-level `port` and `timeout` options remain accepted for source compatibility
-but are intentional no-ops. Configure explicit addresses through service discovery instead of
-`port` (or `resolveServiceUrl` where no environment exists), and pass a per-call `AbortSignal`
-instead of `timeout`. Neither option changes discovery,
-dispatch, or cancellation behavior.
+but are intentional no-ops. Configure explicit addresses through service discovery instead of `port`
+(or `resolveServiceUrl` where no environment exists), and pass a per-call `AbortSignal` instead of
+`timeout`. Neither option changes discovery, dispatch, or cancellation behavior.
 
 ## Docs
 
