@@ -32,6 +32,7 @@
 
 import type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
+import type { ServiceRateLimitOptions } from '../rate-limit/middleware/options.ts';
 import type { ServiceBodyLimitOptions } from '../primitives/body-limit.ts';
 import type { HealthCheck, HealthCheckAdapterOptions } from '../primitives/health.ts';
 import type {
@@ -158,6 +159,26 @@ export interface ServiceBuilder<
    * ```
    */
   withBodyLimit(options: ServiceBodyLimitOptions): ServiceBuilder<TRouter, TCustom>;
+
+  /**
+   * Limits selected routes before routing, using the existing `use()` seam.
+   * Middleware runs in call order; install before any immediate health/info routes.
+   * All selected routes share a quota per key. Repeated calls add independent stages.
+   *
+   * @param options - Route selection, quota, client-key policy, and atomic store.
+   * @returns This configured builder.
+   * @example
+   * ```ts
+   * import { createService } from '@netscript/service';
+   * import { createMemoryRateLimitStore } from '@netscript/service/rate-limit';
+   * const app = createService({}, { name: 'device' })
+   *   .withRateLimit({ routes: ['/device/start'], limit: 5, windowMs: 60_000,
+   *     store: createMemoryRateLimitStore() })
+   *   .route('post', '/device/start', (c) => c.json({ started: true }))
+   *   .build();
+   * ```
+   */
+  withRateLimit(options: ServiceRateLimitOptions): ServiceBuilder<TRouter, TCustom>;
 
   /** Sets the per-request oRPC context factory. */
   withContext<TNext extends object>(
