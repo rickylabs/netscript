@@ -425,6 +425,7 @@ packages/cli/e2e/tests/application/runner/suite-runner_test.ts	e2e	S2/S3/S10	run
 packages/cli/e2e/tests/domain/readme-quickstart_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/fixtures/aspire-13.5.3-mcp-recorded.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/init-json_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/presentation/init-no-aspire-operable_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/quickstart-walk-suite_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/readme-quickstart-suite_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/suite-registry_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -438,16 +439,22 @@ packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target.ts	cli-adap
 packages/cli/src/kernel/adapters/aspire/docker-topology-fixtures_test.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
 packages/cli/src/kernel/adapters/aspire/docker-topology-inspector_test.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
 packages/cli/src/kernel/adapters/aspire/docker-topology-inspector.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
-packages/cli/src/kernel/adapters/config/deploy-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
-packages/cli/src/kernel/adapters/config/infrastructure-docker.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
-packages/cli/src/kernel/adapters/config/infrastructure-resolvers.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
-packages/cli/src/kernel/adapters/database/apphost-lifecycle-lock_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
-packages/cli/src/kernel/adapters/database/apphost-lifecycle-lock.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
-packages/cli/src/kernel/adapters/database/aspire-command-executor.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
-packages/cli/src/kernel/adapters/database/operation-runner_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
-packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
-packages/cli/src/kernel/adapters/database/operation-runner-helpers.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
-packages/cli/src/kernel/adapters/database/operation-runner.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/config/appsettings/appsettings-file_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/config/appsettings/appsettings-file.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/config/deploy-config/deploy-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/config/infrastructure/infrastructure-docker.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/config/infrastructure/infrastructure-resolvers.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/database/operations/apphost-lifecycle-lock_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/apphost-lifecycle-lock.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/aspire-command-executor.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/operation-runner_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/operation-runner-helpers_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/operation-runner-helpers.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/operation-runner.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/select-operation-executor_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/select-operation-executor.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/workspace-task-runner_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/workspace-task-runner.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/providers/mssql.provider.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/providers/mysql.provider.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/providers/postgres.provider.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
@@ -548,6 +555,8 @@ packages/cli/src/kernel/templates/aspire/generate-appsettings.ts	generator	S4/S5
 packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/generate-aspire-config.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/generate-global-json.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
+packages/cli/src/kernel/templates/aspire/generate-standalone-appsettings_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/generate-standalone-appsettings.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/generators_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/_utils.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/generate-config-schema.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
@@ -589,6 +598,7 @@ packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts	generat
 packages/cli/src/kernel/templates/database/generate-prisma-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/templates/database/generators_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/templates/database/postgres-normalizer_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/templates/database/prisma-config-env_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/templates/workspace/aspire-cli-task.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/deno-json.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/generate-readme.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
@@ -615,7 +625,10 @@ packages/cli/src/public/adapters/jsr-import-resolver.ts	cli:other	S4	grep-verifi
 packages/cli/src/public/domain/scaffold-plan_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/agent/agent-group.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
+packages/cli/src/public/features/agent/init/hosts/opencode-config_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
+packages/cli/src/public/features/agent/init/hosts/opencode-config.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/init-agent_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
+packages/cli/src/public/features/agent/init/init-agent-command_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/init-agent.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/config/project/list-appsettings-paths.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/config/project/project-config-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected

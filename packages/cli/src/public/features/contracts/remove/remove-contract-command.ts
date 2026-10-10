@@ -1,6 +1,6 @@
 import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
-import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
+import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config/deploy-config.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { parseContractVersion } from '../../../../kernel/adapters/contracts/types.ts';
 import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/version-registry.ts';

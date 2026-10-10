@@ -6,7 +6,7 @@ import {
   loadRegisteredPluginMetadata,
   loadRegisteredPlugins,
 } from '../../../../kernel/adapters/config/plugin-registry.ts';
-import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/configured-plugin-manifest-probe.ts';
+import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/plugin-manifest/configured-plugin-manifest-probe.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';

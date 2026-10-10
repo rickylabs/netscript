@@ -1,7 +1,7 @@
 import { join } from '@std/path';
 import { disableAnonymousDashboard } from '../dashboard-config.ts';
 import type { ResourceUpdateFollower } from '../resource-state-stream.ts';
-import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adapters/database/operation-runner-helpers.ts';
+import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adapters/database/operations/operation-runner-helpers.ts';
 import {
   type DescribeResourceObservation,
   evaluateDescribeFollow,

@@ -1,3 +1,4 @@
+import type { TaskStdin } from '../domain/task.ts';
 import { defineJob as defineJobImpl } from '../builders/job-builder.ts';
 import { defineTask as defineTaskImpl } from '../builders/task-builder.ts';
 import { defineWorkflow as defineWorkflowImpl } from '../builders/workflow-builder.ts';
@@ -9,12 +10,13 @@ import {
 import { permissions as permissionsImpl } from '../domain/permissions.ts';
 import { createJobHandlerDefinition as createJobHandlerDefinitionImpl } from '../domain/job-handler.ts';
 import type { PublicStandardSchema } from '../domain/public-schema.ts';
-export type { PublicStandardSchema } from '../domain/public-schema.ts';
 import { startWorkers as startWorkersImpl } from '../presets/mod.ts';
 import {
   createWorkersRuntime as createWorkersRuntimeImpl,
   type WorkersRuntimeOptions as RuntimeOptions,
 } from '../runtime/mod.ts';
+export type { PublicStandardSchema } from '../domain/public-schema.ts';
+export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';
 export type {
   WorkerIdempotencyClaim,
   WorkerIdempotencyInput,
@@ -190,6 +192,8 @@ export type TaskDefinition<TId extends string = string, TPayload = unknown, TRes
   Readonly<{
     id: TaskId<TId>;
     entrypoint?: string;
+    /** Runtime-only stdin payload; never persisted in registration. */
+    stdin?: TaskStdin;
     name?: string;
     topic?: string;
     type?: string;
@@ -354,6 +358,8 @@ export interface TaskBuilder<
   permissions(perms: Readonly<Record<string, unknown>>): this;
   /** Append command-line arguments. */
   args(...args: string[]): this;
+  /** Set bytes or JSON on stdin (maximum 1 MiB), written once and closed. */
+  stdin(payload: TaskStdin): this;
   /** Merge environment variables. */
   env(vars: Record<string, string>): this;
   /** Set the working directory. */
