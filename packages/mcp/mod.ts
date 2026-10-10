@@ -141,6 +141,7 @@ export type {
 } from './src/infrastructure/aspire-ps-dashboard-reader.ts';
 export {
   DocsCorpusUnavailableError,
+  DocsDocumentTooLargeError,
   MAX_INDEXED_DOC_LENGTH,
   slugifyDocsHeading,
 } from './src/domain/docs/docs-corpus-port.ts';

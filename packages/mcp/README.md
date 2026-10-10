@@ -114,7 +114,8 @@ the pre-release line, and `netscript agent init` writes the correct pinned form 
 
 Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
 to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
-exact retrieval of a known document or section.
+faithful retrieval of a known document or section; check `mode` and use `full: true` with
+`nextCursor` for exact retrieval of complete text.
 
 **1. Wire up an agent host.** From a NetScript project root:
 
@@ -355,9 +356,11 @@ requests. Tests and custom hosts can replace every source and the probe through
 
 `get_doc({ slug })` returns `contractVersion: 2` and a fidelity `mode`: `verbatim` when the
 JSON-escaped UTF-8 content fits 12 KiB, or `extract` for larger documents. Extraction selects whole
-fenced snippets, commands, inline code/config keys, and link-containing paragraphs before verbatim
-prose sentences. It includes a complete section outline and omitted-block/character counts. A
-snippet that cannot fit is omitted whole.
+fences, command lines and config-key lines first (cheapest first), heading lines second, sentences
+containing inline code or links third, and plain first sentences last. Selected spans retain their
+source order. It includes the whole-document navigation outline even when `content` is scoped to a
+section, and omitted-block/character counts. Partially omitted paragraphs count as omitted blocks. A
+snippet or sentence that cannot fit is omitted whole.
 
 Use `get_doc({ slug, full: true })` for complete source text. Repeat with the returned `nextCursor`
 as `cursor`, the same slug/section, and `full: true` until no cursor remains. Concatenate each
@@ -367,11 +370,13 @@ front matter is metadata, and named sections retain the existing trimmed-body co
 
 The generic 2,000-character/50-item truncation policy does not apply to `get_doc`. Its complete MCP
 response remains bounded at 64 KiB. Oversized metadata returns an explicit error suggesting full
-mode. Sources above 4 Mi UTF-16 characters fail instead of being silently indexed incompletely. Run
-`deno task --cwd packages/mcp benchmark:docs` for the offline docs-corpus benchmark, or append
-`--embedded` for the release fallback. Metrics include lexical token proxies, snippet/link
-retention, missing-material fallback proxies, latency, and exact full reconstruction against the
-previous truncation baseline. Observed agent filesystem fallback is a separate optional receipt.
+mode. Sources above 4 Mi UTF-16 characters are skipped during indexing; retrieving one returns
+`doc_too_large` naming its slug. The accepted corpus remains available, without silent truncation.
+Run `deno task --cwd packages/mcp benchmark:docs` for the offline docs-corpus benchmark, or append
+`--embedded` for the release fallback. Metrics include all-document and extract-only lexical content
+ratios, independently inventoried fence/command/config/link retention, missing-material fallback
+proxies, latency, and exact full reconstruction against the previous truncation baseline. Observed
+agent filesystem fallback is a separate optional receipt.
 
 ## Configuration at a glance
 

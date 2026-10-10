@@ -143,3 +143,13 @@ Deno.test('public docs activate intent guidance before unfamiliar implementation
     );
   }
 });
+
+Deno.test('registry declares semantic truncation and envelope policies per tool', () => {
+  const registry = createToolRegistry();
+  const getDoc = registry.find((tool) => tool.name === 'get_doc')!;
+  assertEquals(getDoc.truncation, 'exempt');
+  assertEquals(getDoc.envelopeCheck, true);
+  const search = registry.find((tool) => tool.name === 'search_docs')!;
+  assertEquals(search.truncation, undefined);
+  assertEquals(search.envelopeCheck, undefined);
+});

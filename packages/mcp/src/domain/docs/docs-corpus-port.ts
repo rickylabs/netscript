@@ -1,7 +1,22 @@
 import type { GuidanceResult } from './guidance-contract.ts';
 
-/** Maximum source characters accepted for one indexed document. */
+/** Source admission ceiling in UTF-16 characters; oversized documents are rejected individually. */
 export const MAX_INDEXED_DOC_LENGTH: number = 4 * 1024 * 1024;
+
+/** One source exceeded admission limits; the remaining corpus stays available. */
+export class DocsDocumentTooLargeError extends Error {
+  /** Stable tool-facing error code. */
+  readonly code = 'doc_too_large';
+  /** Normalized slug of the rejected source. */
+  readonly slug: string;
+
+  /** Identify the source and configured character ceiling without including its content. */
+  constructor(slug: string, maxLength: number) {
+    super(`Documentation source '${slug}' exceeds the ${maxLength}-character admission limit.`);
+    this.name = 'DocsDocumentTooLargeError';
+    this.slug = slug;
+  }
+}
 
 /** Explicit failure raised when a configured filesystem corpus does not exist. */
 export class DocsCorpusUnavailableError extends Error {

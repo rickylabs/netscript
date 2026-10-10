@@ -1,3 +1,5 @@
+import { inventorySourceMaterial } from '../benchmarks/source-material.ts';
+import { DocsDocumentTooLargeError } from '../src/domain/docs/docs-corpus-port.ts';
 import { benchmarkDocs } from '../benchmarks/doc-retrieval.ts';
 import { assert, assertEquals, assertRejects } from '@std/assert';
 import { createDocsFlows } from '../src/application/docs/docs-flows.ts';
@@ -174,6 +176,10 @@ Deno.test('acceptance 5: offline benchmark measures fidelity fallback and baseli
     }),
   );
   assertEquals(report.summary.documents, 2);
+  assertEquals(report.extractOnly.documents, 1);
+  assertEquals(report.extractOnly.fences, 1);
+  assertEquals(report.extractOnly.fencesRetained, 1);
+  assertEquals(report.extractOnly.commandRetention, 1);
   assertEquals(report.summary.fullReconstruction, 'pass');
   assertEquals(report.summary.snippetRetention, 1);
   assertEquals(report.summary.linkRetention, 1);
@@ -181,4 +187,58 @@ Deno.test('acceptance 5: offline benchmark measures fidelity fallback and baseli
   assert(report.summary.baselineFallbackProxyRate > report.summary.fallbackProxyRate);
   assert(report.summary.returnedToVerbatimRatio < 1);
   assert(report.summary.latencyP95Ms >= 0);
+});
+
+Deno.test('oversized documents are rejected individually while both corpora continue indexing', async () => {
+  const root = await Deno.makeTempDir();
+  const documents = [
+    { slug: 'healthy', source: '# Healthy\n\nDocumentation guidance for a healthy CLI command.' },
+    { slug: 'character-limit', source: 'x'.repeat(200) },
+    { slug: 'byte-limit', source: 'x'.repeat(1000) },
+  ];
+  try {
+    for (const doc of documents) await Deno.writeTextFile(`${root}/${doc.slug}.md`, doc.source);
+    const filesystem = new FilesystemDocsCorpus({ root, maxDocumentLength: 128 });
+    const embedded = new EmbeddedDocsCorpus({ documents, maxDocumentLength: 128 });
+    for (const corpus of [filesystem, embedded]) {
+      assertEquals((await corpus.list()).map((doc) => doc.slug), ['healthy']);
+      assertEquals((await corpus.search('healthy'))[0]?.slug, 'healthy');
+      assert((await corpus.findGuidance('healthy CLI command')).recommendations.length > 0);
+      for (const slug of ['character-limit', 'byte-limit']) {
+        const error = await assertRejects(() => corpus.get(slug), DocsDocumentTooLargeError);
+        assertEquals(error.slug, slug);
+        assert(error.message.includes(slug));
+        const result = await createDocsFlows(corpus).get_doc({ slug });
+        assert(!result.ok);
+        assertEquals(result.error.code, 'doc_too_large');
+        assert(result.error.message.includes(slug));
+      }
+    }
+    await Deno.writeTextFile(`${root}/byte-limit.md`, '# Recovered\n\nSmall valid source.');
+    assertEquals((await filesystem.get('byte-limit'))?.title, 'Recovered');
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('benchmark inventory independently counts complete fences commands keys and links', () => {
+  const fence = '````sh\r\ndeno task inside\r\n```\r\n````\r\n';
+  const source = '# Heading\r\n' + fence + 'netscript init app\r\nport: 8080\r\n' +
+    'See [guide](https://example.test/path) and `inline` prose.\r\n';
+  assertEquals(inventorySourceMaterial(source), {
+    fences: [fence],
+    commands: ['deno task inside\r\n', 'netscript init app\r\n'],
+    keys: ['port: 8080\r\n'],
+    links: ['[guide](https://example.test/path)'],
+  });
+});
+
+Deno.test('section extracts explicitly retain the whole-document navigation outline', async () => {
+  const source = '# Sample\n\n## Selected\n\n' + 'Sentence. More detail.\n\n'.repeat(1000) +
+    '## Other section\n\nOther text.';
+  const result = await retrieve(server(source), { section: 'Selected' });
+  assertEquals(result.mode, 'extract');
+  assertEquals(result.section, 'Selected');
+  assert(result.outline?.some((entry) => entry.slug === 'other-section'));
+  assert(!result.content.includes('Other text.'));
 });

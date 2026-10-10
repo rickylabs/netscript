@@ -1,6 +1,7 @@
 import {
   type DocsCorpusPort,
   type DocsDocument,
+  type DocsDocumentTooLargeError,
   type DocsSearchMatch,
   type DocsSummary,
   MAX_INDEXED_DOC_LENGTH,
@@ -22,7 +23,7 @@ export interface EmbeddedDocsSource {
 export interface EmbeddedDocsCorpusOptions {
   /** Markdown assets embedded by the package composition root. */
   readonly documents: readonly EmbeddedDocsSource[];
-  /** Maximum source characters accepted (oversized documents fail instead of truncating) per document. */
+  /** Source admission ceiling; oversized documents are rejected individually, never truncated. */
   readonly maxDocumentLength?: number;
 }
 
@@ -30,14 +31,16 @@ export interface EmbeddedDocsCorpusOptions {
 export class EmbeddedDocsCorpus implements DocsCorpusPort {
   readonly #documents: ReadonlyMap<string, DocsDocument>;
   readonly #aliases: ReadonlyMap<string, string>;
+  readonly #rejected: ReadonlyMap<string, DocsDocumentTooLargeError>;
   readonly #guidance: GuidanceIndex;
 
   /** Parse the supplied package assets once at composition time. */
   constructor(options: EmbeddedDocsCorpusOptions) {
     const maxLength = options.maxDocumentLength ?? MAX_INDEXED_DOC_LENGTH;
-    const { documents, aliases } = processDocsSources(options.documents, maxLength);
+    const { documents, aliases, rejected } = processDocsSources(options.documents, maxLength);
     this.#documents = documents;
     this.#aliases = aliases;
+    this.#rejected = rejected;
     this.#guidance = new GuidanceIndex(documents.values());
   }
 
@@ -67,6 +70,8 @@ export class EmbeddedDocsCorpus implements DocsCorpusPort {
   get(slug: string): Promise<DocsDocument | undefined> {
     const normalized = normalizeDocsSlug(slug);
     const canonicalSlug = this.#aliases.get(normalized) ?? normalized;
+    const rejection = this.#rejected.get(canonicalSlug);
+    if (rejection) return Promise.reject(rejection);
     const document = this.#documents.get(canonicalSlug);
     if (!document) return Promise.resolve(undefined);
     if (canonicalSlug !== normalized) {

@@ -2,6 +2,7 @@ import {
   type DocsCorpusPort,
   DocsCorpusUnavailableError,
   type DocsDocument,
+  DocsDocumentTooLargeError,
   slugifyDocsHeading,
 } from '../../domain/docs/docs-corpus-port.ts';
 import {
@@ -29,7 +30,8 @@ export function createGetDocFlow(corpus: DocsCorpusPort): ToolFlow {
     try {
       document = await corpus.get(input.slug);
     } catch (error) {
-      return error instanceof DocsCorpusUnavailableError
+      return error instanceof DocsCorpusUnavailableError ||
+          error instanceof DocsDocumentTooLargeError
         ? failure(error.code, error.message)
         : failure('docs_corpus_error', 'The documentation corpus could not complete the request.');
     }

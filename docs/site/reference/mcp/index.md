@@ -22,7 +22,8 @@ combo, and the package README for the mental model and recipes.
 
 Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
 to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
-exact retrieval of a known document or section.
+faithful retrieval of a known document or section; check `mode` and use `full: true` with
+`nextCursor` for exact retrieval of complete text.
 
 Two entrypoints carry the surface:
 
@@ -90,11 +91,15 @@ input caps the result count server-side before truncation applies.
 
 `get_doc` reports `contractVersion: 2` and `mode` on every successful response. Documents and
 sections whose JSON-escaped UTF-8 content fits 12 KiB return `mode: "verbatim"` with exact text.
-Larger inputs return `mode: "extract"`: the title, description, complete section outline (heading,
-slug, character count), whole protected source blocks, and verbatim prose sentences. Fences,
-commands, inline code/config keys, and link-containing paragraphs are selected first in source
-order. A protected block that cannot fit is omitted whole; `omitted.blocks` and `omitted.characters`
-report the loss. The extract never paraphrases or cuts a snippet.
+Larger inputs return `mode: "extract"`: title, description, a whole-document navigation outline
+(heading, slug, character count), selected source blocks, and verbatim sentences. Selection uses
+four tiers: whole fences, command lines and config-key lines first (cheapest first); heading lines
+second; sentences containing links or inline code third; plain first sentences last. Selected spans
+are emitted in source order. A fence or sentence that cannot fit is omitted whole. The
+`omitted.blocks` count includes partially omitted paragraphs, and `omitted.characters` counts source
+characters not retained. The extract never paraphrases or cuts a snippet. Section-scoped extracts
+restrict `content` to that section but intentionally retain the whole-document outline to navigate
+to other sections; outline sizes describe the indexed section bodies.
 
 For complete text, call `get_doc` with `full: true`. It returns `mode: "full"`, one exact source
 page, and `nextCursor` when more text remains. Pass that value as `cursor` with the same `slug`,
@@ -107,16 +112,18 @@ surrogate pair. Read the assembled text before using a multi-page snippet.
 Cursors are versioned and bound to canonical slug, section, and SHA-256 source digest. Malformed,
 mismatched, or stale cursors return `invalid_doc_cursor`; restart without a cursor after a change.
 `cursor` requires `full: true`. Default results are cached per indexed document/section. The source
-admission ceiling is 4 Mi UTF-16 characters; oversized sources fail explicitly instead of silently
-discarding their tails. Outline/metadata exceeding the 64 KiB response ceiling produces an explicit
-transport error directing the caller to full mode.
+admission ceiling is 4 Mi UTF-16 characters. Oversized sources are skipped during indexing;
+retrieving one returns `doc_too_large` naming its slug, while list, search and guidance remain
+available for accepted documents. Sources are never silently truncated. Outline/metadata exceeding
+the 64 KiB response ceiling produces an explicit transport error directing the caller to full mode.
 
 The offline benchmark runs with `deno task --cwd packages/mcp benchmark:docs` over public docs site
 sources, or append `--embedded` for the shipped release fallback. It compares lexical token proxies
-including response metadata, protected snippet/link retention, missing-material fallback proxies,
-and cold retrieval latency against the previous 2,000-character truncation. It also checks exact
-full reconstruction for every document. The fallback proxy measures missing source material;
-observed filesystem reads require a separate agent-run receipt. No inference model is used; model
+including response metadata, independently inventoried fence/command/config/link retention,
+missing-material fallback proxies, and cold retrieval latency against the previous 2,000-character
+truncation. It reports both all-document and extract-mode-only aggregates and checks exact full
+reconstruction for every document. The fallback proxy measures missing source material; observed
+filesystem reads require a separate agent-run receipt. No inference model is used; model
 summarization is tracked in #2112.
 
 ### Operation access summary
