@@ -59,6 +59,7 @@ export type {
   SdkClientTransportPolicy,
   SdkClientTransportPolicyMethodOptions,
   ServiceClient,
+  ServiceClientArgs,
   ServiceClientContext,
   ServiceClientContract,
   ServiceClientMethod,

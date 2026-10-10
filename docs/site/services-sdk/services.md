@@ -163,20 +163,22 @@ fallback default — set the port there rather than editing this line.
 ### `defineService(router, options)` — the preset options
 
 `DefineServiceOptions` extends the base `ServiceConfig` (`name`, `version`, `port`) and adds
-the preset-only keys below. These are the **complete** option keys confirmed against the
-package surface — nothing is omitted.
+the preset-only keys below. This is the complete option list.
 
 {{ comp.apiTable({
   caption: "DefineServiceOptions (extends ServiceConfig)",
   rows: [
     { name: "name", type: "string (required)", desc: "Service name used for logging, telemetry, and health-check labels." },
     { name: "version", type: "string?", desc: "Service version (e.g. '1.0.0'); surfaced on /health and the OpenAPI spec." },
-    { name: "port", type: "number?", desc: "Default listener port if serve() is not passed an explicit port. The generated entrypoint reads Deno.env.get('PORT') (allocated dynamically per project at scaffold time)." },
-    { name: "db", type: "DbContext?", desc: "Database context injected as context.db. Accepts a single Prisma client (with $queryRaw) or a multi-db record like { netscript, mdb, prosco, prev }; the first value exposing $queryRaw is auto-wired as the /health and /health/ready probe client." },
+    { name: "port", type: "number?", desc: "Default listener port; the generated entrypoint reads Deno.env.get('PORT') first." },
+    { name: "db", type: "DbContext?", desc: "Database context injected as context.db: one Prisma client or a multi-db record. The configured $queryRaw client backs /health/ready." },
     { name: "openapi", type: "{ title?; description? }?", desc: "Turns on the generated OpenAPI spec endpoint and the Scalar docs UI with this title/description." },
     { name: "debug", type: "boolean?", desc: "Enables verbose oRPC logging. Defaults to the NETSCRIPT_DEBUG env var." },
     { name: "auth", type: "{ authn: AuthnOptions; authz?: AuthzOptions }?", desc: "Installs the authentication (and optional authorization) gate on guarded paths — the preset form of .withAuthn()/.withAuthz()." },
-    { name: "tls", type: "ServiceTlsOptions?", desc: "Opt-in TLS: { cert, key } as PEM strings. When set, the listener serves HTTPS and negotiates HTTP/2 via ALPN automatically. Forwarded to serve() as .serve({ tls }). See TLS & HTTP/2 below." }
+    { name: "tls", type: "ServiceTlsOptions?", desc: "Opt-in TLS { cert, key } (PEM): HTTPS with HTTP/2 via ALPN. See TLS & HTTP/2 below." },
+    { name: "hostname", type: "string?", desc: "Listener bind interface; default 0.0.0.0." },
+    { name: "middleware", type: "ServiceMiddleware[]?", desc: "Runs in order after CORS and logging, before auth." },
+    { name: "bodyLimit", type: "{ maxBytes }?", desc: "Opt-in: typed JSON 413 for larger bodies on RPC and OpenAPI, after auth. See reference/service." }
   ]
 }) }}
 

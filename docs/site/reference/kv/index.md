@@ -128,12 +128,28 @@ This entrypoint also re-exports the kvdex Deno-KV compatibility types: `KvProvid
 ### `@netscript/kv/testing`
 
 A reusable contract harness for adapter authors. Re-exports the shared `KvStore` and
-`WatchableKv` contracts alongside the test helpers.
+`WatchableKv` contracts alongside the test helpers. The in-repo memory and Redis adapters
+run both contracts.
+
+`runKvStoreContract` covers CRUD, listing, and value fidelity: plain-JSON values, including
+objects shaped like encoding markers, read back unchanged. `atomic()` is optional on
+`KvStore`, so its parity checks are a separate opt-in: `runAtomicKvStoreContract` requires
+one commit to write a single versionstamp to every mutated entry and return it (so a
+compare-and-set on the returned versionstamp succeeds), `sum`/`min`/`max` to combine with
+the stored value, concurrent commits to be serializable, and `bigint` values to round-trip
+at any depth. `runWatchableKvContract` requires that watch events carry the versionstamp of
+the write that produced them and deliver values unchanged, that a change received while
+the consumer is between batches is delivered on the next request without waiting for a
+later write, that `debounce` never drops a queued change, and that aborting ends the stream
+promptly, even inside a debounce window.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `runKvStoreContract` | function | `function runKvStoreContract(options: KvStoreContractOptions): void` | Register the canonical KV store contract tests against an adapter. |
-| `KvStoreContractOptions` | interface | `interface KvStoreContractOptions` | Options for `runKvStoreContract`. |
+| `runKvStoreContract` | function | `function runKvStoreContract(options: KvStoreContractOptions): void` | Register the canonical KV store contract tests (CRUD, listing, value fidelity) against an adapter. |
+| `KvStoreContractOptions` | interface | `interface KvStoreContractOptions` | Options for `runKvStoreContract` and `runAtomicKvStoreContract`. |
+| `runAtomicKvStoreContract` | function | `function runAtomicKvStoreContract(options: KvStoreContractOptions): void` | Register the Deno KV `atomic()` parity tests for an adapter that implements the optional `atomic()`. |
+| `runWatchableKvContract` | function | `function runWatchableKvContract(options: WatchableKvContractOptions): void` | Register the canonical `watch()` contract tests against a `WatchableKv` adapter. |
+| `WatchableKvContractOptions` | interface | `interface WatchableKvContractOptions` | Options for `runWatchableKvContract`. |
 | `createMemoryKvAdapter` | function | `function createMemoryKvAdapter(): MemoryKvAdapter` | Factory for a clean in-memory KV adapter for downstream tests. |
 | `MemoryKvAdapter` | class | `class MemoryKvAdapter implements WatchableKv` | Volatile in-memory adapter (re-exported from the root). |
 
