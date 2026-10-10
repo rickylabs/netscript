@@ -408,8 +408,8 @@ idempotent async `dispose`. `StreamCollectionOptionsV1<T>` extends the injected-
 `type`, `parse`, and `getKey`. `StreamCollectionV1<T>` is a real TanStack DB collection, and
 `StreamCollectionBindingV1<T>` describes its connection lifecycle.
 
-`useStreamLiveQueryV1` from `@netscript/sdk/streams/react` wraps the upstream live-query hook
-through `StreamLiveQueryFactoryV1<TContext>` and returns `StreamLiveQueryResultV1<TData>` with
-`data`, `status`, and `isLoading`. The focused entry imports React, without the Fresh runtime. See
-the [Expo how-to](/durable-workflows/expo-streams/) for lifecycle, fetch compatibility, and native
-proof requirements.
+`useStreamLiveQueryV1` from `@netscript/sdk/streams/react` wraps the upstream live-query hook with a
+`StreamCollectionV1<TData>` and returns `StreamLiveQueryResultV1<TData>` with `data`, `status`, and
+`isLoading`. The focused entry imports React, without the Fresh runtime. See the
+[Expo how-to](/durable-workflows/expo-streams/) for lifecycle, fetch compatibility, and native proof
+requirements.
