@@ -31,3 +31,13 @@ Deno.test('Removing a replaced Query instance preserves the current SDK cache en
     client.clear();
   }
 });
+
+Deno.test('Query keys with an own constructor property hash independently of property order', () => {
+  const client = createNetScriptQueryClient();
+  try {
+    client.setQueryData(['users', { constructor: 'user', id: 'one' }], 'cached');
+    assertEquals(client.getQueryData(['users', { id: 'one', constructor: 'user' }]), 'cached');
+  } finally {
+    client.clear();
+  }
+});
