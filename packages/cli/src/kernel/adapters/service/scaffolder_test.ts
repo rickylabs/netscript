@@ -72,7 +72,7 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
 });
 
 for (const hasDatabase of [false, true]) {
-  Deno.test(`ServiceScaffolder guards ${hasDatabase ? 'database' : 'memory'} services with installed auth`, async () => {
+  Deno.test(`ServiceScaffolder prepares ${hasDatabase ? 'database' : 'memory'} services with installed auth`, async () => {
     const { fs, scaffolder, templateAdapter } = createHarness();
     await writeInstalledAuthFixture(fs, '/project');
     const result = await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
@@ -85,10 +85,9 @@ for (const hasDatabase of [false, true]) {
       hasDatabase,
     });
     const main = await fs.readFile('/project/services/orders/src/main.ts');
-    assertStringIncludes(main, "from '@netscript/plugin-auth-core/authenticator'");
-    assertStringIncludes(main, "createAuthServiceAuthenticator({ serviceName: 'auth'");
-    assertStringIncludes(main, "requireScopes: ['orders:access']");
-    assertEquals(main.includes('public: true'), false);
+    assertStringIncludes(main, SERVICE_PUBLIC_REASON);
+    assertEquals(main.includes('public: true'), true);
+    assertEquals(main.includes('createScopeAuthorizer'), false);
     assertEquals(main.includes('allowAnonymous:'), false);
     assertEquals(main.includes('#1382'), false);
     assertEquals(result.configEntry.PluginReferences, ['auth']);

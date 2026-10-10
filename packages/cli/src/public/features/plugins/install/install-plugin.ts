@@ -1,3 +1,4 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import {
   parsePluginManifest,
   type ScaffoldResult as PluginOwnedScaffoldResult,
@@ -126,13 +127,11 @@ export async function installPlugin(
       ci: request.ci,
     });
   }
-  const capabilityRequest = resolvedPlugin === undefined
-    ? request
-    : {
-      ...request,
-      mcp: request.mcp === true &&
-        resolvedPlugin.descriptor.manifest.capabilities.supportsMcpScaffold === true,
-    };
+  const capabilityRequest = resolvedPlugin === undefined ? request : {
+    ...request,
+    mcp: request.mcp === true &&
+      resolvedPlugin.descriptor.manifest.capabilities.supportsMcpScaffold === true,
+  };
   const planningRequest = resolvedPlugin?.planningKind === undefined
     ? capabilityRequest
     : { ...capabilityRequest, kind: resolvedPlugin.planningKind };
@@ -232,8 +231,8 @@ export async function installPlugin(
     : false;
 
   const extraWorkspaceMembers = await dependencies.fs.exists(
-    join(pluginConfigDirectory, SCAFFOLD_FILES.DENO_JSON),
-  )
+      join(pluginConfigDirectory, SCAFFOLD_FILES.DENO_JSON),
+    )
     ? [toWorkspaceRelativePath(plan.projectRoot, pluginConfigDirectory)]
     : [];
   await dependencies.workspaceMutator.ensureWorkspaceMember(
@@ -246,13 +245,15 @@ export async function installPlugin(
     rootDenoJsonBefore,
   });
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
+  const browserAuthFiles = await reconcileBrowserAuth(plan.projectRoot, dependencies.fs);
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
-  const helperFiles = await regenerateHelpers(
+  const generatedHelpers = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
+  const helperFiles = [...browserAuthFiles, ...generatedHelpers];
   if (dependencies.processRunner) {
     await formatGeneratedFiles(dependencies.processRunner, plan.projectRoot, [
       ...helperFiles,
@@ -321,7 +322,10 @@ export async function persistPluginMetadata(
       : {}),
   };
   const pluginDir = await resolvePluginConfigDirectory(plan, fs);
-  await fs.writeFile(join(pluginDir, 'scaffold.plugin.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+  await fs.writeFile(
+    join(pluginDir, 'scaffold.plugin.json'),
+    `${JSON.stringify(metadata, null, 2)}\n`,
+  );
 }
 
 async function readOptionalRootDenoJson(

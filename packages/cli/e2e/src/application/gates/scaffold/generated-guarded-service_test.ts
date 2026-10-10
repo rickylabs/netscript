@@ -1,3 +1,5 @@
+import { reconcileBrowserAuth } from '../../../../../src/kernel/adapters/plugin/browser-auth-reconciler.ts';
+import { addProtectedProbeProcedure } from './probe-generated-guarded-service.ts';
 import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { dirname, join, toFileUrl } from '@std/path';
@@ -13,7 +15,7 @@ import { DenoGeneratedSourceFormatter } from '../../../../../src/kernel/adapters
 import { DenoProcess } from '../../../../../src/kernel/adapters/runtime/process/deno-process.ts';
 import { GUARDED_SERVICE_PROBE_SOURCE } from './guarded-service-probe-source.ts';
 
-Deno.test('generated guarded service: native sessions enforce REST/RPC/discovery 401/403/200 and health 200', async () => {
+Deno.test('generated guarded service: native sessions enforce public discovery/demo and protected REST/RPC 401/403/200', async () => {
   const fs = new MemoryFileSystemAdapter();
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
@@ -44,10 +46,21 @@ Deno.test('generated guarded service: native sessions enforce REST/RPC/discovery
     importMode: 'jsr',
     force: false,
   });
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify({
+      NetScript: {
+        ...JSON.parse(await fs.readFile('/project/appsettings.json')).NetScript,
+        Services: { guarded: result.configEntry },
+      },
+    }),
+  );
+  await reconcileBrowserAuth('/project', fs, formatter);
   const root = await Deno.makeTempDir({ prefix: 'guarded-service-' });
   try {
     for (
       const path of [
+        'auth/service.ts',
         'contracts/mod.ts',
         'contracts/versions/v1/mod.ts',
         'contracts/versions/v1/guarded.contract.ts',
@@ -67,6 +80,7 @@ Deno.test('generated guarded service: native sessions enforce REST/RPC/discovery
           : source,
       );
     }
+    await addProtectedProbeProcedure(root);
     const repo = new URL('../../../../../../../', import.meta.url);
     const config = JSON.parse(await Deno.readTextFile(new URL('deno.json', repo))) as {
       imports: Record<string, string>;
@@ -117,7 +131,7 @@ Deno.test('generated guarded service: native sessions enforce REST/RPC/discovery
     assertEquals(execution.code, 0, output);
     assertStringIncludes(
       output,
-      'Generated guarded service PASS: REST/RPC/discovery anonymous401, insufficient403, permitted200; anonymous health200',
+      'Generated guarded service PASS: discovery/demo public200; protected REST/RPC anonymous401, denied403, permitted200; anonymous health200',
     );
     assertEquals(result.configEntry.PluginReferences, ['auth']);
   } finally {

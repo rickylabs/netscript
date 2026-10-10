@@ -20,7 +20,7 @@ const SAMPLE_SERVICE_VARS: Record<string, string> = {
   serviceName: 'team-members',
   entityName: 'team-members',
   servicePort: '3000',
-  ...serviceAuthTemplate('team-members'),
+  ...serviceAuthTemplate(),
 };
 
 function makeAdapter(): StringTemplateAdapter {

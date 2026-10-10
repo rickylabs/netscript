@@ -18,33 +18,11 @@ export interface ServiceAuthTemplate {
   readonly authPolicy: string;
 }
 
-/** Compose native service guards, or record why the generated API is public. */
-export function serviceAuthTemplate(
-  serviceName: string,
-  authServiceName?: string,
-): ServiceAuthTemplate {
-  if (authServiceName === undefined) {
-    return {
-      authImports: '',
-      authPolicy: `auth: { public: true, reason: '${SERVICE_PUBLIC_REASON}' },`,
-    };
-  }
+/** Emit the scaffold opt-out; lifecycle commands reconcile installed browser auth. */
+export function serviceAuthTemplate(): ServiceAuthTemplate {
   return {
-    authImports:
-      "import { createAuthServiceAuthenticator } from '@netscript/plugin-auth-core/authenticator';\n" +
-      "import { createScopeAuthorizer } from '@netscript/service/auth';",
-    authPolicy: `auth: {
-    authn: {
-      authenticator: createAuthServiceAuthenticator({ serviceName: ${
-      singleQuoted(authServiceName)
-    }, timeoutMs: 10_000 }),
-    },
-    authz: {
-      authorizer: createScopeAuthorizer({
-        rules: [{ match: () => true, requireScopes: [${singleQuoted(`${serviceName}:access`)}] }],
-      }),
-    },
-  },`,
+    authImports: '',
+    authPolicy: `auth: { public: true, reason: '${SERVICE_PUBLIC_REASON}' },`,
   };
 }
 
@@ -98,8 +76,3 @@ const authSettingsSchema = z.object({
     BackgroundProcessors: z.record(z.string(), pluginEntrySchema).optional(),
   }).passthrough().optional(),
 }).passthrough();
-
-function singleQuoted(value: string): string {
-  return "'" + JSON.stringify(value).slice(1, -1).replaceAll("'", "\\'").replaceAll('\\"', '"') +
-    "'";
-}

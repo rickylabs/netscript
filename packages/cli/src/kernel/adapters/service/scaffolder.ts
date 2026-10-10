@@ -62,7 +62,7 @@ export class ServiceScaffolder {
       modelName: options.modelName ?? '',
       projectName: options.projectName,
       servicePort: String(options.servicePort),
-      ...serviceAuthTemplate(options.serviceName, authServiceName),
+      ...serviceAuthTemplate(),
     };
     await this.writeGenerated(
       join(serviceDir, SCAFFOLD_FILES.DENO_JSON),

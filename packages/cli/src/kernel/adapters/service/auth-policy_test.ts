@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { ConfigInvalidError } from '../../domain/errors.ts';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { writeInstalledAuthFixture } from '../../../../tests/installed-auth-fixture.ts';
@@ -76,13 +76,8 @@ Deno.test('service auth discovery gives an actionable JSON error', async () => {
   );
 });
 
-Deno.test('service auth template emits safe single-quoted discovery names', () => {
-  assertStringIncludes(
-    serviceAuthTemplate('orders', 'auth').authPolicy,
-    "serviceName: 'auth'",
-  );
-  assertStringIncludes(
-    serviceAuthTemplate('orders', "team's\\auth").authPolicy,
-    "serviceName: 'team\\'s\\\\auth'",
-  );
+Deno.test('service scaffold exposes an explicit opt-out for lifecycle reconciliation', () => {
+  assertEquals(serviceAuthTemplate().authImports, '');
+  assertEquals(serviceAuthTemplate().authPolicy.includes('public: true'), true);
+  assertEquals(serviceAuthTemplate().authPolicy.includes('createScopeAuthorizer'), false);
 });

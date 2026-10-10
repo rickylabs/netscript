@@ -223,11 +223,25 @@ Deno workspace; `netscript service generate` can regenerate Aspire helpers after
 edits. The service entry point passes the router to `defineService(...)`. The port reads from
 the `PORT` env var with a literal fallback so the same code runs locally and under Aspire.
 
+With auth installed, the shared verifier lives at the workspace root:
+
+```ts
+// auth/service.ts
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth-core/authenticator';
+
+export const browserAuthenticator = createAuthServiceAuthenticator({
+  serviceName: 'auth',
+  timeoutMs: 10_000,
+});
+```
+
+The generated entrypoint composes it with the contract authorizer:
+
 ```ts
 // services/users/src/main.ts
 import { defineService } from '@netscript/service';
-import { createAuthServiceAuthenticator } from '@netscript/plugin-auth-core/authenticator';
-import { createScopeAuthorizer } from '@netscript/service/auth';
+import { browserAuthenticator } from '../../../auth/service.ts';
+import { createContractAuthorizer } from '@netscript/service/auth';
 import { createRouter } from './router.ts';
 import { createMemoryUsersRepository } from './adapters/memory-users-repository.ts';
 
@@ -236,13 +250,10 @@ const router = createRouter(createMemoryUsersRepository());
 await defineService(router, {
   auth: {
     authn: {
-      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
+      authenticator: browserAuthenticator,
+      allowAnonymous: ['/health', '/api/openapi.json', '/api/docs'],
     },
-    authz: {
-      authorizer: createScopeAuthorizer({
-        rules: [{ match: () => true, requireScopes: ['users:access'] }],
-      }),
-    },
+    authz: { authorizer: createContractAuthorizer(router) },
   },
   name: 'users',
   version: '1.0.0',
@@ -254,12 +265,23 @@ await defineService(router, {
 });
 ```
 
-When the auth plugin is installed with `--name auth` and enabled, `netscript service add` generates
-these native guards and records the plugin reference for service discovery. The required scope is
-`<service>:access`: without a bearer session `/api` returns 401, a valid session without that scope
-receives 403, and `/health` remains anonymous. The remote verifier uses the auth service's SDK; the
-guarded service holds no auth backend or provider secret. Authenticated app clients attach the
-bearer through an SDK contribution.
+When the auth plugin is installed with `--name auth` and enabled, `netscript service add` uses the
+same BFF composition as a service created before auth installation. Both commands reconcile the
+scaffold policy through the generated `auth/service.ts` browser authenticator and
+`createContractAuthorizer(router)`. `generate aspire` only regenerates helpers and leaves authored
+source and appsettings unchanged.
+
+`/health`, `/api/openapi.json` and `/api/docs` remain anonymous. Generated demo procedures explicitly
+declare `access: { authentication: 'none' }` in their contracts, so their REST and RPC calls stay
+public. A contract-protected procedure declaring `authentication: 'required'` returns 401 without a
+bearer session; a session denied by its contract authorization returns 403, and an authorized call
+returns 200. Declare the procedure's permissions in its contract; there is no service-wide
+`<service>:access` scope requirement. Authored policies remain authoritative.
+
+The browser authenticator uses the existing bearer-only remote verifier through the auth service's
+SDK; the guarded service holds no backend or provider secret. Fresh forwards the session bearer
+through an SDK contribution on the server. See the [auth model](/explanation/auth-model/#generated-browser-topology)
+and [authentication guide](/identity-access/how-to/add-authentication/) for the BFF topology.
 
 Renamed auth keys are not supported by `service add`; an inconsistent installed auth manifest
 produces a configuration error.

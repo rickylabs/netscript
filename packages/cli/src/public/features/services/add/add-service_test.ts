@@ -98,12 +98,13 @@ describe('public add service flow', () => {
     assertEquals(appsettings.NetScript.Services.billing.ServiceReferences, ['users']);
     assertEquals(appsettings.NetScript.Services.billing.PluginReferences, ['auth']);
     const main = await fs.readFile('/workspace/alpha/services/billing/src/main.ts');
-    assertStringIncludes(main, 'createAuthServiceAuthenticator');
-    assertStringIncludes(main, "requireScopes: ['billing:access']");
+    assertStringIncludes(main, 'authenticator: browserAuthenticator');
+    assertStringIncludes(main, 'createContractAuthorizer(router)');
     assertEquals(main.includes('public: true'), false);
     assertEquals(rootDenoJson.workspace.includes('./services/billing'), true);
     assertStringIncludes(contractMod, './billing.contract.ts');
-    assertEquals(result.helperFiles.length, 1);
+    assertEquals(result.helperFiles.includes('/workspace/alpha/auth/service.ts'), true);
+    assertEquals(result.helperFiles.includes('/workspace/alpha/aspire/apphost.mts'), true);
     assertEquals(helperOptions, [{ formatter }]);
     assertEquals(result.clientPath, '/workspace/alpha/apps/web/lib/billing.ts');
     if (!result.clientPath) throw new Error('Expected generated client path.');

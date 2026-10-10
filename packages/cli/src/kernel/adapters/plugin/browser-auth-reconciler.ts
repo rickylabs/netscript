@@ -3,7 +3,7 @@ import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../templates/template-asset.ts';
-import { SERVICE_PUBLIC_REASON } from '../service/auth-policy.ts';
+import { readAuthServiceName, SERVICE_PUBLIC_REASON } from '../service/auth-policy.ts';
 
 interface BrowserAuthEntry {
   readonly Type?: string;
@@ -13,7 +13,6 @@ interface BrowserAuthEntry {
 }
 interface BrowserAuthSettings {
   NetScript?: {
-    Plugins?: Record<string, { PackageSpecifier?: string; Enabled?: boolean }>;
     Apps?: Record<string, BrowserAuthEntry>;
     Services?: Record<string, BrowserAuthEntry>;
   };
@@ -24,30 +23,18 @@ interface BrowserAuthFile {
   readonly overwrite?: boolean;
 }
 
-// Composition contract with #1382 L1: replace only its exact scaffold opt-out line.
-const PUBLIC_POLICY =
-  "  auth: { public: true, reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy' },";
-
-const FORMATTED_PUBLIC_POLICY = `  auth: {
-    public: true,
-    reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy',
-  },`;
-
-// Retain the legacy opt-out and recognize the current scaffold's exact public reason.
-const PUBLIC_POLICIES = [
-  PUBLIC_POLICY,
-  FORMATTED_PUBLIC_POLICY,
-  `  auth: { public: true, reason: '${SERVICE_PUBLIC_REASON}' },`,
-  `  auth: {
-    public: true,
-    reason: '${SERVICE_PUBLIC_REASON}',
-  },`,
-  `  auth: {
-    public: true,
-    reason:
-      '${SERVICE_PUBLIC_REASON}',
-  },`,
+// Only scaffold-owned reasons may be replaced; whitespace outside strings is immaterial.
+const PUBLIC_REASONS = [
+  'Scaffold demo is public; #1382 L2 will wire the guarded auth policy',
+  SERVICE_PUBLIC_REASON,
 ];
+const PUBLIC_POLICY = new RegExp(
+  String.raw`\bauth\s*:\s*\{\s*public\s*:\s*true\s*,\s*reason\s*:\s*(?:` +
+    PUBLIC_REASONS.map((reason) => {
+      const escaped = reason.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return `'${escaped}'|"${escaped}"`;
+    }).join('|') + String.raw`)\s*,?\s*\}\s*,`,
+);
 
 /** Reconcile install-time browser auth using the CLI's injected filesystem boundary. */
 export async function reconcileBrowserAuth(
@@ -60,12 +47,9 @@ export async function reconcileBrowserAuth(
     await fs.readFile(settingsPath),
   ) as BrowserAuthSettings;
   const config = settings.NetScript;
-  const auth = Object.entries(config?.Plugins ?? {}).find(([name, entry]) =>
-    entry.Enabled !== false &&
-    (name === 'auth' || entry.PackageSpecifier === '@netscript/plugin-auth')
-  );
+  const auth = await readAuthServiceName(projectRoot, fs);
   if (!auth || !config) return [];
-  const authServiceName = JSON.stringify(auth[0]);
+  const authServiceName = `'${auth}'`;
   const files: BrowserAuthFile[] = [
     {
       path: join(projectRoot, 'auth/bff.ts'),
@@ -93,7 +77,7 @@ export async function reconcileBrowserAuth(
       content: renderTemplateAssetSync(TEMPLATE_KEYS.authRoute, { bffImport }),
     });
     entry.PluginReferences = [
-      ...new Set([...(entry.PluginReferences ?? []), auth[0]]),
+      ...new Set([...(entry.PluginReferences ?? []), auth]),
     ];
   }
   for (const [name, entry] of Object.entries(config.Services ?? {})) {
@@ -107,14 +91,14 @@ export async function reconcileBrowserAuth(
     if (!current.includes('await defineService(router, {')) continue;
     if (current.includes('authenticator: browserAuthenticator')) continue;
     // An authored guarded policy is authoritative; a scaffold opt-out must compose exactly.
-    const publicPolicy = PUBLIC_POLICIES.find((policy) => current.includes(policy));
+    const publicPolicy = current.match(PUBLIC_POLICY)?.[0];
     if (!publicPolicy) {
       if (
         /\bauth\s*:/.test(current) && !current.includes('Scaffold demo is public') &&
         !current.includes(SERVICE_PUBLIC_REASON)
       ) continue;
       throw new TypeError(
-        `Cannot wire browser auth for ${name}: expected the exact #1382 scaffold public policy line`,
+        `Cannot wire browser auth for ${name}: expected the scaffold public policy with an unchanged reason`,
       );
     }
     const authImport = relative(
@@ -128,7 +112,7 @@ export async function reconcileBrowserAuth(
         "import { createContractAuthorizer } from '@netscript/service/auth';\n" +
         current.replace(
           publicPolicy,
-          `  auth: {
+          `auth: {
     authn: {
       authenticator: browserAuthenticator,
       // Public discovery endpoints; demo procedures declare access in their contracts.
@@ -139,7 +123,7 @@ export async function reconcileBrowserAuth(
         ),
     });
     entry.PluginReferences = [
-      ...new Set([...(entry.PluginReferences ?? []), auth[0]]),
+      ...new Set([...(entry.PluginReferences ?? []), auth]),
     ];
   }
   const written: string[] = [];
