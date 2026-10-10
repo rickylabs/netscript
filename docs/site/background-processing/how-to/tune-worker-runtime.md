@@ -235,6 +235,25 @@ scaffold default is the Web Worker isolate path (one V8 isolate per pool slot).
   ]
 }) }}
 
+## Abort cleanup budget
+
+`InProcessJobRunner` accepts `abortGracePeriodMs` in its constructor options,
+with a default of **1,000 ms**. After timeout, shutdown, or caller cancellation,
+the runner aborts the handler signal immediately and waits up to this budget for
+handler/progress cleanup. If cleanup does not settle, dispatch rejects with the
+abort reason. Returning success after abort still rejects.
+
+This budget bounds waiting; it cannot physically terminate in-process JavaScript.
+A handler that ignores its signal can continue side effects after dispatch rejects,
+and a blocking synchronous loop prevents timers from firing. Use abort-aware I/O,
+yielding checkpoints, and `finally` cleanup. Do not describe this setting as a
+forced worker or subprocess termination delay, or as a top-level `defineWorkers`
+configuration field.
+
+See [JobContext cancellation](/reference/plugin-workers-core/#job-context-cancellation)
+for `deadlineAt` selection and reason names. The shutdown manager's overall timeout
+is a separate host drain budget; size both within your platform's shutdown window.
+
 ## In-production pitfalls
 
 {{ comp callout { type: "important", title: "A 'deno' task with no permissions runs --allow-all" } }}
