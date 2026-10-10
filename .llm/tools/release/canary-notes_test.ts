@@ -22,6 +22,7 @@ import {
   releaseClosingIssues,
 } from './canary-notes.ts';
 import { breakingMigrationFindings } from '../validation/check-breaking-migration.ts';
+import { discoverWorkspaceMembers } from './publish-workspace.ts';
 
 const repo = 'rickylabs/netscript';
 interface Fixture {
@@ -317,7 +318,13 @@ Deno.test('fixture dry run invokes existing generator without network credential
     stderr: 'piped',
   }).output();
   assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
-  assertEquals(new TextDecoder().decode(output.stdout).trim(), render().trim());
+  assertEquals(
+    new TextDecoder().decode(output.stdout).trim(),
+    renderCanaryReleaseNote(fixture.publishedVersion, fixture.previous, fixture.payload, repo, {
+      ...fixture.context,
+      publishedPackageCount: (await discoverWorkspaceMembers()).length,
+    }).trim(),
+  );
 });
 
 Deno.test('revision: failed E2E still publishes its labelled prerelease and later canaries pass drift', async () => {
