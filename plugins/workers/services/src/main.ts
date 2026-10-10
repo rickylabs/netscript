@@ -103,4 +103,9 @@ if (import.meta.main) {
   await createWorkersService(ctx);
 }
 
-export type { RunningService, RunningServiceAddress, ServiceApp } from '@netscript/service';
+export type {
+  RunningService,
+  RunningServiceAddress,
+  ServiceApp,
+  ServiceEnvironment,
+} from '@netscript/service';
