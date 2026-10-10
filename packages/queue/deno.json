@@ -26,10 +26,10 @@
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
-    "@fedify/fedify": "jsr:@fedify/fedify@^2.2.5",
-    "@fedify/denokv": "jsr:@fedify/denokv@^2.2.5",
-    "@fedify/redis": "jsr:@fedify/redis@^2.2.5",
-    "@fedify/amqp": "jsr:@fedify/amqp@^2.2.5",
+    "@fedify/fedify": "jsr:@fedify/fedify@^2.4.2",
+    "@fedify/denokv": "jsr:@fedify/denokv@^2.4.2",
+    "@fedify/redis": "jsr:@fedify/redis@^2.4.2",
+    "@fedify/amqp": "jsr:@fedify/amqp@^2.4.2",
     "zod": "catalog:",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/async": "jsr:@std/async@^1"

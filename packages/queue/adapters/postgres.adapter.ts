@@ -6,7 +6,7 @@
  * @module
  */
 
-import { Pool } from 'npm:pg@^8.21.0';
+import { Pool } from 'npm:pg@^8.23.1';
 import type {
   DeadLetterStorePort,
   EnqueueOptions,
