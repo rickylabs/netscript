@@ -35,7 +35,7 @@ const CACHE_CONTAINER_IMAGES: Record<
   Garnet: { image: 'ghcr.io/microsoft/garnet', tag: '1.1.10' },
 }
 
-/** Default Redis-compatible TCP port. */
+/** Redis-compatible TCP port inside cache containers. */
 const CACHE_DEFAULT_PORT = 6379
 
 /** Deno KV Connect container image (shared KV over HTTP). */
@@ -463,12 +463,17 @@ function garnetExecutableSetup(
   lines.push(
     `  const ${id} = await builder.addExecutable(${
       JSON.stringify(name)
-    }, 'dotnet', ${id}_workdir, ['tool', 'run', 'garnet-server', '--port', '${CACHE_DEFAULT_PORT}'])`,
+    }, 'dotnet', ${id}_workdir, ['tool', 'run', 'garnet-server'])`,
   )
   lines.push(
-    `    .withEndpoint(${cacheEndpointOptions(entry.Port)});`,
+    `    .withEndpoint(${cacheExecutableEndpointOptions(entry.Port)});`,
   )
   lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
+  lines.push(`  await ${id}.withArgsCallback(async (context) => {`)
+  lines.push(`    const args = await context.args();`)
+  lines.push(`    await args.add('--port');`)
+  lines.push(`    await args.add(${id}_tcpEndpoint.property(EndpointProperty.TargetPort));`)
+  lines.push(`  });`)
   lines.push(
     `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
   )
@@ -551,6 +556,15 @@ function cacheEndpointOptions(port: number | undefined): string {
     `targetPort: ${CACHE_DEFAULT_PORT}`,
     "scheme: 'tcp'",
   ]
+  if (port !== undefined) {
+    options.unshift(`port: ${port}`)
+  }
+  return `{ ${options.join(', ')} }`
+}
+
+/** Executable target ports are allocated per run; Port only opts into a host proxy pin. */
+function cacheExecutableEndpointOptions(port: number | undefined): string {
+  const options = ["name: 'tcp'", "scheme: 'tcp'"]
   if (port !== undefined) {
     options.unshift(`port: ${port}`)
   }
