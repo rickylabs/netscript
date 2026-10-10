@@ -2601,7 +2601,9 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 - **Reason:** #2026 adopts a default-off boolean `trustProxyHeaders` opt-in for one shared inbound
   HTTPS/cookie policy. It requires a perimeter that replaces protocol headers and blocks direct
-  access; it cannot authenticate a chain of proxy hops or source CIDRs.
+  access; it cannot authenticate a chain of proxy hops or source CIDRs. Direct-TLS refresh now
+  supports explicit `cookie.secure` / `NETSCRIPT_AUTH_COOKIE_SECURE`; automatic host TLS metadata
+  propagation into URL-less `AuthnRequest` remains deferred against #2191.
 - **Owner:** Auth package and plugin maintainers.
 - **Target:** Backlog / Triage; before recommending trust in multi-hop deployments.
 - **Linked plan:** #2026 option A decision; follow-up #2191.
@@ -2623,6 +2625,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Target:** Before raw all-export documentation gates are claimed green.
 - **Linked plan:** #2026; PR #2188. Raw baseline/final reports kept in the run record.
 - **Created:** 2026-10-10.
-- **Status:** open; raw doc-lint remains exit 1, no evaluator acceptance claimed.
+- **Status:** open; raw doc-lint remains exit 1. Coordinator accepted the baseline-identical debt
+  for PR #2188 readiness; the independent evaluator confirmed no new lint findings.
 - **Gate:** F-7 raw all-export doc-lint exits zero with sound public contracts and no vendor
   re-export or erased types.

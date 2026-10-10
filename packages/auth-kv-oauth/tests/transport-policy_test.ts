@@ -264,3 +264,48 @@ Deno.test('#2026 trusted proxy does not permit an outbound HTTP token endpoint',
   assertFalse(error instanceof KvOAuthError);
   assertFalse(fetched);
 });
+
+Deno.test('#2026 nested cookie proxy trust applies to both gates unless explicitly overridden', async () => {
+  await using kv = new MemoryKvAdapter();
+  const store = await createKvOAuthStore({ kv, encryptionKey });
+  for (const trustProxyHeaders of [undefined, true, false]) {
+    const options = { provider, store, trustProxyHeaders, cookie: { trustProxyHeaders: true } };
+    const flow = createKvOAuthFlow(options);
+    const backend = await createKvOAuthBackend({ ...options, fetch: tokenFetch });
+    for (const candidate of [flow, backend]) {
+      if (trustProxyHeaders === false) {
+        const error = await assertRejects(() => candidate.signIn(proxiedRequest()), KvOAuthError);
+        assertEquals(error.code, 'flow_https_required');
+      } else {
+        const started = await candidate.signIn(proxiedRequest());
+        assertEquals(started.status, 302);
+        assertStringIncludes(started.headers.get('set-cookie')!, 'Secure');
+      }
+    }
+    const session = await backend.sessions.createSession({
+      userId: 'user',
+      subject: 'user',
+      expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    });
+    await store.putSession({ session, tokens: { accessToken: 'old', refreshToken: 'refresh' } });
+    const headers = new Headers({ 'x-forwarded-proto': 'https' });
+    const authn: AuthnRequest = {
+      method: 'GET',
+      path: '/',
+      headers: () => headers,
+      header: (name) => headers.get(name) ?? undefined,
+      cookie: () => session.id,
+    };
+    if (trustProxyHeaders === false) {
+      const error = await assertRejects(
+        async () => await backend.authenticate(authn),
+        KvOAuthError,
+      );
+      assertEquals(error.code, 'cookie_https_required');
+    } else {
+      const result = await backend.authenticate(authn);
+      assert(result.ok);
+      assertStringIncludes(result.setCookies![0], 'Secure');
+    }
+  }
+});

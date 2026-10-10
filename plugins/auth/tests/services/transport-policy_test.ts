@@ -10,7 +10,7 @@ import { KvOAuthError } from '@netscript/auth-kv-oauth/errors';
 import { authContract } from '@netscript/plugin-auth-core/contracts/v1';
 import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
-import { providerFailure } from '../../services/src/routers/v1-helpers.ts';
+import { providerFailure, toAuthnRequest } from '../../services/src/routers/v1-helpers.ts';
 import { AuthServiceHandlerError } from '../../services/src/routers/v1-types.ts';
 import { serveAuthTestService } from '../testing/auth-service-fixture.ts';
 
@@ -170,4 +170,58 @@ Deno.test('#2026 HTTP cookie and configuration gates retain distinct reasons and
     assertEquals(body.code, cookie.path ? 'AUTH_CONFIGURATION_ERROR' : 'AUTH_TRANSPORT_ERROR');
     assertStringIncludes(body.message, cookie.path ? 'Path=/' : 'cookie gate');
   }
+});
+
+Deno.test('#2026 plugin direct TLS signin and near-expiry refresh honor the secure cookie env', async () => {
+  await using kv = new MemoryKvAdapter();
+  let tokenRequests = 0;
+  const registry = await createAuthServiceBackendRegistry({
+    kv,
+    env: { ...env, NETSCRIPT_AUTH_COOKIE_SECURE: 'true' },
+    fetch: () => {
+      tokenRequests++;
+      return Promise.resolve(Response.json({
+        access_token: 'access_test',
+        refresh_token: 'refresh_test',
+        token_type: 'Bearer',
+        expires_in: 60,
+      }));
+    },
+  });
+  const backend = registry.resolveBackend();
+  assert(backend.interactive);
+  const started = await backend.interactive.signIn(new Request('https://app.example.test/signin'));
+  assertEquals(started.status, 302);
+  assertStringIncludes(started.headers.get('set-cookie')!, 'Secure');
+  const redirect = new URL(started.headers.get('location')!);
+  const params = new URLSearchParams({
+    txn: redirect.searchParams.get('txn')!,
+    state: redirect.searchParams.get('state')!,
+    code: 'code_test',
+  });
+  const completed = await backend.interactive.handleCallback(
+    new Request(`https://app.example.test/callback?${params}`),
+  );
+  const result = await backend.authenticate(toAuthnRequest({
+    url: 'https://app.example.test/session',
+    headers: new Headers({ cookie: `__Host-ns_session=${completed.sessionId}` }),
+  }));
+  assert(result.ok);
+  assertStringIncludes(result.setCookies![0], 'Secure');
+  assertEquals(tokenRequests, 2);
+});
+
+Deno.test('#2026 missing captured service request is an INTERNAL server invariant', async () => {
+  await using kv = new MemoryKvAdapter();
+  const registry = await createAuthServiceBackendRegistry({ kv, env });
+  for (const handler of [signin, callback]) {
+    const error = await assertRejects(() => handler({}, { registry }), AuthServiceHandlerError);
+    assertEquals(error.code, 'INTERNAL');
+    assertEquals(error.status, 500);
+    assertEquals(error.data, {});
+    assertEquals(providerFailure(error), error);
+  }
+  const internal = authContract.signin['~orpc'].errorMap.INTERNAL;
+  assert(internal);
+  assertEquals(internal.status, 500);
 });

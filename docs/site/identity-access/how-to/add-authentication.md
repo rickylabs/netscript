@@ -165,7 +165,7 @@ variables themselves. Ordinary workspace setup uses the source/export step above
 {
 label: "kv-oauth (default, interactive)",
 lang: "sh",
-code: "# Selects the interactive OAuth/OIDC backend\nexport NETSCRIPT_AUTH_BACKEND=kv-oauth\n\n# Provider credentials (e.g. a Google OAuth app)\nexport NETSCRIPT_AUTH_CLIENT_ID=your-client-id\nexport NETSCRIPT_AUTH_CLIENT_SECRET=your-client-secret\nexport NETSCRIPT_AUTH_REDIRECT_URI=http://localhost:8094/api/v1/auth/callback\n\n# OIDC discovery / endpoints (preset providers fill these for you)\nexport NETSCRIPT_AUTH_ISSUER=https://accounts.google.com\nexport NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://accounts.google.com/o/oauth2/v2/auth\nexport NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token\nexport NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://openidconnect.googleapis.com/v1/userinfo\nexport NETSCRIPT_AUTH_SCOPES=openid email profile\n\n# Optional: cookie + KV tuning\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\nexport NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret> # required for kv-oauth: missing key material is a startup error\n# Local HTTP only: export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true\n# TLS proxy only: export NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true\n# Outbound HTTP provider tests only: export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true\n\nexport PORT=8094"
+code: "# Selects the interactive OAuth/OIDC backend\nexport NETSCRIPT_AUTH_BACKEND=kv-oauth\n\n# Provider credentials (e.g. a Google OAuth app)\nexport NETSCRIPT_AUTH_CLIENT_ID=your-client-id\nexport NETSCRIPT_AUTH_CLIENT_SECRET=your-client-secret\nexport NETSCRIPT_AUTH_REDIRECT_URI=http://localhost:8094/api/v1/auth/callback\n\n# OIDC discovery / endpoints (preset providers fill these for you)\nexport NETSCRIPT_AUTH_ISSUER=https://accounts.google.com\nexport NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://accounts.google.com/o/oauth2/v2/auth\nexport NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token\nexport NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://openidconnect.googleapis.com/v1/userinfo\nexport NETSCRIPT_AUTH_SCOPES=openid email profile\n\n# Optional: cookie + KV tuning\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\nexport NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret> # required for kv-oauth: missing key material is a startup error\n# Local HTTP only: export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true\n# TLS proxy only: export NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true\n# Direct TLS at the service: export NETSCRIPT_AUTH_COOKIE_SECURE=true\n# Outbound HTTP provider tests only: export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true\n\nexport PORT=8094"
 },
 {
 label: "workos (non-interactive)",
@@ -363,12 +363,15 @@ redirect. Set <code>NETSCRIPT_AUTH_BACKEND=kv-oauth</code> for an interactive fl
 ignored by default. Behind a TLS-terminating proxy set
 <code>NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true</code> only when that proxy replaces incoming
 protocol headers and blocks direct service access. The flow gate and cookie Secure derivation use
-one policy. Proxied TLS does not need <code>NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS</code>;
+one policy. For direct TLS at the service set <code>NETSCRIPT_AUTH_COOKIE_SECURE=true</code>;
+refresh receives no request URL and needs this explicit Secure cookie setting. Automatic host TLS
+metadata remains deferred to #2191. Proxied TLS does not need <code>NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS</code>;
 that switch now controls outbound OAuth HTTP only. For local HTTP development use the separate
 <code>NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true</code>. Missing or partial provider
 config never enables insecure transport automatically. Transport/config refusals return
 <code>AUTH_TRANSPORT_ERROR</code>/<code>AUTH_CONFIGURATION_ERROR</code> (400), with distinct
-flow/cookie reasons; upstream failures remain 502. Hop/CIDR verification is deferred to
+flow/cookie reasons; missing service request capture returns <code>INTERNAL</code> (500), and
+upstream failures remain 502. Hop/CIDR verification is deferred to
 <a href="https://github.com/rickylabs/netscript/issues/2191">#2191</a>.</li>
 <li><strong>Single active backend</strong> — there is exactly one backend at a time. No multi-active
 routing, cross-backend account linking, global logout, historical replay, or paged session mirror in

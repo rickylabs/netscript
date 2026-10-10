@@ -45,7 +45,7 @@ export function toRequest(
 ): Request {
   if (!serviceRequest) {
     throw new AuthServiceHandlerError(
-      'AUTH_CONFIGURATION_ERROR',
+      'INTERNAL',
       'Auth interactive flow requires a captured service request.',
     );
   }

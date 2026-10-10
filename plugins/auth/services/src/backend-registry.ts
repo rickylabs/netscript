@@ -157,6 +157,11 @@ async function createActiveBackend(
       trustProxyHeaders: env.NETSCRIPT_AUTH_TRUST_PROXY_HEADERS === 'true',
       cookie: {
         name: env.NETSCRIPT_AUTH_COOKIE_NAME,
+        secure: env.NETSCRIPT_AUTH_COOKIE_SECURE === 'true'
+          ? true
+          : env.NETSCRIPT_AUTH_COOKIE_SECURE === 'false'
+          ? false
+          : undefined,
         allowInsecureDev: env.NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS === 'true',
       },
     });

@@ -165,6 +165,14 @@ and block direct service access. This configures one HTTPS policy for OAuth flow
 cookies; outbound provider endpoints still require HTTPS. Trusted hop/CIDR verification is tracked
 in [#2191](https://github.com/rickylabs/netscript/issues/2191).
 
+For direct TLS at the auth service, set `NETSCRIPT_AUTH_COOKIE_SECURE=true`. Sign-in and callback
+can inspect their HTTPS request URL, but session refresh receives a URL-less `AuthnRequest`; the
+explicit setting ensures refreshed cookies remain Secure. Unset preserves protocol derivation;
+`false` explicitly disables Secure (and is refused for `__Host-` cookies unless local development is
+enabled). This cookie override does not bypass the inbound HTTPS flow gate. Automatic host TLS
+metadata and trusted-hop verification remain tracked in
+[#2191](https://github.com/rickylabs/netscript/issues/2191).
+
 For explicit local HTTP development, set `NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true`. It
 opens the inbound flow and development cookie gates. The separate
 `NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true` only allows outbound HTTP OAuth discovery/token
@@ -174,7 +182,8 @@ silently enables insecure transport, including the unconfigured local placeholde
 **Migration:** replace the old outbound switch with the new inbound switch for HTTP development; use
 proxy trust for production TLS termination. Transport refusals return `AUTH_TRANSPORT_ERROR` (400),
 and backend configuration refusals return `AUTH_CONFIGURATION_ERROR` (400), with the gate named in
-the reason. Actual upstream failures remain `AUTH_PROVIDER_ERROR` (502).
+the reason. Missing service request capture is an internal wiring failure (`INTERNAL`, 500). Actual
+upstream failures remain `AUTH_PROVIDER_ERROR` (502).
 
 ## Docs
 
