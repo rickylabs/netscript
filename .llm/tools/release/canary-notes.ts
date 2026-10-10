@@ -15,12 +15,23 @@ export interface CanaryFollowUp {
   readonly state: 'open' | 'closed';
 }
 
+/** Terminal step outcomes reported by GitHub Actions for the pinned E2E wait. */
+const PRODUCTION_E2E_OUTCOMES = ['success', 'failure', 'cancelled', 'skipped'] as const;
+
+/** Validate workflow evidence without silently treating an absent outcome as success. */
+export function parseProductionE2EOutcome(value: string): typeof PRODUCTION_E2E_OUTCOMES[number] {
+  const outcome = PRODUCTION_E2E_OUTCOMES.find((candidate) => candidate === value);
+  if (!outcome) throw new Error('Explicit production E2E outcome required.');
+  return outcome;
+}
+
 /** Exact publication context supplied by the canary workflow. */
 export interface CanaryNoteContext {
   readonly latestStableTag: string;
   readonly publishedPackageCount: number;
   readonly publishRunId: string;
   readonly productionE2ERunId: string;
+  readonly productionE2EOutcome: typeof PRODUCTION_E2E_OUTCOMES[number];
 }
 
 /** Recognize the two breaking-change conventions used by PR authors. */
@@ -70,12 +81,15 @@ export function releaseClosingIssues(body: string): number[] {
 }
 
 /** Collect only explicit reference declarations outside code fences. */
-export function referencedIssues(body: string): number[] {
+export function referencedIssues(body: string, repo?: string): number[] {
   const text = body.replace(/^\s*```[^\n]*\n[\s\S]*?^\s*```\s*$/gm, '');
-  return [
-    ...new Set([...text.matchAll(/\bRefs\s+((?:#\d+\b[\s,]*)+)/gi)]
-      .flatMap((match) => [...match[1].matchAll(/#(\d+)/g)].map((issue) => Number(issue[1])))),
-  ];
+  const references = [...text.matchAll(/\bRefs\s*:?\s+((?:(?:[\w.-]+\/[\w.-]+)?#\d+\b[\s,]*)+)/gi)];
+  const issues = references.flatMap((match) =>
+    [...match[1].matchAll(/(?:([\w.-]+\/[\w.-]+))?#(\d+)\b/g)]
+      .filter((issue) => !issue[1] || issue[1].toLowerCase() === repo?.toLowerCase())
+      .map((issue) => Number(issue[2]))
+  );
+  return [...new Set(issues)];
 }
 
 /** Render deterministic introductions using metadata and fixed prose only. */
@@ -91,12 +105,19 @@ export function renderCanaryIntroduction(
   if (!Number.isSafeInteger(context.publishedPackageCount) || context.publishedPackageCount < 1) {
     throw new Error('Published package count must be positive.');
   }
-  for (const id of [context.publishRunId, context.productionE2ERunId]) {
-    if (!/^\d+$/.test(id)) throw new Error('Exact workflow run IDs required.');
+  const outcome = parseProductionE2EOutcome(context.productionE2EOutcome);
+  if (
+    !/^\d+$/.test(context.publishRunId) ||
+    (context.productionE2ERunId !== '' && !/^\d+$/.test(context.productionE2ERunId)) ||
+    (outcome === 'success' && context.productionE2ERunId === '')
+  ) {
+    throw new Error('Exact workflow run IDs required.');
   }
   const [target, ordinal] = version.split('-canary.');
   const lines = [
-    `**What this canary is for.** canary.${ordinal} is release candidate ${ordinal} for NetScript ${target}. It bundles ${payload.pullRequests.length} pull requests since the previous canary point so downstream apps can try the published packages before ${target} ships. It is a **pre-release**: normal semver resolution never selects it, and **Latest stays ${context.latestStableTag}**. All ${context.publishedPackageCount} \`@netscript/*\` packages are published at exactly \`${version}\`. The canary publish and version-pinned production E2E both passed ([publish](https://github.com/${repo}/actions/runs/${context.publishRunId}), [production E2E](https://github.com/${repo}/actions/runs/${context.productionE2ERunId})).`,
+    `**What this canary is for.** canary.${ordinal} is release candidate ${ordinal} for NetScript ${target}. It bundles ${payload.pullRequests.length} pull requests since the previous canary point so downstream apps can try the published packages before ${target} ships. It is a **pre-release**: normal semver resolution never selects it, and **Latest stays ${context.latestStableTag}**. All ${context.publishedPackageCount} \`@netscript/*\` packages are published at exactly \`${version}\`. ${
+      renderPublicationEvidence(repo, context)
+    }`,
     '',
     '## Highlights',
     '',
@@ -118,6 +139,19 @@ export function renderCanaryIntroduction(
     '',
   );
   return lines.join('\n');
+}
+
+function renderPublicationEvidence(repo: string, context: CanaryNoteContext): string {
+  const publishLink = `[publish](https://github.com/${repo}/actions/runs/${context.publishRunId})`;
+  const e2eLink =
+    `[production E2E](https://github.com/${repo}/actions/runs/${context.productionE2ERunId})`;
+  if (context.productionE2EOutcome === 'success') {
+    return `The canary publish and version-pinned production E2E both passed (${publishLink}, ${e2eLink}).`;
+  }
+  const failedEvidence = context.productionE2ERunId
+    ? e2eLink
+    : `no child run was dispatched; [workflow](https://github.com/${repo}/actions/runs/${context.publishRunId})`;
+  return `The canary publish passed (${publishLink}); production E2E failed (${context.productionE2EOutcome}; ${failedEvidence}).`;
 }
 
 function renderHighlights(payload: CanaryPayload, repo: string): string {
@@ -174,7 +208,9 @@ function renderFollowUps(payload: CanaryPayload, repo: string): string {
     Object.values(payload.pullRequestDetails ?? {}).flatMap((pr) => releaseClosingIssues(pr.body)),
   );
   const references = new Set(
-    Object.values(payload.pullRequestDetails ?? {}).flatMap((pr) => referencedIssues(pr.body)),
+    Object.values(payload.pullRequestDetails ?? {}).flatMap((pr) =>
+      referencedIssues(pr.body, repo)
+    ),
   );
   const followUps = (payload.followUps ?? []).filter((issue) =>
     issue.state === 'open' && references.has(issue.number) && !closing.has(issue.number)
@@ -190,6 +226,28 @@ function renderFollowUps(payload: CanaryPayload, repo: string): string {
 
 /** Remove private execution context while retaining public release text and links. */
 export function publicReleaseText(text: string): string {
+  const parts: string[] = [];
+  let previous = 0;
+  for (const match of text.matchAll(/https?:\/\/[^\s)\]<>"'\x60]+/gi)) {
+    parts.push(redactPrivateContext(text.slice(previous, match.index)));
+    try {
+      const address = new URL(match[0]);
+      parts.push(
+        ['github.com', 'jsr.io'].includes(address.hostname) && !address.username &&
+          !address.password
+          ? match[0]
+          : '[external address]',
+      );
+    } catch {
+      parts.push('[external address]');
+    }
+    previous = match.index + match[0].length;
+  }
+  parts.push(redactPrivateContext(text.slice(previous)));
+  return parts.join('');
+}
+
+function redactPrivateContext(text: string): string {
   return text
     .replace(
       /(?:~\/|\/(?:home|Users|ephemeral|tmp|mnt|root|var|opt|workspace|srv|etc)\/|[A-Z]:\\)[^\s\x60<>"']*/gi,
@@ -202,14 +260,9 @@ export function publicReleaseText(text: string): string {
       '[private identifier]',
     )
     .replace(/\b(?:hostname|host)\s*[:=]\s*[^\s,;]+/gi, '[private host]')
-    .replace(/https?:\/\/[^\s)\]<>]+/gi, (address) => {
-      try {
-        const hostname = new URL(address).hostname;
-        return ['github.com', 'jsr.io'].includes(hostname) ? address : '[external address]';
-      } catch {
-        return '[external address]';
-      }
-    })
     .replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g, '[private host]')
-    .replace(/\b(?:localhost|[\w-]+\.(?:local|internal|lan))(?::\d+)?\b/gi, '[private host]');
+    .replace(
+      /(?<![\w.-])(?:localhost|(?:[\w-]+\.)+(?:local|internal|lan))(?::\d+)?(?![\w-]|\.[\w-])/gi,
+      '[private host]',
+    );
 }

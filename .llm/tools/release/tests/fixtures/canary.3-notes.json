@@ -6,7 +6,8 @@
     "latestStableTag": "v0.0.7",
     "publishedPackageCount": 35,
     "publishRunId": "38059950011",
-    "productionE2ERunId": "38060469468"
+    "productionE2ERunId": "38060469468",
+    "productionE2EOutcome": "success"
   },
   "payload": {
     "commitCount": 61,

@@ -1,8 +1,17 @@
-import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 import {
+  assert,
+  assertEquals,
+  assertRejects,
+  assertStringIncludes,
+  assertThrows,
+} from '@std/assert';
+import {
+  canaryLabelFor,
   type CanaryPayload,
   canaryReleasePayload,
+  checkCanaryDrift,
   deriveCanaryPayload,
+  GitHubClient,
   renderCanaryReleaseNote,
 } from './canary-label.ts';
 import {
@@ -274,7 +283,7 @@ Deno.test('publication context rejects missing exact evidence and keeps prerelea
   assertEquals(payload.make_latest, 'false');
 });
 
-Deno.test('canary workflow composes after exact E2E and CI enforces migration before merge', async () => {
+Deno.test('canary workflow composes after exact E2E and isolated metadata workflow enforces migration', async () => {
   const workflow = await Deno.readTextFile(
     new URL('../../../.github/workflows/release-canary.yml', import.meta.url),
   );
@@ -284,8 +293,10 @@ Deno.test('canary workflow composes after exact E2E and CI enforces migration be
   );
   assertStringIncludes(workflow, '--production-e2e-run-id "$E2E_RUN_ID"');
   assertStringIncludes(workflow, '--publish-run-id "$GITHUB_RUN_ID"');
-  const ci = await Deno.readTextFile(new URL('../../../.github/workflows/ci.yml', import.meta.url));
-  assertStringIncludes(ci, '.llm/tools/validation/check-breaking-migration.ts');
+  const metadata = await Deno.readTextFile(
+    new URL('../../../.github/workflows/pr-metadata-gates.yml', import.meta.url),
+  );
+  assertStringIncludes(metadata, '.llm/tools/validation/check-breaking-migration.ts');
 });
 
 Deno.test('fixture dry run invokes existing generator without network credentials or publication', async () => {
@@ -307,4 +318,210 @@ Deno.test('fixture dry run invokes existing generator without network credential
   }).output();
   assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
   assertEquals(new TextDecoder().decode(output.stdout).trim(), render().trim());
+});
+
+Deno.test('revision: failed E2E still publishes its labelled prerelease and later canaries pass drift', async () => {
+  const requests: Array<{ method: string; path: string; body: Record<string, unknown> }> = [];
+  const github = new GitHubClient(repo, 'fixture-token', (input, init) => {
+    const path = new URL(String(input)).pathname;
+    requests.push({
+      method: init?.method ?? 'GET',
+      path,
+      body: init?.body ? JSON.parse(String(init.body)) : {},
+    });
+    if (path.includes('/releases/tags/')) {
+      return Promise.resolve(new Response('Not found', { status: 404 }));
+    }
+    return Promise.resolve(
+      Response.json(path.endsWith('/labels') && init?.method === 'GET' ? [] : {}),
+    );
+  });
+  const label = canaryLabelFor(fixture.publishedVersion);
+  const note = renderCanaryReleaseNote(
+    fixture.publishedVersion,
+    fixture.previous,
+    fixture.payload,
+    repo,
+    {
+      ...fixture.context,
+      productionE2EOutcome: 'failure',
+    },
+  );
+  await github.ensureLabel(label);
+  await github.applyLabel(1, label);
+  assertEquals(await github.publishCanaryRelease(fixture.publishedVersion, note), 'created');
+  const release = requests.find((request) =>
+    request.method === 'POST' && request.path.endsWith('/releases')
+  )!;
+  assertStringIncludes(String(release.body.body), 'production E2E failed');
+  assertStringIncludes(
+    String(release.body.body),
+    `/actions/runs/${fixture.context.productionE2ERunId}`,
+  );
+  assertEquals(String(release.body.body).includes('both passed'), false);
+  assertEquals(release.body.prerelease, true);
+  assertEquals(release.body.make_latest, 'false');
+  assert(
+    requests.some((request) =>
+      request.method === 'POST' && request.path.endsWith('/issues/1/labels')
+    ),
+  );
+  assertEquals(
+    checkCanaryDrift(
+      [label, 'canary:0.0.8-canary.4'],
+      [fixture.publishedVersion, '0.0.8-canary.4'],
+      '0.0.8',
+    ).ok,
+    true,
+  );
+  const workflow = await Deno.readTextFile(
+    new URL('../../../.github/workflows/release-canary.yml', import.meta.url),
+  );
+  const labelStep = workflow.slice(
+    workflow.indexOf('- name: Label published canary'),
+    workflow.indexOf('- name: Delete ephemeral'),
+  );
+  assertStringIncludes(labelStep, "if: always() && steps.publish.outcome == 'success'");
+  assertStringIncludes(labelStep, 'E2E_OUTCOME: ${{ steps.e2e.outcome }}');
+  assertStringIncludes(labelStep, '--production-e2e-outcome "$E2E_OUTCOME"');
+  assert(
+    workflow.indexOf('deno task release:canary-label') >
+      workflow.indexOf('bash .llm/tools/release/watch-canary-e2e.sh'),
+  );
+});
+
+Deno.test('revision: only successful E2E evidence may say passed and missing child run preserves notes', () => {
+  for (const outcome of ['failure', 'cancelled', 'skipped'] as const) {
+    const note = renderCanaryReleaseNote(
+      fixture.publishedVersion,
+      fixture.previous,
+      fixture.payload,
+      repo,
+      {
+        ...fixture.context,
+        productionE2EOutcome: outcome,
+      },
+    );
+    assertStringIncludes(note, `production E2E failed (${outcome};`);
+    assertStringIncludes(note, `/actions/runs/${fixture.context.productionE2ERunId}`);
+    assertEquals(note.includes('both passed'), false);
+  }
+  const note = renderCanaryReleaseNote(
+    fixture.publishedVersion,
+    fixture.previous,
+    fixture.payload,
+    repo,
+    {
+      ...fixture.context,
+      productionE2EOutcome: 'skipped',
+      productionE2ERunId: '',
+    },
+  );
+  assertStringIncludes(note, 'no child run was dispatched');
+  assertStringIncludes(note, `/actions/runs/${fixture.context.publishRunId}`);
+  assertStringIncludes(render(), 'both passed');
+});
+
+Deno.test('revision: issue 404 and 410 do not prevent valid follow-ups while other HTTP errors fail', async () => {
+  const calls: number[] = [];
+  const github = new GitHubClient(repo, 'fixture-token', (input) => {
+    const number = Number(String(input).split('/').at(-1));
+    calls.push(number);
+    if ([404, 410, 401, 503].includes(number)) {
+      return Promise.resolve(new Response('fixture failure', { status: number }));
+    }
+    return Promise.resolve(
+      Response.json({
+        number,
+        title: 'Referenced issue',
+        state: 'open',
+        ...(number === 2 ? { pull_request: {} } : {}),
+      }),
+    );
+  });
+  const payload = await deriveCanaryPayload('previous', 'head', {
+    rangeCommits: () => Promise.resolve(['merge']),
+    associatedPullRequests: () => Promise.resolve([1]),
+    closingIssues: () => Promise.resolve([]),
+    pullRequestDetails: () =>
+      Promise.resolve({
+        title: 'fix(cli): partial scope',
+        body: 'Refs #404, #410, #1, #2',
+        labels: [],
+      }),
+    issue: (number) => github.issue(number),
+  });
+  assertEquals(payload.followUps, [{ number: 1, title: 'Referenced issue', state: 'open' }]);
+  assertEquals(calls, [1, 2, 404, 410]);
+  for (const status of [401, 503]) {
+    await assertRejects(() => github.issue(status), Error, `failed: ${status}`);
+  }
+});
+
+Deno.test('revision: references accept colon and same-repo qualification without importing foreign IDs', async () => {
+  const body =
+    'Refs: #11, rickylabs/netscript#12, someone/else#13, #14\nRefs RICKYLABS/NETSCRIPT#12\nRefs #11\n```text\nRefs: rickylabs/netscript#15\n```';
+  assertEquals(referencedIssues(body, repo), [11, 12, 14]);
+  assertEquals(referencedIssues('Refs: #11\nRefs rickylabs/netscript#12'), [11]);
+  const lookedUp: number[] = [];
+  const payload = await deriveCanaryPayload('previous', 'head', {
+    rangeCommits: () => Promise.resolve(['merge']),
+    associatedPullRequests: () => Promise.resolve([1]),
+    closingIssues: () => Promise.resolve([]),
+    pullRequestDetails: () => Promise.resolve({ title: 'fix(cli): partial', body, labels: [] }),
+    issue: (number) => {
+      lookedUp.push(number);
+      return Promise.resolve({ number, title: `Follow-up ${number}`, state: 'open' as const });
+    },
+  }, repo);
+  assertEquals(lookedUp, [11, 12, 14]);
+  const section = render(payload).split('## Known open follow-ups')[1].split('## Trying')[0];
+  for (const number of [11, 12, 14]) assertStringIncludes(section, `Follow-up ${number}`);
+  assertEquals(section.includes('#13'), false);
+});
+
+Deno.test('revision: public URL paths and internal filenames survive private-context redaction', () => {
+  for (const segment of ['etc', 'opt', 'tmp', 'home']) {
+    const url = `https://github.com/${repo}/blob/main/${segment}/foo.internal.ts`;
+    const localPath = ['', segment, 'private-file'].join('/');
+    assertEquals(publicReleaseText(`${url} ${localPath}`), `${url} [private path]`);
+  }
+  const filenames = 'foo.internal.ts bar.local.json worker.lan.ts localhost.ts';
+  assertEquals(publicReleaseText(filenames), filenames);
+  assertEquals(
+    publicReleaseText('machine.internal. sub.machine.local:42 localhost'),
+    '[private host]. [private host] [private host]',
+  );
+  assertEquals(
+    publicReleaseText('https://github.com.private-machine.internal/tmp/secret'),
+    '[external address]',
+  );
+});
+
+Deno.test('revision: metadata events are isolated from the original CI triggers and concurrency', async () => {
+  const ci = await Deno.readTextFile(new URL('../../../.github/workflows/ci.yml', import.meta.url));
+  const trigger = ci.slice(ci.indexOf('on:'), ci.indexOf('permissions:'));
+  assertStringIncludes(trigger, "branches: [main, 'feat/package-quality']");
+  assertStringIncludes(trigger, "tags: ['v*']");
+  assertStringIncludes(trigger, "branches: [main, 'feat/**', 'epic/**', 'canary/**']");
+  assertStringIncludes(trigger, 'types: [opened, synchronize, reopened, ready_for_review]');
+  for (const event of ['edited', 'labeled', 'unlabeled']) {
+    assertEquals(trigger.includes(event), false);
+  }
+  assertEquals(ci.includes('check-breaking-migration.ts'), false);
+  const metadata = await Deno.readTextFile(
+    new URL('../../../.github/workflows/pr-metadata-gates.yml', import.meta.url),
+  );
+  assertStringIncludes(
+    metadata,
+    'types: [opened, synchronize, reopened, ready_for_review, edited, labeled, unlabeled]',
+  );
+  assertStringIncludes(
+    metadata,
+    'group: pr-metadata-gates-${{ github.event.pull_request.number }}',
+  );
+  assertStringIncludes(metadata, 'cancel-in-progress: true');
+  assertStringIncludes(metadata, '.llm/tools/validation/check-breaking-migration.ts');
+  assertEquals([...metadata.matchAll(/\n {2}[\w-]+:\n {4}runs-on:/g)].length, 1);
+  assertEquals(metadata.includes('deno task'), false);
 });

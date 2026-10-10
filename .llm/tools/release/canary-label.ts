@@ -6,6 +6,7 @@ import {
   type CanaryFollowUp,
   type CanaryNoteContext,
   type CanaryPullRequestDetails,
+  parseProductionE2EOutcome,
   publicReleaseText,
   referencedIssues,
   renderCanaryIntroduction,
@@ -63,6 +64,7 @@ interface Options {
   readonly fixture?: string;
   readonly publishRunId: string;
   readonly productionE2ERunId: string;
+  readonly productionE2EOutcome: CanaryNoteContext['productionE2EOutcome'];
 }
 
 interface GitHubLabel {
@@ -137,6 +139,7 @@ export async function deriveCanaryPayload(
   previous: string,
   head: string,
   dependencies: CanaryPayloadDependencies,
+  repo?: string,
 ): Promise<CanaryPayload> {
   const pullRequests: number[] = [];
   const seen = new Set<number>();
@@ -166,7 +169,7 @@ export async function deriveCanaryPayload(
     if (dependencies.pullRequestDetails) {
       const details = await dependencies.pullRequestDetails(pullRequest);
       pullRequestDetails[pullRequest] = details;
-      for (const issue of referencedIssues(details.body)) references.add(issue);
+      for (const issue of referencedIssues(details.body, repo)) references.add(issue);
       pullRequestTitles[pullRequest] = details.title;
       continue;
     }
@@ -373,11 +376,23 @@ async function nearestStable(head: string): Promise<string> {
   return candidates[0].ref;
 }
 
-class GitHubClient {
+class GitHubApiError extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message);
+    this.name = 'GitHubApiError';
+  }
+}
+
+/** Read and annotate the canary payload using GitHub's REST and GraphQL APIs. */
+export class GitHubClient {
   readonly #owner: string;
   readonly #name: string;
 
-  constructor(private readonly repo: string, private readonly token: string) {
+  constructor(
+    private readonly repo: string,
+    private readonly token: string,
+    private readonly fetchImpl: typeof fetch = fetch,
+  ) {
     [this.#owner, this.#name] = repo.split('/');
   }
 
@@ -425,12 +440,17 @@ class GitHubClient {
   }
 
   async issue(number: number): Promise<CanaryFollowUp | undefined> {
-    const issue = await this.request<CanaryFollowUp & { pull_request?: unknown }>(
-      'GET',
-      `/repos/${this.repo}/issues/${number}`,
-    );
-    if (issue.pull_request) return undefined;
-    return { number, title: issue.title, state: issue.state };
+    try {
+      const issue = await this.request<CanaryFollowUp & { pull_request?: unknown }>(
+        'GET',
+        `/repos/${this.repo}/issues/${number}`,
+      );
+      if (issue.pull_request) return undefined;
+      return { number, title: issue.title, state: issue.state };
+    } catch (error) {
+      if (error instanceof GitHubApiError && [404, 410].includes(error.status)) return undefined;
+      throw error;
+    }
   }
 
   async latestStableTag(): Promise<string> {
@@ -452,7 +472,7 @@ class GitHubClient {
       await this.request('PATCH', `/repos/${this.repo}/releases/${release.id}`, payload);
       return 'updated';
     } catch (error) {
-      if (!(error instanceof Error) || !error.message.includes('failed: 404 ')) throw error;
+      if (!(error instanceof GitHubApiError) || error.status !== 404) throw error;
       await this.request('POST', `/repos/${this.repo}/releases`, payload);
       return 'created';
     }
@@ -475,7 +495,7 @@ class GitHubClient {
   }
 
   private async request<T = unknown>(method: string, path: string, body?: unknown): Promise<T> {
-    const response = await fetch(`${GITHUB_API_BASE_URL}${path}`, {
+    const response = await this.fetchImpl(`${GITHUB_API_BASE_URL}${path}`, {
       method,
       headers: {
         accept: 'application/vnd.github+json',
@@ -486,7 +506,8 @@ class GitHubClient {
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     if (!response.ok) {
-      throw new Error(
+      throw new GitHubApiError(
+        response.status,
         `GitHub API ${method} ${path} failed: ${response.status} ${await response.text()}`,
       );
     }
@@ -503,6 +524,7 @@ function parseArgs(args: readonly string[]): Options {
   let fixture: string | undefined;
   let publishRunId = Deno.env.get('GITHUB_RUN_ID') ?? '';
   let productionE2ERunId = '';
+  let productionE2EOutcome: CanaryNoteContext['productionE2EOutcome'] = 'skipped';
   for (let index = 0; index < args.length; index++) {
     const arg = args[index];
     if (arg === '--') continue;
@@ -512,12 +534,18 @@ function parseArgs(args: readonly string[]): Options {
     else if (arg === '--fixture') fixture = requireValue(args, ++index, arg);
     else if (arg === '--publish-run-id') publishRunId = requireValue(args, ++index, arg);
     else if (arg === '--production-e2e-run-id') {
-      productionE2ERunId = requireValue(args, ++index, arg);
+      const value = args[++index];
+      if (value === undefined || value.startsWith('--')) {
+        throw new Error(`${arg} requires a value.`);
+      }
+      productionE2ERunId = value;
+    } else if (arg === '--production-e2e-outcome') {
+      productionE2EOutcome = parseProductionE2EOutcome(requireValue(args, ++index, arg));
     } else if (arg === '--json') json = true;
     else if (arg === '--dry-run') dryRun = true;
     else if (arg === '--help') {
       console.log(
-        'Usage: release:canary-label --published-version <x.y.z-canary.n> [--head <ref>] [--repo owner/name] [--json] [--dry-run] [--fixture <json>] [--publish-run-id <id>] [--production-e2e-run-id <id>]',
+        'Usage: release:canary-label --published-version <x.y.z-canary.n> [--head <ref>] [--repo owner/name] [--json] [--dry-run] [--fixture <json>] [--publish-run-id <id>] [--production-e2e-run-id <id>] [--production-e2e-outcome <success|failure|cancelled|skipped>]',
       );
       Deno.exit(0);
     } else throw new Error(`Unknown argument: ${arg}`);
@@ -527,7 +555,17 @@ function parseArgs(args: readonly string[]): Options {
   if (!fixture && (!publishedVersion || !head)) {
     throw new Error('Missing required canary-label arguments.');
   }
-  return { repo, publishedVersion, head, json, dryRun, fixture, publishRunId, productionE2ERunId };
+  return {
+    repo,
+    publishedVersion,
+    head,
+    json,
+    dryRun,
+    fixture,
+    publishRunId,
+    productionE2ERunId,
+    productionE2EOutcome,
+  };
 }
 
 function requireValue(args: readonly string[], index: number, flag: string): string {
@@ -600,7 +638,7 @@ async function main(): Promise<void> {
       closingIssues: (pullRequest) => github.closingIssues(pullRequest),
       pullRequestDetails: (pullRequest) => github.pullRequestDetails(pullRequest),
       issue: (number) => github.issue(number),
-    });
+    }, options.repo);
     setCheck(
       checks,
       activeCheck,
@@ -618,6 +656,7 @@ async function main(): Promise<void> {
         publishedPackageCount: (await discoverWorkspaceMembers()).length,
         publishRunId: options.publishRunId,
         productionE2ERunId: options.productionE2ERunId,
+        productionE2EOutcome: options.productionE2EOutcome,
       },
     );
     if (options.dryRun) {
