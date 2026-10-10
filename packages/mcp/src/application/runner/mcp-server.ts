@@ -11,6 +11,7 @@ import type {
 } from '../../domain/tool-types.ts';
 import { type JsonRpcResponse, parseJsonRpcRequest } from '../../domain/json-rpc.ts';
 import {
+  assertResultByteLimit,
   DEFAULT_TRUNCATION_POLICY,
   ResultByteLimitError,
   truncateResult,
@@ -134,7 +135,12 @@ export function createMcpServer(options: McpServerOptions): McpServer {
       let bounded: unknown;
       try {
         validateSchema(tool.outputSchema, execution.value);
-        bounded = truncateResult(execution.value, policy);
+        bounded = truncateResult(
+          execution.value,
+          tool.name === 'get_doc'
+            ? { maxItems: Number.POSITIVE_INFINITY, maxStringLength: Number.POSITIVE_INFINITY }
+            : policy,
+        );
         validateSchema(tool.outputSchema, bounded);
       } catch (error) {
         await settleFlowReceipt(tool.flow, input, false);
@@ -149,12 +155,26 @@ export function createMcpServer(options: McpServerOptions): McpServer {
           message: error instanceof Error ? error.message : 'Output contract validation failed',
         });
       }
-      await settleFlowReceipt(tool.flow, input, resultSucceeded(execution.value));
-      return rpcResult(request.id, {
+      const response = rpcResult(request.id, {
         content: [{ type: 'text', text: JSON.stringify(bounded) }],
         structuredContent: bounded as Record<string, unknown>,
         isError: false,
       });
+      // get_doc owns its semantic bounds. Check the complete duplicated MCP envelope as well.
+      if (tool.name === 'get_doc') {
+        try {
+          assertResultByteLimit(response);
+        } catch {
+          return rpcError(
+            request.id,
+            -32603,
+            'Document metadata exceeds the transport limit; use full: true.',
+            { code: 'tool_result_too_large' },
+          );
+        }
+      }
+      await settleFlowReceipt(tool.flow, input, resultSucceeded(execution.value));
+      return response;
     },
   };
 }

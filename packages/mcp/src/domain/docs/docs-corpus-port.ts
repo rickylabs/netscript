@@ -1,7 +1,7 @@
 import type { GuidanceResult } from './guidance-contract.ts';
 
-/** Maximum source characters retained for one indexed document. */
-export const MAX_INDEXED_DOC_LENGTH = 100_000;
+/** Maximum source characters accepted for one indexed document. */
+export const MAX_INDEXED_DOC_LENGTH: number = 4 * 1024 * 1024;
 
 /** Explicit failure raised when a configured filesystem corpus does not exist. */
 export class DocsCorpusUnavailableError extends Error {
@@ -27,7 +27,7 @@ export interface DocsSection {
   readonly slug: string;
   /** Heading depth from one through six. */
   readonly level: number;
-  /** Bounded Markdown belonging to this section. */
+  /** Complete Markdown belonging to this section. */
   readonly content: string;
 }
 
@@ -45,7 +45,7 @@ export interface DocsSummary {
 
 /** Indexed public documentation document. */
 export interface DocsDocument extends DocsSummary {
-  /** Bounded Markdown body without front matter. */
+  /** Complete Markdown body without front matter. */
   readonly content: string;
   /** Indexed section bodies. */
   readonly sectionContents: readonly DocsSection[];

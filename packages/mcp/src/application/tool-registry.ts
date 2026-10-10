@@ -72,9 +72,9 @@ export function createToolRegistry(
     Object.freeze({
       name,
       kind: kinds[name],
-      description: `${
-        summaries[name]
-      } Returns a bounded summary; do not print raw output to the user.`,
+      description: name === 'get_doc'
+        ? 'Get faithful documentation: verbatim under budget, deterministic extract otherwise; full: true and nextCursor deliver exact pages. Reports contractVersion 2 and mode.'
+        : `${summaries[name]} Returns a bounded summary; do not print raw output to the user.`,
       inputSchema: TOOL_INPUT_SCHEMAS[name],
       outputSchema: TOOL_OUTPUT_SCHEMAS[name],
       flow: flows[name] ?? createPlannedFlow(name),

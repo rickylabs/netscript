@@ -22,7 +22,7 @@ export interface EmbeddedDocsSource {
 export interface EmbeddedDocsCorpusOptions {
   /** Markdown assets embedded by the package composition root. */
   readonly documents: readonly EmbeddedDocsSource[];
-  /** Maximum Markdown characters retained per document. */
+  /** Maximum source characters accepted (oversized documents fail instead of truncating) per document. */
   readonly maxDocumentLength?: number;
 }
 

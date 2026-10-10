@@ -17,8 +17,8 @@ documentation, discover first-party package exports, and trigger allowlisted CLI
 newline-delimited JSON-RPC on stdio, with no npm MCP SDK on the dependency graph.
 
 Most consumers never import this package: `netscript agent init` installs it as an MCP server and
-`netscript agent mcp` runs it. See [Agent tooling](/ai/agent-tooling/) for the CLI ×
-skills × MCP combo, and the package README for the mental model and recipes.
+`netscript agent mcp` runs it. See [Agent tooling](/ai/agent-tooling/) for the CLI × skills × MCP
+combo, and the package README for the mental model and recipes.
 
 Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
 to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
@@ -73,18 +73,51 @@ input caps the result count server-side before truncation applies.
 | `doctor`                      | `endpoint`                                            | `status`, `endpoint`, `counts`, `checks`, `families`                                                                                                              |
 | `search_docs`                 | **`query`**, `limit`                                  | `count`, `matches`                                                                                                                                                |
 | `list_docs`                   | `limit`                                               | `count`, `docs`, and `corpus` (`kind`, resolved `root`, total `documentCount`)                                                                                    |
-| `get_doc`                     | **`slug`**, `section`                                 | `slug`, `title`, `section`, `content`, `redirectedFrom`                                                                                                           |
+| `get_doc`                     | **`slug`**, `section`, `full`, `cursor`               | `contractVersion`, `mode`, `slug`, `title`, `section`, `content`, `outline`, `omitted`, `nextCursor`, `redirectedFrom`                                            |
 | `find_guidance`               | **`intent`**, `limit`                                 | Bounded ordered section recommendations, cited code, related routes, confidence, fallback, and `truncated`                                                        |
-| `find_export`                 | **`symbol`**, `limit`                                 | Exact `package` / `subpath` / declaration-kind matches, total count, and `truncated`                                                                               |
-| `list_package_exports`        | **`package`**, `offset`, `limit`                      | A stable declaration page grouped by subpath, total/returned counts, `nextOffset`, and `truncated`                                                                 |
+| `find_export`                 | **`symbol`**, `limit`                                 | Exact `package` / `subpath` / declaration-kind matches, total count, and `truncated`                                                                              |
+| `list_package_exports`        | **`package`**, `offset`, `limit`                      | A stable declaration page grouped by subpath, total/returned counts, `nextOffset`, and `truncated`                                                                |
 | `get_export`                  | **`symbol`**, `package`, `subpath`                    | One exact declaration signature and JSDoc with explicit `truncated`; ambiguity is refused with bounded candidates                                                 |
-| `search_exports`              | **`query`**, `package`, `kind`, `limit`               | Ranked partial-name or declaration-shape matches with signatures, scores, totals, and `truncated`                                                                  |
+| `search_exports`              | **`query`**, `package`, `kind`, `limit`               | Ranked partial-name or declaration-shape matches with signatures, scores, totals, and `truncated`                                                                 |
 | `list_commands`               | `filter`, `limit`                                     | `count`, `commands`                                                                                                                                               |
 | `execute_command`             | **`command`**, `args`                                 | `exitCode`, `durationMs`, `outputTail`, `truncated`, `timedOut`                                                                                                   |
 | `record_drift`                | **`resource`**, **`summary`**, `details`              | `recorded`, `resource`, `receipt`                                                                                                                                 |
 | `list_api_services`           | —                                                     | Service status, URLs, optional operation count, conflicts, and verbatim discovery source outcomes                                                                 |
-| `list_service_operations`     | **`service`**, `filter`, `limit`                      | Bounded operation rows with optional `access`, plus `truncated` metadata                                                                                            |
-| `get_operation_schema`        | **`service`**, **`operation`**, `view`                | Projected schema view, operation identity, optional `access`, access-aware `curlExample`, and `authNote`                                                            |
+| `list_service_operations`     | **`service`**, `filter`, `limit`                      | Bounded operation rows with optional `access`, plus `truncated` metadata                                                                                          |
+| `get_operation_schema`        | **`service`**, **`operation`**, `view`                | Projected schema view, operation identity, optional `access`, access-aware `curlExample`, and `authNote`                                                          |
+
+### Faithful documentation retrieval
+
+`get_doc` reports `contractVersion: 2` and `mode` on every successful response. Documents and
+sections whose JSON-escaped UTF-8 content fits 12 KiB return `mode: "verbatim"` with exact text.
+Larger inputs return `mode: "extract"`: the title, description, complete section outline (heading,
+slug, character count), whole protected source blocks, and verbatim prose sentences. Fences,
+commands, inline code/config keys, and link-containing paragraphs are selected first in source
+order. A protected block that cannot fit is omitted whole; `omitted.blocks` and `omitted.characters`
+report the loss. The extract never paraphrases or cuts a snippet.
+
+For complete text, call `get_doc` with `full: true`. It returns `mode: "full"`, one exact source
+page, and `nextCursor` when more text remains. Pass that value as `cursor` with the same `slug`,
+`section` (if selected), and `full: true` until `nextCursor` is absent. Concatenating `content`
+reconstructs the original document body byte for byte, including line endings and whitespace. YAML
+front matter is metadata and is excluded; section retrieval keeps the existing trimmed section-body
+convention. Full pages may divide fences, but preserve every character and never split a Unicode
+surrogate pair. Read the assembled text before using a multi-page snippet.
+
+Cursors are versioned and bound to canonical slug, section, and SHA-256 source digest. Malformed,
+mismatched, or stale cursors return `invalid_doc_cursor`; restart without a cursor after a change.
+`cursor` requires `full: true`. Default results are cached per indexed document/section. The source
+admission ceiling is 4 Mi UTF-16 characters; oversized sources fail explicitly instead of silently
+discarding their tails. Outline/metadata exceeding the 64 KiB response ceiling produces an explicit
+transport error directing the caller to full mode.
+
+The offline benchmark runs with `deno task --cwd packages/mcp benchmark:docs` over public docs site
+sources, or append `--embedded` for the shipped release fallback. It compares lexical token proxies
+including response metadata, protected snippet/link retention, missing-material fallback proxies,
+and cold retrieval latency against the previous 2,000-character truncation. It also checks exact
+full reconstruction for every document. The fallback proxy measures missing source material;
+observed filesystem reads require a separate agent-run receipt. No inference model is used; model
+summarization is tracked in #2112.
 
 ### Operation access summary
 
@@ -104,25 +137,26 @@ This bounded `OperationAccessSummary` reports declared access facts only. `authe
 bounded to 2,000 characters. It never contains a principal, token, cookie, secret, or credential
 value.
 
-| Retained OpenAPI operation | Tool result |
-| --- | --- |
-| No own `security` property | `access` is absent, preserving the undeclared state |
-| `security: []` | `authentication: 'none'`; schemes and scopes are empty |
-| `security: [{}, { bearerAuth: [] }]` | `authentication: 'optional'`; `bearerAuth` is listed |
+| Retained OpenAPI operation                     | Tool result                                                |
+| ---------------------------------------------- | ---------------------------------------------------------- |
+| No own `security` property                     | `access` is absent, preserving the undeclared state        |
+| `security: []`                                 | `authentication: 'none'`; schemes and scopes are empty     |
+| `security: [{}, { bearerAuth: [] }]`           | `authentication: 'optional'`; `bearerAuth` is listed       |
 | `security: [{ bearerAuth: ['catalog:read'] }]` | `authentication: 'required'`; scheme and scopes are listed |
-| Required operation with `x-netscript-roles` | Roles are copied into the bounded `roles` list |
+| Required operation with `x-netscript-roles`    | Roles are copied into the bounded `roles` list             |
 
-`get_operation_schema` produces different credential-free guidance for undeclared, public,
-optional, and required operations. Only the required template includes the literal placeholder
+`get_operation_schema` produces different credential-free guidance for undeclared, public, optional,
+and required operations. Only the required template includes the literal placeholder
 `Authorization: Bearer <credential>`; no real credential is requested or echoed.
 
 **Truncation semantics.** After a flow succeeds, `truncateResult` recursively bounds the result
 using `DEFAULT_TRUNCATION_POLICY` — arrays are capped at 50 elements and strings at 2,000 UTF-16
-code units — before the runner serializes it. The analytics tools (`analyze_service_performance`,
-`analyze_db_bottlenecks`) additionally never return raw spans: their results are computed
-aggregates. `execute_command` returns only a bounded combined output tail (4,096 bytes by default)
-and flags `truncated` when output was cut. A failed flow returns a structured tool error (a stable
-`code` plus a message), not a truncated success.
+code units — before the runner serializes it. `get_doc` is exempt from these recursive cuts; it uses
+the faithful retrieval budget below and checks the complete MCP response against 64 KiB. The
+analytics tools (`analyze_service_performance`, `analyze_db_bottlenecks`) additionally never return
+raw spans: their results are computed aggregates. `execute_command` returns only a bounded combined
+output tail (4,096 bytes by default) and flags `truncated` when output was cut. A failed flow
+returns a structured tool error (a stable `code` plus a message), not a truncated success.
 
 Documentation resolves in this order: explicit `--docs-root`, `NETSCRIPT_DOCS_ROOT`, an indexable
 `<projectRoot>/.netscript/docs`, then a generated release-matched embedded fallback. An empty or
@@ -132,13 +166,22 @@ filesystem path or `null`, and `documentCount` is the total before the requested
 
 ## Record drift
 
-`record_drift` is an evidence-gated mutating tool that appends structured architecture or runtime drift entries to `.netscript/agent/drift.jsonl`.
+`record_drift` is an evidence-gated mutating tool that appends structured architecture or runtime
+drift entries to `.netscript/agent/drift.jsonl`.
 
-- **Required Evidence**: Must be authorized by a fresh successful diagnostic receipt (created within 15 minutes, `exitStatus: 0`) for the target resource. Diagnostic receipts are automatically produced by `doctor`, telemetry tools, API introspection tools, or `netscript plugin doctor --resource <resource>`.
-- **Target & Scope**: `resource` identifies the target component (e.g. plugin name, service name, or `'project'`). Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
-- **Mutation Behavior**: Appends one JSON line to `.netscript/agent/drift.jsonl` containing `timestamp`, `resource`, `summary`, optional `details`, and the attached evidence receipt.
-- **Failure Modes**: If no receipt is found, if the receipt is older than 15 minutes, or if the receipt recorded a non-zero exit status, the tool fails with structured error code `diagnostic_evidence_required`.
-- **Dry-run / Preview**: Inspecting receipt files or invoking `doctor` previews diagnostic state without appending to `drift.jsonl`.
+- **Required Evidence**: Must be authorized by a fresh successful diagnostic receipt (created within
+  15 minutes, `exitStatus: 0`) for the target resource. Diagnostic receipts are automatically
+  produced by `doctor`, telemetry tools, API introspection tools, or
+  `netscript plugin doctor --resource <resource>`.
+- **Target & Scope**: `resource` identifies the target component (e.g. plugin name, service name, or
+  `'project'`). Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
+- **Mutation Behavior**: Appends one JSON line to `.netscript/agent/drift.jsonl` containing
+  `timestamp`, `resource`, `summary`, optional `details`, and the attached evidence receipt.
+- **Failure Modes**: If no receipt is found, if the receipt is older than 15 minutes, or if the
+  receipt recorded a non-zero exit status, the tool fails with structured error code
+  `diagnostic_evidence_required`.
+- **Dry-run / Preview**: Inspecting receipt files or invoking `doctor` previews diagnostic state
+  without appending to `drift.jsonl`.
 
 ## Output bounds
 
@@ -174,15 +217,15 @@ Every tool flow depends on a port, never on a concrete client — which is why t
 on the CLI without depending on it. `@netscript/cli` implements the ports and injects them at its
 own composition root.
 
-| Symbol                | Kind      | Summary                                                     |
-| --------------------- | --------- | ----------------------------------------------------------- |
-| `TelemetryProbePort`  | interface | Telemetry endpoint reachability check.                      |
-| `DocsCorpusPort`      | interface | Public Markdown corpus: search, list, get.                  |
-| `ExportSurfaceCorpusPort` | interface | Version-pinned normalized `deno doc --json` export data. |
-| `CommandCatalogPort`  | interface | Supplies the live CLI command tree to `list_commands`.      |
-| `CommandExecutorPort` | interface | Runs an allowed command, returning structured process data. |
-| `ProjectDoctorPort`   | interface | Typed project and plugin diagnostics.                       |
-| `DoctorCheckFamily`   | interface | One group of doctor checks aggregated into the verdict.     |
+| Symbol                    | Kind      | Summary                                                     |
+| ------------------------- | --------- | ----------------------------------------------------------- |
+| `TelemetryProbePort`      | interface | Telemetry endpoint reachability check.                      |
+| `DocsCorpusPort`          | interface | Public Markdown corpus: search, list, get.                  |
+| `ExportSurfaceCorpusPort` | interface | Version-pinned normalized `deno doc --json` export data.    |
+| `CommandCatalogPort`      | interface | Supplies the live CLI command tree to `list_commands`.      |
+| `CommandExecutorPort`     | interface | Runs an allowed command, returning structured process data. |
+| `ProjectDoctorPort`       | interface | Typed project and plugin diagnostics.                       |
+| `DoctorCheckFamily`       | interface | One group of doctor checks aggregated into the verdict.     |
 
 ## Generated export corpus
 
@@ -196,22 +239,22 @@ model context.
 
 ## Default adapters
 
-| Symbol                 | Kind     | Summary                                                                              |
-| ---------------------- | -------- | ------------------------------------------------------------------------------------ |
-| `EmbeddedDocsCorpus`   | class    | In-memory `DocsCorpusPort` used for package and outer-CLI Markdown assets.          |
-| `EmbeddedExportSurfaceCorpus` | class | Lazy mirror-free `ExportSurfaceCorpusPort` with version, hash, size, and count verification. |
-| `FilesystemDocsCorpus` | class    | `DocsCorpusPort` over an explicit, environment, or project-probed Markdown root.     |
-| `SpawnCommandExecutor` | class    | `CommandExecutorPort` that spawns the `netscript` binary.                            |
-| `StaticCommandCatalog` | class    | `CommandCatalogPort` used when no live catalog is injected.                          |
-| `PluginDoctorFamily`   | class    | Plugin diagnostics as a doctor check family.                                         |
-| `slugifyDocsHeading`   | function | Normalize a Markdown heading into a `get_doc` section slug.                          |
+| Symbol                        | Kind     | Summary                                                                                      |
+| ----------------------------- | -------- | -------------------------------------------------------------------------------------------- |
+| `EmbeddedDocsCorpus`          | class    | In-memory `DocsCorpusPort` used for package and outer-CLI Markdown assets.                   |
+| `EmbeddedExportSurfaceCorpus` | class    | Lazy mirror-free `ExportSurfaceCorpusPort` with version, hash, size, and count verification. |
+| `FilesystemDocsCorpus`        | class    | `DocsCorpusPort` over an explicit, environment, or project-probed Markdown root.             |
+| `SpawnCommandExecutor`        | class    | `CommandExecutorPort` that spawns the `netscript` binary.                                    |
+| `StaticCommandCatalog`        | class    | `CommandCatalogPort` used when no live catalog is injected.                                  |
+| `PluginDoctorFamily`          | class    | Plugin diagnostics as a doctor check family.                                                 |
+| `slugifyDocsHeading`          | function | Normalize a Markdown heading into a `get_doc` section slug.                                  |
 
 ## Sub-path exports
 
-| Export | Path |
-| --- | --- |
-| `@netscript/mcp` | `./mod.ts` |
-| `@netscript/mcp/cli` | `./cli.ts` |
+| Export                              | Path                      |
+| ----------------------------------- | ------------------------- |
+| `@netscript/mcp`                    | `./mod.ts`                |
+| `@netscript/mcp/cli`                | `./cli.ts`                |
 | `@netscript/mcp/openapi-projection` | `./openapi-projection.ts` |
 
 ### `@netscript/mcp/cli`
@@ -219,12 +262,12 @@ model context.
 The executable composition. It binds the real telemetry query, filesystem docs corpus, Aspire /
 project-wiring / plugin doctor families, and the process executor, and runs them over stdio.
 
-| Symbol               | Kind      | Summary                                                                                                       |
-| -------------------- | --------- | ------------------------------------------------------------------------------------------------------------- |
-| `runMcpStdioServer`  | function  | Run the server on Deno standard input and output.                                                             |
-| `createMcpCliServer` | function  | Compose the server with optional outer CLI adapters.                                                          |
-| `resolveDocsRoot`    | function  | Resolve docs by flag, environment, then an indexable `.netscript/docs` project probe.                        |
-| `McpCliOptions`      | interface | Composition seams including `exportSurfaceCorpus`, docs, telemetry, doctor, commands, and project root.      |
+| Symbol               | Kind      | Summary                                                                                                 |
+| -------------------- | --------- | ------------------------------------------------------------------------------------------------------- |
+| `runMcpStdioServer`  | function  | Run the server on Deno standard input and output.                                                       |
+| `createMcpCliServer` | function  | Compose the server with optional outer CLI adapters.                                                    |
+| `resolveDocsRoot`    | function  | Resolve docs by flag, environment, then an indexable `.netscript/docs` project probe.                   |
+| `McpCliOptions`      | interface | Composition seams including `exportSurfaceCorpus`, docs, telemetry, doctor, commands, and project root. |
 
 Telemetry endpoint discovery is ordered: an explicit `endpoint` option, then
 `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then `http://localhost:18888`. Only
@@ -234,9 +277,9 @@ rather than a crash.
 ## Data boundary
 
 The server reads telemetry, project metadata, generated registries, public documentation, and its
-package-embedded public export corpus. It
-never returns project source, environment-variable values, credentials, or secrets. Stdio is
-process-local; the only outbound traffic is the telemetry probe to the resolved endpoint.
+package-embedded public export corpus. It never returns project source, environment-variable values,
+credentials, or secrets. Stdio is process-local; the only outbound traffic is the telemetry probe to
+the resolved endpoint.
 
 ---
 

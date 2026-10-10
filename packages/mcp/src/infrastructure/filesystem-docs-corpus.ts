@@ -10,6 +10,7 @@ import {
   normalizeDocsSlug,
   slugifyDocsHeading,
 } from '../domain/docs/docs-corpus-port.ts';
+import { docSourceBlocks } from '../domain/docs/faithful-extraction.ts';
 import { GuidanceIndex } from '../domain/docs/guidance-index.ts';
 import type { GuidanceResult } from '../domain/docs/guidance-contract.ts';
 
@@ -24,7 +25,7 @@ interface CachedSource {
 export interface FilesystemDocsCorpusOptions {
   /** Absolute or working-directory-relative root containing public Markdown. */
   readonly root: string;
-  /** Maximum Markdown characters retained per document. */
+  /** Maximum source characters accepted (oversized documents fail instead of truncating) per document. */
   readonly maxDocumentLength?: number;
 }
 
@@ -62,6 +63,12 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
     return [...this.#documents.values()].map(toSummary).sort((a, b) =>
       a.slug.localeCompare(b.slug)
     );
+  }
+
+  /** Capture complete indexed documents after one refresh for offline batch consumers. */
+  async snapshot(): Promise<readonly DocsDocument[]> {
+    await this.#refresh();
+    return [...this.#documents.values()];
   }
 
   /** Rank current public documents using weighted lexical matches. */
@@ -113,6 +120,9 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
       if (!isWithinRoot(rootReal, realPath)) continue;
       seen.add(realPath);
       const stat = await Deno.stat(realPath);
+      if (stat.size > this.#maxDocumentLength * 4) {
+        throw new Error('Documentation source exceeds the configured size limit.');
+      }
       const mtime = stat.mtime?.getTime() ?? 0;
       let cached = this.#cache.get(realPath);
       if (!cached || cached.mtime !== mtime) {
@@ -214,6 +224,9 @@ export function processDocsSources(
   const rawAliases = new Map<string, string>();
 
   for (const entry of sources) {
+    if (entry.source.length > maxDocumentLength) {
+      throw new Error('Documentation source exceeds the configured size limit.');
+    }
     const rawSlug = normalizeDocsSlug(entry.slug);
     const fm = parseFrontMatter(entry.source);
 
@@ -280,7 +293,10 @@ export function parseMarkdownDocument(
   maxLength: number,
 ): DocsDocument {
   const { attributes, body } = parseFrontMatter(source);
-  const content = body.slice(0, maxLength);
+  if (source.length > maxLength) {
+    throw new Error('Documentation source exceeds the configured size limit.');
+  }
+  const content = body;
   const sections = parseSections(content);
   const firstHeading = sections.find((section) => section.level === 1)?.heading;
   const title = attributes.title || firstHeading || titleFromSlug(slug);
@@ -313,17 +329,17 @@ export function parseFrontMatter(source: string): ParsedFrontMatter {
   if (!source.startsWith('---\n') && !source.startsWith('---\r\n')) {
     return { attributes: {}, body: source };
   }
-  const lines = source.split(/\r?\n/);
-  const end = lines.indexOf('---', 1);
-  if (end < 0) return { attributes: {}, body: source };
+  const match = /^---\r?\n([\s\S]*?)^---(?:\r?\n|$)/m.exec(source);
+  if (!match) return { attributes: {}, body: source };
+  const lines = match[1]!.split(/\r?\n/);
   const attributes: Record<string, string> = {};
-  for (const line of lines.slice(1, end)) {
+  for (const line of lines) {
     const match = /^([a-zA-Z0-9_-]+):\s*(.*)$/.exec(line);
     if (match?.[1] && match[2] !== undefined) attributes[match[1]] = unquote(match[2].trim());
   }
   return {
     attributes,
-    body: lines.slice(end + 1).join('\n').trimStart(),
+    body: source.slice(match[0].length),
     layout: attributes['layout'],
     redirectTo: attributes['redirectTo'],
     oldUrl: attributes['oldUrl'],
@@ -331,21 +347,37 @@ export function parseFrontMatter(source: string): ParsedFrontMatter {
 }
 
 function parseSections(content: string): DocsSection[] {
-  const matches = [...content.matchAll(/^(#{1,6})\s+(.+?)\s*#*\s*$/gm)];
-  return matches.map((match, index) => {
+  const headings: Array<
+    { heading: string; slug: string; level: number; start: number; end: number }
+  > = [];
+  const stack: number[] = [];
+  let offset = 0;
+  for (const block of docSourceBlocks(content)) {
+    const start = content.indexOf(block.text, offset);
+    offset = start + block.text.length;
+    if (block.fenced) continue;
+    const match = /^(#{1,6})\s+(.+?)\s*#*\s*$/.exec(block.text.trimEnd());
+    if (!match) continue;
+    const level = match[1]!.length;
+    while (stack.length && headings[stack.at(-1)!]!.level >= level) {
+      headings[stack.pop()!]!.end = start;
+    }
     const heading = match[2]!.trim();
-    const start = (match.index ?? 0) + match[0].length;
-    const next = matches.slice(index + 1).find((candidate) =>
-      candidate[1]!.length <= match[1]!.length
-    );
-    const end = next?.index ?? content.length;
-    return {
+    headings.push({
       heading,
       slug: slugifyDocsHeading(heading),
-      level: match[1]!.length,
-      content: content.slice(start, end).trim(),
-    };
-  });
+      level,
+      start: offset,
+      end: content.length,
+    });
+    stack.push(headings.length - 1);
+  }
+  return headings.map(({ heading, slug, level, start, end }) => ({
+    heading,
+    slug,
+    level,
+    content: content.slice(start, end).trim(),
+  }));
 }
 
 /** Rank one parsed document against normalized lexical search terms. */
