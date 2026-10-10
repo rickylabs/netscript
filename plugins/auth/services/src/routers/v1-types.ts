@@ -27,6 +27,8 @@ export type AuthServiceInitialContext = AuthServiceContext;
 export type AuthServiceContext = Readonly<{
   registry: ResolvedAuthBackendRegistry;
   telemetry?: AuthTelemetry;
+  /** Session cookie name from the same environment used to compose the backend. */
+  cookieName?: string;
   request?: AuthServiceRequest;
   traceHeaders?: Readonly<{
     traceparent?: string;
