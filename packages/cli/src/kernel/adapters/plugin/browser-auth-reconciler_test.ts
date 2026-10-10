@@ -7,6 +7,7 @@ import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { regenerateAspireHelpers } from '../service/workspace-mutator.ts';
 import { reconcileBrowserAuth } from './browser-auth-reconciler.ts';
+import { SERVICE_PUBLIC_REASON, serviceAuthTemplate } from '../service/auth-policy.ts';
 
 const settings = {
   NetScript: {
@@ -143,3 +144,36 @@ Deno.test('browser auth rewrites a custom entrypoint and rejects drift in the sc
     'exact #1382 scaffold public policy',
   );
 });
+
+for (
+  const policy of [
+    serviceAuthTemplate('users').authPolicy,
+    `auth: {
+    public: true,
+    reason: '${SERVICE_PUBLIC_REASON}',
+  },`,
+    `auth: {
+    public: true,
+    reason:
+      '${SERVICE_PUBLIC_REASON}',
+  },`,
+  ]
+) {
+  Deno.test(`browser auth reconciles the current scaffold policy: ${policy.split('\n').length} lines`, async () => {
+    const fs = new MemoryFileSystemAdapter();
+    const root = '/workspace';
+    const path = join(root, 'services/users/src/main.ts');
+    await fs.writeFile(join(root, 'appsettings.json'), JSON.stringify(settings));
+    await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
+    await fs.writeFile(path, `await defineService(router, {\n  ${policy}\n  name: 'users' });\n`);
+    assert((await reconcileBrowserAuth(root, fs)).includes(path));
+    assertStringIncludes(await fs.readFile(path), 'authenticator: browserAuthenticator');
+    assertStringIncludes(await fs.readFile(path), 'createContractAuthorizer(router)');
+    assertEquals(await reconcileBrowserAuth(root, fs), []);
+    const custom =
+      `await defineService(router, { auth: { public: true, reason: 'Owner-authored policy' } });`;
+    await fs.writeFile(path, custom);
+    await reconcileBrowserAuth(root, fs);
+    assertEquals(await fs.readFile(path), custom);
+  });
+}

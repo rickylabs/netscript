@@ -51,10 +51,7 @@ Deno.test('generated guarded service: native sessions enforce REST/RPC/discovery
         'contracts/mod.ts',
         'contracts/versions/v1/mod.ts',
         'contracts/versions/v1/guarded.contract.ts',
-        'services/guarded/src/main.ts',
-        'services/guarded/src/router.ts',
-        'services/guarded/src/routers/v1.ts',
-        'services/guarded/src/routers/health.ts',
+        ...result.scaffoldResult.filesCreated.map((path) => path.slice('/project/'.length)),
       ]
     ) {
       const target = join(root, path);

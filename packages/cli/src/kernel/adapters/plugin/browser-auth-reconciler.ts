@@ -3,6 +3,7 @@ import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../templates/template-asset.ts';
+import { SERVICE_PUBLIC_REASON } from '../service/auth-policy.ts';
 
 interface BrowserAuthEntry {
   readonly Type?: string;
@@ -31,6 +32,22 @@ const FORMATTED_PUBLIC_POLICY = `  auth: {
     public: true,
     reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy',
   },`;
+
+// Retain the legacy opt-out and recognize the current scaffold's exact public reason.
+const PUBLIC_POLICIES = [
+  PUBLIC_POLICY,
+  FORMATTED_PUBLIC_POLICY,
+  `  auth: { public: true, reason: '${SERVICE_PUBLIC_REASON}' },`,
+  `  auth: {
+    public: true,
+    reason: '${SERVICE_PUBLIC_REASON}',
+  },`,
+  `  auth: {
+    public: true,
+    reason:
+      '${SERVICE_PUBLIC_REASON}',
+  },`,
+];
 
 /** Reconcile install-time browser auth using the CLI's injected filesystem boundary. */
 export async function reconcileBrowserAuth(
@@ -89,11 +106,12 @@ export async function reconcileBrowserAuth(
     if (!current.includes('await defineService(router, {')) continue;
     if (current.includes('authenticator: browserAuthenticator')) continue;
     // An authored guarded policy is authoritative; a scaffold opt-out must compose exactly.
-    const publicPolicy = [PUBLIC_POLICY, FORMATTED_PUBLIC_POLICY].find((policy) =>
-      current.includes(policy)
-    );
+    const publicPolicy = PUBLIC_POLICIES.find((policy) => current.includes(policy));
     if (!publicPolicy) {
-      if (/\bauth\s*:/.test(current) && !current.includes('Scaffold demo is public')) continue;
+      if (
+        /\bauth\s*:/.test(current) && !current.includes('Scaffold demo is public') &&
+        !current.includes(SERVICE_PUBLIC_REASON)
+      ) continue;
       throw new TypeError(
         `Cannot wire browser auth for ${name}: expected the exact #1382 scaffold public policy line`,
       );
