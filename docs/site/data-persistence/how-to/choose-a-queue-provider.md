@@ -106,6 +106,14 @@ to Aspire service discovery when omitted.
   }
 ] }) }}
 
+### RabbitMQ heartbeat migration in 0.0.8
+
+The RabbitMQ adapter now uses amqplib 2. An explicit `heartbeat=0` in a connection URL disables
+heartbeats. To preserve broker-negotiated heartbeats when upgrading from 0.0.7, remove that query
+parameter from `AMQP_URL` or `connection.rabbitmq.url`. URLs generated through Aspire omit it and
+continue to negotiate with the broker. Keep `heartbeat=0` only when you intend to disable
+heartbeats; a positive value still requests an interval in seconds.
+
 ## Step 3 — Select the PostgreSQL backend
 
 The PostgreSQL provider gives you a SQL-durable queue with row-claim semantics
