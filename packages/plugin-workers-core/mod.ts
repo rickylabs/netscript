@@ -52,4 +52,4 @@ export type {
   WorkflowDefinition,
 } from './src/public/root.ts';
 
-export type { TaskStdin, TaskStdinJson } from './src/domain/task-stdin.ts';
+export type { TaskStdin, TaskStdinJson } from './src/domain/task.ts';

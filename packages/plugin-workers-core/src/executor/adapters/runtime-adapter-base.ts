@@ -1,4 +1,4 @@
-import { encodeTaskStdin } from '../../internal/task-stdin.ts';
+import { encodeTaskStdin } from '../task-stdin.ts';
 import { TaskRuntimeAdapter } from '../../abstracts/mod.ts';
 import type {
   ResolvedTaskExecutionOptions,

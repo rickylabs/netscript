@@ -34,4 +34,4 @@ export type {
 } from './builder-types.ts';
 export type { CronExpression } from '../domain/mod.ts';
 
-export type { TaskStdin, TaskStdinJson } from '../domain/task-stdin.ts';
+export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';

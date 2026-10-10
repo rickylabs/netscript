@@ -1,9 +1,20 @@
-import type { TaskStdin } from './task-stdin.ts';
 import { z } from 'zod';
 import { DEFAULT_TOPIC, TaskSourceSchema, TaskStatusSchema, TaskTypeSchema } from './constants.ts';
 import type { TaskType } from './constants.ts';
 import type { JobPayloadSchema } from './public-schema.ts';
 import { TaskDefinitionPublicBaseSchema } from './public-schema.ts';
+
+/** JSON data accepted by a task's stdin channel (finite numbers and plain objects only). */
+export type TaskStdinJson =
+  | null
+  | boolean
+  | number
+  | string
+  | readonly TaskStdinJson[]
+  | { readonly [key: string]: TaskStdinJson };
+
+/** Bytes or JSON written once to subprocess stdin, then closed; maximum 1 MiB. */
+export type TaskStdin = Uint8Array | TaskStdinJson;
 
 /** Branded worker task identifier. */
 export type TaskId<TId extends string = string> = TId & { readonly __brand: 'TaskId' };

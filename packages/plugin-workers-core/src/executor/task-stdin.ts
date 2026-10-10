@@ -1,4 +1,4 @@
-import type { TaskStdin } from '../domain/task-stdin.ts';
+import type { TaskStdin } from '../domain/task.ts';
 
 const MAX_STDIN_BYTES = 1024 * 1024;
 const encoder = new TextEncoder();
@@ -10,12 +10,21 @@ export function encodeTaskStdin(payload: TaskStdin): Uint8Array {
     if (payload.byteLength > MAX_STDIN_BYTES) throw oversized();
     return payload.slice();
   }
-  const buffer = new Uint8Array(MAX_STDIN_BYTES);
+  let buffer = new Uint8Array(1024);
   let size = 0;
   for (const token of jsonTokens(payload, new Set(), 0)) {
-    const { read, written } = encoder.encodeInto(token, buffer.subarray(size));
-    if (read !== token.length) throw oversized();
-    size += written;
+    const bytes = encoder.encode(token);
+    const nextSize = size + bytes.byteLength;
+    if (nextSize > MAX_STDIN_BYTES) throw oversized();
+    if (nextSize > buffer.byteLength) {
+      const grown = new Uint8Array(
+        Math.min(MAX_STDIN_BYTES, Math.max(nextSize, buffer.length * 2)),
+      );
+      grown.set(buffer.subarray(0, size));
+      buffer = grown;
+    }
+    buffer.set(bytes, size);
+    size = nextSize;
   }
   return buffer.slice(0, size);
 }

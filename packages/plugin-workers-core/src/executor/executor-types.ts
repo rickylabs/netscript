@@ -1,4 +1,4 @@
-import type { TaskStdin } from '../domain/task-stdin.ts';
+import type { TaskStdin } from '../domain/task.ts';
 import type { WorkerTelemetryStatus } from '../telemetry/mod.ts';
 
 /** Worker task runtime identifier supported by built-in adapters. */

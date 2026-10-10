@@ -133,7 +133,8 @@ for (const source of ['stdout', 'stderr'] as const) {
 
 Deno.test('process lifecycle: running abort cancels blocked stdin and drains streams', async () => {
   const task = defineTask('cancel-stdin').runtime('executable').entrypoint(Deno.execPath())
-    .args('eval', 'console.log("ready"); await new Promise(()=>{})').build();
+    .args('eval', 'console.log("ready"); await new Promise(resolve=>setTimeout(resolve,60000))')
+    .build();
   const controller = new AbortController();
   const result = await executor.execute(task, {
     stdin: new Uint8Array(1048576),
@@ -147,8 +148,18 @@ Deno.test('process lifecycle: running abort cancels blocked stdin and drains str
 
 Deno.test('process lifecycle: running timeout has explicit timeout status', async () => {
   const task = defineTask('timeout-stdin').runtime('executable').entrypoint(Deno.execPath())
-    .args('eval', 'await new Promise(()=>{})').build();
+    .args('eval', 'await new Promise(resolve=>setTimeout(resolve,60000))').build();
   const result = await executor.execute(task, { stdin: new Uint8Array(1048576), timeout: 100 });
   assertEquals(result.status, 'timeout');
   assertEquals(result.exitCode, -1);
+});
+
+Deno.test('stdin payload: early pipe closure gives StdinWriteFailed and terminates child', async () => {
+  const task = defineTask('closed-stdin').runtime('executable').entrypoint('python3')
+    .args('-c', 'import os,time; os.close(0); time.sleep(60)')
+    .build();
+  const result = await executor.execute(task, { stdin: new Uint8Array(1048576), timeout: 5000 });
+  assertEquals(result.status, 'failed');
+  assertEquals(result.success, false);
+  assertMatch(result.error!, /^StdinWriteFailed:/);
 });

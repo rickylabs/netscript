@@ -1,5 +1,5 @@
-import type { TaskStdin } from '../domain/task-stdin.ts';
-import { encodeTaskStdin } from '../internal/task-stdin.ts';
+import type { TaskStdin } from '../domain/task.ts';
+import { encodeTaskStdin } from '../executor/task-stdin.ts';
 import { validateJobPayload } from '../domain/job-handler.ts';
 import type {
   JobPayloadSchema,

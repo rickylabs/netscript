@@ -46,4 +46,4 @@ export type {
 } from './executor-types.ts';
 export type { MultiRuntimeTaskExecutorOptions } from './multi-runtime-task-executor.ts';
 
-export type { TaskStdin, TaskStdinJson } from '../domain/task-stdin.ts';
+export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';
