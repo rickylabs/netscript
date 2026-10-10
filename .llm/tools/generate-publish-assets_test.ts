@@ -115,7 +115,7 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
       await Deno.readTextFile(new URL('../assets/agent-docs/provenance.json', import.meta.url)),
     );
     await Promise.all([
-      Deno.mkdir(`${root}/packages/cli`, { recursive: true }),
+      Deno.mkdir(`${root}/packages/cli/src/kernel/assets`, { recursive: true }),
       Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true }),
       Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true }),
     ]);
@@ -133,8 +133,11 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
         `${root}/packages/mcp/README.md`,
       ),
       Deno.copyFile(
-        new URL('../assets/agent-docs/prose.json.gz', import.meta.url),
-        `${root}/.llm/assets/agent-docs/prose.json.gz`,
+        new URL(
+          '../../packages/cli/src/kernel/assets/agent-docs-prose.generated.ts',
+          import.meta.url,
+        ),
+        `${root}/packages/cli/src/kernel/assets/agent-docs-prose.generated.ts`,
       ),
       Deno.writeTextFile(
         `${root}/.llm/assets/agent-docs/provenance.json`,
@@ -174,8 +177,8 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
     );
     assert(generated.includes("MCP_PACKAGE_VERSION: string = '0.0.5-canary.18'"));
     assert(!generated.includes("MCP_PACKAGE_VERSION: string = '0.0.4'"));
-    assert(generated.includes("'frameworkVersion': '0.0.5-canary.18'"));
-    assert(generated.includes("'sourceCommit': 'stale-fixture'"));
+    assert(generated.includes('frameworkVersion: MCP_PACKAGE_VERSION'));
+    assert(generated.includes("sourceCommit: 'content-addressed'"));
   } finally {
     await Deno.remove(root, { recursive: true });
   }
@@ -188,7 +191,7 @@ Deno.test('publish assets consume the genuinely rendered shared corpus without r
   const nextVersion = '0.0.5-canary.99';
   try {
     await Promise.all([
-      Deno.mkdir(`${root}/packages/cli`, { recursive: true }),
+      Deno.mkdir(`${root}/packages/cli/src/kernel/assets`, { recursive: true }),
       Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true }),
       Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true }),
     ]);

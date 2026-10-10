@@ -1,0 +1,75 @@
+name: Generated carrier safety net
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: generated-carriers-main
+  cancel-in-progress: false
+
+jobs:
+  carriers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.0
+      - name: Check every committed carrier
+        id: check
+        continue-on-error: true
+        shell: bash
+        run: |
+          result=0
+          for gate in check:agent-docs-prose check:mcp-export-corpus check:assets-barrel check:publish-assets check:aspire-version-parity; do
+            deno task "$gate" || result=1
+          done
+          exit "$result"
+      - name: Regenerate from the pushed source tree
+        if: steps.check.outcome == 'failure'
+        id: regenerate
+        continue-on-error: true
+        run: |
+          deno task gen:agent-docs-prose
+          deno task gen:mcp-export-corpus --allow-dirty
+          deno task gen:assets-barrel
+          deno task gen:publish-assets
+          deno run --allow-read --allow-write --allow-run=git .llm/tools/validation/aspire-surface-manifest.ts
+      - name: Open or update one regeneration PR
+        if: steps.check.outcome == 'failure' && steps.regenerate.outcome == 'success'
+        id: repair
+        continue-on-error: true
+        uses: actions/github-script@v7
+        env:
+          CHAIN_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          github-token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            if (!process.env.CHAIN_TOKEN) throw new Error('PAT_TOKEN is absent; a GITHUB_TOKEN PR cannot trigger required CI.');
+            const { publishCarrierRepair } = await import(`${process.env.GITHUB_WORKSPACE}/.llm/tools/docs/publish-carrier-repair.mjs`);
+            await publishCarrierRepair({ github, context, exec });
+      - name: Track unrepaired drift and fail visibly
+        if: steps.check.outcome == 'failure' && steps.repair.outcome != 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Generated carrier drift on main requires regeneration';
+            const { owner, repo } = context.repo;
+            const run = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const body = `Carrier checks failed on main. Automatic regeneration could not open a CI-triggering PR. Inspect ${run}; configure PAT_TOKEN or repair regeneration before rerunning.\n\nRefs #2233`;
+            const issues = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: 'open', labels: 'area:tooling', per_page: 100 });
+            const current = issues.find((issue) => !issue.pull_request && issue.title === title);
+            if (current) await github.rest.issues.update({ owner, repo, issue_number: current.number, body });
+            else {
+              const milestones = await github.paginate(github.rest.issues.listMilestones, { owner, repo, state: 'open', per_page: 100 });
+              const milestone = milestones.find((item) => item.title === '0.0.8')?.number;
+              if (!milestone) throw new Error('Required milestone 0.0.8 is missing.');
+              await github.rest.issues.create({ owner, repo, title, body, milestone, labels: ['type:fix', 'area:tooling', 'priority:p1', 'status:triage'] });
+            }
+            core.setFailed('Carrier drift remains unrepaired. See the tracking issue and this run.');

@@ -220,29 +220,23 @@ async function runGenerator(
   );
 }
 
-async function withCommittedWorktree(
+async function withCommittedRepository(
   run: (worktree: string) => Promise<void>,
 ): Promise<void> {
   const source = await runCommand('git', ['rev-parse', '--show-toplevel'], Deno.cwd());
   assertEquals(source.code, 0, source.stderr);
   const sourceRoot = source.stdout.trim();
   const worktree = await Deno.makeTempDir({ prefix: 'netscript-mcp-corpus-test-' });
-  await Deno.remove(worktree);
   const added = await runCommand(
     'git',
-    ['worktree', 'add', '--detach', worktree, 'HEAD'],
+    ['clone', '--shared', '--no-hardlinks', '--quiet', sourceRoot, worktree],
     sourceRoot,
   );
   assertEquals(added.code, 0, added.stderr);
   try {
     await run(worktree);
   } finally {
-    const removed = await runCommand(
-      'git',
-      ['worktree', 'remove', '--force', worktree],
-      sourceRoot,
-    );
-    assertEquals(removed.code, 0, removed.stderr);
+    await Deno.remove(worktree, { recursive: true });
   }
 }
 
@@ -262,7 +256,7 @@ async function assertArtifactWasWritten(worktree: string, oldTime: number): Prom
 }
 
 Deno.test('write mode generates the artifact from a clean committed tree', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     const before = await Deno.readFile(corpusPath(worktree));
     const oldTime = await markArtifactOld(worktree);
     const status = await runCommand(
@@ -287,7 +281,7 @@ for (
   ] as const
 ) {
   Deno.test(`write mode refuses a dirty ${label} before modifying the artifact`, async () => {
-    await withCommittedWorktree(async (worktree) => {
+    await withCommittedRepository(async (worktree) => {
       await Deno.writeTextFile(
         `${worktree}/${dirtyPath}`,
         '\n/** Dirty-tree integration probe. */\nexport const mcpCorpusDirtyProbe: boolean = true;\n',
@@ -305,7 +299,7 @@ for (
 }
 
 Deno.test('write mode ignores a dirty path outside the generator read set', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     await Deno.writeTextFile(`${worktree}/AGENTS.md`, '\n<!-- outside-read-set probe -->\n', {
       append: true,
     });
@@ -318,7 +312,7 @@ Deno.test('write mode ignores a dirty path outside the generator read set', asyn
 });
 
 Deno.test('--check remains freshness-only when the generator read set is dirty', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     const dirtyPath = 'packages/sdk/README.md';
     await Deno.writeTextFile(`${worktree}/${dirtyPath}`, '\n<!-- check-mode probe -->\n', {
       append: true,
@@ -331,7 +325,7 @@ Deno.test('--check remains freshness-only when the generator read set is dirty',
 });
 
 Deno.test('--allow-dirty writes and records the offending path on stderr', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     const dirtyPath = 'packages/sdk/README.md';
     await Deno.writeTextFile(`${worktree}/${dirtyPath}`, '\n<!-- allow-dirty probe -->\n', {
       append: true,
@@ -347,7 +341,7 @@ Deno.test('--allow-dirty writes and records the offending path on stderr', async
 });
 
 Deno.test('write mode warns and continues when git is unavailable', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     const oldTime = await markArtifactOld(worktree);
     const denoBin = Deno.execPath().slice(0, Deno.execPath().lastIndexOf('/'));
     const env = { ...Deno.env.toObject(), PATH: denoBin };
