@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "8845ac462",
-  "extractionTimestamp": "2026-10-10T12:17:53.430Z",
+  "sourceCommit": "aba7c6abd",
+  "extractionTimestamp": "2026-10-10T12:12:51.726Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -124,7 +124,6 @@
     "pages/services-sdk/how-to/discover-services/index.md",
     "pages/services-sdk/how-to/expose-openapi-scalar/index.md",
     "pages/services-sdk/how-to/index.md",
-    "pages/services-sdk/how-to/protect-an-anonymous-route/index.md",
     "pages/services-sdk/index.md",
     "pages/services-sdk/sdk/index.md",
     "pages/services-sdk/services/index.md",
@@ -188,7 +187,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5103824,
-  "compressedBytes": 1475576,
-  "sha256": "e351ce2d28641c76e417b136ff3345dbe3475fb426d0e797846ca69e71caad65"
+  "uncompressedBytes": 5088829,
+  "compressedBytes": 1469784,
+  "sha256": "1c425bb9d7011119fe72d016b8a3599282d63a72df3466626724b7ce92730e6f"
 }
