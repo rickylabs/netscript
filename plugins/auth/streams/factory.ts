@@ -7,7 +7,7 @@
  * @module
  */
 
-import { createStreamDB } from '@durable-streams/state/db';
+import { type Collection, createStreamDB } from '@durable-streams/state/db';
 import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
 import { type AuthSession, authStreamSchema } from './schema.ts';
 
@@ -18,7 +18,7 @@ export interface AuthStreamDB {
   /** TanStack DB collections keyed by auth stream entity name. */
   readonly collections: {
     /** Auth session collection created by the durable streams client. */
-    readonly authSession: unknown;
+    readonly authSession: Collection<AuthSession, string>;
   };
   /** Connect and preload stream state into the collections. */
   preload(): Promise<void>;
@@ -32,12 +32,19 @@ export interface AuthStreamDB {
  * @example
  * ```ts
  * import { createAuthStreamDB } from '@netscript/plugin-auth/streams';
+ * import { useLiveQuery } from '@tanstack/react-db';
  *
  * declare const streamsServiceUrl: string;
  *
  * const authDb = createAuthStreamDB({ baseUrl: streamsServiceUrl });
- * const sessions = authDb.collections.authSession;
- * void sessions;
+ *
+ * // Call inside a React component or custom hook.
+ * function useAuthRows() {
+ *   const result = useLiveQuery((q) => q.from({ item: authDb.collections.authSession }));
+ *   const entityStates = result.data.map((item) => item.state);
+ *   return { rows: result.data, state: result.state, status: result.status, entityStates };
+ * }
+ * void useAuthRows;
  * ```
  */
 export function createAuthStreamDB(options: { baseUrl?: string } = {}): AuthStreamDB {

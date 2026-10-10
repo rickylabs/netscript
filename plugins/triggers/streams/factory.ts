@@ -8,11 +8,12 @@
  */
 
 import { createStateSchema } from '@durable-streams/state';
-import { createStreamDB } from '@durable-streams/state/db';
+import { type Collection, createStreamDB } from '@durable-streams/state/db';
 import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
 import {
   type TriggerEvent,
   type TriggersStreamDefinition,
+  type TriggerStreamEntity,
   TriggerStreamEntitySchema,
 } from './schema.ts';
 
@@ -20,7 +21,7 @@ export type { TriggerEvent };
 
 /** Browser StreamDB collections exposed by the triggers stream client. */
 export type TriggersStreamCollections = Readonly<{
-  triggerEvent: unknown;
+  triggerEvent: Collection<TriggerStreamEntity, string>;
 }>;
 
 /** Browser StreamDB handle for trigger event entities. */
@@ -39,12 +40,19 @@ export type TriggersStreamDBOptions = Readonly<{
  * @example
  * ```ts
  * import { createTriggersStreamDB } from '@netscript/plugin-triggers/streams';
+ * import { useLiveQuery } from '@tanstack/react-db';
  *
  * declare const streamsServiceUrl: string;
  *
  * const triggersDb = createTriggersStreamDB({ baseUrl: streamsServiceUrl });
- * const events = triggersDb.collections.triggerEvent;
- * void events;
+ *
+ * // Call inside a React component or custom hook.
+ * function useTriggersRows() {
+ *   const result = useLiveQuery((q) => q.from({ item: triggersDb.collections.triggerEvent }));
+ *   const entityStates = result.data.map((item) => item.status);
+ *   return { rows: result.data, state: result.state, status: result.status, entityStates };
+ * }
+ * void useTriggersRows;
  * ```
  */
 export function createTriggersStreamDB(
