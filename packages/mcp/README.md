@@ -98,10 +98,10 @@ shipped with your CLI release. The command prints which source decided the host.
 `--host claude|vscode|opencode|all` to choose explicitly.
 
 Skills have one authoritative home in `.agents/skills/`. Claude Code receives only the discovery
-bridge `.claude/skills/repo-skills/SKILL.md` and a root `CLAUDE.md` import of `@AGENTS.md`; existing
-Claude instructions are preserved and the import is added once. Aspire workflow skills use the
-standard `.agents/skills/` location too. Existing legacy mirrors and custom Claude skills are
-preserved; legacy mirror cleanup and divergent-file reporting remain follow-up work.
+bridge `.claude/skills/repo-skills/SKILL.md` and a root `CLAUDE.md` import of `@AGENTS.md`;
+existing Claude instructions are preserved and the import is added once. Aspire workflow skills
+use the standard `.agents/skills/` location too. Existing legacy mirrors and custom Claude skills
+are preserved; legacy mirror cleanup and divergent-file reporting remain follow-up work.
 
 To embed the server in your own host process, add it as a library:
 
@@ -259,12 +259,12 @@ drift into `.netscript/agent/drift.jsonl`.
 To run the public stdio composition from your own Deno entrypoint:
 
 ```ts
-import { runMcpStdioServer } from "@netscript/mcp/cli";
+import { runMcpStdioServer } from '@netscript/mcp/cli';
 
 await runMcpStdioServer({
   projectRoot: Deno.cwd(),
   // Options beat environment, which beats an indexable .netscript/docs project bundle.
-  docsRoot: Deno.env.get("NETSCRIPT_DOCS_ROOT"),
+  docsRoot: Deno.env.get('NETSCRIPT_DOCS_ROOT'),
 });
 ```
 
@@ -285,7 +285,7 @@ The projection subpath accepts an already-loaded OpenAPI document. It keeps disc
 caller's boundary:
 
 ```ts
-import { indexOpenApiOperations } from "@netscript/mcp/openapi-projection";
+import { indexOpenApiOperations } from '@netscript/mcp/openapi-projection';
 
 declare const openApiDocument: unknown;
 
@@ -309,7 +309,7 @@ Embedders can compose the four discovery sources and bounded network probe witho
 OpenAPI projection layer:
 
 ```ts
-import { createServiceEndpointDirectory } from "@netscript/mcp";
+import { createServiceEndpointDirectory } from '@netscript/mcp';
 
 const endpoints = createServiceEndpointDirectory({
   projectRoot: Deno.cwd(),
