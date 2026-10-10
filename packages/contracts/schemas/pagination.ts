@@ -3,7 +3,11 @@
  *
  * @example
  * ```typescript
+ * import { baseContract } from '@netscript/contracts';
  * import { PaginationInputSchema, createPaginatedOutput } from '@netscript/contracts/query';
+ * import { z } from 'zod';
+ *
+ * const UserSchema = z.object({ id: z.number(), name: z.string() });
  *
  * const usersListContract = baseContract
  *   .route({ method: 'GET', path: '/users' })
@@ -138,6 +142,11 @@ export const CursorPaginationOutputSchema: ContractObjectSchema<
  *
  * @example
  * ```typescript
+ * import { createPaginatedOutput } from '@netscript/contracts/query';
+ * import { z } from 'zod';
+ *
+ * const UserSchema = z.object({ id: z.number(), name: z.string() });
+ *
  * const UserListSchema = createPaginatedOutput(UserSchema);
  * // { data: User[], pagination: PaginationOutput }
  * ```
@@ -159,6 +168,11 @@ export function createPaginatedOutput<TOutput, TInput>(
  *
  * @example
  * ```typescript
+ * import { createCursorPaginatedOutput } from '@netscript/contracts/query';
+ * import { z } from 'zod';
+ *
+ * const UserSchema = z.object({ id: z.number(), name: z.string() });
+ *
  * const UserListSchema = createCursorPaginatedOutput(UserSchema);
  * // { data: User[], pagination: CursorPaginationOutput }
  * ```

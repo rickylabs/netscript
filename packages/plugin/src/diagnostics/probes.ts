@@ -114,6 +114,7 @@ export async function summarizeResponse(response: Response): Promise<ProbeHttpRe
  * ```ts
  * import { assertSuccessfulProbe, summarizeResponse } from "@netscript/plugin";
  *
+ * const response = await fetch("http://localhost:8080/health");
  * assertSuccessfulProbe(await summarizeResponse(response), "Sagas health");
  * ```
  */

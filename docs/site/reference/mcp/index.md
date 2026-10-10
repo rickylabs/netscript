@@ -112,6 +112,17 @@ value.
 | `security: [{ bearerAuth: ['catalog:read'] }]` | `authentication: 'required'`; scheme and scopes are listed |
 | Required operation with `x-netscript-roles` | Roles are copied into the bounded `roles` list |
 
+The root and `./cli` entrypoints export the read-tool result types together with the types they
+reference, so typed consumers never meet a private type:
+
+| Symbol                        | Kind      | Summary                                                         |
+| ----------------------------- | --------- | --------------------------------------------------------------- |
+| `ServiceOperationSummary`     | interface | One bounded `list_service_operations` row.                      |
+| `ListServiceOperationsResult` | interface | Successful `list_service_operations` value.                     |
+| `GetOperationSchemaResult`    | interface | Successful `get_operation_schema` value.                        |
+| `OperationAccessSummary`      | interface | Declared access facts; also exported by `./openapi-projection`. |
+| `SchemaViewName`              | type      | Projection view name; also exported by `./openapi-projection`.  |
+
 `get_operation_schema` produces different credential-free guidance for undeclared, public,
 optional, and required operations. Only the required template includes the literal placeholder
 `Authorization: Bearer <credential>`; no real credential is requested or echoed.

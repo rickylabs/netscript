@@ -19,6 +19,8 @@ import type { KvKey, WatchEvent, WatchOptions, WatchPrefixOptions } from './comm
  *
  * @example
  * ```ts
+ * import { getKv } from '@netscript/kv';
+ *
  * const kv = await getKv();
  *
  * // Watch specific keys for changes

@@ -5,7 +5,11 @@
  * ```typescript
  * import { createTransformer } from '@netscript/contracts/transform';
  *
- * const userTransformer = createTransformer((dbUser) => ({
+ * interface DbUser { id: number; name: string; email: string; password: string }
+ * declare const dbUser: DbUser;
+ * declare const dbUsers: DbUser[];
+ *
+ * const userTransformer = createTransformer((dbUser: DbUser) => ({
  *   id: dbUser.id,
  *   name: dbUser.name,
  *   email: dbUser.email,
@@ -98,6 +102,11 @@ export function createTransformer<TInput, TOutput>(
  *
  * @example
  * ```typescript
+ * import { createPickTransformer } from '@netscript/contracts/transform';
+ *
+ * type User = { id: number; name: string; email: string; password: string };
+ * declare const user: User;
+ *
  * const publicUserTransformer = createPickTransformer<User>()('id', 'name', 'email');
  * const publicUser = publicUserTransformer.one(user);
  * // { id: 1, name: 'John', email: 'john@example.com' }
@@ -122,6 +131,11 @@ export function createPickTransformer<T extends Record<string, unknown>>(): Pick
  *
  * @example
  * ```typescript
+ * import { createOmitTransformer } from '@netscript/contracts/transform';
+ *
+ * type User = { id: number; name: string; email: string; password: string; secretKey: string };
+ * declare const user: User;
+ *
  * const safeUserTransformer = createOmitTransformer<User>()('password', 'secretKey');
  * const safeUser = safeUserTransformer.one(user);
  * // { id: 1, name: 'John', email: 'john@example.com' } (no password/secretKey)
@@ -149,6 +163,10 @@ export function createOmitTransformer<T extends Record<string, unknown>>(): Omit
  *
  * @example
  * ```typescript
+ * import { composeTransformers } from '@netscript/contracts/transform';
+ *
+ * interface DbUser { firstName: string; lastName: string; createdAt: Date }
+ *
  * const transformer = composeTransformers(
  *   (user: DbUser) => ({ ...user, fullName: `${user.firstName} ${user.lastName}` }),
  *   (user) => ({ ...user, createdAt: user.createdAt.toISOString() }),
