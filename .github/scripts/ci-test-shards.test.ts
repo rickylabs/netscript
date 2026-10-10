@@ -63,6 +63,31 @@ Deno.test('timing parser retains native module set, test counts and measured dur
     [{ path: 'a_test.ts', durationMs: 170, tests: 2 }],
   );
   assertThrows(() => parseTimings('<testsuites/>'));
+  assertEquals(
+    parseTimings(
+      '<testsuite name="./ignored_test.ts" tests="1"><testcase name="ignored"><skipped/></testcase></testsuite>',
+    ),
+    [{ path: 'ignored_test.ts', durationMs: 0, tests: 1 }],
+  );
+  assertEquals(
+    parseTimings(
+      '<testsuite name="./nested_test.ts" tests="3"><testcase name="outer" time="0.2"></testcase><testcase name="outer &gt; inner" time="0.1"></testcase><testcase name="outer &gt; inner &gt; deep" time="0.05"></testcase></testsuite>',
+    ),
+    [{ path: 'nested_test.ts', durationMs: 200, tests: 3 }],
+  );
+  assertEquals(
+    parseTimings(
+      '<testsuites><testsuite name="./parent_test.ts" tests="1"><testcase name="outer" time="0.2"></testcase></testsuite><testsuite name="ext:cli/40_test.js" tests="1"><testcase name="outer &gt; inner" time="0.1"></testcase></testsuite></testsuites>',
+    ),
+    [{ path: 'parent_test.ts', durationMs: 200, tests: 2 }],
+  );
+  assertEquals(
+    parseTimings(
+      '<testsuite name="./helper.ts" tests="1"><testcase name="contract" time="0.1"></testcase></testsuite>',
+      new Map([[JSON.stringify(['helper.ts', 'contract']), 'contract_test.ts']]),
+    ),
+    [{ path: 'contract_test.ts', durationMs: 100, tests: 1 }],
+  );
 });
 
 Deno.test('discovery follows naming and config selectors without picking scratch tests', async () => {

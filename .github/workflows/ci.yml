@@ -2,8 +2,8 @@ name: ci
 
 # S2 full CI. Lanes over the existing `deno task`s:
 #
-#   - `check-test` — the lean, required S1 pre-merge gate: repo-wide `deno check`
-#     + `deno test`. A lightweight Redis service makes the CAS/saga-store
+#   - `check-test` — the required aggregator over type-check and browser lanes
+#     and six measured test shards. A lightweight Redis service makes the CAS/saga-store
 #     integrations mandatory inside the repo-wide suite rather than silently
 #     skipped or repeated as historical one-off gates.
 #
@@ -16,7 +16,7 @@ name: ci
 #   - `deps-report` — non-blocking dependency-freshness report (informational).
 #
 # Skip policy (#1152, see `.github/scripts/ci-classify-changes.ts`): the
-# `classify` job emits the capability vector; `check-test` reads `needs_deno`
+# `classify` job emits the capability vector; the shards read `needs_deno`
 # and `quality` reads `needs_deno || needs_docs`. Both jobs still START and
 # report SUCCESS (they are required checks) but short-circuit to a
 # "skipped-by-policy" step when the diff cannot affect them — the same
@@ -176,7 +176,7 @@ jobs:
   check-test-shard:
     name: check-test-shard (${{ matrix.lane }})
     needs: classify
-    # Required check: always starts and reports (see the skip-policy header).
+    # Matrix lanes report policy skips as success; the required aggregator checks every lane.
     # FAIL-CLOSED: a failed classify forces RUN=true.
     if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
     runs-on: ubuntu-latest
@@ -187,6 +187,8 @@ jobs:
         include:
           - lane: check
             index: 0
+          - lane: browser
+            index: -1
           - lane: test-1
             index: 1
           - lane: test-2
@@ -203,7 +205,7 @@ jobs:
       RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_deno == 'true' }}
       RUN_FRESH_BROWSER: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_fresh_browser == 'true' }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
-      NETSCRIPT_TEST_REDIS_URL: ${{ matrix.index != 0 && 'redis://127.0.0.1:6379' || '' }}
+      NETSCRIPT_TEST_REDIS_URL: ${{ matrix.index > 0 && 'redis://127.0.0.1:6379' || '' }}
       REDIS_CONTAINER: netscript-ci-redis-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.index }}
     steps:
       - name: Skipped by policy
@@ -241,19 +243,27 @@ jobs:
           --output .llm/tmp/gate-receipts/check-test/policy.json
           --skip-reason "${SKIP_REASON:-Classifier selected no affected check-test surface.}"
 
+      - name: Record skipped browser receipt
+        if: env.RUN == 'true' && matrix.index == -1 && env.RUN_FRESH_BROWSER != 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-browser --id check-test-browser-policy
+          --cwd packages/fresh --output .llm/tmp/gate-receipts/check-test/browser-policy.json
+          --skip-reason "Classifier selected no affected Fresh browser surface."
+
       - name: Install workspace dependencies
         if: env.RUN == 'true'
         run: deno install
 
       - name: Cache required CI Redis image
-        if: env.RUN == 'true' && matrix.index != 0
+        if: env.RUN == 'true' && matrix.index > 0
         uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/ci-images
           key: ${{ runner.os }}-ci-image-${{ env.CI_REDIS_IMAGE }}-v1
 
       - name: Load or pull required CI Redis image
-        if: env.RUN == 'true' && matrix.index != 0
+        if: env.RUN == 'true' && matrix.index > 0
         run: |
           image_cache="${RUNNER_TEMP}/ci-images/redis.tar"
           if [ -f "$image_cache" ]; then
@@ -265,7 +275,7 @@ jobs:
           fi
 
       - name: Start required Redis integration service
-        if: env.RUN == 'true' && matrix.index != 0
+        if: env.RUN == 'true' && matrix.index > 0
         run: |
           docker run --detach --rm --name "$REDIS_CONTAINER" --publish 6379:6379 "$CI_REDIS_IMAGE"
           for attempt in $(seq 1 10); do
@@ -287,7 +297,7 @@ jobs:
           --output .llm/tmp/gate-receipts/check-test/check.report.json
 
       - name: Measured test shard
-        if: env.RUN == 'true' && matrix.index != 0
+        if: env.RUN == 'true' && matrix.index > 0
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate test-shard --id check-test-test-${{ matrix.index }}
@@ -296,7 +306,7 @@ jobs:
           ${{ matrix.index }} --report-output .llm/tmp/gate-receipts/check-test/test.report.json
 
       - name: Install managed-form browser test runtime
-        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true' && matrix.index == 0
+        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true' && matrix.index == -1
         run: |
           browser_runtime="${RUNNER_TEMP}/netscript-playwright-cli"
           npm install --prefix "$browser_runtime" @playwright/cli@0.1.17
@@ -304,14 +314,14 @@ jobs:
           "$browser_runtime/node_modules/.bin/playwright" install --with-deps chromium
 
       - name: Managed form browser regression
-        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true' && matrix.index == 0
+        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true' && matrix.index == -1
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate fresh-browser --id check-test-fresh-browser
           --cwd packages/fresh --output .llm/tmp/gate-receipts/check-test/fresh-browser.json
 
       - name: Stop required Redis integration service
-        if: always() && env.RUN == 'true' && matrix.index != 0
+        if: always() && env.RUN == 'true' && matrix.index > 0
         run: |
           if docker inspect "$REDIS_CONTAINER" >/dev/null 2>&1; then
             docker stop "$REDIS_CONTAINER"

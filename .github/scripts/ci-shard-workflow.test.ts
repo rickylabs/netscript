@@ -24,8 +24,8 @@ Deno.test('checked-in manifest covers the complete current root suite exactly on
   );
   validateManifest(manifest, await discoverTests(new URL(ROOT).pathname));
   const matrix = job(await workflow(), 'check-test-shard');
-  const indices = [...matrix.matchAll(/^\s+index: (\d+)$/gm)].map((match) => Number(match[1]));
-  assertEquals(indices, Array.from({ length: manifest.shardCount + 1 }, (_, i) => i));
+  const indices = [...matrix.matchAll(/^\s+index: (-?\d+)$/gm)].map((match) => Number(match[1]));
+  assertEquals(indices, [0, -1, ...Array.from({ length: manifest.shardCount }, (_, i) => i + 1)]);
 });
 
 Deno.test('required check-test executes an always-run fail-closed matrix aggregator', async () => {
@@ -68,6 +68,8 @@ Deno.test('matrix preserves type checks, browser policy, receipts and required R
   assertStringIncludes(block, 'fail-fast: false');
   assertEquals(block.includes('continue-on-error'), false);
   assertStringIncludes(block, 'matrix.index == 0');
+  assertStringIncludes(block, 'matrix.index == -1');
+  assertStringIncludes(block, '--id check-test-browser-policy');
   assertStringIncludes(block, '--gate check --id check-test-check');
   assertStringIncludes(block, '--gate test-shard');
   assertStringIncludes(block, 'env.RUN_FRESH_BROWSER');
@@ -76,7 +78,7 @@ Deno.test('matrix preserves type checks, browser policy, receipts and required R
   assertStringIncludes(block, "needs.classify.result != 'success'");
   assertStringIncludes(
     block,
-    "NETSCRIPT_TEST_REDIS_URL: ${{ matrix.index != 0 && 'redis://127.0.0.1:6379' || '' }}",
+    "NETSCRIPT_TEST_REDIS_URL: ${{ matrix.index > 0 && 'redis://127.0.0.1:6379' || '' }}",
   );
   assertStringIncludes(block, 'docker load --input "$image_cache"');
   assertStringIncludes(block, 'docker pull "$CI_REDIS_IMAGE"');
