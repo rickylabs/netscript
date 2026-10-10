@@ -200,8 +200,10 @@ Deno.test('bearer contribution makes its declared client context required', () =
       : false
   >;
   type _OmittedOptionsRemainOptional = Expect<
-    OmittedArgs extends [unknown, (infer _TOptions)?] ? true : false
+    OmittedArgs extends [unknown?, (infer _TOptions)?] ? true : false
   >;
+  // An `undefined`-accepting input may be omitted, matching oRPC's `ClientRest`.
+  type _OmittedInputMayBeOmitted = Expect<[] extends OmittedArgs ? true : false>;
   assert(authenticated);
   assert(omitted);
 });
