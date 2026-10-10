@@ -25,7 +25,7 @@ export async function typedDlqDrain(): Promise<void> {
     depth: () => deadLetters.depth(),
     reprocess: (enqueue, options) => deadLetters.reprocess(enqueue, options),
   };
-  const queue = createTypedQueue('typed-dlq', z.object({ id: z.string() }), {
+  const queue = createTypedQueue<unknown>('typed-dlq', z.object({ id: z.string() }), {
     provider: QueueProvider.DenoKv,
     autoDiscover: false,
     validateOnEnqueue: false,
@@ -41,7 +41,7 @@ export async function typedDlqDrain(): Promise<void> {
     assertEquals(appendCompleted, true, 'listen must drain the validation nack');
   });
   try {
-    await queue.enqueue({ id: 123 } as never);
+    await queue.enqueue({ id: 123 });
     await deadline(written.promise, 5_000);
     controller.abort();
     const stopped = queue.stop().then(() => {
@@ -59,9 +59,12 @@ export async function typedDlqDrain(): Promise<void> {
   } finally {
     controller.abort();
     release.resolve();
-    await queue.stop();
-    await listening;
-    await Deno.remove(dir, { recursive: true });
+    try {
+      await queue.stop();
+      await listening;
+    } finally {
+      await Deno.remove(dir, { recursive: true });
+    }
   }
 }
 
@@ -92,7 +95,7 @@ export async function typedDlqRedelivery(backend: 'memory' | 'kv'): Promise<void
     depth: () => deadLetters.depth(),
     reprocess: (enqueue, options) => deadLetters.reprocess(enqueue, options),
   };
-  const queue = createTypedQueue('typed-dlq', z.object({ id: z.string() }), {
+  const queue = createTypedQueue<unknown>('typed-dlq', z.object({ id: z.string() }), {
     provider: QueueProvider.DenoKv,
     autoDiscover: false,
     validateOnEnqueue: false,
@@ -127,9 +130,12 @@ export async function typedDlqRedelivery(backend: 'memory' | 'kv'): Promise<void
   } finally {
     controller.abort();
     release.resolve();
-    await queue.stop();
-    await listening;
-    kv.close();
-    await Deno.remove(dir, { recursive: true });
+    try {
+      await queue.stop();
+      await listening;
+    } finally {
+      kv.close();
+      await Deno.remove(dir, { recursive: true });
+    }
   }
 }

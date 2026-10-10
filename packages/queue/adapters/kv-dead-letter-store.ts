@@ -6,8 +6,10 @@
 
 import { DenoKvAdapter, getKv, type KvKey, type WatchableKv } from '@netscript/kv';
 import type { DeadLetterRecord, DeadLetterStorePort } from '../ports/dead-letter.ts';
+import { QueueConfigurationError } from '../ports/errors.ts';
 
 const DLQ_PREFIX = 'queue:dlq';
+const DLQ_IDENTITY_PREFIX = 'queue:dlq:identity';
 
 /**
  * Options for {@link KvDeadLetterStore}.
@@ -19,7 +21,7 @@ export interface KvDeadLetterStoreOptions {
   queueName: string;
 
   /**
-   * Caller-owned `@netscript/kv` adapter.
+   * Caller-owned `@netscript/kv` adapter supporting atomic compare-and-swap.
    */
   kv?: WatchableKv;
 
@@ -52,13 +54,24 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
   }
 
   /**
-   * Persist a dead-letter record using the stable queue DLQ key layout.
+   * Persist the first terminal record for a message, retaining the ordered DLQ key layout.
    *
    * @param record - Record to append.
    */
   async append(record: DeadLetterRecord<T>): Promise<void> {
     const kv = await this.ensureKv();
-    await kv.set(this.recordKey(record), record);
+    if (!kv.atomic) {
+      throw new QueueConfigurationError('KV dead-letter storage requires atomic compare-and-swap');
+    }
+    // A redelivery has a new failedAt; the identity index makes concurrent appends idempotent.
+    // Both writes commit together, so no marker can suppress a record that was never persisted.
+    await kv.atomic(
+      [{ key: this.identityKey(record.messageId), versionstamp: null }],
+      [
+        { type: 'set', key: this.identityKey(record.messageId), value: this.recordKey(record) },
+        { type: 'set', key: this.recordKey(record), value: record },
+      ],
+    );
   }
 
   /**
@@ -93,6 +106,9 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
     options: { limit?: number } = {},
   ): Promise<number> {
     const kv = await this.ensureKv();
+    if (!kv.atomic) {
+      throw new QueueConfigurationError('KV dead-letter storage requires atomic compare-and-swap');
+    }
     let count = 0;
     for await (
       const entry of kv.list<DeadLetterRecord<T>>({
@@ -101,7 +117,22 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
       })
     ) {
       await reenqueue(entry.value);
-      await kv.delete(entry.key);
+      const identityKey = this.identityKey(entry.value.messageId);
+      const identity = await kv.get<KvKey>(identityKey);
+      // Legacy rows have no index. Never delete an index that points to a different row.
+      const ownsIdentity = identity !== null &&
+        JSON.stringify(identity.value) === JSON.stringify(entry.key);
+      const removed = await kv.atomic(
+        [
+          { key: entry.key, versionstamp: entry.versionstamp },
+          ...(ownsIdentity ? [{ key: identityKey, versionstamp: identity.versionstamp }] : []),
+        ],
+        [
+          { type: 'delete', key: entry.key },
+          ...(ownsIdentity ? [{ type: 'delete' as const, key: identityKey }] : []),
+        ],
+      );
+      if (!removed.ok) continue;
       count++;
     }
     return count;
@@ -155,5 +186,10 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
    */
   private recordKey(record: DeadLetterRecord<T>): KvKey {
     return [DLQ_PREFIX, this.queueName, record.failedAt, record.messageId];
+  }
+
+  /** Identity index lives only as long as its stored dead-letter record. */
+  private identityKey(messageId: string): KvKey {
+    return [DLQ_IDENTITY_PREFIX, this.queueName, messageId];
   }
 }
