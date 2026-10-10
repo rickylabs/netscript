@@ -43,7 +43,7 @@ export function createPluginCommand(
     .command(
       "new",
       createNewPluginCommand({
-        newPluginDependencies: dependencies.pluginScaffoldDependencies,
+        newPluginDependencies: dependencies.newPluginDependencies,
         resolveProjectRoot: dependencies.resolveProjectRoot,
         workspaceMutator:
           dependencies.pluginInstallDependencies.workspaceMutator,
