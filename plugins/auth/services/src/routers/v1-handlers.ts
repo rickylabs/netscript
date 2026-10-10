@@ -1,4 +1,5 @@
 import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
+import { captureAuthResponseCookies } from '../request-context.ts';
 import { getParentContextFromHeaders } from '@netscript/telemetry/context';
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
 import type {
@@ -98,6 +99,7 @@ export async function signin(
         { returnTo: input.redirectTo },
       );
       const redirectUrl = responseLocation(response);
+      captureAuthResponseCookies(response);
       const output = {
         started: true,
         providerId: input.providerId ?? firstProviderId(backend),
@@ -160,6 +162,7 @@ export async function callback(
         if (input.providerId) params.set('providerId', input.providerId);
         if (input.code) params.set('code', input.code);
         if (input.state) params.set('state', input.state);
+        if (input.txn) params.set('txn', input.txn);
         const result = await interactive.handleCallback(
           toRequest(context.request, '/v1/auth/callback', params),
         );
@@ -169,6 +172,7 @@ export async function callback(
           redirectTo: input.redirectTo ?? responseLocation(result.response),
           subject: result.principal.subject,
         };
+        captureAuthResponseCookies(result.response);
         await audit.setOutcome({
           outcome: AuthOutcome.SUCCESS,
           subject: result.principal.subject,
@@ -205,12 +209,13 @@ export async function signout(
         throw new AuthServiceHandlerError('UNAUTHORIZED', 'No active auth session was found.');
       }
       if (backend.interactive) {
-        await backend.interactive.signOut(
+        const response = await backend.interactive.signOut(
           toRequest(context.request, '/v1/auth/signout', new URLSearchParams()),
           {
             revoke: !sessionId,
           },
         );
+        captureAuthResponseCookies(response);
       }
       const output = {
         signedOut: true,
@@ -250,7 +255,7 @@ export async function session(
     async (audit) => {
       let resolved: AuthSession | undefined;
       try {
-        const request = toAuthnRequest(context.request, input?.sessionId);
+        const request = toAuthnRequest(context.request, input?.sessionId, context.cookieName);
         resolved = await backend.sessions.getSession({
           sessionId: input?.sessionId,
           token: readBearerCredential(request),
@@ -314,7 +319,7 @@ export async function me(context: AuthServiceContext): Promise<MeResponse> {
     try {
       resolved = await backend.sessions.getSession({
         sessionId,
-        request: toAuthnRequest(context.request, sessionId),
+        request: toAuthnRequest(context.request, sessionId, context.cookieName),
       });
     } catch (error) {
       const authError = providerFailure(error, backend.name);

@@ -71,6 +71,12 @@ export function buildCookieHeader(
   const name = options.name ?? '__Host-ns_session';
   const path = options.path ?? '/';
   const secure = options.secure ?? deriveHttps(request);
+  if (options.httpOnly === false) {
+    throw new KvOAuthError('configuration_error', 'Auth cookies require HttpOnly.');
+  }
+  if (!secure && !options.allowInsecureDev) {
+    throw new KvOAuthError('https_required', 'Auth cookies require HTTPS.');
+  }
   assertCookiePolicy(name, path, options.domain, secure, options.allowInsecureDev ?? false);
   const parts = [
     `${name}=${encodeURIComponent(value)}`,
