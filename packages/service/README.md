@@ -31,6 +31,9 @@ not.
 - **Explicit bind address** — `serve({ hostname })` and `defineService(router, { hostname })` bind
   one interface, such as `'127.0.0.1'` for a loopback-only listener, on both the plain and the TLS
   listener; omitting it keeps the all-interfaces default.
+- **Middleware slot and body limit** — `defineService(router, { middleware, bodyLimit })` installs
+  caller middleware after CORS and logging and before auth, and an opt-in request-body limit that
+  answers oversized bodies with a typed JSON `413` on both the RPC and OpenAPI projections.
 - **One app-wide budget** — `createRuntimeHost()` invokes existing service, worker, queue, and
   database drains in deterministic phase order and returns one aggregate report.
 - **Tracing on every request** — the builder registers tracing middleware as the outermost layer on
@@ -45,7 +48,7 @@ not.
 ```mermaid
 flowchart LR
     R["oRPC router"] --> D["defineService()<br/>or createService()"]
-    D --> M["Middleware stack<br/>tracing · CORS · logging · auth"]
+    D --> M["Middleware stack<br/>tracing · CORS · logging · middleware · auth · body limit"]
     M --> E["Endpoints<br/>/rpc · /api · OpenAPI · Scalar docs"]
     M --> H["Health<br/>/health · /health/live · /health/ready"]
     D --> G["Graceful shutdown<br/>drain · LIFO hooks · signals"]
@@ -193,6 +196,27 @@ const authorizer = createContractAuthorizer(OrdersContractV1, {
 `createContractAuthorizer()` throws
 `[netscript.service.contract-policy] optional authentication is unsupported: <procedure>`; the error
 is raised while the contract is traversed, not on the first request.
+
+A raw route added with `.route(method, path, handler)` under the guarded prefix matches no
+procedure, so it is denied with `authz.no-contract-procedure` until it is declared. Declare it with
+`rawRoutes`:
+
+```ts
+import { createContractAuthorizer } from '@netscript/service/auth';
+import type { ContractPolicyContract } from '@netscript/service/auth';
+
+declare const OrdersContractV1: ContractPolicyContract;
+
+const authorizer = createContractAuthorizer(OrdersContractV1, {
+  rawRoutes: [{ path: '/api/tools/mcp', authentication: 'required' }],
+});
+```
+
+A declared raw route always requires authentication, even outside `protect`. It is never a public
+bypass. It may add `authorization: { scopes?, roles? }`. Matching is exact: `/api/tools/mcp` does
+not cover `/api/tools/mcp-admin` or `/api/tools/mcp/nested`. Construction rejects wildcard or
+parameter paths, a non-`'required'` authentication and duplicates. `.build()` rejects a raw path
+that overlaps the REST or RPC projection.
 
 The `defineService()` preset accepts the same ports through its `auth` option. The following legacy
 path-prefix form remains valid and behavior-compatible; new services should prefer contract metadata

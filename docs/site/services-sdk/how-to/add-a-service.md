@@ -242,8 +242,14 @@ await defineService(router, {
   port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ
   openapi: { title: 'Users API', description: 'users service' },
   debug: true,
+  // Reject request bodies over 1 MiB with a typed 413. Raise it for upload-heavy services.
+  bodyLimit: { maxBytes: 1024 * 1024 },
 });
 ```
+
+New services scaffolded by `netscript service add` opt into a 1 MiB `bodyLimit`. Raise
+`maxBytes` for a service that accepts larger payloads, such as base64 document uploads. Remove the
+line to accept unbounded bodies, which is how services created before this option behave.
 
 Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
 of truth is your `netscript.config.ts` `services.<name>.port` field, which the scaffold wires as the
