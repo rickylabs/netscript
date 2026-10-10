@@ -215,20 +215,11 @@ Web Worker pool.
 WORKERS_CONCURRENCY=8 deno run -A plugins/workers/bin/combined.ts
 ```
 
-{{ comp callout { type: "warning", title: "Two concurrency env vars — know which one wins" } }}
-There are <strong>two</strong> concurrency env names in play and they are <em>not</em> the
-same variable. The worker entrypoint (<code>plugins/workers/bin/runtime.ts</code>) reads
-<code>WORKERS_CONCURRENCY</code> (note the <strong>S</strong>) and defaults it to
-<code>1</code>. The Aspire contribution, however, declares and injects
-<code>WORKER_CONCURRENCY</code> (no S, value <code>2</code>) via its
-<code>concurrencyEnvVar</code>. Under <code>aspire start</code> today, the injected
-<code>WORKER_CONCURRENCY</code> does <em>not</em> feed the entrypoint's
-<code>WORKERS_CONCURRENCY</code> read, so the process pool falls back to its default. Set
-<code>WORKERS_CONCURRENCY</code> explicitly on the background resource if you need a specific
-pool size, and treat the per-topic <code>scaling.concurrency</code> in
-<code>defineWorkers</code> as the durable, config-driven control. This naming seam is a known
-rough edge.
-{{ /comp }}
+Under `aspire start` you do not set it by hand: the workers plugin's Aspire metadata injects
+`WORKERS_CONCURRENCY` on the background resource with the plugin's declared default (`2`), and the
+deploy-generated `.env` writes the same variable. Change the declared value in `appsettings.json`
+(the background processor's `Concurrency`) and regenerate the AppHost helpers with
+`netscript service generate`, or override `WORKERS_CONCURRENCY` in the environment.
 
 ## Choosing a runner mode
 
