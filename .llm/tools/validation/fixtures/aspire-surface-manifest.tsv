@@ -625,7 +625,10 @@ packages/cli/src/public/adapters/jsr-import-resolver.ts	cli:other	S4	grep-verifi
 packages/cli/src/public/domain/scaffold-plan_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/agent/agent-group.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
+packages/cli/src/public/features/agent/init/hosts/opencode-config_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
+packages/cli/src/public/features/agent/init/hosts/opencode-config.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/init-agent_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
+packages/cli/src/public/features/agent/init/init-agent-command_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/init-agent.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/config/project/list-appsettings-paths.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/config/project/project-config-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
