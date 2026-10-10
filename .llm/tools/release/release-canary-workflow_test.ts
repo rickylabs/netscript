@@ -156,9 +156,9 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
     '.llm/tools/release/run-publish.ts --dry-run',
     '.llm/tools/release/run-publish.ts --preflight',
     '.llm/tools/release/run-publish.ts\n',
-    'deno task release:canary-label',
     'return_run_details=true',
     'bash .llm/tools/release/watch-canary-e2e.sh "$E2E_RUN_ID"',
+    'deno task release:canary-label',
     '-f state=success',
   ];
   let previous = -1;

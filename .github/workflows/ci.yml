@@ -40,7 +40,7 @@ on:
     tags: ['v*']
   pull_request:
     branches: [main, 'feat/**', 'epic/**', 'canary/**']
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, edited, labeled, unlabeled]
 
 permissions:
   contents: read
@@ -88,6 +88,15 @@ jobs:
           --repo "${{ github.repository }}"
           --pr "${{ github.event.pull_request.number }}"
           --pretty
+
+      - name: Breaking change migration gate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >
+          deno run --allow-env --allow-net
+          .llm/tools/validation/check-breaking-migration.ts
+          --repo "${{ github.repository }}"
+          --pr "${{ github.event.pull_request.number }}"
 
       - name: Referenced issue acceptance gate
         env:
