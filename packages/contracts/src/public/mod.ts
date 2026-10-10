@@ -39,6 +39,7 @@ export {
 export type { ErrorResult, OkResult, Result } from '../domain/result.ts';
 export type {
   NetScriptAuthenticationRequirement,
+  NetScriptProcedureAudience,
   NetScriptProcedureMeta,
 } from '../domain/procedure-meta.ts';
 export type {

@@ -234,7 +234,7 @@ that matches your isolation, memory, and parallelism needs.
 {{ comp.apiTable({
   caption: "Deployment & scaling knobs (workers config)",
   rows: [
-    { name: "WORKERS_CONCURRENCY", type: "env (number)", desc: "Runtime worker process pool size. The entrypoint reads this plural variable; current Aspire metadata also emits WORKER_CONCURRENCY, but the runtime does not consume it." },
+    { name: "WORKERS_CONCURRENCY", type: "env (number)", desc: "Runtime worker process pool size. Aspire metadata injects it with the declared default (2); the entrypoint defaults to 1 when it is unset." },
     { name: "concurrency", type: "number", desc: "Per-topic max concurrent workers (WorkersConfigData.concurrency / per-group scaling)." },
     { name: "mode", type: "'combined' | 'distributed'", desc: "Per-topic deployment mode: one combined runner vs. distributed runners. Defaults to 'combined'." },
     { name: "queueProvider", type: "'auto' | 'deno-kv' | 'redis' | 'postgres' | 'amqp'", desc: "Queue backend. 'auto' resolves a provider; see Choose a queue provider." },
@@ -424,10 +424,9 @@ collisions: the plugin's own jobs register first, then the generated user defini
 first registration wins. Background execution runs from
 <code>plugins/workers/bin/combined.ts</code>, a <em>separate</em> process from the API service —
 the API enqueues, the runner executes. A missing generated registry is tolerated as an empty set,
-so a fresh workspace boots before you author any job. Set <code>WORKERS_CONCURRENCY</code> on the
-worker background process when you need a specific process pool size. Current Aspire metadata also
-emits <code>WORKER_CONCURRENCY</code>, but the runtime entrypoint does not consume it; use
-<a href="/background-processing/how-to/tune-worker-runtime/">Tune the worker runtime</a> for the mismatch details.
+so a fresh workspace boots before you author any job. The process pool size is
+<code>WORKERS_CONCURRENCY</code>, which Aspire injects on the worker background process; see
+<a href="/background-processing/how-to/tune-worker-runtime/">Tune the worker runtime</a> to change it.
 {{ /comp }}
 
 ## Observability: real job traces out of the box

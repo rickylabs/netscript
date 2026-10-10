@@ -6,10 +6,12 @@ import {
   type EnvSource,
   type HealthCheckSpec,
 } from '@netscript/aspire/public';
+import { WORKERS_CONCURRENCY_ENV } from '../runtime/concurrency.ts';
 
 const WORKERS_PLUGIN_VERSION = '0.0.1-alpha.0';
 const WORKERS_API_RESOURCE = 'workers-api';
 const WORKERS_COMBINED_RESOURCE = 'workers-combined';
+const WORKERS_DEFAULT_CONCURRENCY = '2';
 
 const WORKERS_SERVICE_PERMISSIONS = [
   '--unstable-kv',
@@ -56,7 +58,7 @@ export class WorkersAspireContribution extends AspireNSPluginContribution {
       workdir: ctx.projectRoot,
       entrypoint: 'plugins/workers/bin/combined.ts',
       permissions: WORKERS_BACKGROUND_PERMISSIONS,
-      concurrencyEnvVar: 'WORKER_CONCURRENCY',
+      concurrencyEnvVar: WORKERS_CONCURRENCY_ENV,
       watchMode: true,
     });
 
@@ -69,7 +71,7 @@ export class WorkersAspireContribution extends AspireNSPluginContribution {
   override declareEnv(_ctx: ContributionContext): Record<string, EnvSource | string> {
     return {
       WORKERS_API_URL: { kind: 'resource', resource: WORKERS_API_RESOURCE, key: 'url' },
-      WORKER_CONCURRENCY: '2',
+      [WORKERS_CONCURRENCY_ENV]: WORKERS_DEFAULT_CONCURRENCY,
     };
   }
 

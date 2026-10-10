@@ -63,6 +63,7 @@ import type { JsrPackageFileFetcher } from '../../infra/jsr/verify-jsr-package-i
 import { doctorPlugin } from '../plugins/doctor/doctor-plugin-use-case.ts';
 import type { RemovePluginDependencies } from '../plugins/remove/remove-plugin.ts';
 import type { PluginScaffoldDependencies } from '../plugins/scaffold/scaffold-plugin-use-case.ts';
+import type { NewPluginDependencies } from '../plugins/new/new-plugin-use-case.ts';
 import type { PublicCliHost } from './public-command-tree.ts';
 import { FetchAuthSessionHttp } from '../plugins/auth/auth-session-client.ts';
 import type { AuthSessionHttpPort } from '../plugins/auth/auth-types.ts';
@@ -178,6 +179,8 @@ export interface PublicCommandDependencies {
   readonly authRegenerateAspire: (projectRoot: string) => Promise<void>;
   /** Dependencies for plugin package scaffolding. */
   readonly pluginScaffoldDependencies: PluginScaffoldDependencies;
+  /** Dependencies for greenfield dual-tier plugin generation. */
+  readonly newPluginDependencies: NewPluginDependencies;
   /** Dependencies for runtime config schema generation. */
   readonly generateRuntimeSchemasCommandDependencies: GenerateRuntimeSchemasCommandDependencies;
   /** Dependencies for plugin registry generation. */
@@ -400,6 +403,10 @@ export function createPublicCommandDependencies(
     },
     pluginScaffoldDependencies: {
       fs,
+    },
+    newPluginDependencies: {
+      fs,
+      formatter: generatedSourceFormatter,
     },
     generateRuntimeSchemasCommandDependencies: {
       resolveProjectRoot,
