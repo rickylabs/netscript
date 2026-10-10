@@ -333,16 +333,14 @@ Deno.test('stream live queries preserve nested source alias scope', async () => 
   });
   try {
     await settle();
-    transport.send(data([change('1', 'first')]) + control('opaque:1'));
+    transport.send(data([change('1', 'first'), change('2', 'other')]) + control('opaque:1'));
     await nested.preload();
-    assertEquals(nested.get(nested.toArray[0].$key)?.children, [{ title: 'first' }]);
-    assertEquals(joined.toArray.map(({ id, title }) => ({ id, title })), [{
-      id: '1',
-      title: 'first',
-    }]);
+    assertEquals(nested.toArray.find(({ id }) => id === '1')?.children, [{ title: 'first' }]);
+    assertEquals(nested.toArray.find(({ id }) => id === '2')?.children, [{ title: 'other' }]);
     transport.send(data([change('1', 'updated')]) + control('opaque:2'));
     await settle();
-    assertEquals(nested.toArray[0].children, [{ title: 'updated' }]);
+    assertEquals(nested.toArray.find(({ id }) => id === '1')?.children, [{ title: 'updated' }]);
+    assertEquals(nested.toArray.find(({ id }) => id === '2')?.children, [{ title: 'other' }]);
   } finally {
     await nested.cleanup();
     await binding.dispose();
