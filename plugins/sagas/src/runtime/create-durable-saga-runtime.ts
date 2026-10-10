@@ -27,8 +27,7 @@ export type DurableSagaRuntimeOptions = Readonly<{
   backend?: DurableSagaStoreBackend;
   kv?: KvStore;
   /** Terminal KV retention resolved from the host's saga topic configuration. */
-  completedRetentionDays?:
-    import('@netscript/plugin-sagas-core/stores').KvSagaStoreOptions['completedRetentionDays'];
+  completedRetentionDays?: number | ((envelope: Parameters<SagaStorePort['save']>[0]) => number);
   prisma?: PrismaSagaStoreClient;
   store?: SagaStorePort;
   projection?: SagaInstanceProjectionPort;

@@ -1,3 +1,4 @@
+import { KvJobRegistry } from '../registry/kv-job-registry.ts';
 import { assertEquals } from 'jsr:@std/assert@^1';
 import { FakeTime } from 'jsr:@std/testing@^1/time';
 import { MemoryKvAdapter } from '@netscript/kv';
@@ -12,7 +13,9 @@ Deno.test('worker retention expires settled execution and preserves live executi
   });
   const open = await state.create({ jobId: 'short', triggeredBy: 'manual' });
   const done = await state.create({ jobId: 'short', triggeredBy: 'manual' });
-  await state.complete(done.id, { status: 'completed' });
+  const completed = await state.complete(done.id, { status: 'completed' });
+  if (!completed) throw new Error('Expected persisted execution.');
+  await new KvJobRegistry({ kv }).saveExecution({ ...completed });
   time.tick(86_400_001);
   assertEquals(await state.get(done.id), null);
   assertEquals((await state.start(open.id))?.status, 'running');
