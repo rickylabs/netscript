@@ -116,7 +116,7 @@ Deno.test('sagas install runtime glue exposes a supervisor-backed health endpoin
   assert(runtimeArtifact, 'sagas install must emit sagas/runtime.ts');
 
   const source = artifactText(runtimeArtifact);
-  assertStringIncludes(source, 'await startSagaRunner()');
+  assertStringIncludes(source, 'await startSagaRunner({ supervisor: { health } })');
   assertStringIncludes(source, 'await runChildHealthProcess(');
   assertStringIncludes(source, 'supervisor?.snapshot().childHealth');
   assertStringIncludes(source, 'supervisor.waitForDelivery()');
