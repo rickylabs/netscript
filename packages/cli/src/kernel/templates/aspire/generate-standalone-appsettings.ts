@@ -2,7 +2,7 @@
  * @module templates/aspire/generate-standalone-appsettings
  *
  * Tier 1 generator for the `appsettings.json` of a project scaffolded with
- * `--no-aspire` (#1996): the same file and schema every service, database and
+ * `--no-aspire`: the same file and schema every service, database and
  * config command reads, without AppHost wiring.
  */
 
