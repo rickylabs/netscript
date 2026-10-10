@@ -69,6 +69,8 @@ export class NetScriptChatProducerError extends Error {
    */
   readonly kind:
     | 'retryable'
+    | 'unauthorized'
+    | 'timeout'
     | 'stale-epoch'
     | 'sequence-gap'
     | 'stream-closed'
