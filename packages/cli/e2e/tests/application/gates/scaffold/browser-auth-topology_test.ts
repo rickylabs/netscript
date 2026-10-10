@@ -3,7 +3,7 @@ import { resolve, toFileUrl } from '@std/path';
 import { MemoryKvAdapter } from '@netscript/kv';
 import { createService } from '@netscript/service';
 import { createAuthServiceAuthenticator } from '@netscript/plugin-auth-core/authenticator';
-import { oc } from 'npm:@orpc/contract@^1.15.0';
+import { baseContract } from '@netscript/contracts';
 import { implement } from '@orpc/server';
 import { z } from 'zod';
 import type { ServiceClient } from '@netscript/sdk/client';
@@ -15,9 +15,10 @@ import { renderTemplateAssetSync } from '../../../../../src/kernel/adapters/temp
 import { TEMPLATE_KEYS } from '../../../../../src/kernel/assets/manifest.ts';
 
 const contract = {
-  read: oc.route({ method: 'GET', path: '/read' }).output(
-    z.object({ accepted: z.boolean() }),
-  ),
+  read: baseContract.route({ method: 'GET', path: '/read' })
+    .meta({ access: { authentication: 'required' } }).output(
+      z.object({ accepted: z.boolean() }),
+    ),
 };
 interface GeneratedBff {
   handleBrowserAuth(request: Request, action: string): Promise<Response>;
