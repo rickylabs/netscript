@@ -98,9 +98,10 @@ async function serve() {
   }).build();
   const server = Deno.serve({ hostname: '127.0.0.1', port: 0, onListen: () => {} }, app.fetch);
   await Deno.writeTextFile(
-    readyFile,
+    readyFile + '.pending',
     JSON.stringify({ pid: Deno.pid, url: `http://127.0.0.1:${server.addr.port}` }),
   );
+  await Deno.rename(readyFile + '.pending', readyFile);
   await server.finished;
 }
 
@@ -234,7 +235,13 @@ Deno.test('HTTP publish recovers commit-before-acceptance process crash without 
     try {
       assertEquals((await first.publisher.publish(message('restart', 'First'))).published, true);
       assertEquals((await first.publisher.publish(message('restart', 'Second'))).published, false);
-      const departure = await first.status;
+      const ceiling = new AbortController();
+      const departure = await Promise.race([
+        first.status,
+        delay(10000, { signal: ceiling.signal }).then(() => {
+          throw new Error('Service did not exit at the committed crash boundary');
+        }),
+      ]).finally(() => ceiling.abort());
       assertEquals(departure.code, 86);
       if (control === 'drop-outbox') {
         await root.$executeRawUnsafe('DELETE FROM netscript_command_outbox');
