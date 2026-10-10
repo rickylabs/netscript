@@ -35,7 +35,7 @@
     "@std/path": "jsr:@std/path@^1",
     "@std/json": "jsr:@std/json@^1",
     "@std/jsonc": "jsr:@std/jsonc@^1",
-    "jsonc-parser": "catalog:",
+    "jsonc-parser": "npm:jsonc-parser@^3.3.1",
     "@std/async": "jsr:@std/async@^1",
     "@std/collections": "jsr:@std/collections@^1",
     "@std/text": "jsr:@std/text@^1",
