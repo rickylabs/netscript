@@ -109,7 +109,7 @@ export async function createKvOAuthBackend(
 ): Promise<KvOAuthBackend> {
   const store = options.store ?? await createKvOAuthStore();
   const provider = options.provider;
-  const cookie = options.cookie;
+  const cookie = { ...options.cookie, trustProxyHeaders: options.trustProxyHeaders ?? false };
   const flow = createKvOAuthFlow({ ...options, store });
   const sessions = createSessionStore(provider, store, cookie);
   const principalMapper = createPrincipalMapper();

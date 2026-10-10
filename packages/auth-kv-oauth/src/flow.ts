@@ -14,7 +14,7 @@
 
 import * as oauth from '@panva/oauth4webapi';
 import type { Principal } from '@netscript/service/auth';
-import { buildCookieHeader, clearCookieHeader, parseCookieHeader } from './cookies.ts';
+import { buildCookieHeader, clearCookieHeader, deriveHttps, parseCookieHeader } from './cookies.ts';
 import type { KvOAuthCookieOptions } from './cookies.ts';
 import { KvOAuthError } from './errors.ts';
 import { hasIssuerDiscovery, type OAuthProviderConfig } from './providers.ts';
@@ -82,7 +82,12 @@ export type CreateKvOAuthFlowOptions = Readonly<{
   cookie?: KvOAuthCookieOptions;
   allowedReturnTo?: readonly string[] | ((url: URL) => boolean);
   defaultReturnTo?: string;
+  /** Allow HTTP on outbound OAuth discovery/token requests only. Default false. */
   allowInsecureRequests?: boolean;
+  /** Allow plain HTTP on inbound sign-in/callback requests for development only. Default false. */
+  allowInsecureHttpRequests?: boolean;
+  /** Trust proxy-written protocol headers for both the flow and cookies. Default false. */
+  trustProxyHeaders?: boolean;
   fetch?: KvOAuthFetch;
   normalizePrincipal?: (
     context: NormalizePrincipalContext,
@@ -99,7 +104,8 @@ export type NormalizePrincipalContext = Readonly<{
 
 /** Creates pure OAuth/OIDC flow primitives without mounting HTTP routes. */
 export function createKvOAuthFlow(options: CreateKvOAuthFlowOptions): KvOAuthFlow {
-  const cookieName = options.cookie?.name ?? '__Host-ns_session';
+  const cookie = { ...options.cookie, trustProxyHeaders: options.trustProxyHeaders ?? false };
+  const cookieName = cookie.name ?? '__Host-ns_session';
   const defaultReturnTo = options.defaultReturnTo ?? new URL(options.provider.redirectUri).origin;
 
   return {
@@ -140,7 +146,7 @@ export function createKvOAuthFlow(options: CreateKvOAuthFlowOptions): KvOAuthFlo
       for (const [key, value] of Object.entries(options.provider.extraAuthParams)) {
         url.searchParams.set(key, value);
       }
-      return redirect(url, buildCookieHeader(txn.id, request, options.cookie));
+      return redirect(url, buildCookieHeader(txn.id, request, cookie));
     },
     async handleCallback(request): Promise<KvOAuthCallbackResult> {
       assertHttps(request, options);
@@ -219,7 +225,7 @@ export function createKvOAuthFlow(options: CreateKvOAuthFlowOptions): KvOAuthFlo
       return {
         response: redirect(
           new URL(txn.returnTo),
-          buildCookieHeader(sessionId, request, options.cookie),
+          buildCookieHeader(sessionId, request, cookie),
         ),
         sessionId,
         principal,
@@ -235,7 +241,7 @@ export function createKvOAuthFlow(options: CreateKvOAuthFlowOptions): KvOAuthFlo
       if (sessionId) {
         await options.store.deleteSession(sessionId);
       }
-      return redirect(new URL(defaultReturnTo), clearCookieHeader(request, options.cookie));
+      return redirect(new URL(defaultReturnTo), clearCookieHeader(request, cookie));
     },
   };
 }
@@ -334,10 +340,13 @@ function validateReturnTo(value: string, options: CreateKvOAuthFlowOptions): URL
 }
 
 function assertHttps(request: Request, options: CreateKvOAuthFlowOptions): void {
-  if (!options.allowInsecureRequests && new URL(request.url).protocol !== 'https:') {
+  if (
+    !options.allowInsecureHttpRequests &&
+    !deriveHttps(request, undefined, options.trustProxyHeaders)
+  ) {
     throw new KvOAuthError(
-      'https_required',
-      'OAuth flow requires HTTPS unless allowInsecureRequests is enabled for tests.',
+      'flow_https_required',
+      'OAuth flow gate requires HTTPS; configure trustProxyHeaders for a trusted TLS proxy or allowInsecureHttpRequests for development.',
     );
   }
 }

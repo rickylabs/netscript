@@ -27,6 +27,8 @@ export type KvOAuthCookieOptions = Readonly<{
   maxAge?: number;
   sameSite?: 'Strict' | 'Lax' | 'None';
   secure?: boolean;
+  /** Trust proxy-written protocol headers only when direct client access is blocked. Default false. */
+  trustProxyHeaders?: boolean;
   httpOnly?: boolean;
   allowInsecureDev?: boolean;
 }>;
@@ -43,21 +45,43 @@ export function parseCookieHeader(cookieHeader: string | undefined): ReadonlyMap
   return cookies;
 }
 
-/** Derives whether a request should be treated as HTTPS behind proxies. */
-export function deriveHttps(input: Request | AuthnRequest, override?: boolean): boolean {
+/**
+ * Derives HTTPS from the request URL, or protocol headers with explicit proxy trust.
+ *
+ * AuthnRequest has no URL; callers without trusted headers must supply an explicit override.
+ * Trusted proxies must replace incoming protocol headers and prevent direct client access.
+ * X-Forwarded-Proto takes precedence; only the first Forwarded hop is considered.
+ *
+ * @example
+ * ```ts
+ * import { deriveHttps } from "@netscript/auth-kv-oauth/cookies";
+ * const request = new Request("http://app.example.test/", {
+ *   headers: { "x-forwarded-proto": "https" },
+ * });
+ * const https = deriveHttps(request, undefined, true);
+ * ```
+ */
+export function deriveHttps(
+  input: Request | AuthnRequest,
+  override?: boolean,
+  trustProxyHeaders = false,
+): boolean {
   if (override !== undefined) {
     return override;
   }
-  const header = input instanceof Request
-    ? input.headers.get.bind(input.headers)
-    : input.header.bind(input);
-  const forwardedProto = header('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
-  if (forwardedProto) {
-    return forwardedProto === 'https';
-  }
-  const proto = header('forwarded')?.match(/proto=([^;,]+)/i)?.[1]?.toLowerCase();
-  if (proto) {
-    return proto === 'https';
+  if (trustProxyHeaders) {
+    const header = input instanceof Request
+      ? input.headers.get.bind(input.headers)
+      : input.header.bind(input);
+    const forwardedProto = header('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
+    if (forwardedProto) {
+      return forwardedProto === 'https';
+    }
+    const firstHop = header('forwarded')?.split(',')[0];
+    const proto = firstHop?.match(/(?:^|;)\s*proto=(?:"([^";]+)"|([^;\s]+))/i);
+    if (proto) {
+      return (proto[1] ?? proto[2])?.toLowerCase() === 'https';
+    }
   }
   return input instanceof Request ? new URL(input.url).protocol === 'https:' : false;
 }
@@ -70,7 +94,7 @@ export function buildCookieHeader(
 ): string {
   const name = options.name ?? '__Host-ns_session';
   const path = options.path ?? '/';
-  const secure = options.secure ?? deriveHttps(request);
+  const secure = options.secure ?? deriveHttps(request, undefined, options.trustProxyHeaders);
   assertCookiePolicy(name, path, options.domain, secure, options.allowInsecureDev ?? false);
   const parts = [
     `${name}=${encodeURIComponent(value)}`,
@@ -117,7 +141,10 @@ function assertCookiePolicy(
       );
     }
     if (!secure && !allowInsecureDev) {
-      throw new KvOAuthError('https_required', '__Host- cookies require HTTPS.');
+      throw new KvOAuthError(
+        'cookie_https_required',
+        '__Host- cookie gate requires HTTPS; configure trusted proxy headers or explicit cookie.allowInsecureDev for development.',
+      );
     }
   }
 }

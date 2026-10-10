@@ -22,7 +22,8 @@ export type KvOAuthErrorCode =
   | 'return_to_not_allowed'
   | 'session_not_found'
   | 'configuration_error'
-  | 'https_required';
+  | 'flow_https_required'
+  | 'cookie_https_required';
 
 /** Structured error thrown for expected OAuth backend failures. */
 export class KvOAuthError extends Error {
