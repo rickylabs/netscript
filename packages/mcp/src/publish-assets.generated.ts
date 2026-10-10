@@ -80,7 +80,7 @@ export const MCP_EMBEDDED_DOCS = [{
 export const MCP_EMBEDDED_DOCS_PROVENANCE = {
   'schemaVersion': 1,
   'frameworkVersion': '0.0.7',
-  'sourceCommit': '9f6386d95',
+  'sourceCommit': 'b192a3bca',
   'paths': [
     'llms.txt',
     'pages/durable-workflows/how-to/bound-stream-retention/index.md',
