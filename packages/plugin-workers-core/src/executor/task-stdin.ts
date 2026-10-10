@@ -73,10 +73,15 @@ function* jsonTokens(value: unknown, ancestors: Set<object>, depth: number): Gen
     yield array ? '[' : '{';
     let first = true;
     if (array) {
-      for (const item of value) {
+      // Index descriptors avoid executing element getters or a custom iterator.
+      for (let index = 0; index < value.length; index++) {
+        const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
+        if (!descriptor || !('value' in descriptor)) {
+          throw new Error('InvalidStdinPayload: JSON array elements must be own data properties.');
+        }
         if (!first) yield ',';
         first = false;
-        yield* jsonTokens(item, ancestors, depth + 1);
+        yield* jsonTokens(descriptor.value, ancestors, depth + 1);
       }
     } else {
       for (const key in value) {
