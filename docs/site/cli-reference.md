@@ -100,7 +100,7 @@ accepts `--dry-run`.
 | `netscript plugin install` / `netscript plugin update` / `netscript plugin remove` | Plugin dependency and host registration | Workspace glue, plugin registries, Aspire helpers | AppHost and plugin service/runtime discovery | `install --dry-run`; others no |
 | `netscript generate plugins` | Installed plugin manifests and project source | `.netscript/generated` plugin registries | Plugin host and generated imports | `--dry-run` |
 | `netscript generate runtime-schemas` | Runtime topic declarations | Runtime-config JSON Schema files | Editors, validators, runtime override tooling | `--dry-run` |
-| `netscript generate aspire` | Root `appsettings.json` | AppHost helper files and `.netscript/aspire-cli.ts` | Aspire AppHost and telemetry tasks | `--dry-run` |
+| `netscript generate aspire` | Root `appsettings.json` | AppHost helper files and `.netscript/aspire-cli.ts` | Aspire AppHost and telemetry tasks | No |
 | `netscript ui:init` / `netscript ui:add` | Registry selection | Workspace-owned components, pages, islands, styles, and tokens | Fresh app and its Vite build | No |
 | `netscript ui:update` / `netscript ui:remove` | Installed registry inventory and unmodified copied files | Updated or removed copy-source UI files | Fresh app and its Vite build | No |
 | `netscript deploy build` / target `plan` | Deployment manifest plus project entrypoints | Target deployment artifacts or an emitted plan | Target runtime or service manager | `plan` is non-deploying |
