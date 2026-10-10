@@ -23,7 +23,8 @@ surface reported by `deno doc`. For the full index of packages and plugins retur
 > - **Listener-readiness health checks (`addHealthCheck` / `withHealthCheck`):** backing-infrastructure
 >   contracts define credential-free listener-readiness probes — a TCP socket connect for
 >   Postgres/MySQL/MSSQL, and a RESP `PING` → `+PONG` exchange for Redis/Garnet over `node:net` with a
->   2000 ms timeout.
+>   2000 ms timeout. Container PostgreSQL also gets a `<name>_auth` credential check (see
+>   [Credential readiness](#credential-readiness-postgresql)).
 > - **Typed resource commands (`CommandOptions.Arguments`):** `<db>-cli` resources define typed
 >   command shapes — `migrate` (with `--timeout <seconds>`), `seed`, and `reset` (guarded by
 >   `--confirm true`) — in the generated TypeScript AppHost definitions.
@@ -67,6 +68,29 @@ blocks on the evaluated health state, and `aspire describe --format Json` expose
 resource. Scraping a container log for a readiness phrase will report success before the endpoint is
 usable, which is the failure this contract exists to prevent. Treat `healthReports: {}` — no check
 registered — as *unknown* rather than healthy.
+
+### Credential readiness (PostgreSQL)
+
+A listener accepts the socket before the server accepts a login, so `<name>_listener` cannot tell
+a wrong password from a ready database. For each container PostgreSQL resource the generated
+helper therefore registers a second check, `<name>_auth`, beside the listener check. Each
+evaluation makes one authenticated `SELECT 1` through the [`pg`](https://node-postgres.com/)
+client, bounded at 2000 ms. The scaffold adds `pg` to the AppHost's `package.json`, and
+`netscript db add` adds it when PostgreSQL joins an existing project.
+
+- **Healthy** reads `postgres credentials accepted on <host>:<port>`.
+- **Unhealthy** reads `postgres credential check failed: <class> <code> at <host>:<port> after <n> ms`,
+  with `data` holding only `class`, `code`, `host`, `port` and `elapsedMs`. The `class` is derived
+  from SQLSTATE and socket codes only: `auth` (`28P01` wrong password, `28000` unknown role),
+  `database` (`3D000`), `starting` (`57P03`), `server`, `listener`, `timeout` or `client` (no `pg`
+  installed).
+- **No credential bytes.** The check never reports the password, the role or any server or driver
+  message text. It takes the same in-memory value as the resource's secret password parameter,
+  so the generated helper contains no literal credential.
+
+Aspire's PostgreSQL integration also attaches its own `<name>_check` (an Npgsql `SELECT 1`), whose
+description is the driver's raw message. `<name>_auth` is the classified, credential-free signal to
+build on. MySQL and SQL Server have listener readiness only for now.
 
 ## Diagnostics (root export)
 
