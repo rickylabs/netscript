@@ -1,7 +1,7 @@
 /**
  * #1726 runtime proof: a wrong PostgreSQL password is reported as an auth-classified
  * `Unhealthy` credential check while the listener stays Healthy, `aspire wait` exits 18,
- * and neither the real nor the fixture password appears in Aspire's described state.
+ * and neither password appears in generated helpers, health evidence or MCP list_resources.
  */
 
 import {
@@ -17,6 +17,14 @@ import {
   type ListenerHealthReport,
   readListenerHealthReport,
 } from './verify-listener-readiness.ts';
+import {
+  assertGeneratedHelpersHaveNoSecrets,
+  assertHealthReportsHaveNoSecrets,
+  assertMcpResourcesHaveNoSecrets,
+  assertNoSecretBytes,
+} from './credential-secret-surfaces.ts';
+
+export { assertNoSecretBytes } from './credential-secret-surfaces.ts';
 
 const POSTGRES_RESOURCE = 'postgres';
 const POSTGRES_LISTENER_HEALTH_KEY = 'postgres_listener';
@@ -45,14 +53,14 @@ export interface BoundedWaitResult {
 
 /**
  * Require the wrong-credential report to be auth-classified, the real listener and credential
- * checks to stay Healthy, and the snapshot to carry no credential bytes.
+ * checks to stay Healthy, and all health evidence to carry no credential bytes.
  */
 export function assertCredentialRejectionEvidence(
   rawSnapshot: string,
   secrets: readonly string[],
 ): CredentialRejectionEvidence {
-  assertNoSecretBytes('aspire describe', rawSnapshot, secrets);
   const topology: unknown = JSON.parse(rawSnapshot);
+  assertHealthReportsHaveNoSecrets(topology, secrets);
   const rejected = readListenerHealthReport(
     topology,
     CREDENTIAL_FAULT_PROBE_RESOURCE,
@@ -106,14 +114,6 @@ export function assertBoundedWaitRejected(
   }
 }
 
-/** Fail when any credential appears in the text; the message never echoes the credential. */
-export function assertNoSecretBytes(label: string, text: string, secrets: readonly string[]): void {
-  for (const [index, secret] of secrets.entries()) {
-    if (secret.length < 8) throw new Error(`credential #${index} is too short to scan for`);
-    if (text.includes(secret)) throw new Error(`${label} output contains credential #${index}`);
-  }
-}
-
 /** Observe the probe's Unhealthy transition, then attribute it from one settled snapshot. */
 export async function verifyCredentialRejection(
   appHost: string,
@@ -135,7 +135,6 @@ export async function verifyCredentialRejection(
     assertNoSecretBytes('aspire describe', snapshot.output, secrets);
     throw new Error(`aspire describe failed (${snapshot.code}): ${snapshot.output}`);
   }
-  assertNoSecretBytes('aspire describe diagnostics', snapshot.output, secrets);
   const evidence = assertCredentialRejectionEvidence(snapshot.stdout, secrets);
 
   const wait = await runAspire([
@@ -149,6 +148,8 @@ export async function verifyCredentialRejection(
     appHost,
   ]);
   assertBoundedWaitRejected(wait, secrets);
+  await assertGeneratedHelpersHaveNoSecrets(projectRoot, secrets);
+  await assertMcpResourcesHaveNoSecrets(projectRoot, appHost, secrets);
 
   const receiptDir = `${projectRoot}/.netscript/e2e`;
   const receiptPath = `${receiptDir}/credential-rejection-receipt.json`;
@@ -161,6 +162,11 @@ export async function verifyCredentialRejection(
           ...evidence,
           boundedWait: { code: wait.code, durationMs: wait.durationMs },
           scannedCredentials: secrets.length,
+          scannedSurfaces: [
+            'generated helpers',
+            'healthReports / healthChecks',
+            'MCP list_resources',
+          ],
         },
         null,
         2,

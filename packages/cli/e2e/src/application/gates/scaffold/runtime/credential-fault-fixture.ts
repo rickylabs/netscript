@@ -48,11 +48,13 @@ export function injectCredentialFaultHealthCheck(source: string, wrongPassword: 
   const end = (attachments[0].index ?? 0) + statement.length;
   const block = [
     `${indentation}// #1726 E2E: live listener, deliberately wrong password, separate probe resource.`,
-    `${indentation}builder.addHealthCheck('${TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY}', createPostgresCredentialReadinessCheck({ endpoint: () => ${serverBinding}.getEndpoint('tcp'), password: '${wrongPassword}' }));`,
+    `${indentation}const credential_fault_password = JSON.parse(await readCredentialFaultState(\`\${appHostDir}/${CREDENTIAL_FAULT_STATE_FILE}\`, 'utf8')).wrongPassword;`,
+    `${indentation}builder.addHealthCheck('${TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY}', createPostgresCredentialReadinessCheck({ endpoint: () => ${serverBinding}.getEndpoint('tcp'), password: credential_fault_password }));`,
     `${indentation}const credential_fault_probe = builder.addExecutable('${CREDENTIAL_FAULT_PROBE_RESOURCE}', 'deno', \`\${appHostDir}/${CREDENTIAL_FAULT_PROBE_DIR}\`, ['task', 'start']);`,
     `${indentation}await credential_fault_probe.withHealthCheck('${TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY}');`,
   ].join('\n');
-  return `${source.slice(0, end)}\n${block}${source.slice(end)}`;
+  return `import { readFile as readCredentialFaultState } from 'node:fs/promises';\n` +
+    `${source.slice(0, end)}\n${block}${source.slice(end)}`;
 }
 
 /** Create a fresh wrong password; 32 hex characters, never derived from the real one. */

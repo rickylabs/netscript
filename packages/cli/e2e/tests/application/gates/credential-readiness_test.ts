@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from '@std/assert';
 import { delay } from '@std/async/delay';
 
 import { generateRegisterInfrastructure } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
@@ -15,6 +15,11 @@ import {
 } from '../../../src/application/gates/scaffold/runtime/credential-fault-fixture.ts';
 import { createCredentialReadinessGates } from '../../../src/application/gates/scaffold/runtime/credential-readiness-gates.ts';
 import { injectListenerFaultHealthChecks } from '../../../src/application/gates/scaffold/runtime/prepare-readiness-fixture.ts';
+import {
+  assertGeneratedHelpersHaveNoSecrets,
+  assertHealthReportsHaveNoSecrets,
+  assertMcpTranscriptHasNoSecrets,
+} from '../../../src/application/gates/scaffold/runtime/credential-secret-surfaces.ts';
 import {
   ASPIRE_WAIT_TIMEOUT_EXIT_CODE,
   assertBoundedWaitRejected,
@@ -72,18 +77,18 @@ Deno.test('credential fault splice reuses the generated postgres_auth server bin
 
   assertEquals(attachment > 0, true);
   assertStringIncludes(
-    lines[attachment + 2],
+    lines[attachment + 3],
     `builder.addHealthCheck('${TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY}', ` +
       `createPostgresCredentialReadinessCheck({ endpoint: () => db_0_server.getEndpoint('tcp'), ` +
-      `password: '${WRONG_PASSWORD}' }));`,
+      'password: credential_fault_password }));',
   );
   assertStringIncludes(
-    lines[attachment + 3],
+    lines[attachment + 4],
     `builder.addExecutable('${CREDENTIAL_FAULT_PROBE_RESOURCE}', 'deno', ` +
       '`${appHostDir}/.netscript/e2e/credential-fault-probe`',
   );
   assertStringIncludes(
-    lines[attachment + 4],
+    lines[attachment + 5],
     `await credential_fault_probe.withHealthCheck('${TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY}');`,
   );
   // The fault never touches the real database's checks.
@@ -94,6 +99,8 @@ Deno.test('credential fault splice reuses the generated postgres_auth server bin
     ),
     [],
   );
+  assertEquals(injected.includes(WRONG_PASSWORD), false);
+  assertStringIncludes(injected, 'readCredentialFaultState');
   assertStringIncludes(injected, 'appHostDir: string');
   assertStringIncludes(injected, 'createPostgresCredentialReadinessCheck,');
 });
@@ -163,15 +170,68 @@ Deno.test('rejection evidence refuses a non-auth failure or a degraded real serv
   );
 });
 
-Deno.test('rejection evidence fails on credential bytes without echoing them', () => {
+Deno.test('describe environment projection is deferred to #2259; health descriptions still fail', () => {
   for (const secret of SECRETS) {
-    const leaked = snapshot({ extraEnvironment: `Password=${secret}` });
+    assertCredentialRejectionEvidence(
+      snapshot({ extraEnvironment: `Password=${secret}` }),
+      SECRETS,
+    );
     const error = assertThrows(
-      () => assertCredentialRejectionEvidence(leaked, SECRETS),
+      () => assertCredentialRejectionEvidence(snapshot({ rejectedDescription: secret }), SECRETS),
       Error,
-      'output contains credential',
+      'health evidence output contains credential',
     );
     assertEquals(error.message.includes(secret), false);
+  }
+});
+
+Deno.test('scoped secret scan rejects each credential in helpers, all health evidence and MCP', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  try {
+    await Deno.mkdir(`${projectRoot}/aspire/.helpers/nested`, { recursive: true });
+    for (const secret of SECRETS) {
+      await Deno.writeTextFile(`${projectRoot}/aspire/.helpers/nested/probe.mts`, secret);
+      const helperError = await assertRejects(
+        () => assertGeneratedHelpersHaveNoSecrets(projectRoot, SECRETS),
+        Error,
+        'generated helper output contains credential',
+      );
+      assertEquals(helperError.message.includes(secret), false);
+      for (const key of ['healthReports', 'healthChecks', 'healthCheckDescriptions']) {
+        for (const field of ['description', 'data', 'exception']) {
+          const healthError = assertThrows(
+            () =>
+              assertHealthReportsHaveNoSecrets({
+                resources: [
+                  { name: 'unselected-resource', [key]: { other_check: { [field]: secret } } },
+                ],
+              }, SECRETS),
+            Error,
+            'health evidence output contains credential',
+          );
+          assertEquals(healthError.message.includes(secret), false);
+        }
+      }
+      const mcpError = assertThrows(
+        () =>
+          assertMcpTranscriptHasNoSecrets(
+            [
+              { direction: 'response', message: { result: { content: [{ text: secret }] } } },
+            ],
+            SECRETS,
+          ),
+        Error,
+        'MCP list_resources output contains credential',
+      );
+      assertEquals(mcpError.message.includes(secret), false);
+    }
+    await Deno.writeTextFile(
+      `${projectRoot}/aspire/.helpers/nested/probe.mts`,
+      '// no literal secret',
+    );
+    await assertGeneratedHelpersHaveNoSecrets(projectRoot, SECRETS);
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
   }
 });
 
