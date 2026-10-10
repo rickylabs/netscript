@@ -1,0 +1,1156 @@
+{
+  "schemaVersion": 1,
+  "repo": "rickylabs/netscript",
+  "milestone": "0.0.8",
+  "capturedAt": "2026-10-09T20:53:47.000Z",
+  "baselineMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
+  "ownerRatifiedAt": "2026-10-09T19:18:42.000Z",
+  "ownerRatification": {
+    "at": "2026-10-09T19:18:42.000Z",
+    "ratifiedBy": "owner (rickylabs / Eric)",
+    "instrument": "Owner delegation in the #2103 /swarm brief (2026-10-08/09): run Step 0, obtain one gpt-6.1-sol PLAN-EVAL, post the summary, and stop only if a decision changes what wave 1 builds \u2014 otherwise take the coordinator recommendation, write it on the issue and continue. Owner message 2026-10-09 approved admitting the 13 same-day issues (+#2111 by operator relay) into their planned canaries.",
+    "planEval": {
+      "verdict": "APPROVED",
+      "at": "2026-10-09T19:18:14Z",
+      "evaluator": "gpt-6.1-sol high via codex exec (thread <session-id>)",
+      "rounds": [
+        "CHANGES_REQUESTED (sandbox read failure)",
+        "CHANGES_REQUESTED (6 later-wave findings; wave 1 confirmed)",
+        "APPROVED"
+      ]
+    }
+  },
+  "sources": {
+    "targetMilestone": true,
+    "unmilestoned": true,
+    "backlog": true,
+    "laterMilestones": true
+  },
+  "candidates": [
+    {
+      "number": 1362,
+      "title": "fix(scaffold/service): generated services have no internal layering \u2014 the v1 router template teaches ORM-in-handler and `deno task test` fails on an empty tree",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1362"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1364,
+      "title": "docs(orchestration-runtime): outbound webhook delivery has no recipe or template \u2014 triggers ship inbound ingress only, so every product hand-rolls signing, retry and dead-lettering",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1364"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1366,
+      "title": "fix(plugins): every declareHealthChecks returns only the API resource \u2014 a crash-looping background child leaves the declared health surface green",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1366"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1367,
+      "title": "fix(streams): STREAMS_DATA_DIR is set by nothing the framework generates, so \"durable streams\" is always in-memory",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1367"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1369,
+      "title": "fix(plugins): two defects shipped as documented caveats \u2014 WORKER_CONCURRENCY never reaches the runtime, and @netscript/plugin-streams root exports always throw",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1369"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1372,
+      "title": "test(e2e): the merge-readiness gate probes API health only \u2014 background children and streams go unverified, and a saga stuck compensating is reported COMPENSATED",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1372"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1382,
+      "title": "fix(scaffold): the generated service ships `/api` unprotected and a framework test codifies public API routes as correct",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1382"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1383,
+      "title": "fix(plugin): `createPluginService` has no auth seam, so every first-party plugin API is unguardable by construction",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1383"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1384,
+      "title": "fix(auth): `POST /api/v1/auth/signout` revokes any session id an unauthenticated caller supplies",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1384"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1385,
+      "title": "fix(auth): oRPC `signin`/`callback` discard the backend `Set-Cookie`, so the interactive browser flow can never establish a session",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1385"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1386,
+      "title": "fix(service): the default CORS policy is `origin: '*'`, which makes credentialed browser calls impossible on every generated and plugin service",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1386"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1388,
+      "title": "test(e2e): the scaffold runtime auth gate proves only that an unauthenticated request succeeds",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1388"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1655,
+      "title": "chore(workers): eliminate 20 private-type-ref diagnostics from the published export surface",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1655"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1667,
+      "title": "test(queue): eliminate typed-queue DLQ timing flake",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1667"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1670,
+      "title": "docs(sdk): align cache-first loaders on action-then-metadata and document the warm-stale persistence-failure shape",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1670"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1681,
+      "title": "fix(workers): queue dispatch path drops CORRELATION_ID/TRACEPARENT env injection for task subprocesses",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1681"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1682,
+      "title": "fix(queue): named queues collide on a shared local Deno KV database \u2014 listeners consume each other's messages",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1682"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1684,
+      "title": "fix(workers): documented web-worker/subprocess runner modes are unimplemented \u2014 docs truthing or Tier-3 pool implementation",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1684"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1688,
+      "title": "fresh-ui: useDialog/useSheet never call showModal(), so every Dialog opens non-modally",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1688"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1690,
+      "title": "docs(reference/sdk): align error-handling emphasis between the reference page and package JSDoc",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1690"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1708,
+      "title": "docs(mcp): clear baseline private-type-ref errors across the export map",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1708"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1726,
+      "title": "[aspire-13-5 S6b] Protocol/credential-level readiness for backing services (0.0.8 follow-up to S6)",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1726"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1742,
+      "title": "fix(cli): Garnet executable arm binds host port 6379 regardless of Aspire allocation",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1742"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1765,
+      "title": "docs(packages): 116 published JSDoc examples reference undeclared application-side names",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1765"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1766,
+      "title": "fix(packages): 20 published JSDoc examples do not type-check against their documented signature",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1766"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1767,
+      "title": "test(contracts): harden the baseContract initializer pin against identifier rebinding and annotation-span brittleness",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1767"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1786,
+      "title": "fix(logger): LoggingPlugin correlates request IDs via shared closure state, so concurrent requests cross-attribute",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1786"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1825,
+      "title": "fix(sagas): unresolved-endpoint rejection carries a bare `no-endpoint` reason that names none of the keys it tried",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1825"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1826,
+      "title": "test(sagas): no coverage proves publish survives unavailable API, restart, duplicate publish, or out-of-order delivery",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1826"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1849,
+      "title": "chore(aspire): migrate NetScript to Garnet 2.x \u2014 arms are split across 1.1.1 and 1.1.10 while 2.1.5 is current",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1849"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1893,
+      "title": "fix(tooling): check:aspire-host-ports passes on runtime literal service URLs its own S5 test rejects",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1893"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1896,
+      "title": "feat(plugin): validate root composition collisions and dependency closure",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1896"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1912,
+      "title": "feat(cli): expose non-mutating plugin and Aspire generated-surface parity",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1912"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1939,
+      "title": "fix(docs): the `@app/router.ts` README fence pair is deferred on fixture-drift risk, not impossibility",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1939"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1990,
+      "title": "fix(sagas): .compensate() results are never persisted \u2014 an instance that compensates rests at `compensating` forever",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1990"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1996,
+      "title": "fix(cli): --no-aspire init emits netscript.config.ts but every command reads appsettings.json, so the generated project cannot be operated",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1996"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1999,
+      "title": "bug(auth): OpenAPI GET me rejects empty request before authentication",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1999"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2007,
+      "title": "feat(cli): agent init misses its host, ships no OpenCode MCP config, and is never run by init \u2014 agents silently work without MCP",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2007"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2008,
+      "title": "fix(cli): agent init mirrors the whole .agents/skills tree into .claude/skills and ships no CLAUDE.md \u2014 the repo's own pattern is a one-file bridge plus @AGENTS.md",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2008"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2009,
+      "title": "docs/cli: renaming or moving a route is undocumented, unsupported by CLI verbs, and misdocumented as type-safe",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2009"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2010,
+      "title": "mcp: get_doc \"bounded summary\" is truncation, not summarization",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2010"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2013,
+      "title": "contract list reports 'service paired' from a directory-existence check, not from a registered handler",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2013"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2018,
+      "title": "sdk: createServiceClient cannot resolve a service URL on React Native, and the pure resolver that would fix it is unexported",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2018"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2021,
+      "title": "aspire generator: `register-background.mts` is emitted with unused local bindings when no background processors are configured",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2021"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2024,
+      "title": "aspire: a generated project silently cannot reach its own provisioned containers when the Docker daemon is not local, and nothing reports it",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2024"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2025,
+      "title": "auth: GET /api/v1/auth/me answers an unauthenticated request with a 400 input-validation error instead of an authentication outcome",
+      "source": "targetMilestone",
+      "decision": "exclude",
+      "reason": "Duplicate of canonical #1999 (same 400 at auth.contract.ts:340, reproduced in-process on 39cb712); evidence and extra acceptance carried into #1999; closed 2026-10-09.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2025",
+        "https://github.com/rickylabs/netscript/issues/2025",
+        "https://github.com/rickylabs/netscript/issues/1999"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2026,
+      "title": "auth-kv-oauth: assertHttps is proxy-blind while deriveHttps is proxy-aware, so the OAuth flow refuses any TLS-terminating-proxy deployment",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2026"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2027,
+      "title": "doctor: `plugin_registry` reports a missing registry and prescribes a remedy the generator provably cannot satisfy",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2027"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2028,
+      "title": "config: a service's port can be pinned, a plugin's cannot \u2014 and the auth plugin hosts an OAuth callback",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2028"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2029,
+      "title": "fix(cli): generated aspire-cli.ts invokes `aspire` by bare name, so a version-managed toolchain cannot run it \u2014 and the file says DO NOT EDIT",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2029"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2030,
+      "title": "fix(cli): `generate resource` resolves the contract from --client, not --procedure, so it cannot scaffold against a multi-namespace service",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2030"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2031,
+      "title": "fix(sdk): createServiceClient erases the contract error map, so isDefinedError narrows to never",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2031"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2032,
+      "title": "fix(auth): non-OIDC providers get the session id as their subject, and the plugin exposes no way to change it",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2032"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2033,
+      "title": "auth: no device authorization grant (RFC 8628) in the default auth adapter",
+      "source": "targetMilestone",
+      "decision": "defer",
+      "reason": "Bounded-scope decision (#2103): net-new RFC 8628 capability, not a regression; needs #2032's stable subject first and queues behind five same-file auth fixes; no bounded single leaf fits 0.0.8. Moved to 0.0.9 with the decision recorded on the issue.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2033",
+        "https://github.com/rickylabs/netscript/issues/2033",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2036,
+      "title": "fix(ai): keep published TanStack adapter ranges peer-compatible with AI core",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2036"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2039,
+      "title": "fix(fresh/sdk): align TanStack DB adapter family; mixed Collection runtimes crash stream-query SSR",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2039"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2040,
+      "title": "fix(fresh): route.href hides useContext and corrupts island hook order / navigation",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2040"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2041,
+      "title": "Desktop SDK 0.0.7: window-scoped pending receive prevents client reconnection after document reload",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2041"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2063,
+      "title": "fix(ai/anthropic): Claude 5.5 IDs rejected locally on 0.0.7; qualify forward-compatible model support",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2063"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2064,
+      "title": "service/sdk: no documented internal (service-to-service) procedure lane; nothing provisions the credential and the OpenAPI projection is an easy bypass",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2064"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2065,
+      "title": "service: defineService has no middleware slot and @netscript/service has no request-body size limit",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2065"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2066,
+      "title": "plugin-workers-core: JobContext has no AbortSignal or deadline, so handlers cannot observe timeout, shutdown or cancel",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2066"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2067,
+      "title": "fresh/ai: durable chat transcript appends carry no producer identity/epoch, so stale writers cannot be fenced",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2067"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2068,
+      "title": "fresh/ai: createNetScriptChatConnection.send narrows UIMessages to text, blocking adoption of the #1583 single-subscriber fix",
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Open 0.0.8 issue re-read against baseline main; acceptance still unmet.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2068"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2120,
+      "title": "bug(auth): me ignores bearer credentials that /session honors on kv-oauth",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate release-critical; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2120",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T20:41:00.000Z"
+    },
+    {
+      "number": 2095,
+      "title": "database: harden PostgreSQL command error classification and tidy #2093 docs",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate release-critical; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2095",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2098,
+      "title": "feat(streams): stream retention seam (create-time TTL, delete/head admin port) in plugin-streams-core",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate high-value-coherent; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2098",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2099,
+      "title": "fix(kv): MemoryKvAdapter.atomic returns a versionstamp no entry has (CAS after commit always fails)",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate release-critical; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2099",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2100,
+      "title": "sdk: supported React Native / Expo runtime: service client, fetch-based durable stream source, live-query binding",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate high-value-coherent; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2100",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2101,
+      "title": "fix(kv): RedisKvAdapter.watch holds back a received change, and a stale debounce timer drops queued ones",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate release-critical; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2101",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2102,
+      "title": "fix(mcp): find_guidance matches on stop words, so sentence-length intents miss the right page",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate high-value-coherent; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2102",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2104,
+      "title": "database: Postgres connection-string normalizer that preserves TLS or refuses (ADO.NET/Npgsql form)",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate release-critical; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2104",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2105,
+      "title": "service/auth: createContractAuthorizer denies raw routes mounted under the guarded prefix; no authentication-only seam for them",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate release-critical; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2105",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2106,
+      "title": "service: rate-limit stage for anonymous routes, and expose the client remote address",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate high-value-coherent; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2106",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2107,
+      "title": "logger: add handle/prompt to RPC debug redaction and make the fragments configurable",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate release-critical; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2107",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2108,
+      "title": "feat(plugins): a supported KV-only install for workers, sagas and triggers",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate high-value-coherent; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2108",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2109,
+      "title": "fix(plugins): retention for the KV runtime stores of sagas, workers and triggers",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate release-critical; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2109",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2110,
+      "title": "feat(workers): a stdin payload channel for polyglot tasks",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate high-value-coherent; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2110",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:51:00.000Z"
+    },
+    {
+      "number": 2111,
+      "title": "sdk: createQueryFactories rejects a client whose bearer contribution context is required",
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "Owner-approved admission 2026-10-09; predicate high-value-coherent; lane/canary per wave plan.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2111",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.8",
+      "movedAt": "2026-10-09T18:55:26.000Z"
+    },
+    {
+      "number": 1668,
+      "title": "#1668",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "stale freshness report candidate; owner plan \u00a7 All Unassigned: run exact-main freshness then close or re-intake \u2014 not 0.0.8 stabilization",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1668",
+        "https://github.com/rickylabs/netscript/issues/1668"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1676,
+      "title": "#1676",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "framework chart primitive expansion \u2014 Backlog per owner plan",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1676",
+        "https://github.com/rickylabs/netscript/issues/1676"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1689,
+      "title": "#1689",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "command-palette primitive \u2014 Backlog per owner plan",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1689",
+        "https://github.com/rickylabs/netscript/issues/1689"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1698,
+      "title": "#1698",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "MCP 2026 foundation epic \u2014 Backlog until RFC/DAG rebaseline",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1698",
+        "https://github.com/rickylabs/netscript/issues/1698"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1699,
+      "title": "#1699",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "MCP 2026 S1 \u2014 keep with epic in Backlog",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1699",
+        "https://github.com/rickylabs/netscript/issues/1699"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1700,
+      "title": "#1700",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "MCP 2026 S2 \u2014 Backlog",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1700",
+        "https://github.com/rickylabs/netscript/issues/1700"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1701,
+      "title": "#1701",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "MCP 2026 S3 \u2014 Backlog",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1701",
+        "https://github.com/rickylabs/netscript/issues/1701"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1702,
+      "title": "#1702",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "MCP 2026 S4 \u2014 Backlog",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1702",
+        "https://github.com/rickylabs/netscript/issues/1702"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1703,
+      "title": "#1703",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "MCP 2026 S5 \u2014 Backlog",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1703",
+        "https://github.com/rickylabs/netscript/issues/1703"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1704,
+      "title": "#1704",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "MCP 2026 S6 \u2014 Backlog",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1704",
+        "https://github.com/rickylabs/netscript/issues/1704"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1705,
+      "title": "#1705",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "mixed framework/Harness umbrella \u2014 split before scheduling",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1705",
+        "https://github.com/rickylabs/netscript/issues/1705"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1706,
+      "title": "#1706",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "Harness native routes \u2014 #2052 destination",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1706",
+        "https://github.com/rickylabs/netscript/issues/1706"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2011,
+      "title": "#2011",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "Harness delegation matrix \u2014 excluded (Harness/internal)",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2011",
+        "https://github.com/rickylabs/netscript/issues/2011"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2012,
+      "title": "#2012",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "Harness retired-id registry \u2014 excluded",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2012",
+        "https://github.com/rickylabs/netscript/issues/2012"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2015,
+      "title": "#2015",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "Harness matrix CLI \u2014 excluded",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2015",
+        "https://github.com/rickylabs/netscript/issues/2015"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 2023,
+      "title": "#2023",
+      "source": "unmilestoned",
+      "decision": "exclude",
+      "reason": "doctor host inference \u2014 Harness WSL doctor per owner plan; excluded",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2023",
+        "https://github.com/rickylabs/netscript/issues/2023"
+      ],
+      "ownerRatified": true
+    }
+  ]
+}

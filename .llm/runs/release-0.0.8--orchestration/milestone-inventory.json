@@ -1,0 +1,572 @@
+{
+  "schemaVersion": 1,
+  "repo": "rickylabs/netscript",
+  "milestone": "0.0.8",
+  "capturedAt": "2026-10-09T20:53:47.000Z",
+  "baselineMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
+  "ownerRatifiedAt": "2026-10-09T19:18:42.000Z",
+  "targetIssueCount": 79,
+  "issues": [
+    {
+      "number": 1362,
+      "title": "fix(scaffold/service): generated services have no internal layering \u2014 the v1 router template teaches ORM-in-handler and `deno task test` fails on an empty tree",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F19"
+    },
+    {
+      "number": 1364,
+      "title": "docs(orchestration-runtime): outbound webhook delivery has no recipe or template \u2014 triggers ship inbound ingress only, so every product hand-rolls signing, retry and dead-lettering",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F23"
+    },
+    {
+      "number": 1366,
+      "title": "fix(plugins): every declareHealthChecks returns only the API resource \u2014 a crash-looping background child leaves the declared health surface green",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F14"
+    },
+    {
+      "number": 1367,
+      "title": "fix(streams): STREAMS_DATA_DIR is set by nothing the framework generates, so \"durable streams\" is always in-memory",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F13"
+    },
+    {
+      "number": 1369,
+      "title": "fix(plugins): two defects shipped as documented caveats \u2014 WORKER_CONCURRENCY never reaches the runtime, and @netscript/plugin-streams root exports always throw",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F11"
+    },
+    {
+      "number": 1372,
+      "title": "test(e2e): the merge-readiness gate probes API health only \u2014 background children and streams go unverified, and a saga stuck compensating is reported COMPENSATED",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F14"
+    },
+    {
+      "number": 1382,
+      "title": "fix(scaffold): the generated service ships `/api` unprotected and a framework test codifies public API routes as correct",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F02"
+    },
+    {
+      "number": 1383,
+      "title": "fix(plugin): `createPluginService` has no auth seam, so every first-party plugin API is unguardable by construction",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F02"
+    },
+    {
+      "number": 1384,
+      "title": "fix(auth): `POST /api/v1/auth/signout` revokes any session id an unauthenticated caller supplies",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F03"
+    },
+    {
+      "number": 1385,
+      "title": "fix(auth): oRPC `signin`/`callback` discard the backend `Set-Cookie`, so the interactive browser flow can never establish a session",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F04"
+    },
+    {
+      "number": 1386,
+      "title": "fix(service): the default CORS policy is `origin: '*'`, which makes credentialed browser calls impossible on every generated and plugin service",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F04"
+    },
+    {
+      "number": 1388,
+      "title": "test(e2e): the scaffold runtime auth gate proves only that an unauthenticated request succeeds",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F05"
+    },
+    {
+      "number": 1655,
+      "title": "chore(workers): eliminate 20 private-type-ref diagnostics from the published export surface",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F20"
+    },
+    {
+      "number": 1667,
+      "title": "test(queue): eliminate typed-queue DLQ timing flake",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F10"
+    },
+    {
+      "number": 1670,
+      "title": "docs(sdk): align cache-first loaders on action-then-metadata and document the warm-stale persistence-failure shape",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F21"
+    },
+    {
+      "number": 1681,
+      "title": "fix(workers): queue dispatch path drops CORRELATION_ID/TRACEPARENT env injection for task subprocesses",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F11"
+    },
+    {
+      "number": 1682,
+      "title": "fix(queue): named queues collide on a shared local Deno KV database \u2014 listeners consume each other's messages",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F10"
+    },
+    {
+      "number": 1684,
+      "title": "fix(workers): documented web-worker/subprocess runner modes are unimplemented \u2014 docs truthing or Tier-3 pool implementation",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F21"
+    },
+    {
+      "number": 1688,
+      "title": "fresh-ui: useDialog/useSheet never call showModal(), so every Dialog opens non-modally",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F08"
+    },
+    {
+      "number": 1690,
+      "title": "docs(reference/sdk): align error-handling emphasis between the reference page and package JSDoc",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F21"
+    },
+    {
+      "number": 1708,
+      "title": "docs(mcp): clear baseline private-type-ref errors across the export map",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F20"
+    },
+    {
+      "number": 1726,
+      "title": "[aspire-13-5 S6b] Protocol/credential-level readiness for backing services (0.0.8 follow-up to S6)",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F17"
+    },
+    {
+      "number": 1742,
+      "title": "fix(cli): Garnet executable arm binds host port 6379 regardless of Aspire allocation",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F17"
+    },
+    {
+      "number": 1765,
+      "title": "docs(packages): 116 published JSDoc examples reference undeclared application-side names",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F20"
+    },
+    {
+      "number": 1766,
+      "title": "fix(packages): 20 published JSDoc examples do not type-check against their documented signature",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F20"
+    },
+    {
+      "number": 1767,
+      "title": "test(contracts): harden the baseContract initializer pin against identifier rebinding and annotation-span brittleness",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F28"
+    },
+    {
+      "number": 1786,
+      "title": "fix(logger): LoggingPlugin correlates request IDs via shared closure state, so concurrent requests cross-attribute",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F28"
+    },
+    {
+      "number": 1825,
+      "title": "fix(sagas): unresolved-endpoint rejection carries a bare `no-endpoint` reason that names none of the keys it tried",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F12"
+    },
+    {
+      "number": 1826,
+      "title": "test(sagas): no coverage proves publish survives unavailable API, restart, duplicate publish, or out-of-order delivery",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F12"
+    },
+    {
+      "number": 1849,
+      "title": "chore(aspire): migrate NetScript to Garnet 2.x \u2014 arms are split across 1.1.1 and 1.1.10 while 2.1.5 is current",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F17"
+    },
+    {
+      "number": 1893,
+      "title": "fix(tooling): check:aspire-host-ports passes on runtime literal service URLs its own S5 test rejects",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F17"
+    },
+    {
+      "number": 1896,
+      "title": "feat(plugin): validate root composition collisions and dependency closure",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F16"
+    },
+    {
+      "number": 1912,
+      "title": "feat(cli): expose non-mutating plugin and Aspire generated-surface parity",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F16"
+    },
+    {
+      "number": 1939,
+      "title": "fix(docs): the `@app/router.ts` README fence pair is deferred on fixture-drift risk, not impossibility",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F20"
+    },
+    {
+      "number": 1990,
+      "title": "fix(sagas): .compensate() results are never persisted \u2014 an instance that compensates rests at `compensating` forever",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F12"
+    },
+    {
+      "number": 1996,
+      "title": "fix(cli): --no-aspire init emits netscript.config.ts but every command reads appsettings.json, so the generated project cannot be operated",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F15"
+    },
+    {
+      "number": 1999,
+      "title": "bug(auth): OpenAPI GET me rejects empty request before authentication",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F03"
+    },
+    {
+      "number": 2007,
+      "title": "feat(cli): agent init misses its host, ships no OpenCode MCP config, and is never run by init \u2014 agents silently work without MCP",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F18"
+    },
+    {
+      "number": 2008,
+      "title": "fix(cli): agent init mirrors the whole .agents/skills tree into .claude/skills and ships no CLAUDE.md \u2014 the repo's own pattern is a one-file bridge plus @AGENTS.md",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F18"
+    },
+    {
+      "number": 2009,
+      "title": "docs/cli: renaming or moving a route is undocumented, unsupported by CLI verbs, and misdocumented as type-safe",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F19"
+    },
+    {
+      "number": 2010,
+      "title": "mcp: get_doc \"bounded summary\" is truncation, not summarization",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F24"
+    },
+    {
+      "number": 2013,
+      "title": "contract list reports 'service paired' from a directory-existence check, not from a registered handler",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F18"
+    },
+    {
+      "number": 2018,
+      "title": "sdk: createServiceClient cannot resolve a service URL on React Native, and the pure resolver that would fix it is unexported",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F07"
+    },
+    {
+      "number": 2021,
+      "title": "aspire generator: `register-background.mts` is emitted with unused local bindings when no background processors are configured",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F15"
+    },
+    {
+      "number": 2024,
+      "title": "aspire: a generated project silently cannot reach its own provisioned containers when the Docker daemon is not local, and nothing reports it",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F17"
+    },
+    {
+      "number": 2025,
+      "title": "auth: GET /api/v1/auth/me answers an unauthenticated request with a 400 input-validation error instead of an authentication outcome",
+      "disposition": "close-duplicate",
+      "lane": null,
+      "reason": "Duplicate of canonical #1999 (same 400 at auth.contract.ts:340, reproduced in-process on 39cb712); evidence and extra acceptance carried into #1999; closed 2026-10-09.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2025",
+        "https://github.com/rickylabs/netscript/issues/1999"
+      ]
+    },
+    {
+      "number": 2026,
+      "title": "auth-kv-oauth: assertHttps is proxy-blind while deriveHttps is proxy-aware, so the OAuth flow refuses any TLS-terminating-proxy deployment",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F04"
+    },
+    {
+      "number": 2027,
+      "title": "doctor: `plugin_registry` reports a missing registry and prescribes a remedy the generator provably cannot satisfy",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F16"
+    },
+    {
+      "number": 2028,
+      "title": "config: a service's port can be pinned, a plugin's cannot \u2014 and the auth plugin hosts an OAuth callback",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F17"
+    },
+    {
+      "number": 2029,
+      "title": "fix(cli): generated aspire-cli.ts invokes `aspire` by bare name, so a version-managed toolchain cannot run it \u2014 and the file says DO NOT EDIT",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F15"
+    },
+    {
+      "number": 2030,
+      "title": "fix(cli): `generate resource` resolves the contract from --client, not --procedure, so it cannot scaffold against a multi-namespace service",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F15"
+    },
+    {
+      "number": 2031,
+      "title": "fix(sdk): createServiceClient erases the contract error map, so isDefinedError narrows to never",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F07"
+    },
+    {
+      "number": 2032,
+      "title": "fix(auth): non-OIDC providers get the session id as their subject, and the plugin exposes no way to change it",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F03"
+    },
+    {
+      "number": 2033,
+      "title": "auth: no device authorization grant (RFC 8628) in the default auth adapter",
+      "disposition": "move",
+      "lane": null,
+      "reason": "Bounded-scope decision (#2103): net-new RFC 8628 capability, not a regression; needs #2032's stable subject first and queues behind five same-file auth fixes; no bounded single leaf fits 0.0.8. Moved to 0.0.9 with the decision recorded on the issue.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/2033",
+        "https://github.com/rickylabs/netscript/issues/2103"
+      ]
+    },
+    {
+      "number": 2036,
+      "title": "fix(ai): keep published TanStack adapter ranges peer-compatible with AI core",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F09v"
+    },
+    {
+      "number": 2039,
+      "title": "fix(fresh/sdk): align TanStack DB adapter family; mixed Collection runtimes crash stream-query SSR",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F09v"
+    },
+    {
+      "number": 2040,
+      "title": "fix(fresh): route.href hides useContext and corrupts island hook order / navigation",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F08v"
+    },
+    {
+      "number": 2041,
+      "title": "Desktop SDK 0.0.7: window-scoped pending receive prevents client reconnection after document reload",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F07v"
+    },
+    {
+      "number": 2063,
+      "title": "fix(ai/anthropic): Claude 5.5 IDs rejected locally on 0.0.7; qualify forward-compatible model support",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F09v"
+    },
+    {
+      "number": 2064,
+      "title": "service/sdk: no documented internal (service-to-service) procedure lane; nothing provisions the credential and the OpenAPI projection is an easy bypass",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F25"
+    },
+    {
+      "number": 2065,
+      "title": "service: defineService has no middleware slot and @netscript/service has no request-body size limit",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F26"
+    },
+    {
+      "number": 2066,
+      "title": "plugin-workers-core: JobContext has no AbortSignal or deadline, so handlers cannot observe timeout, shutdown or cancel",
+      "disposition": "active",
+      "lane": "docs",
+      "group": "F11"
+    },
+    {
+      "number": 2067,
+      "title": "fresh/ai: durable chat transcript appends carry no producer identity/epoch, so stale writers cannot be fenced",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F13"
+    },
+    {
+      "number": 2068,
+      "title": "fresh/ai: createNetScriptChatConnection.send narrows UIMessages to text, blocking adoption of the #1583 single-subscriber fix",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F22"
+    },
+    {
+      "number": 2095,
+      "title": "database: harden PostgreSQL command error classification and tidy #2093 docs",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F32f"
+    },
+    {
+      "number": 2098,
+      "title": "feat(streams): stream retention seam (create-time TTL, delete/head admin port) in plugin-streams-core",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F13"
+    },
+    {
+      "number": 2099,
+      "title": "fix(kv): MemoryKvAdapter.atomic returns a versionstamp no entry has (CAS after commit always fails)",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F10"
+    },
+    {
+      "number": 2100,
+      "title": "sdk: supported React Native / Expo runtime: service client, fetch-based durable stream source, live-query binding",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F07f"
+    },
+    {
+      "number": 2101,
+      "title": "fix(kv): RedisKvAdapter.watch holds back a received change, and a stale debounce timer drops queued ones",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F10"
+    },
+    {
+      "number": 2102,
+      "title": "fix(mcp): find_guidance matches on stop words, so sentence-length intents miss the right page",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F24f"
+    },
+    {
+      "number": 2104,
+      "title": "database: Postgres connection-string normalizer that preserves TLS or refuses (ADO.NET/Npgsql form)",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F32f"
+    },
+    {
+      "number": 2105,
+      "title": "service/auth: createContractAuthorizer denies raw routes mounted under the guarded prefix; no authentication-only seam for them",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F02"
+    },
+    {
+      "number": 2106,
+      "title": "service: rate-limit stage for anonymous routes, and expose the client remote address",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F26f"
+    },
+    {
+      "number": 2107,
+      "title": "logger: add handle/prompt to RPC debug redaction and make the fragments configurable",
+      "disposition": "active",
+      "lane": "internals",
+      "group": "F28"
+    },
+    {
+      "number": 2108,
+      "title": "feat(plugins): a supported KV-only install for workers, sagas and triggers",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F14"
+    },
+    {
+      "number": 2109,
+      "title": "fix(plugins): retention for the KV runtime stores of sagas, workers and triggers",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F14"
+    },
+    {
+      "number": 2110,
+      "title": "feat(workers): a stdin payload channel for polyglot tasks",
+      "disposition": "active",
+      "lane": "features",
+      "group": "F14"
+    },
+    {
+      "number": 2111,
+      "title": "sdk: createQueryFactories rejects a client whose bearer contribution context is required",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F07"
+    },
+    {
+      "number": 2120,
+      "title": "bug(auth): me ignores bearer credentials that /session honors on kv-oauth",
+      "disposition": "active",
+      "lane": "fixes",
+      "group": "F03"
+    }
+  ]
+}

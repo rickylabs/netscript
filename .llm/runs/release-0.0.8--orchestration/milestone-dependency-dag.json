@@ -1,0 +1,1011 @@
+{
+  "schemaVersion": 1,
+  "milestone": "0.0.8",
+  "baselineMainSha": "39cb712b631a0922e0674f40e75224cffcc70549",
+  "nodes": [
+    {
+      "id": "issue:1362",
+      "kind": "issue",
+      "issueNumber": 1362,
+      "lane": "features",
+      "title": "fix(scaffold/service): generated services have no internal layering \u2014 the v1 router template teaches ORM-in-handler and `deno task test` fails on an empty tree"
+    },
+    {
+      "id": "issue:1364",
+      "kind": "issue",
+      "issueNumber": 1364,
+      "lane": "features",
+      "title": "docs(orchestration-runtime): outbound webhook delivery has no recipe or template \u2014 triggers ship inbound ingress only, so every product hand-rolls signing, retry and dead-lettering"
+    },
+    {
+      "id": "issue:1366",
+      "kind": "issue",
+      "issueNumber": 1366,
+      "lane": "internals",
+      "title": "fix(plugins): every declareHealthChecks returns only the API resource \u2014 a crash-looping background child leaves the declared health surface green"
+    },
+    {
+      "id": "issue:1367",
+      "kind": "issue",
+      "issueNumber": 1367,
+      "lane": "fixes",
+      "title": "fix(streams): STREAMS_DATA_DIR is set by nothing the framework generates, so \"durable streams\" is always in-memory"
+    },
+    {
+      "id": "issue:1369",
+      "kind": "issue",
+      "issueNumber": 1369,
+      "lane": "fixes",
+      "title": "fix(plugins): two defects shipped as documented caveats \u2014 WORKER_CONCURRENCY never reaches the runtime, and @netscript/plugin-streams root exports always throw"
+    },
+    {
+      "id": "issue:1372",
+      "kind": "issue",
+      "issueNumber": 1372,
+      "lane": "internals",
+      "title": "test(e2e): the merge-readiness gate probes API health only \u2014 background children and streams go unverified, and a saga stuck compensating is reported COMPENSATED"
+    },
+    {
+      "id": "issue:1382",
+      "kind": "issue",
+      "issueNumber": 1382,
+      "lane": "fixes",
+      "title": "fix(scaffold): the generated service ships `/api` unprotected and a framework test codifies public API routes as correct"
+    },
+    {
+      "id": "issue:1383",
+      "kind": "issue",
+      "issueNumber": 1383,
+      "lane": "internals",
+      "title": "fix(plugin): `createPluginService` has no auth seam, so every first-party plugin API is unguardable by construction"
+    },
+    {
+      "id": "issue:1384",
+      "kind": "issue",
+      "issueNumber": 1384,
+      "lane": "fixes",
+      "title": "fix(auth): `POST /api/v1/auth/signout` revokes any session id an unauthenticated caller supplies"
+    },
+    {
+      "id": "issue:1385",
+      "kind": "issue",
+      "issueNumber": 1385,
+      "lane": "fixes",
+      "title": "fix(auth): oRPC `signin`/`callback` discard the backend `Set-Cookie`, so the interactive browser flow can never establish a session"
+    },
+    {
+      "id": "issue:1386",
+      "kind": "issue",
+      "issueNumber": 1386,
+      "lane": "fixes",
+      "title": "fix(service): the default CORS policy is `origin: '*'`, which makes credentialed browser calls impossible on every generated and plugin service"
+    },
+    {
+      "id": "issue:1388",
+      "kind": "issue",
+      "issueNumber": 1388,
+      "lane": "internals",
+      "title": "test(e2e): the scaffold runtime auth gate proves only that an unauthenticated request succeeds"
+    },
+    {
+      "id": "issue:1655",
+      "kind": "issue",
+      "issueNumber": 1655,
+      "lane": "docs",
+      "title": "chore(workers): eliminate 20 private-type-ref diagnostics from the published export surface"
+    },
+    {
+      "id": "issue:1667",
+      "kind": "issue",
+      "issueNumber": 1667,
+      "lane": "fixes",
+      "title": "test(queue): eliminate typed-queue DLQ timing flake"
+    },
+    {
+      "id": "issue:1670",
+      "kind": "issue",
+      "issueNumber": 1670,
+      "lane": "docs",
+      "title": "docs(sdk): align cache-first loaders on action-then-metadata and document the warm-stale persistence-failure shape"
+    },
+    {
+      "id": "issue:1681",
+      "kind": "issue",
+      "issueNumber": 1681,
+      "lane": "fixes",
+      "title": "fix(workers): queue dispatch path drops CORRELATION_ID/TRACEPARENT env injection for task subprocesses"
+    },
+    {
+      "id": "issue:1682",
+      "kind": "issue",
+      "issueNumber": 1682,
+      "lane": "fixes",
+      "title": "fix(queue): named queues collide on a shared local Deno KV database \u2014 listeners consume each other's messages"
+    },
+    {
+      "id": "issue:1684",
+      "kind": "issue",
+      "issueNumber": 1684,
+      "lane": "docs",
+      "title": "fix(workers): documented web-worker/subprocess runner modes are unimplemented \u2014 docs truthing or Tier-3 pool implementation"
+    },
+    {
+      "id": "issue:1688",
+      "kind": "issue",
+      "issueNumber": 1688,
+      "lane": "fixes",
+      "title": "fresh-ui: useDialog/useSheet never call showModal(), so every Dialog opens non-modally"
+    },
+    {
+      "id": "issue:1690",
+      "kind": "issue",
+      "issueNumber": 1690,
+      "lane": "docs",
+      "title": "docs(reference/sdk): align error-handling emphasis between the reference page and package JSDoc"
+    },
+    {
+      "id": "issue:1708",
+      "kind": "issue",
+      "issueNumber": 1708,
+      "lane": "docs",
+      "title": "docs(mcp): clear baseline private-type-ref errors across the export map"
+    },
+    {
+      "id": "issue:1726",
+      "kind": "issue",
+      "issueNumber": 1726,
+      "lane": "fixes",
+      "title": "[aspire-13-5 S6b] Protocol/credential-level readiness for backing services (0.0.8 follow-up to S6)"
+    },
+    {
+      "id": "issue:1742",
+      "kind": "issue",
+      "issueNumber": 1742,
+      "lane": "fixes",
+      "title": "fix(cli): Garnet executable arm binds host port 6379 regardless of Aspire allocation"
+    },
+    {
+      "id": "issue:1765",
+      "kind": "issue",
+      "issueNumber": 1765,
+      "lane": "docs",
+      "title": "docs(packages): 116 published JSDoc examples reference undeclared application-side names"
+    },
+    {
+      "id": "issue:1766",
+      "kind": "issue",
+      "issueNumber": 1766,
+      "lane": "docs",
+      "title": "fix(packages): 20 published JSDoc examples do not type-check against their documented signature"
+    },
+    {
+      "id": "issue:1767",
+      "kind": "issue",
+      "issueNumber": 1767,
+      "lane": "internals",
+      "title": "test(contracts): harden the baseContract initializer pin against identifier rebinding and annotation-span brittleness"
+    },
+    {
+      "id": "issue:1786",
+      "kind": "issue",
+      "issueNumber": 1786,
+      "lane": "internals",
+      "title": "fix(logger): LoggingPlugin correlates request IDs via shared closure state, so concurrent requests cross-attribute"
+    },
+    {
+      "id": "issue:1825",
+      "kind": "issue",
+      "issueNumber": 1825,
+      "lane": "fixes",
+      "title": "fix(sagas): unresolved-endpoint rejection carries a bare `no-endpoint` reason that names none of the keys it tried"
+    },
+    {
+      "id": "issue:1826",
+      "kind": "issue",
+      "issueNumber": 1826,
+      "lane": "fixes",
+      "title": "test(sagas): no coverage proves publish survives unavailable API, restart, duplicate publish, or out-of-order delivery"
+    },
+    {
+      "id": "issue:1849",
+      "kind": "issue",
+      "issueNumber": 1849,
+      "lane": "fixes",
+      "title": "chore(aspire): migrate NetScript to Garnet 2.x \u2014 arms are split across 1.1.1 and 1.1.10 while 2.1.5 is current"
+    },
+    {
+      "id": "issue:1893",
+      "kind": "issue",
+      "issueNumber": 1893,
+      "lane": "internals",
+      "title": "fix(tooling): check:aspire-host-ports passes on runtime literal service URLs its own S5 test rejects"
+    },
+    {
+      "id": "issue:1896",
+      "kind": "issue",
+      "issueNumber": 1896,
+      "lane": "features",
+      "title": "feat(plugin): validate root composition collisions and dependency closure"
+    },
+    {
+      "id": "issue:1912",
+      "kind": "issue",
+      "issueNumber": 1912,
+      "lane": "features",
+      "title": "feat(cli): expose non-mutating plugin and Aspire generated-surface parity"
+    },
+    {
+      "id": "issue:1939",
+      "kind": "issue",
+      "issueNumber": 1939,
+      "lane": "docs",
+      "title": "fix(docs): the `@app/router.ts` README fence pair is deferred on fixture-drift risk, not impossibility"
+    },
+    {
+      "id": "issue:1990",
+      "kind": "issue",
+      "issueNumber": 1990,
+      "lane": "fixes",
+      "title": "fix(sagas): .compensate() results are never persisted \u2014 an instance that compensates rests at `compensating` forever"
+    },
+    {
+      "id": "issue:1996",
+      "kind": "issue",
+      "issueNumber": 1996,
+      "lane": "fixes",
+      "title": "fix(cli): --no-aspire init emits netscript.config.ts but every command reads appsettings.json, so the generated project cannot be operated"
+    },
+    {
+      "id": "issue:1999",
+      "kind": "issue",
+      "issueNumber": 1999,
+      "lane": "fixes",
+      "title": "bug(auth): OpenAPI GET me rejects empty request before authentication"
+    },
+    {
+      "id": "issue:2007",
+      "kind": "issue",
+      "issueNumber": 2007,
+      "lane": "features",
+      "title": "feat(cli): agent init misses its host, ships no OpenCode MCP config, and is never run by init \u2014 agents silently work without MCP"
+    },
+    {
+      "id": "issue:2008",
+      "kind": "issue",
+      "issueNumber": 2008,
+      "lane": "features",
+      "title": "fix(cli): agent init mirrors the whole .agents/skills tree into .claude/skills and ships no CLAUDE.md \u2014 the repo's own pattern is a one-file bridge plus @AGENTS.md"
+    },
+    {
+      "id": "issue:2009",
+      "kind": "issue",
+      "issueNumber": 2009,
+      "lane": "features",
+      "title": "docs/cli: renaming or moving a route is undocumented, unsupported by CLI verbs, and misdocumented as type-safe"
+    },
+    {
+      "id": "issue:2010",
+      "kind": "issue",
+      "issueNumber": 2010,
+      "lane": "features",
+      "title": "mcp: get_doc \"bounded summary\" is truncation, not summarization"
+    },
+    {
+      "id": "issue:2013",
+      "kind": "issue",
+      "issueNumber": 2013,
+      "lane": "features",
+      "title": "contract list reports 'service paired' from a directory-existence check, not from a registered handler"
+    },
+    {
+      "id": "issue:2018",
+      "kind": "issue",
+      "issueNumber": 2018,
+      "lane": "fixes",
+      "title": "sdk: createServiceClient cannot resolve a service URL on React Native, and the pure resolver that would fix it is unexported"
+    },
+    {
+      "id": "issue:2021",
+      "kind": "issue",
+      "issueNumber": 2021,
+      "lane": "fixes",
+      "title": "aspire generator: `register-background.mts` is emitted with unused local bindings when no background processors are configured"
+    },
+    {
+      "id": "issue:2024",
+      "kind": "issue",
+      "issueNumber": 2024,
+      "lane": "fixes",
+      "title": "aspire: a generated project silently cannot reach its own provisioned containers when the Docker daemon is not local, and nothing reports it"
+    },
+    {
+      "id": "issue:2026",
+      "kind": "issue",
+      "issueNumber": 2026,
+      "lane": "fixes",
+      "title": "auth-kv-oauth: assertHttps is proxy-blind while deriveHttps is proxy-aware, so the OAuth flow refuses any TLS-terminating-proxy deployment"
+    },
+    {
+      "id": "issue:2027",
+      "kind": "issue",
+      "issueNumber": 2027,
+      "lane": "features",
+      "title": "doctor: `plugin_registry` reports a missing registry and prescribes a remedy the generator provably cannot satisfy"
+    },
+    {
+      "id": "issue:2028",
+      "kind": "issue",
+      "issueNumber": 2028,
+      "lane": "docs",
+      "title": "config: a service's port can be pinned, a plugin's cannot \u2014 and the auth plugin hosts an OAuth callback"
+    },
+    {
+      "id": "issue:2029",
+      "kind": "issue",
+      "issueNumber": 2029,
+      "lane": "fixes",
+      "title": "fix(cli): generated aspire-cli.ts invokes `aspire` by bare name, so a version-managed toolchain cannot run it \u2014 and the file says DO NOT EDIT"
+    },
+    {
+      "id": "issue:2030",
+      "kind": "issue",
+      "issueNumber": 2030,
+      "lane": "fixes",
+      "title": "fix(cli): `generate resource` resolves the contract from --client, not --procedure, so it cannot scaffold against a multi-namespace service"
+    },
+    {
+      "id": "issue:2031",
+      "kind": "issue",
+      "issueNumber": 2031,
+      "lane": "fixes",
+      "title": "fix(sdk): createServiceClient erases the contract error map, so isDefinedError narrows to never"
+    },
+    {
+      "id": "issue:2032",
+      "kind": "issue",
+      "issueNumber": 2032,
+      "lane": "fixes",
+      "title": "fix(auth): non-OIDC providers get the session id as their subject, and the plugin exposes no way to change it"
+    },
+    {
+      "id": "issue:2036",
+      "kind": "issue",
+      "issueNumber": 2036,
+      "lane": "internals",
+      "title": "fix(ai): keep published TanStack adapter ranges peer-compatible with AI core"
+    },
+    {
+      "id": "issue:2039",
+      "kind": "issue",
+      "issueNumber": 2039,
+      "lane": "internals",
+      "title": "fix(fresh/sdk): align TanStack DB adapter family; mixed Collection runtimes crash stream-query SSR"
+    },
+    {
+      "id": "issue:2040",
+      "kind": "issue",
+      "issueNumber": 2040,
+      "lane": "internals",
+      "title": "fix(fresh): route.href hides useContext and corrupts island hook order / navigation"
+    },
+    {
+      "id": "issue:2041",
+      "kind": "issue",
+      "issueNumber": 2041,
+      "lane": "internals",
+      "title": "Desktop SDK 0.0.7: window-scoped pending receive prevents client reconnection after document reload"
+    },
+    {
+      "id": "issue:2063",
+      "kind": "issue",
+      "issueNumber": 2063,
+      "lane": "internals",
+      "title": "fix(ai/anthropic): Claude 5.5 IDs rejected locally on 0.0.7; qualify forward-compatible model support"
+    },
+    {
+      "id": "issue:2064",
+      "kind": "issue",
+      "issueNumber": 2064,
+      "lane": "features",
+      "title": "service/sdk: no documented internal (service-to-service) procedure lane; nothing provisions the credential and the OpenAPI projection is an easy bypass"
+    },
+    {
+      "id": "issue:2065",
+      "kind": "issue",
+      "issueNumber": 2065,
+      "lane": "features",
+      "title": "service: defineService has no middleware slot and @netscript/service has no request-body size limit"
+    },
+    {
+      "id": "issue:2066",
+      "kind": "issue",
+      "issueNumber": 2066,
+      "lane": "docs",
+      "title": "plugin-workers-core: JobContext has no AbortSignal or deadline, so handlers cannot observe timeout, shutdown or cancel"
+    },
+    {
+      "id": "issue:2067",
+      "kind": "issue",
+      "issueNumber": 2067,
+      "lane": "fixes",
+      "title": "fresh/ai: durable chat transcript appends carry no producer identity/epoch, so stale writers cannot be fenced"
+    },
+    {
+      "id": "issue:2068",
+      "kind": "issue",
+      "issueNumber": 2068,
+      "lane": "features",
+      "title": "fresh/ai: createNetScriptChatConnection.send narrows UIMessages to text, blocking adoption of the #1583 single-subscriber fix"
+    },
+    {
+      "id": "issue:2095",
+      "kind": "issue",
+      "issueNumber": 2095,
+      "lane": "fixes",
+      "title": "database: harden PostgreSQL command error classification and tidy #2093 docs"
+    },
+    {
+      "id": "issue:2098",
+      "kind": "issue",
+      "issueNumber": 2098,
+      "lane": "features",
+      "title": "feat(streams): stream retention seam (create-time TTL, delete/head admin port) in plugin-streams-core"
+    },
+    {
+      "id": "issue:2099",
+      "kind": "issue",
+      "issueNumber": 2099,
+      "lane": "fixes",
+      "title": "fix(kv): MemoryKvAdapter.atomic returns a versionstamp no entry has (CAS after commit always fails)"
+    },
+    {
+      "id": "issue:2100",
+      "kind": "issue",
+      "issueNumber": 2100,
+      "lane": "features",
+      "title": "sdk: supported React Native / Expo runtime: service client, fetch-based durable stream source, live-query binding"
+    },
+    {
+      "id": "issue:2101",
+      "kind": "issue",
+      "issueNumber": 2101,
+      "lane": "fixes",
+      "title": "fix(kv): RedisKvAdapter.watch holds back a received change, and a stale debounce timer drops queued ones"
+    },
+    {
+      "id": "issue:2102",
+      "kind": "issue",
+      "issueNumber": 2102,
+      "lane": "fixes",
+      "title": "fix(mcp): find_guidance matches on stop words, so sentence-length intents miss the right page"
+    },
+    {
+      "id": "issue:2104",
+      "kind": "issue",
+      "issueNumber": 2104,
+      "lane": "fixes",
+      "title": "database: Postgres connection-string normalizer that preserves TLS or refuses (ADO.NET/Npgsql form)"
+    },
+    {
+      "id": "issue:2105",
+      "kind": "issue",
+      "issueNumber": 2105,
+      "lane": "fixes",
+      "title": "service/auth: createContractAuthorizer denies raw routes mounted under the guarded prefix; no authentication-only seam for them"
+    },
+    {
+      "id": "issue:2106",
+      "kind": "issue",
+      "issueNumber": 2106,
+      "lane": "features",
+      "title": "service: rate-limit stage for anonymous routes, and expose the client remote address"
+    },
+    {
+      "id": "issue:2107",
+      "kind": "issue",
+      "issueNumber": 2107,
+      "lane": "internals",
+      "title": "logger: add handle/prompt to RPC debug redaction and make the fragments configurable"
+    },
+    {
+      "id": "issue:2108",
+      "kind": "issue",
+      "issueNumber": 2108,
+      "lane": "features",
+      "title": "feat(plugins): a supported KV-only install for workers, sagas and triggers"
+    },
+    {
+      "id": "issue:2109",
+      "kind": "issue",
+      "issueNumber": 2109,
+      "lane": "fixes",
+      "title": "fix(plugins): retention for the KV runtime stores of sagas, workers and triggers"
+    },
+    {
+      "id": "issue:2110",
+      "kind": "issue",
+      "issueNumber": 2110,
+      "lane": "features",
+      "title": "feat(workers): a stdin payload channel for polyglot tasks"
+    },
+    {
+      "id": "issue:2111",
+      "kind": "issue",
+      "issueNumber": 2111,
+      "lane": "fixes",
+      "title": "sdk: createQueryFactories rejects a client whose bearer contribution context is required"
+    },
+    {
+      "id": "issue:2120",
+      "kind": "issue",
+      "issueNumber": 2120,
+      "lane": "fixes",
+      "title": "bug(auth): me ignores bearer credentials that /session honors on kv-oauth"
+    }
+  ],
+  "edges": [
+    {
+      "from": "issue:2065",
+      "to": "issue:2064",
+      "kind": "requires",
+      "reason": "serialize: packages/service builder and service auth-policy shape"
+    },
+    {
+      "from": "issue:2065",
+      "to": "issue:1386",
+      "kind": "requires",
+      "reason": "serialize: define-service.ts; CORS allowlist builds on the new middleware slot"
+    },
+    {
+      "from": "issue:1386",
+      "to": "issue:1382",
+      "kind": "requires",
+      "reason": "#1382 app-call leaf needs #1386's ratified browser topology; define-service.ts"
+    },
+    {
+      "from": "issue:2064",
+      "to": "issue:1382",
+      "kind": "requires",
+      "reason": "serialize: service auth policy shape"
+    },
+    {
+      "from": "issue:1999",
+      "to": "issue:1384",
+      "kind": "requires",
+      "reason": "serialize: auth.contract.ts + plugins/auth HTTP tests"
+    },
+    {
+      "from": "issue:1384",
+      "to": "issue:2026",
+      "kind": "requires",
+      "reason": "serialize: auth contract/service files"
+    },
+    {
+      "from": "issue:2032",
+      "to": "issue:2026",
+      "kind": "requires",
+      "reason": "serialize: auth-kv-oauth flow + backend-registry.ts"
+    },
+    {
+      "from": "issue:2026",
+      "to": "issue:1385",
+      "kind": "requires",
+      "reason": "serialize: auth contract + kv-oauth flow; cookie round trip after transport policy"
+    },
+    {
+      "from": "issue:1384",
+      "to": "issue:1385",
+      "kind": "requires",
+      "reason": "serialize: auth service signout/signin handlers"
+    },
+    {
+      "from": "issue:2031",
+      "to": "issue:2018",
+      "kind": "requires",
+      "reason": "serialize: sdk ports/service-client.ts"
+    },
+    {
+      "from": "issue:1999",
+      "to": "issue:2120",
+      "kind": "requires",
+      "reason": "serialize: me route + auth contract; bearer me after empty-input me"
+    },
+    {
+      "from": "issue:2018",
+      "to": "issue:2111",
+      "kind": "requires",
+      "reason": "serialize: sdk service-client/query-factory typing"
+    },
+    {
+      "from": "issue:1384",
+      "to": "issue:1388",
+      "kind": "requires",
+      "reason": "runtime auth gate asserts ownership-checked signout negatives"
+    },
+    {
+      "from": "issue:1382",
+      "to": "issue:1388",
+      "kind": "requires",
+      "reason": "runtime auth gate asserts guarded generated service"
+    },
+    {
+      "from": "issue:1682",
+      "to": "issue:1667",
+      "kind": "requires",
+      "reason": "serialize: queue KV delivery; deterministic DLQ fixture on isolated named queues"
+    },
+    {
+      "from": "issue:1825",
+      "to": "issue:1826",
+      "kind": "requires",
+      "reason": "serialize: sagas publish path + its fault tests"
+    },
+    {
+      "from": "issue:1369",
+      "to": "issue:1367",
+      "kind": "requires",
+      "reason": "serialize: plugin-streams mod.ts + streams docs page"
+    },
+    {
+      "from": "issue:2067",
+      "to": "issue:2068",
+      "kind": "requires",
+      "reason": "serialize: toNetScriptChatResponse / chat transcript append path"
+    },
+    {
+      "from": "issue:2067",
+      "to": "issue:2098",
+      "kind": "requires",
+      "reason": "serialize: plugin-streams-core producer options and transport port"
+    },
+    {
+      "from": "issue:2065",
+      "to": "issue:2106",
+      "kind": "requires",
+      "reason": "rate-limit stage builds on the public middleware seam"
+    },
+    {
+      "from": "issue:2026",
+      "to": "issue:2106",
+      "kind": "requires",
+      "reason": "shares the explicit trusted-proxy policy (remote address vs forwarded headers)"
+    },
+    {
+      "from": "issue:1385",
+      "to": "issue:1386",
+      "kind": "requires",
+      "reason": "#1386 scaffold-topology leaf needs #1385's cookie round trip (L1)"
+    },
+    {
+      "from": "issue:1369",
+      "to": "issue:2066",
+      "kind": "requires",
+      "reason": "serialize: workers docs pages (signal/deadline docs after the concurrency rebaseline)"
+    },
+    {
+      "from": "issue:1369",
+      "to": "issue:1366",
+      "kind": "requires",
+      "reason": "serialize: workers-contribution.ts"
+    },
+    {
+      "from": "issue:1366",
+      "to": "issue:1372",
+      "kind": "requires",
+      "reason": "integrated E2E needs the background-child health contract"
+    },
+    {
+      "from": "issue:1990",
+      "to": "issue:1372",
+      "kind": "requires",
+      "reason": "integrated E2E needs persisted terminal compensation"
+    },
+    {
+      "from": "issue:1990",
+      "to": "issue:2109",
+      "kind": "requires",
+      "reason": "serialize: kv-saga-store writes (retention applies to the persisted compensation path)"
+    },
+    {
+      "from": "issue:2109",
+      "to": "issue:2108",
+      "kind": "requires",
+      "reason": "KV-only install must be bounded; serialize saga runner/store"
+    },
+    {
+      "from": "issue:1681",
+      "to": "issue:2110",
+      "kind": "requires",
+      "reason": "serialize: plugin-workers-core process runner"
+    },
+    {
+      "from": "issue:2018",
+      "to": "issue:2100",
+      "kind": "requires",
+      "reason": "#2100 builds on #2018's exported resolver (its own acceptance)"
+    },
+    {
+      "from": "issue:1996",
+      "to": "issue:2029",
+      "kind": "requires",
+      "reason": "serialize: plan-init.ts, workspace deno-json template, aspire-command-executor.ts"
+    },
+    {
+      "from": "issue:1896",
+      "to": "issue:1912",
+      "kind": "requires",
+      "reason": "serialize: plugin registry + generate aspire path; parity check runs composition validation"
+    },
+    {
+      "from": "issue:2029",
+      "to": "issue:1912",
+      "kind": "requires",
+      "reason": "serialize: generated aspire-cli/helper output changes #1912 parity inventory"
+    },
+    {
+      "from": "issue:1912",
+      "to": "issue:2027",
+      "kind": "requires",
+      "reason": "doctor remedy leaf 2 needs generator-owned parity"
+    },
+    {
+      "from": "issue:1893",
+      "to": "issue:1742",
+      "kind": "requires",
+      "reason": "serialize: check-aspire-host-ports.ts and its test"
+    },
+    {
+      "from": "issue:1742",
+      "to": "issue:1849",
+      "kind": "requires",
+      "reason": "serialize: Garnet arms in generate-register-infrastructure.ts"
+    },
+    {
+      "from": "issue:1996",
+      "to": "issue:1362",
+      "kind": "requires",
+      "reason": "serialize: init output + fixtures (F15 precedes F19)"
+    },
+    {
+      "from": "issue:2030",
+      "to": "issue:2009",
+      "kind": "requires",
+      "reason": "serialize: client-selector.ts used by web-scaffold.ts"
+    },
+    {
+      "from": "issue:2007",
+      "to": "issue:2008",
+      "kind": "requires",
+      "reason": "serialize: init-agent.ts"
+    },
+    {
+      "from": "issue:1369",
+      "to": "issue:1655",
+      "kind": "requires",
+      "reason": "serialize: workers bin/runtime.ts"
+    },
+    {
+      "from": "issue:2066",
+      "to": "issue:1655",
+      "kind": "requires",
+      "reason": "serialize: runtime-types.ts + shared debt entry"
+    },
+    {
+      "from": "issue:1369",
+      "to": "issue:1684",
+      "kind": "requires",
+      "reason": "serialize: workers docs pages (truth the runner after the concurrency rebaseline)"
+    },
+    {
+      "from": "issue:2031",
+      "to": "issue:1690",
+      "kind": "requires",
+      "reason": "error-handling docs can lead with isDefined narrowing only after #2031"
+    },
+    {
+      "from": "issue:1765",
+      "to": "issue:1766",
+      "kind": "requires",
+      "reason": "serialize: shared example files and ratchet"
+    },
+    {
+      "from": "issue:1786",
+      "to": "issue:1765",
+      "kind": "requires",
+      "reason": "serialize: logger example files"
+    },
+    {
+      "from": "issue:1682",
+      "to": "issue:1364",
+      "kind": "requires",
+      "reason": "webhook recipe's end-to-end proof needs isolated named queues"
+    },
+    {
+      "from": "issue:2102",
+      "to": "issue:2010",
+      "kind": "requires",
+      "reason": "serialize: packages/mcp docs flows"
+    },
+    {
+      "from": "issue:1708",
+      "to": "issue:2010",
+      "kind": "requires",
+      "reason": "serialize: MCP public export surface"
+    }
+  ],
+  "waves": [
+    {
+      "index": 1,
+      "title": "C3 wave 1 \u2014 critical-path seams: service middleware/body limit; finish #1383",
+      "nodeIds": [
+        "issue:2065",
+        "issue:1383"
+      ]
+    },
+    {
+      "index": 2,
+      "title": "C3 wave 2 \u2014 independent small fixes",
+      "nodeIds": [
+        "issue:1999",
+        "issue:2031",
+        "issue:2102",
+        "issue:1688",
+        "issue:2105"
+      ]
+    },
+    {
+      "index": 3,
+      "title": "C3 wave 3",
+      "nodeIds": [
+        "issue:2032",
+        "issue:2018",
+        "issue:1384",
+        "issue:2064",
+        "issue:2120"
+      ]
+    },
+    {
+      "index": 4,
+      "title": "C3 wave 4",
+      "nodeIds": [
+        "issue:2026",
+        "issue:2111"
+      ]
+    },
+    {
+      "index": 5,
+      "title": "C3 wave 5 \u2014 cookie round trip (L1); #1388-L1 HttpGate status/header primitive runs here as a Refs leaf",
+      "nodeIds": [
+        "issue:1385"
+      ]
+    },
+    {
+      "index": 6,
+      "title": "C3 wave 6 \u2014 browser topology (owner ratification)",
+      "nodeIds": [
+        "issue:1386"
+      ]
+    },
+    {
+      "index": 7,
+      "title": "C3 wave 7 \u2014 guarded-by-default generated services",
+      "nodeIds": [
+        "issue:1382"
+      ]
+    },
+    {
+      "index": 8,
+      "title": "C3 canary qualification \u2014 published-consumer checks after the owner cuts canary .3 (stable-only boxes close at release)",
+      "nodeIds": [
+        "issue:2036",
+        "issue:2039",
+        "issue:2040",
+        "issue:2041",
+        "issue:2063"
+      ]
+    },
+    {
+      "index": 9,
+      "title": "C4 wave 1",
+      "nodeIds": [
+        "issue:1388",
+        "issue:1682",
+        "issue:2099",
+        "issue:2101",
+        "issue:1681",
+        "issue:1990",
+        "issue:1825",
+        "issue:1767",
+        "issue:1786",
+        "issue:2107",
+        "issue:2095",
+        "issue:2104",
+        "issue:2067",
+        "issue:1369"
+      ]
+    },
+    {
+      "index": 10,
+      "title": "C4 wave 2",
+      "nodeIds": [
+        "issue:1667",
+        "issue:1826",
+        "issue:1367",
+        "issue:2068",
+        "issue:2098",
+        "issue:2106",
+        "issue:2066"
+      ]
+    },
+    {
+      "index": 11,
+      "title": "C5 wave 1",
+      "nodeIds": [
+        "issue:1366",
+        "issue:1996",
+        "issue:2030",
+        "issue:2021",
+        "issue:1896",
+        "issue:1893",
+        "issue:2024",
+        "issue:2028",
+        "issue:1726",
+        "issue:2109",
+        "issue:2110",
+        "issue:2100"
+      ]
+    },
+    {
+      "index": 12,
+      "title": "C5 wave 2",
+      "nodeIds": [
+        "issue:1372",
+        "issue:2029",
+        "issue:1742",
+        "issue:2108"
+      ]
+    },
+    {
+      "index": 13,
+      "title": "C5 wave 3",
+      "nodeIds": [
+        "issue:1912",
+        "issue:1849"
+      ]
+    },
+    {
+      "index": 14,
+      "title": "C5 wave 4",
+      "nodeIds": [
+        "issue:2027"
+      ]
+    },
+    {
+      "index": 15,
+      "title": "C6 wave 1",
+      "nodeIds": [
+        "issue:1362",
+        "issue:2009",
+        "issue:2007",
+        "issue:2013",
+        "issue:1655",
+        "issue:1708",
+        "issue:1765",
+        "issue:1939",
+        "issue:1670",
+        "issue:1690",
+        "issue:1684",
+        "issue:1364"
+      ]
+    },
+    {
+      "index": 16,
+      "title": "C6 wave 2",
+      "nodeIds": [
+        "issue:2008",
+        "issue:1766",
+        "issue:2010"
+      ]
+    }
+  ]
+}

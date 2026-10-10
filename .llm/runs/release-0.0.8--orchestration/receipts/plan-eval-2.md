@@ -1,0 +1,31 @@
+**[PHASE: PLAN-EVAL] [VERDICT: CHANGES_REQUESTED]**
+Wave 1 is sound, but acceptance, dependency ordering and merge enforcement still need correction.
+
+### Findings
+
+1. **Blocker — #1384 weakens live acceptance.** The plan rejects `everywhere:true`, while [#1384](https://github.com/rickylabs/netscript/issues/1384) requires it to revoke all sessions owned by the authenticated subject. Rejecting the operation does not deliver that behavior. **Fix:** implement subject-scoped global logout, or explicitly relocate the unchanged requirement to a linked follow-up with the parent’s acceptance reconciled. Keep any administrative revocation operation separate from ordinary signout’s ownership guarantee.
+
+2. **Major — missing leaf dependencies on the auth critical path.** The audit says #1382’s runtime 401 proof requires #1388’s status/header-aware HTTP gate, yet #1382 is W6 and #1388 is W8. W5 also contains both #1385 and #1386 although #1386-L4 requires #1385-L1, and #1385-L2 follows the topology decision. **Fix:** represent these as leaf dependencies: land #1388’s gate primitive before #1382, retain final conformance proof later, and explicitly order the cookie/topology leaves.
+
+3. **Major — shared-file serialization is incomplete.** #2029 and #1912 occupy W11 although regenerating the Aspire helper changes #1912’s output inventory and both touch the generation path. #1369 and #2066 also overlap worker documentation in W8. Checking for conflicts only before each wave does not protect two concurrent launches within it. **Fix:** add serialization constraints, including #2029 before #1912’s inventory leaf, and acquire file ownership before every leaf dispatch. Preserve the global two-implementer cap.
+
+4. **Major — publication-dependent closure is scheduled too early.** W7 follows canary .3, but #2063 expressly requires **stable** package publication; its leaf promises stable publication and closure there. #1912 additionally requires published Windows/Linux smoke. #2066 and #2068 retain publication-dependent acceptance. **Fix:** distinguish canary qualification from final closure, assign named release-verification ownership and capable hosts, and keep implementation PRs as `Refs` until remaining acceptance is proven. Stable-only criteria must not become a barrier to subsequent implementation waves.
+
+5. **Major — several live acceptance contracts remain impossible or inconsistent with the chosen implementation.** #1385 still mandates `outputStructure: 'detailed'` despite the selected header bag, and asks an incoming cookie to preserve attributes that are absent from the `Cookie` header. #1388 still requires public session introspection to return 401 and ancient-head red controls. #1849 says 2.1.x while the plan selects 2.2.1, with mutually exclusive adoption/deferral boxes conflicting with “zero unticked boxes.” **Fix:** amend these explicitly before dispatch, preserving both-projection cookie behavior, issuance-policy negatives, guarded-route negatives and evidence for the selected version/branch.
+
+6. **Major — the merge gate weakens the owner’s instruction.** The plan accepts answered threads; the [owner’s launch contract](https://github.com/rickylabs/netscript/issues/2103#issuecomment-6086943080) requires resolved threads. `check:review-threads` alone does not establish resolution. **Fix:** enforce resolution separately alongside exact-head CI, independent PASS/MERGE and pasted quality evidence. Also complete the blank leaf scopes for the 14 admissions and replace truncated table entries with reviewable scope, file ownership, size and acceptance/gate mappings.
+
+### Spot-checks
+
+- **Every open issue has one disposition → verified.** Live milestone membership is 76 delivery issues plus reference-only umbrella #2103. The active inventory matches exactly, without duplicates or omissions. All 14 admissions have recorded owner approval and coherent release-critical/high-value predicates.
+- **#2025 duplicate; #2033 moved → verified.** [Duplicate evidence](https://github.com/rickylabs/netscript/issues/2025#issuecomment-6087245759) is recorded; [#2033](https://github.com/rickylabs/netscript/issues/2033#issuecomment-6087410248) is live in 0.0.9.
+- **#2021 partially fixed → verified.** [#1998](https://github.com/rickylabs/netscript/pull/1998) supplies the empty-registration fix; baseline populated templates still emit unconditional DB/OTEL imports and bindings, consistent with the audit’s failing variants.
+- **#1999 remains valid → verified.** Baseline [`meRouteInput`](https://github.com/rickylabs/netscript/blob/39cb712/packages/plugin-auth-core/src/contracts/v1/auth.contract.ts#L340) remains `z.undefined().optional()`; the recorded REST/RPC reproduction supports the duplicate disposition.
+- **#1383 seam delivered, runtime coverage missing → verified.** [#2002](https://github.com/rickylabs/netscript/pull/2002)/[#2003](https://github.com/rickylabs/netscript/pull/2003) delivered the seam. Baseline suite membership includes the guarded gate only in the plugin suite.
+- **#2040/#2041 source-fixed awaiting publication → verified.** [#2090](https://github.com/rickylabs/netscript/pull/2090) and [#2091](https://github.com/rickylabs/netscript/pull/2091) merged after canary .2’s publication.
+- **Four bounded decisions preserve acceptance → verified.** #2010→#2112 and #1362→#2113 preserve deferred requirements; #1367 retains every box through branch B, with #2114 an enhancement. None changes wave 1.
+- **Golden rule 5, umbrella references, owner-only publication and no committed runs → verified in the plan.** Their enforcement must remain in dispatch and review.
+
+### Wave 1
+
+**Confirm #2065 + #1383.** They are bounded and independently mergeable as one complete PR each. #2065 must include the actual body limit, both projections and typed failure behavior. #1383 must include suite membership and the three named documentation updates, with the full scaffold-runtime CI execution at the exact PR head and the guarded gate **PASS, not SKIP**, in both tiers. The outstanding browser-topology decision blocks later auth work, not this pair.
