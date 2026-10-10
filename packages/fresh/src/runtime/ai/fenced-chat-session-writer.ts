@@ -28,9 +28,9 @@ import {
 import {
   ensureDurableChatSessionStream,
   sanitizeChunkForStorage,
-  toMessageEchoChunks,
 } from '@durable-streams/tanstack-ai-transport';
 import type { StreamProducerTransportFailureKindV1 } from '@netscript/plugin-streams-core';
+import { chatMessageChunks } from '../../internal/chat-message-replay.ts';
 import { type NetScriptChatProducer, NetScriptChatProducerError } from './chat-producer.ts';
 
 /**
@@ -94,11 +94,7 @@ export async function toFencedChatSessionResponse(
     createIfMissing: true,
   });
   const writer = new FencedChatSessionWriter(stream, input.producer);
-  await writer.writeEcho(
-    input.newMessages.flatMap((message) =>
-      toMessageEchoChunks(message as Parameters<typeof toMessageEchoChunks>[0])
-    ),
-  );
+  await writer.writeEcho(chatMessageChunks(input.newMessages));
   const writeAssistant = writer.pipe(input.source);
 
   if (input.mode === 'await') {

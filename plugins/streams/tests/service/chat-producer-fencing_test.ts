@@ -18,9 +18,11 @@ import { createStreamsProxyHandler } from '../../services/src/proxy.ts';
 import {
   type NetScriptChatMessage,
   resolveChatSessionUrl,
+  resolveChatSnapshot,
   toNetScriptChatResponse,
 } from '../../../../packages/fresh/src/runtime/ai/create-chat-connection.ts';
 import { NetScriptChatProducerError } from '../../../../packages/fresh/src/runtime/ai/chat-producer.ts';
+import { createChatMessageReplay } from '../../../../packages/fresh/src/internal/chat-message-replay.ts';
 
 interface RecordedAppend {
   readonly path: string;
@@ -180,7 +182,7 @@ const REPLAY_CHUNKS = [
   { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a-1', delta: 'three' },
   { type: 'TEXT_MESSAGE_END', messageId: 'a-1' },
 ];
-const ECHO_CHUNK_COUNT = 3;
+const ECHO_CHUNK_COUNT = 4;
 
 /** Yields each chunk after `delayMs`, so no two chunks share a producer linger window. */
 async function* paced(chunks: readonly unknown[], delayMs: number): AsyncIterable<unknown> {
@@ -282,7 +284,7 @@ Deno.test('fenced chat: the echo and the assistant chunks share one producer seq
   const appends = streams.appends;
   assertEquals(
     appends.map((append) => [append.producerId, append.epoch, append.seq, append.status]),
-    ['0', '1', '2', '3', '4', '5'].map((seq) => ['chat-turn:shared:t1', '7', seq, 200]),
+    ['0', '1', '2', '3', '4', '5', '6'].map((seq) => ['chat-turn:shared:t1', '7', seq, 200]),
   );
   assertEquals(
     appends.map((append) => [append.items.length, append.items[0].type, append.items[0].model]),
@@ -290,13 +292,100 @@ Deno.test('fenced chat: the echo and the assistant chunks share one producer seq
       [1, 'TEXT_MESSAGE_START', 'client'],
       [1, 'TEXT_MESSAGE_CONTENT', 'client'],
       [1, 'TEXT_MESSAGE_END', 'client'],
+      [1, 'CUSTOM', undefined],
       [1, 'TEXT_MESSAGE_START', undefined],
       [1, 'TEXT_MESSAGE_CONTENT', undefined],
       [1, 'TEXT_MESSAGE_END', undefined],
     ],
   );
   // Sanitized exactly like the unfenced path: stored content deltas drop `content`.
-  assertEquals('content' in appends[4].items[0], false);
+  assertEquals(appends[3].items[0].name, 'netscript.chat.messages');
+  assertEquals('content' in appends[5].items[0], false);
+});
+
+Deno.test('fenced chat: native tool parts and metadata survive storage and seed replay', async () => {
+  await using streams = await startStreamsService();
+  const nativeMessage = {
+    id: 'native-tool',
+    role: 'assistant' as const,
+    parts: [
+      { type: 'text' as const, content: 'Inspecting' },
+      {
+        type: 'tool-call' as const,
+        id: 'inspect-call',
+        name: 'inspect',
+        arguments: '{"path":"report.txt"}',
+        state: 'input-complete' as const,
+      },
+    ],
+    metadata: { trace: 'native-turn' },
+  };
+  const chatTarget = target(streams, 'native');
+  const response = await toNetScriptChatResponse({
+    target: chatTarget,
+    newMessages: [nativeMessage],
+    source: sourceOf(assistantChunks('reply', 'Done')),
+    mode: 'await',
+    producer: { id: 'chat-turn:native:t1', epoch: 0 },
+  });
+  assertEquals(response.status, 200);
+  const stored = parseItems(await streams.read(sessionPath(streams, 'native')));
+  const batches = stored.filter((chunk) => chunk.name === 'netscript.chat.messages');
+  assertEquals(batches.map((chunk) => chunk.value), [[nativeMessage]]);
+  const replay = createChatMessageReplay();
+  for (const chunk of stored) replay.apply(chunk);
+  assertEquals(replay.messages()[0], nativeMessage);
+  const seed = await resolveChatSnapshot({ target: chatTarget });
+  assertEquals(await resolveChatSnapshot({ target: chatTarget }), seed);
+  assertEquals(seed.messages.map((message) => message.content), ['Inspecting', 'Done']);
+  assert(seed.renderParts.some((part) => part.kind === 'tool' && part.toolName === 'inspect'));
+});
+
+Deno.test('fenced chat: a stale epoch cannot store a native-only batch', async () => {
+  await using streams = await startStreamsService();
+  const chatTarget = target(streams, 'native-stale');
+  const id = 'chat-turn:native-stale:t1';
+  await toNetScriptChatResponse({
+    target: chatTarget,
+    source: sourceOf(assistantChunks('winner', 'New claim')),
+    mode: 'await',
+    producer: { id, epoch: 2 },
+  });
+  const before = await streams.read(sessionPath(streams, 'native-stale'));
+  const appendsBefore = streams.appends.length;
+  let sourceStarted = false;
+  const zombieMessage = {
+    id: 'zombie-file',
+    role: 'user' as const,
+    parts: [{
+      type: 'file' as const,
+      source: { type: 'url' as const, url: 'https://example.com/file' },
+    }],
+    metadata: { trace: 'zombie' },
+  };
+  const error = await assertRejects(
+    () =>
+      toNetScriptChatResponse({
+        target: chatTarget,
+        newMessages: [zombieMessage],
+        source: (async function* () {
+          sourceStarted = true;
+          yield* sourceOf(assistantChunks('zombie', 'Late'));
+        })(),
+        mode: 'await',
+        producer: { id, epoch: 1 },
+      }),
+    NetScriptChatProducerError,
+  );
+  assertEquals([error.kind, error.currentEpoch], ['stale-epoch', 2]);
+  assertEquals(sourceStarted, false);
+  assertEquals(await streams.read(sessionPath(streams, 'native-stale')), before);
+  const nativeAppends = streams.appends.slice(appendsBefore).filter((append) =>
+    append.items[0]?.name === 'netscript.chat.messages'
+  );
+  assertEquals(nativeAppends.length, 1, 'the native-only batch must reach the epoch fence');
+  assertEquals(nativeAppends[0].items[0].value, [zombieMessage]);
+  assertEquals([nativeAppends[0].epoch, nativeAppends[0].status], ['1', 403]);
 });
 
 Deno.test('unfenced chat: native batches retain upstream chunk bytes without producer headers', async () => {

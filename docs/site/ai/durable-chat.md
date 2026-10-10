@@ -149,9 +149,12 @@ and throws.
 A chat turn that runs in the background — in a worker or saga under a service identity, not
 in a request an open app keeps alive — can be reclaimed: its lease expires, a new claim runs
 the turn again, and the old executor may still be writing. Pass `producer` to fence it.
-Every append (the `newMessages` echo and each assistant chunk) then carries one
+Every append (the text echoes, complete native `newMessages` batch, and each assistant
+chunk) then carries one
 durable-streams idempotent-producer sequence `(id, epoch, seq)`, and the streams service
-rejects a writer whose epoch is older than the newest one that has written.
+rejects a writer whose epoch is older than the newest one that has written. Fenced turns
+persist the same native message batch as the default path, including non-text parts and
+metadata.
 
 ```ts
 import { NetScriptChatProducerError, toNetScriptChatResponse } from "@netscript/fresh/ai";
@@ -181,7 +184,7 @@ try {
   generation, use that.
 - **A replay under the same pair is deduplicated chunk by chunk.** Each chunk is sent as
   its own producer batch, so its sequence number is its index in the turn (the
-  `newMessages` echo first, then the assistant chunks), however fast the source yields.
+  text echoes first, then the native batch, then the assistant chunks), however fast the source yields.
   Replaying the same turn under the same `(id, epoch)` therefore appends only the chunks an
   earlier call never stored, for example after the executor was interrupted. The service
   drops an already-stored index without comparing content, so use one id per turn.
@@ -196,8 +199,8 @@ try {
   `'sequence-gap'`, `'stream-closed'`, `'retryable'`, ...). It is thrown in `'await'` mode or
   while echoing `newMessages`. In the default `'immediate'` mode a failure after the `202` is
   logged, as the unfenced writer does, so executors should use `'await'`.
-- **Without `producer` nothing changes.** Appends go through the upstream transport exactly as
-  before, with no producer headers.
+- **Without `producer` nothing changes.** The default (unfenced) NetScript path is used
+  unchanged, with no producer headers.
 
 ## Seeding first paint (SSR)
 
