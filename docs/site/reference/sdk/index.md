@@ -38,8 +38,8 @@ These symbols are available from the root export and the focused, browser-safe
 | Symbol | Kind | Signature / Description |
 | --- | --- | --- |
 | `createServiceClient` | function | Type-safe service client using Aspire service discovery and oRPC. Signature: `createServiceClient<TContract>(options): ServiceClient<TContract>`. |
-| `safe` | function | Resolve a promise into a tuple/object result mirroring the oRPC safe-call ergonomics. |
-| `isDefinedError` | function | Narrow an unknown error to an oRPC defined error. |
+| `safe` | function | Resolve a promise into a result narrowed with `isSuccess` first, then `isDefined` on failure. |
+| `isDefinedError` | function | Narrow a typed failure error to its defined members; prefer `isSuccess` then `isDefined` on `safe` results. |
 | `ServiceClient` | type alias | Typed service client derived from a contract router. |
 | `ServiceClientShape` | type alias | Recursive callable/router shape for a typed service client. |
 | `ServiceClientMethod` | type alias | Typed service-client method derived from a contract procedure. |
@@ -57,9 +57,21 @@ These symbols are available from the root export and the focused, browser-safe
 | `ProcedureInputFromNode` | type alias | Input payload for a contract procedure node. |
 | `ProcedureOutputFromNode` | type alias | Output payload for a contract procedure node. |
 | `DefinedError` | interface | Public shape of an oRPC defined error. |
-| `SafeResult` | type alias | Tuple/object result returned by `safe`. |
+| `SafeResult` | type alias | Result returned by `safe`; narrow with `isSuccess` first, then `isDefined` on failure. |
 | `SafeSuccess` | type alias | Success branch returned by `safe`. |
-| `SafeFailure` | type alias | Failure branch returned by `safe`. |
+| `SafeFailure` | type alias | Failure branch returned by `safe`; after checking `isSuccess`, use `isDefined` to narrow the error. |
+
+Prefer the named discriminants: check `result.isSuccess` first, then `result.isDefined` on the
+failure before reading contract error codes and data. See
+[Safe error narrowing](/services-sdk/sdk/#safe-error-narrowing) for a service-client example.
+`isDefinedError` preserves defined members of an already typed error union; it does not infer
+contract errors from an arbitrary `unknown` value.
+
+Tuple destructuring remains supported:
+`const [error, data, isDefined, isSuccess] = await safe(promise)`. Both forms describe the same
+result. A bare promise without contract error typing has no statically reachable defined-error arm;
+see
+[Bare promises and the defined-error arm](/services-sdk/sdk/#bare-promises-and-the-defined-error-arm).
 
 ### Client contributions (`SdkClientContribution`)
 
