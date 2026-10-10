@@ -9,6 +9,7 @@ export type { SagaCommandSinkOptions } from './src/integration/commands/saga-com
 export type { SagaCorrelationKey, SagaMessage, SagaMessageId } from './src/domain/mod.ts';
 export type {
   SagaPublisherBatchMode,
+  SagaPublisherEndpointDiagnostic,
   SagaPublisherPort,
   SagaPublisherPublishManyOptions,
   SagaPublisherPublishOptions,

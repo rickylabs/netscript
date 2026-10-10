@@ -43,6 +43,8 @@ export type CallbackInput = Readonly<{
   providerId?: string;
   code?: string;
   state?: string;
+  /** Explicit OAuth transaction id for callers without a transaction cookie. */
+  txn?: string;
   error?: string;
   errorDescription?: string;
   redirectTo?: string;
@@ -155,6 +157,16 @@ const validationErrorDataSchema: z.ZodObject<{
 /** Auth-specific oRPC error entries merged onto the base plugin vocabulary. */
 const AUTH_SPECIFIC_ERRORS: Readonly<{
   UNAUTHORIZED: { status: number; message: string; data: z.ZodType<{ reason: string }> };
+  AUTH_TRANSPORT_ERROR: {
+    status: number;
+    message: string;
+    data: z.ZodType<{ providerId?: string; reason: string }>;
+  };
+  AUTH_CONFIGURATION_ERROR: {
+    status: number;
+    message: string;
+    data: z.ZodType<{ providerId?: string; reason: string }>;
+  };
   AUTH_PROVIDER_ERROR: {
     status: number;
     message: string;
@@ -166,6 +178,16 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
     status: 401,
     message: 'Authentication required',
     data: z.object({ reason: z.string() }),
+  },
+  AUTH_TRANSPORT_ERROR: {
+    status: 400,
+    message: 'Auth request requires secure transport',
+    data: z.object({ providerId: z.string().optional(), reason: z.string() }),
+  },
+  AUTH_CONFIGURATION_ERROR: {
+    status: 400,
+    message: 'Auth configuration refused',
+    data: z.object({ providerId: z.string().optional(), reason: z.string() }),
   },
   AUTH_PROVIDER_ERROR: {
     status: 502,
@@ -269,6 +291,7 @@ const CallbackInputZodSchema: z.ZodObject<{
   providerId: z.ZodOptional<z.ZodString>;
   code: z.ZodOptional<z.ZodString>;
   state: z.ZodOptional<z.ZodString>;
+  txn: z.ZodOptional<z.ZodString>;
   error: z.ZodOptional<z.ZodString>;
   errorDescription: z.ZodOptional<z.ZodString>;
   redirectTo: z.ZodOptional<z.ZodString>;
@@ -276,6 +299,7 @@ const CallbackInputZodSchema: z.ZodObject<{
   providerId: z.string().min(1).optional(),
   code: z.string().optional(),
   state: z.string().optional(),
+  txn: z.string().min(1).optional(),
   error: z.string().optional(),
   errorDescription: z.string().optional(),
   redirectTo: z.string().optional(),

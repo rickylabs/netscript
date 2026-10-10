@@ -48,7 +48,7 @@ async function createBackend(
       redirectUri: 'https://app.example.test/auth/callback',
     }),
     store,
-    allowInsecureRequests: true,
+    trustProxyHeaders: true,
     fetch,
   });
   return { backend, store };

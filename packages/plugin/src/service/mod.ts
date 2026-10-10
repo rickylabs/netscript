@@ -9,7 +9,14 @@
  *
  * @example
  * ```ts
- * import { createPluginService } from '@netscript/plugin/service';
+ * import {
+ *   type AuthenticatorPort,
+ *   createPluginService,
+ *   type ServiceRouter,
+ * } from '@netscript/plugin/service';
+ *
+ * declare const router: ServiceRouter;
+ * declare const authenticator: AuthenticatorPort;
  *
  * const running = await createPluginService(router, { name: 'workers', auth: { authn: { authenticator } } }).serve({ port: 3000 });
  * await running.stop();

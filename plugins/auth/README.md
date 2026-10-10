@@ -21,10 +21,10 @@ them to a NetScript host.
 
 ## Why teams use it
 
-- **One auth API, swappable backends** — the `auth-api` service uses an Aspire-allocated endpoint and exposes
-  `signin`, `callback`, `signout`, `session`, and `me` over a versioned v1 contract, backed by a
-  single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth` (interactive OAuth/OIDC),
-  `workos`, or `better-auth`.
+- **One auth API, swappable backends** — the `auth-api` service uses an Aspire-allocated endpoint
+  and exposes `signin`, `callback`, `signout`, `session`, and `me` over a versioned v1 contract,
+  backed by a single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth` (interactive
+  OAuth/OIDC), `workos`, or `better-auth`.
 - **Stable user subjects** — on `kv-oauth`, `NETSCRIPT_AUTH_SUBJECT_SOURCE` (`id_token` |
   `userinfo`) and `NETSCRIPT_AUTH_SUBJECT_CLAIM` choose where the subject comes from. A preset named
   by `NETSCRIPT_AUTH_PROVIDER_ID` supplies its default (GitHub: userinfo `id`, as `github:<id>`). A
@@ -38,8 +38,8 @@ them to a NetScript host.
   projection for the `authSession` entity, with server-side emit helpers on `./streams/server`.
 - **Provisioning recorded up front** — auth requires Postgres (schema) and Deno KV (sessions); the
   install records both from the manifest so `netscript db` and Aspire provision them for you.
-- **Typed bearer client opt-in** — the manifest advertises a browser/server-safe bearer factory,
-  and install emits `auth/sdk-client.ts` for explicit placement on the `auth-api` client only.
+- **Typed bearer client opt-in** — the manifest advertises a browser/server-safe bearer factory, and
+  install emits `auth/sdk-client.ts` for explicit placement on the `auth-api` client only.
 
 ## Architecture
 
@@ -120,8 +120,8 @@ console.log(
 );
 ```
 
-The manifest reference makes the bearer factory discoverable; it does not activate credentials.
-The install-owned `auth/sdk-client.ts` exports `authSdkClientContribution`. Add it explicitly to the
+The manifest reference makes the bearer factory discoverable; it does not activate credentials. The
+install-owned `auth/sdk-client.ts` exports `authSdkClientContribution`. Add it explicitly to the
 named auth service and supply its required context on authenticated calls:
 
 ```typescript
@@ -152,15 +152,15 @@ remains application-owned and per call; bearer headers default to HTTPS plus loc
 
 ## Public surface
 
-| Entry              | What it gives you                                                    |
-| ------------------ | -------------------------------------------------------------------- |
-| `.`                | `authPlugin` plus the `AUTH_*` identity and service constants        |
-| `./services`       | The auth API service composition (`auth-api`, Aspire-allocated port) |
-| `./streams`        | Browser-safe durable-stream projection for the `authSession` entity  |
-| `./streams/server` | Server-side session-stream emit helpers                              |
-| `./contracts`      | The versioned auth API contract generated registries bind against    |
-| `./scaffold`       | The plugin-owned scaffolder `netscript plugin install auth` executes |
-| `./authenticator` | Remote session verifier, options, bearer reader and redacted failure vocabulary |
+| Entry              | What it gives you                                                               |
+| ------------------ | ------------------------------------------------------------------------------- |
+| `.`                | `authPlugin` plus the `AUTH_*` identity and service constants                   |
+| `./services`       | The auth API service composition (`auth-api`, Aspire-allocated port)            |
+| `./streams`        | Browser-safe durable-stream projection for the `authSession` entity             |
+| `./streams/server` | Server-side session-stream emit helpers                                         |
+| `./contracts`      | The versioned auth API contract generated registries bind against               |
+| `./scaffold`       | The plugin-owned scaffolder `netscript plugin install auth` executes            |
+| `./authenticator`  | Remote session verifier, options, bearer reader and redacted failure vocabulary |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-auth@<version>`](https://jsr.io/@netscript/plugin-auth/doc) (pin
@@ -174,6 +174,34 @@ implementation. Use `createAuthServiceAuthenticator({ serviceName, timeoutMs })`
 service, not its provider secrets or backend storage. See the
 [auth-core verification guide](../../packages/plugin-auth-core/README.md#verify-sessions-in-another-service)
 for denial versus unavailability, transport policy and backend limits.
+
+## Transport configuration
+
+For `kv-oauth` behind a TLS-terminating proxy, set `NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true`.
+Default is false. The proxy must replace client-supplied `X-Forwarded-Proto` / `Forwarded` headers
+and block direct service access. This configures one HTTPS policy for OAuth flow checks and Secure
+cookies; outbound provider endpoints still require HTTPS. Trusted hop/CIDR verification is tracked
+in [#2191](https://github.com/rickylabs/netscript/issues/2191).
+
+For direct TLS at the auth service, set `NETSCRIPT_AUTH_COOKIE_SECURE=true`. Sign-in and callback
+can inspect their HTTPS request URL, but session refresh receives a URL-less `AuthnRequest`; the
+explicit setting ensures refreshed cookies remain Secure. Unset preserves protocol derivation;
+`false` explicitly disables Secure (and is refused for `__Host-` cookies unless local development is
+enabled). This cookie override does not bypass the inbound HTTPS flow gate. Automatic host TLS
+metadata and trusted-hop verification remain tracked in
+[#2191](https://github.com/rickylabs/netscript/issues/2191).
+
+For explicit local HTTP development, set `NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true`. It
+opens the inbound flow and development cookie gates. The separate
+`NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true` only allows outbound HTTP OAuth discovery/token
+endpoints. All three switches default to false. Missing or partial provider configuration never
+silently enables insecure transport, including the unconfigured local placeholder.
+
+**Migration:** replace the old outbound switch with the new inbound switch for HTTP development; use
+proxy trust for production TLS termination. Transport refusals return `AUTH_TRANSPORT_ERROR` (400),
+and backend configuration refusals return `AUTH_CONFIGURATION_ERROR` (400), with the gate named in
+the reason. Missing service request capture is an internal wiring failure (`INTERNAL`, 500). Actual
+upstream failures remain `AUTH_PROVIDER_ERROR` (502).
 
 ## Docs
 

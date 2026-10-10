@@ -83,6 +83,55 @@ console.log(`listening on :${service.addr.port}`);
 await service.stop();
 ```
 
+## CORS migration (breaking in 0.0.8)
+
+`withCors()` and `defineService()` no longer grant `Access-Control-Allow-Origin: *` by default. An
+omitted `origin` reads `NETSCRIPT_CORS_ORIGINS` once when the builder is configured. Supply
+comma-separated exact HTTP(S) origins, with no path or trailing slash:
+
+```sh
+export NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'
+```
+
+Generated CLI/Aspire helpers inject the enabled web apps' allocated endpoint origins into every
+service and plugin API resource. For independently launched services, configure this variable in
+each service's launch environment. An unset or blank value allows no cross-origin browser reads. The
+existing `createPluginService()` factory delegates its `config.cors` to this same builder, so
+omitted origins consume the workspace allowlist without separate plugin policy. `enableCors: false`
+continues to skip plugin CORS. Explicit origins override the environment, including an empty array
+to deny all cross-origin access:
+
+```ts
+import { defineService, type ServiceRouter } from '@netscript/service';
+
+declare const router: ServiceRouter;
+const service = await defineService(router, {
+  name: 'users',
+  cors: { origin: ['https://app.example'] },
+});
+await service.stop();
+```
+
+Builder callers use `.withCors({ origin: ['https://app.example'] })`; plugin callers use
+`cors: { origin: ['https://app.example'] }`. Options such as `allowHeaders` without an `origin`
+still inherit the environment allowlist. Environment entries must be exact origins; wildcard, opaque
+`null`, malformed URLs, and URL paths fail configuration. Reading defaults requires
+`--allow-env=NETSCRIPT_CORS_ORIGINS`; explicit origins need no environment permission.
+
+Public APIs can opt into `.withCors({ origin: '*' })` without credentials. `build()` rejects
+wildcard plus `credentials: true`, including wildcard entries in arrays. Origin resolver callbacks
+remain supported; a credentialed callback returning `'*'` grants no ACAO header. Allowlisted origins
+receive their exact ACAO; other origins receive none, so the browser refuses access to the response.
+CORS is a browser response policy, not authentication or CSRF protection.
+
+The owner-approved browser auth topology is a BFF: the Fresh app owns sign-in/callback and its
+first-party session cookie, and its server forwards a bearer through the SDK contribution to
+services. Browser-to-service credentialed CORS is not part of this topology. Generated BFF routes
+and a real browser session round trip are follow-up scope of
+[#1386](https://github.com/rickylabs/netscript/issues/1386).
+
+## Runtime shutdown
+
 Compose every in-process runtime behind one bounded shutdown handle without replacing its own drain:
 
 ```ts

@@ -303,3 +303,30 @@ declaration). A registry that is neither in the manifest nor explicitly internal
 - [ ] No typed container unless three conditions hold (many providers, ordered composition,
       lifetimes that must be enforced at the type level).
 - [ ] Optional dependencies use `?? defaultX()`; never try/catch imports.
+
+## Browser authentication topology (0.0.8, owner decision)
+
+The default browser authentication topology is a backend for frontend (BFF), ratified in
+[#1386](https://github.com/rickylabs/netscript/issues/1386) and milestone coordinator
+[#2103](https://github.com/rickylabs/netscript/issues/2103). The Fresh app owns sign-in, callback,
+and the first-party session cookie on its origin. Its server forwards a bearer to services through
+the SDK bearer contribution (#1352); guarded services use the existing bearer-only remote session
+authenticator. Browser-to-service credentialed cross-origin CORS is outside this topology.
+
+The app server adapts interactive HTTP requests; it does not host background orchestration. Workers,
+sagas and triggers operate with a service identity (#2064), independent of an open app or an owner's
+session. Cookie response handling (#1385), generated BFF routes and browser session conformance are
+separate adoption gates; recording this decision does not certify their behavior.
+
+Service CORS is an explicit browser response allowlist. `withCors()` and the `defineService()` /
+`createPluginService()` presets consume `NETSCRIPT_CORS_ORIGINS` when their `origin` option is
+omitted. The variable contains comma-separated exact HTTP(S) origins, supplied by workspace launch
+configuration; CLI/Aspire helpers inject enabled web app endpoint origins into every service and
+plugin API (#1386 L3). Unset means no cross-origin response access. An explicit origin or origin
+array overrides the environment. Wildcard access requires an explicit option and cannot be combined
+with credentials; invalid combinations fail before serving.
+
+The breaking migration and exact environment/option examples live in
+[`packages/service/README.md`](../../../packages/service/README.md#cors-migration-breaking-in-008).
+CORS does not authenticate callers or replace CSRF protection, and a rejected origin means no ACAO
+header, rather than proof that the service did not execute a request.

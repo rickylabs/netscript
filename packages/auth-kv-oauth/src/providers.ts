@@ -25,7 +25,7 @@ import {
 
 export type { AuthProviderCapability, AuthProviderDescriptor } from '@netscript/plugin-auth-core';
 export type { OAuthSubjectSource } from './subject-source.ts';
-export { presetSubjectSource } from './subject-source.ts';
+export { presetProviderKind, presetSubjectSource } from './subject-source.ts';
 
 /** Client authentication method used at the token endpoint. */
 export type ClientAuthMethod = 'client_secret_basic' | 'client_secret_post' | 'none';
