@@ -224,6 +224,22 @@ export function createRuntimeBehaviorGates(
       GATE_PHASE.BEHAVIOR,
       (context) => pluginProbeCommand(context, 'sagas-api', 'get', '/health/live'),
     ),
+    ...(database === DATABASE.POSTGRES
+      ? [commandGate(
+        GATE.BEHAVIOR_SAGAS_PUBLISH_PROCESS,
+        'Saga HTTP process crash replay, reversed delivery and stale PostgreSQL writer',
+        GATE_PHASE.BEHAVIOR,
+        (context) => [
+          'deno',
+          'run',
+          '--allow-read',
+          '--allow-run=aspire,deno',
+          `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-saga-publish-process.ts`,
+          context.project.appHost,
+          context.project.repoRoot,
+        ],
+      )]
+      : []),
     commandGate(
       GATE.BEHAVIOR_SAGAS_LIST,
       'List saga definitions',

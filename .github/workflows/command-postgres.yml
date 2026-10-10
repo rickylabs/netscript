@@ -5,6 +5,7 @@ on:
       - 'packages/database/**'
       - 'packages/plugin-sagas-core/**'
       - 'plugins/sagas/database/**'
+      - 'plugins/sagas/tests/runtime/**'
       - '.llm/tools/command-postgres-conformance.sh'
       - '.github/workflows/command-postgres.yml'
   workflow_dispatch:
