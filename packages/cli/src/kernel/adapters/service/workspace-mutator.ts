@@ -6,6 +6,7 @@
 
 import { basename, join } from '@std/path';
 import { parseAppSettings } from '@netscript/aspire/config';
+import { generateAspireCliTaskRunner } from '../../templates/workspace/aspire-cli-task.ts';
 import { HelpersGeneratorPipeline } from '../../templates/aspire/helpers/helpers-generator-pipeline.ts';
 import { reconcileAppHostPackageDependencies } from '../aspire/apphost-package-dependencies.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
@@ -196,9 +197,16 @@ export async function regenerateAspireHelpers(
     generateAppHost: true,
   });
 
+  const workspaceFiles = [
+    ...files.map((file) => ({ ...file, path: join(aspireDir, file.path) })),
+    {
+      path: join(projectRoot, SCAFFOLD_DIRS.NETSCRIPT, SCAFFOLD_FILES.ASPIRE_CLI_TASK),
+      content: generateAspireCliTaskRunner(),
+    },
+  ];
   const written: string[] = [...browserAuthFiles];
-  for (const file of files) {
-    const path = join(aspireDir, file.path);
+  for (const file of workspaceFiles) {
+    const path = file.path;
     const content = options.formatter
       ? await options.formatter.formatContent(path, file.content)
       : file.content;

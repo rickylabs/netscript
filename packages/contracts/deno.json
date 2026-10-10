@@ -11,7 +11,7 @@
     "./commands": "./commands.ts"
   },
   "imports": {
-    "@orpc/contract": "npm:@orpc/contract@^1.15.0",
+    "@orpc/contract": "npm:@orpc/contract@^1.15.5",
     "zod": "catalog:"
   },
   "tasks": {

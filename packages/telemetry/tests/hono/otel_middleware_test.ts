@@ -1,5 +1,5 @@
 import { assertEquals, assertExists } from '@std/assert';
-import { Hono } from 'jsr:@hono/hono@4.12.24';
+import { Hono } from 'jsr:@hono/hono@4.13.13';
 import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from 'npm:@opentelemetry/core@^2.5.0';
 import { AsyncLocalStorageContextManager } from 'npm:@opentelemetry/context-async-hooks@^2.9.0';
