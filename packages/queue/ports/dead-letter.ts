@@ -10,7 +10,8 @@
 export type DeadLetterReason =
   | 'max_attempts_exceeded'
   | 'nack_without_requeue'
-  | 'validation_failed';
+  | 'validation_failed'
+  | 'unroutable';
 
 /**
  * Structured dead-letter record written by queue adapters before discarding poison messages.
