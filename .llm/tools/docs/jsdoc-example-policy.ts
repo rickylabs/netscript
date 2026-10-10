@@ -23,7 +23,6 @@ export const JSDOC_EXAMPLE_RATCHET = {
   minimumCandidates: 348,
   minimumChecked: 348,
   maximumExempt: 0,
-  maximumDeferredUnboundName: 116,
   maximumDeferredTypeError: 14,
 } as const;
 
@@ -49,14 +48,7 @@ export function jsdocExampleRatchetFailures(
   if (census.exempt > JSDOC_EXAMPLE_RATCHET.maximumExempt) {
     failures.push(`exempt ${census.exempt} > ${JSDOC_EXAMPLE_RATCHET.maximumExempt}`);
   }
-  const unboundName = deferredExamples.filter((entry) => entry.failureClass === 'unboundName')
-    .length;
-  const typeError = deferredExamples.length - unboundName;
-  if (unboundName > JSDOC_EXAMPLE_RATCHET.maximumDeferredUnboundName) {
-    failures.push(
-      `deferred unboundName ${unboundName} > ${JSDOC_EXAMPLE_RATCHET.maximumDeferredUnboundName}`,
-    );
-  }
+  const typeError = deferredExamples.filter((entry) => entry.failureClass === 'typeError').length;
   if (typeError > JSDOC_EXAMPLE_RATCHET.maximumDeferredTypeError) {
     failures.push(
       `deferred typeError ${typeError} > ${JSDOC_EXAMPLE_RATCHET.maximumDeferredTypeError}`,

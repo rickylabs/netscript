@@ -9,7 +9,17 @@
  *
  * @example Drive a bounded, cancellable loop
  * ```ts
- * import { createAgentLoop, slidingWindowHistory } from "@netscript/ai/agent";
+ * import {
+ *   type ChatModelProviderPort,
+ *   createAgentLoop,
+ *   slidingWindowHistory,
+ *   type ToolRegistryPort,
+ * } from "@netscript/ai/agent";
+ * import type { Message } from "@netscript/ai/contracts";
+ *
+ * declare const modelProvider: ChatModelProviderPort;
+ * declare const tools: ToolRegistryPort;
+ * declare const messages: Message[];
  *
  * const loop = createAgentLoop({
  *   modelProvider,               // a ChatModelProviderPort
