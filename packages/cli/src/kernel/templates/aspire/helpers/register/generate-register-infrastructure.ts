@@ -72,6 +72,9 @@ export function generateRegisterInfrastructure(
     ['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine) &&
     (entry.Mode ?? 'Container') === 'Container'
   )
+  const usesPostgresCredentialReadiness = dbEntries.some(([, entry]) =>
+    entry.Engine === 'Postgres' && (entry.Mode ?? 'Container') === 'Container'
+  )
   const usesRespReadiness = cacheEntries.some(([, entry]) =>
     ['Redis', 'Garnet'].includes(entry.Engine) &&
     !['External', 'Local'].includes(entry.Mode ?? 'Container')
@@ -85,6 +88,7 @@ export function generateRegisterInfrastructure(
   const compatImports = [
     'type CacheWiring',
     ...(usesDatabaseListenerReadiness ? ['createEndpointListenerReadinessCheck'] : []),
+    ...(usesPostgresCredentialReadiness ? ['createPostgresCredentialReadinessCheck'] : []),
     ...(usesRespReadiness ? ['createRespPingCheck'] : []),
     ...(dbEntries.some(([, entry]) =>
         ['Postgres', 'Mysql'].includes(entry.Engine) &&
@@ -143,12 +147,18 @@ export function generateRegisterInfrastructure(
     // "Argument 'source' is a Promise-like value". So we `await` the entire
     // chain here.
     if (entry.Engine === 'Postgres' || entry.Engine === 'Mysql') {
+      // Read once: the secret parameter and the credential check must see the same value.
+      lines.push(
+        `  const ${id}_password_value = ensureDatabasePassword(appHostDir, ${
+          JSON.stringify(name)
+        });`,
+      )
       lines.push(
         `  const ${id}_password = await builder.addParameter(${
           JSON.stringify(`${name}-password`)
         }, {`,
       )
-      lines.push(`    value: ensureDatabasePassword(appHostDir, ${JSON.stringify(name)}),`)
+      lines.push(`    value: ${id}_password_value,`)
       lines.push(`    secret: true,`)
       lines.push(`  });`)
       lines.push(`  const ${id}_server = await builder.${method}(${JSON.stringify(name)}, {`)
@@ -216,6 +226,9 @@ export function generateRegisterInfrastructure(
       lines.push(`    })();`)
       lines.push(`  });`)
       lines.push(`  await ${id}_server.withHealthCheck(${JSON.stringify(healthCheckKey)});`)
+    }
+    if (entry.Engine === 'Postgres') {
+      appendPostgresCredentialReadinessLines(lines, id, name)
     }
 
     // Add database child resource if DatabaseName is specified
@@ -532,6 +545,25 @@ function redisGarnetContainerSetup(
       JSON.stringify(provider)
     } }, local: false }`
   return { lines, wiring }
+}
+
+/**
+ * Emits the `<name>_auth` check beside the listener check. A listener accepts the socket
+ * before the server accepts the login, so only this check proves consumers can connect.
+ * The password travels as the in-memory value already given to the secret parameter —
+ * Aspire 13.5.3 rejects `ReferenceExpression.getValue()` inside AppHost callbacks.
+ */
+function appendPostgresCredentialReadinessLines(lines: string[], id: string, name: string): void {
+  const healthCheckKey = `${name}_auth`
+  lines.push(
+    `  builder.addHealthCheck(${
+      JSON.stringify(healthCheckKey)
+    }, createPostgresCredentialReadinessCheck({`,
+  )
+  lines.push(`    endpoint: () => ${id}_server.getEndpoint('tcp'),`)
+  lines.push(`    password: ${id}_password_value,`)
+  lines.push(`  }));`)
+  lines.push(`  await ${id}_server.withHealthCheck(${JSON.stringify(healthCheckKey)});`)
 }
 
 function appendRespReadinessLines(lines: string[], id: string, name: string): void {

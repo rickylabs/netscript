@@ -4,10 +4,11 @@
  * Executes the generated compatibility helper against real local Node sockets.
  */
 
-import { assertEquals, assertMatch } from 'jsr:@std/assert@^1'
+import { assert, assertEquals, assertMatch } from 'jsr:@std/assert@^1'
 import { afterAll, describe, it } from 'jsr:@std/testing@^1/bdd'
 import { createServer, type Server, type Socket } from 'node:net'
 import { fromFileUrl, resolve, toFileUrl } from 'jsr:@std/path@^1'
+import { type FakePostgresServer, startFakePostgresServer } from './fake-postgres-server.ts'
 
 const compatContent = await Deno.readTextFile(
   new URL(
@@ -86,9 +87,25 @@ await Deno.writeTextFile(
   }, null, 2)}\n`,
 )
 await Deno.writeTextFile(compatPath, compatContent)
+// The generated helper loads `pg` from the AppHost's node_modules; the test resolves the
+// same bare specifier to the workspace-locked npm package instead.
+const POSTGRES_CLIENT_MODULE_DECLARATION = "const POSTGRES_CLIENT_MODULE = 'pg';"
+assertEquals(compatContent.split(POSTGRES_CLIENT_MODULE_DECLARATION).length, 2)
+const runtimeCompatContent = compatContent.replace("from 'zod';", `from '${zodSpecifier}';`)
 await Deno.writeTextFile(
   runtimeCompatPath,
-  compatContent.replace("from 'zod';", `from '${zodSpecifier}';`),
+  runtimeCompatContent.replace(
+    POSTGRES_CLIENT_MODULE_DECLARATION,
+    "const POSTGRES_CLIENT_MODULE = 'npm:pg@^8.21.0';",
+  ),
+)
+const clientlessCompatPath = `${helpersDir}/_aspire-compat.clientless.mts`
+await Deno.writeTextFile(
+  clientlessCompatPath,
+  runtimeCompatContent.replace(
+    POSTGRES_CLIENT_MODULE_DECLARATION,
+    "const POSTGRES_CLIENT_MODULE = 'data:text/javascript,export default {}';",
+  ),
 )
 await Deno.writeTextFile(
   `${generatedRoot}/format-sentinel.ts`,
@@ -96,6 +113,9 @@ await Deno.writeTextFile(
 )
 const compatModule = await import(
   `${toFileUrl(runtimeCompatPath).href}?test=${crypto.randomUUID()}`
+)
+const clientlessCompatModule = await import(
+  `${toFileUrl(clientlessCompatPath).href}?test=${crypto.randomUUID()}`
 )
 
 afterAll(async () => {
@@ -333,6 +353,216 @@ describe('generated Aspire listener readiness helpers', () => {
     }
   })
 })
+
+describe('generated Aspire PostgreSQL credential readiness', () => {
+  const PASSWORD = 'fixture-right-0d9c3f'
+  const WRONG_PASSWORD = 'fixture-wrong-7a41be'
+
+  it('reports Healthy only after an authenticated SELECT 1', async () => {
+    const server = await startFakePostgresServer({ kind: 'password', password: PASSWORD })
+    try {
+      const result = await credentialCheck(server, PASSWORD)
+
+      assertEquals(result, {
+        status: 'Healthy',
+        description: `postgres credentials accepted on 127.0.0.1:${server.port}`,
+      })
+      assertEquals(server.attempts, [{ user: 'postgres', password: PASSWORD }])
+    } finally {
+      await server.close()
+    }
+  })
+
+  it('reports a rejected password as an auth failure while the listener is Healthy', async () => {
+    const server = await startFakePostgresServer({ kind: 'password', password: PASSWORD })
+    try {
+      const listener = await compatModule.createListenerReadinessCheck({
+        kind: 'postgres',
+        host: '127.0.0.1',
+        port: server.port,
+      })()
+      const result = await credentialCheck(server, WRONG_PASSWORD)
+
+      assertEquals(listener.status, 'Healthy')
+      assertEquals(result.status, 'Unhealthy')
+      assertMatch(
+        result.description,
+        new RegExp(
+          `^postgres credential check failed: auth 28P01 \\(invalid_password\\) at 127\\.0\\.0\\.1:${server.port} after \\d+ ms$`,
+        ),
+      )
+      assertCredentialFailureData(result.data, 'auth', '28P01', server.port)
+      assertEquals(server.attempts, [{ user: 'postgres', password: WRONG_PASSWORD }])
+      assertNoCredentialBytes(result, [WRONG_PASSWORD, PASSWORD, 'authentication failed'])
+    } finally {
+      await server.close()
+    }
+  })
+
+  it('classifies a missing role as auth and a missing database as database', async () => {
+    const cases = [
+      { sqlstate: '28000', failureClass: 'auth', name: 'invalid_authorization_specification' },
+      { sqlstate: '3D000', failureClass: 'database', name: 'invalid_catalog_name' },
+      { sqlstate: '57P03', failureClass: 'starting', name: 'cannot_connect_now' },
+    ] as const
+    for (const fixture of cases) {
+      const server = await startFakePostgresServer({
+        kind: 'reject-startup',
+        sqlstate: fixture.sqlstate,
+        message: `server text naming role "postgres" and secret ${PASSWORD}`,
+      })
+      try {
+        const result = await credentialCheck(server, PASSWORD)
+
+        assertEquals(result.status, 'Unhealthy')
+        assertMatch(
+          result.description,
+          new RegExp(
+            `^postgres credential check failed: ${fixture.failureClass} ${fixture.sqlstate} \\(${fixture.name}\\) at `,
+          ),
+        )
+        assertCredentialFailureData(
+          result.data,
+          fixture.failureClass,
+          fixture.sqlstate,
+          server.port,
+        )
+        assertNoCredentialBytes(result, [PASSWORD, 'server text', 'role "postgres"'])
+      } finally {
+        await server.close()
+      }
+    }
+  })
+
+  it('classifies an unknown server error by SQLSTATE without echoing its text', async () => {
+    const server = await startFakePostgresServer({
+      kind: 'reject-startup',
+      sqlstate: 'XX000',
+      message: `internal error mentioning ${PASSWORD}`,
+    })
+    try {
+      const result = await credentialCheck(server, PASSWORD)
+
+      assertEquals(result.status, 'Unhealthy')
+      assertMatch(result.description, /^postgres credential check failed: server XX000 at /)
+      assertCredentialFailureData(result.data, 'server', 'XX000', server.port)
+      assertNoCredentialBytes(result, [PASSWORD, 'internal error'])
+    } finally {
+      await server.close()
+    }
+  })
+
+  it('reports a closed port as a listener failure without waiting for the deadline', async () => {
+    const server = await startFakePostgresServer({ kind: 'password', password: PASSWORD })
+    const port = server.port
+    await server.close()
+    const startedAt = performance.now()
+
+    const result = await credentialCheck({ port }, PASSWORD)
+    const elapsedMs = performance.now() - startedAt
+
+    assertEquals(result.status, 'Unhealthy')
+    assertMatch(result.description, /^postgres credential check failed: listener ECONNREFUSED at /)
+    assertCredentialFailureData(result.data, 'listener', 'ECONNREFUSED', port)
+    assertEquals(elapsedMs < 1_000, true)
+  })
+
+  it('bounds a server that accepts the socket but never answers the login', async () => {
+    const server = await startFakePostgresServer({ kind: 'silent' })
+    const startedAt = performance.now()
+    try {
+      const result = await credentialCheck(server, PASSWORD)
+      const elapsedMs = performance.now() - startedAt
+
+      assertEquals(result.status, 'Unhealthy')
+      assertMatch(result.description, /^postgres credential check failed: timeout ETIMEDOUT at /)
+      assertCredentialFailureData(result.data, 'timeout', 'ETIMEDOUT', server.port)
+      assertEquals(elapsedMs >= 1_900 && elapsedMs < 3_500, true)
+    } finally {
+      await server.close()
+    }
+  })
+
+  it('publishes endpoint allocation timeout as a listener failure instead of hanging', async () => {
+    const result = await compatModule.createPostgresCredentialReadinessCheck({
+      endpoint: () => new Promise(() => {}),
+      password: PASSWORD,
+    })()
+
+    assertEquals(result.status, 'Unhealthy')
+    assertMatch(
+      result.description,
+      /^postgres credential check failed: listener ENDPOINT_UNALLOCATED at <unallocated>:<unallocated> after \d+ ms$/,
+    )
+    assertEquals(result.data?.class, 'listener')
+    assertNoCredentialBytes(result, [PASSWORD])
+  })
+
+  it('reports a missing pg client as a client failure without attempting a login', async () => {
+    const server = await startFakePostgresServer({ kind: 'password', password: PASSWORD })
+    try {
+      const result = await clientlessCompatModule.createPostgresCredentialReadinessCheck({
+        endpoint: () => Promise.resolve(fixedEndpoint(server.port)),
+        password: PASSWORD,
+      })()
+
+      assertEquals(result.status, 'Unhealthy')
+      assertMatch(
+        result.description,
+        /^postgres credential check failed: client PG_CLIENT_UNAVAILABLE at /,
+      )
+      assertCredentialFailureData(result.data, 'client', 'PG_CLIENT_UNAVAILABLE', server.port)
+      assertEquals(server.attempts, [])
+    } finally {
+      await server.close()
+    }
+  })
+})
+
+interface CredentialCheckResult {
+  readonly status: string
+  readonly description: string
+  readonly data?: Record<string, string>
+}
+
+function fixedEndpoint(port: number) {
+  return {
+    host: () => Promise.resolve('127.0.0.1'),
+    port: () => Promise.resolve(port),
+  }
+}
+
+async function credentialCheck(
+  server: Pick<FakePostgresServer, 'port'>,
+  password: string,
+): Promise<CredentialCheckResult> {
+  return await compatModule.createPostgresCredentialReadinessCheck({
+    endpoint: () => Promise.resolve(fixedEndpoint(server.port)),
+    password,
+  })()
+}
+
+function assertCredentialFailureData(
+  data: Record<string, string> | undefined,
+  failureClass: string,
+  code: string,
+  port: number,
+): void {
+  assert(data, 'credential failure must publish classified data')
+  assertEquals(Object.keys(data).sort(), ['class', 'code', 'elapsedMs', 'host', 'port'])
+  assertEquals(data.class, failureClass)
+  assertEquals(data.code, code)
+  assertEquals(data.host, '127.0.0.1')
+  assertEquals(data.port, String(port))
+  assertMatch(data.elapsedMs, /^\d+$/)
+}
+
+function assertNoCredentialBytes(result: unknown, forbidden: readonly string[]): void {
+  const serialized = JSON.stringify(result)
+  for (const value of forbidden) {
+    assertEquals(serialized.includes(value), false, `health result leaked ${value}`)
+  }
+}
 
 interface RespFailureResult {
   readonly status: string

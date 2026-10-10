@@ -612,13 +612,83 @@ describe('generateRegisterInfrastructure', () => {
       assertStringIncludes(output, `builder.addParameter(${JSON.stringify(`${name}-password`)}, {`)
       assertStringIncludes(
         output,
-        `value: ensureDatabasePassword(appHostDir, ${JSON.stringify(name)})`,
+        `const db_0_password_value = ensureDatabasePassword(appHostDir, ${JSON.stringify(name)});`,
       )
+      assertStringIncludes(output, 'value: db_0_password_value,')
+      assertEquals(countOccurrences(output, 'ensureDatabasePassword(appHostDir'), 1)
       assertStringIncludes(
         output,
         `builder.${Engine === 'Postgres' ? 'addPostgres' : 'addMySql'}(${JSON.stringify(name)}, {`,
       )
       assertStringIncludes(output, 'password: db_0_password')
+    }
+  })
+
+  it('emits an authenticated postgres_auth check beside the container listener check', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {
+        postgres: { Enabled: true, Engine: 'Postgres', Mode: 'Container', Persistent: false },
+      },
+      caches: {},
+      primaryDatabase: 'postgres',
+    })
+    const registration = 'builder.addHealthCheck("postgres_auth", ' +
+      'createPostgresCredentialReadinessCheck({\n' +
+      "    endpoint: () => db_0_server.getEndpoint('tcp'),\n" +
+      '    password: db_0_password_value,\n' +
+      '  }));\n' +
+      '  await db_0_server.withHealthCheck("postgres_auth");'
+
+    assertStringIncludes(output, registration)
+    assertEquals(countOccurrences(output, 'withHealthCheck("postgres_auth")'), 1)
+    assertStringIncludes(output, 'createPostgresCredentialReadinessCheck')
+    assert(
+      output.indexOf('withHealthCheck("postgres_listener")') < output.indexOf(registration),
+      'credential readiness must be registered after the listener check it refines',
+    )
+    assert(
+      output.indexOf('const db_0_password_value') < output.indexOf(registration),
+      'the check must reuse the value already given to the secret parameter',
+    )
+    // Aspire 13.5.3 rejects ReferenceExpression.getValue() inside AppHost callbacks (#1754).
+    assert(!output.includes('connectionStringExpression()'))
+    assert(!output.includes('.getValue()'))
+  })
+
+  it('emits no credential check where this leaf does not own credential readiness', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {
+        mysql: { Enabled: true, Engine: 'Mysql', Mode: 'Container', Persistent: false },
+        mssql: { Enabled: true, Engine: 'Mssql', Mode: 'Container', Persistent: false },
+        external: { Enabled: true, Engine: 'Postgres', Mode: 'External' },
+        sqlite: { Enabled: true, Engine: 'Sqlite', DataPath: '.data/app.sqlite' },
+      },
+      caches: {},
+    })
+
+    assert(!output.includes('createPostgresCredentialReadinessCheck'))
+    assert(!output.includes('_auth"'))
+  })
+
+  it('keeps the Postgres credential out of the generated helper text', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {
+        postgres: { Enabled: true, Engine: 'Postgres', Mode: 'Container', Persistent: true },
+      },
+      caches: {},
+    })
+    const postgresBlock = output.slice(
+      output.indexOf('// database 0 (Container)'),
+      output.indexOf('databases.set("postgres", db_0);'),
+    )
+
+    assert(postgresBlock.length > 0)
+    for (const line of postgresBlock.split('\n')) {
+      if (!/password/i.test(line)) continue
+      assert(
+        !/password[^:=]*[:=]\s*['"`]/i.test(line),
+        `generated Postgres helper line carries a literal credential: ${line.trim()}`,
+      )
     }
   })
 })
