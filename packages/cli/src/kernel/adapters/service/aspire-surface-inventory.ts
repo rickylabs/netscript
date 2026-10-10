@@ -1,5 +1,6 @@
 import { basename, join } from '@std/path';
 import { normalize } from '@std/path/posix';
+import { generateAspireCliTaskRunner } from '../../templates/workspace/aspire-cli-task.ts';
 import {
   ASPIRE_SURFACE_GENERATOR,
   ASPIRE_SURFACE_MARKER,
@@ -16,11 +17,13 @@ export async function canonicalizeAspireOutputs(
   files: readonly GeneratedFile[],
   formatter: GeneratedSourceFormatterPort,
 ): Promise<readonly GeneratedFile[]> {
-  if (files.length > 256) throw new Error('Aspire output inventory exceeds its bounded capacity.');
+  if (files.length >= 256) throw new Error('Aspire output inventory exceeds its bounded capacity.');
+  const helper = { path: '.netscript/aspire-cli.ts', content: generateAspireCliTaskRunner() };
+  const outputs = [...files.map((file) => ({ ...file, path: `aspire/${file.path}` })), helper];
   const seen = new Set<string>();
   const canonical: GeneratedFile[] = [];
-  for (const file of files) {
-    const path = `aspire/${file.path}`;
+  for (const file of outputs) {
+    const path = file.path;
     if (!isAspireOutputPath(path) || seen.has(path.toLowerCase())) {
       throw new Error('Aspire producer overlap or authored output ownership violation.');
     }
@@ -44,7 +47,7 @@ export async function canonicalizeAspireOutputs(
 export function isAspireOutputPath(path: string): boolean {
   return basename(path) !== 'appsettings.json' && !path.includes('\\') &&
     normalize(path) === path &&
-    (path === 'aspire/apphost.mts' ||
+    (path === '.netscript/aspire-cli.ts' || path === 'aspire/apphost.mts' ||
       (path.startsWith('aspire/.helpers/') && !path.endsWith('/')));
 }
 

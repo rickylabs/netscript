@@ -7,7 +7,6 @@
 import { basename, join } from '@std/path';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { type AspireSurfaceRenderOptions, renderAspireSurface } from './aspire-surface-renderer.ts';
-
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace-writer.ts';

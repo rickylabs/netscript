@@ -1,3 +1,6 @@
+import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { join } from '@std/path';
+import { generateAspireCliTaskRunner } from '../../templates/workspace/aspire-cli-task.ts';
 import { parseAppSettings } from '@netscript/aspire/config';
 import { HelpersGeneratorPipeline } from '../../templates/aspire/helpers/helpers-generator-pipeline.ts';
 import { ASPIRE_SURFACE_MARKER } from '../../domain/aspire-generated-surface.ts';
@@ -5,8 +8,6 @@ import { DenoGeneratedSourceFormatter } from '../runtime/process/deno-generated-
 import { DenoProcess } from '../runtime/process/deno-process.ts';
 import type { ProcessPort } from '../../ports/process-port.ts';
 import { checkAspire } from '../../../public/features/generate/aspire/check-aspire.ts';
-import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
-import { join } from '@std/path';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
 import { Scaffolder } from '../scaffold/scaffolder.ts';
@@ -75,6 +76,10 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
     const first = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, {
       formatter,
     });
+    const helperPath = join(root, '.netscript', 'aspire-cli.ts');
+    assertEquals(first.includes(helperPath), true);
+    assertStringIncludes(await fs.readFile(helperPath), 'NETSCRIPT_ASPIRE_CLI');
+    assertStringIncludes(await fs.readFile(helperPath), 'netscript generate aspire');
     const snapshot = await readFiles(fs, first);
     const dryRun = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, {
       dryRun: true,
@@ -96,6 +101,17 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
     assertEquals(forced, first);
     assertEquals(second, []);
     assertEquals(formattedPaths.length, first.length * 4);
+    await fs.writeFile(helperPath, '// stale helper');
+    const preview = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, {
+      dryRun: true,
+      formatter,
+    });
+    assertEquals(preview, [helperPath]);
+    assertEquals(await fs.readFile(helperPath), '// stale helper');
+    assertEquals(
+      await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, { formatter }),
+      [helperPath],
+    );
     for (const path of first) {
       assertEquals((await fs.readFile(path)).startsWith('// canonical\n'), true);
     }
@@ -155,7 +171,7 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
       templateAdapter,
       { process, formatter: new DenoGeneratedSourceFormatter(nativeProcess) },
     );
-    assertEquals(written.length, 13);
+    assertEquals(written.length, 14);
     const before = await readFiles(fs, written);
     const report = await checkAspire(root, {
       fs,
@@ -177,7 +193,7 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
   }
 });
 
-Deno.test('Aspire regeneration formats all 13 outputs with two bounded subprocesses with byte-identical results', async () => {
+Deno.test('Aspire regeneration formats all 14 outputs with two bounded subprocesses with byte-identical results', async () => {
   const controlModule = Deno.env.get('NETSCRIPT_ASPIRE_REGEN_MODULE');
   const regenerate: typeof regenerateAspireHelpers = controlModule
     ? (await import(controlModule)).regenerateAspireHelpers
@@ -226,7 +242,7 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
       formatter,
       process,
     });
-    assertEquals(files.length, 13);
+    assertEquals(files.length, 14);
     assertEquals(formattingProcesses, 2);
     const parsed = await parseAppSettings(join(root, 'appsettings.json'));
     const raw = await new HelpersGeneratorPipeline(templates).execute({
@@ -243,6 +259,14 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
         await previousFormatter.formatContent(path, ASPIRE_SURFACE_MARKER + file.content),
       );
     }
+    const helperPath = join(root, '.netscript', 'aspire-cli.ts');
+    assertEquals(
+      await fs.readFile(helperPath),
+      await previousFormatter.formatContent(
+        helperPath,
+        ASPIRE_SURFACE_MARKER + generateAspireCliTaskRunner(),
+      ),
+    );
     assertEquals(
       await regenerate(root, fs, scaffolder, templates, { formatter, process }),
       [],

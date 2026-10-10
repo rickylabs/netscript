@@ -85,11 +85,13 @@ Deno.test('Aspire check inventories every selected output, uses canonical genera
     const report = await inspect(root);
     assertEquals(report.status, 'current');
     assertEquals(report.version, 1);
-    assertEquals(report.outputs.length, 13);
+    assertEquals(report.outputs.length, 14);
     assert(report.outputs.some((entry) => entry.path === 'aspire/apphost.mts'));
     assertEquals(
       report.outputs.map((entry) => entry.path).sort(),
-      Object.keys(before).filter((path) => path.startsWith('/aspire/')).map((path) => path.slice(1))
+      Object.keys(before).filter((path) =>
+        path.startsWith('/aspire/') || path === '/.netscript/aspire-cli.ts'
+      ).map((path) => path.slice(1))
         .sort(),
     );
     for (const entry of report.outputs) {
@@ -113,6 +115,19 @@ Deno.test('Aspire check inventories every selected output, uses canonical genera
 });
 
 const mutations: { name: string; kind: string; mutate: (root: string) => Promise<void> }[] = [
+  {
+    name: 'missing Aspire CLI helper',
+    kind: 'missing',
+    mutate: (root) => Deno.remove(join(root, '.netscript/aspire-cli.ts')),
+  },
+  {
+    name: 'stale Aspire CLI helper',
+    kind: 'bytes',
+    mutate: async (root) => {
+      const path = join(root, '.netscript/aspire-cli.ts');
+      await Deno.writeTextFile(path, await Deno.readTextFile(path) + '// stale helper\n');
+    },
+  },
   {
     name: 'missing output',
     kind: 'missing',

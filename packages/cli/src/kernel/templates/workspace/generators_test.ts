@@ -143,11 +143,11 @@ Deno.test('generateDenoJson emits detached Aspire telemetry task routes', () => 
 
   assertEquals(
     result.tasks['aspire:otel'],
-    'deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts otel',
+    'deno run --allow-run --allow-env=NETSCRIPT_ASPIRE_CLI --allow-read .netscript/aspire-cli.ts otel',
   );
   assertEquals(
     result.tasks['aspire:export'],
-    'deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts export',
+    'deno run --allow-run --allow-env=NETSCRIPT_ASPIRE_CLI --allow-read .netscript/aspire-cli.ts export',
   );
 });
 
