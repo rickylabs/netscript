@@ -33,7 +33,7 @@ export async function createKvOAuthTestRegistry(kv: MemoryKvAdapter): Promise<Au
       NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
       NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
       NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
-      NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
+      NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS: 'true',
     },
     fetch: () =>
       Promise.resolve(

@@ -155,6 +155,16 @@ const validationErrorDataSchema: z.ZodObject<{
 /** Auth-specific oRPC error entries merged onto the base plugin vocabulary. */
 const AUTH_SPECIFIC_ERRORS: Readonly<{
   UNAUTHORIZED: { status: number; message: string; data: z.ZodType<{ reason: string }> };
+  AUTH_TRANSPORT_ERROR: {
+    status: number;
+    message: string;
+    data: z.ZodType<{ providerId?: string; reason: string }>;
+  };
+  AUTH_CONFIGURATION_ERROR: {
+    status: number;
+    message: string;
+    data: z.ZodType<{ providerId?: string; reason: string }>;
+  };
   AUTH_PROVIDER_ERROR: {
     status: number;
     message: string;
@@ -166,6 +176,16 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
     status: 401,
     message: 'Authentication required',
     data: z.object({ reason: z.string() }),
+  },
+  AUTH_TRANSPORT_ERROR: {
+    status: 400,
+    message: 'Auth request requires secure transport',
+    data: z.object({ providerId: z.string().optional(), reason: z.string() }),
+  },
+  AUTH_CONFIGURATION_ERROR: {
+    status: 400,
+    message: 'Auth configuration refused',
+    data: z.object({ providerId: z.string().optional(), reason: z.string() }),
   },
   AUTH_PROVIDER_ERROR: {
     status: 502,
