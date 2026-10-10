@@ -1,5 +1,5 @@
 /** Guard member-private lockfiles against drifting from the root lock's workspace section. */
-import { join } from 'jsr:@std/path@^1.0.0';
+import { join } from '@std/path';
 import {
   discoverWorkspaceMembers,
   exists,
