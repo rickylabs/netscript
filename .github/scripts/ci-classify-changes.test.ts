@@ -536,12 +536,14 @@ Deno.test('Fresh UI and Pages selectors distinguish tasks-only root config', () 
   assertEquals(toolchain.needsFreshUi, true);
 });
 
-Deno.test('managed-form browser selector is limited to Fresh and its owners', () => {
+Deno.test('Fresh browser selector is limited to Fresh, fresh-ui and their owners', () => {
   for (
     const path of [
       'packages/fresh/src/application/form/form.ts',
       'packages/fresh/tests/form-navigation_browser.ts',
       'packages/fresh/deno.json',
+      'packages/fresh-ui/src/runtime/dialog/use-dialog.ts',
+      'packages/fresh-ui/deno.json',
       '.github/workflows/ci.yml',
       '.llm/tools/gates/catalog.ts',
     ]

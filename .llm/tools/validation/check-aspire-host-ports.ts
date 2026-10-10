@@ -15,6 +15,15 @@
  * `withHttpEndpoint({ port: <literal> ... })` emitted from a source position
  * that is not driven by config.
  *
+ * The same reservation leaks in one layer up when plugin runtime source falls
+ * back to a literal loopback service URL (`options.baseUrl ??
+ * 'http://localhost:4437'`): the plugin silently talks to whichever instance owns
+ * that port instead of the one Aspire discovery names (#1893). Runtime source is
+ * therefore held to the S5 policy too — no loopback URL with an embedded port in
+ * plugin source, and none of the retired well-known service ports anywhere in
+ * plugin or CLI source. {@link LINE_RULES} is that single policy; the S5 test
+ * asserts it over the shipped tree rather than restating it.
+ *
  * A deliberate exception may carry an inline `aspire-host-port-ok: <reason>`
  * marker; an empty reason is itself a failure.
  */
@@ -22,7 +31,8 @@ import { walk } from 'jsr:@std/fs@^1/walk';
 import { relative } from 'jsr:@std/path@^1';
 import { isTransientAspireScanPath } from './aspire-scan-scope.ts';
 
-const DEFAULT_ROOTS = ['packages/cli/src', 'plugins'] as const;
+/** Roots scanned when none are given: everything the S5 runtime-literal policy covers. */
+export const DEFAULT_ROOTS: readonly string[] = ['packages/cli/src', 'packages/cli/e2e', 'plugins'];
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.template', '.json']);
 const ALLOW_MARKER = 'aspire-host-port-ok:';
 const GENERATED_STATE_DIR = /[\\/](?:\.data|\.git|node_modules)(?:[\\/]|$)/;
@@ -54,8 +64,20 @@ const PLUGIN_CONTRIBUTION = /^plugins\/[^/]+\/src\/aspire\/[^/]+-contribution\.t
 /** A contribution supplying a fallback defeats Aspire's run-time allocation. */
 const CONTRIBUTION_PORT_FALLBACK = /\bctx\.port\([^)]*,[^)]*\)/;
 
+/** Plugin runtime source: every shipped plugin file the walk did not skip as test/generated. */
+const PLUGIN_RUNTIME_SOURCE = /^plugins\/[^/]+\//;
+
 /** Loopback URLs with an embedded port bypass the resource-reference contract. */
 const LOOPBACK_PORT_URL = /https?:\/\/(?:localhost|127\.0\.0\.1):(?:\d+|\$\{[^}]*PORT[^}]*\})/;
+
+/** Source whose service endpoints must come from Aspire discovery, not a retired default. */
+const SERVICE_ENDPOINT_SOURCE = /^(?:plugins|packages\/cli\/(?:src|e2e))\//;
+
+/**
+ * The plugin API and streams defaults retired by #1740 (S5): workers..auth
+ * `8091`-`8094`, durable streams `4437`, and a `127.0.0.1:80xx` probe.
+ */
+const RETIRED_SERVICE_PORT = /809[1-4]|4437|127\.0\.0\.1:80/;
 
 /** A generator that bakes a numeric infrastructure host port into its output. */
 const INFRASTRUCTURE_GENERATOR =
@@ -66,6 +88,60 @@ const INFRASTRUCTURE_LITERAL_HOST_PORT = /\bport:\s*\d/;
 const SCAFFOLD_ENTRY_FILES = [
   'packages/cli/src/kernel/application/scaffold/render-ts-apphost.ts',
   'packages/cli/src/kernel/templates/aspire/generate-appsettings.ts',
+];
+
+/**
+ * One line-level policy: the source it governs, the line shape it rejects, and
+ * the remedy reported for a hit. Rules are independent so a new defect class is
+ * one more entry, not another branch in the scanner.
+ */
+export interface HostPortLineRule {
+  /** Whether the rule governs a repo-relative, `/`-separated path. */
+  readonly appliesTo: (path: string) => boolean;
+  /** Whether one source line is a violation. */
+  readonly matches: (text: string) => boolean;
+  /** Remedy reported with each finding. */
+  readonly message: string;
+}
+
+const ENTRY_PORT_MESSAGE =
+  'Scaffold writes a literal host port into appsettings.json. Leave it unset so ' +
+  'Aspire allocates the host and target ports.';
+
+/**
+ * The line policy shared by the gate and its S5 test. At most one finding per
+ * line: the first rule that governs the path and matches the line wins.
+ */
+export const LINE_RULES: readonly HostPortLineRule[] = [
+  {
+    appliesTo: (path) => PLUGIN_RUNTIME_SOURCE.test(path),
+    matches: (text) => LOOPBACK_PORT_URL.test(text),
+    message: 'Plugin runtime source embeds a loopback service port. Resolve the URL through ' +
+      'Aspire discovery (a resource reference, the allocated `ctx.port(resource)` value, or the ' +
+      'injected service URL) so it never targets another instance.',
+  },
+  {
+    appliesTo: (path) => SERVICE_ENDPOINT_SOURCE.test(path),
+    matches: (text) => RETIRED_SERVICE_PORT.test(text),
+    message: 'Source embeds a retired well-known service port. Resolve the endpoint through ' +
+      'Aspire discovery instead of a fixed default.',
+  },
+  {
+    appliesTo: (path) => path === INFRASTRUCTURE_GENERATOR,
+    matches: (text) => INFRASTRUCTURE_LITERAL_HOST_PORT.test(text),
+    message: 'Infrastructure generator embeds a host port. Emit `port` only from an explicit ' +
+      'database/cache `Port` entry.',
+  },
+  {
+    appliesTo: (path) => SCAFFOLD_ENTRY_FILES.includes(path),
+    matches: (text) => ENTRY_PORT_KEY.test(text) && !CONDITIONAL_WRITE.test(text),
+    message: ENTRY_PORT_MESSAGE,
+  },
+  {
+    appliesTo: (path) => path.endsWith('/aspire/appsettings.json'),
+    matches: (text) => JSON_PORT_KEY.test(text),
+    message: ENTRY_PORT_MESSAGE,
+  },
 ];
 
 const ENDPOINT_LITERAL_MESSAGE =
@@ -144,10 +220,8 @@ export function scanContent(
   const allowances: HostPortAllowance[] = [];
   const normalizedPath = normalized(path);
   if (isTransientAspireScanPath(scopePath)) return { findings, allowances };
-  const checksEntryPorts = SCAFFOLD_ENTRY_FILES.includes(normalizedPath);
-  const checksGeneratedJson = normalizedPath.endsWith('/aspire/appsettings.json');
   const checksContribution = PLUGIN_CONTRIBUTION.test(normalizedPath);
-  const checksInfrastructureGenerator = normalizedPath === INFRASTRUCTURE_GENERATOR;
+  const lineRules = LINE_RULES.filter((rule) => rule.appliesTo(normalizedPath));
 
   const fullTextChecks = [
     { pattern: LITERAL_HOST_PORT, message: ENDPOINT_LITERAL_MESSAGE },
@@ -180,20 +254,10 @@ export function scanContent(
     }
   }
 
+  if (lineRules.length === 0) return { findings, allowances };
   content.split('\n').forEach((text, index) => {
-    const hitsEntry = checksEntryPorts &&
-      ENTRY_PORT_KEY.test(text) &&
-      !CONDITIONAL_WRITE.test(text);
-    const hitsGeneratedJson = checksGeneratedJson && JSON_PORT_KEY.test(text);
-    const hitsContributionUrl = checksContribution && LOOPBACK_PORT_URL.test(text);
-    const hitsInfrastructureLiteral = checksInfrastructureGenerator &&
-      INFRASTRUCTURE_LITERAL_HOST_PORT.test(text);
-    if (
-      !hitsEntry &&
-      !hitsGeneratedJson &&
-      !hitsContributionUrl &&
-      !hitsInfrastructureLiteral
-    ) return;
+    const rule = lineRules.find((candidate) => candidate.matches(text));
+    if (rule === undefined) return;
 
     const line = index + 1;
     const reason = allowanceReason(text);
@@ -211,17 +275,7 @@ export function scanContent(
       return;
     }
 
-    findings.push({
-      path,
-      line,
-      text: text.trim(),
-      message: hitsContributionUrl
-        ? 'Plugin contribution embeds a loopback port. Use a resource reference or the allocated `ctx.port(resource)` value.'
-        : hitsInfrastructureLiteral
-        ? 'Infrastructure generator embeds a host port. Emit `port` only from an explicit database/cache `Port` entry.'
-        : 'Scaffold writes a literal host port into appsettings.json. Leave it unset so ' +
-          'Aspire allocates the host and target ports.',
-    });
+    findings.push({ path, line, text: text.trim(), message: rule.message });
   });
 
   return { findings, allowances };
@@ -271,7 +325,7 @@ if (import.meta.main) {
       'Usage:',
       '  deno run --allow-read check-aspire-host-ports.ts [root ...] [--pretty] [--generated-project]',
       '',
-      'Roots default to packages/cli/src and plugins. Pass a generated project root to validate the scaffold',
+      'Roots default to packages/cli/src, packages/cli/e2e and plugins. Pass a generated project root to validate the scaffold',
       'that consumers actually received.',
       '--generated-project checks an explicitly selected scaffold, including one created under scratch; internal transient state is still excluded.',
     ].join('\n'));
