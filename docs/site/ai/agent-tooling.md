@@ -49,12 +49,28 @@ in, client out. The server's full per-tool contracts live in the
 netscript agent init
 ```
 
-Host detection selects which host integrations are added. Use `--host claude`, `--host vscode`, or
-`--host all` to select an agent host explicitly. Editor configuration is a separate, shared target:
-`--editor none|zed|vscode` applies the same Deno editor setup available during `netscript init` to
-an existing project and adds native MCP wiring. When omitted, one existing `.zed` or `.vscode`
-directory is honoured; if both exist, select explicitly. Unsupported editor names fail with the
-supported list and instructions to use `--editor none` plus a manual MCP configuration.
+Host detection selects which host integrations are added. Use `--host claude`, `--host vscode`,
+`--host opencode`, or `--host all` (all three) to select an agent host explicitly. Without the flag,
+hosts resolve in this order, and the first source that yields a host decides:
+
+1. **Project markers** — an existing `.claude` directory (Claude Code), `.vscode` directory (VS
+   Code), or `opencode.json`, `opencode.jsonc`, or `.opencode` (OpenCode).
+2. **The invoking environment** — `CLAUDECODE` (Claude Code), `OPENCODE` or any `OPENCODE_*`
+   variable (OpenCode), and a VS Code-family terminal (`TERM_PROGRAM=vscode`, `VSCODE_*`, or
+   `CURSOR_*`).
+3. **The default** — Claude Code.
+
+The command prints the decision, for example
+`Agent hosts: opencode (from environment: OPENCODE).`, followed by the editor decision. Only
+variable names are printed, never their values.
+
+Editor configuration is a separate, shared target: `--editor none|zed|vscode` applies the same Deno
+editor setup available during `netscript init` to an existing project and adds native MCP wiring.
+When omitted, one existing `.zed` or `.vscode` directory is honoured; if both exist, select
+explicitly. With neither directory, the editor whose integrated terminal launched the command is
+used: `TERM_PROGRAM` first, because each terminal rewrites it, then `ZED_TERM` (Zed), then
+`VSCODE_*` or `CURSOR_*` (VS Code). Unsupported editor names fail with the supported list and
+instructions to use `--editor none` plus a manual MCP configuration.
 
 If network lookup is unavailable or the framework is unfamiliar, add `--with-docs`. This opt-in
 expands a several-megabyte local corpus containing the release-built prose and task router plus
@@ -71,11 +87,27 @@ NetScript section in `AGENTS.md`. Host and editor targets add only their own int
 | Claude Code host | `.mcp.json`, a derived mirror of the canonical bundle under `.claude/skills/`, and the conditional `playwright-cli` skill when that skill is absent and Aspire is available (best-effort; failures and timeouts are reported and skipped) |
 | VS Code editor | `.vscode/mcp.json`, `.netscript/schema/config-file.v1.json`, `.vscode/settings.json`, `.vscode/extensions.json`, `.vscode/launch.json`, `.vscode/tasks.json` |
 | Zed editor | `.zed/settings.json` with `context_servers`, `.zed/debug.json`, `.zed/tasks.json`, `.netscript/schema/config-file.v1.json` |
+| OpenCode host | `opencode.json` with `netscript` and `aspire` local MCP servers, the `deno lsp` language server, and the `deno fmt` formatter |
+
+OpenCode reads `opencode.json` from the project root and never reads `.mcp.json`, so it gets its
+own writer. Each MCP server entry carries an explicit `timeout` (180 s for `netscript`, 120 s for
+`aspire`) because OpenCode's 5-second default does not cover a cold-cache JSR resolve. OpenCode
+leaves language servers and formatters off when `lsp` and `formatter` are omitted, and ships no
+Deno formatter, so the file also declares `lsp.deno` and `formatter.deno`. An existing `deno` entry
+and an explicit `false` are kept. OpenCode discovers `.agents/skills/` itself, so no extra skill
+tree is written for it.
 
 The generated MCP configuration runs `netscript agent mcp` for the current
 project. Re-running `agent init` is idempotent: unchanged files are left alone,
 and existing host configuration is preserved alongside the `netscript` server
 entry.
+
+The marked `AGENTS.md` section states that MCP is the default surface for NetScript work. When no
+`netscript` MCP tools are listed, it tells the agent to call MCP `doctor` if the server is up, or
+otherwise run `netscript plugin doctor` from the shell (there is no bare `netscript doctor`). The
+agent then re-runs `netscript agent init --host <host>` and restarts its host. Skills are named by
+their registered name ("call the `netscript` skill"), so hosts load them through their skill tool
+instead of reading `SKILL.md` files directly.
 
 Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
 to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
