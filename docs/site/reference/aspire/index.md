@@ -76,7 +76,8 @@ a wrong password from a ready database. For each container PostgreSQL resource t
 helper therefore registers a second check, `<name>_auth`, beside the listener check. Each
 evaluation makes one authenticated `SELECT 1` through the [`pg`](https://node-postgres.com/)
 client, bounded at 2000 ms. The scaffold adds `pg` to the AppHost's `package.json`, and
-`netscript db add` adds it when PostgreSQL joins an existing project.
+every helper regeneration (`netscript service generate`, `netscript db add`, plugin and service
+add/remove) adds it to an existing AppHost that lacks it, keeping project-owned entries.
 
 - **Healthy** reads `postgres credentials accepted on <host>:<port>`.
 - **Unhealthy** reads `postgres credential check failed: <class> <code> at <host>:<port> after <n> ms`,
