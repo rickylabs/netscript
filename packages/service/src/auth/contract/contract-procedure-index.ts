@@ -54,8 +54,14 @@ export interface IndexedProcedure {
 
 /** Bound lookup from a request to the contract procedure it reaches. */
 export interface ProcedureIndex {
-  /** Returns the procedure a request reaches, or undefined when it reaches none. */
+  /** Returns the procedure the oRPC handlers execute for a request, or undefined for none. */
   find(request: ProcedurePolicyRequest): IndexedProcedure | undefined;
+  /**
+   * Returns an internal procedure whose OpenAPI path the request reaches with a method oRPC does
+   * not serve (HEAD, extension methods). Consulted only after real dispatch found nothing, so such
+   * requests fail closed toward the internal procedure.
+   */
+  findInternalGuard(request: ProcedurePolicyRequest): IndexedProcedure | undefined;
   /** Reports whether the RPC mount or any OpenAPI route (any method) already serves a path. */
   claims(path: string): boolean;
 }
@@ -123,11 +129,14 @@ export function bindProcedureIndex(
 
       // An RPC miss falls through to the OpenAPI handler, whose mount usually encloses RPC.
       const relative = stripMount(request.path, apiMount);
-      if (relative === undefined) return undefined;
-      return findRoute(restRoutes, request.method, relative)?.data ??
-        // oRPC serves nothing for a method no procedure declares on this path (HEAD, extension
-        // methods). Fail closed toward an internal procedure on the path all the same.
-        findRoute(internalRoutes, '', relative)?.data;
+      return relative === undefined
+        ? undefined
+        : findRoute(restRoutes, request.method, relative)?.data;
+    },
+
+    findInternalGuard(request: ProcedurePolicyRequest): IndexedProcedure | undefined {
+      const relative = stripMount(request.path, apiMount);
+      return relative === undefined ? undefined : findRoute(internalRoutes, '', relative)?.data;
     },
   });
 }

@@ -307,3 +307,76 @@ Deno.test('raw routes resolve by the path Hono dispatches and cannot shadow defa
   assertEquals(statuses, [200, 200, 403, 401]);
   assertEquals(served, 2);
 });
+
+Deno.test('a raw route never overrides the procedure oRPC actually dispatches', async () => {
+  const secret = await createInstallationSecret(new Uint8Array(32).fill(9));
+  const credential = await deriveInternalCredential(secret, SERVICE);
+  // The undecoded segment `%70ublic` is a distinct oRPC route from the raw route's `public`, so
+  // the declarations do not overlap, yet Hono decodes `/api/items/%70ublic` to the raw route.
+  const contract = {
+    sync: baseContract.route({ method: 'POST', path: '/items/%70ublic' }).output(SuccessSchema)
+      .meta({ access: { audience: 'internal' } }),
+  };
+  const executed: string[] = [];
+  const implemented = implement(contract);
+  const app = createService(
+    implemented.router({
+      sync: implemented.sync.handler(() => {
+        executed.push('internal');
+        return { success: true };
+      }),
+    }),
+    { name: SERVICE },
+  )
+    .withRPC()
+    .withAuthn({
+      authenticator: createCompositeAuthenticator([
+        createInternalCredentialAuthenticator({ secret, service: SERVICE }),
+        createStaticCredentialAuthenticator({
+          credentials: { [USER_TOKEN]: { subject: 'user:alice' } },
+        }),
+      ]),
+    })
+    .withAuthz({
+      authorizer: createContractAuthorizer(contract, {
+        rawRoutes: [{ path: '/api/items/public', authentication: 'required' }],
+      }),
+    })
+    .route('all', '/api/items/public', () => {
+      executed.push('raw');
+      return new Response('raw');
+    })
+    .build();
+
+  const cases = [
+    // oRPC dispatches the encoded POST to the internal procedure: its policy governs.
+    ['POST', '/api/items/%70ublic', undefined, 401, []],
+    ['POST', '/api/items/%70ublic', USER_TOKEN, 403, []],
+    ['POST', '/api/items/%70ublic', credential, 200, ['internal']],
+    // oRPC serves no GET there, so Hono dispatches to the raw route: the raw policy governs.
+    ['GET', '/api/items/%70ublic', undefined, 401, []],
+    ['GET', '/api/items/%70ublic', USER_TOKEN, 200, ['raw']],
+    // The genuine raw path keeps the raw-route behaviour.
+    ['POST', '/api/items/public', undefined, 401, []],
+    ['POST', '/api/items/public', USER_TOKEN, 200, ['raw']],
+  ] as const;
+
+  for (const [method, path, bearer, status, ran] of cases) {
+    executed.length = 0;
+    const response = await app.request(path, {
+      method,
+      headers: {
+        'content-type': 'application/json',
+        ...(bearer ? { authorization: `Bearer ${bearer}` } : {}),
+      },
+      ...(method === 'POST' ? { body: '{}' } : {}),
+    });
+    await response.body?.cancel();
+    const label = bearer === USER_TOKEN ? 'session' : bearer ? 'credential' : 'anonymous';
+    assertEquals(
+      { status: response.status, executed: [...executed] },
+      { status, executed: [...ran] },
+      `${method} ${path} as ${label}`,
+    );
+  }
+});

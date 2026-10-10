@@ -76,12 +76,16 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
         if (index.claims(path)) throw new Error(`${RAW_ROUTE_OVERLAP_ERROR}: ${path}`);
       }
       resolver = Object.freeze({
+        // Precedence follows real dispatch: the builder mounts the oRPC handlers before raw
+        // routes, so a raw route only runs when oRPC serves nothing for the request.
         resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
+          const procedure = index.find(request);
+          if (procedure) return { matched: true, policy: procedure.policy };
           // Raw routes are Hono routes: look them up by the path Hono dispatches on.
           const rawPolicy = rawRoutes.get(normalizePath(request.routePath ?? request.path));
           if (rawPolicy) return { matched: true, policy: rawPolicy };
-          const procedure = index.find(request);
-          return procedure ? { matched: true, policy: procedure.policy } : { matched: false };
+          const guarded = index.findInternalGuard(request);
+          return guarded ? { matched: true, policy: guarded.policy } : { matched: false };
         },
       });
       return resolver;

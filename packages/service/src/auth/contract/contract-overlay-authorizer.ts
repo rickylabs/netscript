@@ -74,7 +74,7 @@ export function createContractOverlayAuthorizer<TContract extends ContractPolicy
       const index = bindProcedureIndex(procedures, binding);
       resolver = Object.freeze({
         resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
-          const policy = index.find(request)?.policy;
+          const policy = (index.find(request) ?? index.findInternalGuard(request))?.policy;
           // Unmarked procedures are deliberately unmatched: the service's own policy applies.
           return policy ? { matched: true, policy } : { matched: false };
         },
