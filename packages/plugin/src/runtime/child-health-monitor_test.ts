@@ -101,3 +101,20 @@ Deno.test('a long failed interval cannot satisfy crash-loop recovery', () => {
   now += CHILD_CRASH_LOOP_THRESHOLD.windowMs;
   assertEquals(health.snapshot().state, 'ready');
 });
+
+Deno.test('readiness must hold throughout the clean running window', () => {
+  let now = 0;
+  const health = new ChildHealthMonitor(() => now);
+  for (let i = 0; i < 3; i++) health.restarting();
+  health.running();
+  now = CHILD_CRASH_LOOP_THRESHOLD.windowMs;
+  health.registryLoaded();
+  health.dependenciesReady();
+  assertEquals(health.snapshot().state, 'crash-looping');
+  now += CHILD_CRASH_LOOP_THRESHOLD.windowMs - 1;
+  health.registryLoaded();
+  health.dependenciesReady();
+  assertEquals(health.snapshot().state, 'crash-looping');
+  now++;
+  assertEquals(health.snapshot().state, 'ready');
+});

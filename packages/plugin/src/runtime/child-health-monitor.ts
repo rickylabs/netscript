@@ -47,11 +47,15 @@ export class ChildHealthMonitor {
 
   /** Record successful static registry load and validation. */
   registryLoaded(): void {
+    if (!this.#registryReady && this.#runningSince !== undefined) this.#runningSince = this.#now();
     this.#registryReady = true;
   }
 
   /** Record successful startup dependency checks. */
   dependenciesReady(): void {
+    if (!this.#dependencyReady && this.#runningSince !== undefined) {
+      this.#runningSince = this.#now();
+    }
     this.#dependencyReady = true;
   }
 
