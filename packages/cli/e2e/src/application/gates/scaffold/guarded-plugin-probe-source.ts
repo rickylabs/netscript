@@ -29,11 +29,18 @@ const registry = await createAuthServiceBackendRegistry({
     NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
     NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
     NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
+    NETSCRIPT_AUTH_USERINFO_ENDPOINT: 'https://issuer.example.test/oauth/userinfo',
+    NETSCRIPT_AUTH_SUBJECT_SOURCE: 'userinfo',
+    NETSCRIPT_AUTH_SUBJECT_CLAIM: 'id',
   },
-  fetch: () => Promise.resolve(new Response(JSON.stringify({
-    access_token: 'access_test', refresh_token: 'refresh_test', token_type: 'Bearer',
-    expires_in: 3600, scope,
-  }), { headers: { 'content-type': 'application/json' } })),
+  fetch: (input) => Promise.resolve(
+    String(input instanceof Request ? input.url : input).endsWith('/oauth/userinfo')
+      ? Response.json({ id: 4242 })
+      : Response.json({
+        access_token: 'access_test', refresh_token: 'refresh_test', token_type: 'Bearer',
+        expires_in: 3600, scope,
+      }),
+  ),
 });
 async function mintSession(scopes: string): Promise<string> {
   scope = scopes;

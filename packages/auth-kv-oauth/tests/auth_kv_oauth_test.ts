@@ -33,6 +33,7 @@ function provider(): ReturnType<typeof defineOAuthProvider> {
     authorizationEndpoint: 'https://issuer.example.test/oauth/authorize',
     tokenEndpoint: 'https://issuer.example.test/oauth/token',
     userInfoEndpoint: 'https://issuer.example.test/me',
+    subject: { source: 'userinfo', claim: 'id' },
     redirectUri: 'https://app.example.test/auth/callback',
     scopes: ['profile', 'email', 'offline_access'],
   });
@@ -157,18 +158,20 @@ Deno.test('flow performs sign-in and callback with single-use state', async () =
     provider: provider(),
     store,
     allowInsecureRequests: true,
-    fetch: () =>
+    fetch: (url) =>
       Promise.resolve(
-        new Response(
-          JSON.stringify({
-            access_token: 'access_test',
-            refresh_token: 'refresh_test',
-            token_type: 'Bearer',
-            expires_in: 3600,
-            scope: 'profile email',
-          }),
-          { headers: { 'content-type': 'application/json' } },
-        ),
+        url === 'https://issuer.example.test/me'
+          ? Response.json({ id: 'user_test' })
+          : new Response(
+            JSON.stringify({
+              access_token: 'access_test',
+              refresh_token: 'refresh_test',
+              token_type: 'Bearer',
+              expires_in: 3600,
+              scope: 'profile email',
+            }),
+            { headers: { 'content-type': 'application/json' } },
+          ),
       ),
   });
 

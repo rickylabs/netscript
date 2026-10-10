@@ -71,6 +71,7 @@ export type {
   OAuthProviderBaseConfig,
   OAuthProviderClientAuthConfig,
   OAuthProviderConfig,
+  OAuthSubjectSource,
   OAuthTokenCustomFetch,
 } from './flow.ts';
 export type { KvOAuthCookieOptions } from './cookies.ts';
