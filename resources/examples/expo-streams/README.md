@@ -59,7 +59,7 @@ instance as the Expo reference rather than the workspace's independently resolve
 deprecated upstream and is not a production app dependency or native-execution proof.
 
 Run the isolated fixture directly from the reference directory with
-`deno test --lock=stream-react.fixture.lock --frozen --unstable-kv --allow-all stream-react.fixture.ts`.
+`deno test --lock=deno.lock --frozen --unstable-kv --allow-all stream-react.fixture.ts`.
 It verifies subscription updates/unmount and a fatal pre-readiness error, including rendering the
 error after remount. The nested SDK run uses the same committed fixture lock with `--frozen`, so
 transitive resolution cannot change between a warm cache, a cold cache, and a PR merge ref. The

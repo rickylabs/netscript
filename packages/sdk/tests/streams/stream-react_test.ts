@@ -7,7 +7,7 @@ Deno.test('Expo-pinned React hook regressions run in the reference compiler cont
     env: { NO_COLOR: '1' },
     args: [
       'test',
-      '--lock=stream-react.fixture.lock',
+      '--lock=deno.lock',
       '--frozen',
       '--unstable-kv',
       '--allow-all',

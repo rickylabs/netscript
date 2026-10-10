@@ -914,6 +914,7 @@ resources/design/dashboard/screens/01-stack-map.html	archival:design-corpus	arch
 resources/design/dashboard/screens/02-flow-trace.html	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
 resources/design/dashboard/screens/03-service-catalog.html	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
 resources/design/dashboard/screens/04-run-inspector.html	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
+resources/examples/expo-streams/deno.lock	lockfile	N/A	dependency lock; any version literal belongs to an unrelated package; excluded from literal sweeps in both parity phases (lock hygiene per AGENTS.md)
 rfcs/0000-polyglot-task-protocol.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0000-scriptc-task-runtime-adapter.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0002-runtime-versioned-automation.md	archival:rfc	archival	exempt — RFC body; dated addenda only
