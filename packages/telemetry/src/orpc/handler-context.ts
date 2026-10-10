@@ -119,9 +119,10 @@ export interface TraceContext {
  *
  * @example
  * ```ts
- * import { notFound } from '@netscript/contracts';
+ * import { notFound, type NotFoundOptions } from '@netscript/contracts';
  *
  * declare const input: { id: string };
+ * declare const errors: NotFoundOptions['errors'];
  * declare const db: { user: { findUnique(args: { where: { id: string } }): Promise<{ id: string } | null> } };
  *
  * // Inside a handler, after its input has been validated:
@@ -132,7 +133,7 @@ export interface TraceContext {
  *
  * if (!user) {
  *   trace.setAttributes({ 'user.notFound': true });
- *   notFound({ resourceType: 'user', resourceId: input.id });
+ *   notFound({ errors, path: ['users', 'getById'], resourceId: input.id });
  * }
  * console.log(user.id);
  * ```
