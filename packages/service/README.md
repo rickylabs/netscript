@@ -651,9 +651,12 @@ metadata or a custom `key` for per-client quotas. The stage warns once through t
 
 IPv6 address keys share their /64 network by default, preventing interface-ID rotation from evading
 quota or filling the memory store with keys within that network. `ipv6Prefix` accepts 0–128; `128`
-retains individual hosts. Canonicalization includes trusted XFF and mapped IPv4 forms, retains IPv6
-scope IDs, and leaves IPv4/custom keys unchanged. This does not alter socket metadata or proxy
-trust. Multiple IPv6 networks or attacker-controlled custom keys can still exhaust capacity.
+retains individual hosts. Canonicalization includes trusted XFF and retains IPv6 scope IDs.
+IPv4-mapped IPv6 peers (`::ffff:0:0/96`) are converted to dotted IPv4 before prefix masking and
+share only the corresponding native IPv4 quota. This keeps IPv4 clients independent on dual-stack
+listeners and through proxies writing mapped forms. Native IPv4 and custom keys stay unchanged. This
+does not alter socket metadata or proxy trust. Multiple IPv6 networks or attacker-controlled custom
+keys can still exhaust capacity.
 
 KV counters expire at the window boundary, but TTL limits lifetime rather than live key count.
 Accepted writes refresh only the remaining window duration; rejections do not create or refresh

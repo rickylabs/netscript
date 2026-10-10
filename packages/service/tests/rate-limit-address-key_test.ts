@@ -1,5 +1,6 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import { configure, createPackageLogger, type LogRecord, resetLogging } from '@netscript/logger';
+import { getConnInfo } from 'hono/deno';
 import { createService, type ServiceApp } from '../mod.ts';
 import { createMemoryRateLimitStore, type ServiceRateLimitOptions } from '../src/rate-limit/mod.ts';
 
@@ -65,6 +66,66 @@ Deno.test('IPv6 address keys canonicalize mapped IPv4 forms and retain scope IDs
   assertEquals(await request(scoped, 'fe80::1%eth0'), 200);
   assertEquals(await request(scoped, 'fe80::2%eth0'), 429);
   assertEquals(await request(scoped, 'fe80::1%eth1'), 200);
+});
+
+Deno.test('mapped IPv4 peers have independent native IPv4 quotas before prefix masking', async () => {
+  for (const ipv6Prefix of [undefined, 0, 64, 128]) {
+    const service = app({ ipv6Prefix });
+    assertEquals(await request(service, '::ffff:192.0.2.1'), 200);
+    assertEquals(await request(service, '::ffff:198.51.100.7'), 200);
+    assertEquals(await request(service, '192.0.2.1'), 429);
+    assertEquals(await request(service, '0:0:0:0:0:FFFF:c000:0201'), 429);
+    assertEquals(await request(service, '198.51.100.7'), 429);
+    // Similar-looking non-mapped addresses keep their IPv6 prefix policy.
+    assertEquals(await request(service, '::fffe:c000:201'), 200);
+  }
+});
+
+Deno.test('trusted mapped XFF addresses share only their corresponding native IPv4 quota', async () => {
+  const service = app({ trustProxy: (address) => address === '192.0.2.10' });
+  assertEquals(await request(service, '192.0.2.10', '::ffff:192.0.2.1'), 200);
+  assertEquals(await request(service, '192.0.2.10', '::ffff:198.51.100.7'), 200);
+  assertEquals(await request(service, '192.0.2.10', '192.0.2.1'), 429);
+  assertEquals(await request(service, '192.0.2.10', '::ffff:c633:6407'), 429);
+});
+
+Deno.test('dual-stack listener keeps distinct mapped IPv4 socket peers in independent quotas', async () => {
+  const running = await createService({}, { name: 'dual-stack-quota' })
+    .withRateLimit({
+      routes: ['/a'],
+      limit: 1,
+      windowMs: 1000,
+      now: () => 0,
+      store: createMemoryRateLimitStore(),
+    })
+    .route('get', '/a', (c) => c.json(getConnInfo(c).remote))
+    .serve({ hostname: '::', port: 0, handleSignals: false });
+  const first = Deno.createHttpClient({ localAddress: '127.0.0.1' });
+  const second = Deno.createHttpClient({ localAddress: '127.0.0.2' });
+  try {
+    const url = `http://127.0.0.1:${running.addr.port}/a`;
+    for (
+      const [client, address] of [[first, '::ffff:127.0.0.1'], [
+        second,
+        '::ffff:127.0.0.2',
+      ]] as const
+    ) {
+      const init: RequestInit & { client: Deno.HttpClient } = { client };
+      const response = await fetch(url, init);
+      assertEquals(response.status, 200);
+      assertEquals((await response.json()).address, address);
+    }
+    for (const client of [first, second]) {
+      const init: RequestInit & { client: Deno.HttpClient } = { client };
+      const response = await fetch(url, init);
+      assertEquals(response.status, 429);
+      await response.body?.cancel();
+    }
+  } finally {
+    first.close();
+    second.close();
+    await running.stop();
+  }
 });
 
 Deno.test('IPv4 and custom keys retain their individual quotas', async () => {

@@ -92,11 +92,14 @@ IPv6 address keys are canonicalized and grouped by /64 by default, including tru
 Rotating interface IDs within that network shares one bucket instead of evading quota or consuming
 one memory-store slot per address. Set `ipv6Prefix` to an integer from 0–128 to choose another
 prefix; `/128` keeps individual IPv6 hosts, and `/0` shares one IPv6 bucket per scope ID. Scope IDs
-remain distinct, and IPv4-mapped IPv6 addresses follow the IPv6 prefix policy. Native IPv4 addresses
-are unchanged. Custom `key` results are used verbatim, and proxy trust and Hono's socket metadata
-still use the original address. Grouping can throttle several clients on one IPv6 network; choose a
-prefix suited to your deployment. Prefix grouping reduces address churn within a network, but does
-not prevent exhaustion by clients from many networks or attacker-controlled custom keys.
+remain distinct. IPv4-mapped IPv6 addresses (`::ffff:0:0/96`) are converted to dotted IPv4 before
+prefix masking and use the same bucket as the corresponding native IPv4 address. Distinct IPv4
+clients retain independent quotas on dual-stack listeners and behind proxies writing mapped forms,
+regardless of `ipv6Prefix`. Native IPv4 addresses are unchanged. Custom `key` results are used
+verbatim, and proxy trust and Hono's socket metadata still use the original address. Grouping can
+throttle several clients on one IPv6 network; choose a prefix suited to your deployment. Prefix
+grouping reduces address churn within a network, but does not prevent exhaustion by clients from
+many networks or attacker-controlled custom keys.
 
 ## Bound storage and contention
 

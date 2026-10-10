@@ -51,10 +51,11 @@ export function resolveServiceClientAddress(
 /**
  * Canonicalizes an address bucket, grouping IPv6 interface addresses by prefix.
  * URL supplies upstream IPv6 parsing/serialization, including IPv4-mapped forms.
+ * Mapped IPv4 peers use the native IPv4 bucket before any IPv6 prefix masking.
  * This changes quota keys only; socket metadata and proxy trust use the original peer.
  * @param address - Resolved client address.
  * @param prefix - Validated IPv6 prefix length.
- * @returns Prefix bucket for IPv6, or the unchanged non-IPv6 address.
+ * @returns Native IPv4 key for mapped peers, IPv6 prefix bucket, or unchanged other address.
  */
 export function rateLimitAddressKey(address: string, prefix: number): string {
   if (isIP(address) !== 6) return address;
@@ -66,9 +67,15 @@ export function rateLimitAddressKey(address: string, prefix: number): string {
   const words = right
     ? [...left, ...Array<string>(8 - left.length - right.length).fill('0'), ...right]
     : left;
-  const network = words.map((word, index) => {
+  const values = words.map((word) => parseInt(word, 16));
+  if (values.slice(0, 5).every((word) => word === 0) && values[5] === 0xffff) {
+    const high = values[6]!;
+    const low = values[7]!;
+    return [high >>> 8, high & 0xff, low >>> 8, low & 0xff].join('.');
+  }
+  const network = values.map((word, index) => {
     const bits = Math.max(0, Math.min(16, prefix - index * 16));
-    return (parseInt(word, 16) & (0xffff << (16 - bits))).toString(16);
+    return (word & (0xffff << (16 - bits))).toString(16);
   });
   return `${network.join(':')}${zone ? `%${zone}` : ''}/${prefix}`;
 }

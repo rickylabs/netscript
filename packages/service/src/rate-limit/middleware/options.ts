@@ -30,7 +30,10 @@ export interface ServiceRateLimitOptions {
   readonly key?: (context: ServiceContext) => string | Promise<string>;
   /** Default false, matching the auth transport policy. Trust only known proxy addresses. */
   readonly trustProxy?: ServiceProxyTrust;
-  /** IPv6 address-key prefix length, 0–128; defaults to /64. Custom keys are unchanged. */
+  /**
+   * Native IPv6 address-key prefix length, 0–128; defaults to /64.
+   * Mapped IPv4 uses native IPv4 keys; custom keys are unchanged.
+   */
   readonly ipv6Prefix?: number;
   /** Clock returning epoch milliseconds; defaults to Date.now. */
   readonly now?: () => number;

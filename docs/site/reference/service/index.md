@@ -143,7 +143,9 @@ retry exhaustion or memory capacity pressure rejects conservatively; store failu
 `ServiceApp.request(input, init, env)` accept it. The listener supplies `remoteAddr` on plain and
 TLS requests so Hono's Deno `getConnInfo` works. The default limiter key is the resolved client
 address; IPv6 keys are canonicalized and grouped by /64, with `ipv6Prefix` (0–128) selecting
-another prefix. IPv4 and custom keys stay unchanged. This grouping affects quota keys only, not
+another prefix. IPv4-mapped IPv6 peers use their corresponding dotted IPv4 bucket before prefix
+masking, so distinct IPv4 clients retain independent quotas on dual-stack listeners. Native IPv4
+and custom keys stay unchanged. This grouping affects quota keys only, not
 socket metadata or proxy trust. A mounted app without metadata uses a shared `unknown` bucket and
 logs a warning once per stage through the request logger or service package logger.
 
