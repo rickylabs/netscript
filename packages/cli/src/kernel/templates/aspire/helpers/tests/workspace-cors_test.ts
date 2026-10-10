@@ -31,6 +31,19 @@ const config = {
   Plugins: { auth: UNPINNED_PLUGIN, workers: UNPINNED_PLUGIN },
 };
 
+Deno.test('rendered register-apps type-checks resources without Environment', async () => {
+  assertEquals('Environment' in UNPINNED_SERVICE, false);
+  assertEquals('Environment' in UNPINNED_PLUGIN, false);
+  const registered = await registerWorkspace({
+    ...EMPTY_CONFIG,
+    Apps: {},
+    Services: { users: UNPINNED_SERVICE },
+    Plugins: { auth: UNPINNED_PLUGIN },
+  });
+  assertEquals(corsValue(registered.services.get('users')!), '');
+  assertEquals(corsValue(registered.plugins.get('auth')!), '');
+});
+
 Deno.test('generated helper injects deferred app origins into every service and plugin', async () => {
   const registered = await registerWorkspace(config);
   // Deliberately allocated after registration; no fixed generator ports.

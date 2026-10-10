@@ -45,7 +45,8 @@ const demoCrud = createCrudContract({
 });
 
 // These seeded showcase procedures are intentionally public on REST and RPC.
-// Metadata preserves the CRUD input/output schema refinements; it changes only access.
+// .meta() drops CRUD's phantom __netscriptSchemas and narrowed ~orpc schema types.
+// Restore those unchanged input/output refinements after changing only access metadata.
 export const {{serviceName | pascalCase}}CrudContractV1 = {
   list: demoCrud.list.meta({ access: { authentication: 'none' } }) as typeof demoCrud.list,
   getById: demoCrud.getById.meta({ access: { authentication: 'none' } }) as typeof demoCrud.getById,

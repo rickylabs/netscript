@@ -32,6 +32,19 @@ function isEnvironmentTarget(resource: unknown): resource is EnvironmentTarget {
     'withEnvironment' in resource && typeof resource.withEnvironment === 'function';
 }
 
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) &&
+    Object.values(value).every((entry) => typeof entry === 'string');
+}
+
+function declaredCorsOrigins(entry: unknown): string | undefined {
+  if (entry === null || typeof entry !== 'object') return undefined;
+  const environment = 'Environment' in entry ? entry.Environment : undefined;
+  const legacy = 'Env' in entry ? entry.Env : undefined;
+  const values = environment ?? legacy;
+  return isStringRecord(values) ? values.NETSCRIPT_CORS_ORIGINS?.trim() : undefined;
+}
+
 /**
  * Registers application resources (web apps, Tauri desktop apps, and tasks)
  * with the Aspire SDK builder.
@@ -73,8 +86,7 @@ export async function registerApps(
       if (!isEnvironmentTarget(resource)) {
         throw new TypeError('Service/plugin resource cannot receive the workspace CORS allowlist');
       }
-      const entry = entries[name];
-      const extra = (entry?.Environment ?? entry?.Env)?.NETSCRIPT_CORS_ORIGINS?.trim();
+      const extra = declaredCorsOrigins(entries[name]);
       const origins = extra && corsOrigins
         ? ReferenceExpression.create`${corsOrigins},${extra}`
         : corsOrigins ?? extra ?? '';

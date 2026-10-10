@@ -47,10 +47,7 @@ export async function readServiceProjectMetadata(
     if (raw.NetScript?.Name) {
       return {
         projectName: raw.NetScript.Name,
-        packagesAsWorkspaceMembers: await hasLocalPackageWorkspace(
-          projectRoot,
-          fs,
-        ),
+        packagesAsWorkspaceMembers: await hasLocalPackageWorkspace(projectRoot, fs),
       };
     }
   }
@@ -65,10 +62,7 @@ export async function readServiceProjectMetadata(
       if (scope) {
         return {
           projectName: scope,
-          packagesAsWorkspaceMembers: await hasLocalPackageWorkspace(
-            projectRoot,
-            fs,
-          ),
+          packagesAsWorkspaceMembers: await hasLocalPackageWorkspace(projectRoot, fs),
         };
       }
     }
@@ -183,16 +177,11 @@ export async function regenerateAspireHelpers(
   }
 
   const parsed = await parseAppSettings(appsettingsPath);
-  const rawAppsettings = JSON.parse(
-    await fs.readFile(appsettingsPath),
-  ) as unknown;
+  const rawAppsettings = JSON.parse(await fs.readFile(appsettingsPath)) as unknown;
   const projectConfig = await loadProjectConfig({ cwd: projectRoot }, {
     process: new DenoProcess(),
   });
-  const registeredPlugins = await loadRegisteredPluginMetadata(
-    projectRoot,
-    projectConfig,
-  );
+  const registeredPlugins = await loadRegisteredPluginMetadata(projectRoot, projectConfig);
   const config = applyRegisteredPluginPermissions(
     preservePluginEnvironment(parsed.config, rawAppsettings),
     registeredPlugins,
@@ -262,11 +251,7 @@ function applyRegisteredPluginPermissions<
       ),
     };
   }
-  return {
-    ...config,
-    Plugins: plugins,
-    BackgroundProcessors: backgroundProcessors,
-  };
+  return { ...config, Plugins: plugins, BackgroundProcessors: backgroundProcessors };
 }
 
 function readDefaultPermissions(value: unknown): readonly string[] {
@@ -275,29 +260,22 @@ function readDefaultPermissions(value: unknown): readonly string[] {
 }
 
 function stringArray(value: unknown): readonly string[] | undefined {
-  return Array.isArray(value) &&
-      value.every((entry) => typeof entry === 'string')
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
     ? value
     : undefined;
 }
 
-function preservePluginEnvironment<
-  TConfig extends { Plugins: Record<string, unknown> },
->(
+function preservePluginEnvironment<TConfig extends { Plugins: Record<string, unknown> }>(
   config: TConfig,
   rawAppsettings: unknown,
 ): TConfig {
-  if (!isRecord(rawAppsettings) || !isRecord(rawAppsettings.NetScript)) {
-    return config;
-  }
+  if (!isRecord(rawAppsettings) || !isRecord(rawAppsettings.NetScript)) return config;
   const rawPlugins = rawAppsettings.NetScript.Plugins;
   if (!isRecord(rawPlugins)) return config;
 
   const plugins = { ...config.Plugins };
   for (const [name, rawPlugin] of Object.entries(rawPlugins)) {
-    if (!isRecord(rawPlugin) || !isStringRecord(rawPlugin.Environment)) {
-      continue;
-    }
+    if (!isRecord(rawPlugin) || !isStringRecord(rawPlugin.Environment)) continue;
     const parsedPlugin = plugins[name];
     if (!isRecord(parsedPlugin)) continue;
     plugins[name] = { ...parsedPlugin, Environment: rawPlugin.Environment };
@@ -310,8 +288,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isStringRecord(value: unknown): value is Record<string, string> {
-  return isRecord(value) &&
-    Object.values(value).every((entry) => typeof entry === 'string');
+  return isRecord(value) && Object.values(value).every((entry) => typeof entry === 'string');
 }
 
 async function hasLocalPackageWorkspace(

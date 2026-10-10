@@ -47,8 +47,18 @@ export interface DistributedApplicationBuilder {
 }
 `;
 
+// Use the shipped config/resource interfaces, whose extension fields are unknown.
+// A narrower Environment double would hide errors in the rendered helper.
+const compatTemplate = await Deno.readTextFile(
+  new URL('../../../../assets/aspire/helpers/_aspire-compat.ts.template', import.meta.url),
+);
+const compatTypes = compatTemplate.match(
+  /export interface NetScriptConfig\s*\{[\s\S]*?(?=export interface ResourceDependencies)/,
+);
+assert(compatTypes, 'The shipped compatibility config interfaces must be present');
+
 const COMPAT_DOUBLE = `
-export interface NetScriptConfig { Apps: Record<string, { Enabled?: boolean }>; Version: string; Services: Record<string, { Environment?: Record<string, string>; Env?: Record<string, string> }>; Plugins: Record<string, { Environment?: Record<string, string>; Env?: Record<string, string> }> }
+${compatTypes[0]}
 export function buildOtelEnvVars(_name: string, _version: string, _mode: string): Record<string, string> { return {}; }
 export function buildViteEnvVarName(name: string) { return { full: name, shorthand: name }; }
 export function resolveWorkspacePath(root: string, path: string) { return root + '/' + path; }
