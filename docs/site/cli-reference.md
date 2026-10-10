@@ -171,8 +171,11 @@ An absolute path also works in non-interactive shells without activating the ver
 Refresh the generated helper with `netscript generate aspire`; do not hand-edit
 `.netscript/aspire-cli.ts`. This command also regenerates the AppHost helpers from root
 `appsettings.json`, and refuses a workspace scaffolded with `--no-aspire`. It does not rewrite root
-`deno.json`. For an existing workspace, update its two telemetry task grants once to match new
-scaffolds:
+`deno.json`. Plugin install/update/remove and service add/remove also regenerate this helper.
+Existing workspace tasks with `--allow-run=aspire --allow-read` keep using `aspire` after regeneration,
+even in non-interactive runs: the helper reads the override only when env permission is already
+granted, and otherwise defaults to `aspire` without prompting. For an existing workspace, update its
+two telemetry task grants only when adopting the override:
 
 ```json
 {

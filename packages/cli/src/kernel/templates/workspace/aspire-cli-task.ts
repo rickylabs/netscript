@@ -1,3 +1,5 @@
+import { NETSCRIPT_ASPIRE_CLI_ENV } from '../../constants/scaffold/scaffold-aspire.ts';
+
 /** Guidance printed when detached dashboard discovery cannot resolve a URL. */
 export const ASPIRE_DASHBOARD_RESOLUTION_GUIDANCE =
   'Try: aspire otel <sub> <resource> --dashboard-url <url>\n' +
@@ -17,7 +19,8 @@ export function generateAspireCliTaskRunner(): string {
 import { AspirePsDashboardReader } from '@netscript/mcp';
 
 const guidance = ${JSON.stringify(ASPIRE_DASHBOARD_RESOLUTION_GUIDANCE)};
-const aspireCli = Deno.env.get('NETSCRIPT_ASPIRE_CLI') || 'aspire';
+const envPermission = Deno.permissions.querySync({ name: 'env', variable: '${NETSCRIPT_ASPIRE_CLI_ENV}' });
+const aspireCli = (envPermission.state === 'granted' ? Deno.env.get('${NETSCRIPT_ASPIRE_CLI_ENV}') : undefined) || 'aspire';
 const [mode, ...rawForwardedArgs] = Deno.args;
 const forwardedArgs = rawForwardedArgs[0] === '--' ? rawForwardedArgs.slice(1) : rawForwardedArgs;
 

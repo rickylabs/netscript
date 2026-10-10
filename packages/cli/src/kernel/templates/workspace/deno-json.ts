@@ -8,6 +8,7 @@
  * direct dependencies stay explicit at the consumer boundary.
  */
 
+import { NETSCRIPT_ASPIRE_CLI_ENV } from '../../constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
@@ -97,9 +98,9 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
           'aspire:start:isolated':
             'cd aspire && ASPIRE_CLI_START_TIMEOUT=300 DcpPublisher__RandomizePorts=true aspire start --isolated',
           'aspire:otel':
-            'deno run --allow-run --allow-env=NETSCRIPT_ASPIRE_CLI --allow-read .netscript/aspire-cli.ts otel',
+            `deno run --allow-run --allow-env=${NETSCRIPT_ASPIRE_CLI_ENV} --allow-read .netscript/aspire-cli.ts otel`,
           'aspire:export':
-            'deno run --allow-run --allow-env=NETSCRIPT_ASPIRE_CLI --allow-read .netscript/aspire-cli.ts export',
+            `deno run --allow-run --allow-env=${NETSCRIPT_ASPIRE_CLI_ENV} --allow-read .netscript/aspire-cli.ts export`,
         }
         : {}),
       check: 'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check',

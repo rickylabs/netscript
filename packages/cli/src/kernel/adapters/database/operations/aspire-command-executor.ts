@@ -1,3 +1,5 @@
+import { resolveAspireExecutable } from '../../runtime/process/resolve-aspire-executable.ts';
+
 type CommandStdio = 'inherit' | 'null' | 'piped';
 
 export interface AspireCommandOptions {
@@ -26,7 +28,7 @@ export class DenoAspireCommandExecutor implements AspireCommandExecutor {
     options: AspireCommandOptions,
   ): Promise<CommandOutput> {
     const output = await new Deno.Command(
-      options.env?.NETSCRIPT_ASPIRE_CLI || Deno.env.get('NETSCRIPT_ASPIRE_CLI') || 'aspire',
+      resolveAspireExecutable(options.env),
       {
         args: [...args],
         cwd: options.cwd,
@@ -50,7 +52,7 @@ export class DenoAspireCommandExecutor implements AspireCommandExecutor {
     options: AspireCommandOptions,
   ): Promise<number> {
     const child = new Deno.Command(
-      options.env?.NETSCRIPT_ASPIRE_CLI || Deno.env.get('NETSCRIPT_ASPIRE_CLI') || 'aspire',
+      resolveAspireExecutable(options.env),
       {
         args: [...args],
         cwd: options.cwd,
