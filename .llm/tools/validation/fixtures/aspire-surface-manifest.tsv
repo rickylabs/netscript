@@ -84,6 +84,7 @@ path	class	owner	disposition
 .llm/tools/maint/teardown/teardown.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/release/baselines/public-surfaces.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/release/release-canary-workflow_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/release/tests/fixtures/canary.3-notes.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-fmt.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-lint.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/aspire-scan-scope_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -367,6 +368,7 @@ packages/cli/e2e/src/application/gates/scaffold/verify-endpoint-readiness.ts	e2e
 packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/verify-mcp-endpoint-directory.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/verify-saga-publish-process.ts	e2e:provider-conformance	X-1826-2	PR #2213; repository saga HTTP process proof borrows the described users PostgreSQL allocation; owned schema/PIDs; not generated sagas-api coverage
 packages/cli/e2e/src/domain/cli-surface.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/evidence.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/extension-axes.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -450,6 +452,7 @@ packages/cli/src/kernel/adapters/database/providers/sqlite.provider.ts	cli-adapt
 packages/cli/src/kernel/adapters/database/scaffolder.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/workspace-mutator.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/plugin/appsettings-entry-builders.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/db-integration.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -554,6 +557,7 @@ packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infr
 packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-plugins.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-services.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-tools.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
+packages/cli/src/kernel/templates/aspire/helpers/register/registration-preamble.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/register/render-http-endpoint.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/register/resolve-resource-environment.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-health-checks_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
@@ -569,6 +573,8 @@ packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-test-support.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/register-http-endpoint_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/registration-preamble_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/registration-variant-lint_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-diagnostics-budget_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
@@ -578,6 +584,7 @@ packages/cli/src/kernel/templates/aspire/helpers/types.ts	generator	S4/S5/S6/S8	
 packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/database/generate-prisma-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/templates/database/generators_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/templates/database/postgres-normalizer_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/templates/workspace/aspire-cli-task.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/deno-json.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/generate-readme.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
@@ -694,6 +701,7 @@ packages/fresh/src/runtime/desktop/mod.ts	package:other	S4	mention only (service
 packages/fresh/src/runtime/desktop/types.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/kv/adapters/redis/connection.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/kv/tests/auto-detect_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/mcp/benchmarks/source-material.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/cli.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/deno.json	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/mod.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
@@ -702,6 +710,7 @@ packages/mcp/src/application/flows/doctor-flow.ts	mcp:client	S3/S11/S13	Aspire C
 packages/mcp/src/application/flows/telemetry-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/application/runner/mcp-server.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/application/service-endpoint-directory.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/domain/docs/faithful-extraction.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/domain/doctor-check-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/domain/telemetry-endpoint.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/domain/tool-contracts.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
@@ -861,6 +870,7 @@ plugins/workers/streams/factory.ts	plugin:other	S5	contribution-seam consumers; 
 plugins/workers/test-api.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/aspire/workers-contribution_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/public/manifest_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/tests/public/type-refs_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/runtime/concurrency_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/verify-plugin.ts	plugin:other	S5	contribution-seam consumers; verify no literal port

@@ -4,6 +4,8 @@ import type { SagaDurabilityTier, SagaInstanceStatus } from './constants.ts';
 /** Metadata persisted with every saga instance. */
 export type SagaStateMetadata<TInstanceId extends string = string> = Readonly<{
   instanceId: SagaInstanceId<TInstanceId>;
+  /** Definition identity used to select topic retention for persisted runtime state. */
+  sagaId?: string;
   version: number;
   status: SagaInstanceStatus;
   durability: SagaDurabilityTier;

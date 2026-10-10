@@ -102,3 +102,5 @@ if (import.meta.main) {
   const ctx = await loadWorkersServiceContext();
   await createWorkersService(ctx);
 }
+
+export type { RunningService, RunningServiceAddress, ServiceApp } from '@netscript/service';

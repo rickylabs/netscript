@@ -20,6 +20,7 @@
     "./streams/server": "./streams/server.ts"
   },
   "imports": {
+    "@netscript/config": "jsr:@netscript/config@0.0.7",
     "@std/async": "jsr:@std/async@^1",
     "@netscript/contracts": "jsr:@netscript/contracts@0.0.7",
     "@netscript/kv": "jsr:@netscript/kv@0.0.7",

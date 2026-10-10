@@ -3,12 +3,17 @@ import {
   nativeModelMessage,
   nativeUiMessage,
 } from '../../../tests/type-fixtures/chat-send-consumer_type.ts';
-import { assert, assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { materializeSnapshotFromDurableStream } from '@durable-streams/tanstack-ai-transport';
 import {
   createNetScriptChatConnection,
   type NetScriptChatMessage,
+  type NetScriptChatSendMessage,
+  projectChatSnapshot,
   resolveChatSnapshot,
+  toNetScriptChatResponse,
 } from './create-chat-connection.ts';
+import { createChatMessageReplay } from '../../internal/chat-message-replay.ts';
 
 type DurableEntry = unknown;
 
@@ -65,6 +70,176 @@ class FakeDurableChatStream {
 }
 
 const TARGET = { sessionId: 'durable-session', baseUrl: 'http://streams.test' } as const;
+
+Deno.test('untyped UI messages without IDs persist and replay exactly once with stable IDs', async () => {
+  const chunks: unknown[] = [];
+  const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
+    if (request.method === 'PUT') return new Response(null, { status: 201 });
+    if (request.method === 'POST') {
+      const body: unknown = await request.json();
+      chunks.push(...(Array.isArray(body) ? body : [body]));
+      return new Response(null, { status: 204 });
+    }
+    return Response.json(chunks, {
+      headers: { 'Stream-Next-Offset': String(chunks.length), 'Stream-Up-To-Date': 'true' },
+    });
+  });
+  const target = { sessionId: 'missing-ui-ids', baseUrl: `http://127.0.0.1:${server.addr.port}` };
+  // JSON is the actual untyped runtime boundary; the public UI type requires an ID.
+  const messages: readonly NetScriptChatSendMessage[] = await new Request('https://app.test', {
+    method: 'POST',
+    body: JSON.stringify([
+      { role: 'user', parts: [{ type: 'text', text: 'First prompt' }] },
+      { role: 'user', parts: [{ type: 'text', text: 'Second prompt' }] },
+    ]),
+  }).json();
+  try {
+    await toNetScriptChatResponse({
+      target,
+      newMessages: messages,
+      source: (async function* () {})(),
+      mode: 'await',
+    });
+    const seed = await resolveChatSnapshot({ target });
+    const reload = await resolveChatSnapshot({ target });
+    assertEquals(seed.messages.map((message) => message.content), [
+      'First prompt',
+      'Second prompt',
+    ]);
+    assert(seed.messages.every((message) => message.id.length > 0));
+    assertEquals(new Set(seed.messages.map((message) => message.id)).size, 2);
+    assertEquals(reload, seed);
+    assertEquals(messages.map((message) => message.id), [undefined, undefined]);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('native batch public-reader and seed/live limits are explicitly documented', async () => {
+  const chunks: unknown[] = [];
+  const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
+    if (request.method === 'PUT') return new Response(null, { status: 201 });
+    if (request.method === 'POST') {
+      const body: unknown = await request.json();
+      chunks.push(...(Array.isArray(body) ? body : [body]));
+      return new Response(null, { status: 204 });
+    }
+    return Response.json(chunks, {
+      headers: { 'Stream-Next-Offset': String(chunks.length), 'Stream-Up-To-Date': 'true' },
+    });
+  });
+  const target = {
+    sessionId: 'native-reader-limits',
+    baseUrl: `http://127.0.0.1:${server.addr.port}`,
+  };
+  try {
+    await toNetScriptChatResponse({
+      target,
+      newMessages: [nativeUiMessage],
+      source: (async function* () {})(),
+      mode: 'await',
+    });
+    const seed = await resolveChatSnapshot({ target });
+    const upstream = await materializeSnapshotFromDurableStream({
+      readUrl: `${target.baseUrl}/v1/stream/netscript/ai/chat/${target.sessionId}`,
+    });
+    const liveBootstrap = projectChatSnapshot(upstream.messages);
+    assert(seed.renderParts.some((part) => part.kind === 'tool'));
+    assertEquals(liveBootstrap.renderParts.some((part) => part.kind === 'tool'), false);
+    assertEquals(seed.messages.map((message) => Object.keys(message)), [['id', 'role', 'content']]);
+    for (const file of ['README.md', '../../../../../docs/site/ai/durable-chat.md']) {
+      const docs = await Deno.readTextFile(new URL(file, import.meta.url));
+      assertStringIncludes(docs, 'No public API returns persisted native parts.');
+      assertStringIncludes(
+        docs,
+        'Native batch tool cards appear on seed/reload but not on live subscribers.',
+      );
+    }
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('native newMessages survive default persistence and seed reload without replacing history', async () => {
+  const chunks: unknown[] = [];
+  const methods: string[] = [];
+  const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
+    methods.push(request.method);
+    if (request.method === 'POST') {
+      const body: unknown = await request.json();
+      chunks.push(...(Array.isArray(body) ? body : [body]));
+      return new Response(null, {
+        status: 204,
+        headers: { 'Stream-Next-Offset': String(chunks.length) },
+      });
+    }
+    if (request.method === 'PUT') return new Response(null, { status: 201 });
+    return Response.json(chunks, {
+      headers: { 'Stream-Next-Offset': String(chunks.length), 'Stream-Up-To-Date': 'true' },
+    });
+  });
+  const target = {
+    sessionId: 'native-persistence',
+    baseUrl: `http://127.0.0.1:${server.addr.port}`,
+  };
+  const legacy = { id: 'legacy', role: 'user' as const, content: 'Existing history —' };
+  const messages = [
+    { ...nativeUiMessage, futureField: { retained: true } },
+    nativeModelMessage,
+    nativeActivityMessage,
+    { id: 'future', role: 'user' as const, parts: [{ type: 'future-attachment', opaque: true }] },
+    { id: 'null-model', role: 'tool' as const, content: null, toolCallId: 'null-call' },
+    { role: 'user' as const, content: 'Model without an id' },
+  ];
+  const expected = JSON.parse(JSON.stringify(messages));
+  try {
+    const immediate = await toNetScriptChatResponse({
+      target,
+      newMessages: [legacy],
+      source: (async function* () {})(),
+    });
+    assertEquals(immediate.status, 202);
+    assert(chunks.length > 0, 'client messages must persist before an immediate response returns');
+    await toNetScriptChatResponse({
+      target,
+      newMessages: messages,
+      source: (async function* () {
+        yield { type: 'TEXT_MESSAGE_START', messageId: 'reply', role: 'assistant' };
+        yield { type: 'TEXT_MESSAGE_CONTENT', messageId: 'reply', delta: 'Retained reply…' };
+        yield { type: 'TEXT_MESSAGE_END', messageId: 'reply' };
+      })(),
+      mode: 'await',
+    });
+    // A fresh replay reads serialized durable bytes, not the objects passed to send.
+    const replay = createChatMessageReplay();
+    const persisted: unknown[] =
+      await (await fetch(`${target.baseUrl}/v1/stream/netscript/ai/chat/${target.sessionId}`))
+        .json();
+    for (const chunk of persisted) replay.apply(chunk);
+    const reloaded = replay.messages() as Record<string, unknown>[];
+    assertEquals(reloaded[1]?.parts, expected[0].parts);
+    assertEquals(reloaded[0], { ...legacy, parts: [{ type: 'text', text: legacy.content }] });
+    for (const [index, message] of expected.entries()) {
+      const actual = reloaded[index + 1];
+      for (const [key, value] of Object.entries(message)) assertEquals(actual[key], value);
+    }
+    assert(typeof reloaded[6].id === 'string' && reloaded[6].id.length > 0);
+    assertEquals(reloaded.at(-1)?.id, 'reply');
+    const seed = await resolveChatSnapshot({ target });
+    const reload = await resolveChatSnapshot({ target });
+    assertEquals(reload, seed);
+    assertEquals(seed.messages[0].content, legacy.content);
+    assertEquals(seed.messages.at(-1)?.content, 'Retained reply…');
+    assert(seed.renderParts.some((part) => part.kind === 'tool' && part.toolName === 'inspect'));
+    assertEquals(seed.offset, String(chunks.length));
+    assertEquals(methods.filter((method) => method === 'PUT').length, 2);
+    assertEquals(methods.filter((method) => method === 'GET').length, 3);
+    // Serialization and replay must not mutate the caller's parts or metadata.
+    assertEquals(JSON.parse(JSON.stringify(messages)), expected);
+  } finally {
+    await server.shutdown();
+  }
+});
 
 function nextValue<T>(iterator: AsyncIterator<T>): Promise<T> {
   return iterator.next().then((result) => {

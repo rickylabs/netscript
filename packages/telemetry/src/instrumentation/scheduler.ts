@@ -341,10 +341,15 @@ export function startJobDispatchSpan(
  *
  * @example
  * ```ts
+ * import type { MessageQueue, ScheduledJobDefinition } from '@netscript/telemetry/instrumentation';
+ *
+ * declare const jobDef: ScheduledJobDefinition;
+ * declare const queue: MessageQueue<{ jobId: string; triggeredBy: string }>;
+ *
  * await traceJobDispatch(
  *   { job: jobDef, triggeredBy: 'cron', queueName: 'jobs' },
  *   async (headers) => {
- *     const message = { jobId: job.id, triggeredBy: 'cron', ... };
+ *     const message = { jobId: jobDef.id, triggeredBy: 'cron' };
  *     await queue.enqueue(message, { headers });
  *   }
  * );
