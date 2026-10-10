@@ -985,7 +985,10 @@ Deno.test('#2007 agent init resolves the host from the invoking environment and 
       environment: { OPENCODE: '1' },
     });
     assertEquals(project.hosts, ['claude']);
-    assertEquals(describeAgentInitResolution(project.resolution)[0], 'Agent hosts: claude (from project: .claude).');
+    assertEquals(
+      describeAgentInitResolution(project.resolution)[0],
+      'Agent hosts: claude (from project: .claude).',
+    );
     assertFalse(await fs.exists(join(projectRoot, 'opencode.json')));
 
     const fallback = await initAgent({ projectRoot: defaultRoot }, {

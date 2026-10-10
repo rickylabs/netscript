@@ -22,7 +22,11 @@ export const AGENT_PROJECT_MARKERS = [
 /** One project-root agent host or editor marker. */
 export type AgentProjectMarker = typeof AGENT_PROJECT_MARKERS[number];
 
-const OPENCODE_MARKERS: readonly AgentProjectMarker[] = ['opencode.json', 'opencode.jsonc', '.opencode'];
+const OPENCODE_MARKERS: readonly AgentProjectMarker[] = [
+  'opencode.json',
+  'opencode.jsonc',
+  '.opencode',
+];
 
 interface Signal<T> {
   readonly value: T;
