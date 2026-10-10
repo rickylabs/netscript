@@ -1,5 +1,5 @@
 /**
- * Fenced durable chat session writer (#2067) — internal to `@netscript/fresh/ai`.
+ * Fenced durable chat session writer for `@netscript/fresh/ai`.
  *
  * Mirrors `toDurableChatSessionResponse` from
  * `@durable-streams/tanstack-ai-transport` (same stream setup, same echo and

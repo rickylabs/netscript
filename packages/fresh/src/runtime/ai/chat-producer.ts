@@ -1,5 +1,5 @@
 /**
- * Writer-identity contract for fenced durable chat appends (#2067).
+ * Writer-identity contract for fenced durable chat appends.
  *
  * A chat executor that may be reclaimed (a worker or saga whose lease expired
  * and whose turn was handed to a new claim) names itself with a

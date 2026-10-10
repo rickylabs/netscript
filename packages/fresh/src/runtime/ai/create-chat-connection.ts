@@ -288,17 +288,11 @@ export interface NetScriptChatResponseOptions {
    * hook returns `true`. No default is applied.
    */
   readonly authorize?: NetScriptChatAuthorize;
-  /**
-   * Opt-in writer fencing for a reclaimable executor: the echo and assistant
-   * chunks share one idempotent-producer sequence, and a stale epoch rejects with
-   * `NetScriptChatProducerError` without storing anything. See
-   * {@link NetScriptChatProducer}. Omitted: appends are unfenced, as before.
-   */
+  /** Opt-in writer fencing; see {@link NetScriptChatProducer}. Omitted: appends are unfenced. */
   readonly producer?: NetScriptChatProducer;
   /**
-   * Test/adapter seam: build the durable session `Response`. Defaults to
-   * `toDurableChatSessionResponse` from the transport, or the fenced
-   * idempotent-producer writer when `producer` is present.
+   * Test/adapter seam: build the durable session `Response`. Defaults to the
+   * transport response, or the fenced writer when `producer` is present.
    */
   readonly toResponse?: (input: {
     readonly writeUrl: string;
