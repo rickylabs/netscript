@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name": "NetScript stream reference",
+    "slug": "netscript-stream-reference",
+    "jsEngine": "hermes",
+    "android": { "package": "dev.netscript.streamreference" }
+  }
+}

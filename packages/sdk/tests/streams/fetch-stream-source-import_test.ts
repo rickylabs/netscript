@@ -27,6 +27,11 @@ Deno.test('published fetch consumer excludes telemetry, OTel and Deno API module
   const root = new URL('../../', import.meta.url);
   const manifest = JSON.parse(await Deno.readTextFile(new URL('deno.json', root)));
   assertEquals(manifest.exports['./streams/consumer'], './src/client/stream-source/mod.ts');
+  assertEquals(manifest.exports['./streams/collections'], './src/client/stream-collection/mod.ts');
+  assertEquals(manifest.exports['./streams/react'], './src/client/stream-react/mod.ts');
+  for (const key of ['./streams/collections', './streams/react']) {
+    assertEquals(await unsafeModules(new URL(manifest.exports[key], root)), []);
+  }
   const consumer = new URL(manifest.exports['./streams/consumer'], root);
   assertEquals(await unsafeModules(consumer), []);
 
