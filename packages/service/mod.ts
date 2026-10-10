@@ -83,6 +83,7 @@ export type {
   AuthzOptions,
   ContractAuthorizerOptions,
   ContractAuthorizerRawRoute,
+  ContractOverlayAuthorizerOptions,
   ServiceAuthPolicy,
   ServiceGuardedAuthPolicy,
   ServicePublicAuthPolicy,
@@ -94,12 +95,14 @@ export type {
   ContractPolicyBindingOptions,
   ContractPolicyContract,
   ContractPolicyRpcRouteAlias,
+  InternalCallerPredicate,
   ProcedureAccessPolicy,
   ProcedurePolicyRequest,
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
-} from './src/auth/contract-policy.ts';
+} from './src/auth/contract/contract-policy.ts';
 export { createContractAuthorizer } from './src/auth/contract/contract-authorizer.ts';
+export { createContractOverlayAuthorizer } from './src/auth/contract/contract-overlay-authorizer.ts';
 export type {
   AuthenticatorPort,
   AuthnRequest,
