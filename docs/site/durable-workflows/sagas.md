@@ -402,7 +402,7 @@ response; the endpoint never treats an indefinitely pending publish as success.
     { name: "headers", type: "Record<string, string>", desc: "Extra headers sent with every publish (auth, tenant routing)." },
     { name: "retryableStatusCodes", type: "readonly number[] (default 408,409,425,429,5xx)", desc: "HTTP statuses treated as retryable so the receipt is marked retryable." },
     { name: "id", type: "string (default 'http-saga-publisher')", desc: "Stable publisher id surfaced in diagnostics." },
-    { name: "fetcher / readEnv", type: "boundary fns", desc: "Test/injection seams for the fetch implementation and the env reader used for discovery." }
+    { name: "fetcher / readEnv / listEnvKeys", type: "boundary fns", desc: "Test/injection seams for the fetch implementation, the env reader used for discovery, and the env key-name enumeration used only to diagnose a failed discovery." }
   ]
 }) }}
 
@@ -410,6 +410,14 @@ The port returns a typed **receipt** rather than throwing: `publish(...)` resolv
 `SagaPublisherResult` — either `{ published: true, ... }` (a `SagaPublisherReceipt`) or
 `{ published: false, reason, retryable }` (a `SagaPublisherRejected`). `publishMany(...)`
 takes a `mode: 'sequential' | 'parallel'` so a batch can fan out.
+
+There is no fallback port: when no source resolves, the receipt is non-retryable with
+`reason: 'no-endpoint'` and a `diagnostic` naming each source tried, in order —
+`options.baseUrl`, `services__<serviceName>__https__0`, `services__<serviceName>__http__0`,
+`SAGAS_API_URL`, `NETSCRIPT_SAGAS_URL` — plus whether a `services__*` key or `NETSCRIPT_ASPIRE`
+marker proved an Aspire environment and whether env enumeration was denied. It carries key
+names only, never values. `publishSagaOrThrow(...)` renders that diagnostic into the
+`SagasError` it raises.
 
 {{ comp.tabbedCode({ tabs: [
   {
