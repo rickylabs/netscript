@@ -57,6 +57,7 @@ Deno.test('defineService disconnects a capable database client on stop', async (
     };
 
     const running = await defineService({}, {
+      auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
       name: 'define-service-disconnect',
       port: 0,
       db,
@@ -71,6 +72,7 @@ Deno.test('defineService disconnects a capable database client on stop', async (
 
 Deno.test('defineService exposes a friendly service landing response', async () => {
   const running = await defineService({}, {
+    auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
     name: 'define-service-landing',
     port: 0,
   });
@@ -98,6 +100,7 @@ Deno.test('defineService aggregate health selects sqlite and excludes unused mys
   let sqliteQueries = 0;
 
   const running = await defineService({}, {
+    auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
     name: 'define-service-provider-health',
     port: 0,
     db: {
@@ -137,6 +140,7 @@ Deno.test('defineService preserves readiness for the configured database', async
   let rejectQuery = false;
 
   const running = await defineService({}, {
+    auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
     name: 'define-service-provider-readiness',
     port: 0,
     db: {
@@ -181,6 +185,7 @@ Deno.test('defineService skips disconnect hook for non-capable database client',
     };
 
     const running = await defineService({}, {
+      auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
       name: 'define-service-no-disconnect',
       port: 0,
       db,

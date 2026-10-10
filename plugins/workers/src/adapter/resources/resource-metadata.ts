@@ -8,6 +8,7 @@ export type WorkerResourceMetadata = Readonly<{
   schedule?: string;
   timeout?: number;
   maxRetries?: number;
+  template?: 'webhook-delivery';
   tags?: readonly string[];
   runtime?: string;
 }>;

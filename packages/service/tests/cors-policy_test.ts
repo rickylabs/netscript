@@ -1,5 +1,10 @@
 import { assertEquals, assertRejects, assertThrows } from '@std/assert';
-import { createService, defineService, type ServiceApp } from '../mod.ts';
+import {
+  createService,
+  defineService,
+  type DefineServiceOptions,
+  type ServiceApp,
+} from '../mod.ts';
 
 const appOrigin = 'https://app.example';
 const otherOrigin = 'https://other.example';
@@ -151,15 +156,23 @@ Deno.test('CORS credentialed origin callbacks cannot emit a wildcard', async () 
 
 Deno.test('defineService inherits workspace origins and accepts an explicit override', async () => {
   await withOrigins(appOrigin, async () => {
-    const running = await defineService({}, { name: 'preset-env', port: 0 });
+    const running = await defineService({}, {
+      auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
+      name: 'preset-env',
+      port: 0,
+    });
     try {
       await assertOrigin(running.app, appOrigin, appOrigin);
       await assertOrigin(running.app, otherOrigin, null);
     } finally {
       await running.stop();
     }
-    // Structural options keep this regression test compilable against main's old preset type.
-    const options = { name: 'preset-explicit', port: 0, cors: { origin: [otherOrigin] } };
+    const options: DefineServiceOptions = {
+      name: 'preset-explicit',
+      port: 0,
+      cors: { origin: [otherOrigin] },
+      auth: { public: true, reason: 'Public CORS fixture' },
+    };
     const explicit = await defineService({}, options);
     try {
       await assertOrigin(explicit.app, otherOrigin, otherOrigin);
@@ -171,7 +184,12 @@ Deno.test('defineService inherits workspace origins and accepts an explicit over
 });
 
 Deno.test('defineService rejects credentialed wildcards before opening a listener', async () => {
-  const options = { name: 'preset-invalid', port: 0, cors: { origin: '*', credentials: true } };
+  const options: DefineServiceOptions = {
+    name: 'preset-invalid',
+    port: 0,
+    cors: { origin: '*', credentials: true },
+    auth: { public: true, reason: 'Public CORS fixture' },
+  };
   await assertRejects(
     async () => {
       const unexpected = await defineService({}, options);
