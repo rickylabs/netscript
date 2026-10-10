@@ -12,16 +12,15 @@ import type {
   RegisteredPluginEnvironmentVariableValue,
 } from '../../domain/resolved-config.ts';
 import type { PluginInfrastructureDependency } from '../../domain/plugin-kind.ts';
-import { ConfigError } from '../../domain/errors/cli-exit-error.ts';
 import { loadProjectConfig } from './project-config-loader.ts';
 import { DenoProcess } from '../runtime/process/deno-process.ts';
 import { resolveExportedPluginManifest } from '../../application/plugin/exported-plugin-manifest.ts';
 import { resolvePluginImportSpecifier } from '../../application/plugin/configured-plugin-specifier.ts';
 import { resolveRegisteredPluginSource } from '../../application/plugin/registered-plugin-source.ts';
 import { probeConfiguredPluginManifest } from './configured-plugin-manifest-probe.ts';
+import { requireValidPluginComposition } from '../../application/plugin/plugin-composition.ts';
 import type { ConfiguredPluginManifestSummary } from './configured-plugin-manifest-summary.ts';
 
-const PLUGIN_DEPENDENCY_MISSING_EXIT_CODE = 76;
 const SCAFFOLD_PLUGIN_MANIFEST = 'scaffold.plugin.json';
 const CONFIGURED_PLUGIN_MANIFEST_RESULT_PREFIX = 'NETSCRIPT_CONFIGURED_PLUGIN_MANIFESTS=';
 const CONFIGURED_PLUGIN_MANIFEST_LOAD_TIMEOUT_MS = 30_000;
@@ -138,18 +137,39 @@ async function resolvePluginConfigSnapshot(
   config?: NetScriptConfig,
 ): Promise<RegisteredPluginSnapshot[]> {
   const specs = resolvePluginSpecs(config);
-  const manifests = await readOptionalTextFile(join(projectRoot, 'deno.json')) === null
-    ? await resolvePluginManifestsInProcess(projectRoot, specs)
-    : await resolvePluginManifestsWithProjectConfig(projectRoot, specs);
-
-  const installedPluginNames = new Set(manifests.map((manifest) => manifest.name));
-  for (const manifest of manifests) {
-    validatePluginDependencies(manifest, installedPluginNames);
-  }
+  const manifests = await loadConfiguredPluginManifests(projectRoot, specs);
+  requireValidPluginComposition(manifests);
 
   return manifests.map((manifest, index) =>
     resolveRegisteredPluginSnapshot(manifest, specs[index] ?? manifest.name, config)
   );
+}
+
+/**
+ * Load every configured plugin manifest and validate the root composition.
+ *
+ * Generators call this before emitting host wiring so they share the runtime bootstrap's
+ * `validatePluginComposition` check.
+ */
+export async function validateConfiguredPluginComposition(
+  projectRoot: string,
+  config?: NetScriptConfig,
+): Promise<void> {
+  const resolvedConfig = config ??
+    await loadProjectConfig({ cwd: projectRoot }, { process: new DenoProcess() });
+  const specs = resolvePluginSpecs(resolvedConfig);
+  const manifests = await loadConfiguredPluginManifests(projectRoot, specs);
+  requireValidPluginComposition(manifests);
+}
+
+async function loadConfiguredPluginManifests(
+  projectRoot: string,
+  specs: readonly string[],
+): Promise<PluginManifest[]> {
+  if (specs.length === 0) return [];
+  return await readOptionalTextFile(join(projectRoot, 'deno.json')) === null
+    ? await resolvePluginManifestsInProcess(projectRoot, specs)
+    : await resolvePluginManifestsWithProjectConfig(projectRoot, specs);
 }
 
 async function resolvePluginManifestsInProcess(
@@ -476,39 +496,6 @@ async function resolvePluginManifest(
     throw new Error(`Plugin spec "${spec}" does not export a plugin manifest.`);
   }
   return manifest;
-}
-
-function validatePluginDependencies(
-  manifest: PluginManifest,
-  installedPluginNames: ReadonlySet<string>,
-): void {
-  for (const [alias, dependency] of Object.entries(manifest.dependencies ?? {})) {
-    if (!hasHostContribution(dependency)) {
-      continue;
-    }
-
-    if (installedPluginNames.has(dependency.name)) {
-      continue;
-    }
-
-    throw new ConfigError(
-      PLUGIN_DEPENDENCY_MISSING_EXIT_CODE,
-      `Plugin "${manifest.name}" depends on "${dependency.name}" (alias "${alias}") which is not installed. Run: ns plugins install ${dependency.name}`,
-      {
-        context: {
-          plugin: manifest.name,
-          dependency: dependency.name,
-          alias,
-        },
-      },
-    );
-  }
-}
-
-function hasHostContribution(manifest: PluginManifest): boolean {
-  return Object.values(manifest.contributions).some((contribution) =>
-    Array.isArray(contribution) ? contribution.length > 0 : contribution !== undefined
-  );
 }
 
 function resolveRegisteredPluginSnapshot(
