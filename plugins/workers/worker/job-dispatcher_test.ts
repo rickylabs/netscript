@@ -32,6 +32,17 @@ import type {
   WorkerTaskResult,
 } from './worker-options.ts';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
+import { context as otelContext, propagation } from 'npm:@opentelemetry/api@^1.9.1';
+import { AsyncLocalStorageContextManager } from 'npm:@opentelemetry/context-async-hooks@^2.9.0';
+import { W3CTraceContextPropagator } from 'npm:@opentelemetry/core@^2.5.0';
+import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
+import { getParentContextFromHeaders } from '@netscript/telemetry/context';
+
+const MESSAGE_TRACE_ID = '0af7651916cd43dd8448eb211c80319c';
+const MESSAGE_TRACEPARENT = `00-${MESSAGE_TRACE_ID}-b7ad6b7169203331-01`;
+const MESSAGE_TRACESTATE = 'vendor=message';
+const ACTIVE_TRACE_ID = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const ACTIVE_TRACEPARENT = `00-${ACTIVE_TRACE_ID}-bbbbbbbbbbbbbbbb-01`;
 
 Deno.test('processWorkerJob skips completed duplicate redelivery without creating a second execution', async () => {
   await using kv = new MemoryKvAdapter();
@@ -478,12 +489,14 @@ class MemoryExecutionState implements WorkerExecutionState {
 
 class CountingTaskExecutor implements WorkerTaskExecutor {
   calls = 0;
+  readonly options: TaskExecutionOptions[] = [];
 
   constructor(private readonly results: (WorkerTaskResult | Error)[]) {}
 
-  execute(_task: TaskDefinition, _options: TaskExecutionOptions): Promise<WorkerTaskResult> {
+  execute(_task: TaskDefinition, options: TaskExecutionOptions): Promise<WorkerTaskResult> {
     const result = this.results[this.calls] ?? { success: true, duration: 1 };
     this.calls += 1;
+    this.options.push(options);
     if (result instanceof Error) {
       return Promise.reject(result);
     }
@@ -491,13 +504,13 @@ class CountingTaskExecutor implements WorkerTaskExecutor {
   }
 }
 
-async function bounded<T>(promise: Promise<T>): Promise<T> {
+async function bounded<T>(promise: Promise<T>, timeoutMs = 2_000): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
       promise,
       new Promise<never>((_resolve, reject) => {
-        timer = setTimeout(() => reject(new Error('Lifecycle did not settle.')), 2_000);
+        timer = setTimeout(() => reject(new Error('Lifecycle did not settle.')), timeoutMs);
       }),
     ]);
   } finally {
@@ -738,3 +751,177 @@ for (const cause of ['timeout', 'cancel', 'shutdown'] as const) {
 }
 Deno.test('Worker reentrant stop from abort listener shares completion and cleanup', () =>
   verifyBlockedProgressWorker('shutdown', true));
+
+Deno.test('processWorkerTask forwards correlation and message trace context into executor options', async () => {
+  await using kv = new MemoryKvAdapter();
+  const executionState = new MemoryExecutionState();
+  const taskExecutor = new CountingTaskExecutor([{ success: true, duration: 1 }]);
+  const context = dispatchContext({
+    kv,
+    executionState,
+    taskExecutor,
+    task: taskDefinition('traced-task'),
+  });
+
+  await processWorkerTask(context, {
+    taskId: 'traced-task',
+    topic: 'tasks',
+    triggeredBy: 'manual',
+    correlationId: 'corr-task-1',
+    traceparent: MESSAGE_TRACEPARENT,
+    tracestate: MESSAGE_TRACESTATE,
+  }, messageContext('task-trace-1'));
+
+  assertEquals(taskExecutor.options.length, 1);
+  const options = taskExecutor.options[0]!;
+  assertEquals(options.correlationId, 'corr-task-1');
+  assertEquals(options.traceparent, MESSAGE_TRACEPARENT);
+  assertEquals(options.tracestate, MESSAGE_TRACESTATE);
+  assertEquals(executionState.created[0]?.correlationId, 'corr-task-1');
+  assertEquals(executionState.created[0]?.traceparent, MESSAGE_TRACEPARENT);
+  assertEquals(executionState.created[0]?.tracestate, MESSAGE_TRACESTATE);
+});
+
+Deno.test('processWorkerTask prefers the active span context over the message traceparent', async () => {
+  const restore = installTracePropagation();
+  try {
+    await using kv = new MemoryKvAdapter();
+    const taskExecutor = new CountingTaskExecutor([{ success: true, duration: 1 }]);
+    const context = dispatchContext({
+      kv,
+      executionState: new MemoryExecutionState(),
+      taskExecutor,
+      task: taskDefinition('span-task'),
+    });
+
+    await otelContext.with(
+      getParentContextFromHeaders({ traceparent: ACTIVE_TRACEPARENT }),
+      () =>
+        processWorkerTask(context, {
+          taskId: 'span-task',
+          topic: 'tasks',
+          triggeredBy: 'manual',
+          correlationId: 'corr-span-1',
+          traceparent: MESSAGE_TRACEPARENT,
+          tracestate: MESSAGE_TRACESTATE,
+        }, messageContext('task-span-1')),
+    );
+
+    const options = taskExecutor.options[0]!;
+    assertEquals(options.correlationId, 'corr-span-1');
+    assertEquals(options.traceparent, ACTIVE_TRACEPARENT);
+    assertEquals(options.tracestate, undefined);
+  } finally {
+    restore();
+  }
+});
+
+Deno.test('processWorkerJob forwards the correlation id to the polyglot subprocess executor', async () => {
+  await using kv = new MemoryKvAdapter();
+  const taskExecutor = new CountingTaskExecutor([{ success: true, duration: 1 }]);
+  const context = dispatchContext({
+    kv,
+    executionState: new MemoryExecutionState(),
+    taskExecutor,
+    job: polyglotJob('traced-polyglot-job'),
+  });
+
+  await processWorkerJob(context, {
+    jobId: 'traced-polyglot-job',
+    topic: 'jobs',
+    triggeredBy: 'manual',
+    correlationId: 'corr-job-1',
+    traceparent: MESSAGE_TRACEPARENT,
+  }, messageContext('job-trace-1'));
+
+  assertEquals(taskExecutor.options.length, 1);
+  const options = taskExecutor.options[0]!;
+  assertEquals(options.correlationId, 'corr-job-1');
+  assert(String(options.traceparent).includes(MESSAGE_TRACE_ID));
+});
+
+Deno.test({
+  name: 'Worker task queue delivers CORRELATION_ID and TRACEPARENT into a real task subprocess env',
+  fn: async () => {
+    await using kv = new MemoryKvAdapter();
+    const scriptDir = await Deno.makeTempDir({ prefix: 'workers-task-env-' });
+    const entrypoint = `${scriptDir}/echo-trace-env.ts`;
+    await Deno.writeTextFile(
+      entrypoint,
+      `console.log(JSON.stringify({
+  taskId: Deno.env.get('TASK_ID') ?? null,
+  correlationId: Deno.env.get('CORRELATION_ID') ?? null,
+  traceparent: Deno.env.get('TRACEPARENT') ?? null,
+  tracestate: Deno.env.get('TRACESTATE') ?? null,
+}));
+`,
+    );
+    const task: TaskDefinition = {
+      id: 'echo-trace-env',
+      topic: 'tasks',
+      enabled: true,
+      type: 'deno',
+      entrypoint,
+      cwd: scriptDir,
+      timeout: 60_000,
+      permissions: { env: true },
+    };
+    const terminal = Promise.withResolvers<WorkerCompleteExecutionOptions>();
+    const executionState: WorkerExecutionState = {
+      create: () => Promise.resolve({ id: 'task-execution-1' }),
+      start: () => Promise.resolve({ id: 'task-execution-1' }),
+      progress: () => Promise.resolve({ id: 'task-execution-1' }),
+      complete: (_id, options) => {
+        terminal.resolve(options);
+        return Promise.resolve({ id: 'task-execution-1' });
+      },
+    };
+    const taskQueue = new MemoryQueueAdapter<TaskMessage>({ pollInterval: 1 });
+    const worker = new Worker({
+      workerId: 'task-trace-env',
+      queue: new MemoryQueueAdapter<JobMessage>({ pollInterval: 1 }),
+      taskQueue,
+      registry: { get: () => Promise.resolve(undefined) },
+      executionState,
+      taskRegistry: { get: (id) => Promise.resolve(id === task.id ? task : undefined) },
+      taskExecutor: createDefaultTaskExecutor(),
+      idempotency: new KvWorkerIdempotencyStore({ kv }),
+    });
+    const started = worker.start();
+    void started.catch(() => undefined);
+    try {
+      await taskQueue.enqueue({
+        taskId: task.id,
+        topic: 'tasks',
+        triggeredBy: 'queue',
+        correlationId: 'corr-subprocess-1',
+        traceparent: MESSAGE_TRACEPARENT,
+        tracestate: MESSAGE_TRACESTATE,
+      });
+      const completed = await bounded(terminal.promise, 60_000);
+
+      assertEquals(completed.status, 'completed', completed.error ?? undefined);
+      assertEquals(completed.result, {
+        taskId: task.id,
+        correlationId: 'corr-subprocess-1',
+        traceparent: MESSAGE_TRACEPARENT,
+        tracestate: MESSAGE_TRACESTATE,
+      });
+    } finally {
+      await bounded(worker.stop());
+      await bounded(started);
+      await Deno.remove(scriptDir, { recursive: true });
+    }
+  },
+});
+
+function installTracePropagation(): () => void {
+  otelContext.disable();
+  propagation.disable();
+  assert(otelContext.setGlobalContextManager(new AsyncLocalStorageContextManager().enable()));
+  assert(propagation.setGlobalPropagator(new W3CTraceContextPropagator()));
+  return () => {
+    otelContext.disable();
+    propagation.disable();
+  };
+}

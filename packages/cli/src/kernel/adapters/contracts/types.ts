@@ -95,8 +95,13 @@ export interface DiscoveredContract {
   /** Absolute path to the contract file. */
   readonly filePath: string;
 
-  /** Whether a matching service directory exists. */
-  readonly hasService: boolean;
+  /**
+   * Whether a `services/<name>/` directory exists in the workspace.
+   *
+   * This is a filesystem probe only. It does not prove that a handler for the
+   * contract is implemented, registered in a router, or served.
+   */
+  readonly hasServiceDirectory: boolean;
 }
 
 /** Inspectable route metadata for one contract procedure. */

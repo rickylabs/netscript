@@ -25,8 +25,9 @@
  *                        implementation/public metadata excluding tests,
  *                        docs tooling, root toolchain)
  *   - `needs_fresh_ui` -> Fresh UI sources and its dedicated quality tooling
- *   - `needs_fresh_browser` -> managed-form Playwright coverage under
- *                              `packages/fresh/**`
+ *   - `needs_fresh_browser` -> Playwright coverage under `packages/fresh/**`
+ *                              (managed forms, and the fresh-ui overlay
+ *                              fixture, so `packages/fresh-ui/**` too)
  *
  * Precision rules (#1122): only the tier-defining workflows (`e2e-cli.yml`,
  * `ci.yml`) escalate the scaffold tiers — `release-canary.yml`, `pages.yml`
@@ -192,6 +193,11 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
  * other workflow -> Markdown -> code prefixes -> docs prefixes ->
  * unrecognised (which forces EVERYTHING).
  */
+/** Paths whose behaviour the `packages/fresh` Playwright lane exercises in a real browser. */
+function isFreshBrowserSurface(path: string): boolean {
+  return path.startsWith('packages/fresh/') || path.startsWith('packages/fresh-ui/');
+}
+
 export function classifyPath(
   rawPath: string,
   rootDenoConfig: DenoConfigChange = 'toolchain',
@@ -223,7 +229,7 @@ export function classifyPath(
         !isPackageTestOnly(path),
       freshUi: path.startsWith('packages/fresh-ui/') || path === 'deno.lock' ||
         /^(?:packages\/[^/]+|packages\/cli\/e2e|plugins\/[^/]+)\/deno\.jsonc?$/.test(path),
-      freshBrowser: path === 'deno.lock' || path.startsWith('packages/fresh/'),
+      freshBrowser: path === 'deno.lock' || isFreshBrowserSurface(path),
     };
   }
   if (TIER_DEFINING_WORKFLOWS.has(path)) {
@@ -284,7 +290,7 @@ export function classifyPath(
       pages: (path.startsWith('packages/') || path.startsWith('plugins/')) &&
         !isPackageTestOnly(path),
       freshUi: path.startsWith('packages/fresh-ui/'),
-      freshBrowser: path.startsWith('packages/fresh/'),
+      freshBrowser: isFreshBrowserSurface(path),
     };
   }
   if (DOCS_PREFIXES.some((prefix) => path.startsWith(prefix))) {
