@@ -99,7 +99,7 @@ Deno.test('sagas install runtime glue registers Redis before starting the runner
   const source = artifactText(runtimeArtifact);
   const registrationImport = "import '@netscript/kv/redis';";
   const runnerImport =
-    "import { startSagaRunner, type SagaRuntimeSupervisor } from '@netscript/plugin-sagas/runtime';";
+    "import { type SagaRuntimeSupervisor, startSagaRunner } from '@netscript/plugin-sagas/runtime';";
 
   assertStringIncludes(source, registrationImport);
   assertStringIncludes(source, runnerImport);
