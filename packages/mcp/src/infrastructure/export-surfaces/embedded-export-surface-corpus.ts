@@ -77,77 +77,90 @@ export class EmbeddedExportSurfaceCorpus implements ExportSurfaceCorpusPort {
     return validateCorpus(parsed, provenance, this.#expectedFrameworkVersion);
   }
   async #decodeRows(): Promise<ExportSurfaceCorpus> {
-    if (EXPORT_SURFACE_FRAMEWORK_VERSION !== this.#expectedFrameworkVersion) {
-      throw new Error(
-        `export corpus version ${EXPORT_SURFACE_FRAMEWORK_VERSION} does not match ${this.#expectedFrameworkVersion}`,
-      );
-    }
-    const surfaces: ExportSurfaceSubpath[] = [];
-    const entries: ExportSurfaceEntry[] = [];
-    for (const [packageSuffix, subpath, base64, hash, size, count] of EXPORT_SURFACE_ROWS) {
-      const packageName = `@netscript/${packageSuffix}`;
-      const compressed = Uint8Array.fromBase64(base64);
-      if (
-        new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array(compressed).buffer))
-          .toBase64() !== hash
-      ) {
-        throw new Error('export corpus hash does not match');
-      }
-      const decoded = new Uint8Array(
-        await new Response(
-          new Blob([new Uint8Array(compressed).buffer]).stream().pipeThrough(
-            new DecompressionStream('deflate-raw'),
-          ),
-        ).arrayBuffer(),
-      );
-      if (decoded.byteLength !== size) {
-        throw new Error('export corpus uncompressed byte count does not match provenance');
-      }
-      const parsed: unknown = JSON.parse(new TextDecoder().decode(decoded));
-      if (
-        !Array.isArray(parsed) || parsed.length !== 4 ||
-        parsed.some((column) =>
-          !Array.isArray(column) || column.length !== count ||
-          column.some((value: unknown) => typeof value !== 'string')
-        )
-      ) throw new Error('export corpus cardinality does not match provenance');
-      const columns = parsed as string[][];
-      const declarations = Array.from(
-        { length: count },
-        (_, index) =>
-          validateEntry({
-            packageName,
-            subpath,
-            symbol: columns[0]?.[index],
-            kind: columns[1]?.[index],
-            signature: columns[2]?.[index],
-            jsDoc: columns[3]?.[index],
-          }),
-      );
-      surfaces.push({ packageName, subpath });
-      entries.push(...declarations);
-    }
-    const provenance: ExportSurfaceCorpusProvenance = {
-      schemaVersion: EXPORT_SURFACE_SCHEMA_VERSION,
-      frameworkVersion: this.#expectedFrameworkVersion,
-      packageCount: new Set(surfaces.map((surface) => surface.packageName)).size,
-      subpathCount: surfaces.length,
-      symbolCount: entries.length,
-      compressedBytes: 0,
-      uncompressedBytes: 0,
-      sha256: '',
-    };
-    return validateCorpus(
-      {
-        schemaVersion: EXPORT_SURFACE_SCHEMA_VERSION,
-        frameworkVersion: this.#expectedFrameworkVersion,
-        surfaces,
-        entries,
-      },
-      provenance,
+    return await decodeExportSurfaceRows(
+      EXPORT_SURFACE_ROWS,
+      EXPORT_SURFACE_FRAMEWORK_VERSION,
       this.#expectedFrameworkVersion,
     );
   }
+}
+
+/** Decode and validate independent rows; the runtime adapter and frozen parity fixtures share this seam. */
+export async function decodeExportSurfaceRows(
+  rows: typeof EXPORT_SURFACE_ROWS,
+  frameworkVersion: string,
+  expectedFrameworkVersion: string = frameworkVersion,
+): Promise<ExportSurfaceCorpus> {
+  if (frameworkVersion !== expectedFrameworkVersion) {
+    throw new Error(
+      `export corpus version ${frameworkVersion} does not match ${expectedFrameworkVersion}`,
+    );
+  }
+  const surfaces: ExportSurfaceSubpath[] = [];
+  const entries: ExportSurfaceEntry[] = [];
+  for (const [packageSuffix, subpath, base64, hash, size, count] of rows) {
+    const packageName = `@netscript/${packageSuffix}`;
+    const compressed = Uint8Array.fromBase64(base64);
+    if (
+      new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array(compressed).buffer))
+        .toBase64() !== hash
+    ) {
+      throw new Error('export corpus hash does not match');
+    }
+    const decoded = new Uint8Array(
+      await new Response(
+        new Blob([new Uint8Array(compressed).buffer]).stream().pipeThrough(
+          new DecompressionStream('deflate-raw'),
+        ),
+      ).arrayBuffer(),
+    );
+    if (decoded.byteLength !== size) {
+      throw new Error('export corpus uncompressed byte count does not match provenance');
+    }
+    const parsed: unknown = JSON.parse(new TextDecoder().decode(decoded));
+    if (
+      !Array.isArray(parsed) || parsed.length !== 4 ||
+      parsed.some((column) =>
+        !Array.isArray(column) || column.length !== count ||
+        column.some((value: unknown) => typeof value !== 'string')
+      )
+    ) throw new Error('export corpus cardinality does not match provenance');
+    const columns = parsed as string[][];
+    const declarations = Array.from(
+      { length: count },
+      (_, index) =>
+        validateEntry({
+          packageName,
+          subpath,
+          symbol: columns[0]?.[index],
+          kind: columns[1]?.[index],
+          signature: columns[2]?.[index],
+          jsDoc: columns[3]?.[index],
+        }),
+    );
+    surfaces.push({ packageName, subpath });
+    entries.push(...declarations);
+  }
+  const provenance: ExportSurfaceCorpusProvenance = {
+    schemaVersion: EXPORT_SURFACE_SCHEMA_VERSION,
+    frameworkVersion: expectedFrameworkVersion,
+    packageCount: new Set(surfaces.map((surface) => surface.packageName)).size,
+    subpathCount: surfaces.length,
+    symbolCount: entries.length,
+    compressedBytes: 0,
+    uncompressedBytes: 0,
+    sha256: '',
+  };
+  return validateCorpus(
+    {
+      schemaVersion: EXPORT_SURFACE_SCHEMA_VERSION,
+      frameworkVersion: expectedFrameworkVersion,
+      surfaces,
+      entries,
+    },
+    provenance,
+    expectedFrameworkVersion,
+  );
 }
 
 function validateCorpus(

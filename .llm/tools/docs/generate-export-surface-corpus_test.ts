@@ -367,3 +367,45 @@ Deno.test('embedded query factory documentation matches the live required-contex
   assert(embedded, 'Missing embedded createQueryFactories entry');
   assertEquals(embedded.jsDoc, live.jsDoc, 'Stale SDK query factory documentation');
 });
+
+Deno.test('entrypoint generator keeps a valid alternate compressor encoding and rejects decoded drift', async () => {
+  const { deflateRawSync } = await import('node:zlib');
+  const corpus: GeneratedExportSurfaceCorpus = {
+    schemaVersion: 1,
+    frameworkVersion: '0.0.4',
+    surfaces: [{ packageName: '@netscript/fresh', subpath: '.' }],
+    entries: [{
+      packageName: '@netscript/fresh',
+      subpath: '.',
+      symbol: 'fixture',
+      kind: 'function',
+      signature: 'function fixture(): string',
+      jsDoc: 'Repeated documentation text. '.repeat(150),
+    }],
+  };
+  const first = await createGeneratedAsset(corpus);
+  const alternate = await Promise.all(
+    first.source.split('\n').map(async (line) => {
+      if (!line.startsWith('  [')) return line;
+      const row: [string, string, string, string, number, number] = JSON.parse(
+        line.trim().replace(/,$/, ''),
+      );
+      const bytes = new Uint8Array(
+        await new Response(
+          new Blob([Uint8Array.fromBase64(row[2])]).stream().pipeThrough(
+            new DecompressionStream('deflate-raw'),
+          ),
+        ).arrayBuffer(),
+      );
+      const encoded = new Uint8Array(deflateRawSync(bytes, { level: 1 }));
+      row[2] = encoded.toBase64();
+      row[3] = new Uint8Array(await crypto.subtle.digest('SHA-256', encoded)).toBase64();
+      return `  ${JSON.stringify(row)},`;
+    }),
+  );
+  const source = alternate.join('\n');
+  assert(source !== first.source);
+  assertEquals((await createGeneratedAsset(corpus, source)).source, source);
+  const changed = { ...corpus, entries: [{ ...corpus.entries[0], jsDoc: 'Changed' }] };
+  assert((await createGeneratedAsset(changed, source)).source !== source);
+});

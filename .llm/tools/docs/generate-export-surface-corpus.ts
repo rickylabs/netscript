@@ -145,6 +145,7 @@ export function renderDeclarationSignature(name: string, declaration: unknown): 
 /** Build the deterministic compressed TypeScript asset for a normalized corpus. */
 export async function createGeneratedAsset(
   corpus: GeneratedExportSurfaceCorpus,
+  existingSource: string = '',
 ): Promise<GeneratedAsset> {
   const serialized = new TextEncoder().encode(JSON.stringify(corpus));
   const compressed = await gzip(serialized);
@@ -162,6 +163,15 @@ export async function createGeneratedAsset(
     symbolCount: corpus.entries.length,
   };
   const rows: string[] = [];
+  const previousRows = new Map<string, readonly [string, string, string, string, number, number]>();
+  for (const line of existingSource.split('\n').filter((line) => line.startsWith('  ['))) {
+    try {
+      const row: readonly [string, string, string, string, number, number] = JSON.parse(
+        line.trim().replace(/,$/, ''),
+      );
+      previousRows.set(`${row[0]}\0${row[1]}`, row);
+    } catch { /* A malformed row cannot be reused. */ }
+  }
   for (const surface of corpus.surfaces) {
     const entries = corpus.entries.filter((entry) =>
       entry.packageName === surface.packageName && entry.subpath === surface.subpath
@@ -173,6 +183,24 @@ export async function createGeneratedAsset(
       entries.map((entry) => entry.jsDoc),
     ];
     const bytes = new TextEncoder().encode(JSON.stringify(columns));
+    const previous = previousRows.get(
+      `${surface.packageName.slice('@netscript/'.length)}\0${surface.subpath}`,
+    );
+    if (previous && previous[4] === bytes.byteLength && previous[5] === entries.length) {
+      try {
+        const compressed = Uint8Array.fromBase64(previous[2]);
+        const hash = new Uint8Array(
+          await crypto.subtle.digest('SHA-256', new Uint8Array(compressed).buffer),
+        ).toBase64();
+        const decoded = await new Response(
+          new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate-raw')),
+        ).text();
+        if (hash === previous[3] && decoded === new TextDecoder().decode(bytes)) {
+          rows.push(`  ${JSON.stringify(previous)},`);
+          continue;
+        }
+      } catch { /* Regenerate a corrupt transport. */ }
+    }
     const zipped = new Uint8Array(
       await new Response(
         new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw')),
@@ -571,9 +599,9 @@ if (import.meta.main) {
     throw new Error(`${ALLOW_DIRTY_ARGUMENT} is only valid when writing the generated corpus`);
   }
   if (!check) await guardGeneratorWrite(REPO_ROOT, allowDirty);
-  const asset = await createGeneratedAsset(await buildExportSurfaceCorpus());
+  const current = await Deno.readTextFile(OUTPUT_PATH).catch(() => '');
+  const asset = await createGeneratedAsset(await buildExportSurfaceCorpus(), current);
   if (check) {
-    const current = await Deno.readTextFile(OUTPUT_PATH).catch(() => '');
     if (current !== asset.source) {
       throw new Error('MCP export-surface corpus is stale; run deno task gen:mcp-export-corpus');
     }

@@ -11,10 +11,26 @@ export const AGENT_DOCS_PAGE_CARRIER =
 /** Render sorted pages with local integrity metadata; aggregates are derived by consumers. */
 export async function renderAgentDocsPages(
   files: Readonly<Record<string, string>>,
+  existingSource: string = '',
 ): Promise<string> {
+  const existing = new Map<string, AgentDocsPage>();
+  if (existingSource) {
+    for (const row of parseAgentDocsPages(existingSource)) {
+      // Integrity is checked before reuse; corrupt rows are regenerated rather than preserved.
+      try {
+        const decoded = await decodeAgentDocsPages([row]);
+        if (decoded[row[0]] === files[row[0]]) existing.set(row[0], row);
+      } catch { /* Regenerate a corrupt row. */ }
+    }
+  }
   const rows: string[] = [];
   for (const path of Object.keys(files).sort()) {
     if (path === 'llms-full.txt') continue;
+    const previous = existing.get(path);
+    if (previous) {
+      rows.push(`  ${JSON.stringify(previous)},`);
+      continue;
+    }
     const bytes = new TextEncoder().encode(files[path]);
     const compressed = new Uint8Array(
       await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip')))

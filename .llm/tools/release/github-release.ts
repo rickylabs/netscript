@@ -1,5 +1,3 @@
-import { AGENT_DOCS_PAGE_CARRIER, parseAgentDocsPages } from '../docs/agent-docs-page-carrier.ts';
-import { decodeAgentDocsPages } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
 /**
  * github-release.ts — create the GitHub Release that publishes a NetScript version.
  *
@@ -36,6 +34,8 @@ import { decodeAgentDocsPages } from '../../../packages/cli/src/kernel/assets/ag
  *   deno task release:publish -- 0.0.1-alpha.20 --message "One-line intro." --dry-run
  */
 
+import { AGENT_DOCS_PAGE_CARRIER, parseAgentDocsPages } from '../docs/agent-docs-page-carrier.ts';
+import { decodeAgentDocsPages } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
 import {
   githubField,
   githubRequest,
@@ -237,7 +237,7 @@ export async function verifyGreenCanaryPair(
               ))
             ) {
               throw new Error(
-                'Stable publication blocked: agent-docs provenance contains non-version changes, so the parent canary evidence cannot authorize this content.',
+                'Stable publication blocked: agent-docs prose contains non-version changes or invalid page provenance, so the parent canary evidence cannot authorize this content.',
               );
             }
           } else {
@@ -391,7 +391,8 @@ export async function isExactAgentDocsProvenanceReplacement(
   }
 }
 
-/** Verify page rows and strict nonvolatile sidecars before the unchanged writer-freshness proof. */
+/** Compare verified page contents after the declared version substitution. Writer freshness still
+ * proves that the resulting pages came from the version-only source tree. */
 export async function isExactAgentDocsPageReplacement(
   beforeSource: string,
   afterSource: string,
@@ -412,7 +413,11 @@ export async function isExactAgentDocsPageReplacement(
     ) return false;
     const before = await decodeAgentDocsPages(parseAgentDocsPages(beforePages));
     const after = await decodeAgentDocsPages(parseAgentDocsPages(afterPages));
-    return JSON.stringify(Object.keys(before)) === JSON.stringify(Object.keys(after));
+    return JSON.stringify(Object.keys(before).sort()) ===
+        JSON.stringify(Object.keys(after).sort()) &&
+      Object.keys(before).every((path) =>
+        before[path].replaceAll(previousVersion, nextVersion) === after[path]
+      );
   } catch {
     return false;
   }

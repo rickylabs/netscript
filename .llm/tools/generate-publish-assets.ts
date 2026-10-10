@@ -1,6 +1,6 @@
-import { AGENT_DOCS_PAGE_CARRIER, readAgentDocsPages } from './docs/agent-docs-page-carrier.ts';
 /** Generates registry-safe TypeScript constants for publish-time package assets. */
 
+import { AGENT_DOCS_PAGE_CARRIER, readAgentDocsPages } from './docs/agent-docs-page-carrier.ts';
 import { normalizeDocsSlug } from '../../packages/mcp/src/domain/docs/docs-corpus-port.ts';
 import { rewriteNetScriptVersion } from './deps/bump-version.ts';
 
@@ -37,6 +37,7 @@ export const MCP_EMBEDDED_DOCS_MAX_BYTES = 264_192;
 
 export const PUBLISH_ASSET_OUTPUTS: readonly string[] = [
   AGENT_DOCS_PAGE_CARRIER,
+  'packages/cli/src/kernel/assets/llms-policy.generated.ts',
   '.llm/assets/agent-docs/provenance.json',
   'packages/cli/src/kernel/assets/agent-tools.generated.ts',
   'packages/cli/src/kernel/assets/agent-docs.generated.ts',
@@ -366,7 +367,21 @@ export async function generateMcpAssets(
 ): Promise<void> {
   const version = await readVersion('packages/mcp/deno.json', root);
   const readme = await Deno.readTextFile(new URL('packages/mcp/README.md', root));
-  const readmeCompressed = await compressGzip(new TextEncoder().encode(readme));
+  const current = await Deno.readTextFile(
+    new URL('packages/mcp/src/publish-assets.generated.ts', root),
+  ).catch(() => '');
+  const previous = current.match(/MCP_PACKAGE_README_GZIP_BASE64: string =\s*("[^"]*"|'[^']*')/)
+    ?.[1];
+  let readmeCompressed: Uint8Array | undefined;
+  if (previous) {
+    try {
+      const bytes = Uint8Array.fromBase64(previous.slice(1, -1));
+      if (new TextDecoder().decode(await decompressGzip(bytes)) === readme) {
+        readmeCompressed = bytes;
+      }
+    } catch { /* Regenerate a corrupt transport. */ }
+  }
+  readmeCompressed ??= await compressGzip(new TextEncoder().encode(readme));
   const embedded = await buildMcpEmbeddedDocs(root);
   await write(
     'packages/mcp/src/publish-assets.generated.ts',

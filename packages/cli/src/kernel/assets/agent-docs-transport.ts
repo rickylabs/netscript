@@ -1,3 +1,5 @@
+import { buildLlmsFull, DOCS_SITE_LOCATION } from './llms-policy.generated.ts';
+
 /** One independently verifiable page: path, gzip/base64, SHA-256, decoded byte count. */
 export type AgentDocsPage = readonly [string, string, string, number];
 
@@ -27,34 +29,9 @@ export function agentDocsFullCorpus(
   files: Readonly<Record<string, string>>,
   version: string,
 ): string {
-  const section = (path: string): number => {
-    const url = '/' + path.slice('pages/'.length);
-    if (url.startsWith('/tutorials/')) return 1;
-    if (url.startsWith('/how-to/')) return 2;
-    if (url.startsWith('/reference/')) return 4;
-    if (url.startsWith('/explanation/')) return 5;
-    const hubs = [
-      '/web-layer/',
-      '/services-sdk/',
-      '/background-processing/',
-      '/durable-workflows/',
-      '/data-persistence/',
-      '/identity-access/',
-      '/orchestration-runtime/',
-      '/observability/',
-      '/capabilities/',
-    ];
-    return hubs.some((prefix) => url.startsWith(prefix)) ? 3 : 0;
-  };
-  const paths = Object.keys(files).filter((path) => path.startsWith('pages/')).sort((a, b) =>
-    section(a) - section(b) ||
-    a.replace(/index\.md$/, '').localeCompare(b.replace(/index\.md$/, ''))
-  );
-  const header =
-    `# NetScript documentation — full corpus\n\n> Deno-native, polyglot backend framework, pre-1.0 (${version}). This file concatenates the Markdown twin of every documentation page for AI ingestion.\n\n`;
-  const blocks = paths.map((path) => {
-    const url = path.slice('pages/'.length).replace(/index\.md$/, '');
-    return `${files[path].trim()}\n\n_Canonical: https://rickylabs.github.io/netscript/${url}_`;
-  });
-  return `${header}${blocks.join('\n\n---\n\n')}\n`;
+  const pages = Object.keys(files).filter((path) => path.startsWith('pages/')).map((path) => ({
+    url: '/' + path.slice('pages/'.length).replace(/index\.md$/, ''),
+    markdown: files[path],
+  }));
+  return buildLlmsFull(pages, new URL(DOCS_SITE_LOCATION), version);
 }

@@ -6,16 +6,15 @@
  * `agent init --with-docs` regenerates them from the exact packages in the initialized project.
  */
 
-import { agentDocsFullCorpus } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
 import { dirname, fromFileUrl, join, relative, resolve } from 'jsr:@std/path@^1';
-
-const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../..');
-const OUTPUT_ROOT = join(REPO_ROOT, '.llm', 'assets', 'agent-docs');
+import { buildLlmsFull, DOCS_SITE_LOCATION } from '../../../docs/site/_plugins/llms-policy.ts';
 import {
   AGENT_DOCS_PAGE_CARRIER,
   readAgentDocsPages,
   renderAgentDocsPages,
 } from './agent-docs-page-carrier.ts';
+const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../..');
+const OUTPUT_ROOT = join(REPO_ROOT, '.llm', 'assets', 'agent-docs');
 const PROSE_PATH = join(REPO_ROOT, AGENT_DOCS_PAGE_CARRIER);
 const PROVENANCE_PATH = join(OUTPUT_ROOT, 'provenance.json');
 
@@ -74,7 +73,7 @@ async function gunzip(bytes: Uint8Array): Promise<Uint8Array> {
   return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
-async function readCorpus(path: string, version = '0.0.7'): Promise<AgentDocsProseCorpus> {
+async function readCorpus(path: string, version: string): Promise<AgentDocsProseCorpus> {
   if (!path.endsWith('.gz')) {
     return { schemaVersion: 1, files: await readAgentDocsPages(path, version) };
   }
@@ -111,7 +110,8 @@ async function writeCorpus(
   metadata: AgentDocsSiteMetadata,
   outputRoot: string,
 ): Promise<AgentDocsProseProvenance> {
-  const source = await renderAgentDocsPages(contents);
+  const existing = await Deno.readTextFile(carrierPath(outputRoot)).catch(() => '');
+  const source = await renderAgentDocsPages(contents, existing);
   const provenance = { schemaVersion: 1 as const, version: metadata.version };
   await Deno.mkdir(outputRoot, { recursive: true });
   await Deno.writeTextFile(carrierPath(outputRoot), source);
@@ -134,7 +134,8 @@ async function checkCorpus(
   metadata: AgentDocsSiteMetadata,
   outputRoot: string,
 ): Promise<AgentDocsProseFreshness> {
-  const source = await renderAgentDocsPages(contents);
+  const existing = await Deno.readTextFile(carrierPath(outputRoot)).catch(() => '');
+  const source = await renderAgentDocsPages(contents, existing);
   const stalePaths: string[] = [];
   if (await Deno.readTextFile(carrierPath(outputRoot)).catch(() => '') !== source) {
     stalePaths.push('agent-docs-prose.generated.ts');
@@ -160,6 +161,30 @@ function manifestValue(manifest: string, label: string): string {
   const value = row?.split('|')[2]?.trim();
   if (!value) throw new Error(`External docs MANIFEST.md is missing ${label}`);
   return value.replaceAll('`', '').split(/\s+/)[0];
+}
+
+function siteFullCorpus(contents: Readonly<Record<string, string>>, version: string): string {
+  return buildLlmsFull(
+    Object.keys(contents).filter((path) => path.startsWith('pages/')).map((path) => ({
+      url: '/' + path.slice('pages/'.length).replace(/index\.md$/, ''),
+      markdown: contents[path],
+    })),
+    new URL(DOCS_SITE_LOCATION),
+    version,
+  );
+}
+
+/** Publish the site's pure composition source without a runtime dependency on the site tree. */
+async function syncCompositionPolicy(check: boolean): Promise<void> {
+  const source = await Deno.readTextFile(join(REPO_ROOT, 'docs/site/_plugins/llms-policy.ts'));
+  const expected =
+    '// @generated from docs/site/_plugins/llms-policy.ts by gen:agent-docs-prose.\n' + source;
+  const output = join(REPO_ROOT, 'packages/cli/src/kernel/assets/llms-policy.generated.ts');
+  if (check) {
+    if (await Deno.readTextFile(output).catch(() => '') !== expected) {
+      throw new Error('CLI llms composition policy is stale; run deno task gen:agent-docs-prose');
+    }
+  } else await Deno.writeTextFile(output, expected);
 }
 
 /** Refresh the checked-in compressed prose source from an external docs bundle. */
@@ -220,7 +245,7 @@ export async function buildAgentDocsProseFromSite(
   if (!/^## Task router$/m.test(contents['llms.txt'])) {
     throw new Error('Rendered docs site does not contain the #1068 task router in llms.txt');
   }
-  if (agentDocsFullCorpus(contents, metadata.version) !== contents['llms-full.txt']) {
+  if (siteFullCorpus(contents, metadata.version) !== contents['llms-full.txt']) {
     throw new Error(
       'Derived full corpus does not match the rendered site; update the page composition policy',
     );
@@ -254,7 +279,7 @@ export async function checkAgentDocsProseFromSite(
   if (!/^## Task router$/m.test(contents['llms.txt'])) {
     throw new Error('Rendered docs site does not contain the #1068 task router in llms.txt');
   }
-  if (agentDocsFullCorpus(contents, metadata.version) !== contents['llms-full.txt']) {
+  if (siteFullCorpus(contents, metadata.version) !== contents['llms-full.txt']) {
     throw new Error(
       'Derived full corpus does not match the rendered site; update the page composition policy',
     );
@@ -276,6 +301,7 @@ if (import.meta.main) {
   if ((bundleRoot ? 1 : 0) + (siteRoot ? 1 : 0) !== 1) {
     throw new Error('exactly one of --bundle-dir <path> or --site-dir <path> is required');
   }
+  await syncCompositionPolicy(Deno.args.includes('--check'));
   if (bundleRoot) {
     console.log(JSON.stringify(await buildAgentDocsProse(bundleRoot)));
   } else {

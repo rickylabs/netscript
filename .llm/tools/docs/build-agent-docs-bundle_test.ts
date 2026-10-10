@@ -84,3 +84,47 @@ Deno.test('site rebuild preserves external entries and freshness rejects input o
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('page check and write preserve a different valid gzip encoding of unchanged decoded text', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const site = join(root, 'site');
+    const output = join(root, 'output');
+    const original = join(root, 'bundle');
+    await bundle(original);
+    await buildAgentDocsProse(original, output);
+    await Deno.mkdir(site);
+    const home = '# Home\n';
+    await Deno.writeTextFile(join(site, 'llms.txt'), '## Task router\n');
+    await Deno.writeTextFile(join(site, 'index.md'), home);
+    await Deno.writeTextFile(
+      join(site, 'llms-full.txt'),
+      agentDocsFullCorpus({ 'pages/index.md': home }, '0.0.7'),
+    );
+    const path = join(output, 'agent-docs-prose.generated.ts');
+    const metadata = { version: '0.0.7', preservedCorpusPath: path };
+    await buildAgentDocsProseFromSite(site, metadata, output);
+    const source = await Deno.readTextFile(path);
+    const changed = source.split('\n').map((line) => {
+      if (!line.startsWith('  [')) return line;
+      const row: [string, string, string, number] = JSON.parse(line.trim().replace(/,$/, ''));
+      const gzip = Uint8Array.fromBase64(row[1]);
+      gzip[4] ^= 1; // A different valid gzip modification-time header; decoded bytes and CRC are unchanged.
+      row[1] = gzip.toBase64();
+      return `  ${JSON.stringify(row)},`;
+    }).join('\n');
+    assertEquals(source === changed, false);
+    await Deno.writeTextFile(path, changed);
+    assertEquals((await checkAgentDocsProseFromSite(site, metadata, output)).fresh, true);
+    await buildAgentDocsProseFromSite(site, metadata, output);
+    assertEquals(await Deno.readTextFile(path), changed);
+    await Deno.writeTextFile(join(site, 'index.md'), '# Changed\n');
+    await Deno.writeTextFile(
+      join(site, 'llms-full.txt'),
+      agentDocsFullCorpus({ 'pages/index.md': '# Changed\n' }, '0.0.7'),
+    );
+    assertEquals((await checkAgentDocsProseFromSite(site, metadata, output)).fresh, false);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

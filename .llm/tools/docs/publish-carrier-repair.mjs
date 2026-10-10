@@ -2,8 +2,11 @@
 export async function publishCarrierRepair({ github, context, exec }) {
   const { owner, repo } = context.repo;
   const branch = 'automation/generated-carriers';
-  const output = await exec.getExecOutput('git', ['diff', '--name-only']);
-  const paths = output.stdout.trim().split('\n').filter(Boolean);
+  const tracked = await exec.getExecOutput('git', ['diff', '--name-only']);
+  const untracked = await exec.getExecOutput('git', ['ls-files', '-o', '--exclude-standard']);
+  const paths = [
+    ...new Set(`${tracked.stdout}\n${untracked.stdout}`.trim().split('\n').filter(Boolean)),
+  ].sort();
   const allowed = (path) =>
     path.endsWith('.generated.ts') ||
     path === '.llm/assets/agent-docs/provenance.json' ||
@@ -78,19 +81,59 @@ export async function publishCarrierRepair({ github, context, exec }) {
     })).data
     : (await github.rest.pulls.create({ owner, repo, head: branch, base: 'main', title, body }))
       .data;
-  const milestones = await github.paginate(github.rest.issues.listMilestones, {
-    owner,
-    repo,
-    state: 'open',
-    per_page: 100,
-  });
-  const milestone = milestones.find((item) => item.title === '0.0.8')?.number;
-  if (!milestone) throw new Error('Required milestone 0.0.8 is missing.');
   await github.rest.issues.update({
     owner,
     repo,
     issue_number: pull.number,
-    milestone,
     labels: ['type:chore', 'area:tooling', 'priority:p1', 'status:impl-eval'],
   });
+  await assignTriageMilestone({ github, context, issueNumber: pull.number });
+}
+
+/** Generic maintenance follows the repository's Backlog / Triage policy, not a release train. */
+async function assignTriageMilestone({ github, context, issueNumber }) {
+  const { owner, repo } = context.repo;
+  try {
+    const milestones = await github.paginate(github.rest.issues.listMilestones, {
+      owner,
+      repo,
+      state: 'open',
+      per_page: 100,
+    });
+    const milestone = milestones.find((item) => item.title === 'Backlog / Triage')?.number;
+    if (milestone !== undefined) {
+      await github.rest.issues.update({ owner, repo, issue_number: issueNumber, milestone });
+    }
+  } catch {
+    // Metadata failures must never prevent an already-created tracking issue or repair PR.
+    console.warn('Unable to assign the Backlog / Triage milestone; tracking remains available.');
+  }
+}
+
+/** Create tracking before milestone lookup so lookup/assignment failures cannot suppress the issue. */
+export async function trackCarrierDrift({ github, context }) {
+  const title = 'Generated carrier drift on main requires regeneration';
+  const { owner, repo } = context.repo;
+  const run = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+  const body =
+    `Carrier checks failed on main. Automatic regeneration could not open a CI-triggering PR. Inspect ${run}; configure PAT_TOKEN or repair regeneration before rerunning.\n\nRefs #2233`;
+  const issues = await github.paginate(github.rest.issues.listForRepo, {
+    owner,
+    repo,
+    state: 'open',
+    labels: 'area:tooling',
+    per_page: 100,
+  });
+  const current = issues.find((issue) => !issue.pull_request && issue.title === title);
+  const issue = current
+    ? (await github.rest.issues.update({ owner, repo, issue_number: current.number, body })).data
+    : (await github.rest.issues.create({
+      owner,
+      repo,
+      title,
+      body,
+      labels: ['type:fix', 'area:tooling', 'priority:p1', 'status:triage'],
+    })).data;
+  await assignTriageMilestone({ github, context, issueNumber: issue.number });
+  return issue.number;
 }

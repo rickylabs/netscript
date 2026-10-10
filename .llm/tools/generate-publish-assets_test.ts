@@ -316,3 +316,47 @@ function copiedBuffer(bytes: Uint8Array): ArrayBuffer {
   copy.set(bytes);
   return copy.buffer;
 }
+
+Deno.test('MCP README check and write reuse a different valid gzip encoding of the same text', async () => {
+  const root = await Deno.makeTempDir();
+  const rootUrl = toFileUrl(`${root}/`);
+  try {
+    await Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true });
+    await Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/packages/mcp/deno.json`,
+      JSON.stringify({ version: '0.0.7' }),
+    );
+    await Deno.writeTextFile(`${root}/packages/mcp/README.md`, '# Fixture README\n');
+    const files = Object.fromEntries(MCP_EMBEDDED_DOC_PATHS.map((path) => [path, `# ${path}\n`]));
+    await Deno.writeFile(
+      `${root}/.llm/assets/agent-docs/prose.json.gz`,
+      await gzip(new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }))),
+    );
+    await Deno.writeTextFile(
+      `${root}/.llm/assets/agent-docs/provenance.json`,
+      JSON.stringify({ schemaVersion: 1, version: '0.0.7' }),
+    );
+    await generateMcpAssets(rootUrl, false, []);
+    const path = `${root}/packages/mcp/src/publish-assets.generated.ts`;
+    const source = await Deno.readTextFile(path);
+    const quoted = source.match(/MCP_PACKAGE_README_GZIP_BASE64: string =\s*('([^']+)'|"([^"]+)")/)
+      ?.[1];
+    assert(quoted);
+    const bytes = Uint8Array.fromBase64(quoted.slice(1, -1));
+    bytes[4] ^= 1;
+    const alternate = source.replace(quoted, `${quoted[0]}${bytes.toBase64()}${quoted[0]}`);
+    assert(alternate !== source);
+    await Deno.writeTextFile(path, alternate);
+    const stale: string[] = [];
+    await generateMcpAssets(rootUrl, true, stale);
+    assertEquals(stale, []);
+    await generateMcpAssets(rootUrl, false, stale);
+    assertEquals(await Deno.readTextFile(path), alternate);
+    await Deno.writeTextFile(`${root}/packages/mcp/README.md`, '# Changed\n');
+    await generateMcpAssets(rootUrl, true, stale);
+    assertEquals(stale, ['packages/mcp/src/publish-assets.generated.ts']);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

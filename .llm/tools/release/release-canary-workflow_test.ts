@@ -76,6 +76,7 @@ function classifyConcurrencyGroup(group: string): string {
     return 'ref-templated / repo-wide literal';
   }
   if (
+    group === 'generated-carriers-main' ||
     group === 'e2e-scaffold-runtime-global-v2' ||
     group === 'e2e-scaffold-runtime-sqlite-global-v2'
   ) {
@@ -241,6 +242,7 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
     'e2e-cli-prod.yml',
     'e2e-cli.yml',
     'fresh-ui-quality.yml',
+    'generated-carriers.yml',
     'jsr-settings.yml',
     'openhands-agent.yml',
     'openhands-phase-eval.yml',
@@ -310,6 +312,14 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
       group: 'e2e-cli-${{ github.workflow }}-${{ github.ref }}',
       classification: 'ref-templated',
       cancelInProgress: true,
+    },
+    {
+      workflow: 'generated-carriers.yml',
+      scope: 'workflow',
+      group: 'generated-carriers-main',
+      classification: 'repo-wide literal',
+      cancelInProgress: false,
+      queue: 'max',
     },
     {
       workflow: 'openhands-agent.yml',

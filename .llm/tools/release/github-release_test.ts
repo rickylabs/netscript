@@ -716,6 +716,7 @@ Deno.test('parent canary evidence rejects semantically drifted rebuilt corpus co
 
 Deno.test('parent canary evidence distinguishes permission failure from content drift', async () => {
   const driftFixture = await createRenderedCanaryPairFixture(true);
+  const freshFixture = await createRenderedCanaryPairFixture(false);
   try {
     await assertRejects(
       () =>
@@ -726,8 +727,8 @@ Deno.test('parent canary evidence distinguishes permission failure from content 
 
     await assertRejects(
       () =>
-        verifyGreenCanaryPair('owner/repo', 'token', driftFixture.root, {
-          ...driftFixture.dependencies,
+        verifyGreenCanaryPair('owner/repo', 'token', freshFixture.root, {
+          ...freshFixture.dependencies,
           generatedOutputsFresh: () =>
             Promise.reject(
               new Deno.errors.PermissionDenied(
@@ -740,6 +741,7 @@ Deno.test('parent canary evidence distinguishes permission failure from content 
     );
   } finally {
     await driftFixture.dispose();
+    await freshFixture.dispose();
   }
 });
 
@@ -1278,6 +1280,24 @@ Deno.test('page canary provenance requires strict versions, page integrity and i
       '0.0.7-canary.1',
       '0.0.7',
     ),
+    false,
+  );
+});
+
+Deno.test('page replacement compares decoded contents after version normalization', async () => {
+  const previous = '0.0.7-canary.1';
+  const next = '0.0.7';
+  const before = JSON.stringify({ schemaVersion: 1, version: previous });
+  const after = JSON.stringify({ schemaVersion: 1, version: next });
+  const oldPages = await renderAgentDocsPages({ 'llms.txt': `NetScript ${previous}\n` });
+  const newPages = await renderAgentDocsPages({ 'llms.txt': `NetScript ${next}\n` });
+  assertEquals(
+    await isExactAgentDocsPageReplacement(before, after, oldPages, newPages, previous, next),
+    true,
+  );
+  const drift = await renderAgentDocsPages({ 'llms.txt': `NetScript ${next}\nChanged prose\n` });
+  assertEquals(
+    await isExactAgentDocsPageReplacement(before, after, oldPages, drift, previous, next),
     false,
   );
 });
