@@ -30,7 +30,9 @@ export async function useLocalWorkspaceImports(
     ...config.imports,
     ...await collectLocalWorkspaceImports(repositoryRoot),
   };
-  Object.assign(config, { catalog: repositoryConfig.catalog });
+  // Source fixtures qualify the checkout's selected release pins before their
+  // default age window elapses, including nested `deno eval` probes.
+  Object.assign(config, { catalog: repositoryConfig.catalog, minimumDependencyAge: 0 });
   await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
   installedProjectRoots.add(normalizedProjectRoot);
 }
