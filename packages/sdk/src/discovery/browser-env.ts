@@ -38,6 +38,18 @@ export function createBrowserServiceShortEnvKey(serviceName: string): string {
 
 /**
  * Read a service URL from a provided browser environment bag.
+ *
+ * Looks up `VITE_services__<name>__<protocol>__<index>` first, then the
+ * `VITE_<NAME>_URL` shorthand. Returns `undefined` when neither key holds a
+ * non-empty string.
+ *
+ * @example
+ * ```ts
+ * import { getBrowserServiceUrlFromEnv } from '@netscript/sdk/discovery';
+ *
+ * const url = getBrowserServiceUrlFromEnv({ VITE_ORDERS_URL: 'https://api.example.com' }, 'orders');
+ * // url === 'https://api.example.com'
+ * ```
  */
 export function getBrowserServiceUrlFromEnv(
   env: BrowserEnvironment,

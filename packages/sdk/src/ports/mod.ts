@@ -118,4 +118,5 @@ export type {
   ServiceClientShape,
   ServiceRequestOptions,
   ServiceRequestRest,
+  ServiceUrlResolver,
 } from './service-client.ts';
