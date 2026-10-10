@@ -1,0 +1,477 @@
+import { assertEquals, assertRejects } from '@std/assert';
+
+import { defineSaga, sagaCompensate, sagaComplete, sagaFail, send } from '../../mod.ts';
+import type {
+  CascadedMessage,
+  SagaCorrelationKey,
+  SagaDefinition,
+  SagaId,
+  SagaInstanceId,
+  SagaMessage,
+  SagaState,
+} from '../../src/domain/mod.ts';
+import { createSagaRuntime, SagaCompensator, SagaEngine } from '../../src/runtime/mod.ts';
+import { MemorySagaStore, TestSagaClock } from '../../src/testing/mod.ts';
+
+// Every assertion reads the store, never a handler's return value: the defect in #1990 was that a
+// suite asserting returned effects stayed green while the store never received the outcome.
+
+type Ledger = Readonly<{ payment: 'captured' | 'refunded' }>;
+type StoreMode = Readonly<{ name: string; atomic: boolean }>;
+
+const STORE_MODES: readonly StoreMode[] = [
+  { name: 'plain store', atomic: false },
+  { name: 'atomic transition store', atomic: true },
+];
+const SAGA_ID = 'refund';
+const CORRELATION_KEY = 'order-1' as SagaCorrelationKey;
+const INSTANCE_ID = `${SAGA_ID}:${CORRELATION_KEY}` as SagaInstanceId;
+
+function refundSaga(
+  mode: StoreMode,
+  compensation: (saga: { state: SagaState }) => readonly CascadedMessage[],
+): SagaDefinition {
+  // Before #1990 a sagaFail returned here was routed back into this same branch without end.
+  let runs = 0;
+  const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
+  return (mode.atomic ? builder.durableWorkerCommands() : builder)
+    .on('FulfillmentFailed', () => [
+      sagaCompensate({ type: 'RefundPayment', payload: {} }, 'out of stock'),
+    ])
+    .compensate('RefundPayment', (saga) => {
+      runs += 1;
+      if (runs > 1) throw new Error('compensation branch re-entered');
+      return compensation(saga);
+    })
+    .build() as SagaDefinition;
+}
+
+async function runSaga(
+  definition: SagaDefinition | readonly SagaDefinition[],
+  messages: readonly SagaMessage[],
+  store = new MemorySagaStore(),
+): Promise<MemorySagaStore> {
+  const runtime = createSagaRuntime({
+    native: { store, compensator: new SagaCompensator({ clock: new TestSagaClock() }) },
+  });
+  await runtime.register(Array.isArray(definition) ? definition : [definition]);
+  await runtime.start();
+  try {
+    for (const message of messages) {
+      await runtime.publish({ ...message, correlationKey: CORRELATION_KEY });
+    }
+  } finally {
+    await runtime.stop('compensation persistence test complete');
+  }
+  return store;
+}
+
+const fulfillmentFailed: SagaMessage = { type: 'FulfillmentFailed', payload: {} };
+
+for (const mode of STORE_MODES) {
+  Deno.test(`${mode.name}: compensate returning sagaFail persists failed and the compensated state`, async () => {
+    const store = await runSaga(
+      refundSaga(mode, (saga) => {
+        saga.state = { payment: 'refunded' };
+        return [sagaFail('order cancelled')];
+      }),
+      [fulfillmentFailed],
+    );
+
+    const loaded = await store.load<Ledger>(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'failed');
+    assertEquals(loaded?.state, { payment: 'refunded' });
+    assertEquals(loaded?.metadata.version, 2);
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['compensating', 'failed'],
+    );
+  });
+
+  Deno.test(`${mode.name}: compensate returning [] persists terminal compensated, distinct from sagaFail`, async () => {
+    const store = await runSaga(
+      refundSaga(mode, (saga) => {
+        saga.state = { payment: 'refunded' };
+        return [];
+      }),
+      [fulfillmentFailed],
+    );
+
+    const loaded = await store.load<Ledger>(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'compensated');
+    assertEquals(loaded?.state, { payment: 'refunded' });
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['compensating', 'compensated'],
+    );
+  });
+
+  Deno.test(`${mode.name}: compensate returning sagaComplete persists completed`, async () => {
+    const store = await runSaga(
+      refundSaga(mode, () => [sagaComplete({ refunded: true })]),
+      [fulfillmentFailed],
+    );
+
+    const loaded = await store.load<Ledger>(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'completed');
+    assertEquals(loaded?.metadata.completedAt instanceof Date, true);
+  });
+
+  Deno.test(`${mode.name}: a throwing compensate handler persists failed with the compensation error`, async () => {
+    const store = new MemorySagaStore();
+    const definition = refundSaga(mode, (saga) => {
+      saga.state = { payment: 'refunded' };
+      throw new RangeError('refund gateway rejected the request');
+    });
+
+    await assertRejects(
+      () => runSaga(definition, [fulfillmentFailed], store),
+      RangeError,
+      'refund gateway rejected the request',
+    );
+
+    const loaded = await store.load<Ledger>(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'failed');
+    // The throwing handler's partial mutation is discarded; the state is the pre-undo state.
+    assertEquals(loaded?.state, { payment: 'captured' });
+    assertEquals(loaded?.metadata.compensationError, {
+      name: 'RangeError',
+      message: 'refund gateway rejected the request',
+    });
+  });
+
+  Deno.test(`${mode.name}: a throwing branch's in-place mutations are not persisted`, async () => {
+    // Mutating the loaded state object (directly and through a nested object) rather than
+    // replacing `saga.state` must not leak into the persisted pre-undo snapshot.
+    const builder = defineSaga(SAGA_ID).state<SagaState>({
+      payment: 'captured',
+      ledger: { entries: ['charge'] },
+    });
+    const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
+      .on('FulfillmentFailed', () => [sagaCompensate({ type: 'RefundPayment', payload: {} })])
+      .compensate('RefundPayment', (saga) => {
+        const state = saga.state as { payment: string; ledger: { entries: string[] } };
+        state.payment = 'refunding';
+        state.ledger.entries.push('refund');
+        throw new Error('refund gateway timed out');
+      })
+      .build() as SagaDefinition;
+    const store = new MemorySagaStore();
+
+    await assertRejects(
+      () => runSaga(definition, [fulfillmentFailed], store),
+      Error,
+      'refund gateway timed out',
+    );
+
+    const loaded = await store.load(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'failed');
+    assertEquals(loaded?.state, { payment: 'captured', ledger: { entries: ['charge'] } });
+  });
+
+  Deno.test(`${mode.name}: sibling compensations each persist their own outcome in order`, async () => {
+    const runs: string[] = [];
+    const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
+    const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
+      .on('FulfillmentFailed', () => [
+        sagaCompensate({ type: 'ReleaseStock', payload: {} }),
+        sagaCompensate({ type: 'RefundPayment', payload: {} }),
+      ])
+      .compensate('ReleaseStock', (saga) => {
+        runs.push('ReleaseStock');
+        saga.state = { ...saga.state, stock: 'released' };
+        return [];
+      })
+      .compensate('RefundPayment', (saga) => {
+        runs.push('RefundPayment');
+        saga.state = { ...saga.state, payment: 'refunded' };
+        return [sagaFail('order cancelled')];
+      })
+      .build() as SagaDefinition;
+    const store = new MemorySagaStore();
+    const replayed = { ...fulfillmentFailed, idempotencyKey: 'fulfillment-failed-1' };
+
+    // The same inbound message delivered twice: the replay must write nothing.
+    await runSaga(definition, [replayed, replayed], store);
+
+    assertEquals(runs, ['ReleaseStock', 'RefundPayment']);
+    const loaded = await store.load(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'failed');
+    assertEquals(loaded?.metadata.version, 3);
+    // The second branch ran against the first branch's committed state.
+    assertEquals(loaded?.state, { payment: 'refunded', stock: 'released' });
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['compensating', 'compensated', 'failed'],
+    );
+  });
+
+  Deno.test(`${mode.name}: a send sibling that moves the same instance is threaded into the next compensation`, async () => {
+    const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
+    const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
+      .correlate(() => CORRELATION_KEY)
+      .on('FulfillmentFailed', () => [
+        send('StockReleased', {}),
+        sagaCompensate({ type: 'RefundPayment', payload: {} }),
+      ])
+      .on('StockReleased', (saga) => {
+        saga.state = { ...saga.state, stock: 'released' };
+        return [];
+      })
+      .compensate('RefundPayment', (saga) => {
+        saga.state = { ...saga.state, payment: 'refunded' };
+        return [];
+      })
+      .build() as SagaDefinition;
+
+    const store = await runSaga(definition, [fulfillmentFailed]);
+
+    const loaded = await store.load(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'compensated');
+    assertEquals(loaded?.metadata.version, 3);
+    assertEquals(loaded?.state, { payment: 'refunded', stock: 'released' });
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['compensating', 'compensating', 'compensated'],
+    );
+  });
+
+  Deno.test(`${mode.name}: a send chain through another saga is threaded into the next compensation`, async () => {
+    // A -> B -> A: saga A's first sibling reaches saga B, whose cascade moves A to version 2.
+    // A's following compensation must commit version 3, not race the indirect transition.
+    const refund = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
+    const relay = defineSaga('relay').state<SagaState>({});
+    const definitions = [
+      (mode.atomic ? refund.durableWorkerCommands() : refund)
+        .correlate(() => CORRELATION_KEY)
+        .on('FulfillmentFailed', () => [
+          send('ReleaseStock', {}),
+          sagaCompensate({ type: 'RefundPayment', payload: {} }),
+        ])
+        .on('StockReleased', (saga) => {
+          saga.state = { ...saga.state, stock: 'released' };
+          return [];
+        })
+        .compensate('RefundPayment', (saga) => {
+          saga.state = { ...saga.state, payment: 'refunded' };
+          return [sagaFail('order cancelled')];
+        })
+        .build() as SagaDefinition,
+      (mode.atomic ? relay.durableWorkerCommands() : relay)
+        .on('ReleaseStock', () => [send('StockReleased', {})])
+        .build() as SagaDefinition,
+    ];
+
+    const store = await runSaga(definitions, [fulfillmentFailed]);
+
+    const loaded = await store.load(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'failed');
+    assertEquals(loaded?.metadata.version, 3);
+    assertEquals(loaded?.state, { payment: 'refunded', stock: 'released' });
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['compensating', 'compensating', 'failed'],
+    );
+  });
+
+  Deno.test(`${mode.name}: a broadcast result is not rolled back by an earlier result's cascade`, async () => {
+    // Both sagas handle `Start`, so one engine call commits both before the bridge dispatches.
+    // A's cascade moves B to version 2 before B's own result (version 1) is dispatched; B's
+    // compensation must still commit version 3 rather than race its own stale snapshot.
+    const toucher = defineSaga('toucher').state<SagaState>({});
+    const refund = defineSaga(SAGA_ID).state<SagaState>({ touched: false, undone: false });
+    const definitions = [
+      (mode.atomic ? toucher.durableWorkerCommands() : toucher)
+        .on('Start', () => [send('TouchRefund', {})])
+        .build() as SagaDefinition,
+      (mode.atomic ? refund.durableWorkerCommands() : refund)
+        .correlate(() => CORRELATION_KEY)
+        .on('Start', () => [sagaCompensate({ type: 'Undo', payload: {} })])
+        .on('TouchRefund', (saga) => {
+          saga.state = { ...saga.state, touched: true };
+          return [];
+        })
+        .compensate('Undo', (saga) => {
+          saga.state = { ...saga.state, undone: true };
+          return [sagaFail('order cancelled')];
+        })
+        .build() as SagaDefinition,
+    ];
+
+    // The keyed broadcast is delivered twice; the replay must write nothing to either instance.
+    const start = { type: 'Start', payload: {}, idempotencyKey: 'start-1' };
+    const store = await runSaga(definitions, [start, start]);
+
+    const loaded = await store.load(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'failed');
+    assertEquals(loaded?.metadata.version, 3);
+    assertEquals(loaded?.state, { touched: true, undone: true });
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['compensating', 'compensating', 'failed'],
+    );
+  });
+
+  Deno.test(`${mode.name}: sagaFail from .on() persists the outcome of its compensate branch`, async () => {
+    const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
+    const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
+      .on('PaymentDisputed', () => [sagaFail('disputed')])
+      .compensate('PaymentDisputed', (saga) => {
+        saga.state = { payment: 'refunded' };
+        return [];
+      })
+      .build() as SagaDefinition;
+
+    const store = await runSaga(definition, [{ type: 'PaymentDisputed', payload: {} }]);
+
+    const loaded = await store.load<Ledger>(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'compensated');
+    assertEquals(loaded?.state, { payment: 'refunded' });
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['failed', 'compensated'],
+    );
+  });
+
+  Deno.test(`${mode.name}: sagaFail from a same-type compensate branch terminates instead of re-entering it`, async () => {
+    // The documented order-saga shape: the compensate branch is keyed on the failing message type
+    // and returns sagaFail. Before #1990 the bridge routed that sagaFail back into the same branch.
+    let runs = 0;
+    const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
+    const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
+      .on('FulfillmentFailed', (_saga, message) => [sagaCompensate(message, 'out of stock')])
+      .compensate('FulfillmentFailed', (saga) => {
+        runs += 1;
+        if (runs > 1) throw new Error('compensation branch re-entered');
+        saga.state = { payment: 'refunded' };
+        return [sagaFail('order unfulfilled')];
+      })
+      .build() as SagaDefinition;
+
+    const store = await runSaga(definition, [fulfillmentFailed]);
+
+    assertEquals(runs, 1);
+    const loaded = await store.load<Ledger>(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'failed');
+    assertEquals(loaded?.metadata.compensationError, undefined);
+    assertEquals(loaded?.state, { payment: 'refunded' });
+  });
+
+  Deno.test(`${mode.name}: a compensation transition is idempotent on replay`, async () => {
+    const store = new MemorySagaStore();
+    const engine = new SagaEngine({ store });
+    const definition = refundSaga(mode, (saga) => {
+      saga.state = { payment: 'refunded' };
+      return [];
+    });
+    await engine.register([definition]);
+    await engine.start();
+    try {
+      const [requested] = await engine.handle({
+        ...fulfillmentFailed,
+        correlationKey: CORRELATION_KEY,
+      });
+      const outcome = {
+        sagaId: requested.sagaId,
+        instanceId: requested.instanceId,
+        correlationKey: requested.correlationKey,
+        message: { type: 'RefundPayment', payload: {} },
+        version: requested.version ?? 0,
+        state: { payment: 'refunded' },
+        cascaded: [],
+      };
+
+      const first = await engine.commitCompensation(outcome);
+      const replay = await engine.commitCompensation(outcome);
+
+      assertEquals(first, { committed: true, status: 'compensated', version: 2 });
+      assertEquals(replay, { committed: false, status: 'compensated', version: 2 });
+      const loaded = await store.load<Ledger>(INSTANCE_ID);
+      assertEquals(loaded?.metadata.version, 2);
+      assertEquals(store.transitions(INSTANCE_ID).length, 2);
+    } finally {
+      await engine.stop();
+    }
+  });
+
+  Deno.test(`${mode.name}: a legacy compensating row is non-terminal but never silently reopened`, async () => {
+    const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
+    const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
+      .on('Heartbeat', () => [])
+      .on('RefundSettled', (saga) => {
+        saga.state = { payment: 'refunded' };
+        return [sagaFail('refund settled out of band')];
+      })
+      .build() as SagaDefinition;
+    const store = new MemorySagaStore();
+    // A row written by a pre-#1990 runtime: the instance rests at `compensating`.
+    await store.save({
+      metadata: {
+        instanceId: INSTANCE_ID,
+        version: 1,
+        status: 'compensating',
+        durability: 't1',
+        createdAt: new Date('2026-01-01T00:00:00Z'),
+        updatedAt: new Date('2026-01-01T00:00:00Z'),
+      },
+      state: { payment: 'captured' },
+    });
+    await store.saveCorrelation({
+      sagaId: SAGA_ID as SagaId,
+      correlationKey: CORRELATION_KEY,
+      instanceId: INSTANCE_ID,
+    });
+
+    await runSaga(definition, [{ type: 'Heartbeat', payload: {} }], store);
+    assertEquals((await store.load(INSTANCE_ID))?.metadata.status, 'compensating');
+
+    await runSaga(definition, [{ type: 'RefundSettled', payload: {} }], store);
+    const settled = await store.load<Ledger>(INSTANCE_ID);
+    assertEquals(settled?.metadata.status, 'failed');
+    assertEquals(settled?.state, { payment: 'refunded' });
+  });
+}
+
+Deno.test('compensation cascades still dispatch send effects after the outcome is persisted', async () => {
+  const observed: string[] = [];
+  const definition = defineSaga(SAGA_ID)
+    .state<SagaState>({ payment: 'captured' })
+    .on('FulfillmentFailed', () => [sagaCompensate({ type: 'RefundPayment', payload: {} })])
+    .on('RefundRecorded', () => {
+      observed.push('RefundRecorded');
+      return [];
+    })
+    .compensate('RefundPayment', (saga) => {
+      saga.state = { payment: 'refunded' };
+      return [send('RefundRecorded', {})];
+    })
+    .correlate(() => CORRELATION_KEY)
+    .build() as SagaDefinition;
+
+  const store = await runSaga(definition, [fulfillmentFailed]);
+
+  assertEquals(observed, ['RefundRecorded']);
+  const loaded = await store.load<Ledger>(INSTANCE_ID);
+  assertEquals(loaded?.metadata.status, 'compensated');
+  assertEquals(loaded?.state, { payment: 'refunded' });
+});
+
+Deno.test('a storeless runtime still runs compensation without persisting', async () => {
+  const observed: SagaState[] = [];
+  const definition = refundSaga(STORE_MODES[0], (saga) => {
+    saga.state = { payment: 'refunded' };
+    observed.push(saga.state);
+    return [sagaFail('order cancelled')];
+  });
+  const runtime = createSagaRuntime({
+    native: { compensator: new SagaCompensator({ clock: new TestSagaClock() }) },
+  });
+  await runtime.register([definition]);
+  await runtime.start();
+  try {
+    await runtime.publish({ ...fulfillmentFailed, correlationKey: CORRELATION_KEY });
+  } finally {
+    await runtime.stop('storeless compensation test complete');
+  }
+  assertEquals(observed, [{ payment: 'refunded' }]);
+});

@@ -127,6 +127,8 @@ export function renderTemplate(
  *
  * @example
  * ```typescript
+ * import { DenoFileSystem, StringTemplateAdapter } from '@netscript/cli/scaffolding';
+ *
  * const fs = new DenoFileSystem();
  * const adapter = new StringTemplateAdapter(fs);
  *

@@ -16,14 +16,14 @@ authoring a single `defineJobHandler` module, not first assembling a queue, a wo
 and an inspection UI around it.
 
 A NetScript **background job** is a durable, KV-backed TypeScript handler that runs in
-its own thread-isolated worker, separate from your request-serving services. You author a
+the background worker process, separate from your request-serving services. You author a
 job as one `defineJobHandler(...)` callable, give it an `id`, and the runtime takes care of
 registration, dispatch, retry, execution tracking, scheduling, and an HTTP API to enqueue
 and inspect runs. It is the unit you reach for whenever work should happen *after* a request
 returns — charging a payment, sending a welcome email, processing an upload — without
 blocking the caller.
 
-{{ comp.diagram({ src: "/assets/diagrams/queue-worker-scheduler.svg", alt: "An enqueue call (from a trigger, an HTTP POST to the workers API, or the scheduler) places a job on the durable queue; the worker runtime pulls it and runs the handler in one of three runner modes — in-process, web-worker (one V8 isolate per worker), or subprocess — then writes a JobResult to the KV-backed execution store, which streams updates back over SSE.", caption: "Enqueue → durable queue → worker runtime (in-process / web-worker / subprocess) → result store. The scheduler fires cron-defined jobs onto the same queue; graceful shutdown drains in-flight runs before the runner stops." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/queue-worker-scheduler.svg", alt: "An enqueue call (from a trigger, an HTTP POST to the workers API, or the scheduler) places a job on the durable queue; the worker runtime pulls it and runs the handler in-process with cooperative async concurrency — then writes a JobResult to the KV-backed execution store, which streams updates back over SSE.", caption: "Enqueue → durable queue → in-process job runner → result store. The scheduler fires cron-defined jobs onto the same queue; graceful shutdown drains in-flight runs before the runner stops." }) }}
 
 ## The story: a screenshot becomes a diagnosis
 
@@ -58,9 +58,8 @@ The headline surface — `defineJobHandler`, `createSuccessResult`, and `createF
 from `@netscript/plugin-workers-core` — lets you write a typed handler over a `ctx`, do the
 work, and return a structured `JobResult`. Job dispatch and execution are instrumented with
 real OpenTelemetry spans that show up in the [Aspire dashboard](/explanation/aspire/)
-automatically, so a queued run is observable end to end without wiring. The runner mode
-(how the handler is isolated) is a **user-tunable** — see the runtime-mode table below — and
-the same queue and scheduler also drive [polyglot tasks](/background-processing/polyglot-tasks/) when
+automatically, so a queued run is observable end to end without wiring. Jobs currently run
+in-process inside the background worker; the same queue and scheduler also drive [polyglot tasks](/background-processing/polyglot-tasks/) when
 the work is owned by another runtime. The why-behind-the-choreography lives in
 [Durability model](/explanation/durability-model/).
 
@@ -88,7 +87,7 @@ as a <a href="/durable-workflows/sagas/">durable saga</a>; jobs and sagas compos
   },
   {
     title: "Do — Tune the worker runtime",
-    body: "Recipe: pick the in-process / web-worker / subprocess runner, set WORKERS_CONCURRENCY, and choose a queue provider for your deployment.",
+    body: "Recipe: set in-process queue concurrency with WORKERS_CONCURRENCY and choose a queue provider for your deployment.",
     href: "/background-processing/how-to/tune-worker-runtime/",
     icon: "◆"
   },
@@ -217,24 +216,25 @@ two shapes are the contract you write against; read them before the option table
 
 ## Worker runtime modes (`WORKER_RUNTIMES`)
 
-How a handler is isolated from the API process is a tunable: `WORKER_RUNTIMES` enumerates the
-three runner modes the worker runtime supports. The scaffold default is **web-worker**, where
-each worker is its own V8 isolate sized by the `WORKERS_CONCURRENCY` env var. Pick the mode
-that matches your isolation, memory, and parallelism needs.
+Only **in-process** job execution is implemented today. The background worker service is
+separate from the API service, but its job handlers share one isolate and event loop.
+`WORKER_RUNTIMES` / `WorkerRuntime` retain vocabulary for compatibility; they are not a
+runner selector. `web-worker` and `subprocess` job-runner modes are reserved, not implemented.
+Subprocess execution is implemented separately for polyglot tasks.
 
 {{ comp.apiTable({
-  caption: "WORKER_RUNTIMES — runner isolation modes (WorkerRuntime type)",
+  caption: "WORKER_RUNTIMES — implemented and reserved job-runner vocabulary",
   rows: [
-    { name: "in-process", type: "WorkerRuntime", desc: "Runs the handler in the same process via the in-process runner (registry-first). Lowest overhead, no isolation — best for tests, compiled binaries, and single-tenant local composition." },
-    { name: "web-worker", type: "WorkerRuntime", desc: "Runs each worker in its own Web Worker / V8 isolate (~20-40 MB each). The scaffold default; WORKERS_CONCURRENCY sets the process pool size for parallel job execution. Keep it low to bound memory." },
-    { name: "subprocess", type: "WorkerRuntime", desc: "Runs the handler in a spawned subprocess. Strongest process isolation; only Deno tasks get permission sandboxing through .permissions(). Python, .NET, shell, PowerShell, and cmd inherit the worker process's OS permissions." }
+    { name: "in-process", type: "WorkerRuntime", desc: "Implemented: handlers share the background worker process and event loop; asynchronous I/O can overlap, synchronous CPU work cannot run in parallel." },
+    { name: "web-worker", type: "WorkerRuntime", desc: "Reserved job-runner vocabulary; no Web Worker isolate pool is implemented." },
+    { name: "subprocess", type: "WorkerRuntime", desc: "Reserved job-runner vocabulary. Subprocesses are implemented for task executors, not job handlers; Deno task permissions apply only to Deno tasks." }
   ]
 }) }}
 
 {{ comp.apiTable({
   caption: "Deployment & scaling knobs (workers config)",
   rows: [
-    { name: "WORKERS_CONCURRENCY", type: "env (number)", desc: "Runtime worker process pool size. Aspire metadata injects it with the declared default (2); the entrypoint defaults to 1 when it is unset." },
+    { name: "WORKERS_CONCURRENCY", type: "env (number)", desc: "Queue concurrency in the background worker process. Aspire metadata injects it with the declared default (2); the entrypoint defaults to 1 when it is unset." },
     { name: "concurrency", type: "number", desc: "Per-topic max concurrent workers (WorkersConfigData.concurrency / per-group scaling)." },
     { name: "mode", type: "'combined' | 'distributed'", desc: "Per-topic deployment mode: one combined runner vs. distributed runners. Defaults to 'combined'." },
     { name: "queueProvider", type: "'auto' | 'deno-kv' | 'redis' | 'postgres' | 'amqp'", desc: "Queue backend. 'auto' resolves a provider; see Choose a queue provider." },
@@ -243,13 +243,11 @@ that matches your isolation, memory, and parallelism needs.
 }) }}
 
 {{ comp callout { type: "note", title: "Tune it without touching code" } }}
-The runner mode and pool size are deployment settings, not handler concerns — the same
-<code>process-payment</code> handler runs unchanged under any
-<a href="/background-processing/how-to/tune-worker-runtime/"><code>WORKER_RUNTIMES</code> mode</a>. Start on the
-<code>web-worker</code> default with a small <code>WORKERS_CONCURRENCY</code>, move to
-<code>subprocess</code> when you need hard isolation, and drop to <code>in-process</code> for
-tests and compiled single-binary deployments. Resolution precedence (schema default → config
-file → env → override) is covered in
+Set <code>WORKERS_CONCURRENCY</code> to bound concurrent queue deliveries in the background
+worker process. I/O-bound handlers can overlap; synchronous CPU-bound handlers block its
+shared event loop, including queue listeners and health checks. Raising concurrency does
+not create isolates or add CPU parallelism. Use a polyglot task when work needs a subprocess.
+Resolution precedence (schema default → config file → env → override) is covered in
 <a href="/orchestration-runtime/runtime-config/">runtime configuration</a>.
 {{ /comp }}
 
@@ -457,7 +455,7 @@ collisions: the plugin's own jobs register first, then the generated user defini
 first registration wins. Background execution runs from
 <code>plugins/workers/bin/combined.ts</code>, a <em>separate</em> process from the API service —
 the API enqueues, the runner executes. A missing generated registry is tolerated as an empty set,
-so a fresh workspace boots before you author any job. The process pool size is
+so a fresh workspace boots before you author any job. The queue concurrency is
 <code>WORKERS_CONCURRENCY</code>, which Aspire injects on the worker background process; see
 <a href="/background-processing/how-to/tune-worker-runtime/">Tune the worker runtime</a> to change it.
 {{ /comp }}
@@ -497,7 +495,7 @@ documentation (as of mid-2026), not rankings.
 |---|---|---|---|
 | Handler code | Plain async TypeScript (`defineJobHandler`); failed runs are retried, never replayed | TypeScript tasks in your repo, executed by the platform | Workflow code replayed from event history; side effects live in activities |
 | Determinism constraint on orchestration code | None — handlers may call `Date.now()`, `Math.random()`, and do direct I/O | Not required | Required in workflow code: no `Date.now()`, `Math.random()`, or direct I/O |
-| Where handlers execute | Your own processes: in-process, web-worker, or subprocess runner | Managed cloud; self-hosting via Docker Compose | Self-hosted cluster or Temporal Cloud |
+| Where handlers execute | Your background worker process: in-process jobs; subprocess task executors | Managed cloud; self-hosting via Docker Compose | Self-hosted cluster or Temporal Cloud |
 | Backing stores | Pluggable queue (`deno-kv`, `redis`, `postgres`, `amqp`); Deno KV execution state; Postgres job definitions | Platform-managed | Database, Elasticsearch, server, and workers (self-hosted) |
 | Control plane | None separate — the workers API is one of your services (running on its scaffold-assigned port) | The Trigger.dev platform | The Temporal cluster |
 

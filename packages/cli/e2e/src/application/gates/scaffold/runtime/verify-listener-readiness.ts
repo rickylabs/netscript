@@ -182,17 +182,29 @@ export async function verifyListenerReadiness(
   readSnapshot: (appHost: string, resourceName: string) => Promise<string> = describeResource,
 ): Promise<ListenerHealthReport> {
   const subscription = await watch(appHost, resourceName);
+  let lastUpdate: ResourceUpdate | undefined;
   try {
     let update: ResourceUpdate;
     try {
       update = await subscription.waitFor(
-        (candidate) => resourceHealthIs(candidate, 'Healthy'),
+        (candidate) => {
+          lastUpdate = candidate;
+          return resourceHealthIs(candidate, 'Healthy');
+        },
         failureCeilingMs,
       );
     } catch (error) {
       throw new Error(
         `Aspire did not observe ${resourceName} transition to aggregate Healthy before the ` +
-          `${failureCeilingMs}ms test-failure ceiling`,
+          `${failureCeilingMs}ms test-failure ceiling; last state=${
+            typeof lastUpdate?.resource.state === 'string'
+              ? lastUpdate.resource.state
+              : 'Unknown (not observed)'
+          }; healthStatus=${
+            typeof lastUpdate?.resource.healthStatus === 'string'
+              ? lastUpdate.resource.healthStatus
+              : 'Unknown'
+          }; ${String(error)}`,
         { cause: error },
       );
     }

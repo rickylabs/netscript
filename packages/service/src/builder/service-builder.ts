@@ -9,7 +9,10 @@
  *
  * @example
  * ```typescript
- * import { createService } from '@netscript/service';
+ * import { createService, type Database, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ * declare const db: Database;
  *
  * const running = await createService(router, { name: 'users', version: '1.0.0' })
  *   .withCors()
@@ -64,7 +67,11 @@ export interface ServiceBuilder<
   TRouter extends ServiceRouter,
   TCustom extends object = Record<never, never>,
 > {
-  /** Enables CORS middleware. */
+  /**
+   * Enables CORS with explicit origins or `NETSCRIPT_CORS_ORIGINS` when omitted.
+   * Unset origins deny cross-origin access. `build()` rejects wildcard origins
+   * combined with credentials before a listener starts.
+   */
   withCors(options?: CorsOptions): ServiceBuilder<TRouter, TCustom>;
 
   /** Enables structured request logging middleware. */
@@ -211,6 +218,10 @@ export interface ServiceBuilder<
  *
  * @example
  * ```typescript
+ * import type { ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ *
  * const running = await createService(router, { name: 'users', version: '1.0.0' })
  *   .withCors()
  *   .withLogger()
