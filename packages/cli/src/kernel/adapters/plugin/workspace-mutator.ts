@@ -17,6 +17,7 @@ import {
   buildBackgroundProcessorEntry,
   buildPluginEntry,
   buildPluginServiceEntry,
+  carryHostPortPin,
 } from './appsettings-entry-builders.ts';
 import { insertPluginSpecifier, removePluginSpecifiers } from './netscript-config-plugin.ts';
 import { resolveNetScriptImports } from '../scaffold/import-resolver.ts';
@@ -337,7 +338,11 @@ export class PluginWorkspaceMutator {
   /** Create a mutator with injected filesystem access. */
   constructor(private readonly fs: FileSystemPort) {}
 
-  /** Add or replace the plugin entry in root `appsettings.json`. */
+  /**
+   * Add or replace the plugin entry in root `appsettings.json`.
+   *
+   * A replaced entry keeps its operator-set `HostPort` unless this run pins a new one.
+   */
   async updateAppsettings(
     projectRoot: string,
     scaffoldResult: PluginScaffoldResult,
@@ -358,11 +363,11 @@ export class PluginWorkspaceMutator {
     let entry: PluginConfigEntry | undefined;
 
     if (provider.category === 'plugin') {
-      const pluginEntry = buildPluginEntry(scaffoldResult, provider, options);
-      entry = pluginEntry;
-      if (pluginEntry !== undefined) {
+      const builtEntry = buildPluginEntry(scaffoldResult, provider, options);
+      if (builtEntry !== undefined) {
         raw.NetScript.Plugins ??= {};
-        raw.NetScript.Plugins[scaffoldResult.configKey] = pluginEntry;
+        entry = carryHostPortPin(builtEntry, raw.NetScript.Plugins[scaffoldResult.configKey]);
+        raw.NetScript.Plugins[scaffoldResult.configKey] = entry;
       }
     } else {
       const backgroundEntry = buildBackgroundProcessorEntry(scaffoldResult, provider, options);
@@ -371,10 +376,9 @@ export class PluginWorkspaceMutator {
       raw.NetScript.BackgroundProcessors[scaffoldResult.configKey] = backgroundEntry;
       if (provider.defaultServiceEntrypoint) {
         raw.NetScript.Plugins ??= {};
-        raw.NetScript.Plugins[scaffoldResult.serviceConfigKey] = buildPluginServiceEntry(
-          scaffoldResult,
-          provider,
-          options,
+        raw.NetScript.Plugins[scaffoldResult.serviceConfigKey] = carryHostPortPin(
+          buildPluginServiceEntry(scaffoldResult, provider, options),
+          raw.NetScript.Plugins[scaffoldResult.serviceConfigKey],
         );
       }
     }
@@ -500,7 +504,7 @@ export class PluginWorkspaceMutator {
     return imports;
   }
 
-  /** Add or replace a direct plugin appsettings entry. */
+  /** Add or replace a direct plugin appsettings entry, keeping an operator-set `HostPort`. */
   async upsertPluginAppsettingsEntry(
     projectRoot: string,
     configKey: string,
@@ -517,7 +521,7 @@ export class PluginWorkspaceMutator {
     const raw = JSON.parse(await this.fs.readFile(configPath)) as AppsettingsShape;
     raw.NetScript ??= {};
     raw.NetScript.Plugins ??= {};
-    raw.NetScript.Plugins[configKey] = entry;
+    raw.NetScript.Plugins[configKey] = carryHostPortPin(entry, raw.NetScript.Plugins[configKey]);
 
     await this.fs.writeFile(configPath, JSON.stringify(raw, null, 2) + '\n');
   }
