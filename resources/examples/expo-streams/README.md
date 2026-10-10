@@ -51,13 +51,15 @@ Hermes execution. Native Hermes and native Expo network integration remain unver
 this executable proof is provided for the follow-up acceptance run.
 
 The hook regression tests run with this reference's exact React 19.2.3 and compiler configuration;
-the SDK suite launches them in that isolated context. This keeps the renderer and hook on the same
-React instance as the Expo reference rather than the workspace's independently resolved React patch.
+the SDK suite launches them in that isolated context. The explicit `stream-react.fixture.ts`
+filename keeps the reference-only imports out of root test discovery; the SDK wrapper remains
+discoverable and runs both fixture tests. This keeps the renderer and hook on the same React
+instance as the Expo reference rather than the workspace's independently resolved React patch.
 `react-test-renderer@19.2.3` is retained only for this existing component-lifecycle fixture; it is
 deprecated upstream and is not a production app dependency or native-execution proof.
 
 Run the isolated fixture directly from the reference directory with
-`deno test --no-lock --unstable-kv --allow-all stream-react_test.ts`. It verifies subscription
+`deno test --no-lock --unstable-kv --allow-all stream-react.fixture.ts`. It verifies subscription
 updates/unmount and a fatal pre-readiness error, including rendering the error after remount.
 
 The automated integration test consumes the reference's actual `createCockpitStream` factory under

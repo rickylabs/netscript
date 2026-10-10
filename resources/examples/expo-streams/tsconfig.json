@@ -10,6 +10,6 @@
   ],
   "exclude": [
     "prepare.ts",
-    "*_test.ts"
+    "stream-react.fixture.ts"
   ]
 }

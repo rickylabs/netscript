@@ -5,7 +5,7 @@ Deno.test('Expo-pinned React hook regressions run in the reference compiler cont
   const result = await new Deno.Command(Deno.execPath(), {
     cwd: reference,
     env: { NO_COLOR: '1' },
-    args: ['test', '--no-lock', '--unstable-kv', '--allow-all', 'stream-react_test.ts'],
+    args: ['test', '--no-lock', '--unstable-kv', '--allow-all', 'stream-react.fixture.ts'],
     stdout: 'piped',
     stderr: 'piped',
   }).output();

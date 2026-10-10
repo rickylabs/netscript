@@ -128,6 +128,8 @@ export function createStreamCollectionV1<T extends object>(
     },
   );
   void done.catch(() => {});
+  // Intentionally wrap upstream preload: readiness alone cannot surface a fatal source failure.
+  // Keep the original bound method, and preserve this done/error race across TanStack upgrades.
   const preload = collection.preload.bind(collection);
   collection.preload = async () => {
     if (failure) throw failure;
