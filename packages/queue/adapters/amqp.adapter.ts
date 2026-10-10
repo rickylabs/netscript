@@ -7,8 +7,8 @@
  */
 
 import { AmqpMessageQueue } from '@fedify/amqp';
-import { connect } from 'npm:amqplib@^0.10.3';
-import type { ChannelModel } from 'npm:amqplib@^0.10.3';
+import { connect } from 'amqplib';
+import type { ChannelModel } from 'amqplib';
 import type {
   DeadLetterStorePort,
   EnqueueOptions,
