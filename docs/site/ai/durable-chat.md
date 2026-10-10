@@ -29,7 +29,7 @@ now.
   caption: "@netscript/fresh/ai — the durable-chat surface",
   rows: [
     { name: "createNetScriptChatStreamProxy", type: "(options) => handler", desc: "Build the single durable chat-stream proxy handler — resolves the session target (static or per-request), proxies to the durable-stream URL with server auth, passes the body through unbuffered, and tears down on client abort." },
-    { name: "toNetScriptChatResponse", type: "(options) => Promise<Response>", desc: "Produce a durable-session `Response` from a server chat stream; enforces `authorize` (a denial becomes `403`) before the session stream is touched." },
+    { name: "toNetScriptChatResponse", type: "(options) => Promise<Response>", desc: "Produce a durable-session `Response` from a server chat stream; enforces `authorize` (a denial becomes `403`) before the session stream is touched. With `producer: { id, epoch }`, appends are fenced against stale writers." },
     { name: "resolveChatSnapshot", type: "(options) => Promise<NetScriptChatSnapshot>", desc: "Resolve the seed snapshot for SSR / first paint by materializing the session and reducing it through `projectChatSnapshot`." },
     { name: "projectChatSnapshot", type: "(messages) => {messages, renderParts}", desc: "THE single projection reducer — deterministic and side-effect-free. Both seed and live paths MUST route through it (the one-projection law)." },
     { name: "createNetScriptChatConnection", type: "(options) => NetScriptChatConnection", desc: "Open a live durable session handle: SR2-tolerant `subscribe`, a `send` that persists client messages, and one idempotent teardown (`close`/`stop`/`dispose`)." }
@@ -143,6 +143,64 @@ the factory <strong>never</strong> bakes in a default allow-all. Ship a real
 Supplying <code>authorize</code> without a <code>request</code> is a programming error
 and throws.
 {{ /comp }}
+
+## Fencing a reclaimed chat executor
+
+A chat turn that runs in the background — in a worker or saga under a service identity, not
+in a request an open app keeps alive — can be reclaimed: its lease expires, a new claim runs
+the turn again, and the old executor may still be writing. Pass `producer` to fence it.
+Every append (the text echoes, complete native `newMessages` batch, and each assistant
+chunk) then carries one
+durable-streams idempotent-producer sequence `(id, epoch, seq)`, and the streams service
+rejects a writer whose epoch is older than the newest one that has written. Fenced turns
+persist the same native message batch as the default path, including non-text parts and
+metadata.
+
+```ts
+import { NetScriptChatProducerError, toNetScriptChatResponse } from "@netscript/fresh/ai";
+
+try {
+  await toNetScriptChatResponse({
+    target: { sessionId: turn.sessionId },
+    newMessages: turn.newMessages,
+    source: assistantChatStream,
+    mode: "await", // the executor waits for every append to be acknowledged
+    // id: stable across retries of this turn. epoch: this claim's generation.
+    producer: { id: `chat-turn:${turn.sessionId}:${turn.id}`, epoch: claim.generation },
+  });
+} catch (error) {
+  if (error instanceof NetScriptChatProducerError && error.kind === "stale-epoch") {
+    // A newer claim (error.currentEpoch) owns this turn; nothing from this writer was stored.
+    return;
+  }
+  throw error;
+}
+```
+
+- **The caller owns the epoch.** NetScript never claims or bumps an epoch: `autoClaim` stays
+  off, because re-claiming a stale epoch would defeat fencing. Use a non-negative integer that
+  increases on every claim of the turn: a claim counter or row version your executor
+  increments when it takes the turn. When your job runtime exposes a lease or claim
+  generation, use that.
+- **A replay under the same pair is deduplicated chunk by chunk.** Each chunk is sent as
+  its own producer batch, so its sequence number is its index in the turn (the
+  text echoes first, then the native batch, then the assistant chunks), however fast the source yields.
+  Replaying the same turn under the same `(id, epoch)` therefore appends only the chunks an
+  earlier call never stored, for example after the executor was interrupted. The service
+  drops an already-stored index without comparing content, so use one id per turn.
+- **A new epoch starts a new sequence.** A newer claim rewrites the turn from index `0`;
+  whatever an older claim stored before it was fenced stays in the transcript.
+- **One request per chunk.** Fenced turns trade batching for that determinism: each chunk is
+  its own request, with at most five in flight.
+- **Fencing starts once the newer claim has written.** Until the new epoch's first append,
+  the service has not seen it, so an older writer is still accepted.
+- **Errors are typed.** A rejected append becomes a `NetScriptChatProducerError` whose `kind`
+  uses the same failure vocabulary as State Protocol producers (`'stale-epoch'`,
+  `'sequence-gap'`, `'stream-closed'`, `'retryable'`, ...). It is thrown in `'await'` mode or
+  while echoing `newMessages`. In the default `'immediate'` mode a failure after the `202` is
+  logged, as the unfenced writer does, so executors should use `'await'`.
+- **Without `producer` nothing changes.** The default (unfenced) NetScript path is used
+  unchanged, with no producer headers.
 
 ## Seeding first paint (SSR)
 
