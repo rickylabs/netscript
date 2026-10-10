@@ -4,9 +4,8 @@
  * Service discovery from scaffolded workspace config.
  */
 
-import { join } from '@std/path';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
-import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
+import { requireAppsettingsPath } from '../config/appsettings/appsettings-file.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { DiscoveredService, ServiceConfigEntry } from '../../domain/service-shape.ts';
 
@@ -20,6 +19,7 @@ export class ServiceWorkspaceResolver {
    *
    * @param projectRoot - Absolute project root path
    * @returns Service entries sorted by name
+   * @throws {ConfigNotFoundError} When `appsettings.json` is absent.
    */
   async discoverServices(projectRoot: string): Promise<readonly DiscoveredService[]> {
     const services = await this.readServices(projectRoot);
@@ -51,9 +51,7 @@ export class ServiceWorkspaceResolver {
   private async readServices(
     projectRoot: string,
   ): Promise<Record<string, ServiceConfigEntry>> {
-    const configPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
-    if (!await this.fs.exists(configPath)) return {};
-
+    const configPath = await requireAppsettingsPath(this.fs, projectRoot);
     const raw = JSON.parse(await this.fs.readFile(configPath)) as {
       NetScript?: { Services?: Record<string, ServiceConfigEntry> };
     };

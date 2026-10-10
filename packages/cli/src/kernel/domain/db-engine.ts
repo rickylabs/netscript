@@ -137,3 +137,9 @@ export interface DbOperationRequest {
   /** Absolute project root. */
   readonly projectRoot: string;
 }
+
+/** Executes one resolved database operation and reports its process exit code. */
+export interface DbOperationExecutor {
+  /** Run the operation against every target database, stopping at the first failure. */
+  execute(request: DbOperationRequest): Promise<number>;
+}

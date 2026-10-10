@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { join } from '@std/path';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
@@ -7,6 +7,8 @@ import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
 import { regenerateAspireHelpers } from './workspace-mutator.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { SCAFFOLD_VERSIONS } from '../../constants/scaffold/scaffold-versions.ts';
+import { ScaffoldValidationError } from '../../domain/errors.ts';
+import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 
 function appsettings(databases: Record<string, unknown> = {}): string {
   return JSON.stringify({
@@ -146,3 +148,21 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
   );
   await fs.createDir(join(root, 'aspire'));
 }
+// #1996: `generate aspire` in a --no-aspire project names the real cause.
+Deno.test('Aspire helper regeneration refuses a project scaffolded without Aspire', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile('/project/appsettings.json', appsettings());
+  const templateAdapter = new StringTemplateAdapter(fs);
+
+  await assertRejects(
+    () =>
+      regenerateAspireHelpers(
+        '/project',
+        fs,
+        new Scaffolder(templateAdapter, fs),
+        templateAdapter,
+      ),
+    ScaffoldValidationError,
+    'this project was scaffolded without Aspire (netscript init --no-aspire)',
+  );
+});

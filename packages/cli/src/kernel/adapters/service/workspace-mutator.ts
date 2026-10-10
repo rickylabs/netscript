@@ -23,7 +23,7 @@ import {
 } from '../config/plugin-registry.ts';
 import { loadProjectConfig } from '../config/project-config-loader.ts';
 import { DenoProcess } from '../runtime/process/deno-process.ts';
-import { resolveEffectivePluginPermissions } from '../config/deploy-config-resolvers.ts';
+import { resolveEffectivePluginPermissions } from '../config/deploy-config/deploy-config-resolvers.ts';
 import type { RegisteredPluginConfig } from '../../domain/resolved-config.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
@@ -155,19 +155,21 @@ export async function regenerateAspireHelpers(
     readonly formatter?: GeneratedSourceFormatterPort;
   } = {},
 ): Promise<readonly string[]> {
+  const aspireDir = join(projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
+  if (!await fs.exists(aspireDir)) {
+    throw new ScaffoldValidationError(
+      `Cannot regenerate Aspire helpers: this project was scaffolded without Aspire ` +
+        `(netscript init --no-aspire), so there is no ${SCAFFOLD_DIRS.ASPIRE_TS}/ AppHost ` +
+        `to generate helpers for. Run services and apps directly with their deno tasks.`,
+      { projectRoot, aspireDir },
+    );
+  }
+
   const appsettingsPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
   if (!await fs.exists(appsettingsPath)) {
     throw new ScaffoldValidationError(
       `Cannot regenerate Aspire helpers because ${SCAFFOLD_FILES.APPSETTINGS} was not found.`,
       { projectRoot },
-    );
-  }
-
-  const aspireDir = join(projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
-  if (!await fs.exists(aspireDir)) {
-    throw new ScaffoldValidationError(
-      `Cannot regenerate Aspire helpers because ${SCAFFOLD_DIRS.ASPIRE_TS}/ was not found.`,
-      { projectRoot, aspireDir },
     );
   }
 

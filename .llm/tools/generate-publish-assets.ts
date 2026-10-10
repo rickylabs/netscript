@@ -25,6 +25,7 @@ export const MCP_EMBEDDED_DOC_PATHS = [
   'pages/web-layer/how-to/build-a-server-validated-form/index.md',
   'pages/web-layer/query/index.md',
   'pages/web-layer/route/index.md',
+  'pages/web-layer/generated-surface/index.md',
   'pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md',
   'pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md',
 ] as const;

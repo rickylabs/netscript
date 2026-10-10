@@ -9,7 +9,7 @@ import { Command } from '@cliffy/command';
 import type { NetScriptConfig } from '@netscript/config';
 import { AstExtractor, FilesystemWalker } from '@netscript/plugin/sdk';
 import { resolve } from '@std/path';
-import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
+import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config/deploy-config.ts';
 import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
