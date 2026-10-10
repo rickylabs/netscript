@@ -1,7 +1,6 @@
 import { inspectConfig, type NetScriptConfig } from '@netscript/config';
-import { join } from '@std/path';
 
-import { appsettingsNotFound } from '../../../../kernel/adapters/config/appsettings-file.ts';
+import { requireAppsettingsPath } from '../../../../kernel/adapters/config/appsettings-file.ts';
 import { ConfigInvalidError } from '../../../../kernel/domain/errors.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import { isObject, step } from './read-appsettings-schema.ts';
@@ -10,8 +9,6 @@ import {
   type ResolvedAppsettingsPath,
   resolveAppsettingsPath,
 } from './resolve-appsettings-path.ts';
-
-const APPSETTINGS_FILE = 'appsettings.json';
 
 /** Options controlling how a project configuration value is written. */
 export interface SetProjectConfigOptions {
@@ -56,9 +53,8 @@ export async function setProjectConfigValue(
   value: unknown,
   options?: SetProjectConfigOptions,
 ): Promise<SetProjectConfigResult> {
-  const path = join(projectRoot, APPSETTINGS_FILE);
-  const document = await readAppsettingsDocument(fs, path);
-  if (!document) throw appsettingsNotFound(path);
+  const path = await requireAppsettingsPath(fs, projectRoot);
+  const document = await parseAppsettingsDocument(fs, path);
 
   const resolved = resolveAppsettingsPath(dottedPath, document);
   const forced = options?.force === true;
@@ -87,20 +83,30 @@ export async function readAppsettingsValue(
   projectRoot: string,
   dottedPath: string,
 ): Promise<unknown> {
-  const document = await readAppsettingsDocument(fs, join(projectRoot, APPSETTINGS_FILE));
-  if (!document) return undefined;
+  const document = await readAppsettingsDocument(fs, projectRoot);
   // Walk the resolved segments rather than the dotted string: a record key may
   // itself contain a dot.
   return resolveAppsettingsPath(dottedPath, document).segments
     .reduce<unknown>((value, segment) => step(value, segment), document);
 }
 
-/** Load the project's `appsettings.json`, or `undefined` when it does not exist. */
+/**
+ * Load the project's `appsettings.json`.
+ *
+ * @throws {ConfigNotFoundError} When the file does not exist: a reader never
+ * reports a missing configuration as an empty one.
+ */
 export async function readAppsettingsDocument(
   fs: FileSystemPort,
+  projectRoot: string,
+): Promise<Record<string, unknown>> {
+  return await parseAppsettingsDocument(fs, await requireAppsettingsPath(fs, projectRoot));
+}
+
+async function parseAppsettingsDocument(
+  fs: FileSystemPort,
   path: string,
-): Promise<Record<string, unknown> | undefined> {
-  if (!await fs.exists(path)) return undefined;
+): Promise<Record<string, unknown>> {
   const parsed = JSON.parse(await fs.readFile(path)) as unknown;
   return isObject(parsed) ? { ...parsed } : {};
 }
