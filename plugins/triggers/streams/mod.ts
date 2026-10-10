@@ -73,3 +73,11 @@ export type {
 } from './schema.ts';
 
 export { createStreamDB, type StreamCollection } from '@netscript/plugin-streams-core';
+
+export type {
+  CollectionDefinition,
+  StreamSchemaIssue,
+  StreamSchemaValidationOptions,
+  StreamSchemaValidationResult,
+  StreamStandardSchema,
+} from '@netscript/plugin-streams-core';
