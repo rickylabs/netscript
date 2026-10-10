@@ -1,17 +1,10 @@
 {{__slot0__}}
 
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-import { OtlpProtocol } from '{{__slot1__}}';
-import type { NetScriptConfig } from '{{__slot2__}}';
+{{otlpImport}}import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
 import {
-  buildDatabaseUriEnvKey,
-  buildDatabaseProviderEnvVars,
-  buildSqliteDatabaseUrl,
-  buildOtelEnvVars,
-  resolvePermissions,
-  resolveWorkspacePath,
-  withCacheReference as _withCacheReference,
+{{compatImports}}
 } from '{{__slot3__}}';
 
 type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
@@ -38,15 +31,13 @@ type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutabl
 export async function registerBackgroundProcessors(
   builder: DistributedApplicationBuilder,
   config: NetScriptConfig,
-  infrastructure: InfrastructureContext,
+  {{infrastructureParameter}}: InfrastructureContext,
   _services: Map<string, ExecutableResource>,
   _plugins: Map<string, ExecutableResource>,
   appHostDir: string,
 ): Promise<Map<string, ExecutableResource>> {
   const backgroundProcessors = new Map<string, ExecutableResource>();
-  const databaseEnvKey = buildDatabaseUriEnvKey(config);
-  const databaseProviderEnv = buildDatabaseProviderEnvVars(config);
-
+{{databaseBindings}}
 {{__slot4__}}
 
   return backgroundProcessors;
