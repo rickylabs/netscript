@@ -1,4 +1,4 @@
-import { resolveExportedPluginManifest } from '../../application/plugin/exported-plugin-manifest.ts';
+import { resolveExportedPluginManifest } from '../../../application/plugin/exported-plugin-manifest.ts';
 
 const RESULT_PREFIX = 'NETSCRIPT_CONFIGURED_PLUGIN_MANIFESTS=';
 

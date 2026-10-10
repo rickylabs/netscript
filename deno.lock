@@ -4531,7 +4531,6 @@
       },
       "packages/plugin-workers-core": {
         "dependencies": [
-          "jsr:@david/dax@0.48",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
           "jsr:@netscript/plugin@0.0.7",

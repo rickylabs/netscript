@@ -3,7 +3,7 @@ import { Command } from '@cliffy/command';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { parseContractVersion } from '../../../../kernel/adapters/contracts/types.ts';
 import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/version-registry.ts';
-import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
+import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config/deploy-config.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import type { AddContractVersionInput } from './add-contract-version-input.ts';

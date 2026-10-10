@@ -5,13 +5,15 @@ import { DenoGeneratedSourceFormatter } from '../runtime/process/deno-generated-
 import { DenoProcess } from '../runtime/process/deno-process.ts';
 import type { ProcessPort } from '../../ports/process-port.ts';
 import { checkAspire } from '../../../public/features/generate/aspire/check-aspire.ts';
-import { assertEquals, assertStringIncludes } from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
 import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
 import { regenerateAspireHelpers } from './workspace-mutator.ts';
+import { ScaffoldValidationError } from '../../domain/errors.ts';
+import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
 
 function appsettings(): string {
@@ -252,4 +254,34 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+// #1996: `generate aspire` in a --no-aspire project names the real cause.
+Deno.test('Aspire helper regeneration refuses a project scaffolded without Aspire', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile('/project/appsettings.json', appsettings());
+  const authored = await fs.readFile('/project/appsettings.json');
+  const writes: string[] = [];
+  const writeFile = fs.writeFile.bind(fs);
+  fs.writeFile = async (path, content) => {
+    writes.push(path);
+    await writeFile(path, content);
+  };
+  const templateAdapter = new StringTemplateAdapter(fs);
+
+  await assertRejects(
+    () =>
+      regenerateAspireHelpers(
+        '/project',
+        fs,
+        new Scaffolder(templateAdapter, fs),
+        templateAdapter,
+        { formatter: new DenoGeneratedSourceFormatter(new DenoProcess()) },
+      ),
+    ScaffoldValidationError,
+    'this project was scaffolded without Aspire (netscript init --no-aspire)',
+  );
+  assertEquals(writes, []);
+  assertEquals(await fs.readFile('/project/appsettings.json'), authored);
+  assertEquals(await fs.exists('/project/aspire'), false);
 });

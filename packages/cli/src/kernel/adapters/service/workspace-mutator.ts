@@ -142,6 +142,16 @@ export async function regenerateAspireHelpers(
     readonly force?: boolean;
   },
 ): Promise<readonly string[]> {
+  const aspireDir = join(projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
+  if (!await fs.exists(aspireDir)) {
+    throw new ScaffoldValidationError(
+      `Cannot regenerate Aspire helpers: this project was scaffolded without Aspire ` +
+        `(netscript init --no-aspire), so there is no ${SCAFFOLD_DIRS.ASPIRE_TS}/ AppHost ` +
+        `to generate helpers for. Run services and apps directly with their deno tasks.`,
+      { projectRoot, aspireDir },
+    );
+  }
+
   const files = await renderAspireSurface(projectRoot, fs, templateAdapter, options);
   const written: string[] = [];
   for (const file of files) {

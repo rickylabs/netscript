@@ -370,3 +370,28 @@ Deno.test('scaffoldRoot omits Aspire-backed compose CI when --no-aspire is used'
     result.filesCreated.includes(join(workflowsRoot, 'deploy-bare-metal.yml')),
   );
 });
+
+// #1996: --no-aspire projects must carry the config every operating command reads.
+Deno.test('scaffoldRoot writes an Aspire-free appsettings.json when --no-aspire is used', async () => {
+  const scaffolder = new InMemoryScaffolder();
+  const result = await scaffoldRoot(
+    context(scaffolder),
+    options({
+      noAspire: true,
+      dbEngine: 'postgres',
+      includeExampleService: true,
+      serviceName: 'probe-svc',
+      servicePort: 61432,
+    }),
+  );
+  const appsettingsPath = '/workspace/deploy-app/appsettings.json';
+
+  assert(result.filesCreated.includes(appsettingsPath));
+  const netScript = JSON.parse(scaffolder.files.get(appsettingsPath) ?? '{}').NetScript;
+  assertEquals(netScript.Name, 'deploy-app');
+  assertEquals(netScript.Databases.postgres.Mode, 'External');
+  assertEquals(netScript.Services['probe-svc'].Port, 61432);
+  assertEquals(netScript.Apps, undefined);
+  assertEquals(netScript.Tools, undefined);
+  assertEquals(netScript.Otel, undefined);
+});

@@ -1,6 +1,6 @@
 import { join } from '@std/path';
-import type { ProcessPort } from '../../ports/process-port.ts';
-import { resolvePluginImportSpecifier } from '../../application/plugin/configured-plugin-specifier.ts';
+import type { ProcessPort } from '../../../ports/process-port.ts';
+import { resolvePluginImportSpecifier } from '../../../application/plugin/configured-plugin-specifier.ts';
 import {
   CONFIGURED_PLUGIN_PROBE_SCHEMA_VERSION,
   parseResolvedConfiguredPluginManifestPayload,
