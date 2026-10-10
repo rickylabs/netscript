@@ -1,12 +1,15 @@
 /**
  * WorkOS AuthKit authenticators for NetScript services.
  *
+ * Supply the exported sealed-session client port. Direct WorkOS SDK compatibility is tracked in
+ * {@link https://github.com/rickylabs/netscript/issues/2231 | issue #2231}.
+ *
  * @example
  * ```ts
- * import { WorkOS } from '@workos-inc/node';
- * import { createWorkosBackend } from '@netscript/auth-workos';
+ * import { createWorkosBackend, type WorkosSessionClient } from '@netscript/auth-workos';
  *
- * const workos = new WorkOS('sk_test_123', { clientId: 'client_123' });
+ * // Supply the application's sealed-session client through the published port.
+ * declare const workos: WorkosSessionClient;
  * const backend = createWorkosBackend({
  *   workos,
  *   cookiePassword: Deno.env.get('WORKOS_COOKIE_PASSWORD')!,
