@@ -36,19 +36,42 @@ const PUBLIC_POLICY = new RegExp(
     }).join('|') + String.raw`)\s*,?\s*\}\s*,`,
 );
 
+/** Exact authored paths a lifecycle rollback must preserve before browser reconciliation. */
+export async function browserAuthReconciliationPaths(
+  projectRoot: string,
+  fs: FileSystemPort,
+): Promise<readonly string[]> {
+  const auth = await readAuthServiceName(projectRoot, fs);
+  if (!auth) return [];
+  const settingsPath = join(projectRoot, 'appsettings.json');
+  if (!await fs.exists(settingsPath)) return [];
+  const settings = JSON.parse(await fs.readFile(settingsPath)) as BrowserAuthSettings;
+  return [
+    join(projectRoot, 'auth/bff.ts'),
+    join(projectRoot, 'auth/service.ts'),
+    ...Object.entries(settings.NetScript?.Apps ?? {}).filter(([, entry]) =>
+      !entry.Type || entry.Type === 'app'
+    ).map(([name, entry]) => dirname(appAuthRoute(projectRoot, name, entry))),
+    ...Object.entries(settings.NetScript?.Services ?? {}).map(([name, entry]) =>
+      serviceEntrypoint(projectRoot, name, entry)
+    ),
+  ];
+}
+
 /** Reconcile install-time browser auth using the CLI's injected filesystem boundary. */
 export async function reconcileBrowserAuth(
   projectRoot: string,
   fs: FileSystemPort,
   formatter?: GeneratedSourceFormatterPort,
 ): Promise<readonly string[]> {
+  const auth = await readAuthServiceName(projectRoot, fs);
+  if (!auth) return [];
   const settingsPath = join(projectRoot, 'appsettings.json');
   const settings = JSON.parse(
     await fs.readFile(settingsPath),
   ) as BrowserAuthSettings;
   const config = settings.NetScript;
-  const auth = await readAuthServiceName(projectRoot, fs);
-  if (!auth || !config) return [];
+  if (!config) return [];
   const authServiceName = `'${auth}'`;
   const files: BrowserAuthFile[] = [
     {
@@ -67,7 +90,7 @@ export async function reconcileBrowserAuth(
   for (const [name, entry] of Object.entries(config.Apps ?? {})) {
     if (entry.Type && entry.Type !== 'app') continue;
     const appRoot = workspacePath(projectRoot, entry.Workdir ?? `apps/${name}`);
-    const path = join(appRoot, 'routes/auth/[action].ts');
+    const path = appAuthRoute(projectRoot, name, entry);
     // Custom layouts are left to their author; this route is for generated Fresh apps.
     if (!await fs.exists(join(appRoot, 'utils.ts'))) continue;
     const bffImport = relative(dirname(path), join(projectRoot, 'auth/bff.ts'))
@@ -81,11 +104,7 @@ export async function reconcileBrowserAuth(
     ];
   }
   for (const [name, entry] of Object.entries(config.Services ?? {})) {
-    const serviceRoot = workspacePath(
-      projectRoot,
-      entry.Workdir ?? `services/${name}`,
-    );
-    const path = join(serviceRoot, entry.Entrypoint ?? 'src/main.ts');
+    const path = serviceEntrypoint(projectRoot, name, entry);
     if (!await fs.exists(path)) continue;
     const current = await fs.readFile(path);
     if (!current.includes('await defineService(router, {')) continue;
@@ -145,6 +164,17 @@ export async function reconcileBrowserAuth(
     await fs.writeFile(settingsPath, content);
   }
   return written;
+}
+
+function appAuthRoute(root: string, name: string, entry: BrowserAuthEntry): string {
+  return join(workspacePath(root, entry.Workdir ?? `apps/${name}`), 'routes/auth/[action].ts');
+}
+
+function serviceEntrypoint(root: string, name: string, entry: BrowserAuthEntry): string {
+  return join(
+    workspacePath(root, entry.Workdir ?? `services/${name}`),
+    entry.Entrypoint ?? 'src/main.ts',
+  );
 }
 
 function workspacePath(root: string, path: string): string {

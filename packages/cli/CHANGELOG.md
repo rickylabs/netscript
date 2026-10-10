@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.0.8
+
+- Public and local contributor service/plugin lifecycle commands reconcile installed plugin
+  references and browser auth wiring. `generate aspire` now reads authored configuration and
+  entrypoints without repairing them; use the owning service or plugin lifecycle command to update
+  wiring. Generation continues to refresh Aspire helpers and the Aspire CLI task runner.
+
 ## 0.0.7
 
 - `agent init` now installs canonical cross-host skills and project guidance together with an
@@ -16,8 +23,8 @@
   clients in seeds, and project missing rows as defined 404 responses.
 - Generated design registries include the complete component manifest and collection membership
   instead of a partial catalog.
-- Generated Aspire background registration fails before processor startup when a declared service
-  or plugin reference has no resolvable HTTP endpoint.
+- Generated Aspire background registration fails before processor startup when a declared service or
+  plugin reference has no resolvable HTTP endpoint.
 - The Prisma MySQL adapter exposes the connected adapter contract and classified connection-error
   hook, ships an executable Prisma 7/mysql2 example, stops root-exporting the legacy
   `DenoMySqlClient`, `DenoMySqlConnection`, and `ExecuteResult` types, narrows result column types,
@@ -31,8 +38,8 @@
 - SDK cache queries return fetched data when persistence fails, bound telemetry namespace
   cardinality, retain incomplete-topology evidence, honor fresh cached entries under stale-only
   refresh policy, and deduplicate background refresh persistence.
-- SDK service clients preserve exact contract errors through `safe()` and `isDefinedError`;
-  failures now carry `undefined` rather than `null`, `SafeFailure` splits into literal defined and
+- SDK service clients preserve exact contract errors through `safe()` and `isDefinedError`; failures
+  now carry `undefined` rather than `null`, `SafeFailure` splits into literal defined and
   non-defined arms, default `TError` changes from `unknown` to `Error`, `safe()` no longer accepts
   non-Promise thenables, and `baseContract` rejects error codes outside its six declared literals
   (`NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, and
@@ -41,8 +48,8 @@
   (`KvExecutionState.progress()`), and the worker pool drains progress in FIFO order before terminal
   delivery. Installed job registries now carry the complete `netscript.config.ts` job policy,
   `JobConfig` gains the four policy fields the job-definition schema already used, and the root
-  `JobDefinition`/`JobBuilder.build()` surface preserves payload and result generics so
-  `enqueueJob` rejects a payload that does not match the selected job.
+  `JobDefinition`/`JobBuilder.build()` surface preserves payload and result generics so `enqueueJob`
+  rejects a payload that does not match the selected job.
 - Service principals are typed and procedure policy is declared on the contract instead of inferred
   at runtime.
 - `@netscript/plugin/sdk` publishes `createPluginServiceContext`, third-party plugin factories now
@@ -70,22 +77,20 @@
   deploy prebuild, follow Aspire's Vite identifier normalization so hyphenated resource names
   resolve.
 - Fresh exposes awaited chat persistence and background-work registration through
-  `toNetScriptChatResponse`, keeps readonly query hydration verified against TanStack Query
-  5.102.x, orders the partial-navigation lifecycle through the SSR-safe
-  `@netscript/fresh/navigation` surface (superseded responses are drained, native `key` partial
-  boundaries render), invokes the captured navigation fetch with the browser receiver, and rejects
-  undeclared keys on pattern-inferred route params at the property-access site.
-  `@netscript/fresh/vite` now publishes route-manifest derivation (`discoverNetScriptRoutes`,
-  `resolveNetScriptRouteManifestOptions`, `writeNetScriptRouteManifestSync`) so the CLI can write
-  and compare Fresh-owned manifest output.
+  `toNetScriptChatResponse`, keeps readonly query hydration verified against TanStack Query 5.102.x,
+  orders the partial-navigation lifecycle through the SSR-safe `@netscript/fresh/navigation` surface
+  (superseded responses are drained, native `key` partial boundaries render), invokes the captured
+  navigation fetch with the browser receiver, and rejects undeclared keys on pattern-inferred route
+  params at the property-access site. `@netscript/fresh/vite` now publishes route-manifest
+  derivation (`discoverNetScriptRoutes`, `resolveNetScriptRouteManifestOptions`,
+  `writeNetScriptRouteManifestSync`) so the CLI can write and compare Fresh-owned manifest output.
   `FormCollectionStrategy` rejects `navigation: 'document'` together with `mode: 'client'` at the
-  type level instead of silently dropping the navigation choice.
-  The form descriptor's `controlProps()` bag is directly assignable to Preact `input`, `select`,
-  and `textarea` elements, and derives `pattern` plus inclusive numeric `min`/`max`/`step` native
-  constraints from the Zod 4 schema.
-  `useQuery` from `@netscript/fresh/query` seeds `initialDataUpdatedAt` alongside `initialData`,
-  so `staleTime` is measured from the server load rather than browser hydration, and the scaffolded
-  showcase island passes the loader's `cachedAt` through instead of discarding it.
+  type level instead of silently dropping the navigation choice. The form descriptor's
+  `controlProps()` bag is directly assignable to Preact `input`, `select`, and `textarea` elements,
+  and derives `pattern` plus inclusive numeric `min`/`max`/`step` native constraints from the Zod 4
+  schema. `useQuery` from `@netscript/fresh/query` seeds `initialDataUpdatedAt` alongside
+  `initialData`, so `staleTime` is measured from the server load rather than browser hydration, and
+  the scaffolded showcase island passes the loader's `cachedAt` through instead of discarding it.
 - Saga publish receipts are non-discardable, and saga cascade spans are emitted and correlated
   across planes.
 - AI maps typed generation options for OpenAI Responses when a provider is configured with
@@ -93,13 +98,12 @@
   the TanStack AI dependency family to its current stable releases.
 - `ui:add page --island` emits a working page, island, and query-loader data screen instead of a
   counter; the shipped skill bundle no longer references the derived `.claude/` mirror and resolves
-  to the canonical `.agents/skills/` tree;
-  Garnet readiness in scaffolded runtimes is deterministic and its version pins are aligned.
-  `netscript deploy <target> emit` is routed, and a fail-fast invariant keeps advertised deploy
-  operations from being silently omitted by the command router. The CLI also ships the neutral
-  Fresh 2.x resource-slice template family (`packages/cli/src/kernel/assets/resource-slice/`),
-  rendered through the pure slice planner with exact core/form/partial/stream option deltas; no
-  command wires it yet.
+  to the canonical `.agents/skills/` tree; Garnet readiness in scaffolded runtimes is deterministic
+  and its version pins are aligned. `netscript deploy <target> emit` is routed, and a fail-fast
+  invariant keeps advertised deploy operations from being silently omitted by the command router.
+  The CLI also ships the neutral Fresh 2.x resource-slice template family
+  (`packages/cli/src/kernel/assets/resource-slice/`), rendered through the pure slice planner with
+  exact core/form/partial/stream option deltas; no command wires it yet.
   `netscript service generate` reconciles every manifest service into a generator-owned
   `apps/<app>/lib/<service>.ts` client module with service-scoped query-factory keys and
   collision-safe naming, validates each `contracts/versions/v1/<service>.contract.ts` export before
@@ -115,13 +119,12 @@
   through `resolveTelemetryEndpoint` (explicit value, `NETSCRIPT_TELEMETRY_ENDPOINT`,
   `ASPIRE_DASHBOARD_PORT`, the running AppHost, then the named default). The shipped `aspire` skill
   and `help.md` are re-verified against Aspire CLI 13.5.3 (`aspire agent mcp`, the
-  `aspire resources` alias, `healthReports` as an object) with receipt keys linking each
-  re-verified command to its smoke evidence.
-  The Aspire reference documents the backing-resource readiness contract: `healthStatus` reports
-  reachability at the published endpoint, so a container log line is not the readiness authority
-  and `Unhealthy` means "not reachable where you will connect", not "not started".
-  Scaffolded Aspire helpers gain `createEndpointListenerReadinessCheck`: the postgres listener
-  readiness check bounds endpoint allocation with the same deadline as the socket probe and
+  `aspire resources` alias, `healthReports` as an object) with receipt keys linking each re-verified
+  command to its smoke evidence. The Aspire reference documents the backing-resource readiness
+  contract: `healthStatus` reports reachability at the published endpoint, so a container log line
+  is not the readiness authority and `Unhealthy` means "not reachable where you will connect", not
+  "not started". Scaffolded Aspire helpers gain `createEndpointListenerReadinessCheck`: the postgres
+  listener readiness check bounds endpoint allocation with the same deadline as the socket probe and
   reports `ENDPOINT_ALLOCATION_TIMEOUT` instead of waiting indefinitely when the endpoint is never
   allocated.
 - The oRPC dependency family moves to 1.15.0 with one resolved copy of each `@orpc/*` package.

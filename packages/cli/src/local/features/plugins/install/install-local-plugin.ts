@@ -1,3 +1,4 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { join } from '@std/path';
 import {
   copyPluginSchemasToRootDb,
@@ -164,9 +165,7 @@ export async function installLocalPlugin(
   await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
     plan.projectRoot,
     plan.pluginName,
-    pluginOwned === undefined
-      ? rendered.plugin.pluginDir
-      : pluginConfigDirectory,
+    pluginOwned === undefined ? rendered.plugin.pluginDir : pluginConfigDirectory,
     pluginOwned === undefined ? 'mod.ts' : 'plugin.ts',
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
@@ -180,19 +179,24 @@ export async function installLocalPlugin(
       toWorkspaceRelativePath(plan.projectRoot, pluginConfigDirectory),
     ])
     : rendered.workspaceMembers;
-  await dependencies.workspaceMutator.ensureWorkspaceMember(plan.projectRoot, pluginWorkspaceMembers);
+  await dependencies.workspaceMutator.ensureWorkspaceMember(
+    plan.projectRoot,
+    pluginWorkspaceMembers,
+  );
 
   if (pluginOwned !== undefined && resolvedPlugin !== undefined) {
     await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
   }
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
+  const browserAuthFiles = await reconcileBrowserAuth(plan.projectRoot, dependencies.fs);
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
-  const helperFiles = await regenerateHelpers(
+  const aspireFiles = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
   if (dependencies.processRunner) {
     await formatGeneratedFiles(dependencies.processRunner, plan.projectRoot, [
       ...helperFiles,
