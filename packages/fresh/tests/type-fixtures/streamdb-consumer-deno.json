@@ -1,7 +1,7 @@
 {
   "workspace": [],
   "catalog": {
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   },
   "imports": {
     "@durable-streams/client": "npm:@durable-streams/client@0.2.7",

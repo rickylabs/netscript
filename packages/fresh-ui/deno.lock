@@ -27,9 +27,6 @@
     "jsr:@fedify/webfinger@^2.3.4": "2.3.4",
     "jsr:@fresh/build-id@1": "1.0.1",
     "jsr:@fresh/core@^2.3.3": "2.3.3",
-    "jsr:@hono/hono@4.12.24": "4.12.24",
-    "jsr:@hono/hono@^4.8.3": "4.12.24",
-    "jsr:@hono/otel@^1.1.2": "1.1.2",
     "jsr:@logtape/logtape@2": "2.3.0",
     "jsr:@logtape/logtape@^2.0.5": "2.3.0",
     "jsr:@logtape/logtape@^2.2.0": "2.3.0",
@@ -92,21 +89,18 @@
     "npm:@durable-streams/state@0.3.2": "0.3.2_@tanstack+db@0.13.0__typescript@7.0.2_typescript@7.0.2",
     "npm:@durable-streams/tanstack-ai-transport@0.0.10": "0.0.10",
     "npm:@multiformats/base-x@^4.0.1": "4.0.1",
-    "npm:@opentelemetry/api@^1.9.0": "1.9.1",
     "npm:@opentelemetry/api@^1.9.1": "1.9.1",
     "npm:@opentelemetry/core@^2.7.1": "2.9.0_@opentelemetry+api@1.9.1",
     "npm:@opentelemetry/sdk-metrics@2.7.1": "2.7.1_@opentelemetry+api@1.9.1",
     "npm:@opentelemetry/sdk-trace-base@^2.7.1": "2.9.0_@opentelemetry+api@1.9.1",
-    "npm:@opentelemetry/semantic-conventions@1.41.1": "1.41.1",
-    "npm:@opentelemetry/semantic-conventions@^1.28.0": "1.41.1",
-    "npm:@opentelemetry/semantic-conventions@^1.40.0": "1.41.1",
-    "npm:@orpc/client@^1.15.0": "1.15.0_@opentelemetry+api@1.9.1",
-    "npm:@orpc/contract@^1.15.0": "1.15.0_@opentelemetry+api@1.9.1",
-    "npm:@orpc/openapi@^1.15.0": "1.15.0_@opentelemetry+api@1.9.1",
-    "npm:@orpc/otel@^1.15.0": "1.15.0_@opentelemetry+api@1.9.1_@opentelemetry+instrumentation@0.221.0__@opentelemetry+api@1.9.1",
-    "npm:@orpc/server@^1.15.0": "1.15.0_@opentelemetry+api@1.9.1",
-    "npm:@orpc/tanstack-query@^1.15.0": "1.15.0_@orpc+client@1.15.0__@opentelemetry+api@1.9.1_@tanstack+query-core@5.101.1_@opentelemetry+api@1.9.1",
-    "npm:@orpc/zod@^1.15.0": "1.15.0_@orpc+contract@1.15.0__@opentelemetry+api@1.9.1_@orpc+server@1.15.0__@opentelemetry+api@1.9.1_zod@4.4.3_@opentelemetry+api@1.9.1",
+    "npm:@opentelemetry/semantic-conventions@1.43.0": "1.43.0",
+    "npm:@orpc/client@^1.15.5": "1.15.5_@opentelemetry+api@1.9.1",
+    "npm:@orpc/contract@^1.15.5": "1.15.5_@opentelemetry+api@1.9.1",
+    "npm:@orpc/openapi@^1.15.5": "1.15.5_@opentelemetry+api@1.9.1",
+    "npm:@orpc/otel@^1.15.5": "1.15.5_@opentelemetry+api@1.9.1_@opentelemetry+instrumentation@0.223.0__@opentelemetry+api@1.9.1",
+    "npm:@orpc/server@^1.15.5": "1.15.5_@opentelemetry+api@1.9.1",
+    "npm:@orpc/tanstack-query@^1.15.5": "1.15.5_@orpc+client@1.15.5__@opentelemetry+api@1.9.1_@tanstack+query-core@5.104.1_@opentelemetry+api@1.9.1",
+    "npm:@orpc/zod@^1.15.5": "1.15.5_@orpc+contract@1.15.5__@opentelemetry+api@1.9.1_@orpc+server@1.15.5__@opentelemetry+api@1.9.1_zod@4.6.5_@opentelemetry+api@1.9.1",
     "npm:@preact/signals@2.9.2": "2.9.2_preact@10.29.2",
     "npm:@preact/signals@^2.5.1": "2.9.2_preact@10.29.2",
     "npm:@prisma/adapter-mssql@^7.8.0": "7.8.0",
@@ -115,21 +109,21 @@
     "npm:@prisma/driver-adapter-utils@^7.8.0": "7.8.0",
     "npm:@prisma/instrumentation-contract@^7.8.0": "7.8.0_@opentelemetry+api@1.9.1",
     "npm:@saga-bus/core@~0.2.2": "0.2.2_typescript@7.0.2",
-    "npm:@tanstack/ai-anthropic@0.20.0": "0.20.0_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-anthropic@~0.18.3": "0.18.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-client@0.39.0": "0.39.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-mcp@0.8.1": "0.8.1_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-mcp@~0.3.8": "0.3.8_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-openai@0.28.0": "0.28.0_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-openai@~0.22.3": "0.22.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-preact@0.20.1": "0.20.1_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-preact@~0.14.4": "0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai@0.52": "0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai@0.66.0": "0.66.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+    "npm:@tanstack/ai-anthropic@0.20.0": "0.20.0_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5",
+    "npm:@tanstack/ai-anthropic@~0.18.3": "0.18.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5",
+    "npm:@tanstack/ai-client@0.39.0": "0.39.0_zod@4.6.5",
+    "npm:@tanstack/ai-mcp@0.8.1": "0.8.1_zod@4.6.5",
+    "npm:@tanstack/ai-mcp@~0.3.8": "0.3.8_zod@4.6.5",
+    "npm:@tanstack/ai-openai@0.28.0": "0.28.0_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5",
+    "npm:@tanstack/ai-openai@~0.22.3": "0.22.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5",
+    "npm:@tanstack/ai-preact@0.20.1": "0.20.1_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.6.5_preact@10.29.2_zod@4.6.5",
+    "npm:@tanstack/ai-preact@~0.14.4": "0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.6.5_preact@10.29.2_zod@4.6.5",
+    "npm:@tanstack/ai@0.52": "0.52.0_@opentelemetry+api@1.9.1_zod@4.6.5",
+    "npm:@tanstack/ai@0.66.0": "0.66.0_@opentelemetry+api@1.9.1_zod@4.6.5",
     "npm:@tanstack/db@0.13.0": "0.13.0_typescript@7.0.2",
-    "npm:@tanstack/preact-query@^5.101.0": "5.101.1_preact@10.29.2",
-    "npm:@tanstack/query-core@^5.101.0": "5.101.1",
-    "npm:@tanstack/query-db-collection@1.4.3": "1.4.3_@tanstack+query-core@5.101.1_typescript@7.0.2",
+    "npm:@tanstack/preact-query@^5.104.1": "5.104.1_preact@10.29.2",
+    "npm:@tanstack/query-core@^5.104.1": "5.104.1",
+    "npm:@tanstack/query-db-collection@1.4.3": "1.4.3_@tanstack+query-core@5.104.1_typescript@7.0.2",
     "npm:@tanstack/react-db@0.5.8": "0.5.8_react@19.2.8_typescript@7.0.2",
     "npm:@types/amqplib@~0.10.7": "0.10.8",
     "npm:@workos-inc/node@^10.4.0": "10.6.0",
@@ -163,7 +157,7 @@
     "npm:tailwind-merge@^3.6.0": "3.6.0",
     "npm:vite@7.2.2": "7.2.2_@types+node@26.0.1",
     "npm:zod@^3.24.0": "3.25.76",
-    "npm:zod@^4.4.3": "4.4.3"
+    "npm:zod@^4.6.5": "4.6.5"
   },
   "jsr": {
     "@cliffy/ansi@1.2.1": {
@@ -284,11 +278,9 @@
         "jsr:@fedify/vocab-runtime",
         "jsr:@fedify/webfinger",
         "jsr:@logtape/logtape@^2.2.0",
-        "npm:@opentelemetry/api@^1.9.1",
         "npm:@opentelemetry/core",
         "npm:@opentelemetry/sdk-metrics",
         "npm:@opentelemetry/sdk-trace-base",
-        "npm:@opentelemetry/semantic-conventions@^1.40.0",
         "npm:byte-encodings",
         "npm:es-toolkit",
         "npm:json-canon",
@@ -312,7 +304,6 @@
         "jsr:@fedify/vocab-runtime",
         "jsr:@fedify/webfinger",
         "jsr:@logtape/logtape@^2.2.0",
-        "npm:@opentelemetry/api@^1.9.1",
         "npm:es-toolkit"
       ]
     },
@@ -321,7 +312,6 @@
       "dependencies": [
         "jsr:@logtape/logtape@^2.2.0",
         "npm:@multiformats/base-x",
-        "npm:@opentelemetry/api@^1.9.1",
         "npm:asn1js",
         "npm:byte-encodings",
         "npm:jsonld",
@@ -332,8 +322,7 @@
       "integrity": "c269e1c9bed2e9b98116a99ddba0aeba7f20531c9e0f8e026ed886b66a781f53",
       "dependencies": [
         "jsr:@fedify/vocab-runtime",
-        "jsr:@logtape/logtape@^2.2.0",
-        "npm:@opentelemetry/api@^1.9.1"
+        "jsr:@logtape/logtape@^2.2.0"
       ]
     },
     "@fresh/build-id@1.0.1": {
@@ -358,24 +347,12 @@
         "jsr:@std/path@^1.1.2",
         "jsr:@std/semver@^1.0.6",
         "jsr:@std/uuid",
-        "npm:@opentelemetry/api@^1.9.0",
         "npm:@preact/signals@^2.5.1",
         "npm:esbuild-wasm",
         "npm:esbuild@0.25.7",
         "npm:preact-render-to-string@^6.6.3",
         "npm:preact@^10.28.2",
         "npm:preact@^10.29.1"
-      ]
-    },
-    "@hono/hono@4.12.24": {
-      "integrity": "a74a40f06ae6704ddd0e8e576f6da9d34666c3e1e0f5412a2c1ff800ffd092f4"
-    },
-    "@hono/otel@1.1.2": {
-      "integrity": "9b735a965407845ab4c67ea58693c87f2c54a825d56d1a8217c9339e593347ce",
-      "dependencies": [
-        "jsr:@hono/hono@^4.8.3",
-        "npm:@opentelemetry/api@^1.9.0",
-        "npm:@opentelemetry/semantic-conventions@^1.28.0"
       ]
     },
     "@logtape/logtape@2.3.0": {
@@ -523,33 +500,33 @@
     }
   },
   "npm": {
-    "@ag-ui/core@0.1.1-canary.beta.0_zod@4.4.3": {
+    "@ag-ui/core@0.1.1-canary.beta.0_zod@4.6.5": {
       "integrity": "sha512-zcP3RH5p3HJTZ0kyQxNOL1blnVFTDpaShitR7UMS/thwFdl48V6CAG+WQBcYEu/dfa8mKonRez88N0Ok+nEI+w==",
       "dependencies": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ],
       "optionalPeers": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ]
     },
-    "@ag-ui/core@1.0.0_zod@4.4.3": {
+    "@ag-ui/core@1.0.0_zod@4.6.5": {
       "integrity": "sha512-yCRhsQvb4+lmGMrDsi4TOJxqKpm/kb3H64wwL+Z90jNVrkhy17RErfzsNgybfbjNKLM0nenEDYDVJsZHJJSigQ==",
       "dependencies": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ],
       "optionalPeers": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ]
     },
-    "@anthropic-ai/sdk@0.97.1_zod@4.4.3": {
+    "@anthropic-ai/sdk@0.97.1_zod@4.6.5": {
       "integrity": "sha512-wOf7AUeJPitcVpvKO4UMu63mWH5SaVipkGd7OOQJt/G6VYGlV8D2Gp9dLxOrttDJh/9gqPqdaBwDGcBevumeAg==",
       "dependencies": [
         "json-schema-to-ts",
         "standardwebhooks",
-        "zod@4.4.3"
+        "zod@4.6.5"
       ],
       "optionalPeers": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ],
       "bin": true
     },
@@ -713,7 +690,7 @@
         "better-call",
         "kysely",
         "nanostores",
-        "zod@4.4.3"
+        "zod@4.6.5"
       ],
       "optionalPeers": [
         "@opentelemetry/api"
@@ -1210,16 +1187,16 @@
         "eventsource-parser",
         "jose",
         "pkce-challenge",
-        "zod@4.4.3"
+        "zod@4.6.5"
       ]
     },
     "@modelcontextprotocol/core@2.3.1": {
       "integrity": "sha512-laVmIhPGpWi7rG9q+0UigblRN0Hws/Yjlb6qLFtVqryXVLkc4h+yN8z731POD2LnAGQlFe7/tXhUm7Bi0YB91g==",
       "dependencies": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ]
     },
-    "@modelcontextprotocol/sdk@1.30.0_zod@4.4.3": {
+    "@modelcontextprotocol/sdk@1.30.0_zod@4.6.5": {
       "integrity": "sha512-xKd8OIzlqNzcqcNumGAa6g+PW2kjD5vrpcKOnfldAUPP3j7lnqMPwlTXQm8gF+UwH72z0lqaRbjr9hqGz0eITA==",
       "dependencies": [
         "@hono/node-server",
@@ -1237,7 +1214,7 @@
         "json-schema-typed",
         "pkce-challenge",
         "raw-body",
-        "zod@4.4.3",
+        "zod@4.6.5",
         "zod-to-json-schema"
       ]
     },
@@ -1245,7 +1222,7 @@
       "integrity": "sha512-e59MfWuSssj6DoQ96JCTqdW1AXT5/XtnTl0WWd6MU1Ka434fFUGGosCLJbGNySDhHGvxQWoRWK137FXYFkYNWw==",
       "dependencies": [
         "@modelcontextprotocol/core",
-        "zod@4.4.3"
+        "zod@4.6.5"
       ]
     },
     "@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.4": {
@@ -1293,8 +1270,8 @@
     "@noble/hashes@2.2.0": {
       "integrity": "sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg=="
     },
-    "@opentelemetry/api-logs@0.221.0": {
-      "integrity": "sha512-OlanaW1vv7ufTqQ3/fPLI4arGt5ZoM+P8abOMki6uEYnpRazepSWDwDnnw+la7kE26SHVC18//SMccrDvLKOXQ==",
+    "@opentelemetry/api-logs@0.223.0": {
+      "integrity": "sha512-Oepm6etVPFCn0VWB1t833iOTgz1eYBDUPxcrOR/XvwzD1+Ag9VzSPSrrKAFNJ/haatj+8CXbG47pZXvdNQKDJw==",
       "dependencies": [
         "@opentelemetry/api"
       ]
@@ -1316,8 +1293,8 @@
         "@opentelemetry/semantic-conventions"
       ]
     },
-    "@opentelemetry/instrumentation@0.221.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-cCk80Z/iRDf/5gfsKMB4f74LqVA5yKETB/9ojPzVW/6/f70iu89nJvGxsFCxx4XfSohaOofkU19kiYm84AiAlw==",
+    "@opentelemetry/instrumentation@0.223.0_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-tttBo88TbwK1zpsH6VeJoxLQopxOjW3cnrP50fsQJRZftkSKDDwjolXXBvow2jy0LKXlNRkDQh0NT6yI/q+BEQ==",
       "dependencies": [
         "@opentelemetry/api",
         "@opentelemetry/api-logs",
@@ -1368,11 +1345,11 @@
         "@opentelemetry/semantic-conventions"
       ]
     },
-    "@opentelemetry/semantic-conventions@1.41.1": {
-      "integrity": "sha512-/UhIkaZgPutTFmQ7RnIJGgDXZmtEJ7Dvi86xNTFWcnRxVRNk/aotsqDJYeEvDP+FSMB2SdW+pQzNMcWP0rwuNA=="
+    "@opentelemetry/semantic-conventions@1.43.0": {
+      "integrity": "sha512-eSYWTm620tTk45EKSedaUL8MFYI8hW164hIXsgIHyxu3VobUB3fFCu5t0hQby6OoWRPsG1KkKUG2M5UadiLiVg=="
     },
-    "@orpc/client@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-Qt0FdPSGySdQwy83iUWOq+Iqhw2gM9qHtyxfBbcw1mwOz1s4O2BwUFA3ymVTLIRRNYRgPrQLaBZhp8CacqeePg==",
+    "@orpc/client@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-0usheWO9w5HRHG20+nGB5AJlOQfea/fEmOX1KKHneBTkLpFTBSTkyJSqAN6ugJbhWm8BKVs9caimFQr8vcI0Ig==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server",
@@ -1380,8 +1357,8 @@
         "@orpc/standard-server-peer"
       ]
     },
-    "@orpc/contract@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-zo8+x+5iqnIMrFdcj+ibVgn6dJneWzLNcD3kZQxrJFGFNAFoxvZbwryR5wOdcHkaSCeS3N7Ib2NydU6pihSYmg==",
+    "@orpc/contract@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-VAT6NOusDZrvp3e6GqW1Xo7mTpMrCZCVqg0oCGuRjFfsVoCTOMeEoqP7IqA4SbThzim0iA3laC198aYYM0lvcg==",
       "dependencies": [
         "@orpc/client",
         "@orpc/shared",
@@ -1389,11 +1366,11 @@
         "openapi-types"
       ]
     },
-    "@orpc/interop@1.15.0": {
-      "integrity": "sha512-Ah48o/rc00rN1yP5HcaoVsDCjdUhoh3JP1VibBbvwijhGvdOwRwiw5RWiGu442GSKcrPt9etAGhWXH88q8C3ww=="
+    "@orpc/interop@1.15.5": {
+      "integrity": "sha512-VA9FQLt2jHY5MN8aMQ0Eg6muPZViOWBZaOmreARt8A/3AN8HaUOR43ccma6iTHVzojX7T1rz/9YXSY7zfUbDqw=="
     },
-    "@orpc/json-schema@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-MH8Qh6yPVaz76BdwcetKMUoL+Fpho1/e30Tb3WawU+EDZGD5jzA7W/KdRGvEYTHGod7qduS/kPd191NCVIEtDw==",
+    "@orpc/json-schema@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-nBXjDIF7sWz5csOGoX0eM1fZ/AVroxqOOlxyQtS+PYTV18JMy8zBUMfGOe23Npkb9FDAfpOiLb5czwaQS4Pszg==",
       "dependencies": [
         "@orpc/contract",
         "@orpc/interop",
@@ -1403,8 +1380,8 @@
         "json-schema-typed"
       ]
     },
-    "@orpc/openapi-client@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-MGyMAC6dvQ/YoUARpTN4L1MAnK4L2T3+Z7LA8PVva2rZ8XpKABZRcfqufyPfAC0nu/0uPeebnxHaXZ/OeUIOFg==",
+    "@orpc/openapi-client@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-+Dh294/EIrsKE7j0up0VdiA0+hXWqE49Kzu3/57f6hOw87XabVochnIOd2Q+LB6LDfCmBRtEpWpkK5wtRcAfSQ==",
       "dependencies": [
         "@orpc/client",
         "@orpc/contract",
@@ -1412,8 +1389,8 @@
         "@orpc/standard-server"
       ]
     },
-    "@orpc/openapi@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-nwdsVkIRTVhW+2kjtEwHQqfkYnmbJN6HTHvBfnt0KYrPftJ7qvwDo4WnoxfS7Q1jdUlVu8griT5cKZ1gAIYcpQ==",
+    "@orpc/openapi@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-+CF789KNssNZt+lrwO0IzlYcXRKMwTimo1INjpZiFdg19n8buL1oZLlKsGi00EUUsL65HVgDs0yXuxLjR94WXA==",
       "dependencies": [
         "@orpc/client",
         "@orpc/contract",
@@ -1426,16 +1403,16 @@
         "rou3"
       ]
     },
-    "@orpc/otel@1.15.0_@opentelemetry+api@1.9.1_@opentelemetry+instrumentation@0.221.0__@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-1D4PjdbCfHHYh2YnUnerq8A9g2slcy7wmpQv63bCelfiVZqcV8ycR5xn1W/4JqsCt3Tp8C0duZIV1APNjcPgQQ==",
+    "@orpc/otel@1.15.5_@opentelemetry+api@1.9.1_@opentelemetry+instrumentation@0.223.0__@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-QuWnU6xsdTkbjKs52uBb8eDk8aGWxx2a+yWJ/i9JGN3ityhcrCqGwdssDCx+G7tH6kvbLnWy+GVGlLTCg8FQlA==",
       "dependencies": [
         "@opentelemetry/api",
         "@opentelemetry/instrumentation",
         "@orpc/shared"
       ]
     },
-    "@orpc/server@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-l9FnL1MjQ8g77mB10/8D61okuKHLJBWhuwmd6OF65POHzBF177kMCcbHvRFEqUuxSbzP2eNiZGf3kXPMHmIKiQ==",
+    "@orpc/server@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-sH69dyk4M7nHGlRMGVx3WUBRBhGP+usSPjI9XnIxMxnqcyuib4zuLZARdFaeSWL1HSb0hWsGWMEheHxAMfuduQ==",
       "dependencies": [
         "@orpc/client",
         "@orpc/contract",
@@ -1450,8 +1427,8 @@
         "cookie@1.1.1"
       ]
     },
-    "@orpc/shared@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-A3/JE7pQYSrrRm6/WYJxV3GBhpMdJRPM3h47slQtWBUZe9Sao5En5WBc4tISGQNP2emcez6qIvDziSgD2T+img==",
+    "@orpc/shared@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-5Vrvnf0DUUMibXtyI5crUR6e7dZAflJ1rg4kIUnyqGyNCZS3grd96OauGnSfjV6PXDX/FfVRlVe0UU1tv2UWuA==",
       "dependencies": [
         "@opentelemetry/api",
         "radash",
@@ -1461,8 +1438,8 @@
         "@opentelemetry/api"
       ]
     },
-    "@orpc/standard-server-aws-lambda@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-laFW7C4t1gEV0NIt4EjCVCBU3kFPnj2FObJLQkTH+DkEOzxVy6zyJ1coIncDSeOPxzbf7rG8cs0B2vQQyuROag==",
+    "@orpc/standard-server-aws-lambda@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-YM3Tc40g2veqTVu42FcFPzZpk3T9qFjEbi8hDBVTVpwDnupL5F/OYZW3F+yvDytWTUBmm+DivTEXHBWqJs7bsw==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server",
@@ -1470,52 +1447,52 @@
         "@orpc/standard-server-node"
       ]
     },
-    "@orpc/standard-server-fastify@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-fcOl2004o3RnZxW7rhLuDCrCKSi/H2eWnyljeeoY+xykcygRf0ONCs2K2bSdxPm6cmvQGAXa9m8VBglG9oERVQ==",
+    "@orpc/standard-server-fastify@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-4jmMiKfalBG07YDzV82uw5gfxZXVkNJr192EbReEqCmT1g84DNXVnFpSlg4jKDE9VNCM3noykKmsLPKg1HluMA==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server",
         "@orpc/standard-server-node"
       ]
     },
-    "@orpc/standard-server-fetch@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-XYVfgmIt71YrPJSI7RKRiNWjcyktPYHpevkjeohGNBP5aSMAUL95quZArAWr+XOPp4U56XRao54I6wFMZa4How==",
+    "@orpc/standard-server-fetch@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-VK1XxCi58tkEv0Ak4Syy+7uyZq5ZCqNTMKjFyUnk3ihy7PEq+29zdukZzH3ppO7qxF+Bi9Qzu/6Gu75B+3oxaQ==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server"
       ]
     },
-    "@orpc/standard-server-node@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-3ye9SIIhYfJckQwyyGQQRHAEF5vW6QDbax7oi1mOQ9UBHaRDH5kcL28mT0JnETrUvgBoDRx+rfCsQaAOB4n3zw==",
+    "@orpc/standard-server-node@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-tE3KnpdL7+13zSwEwcAZcDubJmomtJN9NpcT9KeykEiZcFDfrXs7pN25JAa5JVLYN1RQdIN20rmYp+uWFA2H/g==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server",
         "@orpc/standard-server-fetch"
       ]
     },
-    "@orpc/standard-server-peer@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-fsTN+FrdPkseVx99yRenGJYSp0xOrEk9fODk8oh3zzricNYzlZ8GGgCYtDNgt9vFIR/J05dc+Nk76KhcPBQpLw==",
+    "@orpc/standard-server-peer@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-6bDF2CSezKTIvKb5TWCksklrf/lMSUixoBF59uYFakhOCuocplFE1qTb5mmI3ZPfHFgpgSjeVtQf6r1JnLPAXg==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server"
       ]
     },
-    "@orpc/standard-server@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-bje/xn6thDqJY/JQ7xoOjmD1KWE4FsyZOPgnPxwqTZLx/r00stRhLuFvk1hDEGj9UlG7NLZEijDVx0wqvcyDzA==",
+    "@orpc/standard-server@1.15.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-P+9tyTbYAIVjeS15fYA4jdpazojRcEmUwLKK1x7UtiEBAgmDQ8FpCkNXSYHqJMV3i2H5fcXFFlqm4u5ea9An7g==",
       "dependencies": [
         "@orpc/shared"
       ]
     },
-    "@orpc/tanstack-query@1.15.0_@orpc+client@1.15.0__@opentelemetry+api@1.9.1_@tanstack+query-core@5.101.1_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-Dp2JXqdmmRjBQu21Cq6oGBhxJF0Gel5ao5qMdOSYpVb5RjdqAEaXsDO9VMj1nEj6SseKGfm9pk10ZIskuI1jjg==",
+    "@orpc/tanstack-query@1.15.5_@orpc+client@1.15.5__@opentelemetry+api@1.9.1_@tanstack+query-core@5.104.1_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-ITKaeWecO/riLn+ZnXBD50D3g62IVDur2pG4Ut7B5a4Lr1k5jHA3ag5rAG0cK8MWBnb2cEoUm7v/qMj9NC1UqA==",
       "dependencies": [
         "@orpc/client",
         "@orpc/shared",
         "@tanstack/query-core"
       ]
     },
-    "@orpc/zod@1.15.0_@orpc+contract@1.15.0__@opentelemetry+api@1.9.1_@orpc+server@1.15.0__@opentelemetry+api@1.9.1_zod@4.4.3_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-QaxvUaxemoz57ljE6GNoRHy6tUrLz9PZH+NjPtbL2SilTwrtTDPgWzS+D8TYW6VZqhdBJM6jY93j81ygVf88dQ==",
+    "@orpc/zod@1.15.5_@orpc+contract@1.15.5__@opentelemetry+api@1.9.1_@orpc+server@1.15.5__@opentelemetry+api@1.9.1_zod@4.6.5_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-hMZJKn09EFsaLavVmUsmZnHPf67eNfnHvWxFYEA7uKcTovkQRBTg5Nu7efcWpXlrY4DOeXj6i6h/4s2c8XK6sg==",
       "dependencies": [
         "@orpc/contract",
         "@orpc/json-schema",
@@ -1524,7 +1501,7 @@
         "@orpc/shared",
         "escape-string-regexp",
         "wildcard-match",
-        "zod@4.4.3"
+        "zod@4.6.5"
       ]
     },
     "@preact/signals-core@1.14.3": {
@@ -1719,34 +1696,34 @@
     "@standard-schema/spec@1.1.0": {
       "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="
     },
-    "@tanstack/ai-anthropic@0.18.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-anthropic@0.18.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5": {
       "integrity": "sha512-j9w/duqgvSkszp9s9i7Qgf4TqKMDMK4QC8wgtNnJlSqL980M7zk+p6S+GSaWBPeqcA+dZk0BQGM3zdnDNEWUWg==",
       "dependencies": [
         "@anthropic-ai/sdk",
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.6.5",
         "@tanstack/ai-utils"
       ]
     },
-    "@tanstack/ai-anthropic@0.20.0_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-anthropic@0.20.0_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5": {
       "integrity": "sha512-6+zPeAd2L/ZfApTk3809wg0AnGH/0SGgWiXDCal638pyK0Xbr2/Ml0HK+5IvTlXm1TUpw3hS7ZwFAlLupOOg/A==",
       "dependencies": [
         "@anthropic-ai/sdk",
-        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.6.5",
         "@tanstack/ai-utils"
       ]
     },
-    "@tanstack/ai-client@0.29.2_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-client@0.29.2_zod@4.6.5": {
       "integrity": "sha512-SciysncXh5R5MHQ1GoF3kHfaygRFljUO1yVRvH97elR5l7Xjx9VYVB0KLnW7g11SIwxUrpODlLynlxEJSL2USg==",
       "dependencies": [
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.6.5",
         "@tanstack/ai-event-client@0.11.2",
         "@tanstack/ai-utils"
       ]
     },
-    "@tanstack/ai-client@0.39.0_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-client@0.39.0_zod@4.6.5": {
       "integrity": "sha512-FhusK2T/lLTlpnVqGsc8Mh9KJLpFvJII3/fZQK7u6N/r/TtAcNLifCI+pH3O2xvNZEATw7nrY/L6w7uwWoFm4g==",
       "dependencies": [
-        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.6.5",
         "@tanstack/ai-event-client@0.13.1",
         "@tanstack/ai-utils"
       ]
@@ -1763,65 +1740,65 @@
         "@tanstack/devtools-event-client"
       ]
     },
-    "@tanstack/ai-mcp@0.3.8_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-mcp@0.3.8_zod@4.6.5": {
       "integrity": "sha512-bqAJZ6Q3uWCedz/NNe24PZLJ7eerWbb2Q9YYe3yCVs1OYxr9jNg7z9N1bWiquCAkjTe0jI0baBDVBXSjUpBCGA==",
       "dependencies": [
         "@modelcontextprotocol/sdk",
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3"
+        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.6.5"
       ],
       "bin": true
     },
-    "@tanstack/ai-mcp@0.8.1_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-mcp@0.8.1_zod@4.6.5": {
       "integrity": "sha512-Y8zgpSYbrID3+ln6/RzdwjB3/JMkD1Z4a+ZkGfonijhdzVTNT0HA33SoVpRpCrbeX6+8DvlZI0ZHcrokTRvtwQ==",
       "dependencies": [
         "@modelcontextprotocol/client",
         "@modelcontextprotocol/server",
-        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.6.5",
         "jose"
       ],
       "bin": true
     },
-    "@tanstack/ai-openai@0.22.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-openai@0.22.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5": {
       "integrity": "sha512-h/pIG+O1JZdrXq2AmCLLyf4Kr3VF8K8Hycj4yN23JIwJ+6HTp8LoAG9w8CRcL8wTGhWpuzDbMgdBExRNg9ZORQ==",
       "dependencies": [
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.6.5",
         "@tanstack/ai-utils",
-        "@tanstack/openai-base@0.10.8_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "openai@6.49.0_zod@4.4.3"
+        "@tanstack/openai-base@0.10.8_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5",
+        "openai@6.49.0_zod@4.6.5"
       ]
     },
-    "@tanstack/ai-openai@0.28.0_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-openai@0.28.0_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5": {
       "integrity": "sha512-pfKW9fV8rzSJ94yJOUqfQJFMviSfGGeNdlkn42JpOZG82nc7UM0Hag8prnNvJALg8ELw77WyrPW6j/BBrshmvA==",
       "dependencies": [
-        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.6.5",
         "@tanstack/ai-utils",
-        "@tanstack/openai-base@0.12.6_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "openai@7.30.1_zod@4.4.3"
+        "@tanstack/openai-base@0.12.6_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5",
+        "openai@7.30.1_zod@4.6.5"
       ]
     },
-    "@tanstack/ai-preact@0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-preact@0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.6.5_preact@10.29.2_zod@4.6.5": {
       "integrity": "sha512-odY4lGCqOwwJez3aE9hDmHenP+ZR93ripnLxsGlp4zs7b0xkK3M/RSE02C1rgoK523LMf1eG4xusk0W4SpXyiA==",
       "dependencies": [
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-client@0.29.2_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.6.5",
+        "@tanstack/ai-client@0.29.2_zod@4.6.5",
         "preact"
       ]
     },
-    "@tanstack/ai-preact@0.20.1_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-preact@0.20.1_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.6.5_preact@10.29.2_zod@4.6.5": {
       "integrity": "sha512-RB5Ww/fbAo4kcFJuK0SIuxygiOhuZOeSMffFcvm9/uu+vLvMe84HdeW2Ki1VERhqW3ghw01CdtoeEfHEMDTz0w==",
       "dependencies": [
-        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-client@0.39.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.6.5",
+        "@tanstack/ai-client@0.39.0_zod@4.6.5",
         "preact"
       ]
     },
     "@tanstack/ai-utils@0.4.1": {
       "integrity": "sha512-B3PGn2WYiRtivZCt7MUN2iXeoK9fwZhgdbrPIz5hPqVR8r8sNDZMmMqtiOkp7sxzPvVlCBItFVHw7QpZ9g6e9w=="
     },
-    "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.6.5": {
       "integrity": "sha512-a2a+A+QguzZ3b8D7dqaA94A+CT42WUgxGYfscLrKJ+e2gHuEI8VNFGLq17KFuJI60A481bGpoGZ17fKpJF7q1A==",
       "dependencies": [
-        "@ag-ui/core@0.1.1-canary.beta.0_zod@4.4.3",
+        "@ag-ui/core@0.1.1-canary.beta.0_zod@4.6.5",
         "@opentelemetry/api",
         "@standard-schema/spec",
         "@tanstack/ai-event-client@0.11.2",
@@ -1832,10 +1809,10 @@
         "@opentelemetry/api"
       ]
     },
-    "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.6.5": {
       "integrity": "sha512-vU520lSSrvH4Pw/znf9T49SmTcsV3k2hlKcMWVB21XDjO6zzBQGmib48iyUWIEwYOAQfDJQQPTCy+nd96gdJOg==",
       "dependencies": [
-        "@ag-ui/core@1.0.0_zod@4.4.3",
+        "@ag-ui/core@1.0.0_zod@4.6.5",
         "@opentelemetry/api",
         "@standard-schema/spec",
         "@tanstack/ai-event-client@0.13.1",
@@ -1868,36 +1845,36 @@
       "integrity": "sha512-6T5Yop/793YI+H+5J8Hsyj4kCih9sl4t3ElLgKioW5hk3ocn+ZdSJ94tT7vL7uabxSugWYBZlOTMPzEw2puvQw==",
       "bin": true
     },
-    "@tanstack/openai-base@0.10.8_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/openai-base@0.10.8_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5": {
       "integrity": "sha512-fNEKKuve6IJmAEzaGwRNwa8ypXSvjgbyezUZG0VRs8HUXfrdfSwoCVDpDeIEVIfP+a3UiiMUTa7uNyKUkgkVzw==",
       "dependencies": [
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.6.5",
         "@tanstack/ai-utils",
-        "openai@6.49.0_zod@4.4.3"
+        "openai@6.49.0_zod@4.6.5"
       ]
     },
-    "@tanstack/openai-base@0.12.6_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/openai-base@0.12.6_@tanstack+ai@0.66.0__@opentelemetry+api@1.9.1__zod@4.6.5_zod@4.6.5": {
       "integrity": "sha512-mXNvpWzRfbFyz7gsobRTF10FMf6451h7W8hvLHzVdZC4HAYIQNsyDpuxC4ptrdTVwML4uO8Ld2tU30MIM2vb6g==",
       "dependencies": [
-        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+        "@tanstack/ai@0.66.0_@opentelemetry+api@1.9.1_zod@4.6.5",
         "@tanstack/ai-utils",
-        "openai@7.30.1_zod@4.4.3"
+        "openai@7.30.1_zod@4.6.5"
       ]
     },
     "@tanstack/pacer-lite@0.2.2": {
       "integrity": "sha512-eQ1MyLKCHyXiH7NbdmB80W77OhiMgGBUb+qDx/8WMGbwg5Lf/NlfD0TfNYAqY77i8V3AxoDoYdICrQE5ADw4Yw=="
     },
-    "@tanstack/preact-query@5.101.1_preact@10.29.2": {
-      "integrity": "sha512-7Sco5dxNKTpRIyA4I6mGR7wdpF8uRQ07BiyZCxSDSDSAQse8shVfpnhO2T5JjBPvsSmIoRfR1u9gqZ2Pq40k8A==",
+    "@tanstack/preact-query@5.104.1_preact@10.29.2": {
+      "integrity": "sha512-3+EnqSDx3R8yzGoycJpR0REeKVND3g6Mp+SLa5+KXUyYw8Pt5Twmqn/8/9W4EiWTFQ7OBCW2YOlVJUHa7TGAtQ==",
       "dependencies": [
         "@tanstack/query-core",
         "preact"
       ]
     },
-    "@tanstack/query-core@5.101.1": {
-      "integrity": "sha512-Y6Y92dkXtNqx67m2pMSxUsA3zOCwv862JexZRP8/EPwvKXMPu9m8rv43spiXWzOUIggQ3SQApttALStzhA8B4g=="
+    "@tanstack/query-core@5.104.1": {
+      "integrity": "sha512-TiRghcrGkUTE+M4JBxvpPSpBhxvIzQairw+cksrHYGr+2uwC77yW1SY9nYxnYRYOppvucf8rEg6b5byoz4rTpw=="
     },
-    "@tanstack/query-db-collection@1.4.3_@tanstack+query-core@5.101.1_typescript@7.0.2": {
+    "@tanstack/query-db-collection@1.4.3_@tanstack+query-core@5.104.1_typescript@7.0.2": {
       "integrity": "sha512-vTmt/nA/z+NlSQggFH8/847VTfn3uGw51xYSWzcQuEe71O1gOnhMee0mBkIB4sHEM6sq1Rmgj4A9tYfr2W/Dfg==",
       "dependencies": [
         "@standard-schema/spec",
@@ -2158,7 +2135,7 @@
         "nanostores",
         "pg",
         "react",
-        "zod@4.4.3"
+        "zod@4.6.5"
       ],
       "optionalPeers": [
         "@prisma/client",
@@ -2173,11 +2150,7 @@
         "@better-auth/utils",
         "@better-fetch/fetch",
         "rou3",
-        "set-cookie-parser",
-        "zod@4.4.3"
-      ],
-      "optionalPeers": [
-        "zod@4.4.3"
+        "set-cookie-parser"
       ]
     },
     "bl@6.1.6": {
@@ -2267,8 +2240,8 @@
     "change-case@5.4.4": {
       "integrity": "sha512-HRQyTk2/YPEkt9TnUPbOpr64Uw3KOicFWPVBb+xiHvd6eBx/qPr9xqfBFDT8P2vWsvvz4jbEkfDe71W3VyNu2w=="
     },
-    "cjs-module-lexer@2.2.1": {
-      "integrity": "sha512-Ca8swihM+/4yKecYHY52kgJd300hi2lADU/a1RxNTRe+RJ9jvqQlESpbz9DnG9mowez8qwXHB8qYdIUw9e+F5Q=="
+    "cjs-module-lexer@2.3.0": {
+      "integrity": "sha512-lmNyBzi6iYiqyrExTctfmjd8tInx+dHu9PBomTfH5RXS53c27JMFJgzNv5TyAnm3PgGf+MLy0+Ws41/HlVxdKQ=="
     },
     "clsx@2.1.1": {
       "integrity": "sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA=="
@@ -2397,8 +2370,8 @@
     "es-errors@1.3.0": {
       "integrity": "sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw=="
     },
-    "es-module-lexer@2.3.2": {
-      "integrity": "sha512-poHGpORABojJJucnV9KbOavETW8lBVnphkW77ER5/BQ5Fz7oXSoCNek7IH3vR5nRjdsEz926ibFYX8KtLQmdyw=="
+    "es-module-lexer@3.0.3": {
+      "integrity": "sha512-yWGe1O/j+almnV4hOYrmZo8u58JdnmXEMneRQAYkWtqSiT86yoMIEKF4rpqEDj52tbYl3xceBD3DQIBwcsC9Pw=="
     },
     "es-object-atoms@1.1.2": {
       "integrity": "sha512-HWcBoN6NileqtSydK2FqHbS/LoDd2pqrnQHLyJzBj4kOp/ky2MWMN694xOfkK8/SnUsW2DH7EfyVlydKCsm1Zw==",
@@ -2674,8 +2647,8 @@
     "ieee754@1.2.1": {
       "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
     },
-    "import-in-the-middle@3.3.3": {
-      "integrity": "sha512-AiohS3H80sXO6owEltjGX+glb7qXaDhBoJb9XcQVH4UI207xu/bDLUcadVKp7Qe576reg9yr/PXZjV5qx8gfbA==",
+    "import-in-the-middle@3.5.2": {
+      "integrity": "sha512-WseIA/4o56+GYO3RmlOPvejYi771OFeJEeK/ejROsr9bdjW+E5NXTOD1Di8TL40Qgg3JJX9aa97Hf8iiSVIKZw==",
       "dependencies": [
         "cjs-module-lexer",
         "es-module-lexer",
@@ -3088,22 +3061,22 @@
         "wsl-utils"
       ]
     },
-    "openai@6.49.0_zod@4.4.3": {
+    "openai@6.49.0_zod@4.6.5": {
       "integrity": "sha512-aYCc0C6L864eR6WSYIwQGyXriw/nIyZx0ObvhzOEVuk0zoBDpynjSbrionWI7q65B5H8jJX0DXR9snEzM6bfPg==",
       "dependencies": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ],
       "optionalPeers": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ]
     },
-    "openai@7.30.1_zod@4.4.3": {
+    "openai@7.30.1_zod@4.6.5": {
       "integrity": "sha512-YgiPjBgXdItqTsgAR138bu9aHxBb3/L7qiiP8ucU8e9msRfF8cjRtp8y5qYW7E3Oe9O8UWejQZERf37dtdvoTg==",
       "dependencies": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ],
       "optionalPeers": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ]
     },
     "openapi-types@12.1.3": {
@@ -3723,8 +3696,8 @@
       ],
       "bin": true
     },
-    "wildcard-match@5.1.4": {
-      "integrity": "sha512-wldeCaczs8XXq7hj+5d/F38JE2r7EXgb6WQDM84RVwxy81T/sxB5e9+uZLK9Q9oNz1mlvjut+QtvgaOQFPVq/g=="
+    "wildcard-match@5.1.6": {
+      "integrity": "sha512-Dh5N543my42ynFsbT0v6iPpaqJt95MOK1n/lhojVTe/hS3gpP6e938bbzsfaS0goLlJbhEOCIJPe/Tc3hckoaQ=="
     },
     "wrappy@1.0.2": {
       "integrity": "sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ=="
@@ -3741,17 +3714,17 @@
     "yallist@4.0.0": {
       "integrity": "sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A=="
     },
-    "zod-to-json-schema@3.25.2_zod@4.4.3": {
+    "zod-to-json-schema@3.25.2_zod@4.6.5": {
       "integrity": "sha512-O/PgfnpT1xKSDeQYSCfRI5Gy3hPf91mKVDuYLUHZJMiDFptvP41MSnWofm8dnCm0256ZNfZIM7DSzuSMAFnjHA==",
       "dependencies": [
-        "zod@4.4.3"
+        "zod@4.6.5"
       ]
     },
     "zod@3.25.76": {
       "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
     },
-    "zod@4.4.3": {
-      "integrity": "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ=="
+    "zod@4.6.5": {
+      "integrity": "sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q=="
     }
   },
   "workspace": {
@@ -3777,7 +3750,7 @@
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ]
       },
       "packages/auth-better-auth": {
@@ -3814,8 +3787,8 @@
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
           "jsr:@std/streams@1",
-          "npm:@orpc/server@^1.15.0",
-          "npm:zod@^4.4.3"
+          "npm:@orpc/server@^1.15.5",
+          "npm:zod@^4.6.5"
         ]
       },
       "packages/cli": {
@@ -3842,7 +3815,7 @@
           "jsr:@std/semver@1",
           "jsr:@std/text@1",
           "npm:jsonc-parser@^3.3.1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ]
       },
       "packages/cli/e2e": {
@@ -3852,7 +3825,7 @@
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
-          "npm:@orpc/server@^1.15.0"
+          "npm:@orpc/server@^1.15.5"
         ]
       },
       "packages/config": {
@@ -3860,17 +3833,17 @@
           "jsr:@std/fs@1",
           "jsr:@std/jsonc@1",
           "jsr:@std/path@1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ]
       },
       "packages/contracts": {
         "dependencies": [
-          "npm:@orpc/contract@^1.15.0",
-          "npm:zod@^4.4.3"
+          "npm:@orpc/contract@^1.15.5",
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@orpc/server@^1.15.0"
+            "npm:@orpc/server@^1.15.5"
           ]
         }
       },
@@ -3907,26 +3880,26 @@
           "npm:@durable-streams/client@0.2.7",
           "npm:@durable-streams/state@0.3.2",
           "npm:@durable-streams/tanstack-ai-transport@0.0.10",
-          "npm:@orpc/server@^1.15.0",
+          "npm:@orpc/server@^1.15.5",
           "npm:@preact/signals@2.9.2",
           "npm:@tanstack/ai-client@0.39.0",
           "npm:@tanstack/ai-preact@0.20.1",
           "npm:@tanstack/ai@0.66.0",
-          "npm:@tanstack/preact-query@^5.101.0",
-          "npm:@tanstack/query-core@^5.101.0",
+          "npm:@tanstack/preact-query@^5.104.1",
+          "npm:@tanstack/query-core@^5.104.1",
           "npm:@tanstack/react-db@0.5.8",
           "npm:preact-render-to-string@^6.7.0",
           "npm:preact@^10.29.2",
           "npm:vite@7.2.2",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/client@0.2.7",
             "npm:@durable-streams/state@0.3.2",
             "npm:@preact/signals@2.9.2",
-            "npm:@tanstack/preact-query@^5.101.0",
-            "npm:@tanstack/query-core@^5.101.0",
+            "npm:@tanstack/preact-query@^5.104.1",
+            "npm:@tanstack/query-core@^5.104.1",
             "npm:@tanstack/react-db@0.5.8",
             "npm:preact-render-to-string@^6.7.0",
             "npm:preact@^10.29.2",
@@ -3966,10 +3939,10 @@
       },
       "packages/logger": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@logtape/logtape@2",
           "jsr:@std/assert@1",
-          "npm:@orpc/server@^1.15.0"
+          "npm:@orpc/server@^1.15.5"
         ]
       },
       "packages/mcp": {
@@ -3989,9 +3962,9 @@
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
           "jsr:@std/semver@1",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/server@^1.15.0",
-          "npm:zod@^4.4.3"
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/server@^1.15.5",
+          "npm:zod@^4.6.5"
         ]
       },
       "packages/plugin-ai-core": {
@@ -3999,23 +3972,23 @@
           "jsr:@netscript/ai@0.0.7",
           "jsr:@netscript/plugin@0.0.7",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/server@^1.15.0",
-          "npm:zod@^4.4.3"
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/server@^1.15.5",
+          "npm:zod@^4.6.5"
         ]
       },
       "packages/plugin-auth-core": {
         "dependencies": [
           "jsr:@netscript/plugin-streams-core@0.0.7",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/server@^1.15.0",
-          "npm:zod@^4.4.3"
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/server@^1.15.5",
+          "npm:zod@^4.6.5"
         ]
       },
       "packages/plugin-sagas-core": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/database@0.0.7",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
@@ -4023,12 +3996,12 @@
           "jsr:@netscript/service@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@std/assert@1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@orpc/contract@^1.15.0",
-            "npm:@orpc/server@^1.15.0",
+            "npm:@orpc/contract@^1.15.5",
+            "npm:@orpc/server@^1.15.5",
             "npm:@saga-bus/core@~0.2.2",
             "npm:ioredis@^5.11.1"
           ]
@@ -4053,12 +4026,12 @@
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/watchers@0.0.7",
           "jsr:@std/assert@1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@orpc/contract@^1.15.0",
-            "npm:@orpc/server@^1.15.0"
+            "npm:@orpc/contract@^1.15.5",
+            "npm:@orpc/server@^1.15.5"
           ]
         }
       },
@@ -4072,14 +4045,14 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/server@^1.15.0",
-          "npm:zod@^4.4.3"
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/server@^1.15.5",
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@orpc/contract@^1.15.0",
-            "npm:@orpc/server@^1.15.0"
+            "npm:@orpc/contract@^1.15.5",
+            "npm:@orpc/server@^1.15.5"
           ]
         }
       },
@@ -4099,7 +4072,7 @@
           "jsr:@fedify/redis@^2.2.5",
           "jsr:@std/assert@1",
           "jsr:@std/async@1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
@@ -4119,68 +4092,68 @@
           "jsr:@netscript/service@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.15.0",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/openapi@^1.15.0",
-          "npm:@orpc/server@^1.15.0",
-          "npm:@orpc/tanstack-query@^1.15.0",
-          "npm:@orpc/zod@^1.15.0",
+          "npm:@orpc/client@^1.15.5",
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/openapi@^1.15.5",
+          "npm:@orpc/server@^1.15.5",
+          "npm:@orpc/tanstack-query@^1.15.5",
+          "npm:@orpc/zod@^1.15.5",
           "npm:@tanstack/db@0.13.0",
-          "npm:@tanstack/query-core@^5.101.0",
+          "npm:@tanstack/query-core@^5.104.1",
           "npm:@tanstack/query-db-collection@1.4.3",
           "npm:@tanstack/react-db@0.5.8",
           "npm:react@^19.2.3"
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@orpc/client@^1.15.0",
-            "npm:@orpc/contract@^1.15.0",
-            "npm:@orpc/openapi@^1.15.0",
-            "npm:@orpc/server@^1.15.0",
-            "npm:@orpc/tanstack-query@^1.15.0",
-            "npm:@orpc/zod@^1.15.0",
+            "npm:@orpc/client@^1.15.5",
+            "npm:@orpc/contract@^1.15.5",
+            "npm:@orpc/openapi@^1.15.5",
+            "npm:@orpc/server@^1.15.5",
+            "npm:@orpc/tanstack-query@^1.15.5",
+            "npm:@orpc/zod@^1.15.5",
             "npm:@tanstack/db@0.13.0",
-            "npm:@tanstack/query-core@^5.101.0",
+            "npm:@tanstack/query-core@^5.104.1",
             "npm:@tanstack/query-db-collection@1.4.3"
           ]
         }
       },
       "packages/service": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/database@0.0.7",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.15.0",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/openapi@^1.15.0",
-          "npm:@orpc/server@^1.15.0",
-          "npm:@orpc/zod@^1.15.0",
+          "npm:@orpc/client@^1.15.5",
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/openapi@^1.15.5",
+          "npm:@orpc/server@^1.15.5",
+          "npm:@orpc/zod@^1.15.5",
           "npm:rou3@~0.7.12",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@orpc/openapi@^1.15.0",
-            "npm:@orpc/server@^1.15.0",
-            "npm:@orpc/zod@^1.15.0"
+            "npm:@orpc/openapi@^1.15.5",
+            "npm:@orpc/server@^1.15.5",
+            "npm:@orpc/zod@^1.15.5"
           ]
         }
       },
       "packages/telemetry": {
         "dependencies": [
-          "jsr:@hono/otel@^1.1.2",
+          "jsr:@hono/otel@^1.2.0",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@opentelemetry/semantic-conventions@1.41.1"
+          "npm:@opentelemetry/semantic-conventions@1.43.0"
         ],
         "packageJson": {
           "dependencies": [
             "npm:@opentelemetry/api@^1.9.1",
-            "npm:@orpc/contract@^1.15.0",
-            "npm:@orpc/otel@^1.15.0"
+            "npm:@orpc/contract@^1.15.5",
+            "npm:@orpc/otel@^1.15.5"
           ]
         }
       },
@@ -4211,21 +4184,21 @@
           "jsr:@netscript/plugin@0.0.7",
           "jsr:@netscript/service@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/state@0.3.2",
-            "npm:@orpc/contract@^1.15.0",
-            "npm:@orpc/server@^1.15.0",
-            "npm:@orpc/zod@^1.15.0",
+            "npm:@orpc/contract@^1.15.5",
+            "npm:@orpc/server@^1.15.5",
+            "npm:@orpc/zod@^1.15.5",
             "npm:@workos-inc/node@^10.4.0"
           ]
         }
       },
       "plugins/sagas": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/kv@0.0.7",
@@ -4236,23 +4209,23 @@
           "jsr:@netscript/service@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@std/async@1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/client@0.2.7",
             "npm:@durable-streams/state@0.3.2",
-            "npm:@orpc/contract@^1.15.0",
-            "npm:@orpc/openapi@^1.15.0",
-            "npm:@orpc/server@^1.15.0",
-            "npm:@orpc/zod@^1.15.0",
+            "npm:@orpc/contract@^1.15.5",
+            "npm:@orpc/openapi@^1.15.5",
+            "npm:@orpc/server@^1.15.5",
+            "npm:@orpc/zod@^1.15.5",
             "npm:@tanstack/db@0.13.0"
           ]
         }
       },
       "plugins/streams": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/aspire@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
@@ -4260,19 +4233,19 @@
           "jsr:@netscript/service@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/net@1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/client@0.2.7",
             "npm:@durable-streams/server@0.3.9",
-            "npm:@orpc/server@^1.15.0"
+            "npm:@orpc/server@^1.15.5"
           ]
         }
       },
       "plugins/triggers": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/kv@0.0.7",
@@ -4285,19 +4258,19 @@
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/state@0.3.2",
-            "npm:@orpc/contract@^1.15.0",
-            "npm:@orpc/server@^1.15.0"
+            "npm:@orpc/contract@^1.15.5",
+            "npm:@orpc/server@^1.15.5"
           ]
         }
       },
       "plugins/workers": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/cron@0.0.7",
@@ -4311,16 +4284,16 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/async@1",
           "jsr:@std/path@1",
-          "npm:zod@^4.4.3"
+          "npm:zod@^4.6.5"
         ],
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/client@0.2.7",
             "npm:@durable-streams/state@0.3.2",
-            "npm:@orpc/contract@^1.15.0",
-            "npm:@orpc/openapi@^1.15.0",
-            "npm:@orpc/server@^1.15.0",
-            "npm:@orpc/zod@^1.15.0",
+            "npm:@orpc/contract@^1.15.5",
+            "npm:@orpc/openapi@^1.15.5",
+            "npm:@orpc/server@^1.15.5",
+            "npm:@orpc/zod@^1.15.5",
             "npm:@tanstack/db@0.13.0",
             "npm:@tanstack/react-db@0.5.8"
           ]

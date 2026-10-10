@@ -1,7 +1,7 @@
 /** Executable proof for generated two-service clients and live list invalidation. */
 
 import { join, relative } from '@std/path';
-import { partialMatchKey } from 'npm:@tanstack/query-core@^5.101.0';
+import { partialMatchKey } from 'npm:@tanstack/query-core@^5.104.1';
 import type { SettledRefetchEvidence } from './service-client-browser-probe.ts';
 import { generatedAppHomeUrlsFromAppHost, readPinnedAppPort } from './generated-app-endpoint.ts';
 import { probeResourceQueryRefetch } from './runtime/probe-island-hydration.ts';
