@@ -292,7 +292,7 @@
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
           "jsr:@std/streams@1",
-          "npm:@orpc/server@^1.15.0"
+          "npm:@orpc/server@^1.15.5"
         ]
       },
       "jsr:@netscript/cli-e2e@0.0.7": {
@@ -302,7 +302,7 @@
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
-          "npm:@orpc/server@^1.15.0"
+          "npm:@orpc/server@^1.15.5"
         ]
       },
       "jsr:@netscript/cli@0.0.7": {
@@ -340,7 +340,7 @@
       },
       "jsr:@netscript/contracts@0.0.7": {
         "dependencies": [
-          "npm:@orpc/contract@^1.15.0"
+          "npm:@orpc/contract@^1.15.5"
         ]
       },
       "jsr:@netscript/cron@0.0.7": {
@@ -372,13 +372,13 @@
           "npm:@durable-streams/client@0.2.6",
           "npm:@durable-streams/state@0.3.1",
           "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
-          "npm:@orpc/server@^1.15.0",
+          "npm:@orpc/server@^1.15.5",
           "npm:@preact/signals@2.11.3",
           "npm:@tanstack/ai-client@0.39.0",
           "npm:@tanstack/ai-preact@0.20.1",
           "npm:@tanstack/ai@0.66.0",
-          "npm:@tanstack/preact-query@^5.101.0",
-          "npm:@tanstack/query-core@^5.101.0",
+          "npm:@tanstack/preact-query@^5.104.1",
+          "npm:@tanstack/query-core@^5.104.1",
           "npm:@tanstack/react-db@0.1.95",
           "npm:preact-render-to-string@^6.8.0",
           "npm:preact@^10.29.2",
@@ -397,10 +397,10 @@
       },
       "jsr:@netscript/logger@0.0.7": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@logtape/logtape@2",
           "jsr:@std/assert@1",
-          "npm:@orpc/server@^1.15.0"
+          "npm:@orpc/server@^1.15.5"
         ]
       },
       "jsr:@netscript/mcp@0.0.7": {
@@ -417,8 +417,8 @@
           "jsr:@netscript/ai@0.0.7",
           "jsr:@netscript/plugin@0.0.7",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/server@^1.15.0"
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/server@^1.15.5"
         ]
       },
       "jsr:@netscript/plugin-ai@0.0.7": {
@@ -432,8 +432,8 @@
         "dependencies": [
           "jsr:@netscript/plugin-streams-core@0.0.7",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/server@^1.15.0"
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/server@^1.15.5"
         ]
       },
       "jsr:@netscript/plugin-auth@0.0.7": {
@@ -452,7 +452,7 @@
       },
       "jsr:@netscript/plugin-sagas-core@0.0.7": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/database@0.0.7",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
@@ -464,7 +464,7 @@
       },
       "jsr:@netscript/plugin-sagas@0.0.7": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/kv@0.0.7",
@@ -486,7 +486,7 @@
       },
       "jsr:@netscript/plugin-streams@0.0.7": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/aspire@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
@@ -506,7 +506,7 @@
       },
       "jsr:@netscript/plugin-triggers@0.0.7": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/kv@0.0.7",
@@ -531,13 +531,13 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/server@^1.15.0"
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/server@^1.15.5"
         ]
       },
       "jsr:@netscript/plugin-workers@0.0.7": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/cron@0.0.7",
@@ -561,8 +561,8 @@
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
           "jsr:@std/semver@1",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/server@^1.15.0"
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/server@^1.15.5"
         ]
       },
       "jsr:@netscript/prisma-adapter-mysql@0.0.7": {},
@@ -587,14 +587,14 @@
           "jsr:@netscript/service@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.15.0",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/openapi@^1.15.0",
-          "npm:@orpc/server@^1.15.0",
-          "npm:@orpc/tanstack-query@^1.15.0",
-          "npm:@orpc/zod@^1.15.0",
+          "npm:@orpc/client@^1.15.5",
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/openapi@^1.15.5",
+          "npm:@orpc/server@^1.15.5",
+          "npm:@orpc/tanstack-query@^1.15.5",
+          "npm:@orpc/zod@^1.15.5",
           "npm:@tanstack/db@0.6.17",
-          "npm:@tanstack/query-core@^5.101.0",
+          "npm:@tanstack/query-core@^5.104.1",
           "npm:@tanstack/query-db-collection@1.2.1",
           "npm:@tanstack/react-db@0.1.95",
           "npm:react@^19.2.3"
@@ -602,26 +602,26 @@
       },
       "jsr:@netscript/service@0.0.7": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
+          "jsr:@hono/hono@4.13.13",
           "jsr:@netscript/database@0.0.7",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.15.0",
-          "npm:@orpc/contract@^1.15.0",
-          "npm:@orpc/openapi@^1.15.0",
-          "npm:@orpc/server@^1.15.0",
-          "npm:@orpc/zod@^1.15.0",
+          "npm:@orpc/client@^1.15.5",
+          "npm:@orpc/contract@^1.15.5",
+          "npm:@orpc/openapi@^1.15.5",
+          "npm:@orpc/server@^1.15.5",
+          "npm:@orpc/zod@^1.15.5",
           "npm:rou3@~0.7.12"
         ]
       },
       "jsr:@netscript/telemetry@0.0.7": {
         "dependencies": [
-          "jsr:@hono/otel@^1.1.2",
+          "jsr:@hono/otel@^1.2.0",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@opentelemetry/semantic-conventions@1.41.1"
+          "npm:@opentelemetry/semantic-conventions@1.43.0"
         ]
       },
       "jsr:@netscript/watchers@0.0.7": {
