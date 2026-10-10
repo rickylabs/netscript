@@ -18,11 +18,14 @@ function job(source: string, name: string): string {
   return block;
 }
 
-Deno.test('checked-in manifest covers the complete current root suite exactly once', async () => {
+Deno.test('runtime assignment covers the complete current root suite exactly once', async () => {
   const manifest: ShardManifest = JSON.parse(
     await Deno.readTextFile(new URL('.github/scripts/ci-test-shards.json', ROOT)),
   );
-  validateManifest(manifest, await discoverTests(new URL(ROOT).pathname));
+  const discovered = await discoverTests(new URL(ROOT).pathname);
+  const assignment = validateManifest(manifest, discovered);
+  assertEquals(assignment.files.map((file) => file.path), discovered);
+  assertEquals(new Set(assignment.files.map((file) => file.path)).size, discovered.length);
   const matrix = job(await workflow(), 'check-test-shard');
   const indices = [...matrix.matchAll(/^\s+index: (-?\d+)$/gm)].map((match) => Number(match[1]));
   assertEquals(indices, [0, -1, ...Array.from({ length: manifest.shardCount }, (_, i) => i + 1)]);
@@ -48,19 +51,24 @@ Deno.test('required check-test executes an always-run fail-closed matrix aggrega
   for (const required of ['quality', 'deps-report']) assert(job(source, required));
 });
 
-Deno.test('CI cache keys include OS, Deno version and lock hash with versioned restore keys', async () => {
+Deno.test('upstream Deno caches include version and lock hash and skip unused browser setup', async () => {
   const source = await workflow();
-  assertStringIncludes(source, 'DENO_DIR=${RUNNER_TEMP}/deno-dir');
+  assertEquals(source.includes('Configure Deno module cache'), false);
   for (const name of ['check-test-shard', 'quality', 'deps-report']) {
     const block = job(source, name);
-    assertStringIncludes(block, 'uses: actions/cache@v4');
-    assertStringIncludes(block, 'path: ${{ env.DENO_DIR }}');
+    assertStringIncludes(block, 'uses: denoland/setup-deno@v2');
+    assertStringIncludes(block, 'cache:');
     assertStringIncludes(
       block,
-      "key: ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}",
+      "cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}",
     );
-    assertStringIncludes(block, '${{ runner.os }}-deno-${{ env.DENO_VERSION }}-');
+    assertEquals(block.includes('path: ${{ env.DENO_DIR }}'), false);
   }
+  const matrix = job(source, 'check-test-shard');
+  const policy = "env.RUN == 'true' && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true')";
+  assertStringIncludes(matrix, `cache: \${{ ${policy} }}`);
+  assertStringIncludes(matrix, `name: Install workspace dependencies\n        if: ${policy}`);
+  assertStringIncludes(matrix, '-${{ matrix.lane }}');
 });
 
 Deno.test('matrix preserves type checks, browser policy, receipts and required Redis tests', async () => {
@@ -82,6 +90,11 @@ Deno.test('matrix preserves type checks, browser policy, receipts and required R
   );
   assertStringIncludes(block, 'docker load --input "$image_cache"');
   assertStringIncludes(block, 'docker pull "$CI_REDIS_IMAGE"');
-  assertStringIncludes(block, 'docker save --output "$image_cache" "$CI_REDIS_IMAGE"');
+  assertStringIncludes(block, 'docker tag "$CI_REDIS_IMAGE" netscript-ci-redis:locked');
+  assertStringIncludes(block, '--publish 6379:6379 netscript-ci-redis:locked');
+  assertStringIncludes(block, 'docker save --output "$image_cache" netscript-ci-redis:locked');
   assertStringIncludes(block, 'key: ${{ runner.os }}-ci-image-${{ env.CI_REDIS_IMAGE }}-v1');
+  assert(/CI_REDIS_IMAGE: redis:7-alpine@sha256:[a-f0-9]{64}/.test(await workflow()));
+  assertStringIncludes(block, 'CI Redis $mode:');
+  assertStringIncludes(block, '$GITHUB_STEP_SUMMARY');
 });

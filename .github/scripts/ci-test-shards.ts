@@ -8,7 +8,7 @@ export interface TestTiming {
   tests: number;
 }
 
-/** Checked-in, reproducible longest-first assignment of the complete root test set. */
+/** Checked-in measured weights and suggested assignments; discovery owns the current test set. */
 export interface ShardManifest {
   schemaVersion: 1;
   source: string;
@@ -18,6 +18,16 @@ export interface ShardManifest {
 
 /** Test lanes in the CI matrix; changing this also requires updating its matrix include list. */
 export const CI_TEST_SHARD_COUNT = 6;
+
+/** Estimate until a native timing pass measures a new module. */
+export const UNMEASURED_DURATION_MS = 1000;
+
+export interface RuntimeAssignment {
+  files: ShardManifest['files'];
+  unmeasured: string[];
+  removed: string[];
+  rebalanced: boolean;
+}
 
 interface Selection {
   base: string;
@@ -48,7 +58,8 @@ function selected(path: string, selections: Selection[], directory: boolean): bo
 export async function discoverTests(root: string = Deno.cwd()): Promise<string[]> {
   const files: string[] = [];
   async function visit(directory: string, inherited: Selection[]): Promise<void> {
-    const entries = Array.from(Deno.readDirSync(directory));
+    const entries: Deno.DirEntry[] = [];
+    for await (const entry of Deno.readDir(directory)) entries.push(entry);
     const config = entries.find((entry) => entry.name === 'deno.json') ??
       entries.find((entry) => entry.name === 'deno.jsonc');
     const selections = [...inherited];
@@ -94,37 +105,65 @@ export function balanceTests(timings: TestTiming[], shardCount: number): ShardMa
   }).sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
 }
 
-/** Fail closed if files or deterministic assignments drift from the current root suite. */
-export function validateManifest(manifest: ShardManifest, discovered: string[]): void {
+/** Build exactly-once coverage from discovery, retaining known weights despite manifest drift. */
+export function validateManifest(
+  manifest: ShardManifest,
+  discovered: string[],
+): RuntimeAssignment {
+  const hint = 'Repair the timing data with update-ci-test-shards.ts <description> <junit.xml>.';
   if (manifest.schemaVersion !== 1 || !manifest.source || manifest.files.length === 0) {
-    throw new Error('Invalid manifest');
+    throw new Error(`Invalid manifest. ${hint}`);
   }
   const paths = manifest.files.map((file) => file.path).sort();
   const pathSet = new Set(paths);
   const discoveredSet = new Set(discovered);
-  if (pathSet.size !== paths.length) throw new Error('Duplicate test module');
-  if (JSON.stringify(paths) !== JSON.stringify([...discovered].sort())) {
-    const missing = discovered.filter((path) => !pathSet.has(path));
-    const extra = paths.filter((path) => !discoveredSet.has(path));
-    throw new Error(
-      `Stale test manifest; missing: ${missing.join(', ')}; extra: ${extra.join(', ')}`,
-    );
+  if (pathSet.size !== paths.length) throw new Error(`Duplicate test module. ${hint}`);
+  if (discoveredSet.size !== discovered.length) {
+    throw new Error('Duplicate discovery path; inspect discoverTests selectors.');
   }
   for (const file of manifest.files) {
     if (
       !Number.isFinite(file.durationMs) || file.durationMs < 0 ||
       !Number.isInteger(file.tests) || file.tests < 0
     ) {
-      throw new Error(`Invalid measurement: ${file.path}`);
+      throw new Error(`Invalid measurement: ${file.path}. ${hint}`);
     }
   }
-  const expected = balanceTests(manifest.files, manifest.shardCount);
+  const known = new Map(manifest.files.map((file) => [file.path, file]));
+  const unmeasured = discovered.filter((path) => !pathSet.has(path)).sort();
+  const removed = paths.filter((path) => !discoveredSet.has(path));
+  const files = balanceTests(
+    discovered.map((path) =>
+      known.get(path) ?? { path, durationMs: UNMEASURED_DURATION_MS, tests: 0 }
+    ),
+    manifest.shardCount,
+  );
+  const runtimePaths = files.map((file) => file.path);
   if (
-    manifest.files.some((file, index) =>
-      file.path !== expected[index].path ||
-      file.shard !== expected[index].shard
-    )
-  ) throw new Error('Stale shard assignments');
+    new Set(runtimePaths).size !== discovered.length ||
+    runtimePaths.some((path) => !discoveredSet.has(path))
+  ) throw new Error('Invalid runtime coverage; inspect balanceTests.');
+  return {
+    files,
+    unmeasured,
+    removed,
+    rebalanced: files.some((file) =>
+      known.has(file.path) && known.get(file.path)!.shard !== file.shard
+    ),
+  };
+}
+
+/** Stale weights affect estimated balance, never whether a discovered test runs. */
+export function reportTimingDrift(assignment: RuntimeAssignment): void {
+  if (assignment.unmeasured.length || assignment.removed.length || assignment.rebalanced) {
+    console.warn(JSON.stringify({
+      warning:
+        'Timing data drift; all discovered modules will run. Refresh with update-ci-test-shards.ts <description> <junit.xml>.',
+      unmeasured: assignment.unmeasured,
+      removed: assignment.removed,
+      rebalanced: assignment.rebalanced,
+    }));
+  }
 }
 
 if (import.meta.main) {
@@ -132,6 +171,6 @@ if (import.meta.main) {
     await Deno.readTextFile('.github/scripts/ci-test-shards.json'),
   );
   const discovered = await discoverTests();
-  validateManifest(manifest, discovered);
+  reportTimingDrift(validateManifest(manifest, discovered));
   console.log(JSON.stringify({ modules: discovered.length, shards: manifest.shardCount }));
 }

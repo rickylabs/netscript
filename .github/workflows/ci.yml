@@ -53,7 +53,7 @@ concurrency:
 
 env:
   DENO_VERSION: '2.9.5'
-  CI_REDIS_IMAGE: redis:7-alpine
+  CI_REDIS_IMAGE: redis:7-alpine@sha256:ca0acbb137c1dc3339c8b147a58fd6f42775d4599327b50e7b116c23de501af2
 
 jobs:
   close-gate:
@@ -222,18 +222,8 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ env.DENO_VERSION }}
-
-      - name: Configure Deno module cache
-        run: echo "DENO_DIR=${RUNNER_TEMP}/deno-dir" >> "$GITHUB_ENV"
-
-      - name: Cache Deno modules
-        if: env.RUN == 'true'
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.DENO_DIR }}
-          key: ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-
+          cache: ${{ env.RUN == 'true' && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true') }}
+          cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}-${{ matrix.lane }}
 
       - name: Record skipped check receipt
         if: env.RUN != 'true'
@@ -252,7 +242,7 @@ jobs:
           --skip-reason "Classifier selected no affected Fresh browser surface."
 
       - name: Install workspace dependencies
-        if: env.RUN == 'true'
+        if: env.RUN == 'true' && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true')
         run: deno install
 
       - name: Cache required CI Redis image
@@ -265,19 +255,27 @@ jobs:
       - name: Load or pull required CI Redis image
         if: env.RUN == 'true' && matrix.index > 0
         run: |
+          started=$SECONDS
           image_cache="${RUNNER_TEMP}/ci-images/redis.tar"
           if [ -f "$image_cache" ]; then
+            mode=load
             docker load --input "$image_cache"
           else
+            mode=pull
             docker pull "$CI_REDIS_IMAGE"
             mkdir -p "$(dirname "$image_cache")"
-            docker save --output "$image_cache" "$CI_REDIS_IMAGE"
+            # Docker archives retain tags, not registry digests. Start the pinned image
+            # through this local tag on both cache hits and misses.
+            docker tag "$CI_REDIS_IMAGE" netscript-ci-redis:locked
+            docker save --output "$image_cache" netscript-ci-redis:locked
           fi
+          elapsed=$((SECONDS - started))
+          printf "CI Redis $mode: %s seconds\n" "$elapsed" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Start required Redis integration service
         if: env.RUN == 'true' && matrix.index > 0
         run: |
-          docker run --detach --rm --name "$REDIS_CONTAINER" --publish 6379:6379 "$CI_REDIS_IMAGE"
+          docker run --detach --rm --name "$REDIS_CONTAINER" --publish 6379:6379 netscript-ci-redis:locked
           for attempt in $(seq 1 10); do
             if docker exec "$REDIS_CONTAINER" redis-cli ping | grep -qx PONG; then
               exit 0
@@ -375,6 +373,8 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ env.DENO_VERSION }}
+          cache: ${{ env.RUN == 'true' }}
+          cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
 
       - name: Record skipped quality receipt
         if: env.RUN != 'true'
@@ -397,18 +397,6 @@ jobs:
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate docs-source-format-test --id quality-docs-format-test
           --cwd docs/site --output .llm/tmp/gate-receipts/quality/docs-format-test.json
-
-      - name: Configure Deno module cache
-        run: echo "DENO_DIR=${RUNNER_TEMP}/deno-dir" >> "$GITHUB_ENV"
-
-      - name: Cache Deno modules
-        if: env.RUN_DENO == 'true'
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.DENO_DIR }}
-          key: ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-
 
       - name: Install workspace dependencies
         if: env.RUN_DENO == 'true'
@@ -568,17 +556,8 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ env.DENO_VERSION }}
-
-      - name: Configure Deno module cache
-        run: echo "DENO_DIR=${RUNNER_TEMP}/deno-dir" >> "$GITHUB_ENV"
-
-      - name: Cache Deno modules
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.DENO_DIR }}
-          key: ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-
+          cache: true
+          cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
 
       - name: Install workspace dependencies
         run: deno install

@@ -111,7 +111,7 @@ if (import.meta.main) {
   const discoveredSet = new Set(discovered);
   const timings = new Map<string, TestTiming>();
   // Reuse checked-in measurements; contributors only need to time new/changed modules.
-  // A new module without a native measurement still fails coverage below.
+  // Unmeasured modules remain covered by runtime fallback weights.
   try {
     const previous: ShardManifest = JSON.parse(
       await Deno.readTextFile('.github/scripts/ci-test-shards.json'),
@@ -161,11 +161,16 @@ if (import.meta.main) {
   }
   const missing = discovered.filter((path) => !timings.has(path));
   const extra = [...timings.keys()].filter((path) => !discoveredSet.has(path));
-  if (missing.length || extra.length) {
+  if (extra.length) {
     throw new Error(
       `Timing pass differs from discovery; missing: ${missing.join(', ')}; extra: ${
         extra.join(', ')
       }`,
+    );
+  }
+  if (missing.length) {
+    console.warn(
+      JSON.stringify({ warning: 'Unmeasured modules use the runtime fallback weight.', missing }),
     );
   }
   const manifest: ShardManifest = {

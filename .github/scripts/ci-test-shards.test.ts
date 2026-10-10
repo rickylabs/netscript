@@ -27,29 +27,34 @@ Deno.test('longest-first assignment balances measured modules deterministically'
   assertThrows(() => balanceTests(timings, 0));
 });
 
-Deno.test('coverage rejects omissions, duplicate modules, extras and stale assignments', () => {
+Deno.test('runtime coverage tolerates additions, removals, renames and stale assignments', () => {
   const manifest = fixture();
   const paths = timings.map((file) => file.path);
-  validateManifest(manifest, paths);
-  assertThrows(
-    () => validateManifest({ ...manifest, files: manifest.files.slice(1) }, paths),
-    Error,
-    'Stale test manifest',
-  );
+  const discovered = [paths[0], paths[2], 'new_test.ts', 'renamed.test.tsx'];
+  const assignment = validateManifest(manifest, discovered);
+  assertEquals(assignment.files.map((file) => file.path), [...discovered].sort());
+  assertEquals(assignment.unmeasured, ['new_test.ts', 'renamed.test.tsx']);
+  assertEquals(assignment.removed, ['b.test.tsx']);
+  assertEquals(assignment.files.find((file) => file.path === paths[0])?.durationMs, 100);
+  assertEquals(validateManifest(manifest, [...discovered].reverse()), assignment);
+  const stale = structuredClone(manifest);
+  stale.files[0].shard = 2;
+  assertEquals(validateManifest(stale, paths).rebalanced, true);
+});
+
+Deno.test('invalid measurements and duplicate weights fail with a refresh hint', () => {
+  const manifest = fixture();
+  const paths = timings.map((file) => file.path);
   assertThrows(
     () => validateManifest({ ...manifest, files: [...manifest.files, manifest.files[0]] }, paths),
     Error,
-    'Duplicate',
+    'Duplicate test module. Repair',
   );
   assertThrows(
-    () => validateManifest(manifest, [...paths, 'new_test.ts']),
+    () => validateManifest(manifest, [...paths, paths[0]]),
     Error,
-    'Stale test manifest',
+    'Duplicate discovery',
   );
-  assertThrows(() => validateManifest(manifest, paths.slice(1)), Error, 'Stale test manifest');
-  const stale = structuredClone(manifest);
-  stale.files[0].shard = 2;
-  assertThrows(() => validateManifest(stale, paths), Error, 'Stale shard');
   const invalid = structuredClone(manifest);
   invalid.files[0].durationMs = NaN;
   assertThrows(() => validateManifest(invalid, paths), Error, 'Invalid measurement');
@@ -147,8 +152,7 @@ Deno.test('shard runner refuses an invalid index before starting tests', async (
   );
 });
 
-Deno.test('shard runner executes only its modules and propagates a real test failure', async () => {
-  const cwd = Deno.cwd();
+Deno.test('shard runner executes an unlisted new module exactly once and propagates failure', async () => {
   const root = await Deno.makeTempDir();
   try {
     await Deno.mkdir(`${root}/.github/scripts`, { recursive: true });
@@ -180,16 +184,23 @@ Deno.test('shard runner executes only its modules and propagates a real test fai
       `${root}/.github/scripts/ci-test-shards.json`,
       JSON.stringify(manifest),
     );
-    Deno.chdir(root);
-    for (const file of manifest.files) {
-      const report = `${root}/report-${file.shard}.json`;
-      assertEquals(await runShard(file.shard, report), file.path === 'fail_test.ts' ? 1 : 0);
+    // This file is deliberately absent from the checked-in timing manifest.
+    await Deno.writeTextFile(`${root}/new_test.ts`, 'Deno.test("unlisted pass", () => {});');
+    const assignment = validateManifest(manifest, await discoverTests(root));
+    const executed: string[] = [];
+    for (const index of [1, 2]) {
+      const files = assignment.files.filter((file) => file.shard === index).map((file) =>
+        file.path
+      );
+      const report = `${root}/report-${index}.json`;
+      assertEquals(await runShard(index, report, root), files.includes('fail_test.ts') ? 1 : 0);
       const result = JSON.parse(await Deno.readTextFile(report));
-      assertEquals(result.summary.totalResults, 1);
-      assertEquals(result.command.slice(-2), ['--allow-all', file.path]);
+      assertEquals(result.summary.totalResults, files.length);
+      assertEquals(result.command.slice(-files.length - 1), ['--allow-all', ...files]);
+      executed.push(...files);
     }
+    assertEquals(executed.sort(), ['fail_test.ts', 'new_test.ts', 'pass_test.ts']);
   } finally {
-    Deno.chdir(cwd);
     await Deno.remove(root, { recursive: true });
   }
 });

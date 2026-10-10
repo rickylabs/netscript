@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
-  "source": "Deno 2.9.5 native root JUnit (2026-10-10), helper entrypoints measured separately, shard/workflow guards added",
+  "source": "Native timing pass with refreshed runtime-coverage guards",
   "shardCount": 6,
   "files": [
     {
       "path": ".github/scripts/aspire-nuget-cache-policy.test.ts",
       "durationMs": 7,
       "tests": 2,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": ".github/scripts/ci-classify-changes.test.ts",
       "durationMs": 89,
       "tests": 64,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".github/scripts/ci-receipt-policy.test.ts",
@@ -23,14 +23,14 @@
     },
     {
       "path": ".github/scripts/ci-shard-workflow.test.ts",
-      "durationMs": 477,
+      "durationMs": 373,
       "tests": 4,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": ".github/scripts/ci-test-shards.test.ts",
-      "durationMs": 9189,
-      "tests": 6,
+      "durationMs": 5775,
+      "tests": 7,
       "shard": 2
     },
     {
@@ -43,37 +43,37 @@
       "path": ".github/scripts/draft-workflow-policy.test.ts",
       "durationMs": 6,
       "tests": 3,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": ".github/scripts/e2e-cli-event-policy.test.ts",
       "durationMs": 7,
       "tests": 3,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": ".github/scripts/openhands-comment-trigger.test.ts",
       "durationMs": 14,
       "tests": 16,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": ".github/scripts/phase-eval-claim.test.ts",
       "durationMs": 7,
       "tests": 9,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": ".github/scripts/phase-eval-status.test.ts",
       "durationMs": 6,
       "tests": 11,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/claude/claude-print_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/claude/evaluator-model-guard_test.ts",
@@ -91,31 +91,31 @@
       "path": ".llm/tools/agentic/claude/hybrid-launcher_test.ts",
       "durationMs": 1183,
       "tests": 10,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/claude/hybrid-mcp-server_test.ts",
       "durationMs": 7,
       "tests": 6,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/claude/hybrid-opencode-adapter_test.ts",
       "durationMs": 340,
       "tests": 10,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/claude/openrouter-run_test.ts",
       "durationMs": 275,
       "tests": 17,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/claude/remote-model-gateway_test.ts",
       "durationMs": 29,
       "tests": 7,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/claude/remote-model-launcher_test.ts",
@@ -127,97 +127,97 @@
       "path": ".llm/tools/agentic/codex/agy-live_test.ts",
       "durationMs": 3,
       "tests": 3,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/codex/app-server-message_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/codex/classify-codex-failure_test.ts",
       "durationMs": 4,
       "tests": 7,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/codex/codex-follow_test.ts",
       "durationMs": 674,
       "tests": 3,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/codex/codex-resume_test.ts",
       "durationMs": 16,
       "tests": 2,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/codex/codex-rollout-live_test.ts",
       "durationMs": 19,
       "tests": 7,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/codex/codex-status_test.ts",
       "durationMs": 6,
       "tests": 5,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/codex/codex-thread-read_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/codex/launch-codex-slice_test.ts",
       "durationMs": 2,
       "tests": 5,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/codex/run-codex-slice-lib_test.ts",
       "durationMs": 1,
       "tests": 7,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/compatibility-wrappers_test.ts",
       "durationMs": 3,
       "tests": 3,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/config/harness-models_test.ts",
       "durationMs": 2,
       "tests": 3,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/config/harness-pins_test.ts",
       "durationMs": 4,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/config/no-hardcoded-volatile_test.ts",
       "durationMs": 124,
       "tests": 5,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/copilot/copilot-agent-task_test.ts",
       "durationMs": 24,
       "tests": 4,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/github/gh-pr_test.ts",
       "durationMs": 12,
       "tests": 3,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/github/publication-body_test.ts",
@@ -229,25 +229,25 @@
       "path": ".llm/tools/agentic/lib/agentic-lib_test.ts",
       "durationMs": 27,
       "tests": 66,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/lib/openrouter-credential_test.ts",
       "durationMs": 1,
       "tests": 4,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/lib/provider-credential_test.ts",
       "durationMs": 2,
       "tests": 7,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/opencode/opencode-answer_test.ts",
       "durationMs": 114,
       "tests": 21,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/opencode/opencode-boundary-plugin_test.ts",
@@ -259,55 +259,55 @@
       "path": ".llm/tools/agentic/opencode/opencode-preflight_test.ts",
       "durationMs": 10,
       "tests": 10,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/opencode/opencode-project-config_test.ts",
       "durationMs": 95,
       "tests": 7,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/opencode/opencode-run_test.ts",
       "durationMs": 2487,
       "tests": 20,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/opencode/opencode-web_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/openhands/dispatch-openhands_test.ts",
       "durationMs": 11,
       "tests": 5,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/openhands/phase-eval-workflow_test.ts",
       "durationMs": 17,
       "tests": 11,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/runtime/adapters/antigravity-adapter_test.ts",
       "durationMs": 171,
       "tests": 5,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/runtime/adapters/local-sender-lease-repair-adapter_test.ts",
       "durationMs": 544,
       "tests": 4,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/runtime/adapters_test.ts",
       "durationMs": 16,
       "tests": 12,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/runtime/antigravity-compat_test.ts",
@@ -319,19 +319,19 @@
       "path": ".llm/tools/agentic/runtime/antigravity-evidence-aggregation_test.ts",
       "durationMs": 34,
       "tests": 3,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/runtime/antigravity-evidence_test.ts",
       "durationMs": 2,
       "tests": 6,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/runtime/child-process-environment-adapter_test.ts",
       "durationMs": 41,
       "tests": 4,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/runtime/cli/agentic-runtime_test.ts",
@@ -343,25 +343,25 @@
       "path": ".llm/tools/agentic/runtime/cli/antigravity-evidence-cli_test.ts",
       "durationMs": 2,
       "tests": 2,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/runtime/cli/provider-canary_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/runtime/cli/rollout-canary-cli_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/runtime/cli/rollout-canary-runner_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/runtime/cli/routing-state_test.ts",
@@ -373,7 +373,7 @@
       "path": ".llm/tools/agentic/runtime/codex-remote-repair_test.ts",
       "durationMs": 16,
       "tests": 9,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": ".llm/tools/agentic/runtime/contract_test.ts",
@@ -385,31 +385,31 @@
       "path": ".llm/tools/agentic/runtime/controller_test.ts",
       "durationMs": 73,
       "tests": 9,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/runtime/deferred-boundaries_test.ts",
       "durationMs": 9,
       "tests": 4,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/runtime/launch-route-identity_test.ts",
       "durationMs": 1,
       "tests": 6,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/runtime/legacy-checkpoint_test.ts",
       "durationMs": 26,
       "tests": 1,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/runtime/planner_test.ts",
       "durationMs": 2,
       "tests": 15,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/runtime/preset-canary_test.ts",
@@ -421,7 +421,7 @@
       "path": ".llm/tools/agentic/runtime/provider-canary_test.ts",
       "durationMs": 85,
       "tests": 9,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/runtime/provider-profiles_test.ts",
@@ -433,19 +433,19 @@
       "path": ".llm/tools/agentic/runtime/provider-usage_test.ts",
       "durationMs": 85,
       "tests": 5,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/runtime/rollout-canary_test.ts",
       "durationMs": 2,
       "tests": 5,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/runtime/rollout-report_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/runtime/routing-policy-doc-parity_test.ts",
@@ -457,31 +457,31 @@
       "path": ".llm/tools/agentic/runtime/routing-policy_test.ts",
       "durationMs": 58,
       "tests": 20,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/runtime/routing-signal-classifier_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/runtime/routing-state-machine_test.ts",
       "durationMs": 24,
       "tests": 3,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/runtime/runner-provider-profiles_test.ts",
       "durationMs": 9,
       "tests": 7,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": ".llm/tools/agentic/runtime/sender-lease-repair_test.ts",
       "durationMs": 6,
       "tests": 3,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".llm/tools/agentic/runtime/sender-ownership_test.ts",
@@ -493,13 +493,13 @@
       "path": ".llm/tools/agentic/runtime/sender-profile-provenance_test.ts",
       "durationMs": 146,
       "tests": 4,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": ".llm/tools/agentic/runtime/subscription-expense_test.ts",
       "durationMs": 5,
       "tests": 10,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": ".llm/tools/agentic/task-separator_test.ts",
@@ -511,13 +511,13 @@
       "path": ".llm/tools/agentic/wsl/wsl-foundation_test.ts",
       "durationMs": 63,
       "tests": 20,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": ".llm/tools/deps/bump-version_test.ts",
       "durationMs": 2384,
       "tests": 12,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": ".llm/tools/deps/check-ai-peers_test.ts",
@@ -529,19 +529,19 @@
       "path": ".llm/tools/deps/check-db-alignment_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": ".llm/tools/deps/check-zod-alignment_test.ts",
       "durationMs": 1,
       "tests": 6,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": ".llm/tools/deps/prod-install_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".llm/tools/docs/app-router-support_test.ts",
@@ -553,13 +553,13 @@
       "path": ".llm/tools/docs/build-agent-docs-bundle_test.ts",
       "durationMs": 117,
       "tests": 4,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": ".llm/tools/docs/cache-first-loader-docs_test.ts",
       "durationMs": 130,
       "tests": 10,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": ".llm/tools/docs/check-accuracy-and-discoverability_test.ts",
@@ -577,13 +577,13 @@
       "path": ".llm/tools/docs/check-exports-drift_test.ts",
       "durationMs": 563,
       "tests": 14,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": ".llm/tools/docs/check-internal-links_test.ts",
       "durationMs": 30,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/docs/generate-export-surface-corpus_test.ts",
@@ -607,7 +607,7 @@
       "path": ".llm/tools/docs/jsdoc-example-policy_test.ts",
       "durationMs": 6,
       "tests": 5,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": ".llm/tools/docs/official-saga-publisher-sample-sync_test.ts",
@@ -619,7 +619,7 @@
       "path": ".llm/tools/docs/pages-workflow_test.ts",
       "durationMs": 3,
       "tests": 1,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": ".llm/tools/docs/readme-fence-policy_test.ts",
@@ -637,31 +637,31 @@
       "path": ".llm/tools/docs/snippet-extractor_test.ts",
       "durationMs": 2857,
       "tests": 6,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": ".llm/tools/e2e/print-failed-report-steps_test.ts",
       "durationMs": 3,
       "tests": 4,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/e2e/scaffold-e2e-test_test.ts",
       "durationMs": 115,
       "tests": 5,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": ".llm/tools/fitness/check-doctrine-docs_test.ts",
       "durationMs": 27,
       "tests": 6,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": ".llm/tools/fitness/check-doctrine_test.ts",
       "durationMs": 907,
       "tests": 2,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": ".llm/tools/fitness/check-ds-gates_test.ts",
@@ -679,7 +679,7 @@
       "path": ".llm/tools/gates/command-lifecycle_test.ts",
       "durationMs": 1056,
       "tests": 5,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/gates/evidence-set_test.ts",
@@ -691,13 +691,13 @@
       "path": ".llm/tools/gates/jsdoc-example-workflow_test.ts",
       "durationMs": 5,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".llm/tools/gates/process-runner_test.ts",
       "durationMs": 670,
       "tests": 5,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": ".llm/tools/gates/readme-fence-workflow_test.ts",
@@ -709,19 +709,19 @@
       "path": ".llm/tools/gates/receipt-store_test.ts",
       "durationMs": 15,
       "tests": 3,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": ".llm/tools/gates/run-gate_test.ts",
       "durationMs": 53,
       "tests": 3,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": ".llm/tools/generate-cli-assets-barrel_test.ts",
       "durationMs": 59,
       "tests": 3,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": ".llm/tools/generate-publish-assets_test.ts",
@@ -733,13 +733,13 @@
       "path": ".llm/tools/harness/cleanup-state_test.ts",
       "durationMs": 26,
       "tests": 3,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/harness/extract-verdict_test.ts",
       "durationMs": 3,
       "tests": 6,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": ".llm/tools/harness/render-milestone-status_test.ts",
@@ -751,19 +751,19 @@
       "path": ".llm/tools/harness/validate-milestone-cluster_test.ts",
       "durationMs": 161,
       "tests": 23,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": ".llm/tools/maint/claude/claude-hook-log_test.ts",
       "durationMs": 2054,
       "tests": 9,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/maint/task-namespace_test.ts",
       "durationMs": 24,
       "tests": 3,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": ".llm/tools/maint/teardown/forbidden-commands_test.ts",
@@ -775,19 +775,19 @@
       "path": ".llm/tools/maint/teardown/leak-check_test.ts",
       "durationMs": 100,
       "tests": 11,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".llm/tools/maint/teardown/ownership_test.ts",
       "durationMs": 2,
       "tests": 14,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": ".llm/tools/maint/teardown/phase-b-live-snapshot_test.ts",
       "durationMs": 17,
       "tests": 2,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": ".llm/tools/maint/teardown/probes_test.ts",
@@ -799,55 +799,55 @@
       "path": ".llm/tools/maint/teardown/run-resources_test.ts",
       "durationMs": 21,
       "tests": 5,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": ".llm/tools/maint/teardown/teardown_test.ts",
       "durationMs": 9,
       "tests": 19,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": ".llm/tools/maint/wsl-command_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": ".llm/tools/quality/changed-source-files_test.ts",
       "durationMs": 744,
       "tests": 3,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/quality/check-allowance-budget-diff_test.ts",
       "durationMs": 2,
       "tests": 3,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": ".llm/tools/quality/check-root-coverage_test.ts",
       "durationMs": 671,
       "tests": 9,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": ".llm/tools/quality/scan-code-quality_test.ts",
       "durationMs": 2941,
       "tests": 30,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".llm/tools/release/assert-release-version_test.ts",
       "durationMs": 74,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": ".llm/tools/release/canary-label_test.ts",
       "durationMs": 425,
       "tests": 15,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": ".llm/tools/release/canary_test.ts",
@@ -859,7 +859,7 @@
       "path": ".llm/tools/release/check-jsr-publish-budget_test.ts",
       "durationMs": 10,
       "tests": 3,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".llm/tools/release/config/no-hardcoded-volatile_test.ts",
@@ -871,31 +871,31 @@
       "path": ".llm/tools/release/cut_test.ts",
       "durationMs": 50,
       "tests": 7,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": ".llm/tools/release/github-api_test.ts",
       "durationMs": 1,
       "tests": 7,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": ".llm/tools/release/github-release-pagination_test.ts",
       "durationMs": 49,
       "tests": 6,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": ".llm/tools/release/github-release_test.ts",
       "durationMs": 1682,
       "tests": 32,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": ".llm/tools/release/preflight-release_test.ts",
       "durationMs": 29,
       "tests": 5,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": ".llm/tools/release/preflight-text-imports_test.ts",
@@ -907,19 +907,19 @@
       "path": ".llm/tools/release/prepare-release_test.ts",
       "durationMs": 5,
       "tests": 5,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": ".llm/tools/release/publish-readiness_test.ts",
       "durationMs": 245,
       "tests": 16,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": ".llm/tools/release/publish-workspace_test.ts",
       "durationMs": 1342,
       "tests": 5,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/release/release-canary-workflow_test.ts",
@@ -931,43 +931,43 @@
       "path": ".llm/tools/release/report-jsr-publish-outcome_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": ".llm/tools/release/surface-diff_test.ts",
       "durationMs": 26,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/release/verify-canary-pair_test.ts",
       "durationMs": 15,
       "tests": 1,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": ".llm/tools/release/watch-canary-e2e_test.ts",
       "durationMs": 1894,
       "tests": 6,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/run-deno-check_test.ts",
       "durationMs": 3333,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/run-deno-doc-lint_test.ts",
       "durationMs": 288,
       "tests": 1,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": ".llm/tools/run-deno-fmt_test.ts",
       "durationMs": 6666,
       "tests": 17,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": ".llm/tools/run-deno-lint_test.ts",
@@ -979,7 +979,7 @@
       "path": ".llm/tools/run-deno-test_test.ts",
       "durationMs": 2551,
       "tests": 3,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": ".llm/tools/validation/acceptance-evidence_test.ts",
@@ -991,7 +991,7 @@
       "path": ".llm/tools/validation/aspire-scan-scope_test.ts",
       "durationMs": 276,
       "tests": 3,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": ".llm/tools/validation/check-aspire-host-ports_test.ts",
@@ -1003,13 +1003,13 @@
       "path": ".llm/tools/validation/check-aspire-resource-polling_test.ts",
       "durationMs": 69,
       "tests": 6,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/validation/check-aspire-version-parity_test.ts",
       "durationMs": 3,
       "tests": 26,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": ".llm/tools/validation/check-close-gate_test.ts",
@@ -1021,145 +1021,145 @@
       "path": ".llm/tools/validation/check-compat-fixtures_test.ts",
       "durationMs": 7,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": ".llm/tools/validation/check-netscript-jsr-specifiers_test.ts",
       "durationMs": 73,
       "tests": 10,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": ".llm/tools/validation/check-review-threads_test.ts",
       "durationMs": 40,
       "tests": 8,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": ".llm/tools/validation/fresh-ui-quality_test.ts",
       "durationMs": 2235,
       "tests": 2,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": ".llm/tools/validation/mirror-acceptance-evidence_test.ts",
       "durationMs": 30,
       "tests": 6,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "docs/site/_plugins/check-source-format_test.ts",
       "durationMs": 44,
       "tests": 6,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "docs/site/reference/ai/examples_test.ts",
       "durationMs": 27,
       "tests": 4,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "docs/site/reference/contracts/examples_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "docs/site/reference/cron/examples_test.ts",
       "durationMs": 12,
       "tests": 1,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "docs/site/reference/prisma-adapter-mysql/examples_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "docs/site/reference/queue/examples_test.ts",
       "durationMs": 7,
       "tests": 1,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "docs/site/reference/sagas/examples_test.ts",
       "durationMs": 16,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "docs/site/reference/streams/examples_test.ts",
       "durationMs": 50,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "docs/site/reference/triggers/examples_test.ts",
       "durationMs": 75,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "docs/site/reference/workers/examples_test.ts",
       "durationMs": 6,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/ai/tests/agent_loop_test.ts",
       "durationMs": 12,
       "tests": 14,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/ai/tests/anthropic_forward_compatible_test.ts",
       "durationMs": 630,
       "tests": 11,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/ai/tests/anthropic_test.ts",
       "durationMs": 25,
       "tests": 6,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/ai/tests/byok_test.ts",
       "durationMs": 298,
       "tests": 2,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/ai/tests/generation_options_test.ts",
       "durationMs": 54,
       "tests": 15,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/ai/tests/mcp_test.ts",
       "durationMs": 589,
       "tests": 20,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/ai/tests/ollama_test.ts",
       "durationMs": 27,
       "tests": 10,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/ai/tests/openai_compatible_test.ts",
       "durationMs": 119,
       "tests": 7,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/ai/tests/openai_embeddings_test.ts",
       "durationMs": 47,
       "tests": 5,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/ai/tests/openai_vision_test.ts",
@@ -1189,13 +1189,13 @@
       "path": "packages/ai/tests/provider_retry_test.ts",
       "durationMs": 29,
       "tests": 6,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/ai/tests/registry_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/ai/tests/request_context_test.ts",
@@ -1207,61 +1207,61 @@
       "path": "packages/ai/tests/retriever_test.ts",
       "durationMs": 5,
       "tests": 7,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/ai/tests/runtime_test.ts",
       "durationMs": 2,
       "tests": 6,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/ai/tests/skills_test.ts",
       "durationMs": 11,
       "tests": 5,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/ai/tests/sonnet55_test.ts",
       "durationMs": 57,
       "tests": 2,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/ai/tests/tanstack_chat_client_test.ts",
       "durationMs": 75,
       "tests": 5,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/ai/tests/tools_test.ts",
       "durationMs": 5,
       "tests": 6,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/ai/tests/vector_memory_test.ts",
       "durationMs": 2,
       "tests": 5,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/aspire/tests/_fixtures/readme-examples_test.ts",
       "durationMs": 7,
       "tests": 2,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/aspire/tests/adapters/aspire-typescript-builder_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/aspire/tests/application/compose-apphost_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/aspire/tests/config_test.ts",
@@ -1273,13 +1273,13 @@
       "path": "packages/aspire/tests/helpers_test.ts",
       "durationMs": 36,
       "tests": 30,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/aspire/tests/runtime/aspire-ns-plugin-contribution_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/aspire/tests/runtime/contribution-registry_test.ts",
@@ -1291,37 +1291,37 @@
       "path": "packages/aspire/tests/schema_test.ts",
       "durationMs": 26,
       "tests": 6,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/aspire/tests/types_test.ts",
       "durationMs": 157,
       "tests": 6,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/auth-better-auth/tests/backend-error-interop_test.ts",
       "durationMs": 35,
       "tests": 1,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/auth-better-auth/tests/better-auth-node-compat_test.ts",
       "durationMs": 32,
       "tests": 1,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/auth-better-auth/tests/better-auth_test.ts",
       "durationMs": 122,
       "tests": 10,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/auth-kv-oauth/tests/auth_kv_oauth_test.ts",
       "durationMs": 101,
       "tests": 9,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/auth-kv-oauth/tests/principal-subject_test.ts",
@@ -1339,61 +1339,61 @@
       "path": "packages/auth-workos/tests/workos-access-token_test.ts",
       "durationMs": 1582,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/auth-workos/tests/workos-authenticator_test.ts",
       "durationMs": 24,
       "tests": 5,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/auth-workos/tests/workos-node-compat_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/bench/tests/bench-runner_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/bench/tests/deno-http_test.ts",
       "durationMs": 10,
       "tests": 2,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/bench/tests/json-reporter_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/bench/tests/local-workspace_test.ts",
       "durationMs": 380,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/bench/tests/normalizer_test.ts",
       "durationMs": 3,
       "tests": 7,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/bench/tests/scorer_test.ts",
       "durationMs": 3,
       "tests": 4,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/bench/tests/task-catalog_test.ts",
       "durationMs": 44,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/src/application/gates/quickstart/database-integrity-walk_test.ts",
@@ -1405,37 +1405,37 @@
       "path": "packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-api_test.ts",
       "durationMs": 69,
       "tests": 3,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream_test.ts",
       "durationMs": 18,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/find-job-execute-identity_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/otlp-headers_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/package-backed-plugin-version_test.ts",
       "durationMs": 51,
       "tests": 2,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev_test.ts",
       "durationMs": 2196,
       "tests": 5,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/resource-slice-gates_test.ts",
@@ -1447,19 +1447,19 @@
       "path": "packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example_test.ts",
       "durationMs": 820,
       "tests": 1,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config_test.ts",
       "durationMs": 53,
       "tests": 2,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/select-flow-b-stream-change_test.ts",
@@ -1471,7 +1471,7 @@
       "path": "packages/cli/e2e/src/application/gates/scaffold/service-env/discover-service-subjects_test.ts",
       "durationMs": 15,
       "tests": 8,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/service-env/process-evidence_test.ts",
@@ -1489,13 +1489,13 @@
       "path": "packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts",
       "durationMs": 922,
       "tests": 4,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/validate-aspire-task-traces_test.ts",
       "durationMs": 6,
       "tests": 5,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/src/application/gates/scaffold/validate-flow-b-traces_test.ts",
@@ -1513,19 +1513,19 @@
       "path": "packages/cli/e2e/tests/adapters/commands/docker-resource-cleaner_test.ts",
       "durationMs": 3,
       "tests": 6,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/e2e/tests/adapters/reporting/pretty-reporter_test.ts",
       "durationMs": 389,
       "tests": 5,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/cli/e2e/tests/adapters/reporting/report-file-reporter_test.ts",
       "durationMs": 22,
       "tests": 1,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts",
@@ -1543,19 +1543,19 @@
       "path": "packages/cli/e2e/tests/application/builders/runtime-gates_test.ts",
       "durationMs": 3,
       "tests": 33,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/e2e/tests/application/builders/suite-builder_test.ts",
       "durationMs": 18,
       "tests": 3,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/application/builders/workspace-options_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/aspire-cleanup-evidence_test.ts",
@@ -1567,25 +1567,25 @@
       "path": "packages/cli/e2e/tests/application/gates/aspire-dashboard-telemetry_test.ts",
       "durationMs": 40,
       "tests": 4,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/aspire-mcp-smoke_test.ts",
       "durationMs": 33,
       "tests": 21,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/aspire-structured-evidence_test.ts",
       "durationMs": 42,
       "tests": 17,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/capture-db-endpoint-allocation_test.ts",
       "durationMs": 9,
       "tests": 1,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/command-gate_test.ts",
@@ -1597,37 +1597,37 @@
       "path": "packages/cli/e2e/tests/application/gates/configure-published-workers-block_test.ts",
       "durationMs": 2,
       "tests": 5,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts",
       "durationMs": 75,
       "tests": 24,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/generated-router-template_test.ts",
       "durationMs": 2,
       "tests": 3,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/http-gate_test.ts",
       "durationMs": 912,
       "tests": 11,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/listener-fault-controller_test.ts",
       "durationMs": 39,
       "tests": 4,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts",
       "durationMs": 15,
       "tests": 12,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/listener-unreachable-fixture_test.ts",
@@ -1645,37 +1645,37 @@
       "path": "packages/cli/e2e/tests/application/gates/locate-workers-resource-block_test.ts",
       "durationMs": 6,
       "tests": 9,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/owned-container-log_test.ts",
       "durationMs": 5,
       "tests": 3,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/prepare-readiness-fixture_test.ts",
       "durationMs": 2651,
       "tests": 5,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/probe-app-dynamic-route_test.ts",
       "durationMs": 44,
       "tests": 7,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/probe-app-reference_test.ts",
       "durationMs": 7,
       "tests": 4,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/probe-island-hydration_test.ts",
       "durationMs": 3,
       "tests": 7,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/probe-island-served-surface_test.ts",
@@ -1693,37 +1693,37 @@
       "path": "packages/cli/e2e/tests/application/gates/quickstart-aspire-walk_test.ts",
       "durationMs": 6,
       "tests": 4,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/readiness-disagreement_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/resource-command-gate_test.ts",
       "durationMs": 5,
       "tests": 2,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/resource-state-stream_test.ts",
       "durationMs": 588,
       "tests": 6,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts",
       "durationMs": 13,
       "tests": 13,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/scaffold/behavior-plugins-health-gate_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts",
@@ -1747,7 +1747,7 @@
       "path": "packages/cli/e2e/tests/application/gates/scaffold/ui-ai-gates_test.ts",
       "durationMs": 244,
       "tests": 3,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/scaffold/ui-data-screen-gates_test.ts",
@@ -1765,43 +1765,43 @@
       "path": "packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts",
       "durationMs": 682,
       "tests": 31,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/verify-endpoint-readiness_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts",
       "durationMs": 80,
       "tests": 14,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/tests/application/readme-command_test.ts",
       "durationMs": 184,
       "tests": 4,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/tests/application/runner/gate-runner_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/e2e/tests/application/runner/suite-lease_test.ts",
       "durationMs": 2,
       "tests": 2,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/application/runner/suite-runner_test.ts",
       "durationMs": 33,
       "tests": 9,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/tests/application/verify-clean-clone-readme_test.ts",
@@ -1813,7 +1813,7 @@
       "path": "packages/cli/e2e/tests/config-lib-parity_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/e2e/tests/domain/http-contract_test.ts",
@@ -1825,13 +1825,13 @@
       "path": "packages/cli/e2e/tests/domain/readme-quickstart_test.ts",
       "durationMs": 13,
       "tests": 8,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/presentation/cli-options_test.ts",
       "durationMs": 2,
       "tests": 9,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/cli/e2e/tests/presentation/cli-program_test.ts",
@@ -1849,31 +1849,31 @@
       "path": "packages/cli/e2e/tests/presentation/quickstart-command-drift_test.ts",
       "durationMs": 6,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/e2e/tests/presentation/quickstart-walk-suite_test.ts",
       "durationMs": 7,
       "tests": 9,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/e2e/tests/presentation/readme-quickstart-drift_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/cli/e2e/tests/presentation/readme-quickstart-suite_test.ts",
       "durationMs": 10,
       "tests": 4,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/e2e/tests/presentation/suite-registry_test.ts",
       "durationMs": 20,
       "tests": 20,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/module_import_side_effect_test.ts",
@@ -1885,13 +1885,13 @@
       "path": "packages/cli/scaffolding_test.ts",
       "durationMs": 10,
       "tests": 2,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/adapters/aspire/apphost-doctor-inspector_test.ts",
       "durationMs": 5,
       "tests": 4,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target_test.ts",
@@ -1903,73 +1903,73 @@
       "path": "packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts",
       "durationMs": 2,
       "tests": 8,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/adapters/config/configured-plugin-manifest-summary_test.ts",
       "durationMs": 7,
       "tests": 2,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/adapters/config/deploy-config-resolvers.test.ts",
       "durationMs": 1,
       "tests": 4,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/adapters/config/deploy-config-resolvers_test.ts",
       "durationMs": 2,
       "tests": 7,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/adapters/config/plugin-permission-precedence_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/adapters/config/plugin-registry.test.ts",
       "durationMs": 1374,
       "tests": 9,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/config/project-config-loader_test.ts",
       "durationMs": 1928,
       "tests": 4,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/adapters/contracts/contract-source_test.ts",
       "durationMs": 17,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/adapters/contracts/version-registry_test.ts",
       "durationMs": 10,
       "tests": 1,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/database/apphost-lifecycle-lock_test.ts",
       "durationMs": 98,
       "tests": 1,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts",
       "durationMs": 1,
       "tests": 6,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/adapters/database/operation-runner_test.ts",
       "durationMs": 193,
       "tests": 11,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/adapters/database/scaffolder_test.ts",
@@ -1981,25 +1981,25 @@
       "path": "packages/cli/src/kernel/adapters/database/workspace-mutator_remove_test.ts",
       "durationMs": 6,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/adapters/database/workspace-resolver_test.ts",
       "durationMs": 25,
       "tests": 5,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/adapters/deno-deploy/deno-deploy-cli_test.ts",
       "durationMs": 6,
       "tests": 5,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/adapters/deploy/compile/compile-platform_test.ts",
       "durationMs": 18,
       "tests": 4,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts",
@@ -2011,7 +2011,7 @@
       "path": "packages/cli/src/kernel/adapters/deploy/runtime-detect_test.ts",
       "durationMs": 127,
       "tests": 6,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/adapters/health/fetch-health-probe_test.ts",
@@ -2023,25 +2023,25 @@
       "path": "packages/cli/src/kernel/adapters/linux/systemd/systemd-environment_test.ts",
       "durationMs": 2,
       "tests": 2,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/adapters/linux/systemd/systemd_test.ts",
       "durationMs": 32,
       "tests": 11,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/adapters/plugin/db-integration_test.ts",
       "durationMs": 20,
       "tests": 9,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/adapters/plugin/plugin-reference-reconciler_test.ts",
       "durationMs": 57,
       "tests": 5,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/plugin/scaffolder_test.ts",
@@ -2059,19 +2059,19 @@
       "path": "packages/cli/src/kernel/adapters/runtime/file-system/deno-file-system_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter_test.ts",
       "durationMs": 76,
       "tests": 5,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/runtime/process/deno-process_test.ts",
       "durationMs": 710,
       "tests": 3,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/adapters/scaffold/fresh-route-manifest_test.ts",
@@ -2083,19 +2083,19 @@
       "path": "packages/cli/src/kernel/adapters/scaffold/tests/dry-run-fs_test.ts",
       "durationMs": 125,
       "tests": 19,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/scaffold/tests/fresh-adapter_test.ts",
       "durationMs": 18,
       "tests": 5,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts",
       "durationMs": 6,
       "tests": 9,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/adapters/scaffold/tests/scaffolder_test.ts",
@@ -2107,31 +2107,31 @@
       "path": "packages/cli/src/kernel/adapters/scaffold/tests/template-adapter_test.ts",
       "durationMs": 150,
       "tests": 18,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/adapters/scaffold/tests/workspace-writer_test.ts",
       "durationMs": 18,
       "tests": 18,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/adapters/secrets/env-file-secrets-store_test.ts",
       "durationMs": 1,
       "tests": 6,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/service/client-scaffolder_test.ts",
       "durationMs": 10,
       "tests": 1,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/adapters/service/router-source_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/adapters/service/scaffolder_test.ts",
@@ -2155,25 +2155,25 @@
       "path": "packages/cli/src/kernel/adapters/windows/environment/env-file-dashboard_test.ts",
       "durationMs": 2,
       "tests": 2,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/adapters/windows/manifest/manifest-resolver_test.ts",
       "durationMs": 23,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/application/plugin/registered-plugin-source_test.ts",
       "durationMs": 2,
       "tests": 2,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/application/registries/template-registry_test.ts",
       "durationMs": 118,
       "tests": 2,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/application/resource-slice/client-selector_test.ts",
@@ -2197,13 +2197,13 @@
       "path": "packages/cli/src/kernel/application/resource-slice/reconcile-resource-slice_test.ts",
       "durationMs": 17,
       "tests": 12,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/application/resource-slice/reconcile-state_test.ts",
       "durationMs": 6,
       "tests": 8,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/application/resource-slice/render-resource-slice_test.ts",
@@ -2227,19 +2227,19 @@
       "path": "packages/cli/src/kernel/application/scaffold/plan-init_test.ts",
       "durationMs": 212,
       "tests": 7,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/application/scaffold/s13-stale-surface_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/application/scaffold/support/format-generated-files_test.ts",
       "durationMs": 20,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/application/scaffold/support/post-scripts-init_test.ts",
@@ -2251,49 +2251,49 @@
       "path": "packages/cli/src/kernel/application/scaffold/writers/write-app-files_test.ts",
       "durationMs": 886,
       "tests": 5,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/application/scaffold/writers/write-example-service-app-files_test.ts",
       "durationMs": 655,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/application/ui/registry-deno-json_test.ts",
       "durationMs": 15,
       "tests": 5,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/application/ui/registry-lifecycle_test.ts",
       "durationMs": 23,
       "tests": 5,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/application/ui/registry-styles.test.ts",
       "durationMs": 2,
       "tests": 2,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/application/ui/web-scaffold_test.ts",
       "durationMs": 10,
       "tests": 13,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/constants/version-drift_test.ts",
       "durationMs": 578,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/domain/dependency-closures/netscript-web-runtime-closure_test.ts",
@@ -2305,25 +2305,25 @@
       "path": "packages/cli/src/kernel/domain/deploy/activation-convention_test.ts",
       "durationMs": 1,
       "tests": 4,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/domain/deploy/deno-deploy-target_test.ts",
       "durationMs": 5,
       "tests": 9,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/domain/deploy/deploy-target-port_test.ts",
       "durationMs": 2,
       "tests": 11,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/domain/deploy/health-gate_test.ts",
       "durationMs": 1,
       "tests": 4,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/domain/deploy/observability-convention_test.ts",
@@ -2335,43 +2335,43 @@
       "path": "packages/cli/src/kernel/domain/deploy/rollback-convention_test.ts",
       "durationMs": 1,
       "tests": 9,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/domain/deploy/secrets-convention_test.ts",
       "durationMs": 2,
       "tests": 6,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/domain/deploy/unstable-api-guard_test.ts",
       "durationMs": 1,
       "tests": 6,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/domain/scaffold/app-name_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/domain/scaffold/default-port-allocation_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/templates/app/agent-conventions_test.ts",
       "durationMs": 2,
       "tests": 3,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/templates/app/generators-config_test.ts",
       "durationMs": 229,
       "tests": 21,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/templates/app/route-templates_test.ts",
@@ -2383,13 +2383,13 @@
       "path": "packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts",
       "durationMs": 16,
       "tests": 5,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/generators_test.ts",
       "durationMs": 11,
       "tests": 32,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-health-checks_test.ts",
@@ -2401,37 +2401,37 @@
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/database-permissions_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/empty-registration_test.ts",
       "durationMs": 484,
       "tests": 2,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts",
       "durationMs": 37,
       "tests": 10,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-background_test.ts",
       "durationMs": 768,
       "tests": 15,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts",
       "durationMs": 78,
       "tests": 20,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-source-safety_test.ts",
       "durationMs": 431,
       "tests": 4,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helpers-compile_test.ts",
@@ -2443,7 +2443,7 @@
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts",
       "durationMs": 17,
       "tests": 44,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts",
@@ -2455,25 +2455,25 @@
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts",
       "durationMs": 121,
       "tests": 21,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts",
       "durationMs": 60,
       "tests": 37,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts",
       "durationMs": 51,
       "tests": 26,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/register-http-endpoint_test.ts",
       "durationMs": 41,
       "tests": 20,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-diagnostics-budget_test.ts",
@@ -2485,7 +2485,7 @@
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts",
       "durationMs": 2196,
       "tests": 7,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment-runtime_test.ts",
@@ -2497,31 +2497,31 @@
       "path": "packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment_test.ts",
       "durationMs": 56,
       "tests": 14,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts",
       "durationMs": 6,
       "tests": 6,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/src/kernel/templates/database/generate-database-seed_test.ts",
       "durationMs": 23,
       "tests": 3,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/templates/database/generators_test.ts",
       "durationMs": 8,
       "tests": 10,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/src/kernel/templates/plugins/generate-plugin-service_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/templates/service/generators_test.ts",
@@ -2533,7 +2533,7 @@
       "path": "packages/cli/src/kernel/templates/workspace/dependency-closure-verifier_test.ts",
       "durationMs": 1457,
       "tests": 4,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/kernel/templates/workspace/generators_test.ts",
@@ -2545,13 +2545,13 @@
       "path": "packages/cli/src/kernel/templates/workspace/node-modules-verifier_test.ts",
       "durationMs": 671,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/kernel/templates/workspace/quality-runner_test.ts",
       "durationMs": 5308,
       "tests": 7,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/cli/src/local/composition/local-contributor-command-tree_test.ts",
@@ -2563,49 +2563,49 @@
       "path": "packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts",
       "durationMs": 8379,
       "tests": 6,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/maintainer/adapters/official-plugin-source_test.ts",
       "durationMs": 49,
       "tests": 1,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/cli/src/maintainer/adapters/packages-copier_test.ts",
       "durationMs": 280,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/maintainer/features/init/init-command_test.ts",
       "durationMs": 10,
       "tests": 2,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/src/maintainer/features/root/maintainer-services_test.ts",
       "durationMs": 93,
       "tests": 9,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts",
       "durationMs": 1494,
       "tests": 4,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-samples_test.ts",
       "durationMs": 1180,
       "tests": 2,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/adapters/agent/deno-agent-docs-generator_test.ts",
       "durationMs": 305,
       "tests": 4,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts",
@@ -2623,43 +2623,43 @@
       "path": "packages/cli/src/public/adapters/os-service-factory_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/adapters/service-activation-port_test.ts",
       "durationMs": 6,
       "tests": 6,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/adapters/systemd-os-service_test.ts",
       "durationMs": 30,
       "tests": 4,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/composition/run-public-cli_test.ts",
       "durationMs": 17,
       "tests": 1,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/domain/scaffold-plan_test.ts",
       "durationMs": 3,
       "tests": 3,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/agent/drift/record-drift-command_test.ts",
       "durationMs": 53,
       "tests": 1,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/features/agent/init/init-agent-command_test.ts",
       "durationMs": 8,
       "tests": 2,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/cli/src/public/features/agent/init/init-agent_test.ts",
@@ -2671,7 +2671,7 @@
       "path": "packages/cli/src/public/features/agent/mcp/agent-mcp-command_test.ts",
       "durationMs": 56,
       "tests": 3,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts",
@@ -2683,31 +2683,31 @@
       "path": "packages/cli/src/public/features/agent/mcp/command-policy-parity_test.ts",
       "durationMs": 124,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/config/override/manage-runtime-overrides_test.ts",
       "durationMs": 2,
       "tests": 3,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/config/project/list-appsettings-paths_test.ts",
       "durationMs": 255,
       "tests": 5,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/cli/src/public/features/config/project/project-config-ops_test.ts",
       "durationMs": 150,
       "tests": 10,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/config/project/resolve-appsettings-path_test.ts",
       "durationMs": 153,
       "tests": 14,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/contracts/add-route/add-contract-route_test.ts",
@@ -2725,55 +2725,55 @@
       "path": "packages/cli/src/public/features/contracts/remove/remove-contract_test.ts",
       "durationMs": 5,
       "tests": 1,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/cli/src/public/features/contracts/version-add/add-contract-version_test.ts",
       "durationMs": 55,
       "tests": 1,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/db/add/add-db_test.ts",
       "durationMs": 8,
       "tests": 3,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/db/operations/db-operation-command_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/deploy/build/build-windows-prebuild_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/features/deploy/build/deploy_test.ts",
       "durationMs": 23,
       "tests": 6,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/deploy/build/prepare-deploy-build_test.ts",
       "durationMs": 5,
       "tests": 2,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/deploy/list/list-deploy-targets_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/public/features/deploy/target/desktop/desktop-group_test.ts",
       "durationMs": 27,
       "tests": 1,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/deploy/target/desktop/package/package-desktop-command_test.ts",
@@ -2785,7 +2785,7 @@
       "path": "packages/cli/src/public/features/deploy/target/desktop/package/package-desktop_test.ts",
       "durationMs": 195,
       "tests": 9,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/deploy/target/desktop/package/plan-desktop-packages_test.ts",
@@ -2797,37 +2797,37 @@
       "path": "packages/cli/src/public/features/deploy/target/desktop/release/prepare-native-release_test.ts",
       "durationMs": 10,
       "tests": 2,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/deploy/target/desktop/release/prepare-release-command_test.ts",
       "durationMs": 245,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/deploy/target/desktop/release/release-store_test.ts",
       "durationMs": 230,
       "tests": 4,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/deploy/target/desktop/release/server/release-handler_test.ts",
       "durationMs": 91,
       "tests": 12,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/deploy/target/desktop/release/server/serve-release-command_test.ts",
       "durationMs": 65,
       "tests": 1,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/deploy/target/desktop/release/sign-release_test.ts",
       "durationMs": 2,
       "tests": 2,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts",
@@ -2839,13 +2839,13 @@
       "path": "packages/cli/src/public/features/generate/aspire/generate-aspire_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/generate/plugins/generate-plugin-registries-command_test.ts",
       "durationMs": 23,
       "tests": 2,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts",
@@ -2863,43 +2863,43 @@
       "path": "packages/cli/src/public/features/generate/resource/generate-resource-command_test.ts",
       "durationMs": 375,
       "tests": 10,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/public/features/generate/resource/generate-resource_test.ts",
       "durationMs": 47,
       "tests": 3,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts",
       "durationMs": 151,
       "tests": 5,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/init/init-command_test.ts",
       "durationMs": 8,
       "tests": 11,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/marketplace/marketplace-group_test.ts",
       "durationMs": 18,
       "tests": 2,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/cli/src/public/features/plugins/ai/ai-plugin-command_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/features/plugins/auth/auth-config-security_test.ts",
       "durationMs": 1270,
       "tests": 7,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/features/plugins/auth/auth-env_test.ts",
@@ -2911,13 +2911,13 @@
       "path": "packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts",
       "durationMs": 138,
       "tests": 11,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts",
       "durationMs": 55,
       "tests": 1,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/plugins/auth/auth-session-client_test.ts",
@@ -2929,13 +2929,13 @@
       "path": "packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts",
       "durationMs": 1098,
       "tests": 13,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/plugins/doctor/doctor-plugin-command_test.ts",
       "durationMs": 512,
       "tests": 16,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/plugins/doctor/doctor-plugin-invariants_test.ts",
@@ -2953,19 +2953,19 @@
       "path": "packages/cli/src/public/features/plugins/host/plugin-loader_test.ts",
       "durationMs": 39,
       "tests": 3,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/plugins/install/confirm-plugin-install_test.ts",
       "durationMs": 52,
       "tests": 8,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/plugins/install/install-plugin-command_test.ts",
       "durationMs": 2027,
       "tests": 2,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/plugins/install/install-plugin_test.ts",
@@ -2977,31 +2977,31 @@
       "path": "packages/cli/src/public/features/plugins/install/manifest-service-shape_test.ts",
       "durationMs": 57,
       "tests": 2,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/plugins/install/plugin-package-resolver_test.ts",
       "durationMs": 73,
       "tests": 8,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/plugins/install/plugin-trust-tier_test.ts",
       "durationMs": 66,
       "tests": 3,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/plugins/list/list-plugins-command_test.ts",
       "durationMs": 528,
       "tests": 3,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/features/plugins/new/new-plugin_test.ts",
       "durationMs": 84,
       "tests": 7,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/src/public/features/plugins/remove/remove-plugin_test.ts",
@@ -3013,13 +3013,13 @@
       "path": "packages/cli/src/public/features/plugins/scaffold/scaffold-plugin_test.ts",
       "durationMs": 17,
       "tests": 5,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/features/root/command-registry_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/root/public-command-tree_test.ts",
@@ -3031,43 +3031,43 @@
       "path": "packages/cli/src/public/features/services/add-handler/add-service-handler_test.ts",
       "durationMs": 3,
       "tests": 1,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/cli/src/public/features/services/add/add-service_test.ts",
       "durationMs": 50,
       "tests": 4,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/features/services/configure/mutate-service-config_test.ts",
       "durationMs": 18,
       "tests": 2,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/cli/src/public/features/services/generate/generate-service-clients_test.ts",
       "durationMs": 15,
       "tests": 7,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/features/services/generate/generated-service-client_type_test.ts",
       "durationMs": 6849,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/features/services/remove/remove-service_test.ts",
       "durationMs": 12,
       "tests": 1,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/cli/src/public/features/ui/add/add-ui-command_test.ts",
       "durationMs": 103,
       "tests": 7,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/features/ui/registry.test.ts",
@@ -3079,25 +3079,25 @@
       "path": "packages/cli/src/public/features/ui/ui-app-root-command_test.ts",
       "durationMs": 8617,
       "tests": 7,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/infra/jsr/fetch-jsr-export-map_test.ts",
       "durationMs": 70,
       "tests": 2,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator_test.ts",
       "durationMs": 139,
       "tests": 11,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/cli/src/public/infra/jsr/verify-jsr-package-integrity_test.ts",
       "durationMs": 18,
       "tests": 3,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts",
@@ -3109,19 +3109,19 @@
       "path": "packages/cli/testing_test.ts",
       "durationMs": 6,
       "tests": 3,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/cli/tests/support/local-workspace-imports_test.ts",
       "durationMs": 359,
       "tests": 2,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/config/tests/_fixtures/readme-examples_test.ts",
       "durationMs": 23,
       "tests": 4,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/config/tests/merge/merge_test.ts",
@@ -3133,13 +3133,13 @@
       "path": "packages/config/tests/schema/deploy_schema_test.ts",
       "durationMs": 12,
       "tests": 14,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/config/tests/schema/netscript_config_test.ts",
       "durationMs": 29,
       "tests": 9,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/config/tests/schema/plugins_test.ts",
@@ -3151,7 +3151,7 @@
       "path": "packages/config/tests/schema/service_schema_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/config/workspace.test.ts",
@@ -3163,19 +3163,19 @@
       "path": "packages/contracts/tests/assertion-budget_test.ts",
       "durationMs": 8,
       "tests": 5,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/contracts/tests/commands-type_test.ts",
       "durationMs": 27,
       "tests": 4,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/contracts/tests/contracts_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/contracts/tests/errors_test.ts",
@@ -3187,73 +3187,73 @@
       "path": "packages/contracts/tests/procedure-meta-independence_test.ts",
       "durationMs": 525,
       "tests": 1,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/contracts/tests/procedure-meta-inference_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/contracts/tests/procedure-meta_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/contracts/tests/schema-types_test.ts",
       "durationMs": 11,
       "tests": 3,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/cron/tests/abort-cleanup_test.ts",
       "durationMs": 112,
       "tests": 1,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/cron/tests/memory-adapter_test.ts",
       "durationMs": 71,
       "tests": 4,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/cron/tests/retry-backoff_test.ts",
       "durationMs": 303,
       "tests": 12,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/cron/tests/scheduler_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/cron/tests/types_test.ts",
       "durationMs": 15,
       "tests": 3,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/database/tests/_fixtures/docs-examples_test.ts",
       "durationMs": 30,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/database/tests/adapter-contract_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/database/tests/bound-outbox_test.ts",
       "durationMs": 18,
       "tests": 1,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/database/tests/commands-generated-transaction_test.ts",
@@ -3265,61 +3265,61 @@
       "path": "packages/database/tests/commands-postgres_test.ts",
       "durationMs": 0,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/database/tests/commands-relay-postgres_test.ts",
       "durationMs": 0,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/database/tests/commands-transaction_test.ts",
       "durationMs": 4470,
       "tests": 2,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/database/tests/migrate-artifacts_test.ts",
       "durationMs": 25,
       "tests": 3,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/database/tests/migrate-retry_test.ts",
       "durationMs": 13,
       "tests": 12,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/database/tests/zod-crud-barrel_test.ts",
       "durationMs": 36,
       "tests": 2,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/fresh-ui/tests/_fixtures/docs-examples_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/fresh-ui/tests/ai/render-ui.test.tsx",
       "durationMs": 22,
       "tests": 5,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/fresh-ui/tests/chat/parse-blocks.test.ts",
       "durationMs": 6,
       "tests": 16,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/fresh-ui/tests/consumer-render.test.tsx",
       "durationMs": 1,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/fresh-ui/tests/data-grid.test.tsx",
@@ -3331,49 +3331,49 @@
       "path": "packages/fresh-ui/tests/desktop/desktop-chrome.test.ts",
       "durationMs": 8,
       "tests": 6,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/fresh-ui/tests/primitives.test.tsx",
       "durationMs": 1,
       "tests": 7,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/fresh-ui/tests/registry-doc-drift.test.ts",
       "durationMs": 125,
       "tests": 5,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/avatar.test.tsx",
       "durationMs": 23,
       "tests": 3,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/chart-block.test.tsx",
       "durationMs": 38,
       "tests": 3,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/citation-chip.test.tsx",
       "durationMs": 44,
       "tests": 2,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/code-block.test.tsx",
       "durationMs": 26,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/command-palette.test.tsx",
       "durationMs": 10,
       "tests": 4,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/data-table.test.tsx",
@@ -3391,13 +3391,13 @@
       "path": "packages/fresh-ui/tests/registry/components/ui/donut.test.tsx",
       "durationMs": 33,
       "tests": 2,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/dropzone.test.tsx",
       "durationMs": 83,
       "tests": 5,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/foundation.test.tsx",
@@ -3409,37 +3409,37 @@
       "path": "packages/fresh-ui/tests/registry/components/ui/message.test.tsx",
       "durationMs": 37,
       "tests": 4,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/model-selector.test.tsx",
       "durationMs": 23,
       "tests": 3,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/prompt-input.test.tsx",
       "durationMs": 51,
       "tests": 8,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/search.test.tsx",
       "durationMs": 35,
       "tests": 3,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/fresh-ui/tests/registry/components/ui/tool-call-card.test.tsx",
       "durationMs": 12,
       "tests": 3,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/fresh-ui/tests/registry/islands/desktop-only.test.tsx",
       "durationMs": 3,
       "tests": 3,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/fresh-ui/tests/registry/islands/mcp-ui-widget.test.tsx",
@@ -3451,13 +3451,13 @@
       "path": "packages/fresh-ui/tests/registry/lib/toast.test.ts",
       "durationMs": 5,
       "tests": 4,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/fresh-ui/tests/registry/markdown-pipeline.test.ts",
       "durationMs": 8,
       "tests": 14,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/fresh-ui/tests/registry/markdown-renderer.test.ts",
@@ -3469,19 +3469,19 @@
       "path": "packages/fresh-ui/tests/registry/render-ui-generated.test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/fresh-ui/tests/runtime/_internal/collection-navigation.test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/fresh-ui/tests/runtime/_internal/native-dialog.test.ts",
       "durationMs": 6,
       "tests": 12,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/fresh-ui/tests/runtime/accordion/accordion-render.test.tsx",
@@ -3493,49 +3493,49 @@
       "path": "packages/fresh-ui/tests/runtime/accordion/accordion.test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/fresh-ui/tests/runtime/action-menu/action-menu.test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/fresh-ui/tests/runtime/combobox/combobox.utils.test.ts",
       "durationMs": 1,
       "tests": 6,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/fresh-ui/tests/runtime/dialog/dialog.test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/fresh-ui/tests/runtime/drawer/drawer.test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/fresh-ui/tests/runtime/popover/popover.test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/fresh-ui/tests/runtime/tabs/tabs.utils.test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/fresh-ui/tests/runtime/tooltip/tooltip.test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/application/builders/define-page/tests/builder.test.tsx",
@@ -3547,19 +3547,19 @@
       "path": "packages/fresh/src/application/builders/define-page/tests/navigation.test.tsx",
       "durationMs": 63,
       "tests": 7,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/fresh/src/application/builders/define-page/tests/runtime.test.tsx",
       "durationMs": 260,
       "tests": 6,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/fresh/src/application/builders/define-page/tests/search-params.test.tsx",
       "durationMs": 75,
       "tests": 7,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/fresh/src/application/builders/define-page/tests/surface.test.ts",
@@ -3571,61 +3571,61 @@
       "path": "packages/fresh/src/application/builders/define-partial.test.tsx",
       "durationMs": 52,
       "tests": 7,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/fresh/src/application/defer/DeferIsland.test.ts",
       "durationMs": 38,
       "tests": 9,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/application/defer/Deferred.test.tsx",
       "durationMs": 8,
       "tests": 5,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/fresh/src/application/form/components/form.test.tsx",
       "durationMs": 6,
       "tests": 9,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/fresh/src/application/form/control-props-element-assignability_test.tsx",
       "durationMs": 0,
       "tests": 1,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/fresh/src/application/form/runtime/tests/collection.test.ts",
       "durationMs": 20,
       "tests": 4,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/fresh/src/application/form/runtime/tests/intent.test.ts",
       "durationMs": 2,
       "tests": 6,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/fresh/src/application/form/runtime/tests/reply.test.ts",
       "durationMs": 2,
       "tests": 9,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/application/form/runtime/tests/runtime-state.test.ts",
       "durationMs": 17,
       "tests": 4,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/fresh/src/application/form/schema-adapter/schema-adapter-standard.test.ts",
       "durationMs": 6,
       "tests": 4,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/application/form/schema-adapter/schema-adapter.test.ts",
@@ -3637,19 +3637,19 @@
       "path": "packages/fresh/src/application/form/validation/csrf.test.ts",
       "durationMs": 16,
       "tests": 4,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/application/form/validation/error-normalization.test.ts",
       "durationMs": 2,
       "tests": 3,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/fresh/src/application/query/cache-invalidation/mod.test.ts",
       "durationMs": 15,
       "tests": 2,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/fresh/src/application/query/hydration-script.test.tsx",
@@ -3661,7 +3661,7 @@
       "path": "packages/fresh/src/application/query/initial-data.test.tsx",
       "durationMs": 71,
       "tests": 1,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/fresh/src/application/query/mutation-lifecycle.test.ts",
@@ -3673,61 +3673,61 @@
       "path": "packages/fresh/src/application/query/query-options.test.ts",
       "durationMs": 20,
       "tests": 4,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/fresh/src/application/route/contract.test.ts",
       "durationMs": 22,
       "tests": 11,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/application/route/manifest-page-module.test.ts",
       "durationMs": 5,
       "tests": 12,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/fresh/src/application/route/manifest.test.ts",
       "durationMs": 107,
       "tests": 10,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/application/vite/vite.test.ts",
       "durationMs": 460,
       "tests": 11,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/diagnostics/error/classify_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/fresh/src/diagnostics/error/extract_test.ts",
       "durationMs": 43,
       "tests": 2,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/internal/package-telemetry/telemetry_test.ts",
       "durationMs": 41,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts",
       "durationMs": 168,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/fresh/src/runtime/ai/create-chat-connection_test.ts",
       "durationMs": 276,
       "tests": 19,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/fresh/src/runtime/ai/mcp-app-call-handler_test.ts",
@@ -3739,73 +3739,73 @@
       "path": "packages/fresh/src/runtime/ai/mcp-sandbox-handler_test.ts",
       "durationMs": 53,
       "tests": 7,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/fresh/src/runtime/ai/sandbox_exports_test.ts",
       "durationMs": 137,
       "tests": 1,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/fresh/src/runtime/ai/stream-proxy_test.ts",
       "durationMs": 66,
       "tests": 9,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/runtime/desktop/bind-desktop-rpc-window_test.ts",
       "durationMs": 117,
       "tests": 9,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/fresh/src/runtime/navigation/coordinator_test.ts",
       "durationMs": 75,
       "tests": 7,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/fresh/src/runtime/navigation/keyed-partial_test.tsx",
       "durationMs": 1,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/fresh/src/runtime/server/define-fresh-app.test.ts",
       "durationMs": 1640,
       "tests": 11,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/fresh/src/runtime/server/query-cache-invalidation.test.ts",
       "durationMs": 33,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/runtime/server/sse_test.ts",
       "durationMs": 18,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/runtime/server/stream_test.ts",
       "durationMs": 17,
       "tests": 2,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
       "durationMs": 2635,
       "tests": 5,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/runtime/streams/create-stream-event-source_test.ts",
       "durationMs": 31,
       "tests": 1,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts",
@@ -3829,43 +3829,43 @@
       "path": "packages/fresh/tests/package-manifest_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/fresh/tests/query-hydration-roundtrip_test.tsx",
       "durationMs": 196,
       "tests": 14,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/fresh/tests/query-hydration-version-compat_test.ts",
       "durationMs": 5359,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/fresh/tests/query-hydration_test.ts",
       "durationMs": 90,
       "tests": 3,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/kv/tests/_fixtures/docs-examples_test.ts",
       "durationMs": 11,
       "tests": 3,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/kv/tests/auto-detect_test.ts",
       "durationMs": 5,
       "tests": 2,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/kv/tests/bridge_test.ts",
       "durationMs": 112,
       "tests": 46,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/kv/tests/keys_test.ts",
@@ -3883,31 +3883,31 @@
       "path": "packages/kv/tests/lazy-kv_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/kv/tests/memory.adapter_test.ts",
       "durationMs": 140,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/kv/tests/redis-internals_test.ts",
       "durationMs": 202,
       "tests": 9,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/kv/tests/redis.adapter_test.ts",
       "durationMs": 1230,
       "tests": 5,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/kv/tests/shared_test.ts",
       "durationMs": 128,
       "tests": 1,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/logger/tests/_fixtures/docs-examples_test.ts",
@@ -3919,13 +3919,13 @@
       "path": "packages/logger/tests/config_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/logger/tests/creators_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/logger/tests/middleware_test.ts",
@@ -3943,43 +3943,43 @@
       "path": "packages/mcp/tests/aspire-ps-dashboard-reader_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/mcp/tests/canonical-identity_test.ts",
       "durationMs": 1,
       "tests": 5,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/command_adapters_test.ts",
       "durationMs": 525,
       "tests": 5,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/command_composition_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/mcp/tests/command_flows_test.ts",
       "durationMs": 1,
       "tests": 4,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/mcp/tests/description-ladder_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/mcp/tests/docs-source-policy_test.ts",
       "durationMs": 20,
       "tests": 2,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/mcp/tests/docs_test.ts",
@@ -3991,13 +3991,13 @@
       "path": "packages/mcp/tests/doctor-families_test.ts",
       "durationMs": 46,
       "tests": 4,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/doctor_test.ts",
       "durationMs": 132,
       "tests": 7,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/drift-evidence_test.ts",
@@ -4009,7 +4009,7 @@
       "path": "packages/mcp/tests/embedded-export-surface-corpus_test.ts",
       "durationMs": 123,
       "tests": 2,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/mcp/tests/export-surface-flows_test.ts",
@@ -4021,25 +4021,25 @@
       "path": "packages/mcp/tests/export-surface-mirror-free_test.ts",
       "durationMs": 866,
       "tests": 1,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/mcp/tests/guidance-contract_test.ts",
       "durationMs": 5,
       "tests": 4,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/guidance-corpus-load_test.ts",
       "durationMs": 21,
       "tests": 1,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/mcp/tests/guidance-evaluation_test.ts",
       "durationMs": 1317,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/mcp/tests/guidance-intent-regression_test.ts",
@@ -4051,19 +4051,19 @@
       "path": "packages/mcp/tests/guidance-retrieval_test.ts",
       "durationMs": 171,
       "tests": 7,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/mcp/tests/guidance-terms_test.ts",
       "durationMs": 41,
       "tests": 8,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/mcp/tests/openapi-read-tools_test.ts",
       "durationMs": 1604,
       "tests": 6,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/operation-index_test.ts",
@@ -4075,31 +4075,31 @@
       "path": "packages/mcp/tests/registry_test.ts",
       "durationMs": 57,
       "tests": 6,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/mcp/tests/release-embedded-docs-corpus_test.ts",
       "durationMs": 755,
       "tests": 4,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/mcp/tests/schema-views_test.ts",
       "durationMs": 18,
       "tests": 3,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/service-endpoint-directory_test.ts",
       "durationMs": 62,
       "tests": 9,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/mcp/tests/service-endpoint-sources_test.ts",
       "durationMs": 55,
       "tests": 9,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/mcp/tests/stdio_test.ts",
@@ -4111,31 +4111,31 @@
       "path": "packages/mcp/tests/telemetry-aggregation_test.ts",
       "durationMs": 6,
       "tests": 6,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/telemetry-endpoint_test.ts",
       "durationMs": 3,
       "tests": 3,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/telemetry-flows_test.ts",
       "durationMs": 3,
       "tests": 3,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/mcp/tests/telemetry-live-fixture_test.ts",
       "durationMs": 66,
       "tests": 2,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/mcp/tests/truncation_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/plugin-ai-core/src/contracts/v1/base-error-adapter_test.ts",
@@ -4147,7 +4147,7 @@
       "path": "packages/plugin-ai-core/tests/contracts/ai-contract-soundness_test.ts",
       "durationMs": 12,
       "tests": 3,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/plugin-auth-core/src/adapters/auth-service-authenticator.http_test.ts",
@@ -4159,49 +4159,49 @@
       "path": "packages/plugin-auth-core/src/adapters/auth-service-authenticator_test.ts",
       "durationMs": 30,
       "tests": 3,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/plugin-auth-core/src/adapters/bearer-credential_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/plugin-auth-core/src/config/config_test.ts",
       "durationMs": 18,
       "tests": 2,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/plugin-auth-core/src/contracts/v1/auth.contract_test.ts",
       "durationMs": 5,
       "tests": 6,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/plugin-auth-core/src/contracts/v1/base-error-adapter_test.ts",
       "durationMs": 7,
       "tests": 1,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/plugin-auth-core/src/domain/domain_test.ts",
       "durationMs": 3,
       "tests": 1,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/plugin-auth-core/src/ports/ports_test.ts",
       "durationMs": 60,
       "tests": 8,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/plugin-auth-core/src/presets/presets_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/plugin-auth-core/src/sdk/bearer-contribution_test.ts",
@@ -4213,7 +4213,7 @@
       "path": "packages/plugin-auth-core/src/streams/streams_test.ts",
       "durationMs": 167,
       "tests": 3,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/plugin-auth-core/src/telemetry/telemetry_test.ts",
@@ -4225,37 +4225,37 @@
       "path": "packages/plugin-auth-core/src/testing/testing_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/plugin-auth-core/tests/contracts/auth-contract-soundness_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/plugin-sagas-core/src/stores/kv-saga-store_test.ts",
       "durationMs": 31,
       "tests": 7,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/plugin-sagas-core/src/stores/prisma-saga-store_integration_test.ts",
       "durationMs": 15,
       "tests": 7,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/plugin-sagas-core/src/stores/prisma-saga-store_test.ts",
       "durationMs": 6,
       "tests": 6,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/plugin-sagas-core/src/stores/saga-store-backend_test.ts",
       "durationMs": 7,
       "tests": 5,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/plugin-sagas-core/tests/command-sink_test.ts",
@@ -4267,97 +4267,97 @@
       "path": "packages/plugin-sagas-core/tests/contracts/sagas-contract-soundness_test.ts",
       "durationMs": 3,
       "tests": 1,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/plugin-sagas-core/tests/integration/publisher/publish-saga-or-throw_test.ts",
       "durationMs": 2,
       "tests": 3,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/plugin-sagas-core/tests/prisma-transition-postgres_test.ts",
       "durationMs": 0,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/plugin-sagas-core/tests/prisma-transition-store_test.ts",
       "durationMs": 40,
       "tests": 1,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/plugin-sagas-core/tests/runtime/checkout-saga-contract_test.ts",
       "durationMs": 67,
       "tests": 4,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/plugin-sagas-core/tests/runtime/create-saga-runtime_test.ts",
       "durationMs": 32,
       "tests": 2,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/plugin-sagas-core/tests/runtime/saga-concurrency_test.ts",
       "durationMs": 117,
       "tests": 3,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/plugin-sagas-core/tests/runtime/saga-engine_applied_keys_test.ts",
       "durationMs": 44,
       "tests": 5,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/plugin-sagas-core/tests/runtime/saga-idempotency_test.ts",
       "durationMs": 25,
       "tests": 5,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/plugin-sagas-core/tests/runtime/saga-runtime_applied_keys_test.ts",
       "durationMs": 13,
       "tests": 1,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/plugin-sagas-core/tests/runtime/saga-scheduler_test.ts",
       "durationMs": 56,
       "tests": 1,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/plugin-sagas-core/tests/runtime/saga-store_test.ts",
       "durationMs": 21,
       "tests": 6,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/plugin-sagas-core/tests/runtime/start-sagas_test.ts",
       "durationMs": 25,
       "tests": 1,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/plugin-sagas-core/tests/saga-relay-cohort_test.ts",
       "durationMs": 0,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/plugin-sagas-core/tests/saga-transition-commit_test.ts",
       "durationMs": 23,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/plugin-sagas-core/tests/saga-worker-producer_test.ts",
       "durationMs": 86,
       "tests": 3,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/plugin-sagas-core/tests/stores/kv-saga-runtime-stores_test.ts",
@@ -4375,25 +4375,25 @@
       "path": "packages/plugin-sagas-core/tests/telemetry/instrumentation_test.ts",
       "durationMs": 22,
       "tests": 2,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/plugin-sagas-core/tests/telemetry/otel-saga-telemetry_test.ts",
       "durationMs": 26,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/plugin-sagas-core/tests/telemetry/saga-cascade-spans_test.ts",
       "durationMs": 114,
       "tests": 12,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/plugin-sagas-core/tests/telemetry/saga-engine-spans_test.ts",
       "durationMs": 73,
       "tests": 5,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/plugin-sagas-core/tests/testing/testing-helpers_test.ts",
@@ -4405,19 +4405,19 @@
       "path": "packages/plugin-sagas-core/tests/worker-effects_test.ts",
       "durationMs": 72,
       "tests": 3,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/plugin-streams-core/tests/adapters/durable-stream-producer-transport_test.ts",
       "durationMs": 75,
       "tests": 3,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/plugin-streams-core/tests/application/create-service-stream-producer_test.ts",
       "durationMs": 41,
       "tests": 2,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/plugin-streams-core/tests/application/durable-stream-producer-contract_behavior_test.ts",
@@ -4429,13 +4429,13 @@
       "path": "packages/plugin-streams-core/tests/application/durable-stream-producer-reconnect_behavior_test.ts",
       "durationMs": 570,
       "tests": 4,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/plugin-streams-core/tests/application/durable-stream-producer_test.ts",
       "durationMs": 60,
       "tests": 3,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/plugin-streams-core/tests/application/stream-sse-v1_test.ts",
@@ -4447,49 +4447,49 @@
       "path": "packages/plugin-streams-core/tests/application/stream-url-resolver_test.ts",
       "durationMs": 40,
       "tests": 5,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/plugin-streams-core/tests/command-sink_test.ts",
       "durationMs": 51,
       "tests": 3,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/plugin-streams-core/tests/telemetry/durable-stream-producer-telemetry_test.ts",
       "durationMs": 100,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/plugin-streams-core/tests/telemetry/instrumentation_test.ts",
       "durationMs": 25,
       "tests": 3,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/plugin-streams-core/tests/testing/memory-stream-producer_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/plugin-triggers-core/src/adapters/cron-trigger-scheduler-adapter_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/plugin-triggers-core/src/builders/enqueue-job-payload-contract_test.ts",
       "durationMs": 12,
       "tests": 1,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/plugin-triggers-core/src/builders/trigger-definition-fields_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/plugin-triggers-core/src/runtime/compute-next-fire-times_test.ts",
@@ -4501,61 +4501,61 @@
       "path": "packages/plugin-triggers-core/src/runtime/create-event-subscription_test.ts",
       "durationMs": 18,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/plugin-triggers-core/src/runtime/create-manual-dispatcher_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/plugin-triggers-core/src/runtime/create-trigger-ingress_test.ts",
       "durationMs": 15,
       "tests": 3,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/plugin-triggers-core/src/runtime/create-webhook-test-delivery_test.ts",
       "durationMs": 13,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/plugin-triggers-core/src/runtime/trigger-processor_test.ts",
       "durationMs": 18,
       "tests": 5,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/plugin-triggers-core/src/stores/kv-trigger-defer-scheduler_test.ts",
       "durationMs": 11,
       "tests": 2,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/plugin-triggers-core/src/stores/kv-trigger-enabled-state-store_test.ts",
       "durationMs": 15,
       "tests": 2,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/plugin-triggers-core/src/stores/kv-trigger-runtime-stores_test.ts",
       "durationMs": 6,
       "tests": 3,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/plugin-triggers-core/src/telemetry/instrumentation_test.ts",
       "durationMs": 2,
       "tests": 5,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/plugin-triggers-core/src/testing/testing_test.ts",
       "durationMs": 38,
       "tests": 5,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/plugin-triggers-core/tests/contracts/triggers-contract-soundness_test.ts",
@@ -4567,19 +4567,19 @@
       "path": "packages/plugin-workers-core/src/stores/kv-worker-idempotency-store_test.ts",
       "durationMs": 78,
       "tests": 5,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/plugin-workers-core/tests/command-sink_test.ts",
       "durationMs": 44,
       "tests": 2,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/plugin-workers-core/tests/config/workers-config_test.ts",
       "durationMs": 10,
       "tests": 5,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/plugin-workers-core/tests/contracts/workers-contract-base-seam_test.ts",
@@ -4591,13 +4591,13 @@
       "path": "packages/plugin-workers-core/tests/contracts/workers-contract-soundness_test.ts",
       "durationMs": 5,
       "tests": 1,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/plugin-workers-core/tests/executor/argv-builder_test.ts",
       "durationMs": 50,
       "tests": 6,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/plugin-workers-core/tests/executor/deno-runtime-adapter_test.ts",
@@ -4609,13 +4609,13 @@
       "path": "packages/plugin-workers-core/tests/executor/multi-runtime-task-executor_test.ts",
       "durationMs": 38,
       "tests": 4,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts",
       "durationMs": 153,
       "tests": 7,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/plugin-workers-core/tests/runtime/job-dispatcher_test.ts",
@@ -4627,13 +4627,13 @@
       "path": "packages/plugin-workers-core/tests/runtime/job-payload-contract_test.ts",
       "durationMs": 136,
       "tests": 2,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/plugin-workers-core/tests/runtime/worker-idempotency_test.ts",
       "durationMs": 49,
       "tests": 3,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/plugin-workers-core/tests/state/execution-state_test.ts",
@@ -4651,7 +4651,7 @@
       "path": "packages/plugin-workers-core/tests/testing/memory-worker_test.ts",
       "durationMs": 22,
       "tests": 2,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/plugin/src/adapter/commands/install_test.ts",
@@ -4669,13 +4669,13 @@
       "path": "packages/plugin/src/adapter/item/item-scaffolder_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/plugin/src/adapter/item/substitute_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/plugin/src/adapter/runner/plugin-cli-runner_test.ts",
@@ -4693,49 +4693,49 @@
       "path": "packages/plugin/src/contract-base/domain/contract-mount_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/plugin/src/sdk/discovery/manifest-resolver_test.ts",
       "durationMs": 203,
       "tests": 1,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/plugin/src/sdk/runtime/plugin-service-context-factory_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/plugin/src/sdk/runtime/plugin-service-context-generated-consumer_test.ts",
       "durationMs": 590,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/plugin/src/service/presentation/create-plugin-service-rawroute_test.ts",
       "durationMs": 359,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/plugin/tests/_fixtures/readme-examples_test.ts",
       "durationMs": 38,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/plugin/tests/adapters/memory-file-system_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/plugin/tests/application/plugin-loader_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/plugin/tests/application/plugin-registry_test.ts",
@@ -4747,25 +4747,25 @@
       "path": "packages/plugin/tests/cli/argv_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/plugin/tests/cli/base-meta-commands_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/plugin/tests/cli/generated-project-registry_test.ts",
       "durationMs": 5,
       "tests": 2,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/plugin/tests/cli/plugin-cli_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/plugin/tests/config/sdk-client-contributions_test.ts",
@@ -4777,91 +4777,91 @@
       "path": "packages/plugin/tests/contract-base/base-contract_test.ts",
       "durationMs": 2,
       "tests": 2,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/plugin/tests/diagnostics/e2e-gate_test.ts",
       "durationMs": 10,
       "tests": 1,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/plugin/tests/diagnostics/probes_test.ts",
       "durationMs": 25,
       "tests": 7,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/plugin/tests/diagnostics/verify-plugin_test.ts",
       "durationMs": 1,
       "tests": 18,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/plugin/tests/domain/core-types_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/plugin/tests/domain/errors_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/plugin/tests/protocol/plugin-manifest_test.ts",
       "durationMs": 26,
       "tests": 10,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/plugin/tests/scaffold/scaffold-generators_test.ts",
       "durationMs": 5,
       "tests": 2,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/plugin/tests/sdk/walker-ports_test.ts",
       "durationMs": 69,
       "tests": 13,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/plugin/tests/sdk/watcher-cleanup_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/plugin/tests/service/create-plugin-service-auth_test.ts",
       "durationMs": 1329,
       "tests": 6,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/plugin/tests/service/create-plugin-service-soundness_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/plugin/tests/service/create-plugin-service_test.ts",
       "durationMs": 52,
       "tests": 3,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/plugin/tests/service/plugin-contract-binder_test.ts",
       "durationMs": 12,
       "tests": 1,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/prisma-adapter-mysql/tests/capabilities_test.ts",
       "durationMs": 2,
       "tests": 2,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/prisma-adapter-mysql/tests/connection_errors_test.ts",
@@ -4873,19 +4873,19 @@
       "path": "packages/prisma-adapter-mysql/tests/conversion_test.ts",
       "durationMs": 6,
       "tests": 3,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/prisma-adapter-mysql/tests/errors_test.ts",
       "durationMs": 2,
       "tests": 7,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/prisma-adapter-mysql/tests/surface_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/queue/tests/_fixtures/docs-examples_test.ts",
@@ -4897,7 +4897,7 @@
       "path": "packages/queue/tests/abort-cleanup_test.ts",
       "durationMs": 330,
       "tests": 3,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/queue/tests/dead-letter-store_test.ts",
@@ -4909,25 +4909,25 @@
       "path": "packages/queue/tests/envelope_test.ts",
       "durationMs": 7,
       "tests": 3,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/queue/tests/errors_test.ts",
       "durationMs": 18,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/queue/tests/fedify-adapter-dlq_test.ts",
       "durationMs": 18,
       "tests": 2,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/queue/tests/kv-polling-dlq_test.ts",
       "durationMs": 5,
       "tests": 1,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/queue/tests/memory-queue_test.ts",
@@ -4939,43 +4939,43 @@
       "path": "packages/queue/tests/options_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/queue/tests/postgres-adapter_test.ts",
       "durationMs": 60,
       "tests": 5,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/queue/tests/provider-dead-letter-store_test.ts",
       "durationMs": 3,
       "tests": 2,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/queue/tests/redis-adapter-dlq_test.ts",
       "durationMs": 16,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/queue/tests/typed-queue_test.ts",
       "durationMs": 268,
       "tests": 3,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/queue/tests/validation_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/runtime-config/tests/accessors_test.ts",
       "durationMs": 3,
       "tests": 3,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/runtime-config/tests/loader_test.ts",
@@ -4993,7 +4993,7 @@
       "path": "packages/sdk/src/cache/cache-provider_test.ts",
       "durationMs": 22,
       "tests": 1,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/sdk/src/query-client/key-bridge_test.ts",
@@ -5005,19 +5005,19 @@
       "path": "packages/sdk/tests/assertion-budget_test.ts",
       "durationMs": 33,
       "tests": 7,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/sdk/tests/auto-update/release-client_test.ts",
       "durationMs": 21,
       "tests": 4,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/sdk/tests/auto-update/start-auto-update_test.ts",
       "durationMs": 73,
       "tests": 8,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/sdk/tests/cache/cache-query-kv-limit_test.ts",
@@ -5035,13 +5035,13 @@
       "path": "packages/sdk/tests/cache/cache-telemetry_test.ts",
       "durationMs": 132,
       "tests": 21,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/sdk/tests/cache/cache-topology-contract_test.ts",
       "durationMs": 26,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/sdk/tests/client-contribution-cache-query_test.ts",
@@ -5053,7 +5053,7 @@
       "path": "packages/sdk/tests/client-contribution-observability_test.ts",
       "durationMs": 789,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/sdk/tests/client-contribution-private-surface_test.ts",
@@ -5065,31 +5065,31 @@
       "path": "packages/sdk/tests/client-contribution-validation_test.ts",
       "durationMs": 109,
       "tests": 20,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "packages/sdk/tests/desktop/bind-channel_test.ts",
       "durationMs": 13,
       "tests": 8,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/sdk/tests/desktop/desktop-rpc-client_test.ts",
       "durationMs": 56,
       "tests": 3,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/sdk/tests/discovery/env-ordering_test.ts",
       "durationMs": 17,
       "tests": 108,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "packages/sdk/tests/integration/client-contribution-adapter_test.ts",
       "durationMs": 70,
       "tests": 7,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/sdk/tests/integration/service-client-runtime_test.ts",
@@ -5107,43 +5107,43 @@
       "path": "packages/sdk/tests/locale-contribution_test.ts",
       "durationMs": 120,
       "tests": 6,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/sdk/tests/orpc-defined-error-narrowing_test.ts",
       "durationMs": 104,
       "tests": 3,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/sdk/tests/package-manifest_test.ts",
       "durationMs": 3,
       "tests": 1,
-      "shard": 3
+      "shard": 2
     },
     {
       "path": "packages/sdk/tests/procedure-meta-independence_test.ts",
       "durationMs": 764,
       "tests": 1,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/sdk/tests/query-client/kv-cache-persister_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/sdk/tests/query/define-services-browser-import_test.ts",
       "durationMs": 1832,
       "tests": 1,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/sdk/tests/query/query-factory_test.ts",
       "durationMs": 35,
       "tests": 6,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/sdk/tests/readme-doctest_test.ts",
@@ -5155,7 +5155,7 @@
       "path": "packages/sdk/tests/transport-policy_test.ts",
       "durationMs": 6,
       "tests": 4,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/service/tests/_fixtures/readme-examples_test.ts",
@@ -5167,49 +5167,49 @@
       "path": "packages/service/tests/auth/authenticators_test.ts",
       "durationMs": 59,
       "tests": 7,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/service/tests/auth/authorizer_test.ts",
       "durationMs": 1,
       "tests": 6,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/service/tests/auth/builder-auth_test.ts",
       "durationMs": 242,
       "tests": 9,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/service/tests/auth/contract-authorizer_test.ts",
       "durationMs": 7,
       "tests": 10,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "packages/service/tests/auth/define-service-auth_test.ts",
       "durationMs": 194,
       "tests": 2,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "packages/service/tests/auth/middleware_test.ts",
       "durationMs": 33,
       "tests": 15,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/service/tests/auth/service-auth-policy-soundness_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/service/tests/auth/service-auth-policy_test.ts",
       "durationMs": 2,
       "tests": 38,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/service/tests/body-limit_test.ts",
@@ -5221,13 +5221,13 @@
       "path": "packages/service/tests/commands-codec_test.ts",
       "durationMs": 767,
       "tests": 10,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/service/tests/commands-conformance_test.ts",
       "durationMs": 584,
       "tests": 14,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/service/tests/commands-consumer_test.ts",
@@ -5239,19 +5239,19 @@
       "path": "packages/service/tests/commands-executor-effects_test.ts",
       "durationMs": 62,
       "tests": 10,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/service/tests/commands-executor-identity_test.ts",
       "durationMs": 91,
       "tests": 5,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "packages/service/tests/commands-memory_test.ts",
       "durationMs": 36,
       "tests": 8,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/service/tests/commands-relay_test.ts",
@@ -5269,7 +5269,7 @@
       "path": "packages/service/tests/database-connectivity_test.ts",
       "durationMs": 1,
       "tests": 7,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/service/tests/define-service-middleware_test.ts",
@@ -5299,7 +5299,7 @@
       "path": "packages/service/tests/hono-tracing_test.ts",
       "durationMs": 49,
       "tests": 1,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/service/tests/legacy-abort_test.ts",
@@ -5317,37 +5317,37 @@
       "path": "packages/service/tests/rpc-debug-redaction_test.ts",
       "durationMs": 189,
       "tests": 1,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/service/tests/rpc-path_test.ts",
       "durationMs": 12,
       "tests": 2,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/service/tests/runtime-host_test.ts",
       "durationMs": 53,
       "tests": 3,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "packages/service/tests/runtime_test.ts",
       "durationMs": 140,
       "tests": 10,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/service/tests/service-builder_test.ts",
       "durationMs": 142,
       "tests": 10,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "packages/service/tests/shutdown-coordinator_test.ts",
       "durationMs": 35,
       "tests": 4,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/service/tests/tls-listener_test.ts",
@@ -5359,13 +5359,13 @@
       "path": "packages/service/tests/type-assignability_test.ts",
       "durationMs": 57,
       "tests": 2,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "packages/telemetry/tests/_fixtures/readme-examples_test.ts",
       "durationMs": 140,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/telemetry/tests/adapters/otel_ai_telemetry_test.ts",
@@ -5383,19 +5383,19 @@
       "path": "packages/telemetry/tests/application/fan-in-links_test.ts",
       "durationMs": 21,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/telemetry/tests/attributes/command_test.ts",
       "durationMs": 5,
       "tests": 3,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "packages/telemetry/tests/attributes/helpers_test.ts",
       "durationMs": 3,
       "tests": 8,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/telemetry/tests/commands/lifecycle_test.ts",
@@ -5407,13 +5407,13 @@
       "path": "packages/telemetry/tests/commands/native_test.ts",
       "durationMs": 102,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "packages/telemetry/tests/config/config_test.ts",
       "durationMs": 28,
       "tests": 2,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "packages/telemetry/tests/config/enabled_matrix_test.ts",
@@ -5431,25 +5431,25 @@
       "path": "packages/telemetry/tests/context/w3c_test.ts",
       "durationMs": 201,
       "tests": 5,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "packages/telemetry/tests/core/tracer_test.ts",
       "durationMs": 40,
       "tests": 1,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/telemetry/tests/hono/otel_middleware_test.ts",
       "durationMs": 243,
       "tests": 2,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/telemetry/tests/layering_test.ts",
       "durationMs": 17,
       "tests": 3,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "packages/telemetry/tests/orpc/plugin_test.ts",
@@ -5461,25 +5461,25 @@
       "path": "packages/telemetry/tests/query/aspire_query_test.ts",
       "durationMs": 68,
       "tests": 6,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/telemetry/tests/runtime/instrumentation-registry_test.ts",
       "durationMs": 5,
       "tests": 3,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "packages/telemetry/tests/runtime/provider-registration_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "packages/telemetry/tests/testing/in-memory-span-recorder_test.ts",
       "durationMs": 25,
       "tests": 3,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "packages/watchers/filters/dedup_test.ts",
@@ -5491,19 +5491,19 @@
       "path": "packages/watchers/filters/glob_test.ts",
       "durationMs": 1,
       "tests": 5,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "packages/watchers/filters/stability_test.ts",
       "durationMs": 220,
       "tests": 4,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "packages/watchers/tests/_fixtures/docs-examples_test.ts",
       "durationMs": 8,
       "tests": 4,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "packages/watchers/tests/file-watcher_test.ts",
@@ -5515,25 +5515,25 @@
       "path": "plugins/ai/src/adapter/resources/resources.test.ts",
       "durationMs": 2956,
       "tests": 13,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "plugins/ai/src/cli/ai-commands.test.ts",
       "durationMs": 200,
       "tests": 4,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "plugins/ai/src/cli/ai-registry-compiler.test.ts",
       "durationMs": 13,
       "tests": 9,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "plugins/ai/tests/adapter/doctor_test.ts",
       "durationMs": 13,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "plugins/ai/tests/adapter/no-samples-install_test.ts",
@@ -5563,73 +5563,73 @@
       "path": "plugins/auth/tests/public/manifest_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "plugins/auth/tests/scaffold/manifest_test.ts",
       "durationMs": 5,
       "tests": 2,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "plugins/auth/tests/services/auth-service_test.ts",
       "durationMs": 62,
       "tests": 8,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "plugins/auth/tests/services/auth-v1-context-types_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "plugins/auth/tests/services/import-surface_test.ts",
       "durationMs": 17,
       "tests": 2,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "plugins/auth/tests/services/kv-oauth-subject_test.ts",
       "durationMs": 53,
       "tests": 5,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "plugins/auth/tests/services/me-empty-input-http_test.ts",
       "durationMs": 124,
       "tests": 7,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "plugins/auth/tests/services/session-credentials-http_test.ts",
       "durationMs": 194,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "plugins/auth/tests/streams/factory-discovery_test.ts",
       "durationMs": 25,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "plugins/auth/tests/streams/streams_test.ts",
       "durationMs": 30,
       "tests": 4,
-      "shard": 2
+      "shard": 3
     },
     {
       "path": "plugins/sagas/services/src/database-client_test.ts",
       "durationMs": 2,
       "tests": 3,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "plugins/sagas/src/adapter/resources/resources.test.ts",
       "durationMs": 1,
       "tests": 7,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "plugins/sagas/src/runtime/create-durable-saga-runtime_test.ts",
@@ -5641,19 +5641,19 @@
       "path": "plugins/sagas/src/runtime/durable-saga-restart_test.ts",
       "durationMs": 17,
       "tests": 2,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "plugins/sagas/src/runtime/saga-instance-projection_redis_test.ts",
       "durationMs": 0,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "plugins/sagas/src/runtime/saga-supervisor_test.ts",
       "durationMs": 46,
       "tests": 1,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "plugins/sagas/streams/producer_transition_test.ts",
@@ -5665,67 +5665,67 @@
       "path": "plugins/sagas/tests/adapter/plugin-doctor_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "plugins/sagas/tests/aspire/sagas-contribution_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "plugins/sagas/tests/cli/add-dry-run_test.ts",
       "durationMs": 26,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "plugins/sagas/tests/cli/fluent-call-editor_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "plugins/sagas/tests/cli/local-runtime-backend_test.ts",
       "durationMs": 11,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "plugins/sagas/tests/cli/registry-generator-golden_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "plugins/sagas/tests/cli/sagas-cli_test.ts",
       "durationMs": 1,
       "tests": 3,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "plugins/sagas/tests/e2e/sagas-gates_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "plugins/sagas/tests/public/deprecated-default-port_test.ts",
       "durationMs": 17,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "plugins/sagas/tests/public/manifest_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "plugins/sagas/tests/runtime/project-registry-module_test.ts",
       "durationMs": 1,
       "tests": 4,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "plugins/sagas/tests/runtime/saga-publisher_test.ts",
@@ -5737,7 +5737,7 @@
       "path": "plugins/sagas/tests/runtime/saga-runner_test.ts",
       "durationMs": 21,
       "tests": 1,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "plugins/sagas/tests/runtime/storefront-checkout-flow_test.ts",
@@ -5749,19 +5749,19 @@
       "path": "plugins/sagas/tests/services/init_test.ts",
       "durationMs": 10,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "plugins/sagas/tests/services/publish-http-boundary_test.ts",
       "durationMs": 105,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "plugins/sagas/tests/services/publish-message_test.ts",
       "durationMs": 43,
       "tests": 3,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "plugins/sagas/tests/streams/factory-discovery_test.ts",
@@ -5773,73 +5773,73 @@
       "path": "plugins/sagas/tests/telemetry/otel-saga-tracer_test.ts",
       "durationMs": 33,
       "tests": 2,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "plugins/sagas/tests/telemetry/publish-trace-linkage_test.ts",
       "durationMs": 17,
       "tests": 2,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "plugins/streams/services/src/durability_test.ts",
       "durationMs": 0,
       "tests": 2,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "plugins/streams/services/src/main_test.ts",
       "durationMs": 40,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "plugins/streams/services/src/proxy_test.ts",
       "durationMs": 414,
       "tests": 3,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "plugins/streams/services/src/sse-contract_conformance_test.ts",
       "durationMs": 110,
       "tests": 1,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "plugins/streams/services/src/tests/bounded-file-store_test.ts",
       "durationMs": 250,
       "tests": 4,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "plugins/streams/services/src/tests/bounded-segment-log_test.ts",
       "durationMs": 96,
       "tests": 6,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "plugins/streams/services/src/tests/storage-rss_test.ts",
       "durationMs": 8634,
       "tests": 1,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "plugins/streams/src/adapter/resources/resources.test.ts",
       "durationMs": 5016,
       "tests": 7,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "plugins/streams/tests/aspire/streams-contribution_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "plugins/streams/tests/cli/add-dry-run_test.ts",
       "durationMs": 47,
       "tests": 3,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "plugins/streams/tests/cli/streams-cli_test.ts",
@@ -5851,37 +5851,37 @@
       "path": "plugins/streams/tests/docs/native-event-source-example_test.ts",
       "durationMs": 145,
       "tests": 1,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "plugins/streams/tests/e2e/producer-reconnect_test.ts",
       "durationMs": 75,
       "tests": 2,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "plugins/streams/tests/e2e/streams-gates_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "plugins/streams/tests/public/manifest_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "plugins/streams/tests/public/stream-api_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "plugins/streams/tests/service/durable-stream-producer-idempotency_test.ts",
       "durationMs": 47,
       "tests": 1,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "plugins/streams/tests/service/proxy-headers_test.ts",
@@ -5893,7 +5893,7 @@
       "path": "plugins/triggers/services/src/main_test.ts",
       "durationMs": 505,
       "tests": 14,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "plugins/triggers/src/adapter/resources/resources.test.ts",
@@ -5905,37 +5905,37 @@
       "path": "plugins/triggers/src/runtime/project-trigger-registry_test.ts",
       "durationMs": 56,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "plugins/triggers/src/runtime/trigger-runtime-parenting_test.ts",
       "durationMs": 11,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "plugins/triggers/src/runtime/trigger-runtime-processor_test.ts",
       "durationMs": 32,
       "tests": 3,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "plugins/triggers/tests/aspire/aspire_test.ts",
       "durationMs": 6,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "plugins/triggers/tests/cli/add-dry-run_test.ts",
       "durationMs": 153,
       "tests": 3,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "plugins/triggers/tests/cli/cli_test.ts",
       "durationMs": 2,
       "tests": 4,
-      "shard": 5
+      "shard": 3
     },
     {
       "path": "plugins/triggers/tests/cli/http-triggers-service_test.ts",
@@ -5947,73 +5947,73 @@
       "path": "plugins/triggers/tests/cli/local-runtime-backend_test.ts",
       "durationMs": 763,
       "tests": 3,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "plugins/triggers/tests/cli/trigger-registry-compiler-golden_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 6
+      "shard": 4
     },
     {
       "path": "plugins/triggers/tests/e2e/e2e-gates_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "plugins/triggers/tests/e2e/webhooks-health_test.ts",
       "durationMs": 0,
       "tests": 2,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "plugins/triggers/tests/e2e/webhooks-ingress_test.ts",
       "durationMs": 0,
       "tests": 5,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "plugins/triggers/tests/e2e/webhooks-security_test.ts",
       "durationMs": 0,
       "tests": 5,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "plugins/triggers/tests/public/deprecated-default-port_test.ts",
       "durationMs": 31,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "plugins/triggers/tests/public/manifest_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "plugins/triggers/tests/streams/factory-discovery_test.ts",
       "durationMs": 74,
       "tests": 1,
-      "shard": 4
+      "shard": 5
     },
     {
       "path": "plugins/workers/jobs/health-check_test.ts",
       "durationMs": 57,
       "tests": 1,
-      "shard": 4
+      "shard": 3
     },
     {
       "path": "plugins/workers/jobs/job-tools_test.ts",
       "durationMs": 101,
       "tests": 1,
-      "shard": 3
+      "shard": 4
     },
     {
       "path": "plugins/workers/services/src/describe-route_test.ts",
       "durationMs": 46,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "plugins/workers/services/src/generated-jobs_test.ts",
@@ -6025,55 +6025,55 @@
       "path": "plugins/workers/services/src/init_test.ts",
       "durationMs": 31,
       "tests": 3,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "plugins/workers/services/src/routers/health-soundness_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 2
+      "shard": 4
     },
     {
       "path": "plugins/workers/services/src/trigger-path-id_test.ts",
       "durationMs": 81,
       "tests": 3,
-      "shard": 6
+      "shard": 5
     },
     {
       "path": "plugins/workers/src/adapter/resources/resources.test.ts",
       "durationMs": 129,
       "tests": 7,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "plugins/workers/tests/adapter/plugin-doctor_test.ts",
       "durationMs": 2,
       "tests": 3,
-      "shard": 3
+      "shard": 6
     },
     {
       "path": "plugins/workers/tests/aspire/workers-contribution_test.ts",
       "durationMs": 2,
       "tests": 1,
-      "shard": 4
+      "shard": 2
     },
     {
       "path": "plugins/workers/tests/cli/add-dry-run_test.ts",
       "durationMs": 139,
       "tests": 3,
-      "shard": 2
+      "shard": 5
     },
     {
       "path": "plugins/workers/tests/cli/local-runtime-backend_test.ts",
       "durationMs": 114,
       "tests": 4,
-      "shard": 2
+      "shard": 6
     },
     {
       "path": "plugins/workers/tests/cli/registry-compiler-golden_test.ts",
       "durationMs": 3,
       "tests": 1,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "plugins/workers/tests/cli/runtime-registry-generator_test.ts",
@@ -6085,61 +6085,61 @@
       "path": "plugins/workers/tests/cli/workers-cli_test.ts",
       "durationMs": 20,
       "tests": 3,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "plugins/workers/tests/e2e/workers-gates_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 3
+      "shard": 5
     },
     {
       "path": "plugins/workers/tests/public/manifest_test.ts",
       "durationMs": 1,
       "tests": 1,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "plugins/workers/tests/runtime/background-stream-hook_test.ts",
       "durationMs": 21,
       "tests": 1,
-      "shard": 6
+      "shard": 3
     },
     {
       "path": "plugins/workers/tests/runtime/generated-jobs_test.ts",
       "durationMs": 355,
       "tests": 9,
-      "shard": 6
+      "shard": 2
     },
     {
       "path": "plugins/workers/tests/streams/factory-discovery_test.ts",
       "durationMs": 28,
       "tests": 1,
-      "shard": 5
+      "shard": 4
     },
     {
       "path": "plugins/workers/worker/job-dispatcher_test.ts",
       "durationMs": 1492,
       "tests": 20,
-      "shard": 5
+      "shard": 6
     },
     {
       "path": "plugins/workers/worker/job-execution_test.ts",
       "durationMs": 84,
       "tests": 3,
-      "shard": 4
+      "shard": 6
     },
     {
       "path": "plugins/workers/worker/worker-options_test.ts",
       "durationMs": 1,
       "tests": 2,
-      "shard": 5
+      "shard": 2
     },
     {
       "path": "skills/canonical-tree-references_test.ts",
       "durationMs": 18,
       "tests": 1,
-      "shard": 6
+      "shard": 5
     }
   ]
 }
