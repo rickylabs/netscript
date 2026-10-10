@@ -7,7 +7,7 @@ import { toFileUrl } from '@std/path/to-file-url';
 import { copyPluginSchemasToRootDb } from '../../../../kernel/adapters/plugin/db-integration.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
 import type { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
-import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
+import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
@@ -254,7 +254,8 @@ export async function installPlugin(
     dependencies.fs,
     dependencies.formatter,
   );
-  const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
+  const regenerateHelpers = dependencies.regenerateHelpers ??
+    regenerateAspireHelpersWithDependencies;
   const aspireFiles = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,

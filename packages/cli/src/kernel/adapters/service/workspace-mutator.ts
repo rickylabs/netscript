@@ -5,8 +5,10 @@
  */
 
 import { basename, join } from '@std/path';
+import { parseAppSettings } from '@netscript/aspire/config';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { type AspireSurfaceRenderOptions, renderAspireSurface } from './aspire-surface-renderer.ts';
+import { reconcileAppHostPackageDependencies } from '../aspire/apphost-package-dependencies.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace-writer.ts';
@@ -162,6 +164,40 @@ export async function regenerateAspireHelpers(
     if (!options.dryRun) await scaffolder.writeFile(path, file.content, true);
   }
   return written;
+}
+
+/**
+ * Regenerate helpers and maintain project-owned AppHost dependencies for mutation flows.
+ *
+ * Plugin, service and database commands own manifest reconciliation. Pure Aspire generation
+ * and inspection use the renderer without this authored-input write boundary.
+ */
+export async function regenerateAspireHelpersWithDependencies(
+  projectRoot: string,
+  fs: FileSystemPort,
+  scaffolder: ScaffolderPort,
+  templateAdapter: TemplatePort,
+  options: AspireSurfaceRenderOptions & {
+    readonly dryRun?: boolean;
+    readonly force?: boolean;
+  },
+): Promise<readonly string[]> {
+  // Keep the no-Aspire refusal before every write, including dependency reconciliation.
+  const written = await regenerateAspireHelpers(
+    projectRoot,
+    fs,
+    scaffolder,
+    templateAdapter,
+    options,
+  );
+  const { config } = await parseAppSettings(join(projectRoot, SCAFFOLD_FILES.APPSETTINGS));
+  const packageJson = await reconcileAppHostPackageDependencies(
+    fs,
+    join(projectRoot, SCAFFOLD_DIRS.ASPIRE_TS),
+    config.Databases,
+    { dryRun: options.dryRun },
+  );
+  return packageJson ? [...written, packageJson] : written;
 }
 
 async function hasLocalPackageWorkspace(

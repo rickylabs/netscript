@@ -1,3 +1,4 @@
+import { regenerateAspireHelpersWithDependencies } from '../../../kernel/adapters/service/workspace-mutator.ts';
 import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
 import { copy } from '@std/fs';
 import { dirname, join } from '@std/path';
@@ -377,6 +378,7 @@ export function createPublicCommandDependencies(
     authSessionHttp: new FetchAuthSessionHttp(),
     authRegenerateAspire: async (projectRoot) => {
       const result = await generateAspire({ projectRoot }, {
+        regenerateHelpers: regenerateAspireHelpersWithDependencies,
         formatter: generatedSourceFormatter,
         fs,
         scaffolder,

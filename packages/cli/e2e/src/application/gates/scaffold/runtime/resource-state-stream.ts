@@ -12,7 +12,7 @@ export interface ResourceUpdateSubscription {
     predicate: (update: ResourceUpdate) => boolean,
     ceilingMs: number,
   ): Promise<ResourceUpdate>;
-  close(): Promise<void>;
+  close(requireUnbrokenStream?: boolean): Promise<void>;
 }
 
 interface ResourceUpdateFollowerStatus {
@@ -35,12 +35,14 @@ export type StartResourceUpdateFollower = (command: Deno.Command) => ResourceUpd
  * Start reading Aspire's resource-scoped transition stream before returning the subscription.
  *
  * The positional resource argument is intentional: `--follow` then emits updates for exactly one
- * resource, so consumers never need cross-resource filtering.
+ * resource, so consumers never need cross-resource filtering. The observer receives every parsed
+ * update, including updates buffered while no waitFor predicate is active.
  */
 export async function watchResourceUpdates(
   appHost: string,
   resourceName: string,
   startFollower: StartResourceUpdateFollower = (command) => command.spawn(),
+  onUpdate: (update: ResourceUpdate) => void = () => {},
 ): Promise<ResourceUpdateSubscription> {
   if (appHost.length === 0) throw new Error('AppHost path is required for resource observation');
   if (resourceName.length === 0) throw new Error('resource name is required for observation');
@@ -63,7 +65,7 @@ export async function watchResourceUpdates(
       stderr: 'piped',
     }),
   );
-  const subscription = new BufferedResourceUpdateSubscription(resourceName, follower);
+  const subscription = new BufferedResourceUpdateSubscription(resourceName, follower, onUpdate);
   await subscription.ready();
   return subscription;
 }
@@ -97,6 +99,7 @@ export function parseResourceUpdateLine(
 
 class BufferedResourceUpdateSubscription implements ResourceUpdateSubscription {
   readonly #resourceName: string;
+  readonly #onUpdate: (update: ResourceUpdate) => void;
   readonly #follower: ResourceUpdateFollower;
   readonly #started = Promise.withResolvers<void>();
   readonly #status: Promise<ResourceUpdateFollowerStatus>;
@@ -111,7 +114,12 @@ class BufferedResourceUpdateSubscription implements ResourceUpdateSubscription {
   #waitActive = false;
   #closePromise: Promise<void> | undefined;
 
-  constructor(resourceName: string, follower: ResourceUpdateFollower) {
+  constructor(
+    resourceName: string,
+    follower: ResourceUpdateFollower,
+    onUpdate: (update: ResourceUpdate) => void,
+  ) {
+    this.#onUpdate = onUpdate;
     this.#resourceName = resourceName;
     this.#follower = follower;
     this.#status = follower.status.then((status) => {
@@ -177,9 +185,14 @@ class BufferedResourceUpdateSubscription implements ResourceUpdateSubscription {
     }
   }
 
-  close(): Promise<void> {
+  close(requireUnbrokenStream = false): Promise<void> {
     this.#closePromise ??= this.#close();
-    return this.#closePromise;
+    return this.#closePromise.then(() => {
+      if (requireUnbrokenStream && this.#terminalError) {
+        // Resource diagnostics can contain environment secrets; do not echo the raw failure.
+        throw new Error('Aspire resource follower ended before bounded observation completed');
+      }
+    });
   }
 
   async #close(): Promise<void> {
@@ -239,7 +252,9 @@ class BufferedResourceUpdateSubscription implements ResourceUpdateSubscription {
   }
 
   #acceptLine(rawLine: string): void {
-    this.#updates.push(parseResourceUpdateLine(rawLine, this.#resourceName));
+    const update = parseResourceUpdateLine(rawLine, this.#resourceName);
+    this.#onUpdate(update);
+    this.#updates.push(update);
     this.#notify();
   }
 

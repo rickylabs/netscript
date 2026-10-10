@@ -2,7 +2,7 @@ import { join } from '@std/path';
 
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
-import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
+import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { IoError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
@@ -63,7 +63,7 @@ export interface RemovePluginDependencies {
   /** Injected canonical formatter for shared Aspire outputs. */
   readonly formatter: GeneratedSourceFormatterPort;
   /** Optional regeneration override for contract tests. */
-  readonly regenerateHelpers?: typeof regenerateAspireHelpers;
+  readonly regenerateHelpers?: typeof regenerateAspireHelpersWithDependencies;
 }
 
 /** Remove a plugin from host configuration and dispatch the plugin remove verb. */
@@ -162,13 +162,14 @@ async function regenerateRemovalHelpers(
   if (!dependencies.scaffolder || !dependencies.templateAdapter) {
     throw new Error('Removal wiring regeneration dependencies are unavailable.');
   }
-  const helperFiles = await (dependencies.regenerateHelpers ?? regenerateAspireHelpers)(
-    projectRoot,
-    dependencies.fs,
-    dependencies.scaffolder,
-    dependencies.templateAdapter,
-    { formatter: dependencies.formatter },
-  );
+  const helperFiles =
+    await (dependencies.regenerateHelpers ?? regenerateAspireHelpersWithDependencies)(
+      projectRoot,
+      dependencies.fs,
+      dependencies.scaffolder,
+      dependencies.templateAdapter,
+      { formatter: dependencies.formatter },
+    );
   return helperFiles;
 }
 

@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertMatch } from '@std/assert';
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from '@std/path';
 import { walk } from '@std/fs';
+import { SCAFFOLD_VERSIONS } from '../../../../kernel/constants/scaffold/scaffold-versions.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../kernel/constants/scaffold/scaffold-app-catalog.ts';
 
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
@@ -329,5 +330,66 @@ await defineService(router, {
     assertEquals(await snapshot(root), before);
     assert(!Object.keys(before).some((path) => path.startsWith('/auth/')));
     assert(!('/apps/web/routes/auth/[action].ts' in before));
+  });
+});
+
+Deno.test('Postgres generation and inspection preserve authored AppHost dependencies; service generation repairs them', async () => {
+  await withProject(async (root) => {
+    const settingsPath = join(root, 'appsettings.json');
+    const settings = JSON.parse(await Deno.readTextFile(settingsPath));
+    settings.NetScript.Databases = {
+      main: { Engine: 'Postgres', Mode: 'Container', DatabaseName: 'main' },
+    };
+    const authoredSettings = '  ' + JSON.stringify(settings) + '\n\n';
+    await Deno.writeTextFile(settingsPath, authoredSettings);
+    const packagePath = join(root, 'aspire', 'package.json');
+    const authoredPackage = '  ' + JSON.stringify({
+      name: 'inspection-apphost',
+      dependencies: { 'vscode-jsonrpc': '8.2.0', 'left-pad': '1.3.0' },
+    }) + '\n\n';
+    await Deno.writeTextFile(packagePath, authoredPackage);
+    const generated = await command(root);
+    assertEquals(generated.code, 0, new TextDecoder().decode(generated.stderr));
+    assertEquals(await Deno.readTextFile(settingsPath), authoredSettings);
+    assertEquals(await Deno.readTextFile(packagePath), authoredPackage);
+    assert(
+      (await Deno.readTextFile(join(root, 'aspire/.helpers/register-infrastructure.mts'))).includes(
+        "withHealthCheck('main_auth')",
+      ),
+    );
+    const before = await snapshot(root);
+    assertEquals((await inspect(root)).status, 'current');
+    assertEquals(await snapshot(root), before);
+    const serviceGenerate = (...flags: string[]) =>
+      new Deno.Command(Deno.execPath(), {
+        args: [
+          'run',
+          '--no-lock',
+          '-A',
+          CLI,
+          'service',
+          'generate',
+          '--project-root',
+          root,
+          ...flags,
+        ],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+    const preview = await serviceGenerate('--dry-run');
+    assertEquals(preview.code, 0, new TextDecoder().decode(preview.stderr));
+    assertEquals(await snapshot(root), before);
+    const written = await serviceGenerate();
+    assertEquals(written.code, 0, new TextDecoder().decode(written.stderr));
+    assertEquals(JSON.parse(await Deno.readTextFile(packagePath)).dependencies, {
+      'vscode-jsonrpc': '8.2.0',
+      'left-pad': '1.3.0',
+      pg: SCAFFOLD_VERSIONS.APPHOST_PG,
+    });
+    assertEquals(await Deno.readTextFile(settingsPath), authoredSettings);
+    assertEquals((await inspect(root)).status, 'current');
+    const current = await snapshot(root);
+    assertEquals((await command(root)).code, 0);
+    assertEquals(await snapshot(root), current);
   });
 });

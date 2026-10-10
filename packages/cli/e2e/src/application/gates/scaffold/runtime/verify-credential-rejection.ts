@@ -1,0 +1,273 @@
+/**
+ * #1726 runtime proof: a wrong PostgreSQL password is reported as an auth-classified
+ * `Unhealthy` credential check while the listener stays Healthy, `aspire wait` times out with exit 17,
+ * and neither password appears in generated helpers, health evidence or MCP list_resources.
+ */
+
+import {
+  CREDENTIAL_FAULT_DEPENDENT_RESOURCE,
+  CREDENTIAL_FAULT_PROBE_RESOURCE,
+  CREDENTIAL_FAULT_STATE_FILE,
+  type CredentialFaultState,
+  POSTGRES_AUTH_HEALTH_KEY,
+  TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY,
+} from './credential-fault-fixture.ts';
+import { RESOURCE_TRANSITION_FAILURE_CEILING_MS } from './listener-unreachable-fixture.ts';
+import { type ResourceUpdate, watchResourceUpdates } from './resource-state-stream.ts';
+import {
+  type ListenerHealthReport,
+  readListenerHealthReport,
+} from './verify-listener-readiness.ts';
+import {
+  assertGeneratedHelpersHaveNoSecrets,
+  assertHealthReportsHaveNoSecrets,
+  assertMcpResourcesHaveNoSecrets,
+  assertNoSecretBytes,
+} from './credential-secret-surfaces.ts';
+
+export { assertNoSecretBytes } from './credential-secret-surfaces.ts';
+
+const POSTGRES_RESOURCE = 'postgres';
+const POSTGRES_LISTENER_HEALTH_KEY = 'postgres_listener';
+/** Aspire 13.5.3 WaitTimeout: an Unhealthy resource remains Running, not Failed (exit 18). */
+export const ASPIRE_WAIT_TIMEOUT_EXIT_CODE = 17;
+/** Bounded `aspire wait` budget; the probe can never become Healthy, so this is the whole wait. */
+const BOUNDED_WAIT_SECONDS = 10;
+/** Test-failure ceiling for the bounded wait command itself, not an Aspire schedule. */
+const BOUNDED_WAIT_CEILING_MS = (BOUNDED_WAIT_SECONDS + 30) * 1_000;
+const AUTH_REJECTED_DESCRIPTION =
+  /^postgres credential check failed: auth 28P01 \(invalid_password\) at \S+:\d+ after \d+ ms$/u;
+
+/** Health evidence selected from one settled `aspire describe` snapshot. */
+export interface CredentialRejectionEvidence {
+  readonly rejected: ListenerHealthReport;
+  readonly listener: ListenerHealthReport;
+  readonly accepted: ListenerHealthReport;
+}
+
+/** Outcome of the bounded `aspire wait` against the probe. */
+export interface BoundedWaitResult {
+  readonly code: number;
+  readonly durationMs: number;
+  readonly output: string;
+}
+
+/**
+ * Require the wrong-credential report to be auth-classified, the real listener and credential
+ * checks to stay Healthy, and all health evidence to carry no credential bytes.
+ */
+export function assertCredentialRejectionEvidence(
+  rawSnapshot: string,
+  secrets: readonly string[],
+): CredentialRejectionEvidence {
+  const topology: unknown = JSON.parse(rawSnapshot);
+  assertHealthReportsHaveNoSecrets(topology, secrets);
+  const rejected = readListenerHealthReport(
+    topology,
+    CREDENTIAL_FAULT_PROBE_RESOURCE,
+    TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY,
+  );
+  if (rejected.status !== 'Unhealthy') {
+    throw new Error(`wrong-credential check is ${rejected.status}, expected Unhealthy`);
+  }
+  if (!AUTH_REJECTED_DESCRIPTION.test(rejected.description ?? '')) {
+    throw new Error(
+      `wrong-credential check is not auth-classified: ${JSON.stringify(rejected.description)}`,
+    );
+  }
+  const reportedClass = isRecord(rejected.data) ? rejected.data.class : undefined;
+  if (reportedClass !== undefined && reportedClass !== 'auth') {
+    throw new Error(`wrong-credential check data.class is ${JSON.stringify(reportedClass)}`);
+  }
+  const listener = readListenerHealthReport(
+    topology,
+    POSTGRES_RESOURCE,
+    POSTGRES_LISTENER_HEALTH_KEY,
+  );
+  const accepted = readListenerHealthReport(topology, POSTGRES_RESOURCE, POSTGRES_AUTH_HEALTH_KEY);
+  for (const report of [listener, accepted]) {
+    if (report.status !== 'Healthy') {
+      throw new Error(
+        `${report.resourceName} ${report.healthCheckKey} is ${report.status}; the fixture must ` +
+          'leave the real server reachable and its real credential accepted',
+      );
+    }
+  }
+  return { rejected, listener, accepted };
+}
+
+/** Require the coordinator-approved wait timeout, bounded, without leaking diagnostics. */
+export function assertBoundedWaitRejected(
+  result: BoundedWaitResult,
+  secrets: readonly string[],
+): void {
+  assertNoSecretBytes('aspire wait', result.output, secrets);
+  if (result.code !== ASPIRE_WAIT_TIMEOUT_EXIT_CODE) {
+    throw new Error(
+      `aspire wait ${CREDENTIAL_FAULT_PROBE_RESOURCE} exited ${result.code}, expected ` +
+        `${ASPIRE_WAIT_TIMEOUT_EXIT_CODE}`,
+    );
+  }
+  if (result.durationMs > BOUNDED_WAIT_CEILING_MS) {
+    throw new Error(
+      `aspire wait took ${result.durationMs}ms for a ${BOUNDED_WAIT_SECONDS}s budget`,
+    );
+  }
+}
+
+/** Reject even transient Healthy updates, including credentials in their health evidence. */
+export function assertCredentialResourceNotHealthy(
+  update: ResourceUpdate,
+  secrets: readonly string[],
+): void {
+  assertHealthReportsHaveNoSecrets(update.resource, secrets);
+  if (healthStatusOf(update) === 'healthy') {
+    throw new Error('wrong-credential probe or dependant reported Healthy during observation');
+  }
+}
+
+/** Observe rejection and keep both resource followers open through the bounded healthy wait. */
+export async function verifyCredentialRejection(
+  appHost: string,
+  projectRoot: string,
+): Promise<void> {
+  const secrets = await readFixtureSecrets(projectRoot);
+  let observationFailure: unknown;
+  const observedUpdates: Record<string, number> = {};
+  const observe = (name: string) => (update: ResourceUpdate): void => {
+    observedUpdates[name] = (observedUpdates[name] ?? 0) + 1;
+    try {
+      assertCredentialResourceNotHealthy(update, secrets);
+    } catch (error) {
+      observationFailure ??= error;
+    }
+  };
+  const subscriptions = [];
+  let evidence: CredentialRejectionEvidence;
+  let wait: BoundedWaitResult;
+  try {
+    const probe = await watchResourceUpdates(
+      appHost,
+      CREDENTIAL_FAULT_PROBE_RESOURCE,
+      undefined,
+      observe(CREDENTIAL_FAULT_PROBE_RESOURCE),
+    );
+    subscriptions.push(probe);
+    const dependent = await watchResourceUpdates(
+      appHost,
+      CREDENTIAL_FAULT_DEPENDENT_RESOURCE,
+      undefined,
+      observe(CREDENTIAL_FAULT_DEPENDENT_RESOURCE),
+    );
+    subscriptions.push(dependent);
+    await probe.waitFor(
+      (update) => healthStatusOf(update) === 'unhealthy',
+      RESOURCE_TRANSITION_FAILURE_CEILING_MS,
+    );
+    // Prove the blocked dependant exists; an empty stream cannot satisfy the observation.
+    await dependent.waitFor(() => true, RESOURCE_TRANSITION_FAILURE_CEILING_MS);
+    evidence = await describeRejectionEvidence(appHost, secrets);
+    await assertGeneratedHelpersHaveNoSecrets(projectRoot, secrets);
+    await assertMcpResourcesHaveNoSecrets(projectRoot, appHost, secrets);
+    wait = await runAspire([
+      'wait',
+      CREDENTIAL_FAULT_PROBE_RESOURCE,
+      '--status',
+      'healthy',
+      '--timeout',
+      String(BOUNDED_WAIT_SECONDS),
+      '--apphost',
+      appHost,
+    ], BOUNDED_WAIT_CEILING_MS);
+    assertBoundedWaitRejected(wait, secrets);
+    // Recheck classification and correct-password readiness after the complete wait.
+    evidence = await describeRejectionEvidence(appHost, secrets);
+  } finally {
+    await Promise.all(subscriptions.map((subscription) => subscription.close(true)));
+  }
+  if (observationFailure) throw observationFailure;
+
+  const receiptDir = `${projectRoot}/.netscript/e2e`;
+  const receiptPath = `${receiptDir}/credential-rejection-receipt.json`;
+  await Deno.mkdir(receiptDir, { recursive: true });
+  await Deno.writeTextFile(
+    receiptPath,
+    `${
+      JSON.stringify(
+        {
+          ...evidence,
+          boundedWait: { code: wait.code, durationMs: wait.durationMs },
+          observedUpdates,
+          neverHealthy: [CREDENTIAL_FAULT_PROBE_RESOURCE, CREDENTIAL_FAULT_DEPENDENT_RESOURCE],
+          scannedCredentials: secrets.length,
+          scannedSurfaces: [
+            'generated helpers',
+            'healthReports / healthChecks',
+            'MCP list_resources',
+          ],
+        },
+        null,
+        2,
+      )
+    }\n`,
+  );
+  console.info(`credential rejection receipt: ${receiptPath}`);
+}
+
+async function describeRejectionEvidence(
+  appHost: string,
+  secrets: readonly string[],
+): Promise<CredentialRejectionEvidence> {
+  const snapshot = await runAspire(['describe', '--apphost', appHost, '--format', 'Json']);
+  if (snapshot.code !== 0) {
+    assertNoSecretBytes('aspire describe', snapshot.output, secrets);
+    throw new Error(`aspire describe failed (${snapshot.code}): ${snapshot.output}`);
+  }
+  return assertCredentialRejectionEvidence(snapshot.stdout, secrets);
+}
+
+async function readFixtureSecrets(projectRoot: string): Promise<readonly string[]> {
+  const state = JSON.parse(
+    await Deno.readTextFile(`${projectRoot}/${CREDENTIAL_FAULT_STATE_FILE}`),
+  ) as CredentialFaultState;
+  const realPassword = (
+    await Deno.readTextFile(`${projectRoot}/.data/aspire-secrets/${POSTGRES_RESOURCE}.password`)
+  ).trim();
+  return [realPassword, state.wrongPassword];
+}
+
+function healthStatusOf(update: ResourceUpdate): string | undefined {
+  const value = update.resource.healthStatus;
+  return typeof value === 'string' ? value.toLowerCase() : undefined;
+}
+
+async function runAspire(
+  args: readonly string[],
+  ceilingMs?: number,
+): Promise<BoundedWaitResult & { readonly stdout: string }> {
+  const startedAt = performance.now();
+  const result = await new Deno.Command('aspire', {
+    args: [...args, '--non-interactive', '--nologo'],
+    signal: ceilingMs === undefined ? undefined : AbortSignal.timeout(ceilingMs),
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  const stdout = new TextDecoder().decode(result.stdout);
+  return {
+    code: result.code,
+    durationMs: Math.round(performance.now() - startedAt),
+    stdout,
+    output: `${stdout}${new TextDecoder().decode(result.stderr)}`,
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+if (import.meta.main) {
+  const [appHost, projectRoot] = Deno.args;
+  if (!appHost) throw new Error('AppHost path argument is required');
+  if (!projectRoot) throw new Error('project root argument is required');
+  await verifyCredentialRejection(appHost, projectRoot);
+}

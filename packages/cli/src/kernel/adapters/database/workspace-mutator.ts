@@ -11,9 +11,12 @@ import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { generateTsAspireConfig } from '../../templates/aspire/generate-aspire-config.ts';
-import { regenerateAspireHelpers } from '../service/workspace-mutator.ts';
-import type { DbEngineChoice } from '../../domain/db-engine.ts';
+import { regenerateAspireHelpersWithDependencies } from '../service/workspace-mutator.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
+import {
+  collectConfiguredDbEngines,
+  reconcileAppHostPackageDependencies,
+} from '../aspire/apphost-package-dependencies.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { DbEngine } from '../../domain/db-engine.ts';
@@ -184,6 +187,7 @@ export class DatabaseWorkspaceMutator {
       dbEngines: collectConfiguredDbEngines(config.Databases),
     });
     await this.fs.writeFile(join(aspireDir, SCAFFOLD_FILES.ASPIRE_CONFIG), aspireConfigContent);
+    await reconcileAppHostPackageDependencies(this.fs, aspireDir, config.Databases);
   }
 
   /** Regenerate TypeScript AppHost helper files from root `appsettings.json`. */
@@ -193,7 +197,7 @@ export class DatabaseWorkspaceMutator {
       return [];
     }
 
-    return await regenerateAspireHelpers(
+    return await regenerateAspireHelpersWithDependencies(
       projectRoot,
       this.fs,
       this.scaffolder,
@@ -231,32 +235,4 @@ function ensureRecord(parent: Record<string, unknown>, key: string): Record<stri
   const next: Record<string, unknown> = {};
   parent[key] = next;
   return next;
-}
-
-function collectConfiguredDbEngines(
-  databases: Record<string, { Engine?: string }>,
-): DbEngineChoice[] {
-  const engines = new Set<DbEngineChoice>();
-  for (const entry of Object.values(databases)) {
-    const engine = toDbEngineChoice(entry.Engine);
-    if (engine) {
-      engines.add(engine);
-    }
-  }
-  return [...engines];
-}
-
-function toDbEngineChoice(engine: string | undefined): DbEngineChoice | undefined {
-  switch (engine) {
-    case 'Postgres':
-      return 'postgres';
-    case 'Mysql':
-      return 'mysql';
-    case 'Mssql':
-      return 'mssql';
-    case 'Sqlite':
-      return 'sqlite';
-    default:
-      return undefined;
-  }
 }

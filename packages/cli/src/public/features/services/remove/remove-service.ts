@@ -3,7 +3,7 @@ import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/v
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import {
-  regenerateAspireHelpers,
+  regenerateAspireHelpersWithDependencies,
   removeServiceAppsettingsEntry,
   removeServiceWorkspaceMember,
 } from '../../../../kernel/adapters/service/workspace-mutator.ts';
@@ -28,7 +28,7 @@ export interface RemoveServiceDependencies {
   readonly scaffolder: ScaffolderPort;
   readonly templateAdapter: TemplatePort;
   readonly formatter: GeneratedSourceFormatterPort;
-  readonly regenerateHelpers?: typeof regenerateAspireHelpers;
+  readonly regenerateHelpers?: typeof regenerateAspireHelpersWithDependencies;
 }
 
 /** Result of removing a service workspace. */
@@ -89,7 +89,7 @@ export async function removeService(
     dependencies.fs,
     dependencies.formatter,
   );
-  const regenerate = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
+  const regenerate = dependencies.regenerateHelpers ?? regenerateAspireHelpersWithDependencies;
   const aspireFiles = await regenerate(
     request.projectRoot,
     dependencies.fs,

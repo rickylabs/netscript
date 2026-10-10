@@ -77,6 +77,45 @@ export interface RespPingCheckOptions {
   readonly port: number | string;
 }
 
+export interface PostgresCredentialReadinessCheckOptions {
+  /** The server's published endpoint; resolved per evaluation under the listener deadline. */
+  readonly endpoint: () => PromiseLike<ListenerEndpoint>;
+  /** The same value the server's secret password parameter carries; never reported. */
+  readonly password: string;
+  /** Login role; Aspire's PostgreSQL integration defaults it to `postgres`. */
+  readonly user?: string;
+}
+
+/** Why a credential check failed. Derived from codes only, never from server or driver text. */
+export type PostgresCredentialFailureClass =
+  | 'auth'
+  | 'database'
+  | 'starting'
+  | 'server'
+  | 'listener'
+  | 'timeout'
+  | 'client';
+
+interface PostgresClient {
+  connect(): Promise<unknown>;
+  query(text: string): Promise<unknown>;
+  end(): Promise<unknown>;
+  on(event: 'error', listener: (error: Error) => void): unknown;
+}
+
+type PostgresClientConstructor = new (config: Readonly<Record<string, unknown>>) => PostgresClient;
+
+type PostgresCredentialFailure = Readonly<{
+  failureClass: PostgresCredentialFailureClass;
+  code: string;
+  name?: string;
+}>;
+
+type ResolvedListenerEndpoint = Readonly<{
+  host: string;
+  port: number | string;
+}>;
+
 type ListenerFailureData = Readonly<{
   code: string;
   host: string;
@@ -182,6 +221,22 @@ const ENDPOINT_ALLOCATION_TIMEOUT = 'ENDPOINT_ALLOCATION_TIMEOUT';
 const RESP_PING_COMMAND = '*1\r\n$4\r\nPING\r\n';
 const RESP_REPLY_LIMIT_BYTES = 256;
 const RESP_DIAGNOSTIC_LIMIT_BYTES = 64;
+// Bare specifier kept out of the static graph: only AppHosts with a container PostgreSQL
+// database declare `pg` in package.json, and only their health checks ever load it.
+const POSTGRES_CLIENT_MODULE = 'pg';
+const POSTGRES_DEFAULT_USER = 'postgres';
+const POSTGRES_CREDENTIAL_TIMEOUT_MS = 2_000;
+const POSTGRES_CREDENTIAL_TIMEOUT = 'POSTGRES_CREDENTIAL_TIMEOUT';
+const POSTGRES_CREDENTIAL_QUERY = 'SELECT 1';
+const POSTGRES_SQLSTATES: Readonly<Record<string, Omit<PostgresCredentialFailure, 'code'>>> = {
+  '28P01': { failureClass: 'auth', name: 'invalid_password' },
+  '28000': { failureClass: 'auth', name: 'invalid_authorization_specification' },
+  '3D000': { failureClass: 'database', name: 'invalid_catalog_name' },
+  '57P03': { failureClass: 'starting', name: 'cannot_connect_now' },
+  '53300': { failureClass: 'server', name: 'too_many_connections' },
+};
+
+let postgresClientConstructor: Promise<PostgresClientConstructor> | undefined;
 
 // ============================================================================
 // Listener readiness
@@ -193,13 +248,9 @@ export function createEndpointListenerReadinessCheck(
 ): () => Promise<HealthCheckResult> {
   return async () => {
     const startedAt = performance.now();
-    let resolved: { readonly host: string; readonly port: number | string };
+    let resolved: ResolvedListenerEndpoint;
     try {
-      const endpoint = Promise.resolve().then(options.endpoint).then(async (reference) => {
-        const [host, port] = await Promise.all([reference.host(), reference.port()]);
-        return { host, port };
-      });
-      resolved = await withTimeout(endpoint, LISTENER_READINESS_TIMEOUT_MS);
+      resolved = await resolveListenerEndpoint(options.endpoint);
     } catch (error) {
       return endpointAllocationFailure(options.kind, startedAt, error);
     }
@@ -305,6 +356,140 @@ export function createRespPingCheck(
     });
 }
 
+// ============================================================================
+// PostgreSQL credential readiness
+// ============================================================================
+
+/**
+ * Creates a bounded credential check: one authenticated `SELECT 1` against the server's
+ * published endpoint. A listener can accept the socket while the server still rejects the
+ * login, so this check — not the listener check — decides whether consumers can connect.
+ * The result is classified from SQLSTATE and socket codes only: the password, the role and
+ * any server- or driver-supplied text never reach `healthReports`.
+ */
+export function createPostgresCredentialReadinessCheck(
+  options: PostgresCredentialReadinessCheckOptions,
+): () => Promise<HealthCheckResult> {
+  return async () => {
+    const startedAt = performance.now();
+    let target: ResolvedListenerEndpoint;
+    try {
+      target = await resolveListenerEndpoint(options.endpoint);
+    } catch {
+      return postgresCredentialFailure(
+        { failureClass: 'listener', code: 'ENDPOINT_UNALLOCATED' },
+        undefined,
+        startedAt,
+      );
+    }
+    const port = normalizeListenerPort(target.port);
+    let Client: PostgresClientConstructor;
+    try {
+      Client = await loadPostgresClient();
+    } catch {
+      return postgresCredentialFailure(
+        { failureClass: 'client', code: 'PG_CLIENT_UNAVAILABLE' },
+        { host: target.host, port },
+        startedAt,
+      );
+    }
+    return await probePostgresCredentials(Client, { host: target.host, port }, options, startedAt);
+  };
+}
+
+async function probePostgresCredentials(
+  Client: PostgresClientConstructor,
+  target: Readonly<{ host: string; port: number }>,
+  options: PostgresCredentialReadinessCheckOptions,
+  startedAt: number,
+): Promise<HealthCheckResult> {
+  const client = new Client({
+    host: target.host,
+    port: target.port,
+    user: options.user ?? POSTGRES_DEFAULT_USER,
+    password: options.password,
+    connectionTimeoutMillis: POSTGRES_CREDENTIAL_TIMEOUT_MS,
+    query_timeout: POSTGRES_CREDENTIAL_TIMEOUT_MS,
+  });
+  // A socket error after this evaluation settles must not become an unhandled AppHost crash.
+  client.on('error', () => undefined);
+  const login = client.connect().then(() => client.query(POSTGRES_CREDENTIAL_QUERY));
+  // The race below observes the rejection; this handler keeps a login that loses the race quiet.
+  login.catch(() => undefined);
+  try {
+    await withTimeout(login, POSTGRES_CREDENTIAL_TIMEOUT_MS, POSTGRES_CREDENTIAL_TIMEOUT);
+    return {
+      status: HealthStatus.Healthy,
+      description: `postgres credentials accepted on ${target.host}:${target.port}`,
+    };
+  } catch (error) {
+    return postgresCredentialFailure(classifyPostgresError(error), target, startedAt);
+  } finally {
+    Promise.resolve().then(() => client.end()).catch(() => undefined);
+  }
+}
+
+function loadPostgresClient(): Promise<PostgresClientConstructor> {
+  postgresClientConstructor ??= import(POSTGRES_CLIENT_MODULE).then(postgresClientFromModule);
+  return postgresClientConstructor.catch((error: unknown) => {
+    // Do not pin a failed load: installing `pg` heals the next evaluation without a restart.
+    postgresClientConstructor = undefined;
+    throw error;
+  });
+}
+
+function postgresClientFromModule(module: unknown): PostgresClientConstructor {
+  const named = isObjectRecord(module) ? module.Client : undefined;
+  const fallback = isObjectRecord(module) && isObjectRecord(module.default)
+    ? module.default.Client
+    : undefined;
+  const Client = named ?? fallback;
+  if (typeof Client !== 'function') {
+    throw new Error(`${POSTGRES_CLIENT_MODULE} does not export a Client constructor`);
+  }
+  return Client as PostgresClientConstructor;
+}
+
+function classifyPostgresError(error: unknown): PostgresCredentialFailure {
+  if (!(error instanceof Error)) return { failureClass: 'server', code: 'EPROTO' };
+  if (error.message === POSTGRES_CREDENTIAL_TIMEOUT) {
+    return { failureClass: 'timeout', code: 'ETIMEDOUT' };
+  }
+  const code = Reflect.get(error, 'code');
+  // node-postgres marks server ErrorResponse messages with a severity; socket errors carry none.
+  if (typeof Reflect.get(error, 'severity') === 'string' && typeof code === 'string') {
+    const known = POSTGRES_SQLSTATES[code];
+    if (known) return { ...known, code };
+    return { failureClass: code.startsWith('28') ? 'auth' : 'server', code };
+  }
+  if (typeof code === 'string') return { failureClass: 'listener', code };
+  // node-postgres reports its own connect/query deadlines and early closes without a code.
+  return /timeout/i.test(error.message)
+    ? { failureClass: 'timeout', code: 'ETIMEDOUT' }
+    : { failureClass: 'server', code: 'ECONNCLOSED' };
+}
+
+function postgresCredentialFailure(
+  failure: PostgresCredentialFailure,
+  target: Readonly<{ host: string; port: number }> | undefined,
+  startedAt: number,
+): HealthCheckResult {
+  const host = target?.host ?? '<unallocated>';
+  const port = target ? String(target.port) : '<unallocated>';
+  const elapsedMs = String(Math.round(performance.now() - startedAt));
+  const reason = failure.name ? `${failure.code} (${failure.name})` : failure.code;
+  return {
+    status: HealthStatus.Unhealthy,
+    description:
+      `postgres credential check failed: ${failure.failureClass} ${reason} at ${host}:${port} after ${elapsedMs} ms`,
+    data: { class: failure.failureClass, code: failure.code, host, port, elapsedMs },
+  };
+}
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return (typeof value === 'object' || typeof value === 'function') && value !== null;
+}
+
 function appendRespBytes(
   current: Uint8Array<ArrayBufferLike>,
   chunk: Uint8Array<ArrayBufferLike>,
@@ -362,14 +547,29 @@ function endpointAllocationFailure(
   };
 }
 
-async function withTimeout<T>(operation: Promise<T>, timeoutMs: number): Promise<T> {
+/** Resolves an Aspire endpoint's host and port under the listener deadline. */
+async function resolveListenerEndpoint(
+  endpoint: () => PromiseLike<ListenerEndpoint>,
+): Promise<ResolvedListenerEndpoint> {
+  const resolved = Promise.resolve().then(endpoint).then(async (reference) => {
+    const [host, port] = await Promise.all([reference.host(), reference.port()]);
+    return { host, port };
+  });
+  return await withTimeout(resolved, LISTENER_READINESS_TIMEOUT_MS);
+}
+
+async function withTimeout<T>(
+  operation: Promise<T>,
+  timeoutMs: number,
+  timeoutCode: string = ENDPOINT_ALLOCATION_TIMEOUT,
+): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
       operation,
       new Promise<never>((_resolve, reject) => {
         timer = setTimeout(
-          () => reject(new Error(ENDPOINT_ALLOCATION_TIMEOUT)),
+          () => reject(new Error(timeoutCode)),
           timeoutMs,
         );
       }),

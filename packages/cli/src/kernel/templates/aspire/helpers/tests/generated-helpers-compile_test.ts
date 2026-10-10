@@ -125,6 +125,16 @@ export function createEndpointListenerReadinessCheck(
 ): () => Promise<{ status: string }> {
   return () => Promise.resolve({ status: 'Healthy' });
 }
+
+export function createPostgresCredentialReadinessCheck(
+  _options: {
+    endpoint: () => PromiseLike<{ host(): Promise<string>; port(): Promise<number> }>;
+    password: string;
+    user?: string;
+  },
+): () => Promise<{ status: string }> {
+  return () => Promise.resolve({ status: 'Healthy' });
+}
 `;
 
 Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contract', async () => {
@@ -145,6 +155,7 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
       },
     });
     assertStringIncludes(registerInfrastructure, 'databases.set("main", db_0)');
+    assertStringIncludes(registerInfrastructure, 'withHealthCheck("main_auth")');
     assert(
       !registerInfrastructure.includes('connectionStringExpression()'),
       'compile-clean Container emission must not call an unsupported runtime capability',
