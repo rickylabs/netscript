@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { discoverTests, type ShardManifest, validateManifest } from './ci-test-shards.ts';
+import { gateArgv } from '../../.llm/tools/gates/catalog.ts';
 
 const ROOT = new URL('../../', import.meta.url);
 
@@ -17,6 +18,26 @@ function job(source: string, name: string): string {
   assert(block, `missing job ${name}`);
   return block;
 }
+
+Deno.test('regression: required quality freezes the production graph before workspace install', async () => {
+  const block = job(await workflow(), 'quality');
+  const production = block.match(
+    /\s{6}- name: Frozen production dependency install\n([\s\S]*?)(?=\s{6}- name:)/,
+  )?.[1];
+  assert(production, 'required PR quality must reject production lock drift');
+  assertStringIncludes(production, "if: env.RUN_DENO == 'true'");
+  assertStringIncludes(production, '.llm/tools/gates/run-gate.ts --gate prod-install');
+  assertStringIncludes(production, '--output .llm/tmp/gate-receipts/quality/prod-install.json');
+  assertEquals(gateArgv('prod-install'), ['deno', 'task', 'deps:prod-install']);
+  assertEquals(production.includes('continue-on-error'), false);
+  assert(
+    block.indexOf('name: Frozen production dependency install') <
+      block.indexOf('name: Install workspace dependencies'),
+    'a mutable install must not repair the lock before the frozen gate checks it',
+  );
+  assertStringIncludes(block, 'github.event.pull_request.draft == false');
+  assertStringIncludes(block, "needs.classify.result != 'success'");
+});
 
 Deno.test('runtime assignment covers the complete current root suite exactly once', async () => {
   const manifest: ShardManifest = JSON.parse(

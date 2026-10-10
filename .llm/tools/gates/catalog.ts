@@ -68,6 +68,7 @@ export const GATE_CATALOG = {
   ],
   'doc-lint': ['deno', 'task', 'doc:lint'],
   'quality-gate': ['deno', 'task', 'quality:gate'],
+  'prod-install': ['deno', 'task', 'deps:prod-install'],
   test: ['deno', 'task', 'test'],
   'test-shard': [
     'deno',
