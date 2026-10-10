@@ -19,6 +19,8 @@ export interface WorkersResourceInput {
 
 /** Input accepted by the workers job resource. */
 export interface JobInput extends WorkersResourceInput {
+  /** Select the outbound delivery recipe instead of the starter job. */
+  readonly template?: 'webhook-delivery';
   /** Optional stream topic emitted by the job. */
   readonly topic?: string;
   /** Optional cron schedule for the job. */
@@ -64,8 +66,19 @@ export function exportStem(id: string): string {
 /** Parse job resource input from adapter CLI args. */
 export function parseJobInput(args: PluginCliArgs): JobInput {
   const id = requiredResourceId(args);
+  const template = stringFlag(args, 'template');
+  if (template !== undefined && template !== 'webhook-delivery') {
+    throw new TypeError(`Unsupported workers job template: ${template}`);
+  }
+  if (
+    template === 'webhook-delivery' && numberFlag(args, 'max-retries') !== undefined &&
+    numberFlag(args, 'max-retries') !== 0
+  ) {
+    throw new TypeError('The webhook-delivery handler owns retries; --max-retries must be 0.');
+  }
   return {
     id,
+    template,
     topic: stringFlag(args, 'topic'),
     schedule: stringFlag(args, 'schedule'),
     timeoutMs: numberFlag(args, 'timeout'),

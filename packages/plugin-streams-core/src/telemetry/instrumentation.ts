@@ -146,6 +146,17 @@ export class StreamsInstrumentation {
     this.#metrics = new StreamProducerMetrics(options.meter);
   }
 
+  /** Start a CLIENT span for one whole-stream administrative request. */
+  startAdminSpan(streamPath: string, operation: 'head' | 'delete'): StreamsSpanPort {
+    return this.#tracer.startSpan(
+      operation === 'head' ? StreamSpanNames.HEAD : StreamSpanNames.DELETE,
+      {
+        kind: SpanKind.CLIENT,
+        attributes: streamAttributes({ streamPath, operation }),
+      },
+    );
+  }
+
   /** Start a publish span whose context and lifetime survive reconnect. */
   startPublish(
     input: Readonly<{

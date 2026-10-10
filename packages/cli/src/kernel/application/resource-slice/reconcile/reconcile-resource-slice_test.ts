@@ -5,7 +5,7 @@ import {
   type ResourceSlicePreflightPhase,
   type ResourceSliceStagingResult,
   sha256ResourceSliceBody,
-} from './resource-slice-contract.ts';
+} from '../resource-slice-contract.ts';
 import { classifyResourceSliceLeaf, reconcileResourceSlice } from './reconcile-resource-slice.ts';
 
 async function leaf(

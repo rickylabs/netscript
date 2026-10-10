@@ -64,6 +64,17 @@ const summaries: Readonly<Record<ToolName, string>> = {
     'Get one operation request, response, and error schema before constructing a curl request.',
 };
 
+const policies: Partial<
+  Record<ToolName, Pick<ToolDefinition, 'description' | 'truncation' | 'envelopeCheck'>>
+> = {
+  get_doc: {
+    description:
+      'Get faithful documentation: verbatim under budget, deterministic extract otherwise; full: true and nextCursor deliver exact pages. Reports contractVersion 2 and mode.',
+    truncation: 'exempt',
+    envelopeCheck: true,
+  },
+};
+
 /** Build the immutable enumerable v1 tool registry. */
 export function createToolRegistry(
   flows: Partial<Record<ToolName, ToolFlow>> = {},
@@ -75,6 +86,7 @@ export function createToolRegistry(
       description: `${
         summaries[name]
       } Returns a bounded summary; do not print raw output to the user.`,
+      ...policies[name],
       inputSchema: TOOL_INPUT_SCHEMAS[name],
       outputSchema: TOOL_OUTPUT_SCHEMAS[name],
       flow: flows[name] ?? createPlannedFlow(name),

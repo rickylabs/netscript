@@ -1,5 +1,5 @@
 import type { ExecutionStatus, TriggerType } from '../domain/constants.ts';
-import type { JobPayloadSchema, JobResult as DomainJobResult } from '../domain/mod.ts';
+import type { JobPayloadSchema, JobResult } from '../domain/mod.ts';
 import type { TaskExecutor } from '../abstracts/task-executor.ts';
 import type { MultiRuntimeTaskExecutorOptions } from '../executor/mod.ts';
 import type { RegistryJobStoragePort } from '../registry/mod.ts';
@@ -17,7 +17,7 @@ export type TaskId<TId extends string = string> = TId & { readonly __brand: 'Tas
 export type WorkflowId<TId extends string = string> = TId & { readonly __brand: 'WorkflowId' };
 
 /** Result returned by runtime job handlers. */
-export type JobResult<TResult = unknown> = DomainJobResult<TResult>;
+export type { JobResult } from '../domain/job-result.ts';
 
 /** Context supplied to runtime job handlers. */
 export type JobContext<TPayload = unknown, TResult = unknown> = Readonly<{

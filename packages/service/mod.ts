@@ -32,6 +32,7 @@
  *
  * const service = await defineService(router, {
  *   name: 'users',
+ *   auth: { public: true, reason: 'Public example service' },
  *   port: 3000,
  * });
  *

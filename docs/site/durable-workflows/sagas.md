@@ -308,7 +308,7 @@ parallel processing.
 {{ comp.apiTable({
   caption: "createParallelQueue(name, options) — ParallelQueueOptions (extends QueueOptions)",
   rows: [
-    { name: "concurrency", type: "number (default 1)", desc: "Number of concurrent processors. Must be >= 1; values > 1 wrap the queue for parallel listening. Use for I/O-bound work; for CPU-bound work prefer web-worker tasks." },
+    { name: "concurrency", type: "number (default 1)", desc: "Number of concurrent processors. Must be >= 1; values > 1 wrap the queue for parallel listening. Use for I/O-bound work; for CPU-bound work use a subprocess task executor." },
     { name: "provider", type: "QueueProvider ('deno-kv' | 'redis' | 'rabbitmq' | 'postgres')", desc: "Backing queue provider. Omit to auto-discover from the Aspire environment." },
     { name: "autoDiscover", type: "boolean (default true)", desc: "Discover a queue service from Aspire. Priority RabbitMQ > Redis > Deno KV." },
     { name: "retryAttempts", type: "number (default 3)", desc: "Max retry attempts for failed messages, when the backend lacks native retry." },
