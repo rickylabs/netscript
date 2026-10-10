@@ -38,7 +38,13 @@ export function createAgentCommand(
       "init",
       createInitAgentCommand({
         projectRoot: host.cwd,
-        init: (input) => initAgent(input, { fs, aspireAgentInitializer, docsGenerator }),
+        init: (input) =>
+          initAgent(input, {
+            fs,
+            aspireAgentInitializer,
+            docsGenerator,
+            environment: Deno.env.toObject(),
+          }),
       }),
     )
     .command(
