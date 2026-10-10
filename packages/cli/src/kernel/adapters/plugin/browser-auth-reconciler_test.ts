@@ -177,3 +177,23 @@ for (
     assertEquals(await fs.readFile(path), custom);
   });
 }
+
+Deno.test('browser auth preserves the scaffold public opt-out when auth is disabled', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const root = '/workspace';
+  const path = join(root, 'services/users/src/main.ts');
+  const config = {
+    ...settings,
+    NetScript: {
+      ...settings.NetScript,
+      Plugins: { auth: { ...settings.NetScript.Plugins.auth, Enabled: false } },
+    },
+  };
+  const publicMain = `await defineService(router, { ${serviceAuthTemplate('users').authPolicy} });`;
+  await fs.writeFile(join(root, 'appsettings.json'), JSON.stringify(config));
+  await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
+  await fs.writeFile(path, publicMain);
+  assertEquals(await reconcileBrowserAuth(root, fs), []);
+  assertEquals(await fs.readFile(path), publicMain);
+  assertEquals(await fs.exists(join(root, 'auth/service.ts')), false);
+});

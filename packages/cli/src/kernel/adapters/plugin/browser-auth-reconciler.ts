@@ -13,7 +13,7 @@ interface BrowserAuthEntry {
 }
 interface BrowserAuthSettings {
   NetScript?: {
-    Plugins?: Record<string, { PackageSpecifier?: string }>;
+    Plugins?: Record<string, { PackageSpecifier?: string; Enabled?: boolean }>;
     Apps?: Record<string, BrowserAuthEntry>;
     Services?: Record<string, BrowserAuthEntry>;
   };
@@ -61,7 +61,8 @@ export async function reconcileBrowserAuth(
   ) as BrowserAuthSettings;
   const config = settings.NetScript;
   const auth = Object.entries(config?.Plugins ?? {}).find(([name, entry]) =>
-    name === 'auth' || entry.PackageSpecifier === '@netscript/plugin-auth'
+    entry.Enabled !== false &&
+    (name === 'auth' || entry.PackageSpecifier === '@netscript/plugin-auth')
   );
   if (!auth || !config) return [];
   const authServiceName = JSON.stringify(auth[0]);
