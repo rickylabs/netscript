@@ -42,9 +42,9 @@ export const LOCAL_CONTEXT_JSON = `[
 ]`;
 
 /**
- * Recorded `docker inspect` output (trimmed to the fields read) for two Aspire-provisioned
- * containers: the AppHost's database, published on loopback as DCP does, and a container from an
- * unrelated AppHost on the same daemon.
+ * Recorded `docker inspect` output (trimmed to the fields read) for two AppHosts on one daemon
+ * that both declare a `main-db` resource: this AppHost's instance `main-db-xkcdabcd`, published on
+ * loopback as DCP does, and another AppHost's `main-db-qwertyui` from a different creator.
  */
 export const ASPIRE_CONTAINERS_INSPECT_JSON = `[
     {
@@ -69,7 +69,7 @@ export const ASPIRE_CONTAINERS_INSPECT_JSON = `[
     },
     {
         "Id": "9b2d7c41",
-        "Name": "/other-cache-qwertyui",
+        "Name": "/main-db-qwertyui",
         "Config": {
             "Labels": {
                 "com.microsoft.developer.usvc-dev.creatorProcessId": "5151"
@@ -77,7 +77,7 @@ export const ASPIRE_CONTAINERS_INSPECT_JSON = `[
         },
         "NetworkSettings": {
             "Ports": {
-                "6379/tcp": [
+                "5432/tcp": [
                     {
                         "HostIp": "127.0.0.1",
                         "HostPort": "55002"
@@ -87,3 +87,9 @@ export const ASPIRE_CONTAINERS_INSPECT_JSON = `[
         }
     }
 ]`;
+
+/** Recorded `aspire describe` resource fields for this AppHost (shape of the 13.5.3 fixture). */
+export const THIS_APPHOST_DB_INSTANCE = 'main-db-xkcdabcd';
+
+/** Instance name of the same-named database owned by another AppHost on the daemon. */
+export const OTHER_APPHOST_DB_INSTANCE = 'main-db-qwertyui';

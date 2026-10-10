@@ -1,6 +1,7 @@
 import {
   classifyDockerEndpoint,
   type DockerEndpoint,
+  type DockerEndpointSource,
   type DockerTopologyInspector,
   type PublishedBinding,
   type PublishedBindingsObservation,
@@ -20,8 +21,9 @@ export interface DockerCliTopologyInspectorOptions {
 }
 
 /**
- * Docker CLI-backed topology observation, using the same endpoint resolution the AppHost's
- * Docker client uses: `DOCKER_HOST` first, then the active context.
+ * Docker CLI-backed topology observation. The endpoint follows Docker's own precedence
+ * (`DOCKER_CONTEXT`, then `DOCKER_HOST`, then the current context), and binding reads pin the
+ * resolved context so classification and bindings describe the same daemon.
  */
 export class DockerCliTopologyInspector implements DockerTopologyInspector {
   private readonly readEnv: (name: string) => string | undefined;
@@ -35,32 +37,30 @@ export class DockerCliTopologyInspector implements DockerTopologyInspector {
     this.timeoutMs = options.timeoutMs ?? DOCKER_TIMEOUT_MS;
   }
 
-  /** Classify `DOCKER_HOST`, or the active context's endpoint when it is unset. */
+  /** Classify the endpoint the Docker CLI would use for this environment. */
   async inspectEndpoint(): Promise<DockerEndpoint> {
+    let dockerContext: string | undefined;
     let dockerHost: string | undefined;
     try {
+      dockerContext = this.readEnv('DOCKER_CONTEXT')?.trim();
       dockerHost = this.readEnv('DOCKER_HOST')?.trim();
     } catch (error) {
-      return unknownEndpoint(`DOCKER_HOST could not be read: ${errorMessage(error)}`);
+      return unknownEndpoint(`Docker environment could not be read: ${errorMessage(error)}`);
     }
+    if (dockerContext) return await this.inspectContext(dockerContext, 'DOCKER_CONTEXT');
     if (dockerHost) return classifyDockerEndpoint(dockerHost, 'DOCKER_HOST');
-
-    const result = await this.docker(['context', 'inspect']);
-    if (typeof result === 'string') return unknownEndpoint(result);
-    try {
-      return classifyDockerEndpoint(readContextHost(JSON.parse(result.stdout)), 'docker-context');
-    } catch (error) {
-      return unknownEndpoint(
-        `docker context inspect returned unreadable JSON: ${errorMessage(error)}`,
-      );
-    }
+    return await this.inspectContext(undefined, 'docker-context');
   }
 
-  /** Read published ports of Aspire-labelled containers named after the given resources. */
+  /** Read published ports of exactly the named Aspire containers on the endpoint's daemon. */
   async inspectPublishedBindings(
-    resourceNames: readonly string[],
+    endpoint: DockerEndpoint,
+    containers: readonly string[],
   ): Promise<PublishedBindingsObservation> {
-    const listed = await this.docker([
+    if (containers.length === 0) return { status: 'observed', bindings: [] };
+    const target = endpoint.context ? ['--context', endpoint.context] : [];
+    const listed = await this.docker('docker ps', [
+      ...target,
       'ps',
       '--filter',
       `label=${ASPIRE_CONTAINER_LABEL}`,
@@ -69,26 +69,47 @@ export class DockerCliTopologyInspector implements DockerTopologyInspector {
     ]);
     if (typeof listed === 'string') return { status: 'unavailable', reason: listed };
     const ids = listed.stdout.split(/\r?\n/).map((id) => id.trim()).filter(Boolean);
-    if (ids.length === 0) return { status: 'observed', bindings: [] };
+    if (ids.length === 0) return missingContainers(containers);
 
-    const inspected = await this.docker(['inspect', ...ids]);
+    const inspected = await this.docker('docker inspect', [...target, 'inspect', ...ids]);
     if (typeof inspected === 'string') return { status: 'unavailable', reason: inspected };
+    let document: unknown;
     try {
-      return {
-        status: 'observed',
-        bindings: readPublishedBindings(JSON.parse(inspected.stdout), resourceNames),
-      };
+      document = JSON.parse(inspected.stdout);
     } catch (error) {
       return {
         status: 'unavailable',
         reason: `docker inspect returned unreadable JSON: ${errorMessage(error)}`,
       };
     }
+    return readPublishedBindings(document, containers);
+  }
+
+  private async inspectContext(
+    name: string | undefined,
+    source: DockerEndpointSource,
+  ): Promise<DockerEndpoint> {
+    const result = await this.docker('docker context inspect', [
+      'context',
+      'inspect',
+      ...(name ? [name] : []),
+    ]);
+    if (typeof result === 'string') return unknownEndpoint(result);
+    try {
+      const context = readContext(JSON.parse(result.stdout));
+      return classifyDockerEndpoint(context.host, source, context.name ?? name);
+    } catch (error) {
+      return unknownEndpoint(
+        `docker context inspect returned unreadable JSON: ${errorMessage(error)}`,
+      );
+    }
   }
 
   /** Run one Docker CLI command; a string result is the reason it produced no usable output. */
-  private async docker(args: readonly string[]): Promise<ProcessResult | string> {
-    const command = `docker ${args[0]}${args[1] && !args[1].startsWith('-') ? ` ${args[1]}` : ''}`;
+  private async docker(
+    command: string,
+    args: readonly string[],
+  ): Promise<ProcessResult | string> {
     let result: ProcessResult;
     try {
       result = await this.process.exec('docker', args, { timeoutMs: this.timeoutMs });
@@ -108,44 +129,81 @@ export class DockerCliTopologyInspector implements DockerTopologyInspector {
   }
 }
 
-/** Read `Endpoints.docker.Host` from `docker context inspect` output (an array of one context). */
-export function readContextHost(document: unknown): string | undefined {
+/** Read the name and `Endpoints.docker.Host` of the one context `docker context inspect` prints. */
+export function readContext(
+  document: unknown,
+): { readonly name?: string; readonly host?: string } {
   const context = Array.isArray(document) ? document[0] : document;
-  const endpoints = readRecord(context, 'Endpoints');
-  const docker = readRecord(endpoints, 'docker');
-  const host = docker ? Reflect.get(docker, 'Host') : undefined;
-  return typeof host === 'string' ? host : undefined;
+  const docker = readRecord(readRecord(context, 'Endpoints'), 'docker');
+  return { name: readString(context, 'Name'), host: readString(docker, 'Host') };
 }
 
 /**
- * Flatten `docker inspect` `NetworkSettings.Ports` for containers whose name is a resource name
- * or DCP's `<resource>-<suffix>` instance name.
+ * Flatten `docker inspect` `NetworkSettings.Ports` for exactly the named containers.
+ *
+ * Containers are matched by their full name only, so a same-named resource of another AppHost
+ * (a different instance suffix) is never evidence. A missing container, a record without a port
+ * map, or a binding without a host address or port makes the whole observation unavailable.
+ * Ports mapped to `null` are exposed but unpublished and carry no host traffic.
  */
 export function readPublishedBindings(
   document: unknown,
-  resourceNames: readonly string[],
-): readonly PublishedBinding[] {
-  if (!Array.isArray(document)) throw new Error('docker inspect JSON was not an array');
-  return document.flatMap((row): PublishedBinding[] => {
-    const rawName = row && typeof row === 'object' ? Reflect.get(row, 'Name') : undefined;
-    if (typeof rawName !== 'string') return [];
-    const container = rawName.replace(/^\//, '');
-    if (!resourceNames.some((name) => container === name || container.startsWith(`${name}-`))) {
-      return [];
+  containers: readonly string[],
+): PublishedBindingsObservation {
+  if (!Array.isArray(document)) {
+    return { status: 'unavailable', reason: 'docker inspect JSON was not an array.' };
+  }
+  const wanted = new Set(containers);
+  const rows = new Map<string, unknown>();
+  for (const row of document) {
+    const name = readString(row, 'Name')?.replace(/^\//, '');
+    if (name === undefined) {
+      return {
+        status: 'unavailable',
+        reason: 'docker inspect returned a container without a name.',
+      };
     }
+    if (wanted.has(name)) rows.set(name, row);
+  }
+  const absent = containers.filter((name) => !rows.has(name));
+  if (absent.length > 0) return missingContainers(absent);
+
+  const bindings: PublishedBinding[] = [];
+  for (const [container, row] of rows) {
     const ports = readRecord(readRecord(row, 'NetworkSettings'), 'Ports');
-    if (!ports) return [];
-    return Object.entries(ports).flatMap(([containerPort, hostBindings]) =>
-      Array.isArray(hostBindings)
-        ? hostBindings.flatMap((binding): PublishedBinding[] => {
-          const hostPort = readString(binding, 'HostPort');
-          return hostPort
-            ? [{ container, containerPort, hostIp: readString(binding, 'HostIp') ?? '', hostPort }]
-            : [];
-        })
-        : []
-    );
-  });
+    if (!ports) return incomplete(container, 'has no NetworkSettings.Ports map');
+    for (const [containerPort, hostBindings] of Object.entries(ports)) {
+      if (hostBindings === null) continue;
+      if (!Array.isArray(hostBindings)) {
+        return incomplete(container, `reports ${containerPort} with an unreadable binding list`);
+      }
+      for (const binding of hostBindings) {
+        const hostIp = readString(binding, 'HostIp')?.trim();
+        const hostPort = readString(binding, 'HostPort')?.trim();
+        if (!hostIp || !hostPort) {
+          return incomplete(
+            container,
+            `publishes ${containerPort} without a host address and port`,
+          );
+        }
+        bindings.push({ container, containerPort, hostIp, hostPort });
+      }
+    }
+  }
+  return { status: 'observed', bindings };
+}
+
+function missingContainers(containers: readonly string[]): PublishedBindingsObservation {
+  return {
+    status: 'unavailable',
+    reason: `the AppHost's container(s) ${
+      containers.join(', ')
+    } were not found among Aspire containers on the inspected daemon.`,
+  };
+}
+
+function incomplete(container: string, detail: string): PublishedBindingsObservation {
+  return { status: 'unavailable', reason: `docker inspect for ${container} ${detail}.` };
 }
 
 function unknownEndpoint(reason: string): DockerEndpoint {

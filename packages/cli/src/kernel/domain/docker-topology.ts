@@ -1,21 +1,24 @@
 /**
  * @module kernel/domain/docker-topology
  *
- * Docker daemon topology contract for the generated Aspire AppHost (#2024).
+ * Docker daemon topology contract for the generated Aspire AppHost.
  *
  * A TypeScript AppHost is a host service: it reaches Aspire-provisioned containers through the
  * ports the Docker daemon publishes, addressed as `localhost` on the AppHost machine. When the
  * daemon runs on another machine, those ports land on the daemon host's interfaces instead, and
  * every health wait against them hangs. This module classifies the daemon endpoint and compares
  * observed published bindings with that loopback expectation. It is pure: the adapter supplies
- * recorded `DOCKER_HOST`, `docker context inspect`, and `docker inspect` facts.
+ * recorded `DOCKER_CONTEXT` / `DOCKER_HOST`, `docker context inspect`, and `docker inspect` facts.
  *
  * A verdict is `local` only when the evidence proves it; anything undeterminable is
  * `inconclusive`, never a pass.
  */
 
-/** Where the daemon endpoint was read from, in Docker's own precedence order. */
-export type DockerEndpointSource = 'DOCKER_HOST' | 'docker-context';
+/**
+ * Where the daemon endpoint was read from. Docker's own precedence is `DOCKER_CONTEXT`, then
+ * `DOCKER_HOST`, then the current context from the CLI configuration (`docker-context`).
+ */
+export type DockerEndpointSource = 'DOCKER_CONTEXT' | 'DOCKER_HOST' | 'docker-context';
 
 /** Locality of the Docker daemon relative to the machine running the AppHost. */
 export type DockerEndpointLocality = 'local' | 'remote' | 'unknown';
@@ -28,6 +31,8 @@ export interface DockerEndpoint {
   readonly host?: string;
   /** Endpoint source, when one was observed. */
   readonly source?: DockerEndpointSource;
+  /** Context the endpoint belongs to; later Docker calls pin it so they reach the same daemon. */
+  readonly context?: string;
   /** Daemon hostname for `remote` endpoints. */
   readonly daemonHost?: string;
   /** Why the locality could not be determined, for `unknown` endpoints. */
@@ -40,7 +45,7 @@ export interface PublishedBinding {
   readonly container: string;
   /** Container-side port and protocol, e.g. `5432/tcp`. */
   readonly containerPort: string;
-  /** Daemon-host interface the port is bound to; `0.0.0.0`/`::` mean all interfaces. */
+  /** Daemon-host interface the port is bound to (never empty); `0.0.0.0`/`::` mean all. */
   readonly hostIp: string;
   /** Daemon-host port. */
   readonly hostPort: string;
@@ -74,8 +79,17 @@ export interface DockerTopologyAssessment {
 export interface DockerTopologyInspector {
   /** Resolve and classify the active daemon endpoint. */
   inspectEndpoint(): Promise<DockerEndpoint>;
-  /** Read published bindings of Aspire containers backing the named AppHost resources. */
-  inspectPublishedBindings(resourceNames: readonly string[]): Promise<PublishedBindingsObservation>;
+  /**
+   * Read published bindings of the named containers on the daemon `endpoint` selects.
+   *
+   * `containers` are the unique instance names the running AppHost reports for its container
+   * resources; a container that is absent or whose record is incomplete makes the observation
+   * `unavailable`, never a partial `observed`.
+   */
+  inspectPublishedBindings(
+    endpoint: DockerEndpoint,
+    containers: readonly string[],
+  ): Promise<PublishedBindingsObservation>;
 }
 
 const LOCAL_SCHEMES = new Set(['unix:', 'npipe:']);
@@ -90,7 +104,13 @@ const NETWORK_SCHEMES = new Set(['tcp:', 'http:', 'https:', 'ssh:']);
 export function classifyDockerEndpoint(
   host: string | undefined,
   source: DockerEndpointSource,
+  context?: string,
 ): DockerEndpoint {
+  const located = classifyHost(host, source);
+  return context ? { ...located, context } : located;
+}
+
+function classifyHost(host: string | undefined, source: DockerEndpointSource): DockerEndpoint {
   const trimmed = host?.trim();
   if (!trimmed) {
     return { locality: 'unknown', source, reason: `${source} reported no daemon endpoint.` };
@@ -134,7 +154,8 @@ export function assessDockerTopology(
 }
 
 function assessEndpoint(endpoint: DockerEndpoint): DockerTopologyFinding {
-  const origin = `${endpoint.host} (from ${endpoint.source})`;
+  const context = endpoint.context ? `, context "${endpoint.context}"` : '';
+  const origin = `${endpoint.host} (from ${endpoint.source}${context})`;
   switch (endpoint.locality) {
     case 'local':
       return { verdict: 'local', message: `Docker daemon is local: ${origin}.` };
@@ -224,7 +245,7 @@ function reachableViaLoopback(hostIp: string): boolean {
 }
 
 function isWildcardHost(hostIp: string): boolean {
-  return hostIp === '' || hostIp === '0.0.0.0' || hostIp === '::';
+  return hostIp === '0.0.0.0' || hostIp === '::';
 }
 
 function isLoopbackHost(hostname: string): boolean {

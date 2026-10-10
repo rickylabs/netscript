@@ -206,8 +206,8 @@ a Deno workspace problem.</li>
 ## Services never become ready: a remote Docker daemon
 
 The local workflow assumes the Docker daemon runs on the same machine as the AppHost. If the
-Docker CLI points at another machine, through `DOCKER_HOST` (for example `ssh://…` or
-`tcp://<host>:2376`) or through the active `docker context`, Aspire still provisions every
+Docker CLI points at another machine, through `DOCKER_CONTEXT`, `DOCKER_HOST` (for example
+`ssh://…` or `tcp://<host>:2376`), or the current `docker context`, Aspire still provisions every
 container, and every container reports healthy. The services that wait on them never become
 ready, and nothing prints an error.
 
@@ -229,15 +229,18 @@ ready, and nothing prints an error.
   change project defaults to work around it.
 
 `netscript plugin doctor` checks this topology. Its `docker` report classifies the daemon
-endpoint (`DOCKER_HOST` first, then the active context) as local, remote, or unknown. When the
-AppHost is running, it also lists the published bindings of that AppHost's Aspire containers and
-compares them with the `localhost` address the AppHost uses:
+endpoint as local, remote, or unknown, with the Docker CLI's own precedence: `DOCKER_CONTEXT`,
+then `DOCKER_HOST`, then the current context. When the AppHost is running, it reads the published
+bindings of that AppHost's own containers from the same daemon, and compares them with the
+`localhost` address the AppHost uses. A container counts as the AppHost's only when its name
+equals the instance name `aspire describe` reports for one of its container resources, so a
+same-named resource of another AppHost on the daemon is never used as evidence:
 
 | Result | Status | Meaning |
 | --- | --- | --- |
 | Local | `healthy` | The endpoint is a socket, a named pipe, or loopback, and every binding is reachable through `localhost`. |
 | Mismatch | `warning` | The daemon is remote, or a port is bound to a non-loopback interface. The message names each container, port and bind address. |
-| Inconclusive | `warning` | The endpoint, the AppHost, or the bindings could not be inspected. Doctor never reports this as a pass. |
+| Inconclusive | `warning` | The endpoint, the AppHost, or the bindings could not be inspected, a container could not be attributed, or a binding record is incomplete. Doctor never reports this as a pass. |
 
 If you run a relay, the mismatch warning stays: doctor checks where the daemon publishes ports,
 not whether your relay forwards them.

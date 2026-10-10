@@ -20,7 +20,9 @@ import { DockerCliTopologyInspector } from '../../../../kernel/adapters/aspire/d
 import {
   ASPIRE_CONTAINERS_INSPECT_JSON,
   LOCAL_CONTEXT_JSON,
+  OTHER_APPHOST_DB_INSTANCE,
   REMOTE_CONTEXT_JSON,
+  THIS_APPHOST_DB_INSTANCE,
 } from '../../../../kernel/adapters/aspire/docker-topology-fixtures_test.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
@@ -420,7 +422,7 @@ Deno.test("plugin doctor reports a remote daemon's loopback-published containers
     rendered,
     "main-db-xkcdabcd 5432/tcp -> 127.0.0.1:55001 (daemon host's loopback)",
   );
-  assertEquals(rendered.includes('other-cache'), false);
+  assertEquals(rendered.includes(OTHER_APPHOST_DB_INSTANCE), false);
 });
 
 Deno.test('plugin doctor passes Docker topology only for a provably local daemon', async () => {
@@ -455,6 +457,66 @@ Deno.test('plugin doctor reports undeterminable Docker topology as inconclusive,
     assertEquals(check.status, 'warning');
     assertStringIncludes(check.message ?? '', 'Inconclusive:');
   }
+});
+
+Deno.test("plugin doctor never certifies Docker topology from another AppHost's same-named container", async () => {
+  const foreignOnly = JSON.stringify(
+    JSON.parse(ASPIRE_CONTAINERS_INSPECT_JSON).filter(
+      (row: { Name: string }) => row.Name === `/${OTHER_APPHOST_DB_INSTANCE}`,
+    ),
+  );
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: runningAppHost(),
+    inspectDockerTopology: recordedDockerTopology(LOCAL_CONTEXT_JSON, foreignOnly),
+  });
+  const bindings = reports.find((report) => report.pluginName === 'docker')?.checks.find((check) =>
+    check.id === 'docker:published-bindings'
+  );
+  assertEquals(bindings?.status, 'warning');
+  assertStringIncludes(bindings?.message ?? '', 'Inconclusive:');
+  assertStringIncludes(bindings?.message ?? '', THIS_APPHOST_DB_INSTANCE);
+});
+
+Deno.test('plugin doctor treats a published port without a bind address as inconclusive', async () => {
+  const missingHostIp = JSON.stringify([{
+    Name: `/${THIS_APPHOST_DB_INSTANCE}`,
+    NetworkSettings: { Ports: { '5432/tcp': [{ HostPort: '55001' }] } },
+  }]);
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: runningAppHost(),
+    inspectDockerTopology: recordedDockerTopology(LOCAL_CONTEXT_JSON, missingHostIp),
+  });
+  const docker = reports.find((report) => report.pluginName === 'docker');
+  assertEquals(docker?.status, 'warning');
+  assertStringIncludes(
+    docker?.checks.find((check) => check.id === 'docker:published-bindings')?.message ?? '',
+    'without a host address and port',
+  );
+});
+
+Deno.test('plugin doctor follows DOCKER_CONTEXT over a local DOCKER_HOST', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: runningAppHost(),
+    inspectDockerTopology: recordedDockerTopology(REMOTE_CONTEXT_JSON, ASPIRE_CONTAINERS_INSPECT_JSON, {
+      DOCKER_CONTEXT: 'remote-daemon',
+      DOCKER_HOST: 'unix:///var/run/docker.sock',
+    }),
+  });
+  const docker = reports.find((report) => report.pluginName === 'docker');
+  assertEquals(docker?.checks.map((check) => [check.id, check.status]), [
+    ['docker:endpoint', 'warning'],
+    ['docker:published-bindings', 'warning'],
+  ]);
+  assertStringIncludes(docker?.checks[0].message ?? '', 'from DOCKER_CONTEXT');
 });
 
 Deno.test('plugin manifest import failures degrade to an error report', async () => {
@@ -578,24 +640,37 @@ function runningAppHost() {
         resources: [
           { name: 'api', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
           { name: 'web', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
-          { name: 'main-db', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+          {
+            name: 'main-db',
+            instanceName: THIS_APPHOST_DB_INSTANCE,
+            resourceType: 'Container',
+            state: 'Running',
+            healthStatus: 'Healthy',
+            healthReports: [{}],
+          },
         ],
       }),
   };
 }
 
 /** Docker CLI replay: context inspect, ps (Aspire label), inspect — from recorded output. */
-function recordedDockerTopology(contextJson: string): DockerCliTopologyInspector {
+function recordedDockerTopology(
+  contextJson: string,
+  inspectJson = ASPIRE_CONTAINERS_INSPECT_JSON,
+  environment: Readonly<Record<string, string>> = {},
+): DockerCliTopologyInspector {
   const replies: Readonly<Record<string, string>> = {
     context: contextJson,
     ps: '3f1c0e9a\n9b2d7c41\n',
-    inspect: ASPIRE_CONTAINERS_INSPECT_JSON,
+    inspect: inspectJson,
   };
   const process: ProcessPort = {
-    exec: (_command, args) =>
-      Promise.resolve({ code: 0, stdout: replies[args[0]] ?? '', stderr: '' }),
+    exec: (_command, args) => {
+      const subcommand = args[0] === '--context' ? args[2] : args[0];
+      return Promise.resolve({ code: 0, stdout: replies[subcommand] ?? '', stderr: '' });
+    },
   };
-  return new DockerCliTopologyInspector(process, { readEnv: () => undefined });
+  return new DockerCliTopologyInspector(process, { readEnv: (name) => environment[name] });
 }
 
 class MissingAspireProcess implements ProcessPort {

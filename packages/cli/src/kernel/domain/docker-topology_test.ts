@@ -118,3 +118,24 @@ Deno.test('topology is inconclusive, never a pass, when anything is undeterminab
   assertStringIncludes(cases[1].bindings.message, 'no AppHost is running');
   assertStringIncludes(cases[3].bindings.message, 'docker ps timed out.');
 });
+
+Deno.test('a classified context endpoint keeps its context name for later Docker calls', () => {
+  assertEquals(
+    classifyDockerEndpoint('ssh://ops@daemon-host.example', 'DOCKER_CONTEXT', 'remote-daemon'),
+    {
+      locality: 'remote',
+      host: 'ssh://ops@daemon-host.example',
+      source: 'DOCKER_CONTEXT',
+      daemonHost: 'daemon-host.example',
+      context: 'remote-daemon',
+    },
+  );
+});
+
+Deno.test('an empty bind address is never treated as a wildcard pass', () => {
+  const assessment = assessDockerTopology(LOCAL, {
+    status: 'observed',
+    bindings: [{ ...ASPIRE_POSTGRES, hostIp: '' }],
+  });
+  assertEquals(assessment.bindings.verdict, 'mismatch');
+});

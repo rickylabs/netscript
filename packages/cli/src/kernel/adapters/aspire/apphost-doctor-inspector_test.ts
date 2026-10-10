@@ -53,6 +53,31 @@ Deno.test('AppHost doctor inspector returns named resource state from the matchi
   assertEquals(process.commands.map((command) => command.args[0]), ['ps', 'describe']);
 });
 
+Deno.test('AppHost doctor inspector keeps the instance name and type DCP uses for containers', async () => {
+  const process = new RecordingProcess([
+    ok(JSON.stringify([{ appHostPath: '/workspace/aspire/apphost.mts', status: 'Running' }])),
+    ok(JSON.stringify({
+      resources: [{
+        name: 'postgres-2226b6f5',
+        displayName: 'postgres',
+        resourceType: 'Container',
+        state: 'Running',
+        healthStatus: 'Healthy',
+        healthReports: { postgres_check: { status: 'Healthy' } },
+      }],
+    })),
+  ]);
+  const result = await new AspireAppHostDoctorInspector(process).inspect('/workspace');
+  assertEquals(result.status === 'running' ? result.resources[0] : undefined, {
+    name: 'postgres',
+    instanceName: 'postgres-2226b6f5',
+    resourceType: 'Container',
+    state: 'Running',
+    healthStatus: 'Healthy',
+    healthReports: { postgres_check: { status: 'Healthy' } },
+  });
+});
+
 function ok(stdout: string): ProcessResult {
   return { code: 0, stdout, stderr: '' };
 }

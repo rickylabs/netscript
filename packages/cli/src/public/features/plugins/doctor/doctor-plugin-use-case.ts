@@ -10,6 +10,7 @@ import type {
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
 import {
   assessDockerTopology,
+  type DockerEndpoint,
   type DockerTopologyFinding,
   type DockerTopologyInspector,
   type DockerTopologyVerdict,
@@ -94,6 +95,10 @@ export interface PluginDoctorDependencies {
 /** One named resource observed from a running AppHost. */
 export interface AppHostResourceState {
   readonly name: string;
+  /** Unique per-AppHost instance name (`aspire describe` `name`); DCP names containers with it. */
+  readonly instanceName?: string;
+  /** Aspire resource type, e.g. `Container` or `Executable`. */
+  readonly resourceType?: string;
   readonly state?: string;
   readonly healthStatus?: string;
   /** Raw Aspire readiness reports; an empty set cannot substantiate `Healthy`. */
@@ -299,10 +304,8 @@ async function diagnoseDockerTopology(
   inspector: DockerTopologyInspector,
 ): Promise<PluginDoctorReport> {
   try {
-    const [endpoint, bindings] = await Promise.all([
-      inspector.inspectEndpoint(),
-      observeAppHostBindings(appHost, inspector),
-    ]);
+    const endpoint = await inspector.inspectEndpoint();
+    const bindings = await observeAppHostBindings(appHost, endpoint, inspector);
     const assessment = assessDockerTopology(endpoint, bindings);
     const checks = [
       topologyCheck('docker:endpoint', 'Docker daemon endpoint', assessment.endpoint),
@@ -320,18 +323,38 @@ async function diagnoseDockerTopology(
 
 async function observeAppHostBindings(
   appHost: AppHostObservation | undefined,
+  endpoint: DockerEndpoint,
   inspector: DockerTopologyInspector,
 ): Promise<PublishedBindingsObservation | undefined> {
-  if (appHost?.status === 'running') {
-    return await inspector.inspectPublishedBindings(
-      appHost.resources.map((resource) => resource.name),
-    );
-  }
   if (appHost?.status === 'not-running') return undefined;
+  if (appHost?.status !== 'running') {
+    return unavailableBindings('the AppHost could not be inspected');
+  }
+  if (endpoint.locality === 'unknown') {
+    return unavailableBindings('the Docker endpoint is unknown');
+  }
+  const containers = appHost.resources.filter((resource) =>
+    resource.resourceType?.toLowerCase() === 'container'
+  );
+  const unnamed = containers.filter((resource) => !resource.instanceName);
+  if (unnamed.length > 0) {
+    return {
+      status: 'unavailable',
+      reason: `the AppHost reported no instance name for container resource(s) ${
+        unnamed.map((resource) => resource.name).join(', ')
+      }, so their containers cannot be attributed.`,
+    };
+  }
+  return await inspector.inspectPublishedBindings(
+    endpoint,
+    containers.flatMap((resource) => resource.instanceName ? [resource.instanceName] : []),
+  );
+}
+
+function unavailableBindings(cause: string): PublishedBindingsObservation {
   return {
     status: 'unavailable',
-    reason: 'the AppHost could not be inspected, so published container bindings were not ' +
-      'compared.',
+    reason: `${cause}, so published container bindings were not compared.`,
   };
 }
 
