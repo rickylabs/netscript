@@ -16,6 +16,7 @@
 
 import { delay } from '@std/async';
 import { createPackageLogger } from '@netscript/logger';
+import { combineAtomicValue } from '../application/atomic-combine.ts';
 import { generateVersionstamp, keyHasPrefix, keyToString } from '../application/keys.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
 import type { WatchableKv } from '../types/watchable-kv.ts';
@@ -31,11 +32,19 @@ import type {
   WatchPrefixOptions,
 } from '../types/common.ts';
 
+import {
+  decodeEnvelope,
+  encodeEnvelope,
+  encodeStoredValue,
+  type WatchMessage,
+} from './redis/codec.ts';
 import { RedisConnectionManager } from './redis/connection.ts';
 import { keyToRedisKey, redisKeyToKey } from './redis/serialization.ts';
+import { WatchBatchQueue } from './redis/watch-batch-queue.ts';
 import {
   DEFAULT_REDIS_NAMESPACE,
   DEFAULT_REDIS_URL,
+  REDIS_ATOMIC_MAX_ATTEMPTS,
   REDIS_MGET_BATCH_SIZE,
   REDIS_SCAN_COUNT,
   type StoredValue,
@@ -45,6 +54,19 @@ import {
 export type { RedisKvOptions } from './redis/types.ts';
 
 const logger = createPackageLogger('kv');
+
+/** A change to publish on the watch channel once its write has committed. */
+interface WatchChange {
+  key: KvKey;
+  type: 'set' | 'delete';
+  value: unknown;
+}
+
+type CombineMutation = Extract<AtomicMutation, { type: 'sum' | 'min' | 'max' }>;
+
+function isCombineMutation(mutation: AtomicMutation): mutation is CombineMutation {
+  return mutation.type === 'sum' || mutation.type === 'min' || mutation.type === 'max';
+}
 
 /**
  * Distributed Redis adapter for `@netscript/kv`.
@@ -112,20 +134,8 @@ export class RedisKvAdapter implements WatchableKv {
       return null;
     }
 
-    try {
-      const stored = JSON.parse(data) as StoredValue<T>;
-      return {
-        key,
-        value: stored.value,
-        versionstamp: stored.versionstamp,
-      };
-    } catch {
-      return {
-        key,
-        value: data as T,
-        versionstamp: generateVersionstamp(),
-      };
-    }
+    const stored = this.decodeStored<T>(data);
+    return { key, value: stored.value, versionstamp: stored.versionstamp };
   }
 
   /**
@@ -138,15 +148,16 @@ export class RedisKvAdapter implements WatchableKv {
   async set(key: KvKey, value: unknown, options?: KvSetOptions): Promise<void> {
     const client = await this.connection.ensureClient();
     const redisKey = keyToRedisKey(key, this.namespace);
-    const stored: StoredValue = { value, versionstamp: generateVersionstamp() };
+    const versionstamp = generateVersionstamp();
+    const stored = encodeStoredValue(value, versionstamp);
 
     if (options?.expireIn) {
-      await client.psetex(redisKey, options.expireIn, JSON.stringify(stored));
+      await client.psetex(redisKey, options.expireIn, stored);
     } else {
-      await client.set(redisKey, JSON.stringify(stored));
+      await client.set(redisKey, stored);
     }
 
-    await this.publishChange(key, 'set', value);
+    await this.publishChanges([{ key, type: 'set', value }], versionstamp);
   }
 
   /**
@@ -157,7 +168,7 @@ export class RedisKvAdapter implements WatchableKv {
   async delete(key: KvKey): Promise<void> {
     const client = await this.connection.ensureClient();
     await client.del(keyToRedisKey(key, this.namespace));
-    await this.publishChange(key, 'delete', null);
+    await this.publishChanges([{ key, type: 'delete', value: null }], generateVersionstamp());
   }
 
   /**
@@ -207,21 +218,8 @@ export class RedisKvAdapter implements WatchableKv {
           results[idx] = null;
           continue;
         }
-        try {
-          const stored = JSON.parse(data) as StoredValue<T>;
-          results[idx] = {
-            key: keys[idx],
-            value: stored.value,
-            versionstamp: stored.versionstamp,
-          };
-        } catch {
-          // Legacy value stored without the StoredValue envelope
-          results[idx] = {
-            key: keys[idx],
-            value: data as T,
-            versionstamp: generateVersionstamp(),
-          };
-        }
+        const stored = this.decodeStored<T>(data);
+        results[idx] = { key: keys[idx], value: stored.value, versionstamp: stored.versionstamp };
       }
     }
 
@@ -325,7 +323,7 @@ export class RedisKvAdapter implements WatchableKv {
           if (data === null) continue;
 
           try {
-            const stored = JSON.parse(data) as StoredValue<T>;
+            const stored = decodeEnvelope<StoredValue<T>>(data);
             const key = redisKeyToKey(batchKeys[i], this.namespace);
 
             if (startStr && keyToString(key) < startStr) continue;
@@ -419,7 +417,7 @@ export class RedisKvAdapter implements WatchableKv {
         if (data === null) continue;
 
         try {
-          const stored = JSON.parse(data) as StoredValue<T>;
+          const stored = decodeEnvelope<StoredValue<T>>(data);
           const key = redisKeyToKey(batchKeys[i], this.namespace);
 
           yield { key, value: stored.value, versionstamp: stored.versionstamp };
@@ -460,21 +458,64 @@ export class RedisKvAdapter implements WatchableKv {
     }
   }
 
+  /**
+   * Commit optimistically, retrying while only a concurrent write to a
+   * watched key prevented `EXEC`.
+   *
+   * A retry re-runs the checks, so a commit whose check key changed still
+   * fails; a retry only rescues commits that conflicted on a `sum`/`min`/`max`
+   * operand, which Deno KV never reports as a failure.
+   */
   private async executeAtomic(
     checks: AtomicCheck[],
     mutations: AtomicMutation[],
   ): Promise<AtomicResult> {
     const client = await this.connection.ensureClient();
-    const keysToWatch = checks.map((check) => keyToRedisKey(check.key, this.namespace));
 
-    if (keysToWatch.length > 0) {
-      await client.watch(...keysToWatch);
+    for (let attempt = 1; attempt <= REDIS_ATOMIC_MAX_ATTEMPTS; attempt++) {
+      const outcome = await this.tryCommit(client, checks, mutations);
+      if (outcome !== 'conflict') {
+        return outcome;
+      }
+    }
+
+    logger.warn('Redis atomic commit kept conflicting with concurrent writes', {
+      attempts: REDIS_ATOMIC_MAX_ATTEMPTS,
+    });
+    return { ok: false };
+  }
+
+  /**
+   * One optimistic attempt: `WATCH` every key the commit reads, verify the
+   * checks and read the combine operands in one `MGET`, then `EXEC` every
+   * write under a single versionstamp.
+   *
+   * @returns The commit result, or `'conflict'` when a watched key changed
+   *   before `EXEC`.
+   */
+  private async tryCommit(
+    client: import('ioredis').Redis,
+    checks: AtomicCheck[],
+    mutations: AtomicMutation[],
+  ): Promise<AtomicResult | 'conflict'> {
+    const readKeys = [
+      ...new Set([
+        ...checks.map((check) => keyToRedisKey(check.key, this.namespace)),
+        ...mutations.filter(isCombineMutation).map((mutation) =>
+          keyToRedisKey(mutation.key, this.namespace)
+        ),
+      ]),
+    ];
+
+    if (readKeys.length > 0) {
+      await client.watch(...readKeys);
     }
 
     try {
+      const current = await this.readStored(client, readKeys);
       for (const check of checks) {
-        const currentVersionstamp = (await this.get(check.key))?.versionstamp ?? null;
-        if (currentVersionstamp !== check.versionstamp) {
+        const stored = current.get(keyToRedisKey(check.key, this.namespace));
+        if ((stored?.versionstamp ?? null) !== check.versionstamp) {
           await client.unwatch();
           return { ok: false };
         }
@@ -482,54 +523,87 @@ export class RedisKvAdapter implements WatchableKv {
 
       const versionstamp = generateVersionstamp();
       const multi = client.multi();
+      const changes = this.queueMutations(multi, mutations, current, versionstamp);
 
-      for (const mutation of mutations) {
-        const redisKey = keyToRedisKey(mutation.key, this.namespace);
-        switch (mutation.type) {
-          case 'set': {
-            const stored: StoredValue = { value: mutation.value, versionstamp };
-            if (mutation.expireIn) {
-              multi.psetex(redisKey, mutation.expireIn, JSON.stringify(stored));
-            } else {
-              multi.set(redisKey, JSON.stringify(stored));
-            }
-            break;
-          }
-          case 'delete':
-            multi.del(redisKey);
-            break;
-          case 'sum':
-          case 'min':
-          case 'max': {
-            logger.warn('Falling back to set semantics for unsupported Redis atomic mutation', {
-              mutationType: mutation.type,
-              redisKey,
-            });
-            const stored: StoredValue = { value: mutation.value, versionstamp };
-            multi.set(redisKey, JSON.stringify(stored));
-            break;
-          }
-        }
+      if ((await multi.exec()) === null) {
+        return 'conflict';
       }
 
-      const result = await multi.exec();
-      if (result === null) {
-        return { ok: false };
-      }
-
-      for (const mutation of mutations) {
-        await this.publishChange(
-          mutation.key,
-          mutation.type === 'delete' ? 'delete' : 'set',
-          mutation.type === 'delete' ? null : mutation.value,
-        );
-      }
-
+      await this.publishChanges(changes, versionstamp);
       return { ok: true, versionstamp };
     } catch (error: unknown) {
       await client.unwatch();
       throw error;
     }
+  }
+
+  /**
+   * Read stored envelopes for the given Redis keys in one `MGET`.
+   *
+   * @param client - Command client
+   * @param redisKeys - Keys to read; bounded by the size of one commit
+   * @returns Envelope per key, `null` when absent
+   */
+  private async readStored(
+    client: import('ioredis').Redis,
+    redisKeys: string[],
+  ): Promise<Map<string, StoredValue | null>> {
+    const stored = new Map<string, StoredValue | null>();
+    if (redisKeys.length === 0) {
+      return stored;
+    }
+
+    const values = await client.mget(...redisKeys);
+    redisKeys.forEach((redisKey, index) => {
+      const data = values[index];
+      stored.set(redisKey, data === null ? null : this.decodeStored(data));
+    });
+    return stored;
+  }
+
+  /**
+   * Queue every mutation of a commit on `multi` under one versionstamp.
+   *
+   * `sum`/`min`/`max` combine with the value stored before the commit, or
+   * with the value an earlier mutation of the same commit wrote.
+   *
+   * @returns The changes to publish once the commit succeeds
+   */
+  private queueMutations(
+    multi: import('ioredis').ChainableCommander,
+    mutations: AtomicMutation[],
+    current: ReadonlyMap<string, StoredValue | null>,
+    versionstamp: string,
+  ): WatchChange[] {
+    const written = new Map<string, unknown>();
+    const changes: WatchChange[] = [];
+
+    for (const mutation of mutations) {
+      const redisKey = keyToRedisKey(mutation.key, this.namespace);
+
+      if (mutation.type === 'delete') {
+        multi.del(redisKey);
+        written.set(redisKey, undefined);
+        changes.push({ key: mutation.key, type: 'delete', value: null });
+        continue;
+      }
+
+      const value = mutation.type === 'set' ? mutation.value : combineAtomicValue(
+        mutation.type,
+        written.has(redisKey) ? written.get(redisKey) : current.get(redisKey)?.value,
+        mutation.value,
+      );
+      const stored = encodeStoredValue(value, versionstamp);
+      if (mutation.type === 'set' && mutation.expireIn) {
+        multi.psetex(redisKey, mutation.expireIn, stored);
+      } else {
+        multi.set(redisKey, stored);
+      }
+      written.set(redisKey, value);
+      changes.push({ key: mutation.key, type: 'set', value });
+    }
+
+    return changes;
   }
 
   // ---------------------------------------------------------------------------
@@ -579,68 +653,39 @@ export class RedisKvAdapter implements WatchableKv {
 
     await subscriber.subscribe(channel);
 
-    const eventQueue: WatchEvent<T>[] = [];
-    let resolveNext: ((events: WatchEvent<T>[]) => void) | null = null;
+    const queue = new WatchBatchQueue<WatchEvent<T>>();
     const messageHandler = (receivedChannel: string, message: string): void => {
       if (receivedChannel !== channel) {
         return;
       }
 
-      try {
-        const data = JSON.parse(message) as {
-          key: KvKey;
-          timestamp: number;
-          type: 'set' | 'delete';
-          value: T | null;
-        };
-        const keyStr = keyToString(data.key);
-
-        if (!watchedKeys.has(keyStr)) {
-          return;
-        }
-
-        const event: WatchEvent<T> = {
-          key: data.key,
-          previousValue: previousValues.get(keyStr) ?? null,
-          timestamp: new Date(data.timestamp),
-          type: data.type,
-          value: data.value,
-          versionstamp: generateVersionstamp(),
-        };
-
-        previousValues.set(keyStr, data.value);
-        eventQueue.push(event);
-
-        if (resolveNext) {
-          resolveNext([...eventQueue]);
-          eventQueue.length = 0;
-          resolveNext = null;
-        }
-      } catch {
-        logger.warn('Ignoring malformed Redis watch message');
+      const data = this.parseWatchMessage<T>(message);
+      if (!data) {
+        return;
       }
+
+      const keyStr = keyToString(data.key);
+      if (!watchedKeys.has(keyStr)) {
+        return;
+      }
+
+      queue.push({
+        key: data.key,
+        previousValue: previousValues.get(keyStr) ?? null,
+        timestamp: new Date(data.timestamp),
+        type: data.type,
+        value: data.value,
+        versionstamp: data.versionstamp ?? generateVersionstamp(),
+      });
+      previousValues.set(keyStr, data.value);
     };
 
     subscriber.on('message', messageHandler);
 
     try {
       while (!options?.signal?.aborted) {
-        const events = await new Promise<WatchEvent<T>[]>((resolve) => {
-          resolveNext = resolve;
-          if (options?.debounce) {
-            setTimeout(() => {
-              if (eventQueue.length === 0) {
-                return;
-              }
-
-              resolve([...eventQueue]);
-              eventQueue.length = 0;
-              resolveNext = null;
-            }, options.debounce);
-          }
-        });
-
-        if (events.length > 0) {
+        const events = await queue.next(options?.debounce, options?.signal);
+        if (events.length > 0 && !options?.signal?.aborted) {
           yield events;
         }
       }
@@ -692,35 +737,25 @@ export class RedisKvAdapter implements WatchableKv {
     await subscriber.subscribe(channel);
     const eventQueue: WatchEvent<T>[] = [];
     const messageHandler = (_channel: string, message: string): void => {
-      try {
-        const data = JSON.parse(message) as {
-          key: KvKey;
-          timestamp: number;
-          type: 'set' | 'delete';
-          value: T | null;
-        };
+      const data = this.parseWatchMessage<T>(message);
+      if (!data || !keyHasPrefix(data.key, prefix)) {
+        return;
+      }
 
-        if (!keyHasPrefix(data.key, prefix)) {
-          return;
-        }
+      const keyStr = keyToString(data.key);
+      const versionstamp = data.versionstamp ?? generateVersionstamp();
+      eventQueue.push({
+        key: data.key,
+        timestamp: new Date(data.timestamp),
+        type: data.type,
+        value: data.value,
+        versionstamp,
+      });
 
-        const keyStr = keyToString(data.key);
-        const versionstamp = generateVersionstamp();
-        eventQueue.push({
-          key: data.key,
-          timestamp: new Date(data.timestamp),
-          type: data.type,
-          value: data.value,
-          versionstamp,
-        });
-
-        if (data.type === 'delete') {
-          knownVersions.delete(keyStr);
-        } else {
-          knownVersions.set(keyStr, versionstamp);
-        }
-      } catch {
-        logger.warn('Ignoring malformed Redis prefix watch message');
+      if (data.type === 'delete') {
+        knownVersions.delete(keyStr);
+      } else {
+        knownVersions.set(keyStr, versionstamp);
       }
     };
 
@@ -795,32 +830,61 @@ export class RedisKvAdapter implements WatchableKv {
   }
 
   /**
-   * Publish a watch notification after a write mutation.
+   * Publish watch notifications for committed writes in one pipeline.
    *
-   * @param key - Changed key
-   * @param type - Mutation type
-   * @param value - Updated value
+   * @param changes - Committed changes, in commit order
+   * @param versionstamp - Versionstamp of the commit
    */
-  private async publishChange(
-    key: KvKey,
-    type: 'set' | 'delete',
-    value: unknown,
+  private async publishChanges(
+    changes: readonly WatchChange[],
+    versionstamp: string,
   ): Promise<void> {
     try {
       const client = await this.connection.ensureClient();
-      await client.publish(
-        this.getWatchChannel(),
-        JSON.stringify({
-          key,
-          timestamp: Date.now(),
-          type,
-          value,
-        }),
-      );
+      const pipeline = client.pipeline();
+      const timestamp = Date.now();
+      for (const change of changes) {
+        const message: WatchMessage = { ...change, timestamp, versionstamp };
+        pipeline.publish(this.getWatchChannel(), encodeEnvelope({ ...message }));
+      }
+      await pipeline.exec();
     } catch (error: unknown) {
       logger.warn('Failed to publish Redis KV watch event', {
         error: error instanceof Error ? error.message : String(error),
       });
+    }
+  }
+
+  /**
+   * Parse a watch-channel message.
+   *
+   * @param message - Raw pub/sub payload
+   * @returns The decoded message, or `null` when malformed
+   */
+  private parseWatchMessage<T>(message: string): WatchMessage<T> | null {
+    try {
+      return decodeEnvelope<WatchMessage<T>>(message);
+    } catch {
+      logger.warn('Ignoring malformed Redis watch message');
+      return null;
+    }
+  }
+
+  /**
+   * Decode a stored envelope, tolerating values written without one.
+   *
+   * @param data - Raw Redis value
+   * @returns The envelope; legacy raw (non-JSON) values get a fresh versionstamp
+   * @throws {TypeError} When the envelope's bigint metadata is malformed
+   */
+  private decodeStored<T = unknown>(data: string): StoredValue<T> {
+    try {
+      return decodeEnvelope<StoredValue<T>>(data);
+    } catch (error: unknown) {
+      if (!(error instanceof SyntaxError)) {
+        throw error;
+      }
+      return { value: data as T, versionstamp: generateVersionstamp() };
     }
   }
 }
