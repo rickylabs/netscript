@@ -51,10 +51,10 @@ Deno.test('CLI corpus integrity follows canonical content across gzip transport 
   }
 });
 
-Deno.test('MCP fallback is generated from the locked release prose within 258 KiB', async () => {
+Deno.test('MCP fallback is generated from the locked release prose within 288 KiB', async () => {
   const generated = await buildMcpEmbeddedDocs();
   assertEquals(generated.provenance.paths, MCP_EMBEDDED_DOC_PATHS);
-  assertEquals(generated.provenance.documentCount, 12);
+  assertEquals(generated.provenance.documentCount, 13);
   assertEquals(generated.provenance.documentCount, MCP_EMBEDDED_DOC_PATHS.length);
   assertEquals(generated.documents.map((document) => document.path), [...MCP_EMBEDDED_DOC_PATHS]);
   assertEquals(generated.documents[0]?.path, 'llms.txt');

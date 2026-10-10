@@ -1,3 +1,4 @@
+import type { StreamRetentionPolicyV1 } from '../domain/retention-contract-v1.ts';
 import type {
   StreamProducerBufferPolicyV1,
   StreamProducerReconnectPolicyV1,
@@ -23,6 +24,8 @@ export interface DurableStreamProducerSupervisorOptions {
   readonly url: string;
   /** Request headers, including authorization. */
   readonly headers: Readonly<Record<string, string>>;
+  /** Create-time retention forwarded unchanged on every connection attempt. */
+  readonly retention?: StreamRetentionPolicyV1;
   /** Stable producer identity. */
   readonly producerId: string;
   /** Protocol transport adapter. */
