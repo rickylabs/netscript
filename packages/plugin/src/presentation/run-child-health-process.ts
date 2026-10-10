@@ -1,4 +1,5 @@
 import type { ChildHealthSnapshot } from '../domain/child-health.ts';
+import { PluginError } from '../domain/errors.ts';
 import { ChildHealthMonitor } from '../runtime/child-health-monitor.ts';
 import { childHealthResponse } from './child-health-response.ts';
 
@@ -8,6 +9,7 @@ import { childHealthResponse } from './child-health-response.ts';
  * Signal handlers and the health listener are owned by this process, independent
  * of a frontend session. Fatal causes remain in server logs, never in the payload,
  * and set the process exit code to one. The child must drain when its signal is aborted.
+ * After the fatal grace period, rejects with PluginError for the executable's crash boundary.
  *
  * @example
  * ```ts
@@ -74,5 +76,5 @@ export async function runChildHealthProcess(
     await server.shutdown();
   }
   // Bootstrap may leave dependency handles alive; a fatal process must still terminate.
-  if (terminal) Deno.exit(1);
+  if (terminal) throw new PluginError('Background child failed (details redacted).');
 }
