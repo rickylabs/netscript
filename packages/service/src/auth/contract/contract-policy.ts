@@ -4,8 +4,17 @@
  * @module
  */
 
-import type { ContractAuthorizerOptions } from './options.ts';
-import type { AuthorizerPort } from './types.ts';
+import type { ContractAuthorizerOptions } from '../options.ts';
+import type { AuthorizerPort, Principal } from '../types.ts';
+
+/**
+ * Decides whether an authenticated principal is an internal service caller.
+ *
+ * The default predicate accepts only principals minted by
+ * `createInternalCredentialAuthenticator`; claims and roles are never trusted for this decision,
+ * so no user-session adapter can map its way into the internal audience.
+ */
+export type InternalCallerPredicate = (principal: Principal) => boolean;
 
 /** Contract procedure or router whose procedures carry contract-local access metadata. */
 export type ContractPolicyContract =
@@ -24,14 +33,24 @@ export interface ProcedureAccessPolicy {
   readonly requiredScopes: readonly string[];
   /** Roles the matched procedure requires from an authenticated principal. */
   readonly requiredRoles: readonly string[];
+  /** Caller audience; `'internal'` admits only principals the internal-caller predicate accepts. */
+  readonly audience?: 'internal';
 }
 
 /** Request identity used to locate a procedure's contract-local policy. */
 export interface ProcedurePolicyRequest {
   /** Request method used by REST procedure matching. */
   readonly method: string;
-  /** Request path projected through the bound REST or RPC mount. */
+  /**
+   * Undecoded request pathname (as the oRPC handlers match it), including the REST or RPC mount.
+   * Pass the raw pathname, not a percent-decoded one: decoding can select a different route.
+   */
   readonly path: string;
+  /**
+   * Percent-decoded path the HTTP router dispatches on (Hono's `c.req.path`). Used to match raw
+   * routes declared beside the contract; defaults to `path`.
+   */
+  readonly routePath?: string;
 }
 
 /** Result of resolving a request against the bound contract procedures. */

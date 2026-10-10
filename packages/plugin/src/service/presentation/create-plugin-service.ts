@@ -81,7 +81,10 @@ export interface PluginServiceConfig<
   readonly database?: PluginDatabaseConfig;
   /** Middleware applied in order via `use()`, before context. */
   readonly middleware?: readonly ServiceMiddleware[];
-  /** CORS options applied via `withCors()`. When omitted, CORS is enabled with defaults. */
+  /**
+   * CORS options applied via `withCors()`. Omitted origins use the workspace
+   * `NETSCRIPT_CORS_ORIGINS` allowlist; unset/blank denies cross-origin access.
+   */
   readonly cors?: CorsOptions;
   /** Disables the default CORS middleware when set to `false`. */
   readonly enableCors?: boolean;

@@ -77,6 +77,7 @@ Deno.test('defineService middleware rejections keep CORS headers and run before 
   const running = await defineService(router, {
     name: 'middleware-reject',
     port: 0,
+    cors: { origin: ['https://app.example'] },
     middleware: [async (c, next) => {
       if (c.req.header('x-block') === 'yes') {
         return c.json({ error: 'BLOCKED', message: 'blocked by middleware' }, 429);
@@ -100,7 +101,7 @@ Deno.test('defineService middleware rejections keep CORS headers and run before 
       body: JSON.stringify({ value: 'x' }),
     });
     assertEquals(blocked.status, 429);
-    assertEquals(blocked.headers.get('access-control-allow-origin'), '*');
+    assertEquals(blocked.headers.get('access-control-allow-origin'), 'https://app.example');
     assertEquals(await blocked.json(), { error: 'BLOCKED', message: 'blocked by middleware' });
 
     // A request the middleware passes reaches authentication.
@@ -110,7 +111,7 @@ Deno.test('defineService middleware rejections keep CORS headers and run before 
       body: JSON.stringify({ json: { value: 'x' } }),
     });
     assertEquals(unauthenticated.status, 401);
-    assertEquals(unauthenticated.headers.get('access-control-allow-origin'), '*');
+    assertEquals(unauthenticated.headers.get('access-control-allow-origin'), 'https://app.example');
     await unauthenticated.body?.cancel();
   } finally {
     await running.stop();
@@ -140,7 +141,7 @@ Deno.test('defineService middleware runs before the body limit is enforced', asy
     );
 
     assertEquals(response.status, 413);
-    assertEquals(response.headers.get('access-control-allow-origin'), '*');
+    assertEquals(response.headers.get('access-control-allow-origin'), null);
     await response.body?.cancel();
     assertEquals(seenPaths, ['/api/ping']);
   } finally {

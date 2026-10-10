@@ -361,6 +361,13 @@ const RULES: readonly Rule[] = [
     disposition: 'single 13.5.3 train, cache key, preflight; parity phase 1 enforce',
   },
   {
+    test: (p) => p === '.github/scripts/ci-test-shards.json',
+    cls: 'ci:timing-data',
+    owner: 'S1',
+    disposition:
+      'measured test-module weights; Aspire paths identify test coverage, not version assertions',
+  },
+  {
     test: starts('.github/scripts/'),
     cls: 'ci:policy-test',
     owner: 'S1',
