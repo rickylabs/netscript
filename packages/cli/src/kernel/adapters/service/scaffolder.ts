@@ -15,6 +15,7 @@ import type { ServiceScaffoldOptions, ServiceScaffoldResult } from '../../domain
 import { TEMPLATE_KEYS, type TemplateKey } from '../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../templates/template-asset.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
+import { readAuthServiceName, serviceAuthTemplate } from './auth-policy.ts';
 
 /** Creates a complete service workspace under `services/<name>/`. */
 export class ServiceScaffolder {
@@ -50,11 +51,13 @@ export class ServiceScaffolder {
     await this.createDir(srcDir, directoriesCreated);
     await this.createDir(routersDir, directoriesCreated);
 
+    const authServiceName = await readAuthServiceName(options.targetPath, this._fs);
     const templateVars = {
       serviceName: options.serviceName,
       modelName: options.modelName ?? '',
       projectName: options.projectName,
       servicePort: String(options.servicePort),
+      ...serviceAuthTemplate(options.serviceName, authServiceName),
     };
     await this.writeGenerated(
       join(serviceDir, SCAFFOLD_FILES.DENO_JSON),
@@ -121,6 +124,7 @@ export class ServiceScaffolder {
         ...(options.hostPort !== undefined ? { HostPort: options.hostPort } : {}),
         Entrypoint: 'src/main.ts',
         Workdir: `${SCAFFOLD_DIRS.SERVICES}/${options.serviceName}`,
+        ...(authServiceName ? { PluginReferences: [authServiceName] } : {}),
         ...(options.serviceReferences?.length
           ? { ServiceReferences: [...options.serviceReferences] }
           : {}),

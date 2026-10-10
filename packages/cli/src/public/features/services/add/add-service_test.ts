@@ -44,9 +44,13 @@ describe('public add service flow', () => {
     assertEquals(plan.allocation.source, 'auto');
   });
 
-  it('writes service and contract files with JSR imports', async () => {
+  it('writes guarded service and contract files with JSR imports when auth is installed', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
+    const settingsPath = '/workspace/alpha/appsettings.json';
+    const settings = JSON.parse(await fs.readFile(settingsPath));
+    settings.NetScript.Plugins = { auth: { PackageSpecifier: '@netscript/plugin-auth' } };
+    await fs.writeFile(settingsPath, JSON.stringify(settings));
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
     const formatter = identityFormatter();
@@ -94,6 +98,11 @@ describe('public add service flow', () => {
       'jsr:@netscript/service',
     );
     assertEquals(appsettings.NetScript.Services.billing.ServiceReferences, ['users']);
+    assertEquals(appsettings.NetScript.Services.billing.PluginReferences, ['auth']);
+    const main = await fs.readFile('/workspace/alpha/services/billing/src/main.ts');
+    assertStringIncludes(main, 'createAuthServiceAuthenticator');
+    assertStringIncludes(main, 'requireScopes: ["billing:access"]');
+    assertEquals(main.includes('public: true'), false);
     assertEquals(rootDenoJson.workspace.includes('./services/billing'), true);
     assertStringIncludes(contractMod, './billing.contract.ts');
     assertEquals(result.helperFiles.length, 1);

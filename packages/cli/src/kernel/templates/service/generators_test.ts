@@ -11,6 +11,7 @@ import { StringTemplateAdapter } from '../../adapters/scaffold/template-adapter.
 import { generateServiceDenoJson } from './generate-service-deno-json.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
+import { SERVICE_PUBLIC_REASON, serviceAuthTemplate } from '../../adapters/service/auth-policy.ts';
 const serviceMainTemplate = EMBEDDED_TEMPLATE_CONTENT['service/main.memory.ts.template'];
 const serviceRouterTemplate =
   "/**\r\n * {{serviceName | pascalCase}} router\r\n *\r\n * Aggregates version routers into a single router shape for the oRPC\r\n * server. Add new versions (`v2`, `v3`, …) alongside `v1` as the API\r\n * evolves; existing clients keep talking to their pinned version.\r\n *\r\n * The generated showcase keeps `health` under the service namespace because\r\n * the validated Step 5 contract baseline already owns that path at\r\n * `v1.{{serviceName | camelCase}}.health`.\r\n *\r\n * @see https://orpc.unnoq.com/docs/router\r\n */\r\n\r\nimport { health } from './routers/health.ts';\r\nimport { {{serviceName | pascalCase}}V1 } from './routers/v1.ts';\r\n\r\nexport const v1 = {\r\n  {{serviceName | camelCase}}: {\r\n    ...{{serviceName | pascalCase}}V1,\r\n    health,\r\n  },\r\n};\r\n\r\nexport const router = {\r\n  v1,\r\n};\r\n\r\nexport type Router = typeof router;\r\n";
@@ -19,6 +20,7 @@ const SAMPLE_SERVICE_VARS: Record<string, string> = {
   projectName: 'test-project',
   serviceName: 'team-members',
   servicePort: '3000',
+  ...serviceAuthTemplate('team-members'),
 };
 
 function makeAdapter(): StringTemplateAdapter {
@@ -113,12 +115,12 @@ describe('service template rendering', () => {
     }
   });
 
-  it('both shipped service entrypoints record a greppable public opt-out pending #1382 L2', async () => {
+  it('both shipped service entrypoints record a user-facing public opt-out', async () => {
     const adapter = makeAdapter();
     for (const key of ['service/main.ts.template', 'service/main.memory.ts.template'] as const) {
       const output = await adapter.render(EMBEDDED_TEMPLATE_CONTENT[key], SAMPLE_SERVICE_VARS);
       assertStringIncludes(output, 'auth: { public: true, reason:', key);
-      assertStringIncludes(output, '#1382 L2 will wire the guarded auth policy', key);
+      assertStringIncludes(output, SERVICE_PUBLIC_REASON, key);
     }
   });
 

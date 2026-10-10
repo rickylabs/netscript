@@ -5,13 +5,14 @@
  */
 
 import { defineService } from '@netscript/service';
+{{authImports}}
 import { db } from '@database';
 import { router } from './router.ts';
 
 const database = await db.getClient();
 
 await defineService(router, {
-  auth: { public: true, reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy' },
+  {{authPolicy}}
   name: '{{serviceName}}',
   version: '1.0.0',
   port: parseInt(Deno.env.get('PORT') || '{{servicePort}}'),

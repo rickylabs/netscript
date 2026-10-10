@@ -97,6 +97,7 @@ export const RUNTIME_GATES = [
   // runs before the generated quality gates so the plugin it authors is also
   // type-checked, linted and format-checked; it is never an AppHost resource.
   GATE.BEHAVIOR_GENERATED_GUARDED_PLUGIN,
+  GATE.BEHAVIOR_GENERATED_GUARDED_SERVICE,
   GATE.RUNTIME_ASPIRE_RESTORE,
   // Declared service environment is wired here, not next to the other pre-start
   // fixtures: it regenerates every helper from appsettings.json, so it has to
