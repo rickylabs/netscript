@@ -1,8 +1,8 @@
 import { assertEquals } from '@std/assert';
-import { deadline } from 'jsr:@std/async@^1/deadline';
-import { createElement } from 'npm:react@19.2.3';
+import { deadline } from '@std/async/deadline';
+import { createElement } from 'react';
 // @deno-types="npm:@types/react-test-renderer@19.1.0"
-import { act, create } from 'npm:react-test-renderer@19.2.3';
+import { act, create } from 'react-test-renderer';
 import { createStreamCollectionV1 } from '@netscript/sdk/streams/collections';
 import { useStreamLiveQueryV1 } from '@netscript/sdk/streams/react';
 
