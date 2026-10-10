@@ -219,8 +219,9 @@ Set `retention: { kind: 'ttl', ttlSeconds: 604800 }` or
 its stream. On the shipped server, TTL is a sliding inactivity window renewed by reads and appends;
 HEAD and reopening with PUT do not renew it or change the policy. Use absolute expiry or rotating
 day segments for a hard bound on an active stream. Absolute expiry does not slide. Both policies
-expire the whole stream. Omit retention for the current unbounded behavior. For existing day segments, `headDurableStream` reads metadata and
-`deleteDurableStream` deletes the whole stream through a versioned administrative port.
+expire the whole stream. Omit retention for the current unbounded behavior. For existing day
+segments, `headDurableStream` reads metadata and `deleteDurableStream` deletes the whole stream
+through a versioned administrative port.
 
 Run deletion from background workers or triggers with a service identity, independently of any app
 session. Entity `producer.delete(...)` appends a tombstone and does not shrink the log. See the
