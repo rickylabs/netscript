@@ -88,7 +88,8 @@ export function backoffDelay(
 
 /** Whether a classified transport failure may consume another attempt. */
 export function isRetryable(failure: StreamProducerTransportFailureV1): boolean {
-  return failure.kind === 'retryable' || failure.kind === 'stale-epoch';
+  return failure.kind === 'retryable' || failure.kind === 'stale-epoch' ||
+    failure.kind === 'timeout';
 }
 
 /** Convert an optional abort reason into an Error. */
