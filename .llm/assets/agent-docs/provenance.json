@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "4cd580cb1",
-  "extractionTimestamp": "2026-10-10T10:55:40.141Z",
+  "sourceCommit": "1d85cd8bf",
+  "extractionTimestamp": "2026-10-10T11:25:54.749Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -76,6 +76,7 @@
     "pages/orchestration-runtime/how-to/detached-start-agents-ci/index.md",
     "pages/orchestration-runtime/how-to/graceful-shutdown/index.md",
     "pages/orchestration-runtime/how-to/index.md",
+    "pages/orchestration-runtime/how-to/outbound-webhooks/index.md",
     "pages/orchestration-runtime/how-to/roll-out-runtime-overrides/index.md",
     "pages/orchestration-runtime/index.md",
     "pages/orchestration-runtime/runtime-config/index.md",
@@ -187,7 +188,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5058811,
-  "compressedBytes": 1459481,
-  "sha256": "0da265411cc9a2596f5e40c97bafec62232d2dfaea40699d9d5f1351220a0884"
+  "uncompressedBytes": 5084147,
+  "compressedBytes": 1468759,
+  "sha256": "f9bf96c20af3f8b3f455001cbd13fa05f8e275006b824a8827ed5f912d807b6b"
 }
