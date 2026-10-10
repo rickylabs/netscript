@@ -269,6 +269,7 @@ function createDenoKvQueue<T>(
 
   return new DenoKvAdapter<T>({
     queueName: name,
+    path: explicitPath,
     useShared: !explicitPath,
     verbose,
     deadLetterStore,

@@ -776,8 +776,10 @@ packages/telemetry/tests/layering_test.ts	telemetry-bridge	S3	dashboard /api/tel
 packages/telemetry/tests/query/aspire_query_test.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
 plugins/ai/README.md	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/README.md	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/auth/services/src/backend-registry.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/src/adapter/resources/barrel/barrel.stub.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/src/adapter/resources/resources.test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/auth/src/constants.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/sagas/deno.json	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/README.md	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
@@ -815,6 +817,7 @@ plugins/triggers/src/adapter/resources/resources.test.ts	plugin:other	S5	contrib
 plugins/triggers/src/aspire/mod.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/triggers/src/aspire/triggers-contribution.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/triggers/src/cli/http-triggers-service.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/triggers/src/constants.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/src/public/mod.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/src/runtime/trigger-processor.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/tests/aspire/aspire_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
@@ -832,10 +835,12 @@ plugins/workers/src/aspire/workers-contribution.ts	plugin-contribution	S5/S6	lit
 plugins/workers/src/cli/adapters/runtime-api-client.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/src/e2e/probes/probe-context.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/src/public/mod.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/src/runtime/concurrency.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/streams/factory.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/test-api.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/aspire/workers-contribution_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/public/manifest_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/tests/runtime/concurrency_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/verify-plugin.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 README.md	doc:root	S11	prose sweep (AGENTS.md only if skill path changes)
