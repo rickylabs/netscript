@@ -148,10 +148,13 @@ export function registerORPCInstrumentation(
  *
  * @example
  * ```ts
+ * import { createRPCHandler, type ServiceRouter } from '@netscript/service';
  * import { TracingPlugin } from '@netscript/telemetry/orpc';
- * import { RPCHandler } from '@orpc/server/fetch';
  *
- * const rpcHandler = new RPCHandler(router, {
+ * declare const router: ServiceRouter;
+ *
+ * const rpcHandler = createRPCHandler(router, {
+ *   tracing: false,
  *   plugins: [
  *     new TracingPlugin({ serviceName: 'users' }),
  *   ],

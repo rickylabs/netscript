@@ -330,7 +330,7 @@ treat that as canonical and this essay as the orientation.
     { name: "workers-api", type: "assigned port", desc: "Workers plugin API. /api/v1/workers/{jobs,executions,tasks,seed}; trigger via POST /api/v1/workers/jobs/{id}/trigger." },
     { name: "sagas-api", type: "assigned port", desc: "Sagas plugin API. /api/v1/sagas/{sagas,instances,publish} plus liveness at /health/live." },
     { name: "triggers-api", type: "assigned port", desc: "Triggers plugin API (raw Hono, not oRPC). POST /api/v1/webhooks/inbound/generic, GET /api/v1/events." },
-    { name: "auth-api", type: "assigned port", desc: "Auth plugin oRPC service. /api/v1/auth/{signin,callback,signout,session,me} with one active backend (NETSCRIPT_AUTH_BACKEND)." },
+    { name: "auth-api", type: "assigned port", desc: "Auth plugin oRPC service. /api/v1/auth/{signin,callback,signout,sessions/revoke,session,me} with one active backend (NETSCRIPT_AUTH_BACKEND)." },
     { name: "streams", type: "assigned port", desc: "Durable-streams producer runtime. Served as its own Aspire Deno service; workers/auth/sagas mirror execution state into it." },
     { name: "workers / sagas / triggers", type: "background processors", desc: "Separate from the APIs: workers and sagas run from bin/combined.ts; triggers from src/runtime/trigger-processor.ts. Declared under appsettings BackgroundProcessors." }
   ]

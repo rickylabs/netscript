@@ -1,3 +1,4 @@
+import { KvOAuthError } from '@netscript/auth-kv-oauth/errors';
 import type { AuthnRequest, AuthSession } from '@netscript/plugin-auth-core/domain';
 import type {
   AuthSessionResponse,
@@ -44,7 +45,7 @@ export function toRequest(
 ): Request {
   if (!serviceRequest) {
     throw new AuthServiceHandlerError(
-      'AUTH_PROVIDER_ERROR',
+      'INTERNAL',
       'Auth interactive flow requires a captured service request.',
     );
   }
@@ -97,6 +98,14 @@ export function unsupportedOperation(backendName: string, operation: string): ne
 export function providerFailure(error: unknown, providerId?: string): AuthServiceHandlerError {
   if (error instanceof AuthServiceHandlerError) {
     return error;
+  }
+  if (error instanceof KvOAuthError) {
+    if (error.code === 'flow_https_required' || error.code === 'cookie_https_required') {
+      return new AuthServiceHandlerError('AUTH_TRANSPORT_ERROR', error.message, { providerId });
+    }
+    if (error.code === 'configuration_error') {
+      return new AuthServiceHandlerError('AUTH_CONFIGURATION_ERROR', error.message, { providerId });
+    }
   }
   const reason = error instanceof Error ? error.message : 'Auth backend operation failed.';
   return new AuthServiceHandlerError('AUTH_PROVIDER_ERROR', reason, { providerId });

@@ -226,7 +226,7 @@ Deno.test('an explicit documented-symbol import may shadow the ambient conventio
   assertEquals(result.code, 0, result.diagnostics);
 });
 
-Deno.test('body diagnostics are classified and deferred without weakening the import gate', async () => {
+Deno.test('an unbound name in an example body fails the gate instead of being deferred', async () => {
   const result = await compileJsdocExamples(
     analysis([
       block(
@@ -236,23 +236,25 @@ Deno.test('body diagnostics are classified and deferred without weakening the im
     ]),
     repositoryRoot,
   );
-  assertEquals(result.code, 0, result.diagnostics);
-  assertEquals(result.enforcedFailureCount, 0);
+  assertEquals(result.code, 1, result.diagnostics);
+  assertEquals(result.enforcedFailureCount, 1);
   assertEquals(result.failureCensus.unboundName, 1);
-  assertEquals(
-    result.deferredExamples.map((example) => ({
-      failureClass: example.failureClass,
-      exampleOrdinal: example.exampleOrdinal,
-      fenceOrdinal: example.fenceOrdinal,
-      tsCodes: example.tsCodes,
-    })),
-    [{
-      failureClass: 'unboundName',
-      exampleOrdinal: 1,
-      fenceOrdinal: 1,
-      tsCodes: [2304],
-    }],
+  assertEquals(result.deferredExamples, []);
+  assertStringIncludes(result.diagnostics, "Cannot find name 'missingInput'");
+});
+
+Deno.test('a declared stand-in binds an application-side name', async () => {
+  const result = await compileJsdocExamples(
+    analysis([
+      block(
+        owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+        'declare const missingInput: unknown;\nPaginationInputSchema.parse(missingInput);',
+      ),
+    ]),
+    repositoryRoot,
   );
+  assertEquals(result.code, 0, result.diagnostics);
+  assertEquals(result.failureCensus.unboundName, 0);
 });
 
 Deno.test('an unclassified compiler abort fails closed even when deferred syntax findings exist', async () => {
@@ -363,10 +365,7 @@ Deno.test('diagnostic classification is identical with compiler color on and off
       fenceOrdinal: example.fenceOrdinal,
       tsCodes: example.tsCodes,
     })),
-    [
-      { failureClass: 'unboundName', fenceOrdinal: 2, tsCodes: [2304] },
-      { failureClass: 'typeError', fenceOrdinal: 3, tsCodes: [2345] },
-    ],
+    [{ failureClass: 'typeError', fenceOrdinal: 3, tsCodes: [2345] }],
   );
 });
 
@@ -474,16 +473,11 @@ Deno.test('an example using a value documented elsewhere, without importing it, 
   );
 
   const result = await compileJsdocExamples(analysis([documented, borrower]), repositoryRoot);
-  const borrowed = result.deferredExamples.filter((entry) =>
-    entry.owner.symbol === 'defineStub' && entry.failureClass === 'unboundName'
-  );
-  assertEquals(
-    borrowed.length,
-    1,
-    'the borrowing example must be classified, not silently resolved',
-  );
+  assertEquals(result.code, 1, 'the borrowing example must fail, not be silently resolved');
   assert(
-    borrowed[0]?.tsCodes.includes(2304),
-    'the borrowed symbol must be reported as an unbound name',
+    new RegExp(
+      `TS2304 \\[ERROR\\]: Cannot find name 'substituteTokens'[\\s\\S]*?at [^\\n]*symbol defineStub`,
+    ).test(result.diagnostics),
+    'the borrowed symbol must be reported as an unbound name in the borrowing example',
   );
 });

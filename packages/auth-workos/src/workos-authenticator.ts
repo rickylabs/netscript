@@ -137,6 +137,11 @@ const DEFAULT_COOKIE_NAME = 'wos-session';
  *
  * @example
  * ```ts
+ * import { createWorkosAuthenticator, type WorkosSessionClient } from '@netscript/auth-workos';
+ *
+ * declare const workos: WorkosSessionClient;
+ * declare const cookiePassword: string;
+ *
  * const authenticator = createWorkosAuthenticator({
  *   workos,
  *   cookiePassword,
