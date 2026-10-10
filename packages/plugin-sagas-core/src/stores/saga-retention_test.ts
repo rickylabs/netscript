@@ -3,7 +3,13 @@ import { FakeTime } from 'jsr:@std/testing@^1/time';
 import { DenoKvAdapter, MemoryKvAdapter } from '@netscript/kv';
 import { defineSaga, sagaComplete } from '../../mod.ts';
 import { SagaEngine } from '../runtime/saga-engine.ts';
-import type { SagaCorrelationKey, SagaInstanceId, SagaState } from '../domain/mod.ts';
+import type {
+  SagaCorrelationKey,
+  SagaId,
+  SagaInstanceId,
+  SagaState,
+  SagaStateEnvelope,
+} from '../domain/mod.ts';
 import { KvSagaStore } from './kv-saga-store.ts';
 import { KvSagaAppliedKeyStore } from './kv-saga-runtime-stores.ts';
 
@@ -156,4 +162,56 @@ Deno.test('known engine envelope and correlation avoid per-step retention reads'
   } finally {
     await engine.stop();
   }
+});
+
+Deno.test('real Deno KV rejects stale open retention context after a concurrent terminal sweep', async () => {
+  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+  let now = new Date();
+  const first = new KvSagaStore({ kv, now: () => now });
+  const second = new KvSagaStore({ kv, now: () => now });
+  const instanceId = 'concurrent:one' as SagaInstanceId;
+  const open: SagaStateEnvelope = {
+    state: {},
+    metadata: {
+      instanceId,
+      version: 1,
+      status: 'running',
+      durability: 't1',
+      createdAt: now,
+      updatedAt: now,
+    },
+  };
+  const correlation = {
+    sagaId: 'concurrent' as SagaId,
+    correlationKey: 'one' as SagaCorrelationKey,
+    instanceId,
+  };
+  await first.save(open, { correlation });
+  const terminal: SagaStateEnvelope = {
+    ...open,
+    metadata: {
+      ...open.metadata,
+      version: 2,
+      status: 'completed',
+      completedAt: now,
+    },
+  };
+  await second.save(terminal);
+  for (let i = 0; i < 8; i++) await second.cleanupRetention();
+  assertEquals(await kv.get(['sagas', 'retention', instanceId]), null);
+  now = new Date(now.getTime() + 8 * 86_400_000);
+  await first.appendTransition(instanceId, {
+    version: 1,
+    transition: {
+      from: {},
+      to: {},
+      status: 'running',
+      message: { type: 'Tick', payload: {} },
+      occurredAt: now,
+    },
+  }, open);
+  await first.saveCorrelation(correlation, open);
+  assertEquals(await kv.get(['sagas', 'transition', instanceId, 1]), null);
+  assertEquals(await kv.get(['sagas', 'correlation', 'concurrent', 'one']), null);
+  assertEquals(await kv.get(['sagas', 'correlation-instance', instanceId]), null);
 });

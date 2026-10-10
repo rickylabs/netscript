@@ -52,6 +52,7 @@ export class KvSagaStore implements SagaStorePort {
   readonly #now: () => Date;
   readonly #days: number | ((envelope: SagaStateEnvelope) => number);
   readonly #retention: SagaKvRetention;
+  readonly #savedVersions = new WeakMap<SagaStateEnvelope, string | null>();
 
   /** Create a saga store over the supplied KV adapter. */
   constructor(options: KvSagaStoreOptions) {
@@ -137,6 +138,10 @@ export class KvSagaStore implements SagaStorePort {
     if (!result.ok) {
       throw versionMismatch(envelope.metadata.instanceId);
     }
+    if (expireIn !== undefined && expireIn <= 0) this.#savedVersions.set(envelope, null);
+    else if (result.versionstamp !== undefined) {
+      this.#savedVersions.set(envelope, result.versionstamp);
+    }
   }
 
   /** Append a transition record for one saga instance. */
@@ -145,11 +150,12 @@ export class KvSagaStore implements SagaStorePort {
     record: SagaTransitionRecord<TState>,
     knownEnvelope?: SagaStateEnvelope<TState>,
   ): Promise<void> {
-    const envelope = knownEnvelope ?? await this.load(instanceId);
-    const expireIn = envelope ? this.#remaining(envelope) : undefined;
     const key = this.#transitionKey(instanceId, record.version);
-    if (expireIn !== undefined && expireIn <= 0) await this.#kv.delete(key);
-    else await this.#kv.set(key, record, expireIn === undefined ? undefined : { expireIn });
+    await this.#writeAncillary(instanceId, knownEnvelope, (expireIn) => [
+      expireIn !== undefined && expireIn <= 0
+        ? { type: 'delete', key }
+        : { type: 'set', key, value: record, expireIn },
+    ]);
   }
 
   /** Find an instance id by saga id and correlation key. */
@@ -166,19 +172,21 @@ export class KvSagaStore implements SagaStorePort {
     entry: SagaCorrelationIndexEntry,
     knownEnvelope?: SagaStateEnvelope,
   ): Promise<void> {
-    const envelope = knownEnvelope ?? await this.load(entry.instanceId);
-    const expireIn = envelope ? this.#remaining(envelope) : undefined;
     const key = this.#correlationKey(entry.sagaId, entry.correlationKey);
     const reverseKey: KvKey = [...this.#prefix, 'correlation-instance', entry.instanceId];
-    const mutations: AtomicMutation[] = expireIn !== undefined && expireIn <= 0
-      ? [{ type: 'delete', key }, { type: 'delete', key: reverseKey }]
-      : [{ type: 'set', key, value: entry.instanceId, expireIn }, {
-        type: 'set',
-        key: reverseKey,
-        value: entry,
-        expireIn,
-      }];
-    await requireAtomic(this.#kv)([], mutations);
+    await this.#writeAncillary(
+      entry.instanceId,
+      knownEnvelope,
+      (expireIn) =>
+        expireIn !== undefined && expireIn <= 0
+          ? [{ type: 'delete', key }, { type: 'delete', key: reverseKey }]
+          : [{ type: 'set', key, value: entry.instanceId, expireIn }, {
+            type: 'set',
+            key: reverseKey,
+            value: entry,
+            expireIn,
+          }],
+    );
   }
 
   /** Delete persisted state, transition history, and matching correlation indexes. */
@@ -256,6 +264,39 @@ export class KvSagaStore implements SagaStorePort {
    */
   cleanupRetention(limit = 100): Promise<boolean> {
     return this.#retention.cleanup(limit);
+  }
+
+  // Reuse the engine's saved snapshot without a read, but guard every ancillary write with its
+  // commit stamp. A concurrent terminal writer forces a bounded reload of its current deadline.
+  async #writeAncillary(
+    instanceId: SagaInstanceId,
+    knownEnvelope: SagaStateEnvelope | undefined,
+    mutations: (expireIn: number | undefined) => AtomicMutation[],
+  ): Promise<void> {
+    if (knownEnvelope && knownEnvelope.metadata.instanceId !== instanceId) {
+      throw SagasError.validationFailed('Saga retention envelope does not match the instance.');
+    }
+    const stateKey = this.#stateKey(instanceId);
+    let envelope = knownEnvelope;
+    let versionstamp = knownEnvelope === undefined
+      ? undefined
+      : this.#savedVersions.get(knownEnvelope);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (versionstamp === undefined) {
+        const current = await this.#kv.get<SagaStateEnvelope>(stateKey);
+        envelope = current?.value;
+        versionstamp = current?.versionstamp ?? null;
+      }
+      // A saved instance that has since disappeared must not recreate history or correlations.
+      const expireIn = envelope ? this.#remaining(envelope) : knownEnvelope ? 0 : undefined;
+      const result = await requireAtomic(this.#kv)([
+        { key: stateKey, versionstamp },
+      ], mutations(expireIn));
+      if (result.ok) return;
+      if (knownEnvelope) this.#savedVersions.delete(knownEnvelope);
+      versionstamp = undefined;
+    }
+    throw versionMismatch(instanceId);
   }
 
   #remaining(envelope: SagaStateEnvelope): number | undefined {
