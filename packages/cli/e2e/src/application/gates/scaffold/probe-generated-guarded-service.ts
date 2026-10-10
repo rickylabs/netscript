@@ -81,13 +81,13 @@ export async function probeGeneratedGuardedService(
       projectRoot,
     );
   } finally {
-    for (const path of [main, probe, importMap]) {
-      try {
-        await Deno.remove(path);
-      } catch (error) {
-        if (!(error instanceof Deno.errors.NotFound)) throw error;
-      }
-    }
+    await Promise.all(
+      [main, probe, importMap].map((path) =>
+        Deno.remove(path).catch((error: unknown) => {
+          if (!(error instanceof Deno.errors.NotFound)) throw error;
+        })
+      ),
+    );
   }
 }
 
