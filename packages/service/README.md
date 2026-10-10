@@ -93,12 +93,13 @@ comma-separated exact HTTP(S) origins, with no path or trailing slash:
 export NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'
 ```
 
-Until CLI/Aspire origin injection lands, configure this variable in each service's launch
-environment. An unset or blank value allows no cross-origin browser reads. The existing
-`createPluginService()` factory delegates its `config.cors` to this same builder, so omitted origins
-consume the workspace allowlist without separate plugin policy. `enableCors: false` continues to
-skip plugin CORS. Explicit origins override the environment, including an empty array to deny all
-cross-origin access:
+Generated CLI/Aspire helpers inject the enabled web apps' allocated endpoint origins into every
+service and plugin API resource. For independently launched services, configure this variable in
+each service's launch environment. An unset or blank value allows no cross-origin browser reads. The
+existing `createPluginService()` factory delegates its `config.cors` to this same builder, so
+omitted origins consume the workspace allowlist without separate plugin policy. `enableCors: false`
+continues to skip plugin CORS. Explicit origins override the environment, including an empty array
+to deny all cross-origin access:
 
 ```ts
 import { defineService, type ServiceRouter } from '@netscript/service';
@@ -125,8 +126,8 @@ CORS is a browser response policy, not authentication or CSRF protection.
 
 The owner-approved browser auth topology is a BFF: the Fresh app owns sign-in/callback and its
 first-party session cookie, and its server forwards a bearer through the SDK contribution to
-services. Browser-to-service credentialed CORS is not part of this topology. Generated BFF routes,
-Aspire origin injection and a real browser session round trip are follow-up scope of
+services. Browser-to-service credentialed CORS is not part of this topology. Generated BFF routes
+and a real browser session round trip are follow-up scope of
 [#1386](https://github.com/rickylabs/netscript/issues/1386).
 
 ## Runtime shutdown

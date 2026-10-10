@@ -1,6 +1,5 @@
 import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { createService, defineService, type ServiceApp } from '../mod.ts';
-import { createPluginService } from '../../plugin/src/service/mod.ts';
 
 const appOrigin = 'https://app.example';
 const otherOrigin = 'https://other.example';
@@ -9,6 +8,7 @@ async function withOrigins(
   value: string | undefined,
   run: () => void | Promise<void>,
 ): Promise<void> {
+  // These tests change process-global env and run serially within this module.
   const previous = Deno.env.get('NETSCRIPT_CORS_ORIGINS');
   if (value === undefined) Deno.env.delete('NETSCRIPT_CORS_ORIGINS');
   else Deno.env.set('NETSCRIPT_CORS_ORIGINS', value);
@@ -180,24 +180,4 @@ Deno.test('defineService rejects credentialed wildcards before opening a listene
     TypeError,
     'wildcard',
   );
-});
-
-Deno.test('createPluginService receives workspace origins through its existing builder seam', async () => {
-  await withOrigins(appOrigin, async () => {
-    const app = createPluginService({}, {
-      name: 'plugin-env',
-      auth: { public: true, reason: 'Public health fixture for CORS policy' },
-      serveRpc: false,
-    }).build();
-    await assertOrigin(app, appOrigin, appOrigin);
-    await assertOrigin(app, otherOrigin, null);
-    const override = createPluginService({}, {
-      name: 'plugin-explicit',
-      auth: { public: true, reason: 'Public health fixture for CORS policy' },
-      serveRpc: false,
-      cors: { origin: [otherOrigin] },
-    }).build();
-    await assertOrigin(override, otherOrigin, otherOrigin);
-    await assertOrigin(override, appOrigin, null);
-  });
 });

@@ -321,9 +321,10 @@ separate adoption gates; recording this decision does not certify their behavior
 Service CORS is an explicit browser response allowlist. `withCors()` and the `defineService()` /
 `createPluginService()` presets consume `NETSCRIPT_CORS_ORIGINS` when their `origin` option is
 omitted. The variable contains comma-separated exact HTTP(S) origins, supplied by workspace launch
-configuration; CLI/Aspire injection remains #1386 L3. Unset means no cross-origin response access.
-An explicit origin or origin array overrides the environment. Wildcard access requires an explicit
-option and cannot be combined with credentials; invalid combinations fail before serving.
+configuration; CLI/Aspire helpers inject enabled web app endpoint origins into every service and
+plugin API (#1386 L3). Unset means no cross-origin response access. An explicit origin or origin
+array overrides the environment. Wildcard access requires an explicit option and cannot be combined
+with credentials; invalid combinations fail before serving.
 
 The breaking migration and exact environment/option examples live in
 [`packages/service/README.md`](../../../packages/service/README.md#cors-migration-breaking-in-008).

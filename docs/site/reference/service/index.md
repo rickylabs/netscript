@@ -113,16 +113,34 @@ rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `ServiceConfig` | interface | Service configuration options (input to `createService`). |
-| `DefineServiceOptions` | interface | Options for the `defineService` preset, including `middleware` (caller middleware after CORS and logging, before auth) and the opt-in `bodyLimit`. |
+| `DefineServiceOptions` | interface | Options for the `defineService` preset, including `cors` (explicit origins or the `NETSCRIPT_CORS_ORIGINS` workspace allowlist), `middleware` (caller middleware after CORS and logging, before auth) and the opt-in `bodyLimit`. |
 | `ServiceBodyLimitOptions` | interface | `{ maxBytes }` request-body limit accepted by `withBodyLimit()` and `DefineServiceOptions.bodyLimit`. |
 | `PayloadTooLargeResponse` | interface | JSON body of a `413` body-limit rejection: `{ error: 'PAYLOAD_TOO_LARGE', message, maxBytes }`. |
 | `ServeOptions` | interface | Options for starting a service listener. |
-| `CorsOptions` | interface | CORS options supported by `withCors()`. |
+| `CorsOptions` | interface | CORS options supported by `withCors()`. Omitted `origin` reads comma-separated exact HTTP(S) origins from `NETSCRIPT_CORS_ORIGINS`; unset/blank denies cross-origin access. Explicit origins override the environment; wildcard with credentials fails `build()`. |
 | `OpenAPIConfig` | interface | Configuration for OpenAPI spec generation. |
 | `RPCHandlerConfig` | interface | Configuration options for RPC handlers. |
 | `ScalarDocsOptions` | interface | Configuration for the Scalar docs UI. |
 | `HealthHandlerOptions` | interface | Options for `createHealthHandler`. |
 | `LoggerMiddlewareOptions` | interface | Options for the logger middleware (re-exported from `@netscript/logger/middleware`). |
+
+### CORS origins
+
+`DefineServiceOptions.cors` configures the same policy as `withCors()`. If `origin` is omitted,
+the builder snapshots `NETSCRIPT_CORS_ORIGINS`: comma-separated exact HTTP(S) origins, without
+paths or trailing slashes. Unset or blank means no cross-origin browser access. For example,
+`NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'` permits those two origins.
+An explicit `cors: { origin: ['https://app.example'] }` overrides the environment; `origin: []`
+denies all cross-origin access. Invalid environment entries fail configuration. Wildcard origins
+with `credentials: true` fail before the listener starts.
+
+Generated CLI/Aspire helpers supply the enabled web apps' allocated HTTP endpoint origins to every
+service and plugin service resource. This generated value overrides a declared resource environment
+value; a workspace without enabled web apps supplies an empty allowlist. Independent services must
+configure their launch environment themselves. Origins outside the allowlist receive no
+`Access-Control-Allow-Origin` header. CORS controls browser response access; it does not authenticate
+callers. The chosen [browser authentication topology](https://github.com/rickylabs/netscript/blob/main/docs/architecture/doctrine/07-composition-and-extension.md#browser-authentication-topology-008-owner-decision)
+uses a BFF; scaffolding that topology is separate follow-up scope.
 
 ### Listener bind address
 

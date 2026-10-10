@@ -1,7 +1,8 @@
 {{__slot0__}}
 
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-import { OtlpProtocol } from '{{__slot1__}}';
+import { OtlpProtocol, refExpr } from '{{__slot1__}}';
+import type { EndpointReference } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
 import {
@@ -12,14 +13,23 @@ import {
 } from '{{__slot3__}}';
 
 interface EndpointProvider {
-  getEndpoint(protocol: string): Promise<string | undefined> | string | undefined;
+  getEndpoint(protocol: string): PromiseLike<EndpointReference> | EndpointReference;
 }
 
-async function getResourceEndpoint(resource: unknown, protocol: string): Promise<string | undefined> {
+async function getResourceEndpoint(resource: unknown, protocol: string): Promise<EndpointReference | undefined> {
   if (!resource || typeof resource !== 'object' || !('getEndpoint' in resource)) {
     return undefined;
   }
   return await (resource as EndpointProvider).getEndpoint(protocol);
+}
+
+interface EnvironmentTarget {
+  withEnvironment(key: string, value: unknown): unknown;
+}
+
+function isEnvironmentTarget(resource: unknown): resource is EnvironmentTarget {
+  return resource !== null && typeof resource === 'object' &&
+    'withEnvironment' in resource && typeof resource.withEnvironment === 'function';
 }
 
 /**
@@ -52,8 +62,20 @@ export async function registerApps(
   appHostDir: string,
 ): Promise<Map<string, unknown>> {
   const apps = new Map<string, unknown>();
+  let corsOrigins: ReturnType<typeof refExpr> | undefined;
 
 {{__slot4__}}
+
+  // Workspace web origins own this generated value, after declared service/plugin environment.
+  // Keep endpoint expressions deferred: ports are allocated by Aspire at start/publish time.
+  for (const resources of [_services, _plugins]) {
+    for (const resource of resources.values()) {
+      if (!isEnvironmentTarget(resource)) {
+        throw new TypeError('Service/plugin resource cannot receive the workspace CORS allowlist');
+      }
+      await resource.withEnvironment('NETSCRIPT_CORS_ORIGINS', corsOrigins ?? '');
+    }
+  }
 
   return apps;
 }
