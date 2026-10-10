@@ -71,7 +71,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/runtime-config": ["."],
 
-  "@netscript/sdk": [".","./auto-update","./cache","./client","./collections","./desktop","./discovery","./ports","./presets","./query","./query-client","./streams","./telemetry"],
+  "@netscript/sdk": [".","./auto-update","./cache","./client","./collections","./desktop","./discovery","./ports","./presets","./query","./query-client","./streams","./streams/consumer","./telemetry"],
 
   "@netscript/service": [".","./auth","./commands","./commands/relay","./commands/testing","./internal-credential","./rpc-path"],
 
