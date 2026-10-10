@@ -1321,6 +1321,26 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when `deno task publish:dry-run` passes for the alpha-1 train after PR1 merges,
   and scaffold output no longer emits forward-looking stable ranges.
 
+## packages/auth-better-auth — cookie-cache residual window outside NetScript (`auth-better-auth-cookie-cache-window`)
+
+- **Reason:** better-auth's optional `session.cookieCache` keeps a signed `session_data` cookie
+  that its own reads trust until `maxAge` (default 300 s). `@netscript/auth-better-auth` reads every
+  session with `disableCookieCache` (#1384), so revocation is immediate for everything behind
+  NetScript. Two gaps remain:
+  - better-auth's own `/api/auth/*` endpoints and client helpers still accept a revoked session's
+    cache cookie until `maxAge`;
+  - the NetScript signout response cannot clear the caller's cache cookies, because the auth
+    service discards backend `Set-Cookie` headers (#1385).
+- **Owner:** Auth layer follow-up.
+- **Created:** 2026-10-10.
+- **Status:** open, DEBT_ACCEPTED.
+- **Target:** close with #1385: the auth service forwards backend `Set-Cookie`, and signout
+  expires the caller's better-auth cookies. The cross-device window on better-auth's own endpoints is upstream
+  behavior bounded by `session.cookieCache.maxAge`, and is documented on the better-auth page.
+- **Gate:** Close when the auth service signout response expires the caller's better-auth
+  `session_token` and `session_data` cookies (test against a real instance with the cookie cache
+  on), and the better-auth docs still state the upstream `maxAge` window.
+
 ## packages/auth-workos — subject-wide revocation unsupported (`auth-workos-subject-revocation`)
 
 - **Reason:** `AuthSessionStorePort.revokeSubjectSessions` (#1384) backs `signout { everywhere:

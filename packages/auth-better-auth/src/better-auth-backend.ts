@@ -17,6 +17,7 @@ import {
   type BetterAuthAuthenticatorOptions,
   type BetterAuthSessionPayload,
   createBetterAuthAuthenticator,
+  getAuthoritativeSession,
   principalFromBetterAuthSession,
   unwrapSessionResponse,
 } from './better-auth.ts';
@@ -81,7 +82,7 @@ export function createBetterAuthBackend(options: BetterAuthBackendOptions): Auth
         if (!headers) {
           return undefined;
         }
-        const resolved = await options.auth.api.getSession({ headers, returnHeaders: true });
+        const resolved = await getAuthoritativeSession(options.auth, headers);
         const { session } = unwrapSessionResponse(resolved);
         return session ? authSessionFromBetterAuth(session) : undefined;
       },
@@ -115,7 +116,9 @@ export function createBetterAuthBackend(options: BetterAuthBackendOptions): Auth
             "better-auth revokes a subject's sessions only through a request credential of that subject.",
           );
         }
-        const { session } = unwrapSessionResponse(await options.auth.api.getSession({ headers }));
+        const { session } = unwrapSessionResponse(
+          await getAuthoritativeSession(options.auth, headers),
+        );
         if (session?.user.id !== subject) {
           // Fail closed: never let one subject's credential end another subject's sessions.
           throw new Error(

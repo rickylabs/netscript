@@ -154,6 +154,26 @@ route cannot silently degrade to an anonymous render — the same fail-loud disc
 [authentication](/identity-access/auth/) page describes for the backend port. A machine-to-machine
 API route follows the identical shape: swap the redirect for `throw new HttpError(401)`.
 
+## Revocation and the cookie cache
+
+better-auth can keep a signed copy of the session in a `session_data` cookie
+(`session.cookieCache`) so its own reads skip the database. A revoked session's cache cookie stays
+valid until its `maxAge` (better-auth's default is 300 seconds).
+
+`@netscript/auth-better-auth` never trusts that cache: its authenticator and its
+`backend.sessions.getSession` pass `query: { disableCookieCache: true }`. That is better-auth's own
+guidance for sensitive reads. Through NetScript, a revoked session therefore stops authenticating on
+the next request, on every device, including after `signout { everywhere: true }` (which wraps
+better-auth's `api.revokeSessions`). The cost is one session-store read per NetScript
+authentication, the same as running better-auth without the cookie cache.
+
+The residual window is outside NetScript. better-auth's own `/api/auth/*` endpoints and its client
+helpers still honor a cached `session_data` cookie until `maxAge`. The NetScript signout response
+also does not yet expire the caller's better-auth cookies, because the auth service drops backend
+`Set-Cookie` headers today (tracked in #1385). If your app
+reads sessions from better-auth directly for a sensitive decision, pass `disableCookieCache` there
+too, or keep `session.cookieCache.maxAge` short.
+
 ## Where to go next
 
 - {{ comp.xref({ key: "explain:auth-model" }) }} — how Principals, sessions, and backends fit

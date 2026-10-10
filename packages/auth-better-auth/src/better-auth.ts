@@ -121,7 +121,29 @@ export type BetterAuthRevokeSessionsInput = Readonly<{
 export type BetterAuthGetSessionInput = Readonly<{
   headers: Headers;
   returnHeaders?: boolean;
+  /** better-auth query flags; NetScript always sets `disableCookieCache`. */
+  query?: Readonly<{ disableCookieCache?: boolean }>;
 }>;
+
+/**
+ * Reads the request's session from better-auth's server-side store, never from the signed
+ * `session_data` cookie cache.
+ *
+ * better-auth's own guidance for sensitive reads is to pass `disableCookieCache` so a revoked but
+ * still-cached session cannot authorize anything; NetScript applies it to every lookup, so a
+ * revocation (single or subject-wide) takes effect on the next request instead of after the cache
+ * cookie's `maxAge`.
+ */
+export function getAuthoritativeSession(
+  auth: BetterAuthInstance,
+  headers: Headers,
+): Promise<BetterAuthSessionLookupResponse> {
+  return auth.api.getSession({
+    headers,
+    returnHeaders: true,
+    query: { disableCookieCache: true },
+  });
+}
 
 /** Session lookup response shape consumed by NetScript better-auth adapters. */
 export type BetterAuthSessionLookupResponse =
@@ -209,10 +231,7 @@ export function createBetterAuthAuthenticator(
     async authenticate(request: AuthnRequest): Promise<AuthnResult> {
       let resolved: unknown;
       try {
-        resolved = await options.auth.api.getSession({
-          headers: request.headers(),
-          returnHeaders: true,
-        });
+        resolved = await getAuthoritativeSession(options.auth, request.headers());
       } catch (error) {
         return {
           ok: false,

@@ -248,8 +248,12 @@ otherwise the `__Host-ns_session` cookie does. Every other procedure stays publi
   amount of work and never walks the subject's sessions. `kv-oauth` records one per-subject
   revocation instant: any session issued at or before it stops resolving as active. That includes
   sessions stored before this release, so no migration is needed. `better-auth` delegates to its
-  own `api.revokeSessions` through the caller's credential. `workos` has no user-wide revocation
-  API and returns `AUTH_PROVIDER_ERROR`; this is tracked in #2190.
+  own `api.revokeSessions` through the caller's credential. NetScript reads every better-auth
+  session from the server-side store (`disableCookieCache`), so a cached `session_data` cookie
+  stops authenticating through NetScript on the next request; the
+  [better-auth page](/identity-access/better-auth-plugins/#revocation-and-the-cookie-cache)
+  describes the residual window on better-auth's own endpoints. `workos` has no user-wide
+  revocation API and returns `AUTH_PROVIDER_ERROR`; this is tracked in #2190.
 - **Operators.** Revoking somebody else's session is the separate `revokeSession` procedure,
   gated by the `auth:sessions:revoke` scope. A worker or saga calls it with a service identity
   that holds the scope, so no person needs to be signed in. The CLI's
