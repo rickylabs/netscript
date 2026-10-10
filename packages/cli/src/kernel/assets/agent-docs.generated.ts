@@ -27,7 +27,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/cron": [".","./adapters","./ports","./testing"],
 
-  "@netscript/database": [".","./adapters","./adapters/mssql","./adapters/mysql","./adapters/postgres","./commands","./commands/postgres","./extensions","./ports","./scripts","./testing","./tracing"],
+  "@netscript/database": [".","./adapters","./adapters/mssql","./adapters/mysql","./adapters/postgres","./commands","./commands/postgres","./connection-strings/postgres","./extensions","./ports","./scripts","./testing","./tracing"],
 
   "@netscript/fresh": [".","./ai","./ai/sandbox","./builders","./defer","./defer/island","./desktop","./error","./form","./interactive","./navigation","./query","./route","./server","./streams","./testing","./vite"],
 
