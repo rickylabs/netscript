@@ -12,12 +12,14 @@ Deno.test('tier images use the scaffold cache owner and query the database SDK o
     queries++;
     return Promise.resolve('sdk-owned-image:changed-tag');
   };
-  const cache = SCAFFOLD_CACHE_CONTAINER_IMAGES.Garnet;
-  assertEquals(await runtimeTierImages('sqlite', resolve), [`${cache.image}:${cache.tag}`]);
+  const caches = Object.values(SCAFFOLD_CACHE_CONTAINER_IMAGES).map(({ image, tag }) =>
+    `${image}:${tag}`
+  );
+  assertEquals(await runtimeTierImages('sqlite', resolve), caches);
   assertEquals(queries, 0);
   assertEquals(await runtimeTierImages('postgres', resolve), [
     'sdk-owned-image:changed-tag',
-    `${cache.image}:${cache.tag}`,
+    ...caches,
   ]);
   assertEquals(queries, 1);
   await assertRejects(

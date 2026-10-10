@@ -31,10 +31,14 @@ export async function runtimeTierImages(
   if (tier !== 'postgres' && tier !== 'sqlite') {
     throw new Error(`Unsupported runtime tier: ${tier}`);
   }
-  const cache = SCAFFOLD_CACHE_CONTAINER_IMAGES.Garnet;
+  // The default scaffold uses Redis; the existing runtime listener contract expects Garnet.
+  // Prepare both from the generator's catalog, including startup during database initialization.
+  const caches = Object.values(SCAFFOLD_CACHE_CONTAINER_IMAGES).map(({ image, tag }) =>
+    `${image}:${tag}`
+  );
   return [
     ...(tier === 'postgres' ? [await resolvePostgres()] : []),
-    `${cache.image}:${cache.tag}`,
+    ...caches,
   ];
 }
 
