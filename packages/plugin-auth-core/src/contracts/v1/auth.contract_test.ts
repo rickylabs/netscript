@@ -1,5 +1,6 @@
 import { assertEquals } from '@std/assert';
 import {
+  AUTH_SESSIONS_REVOKE_SCOPE,
   authContract,
   authContractV1,
   AuthSessionResponseSchema,
@@ -25,6 +26,7 @@ Deno.test('authContract exposes the v1 auth procedures', () => {
     'signin',
     'callback',
     'signout',
+    'revokeSession',
     'session',
     'me',
   ]);
@@ -37,6 +39,14 @@ Deno.test('authContract declares public and credential-required routes', () => {
   assertEquals(authContract.signout['~orpc'].meta.access?.authentication, 'required');
   assertEquals(authContract.session['~orpc'].meta.access?.authentication, 'required');
   assertEquals(authContract.me['~orpc'].meta.access?.authentication, 'required');
+  assertEquals(authContract.revokeSession['~orpc'].meta.access, {
+    authentication: 'required',
+    authorization: { scopes: [AUTH_SESSIONS_REVOKE_SCOPE] },
+  });
+  assertEquals(authContract.revokeSession['~orpc'].route, {
+    method: 'POST',
+    path: '/sessions/revoke',
+  });
 });
 
 Deno.test('authContractV1 exposes typed context-bound procedures and errors', () => {

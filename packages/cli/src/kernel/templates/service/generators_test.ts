@@ -11,14 +11,13 @@ import { StringTemplateAdapter } from '../../adapters/scaffold/template-adapter.
 import { generateServiceDenoJson } from './generate-service-deno-json.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
-const serviceMainTemplate =
-  "/**\r\n * {{serviceName | pascalCase}} Service\r\n *\r\n * Type-safe {{serviceName}} API with oRPC.\r\n */\r\n\r\nimport { defineService } from '@netscript/service';\r\nimport { router } from './router.ts';\r\n\r\nawait defineService(router, {\r\n  name: '{{serviceName}}',\r\n  version: '1.0.0',\r\n  port: parseInt(Deno.env.get('PORT') || '{{servicePort}}'),\r\n  openapi: {\r\n    title: '{{serviceName | pascalCase}} API',\r\n    description: '{{serviceName}} service',\r\n  },\r\n  debug: true,\r\n});\r\n";
-const serviceRouterTemplate =
-  "/**\r\n * {{serviceName | pascalCase}} router\r\n *\r\n * Aggregates version routers into a single router shape for the oRPC\r\n * server. Add new versions (`v2`, `v3`, …) alongside `v1` as the API\r\n * evolves; existing clients keep talking to their pinned version.\r\n *\r\n * The generated showcase keeps `health` under the service namespace because\r\n * the validated Step 5 contract baseline already owns that path at\r\n * `v1.{{serviceName | camelCase}}.health`.\r\n *\r\n * @see https://orpc.unnoq.com/docs/router\r\n */\r\n\r\nimport { health } from './routers/health.ts';\r\nimport { {{serviceName | pascalCase}}V1 } from './routers/v1.ts';\r\n\r\nexport const v1 = {\r\n  {{serviceName | camelCase}}: {\r\n    ...{{serviceName | pascalCase}}V1,\r\n    health,\r\n  },\r\n};\r\n\r\nexport const router = {\r\n  v1,\r\n};\r\n\r\nexport type Router = typeof router;\r\n";
+const serviceMainTemplate = EMBEDDED_TEMPLATE_CONTENT['service/main.memory.ts.template'];
+const serviceRouterTemplate = EMBEDDED_TEMPLATE_CONTENT['service/router.ts.template'];
 
 const SAMPLE_SERVICE_VARS: Record<string, string> = {
   projectName: 'test-project',
   serviceName: 'team-members',
+  entityName: 'team-members',
   servicePort: '3000',
 };
 
@@ -84,7 +83,7 @@ describe('service template rendering', () => {
     const output = await adapter.render(serviceMainTemplate, SAMPLE_SERVICE_VARS);
 
     assertStringIncludes(output, "import { defineService } from '@netscript/service';");
-    assertStringIncludes(output, "import { router } from './router.ts';");
+    assertStringIncludes(output, "import { createRouter } from './router.ts';");
     assertStringIncludes(output, "name: 'team-members'");
     assertStringIncludes(output, "title: 'TeamMembers API'");
     assertStringIncludes(output, "description: 'team-members service'");
@@ -94,7 +93,7 @@ describe('service template rendering', () => {
     assert(!output.includes('@orpc/server/fetch'));
     assert(
       output.indexOf("import { defineService } from '@netscript/service';") <
-        output.indexOf("import { router } from './router.ts';"),
+        output.indexOf("import { createRouter } from './router.ts';"),
     );
     assert(
       output.indexOf("name: 'team-members'") <
@@ -114,16 +113,25 @@ describe('service template rendering', () => {
     }
   });
 
+  it('both shipped service entrypoints record a greppable public opt-out pending #1382 L2', async () => {
+    const adapter = makeAdapter();
+    for (const key of ['service/main.ts.template', 'service/main.memory.ts.template'] as const) {
+      const output = await adapter.render(EMBEDDED_TEMPLATE_CONTENT[key], SAMPLE_SERVICE_VARS);
+      assertStringIncludes(output, 'auth: { public: true, reason:', key);
+      assertStringIncludes(output, '#1382 L2 will wire the guarded auth policy', key);
+    }
+  });
+
   it('router.ts preserves the validated service-local health contract shape', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(serviceRouterTemplate, SAMPLE_SERVICE_VARS);
 
     assertStringIncludes(output, "import { health } from './routers/health.ts';");
-    assertStringIncludes(output, "import { TeamMembersV1 } from './routers/v1.ts';");
-    assertStringIncludes(output, 'export const v1 = {');
+    assertStringIncludes(output, "import { createTeamMembersV1 } from './routers/v1.ts';");
+    assertStringIncludes(output, 'v1: {');
     assertStringIncludes(output, 'teamMembers: {');
-    assertStringIncludes(output, '...TeamMembersV1,');
-    assertStringIncludes(output, 'health,');
-    assertStringIncludes(output, 'export const router = {');
+    assertStringIncludes(output, '...createTeamMembersV1(application), health');
+    assertStringIncludes(output, 'health }');
+    assertStringIncludes(output, 'export function createRouter(');
   });
 });

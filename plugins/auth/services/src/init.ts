@@ -8,9 +8,10 @@ import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import type { WatchableKv } from '@netscript/kv';
 import {
   type AuthServiceAppsettings,
+  type AuthServiceBackendRegistry,
   createAuthServiceBackendRegistry,
 } from './backend-registry.ts';
-import type { ResolvedAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
+export type { AuthServiceBackendRegistry } from './backend-registry.ts';
 
 /** Auth plugin service context with the declared auth appsettings seam. */
 export interface AuthPluginServiceContext extends PluginServiceContext {
@@ -22,7 +23,7 @@ export interface AuthPluginServiceContext extends PluginServiceContext {
 export async function initializeAuthService(
   ctx: PluginServiceContext,
   dbClient?: unknown,
-): Promise<ResolvedAuthBackendRegistry> {
+): Promise<AuthServiceBackendRegistry> {
   const kv = watchableKv(ctx.kv);
   return await createAuthServiceBackendRegistry({
     env: { ...Deno.env.toObject(), ...ctx.env },

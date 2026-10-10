@@ -17,7 +17,7 @@ Run the workspace quality verbs it defines: `deno task check`, `deno task test`,
 
 ### MCP is the default surface
 
-MCP is the default surface for NetScript work, not one option among several: NetScript is newer than your training data, so without the `netscript` MCP tools you will reimplement contracts, services, SDK clients, and UI seams the CLI already generates. Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the task. Use `search_docs` for literal lookup and `get_doc` for exact retrieval. Use MCP `doctor` for NetScript, Aspire, project-wiring, and plugin prerequisites; use `get_app_status`, `get_recent_errors`, and the `analyze_*` tools for bounded runtime evidence.{{OFFLINE_DOCS_GUIDANCE}}
+MCP is the default surface for NetScript work, not one option among several: NetScript is newer than your training data, so without the `netscript` MCP tools you will reimplement contracts, services, SDK clients, and UI seams the CLI already generates. Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the task. Use `search_docs` for literal lookup and `get_doc` for faithful retrieval. Check its `mode`; for complete text use `full: true` and follow `nextCursor` with `cursor` until absent. Use MCP `doctor` for NetScript, Aspire, project-wiring, and plugin prerequisites; use `get_app_status`, `get_recent_errors`, and the `analyze_*` tools for bounded runtime evidence.{{OFFLINE_DOCS_GUIDANCE}}
 
 If no `netscript` MCP tools are listed, stop and recover before writing framework code:
 

@@ -161,8 +161,8 @@ not to this reference; see the
 | `netscript plugin auth backend show` | Show the currently selected auth backend. Flag: `--project-root <path>`. |
 | `netscript plugin auth provider set` | Configure an auth provider. Flags: `--preset <preset>`, `--client-id <id>`, `--client-secret <secret>`, `--redirect-uri <uri>`, `--issuer <issuer>`, `--api-key <key>`, `--cookie-password <password>`, `--secret <secret>`, `--kv-oauth-key <key>`, `--project-root <path>`. |
 | `netscript plugin auth secret generate [kind]` | Generate auth secret material. |
-| `netscript plugin auth session list` | List auth sessions. Flag: `--stream-url <url>`. |
-| `netscript plugin auth session revoke <id>` | Revoke an auth session by id. Flag: `--auth-url <url>`. |
+| `netscript plugin auth session list` | List auth sessions. Flag: `--stream-url <url>`. Needs a credential in `NETSCRIPT_AUTH_TOKEN`. |
+| `netscript plugin auth session revoke <id>` | Revoke any auth session by id through the operator `revokeSession` route. Flag: `--auth-url <url>`. Needs `NETSCRIPT_AUTH_TOKEN` holding the `auth:sessions:revoke` scope. |
 
 The backends selectable here are the same ones read at runtime by
 `NETSCRIPT_AUTH_BACKEND` — see [add authentication](/identity-access/how-to/add-authentication/).

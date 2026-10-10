@@ -11,13 +11,23 @@ import type { Principal } from './auth/types.ts';
 /** Router definition accepted by the service builder and handler factories. */
 export type ServiceRouter = Record<string, unknown>;
 
+/** Socket connection metadata supplied by the listener or a mounting host. */
+export interface ServiceEnvironment {
+  /** Socket peer address, preserved for Hono's Deno getConnInfo adapter. */
+  readonly remoteAddr?: Deno.Addr;
+}
+
 /** Minimal mountable service application returned by `build()`. */
 export interface ServiceApp {
   /** Handles a Web Platform request without starting a listener. */
-  fetch(request: Request): Response | Promise<Response>;
+  fetch(request: Request, env?: ServiceEnvironment): Response | Promise<Response>;
 
   /** Executes an in-memory request against the service app. */
-  request(input: Request | string | URL, init?: RequestInit): Response | Promise<Response>;
+  request(
+    input: Request | string | URL,
+    init?: RequestInit,
+    env?: ServiceEnvironment,
+  ): Response | Promise<Response>;
 }
 
 /** Network address assigned to a running service listener. */
@@ -59,6 +69,11 @@ export type ShutdownReason = 'signal' | 'manual' | 'startup-failure';
  *
  * @example
  * ```typescript
+ * import { createService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ * declare const audit: { record(entry: ShutdownContext): void };
+ *
  * createService(router, { name: 'users' })
  *   .onShutdown(({ reason, signal }) => {
  *     audit.record({ reason, signal });
@@ -78,6 +93,8 @@ export interface ShutdownContext {
  *
  * @example
  * ```typescript
+ * declare const db: { $disconnect(): Promise<void> };
+ *
  * const closeDatabase: ShutdownHook = async () => {
  *   await db.$disconnect();
  * };
@@ -154,6 +171,10 @@ export interface ServiceTlsOptions {
  *
  * @example
  * ```typescript
+ * import { createService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ *
  * const running = await createService(router, { name: 'users' })
  *   .withHealth()
  *   .serve({
@@ -264,7 +285,20 @@ export type ServiceNotFoundHandler = NotFoundHandler;
 /** Error handler used by service applications. */
 export type ServiceErrorHandler = ErrorHandler;
 
-/** CORS options supported by `withCors()`. */
+/**
+ * CORS options supported by `withCors()`.
+ *
+ * `origin` accepts an exact origin, an allowlist array, or an upstream resolver.
+ * When omitted, `NETSCRIPT_CORS_ORIGINS` supplies a comma-separated allowlist;
+ * an unset or blank value denies cross-origin access. Only an explicit
+ * `origin: '*'` opts into wildcard access, and it cannot enable credentials.
+ *
+ * @example
+ * ```ts
+ * import type { CorsOptions } from '@netscript/service';
+ * const cors: CorsOptions = { origin: ['https://app.example'] };
+ * ```
+ */
 export type CorsOptions = Parameters<typeof cors>[0];
 
 /** Database client capable of a health-check query. */

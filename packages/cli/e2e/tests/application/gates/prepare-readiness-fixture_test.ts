@@ -105,6 +105,25 @@ Deno.test('readiness app splice namespaces fixture bindings in a real generated 
   );
 });
 
+Deno.test('readiness app splice type-checks deferred CORS for multiple enabled web apps', async () => {
+  const app = {
+    Enabled: true,
+    Runtime: 'deno' as const,
+    Type: 'app' as const,
+    WatchMode: false,
+    RequiresKv: false,
+  };
+  const source = generateRegisterApps({
+    apps: { frontend: app, admin: app, disabled: { ...app, Enabled: false } },
+    version: 'e2e',
+    denoDefaults: { Permissions: [], WatchMode: false },
+  });
+  assertStringIncludes(source, 'ReferenceExpression.create`${corsOrigins},${app_1_origin}`');
+  const injected = injectReadinessFixtureApps(source);
+  assertEquals(duplicateConstBindings(injected), []);
+  await assertGeneratedModuleChecks(injected);
+});
+
 Deno.test('listener fault splice fails closed on missing markers and double registration', () => {
   const source = generatedInfrastructure();
   assertThrows(
@@ -211,12 +230,22 @@ async function assertGeneratedModuleChecks(source: string): Promise<void> {
     // Mirror the generated module's local imports so this stays a compile check, not a runtime test.
     await Deno.writeTextFile(
       `${modules}/aspire.mts`,
-      `export interface ExecutableResource {
-  withEnvironment(key: string, value: string): Promise<void>;
+      `// Relevant public declarations verified against the restored Aspire 13.5.3 SDK.
+// aspire.mts re-exports ReferenceExpression from base.mjs; getEndpoint returns a reference.
+export declare class ReferenceExpression {
+  static create(strings: TemplateStringsArray, ...values: unknown[]): ReferenceExpression;
+}
+export interface EndpointReference {
+  host(): Promise<string>;
+  port(): Promise<number>;
+}
+export interface ExecutableResource {
+  withEnvironment(key: string, value: string | ReferenceExpression | EndpointReference): Promise<void>;
   withOtlpExporter(options: { protocol: string }): Promise<void>;
   withHttpEndpoint(options: unknown): Promise<void>;
   withBrowserLogs(): Promise<void>;
   withHttpHealthCheck(options: unknown): Promise<void>;
+  getEndpoint(name: string): Promise<EndpointReference>;
 }
 export interface DistributedApplicationBuilder {
   addExecutable(name: string, command: string, workdir: string, args: string[]): ExecutableResource;
@@ -230,6 +259,8 @@ export const OtlpProtocol = { HttpProtobuf: 'http-protobuf' } as const;
 export interface NetScriptConfig {
   Apps: Record<string, { Enabled?: boolean }>;
   Version: string;
+  Services: Record<string, { Environment?: Record<string, string>; Env?: Record<string, string> }>;
+  Plugins: Record<string, { Environment?: Record<string, string>; Env?: Record<string, string> }>;
 }
 export function buildOtelEnvVars(
   _name: string,
@@ -256,7 +287,7 @@ export async function withCacheReference(
     );
 
     const output = await new Deno.Command(Deno.execPath(), {
-      args: ['check', '--no-config', `${helpers}/register-apps.mts`],
+      args: ['check', '--no-config', '--no-lock', '--unstable-kv', `${helpers}/register-apps.mts`],
       stdout: 'piped',
       stderr: 'piped',
     }).output();

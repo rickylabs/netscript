@@ -173,7 +173,10 @@ declare function defineSdkClientContribution<TContext extends object>(): <TDescr
   readonly prepare: (options: { readonly context: Readonly<TContext> }) => unknown;
 }>(descriptor: TDescriptor) => TDescriptor;
 declare function createLocaleSdkClientContribution(): unknown;
-declare function createServiceClient(config: unknown): {
+declare function createServiceClient(config: {
+  readonly resolveServiceUrl?: (serviceName: string, protocol: 'http' | 'https') => string | URL;
+  readonly [option: string]: unknown;
+}): {
   readonly get: (input: unknown) => Promise<unknown>;
   readonly getById: (input: unknown) => Promise<unknown>;
 };
@@ -196,6 +199,12 @@ declare function getAllServices(): readonly string[];
 declare function getKvConnection(name?: string): string | undefined;
 declare function getServiceInfo(name: string): unknown;
 declare function getServiceUrl(name: string, protocol?: string): string;
+declare function resolveServiceUrlFromSources(
+  name: string,
+  protocol?: 'http' | 'https',
+  index?: number,
+  sources?: { readonly browserEnv?: Record<string, unknown>; readonly serverEnv?: unknown },
+): string | undefined;
 declare function createQueryCollection(config: {
   readonly resource: string;
   readonly queryKey: readonly string[];
@@ -273,10 +282,26 @@ Deno.test('README examples include checked TypeScript fences', async () => {
   try {
     for (const [index, block] of tsBlocks.entries()) {
       const file = `${tempDir}/snippet-${index}.ts`;
-      await Deno.writeTextFile(file, `${DOCTEST_PRELUDE}\n{\n${stripImports(block.code)}\n}\n`);
-      const result = await new Deno.Command(Deno.execPath(), {
-        args: ['check', '--no-config', file],
-      }).output();
+      // The fetch-source example is self-contained: prove its real public imports rather
+      // than extending the legacy ambient prelude with another simulated SDK signature.
+      const isFetchSourceExample = block.code.includes('createFetchStreamEventSourceV1');
+      const code = isFetchSourceExample
+        ? block.code.replace(
+          "'@netscript/sdk/streams/consumer'",
+          JSON.stringify(new URL('../src/client/stream-source/mod.ts', import.meta.url).href),
+        )
+        : `${DOCTEST_PRELUDE}\n{\n${stripImports(block.code)}\n}\n`;
+      await Deno.writeTextFile(file, code);
+      const args = isFetchSourceExample
+        ? [
+          'check',
+          '--unstable-kv',
+          '--config',
+          new URL('../../../deno.json', import.meta.url).pathname,
+          file,
+        ]
+        : ['check', '--no-config', file];
+      const result = await new Deno.Command(Deno.execPath(), { args }).output();
 
       if (result.code !== 0) {
         const stderr = new TextDecoder().decode(result.stderr);

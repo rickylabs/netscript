@@ -1,12 +1,11 @@
-import { dirname, fromFileUrl, isAbsolute, join, normalize, relative, toFileUrl } from '@std/path';
-import {
-  type JsdocDeferredExample,
-  type JsdocExampleAnalysis,
-  type JsdocExampleBlock,
-  type JsdocExampleCensus,
-  type JsdocExampleFinding,
-  type JsdocExampleOwner,
-  type PublicSymbolBinding,
+import { fromFileUrl, isAbsolute, join, normalize, relative, toFileUrl } from '@std/path';
+import type {
+  JsdocExampleAnalysis,
+  JsdocExampleBlock,
+  JsdocExampleCensus,
+  JsdocExampleFinding,
+  JsdocExampleOwner,
+  PublicSymbolBinding,
 } from './jsdoc-example-contract.ts';
 import { extractFencedBlocks } from './snippet-extractor.ts';
 import {
@@ -17,20 +16,17 @@ import { readJsonFile } from '../deps/workspace.ts';
 
 type JsonObject = Record<string, unknown>;
 
-/** Reviewed GREEN coverage floors and coordinator-owned deferred-class ceilings. */
+/** Reviewed coverage floors; compiler failures have no allowances. */
 export const JSDOC_EXAMPLE_RATCHET = {
   minimumExamples: 349,
   minimumCandidates: 348,
   minimumChecked: 348,
   maximumExempt: 0,
-  maximumDeferredUnboundName: 116,
-  maximumDeferredTypeError: 14,
 } as const;
 
-/** Return every coverage/deferred ratchet violation without hiding sibling failures. */
+/** Return every coverage ratchet violation without hiding sibling failures. */
 export function jsdocExampleRatchetFailures(
   census: JsdocExampleCensus,
-  deferredExamples: readonly JsdocDeferredExample[],
 ): string[] {
   const failures: string[] = [];
   if (census.examples < JSDOC_EXAMPLE_RATCHET.minimumExamples) {
@@ -48,19 +44,6 @@ export function jsdocExampleRatchetFailures(
   }
   if (census.exempt > JSDOC_EXAMPLE_RATCHET.maximumExempt) {
     failures.push(`exempt ${census.exempt} > ${JSDOC_EXAMPLE_RATCHET.maximumExempt}`);
-  }
-  const unboundName = deferredExamples.filter((entry) => entry.failureClass === 'unboundName')
-    .length;
-  const typeError = deferredExamples.length - unboundName;
-  if (unboundName > JSDOC_EXAMPLE_RATCHET.maximumDeferredUnboundName) {
-    failures.push(
-      `deferred unboundName ${unboundName} > ${JSDOC_EXAMPLE_RATCHET.maximumDeferredUnboundName}`,
-    );
-  }
-  if (typeError > JSDOC_EXAMPLE_RATCHET.maximumDeferredTypeError) {
-    failures.push(
-      `deferred typeError ${typeError} > ${JSDOC_EXAMPLE_RATCHET.maximumDeferredTypeError}`,
-    );
   }
   return failures;
 }

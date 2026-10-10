@@ -16,7 +16,7 @@ import { triggersAdapterPlugin } from '../../../../../../plugins/triggers/src/ad
 import { workersAdapterPlugin } from '../../../../../../plugins/workers/src/adapter/plugin.ts';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { PluginWorkspaceMutator } from './workspace-mutator.ts';
-import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
+import type { PluginKindProvider, PluginScaffoldResult } from '../../domain/plugin-kind.ts';
 import {
   NETSCRIPT_RELEASE_VERSION,
   netscriptJsrSpecifier,
@@ -205,6 +205,11 @@ Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into r
   await mutator.ensureRootImportsForPluginKind('/project', 'saga');
   await mutator.ensureRootImportsForPluginKind('/project', 'trigger');
   await mutator.ensureRootImportsForPluginKind('/project', 'auth');
+  const authImports = JSON.parse(await fs.readFile('/project/deno.json')).imports;
+  assertEquals(
+    authImports['@netscript/plugin-auth-core'],
+    netscriptJsrSpecifier('plugin-auth-core'),
+  );
 
   const config = JSON.parse(await fs.readFile('/project/deno.json'));
 
@@ -458,6 +463,87 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
     ConcurrencyEnvVar: 'BACKGROUND_CONCURRENCY',
     PluginReferences: ['billing-worker-api'],
   });
+});
+
+Deno.test('PluginWorkspaceMutator keeps an operator HostPort on a companion API service re-add', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify(
+      {
+        NetScript: {
+          Plugins: {
+            'billing-worker-api': { Enabled: true, Runtime: 'deno', HostPort: 7101 },
+          },
+        },
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+  const scaffoldResult: PluginScaffoldResult = {
+    scaffoldResult: {
+      filesCreated: [],
+      directoriesCreated: [],
+      filesSkipped: [],
+      totalOperations: 0,
+      durationMs: 0,
+    },
+    pluginDir: '/project/plugins/billing-worker',
+    kind: 'background',
+    port: 4400,
+    servicePort: 9181,
+    configSection: 'BackgroundProcessors',
+    configKey: 'billing-worker',
+    serviceConfigKey: 'billing-worker-api',
+  };
+  const mutator = new PluginWorkspaceMutator(fs);
+  const readServiceEntry = async () =>
+    (JSON.parse(await fs.readFile('/project/appsettings.json')) as {
+      NetScript: { Plugins: Record<string, { HostPort?: number; Port?: number }> };
+    }).NetScript.Plugins['billing-worker-api'];
+
+  await mutator.updateAppsettings('/project', scaffoldResult, backgroundProvider);
+  assertEquals((await readServiceEntry()).HostPort, 7101);
+
+  await mutator.updateAppsettings(
+    '/project',
+    { ...scaffoldResult, hostPort: 7102 },
+    backgroundProvider,
+  );
+  assertEquals((await readServiceEntry()).HostPort, 7102);
+});
+
+Deno.test('PluginWorkspaceMutator carries the deprecated Port alias as HostPort on upsert', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify(
+      { NetScript: { Plugins: { auth: { Enabled: true, Runtime: 'deno', Port: 7101 } } } },
+      null,
+      2,
+    ) + '\n',
+  );
+  const mutator = new PluginWorkspaceMutator(fs);
+  const rebuilt = {
+    Enabled: true,
+    Runtime: 'deno',
+    Entrypoint: 'services/src/main.ts',
+    RequiresKv: true,
+    RequiresDb: true,
+  };
+
+  await mutator.upsertPluginAppsettingsEntry('/project', 'auth', rebuilt);
+  const config = JSON.parse(await fs.readFile('/project/appsettings.json')) as {
+    NetScript: { Plugins: Record<string, Record<string, unknown>> };
+  };
+  assertEquals(config.NetScript.Plugins.auth, { ...rebuilt, HostPort: 7101 });
+
+  await mutator.upsertPluginAppsettingsEntry('/project', 'fresh', rebuilt);
+  const after = JSON.parse(await fs.readFile('/project/appsettings.json')) as {
+    NetScript: { Plugins: Record<string, Record<string, unknown>> };
+  };
+  assertEquals(after.NetScript.Plugins.fresh, rebuilt);
 });
 
 Deno.test('PluginWorkspaceMutator omits appsettings entries for service-less plugins', async () => {

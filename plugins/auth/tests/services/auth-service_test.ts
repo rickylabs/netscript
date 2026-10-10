@@ -36,6 +36,7 @@ import {
 } from '../../services/src/backend-registry.ts';
 import { MemoryKvAdapter } from '@netscript/kv';
 import { callback, me, session, signin, signout } from '../../services/src/routers/v1-handlers.ts';
+import { completeTestCallback } from '../testing/auth-service-fixture.ts';
 import { AuthServiceHandlerError } from '../../services/src/routers/v1-types.ts';
 import {
   AUTH_TEST_PROVIDER_USER_ID,
@@ -43,6 +44,7 @@ import {
   authTestUrl,
   syntheticProviderFetch,
 } from '../testing/auth-fixtures.ts';
+import { principalForSession } from '../testing/auth-service-fixture.ts';
 
 Deno.test('kv-oauth handlers complete signin callback session me signout round-trip', async () => {
   const registry = await createInMemoryKvOAuthRegistry({
@@ -61,7 +63,7 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
   assert(started.redirectUrl);
   const redirect = new URL(started.redirectUrl!);
 
-  const completed = await callback({
+  const completed = await completeTestCallback({
     code: 'code_test',
     state: redirect.searchParams.get('state') ?? undefined,
   }, {
@@ -71,9 +73,9 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
       headers: new Headers({ 'x-forwarded-proto': 'https' }),
     },
   });
-  assertEquals(completed.completed, true);
+  assertEquals(completed.output.completed, true);
   assert(completed.sessionId);
-  assertEquals(completed.subject, `default:${AUTH_TEST_PROVIDER_USER_ID}`);
+  assertEquals(completed.output.subject, `default:${AUTH_TEST_PROVIDER_USER_ID}`);
 
   const activeSession = await session({ sessionId: completed.sessionId }, { registry });
   assertEquals(activeSession.authenticated, true);
@@ -88,10 +90,11 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
   });
   assertEquals(currentUser.authenticated, true);
   assertEquals(currentUser.session?.id, completed.sessionId);
-  assertEquals(currentUser.user?.id, completed.subject);
+  assertEquals(currentUser.user?.id, completed.output.subject);
 
   const signedOut = await signout({ sessionId: completed.sessionId }, {
     registry,
+    principal: await principalForSession(registry, completed.sessionId!),
     request: {
       url: authTestUrl('/v1/auth/signout'),
       headers: new Headers({ cookie: `__Host-ns_session=${completed.sessionId}` }),
@@ -126,7 +129,7 @@ Deno.test('auth handlers emit audit-safe telemetry attributes per operation', as
 
   const started = await signin({ redirectTo: '/dashboard' }, baseContext);
   const redirect = new URL(started.redirectUrl!);
-  const completed = await callback({
+  const completed = await completeTestCallback({
     code: 'code_test',
     state: redirect.searchParams.get('state') ?? undefined,
   }, {
@@ -150,6 +153,7 @@ Deno.test('auth handlers emit audit-safe telemetry attributes per operation', as
   await signout({ sessionId: completed.sessionId }, {
     registry,
     telemetry,
+    principal: await principalForSession(registry, completed.sessionId!),
     request: {
       url: authTestUrl('/v1/auth/signout'),
       method: 'GET',
@@ -319,7 +323,7 @@ Deno.test('auth handler errors keep observable central oRPC envelopes', async ()
     {
       code: 'UNAUTHORIZED',
       status: 401,
-      data: { reason: 'No active auth session was found.' },
+      data: { reason: 'Authentication required.' },
     },
   );
   await assertProcedureEnvelope(
@@ -438,6 +442,14 @@ function fakeBackend(name = 'kv-oauth'): AuthBackendPort {
         };
         stored.set(sessionId, revoked);
         return revoked;
+      },
+      revokeSubjectSessions: ({ subject }) => {
+        const revokedAt = new Date().toISOString();
+        for (const current of stored.values()) {
+          if (current.subject !== subject || current.state === 'revoked') continue;
+          stored.set(current.id, { ...current, state: 'revoked', revokedAt });
+        }
+        return { subject, revokedAt };
       },
     },
     crypto: {

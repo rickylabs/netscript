@@ -1,15 +1,7 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import type {
-  JsdocDeferredExample,
-  JsdocExampleCensus,
-  JsdocExampleOwner,
-} from './jsdoc-example-contract.ts';
-import { formatDeferredClassesMarkdown } from './check-jsdoc-examples.ts';
-import {
-  classifyJsdocExampleTag,
-  JSDOC_EXAMPLE_RATCHET,
-  jsdocExampleRatchetFailures,
-} from './jsdoc-example-policy.ts';
+import type { JsdocExampleOwner } from './jsdoc-example-contract.ts';
+import { formatTypeErrorsMarkdown } from './check-jsdoc-examples.ts';
+import { classifyJsdocExampleTag, JSDOC_EXAMPLE_RATCHET } from './jsdoc-example-policy.ts';
 
 const moduleOwner: JsdocExampleOwner = {
   memberName: '@netscript/cron',
@@ -43,57 +35,26 @@ Deno.test('reasoned TypeScript exemption is source local', () => {
   assertEquals(result.findings[0]?.disposition, 'exempt');
 });
 
-Deno.test('deferred body classes are classifier-owned and cannot grow', () => {
-  const census: JsdocExampleCensus = {
-    members: 35,
-    files: 2020,
-    examples: JSDOC_EXAMPLE_RATCHET.minimumExamples,
-    candidates: JSDOC_EXAMPLE_RATCHET.minimumCandidates,
-    checked: JSDOC_EXAMPLE_RATCHET.minimumChecked,
-    exempt: 0,
-    nonTypeScript: 1,
-    unfenced: 0,
-    malformed: 0,
-    failures: 0,
-  };
-  const deferred = (failureClass: JsdocDeferredExample['failureClass']): JsdocDeferredExample => ({
-    failureClass,
-    owner: moduleOwner,
-    exampleOrdinal: 1,
-    fenceOrdinal: 1,
-    tsCodes: failureClass === 'unboundName' ? [2304] : [2345],
-  });
-  const accepted = [
-    ...Array.from(
-      { length: JSDOC_EXAMPLE_RATCHET.maximumDeferredUnboundName },
-      () => deferred('unboundName'),
-    ),
-    ...Array.from(
-      { length: JSDOC_EXAMPLE_RATCHET.maximumDeferredTypeError },
-      () => deferred('typeError'),
-    ),
-  ];
-  assertEquals(jsdocExampleRatchetFailures(census, accepted), []);
-  assertEquals(jsdocExampleRatchetFailures(census, accepted.slice(0, -1)), []);
-  assertEquals(jsdocExampleRatchetFailures(census, [...accepted, deferred('typeError')]), [
-    `deferred typeError ${
-      JSDOC_EXAMPLE_RATCHET.maximumDeferredTypeError + 1
-    } > ${JSDOC_EXAMPLE_RATCHET.maximumDeferredTypeError}`,
-  ]);
+Deno.test('type errors have no deferred ceiling: every failure is enforced', () => {
+  assertEquals(Object.hasOwn(JSDOC_EXAMPLE_RATCHET, 'maximumDeferredTypeError'), false);
 });
 
-Deno.test('deferred-class artifact preserves owner, ordinals, and classifier TS codes', () => {
-  const rendered = formatDeferredClassesMarkdown([{
-    failureClass: 'unboundName',
+Deno.test('unbound names have no deferred ceiling: the class is enforced, not ratcheted', () => {
+  assertEquals(Object.hasOwn(JSDOC_EXAMPLE_RATCHET, 'maximumDeferredUnboundName'), false);
+  assertEquals(formatTypeErrorsMarkdown([]).includes('Unbound-name'), false);
+});
+
+Deno.test('type-error artifact preserves owner, ordinals, and classifier TS codes', () => {
+  const rendered = formatTypeErrorsMarkdown([{
+    failureClass: 'typeError',
     owner: moduleOwner,
     exampleOrdinal: 2,
     fenceOrdinal: 3,
-    tsCodes: [2304, 2552],
+    tsCodes: [2322, 2345],
   }]);
-  assertStringIncludes(rendered, '## Unbound-name convention class — 1 examples');
+  assertStringIncludes(rendered, '## Published-API type-error class — 1 examples');
   assertStringIncludes(
     rendered,
-    '- packages/cron/ports/types.ts · module @netscript/cron · example 2 · fence 3 · TS2304, TS2552',
+    '- packages/cron/ports/types.ts · module @netscript/cron · example 2 · fence 3 · TS2322, TS2345',
   );
-  assertStringIncludes(rendered, '## Published-API type-error class — 0 examples');
 });

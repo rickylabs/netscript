@@ -10,15 +10,19 @@
  */
 
 import { type Context, Hono } from 'hono';
-import { cors } from 'hono/cors';
 import { ensureLogging } from '@netscript/logger';
 import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import { createHonoTracingMiddleware } from '@netscript/telemetry/hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middleware.ts';
+import {
+  assertServiceCorsOptions,
+  createServiceCorsMiddleware,
+  resolveServiceCorsOptions,
+} from '../middleware/service-cors.ts';
 import type {
   ContractPolicyAuthorizerPort,
   ProcedurePolicyResolver,
-} from '../auth/contract-policy.ts';
+} from '../auth/contract/contract-policy.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import type { AuthorizerPort } from '../auth/types.ts';
 import {
@@ -50,6 +54,8 @@ import type {
   ServiceRouter,
   ShutdownHook,
 } from '../types.ts';
+import { createRateLimitMiddleware } from '../rate-limit/middleware/rate-limit-middleware.ts';
+import type { ServiceRateLimitOptions } from '../rate-limit/middleware/options.ts';
 import type { ServiceBuilder, ServiceConfig } from './service-builder.ts';
 import { resolveRpcWiringPaths, type RpcWiringOptions, wireRpc } from './service-rpc.ts';
 import { startServiceListener } from './service-listener.ts';
@@ -89,6 +95,7 @@ export class ServiceBuilderImpl<
   private authInstalled = false;
   private bodyLimitMiddleware: ServiceMiddleware | null = null;
   private bodyLimitInstalled = false;
+  private corsOptions: NonNullable<CorsOptions>[] = [];
   private rpcOptions: (RpcWiringOptions & { traceContext?: boolean }) | null = null;
   private openApiOptions: { title?: string; description?: string } | null = null;
   private docsOptions: { specUrl?: string } | null = null;
@@ -109,7 +116,9 @@ export class ServiceBuilderImpl<
    * @param options - CORS configuration options
    */
   withCors(options?: CorsOptions): ServiceBuilder<TRouter, TCustom> {
-    this.app.use('*', cors(options ?? { origin: '*' }));
+    const resolved = resolveServiceCorsOptions(options);
+    this.corsOptions.push(resolved);
+    this.use(createServiceCorsMiddleware(resolved));
     return this;
   }
 
@@ -287,6 +296,11 @@ export class ServiceBuilderImpl<
   withBodyLimit(options: ServiceBodyLimitOptions): ServiceBuilder<TRouter, TCustom> {
     this.bodyLimitMiddleware = createBodyLimitMiddleware(options);
     return this;
+  }
+
+  /** Adds a route-scoped quota stage through the existing middleware seam. */
+  withRateLimit(options: ServiceRateLimitOptions): ServiceBuilder<TRouter, TCustom> {
+    return this.use(createRateLimitMiddleware(options));
   }
 
   /**
@@ -486,6 +500,7 @@ export class ServiceBuilderImpl<
    * Adds error handlers and returns the app for further customization.
    */
   build(): ServiceApp {
+    for (const options of this.corsOptions) assertServiceCorsOptions(options);
     this.installAuth();
     this.installBodyLimit();
     this.installDeferredRoutes();

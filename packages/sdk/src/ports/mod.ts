@@ -31,6 +31,7 @@ export type {
 } from './cache-topology.ts';
 export type {
   ActionMethod,
+  ActionRequestRest,
   CompositeQuery,
   FactoryConfig,
   ProcedureInput,
@@ -118,4 +119,5 @@ export type {
   ServiceClientShape,
   ServiceRequestOptions,
   ServiceRequestRest,
+  ServiceUrlResolver,
 } from './service-client.ts';

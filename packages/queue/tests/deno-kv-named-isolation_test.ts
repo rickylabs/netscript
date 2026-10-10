@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { delay } from '@std/async';
+import { deadline, delay } from '@std/async';
 import { DenoKvMessageQueue } from '@fedify/denokv';
 import { createQueue } from '../factory/create-queue.ts';
 import { DenoKvAdapter } from '../adapters/deno-kv.adapter.ts';
@@ -127,6 +127,15 @@ Deno.test('an envelope for a name with no local listener is re-enqueued until th
     });
     const jobs: MessageEnvelope<unknown>[] = [];
     const tasks: MessageEnvelope<unknown>[] = [];
+    const reEnqueued = Promise.withResolvers<void>();
+    const delivered = Promise.withResolvers<void>();
+    const enqueue = dispatcher.enqueue.bind(dispatcher);
+    dispatcher.enqueue = async (envelope, delayMs) => {
+      await enqueue(envelope, delayMs);
+      if (envelope.queueName === 'tasks' && (envelope.routingHops ?? 0) > 0) {
+        reEnqueued.resolve();
+      }
+    };
     const controller = new AbortController();
     const listening = [
       dispatcher.listen('jobs', (envelope) => {
@@ -135,20 +144,29 @@ Deno.test('an envelope for a name with no local listener is re-enqueued until th
       }, controller.signal),
     ];
     try {
-      await dispatcher.enqueue(createEnvelope({ task: 1 }, undefined, 'tasks'));
-      await delay(100);
-      assertEquals(tasks.length, 0);
-      listening.push(dispatcher.listen('tasks', (envelope) => {
-        tasks.push(envelope);
-        return Promise.resolve();
-      }, controller.signal));
-      await until(() => tasks.length === 1);
+      await deadline(
+        (async () => {
+          await dispatcher.enqueue(createEnvelope({ task: 1 }, undefined, 'tasks'));
+          // Register only after a real routing hop, regardless of listen-loop startup latency.
+          await reEnqueued.promise;
+          assertEquals(tasks.length, 0);
+          listening.push(dispatcher.listen('tasks', (envelope) => {
+            tasks.push(envelope);
+            delivered.resolve();
+            return Promise.resolve();
+          }, controller.signal));
+          await delivered.promise;
+        })(),
+        30_000,
+      );
     } finally {
       controller.abort();
       await Promise.all(listening);
       await dispatcher.close();
+      dispatcher.enqueue = enqueue;
     }
     assertEquals(jobs, []);
+    assertEquals(tasks.length, 1);
     assertEquals(tasks[0].payload, { task: 1 });
     assertEquals((tasks[0].routingHops ?? 0) > 0, true);
   });
@@ -200,18 +218,25 @@ Deno.test('stopping one named listener leaves the other names on the database li
     const tasks = localQueue<string>('tasks');
     const producer = localQueue<string>('tasks');
     const received: string[] = [];
-    const jobsListening = jobs.listen(() => Promise.resolve());
+    const jobsReady = Promise.withResolvers<void>();
+    const jobsListening = jobs.listen(() => {
+      jobsReady.resolve();
+      return Promise.resolve();
+    });
     const tasksListening = tasks.listen((message) => {
       received.push(message);
       return Promise.resolve();
     });
     try {
-      await delay(50);
+      await jobs.enqueue('listener-ready');
+      await deadline(jobsReady.promise, 5_000);
       await jobs.stop();
       await jobsListening;
       await producer.enqueue('after-jobs-stopped');
       await until(() => received.length === 1);
     } finally {
+      await jobs.stop();
+      await jobsListening;
       await tasks.stop();
       await tasksListening;
       await producer.stop();

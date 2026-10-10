@@ -140,21 +140,29 @@ describe('database template generators', () => {
     const cases = [
       {
         engine: 'postgres' as const,
-        engineRequired: ['PrismaPg', 'PostgresClient', 'normalizePostgresUrl'],
-        prismaRequired: ['defineConfig, env', "env('DATABASE_URL')", 'normalizePostgresUrl'],
+        engineRequired: ['PrismaPg', 'PostgresClient', 'normalizePostgresConnectionString'],
+        prismaRequired: [
+          'defineConfig, env',
+          "env('DATABASE_URL')",
+          'normalizePostgresConnectionString',
+        ],
         forbidden: ['normalizeMysqlUrl', 'normalizeMssqlUrl', 'parseSqlServerEndpoint'],
       },
       {
         engine: 'mysql' as const,
         engineRequired: ['PrismaMySql', 'MysqlClient', 'normalizeMysqlUrl'],
         prismaRequired: ['defineConfig, env', "env('DATABASE_URL')", 'normalizeMysqlUrl'],
-        forbidden: ['normalizePostgresUrl', 'normalizeMssqlUrl', 'parseSqlServerEndpoint'],
+        forbidden: [
+          'normalizePostgresConnectionString',
+          'normalizeMssqlUrl',
+          'parseSqlServerEndpoint',
+        ],
       },
       {
         engine: 'mssql' as const,
         engineRequired: ['PrismaMssql', 'MssqlClient', 'normalizeMssqlUrl'],
         prismaRequired: ['defineConfig, env', "env('DATABASE_URL')", 'normalizeMssqlUrl'],
-        forbidden: ['normalizePostgresUrl', 'normalizeMysqlUrl'],
+        forbidden: ['normalizePostgresConnectionString', 'normalizeMysqlUrl'],
       },
       {
         engine: 'sqlite' as const,
@@ -168,7 +176,7 @@ describe('database template generators', () => {
           "'file:./alpha_app.db'",
         ],
         forbidden: [
-          'normalizePostgresUrl',
+          'normalizePostgresConnectionString',
           'normalizeMysqlUrl',
           'normalizeMssqlUrl',
           'parseConnectionParts',

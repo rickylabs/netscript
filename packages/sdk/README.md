@@ -100,6 +100,47 @@ const ordersQueryUtils = queryUtils.orders;
 Use the side-effect-free `./presets` subpath for `defineServices` in browser/shared modules. Drop to
 `./client`, `./query`, and `./query-client` when an app only needs one of the three pieces.
 
+### Durable streams with an injected fetch
+
+`@netscript/sdk/streams/consumer` provides `createFetchStreamEventSourceV1` for hosts with a
+WHATWG streaming fetch and no DOM event constructors. Supply the host transport and bind the source through the
+existing v1 schema validator:
+
+```ts
+import { bindStreamEventSourceV1, createFetchStreamEventSourceV1 } from '@netscript/sdk/streams/consumer';
+
+const abort = new AbortController();
+const source = createFetchStreamEventSourceV1({
+  url: 'https://api.example.com/v1/stream/netscript/workers/executions?offset=-1',
+  fetch: (url, init) => fetch(url, init), // Use the host's streaming fetch here.
+  signal: abort.signal,
+  authHeaders: () => ({ authorization: 'Bearer example-token' }),
+});
+const binding = bindStreamEventSourceV1({
+  source,
+  onEvent(event) {
+    if (event.event === 'data') console.log(event.payload);
+  },
+});
+
+// Dispose on host teardown; done confirms the reader and timers have stopped.
+binding.dispose();
+await source.done;
+```
+
+The source refreshes credentials on every connect, reconnects after 30 seconds without bytes, and
+retries every non-2xx response (including 401, 403, and 404), refreshing credentials on each attempt.
+Consecutive delays double from one second to a 30-second cap; server `retry:` is clamped between
+the configured initial back-off floor and cap. These bounds and its timer port are configurable.
+Comments and partial bytes renew the heartbeat deadline.
+
+The durable protocol commits progress on a validated `control` frame. The source buffers data until
+that control, then reconnects with its opaque `offset` query parameter and the committed SSE
+`Last-Event-ID` when present. A disconnect before control discards the undelivered data so the
+server can replay it. Framing and pending data each default to a 1 MiB character bound; at most
+1,024 data frames may await control. Exceeding a bound reconnects from committed progress. A
+terminal control or HTTP 204 stops the source. Listener exceptions stop it and reject `done`.
+
 ### Typed request contributions
 
 Use the SDK-owned locale factory or define an application contribution, then attach the literal
@@ -341,12 +382,13 @@ and Linux apply on relaunch.
 | `.`              | Side-effect-free `defineServices` plus common non-cache surfaces                  |
 | `./presets`      | Browser-safe `defineServices` and its package-owned type closure                  |
 | `./client`       | service clients, contribution definitions, redacted errors                        |
-| `./discovery`    | `getServiceUrl`, `getServiceInfo`, `getPostgresConnection`, `getKvConnection`, …  |
+| `./discovery`    | `getServiceUrl`, `resolveServiceUrlFromSources`, `getPostgresConnection`, …       |
 | `./query`        | `createQueryFactory`, `createQueryFactories`, `createCompositeQuery`              |
 | `./query-client` | `createNetScriptQueryClient`, `createServiceQueryUtils`, `createKvCachePersister` |
 | `./cache`        | `KvCacheStore`, `cacheQuery`, explicit cache-provider wiring                      |
 | `./collections`  | `createQueryCollection` — live client-side collections                            |
 | `./streams`      | `createStreamProducer`, `defineStreamSchema`, durable-stream helpers              |
+| `./streams/consumer` | `createFetchStreamEventSourceV1`, `bindStreamEventSourceV1`, consumer contracts |
 | `./telemetry`    | `otelMiddleware` — the outbound-tracing middleware type surface                   |
 | `./auto-update`  | `startAutoUpdate`, `createReleaseClient` — signed native Deno Desktop updates     |
 | `./desktop`      | `createDesktopServiceClient`, `createDesktopRpcLink` — contract-true webview RPC  |
@@ -364,10 +406,37 @@ POST-only transport. Request contributions receive procedure path, metadata, inp
 projection, signal, and the resolved destination; they never receive the HTTP method or control
 retry, deduplication, tracing, fetch, or link plugins.
 
+## Service URL resolution
+
+By default a service client resolves its origin on each call through `getServiceUrl`, which reads
+Vite `import.meta.env` and then `Deno.env`. A runtime with neither, such as React Native, passes its
+own `resolveServiceUrl(serviceName, protocol)` callback. The client keeps only the origin of the
+returned URL and appends its RPC path. To keep Aspire's key names, compose the pure
+`resolveServiceUrlFromSources` from `./discovery` over an explicit environment bag; it reads no
+runtime global and returns `undefined` instead of throwing.
+
+```ts
+import { createServiceClient } from '@netscript/sdk/client';
+import { resolveServiceUrlFromSources } from '@netscript/sdk/discovery';
+import { ordersContract } from './contracts/orders.ts';
+
+const browserEnv = { VITE_ORDERS_URL: 'https://api.example.com' };
+
+const orders = createServiceClient({
+  contract: ordersContract,
+  serviceName: 'orders',
+  resolveServiceUrl: (serviceName, protocol) => {
+    const url = resolveServiceUrlFromSources(serviceName, protocol, 0, { browserEnv });
+    if (url === undefined) throw new Error(`No URL configured for "${serviceName}"`);
+    return url;
+  },
+});
+```
+
 The deprecated client-level `port` and `timeout` options remain accepted for source compatibility
-but are intentional no-ops. Configure explicit addresses through service discovery instead of
-`port`, and pass a per-call `AbortSignal` instead of `timeout`. Neither option changes discovery,
-dispatch, or cancellation behavior.
+but are intentional no-ops. Configure explicit addresses through service discovery instead of `port`
+(or `resolveServiceUrl` where no environment exists), and pass a per-call `AbortSignal` instead of
+`timeout`. Neither option changes discovery, dispatch, or cancellation behavior.
 
 ## Docs
 

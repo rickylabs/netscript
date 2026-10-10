@@ -38,15 +38,16 @@ These symbols are available from the root export and the focused, browser-safe
 | Symbol | Kind | Signature / Description |
 | --- | --- | --- |
 | `createServiceClient` | function | Type-safe service client using Aspire service discovery and oRPC. Signature: `createServiceClient<TContract>(options): ServiceClient<TContract>`. |
-| `safe` | function | Resolve a promise into a tuple/object result mirroring the oRPC safe-call ergonomics. |
-| `isDefinedError` | function | Narrow an unknown error to an oRPC defined error. |
+| `safe` | function | Resolve a promise into a result narrowed with `isSuccess` first, then `isDefined` on failure. |
+| `isDefinedError` | function | Narrow a typed failure error to its defined members; prefer `isSuccess` then `isDefined` on `safe` results. |
 | `ServiceClient` | type alias | Typed service client derived from a contract router. |
 | `ServiceClientShape` | type alias | Recursive callable/router shape for a typed service client. |
 | `ServiceClientMethod` | type alias | Typed service-client method derived from a contract procedure. |
 | `ServiceClientContext` | interface | Per-call service client context. |
 | `ServiceClientContract` | interface | Compile-time marker that preserves the source contract for inference. |
 | `ServiceRequestOptions` | interface | Optional second argument passed to service-client methods. |
-| `CreateServiceClientOptions` | interface | Options for creating a discovered service client. |
+| `CreateServiceClientOptions` | interface | Options for creating a discovered service client, including the optional `resolveServiceUrl` callback that replaces Aspire discovery. |
+| `ServiceUrlResolver` | type alias | `(serviceName, protocol) => string \| URL` callback that resolves a service's base URL per call; the client keeps only its origin. |
 | `ContractLike` | type alias | Recursive structural representation of an oRPC contract router. |
 | `ContractProcedureLike` | interface | Minimal structural representation of an oRPC contract procedure. |
 | `ContractProcedureMetadata` | interface | Public oRPC metadata used to derive client typing. |
@@ -57,9 +58,21 @@ These symbols are available from the root export and the focused, browser-safe
 | `ProcedureInputFromNode` | type alias | Input payload for a contract procedure node. |
 | `ProcedureOutputFromNode` | type alias | Output payload for a contract procedure node. |
 | `DefinedError` | interface | Public shape of an oRPC defined error. |
-| `SafeResult` | type alias | Tuple/object result returned by `safe`. |
+| `SafeResult` | type alias | Result returned by `safe`; narrow with `isSuccess` first, then `isDefined` on failure. |
 | `SafeSuccess` | type alias | Success branch returned by `safe`. |
-| `SafeFailure` | type alias | Failure branch returned by `safe`. |
+| `SafeFailure` | type alias | Failure branch returned by `safe`; after checking `isSuccess`, use `isDefined` to narrow the error. |
+
+Prefer the named discriminants: check `result.isSuccess` first, then `result.isDefined` on the
+failure before reading contract error codes and data. See
+[Safe error narrowing](/services-sdk/sdk/#safe-error-narrowing) for a service-client example.
+`isDefinedError` preserves defined members of an already typed error union; it does not infer
+contract errors from an arbitrary `unknown` value.
+
+Tuple destructuring remains supported:
+`const [error, data, isDefined, isSuccess] = await safe(promise)`. Both forms describe the same
+result. A bare promise without contract error typing has no statically reachable defined-error arm;
+see
+[Bare promises and the defined-error arm](/services-sdk/sdk/#bare-promises-and-the-defined-error-arm).
 
 ### Client contributions (`SdkClientContribution`)
 
@@ -119,6 +132,17 @@ await client.echo(
   { context: { tenantId: 'tenant_123' } },
 );
 ```
+
+### Internal service credential contribution
+
+`createInternalCredentialSdkClientContribution({ service, secret?, allowInsecureTransport? })` sends
+the installation's internal credential for `service` as `Authorization: Bearer …`. Workers, sagas
+and triggers use it to call internal procedures, and session-guarded services that compose the
+internal-credential authenticator, under a service identity instead of an app or user session.
+Without `secret`, it loads `NETSCRIPT_INSTALLATION_SECRET_FILE` once. It derives the bearer once
+per contribution. Procedures declaring `authentication: 'none'` receive no credential. It is
+`direct-only`, so credentialed responses never enter a shared query cache. Non-loopback cleartext
+HTTP is refused unless `allowInsecureTransport` is set.
 
 ## Server-side query factories (`@netscript/sdk/query`)
 
@@ -225,6 +249,8 @@ Browser- and island-facing TanStack Query integration.
 ## Service discovery (`@netscript/sdk/discovery`)
 
 Resolves Aspire-managed service URLs and database/KV connections from environment variables.
+`getServiceUrl` reads the runtime globals; `resolveServiceUrlFromSources` is its pure counterpart
+over explicit sources, for runtimes without Vite or Deno.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -232,6 +258,11 @@ Resolves Aspire-managed service URLs and database/KV connections from environmen
 | `getServiceInfo` | function | Get all endpoints for a service. |
 | `getAllServices` | function | Get all available server-side Aspire service names. |
 | `isServiceAvailable` | function | Check whether a service endpoint is available. |
+| `resolveServiceUrlFromSources` | function | Pure resolver over explicit browser and server environment sources; reads no runtime global and returns `undefined` when no key matches. |
+| `getBrowserServiceUrlFromEnv` | function | Read a service URL from a provided `VITE_` environment bag. |
+| `ServiceUrlEnvironmentSources` | interface | Explicit `browserEnv` / `serverEnv` sources for `resolveServiceUrlFromSources`. |
+| `ServerEnvironment` | interface | Server environment reader (`get`, optional `toObject`), usually `Deno.env`. |
+| `BrowserEnvironment` | type alias | Browser environment bag, usually `import.meta.env`. |
 | `getKvConnection` | function | Get KV connection from SQLite or remote Deno KV environment variables. |
 | `getPostgresConnection` | function | Get PostgreSQL connection settings from environment variables. |
 | `getPostgresUri` | function | Get the PostgreSQL connection URI. |
@@ -247,10 +278,32 @@ Resolves Aspire-managed service URLs and database/KV connections from environmen
 
 ## Durable streams (`@netscript/sdk/streams`)
 
-Server-side writers and schema helpers for NetScript durable streams (State Protocol).
+Server-side writers, schema helpers, and a DOM-independent streaming-fetch consumer for NetScript
+durable streams (State Protocol). `createFetchStreamEventSourceV1` implements the existing
+`StreamEventSourceV1` port and accepts a host streaming fetch, an optional per-connect auth
+provider, an abort signal, and finite heartbeat, reconnect, and buffer limits. It delivers plain
+event objects through `bindStreamEventSourceV1`. Data waits for a valid control before delivery and
+replay progress advances; reconnect uses the control's opaque `offset` plus SSE `Last-Event-ID` when
+available. See the
+[SDK README](https://github.com/rickylabs/netscript/blob/main/packages/sdk/README.md) for a complete
+transport example. The React Native live-query binding and Expo reference app are separate work.
+
+Use `@netscript/sdk/streams/consumer` for the fetch source and binding in shared/browser/React Native
+code. Its import graph excludes telemetry, OTel, and modules using `Deno.*`. The wider `./streams`
+facade retains server producer exports. Every non-2xx response (including 401/403/404) retries with
+fresh per-connect credentials. Server `retry:` is clamped to the configured initial back-off floor
+and cap. HTTP 204 and terminal control stop permanently.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
+| `createFetchStreamEventSourceV1` | function | Create a reconnecting source over injected WHATWG streaming fetch. |
+| `FetchStreamEventSourceOptionsV1` | interface | URL, fetch, auth provider, abort signal, timer port, and bounded transport budgets. |
+| `FetchStreamEventSourceV1` | interface | EventSource-compatible source with awaitable `done` shutdown. |
+| `StreamFetchV1` | type alias | Host-injected `(url, init) => Promise<Response>` streaming transport. |
+| `StreamSourceSchedulerV1` | interface | Schedule a timer and return its cancellation function. |
+| `bindStreamEventSourceV1` | function | Bind data/control listeners through the versioned SSE schema authority. |
+| `StreamSourceEventV1` | interface | Structural native or plain event shape. |
+| `StreamSourceListenerV1` | type alias | Listener accepting structural stream events. |
 | `createStreamProducer` | function | Create or reuse a durable stream producer for a stream path. |
 | `createDurableStream` | reference | Re-export alias for the durable stream producer factory. |
 | `defineStreamSchema` | function | Define a type-safe durable stream schema. |
@@ -272,6 +325,12 @@ Server-side writers and schema helpers for NetScript durable streams (State Prot
 | `Operation` | type alias | State Protocol operation names supported by durable streams. |
 | `StreamTopicInspectionInput` | interface | Input accepted by `inspectStreamTopic`. |
 | `StreamTopicInspectionReport` | interface | Diagnostic report returned by `inspectStreamTopic`. |
+
+The streams entry also exposes the SSE type closure from
+[`@netscript/plugin-streams-core/sse`](/reference/plugin-streams-core/#the-sse-contract-netscriptplugin-streams-coresse),
+including `StreamEventSourceV1`, `BindStreamEventSourceOptionsV1`, `StreamEventSourceBindingV1`,
+`StreamSseConsumerEventV1`, `StreamSseReplayStateV1`, and the versioned frame, payload, schema, and
+reduction types. Parsing and schema validation retain one authority in stream core.
 
 ## Telemetry (`@netscript/sdk/telemetry`)
 
@@ -333,6 +392,7 @@ environment-specific adapters and dependencies out of consumers that do not need
 | `@netscript/sdk/query` | `./src/query/mod.ts` | Server-side cache-aware query factories. |
 | `@netscript/sdk/query-client` | `./src/query-client/mod.ts` | TanStack Query integration for browser/island code. |
 | `@netscript/sdk/streams` | `./src/streams.ts` | Durable stream producers and schema helpers. |
+| `@netscript/sdk/streams/consumer` | `./src/client/stream-source/mod.ts` | Fetch consumer and SSE binding without server telemetry. |
 | `@netscript/sdk/telemetry` | `./src/telemetry/mod.ts` | OpenTelemetry middleware for oRPC. |
 
 ---

@@ -1,10 +1,12 @@
 import type { ResolvedAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
-import type { AuthnRequest, AuthSession } from '@netscript/plugin-auth-core/domain';
+import type { AuthnRequest, AuthSession, Principal } from '@netscript/plugin-auth-core/domain';
 import type { AuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import type {
   CallbackInput,
   CallbackResponse,
   MeResponse,
+  RevokeSessionInput,
+  RevokeSessionResponse,
   SessionInput,
   SessionResponse,
   SigninInput,
@@ -27,7 +29,11 @@ export type AuthServiceInitialContext = AuthServiceContext;
 export type AuthServiceContext = Readonly<{
   registry: ResolvedAuthBackendRegistry;
   telemetry?: AuthTelemetry;
+  /** Session cookie name from the same environment used to compose the backend. */
+  cookieName?: string;
   request?: AuthServiceRequest;
+  /** Principal authenticated by the service guard; required by signout and revokeSession. */
+  principal?: Principal;
   traceHeaders?: Readonly<{
     traceparent?: string;
     tracestate?: string;
@@ -37,9 +43,16 @@ export type AuthServiceContext = Readonly<{
 /** Error thrown by auth service handlers and normalized by the central oRPC error plugin. */
 export class AuthServiceHandlerError extends Error {
   /** Contract error code. */
-  readonly code: 'UNAUTHORIZED' | 'AUTH_PROVIDER_ERROR' | 'VALIDATION_ERROR';
+  readonly code:
+    | 'INTERNAL'
+    | 'UNAUTHORIZED'
+    | 'FORBIDDEN'
+    | 'AUTH_TRANSPORT_ERROR'
+    | 'AUTH_CONFIGURATION_ERROR'
+    | 'AUTH_PROVIDER_ERROR'
+    | 'VALIDATION_ERROR';
   /** HTTP status emitted by the central oRPC error plugin. */
-  readonly status: 401 | 422 | 502;
+  readonly status: 400 | 401 | 403 | 422 | 500 | 502;
   /** Provider id or backend name related to the failure. */
   readonly providerId?: string;
   /** Validation form errors. */
@@ -48,6 +61,7 @@ export class AuthServiceHandlerError extends Error {
   readonly fieldErrors?: Readonly<Record<string, readonly string[] | undefined>>;
   /** Error payload emitted by the central oRPC error plugin. */
   readonly data:
+    | Readonly<{ traceId?: string }>
     | Readonly<{ reason: string }>
     | Readonly<{ providerId?: string; reason: string }>
     | Readonly<{
@@ -77,7 +91,10 @@ export class AuthServiceHandlerError extends Error {
 }
 
 function authErrorStatus(code: AuthServiceHandlerError['code']): AuthServiceHandlerError['status'] {
+  if (code === 'AUTH_TRANSPORT_ERROR' || code === 'AUTH_CONFIGURATION_ERROR') return 400;
+  if (code === 'INTERNAL') return 500;
   if (code === 'UNAUTHORIZED') return 401;
+  if (code === 'FORBIDDEN') return 403;
   if (code === 'VALIDATION_ERROR') return 422;
   return 502;
 }
@@ -91,13 +108,17 @@ function authErrorData(
     readonly fieldErrors?: Readonly<Record<string, readonly string[] | undefined>>;
   },
 ): AuthServiceHandlerError['data'] {
+  if (code === 'INTERNAL') return {};
   if (code === 'VALIDATION_ERROR') {
     return {
       formErrors: options.formErrors ?? [message],
       fieldErrors: options.fieldErrors ?? {},
     };
   }
-  if (code === 'AUTH_PROVIDER_ERROR') {
+  if (
+    code === 'AUTH_PROVIDER_ERROR' || code === 'AUTH_TRANSPORT_ERROR' ||
+    code === 'AUTH_CONFIGURATION_ERROR'
+  ) {
     return {
       providerId: options.providerId,
       reason: message,
@@ -123,6 +144,12 @@ export type SignoutHandler = (
   input: SignoutInput,
   context: AuthServiceContext,
 ) => Promise<SignoutResponse>;
+
+/** Input and output pair for operator revokeSession handler tests. */
+export type RevokeSessionHandler = (
+  input: RevokeSessionInput,
+  context: AuthServiceContext,
+) => Promise<RevokeSessionResponse>;
 
 /** Input and output pair for session handler tests. */
 export type SessionHandler = (

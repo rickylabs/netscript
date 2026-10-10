@@ -3,7 +3,9 @@
  *
  * @example
  * ```typescript
- * import { paginatedQuery } from '@netscript/contracts/query';
+ * import { paginatedQuery, type PrismaModelDelegate } from '@netscript/contracts/query';
+ *
+ * declare const db: { user: PrismaModelDelegate };
  *
  * const result = await paginatedQuery(db.user, {
  *   page: 1,
@@ -62,6 +64,10 @@ export interface PaginatedQueryOptions extends Partial<PaginationInput> {
  *
  * @example
  * ```typescript
+ * import { paginatedQuery, type PrismaModelDelegate } from '@netscript/contracts/query';
+ *
+ * declare const db: { user: PrismaModelDelegate };
+ *
  * const result = await paginatedQuery(db.user, {
  *   page: 1,
  *   limit: 20,
@@ -143,6 +149,10 @@ export interface OffsetPaginatedQueryOptions {
  *
  * @example
  * ```typescript
+ * import { offsetPaginatedQuery, type PrismaModelDelegate } from '@netscript/contracts/query';
+ *
+ * declare const db: { user: PrismaModelDelegate };
+ *
  * const result = await offsetPaginatedQuery(db.user, {
  *   offset: 20,
  *   limit: 10,
@@ -210,6 +220,10 @@ export interface CursorPaginatedQueryOptions {
  *
  * @example
  * ```typescript
+ * import { cursorPaginatedQuery, type PrismaModelDelegate } from '@netscript/contracts/query';
+ *
+ * declare const db: { user: PrismaModelDelegate };
+ *
  * const result = await cursorPaginatedQuery(db.user, {
  *   cursor: 'abc123',
  *   limit: 10,

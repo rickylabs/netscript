@@ -6,6 +6,7 @@ import { router } from './router.ts';
 const port = Number.parseInt(Deno.env.get('PORT') ?? '0', 10);
 
 await defineService(router, {
+  auth: { public: true, reason: 'Public benchmark API; authentication is outside this benchmark' },
   name: 'saga-queue-cron',
   port,
   openapi: {

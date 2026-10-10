@@ -114,6 +114,8 @@ export interface StreamProducerReadinessOptionsV1 {
 /** Stable failure categories translated by the durable-stream transport adapter. */
 export type StreamProducerTransportFailureKindV1 =
   | 'retryable'
+  | 'unauthorized'
+  | 'timeout'
   | 'stale-epoch'
   | 'sequence-gap'
   | 'stream-closed'
@@ -129,3 +131,8 @@ export interface StreamProducerTransportFailureV1 {
   /** Current server epoch supplied with a stale-epoch response. */
   readonly currentEpoch?: number;
 }
+
+/** Result of one transport operation without policy or retry decisions. */
+export type StreamProducerTransportResultV1<T> =
+  | Readonly<{ ok: true; value: T }>
+  | Readonly<{ ok: false; failure: StreamProducerTransportFailureV1 }>;
