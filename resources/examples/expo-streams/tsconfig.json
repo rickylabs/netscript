@@ -9,6 +9,7 @@
     "*.tsx"
   ],
   "exclude": [
-    "prepare.ts"
+    "prepare.ts",
+    "*_test.ts"
   ]
 }
