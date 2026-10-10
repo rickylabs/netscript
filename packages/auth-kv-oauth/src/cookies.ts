@@ -73,11 +73,11 @@ export function deriveHttps(
     const header = input instanceof Request
       ? input.headers.get.bind(input.headers)
       : input.header.bind(input);
-    const forwardedProto = header('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
+    const forwardedProto = header('x-forwarded-proto')?.split(',', 1)[0]?.trim().toLowerCase();
     if (forwardedProto) {
       return forwardedProto === 'https';
     }
-    const firstHop = header('forwarded')?.split(',')[0];
+    const firstHop = header('forwarded')?.split(',', 1)[0];
     const proto = firstHop?.match(/(?:^|;)\s*proto=(?:"([^";]+)"|([^;\s]+))/i);
     if (proto) {
       return (proto[1] ?? proto[2])?.toLowerCase() === 'https';
