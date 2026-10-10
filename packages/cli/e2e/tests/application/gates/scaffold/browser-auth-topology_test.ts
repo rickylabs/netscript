@@ -148,6 +148,12 @@ Deno.test('generated BFF cookie flow forwards a bearer to a guarded service and 
       'signout',
     );
     assertEquals(csrf.status, 403);
+    const anonymousSignout = await bff.handleBrowserAuth(
+      request('/auth/signout', { method: 'POST', headers: { origin: appOrigin } }),
+      'signout',
+    );
+    assertEquals(anonymousSignout.status, 401);
+    assertEquals(anonymousSignout.headers.getSetCookie(), []);
     const signout = await bff.handleBrowserAuth(
       request('/auth/signout', {
         method: 'POST',
