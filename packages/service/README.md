@@ -425,10 +425,10 @@ preventing a response from changing when a stored receipt is decoded.
 ## Command execution
 
 Compose `createCommandExecutor({ store, clock?, ids?, telemetry?, receiptClaimWaitMs?, limits? })`
-with a database-owned `CommandStorePort<TTx>`. The focused `/commands` export keeps the root
-surface unchanged. Execution performs one local interactive transaction; it never retries its
-handler or sends buffered messages. Authorize the actor before calling it and keep remote effects
-outside the handler. The testing store demonstrates semantics and certifies no real provider.
+with a database-owned `CommandStorePort<TTx>`. The focused `/commands` export keeps the root surface
+unchanged. Execution performs one local interactive transaction; it never retries its handler or
+sends buffered messages. Authorize the actor before calling it and keep remote effects outside the
+handler. The testing store demonstrates semantics and certifies no real provider.
 
 ```typescript
 import { createCommandExecutor, defineCommand, jsonCodec } from '@netscript/service/commands';
@@ -438,9 +438,11 @@ import { z } from 'zod';
 type Business = { update(id: string): Promise<void> };
 declare const store: CommandStorePort<Business>;
 const update = defineCommand<'items.update', { id: string }, { updated: boolean }, Business>({
-  name: 'items.update', definitionVersion: 1,
+  name: 'items.update',
+  definitionVersion: 1,
   idempotency: {
-    scope: () => 'items', fingerprint: (input) => input,
+    scope: () => 'items',
+    fingerprint: (input) => input,
     response: jsonCodec(z.object({ updated: z.boolean() })),
   },
   records: { audit: 'required', outbox: 'optional' },
@@ -452,28 +454,30 @@ const update = defineCommand<'items.update', { id: string }, { updated: boolean 
 });
 const executor = createCommandExecutor({ store });
 const result = await executor.execute(update, {
-  input: { id: 'item' }, actor: { kind: 'system', subject: 'maintenance' },
-  correlationId: 'update', idempotencyKey: 'fixture-key-00001',
+  input: { id: 'item' },
+  actor: { kind: 'system', subject: 'maintenance' },
+  correlationId: 'update',
+  idempotencyKey: 'fixture-key-00001',
 });
 result.value;
 ```
 
-The executor validates, detaches and deeply freezes bounded I-JSON input and a narrowed actor
-before calling scope and fingerprint once. Request SHA-256 covers command, definitionVersion,
-scope, selected input, actor kind/subject and expectedVersion or null. A separate SHA-256 hashes
-the key. Scheme, correlation, W3C context and raw key are excluded from request material. Keys
-are 16–256 UTF-8 bytes; scope and remaining identity/header strings are 1–256 bytes. Trace context
-uses W3C known-field validation, retains opaque future fields, and permits empty tracestate members.
-Traceparent rejects HTTP control bytes (including CR, LF, NUL and DEL), while preserving
-allowed HTAB, SP and opaque obs-text in unknown future fields.
+The executor validates, detaches and deeply freezes bounded I-JSON input and a narrowed actor before
+calling scope and fingerprint once. Request SHA-256 covers command, definitionVersion, scope,
+selected input, actor kind/subject and expectedVersion or null. A separate SHA-256 hashes the key.
+Scheme, correlation, W3C context and raw key are excluded from request material. Keys are 16–256
+UTF-8 bytes; scope and remaining identity/header strings are 1–256 bytes. Trace context uses W3C
+known-field validation, retains opaque future fields, and permits empty tracestate members.
+Traceparent rejects HTTP control bytes (including CR, LF, NUL and DEL), while preserving allowed
+HTAB, SP and opaque obs-text in unknown future fields.
 
 Defaults are 64 audit intents, 64 delivery intents and 64 KiB **aggregate** canonical side-row
 bytes, including persisted metadata. Configuration only tightens those ceilings. Each transaction
-receives a finite five-second timeout and validated provider claim-wait policy. Recorders perform
-no IO and detach canonical JSON immediately. Required/forbidden/count/byte policy and response
-codec validation all precede flush. Audit, outbox and receipt completion flush in that order using
-one bound handle; their execution ID is the winning receipt ID. Optional unkeyed attempts still
-have an execution ID but skip claim/completion.
+receives a finite five-second timeout and validated provider claim-wait policy. Recorders perform no
+IO and detach canonical JSON immediately. Required/forbidden/count/byte policy and response codec
+validation all precede flush. Audit, outbox and receipt completion flush in that order using one
+bound handle; their execution ID is the winning receipt ID. Optional unkeyed attempts still have an
+execution ID but skip claim/completion.
 
 Replay rechecks hash, version, completeness, canonical text and decoding, then returns the original
 correlation and performs no handler or side writes. Busy issues no later query and surfaces
@@ -516,15 +520,15 @@ private per-instance seam; a controller binds once and keeps only its latest 128
 business, receipt, audit and outbox together. `after_commit_before_return` models a lost response:
 all rows remain committed and the same-key retry replays without another handler or side record.
 
-`runCommandConformance(createFixture)` accepts a fresh `CommandConformanceFixture<TTx>` factory.
-The store and row types belong to the database package; the business handle stays generic. Supply
-bound write/CAS operations, detached committed inspection, corrupt receipt seeding and an explicit
+`runCommandConformance(createFixture)` accepts a fresh `CommandConformanceFixture<TTx>` factory. The
+store and row types belong to the database package; the business handle stays generic. Supply bound
+write/CAS operations, detached committed inspection, corrupt receipt seeding and an explicit
 outside-write negative control. `createMemoryCommandConformanceFixture()` is the simulated default.
-The finite matrix covers named faults, replay/mismatch, scope/name/version changes, malformed replay,
-cancellation, CAS, callback re-entry, no retry, terminal busy, isolation, policies and ordered flush.
-It includes concurrent replay and recovery after a rolled-back leader. Replacing the fixture's bound
-write with its outside-write control must fail the same-commit assertion. Real adapters still need
-provider-specific driver, lock, timeout and pooled session qualification.
+The finite matrix covers named faults, replay/mismatch, scope/name/version changes, malformed
+replay, cancellation, CAS, callback re-entry, no retry, terminal busy, isolation, policies and
+ordered flush. It includes concurrent replay and recovery after a rolled-back leader. Replacing the
+fixture's bound write with its outside-write control must fail the same-commit assertion. Real
+adapters still need provider-specific driver, lock, timeout and pooled session qualification.
 
 ```ts
 import {
@@ -534,18 +538,18 @@ import {
 const report = await runCommandConformance(createMemoryCommandConformanceFixture);
 ```
 
-`assertCommandDeterminism(definition, envelope, samples)` evaluates actual identity logic 2–32
-times (default four), each over equivalent detached deeply frozen input/actor material. It detects
-scope or fingerprint closure changes that affect sampled identity, without executing the handler
-or store. Its `sampled_equivalence` report is finite evidence, not a universal purity guarantee;
-command authors remain responsible for excluding clocks, randomness, mutable globals and IO.
+`assertCommandDeterminism(definition, envelope, samples)` evaluates actual identity logic 2–32 times
+(default four), each over equivalent detached deeply frozen input/actor material. It detects scope
+or fingerprint closure changes that affect sampled identity, without executing the handler or store.
+Its `sampled_equivalence` report is finite evidence, not a universal purity guarantee; command
+authors remain responsible for excluding clocks, randomness, mutable globals and IO.
 
 ## Durable command outbox relay
 
-Import `createCommandOutboxRelay` and its options from `@netscript/service/commands/relay`.
-Database owns raw persistence; service decodes bounded canonical I-JSON, validates W3C fields,
-resolves a copied sink registry and supervises a bounded drain. Construction starts no timer,
-resource or queue. Schedule `drainOnce` with your existing scheduler and await `stop` on shutdown.
+Import `createCommandOutboxRelay` and its options from `@netscript/service/commands/relay`. Database
+owns raw persistence; service decodes bounded canonical I-JSON, validates W3C fields, resolves a
+copied sink registry and supervises a bounded drain. Construction starts no timer, resource or
+queue. Schedule `drainOnce` with your existing scheduler and await `stop` on shutdown.
 
 ```ts
 import { createCommandOutboxRelay } from '@netscript/service/commands/relay';
@@ -554,10 +558,15 @@ import type { CommandOutboxRelayStore, CommandOutboxSink } from '@netscript/serv
 declare const store: CommandOutboxRelayStore;
 declare const sink: CommandOutboxSink;
 const relay = createCommandOutboxRelay({
-  store, sinks: new Map([[sink.id, sink]]),
-  clock: { now: () => new Date() }, ids: { next: () => crypto.randomUUID() },
-  batchSize: 16, concurrency: 4, leaseMs: 30000,
-  maxAttempts: 10, maxRetryDelayMs: 60000,
+  store,
+  sinks: new Map([[sink.id, sink]]),
+  clock: { now: () => new Date() },
+  ids: { next: () => crypto.randomUUID() },
+  batchSize: 16,
+  concurrency: 4,
+  leaseMs: 30000,
+  maxAttempts: 10,
+  maxRetryDelayMs: 60000,
   classify: () => 'unavailable',
   retryAt: (attempt, now) => new Date(now.getTime() + Math.min(1000 * attempt, 60000)),
 });
@@ -565,11 +574,11 @@ await relay.drainOnce();
 await relay.stop();
 ```
 
-Overlapping drains serialize under one concurrency ceiling. Stop prevents new claims, signals
-active publishers and waits for all active and queued drains, including publishers that ignore
+Overlapping drains serialize under one concurrency ceiling. Stop prevents new claims, signals active
+publishers and waits for all active and queued drains, including publishers that ignore
 cancellation. Aborted claimed rows are released only through their owned token; expired ownership
-remains for a later claim. Caller cancellation is cooperative and passed to provider/sink operations.
-Finite provider timeouts and sink timeouts belong to their supplied boundaries.
+remains for a later claim. Caller cancellation is cooperative and passed to provider/sink
+operations. Finite provider timeouts and sink timeouts belong to their supplied boundaries.
 
 A generic sink may resolve void at its documented acceptance boundary. Checked worker sinks return
 only normalized `{ identity, acceptedAt }`; service validates and snapshots both before database
@@ -599,3 +608,52 @@ cancelled attempts as well as committed/replayed attempts. Definitions are verif
 validation and identity occur once within the observed operation. Completion observer failures do
 not replace committed results. Command spans join through native span context and deliberately
 exclude envelope identities, keys, hashes, payloads and correlation IDs.
+
+## Anonymous route rate limits
+
+Use the existing middleware seam to reject requests before routing. Selected routes share a
+fixed-window quota per key; the default key is the socket client address. Install this stage before
+immediate health/info routes if those routes should also be limited.
+
+```ts
+import { createService } from '@netscript/service';
+import { createMemoryRateLimitStore } from '@netscript/service/rate-limit';
+
+const app = createService({}, { name: 'device' })
+  .withRateLimit({
+    routes: ['/device/start', '/device/poll'],
+    limit: 10,
+    windowMs: 60_000,
+    store: createMemoryRateLimitStore(),
+  })
+  .route('post', '/device/start', (c) => c.json({ started: true }))
+  .route('post', '/device/poll', (c) => c.json({ pending: true }))
+  .build();
+```
+
+A rejected request receives JSON `{ error: 'RATE_LIMITED' }` and `Retry-After` in whole seconds
+rounded up to the window end. For shared production state, import `createKvRateLimitStore` from
+`@netscript/service/rate-limit` and pass a `@netscript/kv` store with atomic support and a dedicated
+`prefix`. Each request makes at most eight read/CAS attempts (sixteen KV round trips); contention
+budget exhaustion rejects conservatively. Store failures propagate to the service error handler.
+
+The memory store is for tests/development: it performs synchronous reservations, evicts expired keys
+in bounded batches, and rejects new keys when its `maxKeys` cap is full. It holds no timers. Neither
+adapter evicts a live quota to admit another key. Windows are aligned to epoch time; a client can
+use two windows' quota around a boundary. Separate limiters must use separate stores or KV prefixes
+unless they intentionally share a quota. Hosts sharing a store need synchronized clocks.
+
+`serve()` supplies `{ remoteAddr: info.remoteAddr }` to Hono on HTTP and TLS listeners, so Hono's
+Deno `getConnInfo` sees the socket peer. A mounting host can pass the same `ServiceEnvironment` to
+`app.fetch(request, env)`. Without metadata, the default key is a shared `unknown` bucket; provide
+metadata or a custom `key` for per-client quotas.
+
+Like the auth transport policy, proxy trust defaults off. `trustProxy: (address) => ...` explicitly
+identifies trusted proxy addresses. XFF is walked right to left from the socket peer, stopping at
+the first untrusted address. A client-supplied XFF from an untrusted socket is ignored. Trusted
+proxies must overwrite or append the actual peer address; malformed or oversized chains fall back to
+the socket address. This client-address policy does not enable auth protocol-header trust.
+
+See
+[Protect an anonymous service route](../../docs/site/services-sdk/how-to/protect-an-anonymous-route.md)
+for a shared KV example.
