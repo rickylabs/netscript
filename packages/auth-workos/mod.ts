@@ -8,7 +8,9 @@
  * import { WorkOS } from '@workos-inc/node';
  * import { createWorkosBackend } from '@netscript/auth-workos';
  *
- * const workos = new WorkOS('sk_test_123', { clientId: 'client_123' });
+ * const workos = new WorkOS(Deno.env.get('WORKOS_API_KEY')!, {
+ *   clientId: Deno.env.get('WORKOS_CLIENT_ID')!,
+ * });
  * const backend = createWorkosBackend({
  *   workos,
  *   cookiePassword: Deno.env.get('WORKOS_COOKIE_PASSWORD')!,

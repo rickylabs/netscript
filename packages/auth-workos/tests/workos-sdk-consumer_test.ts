@@ -9,7 +9,6 @@ import {
   type AuthnRequest,
   createWorkosAuthenticator,
   createWorkosBackend,
-  type WorkosSessionClient,
 } from '@netscript/auth-workos';
 
 Deno.test('real WorkOS SDK client is accepted by both sealed-session factories', async () => {
@@ -74,11 +73,15 @@ const request: AuthnRequest = {
 };
 
 Deno.test('SDK authentication and refresh retain user and principal/session mapping fields', async () => {
-  const workos: WorkosSessionClient = {
+  const workos = {
     userManagement: {
       loadSealedSession: () => ({
         authenticate: () => Promise.resolve(authenticated),
-        refresh: (options) => {
+        refresh: (
+          options?: Parameters<
+            ReturnType<WorkOS['userManagement']['loadSealedSession']>['refresh']
+          >[0],
+        ) => {
           assertEquals(options, { cookiePassword: 'x'.repeat(32), organizationId: 'org_123' });
           return Promise.resolve(refreshed);
         },
