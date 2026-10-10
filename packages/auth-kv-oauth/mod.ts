@@ -27,7 +27,9 @@ export {
   type OAuthProviderClientAuthConfig,
   type OAuthProviderConfig,
   type OAuthProviderInput,
+  type OAuthSubjectSource,
   type PresetOAuthProviderOptions,
+  presetSubjectSource,
   type TenantOAuthProviderOptions,
 } from './src/providers.ts';
 export { providers } from './src/providers.ts';
@@ -61,6 +63,7 @@ export {
 export {
   createKvOAuthFlow,
   type CreateKvOAuthFlowOptions,
+  defaultPrincipal,
   type KvOAuthCallbackResult,
   type KvOAuthFetch,
   type KvOAuthFlow,
@@ -69,6 +72,12 @@ export {
   type OAuthCustomFetch,
   type OAuthTokenCustomFetch,
 } from './src/flow.ts';
+
+export {
+  type KvOAuthUserInfoFetch,
+  type PrincipalSubjectContext,
+  resolvePrincipalSubject,
+} from './src/subject.ts';
 
 export {
   createKvOAuthBackend,

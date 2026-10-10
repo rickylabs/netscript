@@ -20,6 +20,7 @@
   },
   "imports": {
     "hono": "jsr:@hono/hono@4.12.24",
+    "hono/body-limit": "jsr:@hono/hono@4.12.24/body-limit",
     "hono/cors": "jsr:@hono/hono@4.12.24/cors",
     "hono/logger": "jsr:@hono/hono@4.12.24/logger",
     "@orpc/server": "npm:@orpc/server@^1.15.0",
