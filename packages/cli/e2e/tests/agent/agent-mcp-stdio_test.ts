@@ -83,7 +83,7 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
   assertStringIncludes(agents, 'call MCP `find_guidance` with the task');
   for (const skill of ['netscript', 'netscript-build']) {
     assertStringIncludes(
-      await Deno.readTextFile(join(projectRoot, '.claude', 'skills', skill, 'SKILL.md')),
+      await Deno.readTextFile(join(projectRoot, '.agents', 'skills', skill, 'SKILL.md')),
       'find_guidance',
     );
   }
