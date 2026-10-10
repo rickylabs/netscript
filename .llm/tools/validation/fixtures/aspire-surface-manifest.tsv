@@ -647,6 +647,7 @@ packages/cli/src/public/features/plugins/install/install-plugin_test.ts	cli:othe
 packages/cli/src/public/features/plugins/install/install-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/install/render-plugin.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/new/new-plugin-use-case.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/plugins-group.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/remove/plugin-removal-plan.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
