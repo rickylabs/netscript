@@ -95,23 +95,57 @@ function requirePrincipal(context: BillingContext): Principal {
 
 These are re-exports of the public `@netscript/service` contracts. The service package remains the
 owner, and `ServiceHandlerContext.principal` remains optional so unguarded handlers and existing
-plugin services are unaffected. Narrow the principal in handlers that require identity; do not add
-a second plugin-specific principal shape.
+plugin services are unaffected. Narrow the principal in handlers that require identity; do not add a
+second plugin-specific principal shape.
+
+## Background child health
+
+`@netscript/plugin/health` exports `ChildHealthState`, `ChildHealthSnapshot`, `ChildFatalError`,
+`ChildHealthMonitor`, `CHILD_CRASH_LOOP_THRESHOLD`, `childHealthResponse`, and
+`runChildHealthProcess`.
+
+```ts
+import { ChildHealthMonitor } from '@netscript/plugin/health';
+
+const health = new ChildHealthMonitor();
+health.registryLoaded();
+health.dependenciesReady();
+health.running();
+console.log(health.snapshot().state); // ready
+```
+
+The closed state vocabulary is `starting | ready | degraded | crash-looping | stopped | failed`. The
+payload also reports `registryReady`, `dependencyReady`, cumulative `restartCount`, and
+`lastFatalError` (a fixed redacted message plus an epoch-millisecond timestamp, or `null`). Registry
+readiness means every definition was registered; dependency readiness describes startup checks and
+listener failures, rather than a continuous backing-service heartbeat.
+
+Three restarts within 60 seconds latch `crash-looping` for the child lifetime. A successful retry
+cannot turn that child green; clean shutdown reports `stopped`. Restart history retains at most
+three timestamps. Health responses return HTTP 200 only for `ready` with both readiness fields true;
+all other states return HTTP 503. Raw exception messages, stacks, credentials, and definition data
+never enter this payload.
+
+Generated workers, triggers, and sagas glue starts the health listener before bootstrap and keeps a
+failed child observable until process shutdown. These processes run under their service identity
+without an app or owner session. AppHost probe generation and doctor/MCP aggregation consume this
+contract in subsequent slices of #1366.
 
 ## Public surface
 
-| Entry             | What it gives you                                                                                                  |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Entry             | What it gives you                                                                                                                                        |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `.`               | `definePlugin`, `PluginBuilder`, `inspectPlugin`, `verifyPlugin`, `Principal`, `ServiceHandlerContext`, the manifest schema, and the typed error classes |
-| `./adapter`       | The adapter seam deployable plugins expose and hosts drive                                                         |
-| `./config`        | Configuration surfaces for host tooling                                                                            |
-| `./cli`           | Plugin CLI command-group plumbing and argument parsing                                                             |
-| `./sdk`           | Plugin discovery for external tooling                                                                              |
-| `./contract-base` | The base oRPC contract every plugin API contract extends                                                           |
-| `./abstracts`     | Abstract bases marking plugin extension points                                                                     |
-| `./testing`       | Fixtures for exercising manifests and adapters in tests                                                            |
-| `./loader`        | The host-side plugin loader entrypoint                                                                             |
-| `./service`       | Plugin service composition plus the service-owned `Principal` and `ServiceHandlerContext` types                     |
+| `./health`        | Background child state, bounded restart policy, and the child HTTP health transport                                                                      |
+| `./adapter`       | The adapter seam deployable plugins expose and hosts drive                                                                                               |
+| `./config`        | Configuration surfaces for host tooling                                                                                                                  |
+| `./cli`           | Plugin CLI command-group plumbing and argument parsing                                                                                                   |
+| `./sdk`           | Plugin discovery for external tooling                                                                                                                    |
+| `./contract-base` | The base oRPC contract every plugin API contract extends                                                                                                 |
+| `./abstracts`     | Abstract bases marking plugin extension points                                                                                                           |
+| `./testing`       | Fixtures for exercising manifests and adapters in tests                                                                                                  |
+| `./loader`        | The host-side plugin loader entrypoint                                                                                                                   |
+| `./service`       | Plugin service composition plus the service-owned `Principal` and `ServiceHandlerContext` types                                                          |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin@<version>`](https://jsr.io/@netscript/plugin/doc) (pin `<version>`
@@ -144,9 +178,9 @@ const registries = await startWalker('.', options);
 ```
 
 Official plugins emit the same declaration during install or sync; plugin core contains no
-plugin-specific factory table. Additional mappings are snapshotted per extractor instance.
-Malformed identifiers, blank axes, duplicate callees, and a recognizable contribution factory call
-without a matching declaration throw a `TypeError` instead of silently omitting contributions.
+plugin-specific factory table. Additional mappings are snapshotted per extractor instance. Malformed
+identifiers, blank axes, duplicate callees, and a recognizable contribution factory call without a
+matching declaration throw a `TypeError` instead of silently omitting contributions.
 
 This changes the migration boundary for projects scaffolded before `0.0.7`: re-run plugin sync or
 update so each plugin's control-plane module receives its declaration before using no-argument
@@ -176,9 +210,9 @@ JSR with cryptographically verified provenance.
 
 ## Explicit service authentication
 
-`createPluginService` requires `auth`. Guarded services pass native service-auth options;
-JavaScript callers receive a `TypeError` for missing or ambiguous policies before a builder is
-constructed. TypeScript callers must migrate their service configuration.
+`createPluginService` requires `auth`. Guarded services pass native service-auth options; JavaScript
+callers receive a `TypeError` for missing or ambiguous policies before a builder is constructed.
+TypeScript callers must migrate their service configuration.
 
 ```ts
 import { assemblePluginContractRouter, createPluginService } from '@netscript/plugin/service';
@@ -210,15 +244,15 @@ const service = createPluginService(router, {
 });
 ```
 
-The contract must declare the required access metadata, and the plugin must declare its auth
-service dependency. The builder resolves procedure policy across REST and RPC; do not infer a
-procedure's required scope from the transport's HTTP method.
+The contract must declare the required access metadata, and the plugin must declare its auth service
+dependency. The builder resolves procedure policy across REST and RPC; do not infer a procedure's
+required scope from the transport's HTTP method.
 
 `contractMount` is the same `{ version, namespace }` value used to assemble the router.
 `mountPluginContract` prefixes REST paths and nests RPC keys without changing the source contract,
 its access metadata, or its errors. Passing the flat contract to the authorizer would deny mounted
-requests because their paths differ. The generator exports one mount constant in `handlers.ts`
-and shares it with the authorizer; preserve that single authority when adapting the scaffold.
+requests because their paths differ. The generator exports one mount constant in `handlers.ts` and
+shares it with the authorizer; preserve that single authority when adapting the scaffold.
 
 For a deliberately public service, record the reason instead:
 
@@ -233,10 +267,10 @@ const service = createPluginService({}, {
 
 Never combine public and guarded fields. Public reasons must be nonblank. Options pass through
 unchanged: a custom nonempty `allowAnonymous` list replaces the native default. The builder's
-built-in health routes remain public because they are registered before auth middleware; raw
-routes are installed after it and follow the configured guards.
+built-in health routes remain public because they are registered before auth middleware; raw routes
+are installed after it and follow the configured guards.
 
 The existing first-party public declarations record unfinished adoption, not proof that those
-services are guarded. Their credential propagation, session seeding, per-service access policy
-and auth discovery work remain under #1383; auth signout authorization remains under #1384.
-This source change does not imply availability in an existing published package.
+services are guarded. Their credential propagation, session seeding, per-service access policy and
+auth discovery work remain under #1383; auth signout authorization remains under #1384. This source
+change does not imply availability in an existing published package.

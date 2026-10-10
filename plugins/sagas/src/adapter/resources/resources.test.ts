@@ -98,7 +98,8 @@ Deno.test('sagas install runtime glue registers Redis before starting the runner
 
   const source = artifactText(runtimeArtifact);
   const registrationImport = "import '@netscript/kv/redis';";
-  const runnerImport = "import { startSagaRunner } from '@netscript/plugin-sagas/runtime';";
+  const runnerImport =
+    "import { startSagaRunner, type SagaRuntimeSupervisor } from '@netscript/plugin-sagas/runtime';";
 
   assertStringIncludes(source, registrationImport);
   assertStringIncludes(source, runnerImport);
@@ -115,10 +116,11 @@ Deno.test('sagas install runtime glue exposes a supervisor-backed health endpoin
   assert(runtimeArtifact, 'sagas install must emit sagas/runtime.ts');
 
   const source = artifactText(runtimeArtifact);
-  assertStringIncludes(source, 'await startSagaRunner({');
-  assertStringIncludes(source, 'Deno.serve({ port }, (request) =>');
-  assertStringIncludes(source, "snapshot.status === 'running'");
-  assertStringIncludes(source, "Deno.env.get('PORT')");
+  assertStringIncludes(source, 'await startSagaRunner()');
+  assertStringIncludes(source, 'await runChildHealthProcess(');
+  assertStringIncludes(source, 'supervisor?.snapshot().childHealth');
+  assertStringIncludes(source, 'supervisor.waitForDelivery()');
+  assertStringIncludes(source, "await supervisor.stop('background-child-shutdown')");
 });
 
 Deno.test('sagas resource token map rejects misspelled tokens at compile time', () => {

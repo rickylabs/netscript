@@ -59,3 +59,10 @@ export type {
   WorkerTaskResult,
 } from './worker.ts';
 export type { WorkerPoolOptions } from './job-runner-pool.ts';
+
+export type {
+  ChildFatalError,
+  ChildHealthMonitor,
+  ChildHealthSnapshot,
+  ChildHealthState,
+} from '@netscript/plugin/health';

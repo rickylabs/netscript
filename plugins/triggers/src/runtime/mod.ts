@@ -85,3 +85,10 @@ export type {
 } from '@netscript/plugin-triggers-core/ports';
 export type { RuntimeTriggerProcessorOptions } from './trigger-runtime-processor.ts';
 export type { TriggerProcessorRuntimeOptions } from './trigger-processor.ts';
+
+export type {
+  ChildFatalError,
+  ChildHealthMonitor,
+  ChildHealthSnapshot,
+  ChildHealthState,
+} from '@netscript/plugin/health';
