@@ -97,6 +97,12 @@ Claude Code) and writes `.mcp.json` (Claude Code), `.vscode/mcp.json` (VS Code),
 shipped with your CLI release. The command prints which source decided the host. Use
 `--host claude|vscode|opencode|all` to choose explicitly.
 
+Skills have one authoritative home in `.agents/skills/`. Claude Code receives only the discovery
+bridge `.claude/skills/repo-skills/SKILL.md` and a root `CLAUDE.md` import of `@AGENTS.md`;
+existing Claude instructions are preserved and the import is added once. Aspire workflow skills
+use the standard `.agents/skills/` location too. Existing legacy mirrors and custom Claude skills
+are preserved; legacy mirror cleanup and divergent-file reporting remain follow-up work.
+
 To embed the server in your own host process, add it as a library:
 
 ```bash
