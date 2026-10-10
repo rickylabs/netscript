@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertStrictEquals } from '@std/assert';
 import { oc } from '@orpc/contract';
-import { z } from 'npm:zod@^4.4.3';
+import { z } from 'npm:zod@^4.6.5';
 import { QueryClient } from '@tanstack/query-core';
 import { createServiceQueryUtils } from '@netscript/sdk/query-client';
 import type { ServiceClient } from '@netscript/sdk/ports';

@@ -2,7 +2,7 @@ import { assertEquals } from '@std/assert';
 import { fromFileUrl } from '@std/path';
 
 const freshRoot = fromFileUrl(new URL('../', import.meta.url));
-const queryCoreVersions: readonly string[] = ['5.101.0', '5.102.8'];
+const queryCoreVersions: readonly string[] = ['5.101.0', '5.102.8', '5.104.1'];
 
 for (const version of queryCoreVersions) {
   Deno.test(`query hydration type-checks against query-core ${version}`, async () => {
