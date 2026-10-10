@@ -225,14 +225,14 @@ export function generateEnvFileContent(
     '# ============================================================================',
     '# WORKER / SAGA / TRIGGER CONFIGURATION',
     '# ============================================================================',
-    '# WORKER_CONCURRENCY controls the Web Worker pool size (parallel job execution).',
+    '# WORKERS_CONCURRENCY controls the Web Worker pool size (parallel job execution).',
     '# Each Web Worker spawns its own V8 isolate (~20-40 MB). Keep low for memory.',
     '',
     '# QUEUE_PROVIDER=redis',
   );
 
   const orderedTargetKeys = [
-    'WORKER_CONCURRENCY',
+    'WORKERS_CONCURRENCY',
     'WORKERS_API_VERSION',
     'SAGAS_API_VERSION',
     'SAGA_CONCURRENCY',
