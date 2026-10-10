@@ -55,7 +55,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/plugin-streams": [".","./adapter-cli","./aspire","./cli","./e2e","./scaffold","./services"],
 
-  "@netscript/plugin-streams-core": [".","./integration/commands","./sse","./telemetry","./testing"],
+  "@netscript/plugin-streams-core": [".","./admin","./integration/commands","./sse","./telemetry","./testing"],
 
   "@netscript/plugin-triggers": [".","./adapter-cli","./aspire","./cli","./plugin","./public","./runtime","./scaffold","./services","./streams","./streams/server"],
 
