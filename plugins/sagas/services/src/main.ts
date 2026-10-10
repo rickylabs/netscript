@@ -82,7 +82,7 @@ export default async function createSagasService(
       const sagaDbClient = resolveSagaServicePrismaClient(hostDbClient, sagaStoreBackend);
       if (sagaDbClient) {
         dbClient = sagaDbClient;
-        useKvProjection = false;
+        useKvProjection = sagaStoreBackend !== 'prisma';
       }
       await registerSagas();
       if (sagaDbClient) {

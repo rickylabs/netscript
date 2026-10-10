@@ -8,6 +8,8 @@
  */
 
 import { PrismaMssql } from '@prisma/adapter-mssql';
+import { tokenizeAdoNetConnectionString } from './connection-strings/tokenize-ado-net.ts';
+export { AdoNetConnectionStringSyntaxError } from './connection-strings/tokenize-ado-net.ts';
 import type {
   DatabaseAdapter,
   DatabaseConnectionOptions,
@@ -107,6 +109,7 @@ export interface MssqlDriverAdapter {
  *
  * @param connectionString - ADO.NET format connection string
  * @returns MssqlAdapterConfig object for PrismaMssql
+ * @throws {AdoNetConnectionStringSyntaxError} For malformed key=value segments or quotes.
  *
  * @example
  * ```typescript
@@ -119,12 +122,8 @@ export interface MssqlDriverAdapter {
 export function parseAdoNetConnectionString(connectionString: string): MssqlAdapterConfig {
   const params: Record<string, string> = {};
 
-  // Parse key=value pairs (semicolon-separated)
-  for (const part of connectionString.split(';')) {
-    const [key, ...valueParts] = part.split('=');
-    if (key && valueParts.length > 0) {
-      params[key.trim().toLowerCase()] = valueParts.join('=').trim();
-    }
+  for (const { key, value } of tokenizeAdoNetConnectionString(connectionString)) {
+    params[key] = value;
   }
 
   // Parse server and port (format: "host,port" or "host\instance")
@@ -280,7 +279,7 @@ export function getMssqlConfigFromEnv(resourceName = 'MSSQL'): MssqlAdapterConfi
  *
  * // Or with connection string:
  * // MSSQLDB_URI=Server=localhost,1433;Database=mydb;...
- * const config = getMssqlConfig('MSSQLDB_URI');
+ * const connectionStringConfig = getMssqlConfig('MSSQLDB_URI');
  * ```
  */
 export function getMssqlConfig(connectionStringEnvVar = 'MSSQLDB_URI'): MssqlAdapterConfig {

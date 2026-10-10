@@ -1,0 +1,7 @@
+import { define } from '../../utils.ts';
+import { handleBrowserAuth } from '{{bffImport}}';
+
+export const handler = define.handlers({
+  GET: (ctx) => handleBrowserAuth(ctx.req, ctx.params.action),
+  POST: (ctx) => handleBrowserAuth(ctx.req, ctx.params.action),
+});
