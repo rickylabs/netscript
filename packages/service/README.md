@@ -104,11 +104,11 @@ For a genuinely public status service, the exact migration is:
 +});
 ```
 
-The policy and its validator are the shared `ServiceAuthPolicy` / `assertServiceAuthPolicy`
-contract from `@netscript/service/auth`, also used by plugin services. Guarded policies preserve
-the existing `/api` protection and anonymous `/health` defaults; custom `protect` and
-`allowAnonymous` options keep their existing semantics. `createService()` remains the lower-level
-composition API; it installs guards through `.withAuthn()` and `.withAuthz()`.
+The policy and its validator are the shared `ServiceAuthPolicy` / `assertServiceAuthPolicy` contract
+from `@netscript/service/auth`, also used by plugin services. Guarded policies preserve the existing
+`/api` protection and anonymous `/health` defaults; custom `protect` and `allowAnonymous` options
+keep their existing semantics. `createService()` remains the lower-level composition API; it
+installs guards through `.withAuthn()` and `.withAuthz()`.
 
 `netscript service add` and auth installation share the BFF composition: `browserAuthenticator`
 verifies remote sessions and `createContractAuthorizer(router)` enforces procedure-local access.
