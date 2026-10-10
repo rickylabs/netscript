@@ -23,6 +23,7 @@ export { createFetchStreamEventSourceV1 } from './application/create-fetch-strea
 export type {
   FetchStreamEventSourceOptionsV1,
   FetchStreamEventSourceV1,
+  StreamFetchResponseV1,
   StreamFetchV1,
   StreamSourceSchedulerV1,
 } from './ports/fetch-stream-source.ts';

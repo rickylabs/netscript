@@ -84,6 +84,9 @@ therefore remains entity replay: offsets order the retained updates, and reducin
 materializes the newest record with its last progress value and terminal status. Intermediate
 updates may be visible in the retained log, but this is not a separate progress-history API.
 
+For React Native screens, follow [Consume durable streams in Expo](/durable-workflows/expo-streams/).
+It uses the same TanStack DB engine through an injected fetch and includes the native runtime probe.
+
 ## Learn → / Do →
 
 {{ comp.featureGrid({ items: [
