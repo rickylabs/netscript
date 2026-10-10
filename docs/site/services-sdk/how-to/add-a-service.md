@@ -36,16 +36,15 @@ step by step. Both stand up the same Hono + oRPC runtime and advertise the ident
 
 ## Before you start
 
-{{ comp.apiTable({ caption: "Prerequisites", rows: [ { name: "A NetScript workspace", type:
-"netscript init", desc: "An existing project on disk. If you do not have one, scaffold it first —
-see the tutorials. Run commands from the workspace root." }, { name: "The netscript CLI", type: "on
-your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript
-jsr:@netscript/cli" + releaseSpecifier + " — then confirm with netscript --help." }, { name: "A
-contracts workspace", type: "contracts/", desc: "The init scaffold ships a shared contracts/
-workspace exposed as the @<project>/contracts import alias. New services add their contract here so
-clients can import it." }, { name: "A free port", type: "Randomized by default", desc: "Standalone
-services, plugin APIs, and apps are allocated stable high-range ports (>= 49152) at scaffold time to
-avoid collision. The exact ports are written to your appsettings.json." } ] }) }}
+{{ comp.apiTable({
+caption: "Prerequisites",
+rows: [
+{ name: "A NetScript workspace", type: "netscript init", desc: "An existing project on disk. If you do not have one, scaffold it first — see the tutorials. Run commands from the workspace root." },
+{ name: "The netscript CLI", type: "on your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + " — then confirm with netscript --help." },
+{ name: "A contracts workspace", type: "contracts/", desc: "The init scaffold ships a shared contracts/ workspace exposed as the @<project>/contracts import alias. New services add their contract here so clients can import it." },
+{ name: "A free port", type: "Randomized by default", desc: "Standalone services, plugin APIs, and apps are allocated stable high-range ports (>= 49152) at scaffold time to avoid collision. The exact ports are written to your appsettings.json." }
+]
+}) }}
 
 This recipe adds a service named `users` on its assigned port, mirroring the example the scaffold
 ships, so every path and code shape below matches a real generated workspace. Substitute your own
@@ -388,16 +387,12 @@ persistence with the database recipe before you depend on durability. {{ /comp }
 
 ## See also
 
-{{ comp.featureGrid({ items: [ { title: "Tutorial: Build a service", body: "The guided,
-learning-oriented version — contract to typed client to a Fresh island, explained step by step.",
-href: "/tutorials/storefront/02-catalog-service/", icon: "→" }, { title: "Service API reference",
-body: "The full generated surface of defineService and createService — every option, builder method,
-and return type.", href: "/reference/service/", icon: "◆" }, { title: "Contracts, explained", body:
-"How an oRPC contract flows from service to typed client to UI without a codegen step.", href:
-"/explanation/contracts/", icon: "◎" }, { title: "Database & migration", body: "Replace the seeded
-in-memory records with real Prisma-backed persistence — Postgres is the recommended engine, or mysql
-/ mssql / sqlite via --db — init, generate, seed (Aspire up first).", href:
-"/data-persistence/how-to/database-migration/", icon: "▣" } ] }) }}
+{{ comp.featureGrid({ items: [
+{ title: "Tutorial: Build a service", body: "The guided, learning-oriented version — contract to typed client to a Fresh island, explained step by step.", href: "/tutorials/storefront/02-catalog-service/", icon: "→" },
+{ title: "Service API reference", body: "The full generated surface of defineService and createService — every option, builder method, and return type.", href: "/reference/service/", icon: "◆" },
+{ title: "Contracts, explained", body: "How an oRPC contract flows from service to typed client to UI without a codegen step.", href: "/explanation/contracts/", icon: "◎" },
+{ title: "Database & migration", body: "Replace the seeded in-memory records with real Prisma-backed persistence — Postgres is the recommended engine, or mysql / mssql / sqlite via --db — init, generate, seed (Aspire up first).", href: "/data-persistence/how-to/database-migration/", icon: "▣" }
+] }) }}
 
 Manage the service over its lifetime by editing its contract under `contracts/versions/` and
 re-running your workspace gates (`deno task check`). For the concepts behind contract-first
