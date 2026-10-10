@@ -67,7 +67,10 @@ async function runGate(
     store: new AtomicFileReceiptStore(receiptPath),
     childReport: report,
   });
-  assertEquals(JSON.parse(await Deno.readTextFile(receiptPath)), JSON.parse(JSON.stringify(receipt)));
+  assertEquals(
+    JSON.parse(await Deno.readTextFile(receiptPath)),
+    JSON.parse(JSON.stringify(receipt)),
+  );
   return receipt;
 }
 
