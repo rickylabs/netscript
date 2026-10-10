@@ -7,9 +7,10 @@ order: 112
 
 # Deliver outbound webhooks
 
-**Goal:** deliver committed service events to a receiver with authenticated payloads, bounded
-retries, and durable terminal-failure records. This is a recipe for the existing workers plugin; it
-creates no new package, plugin, or runtime primitive.
+**Goal:** deliver signed outbox events with retries and a DLQ.
+
+Use the existing workers plugin for authenticated delivery, bounded retries, and durable
+terminal-failure records. This recipe creates no new package, plugin, or runtime primitive.
 
 Delivery is **at-least-once, never exactly-once**. A receiver can commit the effect and lose its
 HTTP response, or a worker can crash after sending and before recording completion. Both permit
