@@ -20,6 +20,31 @@ the same definitions run in production and in permission-free tests.
 This is the core that the deployable [`@netscript/plugin-workers`](/reference/workers/) plugin binds
 to a NetScript host. Use it directly for custom hosts, libraries, and tests.
 
+## Job context cancellation
+
+`JobHandlerContext` on the root surface and `JobContext` on the runtime surface
+carry a required `signal: AbortSignal` and optional `deadlineAt: number` (epoch
+milliseconds). `JobDispatchContext` accepts an optional caller signal; the
+`InProcessJobRunner` supplies a separate owned signal to the handler.
+
+| Input or event                       | In-process runner behavior                                                                                       |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `job.timeout`                        | Deadline is runner clock time at dispatch plus timeout in milliseconds.                                          |
+| Caller `deadlineAt`                  | Uses the earlier of this deadline and the job timeout deadline; absent when neither exists.                      |
+| Deadline elapsed                     | Aborts with a `DOMException` named `TimeoutError`.                                                               |
+| `runner.stop()`                      | Stops admission, aborts active handlers with `ShutdownError`, and awaits bounded drain.                          |
+| Caller signal abort                  | Preserves an Error named `TimeoutError`, `ShutdownError`, or `AbortError`; otherwise normalizes to `AbortError`. |
+| Later abort                          | Does not replace the first abort reason.                                                                         |
+| Cleanup exceeds `abortGracePeriodMs` | Dispatch rejects with the abort reason; default budget 1,000 ms, without physical JavaScript termination.        |
+
+Pass the signal into downstream abort-aware APIs and check it at yielding
+checkpoints. Cleanup belongs in `finally`. See
+[handler guidance](/background-processing/workers/#observe-cancellation-and-deadlines)
+and [cleanup tuning](/background-processing/how-to/tune-worker-runtime/#abort-cleanup-budget).
+The Workers API runs router does not expose an operator cancel operation; caller
+signal cancellation here describes custom in-process dispatch, not an HTTP cancel
+endpoint. Other execution modes require their own propagation verification.
+
 ## Exports
 
 The package publishes eighteen entrypoints. The root path carries the authoring surface; the

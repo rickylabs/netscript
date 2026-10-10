@@ -23,7 +23,10 @@
 import type { Context, MiddlewareHandler } from 'hono';
 import { createLogger, type Logger } from '@netscript/logger';
 import type { AuthnOptions, AuthzOptions } from './options.ts';
-import type { ProcedurePolicyResolution, ProcedurePolicyResolver } from './contract-policy.ts';
+import type {
+  ProcedurePolicyResolution,
+  ProcedurePolicyResolver,
+} from './contract/contract-policy.ts';
 import type { AuthnRequest, AuthnResult, Principal } from './types.ts';
 
 /** Default path prefixes guarded by auth middleware. */
@@ -124,6 +127,7 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
         principal,
         method: c.req.method,
         path: c.req.path,
+        rawPath: rawPathname(c),
       });
 
       if (!decision.allow) {
@@ -158,7 +162,19 @@ function resolvePolicy(
   resolver: ProcedurePolicyResolver | undefined,
   c: Context,
 ): ProcedurePolicyResolution | undefined {
-  return resolver?.resolve({ method: c.req.method, path: c.req.path });
+  return resolver?.resolve({ method: c.req.method, path: rawPathname(c), routePath: c.req.path });
+}
+
+/**
+ * Returns the undecoded pathname the oRPC handlers match. Hono's `c.req.path` is percent-decoded,
+ * and a decoded path can select a different procedure than the one oRPC executes.
+ */
+function rawPathname(c: Context): string {
+  const url = c.req.url;
+  const start = url.indexOf('/', url.indexOf('//') + 2);
+  if (start < 0) return '/';
+  const end = url.slice(start).search(/[?#]/);
+  return end < 0 ? url.slice(start) : url.slice(start, start + end);
 }
 
 function requiresAuthentication(
