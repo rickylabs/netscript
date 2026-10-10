@@ -27,7 +27,7 @@ export class DenoAspireAgentInitializer implements AspireAgentInitializer {
     signal: AbortSignal,
   ): Promise<AspireAgentInitializationResult> {
     try {
-      const output = await new Deno.Command('aspire', {
+      const output = await new Deno.Command(Deno.env.get('NETSCRIPT_ASPIRE_CLI') || 'aspire', {
         args: aspireAgentInitArgs(projectRoot),
         signal,
         stdout: 'piped',
@@ -41,7 +41,10 @@ export class DenoAspireAgentInitializer implements AspireAgentInitializer {
       };
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {
-        return { ok: false, reason: 'the aspire executable was not found on PATH' };
+        return {
+          ok: false,
+          reason: 'the Aspire executable was not found; check NETSCRIPT_ASPIRE_CLI or PATH',
+        };
       }
       throw error;
     }

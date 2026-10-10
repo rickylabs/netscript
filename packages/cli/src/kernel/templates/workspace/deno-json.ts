@@ -96,9 +96,10 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
           'aspire:start': 'cd aspire && ASPIRE_CLI_START_TIMEOUT=300 aspire start',
           'aspire:start:isolated':
             'cd aspire && ASPIRE_CLI_START_TIMEOUT=300 DcpPublisher__RandomizePorts=true aspire start --isolated',
-          'aspire:otel': 'deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts otel',
+          'aspire:otel':
+            'deno run --allow-run --allow-env=NETSCRIPT_ASPIRE_CLI --allow-read .netscript/aspire-cli.ts otel',
           'aspire:export':
-            'deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts export',
+            'deno run --allow-run --allow-env=NETSCRIPT_ASPIRE_CLI --allow-read .netscript/aspire-cli.ts export',
         }
         : {}),
       check: 'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check',
