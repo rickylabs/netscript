@@ -133,6 +133,11 @@ failed child observable during a one-second grace period before exiting nonzero.
 without an app or owner session. AppHost probe generation and doctor/MCP aggregation consume this
 contract in subsequent slices of #1366.
 
+Fatal bootstrap causes are logged to server stderr and set exit code 1. The process retains a red
+health response for one second, then closes its listener and exits; it does not require an operator
+signal. PORT selects the health listener port; without it, Deno binds an ephemeral port on its default
+interface. Rule-based AppHost port wiring and probes remain a subsequent slice of #1366.
+
 ## Public surface
 
 | Entry             | What it gives you                                                                                                                                        |
@@ -276,8 +281,3 @@ The existing first-party public declarations record unfinished adoption, not pro
 services are guarded. Their credential propagation, session seeding, per-service access policy and
 auth discovery work remain under #1383; auth signout authorization remains under #1384. This source
 change does not imply availability in an existing published package.
-
-Fatal bootstrap causes are logged to server stderr and set exit code 1. The process retains a red
-health response for one second, then closes its listener and exits; it does not require an operator
-signal. PORT selects the health listener port; without it, Deno binds an ephemeral port on its default
-interface. Rule-based AppHost port wiring and probes remain a subsequent slice of #1366.
