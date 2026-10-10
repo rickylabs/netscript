@@ -1,3 +1,4 @@
+import { presetProviderKind } from '@netscript/auth-kv-oauth/providers';
 import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { Command } from '@cliffy/command';
 
@@ -120,6 +121,11 @@ export function createAuthPluginCommand(
             kvOAuthKey: options.kvOauthKey,
           }, dependencies.fs);
           await dependencies.regenerateAspire?.(projectRoot);
+          if (options.issuer && presetProviderKind(preset) === 'oauth') {
+            print(
+              `Ignored --issuer for ${preset}: this OAuth preset uses explicit endpoints, not OIDC discovery.`,
+            );
+          }
           print(`Configured ${preset}.`);
         }),
     );

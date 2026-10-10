@@ -130,7 +130,9 @@ set +a
 ```
 
 GitHub is OAuth 2.0, so the preset emits no `NETSCRIPT_AUTH_ISSUER` and ignores `--issuer`.
-Re-running the command removes an issuer saved by an older preset. GitHub does not serve an OIDC
+The CLI prints a notice when `--issuer` is ignored. Re-running the command removes an issuer saved
+by an older preset. The runtime also ignores an issuer inherited from an old shell or deployment
+when `NETSCRIPT_AUTH_PROVIDER_ID=github`. GitHub does not serve an OIDC
 discovery document; sign-in uses these explicit endpoints and derives the stable subject
 `github:<id>` from userinfo instead:
 

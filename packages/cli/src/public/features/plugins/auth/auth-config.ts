@@ -1,3 +1,4 @@
+import { presetProviderKind } from '@netscript/auth-kv-oauth/providers';
 import { join } from '@std/path';
 import { isCredentialEnvironmentKey } from '../../../../kernel/templates/aspire/helpers/register/resolve-resource-environment.ts';
 
@@ -138,9 +139,11 @@ function providerEnv(
     NETSCRIPT_AUTH_REDIRECT_URI: required('--redirect-uri', input.redirectUri),
     ...(PRESET_ENV[preset] ?? {}),
   };
-  // GitHub has no OIDC discovery document. Ignore --issuer for this OAuth preset so
+  // OAuth presets have no OIDC discovery document. Ignore --issuer so
   // the flow always uses its explicit endpoints, including when reconfiguring old projects.
-  if (input.issuer && preset !== 'github') values.NETSCRIPT_AUTH_ISSUER = input.issuer;
+  if (input.issuer && presetProviderKind(preset) !== 'oauth') {
+    values.NETSCRIPT_AUTH_ISSUER = input.issuer;
+  }
   if (input.kvOAuthKey) values.NETSCRIPT_AUTH_KV_OAUTH_KEY = input.kvOAuthKey;
   if (!values.NETSCRIPT_AUTH_ISSUER && !values.NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT) {
     throw new Error(`Provider preset "${preset}" requires --issuer.`);
@@ -177,7 +180,9 @@ async function writeAuthEnv(
     reconcileAuthEnv(
       current,
       values,
-      values.NETSCRIPT_AUTH_PROVIDER_ID === 'github' ? ['NETSCRIPT_AUTH_ISSUER'] : [],
+      presetProviderKind(values.NETSCRIPT_AUTH_PROVIDER_ID ?? '') === 'oauth'
+        ? ['NETSCRIPT_AUTH_ISSUER']
+        : [],
     ),
   );
 }

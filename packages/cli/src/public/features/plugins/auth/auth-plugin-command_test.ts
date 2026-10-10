@@ -199,7 +199,6 @@ Deno.test('GitHub preset docs describe explicit OAuth endpoints without an issue
       import.meta.url,
     ),
   );
-  assert(docs.includes('GitHub is OAuth 2.0, so the preset emits no `NETSCRIPT_AUTH_ISSUER`'));
   const fs = new MemoryFileSystemAdapter();
   await setAuthProvider({
     projectRoot: '/workspace',
@@ -208,17 +207,36 @@ Deno.test('GitHub preset docs describe explicit OAuth endpoints without an issue
     clientSecret: 'secret_test',
     redirectUri: 'https://app.test/v1/auth/callback',
   }, fs);
-  const assignments = (await fs.readFile('/workspace/.env')).replaceAll("'", '').split('\n');
+  const emitted = Object.fromEntries(
+    (await fs.readFile('/workspace/.env')).replaceAll("'", '').trim().split('\n')
+      .map((line) => line.split(/=(.*)/s).slice(0, 2)),
+  );
+  const blocks = [...docs.matchAll(/```(?:dotenv|sh)\n([\s\S]*?)```/g)]
+    .map((match) => match[1])
+    .filter((block) =>
+      /NETSCRIPT_AUTH_PROVIDER_ID=github|https:\/\/(?:api\.)?github\.com/.test(block)
+    );
+  assert(blocks.length > 0, 'GitHub configuration example must exist');
+  const documented = Object.fromEntries(
+    blocks.flatMap((block) =>
+      [...block.matchAll(/^(NETSCRIPT_AUTH_[A-Z_]+)=(.*)$/gm)]
+        .map((match) => [match[1], match[2]])
+    ),
+  );
+  assertEquals(documented.NETSCRIPT_AUTH_ISSUER, undefined);
+  for (const [key, value] of Object.entries(documented)) {
+    assertEquals(value, emitted[key], `GitHub docs must match emitted ${key}`);
+  }
   for (
     const key of [
+      'NETSCRIPT_AUTH_PROVIDER_ID',
       'NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT',
       'NETSCRIPT_AUTH_TOKEN_ENDPOINT',
       'NETSCRIPT_AUTH_USERINFO_ENDPOINT',
       'NETSCRIPT_AUTH_SCOPES',
     ]
   ) {
-    const assignment = assignments.find((line) => line.startsWith(`${key}=`));
-    assert(assignment && docs.includes(assignment), `GitHub docs must match ${key}`);
+    assertEquals(documented[key], emitted[key], `GitHub docs must include emitted ${key}`);
   }
 });
 
@@ -445,4 +463,32 @@ Deno.test('session CLI lists a signed-in backend session and revoke invalidates 
 
   assertMatch(output[1], new RegExp(id));
   assertEquals((await session({ sessionId: id }, { registry })).authenticated, false);
+});
+
+Deno.test('provider command reports that an issuer was ignored for an OAuth preset', async () => {
+  const output: string[] = [];
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: { list: () => Promise.resolve([]), revoke: (_url, id) => Promise.resolve(id) },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+    print: (message) => output.push(message),
+  });
+  await command.parse([
+    'provider',
+    'set',
+    '--preset',
+    'github',
+    '--client-id',
+    'client_test',
+    '--client-secret',
+    'secret_test',
+    '--redirect-uri',
+    'https://app.test/callback',
+    '--issuer',
+    'https://github.com',
+  ]);
+  assertEquals(output, [
+    'Ignored --issuer for github: this OAuth preset uses explicit endpoints, not OIDC discovery.',
+    'Configured github.',
+  ]);
 });
