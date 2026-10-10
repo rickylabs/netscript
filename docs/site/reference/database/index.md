@@ -219,6 +219,12 @@ documented in the sections above.
 | `@netscript/database/commands` | `./commands.ts` | Bound command port and logical rows. |
 | `@netscript/database/testing` | `./testing/mod.ts` | Mock adapter and shared port contract tests. |
 
+Connection-string utility:
+
+| Export                                            | Entrypoint                         | Purpose                                   |
+| ------------------------------------------------- | ---------------------------------- | ----------------------------------------- |
+| `@netscript/database/connection-strings/postgres` | `./connection-strings/postgres.ts` | Dependency-free PostgreSQL normalization. |
+
 ---
 
 Back to the [reference overview](/reference/).
