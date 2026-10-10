@@ -11,7 +11,8 @@
     "./cookies": "./src/cookies.ts",
     "./flow": "./src/flow.ts",
     "./backend": "./src/backend.ts",
-    "./errors": "./src/errors.ts"
+    "./errors": "./src/errors.ts",
+    "./subject": "./src/subject.ts"
   },
   "imports": {
     "@panva/oauth4webapi": "jsr:@panva/oauth4webapi@^3.8.6",
