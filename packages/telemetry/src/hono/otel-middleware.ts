@@ -39,7 +39,10 @@ export interface HonoTracingMiddlewareOptions extends Omit<UpstreamHonoOtelConfi
  *
  * @example
  * ```ts
+ * import type { Hono } from "hono";
  * import { createHonoTracingMiddleware } from "@netscript/telemetry/hono";
+ *
+ * declare const app: Hono;
  *
  * app.use("*", createHonoTracingMiddleware({ serviceName: "users" }));
  * ```

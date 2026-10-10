@@ -51,6 +51,10 @@ const BETTER_AUTH_BACKEND_NAME = 'better-auth';
  *
  * @example
  * ```ts
+ * import { type BetterAuthInstance, createBetterAuthBackend } from "@netscript/auth-better-auth";
+ *
+ * declare const auth: BetterAuthInstance;
+ *
  * const backend = createBetterAuthBackend({
  *   auth,
  *   sessionTokenSecret: Deno.env.get("BETTER_AUTH_SECRET")!,
