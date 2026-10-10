@@ -7,7 +7,11 @@ import {
 import { join } from '@std/path';
 
 /** Execute one measured shard through the existing structured runner without altering test flags. */
-export async function runShard(index: number, report: string, root: string = Deno.cwd()): Promise<number> {
+export async function runShard(
+  index: number,
+  report: string,
+  root: string = Deno.cwd(),
+): Promise<number> {
   if (!Number.isInteger(index) || index < 1) throw new Error(`Invalid shard index: ${index}`);
   const manifest: ShardManifest = JSON.parse(
     await Deno.readTextFile(join(root, '.github/scripts/ci-test-shards.json')),

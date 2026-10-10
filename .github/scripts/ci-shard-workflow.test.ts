@@ -66,9 +66,9 @@ Deno.test('upstream Deno caches include version and lock hash and skip unused br
   }
   const matrix = job(source, 'check-test-shard');
   const policy = "env.RUN == 'true' && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true')";
-  assertStringIncludes(matrix, `cache: \${{ ${policy} }}`);
+  assertStringIncludes(matrix, "cache: ${{ env.RUN == 'true' && matrix.index == 0 }}");
   assertStringIncludes(matrix, `name: Install workspace dependencies\n        if: ${policy}`);
-  assertStringIncludes(matrix, '-${{ matrix.lane }}');
+  assertEquals(matrix.includes("hashFiles('deno.lock') }}-${{ matrix.lane }}"), false);
 });
 
 Deno.test('matrix preserves type checks, browser policy, receipts and required Redis tests', async () => {
@@ -97,4 +97,47 @@ Deno.test('matrix preserves type checks, browser policy, receipts and required R
   assert(/CI_REDIS_IMAGE: redis:7-alpine@sha256:[a-f0-9]{64}/.test(await workflow()));
   assertStringIncludes(block, 'CI Redis $mode:');
   assertStringIncludes(block, '$GITHUB_STEP_SUMMARY');
+});
+
+Deno.test('regression: Fresh module graph is primed before isolated test and browser lanes', async () => {
+  const block = job(await workflow(), 'check-test-shard');
+  const prime = block.match(
+    /\s{6}- name: Prime Fresh Vite module graph\n([\s\S]*?)(?=\s{6}- name:)/,
+  )?.[1];
+  assert(prime, 'Vite lanes must prepare their graph without depending on repo-wide check');
+  assertStringIncludes(
+    prime,
+    "if: env.RUN == 'true' && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true')",
+  );
+  assertStringIncludes(
+    prime,
+    'run: deno run --allow-read --allow-run .github/scripts/prime-ci-npm-metadata.ts',
+  );
+  const primeIndex = block.indexOf('name: Prime Fresh Vite module graph');
+  assert(primeIndex < block.indexOf('name: Measured test shard'));
+  assert(primeIndex < block.indexOf('name: Managed form browser regression'));
+});
+
+Deno.test('regression: matrix Deno cache has one shared key and a single writer', async () => {
+  const block = job(await workflow(), 'check-test-shard');
+  assertStringIncludes(block, "cache: ${{ env.RUN == 'true' && matrix.index == 0 }}");
+  assertStringIncludes(
+    block,
+    "cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}\n",
+  );
+  assertEquals(block.includes("hashFiles('deno.lock') }}-${{ matrix.lane }}"), false);
+  const restore = block.match(
+    /\s{6}- name: Restore shared Deno modules\n([\s\S]*?)(?=\s{6}- name:)/,
+  )?.[1];
+  assert(restore, 'non-writer lanes need a read-only restore');
+  assertStringIncludes(restore, 'uses: actions/cache/restore@v4');
+  assertStringIncludes(
+    restore,
+    "if: env.RUN == 'true' && matrix.index != 0 && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true')",
+  );
+  assertStringIncludes(
+    restore,
+    "key: deno-cache-${{ runner.os }}-${{ runner.arch }}-check-test-shard-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}",
+  );
+  assertEquals(block.includes('actions/cache/save'), false);
 });

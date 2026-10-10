@@ -222,8 +222,25 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ env.DENO_VERSION }}
-          cache: ${{ env.RUN == 'true' && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true') }}
-          cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}-${{ matrix.lane }}
+          cache: ${{ env.RUN == 'true' && matrix.index == 0 }}
+          cache-hash: ${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
+
+      # setup-deno owns the shared key and saves only in the check lane.
+      # The action has no read-only input, so the remaining lanes restore that
+      # upstream key through the read-only cache action without creating more copies.
+      - name: Locate Deno module cache
+        id: deno-cache
+        if: env.RUN == 'true' && matrix.index != 0 && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true')
+        run: echo "path=$(deno info --json | jq -r .denoDir)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore shared Deno modules
+        if: env.RUN == 'true' && matrix.index != 0 && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true')
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.deno-cache.outputs.path }}
+          key: deno-cache-${{ runner.os }}-${{ runner.arch }}-check-test-shard-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            deno-cache-${{ runner.os }}-${{ runner.arch }}-check-test-shard-${{ env.DENO_VERSION }}-
 
       - name: Record skipped check receipt
         if: env.RUN != 'true'
@@ -244,6 +261,10 @@ jobs:
       - name: Install workspace dependencies
         if: env.RUN == 'true' && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true')
         run: deno install
+
+      - name: Prime Fresh Vite module graph
+        if: env.RUN == 'true' && (matrix.index != -1 || env.RUN_FRESH_BROWSER == 'true')
+        run: deno run --allow-read --allow-run .github/scripts/prime-ci-npm-metadata.ts
 
       - name: Cache required CI Redis image
         if: env.RUN == 'true' && matrix.index > 0
