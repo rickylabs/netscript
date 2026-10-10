@@ -8,6 +8,7 @@ import { assert, assertEquals, assertNotEquals, assertStringIncludes } from '@st
 import { dirname, fromFileUrl, join } from '@std/path';
 
 const PROJECT = 'noaspire-probe';
+const SQLITE_PROJECT = 'noaspire-sqlite';
 const CONFIG_NOT_FOUND_EXIT = 100;
 
 function repoRoot(): string {
@@ -38,9 +39,9 @@ async function cli(cwd: string, args: readonly string[]): Promise<CliRun> {
   };
 }
 
-async function locateProjectRoot(targetPath: string): Promise<string> {
+async function locateProjectRoot(targetPath: string, name = PROJECT): Promise<string> {
   // The maintainer CLI nests the project under the target path.
-  for (const candidate of [join(targetPath, PROJECT), targetPath]) {
+  for (const candidate of [join(targetPath, name), targetPath]) {
     try {
       await Deno.stat(join(candidate, 'netscript.config.ts'));
       return candidate;
@@ -130,6 +131,68 @@ Deno.test({
           init.output.indexOf('db generate'),
         init.output,
       );
+    } finally {
+      await Deno.remove(targetPath, { recursive: true }).catch(() => {});
+    }
+  },
+});
+
+/** The `db …` commands the init summary advertises, in order, as CLI arguments. */
+function advertisedDbSteps(initOutput: string): string[][] {
+  return [...initOutput.matchAll(/netscript-dev\.ts (db [^#\n]+?)\s*(?:#.*)?$/gm)]
+    .map((match) => match[1].trim().split(/\s+/));
+}
+
+// #1996 runtime acceptance: every database step `init --no-aspire` advertises
+// runs against a live database with no AppHost. SQLite is file-backed, so the
+// whole lifecycle (migrate, generate, seed, status) is real and needs no server.
+Deno.test({
+  name: 'init --no-aspire database lifecycle runs end to end without an AppHost',
+  sanitizeResources: false,
+  sanitizeOps: false,
+  async fn() {
+    const root = repoRoot();
+    const targetPath = join(root, '.llm/tmp', `init-no-aspire-db-${crypto.randomUUID()}`);
+    try {
+      const init = await cli(root, [
+        'init',
+        SQLITE_PROJECT,
+        '--path',
+        targetPath,
+        '--no-aspire',
+        '--db',
+        'sqlite',
+        '--service',
+        '--service-name',
+        'probe-svc',
+        '--model-name',
+        'ProbeReceipt',
+        '--ci',
+        '--yes',
+        '--no-git',
+        '--force',
+      ]);
+      assertEquals(init.code, 0, init.output);
+      const project = await locateProjectRoot(targetPath, SQLITE_PROJECT);
+
+      // Run exactly what the summary advertises, then confirm the schema state.
+      const steps = advertisedDbSteps(init.output);
+      const outputs: string[] = [];
+      for (const step of [...steps, ['db', 'status']]) {
+        const run = await cli(project, step);
+        assertEquals(run.code, 0, `${step.join(' ')}\n${run.output}`);
+        assertStringIncludes(run.output, 'No Aspire AppHost in this project');
+        outputs.push(run.output);
+      }
+      assertEquals(
+        steps.map((step) => step.join(' ')),
+        ['db init --name init', 'db generate', 'db seed'],
+        init.output,
+      );
+      const [migrate, , seed, status] = outputs;
+      assertStringIncludes(migrate, 'Applied migrations');
+      assertStringIncludes(seed, 'Seeded representative ProbeReceipt row');
+      assertStringIncludes(status, 'Database schema is up to date!');
     } finally {
       await Deno.remove(targetPath, { recursive: true }).catch(() => {});
     }
