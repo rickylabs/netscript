@@ -37,7 +37,7 @@ import type {
   ListenOptions,
   MessageContext,
   MessageQueue,
-  TracedMessageContext,
+  TracedQueueMessageContext,
   TracedQueueOptions,
 } from './types.ts';
 
@@ -211,7 +211,7 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
    * Creates a CONSUMER span for each message and provides the span in the context.
    */
   async listen(
-    handler: (message: T, context: TracedMessageContext) => Promise<void>,
+    handler: (message: T, context: TracedQueueMessageContext) => Promise<void>,
     options?: ListenOptions,
   ): Promise<void> {
     const tracedHandler = async (message: T, ctx: MessageContext): Promise<void> => {
@@ -283,7 +283,7 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
     ctx: MessageContext,
     span: Span,
     parentContext: Context,
-  ): TracedMessageContext {
+  ): TracedQueueMessageContext {
     const traceAckNack = this.options.traceAckNack;
     const tracer = this.tracer;
 

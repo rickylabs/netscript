@@ -4,7 +4,7 @@ import type { MessageQueue as PlainMessageQueue } from '@netscript/queue/ports';
 import {
   type MessageContext,
   type MessageQueue,
-  type TracedMessageContext,
+  type TracedQueueMessageContext,
   TracedQueue,
 } from '@netscript/telemetry/instrumentation';
 import { getSpanFromContext } from '@netscript/telemetry/context';
@@ -43,7 +43,7 @@ Deno.test('TracedQueue delivers the active consumer span and remains a plain Mes
     };
     const queue = new TracedQueue(inner, { queueName: 'jobs' });
     await queue.listen(async (received, ctx) => {
-      const contract: TracedMessageContext = ctx;
+      const contract: TracedQueueMessageContext = ctx;
       assert(ctx.span === trace.getActiveSpan());
       assert(ctx.parentContext);
       assert(getSpanFromContext(ctx.parentContext) === ctx.span);
