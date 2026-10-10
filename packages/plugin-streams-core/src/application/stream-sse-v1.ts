@@ -141,12 +141,25 @@ export function reduceStreamSseReplayStateV1(
   };
 }
 
-/** Minimal native EventSource surface used at the browser edge and in tests. */
+/** Structural event accepted from native EventSource and DOM-independent transports. */
+export interface StreamSourceEventV1 {
+  /** Named SSE event or transport outcome. */
+  readonly type: string;
+  /** Message text, when present; validated by the binding before delivery. */
+  readonly data?: unknown;
+  /** Last SSE event identifier, when provided by the transport. */
+  readonly lastEventId?: string;
+}
+
+/** Listener accepting native events and plain MessageEvent-shaped objects. */
+export type StreamSourceListenerV1 = (event: StreamSourceEventV1) => void;
+
+/** Minimal EventSource-compatible surface used at browser and non-DOM edges. */
 export interface StreamEventSourceV1 {
   /** Register a named SSE or transport listener. */
-  addEventListener(type: string, listener: EventListener): void;
+  addEventListener(type: string, listener: StreamSourceListenerV1): void;
   /** Remove a previously registered listener. */
-  removeEventListener(type: string, listener: EventListener): void;
+  removeEventListener(type: string, listener: StreamSourceListenerV1): void;
   /** Close the underlying connection. */
   close(): void;
 }
@@ -175,8 +188,8 @@ export function bindStreamEventSourceV1(
 ): StreamEventSourceBindingV1 {
   let state = options.initialState ?? createStreamSseReplayStateV1();
 
-  const receive = (eventName: 'data' | 'control') => (event: Event): void => {
-    const data = event instanceof MessageEvent && typeof event.data === 'string' ? event.data : '';
+  const receive = (eventName: 'data' | 'control') => (event: StreamSourceEventV1): void => {
+    const data = typeof event.data === 'string' ? event.data : '';
     const result = parseStreamSseEventV1({
       eventName,
       data,
@@ -193,7 +206,7 @@ export function bindStreamEventSourceV1(
 
   const onData = receive('data');
   const onControl = receive('control');
-  const onError = (_event: Event): void => {
+  const onError = (_event: StreamSourceEventV1): void => {
     options.onEvent({
       event: 'error',
       payload: {

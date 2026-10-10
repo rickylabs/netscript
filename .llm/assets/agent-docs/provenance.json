@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "01a9daa40",
-  "extractionTimestamp": "2026-10-10T17:17:57.076Z",
+  "sourceCommit": "664b09f74",
+  "extractionTimestamp": "2026-10-10T17:14:59.316Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -128,7 +128,6 @@
     "pages/services-sdk/how-to/index.md",
     "pages/services-sdk/index.md",
     "pages/services-sdk/sdk/index.md",
-    "pages/services-sdk/service-layout/index.md",
     "pages/services-sdk/services/index.md",
     "pages/tutorials/chat/01-scaffold/index.md",
     "pages/tutorials/chat/02-durable-chat-route/index.md",
@@ -191,7 +190,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5258886,
-  "compressedBytes": 1530243,
-  "sha256": "8e4a700ba46bbf9fdcc60891dcce886d29ed1c4cd8cb60080b9fcfb23f00845a"
+  "uncompressedBytes": 5250235,
+  "compressedBytes": 1526904,
+  "sha256": "d03ef4378cdc552b0431d3907d609bc3516268642539767f9b4310ce268c81e6"
 }
