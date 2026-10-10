@@ -108,6 +108,15 @@ Deno.test('kv-oauth authenticate resolves credentials exactly like sessions.getS
   });
 });
 
+Deno.test('kv-oauth getSession rejects an empty selected credential instead of falling through', async () => {
+  const { backend } = await createBackend();
+  const cookieOwner = await createSession(backend, 'cookie_owner');
+  const request = authnRequest({ cookie: `__Host-ns_session=${cookieOwner.id}` });
+  assertEquals((await backend.sessions.getSession({ request }))?.subject, 'cookie_owner');
+  assertEquals(await backend.sessions.getSession({ sessionId: '', request }), undefined);
+  assertEquals(await backend.sessions.getSession({ token: '', request }), undefined);
+});
+
 Deno.test('kv-oauth refresh-on-read re-issues a cookie only for a cookie-borne session', async () => {
   const { backend, store } = await createBackend(() =>
     Promise.resolve(

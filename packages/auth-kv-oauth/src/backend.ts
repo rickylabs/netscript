@@ -208,16 +208,19 @@ type KvOAuthSessionCredential = Readonly<{
 /**
  * Resolve the session credential for both `sessions.getSession` and `authenticate`, so the auth
  * service `session` and `me` operations agree: an explicit session id, then a bearer credential,
- * then the session cookie.
+ * then the session cookie. Selection is nullish: a provided but empty credential is selected and
+ * rejected, never skipped in favour of a weaker one.
  */
 function resolveSessionCredential(
   lookup: AuthSessionLookup,
   cookieName: string,
 ): KvOAuthSessionCredential | undefined {
-  if (lookup.sessionId) return { sessionId: lookup.sessionId, transport: 'lookup' };
-  if (lookup.token) return { sessionId: lookup.token, transport: 'bearer' };
-  const sessionId = lookup.request?.cookie(cookieName);
-  return sessionId ? { sessionId, transport: 'cookie' } : undefined;
+  const { sessionId, transport } = lookup.sessionId !== undefined
+    ? { sessionId: lookup.sessionId, transport: 'lookup' as const }
+    : lookup.token !== undefined
+    ? { sessionId: lookup.token, transport: 'bearer' as const }
+    : { sessionId: lookup.request?.cookie(cookieName), transport: 'cookie' as const };
+  return sessionId ? { sessionId, transport } : undefined;
 }
 
 function createProviderRegistry(provider: OAuthProviderConfig): AuthProviderRegistryPort {
