@@ -1,4 +1,5 @@
 import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import { delay } from '@std/async/delay';
 
 import { generateRegisterInfrastructure } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
 import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
@@ -6,8 +7,10 @@ import { DATABASE, PACKAGE_SOURCE, REPORT_FORMAT } from '../../../src/domain/ext
 import type { RunContext } from '../../../src/domain/run-context.ts';
 import {
   createCredentialFaultPassword,
+  CREDENTIAL_FAULT_PROBE_DIR,
   CREDENTIAL_FAULT_PROBE_RESOURCE,
   injectCredentialFaultHealthCheck,
+  prepareCredentialFaultFixture,
   TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY,
 } from '../../../src/application/gates/scaffold/runtime/credential-fault-fixture.ts';
 import { createCredentialReadinessGates } from '../../../src/application/gates/scaffold/runtime/credential-readiness-gates.ts';
@@ -23,6 +26,45 @@ const WRONG_PASSWORD = '0123456789abcdef0123456789abcdef';
 const SECRETS = [REAL_PASSWORD, WRONG_PASSWORD];
 const AUTH_DESCRIPTION =
   'postgres credential check failed: auth 28P01 (invalid_password) at localhost:54321 after 9 ms';
+
+Deno.test('credential fault probe task stays alive for repeated Aspire health evaluations', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  let probe: Deno.ChildProcess | undefined;
+  let probeExited = false;
+  try {
+    await prepareCredentialFaultFixture(projectRoot, postgresInfrastructure());
+    probe = new Deno.Command(Deno.execPath(), {
+      args: ['task', 'start'],
+      cwd: `${projectRoot}/${CREDENTIAL_FAULT_PROBE_DIR}`,
+      stdin: 'null',
+      stdout: 'null',
+      stderr: 'null',
+    }).spawn();
+    const abort = new AbortController();
+    try {
+      const outcome = await Promise.race([
+        probe.status.then((status) => {
+          probeExited = true;
+          return `exited ${status.code}`;
+        }),
+        delay(500, { signal: abort.signal }).then(() => 'running'),
+      ]);
+      assertEquals(outcome, 'running', 'the probe must keep active event-loop work');
+    } finally {
+      abort.abort();
+    }
+  } finally {
+    if (probe) {
+      try {
+        if (!probeExited) probe.kill('SIGTERM');
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      }
+      await probe.status;
+    }
+    await Deno.remove(projectRoot, { recursive: true });
+  }
+});
 
 Deno.test('credential fault splice reuses the generated postgres_auth server binding', () => {
   const source = injectListenerFaultHealthChecks(postgresInfrastructure(), DATABASE.POSTGRES);

@@ -71,7 +71,9 @@ export async function prepareCredentialFaultFixture(
   await Deno.mkdir(probeDir, { recursive: true });
   await Deno.writeTextFile(
     `${probeDir}/main.ts`,
-    '// Stays alive so Aspire evaluates the attached credential check.\nawait new Promise(() => {});\n',
+    '// Active event-loop work keeps the probe Running while Aspire reevaluates its check.\n' +
+      '// An unresolved promise alone lets Deno exit before PostgreSQL is ready.\n' +
+      'setInterval(() => {}, 60_000);\n',
   );
   await Deno.writeTextFile(
     `${probeDir}/deno.json`,

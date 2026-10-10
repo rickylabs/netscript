@@ -7,7 +7,7 @@
  * resource resolution.
  */
 
-import type { CacheEntry } from '@netscript/aspire/types'
+import type { CacheEntry, DatabaseEntry } from '@netscript/aspire/types'
 import type { RegisterInfrastructureOptions } from '../types.ts'
 import { fileHeader } from '../_utils.ts'
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts'
@@ -65,7 +65,7 @@ export function generateRegisterInfrastructure(
     (entry.Mode ?? 'Container') === 'Container'
   )
   const usesPostgresCredentialReadiness = dbEntries.some(([, entry]) =>
-    entry.Engine === 'Postgres' && (entry.Mode ?? 'Container') === 'Container'
+    needsPostgresCredentialReadiness(entry)
   )
   const usesRespReadiness = cacheEntries.some(([, entry]) =>
     ['Redis', 'Garnet'].includes(entry.Engine) &&
@@ -219,7 +219,7 @@ export function generateRegisterInfrastructure(
       lines.push(`  });`)
       lines.push(`  await ${id}_server.withHealthCheck(${JSON.stringify(healthCheckKey)});`)
     }
-    if (entry.Engine === 'Postgres') {
+    if (needsPostgresCredentialReadiness(entry)) {
       appendPostgresCredentialReadinessLines(lines, id, name)
     }
 
@@ -376,6 +376,10 @@ export function generateRegisterInfrastructure(
       ),
     },
   )
+}
+
+function needsPostgresCredentialReadiness(entry: DatabaseEntry): boolean {
+  return entry.Engine === 'Postgres' && (entry.Mode ?? 'Container') === 'Container'
 }
 
 function usesResolvedDataPath(
