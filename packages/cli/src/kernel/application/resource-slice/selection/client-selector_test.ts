@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from '@std/assert';
-import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
-import { selectClientBinding } from './client-selector.ts';
+import { MemoryFileSystemAdapter } from '../../../adapters/scaffold/memory-fs.ts';
+import { selectClientBinding, selectResourceClient } from './client-selector.ts';
 
 const APP_ROOT = '/workspace/shop/apps/dashboard';
 const PREREQUISITE = 'netscript service add --name <service> --with-client';
@@ -93,4 +93,50 @@ Deno.test('--client reports an exact duplicate-match diagnostic', async () => {
     Error,
     `Cannot scaffold a data-bound island: selected client 'orders' matches more than one query client. Candidates: ${APP_ROOT}/lib/orders-copy.ts, ${APP_ROOT}/lib/orders.ts. More than one candidate declares service 'orders'. Exactly one conventional generated client is required. Prerequisite: ${PREREQUISITE}.`,
   );
+});
+
+Deno.test('generate resource client selection does not apply the ui:add list-contract gate', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(`${APP_ROOT}/lib/catalog.ts`, queryModule('catalog'));
+  const contract = '/workspace/shop/contracts/versions/v1/catalog.contract.ts';
+  await fs.writeFile(contract, 'export const CatalogContractV1 = { health: oc.route({}) };\n');
+
+  const expected = {
+    serviceName: 'catalog',
+    moduleSpecifier: '@app/lib/catalog.ts',
+    queryFactoryName: 'catalogQueries',
+  };
+  assertEquals(await selectResourceClient(APP_ROOT, fs, 'catalog'), expected);
+  assertEquals(await selectResourceClient(APP_ROOT, fs), expected);
+  // ui:add still needs a list contract for its data-bound island input.
+  await assertRejects(
+    () => selectClientBinding(APP_ROOT, fs, 'catalog'),
+    Error,
+    `unsupported list contract ${contract}`,
+  );
+  await fs.remove(contract);
+  assertEquals(await selectResourceClient(APP_ROOT, fs, 'catalog'), expected);
+});
+
+Deno.test('a hand-authored client fronting several namespaces is selectable with --client', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await seedClient(fs, 'orders', 'orders');
+  await fs.writeFile(
+    `${APP_ROOT}/lib/catalog.ts`,
+    `import { createQueryFactories } from '@netscript/sdk/query';
+export const catalogName = 'catalog';
+export const catalogQueries = createQueryFactories({
+  alpha: { contract: AlphaContractV1, client: alphaClient },
+  serviceNamespace: { contract: CatalogContractV1, client: catalogClient },
+  beta: { contract: BetaContractV1, client: betaClient },
+  gamma: { contract: GammaContractV1, client: gammaClient },
+});
+`,
+  );
+
+  assertEquals(await selectResourceClient(APP_ROOT, fs, 'catalog'), {
+    serviceName: 'catalog',
+    moduleSpecifier: '@app/lib/catalog.ts',
+    queryFactoryName: 'catalogQueries',
+  });
 });

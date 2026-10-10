@@ -170,6 +170,9 @@ function makeBuilder(state: BuilderState<unknown>): AiToolBuilder {
  * @example A server tool
  * ```ts
  * import { defineAiTool } from "@netscript/ai/tools";
+ * import type { StandardSchemaV1 } from "@standard-schema/spec";
+ *
+ * declare const myStandardSchema: StandardSchemaV1<unknown, { text: string }>;
  *
  * const echo = defineAiTool("echo")
  *   .describe("Echo a message back")

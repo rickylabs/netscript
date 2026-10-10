@@ -77,13 +77,12 @@ plugin and its API plus background processor appear; remove it and they vanish, 
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Plugin API ports are allocated per project, not fixed" } }}
-A plugin runtime installed without <code>--port</code> gets a host port the installer picks: a hash of
-your <em>project name</em> over the IANA dynamic range (<code>49152–65535</code>), probing upward past
-ports already claimed in this workspace. That keeps two of your own projects apart in practice, but it
-is not a guarantee — the range is finite and workspaces cannot see each other's allocations — and no
-number printed here would match yours. The dashboard's <strong>Resources</strong> tab is the authority for the exact port each
-resource bound. Read it from there.
+{{ comp callout { type: "note", title: "Plugin API ports are allocated per start, not fixed" } }}
+A plugin runtime installed without <code>--port</code> carries no <code>HostPort</code>, so Aspire
+allocates its host port at every start — no number printed here would match yours, and yours changes
+on restart. The dashboard's <strong>Resources</strong> tab is the authority for the exact port each
+resource bound. Read it from there. Pin a plugin with <code>--port</code> only when something outside
+the graph must keep its address, such as an OAuth callback.
 {{ /comp }}
 
 ## Step 2 — Restore and run

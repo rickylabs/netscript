@@ -16,6 +16,7 @@ export type {
   CascadedMessageTarget,
   QueryDefinition,
   RetryPolicy,
+  SagaCompensationError,
   SagaConcurrencyPolicy,
   SagaContext,
   SagaCorrelation,
@@ -89,6 +90,8 @@ export type {
   SagaCompensatorOptions,
 } from './saga-compensator.ts';
 export type {
+  SagaCompensationCommit,
+  SagaCompensationOutcome,
   SagaEngineDispatchEntry,
   SagaEngineHandleResult,
   SagaEngineOptions,
