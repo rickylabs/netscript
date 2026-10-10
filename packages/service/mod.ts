@@ -32,6 +32,7 @@
  *
  * const service = await defineService(router, {
  *   name: 'users',
+ *   auth: { public: true, reason: 'Public example service' },
  *   port: 3000,
  * });
  *
@@ -40,7 +41,9 @@
  *
  * @example Customize the builder before serving.
  * ```typescript
- * import { createService } from '@netscript/service';
+ * import { createService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
  *
  * const service = await createService(router, { name: 'custom' })
  *   .withCors({ origin: 'https://example.com' })
@@ -56,7 +59,11 @@
  *
  * @example Use health primitives directly in a host app.
  * ```typescript
- * import { createHealthHandler, healthChecks } from '@netscript/service';
+ * import type { Hono } from 'hono';
+ * import { createHealthHandler, type Database, healthChecks } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const db: Database;
  *
  * app.get('/health', createHealthHandler({
  *   checks: [healthChecks.database(db)],
@@ -158,6 +165,7 @@ export type {
   ServeOptions,
   ServiceApp,
   ServiceContext,
+  ServiceEnvironment,
   ServiceErrorHandler,
   ServiceHandler,
   ServiceHandlerContext,
@@ -200,3 +208,7 @@ export type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 
 // Layer 3: Presets
 export { defineService, type DefineServiceOptions } from './src/presets/define-service.ts';
+export type { ServiceRateLimitOptions } from './src/rate-limit/middleware/options.ts';
+export type { RateLimitStore } from './src/rate-limit/ports/rate-limit-store.ts';
+export type { RateLimitDecision, RateLimitRequest } from './src/rate-limit/domain/rate-limit.ts';
+export type { ServiceProxyTrust } from './src/rate-limit/middleware/options.ts';

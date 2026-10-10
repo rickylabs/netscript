@@ -1,3 +1,4 @@
+import { retentionPolicy, type StreamRetentionPolicyV1 } from '../domain/retention-contract-v1.ts';
 import type {
   StreamProducerBufferPolicyV1,
   StreamProducerReadinessOptionsV1,
@@ -33,6 +34,8 @@ export interface DurableStreamProducerOptions<TDef extends StreamStateDefinition
   readonly schema: StateSchema<TDef>;
   /** Stable producer identity for idempotent delivery. */
   readonly producerId: string;
+  /** Server retention applied only when the stream is first created. */
+  readonly retention?: StreamRetentionPolicyV1;
   /** Optional finite reconnect policy overrides. */
   readonly reconnectPolicy?: Partial<StreamProducerReconnectPolicyV1>;
   /** Optional dual buffer policy overrides. */
@@ -64,6 +67,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
 
   /** Create a producer and begin connecting under the finite retry policy. */
   constructor(options: DurableStreamProducerOptions<TDef>) {
+    const retention = retentionPolicy(options.retention);
     this.streamPath = options.streamPath;
     this.configurationFingerprint = producerFingerprint(options);
     this.#schema = options.schema;
@@ -72,6 +76,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     this.#supervisor = new DurableStreamProducerSupervisor({
       url: resolveRequiredStreamUrl(this.streamPath),
       headers: getStreamsAuth(),
+      retention,
       producerId: options.producerId,
       transport: options.transport ?? new DurableStreamProducerTransport(),
       clock: options.clock ?? new SystemStreamProducerClock(),
@@ -268,6 +273,7 @@ function producerFingerprint<TDef extends StreamStateDefinition>(
     producerId: options.producerId,
     reconnectPolicy: options.reconnectPolicy ?? {},
     bufferPolicy: options.bufferPolicy ?? {},
+    retention: retentionPolicy(options.retention),
   });
 }
 

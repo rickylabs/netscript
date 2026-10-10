@@ -66,3 +66,18 @@ export type {
   ChildHealthSnapshot,
   ChildHealthState,
 } from '@netscript/plugin/health';
+
+export type {
+  ExecutionStatus,
+  JobFailure,
+  JobPayloadSchema,
+  JobSuccess,
+  PublicStandardSchema,
+  TriggerType,
+} from '@netscript/plugin-workers-core/runtime';
+export type {
+  WorkerIdempotencyClaim,
+  WorkerIdempotencyInput,
+  WorkerIdempotencyPort,
+  WorkerIdempotencySource,
+} from '@netscript/plugin-workers-core/stores';

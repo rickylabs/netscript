@@ -147,7 +147,7 @@ the same Hono + oRPC runtime; `defineService` is a curated preset over the same 
   {
     label: "Simple — defineService (one-shot)",
     lang: "ts",
-    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});"
+    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nawait defineService(router, {\n  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});"
   },
   {
     label: "Advanced — createService().serve() (fluent)",
@@ -174,7 +174,7 @@ the preset-only keys below. This is the complete option list.
     { name: "db", type: "DbContext?", desc: "Database context injected as context.db: one Prisma client or a multi-db record. The configured $queryRaw client backs /health/ready." },
     { name: "openapi", type: "{ title?; description? }?", desc: "Turns on the generated OpenAPI spec endpoint and the Scalar docs UI with this title/description." },
     { name: "debug", type: "boolean?", desc: "Enables verbose oRPC logging. Defaults to the NETSCRIPT_DEBUG env var." },
-    { name: "auth", type: "{ authn: AuthnOptions; authz?: AuthzOptions }?", desc: "Installs the authentication (and optional authorization) gate on guarded paths — the preset form of .withAuthn()/.withAuthz()." },
+    { name: "auth", type: "ServiceAuthPolicy (required)", desc: "Choose native { authn, authz? } guards or an explicit { public: true, reason } opt-out. The reason must be nonblank; omission fails before startup." },
     { name: "tls", type: "ServiceTlsOptions?", desc: "Opt-in TLS { cert, key } (PEM): HTTPS with HTTP/2 via ALPN. See TLS & HTTP/2 below." },
     { name: "hostname", type: "string?", desc: "Listener bind interface; default 0.0.0.0." },
     { name: "middleware", type: "ServiceMiddleware[]?", desc: "Runs in order after CORS and logging, before auth." },
@@ -192,6 +192,13 @@ Prisma comes later; see <a href="/data-persistence/database/">Database</a>.
 {{ /comp }}
 
 ## Endpoints & ports
+
+In 0.0.8, `defineService()` requires an explicit auth policy. The examples above are deliberately
+public demonstrations. For protected operations, pass `auth: { authn: { authenticator }, authz:
+{ authorizer } }`; authorization is optional. Missing policy is a type error and a runtime
+`TypeError` for JavaScript callers. To keep a genuinely public service public, add
+`auth: { public: true, reason: 'Public status service with no protected operations' }`.
+See the [explicit service posture and migration](/reference/service/#explicit-service-posture).
 
 A `defineService` runtime exposes its OpenAPI routes, a typed oRPC endpoint mounted under
 `/api/rpc/*`, and a health check. The example `users` service is reachable once
@@ -259,7 +266,7 @@ so query-string values coerce to their schema types automatically).
   {
     label: "Preset — defineService({ openapi })",
     lang: "ts",
-    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Turns on the OpenAPI spec + Scalar docs UI in one option.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: 3001, // note: your scaffold's port will differ\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
+    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Turns on the OpenAPI spec + Scalar docs UI in one option.\nawait defineService(router, {\n  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },\n  name: 'users',\n  version: '1.0.0',\n  port: 3001, // note: your scaffold's port will differ\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
   },
   {
     label: "Primitives — mount in a host app",
@@ -365,6 +372,7 @@ import { defineService } from '@netscript/service';
 import { router } from './router.ts';
 
 await defineService(router, {
+  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },
   name: 'users',
   port: 3000, // note: your scaffold's port will differ
   tls: {
@@ -492,3 +500,14 @@ This hub is intentionally thin — the full generated API lives in the reference
 ] }) }}
 
 {{ comp.nextPrev({ prev: { label: "Capabilities", href: "/capabilities/" }, next: { label: "Background jobs", href: "/background-processing/workers/" } }) }}
+
+## Protect anonymous routes
+
+Use `.withRateLimit({ routes, limit, windowMs, store })` on the builder's middleware seam to reserve
+a per-client quota before routing. The socket peer is propagated to Hono; XFF requires explicit
+proxy trust. Shared production quotas use the `@netscript/kv` atomic adapter, while bounded memory
+storage supports tests/development. Follow
+[Protect an anonymous service route](/services-sdk/how-to/protect-an-anonymous-route/) for a
+device-flow start/poll example and the
+[`@netscript/service` reference](/reference/service/#rate-limits-and-client-addresses) for the
+contracts.

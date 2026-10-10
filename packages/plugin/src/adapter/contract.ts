@@ -15,6 +15,8 @@ export type PluginCommandConfig = Readonly<Record<string, PluginCommandValue>>;
  *
  * @example
  * ```ts
+ * import type { PluginCommandConfig } from '@netscript/plugin/adapter';
+ *
  * const config: PluginCommandConfig = { enabled: true };
  * console.log(config.enabled);
  * ```
@@ -148,7 +150,7 @@ export interface DoctorSpec {
  * @example
  * ```ts
  * const info: InfoSpec = { capabilities: ['jobs'], versionSource: 'manifest' };
- * console.log(info.capabilities.length);
+ * console.log(info.capabilities?.length ?? 0);
  * ```
  */
 export interface InfoSpec {

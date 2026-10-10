@@ -18,6 +18,7 @@ export type AuthSpanNamesMap = Readonly<{
   SIGNIN: 'auth.signin';
   CALLBACK: 'auth.callback';
   SIGNOUT: 'auth.signout';
+  SESSION_REVOKE: 'auth.session.revoke';
   SESSION: 'auth.session';
   ME: 'auth.me';
 }>;
@@ -27,6 +28,7 @@ export const AuthSpanNames: AuthSpanNamesMap = Object.freeze({
   SIGNIN: 'auth.signin',
   CALLBACK: 'auth.callback',
   SIGNOUT: 'auth.signout',
+  SESSION_REVOKE: 'auth.session.revoke',
   SESSION: 'auth.session',
   ME: 'auth.me',
 });
@@ -81,6 +83,7 @@ export const AuthSpanEvents: AuthSpanEventsMap = Object.freeze({
 export type AuthOutcomeMap = Readonly<{
   SUCCESS: 'success';
   UNAUTHENTICATED: 'unauthenticated';
+  FAILED_FORBIDDEN: 'failed_forbidden';
   FAILED_BAD_CREDENTIALS: 'failed_bad_credentials';
   FAILED_SESSION_EXPIRED: 'failed_session_expired';
   FAILED_PROVIDER_ERROR: 'failed_provider_error';
@@ -91,6 +94,7 @@ export type AuthOutcomeMap = Readonly<{
 export const AuthOutcome: AuthOutcomeMap = Object.freeze({
   SUCCESS: 'success',
   UNAUTHENTICATED: 'unauthenticated',
+  FAILED_FORBIDDEN: 'failed_forbidden',
   FAILED_BAD_CREDENTIALS: 'failed_bad_credentials',
   FAILED_SESSION_EXPIRED: 'failed_session_expired',
   FAILED_PROVIDER_ERROR: 'failed_provider_error',
@@ -100,6 +104,7 @@ export const AuthOutcome: AuthOutcomeMap = Object.freeze({
 /** Canonical auth error codes attached at the service seam. */
 export type AuthErrorCodeMap = Readonly<{
   INVALID_CREDENTIALS: 'AUTH_INVALID_CREDENTIALS';
+  FORBIDDEN: 'AUTH_FORBIDDEN';
   SESSION_EXPIRED: 'AUTH_SESSION_EXPIRED';
   PROVIDER_ERROR: 'AUTH_PROVIDER_ERROR';
   CALLBACK_INVALID: 'AUTH_CALLBACK_INVALID';
@@ -108,6 +113,7 @@ export type AuthErrorCodeMap = Readonly<{
 /** Machine-readable auth error codes. */
 export const AuthErrorCode: AuthErrorCodeMap = Object.freeze({
   INVALID_CREDENTIALS: 'AUTH_INVALID_CREDENTIALS',
+  FORBIDDEN: 'AUTH_FORBIDDEN',
   SESSION_EXPIRED: 'AUTH_SESSION_EXPIRED',
   PROVIDER_ERROR: 'AUTH_PROVIDER_ERROR',
   CALLBACK_INVALID: 'AUTH_CALLBACK_INVALID',

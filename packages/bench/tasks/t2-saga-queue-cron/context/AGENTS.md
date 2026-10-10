@@ -32,3 +32,6 @@ Use NetScript's durable-workflow spine; do not replace it with an in-memory stat
 - Use the shared `NOT_FOUND` and `VALIDATION_ERROR` vocabulary and factories.
 
 Run `deno doc` on the named modules when you need exact signatures.
+
+- Choose an explicit service auth policy. This public benchmark uses
+  `auth: { public: true, reason: 'Public benchmark API; authentication is outside this benchmark' }`.

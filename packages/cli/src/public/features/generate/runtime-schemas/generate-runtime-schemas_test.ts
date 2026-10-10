@@ -16,6 +16,7 @@ describe('public generate application flows', () => {
       fs,
       scaffolder: {} as ScaffolderPort,
       templateAdapter: {} as TemplatePort,
+      validateComposition: () => Promise.resolve(),
       regenerateHelpers: (projectRoot) =>
         Promise.resolve([
           `${projectRoot}/.aspire/apphost.mts`,

@@ -64,7 +64,13 @@ export type AuthTelemetryAttributeValue = string | number | boolean | undefined;
 /** Attribute bag emitted by auth telemetry spans and audit events. */
 export type AuthTelemetryAttributes = Readonly<Record<string, AuthTelemetryAttributeValue>>;
 /** Auth operation names supported by the service instrumentation facade. */
-export type AuthTelemetryOperation = 'signin' | 'callback' | 'signout' | 'session' | 'me';
+export type AuthTelemetryOperation =
+  | 'signin'
+  | 'callback'
+  | 'signout'
+  | 'revokeSession'
+  | 'session'
+  | 'me';
 
 /** Inputs shared by all auth operation spans. */
 export type AuthOperationInput = Readonly<{
@@ -342,6 +348,7 @@ function spanNameForOperation(operation: AuthTelemetryOperation): AuthSpanName {
   if (operation === 'signin') return AuthSpanNames.SIGNIN;
   if (operation === 'callback') return AuthSpanNames.CALLBACK;
   if (operation === 'signout') return AuthSpanNames.SIGNOUT;
+  if (operation === 'revokeSession') return AuthSpanNames.SESSION_REVOKE;
   if (operation === 'session') return AuthSpanNames.SESSION;
   return AuthSpanNames.ME;
 }

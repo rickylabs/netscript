@@ -1,0 +1,13 @@
+import { listQuery, pagination } from './{{entityName}}.ts';
+
+Deno.test('{{modelName}} list policy bounds the page and rejects unknown sort fields', () => {
+  const input = { page: 2, limit: 10, sortBy: 'unsafe', sortOrder: 'desc' as const };
+  const query = listQuery(input);
+  if (query.skip !== 10 || query.take !== 10 || query.orderBy.id !== 'desc') {
+    throw new Error('Unexpected list query');
+  }
+  const result = pagination(input, 25);
+  if (result.totalPages !== 3 || !result.hasNext || !result.hasPrev) {
+    throw new Error('Unexpected pagination');
+  }
+});

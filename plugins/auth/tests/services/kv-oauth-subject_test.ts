@@ -5,7 +5,8 @@ import {
   createInMemoryKvOAuthRegistry,
 } from '../../services/src/backend-registry.ts';
 import { resolveKvOAuthSubjectSource } from '../../services/src/kv-oauth-subject.ts';
-import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
+import { signin } from '../../services/src/routers/v1-handlers.ts';
+import { completeTestCallback } from '../testing/auth-service-fixture.ts';
 import { AuthServiceHandlerError } from '../../services/src/routers/v1-types.ts';
 import type { ResolvedAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
 import {
@@ -25,7 +26,7 @@ async function completeSignIn(registry: ResolvedAuthBackendRegistry) {
   });
   assert(started.redirectUrl);
   const redirect = new URL(started.redirectUrl);
-  return await callback({
+  const completed = await completeTestCallback({
     code: 'code_test',
     state: redirect.searchParams.get('state') ?? undefined,
   }, {
@@ -35,6 +36,7 @@ async function completeSignIn(registry: ResolvedAuthBackendRegistry) {
       headers: new Headers({ 'x-forwarded-proto': 'https' }),
     },
   });
+  return { ...completed.output, sessionId: completed.sessionId };
 }
 
 Deno.test('subject source resolves from env, then the named preset, then the ID-token sub', () => {
@@ -145,6 +147,8 @@ Deno.test('the local-defaults stub never issues a session-id subject', async () 
     NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
     NETSCRIPT_AUTH_KV_OAUTH_KEY: KV_KEY,
     PORT: SYNTHETIC_PORT,
+    // This subject-only test deliberately exercises the stub's HTTP token endpoint.
+    NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
   };
   // Even if the stub's placeholder token endpoint answered, the subject is still required.
   const registry = await createAuthServiceBackendRegistry({
@@ -175,6 +179,7 @@ for (const providerId of ['github', 'discord', 'spotify', 'facebook', 'twitter']
       kv: new MemoryKvAdapter(),
       env: {
         NETSCRIPT_AUTH_PROVIDER_ID: providerId,
+        NETSCRIPT_AUTH_TRUST_PROXY_HEADERS: 'true',
         NETSCRIPT_AUTH_CLIENT_ID: 'client_test',
         NETSCRIPT_AUTH_CLIENT_SECRET: 'secret_test',
         NETSCRIPT_AUTH_REDIRECT_URI: authTestUrl('/v1/auth/callback'),

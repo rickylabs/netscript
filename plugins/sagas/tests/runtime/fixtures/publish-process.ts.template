@@ -1,0 +1,384 @@
+import { type Prisma, PrismaClient } from './.generated/client.ts';
+import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
+import { delay } from 'jsr:@std/async@1';
+import { createPrismaSagaTransitionStore } from '@netscript/plugin-sagas-core/stores';
+import { createSagaRuntime } from '@netscript/plugin-sagas-core/runtime';
+import { createPluginService } from '@netscript/plugin/service';
+import type {
+  PostgresCommandClient,
+  TransactionClientPort,
+} from '@netscript/database/commands/postgres';
+import type { SagaCorrelationKey, SagaInstanceId } from '@netscript/plugin-sagas-core/domain';
+import type { SagaTransitionCommitRequest } from '@netscript/plugin-sagas-core/ports';
+import { createSagaPublisher } from '@netscript/plugin-sagas/runtime';
+import { stderrTail } from 'REPO_URLpackages/plugin-sagas-core/tests/fixtures/transition-store/provider-process.ts';
+import { router } from 'REPO_URLplugins/sagas/services/src/router.ts';
+import { applyPublishOrderEffect } from 'REPO_URLplugins/sagas/tests/runtime/fixtures/apply-publish-order-effect.ts';
+import { publishOrderSaga } from 'REPO_URLplugins/sagas/tests/runtime/fixtures/publish-order-saga.ts';
+import type {
+  SagaServiceDatabaseClient,
+  SagaServiceRuntime,
+} from 'REPO_URLplugins/sagas/services/src/routers/v1-types.ts';
+
+// The consumer owns a generated Prisma client and a real interactive callback.
+// A per-test schema confines all migrations and cleanup to positively owned rows.
+type Tx = Omit<
+  Prisma.TransactionClient,
+  '$transaction' | '$connect' | '$disconnect' | '$on' | '$use' | '$extends'
+>;
+function client(schema?: string) {
+  const connectionString = Deno.env.get('SAGA_PROCESS_DATABASE_URL');
+  const connection = connectionString ? { connectionString } : {
+    host: Deno.env.get('COMMAND_POSTGRES_SOCKET'),
+    database: 'postgres',
+    user: Deno.env.get('PGUSER'),
+    port: Number(Deno.env.get('PGPORT')),
+  };
+  return new PrismaClient({
+    adapter: new PrismaPg({
+      ...connection,
+      ...(schema ? { options: `-c search_path=${schema}` } : {}),
+      connectionTimeoutMillis: 5000,
+    }, schema ? { schema } : undefined),
+  });
+}
+function bridge(root: PrismaClient): PostgresCommandClient & TransactionClientPort<Tx> {
+  return {
+    $queryRawUnsafe: root.$queryRawUnsafe.bind(root),
+    $executeRawUnsafe: root.$executeRawUnsafe.bind(root),
+    $transaction(work, options) {
+      if (options?.isolationLevel === 'Snapshot') throw new TypeError('unsupported isolation');
+      return root.$transaction((tx) =>
+        work(
+          new Proxy(tx, {
+            get(target, key, receiver) {
+              if (
+                typeof key === 'string' &&
+                ['$transaction', '$connect', '$disconnect', '$on', '$use', '$extends'].includes(key)
+              ) return undefined;
+              return Reflect.get(target, key, receiver);
+            },
+          }),
+        ), { ...options, isolationLevel: options?.isolationLevel });
+    },
+  };
+}
+function refuseReadModel(): never {
+  throw new Error('Publish conformance must not read the metadata projection');
+}
+const unusedReadModel: SagaServiceDatabaseClient = {
+  sagaInstance: { findMany: refuseReadModel, count: refuseReadModel },
+  sagaExecutionHistory: { findMany: refuseReadModel, count: refuseReadModel },
+};
+
+async function serve() {
+  const [schema, readyFile, crashKey] = Deno.args;
+  if (crashKey === '__startup_failure__') {
+    await Deno.stderr.write(
+      new TextEncoder().encode('discarded-prefix' + 'x'.repeat(9000) + 'startup-tail-sentinel'),
+    );
+    Deno.exit(87);
+  }
+  assert(/^saga_publish_[a-f0-9]+$/.test(schema));
+  const root = client(schema);
+  const store = createPrismaSagaTransitionStore(bridge(root), { transactionTimeoutMs: 5000 });
+  const runtime = createSagaRuntime({ native: { store } });
+  await runtime.register([publishOrderSaga]);
+  await runtime.start();
+  const boundary: SagaServiceRuntime = {
+    async publish(message, options) {
+      await runtime.publish({
+        ...message,
+        payload: message.payload ?? {},
+        correlationKey: message.correlationKey as SagaCorrelationKey,
+      }, options);
+      // Kill the actual service after the physical transition/outbox commit and before HTTP
+      // acceptance. No graceful stop, drain or in-memory store is involved in this boundary.
+      if (message.idempotencyKey === crashKey) Deno.exit(86);
+    },
+  };
+  const app = createPluginService(router, {
+    auth: { public: true, reason: 'Isolated saga process conformance fixture' },
+    name: 'saga-process-conformance',
+    context: () => ({ db: unusedReadModel, sagaRuntime: boundary }),
+  }).build();
+  const server = Deno.serve({ hostname: '127.0.0.1', port: 0, onListen: () => {} }, app.fetch);
+  await Deno.writeTextFile(
+    readyFile + '.pending',
+    JSON.stringify({ pid: Deno.pid, url: `http://127.0.0.1:${server.addr.port}` }),
+  );
+  await Deno.rename(readyFile + '.pending', readyFile);
+  await server.finished;
+}
+
+async function ownedFixture(
+  run: (root: PrismaClient, schema: string, temp: string) => Promise<void>,
+) {
+  const schema = 'saga_publish_' + crypto.randomUUID().replaceAll('-', '');
+  const admin = client();
+  const root = client(schema);
+  const temp = await Deno.makeTempDir();
+  let created = false;
+  try {
+    await admin.$executeRawUnsafe(`CREATE SCHEMA ${schema}`);
+    created = true;
+    for (
+      const path of [
+        'packages/database/tests/fixtures/command-store/migration.sql',
+        'packages/plugin-sagas-core/tests/fixtures/transition-store/runtime-migration.sql',
+        'packages/plugin-sagas-core/tests/fixtures/transition-store/command-replay-migration.sql',
+      ]
+    ) {
+      const migration = await Deno.readTextFile(new URL(path, 'REPO_URL'));
+      for (
+        const statement of migration.replace(/^--.*$/gm, '').split(';').filter((text) =>
+          text.trim()
+        )
+      ) {
+        await root.$executeRawUnsafe(statement);
+      }
+    }
+    await run(root, schema, temp);
+  } finally {
+    await root.$disconnect();
+    if (created) await admin.$executeRawUnsafe(`DROP SCHEMA ${schema} CASCADE`);
+    await admin.$disconnect();
+    await Deno.remove(temp, { recursive: true });
+  }
+}
+
+async function start(schema: string, temp: string, crashKey = '') {
+  const readyFile = `${temp}/${crypto.randomUUID()}.json`;
+  const child = new Deno.Command(Deno.execPath(), {
+    args: [
+      'run',
+      '--no-check',
+      '--no-lock',
+      '--config',
+      new URL('deno.json', import.meta.url).pathname,
+      '--unstable-kv',
+      '-A',
+      new URL(import.meta.url).pathname,
+      schema,
+      readyFile,
+      crashKey,
+    ],
+    stdout: 'null',
+    stderr: 'piped',
+  }).spawn();
+  const stderr = stderrTail(child.stderr);
+  let exited = false;
+  const status = child.status.then(async (value) => {
+    exited = true;
+    const tail = await stderr;
+    console.error(`Saga child exit ${value.code}; stderr tail (at most 8 KiB):\n${tail}`);
+    return value;
+  });
+  const stop = async () => {
+    if (!exited) child.kill('SIGKILL');
+    return await status;
+  };
+  try {
+    for (let attempt = 0; attempt < 1200; attempt++) {
+      if (exited) {
+        throw new Error(
+          `Saga service exited before listening (${
+            (await status).code
+          }); stderr tail:\n${await stderr}`,
+        );
+      }
+      try {
+        const ready = JSON.parse(await Deno.readTextFile(readyFile));
+        assertEquals(ready.pid, child.pid);
+        const publisher = createSagaPublisher({
+          baseUrl: ready.url,
+          readEnv: () => undefined,
+          fetcher: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(5000) }),
+        });
+        return { publisher, pid: child.pid, status, stop };
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      }
+      await delay(50);
+    }
+    await stop();
+    throw new Error(
+      `Saga service did not listen within the 60-second failure ceiling; stderr tail:\n${await stderr}`,
+    );
+  } catch (error) {
+    await stop();
+    throw error;
+  }
+}
+function message(key: string, type: 'First' | 'Second') {
+  return {
+    type,
+    payload: {},
+    correlationKey: key as SagaCorrelationKey,
+    idempotencyKey: `${key}:${type}`,
+  };
+}
+function instance(key: string) {
+  return `publish-order:${key}` as SagaInstanceId;
+}
+async function counts(root: PrismaClient) {
+  const result: number[] = [];
+  for (
+    const table of [
+      'saga_runtime_state',
+      'saga_runtime_correlation',
+      'saga_runtime_transition',
+      'netscript_command_outbox',
+      'saga_runtime_command_applied_key',
+    ]
+  ) {
+    const rows = await root.$queryRawUnsafe<{ count: bigint }[]>(
+      `SELECT count(*) AS count FROM ${table}`,
+    );
+    result.push(Number(rows[0].count));
+  }
+  return result;
+}
+async function commands(root: PrismaClient) {
+  return await root.$queryRawUnsafe<{ id: string; payload_json: string; dedupe_key: string }[]>(
+    'SELECT id,payload_json,dedupe_key FROM netscript_command_outbox ORDER BY id',
+  );
+}
+const control = Deno.env.get('SAGA_PROCESS_NEGATIVE_CONTROL');
+
+Deno.test('startup failure retains bounded child stderr in the error and process evidence', async () => {
+  await ownedFixture(async (_root, schema, temp) => {
+    const error = await assertRejects(
+      () => start(schema, temp, '__startup_failure__'),
+      Error,
+      'Saga service exited before listening (87)',
+    );
+    assert(error.message.includes('startup-tail-sentinel'));
+    assert(!error.message.includes('discarded-prefix'));
+  });
+});
+
+Deno.test('HTTP publish recovers commit-before-acceptance process crash without lost or duplicate worker intent', async () => {
+  await ownedFixture(async (root, schema, temp) => {
+    const first = await start(schema, temp, 'restart:Second');
+    const store = createPrismaSagaTransitionStore(bridge(root), { transactionTimeoutMs: 5000 });
+    try {
+      assertEquals((await first.publisher.publish(message('restart', 'First'))).published, true);
+      assertEquals((await first.publisher.publish(message('restart', 'Second'))).published, false);
+      const ceiling = new AbortController();
+      const departure = await Promise.race([
+        first.status,
+        delay(10000, { signal: ceiling.signal }).then(() => {
+          throw new Error('Service did not exit at the committed crash boundary');
+        }),
+      ]).finally(() => ceiling.abort());
+      assertEquals(departure.code, 86);
+      if (control === 'drop-outbox') {
+        await root.$executeRawUnsafe('DELETE FROM netscript_command_outbox');
+      }
+      assertEquals(await counts(root), [1, 1, 2, 1, 2]);
+      const before = await store.load(instance('restart'));
+      assertEquals(before?.state, { status: 'ready', first: true, second: true });
+      const intent = await commands(root);
+      assertEquals(JSON.parse(intent[0].payload_json), { correlationKey: 'restart' });
+      assertEquals(intent[0].id, intent[0].dedupe_key);
+      if (control === 'forget-replay') {
+        await root.$executeRawUnsafe('DELETE FROM saga_runtime_command_applied_key');
+      }
+      const second = await start(schema, temp);
+      try {
+        assert(second.pid !== first.pid);
+        assertEquals(
+          (await second.publisher.publish(message('restart', 'Second'))).published,
+          true,
+        );
+        assertEquals((await second.publisher.publish(message('restart', 'First'))).published, true);
+        assertEquals(await store.load(instance('restart')), before);
+        assertEquals(await commands(root), intent);
+        assertEquals(await counts(root), [1, 1, 2, 1, 2]);
+        await applyPublishOrderEffect(bridge(root), temp);
+        // New correlation still progresses after restart; this is not a permanently stopped bus.
+        assertEquals((await second.publisher.publish(message('next', 'First'))).published, true);
+        assertEquals((await second.publisher.publish(message('next', 'Second'))).published, true);
+        assertEquals(await counts(root), [2, 2, 4, 2, 4]);
+      } finally {
+        await second.stop();
+      }
+    } finally {
+      await first.stop();
+    }
+  });
+});
+
+Deno.test('HTTP N+1 before N preserves state and physical stale-version commit rolls back every row', async () => {
+  await ownedFixture(async (root, schema, temp) => {
+    const service = await start(schema, temp);
+    const store = createPrismaSagaTransitionStore(bridge(root), { transactionTimeoutMs: 5000 });
+    try {
+      assertEquals((await service.publisher.publish(message('order', 'Second'))).published, true);
+      const old = (await store.load(instance('order')))!;
+      assertEquals(old.state, { status: 'waiting-first', first: false, second: true });
+      assertEquals(await counts(root), [1, 1, 1, 0, 1]);
+      if (control === 'drop-early') {
+        await root.$executeRawUnsafe(
+          "UPDATE saga_runtime_state SET envelope=jsonb_set(envelope,'{state,second}','false')",
+        );
+      }
+      assertEquals((await service.publisher.publish(message('order', 'First'))).published, true);
+      const before = (await store.load(instance('order')))!;
+      assertEquals(before.state, { status: 'ready', first: true, second: true });
+      const history = await store.transitions(instance('order'));
+      assertEquals(history.map((row) => row.transition.message.type), ['Second', 'First']);
+      assertEquals(await counts(root), [1, 1, 2, 1, 2]);
+      assertEquals((await service.publisher.publish(message('order', 'Second'))).published, true);
+      assertEquals(await store.load(instance('order')), before);
+      const intents = await commands(root);
+      const request: SagaTransitionCommitRequest = {
+        expectedVersion: old.metadata.version,
+        envelope: { ...old, metadata: { ...old.metadata, version: 2 }, state: { corrupt: true } },
+        correlation: {
+          sagaId: publishOrderSaga.id,
+          correlationKey: 'order' as SagaCorrelationKey,
+          instanceId: instance('order'),
+        },
+        record: { ...history[1], transition: { ...history[1].transition, to: { corrupt: true } } },
+        commands: [{
+          id: 'stale-effect',
+          executionId: 'stale-effect',
+          commandName: 'saga.worker-job:publish-order',
+          commandVersion: 1,
+          destination: 'workers',
+          topic: 'publish-order',
+          payloadJson: '{}',
+          dedupeKey: 'stale-effect',
+          correlationId: 'order',
+          availableAt: new Date(),
+        }],
+        appliedKeyHash: 'a'.repeat(64),
+      };
+      if (control === 'accept-stale') {
+        await root.$executeRawUnsafe('UPDATE saga_runtime_state SET version=1');
+        await root.$executeRawUnsafe('DELETE FROM saga_runtime_transition WHERE version=2');
+      }
+      await assertRejects(
+        () => store.commitTransition(request),
+        Error,
+        'Atomic saga version mismatch',
+      );
+      assertEquals(await store.load(instance('order')), before);
+      assertEquals(await store.transitions(instance('order')), history);
+      assertEquals(await commands(root), intents);
+      assertEquals(await counts(root), [1, 1, 2, 1, 2]);
+      const keys = await root.$queryRawUnsafe<{ count: bigint }[]>(
+        'SELECT count(*) AS count FROM saga_runtime_command_applied_key WHERE key_hash=$1',
+        request.appliedKeyHash,
+      );
+      assertEquals(Number(keys[0].count), 0);
+    } finally {
+      await service.stop();
+    }
+  });
+});
+
+if (import.meta.main) await serve();

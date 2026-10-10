@@ -131,7 +131,7 @@ const triggerProvider: PluginKindProvider = {
 
 const streamsProvider: PluginKindProvider = {
   kind: 'stream',
-  displayName: 'Durable Streams',
+  displayName: 'Streams (ephemeral by default)',
   category: 'plugin',
   portRangeKey: 'PLUGIN_API',
   defaultPermissions: [
@@ -1629,6 +1629,117 @@ describe('public install plugin flow', () => {
       await Deno.remove(projectRoot, { recursive: true });
     }
   });
+
+  it('keeps a pinned auth HostPort across plugins update and a forced re-add without --port', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const authRoot = repoPath('plugins/auth');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const dependencies = {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry: new PluginKindRegistry(),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      };
+      const install = (port: number | undefined) =>
+        installPlugin({
+          kind: 'auth',
+          pluginName: 'auth',
+          port,
+          serviceReferences: [],
+          pluginReferences: [],
+          noDb: false,
+          includeSamples: false,
+          skipConfirmation: true,
+          ci: true,
+          localPath: authRoot,
+          projectRoot,
+          overwrite: true,
+        }, dependencies);
+      const readHostPorts = async () => {
+        const raw = JSON.parse(await Deno.readTextFile(join(projectRoot, 'appsettings.json'))) as {
+          NetScript: { Plugins: Record<string, { HostPort?: number }> };
+        };
+        return Object.values(raw.NetScript.Plugins).map((entry) => entry.HostPort);
+      };
+
+      await install(7101);
+      assertEquals(await readHostPorts(), [7101]);
+
+      // `netscript plugins update auth` re-runs the install without `--port`.
+      await install(undefined);
+      assertEquals(await readHostPorts(), [7101]);
+
+      // An operator pins the port by hand in appsettings, then re-adds with --force.
+      const settingsPath = join(projectRoot, 'appsettings.json');
+      const edited = JSON.parse(await Deno.readTextFile(settingsPath)) as {
+        NetScript: { Plugins: Record<string, { HostPort?: number }> };
+      };
+      for (const entry of Object.values(edited.NetScript.Plugins)) entry.HostPort = 7102;
+      await Deno.writeTextFile(settingsPath, JSON.stringify(edited, null, 2) + '\n');
+      await install(undefined);
+      assertEquals(await readHostPorts(), [7102]);
+
+      // An explicit --port on the re-run is the operator's newer decision and wins.
+      await install(7103);
+      assertEquals(await readHostPorts(), [7103]);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('pins no auth HostPort when --port was never given', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const authRoot = repoPath('plugins/auth');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const request = {
+        kind: 'auth',
+        pluginName: 'auth',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: false,
+        includeSamples: false,
+        skipConfirmation: true,
+        ci: true,
+        localPath: authRoot,
+        projectRoot,
+        overwrite: true,
+      };
+      const dependencies = {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry: new PluginKindRegistry(),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      };
+
+      await installPlugin(request, dependencies);
+      await installPlugin(request, dependencies);
+
+      const raw = JSON.parse(await Deno.readTextFile(join(projectRoot, 'appsettings.json'))) as {
+        NetScript: { Plugins: Record<string, { HostPort?: number; Port?: number }> };
+      };
+      const entries = Object.values(raw.NetScript.Plugins);
+      assertEquals(entries.length, 1);
+      assertEquals(entries.map((entry) => entry.HostPort ?? entry.Port), [undefined]);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
 });
 
 class FixturePluginValidator implements JsrPluginValidatorPort {
@@ -2193,9 +2304,9 @@ function streamsDescriptor(): ValidatedPluginDescriptor {
       schemaVersion: 1,
       name: '@netscript/plugin-streams',
       version: '0.0.1-alpha.12',
-      displayName: 'Durable Streams',
+      displayName: 'Streams (ephemeral by default)',
       description:
-        'Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.',
+        'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
       peerDependencies: {
         '@netscript/plugin': '0.0.1-alpha.12',
       },
@@ -2242,7 +2353,7 @@ function streamsDescriptor(): ValidatedPluginDescriptor {
     },
     details: {
       description:
-        'Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.',
+        'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
       score: 95,
     },
   };

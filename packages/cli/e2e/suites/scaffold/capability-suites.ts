@@ -34,13 +34,14 @@ const SERVICE_GATES = [
   GATE.GENERATED_SERVICE_CHECK,
   // GATE.GENERATED_DENO_LINT is deliberately NOT wired into the service suite.
   // It already runs in the runtime suite, where the scaffold registers plugins.
-  // This suite's fixture registers none, so the Aspire helper template's
-  // `{{__slot4__}}`/`{{__slot5__}}` render empty and its `builder`,
-  // `infrastructure`, `appHostDir`, `databaseEnvKey`, and `databaseProviderEnv`
-  // symbols become unused -- 23 `no-unused-vars` in generated output this branch
-  // does not author. That is pre-existing template debt, tracked separately; it
-  // is not a reason to hold this slice, and suppressing it here would weaken a
-  // gate that is genuinely useful where the slots are populated.
+  // `register-plugins.mts` and `register-background.mts` are lint-clean for every
+  // contribution set: the empty set renders the empty-registration template, and
+  // populated sets emit only the preamble their blocks consume (pinned by
+  // `registration-variant-lint_test.ts`). This suite's fixture still trips
+  // `no-unused-vars` in other generated helpers (`register-apps.mts`,
+  // `register-tools.mts`) when it registers no apps or tools; that is separate
+  // template debt, and suppressing it here would weaken a gate that is useful
+  // where those helpers are populated.
 ] as const;
 
 const CONTRACT_GATES = [
@@ -93,6 +94,10 @@ export const RUNTIME_GATES = [
   GATE.GENERATED_WORKERS_REGISTRY,
   GATE.GENERATED_SAGAS_REGISTRY,
   GATE.BEHAVIOR_PLUGIN_DOCTOR_MISSING_MODULE,
+  // In-process proof that a CLI-generated plugin service is guarded (#1383). It
+  // runs before the generated quality gates so the plugin it authors is also
+  // type-checked, linted and format-checked; it is never an AppHost resource.
+  GATE.BEHAVIOR_GENERATED_GUARDED_PLUGIN,
   GATE.RUNTIME_ASPIRE_RESTORE,
   // Declared service environment is wired here, not next to the other pre-start
   // fixtures: it regenerates every helper from appsettings.json, so it has to
