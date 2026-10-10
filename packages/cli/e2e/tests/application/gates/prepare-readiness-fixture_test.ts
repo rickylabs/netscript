@@ -259,6 +259,8 @@ export const OtlpProtocol = { HttpProtobuf: 'http-protobuf' } as const;
 export interface NetScriptConfig {
   Apps: Record<string, { Enabled?: boolean }>;
   Version: string;
+  Services: Record<string, { Environment?: Record<string, string>; Env?: Record<string, string> }>;
+  Plugins: Record<string, { Environment?: Record<string, string>; Env?: Record<string, string> }>;
 }
 export function buildOtelEnvVars(
   _name: string,

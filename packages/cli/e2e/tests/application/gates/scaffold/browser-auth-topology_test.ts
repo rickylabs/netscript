@@ -118,18 +118,18 @@ Deno.test('generated BFF cookie flow forwards a bearer to a guarded service and 
       { accepted: true },
     );
     assertEquals(downstreamCookie, undefined);
-    const direct = await fetch(
-      `http://127.0.0.1:${service.addr.port}/api/v1/private/read`,
-      {
-        headers: {
-          cookie: cookie.split(';')[0],
-          origin: 'https://foreign.example',
-        },
-      },
-    );
-    assertEquals(direct.status, 401);
-    assertEquals(direct.headers.get('access-control-allow-origin'), null);
-    await direct.body?.cancel();
+    for (const origin of [appOrigin, 'https://foreign.example']) {
+      const direct = await fetch(`http://127.0.0.1:${service.addr.port}/api/v1/private/read`, {
+        headers: { cookie: cookie.split(';')[0], origin },
+      });
+      assertEquals(direct.status, 401);
+      assertEquals(
+        direct.headers.get('access-control-allow-origin'),
+        origin === appOrigin ? appOrigin : null,
+      );
+      assertEquals(direct.headers.get('access-control-allow-credentials'), null);
+      await direct.body?.cancel();
+    }
     const missingTxn = await bff.handleBrowserAuth(
       request('/auth/callback?code=c&state=bad'),
       'callback',
