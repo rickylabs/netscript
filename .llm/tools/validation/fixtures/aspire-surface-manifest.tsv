@@ -430,6 +430,9 @@ packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target_test.ts	cli-a
 packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target.ts	cli-adapter:deploy	S4	verify the 13.5 aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; docs also list --yes, --clear-cache, --pipeline-log-level, --include-exception-details) against sources; adapter tests updated; S2 V12 --help receipts (D-15)
 packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts	cli-adapter:deploy	S4	verify the 13.5 aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; docs also list --yes, --clear-cache, --pipeline-log-level, --include-exception-details) against sources; adapter tests updated; S2 V12 --help receipts (D-15)
 packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target.ts	cli-adapter:deploy	S4	verify the 13.5 aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; docs also list --yes, --clear-cache, --pipeline-log-level, --include-exception-details) against sources; adapter tests updated; S2 V12 --help receipts (D-15)
+packages/cli/src/kernel/adapters/aspire/docker-topology-fixtures_test.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
+packages/cli/src/kernel/adapters/aspire/docker-topology-inspector_test.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
+packages/cli/src/kernel/adapters/aspire/docker-topology-inspector.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
 packages/cli/src/kernel/adapters/config/deploy-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/config/infrastructure-docker.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/config/infrastructure-resolvers.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -525,6 +528,8 @@ packages/cli/src/kernel/domain/deploy/deploy-target-port_test.ts	cli:other	S4	gr
 packages/cli/src/kernel/domain/deploy/deploy-target-port.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/rollback-convention.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/secrets-convention.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/domain/docker-topology_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/domain/docker-topology.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/infrastructure-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/plugin-kind.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/resolved-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
