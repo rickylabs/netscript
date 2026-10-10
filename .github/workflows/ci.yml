@@ -51,6 +51,10 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  DENO_VERSION: '2.9.5'
+  CI_REDIS_IMAGE: redis:7-alpine
+
 jobs:
   close-gate:
     runs-on: ubuntu-latest
@@ -67,7 +71,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.5'
+          deno-version: ${{ env.DENO_VERSION }}
 
       - name: Mirror structured acceptance evidence
         # Live-state invariant: the tool fetches labels/body/head at execution
@@ -124,7 +128,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.5'
+          deno-version: ${{ env.DENO_VERSION }}
 
       - name: Self-check the classifier
         run: >-
@@ -169,19 +173,38 @@ jobs:
           ROOT_DENO_JSON_HEAD: ${{ steps.rootcfg.outputs.head }}
         run: deno run --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.ts
 
-  check-test:
+  check-test-shard:
+    name: check-test-shard (${{ matrix.lane }})
     needs: classify
     # Required check: always starts and reports (see the skip-policy header).
     # FAIL-CLOSED: a failed classify forces RUN=true.
     if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lane: check
+            index: 0
+          - lane: test-1
+            index: 1
+          - lane: test-2
+            index: 2
+          - lane: test-3
+            index: 3
+          - lane: test-4
+            index: 4
+          - lane: test-5
+            index: 5
+          - lane: test-6
+            index: 6
     env:
       RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_deno == 'true' }}
       RUN_FRESH_BROWSER: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_fresh_browser == 'true' }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
-      NETSCRIPT_TEST_REDIS_URL: redis://127.0.0.1:6379
-      REDIS_CONTAINER: netscript-ci-redis-${{ github.run_id }}-${{ github.run_attempt }}
+      NETSCRIPT_TEST_REDIS_URL: ${{ matrix.index != 0 && 'redis://127.0.0.1:6379' || '' }}
+      REDIS_CONTAINER: netscript-ci-redis-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.index }}
     steps:
       - name: Skipped by policy
         if: env.RUN != 'true'
@@ -196,7 +219,19 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.5'
+          deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Configure Deno module cache
+        run: echo "DENO_DIR=${RUNNER_TEMP}/deno-dir" >> "$GITHUB_ENV"
+
+      - name: Cache Deno modules
+        if: env.RUN == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-
 
       - name: Record skipped check receipt
         if: env.RUN != 'true'
@@ -210,10 +245,29 @@ jobs:
         if: env.RUN == 'true'
         run: deno install
 
-      - name: Start required Redis integration service
-        if: env.RUN == 'true'
+      - name: Cache required CI Redis image
+        if: env.RUN == 'true' && matrix.index != 0
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/ci-images
+          key: ${{ runner.os }}-ci-image-${{ env.CI_REDIS_IMAGE }}-v1
+
+      - name: Load or pull required CI Redis image
+        if: env.RUN == 'true' && matrix.index != 0
         run: |
-          docker run --detach --rm --name "$REDIS_CONTAINER" --publish 6379:6379 redis:7-alpine
+          image_cache="${RUNNER_TEMP}/ci-images/redis.tar"
+          if [ -f "$image_cache" ]; then
+            docker load --input "$image_cache"
+          else
+            docker pull "$CI_REDIS_IMAGE"
+            mkdir -p "$(dirname "$image_cache")"
+            docker save --output "$image_cache" "$CI_REDIS_IMAGE"
+          fi
+
+      - name: Start required Redis integration service
+        if: env.RUN == 'true' && matrix.index != 0
+        run: |
+          docker run --detach --rm --name "$REDIS_CONTAINER" --publish 6379:6379 "$CI_REDIS_IMAGE"
           for attempt in $(seq 1 10); do
             if docker exec "$REDIS_CONTAINER" redis-cli ping | grep -qx PONG; then
               exit 0
@@ -224,7 +278,7 @@ jobs:
           exit 1
 
       - name: Repo-wide check
-        if: env.RUN == 'true'
+        if: env.RUN == 'true' && matrix.index == 0
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate check --id check-test-check
@@ -232,17 +286,17 @@ jobs:
           --child-report .llm/tmp/gate-receipts/check-test/check.report.json --
           --output .llm/tmp/gate-receipts/check-test/check.report.json
 
-      - name: Repo-wide test
-        if: env.RUN == 'true'
+      - name: Measured test shard
+        if: env.RUN == 'true' && matrix.index != 0
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
-          .llm/tools/gates/run-gate.ts --gate test --id check-test-test
+          .llm/tools/gates/run-gate.ts --gate test-shard --id check-test-test-${{ matrix.index }}
           --output .llm/tmp/gate-receipts/check-test/test.receipt.json
           --child-report .llm/tmp/gate-receipts/check-test/test.report.json --
-          --report-output .llm/tmp/gate-receipts/check-test/test.report.json
+          ${{ matrix.index }} --report-output .llm/tmp/gate-receipts/check-test/test.report.json
 
       - name: Install managed-form browser test runtime
-        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true'
+        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true' && matrix.index == 0
         run: |
           browser_runtime="${RUNNER_TEMP}/netscript-playwright-cli"
           npm install --prefix "$browser_runtime" @playwright/cli@0.1.17
@@ -250,14 +304,14 @@ jobs:
           "$browser_runtime/node_modules/.bin/playwright" install --with-deps chromium
 
       - name: Managed form browser regression
-        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true'
+        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true' && matrix.index == 0
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate fresh-browser --id check-test-fresh-browser
           --cwd packages/fresh --output .llm/tmp/gate-receipts/check-test/fresh-browser.json
 
       - name: Stop required Redis integration service
-        if: always() && env.RUN == 'true'
+        if: always() && env.RUN == 'true' && matrix.index != 0
         run: |
           if docker inspect "$REDIS_CONTAINER" >/dev/null 2>&1; then
             docker stop "$REDIS_CONTAINER"
@@ -267,9 +321,21 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ github.workflow }}-${{ github.job }}-${{ matrix.lane }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
           path: .llm/tmp/gate-receipts/check-test/*.json
           if-no-files-found: error
+
+  check-test:
+    name: check-test
+    needs: check-test-shard
+    if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every matrix lane to succeed
+        env:
+          SHARDS_RESULT: ${{ needs.check-test-shard.result }}
+        run: test "$SHARDS_RESULT" = success
 
   quality:
     needs: classify
@@ -298,7 +364,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.5'
+          deno-version: ${{ env.DENO_VERSION }}
 
       - name: Record skipped quality receipt
         if: env.RUN != 'true'
@@ -321,6 +387,18 @@ jobs:
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate docs-source-format-test --id quality-docs-format-test
           --cwd docs/site --output .llm/tmp/gate-receipts/quality/docs-format-test.json
+
+      - name: Configure Deno module cache
+        run: echo "DENO_DIR=${RUNNER_TEMP}/deno-dir" >> "$GITHUB_ENV"
+
+      - name: Cache Deno modules
+        if: env.RUN_DENO == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-
 
       - name: Install workspace dependencies
         if: env.RUN_DENO == 'true'
@@ -479,7 +557,18 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.5'
+          deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Configure Deno module cache
+        run: echo "DENO_DIR=${RUNNER_TEMP}/deno-dir" >> "$GITHUB_ENV"
+
+      - name: Cache Deno modules
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-${{ env.DENO_VERSION }}-
 
       - name: Install workspace dependencies
         run: deno install
