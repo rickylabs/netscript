@@ -127,3 +127,66 @@ Deno.test('publishSagaOrThrow raises a non-retryable SagasError', async () => {
   assertEquals(error.retryable, false);
   assertStrictEquals(error.cause, rejection);
 });
+
+Deno.test('publishSagaOrThrow renders an endpoint diagnostic into the SagasError message', async () => {
+  const rejection = {
+    published: false as const,
+    messageType: 'TestMessage' as const,
+    reason: 'no-endpoint',
+    retryable: false,
+    diagnostic: {
+      attempted: ['options.baseUrl', 'services__sagas-api__http__0', 'SAGAS_API_URL'],
+      aspireDetected: true,
+      envEnumerationDenied: false,
+    },
+  };
+  const publishSagaOrThrow = await loadPublishSagaOrThrow();
+
+  const error = await assertRejects(() =>
+    publishSagaOrThrow(
+      createPublisher(rejection),
+      { type: 'TestMessage', payload: { value: 'unresolved' } },
+    )
+  );
+
+  assertInstanceOf(error, SagasError);
+  assertEquals(error.code, 'SAGA_NON_RETRYABLE');
+  assertStrictEquals(error.cause, rejection);
+  assertEquals(
+    error.message,
+    'Saga publisher "test-publisher" rejected message "TestMessage": no-endpoint ' +
+      '(tried in order: options.baseUrl, services__sagas-api__http__0, SAGAS_API_URL; ' +
+      'Aspire environment: detected; environment enumeration: allowed)',
+  );
+});
+
+Deno.test('publishSagaOrThrow marks Aspire detection inconclusive when enumeration was denied', async () => {
+  const rejection = {
+    published: false as const,
+    messageType: 'TestMessage' as const,
+    reason: 'no-endpoint',
+    retryable: false,
+    diagnostic: {
+      attempted: ['options.baseUrl'],
+      aspireDetected: false,
+      envEnumerationDenied: true,
+    },
+  };
+  const publishSagaOrThrow = await loadPublishSagaOrThrow();
+
+  const error = await assertRejects(() =>
+    publishSagaOrThrow(
+      createPublisher(rejection),
+      { type: 'TestMessage', payload: { value: 'denied' } },
+    )
+  );
+
+  assertInstanceOf(error, SagasError);
+  assert(
+    error.message.endsWith(
+      'no-endpoint (tried in order: options.baseUrl; ' +
+        'Aspire environment: not detected; environment enumeration: denied)',
+    ),
+    error.message,
+  );
+});
