@@ -5,7 +5,7 @@ import {
 } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
 import { EMBEDDED_AGENT_DOCS_PAGES } from '../../../packages/cli/src/kernel/assets/agent-docs-prose.generated.ts';
 import { decodeExportSurfaceRows } from '../../../packages/mcp/src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts';
-import { EXPORT_SURFACE_ROWS } from '../../../packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts';
+import type { EXPORT_SURFACE_ROWS } from '../../../packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts';
 import { MCP_EMBEDDED_DOCS } from '../../../packages/mcp/src/publish-assets.generated.ts';
 import { parseAgentDocsPages, renderAgentDocsPages } from './agent-docs-page-carrier.ts';
 import {
