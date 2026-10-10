@@ -32,6 +32,7 @@ sub-path exports add higher-level builders:
 | `BaseContractRoute` | type alias | `type BaseContractRoute<TIn, TOut> = ContractProcedureBuilderWithInputOutput<...>` | Sound type of a route built via baseContract.route(...).input(TIn).output(TOut). |
 | `BaseContractOutputRoute` | type alias | `type BaseContractOutputRoute<TOut> = ContractProcedureBuilderWithOutput<...>` | Sound type of an output-only route built via baseContract.route(...).output(TOut) (no .input(...)). |
 | `NetScriptAuthenticationRequirement` | type alias | `type NetScriptAuthenticationRequirement = "none" \| "optional" \| "required"` | NetScript-owned authentication vocabulary used by procedure metadata. Existing literals remain stable; metadata capabilities evolve through additive optional readonly fields. |
+| `NetScriptProcedureAudience` | type alias | `type NetScriptProcedureAudience = "internal"` | Caller audience a procedure is restricted to. `"internal"` admits only service-to-service callers presenting the internal service credential. |
 | `NetScriptProcedureMeta` | interface | `interface NetScriptProcedureMeta` | NetScript-owned semantic procedure metadata, independent of the upstream contract-library representation. Consumers treat absent fields as unspecified; compatibility evolves through additive optional readonly fields. |
 
 ### Procedure access metadata
@@ -61,6 +62,7 @@ export const readOrder = baseContract
 | Field | Meaning |
 | --- | --- |
 | `access.authentication` | Optional `'none' \| 'optional' \| 'required'` declaration. An absent access field is unspecified. |
+| `access.audience` | Optional `'internal'`: only service-to-service callers presenting the internal service credential. Implies required authentication. |
 | `access.authorization.scopes` | Optional readonly scope requirements. |
 | `access.authorization.roles` | Optional readonly role requirements. |
 

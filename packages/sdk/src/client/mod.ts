@@ -20,6 +20,12 @@ export { defineSdkClientContribution } from './sdk-client-contribution.ts';
 export type { SdkClientContributionDefinition } from './sdk-client-contribution.ts';
 export { createLocaleSdkClientContribution } from './locale-contribution.ts';
 export type { LocaleSdkClientContext, LocaleSdkClientContribution } from './locale-contribution.ts';
+export { createInternalCredentialSdkClientContribution } from './internal-credential-contribution.ts';
+export type {
+  InstallationSecret,
+  InternalCredentialSdkClientContribution,
+  InternalCredentialSdkClientContributionOptions,
+} from './internal-credential-contribution.ts';
 export { isDefinedError, safe, SdkClientContributionError } from './errors.ts';
 export type {
   DefinedError,
@@ -59,10 +65,12 @@ export type {
   SdkClientTransportPolicy,
   SdkClientTransportPolicyMethodOptions,
   ServiceClient,
+  ServiceClientArgs,
   ServiceClientContext,
   ServiceClientContract,
   ServiceClientMethod,
   ServiceClientShape,
   ServiceRequestOptions,
   ServiceRequestRest,
+  ServiceUrlResolver,
 } from '../ports/service-client.ts';

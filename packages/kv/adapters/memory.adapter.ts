@@ -6,6 +6,7 @@
 
 import { delay } from '@std/async';
 import { BinaryHeap } from '@std/data-structures';
+import { combineAtomicValue } from '../application/atomic-combine.ts';
 import { KvClosedError } from '../application/errors.ts';
 import {
   compareKeys,
@@ -106,22 +107,7 @@ export class MemoryKvAdapter implements WatchableKv {
    */
   set(key: KvKey, value: unknown, options?: KvSetOptions): Promise<void> {
     this.assertOpen();
-    const keyStr = keyToString(key);
-    const existing = this.storage.get(keyStr);
-    const entry: StorageEntry = {
-      expiresAt: options?.expireIn ? Date.now() + options.expireIn : undefined,
-      key,
-      value,
-      versionstamp: generateVersionstamp(),
-    };
-
-    this.storage.set(keyStr, entry);
-
-    if (entry.expiresAt) {
-      this.expirationHeap.push({ expiresAt: entry.expiresAt, keyStr });
-    }
-
-    this.notifyWatchers(key, value, existing?.value ?? null, 'set');
+    this.writeEntry(key, value, generateVersionstamp(), options?.expireIn);
     return Promise.resolve();
   }
 
@@ -132,14 +118,7 @@ export class MemoryKvAdapter implements WatchableKv {
    */
   delete(key: KvKey): Promise<void> {
     this.assertOpen();
-    const keyStr = keyToString(key);
-    const existing = this.storage.get(keyStr);
-    if (!existing) {
-      return Promise.resolve();
-    }
-
-    this.storage.delete(keyStr);
-    this.notifyWatchers(key, null, existing.value, 'delete');
+    this.removeEntry(key, generateVersionstamp());
     return Promise.resolve();
   }
 
@@ -202,56 +181,34 @@ export class MemoryKvAdapter implements WatchableKv {
   /**
    * Execute an in-memory atomic mutation batch.
    *
+   * Checks and writes run synchronously as one unit, so no other caller can
+   * observe or interleave with a partial commit. Every entry written by the
+   * commit, and every watch event it fires, carries the single versionstamp
+   * that is returned.
+   *
    * @param checks - Version checks that must succeed
    * @param mutations - Mutations to apply
    * @returns Atomic operation result
    */
-  async atomic(
+  atomic(
     checks: AtomicCheck[],
     mutations: AtomicMutation[],
   ): Promise<AtomicResult> {
     this.assertOpen();
 
     for (const check of checks) {
-      const currentVersionstamp = this.storage.get(keyToString(check.key))?.versionstamp ?? null;
+      const currentVersionstamp = this.liveEntry(keyToString(check.key))?.versionstamp ?? null;
       if (currentVersionstamp !== check.versionstamp) {
-        return { ok: false };
+        return Promise.resolve({ ok: false });
       }
     }
 
+    const versionstamp = generateVersionstamp();
     for (const mutation of mutations) {
-      const keyStr = keyToString(mutation.key);
-
-      switch (mutation.type) {
-        case 'set':
-          await this.set(mutation.key, mutation.value, { expireIn: mutation.expireIn });
-          break;
-        case 'delete':
-          await this.delete(mutation.key);
-          break;
-        case 'sum': {
-          const current = typeof this.storage.get(keyStr)?.value === 'bigint'
-            ? this.storage.get(keyStr)!.value as bigint
-            : 0n;
-          await this.set(mutation.key, current + mutation.value);
-          break;
-        }
-        case 'min': {
-          const existing = this.storage.get(keyStr)?.value;
-          const current = typeof existing === 'bigint' ? existing : mutation.value;
-          await this.set(mutation.key, current < mutation.value ? current : mutation.value);
-          break;
-        }
-        case 'max': {
-          const existing = this.storage.get(keyStr)?.value;
-          const current = typeof existing === 'bigint' ? existing : mutation.value;
-          await this.set(mutation.key, current > mutation.value ? current : mutation.value);
-          break;
-        }
-      }
+      this.applyMutation(mutation, versionstamp);
     }
 
-    return { ok: true, versionstamp: generateVersionstamp() };
+    return Promise.resolve({ ok: true, versionstamp });
   }
 
   /**
@@ -337,8 +294,8 @@ export class MemoryKvAdapter implements WatchableKv {
         const events = [...eventQueue];
         eventQueue.length = 0;
 
-        if (options?.debounce) {
-          await delay(options.debounce);
+        if (options?.debounce && !(await this.debounce(options.debounce, options.signal))) {
+          break;
         }
 
         yield events;
@@ -418,8 +375,8 @@ export class MemoryKvAdapter implements WatchableKv {
 
         while (eventQueue.length > 0) {
           const event = eventQueue.shift()!;
-          if (options?.debounce) {
-            await delay(options.debounce);
+          if (options?.debounce && !(await this.debounce(options.debounce, options.signal))) {
+            return;
           }
           yield event;
         }
@@ -459,6 +416,111 @@ export class MemoryKvAdapter implements WatchableKv {
   }
 
   /**
+   * Wait out a watch debounce window, ending early when the watch is aborted.
+   *
+   * @param ms - Debounce window in milliseconds
+   * @param signal - Watch abort signal
+   * @returns `true` when the window elapsed, `false` when the watch was aborted
+   */
+  private async debounce(ms: number, signal?: AbortSignal): Promise<boolean> {
+    try {
+      await delay(ms, { signal });
+      return true;
+    } catch (error: unknown) {
+      if (signal?.aborted) return false;
+      throw error;
+    }
+  }
+
+  /**
+   * Apply one atomic mutation under the commit versionstamp.
+   *
+   * @param mutation - Mutation to apply
+   * @param versionstamp - Versionstamp of the enclosing commit
+   */
+  private applyMutation(mutation: AtomicMutation, versionstamp: string): void {
+    switch (mutation.type) {
+      case 'set':
+        this.writeEntry(mutation.key, mutation.value, versionstamp, mutation.expireIn);
+        return;
+      case 'delete':
+        this.removeEntry(mutation.key, versionstamp);
+        return;
+      default: {
+        const stored = this.liveEntry(keyToString(mutation.key))?.value;
+        this.writeEntry(
+          mutation.key,
+          combineAtomicValue(mutation.type, stored, mutation.value),
+          versionstamp,
+        );
+      }
+    }
+  }
+
+  /**
+   * Store an entry and notify watchers.
+   *
+   * @param key - Key to write
+   * @param value - Value to store
+   * @param versionstamp - Versionstamp of the write
+   * @param expireIn - Optional TTL in milliseconds
+   */
+  private writeEntry(
+    key: KvKey,
+    value: unknown,
+    versionstamp: string,
+    expireIn?: number,
+  ): void {
+    const keyStr = keyToString(key);
+    const existing = this.storage.get(keyStr);
+    const entry: StorageEntry = {
+      expiresAt: expireIn ? Date.now() + expireIn : undefined,
+      key,
+      value,
+      versionstamp,
+    };
+
+    this.storage.set(keyStr, entry);
+
+    if (entry.expiresAt) {
+      this.expirationHeap.push({ expiresAt: entry.expiresAt, keyStr });
+    }
+
+    this.notifyWatchers(key, value, existing?.value ?? null, 'set', versionstamp);
+  }
+
+  /**
+   * Remove an entry, if present, and notify watchers.
+   *
+   * @param key - Key to remove
+   * @param versionstamp - Versionstamp of the deletion
+   */
+  private removeEntry(key: KvKey, versionstamp: string): void {
+    const keyStr = keyToString(key);
+    const existing = this.storage.get(keyStr);
+    if (!existing) {
+      return;
+    }
+
+    this.storage.delete(keyStr);
+    this.notifyWatchers(key, null, existing.value, 'delete', versionstamp);
+  }
+
+  /**
+   * Resolve a stored entry that has not expired.
+   *
+   * @param keyStr - Serialized key
+   * @returns The live entry, or `undefined`
+   */
+  private liveEntry(keyStr: string): StorageEntry | undefined {
+    const entry = this.storage.get(keyStr);
+    if (entry?.expiresAt && entry.expiresAt <= Date.now()) {
+      return undefined;
+    }
+    return entry;
+  }
+
+  /**
    * Ensure the adapter has not been closed.
    */
   private assertOpen(): void {
@@ -484,7 +546,7 @@ export class MemoryKvAdapter implements WatchableKv {
         if (!entry || !entry.expiresAt || entry.expiresAt > now) continue;
 
         this.storage.delete(top.keyStr);
-        this.notifyWatchers(entry.key, null, entry.value, 'delete');
+        this.notifyWatchers(entry.key, null, entry.value, 'delete', generateVersionstamp());
       }
     }, 1000);
   }
@@ -496,12 +558,14 @@ export class MemoryKvAdapter implements WatchableKv {
    * @param value - New value
    * @param previousValue - Previous value
    * @param type - Mutation type
+   * @param versionstamp - Versionstamp of the write that caused the event
    */
   private notifyWatchers<T>(
     key: KvKey,
     value: T | null,
     previousValue: T | null,
     type: 'set' | 'delete',
+    versionstamp: string,
   ): void {
     const event: WatchEvent<T> = {
       key,
@@ -509,7 +573,7 @@ export class MemoryKvAdapter implements WatchableKv {
       timestamp: new Date(),
       type,
       value,
-      versionstamp: generateVersionstamp(),
+      versionstamp,
     };
 
     const keyWatchers = this.watchers.get(keyToString(key));

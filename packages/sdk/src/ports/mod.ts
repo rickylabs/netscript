@@ -111,10 +111,12 @@ export type {
   SdkClientTransportPolicy,
   SdkClientTransportPolicyMethodOptions,
   ServiceClient,
+  ServiceClientArgs,
   ServiceClientContext,
   ServiceClientContract,
   ServiceClientMethod,
   ServiceClientShape,
   ServiceRequestOptions,
   ServiceRequestRest,
+  ServiceUrlResolver,
 } from './service-client.ts';
