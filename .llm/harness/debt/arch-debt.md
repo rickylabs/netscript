@@ -1321,6 +1321,45 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when `deno task publish:dry-run` passes for the alpha-1 train after PR1 merges,
   and scaffold output no longer emits forward-looking stable ranges.
 
+## packages/auth-better-auth — cookie-cache residual window outside NetScript (`auth-better-auth-cookie-cache-window`)
+
+- **Reason:** better-auth's optional `session.cookieCache` keeps a signed `session_data` cookie
+  that its own reads trust until `maxAge` (default 300 s). `@netscript/auth-better-auth` reads every
+  session with `disableCookieCache` (#1384), so revocation is immediate for everything behind
+  NetScript. Two gaps remain:
+  - better-auth's own `/api/auth/*` endpoints and client helpers still accept a revoked session's
+    cache cookie until `maxAge`;
+  - the NetScript signout response does not clear the caller's better-auth cookies. The auth
+    service forwards backend `Set-Cookie` from interactive sign-out flows (#2189), but
+    better-auth's `revokeSessions` sets none, and better-auth has no interactive sign-out port.
+- **Owner:** Auth layer follow-up.
+- **Created:** 2026-10-10.
+- **Status:** open, DEBT_ACCEPTED.
+- **Target:** auth layer follow-up. Signout on better-auth should also return better-auth's own
+  cookie-clearing headers (its `api.signOut` response), carried by the #2189 propagation. The
+  cross-device window on better-auth's own endpoints is upstream behavior bounded by
+  `session.cookieCache.maxAge`, and is documented on the better-auth page.
+- **Gate:** Close when the auth service signout response expires the caller's better-auth
+  `session_token` and `session_data` cookies (test against a real instance with the cookie cache
+  on), and the better-auth docs still state the upstream `maxAge` window.
+
+## packages/auth-workos — subject-wide revocation unsupported (`auth-workos-subject-revocation`)
+
+- **Reason:** `AuthSessionStorePort.revokeSubjectSessions` (#1384) backs `signout { everywhere:
+  true }` and must do bounded work per call. kv-oauth meets it with a per-subject revocation
+  instant, and better-auth wraps its upstream `api.revokeSessions`. `@workos-inc/node` has no
+  user-wide revocation call, only paginated `listSessions` plus per-session `revokeSession`.
+  WorkOS access tokens are also verified locally until they expire, so `@netscript/auth-workos`
+  still throws `AuthBackendOperationUnsupportedError`. Global logout on a WorkOS deployment
+  therefore returns `AUTH_PROVIDER_ERROR` (502).
+- **Owner:** Auth layer follow-up (#2190).
+- **Created:** 2026-10-10.
+- **Status:** open, DEBT_ACCEPTED.
+- **Target:** 0.0.8 milestone (#2190, triage).
+- **Gate:** Close when the WorkOS backend implements `revokeSubjectSessions`. Every session of the
+  subject must fail authentication immediately, with no per-session work in the request, and
+  `signout { everywhere: true }` must return 200 on a WorkOS deployment under test.
+
 ## plugins/auth — single active backend v1 boundary (`auth-single-active-backend-boundary`)
 
 - **Reason:** `@netscript/plugin-auth` composes exactly one backend selected by
@@ -2597,6 +2636,39 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   exit 0. Focused doc lint exit 1 with only the two named references. Project
   runs/2026-10-08-fix-ai-peer-types/ai-doc-lint.log retains the raw failure.
 
+## auth-kv-oauth — explicit boolean proxy trust (`auth-trusted-proxy-hops-2026`)
+
+- **Reason:** #2026 adopts a default-off boolean `trustProxyHeaders` opt-in for one shared inbound
+  HTTPS/cookie policy. It requires a perimeter that replaces protocol headers and blocks direct
+  access; it cannot authenticate a chain of proxy hops or source CIDRs. Direct-TLS refresh now
+  supports explicit `cookie.secure` / `NETSCRIPT_AUTH_COOKIE_SECURE`; automatic host TLS metadata
+  propagation into URL-less `AuthnRequest` remains deferred against #2191.
+- **Owner:** Auth package and plugin maintainers.
+- **Target:** Backlog / Triage; before recommending trust in multi-hop deployments.
+- **Linked plan:** #2026 option A decision; follow-up #2191.
+- **Created:** 2026-10-10.
+- **Status:** open; option B deferred by coordinator, option C rejected as spoofable.
+- **Gate:** F-2/F-3 trusted-hop/CIDR contract and spoofing regression tests covering both flow and
+  cookie derivation, with documented migration from boolean trust. Outbound OAuth transport stays
+  independent.
+
+## Auth integration — unchanged raw documentation lint baseline (`auth-doc-baseline-2026`)
+
+- **Reason:** The #2026 transport fix preserves the complete raw doc-lint reports from pristine
+  baseline `e876d98847298ee8a902a6ab95942ec912e1e3aa`: plugin-auth-core has four combined private
+  type references; plugins/auth has thirteen. Every entrypoint count and exit is identical.
+  auth-kv-oauth has zero findings. The findings include the existing private contract shape and
+  upstream oRPC implementer plus stream types. No type erasure, lint suppression, gate relaxation,
+  or additional slow-types flag is introduced.
+- **Owner:** Auth and streams public-surface maintainers; coordinator adjudicates readiness.
+- **Target:** Before raw all-export documentation gates are claimed green.
+- **Linked plan:** #2026; PR #2188. Raw baseline/final reports kept in the run record.
+- **Created:** 2026-10-10.
+- **Status:** open; raw doc-lint remains exit 1. Coordinator accepted the baseline-identical debt
+  for PR #2188 readiness; the independent evaluator confirmed no new lint findings.
+- **Gate:** F-7 raw all-export doc-lint exits zero with sound public contracts and no vendor
+  re-export or erased types.
+
 ## packages/auth-workos — AUTH-WORKOS-BEARER-PARITY
 
 - **ID:** `AUTH-WORKOS-BEARER-PARITY`
@@ -2638,3 +2710,19 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Exit condition:** Replace these imports with a supported public execution/testing contract that
   preserves the physical PostgreSQL effect and durable duplicate-execution proof.
 - **Gate:** Real HTTP/PostgreSQL publish-process conformance and worker idempotency assertions.
+
+
+## packages/service — residual F-1 builder and type-module size (#1386 L2)
+
+- **Reason:** The service builder and public type module already exceeded their F-1 size caps before
+  #1386 L2. The CORS contract and middleware registration add lines to those existing modules. CORS
+  policy itself is extracted to the focused `src/middleware/service-cors.ts`; further decomposition
+  of the existing builder and public types remains separate work.
+- **Owner:** NetScript service maintainers / architecture follow-up.
+- **Target:** Next service architecture decomposition pass, before the stable public API line.
+- **Linked change:** [Leaf X-1386, PR #2193](https://github.com/rickylabs/netscript/pull/2193).
+- **Created:** 2026-10-10.
+- **Status:** open; residual size debt recorded, no closure claimed by this leaf.
+- **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
+  `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
+  green. `arch:check` currently exits zero with these size warnings.

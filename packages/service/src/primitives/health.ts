@@ -3,7 +3,11 @@
  *
  * @example
  * ```typescript
- * import { createHealthHandler, healthChecks } from '@netscript/service';
+ * import type { Hono } from 'hono';
+ * import { createHealthHandler, type Database, healthChecks } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const db: Database;
  *
  * app.get('/health', createHealthHandler({
  *   checks: [
@@ -87,6 +91,12 @@ export interface HealthHandlerOptions {
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ * import { type Database, healthChecks } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const db: Database;
+ *
  * app.get('/health', createHealthHandler({
  *   checks: [healthChecks.database(db)],
  *   version: '1.0.0',
@@ -287,6 +297,10 @@ export const healthChecks: {
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ *
+ * declare const app: Hono;
+ *
  * app.get('/health/live', createLivenessHandler());
  * ```
  */
@@ -299,6 +313,12 @@ export function createLivenessHandler(): ServiceHandler {
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ * import type { Database } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const db: Database;
+ *
  * app.get('/health/ready', createReadinessHandler([
  *   async () => { await db.$queryRaw`SELECT 1`; return true; },
  * ]));

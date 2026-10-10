@@ -1,4 +1,4 @@
-import type { RequiredResourceState } from './resource-slice-contract.ts';
+import type { RequiredResourceState } from '../resource-slice-contract.ts';
 
 export type StateReconcileResult =
   | Readonly<{ status: 'exact'; content: string }>
