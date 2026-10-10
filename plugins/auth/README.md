@@ -22,9 +22,9 @@ them to a NetScript host.
 ## Why teams use it
 
 - **One auth API, swappable backends** — the `auth-api` service uses an Aspire-allocated endpoint
-  and exposes `signin`, `callback`, `signout`, `session`, and `me` over a versioned v1 contract,
-  backed by a single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth` (interactive
-  OAuth/OIDC), `workos`, or `better-auth`.
+  and exposes `signin`, `callback`, `signout`, `revokeSession`, `session`, and `me` over a versioned
+  v1 contract, backed by a single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth`
+  (interactive OAuth/OIDC), `workos`, or `better-auth`.
 - **Stable user subjects** — on `kv-oauth`, `NETSCRIPT_AUTH_SUBJECT_SOURCE` (`id_token` |
   `userinfo`) and `NETSCRIPT_AUTH_SUBJECT_CLAIM` choose where the subject comes from. A preset named
   by `NETSCRIPT_AUTH_PROVIDER_ID` supplies its default (GitHub: userinfo `id`, as `github:<id>`). A
@@ -46,7 +46,7 @@ them to a NetScript host.
 ```mermaid
 flowchart LR
     M["authPlugin manifest"] --> H["NetScript host<br/>(plugin install + sync)"]
-    H --> A["auth-api<br/>Aspire-allocated endpoint<br/>signin · callback · session · me · signout"]
+    H --> A["auth-api<br/>Aspire-allocated endpoint<br/>signin · callback · session · me · signout · revokeSession"]
     A --> B["Active backend<br/>(NETSCRIPT_AUTH_BACKEND)"]
     B --> K["kv-oauth"]
     B --> W["workos"]

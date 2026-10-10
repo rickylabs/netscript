@@ -294,7 +294,7 @@ architecture behind this, read [the authentication model](/explanation/auth-mode
 ## Step 6 — Start the service and the auth endpoints
 
 With Aspire running, the `auth-api` service answers on host port **8094** (pinned in Step 1) and
-mounts five endpoints under the
+mounts six endpoints under the
 public REST prefix **`/api/v1/auth/*`** (the oRPC surface is mirrored at `/api/rpc/v1/auth/*`):
 
 {{ comp.apiTable({
@@ -302,7 +302,8 @@ caption: "auth-api endpoints (:8094, /api/v1/auth/*)",
 rows: [
 { name: "POST /api/v1/auth/signin", type: "interactive only", desc: "Begin the OAuth/OIDC redirect flow. Live on kv-oauth; returns AUTH_PROVIDER_ERROR on workos/better-auth." },
 { name: "POST /api/v1/auth/callback", type: "interactive only", desc: "Complete the provider redirect, mint a session. Live on kv-oauth; AUTH_PROVIDER_ERROR on the others." },
-{ name: "POST /api/v1/auth/signout", type: "session", desc: "On kv-oauth, revoke the current session and emit its session-clearing Set-Cookie." },
+{ name: "POST /api/v1/auth/signout", type: "session", desc: "End the caller's own session. Needs the session cookie or a bearer credential (401 otherwise); everywhere: true ends all of the caller's sessions. On kv-oauth the response carries the session-clearing Set-Cookie." },
+{ name: "POST /api/v1/auth/sessions/revoke", type: "operator", desc: "Revoke any session by id. Needs a credential holding the auth:sessions:revoke scope (403 otherwise)." },
 { name: "GET /api/v1/auth/session", type: "session", desc: "Return the current session if one is present and valid. Works on all backends." },
 { name: "GET /api/v1/auth/me", type: "identity", desc: "Return the authenticated principal (the resolved user). Works on all backends." }
 ]
@@ -392,6 +393,18 @@ security policy tightening as a breaking change: remove insecure production
 cookie overrides, use HTTPS, and keep `HttpOnly` enabled. `__Host-` cookies must
 retain `Path=/` and omit `Domain`, even during development.
 
+Sign out with the same cookie. Signout only ever ends the caller's own sessions: without a
+credential it returns `401`, and a `sessionId` that is unknown or belongs to someone else returns
+the same `401`. See [signout ownership](/identity-access/auth/#signout-acts-only-for-the-caller).
+
+```sh
+# End this session
+curl -b cookies.txt -X POST http://localhost:8094/api/v1/auth/signout
+# End every session of the signed-in subject
+curl -b cookies.txt -X POST -H 'content-type: application/json' \
+  -d '{"everywhere":true}' http://localhost:8094/api/v1/auth/signout
+```
+
 For a typed service-client call, use the `auth/sdk-client.ts` module emitted during install. The
 manifest only advertises the factory; it never auto-attaches credentials. Select the generated
 descriptor on the `auth-api` client and provide its declared context explicitly:
@@ -419,7 +432,7 @@ const session = await authClient.session(undefined, {
 ```
 
 `signin`, `callback`, and `describe` are explicitly public and do not resolve the credential.
-`session`, `me`, and `signout` require it. The generated resolver reads no ambient environment,
+`session`, `me`, `signout`, and `revokeSession` require it. The generated resolver reads no ambient environment,
 cookie, or browser storage; your application supplies the credential for each logical call. Keep
 `authCachePartition` stable and non-secret—never use a token, session id, email, or another
 reversible identifier. Bearer headers require HTTPS outside localhost and loopback development.

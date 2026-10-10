@@ -12,7 +12,7 @@ contract between "your app's auth API" and "whatever backend answers it" has to 
 neutral. This package is that place. `AuthBackendPort` composes provider registry, session store,
 token crypto, and principal mapping into one seam every backend adapter implements;
 `AuthConfigSchema` normalizes app settings into a defaulted, secure configuration; and
-`authContract` defines the signin, callback, session, me, and signout routes the auth service serves
+`authContract` defines the signin, callback, session, me, signout, and revokeSession routes the auth service serves
 and typed clients call.
 
 This is the contract surface every auth backend implements and every service host wires; the
@@ -31,7 +31,7 @@ NetScript host.
   `AuthProviderConfigSchema` normalize settings into a defaulted `AuthConfig` (secure `__Host-`
   cookies, TTL, refresh window).
 - **A versioned API contract** — `authContract` / `authContractV1` define the signin, callback,
-  session, me, and signout routes with explicit authentication metadata, so services and clients
+  session, me, signout, and revokeSession routes with explicit authentication metadata, so services and clients
   share one typed source of truth.
 - **Typed client credentials** — `createBearerSdkClientContribution` resolves credentials from
   explicit per-call context and contributes only the declared `authorization` header.
@@ -43,7 +43,7 @@ NetScript host.
 
 ```mermaid
 flowchart LR
-    C["authContract v1<br/>signin · callback · session · me · signout"] --> S["Auth service host"]
+    C["authContract v1<br/>signin · callback · session · me · signout · revokeSession"] --> S["Auth service host"]
     S --> RG["createAuthBackendRegistry<br/>(single active backend)"]
     RG --> P["AuthBackendPort<br/>providers · sessions · crypto · principals"]
     P --> B1["kv-oauth adapter"]
@@ -165,7 +165,8 @@ The verifier does not forward cookies. On the auth service itself, KV-OAuth reso
 session ID before bearer before cookie; WorkOS resolves bearer before cookie. Better-auth retains
 its own request-header behavior, so this factory does not promise bearer support for every provider.
 HTTPS and loopback HTTP are accepted by default; other cleartext transport requires explicit
-`allowInsecureTransport`. This API does not add authorization rules or repair signout ownership.
+`allowInsecureTransport`. This API does not add authorization rules; the auth service enforces
+signout ownership itself.
 
 ## Docs
 
