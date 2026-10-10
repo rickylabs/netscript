@@ -102,8 +102,10 @@ JSON object as the **last line of `stdout`**.
 Input is passed as <strong>command-line arguments</strong> (<code>args</code>) and
 <strong>environment variables</strong> (<code>env</code>) — there is no JSON-over-stdin
 channel. The runtime merges <code>Deno.env</code>, the task's <code>env</code>, and the
-call's <code>options.env</code>, and injects <code>TRACEPARENT</code>,
-<code>TRACESTATE</code>, and <code>CORRELATION_ID</code> for trace propagation. Output is
+call's <code>options.env</code>, then sets <code>TRACEPARENT</code>,
+<code>TRACESTATE</code>, and <code>CORRELATION_ID</code> from the call's
+<code>options.traceparent</code>, <code>options.tracestate</code>, and
+<code>options.correlationId</code> (each only when supplied). Output is
 the reverse: the subprocess returns a structured value by printing <strong>one JSON object
 as the final line of <code>stdout</code></strong>; the runtime parses that line into
 <code>result.result</code> (a non-object or non-final-line value yields <code>null</code>).
@@ -208,9 +210,17 @@ exit code <code>-1</code>; passing an already-aborted <code>signal</code> yields
 Polyglot tasks spawn arbitrary processes with the worker's OS privileges. Pin entrypoints
 to known scripts, prefer a pinned interpreter / venv (<code>pythonConfig.venvPath</code>)
 over <code>$PATH</code> discovery, and avoid interpolating untrusted input into
-<code>args</code> or the entrypoint path. Trace context
-(<code>TRACEPARENT</code>/<code>CORRELATION_ID</code>) is injected into the subprocess
-environment so cross-runtime spans stitch together in telemetry.
+<code>args</code> or the entrypoint path.
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "Queue-triggered tasks carry trace and correlation context" } }}
+When the worker runs a task from its task queue, or runs a polyglot (non-Deno) job, it
+supplies the trace options itself. <code>CORRELATION_ID</code> is the message's
+<code>correlationId</code>. <code>TRACEPARENT</code>/<code>TRACESTATE</code> come from
+the active span, so the subprocess continues the worker's trace; when no span is active
+they fall back to the message's <code>traceparent</code>/<code>tracestate</code>. Read
+them in the subprocess to stitch cross-runtime spans and logs together. A direct
+<code>executor.execute()</code> call gets only the options you pass.
 {{ /comp }}
 
 ## Reference →

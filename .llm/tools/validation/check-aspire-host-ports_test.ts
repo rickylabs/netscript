@@ -5,8 +5,8 @@
  * the shapes that replaced them.
  */
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
-import { join } from 'jsr:@std/path@^1';
-import { scanContent, scanHostPorts } from './check-aspire-host-ports.ts';
+import { dirname, fromFileUrl, join } from 'jsr:@std/path@^1';
+import { DEFAULT_ROOTS, scanContent, scanHostPorts } from './check-aspire-host-ports.ts';
 
 const APPHOST = 'packages/cli/src/kernel/application/scaffold/render-ts-apphost.ts';
 
@@ -212,33 +212,88 @@ Deno.test('accepts explicit-only infrastructure host-port interpolation', () => 
   assertEquals(result.findings, []);
 });
 
-Deno.test('S5 runtime literal grep excludes generated barrels and allows only compatibility contracts', async () => {
-  const pattern = String.raw`809[1-4]|4437|127\.0\.0\.1:80`;
-  const output = await new Deno.Command('git', {
-    args: [
-      'grep',
-      '-nE',
-      pattern,
-      '--',
-      'plugins',
-      'packages/cli/src',
-      'packages/cli/e2e',
-      ':(exclude,glob)**/*.generated.ts',
-    ],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
-  const stdout = new TextDecoder().decode(output.stdout).trim();
-  const lines = stdout.length === 0 ? [] : stdout.split('\n');
-  const unexpected = lines.filter((line) => {
-    const path = line.slice(0, line.indexOf(':'));
-    return path !== 'plugins/auth/src/constants.ts' &&
-      path !== 'plugins/auth/tests/public/deprecated-default-port_test.ts' &&
-      path !== 'plugins/sagas/src/constants.ts' &&
-      path !== 'plugins/sagas/tests/public/deprecated-default-port_test.ts' &&
-      path !== 'plugins/triggers/src/constants.ts' &&
-      path !== 'plugins/triggers/tests/public/deprecated-default-port_test.ts';
-  });
+const GATE = fromFileUrl(new URL('./check-aspire-host-ports.ts', import.meta.url));
+const REPO_CONFIG = fromFileUrl(new URL('../../../deno.json', import.meta.url));
+const STREAMS_FACTORY_PLUGINS = ['auth', 'sagas', 'triggers', 'workers'] as const;
+/** The line a stale-base branch re-introduced into all four factories (#1893). */
+const STREAMS_FACTORY_FALLBACK = "  const baseUrl = options.baseUrl ?? 'http://localhost:4437';";
 
-  assertEquals(unexpected, []);
+Deno.test('S5 runtime literal policy holds on the shipped tree, with only reasoned allowances', async () => {
+  // The S5 policy is the gate's own LINE_RULES; this asserts it over the same
+  // roots `check:aspire-host-ports` scans instead of restating it as a grep.
+  const result = await scanHostPorts(DEFAULT_ROOTS);
+  assertEquals(result.findings, []);
+  assertEquals(result.allowances.map((allowance) => allowance.path).sort(), [
+    'plugins/auth/services/src/backend-registry.ts',
+    'plugins/auth/src/constants.ts',
+    'plugins/sagas/src/constants.ts',
+    'plugins/triggers/src/constants.ts',
+  ]);
+});
+
+Deno.test('rejects the loopback service-URL fallback in every plugin streams factory', () => {
+  for (const plugin of STREAMS_FACTORY_PLUGINS) {
+    const { findings } = scanContent(
+      `plugins/${plugin}/streams/factory.ts`,
+      STREAMS_FACTORY_FALLBACK,
+    );
+    assertEquals(findings.length, 1, `expected a finding for plugins/${plugin}/streams/factory.ts`);
+    assert(findings[0].message.includes('loopback service port'));
+  }
+});
+
+Deno.test('accepts the discovery-driven streams factory URL', () => {
+  const { findings } = scanContent(
+    'plugins/auth/streams/factory.ts',
+    "      url: buildStreamUrl('/auth/sessions', options.baseUrl),",
+  );
+  assertEquals(findings, []);
+});
+
+Deno.test('rejects a retired service port in CLI source and E2E probes', () => {
+  for (
+    const path of ['packages/cli/src/kernel/probe.ts', 'packages/cli/e2e/src/probe.ts']
+  ) {
+    const { findings } = scanContent(path, "const url = 'http://127.0.0.1:8091/health';");
+    assertEquals(findings.length, 1, `expected a finding for ${path}`);
+  }
+});
+
+Deno.test('keeps the loopback-URL rule scoped to plugin runtime source', () => {
+  const { findings } = scanContent(
+    'packages/cli/src/kernel/help.ts',
+    "const example = 'http://localhost:3000';",
+  );
+  assertEquals(findings, []);
+});
+
+async function runGateOnStreamsFactory(line: string): Promise<{ code: number; stdout: string }> {
+  const root = await Deno.makeTempDir();
+  try {
+    const factory = join(root, 'plugins', 'auth', 'streams', 'factory.ts');
+    await Deno.mkdir(dirname(factory), { recursive: true });
+    await Deno.writeTextFile(
+      factory,
+      `export function create(options: { baseUrl?: string }) {\n${line}\n}\n`,
+    );
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: ['run', '--allow-read', '--config', REPO_CONFIG, GATE, 'plugins', '--pretty'],
+      cwd: root,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    return { code: output.code, stdout: new TextDecoder().decode(output.stdout) };
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+}
+
+Deno.test('the gate exits non-zero when a streams factory re-introduces the fallback', async () => {
+  const red = await runGateOnStreamsFactory(STREAMS_FACTORY_FALLBACK);
+  assertEquals(red.code, 1);
+  assert(red.stdout.includes('plugins/auth/streams/factory.ts:2'));
+
+  // Negative control: the same tree without the literal passes.
+  const green = await runGateOnStreamsFactory('  const baseUrl = options.baseUrl;');
+  assertEquals(green.code, 0, green.stdout);
 });
