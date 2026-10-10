@@ -335,10 +335,16 @@ Deno.test('discoverVersionFiles falls back to existing locks outside a Git workt
     );
     await Deno.writeTextFile(`${root}/deno.lock`, '{"version":"4"}\n');
     await Deno.writeTextFile(`${root}/packages/example/deno.lock`, '{"version":"4"}\n');
+    await Deno.mkdir(`${root}/resources/examples/mobile`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/resources/examples/mobile/deno.lock`,
+      '{"version":"4"}\n',
+    );
 
     const files = await discoverVersionFiles(root);
     assertEquals(files.includes(`${root}/deno.lock`), true);
     assertEquals(files.includes(`${root}/packages/example/deno.lock`), true);
+    assertEquals(files.includes(`${root}/resources/examples/mobile/deno.lock`), true);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
@@ -449,3 +455,77 @@ Deno.test('findVersionResidue reports stale generated TypeScript and retains del
     await Deno.remove(root, { recursive: true });
   }
 });
+
+for (const mode of ['stable', 'canary'] as const) {
+  Deno.test(`coordinated ${mode} bump keeps nested tracked reference locks coherent`, async () => {
+    const { coordinateVersionBump, discoverVersionFiles, findVersionResidue } = await import(
+      './bump-version.ts'
+    );
+    const root = await Deno.makeTempDir({ prefix: 'ns-reference-lock-bump-' });
+    const nestedLock = `${root}/resources/examples/mobile/deno.lock`;
+    const ignoredLock = `${root}/.llm/runs/capture/deno.lock`;
+    const untrackedLock = `${root}/resources/examples/local/deno.lock`;
+    const newVersion = mode === 'stable' ? '1.3.0' : '1.3.0-canary.1';
+    const lock = JSON.stringify(
+      {
+        version: '5',
+        specifiers: {
+          'npm:react@1.2.3': '1.2.3',
+        },
+        workspace: {
+          dependencies: ['npm:react@1.2.3', 'jsr:@netscript/sdk@1.2.3'],
+          members: {
+            'jsr:@netscript/sdk@1.2.3': {
+              dependencies: ['jsr:@netscript/config@1.2.3'],
+            },
+          },
+        },
+      },
+      null,
+      2,
+    );
+    try {
+      await Deno.writeTextFile(
+        `${root}/deno.json`,
+        JSON.stringify({ version: '1.2.3', workspace: [] }),
+      );
+      for (const path of [nestedLock, ignoredLock, untrackedLock]) {
+        await Deno.mkdir(path.slice(0, path.lastIndexOf('/')), { recursive: true });
+        await Deno.writeTextFile(path, lock);
+      }
+      assertEquals((await run('git', ['init'], root)).code, 0);
+      assertEquals(
+        (await run('git', ['add', 'resources/examples/mobile/deno.lock', '.llm/runs'], root)).code,
+        0,
+      );
+
+      const files = await discoverVersionFiles(root);
+      assertEquals(files.includes(nestedLock), true);
+      assertEquals(files.includes(ignoredLock), false);
+      assertEquals(files.includes(untrackedLock), false);
+      assertEquals(
+        await findVersionResidue(root, '1.2.3'),
+        [`${root}/deno.json`, untrackedLock, nestedLock].sort(),
+      );
+
+      const result = await coordinateVersionBump(root, newVersion, mode);
+      assertEquals(result.files.includes(nestedLock), true);
+      const bumped = JSON.parse(await Deno.readTextFile(nestedLock));
+      assertEquals(bumped.version, '5');
+      assertEquals(bumped.workspace.members[`jsr:@netscript/sdk@${newVersion}`].dependencies, [
+        `jsr:@netscript/config@${newVersion}`,
+      ]);
+      assertEquals(bumped.specifiers['npm:react@1.2.3'], '1.2.3');
+      assertEquals(bumped.workspace.dependencies, [
+        'npm:react@1.2.3',
+        `jsr:@netscript/sdk@${newVersion}`,
+      ]);
+      assertEquals(await Deno.readTextFile(ignoredLock), lock);
+      assertEquals(await Deno.readTextFile(untrackedLock), lock);
+      // Local stale locks remain visible to residue detection; discovery must not stage them.
+      assertEquals(await findVersionResidue(root, '1.2.3'), [untrackedLock]);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  });
+}
