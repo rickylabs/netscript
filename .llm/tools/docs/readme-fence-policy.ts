@@ -15,19 +15,17 @@
  * four-backtick fence in `packages/mcp/README.md` also un-masked two blocks the aborted parse had
  * been hiding, so `tsLike` rose 72→73 and `checked` 71→73.
  *
- * The 7 that remain are 6 `TS2307` on modules that correctly have no repository path — imports of
- * consumer-owned or installer-emitted files (`blocks/contracts/orders.ts`, `blocks/router.ts`,
- * `.generated/client.server.ts`, `auth/sdk-client.ts`) and the two illustrative aliases
- * `@app/router.ts` and `@example/contracts` — plus one `TS18046` downstream of the `@app/*` one.
+ * Lowered again by #1939: `typeErrors` 7→5, `failingReadmes` 5→4, with no README text change.
+ * `packages/fresh/README.md` imports the scaffolded app's own `@app/router.ts`; that alias now
+ * resolves to the CLI's shipped router template, rendered with the CLI's renderer over route modules
+ * produced by the scaffold's route generator (`app-router-support.ts`), so the support cannot drift
+ * from what `netscript init` emits. That cleared its `TS2307` and the `TS18046` downstream of it.
  *
- * Five of the six are not honestly repairable in place: the README would have to name something
- * other than what a reader actually writes. The `@app/router.ts` pair is a **disclosed tradeoff**,
- * not an impossibility — a faithful `@app/router.ts` support stub in `materializeSharedSupports`,
- * following the fabrication pattern already used there for `@app/lib/*`, would clear both errors
- * (7→5, failing READMEs 5→4) without changing a character of the README. It is left out here
- * because a fabricated router stub can drift from the real scaffold generator, and a shared fixture
- * that every package's fences compile against deserves its own evaluated slice rather than a
- * late addition to this one.
+ * The 5 that remain are all `TS2307` on modules that correctly have no repository path: imports of
+ * consumer-owned or installer-emitted files (`blocks/contracts/orders.ts`, `blocks/router.ts`,
+ * `.generated/client.server.ts`, `auth/sdk-client.ts`) and the illustrative `@example/contracts`
+ * alias. None is honestly repairable in place: the README would have to name something other than
+ * what a reader actually writes.
  */
 export const README_FENCE_RATCHET = {
   /** Discovered `packages/*` and `plugins/*` READMEs. */
@@ -39,9 +37,9 @@ export const README_FENCE_RATCHET = {
   /** Fences tagged TypeScript whose body does not parse; `deno check` aborts the program on these. */
   maximumSyntaxInvalid: 0,
   /** READMEs carrying at least one type error. */
-  maximumFailingReadmes: 5,
+  maximumFailingReadmes: 4,
   /** Total type errors across the corpus. */
-  maximumTypeErrors: 7,
+  maximumTypeErrors: 5,
 } as const;
 
 /** One README fence that could not be parsed as TypeScript. */

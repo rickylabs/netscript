@@ -31,6 +31,9 @@ not.
 - **Explicit bind address** — `serve({ hostname })` and `defineService(router, { hostname })` bind
   one interface, such as `'127.0.0.1'` for a loopback-only listener, on both the plain and the TLS
   listener; omitting it keeps the all-interfaces default.
+- **Middleware slot and body limit** — `defineService(router, { middleware, bodyLimit })` installs
+  caller middleware after CORS and logging and before auth, and an opt-in request-body limit that
+  answers oversized bodies with a typed JSON `413` on both the RPC and OpenAPI projections.
 - **One app-wide budget** — `createRuntimeHost()` invokes existing service, worker, queue, and
   database drains in deterministic phase order and returns one aggregate report.
 - **Tracing on every request** — the builder registers tracing middleware as the outermost layer on
@@ -45,7 +48,7 @@ not.
 ```mermaid
 flowchart LR
     R["oRPC router"] --> D["defineService()<br/>or createService()"]
-    D --> M["Middleware stack<br/>tracing · CORS · logging · auth"]
+    D --> M["Middleware stack<br/>tracing · CORS · logging · middleware · auth · body limit"]
     M --> E["Endpoints<br/>/rpc · /api · OpenAPI · Scalar docs"]
     M --> H["Health<br/>/health · /health/live · /health/ready"]
     D --> G["Graceful shutdown<br/>drain · LIFO hooks · signals"]
