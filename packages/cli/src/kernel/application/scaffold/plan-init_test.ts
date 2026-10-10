@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { join } from '@std/path';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 import { InMemoryScaffolder } from '../testing/in-memory-scaffolder.ts';
 import { DeployTargetRegistry } from '../registries/deploy-target-registry.ts';
@@ -45,8 +46,14 @@ function options(
 }
 
 function context(scaffolder: InMemoryScaffolder): InitPipelineContext {
+  const formatter: GeneratedSourceFormatterPort = {
+    formatContent: (_path, content) => Promise.resolve(content),
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
+    formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+  };
   return {
     scaffolder,
+    formatter,
     packagesAsWorkspaceMembers: () => false,
   } as unknown as InitPipelineContext;
 }
