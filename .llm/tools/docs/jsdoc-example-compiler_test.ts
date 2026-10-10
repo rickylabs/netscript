@@ -239,7 +239,7 @@ Deno.test('an unbound name in an example body fails the gate instead of being de
   assertEquals(result.code, 1, result.diagnostics);
   assertEquals(result.enforcedFailureCount, 1);
   assertEquals(result.failureCensus.unboundName, 1);
-  assertEquals(result.deferredExamples, []);
+  assertEquals(result.typeErrorExamples, []);
   assertStringIncludes(result.diagnostics, "Cannot find name 'missingInput'");
 });
 
@@ -248,7 +248,7 @@ Deno.test('a declared stand-in binds an application-side name', async () => {
     analysis([
       block(
         owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
-        'declare const missingInput: unknown;\nPaginationInputSchema.parse(missingInput);',
+        'declare const missingInput: { page: number; limit: number };\nPaginationInputSchema.parse(missingInput);',
       ),
     ]),
     repositoryRoot,
@@ -257,7 +257,7 @@ Deno.test('a declared stand-in binds an application-side name', async () => {
   assertEquals(result.failureCensus.unboundName, 0);
 });
 
-Deno.test('an unclassified compiler abort fails closed even when deferred syntax findings exist', async () => {
+Deno.test('an unclassified compiler abort fails closed alongside syntax findings', async () => {
   const result = await compileJsdocExamples(
     analysis([
       block(
@@ -292,11 +292,12 @@ Deno.test('placeholder preclassification ignores comments and leaves diagnostics
     ]),
     repositoryRoot,
   );
-  assertEquals(result.code, 0, result.diagnostics);
+  assertEquals(result.code, 1, result.diagnostics);
+  assertEquals(result.enforcedFailureCount, 1);
   assert(result.denoCheckSpawned);
   assertEquals(result.failureCensus.typeError, 1);
   assertEquals(
-    result.deferredExamples.map(({ fenceOrdinal, tsCodes }) => ({ fenceOrdinal, tsCodes })),
+    result.typeErrorExamples.map(({ fenceOrdinal, tsCodes }) => ({ fenceOrdinal, tsCodes })),
     [{ fenceOrdinal: 2, tsCodes: [2451] }],
   );
 });
@@ -360,7 +361,7 @@ Deno.test('diagnostic classification is identical with compiler color on and off
   assertEquals(withColor, withoutColor);
   assertEquals(withColor.census, { badSpecifier: 1, typeError: 1, unboundName: 1 });
   assertEquals(
-    withColor.deferredExamples.map((example) => ({
+    withColor.typeErrorExamples.map((example) => ({
       failureClass: example.failureClass,
       fenceOrdinal: example.fenceOrdinal,
       tsCodes: example.tsCodes,
@@ -480,4 +481,37 @@ Deno.test('an example using a value documented elsewhere, without importing it, 
     ).test(result.diagnostics),
     'the borrowed symbol must be reported as an unbound name in the borrowing example',
   );
+});
+
+Deno.test('published API type errors reject the gate without a deferred allowance', async () => {
+  const api = owner('buildPrismaWhere', 'value', '@netscript/contracts/query');
+  const result = await compileJsdocExamples(
+    analysis([
+      block(
+        api,
+        `const filters = [{ field: 'status', operator: 'equals', value: 'active' }];
+buildPrismaWhere(filters);`,
+        1,
+      ),
+      block(
+        api,
+        `const info: { capabilities?: readonly string[] } = {};
+console.log(info.capabilities.length);`,
+        2,
+      ),
+      block(api, 'const repeated = 1;\nconst repeated = 2;', 3),
+      block(api, 'const illustrative = { value: ... };', 4),
+      block(
+        api,
+        `buildPrismaWhere([{ field: 'status', operator: 'equals', value: 'active' }]);`,
+        5,
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(result.failureCensus.typeError, 4, result.diagnostics);
+  assertEquals(result.failureCensus.unboundName, 0);
+  assertEquals(result.code, 1, result.diagnostics);
+  assertEquals(result.enforcedFailureCount, 4);
+  assert(result.rootLockUnchanged);
 });
