@@ -130,7 +130,8 @@ export class KvSagaAppliedKeyStore implements SagaAppliedKeyStore {
   ): Promise<SagaAppliedKeyOutcome> {
     const value = Object.freeze({ appliedAt: this.#now().toISOString() });
     const key = this.#appliedKey(instanceId, idempotencyKey);
-    const state = await this.#kv.get<SagaStateEnvelope>([...this.#prefix, 'state', instanceId]);
+    const stateKey: KvKey = [...this.#prefix, 'state', instanceId];
+    const state = await this.#kv.get<SagaStateEnvelope>(stateKey);
     const expireIn = state === null ? undefined : sagaRetentionRemaining(
       state.value,
       typeof this.#days === 'number' ? this.#days : this.#days(state.value),
@@ -139,7 +140,13 @@ export class KvSagaAppliedKeyStore implements SagaAppliedKeyStore {
     if (expireIn !== undefined && expireIn <= 0) return Object.freeze({ applied: false });
     const mutation: AtomicMutation = { type: 'set', key, value, expireIn };
 
-    const result = await requireAtomic(this.#kv)([{ key, versionstamp: null }], [mutation]);
+    const result = await requireAtomic(this.#kv)([
+      { key, versionstamp: null },
+      { key: stateKey, versionstamp: state?.versionstamp ?? null },
+    ], [mutation]);
+    if (!result.ok && await this.#kv.get(key) === null) {
+      throw new Error('Saga state changed while recording an applied key; retry the message.');
+    }
     return Object.freeze({ applied: result.ok });
   }
 

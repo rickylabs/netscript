@@ -1,4 +1,5 @@
 import { delay } from '@std/async';
+import { runSagaRetentionCleanup } from './saga-retention-loop.ts';
 import type {
   SagaClockPort,
   SagaRuntime,
@@ -130,15 +131,12 @@ async function resolveStoreResources(
 
   const kv = options.kv ?? await openSagaRuntimeKv();
   const store = new KvSagaStore({ kv, completedRetentionDays: options.completedRetentionDays });
-  await store.cleanupRetention();
   let controller: AbortController | undefined;
-  let failure: unknown;
   let cleanup: Promise<void> | undefined;
   const stopCleanup = async (): Promise<void> => {
     controller?.abort();
     await cleanup;
     cleanup = undefined;
-    if (failure !== undefined) throw failure;
   };
   return Object.freeze({
     store,
@@ -146,9 +144,7 @@ async function resolveStoreResources(
     startCleanup: () => {
       if (cleanup !== undefined) return;
       controller = new AbortController();
-      cleanup = runRetentionCleanup(store, controller.signal).catch((cause: unknown) => {
-        failure = cause;
-      });
+      cleanup = runSagaRetentionCleanup(store, controller.signal);
     },
     stopCleanup,
     dispose: async () => {
@@ -159,17 +155,6 @@ async function resolveStoreResources(
       }
     },
   });
-}
-
-async function runRetentionCleanup(store: KvSagaStore, signal: AbortSignal): Promise<void> {
-  while (!signal.aborted) {
-    await store.cleanupRetention();
-    try {
-      await delay(100, { signal });
-    } catch (error) {
-      if (!signal.aborted) throw error;
-    }
-  }
 }
 
 async function closeStore(store: SagaStorePort, kv?: KvStore): Promise<void> {

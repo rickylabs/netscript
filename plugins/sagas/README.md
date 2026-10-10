@@ -167,15 +167,23 @@ Terminal `completed`, `failed`, `cancelled`, and `compensated` instances expire 
 `completedDays`, measured from the terminal timestamp. Canonical state, forward and reverse
 correlations, new terminal transitions, and `saga_instances` query documents use KV `expireIn`. The
 saga service applies the same deadline to earlier transitions and applied keys in atomic pages of at
-most 100 entries. A persistent `sagas/retention` cursor resumes that work after restart and is
-deleted once all history has received its TTL. Low-level `KvSagaStore` callers must drive
-`cleanupRetention()`; the shipped durable runtime drives it in the background and drains it on stop.
-A backlog can delay migration of historical keys, so backend expiry alone is guaranteed only after
-their terminal deadline has been assigned. No API read or owner app session drives cleanup.
+most 98 entries (100 checks and 99 mutations including state and cursor). A persistent
+`sagas/retention` cursor resumes that work after restart and is deleted once all history has
+received its TTL. Low-level `KvSagaStore` callers must drive `cleanupRetention()`; it returns
+whether work remains. The shipped durable runtime drains backlog without a polling delay, backs off
+from 100 ms to 30 seconds while idle, and logs/retries transient sweep failures with exponential
+backoff. Retention failures do not prevent runtime startup. A backlog can delay migration of
+historical keys, so backend expiry alone is guaranteed only after their terminal deadline has been
+assigned. No API read or owner app session drives cleanup.
 
-Transport reservations already use their separate deduplication TTL. `archiveToDb: false` keeps
-runtime query projections in KV even when a Prisma client is available; the runner does not write
-the optional Prisma projection for those definitions.
+Transport reservations already use their separate deduplication TTL. With the KV backend,
+`archiveToDb: false` skips the optional Prisma archive even when a Prisma client is available. With
+`--saga-store-backend prisma`, the Prisma query model remains required runtime state so
+`listInstances`, `getInstance`, and stream hydration stay populated independently of archival.
+
+Migration: `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and no longer expires open replay
+markers. Configure `completedRetentionDays` to match the canonical terminal window instead. Markers
+survive open instances and receive their deadline only after terminal state.
 
 Delayed saga messages remain owned by the queue adapter. The queue scheduling port currently has no
 terminal-instance cancellation/expiry contract, so their retention window is not proven by this

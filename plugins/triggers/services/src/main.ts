@@ -182,6 +182,7 @@ export async function createTriggersServiceContext(
     await createRuntimeTriggerProcessor({
       kv,
       kvRetentionDays,
+      eventStore,
       eventSubscription,
       enabledState,
       definitions,

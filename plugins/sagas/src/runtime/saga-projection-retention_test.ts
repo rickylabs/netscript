@@ -70,3 +70,41 @@ Deno.test('saga query projection survives while open, expires after terminal win
   assertEquals(await kv.get(['saga_instances', 'saga', 'instance']), null);
   assertEquals(archived, 0);
 });
+
+Deno.test('saga KV projection uses its injected clock for the terminal deadline', async () => {
+  await using kv = new MemoryKvAdapter();
+  let now = new Date('2030-01-01T00:00:00Z');
+  const projection = new KvSagaInstanceProjection(kv, () => 1, () => now);
+  const input: SagaInstanceProjection = {
+    sagaId: 'clock',
+    instanceId: 'one',
+    correlationKey: 'one',
+    envelope: {
+      state: {},
+      metadata: {
+        instanceId: 'one' as SagaInstanceId,
+        version: 1,
+        status: 'completed',
+        durability: 't1',
+        createdAt: now,
+        updatedAt: now,
+        completedAt: now,
+      },
+    },
+    transition: {
+      version: 1,
+      transition: {
+        from: {},
+        to: {},
+        status: 'completed',
+        message: { type: 'Done', payload: {} },
+        occurredAt: now,
+      },
+    },
+  };
+  await projection.upsert(input);
+  assertEquals((await kv.get(['saga_instances', 'clock', 'one']))?.value !== undefined, true);
+  now = new Date(now.getTime() + 86_400_001);
+  await projection.upsert(input);
+  assertEquals(await kv.get(['saga_instances', 'clock', 'one']), null);
+});

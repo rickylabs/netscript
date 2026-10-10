@@ -33,10 +33,12 @@ export class SagaKvRetention {
   }
 
   /** Process at most one page; its durable cursor survives process shutdown and restart. */
-  async cleanup(limit: number): Promise<void> {
+  async cleanup(limit: number): Promise<boolean> {
     if (!Number.isSafeInteger(limit) || limit <= 0 || limit > 100) {
       throw new RangeError('Saga retention page size must be between 1 and 100.');
     }
+    // Two checks belong to the cursor and canonical state; one mutation advances the cursor.
+    const pageSize = Math.min(limit, 98);
     const iterator = this.#kv.list<RetentionCursor>({
       prefix: [...this.#prefix, 'retention'],
       limit: 1,
@@ -48,18 +50,21 @@ export class SagaKvRetention {
       const state = await this.#kv.get<SagaStateEnvelope>(stateKey);
       if (state && !isTerminalSaga(state.value)) {
         // A later open state invalidates the terminal sweep; never delete its replay data.
-        await this.#atomic([{ key: pending.key, versionstamp: pending.versionstamp }], [
+        await this.#atomic([
+          { key: pending.key, versionstamp: pending.versionstamp },
+          { key: stateKey, versionstamp: state.versionstamp },
+        ], [
           { type: 'delete', key: pending.key },
         ]);
-        this.#start = pending.key;
-        return;
+        this.#start = [...pending.key, ''];
+        return true;
       }
       const cursor = pending.value;
       const entries = [];
       for await (
         const entry of this.#kv.list({
           prefix: [...this.#prefix, cursor.family, instanceId],
-          limit,
+          limit: pageSize,
           start: cursor.start,
         })
       ) entries.push(entry);
@@ -69,7 +74,7 @@ export class SagaKvRetention {
           ? { type: 'delete', key: entry.key }
           : { type: 'set', key: entry.key, value: entry.value, expireIn: remaining }
       );
-      const finishedFamily = entries.length < limit;
+      const finishedFamily = entries.length < pageSize;
       const finished = finishedFamily && cursor.family === 'applied';
       mutations.push(
         finished ? { type: 'delete', key: pending.key } : {
@@ -78,7 +83,8 @@ export class SagaKvRetention {
           value: {
             expiresAt: cursor.expiresAt,
             family: finishedFamily ? 'applied' : cursor.family,
-            start: finishedFamily ? undefined : entries.at(-1)?.key,
+            // These key families have no child keys: extending the key skips it on every adapter.
+            start: finishedFamily ? undefined : [...entries.at(-1)!.key, ''],
           } satisfies RetentionCursor,
         },
       );
@@ -87,10 +93,12 @@ export class SagaKvRetention {
         { key: stateKey, versionstamp: state?.versionstamp ?? null },
         ...entries.map(({ key, versionstamp }) => ({ key, versionstamp })),
       ], mutations);
-      if (result.ok) this.#start = pending.key;
-      return;
+      if (result.ok) this.#start = [...pending.key, ''];
+      return true;
     }
+    const wrapped = this.#start !== undefined;
     this.#start = undefined;
+    return wrapped;
   }
 
   #atomic(checks: Parameters<NonNullable<KvStore['atomic']>>[0], mutations: AtomicMutation[]) {

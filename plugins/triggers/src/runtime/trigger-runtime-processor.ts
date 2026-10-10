@@ -15,6 +15,7 @@ import type {
   TriggerDeferSchedulerPort,
   TriggerDlqPort,
   TriggerEnabledStatePort,
+  TriggerEventStorePort,
   TriggerEventSubscriptionPort,
   TriggerIdempotencyPort,
   TriggerProcessorPort,
@@ -25,6 +26,7 @@ import { createTriggerProcessor } from '@netscript/plugin-triggers-core/runtime'
 import {
   KvTriggerDeferScheduler,
   KvTriggerDlqStore,
+  KvTriggerEventStore,
   KvTriggerIdempotencyStore,
   openTriggerRuntimeKv,
 } from '@netscript/plugin-triggers-core/stores';
@@ -59,6 +61,8 @@ export type RuntimeTriggerProcessorOptions = Readonly<{
   dlq?: TriggerDlqPort;
   jobQueue?: ReturnType<typeof createQueue<JobMessage>>;
   eventSubscription?: TriggerEventSubscriptionPort;
+  /** Shared ingress event store, also used to settle deferred replay history. */
+  eventStore?: TriggerEventStorePort;
   enabledState?: TriggerEnabledStatePort;
   deferScheduler?: TriggerDeferSchedulerPort;
   definitions?: readonly ProcessableTriggerDefinition[];
@@ -98,6 +102,11 @@ export async function createRuntimeTriggerProcessor(
     deferScheduler,
     options.definitions ?? [],
     options.clock,
+    options.eventStore ?? (kv === undefined ? undefined : new KvTriggerEventStore({
+      kv,
+      kvRetentionDays,
+      now: options.clock === undefined ? undefined : () => options.clock!.now(),
+    })),
   );
 }
 
@@ -138,6 +147,7 @@ class DeferredTriggerProcessor implements TriggerProcessorPort {
   readonly #scheduler: TriggerDeferSchedulerPort;
   readonly #definitions = new Map<string, ProcessableTriggerDefinition>();
   readonly #clock: TriggerClockPort | undefined;
+  readonly #eventStore?: TriggerEventStorePort;
   readonly #controller = new AbortController();
   readonly #run: Promise<void>;
   #runError: unknown;
@@ -147,10 +157,12 @@ class DeferredTriggerProcessor implements TriggerProcessorPort {
     scheduler: TriggerDeferSchedulerPort,
     definitions: readonly ProcessableTriggerDefinition[],
     clock?: TriggerClockPort,
+    eventStore?: TriggerEventStorePort,
   ) {
     this.#processor = processor;
     this.#scheduler = scheduler;
     this.#clock = clock;
+    this.#eventStore = eventStore;
     for (const definition of definitions) this.#definitions.set(definition.id, definition);
     this.#run = scheduler.run((record) => this.#replay(record), {
       signal: this.#controller.signal,
@@ -183,17 +195,22 @@ class DeferredTriggerProcessor implements TriggerProcessorPort {
     }
     const now = (this.#clock?.now() ?? new Date()).toISOString();
     const replayId = `${record.event.id}:defer:${record.id}` as TriggerEventId;
-    await this.process(
-      {
-        ...record.event,
-        id: replayId,
-        status: 'pending',
-        attempt: record.event.attempt + 1,
-        detectedAt: now,
-        updatedAt: now,
-        idempotencyKey: replayId,
-      },
-      definition,
+    const replayEvent: TriggerEvent = {
+      ...record.event,
+      id: replayId,
+      status: 'pending',
+      attempt: record.event.attempt + 1,
+      detectedAt: now,
+      updatedAt: now,
+      idempotencyKey: replayId,
+    };
+    await this.#eventStore?.save(replayEvent);
+    const result = await this.process(replayEvent, definition);
+    await this.#eventStore?.updateStatus(replayId, result.status);
+    // The original deferral has fired; any further deferral belongs to the new replay event.
+    await this.#eventStore?.updateStatus(
+      record.event.id,
+      result.status === 'failed' || result.status === 'dlq' ? result.status : 'completed',
     );
   }
 }

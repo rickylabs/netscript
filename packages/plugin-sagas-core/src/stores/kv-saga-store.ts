@@ -90,7 +90,10 @@ export class KvSagaStore implements SagaStorePort {
       'correlation-instance',
       envelope.metadata.instanceId,
     ];
-    const correlation = await this.#kv.get<SagaCorrelationIndexEntry>(reverseKey);
+    const correlation = options.correlation === undefined
+      ? await this.#kv.get<SagaCorrelationIndexEntry>(reverseKey)
+      : undefined;
+    const correlationValue = options.correlation ?? correlation?.value;
     const mutations: AtomicMutation[] = expireIn === undefined
       ? [{ type: 'set', key, value: envelope }, {
         type: 'delete',
@@ -100,13 +103,13 @@ export class KvSagaStore implements SagaStorePort {
         expireIn <= 0 ? { type: 'delete', key } : { type: 'set', key, value: envelope, expireIn },
         this.#retention.mutation(envelope.metadata.instanceId, this.#now().getTime() + expireIn),
       ];
-    if (correlation) {
+    if (correlationValue) {
       const correlationKey = this.#correlationKey(
-        correlation.value.sagaId,
-        correlation.value.correlationKey,
+        correlationValue.sagaId,
+        correlationValue.correlationKey,
       );
       for (
-        const [ownedKey, value] of [[reverseKey, correlation.value], [
+        const [ownedKey, value] of [[reverseKey, correlationValue], [
           correlationKey,
           envelope.metadata.instanceId,
         ]] as const
@@ -119,10 +122,15 @@ export class KvSagaStore implements SagaStorePort {
       }
     }
     const result = await requireAtomic(this.#kv)(
-      [{ key, versionstamp: current?.versionstamp ?? null }, {
-        key: reverseKey,
-        versionstamp: correlation?.versionstamp ?? null,
-      }],
+      [
+        { key, versionstamp: current?.versionstamp ?? null },
+        ...(options.correlation === undefined
+          ? [{
+            key: reverseKey,
+            versionstamp: correlation?.versionstamp ?? null,
+          }]
+          : []),
+      ],
       mutations,
     );
 
@@ -135,8 +143,9 @@ export class KvSagaStore implements SagaStorePort {
   async appendTransition<TState extends SagaState>(
     instanceId: SagaInstanceId,
     record: SagaTransitionRecord<TState>,
+    knownEnvelope?: SagaStateEnvelope<TState>,
   ): Promise<void> {
-    const envelope = await this.load(instanceId);
+    const envelope = knownEnvelope ?? await this.load(instanceId);
     const expireIn = envelope ? this.#remaining(envelope) : undefined;
     const key = this.#transitionKey(instanceId, record.version);
     if (expireIn !== undefined && expireIn <= 0) await this.#kv.delete(key);
@@ -153,8 +162,11 @@ export class KvSagaStore implements SagaStorePort {
   }
 
   /** Save or update the correlation index for an instance. */
-  async saveCorrelation(entry: SagaCorrelationIndexEntry): Promise<void> {
-    const envelope = await this.load(entry.instanceId);
+  async saveCorrelation(
+    entry: SagaCorrelationIndexEntry,
+    knownEnvelope?: SagaStateEnvelope,
+  ): Promise<void> {
+    const envelope = knownEnvelope ?? await this.load(entry.instanceId);
     const expireIn = envelope ? this.#remaining(envelope) : undefined;
     const key = this.#correlationKey(entry.sagaId, entry.correlationKey);
     const reverseKey: KvKey = [...this.#prefix, 'correlation-instance', entry.instanceId];
@@ -230,6 +242,7 @@ export class KvSagaStore implements SagaStorePort {
 
   /**
    * Apply terminal deadlines to one bounded page of history and applied keys.
+   * Returns whether a page was found or the sweep must wrap to its first cursor.
    * Production runtime composition calls this independently of API reads.
    *
    * @example
@@ -241,7 +254,7 @@ export class KvSagaStore implements SagaStorePort {
    * await store.cleanupRetention();
    * ```
    */
-  cleanupRetention(limit = 100): Promise<void> {
+  cleanupRetention(limit = 100): Promise<boolean> {
     return this.#retention.cleanup(limit);
   }
 

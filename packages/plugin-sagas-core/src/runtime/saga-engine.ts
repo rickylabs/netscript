@@ -584,9 +584,9 @@ export class SagaEngine implements SagaBusPort {
         ...(appliedKeyHash === undefined ? {} : { appliedKeyHash }),
       })).committed;
     }
-    await this.#store.save(envelope, { expectedVersion: input.expectedVersion });
-    await this.#store.saveCorrelation(correlation);
-    await this.#store.appendTransition(input.instanceId, record);
+    await this.#store.save(envelope, { expectedVersion: input.expectedVersion, correlation });
+    await this.#store.saveCorrelation(correlation, envelope);
+    await this.#store.appendTransition(input.instanceId, record, envelope);
     return true;
   }
 

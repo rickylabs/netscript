@@ -267,7 +267,10 @@ for a custom composition. Each record/index pair receives the same `expireIn` in
 Event TTL starts at terminal `updatedAt`; DLQ TTL starts at `failedAt`, so rewriting old failures
 does not extend their window. Manual fire now persists its processing outcome before returning.
 
-Pending, in-flight, and deferred events keep their durable state until processing settles. Active
+Pending, in-flight, and deferred events keep their durable state until processing settles. When a
+deferred action fires, the original event becomes terminal and its event/index pair receives TTL.
+Each replay is persisted separately; a further deferral keeps that replay open until its own action
+fires. The service shares its ingress event store with the background replay processor. Active
 idempotency claims and completed deduplication markers retain their existing claim/deduplication
 TTLs. Deferred replay records are removed on successful replay or explicit cancellation; enabled
 state remains configuration. Existing terminal records written without TTL need a migration; this

@@ -1,3 +1,4 @@
+import { SAGA_STORE_BACKEND_ENV } from '@netscript/plugin-sagas-core/stores';
 import { loadSagaRetention } from './load-saga-retention.ts';
 import type { SagaDefinition } from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
@@ -180,7 +181,11 @@ async function resolveProjection(
   const readModelProjection = isProjectionClient(client)
     ? new CompositeSagaInstanceProjection([
       kvProjection,
-      new PrismaSagaInstanceProjection(client, retention.archiveToDb),
+      new PrismaSagaInstanceProjection(
+        client,
+        retention.archiveToDb,
+        readEnv(SAGA_STORE_BACKEND_ENV)?.trim().toLowerCase() === 'prisma' ? 'prisma' : 'kv',
+      ),
     ])
     : kvProjection;
   return withStreamProjection(readModelProjection);
