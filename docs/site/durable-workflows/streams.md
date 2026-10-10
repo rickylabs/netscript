@@ -212,6 +212,20 @@ implemented-by interface — the same four members, with `entityType` widened to
   ]
 }) }}
 
+## Bound stream retention
+
+Set `retention: { kind: 'ttl', ttlSeconds: 604800 }` or
+`retention: { kind: 'expires-at', expiresAt: '2030-10-08T00:00:00Z' }` on a producer before creating
+its stream. The server expires the whole stream at the creation-time deadline; appends do not renew
+it and reopening an existing stream does not change its policy. Omit retention for the current
+unbounded behavior. For existing day segments, `headDurableStream` reads metadata and
+`deleteDurableStream` deletes the whole stream through a versioned administrative port.
+
+Run deletion from background workers or triggers with a service identity, independently of any app
+session. Entity `producer.delete(...)` appends a tombstone and does not shrink the log. See the
+[stream retention how-to](/durable-workflows/how-to/bound-stream-retention/) for server TTL,
+absolute expiry, scheduled segment deletion, typed failure handling, and document day baselines.
+
 ## Service-side producers — `createServiceStreamProducer`
 
 When the writer is a backend **Service** — for example an ingestion worker that

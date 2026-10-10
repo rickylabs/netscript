@@ -24,7 +24,8 @@ instances, sessions — into durable topics.
 
 | Export specifier | Module | Exports | Purpose |
 | --- | --- | --- | --- |
-| `@netscript/plugin-streams-core` | `./mod.ts` | 51 | Schema definition, the durable producer, endpoint resolution, diagnostics, and the v1 producer port vocabulary (documented below). |
+| `@netscript/plugin-streams-core` | `./mod.ts` | 60 | Schema definition, the durable producer, endpoint resolution, diagnostics, and the v1 producer port vocabulary (documented below). |
+| `@netscript/plugin-streams-core/admin` | `./admin.ts` | 10 | Whole-stream administrative adapter, helpers, and versioned contracts for background services. |
 | `@netscript/plugin-streams-core/sse` | `./src/sse/mod.ts` | 33 | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. |
 | `@netscript/plugin-streams-core/telemetry` | `./src/telemetry/mod.ts` | 33 | Telemetry registration, span names, attribute keys, and the meter/counter/gauge ports used by reconnect metrics. |
 | `@netscript/plugin-streams-core/testing` | `./src/testing/mod.ts` | 4 | An in-memory producer and a small schema fixture for tests that must not open network sockets. |
@@ -130,6 +131,53 @@ A write returns a **receipt**, not a boolean: acceptance is immediate, and the t
 delivered, rejected, cancelled, or unknown — settles later. `unknown` is a distinct outcome rather
 than a failure, because a producer that lost its connection mid-append cannot honestly report either
 success or rejection.
+
+## Bounded streams: retention and trim
+
+`StreamRetentionPolicyV1` is a create-time policy accepted by `DurableStreamProducerOptions` and
+`StreamProducerConnectInputV1`:
+
+```ts
+import type { StreamRetentionPolicyV1 } from '@netscript/plugin-streams-core';
+
+const ttl: StreamRetentionPolicyV1 = { kind: 'ttl', ttlSeconds: 604800 };
+const expiry: StreamRetentionPolicyV1 = { kind: 'expires-at', expiresAt: '2030-10-08T00:00:00Z' };
+```
+
+TTL must be a positive safe integer; expiry must be valid RFC3339 with a timezone. Construction
+validates and copies the policy before connecting. The adapter uses the upstream create options
+`ttlSeconds` / `expiresAt`, sending `Stream-TTL` / `Stream-Expires-At` only on PUT. TTL begins at
+creation, expires the whole stream, and does not renew on append or reopen. Omitted retention keeps
+current behavior. Retention participates in singleton compatibility; rotate segment paths to change
+an existing server policy.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `StreamRetentionPolicyV1` | type alias | Mutually exclusive create-time TTL or absolute expiry. |
+| `StreamAdminPort` | interface | Versioned whole-stream `head` and `delete` requests. |
+| `StreamAdminInputV1` | interface | Resolved URL, service headers, finite timeout, and optional cancellation. |
+| `StreamHeadV1` | interface | Content type, opaque offset, ETag, cache control, and durable EOF state. |
+| `StreamDeletionV1` | interface | Typed successful deletion result (`deleted: boolean`). |
+| `StreamAdminOptionsV1` | interface | Helper cancellation, timeout, administrative port, and instrumentation overrides. |
+| `headDurableStream` | function | Return metadata or `null` for an absent stream. |
+| `deleteDurableStream` | function | Return `true` when deleted or `false` when already absent. |
+| `StreamAdminError` | class | Typed failure thrown by administrative helpers. |
+| `DurableStreamAdmin` | class | Upstream `DurableStream.head` / `delete` adapter, exported from `./admin`. |
+
+The port returns the existing `StreamProducerTransportResultV1<T>`. Authorization failures are
+`unauthorized`, request deadlines are `timeout`, caller cancellation is `aborted`, transient
+transport/server failures are `retryable`, and other client failures are `non-retryable`. Helpers
+throw `StreamAdminError` retaining that failure; absence is a successful `null`/`false` result.
+Requests default to 5,000 ms and perform one attempt, leaving retry policy to background workers.
+Both helpers emit client spans through `StreamsInstrumentation` (`stream.head`, `stream.delete`).
+
+Use these helpers in background workers or triggers under a service identity resolved by
+`buildStreamUrl` and `getStreamsAuth`. The app is an interface and need not remain open.
+`DurableStreamProducer.delete(collection, key)` appends a tombstone; it does not reclaim stream
+storage. Stop a segment's producer before deleting it to prevent a reconnect from recreating it.
+Offset trim and server-side listing remain future protocol capabilities. The
+[stream retention how-to](/durable-workflows/how-to/bound-stream-retention/) pairs server retention
+with a scheduled trigger and background deletion worker, including day-baseline guidance.
 
 ## The SSE contract (`@netscript/plugin-streams-core/sse`)
 

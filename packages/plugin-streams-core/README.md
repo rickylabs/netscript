@@ -176,7 +176,28 @@ is a new producer operation with the same message id. Downstream processing must
 No producer, queue or resource starts on sink construction.
 
 ```ts
-import { createStreamCommandOutboxSink, type StreamProducerPort } from '@netscript/plugin-streams-core/integration/commands';
+import {
+  createStreamCommandOutboxSink,
+  type StreamProducerPort,
+} from '@netscript/plugin-streams-core/integration/commands';
 declare const producer: StreamProducerPort;
 const sink = createStreamCommandOutboxSink({ id: 'streams', producer });
 ```
+
+## Stream retention and administration
+
+Set `retention: { kind: 'ttl', ttlSeconds: 604800 }` or an `expires-at` RFC3339 timestamp on
+producer options. Retention applies at creation, expires the whole stream, and is validated before
+IO; reconnecting does not renew it. Without retention, existing behavior is preserved.
+
+`headDurableStream(path)` returns metadata or null; `deleteDurableStream(path)` returns true when
+deleted and false when already absent. Both resolve discovery/auth through the existing streams
+service configuration and throw `StreamAdminError` with typed authorization, timeout, cancellation,
+or transport failures. Requests default to a 5,000 ms deadline and emit administrative spans.
+Use these helpers in a background worker or scheduled trigger under a service identity.
+
+The `./admin` subpath exports `DurableStreamAdmin` and the versioned administrative port contracts
+for injection. Stop segment producers before deleting their streams. Entity-level producer delete
+only appends a tombstone. Offset trim and server-side listing are not implemented.
+
+See the [retention how-to](https://rickylabs.github.io/netscript/durable-workflows/how-to/bound-stream-retention/).
