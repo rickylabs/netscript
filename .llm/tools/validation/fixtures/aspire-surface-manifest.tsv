@@ -695,7 +695,6 @@ packages/mcp/src/domain/telemetry-endpoint.ts	mcp:client	S3/S11/S13	Aspire CLI/d
 packages/mcp/src/domain/tool-contracts.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-ps-dashboard-reader.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
-packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/appsettings-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-command.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
@@ -753,6 +752,7 @@ packages/queue/ports/options.ts	package:other	S4	mention only (service discovery
 packages/queue/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/mod.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/sdk/src/client/http-client-link.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/client/mod.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/client/service-client.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/discovery/browser-env.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
@@ -762,6 +762,7 @@ packages/sdk/src/discovery/service-url.ts	package:other	S4	mention only (service
 packages/sdk/src/ports/service-client.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/presets/define-services.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/tests/discovery/env-ordering_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/sdk/tests/integration/service-url-resolver_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/service/src/diagnostics/database-connectivity.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/telemetry/query.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
 packages/telemetry/README.md	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff

@@ -304,6 +304,32 @@ export type ServiceClient<
   & ServiceClientContract<TContract>;
 
 /**
+ * Resolve the base URL of a service for one protocol.
+ *
+ * The service client calls the resolver lazily, once per request, with the client's
+ * `serviceName` and `protocol`, and keeps only the returned URL's origin. Throw to report an
+ * unresolvable service; the call rejects with that error. The default resolver is
+ * `getServiceUrl` from `@netscript/sdk/discovery`, which reads Vite `import.meta.env` and then
+ * `Deno.env`. Supply your own on a runtime that has neither, such as React Native.
+ *
+ * @example Supply the origin from app configuration
+ * ```ts
+ * import type { ServiceUrlResolver } from '@netscript/sdk/client';
+ *
+ * const origins: Readonly<Record<string, string>> = { orders: 'https://api.example.com' };
+ * const resolveServiceUrl: ServiceUrlResolver = (serviceName) => {
+ *   const origin = origins[serviceName];
+ *   if (origin === undefined) throw new Error(`No origin configured for "${serviceName}"`);
+ *   return origin;
+ * };
+ * ```
+ */
+export type ServiceUrlResolver = (
+  serviceName: string,
+  protocol: 'http' | 'https',
+) => string | URL;
+
+/**
  * Options for creating a discovered service client.
  *
  * @typeParam TContract - Contract used by the service.
@@ -342,6 +368,13 @@ export interface CreateServiceClientOptions<
   transportPolicy?: SdkClientTransportPolicy;
   /** Whether to propagate trace context headers automatically. */
   propagateTraceContext?: boolean;
+  /**
+   * Resolve the service URL for each call instead of using Aspire discovery.
+   *
+   * Defaults to `getServiceUrl` from `@netscript/sdk/discovery`. Compose
+   * `resolveServiceUrlFromSources` to read an explicit environment bag.
+   */
+  resolveServiceUrl?: ServiceUrlResolver;
   /** Explicit literal tuple of typed SDK client contributions. */
   contributions?:
     & TContributions
