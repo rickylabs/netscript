@@ -1159,6 +1159,48 @@ Deno.test('#2007 OpenCode host refreshes a stale opencode.jsonc server so the ef
   }
 });
 
+Deno.test('#2007 OpenCode host honours lsp and formatter settings inherited from opencode.json', async () => {
+  const fs = new DenoAgentInitFileSystem();
+  const optOutRoot = await Deno.makeTempDir();
+  const customRoot = await Deno.makeTempDir();
+  const custom = {
+    lsp: { deno: { command: ['deno', 'lsp', '--custom'] } },
+    formatter: { deno: { command: ['deno', 'fmt', '--custom', '$FILE'] } },
+  };
+  try {
+    for (
+      const [root, json] of [
+        [optOutRoot, '{"lsp":false,"formatter":false}\n'],
+        [customRoot, `${JSON.stringify(custom)}\n`],
+      ] as const
+    ) {
+      await fs.writeText(join(root, 'opencode.json'), json);
+      await fs.writeText(join(root, 'opencode.jsonc'), '{ "model": "local/model" }\n');
+      await initAgent({ projectRoot: root }, {
+        fs,
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      });
+      const jsonc = parseJsonc(await Deno.readTextFile(join(root, 'opencode.jsonc')));
+      // Nothing in opencode.jsonc may override the inherited choice.
+      assertEquals(jsonAt(jsonc, 'lsp'), undefined);
+      assertEquals(jsonAt(jsonc, 'formatter'), undefined);
+      assertEquals(jsonAt(jsonc, 'model'), 'local/model');
+      assertEquals(jsonAt(jsonc, 'mcp', 'netscript', 'command', '0'), 'deno');
+      assertEquals(await Deno.readTextFile(join(root, 'opencode.json')), json);
+      assertEquals(
+        (await initAgent({ projectRoot: root }, {
+          fs,
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+        })).changedFiles,
+        [],
+      );
+    }
+  } finally {
+    await Deno.remove(optOutRoot, { recursive: true });
+    await Deno.remove(customRoot, { recursive: true });
+  }
+});
+
 Deno.test('#2007 a malformed OpenCode config aborts before any project write', async () => {
   const root = await Deno.makeTempDir();
   try {

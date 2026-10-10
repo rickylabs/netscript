@@ -57,6 +57,8 @@ export interface OpenCodeConfigWrite {
  * The effective file (`opencode.jsonc` when it exists, otherwise `opencode.json`) receives the full
  * NetScript wiring. Because OpenCode merges both files, the other file only has an existing
  * `netscript` or `aspire` server declaration refreshed, so a stale declaration cannot win the merge.
+ * `lsp` and `formatter` defaults are decided on the merged (effective) value, so an opt-out or a
+ * `deno` entry inherited from `opencode.json` is never overridden from `opencode.jsonc`.
  * Both files are parsed as JSONC and edited in place, keeping comments and unrelated settings; a
  * malformed file aborts the plan before anything is written.
  */
@@ -66,9 +68,10 @@ export function planOpenCodeConfig(
   netscriptCommand: readonly string[],
 ): readonly OpenCodeConfigWrite[] {
   const [primary, secondary] = jsonc.text === undefined ? [json, jsonc] : [jsonc, json];
+  const inherited = secondary.text === undefined ? {} : parseConfig(secondary.text, secondary.path);
   const writes = [{
     path: primary.path,
-    content: renderOpenCodeConfig(primary.text, netscriptCommand, primary.path),
+    content: renderOpenCodeConfig(primary.text, netscriptCommand, primary.path, inherited),
   }];
   if (secondary.text !== undefined) {
     writes.push({
@@ -83,33 +86,39 @@ export function planOpenCodeConfig(
  * Merge NetScript's OpenCode wiring into existing configuration text.
  *
  * The `netscript` and `aspire` MCP entries are always rewritten so the pinned CLI stays current.
- * `lsp.deno` and `formatter.deno` are added when absent; an existing `deno` entry and an explicit
- * `false` opt-out are preserved. Comments and every unrelated key are kept.
+ * `lsp.deno` and `formatter.deno` are added when absent from the effective configuration (this
+ * file merged over `inherited`, the lower-precedence project file OpenCode also loads); an existing
+ * `deno` entry and an explicit `false` opt-out in either file are preserved. Comments and every
+ * unrelated key are kept.
  */
 export function renderOpenCodeConfig(
   currentText: string | undefined,
   netscriptCommand: readonly string[],
   label = OPENCODE_CONFIG_FILE,
+  inherited: Readonly<Record<string, unknown>> = {},
 ): string {
   if (currentText === undefined || currentText.trim() === '') {
-    return `${
-      JSON.stringify(
-        {
-          $schema: OPENCODE_SCHEMA_URL,
-          mcp: mcpServers(netscriptCommand),
-          lsp: { deno: DENO_LSP_ENTRY },
-          formatter: { deno: DENO_FORMATTER_ENTRY },
-        },
-        null,
-        2,
-      )
-    }\n`;
+    const config: Record<string, unknown> = {
+      $schema: OPENCODE_SCHEMA_URL,
+      mcp: mcpServers(netscriptCommand),
+    };
+    if (needsDenoEntry(undefined, inherited.lsp)) config.lsp = { deno: DENO_LSP_ENTRY };
+    if (needsDenoEntry(undefined, inherited.formatter)) {
+      config.formatter = { deno: DENO_FORMATTER_ENTRY };
+    }
+    return `${JSON.stringify(config, null, 2)}\n`;
   }
   const current = parseConfig(currentText, label);
   let text = setServers(currentText, current, netscriptCommand, false);
   if (current.$schema === undefined) text = edit(text, ['$schema'], OPENCODE_SCHEMA_URL);
-  text = withDenoEntry(text, 'lsp', current.lsp, DENO_LSP_ENTRY);
-  return withDenoEntry(text, 'formatter', current.formatter, DENO_FORMATTER_ENTRY);
+  text = withDenoEntry(text, 'lsp', current.lsp, inherited.lsp, DENO_LSP_ENTRY);
+  return withDenoEntry(
+    text,
+    'formatter',
+    current.formatter,
+    inherited.formatter,
+    DENO_FORMATTER_ENTRY,
+  );
 }
 
 /** Refresh only the `netscript` and `aspire` servers a file already declares. */
@@ -152,13 +161,24 @@ function withDenoEntry(
   text: string,
   key: 'lsp' | 'formatter',
   current: unknown,
+  inherited: unknown,
   entry: object,
 ): string {
-  if (current === false) return text;
-  if (isRecord(current)) {
-    return current.deno === undefined ? edit(text, [key, 'deno'], entry) : text;
-  }
-  return edit(text, [key], { deno: entry });
+  if (!needsDenoEntry(current, inherited)) return text;
+  return isRecord(current) ? edit(text, [key, 'deno'], entry) : edit(text, [key], { deno: entry });
+}
+
+/** Whether the effective `lsp`/`formatter` value lacks a `deno` entry and is not opted out. */
+function needsDenoEntry(current: unknown, inherited: unknown): boolean {
+  const effective = mergedSetting(inherited, current);
+  if (effective === false) return false;
+  return !(isRecord(effective) && effective.deno !== undefined);
+}
+
+/** OpenCode's project merge: objects merge key by key, any other higher-precedence value wins. */
+function mergedSetting(lower: unknown, higher: unknown): unknown {
+  if (higher === undefined) return lower;
+  return isRecord(lower) && isRecord(higher) ? { ...lower, ...higher } : higher;
 }
 
 function edit(text: string, path: JSONPath, value: unknown): string {

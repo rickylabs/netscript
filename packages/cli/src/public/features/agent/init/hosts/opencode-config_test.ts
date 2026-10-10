@@ -180,3 +180,53 @@ Deno.test('OpenCode plan writes opencode.json when no JSONC file exists', () => 
   );
   assertEquals(writes.map((write) => write.path), ['opencode.json']);
 });
+
+/** OpenCode's project merge for one top-level key: objects merge, otherwise opencode.jsonc wins. */
+function effectiveSetting(writes: readonly { path: string; content: string }[], key: string) {
+  const read = (name: string) =>
+    at(parseJsonc(writes.find((write) => write.path === name)?.content ?? '{}'), key);
+  const lower = read('opencode.json');
+  const higher = read('opencode.jsonc');
+  if (higher === undefined) return lower;
+  const isObject = (value: unknown): value is Record<string, unknown> =>
+    value !== null && typeof value === 'object' && !Array.isArray(value);
+  return isObject(lower) && isObject(higher) ? { ...lower, ...higher } : higher;
+}
+
+function planBoth(json: string, jsonc: string) {
+  return planOpenCodeConfig(
+    { path: 'opencode.json', text: json },
+    { path: 'opencode.jsonc', text: jsonc },
+    NETSCRIPT_COMMAND,
+  );
+}
+
+Deno.test('OpenCode plan keeps lsp and formatter opt-outs inherited from opencode.json', () => {
+  const json = '{"lsp":false,"formatter":false}\n';
+  const writes = planBoth(json, '{ "model": "local/model" }\n');
+  assertEquals(effectiveSetting(writes, 'lsp'), false);
+  assertEquals(effectiveSetting(writes, 'formatter'), false);
+  assertEquals(at(parseJsonc(writes[0].content), 'mcp', 'netscript', 'command'), NETSCRIPT_COMMAND);
+  const rerun = planBoth(writes[1].content, writes[0].content);
+  assertEquals(rerun, writes);
+});
+
+Deno.test('OpenCode plan keeps custom Deno entries inherited from opencode.json', () => {
+  const custom = {
+    lsp: { deno: { command: ['deno', 'lsp', '--custom'], extensions: ['.ts'] } },
+    formatter: { deno: { command: ['deno', 'fmt', '--custom', '$FILE'], extensions: ['.ts'] } },
+  };
+  const writes = planBoth(`${JSON.stringify(custom)}\n`, '{ "model": "local/model" }\n');
+  assertEquals(effectiveSetting(writes, 'lsp'), custom.lsp);
+  assertEquals(effectiveSetting(writes, 'formatter'), custom.formatter);
+  assertEquals(planBoth(writes[1].content, writes[0].content), writes);
+});
+
+Deno.test('OpenCode plan adds Deno beside non-Deno servers inherited from opencode.json', () => {
+  const writes = planBoth('{"lsp":{"gopls":{"command":["gopls"]}}}\n', '{}\n');
+  assertEquals(effectiveSetting(writes, 'lsp'), {
+    gopls: { command: ['gopls'] },
+    deno: { command: ['deno', 'lsp'], extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs'] },
+  });
+  assertEquals(at(parseJsonc(writes[1].content), 'lsp', 'deno'), undefined);
+});

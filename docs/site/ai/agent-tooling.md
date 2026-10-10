@@ -94,7 +94,8 @@ own writer. Each MCP server entry carries an explicit `timeout` (180 s for `nets
 `aspire`) because OpenCode's 5-second default does not cover a cold-cache JSR resolve. OpenCode
 leaves language servers and formatters off when `lsp` and `formatter` are omitted, and ships no
 Deno formatter, so the file also declares `lsp.deno` and `formatter.deno`. An existing `deno` entry
-and an explicit `false` are kept. OpenCode discovers `.agents/skills/` itself, so no extra skill
+and an explicit `false` are kept, including one inherited from `opencode.json` when the wiring goes
+into `opencode.jsonc`. OpenCode discovers `.agents/skills/` itself, so no extra skill
 tree is written for it.
 
 Both project files are read as JSONC and edited in place, so comments, trailing commas, and
