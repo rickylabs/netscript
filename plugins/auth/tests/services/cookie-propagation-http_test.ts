@@ -94,7 +94,8 @@ for (const projection of ['rest', 'rpc'] as const) {
     // No sessionId in body, query, or Authorization; only the emitted cookie.
     const session = await call('session', undefined, credential);
     assertEquals(session.body.authenticated, true);
-    assertEquals(session.body.session.id, completed.body.sessionId);
+    assertEquals(session.body.session.id, credential.slice(credential.indexOf('=') + 1));
+    assertEquals(Object.hasOwn(completed.body, 'sessionId'), false);
     assertEquals(session.response.headers.getSetCookie(), []);
     const me = await call('me', undefined, credential);
     assertEquals(me.body.authenticated, true);
