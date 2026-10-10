@@ -1,11 +1,11 @@
-import type { EditorChoice } from '../../../../kernel/domain/scaffold/workspace-config.ts';
+import type { EditorChoice } from '../../../../../kernel/domain/scaffold/workspace-config.ts';
 import {
   AGENT_HOSTS,
   type AgentHost,
   type AgentInitResolution,
   type AgentResolution,
   type InitAgentInput,
-} from './init-agent-input.ts';
+} from '../init-agent-input.ts';
 
 /** Snapshot of the invoking process environment consumed by host resolution. */
 export type AgentEnvironment = Readonly<Record<string, string | undefined>>;

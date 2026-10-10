@@ -5,7 +5,7 @@ import {
   describeAgentInitResolution,
   resolveAgentInit,
 } from './agent-host-resolution.ts';
-import type { AgentHost, InitAgentInput } from './init-agent-input.ts';
+import type { AgentHost, InitAgentInput } from '../init-agent-input.ts';
 
 function resolve(
   input: Pick<InitAgentInput, 'host' | 'editor'> = {},

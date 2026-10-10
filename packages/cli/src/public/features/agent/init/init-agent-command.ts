@@ -7,7 +7,7 @@ import {
   type InitAgentInput,
   type InitAgentResult,
 } from "./init-agent-input.ts";
-import { describeAgentInitResolution } from "./agent-host-resolution.ts";
+import { describeAgentInitResolution } from "./hosts/agent-host-resolution.ts";
 import {
   EDITOR_CHOICES,
   type EditorChoice,

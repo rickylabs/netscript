@@ -21,8 +21,8 @@ import {
   type AgentEnvironment,
   type AgentProjectMarker,
   resolveAgentInit,
-} from './agent-host-resolution.ts';
-import { OPENCODE_CONFIG_FILE, renderOpenCodeConfig } from './opencode-config.ts';
+} from './hosts/agent-host-resolution.ts';
+import { OPENCODE_CONFIG_FILE, renderOpenCodeConfig } from './hosts/opencode-config.ts';
 
 const START_MARKER = '<!-- netscript-agent:start -->';
 const END_MARKER = '<!-- netscript-agent:end -->';
