@@ -1,6 +1,6 @@
 import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
 import { copy } from '@std/fs';
-import { dirname, join, relative, toFileUrl } from '@std/path';
+import { dirname, join } from '@std/path';
 
 import {
   findProjectRoot as findDeployProjectRoot,
@@ -69,12 +69,13 @@ import { FetchAuthSessionHttp } from '../plugins/auth/auth-session-client.ts';
 import type { AuthSessionHttpPort } from '../plugins/auth/auth-types.ts';
 import { generateAspire } from '../generate/aspire/generate-aspire.ts';
 import { AspireAppHostDoctorInspector } from '../../../kernel/adapters/aspire/apphost-doctor-inspector.ts';
+import { DockerCliTopologyInspector } from '../../../kernel/adapters/aspire/docker-topology-inspector.ts';
 import { fetchJsrExportMap } from '../../infra/jsr/fetch-jsr-export-map.ts';
 import { resolveUiAppRoot as resolveUiAppRootFromWorkspace } from '../../../kernel/application/ui/resolve-ui-app-root.ts';
 import type { UiAppRootResolver } from '../../presentation/support.ts';
 import type { GeneratedSourceFormatterPort } from '../../../kernel/ports/generated-source-formatter-port.ts';
-import { selectClientBinding } from '../../../kernel/application/resource-slice/client-selector.ts';
-import type { SelectedResourceClient } from '../../../kernel/application/resource-slice/resource-slice-contract.ts';
+import { selectResourceClient } from '../../../kernel/application/resource-slice/selection/client-selector.ts';
+import { resolveQueryProcedure } from '../../../kernel/application/resource-slice/selection/query-procedure.ts';
 import type { GenerateResourceCommandDependencies } from '../generate/resource/generate-resource-command.ts';
 import type {
   ResourceSliceStager,
@@ -244,26 +245,6 @@ export function createPublicCommandDependencies(
     fs,
     process,
   });
-  const resolveResourceClient = async (
-    appRoot: string,
-    selectedService: string | undefined,
-  ): Promise<SelectedResourceClient> => {
-    const binding = await selectClientBinding(appRoot, fs, selectedService);
-    const source = await fs.readFile(binding.path);
-    const serviceName = source.match(
-      /export const \w+Name\s*=\s*['"]([^'"]+)['"]/i,
-    )?.[1];
-    if (!serviceName) {
-      throw new Error(
-        `Selected query client does not declare a service name: ${binding.path}`,
-      );
-    }
-    return {
-      serviceName,
-      moduleSpecifier: `@app/${relative(appRoot, binding.path).replaceAll('\\', '/')}`,
-      queryFactoryName: binding.queries,
-    };
-  };
   const serviceAddDependencies = {
     fs,
     scaffolder,
@@ -389,6 +370,7 @@ export function createPublicCommandDependencies(
           process,
           loadJsrExportMap: fetchJsrExportMap,
           inspectAppHost: new AspireAppHostDoctorInspector(process),
+          inspectDockerTopology: new DockerCliTopologyInspector(process),
           inspectRuntimeRegistries: generatePluginRegistries,
         }),
     },
@@ -446,9 +428,9 @@ export function createPublicCommandDependencies(
         ),
         templates: loadResourceSliceTemplateAssetsSync(),
         resolveAppRoot: resolveUiAppRoot,
-        resolveClient: resolveResourceClient,
-        resolveProcedure: async ({ appRoot, client, procedure }) =>
-          await resolveResourceProcedure(appRoot, client, procedure, process),
+        resolveClient: (appRoot, client) => selectResourceClient(appRoot, fs, client),
+        resolveProcedure: (input) =>
+          resolveQueryProcedure(input, { process, executable: Deno.execPath() }),
         stage: createResourceSliceStager(),
       },
     },
@@ -520,39 +502,4 @@ function createResourceSliceStager(): ResourceSliceStager {
       await Deno.remove(stagingRoot, { recursive: true });
     }
   };
-}
-
-async function resolveResourceProcedure(
-  appRoot: string,
-  client: SelectedResourceClient,
-  procedure: string,
-  process: ProcessPort,
-) {
-  const path = procedure.split('.').filter(Boolean);
-  if (
-    path.length === 0 ||
-    path.some((segment) => !/^[A-Za-z_$][\w$]*$/.test(segment)) ||
-    path.join('.') !== procedure
-  ) {
-    throw new Error(`Invalid query procedure '${procedure}'.`);
-  }
-  const moduleUrl = toFileUrl(
-    join(appRoot, client.moduleSpecifier.replace(/^@app\//, '')),
-  ).href;
-  const script = `const module = await import(${JSON.stringify(moduleUrl)});
-let node = module[${JSON.stringify(client.queryFactoryName)}];
-for (const segment of ${JSON.stringify(path)}) node = Reflect.get(node, segment);
-if (typeof node !== 'function' || typeof node.queryOptions !== 'function' || typeof node.clientKey !== 'function') throw new Error('Selected procedure is not a query factory.');
-`;
-  const result = await process.exec(
-    Deno.execPath(),
-    ['eval', `--config=${join(appRoot, 'deno.json')}`, script],
-    { cwd: appRoot, timeoutMs: 30_000 },
-  );
-  if (result.code !== 0) {
-    throw new Error(
-      `Query procedure '${procedure}' does not exist on client '${client.serviceName}'.`,
-    );
-  }
-  return { path: path as [string, ...string[]], kind: 'query' as const };
 }

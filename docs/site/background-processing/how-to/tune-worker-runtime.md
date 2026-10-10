@@ -8,15 +8,14 @@ oldUrl: /how-to/tune-worker-runtime/
 
 # Tune the worker runtime
 
-Trade throughput against isolation by tuning four real knobs — worker **concurrency**, the
-**runner mode**, per-task **Deno permissions**, and **timeouts/retries** — without touching a
-single job handler.
+Tune queue **concurrency**, per-topic **deployment mode**, per-task **Deno permissions**,
+and **timeouts/retries** without changing a job handler.
 
-The same `process-payment` handler runs unchanged whether you give it one in-process slot or
-ten subprocess-isolated workers. Everything below is a deployment setting: it lives in
-`config/official-plugins/mod.ts` (`defineWorkers(...)`), in per-task runtime config, or in an
-environment variable read by the worker entrypoint. See
-[Background jobs](/capabilities/background-jobs/) for the handler-authoring side.
+Jobs currently execute in-process in the background worker service. Concurrency overlaps
+asynchronous I/O; it does not create Web Worker isolates or parallelize synchronous CPU work.
+These settings live in `config/official-plugins/mod.ts` (`defineWorkers(...)`), per-task
+runtime config, or an environment variable read by the worker entrypoint. See
+[Background jobs](/capabilities/background-jobs/) for handler authoring.
 
 ## Prerequisites
 
@@ -32,16 +31,16 @@ environment variable read by the worker entrypoint. See
 
 ## Knob 1 — Default concurrency
 
-`concurrency` on the workers config is the size of the Web Worker pool the runner spins up:
-each slot is its own V8 isolate, so raising it buys parallelism at roughly 20–40 MB per
-isolate. The schema default is `2`.
+`concurrency` on the workers config declares queue concurrency (schema default `2`).
+Handlers share the background worker's isolate. Increase concurrency for I/O-bound work,
+then measure throughput and memory under load; there is no per-slot isolate allocation.
 
 Show the type before the call site:
 
 {{ comp.apiTable({
   caption: "WorkersConfigData — top-level worker config (@netscript/plugin-workers-core/config)",
   rows: [
-    { name: "concurrency", type: "number", desc: "Default worker pool size (V8 isolates running jobs in parallel). Schema default 2." },
+    { name: "concurrency", type: "number", desc: "Default queue concurrency for in-process jobs. Schema default 2; no isolate pool is allocated." },
     { name: "queueProvider", type: "'auto' | 'deno-kv' | 'redis' | 'postgres' | 'amqp'", desc: "Queue backend. 'auto' resolves one for you. Default 'auto'." },
     { name: "queueName", type: "string", desc: "Queue the runner consumes from. Default 'jobs'." },
     { name: "jobsDir / tasksDir", type: "string", desc: "Directories scanned for default-exported job and task modules. Defaults ./workers/jobs and ./workers/tasks." },
@@ -59,7 +58,7 @@ export const workers = defineWorkers({
   tasksDir: './workers/tasks',
   queueProvider: 'auto',
   queueName: 'jobs',
-  concurrency: 4, // pool size: 4 isolates → ~80-160 MB. Raise for throughput, lower to bound memory.
+  concurrency: 4, // Queue concurrency: overlap up to 4 I/O-bound jobs; no CPU parallelism.
   enabled: true,
   groups: [],
 });
@@ -67,7 +66,7 @@ export const workers = defineWorkers({
 
 ## Knob 2 — Per-topic scaling (concurrency + mode)
 
-Different topics deserve different parallelism. A `WorkerGroup` binds a queue `topic` to its
+Different topics deserve different concurrency budgets. A `WorkerGroup` binds a queue `topic` to its
 own `scaling` policy, so you can run a hot `webhooks` topic at concurrency 10 while a heavy
 `reports` topic stays at 1. The `mode` selects whether the worker and scheduler share one
 runner (`combined`) or run as separate processes (`distributed`).
@@ -203,15 +202,15 @@ while a task defaults to <code>timeout: 300000</code> (5&nbsp;min) and <code>max
 Set both explicitly in production rather than relying on the default that happens to apply.
 {{ /comp }}
 
-## Knob 4 — Runner pool size at the process level
+## Knob 4 — Queue concurrency at the process level
 
-The numbers above configure *definitions*. The actual pool the background process spins up is
-read from an environment variable when `plugins/workers/bin/combined.ts` (or `worker.ts`)
-starts. That entrypoint reads **`WORKERS_CONCURRENCY`** (default `1`) and passes it to the
-Web Worker pool.
+The numbers above configure *definitions*. The background entrypoint
+(`plugins/workers/bin/combined.ts` or `worker.ts`) reads **`WORKERS_CONCURRENCY`** (default `1`)
+and passes it as queue concurrency. The in-process runner ignores the legacy `poolSize`
+and `workerUrl` options; it does not allocate an isolate pool.
 
 ```bash
-# Override the running pool size for the background worker process.
+# Override the queue concurrency for the background worker process.
 WORKERS_CONCURRENCY=8 deno run -A plugins/workers/bin/combined.ts
 ```
 
@@ -223,17 +222,38 @@ deploy-generated `.env` writes the same variable. Change the declared value in `
 
 ## Choosing a runner mode
 
-How a handler is isolated is the `WORKER_RUNTIMES` tunable — three modes, same handler. The
-scaffold default is the Web Worker isolate path (one V8 isolate per pool slot).
+Only **in-process** job execution is implemented. `WORKER_RUNTIMES` / `WorkerRuntime`
+are compatibility vocabulary, not a selectable runtime setting. The `web-worker` and
+`subprocess` job-runner modes are reserved. Polyglot task executors can spawn subprocesses;
+that does not enable subprocess isolation for job handlers.
 
 {{ comp.apiTable({
-  caption: "WORKER_RUNTIMES — runner isolation modes (WorkerRuntime type)",
+  caption: "WORKER_RUNTIMES — implemented and reserved job-runner vocabulary",
   rows: [
-    { name: "in-process", type: "WorkerRuntime", desc: "Handler runs in the same process. Lowest overhead, no isolation. Best for tests, compiled single-binary deploys, single-tenant local composition." },
-    { name: "web-worker", type: "WorkerRuntime", desc: "Each pool slot is its own Web Worker / V8 isolate (~20-40 MB). The scaffold default; pool size = concurrency. Keep it low to bound memory." },
-    { name: "subprocess", type: "WorkerRuntime", desc: "Handler runs in a spawned subprocess. Strongest process isolation; only Deno tasks get permission sandboxing through .permissions(). Python, .NET, shell, PowerShell, and cmd inherit the worker process's OS permissions." }
+    { name: "in-process", type: "WorkerRuntime", desc: "Implemented: handlers share the background worker process and event loop; asynchronous I/O can overlap, synchronous CPU work cannot run in parallel." },
+    { name: "web-worker", type: "WorkerRuntime", desc: "Reserved job-runner vocabulary; no Web Worker isolate pool is implemented." },
+    { name: "subprocess", type: "WorkerRuntime", desc: "Reserved job-runner vocabulary. Subprocesses are implemented for task executors, not job handlers; Deno task permissions apply only to Deno tasks." }
   ]
 }) }}
+
+## Abort cleanup budget
+
+`InProcessJobRunner` accepts `abortGracePeriodMs` in its constructor options,
+with a default of **1,000 ms**. After timeout, shutdown, or caller cancellation,
+the runner aborts the handler signal immediately and waits up to this budget for
+handler/progress cleanup. If cleanup does not settle, dispatch rejects with the
+abort reason. Returning success after abort still rejects.
+
+This budget bounds waiting; it cannot physically terminate in-process JavaScript.
+A handler that ignores its signal can continue side effects after dispatch rejects,
+and a blocking synchronous loop prevents timers from firing. Use abort-aware I/O,
+yielding checkpoints, and `finally` cleanup. Do not describe this setting as a
+forced worker or subprocess termination delay, or as a top-level `defineWorkers`
+configuration field.
+
+See [JobContext cancellation](/reference/plugin-workers-core/#job-context-cancellation)
+for `deadlineAt` selection and reason names. The shutdown manager's overall timeout
+is a separate host drain budget; size both within your platform's shutdown window.
 
 ## In-production pitfalls
 
@@ -246,13 +266,12 @@ tightened preset) on every <code>deno</code> task you ship. Path-scope <code>rea
 <code>write</code> and host-scope <code>net</code> rather than passing bare <code>true</code>.
 {{ /comp }}
 
-{{ comp callout { type: "warning", title: "Concurrency is a memory multiplier" } }}
-Each <code>web-worker</code> slot is a separate V8 isolate at roughly 20–40&nbsp;MB. A
-<code>concurrency</code> of 20 is up to ~800&nbsp;MB of isolates before your jobs allocate a
-byte. Raise concurrency to chase throughput, but profile memory under load and prefer
-<strong>per-topic</strong> scaling so a hot topic does not starve the rest of the host. Drop
-to <code>in-process</code> for tests and compiled single-binary deploys where isolation is not
-worth the per-isolate cost.
+{{ comp callout { type: "warning", title: "Concurrency overlaps I/O, not synchronous CPU work" } }}
+All job handlers share the background worker's event loop. A synchronous CPU-bound handler
+blocks other jobs, queue listeners, and health checks until it yields. Increasing
+<code>WORKERS_CONCURRENCY</code> does not add CPU parallelism. Concurrent handlers still
+retain payloads and allocate memory, so measure memory and throughput under realistic load.
+Use a subprocess task executor for work that needs a separate process.
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "Timeouts and retries interact — bound them together" } }}

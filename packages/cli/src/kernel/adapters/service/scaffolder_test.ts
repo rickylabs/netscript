@@ -65,6 +65,8 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
 
   const mainContent = await fs.readFile('/project/services/orders/src/main.ts');
   assertStringIncludes(mainContent, "port: parseInt(Deno.env.get('PORT') || '3000')");
+  assertStringIncludes(mainContent, 'public: true');
+  assertStringIncludes(mainContent, '#1382 L2 will wire the guarded auth policy');
 });
 
 Deno.test('ServiceScaffolder writes canonical content for every generated service file', async () => {

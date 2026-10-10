@@ -191,7 +191,7 @@ instrumentation facade that the auth service composition root wires in with `cre
 It does three things, all of them on purpose.
 
 **It traces auth operations as first-class spans.** `traceOperation` brackets each auth operation —
-`auth.signin`, `auth.callback`, `auth.signout`, `auth.session`, `auth.me` — in a child span that
+`auth.signin`, `auth.callback`, `auth.signout`, `auth.session.revoke`, `auth.session`, `auth.me` — in a child span that
 joins the incoming request trace, so a failed sign-in is a node in the same trace as the request
 that triggered it, not a disconnected log line.
 

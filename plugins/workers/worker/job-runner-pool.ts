@@ -9,10 +9,10 @@ import {
 
 /** Options for the plugin-layer in-process job runner pool. */
 export type WorkerPoolOptions = Readonly<{
-  /** @deprecated The current runner is in-process and does not allocate a thread pool. */
+  /** @deprecated Reserved for a future isolate pool; the in-process runner ignores this value. */
   poolSize?: number;
   registry?: StaticJobRegistry;
-  /** @deprecated The current runner is in-process and does not load a worker entry point. */
+  /** @deprecated Reserved for a future isolate pool; the in-process runner does not load this URL. */
   workerUrl?: string;
   /** Cleanup wait after abort; does not physically terminate an in-process handler. */
   abortGracePeriodMs?: number;

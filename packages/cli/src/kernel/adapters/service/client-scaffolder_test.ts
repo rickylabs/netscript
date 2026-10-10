@@ -48,3 +48,22 @@ Deno.test('service client scaffolder mirrors the typed SDK and query template', 
   assertStringIncludes(source, "export const ordersName = 'orders';");
   assertFalse(source.includes('exampleService'));
 });
+
+Deno.test('generated service client carries a banner naming the generators that depend on it', async () => {
+  await DEFAULT_TEMPLATE_REGISTRY.hydrate();
+  const fs = new MemoryFileSystemAdapter();
+  const template = new StringTemplateAdapter(fs);
+  await fs.writeFile('/app/deno.json', JSON.stringify({ workspace: ['./apps/dashboard'] }));
+  await fs.writeFile(
+    '/app/contracts/versions/v1/orders.contract.ts',
+    'export const OrdersContractV1 = { list: {} };\n',
+  );
+  const path = await new ServiceClientScaffolder(new Scaffolder(template, fs), fs, formatter)
+    .scaffold('/app', 'shop', 'orders', false);
+  const banner = (await fs.readFile(path)).split('\nimport ')[0];
+
+  assertStringIncludes(banner, "// Query client for the 'orders' service.");
+  assertStringIncludes(banner, '`netscript ui add`');
+  assertStringIncludes(banner, '`netscript generate resource`');
+  assertStringIncludes(banner, 'deleting it disables those generators.');
+});

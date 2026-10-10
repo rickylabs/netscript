@@ -8,6 +8,14 @@ import type {
 } from '@netscript/plugin/adapter';
 
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
+import {
+  assessDockerTopology,
+  type DockerEndpoint,
+  type DockerTopologyFinding,
+  type DockerTopologyInspector,
+  type DockerTopologyVerdict,
+  type PublishedBindingsObservation,
+} from '../../../../kernel/domain/docker-topology.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
@@ -78,6 +86,8 @@ export interface PluginDoctorDependencies {
   readonly loadJsrExportMap?: JsrExportMapLoader;
   /** Inspect the running Aspire AppHost for configured resource truth. */
   readonly inspectAppHost?: AppHostInspector;
+  /** Inspect the Docker daemon topology the AppHost provisions containers on. */
+  readonly inspectDockerTopology?: DockerTopologyInspector;
   /** Inspect manifest-declared runtime registries without regenerating them. */
   readonly inspectRuntimeRegistries?: GenerateInstalledPluginRegistries;
 }
@@ -85,6 +95,10 @@ export interface PluginDoctorDependencies {
 /** One named resource observed from a running AppHost. */
 export interface AppHostResourceState {
   readonly name: string;
+  /** Unique per-AppHost instance name (`aspire describe` `name`); DCP names containers with it. */
+  readonly instanceName?: string;
+  /** Aspire resource type, e.g. `Container` or `Executable`. */
+  readonly resourceType?: string;
   readonly state?: string;
   readonly healthStatus?: string;
   /** Raw Aspire readiness reports; an empty set cannot substantiate `Healthy`. */
@@ -120,14 +134,20 @@ export async function doctorPlugin(
   );
   const serviceChecks = await checkServiceEntrypoints(input.projectRoot, dependencies);
   const runtimeRegistryReport = await diagnoseRuntimeRegistries(input.projectRoot, dependencies);
-  const appHostReport = dependencies.inspectAppHost
-    ? await diagnoseAppHost(input.projectRoot, config, dependencies.inspectAppHost)
+  const appHostSnapshot = dependencies.inspectAppHost
+    ? await inspectAppHost(input.projectRoot, dependencies.inspectAppHost)
+    : undefined;
+  const appHostReport = appHostSnapshot ? diagnoseAppHost(config, appHostSnapshot) : undefined;
+  const dockerReport = dependencies.inspectDockerTopology
+    ? await diagnoseDockerTopology(appHostSnapshot, dependencies.inspectDockerTopology)
     : undefined;
   if (pluginSpecs.length === 0) {
     const serviceReport = serviceChecks.some((entry) => entry.check.status === 'error')
       ? workspaceChecksReport(serviceChecks)
       : undefined;
-    return [appHostReport, runtimeRegistryReport, serviceReport].filter(isPluginDoctorReport);
+    return [appHostReport, dockerReport, runtimeRegistryReport, serviceReport].filter(
+      isPluginDoctorReport,
+    );
   }
 
   let plugins: Record<string, RegisteredPluginConfig>;
@@ -159,9 +179,13 @@ export async function doctorPlugin(
   const unmatchedServiceReport = unmatchedServiceChecks.length > 0
     ? workspaceChecksReport(unmatchedServiceChecks)
     : undefined;
-  return [appHostReport, runtimeRegistryReport, ...reports, unmatchedServiceReport].filter(
-    isPluginDoctorReport,
-  );
+  return [
+    appHostReport,
+    dockerReport,
+    runtimeRegistryReport,
+    ...reports,
+    unmatchedServiceReport,
+  ].filter(isPluginDoctorReport);
 }
 
 async function diagnoseRuntimeRegistries(
@@ -189,72 +213,163 @@ async function diagnoseRuntimeRegistries(
   }
 }
 
-async function diagnoseAppHost(
+/** AppHost snapshot, or the error that prevented one. */
+type AppHostObservation = AppHostInspection | {
+  readonly status: 'failed';
+  readonly error: unknown;
+};
+
+async function inspectAppHost(
   projectRoot: string,
-  config: NetScriptConfig,
   inspector: AppHostInspector,
+): Promise<AppHostObservation> {
+  try {
+    return await inspector.inspect(projectRoot);
+  } catch (error) {
+    return { status: 'failed', error };
+  }
+}
+
+function diagnoseAppHost(
+  config: NetScriptConfig,
+  snapshot: AppHostObservation,
+): PluginDoctorReport {
+  if (snapshot.status === 'failed') {
+    return workspaceErrorReport(
+      'apphost:inspection',
+      'Could not inspect Aspire AppHost.',
+      snapshot.error,
+    );
+  }
+  if (snapshot.status === 'unavailable') {
+    return {
+      pluginName: 'apphost',
+      status: 'warning',
+      checks: [{
+        id: 'apphost:inspection-unavailable',
+        title: 'Aspire AppHost inspection available',
+        status: 'warning',
+        message: snapshot.reason,
+      }],
+    };
+  }
+  if (snapshot.status === 'not-running') {
+    return {
+      pluginName: 'apphost',
+      status: 'warning',
+      checks: [{
+        id: 'apphost:not-running',
+        title: 'Aspire AppHost running',
+        status: 'warning',
+        message: 'No AppHost is running for this project. Start it and rerun plugin doctor.',
+      }],
+    };
+  }
+  const observed = new Map(snapshot.resources.map((resource) => [resource.name, resource]));
+  const checks = configuredResourceNames(config).map((name): PluginDoctorCheck => {
+    const resource = observed.get(name);
+    if (!resource) {
+      return {
+        id: `apphost:missing:${name}`,
+        title: `AppHost resource ${name}`,
+        status: 'error',
+        message: `Configured resource "${name}" is missing from the running AppHost.`,
+      };
+    }
+    const reportsReady = resource.healthReports !== undefined &&
+      (Array.isArray(resource.healthReports)
+        ? resource.healthReports.length > 0
+        : Object.keys(resource.healthReports).length > 0);
+    const aspireHealthy = resource.state?.toLowerCase() === 'running' &&
+      resource.healthStatus?.toLowerCase() === 'healthy';
+    const status = !aspireHealthy ? 'error' : reportsReady ? 'healthy' : 'warning';
+    return {
+      id: `apphost:resource:${name}`,
+      title: `AppHost resource ${name}`,
+      status,
+      message: status === 'healthy'
+        ? 'Running and healthy'
+        : status === 'warning'
+        ? `Resource "${name}" reports Healthy but has no readiness evidence.`
+        : `Resource "${name}" is ${resource.state ?? 'unknown'} / ${
+          resource.healthStatus ?? 'unknown'
+        }.`,
+    };
+  });
+  return { pluginName: 'apphost', status: aggregateStatus(checks), checks };
+}
+
+async function diagnoseDockerTopology(
+  appHost: AppHostObservation | undefined,
+  inspector: DockerTopologyInspector,
 ): Promise<PluginDoctorReport> {
   try {
-    const snapshot = await inspector.inspect(projectRoot);
-    if (snapshot.status === 'unavailable') {
-      return {
-        pluginName: 'apphost',
-        status: 'warning',
-        checks: [{
-          id: 'apphost:inspection-unavailable',
-          title: 'Aspire AppHost inspection available',
-          status: 'warning',
-          message: snapshot.reason,
-        }],
-      };
-    }
-    if (snapshot.status === 'not-running') {
-      return {
-        pluginName: 'apphost',
-        status: 'warning',
-        checks: [{
-          id: 'apphost:not-running',
-          title: 'Aspire AppHost running',
-          status: 'warning',
-          message: 'No AppHost is running for this project. Start it and rerun plugin doctor.',
-        }],
-      };
-    }
-    const observed = new Map(snapshot.resources.map((resource) => [resource.name, resource]));
-    const checks = configuredResourceNames(config).map((name): PluginDoctorCheck => {
-      const resource = observed.get(name);
-      if (!resource) {
-        return {
-          id: `apphost:missing:${name}`,
-          title: `AppHost resource ${name}`,
-          status: 'error',
-          message: `Configured resource "${name}" is missing from the running AppHost.`,
-        };
-      }
-      const reportsReady = resource.healthReports !== undefined &&
-        (Array.isArray(resource.healthReports)
-          ? resource.healthReports.length > 0
-          : Object.keys(resource.healthReports).length > 0);
-      const aspireHealthy = resource.state?.toLowerCase() === 'running' &&
-        resource.healthStatus?.toLowerCase() === 'healthy';
-      const status = !aspireHealthy ? 'error' : reportsReady ? 'healthy' : 'warning';
-      return {
-        id: `apphost:resource:${name}`,
-        title: `AppHost resource ${name}`,
-        status,
-        message: status === 'healthy'
-          ? 'Running and healthy'
-          : status === 'warning'
-          ? `Resource "${name}" reports Healthy but has no readiness evidence.`
-          : `Resource "${name}" is ${resource.state ?? 'unknown'} / ${
-            resource.healthStatus ?? 'unknown'
-          }.`,
-      };
-    });
-    return { pluginName: 'apphost', status: aggregateStatus(checks), checks };
+    const endpoint = await inspector.inspectEndpoint();
+    const bindings = await observeAppHostBindings(appHost, endpoint, inspector);
+    const assessment = assessDockerTopology(endpoint, bindings);
+    const checks = [
+      topologyCheck('docker:endpoint', 'Docker daemon endpoint', assessment.endpoint),
+      topologyCheck(
+        'docker:published-bindings',
+        'Published container bindings',
+        assessment.bindings,
+      ),
+    ];
+    return { pluginName: 'docker', status: aggregateStatus(checks), checks };
   } catch (error) {
-    return workspaceErrorReport('apphost:inspection', 'Could not inspect Aspire AppHost.', error);
+    return workspaceErrorReport('docker:inspection', 'Could not inspect Docker topology.', error);
   }
+}
+
+async function observeAppHostBindings(
+  appHost: AppHostObservation | undefined,
+  endpoint: DockerEndpoint,
+  inspector: DockerTopologyInspector,
+): Promise<PublishedBindingsObservation | undefined> {
+  if (appHost?.status === 'not-running') return undefined;
+  if (appHost?.status !== 'running') {
+    return unavailableBindings('the AppHost could not be inspected');
+  }
+  if (endpoint.locality === 'unknown') {
+    return unavailableBindings('the Docker endpoint is unknown');
+  }
+  const containers = appHost.resources.filter((resource) =>
+    resource.resourceType?.toLowerCase() === 'container'
+  );
+  const unnamed = containers.filter((resource) => !resource.instanceName);
+  if (unnamed.length > 0) {
+    return {
+      status: 'unavailable',
+      reason: `the AppHost reported no instance name for container resource(s) ${
+        unnamed.map((resource) => resource.name).join(', ')
+      }, so their containers cannot be attributed.`,
+    };
+  }
+  return await inspector.inspectPublishedBindings(
+    endpoint,
+    containers.flatMap((resource) => resource.instanceName ? [resource.instanceName] : []),
+  );
+}
+
+function unavailableBindings(cause: string): PublishedBindingsObservation {
+  return {
+    status: 'unavailable',
+    reason: `${cause}, so published container bindings were not compared.`,
+  };
+}
+
+const TOPOLOGY_STATUS: Readonly<Record<DockerTopologyVerdict, PluginDoctorCheckStatus>> = {
+  local: 'healthy',
+  mismatch: 'warning',
+  inconclusive: 'warning',
+};
+
+function topologyCheck(
+  id: string,
+  title: string,
+  finding: DockerTopologyFinding,
+): PluginDoctorCheck {
+  return check(id, title, TOPOLOGY_STATUS[finding.verdict], finding.message);
 }
 
 function configuredResourceNames(config: NetScriptConfig): readonly string[] {
