@@ -4448,6 +4448,7 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
+          "jsr:@std/semver@1",
           "npm:@orpc/contract@^1.15.0",
           "npm:@orpc/server@^1.15.0",
           "npm:zod@^4.4.3"
