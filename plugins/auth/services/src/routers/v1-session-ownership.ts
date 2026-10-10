@@ -11,7 +11,7 @@
 import { AUTH_SESSIONS_REVOKE_SCOPE } from '@netscript/plugin-auth-core/contracts/v1';
 import type { AuthnRequest, AuthSession, Principal } from '@netscript/plugin-auth-core/domain';
 import type { AuthBackendPort } from '@netscript/plugin-auth-core/ports';
-import type { AuthOperationRecorder } from '@netscript/plugin-auth-core/telemetry';
+import { type AuthOperationRecorder, AuthOutcome } from '@netscript/plugin-auth-core/telemetry';
 import { emitSessionRevoked } from '../../../streams/server.ts';
 import { toRequest } from './v1-helpers.ts';
 import { type AuthServiceContext, AuthServiceHandlerError } from './v1-types.ts';
@@ -44,6 +44,21 @@ export function requirePrincipal(context: AuthServiceContext): Principal {
     throw new AuthServiceHandlerError('UNAUTHORIZED', AUTHENTICATION_REQUIRED_REASON);
   }
   return context.principal;
+}
+
+/** Returns the guard-authenticated principal and records it, or audits the refusal. */
+export async function requireAuditedPrincipal(
+  context: AuthServiceContext,
+  audit: AuthOperationRecorder,
+): Promise<Principal> {
+  try {
+    const principal = requirePrincipal(context);
+    await audit.recordPrincipal(principal);
+    return principal;
+  } catch (error) {
+    await audit.setOutcome({ outcome: AuthOutcome.UNAUTHENTICATED });
+    throw error;
+  }
 }
 
 /** Refuses an operator call whose principal lacks the session-revocation scope. */

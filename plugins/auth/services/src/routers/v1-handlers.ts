@@ -1,5 +1,4 @@
 import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
-import { getParentContextFromHeaders } from '@netscript/telemetry/context';
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
 import type {
   CallbackInput,
@@ -17,14 +16,10 @@ import type {
 import {
   AuthErrorCode,
   authErrorCodeForReason,
-  type AuthOperationInput,
   type AuthOperationRecorder,
   AuthOutcome,
   authOutcomeForReason,
-  type AuthTelemetryOperation,
-  createAuthTelemetry,
 } from '@netscript/plugin-auth-core/telemetry';
-import type { Context } from '@netscript/telemetry/context';
 import {
   mapSession,
   mapUserFromSession,
@@ -38,12 +33,13 @@ import { type AuthServiceContext, AuthServiceHandlerError } from './v1-types.ts'
 import {
   endInteractiveSession,
   recordRevokedSessions,
-  requirePrincipal,
+  requireAuditedPrincipal,
   requireRevokeScope,
   revokeSignoutSessions,
 } from './v1-session-ownership.ts';
+import { recordAuthFailure, traceAuth } from './v1-telemetry.ts';
 import { type AuthHandlers, router } from './router-context.ts';
-import type { AuthSession, Principal } from '@netscript/plugin-auth-core/domain';
+import type { AuthSession } from '@netscript/plugin-auth-core/domain';
 import type { AuthBackendPort, InteractiveFlowPort } from '@netscript/plugin-auth-core/ports';
 import {
   emitOidcCompleted,
@@ -51,8 +47,6 @@ import {
   emitSigninStarted,
   emitTokenRefreshed,
 } from '../../../streams/server.ts';
-
-const FALLBACK_AUTH_TELEMETRY = createAuthTelemetry({ enabled: false });
 
 /**
  * Capabilities document advertised by the running auth service.
@@ -425,20 +419,6 @@ async function emitCallbackSessionCompleted(
   }
 }
 
-async function requireAuditedPrincipal(
-  context: AuthServiceContext,
-  audit: AuthOperationRecorder,
-): Promise<Principal> {
-  try {
-    const principal = requirePrincipal(context);
-    await audit.recordPrincipal(principal);
-    return principal;
-  } catch (error) {
-    await audit.setOutcome({ outcome: AuthOutcome.UNAUTHENTICATED });
-    throw error;
-  }
-}
-
 function requireInteractive(backend: AuthBackendPort, operation: string): InteractiveFlowPort {
   if (!backend.interactive) {
     unsupportedOperation(backend.name, operation);
@@ -453,50 +433,6 @@ function emitObservedRefresh(
   if (authSession.refreshedAt) {
     emitTokenRefreshed(authSession, { traceContext });
   }
-}
-
-async function traceAuth<T>(
-  context: AuthServiceContext,
-  operation: AuthTelemetryOperation,
-  backend: AuthBackendPort,
-  providerId: string | undefined,
-  sessionId: string | undefined,
-  run: (audit: AuthOperationRecorder) => Promise<T>,
-): Promise<T> {
-  const telemetry = context.telemetry ?? FALLBACK_AUTH_TELEMETRY;
-  const input: AuthOperationInput = {
-    operation,
-    backend: backend.name,
-    method: context.request?.method ?? 'RPC',
-    providerId,
-    sessionId,
-    parentContext: parentContextFromTraceHeaders(context.traceHeaders),
-  };
-  return await telemetry.traceOperation(input, run);
-}
-
-function parentContextFromTraceHeaders(
-  traceHeaders: AuthServiceContext['traceHeaders'],
-): Context | undefined {
-  const traceparent = traceHeaders?.traceparent;
-  const tracestate = traceHeaders?.tracestate;
-  if (!traceparent && !tracestate) {
-    return undefined;
-  }
-  const headers: Record<string, string> = {};
-  if (traceparent) headers.traceparent = traceparent;
-  if (tracestate) headers.tracestate = tracestate;
-  return getParentContextFromHeaders(headers);
-}
-
-async function recordAuthFailure(
-  audit: AuthOperationRecorder,
-  reason: string,
-): Promise<void> {
-  await audit.setOutcome({
-    outcome: authOutcomeForReason(reason),
-    errorCode: authErrorCodeForReason(reason),
-  });
 }
 
 function firstProviderId(backend: AuthBackendPort): string | undefined {
