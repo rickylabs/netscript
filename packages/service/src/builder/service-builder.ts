@@ -64,7 +64,11 @@ export interface ServiceBuilder<
   TRouter extends ServiceRouter,
   TCustom extends object = Record<never, never>,
 > {
-  /** Enables CORS middleware. */
+  /**
+   * Enables CORS with explicit origins or `NETSCRIPT_CORS_ORIGINS` when omitted.
+   * Unset origins deny cross-origin access. `build()` rejects wildcard origins
+   * combined with credentials before a listener starts.
+   */
   withCors(options?: CorsOptions): ServiceBuilder<TRouter, TCustom>;
 
   /** Enables structured request logging middleware. */
