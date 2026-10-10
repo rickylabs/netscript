@@ -1,6 +1,5 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import { configure, createPackageLogger, type LogRecord, resetLogging } from '@netscript/logger';
-import { getConnInfo } from 'hono/deno';
 import { createService, type ServiceApp } from '../mod.ts';
 import { createMemoryRateLimitStore, type ServiceRateLimitOptions } from '../src/rate-limit/mod.ts';
 
@@ -98,7 +97,7 @@ Deno.test('dual-stack listener keeps distinct mapped IPv4 socket peers in indepe
       now: () => 0,
       store: createMemoryRateLimitStore(),
     })
-    .route('get', '/a', (c) => c.json(getConnInfo(c).remote))
+    .route('get', '/a', (c) => c.json(c.env.remoteAddr))
     .serve({ hostname: '::', port: 0, handleSignals: false });
   const first = Deno.createHttpClient({ localAddress: '127.0.0.1' });
   const second = Deno.createHttpClient({ localAddress: '127.0.0.2' });
@@ -113,7 +112,7 @@ Deno.test('dual-stack listener keeps distinct mapped IPv4 socket peers in indepe
       const init: RequestInit & { client: Deno.HttpClient } = { client };
       const response = await fetch(url, init);
       assertEquals(response.status, 200);
-      assertEquals((await response.json()).address, address);
+      assertEquals((await response.json()).hostname, address);
     }
     for (const client of [first, second]) {
       const init: RequestInit & { client: Deno.HttpClient } = { client };

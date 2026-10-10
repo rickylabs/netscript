@@ -1,5 +1,4 @@
 /** Client-address resolution with explicit trusted-proxy policy. @module */
-import { isIP } from 'node:net';
 import type { ServiceEnvironment } from '../../types.ts';
 import type { ServiceProxyTrust } from './options.ts';
 
@@ -39,7 +38,7 @@ export function resolveServiceClientAddress(
   const hops = forwarded.split(',');
   if (hops.length > 32) return socket;
   const addresses = hops.map((hop) => hop.trim());
-  if (addresses.some((address) => !isIP(address))) return socket;
+  if (addresses.some((address) => !isClientIp(address))) return socket;
   let client = socket;
   for (let i = addresses.length - 1; i >= 0; i--) {
     if (i < addresses.length - 1 && !trustProxy(client)) break;
@@ -58,7 +57,7 @@ export function resolveServiceClientAddress(
  * @returns Native IPv4 key for mapped peers, IPv6 prefix bucket, or unchanged other address.
  */
 export function rateLimitAddressKey(address: string, prefix: number): string {
-  if (isIP(address) !== 6) return address;
+  if (!address.includes(':') || !isClientIp(address)) return address;
   const [ip, zone] = address.split('%');
   const canonical = new URL(`http://[${ip}]/`).hostname.slice(1, -1);
   const [head = '', tail] = canonical.split('::');
@@ -78,4 +77,20 @@ export function rateLimitAddressKey(address: string, prefix: number): string {
     return (word & (0xffff << (16 - bits))).toString(16);
   });
   return `${network.join(':')}${zone ? `%${zone}` : ''}/${prefix}`;
+}
+
+/** Validate literal IP tokens without WHATWG's IPv4 shorthand or URL syntax. */
+function isClientIp(address: string): boolean {
+  try {
+    if (address.includes(':')) {
+      // Zones belong to socket metadata, not to URL host syntax.
+      if (!/^[0-9a-fA-F:.]+(?:%[0-9a-zA-Z_.~-]+)?$/.test(address)) return false;
+      const ip = address.split('%')[0]!;
+      return new URL(`http://[${ip}]/`).hostname.startsWith('[');
+    }
+    return /^\d+\.\d+\.\d+\.\d+$/.test(address) &&
+      new URL(`http://${address}/`).hostname === address;
+  } catch {
+    return false;
+  }
 }

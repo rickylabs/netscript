@@ -1,5 +1,4 @@
 import { assert, assertEquals } from '@std/assert';
-import { getConnInfo } from 'hono/deno';
 import { createService } from '../mod.ts';
 import { createMemoryRateLimitStore, resolveServiceClientAddress } from '../src/rate-limit/mod.ts';
 
@@ -48,6 +47,16 @@ Deno.test('client address rejects malformed, oversized and overlong XFF chains',
       'unknown',
       '192.0.2.1,',
       '192.0.2.1:1234',
+      '127.1',
+      '0x7f000001',
+      '192.000.2.1',
+      '192.0.2.256',
+      '192.0.2.1/path',
+      'user@192.0.2.1',
+      '[2001:db8::1]',
+      '2001:db8::1/path',
+      '2001:db8::1junk',
+      '2001::db8::1',
       'a'.repeat(8193),
       Array(33).fill('192.0.2.10').join(','),
     ]
@@ -56,16 +65,16 @@ Deno.test('client address rejects malformed, oversized and overlong XFF chains',
   }
 });
 
-Deno.test('listener exposes the direct socket address to Hono getConnInfo', async () => {
+Deno.test('listener exposes the direct socket address through ServiceEnvironment', async () => {
   const running = await createService({}, { name: 'socket-address' })
-    .route('get', '/peer', (c) => c.json(getConnInfo(c).remote))
+    .route('get', '/peer', (c) => c.json(c.env.remoteAddr))
     .serve({ hostname: '127.0.0.1', port: 0, handleSignals: false });
   try {
     const response = await fetch(`http://127.0.0.1:${running.addr.port}/peer`, {
       headers: { 'x-forwarded-for': '203.0.113.1' },
     });
     const peer = await response.json();
-    assertEquals(peer.address, '127.0.0.1');
+    assertEquals(peer.hostname, '127.0.0.1');
     assert(Number.isInteger(peer.port) && peer.port > 0);
   } finally {
     await running.stop();

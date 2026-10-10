@@ -36,8 +36,7 @@
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "@netscript/database": "jsr:@netscript/database@0.0.7",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7",
-    "@netscript/kv": "jsr:@netscript/kv@0.0.7",
-    "hono/deno": "jsr:@hono/hono@4.12.24/deno"
+    "@netscript/kv": "jsr:@netscript/kv@0.0.7"
   },
   "publish": {
     "include": [
