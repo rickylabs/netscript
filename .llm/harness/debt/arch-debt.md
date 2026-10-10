@@ -2472,6 +2472,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Remove the compatibility bridge when a native supported seam passes complete-frame,
   fork/cap/sub-offset, restart/producer-state and >=1 GiB RSS regressions at the same memory
   ceiling.
+- **Substrate:** The production composition still uses `DurableStreamTestServer` for its native HTTP
+  protocol implementation. This is accepted within the same named debt; it is not a production
+  durability certification. File mode is startup-probed and producer restart-tested; memory mode is
+  explicitly ephemeral.
+- **Exit condition:** Replace `DurableStreamTestServer` with an upstream supported production
+  server/store-injection API after durable-streams#420 lands, preserving the bounded store, real
+  producer write/process-restart/read, framing, fork and RSS regression proofs.
 - **Cost:** Dependency upgrades require hook-shape and semantic compatibility verification. Runtime
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
   RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades
