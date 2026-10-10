@@ -84,6 +84,7 @@ path	class	owner	disposition
 .llm/tools/maint/teardown/teardown.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/release/baselines/public-surfaces.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/release/release-canary-workflow_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/release/tests/fixtures/canary.3-notes.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-fmt.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-lint.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/aspire-scan-scope_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
