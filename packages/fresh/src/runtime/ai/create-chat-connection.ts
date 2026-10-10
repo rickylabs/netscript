@@ -32,11 +32,9 @@ import { stream } from '@durable-streams/client';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 import type { ModelMessage, UIMessage } from '@tanstack/ai';
 import { createChatSubscriptionHub } from '../../internal/chat-subscription-hub.ts';
+import type { NetScriptChatProducer } from './chat-producer.ts';
+import { assertChatProducer, toFencedChatSessionResponse } from './fenced-chat-session-writer.ts';
 import { chatMessageChunks, createChatMessageReplay } from '../../internal/chat-message-replay.ts';
-
-// ---------------------------------------------------------------------------
-// Session addressing (internal — not part of the public `./ai` surface).
-// ---------------------------------------------------------------------------
 
 /**
  * Path (under the durable-streams State Protocol prefix) that every NetScript
@@ -74,10 +72,6 @@ export function resolveChatSessionUrl(
 export function resolveChatHeaders(target: NetScriptChatSessionTarget): Record<string, string> {
   return withIdentityEncoding({ ...getStreamsAuth(), ...(target.headers ?? {}) });
 }
-
-// ---------------------------------------------------------------------------
-// Public NetScript surface types.
-// ---------------------------------------------------------------------------
 
 /**
  * Addresses one durable chat session stream. NetScript-owned target that FA1
@@ -292,9 +286,11 @@ export interface NetScriptChatResponseOptions {
    * hook returns `true`. No default is applied.
    */
   readonly authorize?: NetScriptChatAuthorize;
+  /** Opt-in writer fencing; see {@link NetScriptChatProducer}. Omitted: appends are unfenced. */
+  readonly producer?: NetScriptChatProducer;
   /**
-   * Test/adapter seam: build the durable session `Response`. Defaults to
-   * `toDurableChatSessionResponse` from the transport.
+   * Test/adapter seam: build the durable session `Response`. Defaults to the
+   * transport response, or the fenced writer when `producer` is present.
    */
   readonly toResponse?: (input: {
     readonly writeUrl: string;
@@ -303,6 +299,8 @@ export interface NetScriptChatResponseOptions {
     readonly source: AsyncIterable<unknown>;
     readonly mode?: 'immediate' | 'await';
     readonly waitUntil?: (task: Promise<unknown>) => void;
+    /** Writer identity, present only when the caller supplied `producer`. */
+    readonly producer?: NetScriptChatProducer;
   }) => Promise<Response>;
 }
 
@@ -343,9 +341,7 @@ export interface NetScriptChatSnapshotOptions {
   }) => Promise<{ readonly messages: readonly unknown[]; readonly offset?: string }>;
 }
 
-// ---------------------------------------------------------------------------
 // The ONE projection reducer (seed + live share this — see mod.ts @module doc).
-// ---------------------------------------------------------------------------
 
 /**
  * The single chat projection reducer. Both the seed snapshot
@@ -397,9 +393,7 @@ export function projectChatSnapshot(
   return { messages: outMessages, renderParts };
 }
 
-// ---------------------------------------------------------------------------
 // FA1 factory functions.
-// ---------------------------------------------------------------------------
 
 /**
  * Open a durable chat session connection.
@@ -489,12 +483,33 @@ export function createNetScriptChatConnection(
  * is enforced against `request` (see {@link NetScriptChatAuthorize}); a denial
  * yields `403 Forbidden` and the session stream is never touched. Supplying
  * `authorize` without `request` is a programming error and throws.
+ *
+ * With `producer`, appends are fenced: a stale epoch rejects (in `'await'`
+ * mode, or while echoing `newMessages`) with a `NetScriptChatProducerError`.
+ *
+ * @example Fence a worker-hosted chat turn
+ * ```ts
+ * import { toNetScriptChatResponse } from '@netscript/fresh/ai';
+ *
+ * declare const turn: { sessionId: string; turnId: string; claimGeneration: number };
+ * declare const source: AsyncIterable<unknown>;
+ *
+ * // The id names the turn; the epoch is the executor's claim generation.
+ * const response = await toNetScriptChatResponse({
+ *   target: { sessionId: turn.sessionId },
+ *   source,
+ *   mode: 'await',
+ *   producer: { id: `chat-turn:${turn.sessionId}:${turn.turnId}`, epoch: turn.claimGeneration },
+ * });
+ * console.log(response.status);
+ * ```
  */
 export async function toNetScriptChatResponse(
   options: NetScriptChatResponseOptions,
 ): Promise<Response> {
-  const { target, source, newMessages, request, authorize } = options;
+  const { target, source, newMessages, request, authorize, producer } = options;
 
+  if (producer) assertChatProducer(producer);
   if (authorize) {
     if (!request) {
       throw new Error(
@@ -515,6 +530,7 @@ export async function toNetScriptChatResponse(
     source,
     mode: options.mode,
     waitUntil: options.waitUntil,
+    ...(producer ? { producer } : {}),
   });
 }
 
@@ -544,10 +560,6 @@ export async function resolveChatSnapshot(
     offset: raw.offset ?? null,
   };
 }
-
-// ---------------------------------------------------------------------------
-// Internal helpers.
-// ---------------------------------------------------------------------------
 
 interface UpstreamChatConnection {
   readonly subscribe: (signal?: AbortSignal) => AsyncIterable<unknown>;
@@ -595,14 +607,12 @@ async function defaultMaterialize(input: {
   return { messages: replay.messages(), offset: response.offset };
 }
 
-async function defaultToResponse(input: {
-  readonly writeUrl: string;
-  readonly headers: Record<string, string>;
-  readonly newMessages: readonly unknown[];
-  readonly source: AsyncIterable<unknown>;
-  readonly mode?: 'immediate' | 'await';
-  readonly waitUntil?: (task: Promise<unknown>) => void;
-}): Promise<Response> {
+async function defaultToResponse(
+  input: Parameters<NonNullable<NetScriptChatResponseOptions['toResponse']>>[0],
+): Promise<Response> {
+  if (input.producer) {
+    return toFencedChatSessionResponse({ ...input, producer: input.producer });
+  }
   const streamTarget = { writeUrl: input.writeUrl, headers: input.headers, createIfMissing: true };
   const durableStream = await ensureDurableChatSessionStream(streamTarget);
   // Persist client messages before returning, including in immediate mode.
