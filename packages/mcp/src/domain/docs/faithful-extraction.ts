@@ -91,6 +91,7 @@ export function extractDocContent(content: string): {
     let proseStart = 0;
     const flush = (end: number) => {
       const text = block.text.slice(proseStart, end);
+      const lastTextEnd = text.trimEnd().length;
       const spans = [...text.matchAll(protectedSpan)];
       let start = 0;
       let first = true;
@@ -120,7 +121,7 @@ export function extractDocContent(content: string): {
           continue;
         }
         const end = boundary.index + 1;
-        if (text.slice(end).trim()) sentence(end);
+        if (end < lastTextEnd) sentence(end);
       }
       sentence(text.length);
       proseStart = end;
