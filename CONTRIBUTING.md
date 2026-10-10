@@ -54,10 +54,10 @@ deno task lint
 deno task fmt:check
 ```
 
-When you add or change a JSDoc `@example` in a published package, run `deno task docs:jsdoc-examples`.
-It compiles every published example, so an example must bind every name it uses: import package
-exports, and declare application-owned values (a router, a database client) as visible typed
-stand-ins. The convention is in
+When you add or change a JSDoc `@example` in a published package, run
+`deno task docs:jsdoc-examples`. It compiles every published example, so an example must bind every
+name it uses: import package exports, and declare application-owned values (a router, a database
+client) as visible typed stand-ins. The convention is in
 [Application context in examples](docs/architecture/doctrine/02-public-surface.md#application-context-in-examples).
 
 For changes to scaffold output, plugin scaffolding, DB wiring, or Aspire helpers, run the full CLI

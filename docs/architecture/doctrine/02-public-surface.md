@@ -175,10 +175,9 @@ broken.
 
 ### Application context in examples
 
-An example often needs something the application owns: a router, a
-database client, a contract, a model provider. Declare it visibly at the
-top of the fence with a typed stand-in, so a reader copying the example
-sees exactly what they must supply:
+An example often needs something the application owns: a router, a database client, a contract, a
+model provider. Declare it visibly at the top of the fence with a typed stand-in, so a reader
+copying the example sees exactly what they must supply:
 
 ```ts
 import { createRPCHandler, type ServiceRouter } from '@netscript/service';
@@ -188,21 +187,19 @@ declare const router: ServiceRouter;
 const rpcHandler = createRPCHandler(router);
 ```
 
-- **Every name is bound.** Package exports are imported the way a
-  consumer imports them; only application-owned values are declared.
-- **Stand-ins use real types.** Prefer an exported type from the
-  documented package, a sibling `@netscript/*` package, or the upstream
-  package the example wires (`import type { Hono } from 'hono'`). Declare
-  a minimal local shape only for data the application itself defines.
-  Never `any`.
-- **About three lines at most.** If an example needs more stand-ins,
-  trim it to what the documented symbol demonstrates instead of declaring
-  more context.
-- **No suppressions.** No `@ts-ignore`, `@ts-expect-error`, `as any`, or
-  fence attributes that skip checking.
+- **Every name is bound.** Package exports are imported the way a consumer imports them; only
+  application-owned values are declared.
+- **Stand-ins use real types.** Prefer an exported type from the documented package, a sibling
+  `@netscript/*` package, or the upstream package the example wires
+  (`import type { Hono } from 'hono'`). Declare a minimal local shape only for data the application
+  itself defines. Never `any`.
+- **About three lines at most.** If an example needs more stand-ins, trim it to what the documented
+  symbol demonstrates instead of declaring more context.
+- **No suppressions.** No `@ts-ignore`, `@ts-expect-error`, `as any`, or fence attributes that skip
+  checking.
 
-`deno task docs:jsdoc-examples` compiles every published example against
-its public specifiers; an undeclared name fails it.
+`deno task docs:jsdoc-examples` compiles every published example against its public specifiers; an
+undeclared name fails it.
 
 ## What does not belong on the surface
 
