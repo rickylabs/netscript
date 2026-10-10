@@ -1,0 +1,34 @@
+{
+  "tasks": {
+    "check": "deno check --no-lock --unstable-kv App.tsx expo-fetch.ts cockpit.ts runtime-proof.ts",
+    "prepare": "deno run --no-lock --allow-read --allow-write prepare.ts"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "npm:react@19.2.3",
+    "types": [
+      "npm:@types/react@19.2.17"
+    ]
+  },
+  "fmt": {
+    "singleQuote": true,
+    "lineWidth": 100
+  },
+  "imports": {
+    "@netscript/sdk/streams/consumer": "../../src/client/stream-source/mod.ts",
+    "@netscript/sdk/streams/collections": "../../src/client/stream-collection/mod.ts",
+    "@netscript/sdk/streams/react": "../../src/client/stream-react/mod.ts",
+    "@netscript/plugin-streams-core/sse": "../../../plugin-streams-core/src/sse/mod.ts",
+    "@tanstack/db": "npm:@tanstack/db@0.6.17",
+    "@tanstack/react-db": "npm:@tanstack/react-db@0.1.95",
+    "expo/fetch": "npm:expo@57.0.27/fetch",
+    "react": "npm:react@19.2.3",
+    "react-native": "npm:react-native@0.86.3",
+    "@std/fs/copy": "jsr:@std/fs@^1/copy"
+  },
+  "nodeModulesDir": "none",
+  "catalog": {
+    "zod": "^4.4.3"
+  }
+}

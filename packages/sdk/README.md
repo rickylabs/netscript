@@ -102,12 +102,15 @@ Use the side-effect-free `./presets` subpath for `defineServices` in browser/sha
 
 ### Durable streams with an injected fetch
 
-`@netscript/sdk/streams/consumer` provides `createFetchStreamEventSourceV1` for hosts with a
-WHATWG streaming fetch and no DOM event constructors. Supply the host transport and bind the source through the
-existing v1 schema validator:
+`@netscript/sdk/streams/consumer` provides `createFetchStreamEventSourceV1` for hosts with a WHATWG
+streaming fetch and no DOM event constructors. Supply the host transport and bind the source through
+the existing v1 schema validator:
 
 ```ts
-import { bindStreamEventSourceV1, createFetchStreamEventSourceV1 } from '@netscript/sdk/streams/consumer';
+import {
+  bindStreamEventSourceV1,
+  createFetchStreamEventSourceV1,
+} from '@netscript/sdk/streams/consumer';
 
 const abort = new AbortController();
 const source = createFetchStreamEventSourceV1({
@@ -129,10 +132,10 @@ await source.done;
 ```
 
 The source refreshes credentials on every connect, reconnects after 30 seconds without bytes, and
-retries every non-2xx response (including 401, 403, and 404), refreshing credentials on each attempt.
-Consecutive delays double from one second to a 30-second cap; server `retry:` is clamped between
-the configured initial back-off floor and cap. These bounds and its timer port are configurable.
-Comments and partial bytes renew the heartbeat deadline.
+retries every non-2xx response (including 401, 403, and 404), refreshing credentials on each
+attempt. Consecutive delays double from one second to a 30-second cap; server `retry:` is clamped
+between the configured initial back-off floor and cap. These bounds and its timer port are
+configurable. Comments and partial bytes renew the heartbeat deadline.
 
 The durable protocol commits progress on a validated `control` frame. The source buffers data until
 that control, then reconnects with its opaque `offset` query parameter and the committed SSE
@@ -295,11 +298,11 @@ lowercase, separator-normalized, and capped at 80 characters. They are contract 
 construct one from query props, tenant/user ids, cache keys, values, or URLs.
 
 Cache telemetry admits at most 256 distinct normalized operation namespaces per process. The first
-new namespace beyond that budget is collapsed to the fixed `overflow` namespace and named once in
-a `cache.namespace.overflow` span event; later over-budget namespaces also collapse to `overflow`
-without retaining or emitting their original ids. Composite construction only normalizes its
-static default. Admission happens when a real cache operation opens a span, so construction alone
-does not consume the process budget.
+new namespace beyond that budget is collapsed to the fixed `overflow` namespace and named once in a
+`cache.namespace.overflow` span event; later over-budget namespaces also collapse to `overflow`
+without retaining or emitting their original ids. Composite construction only normalizes its static
+default. Admission happens when a real cache operation opens a span, so construction alone does not
+consume the process budget.
 
 Topology evidence validation is fail-safe. Missing, unbounded, or malformed provider evidence marks
 the active cache span with `outcome=error` and `topology_complete=false`, but it does not turn an
@@ -377,30 +380,30 @@ and Linux apply on relaunch.
 
 ## API at a glance
 
-| Entry            | What it gives you                                                                 |
-| ---------------- | --------------------------------------------------------------------------------- |
-| `.`              | Side-effect-free `defineServices` plus common non-cache surfaces                  |
-| `./presets`      | Browser-safe `defineServices` and its package-owned type closure                  |
-| `./client`       | service clients, contribution definitions, redacted errors                        |
-| `./discovery`    | `getServiceUrl`, `resolveServiceUrlFromSources`, `getPostgresConnection`, …       |
-| `./query`        | `createQueryFactory`, `createQueryFactories`, `createCompositeQuery`              |
-| `./query-client` | `createNetScriptQueryClient`, `createServiceQueryUtils`, `createKvCachePersister` |
-| `./cache`        | `KvCacheStore`, `cacheQuery`, explicit cache-provider wiring                      |
-| `./collections`  | `createQueryCollection` — live client-side collections                            |
-| `./streams`      | `createStreamProducer`, `defineStreamSchema`, durable-stream helpers              |
-| `./streams/consumer` | `createFetchStreamEventSourceV1`, `bindStreamEventSourceV1`, consumer contracts |
-| `./telemetry`    | `otelMiddleware` — the outbound-tracing middleware type surface                   |
-| `./auto-update`  | `startAutoUpdate`, `createReleaseClient` — signed native Deno Desktop updates     |
-| `./desktop`      | `createDesktopServiceClient`, `createDesktopRpcLink` — contract-true webview RPC  |
-| `./ports`        | structural client/query and contribution contracts, upstream-type-free            |
+| Entry                | What it gives you                                                                 |
+| -------------------- | --------------------------------------------------------------------------------- |
+| `.`                  | Side-effect-free `defineServices` plus common non-cache surfaces                  |
+| `./presets`          | Browser-safe `defineServices` and its package-owned type closure                  |
+| `./client`           | service clients, contribution definitions, redacted errors                        |
+| `./discovery`        | `getServiceUrl`, `resolveServiceUrlFromSources`, `getPostgresConnection`, …       |
+| `./query`            | `createQueryFactory`, `createQueryFactories`, `createCompositeQuery`              |
+| `./query-client`     | `createNetScriptQueryClient`, `createServiceQueryUtils`, `createKvCachePersister` |
+| `./cache`            | `KvCacheStore`, `cacheQuery`, explicit cache-provider wiring                      |
+| `./collections`      | `createQueryCollection` — live client-side collections                            |
+| `./streams`          | `createStreamProducer`, `defineStreamSchema`, durable-stream helpers              |
+| `./streams/consumer` | `createFetchStreamEventSourceV1`, `bindStreamEventSourceV1`, consumer contracts   |
+| `./telemetry`        | `otelMiddleware` — the outbound-tracing middleware type surface                   |
+| `./auto-update`      | `startAutoUpdate`, `createReleaseClient` — signed native Deno Desktop updates     |
+| `./desktop`          | `createDesktopServiceClient`, `createDesktopRpcLink` — contract-true webview RPC  |
+| `./ports`            | structural client/query and contribution contracts, upstream-type-free            |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/sdk@<version>`](https://jsr.io/@netscript/sdk/doc).
 
 ## Transport policy
 
-Service clients derive the HTTP method, GET deduplication, and cache group from the contract and
-its NetScript procedure metadata through one SDK-owned policy decision. Use the optional
+Service clients derive the HTTP method, GET deduplication, and cache group from the contract and its
+NetScript procedure metadata through one SDK-owned policy decision. Use the optional
 `transportPolicy.method` callback only when adapting that final method—for example, a future
 POST-only transport. Request contributions receive procedure path, metadata, input, their context
 projection, signal, and the resolved destination; they never receive the HTTP method or control
@@ -464,13 +467,26 @@ JSR with cryptographically verified provenance.
 
 SDK query collections and Fresh live queries share TanStack DB **0.6.17** with
 `@tanstack/query-db-collection` **1.2.1**, `@tanstack/react-db` **0.1.95**, and
-`@durable-streams/state` **0.3.1**. These exact declarations are intentional:
-compatible version ranges alone can admit different Collection constructors.
-Upgrade the family together and run `deno task deps:check:db`, which resolves
-both a mixed SDK/Fresh consumer and a Fresh-only consumer without a workspace
-lock or warm cache and rejects multiple complete DB identities, including peer
+`@durable-streams/state` **0.3.1**. These exact declarations are intentional: compatible version
+ranges alone can admit different Collection constructors. Upgrade the family together and run
+`deno task deps:check:db`, which resolves both a mixed SDK/Fresh consumer and a Fresh-only consumer
+without a workspace lock or warm cache and rejects multiple complete DB identities, including peer
 resolution suffixes. The guard also rejects unresolved modules.
 
-After coordinated publication, qualify a fresh consumer of the fixed published
-SDK and Fresh versions with no application dependency overrides before removing
-downstream DB pins. Source qualification does not prove published resolution.
+After coordinated publication, qualify a fresh consumer of the fixed published SDK and Fresh
+versions with no application dependency overrides before removing downstream DB pins. Source
+qualification does not prove published resolution.
+
+## React Native stream collections
+
+Use `@netscript/sdk/streams/collections`'s `createStreamCollectionV1` to materialize full State
+Protocol entities into a real TanStack DB collection. Configure the existing injected source with
+`type`, `parse`, and `getKey`; validated control-committed batches update rows directly. The handle
+provides `collection`, `done`, `snapshot()`, and idempotent `dispose()`.
+`@netscript/sdk/streams/react`'s `useStreamLiveQueryV1` subscribes a React Native screen through
+TanStack DB without loading Fresh.
+
+The [Expo reference](./examples/expo-streams/README.md) includes checked fetch types, a complete
+React Native screen, and an executable Hermes probe. See the
+[streams how-to](https://netscript.dev/durable-workflows/expo-streams/) for replay and lifecycle.
+Native Hermes and Expo network integration still require the recorded device acceptance run.
