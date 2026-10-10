@@ -1,4 +1,5 @@
 import { dirname, join, toFileUrl } from '@std/path';
+import { materializeAppRouterSupport } from './app-router-support.ts';
 
 export interface JsdocScaffoldAliasRule {
   readonly prefix: string;
@@ -59,6 +60,8 @@ export async function materializeSharedSupports(
     '@app/lib/contacts.ts': join(supportRoot, 'contacts.ts'),
     '@app/lib/orders.ts': join(supportRoot, 'orders.ts'),
     '@app/streams/schemas.ts': join(supportRoot, 'app-stream-schemas.ts'),
+    // Rendered from the scaffold's own router template and route generator, never hand-written.
+    '@app/router.ts': await materializeAppRouterSupport(join(supportRoot, 'app')),
   };
 
   await writeSnippetFile(
