@@ -37,8 +37,9 @@ export class SagaKvRetention {
     if (!Number.isSafeInteger(limit) || limit <= 0 || limit > 100) {
       throw new RangeError('Saga retention page size must be between 1 and 100.');
     }
-    // Two checks belong to the cursor and canonical state; one mutation advances the cursor.
-    const pageSize = Math.min(limit, 98);
+    // Ten full 64 KiB values plus the cursor and key/check overhead fit the 800 KiB
+    // Deno KV mutation budget as well as its check and mutation count limits.
+    const pageSize = Math.min(limit, 10);
     const iterator = this.#kv.list<RetentionCursor>({
       prefix: [...this.#prefix, 'retention'],
       limit: 1,

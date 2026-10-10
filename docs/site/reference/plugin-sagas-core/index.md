@@ -239,14 +239,15 @@ Terminal `completed`, `failed`, `cancelled`, and `compensated` instances expire 
 `completedDays`, measured from the terminal timestamp. Canonical state, forward and reverse
 correlations, new terminal transitions, and `saga_instances` query documents use KV `expireIn`. The
 saga service applies the same deadline to earlier transitions and applied keys in atomic pages of at
-most 98 entries (100 checks and 99 mutations including state and cursor). A persistent
-`sagas/retention` cursor resumes that work after restart and is deleted once all history has
-received its TTL. Low-level `KvSagaStore` callers must drive `cleanupRetention()`; it returns
-whether work remains. The shipped durable runtime drains backlog without a polling delay, backs off
-from 100 ms to 30 seconds while idle, and logs/retries transient sweep failures with exponential
-backoff. Retention failures do not prevent runtime startup. A backlog can delay migration of
-historical keys, so backend expiry alone is guaranteed only after their terminal deadline has been
-assigned. No API read or owner app session drives cleanup.
+most 10 entries (12 checks and 11 mutations including state and cursor), conservatively bounded for
+Deno KV's mutation byte budget even for full-size values. A persistent `sagas/retention` cursor
+resumes that work after restart and is deleted once all history has received its TTL. Low-level
+`KvSagaStore` callers must drive `cleanupRetention()`; it returns whether work remains. The shipped
+durable runtime drains backlog without a polling delay, backs off from 100 ms to 30 seconds while
+idle, and logs/retries transient sweep failures with exponential backoff. Retention failures do not
+prevent runtime startup. A backlog can delay migration of historical keys, so backend expiry alone
+is guaranteed only after their terminal deadline has been assigned. No API read or owner app session
+drives cleanup.
 
 Transport reservations already use their separate deduplication TTL. With the KV backend,
 `archiveToDb: false` skips the optional Prisma archive even when a Prisma client is available. With

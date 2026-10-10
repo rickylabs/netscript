@@ -215,3 +215,32 @@ Deno.test('real Deno KV rejects stale open retention context after a concurrent 
   assertEquals(await kv.get(['sagas', 'correlation', 'concurrent', 'one']), null);
   assertEquals(await kv.get(['sagas', 'correlation-instance', instanceId]), null);
 });
+
+Deno.test('real Deno KV retention pages fit the mutation byte budget for large history values', async () => {
+  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+  const store = new KvSagaStore({ kv });
+  const now = new Date();
+  const instanceId = 'large' as SagaInstanceId;
+  for (let i = 0; i < 40; i++) {
+    await kv.set(['sagas', 'transition', instanceId, i], { payload: 'x'.repeat(50_000) });
+  }
+  await store.save({
+    state: {},
+    metadata: {
+      instanceId,
+      version: 1,
+      status: 'completed',
+      durability: 't1',
+      createdAt: now,
+      updatedAt: now,
+      completedAt: now,
+    },
+  });
+  for (let i = 0; i < 20; i++) await store.cleanupRetention();
+  assertEquals(await kv.get(['sagas', 'retention', instanceId]), null);
+  const records = [];
+  for await (const record of kv.list({ prefix: ['sagas', 'transition', instanceId] })) {
+    records.push(record);
+  }
+  assertEquals(records.length, 40);
+});
