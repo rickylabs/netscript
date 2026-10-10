@@ -85,6 +85,11 @@ export interface AuthzRequest {
   readonly method: string;
   /** Request path. */
   readonly path: string;
+  /**
+   * Undecoded request pathname, exactly as the oRPC handlers match it. Set by the service
+   * middleware; contract-policy authorizers resolve procedures from it when present.
+   */
+  readonly rawPath?: string;
 }
 
 /** Authorization decision. */

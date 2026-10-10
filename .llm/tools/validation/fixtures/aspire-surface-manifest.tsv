@@ -720,6 +720,9 @@ packages/mcp/tests/telemetry-endpoint_test.ts	mcp:fixtures	S3	add 13.5.3 describ
 packages/mcp/tests/telemetry-live-fixture_test.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/plugin-auth-core/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-auth-core/src/adapters/auth-service-authenticator.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin-sagas-core/src/integration/publisher/publish-saga-or-throw.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin-sagas-core/src/integration/publisher/saga-publisher-port.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin-sagas-core/tests/integration/publisher/publish-saga-or-throw_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-streams-core/src/application/create-durable-stream.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-streams-core/src/application/create-service-stream-producer.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-streams-core/src/application/stream-url-resolver.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
@@ -793,6 +796,7 @@ plugins/sagas/src/cli/adapters/runtime-api-client.ts	plugin:sagas	S5	SagaPublish
 plugins/sagas/src/constants.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/e2e/probes/probe-context.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/public/mod.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
+plugins/sagas/src/runtime/saga-endpoint-resolver.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/runtime/saga-publisher.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/aspire/sagas-contribution_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/e2e/sagas-gates_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
