@@ -15,7 +15,7 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
       InMemorySpanExporter,
       SimpleSpanProcessor,
     } from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
-    import { os } from 'npm:@orpc/server@^1.14.6';
+    import { os } from 'npm:@orpc/server@^1.15.5';
     import { defineSdkClientContribution } from ${JSON.stringify(contributionModule.href)};
     import { createHttpClientLink } from ${JSON.stringify(linkModule.href)};
     import { createServerServiceEnvKey } from ${JSON.stringify(discoveryModule.href)};

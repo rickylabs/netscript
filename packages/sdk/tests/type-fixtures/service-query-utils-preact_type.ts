@@ -1,5 +1,5 @@
 import { oc } from '@orpc/contract';
-import { z } from 'npm:zod@^4.4.3';
+import { z } from 'npm:zod@^4.6.5';
 import { QueryClient, type QueryFunctionContext } from '@tanstack/query-core';
 import { useQuery } from 'npm:@tanstack/preact-query@^5.104.1';
 import { createServiceClient } from '@netscript/sdk/client';
