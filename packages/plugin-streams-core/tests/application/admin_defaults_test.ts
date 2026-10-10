@@ -8,7 +8,7 @@ import {
   type StreamsSpanPort,
 } from '../../src/telemetry/instrumentation.ts';
 
-Deno.test('admin subpath exposes only its adapter while root owns helpers and contracts', () => {
+Deno.test('admin subpath exposes only its adapter at runtime while root owns helpers', () => {
   assertEquals(Object.keys(adminExports), ['DurableStreamAdmin']);
 });
 

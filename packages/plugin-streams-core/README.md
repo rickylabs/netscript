@@ -197,10 +197,11 @@ service configuration and throw `StreamAdminError` with typed authorization, tim
 or transport failures. Requests default to a 5,000 ms deadline and emit administrative spans. Use
 these helpers in a background worker or scheduled trigger under a service identity.
 
-The `./admin` subpath exports only `DurableStreamAdmin` for injection; helpers and versioned
-administrative contracts are exported from the package root. Stop segment producers before deleting
-their streams. Entity-level producer delete only appends a tombstone. Offset trim and server-side
-listing are not implemented.
+The `./admin` subpath exports `DurableStreamAdmin` for injection and its signature types. Those
+types are intentionally available at both entrypoints so the adapter surface is self-contained;
+helpers and `StreamAdminError` are exported only from the package root. Stop segment producers
+before deleting their streams. Entity-level producer delete only appends a tombstone. Offset trim
+and server-side listing are not implemented.
 
 See the
 [retention how-to](https://rickylabs.github.io/netscript/durable-workflows/how-to/bound-stream-retention/).

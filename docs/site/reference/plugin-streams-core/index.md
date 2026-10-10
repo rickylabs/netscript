@@ -25,7 +25,7 @@ instances, sessions — into durable topics.
 | Export specifier                                      | Module                   | Exports | Purpose                                                                                                                              |
 | ----------------------------------------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `@netscript/plugin-streams-core`                      | `./mod.ts`               | 62      | Schema definition, the durable producer, endpoint resolution, diagnostics, and the v1 producer port vocabulary (documented below).   |
-| `@netscript/plugin-streams-core/admin`                | `./admin.ts`             | 1       | Upstream whole-stream administrative adapter; helpers and versioned contracts live in the root.                                      |
+| `@netscript/plugin-streams-core/admin`                | `./admin.ts`             | 8       | Upstream whole-stream administrative adapter and signature types; helpers live in the root.                                          |
 | `@netscript/plugin-streams-core/sse`                  | `./src/sse/mod.ts`       | 33      | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. |
 | `@netscript/plugin-streams-core/telemetry`            | `./src/telemetry/mod.ts` | 33      | Telemetry registration, span names, attribute keys, and the meter/counter/gauge ports used by reconnect metrics.                     |
 | `@netscript/plugin-streams-core/testing`              | `./src/testing/mod.ts`   | 4       | An in-memory producer and a small schema fixture for tests that must not open network sockets.                                       |
@@ -167,6 +167,10 @@ paths to change an existing server policy.
 | `StreamAdminInstrumentationV1` | interface  | Narrow telemetry port satisfied by `StreamsInstrumentation`.                      |
 | `StreamAdminError`             | class      | Typed failure thrown by administrative helpers.                                   |
 | `DurableStreamAdmin`           | class      | Upstream `DurableStream.head` / `delete` adapter, exported from `./admin`.        |
+
+Helpers and `StreamAdminError` have one public import path, the package root. The adapter signature
+types are intentionally re-exported from `./admin` as well, keeping that entrypoint self-contained
+for consumers and documentation tooling.
 
 The port returns the existing `StreamProducerTransportResultV1<T>`. Authorization failures are
 `unauthorized`, request deadlines are `timeout`, caller cancellation is `aborted`, transient
