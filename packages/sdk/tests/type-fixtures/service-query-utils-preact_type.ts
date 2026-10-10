@@ -52,7 +52,8 @@ export function consumerAssertions(): void {
   >;
   type RequiredContext = Assert<
     Equal<
-      {} extends Pick<Parameters<typeof securedUtils.list.queryOptions>[0], 'context'> ? true
+      Record<never, never> extends
+        Pick<Parameters<typeof securedUtils.list.queryOptions>[0], 'context'> ? true
         : false,
       false
     >
