@@ -23,17 +23,16 @@
  */
 
 import {
+  appendSanitizedChunksToStream,
   durableStreamConnection,
+  ensureDurableChatSessionStream,
   toDurableChatSessionResponse,
 } from '@durable-streams/tanstack-ai-transport';
 import { stream } from '@durable-streams/client';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 import type { ModelMessage, UIMessage } from '@tanstack/ai';
 import { createChatSubscriptionHub } from '../../internal/chat-subscription-hub.ts';
-import {
-  createChatMessageReplay,
-  prependChatMessages,
-} from '../../internal/chat-message-replay.ts';
+import { chatMessageChunks, createChatMessageReplay } from '../../internal/chat-message-replay.ts';
 
 // ---------------------------------------------------------------------------
 // Session addressing (internal — not part of the public `./ai` surface).
@@ -589,7 +588,7 @@ async function defaultMaterialize(input: {
   return { messages: replay.messages(), offset: response.offset };
 }
 
-function defaultToResponse(input: {
+async function defaultToResponse(input: {
   readonly writeUrl: string;
   readonly headers: Record<string, string>;
   readonly newMessages: readonly unknown[];
@@ -597,11 +596,16 @@ function defaultToResponse(input: {
   readonly mode?: 'immediate' | 'await';
   readonly waitUntil?: (task: Promise<unknown>) => void;
 }): Promise<Response> {
+  const streamTarget = { writeUrl: input.writeUrl, headers: input.headers, createIfMissing: true };
+  const durableStream = await ensureDurableChatSessionStream(streamTarget);
+  // Persist client messages before returning, including in immediate mode.
+  await appendSanitizedChunksToStream(durableStream, chatMessageChunks(input.newMessages));
   return toDurableChatSessionResponse({
-    stream: { writeUrl: input.writeUrl, headers: input.headers, createIfMissing: true },
+    // The stream was already ensured above; no second create request is needed.
+    stream: { ...streamTarget, createIfMissing: false },
     // The upstream newMessages path emits only text echo chunks.
     newMessages: [],
-    responseStream: prependChatMessages(input.newMessages, input.source),
+    responseStream: input.source,
     mode: input.mode,
     waitUntil: input.waitUntil,
   });

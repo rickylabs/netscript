@@ -101,12 +101,13 @@ Deno.test('native newMessages survive default persistence and seed reload withou
   ];
   const expected = JSON.parse(JSON.stringify(messages));
   try {
-    await toNetScriptChatResponse({
+    const immediate = await toNetScriptChatResponse({
       target,
       newMessages: [legacy],
       source: (async function* () {})(),
-      mode: 'await',
     });
+    assertEquals(immediate.status, 202);
+    assert(chunks.length > 0, 'client messages must persist before an immediate response returns');
     await toNetScriptChatResponse({
       target,
       newMessages: messages,

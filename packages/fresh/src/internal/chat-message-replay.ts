@@ -5,24 +5,15 @@ import { toMessageEchoChunks } from '@durable-streams/tanstack-ai-transport';
 
 const MESSAGE_APPEND = 'netscript.chat.messages';
 
-/** Store complete new messages once, before consuming the assistant source. */
-export async function* prependChatMessages(
-  messages: readonly unknown[],
-  source: AsyncIterable<unknown>,
-): AsyncIterable<unknown> {
-  if (messages.length > 0) {
-    // Retain standard text echoes for raw upstream clients. The native event follows
-    // them so replay restores the exact original parts rather than doubling text.
-    for (const message of messages) {
-      for (
-        const chunk of toMessageEchoChunks(message as Parameters<typeof toMessageEchoChunks>[0])
-      ) {
-        yield chunk;
-      }
-    }
-    yield { type: 'CUSTOM', name: MESSAGE_APPEND, value: messages };
-  }
-  yield* source;
+/** Encode complete new messages once, alongside compatible upstream text echoes. */
+export function chatMessageChunks(messages: readonly unknown[]): readonly unknown[] {
+  if (messages.length === 0) return [];
+  // The native event follows the echoes so replay restores original parts.
+  const chunks: unknown[] = messages.flatMap((message) =>
+    toMessageEchoChunks(message as Parameters<typeof toMessageEchoChunks>[0])
+  );
+  chunks.push({ type: 'CUSTOM', name: MESSAGE_APPEND, value: messages });
+  return chunks;
 }
 
 /** Replay native appends and ordinary chunks through one upstream reducer. */
