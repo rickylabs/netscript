@@ -94,6 +94,15 @@ export const REDIS_MGET_BATCH_SIZE: number = (() => {
 })();
 
 /**
+ * Attempts `atomic()` makes when `EXEC` aborts because a watched key changed.
+ *
+ * Every attempt re-runs the checks, so retrying never turns a failed check
+ * into a success; it only rescues commits that conflicted on a
+ * `sum`/`min`/`max` operand.
+ */
+export const REDIS_ATOMIC_MAX_ATTEMPTS = 5;
+
+/**
  * Maximum time (ms) to wait for the initial Redis connection.
  */
 export const REDIS_CONNECT_TIMEOUT_MS = 10_000;
