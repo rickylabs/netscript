@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "54e0601d8",
-  "extractionTimestamp": "2026-10-10T17:44:14.872Z",
+  "sourceCommit": "4d9aa23c9",
+  "extractionTimestamp": "2026-10-10T18:02:42.708Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -129,6 +129,7 @@
     "pages/services-sdk/how-to/protect-an-anonymous-route/index.md",
     "pages/services-sdk/index.md",
     "pages/services-sdk/sdk/index.md",
+    "pages/services-sdk/service-layout/index.md",
     "pages/services-sdk/services/index.md",
     "pages/tutorials/chat/01-scaffold/index.md",
     "pages/tutorials/chat/02-durable-chat-route/index.md",
@@ -191,7 +192,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5277342,
-  "compressedBytes": 1537348,
-  "sha256": "3dadbceb25c7743e356e3585b7e92932ca2d51db9f08b5d6582ac7113ea05cc0"
+  "uncompressedBytes": 5291703,
+  "compressedBytes": 1542644,
+  "sha256": "5105debeb3913ba4812d368916225020bac38685f35320f50d6d59137256bacf"
 }
