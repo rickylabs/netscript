@@ -47,14 +47,14 @@ function refundSaga(
 }
 
 async function runSaga(
-  definition: SagaDefinition,
+  definition: SagaDefinition | readonly SagaDefinition[],
   messages: readonly SagaMessage[],
   store = new MemorySagaStore(),
 ): Promise<MemorySagaStore> {
   const runtime = createSagaRuntime({
     native: { store, compensator: new SagaCompensator({ clock: new TestSagaClock() }) },
   });
-  await runtime.register([definition]);
+  await runtime.register(Array.isArray(definition) ? definition : [definition]);
   await runtime.start();
   try {
     for (const message of messages) {
@@ -233,6 +233,44 @@ for (const mode of STORE_MODES) {
     assertEquals(
       store.transitions(INSTANCE_ID).map((record) => record.transition.status),
       ['compensating', 'compensating', 'compensated'],
+    );
+  });
+
+  Deno.test(`${mode.name}: a send chain through another saga is threaded into the next compensation`, async () => {
+    // A -> B -> A: saga A's first sibling reaches saga B, whose cascade moves A to version 2.
+    // A's following compensation must commit version 3, not race the indirect transition.
+    const refund = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
+    const relay = defineSaga('relay').state<SagaState>({});
+    const definitions = [
+      (mode.atomic ? refund.durableWorkerCommands() : refund)
+        .correlate(() => CORRELATION_KEY)
+        .on('FulfillmentFailed', () => [
+          send('ReleaseStock', {}),
+          sagaCompensate({ type: 'RefundPayment', payload: {} }),
+        ])
+        .on('StockReleased', (saga) => {
+          saga.state = { ...saga.state, stock: 'released' };
+          return [];
+        })
+        .compensate('RefundPayment', (saga) => {
+          saga.state = { ...saga.state, payment: 'refunded' };
+          return [sagaFail('order cancelled')];
+        })
+        .build() as SagaDefinition,
+      (mode.atomic ? relay.durableWorkerCommands() : relay)
+        .on('ReleaseStock', () => [send('StockReleased', {})])
+        .build() as SagaDefinition,
+    ];
+
+    const store = await runSaga(definitions, [fulfillmentFailed]);
+
+    const loaded = await store.load(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'failed');
+    assertEquals(loaded?.metadata.version, 3);
+    assertEquals(loaded?.state, { payment: 'refunded', stock: 'released' });
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['compensating', 'compensating', 'failed'],
     );
   });
 
