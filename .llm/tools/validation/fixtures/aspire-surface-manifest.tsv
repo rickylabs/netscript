@@ -834,10 +834,12 @@ plugins/workers/src/aspire/workers-contribution.ts	plugin-contribution	S5/S6	lit
 plugins/workers/src/cli/adapters/runtime-api-client.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/src/e2e/probes/probe-context.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/src/public/mod.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/src/runtime/concurrency.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/streams/factory.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/test-api.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/aspire/workers-contribution_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/public/manifest_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/tests/runtime/concurrency_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/verify-plugin.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 README.md	doc:root	S11	prose sweep (AGENTS.md only if skill path changes)
