@@ -14,7 +14,7 @@
     "./rate-limit": "./src/rate-limit/mod.ts"
   },
   "tasks": {
-    "check": "deno check --unstable-kv ./mod.ts commands.ts commands-testing.ts commands-relay.ts ./src/auth/internal-credential/mod.ts",
+    "check": "deno check --unstable-kv ./mod.ts commands.ts commands-testing.ts commands-relay.ts ./src/auth/internal-credential/mod.ts ./src/rate-limit/mod.ts",
     "test": "deno test --allow-all ./tests/",
     "lint": "deno lint",
     "fmt": "deno fmt --check",

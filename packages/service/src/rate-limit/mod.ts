@@ -17,6 +17,8 @@ export {
 } from './adapters/kv-rate-limit-store.ts';
 export type { ServiceContext, ServiceEnvironment, ServiceMiddleware } from '../types.ts';
 export type { KvKey, KvStore } from '@netscript/kv';
+// KvStore's public methods reference these six types transitively. Keep that port intact
+// instead of duplicating it; named re-exports make its signature deno doc --lint clean.
 export type {
   AtomicCheck,
   AtomicMutation,

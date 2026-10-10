@@ -60,7 +60,8 @@ auth/body-limit stages and deferred custom/RPC routes. Install it before `withHe
 `serve()` supplies the socket peer to Hono, including on TLS listeners. Hono's Deno `getConnInfo`
 continues to report that peer. The limiter defaults to this address. A mounting host must pass
 `{ remoteAddr }` to `app.fetch(request, env)`, or supply a custom `key`; without metadata, clients
-share the `unknown` bucket.
+share the `unknown` bucket. The stage logs a warning once when it first encounters this fallback,
+through the request logger or the service package logger. Configure logging to make it visible.
 
 Forwarded headers are ignored by default, matching the auth transport policy introduced in #2026.
 Enable XFF only with an explicit predicate identifying trusted proxy addresses:
@@ -87,12 +88,27 @@ restrict direct access as appropriate for the deployment. Malformed chains, chai
 headers over 8192 characters fall back to the socket address. This option does not change OAuth
 protocol-header trust; configure auth's `trustProxyHeaders` independently.
 
+IPv6 address keys are canonicalized and grouped by /64 by default, including trusted XFF addresses.
+Rotating interface IDs within that network shares one bucket instead of evading quota or consuming
+one memory-store slot per address. Set `ipv6Prefix` to an integer from 0–128 to choose another
+prefix; `/128` keeps individual IPv6 hosts, and `/0` shares one IPv6 bucket per scope ID. Scope IDs
+remain distinct, and IPv4-mapped IPv6 addresses follow the IPv6 prefix policy. Native IPv4 addresses
+are unchanged. Custom `key` results are used verbatim, and proxy trust and Hono's socket metadata
+still use the original address. Grouping can throttle several clients on one IPv6 network; choose a
+prefix suited to your deployment. Prefix grouping reduces address churn within a network, but does
+not prevent exhaustion by clients from many networks or attacker-controlled custom keys.
+
 ## Bound storage and contention
 
 The KV store uses one read and one atomic version-checked write per attempt. Each accepted write has
 `expireIn` equal to the remaining window duration. The default retry budget is eight attempts (at
 most sixteen KV round trips), independent of client count; `maxAttempts` supports 1–32. Exhausting
-the budget rejects conservatively with `429`. Storage failures propagate through the service error
+the budget rejects conservatively with `429`. TTL bounds the lifetime of each attacker-chosen key,
+but the KV adapter has no global key-count cap: many distinct keys can allocate many counters during
+one live window. Accepted writes refresh expiry to the remaining window duration rather than adding
+another full window. Rejected requests neither create nor refresh counters. Configure backend
+capacity/admission controls and a stable, bounded custom key policy when callers can influence keys;
+TTL alone does not bound live cardinality. Storage failures propagate through the service error
 handler and never allow the protected route to run.
 
 The memory store performs synchronous reservations, evicts expired entries in batches of at most 32

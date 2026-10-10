@@ -1,8 +1,11 @@
 /** Rate-limit stage on the existing service middleware seam. @module */
 import type { ServiceEnvironment, ServiceMiddleware } from '../../types.ts';
+import { createPackageLogger, type Logger } from '@netscript/logger';
 import { rateLimitWindow } from '../domain/rate-limit.ts';
-import { resolveServiceClientAddress } from './client-address.ts';
+import { rateLimitAddressKey, resolveServiceClientAddress } from './client-address.ts';
 import type { ServiceRateLimitOptions } from './options.ts';
+
+const RATE_LIMIT_LOGGER = createPackageLogger('service');
 
 /**
  * Creates route-scoped middleware returning JSON 429 and whole-second Retry-After.
@@ -26,6 +29,11 @@ import type { ServiceRateLimitOptions } from './options.ts';
 export function createRateLimitMiddleware(options: ServiceRateLimitOptions): ServiceMiddleware {
   const { limit, windowMs, store, key, trustProxy } = options;
   rateLimitWindow({ key: '', limit, windowMs, now: 0 });
+  const ipv6Prefix = options.ipv6Prefix ?? 64;
+  if (!Number.isInteger(ipv6Prefix) || ipv6Prefix < 0 || ipv6Prefix > 128) {
+    throw new RangeError('Rate-limit ipv6Prefix must be an integer from 0 to 128');
+  }
+  let warnedMissingPeer = false;
   const now = options.now ?? Date.now;
   const routes = options.routes.map((route) => {
     if (
@@ -50,11 +58,24 @@ export function createRateLimitMiddleware(options: ServiceRateLimitOptions): Ser
       await next();
       return;
     }
-    const clientKey = key ? await key(context) : resolveServiceClientAddress(
-      context.req.raw,
-      context.env as ServiceEnvironment | undefined,
-      trustProxy,
-    ) ?? 'unknown';
+    let clientKey: string;
+    if (key) {
+      clientKey = await key(context);
+    } else {
+      const address = resolveServiceClientAddress(
+        context.req.raw,
+        context.env as ServiceEnvironment | undefined,
+        trustProxy,
+      );
+      if (address === undefined && !warnedMissingPeer) {
+        warnedMissingPeer = true;
+        const logger: Logger = context.get('logger') ?? RATE_LIMIT_LOGGER;
+        logger.warn(
+          'Rate limit has no socket metadata or custom key; all clients share the unknown bucket. Pass remoteAddr to fetch() or set key.',
+        );
+      }
+      clientKey = address === undefined ? 'unknown' : rateLimitAddressKey(address, ipv6Prefix);
+    }
     const decision = await store.consume({
       key: clientKey,
       limit,

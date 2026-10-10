@@ -118,7 +118,7 @@ The `@netscript/service/rate-limit` subpath exposes:
 | `createKvRateLimitStore`      | function  | Uses KV atomic compare-and-set plus TTL in a dedicated prefix, with a bounded retry budget. |
 | `createMemoryRateLimitStore`  | function  | Creates a synchronous, capped development store with bounded TTL eviction.                  |
 | `resolveServiceClientAddress` | function  | Resolves the socket peer or explicitly trusted XFF hops, walking right to left.             |
-| `ServiceRateLimitOptions`     | interface | `routes`, `limit`, `windowMs`, `store`, and optional `key`, `trustProxy`, `now`.            |
+| `ServiceRateLimitOptions`     | interface | `routes`, `limit`, `windowMs`, `store`, and optional `key`, `trustProxy`, `ipv6Prefix`, `now`.            |
 | `ServiceProxyTrust`           | type      | `false` or an address predicate identifying trusted proxy hops; default off.                |
 | `RateLimitStore`              | interface | Port reserving one slot atomically with `consume(request)`.                                 |
 | `RateLimitRequest`            | interface | Key, quota, window, epoch milliseconds, and optional request cancellation signal.           |
@@ -129,6 +129,9 @@ The `@netscript/service/rate-limit` subpath exposes:
 The subpath also re-exports the first-party integration types `ServiceContext`,
 `ServiceEnvironment`, `ServiceMiddleware`, `KvStore`, `KvKey`, `KvEntry`, `KvListOptions`,
 `KvSetOptions`, `AtomicCheck`, `AtomicMutation`, and `AtomicResult` used by these signatures.
+The six ancillary KV types are intentional: the accepted `KvStore` port references them through
+its public methods. Re-exporting them preserves the upstream port and makes Deno's documentation
+lint resolve its transitive signature types, without introducing a duplicate KV interface.
 
 Selected routes share one quota per key and epoch-aligned window. Paths are exact or end in `/*` for
 a subtree (including its root). Rejections return `{ error: 'RATE_LIMITED' }` with `429` and
@@ -139,7 +142,14 @@ retry exhaustion or memory capacity pressure rejects conservatively; store failu
 `ServiceEnvironment` is exported from the root entrypoint. `ServiceApp.fetch(request, env)` and
 `ServiceApp.request(input, init, env)` accept it. The listener supplies `remoteAddr` on plain and
 TLS requests so Hono's Deno `getConnInfo` works. The default limiter key is the resolved client
-address; a mounted app without metadata uses a shared `unknown` bucket.
+address; IPv6 keys are canonicalized and grouped by /64, with `ipv6Prefix` (0–128) selecting
+another prefix. IPv4 and custom keys stay unchanged. This grouping affects quota keys only, not
+socket metadata or proxy trust. A mounted app without metadata uses a shared `unknown` bucket and
+logs a warning once per stage through the request logger or service package logger.
+
+KV counter TTL bounds each key's lifetime, not total live cardinality. Distinct attacker-chosen
+keys can allocate distinct counters until window expiry; use backend admission/capacity controls
+and stable custom keys. The memory store instead rejects new keys when its live-key cap is full.
 
 Like auth's #2026 transport policy, forwarded headers are ignored by default. Explicit proxy trust
 identifies permitted socket/hop addresses; malformed or excessive XFF chains fall back to the

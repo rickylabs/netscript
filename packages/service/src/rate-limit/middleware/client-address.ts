@@ -47,3 +47,28 @@ export function resolveServiceClientAddress(
   }
   return client;
 }
+
+/**
+ * Canonicalizes an address bucket, grouping IPv6 interface addresses by prefix.
+ * URL supplies upstream IPv6 parsing/serialization, including IPv4-mapped forms.
+ * This changes quota keys only; socket metadata and proxy trust use the original peer.
+ * @param address - Resolved client address.
+ * @param prefix - Validated IPv6 prefix length.
+ * @returns Prefix bucket for IPv6, or the unchanged non-IPv6 address.
+ */
+export function rateLimitAddressKey(address: string, prefix: number): string {
+  if (isIP(address) !== 6) return address;
+  const [ip, zone] = address.split('%');
+  const canonical = new URL(`http://[${ip}]/`).hostname.slice(1, -1);
+  const [head = '', tail] = canonical.split('::');
+  const left = head ? head.split(':') : [];
+  const right = tail === undefined ? undefined : tail ? tail.split(':') : [];
+  const words = right
+    ? [...left, ...Array<string>(8 - left.length - right.length).fill('0'), ...right]
+    : left;
+  const network = words.map((word, index) => {
+    const bits = Math.max(0, Math.min(16, prefix - index * 16));
+    return (parseInt(word, 16) & (0xffff << (16 - bits))).toString(16);
+  });
+  return `${network.join(':')}${zone ? `%${zone}` : ''}/${prefix}`;
+}

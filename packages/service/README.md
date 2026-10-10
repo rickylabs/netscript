@@ -646,7 +646,19 @@ unless they intentionally share a quota. Hosts sharing a store need synchronized
 `serve()` supplies `{ remoteAddr: info.remoteAddr }` to Hono on HTTP and TLS listeners, so Hono's
 Deno `getConnInfo` sees the socket peer. A mounting host can pass the same `ServiceEnvironment` to
 `app.fetch(request, env)`. Without metadata, the default key is a shared `unknown` bucket; provide
-metadata or a custom `key` for per-client quotas.
+metadata or a custom `key` for per-client quotas. The stage warns once through the request logger
+(or the service package logger) when a selected request falls back to this global bucket.
+
+IPv6 address keys share their /64 network by default, preventing interface-ID rotation from evading
+quota or filling the memory store with keys within that network. `ipv6Prefix` accepts 0–128; `128`
+retains individual hosts. Canonicalization includes trusted XFF and mapped IPv4 forms, retains IPv6
+scope IDs, and leaves IPv4/custom keys unchanged. This does not alter socket metadata or proxy
+trust. Multiple IPv6 networks or attacker-controlled custom keys can still exhaust capacity.
+
+KV counters expire at the window boundary, but TTL limits lifetime rather than live key count.
+Accepted writes refresh only the remaining window duration; rejections do not create or refresh
+counters. Use backend capacity/admission controls and stable custom keys for untrusted inputs. The
+memory store bounds live keys with `maxKeys` and rejects new keys when full.
 
 Like the auth transport policy, proxy trust defaults off. `trustProxy: (address) => ...` explicitly
 identifies trusted proxy addresses. XFF is walked right to left from the socket peer, stopping at
