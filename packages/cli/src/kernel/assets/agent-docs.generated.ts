@@ -39,7 +39,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/mcp": [".","./cli","./openapi-projection"],
 
-  "@netscript/plugin": [".","./abstracts","./adapter","./cli","./config","./contract-base","./health","./loader","./protocol","./scaffold","./sdk","./service","./templates","./testing"],
+  "@netscript/plugin": [".","./abstracts","./adapter","./cli","./config","./contract-base","./loader","./protocol","./scaffold","./sdk","./service","./templates","./testing"],
 
   "@netscript/plugin-ai": [".","./adapter","./adapter-cli","./contracts","./plugin","./public","./scaffold"],
 
