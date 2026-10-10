@@ -4,6 +4,8 @@
  * @module
  */
 
+import type { QueryFunction } from '@tanstack/query-core';
+
 import type {
   ContractLike,
   ContractProcedureLike,
@@ -92,7 +94,7 @@ export interface ServiceProcedureQueryResult<TOutput> {
   /** Full query key tagged by the utility implementation. */
   readonly queryKey: readonly unknown[];
   /** Query function that invokes the service procedure. */
-  readonly queryFn: (context: never) => Promise<TOutput> | TOutput;
+  readonly queryFn: QueryFunction<TOutput>;
   /** Whether the query should run. */
   readonly enabled?: boolean;
   /** Cache freshness window in milliseconds. */
