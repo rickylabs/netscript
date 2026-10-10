@@ -4,7 +4,8 @@ import { QueryClient, type QueryFunctionContext } from '@tanstack/query-core';
 import { useQuery } from 'npm:@tanstack/preact-query@^5.101.0';
 import { createServiceClient } from '@netscript/sdk/client';
 import { createServiceQueryUtils } from '@netscript/sdk/query-client';
-import type { ServiceClient } from '@netscript/sdk/ports';
+import type { QueryClientPort as PresetQueryClientPort } from '@netscript/sdk/presets';
+import type { QueryClientPort, ServiceClient } from '@netscript/sdk/ports';
 
 const contract = {
   list: oc.input(z.object({ offset: z.number(), limit: z.number() })).output(
@@ -32,6 +33,7 @@ export function consumerAssertions(): void {
   type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true
     : false;
   type Assert<T extends true> = T;
+  type PresetTypeClosure = Assert<Equal<PresetQueryClientPort, QueryClientPort>>;
   type Input = Assert<
     Equal<Parameters<typeof utils.list.queryOptions>[0]['input'], {
       offset: number;
@@ -69,6 +71,7 @@ export function consumerAssertions(): void {
   void data;
   void result;
   const proof:
+    & PresetTypeClosure
     & Input
     & Output
     & Cancellation
