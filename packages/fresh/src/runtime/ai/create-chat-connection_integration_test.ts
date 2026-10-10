@@ -8,7 +8,9 @@ import {
   createNetScriptChatConnection,
   type NetScriptChatMessage,
   resolveChatSnapshot,
+  toNetScriptChatResponse,
 } from './create-chat-connection.ts';
+import { createChatMessageReplay } from '../../internal/chat-message-replay.ts';
 
 type DurableEntry = unknown;
 
@@ -65,6 +67,86 @@ class FakeDurableChatStream {
 }
 
 const TARGET = { sessionId: 'durable-session', baseUrl: 'http://streams.test' } as const;
+
+Deno.test('native newMessages survive default persistence and seed reload without replacing history', async () => {
+  const chunks: unknown[] = [];
+  const methods: string[] = [];
+  const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
+    methods.push(request.method);
+    if (request.method === 'POST') {
+      const body: unknown = await request.json();
+      chunks.push(...(Array.isArray(body) ? body : [body]));
+      return new Response(null, {
+        status: 204,
+        headers: { 'Stream-Next-Offset': String(chunks.length) },
+      });
+    }
+    if (request.method === 'PUT') return new Response(null, { status: 201 });
+    return Response.json(chunks, {
+      headers: { 'Stream-Next-Offset': String(chunks.length), 'Stream-Up-To-Date': 'true' },
+    });
+  });
+  const target = {
+    sessionId: 'native-persistence',
+    baseUrl: `http://127.0.0.1:${server.addr.port}`,
+  };
+  const legacy = { id: 'legacy', role: 'user' as const, content: 'Existing history —' };
+  const messages = [
+    { ...nativeUiMessage, futureField: { retained: true } },
+    nativeModelMessage,
+    nativeActivityMessage,
+    { id: 'future', role: 'user' as const, parts: [{ type: 'future-attachment', opaque: true }] },
+    { id: 'null-model', role: 'tool' as const, content: null, toolCallId: 'null-call' },
+    { role: 'user' as const, content: 'Model without an id' },
+  ];
+  const expected = JSON.parse(JSON.stringify(messages));
+  try {
+    await toNetScriptChatResponse({
+      target,
+      newMessages: [legacy],
+      source: (async function* () {})(),
+      mode: 'await',
+    });
+    await toNetScriptChatResponse({
+      target,
+      newMessages: messages,
+      source: (async function* () {
+        yield { type: 'TEXT_MESSAGE_START', messageId: 'reply', role: 'assistant' };
+        yield { type: 'TEXT_MESSAGE_CONTENT', messageId: 'reply', delta: 'Retained reply…' };
+        yield { type: 'TEXT_MESSAGE_END', messageId: 'reply' };
+      })(),
+      mode: 'await',
+    });
+    // A fresh replay reads serialized durable bytes, not the objects passed to send.
+    const replay = createChatMessageReplay();
+    const persisted: unknown[] =
+      await (await fetch(`${target.baseUrl}/v1/stream/netscript/ai/chat/${target.sessionId}`))
+        .json();
+    for (const chunk of persisted) replay.apply(chunk);
+    const reloaded = replay.messages() as Record<string, unknown>[];
+    assertEquals(reloaded[1]?.parts, expected[0].parts);
+    assertEquals(reloaded[0], { ...legacy, parts: [{ type: 'text', text: legacy.content }] });
+    for (const [index, message] of expected.entries()) {
+      const actual = reloaded[index + 1];
+      for (const [key, value] of Object.entries(message)) assertEquals(actual[key], value);
+    }
+    assert(typeof reloaded[6].id === 'string' && reloaded[6].id.length > 0);
+    assertEquals(reloaded.at(-1)?.id, 'reply');
+    const seed = await resolveChatSnapshot({ target });
+    const reload = await resolveChatSnapshot({ target });
+    assertEquals(reload, seed);
+    assertEquals(seed.messages[0].content, legacy.content);
+    assertEquals(seed.messages.at(-1)?.content, 'Retained reply…');
+    assert(seed.renderParts.some((part) => part.kind === 'tool' && part.toolName === 'inspect'));
+    assertEquals(seed.offset, String(chunks.length));
+    assertEquals(methods.filter((method) => method === 'PUT').length, 2);
+    assertEquals(methods.filter((method) => method === 'GET').length, 3);
+    // Serialization and replay must not mutate the caller's parts or metadata.
+    assertEquals(JSON.parse(JSON.stringify(messages)), expected);
+  } finally {
+    await server.shutdown();
+  }
+});
 
 function nextValue<T>(iterator: AsyncIterator<T>): Promise<T> {
   return iterator.next().then((result) => {

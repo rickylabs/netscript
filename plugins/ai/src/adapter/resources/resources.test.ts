@@ -115,6 +115,11 @@ Deno.test('ai scaffold emitters have focused golden content', () => {
   assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'aiContractV1');
   assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'createAiRouter');
   assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'toNetScriptChatResponse');
+  assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'NetScriptChatSendMessage');
+  assertStringIncludes(
+    byPath.get('ai/routes/chat-stream.ts') ?? '',
+    'newMessages: body.newMessages ??',
+  );
   assertStringIncludes(byPath.get('ai/routes/chat.tsx') ?? '', 'createNetScriptChatConnection');
 });
 

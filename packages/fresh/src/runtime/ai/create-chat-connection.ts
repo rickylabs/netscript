@@ -24,12 +24,16 @@
 
 import {
   durableStreamConnection,
-  materializeSnapshotFromDurableStream,
   toDurableChatSessionResponse,
 } from '@durable-streams/tanstack-ai-transport';
+import { stream } from '@durable-streams/client';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 import type { ModelMessage, UIMessage } from '@tanstack/ai';
 import { createChatSubscriptionHub } from '../../internal/chat-subscription-hub.ts';
+import {
+  createChatMessageReplay,
+  prependChatMessages,
+} from '../../internal/chat-message-replay.ts';
 
 // ---------------------------------------------------------------------------
 // Session addressing (internal — not part of the public `./ai` surface).
@@ -272,8 +276,11 @@ export interface NetScriptChatResponseOptions {
   readonly streamPath?: NetScriptChatStreamPath;
   /** The server-side chat stream to sanitize and persist as chunks. */
   readonly source: AsyncIterable<unknown>;
-  /** New client messages to persist before the assistant turn (optional). */
-  readonly newMessages?: readonly NetScriptChatMessage[];
+  /**
+   * Complete UI/Model messages to persist before the assistant turn (optional).
+   * Native parts and fields survive storage; content-string inputs remain supported.
+   */
+  readonly newMessages?: readonly NetScriptChatSendMessage[];
   /** Completion mode forwarded to the transport. Defaults to `'immediate'` (transport default) when omitted. */
   readonly mode?: 'immediate' | 'await';
   /** Background-task registration forwarded to the transport (e.g. a Worker's `ctx.waitUntil`). */
@@ -509,8 +516,8 @@ export async function toNetScriptChatResponse(
 /**
  * Resolve the seed chat snapshot for SSR / first paint.
  *
- * Materializes the durable session (via `materializeSnapshotFromDurableStream`)
- * and reduces it through {@link projectChatSnapshot} — the SAME reducer the live
+ * Replays the durable session with TanStack's `StreamProcessor`, retaining native
+ * message append parts, and reduces it through {@link projectChatSnapshot} — the SAME reducer the live
  * island path uses (ONE-PROJECTION LAW) — so tool cards rendered at seed time
  * survive the first live chunk unchanged. The returned `offset` seeds the live
  * subscription so seed and live read one continuous chunk log.
@@ -565,16 +572,21 @@ function defaultCreateConnection(input: {
   };
 }
 
-function defaultMaterialize(input: {
+async function defaultMaterialize(input: {
   readonly readUrl: string;
   readonly headers: Record<string, string>;
   readonly offset?: string;
 }): Promise<{ readonly messages: readonly unknown[]; readonly offset?: string }> {
-  return materializeSnapshotFromDurableStream({
-    readUrl: input.readUrl,
+  const response = await stream({
+    url: input.readUrl,
+    json: true,
+    live: false,
     headers: input.headers,
     offset: input.offset,
   });
+  const replay = createChatMessageReplay();
+  for (const chunk of await response.json()) replay.apply(chunk);
+  return { messages: replay.messages(), offset: response.offset };
 }
 
 function defaultToResponse(input: {
@@ -587,10 +599,9 @@ function defaultToResponse(input: {
 }): Promise<Response> {
   return toDurableChatSessionResponse({
     stream: { writeUrl: input.writeUrl, headers: input.headers, createIfMissing: true },
-    newMessages: input.newMessages as Parameters<
-      typeof toDurableChatSessionResponse
-    >[0]['newMessages'],
-    responseStream: input.source,
+    // The upstream newMessages path emits only text echo chunks.
+    newMessages: [],
+    responseStream: prependChatMessages(input.newMessages, input.source),
     mode: input.mode,
     waitUntil: input.waitUntil,
   });
@@ -622,15 +633,14 @@ function withIdentityEncoding(headers: Record<string, string>): Record<string, s
   return normalized;
 }
 
-function toDurableMessage(message: NetScriptChatMessage): {
-  readonly id: string;
-  readonly role: string;
-  readonly parts: ReadonlyArray<{ readonly type: 'text'; readonly text: string }>;
-} {
+function toDurableMessage(message: NetScriptChatSendMessage): NetScriptChatSendMessage {
+  if ('parts' in message) return message;
   return {
-    id: message.id,
-    role: message.role,
-    parts: [{ type: 'text', text: message.content }],
+    ...message,
+    id: message.id ?? crypto.randomUUID(),
+    parts: typeof message.content === 'string'
+      ? [{ type: 'text', text: message.content }]
+      : message.content ?? [],
   };
 }
 
