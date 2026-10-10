@@ -4608,6 +4608,7 @@
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
           "jsr:@netscript/database@0.0.7",
+          "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
