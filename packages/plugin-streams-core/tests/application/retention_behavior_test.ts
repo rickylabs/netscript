@@ -4,7 +4,7 @@ import { createStreamTopicFixture } from '../../src/testing/mod.ts';
 import { DurableStreamProducerTransport } from '../../src/adapters/durable-stream-producer-transport.ts';
 import type { StreamRetentionPolicyV1 } from '../../mod.ts';
 
-async function withStreamsUrl(action: () => Promise<void>): Promise<void> {
+async function withStreamsUrl(action: () => void | Promise<void>): Promise<void> {
   const previous = Deno.env.get('DURABLE_STREAMS_URL');
   Deno.env.set('DURABLE_STREAMS_URL', 'http://streams.test');
   try {
@@ -55,7 +55,7 @@ for (
 }
 
 Deno.test('invalid retention fails at construction before transport IO', () =>
-  withStreamsUrl(async () => {
+  withStreamsUrl(() => {
     let connects = 0;
     const transport = new DurableStreamProducerTransport(() => {
       connects++;

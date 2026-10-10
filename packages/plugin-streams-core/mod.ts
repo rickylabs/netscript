@@ -70,8 +70,10 @@ export type {
 export { deleteDurableStream, headDurableStream, StreamAdminError } from './src/public/mod.ts';
 export type {
   StreamAdminInputV1,
+  StreamAdminInstrumentationV1,
   StreamAdminOptionsV1,
   StreamAdminPort,
+  StreamAdminSpanV1,
   StreamDeletionV1,
   StreamHeadV1,
   StreamRetentionPolicyV1,

@@ -8,8 +8,8 @@ order: 103
 # Bound stream retention
 
 Use create-time stream retention to bound a durable stream without an application session or a
-cleanup sweeper. The streams server expires the whole stream. For existing day-segmented logs,
-a scheduled trigger can enqueue a background worker that deletes known expired segment paths.
+cleanup sweeper. The streams server expires the whole stream. For existing day-segmented logs, a
+scheduled trigger can enqueue a background worker that deletes known expired segment paths.
 
 ## Prefer server TTL or absolute expiry
 
@@ -42,16 +42,16 @@ await producer.stop();
 
 For a calendar-aligned expiry use
 `retention: { kind: 'expires-at', expiresAt: '2030-10-08T00:00:00Z' }` instead. The versioned
-`StreamRetentionPolicyV1` union makes TTL and expiry mutually exclusive. TTL must be a positive
-safe integer number of seconds; expiry must be a valid RFC3339 timestamp with a timezone.
-Invalid retention throws at producer construction before transport IO.
+`StreamRetentionPolicyV1` union makes TTL and expiry mutually exclusive. TTL must be a positive safe
+integer number of seconds; expiry must be a valid RFC3339 timestamp with a timezone. Invalid
+retention throws at producer construction before transport IO.
 
 The transport maps these options through the upstream client's `ttlSeconds` / `expiresAt` to
 `Stream-TTL` / `Stream-Expires-At` on the create PUT. Appends and durable close carry no retention
-headers. Reopening an existing stream does not change its retention or renew its deadline. To
-change policy, rotate to a new segment path. A path singleton rejects conflicting retention options.
-Stop old producers before deleting a segment: a live producer can recreate an absent stream on a
-later reconnect.
+headers. Reopening an existing stream does not change its retention or renew its deadline. To change
+policy, rotate to a new segment path. A path singleton rejects conflicting retention options. Stop
+old producers before deleting a segment: a live producer can recreate an absent stream on a later
+reconnect.
 
 ## Delete known segments in a background worker
 
@@ -73,7 +73,10 @@ export default defineJobHandler(
   z.object({ segmentPath: z.string().regex(/^\/observations\/\d{4}-\d{2}-\d{2}$/) }),
   async ({ payload, signal }) => {
     try {
-      const deleted = await deleteDurableStream(payload.segmentPath, { requestTimeoutMs: 5000, signal });
+      const deleted = await deleteDurableStream(payload.segmentPath, {
+        requestTimeoutMs: 5000,
+        signal,
+      });
       return { success: true, data: { deleted } };
     } catch (error) {
       if (error instanceof StreamAdminError && error.failure.kind === 'unauthorized') {
@@ -101,12 +104,13 @@ const deleteSegment = defineJob('delete-observation-segment')
   .build();
 
 export default defineScheduledTrigger(
-  () => Promise.resolve([
-    enqueueJob(deleteSegment, {
-      payload: { segmentPath: '/observations/2026-10-01' },
-      idempotencyKey: 'delete-observation-segment:2026-10-01',
-    }),
-  ]),
+  () =>
+    Promise.resolve([
+      enqueueJob(deleteSegment, {
+        payload: { segmentPath: '/observations/2026-10-01' },
+        idempotencyKey: 'delete-observation-segment:2026-10-01',
+      }),
+    ]),
   { id: 'observation-retention', cron: '0 2 * * *', timezone: 'UTC' },
 );
 ```
@@ -119,34 +123,36 @@ retention runs even when every phone and web application is closed.
 
 ## Errors, cancellation, and instrumentation
 
-The administrative helpers accept `signal`, positive integer `requestTimeoutMs` (default 5,000),
-an injectable `StreamAdminPort`, and `StreamsInstrumentation`. They emit `stream.head` and
-`stream.delete` client spans, finishing both successful and failed requests. The port uses the
-same `StreamProducerTransportResultV1<T>` as producer transports. Helpers throw `StreamAdminError`
-with its typed `failure` for authorization, timeout, cancellation, and transport failures.
+The administrative helpers accept `signal`, positive integer `requestTimeoutMs` (default 5,000), an
+injectable `StreamAdminPort`, and `StreamsInstrumentation`. They emit `stream.head` and
+`stream.delete` client spans, finishing both successful and failed requests. The port uses the same
+`StreamProducerTransportResultV1<T>` as producer transports. Helpers throw `StreamAdminError` with
+its typed `failure` for authorization, timeout, cancellation, and transport failures.
 
-| Result | Helper behavior | Port outcome |
-| --- | --- | --- |
-| Present / deleted | Metadata / `true` | `ok: true` |
-| Not found | `null` / `false` | `ok: true` |
-| HTTP 401 or 403 | Throws `StreamAdminError` | `unauthorized` |
-| Request deadline or HTTP 408 | Throws `StreamAdminError` | `timeout` |
-| Caller cancellation | Throws `StreamAdminError` | `aborted` |
-| Network, HTTP 429 or 5xx | Throws `StreamAdminError` | `retryable` |
-| Other HTTP 4xx | Throws `StreamAdminError` | `non-retryable` |
+| Result                       | Helper behavior           | Port outcome    |
+| ---------------------------- | ------------------------- | --------------- |
+| Present / deleted            | Metadata / `true`         | `ok: true`      |
+| Not found                    | `null` / `false`          | `ok: true`      |
+| HTTP 401 or 403              | Throws `StreamAdminError` | `unauthorized`  |
+| Request deadline or HTTP 408 | Throws `StreamAdminError` | `timeout`       |
+| Caller cancellation          | Throws `StreamAdminError` | `aborted`       |
+| Network, HTTP 429 or 5xx     | Throws `StreamAdminError` | `retryable`     |
+| Other HTTP 4xx               | Throws `StreamAdminError` | `non-retryable` |
 
 Administrative adapters perform one bounded attempt. The background runtime owns retry decisions;
-missing segments are already-successful deletions and need no retry. Reading HEAD before DELETE
-is optional, adds a request, and cannot prove a segment will still exist when deleted.
+missing segments are already-successful deletions and need no retry. Reading HEAD before DELETE is
+optional, adds a request, and cannot prove a segment will still exist when deleted.
 
 ## Retention and trim limits
 
 This API expires or deletes whole streams. Offset-based trim and server-side segment listing are
 future protocol capabilities and have no NetScript API today. Keep a service-owned bounded segment
-index when deletion needs discovery. For document streams, publish a complete baseline into each
-new day segment before incremental changes so consumers can reconstruct retained state after an
-older segment expires.
+index when deletion needs discovery. For document streams, publish a complete baseline into each new
+day segment before incremental changes so consumers can reconstruct retained state after an older
+segment expires.
 
-See [Bounded streams: retention and trim](/reference/plugin-streams-core/#bounded-streams-retention-and-trim)
-for the public contract and [scheduled triggers](/durable-workflows/triggers/#scheduled-triggers-cron)
-for the background scheduler.
+See
+[Bounded streams: retention and trim](/reference/plugin-streams-core/#bounded-streams-retention-and-trim)
+for the public contract and
+[scheduled triggers](/durable-workflows/triggers/#scheduled-triggers-cron) for the background
+scheduler.

@@ -83,8 +83,8 @@ await producer.flush();
 bounded operation exhausts its retry budget or the server reports a non-retryable protocol failure.
 The default policy makes eight total attempts with exponential delay from 100 ms, capped at five
 seconds and jittered by 20 percent. Each transport request also has a five-second timeout, so a
-connected proxy with an unavailable backend cannot hold an attempt open forever. Infinite retry
-or request duration is not supported.
+connected proxy with an unavailable backend cannot hold an attempt open forever. Infinite retry or
+request duration is not supported.
 
 Writes enter a FIFO bounded to 256 events and 1 MiB of serialized UTF-8 by default. The producer
 rejects the newest write when either bound would be exceeded; it never evicts an already accepted
@@ -164,16 +164,15 @@ JSR with cryptographically verified provenance.
 
 `./integration/commands` exports `createStreamCommandOutboxSink`. Supply an existing
 `StreamProducerPort`; topic selects a collection and payload is either
-`{ operation: 'upsert', value: { id: 'entity', ... } }` or
-`{ operation: 'delete', key: 'entity' }`. The adapter forwards the stable outbox id as
-`StreamWriteContextV1.messageId` and the command correlation. The existing producer serializes
-both into State Protocol headers and owns W3C producer context, buffering and bounded retries.
-Only eventual `delivered` completion acknowledges the relay, including native duplicate-tuple
-acknowledgements. Local FIFO acceptance alone, rejection, cancellation or delivery-unknown cannot
-settle the outbox. Cancellation is cooperative around completion; this sink never stops the
-consumer-owned producer. Native transport retries retain their producer tuple; relay redelivery
-is a new producer operation with the same message id. Downstream processing must be idempotent.
-No producer, queue or resource starts on sink construction.
+`{ operation: 'upsert', value: { id: 'entity', ... } }` or `{ operation: 'delete', key: 'entity' }`.
+The adapter forwards the stable outbox id as `StreamWriteContextV1.messageId` and the command
+correlation. The existing producer serializes both into State Protocol headers and owns W3C producer
+context, buffering and bounded retries. Only eventual `delivered` completion acknowledges the relay,
+including native duplicate-tuple acknowledgements. Local FIFO acceptance alone, rejection,
+cancellation or delivery-unknown cannot settle the outbox. Cancellation is cooperative around
+completion; this sink never stops the consumer-owned producer. Native transport retries retain their
+producer tuple; relay redelivery is a new producer operation with the same message id. Downstream
+processing must be idempotent. No producer, queue or resource starts on sink construction.
 
 ```ts
 import {
@@ -193,11 +192,12 @@ IO; reconnecting does not renew it. Without retention, existing behavior is pres
 `headDurableStream(path)` returns metadata or null; `deleteDurableStream(path)` returns true when
 deleted and false when already absent. Both resolve discovery/auth through the existing streams
 service configuration and throw `StreamAdminError` with typed authorization, timeout, cancellation,
-or transport failures. Requests default to a 5,000 ms deadline and emit administrative spans.
-Use these helpers in a background worker or scheduled trigger under a service identity.
+or transport failures. Requests default to a 5,000 ms deadline and emit administrative spans. Use
+these helpers in a background worker or scheduled trigger under a service identity.
 
 The `./admin` subpath exports `DurableStreamAdmin` and the versioned administrative port contracts
 for injection. Stop segment producers before deleting their streams. Entity-level producer delete
 only appends a tombstone. Offset trim and server-side listing are not implemented.
 
-See the [retention how-to](https://rickylabs.github.io/netscript/durable-workflows/how-to/bound-stream-retention/).
+See the
+[retention how-to](https://rickylabs.github.io/netscript/durable-workflows/how-to/bound-stream-retention/).

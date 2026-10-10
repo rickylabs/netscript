@@ -20,3 +20,12 @@ export interface StreamAdminPort {
   /** Delete the whole stream; absence is a successful idempotent outcome. */
   delete(input: StreamAdminInputV1): Promise<StreamProducerTransportResultV1<StreamDeletionV1>>;
 }
+
+/** Narrow telemetry dependency satisfied by the existing StreamsInstrumentation facade. */
+export interface StreamAdminInstrumentationV1 {
+  /** Start one administrative request span. */
+  startAdminSpan(
+    streamPath: string,
+    operation: 'head' | 'delete',
+  ): import('../domain/admin-contract-v1.ts').StreamAdminSpanV1;
+}

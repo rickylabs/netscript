@@ -74,5 +74,13 @@ export {
 } from '../application/administer-durable-stream.ts';
 export type { StreamAdminOptionsV1 } from '../application/administer-durable-stream.ts';
 export type { StreamRetentionPolicyV1 } from '../domain/retention-contract-v1.ts';
-export type { StreamDeletionV1, StreamHeadV1 } from '../domain/admin-contract-v1.ts';
-export type { StreamAdminInputV1, StreamAdminPort } from '../ports/stream-admin-port.ts';
+export type {
+  StreamAdminSpanV1,
+  StreamDeletionV1,
+  StreamHeadV1,
+} from '../domain/admin-contract-v1.ts';
+export type {
+  StreamAdminInputV1,
+  StreamAdminInstrumentationV1,
+  StreamAdminPort,
+} from '../ports/stream-admin-port.ts';

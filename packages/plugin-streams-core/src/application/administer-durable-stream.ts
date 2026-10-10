@@ -1,12 +1,9 @@
 import type { StreamHeadV1 } from '../domain/admin-contract-v1.ts';
 import type { StreamProducerTransportFailureV1 } from '../domain/producer-contract-v1.ts';
-import type { StreamAdminPort } from '../ports/stream-admin-port.ts';
+import type { StreamAdminInstrumentationV1, StreamAdminPort } from '../ports/stream-admin-port.ts';
 import { DurableStreamAdmin } from '../adapters/durable-stream-admin.ts';
 import { buildStreamUrl, getStreamsAuth } from './stream-url-resolver.ts';
-import {
-  createStreamsInstrumentation,
-  type StreamsInstrumentation,
-} from '../telemetry/instrumentation.ts';
+import { createStreamsInstrumentation } from '../telemetry/instrumentation.ts';
 
 /** Service-side administrative helper dependencies and bounded request policy. */
 export interface StreamAdminOptionsV1 {
@@ -17,7 +14,7 @@ export interface StreamAdminOptionsV1 {
   /** Optional administrative port override. */
   readonly admin?: StreamAdminPort;
   /** Optional telemetry facade override. */
-  readonly instrumentation?: StreamsInstrumentation;
+  readonly instrumentation?: StreamAdminInstrumentationV1;
 }
 
 /** Typed transport failure thrown by the public administrative helpers. */

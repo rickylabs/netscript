@@ -1,4 +1,5 @@
 import { assert, assertEquals } from '@std/assert';
+import { ReleaseEmbeddedDocsCorpus } from '../src/infrastructure/release-embedded-docs-corpus.ts';
 import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corpus.ts';
 
 const docsRoot = new URL('../../../docs/site/', import.meta.url).pathname;
@@ -38,4 +39,15 @@ Deno.test('stream retention docs expose background deletion and typed failure ha
   assert(worker?.content.includes('defineJobHandler'));
   assert(worker?.content.includes('defineScheduledTrigger'));
   assert(worker?.content.includes('deleteDurableStream'));
+});
+
+Deno.test('standalone MCP ships stream retention guidance without a filesystem corpus', async () => {
+  const docs = new ReleaseEmbeddedDocsCorpus();
+  const guidance = await docs.findGuidance('stream retention');
+  assertEquals(guidance.confidence, 'high');
+  assert(guidance.recommendations.some((entry) => entry.slug === `pages/${recipe}`));
+  assert(guidance.recommendations.some((entry) =>
+    entry.slug === `pages/${reference}` &&
+    entry.section === 'bounded-streams-retention-and-trim'
+  ));
 });
