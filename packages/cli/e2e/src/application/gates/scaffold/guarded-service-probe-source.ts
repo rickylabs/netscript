@@ -4,7 +4,7 @@ import { assert, assertEquals } from '@std/assert';
 import { DenoKvAdapter } from '@netscript/kv';
 import { createPluginService } from '@netscript/plugin/service';
 import { createAuthServiceBackendRegistry } from '__AUTH_SOURCE__/backend-registry.ts';
-import { signin, callback } from '__AUTH_SOURCE__/routers/v1-handlers.ts';
+import { signin } from '__AUTH_SOURCE__/routers/v1-handlers.ts';
 import { router } from '__AUTH_SOURCE__/router.ts';
 import { currentAuthRequest, withAuthRequest } from '__AUTH_SOURCE__/request-context.ts';
 import { httpExchangeInit, judgeHttpResponse, type HttpExchangeContract } from '__HTTP_CONTRACT__';
@@ -43,10 +43,10 @@ async function mintSession(scopes: string): Promise<string> {
   });
   assert(started.redirectUrl);
   const redirect = new URL(started.redirectUrl);
-  const completed = await callback({ code: 'synthetic-code', state: redirect.searchParams.get('state') ?? undefined }, {
-    registry,
-    request: { url: 'https://app.example.test/api/v1/auth/callback?txn=' + redirect.searchParams.get('txn'), headers: new Headers({ 'x-forwarded-proto': 'https' }) },
-  });
+  const flow = registry.resolveBackend().interactive;
+  assert(flow);
+  const params = new URLSearchParams({ code: 'synthetic-code', state: redirect.searchParams.get('state')!, txn: redirect.searchParams.get('txn')! });
+  const completed = await flow.handleCallback(new Request('https://app.example.test/api/v1/auth/callback?' + params));
   assert(completed.sessionId);
   return completed.sessionId;
 }
