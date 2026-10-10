@@ -35,8 +35,8 @@ export const MCP_EMBEDDED_DOC_PATHS = [
  */
 export const MCP_EMBEDDED_DOCS_MAX_BYTES = 264_192;
 
-export const PUBLISH_ASSET_OUTPUTS = [
-  '.llm/assets/agent-docs/prose.json.gz',
+export const PUBLISH_ASSET_OUTPUTS: readonly string[] = [
+  AGENT_DOCS_PAGE_CARRIER,
   '.llm/assets/agent-docs/provenance.json',
   'packages/cli/src/kernel/assets/agent-tools.generated.ts',
   'packages/cli/src/kernel/assets/agent-docs.generated.ts',

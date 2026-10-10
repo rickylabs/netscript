@@ -1,3 +1,5 @@
+import { AGENT_DOCS_PAGE_CARRIER, parseAgentDocsPages } from '../docs/agent-docs-page-carrier.ts';
+import { decodeAgentDocsPages } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
 /**
  * github-release.ts — create the GitHub Release that publishes a NetScript version.
  *
@@ -210,36 +212,63 @@ export async function verifyGreenCanaryPair(
       if (inexactGeneratedPaths.length > 0) {
         const agentDocsChanged = inexactGeneratedPaths.some((path) => {
           const normalized = normalizeGitPath(path);
-          return normalized === AGENT_DOCS_PROSE_PATH || normalized === AGENT_DOCS_PROVENANCE_PATH;
+          return normalized === AGENT_DOCS_PROSE_PATH || normalized === AGENT_DOCS_PAGE_CARRIER ||
+            normalized === AGENT_DOCS_PROVENANCE_PATH;
         });
         if (agentDocsChanged) {
-          const readBytes = dependencies.fileBytesAtRevision;
-          if (!readBytes) {
-            throw new Error(
-              'Stable publication blocked: agent-docs provenance requires binary parent-to-HEAD ' +
-                'prose comparisons before canary evidence can be inherited.',
-            );
-          }
-          const [beforeProvenance, afterProvenance, beforeProse, afterProse] = await Promise.all([
-            dependencies.fileAtRevision(root, parent, AGENT_DOCS_PROVENANCE_PATH),
-            dependencies.fileAtRevision(root, current, AGENT_DOCS_PROVENANCE_PATH),
-            readBytes(root, parent, AGENT_DOCS_PROSE_PATH),
-            readBytes(root, current, AGENT_DOCS_PROSE_PATH),
-          ]);
-          if (
-            !(await isExactAgentDocsProvenanceReplacement(
-              beforeProvenance,
-              afterProvenance,
-              beforeProse,
-              afterProse,
-              previousVersion,
-              nextVersion,
-            ))
-          ) {
-            throw new Error(
-              'Stable publication blocked: agent-docs provenance contains non-version changes, ' +
-                'so the parent canary evidence cannot authorize this content.',
-            );
+          const pageFormat = inexactGeneratedPaths.some((path) =>
+            normalizeGitPath(path) === AGENT_DOCS_PAGE_CARRIER
+          );
+          if (pageFormat) {
+            const [beforeMetadata, afterMetadata, beforePages, afterPages] = await Promise.all([
+              dependencies.fileAtRevision(root, parent, AGENT_DOCS_PROVENANCE_PATH),
+              dependencies.fileAtRevision(root, current, AGENT_DOCS_PROVENANCE_PATH),
+              dependencies.fileAtRevision(root, parent, AGENT_DOCS_PAGE_CARRIER),
+              dependencies.fileAtRevision(root, current, AGENT_DOCS_PAGE_CARRIER),
+            ]);
+            if (
+              !(await isExactAgentDocsPageReplacement(
+                beforeMetadata,
+                afterMetadata,
+                beforePages,
+                afterPages,
+                previousVersion,
+                nextVersion,
+              ))
+            ) {
+              throw new Error(
+                'Stable publication blocked: agent-docs provenance contains non-version changes, so the parent canary evidence cannot authorize this content.',
+              );
+            }
+          } else {
+            const readBytes = dependencies.fileBytesAtRevision;
+            if (!readBytes) {
+              throw new Error(
+                'Stable publication blocked: agent-docs provenance requires binary parent-to-HEAD ' +
+                  'prose comparisons before canary evidence can be inherited.',
+              );
+            }
+            const [beforeProvenance, afterProvenance, beforeProse, afterProse] = await Promise.all([
+              dependencies.fileAtRevision(root, parent, AGENT_DOCS_PROVENANCE_PATH),
+              dependencies.fileAtRevision(root, current, AGENT_DOCS_PROVENANCE_PATH),
+              readBytes(root, parent, AGENT_DOCS_PROSE_PATH),
+              readBytes(root, current, AGENT_DOCS_PROSE_PATH),
+            ]);
+            if (
+              !(await isExactAgentDocsProvenanceReplacement(
+                beforeProvenance,
+                afterProvenance,
+                beforeProse,
+                afterProse,
+                previousVersion,
+                nextVersion,
+              ))
+            ) {
+              throw new Error(
+                'Stable publication blocked: agent-docs provenance contains non-version changes, ' +
+                  'so the parent canary evidence cannot authorize this content.',
+              );
+            }
           }
         }
         const assertFresh = dependencies.generatedOutputsFresh;
@@ -362,6 +391,33 @@ export async function isExactAgentDocsProvenanceReplacement(
   }
 }
 
+/** Verify page rows and strict nonvolatile sidecars before the unchanged writer-freshness proof. */
+export async function isExactAgentDocsPageReplacement(
+  beforeSource: string,
+  afterSource: string,
+  beforePages: string,
+  afterPages: string,
+  previousVersion: string,
+  nextVersion: string,
+): Promise<boolean> {
+  try {
+    if (previousVersion === nextVersion) return false;
+    const metadataMatches = (source: string, version: string): boolean => {
+      const value: unknown = JSON.parse(source);
+      return isRecord(value) && value.schemaVersion === 1 && value.version === version &&
+        Object.keys(value).sort().join(',') === 'schemaVersion,version';
+    };
+    if (
+      !metadataMatches(beforeSource, previousVersion) || !metadataMatches(afterSource, nextVersion)
+    ) return false;
+    const before = await decodeAgentDocsPages(parseAgentDocsPages(beforePages));
+    const after = await decodeAgentDocsPages(parseAgentDocsPages(afterPages));
+    return JSON.stringify(Object.keys(before)) === JSON.stringify(Object.keys(after));
+  } catch {
+    return false;
+  }
+}
+
 function parseAgentDocsProvenance(source: string): AgentDocsProvenance | undefined {
   const value: unknown = JSON.parse(source);
   if (
@@ -431,7 +487,7 @@ async function sha256Hex(bytes: Uint8Array): Promise<string> {
 
 function isPreparedReleaseGeneratedOutput(path: string): boolean {
   const normalized = normalizeGitPath(path);
-  return PREPARED_RELEASE_GENERATED_OUTPUTS.some(
+  return normalized === AGENT_DOCS_PROSE_PATH || PREPARED_RELEASE_GENERATED_OUTPUTS.some(
     (generatedPath) => normalizeGitPath(generatedPath) === normalized,
   );
 }

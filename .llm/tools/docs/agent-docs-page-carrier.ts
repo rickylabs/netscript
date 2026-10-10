@@ -34,11 +34,17 @@ export async function readAgentDocsPages(
   version: string,
 ): Promise<Record<string, string>> {
   const source = await Deno.readTextFile(path);
+  const rows = parseAgentDocsPages(source);
+  const files = await decodeAgentDocsPages(rows);
+  files['llms-full.txt'] = agentDocsFullCorpus(files, version);
+  return files;
+}
+
+/** Parse revision text using the same transport contract as filesystem generation. */
+export function parseAgentDocsPages(source: string): readonly AgentDocsPage[] {
   const rows = source.split('\n').filter((line) => line.startsWith('  [')).map((line) =>
     JSON.parse(line.trim().replace(/,$/, '')) as AgentDocsPage
   );
   if (!rows.length) throw new Error('Agent docs page carrier is empty');
-  const files = await decodeAgentDocsPages(rows);
-  files['llms-full.txt'] = agentDocsFullCorpus(files, version);
-  return files;
+  return rows;
 }

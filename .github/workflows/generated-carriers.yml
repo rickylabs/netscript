@@ -17,10 +17,10 @@ jobs:
   carriers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.9.0
+          deno-version: 2.9.5
       - name: Check every committed carrier
         id: check
         continue-on-error: true
