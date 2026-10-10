@@ -1,4 +1,6 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
+import { walk } from 'jsr:@std/fs@^1/walk';
+import { fromFileUrl } from '@std/path';
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
@@ -7,6 +9,7 @@ import { createNewPluginCommand } from './new-plugin-command.ts';
 import { z } from 'zod';
 import { JSR_SPECIFIERS } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
+import { generateDenoJson } from '../../../../kernel/templates/workspace/deno-json.ts';
 
 describe('plugin new use case', () => {
   it('registers a generated plugin by default', async () => {
@@ -119,6 +122,77 @@ describe('plugin new use case', () => {
       ),
       true,
     );
+  });
+});
+
+describe('plugin new formatting', () => {
+  it('passes the generated workspace format check through the public CLI', async () => {
+    const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-plugin-new-fmt-' });
+    try {
+      const workspace = z.object({ fmt: z.record(z.string(), z.unknown()) }).parse(
+        JSON.parse(generateDenoJson({
+          name: 'fmt-probe',
+          appName: 'web',
+          workspaceMembers: [],
+          importMode: 'jsr',
+        })),
+      );
+      await Deno.writeTextFile(`${projectRoot}/deno.json`, '{}\n');
+      // The generated root deno.json fmt policy, isolated from its registered workspace members.
+      const fmtConfig = `${projectRoot}/fmt-policy.json`;
+      await Deno.writeTextFile(fmtConfig, JSON.stringify({ fmt: workspace.fmt }));
+      await Deno.writeTextFile(
+        `${projectRoot}/netscript.config.ts`,
+        "import { defineConfig } from '@netscript/config';\nexport default defineConfig({\n  plugins: [],\n});\n",
+      );
+      const cli = fromFileUrl(new URL('../../../../../bin/netscript.ts', import.meta.url));
+      const generated = await new Deno.Command(Deno.execPath(), {
+        args: ['run', '-A', cli, 'plugin', 'new', 'guarded-fixture', '--project-root', projectRoot],
+        stdout: 'null',
+        stderr: 'piped',
+      }).output();
+      assertEquals(generated.code, 0, new TextDecoder().decode(generated.stderr));
+      const sources: string[] = [];
+      for (const root of ['packages/plugin-guarded-fixture-core', 'plugins/guarded-fixture']) {
+        for await (const entry of walk(`${projectRoot}/${root}`, { exts: ['.ts'] })) {
+          sources.push(entry.path);
+        }
+      }
+      const checked = await new Deno.Command(Deno.execPath(), {
+        args: ['fmt', '--check', '--config', fmtConfig, ...sources],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      assertEquals(
+        checked.code,
+        0,
+        new TextDecoder().decode(checked.stdout) + new TextDecoder().decode(checked.stderr),
+      );
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('formats only TypeScript artifacts', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    const formatted: string[] = [];
+    const result = await createNewPlugin(
+      { name: 'billing', projectRoot: '/workspace/app' },
+      {
+        fs,
+        formatter: {
+          formatContent: (path, content) => {
+            formatted.push(path);
+            return Promise.resolve(content);
+          },
+          formatFiles: () => Promise.reject(new Error('plugin new formats rendered content only')),
+        },
+      },
+    );
+    const expected = result.filesCreated
+      .map((path) => path.replace(/\\/g, '/').replace('/workspace/app/', ''))
+      .filter((path) => path.endsWith('.ts'));
+    assertEquals(formatted, expected);
   });
 });
 
