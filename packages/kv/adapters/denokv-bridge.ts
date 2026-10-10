@@ -135,8 +135,8 @@ export interface DenoAtomicCheck {
  * {@linkcode WatchableKv.atomic} on {@linkcode commit}.
  *
  * kvdex only uses `set`, `delete`, and `check` internally for index
- * maintenance. `sum`/`min`/`max` are passed through with a warning since the
- * Redis adapter falls back to plain `set` semantics for these.
+ * maintenance. `sum`/`min`/`max` are passed through to the adapter, which
+ * combines them with the stored value.
  */
 export interface DenoAtomicOperation {
   /** Add version checks that must pass for the commit to succeed. */
@@ -147,13 +147,13 @@ export interface DenoAtomicOperation {
   delete(key: DenoKvStrictKey): this;
   /** Buffer an enqueue mutation (stub — not used). */
   enqueue(value: unknown, options?: DenoKvEnqueueOptions): this;
-  /** Buffer a max mutation (falls back to set on Redis). */
+  /** Buffer a max mutation; combines with the stored value. */
   max(key: DenoKvStrictKey, n: bigint): this;
-  /** Buffer a min mutation (falls back to set on Redis). */
+  /** Buffer a min mutation; combines with the stored value. */
   min(key: DenoKvStrictKey, n: bigint): this;
   /** Buffer a set mutation. */
   set(key: DenoKvStrictKey, value: unknown, options?: DenoKvSetOptions): this;
-  /** Buffer a sum mutation (falls back to set on Redis). */
+  /** Buffer a sum mutation; combines with the stored value. */
   sum(key: DenoKvStrictKey, n: bigint): this;
 }
 
@@ -190,19 +190,16 @@ class RedisAtomicOperation implements DenoAtomicOperation {
   }
 
   sum(key: DenoKvStrictKey, n: bigint): this {
-    logger.warn('Bridge atomic sum() falls back to set semantics on Redis');
     this.#ops.push({ type: 'sum', key, value: n });
     return this;
   }
 
   min(key: DenoKvStrictKey, n: bigint): this {
-    logger.warn('Bridge atomic min() falls back to set semantics on Redis');
     this.#ops.push({ type: 'min', key, value: n });
     return this;
   }
 
   max(key: DenoKvStrictKey, n: bigint): this {
-    logger.warn('Bridge atomic max() falls back to set semantics on Redis');
     this.#ops.push({ type: 'max', key, value: n });
     return this;
   }

@@ -463,19 +463,25 @@ Deno.test(
 );
 
 Deno.test(
-  'WatchableKvBridge.atomic — sum/min/max fall back to set without throwing',
+  'WatchableKvBridge.atomic — sum/min/max combine with the stored value',
   async () => {
-    const { bridge } = createBridge();
+    const { bridge, adapter } = createBridge();
     try {
-      // These should not throw — they fall back to set semantics
-      const result = await bridge
-        .atomic()
-        .sum(['counter'], 10n)
-        .min(['min-val'], 5n)
-        .max(['max-val'], 100n)
-        .commit();
+      const commit = () =>
+        bridge
+          .atomic()
+          .sum(['counter'], 10n)
+          .min(['min-val'], 5n)
+          .max(['max-val'], 100n)
+          .commit();
 
-      assertEquals(result.ok, true);
+      assertEquals((await commit()).ok, true);
+      await adapter.set(['min-val'], 3n);
+      assertEquals((await commit()).ok, true);
+
+      assertEquals((await adapter.get(['counter']))?.value, 20n);
+      assertEquals((await adapter.get(['min-val']))?.value, 3n);
+      assertEquals((await adapter.get(['max-val']))?.value, 100n);
     } finally {
       await bridge.close();
     }
