@@ -190,7 +190,7 @@ two artifacts.
   {
     label: "services/users/src/main.ts",
     lang: "ts",
-    code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});\n// Serves /api/v1/users/* (OpenAPI) and /api/rpc/v1/... (typed RPC) on its assigned port."
+    code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, {\n  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});\n// Serves /api/v1/users/* (OpenAPI) and /api/rpc/v1/... (typed RPC) on its assigned port."
   }
 ] }) }}
 

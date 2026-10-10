@@ -237,6 +237,7 @@ import { defineService } from '@netscript/service';
 import { router } from './router.ts';
 
 await defineService(router, {
+  auth: { public: true, reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy' },
   name: 'users',
   version: '1.0.0',
   port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ
