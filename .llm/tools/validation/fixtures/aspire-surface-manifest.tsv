@@ -47,6 +47,7 @@ path	class	owner	disposition
 .llm/tools/CLEANUP-PLAYBOOK.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-README.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-tools.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/app-router-support_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-accuracy-and-discoverability_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-accuracy-and-discoverability.ts	negative-version-guard	S7/S13	negative docs enforcement: retain only direct forbidText second-argument version literals, enforce all other references
 .llm/tools/docs/check-docs-contract-derivation.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -363,6 +364,7 @@ packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts	e2e
 packages/cli/e2e/src/domain/cli-surface.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/evidence.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/extension-axes.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/domain/http-contract.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/readme-quickstart.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/presentation/cli/commands/full-command.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/presentation/cli/commands/run-command.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -692,6 +694,7 @@ packages/mcp/src/domain/telemetry-endpoint.ts	mcp:client	S3/S11/S13	Aspire CLI/d
 packages/mcp/src/domain/tool-contracts.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-ps-dashboard-reader.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/appsettings-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-command.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated

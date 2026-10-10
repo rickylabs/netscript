@@ -13,11 +13,16 @@ import {
   type TracedMessageContext,
   traceJobExecution,
 } from '@netscript/telemetry/instrumentation';
-import { getParentContextFromHeaders, getTraceContext } from '@netscript/telemetry/context';
+import { getParentContextFromHeaders } from '@netscript/telemetry/context';
 import { WorkerAttributes } from '@netscript/telemetry/attributes';
 import { executeWorkerJob } from './job-execution.ts';
 import type { JobExecutionContext, WorkerDispatchContext } from './worker-options.ts';
 import { recordIdempotentSkip } from './worker-idempotency-events.ts';
+import {
+  getMessageTraceHeaders,
+  resolveSubprocessTraceHeaders,
+  toSubprocessTraceOptions,
+} from './subprocess-trace-context.ts';
 
 /**
  * Narrow a wire-supplied `triggeredBy` string to the canonical {@link TriggerType}.
@@ -40,7 +45,7 @@ export async function processWorkerJob(
   tracedContext?: TracedMessageContext,
 ): Promise<void> {
   const { jobId, payload, correlationId } = message;
-  const traceHeaders = getTraceHeaders(message, tracedContext);
+  const traceHeaders = getMessageTraceHeaders(message, tracedContext);
   const parentContext = tracedContext?.parentContext ?? getParentContextFromHeaders(traceHeaders);
   const triggeredBy = normalizeTriggeredBy(message.triggeredBy);
 
@@ -137,13 +142,7 @@ export async function processWorkerJob(
         addJobStepEvent('state_update', { status: 'running' });
         await context.executionState.start(executionId!);
 
-        const currentTraceCtx = getTraceContext();
-        const subprocessHeaders: Record<string, string> = currentTraceCtx
-          ? {
-            traceparent: currentTraceCtx.traceparent,
-            ...(currentTraceCtx.tracestate ? { tracestate: currentTraceCtx.tracestate } : {}),
-          }
-          : traceHeaders;
+        const subprocessHeaders = resolveSubprocessTraceHeaders(traceHeaders);
 
         addJobStepEvent('spawn_subprocess');
         const result = await executeWorkerJob(
@@ -204,6 +203,7 @@ export async function processWorkerTask(
   queueContext?: MessageContext,
 ): Promise<void> {
   const { taskId, payload, correlationId } = message;
+  const traceHeaders = getMessageTraceHeaders(message, queueContext);
   const triggeredBy = normalizeTriggeredBy(message.triggeredBy);
   const topic = message.topic ?? DEFAULT_TOPIC;
   let executionId: string | undefined;
@@ -235,6 +235,8 @@ export async function processWorkerTask(
       triggeredBy,
       payload,
       correlationId,
+      traceparent: traceHeaders['traceparent'],
+      tracestate: traceHeaders['tracestate'],
     });
 
     executionId = execution.id;
@@ -246,6 +248,7 @@ export async function processWorkerTask(
         ...(payload ? { TASK_PAYLOAD: JSON.stringify(payload) } : {}),
       },
       timeout: taskDef.timeout,
+      ...toSubprocessTraceOptions(resolveSubprocessTraceHeaders(traceHeaders), correlationId),
     });
 
     if (result.success) {
@@ -289,29 +292,6 @@ export async function processWorkerTask(
       );
     }
   }
-}
-
-function getTraceHeaders(
-  message: JobMessage,
-  tracedContext?: TracedMessageContext,
-): Record<string, string> {
-  const messageWithTrace = message as typeof message & {
-    headers?: Record<string, string>;
-    traceparent?: string;
-    tracestate?: string;
-  };
-
-  const traceHeaders: Record<string, string> = {
-    ...(tracedContext?.headers ?? {}),
-    ...(messageWithTrace.headers ?? {}),
-  };
-  if (messageWithTrace.traceparent && !traceHeaders['traceparent']) {
-    traceHeaders['traceparent'] = messageWithTrace.traceparent;
-  }
-  if (messageWithTrace.tracestate && !traceHeaders['tracestate']) {
-    traceHeaders['tracestate'] = messageWithTrace.tracestate;
-  }
-  return traceHeaders;
 }
 
 async function recordJobFailure(

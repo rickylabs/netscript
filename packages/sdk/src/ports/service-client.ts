@@ -214,6 +214,20 @@ export type ServiceRequestRest<TContext extends object = ServiceClientContext> =
     : [options: { readonly context: TContext }];
 
 /**
+ * Argument tuple for a service-client method.
+ *
+ * Mirrors oRPC's `ClientRest`: when the procedure input accepts `undefined`
+ * the input argument may be omitted (`client.me()`), unless the client context
+ * has required keys, in which case the options argument must still be passed.
+ */
+export type ServiceClientArgs<TInput, TContext extends object = ServiceClientContext> =
+  undefined extends TInput
+    ? RequiredKeys<TContext> extends never
+      ? [input?: TInput, options?: ServiceRequestOptions<TContext>]
+    : [input: TInput, options: { readonly context: TContext }]
+    : [input: TInput, ...request: ServiceRequestRest<TContext>];
+
+/**
  * Typed service-client method derived from a contract procedure.
  */
 export type ServiceClientMethod<
@@ -222,8 +236,7 @@ export type ServiceClientMethod<
   TError = Error,
   TContext extends object = ServiceClientContext,
 > = (
-  input: TInput,
-  ...request: ServiceRequestRest<TContext>
+  ...args: ServiceClientArgs<TInput, TContext>
 ) => Promise<TOutput> & { __error?: { type: TError } };
 
 /**
@@ -258,6 +271,14 @@ export type ServiceClientShape<
                 readonly code: K;
                 readonly status: number;
                 readonly data: ContractSchemaOutput<TDataSchema>;
+                // Mirrors ORPCError#toJSON so oRPC's native safe()/isDefinedError narrow too.
+                toJSON(): {
+                  readonly defined: boolean;
+                  readonly code: K;
+                  readonly status: number;
+                  readonly message: string;
+                  readonly data: ContractSchemaOutput<TDataSchema>;
+                };
               }
             : never
             : never;

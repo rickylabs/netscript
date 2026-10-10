@@ -193,6 +193,12 @@ This is why `getCachedEntry()` and `withLayer` fit together without an adapter â
 [The query bridge](/web-layer/query-bridge/#the-loader-half-a-read-not-a-fetch) for what that call
 does and does not do.
 
+The loader is a bare metadata read, not the
+[action-then-metadata loader](/services-sdk/sdk/#service-discovery-query-client), because this layer
+owns its refresh: on a miss or a stale entry the runtime prewarms the `partial` route, and that
+route's loader runs the callable action that fetches and re-caches. A layer with no `partial` has no
+such path; give it the action-then-metadata loader instead.
+
 `staleReloadMode` decides what a *stale* entry means. With `'background'`, the stale data still
 renders and the server is asked to prewarm behind it. With `'blocking'`, the runtime discards the
 data before render, so the region paints its fallback rather than known-stale content:

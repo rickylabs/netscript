@@ -3,6 +3,7 @@ import type { RunContext } from './run-context.ts';
 import type { GateId, GatePhase } from './cli-surface.ts';
 import type { CommandOutputMode } from '../ports/command-executor.ts';
 import type { ExecutionPlatform } from './platform.ts';
+import type { HttpExchangeContract } from './http-contract.ts';
 
 /** Gate verdicts emitted by the runner. */
 export type GateVerdict = 'passed' | 'failed' | 'skipped';
@@ -86,10 +87,12 @@ export interface CommandGateDefinition extends BaseGateDefinition {
   readonly failureClass?: GateFailureClass;
 }
 
-/** Semantic gate backed by an HTTP health probe. */
-export interface HttpGateDefinition extends BaseGateDefinition {
+/**
+ * Semantic gate backed by one HTTP exchange: it passes only when the endpoint serves the exact
+ * `expectStatus` (and `expectBody`, when set) for a request carrying `headers`.
+ */
+export interface HttpGateDefinition extends BaseGateDefinition, HttpExchangeContract {
   readonly kind: 'http';
-  readonly method: 'GET' | 'POST';
   readonly url: UrlFactory;
 }
 

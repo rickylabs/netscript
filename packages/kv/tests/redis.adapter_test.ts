@@ -65,6 +65,36 @@ Deno.test({
 });
 
 Deno.test({
+  name: 'RedisKvAdapter sum commits from separate instances all combine without failing',
+  ignore: !redisUrl,
+  async fn() {
+    assert(redisUrl);
+    const namespace = `test-${crypto.randomUUID()}`;
+    const writers = [
+      new RedisKvAdapter({ url: redisUrl, namespace }),
+      new RedisKvAdapter({ url: redisUrl, namespace }),
+    ];
+
+    try {
+      const outcomes = await withTimeout(
+        Promise.all(
+          Array.from(
+            { length: 12 },
+            (_, index) =>
+              writers[index % 2].atomic([], [{ type: 'sum', key: ['hits'], value: 1n }]),
+          ),
+        ),
+        5_000,
+      );
+      assertEquals(outcomes.filter((outcome) => outcome.ok).length, 12);
+      assertEquals((await writers[0].get<bigint>(['hits']))?.value, 12n);
+    } finally {
+      await Promise.all(writers.map((writer) => writer.close()));
+    }
+  },
+});
+
+Deno.test({
   name: 'RedisKvAdapter fails during a Redis restart and recovers on the same instance',
   ignore: !Deno.env.get('NETSCRIPT_TEST_REDIS_URL') ||
     !Deno.env.get('NETSCRIPT_TEST_REDIS_CONTAINER'),
