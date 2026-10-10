@@ -37,6 +37,7 @@ export type {
   AuthnOptions,
   AuthzOptions,
   ContractAuthorizerOptions,
+  ContractAuthorizerRawRoute,
   ContractOverlayAuthorizerOptions,
   ServiceAuthPolicy,
   ServiceGuardedAuthPolicy,

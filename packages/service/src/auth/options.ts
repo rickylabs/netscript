@@ -36,10 +36,32 @@ export interface AuthzOptions {
   readonly denyByDefault?: boolean;
 }
 
+/**
+ * Raw (non-contract) route declared to a contract-policy authorizer.
+ *
+ * A declared raw route always requires successful authentication; it is never a public bypass.
+ * The path is matched exactly, so a declaration does not cover sibling or nested paths.
+ */
+export interface ContractAuthorizerRawRoute {
+  /** Absolute mounted path, as passed to the builder's `route()`; no wildcards or parameters. */
+  readonly path: string;
+  /** Raw routes are authentication-only seams; public raw routes are not supported. */
+  readonly authentication: 'required';
+  /** Optional scope and role requirements, enforced like a procedure's declared authorization. */
+  readonly authorization?: {
+    /** Scopes required from the authenticated principal. */
+    readonly scopes?: readonly string[];
+    /** Roles required from the authenticated principal. */
+    readonly roles?: readonly string[];
+  };
+}
+
 /** Options for constructing the opt-in contract-policy authorizer. */
 export interface ContractAuthorizerOptions {
   /** Match-aware legacy authorizer consulted only when matched procedure metadata is absent. */
   readonly fallback?: MatchAwareAuthorizerPort;
+  /** Raw routes mounted beside the contract router; any other unmatched route stays denied. */
+  readonly rawRoutes?: readonly ContractAuthorizerRawRoute[];
   /**
    * Decides which principals satisfy `access.audience: 'internal'`. Defaults to
    * `isInternalServicePrincipal`, which accepts only internal-credential principals.

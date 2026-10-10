@@ -162,7 +162,7 @@ function resolvePolicy(
   resolver: ProcedurePolicyResolver | undefined,
   c: Context,
 ): ProcedurePolicyResolution | undefined {
-  return resolver?.resolve({ method: c.req.method, path: rawPathname(c) });
+  return resolver?.resolve({ method: c.req.method, path: rawPathname(c), routePath: c.req.path });
 }
 
 /**

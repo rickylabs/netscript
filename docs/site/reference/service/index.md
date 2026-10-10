@@ -219,7 +219,7 @@ const app = createService(router, { name: 'orders' })
 
 Contract enforcement is opt-in: existing unguarded services, scaffolds, and standalone
 `createScopeAuthorizer()` consumers are unchanged. It activates only when an application passes a
-`createContractAuthorizer(contract, { fallback? })` result to `.withAuthz()`.
+`createContractAuthorizer(contract, { fallback?, rawRoutes? })` result to `.withAuthz()`.
 
 Contract metadata wins on disagreement. A match-aware fallback, including
 `createScopeAuthorizer()`, is consulted only when a matched procedure has no access metadata. No
@@ -235,6 +235,40 @@ match-aware migration fallback; it is not deprecated.
 `createContractAuthorizer()` throws
 `[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` during
 construction, before any request.
+
+### Raw routes beside a contract router
+
+A request under the guarded prefix that matches no contract procedure is denied with
+`authz.no-contract-procedure`, including raw routes added with `.route(method, path, handler)`.
+Declare each raw route that should be served through the `rawRoutes` option:
+
+```ts
+const authorizer = createContractAuthorizer(OrdersContractV1, {
+  rawRoutes: [{ path: '/api/tools/mcp', authentication: 'required' }],
+});
+
+const app = createService(router, { name: 'orders' })
+  .withRPC()
+  .withAuthn({ authenticator })
+  .withAuthz({ authorizer })
+  .route('all', '/api/tools/mcp', handler)
+  .build();
+```
+
+A declared raw route requires a successfully authenticated principal. This applies even when its path
+is outside `protect` or inside `allowAnonymous`, so a declaration never makes a path public. An
+optional `authorization: { scopes?, roles? }` is enforced like a procedure's declared
+authorization. Matching is exact and case-sensitive, and ignores only a trailing slash. Declaring
+`/api/tools/mcp` covers neither `/api/tools/mcp-admin` nor `/api/tools/mcp/nested`, and every
+undeclared sibling stays denied with `authz.no-contract-procedure`.
+
+Declarations are validated before any request. Construction throws
+`[netscript.service.contract-policy] invalid raw route: <path> ...` for a path that is not absolute,
+a path containing `*`, `:`, `{`, `}`, `?` or `#`, an `authentication` other than `'required'`, or a
+path declared twice. Binding then throws
+`[netscript.service.contract-policy] raw route overlaps the contract projection: <path>` when the
+path falls under an RPC mount or alias or matches a REST procedure path. Binding happens in
+`.build()`.
 
 ### Internal procedures and the internal service credential
 
@@ -335,6 +369,7 @@ assertServiceAuthPolicy(policy);
 | `createTrustedHeaderAuthenticator` | Maps trusted upstream identity headers to principals. |
 | `Principal` | Service-owned identity contract. |
 | `ContractPolicyAuthorizerPort` | Authorizer that binds to the builder's REST/RPC projection paths. |
+| `ContractAuthorizerRawRoute` | Exact, authentication-required raw route declared through `createContractAuthorizer(contract, { rawRoutes })`. |
 
 ## Exports
 

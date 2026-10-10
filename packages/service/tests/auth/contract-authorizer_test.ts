@@ -7,6 +7,7 @@ import type {
   ProcedurePolicyResolution,
 } from '../../src/auth/contract/contract-policy.ts';
 import type { AuthzRequest, MatchAwareAuthorizerPort, Principal } from '../../src/auth/types.ts';
+import type { ContractAuthorizerRawRoute } from '../../src/auth/options.ts';
 
 const principal: Principal = {
   subject: 'user:contract-policy',
@@ -192,4 +193,98 @@ Deno.test('contract metadata wins when fallback authorization disagrees', async 
   });
   assertEquals(await authorizer.authorize(request('/rest/status')), { allow: true });
   assertEquals(fallbackCalls, 0);
+});
+
+const rawRouteContract = {
+  readItem: baseContract
+    .route({ method: 'GET', path: '/items/{id}' })
+    .output(SuccessSchema)
+    .meta({ access: { authentication: 'required' } }),
+} satisfies ContractPolicyContract;
+
+Deno.test('contract resolver matches a declared raw route exactly as authentication-required', () => {
+  const resolver = createContractAuthorizer(rawRouteContract, {
+    rawRoutes: [{ path: '/api/tools/mcp/', authentication: 'required' }],
+  }).bind({ apiPath: '/api', rpcPath: '/api/rpc' });
+  const required: ProcedurePolicyResolution = {
+    matched: true,
+    policy: { authentication: 'required', requiredScopes: [], requiredRoles: [] },
+  };
+
+  for (const path of ['/api/tools/mcp', '/api/tools/mcp/']) {
+    assertEquals(resolver.resolve({ method: 'POST', path }), required, path);
+  }
+  for (
+    const path of ['/api/tools/mcp-admin', '/api/tools/mcp/nested', '/api/tools', '/API/tools/mcp']
+  ) {
+    assertEquals(resolver.resolve({ method: 'POST', path }), { matched: false }, path);
+  }
+});
+
+Deno.test('contract authorizer enforces raw route requirements and denies undeclared routes', async () => {
+  const authorizer = createContractAuthorizer(rawRouteContract, {
+    rawRoutes: [{
+      path: '/api/tools/mcp',
+      authentication: 'required',
+      authorization: { scopes: ['items:read'], roles: ['service'] },
+    }],
+  });
+  authorizer.bind({ apiPath: '/api', rpcPath: '/api/rpc' });
+  const service: Principal = { ...principal, subject: 'service:worker', roles: ['service'] };
+
+  assertEquals(await authorizer.authorize(request('/api/tools/mcp', service, 'POST')), {
+    allow: true,
+  });
+  assertEquals(await authorizer.authorize(request('/api/tools/mcp', principal, 'POST')), {
+    allow: false,
+    reason: 'authz.missing-role:service',
+  });
+  assertEquals(await authorizer.authorize(request('/api/tools/other', service, 'POST')), {
+    allow: false,
+    reason: 'authz.no-contract-procedure',
+  });
+});
+
+Deno.test('createContractAuthorizer rejects raw routes that are not exact authenticated paths', () => {
+  const invalid: readonly [unknown, string][] = [
+    [{ path: '/api/tools/*', authentication: 'required' }, '/api/tools/* is not an exact'],
+    [{ path: '/api/tools/:id', authentication: 'required' }, '/api/tools/:id is not an exact'],
+    [{ path: '/api/tools/{id}', authentication: 'required' }, '/api/tools/{id} is not an exact'],
+    [{ path: 'api/tools/mcp', authentication: 'required' }, 'api/tools/mcp is not an exact'],
+    [{ path: '/api/tools/mcp', authentication: 'none' }, '/api/tools/mcp must require'],
+  ];
+  for (const [route, message] of invalid) {
+    assertThrows(
+      () =>
+        createContractAuthorizer(rawRouteContract, {
+          rawRoutes: [route as ContractAuthorizerRawRoute],
+        }),
+      Error,
+      `[netscript.service.contract-policy] invalid raw route: ${message}`,
+    );
+  }
+  assertThrows(
+    () =>
+      createContractAuthorizer(rawRouteContract, {
+        rawRoutes: [
+          { path: '/api/tools/mcp', authentication: 'required' },
+          { path: '/api/tools/mcp/', authentication: 'required' },
+        ],
+      }),
+    Error,
+    'invalid raw route: /api/tools/mcp is declared more than once',
+  );
+});
+
+Deno.test('contract resolver refuses raw routes that overlap the REST or RPC projection', () => {
+  for (const path of ['/api/items/42', '/api/rpc/tools', '/api/rpc']) {
+    const authorizer = createContractAuthorizer(rawRouteContract, {
+      rawRoutes: [{ path, authentication: 'required' }],
+    });
+    assertThrows(
+      () => authorizer.bind({ apiPath: '/api', rpcPath: '/api/rpc' }),
+      Error,
+      `[netscript.service.contract-policy] raw route overlaps the contract projection: ${path}`,
+    );
+  }
 });

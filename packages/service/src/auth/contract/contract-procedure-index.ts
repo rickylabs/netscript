@@ -19,6 +19,7 @@ import { toHttpPath } from '@orpc/client/standard';
 import { fallbackContractConfig, type HTTPMethod } from '@orpc/contract';
 import { toRou3Pattern } from '@orpc/openapi/standard';
 import { addRoute, createRouter, findRoute } from 'rou3';
+import { isWithinPrefix, normalizePath } from './contract-path.ts';
 import type {
   ContractPolicyBindingOptions,
   ContractPolicyContract,
@@ -55,6 +56,8 @@ export interface IndexedProcedure {
 export interface ProcedureIndex {
   /** Returns the procedure a request reaches, or undefined when it reaches none. */
   find(request: ProcedurePolicyRequest): IndexedProcedure | undefined;
+  /** Reports whether the RPC mount or any OpenAPI route (any method) already serves a path. */
+  claims(path: string): boolean;
 }
 
 /**
@@ -92,15 +95,24 @@ export function bindProcedureIndex(
     procedures.map((procedure) => [toHttpPath(procedure.routerPath), procedure]),
   );
   const restRoutes = createRouter<IndexedProcedure>();
+  const anyMethodRoutes = createRouter<IndexedProcedure>();
   const internalRoutes = createRouter<IndexedProcedure>();
   for (const procedure of procedures) {
     addRoute(restRoutes, procedure.restMethod, procedure.restPattern, procedure);
+    addRoute(anyMethodRoutes, '', procedure.restPattern, procedure);
     if (procedure.policy?.audience === 'internal') {
       addRoute(internalRoutes, '', procedure.restPattern, procedure);
     }
   }
 
   return Object.freeze({
+    claims(path: string): boolean {
+      const rpcPathname = remapDeprecatedRpcPath(path, binding);
+      if (rpcMounts.some((mount) => stripMount(rpcPathname, mount) !== undefined)) return true;
+      const relative = stripMount(path, apiMount);
+      return relative !== undefined && findRoute(anyMethodRoutes, '', relative) !== undefined;
+    },
+
     find(request: ProcedurePolicyRequest): IndexedProcedure | undefined {
       const rpcPathname = remapDeprecatedRpcPath(request.path, binding);
       for (const mount of rpcMounts) {
@@ -227,16 +239,6 @@ function remapDeprecatedRpcPath(
     }
   }
   return path;
-}
-
-function normalizePath(path: string): string {
-  const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
-  const withoutTrailingSlash = withLeadingSlash.replace(/\/+$/, '');
-  return withoutTrailingSlash || '/';
-}
-
-function isWithinPrefix(path: string, prefix: string): boolean {
-  return path === prefix || path.startsWith(prefix === '/' ? '/' : `${prefix}/`);
 }
 
 function readProperty(value: unknown, property: string): unknown {

@@ -46,6 +46,11 @@ export interface ProcedurePolicyRequest {
    * Pass the raw pathname, not a percent-decoded one: decoding can select a different route.
    */
   readonly path: string;
+  /**
+   * Percent-decoded path the HTTP router dispatches on (Hono's `c.req.path`). Used to match raw
+   * routes declared beside the contract; defaults to `path`.
+   */
+  readonly routePath?: string;
 }
 
 /** Result of resolving a request against the bound contract procedures. */

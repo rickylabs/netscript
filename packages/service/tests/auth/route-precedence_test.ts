@@ -241,3 +241,69 @@ Deno.test('same-route procedures with different access are rejected at construct
     factory(consistent);
   }
 });
+
+Deno.test('raw routes resolve by the path Hono dispatches and cannot shadow default projections', async () => {
+  const contract = {
+    defaults: { sync: baseContract.output(SuccessSchema) },
+  };
+  const implemented = implement(contract);
+  const router = implemented.router({
+    defaults: { sync: implemented.defaults.sync.handler(() => ({ success: true })) },
+  });
+
+  // `/api/defaults/sync` is the procedure's default OpenAPI path, so a raw route there overlaps.
+  const overlapping = createContractAuthorizer(contract, {
+    rawRoutes: [{ path: '/api/defaults/sync', authentication: 'required' }],
+  });
+  assertThrows(
+    () => overlapping.bind({ apiPath: '/api', rpcPath: '/api/rpc' }),
+    Error,
+    'raw route overlaps the contract projection: /api/defaults/sync',
+  );
+
+  let served = 0;
+  const app = createService(router, { name: SERVICE })
+    .withRPC()
+    .withAuthn({
+      authenticator: createStaticCredentialAuthenticator({
+        credentials: {
+          tools: { subject: 'user:tools', scopes: ['tools:use'] },
+          other: { subject: 'user:other' },
+        },
+      }),
+    })
+    .withAuthz({
+      authorizer: createContractAuthorizer(contract, {
+        rawRoutes: [{
+          path: '/api/tools/mcp',
+          authentication: 'required',
+          authorization: { scopes: ['tools:use'] },
+        }],
+      }),
+    })
+    .route('all', '/api/tools/mcp', () => {
+      served += 1;
+      return new Response('ok');
+    })
+    .build();
+
+  const statuses = [];
+  for (
+    const [path, bearer] of [
+      ['/api/tools/mcp', 'tools'],
+      // Hono decodes `%6Dcp` and dispatches to the raw route; the policy must follow it.
+      ['/api/tools/%6Dcp', 'tools'],
+      ['/api/tools/%6Dcp', 'other'],
+      ['/api/tools/%6Dcp', undefined],
+    ] as const
+  ) {
+    const response = await app.request(
+      path,
+      bearer ? { headers: { authorization: `Bearer ${bearer}` } } : {},
+    );
+    await response.body?.cancel();
+    statuses.push(response.status);
+  }
+  assertEquals(statuses, [200, 200, 403, 401]);
+  assertEquals(served, 2);
+});

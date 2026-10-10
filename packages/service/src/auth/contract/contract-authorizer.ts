@@ -13,10 +13,15 @@ import type {
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
 } from './contract-policy.ts';
+import { normalizePath } from './contract-path.ts';
 import { bindProcedureIndex, compileProcedures } from './contract-procedure-index.ts';
+import { compileRawRoutes } from './contract-raw-routes.ts';
 import { isInternalServicePrincipal } from '../internal-credential/internal-credential-authenticator.ts';
 import { authorizeProcedurePolicy } from './procedure-policy-decision.ts';
 import type { AuthzDecision, AuthzRequest } from '../types.ts';
+
+const RAW_ROUTE_OVERLAP_ERROR =
+  '[netscript.service.contract-policy] raw route overlaps the contract projection';
 
 /**
  * Creates an opt-in authorizer whose decisions come from procedure-local contract metadata.
@@ -60,14 +65,21 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
   options: ContractAuthorizerOptions = {},
 ): ContractPolicyAuthorizerPort {
   const procedures = compileProcedures(contract);
+  const rawRoutes = compileRawRoutes(options.rawRoutes ?? []);
   const isInternalCaller = options.isInternalCaller ?? isInternalServicePrincipal;
   let resolver: ProcedurePolicyResolver | undefined;
 
   return {
     bind(binding: ContractPolicyBindingOptions): ProcedurePolicyResolver {
       const index = bindProcedureIndex(procedures, binding);
+      for (const path of rawRoutes.keys()) {
+        if (index.claims(path)) throw new Error(`${RAW_ROUTE_OVERLAP_ERROR}: ${path}`);
+      }
       resolver = Object.freeze({
         resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
+          // Raw routes are Hono routes: look them up by the path Hono dispatches on.
+          const rawPolicy = rawRoutes.get(normalizePath(request.routePath ?? request.path));
+          if (rawPolicy) return { matched: true, policy: rawPolicy };
           const procedure = index.find(request);
           return procedure ? { matched: true, policy: procedure.policy } : { matched: false };
         },
@@ -83,6 +95,7 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
       const resolution = resolver.resolve({
         method: request.method,
         path: request.rawPath ?? request.path,
+        routePath: request.path,
       });
       if (!resolution.matched) {
         return deny('authz.no-contract-procedure');
