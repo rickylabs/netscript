@@ -1,3 +1,5 @@
+import { resolveAspireExecutable } from '../../runtime/process/resolve-aspire-executable.ts';
+
 type CommandStdio = 'inherit' | 'null' | 'piped';
 
 export interface AspireCommandOptions {
@@ -25,15 +27,18 @@ export class DenoAspireCommandExecutor implements AspireCommandExecutor {
     args: readonly string[],
     options: AspireCommandOptions,
   ): Promise<CommandOutput> {
-    const output = await new Deno.Command('aspire', {
-      args: [...args],
-      cwd: options.cwd,
-      env: options.env,
-      stdin: options.stdin ?? 'null',
-      stdout: options.stdout ?? 'piped',
-      stderr: options.stderr ?? 'piped',
-      signal: options.signal,
-    }).output();
+    const output = await new Deno.Command(
+      resolveAspireExecutable(options.env),
+      {
+        args: [...args],
+        cwd: options.cwd,
+        env: options.env,
+        stdin: options.stdin ?? 'null',
+        stdout: options.stdout ?? 'piped',
+        stderr: options.stderr ?? 'piped',
+        signal: options.signal,
+      },
+    ).output();
 
     return {
       code: output.code,
@@ -46,15 +51,18 @@ export class DenoAspireCommandExecutor implements AspireCommandExecutor {
     args: readonly string[],
     options: AspireCommandOptions,
   ): Promise<number> {
-    const child = new Deno.Command('aspire', {
-      args: [...args],
-      cwd: options.cwd,
-      env: options.env,
-      stdin: options.stdin ?? 'inherit',
-      stdout: options.stdout ?? 'inherit',
-      stderr: options.stderr ?? 'inherit',
-      signal: options.signal,
-    }).spawn();
+    const child = new Deno.Command(
+      resolveAspireExecutable(options.env),
+      {
+        args: [...args],
+        cwd: options.cwd,
+        env: options.env,
+        stdin: options.stdin ?? 'inherit',
+        stdout: options.stdout ?? 'inherit',
+        stderr: options.stderr ?? 'inherit',
+        signal: options.signal,
+      },
+    ).spawn();
 
     const status = await child.status;
     return status.code;

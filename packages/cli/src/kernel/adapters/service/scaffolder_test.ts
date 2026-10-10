@@ -250,7 +250,7 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
           '@orpc/server': './stubs/orpc.ts',
           '@netscript/contracts': './stubs/contracts.ts',
           '@netscript/contracts/crud': './stubs/crud.ts',
-          zod: 'npm:zod@^4.3.6',
+          zod: 'npm:zod@^4.6.5',
         },
       }),
     );

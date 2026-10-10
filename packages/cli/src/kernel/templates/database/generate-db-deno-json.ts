@@ -124,7 +124,7 @@ export function generateDatabaseDenoJson(
       '@prisma/instrumentation-contract': 'npm:@prisma/instrumentation-contract@^7.4.2',
       '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.0',
       dotenv: 'npm:dotenv@^16.4.7',
-      zod: 'npm:zod@^4.3.6',
+      zod: 'npm:zod@^4.6.5',
       ...databaseImports,
       [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: imports[SCAFFOLD_PACKAGES.NETSCRIPT_SDK],
       ...adapterImports(provider.engine, imports),

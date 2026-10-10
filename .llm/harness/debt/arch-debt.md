@@ -2667,6 +2667,29 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   exit 0. Focused doc lint exit 1 with only the two named references. Project
   runs/2026-10-08-fix-ai-peer-types/ai-doc-lint.log retains the raw failure.
 
+## packages/fresh — `create-chat-connection.ts` grows further past the 500-line cap (`fresh-ai-chat-connection-a8-2067`)
+
+- **Reason:** PR #2138 (issue #2067) adds the optional `producer` member to
+  `NetScriptChatResponseOptions` and to the `toResponse` seam input, plus the fenced-turn JSDoc
+  example on `toNetScriptChatResponse`. That takes
+  `packages/fresh/src/runtime/ai/create-chat-connection.ts` from **652 to 684 lines** (as counted by
+  `arch:check`) against the 500-line A8/AP-1/F-1 cap. The file was already 152 lines over at
+  baseline (same doctrine WARN on `origin/main`). The fenced writer itself lives in the separate
+  `fenced-chat-session-writer.ts`, and the producer contract and error in `chat-producer.ts`; only
+  the option member, the seam field and their documentation are added to the over-cap module. The
+  remediation trimmed the duplicated seam input type to keep the growth to those lines.
+- **Owner:** Fresh AI public-surface maintainers (`@netscript/fresh/ai`).
+- **Target:** Before the next public member is added to `create-chat-connection.ts`, and before
+  stable Fresh AI publication readiness is claimed.
+- **Linked plan:** Issue #2067; PR #2138 (IMPL-EVAL finding 2).
+- **Created:** 2026-10-10
+- **Status:** open, DEBT_ACCEPTED for #2138 pending independent IMPL-EVAL.
+- **Gate:** Split `create-chat-connection.ts` into role-named modules behind the unchanged `./ai`
+  barrel (session addressing and connection, durable session response, snapshot and the
+  one-projection reducer), each under 500 lines. The exported symbol set and `deno doc` output of
+  `src/runtime/ai/mod.ts` stay identical; `deno test packages/fresh/src/runtime/ai`, the
+  streams-service fencing regression, doc-lint, publish dry-run and `arch:check` stay green.
+
 ## auth-kv-oauth — explicit boolean proxy trust (`auth-trusted-proxy-hops-2026`)
 
 - **Reason:** #2026 adopts a default-off boolean `trustProxyHeaders` opt-in for one shared inbound
