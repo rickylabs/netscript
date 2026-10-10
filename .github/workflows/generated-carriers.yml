@@ -1,0 +1,68 @@
+name: Generated carrier safety net
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: generated-carriers-main
+  cancel-in-progress: false
+  queue: max
+
+env:
+  DENO_VERSION: '2.9.5'
+
+jobs:
+  carriers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+      - name: Check every committed carrier
+        id: check
+        continue-on-error: true
+        shell: bash
+        run: |
+          result=0
+          for gate in check:agent-docs-prose check:mcp-export-corpus check:assets-barrel check:publish-assets check:aspire-version-parity; do
+            deno task "$gate" || result=1
+          done
+          exit "$result"
+      - name: Regenerate from the pushed source tree
+        if: steps.check.outcome == 'failure'
+        id: regenerate
+        continue-on-error: true
+        run: |
+          deno task gen:agent-docs-prose
+          deno task gen:mcp-export-corpus --allow-dirty
+          deno task gen:assets-barrel
+          deno task gen:publish-assets
+          deno run --allow-read --allow-write --allow-run=git .llm/tools/validation/aspire-surface-manifest.ts
+      - name: Open or update one regeneration PR
+        if: steps.check.outcome == 'failure' && steps.regenerate.outcome == 'success'
+        id: repair
+        continue-on-error: true
+        uses: actions/github-script@v7
+        env:
+          CHAIN_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          github-token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            if (!process.env.CHAIN_TOKEN) throw new Error('PAT_TOKEN is absent; a GITHUB_TOKEN PR cannot trigger required CI.');
+            const { publishCarrierRepair } = await import(`${process.env.GITHUB_WORKSPACE}/.llm/tools/docs/publish-carrier-repair.mjs`);
+            await publishCarrierRepair({ github, context, exec });
+      - name: Track unrepaired drift and fail visibly
+        if: steps.check.outcome == 'failure' && steps.repair.outcome != 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { trackCarrierDrift } = await import(`${process.env.GITHUB_WORKSPACE}/.llm/tools/docs/publish-carrier-repair.mjs`);
+            await trackCarrierDrift({ github, context });
+            core.setFailed('Carrier drift remains unrepaired. See the tracking issue and this run.');
