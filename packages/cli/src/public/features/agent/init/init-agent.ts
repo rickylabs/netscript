@@ -165,6 +165,17 @@ export async function initAgent(
     changedFiles,
   );
   if (hosts.includes('claude')) {
+    const skillNames = [
+      ...new Set([
+        ...(skillManifest.files ?? []).filter((path) => path.endsWith('/SKILL.md')).map(
+          (path) => path.split('/')[0],
+        ),
+        ...ASPIRE_WORKFLOW_SKILLS,
+      ]),
+    ];
+    messages.push(
+      ...await legacyClaudeSkillWarnings(input.projectRoot, skillNames, dependencies.fs),
+    );
     await writeHostConfig(
       dependencies.fs,
       join(input.projectRoot, '.mcp.json'),
@@ -180,7 +191,7 @@ export async function initAgent(
       EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentClaudeSkillBridge].replace(
         '{{PROJECT_NAME}}',
         () => basename(input.projectRoot),
-      ),
+      ).replace('{{SKILL_NAMES}}', () => skillNames.join(', ')),
       changedFiles,
     );
     const claudePath = join(input.projectRoot, 'CLAUDE.md');
@@ -245,6 +256,19 @@ export async function initAgent(
     );
   }
   return { hosts, resolution, changedFiles, messages };
+}
+
+async function legacyClaudeSkillWarnings(
+  projectRoot: string,
+  skillNames: readonly string[],
+  fs: AgentInitFileSystem,
+): Promise<string[]> {
+  const present = await Promise.all(
+    skillNames.map((name) => fs.exists(join(projectRoot, '.claude', 'skills', name))),
+  );
+  return skillNames.filter((_, index) => present[index]).map((name) =>
+    `Legacy .claude/skills/${name} is no longer refreshed; use the canonical .agents/skills/${name} through repo-skills. The legacy directory was preserved.`
+  );
 }
 
 async function hasAspireWorkflowSkills(
