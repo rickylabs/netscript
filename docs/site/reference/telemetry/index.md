@@ -127,39 +127,39 @@ W3C trace-context propagation across job subprocesses and message headers.
 Semantic attribute keys, span-name constants, and attribute builders. The TC-1..TC-14 checklist is
 published in [`convention.md`](./convention/).
 
-| Symbol                                                                     | Signature                                                                         | Description                                                                                                               |
-| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `spanName`                                                                 | `function spanName(base: string, suffix?: string): string`                        | Compose a namespaced span name.                                                                                           |
-| `createJobAttributes`                                                      | `function createJobAttributes(job): Record<string, AttributeValue>`               | Build job span attributes with beta.5 deprecated aliases.                                                                 |
-| `createMessagingAttributes`                                                | `function createMessagingAttributes(options): Record<string, AttributeValue>`     | Build messaging span attributes.                                                                                          |
-| `createSagaAttributes`                                                     | `function createSagaAttributes(saga): Record<string, AttributeValue>`             | Build saga span attributes with beta.5 deprecated aliases.                                                                |
-| `createExecutionAttributes`                                                | `function createExecutionAttributes(execution): Record<string, AttributeValue>`   | Build execution lifecycle span attributes.                                                                                |
-| `createGenAiAttributes`                                                    | `function createGenAiAttributes(genai): Record<string, AttributeValue>`           | Build GenAI semantic-convention attributes.                                                                               |
-| `createTriggerAttributes`                                                  | `function createTriggerAttributes(trigger): Record<string, string>`               | Build trigger span attributes.                                                                                            |
-| `createTriggerFileAttributes`                                              | `function createTriggerFileAttributes(payload): Record<string, string \| number>` | Build file-trigger span attributes.                                                                                       |
-| `CacheAttributes`                                                          | `const CacheAttributes`                                                           | Cache-topology attribute-name constants for the published `netscript.cache.*` compatibility surface; the operation key is the shared `netscript.operation`. |
-| `CacheOperations`                                                          | `const CacheOperations`                                                           | Logical span-name verbs: `cache.read`, `cache.write`, and `cache.invalidate`; promotion is a `cache.promote` event, not a fourth operation verb. |
-| `CacheOperation`                                                           | `type CacheOperation`                                                             | Union of the logical cache-operation verbs in `CacheOperations`.                                                          |
-| `CacheTiers`                                                               | `const CacheTiers`                                                                | Runtime-validated cache tiers: `l1`, `l2`, and `durable`.                                                                  |
-| `CacheTier`                                                                | `type CacheTier = 'l1' \| 'l2' \| 'durable'`                                    | Bounded cache-tier identifier accepted by cache-topology attributes.                                                      |
-| `CacheOutcomes`                                                            | `const CacheOutcomes`                                                             | Bounded results: `hit`, `miss`, `stale`, and `error`. An unknowable successful provider chain sets `topology_complete=false` and omits `outcome`; `error` is emitted only when the operation throws. |
-| `CacheOutcome`                                                             | `type CacheOutcome = 'hit' \| 'miss' \| 'stale' \| 'error'`                    | Union of the bounded lookup and mutation outcomes in `CacheOutcomes`.                                                     |
-| `CacheAttributeOptions`                                                    | `type CacheAttributeOptions`                                                      | Bounded operation, provider, namespace, tier, outcome, timing, loader, and topology facts accepted by the cache attribute builder; it has no cache-key field. |
-| `createCacheAttributes`                                                    | `function createCacheAttributes(options: CacheAttributeOptions): TelemetryAttributeBuilderMap` | Build bounded cache-topology attributes. The API accepts no cache key, making raw-key leakage structurally impossible. |
-| `TelemetryConventionChecklist`                                             | `const TelemetryConventionChecklist`                                              | TC-1..TC-14 conformance checklist.                                                                                        |
-| `SpanNames`                                                                | `const SpanNames`                                                                 | Canonical span-name constants for scheduler, queue, worker, job, saga, execution, RPC, GenAI, SSE, KV, and trigger spans. |
-| `NetScriptAttributeDomains`                                                | `const NetScriptAttributeDomains`                                                 | Single-root `netscript.*` proprietary attribute domains.                                                                  |
-| `NetScriptCorrelationAttributes`                                           | `const NetScriptCorrelationAttributes`                                            | Shared `netscript.correlation.id` attribute floor.                                                                        |
-| `ExecutionAttributes` / `NetScriptExecutionAttributes`                     | `const`                                                                           | Deprecated execution aliases and canonical execution lifecycle attribute keys.                                            |
-| `JobAttributes` / `NetScriptJobAttributes` / `JobStatuses` / `JobTriggers` | const                                                                             | Deprecated job aliases, canonical job keys, and enumerated status/trigger values.                                         |
-| `WorkerAttributes`                                                         | `const WorkerAttributes`                                                          | Worker attribute keys.                                                                                                    |
-| `SchedulerAttributes`                                                      | `const SchedulerAttributes`                                                       | Scheduler attribute keys.                                                                                                 |
-| `MessagingAttributes` / `MessagingOperations` / `MessagingSystems`         | const                                                                             | Messaging attribute keys and enumerated operations/systems.                                                               |
-| `SagaAttributes`                                                           | `const SagaAttributes`                                                            | Saga attribute keys.                                                                                                      |
-| `GenAiAttributes`                                                          | `const GenAiAttributes`                                                           | GenAI semantic-convention attribute keys.                                                                                 |
-| `KVAttributes` / `KVOperations`                                            | const                                                                             | KV attribute keys and operation values.                                                                                   |
-| `SSEAttributes`                                                            | `const SSEAttributes`                                                             | SSE attribute keys.                                                                                                       |
-| `TriggerAttributes`                                                        | `const TriggerAttributes`                                                         | Trigger attribute keys.                                                                                                   |
+| Symbol                                                                     | Signature                                                                                      | Description                                                                                                                                                                                          |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `spanName`                                                                 | `function spanName(base: string, suffix?: string): string`                                     | Compose a namespaced span name.                                                                                                                                                                      |
+| `createJobAttributes`                                                      | `function createJobAttributes(job): Record<string, AttributeValue>`                            | Build job span attributes with beta.5 deprecated aliases.                                                                                                                                            |
+| `createMessagingAttributes`                                                | `function createMessagingAttributes(options): Record<string, AttributeValue>`                  | Build messaging span attributes.                                                                                                                                                                     |
+| `createSagaAttributes`                                                     | `function createSagaAttributes(saga): Record<string, AttributeValue>`                          | Build saga span attributes with beta.5 deprecated aliases.                                                                                                                                           |
+| `createExecutionAttributes`                                                | `function createExecutionAttributes(execution): Record<string, AttributeValue>`                | Build execution lifecycle span attributes.                                                                                                                                                           |
+| `createGenAiAttributes`                                                    | `function createGenAiAttributes(genai): Record<string, AttributeValue>`                        | Build GenAI semantic-convention attributes.                                                                                                                                                          |
+| `createTriggerAttributes`                                                  | `function createTriggerAttributes(trigger): Record<string, string>`                            | Build trigger span attributes.                                                                                                                                                                       |
+| `createTriggerFileAttributes`                                              | `function createTriggerFileAttributes(payload): Record<string, string \| number>`              | Build file-trigger span attributes.                                                                                                                                                                  |
+| `CacheAttributes`                                                          | `const CacheAttributes`                                                                        | Cache-topology attribute-name constants for the published `netscript.cache.*` compatibility surface; the operation key is the shared `netscript.operation`.                                          |
+| `CacheOperations`                                                          | `const CacheOperations`                                                                        | Logical span-name verbs: `cache.read`, `cache.write`, and `cache.invalidate`; promotion is a `cache.promote` event, not a fourth operation verb.                                                     |
+| `CacheOperation`                                                           | `type CacheOperation`                                                                          | Union of the logical cache-operation verbs in `CacheOperations`.                                                                                                                                     |
+| `CacheTiers`                                                               | `const CacheTiers`                                                                             | Runtime-validated cache tiers: `l1`, `l2`, and `durable`.                                                                                                                                            |
+| `CacheTier`                                                                | `type CacheTier = 'l1' \| 'l2' \| 'durable'`                                                   | Bounded cache-tier identifier accepted by cache-topology attributes.                                                                                                                                 |
+| `CacheOutcomes`                                                            | `const CacheOutcomes`                                                                          | Bounded results: `hit`, `miss`, `stale`, and `error`. An unknowable successful provider chain sets `topology_complete=false` and omits `outcome`; `error` is emitted only when the operation throws. |
+| `CacheOutcome`                                                             | `type CacheOutcome = 'hit' \| 'miss' \| 'stale' \| 'error'`                                    | Union of the bounded lookup and mutation outcomes in `CacheOutcomes`.                                                                                                                                |
+| `CacheAttributeOptions`                                                    | `type CacheAttributeOptions`                                                                   | Bounded operation, provider, namespace, tier, outcome, timing, loader, and topology facts accepted by the cache attribute builder; it has no cache-key field.                                        |
+| `createCacheAttributes`                                                    | `function createCacheAttributes(options: CacheAttributeOptions): TelemetryAttributeBuilderMap` | Build bounded cache-topology attributes. The API accepts no cache key, making raw-key leakage structurally impossible.                                                                               |
+| `TelemetryConventionChecklist`                                             | `const TelemetryConventionChecklist`                                                           | TC-1..TC-14 conformance checklist.                                                                                                                                                                   |
+| `SpanNames`                                                                | `const SpanNames`                                                                              | Canonical span-name constants for scheduler, queue, worker, job, saga, execution, RPC, GenAI, SSE, KV, and trigger spans.                                                                            |
+| `NetScriptAttributeDomains`                                                | `const NetScriptAttributeDomains`                                                              | Single-root `netscript.*` proprietary attribute domains.                                                                                                                                             |
+| `NetScriptCorrelationAttributes`                                           | `const NetScriptCorrelationAttributes`                                                         | Shared `netscript.correlation.id` attribute floor.                                                                                                                                                   |
+| `ExecutionAttributes` / `NetScriptExecutionAttributes`                     | `const`                                                                                        | Deprecated execution aliases and canonical execution lifecycle attribute keys.                                                                                                                       |
+| `JobAttributes` / `NetScriptJobAttributes` / `JobStatuses` / `JobTriggers` | const                                                                                          | Deprecated job aliases, canonical job keys, and enumerated status/trigger values.                                                                                                                    |
+| `WorkerAttributes`                                                         | `const WorkerAttributes`                                                                       | Worker attribute keys.                                                                                                                                                                               |
+| `SchedulerAttributes`                                                      | `const SchedulerAttributes`                                                                    | Scheduler attribute keys.                                                                                                                                                                            |
+| `MessagingAttributes` / `MessagingOperations` / `MessagingSystems`         | const                                                                                          | Messaging attribute keys and enumerated operations/systems.                                                                                                                                          |
+| `SagaAttributes`                                                           | `const SagaAttributes`                                                                         | Saga attribute keys.                                                                                                                                                                                 |
+| `GenAiAttributes`                                                          | `const GenAiAttributes`                                                                        | GenAI semantic-convention attribute keys.                                                                                                                                                            |
+| `KVAttributes` / `KVOperations`                                            | const                                                                                          | KV attribute keys and operation values.                                                                                                                                                              |
+| `SSEAttributes`                                                            | `const SSEAttributes`                                                                          | SSE attribute keys.                                                                                                                                                                                  |
+| `TriggerAttributes`                                                        | `const TriggerAttributes`                                                                      | Trigger attribute keys.                                                                                                                                                                              |
 
 ## Instrumentation (`@netscript/telemetry/instrumentation`)
 
@@ -170,26 +170,26 @@ with a required consumer `span`. Use `ctx.span.setAttribute('job.id', message.jo
 callback to annotate that active span. Plain `MessageQueue` handlers remain compatible, and the
 shared `TracedMessageContext` retains its optional span for other consumers.
 
-| Symbol                                                | Signature                                                                        | Description                                        |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `startWorkerSpan`                                     | `function startWorkerSpan(config): Span`                                         | Start a worker span.                               |
-| `createWorkerStopSpan`                                | `function createWorkerStopSpan(workerId, activeJobs): Span`                      | Span for worker shutdown.                          |
-| `recordWorkerMetrics`                                 | `function recordWorkerMetrics(span, metrics): void`                              | Record worker metrics on a span.                   |
-| `traceJobExecution`                                   | `async function traceJobExecution<T>(options, fn): Promise<T>`                   | Trace a job execution.                             |
-| `createJobSpawnSpan`                                  | `function createJobSpawnSpan(job, executionId): Span`                            | Span for spawning a job subprocess.                |
-| `createJobSubprocessEnv`                              | `function createJobSubprocessEnv(additionalEnv): Record<string, string>`         | Build the traced subprocess env.                   |
-| `getJobTraceContext`                                  | `function getJobTraceContext(): SerializedTraceContext \| null`                  | Read serialized trace context in a job.            |
-| `initJobTracing`                                      | `function initJobTracing(): Context \| null`                                     | Initialize tracing in a job subprocess.            |
-| `runTracedJob`                                        | `async function runTracedJob<T>(jobId, fn): Promise<T>`                          | Wrap a job main with tracing.                      |
-| `addJobStepEvent`                                     | `function addJobStepEvent(stepName, attributes?): void`                          | Add a step event to the active job span.           |
-| `recordJobProgress`                                   | `function recordJobProgress(current, total, unit): void`                         | Record job progress on the active span.            |
-| `startJobDispatchSpan`                                | `function startJobDispatchSpan(context, options)`                                | Start a job-dispatch span and propagation headers. |
-| `traceJobDispatch`                                    | `async function traceJobDispatch(context, fn, options): Promise<void>`           | Trace a job dispatch.                              |
-| `isTracedQueue`                                       | `function isTracedQueue<T>(queue): queue is TracedQueue<T>`                      | Type guard for a traced queue.                     |
-| `startSchedulerTickSpan`                              | `function startSchedulerTickSpan(context): Span`                                 | Span for a scheduler tick.                         |
-| `createSchedulerStartSpan`, `createSchedulerStopSpan` | functions returning `Span`                                                       | Spans for scheduler start/stop.                    |
-| `createScheduleJobSpan`, `createUnscheduleJobSpan`    | functions returning `Span`                                                       | Root spans for scheduling/unscheduling a job.      |
-| `recordCronJobRun`, `recordSchedulerReload`           | functions returning `void`                                                       | Record scheduler run/reload outcomes.              |
+| Symbol                                                | Signature                                                                | Description                                        |
+| ----------------------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------- |
+| `startWorkerSpan`                                     | `function startWorkerSpan(config): Span`                                 | Start a worker span.                               |
+| `createWorkerStopSpan`                                | `function createWorkerStopSpan(workerId, activeJobs): Span`              | Span for worker shutdown.                          |
+| `recordWorkerMetrics`                                 | `function recordWorkerMetrics(span, metrics): void`                      | Record worker metrics on a span.                   |
+| `traceJobExecution`                                   | `async function traceJobExecution<T>(options, fn): Promise<T>`           | Trace a job execution.                             |
+| `createJobSpawnSpan`                                  | `function createJobSpawnSpan(job, executionId): Span`                    | Span for spawning a job subprocess.                |
+| `createJobSubprocessEnv`                              | `function createJobSubprocessEnv(additionalEnv): Record<string, string>` | Build the traced subprocess env.                   |
+| `getJobTraceContext`                                  | `function getJobTraceContext(): SerializedTraceContext \| null`          | Read serialized trace context in a job.            |
+| `initJobTracing`                                      | `function initJobTracing(): Context \| null`                             | Initialize tracing in a job subprocess.            |
+| `runTracedJob`                                        | `async function runTracedJob<T>(jobId, fn): Promise<T>`                  | Wrap a job main with tracing.                      |
+| `addJobStepEvent`                                     | `function addJobStepEvent(stepName, attributes?): void`                  | Add a step event to the active job span.           |
+| `recordJobProgress`                                   | `function recordJobProgress(current, total, unit): void`                 | Record job progress on the active span.            |
+| `startJobDispatchSpan`                                | `function startJobDispatchSpan(context, options)`                        | Start a job-dispatch span and propagation headers. |
+| `traceJobDispatch`                                    | `async function traceJobDispatch(context, fn, options): Promise<void>`   | Trace a job dispatch.                              |
+| `isTracedQueue`                                       | `function isTracedQueue<T>(queue): queue is TracedQueue<T>`              | Type guard for a traced queue.                     |
+| `startSchedulerTickSpan`                              | `function startSchedulerTickSpan(context): Span`                         | Span for a scheduler tick.                         |
+| `createSchedulerStartSpan`, `createSchedulerStopSpan` | functions returning `Span`                                               | Spans for scheduler start/stop.                    |
+| `createScheduleJobSpan`, `createUnscheduleJobSpan`    | functions returning `Span`                                               | Root spans for scheduling/unscheduling a job.      |
+| `recordCronJobRun`, `recordSchedulerReload`           | functions returning `void`                                               | Record scheduler run/reload outcomes.              |
 
 ## Registry (`@netscript/telemetry/registry`)
 
@@ -226,22 +226,22 @@ Tracing and error-handling plugins for the NetScript oRPC handler.
 The following entrypoints are published alongside the root export. Each is documented against its
 own `deno doc` surface.
 
-| Export                                 | Entrypoint             | Purpose                                                             |
-| -------------------------------------- | ---------------------- | ------------------------------------------------------------------- |
-| `@netscript/telemetry`                 | `./mod.ts`             | Diagnostics + instrumentation registry contract (documented above). |
-| `@netscript/telemetry/config`          | `./config.ts`          | Telemetry configuration and OTEL env resolution.                    |
-| `@netscript/telemetry/tracer`          | `./tracer.ts`          | Tracer accessors and span helpers.                                  |
-| `@netscript/telemetry/context`         | `./context.ts`         | W3C trace-context propagation.                                      |
-| `@netscript/telemetry/commands` | `./commands.ts` | Privacy-first command adapter and native relationship wrappers. |
-| `@netscript/telemetry/attributes`      | `./attributes.ts`      | Semantic attribute and span-name constants.                         |
-| `@netscript/telemetry/instrumentation` | `./instrumentation.ts` | Worker/queue/scheduler/SSE instrumentation.                         |
-| `@netscript/telemetry/registry`        | `./registry.ts`        | Instrumentation lifecycle registry.                                 |
-| `@netscript/telemetry/orpc`            | `./orpc.ts`            | oRPC tracing and error-handling plugins.                            |
-| `@netscript/telemetry/hono`            | `./hono.ts`            | Hono request and response tracing middleware.                       |
-| `@netscript/telemetry/ai`              | `./ai.ts`              | GenAI request, token, and chat-client metrics and tracing.          |
+| Export                                 | Entrypoint                   | Purpose                                                             |
+| -------------------------------------- | ---------------------------- | ------------------------------------------------------------------- |
+| `@netscript/telemetry`                 | `./mod.ts`                   | Diagnostics + instrumentation registry contract (documented above). |
+| `@netscript/telemetry/config`          | `./config.ts`                | Telemetry configuration and OTEL env resolution.                    |
+| `@netscript/telemetry/tracer`          | `./tracer.ts`                | Tracer accessors and span helpers.                                  |
+| `@netscript/telemetry/context`         | `./context.ts`               | W3C trace-context propagation.                                      |
+| `@netscript/telemetry/commands`        | `./commands.ts`              | Privacy-first command adapter and native relationship wrappers.     |
+| `@netscript/telemetry/attributes`      | `./attributes.ts`            | Semantic attribute and span-name constants.                         |
+| `@netscript/telemetry/instrumentation` | `./instrumentation.ts`       | Worker/queue/scheduler/SSE instrumentation.                         |
+| `@netscript/telemetry/registry`        | `./registry.ts`              | Instrumentation lifecycle registry.                                 |
+| `@netscript/telemetry/orpc`            | `./orpc.ts`                  | oRPC tracing and error-handling plugins.                            |
+| `@netscript/telemetry/hono`            | `./hono.ts`                  | Hono request and response tracing middleware.                       |
+| `@netscript/telemetry/ai`              | `./ai.ts`                    | GenAI request, token, and chat-client metrics and tracing.          |
 | `@netscript/telemetry/otel`            | `./src/adapters/otel/mod.ts` | OpenTelemetry Deno provider adapters.                               |
-| `@netscript/telemetry/query`           | `./query.ts`           | Telemetry query capabilities and filters.                           |
-| `@netscript/telemetry/testing`         | `./src/testing/mod.ts` | In-memory span recorder for test verification.                      |
+| `@netscript/telemetry/query`           | `./query.ts`                 | Telemetry query capabilities and filters.                           |
+| `@netscript/telemetry/testing`         | `./src/testing/mod.ts`       | In-memory span recorder for test verification.                      |
 
 ---
 
@@ -263,22 +263,21 @@ topics/destinations and exception text never enter command spans. Existing messa
 identifier conventions retain their separate ownership; command privacy policy deliberately
 supersedes their general correlation/exception floor.
 
-
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `CommandSpanNames` | constant | Fixed execute, relay lifecycle and publication names. |
-| `CommandAttributes` | constant | The eight identifier-free RFC command attribute keys. |
-| `CommandOutcomes` | constant | Closed applied/replayed/conflict/rejected/failed/cancelled values. |
-| `CommandIdempotencyStates` | constant | Closed claimed/replayed/not_requested/missing/mismatch/busy values. |
-| `CommandIsolationLevels` | constant | Store isolation enums plus default. |
-| `CommandStoreProviders` | constant | Bounded postgres/mssql/mysql/sqlite values. |
-| `CommandErrorTypes` | constant | Nine stable command failure kinds, excluding exception text. |
-| `CommandTelemetryDefinition` | type | Static registered name/version pair. |
-| `OtelCommandTelemetryStart` | type | Finite definition/provider/isolation/idempotency observation. |
-| `OtelCommandTelemetryResult` | type | Finite outcome, counts and optional stable failure kind. |
-| `commandStartAttributes` | function | Validate configured definition membership and select initial attributes. |
-| `commandResultAttributes` | function | Validate completion and emit counts only for successful outcomes. |
-| `createOtelCommandTelemetryPort` | function | Copy registrations and compose the structural executor adapter. |
-| `CreateOtelCommandTelemetryPortOptions` | type | Construction-time registrations and optional native tracer. |
-| `OtelCommandTelemetryPort` | interface | Execute, relay and publication wrappers invoking operations once. |
-| `OtelCommandTelemetrySpan` | interface | Once-only finite completion observer. |
+| Symbol                                  | Kind      | Description                                                              |
+| --------------------------------------- | --------- | ------------------------------------------------------------------------ |
+| `CommandSpanNames`                      | constant  | Fixed execute, relay lifecycle and publication names.                    |
+| `CommandAttributes`                     | constant  | The eight identifier-free RFC command attribute keys.                    |
+| `CommandOutcomes`                       | constant  | Closed applied/replayed/conflict/rejected/failed/cancelled values.       |
+| `CommandIdempotencyStates`              | constant  | Closed claimed/replayed/not_requested/missing/mismatch/busy values.      |
+| `CommandIsolationLevels`                | constant  | Store isolation enums plus default.                                      |
+| `CommandStoreProviders`                 | constant  | Bounded postgres/mssql/mysql/sqlite values.                              |
+| `CommandErrorTypes`                     | constant  | Nine stable command failure kinds, excluding exception text.             |
+| `CommandTelemetryDefinition`            | type      | Static registered name/version pair.                                     |
+| `OtelCommandTelemetryStart`             | type      | Finite definition/provider/isolation/idempotency observation.            |
+| `OtelCommandTelemetryResult`            | type      | Finite outcome, counts and optional stable failure kind.                 |
+| `commandStartAttributes`                | function  | Validate configured definition membership and select initial attributes. |
+| `commandResultAttributes`               | function  | Validate completion and emit counts only for successful outcomes.        |
+| `createOtelCommandTelemetryPort`        | function  | Copy registrations and compose the structural executor adapter.          |
+| `CreateOtelCommandTelemetryPortOptions` | type      | Construction-time registrations and optional native tracer.              |
+| `OtelCommandTelemetryPort`              | interface | Execute, relay and publication wrappers invoking operations once.        |
+| `OtelCommandTelemetrySpan`              | interface | Once-only finite completion observer.                                    |
