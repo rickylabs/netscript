@@ -71,8 +71,8 @@ import type {
  * await queue.enqueue({ jobId: 'test', payload: {} });
  *
  * // Listen with automatic tracing
- * await queue.listen(async (message) => {
- *   console.log(`processing ${message.jobId}`);
+ * await queue.listen(async (message, ctx) => {
+ *   ctx.span.setAttribute('job.id', message.jobId);
  * });
  * ```
  */
@@ -211,7 +211,7 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
    * Creates a CONSUMER span for each message and provides the span in the context.
    */
   async listen(
-    handler: (message: T, context: MessageContext) => Promise<void>,
+    handler: (message: T, context: TracedMessageContext) => Promise<void>,
     options?: ListenOptions,
   ): Promise<void> {
     const tracedHandler = async (message: T, ctx: MessageContext): Promise<void> => {

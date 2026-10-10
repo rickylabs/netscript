@@ -86,7 +86,7 @@ export interface TracedQueueOptions {
  */
 export interface TracedMessageContext extends MessageContext {
   /** Span representing the current message processing operation. */
-  readonly span?: Span;
+  readonly span: Span;
   /** Parent context extracted from message headers. */
   readonly parentContext?: Context;
 }
