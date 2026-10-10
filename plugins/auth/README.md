@@ -67,7 +67,7 @@ with an identity provider must keep its port, so pin it when you use the interac
 backend:
 
 ```bash
-netscript plugin install auth --name auth --port 8094
+netscript plugin install auth --name auth --port 7100
 ```
 
 `--port` writes `HostPort` on the plugin's `appsettings.json` entry; `netscript plugin update` and a

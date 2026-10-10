@@ -468,7 +468,7 @@ Deno.test('PluginWorkspaceMutator keeps an operator HostPort on a companion API 
       {
         NetScript: {
           Plugins: {
-            'billing-worker-api': { Enabled: true, Runtime: 'deno', HostPort: 8094 },
+            'billing-worker-api': { Enabled: true, Runtime: 'deno', HostPort: 7101 },
           },
         },
       },
@@ -499,14 +499,14 @@ Deno.test('PluginWorkspaceMutator keeps an operator HostPort on a companion API 
     }).NetScript.Plugins['billing-worker-api'];
 
   await mutator.updateAppsettings('/project', scaffoldResult, backgroundProvider);
-  assertEquals((await readServiceEntry()).HostPort, 8094);
+  assertEquals((await readServiceEntry()).HostPort, 7101);
 
   await mutator.updateAppsettings(
     '/project',
-    { ...scaffoldResult, hostPort: 8095 },
+    { ...scaffoldResult, hostPort: 7102 },
     backgroundProvider,
   );
-  assertEquals((await readServiceEntry()).HostPort, 8095);
+  assertEquals((await readServiceEntry()).HostPort, 7102);
 });
 
 Deno.test('PluginWorkspaceMutator carries the deprecated Port alias as HostPort on upsert', async () => {
@@ -514,7 +514,7 @@ Deno.test('PluginWorkspaceMutator carries the deprecated Port alias as HostPort 
   await fs.writeFile(
     '/project/appsettings.json',
     JSON.stringify(
-      { NetScript: { Plugins: { auth: { Enabled: true, Runtime: 'deno', Port: 8094 } } } },
+      { NetScript: { Plugins: { auth: { Enabled: true, Runtime: 'deno', Port: 7101 } } } },
       null,
       2,
     ) + '\n',
@@ -532,7 +532,7 @@ Deno.test('PluginWorkspaceMutator carries the deprecated Port alias as HostPort 
   const config = JSON.parse(await fs.readFile('/project/appsettings.json')) as {
     NetScript: { Plugins: Record<string, Record<string, unknown>> };
   };
-  assertEquals(config.NetScript.Plugins.auth, { ...rebuilt, HostPort: 8094 });
+  assertEquals(config.NetScript.Plugins.auth, { ...rebuilt, HostPort: 7101 });
 
   await mutator.upsertPluginAppsettingsEntry('/project', 'fresh', rebuilt);
   const after = JSON.parse(await fs.readFile('/project/appsettings.json')) as {

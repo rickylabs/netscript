@@ -1670,26 +1670,26 @@ describe('public install plugin flow', () => {
         return Object.values(raw.NetScript.Plugins).map((entry) => entry.HostPort);
       };
 
-      await install(8094);
-      assertEquals(await readHostPorts(), [8094]);
+      await install(7101);
+      assertEquals(await readHostPorts(), [7101]);
 
       // `netscript plugins update auth` re-runs the install without `--port`.
       await install(undefined);
-      assertEquals(await readHostPorts(), [8094]);
+      assertEquals(await readHostPorts(), [7101]);
 
       // An operator pins the port by hand in appsettings, then re-adds with --force.
       const settingsPath = join(projectRoot, 'appsettings.json');
       const edited = JSON.parse(await Deno.readTextFile(settingsPath)) as {
         NetScript: { Plugins: Record<string, { HostPort?: number }> };
       };
-      for (const entry of Object.values(edited.NetScript.Plugins)) entry.HostPort = 8095;
+      for (const entry of Object.values(edited.NetScript.Plugins)) entry.HostPort = 7102;
       await Deno.writeTextFile(settingsPath, JSON.stringify(edited, null, 2) + '\n');
       await install(undefined);
-      assertEquals(await readHostPorts(), [8095]);
+      assertEquals(await readHostPorts(), [7102]);
 
       // An explicit --port on the re-run is the operator's newer decision and wins.
-      await install(8096);
-      assertEquals(await readHostPorts(), [8096]);
+      await install(7103);
+      assertEquals(await readHostPorts(), [7103]);
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
