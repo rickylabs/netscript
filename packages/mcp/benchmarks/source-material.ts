@@ -47,3 +47,20 @@ export function inventorySourceMaterial(source: string): SourceMaterial {
   );
   return { fences, commands, keys, links };
 }
+
+/** Count retained occurrences, so one repeated snippet cannot stand in for several omitted copies. */
+export function countRetainedMaterial(items: readonly string[], content: string): number {
+  const counts = new Map<string, number>();
+  for (const item of items) counts.set(item, (counts.get(item) ?? 0) + 1);
+  let retained = 0;
+  for (const [item, expected] of counts) {
+    let offset = 0;
+    for (let found = 0; found < expected; found++) {
+      const index = content.indexOf(item, offset);
+      if (index < 0) break;
+      retained++;
+      offset = index + item.length;
+    }
+  }
+  return retained;
+}

@@ -3,7 +3,7 @@ import { createDocsFlows } from '../src/application/docs/docs-flows.ts';
 import { createMcpServer } from '../src/application/runner/mcp-server.ts';
 import type { DocsCorpusPort } from '../src/domain/docs/docs-corpus-port.ts';
 import type { DocRetrievalResult } from '../src/domain/docs/doc-retrieval-contract.ts';
-import { inventorySourceMaterial } from './source-material.ts';
+import { countRetainedMaterial, inventorySourceMaterial } from './source-material.ts';
 import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corpus.ts';
 import { ReleaseEmbeddedDocsCorpus } from '../src/infrastructure/release-embedded-docs-corpus.ts';
 
@@ -104,8 +104,7 @@ export async function benchmarkDocs(corpus: DocsCorpusPort): Promise<DocBenchmar
       : `${doc.content.slice(0, 2000)}…[truncated]`;
     const { fences, commands, keys, links } = inventorySourceMaterial(doc.content);
     const snippets = [...fences, ...commands, ...keys];
-    const retained = (items: readonly string[], content: string) =>
-      items.filter((item) => content.includes(item)).length;
+    const retained = countRetainedMaterial;
     let full = '';
     let cursor: string | undefined;
     do {

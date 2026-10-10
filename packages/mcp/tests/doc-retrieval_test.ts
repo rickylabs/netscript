@@ -1,4 +1,4 @@
-import { inventorySourceMaterial } from '../benchmarks/source-material.ts';
+import { countRetainedMaterial, inventorySourceMaterial } from '../benchmarks/source-material.ts';
 import { DocsDocumentTooLargeError } from '../src/domain/docs/docs-corpus-port.ts';
 import { benchmarkDocs } from '../benchmarks/doc-retrieval.ts';
 import { assert, assertEquals, assertRejects } from '@std/assert';
@@ -225,6 +225,7 @@ Deno.test('benchmark inventory independently counts complete fences commands key
   const fence = '````sh\r\ndeno task inside\r\n```\r\n````\r\n';
   const source = '# Heading\r\n' + fence + 'netscript init app\r\nport: 8080\r\n' +
     'See [guide](https://example.test/path) and `inline` prose.\r\n';
+  assertEquals(countRetainedMaterial([fence, fence], fence), 1);
   assertEquals(inventorySourceMaterial(source), {
     fences: [fence],
     commands: ['deno task inside\r\n', 'netscript init app\r\n'],
