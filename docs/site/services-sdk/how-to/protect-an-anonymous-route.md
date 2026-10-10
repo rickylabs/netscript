@@ -101,7 +101,7 @@ and never evicts a live quota to admit another client. There are no timers to sh
 tests/development; separate instances have separate quotas.
 
 Fixed windows permit up to two windows' quota near a boundary. This primitive controls a shared
-request quota; a separate poll interval or different start/poll quotas can use additional stages
-with separate stores/prefixes and custom keys. See the
+request quota; different start/poll quotas can use additional stages with separate stores/prefixes
+and custom keys. A minimum elapsed interval between polls requires a separate policy. See the
 [`@netscript/service` reference](/reference/service/#rate-limits-and-client-addresses) for the
 public contracts and [KV reference](/reference/kv/#atomic-operations) for adapter atomic semantics.
