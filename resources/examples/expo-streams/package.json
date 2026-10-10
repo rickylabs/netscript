@@ -1,0 +1,21 @@
+{
+  "name": "netscript-expo-stream-reference",
+  "private": true,
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@netscript/sdk": "file:./.generated/sdk",
+    "expo": "57.0.27",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "@netscript/plugin-streams-core": "file:./.generated/stream-core"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^7.0.2"
+  }
+}

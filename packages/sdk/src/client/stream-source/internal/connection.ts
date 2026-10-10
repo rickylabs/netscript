@@ -1,4 +1,7 @@
-import type { StreamSourceSchedulerV1 } from '../ports/fetch-stream-source.ts';
+import type {
+  StreamFetchResponseV1,
+  StreamSourceSchedulerV1,
+} from '../ports/fetch-stream-source.ts';
 import type { SseBlock } from './sse-parser.ts';
 import { SseParser } from './sse-parser.ts';
 
@@ -45,7 +48,7 @@ export function createHeartbeatDeadline(
 
 /** Read bounded UTF-8 slices without flushing incomplete SSE blocks at disconnect. */
 export async function readSseConnection(options: {
-  response: Response;
+  response: StreamFetchResponseV1;
   signal: AbortSignal;
   bufferLimit: number;
   lastEventId: string;

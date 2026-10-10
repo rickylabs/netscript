@@ -291,7 +291,7 @@ per-target verb flags, and the artifact-copy verbs are in the
 {{ comp.apiTable({
   caption: "AI agent commands",
   rows: [
-    { name: "Install agent tooling", type: "netscript agent init", desc: "Install NetScript MCP, consumer tools, and skills. Use <code>--editor none|zed|vscode</code> to apply editor-native setup to a new or existing project; one existing editor directory is detected by default. Use <code>--host claude|vscode|all</code> for agent hosts and <code>--with-docs</code> for the exact-version offline corpus." },
+    { name: "Install agent tooling", type: "netscript agent init", desc: "Install NetScript MCP, consumer tools, and skills. Use <code>--editor none|zed|vscode</code> to apply editor-native setup to a new or existing project; one existing editor directory is detected by default. Use <code>--host claude|vscode|opencode|all</code> for agent hosts (detected from project markers, then the invoking environment, when omitted) and <code>--with-docs</code> for the exact-version offline corpus." },
     { name: "Run the MCP server", type: "netscript agent mcp", desc: "Start the NetScript MCP server over standard input/output." },
     { name: "Record drift", type: "netscript agent drift record --resource <name> --summary <text>", desc: "Record an evidence-gated drift note after a fresh successful diagnostic pass. The record is rejected unless the evidence for <code>--resource</code> is present on disk, so it cannot be written from memory. <code>--details &lt;text&gt;</code> is optional." }
   ]
