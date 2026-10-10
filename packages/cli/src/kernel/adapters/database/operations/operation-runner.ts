@@ -2,16 +2,20 @@ import {
   outputError,
   outputText,
   outputWarning,
-} from '../../presentation/output/default-output.ts';
+} from '../../../presentation/output/default-output.ts';
 /**
  * @module infra/database/operation-runner
  */
 
 import { join } from '@std/path';
 
-import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
-import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
-import type { DbOperationRequest, DiscoveredDatabase } from '../../domain/db-engine.ts';
+import { SCAFFOLD_DIRS } from '../../../constants/scaffold/scaffold-dirs.ts';
+import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
+import type {
+  DbOperationExecutor,
+  DbOperationRequest,
+  DiscoveredDatabase,
+} from '../../../domain/db-engine.ts';
 import {
   type AppHostLifecycleLease,
   type AppHostLifecycleLock,
@@ -48,7 +52,7 @@ interface DbOperationRunnerOptions {
 }
 
 /** Executes database operations through a resident AppHost or a scoped standalone host. */
-export class DbOperationRunner {
+export class DbOperationRunner implements DbOperationExecutor {
   private readonly executor: AspireCommandExecutor;
   private readonly lifecycleLock: AppHostLifecycleLock;
   private readonly pollIntervalMs: number;

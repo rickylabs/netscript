@@ -5,7 +5,7 @@ import { dirname, join } from '@std/path';
 import {
   findProjectRoot as findDeployProjectRoot,
   loadDeployConfig,
-} from '../../../kernel/adapters/config/deploy-config.ts';
+} from '../../../kernel/adapters/config/deploy-config/deploy-config.ts';
 import type { buildWindowsDeployment } from '../deploy/build/build-windows-strategy.ts';
 import { loadRegisteredPlugins } from '../../../kernel/adapters/config/plugin-registry.ts';
 import { createProjectConfigLoader } from '../../../kernel/adapters/config/project-config-loader.ts';

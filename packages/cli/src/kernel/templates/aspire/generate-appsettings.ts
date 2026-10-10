@@ -55,7 +55,7 @@ export interface AppsettingsOptions {
 }
 
 /** JSON shape of a Databases entry. */
-interface DatabaseBlock {
+export interface DatabaseBlock {
   readonly Engine: 'Postgres' | 'Mysql' | 'Mssql' | 'Sqlite'
   readonly Mode?: 'Container' | 'External'
   readonly DatabaseName?: string
@@ -73,7 +73,7 @@ interface ToolBlock {
 /** JSON shape of a Cache entry. */
 export interface CacheBlock {
   readonly Engine: 'Redis' | 'Garnet' | 'DenoKv'
-  readonly Mode: 'Container' | 'External'
+  readonly Mode: 'Local' | 'Container' | 'External'
   readonly DataPath?: string
   readonly Port?: number
 }
@@ -137,7 +137,7 @@ export function deriveSqliteDbFileName(projectName: string): string {
  * @param projectName - Project name used to derive `DatabaseName`.
  * @returns `undefined` when `engine === 'none'`; otherwise a `{ key, block }`.
  */
-function buildDatabaseBlock(
+export function buildDatabaseBlock(
   engine: DbEngineChoice,
   projectName: string,
 ): { readonly key: string; readonly block: DatabaseBlock } | undefined {

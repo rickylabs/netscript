@@ -1,4 +1,4 @@
-import type { DbOperationRequest } from '../../domain/db-engine.ts';
+import type { DbOperationRequest } from '../../../domain/db-engine.ts';
 
 interface AspireResourceStatus {
   readonly displayName?: string;
@@ -50,8 +50,20 @@ export function buildDbCliEnv(
   migrationName?: string,
   interactive?: boolean,
 ): Record<string, string> {
-  const env: Record<string, string> = {
+  return {
     ASPIRE_CLI_START_TIMEOUT: String(resolveDbCliTimeoutSeconds()),
+    ...buildDbTaskEnv(operation, configKey, migrationName, interactive),
+  };
+}
+
+/** Operation inputs the generated database workspace scripts read from the environment. */
+export function buildDbTaskEnv(
+  operation: DbOperationRequest['operation'],
+  configKey: string,
+  migrationName?: string,
+  interactive?: boolean,
+): Record<string, string> {
+  const env: Record<string, string> = {
     NETSCRIPT_PRISMA_OPERATION: operation,
     NETSCRIPT_PRISMA_TARGET: configKey,
   };

@@ -5,7 +5,7 @@
  */
 
 import { Command } from '@cliffy/command';
-import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
+import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config/deploy-config.ts';
 import { parseContractVersion } from '../../../../kernel/adapters/contracts/types.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';

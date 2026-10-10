@@ -8,7 +8,7 @@ import { Command } from '@cliffy/command';
 
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { CliCommand } from '../../../../kernel/application/abstracts/cli-command.ts';
-import { DbOperationRunner } from '../../../../kernel/adapters/database/operation-runner.ts';
+import { selectDbOperationExecutor } from '../../../../kernel/adapters/database/operations/select-operation-executor.ts';
 import { DbWorkspaceResolver } from '../../../../kernel/adapters/database/workspace-resolver.ts';
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { DbOperation } from '../../../../kernel/domain/db-engine.ts';
@@ -76,8 +76,8 @@ export async function runDbOperation(
   const resolver = new DbWorkspaceResolver(fs);
   const databases = await resolver.discoverDatabases(projectRoot);
   const target = resolver.resolveTarget(databases, options.db);
-  const runner = new DbOperationRunner();
-  return await runner.execute({
+  const executor = await selectDbOperationExecutor(projectRoot, fs);
+  return await executor.execute({
     operation,
     target,
     migrationName: options.migrationName,

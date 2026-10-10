@@ -2003,7 +2003,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Reason:** `netscript db generate` is pure, DB-less codegen (Prisma client + `@database/zod`
   schemas + the `schema/.generated/zod/crud.ts` barrel) but is **Aspire-coupled**: the shared
   `DbOperationRunner.executeDetached`
-  (`packages/cli/src/kernel/adapters/database/operation-runner.ts`) always runs
+  (`packages/cli/src/kernel/adapters/database/operations/operation-runner.ts`) always runs
   `aspire start --apphost apphost.mts` and polls `aspire describe` before executing any db
   operation. So `db generate` cannot run where the aspire CLI / .NET is absent (deno-only CI,
   containerless dev), failing fast (~243ms, `aspire` command-not-found) even though no database,
@@ -2027,6 +2027,11 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Created:** 2026-07-01.
 - **Status:** open — worked around in the e2e harness (C14 `database.codegen` gate); the CLI command
   itself remains Aspire-coupled.
+- **Progress (2026-10-10, #1996 / PR #2170):** projects without `aspire/apphost.mts` (`init
+  --no-aspire`) now run every `db` operation through the database workspace task
+  (`DbWorkspaceTaskRunner`, selected by `selectDbOperationExecutor` in
+  `packages/cli/src/kernel/adapters/database/operations/`). Projects that have an AppHost still route
+  `db generate` through it, so this entry stays open for the Aspire-project codegen path.
 - **Gate:** Close when `netscript db generate` completes DB-less codegen in a deno-only environment
   (no aspire CLI / .NET / docker) and the static suites can invoke the CLI command directly instead
   of the standalone `deno task db:generate` workaround.
