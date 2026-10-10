@@ -746,6 +746,8 @@ packages/plugin/src/abstracts/mod.ts	package:other	S4	mention only (service disc
 packages/plugin/src/abstracts/plugin-aspire-contribution.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin/src/config/application/contribution-merger.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin/src/config/builders/plugin-builder.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin/src/config/domain/contribution-identity.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin/src/config/domain/plugin-composition.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin/src/config/domain/plugin-contributions.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin/src/diagnostics/mod.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin/src/diagnostics/verify-plugin.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
@@ -758,6 +760,7 @@ packages/plugin/src/templates/skeleton/mod.ts.template	package:other	S4	mention 
 packages/plugin/src/templates/skeleton/README.md.template	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin/src/templates/skeleton/src/aspire/{{plugin-name}}-contribution.ts.template	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin/src/templates/skeleton/src/aspire/mod.ts.template	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin/tests/config/plugin-composition_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin/tests/diagnostics/verify-plugin_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin/tests/domain/core-types_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/queue/adapters/deno-kv.adapter.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
