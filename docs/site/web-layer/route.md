@@ -16,7 +16,7 @@ A **route contract** is the schema half of that pair: it owns a route's path and
 independently of any concrete URL. Binding it to a pattern produces a **route reference** — one
 object that parses a request *and* builds hrefs, from the same schemas. This page is about what each
 piece actually guarantees, and about the third piece that closes the loop: a generated `routes` tree
-derived from the filesystem, so a moved route file is a compile error at every call site.
+derived from the filesystem, so a moved route file can invalidate call sites that use that tree.
 
 Import the surface from `@netscript/fresh/route`.
 
@@ -83,8 +83,8 @@ the contract to a concrete Fresh pattern and returns a **route reference**: the 
 bound `Link` component, `nav`, and `withPartial()`. `createRouteReference(pattern)` produces the same
 reference shape without a contract, inferring path params from the pattern itself.
 
-The generated `routes` tree binds every route file in the app to one of those references, so the
-pattern string appears exactly once in the whole codebase — inside a generated module.
+The generated `routes` tree binds discovered route files to those references. Call sites using the
+tree share generated patterns; separately authored string-literal references still need manual updates.
 
 ```ts
 import { defineRouteContract, enumPathParamSchema, paginationSearchSchema } from '@netscript/fresh/route';
@@ -264,6 +264,46 @@ The guarantee applies only to call sites that go through the generated tree. A h
 `createRouteReference('/dashboard/orders/[id]')` holds a string literal and is not rename-tracked —
 prefer the generated accessor wherever a route file can move, and keep `createRouteReference` for
 patterns outside the generated tree.
+
+## Renaming or Moving a Route
+
+`netscript ui:add page catalog --island --client catalog` registers a string-literal route in
+`router.ts`: `appRoutes['catalog']` uses `createRouteReference('/catalog', ...)`. The page binds
+with `.withRoute(appRoutes['catalog'])`. Moving its directory to `routes/inventory/` does **not**
+update that literal, and `deno check` can still pass while links point to `/catalog`. The generated
+tree guarantee above therefore does not apply to these scaffolded bindings.
+
+Route renaming is currently manual. There is no `netscript ui:rename` or `netscript route rename`
+verb, and no `netscript generate routes` command. `netscript ui:remove <name>` removes a copied
+Fresh UI registry item; it does not remove a page or reconcile its route registration.
+
+For example, to move `routes/catalog/index.tsx` from `/catalog` to `/inventory`:
+
+- [ ] Move the route directory to `routes/inventory/`, including any colocated
+      `(_shared)/query-loaders.ts`, `(_islands)/CatalogIsland.tsx`, and contract sidecar. Review
+      imports to and from the moved files; nesting changes can invalidate relative paths. Component
+      names may stay unchanged unless you also want to rename them.
+- [ ] Reconcile `router.ts`: change the registration's pattern from `/catalog` to `/inventory`. The
+      `appRoutes` key and metadata `id` are identifiers, not URL segments. Keep `catalog` if it is
+      still the desired identifier, or change the key and `id` together to `inventory` and update
+      every consumer, including the page's `.withRoute(appRoutes['inventory'])` binding. Remove
+      obsolete or duplicate registrations.
+- [ ] Search for the old URL, `appRoutes` key, and generated accessor. Update navigation links,
+      redirects, partial pairings, tests, and any string-literal route references. If path
+      parameters changed, reconcile the path schema and every href input too.
+- [ ] Refresh `.generated/manifest.ts` and `.generated/routes.ts` through the app's Vite build or
+      dev server with `routeManifest` enabled. Do not edit these files by hand. Running `deno check`
+      alone does not run the generator.
+- [ ] Type-check the app **after** regeneration and resolve stale generated-tree accessors and
+      imports. This catches type drift but does not prove string-literal URLs match the filesystem.
+- [ ] Visit `/inventory`, follow the app's navigation to it, and exercise any loader/island and
+      paired partial. Check the old `/catalog` URL and decide whether it should return 404 or
+      whether you need to author a redirect for existing links.
+
+For removal, manually remove the page and its owned loader/island files, prune its `router.ts`
+registration and consumers, regenerate, then verify navigation and the old URL. Do not remove shared
+modules still used by other pages. See [Generated web surface](/web-layer/generated-surface/) for
+the distinction between editable scaffold output and regenerated modules.
 
 ## Three authoring forms, one generated binding
 
