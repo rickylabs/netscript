@@ -183,7 +183,7 @@ Deno.test('byte and comment heartbeats renew deadline; auth refreshes; retries c
   let authCalls = 0;
   const { source, transport, scheduler } = await create({
     signal: abort.signal,
-    authHeaders: async () => ({ authorization: `Bearer token-${++authCalls}` }),
+    authHeaders: () => Promise.resolve({ authorization: `Bearer token-${++authCalls}` }),
   });
   try {
     assertEquals(authCalls, 1);
