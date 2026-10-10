@@ -61,6 +61,7 @@ export default async function createAuthService(
   const port = Number.parseInt(portValue, 10);
   const dbClient = await ctx.db.getClient();
   const registry = await initializeAuthService(ctx, dbClient);
+  const cookieName = registry.cookieName;
   const telemetry = createAuthTelemetry({
     subjectHashSalt: resolveAuditSalt(ctx),
   });
@@ -87,7 +88,7 @@ export default async function createAuthService(
     docs: {},
     database: { context: toDbContext(dbClient) },
     middleware: [withAuthRequest],
-    context: () => ({ registry, telemetry, request: currentAuthRequest() }),
+    context: () => ({ registry, telemetry, cookieName, request: currentAuthRequest() }),
     traceContext: true,
   }).serve();
 }

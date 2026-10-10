@@ -5,6 +5,7 @@ import type {
 } from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
+  SagaPublisherEndpointDiagnostic,
   SagaPublisherPort,
   SagaPublisherPublishManyOptions,
   SagaPublisherPublishOptions,
@@ -13,6 +14,18 @@ import type {
 } from '@netscript/plugin-sagas-core/integration/publisher';
 
 import { SAGAS_API_SERVICE_NAME } from '../constants.ts';
+import {
+  createSagaEndpointResolver,
+  listDenoEnvKeys,
+  type SagaEndpointResolver,
+  type SagaPublisherEnvKeyLister,
+  type SagaPublisherEnvReader,
+} from './saga-endpoint-resolver.ts';
+
+export type {
+  SagaPublisherEnvKeyLister,
+  SagaPublisherEnvReader,
+} from './saga-endpoint-resolver.ts';
 
 /** JSON primitive accepted by the saga HTTP publisher. */
 export type SagaPublisherJsonPrimitive = string | number | boolean | null;
@@ -32,9 +45,6 @@ export type SagaPublisherFetch = (
   init?: RequestInit,
 ) => Promise<Response>;
 
-/** Environment lookup boundary used for Aspire service discovery. */
-export type SagaPublisherEnvReader = (name: string) => string | undefined;
-
 /** Options for the plugin-layer HTTP saga publisher. */
 export type HttpSagaPublisherOptions = Readonly<{
   id?: string;
@@ -44,6 +54,8 @@ export type HttpSagaPublisherOptions = Readonly<{
   headers?: Readonly<Record<string, string>>;
   fetcher?: SagaPublisherFetch;
   readEnv?: SagaPublisherEnvReader;
+  /** Env key enumeration used only to diagnose a failed discovery; defaults to `Deno.env` key names. */
+  listEnvKeys?: SagaPublisherEnvKeyLister;
   retryableStatusCodes?: readonly number[];
 }>;
 
@@ -84,23 +96,24 @@ export class HttpSagaPublisher<TMessage extends SagaMessage = SagaMessage>
   /** Stable publisher identifier used by downstream observability. */
   readonly id: string;
 
-  private readonly serviceName: string;
-  private readonly baseUrl?: string;
+  private readonly endpoint: SagaEndpointResolver;
   private readonly publishPath: string;
   private readonly headers: Readonly<Record<string, string>>;
   private readonly fetcher: SagaPublisherFetch;
-  private readonly readEnv: SagaPublisherEnvReader;
   private readonly retryableStatusCodes: readonly number[];
 
   /** Create an HTTP saga publisher with optional service discovery overrides. */
   constructor(options: HttpSagaPublisherOptions = {}) {
     this.id = options.id ?? DEFAULT_PUBLISHER_ID;
-    this.serviceName = options.serviceName ?? SAGAS_API_SERVICE_NAME;
-    this.baseUrl = options.baseUrl;
+    this.endpoint = createSagaEndpointResolver({
+      serviceName: options.serviceName ?? SAGAS_API_SERVICE_NAME,
+      baseUrl: options.baseUrl,
+      readEnv: options.readEnv ?? ((name: string): string | undefined => Deno.env.get(name)),
+      listEnvKeys: options.listEnvKeys ?? listDenoEnvKeys,
+    });
     this.publishPath = normalizePath(options.publishPath ?? DEFAULT_PUBLISH_PATH);
     this.headers = Object.freeze(options.headers ?? {});
     this.fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
-    this.readEnv = options.readEnv ?? ((name: string): string | undefined => Deno.env.get(name));
     this.retryableStatusCodes = options.retryableStatusCodes ?? DEFAULT_RETRYABLE_STATUS_CODES;
   }
 
@@ -113,7 +126,7 @@ export class HttpSagaPublisher<TMessage extends SagaMessage = SagaMessage>
       const input = createPublishHttpInput(message, options);
       const publishUrl = this.publishUrl();
       if (publishUrl === undefined) {
-        return rejectedResult(message, options, 'no-endpoint', false);
+        return rejectedResult(message, options, 'no-endpoint', false, this.endpoint.diagnose());
       }
       const response = await this.fetcher(publishUrl, {
         body: JSON.stringify(input),
@@ -164,7 +177,7 @@ export class HttpSagaPublisher<TMessage extends SagaMessage = SagaMessage>
 
   /** Resolve the current publish URL from static options or Aspire service discovery. */
   private publishUrl(): string | undefined {
-    const serviceUrl = resolveServiceUrl(this.serviceName, this.baseUrl, this.readEnv);
+    const serviceUrl = this.endpoint.resolve();
     return serviceUrl === undefined ? undefined : joinUrl(serviceUrl, this.publishPath);
   }
 }
@@ -266,6 +279,7 @@ function rejectedResult<TMessage extends SagaMessage>(
   options: SagaPublisherPublishOptions,
   reason: string,
   retryable: boolean,
+  diagnostic?: SagaPublisherEndpointDiagnostic,
 ): SagaPublisherRejected<TMessage['type']> {
   return Object.freeze({
     published: false,
@@ -274,6 +288,7 @@ function rejectedResult<TMessage extends SagaMessage>(
     correlationKey: options.correlationKey ?? message.correlationKey,
     reason,
     retryable,
+    ...(diagnostic === undefined ? {} : { diagnostic }),
   });
 }
 
@@ -292,19 +307,6 @@ function createPublishHeaders<TMessage extends SagaMessage>(
 
 function optionalHeader(name: string, value: string | undefined): Readonly<Record<string, string>> {
   return value === undefined ? Object.freeze({}) : Object.freeze({ [name]: value });
-}
-
-function resolveServiceUrl(
-  serviceName: string,
-  baseUrl: string | undefined,
-  readEnv: SagaPublisherEnvReader,
-): string | undefined {
-  const resolved = baseUrl ??
-    readEnv(`services__${serviceName}__https__0`) ??
-    readEnv(`services__${serviceName}__http__0`) ??
-    readEnv('SAGAS_API_URL') ??
-    readEnv('NETSCRIPT_SAGAS_URL');
-  return resolved === undefined ? undefined : normalizeBaseUrl(resolved);
 }
 
 function joinUrl(baseUrl: string, path: string): string {

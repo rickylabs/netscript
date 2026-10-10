@@ -17,7 +17,16 @@ Deno.test('every pull-request workflow handles ready_for_review', async () => {
 
 Deno.test('draft PRs schedule no core, e2e, quality, or surface jobs', async () => {
   const core = await Deno.readTextFile('.github/workflows/ci.yml');
-  for (const job of ['close-gate', 'classify', 'check-test', 'quality', 'deps-report']) {
+  for (
+    const job of [
+      'close-gate',
+      'classify',
+      'check-test-shard',
+      'check-test',
+      'quality',
+      'deps-report',
+    ]
+  ) {
     const block = core.match(
       new RegExp(`^  ${job}:\\n([\\s\\S]*?)(?=^  [a-z][a-z0-9-]*:|\\z)`, 'm'),
     )?.[1];

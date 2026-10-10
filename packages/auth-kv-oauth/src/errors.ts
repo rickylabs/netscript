@@ -27,7 +27,8 @@ export type KvOAuthErrorCode =
   | 'return_to_not_allowed'
   | 'session_not_found'
   | 'configuration_error'
-  | 'https_required'
+  | 'flow_https_required'
+  | 'cookie_https_required'
   | 'subject_missing'
   | 'userinfo_failed';
 

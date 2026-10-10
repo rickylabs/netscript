@@ -9,6 +9,7 @@ import {
   createKvOAuthBackend,
   createKvOAuthStore,
   defineOAuthProvider,
+  presetProviderKind,
 } from '@netscript/auth-kv-oauth';
 import {
   createWorkosBackend,
@@ -94,20 +95,35 @@ type WorkosSdkCookieSession = Readonly<{
   }): Promise<WorkosSdkRefreshResult>;
 }>;
 
-/** Creates a single-active auth backend registry for the plugin service. */
+/** Resolved auth backend registry and its service cookie policy. */
+export type AuthServiceBackendRegistry =
+  & ResolvedAuthBackendRegistry
+  & Readonly<{
+    /** Cookie name resolved from the backend's effective environment. */
+    cookieName: string;
+  }>;
+
+/** Creates a single-active auth backend registry and its resolved cookie policy. */
 export async function createAuthServiceBackendRegistry(
   options: CreateAuthServiceBackendRegistryOptions = {},
-): Promise<ResolvedAuthBackendRegistry> {
-  const env = {
+): Promise<AuthServiceBackendRegistry> {
+  const configuredEnv = {
     ...(options.appsettings?.auth?.environment ?? options.appsettings?.Auth?.Environment ?? {}),
     ...(options.env ?? Deno.env.toObject()),
   };
+  const env = {
+    ...configuredEnv,
+    NETSCRIPT_AUTH_COOKIE_NAME: configuredEnv.NETSCRIPT_AUTH_COOKIE_NAME ?? '__Host-ns_session',
+  };
   const activeName = resolveActiveBackendName(env, options.appsettings);
   const backend = await createActiveBackend(activeName, { ...options, env });
-  return createAuthBackendRegistry(
-    new Map<string, AuthBackendPort>([[activeName, backend]]),
-    activeName,
-  );
+  return {
+    ...createAuthBackendRegistry(
+      new Map<string, AuthBackendPort>([[activeName, backend]]),
+      activeName,
+    ),
+    cookieName: env.NETSCRIPT_AUTH_COOKIE_NAME,
+  };
 }
 
 /** Resolve the active backend name from appsettings and `NETSCRIPT_AUTH_BACKEND`. */
@@ -139,7 +155,10 @@ async function createActiveBackend(
         displayName: env.NETSCRIPT_AUTH_PROVIDER_DISPLAY_NAME,
         clientId: provider.clientId,
         clientSecret: env.NETSCRIPT_AUTH_CLIENT_SECRET,
-        issuer: env.NETSCRIPT_AUTH_ISSUER,
+        // OAuth presets use explicit endpoints, even if an old shell or deployment supplies issuer.
+        issuer: presetProviderKind(env.NETSCRIPT_AUTH_PROVIDER_ID ?? '') === 'oauth'
+          ? undefined
+          : env.NETSCRIPT_AUTH_ISSUER,
         authorizationEndpoint: provider.authorizationEndpoint,
         tokenEndpoint: provider.tokenEndpoint,
         userInfoEndpoint: env.NETSCRIPT_AUTH_USERINFO_ENDPOINT,
@@ -154,12 +173,17 @@ async function createActiveBackend(
         })
         : undefined,
       fetch: options.fetch,
-      allowInsecureRequests: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true' ||
-        provider.usesLocalDefaults,
+      allowInsecureRequests: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true',
+      allowInsecureHttpRequests: env.NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS === 'true',
+      trustProxyHeaders: env.NETSCRIPT_AUTH_TRUST_PROXY_HEADERS === 'true',
       cookie: {
         name: env.NETSCRIPT_AUTH_COOKIE_NAME,
-        allowInsecureDev: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true' ||
-          provider.usesLocalDefaults,
+        secure: env.NETSCRIPT_AUTH_COOKIE_SECURE === 'true'
+          ? true
+          : env.NETSCRIPT_AUTH_COOKIE_SECURE === 'false'
+          ? false
+          : undefined,
+        allowInsecureDev: env.NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS === 'true',
       },
     });
   }
@@ -254,11 +278,7 @@ function resolveKvOAuthProviderEnv(
   redirectUri: string;
   authorizationEndpoint?: string;
   tokenEndpoint?: string;
-  usesLocalDefaults: boolean;
 }> {
-  const usesLocalDefaults = !env.NETSCRIPT_AUTH_CLIENT_ID || !env.NETSCRIPT_AUTH_REDIRECT_URI ||
-    (!env.NETSCRIPT_AUTH_ISSUER &&
-      (!env.NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT || !env.NETSCRIPT_AUTH_TOKEN_ENDPOINT));
   return {
     clientId: env.NETSCRIPT_AUTH_CLIENT_ID ?? 'netscript-auth-local',
     redirectUri: env.NETSCRIPT_AUTH_REDIRECT_URI ??
@@ -271,7 +291,6 @@ function resolveKvOAuthProviderEnv(
       (env.NETSCRIPT_AUTH_ISSUER
         ? undefined
         : `${localAuthOrigin(env)}/v1/auth/token/not-configured`),
-    usesLocalDefaults,
   };
 }
 
@@ -311,7 +330,7 @@ export async function createInMemoryKvOAuthRegistry(
       NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
       NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
       NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
-      NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
+      NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS: 'true',
       ...(options.env ?? {}),
     },
   });

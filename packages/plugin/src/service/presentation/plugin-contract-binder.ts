@@ -83,9 +83,19 @@ export interface PluginContractBinder<TContract extends PluginContractImplemente
  *
  * @example
  * ```ts
- * const bound = bindPluginContract(workersContractV1).context<WorkersContext>();
+ * import { implement } from '@orpc/server';
+ * import { baseContract } from '@netscript/contracts';
+ * import { z } from 'zod';
+ *
+ * const workersContractV1 = implement({
+ *   describe: baseContract
+ *     .route({ method: 'GET', path: '/workers/describe' })
+ *     .output(z.object({ capabilities: z.array(z.string()) })),
+ * });
+ *
+ * const bound = bindPluginContract(workersContractV1).context<{ readonly requestId: string }>();
  * export const workersV1 = bound.handlers({
- *   describe: bound.router.describe.handler(() => capabilities),
+ *   describe: bound.router.describe.handler(() => ({ capabilities: ['jobs'] })),
  * });
  * export const router = bound.assemble({ version: 'v1', namespace: 'workers', handlers: workersV1 });
  * ```

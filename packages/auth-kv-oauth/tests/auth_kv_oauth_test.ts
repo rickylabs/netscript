@@ -277,7 +277,7 @@ Deno.test('backend refreshes near-expiry sessions and detects refresh-token reus
   const backend = await createKvOAuthBackend({
     provider: provider(),
     store,
-    allowInsecureRequests: true,
+    trustProxyHeaders: true,
     fetch: () =>
       Promise.resolve(
         new Response(
