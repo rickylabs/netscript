@@ -1,7 +1,15 @@
-import { assertEquals, assertRejects, assertThrows } from '@std/assert';
+import { assertEquals, assertRejects, assertStrictEquals, assertThrows } from '@std/assert';
 import { deadline } from 'jsr:@std/async@^1/deadline';
 import { createStreamCollectionV1 } from '@netscript/sdk/streams/collections';
-import { createLiveQueryCollection, eq, isCollection } from '@tanstack/db';
+import {
+  and,
+  createLiveQueryCollection,
+  createTransaction,
+  eq,
+  isCollection,
+  Query,
+  toArray,
+} from '@tanstack/db';
 import type { Collection } from '@tanstack/db';
 import type { StreamFetchV1, StreamSourceSchedulerV1 } from '@netscript/sdk/streams/consumer';
 
@@ -225,13 +233,65 @@ Deno.test('fatal protocol failure before first control settles preload and expos
   await assertRejects(() => binding.dispose(), TypeError);
 });
 
-Deno.test('cleanup forbids rebinding the cancelled single-use source', async () => {
+Deno.test('HTTP 204 before readiness resolves preload without a stream failure', async () => {
+  const binding = createStreamCollectionV1({
+    type: 'tasks',
+    url: 'https://api.example.com/v1/stream/netscript/tasks?offset=-1',
+    fetch: () => Promise.resolve(new Response(null, { status: 204 })),
+    parse,
+    getKey: (task) => task.id,
+  });
+  await deadline(binding.collection.preload(), 1_000);
+  await binding.done;
+  assertEquals(binding.collection.status, 'cleaned-up');
+  assertEquals(binding.collection.utils.getError(), undefined);
+  await binding.dispose();
+});
+
+Deno.test('dispose during preload resolves readiness without a stream failure', async () => {
+  const binding = create(new Transport());
+  const pending = deadline(binding.collection.preload(), 1_000);
+  await settle();
+  await binding.dispose();
+  await pending;
+  await binding.done;
+  assertEquals(binding.collection.status, 'cleaned-up');
+  assertEquals(binding.collection.utils.getError(), undefined);
+});
+
+Deno.test('fatal entity failure rejects preload with the specific source error', async () => {
+  const transport = new Transport();
+  const fatal = new TypeError('Invalid task from the stream');
+  const binding = createStreamCollectionV1<Task>({
+    type: 'tasks',
+    url: 'https://api.example.com/v1/stream/netscript/tasks?offset=-1',
+    fetch: transport.fetch,
+    parse: () => {
+      throw fatal;
+    },
+    getKey: (task) => task.id,
+  });
+  const pending = assertRejects(
+    () => deadline(binding.collection.preload(), 1_000),
+    TypeError,
+    fatal.message,
+  );
+  const done = assertRejects(() => binding.done, TypeError, fatal.message);
+  await settle();
+  transport.send(data([change('1', 'invalid')]) + control('opaque:1'));
+  assertStrictEquals(await pending, fatal);
+  assertStrictEquals(await done, fatal);
+  assertStrictEquals(binding.collection.utils.getError(), fatal);
+  assertStrictEquals(await assertRejects(() => binding.dispose(), TypeError, fatal.message), fatal);
+});
+
+Deno.test('cleanup resolves preload and forbids rebinding the cancelled single-use source', async () => {
   const transport = new Transport();
   const binding = create(transport);
   await settle();
   const collection = binding.collection;
   if (!isCollection(collection)) throw new TypeError('Expected a TanStack collection');
-  const pending = binding.collection.preload();
+  const pending = deadline(binding.collection.preload(), 1_000);
   await binding.collection.cleanup();
   await pending;
   assertThrows(
@@ -239,7 +299,7 @@ Deno.test('cleanup forbids rebinding the cancelled single-use source', async () 
     Error,
     'Stream collection is closed; create a new binding',
   );
-  await assertRejects(() => binding.collection.preload(), Error);
+  assertEquals(binding.collection.utils.getError(), undefined);
   await binding.dispose();
   assertEquals(transport.urls.length, 1);
 });
@@ -265,6 +325,108 @@ Deno.test('batch-local insert update delete order and full replacement remain se
     assertEquals(binding.dispose(), first);
     await first;
   } finally {
+    await binding.dispose();
+  }
+});
+
+Deno.test('accepted stream writes stay hidden until an optimistic transaction settles', async () => {
+  const transport = new Transport();
+  const binding = create(transport);
+  const collection = binding.collection;
+  if (!isCollection(collection)) throw new TypeError('Expected a TanStack collection');
+  const tasks: Collection<Task, string> = collection;
+  const persistence = Promise.withResolvers<void>();
+  const transaction = createTransaction({ mutationFn: () => persistence.promise });
+  try {
+    await settle();
+    transport.send(data([change('1', 'original')]) + control('opaque:1'));
+    await tasks.preload();
+    transaction.mutate(() =>
+      tasks.update('1', (draft) => {
+        draft.title = 'optimistic';
+      })
+    );
+    transport.send(data([change('1', 'accepted-first')]) + control('opaque:2'));
+    await settle();
+    transport.send(data([change('1', 'accepted-last')]) + control('opaque:3'));
+    await settle();
+    assertEquals(binding.snapshot().lastCommittedOffset, 'opaque:3');
+    assertEquals(tasks.base.get('1')?.title, 'original');
+    assertEquals(tasks.get('1')?.title, 'optimistic');
+    persistence.resolve();
+    await transaction.when('settled');
+    assertEquals(tasks.base.get('1')?.title, 'accepted-last');
+    assertEquals(tasks.get('1')?.title, 'accepted-last');
+  } finally {
+    persistence.resolve();
+    await transaction.isPersisted.promise;
+    await binding.dispose();
+  }
+});
+
+Deno.test('stream live queries preserve nested source alias scope', async () => {
+  const transport = new Transport();
+  const binding = create(transport);
+  const collection = binding.collection;
+  if (!isCollection(collection)) throw new TypeError('Expected a TanStack collection');
+  const tasks: Collection<Task, string> = collection;
+  const nested = createLiveQueryCollection({
+    query: (q) =>
+      q.from({ task: tasks }).select(({ task }) => ({
+        id: task.id,
+        children: toArray(
+          new Query().from({ task: tasks })
+            .where(({ task: child }) => eq(child.id, task.id))
+            .select(({ task: child }) => ({ title: child.title })),
+        ),
+      })),
+    startSync: true,
+    gcTime: Infinity,
+  });
+  try {
+    await settle();
+    transport.send(data([change('1', 'first'), change('2', 'other')]) + control('opaque:1'));
+    await nested.preload();
+    assertEquals(nested.toArray.find(({ id }) => id === '1')?.children, [{ title: 'first' }]);
+    assertEquals(nested.toArray.find(({ id }) => id === '2')?.children, [{ title: 'other' }]);
+    transport.send(data([change('1', 'updated')]) + control('opaque:2'));
+    await settle();
+    assertEquals(nested.toArray.find(({ id }) => id === '1')?.children, [{ title: 'updated' }]);
+    assertEquals(nested.toArray.find(({ id }) => id === '2')?.children, [{ title: 'other' }]);
+  } finally {
+    await nested.cleanup();
+    await binding.dispose();
+  }
+});
+
+Deno.test('stream live queries preserve compound joins', async () => {
+  const transport = new Transport();
+  const binding = create(transport);
+  const collection = binding.collection;
+  if (!isCollection(collection)) throw new TypeError('Expected a TanStack collection');
+  const tasks: Collection<Task, string> = collection;
+  const joined = createLiveQueryCollection({
+    query: (q) =>
+      q.from({ task: tasks })
+        .innerJoin({ peer: tasks }, ({ task, peer }) =>
+          and(eq(task.id, peer.id), eq(task.title, peer.title)))
+        .select(({ task }) => ({ id: task.id, title: task.title })),
+    startSync: true,
+    gcTime: Infinity,
+  });
+  try {
+    await settle();
+    transport.send(data([change('1', 'first')]) + control('opaque:1'));
+    await joined.preload();
+    assertEquals(joined.toArray.map(({ id, title }) => ({ id, title })), [{
+      id: '1',
+      title: 'first',
+    }]);
+    transport.send(data([change('1', 'updated')]) + control('opaque:2'));
+    await settle();
+    assertEquals(joined.toArray[0].title, 'updated');
+  } finally {
+    await joined.cleanup();
     await binding.dispose();
   }
 });

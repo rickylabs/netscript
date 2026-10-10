@@ -44,9 +44,9 @@
     "preact": "npm:preact@^10.29.2",
     "preact-render-to-string": "npm:preact-render-to-string@^6.7.0",
     "zod": "catalog:",
-    "@durable-streams/state": "npm:@durable-streams/state@0.3.1",
-    "@durable-streams/client": "npm:@durable-streams/client@0.2.6",
-    "@durable-streams/tanstack-ai-transport": "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
+    "@durable-streams/state": "npm:@durable-streams/state@0.3.2",
+    "@durable-streams/client": "npm:@durable-streams/client@0.2.7",
+    "@durable-streams/tanstack-ai-transport": "npm:@durable-streams/tanstack-ai-transport@0.0.10",
     "@netscript/ai": "jsr:@netscript/ai@0.0.7",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7",
     "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.7",
@@ -59,7 +59,7 @@
     "@tanstack/ai-preact": "npm:@tanstack/ai-preact@0.20.1",
     "@tanstack/preact-query": "npm:@tanstack/preact-query@^5.104.1",
     "@tanstack/query-core": "npm:@tanstack/query-core@^5.104.1",
-    "@tanstack/react-db": "npm:@tanstack/react-db@0.1.95",
+    "@tanstack/react-db": "npm:@tanstack/react-db@0.5.8",
     "vite": "npm:vite@7.2.2"
   },
   "publish": {

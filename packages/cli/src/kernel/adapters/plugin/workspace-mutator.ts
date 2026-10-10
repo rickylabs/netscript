@@ -167,10 +167,10 @@ const PLUGIN_KIND_SOURCE_IMPORTS: Readonly<Record<string, Readonly<Record<string
 };
 
 const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
-  '@durable-streams/client': 'npm:@durable-streams/client@^0.2.6',
-  '@durable-streams/server': 'npm:@durable-streams/server@^0.3.7',
-  '@durable-streams/state': 'npm:@durable-streams/state@^0.3.1',
-  '@durable-streams/state/db': 'npm:@durable-streams/state@^0.3.1/db',
+  '@durable-streams/client': 'npm:@durable-streams/client@0.2.7',
+  '@durable-streams/server': 'npm:@durable-streams/server@0.3.9',
+  '@durable-streams/state': 'npm:@durable-streams/state@0.3.2',
+  '@durable-streams/state/db': 'npm:@durable-streams/state@0.3.2/db',
   '@netscript/cron': netscriptJsrSpecifier('cron'),
   '@netscript/kv/kvdex': netscriptJsrSpecifier('kv', '/kvdex'),
   '@netscript/plugin/contract-base': netscriptJsrSpecifier('plugin', '/contract-base'),
