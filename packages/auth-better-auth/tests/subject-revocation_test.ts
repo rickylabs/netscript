@@ -9,7 +9,7 @@ import { memoryAdapter } from 'better-auth/adapters/memory';
 import type { AuthnRequest } from '@netscript/service/auth';
 import { AuthBackendOperationUnsupportedError, createBetterAuthBackend } from '../mod.ts';
 
-async function createFixture() {
+function createFixture() {
   const db = { user: [], session: [], account: [], verification: [] };
   const auth = betterAuth({
     secret: crypto.randomUUID().repeat(2),
@@ -54,7 +54,7 @@ function cookieRequest(cookie: string): AuthnRequest {
 }
 
 Deno.test('better-auth revokeSubjectSessions ends every session of the subject and no other', async () => {
-  const { backend, signUp, signIn, isActive } = await createFixture();
+  const { backend, signUp, signIn, isActive } = createFixture();
   const alice = await signUp('alice@example.test');
   const aliceElsewhere = await signIn('alice@example.test');
   const bob = await signUp('bob@example.test');
@@ -71,7 +71,7 @@ Deno.test('better-auth revokeSubjectSessions ends every session of the subject a
 });
 
 Deno.test('better-auth revokeSubjectSessions refuses a credential of another subject', async () => {
-  const { backend, signUp, isActive } = await createFixture();
+  const { backend, signUp, isActive } = createFixture();
   const alice = await signUp('alice@example.test');
   const bob = await signUp('bob@example.test');
 
@@ -89,7 +89,7 @@ Deno.test('better-auth revokeSubjectSessions refuses a credential of another sub
 });
 
 Deno.test('better-auth revokeSubjectSessions needs the caller request', async () => {
-  const { backend, signUp, isActive } = await createFixture();
+  const { backend, signUp, isActive } = createFixture();
   const alice = await signUp('alice@example.test');
 
   await assertRejects(
