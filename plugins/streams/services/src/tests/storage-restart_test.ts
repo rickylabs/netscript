@@ -110,9 +110,13 @@ for (const mode of ['memory', 'file'] as const) {
 
 Deno.test('storage process: missing directory fails startup and cannot serve a false file claim', async () => {
   const dir = await Deno.makeTempDir();
+  let unexpected: Awaited<ReturnType<typeof startService>> | undefined;
   try {
-    await assertRejects(() => startService(`${dir}/missing`));
+    await assertRejects(async () => {
+      unexpected = await startService(`${dir}/missing`);
+    });
   } finally {
+    await unexpected?.stop();
     await Deno.remove(dir, { recursive: true });
   }
 });

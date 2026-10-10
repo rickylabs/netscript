@@ -31,9 +31,9 @@ without provisioning any database.
 
 ## Storage contract and operations
 
-The runtime manifest records `storage.defaultMode = "memory"`, `ephemeral = true`, and the file
-opt-in environment key. The installer manifest description declares the ephemeral default and the
-`STREAMS_DATA_DIR` opt-in. `/health` includes a `checks` entry named `streams-storage` with
+The runtime manifest records `metadata.storage.defaultMode = "memory"`, `ephemeral = true`, and the
+file opt-in environment key. The installer manifest description declares the ephemeral default and
+the `STREAMS_DATA_DIR` opt-in. `/health` includes a `checks` entry named `streams-storage` with
 `storage.mode` (`memory` or `file`), `durable`, and `probe` (`not-applicable` or `passed`). Healthy
 memory mode means the service is reachable; it explicitly reports `durable: false`. Local directory
 paths are omitted from health.
