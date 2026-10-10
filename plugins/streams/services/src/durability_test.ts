@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import { createStorageHealthCheck, describeStorageDurability } from './durability.ts';
 
 Deno.test('storage: unset is explicitly ephemeral and cannot claim durability', async () => {
@@ -30,7 +30,12 @@ Deno.test('storage: empty, missing and non-directory opt-ins fail without claimi
   await assertRejects(() => describeStorageDurability('   '));
   const dir = await Deno.makeTempDir();
   try {
-    await assertRejects(() => describeStorageDurability(`${dir}/missing`), Deno.errors.NotFound);
+    const missing = await assertRejects(
+      () => describeStorageDurability(`${dir}/missing`),
+      Error,
+      'STREAMS_DATA_DIR must name an existing directory.',
+    );
+    assert(missing.cause instanceof Deno.errors.NotFound);
     await Deno.writeTextFile(`${dir}/file`, 'not a directory');
     await assertRejects(() => describeStorageDurability(`${dir}/file`));
   } finally {

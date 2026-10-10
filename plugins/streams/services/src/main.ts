@@ -11,9 +11,11 @@
  * Streams is the one plugin with no oRPC contract, so the service is built
  * with an empty router and `serveRpc: false` (no `withRPC` wiring).
  *
- * When `STREAMS_DATA_DIR` is set the server uses file-backed storage so
- * events survive process restarts.  Omitting the env var uses in-memory
- * storage (suitable for development).
+ * Storage defaults to ephemeral memory; all events are lost on process restart.
+ * An explicit `STREAMS_DATA_DIR` selects file storage only after a startup
+ * write/read probe succeeds. Empty, missing, non-directory or unwritable opt-ins
+ * fail startup without falling back to memory. File mode supports replay after
+ * an orderly process restart; it does not claim power-loss durability.
  *
  * @module
  */

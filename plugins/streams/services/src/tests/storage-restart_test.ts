@@ -1,12 +1,25 @@
 /** Process-boundary storage acceptance, reusable against a generated project. @module */
-import { assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import { getAvailablePort } from '@std/net';
 import { defineStreamSchema, DurableStreamProducer } from '@netscript/plugin-streams-core';
 import { z } from 'zod';
 
 const projectRoot = Deno.env.get('NETSCRIPT_STREAMS_TEST_PROJECT') ?? Deno.cwd();
 
-async function startService(dataDir?: string) {
+async function readBoundedStderr(stream: ReadableStream<Uint8Array>): Promise<string> {
+  const retained = new Uint8Array(8192);
+  let size = 0;
+  for await (const chunk of stream) {
+    const tail = chunk.subarray(Math.max(0, chunk.length - retained.length));
+    const keep = Math.min(size, retained.length - tail.length);
+    retained.copyWithin(0, size - keep, size);
+    retained.set(tail, keep);
+    size = keep + tail.length;
+  }
+  return new TextDecoder().decode(retained.subarray(0, size));
+}
+
+function spawnService(dataDir?: string) {
   const port = await getAvailablePort();
   const env: Record<string, string> = { ...Deno.env.toObject(), PORT: String(port) };
   delete env.STREAMS_DATA_DIR;
@@ -18,9 +31,13 @@ async function startService(dataDir?: string) {
     env,
     clearEnv: true,
     stdout: 'null',
-    stderr: 'null',
+    stderr: 'piped',
   }).spawn();
-  const base = `http://127.0.0.1:${port}`;
+  return { child, stderr: readBoundedStderr(child.stderr), base: `http://127.0.0.1:${port}` };
+}
+
+async function startService(dataDir?: string) {
+  const { child, stderr, base } = spawnService(dataDir);
   let exited = false;
   const status = child.status.then((result) => {
     exited = true;
@@ -29,6 +46,7 @@ async function startService(dataDir?: string) {
   const stop = async () => {
     if (!exited) child.kill('SIGTERM');
     await status;
+    await stderr;
   };
   try {
     for (let attempt = 0; attempt < 100 && !exited; attempt++) {
@@ -108,15 +126,22 @@ for (const mode of ['memory', 'file'] as const) {
   });
 }
 
-Deno.test('storage process: missing directory fails startup and cannot serve a false file claim', async () => {
+Deno.test('storage process: missing directory exits non-zero with a storage diagnostic', async () => {
   const dir = await Deno.makeTempDir();
-  let unexpected: Awaited<ReturnType<typeof startService>> | undefined;
+  const { child, stderr } = spawnService(`${dir}/missing`);
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    child.kill('SIGTERM');
+  }, 5000);
   try {
-    await assertRejects(async () => {
-      unexpected = await startService(`${dir}/missing`);
-    });
+    const status = await child.status;
+    const diagnostic = await stderr;
+    assert(!timedOut, 'Missing-directory startup must exit without fixture termination.');
+    assert(status.code !== 0, 'Missing-directory startup must exit non-zero.');
+    assert(/STREAMS_DATA_DIR|NotFound/.test(diagnostic), diagnostic);
   } finally {
-    await unexpected?.stop();
+    clearTimeout(timer);
     await Deno.remove(dir, { recursive: true });
   }
 });

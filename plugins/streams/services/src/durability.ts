@@ -39,7 +39,14 @@ export async function describeStorageDurability(
     };
   }
   if (dataDir.trim() === '') throw new Error('STREAMS_DATA_DIR must name an existing directory.');
-  if (!(await Deno.stat(dataDir)).isDirectory) {
+  let directory: Deno.FileInfo;
+  try {
+    directory = await Deno.stat(dataDir);
+  } catch (cause) {
+    if (!(cause instanceof Deno.errors.NotFound)) throw cause;
+    throw new Error('STREAMS_DATA_DIR must name an existing directory.', { cause });
+  }
+  if (!directory.isDirectory) {
     throw new Error('STREAMS_DATA_DIR must name an existing directory.');
   }
   const path = `${dataDir}/.netscript-storage-probe-${crypto.randomUUID()}`;
