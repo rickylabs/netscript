@@ -45,6 +45,7 @@ import { defineService } from '@netscript/service';
 import { router } from './router.ts';
 
 await defineService(router, {
+  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },
   name: 'users',
   version: '1.0.0',
   port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ
@@ -97,7 +98,7 @@ bundled runtime so the UI loads offline.
   {
     label: "Preset — defineService({ openapi })",
     lang: "ts",
-    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One option turns on the spec, the Scalar UI, and the bundled JS.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: 3001, // note: your scaffold's port will differ\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
+    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One option turns on the spec, the Scalar UI, and the bundled JS.\nawait defineService(router, {\n  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },\n  name: 'users',\n  version: '1.0.0',\n  port: 3001, // note: your scaffold's port will differ\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
   },
   {
     label: "Builder — createService().withDocs()",
