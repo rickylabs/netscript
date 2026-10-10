@@ -31,7 +31,9 @@ project markers or the invoking environment. It writes `.mcp.json`, the single d
 idempotently into existing content); the VS Code editor writes `.vscode/mcp.json`; Zed writes native
 `context_servers` into `.zed/settings.json`; OpenCode gets `opencode.json` and discovers
 `.agents/skills/` natively. The `AGENTS.md` section names each skill by its registered name
-("call the `netscript-build` skill") so the host loads it through its skill tool. Select an editor with
+("call the `netscript-build` skill"). Hosts that register those names use their skill tool; on Claude
+Code, call `repo-skills` with the requested skill name. Its bridge instructions permit reading the
+canonical `.agents/skills/<name>/SKILL.md` and bundled references. Select an editor with
 `netscript agent init --editor none|zed|vscode`, including on a cloned existing project. They share
 one vocabulary with the
 `netscript` CLI and the [NetScript MCP tools](/ai/agent-tooling/#what-the-server-exposes),
@@ -54,8 +56,9 @@ re-running `netscript agent init` is idempotent. See
 The upstream Aspire workflow skills (`aspire-init`, `aspire-orchestration`, `aspire-monitoring`,
 `aspire-deployment`) can be installed beside NetScript's `aspire` diagnostic skill by explicit
 name; they never overwrite `aspire/SKILL.md`. Agent initialization uses only Aspire's standard
-`.agents/skills/` location. It preserves existing legacy mirrors and custom Claude skills; legacy
-mirror cleanup and divergent-file reporting remain follow-up work.
+`.agents/skills/` location. It preserves existing legacy mirrors and custom Claude skills, and warns
+when known legacy skill directories remain because they are no longer refreshed. Legacy mirror
+cleanup and divergent-file reporting remain follow-up work.
 
 Agents connect to the Aspire MCP server with `aspire agent mcp`, or with the dashboard-only form
 `aspire agent mcp --dashboard-url <url>` (plus an optional `--api-key`). Aspire 13.5.3 exposes a
