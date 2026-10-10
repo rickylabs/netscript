@@ -314,3 +314,9 @@ Before merging a `packages/*` change that touches `mod.ts`:
 - [ ] `deno publish --dry-run` is clean — no portability
       warnings, and no slow types *unless* the package is
       oRPC-bound (see "Sanctioned exception" above).
+
+## Published example compilation contract
+
+The JSDoc gate enforces invalid syntax and usage that disagrees with a published signature, as well
+as undeclared names and import/fence integrity. Type errors have no deferred allowance. An example
+may not skip checking to hide an API mismatch.

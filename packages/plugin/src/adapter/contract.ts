@@ -150,7 +150,7 @@ export interface DoctorSpec {
  * @example
  * ```ts
  * const info: InfoSpec = { capabilities: ['jobs'], versionSource: 'manifest' };
- * console.log(info.capabilities.length);
+ * console.log(info.capabilities?.length ?? 0);
  * ```
  */
 export interface InfoSpec {
