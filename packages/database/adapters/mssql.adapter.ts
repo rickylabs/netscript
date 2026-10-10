@@ -8,6 +8,7 @@
  */
 
 import { PrismaMssql } from '@prisma/adapter-mssql';
+import { tokenizeAdoNetConnectionString } from './connection-strings/tokenize-ado-net.ts';
 import type {
   DatabaseAdapter,
   DatabaseConnectionOptions,
@@ -119,12 +120,8 @@ export interface MssqlDriverAdapter {
 export function parseAdoNetConnectionString(connectionString: string): MssqlAdapterConfig {
   const params: Record<string, string> = {};
 
-  // Parse key=value pairs (semicolon-separated)
-  for (const part of connectionString.split(';')) {
-    const [key, ...valueParts] = part.split('=');
-    if (key && valueParts.length > 0) {
-      params[key.trim().toLowerCase()] = valueParts.join('=').trim();
-    }
+  for (const { key, value } of tokenizeAdoNetConnectionString(connectionString)) {
+    params[key] = value;
   }
 
   // Parse server and port (format: "host,port" or "host\instance")
