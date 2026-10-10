@@ -17,15 +17,13 @@ export const streamProxyStub: StubSource<never> = defineStub({
   source: `/** In-process AI stream route (POST). Runs the agent loop directly; no gateway hop. */
 
 import { createAiRouter, aiContractV1, type AiRouterImplementation } from '@netscript/plugin-ai-core';
-import { toNetScriptChatResponse, type NetScriptChatSendMessage } from '@netscript/fresh/ai';
+import { toNetScriptChatResponse } from '@netscript/fresh/ai';
 import { createAssistantAgent } from '../agents/assistant.ts';
 import { ai, chatModelId, DEFAULT_CHAT_MODEL } from '../ai.ts';
 
 interface ChatRequestBody {
   readonly sessionId: string;
   readonly message: { readonly role: 'user'; readonly text: string };
-  /** Optional complete UI/Model messages; native parts are persisted unchanged. */
-  readonly newMessages?: readonly NetScriptChatSendMessage[];
 }
 
 type AiRequestContext = {
@@ -148,7 +146,8 @@ export async function handler(request: Request): Promise<Response> {
   const response = toNetScriptChatResponse({
     target: { sessionId },
     source: streamChat({ message: message.text, signal: request.signal }),
-    newMessages: body.newMessages ?? [{ id: crypto.randomUUID(), role: 'user', content: message.text }],
+    // Persist exactly the user prompt passed to the model; client transcript fields are ignored.
+    newMessages: [{ id: crypto.randomUUID(), role: 'user', content: message.text }],
     request,
   });
 

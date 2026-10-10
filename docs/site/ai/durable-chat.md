@@ -2,8 +2,8 @@
 layout: layouts/base.vto
 title: Durable chat
 templateEngine: [vento, md]
-prev: { label: 'AI', href: '/ai/' }
-next: { label: 'Chat UI', href: '/ai/chat-ui/' }
+prev: { label: "AI", href: "/ai/" }
+next: { label: "Chat UI", href: "/ai/chat-ui/" }
 order: 2
 ---
 
@@ -26,14 +26,14 @@ now.
 ## The primitives at a glance
 
 {{ comp.apiTable({
-caption: "@netscript/fresh/ai — the durable-chat surface",
-rows: [
-{ name: "createNetScriptChatStreamProxy", type: "(options) => handler", desc: "Build the single durable chat-stream proxy handler — resolves the session target (static or per-request), proxies to the durable-stream URL with server auth, passes the body through unbuffered, and tears down on client abort." },
-{ name: "toNetScriptChatResponse", type: "(options) => Promise<Response>", desc: "Produce a durable-session `Response` from a server chat stream; enforces `authorize` (a denial becomes `403`) before the session stream is touched." },
-{ name: "resolveChatSnapshot", type: "(options) => Promise<NetScriptChatSnapshot>", desc: "Resolve the seed snapshot for SSR / first paint by materializing the session and reducing it through `projectChatSnapshot`." },
-{ name: "projectChatSnapshot", type: "(messages) => {messages, renderParts}", desc: "THE single projection reducer — deterministic and side-effect-free. Both seed and live paths MUST route through it (the one-projection law)." },
-{ name: "createNetScriptChatConnection", type: "(options) => NetScriptChatConnection", desc: "Open a live durable session handle: SR2-tolerant `subscribe`, a `send` that persists client messages, and one idempotent teardown (`close`/`stop`/`dispose`)." }
-]
+  caption: "@netscript/fresh/ai — the durable-chat surface",
+  rows: [
+    { name: "createNetScriptChatStreamProxy", type: "(options) => handler", desc: "Build the single durable chat-stream proxy handler — resolves the session target (static or per-request), proxies to the durable-stream URL with server auth, passes the body through unbuffered, and tears down on client abort." },
+    { name: "toNetScriptChatResponse", type: "(options) => Promise<Response>", desc: "Produce a durable-session `Response` from a server chat stream; enforces `authorize` (a denial becomes `403`) before the session stream is touched." },
+    { name: "resolveChatSnapshot", type: "(options) => Promise<NetScriptChatSnapshot>", desc: "Resolve the seed snapshot for SSR / first paint by materializing the session and reducing it through `projectChatSnapshot`." },
+    { name: "projectChatSnapshot", type: "(messages) => {messages, renderParts}", desc: "THE single projection reducer — deterministic and side-effect-free. Both seed and live paths MUST route through it (the one-projection law)." },
+    { name: "createNetScriptChatConnection", type: "(options) => NetScriptChatConnection", desc: "Open a live durable session handle: SR2-tolerant `subscribe`, a `send` that persists client messages, and one idempotent teardown (`close`/`stop`/`dispose`)." }
+  ]
 }) }}
 
 ## The one-projection law
@@ -73,12 +73,12 @@ Fresh `Handlers` entry.
 
 ```ts
 // routes/api/chat/[sessionId].ts — the one canonical chat-stream proxy
-import { createNetScriptChatStreamProxy } from '@netscript/fresh/ai';
+import { createNetScriptChatStreamProxy } from "@netscript/fresh/ai";
 
 const proxy = createNetScriptChatStreamProxy({
   // Resolve the session per request from the route param.
   target: (req) => ({
-    sessionId: new URL(req.url).pathname.split('/').pop()!,
+    sessionId: new URL(req.url).pathname.split("/").pop()!,
   }),
 });
 
@@ -105,7 +105,7 @@ chunks and returns the session `Response`. Supply an `authorize` hook and the ma
 
 ```ts
 // The server turn: persist the assistant stream into the durable session, gated by authorize.
-import { toNetScriptChatResponse } from '@netscript/fresh/ai';
+import { toNetScriptChatResponse } from "@netscript/fresh/ai";
 
 const response = await toNetScriptChatResponse({
   target: { sessionId },
@@ -117,14 +117,22 @@ const response = await toNetScriptChatResponse({
 });
 ```
 
-`newMessages` accepts `readonly NetScriptChatSendMessage[]`: native TanStack UI messages with
-`parts`, Model messages with `content` and `toolCalls`, or the existing
-`{ id, role, content: string }` form. UI parts, attachments, tool fields and metadata survive
-storage unchanged. Model content is retained and also exposed as replay parts. `resolveChatSnapshot`
-replays these native batches before producing the reduced `NetScriptChatMessage` text and tool-card
-projection; attachments remain in the durable log rather than being discarded by that rendering
-projection. Raw upstream readers see compatible text echoes; native seed replay uses the NetScript
-snapshot seam.
+`newMessages` accepts `readonly NetScriptChatSendMessage[]`: server-trusted TanStack UI
+messages with `parts`, Model messages with `content` and `toolCalls`, or the existing
+`{ id, role, content: string }` form. Native parts and metadata survive storage unchanged;
+Model content is also exposed as replay parts. Validate any client input before this
+seam and give the model the same prompt that is persisted. The plugin-AI scaffold
+builds its own user turn from `message.text` and ignores client transcript fields.
+
+No public API returns persisted native parts. `resolveChatSnapshot` exposes only
+reduced text and tool cards; attachments remain in the durable log. A public native
+reader remains part of #2068's follow-up scope, along with publication, a published
+consumer check and the EIS live one-SSE-per-pane confirmation.
+
+Native batch tool cards appear on seed/reload but not on live subscribers.
+The upstream live reader ignores `CUSTOM netscript.chat.messages` and sees text echoes.
+The paths use the same projection with different inputs: native live replay remains
+an exception to the one-projection law. Ordinary assistant tool chunks still stream live.
 
 {{ comp callout { type: "warning", title: "authorize is required in production — there is no default allow-all" } }}
 <code>NetScriptChatAuthorize = (request, sessionId) =&gt; boolean | Promise&lt;boolean&gt;</code>
@@ -143,7 +151,7 @@ projection reducer with `resolveChatSnapshot`, then hand the returned `offset` t
 live subscription so seed and live share one continuous log.
 
 ```ts
-import { resolveChatSnapshot } from '@netscript/fresh/ai';
+import { resolveChatSnapshot } from "@netscript/fresh/ai";
 
 const snapshot = await resolveChatSnapshot({ target: { sessionId } });
 // snapshot.messages   -> ordered NetScriptChatMessage[]
@@ -159,7 +167,7 @@ re-polls with backoff instead of throwing), `send` persists client messages, and
 `close`/`stop`/`dispose` are one idempotent teardown so no connection leaks.
 
 ```ts
-import { createNetScriptChatConnection } from '@netscript/fresh/ai';
+import { createNetScriptChatConnection } from "@netscript/fresh/ai";
 
 const chat = createNetScriptChatConnection({
   target: { sessionId },
@@ -185,17 +193,17 @@ intentionally separate and must not be conflated. The transport part is the stab
 contract the UI widens.
 
 {{ comp.apiTable({
-caption: "RenderPart (transport) — @netscript/fresh/ai",
-rows: [
-{ name: "kind", type: "\"text\" | \"tool\"", desc: "Whether this part renders message text or a tool card." },
-{ name: "id", type: "string", desc: "Stable id of this part within the transcript." },
-{ name: "role", type: "\"system\" | \"user\" | \"assistant\" | \"tool\"", desc: "Author role the part belongs to." },
-{ name: "text", type: "string?", desc: "Reduced text (present when `kind === 'text'`)." },
-{ name: "toolName", type: "string?", desc: "Invoked tool name (present when `kind === 'tool'`)." },
-{ name: "toolState", type: "\"pending\" | \"streaming\" | \"complete\" | \"error\"", desc: "Lifecycle state of the tool card reduced from the chunk log." },
-{ name: "input", type: "unknown?", desc: "Reduced tool input (may be partial while `streaming`)." },
-{ name: "output", type: "unknown?", desc: "Reduced tool output, present once `complete`." }
-]
+  caption: "RenderPart (transport) — @netscript/fresh/ai",
+  rows: [
+    { name: "kind", type: "\"text\" | \"tool\"", desc: "Whether this part renders message text or a tool card." },
+    { name: "id", type: "string", desc: "Stable id of this part within the transcript." },
+    { name: "role", type: "\"system\" | \"user\" | \"assistant\" | \"tool\"", desc: "Author role the part belongs to." },
+    { name: "text", type: "string?", desc: "Reduced text (present when `kind === 'text'`)." },
+    { name: "toolName", type: "string?", desc: "Invoked tool name (present when `kind === 'tool'`)." },
+    { name: "toolState", type: "\"pending\" | \"streaming\" | \"complete\" | \"error\"", desc: "Lifecycle state of the tool card reduced from the chunk log." },
+    { name: "input", type: "unknown?", desc: "Reduced tool input (may be partial while `streaming`)." },
+    { name: "output", type: "unknown?", desc: "Reduced tool output, present once `complete`." }
+  ]
 }) }}
 
 The message and session shapes are equally small: `NetScriptChatMessage`
@@ -214,14 +222,14 @@ resource URI. `?theme=` selects a token set; an absent or unknown theme falls ba
 
 ```ts
 // routes/mcp/sandbox.ts
-import { createMcpSandboxHandler } from '@netscript/fresh/ai/sandbox';
+import { createMcpSandboxHandler } from "@netscript/fresh/ai/sandbox";
 
 export const handler = {
   GET: createMcpSandboxHandler({
     resolveResource: (uri, { signal }) => registry.lookup(uri, { signal }),
     themes: {
-      default: { '--ns-color-surface': '#ffffff' },
-      dark: { '--ns-color-surface': '#111111' },
+      default: { "--ns-color-surface": "#ffffff" },
+      dark: { "--ns-color-surface": "#111111" },
     },
   }),
 };
@@ -240,22 +248,22 @@ real today. Do not build on <code>createNetScriptMcpSandbox</code> yet.
 This page orients; the API reference enumerates every exported symbol.
 
 {{ comp.featureGrid({ items: [
-{
-title: "Look up — @netscript/fresh",
-body: "The generated API for the Fresh package, including the /ai and /ai/sandbox subpaths.",
-href: "/reference/fresh/",
-icon: "≡"
-},
-{
-title: "Next — the chat UI",
-body: "The fresh-ui copy-registry components that render this transcript: composer, message thread, tool cards, and the generative-UI block renderer.",
-href: "/ai/chat-ui/",
-icon: "→"
-},
-{
-title: "Understand — the two planes",
-body: "Why chat lives on the durable-session plane and list/board data lives on the StreamDB plane.",
-href: "/ai/",
-icon: "◎"
-}
+  {
+    title: "Look up — @netscript/fresh",
+    body: "The generated API for the Fresh package, including the /ai and /ai/sandbox subpaths.",
+    href: "/reference/fresh/",
+    icon: "≡"
+  },
+  {
+    title: "Next — the chat UI",
+    body: "The fresh-ui copy-registry components that render this transcript: composer, message thread, tool cards, and the generative-UI block renderer.",
+    href: "/ai/chat-ui/",
+    icon: "→"
+  },
+  {
+    title: "Understand — the two planes",
+    body: "Why chat lives on the durable-session plane and list/board data lives on the StreamDB plane.",
+    href: "/ai/",
+    icon: "◎"
+  }
 ] }) }}

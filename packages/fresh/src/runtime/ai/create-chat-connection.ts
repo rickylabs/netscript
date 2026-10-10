@@ -517,8 +517,9 @@ export async function toNetScriptChatResponse(
  *
  * Replays the durable session with TanStack's `StreamProcessor`, retaining native
  * message append parts, and reduces it through {@link projectChatSnapshot} — the SAME reducer the live
- * island path uses (ONE-PROJECTION LAW) — so tool cards rendered at seed time
- * survive the first live chunk unchanged. The returned `offset` seeds the live
+ * island path uses (ONE-PROJECTION LAW). Native batch tool parts currently appear
+ * only on seed/reload: the upstream live reader consumes text echoes, not the
+ * native append extension. No public reader returns the original attachment parts. The returned `offset` seeds the live
  * subscription so seed and live read one continuous chunk log.
  */
 export async function resolveChatSnapshot(
@@ -638,7 +639,7 @@ function withIdentityEncoding(headers: Record<string, string>): Record<string, s
 }
 
 function toDurableMessage(message: NetScriptChatSendMessage): NetScriptChatSendMessage {
-  if ('parts' in message) return message;
+  if ('parts' in message) return { ...message, id: message.id ?? crypto.randomUUID() };
   return {
     ...message,
     id: message.id ?? crypto.randomUUID(),

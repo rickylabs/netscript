@@ -2,8 +2,8 @@
 layout: layouts/base.vto
 title: The durable chat route
 templateEngine: [vento, md]
-prev: { label: '1 · Scaffold', href: '/tutorials/chat/01-scaffold/' }
-next: { label: '3 · Chat UI', href: '/tutorials/chat/03-chat-ui/' }
+prev: { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" }
+next: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" }
 ---
 
 # The durable chat route
@@ -15,12 +15,12 @@ you finish, a `curl` can drive a full turn and a second `curl` replays it — th
 is durable.
 
 {{ comp.learningPath({ steps: [
-{ label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },
-{ label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" },
-{ label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" },
-{ label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" },
-{ label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" },
-{ label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" }
+  { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },
+  { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" },
+  { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" },
+  { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" },
+  { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" },
+  { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" }
 ] }) }}
 
 ## The four seams
@@ -29,12 +29,12 @@ is durable.
 chapter 3 uses the fourth (`createNetScriptChatConnection`) in the island.
 
 {{ comp.apiTable({
-caption: "@netscript/fresh/ai — the durable-chat seams used here",
-rows: [
-{ name: "toNetScriptChatResponse", type: "session route", desc: "Turn a server chat stream into a durable session Response; authorize-gated (→ 403 on deny)." },
-{ name: "resolveChatSnapshot", type: "history seed", desc: "Materialize the transcript so far, reduced through projectChatSnapshot — the model's context." },
-{ name: "createNetScriptChatStreamProxy", type: "the one proxy", desc: "The single durable chat-stream proxy the browser reads through; attaches streams auth server-side." }
-]
+  caption: "@netscript/fresh/ai — the durable-chat seams used here",
+  rows: [
+    { name: "toNetScriptChatResponse", type: "session route", desc: "Turn a server chat stream into a durable session Response; authorize-gated (→ 403 on deny)." },
+    { name: "resolveChatSnapshot", type: "history seed", desc: "Materialize the transcript so far, reduced through projectChatSnapshot — the model's context." },
+    { name: "createNetScriptChatStreamProxy", type: "the one proxy", desc: "The single durable chat-stream proxy the browser reads through; attaches streams auth server-side." }
+  ]
 }) }}
 
 ## Step 1 — The model call
@@ -71,7 +71,7 @@ First give that dynamic route a **typed identity**. `createRouteReference` from
 `@netscript/fresh/route` infers the `{ sessionId }` path param straight from the `[sessionId]`
 pattern, so the id the server reads and the URL the browser posts to in chapter 3 both come from
 one declaration — never a string assembled two different ways. Put it in the shared `contracts/`
-tree so the route and the island import the _same_ object:
+tree so the route and the island import the *same* object:
 
 ```ts
 // contracts/routes/chat-turn.ts
@@ -89,10 +89,7 @@ Now the route reads its param **through the contract** instead of touching `ctx.
 // apps/dashboard/routes/api/chat/[sessionId].ts
 import { chat } from '@tanstack/ai';
 import { anthropicText } from '@tanstack/ai-anthropic';
-import {
-  resolveChatSnapshot,
-  toNetScriptChatResponse,
-} from '@netscript/fresh/ai';
+import { resolveChatSnapshot, toNetScriptChatResponse } from '@netscript/fresh/ai';
 import { chatTurnRoute } from '../../../../contracts/routes/chat-turn.ts';
 
 // REQUIRED in production — no default allow-all. Replace with your real check
@@ -101,19 +98,14 @@ const authorize = (request: Request, sessionId: string): boolean =>
   Boolean(request) && sessionId.length > 0;
 
 export const handler = {
-  async POST(
-    ctx: { req: Request; params: { sessionId: string } },
-  ): Promise<Response> {
+  async POST(ctx: { req: Request; params: { sessionId: string } }): Promise<Response> {
     // Typed off the one route contract — the same object the island builds its URL from.
     const { sessionId } = chatTurnRoute.parsePath(ctx.params);
     const target = { sessionId } as const;
 
     // History so far, reduced through the SAME projection the island seeds from.
     const snapshot = await resolveChatSnapshot({ target });
-    const messages = snapshot.messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    }));
+    const messages = snapshot.messages.map((m) => ({ role: m.role, content: m.content }));
 
     const source = chat({
       adapter: anthropicText('claude-sonnet-4-5'),
@@ -121,12 +113,7 @@ export const handler = {
       systemPrompts: ['You are a helpful assistant.'],
     });
 
-    return toNetScriptChatResponse({
-      target,
-      request: ctx.req,
-      authorize,
-      source,
-    });
+    return toNetScriptChatResponse({ target, request: ctx.req, authorize, source });
   },
 };
 ```
@@ -139,10 +126,14 @@ The user message is appended to the durable session by the island in chapter 3 (
 `connection.send`), so this route reads it back through `resolveChatSnapshot` and only needs
 to stream the assistant reply. You could instead pass `newMessages: [userMessage]` to
 `toNetScriptChatResponse` to persist the prompt here — one place, either way, never both.
-That input accepts native TanStack UI/Model messages as `NetScriptChatSendMessage`,
-including original parts, attachments, metadata and tool calls. The legacy content-string
-input remains valid. Native batches survive durable storage and NetScript seed replay;
-`NetScriptChatMessage` is the reduced rendering projection, not the persistence input.
+That input accepts server-trusted TanStack UI/Model messages as `NetScriptChatSendMessage`,
+including original parts, attachments, metadata and tool calls. Validate any client
+input and give the model that same prompt; the plugin-AI scaffold instead builds a
+user turn from `message.text` and ignores client transcript fields. The legacy
+content-string input remains valid. Native batches survive storage and seed replay,
+but no public API returns their native parts: `NetScriptChatMessage` is the reduced
+rendering projection. Native batch tool cards appear on seed/reload but not live;
+the public native reader and native live replay remain follow-up scope for #2068.
 
 ## Step 3 — The one stream proxy
 
@@ -207,8 +198,8 @@ A provider error (bad or missing <code>ANTHROPIC_API_KEY</code>) surfaces <em>in
 
 The durable backend: a session route that runs a model turn and persists it behind a
 required `authorize` gate, and the one proxy the browser reads through. Notice the
-discipline underneath — complete native messages flow through the persistence input and
-`NetScriptChatMessage` describes the rendering projection, and the turn is written to the durable session _before_ anyone renders it, so an
+discipline underneath — native messages enter persistence while `NetScriptChatMessage`
+describes the reduced rendering projection, and the turn is written to the durable session *before* anyone renders it, so an
 accepted reply survives the request that produced it. That "durable delivery" spine is what
 every later chapter builds on. Next you give it a face — copy the fresh-ui chat components
 and hydrate an island.
