@@ -276,7 +276,7 @@ function resolveKvOAuthProviderEnv(
 }
 
 function localAuthOrigin(env: Readonly<Record<string, string | undefined>>): string {
-  return `http://localhost:${requiredEnv(env, 'PORT')}`;
+  return `http://localhost:${requiredEnv(env, 'PORT')}`; // aspire-host-port-ok: own origin from Aspire-allocated PORT
 }
 
 function resolveKvOAuthKey(env: Readonly<Record<string, string | undefined>>): ArrayBuffer {
