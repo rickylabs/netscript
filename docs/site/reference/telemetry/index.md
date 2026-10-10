@@ -170,26 +170,27 @@ with a required consumer `span`. Use `ctx.span.setAttribute('job.id', message.jo
 callback to annotate that active span. Plain `MessageQueue` handlers remain compatible, and the
 shared `TracedMessageContext` retains its optional span for other consumers.
 
-| Symbol                                                | Signature                                                                | Description                                        |
-| ----------------------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------- |
-| `startWorkerSpan`                                     | `function startWorkerSpan(config): Span`                                 | Start a worker span.                               |
-| `createWorkerStopSpan`                                | `function createWorkerStopSpan(workerId, activeJobs): Span`              | Span for worker shutdown.                          |
-| `recordWorkerMetrics`                                 | `function recordWorkerMetrics(span, metrics): void`                      | Record worker metrics on a span.                   |
-| `traceJobExecution`                                   | `async function traceJobExecution<T>(options, fn): Promise<T>`           | Trace a job execution.                             |
-| `createJobSpawnSpan`                                  | `function createJobSpawnSpan(job, executionId): Span`                    | Span for spawning a job subprocess.                |
-| `createJobSubprocessEnv`                              | `function createJobSubprocessEnv(additionalEnv): Record<string, string>` | Build the traced subprocess env.                   |
-| `getJobTraceContext`                                  | `function getJobTraceContext(): SerializedTraceContext \| null`          | Read serialized trace context in a job.            |
-| `initJobTracing`                                      | `function initJobTracing(): Context \| null`                             | Initialize tracing in a job subprocess.            |
-| `runTracedJob`                                        | `async function runTracedJob<T>(jobId, fn): Promise<T>`                  | Wrap a job main with tracing.                      |
-| `addJobStepEvent`                                     | `function addJobStepEvent(stepName, attributes?): void`                  | Add a step event to the active job span.           |
-| `recordJobProgress`                                   | `function recordJobProgress(current, total, unit): void`                 | Record job progress on the active span.            |
-| `startJobDispatchSpan`                                | `function startJobDispatchSpan(context, options)`                        | Start a job-dispatch span and propagation headers. |
-| `traceJobDispatch`                                    | `async function traceJobDispatch(context, fn, options): Promise<void>`   | Trace a job dispatch.                              |
-| `isTracedQueue`                                       | `function isTracedQueue<T>(queue): queue is TracedQueue<T>`              | Type guard for a traced queue.                     |
-| `startSchedulerTickSpan`                              | `function startSchedulerTickSpan(context): Span`                         | Span for a scheduler tick.                         |
-| `createSchedulerStartSpan`, `createSchedulerStopSpan` | functions returning `Span`                                               | Spans for scheduler start/stop.                    |
-| `createScheduleJobSpan`, `createUnscheduleJobSpan`    | functions returning `Span`                                               | Root spans for scheduling/unscheduling a job.      |
-| `recordCronJobRun`, `recordSchedulerReload`           | functions returning `void`                                               | Record scheduler run/reload outcomes.              |
+| Symbol                                                | Signature                                                                | Description                                                               |
+| ----------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `startWorkerSpan`                                     | `function startWorkerSpan(config): Span`                                 | Start a worker span.                                                      |
+| `createWorkerStopSpan`                                | `function createWorkerStopSpan(workerId, activeJobs): Span`              | Span for worker shutdown.                                                 |
+| `recordWorkerMetrics`                                 | `function recordWorkerMetrics(span, metrics): void`                      | Record worker metrics on a span.                                          |
+| `traceJobExecution`                                   | `async function traceJobExecution<T>(options, fn): Promise<T>`           | Trace a job execution.                                                    |
+| `createJobSpawnSpan`                                  | `function createJobSpawnSpan(job, executionId): Span`                    | Span for spawning a job subprocess.                                       |
+| `createJobSubprocessEnv`                              | `function createJobSubprocessEnv(additionalEnv): Record<string, string>` | Build the traced subprocess env.                                          |
+| `getJobTraceContext`                                  | `function getJobTraceContext(): SerializedTraceContext \| null`          | Read serialized trace context in a job.                                   |
+| `initJobTracing`                                      | `function initJobTracing(): Context \| null`                             | Initialize tracing in a job subprocess.                                   |
+| `runTracedJob`                                        | `async function runTracedJob<T>(jobId, fn): Promise<T>`                  | Wrap a job main with tracing.                                             |
+| `addJobStepEvent`                                     | `function addJobStepEvent(stepName, attributes?): void`                  | Add a step event to the active job span.                                  |
+| `recordJobProgress`                                   | `function recordJobProgress(current, total, unit): void`                 | Record job progress on the active span.                                   |
+| `startJobDispatchSpan`                                | `function startJobDispatchSpan(context, options)`                        | Start a job-dispatch span and propagation headers.                        |
+| `traceJobDispatch`                                    | `async function traceJobDispatch(context, fn, options): Promise<void>`   | Trace a job dispatch.                                                     |
+| `isTracedQueue`                                       | `function isTracedQueue<T>(queue): queue is TracedQueue<T>`              | Type guard for a traced queue.                                            |
+| `TracedQueueMessageContext`                           | interface                                                                | Consumer context with a guaranteed span, delivered by TracedQueue.listen. |
+| `startSchedulerTickSpan`                              | `function startSchedulerTickSpan(context): Span`                         | Span for a scheduler tick.                                                |
+| `createSchedulerStartSpan`, `createSchedulerStopSpan` | functions returning `Span`                                               | Spans for scheduler start/stop.                                           |
+| `createScheduleJobSpan`, `createUnscheduleJobSpan`    | functions returning `Span`                                               | Root spans for scheduling/unscheduling a job.                             |
+| `recordCronJobRun`, `recordSchedulerReload`           | functions returning `void`                                               | Record scheduler run/reload outcomes.                                     |
 
 ## Registry (`@netscript/telemetry/registry`)
 
