@@ -1,6 +1,6 @@
 ---
 name: netscript-build
-description: 'Scaffold and build NetScript applications with the `netscript` CLI. USE FOR: init a project, contract-first flow, database lifecycle (init/generate/migrate/seed/status), add and sync plugins, add services, add UI, generate registries. DO NOT USE FOR: monitoring, debugging, or performance analysis (use netscript-operate); Aspire orchestration (use the aspire skill).'
+description: 'Scaffold and build NetScript applications with the `netscript` CLI. USE FOR: init a project, contract-first flow, database lifecycle (init/generate/migrate/seed/status), add and sync plugins, add services, add UI, route renaming/moving and router.ts reconciliation, generate registries. DO NOT USE FOR: monitoring, debugging, or performance analysis (use netscript-operate); Aspire orchestration (use the aspire skill).'
 ---
 
 # NetScript Build
@@ -42,8 +42,8 @@ Run in order: `init → generate → migrate → seed`, then `status` to confirm
 ## Workflows
 
 Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the
-task. Follow its ordered section citations before choosing an API or architecture. Use
-`search_docs` for literal lookup and `get_doc` for exact retrieval.
+task. Follow its ordered section citations before choosing an API or architecture. Use `search_docs`
+for literal lookup and `get_doc` for exact retrieval.
 
 ## Installed diagnostic tools by symptom
 
@@ -82,6 +82,24 @@ wrong.** Run `netscript plugin doctor` before reading source or hand-probing end
 regenerate with `netscript generate plugins` only if the diagnostic identifies stale wiring.
 
 **Add a service.** `netscript service add` → `netscript service generate` to produce wiring.
+
+## Route lifecycle: rename, move, or remove a page
+
+For route renaming or moving, read `web-layer/route` ("Renaming or Moving a Route") and
+`web-layer/generated-surface` through MCP `get_doc` before editing. `ui:add page` writes an editable
+page and a string-literal registration in `router.ts`; it does not bind through the
+filesystem-generated `routes` tree. Moving a directory can leave a stale URL while type checking
+passes.
+
+Follow the checklist: move the page with its owned loader/island and sidecar, repair imports,
+reconcile the `appRoutes` pattern/key/id and page binding, update consumers, refresh the generated
+route modules through the app's Vite build or dev server, then type-check and verify navigation,
+new/old URLs, and loader/island behavior. For removal, prune the owned files, registration, and
+consumers manually, preserving shared modules still in use.
+
+There is currently no route rename verb, `netscript generate routes`, or `netscript ui:remove page`
+command. `netscript ui:remove <name>` handles copied Fresh UI registry items only. Do not guess a
+CLI route lifecycle verb or hand-edit `.generated/manifest.ts` and `.generated/routes.ts`.
 
 ## Safety rules
 

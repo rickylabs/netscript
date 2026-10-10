@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "71562ce62",
-  "extractionTimestamp": "2026-10-10T14:04:04.147Z",
+  "sourceCommit": "c6be6b8b6",
+  "extractionTimestamp": "2026-10-10T16:27:24.600Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -37,6 +37,7 @@
     "pages/data-persistence/how-to/use-a-second-database/index.md",
     "pages/data-persistence/index.md",
     "pages/data-persistence/kv-queues-cron/index.md",
+    "pages/durable-workflows/how-to/bound-stream-retention/index.md",
     "pages/durable-workflows/how-to/build-a-validated-ingestion-queue/index.md",
     "pages/durable-workflows/how-to/index.md",
     "pages/durable-workflows/how-to/publish-a-durable-stream/index.md",
@@ -76,6 +77,7 @@
     "pages/orchestration-runtime/how-to/detached-start-agents-ci/index.md",
     "pages/orchestration-runtime/how-to/graceful-shutdown/index.md",
     "pages/orchestration-runtime/how-to/index.md",
+    "pages/orchestration-runtime/how-to/outbound-webhooks/index.md",
     "pages/orchestration-runtime/how-to/roll-out-runtime-overrides/index.md",
     "pages/orchestration-runtime/index.md",
     "pages/orchestration-runtime/runtime-config/index.md",
@@ -169,6 +171,7 @@
     "pages/web-layer/examples/index.md",
     "pages/web-layer/form/index.md",
     "pages/web-layer/fresh-ui/index.md",
+    "pages/web-layer/generated-surface/index.md",
     "pages/web-layer/how-to/build-a-desktop-frontend/index.md",
     "pages/web-layer/how-to/build-a-server-validated-form/index.md",
     "pages/web-layer/how-to/customize-fresh-ui/index.md",
@@ -187,7 +190,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5146399,
-  "compressedBytes": 1488749,
-  "sha256": "48b9d2a061685d39f3831c81b8255bbd4cd24ea319fcee888e1363b00e8f9b48"
+  "uncompressedBytes": 5217579,
+  "compressedBytes": 1515173,
+  "sha256": "39da306f344e4a5981a5f2068f2ae1d8d57bb2d7e0a5f647a2fd550af34392db"
 }

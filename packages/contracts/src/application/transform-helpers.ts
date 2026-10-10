@@ -68,6 +68,11 @@ export type OmitTransformerFactory<T extends Record<string, unknown>> = <
  *
  * @example
  * ```typescript
+ * interface DbUser { id: number; firstName: string; lastName: string; email: string; createdAt: Date }
+ * declare const dbUser: DbUser;
+ * declare const dbUsers: DbUser[];
+ * declare const db: { user: { findUnique(args: { where: { id: number } }): Promise<DbUser | null> } };
+ *
  * // Define transform once
  * const userTransformer = createTransformer((dbUser: DbUser) => ({
  *   id: dbUser.id,
@@ -79,7 +84,7 @@ export type OmitTransformerFactory<T extends Record<string, unknown>> = <
  * // Use in handlers
  * const user = userTransformer.one(dbUser);
  * const users = userTransformer.many(dbUsers);
- * const maybeUser = userTransformer.optional(await db.user.findUnique(...));
+ * const maybeUser = userTransformer.optional(await db.user.findUnique({ where: { id: dbUser.id } }));
  * ```
  */
 export function createTransformer<TInput, TOutput>(

@@ -39,8 +39,11 @@ export type ServiceStreamProducerOptions<TDef extends StreamStateDefinition> =
  *   defineStreamSchema,
  * } from "@netscript/plugin-streams-core";
  *
+ * import { z } from 'zod';
+ *
+ * const completionSchema = z.object({ id: z.string(), status: z.string() });
  * const schema = defineStreamSchema({
- *   completion: { schema, type: "completion", primaryKey: "id" },
+ *   completion: { schema: completionSchema, type: "completion", primaryKey: "id" },
  * });
  *
  * const producer = createServiceStreamProducer({

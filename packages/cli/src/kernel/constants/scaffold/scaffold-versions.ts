@@ -13,5 +13,5 @@ export const SCAFFOLD_VERSIONS = {
   SCALAR_ASPIRE: '0.10.3',
   SWASHBUCKLE: '10.0.1',
   /** garnet-server dotnet tool pin for the Docker-less Garnet executable arm. */
-  GARNET_TOOL: '1.1.10',
+  GARNET_TOOL: '2.2.1',
 } as const;

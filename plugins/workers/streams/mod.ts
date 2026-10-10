@@ -21,3 +21,15 @@ export type {
   WorkerStreamEntitySchema,
   WorkerStreamStandardSchema,
 } from '@netscript/plugin-workers-core/streams';
+
+export type {
+  CollectionDefinition,
+  CollectionEventHelpers,
+  CollectionWithHelpers,
+  StateSchema,
+  StreamSchemaIssue,
+  StreamSchemaValidationOptions,
+  StreamSchemaValidationResult,
+  StreamStandardSchema,
+  StreamStateDefinition,
+} from '@netscript/plugin-streams-core';

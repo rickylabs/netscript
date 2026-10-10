@@ -10,11 +10,16 @@
 export * from '@netscript/plugin-workers-core/contracts/v1';
 export type {
   ExecutionRecord,
+  ExecutionStatus,
   JobContext,
   JobDefinition,
+  JobFailure,
   JobHandler,
   JobMessage,
+  JobPayloadSchema,
   JobResult,
+  JobSuccess,
+  PublicStandardSchema,
   RegisterJobInput,
   RegisterTaskInput,
   RuntimePermissions,
@@ -23,4 +28,5 @@ export type {
   TaskExecutionOptions,
   TaskMessage,
   TaskResult,
+  TriggerType,
 } from '@netscript/plugin-workers-core/runtime';

@@ -181,7 +181,16 @@ export function renderProviderConnectionHelpers(provider: DbEngineProvider): str
     throw new Error(`Unterminated connection-helper block for ${provider.engine}.`);
   }
 
-  return `${source.slice(contentStart, endIndex).trim()}\n`;
+  const helpers = source.slice(contentStart, endIndex).trim();
+  const inlineMarker = '/* @netscript-inline:postgres-connection-string */';
+  return `${
+    helpers.includes(inlineMarker)
+      ? helpers.replace(
+        inlineMarker,
+        readTemplateAssetSync(TEMPLATE_KEYS.databasePostgresConnectionString),
+      )
+      : helpers
+  }\n`;
 }
 
 function toPascalIdentifier(value: string): string {

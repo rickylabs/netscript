@@ -146,6 +146,7 @@ export async function handler(request: Request): Promise<Response> {
   const response = toNetScriptChatResponse({
     target: { sessionId },
     source: streamChat({ message: message.text, signal: request.signal }),
+    // Persist exactly the user prompt passed to the model; client transcript fields are ignored.
     newMessages: [{ id: crypto.randomUUID(), role: 'user', content: message.text }],
     request,
   });

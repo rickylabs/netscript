@@ -32,10 +32,15 @@ export function truncateResult(
   policy: TruncationPolicy = DEFAULT_TRUNCATION_POLICY,
 ): unknown {
   const outcome = truncateValue(value, policy);
-  const serialized = JSON.stringify(outcome.value);
+  assertResultByteLimit(outcome.value);
+  return outcome.value;
+}
+
+/** Enforce the hard UTF-8 transport ceiling without altering semantic content. */
+export function assertResultByteLimit(value: unknown): void {
+  const serialized = JSON.stringify(value);
   const byteLength = new TextEncoder().encode(serialized).byteLength;
   if (byteLength > MAX_SERIALIZED_RESULT_BYTES) throw new ResultByteLimitError(byteLength);
-  return outcome.value;
 }
 
 function truncateValue(value: unknown, policy: TruncationPolicy): TruncationOutcome {
