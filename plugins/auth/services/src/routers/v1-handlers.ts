@@ -219,7 +219,9 @@ export async function signout(
         backend,
         principal,
         input,
-        context.request ? toAuthnRequest(context.request, undefined, context.cookieName) : undefined,
+        context.request
+          ? toAuthnRequest(context.request, undefined, context.cookieName)
+          : undefined,
       );
       const { sessionId } = revocation;
       const signOutResponse = await endInteractiveSession(backend, context, revocation.revoked);
