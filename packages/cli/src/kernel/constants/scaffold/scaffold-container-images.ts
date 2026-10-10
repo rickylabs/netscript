@@ -6,4 +6,4 @@ export const SCAFFOLD_CACHE_CONTAINER_IMAGES: Readonly<
 > = {
   Redis: { image: 'docker.io/library/redis', tag: '7' },
   Garnet: { image: 'ghcr.io/microsoft/garnet', tag: SCAFFOLD_VERSIONS.GARNET_TOOL },
-}
+};
