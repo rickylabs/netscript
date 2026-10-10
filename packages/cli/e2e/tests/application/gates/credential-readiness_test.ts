@@ -235,7 +235,7 @@ Deno.test('scoped secret scan rejects each credential in helpers, all health evi
   }
 });
 
-Deno.test('bounded wait must time out with the documented exit code and no leak', () => {
+Deno.test('bounded wait retains the required exit-18 assertion and no leak', () => {
   assertBoundedWaitRejected(
     { code: ASPIRE_WAIT_TIMEOUT_EXIT_CODE, durationMs: 10_400, output: 'timed out' },
     SECRETS,
@@ -244,6 +244,11 @@ Deno.test('bounded wait must time out with the documented exit code and no leak'
     () => assertBoundedWaitRejected({ code: 0, durationMs: 50, output: '' }, SECRETS),
     Error,
     'exited 0, expected 18',
+  );
+  assertThrows(
+    () => assertBoundedWaitRejected({ code: 17, durationMs: 10_400, output: 'timed out' }, SECRETS),
+    Error,
+    'exited 17, expected 18',
   );
   assertThrows(
     () =>

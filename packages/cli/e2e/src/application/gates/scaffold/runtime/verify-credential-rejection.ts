@@ -28,7 +28,10 @@ export { assertNoSecretBytes } from './credential-secret-surfaces.ts';
 
 const POSTGRES_RESOURCE = 'postgres';
 const POSTGRES_LISTENER_HEALTH_KEY = 'postgres_listener';
-/** Aspire CLI exit code when `aspire wait` reaches its timeout before the target status. */
+/**
+ * Retained #1726 exit-18 assertion. Aspire 13.5.3 calls 18 WaitResourceFailed;
+ * WaitTimeout is 17. The legacy constant name predates verification of those CLI semantics.
+ */
 export const ASPIRE_WAIT_TIMEOUT_EXIT_CODE = 18;
 /** Bounded `aspire wait` budget; the probe can never become Healthy, so this is the whole wait. */
 const BOUNDED_WAIT_SECONDS = 10;
@@ -95,7 +98,7 @@ export function assertCredentialRejectionEvidence(
   return { rejected, listener, accepted };
 }
 
-/** Require `aspire wait` to time out with the documented exit code, bounded, without leaks. */
+/** Preserve the requested exit-18 assertion, bounded, without leaking diagnostics. */
 export function assertBoundedWaitRejected(
   result: BoundedWaitResult,
   secrets: readonly string[],
@@ -136,6 +139,8 @@ export async function verifyCredentialRejection(
     throw new Error(`aspire describe failed (${snapshot.code}): ${snapshot.output}`);
   }
   const evidence = assertCredentialRejectionEvidence(snapshot.stdout, secrets);
+  await assertGeneratedHelpersHaveNoSecrets(projectRoot, secrets);
+  await assertMcpResourcesHaveNoSecrets(projectRoot, appHost, secrets);
 
   const wait = await runAspire([
     'wait',
@@ -148,8 +153,6 @@ export async function verifyCredentialRejection(
     appHost,
   ]);
   assertBoundedWaitRejected(wait, secrets);
-  await assertGeneratedHelpersHaveNoSecrets(projectRoot, secrets);
-  await assertMcpResourcesHaveNoSecrets(projectRoot, appHost, secrets);
 
   const receiptDir = `${projectRoot}/.netscript/e2e`;
   const receiptPath = `${receiptDir}/credential-rejection-receipt.json`;
