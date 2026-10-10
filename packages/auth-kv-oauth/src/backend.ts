@@ -28,10 +28,10 @@ import type {
   AuthSessionLookup,
   AuthSessionStorePort,
 } from '@netscript/plugin-auth-core';
+import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
 import type { AuthnRequest, AuthnResult, Principal } from '@netscript/service/auth';
 import * as oauth from '@panva/oauth4webapi';
 import { buildCookieHeader } from './cookies.ts';
-import type { KvOAuthCookieOptions } from './cookies.ts';
 import type { CreateKvOAuthFlowOptions, KvOAuthFlow } from './flow.ts';
 import { clientAuth, createKvOAuthFlow, discoveryRequestOptions, requestOptions } from './flow.ts';
 import { KvOAuthError } from './errors.ts';
@@ -71,6 +71,7 @@ export type {
   OAuthProviderBaseConfig,
   OAuthProviderClientAuthConfig,
   OAuthProviderConfig,
+  OAuthSubjectSource,
   OAuthTokenCustomFetch,
 } from './flow.ts';
 export type { KvOAuthCookieOptions } from './cookies.ts';
@@ -110,8 +111,9 @@ export async function createKvOAuthBackend(
   const store = options.store ?? await createKvOAuthStore();
   const provider = options.provider;
   const cookie = options.cookie;
+  const cookieName = cookie?.name ?? DEFAULT_SESSION_COOKIE_NAME;
   const flow = createKvOAuthFlow({ ...options, store });
-  const sessions = createSessionStore(provider, store, cookie);
+  const sessions = createSessionStore(provider, store, cookieName);
   const principalMapper = createPrincipalMapper();
 
   return {
@@ -122,10 +124,14 @@ export async function createKvOAuthBackend(
     principalMapper,
     interactive: flow,
     async authenticate(request: AuthnRequest): Promise<AuthnResult> {
-      const sessionId = request.cookie(cookie?.name ?? '__Host-ns_session');
-      if (!sessionId) {
+      const credential = resolveSessionCredential(
+        { token: readBearerCredential(request), request },
+        cookieName,
+      );
+      if (!credential) {
         return { ok: false, reason: 'kv_oauth_session_missing' };
       }
+      const sessionId = credential.sessionId;
       const entry = await store.getSessionEntry(sessionId);
       const record = entry?.record;
       if (!record || record.session.state !== 'active') {
@@ -146,7 +152,10 @@ export async function createKvOAuthBackend(
         try {
           const refreshed = await refreshRecord(provider, store, entry!, options);
           session = refreshed.session;
-          setCookies = [buildCookieHeader(session.id, request, cookie)];
+          // Only a cookie-borne session is re-issued; a bearer caller never receives a cookie.
+          if (credential.transport === 'cookie') {
+            setCookies = [buildCookieHeader(session.id, request, cookie)];
+          }
         } catch (error) {
           if (error instanceof KvOAuthError && error.code === 'refresh_failed') {
             const current = await store.getSessionEntry(sessionId);
@@ -188,6 +197,33 @@ export async function createKvOAuthBackend(
  */
 const REVOKE_MAX_ATTEMPTS = 5;
 
+/** Session cookie read when no cookie name is configured. */
+const DEFAULT_SESSION_COOKIE_NAME = '__Host-ns_session';
+
+/** A session credential and the transport it arrived on. */
+type KvOAuthSessionCredential = Readonly<{
+  sessionId: string;
+  transport: 'lookup' | 'bearer' | 'cookie';
+}>;
+
+/**
+ * Resolve the session credential for both `sessions.getSession` and `authenticate`, so the auth
+ * service `session` and `me` operations agree: an explicit session id, then a bearer credential,
+ * then the session cookie. Selection is nullish: a provided but empty credential is selected and
+ * rejected, never skipped in favour of a weaker one.
+ */
+function resolveSessionCredential(
+  lookup: AuthSessionLookup,
+  cookieName: string,
+): KvOAuthSessionCredential | undefined {
+  const { sessionId, transport } = lookup.sessionId !== undefined
+    ? { sessionId: lookup.sessionId, transport: 'lookup' as const }
+    : lookup.token !== undefined
+    ? { sessionId: lookup.token, transport: 'bearer' as const }
+    : { sessionId: lookup.request?.cookie(cookieName), transport: 'cookie' as const };
+  return sessionId ? { sessionId, transport } : undefined;
+}
+
 function createProviderRegistry(provider: OAuthProviderConfig): AuthProviderRegistryPort {
   const descriptor = describeProvider(provider);
   return {
@@ -199,16 +235,15 @@ function createProviderRegistry(provider: OAuthProviderConfig): AuthProviderRegi
 function createSessionStore(
   provider: OAuthProviderConfig,
   store: KvOAuthStore,
-  cookie?: KvOAuthCookieOptions,
+  cookieName: string,
 ): AuthSessionStorePort {
   return {
     async getSession(lookup: AuthSessionLookup): Promise<AuthSession | undefined> {
-      const sessionId = lookup.sessionId ?? lookup.token ??
-        lookup.request?.cookie(cookie?.name ?? '__Host-ns_session');
-      if (!sessionId) {
+      const credential = resolveSessionCredential(lookup, cookieName);
+      if (!credential) {
         return undefined;
       }
-      return (await store.getSession(sessionId))?.session;
+      return (await store.getSession(credential.sessionId))?.session;
     },
     async createSession(input: AuthSessionCreateInput): Promise<AuthSession> {
       const now = new Date().toISOString();

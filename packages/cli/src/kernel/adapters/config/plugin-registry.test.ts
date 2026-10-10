@@ -148,7 +148,7 @@ Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importi
           pluginType: 'background-processor',
           infrastructureRequires: ['kv'],
           infrastructureOptionalDeps: ['db'],
-          concurrencyEnvVar: 'WORKER_CONCURRENCY',
+          concurrencyEnvVar: 'WORKERS_CONCURRENCY',
           defaultConcurrency: 2,
         },
         officialSource: {

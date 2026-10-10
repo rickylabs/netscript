@@ -60,11 +60,12 @@ function literal(value: string): string {
 export function reconcileAuthEnv(
   current: string,
   values: Readonly<Record<string, string>>,
+  removedKeys: readonly string[] = [],
 ): string {
   const pending = new Map(
     Object.entries(values).map(([key, value]) => [key, `${key}=${literal(value)}`]),
   );
-  const updatedKeys = new Set(pending.keys());
+  const updatedKeys = new Set([...pending.keys(), ...removedKeys]);
   const lines: string[] = [];
   for (const entry of assignments(current)) {
     if (!entry.key || !updatedKeys.has(entry.key)) {

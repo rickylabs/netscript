@@ -214,6 +214,20 @@ export type ServiceRequestRest<TContext extends object = ServiceClientContext> =
     : [options: { readonly context: TContext }];
 
 /**
+ * Argument tuple for a service-client method.
+ *
+ * Mirrors oRPC's `ClientRest`: when the procedure input accepts `undefined`
+ * the input argument may be omitted (`client.me()`), unless the client context
+ * has required keys, in which case the options argument must still be passed.
+ */
+export type ServiceClientArgs<TInput, TContext extends object = ServiceClientContext> =
+  undefined extends TInput
+    ? RequiredKeys<TContext> extends never
+      ? [input?: TInput, options?: ServiceRequestOptions<TContext>]
+    : [input: TInput, options: { readonly context: TContext }]
+    : [input: TInput, ...request: ServiceRequestRest<TContext>];
+
+/**
  * Typed service-client method derived from a contract procedure.
  */
 export type ServiceClientMethod<
@@ -222,8 +236,7 @@ export type ServiceClientMethod<
   TError = Error,
   TContext extends object = ServiceClientContext,
 > = (
-  input: TInput,
-  ...request: ServiceRequestRest<TContext>
+  ...args: ServiceClientArgs<TInput, TContext>
 ) => Promise<TOutput> & { __error?: { type: TError } };
 
 /**
@@ -258,6 +271,14 @@ export type ServiceClientShape<
                 readonly code: K;
                 readonly status: number;
                 readonly data: ContractSchemaOutput<TDataSchema>;
+                // Mirrors ORPCError#toJSON so oRPC's native safe()/isDefinedError narrow too.
+                toJSON(): {
+                  readonly defined: boolean;
+                  readonly code: K;
+                  readonly status: number;
+                  readonly message: string;
+                  readonly data: ContractSchemaOutput<TDataSchema>;
+                };
               }
             : never
             : never;
@@ -281,6 +302,32 @@ export type ServiceClient<
 > =
   & ServiceClientShape<TContract, TContext>
   & ServiceClientContract<TContract>;
+
+/**
+ * Resolve the base URL of a service for one protocol.
+ *
+ * The service client calls the resolver lazily, once per request, with the client's
+ * `serviceName` and `protocol`, and keeps only the returned URL's origin. Throw to report an
+ * unresolvable service; the call rejects with that error. The default resolver is
+ * `getServiceUrl` from `@netscript/sdk/discovery`, which reads Vite `import.meta.env` and then
+ * `Deno.env`. Supply your own on a runtime that has neither, such as React Native.
+ *
+ * @example Supply the origin from app configuration
+ * ```ts
+ * import type { ServiceUrlResolver } from '@netscript/sdk/client';
+ *
+ * const origins: Readonly<Record<string, string>> = { orders: 'https://api.example.com' };
+ * const resolveServiceUrl: ServiceUrlResolver = (serviceName) => {
+ *   const origin = origins[serviceName];
+ *   if (origin === undefined) throw new Error(`No origin configured for "${serviceName}"`);
+ *   return origin;
+ * };
+ * ```
+ */
+export type ServiceUrlResolver = (
+  serviceName: string,
+  protocol: 'http' | 'https',
+) => string | URL;
 
 /**
  * Options for creating a discovered service client.
@@ -321,6 +368,13 @@ export interface CreateServiceClientOptions<
   transportPolicy?: SdkClientTransportPolicy;
   /** Whether to propagate trace context headers automatically. */
   propagateTraceContext?: boolean;
+  /**
+   * Resolve the service URL for each call instead of using Aspire discovery.
+   *
+   * Defaults to `getServiceUrl` from `@netscript/sdk/discovery`. Compose
+   * `resolveServiceUrlFromSources` to read an explicit environment bag.
+   */
+  resolveServiceUrl?: ServiceUrlResolver;
   /** Explicit literal tuple of typed SDK client contributions. */
   contributions?:
     & TContributions

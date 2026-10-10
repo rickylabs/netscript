@@ -47,6 +47,7 @@ path	class	owner	disposition
 .llm/tools/CLEANUP-PLAYBOOK.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-README.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-tools.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/app-router-support_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-accuracy-and-discoverability_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-accuracy-and-discoverability.ts	negative-version-guard	S7/S13	negative docs enforcement: retain only direct forbidText second-argument version literals, enforce all other references
 .llm/tools/docs/check-docs-contract-derivation.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -363,6 +364,7 @@ packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts	e2e
 packages/cli/e2e/src/domain/cli-surface.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/evidence.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/extension-axes.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/domain/http-contract.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/readme-quickstart.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/presentation/cli/commands/full-command.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/presentation/cli/commands/run-command.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -752,6 +754,7 @@ packages/queue/ports/options.ts	package:other	S4	mention only (service discovery
 packages/queue/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/mod.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/sdk/src/client/http-client-link.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/client/mod.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/client/service-client.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/discovery/browser-env.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
@@ -761,6 +764,7 @@ packages/sdk/src/discovery/service-url.ts	package:other	S4	mention only (service
 packages/sdk/src/ports/service-client.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/presets/define-services.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/tests/discovery/env-ordering_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/sdk/tests/integration/service-url-resolver_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/service/src/diagnostics/database-connectivity.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/telemetry/query.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
 packages/telemetry/README.md	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
@@ -775,8 +779,10 @@ packages/telemetry/tests/layering_test.ts	telemetry-bridge	S3	dashboard /api/tel
 packages/telemetry/tests/query/aspire_query_test.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
 plugins/ai/README.md	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/README.md	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/auth/services/src/backend-registry.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/src/adapter/resources/barrel/barrel.stub.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/src/adapter/resources/resources.test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/auth/src/constants.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/sagas/deno.json	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/README.md	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
@@ -814,6 +820,7 @@ plugins/triggers/src/adapter/resources/resources.test.ts	plugin:other	S5	contrib
 plugins/triggers/src/aspire/mod.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/triggers/src/aspire/triggers-contribution.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/triggers/src/cli/http-triggers-service.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/triggers/src/constants.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/src/public/mod.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/src/runtime/trigger-processor.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/tests/aspire/aspire_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
@@ -831,10 +838,12 @@ plugins/workers/src/aspire/workers-contribution.ts	plugin-contribution	S5/S6	lit
 plugins/workers/src/cli/adapters/runtime-api-client.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/src/e2e/probes/probe-context.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/src/public/mod.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/src/runtime/concurrency.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/streams/factory.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/test-api.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/aspire/workers-contribution_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/public/manifest_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/tests/runtime/concurrency_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/verify-plugin.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 README.md	doc:root	S11	prose sweep (AGENTS.md only if skill path changes)

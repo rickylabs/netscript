@@ -57,7 +57,7 @@ Deno.test('WorkersAspireContribution publishes one dependency-aware workers runt
       '--allow-sys',
       '--allow-ffi',
     ],
-    concurrencyEnvVar: 'WORKER_CONCURRENCY',
+    concurrencyEnvVar: 'WORKERS_CONCURRENCY',
     watchMode: true,
   });
   assertEquals(builder.references, [{
@@ -68,7 +68,7 @@ Deno.test('WorkersAspireContribution publishes one dependency-aware workers runt
 
   assertEquals(contribution.declareEnv(ctx), {
     WORKERS_API_URL: { kind: 'resource', resource: 'workers-api', key: 'url' },
-    WORKER_CONCURRENCY: '2',
+    WORKERS_CONCURRENCY: '2',
   });
   assertEquals(contribution.declareHealthChecks(ctx), [{
     resource: 'workers-api',
