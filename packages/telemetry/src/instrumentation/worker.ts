@@ -283,8 +283,13 @@ export function createWorkerStopSpan(workerId: string, activeJobs = 0): Span {
  *
  * @example
  * ```ts
+ * import type { TracedJobDefinition, TracedJobResult } from '@netscript/telemetry/instrumentation';
+ *
+ * declare const jobDef: TracedJobDefinition;
+ * declare function executeJob(): Promise<TracedJobResult>;
+ *
  * const result = await traceJobExecution(
- *   { job: jobDef, execution: { executionId, jobId } },
+ *   { job: jobDef, execution: { executionId: crypto.randomUUID(), jobId: jobDef.id } },
  *   async (span) => {
  *     span.setAttribute('custom', 'value');
  *     return await executeJob();
@@ -425,6 +430,9 @@ export function createJobSpawnSpan(
  *
  * @example
  * ```ts
+ * declare const job: { id: string; entrypoint: string };
+ * declare const payload: unknown;
+ *
  * const env = createJobSubprocessEnv({
  *   JOB_ID: job.id,
  *   JOB_PAYLOAD: JSON.stringify(payload),
@@ -569,6 +577,11 @@ export async function runTracedJob<T>(
  *
  * @example
  * ```ts
+ * import { runTracedJob } from '@netscript/telemetry/instrumentation';
+ *
+ * declare function validateData(): Promise<string[]>;
+ * declare function transformData(rows: string[]): Promise<string[]>;
+ *
  * await runTracedJob('my-job', async (jobSpan) => {
  *   // Create child spans for each task
  *   const result1 = await withChildSpan('task.validate', async (span) => {

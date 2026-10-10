@@ -136,7 +136,10 @@ export interface BetterAuthAuthenticatorOptions {
  *
  * @example
  * ```ts
+ * import { type BetterAuthPrismaClient, createNetscriptBetterAuth } from '@netscript/auth-better-auth';
  * import { organization } from 'better-auth/plugins';
+ *
+ * declare const prisma: BetterAuthPrismaClient;
  *
  * const auth = createNetscriptBetterAuth({
  *   prisma,
@@ -190,6 +193,10 @@ export function configureNetscriptBetterAuthOptions(
  *
  * @example
  * ```ts
+ * import { type BetterAuthInstance, createBetterAuthAuthenticator } from '@netscript/auth-better-auth';
+ *
+ * declare const auth: BetterAuthInstance;
+ *
  * const authenticator = createBetterAuthAuthenticator({ auth });
  * ```
  */

@@ -91,9 +91,15 @@ export type JsdocFailureClass =
 /** Per-class failure totals captured before corpus repairs. */
 export type JsdocFailureCensus = Record<JsdocFailureClass, number>;
 
-/** Body diagnostic deferred by the narrowed gate but retained for a non-growing follow-up list. */
+/**
+ * Body diagnostic deferred by the narrowed gate but retained for a non-growing follow-up list.
+ *
+ * Only published-API type errors are deferred. An unbound name is an enforced failure: every name an
+ * example uses is imported or declared as a visible stand-in (doctrine 02, "Application context in
+ * examples").
+ */
 export interface JsdocDeferredExample {
-  failureClass: 'unboundName' | 'typeError';
+  failureClass: 'typeError';
   owner: JsdocExampleOwner;
   exampleOrdinal: number;
   fenceOrdinal: number;

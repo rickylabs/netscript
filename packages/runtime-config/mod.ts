@@ -13,6 +13,8 @@
  *   summarizeRuntimeConfig,
  * } from '@netscript/runtime-config';
  *
+ * declare function publishRuntimeStatus(status: { enabled: boolean; messages: string[] }): Promise<void>;
+ *
  * const config = await loadRuntimeConfig();
  * const enabled = isFeatureEnabled(config, 'worker-rollout', false);
  * const summary = summarizeRuntimeConfig(config);

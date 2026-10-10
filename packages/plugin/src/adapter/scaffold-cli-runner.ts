@@ -24,6 +24,10 @@ interface ScaffoldCliContextPayload {
  *
  * @example
  * ```ts
+ * import type { PluginScaffoldEntrypoint } from '@netscript/plugin/adapter';
+ *
+ * declare const scaffold: PluginScaffoldEntrypoint;
+ *
  * if (import.meta.main) {
  *   await runPluginScaffoldCli(scaffold);
  * }
