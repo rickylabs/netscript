@@ -100,6 +100,8 @@ Deno.test('a configured provider without a stable subject refuses sign-in', asyn
 });
 
 const KV_KEY = 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=';
+// Only builds the local-default redirect URI; nothing listens on it.
+const SYNTHETIC_PORT = '43210';
 
 Deno.test('a partially configured provider honours explicit subject settings', async () => {
   // Redirect URI is left to its local default, so the registry's local-defaults transport applies;
@@ -114,7 +116,7 @@ Deno.test('a partially configured provider honours explicit subject settings', a
     NETSCRIPT_AUTH_SUBJECT_SOURCE: 'userinfo',
     NETSCRIPT_AUTH_SUBJECT_CLAIM: 'id',
     NETSCRIPT_AUTH_KV_OAUTH_KEY: KV_KEY,
-    PORT: '8094',
+    PORT: SYNTHETIC_PORT,
   };
   const stable = await createAuthServiceBackendRegistry({
     kv: new MemoryKvAdapter(),
@@ -142,7 +144,7 @@ Deno.test('the local-defaults stub never issues a session-id subject', async () 
   const env = {
     NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
     NETSCRIPT_AUTH_KV_OAUTH_KEY: KV_KEY,
-    PORT: '8094',
+    PORT: SYNTHETIC_PORT,
   };
   // Even if the stub's placeholder token endpoint answered, the subject is still required.
   const registry = await createAuthServiceBackendRegistry({
