@@ -14,7 +14,7 @@ export const webhookDeliveryStub: StubSource<'JOB_ID' | 'JOB_EXPORT' | 'JOB_FILE
 } from '@netscript/plugin-workers-core';
 import type { DeadLetterStorePort } from '@netscript/queue';
 import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
-import { delay } from 'jsr:@std/async@^1';
+import { delay } from '@std/async';
 import { z } from 'zod';
 
 /** Raw body is persisted once by the producer and reused byte-for-byte. */
@@ -110,7 +110,10 @@ export function createDeliveryHandler(config: DeliveryConfig): JobHandlerDefinit
       const remaining = ctx.deadlineAt === undefined
         ? config.attemptTimeoutMs
         : ctx.deadlineAt - now();
-      if (remaining <= 0) throw new DOMException('Webhook job deadline reached', 'TimeoutError');
+      if (remaining <= 0) {
+        outcome = 'job_deadline_exceeded';
+        break;
+      }
       attempts += 1;
       const controller = new AbortController();
       const timer = setTimeout(
@@ -141,9 +144,12 @@ export function createDeliveryHandler(config: DeliveryConfig): JobHandlerDefinit
         signal.throwIfAborted();
         outcome = 'http_' + response.status;
         delivered = response.ok;
-      } catch (error) {
+      } catch {
         ctx.signal.throwIfAborted();
-        if (ctx.deadlineAt !== undefined && now() >= ctx.deadlineAt) throw error;
+        if (ctx.deadlineAt !== undefined && now() >= ctx.deadlineAt) {
+          outcome = 'job_deadline_exceeded';
+          break;
+        }
         outcome = controller.signal.aborted ? 'attempt_timeout' : 'network_error';
       } finally {
         clearTimeout(timer);
@@ -163,7 +169,8 @@ export function createDeliveryHandler(config: DeliveryConfig): JobHandlerDefinit
         }
         const ms = backoffMs(attempts, config.baseDelayMs, config.maxDelayMs, sample);
         if (ctx.deadlineAt !== undefined && now() + ms >= ctx.deadlineAt) {
-          throw new DOMException('Webhook retry exceeds job deadline', 'TimeoutError');
+          outcome = 'job_deadline_exceeded';
+          break;
         }
         await wait(ms, ctx.signal);
       }

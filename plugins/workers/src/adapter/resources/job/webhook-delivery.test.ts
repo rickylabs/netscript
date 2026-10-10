@@ -6,13 +6,14 @@ import {
   assertThrows,
 } from '@std/assert';
 import { fromFileUrl } from '@std/path';
-import { artifactText } from '@netscript/plugin/adapter';
+import { artifactText, defineStub } from '@netscript/plugin/adapter';
 import { LocalProjectFiles } from '@netscript/plugin/cli';
 import type { JobHandlerDefinition } from '@netscript/plugin-workers-core';
 import type { DeadLetterStorePort } from '@netscript/queue';
 import { MemoryDeadLetterStore } from '@netscript/queue/testing';
 import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
 import { jobScaffolder } from './job.ts';
+import { webhookDeliveryStub } from './webhook-delivery.stub.ts';
 import { parseJobInput } from '../input.ts';
 import { LocalWorkersRuntimeBackend } from '../../../cli/local-runtime-backend.ts';
 import { AddJobCommand } from '../../../cli/commands.ts';
@@ -63,11 +64,21 @@ Deno.test('webhook delivery scaffold golden rejects hardcoded endpoint and unkno
   });
   const source = artifactText(jobScaffolder.emit(input)[0]);
   assertConfiguredEndpoint(source);
-  assertThrows(() =>
-    assertConfiguredEndpoint(
-      source.replace("requiredConfig('WEBHOOK_ENDPOINT_URL')", "'https://hardcoded.invalid'"),
-    )
-  );
+  const fixture = defineStub({
+    ...webhookDeliveryStub,
+    source: webhookDeliveryStub.source.replace(
+      "requiredConfig('WEBHOOK_ENDPOINT_URL')",
+      "'https://hardcoded.invalid'",
+    ),
+  });
+  const original = Object.getOwnPropertyDescriptor(webhookDeliveryStub, 'source')!;
+  try {
+    // Exercise the real emitter with a faulty stub, then restore the shared fixture synchronously.
+    Object.defineProperty(webhookDeliveryStub, 'source', { ...original, value: fixture.source });
+    assertThrows(() => assertConfiguredEndpoint(artifactText(jobScaffolder.emit(input)[0])));
+  } finally {
+    Object.defineProperty(webhookDeliveryStub, 'source', original);
+  }
   assertThrows(() =>
     parseJobInput({ command: 'add-job', values: ['delivery'], flags: { template: 'unknown' } })
   );
@@ -99,7 +110,8 @@ Deno.test('generated webhook delivery compiles and executes signature, retry and
     // Consumer import map uses the same catalog version; first-party imports remain public entrypoints.
     await Deno.writeTextFile(
       path,
-      source.replace("from 'zod'", "from 'npm:zod@" + rootConfig.catalog.zod + "'"),
+      source.replace("from 'zod'", "from 'npm:zod@" + rootConfig.catalog.zod + "'")
+        .replace("from '@std/async'", "from 'jsr:@std/async@^1'"),
     );
     assertConfiguredEndpoint(source);
     const format = await new Deno.Command(Deno.execPath(), {
@@ -360,23 +372,63 @@ Deno.test('generated webhook delivery compiles and executes signature, retry and
       );
       assertEquals(await store.depth(), 0);
     });
-    await t.step('deadline prevents a retry whose delay consumes remaining budget', async () => {
+    await t.step('deadline prevents a retry and durably dead-letters the delivery', async () => {
       const store = new MemoryDeadLetterStore<Delivery>();
       let calls = 0;
-      await assertRejects(
-        async () =>
-          await module.createDeliveryHandler(config(store, {
-            send: () => {
-              calls++;
-              return Promise.resolve(new Response(null, { status: 500 }));
-            },
-          }))({ ...context(), deadlineAt: Date.parse(payload.enqueuedAt) + 25 }),
-        DOMException,
-        'deadline',
-      );
+      const result = await module.createDeliveryHandler(config(store, {
+        send: () => {
+          calls++;
+          return Promise.resolve(new Response(null, { status: 500 }));
+        },
+      }))({ ...context(), deadlineAt: Date.parse(payload.enqueuedAt) + 25 });
+      assertEquals(result.success, true);
       assertEquals(calls, 1);
-      assertEquals(await store.depth(), 0);
+      assertEquals(await store.depth(), 1);
+      const [record] = await store.list();
+      assertEquals(record.errorCode, 'job_deadline_exceeded');
+      assertEquals(record.deliveryCount, 1);
+      assertEquals(record.messageId, payload.deliveryId);
+      assertEquals(record.payload, payload);
     });
+    await t.step('deadline exhaustion before sending or during fetch writes DLQ', async () => {
+      for (const duringFetch of [false, true]) {
+        const store = new MemoryDeadLetterStore<Delivery>();
+        let clock = Date.parse(payload.enqueuedAt);
+        const deadlineAt = clock + (duringFetch ? 25 : 0);
+        let calls = 0;
+        await module.createDeliveryHandler(config(store, {
+          now: () => clock,
+          send: () => {
+            calls++;
+            clock = deadlineAt;
+            return Promise.reject(new DOMException('deadline', 'TimeoutError'));
+          },
+        }))({ ...context(), deadlineAt });
+        assertEquals(calls, duringFetch ? 1 : 0);
+        assertEquals(await store.depth(), 1);
+        const [record] = await store.list();
+        assertEquals(record.errorCode, 'job_deadline_exceeded');
+        assertEquals(record.deliveryCount, calls);
+      }
+    });
+    await t.step(
+      'runtime timeout abort remains cancellation even at an exhausted deadline',
+      async () => {
+        const controller = new AbortController();
+        controller.abort(new DOMException('runtime timeout', 'TimeoutError'));
+        const store = new MemoryDeadLetterStore<Delivery>();
+        await assertRejects(
+          async () =>
+            await module.createDeliveryHandler(config(store))({
+              ...context(controller.signal),
+              deadlineAt: Date.parse(payload.enqueuedAt),
+            }),
+          DOMException,
+          'runtime timeout',
+        );
+        assertEquals(await store.depth(), 0);
+      },
+    );
     await t.step('attempt timeout aborts network and bounded exhaustion writes DLQ', async () => {
       const store = new MemoryDeadLetterStore<Delivery>();
       await module.createDeliveryHandler(

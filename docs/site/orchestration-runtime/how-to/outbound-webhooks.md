@@ -17,24 +17,24 @@ duplicates. The attempt budget bounds one handler execution, not all crash redel
 receipt is not an SLA: after exhaustion the delivery remains in the DLQ for an operator to inspect
 or reprocess.
 
-[Inbound `defineWebhook`](/tutorials/storefront/05-shipping-webhook/) is the **opposite direction**:
-it verifies events arriving at your service. This recipe sends events from your background worker.
+[Inbound `defineWebhook`]({{ 'tut:ingest-webhook' |> xref }}) is the **opposite direction**: it
+verifies events arriving at your service. This recipe sends events from your background worker.
 
 ## Generate the delivery job
 
-Install the workers plugin using [Add a plugin](/orchestration-runtime/how-to/add-a-plugin/), then
-run its plugin CLI from your workspace root:
+Install the workers plugin using [Add a plugin]({{ 'howto:add-a-plugin' |> xref }}), then run its
+plugin CLI from your workspace root:
 
 ```sh
-deno run -A jsr:@netscript/plugin-workers/cli add job deliver-webhook --template=webhook-delivery
+deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli add job deliver-webhook --template=webhook-delivery
 ```
 
 The command emits `workers/jobs/deliver-webhook.ts` and regenerates the static worker registry. It
 contains a schema-backed handler, a `defineJob` definition, and a configuration-injected
 `createDeliveryHandler` factory. Register the exported `deliveryJob` with **maxRetries 0** (the
 builder uses `.retry(0)`); keep that value in your workers configuration as well. The handler owns
-HTTP retries. The queue/runtime still owns crash recovery and cancellation, which can redeliver the
-same delivery. Do not multiply this budget with runtime job retries.
+HTTP retries. Crash recovery belongs to the queue/runtime; this recipe does not guarantee replay
+after cancellation. Do not multiply this budget with runtime job retries.
 
 Inject these values into the **worker service**, under a service identity:
 
@@ -187,20 +187,21 @@ count and HTTP outcome are reported through the existing job progress callback; 
 `delivered` or `dead_lettered` with the delivery ID and count.
 
 The loop propagates `ctx.signal` to fetch and waits. Each fetch timeout is capped by
-`ctx.deadlineAt`; it refuses a retry that cannot fit the remaining job budget.
-Shutdown/cancellation/deadline exhaustion propagates to the worker rather than treating interrupted
-work as a terminal HTTP failure. Queue recovery can subsequently replay that delivery under the same
-ID. Configure the overall job timeout for the intended budget (five attempts need up to 50 seconds
-of HTTP time plus capped jitter).
+`ctx.deadlineAt`; it refuses a retry that cannot fit the remaining job budget. When the handler
+observes an exhausted deadline or cannot fit the next retry delay, it awaits a DLQ append with
+`errorCode: 'job_deadline_exceeded'`. An aborted `ctx.signal`, including a runtime timeout abort,
+still propagates without dead-lettering; cancellation recovery depends on the runtime and is not
+proven by this recipe. Configure the overall job timeout for the intended budget (five attempts need
+up to 50 seconds of HTTP time plus capped jitter).
 
-After the configured maximum attempts, the handler **awaits** `deadLetters.append` with the existing
-`DeadLetterRecord`: `messageId` is the outbox ID, `deliveryCount` is the attempt count, the original
-payload is retained, and `reason` is `max_attempts_exceeded`. Only a successful append completes the
-job. A store failure propagates; it never acknowledges a silently dropped delivery. The delivery ID
-stays stable; the existing KV store keys terminal records by namespace, failure time and message ID,
-so separate exhausted executions can retain separate failure records. No signing secret or arbitrary
-receiver response text is stored in the record. Protect DLQ access because the original event
-payload can contain private data.
+After the configured maximum attempts or handler-observed deadline exhaustion, the handler
+**awaits** `deadLetters.append` with the existing `DeadLetterRecord`: `messageId` is the outbox ID,
+`deliveryCount` is the attempt count, the original payload is retained, and `reason` is
+`max_attempts_exceeded`. Only a successful append completes the job. A store failure propagates; it
+never acknowledges a silently dropped delivery. The delivery ID stays stable; the existing KV store
+keys terminal records by namespace, failure time and message ID, so separate exhausted executions
+can retain separate failure records. No signing secret or arbitrary receiver response text is stored
+in the record. Protect DLQ access because the original event payload can contain private data.
 
 Use the existing store's `list`, `depth` and `reprocess` methods to inspect and replay failures.
 Replays keep the original delivery ID and body; resolve the current service secret and generate a

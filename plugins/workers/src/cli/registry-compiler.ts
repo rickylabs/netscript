@@ -44,8 +44,10 @@ export async function compileWorkersRegistry(
       job.relativePath,
       'job',
     );
-    if (metadata.maxRetries === undefined) return;
-    retryPolicies.set(job.relativePath, { id: metadata.id, maxRetries: metadata.maxRetries });
+    // Ordinary job metadata has never overridden the registry's retry defaults.
+    // Only this recipe owns its retry loop; keep its zero-runtime-retry policy scoped.
+    if (metadata.template !== 'webhook-delivery') return;
+    retryPolicies.set(job.relativePath, { maxRetries: 0 });
   }));
   const source = renderRegistrySource(registryPath, jobs, retryPolicies);
   await files.writeTextFile(registryPath, source);
@@ -135,7 +137,13 @@ function renderRegistrySource(
         const policy = policies.get(job.relativePath);
         return `  [${id}]: createLocalJobDefinition(${id}, ${entrypoint}, jobHandlersById[${id}]${
           policy
-            ? `, ${JSON.stringify({ ...policy, entrypoint: toJobEntrypoint(job.relativePath) })}`
+            ? `, ${
+              JSON.stringify({
+                id: jobId(job.relativePath),
+                ...policy,
+                entrypoint: toJobEntrypoint(job.relativePath),
+              })
+            }`
             : ''
         }),`;
       }),

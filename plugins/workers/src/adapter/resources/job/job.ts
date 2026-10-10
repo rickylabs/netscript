@@ -34,10 +34,11 @@ export const jobScaffolder: ItemScaffolder<JobInput> = {
           schedule: input.schedule,
           timeout: input.timeoutMs,
           maxRetries: input.template === 'webhook-delivery' ? 0 : input.maxRetries,
+          template: input.template,
           tags: input.tags,
         }) + (input.template === 'webhook-delivery'
           ? substituteTokens(webhookDeliveryStub, {
-            JOB_ID: input.id,
+            JOB_ID: fileStem(input.id),
             JOB_EXPORT: `${exportStem(input.id)}Job`,
             JOB_FILE: fileStem(input.id),
           })
