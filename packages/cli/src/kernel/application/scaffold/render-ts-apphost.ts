@@ -6,6 +6,7 @@ import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
+import { generateAppHostPackageJson } from '../../templates/aspire/generate-apphost-package-json.ts';
 import { generateTsAspireConfig } from '../../templates/aspire/generate-aspire-config.ts';
 import {
   buildCacheBlock,
@@ -53,24 +54,10 @@ export async function scaffoldTsAppHost(
   // 2. package.json — Node/TypeScript dependencies required by Aspire TS AppHost runtime.
   //    Lives inside `aspire/` to keep the Node.js package graph isolated
   //    from the Deno workspace at the project root.
-  const packageJsonContent = JSON.stringify(
-    {
-      name: `${options.name}-apphost`,
-      version: '1.0.0',
-      private: true,
-      type: 'module',
-      dependencies: {
-        'vscode-jsonrpc': '8.2.0',
-      },
-      devDependencies: {
-        '@types/node': '^22.0.0',
-        tsx: '4.21.0',
-        typescript: '^5.9.3',
-      },
-    },
-    null,
-    2,
-  ) + '\n';
+  const packageJsonContent = generateAppHostPackageJson({
+    name: options.name,
+    dbEngines: [options.dbEngine],
+  });
   const packageJsonPath = join(aspireDir, 'package.json');
   if (await context.scaffolder.writeFile(packageJsonPath, packageJsonContent, options.force)) {
     filesCreated.push(packageJsonPath);

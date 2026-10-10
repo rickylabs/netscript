@@ -10,6 +10,7 @@ import { join } from '@std/path';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
+import { reconcileAppHostPackageJson } from '../../templates/aspire/generate-apphost-package-json.ts';
 import { generateTsAspireConfig } from '../../templates/aspire/generate-aspire-config.ts';
 import { HelpersGeneratorPipeline } from '../../templates/aspire/helpers/helpers-generator-pipeline.ts';
 import type { DbEngineChoice } from '../../domain/db-engine.ts';
@@ -176,10 +177,27 @@ export class DatabaseWorkspaceMutator {
     }
 
     const { config } = await parseAppSettings(join(projectRoot, SCAFFOLD_FILES.APPSETTINGS));
-    const aspireConfigContent = generateTsAspireConfig({
-      dbEngines: collectConfiguredDbEngines(config.Databases),
-    });
+    const dbEngines = collectConfiguredDbEngines(config.Databases);
+    const aspireConfigContent = generateTsAspireConfig({ dbEngines });
     await this.fs.writeFile(join(aspireDir, SCAFFOLD_FILES.ASPIRE_CONFIG), aspireConfigContent);
+    await this.reconcileAppHostDependencies(aspireDir, dbEngines);
+  }
+
+  /**
+   * Declare the AppHost npm packages the regenerated helpers load for these engines, so a
+   * newly added PostgreSQL database's credential readiness check can resolve `pg`.
+   */
+  private async reconcileAppHostDependencies(
+    aspireDir: string,
+    dbEngines: readonly DbEngineChoice[],
+  ): Promise<void> {
+    const packageJsonPath = join(aspireDir, SCAFFOLD_FILES.PACKAGE_JSON);
+    if (!(await this.fs.exists(packageJsonPath))) return;
+    const reconciled = reconcileAppHostPackageJson(
+      await this.fs.readFile(packageJsonPath),
+      dbEngines,
+    );
+    if (reconciled !== null) await this.fs.writeFile(packageJsonPath, reconciled);
   }
 
   /** Regenerate TypeScript AppHost helper files from root `appsettings.json`. */
