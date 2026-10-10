@@ -177,7 +177,7 @@ variables themselves. Ordinary workspace setup uses the source/export step above
   {
     label: "kv-oauth (default, interactive)",
     lang: "sh",
-    code: "# Selects the interactive OAuth/OIDC backend\nexport NETSCRIPT_AUTH_BACKEND=kv-oauth\n\n# Provider credentials (e.g. a Google OAuth app)\nexport NETSCRIPT_AUTH_CLIENT_ID=your-client-id\nexport NETSCRIPT_AUTH_CLIENT_SECRET=your-client-secret\nexport NETSCRIPT_AUTH_REDIRECT_URI=http://localhost:8094/api/v1/auth/callback\n\n# OIDC discovery / endpoints (preset providers fill these for you)\nexport NETSCRIPT_AUTH_ISSUER=https://accounts.google.com\nexport NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://accounts.google.com/o/oauth2/v2/auth\nexport NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token\nexport NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://openidconnect.googleapis.com/v1/userinfo\nexport NETSCRIPT_AUTH_SCOPES=openid email profile\n\n# Optional: cookie + KV tuning\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\nexport NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret>  # required for kv-oauth: missing key material is a startup error\n# export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=false\n\nexport PORT=8094"
+    code: "# Selects the interactive OAuth/OIDC backend\nexport NETSCRIPT_AUTH_BACKEND=kv-oauth\n\n# Provider credentials (e.g. a Google OAuth app)\nexport NETSCRIPT_AUTH_CLIENT_ID=your-client-id\nexport NETSCRIPT_AUTH_CLIENT_SECRET=your-client-secret\nexport NETSCRIPT_AUTH_REDIRECT_URI=http://localhost:8094/api/v1/auth/callback\n\n# OIDC discovery / endpoints (preset providers fill these for you)\nexport NETSCRIPT_AUTH_ISSUER=https://accounts.google.com\nexport NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://accounts.google.com/o/oauth2/v2/auth\nexport NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token\nexport NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://openidconnect.googleapis.com/v1/userinfo\nexport NETSCRIPT_AUTH_SCOPES=openid email profile\n\n# Stable subject: OIDC providers use the ID-token sub. A preset named by\n# NETSCRIPT_AUTH_PROVIDER_ID supplies its own default (github: userinfo id).\n# export NETSCRIPT_AUTH_SUBJECT_SOURCE=userinfo  # id_token | userinfo\n# export NETSCRIPT_AUTH_SUBJECT_CLAIM=id\n\n# Optional: cookie + KV tuning\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\nexport NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret>  # required for kv-oauth: missing key material is a startup error\n# export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=false\n\nexport PORT=8094"
   },
   {
     label: "workos (non-interactive)",
@@ -388,6 +388,13 @@ service tuple and pass its typed context per call.</li>
 <code>NETSCRIPT_AUTH_CLIENT_ID</code>/<code>SECRET</code>/<code>REDIRECT_URI</code> the
 <code>kv-oauth</code> backend boots into a stub fallback; <code>session</code>/<code>me</code> answer
 but no real sign-in is possible.</li>
+<li><strong>Non-OIDC providers need a stable subject</strong> — GitHub and other plain OAuth 2.0
+providers return no ID token. The subject then comes from the provider's userinfo response, namespaced
+by provider (<code>github:&lt;numeric id&gt;</code>). Keep <code>NETSCRIPT_AUTH_PROVIDER_ID</code> set
+to the preset name, or set <code>NETSCRIPT_AUTH_SUBJECT_SOURCE</code>/<code>NETSCRIPT_AUTH_SUBJECT_CLAIM</code>.
+A provider with no stable identifier refuses sign-in (<code>subject_missing</code>) instead of
+issuing a new subject per sign-in. See
+<a href="../../session-lifecycles/#stable-subjects-for-non-oidc-providers">stable subjects</a>.</li>
 <li><strong>Aspire down</strong> — a 404 on <code>:8094</code> or a DB error during
 <code>netscript db</code> almost always means orchestration is not running. <code>cd aspire &amp;&amp;
 aspire start</code> first.</li>
