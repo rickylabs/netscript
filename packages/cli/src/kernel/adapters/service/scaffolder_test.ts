@@ -222,11 +222,11 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       ),
       Deno.writeTextFile(
         join(compileRoot, 'stubs', 'contracts.ts'),
-        'export const baseContract = { route: (_route: unknown) => ({ output: <T>(schema: T): T => schema }) };\n',
+        'export const baseContract = { route: (_route: unknown) => ({ meta(_meta: unknown) { return this; }, output: <T>(schema: T): T => schema }) };\n',
       ),
       Deno.writeTextFile(
         join(compileRoot, 'stubs', 'crud.ts'),
-        'export function createCrudContract(_options: unknown): Record<string, unknown> { return {}; }\n',
+        'export function createCrudContract(_options: unknown) { const procedure = { meta(_meta: unknown) { return this; } }; return { list: procedure, getById: procedure, create: procedure, update: procedure, delete: procedure }; }\n',
       ),
     ]);
     await writeCrudZodBarrel({ zodOutputDir, modelName: 'Cycle' });
