@@ -88,7 +88,8 @@ export function generateDatabaseDenoJson(
   };
 
   if (provider.capabilities.hasPrismaFormat) {
-    tasks['db:format'] = `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 format --schema schema/schema.prisma`;
+    tasks['db:format'] =
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 format --schema schema/schema.prisma`;
   }
   if (provider.capabilities.hasZodGeneration) {
     tasks['db:zod'] = `${DENO_SCRIPT_RUN} scripts/generate-zod.ts`;
@@ -104,10 +105,12 @@ export function generateDatabaseDenoJson(
     }
     : {
       [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]: imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE],
-      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS]:
-        `${imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]}/scripts`,
-      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING]:
-        `${imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]}/tracing`,
+      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS]: `${
+        imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]
+      }/scripts`,
+      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING]: `${
+        imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]
+      }/tracing`,
     };
 
   const config = {
