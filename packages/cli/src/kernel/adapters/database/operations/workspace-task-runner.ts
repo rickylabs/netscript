@@ -103,7 +103,9 @@ export class DbWorkspaceTaskRunner implements DbOperationExecutor {
       `Cannot run '${task}': this project has no Aspire AppHost (aspire/${SCAFFOLD_FILES.APPHOST_MTS}) ` +
         `and ${workspaceDir}/${SCAFFOLD_FILES.DENO_JSON} does not define that task. ` +
         `Restore the generated database workspace tasks, then run ` +
-        `'deno task --cwd ${workspaceDir} ${task}' with ${databaseUrlEnvKey(database.configKey)} or DATABASE_URL set.`,
+        `'deno task --cwd ${workspaceDir} ${task}' with ${
+          databaseUrlEnvKey(database.configKey)
+        } or DATABASE_URL set.`,
       { workspaceDir, task },
     );
   }
@@ -113,9 +115,7 @@ function readTasks(denoJson: string): Record<string, unknown> | undefined {
   const parsed: unknown = JSON.parse(denoJson);
   if (typeof parsed !== 'object' || parsed === null) return undefined;
   const tasks = Reflect.get(parsed, 'tasks');
-  return typeof tasks === 'object' && tasks !== null
-    ? tasks as Record<string, unknown>
-    : undefined;
+  return typeof tasks === 'object' && tasks !== null ? tasks as Record<string, unknown> : undefined;
 }
 
 async function spawnDenoTask(

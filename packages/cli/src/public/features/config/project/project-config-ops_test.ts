@@ -199,7 +199,10 @@ Deno.test('project config readers fail closed when appsettings.json is missing',
     await Deno.remove(join(root, 'appsettings.json'));
 
     await assertRejects(() => readAppsettingsDocument(fs, root), ConfigNotFoundError);
-    await assertRejects(() => readAppsettingsValue(fs, root, 'NetScript.Name'), ConfigNotFoundError);
+    await assertRejects(
+      () => readAppsettingsValue(fs, root, 'NetScript.Name'),
+      ConfigNotFoundError,
+    );
     await assertRejects(
       () => setProjectConfigValue(fs, root, 'NetScript.Name', 'renamed'),
       ConfigNotFoundError,

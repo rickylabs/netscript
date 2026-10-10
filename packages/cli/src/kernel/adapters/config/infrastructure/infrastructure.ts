@@ -3,7 +3,10 @@
  */
 
 import { CACHE_PROVIDERS, CACHE_URI_PREFIXES } from '../../../constants/providers.ts';
-import type { DatabaseConfig, InfrastructureConfig } from '../../../domain/infrastructure-config.ts';
+import type {
+  DatabaseConfig,
+  InfrastructureConfig,
+} from '../../../domain/infrastructure-config.ts';
 import { inferCacheProvider, inferDbProvider } from './infrastructure-connection-strings.ts';
 import { resolveCache, resolveDatabase } from './infrastructure-resolvers.ts';
 

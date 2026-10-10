@@ -53,18 +53,24 @@ function withEnv(values: Record<string, string | undefined>, run: () => Promise<
 
 Deno.test(
   'generated Postgres prisma.config.ts resolves POSTGRES_URI without DATABASE_URL',
-  withEnv({ POSTGRES_URI: 'postgres://app:secret@db.internal:5432/app', DATABASE_URL: undefined }, async () => {
-    const config = await evaluatePostgresConfig();
-    assertEquals(config.datasource.url, 'postgres://app:secret@db.internal:5432/app');
-  }),
+  withEnv(
+    { POSTGRES_URI: 'postgres://app:secret@db.internal:5432/app', DATABASE_URL: undefined },
+    async () => {
+      const config = await evaluatePostgresConfig();
+      assertEquals(config.datasource.url, 'postgres://app:secret@db.internal:5432/app');
+    },
+  ),
 );
 
 Deno.test(
   'generated Postgres prisma.config.ts falls back to DATABASE_URL',
-  withEnv({ POSTGRES_URI: undefined, DATABASE_URL: 'postgres://app@fallback:5432/app' }, async () => {
-    const config = await evaluatePostgresConfig();
-    assertEquals(config.datasource.url, 'postgres://app@fallback:5432/app');
-  }),
+  withEnv(
+    { POSTGRES_URI: undefined, DATABASE_URL: 'postgres://app@fallback:5432/app' },
+    async () => {
+      const config = await evaluatePostgresConfig();
+      assertEquals(config.datasource.url, 'postgres://app@fallback:5432/app');
+    },
+  ),
 );
 
 Deno.test(

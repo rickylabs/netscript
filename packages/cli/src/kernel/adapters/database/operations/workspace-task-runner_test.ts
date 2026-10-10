@@ -4,8 +4,8 @@ import { MemoryFileSystemAdapter } from '../../scaffold/memory-fs.ts';
 import { ScaffoldValidationError } from '../../../domain/errors.ts';
 import type { DbOperationRequest, DiscoveredDatabase } from '../../../domain/db-engine.ts';
 import {
-  type DenoTaskSpawner,
   DbWorkspaceTaskRunner,
+  type DenoTaskSpawner,
   resolveDbTaskOperation,
 } from './workspace-task-runner.ts';
 
@@ -143,10 +143,12 @@ Deno.test('DbWorkspaceTaskRunner opens studio for the first target only', async 
 });
 
 Deno.test('DbWorkspaceTaskRunner refuses with the remedy when the workspace task is missing', async () => {
-  for (const fs of [
-    new MemoryFileSystemAdapter(),
-    await workspaceWithTasks(['database/postgres', ['db:generate:postgres']]),
-  ]) {
+  for (
+    const fs of [
+      new MemoryFileSystemAdapter(),
+      await workspaceWithTasks(['database/postgres', ['db:generate:postgres']]),
+    ]
+  ) {
     const spawner = recordingSpawner();
     const error = await assertRejects(
       () => new DbWorkspaceTaskRunner(fs, spawner.spawn).execute(request()),

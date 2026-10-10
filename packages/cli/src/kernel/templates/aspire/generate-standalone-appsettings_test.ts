@@ -5,17 +5,17 @@
  * service, database and config commands read, without AppHost wiring.
  */
 
-import { assertEquals } from 'jsr:@std/assert@^1'
-import { parseAppSettings } from '@netscript/aspire/config'
-import { generateStandaloneAppsettings } from './generate-appsettings.ts'
+import { assertEquals } from 'jsr:@std/assert@^1';
+import { parseAppSettings } from '@netscript/aspire/config';
+import { generateStandaloneAppsettings } from './generate-standalone-appsettings.ts';
 
 async function parseStrict(content: string) {
-  const path = await Deno.makeTempFile({ suffix: '.json' })
+  const path = await Deno.makeTempFile({ suffix: '.json' });
   try {
-    await Deno.writeTextFile(path, content)
-    return await parseAppSettings(path, { strict: true })
+    await Deno.writeTextFile(path, content);
+    return await parseAppSettings(path, { strict: true });
   } finally {
-    await Deno.remove(path)
+    await Deno.remove(path);
   }
 }
 
@@ -28,11 +28,11 @@ Deno.test('standalone appsettings parses strictly for every engine and cache bac
         cache: true,
         cacheBackend,
         service: { name: 'probe-svc', port: 3001 },
-      }))
-      assertEquals(warnings, [], `${dbEngine} + ${cacheBackend}`)
+      }));
+      assertEquals(warnings, [], `${dbEngine} + ${cacheBackend}`);
     }
   }
-})
+});
 
 Deno.test('standalone appsettings registers developer-provisioned infrastructure only', () => {
   const document = JSON.parse(generateStandaloneAppsettings({
@@ -41,7 +41,7 @@ Deno.test('standalone appsettings registers developer-provisioned infrastructure
     cache: true,
     cacheBackend: 'redis',
     service: { name: 'probe-svc', port: 61432 },
-  }))
+  }));
 
   assertEquals(document, {
     NetScript: {
@@ -59,8 +59,8 @@ Deno.test('standalone appsettings registers developer-provisioned infrastructure
       Plugins: {},
       BackgroundProcessors: {},
     },
-  })
-})
+  });
+});
 
 Deno.test('standalone appsettings keeps SQLite file-backed and Deno KV in-process', () => {
   const document = JSON.parse(generateStandaloneAppsettings({
@@ -68,13 +68,13 @@ Deno.test('standalone appsettings keeps SQLite file-backed and Deno KV in-proces
     dbEngine: 'sqlite',
     cache: true,
     cacheBackend: 'deno-kv',
-  }))
+  }));
 
   assertEquals(document.NetScript.Databases, {
     sqlite: { Engine: 'Sqlite', DatabaseName: 'probeapp.db' },
-  })
+  });
   assertEquals(document.NetScript.Cache, {
     'deno-kv': { Engine: 'DenoKv', Mode: 'Local', DataPath: 'data/kv' },
-  })
-  assertEquals(document.NetScript.Services, {})
-})
+  });
+  assertEquals(document.NetScript.Services, {});
+});

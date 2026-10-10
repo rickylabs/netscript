@@ -120,7 +120,11 @@ Deno.test({
         ]
       ) {
         const unreadable = await cli(project, args);
-        assertEquals(unreadable.code, CONFIG_NOT_FOUND_EXIT, `${args.join(' ')}\n${unreadable.output}`);
+        assertEquals(
+          unreadable.code,
+          CONFIG_NOT_FOUND_EXIT,
+          `${args.join(' ')}\n${unreadable.output}`,
+        );
         assertStringIncludes(unreadable.output, 'NetScript config not found');
         assertEquals(unreadable.output.includes('No services configured.'), false);
       }

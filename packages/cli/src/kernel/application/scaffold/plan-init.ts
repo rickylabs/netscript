@@ -14,10 +14,8 @@ import { generateQualityRunner } from '../../templates/workspace/quality-runner.
 import { generatePackageJson } from '../../templates/workspace/package-json.ts';
 import { generateEditorConfigFiles } from '../../adapters/scaffold/editor-config.ts';
 import { loadRootScaffoldTemplateAssets } from '../../adapters/templates/scaffold-template-assets.ts';
-import {
-  generateAppsettings,
-  generateStandaloneAppsettings,
-} from '../../templates/aspire/generate-appsettings.ts';
+import { generateAppsettings } from '../../templates/aspire/generate-appsettings.ts';
+import { generateStandaloneAppsettings } from '../../templates/aspire/generate-standalone-appsettings.ts';
 import type { InitPipelineContext } from './context.ts';
 import { createScaffoldPlan } from '../../domain/scaffold/scaffold-plan.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
