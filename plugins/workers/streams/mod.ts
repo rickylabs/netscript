@@ -33,3 +33,5 @@ export type {
   StreamStandardSchema,
   StreamStateDefinition,
 } from '@netscript/plugin-streams-core';
+
+export type { StreamCollection, StreamDBFactory } from '@netscript/plugin-streams-core';
