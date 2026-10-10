@@ -7,7 +7,7 @@ export const runtimeGlueStub: StubSource<never> = defineStub({
     '/** Sagas background child health and runtime glue. @module */',
     "import '@netscript/kv/redis';",
     "import { runChildHealthProcess } from '@netscript/plugin/health';",
-    "import { startSagaRunner, type SagaRuntimeSupervisor } from '@netscript/plugin-sagas/runtime';",
+    "import { type SagaRuntimeSupervisor, startSagaRunner } from '@netscript/plugin-sagas/runtime';",
     '',
     'if (import.meta.main) {',
     '  let supervisor: SagaRuntimeSupervisor | undefined;',
