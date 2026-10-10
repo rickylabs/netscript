@@ -223,17 +223,22 @@ booleans, null, arrays, and plain objects with at most 64 levels of nesting; cyc
 unsupported values produce `InvalidStdinPayload`. A subprocess that closes stdin before accepting
 the payload produces `StdinWriteFailed`.
 
-Captured stdout and stderr each default to **1 MiB**. Set positive integer `stdoutLimitBytes` /
-`stderrLimitBytes` execution options, or configure those defaults on
-`new ExecutableRuntimeAdapter({ stdoutLimitBytes, stderrLimitBytes })`. Exceeding a cap kills the
-subprocess and returns `status: 'failed'`, `success: false`, and `StdoutLimitExceeded` or
-`StderrLimitExceeded`; caps also apply with `streamLogs: false`. Runtime validation and write errors
-return failed task results; builder validation throws before building the task. Running aborts
-return `cancelled`, and timeouts return `timeout`, both with exit code `-1`.
+By default, stdout and stderr each retain only their **last 1 MiB** while continuing to read and
+stream all output. Healthy tasks can print more than 1 MiB without failing; a final stdout JSON
+object that fits in the retained tail remains available. Lines longer than 1 MiB of characters are delivered
+to log callbacks in bounded fragments. Set positive integer `stdoutLimitBytes` / `stderrLimitBytes`
+execution options, or configure them on
+`new ExecutableRuntimeAdapter({ stdoutLimitBytes, stderrLimitBytes })`, to opt into a total output
+cap. Exceeding an explicit cap terminates the process tree and returns `status: 'failed'`,
+`success: false`, and `StdoutLimitExceeded` or `StderrLimitExceeded`; explicit caps also apply with
+`streamLogs: false`. Runtime validation and write errors return failed task results; builder
+validation throws before building the task. Running aborts return `cancelled`, and timeouts return
+`timeout`, both with exit code `-1`.
 
-Stdin is runtime input, not a persisted registration field or a CLI stdin flag. Supply private
-per-execution input through the executor in background workers; the phone and web app need not
-remain open. Scripts control their own stdout/stderr: do not print private payloads.
+Builder `.stdin()` applies only to direct executor calls. KV task registration validates through a
+schema that strips this runtime field, and queue dispatch does not carry it. Supply private
+per-execution input in `options.stdin` when calling the executor in a worker. Stdin is not a CLI
+stdin flag. Scripts control their own stdout/stderr: do not print private payloads.
 
 ## Production notes
 

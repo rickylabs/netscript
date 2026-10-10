@@ -1,4 +1,5 @@
-import { encodeTaskStdin } from '../task-stdin.ts';
+import { validateTaskStdinBytes } from '../task-stdin.ts';
+import { OutputTail } from '../output-tail.ts';
 import type {
   ResolvedTaskExecutionOptions,
   TaskDefinition,
@@ -37,8 +38,8 @@ export class DaxProcessRunner implements ProcessRunner {
 /** Run a subprocess with bounded stdin, output capture, and log callbacks. */
 export async function runProcess(input: ProcessRunInput): Promise<TaskResult> {
   const startedAt = Date.now();
-  const stdout: string[] = [];
-  const stderr: string[] = [];
+  let stdout = new OutputTail();
+  let stderr = new OutputTail();
   const env = buildEnvironment(input);
 
   if (input.options.signal?.aborted) {
@@ -56,26 +57,22 @@ export async function runProcess(input: ProcessRunInput): Promise<TaskResult> {
   let child: Deno.ChildProcess | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let failure: { status: string; message: string } | undefined;
+  const ioAbort = new AbortController();
+  let termination = Promise.resolve();
   const stop = (status: string, message: string): void => {
     if (failure) return;
     failure = { status, message };
-    try {
-      child?.kill('SIGKILL');
-    } catch {
-      // The child may have exited between the failure and the kill request.
-    }
+    if (child) termination = terminateProcessTree(child);
+    ioAbort.abort();
   };
   const cancel = (): void => stop('cancelled', 'Task cancelled.');
   try {
-    const stdin = input.stdin !== undefined
-      ? encodeTaskStdin(input.stdin)
-      : Object.hasOwn(input.options, 'stdin')
-      ? encodeTaskStdin(input.options.stdin!)
-      : input.task.stdin !== undefined
-      ? encodeTaskStdin(input.task.stdin)
-      : undefined;
+    const stdin = input.stdin;
+    if (stdin !== undefined) validateTaskStdinBytes(stdin);
     const stdoutLimit = outputLimit(input.options.stdoutLimitBytes);
     const stderrLimit = outputLimit(input.options.stderrLimitBytes);
+    stdout = new OutputTail(stdoutLimit);
+    stderr = new OutputTail(stderrLimit);
     child = new Deno.Command(input.command, {
       args: [...input.args],
       cwd: input.options.cwd || Deno.cwd(),
@@ -83,6 +80,8 @@ export async function runProcess(input: ProcessRunInput): Promise<TaskResult> {
       stdin: stdin === undefined ? 'null' : 'piped',
       stdout: 'piped',
       stderr: 'piped',
+      // A dedicated POSIX group lets cancellation kill wrapper descendants too.
+      detached: Deno.build.os !== 'windows',
     }).spawn();
     input.options.signal?.addEventListener('abort', cancel, { once: true });
     if (input.options.signal?.aborted) cancel();
@@ -96,10 +95,11 @@ export async function runProcess(input: ProcessRunInput): Promise<TaskResult> {
     };
     const [result] = await Promise.all([
       child.status,
-      guard(streamOutput(child.stdout, input, 'stdout', stdout, stdoutLimit)),
-      guard(streamOutput(child.stderr, input, 'stderr', stderr, stderrLimit)),
+      guard(streamOutput(child.stdout, input, 'stdout', stdout, stdoutLimit, ioAbort.signal)),
+      guard(streamOutput(child.stderr, input, 'stderr', stderr, stderrLimit, ioAbort.signal)),
       stdin === undefined ? Promise.resolve() : guard(writeStdin(child.stdin, stdin)),
     ]);
+    await termination;
     const success = !failure && result.code === 0;
     return createProcessResult(
       input.task,
@@ -109,11 +109,12 @@ export async function runProcess(input: ProcessRunInput): Promise<TaskResult> {
       stderr,
       failure?.status ?? (success ? 'completed' : 'failed'),
       failure?.message ??
-        (success ? null : buildErrorMessage(result.code, input.command, stderr.join('\n'))),
+        (success ? null : buildErrorMessage(result.code, input.command, stderr.text())),
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     stop('failed', message);
+    await termination;
     if (child) await child.status;
     return createProcessResult(input.task, startedAt, -1, stdout, stderr, 'failed', message);
   } finally {
@@ -137,11 +138,17 @@ async function streamOutput(
   stream: ReadableStream<Uint8Array>,
   input: ProcessRunInput,
   source: TaskLogEntry['source'],
-  buffer: string[],
-  limit: number,
+  buffer: OutputTail,
+  limit: number | undefined,
+  signal: AbortSignal,
 ): Promise<void> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
+  const cancel = (): void => {
+    void reader.cancel().catch(() => {});
+  };
+  signal.addEventListener('abort', cancel, { once: true });
+  if (signal.aborted) cancel();
   let partial = '';
   let size = 0;
   try {
@@ -149,24 +156,33 @@ async function streamOutput(
       const { done, value } = await reader.read();
       if (done) break;
       size += value.byteLength;
-      if (size > limit) {
+      if (limit !== undefined && size > limit) {
         throw new Error(
           `${
             source === 'stdout' ? 'Stdout' : 'Stderr'
           }LimitExceeded: output exceeds ${limit} bytes.`,
         );
       }
+      buffer.append(value);
       const lines = (partial + decoder.decode(value, { stream: true })).split('\n');
       partial = lines.pop() ?? '';
-      for (const line of lines) emitLine(line, input, source, buffer);
+      for (const line of lines) emitLine(line, input, source);
+      // A newline-free producer cannot grow the pending log message forever.
+      // Stream long lines in bounded fragments; capture remains a byte tail.
+      while (partial.length >= 1048576) {
+        emitLine(partial.slice(0, 1048576), input, source);
+        partial = partial.slice(1048576);
+      }
     }
-    emitLine(partial + decoder.decode(), input, source, buffer);
+    emitLine(partial + decoder.decode(), input, source);
   } finally {
+    signal.removeEventListener('abort', cancel);
     reader.releaseLock();
   }
 }
 
-function outputLimit(limit: number = 1024 * 1024): number {
+function outputLimit(limit?: number): number | undefined {
+  if (limit === undefined) return undefined;
   if (!Number.isSafeInteger(limit) || limit <= 0) {
     throw new Error('InvalidOutputLimit: expected a positive safe integer byte limit.');
   }
@@ -191,10 +207,8 @@ function emitLine(
   line: string,
   input: ProcessRunInput,
   source: TaskLogEntry['source'],
-  buffer: string[],
 ): void {
   if (!line.trim()) return;
-  buffer.push(line);
   if (input.options.streamLogs === false) return;
   const entry: TaskLogEntry = {
     message: line,
@@ -212,18 +226,18 @@ function createProcessResult(
   task: TaskDefinition,
   startedAt: number,
   exitCode: number,
-  stdout: readonly string[],
-  stderr: readonly string[],
+  stdout: OutputTail,
+  stderr: OutputTail,
   status: TaskResult['status'],
   error: string | null,
 ): TaskResult {
-  const stdoutText = stdout.join('\n');
+  const stdoutText = stdout.text();
   return {
     taskId: task.id,
     status,
     exitCode,
     stdout: stdoutText,
-    stderr: stderr.join('\n'),
+    stderr: stderr.text(),
     duration: Date.now() - startedAt,
     success: status === 'completed',
     error,
@@ -253,4 +267,24 @@ function buildErrorMessage(exitCode: number, command: string, stderr: string): s
   if (exitCode === 127) message += ` (command not found: '${command}')`;
   const firstLine = stderr.trim().split('\n')[0];
   return firstLine && firstLine.length < 200 ? `${message}. stderr: ${firstLine}` : message;
+}
+
+async function terminateProcessTree(child: Deno.ChildProcess): Promise<void> {
+  try {
+    if (Deno.build.os === 'windows') {
+      // taskkill /T operates only on the tree rooted at this owned child PID.
+      await new Deno.Command('taskkill', {
+        args: ['/PID', String(child.pid), '/T', '/F'],
+        stdout: 'null',
+        stderr: 'null',
+      }).output();
+    } else {
+      Deno.kill(-child.pid, 'SIGKILL');
+    }
+  } catch {
+    // The group may already have exited; retain the direct-child fallback.
+  }
+  try {
+    child.kill('SIGKILL');
+  } catch { /* Already exited. */ }
 }

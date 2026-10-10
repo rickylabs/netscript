@@ -40,10 +40,10 @@ export type {
   TaskLogEntry,
   TaskResult,
   TaskRuntimeAdapterLike,
+  TaskStdin,
+  TaskStdinJson,
   TaskType,
   WorkerTaskPermissionField,
   WorkerTaskPermissions,
 } from './executor-types.ts';
 export type { MultiRuntimeTaskExecutorOptions } from './multi-runtime-task-executor.ts';
-
-export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';

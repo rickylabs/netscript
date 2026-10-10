@@ -325,9 +325,9 @@ export type TaskResponse = typeof TaskResponseSchema['_output'];
 export type TaskExecutionOptions = Readonly<{
   /** Bytes or JSON written to stdin once, then closed; maximum 1 MiB. */
   stdin?: TaskStdin;
-  /** Maximum captured stdout bytes; defaults to 1 MiB. */
+  /** Optional total stdout byte cap; exceeding it fails the task. Capture retains a 1 MiB tail by default. */
   stdoutLimitBytes?: number;
-  /** Maximum captured stderr bytes; defaults to 1 MiB. */
+  /** Optional total stderr byte cap; exceeding it fails the task. Capture retains a 1 MiB tail by default. */
   stderrLimitBytes?: number;
   cwd?: string;
   env?: Record<string, string>;

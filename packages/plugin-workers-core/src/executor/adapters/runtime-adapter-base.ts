@@ -1,4 +1,4 @@
-import { encodeTaskStdin } from '../task-stdin.ts';
+import { encodeTaskStdin, validateTaskStdinBytes } from '../task-stdin.ts';
 import { TaskRuntimeAdapter } from '../../abstracts/mod.ts';
 import type {
   ResolvedTaskExecutionOptions,
@@ -57,11 +57,7 @@ export class RuntimeAdapterBase extends TaskRuntimeAdapter {
         command: spec.command,
         args: spec.args,
         task,
-        stdin: Object.hasOwn(options, 'stdin')
-          ? encodeTaskStdin(options.stdin!)
-          : task.stdin !== undefined
-          ? encodeTaskStdin(task.stdin)
-          : undefined,
+        stdin: resolveStdin(task, options),
         options: {
           ...options,
           stdoutLimitBytes: options.stdoutLimitBytes ?? this.#stdoutLimitBytes,
@@ -93,4 +89,18 @@ export function failedTaskResult(task: TaskDefinition, error: unknown): TaskResu
     completedAt: new Date().toISOString(),
     attempt: 0,
   };
+}
+
+// This is the sole precedence boundary. Builder bytes are already snapshotted;
+// execution input is encoded once, then passed through to the stream writer.
+function resolveStdin(
+  task: TaskDefinition,
+  options: ResolvedTaskExecutionOptions,
+): Uint8Array | undefined {
+  if (Object.hasOwn(options, 'stdin')) return encodeTaskStdin(options.stdin!);
+  if (task.stdin instanceof Uint8Array) {
+    validateTaskStdinBytes(task.stdin);
+    return task.stdin;
+  }
+  return task.stdin === undefined ? undefined : encodeTaskStdin(task.stdin);
 }

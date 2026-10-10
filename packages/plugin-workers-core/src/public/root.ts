@@ -1,4 +1,5 @@
 import type { TaskStdin } from '../domain/task.ts';
+export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';
 import { defineJob as defineJobImpl } from '../builders/job-builder.ts';
 import { defineTask as defineTaskImpl } from '../builders/task-builder.ts';
 import { defineWorkflow as defineWorkflowImpl } from '../builders/workflow-builder.ts';
@@ -543,5 +544,3 @@ export function inspectWorkflow(
 ): Readonly<{ id: string; kind: 'workflow' }> {
   return Object.freeze({ id: workflow.id, kind: 'workflow' });
 }
-
-export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';

@@ -48,8 +48,8 @@ export type {
   PublicStandardSchema,
   TaskBuilder,
   TaskDefinition,
+  TaskStdin,
+  TaskStdinJson,
   WorkflowBuilder,
   WorkflowDefinition,
 } from './src/public/root.ts';
-
-export type { TaskStdin, TaskStdinJson } from './src/domain/task.ts';

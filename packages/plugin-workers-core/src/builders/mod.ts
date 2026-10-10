@@ -32,6 +32,4 @@ export type {
   WorkflowId,
   WorkflowStep,
 } from './builder-types.ts';
-export type { CronExpression } from '../domain/mod.ts';
-
-export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';
+export type { CronExpression, TaskStdin, TaskStdinJson } from '../domain/mod.ts';

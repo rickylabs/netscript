@@ -1,4 +1,5 @@
 import type { TaskStdin } from '../domain/task.ts';
+export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';
 import type { WorkerTelemetryStatus } from '../telemetry/mod.ts';
 
 /** Worker task runtime identifier supported by built-in adapters. */
@@ -63,9 +64,9 @@ export type RuntimeTaskMetadata = Readonly<{
 export type TaskExecutionOptions = Readonly<{
   /** Bytes or JSON written once to stdin, then closed; maximum 1 MiB. */
   readonly stdin?: TaskStdin;
-  /** Maximum captured stdout bytes; defaults to 1 MiB. */
+  /** Optional total stdout byte cap; exceeding it fails the task. Capture retains a 1 MiB tail by default. */
   readonly stdoutLimitBytes?: number;
-  /** Maximum captured stderr bytes; defaults to 1 MiB. */
+  /** Optional total stderr byte cap; exceeding it fails the task. Capture retains a 1 MiB tail by default. */
   readonly stderrLimitBytes?: number;
   readonly args?: readonly string[];
   readonly cwd?: string;

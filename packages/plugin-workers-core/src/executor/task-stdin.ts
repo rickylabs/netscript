@@ -7,7 +7,7 @@ const encoder = new TextEncoder();
 export function encodeTaskStdin(payload: TaskStdin): Uint8Array {
   if (payload === undefined) throw new Error('MissingStdinPayload: expected bytes or JSON.');
   if (payload instanceof Uint8Array) {
-    if (payload.byteLength > MAX_STDIN_BYTES) throw oversized();
+    validateTaskStdinBytes(payload);
     return payload.slice();
   }
   let buffer = new Uint8Array(1024);
@@ -26,7 +26,12 @@ export function encodeTaskStdin(payload: TaskStdin): Uint8Array {
     buffer.set(bytes, size);
     size = nextSize;
   }
-  return buffer.slice(0, size);
+  return buffer.subarray(0, size);
+}
+
+/** Validate already encoded input without copying or resolving precedence. */
+export function validateTaskStdinBytes(bytes: Uint8Array): void {
+  if (bytes.byteLength > MAX_STDIN_BYTES) throw oversized();
 }
 
 function oversized(): Error {

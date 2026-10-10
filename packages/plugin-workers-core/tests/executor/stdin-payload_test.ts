@@ -1,7 +1,11 @@
 import { assertEquals, assertMatch, assertThrows } from '@std/assert';
 import { defineTask as defineRootTask } from '../../mod.ts';
 import { defineTask } from '../../src/builders/mod.ts';
-import { createDefaultTaskExecutor, ExecutableRuntimeAdapter } from '../../src/executor/mod.ts';
+import {
+  createDefaultTaskExecutor,
+  ExecutableRuntimeAdapter,
+  runProcess,
+} from '../../src/executor/mod.ts';
 
 const executor = createDefaultTaskExecutor();
 const echo =
@@ -162,4 +166,117 @@ Deno.test('stdin payload: early pipe closure gives StdinWriteFailed and terminat
   assertEquals(result.status, 'failed');
   assertEquals(result.success, false);
   assertMatch(result.error!, /^StdinWriteFailed:/);
+});
+
+for (const streamLogs of [true, false]) {
+  Deno.test(`default output: chatty task survives with bounded tails (streamLogs=${streamLogs})`, async () => {
+    let lines = 0;
+    const task = defineTask('chatty').runtime('executable').entrypoint(Deno.execPath())
+      .args(
+        'eval',
+        `for(let i=0;i<2048;i++) { console.log('x'.repeat(1024)); console.error('y'.repeat(1024)); }
+console.log('{"done":true}');`,
+      ).build();
+    const result = await executor.execute(task, { streamLogs, onStdout: () => lines++ });
+    assertEquals(result.status, 'completed');
+    assertEquals(result.exitCode, 0);
+    assertEquals(result.result, { done: true });
+    assertEquals(result.stdout.length <= 1048576, true);
+    assertEquals(result.stderr.length <= 1048576, true);
+    assertEquals(lines, streamLogs ? 2049 : 0);
+  });
+}
+
+Deno.test('default output: newline-free output is bounded and streamed in fragments', async () => {
+  let streamed = 0;
+  const task = defineTask('long-line').runtime('executable').entrypoint(Deno.execPath())
+    .args('eval', `console.log('x'.repeat(3*1048576)); console.log('{"done":true}');`).build();
+  const result = await executor.execute(task, { onStdout: (line) => streamed += line.length });
+  assertEquals(result.success, true);
+  assertEquals(result.result, { done: true });
+  assertEquals(result.stdout.length <= 1048576, true);
+  assertEquals(streamed, 3 * 1048576 + '{"done":true}'.length);
+});
+
+for (const mode of ['cancelled', 'timeout'] as const) {
+  Deno.test({
+    name: `process tree: ${mode} terminates a shell wrapper and its pipe-holding grandchild`,
+    ignore: Deno.build.os !== 'linux',
+    async fn() {
+      const dir = await Deno.makeTempDir();
+      let pid: number | undefined;
+      let watchdog: ReturnType<typeof setTimeout> | undefined;
+      const controller = new AbortController();
+      try {
+        await Deno.writeTextFile(
+          `${dir}/child.ts`,
+          `console.log(Deno.pid);
+await new Promise(resolve => setTimeout(resolve, 60000));`,
+        );
+        // A real wrapper keeps a grandchild alive with inherited stdout/stderr.
+        await Deno.writeTextFile(`${dir}/wrapper.sh`, '"$1" run "$2" &\nwait\n');
+        const task = defineTask('wrapper').runtime('executable').entrypoint('sh')
+          .args(`${dir}/wrapper.sh`, Deno.execPath(), `${dir}/child.ts`).build();
+        const started = Date.now();
+        const result = await executor.execute(task, {
+          timeout: mode === 'timeout' ? 500 : 5000,
+          signal: controller.signal,
+          onStdout(line) {
+            pid = Number(line);
+            // This owned-PID watchdog also makes the regression test safe on old code.
+            watchdog = setTimeout(() => {
+              try {
+                Deno.kill(pid!, 'SIGKILL');
+              } catch { /* Exited. */ }
+            }, 1500);
+            if (mode === 'cancelled') controller.abort();
+          },
+        });
+        assertEquals(result.status, mode);
+        assertEquals(result.exitCode, -1);
+        assertEquals(Date.now() - started < 1200, true);
+        assertEquals(Number.isSafeInteger(pid), true);
+        // A reparented zombie is already terminated and owns no pipes or memory.
+        let dead = false;
+        for (let attempt = 0; attempt < 50 && !dead; attempt++) {
+          try {
+            const stat = await Deno.readTextFile(`/proc/${pid}/stat`);
+            dead = stat.slice(stat.lastIndexOf(')') + 2).split(' ')[0] === 'Z';
+          } catch (error) {
+            if (!(error instanceof Deno.errors.NotFound)) throw error;
+            dead = true;
+          }
+          if (!dead) await new Promise((resolve) => setTimeout(resolve, 10));
+        }
+        assertEquals(dead, true);
+      } finally {
+        clearTimeout(watchdog);
+        if (pid !== undefined) {
+          try {
+            Deno.kill(pid, 'SIGKILL');
+          } catch { /* Exited. */ }
+        }
+        await Deno.remove(dir, { recursive: true });
+      }
+    },
+  });
+}
+
+Deno.test('stdin payload: adapter passes the builder snapshot directly to the runner', async () => {
+  const source = new TextEncoder().encode('{"value":"snapshot"}');
+  const builder = pythonTask().stdin(source);
+  source.fill(0);
+  const task = builder.build();
+  assertEquals(task.stdin === builder.build().stdin, true);
+  const adapter = new ExecutableRuntimeAdapter({
+    runner: {
+      run(input) {
+        assertEquals(input.stdin === task.stdin, true);
+        return runProcess(input);
+      },
+    },
+  });
+  const result = await adapter.execute(task, { args: [], cwd: '', env: {}, timeout: 5000 });
+  assertEquals(result.success, true, result.error ?? undefined);
+  assertEquals(result.result, { payload: { value: 'snapshot' } });
 });

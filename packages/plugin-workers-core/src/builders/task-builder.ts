@@ -289,7 +289,7 @@ class TaskBuilderImpl<
       source: 'local',
       args: [...this.#data.args],
       cwd: this.#data.cwd,
-      stdin: this.#data.stdin?.slice(),
+      stdin: this.#data.stdin,
       env: this.#data.env ? { ...this.#data.env } : undefined,
       permissions: toDomainPermissions(this.#data.permissions),
       timezone: 'UTC',

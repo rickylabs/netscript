@@ -18,6 +18,8 @@ export type {
   JobHandlerDefinition,
   JobPayloadSchema,
   PublicStandardSchema,
+  TaskStdin,
+  TaskStdinJson,
 } from '../domain/mod.ts';
 export type { JobPayloadMap, JobPayloadOf } from '../public/root.ts';
 // Canonical execution status / trigger enums. Re-exported from the runtime
@@ -191,5 +193,3 @@ export type {
   WorkerIdempotencyPort,
   WorkerIdempotencySource,
 } from '../ports/worker-idempotency-port.ts';
-
-export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';
