@@ -13,6 +13,8 @@ Deno.test('review regression: inline prose before late fence cannot starve code 
   assert(result.content.includes('## Late heading\n'));
   assert(docContentBytes(result.content) <= DOC_CONTENT_BUDGET);
   assert(!result.content.includes('\n\n\n'), 'Assembly must not duplicate block blank separators.');
+  const crlf = extractDocContent(source.replaceAll('\n', '\r\n'));
+  assert(!/(?:\r?\n){3}/.test(crlf.content), 'CRLF blank separators must also be preserved.');
 });
 
 Deno.test('code selection favors several cheap late fences over one expensive early fence', () => {

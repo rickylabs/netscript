@@ -158,8 +158,8 @@ export function extractDocContent(content: string): {
   let previousEnd = -1;
   for (const candidate of selected) {
     if (result && previousEnd !== candidate.offset) {
-      const trailing = /\n*$/.exec(result)![0].length;
-      const leading = /^\n*/.exec(candidate.text)![0].length;
+      const trailing = /(?:\r?\n)*$/.exec(result)![0].split('\n').length - 1;
+      const leading = /^(?:\r?\n)*/.exec(candidate.text)![0].split('\n').length - 1;
       result += '\n'.repeat(Math.max(0, 2 - trailing - leading));
     }
     result += candidate.text;
