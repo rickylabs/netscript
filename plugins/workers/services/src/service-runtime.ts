@@ -1,4 +1,7 @@
 import {
+  type AtomicCheck,
+  type AtomicMutation,
+  type AtomicResult,
   getKv,
   type KvEntry,
   type KvKey,
@@ -41,6 +44,12 @@ class LazyWorkersKvStore implements RegistryKvStore, WorkerIdempotencyKvStore {
 
   async delete(key: readonly unknown[]): Promise<void> {
     await (await this.#kv).delete(toKvKey(key));
+  }
+
+  async atomic(checks: AtomicCheck[], mutations: AtomicMutation[]): Promise<AtomicResult> {
+    const kv = await this.#kv;
+    if (!kv.atomic) throw new Error('Workers retention cleanup requires atomic KV support.');
+    return kv.atomic(checks, mutations);
   }
 
   async has(key: readonly unknown[]): Promise<boolean> {
