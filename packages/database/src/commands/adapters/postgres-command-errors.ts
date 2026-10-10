@@ -5,9 +5,15 @@ import { CommandStoreError } from '../../../ports/command-store-error.ts';
 // whose classes differ from any copy this package could resolve.
 type KnownRequestError = Readonly<{ code: string; meta?: Readonly<Record<string, unknown>> }>;
 
+// Prisma request codes are `P` plus four digits; every known-request error carries a client
+// version. Callback errors that only borrow the name stay unclassified and pass through.
+const PRISMA_REQUEST_CODE = /^P\d{4}$/;
+
 function isKnownRequestError(error: object): error is KnownRequestError {
+  const code: unknown = Reflect.get(error, 'code');
   return Reflect.get(error, 'name') === 'PrismaClientKnownRequestError' &&
-    typeof Reflect.get(error, 'code') === 'string';
+    typeof code === 'string' && PRISMA_REQUEST_CODE.test(code) &&
+    typeof Reflect.get(error, 'clientVersion') === 'string';
 }
 
 /** Same predicate as `isDriverAdapterError` in `@prisma/driver-adapter-utils`, null-safe. */

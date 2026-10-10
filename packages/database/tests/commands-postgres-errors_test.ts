@@ -142,13 +142,34 @@ for (
   });
 }
 
-Deno.test('business errors without a provider shape pass through unclassified', async () => {
-  const error = Object.assign(new Error('domain'), { code: '40001' });
-  const thrown = await assertRejects(() =>
-    store({}).transaction({ receiptClaimWaitMs: 25 }, () => Promise.reject(error))
-  );
-  assertStrictEquals(thrown, error);
-});
+for (
+  const [label, error] of [
+    ['a SQLSTATE code', Object.assign(new Error('domain'), { code: '40001' })],
+    // The native conformance fixture's business error: Prisma's name, but no Prisma request code.
+    [
+      "Prisma's name with a SQLSTATE code",
+      Object.assign(new Error('business'), {
+        code: '40001',
+        name: 'PrismaClientKnownRequestError',
+        meta: { code: '40001' },
+      }),
+    ],
+    [
+      "Prisma's name and code without a client version",
+      Object.assign(new Error('business'), {
+        code: 'P2034',
+        name: 'PrismaClientKnownRequestError',
+      }),
+    ],
+  ] as const
+) {
+  Deno.test(`business errors with ${label} pass through unclassified`, async () => {
+    const thrown = await assertRejects(() =>
+      store({}).transaction({ receiptClaimWaitMs: 25 }, () => Promise.reject(error))
+    );
+    assertStrictEquals(thrown, error);
+  });
+}
 
 Deno.test('foreign-instance business-phase serialization failure is retryable', async () => {
   const error = postgresError('40001');
