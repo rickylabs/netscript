@@ -19,6 +19,7 @@ import type { KvOAuthCookieOptions } from './cookies.ts';
 import { KvOAuthError } from './errors.ts';
 import { hasIssuerDiscovery, type OAuthProviderConfig } from './providers.ts';
 import type { KvOAuthStore, KvOAuthTokenSet } from './store.ts';
+import { resolvePrincipalSubject } from './subject.ts';
 
 export type { Principal } from '@netscript/service/auth';
 export type { KvOAuthJsonValidator } from './crypto.ts';
@@ -28,6 +29,7 @@ export type {
   OAuthProviderBaseConfig,
   OAuthProviderClientAuthConfig,
   OAuthProviderConfig,
+  OAuthSubjectSource,
 } from './providers.ts';
 export type { KvOAuthCookieOptions } from './cookies.ts';
 export type {
@@ -89,17 +91,25 @@ export type CreateKvOAuthFlowOptions = Readonly<{
   ) => KvOAuthPrincipal | Promise<KvOAuthPrincipal>;
 }>;
 
-/** Context passed to custom principal mappers. */
+/**
+ * Context passed to custom principal mappers.
+ *
+ * `fetch` is the flow's injected fetch (the global `fetch` when none was injected), so a mapper's
+ * own provider calls follow the same transport as the token exchange.
+ */
 export type NormalizePrincipalContext = Readonly<{
   provider: OAuthProviderConfig;
   sessionId: string;
   tokenSet: KvOAuthTokenSet;
   claims: Readonly<Record<string, unknown>>;
+  fetch: KvOAuthFetch;
+  allowInsecureRequests: boolean;
 }>;
 
 /** Creates pure OAuth/OIDC flow primitives without mounting HTTP routes. */
 export function createKvOAuthFlow(options: CreateKvOAuthFlowOptions): KvOAuthFlow {
   const cookieName = options.cookie?.name ?? '__Host-ns_session';
+  const principalFetch: KvOAuthFetch = options.fetch ?? ((url, init) => fetch(url, init));
   const defaultReturnTo = options.defaultReturnTo ?? new URL(options.provider.redirectUri).origin;
 
   return {
@@ -199,6 +209,8 @@ export function createKvOAuthFlow(options: CreateKvOAuthFlowOptions): KvOAuthFlo
         sessionId,
         tokenSet,
         claims,
+        fetch: principalFetch,
+        allowInsecureRequests: options.allowInsecureRequests === true,
       });
       const now = new Date();
       await options.store.putSession({
@@ -352,10 +364,40 @@ function redirect(url: URL, setCookie: string): Response {
   });
 }
 
-function defaultPrincipal(
+/**
+ * Default principal mapping used when no `normalizePrincipal` is supplied.
+ *
+ * The subject follows `provider.subject` (see {@link resolvePrincipalSubject}); roles are
+ * `['user']`, scopes come from the token response or the provider config, and `sessionId` and
+ * `providerId` are merged into the claims. Custom mappers compose on top of it rather than
+ * replacing it, so these defaults are kept.
+ *
+ * @example
+ * ```ts
+ * import {
+ *   createKvOAuthFlow,
+ *   defaultPrincipal,
+ *   type KvOAuthStore,
+ *   type OAuthProviderConfig,
+ * } from "@netscript/auth-kv-oauth/flow";
+ *
+ * declare const provider: OAuthProviderConfig;
+ * declare const store: KvOAuthStore;
+ *
+ * const flow = createKvOAuthFlow({
+ *   provider,
+ *   store,
+ *   normalizePrincipal: async (context) => {
+ *     const principal = await defaultPrincipal(context);
+ *     return { ...principal, roles: [...principal.roles, "member"] };
+ *   },
+ * });
+ * ```
+ */
+export async function defaultPrincipal(
   context: NormalizePrincipalContext,
-): KvOAuthPrincipal {
-  const subject = typeof context.claims.sub === 'string' ? context.claims.sub : context.sessionId;
+): Promise<KvOAuthPrincipal> {
+  const subject = await resolvePrincipalSubject(context);
   const scopes = context.tokenSet.scope?.split(/\s+/).filter(Boolean) ?? context.provider.scopes;
   return {
     subject,

@@ -16,7 +16,11 @@ package's public surface reported by `deno doc`.
 | `createKvOAuthFlow` | function | Create the OAuth sign-in and callback flow. |
 | `createKvOAuthStore` | function | Create the KV-backed OAuth store. |
 | `createKvOAuthCrypto` | function | Create crypto helpers for OAuth state and token storage. |
+| `presetProviderKind` | function | Read the shipped preset protocol kind (`oauth` or `oidc`); custom ids return undefined. OAuth presets use explicit endpoints without issuer discovery. |
 | `defineOAuthProvider` | function | Normalize generic OAuth provider input into an `OAuthProviderConfig`. |
+| `defaultPrincipal` | function | Default principal mapping; custom `normalizePrincipal` mappers compose on it. |
+| `resolvePrincipalSubject` | function | Resolve the stable subject from the provider's `subject` source (ID token or userinfo). |
+| `presetSubjectSource` | function | Return the subject source a shipped preset uses, by preset provider id. |
 | `providers` | constant | Provider preset collection including GitHub, Google, GitLab, Discord, Slack, Spotify, Facebook, Twitter, Auth0, Okta, AWS Cognito, Azure AD, Logto, and Clerk. |
 
 ## Cookie, environment, and discovery helpers
@@ -46,6 +50,10 @@ package's public surface reported by `deno doc`.
 | `PresetOAuthProviderOptions` | type alias | Options accepted by provider presets. |
 | `KvOAuthCallbackResult` | type alias | Callback result returned by the OAuth flow. |
 | `KvOAuthTokenSet` | type alias | Token set stored by the KV OAuth backend. |
+| `OAuthSubjectSource` | type alias | Where the subject comes from: `id_token` claim or namespaced `userinfo` field. |
+| `NormalizePrincipalContext` | type alias | Context passed to `normalizePrincipal`, including the injected `fetch`. |
+| `PrincipalSubjectContext` | type alias | Input accepted by `resolvePrincipalSubject`. |
+| `KvOAuthUserInfoFetch` | type alias | Fetch replacement used for userinfo requests. |
 
 ## Sub-path exports
 
@@ -58,6 +66,7 @@ package's public surface reported by `deno doc`.
 | `@netscript/auth-kv-oauth/cookies` | `./src/cookies.ts` | Cookie parsing and header helpers. |
 | `@netscript/auth-kv-oauth/flow` | `./src/flow.ts` | OAuth sign-in and callback flow. |
 | `@netscript/auth-kv-oauth/backend` | `./src/backend.ts` | Backend adapter factory. |
-| `@netscript/auth-kv-oauth/errors` | `./src/errors.ts` | KV OAuth error class and codes. |
+| `@netscript/auth-kv-oauth/errors` | `./src/errors.ts` | KV OAuth error class and codes, including `subject_missing` and `userinfo_failed`. |
+| `@netscript/auth-kv-oauth/subject` | `./src/subject.ts` | Stable principal-subject resolution. |
 
 Back to the [auth reference hub](/reference/auth/).

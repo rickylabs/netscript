@@ -9,6 +9,7 @@ import {
   createKvOAuthBackend,
   createKvOAuthStore,
   defineOAuthProvider,
+  presetProviderKind,
 } from '@netscript/auth-kv-oauth';
 import {
   createWorkosBackend,
@@ -24,6 +25,7 @@ import {
   createAuthBackendRegistry,
   type ResolvedAuthBackendRegistry,
 } from '@netscript/plugin-auth-core/ports';
+import { resolveKvOAuthSubjectSource } from './kv-oauth-subject.ts';
 
 /** Backend names supported by the auth plugin v1 service. */
 export type AuthPluginBackendName = 'kv-oauth' | 'workos' | 'better-auth';
@@ -93,20 +95,35 @@ type WorkosSdkCookieSession = Readonly<{
   }): Promise<WorkosSdkRefreshResult>;
 }>;
 
-/** Creates a single-active auth backend registry for the plugin service. */
+/** Resolved auth backend registry and its service cookie policy. */
+export type AuthServiceBackendRegistry =
+  & ResolvedAuthBackendRegistry
+  & Readonly<{
+    /** Cookie name resolved from the backend's effective environment. */
+    cookieName: string;
+  }>;
+
+/** Creates a single-active auth backend registry and its resolved cookie policy. */
 export async function createAuthServiceBackendRegistry(
   options: CreateAuthServiceBackendRegistryOptions = {},
-): Promise<ResolvedAuthBackendRegistry> {
-  const env = {
+): Promise<AuthServiceBackendRegistry> {
+  const configuredEnv = {
     ...(options.appsettings?.auth?.environment ?? options.appsettings?.Auth?.Environment ?? {}),
     ...(options.env ?? Deno.env.toObject()),
   };
+  const env = {
+    ...configuredEnv,
+    NETSCRIPT_AUTH_COOKIE_NAME: configuredEnv.NETSCRIPT_AUTH_COOKIE_NAME ?? '__Host-ns_session',
+  };
   const activeName = resolveActiveBackendName(env, options.appsettings);
   const backend = await createActiveBackend(activeName, { ...options, env });
-  return createAuthBackendRegistry(
-    new Map<string, AuthBackendPort>([[activeName, backend]]),
-    activeName,
-  );
+  return {
+    ...createAuthBackendRegistry(
+      new Map<string, AuthBackendPort>([[activeName, backend]]),
+      activeName,
+    ),
+    cookieName: env.NETSCRIPT_AUTH_COOKIE_NAME,
+  };
 }
 
 /** Resolve the active backend name from appsettings and `NETSCRIPT_AUTH_BACKEND`. */
@@ -138,10 +155,14 @@ async function createActiveBackend(
         displayName: env.NETSCRIPT_AUTH_PROVIDER_DISPLAY_NAME,
         clientId: provider.clientId,
         clientSecret: env.NETSCRIPT_AUTH_CLIENT_SECRET,
-        issuer: env.NETSCRIPT_AUTH_ISSUER,
+        // OAuth presets use explicit endpoints, even if an old shell or deployment supplies issuer.
+        issuer: presetProviderKind(env.NETSCRIPT_AUTH_PROVIDER_ID ?? '') === 'oauth'
+          ? undefined
+          : env.NETSCRIPT_AUTH_ISSUER,
         authorizationEndpoint: provider.authorizationEndpoint,
         tokenEndpoint: provider.tokenEndpoint,
         userInfoEndpoint: env.NETSCRIPT_AUTH_USERINFO_ENDPOINT,
+        subject: resolveKvOAuthSubjectSource(env),
         redirectUri: provider.redirectUri,
         scopes: env.NETSCRIPT_AUTH_SCOPES?.split(/\s+/).filter(Boolean),
       }),
@@ -274,7 +295,7 @@ function resolveKvOAuthProviderEnv(
 }
 
 function localAuthOrigin(env: Readonly<Record<string, string | undefined>>): string {
-  return `http://localhost:${requiredEnv(env, 'PORT')}`;
+  return `http://localhost:${requiredEnv(env, 'PORT')}`; // aspire-host-port-ok: own origin from Aspire-allocated PORT
 }
 
 function resolveKvOAuthKey(env: Readonly<Record<string, string | undefined>>): ArrayBuffer {

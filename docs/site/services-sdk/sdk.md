@@ -416,6 +416,10 @@ export async function loadUser(id: string) {
 It preserves the defined members present in that input type; it does not turn an arbitrary
 `unknown` value into one of the contract's declared errors.
 
+Both helper families are supported on a service-client promise: the SDK's `safe` and
+`isDefinedError` from `@netscript/sdk/client`, and oRPC's native `safe` and `isDefinedError` from
+`@orpc/client`, narrow to the same contract-declared codes.
+
 ### Bare promises and the defined-error arm
 
 When a promise carries no contract error type, `TError` falls back to `Error`. In that case the
