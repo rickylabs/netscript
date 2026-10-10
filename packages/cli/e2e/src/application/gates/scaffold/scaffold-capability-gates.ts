@@ -25,6 +25,7 @@ import {
   createRuntimeGates,
 } from './runtime-gates.ts';
 import { createRuntimeBehaviorGates } from './runtime/behavior-gates.ts';
+import { createCredentialReadinessGates } from './runtime/credential-readiness-gates.ts';
 import {
   createListenerReadinessGates,
   createTypedDbPhaseBGate,
@@ -68,6 +69,7 @@ export function createScaffoldCapabilityGates(
     ...runtimeGates.slice(startIndex + 1),
     createAspireMcpSmokeGate(),
     ...createListenerReadinessGates(database),
+    ...createCredentialReadinessGates(),
     createTypedDbPhaseBGate(),
     ...createRuntimeBehaviorGates(database),
     ...createBehaviorPluginHealthGates(),

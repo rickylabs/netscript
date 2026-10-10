@@ -660,8 +660,8 @@ describe('generateRegisterInfrastructure', () => {
       databases: {
         mysql: { Enabled: true, Engine: 'Mysql', Mode: 'Container', Persistent: false },
         mssql: { Enabled: true, Engine: 'Mssql', Mode: 'Container', Persistent: false },
-        external: { Enabled: true, Engine: 'Postgres', Mode: 'External' },
-        sqlite: { Enabled: true, Engine: 'Sqlite', DataPath: '.data/app.sqlite' },
+        external: { Enabled: true, Engine: 'Postgres', Mode: 'External', Persistent: false },
+        sqlite: { Enabled: true, Engine: 'Sqlite', DataPath: '.data/app.sqlite', Persistent: false },
       },
       caches: {},
     })

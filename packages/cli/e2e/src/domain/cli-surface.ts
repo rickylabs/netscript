@@ -142,6 +142,8 @@ export const GATE = {
   RUNTIME_RESOURCE_COMMAND: 'runtime.resource-command',
   AGENT_ASPIRE_MCP_SMOKE,
   RUNTIME_HEALTH_LISTENER_UNREACHABLE: 'runtime.health.listener-unreachable',
+  RUNTIME_HEALTH_CREDENTIAL_ACCEPTED: 'runtime.health.credential-accepted',
+  RUNTIME_HEALTH_CREDENTIAL_REJECTED: 'runtime.health.credential-rejected',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
   BEHAVIOR_APP_DYNAMIC_ROUTE: 'behavior.app-dynamic-route',
   BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',

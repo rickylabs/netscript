@@ -495,6 +495,8 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
     GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
     GATE.RUNTIME_TYPED_DB_PHASE_B,
     GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
+    GATE.RUNTIME_HEALTH_CREDENTIAL_ACCEPTED,
+    GATE.RUNTIME_HEALTH_CREDENTIAL_REJECTED,
   ]);
   const databaseWaits = new Set<GateId>([
     GATE.RUNTIME_WAIT_POSTGRES,
@@ -530,6 +532,8 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
         GATE.RUNTIME_TYPED_DB_PHASE_B,
         GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
+        GATE.RUNTIME_HEALTH_CREDENTIAL_ACCEPTED,
+        GATE.RUNTIME_HEALTH_CREDENTIAL_REJECTED,
       ])).has(gate)
     ),
   );
