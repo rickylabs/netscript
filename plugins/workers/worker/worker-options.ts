@@ -150,7 +150,7 @@ export interface WorkerOptions {
   jobsDir?: string;
   /** Additional queue triggers. */
   queueTriggers?: QueueTriggerConfig[];
-  /** @deprecated The current runner is in-process and ignores a worker entry point URL. */
+  /** @deprecated Reserved for a future isolate pool; the in-process job runner ignores this URL. */
   workerUrl?: string;
   /** Options for in-process job handler resolution. */
   workerPoolOptions?: WorkerPoolOptions;
