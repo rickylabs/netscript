@@ -4236,6 +4236,7 @@
       "plugins/sagas": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-sagas-core@0.0.7",
@@ -4282,6 +4283,7 @@
       "plugins/triggers": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
