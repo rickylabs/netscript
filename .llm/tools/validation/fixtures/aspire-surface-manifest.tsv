@@ -446,6 +446,7 @@ packages/cli/src/kernel/adapters/config/infrastructure/infrastructure-docker.ts	
 packages/cli/src/kernel/adapters/config/infrastructure/infrastructure-resolvers.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/database/operations/apphost-lifecycle-lock_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operations/apphost-lifecycle-lock.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/aspire-command-executor_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operations/aspire-command-executor.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operations/operation-runner_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operations/operation-runner-helpers_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
@@ -466,6 +467,7 @@ packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts	cli:othe
 packages/cli/src/kernel/adapters/plugin/db-integration.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/runtime/process/resolve-aspire-executable.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/scaffold/import-resolver.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/workspace-mutator_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -599,6 +601,7 @@ packages/cli/src/kernel/templates/database/generate-prisma-config.ts	cli:other	S
 packages/cli/src/kernel/templates/database/generators_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/templates/database/postgres-normalizer_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/templates/database/prisma-config-env_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/templates/workspace/aspire-cli-task_test.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/aspire-cli-task.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/deno-json.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/generate-readme.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
