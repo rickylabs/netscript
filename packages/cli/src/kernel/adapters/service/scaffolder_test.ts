@@ -89,7 +89,7 @@ for (const hasDatabase of [false, true]) {
       hasDatabase,
     });
     const main = await fs.readFile('/project/services/orders/src/main.ts');
-    assertStringIncludes(main, "from '@netscript/plugin-auth/authenticator'");
+    assertStringIncludes(main, "from '@netscript/plugin-auth-core/authenticator'");
     assertStringIncludes(main, 'createAuthServiceAuthenticator({ serviceName: "identity"');
     assertStringIncludes(main, 'requireScopes: ["orders:access"]');
     assertEquals(main.includes('public: true'), false);

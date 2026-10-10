@@ -234,7 +234,7 @@ the `PORT` env var with a literal fallback so the same code runs locally and und
 ```ts
 // services/users/src/main.ts
 import { defineService } from '@netscript/service';
-import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth-core/authenticator';
 import { createScopeAuthorizer } from '@netscript/service/auth';
 import { router } from './router.ts';
 

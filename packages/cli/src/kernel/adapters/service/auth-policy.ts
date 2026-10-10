@@ -25,7 +25,7 @@ export function serviceAuthTemplate(
   }
   return {
     authImports:
-      "import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';\n" +
+      "import { createAuthServiceAuthenticator } from '@netscript/plugin-auth-core/authenticator';\n" +
       "import { createScopeAuthorizer } from '@netscript/service/auth';",
     authPolicy: `auth: {
     authn: {

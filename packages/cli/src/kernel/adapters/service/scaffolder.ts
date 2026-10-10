@@ -68,6 +68,7 @@ export class ServiceScaffolder {
         localBase: options.localBase,
         packagesAsWorkspaceMembers: options.packagesAsWorkspaceMembers,
         hasDatabase: options.hasDatabase,
+        authServiceName,
       }),
       options.force,
       filesCreated,

@@ -40,6 +40,25 @@ describe('generateServiceDenoJson', () => {
     assertEquals(config.imports['@test-project/contracts'], '../../contracts/mod.ts');
     assertEquals(config.imports['@netscript/service'], netscriptJsrSpecifier('service'));
     assert(!('@netscript/telemetry' in config.imports));
+    assert(!('@netscript/plugin-auth-core' in config.imports));
+  });
+
+  it('declares the guarded service authenticator dependency in both source modes', () => {
+    for (const importMode of ['jsr', 'local'] as const) {
+      const config = JSON.parse(generateServiceDenoJson({
+        projectName: 'test-project',
+        serviceName: 'team-members',
+        importMode,
+        localBase: '../..',
+        authServiceName: 'auth',
+      }));
+      assertEquals(
+        config.imports['@netscript/plugin-auth-core'],
+        importMode === 'jsr'
+          ? netscriptJsrSpecifier('plugin-auth-core')
+          : '../../packages/plugin-auth-core/mod.ts',
+      );
+    }
   });
 
   it('should resolve service imports against local packages when using copied workspace members', () => {
