@@ -29,6 +29,8 @@ export type AuthServiceInitialContext = AuthServiceContext;
 export type AuthServiceContext = Readonly<{
   registry: ResolvedAuthBackendRegistry;
   telemetry?: AuthTelemetry;
+  /** Session cookie name from the same environment used to compose the backend. */
+  cookieName?: string;
   request?: AuthServiceRequest;
   /** Principal authenticated by the service guard; required by signout and revokeSession. */
   principal?: Principal;

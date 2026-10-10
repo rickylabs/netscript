@@ -28,6 +28,8 @@ export type CallbackInput = Readonly<{
   providerId?: string;
   code?: string;
   state?: string;
+  /** Explicit OAuth transaction id for callers without a transaction cookie. */
+  txn?: string;
   error?: string;
   errorDescription?: string;
   redirectTo?: string;

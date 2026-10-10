@@ -104,7 +104,7 @@ async function withService(run: (harness: Harness) => Promise<void>): Promise<vo
   const registry = await createKvOAuthTestRegistry(kv);
   const tracer = new RecordingTracer();
   const telemetry = createAuthTelemetry({ tracer, subjectHashSalt: 'test_salt' });
-  await using service = await serveAuthTestService(registry, { telemetry });
+  await using service = await serveAuthTestService(registry, telemetry);
   const backend = registry.resolveBackend();
   await run({
     kv,

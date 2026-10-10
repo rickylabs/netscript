@@ -44,6 +44,10 @@ plaintext tokens are never written.
 - **PKCE and OIDC by default** — every flow uses authorization-code with PKCE S256 and exact state
   validation; OIDC providers add nonce and ID-token validation.
 
+`presetProviderKind(id)` returns the shipped preset's `oauth` or `oidc` protocol kind, or
+`undefined` for a custom provider. Configuration consumers use this same preset data to prevent
+an inherited issuer from triggering discovery for an OAuth preset.
+
 Custom `KvOAuthStore` implementations must provide `getSessionEntry(id)` with the session record and
 its KV versionstamp. This new required method lets refresh and revoke compare against the version
 they actually read; implementations of the earlier store interface need to add it.

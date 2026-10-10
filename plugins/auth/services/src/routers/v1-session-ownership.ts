@@ -157,16 +157,22 @@ export async function recordRevokedSessions(
   }
 }
 
-/** Clears backend cookie state only when the request's own cookie session was just revoked. */
+/**
+ * Clears backend cookie state only when the request's own cookie session was just revoked.
+ *
+ * Returns the backend sign-out response, whose cookie-clearing `Set-Cookie` headers the handler
+ * propagates to the caller; `undefined` when no interactive sign-out ran.
+ */
 export async function endInteractiveSession(
   backend: AuthBackendPort,
   context: AuthServiceContext,
   revoked: readonly AuthSession[],
-): Promise<void> {
-  if (!backend.interactive || !context.request) return;
+): Promise<Response | undefined> {
+  if (!backend.interactive || !context.request) return undefined;
   const request = toRequest(context.request, '/v1/auth/signout', new URLSearchParams());
   const cookieSessionId = await backend.interactive.getSessionId(request);
   if (cookieSessionId && revoked.some((session) => session.id === cookieSessionId)) {
-    await backend.interactive.signOut(request, { revoke: false });
+    return await backend.interactive.signOut(request, { revoke: false });
   }
+  return undefined;
 }

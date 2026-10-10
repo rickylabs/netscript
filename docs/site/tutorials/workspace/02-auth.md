@@ -229,20 +229,37 @@ curl http://localhost:8094/api/v1/auth/session
 curl http://localhost:8094/api/v1/auth/me
 ```
 
-To exercise the full interactive flow on `kv-oauth`, drive the redirect from a browser: open
-`POST /api/v1/auth/signin` (the service issues the provider redirect), authenticate with your
-provider, let it call back to `/api/v1/auth/callback`, then re-check the session with the cookie the
-flow set:
+For the plain-HTTP loopback recipe, set these host environment variables before starting or
+restarting `auth-api`, alongside the provider configuration in Step 4:
 
 ```sh
-# After completing the browser sign-in, the __Host-ns_session cookie is set.
+export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true
+export NETSCRIPT_AUTH_COOKIE_NAME=ns_session_dev
+```
+
+The unprefixed development name lets curl save the cookie on HTTP; clients reject an insecure
+`__Host-` cookie. Remove both overrides and use HTTPS for production.
+
+For the full interactive round trip, follow the
+[cookie-jar signin and callback sequence](/identity-access/how-to/add-authentication/#step-7-verify-a-session).
+`POST /api/v1/auth/signin` returns JSON containing `redirectUrl` and sets the
+transaction cookie. After provider authentication, post its `code` and `state`
+to `POST /api/v1/auth/callback` with that cookie; the callback sets the session
+cookie. The application must bridge a provider's GET redirect to that POST
+endpoint. Both REST and RPC preserve the backend cookie headers.
+
+```sh
+# After callback, cookies.txt contains the session cookie saved with curl -c.
+# No session id in the body or query is needed.
 curl -b cookies.txt http://localhost:8094/api/v1/auth/session
 curl -b cookies.txt http://localhost:8094/api/v1/auth/me
 ```
 
-A successful `GET /api/v1/auth/me` after sign-in returns `{ authenticated: true, user, session }`.
-That round trip is the proof the backend is composed, the migration is applied, and the provider
-credentials are correct.
+Use HTTPS outside explicit insecure local development. A successful
+`GET /api/v1/auth/me` after sign-in returns
+`{ authenticated: true, user, session }`. The callback retains `sessionId` for
+existing bearer consumers, but this cookie flow does not need to pass it by
+hand.
 
 - [ ] `netscript plugin list` shows the `auth` plugin.
 - [ ] `netscript db status` reports the `auth.prisma` migration applied.

@@ -173,7 +173,10 @@ declare function defineSdkClientContribution<TContext extends object>(): <TDescr
   readonly prepare: (options: { readonly context: Readonly<TContext> }) => unknown;
 }>(descriptor: TDescriptor) => TDescriptor;
 declare function createLocaleSdkClientContribution(): unknown;
-declare function createServiceClient(config: unknown): {
+declare function createServiceClient(config: {
+  readonly resolveServiceUrl?: (serviceName: string, protocol: 'http' | 'https') => string | URL;
+  readonly [option: string]: unknown;
+}): {
   readonly get: (input: unknown) => Promise<unknown>;
   readonly getById: (input: unknown) => Promise<unknown>;
 };
@@ -196,6 +199,12 @@ declare function getAllServices(): readonly string[];
 declare function getKvConnection(name?: string): string | undefined;
 declare function getServiceInfo(name: string): unknown;
 declare function getServiceUrl(name: string, protocol?: string): string;
+declare function resolveServiceUrlFromSources(
+  name: string,
+  protocol?: 'http' | 'https',
+  index?: number,
+  sources?: { readonly browserEnv?: Record<string, unknown>; readonly serverEnv?: unknown },
+): string | undefined;
 declare function createQueryCollection(config: {
   readonly resource: string;
   readonly queryKey: readonly string[];

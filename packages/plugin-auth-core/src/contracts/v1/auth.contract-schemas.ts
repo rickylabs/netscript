@@ -68,6 +68,7 @@ export const CallbackInputZodSchema: z.ZodObject<{
   providerId: z.ZodOptional<z.ZodString>;
   code: z.ZodOptional<z.ZodString>;
   state: z.ZodOptional<z.ZodString>;
+  txn: z.ZodOptional<z.ZodString>;
   error: z.ZodOptional<z.ZodString>;
   errorDescription: z.ZodOptional<z.ZodString>;
   redirectTo: z.ZodOptional<z.ZodString>;
@@ -75,6 +76,7 @@ export const CallbackInputZodSchema: z.ZodObject<{
   providerId: z.string().min(1).optional(),
   code: z.string().optional(),
   state: z.string().optional(),
+  txn: z.string().min(1).optional(),
   error: z.string().optional(),
   errorDescription: z.string().optional(),
   redirectTo: z.string().optional(),

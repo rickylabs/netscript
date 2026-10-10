@@ -29,6 +29,7 @@ export {
   type OAuthProviderInput,
   type OAuthSubjectSource,
   type PresetOAuthProviderOptions,
+  presetProviderKind,
   presetSubjectSource,
   type TenantOAuthProviderOptions,
 } from './src/providers.ts';

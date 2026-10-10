@@ -1,4 +1,5 @@
 import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
+import { captureAuthResponseCookies } from '../request-context.ts';
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
 import type {
   CallbackInput,
@@ -125,6 +126,7 @@ export async function signin(
       }, {
         traceContext: audit.traceContext(),
       });
+      captureAuthResponseCookies(response);
       return output;
     } catch (error) {
       const authError = providerFailure(error, input.providerId ?? backend.name);
@@ -172,6 +174,7 @@ export async function callback(
         if (input.providerId) params.set('providerId', input.providerId);
         if (input.code) params.set('code', input.code);
         if (input.state) params.set('state', input.state);
+        if (input.txn) params.set('txn', input.txn);
         const result = await interactive.handleCallback(
           toRequest(context.request, '/v1/auth/callback', params),
         );
@@ -188,6 +191,7 @@ export async function callback(
         });
         await audit.recordSessionIssued(result.sessionId, result.principal.subject);
         void emitCallbackSessionCompleted(backend, result.sessionId, audit.traceContext());
+        captureAuthResponseCookies(result.response);
         return output;
       } catch (error) {
         const authError = providerFailure(error, input.providerId ?? backend.name);
@@ -215,16 +219,17 @@ export async function signout(
         backend,
         principal,
         input,
-        context.request ? toAuthnRequest(context.request) : undefined,
+        context.request ? toAuthnRequest(context.request, undefined, context.cookieName) : undefined,
       );
       const { sessionId } = revocation;
-      await endInteractiveSession(backend, context, revocation.revoked);
+      const signOutResponse = await endInteractiveSession(backend, context, revocation.revoked);
       await audit.setOutcome({
         outcome: AuthOutcome.SUCCESS,
         sessionId,
         subject: principal.subject,
       });
       await recordRevokedSessions(audit, revocation, principal.subject);
+      if (signOutResponse) captureAuthResponseCookies(signOutResponse);
       return { signedOut: true, sessionId, redirectTo: input.redirectTo };
     } catch (error) {
       const authError = providerFailure(error, backend.name);
@@ -296,7 +301,12 @@ export async function session(
     async (audit) => {
       let resolved: AuthSession | undefined;
       try {
-        resolved = await lookupSession(backend, context.request, input?.sessionId);
+        resolved = await lookupSession(
+          backend,
+          context.request,
+          input?.sessionId,
+          context.cookieName,
+        );
       } catch (error) {
         const authError = providerFailure(error, backend.name);
         await recordAuthFailure(audit, authError.message);
@@ -353,7 +363,7 @@ export async function me(context: AuthServiceContext): Promise<MeResponse> {
       : undefined;
     let resolved: AuthSession | undefined;
     try {
-      resolved = await lookupSession(backend, context.request, sessionId);
+      resolved = await lookupSession(backend, context.request, sessionId, context.cookieName);
     } catch (error) {
       const authError = providerFailure(error, backend.name);
       await recordAuthFailure(audit, authError.message);
@@ -395,8 +405,9 @@ async function lookupSession(
   backend: AuthBackendPort,
   serviceRequest: AuthServiceContext['request'],
   sessionId: string | undefined,
+  cookieName: AuthServiceContext['cookieName'],
 ): Promise<AuthSession | undefined> {
-  const request = toAuthnRequest(serviceRequest, sessionId);
+  const request = toAuthnRequest(serviceRequest, sessionId, cookieName);
   return await backend.sessions.getSession({
     sessionId,
     token: readBearerCredential(request),

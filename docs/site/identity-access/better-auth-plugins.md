@@ -169,8 +169,9 @@ authentication, the same as running better-auth without the cookie cache.
 
 The residual window is outside NetScript. better-auth's own `/api/auth/*` endpoints and its client
 helpers still honor a cached `session_data` cookie until `maxAge`. The NetScript signout response
-also does not yet expire the caller's better-auth cookies, because the auth service drops backend
-`Set-Cookie` headers today (tracked in #1385). If your app
+also does not expire the caller's better-auth cookies. The auth service forwards backend
+`Set-Cookie` headers from interactive sign-out flows, but better-auth's `revokeSessions` sets none,
+and better-auth has no interactive sign-out port through which they would arrive. If your app
 reads sessions from better-auth directly for a sensitive decision, pass `disableCookieCache` there
 too, or keep `session.cookieCache.maxAge` short.
 

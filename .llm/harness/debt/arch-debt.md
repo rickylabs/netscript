@@ -1329,14 +1329,16 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   NetScript. Two gaps remain:
   - better-auth's own `/api/auth/*` endpoints and client helpers still accept a revoked session's
     cache cookie until `maxAge`;
-  - the NetScript signout response cannot clear the caller's cache cookies, because the auth
-    service discards backend `Set-Cookie` headers (#1385).
+  - the NetScript signout response does not clear the caller's better-auth cookies. The auth
+    service forwards backend `Set-Cookie` from interactive sign-out flows (#2189), but
+    better-auth's `revokeSessions` sets none, and better-auth has no interactive sign-out port.
 - **Owner:** Auth layer follow-up.
 - **Created:** 2026-10-10.
 - **Status:** open, DEBT_ACCEPTED.
-- **Target:** close with #1385: the auth service forwards backend `Set-Cookie`, and signout
-  expires the caller's better-auth cookies. The cross-device window on better-auth's own endpoints is upstream
-  behavior bounded by `session.cookieCache.maxAge`, and is documented on the better-auth page.
+- **Target:** auth layer follow-up. Signout on better-auth should also return better-auth's own
+  cookie-clearing headers (its `api.signOut` response), carried by the #2189 propagation. The
+  cross-device window on better-auth's own endpoints is upstream behavior bounded by
+  `session.cookieCache.maxAge`, and is documented on the better-auth page.
 - **Gate:** Close when the auth service signout response expires the caller's better-auth
   `session_token` and `session_data` cookies (test against a real instance with the cookie cache
   on), and the better-auth docs still state the upstream `maxAge` window.
