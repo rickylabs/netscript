@@ -349,6 +349,47 @@ together: sign users in with the plugin, then gate individual service routes wit
 {{ comp.xref({ key: "cap:services", text: "Services & contracts" }) }}.
 {{ /comp }}
 
+### Verify sessions from another plugin's service
+
+Another plugin's service does not need the auth backend in order to trust its sessions.
+`createAuthServiceAuthenticator` from `@netscript/plugin-auth/authenticator` returns an
+`AuthenticatorPort` that verifies each request's bearer session by calling the `auth` service's
+typed `session` procedure. The guarded service therefore holds no backend instance, no KV handle,
+and no provider secret. A plugin service declares that guard in its required `auth` posture:
+
+```ts
+// plugins/billing/services/src/main.ts
+import { createPluginService } from '@netscript/plugin/service';
+import { mountPluginContract } from '@netscript/plugin/contract-base';
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
+import { createContractAuthorizer } from '@netscript/service/auth';
+import { billingContractDefinition } from '@netscript/plugin-billing-core/contracts/v1';
+import { billingContractMount, billingRouter } from './handlers.ts';
+
+export const billingService = createPluginService(billingRouter, {
+  name: 'billing',
+  auth: {
+    authn: {
+      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
+    },
+    authz: {
+      authorizer: createContractAuthorizer(
+        mountPluginContract(billingContractDefinition, billingContractMount),
+      ),
+    },
+  },
+});
+```
+
+A missing or rejected session returns `401`, an insufficient scope returns `403`, and an
+unreachable auth service returns `503`. A revoked session is rejected on its next request, because
+the authenticator keeps no principal between requests. `netscript plugin new <name>` generates
+this form. Background callers (workers, sagas, triggers) run under a service identity, not an app
+session. A guarded API they call over HTTP must accept a service credential, for example through
+`createStaticCredentialAuthenticator`. The
+[add-authentication how-to](/identity-access/how-to/add-authentication/#protect-a-plugin-api)
+walks through the posture choices.
+
 ## Database & runtime events
 
 The plugin contributes a package-provided `auth.prisma` schema with four
