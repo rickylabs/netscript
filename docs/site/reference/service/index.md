@@ -69,6 +69,38 @@ The generated `bearerAuth` component uses HTTP bearer authentication. Optional a
 visible in the generated specification even though the current contract authorizer rejects it at
 construction.
 
+## Request-body limit
+
+| Symbol | Signature | Description |
+| --- | --- | --- |
+| `createBodyLimitMiddleware` | `function createBodyLimitMiddleware(options: ServiceBodyLimitOptions): ServiceMiddleware` | Creates middleware that rejects request bodies larger than `maxBytes` with a typed JSON `413` before any handler parses them. Throws `RangeError` unless `maxBytes` is a positive safe integer. |
+| `PAYLOAD_TOO_LARGE_ERROR` | `const PAYLOAD_TOO_LARGE_ERROR: 'PAYLOAD_TOO_LARGE'` | Error code carried by the JSON body of a `413` body-limit rejection. |
+
+The builder form is `createService(...).withBodyLimit({ maxBytes })` and the preset form is
+`defineService(router, { bodyLimit: { maxBytes } })`. A request that declares `Content-Length` is
+rejected from the header. A chunked request is counted as it streams and rejected once it passes
+the limit, so at most `maxBytes` plus one chunk is buffered. The rejection body is a
+`PayloadTooLargeResponse`: `{ error: 'PAYLOAD_TOO_LARGE', message, maxBytes }`. There is no read
+timeout.
+
+### Pipeline order
+
+`defineService` and a builder chain installed in the same order produce this request pipeline:
+
+| Order | Stage | Installed by |
+| --- | --- | --- |
+| 1 | Tracing | always, at construction |
+| 2 | CORS | `withCors()` |
+| 3 | Request logging | `withLogger()` |
+| 4 | Caller middleware, in order | `use()` / `DefineServiceOptions.middleware` |
+| 5 | Authentication, then authorization | `withAuthn()` / `withAuthz()`, installed by `build()` |
+| 6 | Request-body limit | `withBodyLimit()` / `DefineServiceOptions.bodyLimit`, installed by `build()` |
+| 7 | OpenAPI spec, docs, RPC and OpenAPI projections, custom routes | `build()` |
+
+`use()` registers middleware immediately, so builder middleware runs in call order relative to
+`withCors()` and `withLogger()`. It always runs before the stages that `build()` installs. A
+rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
+
 ## Error and routing handlers
 
 | Symbol | Signature | Description |
@@ -81,7 +113,9 @@ construction.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `ServiceConfig` | interface | Service configuration options (input to `createService`). |
-| `DefineServiceOptions` | interface | Options for the `defineService` preset. |
+| `DefineServiceOptions` | interface | Options for the `defineService` preset, including `middleware` (caller middleware after CORS and logging, before auth) and the opt-in `bodyLimit`. |
+| `ServiceBodyLimitOptions` | interface | `{ maxBytes }` request-body limit accepted by `withBodyLimit()` and `DefineServiceOptions.bodyLimit`. |
+| `PayloadTooLargeResponse` | interface | JSON body of a `413` body-limit rejection: `{ error: 'PAYLOAD_TOO_LARGE', message, maxBytes }`. |
 | `ServeOptions` | interface | Options for starting a service listener. |
 | `CorsOptions` | interface | CORS options supported by `withCors()`. |
 | `OpenAPIConfig` | interface | Configuration for OpenAPI spec generation. |
@@ -185,7 +219,7 @@ const app = createService(router, { name: 'orders' })
 
 Contract enforcement is opt-in: existing unguarded services, scaffolds, and standalone
 `createScopeAuthorizer()` consumers are unchanged. It activates only when an application passes a
-`createContractAuthorizer(contract, { fallback? })` result to `.withAuthz()`.
+`createContractAuthorizer(contract, { fallback?, rawRoutes? })` result to `.withAuthz()`.
 
 Contract metadata wins on disagreement. A match-aware fallback, including
 `createScopeAuthorizer()`, is consulted only when a matched procedure has no access metadata. No
@@ -201,6 +235,40 @@ match-aware migration fallback; it is not deprecated.
 `createContractAuthorizer()` throws
 `[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` during
 construction, before any request.
+
+### Raw routes beside a contract router
+
+A request under the guarded prefix that matches no contract procedure is denied with
+`authz.no-contract-procedure`, including raw routes added with `.route(method, path, handler)`.
+Declare each raw route that should be served through the `rawRoutes` option:
+
+```ts
+const authorizer = createContractAuthorizer(OrdersContractV1, {
+  rawRoutes: [{ path: '/api/tools/mcp', authentication: 'required' }],
+});
+
+const app = createService(router, { name: 'orders' })
+  .withRPC()
+  .withAuthn({ authenticator })
+  .withAuthz({ authorizer })
+  .route('all', '/api/tools/mcp', handler)
+  .build();
+```
+
+A declared raw route requires a successfully authenticated principal. This applies even when its path
+is outside `protect` or inside `allowAnonymous`, so a declaration never makes a path public. An
+optional `authorization: { scopes?, roles? }` is enforced like a procedure's declared
+authorization. Matching is exact and case-sensitive, and ignores only a trailing slash. Declaring
+`/api/tools/mcp` covers neither `/api/tools/mcp-admin` nor `/api/tools/mcp/nested`, and every
+undeclared sibling stays denied with `authz.no-contract-procedure`.
+
+Declarations are validated before any request. Construction throws
+`[netscript.service.contract-policy] invalid raw route: <path> ...` for a path that is not absolute,
+a path containing `*`, `:`, `{`, `}`, `?` or `#`, an `authentication` other than `'required'`, or a
+path declared twice. Binding then throws
+`[netscript.service.contract-policy] raw route overlaps the contract projection: <path>` when the
+path falls under an RPC mount or alias or matches a REST procedure path. Binding happens in
+`.build()`.
 
 ### Explicit service posture
 
@@ -237,6 +305,7 @@ assertServiceAuthPolicy(policy);
 | `createTrustedHeaderAuthenticator` | Maps trusted upstream identity headers to principals. |
 | `Principal` | Service-owned identity contract. |
 | `ContractPolicyAuthorizerPort` | Authorizer that binds to the builder's REST/RPC projection paths. |
+| `ContractAuthorizerRawRoute` | Exact, authentication-required raw route declared through `createContractAuthorizer(contract, { rawRoutes })`. |
 
 ## Exports
 
