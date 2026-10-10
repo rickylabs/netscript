@@ -121,6 +121,17 @@ await client.echo(
 );
 ```
 
+### Internal service credential contribution
+
+`createInternalCredentialSdkClientContribution({ service, secret?, allowInsecureTransport? })` sends
+the installation's internal credential for `service` as `Authorization: Bearer …`. Workers, sagas
+and triggers use it to call internal procedures, and session-guarded services that compose the
+internal-credential authenticator, under a service identity instead of an app or user session.
+Without `secret`, it loads `NETSCRIPT_INSTALLATION_SECRET_FILE` once. It derives the bearer once
+per contribution. Procedures declaring `authentication: 'none'` receive no credential. It is
+`direct-only`, so credentialed responses never enter a shared query cache. Non-loopback cleartext
+HTTP is refused unless `allowInsecureTransport` is set.
+
 ## Server-side query factories (`@netscript/sdk/query`)
 
 | Symbol | Kind | Signature / Description |
