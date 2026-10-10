@@ -95,20 +95,35 @@ type WorkosSdkCookieSession = Readonly<{
   }): Promise<WorkosSdkRefreshResult>;
 }>;
 
-/** Creates a single-active auth backend registry for the plugin service. */
+/** Resolved auth backend registry and its service cookie policy. */
+export type AuthServiceBackendRegistry =
+  & ResolvedAuthBackendRegistry
+  & Readonly<{
+    /** Cookie name resolved from the backend's effective environment. */
+    cookieName: string;
+  }>;
+
+/** Creates a single-active auth backend registry and its resolved cookie policy. */
 export async function createAuthServiceBackendRegistry(
   options: CreateAuthServiceBackendRegistryOptions = {},
-): Promise<ResolvedAuthBackendRegistry> {
-  const env = {
+): Promise<AuthServiceBackendRegistry> {
+  const configuredEnv = {
     ...(options.appsettings?.auth?.environment ?? options.appsettings?.Auth?.Environment ?? {}),
     ...(options.env ?? Deno.env.toObject()),
   };
+  const env = {
+    ...configuredEnv,
+    NETSCRIPT_AUTH_COOKIE_NAME: configuredEnv.NETSCRIPT_AUTH_COOKIE_NAME ?? '__Host-ns_session',
+  };
   const activeName = resolveActiveBackendName(env, options.appsettings);
   const backend = await createActiveBackend(activeName, { ...options, env });
-  return createAuthBackendRegistry(
-    new Map<string, AuthBackendPort>([[activeName, backend]]),
-    activeName,
-  );
+  return {
+    ...createAuthBackendRegistry(
+      new Map<string, AuthBackendPort>([[activeName, backend]]),
+      activeName,
+    ),
+    cookieName: env.NETSCRIPT_AUTH_COOKIE_NAME,
+  };
 }
 
 /** Resolve the active backend name from appsettings and `NETSCRIPT_AUTH_BACKEND`. */
