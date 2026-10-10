@@ -1,6 +1,7 @@
 import type { JobConfig } from '@netscript/plugin-workers-core/config';
 import { resolveConfiguredJobPolicies } from './configured-job-policies.ts';
 import { loadWorkersConfig } from './load-workers-config.ts';
+import { parseWorkerResourceMetadata } from '../adapter/resources/resource-metadata.ts';
 import {
   type ProjectFileEntry,
   type ProjectFiles,
@@ -35,7 +36,18 @@ export async function compileWorkersRegistry(
       workers,
     )
     : new Map<string, JobConfig>();
-  const source = renderRegistrySource(registryPath, jobs, policies);
+  const retryPolicies = new Map<string, Partial<JobConfig>>(policies);
+  await Promise.all(jobs.map(async (job) => {
+    if (retryPolicies.has(job.relativePath)) return;
+    const metadata = parseWorkerResourceMetadata(
+      await files.readTextFile(job.relativePath) ?? '',
+      job.relativePath,
+      'job',
+    );
+    if (metadata.maxRetries === undefined) return;
+    retryPolicies.set(job.relativePath, { id: metadata.id, maxRetries: metadata.maxRetries });
+  }));
+  const source = renderRegistrySource(registryPath, jobs, retryPolicies);
   await files.writeTextFile(registryPath, source);
   return Object.freeze({
     registryPath,
@@ -46,7 +58,7 @@ export async function compileWorkersRegistry(
 function renderRegistrySource(
   registryPath: string,
   jobs: readonly ProjectFileEntry[],
-  policies: ReadonlyMap<string, JobConfig>,
+  policies: ReadonlyMap<string, Partial<JobConfig>>,
 ): string {
   const jobId = (path: string): string => policies.get(path)?.id ?? toJobId(path);
   return renderRegistryModule({
