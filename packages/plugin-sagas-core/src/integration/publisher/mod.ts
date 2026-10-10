@@ -7,6 +7,7 @@
 export type { SagaCorrelationKey, SagaMessage, SagaMessageId } from '../../domain/mod.ts';
 export type {
   SagaPublisherBatchMode,
+  SagaPublisherEndpointDiagnostic,
   SagaPublisherPort,
   SagaPublisherPublishManyOptions,
   SagaPublisherPublishOptions,
