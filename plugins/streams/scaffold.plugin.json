@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "name": "@netscript/plugin-streams",
   "version": "0.0.7",
-  "displayName": "Durable Streams",
-  "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
+  "displayName": "Streams (ephemeral by default)",
+  "description": "Ephemeral streams service with restart-proven file storage opt-in via STREAMS_DATA_DIR.",
   "peerDependencies": {
     "@netscript/plugin": "0.0.7"
   },
@@ -16,13 +16,17 @@
     "export": "./scaffold",
     "requiredPermissions": {
       "net": [],
-      "read": ["<workspaceRoot>"],
-      "write": ["<workspaceRoot>"]
+      "read": [
+        "<workspaceRoot>"
+      ],
+      "write": [
+        "<workspaceRoot>"
+      ]
     }
   },
   "provider": {
     "kind": "stream",
-    "displayName": "Durable Streams",
+    "displayName": "Streams (ephemeral by default)",
     "category": "plugin",
     "portRangeKey": "PLUGIN_API",
     "defaultPermissions": [

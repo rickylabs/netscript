@@ -1,38 +1,54 @@
-import { describeStorageDurability } from './durability.ts';
+import { assertEquals, assertRejects } from '@std/assert';
+import { createStorageHealthCheck, describeStorageDurability } from './durability.ts';
 
-function assertEquals<T>(actual: T, expected: T, msg?: string): void {
-  if (actual !== expected) {
-    throw new Error(
-      `Assertion failed${msg ? ` (${msg})` : ''}: expected ${String(expected)}, got ${
-        String(actual)
-      }`,
-    );
-  }
-}
-
-Deno.test('describeStorageDurability: file-backed durable branch', () => {
-  const result = describeStorageDurability('/var/data/streams');
-  assertEquals(result.durable, true);
-  assertEquals(result.dataDir, '/var/data/streams');
-  assertEquals(
-    result.message,
-    'Streams service storage is durable (file-backed at /var/data/streams).',
-  );
+Deno.test('storage: unset is explicitly ephemeral and cannot claim durability', async () => {
+  const info = await describeStorageDurability(undefined);
+  assertEquals(info.mode, 'memory');
+  assertEquals(info.durable, false);
+  assertEquals(info.probe, 'not-applicable');
+  assertEquals((await createStorageHealthCheck(info).check()).storage, info);
 });
 
-Deno.test('describeStorageDurability: in-memory non-durable branch', () => {
-  const resultUndefined = describeStorageDurability(undefined);
-  assertEquals(resultUndefined.durable, false);
-  assertEquals(resultUndefined.dataDir, undefined);
-  assertEquals(
-    resultUndefined.message,
-    'Streams service storage is non-durable (in-memory). Set STREAMS_DATA_DIR=<path> to enable file-backed durable storage.',
-  );
+Deno.test('storage: file mode is reported only after an executed write/read probe', async () => {
+  const dir = await Deno.makeTempDir();
+  try {
+    const info = await describeStorageDurability(dir);
+    assertEquals(info.mode, 'file');
+    assertEquals(info.durable, true);
+    assertEquals(info.probe, 'passed');
+    assertEquals(info.dataDir, dir);
+    assertEquals(Array.from(Deno.readDirSync(dir)), []);
+    const health = await createStorageHealthCheck(info).check();
+    assertEquals(health.storage.mode, 'file');
+    assertEquals(health.storage.dataDir, undefined);
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
 
-  const resultEmpty = describeStorageDurability('   ');
-  assertEquals(resultEmpty.durable, false);
-  assertEquals(
-    resultEmpty.message,
-    'Streams service storage is non-durable (in-memory). Set STREAMS_DATA_DIR=<path> to enable file-backed durable storage.',
-  );
+Deno.test('storage: empty, missing and non-directory opt-ins fail without claiming file mode', async () => {
+  await assertRejects(() => describeStorageDurability('   '));
+  const dir = await Deno.makeTempDir();
+  try {
+    await assertRejects(() => describeStorageDurability(`${dir}/missing`), Deno.errors.NotFound);
+    await Deno.writeTextFile(`${dir}/file`, 'not a directory');
+    await assertRejects(() => describeStorageDurability(`${dir}/file`));
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
+
+Deno.test({
+  name: 'storage: an unwritable directory fails the probe without claiming durability',
+  ignore: Deno.build.os === 'windows' || Deno.uid() === 0,
+  async fn() {
+    const dir = await Deno.makeTempDir();
+    try {
+      await Deno.chmod(dir, 0o500);
+      await assertRejects(() => describeStorageDurability(dir), Deno.errors.PermissionDenied);
+    } finally {
+      await Deno.chmod(dir, 0o700);
+      await Deno.remove(dir);
+    }
+  },
 });

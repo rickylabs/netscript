@@ -1,7 +1,7 @@
 {
   "name": "@netscript/plugin-streams",
   "version": "0.0.7",
-  "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
+  "description": "Ephemeral streams service with restart-proven file storage opt-in via STREAMS_DATA_DIR.",
   "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",

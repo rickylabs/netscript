@@ -36,12 +36,14 @@ const STREAMS_SERVICE_PERMISSIONS = [
  * ```
  */
 export const streamsPlugin: PluginManifest = definePlugin('@netscript/plugin-streams', VERSION)
-  .withDisplayName('Durable Streams')
+  .withDisplayName('Streams (ephemeral by default)')
   .withType('utility')
-  .withDescription('Durable Streams service and tooling for NetScript applications.')
+  .withDescription(
+    'Ephemeral streams service with restart-proven file storage opt-in via STREAMS_DATA_DIR.',
+  )
   .withAuthor('NetScript Team')
   .withLicense('Apache-2.0')
-  .withTags(['streams', 'sse', 'realtime', 'durable', 'tanstack-db'])
+  .withTags(['streams', 'sse', 'realtime', 'durable-streams-protocol', 'tanstack-db'])
   .withPermissions(STREAMS_SERVICE_PERMISSIONS)
   .withService({
     name: 'streams',
@@ -69,8 +71,15 @@ export const streamsPlugin: PluginManifest = definePlugin('@netscript/plugin-str
   .withMetadata({
     repository: 'https://github.com/rickylabs/netscript-start',
     documentation: 'https://netscript.dev/plugins/streams',
+    storage: {
+      defaultMode: 'memory',
+      ephemeral: true,
+      fileOptInEnv: 'STREAMS_DATA_DIR',
+      startupProbe: 'write-read',
+      restartGuarantee: 'orderly-process-restart',
+    },
     features: [
-      'Durable stream HTTP server for development and tests',
+      'Durable Streams protocol HTTP server; memory storage by default',
       'SSE and long-poll consumers',
       'Idempotent producer support',
       'State Protocol entity upsert and delete events',
