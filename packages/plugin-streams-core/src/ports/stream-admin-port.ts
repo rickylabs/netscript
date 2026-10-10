@@ -1,4 +1,8 @@
-import type { StreamDeletionV1, StreamHeadV1 } from '../domain/admin-contract-v1.ts';
+import type {
+  StreamAdminSpanV1,
+  StreamDeletionV1,
+  StreamHeadV1,
+} from '../domain/admin-contract-v1.ts';
 import type { StreamProducerTransportResultV1 } from '../domain/producer-contract-v1.ts';
 
 /** Resolved service request accepted by the administrative transport edge. */
@@ -27,5 +31,5 @@ export interface StreamAdminInstrumentationV1 {
   startAdminSpan(
     streamPath: string,
     operation: 'head' | 'delete',
-  ): import('../domain/admin-contract-v1.ts').StreamAdminSpanV1;
+  ): StreamAdminSpanV1;
 }

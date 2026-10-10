@@ -186,8 +186,10 @@ const sink = createStreamCommandOutboxSink({ id: 'streams', producer });
 ## Stream retention and administration
 
 Set `retention: { kind: 'ttl', ttlSeconds: 604800 }` or an `expires-at` RFC3339 timestamp on
-producer options. Retention applies at creation, expires the whole stream, and is validated before
-IO; reconnecting does not renew it. Without retention, existing behavior is preserved.
+producer options. The policy is validated before IO and sent when creating the whole stream. TTL is
+a sliding inactivity window renewed by reads and appends; HEAD and reopening with PUT do not renew
+it. Use absolute expiry or rotating day segments for a hard bound on an active stream. Absolute
+expiry does not slide. Without retention, existing behavior is preserved.
 
 `headDurableStream(path)` returns metadata or null; `deleteDurableStream(path)` returns true when
 deleted and false when already absent. Both resolve discovery/auth through the existing streams
@@ -195,9 +197,10 @@ service configuration and throw `StreamAdminError` with typed authorization, tim
 or transport failures. Requests default to a 5,000 ms deadline and emit administrative spans. Use
 these helpers in a background worker or scheduled trigger under a service identity.
 
-The `./admin` subpath exports `DurableStreamAdmin` and the versioned administrative port contracts
-for injection. Stop segment producers before deleting their streams. Entity-level producer delete
-only appends a tombstone. Offset trim and server-side listing are not implemented.
+The `./admin` subpath exports only `DurableStreamAdmin` for injection; helpers and versioned
+administrative contracts are exported from the package root. Stop segment producers before deleting
+their streams. Entity-level producer delete only appends a tombstone. Offset trim and server-side
+listing are not implemented.
 
 See the
 [retention how-to](https://rickylabs.github.io/netscript/durable-workflows/how-to/bound-stream-retention/).

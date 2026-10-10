@@ -7,15 +7,19 @@ order: 103
 
 # Bound stream retention
 
-Use create-time stream retention to bound a durable stream without an application session or a
-cleanup sweeper. The streams server expires the whole stream. For existing day-segmented logs, a
-scheduled trigger can enqueue a background worker that deletes known expired segment paths.
+Use absolute expiry or rotating day segments for a hard bound on a durable stream without an
+application session. A TTL is a sliding inactivity window: it expires idle streams, but cannot bound
+a stream that stays active. The streams server expires the whole stream. For existing day-segmented
+logs, a scheduled trigger can enqueue a background worker that deletes known expired segment paths.
 
-## Prefer server TTL or absolute expiry
+## Choose absolute expiry for a hard bound
 
 Declare `retention` on `createServiceStreamProducer` or `createDurableStream` before the stream is
-created. A TTL starts at creation, not at the latest append. It expires the entire stream rather
-than individual events. Omitting retention preserves the existing unbounded server policy.
+created. On the shipped reference server, TTL is a sliding inactivity window renewed by reads and
+appends. HEAD and reopening with PUT do not renew it. A continuously accessed stream can therefore
+live indefinitely. Absolute expiry does not slide and gives a hard deadline even while the stream is
+active. Both policies expire the entire stream rather than individual events. Omitting retention
+preserves the existing unbounded server policy.
 
 ```ts
 import { createServiceStreamProducer, defineStreamSchema } from '@netscript/plugin-streams-core';
@@ -32,7 +36,7 @@ const producer = createServiceStreamProducer({
   streamPath: '/observations/2030-10-01',
   schema,
   producerId: 'observations-service',
-  retention: { kind: 'ttl', ttlSeconds: 7 * 24 * 60 * 60 },
+  retention: { kind: 'expires-at', expiresAt: '2030-10-08T00:00:00Z' },
 });
 await producer.waitUntilReady();
 const receipt = producer.upsert('observations', { id: 'event-1', detail: 'received' });
@@ -40,18 +44,18 @@ await receipt.completion;
 await producer.stop();
 ```
 
-For a calendar-aligned expiry use
-`retention: { kind: 'expires-at', expiresAt: '2030-10-08T00:00:00Z' }` instead. The versioned
+For cleanup after inactivity use `retention: { kind: 'ttl', ttlSeconds: 7 * 24 * 60 * 60 }` instead.
+This is seven days since the latest read or append, not seven days since creation. The versioned
 `StreamRetentionPolicyV1` union makes TTL and expiry mutually exclusive. TTL must be a positive safe
 integer number of seconds; expiry must be a valid RFC3339 timestamp with a timezone. Invalid
 retention throws at producer construction before transport IO.
 
 The transport maps these options through the upstream client's `ttlSeconds` / `expiresAt` to
 `Stream-TTL` / `Stream-Expires-At` on the create PUT. Appends and durable close carry no retention
-headers. Reopening an existing stream does not change its retention or renew its deadline. To change
-policy, rotate to a new segment path. A path singleton rejects conflicting retention options. Stop
-old producers before deleting a segment: a live producer can recreate an absent stream on a later
-reconnect.
+headers. Reopening with PUT preserves the policy and last-access time. Later reads and appends renew
+a TTL, but never move an absolute expiry. To change policy, rotate to a new segment path. A path
+singleton rejects conflicting retention options. Stop old producers before deleting a segment: a
+live producer can recreate an absent stream on a later reconnect.
 
 ## Delete known segments in a background worker
 

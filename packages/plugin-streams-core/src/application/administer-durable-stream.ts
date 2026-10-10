@@ -1,9 +1,16 @@
 import type { StreamHeadV1 } from '../domain/admin-contract-v1.ts';
-import type { StreamProducerTransportFailureV1 } from '../domain/producer-contract-v1.ts';
+import type {
+  StreamProducerTransportFailureV1,
+  StreamProducerTransportResultV1,
+} from '../domain/producer-contract-v1.ts';
 import type { StreamAdminInstrumentationV1, StreamAdminPort } from '../ports/stream-admin-port.ts';
 import { DurableStreamAdmin } from '../adapters/durable-stream-admin.ts';
 import { buildStreamUrl, getStreamsAuth } from './stream-url-resolver.ts';
 import { createStreamsInstrumentation } from '../telemetry/instrumentation.ts';
+
+// Resolve telemetry on first use so hosts can register their provider before administration starts.
+let defaultInstrumentation: StreamAdminInstrumentationV1 | undefined;
+const defaultAdmin: StreamAdminPort = new DurableStreamAdmin();
 
 /** Service-side administrative helper dependencies and bounded request policy. */
 export interface StreamAdminOptionsV1 {
@@ -78,7 +85,7 @@ async function administer<T>(
   request: (
     admin: StreamAdminPort,
     input: Parameters<StreamAdminPort['head']>[0],
-  ) => Promise<import('../domain/producer-contract-v1.ts').StreamProducerTransportResultV1<T>>,
+  ) => Promise<StreamProducerTransportResultV1<T>>,
 ): Promise<T> {
   const requestTimeoutMs = options.requestTimeoutMs ?? 5_000;
   if (!Number.isSafeInteger(requestTimeoutMs) || requestTimeoutMs <= 0) {
@@ -90,12 +97,14 @@ async function administer<T>(
     requestTimeoutMs,
     signal: options.signal,
   };
-  const span = (options.instrumentation ?? createStreamsInstrumentation()).startAdminSpan(
+  const instrumentation = options.instrumentation ??
+    (defaultInstrumentation ??= createStreamsInstrumentation());
+  const span = instrumentation.startAdminSpan(
     path,
     operation,
   );
   try {
-    const result = await request(options.admin ?? new DurableStreamAdmin(), input);
+    const result = await request(options.admin ?? defaultAdmin, input);
     if (!result.ok) throw new StreamAdminError(result.failure);
     span.setStatus({ code: 1 });
     return result.value;

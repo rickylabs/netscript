@@ -15,7 +15,6 @@ const stalePaths: string[] = [];
 export const MCP_EMBEDDED_DOC_PATHS = [
   'llms.txt',
   'pages/durable-workflows/how-to/bound-stream-retention/index.md',
-  'pages/reference/plugin-streams-core/index.md',
   'pages/explanation/contracts/index.md',
   'pages/explanation/plugin-system/index.md',
   'pages/orchestration-runtime/how-to/author-a-plugin/index.md',
@@ -30,8 +29,8 @@ export const MCP_EMBEDDED_DOC_PATHS = [
 ] as const;
 
 /** Maximum UTF-8 source bytes accepted for the generated MCP fallback prose. */
-// Two streams retention documents extend the curated fallback; keep startup allocation bounded.
-export const MCP_EMBEDDED_DOCS_MAX_BYTES = 327_680;
+// Embed the retention recipe alone rather than the entire streams reference page.
+export const MCP_EMBEDDED_DOCS_MAX_BYTES = 294_912;
 
 export const PUBLISH_ASSET_OUTPUTS = [
   '.llm/assets/agent-docs/prose.json.gz',

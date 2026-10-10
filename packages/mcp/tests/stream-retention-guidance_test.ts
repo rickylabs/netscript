@@ -6,6 +6,23 @@ const docsRoot = new URL('../../../docs/site/', import.meta.url).pathname;
 const recipe = 'durable-workflows/how-to/bound-stream-retention';
 const reference = 'reference/plugin-streams-core';
 
+Deno.test('retention guidance distinguishes idle TTL from absolute expiry across the public docs', async () => {
+  const docs = new FilesystemDocsCorpus({ root: docsRoot });
+  for (const slug of [recipe, reference, 'durable-workflows/streams']) {
+    const document = await docs.get(slug);
+    assert(document?.content.includes('sliding inactivity window'), slug);
+    assert(document?.content.includes('Absolute expiry does not slide'), slug);
+    assert(!document?.content.includes('appends do not renew'), slug);
+  }
+  const readme = await Deno.readTextFile(
+    new URL('../../plugin-streams-core/README.md', import.meta.url),
+  );
+  assert(readme.includes('sliding inactivity window'));
+  const guidance = await docs.findGuidance('stream retention');
+  assertEquals(guidance.confidence, 'high');
+  assert(guidance.recommendations.some((entry) => entry.excerpt.includes('hard bound')));
+});
+
 Deno.test('stream retention guidance finds the bounded-stream recipe and typed reference', async () => {
   const docs = new FilesystemDocsCorpus({ root: docsRoot });
   const guidance = await docs.findGuidance('stream retention');
@@ -17,7 +34,7 @@ Deno.test('stream retention guidance finds the bounded-stream recipe and typed r
   ));
   assert(
     guidance.recommendations.flatMap((entry) => entry.code).some((entry) =>
-      entry.code.includes("retention: { kind: 'ttl'")
+      entry.code.includes("retention: { kind: 'expires-at'")
     ),
   );
 });
@@ -46,8 +63,7 @@ Deno.test('standalone MCP ships stream retention guidance without a filesystem c
   const guidance = await docs.findGuidance('stream retention');
   assertEquals(guidance.confidence, 'high');
   assert(guidance.recommendations.some((entry) => entry.slug === `pages/${recipe}`));
-  assert(guidance.recommendations.some((entry) =>
-    entry.slug === `pages/${reference}` &&
-    entry.section === 'bounded-streams-retention-and-trim'
-  ));
+  const document = await docs.get(`pages/${recipe}`);
+  assert(document?.content.includes('sliding inactivity window'));
+  assert(document?.content.includes('absolute expiry'));
 });

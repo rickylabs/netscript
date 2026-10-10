@@ -15,7 +15,6 @@ Deno.test('generated release fallback contains the enumerated intent-guidance do
     'pages/explanation/contracts',
     'pages/explanation/plugin-system',
     'pages/orchestration-runtime/how-to/author-a-plugin',
-    'pages/reference/plugin-streams-core',
     'pages/services-sdk/services',
     'pages/tutorials/live-dashboard/03-sdk-cache-first-query',
     'pages/tutorials/live-dashboard/04-definePage-QueryIsland',

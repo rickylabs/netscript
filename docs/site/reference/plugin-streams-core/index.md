@@ -25,7 +25,7 @@ instances, sessions — into durable topics.
 | Export specifier                                      | Module                   | Exports | Purpose                                                                                                                              |
 | ----------------------------------------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `@netscript/plugin-streams-core`                      | `./mod.ts`               | 62      | Schema definition, the durable producer, endpoint resolution, diagnostics, and the v1 producer port vocabulary (documented below).   |
-| `@netscript/plugin-streams-core/admin`                | `./admin.ts`             | 14      | Whole-stream administrative adapter, helpers, and versioned contracts for background services.                                       |
+| `@netscript/plugin-streams-core/admin`                | `./admin.ts`             | 1       | Upstream whole-stream administrative adapter; helpers and versioned contracts live in the root.                                      |
 | `@netscript/plugin-streams-core/sse`                  | `./src/sse/mod.ts`       | 33      | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. |
 | `@netscript/plugin-streams-core/telemetry`            | `./src/telemetry/mod.ts` | 33      | Telemetry registration, span names, attribute keys, and the meter/counter/gauge ports used by reconnect metrics.                     |
 | `@netscript/plugin-streams-core/testing`              | `./src/testing/mod.ts`   | 4       | An in-memory producer and a small schema fixture for tests that must not open network sockets.                                       |
@@ -146,10 +146,12 @@ const expiry: StreamRetentionPolicyV1 = { kind: 'expires-at', expiresAt: '2030-1
 
 TTL must be a positive safe integer; expiry must be valid RFC3339 with a timezone. Construction
 validates and copies the policy before connecting. The adapter uses the upstream create options
-`ttlSeconds` / `expiresAt`, sending `Stream-TTL` / `Stream-Expires-At` only on PUT. TTL begins at
-creation, expires the whole stream, and does not renew on append or reopen. Omitted retention keeps
-current behavior. Retention participates in singleton compatibility; rotate segment paths to change
-an existing server policy.
+`ttlSeconds` / `expiresAt`, sending `Stream-TTL` / `Stream-Expires-At` only on PUT. On the shipped
+server, TTL is a sliding inactivity window renewed by reads and appends; HEAD and reopening with PUT
+do not renew it. TTL cannot bound a continuously active stream. Use absolute expiry or rotating day
+segments for a hard bound. Absolute expiry does not slide. Both expire the whole stream. Omitted
+retention keeps current behavior. Retention participates in singleton compatibility; rotate segment
+paths to change an existing server policy.
 
 | Symbol                         | Kind       | Description                                                                       |
 | ------------------------------ | ---------- | --------------------------------------------------------------------------------- |
@@ -171,7 +173,10 @@ The port returns the existing `StreamProducerTransportResultV1<T>`. Authorizatio
 transport/server failures are `retryable`, and other client failures are `non-retryable`. Helpers
 throw `StreamAdminError` retaining that failure; absence is a successful `null`/`false` result.
 Requests default to 5,000 ms and perform one attempt, leaving retry policy to background workers.
-Both helpers emit client spans through `StreamsInstrumentation` (`stream.head`, `stream.delete`).
+The shared failure union now includes `unauthorized` and `timeout`; exhaustive consumers must handle
+these new categories. Producer adapters still report retryable request failures as `retryable`;
+`timeout` alone does not opt a custom producer transport into retries. Both helpers emit client
+spans through `StreamsInstrumentation` (`stream.head`, `stream.delete`).
 
 Use these helpers in background workers or triggers under a service identity resolved by
 `buildStreamUrl` and `getStreamsAuth`. The app is an interface and need not remain open.

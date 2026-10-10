@@ -216,9 +216,10 @@ implemented-by interface — the same four members, with `entityType` widened to
 
 Set `retention: { kind: 'ttl', ttlSeconds: 604800 }` or
 `retention: { kind: 'expires-at', expiresAt: '2030-10-08T00:00:00Z' }` on a producer before creating
-its stream. The server expires the whole stream at the creation-time deadline; appends do not renew
-it and reopening an existing stream does not change its policy. Omit retention for the current
-unbounded behavior. For existing day segments, `headDurableStream` reads metadata and
+its stream. On the shipped server, TTL is a sliding inactivity window renewed by reads and appends;
+HEAD and reopening with PUT do not renew it or change the policy. Use absolute expiry or rotating
+day segments for a hard bound on an active stream. Absolute expiry does not slide. Both policies
+expire the whole stream. Omit retention for the current unbounded behavior. For existing day segments, `headDurableStream` reads metadata and
 `deleteDurableStream` deletes the whole stream through a versioned administrative port.
 
 Run deletion from background workers or triggers with a service identity, independently of any app

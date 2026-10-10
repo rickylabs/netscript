@@ -1,4 +1,7 @@
-/** Retention applied by the server when a producer creates a stream. */
+/**
+ * Retention policy sent when a producer creates a stream.
+ * The shipped server renews a TTL on reads and appends; absolute expiry is a hard deadline.
+ */
 export type StreamRetentionPolicyV1 =
   | Readonly<{ kind: 'ttl'; ttlSeconds: number }>
   | Readonly<{ kind: 'expires-at'; expiresAt: string }>;
