@@ -48,7 +48,7 @@ const FIXTURE_DOCS_GENERATOR: AgentDocsGenerator = {
     }),
 };
 
-Deno.test('agent init writes canonical skills, Claude mirrors, and marked AGENTS idempotently', async () => {
+Deno.test('agent init writes canonical skills, Claude bridge, and marked AGENTS idempotently', async () => {
   const root = await Deno.makeTempDir();
   try {
     const fs = new DenoAgentInitFileSystem();
@@ -87,8 +87,8 @@ Deno.test('agent init writes canonical skills, Claude mirrors, and marked AGENTS
       'NetScript',
     );
     assertStringIncludes(
-      await Deno.readTextFile(join(root, '.claude/skills/netscript/SKILL.md')),
-      'NetScript',
+      await Deno.readTextFile(join(root, '.claude/skills/repo-skills/SKILL.md')),
+      '.agents/skills/',
     );
     assertStringIncludes(
       await Deno.readTextFile(join(root, 'AGENTS.md')),
@@ -105,7 +105,7 @@ Deno.test('agent init writes canonical skills, Claude mirrors, and marked AGENTS
     );
     for (const skill of ['netscript', 'netscript-build']) {
       assertStringIncludes(
-        await Deno.readTextFile(join(root, `.claude/skills/${skill}/SKILL.md`)),
+        await Deno.readTextFile(join(root, `.agents/skills/${skill}/SKILL.md`)),
         'find_guidance',
       );
     }
@@ -177,7 +177,7 @@ Deno.test('#1672 root guidance teaches Deno inspection before implementation', a
   }
 });
 
-Deno.test('#1675 installs canonical skills and derives Claude mirrors', async () => {
+Deno.test('#1675 installs canonical skills and a Claude discovery bridge', async () => {
   const allRoot = await Deno.makeTempDir();
   const nonClaudeRoot = await Deno.makeTempDir();
   try {
@@ -191,8 +191,8 @@ Deno.test('#1675 installs canonical skills and derives Claude mirrors', async ()
     };
     for (const path of manifest.files.filter((path) => path !== 'manifest.json')) {
       const canonical = await Deno.readTextFile(join(allRoot, '.agents', 'skills', path));
-      const claude = await Deno.readTextFile(join(allRoot, '.claude', 'skills', path));
-      assertEquals(claude, canonical, `Claude mirror diverged at ${path}`);
+      assertEquals(canonical, EMBEDDED_SKILL_FILES[path], `Canonical skill diverged at ${path}`);
+      assertFalse(await fs.exists(join(allRoot, '.claude', 'skills', path)));
     }
 
     await initAgent({ projectRoot: nonClaudeRoot, host: 'vscode' }, {
@@ -460,7 +460,7 @@ Deno.test('installed skill routing resolves to installed skills or help', async 
     };
     const installed = new Set([...manifest.skills, 'help.md']);
     for (const skill of manifest.skills) {
-      const installedPath = join(root, '.claude/skills', skill, 'SKILL.md');
+      const installedPath = join(root, '.agents/skills', skill, 'SKILL.md');
       assert(await fs.exists(installedPath), `${skill} was not installed`);
       const text = await Deno.readTextFile(installedPath);
       for (
@@ -510,9 +510,10 @@ Deno.test('aspire delegation installs four workflow skills without changing cano
           await Deno.readTextFile(join(projectRoot, '.agents/skills/aspire/SKILL.md')),
         );
         for (const skill of ASPIRE_WORKFLOW_SKILLS) {
-          for (const location of ['.agents/skills', '.claude/skills']) {
-            await fs.writeText(join(projectRoot, location, skill, 'SKILL.md'), `# ${skill}\n`);
-          }
+          await fs.writeText(
+            join(projectRoot, '.agents/skills', skill, 'SKILL.md'),
+            `# ${skill}\n`,
+          );
         }
         return { ok: true };
       },
@@ -532,7 +533,7 @@ Deno.test('aspire delegation installs four workflow skills without changing cano
     );
     for (const skill of ASPIRE_WORKFLOW_SKILLS) {
       assert(await fs.exists(join(root, '.agents', 'skills', skill, 'SKILL.md')));
-      assert(await fs.exists(join(root, '.claude', 'skills', skill, 'SKILL.md')));
+      assertFalse(await fs.exists(join(root, '.claude', 'skills', skill, 'SKILL.md')));
     }
     assertEquals(second.changedFiles, []);
     assertEquals(second.messages, []);
@@ -614,7 +615,7 @@ Deno.test('agent init installs the complete diagnostic surface', async () => {
     for (const path of ['aspire/SKILL.md', 'deno/SKILL.md', 'help.md']) {
       assert(
         await new DenoAgentInitFileSystem().exists(
-          join(root, '.claude', 'skills', path),
+          join(root, '.agents', 'skills', path),
         ),
       );
     }
@@ -628,7 +629,7 @@ Deno.test('agent init installs the complete diagnostic surface', async () => {
     const dangling = new Set<string>();
     for (const path of routingPaths) {
       const markdown = await Deno.readTextFile(
-        join(root, '.claude', 'skills', path),
+        join(root, '.agents', 'skills', path),
       );
       for (const reference of extractSkillReferences(markdown)) {
         referenced.add(reference);
@@ -682,7 +683,7 @@ Deno.test('agent init installs the consumer tool surface for every host', async 
       join(root, 'AGENTS.md'),
       ...Object.keys(EMBEDDED_SKILL_FILES)
         .filter((path) => path.endsWith('.md'))
-        .map((path) => join(root, '.claude', 'skills', path)),
+        .map((path) => join(root, '.agents', 'skills', path)),
       join(root, '.llm', 'tools', 'README.md'),
     ];
     for (const referenceFile of referenceFiles) {
@@ -1017,7 +1018,10 @@ Deno.test('#2007 OpenCode host writes opencode.json and merges an existing one i
       environment: { OPENCODE: '1' },
     });
     assertEquals(fresh.hosts, ['opencode']);
-    assertEquals(describeAgentInitResolution(fresh.resolution)[0], 'Agent hosts: opencode (from environment: OPENCODE).');
+    assertEquals(
+      describeAgentInitResolution(fresh.resolution)[0],
+      'Agent hosts: opencode (from environment: OPENCODE).',
+    );
     const config = JSON.parse(await Deno.readTextFile(join(freshRoot, 'opencode.json')));
     assertEquals(config.mcp.netscript.type, 'local');
     assertEquals(config.mcp.netscript.command, [

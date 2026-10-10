@@ -133,6 +133,8 @@ export const TEMPLATE_KEYS = {
   workspaceGitignore: 'workspace/gitignore.template',
   workspacePluginsMod: 'workspace/plugins/mod.ts.template',
   agentGuidance: 'agent/guidance.md.template',
+  agentClaudeGuidance: 'agent/claude.md.template',
+  agentClaudeSkillBridge: 'agent/repo-skills.md.template',
 } as const;
 
 export type TemplateKey = typeof TEMPLATE_KEYS[keyof typeof TEMPLATE_KEYS];

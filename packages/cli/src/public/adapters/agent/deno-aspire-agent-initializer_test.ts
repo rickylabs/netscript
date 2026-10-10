@@ -2,7 +2,7 @@ import { assertEquals } from '@std/assert';
 import { ASPIRE_WORKFLOW_SKILLS } from '../../features/agent/init/aspire-agent-initializer.ts';
 import { aspireAgentInitArgs } from './deno-aspire-agent-initializer.ts';
 
-Deno.test('Aspire agent init selects only the four non-colliding workflow skills', () => {
+Deno.test('#2008 Aspire agent init selects only the standard location and four non-colliding workflow skills', () => {
   const args = aspireAgentInitArgs('/workspace/project');
   assertEquals(args, [
     'agent',
@@ -12,7 +12,7 @@ Deno.test('Aspire agent init selects only the four non-colliding workflow skills
     '--workspace-root',
     '/workspace/project',
     '--skill-locations',
-    'standard,claudecode',
+    'standard',
     '--skills',
     'aspire-init,aspire-orchestration,aspire-monitoring,aspire-deployment',
   ]);
