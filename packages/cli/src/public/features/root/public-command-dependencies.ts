@@ -69,6 +69,7 @@ import { FetchAuthSessionHttp } from '../plugins/auth/auth-session-client.ts';
 import type { AuthSessionHttpPort } from '../plugins/auth/auth-types.ts';
 import { generateAspire } from '../generate/aspire/generate-aspire.ts';
 import { AspireAppHostDoctorInspector } from '../../../kernel/adapters/aspire/apphost-doctor-inspector.ts';
+import { DockerCliTopologyInspector } from '../../../kernel/adapters/aspire/docker-topology-inspector.ts';
 import { fetchJsrExportMap } from '../../infra/jsr/fetch-jsr-export-map.ts';
 import { resolveUiAppRoot as resolveUiAppRootFromWorkspace } from '../../../kernel/application/ui/resolve-ui-app-root.ts';
 import type { UiAppRootResolver } from '../../presentation/support.ts';
@@ -364,6 +365,7 @@ export function createPublicCommandDependencies(
           process,
           loadJsrExportMap: fetchJsrExportMap,
           inspectAppHost: new AspireAppHostDoctorInspector(process),
+          inspectDockerTopology: new DockerCliTopologyInspector(process),
           inspectRuntimeRegistries: generatePluginRegistries,
         }),
     },
