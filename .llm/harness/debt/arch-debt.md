@@ -2730,3 +2730,17 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
   `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
   green. `arch:check` currently exits zero with these size warnings.
+
+## plugins/sagas — SAGAS-WORKER-DISPATCH-FIXTURE
+
+- **ID:** `SAGAS-WORKER-DISPATCH-FIXTURE`
+- **Reason:** The PostgreSQL publish-process test fixture imports the workers dispatcher, pool
+  factory, and dispatch context across plugin internals to prove real durable worker execution. The
+  public `@netscript/plugin-workers/worker` exports Worker and WorkerPoolOptions, but does not
+  expose these three seams; workers-core exports primitives rather than this plugin dispatcher.
+- **Owner:** Workers runtime maintainers.
+- **Target:** Next workers runtime testing-contract review.
+- **Status:** open, test-only coupling accepted for PR #2213.
+- **Exit condition:** Replace these imports with a supported public execution/testing contract that
+  preserves the physical PostgreSQL effect and durable duplicate-execution proof.
+- **Gate:** Real HTTP/PostgreSQL publish-process conformance and worker idempotency assertions.
