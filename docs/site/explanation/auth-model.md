@@ -159,8 +159,8 @@ the same fact: this backend does not own sign-in.
 The unifying plugin [`@netscript/plugin-auth`](/capabilities/auth/) composes **exactly one** active
 backend. It reads `NETSCRIPT_AUTH_BACKEND` (or `auth.backend` in appsettings), resolves it through a
 registry — valid values `kv-oauth` | `workos` | `better-auth`, **default `kv-oauth`** — and serves
-the `auth-api` oRPC service on **:8094** with five endpoints under `/api/v1/auth/`:
-`signin`, `callback`, `signout`, `session`, `me`.
+the `auth-api` oRPC service on **:8094** with six endpoints under `/api/v1/auth/`:
+`signin`, `callback`, `signout`, `sessions/revoke`, `session`, `me`.
 
 ```text
                     NETSCRIPT_AUTH_BACKEND  (default: kv-oauth)

@@ -297,3 +297,32 @@ Deno.test('the gate exits non-zero when a streams factory re-introduces the fall
   const green = await runGateOnStreamsFactory('  const baseUrl = options.baseUrl;');
   assertEquals(green.code, 0, green.stdout);
 });
+
+Deno.test('rejects Garnet executable literal argv ports in generator and emitted helpers', () => {
+  const paths = [INFRASTRUCTURE, 'fixture/aspire/.helpers/register-infrastructure.mts'];
+  const argv = [
+    "['tool', 'run', 'garnet-server', '--port', '6379']",
+    "['tool', 'run', 'garnet-server', '--port', '${CACHE_DEFAULT_PORT}']",
+    "['tool', 'run', 'garnet-server', '--port',\n '6379']",
+  ];
+  for (const path of paths) {
+    for (const text of argv) {
+      const result = scanContent(path, text);
+      assertEquals(result.findings.length, 1, text);
+      assert(result.findings[0].message.includes('TargetPort'));
+    }
+  }
+});
+
+Deno.test('accepts allocated Garnet executable arguments and container-internal ports', () => {
+  const result = scanContent(
+    INFRASTRUCTURE,
+    [
+      "['tool', 'run', 'garnet-server']",
+      "await args.add('--port');",
+      'await args.add(endpoint.property(EndpointProperty.TargetPort));',
+      "withEndpoint({ name: 'tcp', targetPort: 6379, scheme: 'tcp' })",
+    ].join('\n'),
+  );
+  assertEquals(result.findings, []);
+});

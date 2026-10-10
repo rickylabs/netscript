@@ -123,6 +123,9 @@ export interface QueryCollectionOptions<TItem extends object> {
  * import { createQueryCollection } from '@netscript/sdk/collections';
  * import { getIslandQueryClient } from '@netscript/fresh/query';
  *
+ * interface Order { id: string; total: number }
+ * declare const ordersClient: { list(input: { page: number; limit: number }): Promise<Order[]> };
+ *
  * const ordersCollection = createQueryCollection({
  *   resource: 'orders',
  *   queryKey: ['orders', 'list'],
