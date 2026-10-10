@@ -694,6 +694,7 @@ packages/mcp/src/domain/telemetry-endpoint.ts	mcp:client	S3/S11/S13	Aspire CLI/d
 packages/mcp/src/domain/tool-contracts.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-ps-dashboard-reader.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/appsettings-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-command.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
@@ -774,8 +775,10 @@ packages/telemetry/tests/layering_test.ts	telemetry-bridge	S3	dashboard /api/tel
 packages/telemetry/tests/query/aspire_query_test.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
 plugins/ai/README.md	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/README.md	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/auth/services/src/backend-registry.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/src/adapter/resources/barrel/barrel.stub.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/src/adapter/resources/resources.test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/auth/src/constants.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/sagas/deno.json	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/README.md	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
@@ -813,6 +816,7 @@ plugins/triggers/src/adapter/resources/resources.test.ts	plugin:other	S5	contrib
 plugins/triggers/src/aspire/mod.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/triggers/src/aspire/triggers-contribution.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/triggers/src/cli/http-triggers-service.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/triggers/src/constants.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/src/public/mod.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/src/runtime/trigger-processor.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/tests/aspire/aspire_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port

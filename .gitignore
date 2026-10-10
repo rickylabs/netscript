@@ -24,3 +24,6 @@ dist/
 # .ds-sync/bundle after each build, never commit.
 resources/design/dashboard/_ns_runtime.js
 resources/design/dashboard/_ns_styles.css
+
+# Vite writes transient bundled configs next to vite.config.ts during browser runs (machine-specific paths)
+**/vite.config.ts.timestamp-*.mjs
