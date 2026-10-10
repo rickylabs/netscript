@@ -67,6 +67,19 @@ The plugin owns its setup — the CLI ships no embedded templates. The scaffolde
 service, the auth database schema, session streams, and Aspire resources into your workspace, then
 pins the matching `@netscript/*` versions.
 
+By default Aspire allocates the `auth-api` host port at every start. An OAuth callback registered
+with an identity provider must keep its port, so pin it when you use the interactive `kv-oauth`
+backend:
+
+```bash
+netscript plugin install auth --name auth --port 7100
+```
+
+`--port` writes `HostPort` on the plugin's `appsettings.json` entry; `netscript plugin update` and a
+forced re-install without `--port` keep it. A pinned host port is a machine-global reservation, so
+`aspire start --isolated` cannot randomise it and two workspaces pinning the same port collide. See
+[Add authentication](https://rickylabs.github.io/netscript/how-to/add-authentication/).
+
 To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
 ```bash
@@ -82,7 +95,7 @@ Install the plugin:
 
 ```bash
 $ netscript plugin install auth --name auth
-Installed auth plugin "auth" on port <allocated-port>.
+Installed auth plugin "auth". View its endpoint in the Aspire dashboard.
 Created 1 plugin files.
 Regenerated 12 Aspire helper files.
 ```
