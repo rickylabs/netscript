@@ -33,8 +33,13 @@ name: e2e-cli
 # triggers the workflow immediately. Version tags and manual dispatch run the
 # complete release-grade suite.
 #
-# Queue policy: the docker and sqlite runtime tiers remain separate repo-wide
-# mutexes because they contend for host resources. Each group uses GitHub's
+# Queue policy (v3, 0.0.8 run #2103, owner-approved): each tier is keyed per PR
+# (`github.event.pull_request.number`, falling back to `github.ref` for push, tag
+# and dispatch runs). Every tier job runs on its own GitHub-hosted VM, so separate
+# PRs do not contend for host resources. A repo-wide mutex only serialized
+# independent PRs (one ~30-minute Postgres run at a time across the repository).
+# Within one PR, the workflow-level per-ref group still cancels superseded runs.
+# The historical notes below describe the earlier repo-wide v1/v2 mutexes: Each group uses GitHub's
 # bounded `queue: max` admission (one running plus up to 100 pending) rather
 # than the default single pending entry, which replaces and cancels overflow.
 # A deferred job therefore stays visibly pending and resumes on the same run
@@ -295,7 +300,7 @@ jobs:
     name: scaffold-runtime (aspire + docker + postgres)
     needs: classify
     concurrency:
-      group: e2e-scaffold-runtime-global-v2
+      group: e2e-scaffold-runtime-v3-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: false
       queue: max
     # Applicable only after release/manual/PR opt-in. `ci:skip-e2e` can
@@ -384,7 +389,7 @@ jobs:
     name: scaffold-runtime-sqlite (aspire + sqlite + garnet)
     needs: classify
     concurrency:
-      group: e2e-scaffold-runtime-sqlite-global-v2
+      group: e2e-scaffold-runtime-sqlite-v3-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: false
       queue: max
     # Applicable only after release/manual/PR opt-in. The sqlite runtime follows
