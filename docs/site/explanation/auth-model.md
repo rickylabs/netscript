@@ -159,8 +159,8 @@ the same fact: this backend does not own sign-in.
 The unifying plugin [`@netscript/plugin-auth`](/capabilities/auth/) composes **exactly one** active
 backend. It reads `NETSCRIPT_AUTH_BACKEND` (or `auth.backend` in appsettings), resolves it through a
 registry — valid values `kv-oauth` | `workos` | `better-auth`, **default `kv-oauth`** — and serves
-the `auth-api` oRPC service on **:8094** with five endpoints under `/api/v1/auth/`:
-`signin`, `callback`, `signout`, `session`, `me`.
+the `auth-api` oRPC service on **:8094** with six endpoints under `/api/v1/auth/`:
+`signin`, `callback`, `signout`, `sessions/revoke`, `session`, `me`.
 
 ```text
                     NETSCRIPT_AUTH_BACKEND  (default: kv-oauth)
@@ -246,5 +246,24 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
 - **Reference:** the neutral authentication contract lives in
   [`reference/service/`](/reference/service/) (the `/auth` subpath: `Principal`, `AuthnResult`,
   `AuthenticatorPort`).
+
+## Generated browser topology
+
+The generated Fresh app uses a backend for frontend (BFF). Installing auth emits
+app-origin signin, callback, session, and signout routes backed by the existing
+auth plugin. The first-party HttpOnly cookie carries the opaque session
+credential. The app reads it only on the server and supplies it to the SDK
+bearer contribution for each guarded service call; the service verifies the
+bearer through the remote auth authenticator. Browser JSON excludes session
+credentials, and credentialed calls use direct-only caching.
+
+The generated demo procedures declare `access: { authentication: 'none' }` and
+remain public on REST and RPC. The generated service policy also leaves
+`/api/openapi.json` and `/api/docs` public for discovery; other API routes require
+a bearer and a contract authorization decision. Authored policies and routes remain authoritative. Background
+processing belongs to workers, sagas, and triggers using service identities. See
+[Add authentication](/identity-access/how-to/add-authentication/) for the
+generated route and client recipe, local cookie behavior, and deployment
+limitations.
 
 {{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next: { label: "Durability model", href: "/explanation/durability-model/" } }) }}

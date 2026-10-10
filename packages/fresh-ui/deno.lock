@@ -3773,7 +3773,8 @@
     "dependencies": [
       "jsr:@std/assert@1",
       "jsr:@std/path@1",
-      "jsr:@std/semver@1"
+      "jsr:@std/semver@1",
+      "jsr:@std/testing@1"
     ],
     "members": {
       "packages/ai": {
@@ -4001,6 +4002,7 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
+          "jsr:@std/semver@1",
           "npm:@orpc/contract@^1.15.0",
           "npm:@orpc/server@^1.15.0",
           "npm:zod@^4.4.3"
@@ -4160,6 +4162,7 @@
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
           "jsr:@netscript/database@0.0.7",
+          "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
@@ -4236,6 +4239,7 @@
       "plugins/sagas": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-sagas-core@0.0.7",
@@ -4282,6 +4286,7 @@
       "plugins/triggers": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/config@0.0.7",
           "jsr:@netscript/contracts@0.0.7",
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
@@ -4329,7 +4334,8 @@
             "npm:@orpc/openapi@^1.15.0",
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
-            "npm:@tanstack/db@0.6.17"
+            "npm:@tanstack/db@0.6.17",
+            "npm:@tanstack/react-db@0.1.95"
           ]
         }
       }

@@ -25,3 +25,5 @@ deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- -
 "$provider_bin/psql" -h "$COMMAND_POSTGRES_SOCKET" -d postgres -v ON_ERROR_STOP=1 -f "$repo_root/packages/plugin-sagas-core/tests/fixtures/transition-store/command-replay-migration.sql" >> "$provider_run/saga-migrate.log" 2>&1
 deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --unstable-kv --allow-all packages/plugin-sagas-core/tests/prisma-transition-postgres_test.ts
 deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --unstable-kv --allow-all packages/plugin-sagas-core/tests/saga-relay-cohort_test.ts
+
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --unstable-kv --allow-all plugins/sagas/tests/runtime/publish-process-postgres_test.ts

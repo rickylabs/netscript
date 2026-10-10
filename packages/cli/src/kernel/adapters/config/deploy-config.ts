@@ -19,6 +19,7 @@ import { DEFAULT_DEPLOY_OUTPUT_DIR } from '../../constants/runtime.ts';
 import { ConfigInvalidError, ConfigNotFoundError } from '../../domain/errors.ts';
 import { detectInfrastructure, type RawInfrastructureEntries } from './infrastructure.ts';
 import { loadRegisteredPlugins } from './plugin-registry.ts';
+import { isPluginCompositionFailure } from '../../application/plugin/plugin-composition.ts';
 import type { ResolvedConfig } from '../../domain/resolved-config.ts';
 import { loadProjectConfig } from './project-config-loader.ts';
 import { DenoProcess } from '../runtime/process/deno-process.ts';
@@ -139,6 +140,7 @@ export async function loadDeployConfig(options?: LoadDeployConfigOptions): Promi
     loadAppSettings(projectRoot),
     discoverWorkspace(projectRoot).catch(() => undefined),
     loadRegisteredPlugins(projectRoot, netscriptConfig).catch((error: unknown) => {
+      if (isPluginCompositionFailure(error)) throw error;
       if (!options?.quiet) {
         outputWarning(
           `[cli] Warning: failed to load configured plugins: ${(error as Error).message}`,

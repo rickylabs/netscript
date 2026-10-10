@@ -66,3 +66,17 @@ export type {
   StreamStandardSchema,
   StreamStateDefinition,
 } from './src/public/mod.ts';
+
+export { deleteDurableStream, headDurableStream, StreamAdminError } from './src/public/mod.ts';
+export type {
+  StreamAdminInputV1,
+  StreamAdminInstrumentationV1,
+  StreamAdminOptionsV1,
+  StreamAdminPort,
+  StreamAdminSpanV1,
+  StreamDeletionV1,
+  StreamHeadV1,
+  StreamRetentionPolicyV1,
+} from './src/public/mod.ts';
+
+export type { StreamCollection, StreamDBFactory } from './src/domain/stream-collection.ts';

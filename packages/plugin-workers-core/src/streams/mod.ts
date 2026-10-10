@@ -28,3 +28,16 @@ export type {
   WorkerStreamEntitySchema,
   WorkerStreamStandardSchema,
 } from './schema.ts';
+
+export type { WorkerStreamEntities } from './producer.ts';
+export type {
+  CollectionDefinition,
+  CollectionEventHelpers,
+  CollectionWithHelpers,
+  StateSchema,
+  StreamSchemaIssue,
+  StreamSchemaValidationOptions,
+  StreamSchemaValidationResult,
+  StreamStandardSchema,
+  StreamStateDefinition,
+} from '@netscript/plugin-streams-core';

@@ -1,3 +1,4 @@
+import { AGENT_DOCS_PAGE_CARRIER, readAgentDocsPages } from './agent-docs-page-carrier.ts';
 /** Guards genuinely textual documentation policy against surface drift. */
 
 import { resolve } from '@std/path';
@@ -406,7 +407,7 @@ export async function runAccuracyCheck(): Promise<void> {
   const goldenPathDocs = await checkGoldenPathDocs();
   const shippedCorpus = await readShippedAgentDocsCorpus();
   for (const [path, content] of Object.entries(shippedCorpus.files)) {
-    checkForbiddenGoldenPathTerms(content, `.llm/assets/agent-docs/prose.json.gz:${path}`);
+    checkForbiddenGoldenPathTerms(content, `${AGENT_DOCS_PAGE_CARRIER}:${path}`);
   }
   checkMutationMapColumns(cliReference);
 
@@ -435,15 +436,13 @@ async function readShippedAgentDocsCorpus(): Promise<{
   readonly schemaVersion: 1;
   readonly files: Readonly<Record<string, string>>;
 }> {
-  const compressed = await Deno.readFile(
-    new URL('.llm/assets/agent-docs/prose.json.gz', root),
-  );
-  const copied = new Uint8Array(compressed.byteLength);
-  copied.set(compressed);
-  const stream = new Blob([copied.buffer]).stream().pipeThrough(
-    new DecompressionStream('gzip'),
-  );
-  return JSON.parse(await new Response(stream).text());
+  const provenance = JSON.parse(await read('.llm/assets/agent-docs/provenance.json')) as {
+    version: string;
+  };
+  return {
+    schemaVersion: 1,
+    files: await readAgentDocsPages(new URL(AGENT_DOCS_PAGE_CARRIER, root), provenance.version),
+  };
 }
 
 /** Materialize the live public CLI registry through its recursive catalog adapter. */

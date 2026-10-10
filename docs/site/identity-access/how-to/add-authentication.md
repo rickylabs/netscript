@@ -11,7 +11,7 @@ oldUrl: /how-to/add-authentication/
 **Scope.** This recipe adds sign-in, sessions, and a `/me` identity endpoint to an existing
 NetScript workspace by installing the official **`auth`** plugin. You will choose an
 authentication backend, set the backend's environment, run the auth database migration, and
-verify a live session through the `auth-api` service on **`:8094`**. By the end you have a
+verify a live session through the generated Fresh app on its Aspire-discovered origin. By the end you have a
 working OAuth/OIDC sign-in flow on the default backend (`kv-oauth`) and a clear picture of what
 the two non-interactive backends (`workos`, `better-auth`) do and do not provide.
 
@@ -294,7 +294,7 @@ architecture behind this, read [the authentication model](/explanation/auth-mode
 ## Step 6 — Start the service and the auth endpoints
 
 With Aspire running, the `auth-api` service answers on host port **8094** (pinned in Step 1) and
-mounts five endpoints under the
+mounts six endpoints under the
 public REST prefix **`/api/v1/auth/*`** (the oRPC surface is mirrored at `/api/rpc/v1/auth/*`):
 
 {{ comp.apiTable({
@@ -302,7 +302,8 @@ caption: "auth-api endpoints (:8094, /api/v1/auth/*)",
 rows: [
 { name: "POST /api/v1/auth/signin", type: "interactive only", desc: "Begin the OAuth/OIDC redirect flow. Live on kv-oauth; returns AUTH_PROVIDER_ERROR on workos/better-auth." },
 { name: "POST /api/v1/auth/callback", type: "interactive only", desc: "Complete the provider redirect, mint a session. Live on kv-oauth; AUTH_PROVIDER_ERROR on the others." },
-{ name: "POST /api/v1/auth/signout", type: "session", desc: "On kv-oauth, revoke the current session and emit its session-clearing Set-Cookie." },
+{ name: "POST /api/v1/auth/signout", type: "session", desc: "End the caller's own session. Needs the session cookie or a bearer credential (401 otherwise); everywhere: true ends all of the caller's sessions. On kv-oauth the response carries the session-clearing Set-Cookie." },
+{ name: "POST /api/v1/auth/sessions/revoke", type: "operator", desc: "Revoke any session by id. Needs a credential holding the auth:sessions:revoke scope (403 otherwise)." },
 { name: "GET /api/v1/auth/session", type: "session", desc: "Return the current session if one is present and valid. Works on all backends." },
 { name: "GET /api/v1/auth/me", type: "identity", desc: "Return the authenticated principal (the resolved user). Works on all backends." }
 ]
@@ -312,7 +313,71 @@ The service also exposes liveness/readiness probes at `/health/live` and `/healt
 OpenAPI docs, through the standard `@netscript/service` builder. Watch it come up in the Aspire
 dashboard at [https://localhost:18888](https://localhost:18888) under the `auth-api` resource.
 
-## Step 7 — Verify a session
+## Step 7 — Sign in through the generated app
+
+Installing auth into a generated Fresh workspace emits `auth/bff.ts`,
+`auth/service.ts`, and `apps/<app>/routes/auth/[action].ts`. Helper regeneration
+also wires newly added services to the same auth resource. Register the provider
+callback URI as `<app-origin>/auth/callback`, using the app endpoint reported by
+Aspire. No fixed app port is required.
+
+Submit a same-origin HTML form with `method="post"` and `action="/auth/signin"`.
+The app forwards the signin operation to the existing auth plugin and follows
+its provider authorization redirect. The provider returns to the app's GET
+`/auth/callback` route, which submits the code, state, and transaction cookie as
+typed callback input to the plugin. The app response sets the first-party
+HttpOnly session cookie and redirects to the app. GET `/auth/session` then
+returns `authenticated` and `subject`, without exposing the session id. POST
+`/auth/signout` requires the app's Origin, revokes the session, and expires the
+cookie.
+
+Use HTTPS in production. The generated local adapter issues a Secure
+`__Host-ns_session` cookie on `localhost`, which browsers treat as a secure
+cookie host even with a local HTTP endpoint. Other HTTP hosts are refused. If
+you configure `NETSCRIPT_AUTH_COOKIE_NAME`, export the same value for the app
+and auth service before starting Aspire. Authored routes and service policies
+are preserved during regeneration; custom app layouts must mount the adapter
+themselves.
+
+For a guarded server-side read, attach the generated client to the service
+contract and supply only the incoming request's credential context:
+
+```ts
+import {
+  browserSessionContext,
+  createBrowserSessionClient,
+} from "./auth/bff.ts";
+import { CatalogContractV1 } from "./contracts/catalog/v1/mod.ts";
+
+declare const request: Request;
+const catalog = createBrowserSessionClient(
+  CatalogContractV1,
+  "catalog",
+  "catalog",
+);
+const result = await catalog.list({}, {
+  context: browserSessionContext(request),
+});
+```
+
+The generated bearer contribution uses `direct-only` caching: credentials and
+authenticated responses never enter a shared query cache. Services verify the
+forwarded bearer through the existing remote authenticator; browser cookies are
+never forwarded to guarded services. The scaffold's demonstration procedures
+declare `access: { authentication: 'none' }` and remain public on REST and RPC.
+`/api/openapi.json` and `/api/docs` also stay public for discovery. Other `/api`
+paths require a bearer and a contract authorization decision once the CLI installs
+its generated policy. Change the demo procedure metadata when making those routes private,
+and keep browser reads in server-side app handlers. Workers, sagas, and triggers
+use a service identity independently of browser sessions.
+
+Generated CORS origins include enabled workspace apps and extend each
+service/plugin's declared `NETSCRIPT_CORS_ORIGINS`. This is a response
+allowlist; it does not authorize cookie callers. Publish-mode endpoint
+references still require a deployment's public app origin configuration; this
+local scaffold recipe does not certify deployment or browser conformance.
+
+### Direct auth service diagnostics
 
 Confirm the service is up and the session endpoint responds. On a fresh, unauthenticated request,
 `session` reports no active session — which proves the endpoint is wired even before you complete a
@@ -332,8 +397,10 @@ the transaction cookie; `callback` returns `redirectTo` plus the session cookie.
 Your application follows those JSON redirects and posts the provider's `code`
 and `state` to the callback endpoint. The callback is POST-only: configure your
 application callback route to perform that POST when the provider redirects back
-with a GET. Browser cookie retention across origins is a separate deployment
-concern; see [session lifecycles](/identity-access/session-lifecycles/).
+with a GET. For the approved BFF topology, the app server owns these
+browser-facing routes and sets the first-party cookie on its own origin. It forwards a bearer credential to
+services; browser requests do not use credentialed cross-origin CORS. See
+[session lifecycles](/identity-access/session-lifecycles/).
 
 For this plain-HTTP loopback recipe, set both development overrides in the host environment
 **before starting or restarting `auth-api`**. Use an unprefixed cookie name: clients reject
@@ -378,19 +445,37 @@ input `txn`; a callback without either fails with `oauth_cookie_missing`.
 
 A successful `GET /api/v1/auth/session` after callback returns the active
 session; `GET /api/v1/auth/me` returns the authenticated principal. The callback
-still includes `sessionId` for existing bearer consumers while the browser
-topology is decided; browser callers can rely on the cookie alone.
+returns `{ completed, redirectTo, subject }` without `sessionId`. The generated
+BFF preserves the backend cookie on the app origin and uses it to forward a
+bearer credential to services; browser callers use that first-party cookie.
 
 ### 0.0.8 cookie migration
 
-The callback input now accepts optional `txn`. The JSON outputs retain their
-existing shape, including `sessionId`; cookie headers are added to both HTTP
-projections. The public `httpOnly` option now accepts only `true` or omission; remove `false` overrides.
+The callback input now accepts optional `txn`. The callback JSON output no
+longer includes `sessionId`. This is a breaking contract change: replace reads of `callback.sessionId` with a cookie jar and an
+empty-input `session` request. The app server must keep the issued cookie on its
+own origin and forward a bearer credential to services. Server-only integrations
+that compose a backend directly may use `InteractiveFlowPort.handleCallback`
+and its session result; do not expose that credential in browser callback JSON.
+Cookie headers are preserved on both HTTP projections. The public `httpOnly`
+option now accepts only `true` or omission; remove `false` overrides.
 Cookie issuance also refuses `httpOnly: false` from untyped callers and refuses insecure
 cookies outside `allowInsecureDev`, including custom cookie names. Treat this
 security policy tightening as a breaking change: remove insecure production
 cookie overrides, use HTTPS, and keep `HttpOnly` enabled. `__Host-` cookies must
 retain `Path=/` and omit `Domain`, even during development.
+
+Sign out with the same cookie. Signout only ever ends the caller's own sessions: without a
+credential it returns `401`, and a `sessionId` that is unknown or belongs to someone else returns
+the same `401`. See [signout ownership](/identity-access/auth/#signout-acts-only-for-the-caller).
+
+```sh
+# End this session
+curl -b cookies.txt -X POST http://localhost:8094/api/v1/auth/signout
+# End every session of the signed-in subject
+curl -b cookies.txt -X POST -H 'content-type: application/json' \
+  -d '{"everywhere":true}' http://localhost:8094/api/v1/auth/signout
+```
 
 For a typed service-client call, use the `auth/sdk-client.ts` module emitted during install. The
 manifest only advertises the factory; it never auto-attaches credentials. Select the generated
@@ -419,7 +504,7 @@ const session = await authClient.session(undefined, {
 ```
 
 `signin`, `callback`, and `describe` are explicitly public and do not resolve the credential.
-`session`, `me`, and `signout` require it. The generated resolver reads no ambient environment,
+`session`, `me`, `signout`, and `revokeSession` require it. The generated resolver reads no ambient environment,
 cookie, or browser storage; your application supplies the credential for each logical call. Keep
 `authCachePartition` stable and non-secret—never use a token, session id, email, or another
 reversible identifier. Bearer headers require HTTPS outside localhost and loopback development.

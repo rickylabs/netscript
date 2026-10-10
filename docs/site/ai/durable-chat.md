@@ -117,6 +117,23 @@ const response = await toNetScriptChatResponse({
 });
 ```
 
+`newMessages` accepts `readonly NetScriptChatSendMessage[]`: server-trusted TanStack UI
+messages with `parts`, Model messages with `content` and `toolCalls`, or the existing
+`{ id, role, content: string }` form. Native parts and metadata survive storage unchanged;
+Model content is also exposed as replay parts. Validate any client input before this
+seam and give the model the same prompt that is persisted. The plugin-AI scaffold
+builds its own user turn from `message.text` and ignores client transcript fields.
+
+No public API returns persisted native parts. `resolveChatSnapshot` exposes only
+reduced text and tool cards; attachments remain in the durable log. A public native
+reader remains part of #2068's follow-up scope, along with publication, a published
+consumer check and the EIS live one-SSE-per-pane confirmation.
+
+Native batch tool cards appear on seed/reload but not on live subscribers.
+The upstream live reader ignores `CUSTOM netscript.chat.messages` and sees text echoes.
+The paths use the same projection with different inputs: native live replay remains
+an exception to the one-projection law. Ordinary assistant tool chunks still stream live.
+
 {{ comp callout { type: "warning", title: "authorize is required in production — there is no default allow-all" } }}
 <code>NetScriptChatAuthorize = (request, sessionId) =&gt; boolean | Promise&lt;boolean&gt;</code>
 is optional at the type level (the framework cannot prove a caller is production), but

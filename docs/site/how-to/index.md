@@ -137,6 +137,8 @@ construction, that alternative is an integration escape hatch, not the default N
   `SIGINT`/`SIGTERM`.
 - [Roll out runtime overrides]({{ "howto:roll-out-runtime-overrides" |> xref |> url }}) —
   change a deployed behavior without rebuilding the workspace.
+- [Deliver outbound webhooks]({{ "howto:outbound-webhooks" |> xref |> url }}) — sign committed
+  events in a worker, bound retries, and retain exhausted deliveries in the DLQ.
 - [Author a plugin]({{ "howto:author-a-plugin" |> xref |> url }}) — advanced:
   build a custom plugin with the same manifest and `mod.ts` contract the
   first-party plugins use.

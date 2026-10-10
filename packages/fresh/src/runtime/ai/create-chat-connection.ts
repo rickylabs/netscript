@@ -23,19 +23,18 @@
  */
 
 import {
+  appendSanitizedChunksToStream,
   durableStreamConnection,
-  materializeSnapshotFromDurableStream,
+  ensureDurableChatSessionStream,
   toDurableChatSessionResponse,
 } from '@durable-streams/tanstack-ai-transport';
+import { stream } from '@durable-streams/client';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 import type { ModelMessage, UIMessage } from '@tanstack/ai';
 import { createChatSubscriptionHub } from '../../internal/chat-subscription-hub.ts';
 import type { NetScriptChatProducer } from './chat-producer.ts';
 import { assertChatProducer, toFencedChatSessionResponse } from './fenced-chat-session-writer.ts';
-
-// ---------------------------------------------------------------------------
-// Session addressing (internal — not part of the public `./ai` surface).
-// ---------------------------------------------------------------------------
+import { chatMessageChunks, createChatMessageReplay } from '../../internal/chat-message-replay.ts';
 
 /**
  * Path (under the durable-streams State Protocol prefix) that every NetScript
@@ -73,10 +72,6 @@ export function resolveChatSessionUrl(
 export function resolveChatHeaders(target: NetScriptChatSessionTarget): Record<string, string> {
   return withIdentityEncoding({ ...getStreamsAuth(), ...(target.headers ?? {}) });
 }
-
-// ---------------------------------------------------------------------------
-// Public NetScript surface types.
-// ---------------------------------------------------------------------------
 
 /**
  * Addresses one durable chat session stream. NetScript-owned target that FA1
@@ -274,8 +269,11 @@ export interface NetScriptChatResponseOptions {
   readonly streamPath?: NetScriptChatStreamPath;
   /** The server-side chat stream to sanitize and persist as chunks. */
   readonly source: AsyncIterable<unknown>;
-  /** New client messages to persist before the assistant turn (optional). */
-  readonly newMessages?: readonly NetScriptChatMessage[];
+  /**
+   * Complete UI/Model messages to persist before the assistant turn (optional).
+   * Native parts and fields survive storage; content-string inputs remain supported.
+   */
+  readonly newMessages?: readonly NetScriptChatSendMessage[];
   /** Completion mode forwarded to the transport. Defaults to `'immediate'` (transport default) when omitted. */
   readonly mode?: 'immediate' | 'await';
   /** Background-task registration forwarded to the transport (e.g. a Worker's `ctx.waitUntil`). */
@@ -343,9 +341,7 @@ export interface NetScriptChatSnapshotOptions {
   }) => Promise<{ readonly messages: readonly unknown[]; readonly offset?: string }>;
 }
 
-// ---------------------------------------------------------------------------
 // The ONE projection reducer (seed + live share this — see mod.ts @module doc).
-// ---------------------------------------------------------------------------
 
 /**
  * The single chat projection reducer. Both the seed snapshot
@@ -397,9 +393,7 @@ export function projectChatSnapshot(
   return { messages: outMessages, renderParts };
 }
 
-// ---------------------------------------------------------------------------
 // FA1 factory functions.
-// ---------------------------------------------------------------------------
 
 /**
  * Open a durable chat session connection.
@@ -543,10 +537,11 @@ export async function toNetScriptChatResponse(
 /**
  * Resolve the seed chat snapshot for SSR / first paint.
  *
- * Materializes the durable session (via `materializeSnapshotFromDurableStream`)
- * and reduces it through {@link projectChatSnapshot} — the SAME reducer the live
- * island path uses (ONE-PROJECTION LAW) — so tool cards rendered at seed time
- * survive the first live chunk unchanged. The returned `offset` seeds the live
+ * Replays the durable session with TanStack's `StreamProcessor`, retaining native
+ * message append parts, and reduces it through {@link projectChatSnapshot} — the SAME reducer the live
+ * island path uses (ONE-PROJECTION LAW). Native batch tool parts currently appear
+ * only on seed/reload: the upstream live reader consumes text echoes, not the
+ * native append extension. No public reader returns the original attachment parts. The returned `offset` seeds the live
  * subscription so seed and live read one continuous chunk log.
  */
 export async function resolveChatSnapshot(
@@ -565,10 +560,6 @@ export async function resolveChatSnapshot(
     offset: raw.offset ?? null,
   };
 }
-
-// ---------------------------------------------------------------------------
-// Internal helpers.
-// ---------------------------------------------------------------------------
 
 interface UpstreamChatConnection {
   readonly subscribe: (signal?: AbortSignal) => AsyncIterable<unknown>;
@@ -599,29 +590,38 @@ function defaultCreateConnection(input: {
   };
 }
 
-function defaultMaterialize(input: {
+async function defaultMaterialize(input: {
   readonly readUrl: string;
   readonly headers: Record<string, string>;
   readonly offset?: string;
 }): Promise<{ readonly messages: readonly unknown[]; readonly offset?: string }> {
-  return materializeSnapshotFromDurableStream({
-    readUrl: input.readUrl,
+  const response = await stream({
+    url: input.readUrl,
+    json: true,
+    live: false,
     headers: input.headers,
     offset: input.offset,
   });
+  const replay = createChatMessageReplay();
+  for (const chunk of await response.json()) replay.apply(chunk);
+  return { messages: replay.messages(), offset: response.offset };
 }
 
-function defaultToResponse(
+async function defaultToResponse(
   input: Parameters<NonNullable<NetScriptChatResponseOptions['toResponse']>>[0],
 ): Promise<Response> {
   if (input.producer) {
     return toFencedChatSessionResponse({ ...input, producer: input.producer });
   }
+  const streamTarget = { writeUrl: input.writeUrl, headers: input.headers, createIfMissing: true };
+  const durableStream = await ensureDurableChatSessionStream(streamTarget);
+  // Persist client messages before returning, including in immediate mode.
+  await appendSanitizedChunksToStream(durableStream, chatMessageChunks(input.newMessages));
   return toDurableChatSessionResponse({
-    stream: { writeUrl: input.writeUrl, headers: input.headers, createIfMissing: true },
-    newMessages: input.newMessages as Parameters<
-      typeof toDurableChatSessionResponse
-    >[0]['newMessages'],
+    // The stream was already ensured above; no second create request is needed.
+    stream: { ...streamTarget, createIfMissing: false },
+    // The upstream newMessages path emits only text echo chunks.
+    newMessages: [],
     responseStream: input.source,
     mode: input.mode,
     waitUntil: input.waitUntil,
@@ -654,15 +654,14 @@ function withIdentityEncoding(headers: Record<string, string>): Record<string, s
   return normalized;
 }
 
-function toDurableMessage(message: NetScriptChatMessage): {
-  readonly id: string;
-  readonly role: string;
-  readonly parts: ReadonlyArray<{ readonly type: 'text'; readonly text: string }>;
-} {
+function toDurableMessage(message: NetScriptChatSendMessage): NetScriptChatSendMessage {
+  if ('parts' in message) return { ...message, id: message.id ?? crypto.randomUUID() };
   return {
-    id: message.id,
-    role: message.role,
-    parts: [{ type: 'text', text: message.content }],
+    ...message,
+    id: message.id ?? crypto.randomUUID(),
+    parts: typeof message.content === 'string'
+      ? [{ type: 'text', text: message.content }]
+      : message.content ?? [],
   };
 }
 

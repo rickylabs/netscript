@@ -214,7 +214,7 @@ the auth plugin composes against, confirmed on the package's public surface:
     { name: "createAuthBackendRegistry / resolveBackend", type: "function", desc: "Build a registry of named backends and resolve the single active one (DEFAULT_AUTH_BACKEND_NAME is the fallback)." },
     { name: "AuthSession", type: "type", desc: "The normalized session the store persists — id, subject, state, scopes, claims, issuedAt / expiresAt." },
     { name: "createHmacSessionTokenCrypto", type: "function", desc: "HMAC-signs the opaque session token so the cookie value cannot be forged." },
-    { name: "authContractV1", type: "contract", desc: "The five-route auth contract: signin, signout, callback, session, me." }
+    { name: "authContractV1", type: "contract", desc: "The six-route auth contract: signin, signout, revokeSession, callback, session, me." }
   ]
 }) }}
 
@@ -247,7 +247,7 @@ The unprefixed development name lets curl save the cookie on HTTP; clients rejec
 `__Host-` cookie. Remove both overrides and use HTTPS for production.
 
 For the full interactive round trip, follow the
-[cookie-jar signin and callback sequence](/identity-access/how-to/add-authentication/#step-7-verify-a-session).
+[cookie-jar signin and callback sequence](/identity-access/how-to/add-authentication/#direct-auth-service-diagnostics).
 `POST /api/v1/auth/signin` returns JSON containing `redirectUrl` and sets the
 transaction cookie. After provider authentication, post its `code` and `state`
 to `POST /api/v1/auth/callback` with that cookie; the callback sets the session
@@ -263,9 +263,11 @@ curl -b cookies.txt http://localhost:8094/api/v1/auth/me
 
 Use HTTPS outside explicit insecure local development. A successful
 `GET /api/v1/auth/me` after sign-in returns
-`{ authenticated: true, user, session }`. The callback retains `sessionId` for
-existing bearer consumers, but this cookie flow does not need to pass it by
-hand.
+`{ authenticated: true, user, session }`. The callback returns completion and redirect
+metadata without `sessionId`. In the approved BFF topology, the app server owns
+the first-party cookie and forwards a bearer credential to services. Browser
+callers use the cookie alone; see the
+[0.0.8 migration note](/identity-access/how-to/add-authentication/#008-cookie-migration).
 
 - [ ] `netscript plugin list` shows the `auth` plugin.
 - [ ] `netscript db status` reports the `auth.prisma` migration applied.
