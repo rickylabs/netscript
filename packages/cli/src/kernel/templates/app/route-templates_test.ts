@@ -673,33 +673,19 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'TeamMemberUpdateInput');
   });
 
-  it('service router binds Prisma-backed CRUD handlers for the showcase flow', async () => {
+  it('service router binds CRUD use-cases without persistence dependencies', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(serviceV1RouterTemplate, {
       ...SAMPLE_APP_VARS,
       projectName: SAMPLE_APP_VARS.name,
+      entityName: 'team-member',
     });
-    assertStringIncludes(
-      output,
-      "import type { PrismaClient } from '@database';",
-    );
-    assertStringIncludes(
-      output,
-      "type TeamMemberDelegate = PrismaClient['teamMember'];",
-    );
-    assertStringIncludes(
-      output,
-      'type TeamMemberHandlerContext = { readonly db: PrismaClient };',
-    );
-    assertStringIncludes(
-      output,
-      'const teamMembersV1 = v1.teamMembers.$context<TeamMemberHandlerContext>();',
-    );
-    assertStringIncludes(output, 'list: teamMembersV1.list.handler');
-    assertStringIncludes(output, 'create: teamMembersV1.create.handler');
-    assertStringIncludes(output, 'update: teamMembersV1.update.handler');
-    assertStringIncludes(output, 'delete: teamMembersV1.delete.handler');
-    assert(!output.includes('list!.handler'));
-    assert(!output.includes('context.db as PrismaClient'));
+    assertStringIncludes(output, 'createTeamMembersV1(application: TeamMembersApplication)');
+    for (const operation of ['list', 'create', 'update', 'delete']) {
+      assertStringIncludes(output, `v1.teamMembers.${operation}.handler`);
+      assertStringIncludes(output, `application.${operation}(`);
+    }
+    assert(!output.includes('@database'));
+    assert(!output.includes('context.db'));
   });
 });
