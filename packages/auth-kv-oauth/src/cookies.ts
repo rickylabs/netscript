@@ -29,7 +29,8 @@ export type KvOAuthCookieOptions = Readonly<{
   secure?: boolean;
   /** Trust proxy-written protocol headers only when direct client access is blocked. Default false. */
   trustProxyHeaders?: boolean;
-  httpOnly?: boolean;
+  /** Auth cookies are always HttpOnly; false is refused at issuance. */
+  httpOnly?: true;
   allowInsecureDev?: boolean;
 }>;
 
@@ -95,7 +96,17 @@ export function buildCookieHeader(
   const name = options.name ?? '__Host-ns_session';
   const path = options.path ?? '/';
   const secure = options.secure ?? deriveHttps(request, undefined, options.trustProxyHeaders);
-  assertCookiePolicy(name, path, options.domain, secure, options.allowInsecureDev ?? false);
+  // Runtime callers (including JavaScript) must obey the same policy as typed callers.
+  if (options.httpOnly !== undefined && options.httpOnly !== true) {
+    throw new KvOAuthError('configuration_error', 'Auth cookies require HttpOnly.');
+  }
+  if (!secure && !options.allowInsecureDev) {
+    throw new KvOAuthError(
+      'cookie_https_required',
+      'Session cookie gate requires HTTPS; configure trusted proxy headers or explicit cookie.allowInsecureDev for development.',
+    );
+  }
+  assertCookiePolicy(name, path, options.domain);
   const parts = [
     `${name}=${encodeURIComponent(value)}`,
     `Path=${path}`,
@@ -130,20 +141,12 @@ function assertCookiePolicy(
   name: string,
   path: string,
   domain: string | undefined,
-  secure: boolean,
-  allowInsecureDev: boolean,
 ): void {
   if (name.startsWith('__Host-')) {
     if (path !== '/' || domain !== undefined) {
       throw new KvOAuthError(
         'configuration_error',
         '__Host- cookies require Path=/ and no Domain.',
-      );
-    }
-    if (!secure && !allowInsecureDev) {
-      throw new KvOAuthError(
-        'cookie_https_required',
-        '__Host- cookie gate requires HTTPS; configure trusted proxy headers or explicit cookie.allowInsecureDev for development.',
       );
     }
   }

@@ -57,3 +57,12 @@ Deno.test('auth rotation removes CR and multiline credential assignments on repe
     assertEquals(await source(final), { secret: 'final', safe: 'retained' });
   }
 });
+
+Deno.test('auth reconciliation removes all obsolete issuer assignments and preserves neighbors', () => {
+  const current = "SAFE=retained\nexport NETSCRIPT_AUTH_ISSUER='old\nissuer'\n" +
+    "NETSCRIPT_AUTH_ISSUER='duplicate'\n# keep this comment\n";
+  assertEquals(
+    reconcileAuthEnv(current, { NETSCRIPT_AUTH_PROVIDER_ID: 'github' }, ['NETSCRIPT_AUTH_ISSUER']),
+    "SAFE=retained\n# keep this comment\nNETSCRIPT_AUTH_PROVIDER_ID='github'\n",
+  );
+});

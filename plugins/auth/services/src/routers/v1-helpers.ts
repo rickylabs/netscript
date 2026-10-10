@@ -65,10 +65,11 @@ export function toRequest(
 export function toAuthnRequest(
   serviceRequest: AuthServiceRequest | undefined,
   sessionId?: string,
+  cookieName = '__Host-ns_session',
 ): AuthnRequest {
   const headers = new Headers(serviceRequest?.headers ?? {});
   if (sessionId && !headers.has('cookie')) {
-    headers.set('cookie', `__Host-ns_session=${encodeURIComponent(sessionId)}`);
+    headers.set('cookie', `${cookieName}=${encodeURIComponent(sessionId)}`);
   }
   return {
     method: serviceRequest?.method ?? 'GET',

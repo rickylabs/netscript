@@ -43,6 +43,8 @@ export type CallbackInput = Readonly<{
   providerId?: string;
   code?: string;
   state?: string;
+  /** Explicit OAuth transaction id for callers without a transaction cookie. */
+  txn?: string;
   error?: string;
   errorDescription?: string;
   redirectTo?: string;
@@ -289,6 +291,7 @@ const CallbackInputZodSchema: z.ZodObject<{
   providerId: z.ZodOptional<z.ZodString>;
   code: z.ZodOptional<z.ZodString>;
   state: z.ZodOptional<z.ZodString>;
+  txn: z.ZodOptional<z.ZodString>;
   error: z.ZodOptional<z.ZodString>;
   errorDescription: z.ZodOptional<z.ZodString>;
   redirectTo: z.ZodOptional<z.ZodString>;
@@ -296,6 +299,7 @@ const CallbackInputZodSchema: z.ZodObject<{
   providerId: z.string().min(1).optional(),
   code: z.string().optional(),
   state: z.string().optional(),
+  txn: z.string().min(1).optional(),
   error: z.string().optional(),
   errorDescription: z.string().optional(),
   redirectTo: z.string().optional(),

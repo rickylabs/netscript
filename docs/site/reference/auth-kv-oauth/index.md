@@ -16,6 +16,7 @@ package's public surface reported by `deno doc`.
 | `createKvOAuthFlow`       | function | Create the OAuth sign-in and callback flow.                                                                                                                    |
 | `createKvOAuthStore`      | function | Create the KV-backed OAuth store.                                                                                                                              |
 | `createKvOAuthCrypto`     | function | Create crypto helpers for OAuth state and token storage.                                                                                                       |
+| `presetProviderKind`      | function | Read the shipped preset protocol kind (`oauth` or `oidc`); custom ids return undefined. OAuth presets use explicit endpoints without issuer discovery.         |
 | `defineOAuthProvider`     | function | Normalize generic OAuth provider input into an `OAuthProviderConfig`.                                                                                          |
 | `defaultPrincipal`        | function | Default principal mapping; custom `normalizePrincipal` mappers compose on it.                                                                                  |
 | `resolvePrincipalSubject` | function | Resolve the stable subject from the provider's `subject` source (ID token or userinfo).                                                                        |

@@ -133,6 +133,21 @@ set -a
 set +a
 ```
 
+GitHub is OAuth 2.0, so the preset emits no `NETSCRIPT_AUTH_ISSUER` and ignores `--issuer`.
+The CLI prints a notice when `--issuer` is ignored. Re-running the command removes an issuer saved
+by an older preset. The runtime also ignores an issuer inherited from an old shell or deployment
+when `NETSCRIPT_AUTH_PROVIDER_ID=github`. GitHub does not serve an OIDC
+discovery document; sign-in uses these explicit endpoints and derives the stable subject
+`github:<id>` from userinfo instead:
+
+```dotenv
+NETSCRIPT_AUTH_PROVIDER_ID=github
+NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://github.com/login/oauth/authorize
+NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://github.com/login/oauth/access_token
+NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://api.github.com/user
+NETSCRIPT_AUTH_SCOPES=read:user user:email
+```
+
 Provider credentials and settings are written only to the project `.env`, which must stay outside
 version control. Tracked appsettings receives the non-secret backend selector; reconciliation prunes
 legacy credential copies and retains unrelated benign environment settings. Aspire refuses declared
@@ -271,7 +286,7 @@ caption: "auth-api endpoints (:8094, /api/v1/auth/*)",
 rows: [
 { name: "POST /api/v1/auth/signin", type: "interactive only", desc: "Begin the OAuth/OIDC redirect flow. Live on kv-oauth; returns AUTH_PROVIDER_ERROR on workos/better-auth." },
 { name: "POST /api/v1/auth/callback", type: "interactive only", desc: "Complete the provider redirect, mint a session. Live on kv-oauth; AUTH_PROVIDER_ERROR on the others." },
-{ name: "POST /api/v1/auth/signout", type: "session", desc: "Revoke the current session and clear the session cookie." },
+{ name: "POST /api/v1/auth/signout", type: "session", desc: "On kv-oauth, revoke the current session and emit its session-clearing Set-Cookie." },
 { name: "GET /api/v1/auth/session", type: "session", desc: "Return the current session if one is present and valid. Works on all backends." },
 { name: "GET /api/v1/auth/me", type: "identity", desc: "Return the authenticated principal (the resolved user). Works on all backends." }
 ]
@@ -295,21 +310,71 @@ curl http://localhost:8094/health/ready
 curl http://localhost:8094/api/v1/auth/session
 ```
 
-To exercise the full interactive flow on `kv-oauth`, drive the redirect from a browser: open
-`POST /api/v1/auth/signin` (the service issues the provider redirect), authenticate with your
-provider, let the provider call back to `/api/v1/auth/callback`, then re-check the session and
-identity with the cookie the flow set:
+The `kv-oauth` HTTP surface returns JSON redirect fields and emits the backend's
+`Set-Cookie` headers on both REST and RPC. `signin` returns `redirectUrl` plus
+the transaction cookie; `callback` returns `redirectTo` plus the session cookie.
+Your application follows those JSON redirects and posts the provider's `code`
+and `state` to the callback endpoint. The callback is POST-only: configure your
+application callback route to perform that POST when the provider redirects back
+with a GET. Browser cookie retention across origins is a separate deployment
+concern; see [session lifecycles](/identity-access/session-lifecycles/).
+
+For this plain-HTTP loopback recipe, set both development overrides in the host environment
+**before starting or restarting `auth-api`**. Use an unprefixed cookie name: clients reject
+an insecure `__Host-` cookie even when server-side `allowInsecureDev` permits issuance.
+Keep your real provider credentials and redirect URI from Step 3.
 
 ```sh
-# After completing the browser sign-in, the session cookie is set.
-# Re-checking now returns the active session and the resolved principal:
-curl -b cookies.txt http://localhost:8094/api/v1/auth/session
-curl -b cookies.txt http://localhost:8094/api/v1/auth/me
+export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true
+export NETSCRIPT_AUTH_COOKIE_NAME=ns_session_dev
 ```
 
-A successful `GET /api/v1/auth/session` after sign-in returns the active session; `GET /api/v1/auth/me`
-returns the authenticated principal. That round trip is the proof the backend is composed, the
-migration is applied, and the provider credentials are correct.
+Then save the transaction cookie, visit the returned `redirectUrl`, and copy the provider
+callback's code and state into the callback POST. The provider must register the redirect URI
+from Step 3; its GET callback may report a method error on this POST-only service route.
+Copy the code and state from that redirect URL and submit them below:
+
+```sh
+# Save the transaction cookie and read redirectUrl from the JSON response.
+curl -c cookies.txt -X POST http://localhost:8094/api/v1/auth/signin \
+  -H 'Content-Type: application/json' -d '{}'
+
+# Visit redirectUrl and authenticate with the provider, then submit its code/state.
+# Send the transaction cookie and replace it with the issued session cookie.
+curl -b cookies.txt -c cookies.txt -X POST http://localhost:8094/api/v1/auth/callback \
+  -H 'Content-Type: application/json' \
+  -d '{"code":"PROVIDER_CODE","state":"PROVIDER_STATE"}'
+
+# Resolve the active session using only the cookie; no sessionId is needed.
+curl -b cookies.txt http://localhost:8094/api/v1/auth/session
+curl -b cookies.txt http://localhost:8094/api/v1/auth/me
+
+# On kv-oauth, revoke the session and expire the cookie in the jar.
+curl -b cookies.txt -c cookies.txt -X POST http://localhost:8094/api/v1/auth/signout \
+  -H 'Content-Type: application/json' -d '{}'
+```
+
+Use HTTPS for production cookies and remove the two development overrides above. The default
+production cookie is `__Host-ns_session`; the local recipe uses `ns_session_dev` so curl can
+save and resend it over plain HTTP. `NETSCRIPT_AUTH_COOKIE_NAME` configures the name used by
+both the backend and service. A caller without a cookie jar may supply the transaction id as callback
+input `txn`; a callback without either fails with `oauth_cookie_missing`.
+
+A successful `GET /api/v1/auth/session` after callback returns the active
+session; `GET /api/v1/auth/me` returns the authenticated principal. The callback
+still includes `sessionId` for existing bearer consumers while the browser
+topology is decided; browser callers can rely on the cookie alone.
+
+### 0.0.8 cookie migration
+
+The callback input now accepts optional `txn`. The JSON outputs retain their
+existing shape, including `sessionId`; cookie headers are added to both HTTP
+projections. The public `httpOnly` option now accepts only `true` or omission; remove `false` overrides.
+Cookie issuance also refuses `httpOnly: false` from untyped callers and refuses insecure
+cookies outside `allowInsecureDev`, including custom cookie names. Treat this
+security policy tightening as a breaking change: remove insecure production
+cookie overrides, use HTTPS, and keep `HttpOnly` enabled. `__Host-` cookies must
+retain `Path=/` and omit `Domain`, even during development.
 
 For a typed service-client call, use the `auth/sdk-client.ts` module emitted during install. The
 manifest only advertises the factory; it never auto-attaches credentials. Select the generated

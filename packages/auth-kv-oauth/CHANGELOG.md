@@ -14,3 +14,9 @@
   plugin exposes `NETSCRIPT_AUTH_COOKIE_SECURE=true` for this deployment mode. Automatic host TLS
   metadata and verified proxy hops/CIDRs remain deferred to
   [#2191](https://github.com/rickylabs/netscript/issues/2191).
+- Export `presetProviderKind` from the root and providers entrypoints so configuration consumers
+  share the shipped OAuth/OIDC preset policy. OAuth presets use explicit endpoints without issuer
+  discovery.
+- Auth cookies require `HttpOnly` (the public option accepts only `true` or omission) and HTTPS
+  outside explicit `allowInsecureDev`, including custom cookie names. Untyped `httpOnly: false`
+  overrides are refused. `__Host-` cookies still require `Path=/` and no `Domain` in development.

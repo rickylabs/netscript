@@ -11,6 +11,7 @@ import type { AuthnRequest } from '@netscript/service/auth';
 import * as oauth from '@panva/oauth4webapi';
 import {
   buildCookieHeader,
+  clearCookieHeader,
   createKvOAuthBackend,
   createKvOAuthFlow,
   createKvOAuthStore,
@@ -364,4 +365,29 @@ Deno.test('#2026 merged bearer precedence preserves trusted custom-cookie refres
   assertEquals(viaCookie.principal.subject, cookieSession.subject);
   assertStringIncludes(viaCookie.setCookies![0], `${name}=${cookieSession.id}`);
   assertStringIncludes(viaCookie.setCookies![0], 'Secure');
+});
+
+Deno.test('#2026 merged custom cookies require HTTPS and HttpOnly with explicit proxy trust', () => {
+  const request = proxiedRequest();
+  for (const issue of [buildCookieHeader.bind(undefined, 'session'), clearCookieHeader]) {
+    // Custom names obey the same default-off proxy trust and HTTPS policy as __Host- names.
+    const error = assertThrows(() => issue(request, { name: 'custom_session' }), KvOAuthError);
+    assertEquals(error.code, 'cookie_https_required');
+    assertStringIncludes(error.message, 'cookie gate');
+    const trusted = issue(request, { name: 'custom_session', trustProxyHeaders: true });
+    assertStringIncludes(trusted, 'custom_session=');
+    assertStringIncludes(trusted, 'Secure');
+    assertStringIncludes(trusted, 'HttpOnly');
+    const development = issue(request, { name: 'custom_session', allowInsecureDev: true });
+    assertStringIncludes(development, 'HttpOnly');
+    assertFalse(development.includes('Secure'));
+    for (const allowInsecureDev of [false, true]) {
+      const invalid = { name: 'custom_session', trustProxyHeaders: true, allowInsecureDev };
+      // Exercise JavaScript callers without weakening the public literal-true contract.
+      Reflect.set(invalid, 'httpOnly', false);
+      const refused = assertThrows(() => issue(request, invalid), KvOAuthError);
+      assertEquals(refused.code, 'configuration_error');
+      assertStringIncludes(refused.message, 'HttpOnly');
+    }
+  }
 });
