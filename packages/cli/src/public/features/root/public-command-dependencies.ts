@@ -72,8 +72,8 @@ import { fetchJsrExportMap } from '../../infra/jsr/fetch-jsr-export-map.ts';
 import { resolveUiAppRoot as resolveUiAppRootFromWorkspace } from '../../../kernel/application/ui/resolve-ui-app-root.ts';
 import type { UiAppRootResolver } from '../../presentation/support.ts';
 import type { GeneratedSourceFormatterPort } from '../../../kernel/ports/generated-source-formatter-port.ts';
-import { selectResourceClient } from '../../../kernel/application/resource-slice/client-selector.ts';
-import { resolveQueryProcedure } from '../../../kernel/application/resource-slice/query-procedure.ts';
+import { selectResourceClient } from '../../../kernel/application/resource-slice/selection/client-selector.ts';
+import { resolveQueryProcedure } from '../../../kernel/application/resource-slice/selection/query-procedure.ts';
 import type { GenerateResourceCommandDependencies } from '../generate/resource/generate-resource-command.ts';
 import type {
   ResourceSliceStager,

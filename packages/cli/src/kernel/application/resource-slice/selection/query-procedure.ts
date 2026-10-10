@@ -1,9 +1,9 @@
 import { join, toFileUrl } from '@std/path';
-import type { ProcessPort } from '../../ports/process-port.ts';
+import type { ProcessPort } from '../../../ports/process-port.ts';
 import type {
   SelectedResourceClient,
   SelectedResourceProcedure,
-} from './resource-slice-contract.ts';
+} from '../resource-slice-contract.ts';
 
 const REPORT_PREFIX = 'NETSCRIPT_QUERY_PROCEDURE ';
 const LISTED_KEYS = 24;

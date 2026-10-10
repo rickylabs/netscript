@@ -1,6 +1,6 @@
 import { relative, resolve } from '@std/path';
-import type { FileSystemPort } from '../../ports/file-system-port.ts';
-import type { SelectedResourceClient } from './resource-slice-contract.ts';
+import type { FileSystemPort } from '../../../ports/file-system-port.ts';
+import type { SelectedResourceClient } from '../resource-slice-contract.ts';
 
 const PREREQUISITE = 'netscript service add --name <service> --with-client';
 

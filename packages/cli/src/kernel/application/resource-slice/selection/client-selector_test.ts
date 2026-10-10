@@ -1,5 +1,5 @@
 import { assertEquals, assertRejects } from '@std/assert';
-import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
+import { MemoryFileSystemAdapter } from '../../../adapters/scaffold/memory-fs.ts';
 import { selectClientBinding, selectResourceClient } from './client-selector.ts';
 
 const APP_ROOT = '/workspace/shop/apps/dashboard';

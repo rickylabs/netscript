@@ -1,9 +1,9 @@
 import { dirname, join } from '@std/path';
 import { UseCase } from '../../../../kernel/application/abstracts/use-case.ts';
 import { planResourceSlice } from '../../../../kernel/application/resource-slice/plan-resource-slice.ts';
-import { reconcileAppRoutes } from '../../../../kernel/application/resource-slice/reconcile-app-routes.ts';
-import { reconcileResourceSlice } from '../../../../kernel/application/resource-slice/reconcile-resource-slice.ts';
-import { reconcileState } from '../../../../kernel/application/resource-slice/reconcile-state.ts';
+import { reconcileAppRoutes } from '../../../../kernel/application/resource-slice/reconcile/reconcile-app-routes.ts';
+import { reconcileResourceSlice } from '../../../../kernel/application/resource-slice/reconcile/reconcile-resource-slice.ts';
+import { reconcileState } from '../../../../kernel/application/resource-slice/reconcile/reconcile-state.ts';
 import { renderResourceSlice } from '../../../../kernel/application/resource-slice/render-resource-slice.ts';
 import {
   normalizeResourceSliceInput,

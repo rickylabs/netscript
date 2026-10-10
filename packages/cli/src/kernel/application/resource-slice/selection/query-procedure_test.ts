@@ -1,8 +1,8 @@
 import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from '@std/assert';
 import { join } from '@std/path';
 import { createQueryFactories } from '@netscript/sdk/query';
-import { DenoProcess } from '../../adapters/runtime/process/deno-process.ts';
-import { DenoFileSystem } from '../../adapters/runtime/file-system/deno-file-system.ts';
+import { DenoProcess } from '../../../adapters/runtime/process/deno-process.ts';
+import { DenoFileSystem } from '../../../adapters/runtime/file-system/deno-file-system.ts';
 import { selectResourceClient } from './client-selector.ts';
 import {
   describeUnresolvedQueryProcedure,
@@ -10,7 +10,7 @@ import {
   parseQueryProcedurePath,
   resolveQueryProcedure,
 } from './query-procedure.ts';
-import type { SelectedResourceClient } from './resource-slice-contract.ts';
+import type { SelectedResourceClient } from '../resource-slice-contract.ts';
 
 const NAMESPACES = ['alpha', 'beta', 'gamma', 'serviceNamespace'] as const;
 
