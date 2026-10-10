@@ -19,7 +19,7 @@ async function readBoundedStderr(stream: ReadableStream<Uint8Array>): Promise<st
   return new TextDecoder().decode(retained.subarray(0, size));
 }
 
-function spawnService(dataDir?: string) {
+async function spawnService(dataDir?: string) {
   const port = await getAvailablePort();
   const env: Record<string, string> = { ...Deno.env.toObject(), PORT: String(port) };
   delete env.STREAMS_DATA_DIR;
@@ -37,7 +37,7 @@ function spawnService(dataDir?: string) {
 }
 
 async function startService(dataDir?: string) {
-  const { child, stderr, base } = spawnService(dataDir);
+  const { child, stderr, base } = await spawnService(dataDir);
   let exited = false;
   const status = child.status.then((result) => {
     exited = true;
@@ -128,7 +128,7 @@ for (const mode of ['memory', 'file'] as const) {
 
 Deno.test('storage process: missing directory exits non-zero with a storage diagnostic', async () => {
   const dir = await Deno.makeTempDir();
-  const { child, stderr } = spawnService(`${dir}/missing`);
+  const { child, stderr } = await spawnService(`${dir}/missing`);
   let timedOut = false;
   const timer = setTimeout(() => {
     timedOut = true;
