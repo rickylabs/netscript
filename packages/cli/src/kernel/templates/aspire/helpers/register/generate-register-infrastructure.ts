@@ -12,6 +12,7 @@ import type { RegisterInfrastructureOptions } from '../types.ts'
 import { fileHeader } from '../_utils.ts'
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts'
 import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts'
+import { SCAFFOLD_CACHE_CONTAINER_IMAGES } from '../../../../constants/scaffold/scaffold-container-images.ts'
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts'
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts'
 
@@ -25,15 +26,6 @@ const DB_ENGINE_METHODS: Record<string, string> = {
 const MSSQL_CONTAINER_IMAGE = 'mssql/server'
 const MSSQL_CONTAINER_TAG = '2022-latest'
 const MSSQL_SA_PASSWORD = 'NetscriptE2e!Sql2026'
-
-/** Default Redis-compatible cache container images. */
-const CACHE_CONTAINER_IMAGES: Record<
-  string,
-  { readonly image: string; readonly tag: string }
-> = {
-  Redis: { image: 'docker.io/library/redis', tag: '7' },
-  Garnet: { image: 'ghcr.io/microsoft/garnet', tag: '1.1.10' },
-}
 
 /** Default Redis-compatible TCP port. */
 const CACHE_DEFAULT_PORT = 6379
@@ -493,8 +485,8 @@ function redisGarnetContainerSetup(
   name: string,
   entry: CacheEntry,
 ): { lines: string[]; wiring: string } {
-  const image = CACHE_CONTAINER_IMAGES[entry.Engine] ??
-    CACHE_CONTAINER_IMAGES.Redis
+  const image = SCAFFOLD_CACHE_CONTAINER_IMAGES[entry.Engine] ??
+    SCAFFOLD_CACHE_CONTAINER_IMAGES.Redis
   const tag = entry.ImageTag ?? image.tag
   const imageRef = `${image.image}:${tag}`
   const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis'

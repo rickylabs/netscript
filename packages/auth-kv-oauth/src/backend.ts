@@ -11,7 +11,6 @@
  *     clientSecret: "secret_test",
  *     redirectUri: "https://app.example.test/auth/callback",
  *   }),
- *   allowInsecureRequests: true,
  * });
  * ```
  *
@@ -110,8 +109,11 @@ export async function createKvOAuthBackend(
 ): Promise<KvOAuthBackend> {
   const store = options.store ?? await createKvOAuthStore();
   const provider = options.provider;
-  const cookie = options.cookie;
-  const cookieName = cookie?.name ?? DEFAULT_SESSION_COOKIE_NAME;
+  const cookie = {
+    ...options.cookie,
+    trustProxyHeaders: options.trustProxyHeaders ?? options.cookie?.trustProxyHeaders ?? false,
+  };
+  const cookieName = cookie.name ?? DEFAULT_SESSION_COOKIE_NAME;
   const flow = createKvOAuthFlow({ ...options, store });
   const sessions = createSessionStore(provider, store, cookieName);
   const principalMapper = createPrincipalMapper();
