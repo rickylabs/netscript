@@ -72,8 +72,9 @@ export class AddJobCommand extends WorkersCliCommand {
       category: 'jobs',
       description: 'Create a worker job definition.',
       usage:
-        'deno x -A jsr:@netscript/plugin-workers@<version>/cli add job <id> [--topic --schedule --timeout --max-retries --tags]',
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli add job <id> [--template=webhook-delivery --topic --schedule --timeout --max-retries --tags]',
       flags: [
+        { name: 'template', description: 'Job recipe: webhook-delivery.' },
         { name: 'topic', description: 'Stream topic emitted by the job.' },
         { name: 'schedule', description: 'Cron schedule for the job.' },
         { name: 'timeout', description: 'Job timeout in milliseconds.' },

@@ -3,9 +3,9 @@
  *
  * @example
  * ```typescript
- * import { FilterConditionSchema, buildPrismaWhere } from '@netscript/contracts/query';
+ * import { type FilterCondition, buildPrismaWhere } from '@netscript/contracts/query';
  *
- * const filters = [
+ * const filters: FilterCondition[] = [
  *   { field: 'status', operator: 'equals', value: 'active' },
  *   { field: 'name', operator: 'contains', value: 'john' },
  * ];

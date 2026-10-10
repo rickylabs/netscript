@@ -36,3 +36,5 @@ export type {
   WorkerInstrumentationSpan,
 } from './worker-instrumentation.ts';
 export type { WorkersCommandDefinition } from './workers-command.ts';
+
+export type { JobFailure, JobSuccess } from '../domain/job-result.ts';

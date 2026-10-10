@@ -56,7 +56,7 @@ Deno.test('plugin list reports configured-module identity across first-party top
     assertEquals(output.slice(1), [
       'ai\tAI Chat\tutility\ttrue\tai\t-\t-\t-\t0',
       'auth\tAuth\tutility\ttrue\tauth\tservices/src/main.ts\t-\t-\t0',
-      'streams\tDurable Streams\tutility\ttrue\tstreams\tservices/src/main.ts\t-\t-\t0',
+      'streams\tStreams (ephemeral by default)\tutility\ttrue\tstreams\tservices/src/main.ts\t-\t-\t0',
       'workers\tBackground Worker\tbackground-processor\ttrue\tworkers\tservices/src/main.ts\t-\tjobs\t0',
     ]);
   } finally {

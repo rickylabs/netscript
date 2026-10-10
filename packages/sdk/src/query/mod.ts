@@ -22,6 +22,7 @@ export { createQueryFactories, createQueryFactory } from './query-factory.ts';
 export { type CacheProvider, hasCacheProvider, setCacheProvider } from '../cache/cache-provider.ts';
 export type {
   ActionMethod,
+  ActionRequestRest,
   CompositeQuery,
   FactoryConfig,
   ProcedureInput,

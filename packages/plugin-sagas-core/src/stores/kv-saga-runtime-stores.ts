@@ -1,3 +1,5 @@
+import { sagaRetentionRemaining } from './saga-kv-retention.ts';
+import type { SagaStateEnvelope } from '../domain/mod.ts';
 import type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';
 import type {
   SagaAppliedKeyOutcome,
@@ -46,7 +48,10 @@ export type KvSagaIdempotencyStoreOptions =
 export type KvSagaAppliedKeyStoreOptions =
   & SagaRuntimeKvStoreOptions
   & Readonly<{
+    /** @deprecated Active replay markers never expire before terminal state. */
     activeTtlMs?: number;
+    /** Terminal replay window, matching the canonical store's completedDays. */
+    completedRetentionDays?: number | ((envelope: SagaStateEnvelope) => number);
   }>;
 
 /** KV-backed saga transport idempotency reservation store. */
@@ -105,7 +110,7 @@ export class KvSagaAppliedKeyStore implements SagaAppliedKeyStore {
   readonly #kv: KvStore;
   readonly #prefix: KvKey;
   readonly #now: () => Date;
-  readonly #activeTtlMs?: number;
+  readonly #days: number | ((envelope: SagaStateEnvelope) => number);
 
   /** Create an applied-key store over the supplied KV adapter. */
   constructor(options: KvSagaAppliedKeyStoreOptions) {
@@ -115,7 +120,7 @@ export class KvSagaAppliedKeyStore implements SagaAppliedKeyStore {
     this.#kv = options.kv;
     this.#prefix = options.prefix ?? DEFAULT_SAGA_KV_PREFIX;
     this.#now = options.now ?? (() => new Date());
-    this.#activeTtlMs = options.activeTtlMs;
+    this.#days = options.completedRetentionDays ?? 7;
   }
 
   /** Record an instance/key tuple atomically; duplicates return `applied: false`. */
@@ -125,11 +130,23 @@ export class KvSagaAppliedKeyStore implements SagaAppliedKeyStore {
   ): Promise<SagaAppliedKeyOutcome> {
     const value = Object.freeze({ appliedAt: this.#now().toISOString() });
     const key = this.#appliedKey(instanceId, idempotencyKey);
-    const mutation: AtomicMutation = this.#activeTtlMs === undefined
-      ? { type: 'set', key, value }
-      : { type: 'set', key, value, expireIn: this.#activeTtlMs };
+    const stateKey: KvKey = [...this.#prefix, 'state', instanceId];
+    const state = await this.#kv.get<SagaStateEnvelope>(stateKey);
+    const expireIn = state === null ? undefined : sagaRetentionRemaining(
+      state.value,
+      typeof this.#days === 'number' ? this.#days : this.#days(state.value),
+      this.#now(),
+    );
+    if (expireIn !== undefined && expireIn <= 0) return Object.freeze({ applied: false });
+    const mutation: AtomicMutation = { type: 'set', key, value, expireIn };
 
-    const result = await requireAtomic(this.#kv)([{ key, versionstamp: null }], [mutation]);
+    const result = await requireAtomic(this.#kv)([
+      { key, versionstamp: null },
+      { key: stateKey, versionstamp: state?.versionstamp ?? null },
+    ], [mutation]);
+    if (!result.ok && await this.#kv.get(key) === null) {
+      throw new Error('Saga state changed while recording an applied key; retry the message.');
+    }
     return Object.freeze({ applied: result.ok });
   }
 

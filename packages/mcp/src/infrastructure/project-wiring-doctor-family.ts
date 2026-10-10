@@ -100,22 +100,18 @@ export class ProjectWiringDoctorFamily implements DoctorCheckFamily {
 
     const configPath = `${root}/netscript.config.ts`;
     if (await this.dependencies.exists(configPath)) {
-      const configured = /\bplugins\s*:/.test(await this.dependencies.readText(configPath));
-      if (configured) {
-        const generatedRoot = `${root}/.netscript/generated`;
-        const registries = (await this.dependencies.listFiles(generatedRoot)).filter(
-          isGeneratedPluginRegistry,
-        );
-        const present = registries.length > 0;
-        checks.push({
-          name: 'plugin_registry',
-          status: present ? 'pass' : 'fail',
-          summary: present
-            ? `Generated plugin registries are present (${registries.length} module(s)).`
-            : 'Plugins are configured but the generated registry is missing.',
-          ...(present ? {} : { fix: 'Run `netscript generate plugins` from the project root.' }),
-        });
-      }
+      const generatedRoot = `${root}/.netscript/generated`;
+      const registries = (await this.dependencies.listFiles(generatedRoot)).filter(
+        isGeneratedPluginRegistry,
+      );
+      const present = registries.length > 0;
+      checks.push({
+        name: 'plugin_registry',
+        status: present ? 'pass' : 'warn',
+        summary: present
+          ? `Generated plugin registries are present (${registries.length} module(s)).`
+          : 'No generated plugin registries were found. The expected registry set is unknown; plugins without runtime registries can legitimately generate no files.',
+      });
     }
 
     const docsPresent = await this.dependencies.exists(`${root}/docs/site`);

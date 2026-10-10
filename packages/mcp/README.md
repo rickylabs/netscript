@@ -5,8 +5,8 @@
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
 **The Model Context Protocol server for NetScript: 22 token-bounded tools for app health, correlated
-execution debugging, framework telemetry, CLI diagnostics, intent-aware documentation guidance,
-and first-party export discovery over stdio.**
+execution debugging, framework telemetry, CLI diagnostics, intent-aware documentation guidance, and
+first-party export discovery over stdio.**
 
 Point Claude Code or VS Code at a running NetScript app and the agent can ask _"is the app
 healthy?"_, _"why did the last import job fail?"_, and _"what is slowing down `checkout`?"_ — and
@@ -40,8 +40,8 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
   catalog the agent sees comes from the release it runs.
 - **Intent-aware guidance** — `find_guidance` accepts the task in the caller's words and returns a
   bounded, ordered set of section citations and cited code excerpts.
-- **Credential-free operation access** — service-operation list and schema results include a
-  bounded access summary derived from OpenAPI, never a principal, token, cookie, or credential.
+- **Credential-free operation access** — service-operation list and schema results include a bounded
+  access summary derived from OpenAPI, never a principal, token, cookie, or credential.
 - **Zero npm MCP SDK** — a minimal newline-delimited JSON-RPC transport keeps the dependency graph
   lean and the lockfile stable.
 
@@ -70,9 +70,9 @@ cross-domain diagnostics, and documentation lookup.
 Both command tools return an `executor` identity with `mode`, `version`, and the resolved fixed
 command prefix, so the agent can see which CLI it is driving.
 
-- **CLI-hosted server (`netscript agent mcp`)**: re-enters the hosting CLI. Script and global-install
-  runs use the current Deno executable plus the running main module; compiled installs execute the
-  current binary directly. No JSR CLI is downloaded.
+- **CLI-hosted server (`netscript agent mcp`)**: re-enters the hosting CLI. Script and
+  global-install runs use the current Deno executable plus the running main module; compiled
+  installs execute the current binary directly. No JSR CLI is downloaded.
 - **Standalone server (`deno x jsr:@netscript/mcp@<version>/cli`)**: has no host CLI, so the MCP
   release intentionally selects `jsr:@netscript/cli@<MCP_PACKAGE_VERSION>` as its compatible child
   and reports `mode: "standalone"`. This is an explicit MCP-owned compatibility policy, not a claim
@@ -114,7 +114,8 @@ the pre-release line, and `netscript agent init` writes the correct pinned form 
 
 Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
 to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
-exact retrieval of a known document or section.
+faithful retrieval of a known document or section; check `mode` and use `full: true` with
+`nextCursor` for exact retrieval of complete text.
 
 **1. Wire up an agent host.** From a NetScript project root:
 
@@ -162,29 +163,29 @@ results, and `get_run` returns a structured `run_not_found` error the agent can 
 
 ## Tool catalog
 
-| Tool                          | Required input        | Bounded result                                                               |
-| ----------------------------- | --------------------- | ---------------------------------------------------------------------------- |
-| `get_app_status`              | —                     | Health verdict, counts, per-domain summaries                                 |
-| `list_runs`                   | —                     | Recent executions filtered by domain, status, service, time                  |
-| `get_run`                     | `id`                  | One correlated execution with bounded spans and logs                         |
-| `get_recent_errors`           | —                     | Recent errors grouped by service and domain                                  |
-| `get_last_job_result`         | —                     | The latest matching job outcome                                              |
-| `analyze_service_performance` | `service`             | Duration percentiles, throughput, error rate                                 |
-| `analyze_db_bottlenecks`      | —                     | Ranked database and KV operations                                            |
-| `doctor`                      | —                     | Telemetry, Aspire, wiring, and plugin checks; suggested fixes on problems    |
-| `search_docs`                 | `query`               | Ranked public-document matches with snippets                                 |
-| `list_docs`                   | —                     | Public-document summaries                                                    |
-| `get_doc`                     | `slug`                | One public document, or one named section of it                              |
-| `find_export`                 | `symbol`              | Exact symbol locations as package and export subpath                         |
-| `list_package_exports`        | `package`             | Paginated declarations grouped by export subpath                             |
-| `get_export`                  | `symbol`              | One bounded declaration signature and JSDoc block                            |
-| `search_exports`              | `query`               | Ranked partial-name and declaration-shape matches                            |
-| `list_commands`               | —                     | Live CLI descriptors plus resolved executor mode, version, and command       |
-| `execute_command`             | `command`; `resource` optional | Executor identity, status, exit code, duration, and bounded output tail |
-| `record_drift`                | `resource`, `summary` | Evidence-gated drift entry appended to project drift log                     |
-| `list_api_services`           | —                 | Discovered services, live spec status, source outcomes, and operation counts  |
-| `list_service_operations`     | `service`         | Bounded OpenAPI operation rows, optional `access`, and honest truncation metadata |
-| `get_operation_schema`        | `service`, `operation` | Request, response, and error views, optional `access`, and access-aware curl guidance |
+| Tool                          | Required input                 | Bounded result                                                                        |
+| ----------------------------- | ------------------------------ | ------------------------------------------------------------------------------------- |
+| `get_app_status`              | —                              | Health verdict, counts, per-domain summaries                                          |
+| `list_runs`                   | —                              | Recent executions filtered by domain, status, service, time                           |
+| `get_run`                     | `id`                           | One correlated execution with bounded spans and logs                                  |
+| `get_recent_errors`           | —                              | Recent errors grouped by service and domain                                           |
+| `get_last_job_result`         | —                              | The latest matching job outcome                                                       |
+| `analyze_service_performance` | `service`                      | Duration percentiles, throughput, error rate                                          |
+| `analyze_db_bottlenecks`      | —                              | Ranked database and KV operations                                                     |
+| `doctor`                      | —                              | Telemetry, Aspire, wiring, and plugin checks; suggested fixes on problems             |
+| `search_docs`                 | `query`                        | Ranked public-document matches with snippets                                          |
+| `list_docs`                   | —                              | Public-document summaries                                                             |
+| `get_doc`                     | `slug`                         | Faithful document/section extraction or complete cursor-paged text                    |
+| `find_export`                 | `symbol`                       | Exact symbol locations as package and export subpath                                  |
+| `list_package_exports`        | `package`                      | Paginated declarations grouped by export subpath                                      |
+| `get_export`                  | `symbol`                       | One bounded declaration signature and JSDoc block                                     |
+| `search_exports`              | `query`                        | Ranked partial-name and declaration-shape matches                                     |
+| `list_commands`               | —                              | Live CLI descriptors plus resolved executor mode, version, and command                |
+| `execute_command`             | `command`; `resource` optional | Executor identity, status, exit code, duration, and bounded output tail               |
+| `record_drift`                | `resource`, `summary`          | Evidence-gated drift entry appended to project drift log                              |
+| `list_api_services`           | —                              | Discovered services, live spec status, source outcomes, and operation counts          |
+| `list_service_operations`     | `service`                      | Bounded OpenAPI operation rows, optional `access`, and honest truncation metadata     |
+| `get_operation_schema`        | `service`, `operation`         | Request, response, and error views, optional `access`, and access-aware curl guidance |
 
 A top-level input/result field overview for every tool is on the
 [MCP reference](https://rickylabs.github.io/netscript/reference/mcp/); the complete Standard Schema
@@ -212,11 +213,11 @@ echoes a credential.
 
 The projection preserves four distinct states:
 
-| OpenAPI operation | MCP result |
-| --- | --- |
-| No own `security` field | `access` is absent |
-| `security: []` | `authentication: 'none'`, with empty schemes and scopes |
-| `security: [{}, { bearerAuth: [] }]` | `authentication: 'optional'` |
+| OpenAPI operation                                                       | MCP result                                                               |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| No own `security` field                                                 | `access` is absent                                                       |
+| `security: []`                                                          | `authentication: 'none'`, with empty schemes and scopes                  |
+| `security: [{}, { bearerAuth: [] }]`                                    | `authentication: 'optional'`                                             |
 | `security: [{ bearerAuth: ['catalog:read'] }]` plus `x-netscript-roles` | `authentication: 'required'` with the declared scheme, scopes, and roles |
 
 `get_operation_schema` also emits distinct curl guidance for all four states. Required operations
@@ -230,8 +231,10 @@ drift into `.netscript/agent/drift.jsonl`.
 
 - **Required evidence**: Requires a fresh successful diagnostic receipt (timestamped within 15
   minutes, `exitStatus: 0`) for the target resource. Receipts are automatically produced when
-  calling `doctor`, telemetry/API-introspection tools, `netscript plugin doctor --resource
-  <resource>`, or a successful `execute_command` carrying the same `resource`.
+  calling `doctor`, telemetry/API-introspection tools,
+  `netscript plugin doctor --resource
+  <resource>`, or a successful `execute_command` carrying the
+  same `resource`.
 - **Target & Scope**: The `resource` argument targets a specific plugin, service, or `'project'`.
   Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
 - **Mutation behavior**: Appends a single JSON line to `.netscript/agent/drift.jsonl` under the
@@ -349,15 +352,42 @@ The default library composition needs `--allow-read` for carriers and real-path 
 requests. Tests and custom hosts can replace every source and the probe through
 `ServiceEndpointDirectoryOptions`.
 
+## Faithful document retrieval
+
+`get_doc({ slug })` returns `contractVersion: 2` and a fidelity `mode`: `verbatim` when the
+JSON-escaped UTF-8 content fits 12 KiB, or `extract` for larger documents. Extraction selects whole
+fences, command lines and config-key lines first (cheapest first), heading lines second, sentences
+containing inline code or links third, and plain first sentences last. Selected spans retain their
+source order. It includes the whole-document navigation outline even when `content` is scoped to a
+section, and omitted-block/character counts. Partially omitted paragraphs count as omitted blocks. A
+snippet or sentence that cannot fit is omitted whole.
+
+Use `get_doc({ slug, full: true })` for complete source text. Repeat with the returned `nextCursor`
+as `cursor`, the same slug/section, and `full: true` until no cursor remains. Concatenate each
+`content` page in order. Cursors bind the canonical document and section to a SHA-256 digest;
+`invalid_doc_cursor` means restart retrieval. Full pages preserve exact body bytes and Unicode;
+front matter is metadata, and named sections retain the existing trimmed-body convention.
+
+The generic 2,000-character/50-item truncation policy does not apply to `get_doc`. Its complete MCP
+response remains bounded at 64 KiB. Oversized metadata returns an explicit error suggesting full
+mode. Sources above 4 Mi UTF-16 characters are skipped during indexing; retrieving one returns
+`doc_too_large` naming its slug. The accepted corpus remains available, without silent truncation.
+Run `deno task --cwd packages/mcp benchmark:docs` for the offline docs-corpus benchmark, or append
+`--embedded` for the release fallback. Metrics include all-document and extract-only lexical content
+ratios, independently inventoried fence/command/config/link retention, missing-material fallback
+proxies, latency, and exact full reconstruction against the previous truncation baseline. Observed
+agent filesystem fallback is a separate optional receipt.
+
 ## Configuration at a glance
 
 - **Telemetry endpoint discovery** (tools and `doctor`): explicit `--endpoint`, then
   `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then the running AppHost reported by
   `aspire ps --format Json`, then `http://localhost:18888`.
 - **Docs corpus**: explicit `--docs-root <path>`, then `NETSCRIPT_DOCS_ROOT`, then an indexable
-  `<projectRoot>/.netscript/docs`, then the bounded generated release fallback. `agent init
-  --with-docs` writes the installed root into every generated host command. `list_docs.corpus`
-  reports `kind`, resolved `root` (or `null`), and total `documentCount`.
+  `<projectRoot>/.netscript/docs`, then the bounded generated release fallback.
+  `agent init
+  --with-docs` writes the installed root into every generated host command.
+  `list_docs.corpus` reports `kind`, resolved `root` (or `null`), and total `documentCount`.
 - **Service endpoint discovery** (library surface): `.netscript/agent-mcp.json` override, then the
   Aspire CLI machine-readable query, then an identity-bound run manifest, then
   `aspire/appsettings.json`; lower-priority disagreements remain visible as conflicts.
