@@ -82,6 +82,8 @@ same `projectChatSnapshot` applied to the same session log.
 | `NetScriptChatAuthorize`                                                                         | type     | `(request, sessionId) => boolean \| Promise<boolean>`.                                         |
 | `NetScriptChatStreamPath`                                                                        | type     | Static prefix or per-session subpath resolver for durable chat streams.                        |
 | `NetScriptChatConnectionOptions`, `NetScriptChatResponseOptions`, `NetScriptChatSnapshotOptions` | type     | Option bags for the three functions.                                                           |
+| `NetScriptChatProducer`                                                                          | type     | Writer identity `{ id, epoch }` for fenced appends.                                            |
+| `NetScriptChatProducerError`                                                                     | class    | Typed fenced-append failure.                                                                   |
 
 **SR2 tolerance.** `createNetScriptChatConnection(...).subscribe()` complements
 the service-side SR2 fix (204/bridge): a first-subscribe that races a
@@ -103,6 +105,25 @@ a caller is production), but the factory bakes in **no** default allow-all.
 turn (`403 Forbidden`) unless the hook returns `true`, and throws if `authorize`
 is supplied without a `request`. Ship a real `authorize` before exposing a chat
 route publicly — without one the session stream is unauthenticated.
+
+**`producer` — writer fencing (#2067).** A background chat executor (a worker or
+saga holding a lease) passes `producer: { id, epoch }`. The text echoes,
+complete native `newMessages` batch, and every assistant chunk are then appended
+through one `@durable-streams/client` `IdempotentProducer` sequence `(id, epoch,
+seq)`, so the streams service rejects a writer whose epoch is older than the
+newest one that has written. The rejection surfaces as
+`NetScriptChatProducerError` (`kind: 'stale-epoch'`, `currentEpoch`), thrown in
+`mode: 'await'` or while echoing, and nothing from the rejected appends is
+stored. The caller owns the epoch (its claim generation); `autoClaim` is never
+enabled. Every chunk is its own producer batch, so its `seq` is its index in the
+turn whatever the source timing: replaying the same turn under the same `(id,
+epoch)` appends only the chunks an earlier call never stored. Stored indexes are
+dropped without a content comparison, so a pair is for one turn only. A higher
+epoch starts a new sequence and does not remove an older claim's chunks. Fenced
+turns send one request per chunk (at most five in flight). Fenced turns persist
+the same native message batch as the default path, including non-text parts and
+metadata. Without `producer` the default (unfenced) NetScript path is used
+unchanged.
 
 ### FA2 — durable chat stream proxy (sibling slice #251, same subpath)
 
