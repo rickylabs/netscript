@@ -261,8 +261,8 @@ await defineService(router, {
 
 When the auth plugin is installed and enabled, `netscript service add` generates these native guards
 and records the plugin reference for service discovery. The required scope is `<service>:access`:
-without a bearer session `/api` returns 401, a valid session without that scope receives 403,
-and `/health` remains anonymous. The remote verifier uses the auth service's SDK; the guarded service
+without a bearer session `/api` returns 401, a valid session without that scope receives 403, and
+`/health` remains anonymous. The remote verifier uses the auth service's SDK; the guarded service
 holds no auth backend or provider secret. Authenticated app clients attach the bearer through an SDK
 contribution.
 
@@ -275,8 +275,9 @@ auth: {
 },
 ```
 
-After installing auth, add a guarded service or update an existing public entrypoint with the guarded
-policy above. An authored service entrypoint is preserved unless you explicitly overwrite it.
+After installing auth, add a guarded service or update an existing public entrypoint with the
+guarded policy above. An authored service entrypoint is preserved unless you explicitly overwrite
+it.
 
 New services scaffolded by `netscript service add` opt into a 1 MiB `bodyLimit`. Raise
 `maxBytes` for a service that accepts larger payloads, such as base64 document uploads. Remove the

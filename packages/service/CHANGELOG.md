@@ -18,10 +18,10 @@
 
   Reasons must be nonblank; public and guarded fields cannot be mixed. `netscript service add`
   generates remote auth-session verification and a `<service>:access` scope rule when an enabled
-  auth plugin is installed. `/api`, including OpenAPI and RPC, requires that scope; `/health` remains
-  anonymous. Without auth installed, the generated public reason explains how to protect the API.
-  Existing authored services retain their policy and must be migrated explicitly. See the README
-  auth policy migration.
+  auth plugin is installed. `/api`, including OpenAPI and RPC, requires that scope; `/health`
+  remains anonymous. Without auth installed, the generated public reason explains how to protect the
+  API. Existing authored services retain their policy and must be migrated explicitly. See the
+  README auth policy migration.
 
 - **Breaking (0.0.8):** CORS no longer defaults to wildcard access. Configure
   `NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'` for services and plugins, or
