@@ -4,8 +4,8 @@ import type { MessageQueue as PlainMessageQueue } from '@netscript/queue/ports';
 import {
   type MessageContext,
   type MessageQueue,
-  type TracedQueueMessageContext,
   TracedQueue,
+  type TracedQueueMessageContext,
 } from '@netscript/telemetry/instrumentation';
 import { getSpanFromContext } from '@netscript/telemetry/context';
 import { recording } from '../commands/native-fixture.ts';
