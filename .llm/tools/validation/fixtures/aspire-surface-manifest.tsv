@@ -610,6 +610,7 @@ packages/cli/src/kernel/templates/workspace/generators_test.ts	generator:workspa
 packages/cli/src/kernel/templates/workspace/netscript-config.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/quality-runner_test.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/quality-runner.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
+packages/cli/src/local/composition/local-browser-auth-lifecycle_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
