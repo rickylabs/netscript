@@ -9,6 +9,7 @@ import {
   createKvOAuthBackend,
   createKvOAuthStore,
   defineOAuthProvider,
+  presetProviderKind,
 } from '@netscript/auth-kv-oauth';
 import {
   createWorkosBackend,
@@ -139,7 +140,10 @@ async function createActiveBackend(
         displayName: env.NETSCRIPT_AUTH_PROVIDER_DISPLAY_NAME,
         clientId: provider.clientId,
         clientSecret: env.NETSCRIPT_AUTH_CLIENT_SECRET,
-        issuer: env.NETSCRIPT_AUTH_ISSUER,
+        // OAuth presets use explicit endpoints, even if an old shell or deployment supplies issuer.
+        issuer: presetProviderKind(env.NETSCRIPT_AUTH_PROVIDER_ID ?? '') === 'oauth'
+          ? undefined
+          : env.NETSCRIPT_AUTH_ISSUER,
         authorizationEndpoint: provider.authorizationEndpoint,
         tokenEndpoint: provider.tokenEndpoint,
         userInfoEndpoint: env.NETSCRIPT_AUTH_USERINFO_ENDPOINT,

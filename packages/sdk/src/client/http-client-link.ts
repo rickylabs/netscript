@@ -30,7 +30,7 @@ import type {
 } from '../internal/transport-policy.ts';
 import type { ClientLinkPort } from '../ports/client-link-factory.ts';
 import type { SdkClientContributionContext } from '../ports/sdk-client-contribution.ts';
-import type { ServiceClientContext } from '../ports/service-client.ts';
+import type { ServiceClientContext, ServiceUrlResolver } from '../ports/service-client.ts';
 
 type HttpRuntimeClientContext =
   & StableV1TransportContext<object>
@@ -58,6 +58,8 @@ export interface HttpClientLinkOptions<
   propagateTraceContext: boolean;
   /** Trace header provider used when propagation is enabled. */
   getTraceHeaders: () => Record<string, string>;
+  /** Per-call service URL resolver; defaults to Aspire discovery (`getServiceUrl`). */
+  resolveServiceUrl?: ServiceUrlResolver;
   /** Explicit validated client-contribution tuple. */
   contributions?: TContributions;
   /** Private transport fetch seam used by conformance tests. */
@@ -114,6 +116,7 @@ export function createHttpClientLink<
   protocol,
   propagateTraceContext,
   getTraceHeaders,
+  resolveServiceUrl = getServiceUrl,
   contributions,
   fetch: transportFetch = globalThis.fetch,
 }: HttpClientLinkOptions<TContributions>): ClientLinkPort<
@@ -217,7 +220,7 @@ export function createHttpClientLink<
     preparation,
     transportPolicy,
     resolveTransport: () => {
-      const discovered = new URL(getServiceUrl(serviceName, protocol));
+      const discovered = new URL(resolveServiceUrl(serviceName, protocol));
       return Object.freeze({
         kind: 'http' as const,
         origin: new URL(discovered.origin),
