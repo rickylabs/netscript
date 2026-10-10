@@ -169,6 +169,46 @@ cascades also require `native.resolveCompensation` so the runtime can recover th
 instance, and state. Missing compensators, resolvers, matching branches, and unknown effect kinds
 fail with a named `SAGA_NOT_IMPLEMENTED` error instead of being discarded.
 
+### What a compensation persists
+
+A compensation is two persisted transitions, and neither needs a follow-up message. The `.on()`
+transition that returns `sagaCompensate(...)` saves the instance as `compensating`. When the
+`.compensate()` branch finishes, the runtime saves the branch's state change and its outcome as the
+next version of the instance. It uses the same versioned transition commit as `.on()`, on plain and
+atomic stores alike:
+
+| `.compensate()` branch outcome     | Persisted status                                        |
+| ---------------------------------- | ------------------------------------------------------- |
+| returns `[]` (or only `send`s)     | `compensated`: the undo finished (terminal)             |
+| returns `[sagaFail(reason)]`       | `failed` (terminal)                                     |
+| returns `[sagaComplete(result)]`   | `completed` (terminal)                                  |
+| returns `[sagaCompensate(...)]`    | stays `compensating` until the nested branch finishes   |
+| throws                             | `failed`, with `metadata.compensationError` set; every partial state change (including in-place edits of nested objects) is discarded and the error is rethrown |
+
+A branch runs on its own copy of the state, so editing `saga.state` in place is safe: nothing is
+saved unless the branch returns.
+
+When one handler returns several effects, they run in order. Each `sagaCompensate(...)` runs against
+the latest state and version saved for its instance during that dispatch, and saves its own outcome
+as the next version. That includes an earlier compensation, other sagas that handled the same
+message, and any transition a `send(...)` caused, whether the instance handled the message itself or
+it came back through other sagas. So for `[sagaCompensate(releaseStock), sagaCompensate(refundPayment)]`, both branches'
+state changes are kept, and the last outcome sets the final status.
+
+A `sagaFail(...)` returned from `.on()` saves `failed` first. If a `.compensate()` branch is
+registered for that message type, it then runs, and its outcome is saved by the same table. A
+branch's own `sagaFail` ends the instance. It is never routed back into the branch.
+
+`compensating` means the undo is still running. It is not a final status. An ordinary `.on()`
+handler that returns no terminal effect leaves a `compensating` instance as `compensating`; it never
+returns it to `running`. This applies to rows written by runtimes before 0.0.8, which left an
+instance at `compensating` permanently: they still load. To end one, deliver a message whose `.on()`
+handler returns `sagaFail(...)` or `sagaComplete(...)`.
+
+Each outcome commit expects the version the compensation ran against. Its replay identity comes from
+that version. So a redelivered outcome is not applied twice: `SagaEngine.commitCompensation(...)`
+reports `committed: false`, and the branch's cascades are not dispatched again.
+
 ## Key types first
 
 Before the options, the primary interfaces the DSL works in. `SagaState` is the base
@@ -402,7 +442,7 @@ response; the endpoint never treats an indefinitely pending publish as success.
     { name: "headers", type: "Record<string, string>", desc: "Extra headers sent with every publish (auth, tenant routing)." },
     { name: "retryableStatusCodes", type: "readonly number[] (default 408,409,425,429,5xx)", desc: "HTTP statuses treated as retryable so the receipt is marked retryable." },
     { name: "id", type: "string (default 'http-saga-publisher')", desc: "Stable publisher id surfaced in diagnostics." },
-    { name: "fetcher / readEnv", type: "boundary fns", desc: "Test/injection seams for the fetch implementation and the env reader used for discovery." }
+    { name: "fetcher / readEnv / listEnvKeys", type: "boundary fns", desc: "Test/injection seams for the fetch implementation, the env reader used for discovery, and the env key-name enumeration used only to diagnose a failed discovery." }
   ]
 }) }}
 
@@ -410,6 +450,14 @@ The port returns a typed **receipt** rather than throwing: `publish(...)` resolv
 `SagaPublisherResult` — either `{ published: true, ... }` (a `SagaPublisherReceipt`) or
 `{ published: false, reason, retryable }` (a `SagaPublisherRejected`). `publishMany(...)`
 takes a `mode: 'sequential' | 'parallel'` so a batch can fan out.
+
+There is no fallback port: when no source resolves, the receipt is non-retryable with
+`reason: 'no-endpoint'` and a `diagnostic` naming each source tried, in order —
+`options.baseUrl`, `services__<serviceName>__https__0`, `services__<serviceName>__http__0`,
+`SAGAS_API_URL`, `NETSCRIPT_SAGAS_URL` — plus whether a `services__*` key or `NETSCRIPT_ASPIRE`
+marker proved an Aspire environment and whether env enumeration was denied. It carries key
+names only, never values. `publishSagaOrThrow(...)` renders that diagnostic into the
+`SagasError` it raises.
 
 {{ comp.tabbedCode({ tabs: [
   {

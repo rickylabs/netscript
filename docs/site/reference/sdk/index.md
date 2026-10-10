@@ -46,7 +46,8 @@ These symbols are available from the root export and the focused, browser-safe
 | `ServiceClientContext` | interface | Per-call service client context. |
 | `ServiceClientContract` | interface | Compile-time marker that preserves the source contract for inference. |
 | `ServiceRequestOptions` | interface | Optional second argument passed to service-client methods. |
-| `CreateServiceClientOptions` | interface | Options for creating a discovered service client. |
+| `CreateServiceClientOptions` | interface | Options for creating a discovered service client, including the optional `resolveServiceUrl` callback that replaces Aspire discovery. |
+| `ServiceUrlResolver` | type alias | `(serviceName, protocol) => string \| URL` callback that resolves a service's base URL per call; the client keeps only its origin. |
 | `ContractLike` | type alias | Recursive structural representation of an oRPC contract router. |
 | `ContractProcedureLike` | interface | Minimal structural representation of an oRPC contract procedure. |
 | `ContractProcedureMetadata` | interface | Public oRPC metadata used to derive client typing. |
@@ -131,6 +132,17 @@ await client.echo(
   { context: { tenantId: 'tenant_123' } },
 );
 ```
+
+### Internal service credential contribution
+
+`createInternalCredentialSdkClientContribution({ service, secret?, allowInsecureTransport? })` sends
+the installation's internal credential for `service` as `Authorization: Bearer …`. Workers, sagas
+and triggers use it to call internal procedures, and session-guarded services that compose the
+internal-credential authenticator, under a service identity instead of an app or user session.
+Without `secret`, it loads `NETSCRIPT_INSTALLATION_SECRET_FILE` once. It derives the bearer once
+per contribution. Procedures declaring `authentication: 'none'` receive no credential. It is
+`direct-only`, so credentialed responses never enter a shared query cache. Non-loopback cleartext
+HTTP is refused unless `allowInsecureTransport` is set.
 
 ## Server-side query factories (`@netscript/sdk/query`)
 
@@ -237,6 +249,8 @@ Browser- and island-facing TanStack Query integration.
 ## Service discovery (`@netscript/sdk/discovery`)
 
 Resolves Aspire-managed service URLs and database/KV connections from environment variables.
+`getServiceUrl` reads the runtime globals; `resolveServiceUrlFromSources` is its pure counterpart
+over explicit sources, for runtimes without Vite or Deno.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -244,6 +258,11 @@ Resolves Aspire-managed service URLs and database/KV connections from environmen
 | `getServiceInfo` | function | Get all endpoints for a service. |
 | `getAllServices` | function | Get all available server-side Aspire service names. |
 | `isServiceAvailable` | function | Check whether a service endpoint is available. |
+| `resolveServiceUrlFromSources` | function | Pure resolver over explicit browser and server environment sources; reads no runtime global and returns `undefined` when no key matches. |
+| `getBrowserServiceUrlFromEnv` | function | Read a service URL from a provided `VITE_` environment bag. |
+| `ServiceUrlEnvironmentSources` | interface | Explicit `browserEnv` / `serverEnv` sources for `resolveServiceUrlFromSources`. |
+| `ServerEnvironment` | interface | Server environment reader (`get`, optional `toObject`), usually `Deno.env`. |
+| `BrowserEnvironment` | type alias | Browser environment bag, usually `import.meta.env`. |
 | `getKvConnection` | function | Get KV connection from SQLite or remote Deno KV environment variables. |
 | `getPostgresConnection` | function | Get PostgreSQL connection settings from environment variables. |
 | `getPostgresUri` | function | Get the PostgreSQL connection URI. |

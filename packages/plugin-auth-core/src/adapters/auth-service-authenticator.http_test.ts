@@ -71,7 +71,8 @@ Deno.test('remote verifier distinguishes contract denial, provider failure and t
     method: 'GET',
     path: '/private',
   };
-  const verifier = createAuthServiceAuthenticator({ serviceName, timeoutMs: 100 });
+  // Normal replies include cold SDK/service startup; only the stalled-response case needs 100 ms.
+  const verifier = createAuthServiceAuthenticator({ serviceName, timeoutMs: 5000 });
   const app = createService({}, { name: 'remote-verifier-consumer' })
     .route('get', '/api/private', () => Response.json({ allowed: true }))
     .withAuthn({ authenticator: verifier })
@@ -108,8 +109,9 @@ Deno.test('remote verifier distinguishes contract denial, provider failure and t
     });
     assertEquals((await app.request('/api/private', { headers })).status, 401);
     mode = 'timeout';
+    const timeoutVerifier = createAuthServiceAuthenticator({ serviceName, timeoutMs: 100 });
     const timeoutError = await assertRejects(
-      async () => await verifier.authenticate(request),
+      async () => await timeoutVerifier.authenticate(request),
       RemoteSessionVerificationError,
     );
     assertEquals(timeoutError.code, 'timeout');

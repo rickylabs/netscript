@@ -47,6 +47,11 @@ function emptyFailureCensus(analysis: JsdocExampleAnalysis): JsdocFailureCensus 
   };
 }
 
+/** Failure classes the gate enforces; `typeError` alone stays deferred to its ratchet. */
+function enforcedFailures(census: JsdocFailureCensus): number {
+  return census.badSpecifier + census.unboundName + census.unfenced + census.malformed;
+}
+
 function ownerLabel(block: JsdocExampleBlock): string {
   return `${block.owner.sourcePath} · ${block.owner.kind}${
     block.owner.symbol ? ` ${block.owner.symbol}` : ''
@@ -322,7 +327,12 @@ export function unattributedDiagnostics(
   return unattributed;
 }
 
-/** Classify each synthetic module from deterministic, ANSI-independent Deno diagnostics. */
+/**
+ * Classify each synthetic module from deterministic, ANSI-independent Deno diagnostics.
+ *
+ * Bad specifiers and unbound names are enforced failures; only published-API type errors are
+ * returned as deferred examples.
+ */
 export function classifyDenoCheckDiagnostics(
   raw: string,
   modules: ReadonlyArray<{ path: string; block: JsdocExampleBlock }>,
@@ -343,13 +353,6 @@ export function classifyDenoCheckDiagnostics(
       census.badSpecifier += 1;
     } else if (relatedCodes.some((code) => code === 2304 || code === 2552 || code === 18004)) {
       census.unboundName += 1;
-      deferredExamples.push({
-        failureClass: 'unboundName',
-        owner: module.block.owner,
-        exampleOrdinal: module.block.exampleOrdinal,
-        fenceOrdinal: module.block.fenceOrdinal,
-        tsCodes,
-      });
     } else {
       census.typeError += 1;
       deferredExamples.push({
@@ -379,7 +382,7 @@ export async function compileJsdocExamples(
       code: 1,
       diagnostics: `empty selection refused: ${condition}; deno check was not spawned`,
       failureCensus,
-      enforcedFailureCount: failureCensus.unfenced + failureCensus.malformed,
+      enforcedFailureCount: enforcedFailures(failureCensus),
       deferredExamples: [],
       rootLockUnchanged: true,
       temporaryLockRewritten: false,
@@ -410,8 +413,7 @@ export async function compileJsdocExamples(
           'empty selection refused: zero checked modules; deno check was not spawned',
         ].join('\n'),
         failureCensus: classified.failureCensus,
-        enforcedFailureCount: classified.failureCensus.badSpecifier +
-          classified.failureCensus.unfenced + classified.failureCensus.malformed,
+        enforcedFailureCount: enforcedFailures(classified.failureCensus),
         deferredExamples: classified.deferredExamples,
         rootLockUnchanged: true,
         temporaryLockRewritten: false,
@@ -483,8 +485,7 @@ export async function compileJsdocExamples(
         ...unowned.map((entry) => `  ${entry}`),
       ].join('\n'),
     ].filter(Boolean).join('\n');
-    const enforcedFailureCount = classified.failureCensus.badSpecifier +
-      classified.failureCensus.unfenced + classified.failureCensus.malformed;
+    const enforcedFailureCount = enforcedFailures(classified.failureCensus);
     const unclassifiedCompilerFailure = output.code !== 0 &&
       classified.classifiedCompilerFailureCount === 0;
     const code = enforcedFailureCount === 0 && !unclassifiedCompilerFailure && unowned.length === 0

@@ -18,6 +18,7 @@ export type {
   RetryPolicy,
   SagaBusPort,
   SagaClockPort,
+  SagaCompensationError,
   SagaConcurrencyPolicy,
   SagaContext,
   SagaCorrelation,

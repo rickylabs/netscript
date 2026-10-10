@@ -14,6 +14,7 @@ path	class	owner	disposition
 .github/labels.yml	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/pull_request_template.md	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/scripts/aspire-nuget-cache-policy.test.ts	ci:policy-test	S1	single-train assertions; parity phase 1 enforce
+.github/scripts/ci-test-shards.json	ci:timing-data	S1	measured test-module weights; Aspire paths identify test coverage, not version assertions
 .github/toolchain.env	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/workflows/ci.yml	ci:workflow	S1	single 13.5.3 train, cache key, preflight; parity phase 1 enforce
 .github/workflows/e2e-cli-prod-local.yml	ci:workflow	S1	single 13.5.3 train, cache key, preflight; parity phase 1 enforce
@@ -52,6 +53,9 @@ path	class	owner	disposition
 .llm/tools/docs/check-accuracy-and-discoverability.ts	negative-version-guard	S7/S13	negative docs enforcement: retain only direct forbidText second-argument version literals, enforce all other references
 .llm/tools/docs/check-docs-contract-derivation.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-exports-drift.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/e2e/prepull-runtime-images_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/e2e/prepull-runtime-images.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/e2e/resolve-postgres-image.cs	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/e2e/scaffold-e2e-test_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/e2e/scaffold-e2e-test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/entry.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -194,6 +198,7 @@ docs/site/reference/plugin/index.md	doc:public-page	S11	prose sweep + #1000 term
 docs/site/reference/queue/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/sagas/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/sdk/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/reference/service/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/streams/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/triggers/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/workers/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
@@ -327,6 +332,7 @@ packages/cli/e2e/src/application/gates/scaffold/runtime/capture-db-endpoint-allo
 packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-capture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/doctor.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/resource-command.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -379,6 +385,7 @@ packages/cli/e2e/tests/application/builders/suite-builder_test.ts	e2e	S2/S3/S10	
 packages/cli/e2e/tests/application/gates/aspire-cleanup-evidence_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/aspire-dashboard-telemetry_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/aspire-mcp-smoke_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/aspire-start-diagnostics_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/aspire-structured-evidence_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/capture-db-endpoint-allocation_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/command-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -561,6 +568,7 @@ packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-diagnostics-budg
 packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment-runtime_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/workspace-cors-support.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/types.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/database/generate-prisma-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -694,7 +702,6 @@ packages/mcp/src/domain/telemetry-endpoint.ts	mcp:client	S3/S11/S13	Aspire CLI/d
 packages/mcp/src/domain/tool-contracts.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-ps-dashboard-reader.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
-packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/appsettings-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-command.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
@@ -719,6 +726,9 @@ packages/mcp/tests/telemetry-endpoint_test.ts	mcp:fixtures	S3	add 13.5.3 describ
 packages/mcp/tests/telemetry-live-fixture_test.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/plugin-auth-core/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-auth-core/src/adapters/auth-service-authenticator.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin-sagas-core/src/integration/publisher/publish-saga-or-throw.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin-sagas-core/src/integration/publisher/saga-publisher-port.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin-sagas-core/tests/integration/publisher/publish-saga-or-throw_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-streams-core/src/application/create-durable-stream.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-streams-core/src/application/create-service-stream-producer.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-streams-core/src/application/stream-url-resolver.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
@@ -752,6 +762,7 @@ packages/queue/ports/options.ts	package:other	S4	mention only (service discovery
 packages/queue/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/mod.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/sdk/src/client/http-client-link.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/client/mod.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/client/service-client.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/discovery/browser-env.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
@@ -761,6 +772,8 @@ packages/sdk/src/discovery/service-url.ts	package:other	S4	mention only (service
 packages/sdk/src/ports/service-client.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/presets/define-services.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/tests/discovery/env-ordering_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/sdk/tests/integration/service-url-resolver_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/service/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/service/src/diagnostics/database-connectivity.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/telemetry/query.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
 packages/telemetry/README.md	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
@@ -789,6 +802,7 @@ plugins/sagas/src/cli/adapters/runtime-api-client.ts	plugin:sagas	S5	SagaPublish
 plugins/sagas/src/constants.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/e2e/probes/probe-context.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/public/mod.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
+plugins/sagas/src/runtime/saga-endpoint-resolver.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/runtime/saga-publisher.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/aspire/sagas-contribution_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/e2e/sagas-gates_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
