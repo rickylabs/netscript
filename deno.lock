@@ -596,7 +596,9 @@
         "jsr:@std/assert@^1.0.19",
         "jsr:@std/async@^1.4.0",
         "jsr:@std/data-structures@^1.1.0",
-        "jsr:@std/internal@^1.0.14"
+        "jsr:@std/fs@^1.0.24",
+        "jsr:@std/internal@^1.0.14",
+        "jsr:@std/path@^1.1.5"
       ]
     },
     "@std/text@1.0.19": {
