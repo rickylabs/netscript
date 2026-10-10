@@ -73,8 +73,14 @@ export interface WorkosSessionAuthenticationSuccess {
   readonly entitlements?: readonly string[];
   /** WorkOS feature flags present on the token. */
   readonly featureFlags?: readonly string[];
-  /** WorkOS user object. */
-  readonly user: { readonly id: string; readonly [key: string]: unknown };
+  /** WorkOS user object, preserved in claims. Only its id is required for mapping.
+   *
+   * The record alternative accepts additional fields in inline application fixtures without
+   * requiring an index signature on upstream SDK interfaces.
+   */
+  readonly user:
+    | { readonly id: string }
+    | { readonly id: string; readonly [key: string]: unknown };
   /** WorkOS impersonator metadata when the session is impersonated. */
   readonly impersonator?: unknown;
 }
