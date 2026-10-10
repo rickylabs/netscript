@@ -14,6 +14,7 @@ path	class	owner	disposition
 .github/labels.yml	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/pull_request_template.md	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/scripts/aspire-nuget-cache-policy.test.ts	ci:policy-test	S1	single-train assertions; parity phase 1 enforce
+.github/scripts/ci-test-shards.json	ci:timing-data	S1	measured test-module weights; Aspire paths identify test coverage, not version assertions
 .github/toolchain.env	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/workflows/ci.yml	ci:workflow	S1	single 13.5.3 train, cache key, preflight; parity phase 1 enforce
 .github/workflows/e2e-cli-prod-local.yml	ci:workflow	S1	single 13.5.3 train, cache key, preflight; parity phase 1 enforce
