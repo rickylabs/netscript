@@ -383,6 +383,27 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   );
 });
 
+Deno.test('runtime suites prove the CLI-generated guarded plugin before generated quality (#1383)', () => {
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
+    const guarded = ids.indexOf(GATE.BEHAVIOR_GENERATED_GUARDED_PLUGIN);
+    assertEquals(guarded >= 0, true, `${suiteId} must run the generated guarded-plugin gate`);
+    for (const before of [GATE.GENERATED_PLUGINS_CHECK, GATE.GENERATED_SAGAS_REGISTRY]) {
+      assertEquals(ids.indexOf(before) < guarded, true, `${suiteId}: ${before} must precede it`);
+    }
+    for (
+      const after of [
+        GATE.RUNTIME_ASPIRE_RESTORE,
+        GATE.GENERATED_DENO_CHECK,
+        GATE.GENERATED_DENO_LINT,
+        GATE.GENERATED_DENO_FMT_CHECK,
+      ]
+    ) {
+      assertEquals(guarded < ids.indexOf(after), true, `${suiteId}: ${after} must follow it`);
+    }
+  }
+});
+
 Deno.test('listener failure/recovery gate runs after topology capture and before behavior', () => {
   for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
     const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);

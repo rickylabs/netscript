@@ -226,7 +226,7 @@ Deno.test('an explicit documented-symbol import may shadow the ambient conventio
   assertEquals(result.code, 0, result.diagnostics);
 });
 
-Deno.test('body diagnostics are classified and deferred without weakening the import gate', async () => {
+Deno.test('an unbound name in an example body fails the gate instead of being deferred', async () => {
   const result = await compileJsdocExamples(
     analysis([
       block(
@@ -236,26 +236,28 @@ Deno.test('body diagnostics are classified and deferred without weakening the im
     ]),
     repositoryRoot,
   );
-  assertEquals(result.code, 0, result.diagnostics);
-  assertEquals(result.enforcedFailureCount, 0);
+  assertEquals(result.code, 1, result.diagnostics);
+  assertEquals(result.enforcedFailureCount, 1);
   assertEquals(result.failureCensus.unboundName, 1);
-  assertEquals(
-    result.deferredExamples.map((example) => ({
-      failureClass: example.failureClass,
-      exampleOrdinal: example.exampleOrdinal,
-      fenceOrdinal: example.fenceOrdinal,
-      tsCodes: example.tsCodes,
-    })),
-    [{
-      failureClass: 'unboundName',
-      exampleOrdinal: 1,
-      fenceOrdinal: 1,
-      tsCodes: [2304],
-    }],
-  );
+  assertEquals(result.typeErrorExamples, []);
+  assertStringIncludes(result.diagnostics, "Cannot find name 'missingInput'");
 });
 
-Deno.test('an unclassified compiler abort fails closed even when deferred syntax findings exist', async () => {
+Deno.test('a declared stand-in binds an application-side name', async () => {
+  const result = await compileJsdocExamples(
+    analysis([
+      block(
+        owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+        'declare const missingInput: { page: number; limit: number };\nPaginationInputSchema.parse(missingInput);',
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(result.code, 0, result.diagnostics);
+  assertEquals(result.failureCensus.unboundName, 0);
+});
+
+Deno.test('an unclassified compiler abort fails closed alongside syntax findings', async () => {
   const result = await compileJsdocExamples(
     analysis([
       block(
@@ -290,11 +292,12 @@ Deno.test('placeholder preclassification ignores comments and leaves diagnostics
     ]),
     repositoryRoot,
   );
-  assertEquals(result.code, 0, result.diagnostics);
+  assertEquals(result.code, 1, result.diagnostics);
+  assertEquals(result.enforcedFailureCount, 1);
   assert(result.denoCheckSpawned);
   assertEquals(result.failureCensus.typeError, 1);
   assertEquals(
-    result.deferredExamples.map(({ fenceOrdinal, tsCodes }) => ({ fenceOrdinal, tsCodes })),
+    result.typeErrorExamples.map(({ fenceOrdinal, tsCodes }) => ({ fenceOrdinal, tsCodes })),
     [{ fenceOrdinal: 2, tsCodes: [2451] }],
   );
 });
@@ -358,15 +361,12 @@ Deno.test('diagnostic classification is identical with compiler color on and off
   assertEquals(withColor, withoutColor);
   assertEquals(withColor.census, { badSpecifier: 1, typeError: 1, unboundName: 1 });
   assertEquals(
-    withColor.deferredExamples.map((example) => ({
+    withColor.typeErrorExamples.map((example) => ({
       failureClass: example.failureClass,
       fenceOrdinal: example.fenceOrdinal,
       tsCodes: example.tsCodes,
     })),
-    [
-      { failureClass: 'unboundName', fenceOrdinal: 2, tsCodes: [2304] },
-      { failureClass: 'typeError', fenceOrdinal: 3, tsCodes: [2345] },
-    ],
+    [{ failureClass: 'typeError', fenceOrdinal: 3, tsCodes: [2345] }],
   );
 });
 
@@ -474,16 +474,44 @@ Deno.test('an example using a value documented elsewhere, without importing it, 
   );
 
   const result = await compileJsdocExamples(analysis([documented, borrower]), repositoryRoot);
-  const borrowed = result.deferredExamples.filter((entry) =>
-    entry.owner.symbol === 'defineStub' && entry.failureClass === 'unboundName'
-  );
-  assertEquals(
-    borrowed.length,
-    1,
-    'the borrowing example must be classified, not silently resolved',
-  );
+  assertEquals(result.code, 1, 'the borrowing example must fail, not be silently resolved');
   assert(
-    borrowed[0]?.tsCodes.includes(2304),
-    'the borrowed symbol must be reported as an unbound name',
+    new RegExp(
+      `TS2304 \\[ERROR\\]: Cannot find name 'substituteTokens'[\\s\\S]*?at [^\\n]*symbol defineStub`,
+    ).test(result.diagnostics),
+    'the borrowed symbol must be reported as an unbound name in the borrowing example',
   );
+});
+
+Deno.test('published API type errors reject the gate without a deferred allowance', async () => {
+  const api = owner('buildPrismaWhere', 'value', '@netscript/contracts/query');
+  const result = await compileJsdocExamples(
+    analysis([
+      block(
+        api,
+        `const filters = [{ field: 'status', operator: 'equals', value: 'active' }];
+buildPrismaWhere(filters);`,
+        1,
+      ),
+      block(
+        api,
+        `const info: { capabilities?: readonly string[] } = {};
+console.log(info.capabilities.length);`,
+        2,
+      ),
+      block(api, 'const repeated = 1;\nconst repeated = 2;', 3),
+      block(api, 'const illustrative = { value: ... };', 4),
+      block(
+        api,
+        `buildPrismaWhere([{ field: 'status', operator: 'equals', value: 'active' }]);`,
+        5,
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(result.failureCensus.typeError, 4, result.diagnostics);
+  assertEquals(result.failureCensus.unboundName, 0);
+  assertEquals(result.code, 1, result.diagnostics);
+  assertEquals(result.enforcedFailureCount, 4);
+  assert(result.rootLockUnchanged);
 });

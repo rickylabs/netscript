@@ -17,6 +17,7 @@ export type {
   CascadedMessageTarget,
   QueryDefinition,
   RetryPolicy,
+  SagaCompensationError,
   SagaConcurrencyPolicy,
   SagaContext,
   SagaCorrelation,

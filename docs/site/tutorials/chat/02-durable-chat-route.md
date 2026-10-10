@@ -126,6 +126,14 @@ The user message is appended to the durable session by the island in chapter 3 (
 `connection.send`), so this route reads it back through `resolveChatSnapshot` and only needs
 to stream the assistant reply. You could instead pass `newMessages: [userMessage]` to
 `toNetScriptChatResponse` to persist the prompt here — one place, either way, never both.
+That input accepts server-trusted TanStack UI/Model messages as `NetScriptChatSendMessage`,
+including original parts, attachments, metadata and tool calls. Validate any client
+input and give the model that same prompt; the plugin-AI scaffold instead builds a
+user turn from `message.text` and ignores client transcript fields. The legacy
+content-string input remains valid. Native batches survive storage and seed replay,
+but no public API returns their native parts: `NetScriptChatMessage` is the reduced
+rendering projection. Native batch tool cards appear on seed/reload but not live;
+the public native reader and native live replay remain follow-up scope for #2068.
 
 ## Step 3 — The one stream proxy
 
@@ -190,8 +198,8 @@ A provider error (bad or missing <code>ANTHROPIC_API_KEY</code>) surfaces <em>in
 
 The durable backend: a session route that runs a model turn and persists it behind a
 required `authorize` gate, and the one proxy the browser reads through. Notice the
-discipline underneath — one agreed message shape (`NetScriptChatMessage`) flows through the
-route, and the turn is written to the durable session *before* anyone renders it, so an
+discipline underneath — native messages enter persistence while `NetScriptChatMessage`
+describes the reduced rendering projection, and the turn is written to the durable session *before* anyone renders it, so an
 accepted reply survives the request that produced it. That "durable delivery" spine is what
 every later chapter builds on. Next you give it a face — copy the fresh-ui chat components
 and hydrate an island.

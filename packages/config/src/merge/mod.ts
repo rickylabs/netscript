@@ -151,7 +151,10 @@ function normalizeApps(
  *
  * @example
  * ```ts
+ * import type { NetScriptConfig } from "@netscript/config";
  * import { mergePartialConfig } from "@netscript/config/merge";
+ *
+ * declare const config: NetScriptConfig;
  *
  * const next = mergePartialConfig(config, {
  *   services: { "workers-api": { port: 8091 } },

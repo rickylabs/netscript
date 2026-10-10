@@ -21,6 +21,7 @@ import type { ConfigEnv, NetScriptConfig, NetScriptConfigInput } from './types.t
  * export default defineConfig({
  *   name: 'my-app',
  *   version: '1.0.0',
+ *   databases: { config: [] },
  *   services: {
  *     users: { port: 3000 },
  *     products: { port: 3001 },
@@ -51,6 +52,7 @@ export function defineConfig(config: NetScriptConfigInput): NetScriptConfig {
  *
  *   return {
  *     name: 'my-app',
+ *     databases: { config: [] },
  *     logging: {
  *       level: isDev ? 'debug' : 'info',
  *       format: isDev ? 'text' : 'json',

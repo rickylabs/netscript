@@ -11,7 +11,6 @@
  *     clientSecret: "secret_test",
  *     redirectUri: "https://app.example.test/auth/callback",
  *   }),
- *   allowInsecureRequests: true,
  * });
  * ```
  *
@@ -27,11 +26,13 @@ import type {
   AuthSessionCryptoPort,
   AuthSessionLookup,
   AuthSessionStorePort,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
 } from '@netscript/plugin-auth-core';
+import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
 import type { AuthnRequest, AuthnResult, Principal } from '@netscript/service/auth';
 import * as oauth from '@panva/oauth4webapi';
 import { buildCookieHeader } from './cookies.ts';
-import type { KvOAuthCookieOptions } from './cookies.ts';
 import type { CreateKvOAuthFlowOptions, KvOAuthFlow } from './flow.ts';
 import { clientAuth, createKvOAuthFlow, discoveryRequestOptions, requestOptions } from './flow.ts';
 import { KvOAuthError } from './errors.ts';
@@ -53,6 +54,8 @@ export type {
   AuthSessionPrincipalMapping,
   AuthSessionState,
   AuthSessionStorePort,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
   InteractiveCallbackResult,
   InteractiveFlowPort,
 } from '@netscript/plugin-auth-core';
@@ -110,9 +113,13 @@ export async function createKvOAuthBackend(
 ): Promise<KvOAuthBackend> {
   const store = options.store ?? await createKvOAuthStore();
   const provider = options.provider;
-  const cookie = options.cookie;
+  const cookie = {
+    ...options.cookie,
+    trustProxyHeaders: options.trustProxyHeaders ?? options.cookie?.trustProxyHeaders ?? false,
+  };
+  const cookieName = cookie.name ?? DEFAULT_SESSION_COOKIE_NAME;
   const flow = createKvOAuthFlow({ ...options, store });
-  const sessions = createSessionStore(provider, store, cookie);
+  const sessions = createSessionStore(provider, store, cookieName);
   const principalMapper = createPrincipalMapper();
 
   return {
@@ -123,13 +130,17 @@ export async function createKvOAuthBackend(
     principalMapper,
     interactive: flow,
     async authenticate(request: AuthnRequest): Promise<AuthnResult> {
-      const sessionId = request.cookie(cookie?.name ?? '__Host-ns_session');
-      if (!sessionId) {
+      const credential = resolveSessionCredential(
+        { token: readBearerCredential(request), request },
+        cookieName,
+      );
+      if (!credential) {
         return { ok: false, reason: 'kv_oauth_session_missing' };
       }
+      const sessionId = credential.sessionId;
       const entry = await store.getSessionEntry(sessionId);
       const record = entry?.record;
-      if (!record || record.session.state !== 'active') {
+      if (!record || (await withSubjectRevocation(store, record.session)).state !== 'active') {
         return { ok: false, reason: 'kv_oauth_session_not_found' };
       }
       const now = Date.now();
@@ -147,7 +158,10 @@ export async function createKvOAuthBackend(
         try {
           const refreshed = await refreshRecord(provider, store, entry!, options);
           session = refreshed.session;
-          setCookies = [buildCookieHeader(session.id, request, cookie)];
+          // Only a cookie-borne session is re-issued; a bearer caller never receives a cookie.
+          if (credential.transport === 'cookie') {
+            setCookies = [buildCookieHeader(session.id, request, cookie)];
+          }
         } catch (error) {
           if (error instanceof KvOAuthError && error.code === 'refresh_failed') {
             const current = await store.getSessionEntry(sessionId);
@@ -189,6 +203,33 @@ export async function createKvOAuthBackend(
  */
 const REVOKE_MAX_ATTEMPTS = 5;
 
+/** Session cookie read when no cookie name is configured. */
+const DEFAULT_SESSION_COOKIE_NAME = '__Host-ns_session';
+
+/** A session credential and the transport it arrived on. */
+type KvOAuthSessionCredential = Readonly<{
+  sessionId: string;
+  transport: 'lookup' | 'bearer' | 'cookie';
+}>;
+
+/**
+ * Resolve the session credential for both `sessions.getSession` and `authenticate`, so the auth
+ * service `session` and `me` operations agree: an explicit session id, then a bearer credential,
+ * then the session cookie. Selection is nullish: a provided but empty credential is selected and
+ * rejected, never skipped in favour of a weaker one.
+ */
+function resolveSessionCredential(
+  lookup: AuthSessionLookup,
+  cookieName: string,
+): KvOAuthSessionCredential | undefined {
+  const { sessionId, transport } = lookup.sessionId !== undefined
+    ? { sessionId: lookup.sessionId, transport: 'lookup' as const }
+    : lookup.token !== undefined
+    ? { sessionId: lookup.token, transport: 'bearer' as const }
+    : { sessionId: lookup.request?.cookie(cookieName), transport: 'cookie' as const };
+  return sessionId ? { sessionId, transport } : undefined;
+}
+
 function createProviderRegistry(provider: OAuthProviderConfig): AuthProviderRegistryPort {
   const descriptor = describeProvider(provider);
   return {
@@ -200,16 +241,16 @@ function createProviderRegistry(provider: OAuthProviderConfig): AuthProviderRegi
 function createSessionStore(
   provider: OAuthProviderConfig,
   store: KvOAuthStore,
-  cookie?: KvOAuthCookieOptions,
+  cookieName: string,
 ): AuthSessionStorePort {
   return {
     async getSession(lookup: AuthSessionLookup): Promise<AuthSession | undefined> {
-      const sessionId = lookup.sessionId ?? lookup.token ??
-        lookup.request?.cookie(cookie?.name ?? '__Host-ns_session');
-      if (!sessionId) {
+      const credential = resolveSessionCredential(lookup, cookieName);
+      if (!credential) {
         return undefined;
       }
-      return (await store.getSession(sessionId))?.session;
+      const record = await store.getSession(credential.sessionId);
+      return record ? await withSubjectRevocation(store, record.session) : undefined;
     },
     async createSession(input: AuthSessionCreateInput): Promise<AuthSession> {
       const now = new Date().toISOString();
@@ -257,39 +298,67 @@ function createSessionStore(
       }
       return refreshed;
     },
-    async revokeSession(sessionId: string): Promise<AuthSession> {
-      let observed: AuthSession | undefined;
-      for (let attempt = 0; attempt < REVOKE_MAX_ATTEMPTS; attempt += 1) {
-        const entry = await store.getSessionEntry(sessionId);
-        const record = entry?.record;
-        if (!record) {
-          if (!observed) {
-            throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
-          }
-          // The record was deleted while revoking; no authority survives, so report the revocation.
-          return { ...observed, state: 'revoked', revokedAt: new Date().toISOString() };
-        }
-        if (record.session.state === 'revoked') {
-          return record.session;
-        }
-        observed = record.session;
-        const revoked: AuthSession = {
-          ...record.session,
-          state: 'revoked',
-          revokedAt: new Date().toISOString(),
-        };
-        if (
-          await store.rotateSession(sessionId, { ...record, session: revoked }, entry!.versionstamp)
-        ) {
-          return revoked;
-        }
-      }
-      throw new KvOAuthError(
-        'revoke_conflict',
-        `Session ${sessionId} could not be revoked after ${REVOKE_MAX_ATTEMPTS} attempts because concurrent updates kept winning the compare-and-set.`,
-      );
+    revokeSession: (sessionId: string): Promise<AuthSession> =>
+      revokeStoredSession(store, sessionId),
+    async revokeSubjectSessions(
+      { subject }: AuthSubjectRevocationInput,
+    ): Promise<AuthSubjectRevocation> {
+      // One subject-level write: every session issued up to this instant stops resolving as
+      // active, whether or not this adapter has ever seen it, with no per-session work.
+      const revokedAt = await store.revokeSubject(subject, new Date().toISOString());
+      return { subject, revokedAt };
     },
   };
+}
+
+/**
+ * Presents an active session issued at or before its subject's revocation instant as revoked.
+ *
+ * Costs one KV read per resolution and needs no migration of existing session records.
+ */
+async function withSubjectRevocation(
+  store: KvOAuthStore,
+  session: AuthSession,
+): Promise<AuthSession> {
+  if (session.state !== 'active') return session;
+  const revokedAt = await store.getSubjectRevocation(session.subject);
+  if (revokedAt === undefined || Date.parse(session.issuedAt) > Date.parse(revokedAt)) {
+    return session;
+  }
+  return { ...session, state: 'revoked', revokedAt };
+}
+
+async function revokeStoredSession(store: KvOAuthStore, sessionId: string): Promise<AuthSession> {
+  let observed: AuthSession | undefined;
+  for (let attempt = 0; attempt < REVOKE_MAX_ATTEMPTS; attempt += 1) {
+    const entry = await store.getSessionEntry(sessionId);
+    const record = entry?.record;
+    if (!record) {
+      if (!observed) {
+        throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
+      }
+      // The record was deleted while revoking; no authority survives, so report the revocation.
+      return { ...observed, state: 'revoked', revokedAt: new Date().toISOString() };
+    }
+    if (record.session.state === 'revoked') {
+      return record.session;
+    }
+    observed = record.session;
+    const revoked: AuthSession = {
+      ...record.session,
+      state: 'revoked',
+      revokedAt: new Date().toISOString(),
+    };
+    if (
+      await store.rotateSession(sessionId, { ...record, session: revoked }, entry!.versionstamp)
+    ) {
+      return revoked;
+    }
+  }
+  throw new KvOAuthError(
+    'revoke_conflict',
+    `Session ${sessionId} could not be revoked after ${REVOKE_MAX_ATTEMPTS} attempts because concurrent updates kept winning the compare-and-set.`,
+  );
 }
 
 function createSessionCrypto(store: KvOAuthStore): AuthSessionCryptoPort {

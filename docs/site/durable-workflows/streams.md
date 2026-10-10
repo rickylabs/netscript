@@ -9,14 +9,14 @@ order: 2
 
 # Durable streams
 
-A NetScript **stream** is a typed, durable change-log: producers write entity
+A NetScript **stream** is a typed change-log using the Durable Streams protocol: producers write entity
 state into a durable-stream server, and any number of HTTP/SSE consumers
 materialize the latest value per key. {{ comp.badge({ status: "alpha" }) }}
 
 {{ comp.diagram({
   src: "/assets/diagrams/streams-pipeline.svg",
-  alt: "A producer defines a typed stream schema and writes upsert/delete operations into the durable-stream server on its assigned port; the durable log fans out over HTTP/SSE to Fresh consumers that materialize the latest value per key.",
-  caption: "Streams pipeline: producer (defineStreamSchema + createDurableStream) → durable log on its assigned port → HTTP/SSE → Fresh consumers (latest value per key)."
+  alt: "A producer defines a typed stream schema and writes upsert/delete operations into the durable-stream server on its assigned port; the stream log fans out over HTTP/SSE to Fresh consumers that materialize the latest value per key.",
+  caption: "Streams pipeline: producer (defineStreamSchema + createDurableStream) → stream log on its assigned port → HTTP/SSE → Fresh consumers (latest value per key)."
 }) }}
 
 NetScript's streams capability is the typed, change-data backbone the other
@@ -212,6 +212,22 @@ implemented-by interface — the same four members, with `entityType` widened to
   ]
 }) }}
 
+## Bound stream retention
+
+Set `retention: { kind: 'ttl', ttlSeconds: 604800 }` or
+`retention: { kind: 'expires-at', expiresAt: '2030-10-08T00:00:00Z' }` on a producer before creating
+its stream. On the shipped server, TTL is a sliding inactivity window renewed by reads and appends;
+HEAD and reopening with PUT do not renew it or change the policy. Use absolute expiry or rotating
+day segments for a hard bound on an active stream. Absolute expiry does not slide. Both policies
+expire the whole stream. Omit retention for the current unbounded behavior. For existing day
+segments, `headDurableStream` reads metadata and `deleteDurableStream` deletes the whole stream
+through a versioned administrative port.
+
+Run deletion from background workers or triggers with a service identity, independently of any app
+session. Entity `producer.delete(...)` appends a tombstone and does not shrink the log. See the
+[stream retention how-to](/durable-workflows/how-to/bound-stream-retention/) for server TTL,
+absolute expiry, scheduled segment deletion, typed failure handling, and document day baselines.
+
 ## Service-side producers — `createServiceStreamProducer`
 
 When the writer is a backend **Service** — for example an ingestion worker that
@@ -297,8 +313,40 @@ Concrete example:
 - Resolved endpoint: `'https://streams.example.test/v1/stream/netscript/workers/executions'`
 
 {{ comp callout { type: "warning", title: "Storage durability — in-memory by default" } }}
-When <code>STREAMS_DATA_DIR</code> is unset, the streams service uses <strong>in-memory, non-durable storage</strong> — stream event data will be lost when the process restarts. Set <code>STREAMS_DATA_DIR=&lt;path&gt;</code> to enable file-backed durable storage.
+When <code>STREAMS_DATA_DIR</code> is unset, the streams service uses <strong>in-memory, non-durable storage</strong> — stream event data will be lost when the process restarts. File storage is an explicit opt-in: provision an existing persistent writable directory, then set <code>NetScript.Plugins.streams.Environment.STREAMS_DATA_DIR</code> in <code>appsettings.json</code> and regenerate Aspire helpers with <code>netscript generate aspire</code>. The generated AppHost forwards this environment value. Empty, missing or unwritable paths fail startup; there is no memory fallback. A startup write/read probe must pass before health reports file mode.
 {{ /comp }}
+
+## Storage mode and restart operations
+
+The plugin manifest declares memory as the ephemeral default. The detailed `/health` payload
+contains `checks[name="streams-storage"].storage` with `mode: "memory" | "file"`, `durable`, and
+`probe: "not-applicable" | "passed"`. Memory may be healthy while explicitly reporting
+`durable: false`: all stream history disappears on service restart. “Durable Streams” names the
+protocol, not a persistence guarantee for memory storage.
+
+For the default resource working directory, create `.netscript/data/streams`, ignore
+`.netscript/data/` in Git, and set the plugin environment entry to that path. Deployments must mount
+persistent storage separately. File mode has an executed real `DurableStreamProducer` write, flush,
+service-process stop, restart and HTTP replay proof; memory has a restart/data-loss control. The
+proof is in `plugins/streams/services/src/tests/storage-restart_test.ts` and supports orderly
+process restart only, not power-loss durability, replication or multiple concurrent owners.
+
+Retention is unbounded without a configured expiry/deletion policy. Entity deletes append
+tombstones; they do not compact history. Protocol TTL slides on reads/appends; absolute expiry is
+fixed. Both expire whole streams. Use fixed expiry or scheduled whole-stream/day-segment deletion
+from workers/triggers under service identity for a hard bound; monitor disk space. There is no
+automatic compaction or archival.
+
+Recovery stops at the last complete native frame, so an incomplete final append can be lost. Missing
+segment files can read empty; corrupt LMDB metadata may refuse startup. The startup probe verifies
+directory I/O, not historical integrity or repair. Preserve damaged files and restore a known-good
+backup if recovery fails.
+
+Stop producers and streams before copying the **entire** data directory (metadata and segments) for
+backup. Restore the complete copy while streams is stopped, retain compatible storage/protocol
+versions, then verify replay before restarting producers. Live file copies are not a supported
+consistent backup. One process owns a directory. Durable-by-default provisioning and migration
+remain the 0.0.9 enhancement [#2114](https://github.com/rickylabs/netscript/issues/2114).
 
 ## Known limitations
 

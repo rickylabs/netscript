@@ -30,6 +30,7 @@ import {
   type StaticJobDefinitionRegistrar,
   type StaticJobDefinitionRegistry,
 } from '../src/runtime/generated-jobs.ts';
+import { resolveWorkersConcurrency } from '../src/runtime/concurrency.ts';
 import { createWorkersServiceRuntime } from '../services/src/service-runtime.ts';
 import { createStreamMutationHook } from '../streams/server.ts';
 import { Scheduler, Worker } from '../worker/mod.ts';
@@ -95,7 +96,7 @@ export async function startWorkerProcess(options: StartWorkerProcessOptions = {}
   const worker = new Worker({
     workerId: options.workerId ?? Deno.env.get('WORKER_ID') ?? crypto.randomUUID(),
     queueName: options.queueName ?? Deno.env.get('WORKERS_QUEUE') ?? 'jobs',
-    concurrency: options.concurrency ?? parseInt(Deno.env.get('WORKERS_CONCURRENCY') ?? '1'),
+    concurrency: options.concurrency ?? resolveWorkersConcurrency(),
     registry: runtime.jobRegistry,
     executionState: runtime.executionState,
     taskExecutor: createDefaultTaskExecutor(),
@@ -140,7 +141,7 @@ export async function startCombinedProcess(
   const worker = new Worker({
     workerId: options.workerId ?? Deno.env.get('WORKER_ID') ?? crypto.randomUUID(),
     queueName: options.queueName ?? Deno.env.get('WORKERS_QUEUE') ?? 'jobs',
-    concurrency: options.concurrency ?? parseInt(Deno.env.get('WORKERS_CONCURRENCY') ?? '1'),
+    concurrency: options.concurrency ?? resolveWorkersConcurrency(),
     registry: runtime.jobRegistry,
     executionState: runtime.executionState,
     taskExecutor,
@@ -153,3 +154,28 @@ export async function startCombinedProcess(
   await worker.start();
   return Object.freeze({ scheduler, worker });
 }
+
+export type { GeneratedJobRegistryStatus } from '../src/runtime/generated-jobs.ts';
+export type {
+  ExecutionStatus,
+  JobContext,
+  JobDefinition,
+  JobFailure,
+  JobHandler,
+  JobPayloadSchema,
+  JobResult,
+  JobSuccess,
+  PublicStandardSchema,
+  RegisterJobInput,
+  RuntimePermissions,
+  RuntimePermissionValue,
+  StaticJobRegistry,
+  TriggerType,
+} from '@netscript/plugin-workers-core/runtime';
+export type {
+  WorkerIdempotencyClaim,
+  WorkerIdempotencyInput,
+  WorkerIdempotencyPort,
+  WorkerIdempotencySource,
+} from '@netscript/plugin-workers-core/stores';
+export type { ScheduledJobInfo, Scheduler, Worker, WorkerHealthStatus } from '../worker/mod.ts';

@@ -17,13 +17,14 @@
     "@std/path": "jsr:@std/path@^1"
   },
   "tasks": {
+    "benchmark:docs": "deno run --allow-read benchmarks/doc-retrieval.ts",
     "check": "deno check mod.ts cli.ts openapi-projection.ts",
     "test": "deno test --allow-env --allow-net --allow-run --allow-read --allow-write tests/",
     "publish:dry-run": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/release/run-publish-dry-run.ts --root ../.. --member packages/mcp"
   },
   "publish": {
     "include": ["**/*.ts", "deno.json", "README.md"],
-    "exclude": ["tests/", "**/*_test.ts"]
+    "exclude": ["tests/", "benchmarks/", "**/*_test.ts"]
   },
   "compilerOptions": {
     "strict": true,

@@ -29,13 +29,18 @@ import { TEMPLATE_CONVENTIONS } from '../../constants/template-conventions.ts';
  *
  * @example
  * ```typescript
+ * import { type FileSystemPort, Scaffolder, type TemplatePort } from '@netscript/cli/scaffolding';
+ *
+ * declare const templateAdapter: TemplatePort;
+ * declare const fsAdapter: FileSystemPort;
+ *
  * const scaffolder = new Scaffolder(templateAdapter, fsAdapter);
  * const result = await scaffolder.scaffold({
  *   templatePath: '/templates/service',
  *   targetPath: '/out/my-service',
  *   variables: { name: 'my-service' },
  * });
- * outputText(`Created ${result.filesCreated.length} files`);
+ * console.log(`Created ${result.filesCreated.length} files`);
  * ```
  */
 export class Scaffolder implements ScaffolderPort {

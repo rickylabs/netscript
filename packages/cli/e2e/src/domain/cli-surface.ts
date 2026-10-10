@@ -163,6 +163,7 @@ export const GATE = {
   BEHAVIOR_MCP_ENDPOINT_DIRECTORY: 'behavior.mcp-endpoint-directory',
   BEHAVIOR_DB_STATUS_PRESERVES_APPHOST: 'behavior.db-status-preserves-apphost',
   BEHAVIOR_ENDPOINT_READINESS: 'behavior.endpoint-readiness',
+  BEHAVIOR_SAGAS_PUBLISH_PROCESS: 'behavior.sagas-provider-conformance',
   BEHAVIOR_SAGAS_HEALTH: 'behavior.sagas-health',
   BEHAVIOR_SAGAS_LIST: 'behavior.sagas-list',
   BEHAVIOR_SAGAS_INSTANCES: 'behavior.sagas-instances',

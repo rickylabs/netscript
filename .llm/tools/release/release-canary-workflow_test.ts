@@ -76,6 +76,7 @@ function classifyConcurrencyGroup(group: string): string {
     return 'ref-templated / repo-wide literal';
   }
   if (
+    group === 'generated-carriers-main' ||
     group === 'e2e-scaffold-runtime-global-v2' ||
     group === 'e2e-scaffold-runtime-sqlite-global-v2'
   ) {
@@ -156,9 +157,9 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
     '.llm/tools/release/run-publish.ts --dry-run',
     '.llm/tools/release/run-publish.ts --preflight',
     '.llm/tools/release/run-publish.ts\n',
-    'deno task release:canary-label',
     'return_run_details=true',
     'bash .llm/tools/release/watch-canary-e2e.sh "$E2E_RUN_ID"',
+    'deno task release:canary-label',
     '-f state=success',
   ];
   let previous = -1;
@@ -204,6 +205,13 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
   assertStringIncludes(source, 'test "$version" != "null"');
   assertStringIncludes(source, '--published-version "$CANARY_VERSION"');
   assertStringIncludes(source, '--head "$SOURCE_SHA"');
+  const notesStep = source.slice(
+    source.indexOf('- name: Label published canary'),
+    source.indexOf('- name: Delete ephemeral'),
+  );
+  assertStringIncludes(notesStep, "if: always() && steps.publish.outcome == 'success'");
+  assertStringIncludes(notesStep, '--production-e2e-outcome "$E2E_OUTCOME"');
+
   const cutStep = source.slice(
     source.indexOf('- name: Cut ephemeral canary branch and tag'),
     source.indexOf('- name: Verify same-semver canary republish'),
@@ -241,10 +249,12 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
     'e2e-cli-prod.yml',
     'e2e-cli.yml',
     'fresh-ui-quality.yml',
+    'generated-carriers.yml',
     'jsr-settings.yml',
     'openhands-agent.yml',
     'openhands-phase-eval.yml',
     'pages.yml',
+    'pr-metadata-gates.yml',
     'publish.yml',
     'release-canary.yml',
     'surface-diff.yml',
@@ -291,16 +301,16 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
     {
       workflow: 'e2e-cli.yml',
       scope: 'jobs.scaffold-runtime',
-      group: 'e2e-scaffold-runtime-global-v2',
-      classification: 'repo-wide literal',
+      group: 'e2e-scaffold-runtime-v3-${{ github.event.pull_request.number || github.ref }}',
+      classification: 'entity-keyed',
       cancelInProgress: false,
       queue: 'max',
     },
     {
       workflow: 'e2e-cli.yml',
       scope: 'jobs.scaffold-runtime-sqlite',
-      group: 'e2e-scaffold-runtime-sqlite-global-v2',
-      classification: 'repo-wide literal',
+      group: 'e2e-scaffold-runtime-sqlite-v3-${{ github.event.pull_request.number || github.ref }}',
+      classification: 'entity-keyed',
       cancelInProgress: false,
       queue: 'max',
     },
@@ -310,6 +320,14 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
       group: 'e2e-cli-${{ github.workflow }}-${{ github.ref }}',
       classification: 'ref-templated',
       cancelInProgress: true,
+    },
+    {
+      workflow: 'generated-carriers.yml',
+      scope: 'workflow',
+      group: 'generated-carriers-main',
+      classification: 'repo-wide literal',
+      cancelInProgress: false,
+      queue: 'max',
     },
     {
       workflow: 'openhands-agent.yml',
@@ -333,6 +351,13 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
       classification: 'ref-templated / repo-wide literal',
       cancelInProgress: false,
       queue: 'max',
+    },
+    {
+      workflow: 'pr-metadata-gates.yml',
+      scope: 'workflow',
+      group: 'pr-metadata-gates-${{ github.event.pull_request.number }}',
+      classification: 'entity-keyed',
+      cancelInProgress: true,
     },
     {
       workflow: 'release-canary.yml',

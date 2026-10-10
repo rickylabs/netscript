@@ -1,5 +1,6 @@
-import { Page } from "lume/core/file.ts";
-import { releaseVersion } from "../_data.ts";
+import { Page } from 'lume/core/file.ts';
+import { releaseVersion } from '../_data.ts';
+import { buildLlmsFull, sectionOf, SECTIONS } from './llms-policy.ts';
 
 /**
  * AI-affordance tooling for the NetScript docs site (SOTA study rec #1).
@@ -28,34 +29,34 @@ import { releaseVersion } from "../_data.ts";
 
 /** Block-level HTML tags (used to decide inline-vs-block flattening). */
 const BLOCK_TAGS = new Set([
-  "address",
-  "article",
-  "aside",
-  "blockquote",
-  "dd",
-  "div",
-  "dl",
-  "dt",
-  "figcaption",
-  "figure",
-  "footer",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "h5",
-  "h6",
-  "header",
-  "hr",
-  "li",
-  "main",
-  "nav",
-  "ol",
-  "p",
-  "pre",
-  "section",
-  "table",
-  "ul",
+  'address',
+  'article',
+  'aside',
+  'blockquote',
+  'dd',
+  'div',
+  'dl',
+  'dt',
+  'figcaption',
+  'figure',
+  'footer',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'header',
+  'hr',
+  'li',
+  'main',
+  'nav',
+  'ol',
+  'p',
+  'pre',
+  'section',
+  'table',
+  'ul',
 ]);
 
 const NODE_TEXT = 3;
@@ -80,17 +81,17 @@ export function aiTooling(options: AiToolingOptions = {}) {
   return (site: Lume.Site) => {
     const origin = site.options.location;
 
-    site.addEventListener("afterRender", () => {
+    site.addEventListener('afterRender', () => {
       const infos: PageInfo[] = [];
       const newPages: Page[] = [];
 
       for (const page of site.pages) {
         const outputPath = page.outputPath;
-        if (!outputPath.endsWith(".html")) continue;
+        if (!outputPath.endsWith('.html')) continue;
 
         const doc = page.document;
         if (!doc) continue;
-        const article = doc.querySelector("article.ns-prose");
+        const article = doc.querySelector('article.ns-prose');
         if (!article) continue;
 
         const url = page.data.url as string;
@@ -113,11 +114,14 @@ export function aiTooling(options: AiToolingOptions = {}) {
       }
 
       newPages.push(
-        Page.create({ url: "/llms.txt", content: buildLlmsIndex(infos, origin, emitFull) }),
+        Page.create({ url: '/llms.txt', content: buildLlmsIndex(infos, origin, emitFull) }),
       );
       if (emitFull) {
         newPages.push(
-          Page.create({ url: "/llms-full.txt", content: buildLlmsFull(infos, origin) }),
+          Page.create({
+            url: '/llms-full.txt',
+            content: buildLlmsFull(infos, origin, releaseVersion),
+          }),
         );
       }
 
@@ -136,18 +140,18 @@ export default aiTooling;
 
 /** The `.md` twin URL for a page URL (mirrors the link in `base.vto`). */
 function markdownTwinUrl(url: string): string {
-  if (url.endsWith("/")) return `${url}index.md`;
-  if (url.endsWith(".html")) return `${url.slice(0, -5)}.md`;
+  if (url.endsWith('/')) return `${url}index.md`;
+  if (url.endsWith('.html')) return `${url.slice(0, -5)}.md`;
   return `${url}.md`;
 }
 
 /** Resolve a root-relative or bare href to an absolute canonical URL. */
 function absoluteUrl(href: string, origin: URL): string {
   const trimmed = href.trim();
-  if (!trimmed || trimmed.startsWith("#")) return trimmed;
+  if (!trimmed || trimmed.startsWith('#')) return trimmed;
   if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return trimmed; // has a scheme
   try {
-    const path = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
+    const path = trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
     return new URL(path, origin).href;
   } catch {
     return trimmed;
@@ -160,9 +164,9 @@ function absoluteUrl(href: string, origin: URL): string {
 
 function articleToMarkdown(article: Element, origin: URL): string {
   return childBlocks(article, origin)
-    .replace(/[ \t]+\n/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim() + "\n";
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim() + '\n';
 }
 
 /** Serialize an element's children as a sequence of Markdown blocks. */
@@ -172,7 +176,7 @@ function childBlocks(el: Element | ParentNode, origin: URL): string {
     const block = blockMd(child, origin);
     if (block && block.trim()) parts.push(block.trim());
   }
-  return parts.join("\n\n");
+  return parts.join('\n\n');
 }
 
 function hasBlockChild(el: Element): boolean {
@@ -188,58 +192,58 @@ function hasBlockChild(el: Element): boolean {
 }
 
 function isDecorative(el: Element): boolean {
-  return el.getAttribute("aria-hidden") === "true";
+  return el.getAttribute('aria-hidden') === 'true';
 }
 
 /** Serialize a single node as a block-level Markdown string. */
 function blockMd(node: ChildNode, origin: URL): string {
   if (node.nodeType === NODE_TEXT) {
-    return collapse(node.textContent ?? "").trim();
+    return collapse(node.textContent ?? '').trim();
   }
-  if (node.nodeType !== NODE_ELEMENT) return ""; // drops comments
+  if (node.nodeType !== NODE_ELEMENT) return ''; // drops comments
 
   const el = node as Element;
-  if (isDecorative(el)) return "";
+  if (isDecorative(el)) return '';
   const tag = el.tagName.toLowerCase();
 
   switch (tag) {
-    case "h1":
-    case "h2":
-    case "h3":
-    case "h4":
-    case "h5":
-    case "h6": {
+    case 'h1':
+    case 'h2':
+    case 'h3':
+    case 'h4':
+    case 'h5':
+    case 'h6': {
       const text = inlineChildren(el, origin).trim();
-      return text ? `${"#".repeat(Number(tag[1]))} ${text}` : "";
+      return text ? `${'#'.repeat(Number(tag[1]))} ${text}` : '';
     }
-    case "p":
+    case 'p':
       return inlineChildren(el, origin).trim();
-    case "ul":
+    case 'ul':
       return listMd(el, origin, false);
-    case "ol":
+    case 'ol':
       return listMd(el, origin, true);
-    case "pre":
+    case 'pre':
       return codeBlockMd(el);
-    case "blockquote":
-    case "aside":
+    case 'blockquote':
+    case 'aside':
       return quoteMd(childBlocks(el, origin));
-    case "hr":
-      return "---";
-    case "table":
+    case 'hr':
+      return '---';
+    case 'table':
       return tableMd(el, origin);
-    case "figure":
+    case 'figure':
       return figureMd(el, origin);
-    case "img":
+    case 'img':
       return imageMd(el, origin);
-    case "figcaption": {
+    case 'figcaption': {
       const text = inlineChildren(el, origin).trim();
-      return text ? `*${text}*` : "";
+      return text ? `*${text}*` : '';
     }
-    case "button":
-    case "script":
-    case "style":
-    case "template":
-      return "";
+    case 'button':
+    case 'script':
+    case 'style':
+    case 'template':
+      return '';
     default: {
       if (hasBlockChild(el)) return childBlocks(el, origin);
       return inlineChildren(el, origin).trim();
@@ -249,7 +253,7 @@ function blockMd(node: ChildNode, origin: URL): string {
 
 /** Serialize an element's children as inline Markdown (no block breaks). */
 function inlineChildren(el: Element, origin: URL): string {
-  let out = "";
+  let out = '';
   for (const child of Array.from(el.childNodes)) {
     out += inlineMd(child, origin);
   }
@@ -257,41 +261,41 @@ function inlineChildren(el: Element, origin: URL): string {
 }
 
 function inlineMd(node: ChildNode, origin: URL): string {
-  if (node.nodeType === NODE_TEXT) return collapse(node.textContent ?? "");
-  if (node.nodeType !== NODE_ELEMENT) return "";
+  if (node.nodeType === NODE_TEXT) return collapse(node.textContent ?? '');
+  if (node.nodeType !== NODE_ELEMENT) return '';
 
   const el = node as Element;
-  if (isDecorative(el)) return "";
+  if (isDecorative(el)) return '';
   const tag = el.tagName.toLowerCase();
 
   switch (tag) {
-    case "code": {
-      const code = (el.textContent ?? "").replace(/`/g, "");
-      return code ? `\`${code}\`` : "";
+    case 'code': {
+      const code = (el.textContent ?? '').replace(/`/g, '');
+      return code ? `\`${code}\`` : '';
     }
-    case "strong":
-    case "b": {
+    case 'strong':
+    case 'b': {
       const text = inlineChildren(el, origin).trim();
-      return text ? `**${text}**` : "";
+      return text ? `**${text}**` : '';
     }
-    case "em":
-    case "i": {
+    case 'em':
+    case 'i': {
       const text = inlineChildren(el, origin).trim();
-      return text ? `*${text}*` : "";
+      return text ? `*${text}*` : '';
     }
-    case "a": {
-      const href = absoluteUrl(el.getAttribute("href") ?? "", origin);
+    case 'a': {
+      const href = absoluteUrl(el.getAttribute('href') ?? '', origin);
       const text = inlineChildren(el, origin).trim() || href;
       return href ? `[${text}](${href})` : text;
     }
-    case "br":
-      return "  \n";
-    case "img":
+    case 'br':
+      return '  \n';
+    case 'img':
       return imageMd(el, origin);
-    case "button":
-    case "script":
-    case "style":
-      return "";
+    case 'button':
+    case 'script':
+    case 'style':
+      return '';
     default:
       return inlineChildren(el, origin);
   }
@@ -301,73 +305,73 @@ function listMd(el: Element, origin: URL, ordered: boolean): string {
   const items: string[] = [];
   let index = 1;
   for (const li of Array.from(el.children)) {
-    if (li.tagName.toLowerCase() !== "li") continue;
-    const marker = ordered ? `${index}. ` : "- ";
-    const pad = " ".repeat(marker.length);
+    if (li.tagName.toLowerCase() !== 'li') continue;
+    const marker = ordered ? `${index}. ` : '- ';
+    const pad = ' '.repeat(marker.length);
     const content = hasBlockChild(li as Element)
       ? childBlocks(li as Element, origin)
       : inlineChildren(li as Element, origin).trim();
-    const lines = content.split("\n");
+    const lines = content.split('\n');
     const rendered = lines
       .map((line, i) => (i === 0 ? marker + line : pad + line))
-      .join("\n");
+      .join('\n');
     items.push(rendered);
     index++;
   }
-  return items.join("\n");
+  return items.join('\n');
 }
 
 function codeBlockMd(pre: Element): string {
-  const code = pre.querySelector("code") ?? pre;
-  const cls = `${code.getAttribute("class") ?? ""} ${pre.getAttribute("class") ?? ""}`;
+  const code = pre.querySelector('code') ?? pre;
+  const cls = `${code.getAttribute('class') ?? ''} ${pre.getAttribute('class') ?? ''}`;
   const langMatch = cls.match(/language-([\w-]+)/);
-  const lang = langMatch ? langMatch[1] : "";
-  const text = (code.textContent ?? "").replace(/\n+$/, "");
+  const lang = langMatch ? langMatch[1] : '';
+  const text = (code.textContent ?? '').replace(/\n+$/, '');
   return `\`\`\`${lang}\n${text}\n\`\`\``;
 }
 
 function quoteMd(inner: string): string {
   return inner
-    .split("\n")
-    .map((line) => (line ? `> ${line}` : ">"))
-    .join("\n");
+    .split('\n')
+    .map((line) => (line ? `> ${line}` : '>'))
+    .join('\n');
 }
 
 function figureMd(fig: Element, origin: URL): string {
-  const img = fig.querySelector("img");
-  const caption = fig.querySelector("figcaption");
+  const img = fig.querySelector('img');
+  const caption = fig.querySelector('figcaption');
   const parts: string[] = [];
   if (img) parts.push(imageMd(img, origin));
   if (caption) {
     const text = inlineChildren(caption, origin).trim();
     if (text) parts.push(`*${text}*`);
   }
-  return parts.join("\n\n");
+  return parts.join('\n\n');
 }
 
 function imageMd(img: Element, origin: URL): string {
-  const alt = collapse(img.getAttribute("alt") ?? "").trim();
-  const src = absoluteUrl(img.getAttribute("src") ?? "", origin);
+  const alt = collapse(img.getAttribute('alt') ?? '').trim();
+  const src = absoluteUrl(img.getAttribute('src') ?? '', origin);
   return `![${alt}](${src})`;
 }
 
 function tableMd(table: Element, origin: URL): string {
-  const caption = table.querySelector("caption");
-  const rows = Array.from(table.querySelectorAll("tr"));
+  const caption = table.querySelector('caption');
+  const rows = Array.from(table.querySelectorAll('tr'));
   let header: string[] | null = null;
   const body: string[][] = [];
 
   for (const row of rows) {
-    const cells = Array.from(row.querySelectorAll("th, td")).map((cell) =>
-      inlineChildren(cell as Element, origin).trim().replace(/\|/g, "\\|").replace(/\s*\n\s*/g, " ")
+    const cells = Array.from(row.querySelectorAll('th, td')).map((cell) =>
+      inlineChildren(cell as Element, origin).trim().replace(/\|/g, '\\|').replace(/\s*\n\s*/g, ' ')
     );
     if (!cells.length) continue;
-    if (header === null && row.querySelector("th")) header = cells;
+    if (header === null && row.querySelector('th')) header = cells;
     else body.push(cells);
   }
 
   if (!header) {
-    if (!body.length) return "";
+    if (!body.length) return '';
     header = body.shift() as string[];
   }
 
@@ -375,16 +379,16 @@ function tableMd(table: Element, origin: URL): string {
   const lines: string[] = [];
   if (caption) {
     const text = inlineChildren(caption, origin).trim();
-    if (text) lines.push(`**${text}**`, "");
+    if (text) lines.push(`**${text}**`, '');
   }
-  lines.push(`| ${header.join(" | ")} |`);
-  lines.push(`| ${header.map(() => "---").join(" | ")} |`);
+  lines.push(`| ${header.join(' | ')} |`);
+  lines.push(`| ${header.map(() => '---').join(' | ')} |`);
   for (const row of body) {
     const padded = [...row];
-    while (padded.length < width) padded.push("");
-    lines.push(`| ${padded.slice(0, width).join(" | ")} |`);
+    while (padded.length < width) padded.push('');
+    lines.push(`| ${padded.slice(0, width).join(' | ')} |`);
   }
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 /* ------------------------------------------------------------------ */
@@ -392,126 +396,106 @@ function tableMd(table: Element, origin: URL): string {
 /* ------------------------------------------------------------------ */
 
 function collapse(text: string): string {
-  return text.replace(/\s+/g, " ");
+  return text.replace(/\s+/g, ' ');
 }
 
 function deriveTitle(article: Element): string | undefined {
-  const h1 = article.querySelector("h1");
-  return h1 ? collapse(h1.textContent ?? "").trim() || undefined : undefined;
+  const h1 = article.querySelector('h1');
+  return h1 ? collapse(h1.textContent ?? '').trim() || undefined : undefined;
 }
 
 function firstParagraph(article: Element): string {
-  const p = article.querySelector("p");
-  if (!p) return "";
-  const text = collapse(p.textContent ?? "").trim();
+  const p = article.querySelector('p');
+  if (!p) return '';
+  const text = collapse(p.textContent ?? '').trim();
   if (text.length <= 200) return text;
   const cut = text.slice(0, 200);
-  const lastSpace = cut.lastIndexOf(" ");
-  return `${(lastSpace > 80 ? cut.slice(0, lastSpace) : cut).replace(/[.,;:\s]+$/, "")}…`;
+  const lastSpace = cut.lastIndexOf(' ');
+  return `${(lastSpace > 80 ? cut.slice(0, lastSpace) : cut).replace(/[.,;:\s]+$/, '')}…`;
 }
 
 /* ------------------------------------------------------------------ */
 /* llms.txt                                                            */
 /* ------------------------------------------------------------------ */
 
-interface Section {
-  id: string;
-  heading: string;
-}
-
-const SECTIONS: Section[] = [
-  { id: "start", heading: "Getting started" },
-  { id: "tutorials", heading: "Tutorials" },
-  { id: "howto", heading: "How-to guides" },
-  { id: "capabilities", heading: "Capabilities & hubs" },
-  { id: "reference", heading: "Reference" },
-  { id: "explanation", heading: "Explanation" },
-];
-
-const HUB_PREFIXES = [
-  "/web-layer/",
-  "/services-sdk/",
-  "/background-processing/",
-  "/durable-workflows/",
-  "/data-persistence/",
-  "/identity-access/",
-  "/orchestration-runtime/",
-  "/observability/",
-  "/capabilities/",
-];
-
-function sectionOf(url: string): string {
-  if (url.startsWith("/tutorials/")) return "tutorials";
-  if (url.startsWith("/how-to/")) return "howto";
-  if (url.startsWith("/reference/")) return "reference";
-  if (url.startsWith("/explanation/")) return "explanation";
-  if (HUB_PREFIXES.some((prefix) => url.startsWith(prefix))) return "capabilities";
-  return "start";
-}
-
 function buildLlmsIndex(infos: PageInfo[], origin: URL, hasFull: boolean): string {
   const sorted = [...infos].sort((a, b) => a.url.localeCompare(b.url));
-  const twinExample = new URL("reference/telemetry/index.md", origin).href;
+  const twinExample = new URL('reference/telemetry/index.md', origin).href;
   const fullNote = hasFull
-    ? ` A single concatenated corpus of every page is available at ${new URL("llms-full.txt", origin).href}.`
-    : "";
+    ? ` A single concatenated corpus of every page is available at ${
+      new URL('llms-full.txt', origin).href
+    }.`
+    : '';
 
-  const u = (path: string) => new URL(path.replace(/^\//, ""), origin).href;
+  const u = (path: string) => new URL(path.replace(/^\//, ''), origin).href;
 
   const out: string[] = [
-    "# NetScript",
-    "",
-    "> Deno-native, polyglot backend framework: type-safe services and durable workflows in one workspace — observable by default and orchestrated with Aspire, from `netscript init` to a running, type-checked backend.",
-    "",
+    '# NetScript',
+    '',
+    '> Deno-native, polyglot backend framework: type-safe services and durable workflows in one workspace — observable by default and orchestrated with Aspire, from `netscript init` to a running, type-checked backend.',
+    '',
     `**For AI agents:** NetScript is Deno-native and pre-1.0 (${releaseVersion}) — treat every API as unstable. Every documentation page has a clean Markdown twin: append \`index.md\` to any page URL (for example ${twinExample}) to read source-quality Markdown instead of rendered HTML. Prefer the \`.md\` twins when reasoning about the docs. All links below are absolute and canonical.${fullNote}`,
-    "",
-    "## Task router",
-    "",
-    `- **If you are building a service-backed UI:** 1. Read the Web Layer overview ([Web Layer](${u("/web-layer/")})), then Live Dashboard chapters 4–5 ([Chapter 4](${u("/tutorials/live-dashboard/04-definePage-QueryIsland/")}), [Chapter 5](${u("/tutorials/live-dashboard/05-live-stream/")})); 2. inspect the scaffold you generated — its service route and \`components/ui/mod.ts\` — for the shape before writing a component; 3. use \`deno-doc/fresh.txt\` and \`deno-doc/fresh-ui.txt\` last, for symbol lookup. Fresh UI's visual components are copied into your app; do not hand-write a \`Button\`, \`Card\`, \`Badge\`, \`Input\` or \`FormField\`.`,
-    `- **If you are building a service + contract:** 1. Read the Services & SDK hub ([Services & SDK](${u("/services-sdk/")})), then Live Dashboard chapters 2–3 ([Chapter 2](${u("/tutorials/live-dashboard/02-contract-to-service/")}), [Chapter 3](${u("/tutorials/live-dashboard/03-sdk-cache-first-query/")})); 2. inspect the scaffold you generated — its contract definition and service handler — for the shape; 3. use \`deno-doc/service.txt\` and \`deno-doc/sdk.txt\` last, for symbol lookup.`,
-    `- **If you are building a durable workflow / saga:** 1. Read the Durable Workflows hub ([Durable Workflows](${u("/durable-workflows/")})), then Storefront chapter 4 ([Checkout saga](${u("/tutorials/storefront/04-checkout-saga/")})); 2. inspect the scaffold you generated — its saga definition and step handlers — for the shape; 3. use \`deno-doc/plugin-sagas.txt\` last, for symbol lookup.`,
-    `- **If you are building background jobs:** 1. Read the Background Processing hub ([Background Processing](${u("/background-processing/")})), then ERP Sync chapter 2 ([Import job](${u("/tutorials/erp-sync/02-import-job/")})); 2. inspect the scaffold you generated — its worker task definition and runner — for the shape; 3. use \`deno-doc/plugin-workers.txt\` last, for symbol lookup.`,
-    `- **If you are building persistence:** 1. Read the Data Persistence hub ([Data Persistence](${u("/data-persistence/")})), then Workspace chapter 3 ([Workspace data](${u("/tutorials/workspace/03-workspace-data/")})); 2. inspect the scaffold you generated — its database schema and repository bindings — for the shape; 3. use \`deno-doc/database.txt\` and \`deno-doc/queue.txt\` last, for symbol lookup.`,
-    `- **If you are building auth:** 1. Read the Identity & Access hub ([Identity & Access](${u("/identity-access/")})), then Workspace chapter 2 ([Auth](${u("/tutorials/workspace/02-auth/")})); 2. inspect the scaffold you generated — its auth plugin configuration and route guards — for the shape; 3. use \`deno-doc/plugin-auth.txt\` last, for symbol lookup.`,
-    `- **If you are building streams:** 1. Read the Streams capability guide ([Streams](${u("/durable-workflows/streams/")})), then AI Chat chapter 2 ([Durable chat route](${u("/tutorials/chat/02-durable-chat-route/")})); 2. inspect the scaffold you generated — its stream producer and proxy route — for the shape; 3. use \`deno-doc/plugin-streams.txt\` last, for symbol lookup.`,
-    `- **If you are building observability:** 1. Read the Observability hub ([Observability](${u("/observability/")})) and architecture explanation ([Observability explanation](${u("/explanation/observability/")})); 2. inspect the scaffold you generated — its OpenTelemetry exporter and tracer setup — for the shape; 3. use \`deno-doc/telemetry.txt\` and \`deno-doc/logger.txt\` last, for symbol lookup.`,
-    "",
+    '',
+    '## Task router',
+    '',
+    `- **If you are building a service-backed UI:** 1. Read the Web Layer overview ([Web Layer](${
+      u('/web-layer/')
+    })), then Live Dashboard chapters 4–5 ([Chapter 4](${
+      u('/tutorials/live-dashboard/04-definePage-QueryIsland/')
+    }), [Chapter 5](${
+      u('/tutorials/live-dashboard/05-live-stream/')
+    })); 2. inspect the scaffold you generated — its service route and \`components/ui/mod.ts\` — for the shape before writing a component; 3. use \`deno-doc/fresh.txt\` and \`deno-doc/fresh-ui.txt\` last, for symbol lookup. Fresh UI's visual components are copied into your app; do not hand-write a \`Button\`, \`Card\`, \`Badge\`, \`Input\` or \`FormField\`.`,
+    `- **If you are building a service + contract:** 1. Read the Services & SDK hub ([Services & SDK](${
+      u('/services-sdk/')
+    })), then Live Dashboard chapters 2–3 ([Chapter 2](${
+      u('/tutorials/live-dashboard/02-contract-to-service/')
+    }), [Chapter 3](${
+      u('/tutorials/live-dashboard/03-sdk-cache-first-query/')
+    })); 2. inspect the scaffold you generated — its contract definition and service handler — for the shape; 3. use \`deno-doc/service.txt\` and \`deno-doc/sdk.txt\` last, for symbol lookup.`,
+    `- **If you are building a durable workflow / saga:** 1. Read the Durable Workflows hub ([Durable Workflows](${
+      u('/durable-workflows/')
+    })), then Storefront chapter 4 ([Checkout saga](${
+      u('/tutorials/storefront/04-checkout-saga/')
+    })); 2. inspect the scaffold you generated — its saga definition and step handlers — for the shape; 3. use \`deno-doc/plugin-sagas.txt\` last, for symbol lookup.`,
+    `- **If you are building background jobs:** 1. Read the Background Processing hub ([Background Processing](${
+      u('/background-processing/')
+    })), then ERP Sync chapter 2 ([Import job](${
+      u('/tutorials/erp-sync/02-import-job/')
+    })); 2. inspect the scaffold you generated — its worker task definition and runner — for the shape; 3. use \`deno-doc/plugin-workers.txt\` last, for symbol lookup.`,
+    `- **If you are building persistence:** 1. Read the Data Persistence hub ([Data Persistence](${
+      u('/data-persistence/')
+    })), then Workspace chapter 3 ([Workspace data](${
+      u('/tutorials/workspace/03-workspace-data/')
+    })); 2. inspect the scaffold you generated — its database schema and repository bindings — for the shape; 3. use \`deno-doc/database.txt\` and \`deno-doc/queue.txt\` last, for symbol lookup.`,
+    `- **If you are building auth:** 1. Read the Identity & Access hub ([Identity & Access](${
+      u('/identity-access/')
+    })), then Workspace chapter 2 ([Auth](${
+      u('/tutorials/workspace/02-auth/')
+    })); 2. inspect the scaffold you generated — its auth plugin configuration and route guards — for the shape; 3. use \`deno-doc/plugin-auth.txt\` last, for symbol lookup.`,
+    `- **If you are building streams:** 1. Read the Streams capability guide ([Streams](${
+      u('/durable-workflows/streams/')
+    })), then AI Chat chapter 2 ([Durable chat route](${
+      u('/tutorials/chat/02-durable-chat-route/')
+    })); 2. inspect the scaffold you generated — its stream producer and proxy route — for the shape; 3. use \`deno-doc/plugin-streams.txt\` last, for symbol lookup.`,
+    `- **If you are building observability:** 1. Read the Observability hub ([Observability](${
+      u('/observability/')
+    })) and architecture explanation ([Observability explanation](${
+      u('/explanation/observability/')
+    })); 2. inspect the scaffold you generated — its OpenTelemetry exporter and tracer setup — for the shape; 3. use \`deno-doc/telemetry.txt\` and \`deno-doc/logger.txt\` last, for symbol lookup.`,
+    '',
   ];
 
   for (const section of SECTIONS) {
     const entries = sorted.filter((info) => sectionOf(info.url) === section.id);
     if (!entries.length) continue;
-    out.push(`## ${section.heading}`, "");
+    out.push(`## ${section.heading}`, '');
     for (const info of entries) {
-      const href = new URL(info.url.replace(/^\//, ""), origin).href;
-      const summary = info.summary ? `: ${info.summary}` : "";
+      const href = new URL(info.url.replace(/^\//, ''), origin).href;
+      const summary = info.summary ? `: ${info.summary}` : '';
       out.push(`- [${info.title}](${href})${summary}`);
     }
-    out.push("");
+    out.push('');
   }
 
-  return `${out.join("\n").trimEnd()}\n`;
-}
-
-function buildLlmsFull(infos: PageInfo[], origin: URL): string {
-  const order = new Map(SECTIONS.map((section, i) => [section.id, i]));
-  const sorted = [...infos].sort((a, b) => {
-    const sa = order.get(sectionOf(a.url)) ?? 99;
-    const sb = order.get(sectionOf(b.url)) ?? 99;
-    return sa !== sb ? sa - sb : a.url.localeCompare(b.url);
-  });
-
-  const header = [
-    "# NetScript documentation — full corpus",
-    "",
-    `> Deno-native, polyglot backend framework, pre-1.0 (${releaseVersion}). This file concatenates the Markdown twin of every documentation page for AI ingestion.`,
-    "",
-  ].join("\n");
-
-  const blocks = sorted.map((info) => {
-    const canonical = new URL(info.url.replace(/^\//, ""), origin).href;
-    return `${info.markdown.trim()}\n\n_Canonical: ${canonical}_`;
-  });
-
-  return `${header}\n${blocks.join("\n\n---\n\n")}\n`;
+  return `${out.join('\n').trimEnd()}\n`;
 }

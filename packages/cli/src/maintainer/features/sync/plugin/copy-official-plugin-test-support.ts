@@ -83,7 +83,7 @@ export async function writeOfficialPluginManifests(sourceRoot: string): Promise<
     JSON.stringify({
       provider: {
         kind: 'stream',
-        displayName: 'Durable Streams',
+        displayName: 'Streams (ephemeral by default)',
         category: 'plugin',
         portRangeKey: 'PLUGIN_API',
         defaultPermissions: ['--allow-net'],
@@ -114,7 +114,7 @@ export async function writeOfficialPluginManifests(sourceRoot: string): Promise<
   await writePluginManifest(sourceRoot, 'workers', {
     kind: 'worker',
     displayName: 'Background Worker',
-    concurrencyEnvVar: 'WORKER_CONCURRENCY',
+    concurrencyEnvVar: 'WORKERS_CONCURRENCY',
     defaultConcurrency: 2,
     serviceConfigKey: 'workers-api',
     servicePort: 9181,

@@ -101,6 +101,66 @@ timeout.
 `withCors()` and `withLogger()`. It always runs before the stages that `build()` installs. A
 rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
 
+## Rate limits and client addresses
+
+`createService(...).withRateLimit(options)` adds middleware through the existing `use()` seam. It
+runs in call order, before deferred routes and both RPC/REST projections. Install it before
+immediate health/info routes if those routes should be limited. Repeated calls add stages.
+
+The root also exports `ServiceRateLimitOptions`, `ServiceProxyTrust`, `RateLimitStore`,
+`RateLimitRequest`, and `RateLimitDecision` for builder/port contracts.
+
+The `@netscript/service/rate-limit` subpath exposes:
+
+| Symbol                        | Kind      | Description                                                                                 |
+| ----------------------------- | --------- | ------------------------------------------------------------------------------------------- |
+| `createRateLimitMiddleware`   | function  | Creates route-scoped quota middleware returning JSON 429 and whole-second Retry-After.      |
+| `createKvRateLimitStore`      | function  | Uses KV atomic compare-and-set plus TTL in a dedicated prefix, with a bounded retry budget. |
+| `createMemoryRateLimitStore`  | function  | Creates a synchronous, capped development store with bounded TTL eviction.                  |
+| `resolveServiceClientAddress` | function  | Resolves the socket peer or explicitly trusted XFF hops, walking right to left.             |
+| `ServiceRateLimitOptions`     | interface | `routes`, `limit`, `windowMs`, `store`, and optional `key`, `trustProxy`, `ipv6Prefix`, `now`.            |
+| `ServiceProxyTrust`           | type      | `false` or an address predicate identifying trusted proxy hops; default off.                |
+| `RateLimitStore`              | interface | Port reserving one slot atomically with `consume(request)`.                                 |
+| `RateLimitRequest`            | interface | Key, quota, window, epoch milliseconds, and optional request cancellation signal.           |
+| `RateLimitDecision`           | interface | Whether a slot was reserved and the epoch-millisecond window end.                           |
+| `KvRateLimitStoreOptions`     | interface | Dedicated `prefix` and optional `maxAttempts` (default 8, maximum 32).                      |
+| `MemoryRateLimitStoreOptions` | interface | Optional retained-key cap `maxKeys` (default 10,000).                                       |
+
+The subpath also re-exports the first-party integration types `ServiceContext`,
+`ServiceEnvironment`, `ServiceMiddleware`, `KvStore`, `KvKey`, `KvEntry`, `KvListOptions`,
+`KvSetOptions`, `AtomicCheck`, `AtomicMutation`, and `AtomicResult` used by these signatures.
+The six ancillary KV types are intentional: the accepted `KvStore` port references them through
+its public methods. Re-exporting them preserves the upstream port and makes Deno's documentation
+lint resolve its transitive signature types, without introducing a duplicate KV interface.
+
+Selected routes share one quota per key and epoch-aligned window. Paths are exact or end in `/*` for
+a subtree (including its root). Rejections return `{ error: 'RATE_LIMITED' }` with `429` and
+`Retry-After` rounded up to the remaining whole seconds. Unmatched paths perform no store IO.
+Separate policies use separate memory stores or KV prefixes unless sharing a quota is intended. CAS
+retry exhaustion or memory capacity pressure rejects conservatively; store failures throw.
+
+`ServiceEnvironment` is exported from the root entrypoint. `ServiceApp.fetch(request, env)` and
+`ServiceApp.request(input, init, env)` accept it. The listener supplies `remoteAddr` on plain and
+TLS requests so Hono's Deno `getConnInfo` works. The default limiter key is the resolved client
+address; IPv6 keys are canonicalized and grouped by /64, with `ipv6Prefix` (0–128) selecting
+another prefix. IPv4-mapped IPv6 peers use their corresponding dotted IPv4 bucket before prefix
+masking, so distinct IPv4 clients retain independent quotas on dual-stack listeners. Native IPv4
+and custom keys stay unchanged. This grouping affects quota keys only, not
+socket metadata or proxy trust. A mounted app without metadata uses a shared `unknown` bucket and
+logs a warning once per stage through the request logger or service package logger.
+
+KV counter TTL bounds each key's lifetime, not total live cardinality. Distinct attacker-chosen
+keys can allocate distinct counters until window expiry; use backend admission/capacity controls
+and stable custom keys. The memory store instead rejects new keys when its live-key cap is full.
+
+Like auth's #2026 transport policy, forwarded headers are ignored by default. Explicit proxy trust
+identifies permitted socket/hop addresses; malformed or excessive XFF chains fall back to the
+socket. Auth's HTTPS helper is protocol-specific and has no reusable hop resolver, so this client
+address resolver does not alter `deriveHttps` or `trustProxyHeaders`.
+
+See [Protect an anonymous service route](/services-sdk/how-to/protect-an-anonymous-route/) for
+examples and storage/performance guarantees.
+
 ## Error and routing handlers
 
 | Symbol | Signature | Description |
@@ -113,16 +173,34 @@ rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `ServiceConfig` | interface | Service configuration options (input to `createService`). |
-| `DefineServiceOptions` | interface | Options for the `defineService` preset, including `middleware` (caller middleware after CORS and logging, before auth) and the opt-in `bodyLimit`. |
+| `DefineServiceOptions` | interface | Options for the `defineService` preset, including `cors` (explicit origins or the `NETSCRIPT_CORS_ORIGINS` workspace allowlist), `middleware` (caller middleware after CORS and logging, before auth) and the opt-in `bodyLimit`. |
 | `ServiceBodyLimitOptions` | interface | `{ maxBytes }` request-body limit accepted by `withBodyLimit()` and `DefineServiceOptions.bodyLimit`. |
 | `PayloadTooLargeResponse` | interface | JSON body of a `413` body-limit rejection: `{ error: 'PAYLOAD_TOO_LARGE', message, maxBytes }`. |
 | `ServeOptions` | interface | Options for starting a service listener. |
-| `CorsOptions` | interface | CORS options supported by `withCors()`. |
+| `CorsOptions` | interface | CORS options supported by `withCors()`. Omitted `origin` reads comma-separated exact HTTP(S) origins from `NETSCRIPT_CORS_ORIGINS`; unset/blank denies cross-origin access. Explicit origins override the environment; wildcard with credentials fails `build()`. |
 | `OpenAPIConfig` | interface | Configuration for OpenAPI spec generation. |
 | `RPCHandlerConfig` | interface | Configuration options for RPC handlers. |
 | `ScalarDocsOptions` | interface | Configuration for the Scalar docs UI. |
 | `HealthHandlerOptions` | interface | Options for `createHealthHandler`. |
 | `LoggerMiddlewareOptions` | interface | Options for the logger middleware (re-exported from `@netscript/logger/middleware`). |
+
+### CORS origins
+
+`DefineServiceOptions.cors` configures the same policy as `withCors()`. If `origin` is omitted,
+the builder snapshots `NETSCRIPT_CORS_ORIGINS`: comma-separated exact HTTP(S) origins, without
+paths or trailing slashes. Unset or blank means no cross-origin browser access. For example,
+`NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'` permits those two origins.
+An explicit `cors: { origin: ['https://app.example'] }` overrides the environment; `origin: []`
+denies all cross-origin access. Invalid environment entries fail configuration. Wildcard origins
+with `credentials: true` fail before the listener starts.
+
+Generated CLI/Aspire helpers supply the enabled web apps' allocated HTTP endpoint origins to every
+service and plugin service resource. This generated value overrides a declared resource environment
+value; a workspace without enabled web apps supplies an empty allowlist. Independent services must
+configure their launch environment themselves. Origins outside the allowlist receive no
+`Access-Control-Allow-Origin` header. CORS controls browser response access; it does not authenticate
+callers. The chosen [browser authentication topology](https://github.com/rickylabs/netscript/blob/main/docs/architecture/doctrine/07-composition-and-extension.md#browser-authentication-topology-008-owner-decision)
+uses a BFF; scaffolding that topology is separate follow-up scope.
 
 ### Listener bind address
 
@@ -270,6 +348,64 @@ path declared twice. Binding then throws
 path falls under an RPC mount or alias or matches a REST procedure path. Binding happens in
 `.build()`.
 
+### Internal procedures and the internal service credential
+
+`.meta({ access: { audience: 'internal' } })` restricts a procedure to service-to-service callers
+of the same installation: workers, sagas and triggers presenting the internal service credential.
+Both contract authorizers enforce it on the RPC projection and on the OpenAPI projection, including
+oRPC's default OpenAPI path (`POST <apiPath>/<router>/<procedure>`) when the contract declares no
+`route.path`. Requests resolve to the procedure oRPC executes: the undecoded pathname is matched
+with oRPC's own route patterns and `rou3` precedence (static before parameter before wildcard),
+not contract declaration order. A request using a method no procedure declares on an internal
+procedure's OpenAPI path fails closed toward that procedure. A user session never satisfies the
+audience, and the check uses the principal's identity, not its claims or roles. Construction
+throws for an `'internal'` audience combined with `authentication: 'none'`, for any other audience
+value, and for procedures with different access that share one OpenAPI route.
+
+`createContractOverlayAuthorizer(contract, { fallback?, isInternalCaller? })` governs only
+procedures that declare `meta.access`. Every other request keeps the service's own policy: the
+`protect`/`allowAnonymous` path guard, plus the optional fallback authorizer. Marking a few
+internal procedures therefore never forces authentication onto public ones. To keep an otherwise
+public service public, set `allowAnonymous: ['/api', '/health']`; access-marked procedures are
+resolved before the path guard. `createContractAuthorizer` also enforces the audience, but it
+still governs every procedure in the contract.
+
+The credential is derived from one per-installation secret. Carriers deliver
+`NETSCRIPT_INSTALLATION_SECRET_FILE`, a file reference, never the value. `loadInstallationSecret()`
+reads it once at startup. The file holds a textual secret, such as base64 or hex, with surrounding
+whitespace trimmed (4 KiB maximum, 32 bytes minimum). In-memory `Uint8Array` material passed to
+`createInstallationSecret()` is used verbatim. Each service accepts only the bearer
+derived for its own name (HKDF-SHA-256), so a credential cannot be replayed across services. A
+credential expires by rotation: once the secret changes, every credential derived from the old one
+is rejected. `createCompositeAuthenticator([...])` lets one guarded service accept the internal
+credential alongside user sessions over the single `AuthenticatorPort`. Callers send the
+credential with the SDK's `createInternalCredentialSdkClientContribution({ service })`.
+
+```ts
+import { createService } from '@netscript/service';
+import {
+  createCompositeAuthenticator,
+  createContractOverlayAuthorizer,
+  createInternalCredentialAuthenticator,
+  loadInstallationSecret,
+} from '@netscript/service/auth';
+import { OrdersContractV1 } from '@example/contracts';
+import { router } from './router.ts';
+import { sessionAuthenticator } from './session.ts';
+
+const secret = await loadInstallationSecret();
+const app = createService(router, { name: 'orders' })
+  .withRPC()
+  .withAuthn({
+    authenticator: createCompositeAuthenticator([
+      createInternalCredentialAuthenticator({ secret, service: 'orders' }),
+      sessionAuthenticator,
+    ]),
+  })
+  .withAuthz({ authorizer: createContractOverlayAuthorizer(OrdersContractV1) })
+  .build();
+```
+
 ### Explicit service posture
 
 `ServiceAuthPolicy` records either native guards (`{ authn, authz? }`) or a deliberate
@@ -279,7 +415,26 @@ public opt-out (`{ public: true, reason }`). `ServiceGuardedAuthPolicy` and
 ports with a redacted `TypeError`. It preserves the original options: a custom
 `allowAnonymous` list replaces the native default; the assertion does not add `/health`.
 It validates configuration only and does not authenticate requests or install middleware.
-The existing `defineService` preset has not yet adopted this required posture contract.
+`DefineServiceOptions.auth` requires this policy. `defineService()` runs the shared assertion
+before builder configuration, database startup, or listener creation, so JavaScript callers receive
+an actionable `TypeError` as well as TypeScript callers receiving a missing-field error.
+Guarded policies install the existing native stages unchanged; public policies deliberately skip
+them. `/api` is guarded and `/health` stays anonymous with native defaults.
+
+In 0.0.8, search existing entrypoints for `defineService(` and choose native guards or explicitly
+record a public service's reason. The exact public migration is:
+
+```diff
+-await defineService(router, { name: 'status' });
++await defineService(router, {
++  name: 'status',
++  auth: { public: true, reason: 'Public status service with no protected operations' },
++});
+```
+
+Generated L1 service templates include a greppable public demo policy naming #1382 L2; guarded
+scaffolding and authenticated generated app calls are follow-up work. This policy requirement applies
+to the preset; lower-level `createService()` callers still compose their middleware explicitly.
 
 ```ts
 import { assertServiceAuthPolicy, type ServiceAuthPolicy } from '@netscript/service/auth';
@@ -300,6 +455,12 @@ assertServiceAuthPolicy(policy);
 | `ServicePublicAuthPolicy` | Literal public opt-out with a nonblank reason; excludes guard fields. |
 | `assertServiceAuthPolicy` | Validates an explicit posture and required callable ports without changing options. |
 | `createContractAuthorizer` | Traverses a metadata-bearing contract and returns an opt-in authorizer bound by the service builder. |
+| `createContractOverlayAuthorizer` | Enforces only access-marked procedures and leaves every other request to the service's own policy. |
+| `createInternalCredentialAuthenticator` | Accepts the internal bearer derived for this service and mints internal service principals. |
+| `isInternalServicePrincipal` | Default `InternalCallerPredicate`; true only for principals minted by the internal-credential authenticator. |
+| `createCompositeAuthenticator` | Tries authenticators in order over one `AuthenticatorPort` and returns the first success. |
+| `loadInstallationSecret` / `createInstallationSecret` | Import the per-installation secret from its file reference or from memory. |
+| `deriveInternalCredential` | Derives the per-service internal bearer from the installation secret. |
 | `createScopeAuthorizer` | Ordered scope/role rules usable standalone or as a match-aware legacy fallback. |
 | `createStaticCredentialAuthenticator` | Maps configured credentials to principals. |
 | `createTrustedHeaderAuthenticator` | Maps trusted upstream identity headers to principals. |
@@ -318,7 +479,9 @@ The following entrypoints are published alongside the root export:
 | `@netscript/service/commands/testing` | `./commands-testing.ts` | Atomic memory store and explicit test controls. |
 | `@netscript/service/commands` | `./commands.ts` | Opaque command definitions, once-only executor and codecs. |
 | `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
+| `@netscript/service/rate-limit` | `./src/rate-limit/mod.ts` | Route quotas, atomic stores, and trusted client-address resolution. |
 | `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
+| `@netscript/service/internal-credential` | `./src/auth/internal-credential/mod.ts` | Dependency-free installation secret loading and internal credential derivation. |
 
 ## Command definitions and codecs
 

@@ -15,6 +15,7 @@ import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { ServiceConfigEntry } from '../../domain/service-shape.ts';
+import { reconcileBrowserAuth } from '../plugin/browser-auth-reconciler.ts';
 import { reconcilePluginReferences } from '../plugin/plugin-reference-reconciler.ts';
 import {
   getPluginServiceLookupName,
@@ -170,7 +171,11 @@ export async function regenerateAspireHelpers(
     );
   }
 
-  if (!options.dryRun) await reconcilePluginReferences(projectRoot, fs);
+  let browserAuthFiles: readonly string[] = [];
+  if (!options.dryRun) {
+    await reconcilePluginReferences(projectRoot, fs);
+    browserAuthFiles = await reconcileBrowserAuth(projectRoot, fs, options.formatter);
+  }
 
   const parsed = await parseAppSettings(appsettingsPath);
   const rawAppsettings = JSON.parse(await fs.readFile(appsettingsPath)) as unknown;
@@ -189,7 +194,7 @@ export async function regenerateAspireHelpers(
     generateAppHost: true,
   });
 
-  const written: string[] = [];
+  const written: string[] = [...browserAuthFiles];
   for (const file of files) {
     const path = join(aspireDir, file.path);
     const content = options.formatter

@@ -16207,6 +16207,63 @@
       "exports": {
         ".": {
           "symbols": {
+            "BackgroundProcessorContribution": {
+              "signature": "9df79b19455fc403569074415dbf71a42a985dac3e7a202810cd6efab56b48db"
+            },
+            "ContractVersionContribution": {
+              "signature": "20914d2f8f0eae55c94a856b2ee989440f5a50c3bfb91be6164077f69791fbb9"
+            },
+            "DbSchemaContribution": {
+              "signature": "2cfd9b08dbc24a9506d0ea8e08231bb58a8b4b9f6c52d201bdd1ecda11175558"
+            },
+            "E2eContribution": {
+              "signature": "d7e0b687bec32bf0de5bde85fcf67eb43dd9f67c1ae367948d619940c9ec636c"
+            },
+            "MigrationContribution": {
+              "signature": "a320c73207a0920227b49244a485320298cc2fe26d75c8535a3f603f349810bd"
+            },
+            "PluginContext": {
+              "signature": "791e7259c80e74cac954f0f87fb6e54d53e4b24b3f4e712a7527b3681ca24b7c"
+            },
+            "PluginContributions": {
+              "signature": "2547a97670c6c7bfc2ef4145b5833e969a332593443ca36328eb2a4ef21709b3"
+            },
+            "PluginDependencies": {
+              "signature": "af36a8d97d3a90beeb2109d30f657eba9d7525bb5e59ed0ceeea3f07bbb8f868"
+            },
+            "PluginLifecycleHooks": {
+              "signature": "ed8bb5bc0b15bebae9ef146e75764217ee3320126d1840fbfac153827c38e390"
+            },
+            "PluginLogger": {
+              "signature": "be20bc3864cf45b1b3d0bec1b405b68bfb60b0384512be9f72bd2c7ddcbae009"
+            },
+            "PluginManifest": {
+              "signature": "6d4a3178a7193e3c08301b36f059e6214fbedccdab29409abd87660eb75ecad0"
+            },
+            "PluginMetadata": {
+              "signature": "ec4a69af6d74f3722f727f6b532b55bdfa8729980d455fb73f541b2a58d5cc95"
+            },
+            "PluginMetadataValue": {
+              "signature": "c3db589312b73544ed2982486ae5be149dc0ed5a01c7086bbdfe206fda9a7bfd"
+            },
+            "PluginType": {
+              "signature": "0fc0eb48c65e9bc6d71e8ae1fec4d018a17f95e9499488a710ba4242db0ebf85"
+            },
+            "RuntimeConfigTopicContribution": {
+              "signature": "7760e59bcbc53ab566e0fb10d6da2b4a713f6dc56275f9f88ac0f9665db48d4f"
+            },
+            "SdkClientContributionReference": {
+              "signature": "8776cd1d18aa92b2cdf19ad4999cd26b3e4672b60be4fba0d58b9d624c622231"
+            },
+            "ServiceContribution": {
+              "signature": "f79606312c1d7431e5115cd2da90d31e7cf1dfd4f5c4ad53ddad82ede287c44b"
+            },
+            "StreamTopicContribution": {
+              "signature": "66abdd78bf0b5fb8e39317bb73bd3ad4a4a2336c68dd6553204392b7cce68789"
+            },
+            "TelemetryContribution": {
+              "signature": "b36077bfcb4dbddc6a0b7999f4766ad126bc0c6cbf6caa0876e22dcc9f00194b"
+            },
             "workersPlugin": {
               "signature": "0c9de11fd63a34b55bb5b5dc0ddebe55c776939aebf0e9c116ffdf7da65cae7a"
             }
@@ -16267,7 +16324,7 @@
               "signature": "fa4121d818d3a79c429fc5551ab0e018edc73d5b227488fc3b21dd42b410cdcb"
             },
             "WorkersAspireContribution": {
-              "signature": "3f7d9f91618b62e1104c6cfaa1e4b520908b16953b8fe2a516095151368e297a"
+              "signature": "c4c1fb2acd503e5fc917f5f0cf5d277cd86c1231586b28641a7d4cc63ca25c38"
             }
           }
         },
@@ -16283,7 +16340,7 @@
               "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
             },
             "CliCommand": {
-              "signature": "7ada2c8a850ea15048db0035685efe13e2d5f48ae2fbf8fba07195cec4958fac"
+              "signature": "fa01bb652e6d790d22a2325b8bee60f19458f6155ce769def477eac5eaa1bacb"
             },
             "CompileRegistryCommand": {
               "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
@@ -16300,11 +16357,23 @@
             "EnableCommand": {
               "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
             },
+            "ExecutionsCommand": {
+              "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
+            },
+            "FetchWorkersRuntimeApiClient": {
+              "signature": "9938890061cd0cf0089341577bedabf466d35ac3dfe285a5148195d8903bf775"
+            },
+            "FetchWorkersRuntimeApiClientOptions": {
+              "signature": "07e31a055a97bfb572f6b478b406e8658156262d6d2a1f5eecc45b0f676b1da6"
+            },
             "ListJobsCommand": {
               "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
             },
             "ListTasksCommand": {
               "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
+            },
+            "LocalWorkersRuntimeBackendOptions": {
+              "signature": "d49f4b2ec37ff0c97172d785fdb6bfb7686fd102a9876c9f217891400ab69b24"
             },
             "LogsCommand": {
               "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
@@ -16313,19 +16382,67 @@
               "signature": "d06fee391f950ee07b91cc5ba4f7f5ae3d797e841842d934338f1eaf8c84d3f4"
             },
             "PluginCliArgs": {
-              "signature": "42af72314e987c0b6bbded23f038fbcd72dcb8e1f4cbbba0da69c55b07948280"
+              "signature": "0d979806fe5402c56d8e5e6ede5265e8a3eb6489d1acf1289cd967f95ed472fc"
             },
             "PluginCliCommand": {
               "signature": "e9ef1c7f189cdd18af608f13a38613fa6a56f7c2dcab815a4f32ab7bba23a218"
             },
             "PluginCliResult": {
-              "signature": "026890b953ae3ff19c89f6617e2b1f3784d5c1f78effbead5084c9f60de3ebc7"
+              "signature": "0cf61188ff16fe337dc00de62e63432eb83af5df287f27cdf339bd950070af11"
+            },
+            "ProjectFileEntry": {
+              "signature": "279b1ba1aceacc67b1ce63fcc55f259218b4d946c781a3bb58ff61b1c89fcd1b"
+            },
+            "ProjectFiles": {
+              "signature": "a22130f8f08c8e14a3b2a18d685740a5904f8163bef115e9c470bec11f12437d"
+            },
+            "RemoveJobCommand": {
+              "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
+            },
+            "RemoveTaskCommand": {
+              "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
             },
             "RunJobCommand": {
               "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
             },
+            "RunTaskCommand": {
+              "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
+            },
+            "RuntimeTaskMetadata": {
+              "signature": "e566f55c78f8b5549f0b338c3ab9d0027be8b9f717af24150a833805a24dd068"
+            },
+            "ShowJobCommand": {
+              "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
+            },
+            "ShowTaskCommand": {
+              "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
+            },
+            "TaskDefinition": {
+              "signature": "a34f9eed526a8917b502c0bc6dab24e52310c2bd44430c1fa3019a39c1914878"
+            },
+            "TaskExecutionOptions": {
+              "signature": "6fb9744c1ef1a479c6a901fdd7124673986a78ddfaa9c8ddd73c79f2ac374683"
+            },
+            "TaskExecutorLike": {
+              "signature": "50b4d8341a7f92b480fca4e2bd0d45b37dac420f459c49bdf37a5e21653b6d86"
+            },
+            "TaskLogEntry": {
+              "signature": "1a99c42f1e1c171a32424d31e9a043c2de4b7d959010d42eaa5c7c5fcc2cdc85"
+            },
+            "TaskResult": {
+              "signature": "f06cfda4f80a548f35d56a64cc46575be86314d8f6793b13708441ade448dc5c"
+            },
+            "TriggerJobCommand": {
+              "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
+            },
+            "UpdateJobCommand": {
+              "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
+            },
+            "UpdateTaskCommand": {
+              "signature": "9595011b2f40bf035a98ffaf8e79528d3a26b242b896bc4c5197d8c76612790c"
+            },
             "WORKERS_CLI_COMMANDS": {
-              "signature": "f87f8a5f9bce5acf2bca4a2fcadf48025274fb6accdabec1d1120ec6eef62de2"
+              "signature": "3a02890e4aa1cee942924476b3c7d9ee2f18b4ef6e156e26a10e783b06306ded"
             },
             "workersCli": {
               "signature": "7bd175c87051731d9331b26130a77a826d5cda6e2ad5493bed1904f67b658b59"
@@ -16352,137 +16469,249 @@
               "signature": "9b45569bf67fc1ff9ddf4240a9da591f84fa8e200d41c117432c62e352a413c2"
             },
             "WorkersCommand": {
-              "signature": "c1de48f622746b17d8936b5d2c771d5e674e87131056f514b5a4be699569e288"
+              "signature": "e6a7b08f2e717783a40b929ac8f5541bef46df51640a70a4df44ac85eac18730"
             },
             "WorkersCommandDefinition": {
-              "signature": "47cf633ae5c71da5afe029458ab77d0b872ba127ce81a8b897326c10dbfbeeda"
+              "signature": "e4f631409f249e0179c9b1688870ebcee9659a942880fb0987c5abbad0133bf9"
+            },
+            "WorkersRuntimeApiClient": {
+              "signature": "e0b6bd3fa2576ba34a03e4d357456a629bb89a07bcbe3f5966de1a63651c3742"
+            },
+            "WorkersRuntimeRequest": {
+              "signature": "1b343ae41206eefb29b4eb4c79cc0396863529316a0fbd88b9f78acbc6f27280"
+            },
+            "WorkerTaskPermissionField": {
+              "signature": "e77631e812e50feca26919c242cae34a366d2331cb3812b8ae439360ee7b5604"
+            },
+            "WorkerTaskPermissions": {
+              "signature": "2415923b17ada6eb9fab839b6ba80c8b968e7739ded5abb7cbe7a3a9f550f35b"
             }
           }
         },
         "./contracts": {
           "symbols": {
             "ContractSchema": {
-              "signature": "17d7ca06e47513e844e70bb480df6af4c17e9468e2de5f28c604e749b5e6e5d0"
+              "signature": "d481030b6bc5d86da50e83b5b7362d35f765b080c0c55a0c00cf73045ef60123"
             },
             "ContractSchemaResult": {
-              "signature": "ffb223562f0f144982139569fae061b1e2c381fb2b24575e3001044aaec9f2b0"
+              "signature": "03fc111aaa90f4e9eaa6e50bd573a85618b18b6a021ba1ed3f8006194ce6e5e4"
+            },
+            "createWorkersContract": {
+              "signature": "31468656a19da089a91b7a90da170f69edf826ef31df61ea15d68d00ab4b0de4"
             },
             "ExecutionFiltersSchema": {
-              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
+              "signature": "de04e61b326a58d1af63cabbd2d036aa64d736e5982fdc80fc2d04176e7c8ce4"
             },
             "ExecutionRecord": {
-              "signature": "142d35ff29ad3b83d75956bdb873c1af98112923ee75baf22acedc5f89497f72"
+              "signature": "310fa84d8286630757c023fef64e93ff26ec9f0306508320db80d6c432ae2d9c"
             },
             "ExecutionRecordResponse": {
-              "signature": "58f346cd6fa05520d12ed235a63eabe16d16b6a64f05b07eff9df281e4d0f45f"
+              "signature": "db73544a90ae597b1484ef7319c7f2e6d37ab98cee92a2611d4487ec11716351"
             },
             "ExecutionRecordResponseSchema": {
-              "signature": "6c64ac7904a16db0f08750437891409cd59b8e701755fa4c290b891f6f9949cd"
+              "signature": "3288433f71943119d6833eece948dddbead3efd141c676bc39b43ef6c34ee5ff"
+            },
+            "ExecutionStatus": {
+              "signature": "d45d34b17ff1d780c7af3c74ebed42ece729ba6630ccbdcc50131e02e9d7a1e8"
             },
             "JobContext": {
-              "signature": "83d7c85f71698503c070c34e962da7e72ee2247d97a77914c19ecda86be3470c"
+              "signature": "f1481dcd251bf5da834c3bdcb6a1173dbc2710706e74995b3e6b94333a2c7889"
             },
             "JobCreateInputSchema": {
-              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
+              "signature": "029ba56279870785e67b8d2bb77952e5f4d434f2add74b8813092089991f0bed"
             },
             "JobDefinition": {
-              "signature": "ff82854e68c99014bc991102aca8b0b746b70a21c7efcb9a032004fa8fb4ffcd"
+              "signature": "e8c1e8efd136cc0116b02cce93bb90e8ceb8a75d695e00a146c64cb50b8acf7a"
             },
             "JobDefinitionResponse": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+              "signature": "8ef4c5e6ef9591e37b5b612a1d073add09f8e334b4b46e41cb524df0aff40f1d"
             },
             "JobDefinitionResponseSchema": {
-              "signature": "cb5a6be1ae6ca6e388585dfbc583ec3019926d65a9092a000d87dfdec6428e18"
+              "signature": "93b774f56ab3d54309417928d95d1caf79c9f9f1c11fd051dd547e8ad3af367e"
+            },
+            "JobFailure": {
+              "signature": "552932e6690a1a672092ff544891e009c9e9e297ace618be5c1db359c71bf758"
             },
             "JobFiltersSchema": {
-              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
+              "signature": "bfd031e610847f5f0929f65b5670ded20af267f8f397299fb613a180cfb78948"
             },
             "JobHandler": {
-              "signature": "67d3de45f379cdd206fe5e919a572dadce99a7f541a358dd8aa4660655650244"
+              "signature": "0a852f0067f858c75702fc2fd4c4d258c99da3c205f1da6a779ce4dc74142f64"
             },
             "JobMessage": {
-              "signature": "3d04fee5dd72dd9e14be2e4e73d19d402ace9b8f02275ab11d88200a26f69539"
+              "signature": "0077aacebecd49dfb35bc7915012ad3658bbf3146eda6841efc5fdb61cfb6cd6"
+            },
+            "JobPayloadRecord": {
+              "signature": "9d4a6f9d8b747ae851c4c160dfc58bc6e702766127c89cc6098ee5e70e0ddc9f"
+            },
+            "JobPayloadRegistry": {
+              "signature": "22f8cca78e879a2d895d2da84969e3b50def3da8418844426cc3a139dc5ae565"
+            },
+            "JobPayloadSchema": {
+              "signature": "a60b654bd759e0cf14e462d1644e2f33b889d9ccf067cf5490bbbf0cdc5345d7"
             },
             "JobResult": {
-              "signature": "8a6c9420cc09de9b2f5c03c74488b83186b88e1ff334b2a766f38db0b26a69b9"
+              "signature": "daa510641597e0083e32ea1078c5fcef1f3b44f770935b72fd41e77857345f2d"
+            },
+            "JobSuccess": {
+              "signature": "4a462382d604a4eaabcc4d4ff6579d5a2d098b5a5b43d75d2b933861ddb024c6"
             },
             "JobTriggerInput": {
-              "signature": "7cbd0df15eca47a8b5a77ae080d58676ad64d8f2d4e275f6d4d8fdef24aed60c"
+              "signature": "b04ad7617d267a8bbbfffb7bc37b165ad8a1cab36af87b93b39e8065f693f6f2"
             },
             "JobTriggerInputSchema": {
-              "signature": "a307885abf75b26f3843b76e1200ee85900b09382ce3bbb62076b09bfd89d6df"
+              "signature": "d4a630101f35b8478df3e5bcaf78b9905a9a38a218634b937aba8c1be621e504"
             },
             "JobTriggerOutput": {
-              "signature": "fddcbef32870e239c72395fcf1a2725c5c7c6f45d154a40761ace70f77658d6d"
+              "signature": "c345141d14961d205c55e2ca653b8739a635ef77ea1085a83f9851449efc30c4"
             },
             "JobUpdateInputSchema": {
-              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
+              "signature": "82e9a98c899e5525a94f39eb3155e032d3d68a01286fda41ba2e6ad2e27adfd2"
             },
             "JobUpdateWithIdSchema": {
-              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
+              "signature": "d61eb239035a61da51e6cbf36e5f9a92a4181c928a6ca67bde9566c6628ec222"
+            },
+            "PublicStandardSchema": {
+              "signature": "a59dcac4a79120621039e00878dcb36f2970f4f1055eb4b6f40bbafc70b96005"
             },
             "RegisterJobInput": {
-              "signature": "6eebad6d9d810cb0badeb0f11ca0c987fe9fa5df5b24ec959188a270773ac0d4"
+              "signature": "07adefc89d1abfbf6281b7fe48ac0cfedda8ef34275c7a24be62b0a718e5c699"
             },
             "RegisterTaskInput": {
-              "signature": "6eebad6d9d810cb0badeb0f11ca0c987fe9fa5df5b24ec959188a270773ac0d4"
+              "signature": "8973b587f1bebca49739608cabb98c5c81a9ea43f273c3dd9c8d20f50cb164d9"
             },
             "RuntimePermissions": {
-              "signature": "70c89cea72797a66f561313a88898aa735b7ee5f55aa0777735edd16274d08a6"
+              "signature": "5ebe78bbc91eb1230e91108316e9432ec695bd88246bd76f540e3c4d07e30cb1"
             },
             "RuntimePermissionValue": {
-              "signature": "cdc9856fa4e59783f666d812b21615ea00a52891c64d80aed9aa953ac86f76d0"
+              "signature": "1246d1d558be7042e9fbc4d1f961a6383854fa2ca3e91af5a7c8ffe34b3c5bc7"
             },
             "SSEEvent": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+              "signature": "d210889b9aaecca3464ca331b2b90611715ab45a9d58e5cd0ad45a33caefc034"
             },
             "SSEEventSchema": {
-              "signature": "a79315058dffd3a10f51047bda4c8c169d6a221e02b1556a830ba334774e1ac1"
+              "signature": "e51f4b472010408e03eff67c5c083a9a4e27a1a00da2f9067374c970e10f3b7a"
             },
             "TaskDefinition": {
-              "signature": "d8e7e11ced4156d53de97753744f4442a7f7c7fe2b144f6eb22e45d1b551754e"
+              "signature": "5ca44d83e607e646855cb0abe8a5ee5da2b275389e4687387ebc759164ac4499"
             },
             "TaskDefinitionResponse": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+              "signature": "820996e46b218aff4f22f7eb4ba477f437a883eb5e4c1c987629916bbd02f047"
             },
             "TaskDefinitionResponseSchema": {
-              "signature": "c8693b72f233253a1e93d211dc3e944aa521630711f0fb8ca98ea2b73b4196c1"
+              "signature": "bce0474c3f4c28d32c7178deb2a4157f178bb8034abe1a8428c72b101da059a5"
             },
             "TaskExecutionOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+              "signature": "d04582002a4d9b8ad9a20bfa343fd0abd205d58b41f933c801d05ec72c4c24fe"
             },
             "TaskFiltersSchema": {
-              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
+              "signature": "747c878a9ca920028ca0696edb7017da00c990899baa5579e3991ee8c06dc216"
             },
             "TaskMessage": {
-              "signature": "735cdb04b6bf13d8885c6938bd39d91fed497fd4f3c4acc79694b5e8f77af632"
+              "signature": "a5b343ba63a76cfd19eb40e660206cb58e9849eb2b35de57d40b3088f0345e15"
             },
             "TaskResult": {
-              "signature": "d436f99f4957957efa23df37f413bd2d34f6220a8091ceed2be1bbc359a90a1b"
+              "signature": "99cde2891af8102ccfa39b0a729830e8743feb7a6daffcd10a0c0790bb286749"
             },
             "TaskTriggerInput": {
-              "signature": "809b19db8c47c6c780c36e6ca0a493b08325c7371fc0d36d0682aa7292609775"
+              "signature": "984ac5332ec244ec17fa4bf760dd3788af8b79e4d7e78f9f6c4a6972d3b811fc"
             },
             "TaskTriggerOutput": {
-              "signature": "3527da980fd0d35922c201eebe638cb2a01f5b33cef6cc6776b5c1dd69582367"
+              "signature": "ddf3979d9bfe0f7b3240590202ad11c17567ed423331b65f13ca30375d6bbc57"
+            },
+            "TriggerType": {
+              "signature": "6ddddce5bd0c2301161f60884d316c5e902f6e1e1a0601446553012734e227e0"
             },
             "WorkersCapabilities": {
-              "signature": "f72e398cc0112923adb19b64bf796f5524486ee0b89b423a698b2a616d50e00f"
+              "signature": "77e7b9a0b1ac9c292ba82950ba5b903af831e9bddf0fd63961204ee9bf8fa615"
             },
             "workersContract": {
-              "signature": "c403f20a073e6634012b54594842ee1f185d92e6a00bbee64bc56dc8f9629cdb"
+              "signature": "f039af049977f0032dfacc9920b6ebd10424a70e9d07acd2dc41ce2df4ad313b"
             },
             "WorkersContract": {
-              "signature": "40d06c844d511274f575cbb0c7a183836722eb07efd4ec656b2f648f11def060"
+              "signature": "f1d4194ccfe3e8b52f286d6aaa3ecf7424a89d7608ad2a7f59526c53bc8488ab"
             },
             "workersContractV1": {
-              "signature": "7a86a6eb0b1d10a15f483823bf1fa837adc85e18b2033f603840b9c380f156ea"
+              "signature": "812a35c05e58c4b223ada0bb90e477be69f24ec5dfbacc6bd752fed09cdbd9cb"
             },
             "WorkersContractV1": {
-              "signature": "138c5bbee757b25adb0a556703a5be74c36e3ae08572f95722ae9215e5ea12d8"
+              "signature": "673e1fea1ff64e1947f6003dcf8f9608b97b8440325075ab2efb7802da93afe0"
             },
             "WorkersRouter": {
-              "signature": "b8bbd50a945c0d938ef8442ab0a8751584b85802807115fa1ed53940bda95be6"
+              "signature": "7881e06897fb460157862f7c9cd1b98e2f81a6583b5db3531814a901c4beb235"
+            }
+          }
+        },
+        "./doctor": {
+          "symbols": {
+            "DoctorCheck": {
+              "signature": "dab29162d9317ab7ef024344fdd8012c74b73d5e1a9a6fc0aa3e36eac81ac139"
+            },
+            "DoctorCheckSpec": {
+              "signature": "08b34d985009cdde094e943e9d014dfb64ac8f8f3a4033cd68a1cf8688796859"
+            },
+            "DoctorReport": {
+              "signature": "4c44c7d131be9ca0ecc8e6c13ba1b77f0d63e9d7dc313daf2dbd4a230d96e750"
+            },
+            "DoctorSpec": {
+              "signature": "eb83ac9b8cc051482ff7c8450fd85c171652b5260cb3d4fc84371065f6a24a48"
+            },
+            "FileSystemPort": {
+              "signature": "18e20e0be3896a03f40861ed463d90e1e8844369cb025c3e08bcc4c286ee528a"
+            },
+            "InfoSpec": {
+              "signature": "cb67eaef4b2cd76cc03d683057d0836d1ffe7aa5e72e5c4d31b74d8bcc9bc923"
+            },
+            "InstallSpec": {
+              "signature": "e8f765ad833bdf71da0b29c71daa98f45d8a1394f9b83d27deabdee7751f0a0a"
+            },
+            "InstallStarterResource": {
+              "signature": "36b39aaf567a34614fcd81ee5ac82562a76cac3aaaf68cec2a9ff1da462dd143"
+            },
+            "InstallStarterSamplesPolicy": {
+              "signature": "24701a6c2ebe2265c799a148dc98af9b8bed7f7dc5dacfe628c2df15272ae528"
+            },
+            "ItemScaffolder": {
+              "signature": "b218daf624c9b46941b532af1b51b78b864637400f347bef6b093285120d9358"
+            },
+            "NetScriptPlugin": {
+              "signature": "cecd1cb730a042de6c9bea09190c1a2b79be3d1af0bcf3cfe324b7b5abfce76c"
+            },
+            "PluginCliArgs": {
+              "signature": "0d979806fe5402c56d8e5e6ede5265e8a3eb6489d1acf1289cd967f95ed472fc"
+            },
+            "PluginCliResult": {
+              "signature": "0cf61188ff16fe337dc00de62e63432eb83af5df287f27cdf339bd950070af11"
+            },
+            "PluginCommandConfig": {
+              "signature": "2689f12d503d8962786c2f71dcfb1662c09423069ff74f24ac9b3ac8989d0031"
+            },
+            "PluginCommandContext": {
+              "signature": "da0f7d58554cba2938b63b32f0d2c4252fd1b9935d2f10d5944c8aa22ccf5334"
+            },
+            "PluginCommandSpec": {
+              "signature": "1603c338c67debdfa8b799156598e68e27b9f65525296f377072d6f9e53992eb"
+            },
+            "PluginCommandValue": {
+              "signature": "1942e658826dcac2fd3eeabf2d03d508b935ad01aa695a94e0a625a39122c34e"
+            },
+            "PluginResource": {
+              "signature": "d96be2b59ff350887339fe59076b732a4f85faa71036a35cd4216190781ea9df"
+            },
+            "RemoveSpec": {
+              "signature": "e6e038d2ef13fc3cfdbaec1d7fe8915795922917bea24ac2e916f19bac75a2f9"
+            },
+            "ScaffoldArtifact": {
+              "signature": "dba4e50db492577cb104d975e0c01d7240450df228daf439716e2108db1d8005"
+            },
+            "ScaffoldArtifactBody": {
+              "signature": "4c3457f4bd5081928dbf5725ae372b5b84ebc498f2c6731420938a47eb65aea7"
+            },
+            "UpdateSpec": {
+              "signature": "ae990073527ed0cadace1edb297d41bce12b6ffb8a4558b3a77eaa9641919002"
+            },
+            "workersAdapterPlugin": {
+              "signature": "dc135cc87ba8ca529bc791288e6aa071201ea1d0ad7287588d8215b804a026ab"
             }
           }
         },
@@ -16495,26 +16724,95 @@
               "signature": "4aa38a565200118ba4cbe21ee68e398e7dd4259be63134e07cc7eb176b49b4dc"
             },
             "HealthCheckJobContext": {
-              "signature": "f33f97d590f2caddd09ec4ab064cb6407edfd3a47511b448573a161d9f5632f0"
+              "signature": "12d84b7ecf9a64cd0eaf80dd51a4f3e4daecac997eada8a9adf8dce7cb83b8f0"
             },
             "HealthCheckJobHandler": {
-              "signature": "f1fc0cbea080afceef9454b82a75636c177703b3a0f6a63efa8b1baee680b8d4"
+              "signature": "3fc70d153202d8390a8707ed1ee21689a8cf75f6ed2aad9919e365f107e9025f"
+            },
+            "HealthCheckJobPayload": {
+              "signature": "a45b47610fc735b0817796cf26ac18f84a93243cfb322aed08762563a2f82e5b"
+            },
+            "HealthCheckJobPayloadSchema": {
+              "signature": "721e918be08ce3bf8de799a9ec2396623974cf1030c0f869e34976ca1bf2996e"
             },
             "HealthCheckJobResult": {
               "signature": "5e4cce4bd695c687b1e31e86652a2efdd4bd4ead4c171ec24bc7d82c6c26dad8"
+            },
+            "HealthCheckPayloadSchema": {
+              "signature": "1af63603682eef1fc93f8c67601cd82cb140c36b8e4f60feda8021049d3b0679"
             }
           }
         },
         "./runtime": {
           "symbols": {
+            "describeGeneratedJobRegistry": {
+              "signature": "29ef9bde276111a2a473318d4915b545f0c9b23f4f4618bf1f3d40f554b9c5cb"
+            },
+            "ExecutionStatus": {
+              "signature": "d45d34b17ff1d780c7af3c74ebed42ece729ba6630ccbdcc50131e02e9d7a1e8"
+            },
+            "GeneratedJobRegistryError": {
+              "signature": "81c12d01145a202ee0974db13c8084aa4eec8202db50156b2810ce35a4ec7ed8"
+            },
+            "GeneratedJobRegistryStatus": {
+              "signature": "98df24377a63c019577fce8f9efb2f27c21c5f277bed8b83f2840ae4ab6c70d5"
+            },
+            "GeneratedWorkersJobRegistry": {
+              "signature": "bac0b2cbd1f5fa412436d5bca25ef916b73637f370c30585627b70271d307771"
+            },
+            "JobContext": {
+              "signature": "f1481dcd251bf5da834c3bdcb6a1173dbc2710706e74995b3e6b94333a2c7889"
+            },
+            "JobDefinition": {
+              "signature": "e8c1e8efd136cc0116b02cce93bb90e8ceb8a75d695e00a146c64cb50b8acf7a"
+            },
+            "JobFailure": {
+              "signature": "552932e6690a1a672092ff544891e009c9e9e297ace618be5c1db359c71bf758"
+            },
+            "JobHandler": {
+              "signature": "0a852f0067f858c75702fc2fd4c4d258c99da3c205f1da6a779ce4dc74142f64"
+            },
+            "JobPayloadSchema": {
+              "signature": "a60b654bd759e0cf14e462d1644e2f33b889d9ccf067cf5490bbbf0cdc5345d7"
+            },
+            "JobResult": {
+              "signature": "daa510641597e0083e32ea1078c5fcef1f3b44f770935b72fd41e77857345f2d"
+            },
+            "JobSuccess": {
+              "signature": "4a462382d604a4eaabcc4d4ff6579d5a2d098b5a5b43d75d2b933861ddb024c6"
+            },
             "loadGeneratedJobRegistry": {
-              "signature": "0423b8801fb324c4b64d51855f91b0dac1b63bfb22acfcef514c6b16a8d19f25"
+              "signature": "4f7ed0e0421b13fb2d43f9b1a2555cfb542f6714aefcd792c7440f40d59c9502"
             },
             "projectFileUrl": {
               "signature": "3f88c3b3945a77c3f4b26d9813ac1298c82a2660fb9336cbaf41ce49bbec63c5"
             },
+            "PublicStandardSchema": {
+              "signature": "a59dcac4a79120621039e00878dcb36f2970f4f1055eb4b6f40bbafc70b96005"
+            },
+            "registerGeneratedJobRegistry": {
+              "signature": "05d8f4f4c824862b7895503848c101ca65099048119b846792555498dc6be40f"
+            },
+            "RegisterJobInput": {
+              "signature": "07adefc89d1abfbf6281b7fe48ac0cfedda8ef34275c7a24be62b0a718e5c699"
+            },
             "registerStaticJobDefinitions": {
-              "signature": "452d818e592351c07f30f82efee6a638de84298cd11cd0af0ad8e2269f5f088a"
+              "signature": "858d45ca9c738385b0e8b37ff2334063d38aafc3074a917e4c27d39edf9c8c94"
+            },
+            "resolveGeneratedJobRegistryUrl": {
+              "signature": "717bc5ced1b21ad1f9a44b3294eba009fa9db0210ce859d2f8fc695ab6abdbbe"
+            },
+            "RuntimePermissions": {
+              "signature": "5ebe78bbc91eb1230e91108316e9432ec695bd88246bd76f540e3c4d07e30cb1"
+            },
+            "RuntimePermissionValue": {
+              "signature": "1246d1d558be7042e9fbc4d1f961a6383854fa2ca3e91af5a7c8ffe34b3c5bc7"
+            },
+            "ScheduledJobInfo": {
+              "signature": "100c26ae539063175229e09ca078630c435970c6c9e4b7087192c9aacadeb1c5"
+            },
+            "Scheduler": {
+              "signature": "5758112152c4a9f3465a2247fb9a13634d8c78c7d2a0b481e1e2caad24f34196"
             },
             "startCombinedProcess": {
               "signature": "d18c07105ea7e34b3f6974ba7ebb43d6a431e9adb1b54ad9d19bafd8cf44058c"
@@ -16534,8 +16832,35 @@
             "StartWorkerProcessOptions": {
               "signature": "044207a8e8e4102bbd8a9d5176d79259119c563e540308ec91767838c8bb7ca8"
             },
+            "StaticJobDefinitionRegistrar": {
+              "signature": "f010e14963bb99fb6b7aed67f182b622da21bc71d167a5798522a11cd0d6bde4"
+            },
             "StaticJobDefinitionRegistry": {
               "signature": "521756b3d15eca52af8ebb9d2bc3f3ae2009654de709e43adc87a9c269d7b7e2"
+            },
+            "StaticJobRegistry": {
+              "signature": "23f9d3177b8073b2025328e70423e3986e2f0a19c1722da0d2740736193b1b96"
+            },
+            "TriggerType": {
+              "signature": "6ddddce5bd0c2301161f60884d316c5e902f6e1e1a0601446553012734e227e0"
+            },
+            "Worker": {
+              "signature": "da95d779ceb8af6ab2200124a855da10ac1aa1ad21c7192042870505ca6d73d8"
+            },
+            "WorkerHealthStatus": {
+              "signature": "ea1d7988a78cedbc4828b88c45f79dc18c0a7ba03218fb579594dc5128a6bc51"
+            },
+            "WorkerIdempotencyClaim": {
+              "signature": "c359755a7360fb834f3b94ce0b33fc550218b267949b3941df7557f0971ab454"
+            },
+            "WorkerIdempotencyInput": {
+              "signature": "0698bcc0cca9063a8c0a016ef7d2189a44ffc77bc2fa3a0df0aa7d961bbe07ac"
+            },
+            "WorkerIdempotencyPort": {
+              "signature": "5db4ddc9b10f5ec7763b1d574a6ef4f29001d5ba564d66bea1d7a194c485588e"
+            },
+            "WorkerIdempotencySource": {
+              "signature": "f5b6c3d6694b4c03306938845febbad290c39bd98d3081eefe50fc7f063438e0"
             },
             "WORKERS_JOB_REGISTRY_PATH": {
               "signature": "7b54bbfa93f481326cad38db818f46a4269ddf792b4b66ad5cd4c60736c58a6b"
@@ -16548,7 +16873,7 @@
               "signature": "596c794bc2f8d9dc8c833a5f5773d23a17f7cb0c8ecb9868a2d63eb35a912357"
             },
             "PluginLogger": {
-              "signature": "be20bc3864cf45b1b3d0bec1b405b68bfb60b0384512be9f72bd2c7ddcbae009"
+              "signature": "ee262a7c11ea87d9e928448375f78622f11f2037dc6031e68f59bbaea9372aa2"
             },
             "PluginScaffoldEntrypoint": {
               "signature": "e35c08a5a41acfa4eace2212c0fbf54e7034cda0a9e7ef9028d162c574ec84b8"
@@ -16557,7 +16882,7 @@
               "signature": "e7316b8ac518bbebdf5538840260df4ac9e4c1ec409bc5e0721a454d287b3241"
             },
             "ScaffoldResult": {
-              "signature": "36cad210bde1d636a42fa5a8f6ca32a422a38ef0018415ed04d34f38f8648bff"
+              "signature": "00ed5cf70eea32a98d4741733cff28468120868cf56e82ad7508349f8c03ae6d"
             }
           }
         },
@@ -16567,55 +16892,103 @@
               "signature": "979a0ef21b26665d0fb042391bc579b5cfcfa608bd3b24d568c391d4def590bb"
             },
             "PluginServiceContext": {
-              "signature": "a47774bfbac3cbf44da687af9a17ed5de7bbe6699211bb6931c61d470296607e"
+              "signature": "250383447b6e8f12087350ede6220eda014dd6391b0ddd86b56f31aba17853e4"
+            },
+            "RunningService": {
+              "signature": "e159b7415d45250d7e4c1e9b6032b060b9e6ac7f444b9bab08d0b46d5f86d285"
+            },
+            "RunningServiceAddress": {
+              "signature": "dad041a1689075786633aacee329cd55f51919ef8259b0d3919909ece9a37c20"
+            },
+            "ServiceApp": {
+              "signature": "062bdaaa968fc17d403bef865fae383ee0ee9ccc4c1b085d16fcb0dbb1a8d732"
             }
           }
         },
         "./streams": {
           "symbols": {
+            "CollectionDefinition": {
+              "signature": "f3e422577c6b2d83681cb445c11ceb9c8dcec83cc7391b905eca848ee15839b6"
+            },
+            "CollectionEventHelpers": {
+              "signature": "5eaeaafa5ec568703dfee9f2880b0c7d2cdc082508fcca94ef99659500ff928b"
+            },
+            "CollectionWithHelpers": {
+              "signature": "b8aa2bc83c21576a7e0a0989d3dabec67febf4f0e7a2199f5472a2ee8a9e34b6"
+            },
             "createWorkersStreamDB": {
               "signature": "c6a9e8ee3496a187dcf07fd7a0af8e32fc87f286a0d0f15951d850cd58028139"
             },
+            "StateSchema": {
+              "signature": "fdb3656e3db1d37a2f77a15f4807dbeab0bd0f8388c6f5ee15019ac4eb4694f0"
+            },
             "StreamSchemaDefinition": {
-              "signature": "65c21a49b3b914bd0dc8526c55d6c756ae05394e470c2f6bd140da62218b54d6"
+              "signature": "6e396ef348565e9b18880939e473221fcaa6e023af4b0c354d8332858034cf89"
+            },
+            "StreamSchemaIssue": {
+              "signature": "0f171f75df08966ee7a622aaaf4969ace2c6faac99f9b53c94faf99b7a7d83e4"
+            },
+            "StreamSchemaValidationOptions": {
+              "signature": "4531f2e3294f40f99c3b53b2eeb94e411116ee20866aa635aae54f9e32f907ce"
+            },
+            "StreamSchemaValidationResult": {
+              "signature": "8f8231d175f24bbefc4d800cc6303b3d8b899b56d7e7dea7546925262b13cf94"
+            },
+            "StreamStandardSchema": {
+              "signature": "870080515f674696ad5d6d1abf3674b3a5ab44edaec2a27e3d323077f8998cae"
+            },
+            "StreamStateDefinition": {
+              "signature": "8e69419d2c23e10715637150e2fd5b0f88c94635c43b3e51a9a863309dccb05b"
             },
             "WorkerExecution": {
-              "signature": "ba1f5ce99111da05d7b41bfa432f4ed4c6ac5c8eca67769718f3f6bbe5846d05"
+              "signature": "44deac3f419625038a0c9744514089551718d30cd84f2e1a9f5b4353d6424e0a"
             },
             "WorkerExecutionSchema": {
-              "signature": "e3330f12768c0548f1912878b32a52d347a2b969d9e810ec2faa2f812395b1ad"
+              "signature": "fb6dcc65d997505c06dfff68871a1d61bcd03fe7fad5d6973a1576ffaa8c88a2"
             },
             "WorkerJob": {
-              "signature": "6c434ed605359ef99f0d148b31eff5148a032d3603df7f4b0292f91d3255c651"
+              "signature": "b4f4bbabcb01b24d270fcb8396ea6439a1acd19d9105d4f474397b230cc0ae78"
             },
             "WorkerJobSchema": {
-              "signature": "d5030a9e7fe51deaf2e5b8a3992b4b8e1d7768e8df51bdcd3c13b9f92db7a097"
+              "signature": "63890517fb6bff50b7083eaeff2b11f8ff2cb1d8bec65b0b9caa899cb89ccecd"
             },
             "WorkersStreamDB": {
               "signature": "f85ae8b0b362f94720eef4e1acd459bc5f3d9dc35c950d99641894de02d48af1"
             },
             "WorkersStreamDefinition": {
-              "signature": "8ba735ed4ad812cbcf7b84520d8e50f0dcc5c4ef7ea51360067f41c108600f66"
+              "signature": "dfe0abe91d56342db5ac83dbe675709794bc6e1ec16a240fb94700c7c13df50a"
             },
             "workersStreamSchema": {
-              "signature": "63352f735ad6c9e3a7672413e5aa237ef0f72b1d459d4e19c750e921855b5e0e"
+              "signature": "449c9d206ce24437ed83be13bc8fb92d69720e21fbe79166ab41a97be2e1e90b"
             },
             "WorkersStreamSchema": {
-              "signature": "fda366b051b4b786c8092a8f59144299fba24bcb81d2f4324cdb7c682b416e5e"
+              "signature": "9c69a63d7e48ac9f716715f34c20d160b80bcf85ce173044e9a7dc7bb781f81a"
             },
             "WorkerStreamCollectionDefinition": {
-              "signature": "02b6f6be9c3e65b0fd650a2f8314871f2d5ebce491ae951c75da6f8efd001e89"
+              "signature": "1666b49244434c6a36519bcdf4f8d47afb19a162cca6d4379c47e3943cc6d90a"
             },
             "WorkerStreamEntitySchema": {
-              "signature": "0c5b4f473e0f7967b633e679265018455f35daf9f9ae953d715a9fa83dbecc26"
+              "signature": "51683392d39b8b61466be11f38ba3d8b7a056414af663595d1e780ff75effbbc"
             },
             "WorkerStreamStandardSchema": {
-              "signature": "82247be594d4b33ab9b5d944699a7071de84d314d638ecb182f15a7bc0cdf875"
+              "signature": "16fcf31b4ef4ed49a020da223b482455165c7afa622b4d179b6f4bab169268f0"
             }
           }
         },
         "./streams/server": {
           "symbols": {
+            "CanonicalExecutionStatus": {
+              "signature": "d45d34b17ff1d780c7af3c74ebed42ece729ba6630ccbdcc50131e02e9d7a1e8"
+            },
+            "CollectionDefinition": {
+              "signature": "f3e422577c6b2d83681cb445c11ceb9c8dcec83cc7391b905eca848ee15839b6"
+            },
+            "CollectionEventHelpers": {
+              "signature": "5eaeaafa5ec568703dfee9f2880b0c7d2cdc082508fcca94ef99659500ff928b"
+            },
+            "CollectionWithHelpers": {
+              "signature": "b8aa2bc83c21576a7e0a0989d3dabec67febf4f0e7a2199f5472a2ee8a9e34b6"
+            },
             "createStreamMutationHook": {
               "signature": "8a55b971bcf2d71f91662b21db5537a0a5c375fa49649de62f70658941a7c60a"
             },
@@ -16623,104 +16996,170 @@
               "signature": "1f7b6876eb64a41a1a8d43bf08f102978cf44504f81b42edc9ea8be6aba969b3"
             },
             "ExecutionConcept": {
-              "signature": "327ee7d4a49ffeb7f586a119ffb28c2d404c394ca8617472feed64bbd4f01395"
+              "signature": "300f1443568a15ba5f6128308af0ca10215ffecfac402d5dd1b25f4a4afab4a7"
             },
             "ExecutionMutationHook": {
-              "signature": "b7810a3eac5a6d04e085f1b38354740b8828ae00fc32dfb86af9828c78f95ae3"
+              "signature": "0c1c3a445452a4b51267d239493663f4b19739ff969bdbf4568be0fe69fa22ce"
             },
             "ExecutionRecord": {
-              "signature": "ed7fd94f4177aa3264b4fd45298903bf14497aab7ba18dc1e74e007f45a7bdb7"
+              "signature": "ae32704304849da0f7d5ff94106bb581385615f42df69ae827d32c3df92b3435"
             },
             "ExecutionStatus": {
-              "signature": "c18675753798a2394c3ce40609b636116a018a8fa88ebe7f94b086cd52a6e88a"
+              "signature": "b3f1ced1b2b05f50be18d3cd451f4c735ef560d21ea3ad97a5ce0a497aaca218"
             },
             "ExecutionTriggerType": {
-              "signature": "332f5b9b2c438f6a13e38e6bac7f3f3be5010b570942f8013cd12359982c29ed"
+              "signature": "750ed98a39606011be72aceb7f71824beee93054439e96bbbff1d6e61865aff5"
             },
             "getWorkersStreamProducer": {
               "signature": "70fa4bb927135e7805f6ef7157561372ad7c2e23be52973c4ff88697660e7be4"
             },
+            "StateSchema": {
+              "signature": "fdb3656e3db1d37a2f77a15f4807dbeab0bd0f8388c6f5ee15019ac4eb4694f0"
+            },
             "StreamSchemaDefinition": {
-              "signature": "65c21a49b3b914bd0dc8526c55d6c756ae05394e470c2f6bd140da62218b54d6"
+              "signature": "6e396ef348565e9b18880939e473221fcaa6e023af4b0c354d8332858034cf89"
+            },
+            "StreamSchemaIssue": {
+              "signature": "0f171f75df08966ee7a622aaaf4969ace2c6faac99f9b53c94faf99b7a7d83e4"
+            },
+            "StreamSchemaValidationOptions": {
+              "signature": "4531f2e3294f40f99c3b53b2eeb94e411116ee20866aa635aae54f9e32f907ce"
+            },
+            "StreamSchemaValidationResult": {
+              "signature": "8f8231d175f24bbefc4d800cc6303b3d8b899b56d7e7dea7546925262b13cf94"
+            },
+            "StreamStandardSchema": {
+              "signature": "870080515f674696ad5d6d1abf3674b3a5ab44edaec2a27e3d323077f8998cae"
+            },
+            "StreamStateDefinition": {
+              "signature": "8e69419d2c23e10715637150e2fd5b0f88c94635c43b3e51a9a863309dccb05b"
+            },
+            "TriggerType": {
+              "signature": "6ddddce5bd0c2301161f60884d316c5e902f6e1e1a0601446553012734e227e0"
             },
             "WorkerExecution": {
-              "signature": "ba1f5ce99111da05d7b41bfa432f4ed4c6ac5c8eca67769718f3f6bbe5846d05"
+              "signature": "44deac3f419625038a0c9744514089551718d30cd84f2e1a9f5b4353d6424e0a"
             },
             "WorkerExecutionSchema": {
-              "signature": "e3330f12768c0548f1912878b32a52d347a2b969d9e810ec2faa2f812395b1ad"
+              "signature": "fb6dcc65d997505c06dfff68871a1d61bcd03fe7fad5d6973a1576ffaa8c88a2"
             },
             "WorkerJob": {
-              "signature": "6c434ed605359ef99f0d148b31eff5148a032d3603df7f4b0292f91d3255c651"
+              "signature": "b4f4bbabcb01b24d270fcb8396ea6439a1acd19d9105d4f474397b230cc0ae78"
             },
             "WorkerJobSchema": {
-              "signature": "d5030a9e7fe51deaf2e5b8a3992b4b8e1d7768e8df51bdcd3c13b9f92db7a097"
+              "signature": "63890517fb6bff50b7083eaeff2b11f8ff2cb1d8bec65b0b9caa899cb89ccecd"
             },
             "WorkersStreamDefinition": {
-              "signature": "8ba735ed4ad812cbcf7b84520d8e50f0dcc5c4ef7ea51360067f41c108600f66"
+              "signature": "dfe0abe91d56342db5ac83dbe675709794bc6e1ec16a240fb94700c7c13df50a"
             },
             "WorkersStreamProducer": {
-              "signature": "3a39a1ab4ed8287ca11165c0af2d38dd60ae2dc21fb322e9955fc4c56b42d8f5"
+              "signature": "574784e923d25f6e39025599fa3e110badd1ac6b4c4bc026d12f7b53f0315b8c"
             },
             "workersStreamSchema": {
-              "signature": "63352f735ad6c9e3a7672413e5aa237ef0f72b1d459d4e19c750e921855b5e0e"
+              "signature": "449c9d206ce24437ed83be13bc8fb92d69720e21fbe79166ab41a97be2e1e90b"
             },
             "WorkersStreamSchema": {
-              "signature": "fda366b051b4b786c8092a8f59144299fba24bcb81d2f4324cdb7c682b416e5e"
+              "signature": "9c69a63d7e48ac9f716715f34c20d160b80bcf85ce173044e9a7dc7bb781f81a"
             },
             "WorkerStreamCollectionDefinition": {
-              "signature": "02b6f6be9c3e65b0fd650a2f8314871f2d5ebce491ae951c75da6f8efd001e89"
+              "signature": "1666b49244434c6a36519bcdf4f8d47afb19a162cca6d4379c47e3943cc6d90a"
+            },
+            "WorkerStreamEntities": {
+              "signature": "ddb0c62d64b870df2d4cd6374d20f48d742a57fc9ef3fbc7f42e566024658fa3"
             },
             "WorkerStreamEntitySchema": {
-              "signature": "0c5b4f473e0f7967b633e679265018455f35daf9f9ae953d715a9fa83dbecc26"
+              "signature": "51683392d39b8b61466be11f38ba3d8b7a056414af663595d1e780ff75effbbc"
             },
             "WorkerStreamStandardSchema": {
-              "signature": "82247be594d4b33ab9b5d944699a7071de84d314d638ecb182f15a7bc0cdf875"
+              "signature": "16fcf31b4ef4ed49a020da223b482455165c7afa622b4d179b6f4bab169268f0"
             }
           }
         },
         "./worker": {
           "symbols": {
+            "DeadLetterReason": {
+              "signature": "8a76eae375e3553f7c205ab513517c9edfa8e290be7aec2cb922a93fd21ecd02"
+            },
+            "EnqueueOptions": {
+              "signature": "3ffb071a6aac6f811d92701a96ad7390da6dec8627702af6777d511c6aba6fb0"
+            },
+            "ExecutionStatus": {
+              "signature": "d45d34b17ff1d780c7af3c74ebed42ece729ba6630ccbdcc50131e02e9d7a1e8"
+            },
             "JobContext": {
-              "signature": "83d7c85f71698503c070c34e962da7e72ee2247d97a77914c19ecda86be3470c"
+              "signature": "f1481dcd251bf5da834c3bdcb6a1173dbc2710706e74995b3e6b94333a2c7889"
             },
             "JobDefinition": {
-              "signature": "ff82854e68c99014bc991102aca8b0b746b70a21c7efcb9a032004fa8fb4ffcd"
+              "signature": "e8c1e8efd136cc0116b02cce93bb90e8ceb8a75d695e00a146c64cb50b8acf7a"
+            },
+            "JobFailure": {
+              "signature": "552932e6690a1a672092ff544891e009c9e9e297ace618be5c1db359c71bf758"
             },
             "JobHandler": {
-              "signature": "67d3de45f379cdd206fe5e919a572dadce99a7f541a358dd8aa4660655650244"
+              "signature": "0a852f0067f858c75702fc2fd4c4d258c99da3c205f1da6a779ce4dc74142f64"
+            },
+            "JobMessage": {
+              "signature": "0077aacebecd49dfb35bc7915012ad3658bbf3146eda6841efc5fdb61cfb6cd6"
+            },
+            "JobPayloadSchema": {
+              "signature": "a60b654bd759e0cf14e462d1644e2f33b889d9ccf067cf5490bbbf0cdc5345d7"
             },
             "JobResult": {
-              "signature": "8a6c9420cc09de9b2f5c03c74488b83186b88e1ff334b2a766f38db0b26a69b9"
+              "signature": "daa510641597e0083e32ea1078c5fcef1f3b44f770935b72fd41e77857345f2d"
+            },
+            "JobSuccess": {
+              "signature": "4a462382d604a4eaabcc4d4ff6579d5a2d098b5a5b43d75d2b933861ddb024c6"
+            },
+            "ListenOptions": {
+              "signature": "25deb8f801cf5c0a10c83699bcabc3e5ca2643a4d921046c591fc23aa1b20fa7"
+            },
+            "MessageContext": {
+              "signature": "f5bac4e0677e1b3ccae043f93a6ea71960e544b985f3edf190d327891bdcad5b"
+            },
+            "MessageQueue": {
+              "signature": "1d5a67bd693b735a7184d3cae4343da5f158c8f0f6c4af8fe762862c7da479f0"
+            },
+            "NackOptions": {
+              "signature": "add28dfc588704d9ae66082ae6606765e484e9598be151b24c4592a0eda9543b"
+            },
+            "PublicStandardSchema": {
+              "signature": "a59dcac4a79120621039e00878dcb36f2970f4f1055eb4b6f40bbafc70b96005"
             },
             "QueueTriggerConfig": {
               "signature": "2d242fedea1b2def6a745d55bc883b84611ac21501e3a6f2b70f4c11fdc66900"
             },
             "RuntimePermissions": {
-              "signature": "70c89cea72797a66f561313a88898aa735b7ee5f55aa0777735edd16274d08a6"
+              "signature": "5ebe78bbc91eb1230e91108316e9432ec695bd88246bd76f540e3c4d07e30cb1"
             },
             "RuntimePermissionValue": {
-              "signature": "cdc9856fa4e59783f666d812b21615ea00a52891c64d80aed9aa953ac86f76d0"
+              "signature": "1246d1d558be7042e9fbc4d1f961a6383854fa2ca3e91af5a7c8ffe34b3c5bc7"
             },
             "ScheduledJobInfo": {
-              "signature": "100c26ae539063175229e09ca078630c435970c6c9e4b7087192c9aacadeb1c5"
+              "signature": "ddda74ef160a773f645380db20b5e3c677974a8605c80ab4d1dba72ca31d3a7f"
             },
             "Scheduler": {
-              "signature": "5758112152c4a9f3465a2247fb9a13634d8c78c7d2a0b481e1e2caad24f34196"
+              "signature": "4f7a3c1330a7c2f6f534b5de21265654ef0aec1c2ae6ca66746b63a61aaabe39"
             },
             "SchedulerOptions": {
               "signature": "30f3dc0bf1dfc29347683b278a8c7282f373ec2857e67d2d4589c95cabf74e69"
             },
             "StaticJobRegistry": {
-              "signature": "717a5e5cadeace1866a624c70c32c35a203903f80b9908c3d8d87dafea02462f"
+              "signature": "23f9d3177b8073b2025328e70423e3986e2f0a19c1722da0d2740736193b1b96"
             },
             "TaskDefinition": {
-              "signature": "d8e7e11ced4156d53de97753744f4442a7f7c7fe2b144f6eb22e45d1b551754e"
+              "signature": "5ca44d83e607e646855cb0abe8a5ee5da2b275389e4687387ebc759164ac4499"
             },
             "TaskExecutionOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+              "signature": "d04582002a4d9b8ad9a20bfa343fd0abd205d58b41f933c801d05ec72c4c24fe"
+            },
+            "TaskMessage": {
+              "signature": "a5b343ba63a76cfd19eb40e660206cb58e9849eb2b35de57d40b3088f0345e15"
+            },
+            "TriggerType": {
+              "signature": "6ddddce5bd0c2301161f60884d316c5e902f6e1e1a0601446553012734e227e0"
             },
             "Worker": {
-              "signature": "44e26d7afed20de04bb80eaf28fb6fa1d01d6895bafaa96c072f90f8c8588662"
+              "signature": "d23ba388bb92718f8d074e579fb2bdeabda8a0a66b6398aca889d01b77e82b0f"
             },
             "WorkerCompleteExecutionOptions": {
               "signature": "2ea54201249177c751b3016bd3edc8b6088070d1e8a745a3fc9684ff2c791803"
@@ -16738,22 +17177,34 @@
               "signature": "445dc888d7ded953ccdd459cc0c2fc2f1de9386eea7305c5c7b243f8af0214ca"
             },
             "WorkerExecutionState": {
-              "signature": "986c65372bc6eff116eb2823d8b5e226504867d5c277b7619295c3cad4cf825b"
+              "signature": "fe7f63103664f18a214a726dd0878561aad067bd9a457b9daefecd3f01921f84"
             },
             "WorkerHealthStatus": {
-              "signature": "ea1d7988a78cedbc4828b88c45f79dc18c0a7ba03218fb579594dc5128a6bc51"
+              "signature": "0f499a10c3899360aebe0fb418da3cb2ec82a1350020e5e954cb1e84c319d3d3"
+            },
+            "WorkerIdempotencyClaim": {
+              "signature": "c359755a7360fb834f3b94ce0b33fc550218b267949b3941df7557f0971ab454"
+            },
+            "WorkerIdempotencyInput": {
+              "signature": "0698bcc0cca9063a8c0a016ef7d2189a44ffc77bc2fa3a0df0aa7d961bbe07ac"
+            },
+            "WorkerIdempotencyPort": {
+              "signature": "5db4ddc9b10f5ec7763b1d574a6ef4f29001d5ba564d66bea1d7a194c485588e"
+            },
+            "WorkerIdempotencySource": {
+              "signature": "f5b6c3d6694b4c03306938845febbad290c39bd98d3081eefe50fc7f063438e0"
             },
             "WorkerJobRegistry": {
               "signature": "186e012a08ceb0d02ea1d303cdb5de942471a51c9895d2a43f0013da52a3e702"
             },
             "WorkerOptions": {
-              "signature": "a73d3664b3f67e7a1928632003c3b5516816221842ab5df65f4778ba7f836827"
+              "signature": "ab9fcf181fda405e1be77848b69f519441335a69637a714e471fda6b03cb6aa6"
             },
             "WorkerPayloadSchema": {
               "signature": "1a043c42bdb726df4e43f2a5736b16ccfbb7cdc9345efbd3a6be43a97667ef21"
             },
             "WorkerPoolOptions": {
-              "signature": "a1122d2cec395544d4b28f6f99d9d2a0d9f7718cd5e20e778e9095af22701b64"
+              "signature": "c4df65cb99af58d0e139b78f703f1049cab90dc983fbb8578c886eaf2f3b6d89"
             },
             "WorkerSchedulerExecutionState": {
               "signature": "70bfe9dbb6057b7f456c9fb5acd4b910b22f13a56a6fba0eff347ecf463d83de"
@@ -16782,6 +17233,9 @@
             "createFailureResult": {
               "signature": "a787a33a7794d7780c6760a201d8cb1214ce1bab167913a33d7266c1c1ff1693"
             },
+            "createJobTools": {
+              "signature": "e1d2e7bf364cbdc896cf872c343b6493883a8f2ecd869b66bbd10ee38961a49c"
+            },
             "createSuccessResult": {
               "signature": "4afa0c041292da2ca10ec0e3b291d53123e442e59035c5d1fabd2b536350bc33"
             },
@@ -16798,7 +17252,7 @@
               "signature": "5d126db476b3bb98288d2d372863aa7ea5be2477468cc6609e07fdc6d0edce0d"
             },
             "defineJobHandler": {
-              "signature": "11550f663a093f2a94353295e575518dc19c6d9b7947107bc64f6e31ce3e5058"
+              "signature": "fbda6c3b29ff8809cb8ef91e6988f3138739a13512a0a09e957fc4eefe2cca16"
             },
             "defineTask": {
               "signature": "55ec5ea349b0a1d49eeee36ab54a57e67bd8d1e0a20aeb698fea55e5eaa359df"
@@ -16816,19 +17270,40 @@
               "signature": "202a9063587e79ec54e2ae64e5d7d5ca7fe445c3400983880ac51eb08db80055"
             },
             "JobBuilder": {
-              "signature": "820dff98b008de58a8246bb83946b380f38a8f2079c4326fad36d6ebd257bf0b"
+              "signature": "266708b03164b7f43653099f5e5098d639c35944af317b51d4e30ad4b94005a2"
             },
             "JobDefinition": {
-              "signature": "1c48cf00eb4634ba5896151a8bcce08184cdcfbc41ae89a28f895a21c53cc334"
+              "signature": "c98adf8908d31064ed6c7397ccccfce84983f65fe1b639cb4514880cd7c934fb"
+            },
+            "JobHandler": {
+              "signature": "9418367bf692681d13eb355c16f62f6174ccabfd348d4e4f1016515fa0718268"
             },
             "JobHandlerContext": {
-              "signature": "3760047b94bcc116937c9b5c5fe9ea95f793ca1274a7ad4a13fde852c4f0eab1"
+              "signature": "bdd8936427c079b5911811b57f1dc93ed5371cbbed006e8b80511aac7d25bd84"
+            },
+            "JobHandlerDefinition": {
+              "signature": "1b9dd87d0326dde5746cb17067825f9a8ecb321151e63785cba08db80fb02c14"
             },
             "JobId": {
               "signature": "9fb84a15e056679a08e912cbb4676742bd9765c1c20b0d4bafaf3fdb67b94434"
             },
+            "JobPayloadMap": {
+              "signature": "850be241e15aa63159c1c5ddda77cd568c6b66840b865308ce121e4ab3c914d7"
+            },
+            "JobPayloadOf": {
+              "signature": "342d42ac694d89f2dbe381b510fad56103e96ee898acf97a74766d1f605e4a2e"
+            },
+            "JobPayloadSchema": {
+              "signature": "b9fa7d06c457c497f7f8b8a999977a9793ed4ecd6568e942eec54ccf75b37e5c"
+            },
             "JobResult": {
               "signature": "8a6c9420cc09de9b2f5c03c74488b83186b88e1ff334b2a766f38db0b26a69b9"
+            },
+            "JobTools": {
+              "signature": "ce8228fea69ed97b3385f8790e1d3af6d8a55e2c2d9123f11750cdfdb43f3e3b"
+            },
+            "JobToolSpan": {
+              "signature": "801a3e5df3bb11dfd87d11ee4b11bbe7f9f1173d4e2a2427cf7bacb33352c0a7"
             },
             "PermissionPresets": {
               "signature": "092a7937ab9a8ddf74c8694911c0fe405eacb5ca27b246e78970eba6284e25df"
@@ -16836,14 +17311,17 @@
             "permissions": {
               "signature": "41e012d0749f6a2d00b7f458312d420a2e75fdab0af5a72d637ec5dbd85ca673"
             },
+            "PublicStandardSchema": {
+              "signature": "a59dcac4a79120621039e00878dcb36f2970f4f1055eb4b6f40bbafc70b96005"
+            },
             "startWorkers": {
               "signature": "6353eadb00181c71b6ca7f6706188a937786995a4c940628711670034fa5d896"
             },
             "TaskBuilder": {
-              "signature": "a39205457f32f55ac4e0c5d78d2749645009200d982e61ac49a0dad44de2e793"
+              "signature": "6a90149a76434acae52f863db7b239c9ef7f331a21978b8d56d687175e6b34a3"
             },
             "TaskDefinition": {
-              "signature": "ee0a48361c1ff2140d35a5caeff07b1104dbccbc5a642fac5af22da54f34ac3f"
+              "signature": "d712c58b7e6a9934189cd104657e466758170bd5540f93eae3ade1627767f2fe"
             },
             "TaskId": {
               "signature": "ae351ea88e786b55236b115e4c1e3a99acd628ac980afd119e1f5fb326d7e81f"
@@ -16861,107 +17339,10 @@
               "signature": "a42c8f23841ca65128b45979e02df5a6d5659c137f67f084296f78970daadf2c"
             },
             "WorkflowBuilder": {
-              "signature": "943909038e63e6f8ecc83c52f4d94c435867b176e8cb6664c4e70ee664664a63"
+              "signature": "612b6eb2a34d0f3d1dd74f2707d9a4bfefd58d6ff81c7cd859a67c0db7e27a09"
             },
             "WorkflowDefinition": {
               "signature": "2e9d69c0d36bfe0cf9712e36afff203640e082d51cd0b6b1b8d158b2a8cac629"
-            }
-          }
-        },
-        "./abstracts": {
-          "symbols": {
-            "CliCommand": {
-              "signature": "7ada2c8a850ea15048db0035685efe13e2d5f48ae2fbf8fba07195cec4958fac"
-            },
-            "DispatchContext": {
-              "signature": "17be118b40b559066a6c182dfe8699c2eea844187f1a6dc59054e50bdee48f81"
-            },
-            "DisposeContext": {
-              "signature": "2d2ad2eadb10bd84d191152413c4d932c1caf1ad91db639a05e3cbb5b6116fba"
-            },
-            "ExecutionContext": {
-              "signature": "921a9a9b9040613d41deb590bf8d501349acc76ff51c5324976928c2c59512c3"
-            },
-            "InitContext": {
-              "signature": "3d4fb75a35b1cb302c1cba8a9fcf500eb99b699fa62d8f19e9d123712e609a2c"
-            },
-            "JobContext": {
-              "signature": "83d7c85f71698503c070c34e962da7e72ee2247d97a77914c19ecda86be3470c"
-            },
-            "JobDefinition": {
-              "signature": "ff82854e68c99014bc991102aca8b0b746b70a21c7efcb9a032004fa8fb4ffcd"
-            },
-            "JobDispatcher": {
-              "signature": "6379a2a36ac67bb7d1ae8a465e04d5d2f07e37df399d6fc1a4ba21f95c220f80"
-            },
-            "JobHandler": {
-              "signature": "67d3de45f379cdd206fe5e919a572dadce99a7f541a358dd8aa4660655650244"
-            },
-            "JobLifecycleAdapter": {
-              "signature": "b60f9ee97842a20f9feae919316c4655f7fee76b541ee3180134c1d8dfba7be9"
-            },
-            "JobResult": {
-              "signature": "8a6c9420cc09de9b2f5c03c74488b83186b88e1ff334b2a766f38db0b26a69b9"
-            },
-            "JobScheduler": {
-              "signature": "9dda34a9a67b8ad6c4e941a5f45776bf5a63b500d27bf7dd505000d0c315307f"
-            },
-            "Registry": {
-              "signature": "f0a7efd7dac10cd4defb5a066d62fe5e797c378dd790b53d55e4be070cb81987"
-            },
-            "ResolvedTaskExecutionOptions": {
-              "signature": "a9daf5e591d6efbd25290dc3a73aa8b5d6b797a23500a605bd56459c9ec8900e"
-            },
-            "RuntimeTaskMetadata": {
-              "signature": "05bd91a15e606cd6f61f6e503c517dec7b3ac7e27026ec5601b5ccb8e53d9a34"
-            },
-            "TaskDefinition": {
-              "signature": "1c186249ffdc99f20e2e5b063fefc77344204fcd63de7f022094b358cd6079e0"
-            },
-            "TaskExecutionOptions": {
-              "signature": "a857985e9eb9553656f617867e93858471f1e5070a2f53226350b5574a6ae356"
-            },
-            "TaskExecutor": {
-              "signature": "2759f0877ec854ea353f78213e431d4690ae3227c36a2fec0d7e842f2891eac3"
-            },
-            "TaskInstrumentation": {
-              "signature": "620900cb7d3a34f54871ab05e1bb8e1bb7e7424ed5ee23418c8ea6f03b6e22aa"
-            },
-            "TaskLogEntry": {
-              "signature": "1c16ab3d46b368fa3069709a7627e78077d858b0d33e92a51cd81b62896a5031"
-            },
-            "TaskResult": {
-              "signature": "c7b25a663855548c7fcb5e3f362fd9bc54972391c2abd89b78b9e482af618f4b"
-            },
-            "TaskRuntimeAdapter": {
-              "signature": "51a076abb63819029a9ff07acd9f0af1fb6e5ea81f29b3c9fb8bd518166dbc72"
-            },
-            "TaskType": {
-              "signature": "eeb74547ea1659d9ad99a523a879deed808429d36e6e101014a366e394505906"
-            },
-            "WorkerInstrumentation": {
-              "signature": "519a3457388b2b19bcb2e8fb7b95dea838a34fea7ff948c62725d5a7e350c048"
-            },
-            "WorkerInstrumentationContext": {
-              "signature": "744298ea7234ec60ceb2ffc66e5a8b094329ba875699f2f936b19a6b12fadb56"
-            },
-            "WorkerInstrumentationSpan": {
-              "signature": "fb1d02b7e77a38a8698f4bc56baed129a404e1b19fe2579b8bdfad2b9dfcb330"
-            },
-            "WorkersCommand": {
-              "signature": "c1de48f622746b17d8936b5d2c771d5e674e87131056f514b5a4be699569e288"
-            },
-            "WorkersCommandDefinition": {
-              "signature": "47cf633ae5c71da5afe029458ab77d0b872ba127ce81a8b897326c10dbfbeeda"
-            },
-            "WorkersItemScaffolder": {
-              "signature": "eb00db045a6699081a51408529701688f37c96436b2f8bee3caa2d450987f1bc"
-            },
-            "WorkerTaskPermissionField": {
-              "signature": "fbff889ade23276194b13fabbdd45efb23514aff34d135defbc7364f17097486"
-            },
-            "WorkerTaskPermissions": {
-              "signature": "6f92a7857877ec42e7aab1a0f0b8a8f139886539fb016dd57e620edb69d0dcc9"
             }
           }
         },
@@ -16989,25 +17370,25 @@
               "signature": "f1d498de4e2e651a5990d3b705a1ae45d49bb270b4e0725d1ecbd2a44b6544b3"
             },
             "JobBuilder": {
-              "signature": "d49a0870b46a0d4e5b87e02150f9fa1f94d72dd789d5687b8b9778b2df1f1df7"
+              "signature": "dd9b09b7def1026f3220b30bbed02e57bd630576136d35496ad186c80197611a"
             },
             "JobBuilderState": {
-              "signature": "00f8e23c2aab57ca272b35078584e7f47b18bb81c9b2d7974303fabf6a241fb3"
+              "signature": "8b320c9fc6387f2b6c6cbd6369f64cbea8ffb56b7dafcc270a6c7a29ab5efec5"
             },
             "JobDefinition": {
-              "signature": "f723c96b29f8a907a7dc145be9905261836ef1d3f8fa6e96f103339e230178ea"
+              "signature": "40646299abd58dbfc6430ce8ecd12156858c432a256becac41504ad93f7e7a7c"
             },
             "JobHandler": {
-              "signature": "9418367bf692681d13eb355c16f62f6174ccabfd348d4e4f1016515fa0718268"
+              "signature": "a891714829242ae067a9ee464ffe1cfa1e8472f9307bd2bfe4dee05e48fb3407"
             },
             "JobHandlerContext": {
-              "signature": "17661bfa5dc2269274507f5c90f9db02fcbc29dd8b43b8825aef79fedb330bd4"
+              "signature": "0a5462e4c9d1c3d7cf2b2576cef6f54e8a95ca131c71c5f8226eab4fe54a7484"
             },
             "JobId": {
-              "signature": "9fb84a15e056679a08e912cbb4676742bd9765c1c20b0d4bafaf3fdb67b94434"
+              "signature": "7c541f10273901966c5f180aa34b58ce0044f8ba018160952ba4fc4f26c35dba"
             },
             "JobResult": {
-              "signature": "8a6c9420cc09de9b2f5c03c74488b83186b88e1ff334b2a766f38db0b26a69b9"
+              "signature": "eb19d8900d4a509c6e0a632c31897b36cadd9dba5b65e8f7dd56b88d0e20ef52"
             },
             "JobRetentionOptions": {
               "signature": "0920ff0a5e780b21938dd03ec105e834bc0ec05b862c8cefc7a4adb223cf8553"
@@ -17016,140 +17397,40 @@
               "signature": "28198d8ef41793bcd8d473a93596948acb940d0f812ee3716aae7968b4eb4802"
             },
             "TaskBuilder": {
-              "signature": "7515a91196bf0909c39a228ef17bd24c4a242f62b78508b2102295ed7db08a69"
+              "signature": "9bb3cf243d388efc052b447dd00da778271c3c0c8824e2b87df21f56eb04afdc"
             },
             "TaskBuilderState": {
-              "signature": "00f8e23c2aab57ca272b35078584e7f47b18bb81c9b2d7974303fabf6a241fb3"
+              "signature": "8b320c9fc6387f2b6c6cbd6369f64cbea8ffb56b7dafcc270a6c7a29ab5efec5"
             },
             "TaskDefinition": {
-              "signature": "99f8795e5d74815058f9ac0ca23e69111b688af8aac7c57d093a0cc888591778"
+              "signature": "ccce14f04b1065dc96e682e57bdf33135e82cb7c788c268196c4d395f82d37c5"
             },
             "TaskHandler": {
-              "signature": "dbe7fbc5733c6db9c39d05a2394e4636ff9923fe6f276f0225c6485a2f85fd1d"
+              "signature": "39b40326902194dea57eacd2a64ae862ce11d9f479dc057e2518768495a14779"
             },
             "TaskId": {
-              "signature": "ae351ea88e786b55236b115e4c1e3a99acd628ac980afd119e1f5fb326d7e81f"
+              "signature": "b6129092ab16c11ce9854adb77598081480b0947a4b369d03418eada22476f27"
             },
             "WorkflowBuilder": {
-              "signature": "a4ce845f5d99dec1c0f3005e11f5662a809ab2a472eb3ca04e85246de67ac4ee"
+              "signature": "a44293d07e796ac457e4a54fe4da7a4c6acd74ba0b7af95dac770ebb88e2fab9"
             },
             "WorkflowBuilderState": {
               "signature": "e299c18c569d2b77f7c287f8f3101479d30f980d681cce68df21a22c9493d97a"
             },
             "WorkflowDefinition": {
-              "signature": "2e5a0eed720befa4dba618658d106710832963b9211858507dfc860c115a29ab"
+              "signature": "47b931a3a0978464df2465681b834f801627bbb303dc3827e165a4ca8a779e39"
             },
             "WorkflowId": {
-              "signature": "5c179b8cc189bef3a472bb7f893be05242c83675e8ccb17c6d34c85166733e36"
+              "signature": "1ac78e59ef19562cd7307b82516acd2465bdced115ddfcb22b668cb6059e5156"
             },
             "WorkflowJobStepOptions": {
               "signature": "7cede699e511478e48cf09cd1d8e118afd89807d01b76ae6f73443b566d081b3"
             },
             "WorkflowStep": {
-              "signature": "9a3212345bcfd60c6ea0420459a15c7bcff7ebca16269860ce6aae00d15848cb"
+              "signature": "59e0807af33a2829f699c6edbe6d87e5f1c3e1564832e2735c99cda0a61f50a0"
             },
             "WorkflowTaskStepOptions": {
               "signature": "1e5730cf6664d8ebbab27f4722ebf67d1aa346575fdfcccf48f36cdacafe65a3"
-            }
-          }
-        },
-        "./config": {
-          "symbols": {
-            "ConfigSchema": {
-              "signature": "a24013eaf0c73e27fd9874b5de62948655a2e4e4461e4b1910d2a83e4b9d3f3a"
-            },
-            "ConfigSchemaResult": {
-              "signature": "ffb223562f0f144982139569fae061b1e2c381fb2b24575e3001044aaec9f2b0"
-            },
-            "defineJobs": {
-              "signature": "05defb950be3296d6c73efb053475c2a1dc614fc676ea523ea0ba358a7e0483e"
-            },
-            "defineWorkers": {
-              "signature": "be93d13b0d91810f2da4a4330a4ba930ce3144a35a5e4e8c0dacbe94876eb82f"
-            },
-            "JobConfig": {
-              "signature": "629d3b87166aaaf2d4c89570496002f9cb9d53895ca6a8c542a87f85ada4fe5f"
-            },
-            "JobConfigInput": {
-              "signature": "7187f614e86c19bc6c73511b272e30957e88155bb4dcca7de86600618551175b"
-            },
-            "JobConfigSchema": {
-              "signature": "1e772e839e3b6d53026f518c7f39e759dabf89a93b99577ce82ae0fa08f0de14"
-            },
-            "QueueProvider": {
-              "signature": "f43d285fe97556d7efb99201ae6673739a9aa7fb94e5dd89b7a7cf68ec9f09a3"
-            },
-            "QueueProviderData": {
-              "signature": "9b3b22c1cd10d08a9caf0b285f9dae81c4a6870da08d8c9576469ee5f64909e5"
-            },
-            "QueueProviderSchema": {
-              "signature": "a1332aae33fedd37c4227c4a01dcc65819d9f71984f78941aaba61ed1cd67abe"
-            },
-            "RetentionConfig": {
-              "signature": "56b82653f5afe04203e770049f32a60a67b0ce488ec68b168a0267c90744061a"
-            },
-            "RetentionConfigSchema": {
-              "signature": "10a96a5b97752d2c910d71ad28140d8cdc9a54c06d6c066456d75a788c88e710"
-            },
-            "ScalingConfig": {
-              "signature": "958f311ac5c11ed278fb937c6fc4b3c72e3f7848502af739058f14fcfcb5674a"
-            },
-            "ScalingConfigData": {
-              "signature": "08a8967a1b739094383dfe0426035871fe185ab31ce8c8e22697c23cf06beeff"
-            },
-            "ScalingConfigSchema": {
-              "signature": "e59ced625abd5ed21de77dde09e7626416f34e4c67b0f3dd28fb53de6057d517"
-            },
-            "TaskConfig": {
-              "signature": "c8d8962c4317b680546b4442ab58f2a83b51738086f4164a404b5b37648dc16f"
-            },
-            "TaskConfigSchema": {
-              "signature": "9a3abde98ddba679aa7d863b9cd5de6418ca6a4f1785edea59dbec8c85b832dc"
-            },
-            "TopicRetentionConfig": {
-              "signature": "10f808880a8e7b3a2557cd18dbcf60f9e8e5a120552aab871421009b6debfbc8"
-            },
-            "TopicRetentionConfigData": {
-              "signature": "a6f7d97b26401138b2d29d580b0666d1793d3f036b4ae0b71a60e3761bf328fb"
-            },
-            "TopicRetentionConfigSchema": {
-              "signature": "27fbe2d48db712e3926852fca440af60a4c5689976170c1bb40b1e08a3b1cd87"
-            },
-            "WorkerConfigPermissions": {
-              "signature": "40db580b72481a5e1e4b81609367ce56eab30ff267dc20d99a4ecf69002b5cba"
-            },
-            "WorkerConfigPermissionValue": {
-              "signature": "fbff889ade23276194b13fabbdd45efb23514aff34d135defbc7364f17097486"
-            },
-            "WorkerGroup": {
-              "signature": "57dcf7c4f2ca013756b41eafb765b96402bfa17731b67f65e06ddd9ec2f1ea7b"
-            },
-            "WorkerGroupData": {
-              "signature": "d0fbfda3d4dabdfef758808dd0b88e83a9c9fafdc85e7ac3caac34c5ab185ffa"
-            },
-            "WorkerGroupSchema": {
-              "signature": "baec6c2228bfea586e9c3ef2ea3319508a6f102618db0515e646716ecc2185d6"
-            },
-            "WorkerJobSource": {
-              "signature": "b5a69abaa5e8798b9bf77af1624fe70dcdfe1c9fc75e4aa1d76dc6880f29b12e"
-            },
-            "WorkersConfig": {
-              "signature": "ad6d5a09e2a3b649a0119eff5cf03e89a4a9b136e6df64b2eb074c4084b34c04"
-            },
-            "WorkersConfigData": {
-              "signature": "37b995c8dfec976c00dbdcbaa8a754030733bcfcb881e31314b46efdb8cfc1e3"
-            },
-            "WorkersConfigInput": {
-              "signature": "3b9425f0be399a4aba5df1918736c389b729810d78e7bfd5e67e406d2902e593"
-            },
-            "WorkersConfigSchema": {
-              "signature": "3279415ea2340a1b6fa00eb6c7bdbb83c86c5d0b5e8a494441b80ad865bb4a54"
-            },
-            "WorkerTaskSource": {
-              "signature": "5295187e0394f493b18bb46e0a42ca82dbcd54d517341c0e277aeecb7b5d7cab"
-            },
-            "WorkerTaskType": {
-              "signature": "bfa90787041f355873f8e9ec0f5a10e03c775566e04e0ff9b22b2f204a113364"
             }
           }
         },
@@ -17160,6 +17441,9 @@
             },
             "ContractSchemaResult": {
               "signature": "ffb223562f0f144982139569fae061b1e2c381fb2b24575e3001044aaec9f2b0"
+            },
+            "createWorkersContract": {
+              "signature": "2fea7b7eee6711c4ab3a56e19b364e02997b120fb4b2529f31866da075adcaf5"
             },
             "ExecutionFiltersSchema": {
               "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
@@ -17182,8 +17466,14 @@
             "JobFiltersSchema": {
               "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
             },
+            "JobPayloadRecord": {
+              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+            },
+            "JobPayloadRegistry": {
+              "signature": "2b235d8dc7ff34dc5b1c44b0171d90d88e1722c0a32c9814857e107f88ffc8c9"
+            },
             "JobTriggerInput": {
-              "signature": "7cbd0df15eca47a8b5a77ae080d58676ad64d8f2d4e275f6d4d8fdef24aed60c"
+              "signature": "860520de3603b2ee58544fb38ae41eb3caf937affc5ce5ff363aef4ffd06d9c9"
             },
             "JobTriggerInputSchema": {
               "signature": "a307885abf75b26f3843b76e1200ee85900b09382ce3bbb62076b09bfd89d6df"
@@ -17225,7 +17515,7 @@
               "signature": "c403f20a073e6634012b54594842ee1f185d92e6a00bbee64bc56dc8f9629cdb"
             },
             "WorkersContract": {
-              "signature": "40d06c844d511274f575cbb0c7a183836722eb07efd4ec656b2f648f11def060"
+              "signature": "5984144d3beb521c91c8b94a6f1e3de5a762ca687e9688918b3a9d4dafb4d5ef"
             },
             "workersContractV1": {
               "signature": "7a86a6eb0b1d10a15f483823bf1fa837adc85e18b2033f603840b9c380f156ea"
@@ -17235,6 +17525,107 @@
             },
             "WorkersRouter": {
               "signature": "b8bbd50a945c0d938ef8442ab0a8751584b85802807115fa1ed53940bda95be6"
+            }
+          }
+        },
+        "./registry": {
+          "symbols": {
+            "ExecutionRecord": {
+              "signature": "dbe6f394d803abaee955c2dc0958ed2017f60ed68a0b89190b161b814233dbf8"
+            },
+            "JobDefinition": {
+              "signature": "3d253013950987f7ba50364105b888f42ae63ed01dd059720d06297b11de221c"
+            },
+            "JobFilterOptions": {
+              "signature": "610ddfdfa520c118520dcd1b4af0cd8421f264311826f03a0c9d21173385e7d9"
+            },
+            "JobSource": {
+              "signature": "d807351d4b6cb1cc8139a8b195a420fca0edbe2fe18093de3b6395053b96ea48"
+            },
+            "KvEntry": {
+              "signature": "3e5da70dbaa389e53ceb8ad8a0bb7290ac88f52dc6358c7764b9456b93cec03b"
+            },
+            "KvJobRegistry": {
+              "signature": "82fd90bcc492f7316b800b0966700f15e271c73f5777a95d432f1cb72f6ae056"
+            },
+            "KvListSelector": {
+              "signature": "2055fafa72707a287c256969bc32bdb8a6586f107021fb3d6a4c83cab420a5fe"
+            },
+            "KvTaskRegistry": {
+              "signature": "28d754daf78eacdba8efd598035b8dcdac2dcb7dd1a46e7b2dc2c36815e9c4fe"
+            },
+            "MemoryJobRegistry": {
+              "signature": "5421e263769a9c541a6fe2dad762db484f882eae28705a77f4eed87fadc40d79"
+            },
+            "RegisterJobInput": {
+              "signature": "62f338c3b8b7a969b5be8fb009600b66c2d012ea0965c9e21aeab0fed3e0cf25"
+            },
+            "RegisterTaskInput": {
+              "signature": "63813a2c8931b0aaad2a8d05352a235f9275568d94434165572576302e2b709c"
+            },
+            "Registry": {
+              "signature": "d3fbf7ef2b86a9fda54a92e0cd8c2f0071279ccaa45be7236766fb40fc1863e2"
+            },
+            "RegistryJobStoragePort": {
+              "signature": "e2bdb0d9e4a04461cb992ad889ab212fdecdccb254461f659ac287532cb6f83b"
+            },
+            "RegistryKvStore": {
+              "signature": "6888a1fc6a6018dd4fa50d62b8e7924268ac54ed75dacfd5c3c05d6e8e551c71"
+            },
+            "RegistryOptions": {
+              "signature": "d9062560d8a97fab47197f7df20f83a1bee9fe6fc4417c48527c9ffd1667e9a1"
+            },
+            "RegistryTaskPermissionsInput": {
+              "signature": "327e2f93213a3a16d1c0ac68f72e70aa642e91032aa251139bf44752a447fff3"
+            },
+            "RuntimePermissions": {
+              "signature": "d53f839c05936e9e8920251609431ab80dff2beeacf0f6d14663e0a4511f9dd0"
+            },
+            "RuntimePermissionValue": {
+              "signature": "cdc9856fa4e59783f666d812b21615ea00a52891c64d80aed9aa953ac86f76d0"
+            },
+            "TaskDefinition": {
+              "signature": "d1a8ebf0f54829b4004f6fc8fc7a87d7d618603f8c42161389f5e21ac22070f3"
+            },
+            "TaskExecutionType": {
+              "signature": "eeb74547ea1659d9ad99a523a879deed808429d36e6e101014a366e394505906"
+            },
+            "TaskFilterOptions": {
+              "signature": "43004667a7a64061568fb03f31ea8f7b4a964fed32e1dbe1aa23f36ba8dacad2"
+            },
+            "TaskSource": {
+              "signature": "c33256409ad93156e9675334730ee4cd35eff1da181c15802958edb930a4ae3f"
+            }
+          }
+        },
+        "./state": {
+          "symbols": {
+            "CompleteExecutionOptions": {
+              "signature": "90c00778d8ae03903ecfae40125612808dcef2f212a9955a3ee9a99ef62bf9c9"
+            },
+            "CreateExecutionOptions": {
+              "signature": "e77b7bcba38c95f269ab6bd22161673237186ab3b579b8a0f1a3b500de09b963"
+            },
+            "ExecutionConcept": {
+              "signature": "327ee7d4a49ffeb7f586a119ffb28c2d404c394ca8617472feed64bbd4f01395"
+            },
+            "ExecutionMutationHook": {
+              "signature": "b7810a3eac5a6d04e085f1b38354740b8828ae00fc32dfb86af9828c78f95ae3"
+            },
+            "ExecutionRecord": {
+              "signature": "48369b34d36e68ad10e439331a81b91bc21678ef5a4938441c9f3ee6c19000f8"
+            },
+            "ExecutionStatus": {
+              "signature": "c18675753798a2394c3ce40609b636116a018a8fa88ebe7f94b086cd52a6e88a"
+            },
+            "ExecutionTriggerType": {
+              "signature": "332f5b9b2c438f6a13e38e6bac7f3f3be5010b570942f8013cd12359982c29ed"
+            },
+            "KvExecutionState": {
+              "signature": "708644a4da0b67ff12f7cdf3f29eecc430c3ff3a4742543a0b5d7b9e9a438b48"
+            },
+            "ListExecutionOptions": {
+              "signature": "348abb6cdea24d49f423a6b7b24a3890cacf331bbc3ebdfa2251a31e8033a90c"
             }
           }
         },
@@ -17337,451 +17728,186 @@
               "signature": "fbff889ade23276194b13fabbdd45efb23514aff34d135defbc7364f17097486"
             },
             "WorkerTaskPermissions": {
-              "signature": "6f92a7857877ec42e7aab1a0f0b8a8f139886539fb016dd57e620edb69d0dcc9"
+              "signature": "5a6f31d67feb7038f531b79ce82b4af6163376301ade2556271821cd82d929e9"
             }
           }
         },
-        "./presets": {
+        "./workflow": {
           "symbols": {
-            "ExecutionRecord": {
-              "signature": "142d35ff29ad3b83d75956bdb873c1af98112923ee75baf22acedc5f89497f72"
-            },
-            "JobContext": {
-              "signature": "83d7c85f71698503c070c34e962da7e72ee2247d97a77914c19ecda86be3470c"
-            },
-            "JobDefinition": {
-              "signature": "ff82854e68c99014bc991102aca8b0b746b70a21c7efcb9a032004fa8fb4ffcd"
-            },
-            "JobHandler": {
-              "signature": "67d3de45f379cdd206fe5e919a572dadce99a7f541a358dd8aa4660655650244"
-            },
-            "JobMessage": {
-              "signature": "3d04fee5dd72dd9e14be2e4e73d19d402ace9b8f02275ab11d88200a26f69539"
-            },
-            "JobResult": {
-              "signature": "8a6c9420cc09de9b2f5c03c74488b83186b88e1ff334b2a766f38db0b26a69b9"
-            },
-            "RuntimeJobStoragePort": {
-              "signature": "e2bdb0d9e4a04461cb992ad889ab212fdecdccb254461f659ac287532cb6f83b"
-            },
-            "RuntimeSchedulerPort": {
-              "signature": "9257a982db5a7048dc40964ab13b7143078d50f99b46f855c1f03fc0c375718f"
-            },
-            "RuntimeShutdownManager": {
-              "signature": "6949043b9e634c5f5209085edbd1c36c9950d4b3d8aeada0aa5deaed2e605c37"
-            },
-            "RuntimeShutdownOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
-            },
-            "RuntimeShutdownResource": {
-              "signature": "752d88ed2b7de47e6aad2eb52e213d78eb061b951aeb9d89a8f6a32110084822"
-            },
-            "RuntimeTaskExecutor": {
-              "signature": "89c683a468c77e9d3197042d3343ce6b22c805821a3992a9d62429ab70d440a8"
-            },
-            "RuntimeTaskExecutorOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
-            },
-            "RuntimeWorkerPort": {
-              "signature": "b911779ece80f47a1ae5df6fdea36a856b3bee9e6f0d4cb6a877d8c5d1845160"
-            },
-            "RuntimeWorkflowDefinition": {
-              "signature": "22ff26821c8c9fb47a5558f54d8389757984455801cb65d5b707423172344e78"
-            },
-            "RuntimeWorkflowExecutor": {
-              "signature": "a519426231aa909589337fb7b184b9817bf75955d221092e1aa46644e41aac50"
-            },
-            "RuntimeWorkflowOptions": {
-              "signature": "0989836b1c2d9135afc1005ca59ddd88bb91d5172a9f8d0108202fa8ae655e4e"
-            },
-            "startWorkers": {
-              "signature": "b4b0b2438790fd8526874bcc7cf8cdb9d3faa40424c3f5012f506f4368ad81b9"
-            },
-            "StartWorkersOptions": {
-              "signature": "01c184cba5a88e80d607ae9517728d5ce1484f2736d16b13eec0bb82262e626b"
-            },
-            "StaticJobRegistry": {
-              "signature": "717a5e5cadeace1866a624c70c32c35a203903f80b9908c3d8d87dafea02462f"
-            },
-            "TaskDefinition": {
-              "signature": "d8e7e11ced4156d53de97753744f4442a7f7c7fe2b144f6eb22e45d1b551754e"
-            },
-            "TaskExecutionOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
-            },
-            "TaskRegistryPort": {
-              "signature": "8b60ca80a4f3574a40af1881eba7c348dd419da858dc9f92c06caa7d04f882cb"
-            },
-            "TaskResult": {
-              "signature": "d436f99f4957957efa23df37f413bd2d34f6220a8091ceed2be1bbc359a90a1b"
-            },
-            "WorkersClock": {
-              "signature": "365455bad257a54059c5584bcef04649c8b9768299231bad9bb96dccb1f18b88"
-            },
-            "WorkersRuntime": {
-              "signature": "bf9017fd669d6ab2bfbdc7e95b44ba4a2bf668a5aeeb93c1a06340b4979b3d68"
-            },
-            "WorkersRuntimeOptions": {
-              "signature": "1c75c72cc6c71ea61439437f29c3310ba9cc1bfe92535c129d5d9859c117e363"
-            },
-            "WorkflowId": {
-              "signature": "5c179b8cc189bef3a472bb7f893be05242c83675e8ccb17c6d34c85166733e36"
-            }
-          }
-        },
-        "./registry": {
-          "symbols": {
-            "ExecutionRecord": {
-              "signature": "56f0b0298c0d9267911d01c806ce64035a427f9742b3c469a4e56ada121e6520"
-            },
-            "JobDefinition": {
-              "signature": "d6d1a37e60968cb78871c9fb390937ed70ea0ee6c19d0c01994240e073aecef7"
-            },
-            "JobFilterOptions": {
-              "signature": "610ddfdfa520c118520dcd1b4af0cd8421f264311826f03a0c9d21173385e7d9"
-            },
-            "JobSource": {
-              "signature": "d807351d4b6cb1cc8139a8b195a420fca0edbe2fe18093de3b6395053b96ea48"
-            },
-            "KvEntry": {
-              "signature": "3e5da70dbaa389e53ceb8ad8a0bb7290ac88f52dc6358c7764b9456b93cec03b"
-            },
-            "KvJobRegistry": {
-              "signature": "82fd90bcc492f7316b800b0966700f15e271c73f5777a95d432f1cb72f6ae056"
-            },
-            "KvListSelector": {
-              "signature": "2055fafa72707a287c256969bc32bdb8a6586f107021fb3d6a4c83cab420a5fe"
-            },
-            "KvTaskRegistry": {
-              "signature": "28d754daf78eacdba8efd598035b8dcdac2dcb7dd1a46e7b2dc2c36815e9c4fe"
-            },
-            "MemoryJobRegistry": {
-              "signature": "5421e263769a9c541a6fe2dad762db484f882eae28705a77f4eed87fadc40d79"
-            },
-            "RegisterJobInput": {
-              "signature": "42a5f5c5ff60cecf379bd80a7295f6c6f23d645056d4d1762a40f7178f48e5b6"
-            },
-            "RegisterTaskInput": {
-              "signature": "63813a2c8931b0aaad2a8d05352a235f9275568d94434165572576302e2b709c"
-            },
-            "Registry": {
-              "signature": "d3fbf7ef2b86a9fda54a92e0cd8c2f0071279ccaa45be7236766fb40fc1863e2"
-            },
-            "RegistryJobStoragePort": {
-              "signature": "e2bdb0d9e4a04461cb992ad889ab212fdecdccb254461f659ac287532cb6f83b"
-            },
-            "RegistryKvStore": {
-              "signature": "6888a1fc6a6018dd4fa50d62b8e7924268ac54ed75dacfd5c3c05d6e8e551c71"
-            },
-            "RegistryOptions": {
-              "signature": "d9062560d8a97fab47197f7df20f83a1bee9fe6fc4417c48527c9ffd1667e9a1"
-            },
-            "RuntimePermissions": {
-              "signature": "70c89cea72797a66f561313a88898aa735b7ee5f55aa0777735edd16274d08a6"
-            },
-            "RuntimePermissionValue": {
-              "signature": "cdc9856fa4e59783f666d812b21615ea00a52891c64d80aed9aa953ac86f76d0"
-            },
-            "TaskDefinition": {
-              "signature": "d1a8ebf0f54829b4004f6fc8fc7a87d7d618603f8c42161389f5e21ac22070f3"
-            },
-            "TaskExecutionType": {
-              "signature": "eeb74547ea1659d9ad99a523a879deed808429d36e6e101014a366e394505906"
-            },
-            "TaskFilterOptions": {
-              "signature": "43004667a7a64061568fb03f31ea8f7b4a964fed32e1dbe1aa23f36ba8dacad2"
-            },
-            "TaskSource": {
-              "signature": "c33256409ad93156e9675334730ee4cd35eff1da181c15802958edb930a4ae3f"
-            }
-          }
-        },
-        "./runtime": {
-          "symbols": {
-            "createWorkersRuntime": {
-              "signature": "7c35d5ac71ac1ccb7d7170de10c899ec9e9d8102621bf9c6e9f147117773ec32"
-            },
-            "DEFAULT_TOPIC": {
-              "signature": "84f32be3315ea14c16ae47dbd0cdf7d3340b44b2f2c99c413a2456236a7a86d4"
-            },
-            "ExecuteJobMessage": {
-              "signature": "3fab97e65544add279d2b17524137f75cefceabc552d47605f2b6c9c7886c53f"
-            },
-            "ExecutionRecord": {
-              "signature": "142d35ff29ad3b83d75956bdb873c1af98112923ee75baf22acedc5f89497f72"
-            },
-            "ExecutionStatus": {
-              "signature": "5f72983473025caf7913925661fc4e4acbdb617d0fd72896c04ec7c2fadca5a1"
-            },
-            "InProcessJobDispatcher": {
-              "signature": "a91c53ec9e23a08dfe5e752d73dfcb1d9c92b27f854272a33aaeedc085c9b6ea"
-            },
-            "InProcessJobRunner": {
-              "signature": "978da20f83846dc56dd1de0a776959b117b8bfec7b2b023ddc09ca7329a09fb6"
-            },
-            "InProcessJobRunnerOptions": {
-              "signature": "aa976cab21e53069c305c679479cbf6af9e5c5761e7b50aa35b7725e75bf3c09"
-            },
-            "JOB_STATE_CHANNEL": {
-              "signature": "dc22fb5c44c94e0c01278bfb1b813c012708414ff38d21bd240dae48c03617c0"
-            },
-            "JobCompleteMessage": {
-              "signature": "0ff38a566578b23f3c772742e44269d5825b3db968c809be320c16c1a15840e5"
-            },
-            "JobContext": {
-              "signature": "83d7c85f71698503c070c34e962da7e72ee2247d97a77914c19ecda86be3470c"
-            },
-            "JobDefinition": {
-              "signature": "ff82854e68c99014bc991102aca8b0b746b70a21c7efcb9a032004fa8fb4ffcd"
-            },
-            "JobDispatcherOptions": {
-              "signature": "4e19c9b36622822cb476be59f9f37a1a40fc1bbbece1208c08c0f2144c8a7520"
-            },
-            "JobErrorMessage": {
-              "signature": "b128f6a0e9b5637ec008051289e175575bc188f1955e6b83a40fcf8f923aab91"
-            },
-            "JobHandler": {
-              "signature": "67d3de45f379cdd206fe5e919a572dadce99a7f541a358dd8aa4660655650244"
+            "defineWorkflow": {
+              "signature": "9cb94d42b1a813df03973c6e5ac72d09f74e3069925cd4565b512d670dfdda2b"
             },
             "JobId": {
-              "signature": "9fb84a15e056679a08e912cbb4676742bd9765c1c20b0d4bafaf3fdb67b94434"
+              "signature": "da2b9d2a58e93bc06bc8ef39066c75dbb9dabd0b95d9fdc9fc120e35f58e399a"
             },
-            "JobKvKeys": {
-              "signature": "ed66933a5ff0ffe9e9cde7a5b6de2601b9fca01445b8e72c706b337cf762cbb0"
-            },
-            "JobLogMessage": {
-              "signature": "9312c84f3fc111eff1f0a8048c679b4003ee2affae6d2ddd5eb04c298477156b"
-            },
-            "JobMessage": {
-              "signature": "3d04fee5dd72dd9e14be2e4e73d19d402ace9b8f02275ab11d88200a26f69539"
-            },
-            "JobModuleImporter": {
-              "signature": "3a929ee2ea4bd564301793f692ded73c063326b33b6d8550fd7729485b2d0990"
-            },
-            "JobProgressMessage": {
-              "signature": "9d3fb3d1725d2e5dc1beff1e51fc260c96712cb59f6e2cc3ff6d45a734078134"
-            },
-            "JobResolution": {
-              "signature": "4df09e4e3ee0775de3fa95a86b6fa49964b08f734457921eb72b4716ce79dabb"
-            },
-            "JobResolutionSource": {
-              "signature": "91797a7c21d534726be947363d7735b01a3e58c91d9bf00d9ae9a89a7c2dc3d2"
-            },
-            "JobResult": {
-              "signature": "8a6c9420cc09de9b2f5c03c74488b83186b88e1ff334b2a766f38db0b26a69b9"
-            },
-            "RegisterJobInput": {
-              "signature": "6eebad6d9d810cb0badeb0f11ca0c987fe9fa5df5b24ec959188a270773ac0d4"
-            },
-            "RegisterTaskInput": {
-              "signature": "6eebad6d9d810cb0badeb0f11ca0c987fe9fa5df5b24ec959188a270773ac0d4"
-            },
-            "resolveWorkerIdempotencyKey": {
-              "signature": "b609b61449efffdc66a20e613d743523903039e99865181b4cdd86caacc6fd70"
-            },
-            "RuntimeJobKvKeyFactories": {
-              "signature": "2f671f5cd6c9e99ae255cceb2db2303f1606b9d4d3ffc34c468e6fe08cc2d86d"
-            },
-            "RuntimeJobStoragePort": {
-              "signature": "e2bdb0d9e4a04461cb992ad889ab212fdecdccb254461f659ac287532cb6f83b"
-            },
-            "RuntimePermissions": {
-              "signature": "70c89cea72797a66f561313a88898aa735b7ee5f55aa0777735edd16274d08a6"
-            },
-            "RuntimePermissionValue": {
-              "signature": "cdc9856fa4e59783f666d812b21615ea00a52891c64d80aed9aa953ac86f76d0"
-            },
-            "RuntimeSchedulerPort": {
-              "signature": "9257a982db5a7048dc40964ab13b7143078d50f99b46f855c1f03fc0c375718f"
-            },
-            "RuntimeShutdownManager": {
-              "signature": "6949043b9e634c5f5209085edbd1c36c9950d4b3d8aeada0aa5deaed2e605c37"
-            },
-            "RuntimeShutdownOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
-            },
-            "RuntimeShutdownResource": {
-              "signature": "752d88ed2b7de47e6aad2eb52e213d78eb061b951aeb9d89a8f6a32110084822"
-            },
-            "RuntimeTaskExecutor": {
-              "signature": "89c683a468c77e9d3197042d3343ce6b22c805821a3992a9d62429ab70d440a8"
-            },
-            "RuntimeTaskExecutorOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
-            },
-            "RuntimeWorkerPort": {
-              "signature": "b911779ece80f47a1ae5df6fdea36a856b3bee9e6f0d4cb6a877d8c5d1845160"
-            },
-            "RuntimeWorkflowDefinition": {
-              "signature": "22ff26821c8c9fb47a5558f54d8389757984455801cb65d5b707423172344e78"
-            },
-            "RuntimeWorkflowExecutor": {
-              "signature": "a519426231aa909589337fb7b184b9817bf75955d221092e1aa46644e41aac50"
-            },
-            "RuntimeWorkflowOptions": {
-              "signature": "0989836b1c2d9135afc1005ca59ddd88bb91d5172a9f8d0108202fa8ae655e4e"
-            },
-            "SSEEventTypes": {
-              "signature": "71e8e43276f69cf9120d258b9ef025e31fc3b7f54c00952340748cef8ac5c715"
-            },
-            "StateUpdateMessage": {
-              "signature": "f53c3d0d2e6ea61189e1742f492511de2360f19b8dcaaaddef5abd10654c120e"
-            },
-            "StaticJobRegistry": {
-              "signature": "717a5e5cadeace1866a624c70c32c35a203903f80b9908c3d8d87dafea02462f"
-            },
-            "TaskDefinition": {
-              "signature": "d8e7e11ced4156d53de97753744f4442a7f7c7fe2b144f6eb22e45d1b551754e"
-            },
-            "TaskExecutionOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+            "MemoryWorkflowStateStore": {
+              "signature": "edd7d700a74267c59960c8716689826107448df63d82b976b9f27bfed87c5bb6"
             },
             "TaskId": {
-              "signature": "ae351ea88e786b55236b115e4c1e3a99acd628ac980afd119e1f5fb326d7e81f"
+              "signature": "9553068620e732be551920879b804224e70437ce491a1b4ca4ad1aa55f7ed41c"
             },
-            "TaskMessage": {
-              "signature": "735cdb04b6bf13d8885c6938bd39d91fed497fd4f3c4acc79694b5e8f77af632"
+            "WorkflowBuilder": {
+              "signature": "3b3342fb810e34c914673f17d2de3a57f346aed83cd1473fc9224f57443e21e9"
             },
-            "TaskRegistryPort": {
-              "signature": "8b60ca80a4f3574a40af1881eba7c348dd419da858dc9f92c06caa7d04f882cb"
+            "WorkflowBuilderState": {
+              "signature": "dd483b5556e90dafe16b3db946dfe889209601ae376aa9c4727b23e6aff6461e"
             },
-            "TaskResult": {
-              "signature": "d436f99f4957957efa23df37f413bd2d34f6220a8091ceed2be1bbc359a90a1b"
-            },
-            "TerminateMessage": {
-              "signature": "de366b274be548c9805b38acaa43be127237d583267c400879a11c26ef76d3af"
-            },
-            "TriggerType": {
-              "signature": "e44cf532661dae623ecb03b301e65ee30c2b0ac36a47bd09fd5fd1d2280b1352"
-            },
-            "TriggerTypeSchema": {
-              "signature": "b1fe9cfdac6a5e3b07d76c267af65631f75de0842aecbcf7c3cc1cecceba70e7"
-            },
-            "TriggerTypeSchemaValues": {
-              "signature": "24a60f1c18737bb67cdce7d7f8bbfbd8fe3a4e0ecfd5c8e8162e3ed2039ca844"
-            },
-            "WorkerIdempotencyClaim": {
-              "signature": "0152b313f44c9b9299dbbb89f878effd35bfe760aeab0b11b083e1730ab34893"
-            },
-            "WorkerIdempotencyInput": {
-              "signature": "68b400c76371520376d14508061fb0d224c0359edc5cbcd93b63ff995598e7da"
-            },
-            "WorkerIdempotencyPort": {
-              "signature": "8c733a634e8ddc2ee5b160615dbc8e38a4aae607cefd9b8009c35af99a4dcb45"
-            },
-            "WorkerIdempotencySource": {
-              "signature": "a42c8f23841ca65128b45979e02df5a6d5659c137f67f084296f78970daadf2c"
-            },
-            "WorkerInboundMessage": {
-              "signature": "920a2e1eb78966cfac523ff1fbf702a5bc03431482960763a3b12669743d2b18"
-            },
-            "WorkerOutboundMessage": {
-              "signature": "36d99527b59fe791de4f81a0fe86d3f2554fc81b4da80783f632bbb71ab367c9"
-            },
-            "WorkerResolvedIdempotencyKey": {
-              "signature": "b1df7b74b8b2d010332956adc12cd51026a414ea2a642329d81d10801dc6548f"
-            },
-            "WorkersClock": {
+            "WorkflowClock": {
               "signature": "365455bad257a54059c5584bcef04649c8b9768299231bad9bb96dccb1f18b88"
             },
-            "WorkersRuntime": {
-              "signature": "bf9017fd669d6ab2bfbdc7e95b44ba4a2bf668a5aeeb93c1a06340b4979b3d68"
+            "WorkflowDefinition": {
+              "signature": "af2a337295122fd741b42327cefa7744bf9e974baff6d3355de734aa052d2f9d"
             },
-            "WorkersRuntimeOptions": {
-              "signature": "1c75c72cc6c71ea61439437f29c3310ba9cc1bfe92535c129d5d9859c117e363"
+            "WorkflowEvent": {
+              "signature": "14591045196ad964cb61dbe273d7f39d4378e588d0f60b31ddf9facc4d8f6b00"
+            },
+            "WorkflowExecutionOptions": {
+              "signature": "d932a0bf00872dc8604d1fd222576a67ffb10c13a4c79377245e0703720f5fc1"
+            },
+            "WorkflowExecutionStatus": {
+              "signature": "68b755edbc794398861df1ea4a381a82bb58ee7dcd94011f0256f9c01f87a744"
+            },
+            "WorkflowExecutor": {
+              "signature": "2f526e08bb6ae2ed38a342b9ed400ff741ef2972f35ad54ce2c884add7e3be1d"
+            },
+            "WorkflowExecutorOptions": {
+              "signature": "874cc085ebd3cb28313ac46dd66b5b3c9a6d8945028136948d1bedbc44b9fcfa"
             },
             "WorkflowId": {
-              "signature": "5c179b8cc189bef3a472bb7f893be05242c83675e8ccb17c6d34c85166733e36"
+              "signature": "e3d7efe20a1e0feaa4f0abce7bfac881a651736ee2b9d0d0c104f55a543837de"
+            },
+            "WorkflowJobStepOptions": {
+              "signature": "7ce4a9100be655861d769ef0000b5776acdfad8db37b7897d2104d70679a0b0f"
+            },
+            "WorkflowJobStepRunner": {
+              "signature": "82fb862965f954588ef0b82b8cd59f45d11d4e36629ec3c4f617e385db9c2dad"
+            },
+            "WorkflowResults": {
+              "signature": "5b884d79907c486257deeb58d5301318543b5b779aa4ac66533a137951e22c72"
+            },
+            "WorkflowState": {
+              "signature": "253f5e5d4ef7013f2c9bb685df82f36e0b3489aadb241e213d97ab1c483107f3"
+            },
+            "WorkflowStateStore": {
+              "signature": "c93bbd68fbe7a5726ecee89337822fa635c4b45e625d2bb00daf44129499e9de"
+            },
+            "WorkflowStep": {
+              "signature": "a39f911ed33623f6613c24c3168692cfb44e68d54a06a77b368f71bf9e576f59"
+            },
+            "WorkflowStepKind": {
+              "signature": "8e5c7084d94f4c5ecf35880d61ddc46ede899a69899cdea71bc6db5c4b67782a"
+            },
+            "WorkflowStepResult": {
+              "signature": "458f682ed1ec496c23fa09b8a685a8162771cce972edf65e75c49b85bd34f7f9"
+            },
+            "WorkflowStepRunner": {
+              "signature": "27df52374f731c254967e3c0cf0e4a1803262806f23d01b4140fe7f0be83a122"
+            },
+            "WorkflowStepRunnerOptions": {
+              "signature": "9139c1a25c3856da9e7f4e5450b57d02de412c931ad4b4bca5d270d555756f60"
+            },
+            "WorkflowStepStatus": {
+              "signature": "d96b46cca15d3731d9f00eea2946184fff63f45cac6334c96b8ff544378acd56"
+            },
+            "WorkflowTaskStepOptions": {
+              "signature": "fee123d6feda4ce2559e64b1ca3a158d622a010204b9d1b9214260356503b37f"
+            },
+            "WorkflowTaskStepRunner": {
+              "signature": "82fb862965f954588ef0b82b8cd59f45d11d4e36629ec3c4f617e385db9c2dad"
             }
           }
         },
-        "./schemas": {
+        "./streams": {
           "symbols": {
-            "JobDefinitionPublicBaseSchema": {
-              "signature": "9beea60a2e625c632b39d7b33be60f70331d6ec1bc5ead71a4b6ba286c7395bb"
+            "CollectionDefinition": {
+              "signature": "51e5ea03bca87711ffa1d5900e0465a482243c890084ea63f689e212e5e44b7f"
             },
-            "PublicDefinitionSchema": {
-              "signature": "1311d3042456cb99035ca50b1f318bd7586001ed5d4a7149976831931fb39a54"
+            "CollectionEventHelpers": {
+              "signature": "a560ec3095e7b7dd4ba8e1de01d284f5ce3403131ab513b8efbd4ad4c443ad2e"
             },
-            "PublicDefinitionSchemaShape": {
-              "signature": "c5b630aca06db78bf1fa375aa2edb9ca491da29a3938dead50ac8dce04fe8981"
+            "CollectionWithHelpers": {
+              "signature": "4b0def64d82212c49126d3ae8c6069cc144bcaf7c914a0c59c6289e79064abad"
             },
-            "PublicJobDefinitionOutput": {
-              "signature": "db43f42a25cdfcf2016acb21359ea5c417f65b73df01f90a3a8cda4018a6215d"
+            "createStreamMutationHook": {
+              "signature": "67e08205928db1c9295ac215d445ef18d5e441c861740444c9d7f0c08060d569"
             },
-            "PublicJobDefinitionSchema": {
-              "signature": "f77955662c119cc13aca9d258a81f563c2188f52ab4a692e2a894884650f044d"
+            "createWorkersStreamProducer": {
+              "signature": "0ff1588f237bcd10c9daf29e8163f29c78d5378c60e1732b50976e9f9ce21201"
             },
-            "PublicStandardSchema": {
-              "signature": "82247be594d4b33ab9b5d944699a7071de84d314d638ecb182f15a7bc0cdf875"
+            "emitJobToStream": {
+              "signature": "be88c49229fc5527a6f8b90637e24b950fde1e57fa0633f40900d75f0dfd6063"
             },
-            "PublicTaskDefinitionOutput": {
-              "signature": "0b657e41e8cb117b9a80b1c9640b476990e36650ed3d9d233ab9596ae4d21f85"
-            },
-            "PublicTaskDefinitionSchema": {
-              "signature": "a866987b7b13079ee736e8760c8a48ff445dca3f02b89045431eb104fb68a261"
-            },
-            "PublicWorkflowDefinitionOutput": {
-              "signature": "70602aff4458f83f2bc1f6718111e9db75af4c4c93f2f1b6106316af58cb4aec"
-            },
-            "PublicWorkflowDefinitionSchema": {
-              "signature": "ca76b6a4191fc311d4755cb4ff848cb3c719e58b20b8abc3c2c2bda07e7fd0b9"
-            },
-            "TaskDefinitionPublicBaseSchema": {
-              "signature": "4caa3a7acf105ad9b77240c67db3c4b8b7c12f32770b852be3abeab2b54171f7"
-            },
-            "WorkflowDefinitionPublicBaseSchema": {
-              "signature": "06840171894f28fd43e5d26f5b74c8ed84e96f22879ef65211a5eb3759373dce"
-            }
-          }
-        },
-        "./shutdown": {
-          "symbols": {
-            "ShutdownManager": {
-              "signature": "f7c1be062d7117c5f640faf85fc0d5426257fb89d8b8230f390f216982d665f3"
-            },
-            "ShutdownManagerOptions": {
-              "signature": "340f07ca56a9e5915bc75b6136942f2265e7ce21f035b3ca7b8bc10ff1e11914"
-            },
-            "ShutdownReport": {
-              "signature": "e65f4fbdb1bdb378a5f01f7b2836a64f671c6a88dd3078741e4e0edf45b0c7c5"
-            },
-            "ShutdownResource": {
-              "signature": "d57e7591bae84f3bd4f6d47b9e8d74bf0495d7cccfea711580e4c5b5a5960445"
-            },
-            "ShutdownState": {
-              "signature": "e1f416a419a29f8e7f0084e474cc861d6d890d89ffe97d3aabc1fa01bfdea849"
-            }
-          }
-        },
-        "./state": {
-          "symbols": {
-            "CompleteExecutionOptions": {
-              "signature": "90c00778d8ae03903ecfae40125612808dcef2f212a9955a3ee9a99ef62bf9c9"
-            },
-            "CreateExecutionOptions": {
-              "signature": "e77b7bcba38c95f269ab6bd22161673237186ab3b579b8a0f1a3b500de09b963"
-            },
-            "ExecutionConcept": {
-              "signature": "327ee7d4a49ffeb7f586a119ffb28c2d404c394ca8617472feed64bbd4f01395"
+            "ExecutionMutation": {
+              "signature": "edf492c604cfdda49aacce1de7734f319e614a74c584cdd9eebeb049269b07ac"
             },
             "ExecutionMutationHook": {
-              "signature": "b7810a3eac5a6d04e085f1b38354740b8828ae00fc32dfb86af9828c78f95ae3"
+              "signature": "e32db593e1b9b5758690605435d34e9dc81318e71cf14b44024172a22932b7ca"
             },
-            "ExecutionRecord": {
-              "signature": "ed7fd94f4177aa3264b4fd45298903bf14497aab7ba18dc1e74e007f45a7bdb7"
+            "StateSchema": {
+              "signature": "d52eeb117ece5ed9618a6681a1fc1e837c777fda94642064bf2e344144f78724"
             },
-            "ExecutionStatus": {
-              "signature": "c18675753798a2394c3ce40609b636116a018a8fa88ebe7f94b086cd52a6e88a"
+            "StreamSchemaDefinition": {
+              "signature": "a8230cdaff4356bfdd761ef7f60196b95db0d7aae7fe51491fdf7fd1ee84dfdf"
             },
-            "ExecutionTriggerType": {
-              "signature": "332f5b9b2c438f6a13e38e6bac7f3f3be5010b570942f8013cd12359982c29ed"
+            "StreamSchemaIssue": {
+              "signature": "b5cf86cbeb62ccf6a5a071f7221e03c913a8957c79b3bdda9ea0fb5447a6d191"
             },
-            "KvExecutionState": {
-              "signature": "19a92db5d4bbde9bbc644f277f0e12d120475a0a0e12b8632a7fff385794e7d2"
+            "StreamSchemaValidationOptions": {
+              "signature": "849b991b335c3e660c8acd226daa6ecea0f16266d38d72823fa6abab2166e9ce"
             },
-            "ListExecutionOptions": {
-              "signature": "348abb6cdea24d49f423a6b7b24a3890cacf331bbc3ebdfa2251a31e8033a90c"
+            "StreamSchemaValidationResult": {
+              "signature": "5d224473c35451884f3b845d7df1e0f1142aed19a4d4741a79eeb0c321a70b01"
+            },
+            "StreamStandardSchema": {
+              "signature": "9d55cc78ce57876dd63040b64b1cb43ee5ddd924a93942a92d68f41fa3be95e9"
+            },
+            "StreamStateDefinition": {
+              "signature": "c970b6319459dd3e5dc96461ba4dc71806b555945787766c51f1e22bf1811c70"
+            },
+            "toExecutionStreamEntity": {
+              "signature": "e49aada6dba227fb4341b91e7b6af845dbff5e4ba2876e6d7cc4cce0e8c72d58"
+            },
+            "WorkerExecution": {
+              "signature": "b2e7e1773732a69df763496c2303faa2acbf916005a71905f8964f4ec469db1d"
+            },
+            "WorkerExecutionRecord": {
+              "signature": "96e0ce03dc55fd947ad8ba9585771f6ca20952234d7a2fdbee67a249cfc28a33"
+            },
+            "WorkerExecutionSchema": {
+              "signature": "e3330f12768c0548f1912878b32a52d347a2b969d9e810ec2faa2f812395b1ad"
+            },
+            "WorkerJob": {
+              "signature": "4f9856342823ac3318ee063d4a0b976cdc636969c9b9f88b4d9bc395ef2d71c3"
+            },
+            "WorkerJobSchema": {
+              "signature": "d5030a9e7fe51deaf2e5b8a3992b4b8e1d7768e8df51bdcd3c13b9f92db7a097"
+            },
+            "WorkersStreamDefinition": {
+              "signature": "020a4f558fdd515bb4eeb1462945525c7feacacb18a6e361a3c3eb580813f3a0"
+            },
+            "WorkersStreamProducer": {
+              "signature": "0850e9136622c4ca38a48f57778f23184584de394806401da60b3af87331ec74"
+            },
+            "WorkersStreamProducerOptions": {
+              "signature": "926c05cac91069f704e937f329556b00635c68914461f550bc001c06b54034e3"
+            },
+            "workersStreamSchema": {
+              "signature": "63352f735ad6c9e3a7672413e5aa237ef0f72b1d459d4e19c750e921855b5e0e"
+            },
+            "WorkersStreamSchema": {
+              "signature": "17d04331acba083d60893708b1491c96911a06a745d1213e3e713a7efa46f9af"
+            },
+            "WorkerStreamCollectionDefinition": {
+              "signature": "f2e90471a78868d5e03679a20eef4b32e981d3b3fb66afd49cb9160f70c18139"
+            },
+            "WorkerStreamEntities": {
+              "signature": "618899c76f7bd6d3b05cfddf39734cb2bf41940854082aeafbe56ff8db6c1ae1"
+            },
+            "WorkerStreamEntitySchema": {
+              "signature": "30d4123392e305254a3551a4d641fa310abc4fdf012ef1525eba527cfd1e7573"
+            },
+            "WorkerStreamStandardSchema": {
+              "signature": "ccd19167444f8bc454e36b7b702eb1a176d1d7af5bf5ba0fcf6df1918152a7f9"
             }
           }
         },
@@ -17812,86 +17938,184 @@
               "signature": "709a5433c35e7d2caac9541652dab09efd82e6158a4c8d8f0c750b5bf62a8f8c"
             },
             "WorkerIdempotencyClaim": {
-              "signature": "0152b313f44c9b9299dbbb89f878effd35bfe760aeab0b11b083e1730ab34893"
+              "signature": "c359755a7360fb834f3b94ce0b33fc550218b267949b3941df7557f0971ab454"
             },
             "WorkerIdempotencyInput": {
-              "signature": "68b400c76371520376d14508061fb0d224c0359edc5cbcd93b63ff995598e7da"
+              "signature": "0698bcc0cca9063a8c0a016ef7d2189a44ffc77bc2fa3a0df0aa7d961bbe07ac"
             },
             "WorkerIdempotencyKvStore": {
               "signature": "e55dbfa3b939d8cd835236e43350d8dc9f26f3d235ffa2428bf8c31af419d28a"
             },
             "WorkerIdempotencyPort": {
-              "signature": "8c733a634e8ddc2ee5b160615dbc8e38a4aae607cefd9b8009c35af99a4dcb45"
+              "signature": "5db4ddc9b10f5ec7763b1d574a6ef4f29001d5ba564d66bea1d7a194c485588e"
             },
             "WorkerIdempotencySource": {
-              "signature": "a42c8f23841ca65128b45979e02df5a6d5659c137f67f084296f78970daadf2c"
+              "signature": "f5b6c3d6694b4c03306938845febbad290c39bd98d3081eefe50fc7f063438e0"
             },
             "WorkerResolvedIdempotencyKey": {
               "signature": "b1df7b74b8b2d010332956adc12cd51026a414ea2a642329d81d10801dc6548f"
             }
           }
         },
-        "./streams": {
+        "./presets": {
           "symbols": {
-            "createStreamMutationHook": {
-              "signature": "67e08205928db1c9295ac215d445ef18d5e441c861740444c9d7f0c08060d569"
+            "ExecutionRecord": {
+              "signature": "73bbed9f87dd9346c8164124cd34288489c4dca2cd31c3a7e6a49c2d57025e54"
             },
-            "createWorkersStreamProducer": {
-              "signature": "0ff1588f237bcd10c9daf29e8163f29c78d5378c60e1732b50976e9f9ce21201"
+            "JobContext": {
+              "signature": "d9d36ccc9a35f69bb74f56384996a45e56acbd54d20aeeca1e96ca07287c1b11"
             },
-            "emitJobToStream": {
-              "signature": "be88c49229fc5527a6f8b90637e24b950fde1e57fa0633f40900d75f0dfd6063"
+            "JobDefinition": {
+              "signature": "cd8a1f21f56d02cdfa643c6f5949f924788aa05ffad4a3ce3121e88436631d65"
             },
-            "ExecutionMutation": {
-              "signature": "edf492c604cfdda49aacce1de7734f319e614a74c584cdd9eebeb049269b07ac"
+            "JobDispatchContext": {
+              "signature": "fc17e41a1014ce6ccad6c588b940763f4eab663ef6fdcd90f3b0168cf7068cbb"
             },
-            "ExecutionMutationHook": {
-              "signature": "e32db593e1b9b5758690605435d34e9dc81318e71cf14b44024172a22932b7ca"
+            "JobFailure": {
+              "signature": "b68dc70e2d373b92474dc185c4a88df8d56c965f249339a7a105254bfacbb263"
             },
-            "StreamSchemaDefinition": {
-              "signature": "65c21a49b3b914bd0dc8526c55d6c756ae05394e470c2f6bd140da62218b54d6"
+            "JobHandler": {
+              "signature": "67d3de45f379cdd206fe5e919a572dadce99a7f541a358dd8aa4660655650244"
             },
-            "toExecutionStreamEntity": {
-              "signature": "e49aada6dba227fb4341b91e7b6af845dbff5e4ba2876e6d7cc4cce0e8c72d58"
+            "JobMessage": {
+              "signature": "3d04fee5dd72dd9e14be2e4e73d19d402ace9b8f02275ab11d88200a26f69539"
             },
-            "WorkerExecution": {
-              "signature": "ba1f5ce99111da05d7b41bfa432f4ed4c6ac5c8eca67769718f3f6bbe5846d05"
+            "JobResult": {
+              "signature": "c63c4d1417ccfeb654ac366a965af4753799b1d6925e054e05b4f456ef30e0e5"
             },
-            "WorkerExecutionRecord": {
-              "signature": "afbf9e5136cc12175ef9ad46c8ee8857f705ec9793fe758aca552103c050684e"
+            "JobSuccess": {
+              "signature": "f752faccd8e5a71b835ade9bcdf23f72eacbd6befae34ade3cf7d70e3c514cd3"
             },
-            "WorkerExecutionSchema": {
-              "signature": "e3330f12768c0548f1912878b32a52d347a2b969d9e810ec2faa2f812395b1ad"
+            "RuntimeJobStoragePort": {
+              "signature": "22e57fdad8465cbb4176abe43d0b74707bf782398b54f4108162442b85f8882d"
             },
-            "WorkerJob": {
-              "signature": "6c434ed605359ef99f0d148b31eff5148a032d3603df7f4b0292f91d3255c651"
+            "RuntimeSchedulerPort": {
+              "signature": "9257a982db5a7048dc40964ab13b7143078d50f99b46f855c1f03fc0c375718f"
             },
-            "WorkerJobSchema": {
-              "signature": "d5030a9e7fe51deaf2e5b8a3992b4b8e1d7768e8df51bdcd3c13b9f92db7a097"
+            "RuntimeShutdownManager": {
+              "signature": "88874245e2cdaef6bbceb9d9604d199421298f1613fde6259822c63e30b967f4"
             },
-            "WorkersStreamDefinition": {
-              "signature": "8ba735ed4ad812cbcf7b84520d8e50f0dcc5c4ef7ea51360067f41c108600f66"
+            "RuntimeShutdownOptions": {
+              "signature": "463a3d180fa15196aa85ce209014d4decb9ab6d2dcc105c0f95417c7bfb50e9f"
             },
-            "WorkersStreamProducer": {
-              "signature": "3a39a1ab4ed8287ca11165c0af2d38dd60ae2dc21fb322e9955fc4c56b42d8f5"
+            "RuntimeShutdownResource": {
+              "signature": "d67fa13d12e15fb84c42d37d573635f2ee90ca6efc2713ab9ae76557ca85eba8"
             },
-            "WorkersStreamProducerOptions": {
-              "signature": "926c05cac91069f704e937f329556b00635c68914461f550bc001c06b54034e3"
+            "RuntimeTaskExecutor": {
+              "signature": "2d00d1742437176b54167fa04823829f93cb1f9b66136f83aedbfeb6e73022a3"
             },
-            "workersStreamSchema": {
-              "signature": "63352f735ad6c9e3a7672413e5aa237ef0f72b1d459d4e19c750e921855b5e0e"
+            "RuntimeTaskExecutorOptions": {
+              "signature": "49261424d46b92bb7f4ab0024ed541c8d4b9c13fd315f6147ed79a3e74b2c75b"
             },
-            "WorkersStreamSchema": {
-              "signature": "fda366b051b4b786c8092a8f59144299fba24bcb81d2f4324cdb7c682b416e5e"
+            "RuntimeWorkerPort": {
+              "signature": "eb37fe976fcac222b87182fc0e6e1aedd43d90f0e25c1cfbae7cfa5a6a3c6a84"
             },
-            "WorkerStreamCollectionDefinition": {
-              "signature": "02b6f6be9c3e65b0fd650a2f8314871f2d5ebce491ae951c75da6f8efd001e89"
+            "RuntimeWorkflowDefinition": {
+              "signature": "47b931a3a0978464df2465681b834f801627bbb303dc3827e165a4ca8a779e39"
             },
-            "WorkerStreamEntitySchema": {
-              "signature": "0c5b4f473e0f7967b633e679265018455f35daf9f9ae953d715a9fa83dbecc26"
+            "RuntimeWorkflowExecutor": {
+              "signature": "0648504e34b4614e62f076b0af85eb233fd8c8bca4c25ca944ddef4ac56164fd"
             },
-            "WorkerStreamStandardSchema": {
+            "RuntimeWorkflowOptions": {
+              "signature": "1aa594a0a3814ac981914656605d63f72e442573594ba1b4ae82bab51f196d75"
+            },
+            "startWorkers": {
+              "signature": "b4b0b2438790fd8526874bcc7cf8cdb9d3faa40424c3f5012f506f4368ad81b9"
+            },
+            "StartWorkersOptions": {
+              "signature": "01c184cba5a88e80d607ae9517728d5ce1484f2736d16b13eec0bb82262e626b"
+            },
+            "StaticJobRegistry": {
+              "signature": "bb55fbc0088ae16626b66231fec6dd75939840726c5c055730ff1dce3f238911"
+            },
+            "TaskDefinition": {
+              "signature": "d8e7e11ced4156d53de97753744f4442a7f7c7fe2b144f6eb22e45d1b551754e"
+            },
+            "TaskExecutionOptions": {
+              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+            },
+            "TaskRegistryPort": {
+              "signature": "d48d962468d3756e45ffe7f9dbebf854291c5d0c50367519fe001d8f4bc70042"
+            },
+            "TaskResult": {
+              "signature": "d436f99f4957957efa23df37f413bd2d34f6220a8091ceed2be1bbc359a90a1b"
+            },
+            "WorkersClock": {
+              "signature": "365455bad257a54059c5584bcef04649c8b9768299231bad9bb96dccb1f18b88"
+            },
+            "WorkersRuntime": {
+              "signature": "bf9017fd669d6ab2bfbdc7e95b44ba4a2bf668a5aeeb93c1a06340b4979b3d68"
+            },
+            "WorkersRuntimeOptions": {
+              "signature": "1c75c72cc6c71ea61439437f29c3310ba9cc1bfe92535c129d5d9859c117e363"
+            },
+            "WorkflowId": {
+              "signature": "5c179b8cc189bef3a472bb7f893be05242c83675e8ccb17c6d34c85166733e36"
+            }
+          }
+        },
+        "./shutdown": {
+          "symbols": {
+            "ShutdownManager": {
+              "signature": "cea9b51aad978d35125859bc93f3401a357b64e3a3fec4b8ac2ab37f1662f297"
+            },
+            "ShutdownManagerOptions": {
+              "signature": "340f07ca56a9e5915bc75b6136942f2265e7ce21f035b3ca7b8bc10ff1e11914"
+            },
+            "ShutdownReport": {
+              "signature": "e65f4fbdb1bdb378a5f01f7b2836a64f671c6a88dd3078741e4e0edf45b0c7c5"
+            },
+            "ShutdownResource": {
+              "signature": "d57e7591bae84f3bd4f6d47b9e8d74bf0495d7cccfea711580e4c5b5a5960445"
+            },
+            "ShutdownState": {
+              "signature": "e1f416a419a29f8e7f0084e474cc861d6d890d89ffe97d3aabc1fa01bfdea849"
+            }
+          }
+        },
+        "./schemas": {
+          "symbols": {
+            "JobDefinitionPublicBaseSchema": {
+              "signature": "9beea60a2e625c632b39d7b33be60f70331d6ec1bc5ead71a4b6ba286c7395bb"
+            },
+            "JobPayloadSchema": {
+              "signature": "b9fa7d06c457c497f7f8b8a999977a9793ed4ecd6568e942eec54ccf75b37e5c"
+            },
+            "PublicDefinitionFieldSchema": {
+              "signature": "f2f574ce8297316f029bcabb32fe94bea83d255acd2f1d80b87e3e2f329e2c64"
+            },
+            "PublicDefinitionSchema": {
+              "signature": "1311d3042456cb99035ca50b1f318bd7586001ed5d4a7149976831931fb39a54"
+            },
+            "PublicDefinitionSchemaShape": {
+              "signature": "640c683d76983b45d4765891b1f311da60b6bf47a7794f4822fe77c7736dcc32"
+            },
+            "PublicJobDefinitionOutput": {
+              "signature": "db43f42a25cdfcf2016acb21359ea5c417f65b73df01f90a3a8cda4018a6215d"
+            },
+            "PublicJobDefinitionSchema": {
+              "signature": "f77955662c119cc13aca9d258a81f563c2188f52ab4a692e2a894884650f044d"
+            },
+            "PublicStandardSchema": {
               "signature": "82247be594d4b33ab9b5d944699a7071de84d314d638ecb182f15a7bc0cdf875"
+            },
+            "PublicTaskDefinitionOutput": {
+              "signature": "0b657e41e8cb117b9a80b1c9640b476990e36650ed3d9d233ab9596ae4d21f85"
+            },
+            "PublicTaskDefinitionSchema": {
+              "signature": "a866987b7b13079ee736e8760c8a48ff445dca3f02b89045431eb104fb68a261"
+            },
+            "PublicWorkflowDefinitionOutput": {
+              "signature": "70602aff4458f83f2bc1f6718111e9db75af4c4c93f2f1b6106316af58cb4aec"
+            },
+            "PublicWorkflowDefinitionSchema": {
+              "signature": "ca76b6a4191fc311d4755cb4ff848cb3c719e58b20b8abc3c2c2bda07e7fd0b9"
+            },
+            "TaskDefinitionPublicBaseSchema": {
+              "signature": "4caa3a7acf105ad9b77240c67db3c4b8b7c12f32770b852be3abeab2b54171f7"
+            },
+            "WorkflowDefinitionPublicBaseSchema": {
+              "signature": "06840171894f28fd43e5d26f5b74c8ed84e96f22879ef65211a5eb3759373dce"
             }
           }
         },
@@ -17909,6 +18133,9 @@
             "applyWorkerInstrumentations": {
               "signature": "b5df18a513c8b9c96233304821f443dc54b638e9946f3ebdb868fa43c2992cbe"
             },
+            "createJobTools": {
+              "signature": "ba2e9bb43ba66ea6a308916fa743fdc7ad273e1941087bed38f58fe6eeb97f87"
+            },
             "InstrumentationContext": {
               "signature": "9bfd5d95374211c75bd57397646d493ee7065eae9d6bd6013b31487c1c425e6c"
             },
@@ -17917,6 +18144,12 @@
             },
             "JobMainInstrumentation": {
               "signature": "29fa1d49196fc74af326af95b1991eb443bad9fb10c88655d44f5b89ee867523"
+            },
+            "JobTools": {
+              "signature": "41a2837a961d06c64ef79f8c04a95266f3155ed9fc86eb46232bf2e3e9efa52f"
+            },
+            "JobToolSpan": {
+              "signature": "0813f8ffb186d28c8d740cfa8f943dacef158db7824619ee299d7ea07be69e0a"
             },
             "QueueDequeueInstrumentation": {
               "signature": "29fa1d49196fc74af326af95b1991eb443bad9fb10c88655d44f5b89ee867523"
@@ -17961,10 +18194,113 @@
               "signature": "5e47c5cd3d933c0090f67063a442d1eac284ae85b736dcab40c09477d48c19d0"
             },
             "WorkerTelemetryStatus": {
-              "signature": "323f77f90fac267424ca29e36b41edbb0d5a65f62ac14147bdf4368410117f03"
+              "signature": "44420183540822938c648309586ff0b0755cbfbfc3bbf01bbd54e26f946c0b4b"
             },
             "WorkerTelemetryStatuses": {
               "signature": "862a273a708a7bde14f17cd5d19741952a67a55ade08023a36f1bc494bbc21d9"
+            }
+          }
+        },
+        "./abstracts": {
+          "symbols": {
+            "CliCommand": {
+              "signature": "7ada2c8a850ea15048db0035685efe13e2d5f48ae2fbf8fba07195cec4958fac"
+            },
+            "DispatchContext": {
+              "signature": "17be118b40b559066a6c182dfe8699c2eea844187f1a6dc59054e50bdee48f81"
+            },
+            "DisposeContext": {
+              "signature": "2d2ad2eadb10bd84d191152413c4d932c1caf1ad91db639a05e3cbb5b6116fba"
+            },
+            "ExecutionContext": {
+              "signature": "921a9a9b9040613d41deb590bf8d501349acc76ff51c5324976928c2c59512c3"
+            },
+            "InitContext": {
+              "signature": "3d4fb75a35b1cb302c1cba8a9fcf500eb99b699fa62d8f19e9d123712e609a2c"
+            },
+            "JobContext": {
+              "signature": "f1481dcd251bf5da834c3bdcb6a1173dbc2710706e74995b3e6b94333a2c7889"
+            },
+            "JobDefinition": {
+              "signature": "e8c1e8efd136cc0116b02cce93bb90e8ceb8a75d695e00a146c64cb50b8acf7a"
+            },
+            "JobDispatcher": {
+              "signature": "6379a2a36ac67bb7d1ae8a465e04d5d2f07e37df399d6fc1a4ba21f95c220f80"
+            },
+            "JobFailure": {
+              "signature": "552932e6690a1a672092ff544891e009c9e9e297ace618be5c1db359c71bf758"
+            },
+            "JobHandler": {
+              "signature": "0a852f0067f858c75702fc2fd4c4d258c99da3c205f1da6a779ce4dc74142f64"
+            },
+            "JobLifecycleAdapter": {
+              "signature": "b60f9ee97842a20f9feae919316c4655f7fee76b541ee3180134c1d8dfba7be9"
+            },
+            "JobResult": {
+              "signature": "daa510641597e0083e32ea1078c5fcef1f3b44f770935b72fd41e77857345f2d"
+            },
+            "JobScheduler": {
+              "signature": "9dda34a9a67b8ad6c4e941a5f45776bf5a63b500d27bf7dd505000d0c315307f"
+            },
+            "JobSuccess": {
+              "signature": "4a462382d604a4eaabcc4d4ff6579d5a2d098b5a5b43d75d2b933861ddb024c6"
+            },
+            "Registry": {
+              "signature": "f0a7efd7dac10cd4defb5a066d62fe5e797c378dd790b53d55e4be070cb81987"
+            },
+            "ResolvedTaskExecutionOptions": {
+              "signature": "9bb5989975e86d55678288614661232366e407252a1ed4dd3ed167e0299ba938"
+            },
+            "RuntimeTaskMetadata": {
+              "signature": "e566f55c78f8b5549f0b338c3ab9d0027be8b9f717af24150a833805a24dd068"
+            },
+            "TaskDefinition": {
+              "signature": "a34f9eed526a8917b502c0bc6dab24e52310c2bd44430c1fa3019a39c1914878"
+            },
+            "TaskExecutionOptions": {
+              "signature": "6fb9744c1ef1a479c6a901fdd7124673986a78ddfaa9c8ddd73c79f2ac374683"
+            },
+            "TaskExecutor": {
+              "signature": "55ab1c28ab873a65f8a6358d368d9344b8e704e048be7e1affd65c5fe0730093"
+            },
+            "TaskInstrumentation": {
+              "signature": "7b7f412e3fac6d835605d0d60ce10f637d6742b8a57e55c421b7eef9ee4d72df"
+            },
+            "TaskLogEntry": {
+              "signature": "1a99c42f1e1c171a32424d31e9a043c2de4b7d959010d42eaa5c7c5fcc2cdc85"
+            },
+            "TaskResult": {
+              "signature": "f06cfda4f80a548f35d56a64cc46575be86314d8f6793b13708441ade448dc5c"
+            },
+            "TaskRuntimeAdapter": {
+              "signature": "94d6dd1cda868e726ecbb695992cfaeeb509bfcc61359f77b8903f8a7094cfdb"
+            },
+            "TaskType": {
+              "signature": "27561ec58be1a7508fdb032d4bd699178e75e858d01e259ccabed0eb48babc6a"
+            },
+            "WorkerInstrumentation": {
+              "signature": "43f0c00a7d744666924e2fd9914c504f06c4ab8f022a44468f110755f17a7692"
+            },
+            "WorkerInstrumentationContext": {
+              "signature": "2daf04f1645da89f377e3e603bd1fbb93ea7bafb02712e50fd0c3b03cffbd054"
+            },
+            "WorkerInstrumentationSpan": {
+              "signature": "c913d4b1bfe09596f5252d7e10642e9065ccdd139b7f1079d46332e17aa8dd6b"
+            },
+            "WorkersCommand": {
+              "signature": "c1de48f622746b17d8936b5d2c771d5e674e87131056f514b5a4be699569e288"
+            },
+            "WorkersCommandDefinition": {
+              "signature": "47cf633ae5c71da5afe029458ab77d0b872ba127ce81a8b897326c10dbfbeeda"
+            },
+            "WorkersItemScaffolder": {
+              "signature": "eb00db045a6699081a51408529701688f37c96436b2f8bee3caa2d450987f1bc"
+            },
+            "WorkerTaskPermissionField": {
+              "signature": "e77631e812e50feca26919c242cae34a366d2331cb3812b8ae439360ee7b5604"
+            },
+            "WorkerTaskPermissions": {
+              "signature": "2415923b17ada6eb9fab839b6ba80c8b968e7739ded5abb7cbe7a3a9f550f35b"
             }
           }
         },
@@ -17974,7 +18310,7 @@
               "signature": "31ae9db40fa4d557af5f9d04aa45e18ccfd75c207f6bf06b69955c524db960b7"
             },
             "createJobFixture": {
-              "signature": "8e68602e8fe6aaeaf782d5fd294c444031bdfb79eb551663702036857d64681d"
+              "signature": "a9f7b1fa43036c28926a899ec8616955425191cd7488dcc5c4d74b29ff7d736c"
             },
             "createJobResultFixture": {
               "signature": "4afa0c041292da2ca10ec0e3b291d53123e442e59035c5d1fabd2b536350bc33"
@@ -17983,37 +18319,49 @@
               "signature": "609389f5eb9daf0fff529fe05501991188f1b304ff5a5387af44243992292804"
             },
             "ExecutionRecord": {
-              "signature": "56f0b0298c0d9267911d01c806ce64035a427f9742b3c469a4e56ada121e6520"
+              "signature": "87aa92e3b726bbcc3d5e2fd7650d8d0494aedccc3943f0c6b73d61f2ad81d3bc"
             },
             "ExecutionRecordFixtureOptions": {
-              "signature": "4e0aaa5d0b78b942758fa0db8bb9459885c732ae03fd0b65cb58f470c011bfcf"
+              "signature": "467000c8c6b8a8f0cca50f130a10fe8b64ecd7398d5426918553da9931204f06"
             },
             "JobContext": {
-              "signature": "83d7c85f71698503c070c34e962da7e72ee2247d97a77914c19ecda86be3470c"
+              "signature": "f1481dcd251bf5da834c3bdcb6a1173dbc2710706e74995b3e6b94333a2c7889"
             },
             "JobDefinition": {
-              "signature": "ff82854e68c99014bc991102aca8b0b746b70a21c7efcb9a032004fa8fb4ffcd"
+              "signature": "e8c1e8efd136cc0116b02cce93bb90e8ceb8a75d695e00a146c64cb50b8acf7a"
+            },
+            "JobDispatchContext": {
+              "signature": "ffb84a1304fe75edbe2397d37e3aa7aea99d9446cc843e8bb11e9ab3f7265a42"
+            },
+            "JobFailure": {
+              "signature": "552932e6690a1a672092ff544891e009c9e9e297ace618be5c1db359c71bf758"
+            },
+            "JobFixtureDefinition": {
+              "signature": "1cb38e69da59611dd1f9e23ae3885fa17d996c550917621ba1b97d366cbf4b98"
             },
             "JobFixtureOptions": {
-              "signature": "9235cdc272b21999674629586b75cf682db96d61cde2d5fcfaa90ae475d60b61"
+              "signature": "96b07e2009d2191f1a66ea0c6f18f6c03e6ac4c4870b3da8a08ea348dcdeb9f2"
             },
             "JobHandler": {
-              "signature": "67d3de45f379cdd206fe5e919a572dadce99a7f541a358dd8aa4660655650244"
+              "signature": "0a852f0067f858c75702fc2fd4c4d258c99da3c205f1da6a779ce4dc74142f64"
             },
             "JobMessage": {
-              "signature": "3d04fee5dd72dd9e14be2e4e73d19d402ace9b8f02275ab11d88200a26f69539"
+              "signature": "0077aacebecd49dfb35bc7915012ad3658bbf3146eda6841efc5fdb61cfb6cd6"
             },
             "JobResult": {
-              "signature": "8a6c9420cc09de9b2f5c03c74488b83186b88e1ff334b2a766f38db0b26a69b9"
+              "signature": "daa510641597e0083e32ea1078c5fcef1f3b44f770935b72fd41e77857345f2d"
+            },
+            "JobSuccess": {
+              "signature": "4a462382d604a4eaabcc4d4ff6579d5a2d098b5a5b43d75d2b933861ddb024c6"
             },
             "MemoryJobRegistry": {
-              "signature": "5421e263769a9c541a6fe2dad762db484f882eae28705a77f4eed87fadc40d79"
+              "signature": "32454886ca285e2c22754b1843e6a72c2e2e3c35cc763570733821a2da3d5d1b"
             },
             "MemoryJobStorage": {
               "signature": "0bfaefc82c6bb031951cd582eb5e169a46d0d1682c37f793fd67818f26166974"
             },
             "MemoryWorker": {
-              "signature": "35b311261c6a23105b6637d69e998254c1e2a5b8a97105b2c932fd55804537c7"
+              "signature": "b46bad4f0562791355fd0204021d84ce94490d09de8928059fe6732bfddd2349"
             },
             "MemoryWorkerDispatch": {
               "signature": "f249b63b60e2f3504d37ae7120cbda452388f8241e2405889b87d4b1568829d3"
@@ -18022,70 +18370,70 @@
               "signature": "355eb8945c62973e46b0e209301a0bb63bf5dee8638a3121c148368080a23109"
             },
             "Registry": {
-              "signature": "d3fbf7ef2b86a9fda54a92e0cd8c2f0071279ccaa45be7236766fb40fc1863e2"
+              "signature": "f53c1ac126ffe1e2c937913582a244a92e6dd2f2f980d696efafffeb3d7db604"
             },
             "RegistryJobDefinition": {
-              "signature": "d6d1a37e60968cb78871c9fb390937ed70ea0ee6c19d0c01994240e073aecef7"
+              "signature": "ccbb95e2cb5fab1beb3b0742f7788d6e9fd0d73485044fa808c6fbb9e3bbc8b6"
             },
             "RegistryJobSource": {
-              "signature": "d807351d4b6cb1cc8139a8b195a420fca0edbe2fe18093de3b6395053b96ea48"
+              "signature": "84000440b48a6f762e901ae7a75d24a91ac6243aa26d3ab7e21990e4bea345e3"
             },
             "RegistryJobStoragePort": {
-              "signature": "e2bdb0d9e4a04461cb992ad889ab212fdecdccb254461f659ac287532cb6f83b"
+              "signature": "53113f808b7865c5dec648f6ae87831f761ef917318a5f1f55d3e7a704d73160"
             },
             "RegistryRegisterJobInput": {
-              "signature": "42a5f5c5ff60cecf379bd80a7295f6c6f23d645056d4d1762a40f7178f48e5b6"
+              "signature": "abc08f1bc8067e6878701a4beecf91c04a3623fca71ca5dd79706c1728361a77"
             },
             "RuntimeExecutionRecord": {
-              "signature": "142d35ff29ad3b83d75956bdb873c1af98112923ee75baf22acedc5f89497f72"
+              "signature": "310fa84d8286630757c023fef64e93ff26ec9f0306508320db80d6c432ae2d9c"
             },
             "RuntimeJobStoragePort": {
-              "signature": "e2bdb0d9e4a04461cb992ad889ab212fdecdccb254461f659ac287532cb6f83b"
+              "signature": "1b147ce2aedd2daa83f7c574715cb5068efff4961fc24afbdf7b1b601642bcb3"
             },
             "RuntimeSchedulerPort": {
-              "signature": "9257a982db5a7048dc40964ab13b7143078d50f99b46f855c1f03fc0c375718f"
+              "signature": "6ff383c32dbee37edb9ea8d8713562f22e25892994f7a4344c2a4f5672501e5f"
             },
             "RuntimeShutdownManager": {
-              "signature": "6949043b9e634c5f5209085edbd1c36c9950d4b3d8aeada0aa5deaed2e605c37"
+              "signature": "18ee46356db5cadeabb763376f2c245fad7dae3a21e7bdb81c8ac6b13d6c8c30"
             },
             "RuntimeShutdownOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+              "signature": "661cc178c147cfb3a698c1ff6608af205b0455d22ba81032aabb3acc247bfb99"
             },
             "RuntimeShutdownResource": {
-              "signature": "752d88ed2b7de47e6aad2eb52e213d78eb061b951aeb9d89a8f6a32110084822"
+              "signature": "c5484dc2ae3becb3e84e150ed1b23b4edd9b8bf97edf4632e52c05e522034ff3"
             },
             "RuntimeTaskExecutor": {
-              "signature": "89c683a468c77e9d3197042d3343ce6b22c805821a3992a9d62429ab70d440a8"
+              "signature": "5f9cee8ba3be2da6555b771dde99e74e2bfa502e24a7e60ca3c4f5341571d092"
             },
             "RuntimeTaskExecutorOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+              "signature": "f816f8d4be96f8e4512d85de08a2d658ef5ec864aeed4e676d8c71fa37107468"
             },
             "RuntimeWorkerPort": {
-              "signature": "b911779ece80f47a1ae5df6fdea36a856b3bee9e6f0d4cb6a877d8c5d1845160"
+              "signature": "a8f31fa27073e8cf20aa934ed1f78d3da96ab90654fb79610c571bdb5bf3d4dd"
             },
             "RuntimeWorkflowDefinition": {
-              "signature": "22ff26821c8c9fb47a5558f54d8389757984455801cb65d5b707423172344e78"
+              "signature": "a945e6f492e10ab90b4cccbedf7e36b2277cf39e240d88f005430f7586bd7bdd"
             },
             "RuntimeWorkflowExecutor": {
-              "signature": "a519426231aa909589337fb7b184b9817bf75955d221092e1aa46644e41aac50"
+              "signature": "fbe73c292c87870aaf54718978ee177621d2315bac70a3d1439acd0241d5b60a"
             },
             "RuntimeWorkflowOptions": {
-              "signature": "0989836b1c2d9135afc1005ca59ddd88bb91d5172a9f8d0108202fa8ae655e4e"
+              "signature": "3ca23e1b69e0e8d6060edd539444551e6b92af23f1c6645bafde0a263c57b31f"
             },
             "StaticJobRegistry": {
-              "signature": "717a5e5cadeace1866a624c70c32c35a203903f80b9908c3d8d87dafea02462f"
+              "signature": "23f9d3177b8073b2025328e70423e3986e2f0a19c1722da0d2740736193b1b96"
             },
             "TaskDefinition": {
-              "signature": "d8e7e11ced4156d53de97753744f4442a7f7c7fe2b144f6eb22e45d1b551754e"
+              "signature": "5ca44d83e607e646855cb0abe8a5ee5da2b275389e4687387ebc759164ac4499"
             },
             "TaskExecutionOptions": {
-              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
+              "signature": "d04582002a4d9b8ad9a20bfa343fd0abd205d58b41f933c801d05ec72c4c24fe"
             },
             "TaskRegistryPort": {
-              "signature": "8b60ca80a4f3574a40af1881eba7c348dd419da858dc9f92c06caa7d04f882cb"
+              "signature": "253f87f77d7a2e26749e4db6a349bedf8ec61c5f93ba8253a00c827856713d4f"
             },
             "TaskResult": {
-              "signature": "d436f99f4957957efa23df37f413bd2d34f6220a8091ceed2be1bbc359a90a1b"
+              "signature": "99cde2891af8102ccfa39b0a729830e8743feb7a6daffcd10a0c0790bb286749"
             },
             "TestWorkersRuntime": {
               "signature": "dec983b226271f406ad4d907c358492bd2934576cdfe296309659af40e136341"
@@ -18094,101 +18442,589 @@
               "signature": "e19459100ab700bf4c50cb525838318c18dfc32a600f8764eb3fc5995041edc3"
             },
             "WorkersClock": {
-              "signature": "365455bad257a54059c5584bcef04649c8b9768299231bad9bb96dccb1f18b88"
+              "signature": "0ae2d90686f209c16de75083702a027913c1741a18a8c04d40ac960c235edb88"
             },
             "WorkersRuntime": {
-              "signature": "bf9017fd669d6ab2bfbdc7e95b44ba4a2bf668a5aeeb93c1a06340b4979b3d68"
+              "signature": "0a44c94bc42b22b9efa75725ced1732dd24dce666144b3fd31f02e05a1a4e569"
             },
             "WorkersRuntimeOptions": {
-              "signature": "1c75c72cc6c71ea61439437f29c3310ba9cc1bfe92535c129d5d9859c117e363"
+              "signature": "1cc82c5edadd810e436c0301d8548797fd5ddb14283e170e8e25e9913b0e8a80"
             },
             "WorkflowId": {
-              "signature": "5c179b8cc189bef3a472bb7f893be05242c83675e8ccb17c6d34c85166733e36"
+              "signature": "b631111ff3dd2b09da2024b27ef589fb4c95044db21d4a133eed8d70685b30d4"
             }
           }
         },
-        "./workflow": {
+        "./config": {
           "symbols": {
-            "defineWorkflow": {
-              "signature": "f1d498de4e2e651a5990d3b705a1ae45d49bb270b4e0725d1ecbd2a44b6544b3"
+            "ConfigSchema": {
+              "signature": "a24013eaf0c73e27fd9874b5de62948655a2e4e4461e4b1910d2a83e4b9d3f3a"
+            },
+            "ConfigSchemaResult": {
+              "signature": "ffb223562f0f144982139569fae061b1e2c381fb2b24575e3001044aaec9f2b0"
+            },
+            "defineJobs": {
+              "signature": "05defb950be3296d6c73efb053475c2a1dc614fc676ea523ea0ba358a7e0483e"
+            },
+            "defineWorkers": {
+              "signature": "be93d13b0d91810f2da4a4330a4ba930ce3144a35a5e4e8c0dacbe94876eb82f"
+            },
+            "JobConfig": {
+              "signature": "4ddcb542805d06c886af89371b9bfb7e64fa4ff68795264f8410308469c6e33a"
+            },
+            "JobConfigInput": {
+              "signature": "7187f614e86c19bc6c73511b272e30957e88155bb4dcca7de86600618551175b"
+            },
+            "JobConfigSchema": {
+              "signature": "1e772e839e3b6d53026f518c7f39e759dabf89a93b99577ce82ae0fa08f0de14"
+            },
+            "QueueProvider": {
+              "signature": "f43d285fe97556d7efb99201ae6673739a9aa7fb94e5dd89b7a7cf68ec9f09a3"
+            },
+            "QueueProviderData": {
+              "signature": "9b3b22c1cd10d08a9caf0b285f9dae81c4a6870da08d8c9576469ee5f64909e5"
+            },
+            "QueueProviderSchema": {
+              "signature": "a1332aae33fedd37c4227c4a01dcc65819d9f71984f78941aaba61ed1cd67abe"
+            },
+            "RetentionConfig": {
+              "signature": "56b82653f5afe04203e770049f32a60a67b0ce488ec68b168a0267c90744061a"
+            },
+            "RetentionConfigSchema": {
+              "signature": "10a96a5b97752d2c910d71ad28140d8cdc9a54c06d6c066456d75a788c88e710"
+            },
+            "ScalingConfig": {
+              "signature": "958f311ac5c11ed278fb937c6fc4b3c72e3f7848502af739058f14fcfcb5674a"
+            },
+            "ScalingConfigData": {
+              "signature": "08a8967a1b739094383dfe0426035871fe185ab31ce8c8e22697c23cf06beeff"
+            },
+            "ScalingConfigSchema": {
+              "signature": "e59ced625abd5ed21de77dde09e7626416f34e4c67b0f3dd28fb53de6057d517"
+            },
+            "TaskConfig": {
+              "signature": "c8d8962c4317b680546b4442ab58f2a83b51738086f4164a404b5b37648dc16f"
+            },
+            "TaskConfigSchema": {
+              "signature": "9a3abde98ddba679aa7d863b9cd5de6418ca6a4f1785edea59dbec8c85b832dc"
+            },
+            "TopicRetentionConfig": {
+              "signature": "10f808880a8e7b3a2557cd18dbcf60f9e8e5a120552aab871421009b6debfbc8"
+            },
+            "TopicRetentionConfigData": {
+              "signature": "a6f7d97b26401138b2d29d580b0666d1793d3f036b4ae0b71a60e3761bf328fb"
+            },
+            "TopicRetentionConfigSchema": {
+              "signature": "27fbe2d48db712e3926852fca440af60a4c5689976170c1bb40b1e08a3b1cd87"
+            },
+            "WorkerConfigPermissions": {
+              "signature": "40db580b72481a5e1e4b81609367ce56eab30ff267dc20d99a4ecf69002b5cba"
+            },
+            "WorkerConfigPermissionValue": {
+              "signature": "fbff889ade23276194b13fabbdd45efb23514aff34d135defbc7364f17097486"
+            },
+            "WorkerGroup": {
+              "signature": "57dcf7c4f2ca013756b41eafb765b96402bfa17731b67f65e06ddd9ec2f1ea7b"
+            },
+            "WorkerGroupData": {
+              "signature": "d0fbfda3d4dabdfef758808dd0b88e83a9c9fafdc85e7ac3caac34c5ab185ffa"
+            },
+            "WorkerGroupSchema": {
+              "signature": "baec6c2228bfea586e9c3ef2ea3319508a6f102618db0515e646716ecc2185d6"
+            },
+            "WorkerJobSource": {
+              "signature": "b5a69abaa5e8798b9bf77af1624fe70dcdfe1c9fc75e4aa1d76dc6880f29b12e"
+            },
+            "WorkersConfig": {
+              "signature": "ad6d5a09e2a3b649a0119eff5cf03e89a4a9b136e6df64b2eb074c4084b34c04"
+            },
+            "WorkersConfigData": {
+              "signature": "37b995c8dfec976c00dbdcbaa8a754030733bcfcb881e31314b46efdb8cfc1e3"
+            },
+            "WorkersConfigInput": {
+              "signature": "3b9425f0be399a4aba5df1918736c389b729810d78e7bfd5e67e406d2902e593"
+            },
+            "WorkersConfigSchema": {
+              "signature": "3279415ea2340a1b6fa00eb6c7bdbb83c86c5d0b5e8a494441b80ad865bb4a54"
+            },
+            "WorkerTaskSource": {
+              "signature": "5295187e0394f493b18bb46e0a42ca82dbcd54d517341c0e277aeecb7b5d7cab"
+            },
+            "WorkerTaskType": {
+              "signature": "bfa90787041f355873f8e9ec0f5a10e03c775566e04e0ff9b22b2f204a113364"
+            }
+          }
+        },
+        "./runtime": {
+          "symbols": {
+            "createWorkersRuntime": {
+              "signature": "7c35d5ac71ac1ccb7d7170de10c899ec9e9d8102621bf9c6e9f147117773ec32"
+            },
+            "DEFAULT_TOPIC": {
+              "signature": "84f32be3315ea14c16ae47dbd0cdf7d3340b44b2f2c99c413a2456236a7a86d4"
+            },
+            "ExecuteJobMessage": {
+              "signature": "3fab97e65544add279d2b17524137f75cefceabc552d47605f2b6c9c7886c53f"
+            },
+            "ExecutionRecord": {
+              "signature": "310fa84d8286630757c023fef64e93ff26ec9f0306508320db80d6c432ae2d9c"
+            },
+            "ExecutionStatus": {
+              "signature": "5f72983473025caf7913925661fc4e4acbdb617d0fd72896c04ec7c2fadca5a1"
+            },
+            "InProcessJobDispatcher": {
+              "signature": "a91c53ec9e23a08dfe5e752d73dfcb1d9c92b27f854272a33aaeedc085c9b6ea"
+            },
+            "InProcessJobRunner": {
+              "signature": "fdf5d68d17505c3d5165df003d6aa4526fdc58cc0fd7e6e5954f9f4f90bf8b00"
+            },
+            "InProcessJobRunnerOptions": {
+              "signature": "a80ef4ef4784f23e281563d2270599805fbe6bb4df104cfb8820b7f611cab943"
+            },
+            "JOB_STATE_CHANNEL": {
+              "signature": "dc22fb5c44c94e0c01278bfb1b813c012708414ff38d21bd240dae48c03617c0"
+            },
+            "JobCompleteMessage": {
+              "signature": "0ff38a566578b23f3c772742e44269d5825b3db968c809be320c16c1a15840e5"
+            },
+            "JobContext": {
+              "signature": "f1481dcd251bf5da834c3bdcb6a1173dbc2710706e74995b3e6b94333a2c7889"
+            },
+            "JobDefinition": {
+              "signature": "e8c1e8efd136cc0116b02cce93bb90e8ceb8a75d695e00a146c64cb50b8acf7a"
+            },
+            "JobDispatchContext": {
+              "signature": "ffb84a1304fe75edbe2397d37e3aa7aea99d9446cc843e8bb11e9ab3f7265a42"
+            },
+            "JobDispatcherOptions": {
+              "signature": "4e19c9b36622822cb476be59f9f37a1a40fc1bbbece1208c08c0f2144c8a7520"
+            },
+            "JobErrorMessage": {
+              "signature": "b128f6a0e9b5637ec008051289e175575bc188f1955e6b83a40fcf8f923aab91"
+            },
+            "JobFailure": {
+              "signature": "552932e6690a1a672092ff544891e009c9e9e297ace618be5c1db359c71bf758"
+            },
+            "JobHandler": {
+              "signature": "0a852f0067f858c75702fc2fd4c4d258c99da3c205f1da6a779ce4dc74142f64"
+            },
+            "JobHandlerDefinition": {
+              "signature": "1b9dd87d0326dde5746cb17067825f9a8ecb321151e63785cba08db80fb02c14"
             },
             "JobId": {
               "signature": "9fb84a15e056679a08e912cbb4676742bd9765c1c20b0d4bafaf3fdb67b94434"
             },
-            "MemoryWorkflowStateStore": {
-              "signature": "edd7d700a74267c59960c8716689826107448df63d82b976b9f27bfed87c5bb6"
+            "JobKvKeys": {
+              "signature": "ed66933a5ff0ffe9e9cde7a5b6de2601b9fca01445b8e72c706b337cf762cbb0"
+            },
+            "JobLogMessage": {
+              "signature": "9312c84f3fc111eff1f0a8048c679b4003ee2affae6d2ddd5eb04c298477156b"
+            },
+            "JobMessage": {
+              "signature": "0077aacebecd49dfb35bc7915012ad3658bbf3146eda6841efc5fdb61cfb6cd6"
+            },
+            "JobModuleImporter": {
+              "signature": "3a929ee2ea4bd564301793f692ded73c063326b33b6d8550fd7729485b2d0990"
+            },
+            "JobPayloadMap": {
+              "signature": "1d772079bc707469017c046d26b376c1f4bd3c83fe296556038e793f784622a1"
+            },
+            "JobPayloadOf": {
+              "signature": "f0a74f88a232cef805f4ea1a06b56d0c151c04ffa581286b85a8891280ad7e56"
+            },
+            "JobPayloadSchema": {
+              "signature": "a60b654bd759e0cf14e462d1644e2f33b889d9ccf067cf5490bbbf0cdc5345d7"
+            },
+            "JobPayloadValidationError": {
+              "signature": "b6743afaa3466019ffd26a058b8dcf3f8d52ff5194af8e2a805faab97d666545"
+            },
+            "JobProgressMessage": {
+              "signature": "9d3fb3d1725d2e5dc1beff1e51fc260c96712cb59f6e2cc3ff6d45a734078134"
+            },
+            "JobResolution": {
+              "signature": "4df09e4e3ee0775de3fa95a86b6fa49964b08f734457921eb72b4716ce79dabb"
+            },
+            "JobResolutionSource": {
+              "signature": "91797a7c21d534726be947363d7735b01a3e58c91d9bf00d9ae9a89a7c2dc3d2"
+            },
+            "JobResult": {
+              "signature": "daa510641597e0083e32ea1078c5fcef1f3b44f770935b72fd41e77857345f2d"
+            },
+            "JobRunnerClock": {
+              "signature": "70572d4ad102d56e2f2a12906b2d85304ed0437638fc1b35c37e810ab8584b82"
+            },
+            "JobSource": {
+              "signature": "84000440b48a6f762e901ae7a75d24a91ac6243aa26d3ab7e21990e4bea345e3"
+            },
+            "JobSuccess": {
+              "signature": "4a462382d604a4eaabcc4d4ff6579d5a2d098b5a5b43d75d2b933861ddb024c6"
+            },
+            "PublicStandardSchema": {
+              "signature": "a59dcac4a79120621039e00878dcb36f2970f4f1055eb4b6f40bbafc70b96005"
+            },
+            "RegisterJobInput": {
+              "signature": "4ab660669f2354cb97813e0e3805b9bdcfd6fd1c9e21a758024e447352af0931"
+            },
+            "RegisterTaskInput": {
+              "signature": "6eebad6d9d810cb0badeb0f11ca0c987fe9fa5df5b24ec959188a270773ac0d4"
+            },
+            "RegistryRuntimePermissions": {
+              "signature": "86b5392028b8541d0a8bc2230e43cbb4d15f0df1ae82235eca935f39705c5abf"
+            },
+            "ResolvedTaskExecutionOptions": {
+              "signature": "9bb5989975e86d55678288614661232366e407252a1ed4dd3ed167e0299ba938"
+            },
+            "resolveWorkerIdempotencyKey": {
+              "signature": "b609b61449efffdc66a20e613d743523903039e99865181b4cdd86caacc6fd70"
+            },
+            "RuntimeDefaultTaskExecutorOptions": {
+              "signature": "7864e00dbca46d7d77754fbf1ad46b0535f6bf4ba33829adb4872f894979ac57"
+            },
+            "RuntimeDomainJobContext": {
+              "signature": "e8bf004e74a17f911ea7f60dc5ccd70368f9ea592cde5bb50a83cd20c1257db8"
+            },
+            "RuntimeDomainJobDefinition": {
+              "signature": "217d4bd2b8dd0f87c1eee8e56af2b29ceff16fd0747766b1f2dc95d4f042069c"
+            },
+            "RuntimeDomainJobFailure": {
+              "signature": "552932e6690a1a672092ff544891e009c9e9e297ace618be5c1db359c71bf758"
+            },
+            "RuntimeDomainJobHandler": {
+              "signature": "67d3de45f379cdd206fe5e919a572dadce99a7f541a358dd8aa4660655650244"
+            },
+            "RuntimeDomainJobId": {
+              "signature": "9fb84a15e056679a08e912cbb4676742bd9765c1c20b0d4bafaf3fdb67b94434"
+            },
+            "RuntimeDomainJobResult": {
+              "signature": "daa510641597e0083e32ea1078c5fcef1f3b44f770935b72fd41e77857345f2d"
+            },
+            "RuntimeDomainJobSuccess": {
+              "signature": "4a462382d604a4eaabcc4d4ff6579d5a2d098b5a5b43d75d2b933861ddb024c6"
+            },
+            "RuntimeDomainTaskDefinition": {
+              "signature": "ce6f6aa71f9c7ce30d928cb0051cc7ed5bbb92e09df1115f26ea4912b29aa231"
+            },
+            "RuntimeDomainTaskHandler": {
+              "signature": "932138cfab0d61efa4ab08b869ea4f5f432a2369b5db8cb3f20644e8e47421df"
+            },
+            "RuntimeDomainTaskId": {
+              "signature": "ae351ea88e786b55236b115e4c1e3a99acd628ac980afd119e1f5fb326d7e81f"
+            },
+            "RuntimeDomainTaskType": {
+              "signature": "1d0c567566f7168fc24aebc1f1976f648435b3223301ff195a2e683a6a784008"
+            },
+            "RuntimeDomainWorkflowDefinition": {
+              "signature": "84fc2f39a906be829a81c9b14b91beb86d430e2f1f446a35328d238f98ffde9e"
+            },
+            "RuntimeDomainWorkflowId": {
+              "signature": "5c179b8cc189bef3a472bb7f893be05242c83675e8ccb17c6d34c85166733e36"
+            },
+            "RuntimeDomainWorkflowStep": {
+              "signature": "aa643620dce9ad748ed6aee8860bc817e029403437d25d451e521522bc3b5691"
+            },
+            "RuntimeExecutorTaskDefinition": {
+              "signature": "a34f9eed526a8917b502c0bc6dab24e52310c2bd44430c1fa3019a39c1914878"
+            },
+            "RuntimeExecutorTaskExecutionOptions": {
+              "signature": "6fb9744c1ef1a479c6a901fdd7124673986a78ddfaa9c8ddd73c79f2ac374683"
+            },
+            "RuntimeExecutorTaskResult": {
+              "signature": "f06cfda4f80a548f35d56a64cc46575be86314d8f6793b13708441ade448dc5c"
+            },
+            "RuntimeExecutorTaskType": {
+              "signature": "27561ec58be1a7508fdb032d4bd699178e75e858d01e259ccabed0eb48babc6a"
+            },
+            "RuntimeExecutorWorkflowDefinition": {
+              "signature": "af2a337295122fd741b42327cefa7744bf9e974baff6d3355de734aa052d2f9d"
+            },
+            "RuntimeJobKvKeyFactories": {
+              "signature": "2f671f5cd6c9e99ae255cceb2db2303f1606b9d4d3ffc34c468e6fe08cc2d86d"
+            },
+            "RuntimeJobStoragePort": {
+              "signature": "1b147ce2aedd2daa83f7c574715cb5068efff4961fc24afbdf7b1b601642bcb3"
+            },
+            "RuntimePermissions": {
+              "signature": "a4bc96f5c929896dcb5989b227cef6d85fa22f64895a3d647b3d85cfaeb6118c"
+            },
+            "RuntimePermissionValue": {
+              "signature": "cdc9856fa4e59783f666d812b21615ea00a52891c64d80aed9aa953ac86f76d0"
+            },
+            "RuntimeRegistryExecutionRecord": {
+              "signature": "87aa92e3b726bbcc3d5e2fd7650d8d0494aedccc3943f0c6b73d61f2ad81d3bc"
+            },
+            "RuntimeRegistryJobDefinition": {
+              "signature": "ccbb95e2cb5fab1beb3b0742f7788d6e9fd0d73485044fa808c6fbb9e3bbc8b6"
+            },
+            "RuntimeRegistryJobStoragePort": {
+              "signature": "53113f808b7865c5dec648f6ae87831f761ef917318a5f1f55d3e7a704d73160"
+            },
+            "RuntimeSchedulerPort": {
+              "signature": "6ff383c32dbee37edb9ea8d8713562f22e25892994f7a4344c2a4f5672501e5f"
+            },
+            "RuntimeShutdownManager": {
+              "signature": "18ee46356db5cadeabb763376f2c245fad7dae3a21e7bdb81c8ac6b13d6c8c30"
+            },
+            "RuntimeShutdownManagerImplementation": {
+              "signature": "27fc7635f38390374669d3afc2d018ada3f61b020eb0814887b2f8931945c6c5"
+            },
+            "RuntimeShutdownManagerOptions": {
+              "signature": "60b7276beb6f73907bd8dc8bc5cfdf31cc988058c94d9376bddf18ac55e3341e"
+            },
+            "RuntimeShutdownOptions": {
+              "signature": "661cc178c147cfb3a698c1ff6608af205b0455d22ba81032aabb3acc247bfb99"
+            },
+            "RuntimeShutdownReport": {
+              "signature": "9d6b6aaeed6118e1bbe0f6de03b3d113078091aa5e3e1295a0ddcfa7fd928903"
+            },
+            "RuntimeShutdownResource": {
+              "signature": "c5484dc2ae3becb3e84e150ed1b23b4edd9b8bf97edf4632e52c05e522034ff3"
+            },
+            "RuntimeShutdownResourceContract": {
+              "signature": "692d8faa574a2b9f49a1242d1cb5c4d816c75e05266dd37d17a1f234b3d8d67c"
+            },
+            "RuntimeShutdownState": {
+              "signature": "b9748979d40e12334e367419ecb4b3c20d4135f45e99267c51b3538bc555740e"
+            },
+            "RuntimeStoredJobDefinition": {
+              "signature": "9f4f827428c5ac636e9753473ad1fd7345e7373a0f09778bf3f5e61213a008fa"
+            },
+            "RuntimeStoredTaskDefinition": {
+              "signature": "85ba0f6e3e9add32caf294e06670bed59a0d8389e36d850fdd058dff9f2f5889"
+            },
+            "RuntimeTaskExecutor": {
+              "signature": "5f9cee8ba3be2da6555b771dde99e74e2bfa502e24a7e60ca3c4f5341571d092"
+            },
+            "RuntimeTaskExecutorContract": {
+              "signature": "55ab1c28ab873a65f8a6358d368d9344b8e704e048be7e1affd65c5fe0730093"
+            },
+            "RuntimeTaskExecutorOptions": {
+              "signature": "f816f8d4be96f8e4512d85de08a2d658ef5ec864aeed4e676d8c71fa37107468"
+            },
+            "RuntimeTaskInstrumentationLike": {
+              "signature": "47c1862d03e8def65d54eb56ffc359376082e23bb840c599bb351dc411107bd2"
+            },
+            "RuntimeTaskMetadata": {
+              "signature": "e566f55c78f8b5549f0b338c3ab9d0027be8b9f717af24150a833805a24dd068"
+            },
+            "RuntimeTaskPermissionsInput": {
+              "signature": "3c40ec0dcb541d1cc1fb2e33e5cc61f32c5cbe5ee8680685e7f6a8af0167870e"
+            },
+            "RuntimeTaskRuntimeAdapterLike": {
+              "signature": "368c0471ada83669ce22fe7a2c96c6a3888f6701bebe978065b87352f7e02769"
+            },
+            "RuntimeWorkerPort": {
+              "signature": "a8f31fa27073e8cf20aa934ed1f78d3da96ab90654fb79610c571bdb5bf3d4dd"
+            },
+            "RuntimeWorkflowClock": {
+              "signature": "beebac17ea61477d56b8285c141cf7cba476f13ac01f4d772ecb6a84716f84fe"
+            },
+            "RuntimeWorkflowDefinition": {
+              "signature": "a945e6f492e10ab90b4cccbedf7e36b2277cf39e240d88f005430f7586bd7bdd"
+            },
+            "RuntimeWorkflowEvent": {
+              "signature": "d2213bd5c82da6dac56a66b51c93c0e8df1911b3188ef680a06fc3802eb7a84a"
+            },
+            "RuntimeWorkflowExecutionOptions": {
+              "signature": "c9723d0846c6119a4297f0737be673c22471ec323a689d7ddf7fdab90440b0b3"
+            },
+            "RuntimeWorkflowExecutor": {
+              "signature": "fbe73c292c87870aaf54718978ee177621d2315bac70a3d1439acd0241d5b60a"
+            },
+            "RuntimeWorkflowExecutorImplementation": {
+              "signature": "97e707bf93ac8b154ec2a0f28ed0d4ee9554f6cc2a31b25fa6f640b17df332f2"
+            },
+            "RuntimeWorkflowExecutorOptions": {
+              "signature": "da1bdce13a272134957dc3b987e8cb30d1e5e49ed86bd3bf9206894c95a895c8"
+            },
+            "RuntimeWorkflowOptions": {
+              "signature": "3ca23e1b69e0e8d6060edd539444551e6b92af23f1c6645bafde0a263c57b31f"
+            },
+            "RuntimeWorkflowState": {
+              "signature": "d844f6864d5f5d821f33189a906d42ac265f8c16cd6d09c69636e0de64468f58"
+            },
+            "RuntimeWorkflowStateStore": {
+              "signature": "92260a368361a8d8c9b42885a0ec66885f47a3151e27242cc3a8d63465f3bc4f"
+            },
+            "RuntimeWorkflowStepRunnerOptions": {
+              "signature": "a85578b98afc88a96c625398dfad5c2f5e52af55d356beab09de9e9cc9c7e7f4"
+            },
+            "SSEEventTypes": {
+              "signature": "71e8e43276f69cf9120d258b9ef025e31fc3b7f54c00952340748cef8ac5c715"
+            },
+            "StateUpdateMessage": {
+              "signature": "f53c3d0d2e6ea61189e1742f492511de2360f19b8dcaaaddef5abd10654c120e"
+            },
+            "StaticJobRegistry": {
+              "signature": "23f9d3177b8073b2025328e70423e3986e2f0a19c1722da0d2740736193b1b96"
+            },
+            "StoredJobDefinition": {
+              "signature": "12200e4ec481a9b79fe319bd6102f7af3d0a4f6dca4a13b68a1cbe24f3ed3e7a"
+            },
+            "StoredTaskDefinition": {
+              "signature": "d10b9aa788d7f77a8adb3285fd38e1e4e3a5643d104d63d4074f687ae7bef2ff"
+            },
+            "TaskContext": {
+              "signature": "0ff0ed9d0d982334e2d5fe236616bca6fe264cd70b437b6ae35417416c8f3539"
+            },
+            "TaskDefinition": {
+              "signature": "5ca44d83e607e646855cb0abe8a5ee5da2b275389e4687387ebc759164ac4499"
+            },
+            "TaskExecutionOptions": {
+              "signature": "d04582002a4d9b8ad9a20bfa343fd0abd205d58b41f933c801d05ec72c4c24fe"
+            },
+            "TaskHandler": {
+              "signature": "a5fa96cdf5351b080d035fe51b89cdcd761bdfdf57876e81c5d1167b3b745464"
             },
             "TaskId": {
               "signature": "ae351ea88e786b55236b115e4c1e3a99acd628ac980afd119e1f5fb326d7e81f"
             },
-            "WorkflowBuilder": {
-              "signature": "a4ce845f5d99dec1c0f3005e11f5662a809ab2a472eb3ca04e85246de67ac4ee"
+            "TaskInstrumentationSpan": {
+              "signature": "c08d6f164380bc31d57f8ae631b2738c1193a440d02bc105cdeefe6e92df3c1a"
             },
-            "WorkflowBuilderState": {
-              "signature": "e299c18c569d2b77f7c287f8f3101479d30f980d681cce68df21a22c9493d97a"
+            "TaskLogEntry": {
+              "signature": "1a99c42f1e1c171a32424d31e9a043c2de4b7d959010d42eaa5c7c5fcc2cdc85"
             },
-            "WorkflowClock": {
-              "signature": "365455bad257a54059c5584bcef04649c8b9768299231bad9bb96dccb1f18b88"
+            "TaskMessage": {
+              "signature": "735cdb04b6bf13d8885c6938bd39d91fed497fd4f3c4acc79694b5e8f77af632"
             },
-            "WorkflowDefinition": {
-              "signature": "2e5a0eed720befa4dba618658d106710832963b9211858507dfc860c115a29ab"
+            "TaskPermissionsInput": {
+              "signature": "3c40ec0dcb541d1cc1fb2e33e5cc61f32c5cbe5ee8680685e7f6a8af0167870e"
             },
-            "WorkflowEvent": {
-              "signature": "14591045196ad964cb61dbe273d7f39d4378e588d0f60b31ddf9facc4d8f6b00"
+            "TaskRegistryPort": {
+              "signature": "253f87f77d7a2e26749e4db6a349bedf8ec61c5f93ba8253a00c827856713d4f"
             },
-            "WorkflowExecutionOptions": {
-              "signature": "d932a0bf00872dc8604d1fd222576a67ffb10c13a4c79377245e0703720f5fc1"
+            "TaskResult": {
+              "signature": "99cde2891af8102ccfa39b0a729830e8743feb7a6daffcd10a0c0790bb286749"
+            },
+            "TaskType": {
+              "signature": "eeb74547ea1659d9ad99a523a879deed808429d36e6e101014a366e394505906"
+            },
+            "TerminateMessage": {
+              "signature": "de366b274be548c9805b38acaa43be127237d583267c400879a11c26ef76d3af"
+            },
+            "TriggerType": {
+              "signature": "e44cf532661dae623ecb03b301e65ee30c2b0ac36a47bd09fd5fd1d2280b1352"
+            },
+            "TriggerTypeSchema": {
+              "signature": "5828ee051f5e740433fe5fa0de1bb30fe98e0f013da28812e3d567727e0f0543"
+            },
+            "TriggerTypeSchemaValues": {
+              "signature": "24a60f1c18737bb67cdce7d7f8bbfbd8fe3a4e0ecfd5c8e8162e3ed2039ca844"
+            },
+            "validateJobPayload": {
+              "signature": "d7ef86704624c610bab1041458c0e0d8fa5a31913850436e2cfc4b714e781697"
+            },
+            "WorkerEnumSchema": {
+              "signature": "cd8cfd184b4680fa90918e10d3eb2edef2f4b446afab58f60bac4eb7d02e079c"
+            },
+            "WorkerIdempotencyClaim": {
+              "signature": "c359755a7360fb834f3b94ce0b33fc550218b267949b3941df7557f0971ab454"
+            },
+            "WorkerIdempotencyInput": {
+              "signature": "0698bcc0cca9063a8c0a016ef7d2189a44ffc77bc2fa3a0df0aa7d961bbe07ac"
+            },
+            "WorkerIdempotencyPort": {
+              "signature": "5db4ddc9b10f5ec7763b1d574a6ef4f29001d5ba564d66bea1d7a194c485588e"
+            },
+            "WorkerIdempotencySource": {
+              "signature": "f5b6c3d6694b4c03306938845febbad290c39bd98d3081eefe50fc7f063438e0"
+            },
+            "WorkerInboundMessage": {
+              "signature": "920a2e1eb78966cfac523ff1fbf702a5bc03431482960763a3b12669743d2b18"
+            },
+            "WorkerOutboundMessage": {
+              "signature": "36d99527b59fe791de4f81a0fe86d3f2554fc81b4da80783f632bbb71ab367c9"
+            },
+            "WorkerResolvedIdempotencyKey": {
+              "signature": "54c708779faad3d21eeac41db5949fd2401ca2baf6f5470a0a1d2fec834025d4"
+            },
+            "WorkersClock": {
+              "signature": "0ae2d90686f209c16de75083702a027913c1741a18a8c04d40ac960c235edb88"
+            },
+            "WorkersRuntime": {
+              "signature": "0a44c94bc42b22b9efa75725ced1732dd24dce666144b3fd31f02e05a1a4e569"
+            },
+            "WorkersRuntimeOptions": {
+              "signature": "1cc82c5edadd810e436c0301d8548797fd5ddb14283e170e8e25e9913b0e8a80"
+            },
+            "WorkerTaskPermissions": {
+              "signature": "2415923b17ada6eb9fab839b6ba80c8b968e7739ded5abb7cbe7a3a9f550f35b"
+            },
+            "WorkerTelemetryStatus": {
+              "signature": "ea22a6561492ef1ecc01910bf2cd550b5710d5f714821b94f74b2d2ceee1d343"
             },
             "WorkflowExecutionStatus": {
-              "signature": "68b755edbc794398861df1ea4a381a82bb58ee7dcd94011f0256f9c01f87a744"
-            },
-            "WorkflowExecutor": {
-              "signature": "5f226a5fc2e6a9ee24b69d8cafd0e8928bab16c28b24f83b3cdb96eeedb496e6"
-            },
-            "WorkflowExecutorOptions": {
-              "signature": "874cc085ebd3cb28313ac46dd66b5b3c9a6d8945028136948d1bedbc44b9fcfa"
+              "signature": "f4002c27831986b40278d06c7a744532760762331286cb31308b061b41a06b74"
             },
             "WorkflowId": {
-              "signature": "5c179b8cc189bef3a472bb7f893be05242c83675e8ccb17c6d34c85166733e36"
-            },
-            "WorkflowJobStepOptions": {
-              "signature": "7cede699e511478e48cf09cd1d8e118afd89807d01b76ae6f73443b566d081b3"
+              "signature": "b631111ff3dd2b09da2024b27ef589fb4c95044db21d4a133eed8d70685b30d4"
             },
             "WorkflowJobStepRunner": {
-              "signature": "82fb862965f954588ef0b82b8cd59f45d11d4e36629ec3c4f617e385db9c2dad"
+              "signature": "a8bd294fa74d8c428a40105955c20215cc667a761664f07ad7102ed3cdd75216"
             },
             "WorkflowResults": {
-              "signature": "5b884d79907c486257deeb58d5301318543b5b779aa4ac66533a137951e22c72"
-            },
-            "WorkflowState": {
-              "signature": "253f5e5d4ef7013f2c9bb685df82f36e0b3489aadb241e213d97ab1c483107f3"
-            },
-            "WorkflowStateStore": {
-              "signature": "c93bbd68fbe7a5726ecee89337822fa635c4b45e625d2bb00daf44129499e9de"
+              "signature": "b68833fdf454f9be41bc1243c3642a8bce5b14326800b51e75e9c79171256fcf"
             },
             "WorkflowStep": {
-              "signature": "9a3212345bcfd60c6ea0420459a15c7bcff7ebca16269860ce6aae00d15848cb"
+              "signature": "59443a92be131bb87c3d18d59e9c65c91a02f722856f51bdfe8432acffef0b6d"
             },
             "WorkflowStepKind": {
               "signature": "8e5c7084d94f4c5ecf35880d61ddc46ede899a69899cdea71bc6db5c4b67782a"
             },
             "WorkflowStepResult": {
-              "signature": "458f682ed1ec496c23fa09b8a685a8162771cce972edf65e75c49b85bd34f7f9"
-            },
-            "WorkflowStepRunner": {
-              "signature": "27df52374f731c254967e3c0cf0e4a1803262806f23d01b4140fe7f0be83a122"
-            },
-            "WorkflowStepRunnerOptions": {
-              "signature": "9139c1a25c3856da9e7f4e5450b57d02de412c931ad4b4bca5d270d555756f60"
+              "signature": "94efd76bc2cde971d6cd8e6e899e14a2f6d06731511df99e4d5872f19d1d1637"
             },
             "WorkflowStepStatus": {
-              "signature": "d96b46cca15d3731d9f00eea2946184fff63f45cac6334c96b8ff544378acd56"
-            },
-            "WorkflowTaskStepOptions": {
-              "signature": "1e5730cf6664d8ebbab27f4722ebf67d1aa346575fdfcccf48f36cdacafe65a3"
+              "signature": "7e7057fc43e57e3cb4d07df964c2dedbee4b08a23e0f70cb2a38eae7275a31f0"
             },
             "WorkflowTaskStepRunner": {
-              "signature": "82fb862965f954588ef0b82b8cd59f45d11d4e36629ec3c4f617e385db9c2dad"
+              "signature": "ae6761cf35e116a4e5c3c5f406a9f9573006f4fc2d8acb2735148da13a14552b"
+            }
+          }
+        },
+        "./integration/commands": {
+          "symbols": {
+            "CommandJson": {
+              "signature": "bb31a681a105a22f207af9d628363c0c8f0bb227931a8f510f2338bb177fdc48"
+            },
+            "CommandOutboxAcceptance": {
+              "signature": "bcdc7d244c9f3d9796ad6f8dcd29316809a6b2d98edf5bfc845742791d20e627"
+            },
+            "CommandOutboxDelivery": {
+              "signature": "650b21bba95d07fc9f62faf30caf6a7c34813882d35ffe80d6cc3004b7eccd68"
+            },
+            "CommandOutboxSink": {
+              "signature": "45fb1efc3cfd9da342acf62696b6adc915349b17ebfc50cfe574c7faa624e8e5"
+            },
+            "CommandTraceContext": {
+              "signature": "4102ce8ffb9abe3fb55cfa1e6c149c032f649cbeda61c49fdcb8e325cf7659bc"
+            },
+            "createWorkerCommandOutboxSink": {
+              "signature": "5839bbb4ed0a04328f445c9e6a650f66869c705a53ab66bbbea92f452102ce08"
+            },
+            "JobId": {
+              "signature": "0eaaf80b680b22b4d3e6e904a0df490a1de853ab67c0fa4b49e905515e0c9bf1"
+            },
+            "TaskId": {
+              "signature": "670e9be51441dd23c4d821c3ab3a0feb453c2b072f7022ff28ef598ec5f803ab"
+            },
+            "WorkerCommandClientPort": {
+              "signature": "4bf901b67a4f604f16dd181656aa2f1607c0385d91d2b9fbfb7c677e847804ac"
+            },
+            "WorkerCommandMetadata": {
+              "signature": "5ed70873c0ec6fb72caf598ea1be0fe7791f011004c59229adf11a2a008c7911"
+            },
+            "WorkerCommandSinkOptions": {
+              "signature": "1e4b04d8a553d5103e831b5c4838c9d5903e5b285ad148507dbada15956482b1"
+            },
+            "WorkerCommandTarget": {
+              "signature": "52b7533db3a1e7fa8ca77ee84f392660c8a72152124bde612102a4d572dd9f38"
+            },
+            "WorkerJobCommandRequest": {
+              "signature": "2df03f361a438c491a19c3865eaae5f11bbe65b56e637d10a58acff5678789ef"
+            },
+            "WorkerTaskCommandRequest": {
+              "signature": "b7e4bbe47584685fc34dd8e36d18495661b88101f01afb9e708960addebb492e"
             }
           }
         }

@@ -1,5 +1,5 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 
 import type { PluginManifest } from '@netscript/plugin/config';
 import type {
@@ -17,6 +17,7 @@ import type { DirEntry, FileInfo, WalkEntry } from '../../../../kernel/domain/co
 import type { ConfigLoaderPort, PluginHostConfig } from './discover-plugins.ts';
 import { createHostPluginCommand } from './host-plugin-command.ts';
 import { createPluginHostLoader } from './plugin-loader.ts';
+import { ConfigError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 
 describe('plugin host loader', () => {
   it('resolves config plugins, merges contributions, and triggers the walker', async () => {
@@ -63,6 +64,37 @@ describe('plugin host loader', () => {
       ['beta-worker'],
     );
     assertEquals(state.emissions, [{ path: '.netscript/generated/plugins.ts', text: '{}' }]);
+  });
+
+  it('rejects an invalid plugin composition before walking', async () => {
+    const plugins = ['@example/plugin-alpha', '@example/plugin-beta'];
+    const walker = new RecordingWalker();
+    const loader = createPluginHostLoader({
+      projectRoot: '/workspace/app',
+      configLoader: new FakeConfigLoader(createConfig(plugins)),
+      manifestResolver: new FakeManifestResolver([
+        createPluginManifest('@example/plugin-alpha', {
+          contributions: { aspire: './alpha/aspire.ts', services: [{ name: 'api', entrypoint: './a.ts' }] },
+        }),
+        createPluginManifest('@example/plugin-beta', {
+          contributions: { aspire: './beta/aspire.ts', services: [{ name: 'api', entrypoint: './b.ts' }] },
+        }),
+      ]),
+      walker,
+      extractor: new FakeExtractor(),
+      emitter: new FakeEmitter(),
+      fs: new FakeFileSystem(),
+    });
+
+    const error = await assertRejects(() => loader.resolve(), ConfigError);
+    assertEquals(
+      (error.context?.diagnostics as { code: string; axis: string }[]).map(({ code, axis }) => [
+        code,
+        axis,
+      ]),
+      [['duplicate-contribution', 'services']],
+    );
+    assertEquals(walker.roots, []);
   });
 
   it('resolves project root flags before creating the sync loader', async () => {

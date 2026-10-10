@@ -12,7 +12,7 @@ Your [import job](/tutorials/erp-sync/02-import-job/) runs one file at a time. A
 not: the day you backfill Dynamics with SAP's historical exports, twenty files land in the hand-off
 folder at once, and until cutover the two systems only stay aligned if a full re-sync runs every
 night whether or not a file arrived. This chapter adds the two pieces that make both durable: a
-**queue provider** and a worker **concurrency** so bursts drain in parallel, and a **cron
+**queue provider** and a worker **concurrency** so I/O-bound bursts overlap, and a **cron
 schedule** that fires on a cadence rather than an event.
 
 {{ comp.learningPath({ steps: [
@@ -26,7 +26,7 @@ schedule** that fires on a cadence rather than an event.
 ## What you will build
 
 By the end of this chapter your workers config will name a **queue provider** and a worker
-**concurrency** so bursts of imports drain in parallel instead of one-by-one, and a new
+**concurrency** so I/O-bound imports overlap instead of one-by-one, and a new
 **scheduled trigger** (`defineScheduledTrigger`) will enqueue a re-sync job on a cron cadence. You
 will also know the one concurrency naming gotcha to set explicitly so it does not bite you under
 Aspire.
@@ -72,9 +72,10 @@ Deno KV adapter. The full decision guide is in
 
 ## Step 2 — Size worker concurrency in config
 
-`concurrency` on the workers config is the size of the worker pool the runner spins up — each slot is
-its own V8 isolate (~20–40 MB), so raising it buys parallelism at a memory cost. This is where a
-burst of imports gets drained in parallel. Set it in the generated worker config:
+`concurrency` declares queue concurrency. Jobs execute in-process in the background worker
+and share its event loop. Raising concurrency lets I/O-bound imports overlap; it does not
+allocate V8 isolates or speed up synchronous CPU-bound transformations. Set it in the
+generated worker config:
 
 ```ts
 // config/official-plugins/mod.ts
@@ -85,7 +86,7 @@ export const workers = defineWorkers({
   tasksDir: './workers/tasks',
   queueProvider: 'auto', // Deno KV locally; the Aspire cache once up (redis default, garnet alt).
   queueName: 'jobs',
-  concurrency: 4, // pool size: 4 isolates → ~80–160 MB. Raise for throughput, lower to bound memory.
+  concurrency: 4, // Queue concurrency: overlap up to 4 I/O-bound jobs; no CPU parallelism.
   enabled: true,
   groups: [],
 });
@@ -94,7 +95,7 @@ export const workers = defineWorkers({
 {{ comp.apiTable({
   caption: "WorkersConfigData — the fields you set here (@netscript/plugin-workers-core/config)",
   rows: [
-    { name: "concurrency", type: "number", desc: "Default worker pool size (V8 isolates running jobs in parallel). Schema default 2." },
+    { name: "concurrency", type: "number", desc: "Default queue concurrency for in-process jobs. Schema default 2; no isolate pool is allocated." },
     { name: "queueProvider", type: "'auto' | 'deno-kv' | 'redis' | 'postgres' | 'amqp'", desc: "Queue backend. 'auto' resolves one for you. Default 'auto'." },
     { name: "queueName", type: "string", desc: "Queue the runner consumes from. Default 'jobs'." },
     { name: "jobsDir / tasksDir", type: "string", desc: "Directories scanned for default-exported job and task modules." },
@@ -107,18 +108,8 @@ For per-topic control — a hot `imports` topic at concurrency 10 while a heavy 
 at 1 — use a `WorkerGroup` with its own `scaling: { mode, concurrency }`. The full per-topic and
 runner-mode knobs are in [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
 
-{{ comp callout { type: "warning", title: "Set scaling.concurrency in config — the Aspire env var is silently ignored" } }}
-There are <strong>two</strong> concurrency env names in play and they are <em>not</em> the same
-variable. The worker entrypoint reads <code>WORKERS_CONCURRENCY</code> (note the <strong>S</strong>)
-and defaults it to <code>1</code>. The Aspire contribution, however, declares and injects
-<code>WORKER_CONCURRENCY</code> (no S). Under <code>aspire start</code> today the injected
-<code>WORKER_CONCURRENCY</code> does <em>not</em> feed the entrypoint's <code>WORKERS_CONCURRENCY</code>
-read, so the Aspire value is silently ignored and the process pool falls back to its default. Treat
-the config-driven <code>concurrency</code> (and per-topic <code>scaling.concurrency</code>) above as
-the durable control, and if you must override the pool by env, set <code>WORKERS_CONCURRENCY</code>
-explicitly on the background resource. This naming seam is a known rough edge, tracked for a
-framework-side fix.
-{{ /comp }}
+The running queue concurrency is set by `WORKERS_CONCURRENCY`. Aspire injects it on the workers
+background resource with the plugin's declared default, so you only set it to override that value.
 
 ## Step 3 — Add a cron schedule
 
@@ -223,7 +214,7 @@ schedule, not a file event, enqueued it. Set the cron back to `0 6 * * *` when y
 - [ ] `deno task check` is clean.
 - [ ] `daily-resync-schedule` is registered (after `netscript generate plugins` + Aspire restart).
 - [ ] A scheduled `import-products` execution appears on the cron cadence with no file dropped.
-- [ ] You set `WORKERS_CONCURRENCY` explicitly (or rely on config `concurrency`) rather than the ignored Aspire `WORKER_CONCURRENCY`.
+- [ ] The workers background resource shows `WORKERS_CONCURRENCY` in the Aspire dashboard, and you changed it only to override the declared default.
 
 {{ comp callout { type: "important", title: "Make handlers idempotent before you scale concurrency" } }}
 Raising <code>concurrency</code> means more jobs run at once, and every queue backend can redeliver a
@@ -236,7 +227,7 @@ provider</a> for each backend's delivery semantics.
 ## What you built
 
 A workers config that names a queue provider and a worker concurrency so a SAP backfill burst
-drains in parallel, and a `defineScheduledTrigger` cron that enqueues the nightly re-sync — plus
+drains with overlapping I/O, and a `defineScheduledTrigger` cron that enqueues the nightly re-sync — plus
 the knowledge to set concurrency where it actually takes effect. The sync now absorbs bursts and
 runs its recurring work unattended. The last chapter runs the whole thing under Aspire.
 

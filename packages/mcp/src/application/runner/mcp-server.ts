@@ -11,6 +11,7 @@ import type {
 } from '../../domain/tool-types.ts';
 import { type JsonRpcResponse, parseJsonRpcRequest } from '../../domain/json-rpc.ts';
 import {
+  assertResultByteLimit,
   DEFAULT_TRUNCATION_POLICY,
   ResultByteLimitError,
   truncateResult,
@@ -23,7 +24,7 @@ import { settleFlowReceipt } from './receipt-lifecycle.ts';
 export const MCP_PROTOCOL_VERSION = '2025-11-25';
 /** Instructions injected by MCP hosts into every driving agent context. */
 export const MCP_AGENT_INSTRUCTIONS =
-  `Before implementing an unfamiliar NetScript API or architecture, call find_guidance with the task. Use search_docs for literal lookup and get_doc for exact retrieval. Use doctor to check NetScript, Aspire, project wiring, and plugins. Use find_export, list_package_exports, get_export, and search_exports to discover first-party package APIs before guessing symbol names or import subpaths. Use get_app_status and get_recent_errors for live telemetry symptoms, and the analyze_* tools for performance or database evidence. When debugging or calling a service HTTP API, follow the MCP path: list_api_services to discover the live service name, list_service_operations to select an operation, then get_operation_schema for its request and response contract before hand-rolling requests with curl. Search help.md with search_docs when something hangs, is Healthy but does not respond, or leaves a dangling AppHost. record_drift is gated: it refuses unless the same resource has a successful diagnostic receipt from the last 15 minutes.`;
+  `Before implementing an unfamiliar NetScript API or architecture, call find_guidance with the task. Use search_docs for literal lookup and get_doc for faithful retrieval; check mode and use full: true with nextCursor for exact complete text. Use doctor to check NetScript, Aspire, project wiring, and plugins. Use find_export, list_package_exports, get_export, and search_exports to discover first-party package APIs before guessing symbol names or import subpaths. Use get_app_status and get_recent_errors for live telemetry symptoms, and the analyze_* tools for performance or database evidence. When debugging or calling a service HTTP API, follow the MCP path: list_api_services to discover the live service name, list_service_operations to select an operation, then get_operation_schema for its request and response contract before hand-rolling requests with curl. Search help.md with search_docs when something hangs, is Healthy but does not respond, or leaves a dangling AppHost. record_drift is gated: it refuses unless the same resource has a successful diagnostic receipt from the last 15 minutes.`;
 /** Server dependencies and policy. */
 export interface McpServerOptions {
   /** Telemetry reachability adapter. */
@@ -134,7 +135,12 @@ export function createMcpServer(options: McpServerOptions): McpServer {
       let bounded: unknown;
       try {
         validateSchema(tool.outputSchema, execution.value);
-        bounded = truncateResult(execution.value, policy);
+        bounded = truncateResult(
+          execution.value,
+          tool.truncation === 'exempt'
+            ? { maxItems: Number.POSITIVE_INFINITY, maxStringLength: Number.POSITIVE_INFINITY }
+            : policy,
+        );
         validateSchema(tool.outputSchema, bounded);
       } catch (error) {
         await settleFlowReceipt(tool.flow, input, false);
@@ -149,12 +155,26 @@ export function createMcpServer(options: McpServerOptions): McpServer {
           message: error instanceof Error ? error.message : 'Output contract validation failed',
         });
       }
-      await settleFlowReceipt(tool.flow, input, resultSucceeded(execution.value));
-      return rpcResult(request.id, {
+      const response = rpcResult(request.id, {
         content: [{ type: 'text', text: JSON.stringify(bounded) }],
         structuredContent: bounded as Record<string, unknown>,
         isError: false,
       });
+      // Tools that own semantic bounds also validate the complete duplicated MCP envelope.
+      if (tool.envelopeCheck) {
+        try {
+          assertResultByteLimit(response);
+        } catch {
+          return rpcError(
+            request.id,
+            -32603,
+            'Tool response exceeds the transport limit; request a smaller scope or paged full output.',
+            { code: 'tool_result_too_large' },
+          );
+        }
+      }
+      await settleFlowReceipt(tool.flow, input, resultSucceeded(execution.value));
+      return response;
     },
   };
 }

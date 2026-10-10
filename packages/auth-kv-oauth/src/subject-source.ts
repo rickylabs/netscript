@@ -36,25 +36,26 @@ const userInfoId = (
 ): OAuthSubjectSource =>
   Object.freeze({ source: 'userinfo', claim, headers: Object.freeze(headers) });
 
-const PRESET_SUBJECT_SOURCES: Readonly<Record<string, OAuthSubjectSource>> = Object.freeze({
+const PRESET_PROVIDER_POLICIES: Readonly<
+  Record<string, Readonly<{ kind: 'oauth' | 'oidc'; subject: OAuthSubjectSource }>>
+> = Object.freeze({
   // GitHub has no `sub`: the numeric `id` is immutable, `login` is renamable. The REST API
   // rejects requests without a User-Agent.
-  github: userInfoId('id', { 'user-agent': 'netscript-auth-kv-oauth' }),
-  google: DEFAULT_SUBJECT_SOURCE,
-  gitlab: DEFAULT_SUBJECT_SOURCE,
-  discord: userInfoId(),
-  slack: DEFAULT_SUBJECT_SOURCE,
-  spotify: userInfoId(),
-  facebook: userInfoId(),
-  twitter: userInfoId('data.id'),
-  auth0: DEFAULT_SUBJECT_SOURCE,
-  okta: DEFAULT_SUBJECT_SOURCE,
-  'aws-cognito': DEFAULT_SUBJECT_SOURCE,
-  'azure-ad': DEFAULT_SUBJECT_SOURCE,
-  logto: DEFAULT_SUBJECT_SOURCE,
-  clerk: DEFAULT_SUBJECT_SOURCE,
+  github: { kind: 'oauth', subject: userInfoId('id', { 'user-agent': 'netscript-auth-kv-oauth' }) },
+  google: { kind: 'oidc', subject: DEFAULT_SUBJECT_SOURCE },
+  gitlab: { kind: 'oidc', subject: DEFAULT_SUBJECT_SOURCE },
+  discord: { kind: 'oauth', subject: userInfoId() },
+  slack: { kind: 'oidc', subject: DEFAULT_SUBJECT_SOURCE },
+  spotify: { kind: 'oauth', subject: userInfoId() },
+  facebook: { kind: 'oauth', subject: userInfoId() },
+  twitter: { kind: 'oauth', subject: userInfoId('data.id') },
+  auth0: { kind: 'oidc', subject: DEFAULT_SUBJECT_SOURCE },
+  okta: { kind: 'oidc', subject: DEFAULT_SUBJECT_SOURCE },
+  'aws-cognito': { kind: 'oidc', subject: DEFAULT_SUBJECT_SOURCE },
+  'azure-ad': { kind: 'oidc', subject: DEFAULT_SUBJECT_SOURCE },
+  logto: { kind: 'oidc', subject: DEFAULT_SUBJECT_SOURCE },
+  clerk: { kind: 'oidc', subject: DEFAULT_SUBJECT_SOURCE },
 });
-
 /**
  * Returns the stable subject source a shipped preset uses, keyed by preset provider id.
  *
@@ -66,8 +67,26 @@ const PRESET_SUBJECT_SOURCES: Readonly<Record<string, OAuthSubjectSource>> = Obj
  * ```
  */
 export function presetSubjectSource(providerId: string): OAuthSubjectSource | undefined {
-  return Object.hasOwn(PRESET_SUBJECT_SOURCES, providerId)
-    ? PRESET_SUBJECT_SOURCES[providerId]
+  return Object.hasOwn(PRESET_PROVIDER_POLICIES, providerId)
+    ? PRESET_PROVIDER_POLICIES[providerId]?.subject
+    : undefined;
+}
+
+/**
+ * Return the protocol kind declared by a shipped preset, or undefined for a custom provider.
+ *
+ * OAuth presets use explicit endpoints: their issuer must not trigger OIDC discovery.
+ *
+ * @example
+ * ```ts
+ * import { presetProviderKind } from "@netscript/auth-kv-oauth/providers";
+ *
+ * const kind = presetProviderKind("github"); // "oauth"
+ * ```
+ */
+export function presetProviderKind(providerId: string): 'oauth' | 'oidc' | undefined {
+  return Object.hasOwn(PRESET_PROVIDER_POLICIES, providerId)
+    ? PRESET_PROVIDER_POLICIES[providerId]?.kind
     : undefined;
 }
 

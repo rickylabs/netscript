@@ -119,6 +119,12 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       // browser child without a browseable HTTP/HTTPS parent.
       if (type === 'app') {
         lines.push(`    await ${id}.withBrowserLogs();`);
+        lines.push(``);
+        lines.push(`    // Workspace CORS allowlist: this enabled web app's allocated origin.`);
+        lines.push(`    const ${id}_origin = await ${id}.getEndpoint('http');`);
+        lines.push(`    corsOrigins = corsOrigins`);
+        lines.push('      ? ReferenceExpression.create`${corsOrigins},${' + id + '_origin}`');
+        lines.push('      : ReferenceExpression.create`${' + id + '_origin}`;');
       }
     }
 

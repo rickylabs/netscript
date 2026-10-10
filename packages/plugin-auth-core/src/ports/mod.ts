@@ -91,7 +91,38 @@ export interface AuthSessionStorePort {
   refreshSession(sessionId: string): Promise<AuthSession> | AuthSession;
   /** Revokes a session and returns the revoked normalized session. */
   revokeSession(sessionId: string): Promise<AuthSession> | AuthSession;
+  /**
+   * Revokes every session of `input.subject`: no session of that subject issued at or before the
+   * returned `revokedAt` may resolve as active afterwards, including sessions persisted before the
+   * adapter supported this operation. Sessions of any other subject stay untouched.
+   *
+   * The work per call must be bounded — invalidate at the subject level instead of enumerating the
+   * subject's sessions. Adapters whose upstream has no subject-wide revocation throw
+   * {@link AuthBackendOperationUnsupportedError}.
+   */
+  revokeSubjectSessions(
+    input: AuthSubjectRevocationInput,
+  ): Promise<AuthSubjectRevocation> | AuthSubjectRevocation;
 }
+
+/** Input accepted by {@link AuthSessionStorePort.revokeSubjectSessions}. */
+export type AuthSubjectRevocationInput = Readonly<{
+  /** Subject whose sessions are all revoked. */
+  subject: string;
+  /**
+   * Request of the caller acting for `subject`. Adapters whose upstream revokes through the
+   * caller's own credential require it and refuse a credential that belongs to another subject.
+   */
+  request?: AuthnRequest;
+}>;
+
+/** Result of {@link AuthSessionStorePort.revokeSubjectSessions}. */
+export type AuthSubjectRevocation = Readonly<{
+  /** Subject whose sessions were revoked. */
+  subject: string;
+  /** ISO instant at or before which every session of the subject was issued and is now revoked. */
+  revokedAt: string;
+}>;
 
 /** Crypto contract exposed by pure auth backends for token lifecycle work. */
 export interface AuthSessionCryptoPort {
@@ -113,6 +144,10 @@ export type InteractiveCallbackResult = Readonly<{
  *
  * @example
  * ```ts
+ * import type { ResolvedAuthBackendRegistry } from "@netscript/plugin-auth-core/ports";
+ *
+ * declare const registry: ResolvedAuthBackendRegistry;
+ *
  * const backend = registry.resolveBackend();
  * if (backend.interactive) {
  *   const response = await backend.interactive.signIn(
@@ -172,6 +207,10 @@ const HMAC_SESSION_TOKEN_ERROR_MESSAGE = 'Invalid auth backend session token.';
  *
  * @example
  * ```ts
+ * import { type AuthSession, createHmacSessionTokenCrypto } from "@netscript/plugin-auth-core/ports";
+ *
+ * declare const session: AuthSession;
+ *
  * const cryptoPort = createHmacSessionTokenCrypto(
  *   Deno.env.get("AUTH_SESSION_TOKEN_SECRET")!,
  * );
@@ -236,7 +275,15 @@ export interface AuthBackendPort extends AuthenticatorPort {
    * ```
    */
   readonly interactive?: InteractiveFlowPort;
-  /** Authenticates a service request through the backend. */
+  /**
+   * Authenticates a service request through the backend.
+   *
+   * The request credential must resolve exactly as
+   * `sessions.getSession({ token: readBearerCredential(request), request })` resolves it: a
+   * well-formed `Authorization: Bearer <credential>` takes precedence over the backend session
+   * cookie, and a malformed header is no credential. The auth service `me` and `session`
+   * operations rely on this to answer browsers and service identities alike.
+   */
   authenticate(request: AuthnRequest): Promise<AuthnResult> | AuthnResult;
 }
 
