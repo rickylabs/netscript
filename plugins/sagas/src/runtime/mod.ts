@@ -63,6 +63,7 @@ export type {
 } from '@netscript/plugin-sagas-core/domain';
 export type {
   SagaPublisherBatchMode,
+  SagaPublisherEndpointDiagnostic,
   SagaPublisherPort,
   SagaPublisherPublishManyOptions,
   SagaPublisherPublishOptions,
@@ -117,6 +118,7 @@ export type {
 } from './saga-instance-projection.ts';
 export type {
   HttpSagaPublisherOptions,
+  SagaPublisherEnvKeyLister,
   SagaPublisherEnvReader,
   SagaPublisherFetch,
   SagaPublisherJsonObject,
