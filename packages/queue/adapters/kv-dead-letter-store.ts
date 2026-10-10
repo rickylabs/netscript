@@ -95,8 +95,8 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
   }
 
   /**
-   * Claim stored records before requeue, restoring them when the callback rejects.
-   * A message that fails again during requeue keeps its new terminal record.
+   * Release each identity before requeue, retaining its row until requeue succeeds.
+   * Reprocessing is at-least-once; immediate re-failures keep their new terminal record.
    *
    * @param reenqueue - Adapter-owned requeue callback.
    * @param options - Optional maximum number of records.
@@ -131,34 +131,46 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
       const ownsIdentity = identity !== null &&
         identity.value.length === entry.key.length &&
         identity.value.every((part, index) => part === entry.key[index]);
-      const removed = await kv.atomic(
-        [
-          { key: entry.key, versionstamp: entry.versionstamp },
-          ...(ownsIdentity ? [{ key: identityKey, versionstamp: identity.versionstamp }] : []),
-        ],
-        [
-          { type: 'delete', key: entry.key },
-          ...(ownsIdentity ? [{ type: 'delete' as const, key: identityKey }] : []),
-        ],
-      );
-      // Only the CAS winner may requeue: competing reprocessors skip stale entries before
-      // invoking the callback. Releasing the identity also lets immediate re-failures append.
-      if (!removed.ok) continue;
+      if (ownsIdentity) {
+        const claimed = await kv.atomic(
+          [
+            { key: entry.key, versionstamp: entry.versionstamp },
+            { key: identityKey, versionstamp: identity.versionstamp },
+          ],
+          [{ type: 'delete', key: identityKey }],
+        );
+        // Stale identity claims skip before requeue. The row stays durable throughout the
+        // transfer; a competing legacy-row reprocessor may still requeue it at least once.
+        if (!claimed.ok) continue;
+      }
       try {
         await reenqueue(entry.value);
       } catch (error) {
         if (ownsIdentity) {
-          // Idempotent append restores both keys without overwriting a newer failure.
-          await this.append(entry.value);
-        } else {
-          // A legacy row must be restored even if a different row already owns the identity.
-          await kv.atomic(
-            [{ key: entry.key, versionstamp: null }],
-            [{ type: 'set', key: entry.key, value: entry.value }],
-          );
+          try {
+            // Never overwrite a newer failure's identity or point to a row already removed
+            // by a competitor. If this write fails, the original row remains as a legacy row.
+            await kv.atomic(
+              [
+                { key: entry.key, versionstamp: entry.versionstamp },
+                { key: identityKey, versionstamp: null },
+              ],
+              [{ type: 'set', key: identityKey, value: entry.key }],
+            );
+          } catch (restoreError) {
+            throw new AggregateError(
+              [error, restoreError],
+              'DLQ requeue and identity restore failed',
+            );
+          }
         }
         throw error;
       }
+      const removed = await kv.atomic(
+        [{ key: entry.key, versionstamp: entry.versionstamp }],
+        [{ type: 'delete', key: entry.key }],
+      );
+      if (!removed.ok) continue;
       count++;
     }
     return count;

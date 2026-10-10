@@ -1,5 +1,12 @@
 import { assertEquals, assertRejects } from '@std/assert';
-import { DenoKvAdapter, type KvEntry, type KvKey } from '@netscript/kv';
+import {
+  type AtomicCheck,
+  type AtomicMutation,
+  type AtomicResult,
+  DenoKvAdapter,
+  type KvEntry,
+  type KvKey,
+} from '@netscript/kv';
 import { deadline } from '@std/async';
 import { KvDeadLetterStore } from '../adapters/kv-dead-letter-store.ts';
 import type { DeadLetterRecord } from '../ports/dead-letter.ts';
@@ -74,6 +81,91 @@ Deno.test('KvDeadLetterStore can wrap an injected raw Deno KV lazily', async () 
   }
 });
 
+for (const indexed of [true, false]) {
+  Deno.test(`KvDeadLetterStore retains ${indexed ? 'indexed' : 'legacy'} row when requeue and restore fail`, async () => {
+    const kv = await Deno.openKv(':memory:');
+    const requeueError = new Error('requeue unavailable');
+    const restoreError = new Error('KV writes unavailable');
+    let callbackRan = false;
+    class UnavailableAfterRequeueKv extends DenoKvAdapter {
+      override atomic(checks: AtomicCheck[], mutations: AtomicMutation[]): Promise<AtomicResult> {
+        if (callbackRan) return Promise.reject(restoreError);
+        return super.atomic(checks, mutations);
+      }
+    }
+    const adapter = new UnavailableAfterRequeueKv(kv);
+    try {
+      const store = new KvDeadLetterStore({ queueName: 'jobs', kv: adapter });
+      const record = createRecord('msg-1', '2026-06-20T00:00:01.000Z');
+      if (indexed) {
+        await store.append(record);
+      } else {
+        await kv.set(['queue:dlq', 'jobs', record.failedAt, record.messageId], record);
+      }
+      const error = await assertRejects(() =>
+        store.reprocess(() => {
+          callbackRan = true;
+          return Promise.reject(requeueError);
+        })
+      );
+      assertEquals(callbackRan, true);
+      assertEquals(
+        await store.depth(),
+        1,
+        'a failed restore must never be needed to retain the row',
+      );
+      assertEquals(await store.list(), [record]);
+      assertEquals((await kv.get(['queue:dlq:identity', 'jobs', record.messageId])).value, null);
+      if (indexed) {
+        assertEquals(error instanceof AggregateError, true);
+        if (error instanceof AggregateError) {
+          assertEquals(error.errors, [requeueError, restoreError]);
+        }
+      } else {
+        assertEquals(error, requeueError);
+      }
+      callbackRan = false;
+      assertEquals(
+        await store.reprocess(() => Promise.resolve()),
+        1,
+        'the row remains reprocessable',
+      );
+      assertEquals(await store.depth(), 0);
+    } finally {
+      await adapter.close();
+    }
+  });
+}
+
+Deno.test('KvDeadLetterStore retains the row when deletion after successful requeue fails', async () => {
+  const kv = await Deno.openKv(':memory:');
+  let callbackRan = false;
+  class UnavailableAfterRequeueKv extends DenoKvAdapter {
+    override atomic(checks: AtomicCheck[], mutations: AtomicMutation[]): Promise<AtomicResult> {
+      if (callbackRan) return Promise.reject(new Error('KV writes unavailable'));
+      return super.atomic(checks, mutations);
+    }
+  }
+  const adapter = new UnavailableAfterRequeueKv(kv);
+  try {
+    const store = new KvDeadLetterStore({ queueName: 'jobs', kv: adapter });
+    const record = createRecord('msg-1', '2026-06-20T00:00:01.000Z');
+    await store.append(record);
+    await assertRejects(() =>
+      store.reprocess(() => {
+        callbackRan = true;
+        return Promise.resolve();
+      })
+    );
+    assertEquals(await store.list(), [record]);
+    callbackRan = false;
+    assertEquals(await store.reprocess(() => Promise.resolve()), 1);
+    assertEquals(await store.depth(), 0);
+  } finally {
+    await adapter.close();
+  }
+});
+
 for (const backend of ['memory', 'kv'] as const) {
   Deno.test(`${backend} DLQ preserves an immediate same-id failure during reprocessing`, async () => {
     const kv = await Deno.openKv(':memory:');
@@ -109,13 +201,13 @@ for (const backend of ['memory', 'kv'] as const) {
         Error,
         'requeue failed after delivery',
       );
-      assertEquals(await store.list(), [next]);
+      assertEquals(await store.list(), backend === 'kv' ? [first, next] : [next]);
     } finally {
       kv.close();
     }
   });
 
-  Deno.test(`${backend} DLQ admits only one reprocessor per stored record`, async () => {
+  Deno.test(`${backend} DLQ competing reprocessors preserve the delivery guarantee`, async () => {
     const kv = await Deno.openKv(':memory:');
     try {
       const store = backend === 'kv'
@@ -134,12 +226,12 @@ for (const backend of ['memory', 'kv'] as const) {
               callbacks++;
               return Promise.resolve();
             }),
-            0,
+            backend === 'kv' ? 1 : 0,
           );
         }),
-        1,
+        backend === 'kv' ? 0 : 1,
       );
-      assertEquals(callbacks, 1);
+      assertEquals(callbacks, backend === 'kv' ? 2 : 1);
       assertEquals(await store.depth(), 0);
     } finally {
       kv.close();
