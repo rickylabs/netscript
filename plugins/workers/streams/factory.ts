@@ -8,8 +8,12 @@
  * @module
  */
 
-import { type Collection, createStreamDB } from '@durable-streams/state/db';
-import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
+import {
+  buildStreamUrl,
+  createStreamDB,
+  getStreamsAuth,
+  type StreamCollection,
+} from '@netscript/plugin-streams-core';
 import { type WorkerExecution, type WorkerJob, workersStreamSchema } from './schema.ts';
 
 export type { WorkerExecution, WorkerJob };
@@ -19,9 +23,9 @@ export type WorkersStreamDB = Readonly<{
   /** Live collection handles keyed by workers stream entity name. */
   readonly collections: Readonly<{
     /** Worker execution collection handle. */
-    readonly execution: Collection<WorkerExecution, string>;
+    readonly execution: StreamCollection<WorkerExecution>;
     /** Worker job collection handle. */
-    readonly job: Collection<WorkerJob, string>;
+    readonly job: StreamCollection<WorkerJob>;
   }>;
 }>;
 

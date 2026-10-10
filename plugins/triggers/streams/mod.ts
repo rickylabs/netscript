@@ -71,3 +71,5 @@ export type {
   TriggerStreamCollectionHelpers,
   TriggerStreamEntity,
 } from './schema.ts';
+
+export { createStreamDB, type StreamCollection } from '@netscript/plugin-streams-core';

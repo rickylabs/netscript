@@ -7,5 +7,9 @@ Deno.test('all four public StreamDB factories preserve live-query entity and lif
     stdout: 'piped',
     stderr: 'piped',
   }).output();
-  assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+  const diagnostics = new TextDecoder().decode(output.stderr)
+    .split('\n')
+    .filter((line) => /(?:TS\d+ \[ERROR\]|^error:|^Found \d+ errors?)/.test(line))
+    .join('\n');
+  assertEquals(output.code, 0, diagnostics);
 });

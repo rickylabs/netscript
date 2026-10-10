@@ -4320,6 +4320,8 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/async@1",
           "jsr:@std/path@1",
+          "jsr:@std/testing@1",
+          "npm:@tanstack/react-db@0.1.95",
           "npm:zod@^4.4.3"
         ],
         "packageJson": {

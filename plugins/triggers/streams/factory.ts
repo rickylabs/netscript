@@ -8,8 +8,12 @@
  */
 
 import { createStateSchema } from '@durable-streams/state';
-import { type Collection, createStreamDB } from '@durable-streams/state/db';
-import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
+import {
+  buildStreamUrl,
+  createStreamDB,
+  getStreamsAuth,
+  type StreamCollection,
+} from '@netscript/plugin-streams-core';
 import {
   type TriggerEvent,
   type TriggersStreamDefinition,
@@ -21,7 +25,7 @@ export type { TriggerEvent };
 
 /** Browser StreamDB collections exposed by the triggers stream client. */
 export type TriggersStreamCollections = Readonly<{
-  triggerEvent: Collection<TriggerStreamEntity, string>;
+  triggerEvent: StreamCollection<TriggerStreamEntity>;
 }>;
 
 /** Browser StreamDB handle for trigger event entities. */

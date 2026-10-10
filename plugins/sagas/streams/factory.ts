@@ -8,8 +8,12 @@
  */
 
 import { createStateSchema } from '@durable-streams/state';
-import { type Collection, createStreamDB } from '@durable-streams/state/db';
-import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
+import {
+  buildStreamUrl,
+  createStreamDB,
+  getStreamsAuth,
+  type StreamCollection,
+} from '@netscript/plugin-streams-core';
 import { z } from 'zod';
 import { type SagaInstance, SagaInstanceSchema } from './schema.ts';
 
@@ -20,7 +24,7 @@ export interface SagasStreamDB {
   /** TanStack DB collections keyed by saga stream entity name. */
   readonly collections: {
     /** Saga instance collection created by the durable streams client. */
-    readonly sagaInstance: Collection<SagaInstance, string>;
+    readonly sagaInstance: StreamCollection<SagaInstance>;
   };
   /** Connect and preload stream state into the collections. */
   preload(): Promise<void>;

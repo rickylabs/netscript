@@ -7,8 +7,12 @@
  * @module
  */
 
-import { type Collection, createStreamDB } from '@durable-streams/state/db';
-import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
+import {
+  buildStreamUrl,
+  createStreamDB,
+  getStreamsAuth,
+  type StreamCollection,
+} from '@netscript/plugin-streams-core';
 import { type AuthSession, authStreamSchema } from './schema.ts';
 
 export type { AuthSession };
@@ -18,7 +22,7 @@ export interface AuthStreamDB {
   /** TanStack DB collections keyed by auth stream entity name. */
   readonly collections: {
     /** Auth session collection created by the durable streams client. */
-    readonly authSession: Collection<AuthSession, string>;
+    readonly authSession: StreamCollection<AuthSession>;
   };
   /** Connect and preload stream state into the collections. */
   preload(): Promise<void>;

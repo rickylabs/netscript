@@ -1,6 +1,6 @@
 /** Compile-only consumer proof: hooks are type-checked, never invoked outside React. */
-import { assertType, type IsExact } from 'jsr:@std/testing@1/types';
-import { useLiveQuery } from 'npm:@tanstack/react-db@0.1.95';
+import { assertType, type IsExact } from '@std/testing/types';
+import { useLiveQuery } from '@tanstack/react-db';
 import type { CollectionStatus } from '@tanstack/db';
 import {
   createWorkersStreamDB,
