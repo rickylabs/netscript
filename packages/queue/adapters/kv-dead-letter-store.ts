@@ -95,7 +95,8 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
   }
 
   /**
-   * Re-enqueue stored records and delete each record after successful requeue.
+   * Claim stored records before requeue, restoring them when the callback rejects.
+   * A message that fails again during requeue keeps its new terminal record.
    *
    * @param reenqueue - Adapter-owned requeue callback.
    * @param options - Optional maximum number of records.
@@ -109,19 +110,27 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
     if (!kv.atomic) {
       throw new QueueConfigurationError('KV dead-letter storage requires atomic compare-and-swap');
     }
+    // Bound the streaming traversal to the current tail. Later failures stay for the next call,
+    // even when the KV iterator fetches another batch after a requeue callback runs.
+    let end: KvKey | undefined;
+    for await (const entry of kv.list({ prefix: this.prefix, reverse: true, limit: 1 })) {
+      end = [...entry.key, ''];
+    }
+    if (!end) return 0;
     let count = 0;
     for await (
       const entry of kv.list<DeadLetterRecord<T>>({
         prefix: this.prefix,
         limit: options.limit,
+        end,
       })
     ) {
-      await reenqueue(entry.value);
       const identityKey = this.identityKey(entry.value.messageId);
       const identity = await kv.get<KvKey>(identityKey);
       // Legacy rows have no index. Never delete an index that points to a different row.
       const ownsIdentity = identity !== null &&
-        JSON.stringify(identity.value) === JSON.stringify(entry.key);
+        identity.value.length === entry.key.length &&
+        identity.value.every((part, index) => part === entry.key[index]);
       const removed = await kv.atomic(
         [
           { key: entry.key, versionstamp: entry.versionstamp },
@@ -132,7 +141,24 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
           ...(ownsIdentity ? [{ type: 'delete' as const, key: identityKey }] : []),
         ],
       );
+      // Only the CAS winner may requeue: competing reprocessors skip stale entries before
+      // invoking the callback. Releasing the identity also lets immediate re-failures append.
       if (!removed.ok) continue;
+      try {
+        await reenqueue(entry.value);
+      } catch (error) {
+        if (ownsIdentity) {
+          // Idempotent append restores both keys without overwriting a newer failure.
+          await this.append(entry.value);
+        } else {
+          // A legacy row must be restored even if a different row already owns the identity.
+          await kv.atomic(
+            [{ key: entry.key, versionstamp: null }],
+            [{ type: 'set', key: entry.key, value: entry.value }],
+          );
+        }
+        throw error;
+      }
       count++;
     }
     return count;

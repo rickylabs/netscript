@@ -72,7 +72,8 @@ export class MemoryDeadLetterStore<T = unknown> implements DeadLetterStorePort<T
   }
 
   /**
-   * Re-enqueue records and remove successfully re-enqueued entries.
+   * Claim records before requeue, restoring them when the callback rejects.
+   * A message that fails again during requeue keeps its new terminal record.
    *
    * @param reenqueue - Callback that requeues a record.
    * @param options - Optional maximum number of records.
@@ -83,11 +84,21 @@ export class MemoryDeadLetterStore<T = unknown> implements DeadLetterStorePort<T
     options: { limit?: number } = {},
   ): Promise<number> {
     const selected = await this.list(options);
+    let count = 0;
     for (const record of selected) {
-      await reenqueue(record);
-      this.records.delete(JSON.stringify([record.queueName, record.messageId]));
+      const key = JSON.stringify([record.queueName, record.messageId]);
+      // A competing reprocessor may have claimed this snapshot entry already.
+      if (this.records.get(key) !== record) continue;
+      this.records.delete(key);
+      try {
+        await reenqueue(record);
+      } catch (error) {
+        await this.append(record);
+        throw error;
+      }
+      count++;
     }
-    return selected.length;
+    return count;
   }
 
   /**
