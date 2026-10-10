@@ -192,7 +192,7 @@ function renderFollowUps(payload: CanaryPayload, repo: string): string {
 export function publicReleaseText(text: string): string {
   return text
     .replace(
-      /(?:~\/|\/(?:home|Users|ephemeral|tmp|mnt)\/|[A-Z]:\\)[^\s\x60<>"']*/gi,
+      /(?:~\/|\/(?:home|Users|ephemeral|tmp|mnt|root|var|opt|workspace|srv|etc)\/|[A-Z]:\\)[^\s\x60<>"']*/gi,
       '[private path]',
     )
     .replace(/\b(?:session|thread)[-_ ]?id\s*[:=]\s*[^\s,;]+/gi, '[private identifier]')
@@ -201,11 +201,15 @@ export function publicReleaseText(text: string): string {
       /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi,
       '[private identifier]',
     )
-    .replace(/\b(?:hostname|host)\s*[:=]\s*[\w.-]+/gi, '[private host]')
-    .replace(
-      /https?:\/\/(?!github\.com(?:\/|\b)|jsr\.io(?:\/|\b))[^\s)\]<>]+/gi,
-      '[external address]',
-    )
+    .replace(/\b(?:hostname|host)\s*[:=]\s*[^\s,;]+/gi, '[private host]')
+    .replace(/https?:\/\/[^\s)\]<>]+/gi, (address) => {
+      try {
+        const hostname = new URL(address).hostname;
+        return ['github.com', 'jsr.io'].includes(hostname) ? address : '[external address]';
+      } catch {
+        return '[external address]';
+      }
+    })
     .replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g, '[private host]')
     .replace(/\b(?:localhost|[\w-]+\.(?:local|internal|lan))(?::\d+)?\b/gi, '[private host]');
 }

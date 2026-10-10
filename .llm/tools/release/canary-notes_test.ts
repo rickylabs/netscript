@@ -8,6 +8,7 @@ import {
 import {
   type CanaryNoteContext,
   migrationNote,
+  publicReleaseText,
   referencedIssues,
   releaseClosingIssues,
 } from './canary-notes.ts';
@@ -239,6 +240,10 @@ Deno.test('public release output removes private metadata from titles migration 
   for (const privateText of [path, host, 'private-identity']) {
     assertEquals(note.includes(privateText), false, privateText);
   }
+  assertEquals(
+    publicReleaseText('https://github.com.private-machine.internal/detail'),
+    '[external address]',
+  );
   assertStringIncludes(note, '[private path]');
   assertStringIncludes(note, '[private identifier]');
   assertStringIncludes(note, `https://github.com/${repo}/pull/1`);
