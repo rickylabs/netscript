@@ -19,8 +19,8 @@ scripts, the tracing surface, and the test contract harness:
 - [`@netscript/database/ports`](#ports) — adapter contracts and shared types.
 - [`@netscript/database/adapters`](#adapters) — PostgreSQL adapter (default driver surface).
 - [`@netscript/database/adapters/postgres`](#postgresql-adapter) — PostgreSQL driver adapter.
-- [`@netscript/database/connection-strings/postgres`](#postgresql-connection-strings) — dependency-free
-  connection-string normalization.
+- [`@netscript/database/connection-strings/postgres`](#postgresql-connection-strings) —
+  dependency-free connection-string normalization.
 - [`@netscript/database/adapters/mssql`](#sql-server-adapter) — SQL Server driver adapter.
 - [`@netscript/database/adapters/mysql`](#mysql-adapter) — MySQL driver adapter.
 - [`@netscript/database/extensions`](#extensions) — Prisma JSON serialization extensions.
