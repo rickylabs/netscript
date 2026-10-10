@@ -2,11 +2,15 @@
 
 import { assert } from '@std/assert';
 import type { MemoryKvAdapter } from '@netscript/kv';
+import type { Principal } from '@netscript/plugin-auth-core/domain';
+import type { ResolvedAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
+import type { AuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import { createPluginService } from '../../../../packages/plugin/src/service/mod.ts';
 import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
 import { router } from '../../services/src/router.ts';
 import { currentAuthRequest, withAuthRequest } from '../../services/src/request-context.ts';
+import { createAuthServiceGuard } from '../../services/src/auth-guard.ts';
 import {
   AUTH_TEST_USERINFO_SUBJECT_ENV,
   authTestUrl,
@@ -14,7 +18,7 @@ import {
 } from './auth-fixtures.ts';
 
 /** Backend registry type returned by the auth service composition root. */
-export type AuthTestRegistry = Awaited<ReturnType<typeof createAuthServiceBackendRegistry>>;
+export type AuthTestRegistry = ResolvedAuthBackendRegistry;
 
 /** A running in-process auth service bound to a discoverable service name. */
 export interface AuthTestService extends AsyncDisposable {
@@ -37,7 +41,9 @@ export async function createKvOAuthTestRegistry(kv: MemoryKvAdapter): Promise<Au
       NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
       NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
       NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
-      NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
+      NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS: 'true',
+      // This fixture explicitly models a TLS proxy that replaces protocol headers.
+      NETSCRIPT_AUTH_TRUST_PROXY_HEADERS: 'true',
       ...AUTH_TEST_USERINFO_SUBJECT_ENV,
     },
     fetch: syntheticProviderFetch(),
@@ -70,15 +76,18 @@ export async function mintTestSession(registry: AuthTestRegistry): Promise<strin
 }
 
 /** Serve the real auth router (RPC + OpenAPI) on an ephemeral port, as `main.ts` wires it. */
-export async function serveAuthTestService(registry: AuthTestRegistry): Promise<AuthTestService> {
+export async function serveAuthTestService(
+  registry: AuthTestRegistry,
+  telemetry?: AuthTelemetry,
+): Promise<AuthTestService> {
   const running = await createPluginService(router, {
-    auth: { public: true, reason: 'Fixture for existing public service behavior' },
+    auth: createAuthServiceGuard(registry),
     name: 'auth',
     version: '0.0.0',
     port: 0,
     openApi: { title: 'Auth API', description: 'Auth service test fixture' },
     middleware: [withAuthRequest],
-    context: () => ({ registry, request: currentAuthRequest() }),
+    context: () => ({ registry, telemetry, request: currentAuthRequest() }),
     traceContext: false,
   }).serve({ port: 0 });
   const baseUrl = `http://127.0.0.1:${running.addr.port}`;
@@ -92,4 +101,15 @@ export async function serveAuthTestService(registry: AuthTestRegistry): Promise<
       Deno.env.delete(`services__${serviceName}__http__0`);
     },
   };
+}
+
+/** Resolve the principal the service guard would authenticate for `sessionId`. */
+export async function principalForSession(
+  registry: AuthTestRegistry,
+  sessionId: string,
+): Promise<Principal> {
+  const backend = registry.resolveBackend();
+  const authSession = await backend.sessions.getSession({ sessionId });
+  assert(authSession, `fixture session ${sessionId} must exist`);
+  return backend.principalMapper.mapSessionToPrincipal(authSession).principal;
 }

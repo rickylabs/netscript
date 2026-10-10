@@ -3,7 +3,16 @@
  *
  * @example
  * ```typescript
- * import { createOpenAPISpec, createScalarDocs, createScalarJs } from '@netscript/service';
+ * import type { Hono } from 'hono';
+ * import {
+ *   createOpenAPISpec,
+ *   createScalarDocs,
+ *   createScalarJs,
+ *   type ServiceRouter,
+ * } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const router: ServiceRouter;
  *
  * app.get('/api/openapi.json', createOpenAPISpec(router, {
  *   title: 'Users API',
@@ -174,6 +183,12 @@ function projectProcedureAccess(
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ * import type { ServiceRouter } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const router: ServiceRouter;
+ *
  * app.get('/api/openapi.json', createOpenAPISpec(router, {
  *   title: 'Users API',
  *   version: '1.0.0',
@@ -209,6 +224,10 @@ export function createOpenAPISpec<T extends ServiceRouter>(
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ *
+ * declare const app: Hono;
+ *
  * app.get('/api/docs', createScalarDocs({
  *   specUrl: '/api/openapi.json',
  *   title: 'Users API',
@@ -257,6 +276,10 @@ export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ *
+ * declare const app: Hono;
+ *
  * app.get('/api/docs/scalar.js', createScalarJs());
  * ```
  */

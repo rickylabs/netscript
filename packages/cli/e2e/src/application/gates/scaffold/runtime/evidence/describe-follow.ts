@@ -1,6 +1,5 @@
-import { join } from '@std/path';
-import { disableAnonymousDashboard } from '../dashboard-config.ts';
-import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adapters/database/operations/operation-runner-helpers.ts';
+import { captureAspireStartAndDescribe, captureDescribeFollow } from './describe-capture.ts';
+export { captureAspireStartAndDescribe, captureDescribeFollow } from './describe-capture.ts';
 
 const READY_STATES: readonly string[] = ['Healthy', 'Ready', 'Running', 'Finished'];
 
@@ -136,92 +135,6 @@ export function assertDescribeResource(
   return resource;
 }
 
-/** Start Aspire and capture a bounded describe-follow stream through resource convergence. */
-export async function captureAspireStartAndDescribe(
-  appHost: string,
-  projectRoot: string,
-  expectedResources: readonly string[],
-  minimumTimeoutSeconds = 0,
-): Promise<void> {
-  await disableAnonymousDashboard(appHost);
-  const start = await commandOutput('aspire', [
-    'start',
-    '--apphost',
-    appHost,
-    '--isolated',
-    '--non-interactive',
-    '--nologo',
-    '--format',
-    'Json',
-  ]);
-  const metadata: unknown = JSON.parse(extractJson(start));
-  const stateDir = join(projectRoot, '.netscript', 'e2e');
-  const startPath = join(stateDir, 'aspire-start.json');
-  const describePath = join(stateDir, 'aspire-describe.ndjson');
-  await Deno.mkdir(stateDir, { recursive: true });
-  await Deno.writeTextFile(startPath, `${JSON.stringify(metadata, null, 2)}\n`);
-  await captureDescribeFollow(appHost, describePath, expectedResources, minimumTimeoutSeconds);
-  console.info(`Aspire describe evidence: ${describePath}`);
-}
-
-/** Capture a bounded describe-follow stream until the expected resource set converges. */
-export async function captureDescribeFollow(
-  appHost: string,
-  describePath: string,
-  expectedResources: readonly string[],
-  minimumTimeoutSeconds = 0,
-): Promise<void> {
-  await Deno.writeTextFile(describePath, '');
-  const timeoutSeconds = Math.max(resolveDbCliTimeoutSeconds(), minimumTimeoutSeconds);
-  const child = new Deno.Command('aspire', {
-    args: [
-      'describe',
-      '--follow',
-      '--format',
-      'Json',
-      '--apphost',
-      appHost,
-      '--non-interactive',
-      '--nologo',
-    ],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).spawn();
-  let timedOut = false;
-  let converged = false;
-  let accumulated = '';
-  const timeout = setTimeout(() => {
-    timedOut = true;
-    child.kill('SIGTERM');
-  }, timeoutSeconds * 1_000);
-  try {
-    for await (const line of lines(child.stdout)) {
-      if (!line.trim()) continue;
-      accumulated += `${line}\n`;
-      await Deno.writeTextFile(describePath, `${line}\n`, { append: true });
-      try {
-        evaluateDescribeFollow(accumulated, expectedResources);
-        converged = true;
-        child.kill('SIGTERM');
-        break;
-      } catch (error) {
-        if (!(error instanceof Error) || !isPendingConvergence(error.message)) throw error;
-      }
-    }
-    const status = await child.status;
-    if (!converged) {
-      const stderr = new TextDecoder().decode(await new Response(child.stderr).arrayBuffer())
-        .trim();
-      const reason = timedOut
-        ? `timed out after ${timeoutSeconds}s`
-        : `exited ${status.code}${stderr ? `: ${stderr}` : ''}`;
-      throw new Error(`aspire describe --follow did not converge: ${reason}`);
-    }
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
 function resources(value: unknown, lineIndex: number): DescribeResourceObservation[] {
   const root = record(value, `describe line ${lineIndex + 1}`);
   const wrapped = Reflect.has(root, 'resources');
@@ -330,37 +243,6 @@ function healthReports(
   return reports;
 }
 
-async function* lines(stream: ReadableStream<Uint8Array>): AsyncGenerator<string> {
-  let buffered = '';
-  const decoder = new TextDecoder();
-  for await (const chunk of stream) {
-    buffered += decoder.decode(chunk, { stream: true });
-    const parts = buffered.split(/\r?\n/);
-    buffered = parts.pop() ?? '';
-    for (const line of parts) yield line;
-  }
-  buffered += decoder.decode();
-  if (buffered) yield buffered;
-}
-
-async function commandOutput(command: string, args: readonly string[]): Promise<string> {
-  const output = await new Deno.Command(command, {
-    args: [...args],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
-  const stdout = new TextDecoder().decode(output.stdout);
-  const stderr = new TextDecoder().decode(output.stderr).trim();
-  if (!output.success) throw new Error(`${command} ${args.join(' ')} failed: ${stderr || stdout}`);
-  return stdout;
-}
-
-function extractJson(output: string): string {
-  const index = output.indexOf('{');
-  if (index < 0) throw new Error('aspire start did not emit JSON');
-  return output.slice(index);
-}
-
 function nullableString(
   source: Record<string, unknown>,
   key: string,
@@ -390,7 +272,8 @@ function isReadyState(state: string): boolean {
   return READY_STATES.some((candidate) => candidate.toLowerCase() === state.toLowerCase());
 }
 
-function isPendingConvergence(message: string): boolean {
+/** Whether a valid describe stream still awaits resources or healthy states. */
+export function isPendingConvergence(message: string): boolean {
   return message.includes('omitted resources:') || message.includes('did not converge:');
 }
 

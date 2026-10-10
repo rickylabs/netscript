@@ -49,6 +49,12 @@ export class DuplicatePromptSectionError extends AiError {
  *
  * @example Compose catalog, skills, and app instructions
  * ```ts
+ * import { composeSystemPrompt } from "@netscript/ai";
+ *
+ * declare const componentCatalog: string;
+ * declare const skillsSystemBlock: string;
+ * declare const appInstructions: string;
+ *
  * const system = composeSystemPrompt([
  *   { name: "catalog", precedence: 20, content: componentCatalog },
  *   { name: "skills", precedence: 10, content: skillsSystemBlock },

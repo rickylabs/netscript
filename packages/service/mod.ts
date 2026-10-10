@@ -40,7 +40,9 @@
  *
  * @example Customize the builder before serving.
  * ```typescript
- * import { createService } from '@netscript/service';
+ * import { createService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
  *
  * const service = await createService(router, { name: 'custom' })
  *   .withCors({ origin: 'https://example.com' })
@@ -56,7 +58,11 @@
  *
  * @example Use health primitives directly in a host app.
  * ```typescript
- * import { createHealthHandler, healthChecks } from '@netscript/service';
+ * import type { Hono } from 'hono';
+ * import { createHealthHandler, type Database, healthChecks } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const db: Database;
  *
  * app.get('/health', createHealthHandler({
  *   checks: [healthChecks.database(db)],
@@ -83,6 +89,7 @@ export type {
   AuthzOptions,
   ContractAuthorizerOptions,
   ContractAuthorizerRawRoute,
+  ContractOverlayAuthorizerOptions,
   ServiceAuthPolicy,
   ServiceGuardedAuthPolicy,
   ServicePublicAuthPolicy,
@@ -94,12 +101,14 @@ export type {
   ContractPolicyBindingOptions,
   ContractPolicyContract,
   ContractPolicyRpcRouteAlias,
+  InternalCallerPredicate,
   ProcedureAccessPolicy,
   ProcedurePolicyRequest,
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
-} from './src/auth/contract-policy.ts';
+} from './src/auth/contract/contract-policy.ts';
 export { createContractAuthorizer } from './src/auth/contract/contract-authorizer.ts';
+export { createContractOverlayAuthorizer } from './src/auth/contract/contract-overlay-authorizer.ts';
 export type {
   AuthenticatorPort,
   AuthnRequest,

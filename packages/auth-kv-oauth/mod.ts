@@ -29,6 +29,7 @@ export {
   type OAuthProviderInput,
   type OAuthSubjectSource,
   type PresetOAuthProviderOptions,
+  presetProviderKind,
   presetSubjectSource,
   type TenantOAuthProviderOptions,
 } from './src/providers.ts';
@@ -103,6 +104,8 @@ export type {
   AuthSessionPrincipalMapping,
   AuthSessionState,
   AuthSessionStorePort,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
   InteractiveCallbackResult,
   InteractiveFlowPort,
 } from '@netscript/plugin-auth-core';

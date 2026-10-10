@@ -1,4 +1,4 @@
-import { assertEquals, assertMatch, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertMatch, assertRejects } from '@std/assert';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import {
@@ -8,9 +8,9 @@ import {
 import { MemoryKvAdapter } from '@netscript/kv';
 import {
   callback,
+  revokeSession,
   session,
   signin,
-  signout,
 } from '../../../../../../../plugins/auth/services/src/routers/v1-handlers.ts';
 import {
   generateAuthSecret,
@@ -131,6 +131,115 @@ Deno.test('github provider preset writes boot-ready OAuth environment', async ()
   assertEquals(registry.defaultName, 'kv-oauth');
 });
 
+for (const issuer of [undefined, 'https://github.com']) {
+  Deno.test(`GitHub CLI preset skips discovery and resolves userinfo subject (issuer=${issuer})`, async () => {
+    const fs = new MemoryFileSystemAdapter();
+    // Reconfiguring a project must remove its old issuer too.
+    await fs.writeFile('/workspace/.env', "NETSCRIPT_AUTH_ISSUER='https://github.com'\n");
+    await setAuthProvider({
+      projectRoot: '/workspace',
+      preset: 'github',
+      clientId: 'client_test',
+      clientSecret: 'secret_test',
+      redirectUri: 'https://app.test/v1/auth/callback',
+      kvOAuthKey: generateAuthSecret('kv-oauth-key'),
+      issuer,
+    }, fs);
+    const env = Object.fromEntries(
+      (await fs.readFile('/workspace/.env')).trim().split('\n').map((line) => {
+        const separator = line.indexOf('=');
+        return [line.slice(0, separator), line.slice(separator + 1).replaceAll("'", '')];
+      }),
+    );
+    const requests: Request[] = [];
+    const registry = await createAuthServiceBackendRegistry({
+      env,
+      kv: new MemoryKvAdapter(),
+      fetch: (input, init) => {
+        const request = new Request(input, init);
+        requests.push(request);
+        if (request.url === 'https://api.github.com/user') {
+          return Promise.resolve(Response.json({ id: 583231, login: 'octocat' }));
+        }
+        if (request.url === 'https://github.com/login/oauth/access_token') {
+          return Promise.resolve(Response.json({ access_token: 'access', token_type: 'Bearer' }));
+        }
+        throw new Error(`Unexpected provider request: ${request.url}`);
+      },
+    });
+    const started = await signin({}, {
+      registry,
+      request: { url: 'https://app.test/v1/auth/signin' },
+    });
+    const redirect = new URL(started.redirectUrl ?? '');
+    assertEquals(redirect.origin + redirect.pathname, 'https://github.com/login/oauth/authorize');
+    const completed = await callback({
+      code: 'code',
+      state: redirect.searchParams.get('state') ?? undefined,
+    }, {
+      registry,
+      request: { url: `https://app.test/v1/auth/callback?txn=${redirect.searchParams.get('txn')}` },
+    });
+    assertEquals(completed.subject, 'github:583231');
+    assertEquals(env.NETSCRIPT_AUTH_ISSUER, undefined);
+    assertEquals(requests.map((request) => request.url), [
+      'https://github.com/login/oauth/access_token',
+      'https://api.github.com/user',
+    ]);
+    assert(!requests.some((request) => request.url.includes('/.well-known/')));
+    assertEquals(requests[1].headers.get('authorization'), 'Bearer access');
+    assertEquals(requests[1].headers.get('user-agent'), 'netscript-auth-kv-oauth');
+  });
+}
+
+Deno.test('GitHub preset docs describe explicit OAuth endpoints without an issuer', async () => {
+  const docs = await Deno.readTextFile(
+    new URL(
+      '../../../../../../../docs/site/identity-access/how-to/add-authentication.md',
+      import.meta.url,
+    ),
+  );
+  const fs = new MemoryFileSystemAdapter();
+  await setAuthProvider({
+    projectRoot: '/workspace',
+    preset: 'github',
+    clientId: 'client_test',
+    clientSecret: 'secret_test',
+    redirectUri: 'https://app.test/v1/auth/callback',
+  }, fs);
+  const emitted = Object.fromEntries(
+    (await fs.readFile('/workspace/.env')).replaceAll("'", '').trim().split('\n')
+      .map((line) => line.split(/=(.*)/s).slice(0, 2)),
+  );
+  const blocks = [...docs.matchAll(/```(?:dotenv|sh)\n([\s\S]*?)```/g)]
+    .map((match) => match[1])
+    .filter((block) =>
+      /NETSCRIPT_AUTH_PROVIDER_ID=github|https:\/\/(?:api\.)?github\.com/.test(block)
+    );
+  assert(blocks.length > 0, 'GitHub configuration example must exist');
+  const documented = Object.fromEntries(
+    blocks.flatMap((block) =>
+      [...block.matchAll(/^(NETSCRIPT_AUTH_[A-Z_]+)=(.*)$/gm)]
+        .map((match) => [match[1], match[2]])
+    ),
+  );
+  assertEquals(documented.NETSCRIPT_AUTH_ISSUER, undefined);
+  for (const [key, value] of Object.entries(documented)) {
+    assertEquals(value, emitted[key], `GitHub docs must match emitted ${key}`);
+  }
+  for (
+    const key of [
+      'NETSCRIPT_AUTH_PROVIDER_ID',
+      'NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT',
+      'NETSCRIPT_AUTH_TOKEN_ENDPOINT',
+      'NETSCRIPT_AUTH_USERINFO_ENDPOINT',
+      'NETSCRIPT_AUTH_SCOPES',
+    ]
+  ) {
+    assertEquals(documented[key], emitted[key], `GitHub docs must include emitted ${key}`);
+  }
+});
+
 Deno.test('workos and better-auth variants enforce their boot credential contracts', async () => {
   const fs = new MemoryFileSystemAdapter();
   await setAuthProvider({
@@ -182,22 +291,120 @@ Deno.test('session projection parser exposes active sessions', () => {
   assertEquals(sessions.map((session) => session.id), ['session-active', 'session-revoked']);
 });
 
-Deno.test('fetch session adapter lists projections and revokes through signout', async () => {
+Deno.test('fetch session adapter lists projections and revokes through the operator route', async () => {
   const requests: Request[] = [];
   const client = new FetchAuthSessionHttp((input, init) => {
     const request = new Request(input, init);
     requests.push(request);
     if (request.method === 'POST') {
-      return Promise.resolve(Response.json({ signedOut: true, sessionId: 'session-1' }));
+      return Promise.resolve(Response.json({ revoked: true, sessionId: 'session-1' }));
     }
     return Promise.resolve(
       Response.json([{ id: 'session-1', state: 'active', userId: 'user-1' }]),
     );
   });
-  assertEquals((await client.list('http://streams/auth/sessions'))[0].id, 'session-1');
-  assertEquals(await client.revoke('http://auth/api/v1/auth', 'session-1'), 'session-1');
-  assertEquals(requests[1].url, 'http://auth/api/v1/auth/signout');
+  assertEquals(
+    (await client.list('https://streams/auth/sessions', {
+      context: { auth: { getAccessToken: () => 'operator-token' } },
+    }))[0].id,
+    'session-1',
+  );
+  assertEquals(
+    await client.revoke('https://auth/api/v1/auth', 'session-1', {
+      context: { auth: { getAccessToken: () => 'operator-token' } },
+    }),
+    'session-1',
+  );
+  assertEquals(requests[1].url, 'https://auth/api/v1/auth/sessions/revoke');
+  assertEquals(requests[1].headers.get('authorization'), 'Bearer operator-token');
   assertEquals(await requests[1].json(), { sessionId: 'session-1' });
+});
+
+Deno.test('session revoke refuses to run without an operator credential', async () => {
+  let revokeCalls = 0;
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: {
+      list: () => Promise.resolve([]),
+      revoke: (_url, id) => {
+        revokeCalls++;
+        return Promise.resolve(id);
+      },
+    },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+  });
+  const previous = Deno.env.get('NETSCRIPT_AUTH_TOKEN');
+  Deno.env.delete('NETSCRIPT_AUTH_TOKEN');
+  try {
+    await assertRejects(
+      () => command.parse(['session', 'revoke', 'id-1', '--auth-url', 'https://auth.test/api']),
+      Error,
+      'auth:sessions:revoke scope. Set NETSCRIPT_AUTH_TOKEN.',
+    );
+  } finally {
+    if (previous !== undefined) Deno.env.set('NETSCRIPT_AUTH_TOKEN', previous);
+  }
+  assertEquals(revokeCalls, 0);
+});
+
+Deno.test('session list refuses to run without a credential', async () => {
+  let listCalls = 0;
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: {
+      list: () => {
+        listCalls++;
+        return Promise.resolve([]);
+      },
+      revoke: (_url, id) => Promise.resolve(id),
+    },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+  });
+  const previous = Deno.env.get('NETSCRIPT_AUTH_TOKEN');
+  Deno.env.delete('NETSCRIPT_AUTH_TOKEN');
+  try {
+    await assertRejects(
+      () =>
+        command.parse(['session', 'list', '--stream-url', 'https://streams.test/auth/sessions']),
+      Error,
+      'Listing sessions needs a credential. Set NETSCRIPT_AUTH_TOKEN.',
+    );
+  } finally {
+    if (previous !== undefined) Deno.env.set('NETSCRIPT_AUTH_TOKEN', previous);
+  }
+  assertEquals(listCalls, 0);
+});
+
+Deno.test('session commands send the NETSCRIPT_AUTH_TOKEN credential by default', async () => {
+  const credentials: Array<string | undefined> = [];
+  const record = async (options?: AuthSessionRequestOptions) =>
+    credentials.push(await options?.context?.auth?.getAccessToken());
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: {
+      list: async (_url, options) => {
+        await record(options);
+        return [];
+      },
+      revoke: async (_url, id, options) => {
+        await record(options);
+        return id;
+      },
+    },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+    print: () => {},
+  });
+  const token = crypto.randomUUID();
+  const previous = Deno.env.get('NETSCRIPT_AUTH_TOKEN');
+  Deno.env.set('NETSCRIPT_AUTH_TOKEN', token);
+  try {
+    await command.parse(['session', 'list', '--stream-url', 'https://streams.test/auth/sessions']);
+    await command.parse(['session', 'revoke', 'id-1', '--auth-url', 'https://auth.test/api']);
+  } finally {
+    if (previous === undefined) Deno.env.delete('NETSCRIPT_AUTH_TOKEN');
+    else Deno.env.set('NETSCRIPT_AUTH_TOKEN', previous);
+  }
+  assertEquals(credentials, [token, token]);
 });
 
 Deno.test('plugin auth parser drives backend and session verbs', async () => {
@@ -324,17 +531,24 @@ Deno.test('session CLI lists a signed-in backend session and revoke invalidates 
         : [];
     },
     async revoke(_url, sessionId) {
-      const result = await signout({ sessionId }, {
+      const result = await revokeSession({ sessionId }, {
         registry,
-        request: { url: 'https://app.test/v1/auth/signout' },
+        principal: {
+          subject: 'svc-operator',
+          scopes: ['auth:sessions:revoke'],
+          roles: [],
+          scheme: 'bearer',
+          claims: {},
+        },
       });
-      return result.sessionId ?? sessionId;
+      return result.sessionId;
     },
   };
   const output: string[] = [];
   const command = createAuthPluginCommand({
     fs: new MemoryFileSystemAdapter(),
     sessions,
+    resolveSessionContext: () => ({ auth: { getAccessToken: () => 'operator-token' } }),
     resolveProjectRoot: () => Promise.resolve('/workspace'),
     print: (line) => output.push(line),
   });
@@ -354,4 +568,32 @@ Deno.test('session CLI lists a signed-in backend session and revoke invalidates 
 
   assertMatch(output[1], new RegExp(id));
   assertEquals((await session({ sessionId: id }, { registry })).authenticated, false);
+});
+
+Deno.test('provider command reports that an issuer was ignored for an OAuth preset', async () => {
+  const output: string[] = [];
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: { list: () => Promise.resolve([]), revoke: (_url, id) => Promise.resolve(id) },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+    print: (message) => output.push(message),
+  });
+  await command.parse([
+    'provider',
+    'set',
+    '--preset',
+    'github',
+    '--client-id',
+    'client_test',
+    '--client-secret',
+    'secret_test',
+    '--redirect-uri',
+    'https://app.test/callback',
+    '--issuer',
+    'https://github.com',
+  ]);
+  assertEquals(output, [
+    'Ignored --issuer for github: this OAuth preset uses explicit endpoints, not OIDC discovery.',
+    'Configured github.',
+  ]);
 });

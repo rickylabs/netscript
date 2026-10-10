@@ -64,6 +64,11 @@ export interface ValidationResult<T> {
  *
  * @example
  * ```ts
+ * import { safeValidate, type ValidationSchema } from '@netscript/queue';
+ *
+ * declare const MessageSchema: ValidationSchema<{ to: string; body: string }>;
+ * declare const message: unknown;
+ *
  * const result = safeValidate(MessageSchema, message);
  * if (result.success) {
  *   console.log('Valid:', result.data);
@@ -102,6 +107,11 @@ export function safeValidate<T>(
  *
  * @example
  * ```ts
+ * import { validateOrThrow, type ValidationSchema } from '@netscript/queue';
+ *
+ * declare const MessageSchema: ValidationSchema<{ to: string; body: string }>;
+ * declare const message: unknown;
+ *
  * const validated = validateOrThrow(MessageSchema, message, {
  *   queueName: 'notifications',
  * });
@@ -138,6 +148,12 @@ export function validateOrThrow<T>(
  *
  * @example
  * ```ts
+ * import { type MessageQueue, type ValidationSchema, withValidation } from '@netscript/queue';
+ *
+ * declare const MessageSchema: ValidationSchema<{ to: string; body: string }>;
+ * declare const queue: MessageQueue;
+ * declare function processMessage(message: { to: string; body: string }): Promise<void>;
+ *
  * const validatedHandler = withValidation(
  *   MessageSchema,
  *   async (message) => {

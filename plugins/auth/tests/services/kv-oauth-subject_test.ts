@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertRejects, assertThrows } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { MemoryKvAdapter } from '@netscript/kv';
 import {
   createAuthServiceBackendRegistry,
@@ -145,6 +145,8 @@ Deno.test('the local-defaults stub never issues a session-id subject', async () 
     NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
     NETSCRIPT_AUTH_KV_OAUTH_KEY: KV_KEY,
     PORT: SYNTHETIC_PORT,
+    // This subject-only test deliberately exercises the stub's HTTP token endpoint.
+    NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
   };
   // Even if the stub's placeholder token endpoint answered, the subject is still required.
   const registry = await createAuthServiceBackendRegistry({
@@ -165,3 +167,42 @@ Deno.test('the local-defaults stub never issues a session-id subject', async () 
     'NETSCRIPT_AUTH_SUBJECT_SOURCE must be one of id_token, userinfo',
   );
 });
+
+for (const providerId of ['github', 'discord', 'spotify', 'facebook', 'twitter']) {
+  Deno.test(`${providerId} runtime preset ignores a stale issuer and resolves userinfo`, async () => {
+    const requests: string[] = [];
+    const tokenEndpoint = 'https://github.com/login/oauth/access_token';
+    const userInfoEndpoint = 'https://api.github.com/user';
+    const registry = await createAuthServiceBackendRegistry({
+      kv: new MemoryKvAdapter(),
+      env: {
+        NETSCRIPT_AUTH_PROVIDER_ID: providerId,
+        NETSCRIPT_AUTH_TRUST_PROXY_HEADERS: 'true',
+        NETSCRIPT_AUTH_CLIENT_ID: 'client_test',
+        NETSCRIPT_AUTH_CLIENT_SECRET: 'secret_test',
+        NETSCRIPT_AUTH_REDIRECT_URI: authTestUrl('/v1/auth/callback'),
+        NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: 'https://github.com/login/oauth/authorize',
+        NETSCRIPT_AUTH_TOKEN_ENDPOINT: tokenEndpoint,
+        NETSCRIPT_AUTH_USERINFO_ENDPOINT: userInfoEndpoint,
+        NETSCRIPT_AUTH_ISSUER: 'https://github.com',
+        NETSCRIPT_AUTH_KV_OAUTH_KEY: KV_KEY,
+      },
+      fetch: (input) => {
+        const url = input instanceof Request ? input.url : String(input);
+        requests.push(url);
+        if (url === userInfoEndpoint) {
+          return Promise.resolve(Response.json({ id: 583231, data: { id: 583231 } }));
+        }
+        if (url === tokenEndpoint) {
+          return Promise.resolve(
+            Response.json({ access_token: 'access_test', token_type: 'Bearer' }),
+          );
+        }
+        throw new Error(`Unexpected provider request: ${url}`);
+      },
+    });
+    const completed = await completeSignIn(registry);
+    assertEquals(completed.subject, `${providerId}:583231`);
+    assertEquals(requests, [tokenEndpoint, userInfoEndpoint]);
+  });
+}

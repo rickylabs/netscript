@@ -15,6 +15,7 @@ import {
 
 import { IoError, UsageError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import { JSR_SPECIFIERS } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { EXIT_CODES } from '../host/plugin-loader.ts';
 
@@ -37,6 +38,8 @@ export interface NewPluginOptions {
 export interface NewPluginDependencies {
   /** Filesystem adapter used for deterministic artifact writes. */
   readonly fs: FileSystemPort;
+  /** Canonicalizes generated TypeScript so the workspace format gate accepts it. */
+  readonly formatter?: GeneratedSourceFormatterPort;
 }
 
 /** Paths and identifiers derived from a requested plugin name. */
@@ -115,7 +118,10 @@ export async function createNewPlugin(
       }
 
       await dependencies.fs.createDir(dirname(outputPath));
-      await dependencies.fs.writeFile(outputPath, artifactText(artifact));
+      await dependencies.fs.writeFile(
+        outputPath,
+        await canonicalArtifactText(artifact, dependencies.formatter),
+      );
       filesCreated.push(outputPath);
     }
   } catch (error: unknown) {
@@ -128,6 +134,15 @@ export async function createNewPlugin(
   }
 
   return { descriptor, filesCreated, filesSkipped };
+}
+
+async function canonicalArtifactText(
+  artifact: ScaffoldArtifact,
+  formatter: GeneratedSourceFormatterPort | undefined,
+): Promise<string> {
+  const text = artifactText(artifact);
+  if (!formatter || !artifact.path.endsWith('.ts')) return text;
+  return await formatter.formatContent(artifact.path, text);
 }
 
 function buildArtifacts(

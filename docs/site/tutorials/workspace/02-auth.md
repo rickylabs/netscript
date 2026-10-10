@@ -67,12 +67,18 @@ This scaffolds the unified `@netscript/plugin-auth` plugin into `plugins/`, regi
 contributes three things to your workspace: a Prisma schema (`auth.prisma`), a service entry that
 becomes the `auth-api` service, and the `/api/v1/auth/*` routes.
 
-`--port 8094` is what makes the rest of this chapter's `curl`s work. Without it the installer picks a
-port for you and writes it as the resource's `HostPort`, so `auth-api` would answer on some number
-this page cannot print. Pinning has a cost — a pinned host port is a machine-global reservation, so
-`aspire start --isolated` can no longer randomise it away and a second workspace pinning 8094 will
-collide. That is an acceptable trade for a tutorial; for real work, omit `--port` and read the
-endpoint off the dashboard. Confirm it landed:
+`--port 8094` is what makes the rest of this chapter's `curl`s work, and it is what a real OAuth
+callback needs: the provider compares the redirect URI you register against the one the service
+sends, port included. The flag writes `"HostPort": 8094` on the plugin's entry in `appsettings.json`,
+and the generated AppHost passes it to `withHttpEndpoint`. Without it the installer writes no
+`HostPort` and Aspire allocates a host port at every start, so `auth-api` would answer on a number
+this page cannot print — and a different one after each restart. The pin belongs to you, not the
+installer: `netscript plugin update` and a forced re-install without `--port` keep it, and only a new
+`--port` (or editing `HostPort` by hand) changes it. Pinning has a cost — a pinned host port is a
+machine-global reservation, so `aspire start --isolated` can no longer randomise it away and a second
+workspace pinning 8094 will collide. Pin a plugin only when something outside the graph has written
+its address down, as an identity provider does here; otherwise omit `--port` and read the endpoint
+off the dashboard. Confirm it landed:
 
 ```sh
 netscript plugin list
@@ -208,7 +214,7 @@ the auth plugin composes against, confirmed on the package's public surface:
     { name: "createAuthBackendRegistry / resolveBackend", type: "function", desc: "Build a registry of named backends and resolve the single active one (DEFAULT_AUTH_BACKEND_NAME is the fallback)." },
     { name: "AuthSession", type: "type", desc: "The normalized session the store persists — id, subject, state, scopes, claims, issuedAt / expiresAt." },
     { name: "createHmacSessionTokenCrypto", type: "function", desc: "HMAC-signs the opaque session token so the cookie value cannot be forged." },
-    { name: "authContractV1", type: "contract", desc: "The five-route auth contract: signin, signout, callback, session, me." }
+    { name: "authContractV1", type: "contract", desc: "The six-route auth contract: signin, signout, revokeSession, callback, session, me." }
   ]
 }) }}
 
@@ -229,20 +235,37 @@ curl http://localhost:8094/api/v1/auth/session
 curl http://localhost:8094/api/v1/auth/me
 ```
 
-To exercise the full interactive flow on `kv-oauth`, drive the redirect from a browser: open
-`POST /api/v1/auth/signin` (the service issues the provider redirect), authenticate with your
-provider, let it call back to `/api/v1/auth/callback`, then re-check the session with the cookie the
-flow set:
+For the plain-HTTP loopback recipe, set these host environment variables before starting or
+restarting `auth-api`, alongside the provider configuration in Step 4:
 
 ```sh
-# After completing the browser sign-in, the __Host-ns_session cookie is set.
+export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true
+export NETSCRIPT_AUTH_COOKIE_NAME=ns_session_dev
+```
+
+The unprefixed development name lets curl save the cookie on HTTP; clients reject an insecure
+`__Host-` cookie. Remove both overrides and use HTTPS for production.
+
+For the full interactive round trip, follow the
+[cookie-jar signin and callback sequence](/identity-access/how-to/add-authentication/#step-7-verify-a-session).
+`POST /api/v1/auth/signin` returns JSON containing `redirectUrl` and sets the
+transaction cookie. After provider authentication, post its `code` and `state`
+to `POST /api/v1/auth/callback` with that cookie; the callback sets the session
+cookie. The application must bridge a provider's GET redirect to that POST
+endpoint. Both REST and RPC preserve the backend cookie headers.
+
+```sh
+# After callback, cookies.txt contains the session cookie saved with curl -c.
+# No session id in the body or query is needed.
 curl -b cookies.txt http://localhost:8094/api/v1/auth/session
 curl -b cookies.txt http://localhost:8094/api/v1/auth/me
 ```
 
-A successful `GET /api/v1/auth/me` after sign-in returns `{ authenticated: true, user, session }`.
-That round trip is the proof the backend is composed, the migration is applied, and the provider
-credentials are correct.
+Use HTTPS outside explicit insecure local development. A successful
+`GET /api/v1/auth/me` after sign-in returns
+`{ authenticated: true, user, session }`. The callback retains `sessionId` for
+existing bearer consumers, but this cookie flow does not need to pass it by
+hand.
 
 - [ ] `netscript plugin list` shows the `auth` plugin.
 - [ ] `netscript db status` reports the `auth.prisma` migration applied.

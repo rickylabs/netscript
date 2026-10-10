@@ -15,6 +15,8 @@ import { getLogger, type Logger } from '@logtape/logtape';
  * ```typescript
  * import { createServiceLogger } from '@netscript/logger';
  *
+ * declare const error: Error;
+ *
  * const logger = createServiceLogger('users');
  * logger.info('Service starting');
  * logger.error('Failed to connect to database', { error });
@@ -36,6 +38,8 @@ export function createServiceLogger(serviceName: string): Logger {
  * ```typescript
  * import { createPackageLogger } from '@netscript/logger';
  *
+ * declare const key: string;
+ *
  * const logger = createPackageLogger('kv');
  * logger.debug('Cache miss', { key });
  * ```
@@ -55,6 +59,8 @@ export function createPackageLogger(packageName: string): Logger {
  * @example
  * ```typescript
  * import { createWorkerLogger } from '@netscript/logger';
+ *
+ * declare const jobId: string;
  *
  * const logger = createWorkerLogger('executor');
  * logger.info('Executing job', { jobId });

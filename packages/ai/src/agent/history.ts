@@ -74,6 +74,11 @@ function normalizedEstimate(estimator: TokenEstimator, message: Readonly<Message
  *
  * @example
  * ```ts
+ * import { slidingWindowHistory } from "@netscript/ai/agent";
+ * import type { Message } from "@netscript/ai/contracts";
+ *
+ * declare const fullTranscript: Message[];
+ *
  * const strategy = slidingWindowHistory({ maxMessages: 8 });
  * const windowed = strategy.apply(fullTranscript);
  * ```
@@ -113,6 +118,10 @@ export function slidingWindowHistory(options: SlidingWindowOptions = {}): Histor
  * @example
  * ```ts
  * import { tokenBudgetHistory } from "@netscript/ai/agent";
+ * import type { Message } from "@netscript/ai/contracts";
+ *
+ * declare const tokenizer: { encode(text: string): number[] };
+ * declare const fullTranscript: Message[];
  *
  * const strategy = tokenBudgetHistory({
  *   budget: 8_000,
