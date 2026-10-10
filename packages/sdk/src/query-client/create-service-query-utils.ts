@@ -114,16 +114,12 @@ export interface CreateServiceQueryUtilsOptions {
  *
  * @example
  * ```ts
+ * import { createServiceQueryUtils } from '@netscript/sdk/query-client';
  * import { ordersClient } from '@app/lib/orders.ts';
+ * import { useQuery } from '@tanstack/preact-query';
  *
- * const ordersQueryUtils = createServiceQueryUtils(ordersClient, {
- *   path: ['orders'],
- * });
- *
- * const listOptions = ordersQueryUtils.list.queryOptions({
- *   input: { offset: 0, limit: 20 },
- * });
- * console.log(listOptions.queryKey);
+ * const utils = createServiceQueryUtils(ordersClient);
+ * const query = useQuery(utils.list.queryOptions({ input: { offset: 0, limit: 20 } }));
  * ```
  *
  * @typeParam TContract - Contract used by the service client.

@@ -66,6 +66,7 @@ export type {
 export type {
   QueryClientFetchOptions,
   QueryClientFilters,
+  QueryClientPort,
   QueryClientPredicate,
   QueryClientSetOptions,
 } from '../ports/query-client.ts';
