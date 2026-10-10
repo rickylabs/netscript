@@ -3,7 +3,7 @@
   "name": "@netscript/plugin-streams",
   "version": "0.0.7",
   "displayName": "Streams (ephemeral by default)",
-  "description": "Ephemeral streams service with restart-proven file storage opt-in via STREAMS_DATA_DIR.",
+  "description": "Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.",
   "peerDependencies": {
     "@netscript/plugin": "0.0.7"
   },

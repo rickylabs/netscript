@@ -39,7 +39,7 @@ export const streamsPlugin: PluginManifest = definePlugin('@netscript/plugin-str
   .withDisplayName('Streams (ephemeral by default)')
   .withType('utility')
   .withDescription(
-    'Ephemeral streams service with restart-proven file storage opt-in via STREAMS_DATA_DIR.',
+    'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
   )
   .withAuthor('NetScript Team')
   .withLicense('Apache-2.0')
