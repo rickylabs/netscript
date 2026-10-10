@@ -830,7 +830,6 @@ plugins/sagas/tests/streams/factory-discovery_test.ts	plugin:sagas	S5	SagaPublis
 plugins/sagas/verify-plugin.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/streams/deno.json	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/streams/README.md	plugin:other	S5	contribution-seam consumers; verify no literal port
-plugins/streams/scaffold.plugin.json	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/streams/src/adapter/plugin.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/streams/src/adapter/resources/resources.test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/streams/src/aspire/mod.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
