@@ -194,7 +194,6 @@ docs/site/reference/plugin/index.md	doc:public-page	S11	prose sweep + #1000 term
 docs/site/reference/queue/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/sagas/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/sdk/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
-docs/site/reference/service/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/streams/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/triggers/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/workers/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
@@ -562,7 +561,6 @@ packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-diagnostics-budg
 packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment-runtime_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
-packages/cli/src/kernel/templates/aspire/helpers/tests/workspace-cors-support.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/types.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/database/generate-prisma-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -696,6 +694,7 @@ packages/mcp/src/domain/telemetry-endpoint.ts	mcp:client	S3/S11/S13	Aspire CLI/d
 packages/mcp/src/domain/tool-contracts.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-ps-dashboard-reader.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/appsettings-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-command.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
@@ -762,7 +761,6 @@ packages/sdk/src/discovery/service-url.ts	package:other	S4	mention only (service
 packages/sdk/src/ports/service-client.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/presets/define-services.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/tests/discovery/env-ordering_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
-packages/service/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/service/src/diagnostics/database-connectivity.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/telemetry/query.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
 packages/telemetry/README.md	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
