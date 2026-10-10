@@ -12,7 +12,13 @@
  *
  * @example
  * ```ts
- * import { createStreamProducer } from '@netscript/sdk/streams';
+ * import {
+ *   createStreamProducer,
+ *   type StateSchema,
+ *   type StreamStateDefinition,
+ * } from '@netscript/sdk/streams';
+ *
+ * declare const chatStreamSchema: StateSchema<StreamStateDefinition>;
  *
  * // Note: framework prepends STREAMS_URL_PREFIX ('/v1/stream/netscript');
  * // '/user/chat-room-1' resolves to '<base>/v1/stream/netscript/user/chat-room-1'.

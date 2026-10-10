@@ -238,7 +238,7 @@ API on its own during development, start it from the plugin workspace:
 deno task --cwd plugins/triggers dev
 ```
 
-The triggers API listens on a host port the installer picked, so read its endpoint from the
+The triggers API listens on a host port Aspire allocated at start, so read its endpoint from the
 [Aspire dashboard](/explanation/aspire/) resource list — `triggers-api` — and confirm it is alive:
 
 ```sh

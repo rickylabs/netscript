@@ -24,6 +24,7 @@ export type {
   SagaAgentStepResult,
   SagaBusPort,
   SagaClockPort,
+  SagaCompensationError,
   SagaConcurrencyPolicy,
   SagaContext,
   SagaCorrelation,

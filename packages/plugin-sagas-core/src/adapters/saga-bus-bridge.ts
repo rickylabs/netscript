@@ -26,7 +26,11 @@ import type {
   SagaCompensationResult,
   SagaCompensator,
 } from '../runtime/saga-compensator.ts';
-import type { SagaEngine } from '../runtime/saga-engine.ts';
+import type {
+  SagaCompensationCommit,
+  SagaCompensationOutcome,
+  SagaEngine,
+} from '../runtime/saga-engine.ts';
 import type { SagaSchedulerPort } from '../runtime/saga-scheduler.ts';
 import {
   type SagaInstrumentation,
@@ -106,11 +110,16 @@ export class SagaBusBridge implements SagaBusPort {
       return;
     }
 
-    await this.#handleAndDispatch(withPublishOptions(message, options));
+    await this.#handleAndDispatch(
+      withPublishOptions(message, options),
+      undefined,
+      new InstanceLedger(),
+    );
   }
 
   /** Dispatch cascaded messages through engine, scheduler, or compensator. */
   async dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void> {
+    const ledger = new InstanceLedger();
     for (const message of messages) {
       if (
         message.idempotencyKey &&
@@ -121,7 +130,7 @@ export class SagaBusBridge implements SagaBusPort {
           continue;
         }
       }
-      await this.#dispatchOne(message);
+      await this.#dispatchOne(message, undefined, ledger);
     }
   }
 
@@ -141,11 +150,12 @@ export class SagaBusBridge implements SagaBusPort {
 
   async #dispatchOne(
     message: CascadedMessage,
-    compensation?: SagaCompensationRequest,
+    compensation: SagaCompensationRequest | undefined,
+    ledger: InstanceLedger,
   ): Promise<void> {
     switch (message.kind) {
       case 'send':
-        await this.#dispatchSend(message, compensation);
+        await this.#dispatchSend(message, compensation, ledger);
         return;
       case 'scheduled':
         await this.#dispatchScheduled(message, compensation);
@@ -153,10 +163,10 @@ export class SagaBusBridge implements SagaBusPort {
       case 'complete':
         return;
       case 'fail':
-        await this.#compensate(message, compensation);
+        await this.#compensate(message, compensation, ledger);
         return;
       case 'compensate':
-        await this.#compensate(message, compensation);
+        await this.#compensate(message, compensation, ledger);
         return;
       case 'spawn':
         await this.#dispatchSpawn(message, compensation);
@@ -170,8 +180,17 @@ export class SagaBusBridge implements SagaBusPort {
     }
   }
 
-  async #handleAndDispatch(message: SagaMessage, correlationId?: string): Promise<void> {
+  /** Handle one message, record each resulting transition, then dispatch its cascades. */
+  async #handleAndDispatch(
+    message: SagaMessage,
+    correlationId: string | undefined,
+    ledger: InstanceLedger,
+  ): Promise<void> {
     const results = await this.#engine.handle(message, { correlationId });
+    // The engine commits every matching handler before returning, so the whole batch is recorded
+    // first: a cascade dispatched for one result may move another result's instance, and that
+    // newer entry must not be overwritten by the older batch snapshot.
+    for (const result of results) ledger.record(result.instanceId, result.state, result.version);
     for (const result of results) {
       const definition = this.#definitions.get(result.sagaId);
       if (!definition) {
@@ -186,10 +205,25 @@ export class SagaBusBridge implements SagaBusPort {
         correlationKey: result.correlationKey,
         parent: result.spanContext,
         instrumentation: this.#instrumentation,
+        version: result.version,
       };
-      for (const cascaded of result.cascaded) {
-        await this.#dispatchOne(cascaded, request);
-      }
+      await this.#dispatchSequence(result.cascaded, request, ledger);
+    }
+  }
+
+  /**
+   * Dispatch sibling cascades in order. Each one starts from its instance's latest entry in the
+   * ledger, so a compensation step commits against whatever an earlier sibling (or any cascade it
+   * reached, directly or through other sagas) left, and carries its own version-derived replay
+   * identity.
+   */
+  async #dispatchSequence(
+    messages: readonly CascadedMessage[],
+    context: SagaCompensationRequest,
+    ledger: InstanceLedger,
+  ): Promise<void> {
+    for (const message of messages) {
+      await this.#dispatchOne(message, ledger.current(context), ledger);
     }
   }
 
@@ -212,7 +246,8 @@ export class SagaBusBridge implements SagaBusPort {
 
   async #compensate(
     message: CascadedMessage<'fail' | 'compensate'>,
-    context?: SagaCompensationRequest,
+    context: SagaCompensationRequest | undefined,
+    ledger: InstanceLedger,
   ): Promise<void> {
     if (!this.#compensator) {
       throw SagasError.notImplemented(
@@ -220,29 +255,53 @@ export class SagaBusBridge implements SagaBusPort {
       );
     }
 
-    const request = context ?? await this.#resolveCompensation?.(message);
-    if (!request) {
+    const resolved = context ?? await this.#resolveCompensation?.(message);
+    if (!resolved) {
       throw SagasError.notImplemented(
         'externally dispatched compensation cascades require the resolveCompensation option.',
       );
     }
+    const request = ledger.current(resolved);
 
     const executionRequest: SagaCompensationRequest = {
       ...request,
       instrumentation: this.#instrumentation ?? request.instrumentation,
     };
     let result: SagaCompensationResult;
-    if (message.kind === 'fail') {
-      result = await this.#compensator.compensateFailure(executionRequest, message);
-    } else {
-      result = await this.#compensator.compensateCascaded(
-        executionRequest.definition,
-        executionRequest.instanceId,
-        executionRequest.state,
-        message,
-        executionRequest,
-      );
+    try {
+      if (message.kind === 'fail') {
+        result = await this.#compensator.compensateFailure(executionRequest, message);
+      } else {
+        result = await this.#compensator.compensateCascaded(
+          executionRequest.definition,
+          executionRequest.instanceId,
+          executionRequest.state,
+          message,
+          executionRequest,
+        );
+      }
+    } catch (error) {
+      await this.#commitCompensation(request, {
+        message: compensationMessage(message, request),
+        state: request.state,
+        cascaded: [],
+        error,
+      });
+      throw error;
     }
+    // A sagaFail without a matching branch ran nothing; its `failed` status is already persisted.
+    if (!result.compensated) return;
+
+    const commit = await this.#commitCompensation(request, {
+      message: result.message,
+      state: result.state,
+      cascaded: result.cascaded,
+    });
+    // Later siblings start past this step's version, so on a replay their own replay identities
+    // line up with the original run.
+    ledger.record(request.instanceId, result.state, commit?.version ?? request.version);
+    // A replayed outcome was dispatched when it was first committed.
+    if (commit?.committed === false) return;
 
     const nextRequest: SagaCompensationRequest = {
       ...request,
@@ -252,15 +311,36 @@ export class SagaBusBridge implements SagaBusPort {
       correlationKey: result.correlationKey,
       parent: result.spanContext,
       instrumentation: executionRequest.instrumentation,
+      version: commit?.version,
     };
-    for (const cascaded of result.cascaded) {
-      await this.#dispatchOne(cascaded, nextRequest);
-    }
+    // The branch's sagaFail is its persisted outcome; dispatching it would re-enter the branch.
+    await this.#dispatchSequence(
+      result.cascaded.filter((cascaded) => cascaded.kind !== 'fail'),
+      nextRequest,
+      ledger,
+    );
+  }
+
+  /** Persist a compensation outcome through the engine; undefined when there is no version. */
+  async #commitCompensation(
+    request: SagaCompensationRequest,
+    outcome: Pick<SagaCompensationOutcome, 'message' | 'state' | 'cascaded' | 'error'>,
+  ): Promise<SagaCompensationCommit | undefined> {
+    // Storeless engines, and resolver-supplied requests without a version, have nothing to commit.
+    if (request.version === undefined || request.correlationKey === undefined) return undefined;
+    return await this.#engine.commitCompensation({
+      ...outcome,
+      sagaId: request.definition.id,
+      instanceId: request.instanceId,
+      correlationKey: request.correlationKey,
+      version: request.version,
+    });
   }
 
   async #dispatchSend(
     message: CascadedMessage<'send'>,
-    execution?: SagaCompensationRequest,
+    execution: SagaCompensationRequest | undefined,
+    ledger: InstanceLedger,
   ): Promise<void> {
     const span = this.#instrumentation?.startCascadeSendSpan({
       ...cascadeContext(execution),
@@ -272,14 +352,18 @@ export class SagaBusBridge implements SagaBusPort {
     });
     try {
       const child = span && this.#instrumentation?.spanContext(span);
-      await this.#handleAndDispatch({
-        type: message.target.id,
-        payload: message.payload,
-        idempotencyKey: message.idempotencyKey,
-        concurrencyKey: message.concurrencyKey,
-        traceparent: child?.traceparent,
-        tracestate: child?.tracestate,
-      }, execution?.correlationId);
+      await this.#handleAndDispatch(
+        {
+          type: message.target.id,
+          payload: message.payload,
+          idempotencyKey: message.idempotencyKey,
+          concurrencyKey: message.concurrencyKey,
+          traceparent: child?.traceparent,
+          tracestate: child?.tracestate,
+        },
+        execution?.correlationId,
+        ledger,
+      );
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.SUCCESS);
     } catch (error) {
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);
@@ -344,6 +428,35 @@ function withPublishOptions(message: SagaMessage, options: SagaPublishOptions): 
     traceparent: options.traceparent ?? message.traceparent,
     tracestate: options.tracestate ?? message.tracestate,
   });
+}
+
+/**
+ * Latest committed state and version of every instance one synchronous dispatch tree touched.
+ * Scoped to a single `publish`/`dispatchCascaded` call, so it holds at most one entry per instance
+ * that call reached.
+ */
+class InstanceLedger {
+  readonly #entries = new Map<string, Readonly<{ state: SagaState; version?: number }>>();
+
+  /** Record the state and version a transition or compensation commit left an instance at. */
+  record(instanceId: string, state: SagaState, version: number | undefined): void {
+    this.#entries.set(instanceId, Object.freeze({ state, version }));
+  }
+
+  /** The context moved to its instance's latest recorded state and version. */
+  current(context: SagaCompensationRequest): SagaCompensationRequest {
+    const latest = this.#entries.get(context.instanceId);
+    return latest ? { ...context, state: latest.state, version: latest.version } : context;
+  }
+}
+
+function compensationMessage(
+  message: CascadedMessage<'fail' | 'compensate'>,
+  request: SagaCompensationRequest,
+): SagaMessage {
+  return message.kind === 'compensate' && 'type' in message.message
+    ? message.message
+    : request.message;
 }
 
 function cascadeContext(request?: SagaCompensationRequest): Readonly<{

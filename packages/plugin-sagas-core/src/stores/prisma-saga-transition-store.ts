@@ -261,6 +261,7 @@ const metadataSchema = z.object({
   completedAt: z.iso.datetime().optional(),
   traceparent: z.string().optional(),
   tracestate: z.string().optional(),
+  compensationError: z.object({ name: z.string(), message: z.string() }).optional(),
 });
 const envelopeSchema = z.object({
   metadata: metadataSchema,

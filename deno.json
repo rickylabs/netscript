@@ -64,7 +64,7 @@
     "deps:audit": "deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts --level low --pretty",
     "deps:prod-install": "deno run --allow-read --allow-write --allow-net --allow-run --allow-env .llm/tools/deps/prod-install.ts --pretty",
     "deps:census": "deno run --allow-read .llm/tools/deps/census.ts",
-    "deps:check": "deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod && deno task deps:check:db",
+    "deps:check": "deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno run --allow-read .llm/tools/deps/check-private-lock-workspace.ts && deno task deps:check:zod && deno task deps:check:db",
     "deps:check:ai-peers": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/deps/check-ai-peers.ts",
     "deps:check:zod": "deno run --allow-read .llm/tools/deps/check-zod-alignment.ts",
     "deps:check:npm-catalog": "deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts",
