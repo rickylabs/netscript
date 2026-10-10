@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "94cf1a263",
-  "extractionTimestamp": "2026-10-10T16:34:28.779Z",
+  "sourceCommit": "a030e2263",
+  "extractionTimestamp": "2026-10-10T16:40:24.138Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -190,7 +190,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5226475,
-  "compressedBytes": 1518280,
-  "sha256": "4c599066e305070168dc0643de3f03d60dac249234e3ec508a0efef47bf1cdeb"
+  "uncompressedBytes": 5227905,
+  "compressedBytes": 1519156,
+  "sha256": "54ce90d1536684905ff863184ee80dcb2c96437aac6010307c41184e1c989eb6"
 }
