@@ -69,7 +69,7 @@ export class ContractWorkspaceResolver {
         name,
         version,
         filePath: join(versionDir, entry.name),
-        hasService: await this.fs.exists(join(rootPath, SCAFFOLD_DIRS.SERVICES, name)),
+        hasServiceDirectory: await this.fs.exists(join(rootPath, SCAFFOLD_DIRS.SERVICES, name)),
       });
     }
 
