@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects, assertThrows } from '@std/assert';
+import { assertEquals, assertRejects, assertStrictEquals, assertThrows } from '@std/assert';
 import { deadline } from 'jsr:@std/async@^1/deadline';
 import { createStreamCollectionV1 } from '@netscript/sdk/streams/collections';
 import {
@@ -233,13 +233,65 @@ Deno.test('fatal protocol failure before first control settles preload and expos
   await assertRejects(() => binding.dispose(), TypeError);
 });
 
-Deno.test('cleanup forbids rebinding the cancelled single-use source', async () => {
+Deno.test('HTTP 204 before readiness resolves preload without a stream failure', async () => {
+  const binding = createStreamCollectionV1({
+    type: 'tasks',
+    url: 'https://api.example.com/v1/stream/netscript/tasks?offset=-1',
+    fetch: () => Promise.resolve(new Response(null, { status: 204 })),
+    parse,
+    getKey: (task) => task.id,
+  });
+  await deadline(binding.collection.preload(), 1_000);
+  await binding.done;
+  assertEquals(binding.collection.status, 'cleaned-up');
+  assertEquals(binding.collection.utils.getError(), undefined);
+  await binding.dispose();
+});
+
+Deno.test('dispose during preload resolves readiness without a stream failure', async () => {
+  const binding = create(new Transport());
+  const pending = deadline(binding.collection.preload(), 1_000);
+  await settle();
+  await binding.dispose();
+  await pending;
+  await binding.done;
+  assertEquals(binding.collection.status, 'cleaned-up');
+  assertEquals(binding.collection.utils.getError(), undefined);
+});
+
+Deno.test('fatal entity failure rejects preload with the specific source error', async () => {
+  const transport = new Transport();
+  const fatal = new TypeError('Invalid task from the stream');
+  const binding = createStreamCollectionV1<Task>({
+    type: 'tasks',
+    url: 'https://api.example.com/v1/stream/netscript/tasks?offset=-1',
+    fetch: transport.fetch,
+    parse: () => {
+      throw fatal;
+    },
+    getKey: (task) => task.id,
+  });
+  const pending = assertRejects(
+    () => deadline(binding.collection.preload(), 1_000),
+    TypeError,
+    fatal.message,
+  );
+  const done = assertRejects(() => binding.done, TypeError, fatal.message);
+  await settle();
+  transport.send(data([change('1', 'invalid')]) + control('opaque:1'));
+  assertStrictEquals(await pending, fatal);
+  assertStrictEquals(await done, fatal);
+  assertStrictEquals(binding.collection.utils.getError(), fatal);
+  assertStrictEquals(await assertRejects(() => binding.dispose(), TypeError, fatal.message), fatal);
+});
+
+Deno.test('cleanup resolves preload and forbids rebinding the cancelled single-use source', async () => {
   const transport = new Transport();
   const binding = create(transport);
   await settle();
   const collection = binding.collection;
   if (!isCollection(collection)) throw new TypeError('Expected a TanStack collection');
-  const pending = assertRejects(() => binding.collection.preload(), Error);
+  const pending = deadline(binding.collection.preload(), 1_000);
   await binding.collection.cleanup();
   await pending;
   assertThrows(
@@ -247,7 +299,7 @@ Deno.test('cleanup forbids rebinding the cancelled single-use source', async () 
     Error,
     'Stream collection is closed; create a new binding',
   );
-  await assertRejects(() => binding.collection.preload(), Error);
+  assertEquals(binding.collection.utils.getError(), undefined);
   await binding.dispose();
   assertEquals(transport.urls.length, 1);
 });

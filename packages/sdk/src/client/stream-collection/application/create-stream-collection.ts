@@ -1,4 +1,4 @@
-import { createCollection } from '@tanstack/db';
+import { CollectionPreloadAbortedError, createCollection } from '@tanstack/db';
 import {
   bindStreamEventSourceV1,
   createFetchStreamEventSourceV1,
@@ -45,6 +45,7 @@ export function createStreamCollectionV1<T extends object>(
   options: StreamCollectionOptionsV1<T>,
 ): StreamCollectionBindingV1<T> {
   if (!options.type.trim()) throw new TypeError('A stream collection type is required');
+  // startSync: true runs sync synchronously, initializing source before createCollection returns.
   let source!: ReturnType<typeof createFetchStreamEventSourceV1>;
   let binding: ReturnType<typeof bindStreamEventSourceV1>;
   let started = false;
@@ -121,7 +122,7 @@ export function createStreamCollectionV1<T extends object>(
   });
   const done = source.done.then(
     async () => {
-      // Cancellation or HTTP 204 before readiness must also settle pending preload calls.
+      // Clean cancellation or HTTP 204 ends readiness; the wrapper resolves pending preloads.
       if (!ready) await collection.cleanup();
     },
     async (error: unknown) => {
@@ -144,9 +145,11 @@ export function createStreamCollectionV1<T extends object>(
     try {
       await Promise.race([preload(), done]);
     } catch (error) {
-      // Cleanup can reject upstream readiness before done finishes rejecting.
-      // Preserve the source failure already recorded by the supervisor.
-      throw failure ?? error;
+      if (failure) throw failure;
+      if (!(error instanceof CollectionPreloadAbortedError)) throw error;
+      // Upstream cleanup aborts readiness even on a clean close. Wait for the
+      // source outcome so only a fatal stream failure rejects the SDK preload.
+      await done;
     }
     if (failure) throw failure;
   };
