@@ -114,7 +114,7 @@ async function createCompileProject(): Promise<string> {
             Workdir: 'workers',
             Entrypoint: 'bin/combined.ts',
             Concurrency: 2,
-            ConcurrencyEnvVar: 'WORKER_CONCURRENCY',
+            ConcurrencyEnvVar: 'WORKERS_CONCURRENCY',
           },
           sagas: {
             Enabled: true,
@@ -158,7 +158,7 @@ Deno.test('extractCompileTargets emits metadata-driven background processor targ
   const workersApi = byName.get('workers-api');
   const sagasCombined = byName.get('sagas-combined');
   assert(
-    workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+    workersCombined?.concurrencyEnvVar === 'WORKERS_CONCURRENCY',
     'workers-combined should carry concurrency env var',
   );
   assert(
