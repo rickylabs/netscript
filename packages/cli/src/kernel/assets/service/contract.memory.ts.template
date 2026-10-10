@@ -9,7 +9,6 @@
 import { z } from 'zod';
 import { baseContract } from '@netscript/contracts';
 import { implement } from '@orpc/server';
-import { baseContract } from '@netscript/contracts';
 
 export const {{serviceName | pascalCase}}HealthSchemaV1 = z.object({
   status: z.enum(['healthy', 'unhealthy', 'degraded']).describe('Service health status'),
