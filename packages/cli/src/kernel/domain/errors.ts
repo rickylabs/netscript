@@ -141,10 +141,11 @@ export class ScaffoldGitError extends CLIError {
  * Thrown when the netscript.config.ts or appsettings.json cannot be found.
  */
 export class ConfigNotFoundError extends CLIError {
-  constructor(searchedPaths: string[]) {
+  constructor(searchedPaths: string[], remedy?: string) {
     super(
       ExitCode.CONFIG_NOT_FOUND,
-      `NetScript config not found. Searched: ${searchedPaths.join(', ')}`,
+      `NetScript config not found. Searched: ${searchedPaths.join(', ')}` +
+        (remedy ? `. ${remedy}` : ''),
       { searchedPaths },
     );
     this.name = 'ConfigNotFoundError';

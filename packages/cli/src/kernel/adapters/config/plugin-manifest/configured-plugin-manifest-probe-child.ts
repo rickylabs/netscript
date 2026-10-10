@@ -1,7 +1,7 @@
 import {
   inspectExportedPluginManifest,
   resolveExportedPluginManifest,
-} from '../../application/plugin/exported-plugin-manifest.ts';
+} from '../../../application/plugin/exported-plugin-manifest.ts';
 import {
   CONFIGURED_PLUGIN_PROBE_SCHEMA_VERSION,
   summarizeConfiguredPluginManifest,

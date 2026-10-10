@@ -1,6 +1,5 @@
 import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
-import { join } from '@std/path';
 
 import {
   outputJson,
@@ -38,7 +37,7 @@ export function createProjectConfigCommands(
     .option('--json', 'Emit JSON')
     .action(async (options: { projectRoot?: string; json?: boolean }, filter?: string) => {
       const root = await resolveRoot(dependencies, options.projectRoot);
-      const document = await readAppsettingsDocument(dependencies.fs, appsettingsFile(root));
+      const document = await readAppsettingsDocument(dependencies.fs, root);
       const entries = listAppsettingsPaths(document, filter);
       if (options.json) {
         outputJson(entries);
@@ -96,10 +95,6 @@ async function resolveRoot(
   value?: string,
 ): Promise<string> {
   return await requireProjectRoot(dependencies.resolveProjectRoot, value);
-}
-
-function appsettingsFile(root: string): string {
-  return join(root, 'appsettings.json');
 }
 
 function parseValue(value: string): unknown {

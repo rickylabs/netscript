@@ -17,15 +17,15 @@ import { DenoProcess } from '../runtime/process/deno-process.ts';
 import { resolveExportedPluginManifest } from '../../application/plugin/exported-plugin-manifest.ts';
 import { resolvePluginImportSpecifier } from '../../application/plugin/configured-plugin-specifier.ts';
 import { resolveRegisteredPluginSource } from '../../application/plugin/registered-plugin-source.ts';
-import { probeConfiguredPluginManifest } from './configured-plugin-manifest-probe.ts';
+import { probeConfiguredPluginManifest } from './plugin-manifest/configured-plugin-manifest-probe.ts';
+import type { ConfiguredPluginManifestSummary } from './plugin-manifest/configured-plugin-manifest-summary.ts';
 import { requireValidPluginComposition } from '../../application/plugin/plugin-composition.ts';
-import type { ConfiguredPluginManifestSummary } from './configured-plugin-manifest-summary.ts';
 
 const SCAFFOLD_PLUGIN_MANIFEST = 'scaffold.plugin.json';
 const CONFIGURED_PLUGIN_MANIFEST_RESULT_PREFIX = 'NETSCRIPT_CONFIGURED_PLUGIN_MANIFESTS=';
 const CONFIGURED_PLUGIN_MANIFEST_LOAD_TIMEOUT_MS = 30_000;
 const CONFIGURED_PLUGIN_MANIFEST_LOADER = new URL(
-  './configured-plugin-manifest-loader-child.ts',
+  './plugin-manifest/configured-plugin-manifest-loader-child.ts',
   import.meta.url,
 ).href;
 

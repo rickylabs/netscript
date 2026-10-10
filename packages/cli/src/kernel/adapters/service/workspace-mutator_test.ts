@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { join } from '@std/path';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
@@ -6,6 +6,8 @@ import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
 import { regenerateAspireHelpers } from './workspace-mutator.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
+import { ScaffoldValidationError } from '../../domain/errors.ts';
+import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 
 function appsettings(): string {
   return JSON.stringify({
@@ -98,3 +100,22 @@ async function readFiles(
     await Promise.all(paths.map(async (path) => [path, await fs.readFile(path)] as const)),
   );
 }
+
+// #1996: `generate aspire` in a --no-aspire project names the real cause.
+Deno.test('Aspire helper regeneration refuses a project scaffolded without Aspire', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile('/project/appsettings.json', appsettings());
+  const templateAdapter = new StringTemplateAdapter(fs);
+
+  await assertRejects(
+    () =>
+      regenerateAspireHelpers(
+        '/project',
+        fs,
+        new Scaffolder(templateAdapter, fs),
+        templateAdapter,
+      ),
+    ScaffoldValidationError,
+    'this project was scaffolded without Aspire (netscript init --no-aspire)',
+  );
+});

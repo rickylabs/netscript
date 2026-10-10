@@ -4,6 +4,18 @@ import type { TaskType } from './constants.ts';
 import type { JobPayloadSchema } from './public-schema.ts';
 import { TaskDefinitionPublicBaseSchema } from './public-schema.ts';
 
+/** JSON data accepted by a task's stdin channel (finite numbers and plain objects only). */
+export type TaskStdinJson =
+  | null
+  | boolean
+  | number
+  | string
+  | readonly TaskStdinJson[]
+  | { readonly [key: string]: TaskStdinJson };
+
+/** Bytes or JSON written once to subprocess stdin, then closed; maximum 1 MiB. */
+export type TaskStdin = Uint8Array | TaskStdinJson;
+
 /** Branded worker task identifier. */
 export type TaskId<TId extends string = string> = TId & { readonly __brand: 'TaskId' };
 
@@ -233,6 +245,8 @@ export type TaskDefinition<
     id: TaskId<TId>;
     type: TaskType;
     entrypoint?: string;
+    /** Runtime-only stdin payload; never persisted in task registration. */
+    stdin?: TaskStdin;
     handler?: TaskHandler<TPayload, TResult>;
     payloadSchema?: JobPayloadSchema<TPayload>;
   }
@@ -309,6 +323,12 @@ export type TaskResponse = typeof TaskResponseSchema['_output'];
 
 /** Options for executing a task. */
 export type TaskExecutionOptions = Readonly<{
+  /** Bytes or JSON written to stdin once, then closed; maximum 1 MiB. */
+  stdin?: TaskStdin;
+  /** Optional total stdout byte cap; exceeding it fails the task. Capture retains a 1 MiB tail by default. */
+  stdoutLimitBytes?: number;
+  /** Optional total stderr byte cap; exceeding it fails the task. Capture retains a 1 MiB tail by default. */
+  stderrLimitBytes?: number;
   cwd?: string;
   env?: Record<string, string>;
   timeout?: number;
