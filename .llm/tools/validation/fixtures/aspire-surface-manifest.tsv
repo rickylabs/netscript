@@ -47,6 +47,7 @@ path	class	owner	disposition
 .llm/tools/CLEANUP-PLAYBOOK.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-README.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-tools.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/app-router-support_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-accuracy-and-discoverability_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-accuracy-and-discoverability.ts	negative-version-guard	S7/S13	negative docs enforcement: retain only direct forbidText second-argument version literals, enforce all other references
 .llm/tools/docs/check-docs-contract-derivation.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus

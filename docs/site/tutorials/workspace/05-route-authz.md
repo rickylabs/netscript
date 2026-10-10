@@ -173,7 +173,7 @@ export const authorizer = createContractAuthorizer(WorkspaceContractV1);
   caption: "@netscript/service/auth — the route-authz surface",
   rows: [
     { name: "createStaticCredentialAuthenticator(opts)", type: "AuthenticatorPort", desc: "Maps bearer tokens to principals — each credential carries a subject, scopes, and roles. Good for tests and machine-to-machine callers." },
-    { name: "createContractAuthorizer(contract, { fallback? })", type: "ContractPolicyAuthorizerPort", desc: "Traverses procedure-local access metadata and binds it to the builder's real REST/RPC paths and aliases." },
+    { name: "createContractAuthorizer(contract, { fallback?, rawRoutes? })", type: "ContractPolicyAuthorizerPort", desc: "Traverses procedure-local access metadata and binds it to the builder's real REST/RPC paths and aliases. rawRoutes declares exact, authentication-required raw routes; any other unmatched route is denied." },
     { name: "createScopeAuthorizer(opts)", type: "MatchAwareAuthorizerPort", desc: "Supported legacy path-rule authorizer; standalone, or a fallback only when a matched procedure has no metadata." },
     { name: ".withAuthn({ authenticator, protect?, allowAnonymous? })", type: "builder stage", desc: "protect defaults to ['/api']; allowAnonymous defaults to ['/health']." },
     { name: ".withAuthz({ authorizer, denyByDefault? })", type: "builder stage", desc: "denyByDefault defaults to true — fail closed when no decision is reachable." }
