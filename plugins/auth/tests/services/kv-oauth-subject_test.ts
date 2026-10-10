@@ -5,7 +5,8 @@ import {
   createInMemoryKvOAuthRegistry,
 } from '../../services/src/backend-registry.ts';
 import { resolveKvOAuthSubjectSource } from '../../services/src/kv-oauth-subject.ts';
-import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
+import { signin } from '../../services/src/routers/v1-handlers.ts';
+import { completeTestCallback } from '../testing/auth-service-fixture.ts';
 import { AuthServiceHandlerError } from '../../services/src/routers/v1-types.ts';
 import type { ResolvedAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
 import {
@@ -25,7 +26,7 @@ async function completeSignIn(registry: ResolvedAuthBackendRegistry) {
   });
   assert(started.redirectUrl);
   const redirect = new URL(started.redirectUrl);
-  return await callback({
+  const completed = await completeTestCallback({
     code: 'code_test',
     state: redirect.searchParams.get('state') ?? undefined,
   }, {
@@ -35,6 +36,7 @@ async function completeSignIn(registry: ResolvedAuthBackendRegistry) {
       headers: new Headers({ 'x-forwarded-proto': 'https' }),
     },
   });
+  return { ...completed.output, sessionId: completed.sessionId };
 }
 
 Deno.test('subject source resolves from env, then the named preset, then the ID-token sub', () => {

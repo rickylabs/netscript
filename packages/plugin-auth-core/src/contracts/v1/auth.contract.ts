@@ -50,10 +50,9 @@ export type CallbackInput = Readonly<{
   redirectTo?: string;
 }>;
 
-/** Response returned by the callback endpoint. */
+/** Callback status; the session credential is delivered only through Set-Cookie. */
 export type CallbackResponse = Readonly<{
   completed: boolean;
-  sessionId?: string;
   redirectTo?: string;
   subject?: string;
 }>;
@@ -290,12 +289,10 @@ export const CallbackInputSchema: AuthSchema<CallbackInput> = CallbackInputZodSc
 
 const CallbackResponseZodSchema: z.ZodObject<{
   completed: z.ZodBoolean;
-  sessionId: z.ZodOptional<z.ZodString>;
   redirectTo: z.ZodOptional<z.ZodString>;
   subject: z.ZodOptional<z.ZodString>;
 }> = z.object({
   completed: z.boolean(),
-  sessionId: z.string().optional(),
   redirectTo: z.string().optional(),
   subject: z.string().optional(),
 });
