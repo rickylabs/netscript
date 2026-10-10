@@ -24,6 +24,7 @@ import {
   createAuthBackendRegistry,
   type ResolvedAuthBackendRegistry,
 } from '@netscript/plugin-auth-core/ports';
+import { resolveKvOAuthSubjectSource } from './kv-oauth-subject.ts';
 
 /** Backend names supported by the auth plugin v1 service. */
 export type AuthPluginBackendName = 'kv-oauth' | 'workos' | 'better-auth';
@@ -142,6 +143,7 @@ async function createActiveBackend(
         authorizationEndpoint: provider.authorizationEndpoint,
         tokenEndpoint: provider.tokenEndpoint,
         userInfoEndpoint: env.NETSCRIPT_AUTH_USERINFO_ENDPOINT,
+        subject: resolveKvOAuthSubjectSource(env),
         redirectUri: provider.redirectUri,
         scopes: env.NETSCRIPT_AUTH_SCOPES?.split(/\s+/).filter(Boolean),
       }),
@@ -274,7 +276,7 @@ function resolveKvOAuthProviderEnv(
 }
 
 function localAuthOrigin(env: Readonly<Record<string, string | undefined>>): string {
-  return `http://localhost:${requiredEnv(env, 'PORT')}`;
+  return `http://localhost:${requiredEnv(env, 'PORT')}`; // aspire-host-port-ok: own origin from Aspire-allocated PORT
 }
 
 function resolveKvOAuthKey(env: Readonly<Record<string, string | undefined>>): ArrayBuffer {
