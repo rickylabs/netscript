@@ -187,6 +187,7 @@
     "@harness/launchability": "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/launchability.ts",
     "@harness/openrouter-launcher-policy": "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/openrouter-launcher-policy.ts",
     "@std/assert": "jsr:@std/assert@1",
+    "@std/testing": "jsr:@std/testing@^1",
     "@std/semver": "jsr:@std/semver@^1",
     "@std/path": "jsr:@std/path@1"
   },

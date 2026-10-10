@@ -78,3 +78,5 @@ export type {
   StreamHeadV1,
   StreamRetentionPolicyV1,
 } from './src/public/mod.ts';
+
+export type { StreamCollection, StreamDBFactory } from './src/domain/stream-collection.ts';
