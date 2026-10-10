@@ -27,7 +27,8 @@ export type KvOAuthCookieOptions = Readonly<{
   maxAge?: number;
   sameSite?: 'Strict' | 'Lax' | 'None';
   secure?: boolean;
-  httpOnly?: boolean;
+  /** Auth cookies are always HttpOnly; false is refused at issuance. */
+  httpOnly?: true;
   allowInsecureDev?: boolean;
 }>;
 
@@ -71,13 +72,14 @@ export function buildCookieHeader(
   const name = options.name ?? '__Host-ns_session';
   const path = options.path ?? '/';
   const secure = options.secure ?? deriveHttps(request);
-  if (options.httpOnly === false) {
+  // Runtime callers (including JavaScript) must obey the same policy as typed callers.
+  if (options.httpOnly !== undefined && options.httpOnly !== true) {
     throw new KvOAuthError('configuration_error', 'Auth cookies require HttpOnly.');
   }
   if (!secure && !options.allowInsecureDev) {
     throw new KvOAuthError('https_required', 'Auth cookies require HTTPS.');
   }
-  assertCookiePolicy(name, path, options.domain, secure, options.allowInsecureDev ?? false);
+  assertCookiePolicy(name, path, options.domain);
   const parts = [
     `${name}=${encodeURIComponent(value)}`,
     `Path=${path}`,
@@ -112,8 +114,6 @@ function assertCookiePolicy(
   name: string,
   path: string,
   domain: string | undefined,
-  secure: boolean,
-  allowInsecureDev: boolean,
 ): void {
   if (name.startsWith('__Host-')) {
     if (path !== '/' || domain !== undefined) {
@@ -121,9 +121,6 @@ function assertCookiePolicy(
         'configuration_error',
         '__Host- cookies require Path=/ and no Domain.',
       );
-    }
-    if (!secure && !allowInsecureDev) {
-      throw new KvOAuthError('https_required', '__Host- cookies require HTTPS.');
     }
   }
 }

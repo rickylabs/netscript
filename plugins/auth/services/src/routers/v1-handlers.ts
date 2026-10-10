@@ -99,7 +99,6 @@ export async function signin(
         { returnTo: input.redirectTo },
       );
       const redirectUrl = responseLocation(response);
-      captureAuthResponseCookies(response);
       const output = {
         started: true,
         providerId: input.providerId ?? firstProviderId(backend),
@@ -115,6 +114,7 @@ export async function signin(
       }, {
         traceContext: audit.traceContext(),
       });
+      captureAuthResponseCookies(response);
       return output;
     } catch (error) {
       const authError = providerFailure(error, input.providerId ?? backend.name);
@@ -172,7 +172,6 @@ export async function callback(
           redirectTo: input.redirectTo ?? responseLocation(result.response),
           subject: result.principal.subject,
         };
-        captureAuthResponseCookies(result.response);
         await audit.setOutcome({
           outcome: AuthOutcome.SUCCESS,
           subject: result.principal.subject,
@@ -180,6 +179,7 @@ export async function callback(
         });
         await audit.recordSessionIssued(result.sessionId, result.principal.subject);
         void emitCallbackSessionCompleted(backend, result.sessionId, audit.traceContext());
+        captureAuthResponseCookies(result.response);
         return output;
       } catch (error) {
         const authError = providerFailure(error, input.providerId ?? backend.name);
@@ -203,19 +203,19 @@ export async function signout(
 
     try {
       let revokedSession: AuthSession | undefined;
+      let response: Response | undefined;
       if (sessionId) {
         revokedSession = await backend.sessions.revokeSession(sessionId);
       } else if (!backend.interactive) {
         throw new AuthServiceHandlerError('UNAUTHORIZED', 'No active auth session was found.');
       }
       if (backend.interactive) {
-        const response = await backend.interactive.signOut(
+        response = await backend.interactive.signOut(
           toRequest(context.request, '/v1/auth/signout', new URLSearchParams()),
           {
             revoke: !sessionId,
           },
         );
-        captureAuthResponseCookies(response);
       }
       const output = {
         signedOut: true,
@@ -231,6 +231,7 @@ export async function signout(
       if (revokedSession) {
         emitSessionRevoked(revokedSession, { traceContext: audit.traceContext() });
       }
+      if (response) captureAuthResponseCookies(response);
       return output;
     } catch (error) {
       const authError = providerFailure(error, backend.name);

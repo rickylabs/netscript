@@ -6,7 +6,6 @@ Deno.test('cookie issuance rejects insecure policy and invalid __Host attributes
   for (
     const options of [
       { secure: false },
-      { httpOnly: false },
       { domain: 'example.test' },
       { path: '/auth' },
       { domain: 'example.test', allowInsecureDev: true },
@@ -21,8 +20,10 @@ Deno.test('cookie issuance rejects insecure policy and invalid __Host attributes
     buildCookieHeader('session', request, { secure: false, allowInsecureDev: true }),
     'HttpOnly',
   );
-  assertThrows(
-    () => buildCookieHeader('session', request, { httpOnly: false, allowInsecureDev: true }),
-    KvOAuthError,
-  );
+  for (const allowInsecureDev of [false, true]) {
+    assertThrows(() => {
+      // @ts-expect-error The public cookie contract rejects false; untyped callers also fail.
+      return buildCookieHeader('session', request, { httpOnly: false, allowInsecureDev });
+    }, KvOAuthError);
+  }
 });

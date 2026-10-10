@@ -61,12 +61,7 @@ export default async function createAuthService(
   const port = Number.parseInt(portValue, 10);
   const dbClient = await ctx.db.getClient();
   const registry = await initializeAuthService(ctx, dbClient);
-  const cookieName = ctx.env.NETSCRIPT_AUTH_COOKIE_NAME ??
-    Deno.env.get('NETSCRIPT_AUTH_COOKIE_NAME') ??
-    (hasAuthAppsettings(ctx)
-      ? (ctx.appsettings?.auth?.environment ?? ctx.appsettings?.Auth?.Environment)
-        ?.NETSCRIPT_AUTH_COOKIE_NAME
-      : undefined);
+  const cookieName = registry.cookieName;
   const telemetry = createAuthTelemetry({
     subjectHashSalt: resolveAuditSalt(ctx),
   });

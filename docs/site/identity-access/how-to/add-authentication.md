@@ -301,9 +301,20 @@ application callback route to perform that POST when the provider redirects back
 with a GET. Browser cookie retention across origins is a separate deployment
 concern; see [session lifecycles](/identity-access/session-lifecycles/).
 
-For a manual provider round trip, save the transaction cookie, visit the
-returned `redirectUrl`, and copy the provider callback's code and state into the
-callback POST:
+For this plain-HTTP loopback recipe, set both development overrides in the host environment
+**before starting or restarting `auth-api`**. Use an unprefixed cookie name: clients reject
+an insecure `__Host-` cookie even when server-side `allowInsecureDev` permits issuance.
+Keep your real provider credentials and redirect URI from Step 3.
+
+```sh
+export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true
+export NETSCRIPT_AUTH_COOKIE_NAME=ns_session_dev
+```
+
+Then save the transaction cookie, visit the returned `redirectUrl`, and copy the provider
+callback's code and state into the callback POST. The provider must register the redirect URI
+from Step 3; its GET callback may report a method error on this POST-only service route.
+Copy the code and state from that redirect URL and submit them below:
 
 ```sh
 # Save the transaction cookie and read redirectUrl from the JSON response.
@@ -325,11 +336,10 @@ curl -b cookies.txt -c cookies.txt -X POST http://localhost:8094/api/v1/auth/sig
   -H 'Content-Type: application/json' -d '{}'
 ```
 
-Use HTTPS for production cookies. Plain HTTP local testing requires the explicit
-`NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true` development setting; `__Host-`
-browser cookie rules still apply. The default cookie is `__Host-ns_session`;
-`NETSCRIPT_AUTH_COOKIE_NAME` configures the name used by the backend and
-service. A caller without a cookie jar may supply the transaction id as callback
+Use HTTPS for production cookies and remove the two development overrides above. The default
+production cookie is `__Host-ns_session`; the local recipe uses `ns_session_dev` so curl can
+save and resend it over plain HTTP. `NETSCRIPT_AUTH_COOKIE_NAME` configures the name used by
+both the backend and service. A caller without a cookie jar may supply the transaction id as callback
 input `txn`; a callback without either fails with `oauth_cookie_missing`.
 
 A successful `GET /api/v1/auth/session` after callback returns the active
@@ -341,7 +351,8 @@ topology is decided; browser callers can rely on the cookie alone.
 
 The callback input now accepts optional `txn`. The JSON outputs retain their
 existing shape, including `sessionId`; cookie headers are added to both HTTP
-projections. Cookie issuance refuses `httpOnly: false` and refuses insecure
+projections. The public `httpOnly` option now accepts only `true` or omission; remove `false` overrides.
+Cookie issuance also refuses `httpOnly: false` from untyped callers and refuses insecure
 cookies outside `allowInsecureDev`, including custom cookie names. Treat this
 security policy tightening as a breaking change: remove insecure production
 cookie overrides, use HTTPS, and keep `HttpOnly` enabled. `__Host-` cookies must

@@ -229,6 +229,17 @@ curl http://localhost:8094/api/v1/auth/session
 curl http://localhost:8094/api/v1/auth/me
 ```
 
+For the plain-HTTP loopback recipe, set these host environment variables before starting or
+restarting `auth-api`, alongside the provider configuration in Step 4:
+
+```sh
+export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true
+export NETSCRIPT_AUTH_COOKIE_NAME=ns_session_dev
+```
+
+The unprefixed development name lets curl save the cookie on HTTP; clients reject an insecure
+`__Host-` cookie. Remove both overrides and use HTTPS for production.
+
 For the full interactive round trip, follow the
 [cookie-jar signin and callback sequence](/identity-access/how-to/add-authentication/#step-7-verify-a-session).
 `POST /api/v1/auth/signin` returns JSON containing `redirectUrl` and sets the

@@ -2,6 +2,8 @@
 
 import { assert } from '@std/assert';
 import type { MemoryKvAdapter } from '@netscript/kv';
+import type { ResolvedAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
+import type { AuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import { createPluginService } from '../../../../packages/plugin/src/service/mod.ts';
 import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
@@ -10,7 +12,7 @@ import { currentAuthRequest, withAuthRequest } from '../../services/src/request-
 import { authTestUrl } from './auth-fixtures.ts';
 
 /** Backend registry type returned by the auth service composition root. */
-export type AuthTestRegistry = Awaited<ReturnType<typeof createAuthServiceBackendRegistry>>;
+export type AuthTestRegistry = ResolvedAuthBackendRegistry;
 
 /** A running in-process auth service bound to a discoverable service name. */
 export interface AuthTestService extends AsyncDisposable {
@@ -77,7 +79,10 @@ export async function mintTestSession(registry: AuthTestRegistry): Promise<strin
 }
 
 /** Serve the real auth router (RPC + OpenAPI) on an ephemeral port, as `main.ts` wires it. */
-export async function serveAuthTestService(registry: AuthTestRegistry): Promise<AuthTestService> {
+export async function serveAuthTestService(
+  registry: AuthTestRegistry,
+  telemetry?: AuthTelemetry,
+): Promise<AuthTestService> {
   const running = await createPluginService(router, {
     auth: { public: true, reason: 'Fixture for existing public service behavior' },
     name: 'auth',
@@ -85,7 +90,7 @@ export async function serveAuthTestService(registry: AuthTestRegistry): Promise<
     port: 0,
     openApi: { title: 'Auth API', description: 'Auth service test fixture' },
     middleware: [withAuthRequest],
-    context: () => ({ registry, request: currentAuthRequest() }),
+    context: () => ({ registry, telemetry, request: currentAuthRequest() }),
     traceContext: false,
   }).serve({ port: 0 });
   const baseUrl = `http://127.0.0.1:${running.addr.port}`;
