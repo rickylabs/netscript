@@ -1,10 +1,11 @@
 /**
  * #1726 runtime proof: a wrong PostgreSQL password is reported as an auth-classified
- * `Unhealthy` credential check while the listener stays Healthy, `aspire wait` exits 18,
+ * `Unhealthy` credential check while the listener stays Healthy, `aspire wait` times out with exit 17,
  * and neither password appears in generated helpers, health evidence or MCP list_resources.
  */
 
 import {
+  CREDENTIAL_FAULT_DEPENDENT_RESOURCE,
   CREDENTIAL_FAULT_PROBE_RESOURCE,
   CREDENTIAL_FAULT_STATE_FILE,
   type CredentialFaultState,
@@ -28,11 +29,8 @@ export { assertNoSecretBytes } from './credential-secret-surfaces.ts';
 
 const POSTGRES_RESOURCE = 'postgres';
 const POSTGRES_LISTENER_HEALTH_KEY = 'postgres_listener';
-/**
- * Retained #1726 exit-18 assertion. Aspire 13.5.3 calls 18 WaitResourceFailed;
- * WaitTimeout is 17. The legacy constant name predates verification of those CLI semantics.
- */
-export const ASPIRE_WAIT_TIMEOUT_EXIT_CODE = 18;
+/** Aspire 13.5.3 WaitTimeout: an Unhealthy resource remains Running, not Failed (exit 18). */
+export const ASPIRE_WAIT_TIMEOUT_EXIT_CODE = 17;
 /** Bounded `aspire wait` budget; the probe can never become Healthy, so this is the whole wait. */
 const BOUNDED_WAIT_SECONDS = 10;
 /** Test-failure ceiling for the bounded wait command itself, not an Aspire schedule. */
@@ -98,7 +96,7 @@ export function assertCredentialRejectionEvidence(
   return { rejected, listener, accepted };
 }
 
-/** Preserve the requested exit-18 assertion, bounded, without leaking diagnostics. */
+/** Require the coordinator-approved wait timeout, bounded, without leaking diagnostics. */
 export function assertBoundedWaitRejected(
   result: BoundedWaitResult,
   secrets: readonly string[],
@@ -117,42 +115,77 @@ export function assertBoundedWaitRejected(
   }
 }
 
-/** Observe the probe's Unhealthy transition, then attribute it from one settled snapshot. */
+/** Reject even transient Healthy updates, including credentials in their health evidence. */
+export function assertCredentialResourceNotHealthy(
+  update: ResourceUpdate,
+  secrets: readonly string[],
+): void {
+  assertHealthReportsHaveNoSecrets(update.resource, secrets);
+  if (healthStatusOf(update) === 'healthy') {
+    throw new Error('wrong-credential probe or dependant reported Healthy during observation');
+  }
+}
+
+/** Observe rejection and keep both resource followers open through the bounded healthy wait. */
 export async function verifyCredentialRejection(
   appHost: string,
   projectRoot: string,
 ): Promise<void> {
   const secrets = await readFixtureSecrets(projectRoot);
-  const subscription = await watchResourceUpdates(appHost, CREDENTIAL_FAULT_PROBE_RESOURCE);
+  let observationFailure: unknown;
+  const observedUpdates: Record<string, number> = {};
+  const observe = (name: string) => (update: ResourceUpdate): void => {
+    observedUpdates[name] = (observedUpdates[name] ?? 0) + 1;
+    try {
+      assertCredentialResourceNotHealthy(update, secrets);
+    } catch (error) {
+      observationFailure ??= error;
+    }
+  };
+  const subscriptions = [];
+  let evidence: CredentialRejectionEvidence;
+  let wait: BoundedWaitResult;
   try {
-    await subscription.waitFor(
+    const probe = await watchResourceUpdates(
+      appHost,
+      CREDENTIAL_FAULT_PROBE_RESOURCE,
+      undefined,
+      observe(CREDENTIAL_FAULT_PROBE_RESOURCE),
+    );
+    subscriptions.push(probe);
+    const dependent = await watchResourceUpdates(
+      appHost,
+      CREDENTIAL_FAULT_DEPENDENT_RESOURCE,
+      undefined,
+      observe(CREDENTIAL_FAULT_DEPENDENT_RESOURCE),
+    );
+    subscriptions.push(dependent);
+    await probe.waitFor(
       (update) => healthStatusOf(update) === 'unhealthy',
       RESOURCE_TRANSITION_FAILURE_CEILING_MS,
     );
+    // Prove the blocked dependant exists; an empty stream cannot satisfy the observation.
+    await dependent.waitFor(() => true, RESOURCE_TRANSITION_FAILURE_CEILING_MS);
+    evidence = await describeRejectionEvidence(appHost, secrets);
+    await assertGeneratedHelpersHaveNoSecrets(projectRoot, secrets);
+    await assertMcpResourcesHaveNoSecrets(projectRoot, appHost, secrets);
+    wait = await runAspire([
+      'wait',
+      CREDENTIAL_FAULT_PROBE_RESOURCE,
+      '--status',
+      'healthy',
+      '--timeout',
+      String(BOUNDED_WAIT_SECONDS),
+      '--apphost',
+      appHost,
+    ], BOUNDED_WAIT_CEILING_MS);
+    assertBoundedWaitRejected(wait, secrets);
+    // Recheck classification and correct-password readiness after the complete wait.
+    evidence = await describeRejectionEvidence(appHost, secrets);
   } finally {
-    await subscription.close();
+    await Promise.all(subscriptions.map((subscription) => subscription.close(true)));
   }
-
-  const snapshot = await runAspire(['describe', '--apphost', appHost, '--format', 'Json']);
-  if (snapshot.code !== 0) {
-    assertNoSecretBytes('aspire describe', snapshot.output, secrets);
-    throw new Error(`aspire describe failed (${snapshot.code}): ${snapshot.output}`);
-  }
-  const evidence = assertCredentialRejectionEvidence(snapshot.stdout, secrets);
-  await assertGeneratedHelpersHaveNoSecrets(projectRoot, secrets);
-  await assertMcpResourcesHaveNoSecrets(projectRoot, appHost, secrets);
-
-  const wait = await runAspire([
-    'wait',
-    CREDENTIAL_FAULT_PROBE_RESOURCE,
-    '--status',
-    'healthy',
-    '--timeout',
-    String(BOUNDED_WAIT_SECONDS),
-    '--apphost',
-    appHost,
-  ]);
-  assertBoundedWaitRejected(wait, secrets);
+  if (observationFailure) throw observationFailure;
 
   const receiptDir = `${projectRoot}/.netscript/e2e`;
   const receiptPath = `${receiptDir}/credential-rejection-receipt.json`;
@@ -164,6 +197,8 @@ export async function verifyCredentialRejection(
         {
           ...evidence,
           boundedWait: { code: wait.code, durationMs: wait.durationMs },
+          observedUpdates,
+          neverHealthy: [CREDENTIAL_FAULT_PROBE_RESOURCE, CREDENTIAL_FAULT_DEPENDENT_RESOURCE],
           scannedCredentials: secrets.length,
           scannedSurfaces: [
             'generated helpers',
@@ -177,6 +212,18 @@ export async function verifyCredentialRejection(
     }\n`,
   );
   console.info(`credential rejection receipt: ${receiptPath}`);
+}
+
+async function describeRejectionEvidence(
+  appHost: string,
+  secrets: readonly string[],
+): Promise<CredentialRejectionEvidence> {
+  const snapshot = await runAspire(['describe', '--apphost', appHost, '--format', 'Json']);
+  if (snapshot.code !== 0) {
+    assertNoSecretBytes('aspire describe', snapshot.output, secrets);
+    throw new Error(`aspire describe failed (${snapshot.code}): ${snapshot.output}`);
+  }
+  return assertCredentialRejectionEvidence(snapshot.stdout, secrets);
 }
 
 async function readFixtureSecrets(projectRoot: string): Promise<readonly string[]> {
@@ -196,10 +243,12 @@ function healthStatusOf(update: ResourceUpdate): string | undefined {
 
 async function runAspire(
   args: readonly string[],
+  ceilingMs?: number,
 ): Promise<BoundedWaitResult & { readonly stdout: string }> {
   const startedAt = performance.now();
   const result = await new Deno.Command('aspire', {
     args: [...args, '--non-interactive', '--nologo'],
+    signal: ceilingMs === undefined ? undefined : AbortSignal.timeout(ceilingMs),
     stdout: 'piped',
     stderr: 'piped',
   }).output();

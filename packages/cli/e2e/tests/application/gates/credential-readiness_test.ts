@@ -7,6 +7,7 @@ import { DATABASE, PACKAGE_SOURCE, REPORT_FORMAT } from '../../../src/domain/ext
 import type { RunContext } from '../../../src/domain/run-context.ts';
 import {
   createCredentialFaultPassword,
+  CREDENTIAL_FAULT_DEPENDENT_RESOURCE,
   CREDENTIAL_FAULT_PROBE_DIR,
   CREDENTIAL_FAULT_PROBE_RESOURCE,
   injectCredentialFaultHealthCheck,
@@ -24,6 +25,7 @@ import {
   ASPIRE_WAIT_TIMEOUT_EXIT_CODE,
   assertBoundedWaitRejected,
   assertCredentialRejectionEvidence,
+  assertCredentialResourceNotHealthy,
 } from '../../../src/application/gates/scaffold/runtime/verify-credential-rejection.ts';
 
 const REAL_PASSWORD = '5f0c2a9e8b7d4c3a1f6e5d4c3b2a1908';
@@ -101,6 +103,11 @@ Deno.test('credential fault splice reuses the generated postgres_auth server bin
   );
   assertEquals(injected.includes(WRONG_PASSWORD), false);
   assertStringIncludes(injected, 'readCredentialFaultState');
+  assertStringIncludes(injected, `builder.addExecutable('${CREDENTIAL_FAULT_DEPENDENT_RESOURCE}'`);
+  assertStringIncludes(
+    injected,
+    'await credential_fault_dependent.waitFor(credential_fault_probe);',
+  );
   assertStringIncludes(injected, 'appHostDir: string');
   assertStringIncludes(injected, 'createPostgresCredentialReadinessCheck,');
 });
@@ -235,30 +242,69 @@ Deno.test('scoped secret scan rejects each credential in helpers, all health evi
   }
 });
 
-Deno.test('bounded wait retains the required exit-18 assertion and no leak', () => {
+Deno.test('bounded wait maps Running Unhealthy to timeout 17, never resource failure 18', () => {
+  assertEquals(ASPIRE_WAIT_TIMEOUT_EXIT_CODE, 17);
   assertBoundedWaitRejected(
-    { code: ASPIRE_WAIT_TIMEOUT_EXIT_CODE, durationMs: 10_400, output: 'timed out' },
+    { code: 17, durationMs: 10_400, output: 'timed out' },
     SECRETS,
   );
   assertThrows(
     () => assertBoundedWaitRejected({ code: 0, durationMs: 50, output: '' }, SECRETS),
     Error,
-    'exited 0, expected 18',
-  );
-  assertThrows(
-    () => assertBoundedWaitRejected({ code: 17, durationMs: 10_400, output: 'timed out' }, SECRETS),
-    Error,
-    'exited 17, expected 18',
+    'exited 0, expected 17',
   );
   assertThrows(
     () =>
       assertBoundedWaitRejected(
-        { code: 18, durationMs: 10_000, output: `connection Password=${REAL_PASSWORD}` },
+        { code: 18, durationMs: 10_400, output: 'resource failed' },
+        SECRETS,
+      ),
+    Error,
+    'exited 18, expected 17',
+  );
+  assertThrows(
+    () =>
+      assertBoundedWaitRejected(
+        { code: 17, durationMs: 10_000, output: `connection Password=${REAL_PASSWORD}` },
         SECRETS,
       ),
     Error,
     'aspire wait output contains credential #0',
   );
+  assertBoundedWaitRejected({ code: 17, durationMs: 40_000, output: '' }, SECRETS);
+  assertThrows(
+    () => assertBoundedWaitRejected({ code: 17, durationMs: 40_001, output: '' }, SECRETS),
+    Error,
+    'for a 10s budget',
+  );
+});
+
+Deno.test('wrong-credential probe and dependant reject even transient Healthy updates', () => {
+  for (const name of [CREDENTIAL_FAULT_PROBE_RESOURCE, CREDENTIAL_FAULT_DEPENDENT_RESOURCE]) {
+    const update = (healthStatus: string | null, healthReports = {}) => ({
+      rawLine: '',
+      resource: { name, healthStatus, healthReports },
+    });
+    assertCredentialResourceNotHealthy(update(null), SECRETS);
+    assertCredentialResourceNotHealthy(update('Unhealthy'), SECRETS);
+    assertThrows(
+      () => assertCredentialResourceNotHealthy(update('Healthy'), SECRETS),
+      Error,
+      'reported Healthy',
+    );
+    const error = assertThrows(
+      () =>
+        assertCredentialResourceNotHealthy(
+          update('Unhealthy', {
+            check: { description: WRONG_PASSWORD },
+          }),
+          SECRETS,
+        ),
+      Error,
+      'health evidence output contains credential',
+    );
+    assertEquals(error.message.includes(WRONG_PASSWORD), false);
+  }
 });
 
 Deno.test('credential readiness gates wait on postgres_auth and run the rejection verifier', () => {

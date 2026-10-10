@@ -11,6 +11,8 @@
 export const TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY = 'test_only_postgres_auth_rejected';
 /** Aspire resource that carries the wrong-credential check. */
 export const CREDENTIAL_FAULT_PROBE_RESOURCE = 'credential-fault-probe';
+/** Dependant that must remain blocked by the probe's rejected credential check. */
+export const CREDENTIAL_FAULT_DEPENDENT_RESOURCE = 'credential-fault-dependent';
 /** Project-relative directory of the probe's long-lived Deno task. */
 export const CREDENTIAL_FAULT_PROBE_DIR = '.netscript/e2e/credential-fault-probe';
 /** Project-relative state file that records the fixture's wrong password for leak checks. */
@@ -52,6 +54,8 @@ export function injectCredentialFaultHealthCheck(source: string, wrongPassword: 
     `${indentation}builder.addHealthCheck('${TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY}', createPostgresCredentialReadinessCheck({ endpoint: () => ${serverBinding}.getEndpoint('tcp'), password: credential_fault_password }));`,
     `${indentation}const credential_fault_probe = builder.addExecutable('${CREDENTIAL_FAULT_PROBE_RESOURCE}', 'deno', \`\${appHostDir}/${CREDENTIAL_FAULT_PROBE_DIR}\`, ['task', 'start']);`,
     `${indentation}await credential_fault_probe.withHealthCheck('${TEST_ONLY_POSTGRES_AUTH_REJECTED_KEY}');`,
+    `${indentation}const credential_fault_dependent = builder.addExecutable('${CREDENTIAL_FAULT_DEPENDENT_RESOURCE}', 'deno', \`\${appHostDir}/${CREDENTIAL_FAULT_PROBE_DIR}\`, ['task', 'start']);`,
+    `${indentation}await credential_fault_dependent.waitFor(credential_fault_probe);`,
   ].join('\n');
   return `import { readFile as readCredentialFaultState } from 'node:fs/promises';\n` +
     `${source.slice(0, end)}\n${block}${source.slice(end)}`;
