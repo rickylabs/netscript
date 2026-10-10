@@ -196,7 +196,9 @@ async function withMessagesTransport(
   };
   try {
     await run(requests);
-    for (const key of ['test-static-key', 'test-request-key', 'test-env-key']) {
+    for (
+      const key of ['test-static-key', 'test-request-key', 'test-env-key', 'test-bearer-token']
+    ) {
       assert(!JSON.stringify(logs).includes(key));
     }
   } finally {
@@ -256,6 +258,73 @@ Deno.test({
 });
 
 Deno.test({
+  name: 'anthropic: bearer environment fallback preserves explicit credential precedence',
+  sanitizeOps: false,
+  sanitizeResources: false,
+  async fn() {
+    const priorToken = Deno.env.get('ANTHROPIC_AUTH_TOKEN');
+    Deno.env.set('ANTHROPIC_AUTH_TOKEN', 'test-bearer-token');
+    try {
+      await withMessagesTransport(async (requests) => {
+        const envClient = new AnthropicModelProvider().createChatClient('claude-sonnet-5-5');
+        assert((await collect(envClient)).some((event) => event.type === 'finish'));
+        assertEquals(requests.length, 1);
+        assertEquals(requests[0]!.headers.get('authorization'), 'Bearer test-bearer-token');
+        assertEquals(requests[0]!.headers.get('x-api-key'), null);
+        const staticClient = new AnthropicModelProvider({ apiKey: 'test-static-key' })
+          .createChatClient('claude-sonnet-5-5');
+        await collect(staticClient);
+        assertEquals(requests.at(-1)!.headers.get('x-api-key'), 'test-static-key');
+        assertEquals(requests.at(-1)!.headers.get('authorization'), null);
+        await collect(staticClient, undefined, { connection: { apiKey: 'test-request-key' } });
+        assertEquals(requests.at(-1)!.headers.get('x-api-key'), 'test-request-key');
+        assertEquals(requests.at(-1)!.headers.get('authorization'), null);
+        assertEquals(requests.length, 3);
+      });
+    } finally {
+      if (priorToken === undefined) Deno.env.delete('ANTHROPIC_AUTH_TOKEN');
+      else Deno.env.set('ANTHROPIC_AUTH_TOKEN', priorToken);
+    }
+  },
+});
+
+Deno.test({
+  name: 'anthropic: lone surrogates are removed from provider input while emoji survives',
+  sanitizeOps: false,
+  sanitizeResources: false,
+  async fn() {
+    await withMessagesTransport(async (requests) => {
+      const client = new AnthropicModelProvider({ apiKey: 'test-static-key' })
+        .createChatClient('claude-sonnet-5-5');
+      const events = await collect(client, {
+        system: 'system\uD800🙂',
+        messages: [
+          { role: 'user', content: 'question\uDC00🙂' },
+          {
+            role: 'assistant',
+            content: '',
+            toolCalls: [{
+              id: 'call_clean',
+              name: 'lookup',
+              arguments: JSON.stringify({ text: 'arg\uD800🙂' }),
+            }],
+          },
+          { role: 'tool', toolCallId: 'call_clean', content: 'result\uD800🙂' },
+        ],
+      });
+      assert(events.some((event) => event.type === 'finish'));
+      assertEquals(requests.length, 1);
+      const body = JSON.stringify(requests[0]!.body);
+      for (const text of ['system🙂', 'question🙂', 'arg🙂', 'result🙂']) {
+        assert(body.includes(text), `provider input must preserve ${text}`);
+      }
+      assert(!body.includes('\\ud800'));
+      assert(!body.includes('\\udc00'));
+    });
+  },
+});
+
+Deno.test({
   name: 'anthropic: split cumulative usage preserves caches and remains isolated per turn',
   sanitizeOps: false,
   sanitizeResources: false,
@@ -269,9 +338,9 @@ Deno.test({
         const first = (await collect(client)).find((event) => event.type === 'finish');
         assert(first?.type === 'finish');
         assertEquals(first.usage, {
-          promptTokens: 6,
+          promptTokens: 17,
           completionTokens: 8,
-          totalTokens: 14,
+          totalTokens: 25,
           promptTokensDetails: { cacheWriteTokens: 4, cachedTokens: 7 },
           providerUsageDetails: {
             serverToolUse: { webSearchRequests: 2, webFetchRequests: 1 },

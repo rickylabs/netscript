@@ -165,7 +165,10 @@ Choosing between them is mostly a question of where your models live:
 
 - **`./anthropic`** talks to Anthropic directly, combining the
   `@tanstack/ai-anthropic` catalog with Sonnet 5.5 through TanStack's model
-  extension API. `apiKey` defaults to `ANTHROPIC_API_KEY`. Set `models` to explicit additional
+  extension API. Explicit request/provider `apiKey` values win; otherwise the upstream adapter
+  checks `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_OAUTH_TOKEN`, then `ANTHROPIC_API_KEY` when a turn
+  starts. Bearer tokens use `Authorization`; OAuth tokens also enable the upstream Claude Code
+  identity headers/system block. Set `models` to explicit additional
   API IDs when the provider catalog lags a release; discovery and construction remain offline,
   unknown unconfigured IDs reject, and added IDs have no inferred capabilities. The registered
   provider factory accepts the same configuration. Exact Opus 5.5/Fable 5.1 IDs retain mandatory
@@ -174,6 +177,11 @@ Choosing between them is mostly a question of where your models live:
   the fix and is unavailable in published NetScript 0.0.7. Streaming usage retains input/cache counts
   from `message_start` when cumulative `message_delta` frames report only output counts; counters
   reset per turn and the observer emits no provider logs.
+  With the TanStack AI 0.68 family, `usage.promptTokens` includes uncached input, cache reads,
+  and cache writes exactly once. Use it directly as total input; adding
+  `promptTokensDetails.cachedTokens` or `cacheWriteTokens` again double-counts the cache.
+  Subtract those detail fields to obtain uncached input. `totalTokens` includes the total input
+  plus completion tokens.
 - **`./openai-compatible`** is the workhorse for any endpoint that speaks the
   OpenAI API: no fixed catalog (the remote endpoint owns its model list), and it
   throws `AiNotConfiguredError` rather than guessing when `baseURL` / `apiKey`
