@@ -34,3 +34,5 @@ export type {
   WorkerInstrumentationSpan,
 } from './worker-instrumentation.ts';
 export type { WorkersCommandDefinition } from './workers-command.ts';
+
+export type { TaskStdin, TaskStdinJson } from '../domain/task-stdin.ts';

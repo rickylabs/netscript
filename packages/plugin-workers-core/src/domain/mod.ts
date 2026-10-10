@@ -157,3 +157,5 @@ export type {
   TaskSpec,
   TaskSystem,
 } from './task.ts';
+
+export type { TaskStdin, TaskStdinJson } from './task-stdin.ts';

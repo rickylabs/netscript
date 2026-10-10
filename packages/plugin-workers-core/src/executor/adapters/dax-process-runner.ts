@@ -1,4 +1,4 @@
-import $, { type CommandChild } from '@david/dax';
+import { encodeTaskStdin } from '../../internal/task-stdin.ts';
 import type {
   ResolvedTaskExecutionOptions,
   TaskDefinition,
@@ -13,6 +13,8 @@ export type ProcessRunInput = Readonly<{
   args: readonly string[];
   task: TaskDefinition;
   options: ResolvedTaskExecutionOptions;
+  /** Bytes written once and closed; absent stdin is null, never inherited. */
+  stdin?: Uint8Array;
 }>;
 
 /** Subprocess primitive used by runtime adapters. */
@@ -21,7 +23,10 @@ export interface ProcessRunner {
   run(input: ProcessRunInput): Promise<TaskResult>;
 }
 
-/** Run task subprocesses through Dax with streaming output capture. */
+/**
+ * Run task subprocesses with bounded Web Platform stream capture.
+ * The historical class name is preserved; subprocess IO uses Deno.Command.
+ */
 export class DaxProcessRunner implements ProcessRunner {
   /** Run a subprocess and return the normalized task result. */
   run(input: ProcessRunInput): Promise<TaskResult> {
@@ -29,7 +34,7 @@ export class DaxProcessRunner implements ProcessRunner {
   }
 }
 
-/** Run a subprocess through Dax with result capture and log callbacks. */
+/** Run a subprocess with bounded stdin, output capture, and log callbacks. */
 export async function runProcess(input: ProcessRunInput): Promise<TaskResult> {
   const startedAt = Date.now();
   const stdout: string[] = [];
@@ -48,41 +53,72 @@ export async function runProcess(input: ProcessRunInput): Promise<TaskResult> {
     );
   }
 
-  try {
-    let command = $`${[input.command, ...input.args]}`;
-    command = command.cwd(input.options.cwd || Deno.cwd());
-    command = command.env(env).timeout(`${input.options.timeout}ms`).noThrow();
-    command = command.stdout('piped').stderr('piped');
-
-    const child: CommandChild = command.spawn();
-    const streamLogs = input.options.streamLogs !== false;
-    const streams = streamLogs
-      ? [
-        streamOutput(child.stdout(), input, 'stdout', stdout),
-        streamOutput(child.stderr(), input, 'stderr', stderr),
-      ]
-      : [];
-    const [result] = await Promise.all([child, ...streams]);
-
-    if (!streamLogs) {
-      pushLines(String(result.stdout ?? ''), input, 'stdout', stdout);
-      pushLines(String(result.stderr ?? ''), input, 'stderr', stderr);
+  let child: Deno.ChildProcess | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let failure: { status: string; message: string } | undefined;
+  const stop = (status: string, message: string): void => {
+    if (failure) return;
+    failure = { status, message };
+    try {
+      child?.kill('SIGKILL');
+    } catch {
+      // The child may have exited between the failure and the kill request.
     }
-
-    const success = result.code === 0;
+  };
+  const cancel = (): void => stop('cancelled', 'Task cancelled.');
+  try {
+    const stdin = input.stdin !== undefined
+      ? encodeTaskStdin(input.stdin)
+      : Object.hasOwn(input.options, 'stdin')
+      ? encodeTaskStdin(input.options.stdin!)
+      : input.task.stdin !== undefined
+      ? encodeTaskStdin(input.task.stdin)
+      : undefined;
+    const stdoutLimit = outputLimit(input.options.stdoutLimitBytes);
+    const stderrLimit = outputLimit(input.options.stderrLimitBytes);
+    child = new Deno.Command(input.command, {
+      args: [...input.args],
+      cwd: input.options.cwd || Deno.cwd(),
+      env,
+      stdin: stdin === undefined ? 'null' : 'piped',
+      stdout: 'piped',
+      stderr: 'piped',
+    }).spawn();
+    input.options.signal?.addEventListener('abort', cancel, { once: true });
+    if (input.options.signal?.aborted) cancel();
+    timer = setTimeout(() => stop('timeout', 'Task timeout.'), input.options.timeout);
+    const guard = async (operation: Promise<void>): Promise<void> => {
+      try {
+        await operation;
+      } catch (error) {
+        stop('failed', error instanceof Error ? error.message : String(error));
+      }
+    };
+    const [result] = await Promise.all([
+      child.status,
+      guard(streamOutput(child.stdout, input, 'stdout', stdout, stdoutLimit)),
+      guard(streamOutput(child.stderr, input, 'stderr', stderr, stderrLimit)),
+      stdin === undefined ? Promise.resolve() : guard(writeStdin(child.stdin, stdin)),
+    ]);
+    const success = !failure && result.code === 0;
     return createProcessResult(
       input.task,
       startedAt,
-      result.code,
+      failure ? -1 : result.code,
       stdout,
       stderr,
-      success ? 'completed' : 'failed',
-      success ? null : buildErrorMessage(result.code, input.command, stderr.join('\n')),
+      failure?.status ?? (success ? 'completed' : 'failed'),
+      failure?.message ??
+        (success ? null : buildErrorMessage(result.code, input.command, stderr.join('\n'))),
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    const status = message.toLowerCase().includes('timeout') ? 'timeout' : 'failed';
-    return createProcessResult(input.task, startedAt, -1, stdout, stderr, status, message);
+    stop('failed', message);
+    if (child) await child.status;
+    return createProcessResult(input.task, startedAt, -1, stdout, stderr, 'failed', message);
+  } finally {
+    clearTimeout(timer);
+    input.options.signal?.removeEventListener('abort', cancel);
   }
 }
 
@@ -102,31 +138,53 @@ async function streamOutput(
   input: ProcessRunInput,
   source: TaskLogEntry['source'],
   buffer: string[],
+  limit: number,
 ): Promise<void> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
   let partial = '';
+  let size = 0;
   try {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
+      size += value.byteLength;
+      if (size > limit) {
+        throw new Error(
+          `${
+            source === 'stdout' ? 'Stdout' : 'Stderr'
+          }LimitExceeded: output exceeds ${limit} bytes.`,
+        );
+      }
       const lines = (partial + decoder.decode(value, { stream: true })).split('\n');
       partial = lines.pop() ?? '';
       for (const line of lines) emitLine(line, input, source, buffer);
     }
-    emitLine(partial, input, source, buffer);
+    emitLine(partial + decoder.decode(), input, source, buffer);
   } finally {
     reader.releaseLock();
   }
 }
 
-function pushLines(
-  text: string,
-  input: ProcessRunInput,
-  source: TaskLogEntry['source'],
-  buffer: string[],
-): void {
-  for (const line of text.split('\n')) emitLine(line, input, source, buffer);
+function outputLimit(limit: number = 1024 * 1024): number {
+  if (!Number.isSafeInteger(limit) || limit <= 0) {
+    throw new Error('InvalidOutputLimit: expected a positive safe integer byte limit.');
+  }
+  return limit;
+}
+
+async function writeStdin(stream: WritableStream<Uint8Array>, bytes: Uint8Array): Promise<void> {
+  const writer = stream.getWriter();
+  try {
+    for (let offset = 0; offset < bytes.length; offset += 16384) {
+      await writer.write(bytes.subarray(offset, offset + 16384));
+    }
+    await writer.close();
+  } catch {
+    throw new Error('StdinWriteFailed: subprocess closed stdin before the payload was delivered.');
+  } finally {
+    writer.releaseLock();
+  }
 }
 
 function emitLine(
@@ -137,6 +195,7 @@ function emitLine(
 ): void {
   if (!line.trim()) return;
   buffer.push(line);
+  if (input.options.streamLogs === false) return;
   const entry: TaskLogEntry = {
     message: line,
     severity: classifyTaskLog(line, source),

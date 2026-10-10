@@ -1,3 +1,4 @@
+import type { TaskStdin } from './task-stdin.ts';
 import { z } from 'zod';
 import { DEFAULT_TOPIC, TaskSourceSchema, TaskStatusSchema, TaskTypeSchema } from './constants.ts';
 import type { TaskType } from './constants.ts';
@@ -233,6 +234,8 @@ export type TaskDefinition<
     id: TaskId<TId>;
     type: TaskType;
     entrypoint?: string;
+    /** Runtime-only stdin payload; never persisted in task registration. */
+    stdin?: TaskStdin;
     handler?: TaskHandler<TPayload, TResult>;
     payloadSchema?: JobPayloadSchema<TPayload>;
   }
@@ -309,6 +312,12 @@ export type TaskResponse = typeof TaskResponseSchema['_output'];
 
 /** Options for executing a task. */
 export type TaskExecutionOptions = Readonly<{
+  /** Bytes or JSON written to stdin once, then closed; maximum 1 MiB. */
+  stdin?: TaskStdin;
+  /** Maximum captured stdout bytes; defaults to 1 MiB. */
+  stdoutLimitBytes?: number;
+  /** Maximum captured stderr bytes; defaults to 1 MiB. */
+  stderrLimitBytes?: number;
   cwd?: string;
   env?: Record<string, string>;
   timeout?: number;

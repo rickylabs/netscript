@@ -191,3 +191,5 @@ export type {
   WorkerIdempotencyPort,
   WorkerIdempotencySource,
 } from '../ports/worker-idempotency-port.ts';
+
+export type { TaskStdin, TaskStdinJson } from '../domain/task-stdin.ts';

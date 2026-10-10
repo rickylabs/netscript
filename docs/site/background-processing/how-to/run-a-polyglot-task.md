@@ -24,7 +24,7 @@ hub — read that first for the WHY (what a task is, how the subprocess seam wor
   rows: [
     { name: "@netscript/plugin-workers-core", type: "package (alpha)", desc: "Provides defineTask (./builders) and createDefaultTaskExecutor (./executor)." },
     { name: "The target toolchain", type: "host binary", desc: "The interpreter the task spawns must exist on the worker HOST: python3 (or a venv / py on Windows), bash, pwsh/powershell, the .NET SDK, or your prebuilt binary." },
-    { name: "An entrypoint script", type: "file path", desc: "The script or executable to run, e.g. ./scripts/score.py. The task passes it input as argv + env, never stdin." },
+    { name: "An entrypoint script", type: "file path", desc: "The script or executable to run, e.g. ./scripts/score.py. The task passes it input as argv, env, or a bounded stdin payload." },
     { name: "(deno tasks only) a permission set", type: "BuilderPermissions", desc: "net/read/write/env/run/ffi/import. Enforced ONLY for the deno runtime — see the sandbox note below." }
   ]
 }) }}
@@ -66,7 +66,7 @@ The subprocess returns structured data by printing **one JSON object as the last
   {
     label: "score.py",
     lang: "python",
-    code: "# scripts/score.py\nimport json, os, sys\n\n# Input arrives as argv + env (NOT stdin).\nthreshold = float(sys.argv[sys.argv.index('--threshold') + 1])\nmodel_path = os.environ['MODEL_PATH']\n\n# ... do the work ...\nscored = {'kept': 42, 'dropped': 3, 'threshold': threshold}\n\n# Diagnostics go to stderr; the result is the LAST stdout line and must be a\n# single JSON OBJECT (not an array) to populate result.result.\nprint('scoring complete', file=sys.stderr)\nprint(json.dumps(scored))"
+    code: "# scripts/score.py\nimport json, os, sys\n\n# Input arrives as argv + env in this example.\nthreshold = float(sys.argv[sys.argv.index('--threshold') + 1])\nmodel_path = os.environ['MODEL_PATH']\n\n# ... do the work ...\nscored = {'kept': 42, 'dropped': 3, 'threshold': threshold}\n\n# Diagnostics go to stderr; the result is the LAST stdout line and must be a\n# single JSON OBJECT (not an array) to populate result.result.\nprint('scoring complete', file=sys.stderr)\nprint(json.dumps(scored))"
   },
   {
     label: "rotate-logs.sh",
@@ -74,6 +74,60 @@ The subprocess returns structured data by printing **one JSON object as the last
     code: "#!/usr/bin/env bash\n# scripts/rotate-logs.sh\nset -euo pipefail\n\nkeep=\"${2:-7}\"\n# ... rotate ...\necho \"rotated logs, keeping ${keep}\" >&2   # diagnostics -> stderr\n\n# Last stdout line = JSON object result. Non-python runtimes are not -u'd, so\n# flush by emitting the JSON as the final write with nothing after it.\nprintf '{\"rotated\": true, \"kept\": %s}\\n' \"$keep\""
   }
 ] }) }}
+
+### 2a. Send private input on stdin
+
+Use `.stdin(bytesOrJson)` for a fixed task payload or `options.stdin` for input supplied at
+execution time. The execution option replaces the builder payload. JSON is encoded as UTF-8;
+`Uint8Array` values are sent unchanged. The runner writes the payload with backpressure and closes
+stdin, so the script can read to EOF. Absent input uses null stdin and never inherits input from the
+worker host. An explicitly supplied `undefined` payload fails with `MissingStdinPayload`.
+
+```ts
+import { defineTask } from '@netscript/plugin-workers-core/builders';
+import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
+
+const task = defineTask('private-input')
+  .runtime('python')
+  .entrypoint('./scripts/private-input.py')
+  .stdin({ uid: 'service-operator', roots: ['workspace-root'] })
+  .build();
+const executor = createDefaultTaskExecutor();
+const result = await executor.execute(task, {
+  stdin: { uid: 'another-operator', roots: ['another-root'] },
+  stdoutLimitBytes: 65_536,
+  stderrLimitBytes: 65_536,
+});
+console.log(result.success);
+```
+
+```python
+# scripts/private-input.py
+import json, sys
+
+payload = json.load(sys.stdin)
+# Use private input without putting it in argv, env, or diagnostics.
+print(json.dumps({'accepted': len(payload['roots'])}))
+```
+
+Stdin is capped at **1 MiB of encoded bytes**, including JSON punctuation and escaping. Builder
+input is validated and copied when `.stdin()` is called; execution input is validated before
+spawning. Oversized input produces `StdinPayloadTooLarge`. JSON accepts finite numbers, strings,
+booleans, null, arrays, and plain objects with at most 64 levels of nesting; cycles, accessors, and
+unsupported values produce `InvalidStdinPayload`. A subprocess that closes stdin before accepting
+the payload produces `StdinWriteFailed`.
+
+Captured stdout and stderr each default to **1 MiB**. Set positive integer `stdoutLimitBytes` /
+`stderrLimitBytes` execution options, or configure those defaults on
+`new ExecutableRuntimeAdapter({ stdoutLimitBytes, stderrLimitBytes })`. Exceeding a cap kills the
+subprocess and returns `status: 'failed'`, `success: false`, and `StdoutLimitExceeded` or
+`StderrLimitExceeded`; caps also apply with `streamLogs: false`. Runtime validation and write errors
+return failed task results; builder validation throws before building the task. Running aborts
+return `cancelled`, and timeouts return `timeout`, both with exit code `-1`.
+
+Stdin is runtime input, not a persisted registration field or a CLI stdin flag. Supply private
+per-execution input through the executor in background workers; the phone and web app need not
+remain open. Scripts control their own stdout/stderr: do not print private payloads.
 
 ### 3. Run it through the workers CLI
 

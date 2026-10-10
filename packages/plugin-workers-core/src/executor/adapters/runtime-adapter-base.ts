@@ -1,3 +1,4 @@
+import { encodeTaskStdin } from '../../internal/task-stdin.ts';
 import { TaskRuntimeAdapter } from '../../abstracts/mod.ts';
 import type {
   ResolvedTaskExecutionOptions,
@@ -22,6 +23,8 @@ export class RuntimeAdapterBase extends TaskRuntimeAdapter {
   readonly runtime: TaskType | null;
   readonly #build: CommandBuilder;
   readonly #runner: ProcessRunner;
+  readonly #stdoutLimitBytes?: number;
+  readonly #stderrLimitBytes?: number;
 
   /** Create a subprocess adapter from command-building primitives. */
   constructor(options: {
@@ -29,11 +32,15 @@ export class RuntimeAdapterBase extends TaskRuntimeAdapter {
     runtime: TaskType | null;
     build: CommandBuilder;
     runner?: ProcessRunner;
+    stdoutLimitBytes?: number;
+    stderrLimitBytes?: number;
   }) {
     super();
     this.id = options.id;
     this.runtime = options.runtime;
     this.#build = options.build;
+    this.#stdoutLimitBytes = options.stdoutLimitBytes;
+    this.#stderrLimitBytes = options.stderrLimitBytes;
     this.#runner = options.runner ?? new DaxProcessRunner();
   }
 
@@ -50,7 +57,17 @@ export class RuntimeAdapterBase extends TaskRuntimeAdapter {
         command: spec.command,
         args: spec.args,
         task,
-        options: { ...options, env: { ...options.env, ...(spec.env ?? {}) } },
+        stdin: Object.hasOwn(options, 'stdin')
+          ? encodeTaskStdin(options.stdin!)
+          : task.stdin !== undefined
+          ? encodeTaskStdin(task.stdin)
+          : undefined,
+        options: {
+          ...options,
+          stdoutLimitBytes: options.stdoutLimitBytes ?? this.#stdoutLimitBytes,
+          stderrLimitBytes: options.stderrLimitBytes ?? this.#stderrLimitBytes,
+          env: { ...options.env, ...(spec.env ?? {}) },
+        },
       });
     } catch (error) {
       return failedTaskResult(task, error);

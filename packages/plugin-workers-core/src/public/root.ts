@@ -1,3 +1,4 @@
+import type { TaskStdin } from '../domain/task-stdin.ts';
 import { defineJob as defineJobImpl } from '../builders/job-builder.ts';
 import { defineTask as defineTaskImpl } from '../builders/task-builder.ts';
 import { defineWorkflow as defineWorkflowImpl } from '../builders/workflow-builder.ts';
@@ -190,6 +191,8 @@ export type TaskDefinition<TId extends string = string, TPayload = unknown, TRes
   Readonly<{
     id: TaskId<TId>;
     entrypoint?: string;
+    /** Runtime-only stdin payload; never persisted in registration. */
+    stdin?: TaskStdin;
     name?: string;
     topic?: string;
     type?: string;
@@ -354,6 +357,8 @@ export interface TaskBuilder<
   permissions(perms: Readonly<Record<string, unknown>>): this;
   /** Append command-line arguments. */
   args(...args: string[]): this;
+  /** Set bytes or JSON on stdin (maximum 1 MiB), written once and closed. */
+  stdin(payload: TaskStdin): this;
   /** Merge environment variables. */
   env(vars: Record<string, string>): this;
   /** Set the working directory. */
@@ -538,3 +543,5 @@ export function inspectWorkflow(
 ): Readonly<{ id: string; kind: 'workflow' }> {
   return Object.freeze({ id: workflow.id, kind: 'workflow' });
 }
+
+export type { TaskStdin, TaskStdinJson } from '../domain/task-stdin.ts';

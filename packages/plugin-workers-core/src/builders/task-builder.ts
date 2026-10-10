@@ -1,3 +1,5 @@
+import type { TaskStdin } from '../domain/task-stdin.ts';
+import { encodeTaskStdin } from '../internal/task-stdin.ts';
 import { validateJobPayload } from '../domain/job-handler.ts';
 import type {
   JobPayloadSchema,
@@ -84,6 +86,8 @@ export interface TaskBuilder<
   permissions(perms: BuilderPermissions): this;
   /** Append command-line arguments. */
   args(...args: string[]): this;
+  /** Set bytes or JSON on stdin (maximum 1 MiB), written once and closed. */
+  stdin(payload: TaskStdin): this;
   /** Merge environment variables. */
   env(vars: Record<string, string>): this;
   /** Set the working directory. */
@@ -134,6 +138,7 @@ type TaskBuilderData<TId extends string, TPayload, TResult> = Readonly<{
   maxRetries: number;
   permissions?: BuilderPermissions;
   args: readonly string[];
+  stdin?: Uint8Array;
   env?: Readonly<Record<string, string>>;
   cwd?: string;
   tags: readonly string[];
@@ -230,6 +235,10 @@ class TaskBuilderImpl<
     return new TaskBuilderImpl({ ...this.#data, args: [...this.#data.args, ...args] });
   }
 
+  stdin(payload: TaskStdin): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({ ...this.#data, stdin: encodeTaskStdin(payload) });
+  }
+
   env(vars: Record<string, string>): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
     return new TaskBuilderImpl({ ...this.#data, env: { ...this.#data.env, ...vars } });
   }
@@ -280,6 +289,7 @@ class TaskBuilderImpl<
       source: 'local',
       args: [...this.#data.args],
       cwd: this.#data.cwd,
+      stdin: this.#data.stdin?.slice(),
       env: this.#data.env ? { ...this.#data.env } : undefined,
       permissions: toDomainPermissions(this.#data.permissions),
       timezone: 'UTC',
