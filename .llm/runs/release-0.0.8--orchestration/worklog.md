@@ -1479,3 +1479,101 @@ Generated from the coordinator's append-only event stream; newest last.
 - `2026-10-10T17:46:14Z` **merge.pending** — leaf: X-2106; pr: 2224; head: a862388aa5e921a7f18654b436dfd653219f451a; mode: carry; reviewedHead: d29cfe7d52a8d920fe04d39446fec071c68ef547
 - `2026-10-10T17:50:24Z` **merged** — leaf: X-2106; pr: 2224; head: a862388aa5e921a7f18654b436dfd653219f451a; via: merge_when_green
 - `2026-10-10T17:50:56Z` **merged** — leaf: X-2106; pr: 2224; main: 653a7f4; closes: 2106; via: conveyor
+- `2026-10-10T17:56:35Z` **merge.pending** — leaf: X-2230; pr: 2240; head: b5f5cf83d7e63e3d17323e1e9f4342d6b78b91b5; mode: carry; reviewedHead: b14e1748be51241b9cbbdfde434c6bf2093390b1
+- `2026-10-10T18:00:44Z` **merged** — leaf: X-2230; pr: 2240; head: b5f5cf83d7e63e3d17323e1e9f4342d6b78b91b5; via: merge_when_green
+- `2026-10-10T18:01:12Z` **merged** — leaf: X-2230; pr: 2240; main: e3a0f28; closes: ; via: conveyor
+- `2026-10-10T18:03:46Z` **merge.pending** — leaf: X-1362; pr: 2223; head: 7a704488e5984b81188c6691c7b2d20f0830e928; mode: carry; reviewedHead: 673f28d29365656a23fbf139548682ffaea4da82
+- `2026-10-10T18:08:57Z` **merged** — leaf: X-1362; pr: 2223; head: 7a704488e5984b81188c6691c7b2d20f0830e928; via: merge_when_green
+- `2026-10-10T18:09:13Z` **merged** — leaf: X-1362; pr: 2223; main: 984bb0b; closes: 1362; via: conveyor
+- `2026-10-10T18:12:38.316549+00:00` **leaf.exit** — leaf: X-2233; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T18:13:04.132240+00:00` **leaf.exit** — leaf: X-2100-2; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T18:13:25Z` **tooling** — what: merge_train v7.2: modify/delete conflicts on generated carriers resolve to deletion (prep for #2234 removing prose.json.gz); tested on a synthetic repo; atomic rename
+- `2026-10-10T18:13:32Z` **review.queue** — prs: [2234, 2244]; what: #2234 confirm after Codex merge (train v7.2 for prose.json.gz); #2244 first review (#2100 L2)
+- `2026-10-10T18:14:23Z` **review.launch** — leaf: X-2100-2; pr: 2244; head: ca5c8e2e5b64d7d5ce0a6a134991e63a99b6f1b8; requested: {"model": "claude-opus-5-5", "effort": "high"}; mode: first
+- `2026-10-10T18:15:10Z` **review.launch** — leaf: X-2233; pr: 2234; head: dcec4d43ede043f1cbf50eca3ef5087179713be9; requested: {"model": "claude-opus-5-5", "effort": "high"}; mode: confirm
+- `2026-10-10T18:18:00Z` **review.exit** — leaf: X-2100-2; pr: 2244; head: ca5c8e2e5b64d7d5ce0a6a134991e63a99b6f1b8; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; reviewer: claude-opus-5-5; effort: high
+- `2026-10-10T18:18:17Z` **review.result** — pr: 2244; leaf: X-2100-2; verdict: REVISE; head: ca5c8e2e5; reviewer: claude-opus-5-5; what: double cast hides that StreamCollectionV1 is not a typed TanStack collection; fatal-error preload hang; cleanup restart re-binds cancelled source; action: posted; Codex fix (high)
+- `2026-10-10T18:18:17Z` **leaf.launch** — leaf: X-2100-2; requested: {"model": "gpt-6.1-sol", "effort": "high", "runtime": "codex"}; branch: feat/sdk-expo-stream-binding; resume: <session-id>
+- `2026-10-10T18:18:55Z` **review.exit** — leaf: X-2233; pr: 2234; head: dcec4d43ede043f1cbf50eca3ef5087179713be9; exitCode: 0; verdict: VERDICT: PASS; reviewer: claude-opus-5-5; effort: high
+- `2026-10-10T18:19:10Z` **review.result** — pr: 2234; leaf: X-2233; verdict: PASS; head: dcec4d43e; reviewer: claude-opus-5-5; action: posted; queued position 2 (carrier redesign)
+- `2026-10-10T18:31:32Z` **merged** — leaf: X-2233; pr: 2234; head: dcec4d43ede043f1cbf50eca3ef5087179713be9; mode: exact; reviewedHead: dcec4d43ede043f1cbf50eca3ef5087179713be9
+- `2026-10-10T18:31:34Z` **merged** — leaf: X-2233; pr: 2234; main: 2d05019; closes: ; via: conveyor
+- `2026-10-10T18:45:57.655699+00:00` **leaf.exit** — leaf: X-2100-2; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T18:46:54Z` **review.launch** — leaf: X-2100-2; pr: 2244; head: a4b5e3bfdd142bf71058bb3d9c6f38083de8ccd7; requested: {"model": "claude-opus-5-5", "effort": "high"}; mode: confirm
+- `2026-10-10T18:49:46Z` **review.exit** — leaf: X-2100-2; pr: 2244; head: a4b5e3bfdd142bf71058bb3d9c6f38083de8ccd7; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; reviewer: claude-opus-5-5; effort: high
+- `2026-10-10T18:50:03Z` **review.result** — pr: 2244; leaf: X-2100-2; verdict: REVISE; head: a4b5e3bfd; reviewer: claude-opus-5-5; what: reference fixture *_test.ts picked up by root shard test-6 (bare imports); parallel materializer debt; action: posted; Codex fix (medium)
+- `2026-10-10T18:50:03Z` **leaf.launch** — leaf: X-2100-2; requested: {"model": "gpt-6.1-sol", "effort": "medium", "runtime": "codex"}; branch: feat/sdk-expo-stream-binding; resume: <session-id>
+- `2026-10-10T18:57:20Z` **runtime.rerun** — what: re-ran failed runtime jobs once for queued PRs (runtime.aspire-start flakiness, #2185 class); conveyor treats failed runtime as missing and re-applies labels without new runs
+- `2026-10-10T18:58:49.781598+00:00` **leaf.exit** — leaf: X-2100-2; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T18:59:38Z` **conveyor.stop** — pid: 3844085; why: v5 deadlocks on CONFLICTING PRs (waits runtime before training; GitHub runs no PR workflow on conflicts); replacing with v6 after batch-training the 9 queued PRs
+- `2026-10-10T19:00:45Z` **review.launch** — leaf: X-2100-2; pr: 2244; head: edbf2c0a6265bc33a707596d1ca6421eb8e8dc0d; requested: {"model": "claude-opus-5-5", "effort": "high"}; mode: confirm
+- `2026-10-10T19:01:30Z` **leaf.launch** — leaf: W11-1726; requested: {"model": "gpt-6.1-sol", "effort": "low", "runtime": "codex"}; branch: feat/aspire-postgres-credential-readiness; resume: false
+- `2026-10-10T19:01:30Z` **leaf.launch** — leaf: W9-2067; requested: {"model": "gpt-6.1-sol", "effort": "medium", "runtime": "codex"}; branch: feat/chat-producer-fencing; resume: false
+- `2026-10-10T19:01:30Z` **leaf.launch** — leaf: X-1366; requested: {"model": "gpt-6.1-sol", "effort": "medium", "runtime": "codex"}; branch: feat/plugin-child-liveness-contract; resume: <session-id>
+- `2026-10-10T19:01:30Z` **leaf.launch** — leaf: X-1912; requested: {"model": "gpt-6.1-sol", "effort": "medium", "runtime": "codex"}; branch: feat/cli-aspire-generated-surface-check; resume: <session-id>
+- `2026-10-10T19:01:30Z` **leaf.launch** — leaf: X-1382-2; requested: {"model": "gpt-6.1-sol", "effort": "medium", "runtime": "codex"}; branch: fix/service-add-guarded-policy; resume: <session-id>
+- `2026-10-10T19:01:30Z` **leaf.launch** — leaf: W15-2007; requested: {"model": "gpt-6.1-sol", "effort": "low", "runtime": "codex"}; branch: feat/cli-agent-init-hosts-opencode; resume: false
+- `2026-10-10T19:01:30Z` **leaf.launch** — leaf: W11-1996; requested: {"model": "gpt-6.1-sol", "effort": "high", "runtime": "codex"}; branch: fix/cli-no-aspire-operable; resume: false
+- `2026-10-10T19:01:36Z` **merge.delegate** — prs: [2217, 2235, 2203, 2138, 2179, 2170, 2181]; what: source conflicts vs today's main (not carriers); Codex merge turns (W* leaves via takeover); removed from queue until Opus confirm
+- `2026-10-10T19:02:43Z` **conveyor.start** — version: v6; queue: ["2243", "2201"]
+- `2026-10-10T19:03:07Z` **review.exit** — leaf: X-2100-2; pr: 2244; head: edbf2c0a6265bc33a707596d1ca6421eb8e8dc0d; exitCode: 0; verdict: VERDICT: PASS; reviewer: claude-opus-5-5; effort: high
+- `2026-10-10T19:03:18Z` **review.result** — pr: 2244; leaf: X-2100-2; verdict: PASS; head: edbf2c0a6; reviewer: claude-opus-5-5; action: posted; queued
+- `2026-10-10T19:05:31Z` **tooling** — what: merge_train v7.3: merge --no-commit; restore frozen fixtures (.llm/tools/docs/fixtures/legacy-carrier-parity) from main unless the branch touches them; fixes rename detection carrying a branch prose.json.gz into the legacy parity fixture (hit #2201); tested on a synthetic repo
+- `2026-10-10T19:05:52Z` **handmerge** — pr: 2201; leaf: X-2110; head: a5246c410; what: restored frozen legacy parity fixture corrupted by rename detection during the post-#2234 merge; action: Sol confirm launched
+- `2026-10-10T19:05:58Z` **review.confirm.launch** — leaf: X-2110; pr: 2201; head: a5246c41086e165965fd983a306aecc60c77b5f1; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-10T19:12:48Z` **merge.pending** — leaf: X-2100-2; pr: 2244; head: edbf2c0a6265bc33a707596d1ca6421eb8e8dc0d; mode: exact; reviewedHead: edbf2c0a6265bc33a707596d1ca6421eb8e8dc0d
+- `2026-10-10T19:13:58Z` **merged** — leaf: X-2100-2; pr: 2244; head: edbf2c0a6265bc33a707596d1ca6421eb8e8dc0d; via: merge_when_green
+- `2026-10-10T19:14:26Z` **merged** — leaf: X-2100-2; pr: 2244; main: 987c328; closes: ; via: conveyor
+- `2026-10-10T19:17:20Z` **review.exit** — leaf: X-2110; pr: 2201; head: a5246c41086e165965fd983a306aecc60c77b5f1; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; mode: confirm
+- `2026-10-10T19:17:52Z` **merge.pending** — leaf: X-2009-2; pr: 2243; head: 947f30e8139a4af56705b78b0543f62dca901a33; mode: carry; reviewedHead: 2fe51130caee9d6c21962e7561a8aa999c5a2f00
+- `2026-10-10T19:18:21Z` **leaf.launch** — leaf: X-2110; requested: {"model": "gpt-6.1-sol", "effort": "medium", "runtime": "codex"}; branch: feat/workers-stdin-payload-channel; resume: <session-id>
+- `2026-10-10T19:18:23Z` **leaf.launch** — leaf: X-2245; requested: {"model": "gpt-6.1-sol", "effort": "high", "runtime": "codex"}; branch: fix/ci-task-cache-receipts; resume: false
+- `2026-10-10T19:18:29Z` **issue.filed** — issue: 2245; what: P0 CI task cache skips lint/fmt reports; lane: X-2245 (Codex high)
+- `2026-10-10T19:18:29Z` **review.result** — pr: 2201; leaf: X-2110; verdict: REVISE; head: a5246c410; reviewer: gpt-6.1-sol; what: TaskStdin private-type-ref; array accessor; CI cache (#2245); action: posted; Codex fix (medium)
+- `2026-10-10T19:20:18Z` **ci.rerun** — pr: 2243; run: 38078216958; via: conveyor
+- `2026-10-10T19:25:41Z` **ci.fix** — pr: 2243; leaf: X-2009-2; what: generate-publish-assets_test count 14 vs 13 (embedded MCP docs list); action: Codex fix (low); then Opus confirm
+- `2026-10-10T19:25:41Z` **leaf.launch** — leaf: X-2009-2; requested: {"model": "gpt-6.1-sol", "effort": "low", "runtime": "codex"}; branch: feat/mcp-route-management-guidance; resume: <session-id>
+- `2026-10-10T19:31:34.088565+00:00` **leaf.exit** — leaf: X-2245; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T19:31:53Z` **review.queue** — pr: 2246; leaf: X-2245; head: d6e714a16; reviewer: claude-opus-5-5; effort: medium; mode: first; note: P0 CI fix; after first ci run, re-run quality for second-run evidence
+- `2026-10-10T19:32:55Z` **review.launch** — leaf: X-2245; pr: 2246; head: d6e714a16e273a6b3a4a3dc96b59a2c2054757ac; requested: {"model": "claude-opus-5-5", "effort": "medium"}; mode: first
+- `2026-10-10T19:34:03.225653+00:00` **leaf.exit** — leaf: W15-2007; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T19:34:47Z` **review.launch** — pr: 2181; leaf: W15-2007; head: 290526c31; requested: {"model": "claude-opus-5-5", "effort": "medium"}; why: Codex takeover merge of main (W leaf: original code Sol-PASSed; merge delta reviewed by Opus)
+- `2026-10-10T19:34:54Z` **review.launch** — leaf: W15-2007; pr: 2181; head: 290526c31c1cb55fbdcc374be604510036a5651a; requested: {"model": "claude-opus-5-5", "effort": "medium"}; mode: first
+- `2026-10-10T19:37:18Z` **review.exit** — leaf: X-2245; pr: 2246; head: d6e714a16e273a6b3a4a3dc96b59a2c2054757ac; exitCode: 0; verdict: VERDICT: PASS; reviewer: claude-opus-5-5; effort: medium
+- `2026-10-10T19:37:29Z` **review.result** — pr: 2246; leaf: X-2245; verdict: PASS; head: d6e714a16; reviewer: claude-opus-5-5; action: posted; queued FIRST (P0)
+- `2026-10-10T19:41:29.929105+00:00` **leaf.exit** — leaf: X-2110; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T19:41:42Z` **review.confirm.launch** — leaf: X-2110; pr: 2201; head: a8ce25574f48b42417a2ad32785c6f2ba18729dc; requested: {"model": "gpt-6.1-sol", "effort": "high"}
+- `2026-10-10T19:41:56Z` **review.reroute** — pr: 2201; what: cancelled a mistaken Sol confirm (Codex-built fix needs Opus); Opus confirm launched
+- `2026-10-10T19:42:49Z` **review.launch** — leaf: X-2110; pr: 2201; head: a8ce25574f48b42417a2ad32785c6f2ba18729dc; requested: {"model": "claude-opus-5-5", "effort": "medium"}; mode: confirm
+- `2026-10-10T19:43:01Z` **review.exit** — leaf: W15-2007; pr: 2181; head: 290526c31c1cb55fbdcc374be604510036a5651a; exitCode: 0; verdict: VERDICT: PASS; reviewer: claude-opus-5-5; effort: medium
+- `2026-10-10T19:43:14Z` **review.result** — pr: 2181; leaf: W15-2007; verdict: PASS; head: 290526c31; reviewer: claude-opus-5-5; scope: merge delta; action: posted; queued
+- `2026-10-10T19:45:19Z` **review.exit** — leaf: X-2110; pr: 2201; head: a8ce25574f48b42417a2ad32785c6f2ba18729dc; exitCode: 0; verdict: VERDICT: PASS; reviewer: claude-opus-5-5; effort: medium
+- `2026-10-10T19:45:29Z` **review.result** — pr: 2201; leaf: X-2110; verdict: PASS; head: a8ce25574; reviewer: claude-opus-5-5; action: posted; queued
+- `2026-10-10T19:47:09.188189+00:00` **leaf.exit** — leaf: W11-1726; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T19:47:10.509808+00:00` **leaf.exit** — leaf: X-2009-2; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T19:47:22Z` **review.launch** — prs: [2179, 2243]; what: #2179 Opus merge-scope (W leaf takeover); #2243 Opus confirm (Codex fix)
+- `2026-10-10T19:47:25Z` **review.launch** — leaf: W11-1726; pr: 2179; head: 1f978706b0552497c43310c7dd2ca35a8f7ae94c; requested: {"model": "claude-opus-5-5", "effort": "medium"}; mode: first
+- `2026-10-10T19:47:30Z` **merged** — leaf: W15-2007; pr: 2181; head: 290526c31c1cb55fbdcc374be604510036a5651a; mode: exact; reviewedHead: 290526c31c1cb55fbdcc374be604510036a5651a
+- `2026-10-10T19:47:32Z` **merged** — leaf: W15-2007; pr: 2181; main: 60c03c4; closes: ; via: conveyor
+- `2026-10-10T19:47:41Z` **leaf.launch** — leaf: X-2008; requested: {"model": "gpt-6.1-sol", "effort": "high", "runtime": "codex"}; branch: fix/agent-init-claude-bridge; resume: false
+- `2026-10-10T19:48:00.630676+00:00` **leaf.exit** — leaf: X-1912; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T19:48:10Z` **review.launch** — pr: 2217; leaf: X-1912; what: Opus confirm after Codex merge of main
+- `2026-10-10T19:48:18Z` **review.launch** — leaf: X-2009-2; pr: 2243; head: 1b4f913e209a16a4274cdc31830a3587073486b0; requested: {"model": "claude-opus-5-5", "effort": "low"}; mode: confirm
+- `2026-10-10T19:48:59.256539+00:00` **leaf.exit** — leaf: W9-2067; runtime: codex; threadId: <session-id>; exitCode: 0; observedModelHints: []; isError: false; limitHit: false
+- `2026-10-10T19:49:07Z` **review.exit** — leaf: X-2009-2; pr: 2243; head: 1b4f913e209a16a4274cdc31830a3587073486b0; exitCode: 0; verdict: VERDICT: PASS; reviewer: claude-opus-5-5; effort: low
+- `2026-10-10T19:49:08Z` **review.launch** — pr: 2138; leaf: W9-2067; what: Opus merge-scope (W leaf takeover)
+- `2026-10-10T19:49:10Z` **review.launch** — leaf: W9-2067; pr: 2138; head: 1b718a67666f5a540790a84a7a0d17c5bead05ed; requested: {"model": "claude-opus-5-5", "effort": "medium"}; mode: first
+- `2026-10-10T19:49:19Z` **review.result** — pr: 2243; leaf: X-2009-2; verdict: PASS; head: 1b4f913e2; reviewer: claude-opus-5-5; action: posted; queued
+- `2026-10-10T19:49:25Z` **review.exit** — leaf: W11-1726; pr: 2179; head: 1f978706b0552497c43310c7dd2ca35a8f7ae94c; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; reviewer: claude-opus-5-5; effort: medium
+- `2026-10-10T19:49:45Z` **review.result** — pr: 2179; leaf: W11-1726; verdict: REVISE; head: 1f978706b; reviewer: claude-opus-5-5; what: new credential-rejected runtime gate fails on its own postgres tier (probe resource update timeout); action: posted; Codex takeover (high) for root cause
+- `2026-10-10T19:49:45Z` **leaf.launch** — leaf: W11-1726; requested: {"model": "gpt-6.1-sol", "effort": "high", "runtime": "codex"}; branch: feat/aspire-postgres-credential-readiness; resume: false
+- `2026-10-10T19:49:50Z` **review.launch** — leaf: X-1912; pr: 2217; head: 44d658017263dbf63b44a2d3a182d33e8b0e1dc0; requested: {"model": "claude-opus-5-5", "effort": "medium"}; mode: confirm
+- `2026-10-10T19:51:03Z` **review.exit** — leaf: W9-2067; pr: 2138; head: 1b718a67666f5a540790a84a7a0d17c5bead05ed; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; reviewer: claude-opus-5-5; effort: medium
+- `2026-10-10T19:51:23Z` **review.result** — pr: 2138; leaf: W9-2067; verdict: REVISE; head: 1b718a676; reviewer: claude-opus-5-5; what: fenced writer drops #2207 native message batch; README rewrap; action: posted; Codex takeover (high)
+- `2026-10-10T19:51:23Z` **leaf.launch** — leaf: W9-2067; requested: {"model": "gpt-6.1-sol", "effort": "high", "runtime": "codex"}; branch: feat/chat-producer-fencing; resume: false
+- `2026-10-10T19:51:40Z` **queue.fix** — pr: 2246; what: lost from queue by a line-1 insert racing the conveyor; re-added at position 2
+- `2026-10-10T19:54:00Z` **automerge.enabled** — leaf: X-2110; pr: 2201; head: a8ce25574f48b42417a2ad32785c6f2ba18729dc; mode: exact; reviewedHead: a8ce25574f48b42417a2ad32785c6f2ba18729dc
+- `2026-10-10T19:54:39Z` **review.exit** — leaf: X-1912; pr: 2217; head: 44d658017263dbf63b44a2d3a182d33e8b0e1dc0; exitCode: 0; verdict: VERDICT: CHANGES_REQUESTED; reviewer: claude-opus-5-5; effort: medium
+- `2026-10-10T19:55:04Z` **review.result** — pr: 2217; leaf: X-1912; verdict: REVISE; head: 44d658017; reviewer: claude-opus-5-5; what: #2221 reconcileBrowserAuth inside generate aspire violates #1912 no-authored-writes; --check blind; action: posted; Codex fix (high)
+- `2026-10-10T19:55:04Z` **leaf.launch** — leaf: X-1912; requested: {"model": "gpt-6.1-sol", "effort": "high", "runtime": "codex"}; branch: feat/cli-aspire-generated-surface-check; resume: <session-id>
+- `2026-10-10T19:56:27Z` **ci.rerun** — pr: 2201; run: 38080549049; via: conveyor
