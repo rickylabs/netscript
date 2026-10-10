@@ -101,6 +101,66 @@ timeout.
 `withCors()` and `withLogger()`. It always runs before the stages that `build()` installs. A
 rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
 
+## Rate limits and client addresses
+
+`createService(...).withRateLimit(options)` adds middleware through the existing `use()` seam. It
+runs in call order, before deferred routes and both RPC/REST projections. Install it before
+immediate health/info routes if those routes should be limited. Repeated calls add stages.
+
+The root also exports `ServiceRateLimitOptions`, `ServiceProxyTrust`, `RateLimitStore`,
+`RateLimitRequest`, and `RateLimitDecision` for builder/port contracts.
+
+The `@netscript/service/rate-limit` subpath exposes:
+
+| Symbol                        | Kind      | Description                                                                                 |
+| ----------------------------- | --------- | ------------------------------------------------------------------------------------------- |
+| `createRateLimitMiddleware`   | function  | Creates route-scoped quota middleware returning JSON 429 and whole-second Retry-After.      |
+| `createKvRateLimitStore`      | function  | Uses KV atomic compare-and-set plus TTL in a dedicated prefix, with a bounded retry budget. |
+| `createMemoryRateLimitStore`  | function  | Creates a synchronous, capped development store with bounded TTL eviction.                  |
+| `resolveServiceClientAddress` | function  | Resolves the socket peer or explicitly trusted XFF hops, walking right to left.             |
+| `ServiceRateLimitOptions`     | interface | `routes`, `limit`, `windowMs`, `store`, and optional `key`, `trustProxy`, `ipv6Prefix`, `now`.            |
+| `ServiceProxyTrust`           | type      | `false` or an address predicate identifying trusted proxy hops; default off.                |
+| `RateLimitStore`              | interface | Port reserving one slot atomically with `consume(request)`.                                 |
+| `RateLimitRequest`            | interface | Key, quota, window, epoch milliseconds, and optional request cancellation signal.           |
+| `RateLimitDecision`           | interface | Whether a slot was reserved and the epoch-millisecond window end.                           |
+| `KvRateLimitStoreOptions`     | interface | Dedicated `prefix` and optional `maxAttempts` (default 8, maximum 32).                      |
+| `MemoryRateLimitStoreOptions` | interface | Optional retained-key cap `maxKeys` (default 10,000).                                       |
+
+The subpath also re-exports the first-party integration types `ServiceContext`,
+`ServiceEnvironment`, `ServiceMiddleware`, `KvStore`, `KvKey`, `KvEntry`, `KvListOptions`,
+`KvSetOptions`, `AtomicCheck`, `AtomicMutation`, and `AtomicResult` used by these signatures.
+The six ancillary KV types are intentional: the accepted `KvStore` port references them through
+its public methods. Re-exporting them preserves the upstream port and makes Deno's documentation
+lint resolve its transitive signature types, without introducing a duplicate KV interface.
+
+Selected routes share one quota per key and epoch-aligned window. Paths are exact or end in `/*` for
+a subtree (including its root). Rejections return `{ error: 'RATE_LIMITED' }` with `429` and
+`Retry-After` rounded up to the remaining whole seconds. Unmatched paths perform no store IO.
+Separate policies use separate memory stores or KV prefixes unless sharing a quota is intended. CAS
+retry exhaustion or memory capacity pressure rejects conservatively; store failures throw.
+
+`ServiceEnvironment` is exported from the root entrypoint. `ServiceApp.fetch(request, env)` and
+`ServiceApp.request(input, init, env)` accept it. The listener supplies `remoteAddr` on plain and
+TLS requests so Hono's Deno `getConnInfo` works. The default limiter key is the resolved client
+address; IPv6 keys are canonicalized and grouped by /64, with `ipv6Prefix` (0–128) selecting
+another prefix. IPv4-mapped IPv6 peers use their corresponding dotted IPv4 bucket before prefix
+masking, so distinct IPv4 clients retain independent quotas on dual-stack listeners. Native IPv4
+and custom keys stay unchanged. This grouping affects quota keys only, not
+socket metadata or proxy trust. A mounted app without metadata uses a shared `unknown` bucket and
+logs a warning once per stage through the request logger or service package logger.
+
+KV counter TTL bounds each key's lifetime, not total live cardinality. Distinct attacker-chosen
+keys can allocate distinct counters until window expiry; use backend admission/capacity controls
+and stable custom keys. The memory store instead rejects new keys when its live-key cap is full.
+
+Like auth's #2026 transport policy, forwarded headers are ignored by default. Explicit proxy trust
+identifies permitted socket/hop addresses; malformed or excessive XFF chains fall back to the
+socket. Auth's HTTPS helper is protocol-specific and has no reusable hop resolver, so this client
+address resolver does not alter `deriveHttps` or `trustProxyHeaders`.
+
+See [Protect an anonymous service route](/services-sdk/how-to/protect-an-anonymous-route/) for
+examples and storage/performance guarantees.
+
 ## Error and routing handlers
 
 | Symbol | Signature | Description |
@@ -419,6 +479,7 @@ The following entrypoints are published alongside the root export:
 | `@netscript/service/commands/testing` | `./commands-testing.ts` | Atomic memory store and explicit test controls. |
 | `@netscript/service/commands` | `./commands.ts` | Opaque command definitions, once-only executor and codecs. |
 | `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
+| `@netscript/service/rate-limit` | `./src/rate-limit/mod.ts` | Route quotas, atomic stores, and trusted client-address resolution. |
 | `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
 | `@netscript/service/internal-credential` | `./src/auth/internal-credential/mod.ts` | Dependency-free installation secret loading and internal credential derivation. |
 

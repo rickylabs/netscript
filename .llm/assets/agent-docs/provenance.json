@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "9cca5388b",
-  "extractionTimestamp": "2026-10-10T17:48:12.850Z",
+  "sourceCommit": "54e0601d8",
+  "extractionTimestamp": "2026-10-10T17:44:14.872Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -37,7 +37,6 @@
     "pages/data-persistence/how-to/use-a-second-database/index.md",
     "pages/data-persistence/index.md",
     "pages/data-persistence/kv-queues-cron/index.md",
-    "pages/durable-workflows/expo-streams/index.md",
     "pages/durable-workflows/how-to/bound-stream-retention/index.md",
     "pages/durable-workflows/how-to/build-a-validated-ingestion-queue/index.md",
     "pages/durable-workflows/how-to/index.md",
@@ -127,6 +126,7 @@
     "pages/services-sdk/how-to/discover-services/index.md",
     "pages/services-sdk/how-to/expose-openapi-scalar/index.md",
     "pages/services-sdk/how-to/index.md",
+    "pages/services-sdk/how-to/protect-an-anonymous-route/index.md",
     "pages/services-sdk/index.md",
     "pages/services-sdk/sdk/index.md",
     "pages/services-sdk/services/index.md",
@@ -191,7 +191,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5262311,
-  "compressedBytes": 1531291,
-  "sha256": "ed1c5ce72f8f0172b17be550277a447f56d84fdb6ed9d549656892b750ad2ec4"
+  "uncompressedBytes": 5277342,
+  "compressedBytes": 1537348,
+  "sha256": "3dadbceb25c7743e356e3585b7e92932ca2d51db9f08b5d6582ac7113ea05cc0"
 }
