@@ -263,9 +263,11 @@ curl -b cookies.txt http://localhost:8094/api/v1/auth/me
 
 Use HTTPS outside explicit insecure local development. A successful
 `GET /api/v1/auth/me` after sign-in returns
-`{ authenticated: true, user, session }`. The callback retains `sessionId` for
-existing bearer consumers, but this cookie flow does not need to pass it by
-hand.
+`{ authenticated: true, user, session }`. The callback returns completion and redirect
+metadata without `sessionId`. In the approved BFF topology, the app server owns
+the first-party cookie and forwards a bearer credential to services. Browser
+callers use the cookie alone; see the
+[0.0.8 migration note](/identity-access/how-to/add-authentication/#008-cookie-migration).
 
 - [ ] `netscript plugin list` shows the `auth` plugin.
 - [ ] `netscript db status` reports the `auth.prisma` migration applied.

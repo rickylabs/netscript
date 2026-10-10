@@ -1,3 +1,4 @@
+import { completeTestCallback } from '../../../../../../../plugins/auth/tests/testing/auth-service-fixture.ts';
 import { assert, assertEquals, assertMatch, assertRejects } from '@std/assert';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
@@ -7,7 +8,6 @@ import {
 } from '../../../../../../../plugins/auth/services/src/backend-registry.ts';
 import { MemoryKvAdapter } from '@netscript/kv';
 import {
-  callback,
   revokeSession,
   session,
   signin,
@@ -173,14 +173,14 @@ for (const issuer of [undefined, 'https://github.com']) {
     });
     const redirect = new URL(started.redirectUrl ?? '');
     assertEquals(redirect.origin + redirect.pathname, 'https://github.com/login/oauth/authorize');
-    const completed = await callback({
+    const completed = await completeTestCallback({
       code: 'code',
       state: redirect.searchParams.get('state') ?? undefined,
     }, {
       registry,
       request: { url: `https://app.test/v1/auth/callback?txn=${redirect.searchParams.get('txn')}` },
     });
-    assertEquals(completed.subject, 'github:583231');
+    assertEquals(completed.output.subject, 'github:583231');
     assertEquals(env.NETSCRIPT_AUTH_ISSUER, undefined);
     assertEquals(requests.map((request) => request.url), [
       'https://github.com/login/oauth/access_token',
@@ -515,7 +515,7 @@ Deno.test('session CLI lists a signed-in backend session and revoke invalidates 
     request: { url: 'https://app.test/v1/auth/signin' },
   });
   const redirect = new URL(started.redirectUrl ?? '');
-  const completed = await callback({
+  const completed = await completeTestCallback({
     code: 'code',
     state: redirect.searchParams.get('state') ?? undefined,
   }, {
