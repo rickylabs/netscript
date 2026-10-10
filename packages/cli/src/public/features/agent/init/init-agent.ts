@@ -1,4 +1,4 @@
-import { join } from '@std/path';
+import { basename, join } from '@std/path';
 import {
   EMBEDDED_SKILL_BUNDLE_HASH,
   EMBEDDED_SKILL_FILES,
@@ -28,6 +28,7 @@ import {
   type OpenCodeConfigWrite,
   planOpenCodeConfig,
 } from './hosts/opencode-config.ts';
+import { mergeClaudeGuidance } from './hosts/claude-guidance.ts';
 
 const START_MARKER = '<!-- netscript-agent:start -->';
 const END_MARKER = '<!-- netscript-agent:end -->';
@@ -164,6 +165,17 @@ export async function initAgent(
     changedFiles,
   );
   if (hosts.includes('claude')) {
+    const skillNames = [
+      ...new Set([
+        ...(skillManifest.files ?? []).filter((path) => path.endsWith('/SKILL.md')).map(
+          (path) => path.split('/')[0],
+        ),
+        ...ASPIRE_WORKFLOW_SKILLS,
+      ]),
+    ];
+    messages.push(
+      ...await legacyClaudeSkillWarnings(input.projectRoot, skillNames, dependencies.fs),
+    );
     await writeHostConfig(
       dependencies.fs,
       join(input.projectRoot, '.mcp.json'),
@@ -173,19 +185,25 @@ export async function initAgent(
       dependencies.cliSpecifier,
       installedDocsRoot,
     );
-    for (const [path] of skillFiles) {
-      const canonicalPath = join(input.projectRoot, '.agents', 'skills', path);
-      const content = await dependencies.fs.readText(canonicalPath);
-      if (content == null) {
-        throw new Error(`Canonical skill was not installed: ${canonicalPath}`);
-      }
-      await writeChanged(
-        dependencies.fs,
-        join(input.projectRoot, '.claude', 'skills', path),
-        content,
-        changedFiles,
-      );
-    }
+    await writeChanged(
+      dependencies.fs,
+      join(input.projectRoot, '.claude', 'skills', 'repo-skills', 'SKILL.md'),
+      EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentClaudeSkillBridge].replace(
+        '{{PROJECT_NAME}}',
+        () => basename(input.projectRoot),
+      ).replace('{{SKILL_NAMES}}', () => skillNames.join(', ')),
+      changedFiles,
+    );
+    const claudePath = join(input.projectRoot, 'CLAUDE.md');
+    await writeChanged(
+      dependencies.fs,
+      claudePath,
+      mergeClaudeGuidance(
+        await dependencies.fs.readText(claudePath) ?? '',
+        EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentClaudeGuidance],
+      ),
+      changedFiles,
+    );
   }
   if (editor === 'vscode') {
     await writeHostConfig(
@@ -240,13 +258,25 @@ export async function initAgent(
   return { hosts, resolution, changedFiles, messages };
 }
 
+async function legacyClaudeSkillWarnings(
+  projectRoot: string,
+  skillNames: readonly string[],
+  fs: AgentInitFileSystem,
+): Promise<string[]> {
+  const present = await Promise.all(
+    skillNames.map((name) => fs.exists(join(projectRoot, '.claude', 'skills', name))),
+  );
+  return skillNames.filter((_, index) => present[index]).map((name) =>
+    `Legacy .claude/skills/${name} is no longer refreshed; use the canonical .agents/skills/${name} through repo-skills. The legacy directory was preserved.`
+  );
+}
+
 async function hasAspireWorkflowSkills(
   projectRoot: string,
   fs: AgentInitFileSystem,
 ): Promise<boolean> {
   for (const skill of ASPIRE_WORKFLOW_SKILLS) {
     if (!await fs.exists(join(projectRoot, '.agents', 'skills', skill, 'SKILL.md'))) return false;
-    if (!await fs.exists(join(projectRoot, '.claude', 'skills', skill, 'SKILL.md'))) return false;
   }
   return true;
 }
