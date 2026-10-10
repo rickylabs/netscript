@@ -110,6 +110,7 @@ export type {
   ProcedureMetaFromNode,
   ProcedureOutputFromNode,
   ServiceClient,
+  ServiceClientArgs,
   ServiceClientContext,
   ServiceClientContract,
   ServiceClientMethod,
