@@ -14,7 +14,7 @@ export function aspireAgentInitArgs(projectRoot: string): string[] {
     '--workspace-root',
     projectRoot,
     '--skill-locations',
-    'standard,claudecode',
+    'standard',
     '--skills',
     ASPIRE_WORKFLOW_SKILLS.join(','),
   ];

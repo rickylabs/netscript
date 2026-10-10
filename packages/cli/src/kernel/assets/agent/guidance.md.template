@@ -28,7 +28,7 @@ Before hand-rolled curl probes or print debugging, run `netscript plugin doctor`
 
 ### Invoke the right installed skill
 
-Skills are addressed by their registered name. Call the skill by name and its body, with its bundled references, loads on demand; do not read its file directly.
+Skills are addressed by their registered name. Call the skill by name and its body, with its bundled references, loads on demand. Hosts that register these names use their skill tool. On Claude Code, call the `repo-skills` bridge with the requested skill name; the bridge permits loading its canonical file and bundled references.
 
 - Call the `netscript` skill to route an unfamiliar NetScript task.
 - Call the `netscript-build` skill before scaffolding, adding, or generating contracts, services, database assets, plugins, or UI.
