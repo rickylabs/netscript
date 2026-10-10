@@ -20,7 +20,17 @@ interface BrowserAuthSettings {
 interface BrowserAuthFile {
   readonly path: string;
   readonly content: string;
+  readonly overwrite?: boolean;
 }
+
+// Composition contract with #1382 L1: replace only its exact scaffold opt-out line.
+const PUBLIC_POLICY =
+  "  auth: { public: true, reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy' },";
+
+const FORMATTED_PUBLIC_POLICY = `  auth: {
+    public: true,
+    reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy',
+  },`;
 
 /** Reconcile install-time browser auth using the CLI's injected filesystem boundary. */
 export async function reconcileBrowserAuth(
@@ -76,25 +86,37 @@ export async function reconcileBrowserAuth(
     const path = join(serviceRoot, entry.Entrypoint ?? 'src/main.ts');
     if (!await fs.exists(path)) continue;
     const current = await fs.readFile(path);
-    // Authored policy is authoritative. Upgrade only the scaffold's unconfigured preset.
-    if (
-      !current.includes('await defineService(router, {') ||
-      /\bauth\s*:/.test(current)
-    ) continue;
+    if (!current.includes('await defineService(router, {')) continue;
+    if (current.includes('authenticator: browserAuthenticator')) continue;
+    // An authored guarded policy is authoritative; a scaffold opt-out must compose exactly.
+    const publicPolicy = [PUBLIC_POLICY, FORMATTED_PUBLIC_POLICY].find((policy) =>
+      current.includes(policy)
+    );
+    if (!publicPolicy) {
+      if (/\bauth\s*:/.test(current) && !current.includes('Scaffold demo is public')) continue;
+      throw new TypeError(
+        `Cannot wire browser auth for ${name}: expected the exact #1382 scaffold public policy line`,
+      );
+    }
     const authImport = relative(
       dirname(path),
       join(projectRoot, 'auth/service.ts'),
     ).replaceAll('\\', '/');
-    const router = name.replace(
-      /[-_]([a-z])/g,
-      (_, letter: string) => letter.toUpperCase(),
-    );
     files.push({
       path,
+      overwrite: true,
       content: `import { browserAuthenticator } from '${authImport}';\n` +
+        "import { createContractAuthorizer } from '@netscript/service/auth';\n" +
         current.replace(
-          'await defineService(router, {',
-          `await defineService(router, {\n  auth: { authn: { authenticator: browserAuthenticator,\n    // Demonstration routes remain public; other API paths require a bearer.\n    allowAnonymous: ['/health', '/api/v1/${router}', '/api/rpc/v1/${router}'],\n  } },`,
+          publicPolicy,
+          `  auth: {
+    authn: {
+      authenticator: browserAuthenticator,
+      // Public discovery endpoints; demo procedures declare access in their contracts.
+      allowAnonymous: ['/health', '/api/openapi.json', '/api/docs'],
+    },
+    authz: { authorizer: createContractAuthorizer(router) },
+  },`,
         ),
     });
     entry.PluginReferences = [
@@ -105,7 +127,7 @@ export async function reconcileBrowserAuth(
   for (const file of files) {
     if (await fs.exists(file.path)) {
       // Never replace a previously authored module or route.
-      if (!file.path.endsWith('/src/main.ts')) continue;
+      if (!file.overwrite) continue;
       if (await fs.readFile(file.path) === file.content) continue;
     }
     await fs.createDir(dirname(file.path));

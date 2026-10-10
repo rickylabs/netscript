@@ -247,8 +247,6 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
   [`reference/service/`](/reference/service/) (the `/auth` subpath: `Principal`, `AuthnResult`,
   `AuthenticatorPort`).
 
-{{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next: { label: "Durability model", href: "/explanation/durability-model/" } }) }}
-
 ## Generated browser topology
 
 The generated Fresh app uses a backend for frontend (BFF). Installing auth emits
@@ -259,9 +257,13 @@ bearer contribution for each guarded service call; the service verifies the
 bearer through the remote auth authenticator. Browser JSON excludes session
 credentials, and credentialed calls use direct-only caching.
 
-The generated service policy keeps demonstration routes public and guards other
-API routes. Authored policies and routes remain authoritative. Background
+The generated demo procedures declare `access: { authentication: 'none' }` and
+remain public on REST and RPC. The generated service policy also leaves
+`/api/openapi.json` and `/api/docs` public for discovery; other API routes require
+a bearer and a contract authorization decision. Authored policies and routes remain authoritative. Background
 processing belongs to workers, sagas, and triggers using service identities. See
 [Add authentication](/identity-access/how-to/add-authentication/) for the
 generated route and client recipe, local cookie behavior, and deployment
 limitations.
+
+{{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next: { label: "Durability model", href: "/explanation/durability-model/" } }) }}

@@ -343,9 +343,11 @@ const result = await catalog.list({}, {
 The generated bearer contribution uses `direct-only` caching: credentials and
 authenticated responses never enter a shared query cache. Services verify the
 forwarded bearer through the existing remote authenticator; browser cookies are
-never forwarded to guarded services. The scaffold's demonstration service routes
-remain public. Other `/api` paths require a bearer once the CLI installs its
-generated policy. Replace the demo exemptions when making those routes private,
+never forwarded to guarded services. The scaffold's demonstration procedures
+declare `access: { authentication: 'none' }` and remain public on REST and RPC.
+`/api/openapi.json` and `/api/docs` also stay public for discovery. Other `/api`
+paths require a bearer and a contract authorization decision once the CLI installs
+its generated policy. Change the demo procedure metadata when making those routes private,
 and keep browser reads in server-side app handlers. Workers, sagas, and triggers
 use a service identity independently of browser sessions.
 

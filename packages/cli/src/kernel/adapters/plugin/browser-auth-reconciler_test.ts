@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
@@ -34,7 +34,7 @@ const settings = {
   },
 };
 const main =
-  "import { defineService } from '@netscript/service';\nawait defineService(router, { name: 'users' });\n";
+  "import { defineService } from '@netscript/service';\nawait defineService(router, {\n  auth: { public: true, reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy' },\n  name: 'users' });\n";
 
 Deno.test('auth scaffold is request-scoped, idempotent, and preserves authored policy and routes', async () => {
   const fs = new MemoryFileSystemAdapter();
@@ -66,7 +66,7 @@ Deno.test('auth scaffold is request-scoped, idempotent, and preserves authored p
   );
   await fs.writeFile(
     join(root, 'services/users/src/main.ts'),
-    main.replace("name: 'users'", "name: 'users', auth: customPolicy"),
+    main.replace(/auth: .*?,\n/, 'auth: customPolicy,\n'),
   );
   await reconcileBrowserAuth(root, fs);
   assertEquals(
@@ -124,4 +124,22 @@ Deno.test('helper regeneration after auth install or service add emits the BFF t
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test('browser auth rewrites a custom entrypoint and rejects drift in the scaffold opt-out', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const root = '/workspace';
+  const config = structuredClone(settings);
+  config.NetScript.Services.users.Entrypoint = 'server.ts';
+  await fs.writeFile(join(root, 'appsettings.json'), JSON.stringify(config));
+  const path = join(root, 'services/users/server.ts');
+  await fs.writeFile(path, main);
+  assert((await reconcileBrowserAuth(root, fs)).includes(path));
+  assertStringIncludes(await fs.readFile(path), 'authenticator: browserAuthenticator');
+  await fs.writeFile(path, main.replace('#1382 L2', '#1382 changed'));
+  await assertRejects(
+    () => reconcileBrowserAuth(root, fs),
+    TypeError,
+    'exact #1382 scaffold public policy',
+  );
 });

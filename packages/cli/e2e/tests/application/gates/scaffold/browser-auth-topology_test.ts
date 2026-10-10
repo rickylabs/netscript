@@ -39,6 +39,7 @@ Deno.test('generated BFF cookie flow forwards a bearer to a guarded service and 
   await using kv = new MemoryKvAdapter();
   const registry = await createKvOAuthTestRegistry(kv);
   await using auth = await serveAuthTestService(registry);
+  await Deno.mkdir('.llm/tmp', { recursive: true });
   const root = await Deno.makeTempDir({
     dir: '.llm/tmp',
     prefix: 'bff-conformance-',
@@ -165,6 +166,48 @@ Deno.test('generated BFF cookie flow forwards a bearer to a guarded service and 
     );
   } finally {
     await service.stop();
+    Deno.env.delete(envKey);
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('generated BFF session distinguishes rejected credentials from an auth service outage', async () => {
+  await Deno.mkdir('.llm/tmp', { recursive: true });
+  const root = await Deno.makeTempDir({ dir: '.llm/tmp', prefix: 'bff-outage-' });
+  let status = 401;
+  const server = Deno.serve(
+    { port: 0, onListen: () => {} },
+    () =>
+      Response.json({
+        code: status === 401 ? 'UNAUTHORIZED' : 'INTERNAL_SERVER_ERROR',
+        message: 'Auth fixture error',
+      }, { status }),
+  );
+  const name = `outage-${crypto.randomUUID()}`;
+  const envKey = `services__${name}__http__0`;
+  Deno.env.set(envKey, `http://127.0.0.1:${server.addr.port}`);
+  try {
+    const path = `${root}/bff.ts`;
+    await Deno.writeTextFile(
+      path,
+      renderTemplateAssetSync(TEMPLATE_KEYS.authBff, {
+        authServiceName: JSON.stringify(name),
+      }),
+    );
+    const bff: GeneratedBff = await import(toFileUrl(resolve(path)).href);
+    const request = () =>
+      new Request('https://app.example.test/auth/session', {
+        headers: { cookie: '__Host-ns_session=rejected' },
+      });
+    assertEquals((await bff.handleBrowserAuth(request(), 'session')).status, 401);
+    status = 500;
+    const outage = await bff.handleBrowserAuth(request(), 'session');
+    assertEquals(outage.status, 503);
+    assertEquals(await outage.json(), { error: 'Authentication service unavailable' });
+    await server.shutdown();
+    assertEquals((await bff.handleBrowserAuth(request(), 'session')).status, 503);
+  } finally {
+    await server.shutdown();
     Deno.env.delete(envKey);
     await Deno.remove(root, { recursive: true });
   }

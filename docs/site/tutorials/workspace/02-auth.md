@@ -241,7 +241,7 @@ The unprefixed development name lets curl save the cookie on HTTP; clients rejec
 `__Host-` cookie. Remove both overrides and use HTTPS for production.
 
 For the full interactive round trip, follow the
-[cookie-jar signin and callback sequence](/identity-access/how-to/add-authentication/#step-7-verify-a-session).
+[cookie-jar signin and callback sequence](/identity-access/how-to/add-authentication/#direct-auth-service-diagnostics).
 `POST /api/v1/auth/signin` returns JSON containing `redirectUrl` and sets the
 transaction cookie. After provider authentication, post its `code` and `state`
 to `POST /api/v1/auth/callback` with that cookie; the callback sets the session

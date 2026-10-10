@@ -37,12 +37,22 @@ export type {{serviceName | pascalCase}}{{modelName}}UpdateInputV1 = z.infer<
   typeof {{serviceName | pascalCase}}{{modelName}}UpdateInputSchemaV1
 >;
 
-export const {{serviceName | pascalCase}}CrudContractV1 = createCrudContract({
+const demoCrud = createCrudContract({
   resource: '{{serviceName}}',
   entitySchema: {{serviceName | pascalCase}}{{modelName}}SchemaV1,
   createSchema: {{serviceName | pascalCase}}{{modelName}}CreateInputSchemaV1,
   updateSchema: {{serviceName | pascalCase}}{{modelName}}UpdateInputSchemaV1,
 });
+
+// These seeded showcase procedures are intentionally public on REST and RPC.
+// Metadata preserves the CRUD input/output schema refinements; it changes only access.
+export const {{serviceName | pascalCase}}CrudContractV1 = {
+  list: demoCrud.list.meta({ access: { authentication: 'none' } }) as typeof demoCrud.list,
+  getById: demoCrud.getById.meta({ access: { authentication: 'none' } }) as typeof demoCrud.getById,
+  create: demoCrud.create.meta({ access: { authentication: 'none' } }) as typeof demoCrud.create,
+  update: demoCrud.update.meta({ access: { authentication: 'none' } }) as typeof demoCrud.update,
+  delete: demoCrud.delete.meta({ access: { authentication: 'none' } }) as typeof demoCrud.delete,
+};
 
 /**
  * {{serviceName | pascalCase}} contract — Version 1.
@@ -53,6 +63,7 @@ export const {{serviceName | pascalCase}}ContractV1 = {
   health: {
     check: baseContract
       .route({ method: 'GET', path: '/{{serviceName}}/health' })
+      .meta({ access: { authentication: 'none' } })
       .output({{serviceName | pascalCase}}HealthSchemaV1),
   },
   ...{{serviceName | pascalCase}}CrudContractV1,

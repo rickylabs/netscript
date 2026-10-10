@@ -170,7 +170,6 @@ export const GATE = {
   BEHAVIOR_TRIGGERS_EVENTS: 'behavior.triggers-events',
   BEHAVIOR_AUTH_LIVE: 'behavior.auth-live',
   BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
-  BEHAVIOR_AUTH_BFF: 'behavior.auth-bff-conformance',
   /**
    * Unauthenticated `GET /api/v1/auth/session` serves the designed public introspection
    * contract: exactly 200 `{ "authenticated": false }`. It proves no refusal; refusal gates

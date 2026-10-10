@@ -57,8 +57,11 @@ export async function handleBrowserAuth(request: Request, action: string): Promi
         authenticated: result.authenticated,
         subject: result.session?.subject,
       }, { headers });
-    } catch {
-      return Response.json({ authenticated: false }, { status: 401, headers });
+    } catch (error) {
+      if (error instanceof Error && 'status' in error && error.status === 401) {
+        return Response.json({ authenticated: false }, { status: 401, headers });
+      }
+      return Response.json({ error: 'Authentication service unavailable' }, { status: 503, headers });
     }
   }
   if (!['signin', 'callback', 'signout'].includes(action)) {
@@ -101,7 +104,7 @@ export async function handleBrowserAuth(request: Request, action: string): Promi
   }
   const body = await response.json() as { redirectUrl?: string; redirectTo?: string };
   for (const cookie of response.headers.getSetCookie()) {
-    if (cookie.startsWith(`${cookieName}=`) || cookie.startsWith(`${cookieName}_txn=`)) {
+    if (cookie.startsWith(`${cookieName}=`)) {
       headers.append('set-cookie', cookie);
     }
   }
