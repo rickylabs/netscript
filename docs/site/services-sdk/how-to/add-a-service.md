@@ -310,9 +310,9 @@ no drift.
 
 {{ comp callout { type: "warning", title: "Production pitfalls" } }}
 <strong>Port collisions.</strong> Every service needs a distinct port. The scaffolder automatically allocates unique, high-range ports (>= 49152) at scaffold time. Read the port from <code>PORT</code> and let Aspire resolve it dynamically in orchestrated runs rather than hard-coding.<br>
-<strong>RPC lives under <code>/api/rpc/_</code>.</strong> The typed-client surface is
+<strong>RPC lives under <code>/api/rpc/&#42;</code>.</strong> The typed-client surface is
 <code>/api/rpc/&lt;version&gt;/&lt;router&gt;/&lt;procedure&gt;</code>, not a bare <code>/rpc</code>.
-The REST/OpenAPI surface is <code>/api/_</code>. Point clients and smoke tests at the right one.<br>
+The REST/OpenAPI surface is <code>/api/&#42;</code>. Point clients and smoke tests at the right one.<br>
 <strong>Contracts before handlers.</strong> Edit the contract first, then the handler — never
 the reverse. The contract is the shared truth; a handler that out-runs its contract silently
 breaks every client.<br>
