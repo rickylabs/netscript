@@ -3,7 +3,9 @@
  *
  * @example
  * ```typescript
- * import { paginatedQuery } from "@netscript/contracts/query";
+ * import { paginatedQuery, type PrismaModelDelegate } from "@netscript/contracts/query";
+ *
+ * declare const db: { user: PrismaModelDelegate };
  *
  * const users = await paginatedQuery(db.user, { page: 1, limit: 20 });
  * ```

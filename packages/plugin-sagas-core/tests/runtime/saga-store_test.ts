@@ -115,12 +115,14 @@ Deno.test('native runtime persists terminal status from failure and compensation
     });
 
     const failed = await store.load('terminal-status:failed-1' as SagaInstanceId);
-    const compensating = await store.load('terminal-status:compensating-1' as SagaInstanceId);
+    const compensated = await store.load('terminal-status:compensating-1' as SagaInstanceId);
 
     assertEquals(failed?.metadata.status, 'failed');
     assertEquals(store.transitions[0].record.transition.status, 'failed');
-    assertEquals(compensating?.metadata.status, 'compensating');
+    // The request persists `compensating`; the finished branch then persists terminal `compensated`.
+    assertEquals(compensated?.metadata.status, 'compensated');
     assertEquals(store.transitions[1].record.transition.status, 'compensating');
+    assertEquals(store.transitions[2].record.transition.status, 'compensated');
   } finally {
     await runtime.stop('terminal status test complete');
   }

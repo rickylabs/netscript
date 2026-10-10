@@ -17,13 +17,11 @@
  *   - `packages/fresh/mod.ts`
  *   - `packages/sdk/mod.ts`
  *
- * The first ancestor matching all three markers is the monorepo root.
- *
- * @example
- * ```typescript
- * const root = await detectMonorepoRoot('/repo/output/test-app/scaffold/my-app');
- * // => '/repo/output/test-app' (if packages/ exists there)
- * ```
+ * The first ancestor matching all three markers is the monorepo root. For a
+ * target at `/repo/output/test-app/scaffold/my-app`, `detectMonorepoRoot()`
+ * returns `/repo/output/test-app` when that directory holds all three markers.
+ * These helpers are maintainer-internal and are not exported from a public
+ * `@netscript/cli` specifier.
  */
 
 import { dirname, relative, resolve } from '@std/path';

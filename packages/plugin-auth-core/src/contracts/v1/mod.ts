@@ -6,6 +6,7 @@
 
 export {
   AUTH_SESSION_STATES,
+  AUTH_SESSIONS_REVOKE_SCOPE,
   authContract,
   authContractV1,
   AuthSessionResponseSchema,
@@ -13,6 +14,8 @@ export {
   CallbackInputSchema,
   CallbackResponseSchema,
   MeResponseSchema,
+  RevokeSessionInputSchema,
+  RevokeSessionResponseSchema,
   SessionInputSchema,
   SessionResponseSchema,
   SigninInputSchema,
@@ -33,6 +36,8 @@ export type {
   CallbackInput,
   CallbackResponse,
   MeResponse,
+  RevokeSessionInput,
+  RevokeSessionResponse,
   SessionInput,
   SessionResponse,
   SigninInput,

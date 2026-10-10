@@ -36,6 +36,11 @@ export type JobEventListener<E extends SchedulerEvent = SchedulerEvent> = (
  *
  * @example
  * ```ts
+ * import { createScheduler } from '@netscript/cron';
+ *
+ * declare function cleanupOldRecords(): Promise<void>;
+ * declare function generateDailyReport(): Promise<void>;
+ *
  * const scheduler = createScheduler();
  *
  * // Schedule a job

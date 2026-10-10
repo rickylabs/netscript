@@ -1,4 +1,5 @@
 export { mergeContributions } from './application/contribution-merger.ts';
+export { validatePluginComposition } from './application/validate-plugin-composition.ts';
 export { definePlugin } from './builders/define-plugin.ts';
 export { PluginBuilder } from './builders/plugin-builder.ts';
 export type {
@@ -19,6 +20,12 @@ export type { PluginLifecycleHooks } from './domain/plugin-lifecycle-hooks.ts';
 export type { ContributionAxis, PluginContext, PluginLogger } from '../domain/mod.ts';
 export type { PluginType } from '../domain/mod.ts';
 export type { PluginManifest } from './domain/plugin-manifest.ts';
+export type { PluginComposition, PluginCompositionResult } from './domain/plugin-composition.ts';
+export { PluginCompositionError, PluginError, PluginValidationError } from '../domain/mod.ts';
+export type {
+  PluginCompositionDiagnostic,
+  PluginCompositionDiagnosticCode,
+} from '../domain/mod.ts';
 export type { PluginMetadata } from './domain/plugin-metadata.ts';
 export type { PluginMetadataValue } from '../domain/mod.ts';
 export type { PluginManifestParser } from '../domain/mod.ts';

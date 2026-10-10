@@ -290,10 +290,13 @@ function toORPCError(
  *
  * @example
  * ```ts
+ * import { createRPCHandler, type ServiceRouter } from '@netscript/service';
  * import { ErrorHandlingPlugin } from '@netscript/telemetry/orpc';
- * import { RPCHandler } from '@orpc/server/fetch';
  *
- * const rpcHandler = new RPCHandler(router, {
+ * declare const router: ServiceRouter;
+ *
+ * const rpcHandler = createRPCHandler(router, {
+ *   errorHandling: false,
  *   plugins: [
  *     new ErrorHandlingPlugin({
  *       serviceName: 'users',
@@ -418,11 +421,13 @@ export class ErrorHandlingPlugin {
  *
  * @example
  * ```ts
+ * declare const errorTracker: { capture(error: Error, extra: object): Promise<void> };
+ *
  * const plugin = createErrorHandlingPlugin({
  *   serviceName: 'users',
  *   onError: async (error, ctx) => {
  *     // Send to error tracking service
- *     await Sentry.captureException(error, { extra: ctx });
+ *     await errorTracker.capture(error, ctx);
  *   },
  * });
  * ```
