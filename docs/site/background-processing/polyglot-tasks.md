@@ -17,12 +17,12 @@ that is not.
 A **polyglot task** runs non-TypeScript work — a Python script, a .NET program, a
 shell or PowerShell script, or any executable — as a **managed subprocess** spawned by the
 worker runtime. NetScript hands the task its input as command-line arguments and
-environment variables, captures every line of `stdout`/`stderr`, parses a final JSON line
+environment variables or a bounded stdin payload, captures every line of `stdout`/`stderr`, parses a final JSON line
 into a structured result, and normalizes the exit code into a `TaskResult`. It is the
 escape hatch for the moments your platform is otherwise all-TypeScript: an ML model in
 Python, a legacy .NET DLL, a system `pwsh` script. {{ comp.badge({ status: "alpha" }) }}
 
-{{ comp.diagram({ src: "/assets/diagrams/polyglot-task-execution.svg", alt: "The worker runtime resolves a TaskDefinition to a runtime adapter, which builds an argv and spawns a python/node/dotnet subprocess; input flows in as args and env, the subprocess streams stdout/stderr back, and the last JSON line of stdout becomes the structured result returned to the queue and database.", caption: "A task is dispatched to a runtime adapter that spawns a subprocess. Input arrives as argv + env; the last JSON line of stdout is parsed into the result; the exit code, captured logs, and duration become a TaskResult." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/polyglot-task-execution.svg", alt: "The worker runtime resolves a TaskDefinition to a runtime adapter, which builds an argv and spawns a python/node/dotnet subprocess; input flows in as args, env, or bounded stdin, the subprocess streams stdout/stderr back, and the last JSON line of stdout becomes the structured result returned to the queue and database.", caption: "A task is dispatched to a runtime adapter that spawns a subprocess. Input arrives as argv, env, or bounded stdin; the last JSON line of stdout is parsed into the result; the exit code, captured logs, and duration become a TaskResult." }) }}
 
 The typical story is an import pipeline with one step that already exists in another
 language: a legacy-data transform owned by a Python script, say, sitting in the middle of
@@ -40,7 +40,7 @@ with [background jobs](/background-processing/workers/) — the difference is pu
 execution surface. The `MultiRuntimeTaskExecutor` keeps a map of **runtime adapters**
 (one per `TaskType`) and dispatches a `TaskDefinition` to the adapter that supports its
 `type`. Each adapter builds an `argv` for its runtime (e.g. `python3 -u script.py …`,
-`pwsh -File script.ps1 …`) and runs it through a Dax-backed process runner that streams
+`pwsh -File script.ps1 …`) and runs it through a process runner backed by Deno.Command that streams
 output and times the process out. This page covers that subprocess seam; for in-process
 TS handlers, runtime modes, and the queue lifecycle, start at
 [background jobs](/background-processing/workers/).
@@ -94,14 +94,14 @@ JSON object as the **last line of `stdout`**.
   {
     label: "score.py (the subprocess)",
     lang: "python",
-    code: "# scripts/score.py\nimport json, os, sys\n\n# Input arrives as argv + env (NOT stdin).\nthreshold = float(sys.argv[sys.argv.index('--threshold') + 1])\nmodel_path = os.environ['MODEL_PATH']\n\n# ... do the work ...\nscored = {'kept': 42, 'dropped': 3, 'threshold': threshold}\n\n# Any prior prints become captured logs. The result is the LAST line of stdout,\n# and must be a single JSON object (not an array) to populate result.result.\nprint('scoring complete', file=sys.stderr)\nprint(json.dumps(scored))"
+    code: "# scripts/score.py\nimport json, os, sys\n\n# Input arrives as argv + env in this example.\nthreshold = float(sys.argv[sys.argv.index('--threshold') + 1])\nmodel_path = os.environ['MODEL_PATH']\n\n# ... do the work ...\nscored = {'kept': 42, 'dropped': 3, 'threshold': threshold}\n\n# Any prior prints become captured logs. The result is the LAST line of stdout,\n# and must be a single JSON object (not an array) to populate result.result.\nprint('scoring complete', file=sys.stderr)\nprint(json.dumps(scored))"
   }
 ] }) }}
 
 {{ comp callout { type: "important", title: "How input and output cross the process boundary" } }}
-Input is passed as <strong>command-line arguments</strong> (<code>args</code>) and
-<strong>environment variables</strong> (<code>env</code>) — there is no JSON-over-stdin
-channel. The runtime merges <code>Deno.env</code>, the task's <code>env</code>, and the
+Input is passed as <strong>command-line arguments</strong> (<code>args</code>),
+<strong>environment variables</strong> (<code>env</code>), or a bounded
+<strong>stdin payload</strong> (<code>.stdin(bytesOrJson)</code> or <code>options.stdin</code>). The runtime merges <code>Deno.env</code>, the task's <code>env</code>, and the
 call's <code>options.env</code>, then sets <code>TRACEPARENT</code>,
 <code>TRACESTATE</code>, and <code>CORRELATION_ID</code> from the call's
 <code>options.traceparent</code>, <code>options.tracestate</code>, and
@@ -180,6 +180,67 @@ For a <code>deno</code> task, calling <code>.build()</code> <em>without</em>
 pass an explicit, least-privilege permission set for untrusted or third-party Deno task
 code. Non-Deno runtimes ignore these keys entirely — gate those at the OS level instead.
 {{ /comp }}
+
+## Send private input on stdin
+
+Use `.stdin(bytesOrJson)` for a fixed task payload or `options.stdin` for input supplied at
+execution time. The execution option replaces the builder payload. JSON is encoded as UTF-8;
+`Uint8Array` values are sent unchanged. The runner writes the payload with backpressure and closes
+stdin, so the script can read to EOF. Absent input uses null stdin and never inherits input from the
+worker host. An explicitly supplied `undefined` payload fails with `MissingStdinPayload`.
+
+```ts
+import { defineTask } from '@netscript/plugin-workers-core/builders';
+import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
+
+const task = defineTask('private-input')
+  .runtime('python')
+  .entrypoint('./scripts/private-input.py')
+  .stdin({ uid: 'service-operator', roots: ['workspace-root'] })
+  .build();
+const executor = createDefaultTaskExecutor();
+const result = await executor.execute(task, {
+  stdin: { uid: 'another-operator', roots: ['another-root'] },
+  stdoutLimitBytes: 65_536,
+  stderrLimitBytes: 65_536,
+});
+console.log(result.success);
+```
+
+```python
+# scripts/private-input.py
+import json, sys
+
+payload = json.load(sys.stdin)
+# Use private input without putting it in argv, env, or diagnostics.
+print(json.dumps({'accepted': len(payload['roots'])}))
+```
+
+Stdin is capped at **1 MiB of encoded bytes**, including JSON punctuation and escaping. Builder
+input is validated and snapshotted when `.stdin()` is called; each `.build()` receives its own
+byte buffer, which the adapter passes directly to the runner. Execution input is validated before
+spawning. Oversized input produces `StdinPayloadTooLarge`. JSON accepts finite numbers, strings,
+booleans, null, arrays, and plain objects with at most 64 levels of nesting; cycles, accessors, and
+unsupported values produce `InvalidStdinPayload`. A subprocess that closes stdin before accepting
+the payload produces `StdinWriteFailed`.
+
+By default, stdout and stderr each retain only their **last 1 MiB** while continuing to read and
+stream all output. Healthy tasks can print more than 1 MiB without failing; a final stdout JSON
+object that fits in the retained tail remains available. Lines longer than 1 MiB of characters are delivered
+to log callbacks in bounded fragments. Set positive integer `stdoutLimitBytes` / `stderrLimitBytes`
+execution options, or configure them on
+`new ExecutableRuntimeAdapter({ stdoutLimitBytes, stderrLimitBytes })`, to opt into a total output
+cap. Exceeding an explicit cap terminates the process tree and returns `status: 'failed'`,
+`success: false`, and `StdoutLimitExceeded` or `StderrLimitExceeded`; explicit caps also apply with
+`streamLogs: false`. Runtime validation and write errors return failed task results; builder
+validation throws before building the task. Running aborts return `cancelled`, and timeouts return
+`timeout`, both with exit code `-1`. Subprocesses inherit the worker's process group so terminal and supervisor
+signals also reach active tasks.
+
+Builder `.stdin()` applies only to direct executor calls. KV task registration validates through a
+schema that strips this runtime field, and queue dispatch does not carry it. Supply private
+per-execution input in `options.stdin` when calling the executor in a worker. Stdin is not a CLI
+stdin flag. Scripts control their own stdout/stderr: do not print private payloads.
 
 ## Production notes
 
