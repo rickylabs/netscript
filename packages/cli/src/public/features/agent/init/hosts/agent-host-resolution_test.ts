@@ -5,7 +5,12 @@ import {
   describeAgentInitResolution,
   resolveAgentInit,
 } from './agent-host-resolution.ts';
-import type { AgentHost, InitAgentInput } from '../init-agent-input.ts';
+import type {
+  AgentHost,
+  AgentResolutionSignal,
+  AgentResolutionSource,
+  InitAgentInput,
+} from '../init-agent-input.ts';
 
 function resolve(
   input: Pick<InitAgentInput, 'host' | 'editor'> = {},
@@ -13,6 +18,13 @@ function resolve(
   environment: AgentEnvironment = {},
 ) {
   return resolveAgentInit(input, new Set(markers), environment);
+}
+
+function signals(
+  source: AgentResolutionSource,
+  ...names: readonly string[]
+): AgentResolutionSignal[] {
+  return names.map((name) => ({ source, name }));
 }
 
 Deno.test('host resolution: --host flag outranks project markers and environment', () => {
@@ -23,23 +35,31 @@ Deno.test('host resolution: --host flag outranks project markers and environment
   assertEquals(resolution.hosts, {
     value: ['opencode'],
     source: 'flag',
-    signals: ['--host opencode'],
+    signals: signals('flag', '--host opencode'),
   });
 });
 
 Deno.test('host resolution: --host all selects claude, vscode, and opencode', () => {
   const resolution = resolve({ host: 'all' });
   assertEquals(resolution.hosts.value, ['claude', 'vscode', 'opencode']);
-  assertEquals(resolution.editor, { value: 'vscode', source: 'flag', signals: ['--host all'] });
+  assertEquals(resolution.editor, {
+    value: 'vscode',
+    source: 'flag',
+    signals: signals('flag', '--host all'),
+  });
 });
 
 Deno.test('host resolution: project markers outrank environment signals', () => {
   const resolution = resolve({}, ['.claude'], { OPENCODE: '1', TERM_PROGRAM: 'vscode' });
-  assertEquals(resolution.hosts, { value: ['claude'], source: 'project', signals: ['.claude'] });
+  assertEquals(resolution.hosts, {
+    value: ['claude'],
+    source: 'project',
+    signals: signals('project', '.claude'),
+  });
   assertEquals(resolution.editor, {
     value: 'vscode',
     source: 'environment',
-    signals: ['TERM_PROGRAM=vscode'],
+    signals: signals('environment', 'TERM_PROGRAM=vscode'),
   });
 });
 
@@ -48,14 +68,41 @@ Deno.test('host resolution: OpenCode project markers select the opencode host', 
     assertEquals(resolve({}, [marker]).hosts, {
       value: ['opencode'],
       source: 'project',
-      signals: [marker],
+      signals: signals('project', marker),
     });
   }
   assertEquals(resolve({}, ['.vscode', '.claude', 'opencode.json']).hosts, {
     value: ['claude', 'vscode', 'opencode'],
     source: 'project',
-    signals: ['.claude', '.vscode', 'opencode.json'],
+    signals: signals('project', '.claude', '.vscode', 'opencode.json'),
   });
+});
+
+Deno.test('host resolution: an --editor flag keeps flag provenance when it selects the VS Code host', () => {
+  const alone = resolve({ editor: 'vscode' });
+  assertEquals(alone.hosts, {
+    value: ['vscode'],
+    source: 'flag',
+    signals: signals('flag', '--editor vscode'),
+  });
+  assertEquals(describeAgentInitResolution(alone), [
+    'Agent hosts: vscode (from flag: --editor vscode).',
+    'Editor: vscode (from flag: --editor vscode).',
+  ]);
+
+  const mixed = resolve({ editor: 'vscode' }, ['.claude']);
+  assertEquals(mixed.hosts, {
+    value: ['claude', 'vscode'],
+    source: 'flag',
+    signals: [
+      { source: 'project', name: '.claude' },
+      { source: 'flag', name: '--editor vscode' },
+    ],
+  });
+  assertEquals(
+    describeAgentInitResolution(mixed)[0],
+    'Agent hosts: claude, vscode (from flag: --editor vscode; project: .claude).',
+  );
 });
 
 Deno.test('host resolution: each environment signal selects its host when project markers are absent', () => {
@@ -69,7 +116,11 @@ Deno.test('host resolution: each environment signal selects its host when projec
   ];
   for (const [environment, hosts, signal, editor] of cases) {
     const resolution = resolve({}, [], environment);
-    assertEquals(resolution.hosts, { value: hosts, source: 'environment', signals: [signal] });
+    assertEquals(resolution.hosts, {
+      value: hosts,
+      source: 'environment',
+      signals: signals('environment', signal),
+    });
     assertEquals(resolution.editor.value, editor);
   }
 });
@@ -88,7 +139,7 @@ Deno.test('host resolution: TERM_PROGRAM outranks variables inherited from an ou
   assertEquals(resolution.editor, {
     value: 'zed',
     source: 'environment',
-    signals: ['TERM_PROGRAM=zed'],
+    signals: signals('environment', 'TERM_PROGRAM=zed'),
   });
 });
 
@@ -101,7 +152,7 @@ Deno.test('host resolution: combined environment signals keep canonical host ord
   assertEquals(resolution.hosts, {
     value: ['claude', 'vscode', 'opencode'],
     source: 'environment',
-    signals: ['CLAUDECODE', 'TERM_PROGRAM=vscode', 'OPENCODE'],
+    signals: signals('environment', 'CLAUDECODE', 'TERM_PROGRAM=vscode', 'OPENCODE'),
   });
 });
 

@@ -22,7 +22,12 @@ import {
   type AgentProjectMarker,
   resolveAgentInit,
 } from './hosts/agent-host-resolution.ts';
-import { OPENCODE_CONFIG_FILE, renderOpenCodeConfig } from './hosts/opencode-config.ts';
+import {
+  OPENCODE_CONFIG_FILE,
+  OPENCODE_JSONC_CONFIG_FILE,
+  type OpenCodeConfigWrite,
+  planOpenCodeConfig,
+} from './hosts/opencode-config.ts';
 
 const START_MARKER = '<!-- netscript-agent:start -->';
 const END_MARKER = '<!-- netscript-agent:end -->';
@@ -95,6 +100,20 @@ export async function initAgent(
   );
   const editor = resolution.editor.value;
   const hosts = resolution.hosts.value;
+  const openCodeWrites = hosts.includes('opencode')
+    ? await readOpenCodeConfigPlan(
+      input.projectRoot,
+      dependencies.fs,
+      [
+        'deno',
+        ...netscriptMcpArgs(
+          input.projectRoot,
+          dependencies.cliSpecifier ?? netscriptJsrSpecifier('cli'),
+          installedDocsRoot,
+        ),
+      ],
+    )
+    : [];
   const changedFiles: string[] = [];
   const messages: string[] = [];
   for (const path of toolBundle.paths) {
@@ -188,21 +207,8 @@ export async function initAgent(
       installedDocsRoot,
     );
   }
-  if (hosts.includes('opencode')) {
-    const path = join(input.projectRoot, OPENCODE_CONFIG_FILE);
-    await writeChanged(
-      dependencies.fs,
-      path,
-      renderOpenCodeConfig(await dependencies.fs.readText(path), [
-        'deno',
-        ...netscriptMcpArgs(
-          input.projectRoot,
-          dependencies.cliSpecifier ?? netscriptJsrSpecifier('cli'),
-          installedDocsRoot,
-        ),
-      ]),
-      changedFiles,
-    );
+  for (const write of openCodeWrites) {
+    await writeChanged(dependencies.fs, write.path, write.content, changedFiles);
   }
   if (
     hosts.includes('claude') &&
@@ -243,6 +249,23 @@ async function hasAspireWorkflowSkills(
     if (!await fs.exists(join(projectRoot, '.claude', 'skills', skill, 'SKILL.md'))) return false;
   }
   return true;
+}
+
+/** Read both OpenCode config files and plan their writes before any project file is touched. */
+async function readOpenCodeConfigPlan(
+  projectRoot: string,
+  fs: AgentInitFileSystem,
+  netscriptCommand: readonly string[],
+): Promise<readonly OpenCodeConfigWrite[]> {
+  const read = async (name: string) => {
+    const path = join(projectRoot, name);
+    return { path, text: await fs.readText(path) };
+  };
+  return planOpenCodeConfig(
+    await read(OPENCODE_CONFIG_FILE),
+    await read(OPENCODE_JSONC_CONFIG_FILE),
+    netscriptCommand,
+  );
 }
 
 async function findProjectMarkers(

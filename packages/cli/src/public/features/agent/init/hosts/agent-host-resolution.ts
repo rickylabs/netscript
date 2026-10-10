@@ -4,6 +4,8 @@ import {
   type AgentHost,
   type AgentInitResolution,
   type AgentResolution,
+  type AgentResolutionSignal,
+  type AgentResolutionSource,
   type InitAgentInput,
 } from '../init-agent-input.ts';
 
@@ -28,17 +30,24 @@ const OPENCODE_MARKERS: readonly AgentProjectMarker[] = [
   '.opencode',
 ];
 
-interface Signal<T> {
+interface Candidate<T> {
   readonly value: T;
-  readonly signal: string;
+  readonly signal: AgentResolutionSignal;
 }
+
+const SOURCE_ORDER: readonly AgentResolutionSource[] = [
+  'flag',
+  'project',
+  'environment',
+  'default',
+];
 
 /**
  * Resolve the agent hosts and editor for one installation.
  *
  * Precedence is `--host`/`--editor` flag, then existing project markers, then the invoking
- * environment, then the default (`claude` host, no editor). Each result records which source
- * decided it so the command can print the decision.
+ * environment, then the default (`claude` host, no editor). Each result records the deciding source
+ * and the source of every signal it used, so the command can print the decision.
  */
 export function resolveAgentInit(
   input: Pick<InitAgentInput, 'host' | 'editor'>,
@@ -58,9 +67,16 @@ export function describeAgentInitResolution(resolution: AgentInitResolution): re
 }
 
 function describeSource(resolution: AgentResolution<unknown>): string {
-  return resolution.source === 'default'
-    ? 'default: no flag, project marker, or environment signal'
-    : `from ${resolution.source}: ${resolution.signals.join(', ')}`;
+  if (resolution.source === 'default') {
+    return 'default: no flag, project marker, or environment signal';
+  }
+  const groups = SOURCE_ORDER.flatMap((source) => {
+    const names = resolution.signals
+      .filter((signal) => signal.source === source)
+      .map((signal) => signal.name);
+    return names.length > 0 ? [`${source}: ${names.join(', ')}`] : [];
+  });
+  return `from ${groups.join('; ')}`;
 }
 
 function resolveEditor(
@@ -68,9 +84,9 @@ function resolveEditor(
   markers: ReadonlySet<AgentProjectMarker>,
   environment: AgentEnvironment,
 ): AgentResolution<EditorChoice> {
-  if (input.editor) return resolved(input.editor, 'flag', [`--editor ${input.editor}`]);
+  if (input.editor) return single(input.editor, 'flag', `--editor ${input.editor}`);
   if (input.host === 'vscode' || input.host === 'all') {
-    return resolved('vscode', 'flag', [`--host ${input.host}`]);
+    return single('vscode', 'flag', `--host ${input.host}`);
   }
   const hasZed = markers.has('.zed');
   const hasVsCode = markers.has('.vscode');
@@ -79,11 +95,13 @@ function resolveEditor(
       'Both .zed and .vscode exist; pass --editor zed, --editor vscode, or --editor none.',
     );
   }
-  if (hasZed) return resolved('zed', 'project', ['.zed']);
-  if (hasVsCode) return resolved('vscode', 'project', ['.vscode']);
+  if (hasZed) return single('zed', 'project', '.zed');
+  if (hasVsCode) return single('vscode', 'project', '.vscode');
   const detected = editorFromEnvironment(environment);
-  if (detected) return resolved(detected.value, 'environment', [detected.signal]);
-  return resolved('none', 'default', []);
+  if (detected) {
+    return { value: detected.value, source: 'environment', signals: [detected.signal] };
+  }
+  return { value: 'none', source: 'default', signals: [] };
 }
 
 function resolveHosts(
@@ -92,21 +110,24 @@ function resolveHosts(
   environment: AgentEnvironment,
   editor: AgentResolution<EditorChoice>,
 ): AgentResolution<readonly AgentHost[]> {
-  if (input.host === 'all') return resolved(AGENT_HOSTS, 'flag', ['--host all']);
-  if (input.host) return resolved([input.host], 'flag', [`--host ${input.host}`]);
+  if (input.host === 'all') return single(AGENT_HOSTS, 'flag', '--host all');
+  if (input.host) return single([input.host], 'flag', `--host ${input.host}`);
 
-  const fromProject: Signal<AgentHost>[] = [];
-  if (markers.has('.claude')) fromProject.push({ value: 'claude', signal: '.claude' });
-  if (editor.value === 'vscode' && (editor.source === 'flag' || editor.source === 'project')) {
-    fromProject.push({ value: 'vscode', signal: editor.signals[0] });
-  }
+  // An editor chosen by flag or project marker selects the VS Code host alongside project markers;
+  // the signal keeps the editor's own provenance.
+  const editorHost: Candidate<AgentHost>[] =
+    editor.value === 'vscode' && editor.source !== 'environment' && editor.source !== 'default'
+      ? [{ value: 'vscode', signal: editor.signals[0] }]
+      : [];
+  const fromProject: Candidate<AgentHost>[] = [...editorHost];
+  if (markers.has('.claude')) fromProject.push(candidate('claude', 'project', '.claude'));
   const opencodeMarker = OPENCODE_MARKERS.find((marker) => markers.has(marker));
-  if (opencodeMarker) fromProject.push({ value: 'opencode', signal: opencodeMarker });
-  if (fromProject.length > 0) return fromSignals(fromProject, 'project');
+  if (opencodeMarker) fromProject.push(candidate('opencode', 'project', opencodeMarker));
+  if (fromProject.length > 0) return hostResolution(fromProject);
 
-  const fromEnvironment: Signal<AgentHost>[] = [];
+  const fromEnvironment: Candidate<AgentHost>[] = [];
   if (isSet(environment.CLAUDECODE)) {
-    fromEnvironment.push({ value: 'claude', signal: 'CLAUDECODE' });
+    fromEnvironment.push(candidate('claude', 'environment', 'CLAUDECODE'));
   }
   if (editor.value === 'vscode' && editor.source === 'environment') {
     fromEnvironment.push({ value: 'vscode', signal: editor.signals[0] });
@@ -114,46 +135,49 @@ function resolveHosts(
   const opencodeVariable = isSet(environment.OPENCODE)
     ? 'OPENCODE'
     : firstSetVariable(environment, 'OPENCODE_');
-  if (opencodeVariable) fromEnvironment.push({ value: 'opencode', signal: opencodeVariable });
-  if (fromEnvironment.length > 0) return fromSignals(fromEnvironment, 'environment');
+  if (opencodeVariable) {
+    fromEnvironment.push(candidate('opencode', 'environment', opencodeVariable));
+  }
+  if (fromEnvironment.length > 0) return hostResolution(fromEnvironment);
 
-  return resolved(['claude'], 'default', []);
+  return { value: ['claude'], source: 'default', signals: [] };
 }
 
 /**
  * Detect the editor whose integrated terminal launched the command. `TERM_PROGRAM` is rewritten
  * by each terminal, so it outranks variables a nested terminal may have inherited.
  */
-function editorFromEnvironment(environment: AgentEnvironment): Signal<EditorChoice> | undefined {
+function editorFromEnvironment(environment: AgentEnvironment): Candidate<EditorChoice> | undefined {
   const termProgram = environment.TERM_PROGRAM?.toLowerCase();
-  if (termProgram === 'vscode') return { value: 'vscode', signal: 'TERM_PROGRAM=vscode' };
-  if (termProgram === 'zed') return { value: 'zed', signal: 'TERM_PROGRAM=zed' };
-  if (isSet(environment.ZED_TERM)) return { value: 'zed', signal: 'ZED_TERM' };
+  if (termProgram === 'vscode') return candidate('vscode', 'environment', 'TERM_PROGRAM=vscode');
+  if (termProgram === 'zed') return candidate('zed', 'environment', 'TERM_PROGRAM=zed');
+  if (isSet(environment.ZED_TERM)) return candidate('zed', 'environment', 'ZED_TERM');
   const vsCodeFamily = firstSetVariable(environment, 'VSCODE_') ??
     firstSetVariable(environment, 'CURSOR_');
-  return vsCodeFamily ? { value: 'vscode', signal: vsCodeFamily } : undefined;
+  return vsCodeFamily ? candidate('vscode', 'environment', vsCodeFamily) : undefined;
 }
 
-function fromSignals(
-  signals: readonly Signal<AgentHost>[],
-  source: 'project' | 'environment',
+function hostResolution(
+  candidates: readonly Candidate<AgentHost>[],
 ): AgentResolution<readonly AgentHost[]> {
-  const ordered = [...signals].sort((left, right) =>
+  const ordered = [...candidates].sort((left, right) =>
     AGENT_HOSTS.indexOf(left.value) - AGENT_HOSTS.indexOf(right.value)
   );
-  return resolved(
-    ordered.map((entry) => entry.value),
-    source,
-    ordered.map((entry) => entry.signal),
-  );
+  const signals = ordered.map((entry) => entry.signal);
+  return { value: ordered.map((entry) => entry.value), source: highestSource(signals), signals };
 }
 
-function resolved<T>(
-  value: T,
-  source: AgentResolution<T>['source'],
-  signals: readonly string[],
-): AgentResolution<T> {
-  return { value, source, signals };
+function highestSource(signals: readonly AgentResolutionSignal[]): AgentResolutionSource {
+  return SOURCE_ORDER.find((source) => signals.some((signal) => signal.source === source)) ??
+    'default';
+}
+
+function candidate<T>(value: T, source: AgentResolutionSource, name: string): Candidate<T> {
+  return { value, signal: { source, name } };
+}
+
+function single<T>(value: T, source: AgentResolutionSource, name: string): AgentResolution<T> {
+  return { value, source, signals: [{ source, name }] };
 }
 
 function isSet(value: string | undefined): boolean {

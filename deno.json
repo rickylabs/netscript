@@ -240,6 +240,7 @@
   },
   "publish": false,
   "catalog": {
+    "jsonc-parser": "^3.3.1",
     "@durable-streams/client": "0.2.6",
     "@durable-streams/server": "^0.3.7",
     "@durable-streams/state": "0.3.1",

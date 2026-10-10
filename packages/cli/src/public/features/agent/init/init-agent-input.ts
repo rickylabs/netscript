@@ -18,12 +18,17 @@ export interface InitAgentInput {
  */
 export type AgentResolutionSource = "flag" | "project" | "environment" | "default";
 
-/** A resolved value with the source that decided it and the signals that source observed. */
+/** One observed input: a flag, a project marker, or an environment variable name (never its value). */
+export interface AgentResolutionSignal {
+  readonly source: AgentResolutionSource;
+  readonly name: string;
+}
+
+/** A resolved value, the highest-precedence source that decided it, and every signal it used. */
 export interface AgentResolution<T> {
   readonly value: T;
   readonly source: AgentResolutionSource;
-  /** Flags, project markers, or environment variable names; never environment values. */
-  readonly signals: readonly string[];
+  readonly signals: readonly AgentResolutionSignal[];
 }
 
 /** How the agent hosts and editor of one installation were resolved. */

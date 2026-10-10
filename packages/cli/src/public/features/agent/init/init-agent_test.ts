@@ -7,6 +7,7 @@ import {
   assertStringIncludes,
 } from '@std/assert';
 import { dirname, join } from '@std/path';
+import { parse as parseJsonc } from '@std/jsonc';
 import { format, increment, parse } from '@std/semver';
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { EMBEDDED_SKILL_FILES } from '../../../../kernel/assets/skills.generated.ts';
@@ -1056,7 +1057,7 @@ Deno.test('#2007 OpenCode host writes opencode.json and merges an existing one i
       aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
     });
     assertEquals(merged.hosts, ['opencode']);
-    assertEquals(merged.resolution.hosts.signals, ['opencode.json']);
+    assertEquals(merged.resolution.hosts.signals, [{ source: 'project', name: 'opencode.json' }]);
     const mergedConfig = JSON.parse(await Deno.readTextFile(join(mergeRoot, 'opencode.json')));
     assertEquals(mergedConfig.model, 'local/model');
     assertEquals(mergedConfig.mcp.other, { type: 'remote', url: 'https://mcp.example.test' });
@@ -1074,6 +1075,119 @@ Deno.test('#2007 OpenCode host writes opencode.json and merges an existing one i
     await Deno.remove(mergeRoot, { recursive: true });
   }
 });
+
+Deno.test('#2007 OpenCode host merges a commented opencode.json with trailing commas', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    await fs.writeText(
+      join(root, 'opencode.json'),
+      '// project settings\n{\n  "model": "local/model", // keep\n  "mcp": {},\n}\n',
+    );
+    const first = await initAgent({ projectRoot: root }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assertEquals(first.hosts, ['opencode']);
+    const text = await Deno.readTextFile(join(root, 'opencode.json'));
+    assertStringIncludes(text, '// project settings');
+    assertStringIncludes(text, '// keep');
+    const config = parseJsonc(text);
+    assertEquals(jsonAt(config, 'model'), 'local/model');
+    assertEquals(jsonAt(config, 'mcp', 'netscript', 'command', '0'), 'deno');
+    assertEquals(
+      (await initAgent({ projectRoot: root }, {
+        fs,
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      })).changedFiles,
+      [],
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('#2007 OpenCode host refreshes a stale opencode.jsonc server so the effective command is current', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    await fs.writeText(
+      join(root, 'opencode.json'),
+      '{"mcp":{"netscript":{"type":"local","command":["deno","run","jsr:@netscript/cli@old"]}}}\n',
+    );
+    await fs.writeText(
+      join(root, 'opencode.jsonc'),
+      '// pinned by the team\n{\n  "mcp": {\n    "netscript": { "type": "local", "command": ["stale"], },\n  },\n}\n',
+    );
+    const result = await initAgent({ projectRoot: root }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assertEquals(result.hosts, ['opencode']);
+    const expected = [
+      'deno',
+      'run',
+      '--no-lock',
+      '--minimum-dependency-age=0',
+      '--config',
+      join(root, 'deno.json'),
+      '-A',
+      `jsr:@netscript/cli@${NETSCRIPT_RELEASE_VERSION}`,
+      'agent',
+      'mcp',
+      '--project-root',
+      root,
+    ];
+    const jsoncText = await Deno.readTextFile(join(root, 'opencode.jsonc'));
+    assertStringIncludes(jsoncText, '// pinned by the team');
+    const jsonc = parseJsonc(jsoncText);
+    const json = parseJsonc(await Deno.readTextFile(join(root, 'opencode.json')));
+    // OpenCode merges both project files; whichever wins, the effective command is current.
+    assertEquals(jsonAt(jsonc, 'mcp', 'netscript', 'command'), expected);
+    assertEquals(jsonAt(json, 'mcp', 'netscript', 'command'), expected);
+    assertEquals(jsonAt(jsonc, 'lsp', 'deno', 'command'), ['deno', 'lsp']);
+    assertEquals(jsonAt(json, 'lsp'), undefined);
+    assertEquals(
+      (await initAgent({ projectRoot: root }, {
+        fs,
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      })).changedFiles,
+      [],
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('#2007 a malformed OpenCode config aborts before any project write', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(join(root, 'opencode.json'), '{ "mcp": ');
+    await assertRejects(
+      () =>
+        initAgent({ projectRoot: root }, {
+          fs: new DenoAgentInitFileSystem(),
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+        }),
+      Error,
+      'is not valid JSONC',
+    );
+    assertEquals(
+      (await Array.fromAsync(Deno.readDir(root))).map((entry) => entry.name),
+      ['opencode.json'],
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+function jsonAt(value: unknown, ...path: readonly string[]): unknown {
+  return path.reduce<unknown>(
+    (current, key) =>
+      current !== null && typeof current === 'object' ? Reflect.get(current, key) : undefined,
+    value,
+  );
+}
 
 Deno.test('#2007 AGENTS.md states MCP as the default surface with the doctor-then-reinit recovery path', async () => {
   const root = await Deno.makeTempDir();

@@ -66,7 +66,11 @@ Deno.test('agent init command prints the host resolution messages', async () => 
         changedFiles: ['/fixture/opencode.json'],
         hosts: ['opencode'],
         resolution: {
-          hosts: { value: ['opencode'], source: 'environment', signals: ['OPENCODE'] },
+          hosts: {
+            value: ['opencode'],
+            source: 'environment',
+            signals: [{ source: 'environment', name: 'OPENCODE' }],
+          },
           editor: { value: 'none', source: 'default', signals: [] },
         },
         messages: ['Aspire agent wiring was skipped: aspire not found.'],

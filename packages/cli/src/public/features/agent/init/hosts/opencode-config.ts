@@ -1,5 +1,17 @@
-/** Project-root OpenCode configuration file written for the `opencode` agent host. */
+import {
+  applyEdits,
+  type FormattingOptions,
+  type JSONPath,
+  modify,
+  parse,
+  type ParseError,
+  printParseErrorCode,
+} from 'jsonc-parser';
+
+/** Project-root OpenCode configuration file created for the `opencode` agent host. */
 export const OPENCODE_CONFIG_FILE = 'opencode.json';
+/** Project-root OpenCode JSONC configuration; OpenCode lets it override `opencode.json`. */
+export const OPENCODE_JSONC_CONFIG_FILE = 'opencode.jsonc';
 
 /**
  * Per-server MCP request timeouts in milliseconds. OpenCode's 5 s default does not cover a
@@ -12,6 +24,7 @@ export const OPENCODE_MCP_TIMEOUT_MS = {
 } as const;
 
 const OPENCODE_SCHEMA_URL = 'https://opencode.ai/config.json';
+const FORMATTING: FormattingOptions = { insertSpaces: true, tabSize: 2, eol: '\n' };
 
 /** OpenCode only starts language servers it is told about; omitting `lsp` disables them all. */
 const DENO_LSP_ENTRY = {
@@ -25,44 +38,149 @@ const DENO_FORMATTER_ENTRY = {
   extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.jsonc', '.md'],
 } as const;
 
+/** One OpenCode configuration file read from the project root. */
+export interface OpenCodeConfigSource {
+  readonly path: string;
+  /** Current file text, or `undefined` when the file does not exist. */
+  readonly text: string | undefined;
+}
+
+/** A planned OpenCode configuration write. */
+export interface OpenCodeConfigWrite {
+  readonly path: string;
+  readonly content: string;
+}
+
 /**
- * Merge NetScript's OpenCode wiring into existing `opencode.json` text.
+ * Plan NetScript's OpenCode configuration writes for both project config files.
+ *
+ * The effective file (`opencode.jsonc` when it exists, otherwise `opencode.json`) receives the full
+ * NetScript wiring. Because OpenCode merges both files, the other file only has an existing
+ * `netscript` or `aspire` server declaration refreshed, so a stale declaration cannot win the merge.
+ * Both files are parsed as JSONC and edited in place, keeping comments and unrelated settings; a
+ * malformed file aborts the plan before anything is written.
+ */
+export function planOpenCodeConfig(
+  json: OpenCodeConfigSource,
+  jsonc: OpenCodeConfigSource,
+  netscriptCommand: readonly string[],
+): readonly OpenCodeConfigWrite[] {
+  const [primary, secondary] = jsonc.text === undefined ? [json, jsonc] : [jsonc, json];
+  const writes = [{
+    path: primary.path,
+    content: renderOpenCodeConfig(primary.text, netscriptCommand, primary.path),
+  }];
+  if (secondary.text !== undefined) {
+    writes.push({
+      path: secondary.path,
+      content: refreshOpenCodeServers(secondary.text, netscriptCommand, secondary.path),
+    });
+  }
+  return writes;
+}
+
+/**
+ * Merge NetScript's OpenCode wiring into existing configuration text.
  *
  * The `netscript` and `aspire` MCP entries are always rewritten so the pinned CLI stays current.
  * `lsp.deno` and `formatter.deno` are added when absent; an existing `deno` entry and an explicit
- * `false` opt-out are preserved. Every unrelated key is kept.
+ * `false` opt-out are preserved. Comments and every unrelated key are kept.
  */
 export function renderOpenCodeConfig(
   currentText: string | undefined,
   netscriptCommand: readonly string[],
+  label = OPENCODE_CONFIG_FILE,
 ): string {
-  const current = currentText ? asRecord(JSON.parse(currentText)) : {};
-  const config = {
-    $schema: OPENCODE_SCHEMA_URL,
-    ...current,
-    mcp: {
-      ...asRecord(current.mcp),
-      netscript: localServer(netscriptCommand, OPENCODE_MCP_TIMEOUT_MS.netscript),
-      aspire: localServer(['aspire', 'agent', 'mcp'], OPENCODE_MCP_TIMEOUT_MS.aspire),
-    },
-    lsp: withDenoEntry(current.lsp, DENO_LSP_ENTRY),
-    formatter: withDenoEntry(current.formatter, DENO_FORMATTER_ENTRY),
+  if (currentText === undefined || currentText.trim() === '') {
+    return `${
+      JSON.stringify(
+        {
+          $schema: OPENCODE_SCHEMA_URL,
+          mcp: mcpServers(netscriptCommand),
+          lsp: { deno: DENO_LSP_ENTRY },
+          formatter: { deno: DENO_FORMATTER_ENTRY },
+        },
+        null,
+        2,
+      )
+    }\n`;
+  }
+  const current = parseConfig(currentText, label);
+  let text = setServers(currentText, current, netscriptCommand, false);
+  if (current.$schema === undefined) text = edit(text, ['$schema'], OPENCODE_SCHEMA_URL);
+  text = withDenoEntry(text, 'lsp', current.lsp, DENO_LSP_ENTRY);
+  return withDenoEntry(text, 'formatter', current.formatter, DENO_FORMATTER_ENTRY);
+}
+
+/** Refresh only the `netscript` and `aspire` servers a file already declares. */
+function refreshOpenCodeServers(
+  currentText: string,
+  netscriptCommand: readonly string[],
+  label: string,
+): string {
+  return setServers(currentText, parseConfig(currentText, label), netscriptCommand, true);
+}
+
+function setServers(
+  currentText: string,
+  current: Record<string, unknown>,
+  netscriptCommand: readonly string[],
+  onlyDeclared: boolean,
+): string {
+  const servers = mcpServers(netscriptCommand);
+  const declared = isRecord(current.mcp) ? current.mcp : {};
+  let text = currentText;
+  for (const name of ['netscript', 'aspire'] as const) {
+    if (onlyDeclared && !(name in declared)) continue;
+    text = edit(text, ['mcp', name], servers[name]);
+  }
+  return text;
+}
+
+function mcpServers(netscriptCommand: readonly string[]) {
+  return {
+    netscript: localServer(netscriptCommand, OPENCODE_MCP_TIMEOUT_MS.netscript),
+    aspire: localServer(['aspire', 'agent', 'mcp'], OPENCODE_MCP_TIMEOUT_MS.aspire),
   };
-  return `${JSON.stringify(config, null, 2)}\n`;
 }
 
 function localServer(command: readonly string[], timeout: number) {
   return { type: 'local', enabled: true, timeout, command };
 }
 
-function withDenoEntry(current: unknown, entry: object): unknown {
-  if (current === false) return false;
-  const existing = asRecord(current);
-  return { ...existing, deno: existing.deno ?? entry };
+function withDenoEntry(
+  text: string,
+  key: 'lsp' | 'formatter',
+  current: unknown,
+  entry: object,
+): string {
+  if (current === false) return text;
+  if (isRecord(current)) {
+    return current.deno === undefined ? edit(text, [key, 'deno'], entry) : text;
+  }
+  return edit(text, [key], { deno: entry });
 }
 
-function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' && !Array.isArray(value)
-    ? value as Record<string, unknown>
-    : {};
+function edit(text: string, path: JSONPath, value: unknown): string {
+  return applyEdits(text, modify(text, path, value, { formattingOptions: FORMATTING }));
+}
+
+function parseConfig(text: string, label: string): Record<string, unknown> {
+  const errors: ParseError[] = [];
+  const value: unknown = parse(text, errors, { allowTrailingComma: true });
+  if (errors.length > 0) {
+    const [first] = errors;
+    throw new Error(
+      `${label} is not valid JSONC (${
+        printParseErrorCode(first.error)
+      } at offset ${first.offset}); ` +
+        'fix it, then re-run `netscript agent init`.',
+    );
+  }
+  if (!isRecord(value)) throw new Error(`${label} must contain a JSON object.`);
+  return value;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
