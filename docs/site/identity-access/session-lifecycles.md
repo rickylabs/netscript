@@ -140,11 +140,11 @@ To log a user out of the application:
 
 ### Return target and identity normalization
 - **`allowedReturnTo`**: To prevent open-redirect vulnerabilities, the backend restricts post-login redirects. It validates the target against a preset array of URL prefixes or a custom evaluation function. If validation fails, it throws a `return_to_not_allowed` error.
-- **`normalizePrincipal`**: Customizes how user claims and tokens map to a NetScript `Principal` (subject, scopes, and roles).
+- **`normalizePrincipal`**: Customizes how user claims and tokens map to a NetScript `Principal` (subject, scopes, and roles). It *replaces* the default mapping, so compose on top of `defaultPrincipal(ctx)` instead of rebuilding the principal: that keeps the stable subject, the `user` role, `scheme: "custom"`, the token scopes, and the `sessionId`/`providerId` claims. The context also carries the flow's injected `fetch`, so any provider call a mapper makes uses the same transport as the token exchange.
 
 ```ts
 import { Hono } from "npm:hono@^4";
-import { createKvOAuthBackend, providers } from "@netscript/auth-kv-oauth";
+import { createKvOAuthBackend, defaultPrincipal, providers } from "@netscript/auth-kv-oauth";
 import type { AuthnRequest } from "@netscript/service/auth";
 
 // 1. Compose the KV OAuth Backend with allowedReturnTo & identity normalization
@@ -160,21 +160,14 @@ const backend = await createKvOAuthBackend({
   ],
   defaultReturnTo: "http://localhost:8000/dashboard",
   
-  // Custom identity normalization mapping
-  normalizePrincipal: (ctx) => {
-    const email = (ctx.claims.email as string) ?? "";
-    const isCompanyEmail = email.endsWith("@mycompany.com");
-    return {
-      subject: ctx.claims.sub as string,
-      scopes: ctx.tokenSet.scope?.split(/\s+/) ?? ["read"],
-      roles: isCompanyEmail ? ["admin", "user"] : ["user"],
-      scheme: "custom",
-      claims: {
-        email,
-        providerId: ctx.provider.id,
-        sessionId: ctx.sessionId,
-      },
-    };
+  // Custom identity normalization composes on the default mapping, which keeps
+  // the stable subject (github:<numeric id>), scopes, scheme and claims.
+  normalizePrincipal: async (ctx) => {
+    const principal = await defaultPrincipal(ctx);
+    const admins = new Set(["github:583231"]);
+    return admins.has(principal.subject)
+      ? { ...principal, roles: [...principal.roles, "admin"] }
+      : principal;
   },
 });
 
@@ -244,6 +237,43 @@ app.get("/auth/signout", async (c) => {
   return response;
 });
 ```
+
+### Stable subjects for non-OIDC providers
+
+A principal's `subject` is what authorization rows, audit records and background work (workers,
+sagas and triggers running under a service identity) key on. It must be the same on every sign-in
+and must not depend on a live session. Each provider declares where its subject comes from with
+`subject` on `defineOAuthProvider(...)`:
+
+| Source | Value | Used by |
+| --- | --- | --- |
+| `{ source: "id_token", claim: "sub" }` | The validated ID-token claim, verbatim. | OIDC presets (`google`, `gitlab`, `slack`, tenant presets). Unchanged from earlier releases. |
+| `{ source: "userinfo", claim: "id" }` | The userinfo field, namespaced by provider id: `github:583231`. `claim` may be a dot path (`data.id`). | `github`, `discord`, `spotify`, `facebook`, `twitter` (`data.id`). |
+
+The userinfo request uses the flow's injected `fetch`, the access token as a bearer, and the
+source's `headers`. The `github` preset sends a `User-Agent`, which the GitHub API requires. Use the
+immutable numeric `id`; `login` can be renamed.
+
+When a configured source yields no identifier, `handleCallback` throws `KvOAuthError` with code
+`subject_missing` and no session is created. A failed or oversized userinfo response throws
+`userinfo_failed`. A provider defined *without* `subject` uses the ID-token `sub` and is refused the
+same way when the token response carries none. There is no fallback to the per-sign-in session id,
+because a subject that changes on every sign-in cannot carry authorization.
+
+The `auth` plugin configures this from its environment, including the auth environment block of
+`appsettings.json`:
+
+| Variable | Meaning |
+| --- | --- |
+| `NETSCRIPT_AUTH_SUBJECT_SOURCE` | `id_token` or `userinfo`. |
+| `NETSCRIPT_AUTH_SUBJECT_CLAIM` | Claim or userinfo field (default: the preset's, else `sub`). |
+| `NETSCRIPT_AUTH_PROVIDER_ID` | Names the provider and namespaces userinfo subjects. A preset name (`github`) supplies that preset's defaults. |
+
+Unset variables fall back to the preset named by `NETSCRIPT_AUTH_PROVIDER_ID`, then to the ID-token
+`sub`. The settings are read and validated even when the provider is only partly configured, and an
+invalid `NETSCRIPT_AUTH_SUBJECT_SOURCE` stops the service at startup. The local-defaults stub (no
+provider configured) points at placeholder endpoints and cannot complete a sign-in; it never issues a
+session-id subject either.
 
 ---
 
