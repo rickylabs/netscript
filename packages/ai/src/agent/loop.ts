@@ -77,7 +77,12 @@ export interface AgentLoop extends AgentLoopPort {
  *
  * @example Run a bounded loop and consume its chunk stream
  * ```ts
- * import { createAgentLoop } from "@netscript/ai/agent";
+ * import { type ChatModelProviderPort, createAgentLoop, type ToolRegistryPort } from "@netscript/ai/agent";
+ * import type { Message } from "@netscript/ai/contracts";
+ *
+ * declare const modelProvider: ChatModelProviderPort;
+ * declare const tools: ToolRegistryPort;
+ * declare const messages: Message[];
  *
  * const loop = createAgentLoop({ modelProvider, tools });
  * const abort = new AbortController();

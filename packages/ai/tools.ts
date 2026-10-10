@@ -16,6 +16,9 @@
  * @example Define, register, and dispatch a server tool
  * ```ts
  * import { createToolRegistry, defineAiTool } from "@netscript/ai/tools";
+ * import type { StandardSchemaV1 } from "@standard-schema/spec";
+ *
+ * declare const myAddSchema: StandardSchemaV1<unknown, { a: number; b: number }>;
  *
  * const add = defineAiTool("add")
  *   .parameters({

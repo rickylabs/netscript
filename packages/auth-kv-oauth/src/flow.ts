@@ -3,7 +3,14 @@
  *
  * @example
  * ```ts
- * import { createKvOAuthFlow } from "@netscript/auth-kv-oauth/flow";
+ * import {
+ *   createKvOAuthFlow,
+ *   type KvOAuthStore,
+ *   type OAuthProviderConfig,
+ * } from "@netscript/auth-kv-oauth/flow";
+ *
+ * declare const provider: OAuthProviderConfig;
+ * declare const store: KvOAuthStore;
  *
  * const flow = createKvOAuthFlow({ provider, store });
  * const response = await flow.signIn(new Request("https://app.example.test/auth/signin"));

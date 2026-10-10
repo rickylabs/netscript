@@ -60,6 +60,9 @@ export interface ParallelQueueOptions extends QueueOptions {
  *
  * @example
  * ```ts
+ * interface JobMessage { jobId: string }
+ * declare function processJob(message: JobMessage): Promise<void>;
+ *
  * // Create a queue that processes 4 messages concurrently
  * const queue = createParallelQueue<JobMessage>('jobs', { concurrency: 4 });
  *
@@ -71,6 +74,10 @@ export interface ParallelQueueOptions extends QueueOptions {
  *
  * @example
  * ```ts
+ * import { createParallelQueue, QueueProvider } from '@netscript/queue';
+ *
+ * interface NotificationMessage { to: string; body: string }
+ *
  * // With specific provider
  * const queue = createParallelQueue<NotificationMessage>('notifications', {
  *   concurrency: 8,
