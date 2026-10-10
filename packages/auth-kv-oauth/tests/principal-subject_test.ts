@@ -10,6 +10,7 @@ import {
   type KvOAuthFlow,
   type NormalizePrincipalContext,
   type OAuthProviderConfig,
+  presetProviderKind,
   presetSubjectSource,
   providers,
   resolvePrincipalSubject,
@@ -313,3 +314,26 @@ function unsignedJwt(payload: Record<string, unknown>): string {
     btoa(JSON.stringify(value)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
   return `${encode({ alg: 'RS256', typ: 'JWT' })}.${encode(payload)}.c2lnbmF0dXJl`;
 }
+
+Deno.test('preset protocol kinds distinguish OAuth, OIDC and custom providers', () => {
+  for (const id of ['github', 'discord', 'spotify', 'facebook', 'twitter']) {
+    assertEquals(presetProviderKind(id), 'oauth');
+  }
+  for (
+    const id of [
+      'google',
+      'gitlab',
+      'slack',
+      'auth0',
+      'okta',
+      'aws-cognito',
+      'azure-ad',
+      'logto',
+      'clerk',
+    ]
+  ) {
+    assertEquals(presetProviderKind(id), 'oidc');
+  }
+  assertEquals(presetProviderKind('custom'), undefined);
+  assertEquals(presetProviderKind('toString'), undefined);
+});

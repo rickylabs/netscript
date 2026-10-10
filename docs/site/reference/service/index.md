@@ -113,16 +113,34 @@ rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `ServiceConfig` | interface | Service configuration options (input to `createService`). |
-| `DefineServiceOptions` | interface | Options for the `defineService` preset, including `middleware` (caller middleware after CORS and logging, before auth) and the opt-in `bodyLimit`. |
+| `DefineServiceOptions` | interface | Options for the `defineService` preset, including `cors` (explicit origins or the `NETSCRIPT_CORS_ORIGINS` workspace allowlist), `middleware` (caller middleware after CORS and logging, before auth) and the opt-in `bodyLimit`. |
 | `ServiceBodyLimitOptions` | interface | `{ maxBytes }` request-body limit accepted by `withBodyLimit()` and `DefineServiceOptions.bodyLimit`. |
 | `PayloadTooLargeResponse` | interface | JSON body of a `413` body-limit rejection: `{ error: 'PAYLOAD_TOO_LARGE', message, maxBytes }`. |
 | `ServeOptions` | interface | Options for starting a service listener. |
-| `CorsOptions` | interface | CORS options supported by `withCors()`. |
+| `CorsOptions` | interface | CORS options supported by `withCors()`. Omitted `origin` reads comma-separated exact HTTP(S) origins from `NETSCRIPT_CORS_ORIGINS`; unset/blank denies cross-origin access. Explicit origins override the environment; wildcard with credentials fails `build()`. |
 | `OpenAPIConfig` | interface | Configuration for OpenAPI spec generation. |
 | `RPCHandlerConfig` | interface | Configuration options for RPC handlers. |
 | `ScalarDocsOptions` | interface | Configuration for the Scalar docs UI. |
 | `HealthHandlerOptions` | interface | Options for `createHealthHandler`. |
 | `LoggerMiddlewareOptions` | interface | Options for the logger middleware (re-exported from `@netscript/logger/middleware`). |
+
+### CORS origins
+
+`DefineServiceOptions.cors` configures the same policy as `withCors()`. If `origin` is omitted,
+the builder snapshots `NETSCRIPT_CORS_ORIGINS`: comma-separated exact HTTP(S) origins, without
+paths or trailing slashes. Unset or blank means no cross-origin browser access. For example,
+`NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'` permits those two origins.
+An explicit `cors: { origin: ['https://app.example'] }` overrides the environment; `origin: []`
+denies all cross-origin access. Invalid environment entries fail configuration. Wildcard origins
+with `credentials: true` fail before the listener starts.
+
+Generated CLI/Aspire helpers supply the enabled web apps' allocated HTTP endpoint origins to every
+service and plugin service resource. This generated value overrides a declared resource environment
+value; a workspace without enabled web apps supplies an empty allowlist. Independent services must
+configure their launch environment themselves. Origins outside the allowlist receive no
+`Access-Control-Allow-Origin` header. CORS controls browser response access; it does not authenticate
+callers. The chosen [browser authentication topology](https://github.com/rickylabs/netscript/blob/main/docs/architecture/doctrine/07-composition-and-extension.md#browser-authentication-topology-008-owner-decision)
+uses a BFF; scaffolding that topology is separate follow-up scope.
 
 ### Listener bind address
 
@@ -270,6 +288,64 @@ path declared twice. Binding then throws
 path falls under an RPC mount or alias or matches a REST procedure path. Binding happens in
 `.build()`.
 
+### Internal procedures and the internal service credential
+
+`.meta({ access: { audience: 'internal' } })` restricts a procedure to service-to-service callers
+of the same installation: workers, sagas and triggers presenting the internal service credential.
+Both contract authorizers enforce it on the RPC projection and on the OpenAPI projection, including
+oRPC's default OpenAPI path (`POST <apiPath>/<router>/<procedure>`) when the contract declares no
+`route.path`. Requests resolve to the procedure oRPC executes: the undecoded pathname is matched
+with oRPC's own route patterns and `rou3` precedence (static before parameter before wildcard),
+not contract declaration order. A request using a method no procedure declares on an internal
+procedure's OpenAPI path fails closed toward that procedure. A user session never satisfies the
+audience, and the check uses the principal's identity, not its claims or roles. Construction
+throws for an `'internal'` audience combined with `authentication: 'none'`, for any other audience
+value, and for procedures with different access that share one OpenAPI route.
+
+`createContractOverlayAuthorizer(contract, { fallback?, isInternalCaller? })` governs only
+procedures that declare `meta.access`. Every other request keeps the service's own policy: the
+`protect`/`allowAnonymous` path guard, plus the optional fallback authorizer. Marking a few
+internal procedures therefore never forces authentication onto public ones. To keep an otherwise
+public service public, set `allowAnonymous: ['/api', '/health']`; access-marked procedures are
+resolved before the path guard. `createContractAuthorizer` also enforces the audience, but it
+still governs every procedure in the contract.
+
+The credential is derived from one per-installation secret. Carriers deliver
+`NETSCRIPT_INSTALLATION_SECRET_FILE`, a file reference, never the value. `loadInstallationSecret()`
+reads it once at startup. The file holds a textual secret, such as base64 or hex, with surrounding
+whitespace trimmed (4 KiB maximum, 32 bytes minimum). In-memory `Uint8Array` material passed to
+`createInstallationSecret()` is used verbatim. Each service accepts only the bearer
+derived for its own name (HKDF-SHA-256), so a credential cannot be replayed across services. A
+credential expires by rotation: once the secret changes, every credential derived from the old one
+is rejected. `createCompositeAuthenticator([...])` lets one guarded service accept the internal
+credential alongside user sessions over the single `AuthenticatorPort`. Callers send the
+credential with the SDK's `createInternalCredentialSdkClientContribution({ service })`.
+
+```ts
+import { createService } from '@netscript/service';
+import {
+  createCompositeAuthenticator,
+  createContractOverlayAuthorizer,
+  createInternalCredentialAuthenticator,
+  loadInstallationSecret,
+} from '@netscript/service/auth';
+import { OrdersContractV1 } from '@example/contracts';
+import { router } from './router.ts';
+import { sessionAuthenticator } from './session.ts';
+
+const secret = await loadInstallationSecret();
+const app = createService(router, { name: 'orders' })
+  .withRPC()
+  .withAuthn({
+    authenticator: createCompositeAuthenticator([
+      createInternalCredentialAuthenticator({ secret, service: 'orders' }),
+      sessionAuthenticator,
+    ]),
+  })
+  .withAuthz({ authorizer: createContractOverlayAuthorizer(OrdersContractV1) })
+  .build();
+```
+
 ### Explicit service posture
 
 `ServiceAuthPolicy` records either native guards (`{ authn, authz? }`) or a deliberate
@@ -300,6 +376,12 @@ assertServiceAuthPolicy(policy);
 | `ServicePublicAuthPolicy` | Literal public opt-out with a nonblank reason; excludes guard fields. |
 | `assertServiceAuthPolicy` | Validates an explicit posture and required callable ports without changing options. |
 | `createContractAuthorizer` | Traverses a metadata-bearing contract and returns an opt-in authorizer bound by the service builder. |
+| `createContractOverlayAuthorizer` | Enforces only access-marked procedures and leaves every other request to the service's own policy. |
+| `createInternalCredentialAuthenticator` | Accepts the internal bearer derived for this service and mints internal service principals. |
+| `isInternalServicePrincipal` | Default `InternalCallerPredicate`; true only for principals minted by the internal-credential authenticator. |
+| `createCompositeAuthenticator` | Tries authenticators in order over one `AuthenticatorPort` and returns the first success. |
+| `loadInstallationSecret` / `createInstallationSecret` | Import the per-installation secret from its file reference or from memory. |
+| `deriveInternalCredential` | Derives the per-service internal bearer from the installation secret. |
 | `createScopeAuthorizer` | Ordered scope/role rules usable standalone or as a match-aware legacy fallback. |
 | `createStaticCredentialAuthenticator` | Maps configured credentials to principals. |
 | `createTrustedHeaderAuthenticator` | Maps trusted upstream identity headers to principals. |
@@ -319,6 +401,7 @@ The following entrypoints are published alongside the root export:
 | `@netscript/service/commands` | `./commands.ts` | Opaque command definitions, once-only executor and codecs. |
 | `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
 | `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
+| `@netscript/service/internal-credential` | `./src/auth/internal-credential/mod.ts` | Dependency-free installation secret loading and internal credential derivation. |
 
 ## Command definitions and codecs
 

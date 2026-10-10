@@ -202,7 +202,7 @@ The reason this is structural rather than incidental is three-fold:
    resource. The HTTP API keeps serving; other processors keep running.
 2. **Independent scaling.** The API and the processors have different load profiles — request
    latency versus queue depth — so they are tuned and scaled independently
-   (`WORKER_CONCURRENCY` on the background resource never touches the API).
+   (`WORKERS_CONCURRENCY` on the background resource never touches the API).
 3. **Least privilege.** The API gets a narrow permission set (serve HTTP); background resources
    get the wider set they need (queues, database, file watching). Splitting the processes lets
    each one run with only the permissions its job requires.
@@ -213,6 +213,34 @@ service and N background resources — that fan-out is exactly what the AppHost 
 manifest and the plugin's Aspire contribution. See
 <a href="/explanation/aspire/">orchestration with Aspire</a> for how the AppHost assembles them.
 {{ /comp }}
+
+## Guarding a plugin's API
+
+`createPluginService` from `@netscript/plugin/service` requires an explicit `auth` posture and
+installs the guard before any RPC, REST, or raw route; `/health` stays anonymous. This is the
+guarded form `netscript plugin new billing` generates, for a plugin that is not the auth plugin:
+
+```ts
+export const billingService = createPluginService(billingRouter, {
+  name: 'billing',
+  auth: {
+    authn: {
+      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
+    },
+    authz: {
+      authorizer: createContractAuthorizer(
+        mountPluginContract(billingContractDefinition, billingContractMount),
+      ),
+    },
+  },
+});
+```
+
+`createAuthServiceAuthenticator` (`@netscript/plugin-auth/authenticator`) verifies each bearer
+session through the auth service, so `billing` embeds no backend, KV handle, or provider secret.
+A public API records `auth: { public: true, reason: '…' }` instead. Background callers run under
+a service identity, never an app session; see
+[verifying sessions from another plugin](/identity-access/auth/#verify-sessions-from-another-plugins-service).
 
 ## Auth: the model at its richest
 

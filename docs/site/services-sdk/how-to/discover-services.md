@@ -130,7 +130,8 @@ default it targets `<resolved-url>/api/rpc/v1/<service>` over HTTP.
     { name: "protocol", type: "'http' | 'https'?", desc: "Discovery protocol. Defaults to 'http' (resolves the __http__ endpoint)." },
     { name: "apiPath", type: "string?", desc: "Base RPC path the runtime mounts. Defaults to '/api/rpc' — match what the service serves." },
     { name: "apiVersion", type: "string?", desc: "API version segment in the URL. Defaults to 'v1'." },
-    { name: "propagateTraceContext", type: "boolean?", desc: "Attach W3C traceparent/tracestate headers automatically from the active trace context. Defaults to true." }
+    { name: "propagateTraceContext", type: "boolean?", desc: "Attach W3C traceparent/tracestate headers automatically from the active trace context. Defaults to true." },
+    { name: "resolveServiceUrl", type: "ServiceUrlResolver?", desc: "(serviceName, protocol) => string | URL, called per request instead of discovery. Defaults to getServiceUrl. Only the origin of the result is used. See Manual / non-Aspire resolution." }
   ]
 }) }}
 
@@ -245,6 +246,33 @@ to point a client at a fixed URL with no orchestrator:
 services__users__http__0=http://localhost:<users-port> deno task --cwd web dev
 ```
 
+### A runtime with neither Vite nor Deno
+
+`getServiceUrl` has two sources, `import.meta.env` and `Deno.env`. A React Native (Metro) runtime
+has neither, so the default client cannot find the service. Pass `resolveServiceUrl` instead. It
+receives the client's `serviceName` and `protocol` on every call; throw from it to fail the call.
+To keep Aspire's key names, compose the pure `resolveServiceUrlFromSources` over an explicit
+environment bag. It reads no runtime global and returns `undefined` rather than throwing:
+
+```ts
+// mobile/src/clients/users.ts — the origin comes from app config, not the environment
+import { createServiceClient } from '@netscript/sdk/client';
+import { resolveServiceUrlFromSources } from '@netscript/sdk/discovery';
+import { UsersContractV1 } from '@my-app/contracts';
+
+const browserEnv = { VITE_USERS_URL: 'https://api.example.com' };
+
+export const usersClient = createServiceClient({
+  contract: UsersContractV1,
+  serviceName: 'users',
+  resolveServiceUrl: (serviceName, protocol) => {
+    const url = resolveServiceUrlFromSources(serviceName, protocol, 0, { browserEnv });
+    if (url === undefined) throw new Error(`No URL configured for "${serviceName}"`);
+    return url;
+  },
+});
+```
+
 ## End to end in one pass
 
 The four steps above, run start to finish against the example `users` service. Copy the file, then
@@ -326,7 +354,8 @@ resolves a variable that was never injected.</li>
 different path, set them explicitly or calls 404. It is <em>not</em> a bare <code>/rpc</code>.</li>
 <li><strong>Aspire injects the URL; outside Aspire you must.</strong> Without an orchestrator
 the <code>services__&lt;name&gt;__http__0</code> variable is unset — provide it yourself (env
-var) or the client cannot find the service.</li>
+var, or a <code>resolveServiceUrl</code> callback on a runtime with no environment) or the
+client cannot find the service.</li>
 </ul>
 {{ /comp }}
 

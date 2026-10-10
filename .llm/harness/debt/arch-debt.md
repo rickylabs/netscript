@@ -2596,3 +2596,79 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   check, all 42 AI tests, peer guard, frozen install, Fresh lint and touched-source formatting
   exit 0. Focused doc lint exit 1 with only the two named references. Project
   runs/2026-10-08-fix-ai-peer-types/ai-doc-lint.log retains the raw failure.
+
+## auth-kv-oauth — explicit boolean proxy trust (`auth-trusted-proxy-hops-2026`)
+
+- **Reason:** #2026 adopts a default-off boolean `trustProxyHeaders` opt-in for one shared inbound
+  HTTPS/cookie policy. It requires a perimeter that replaces protocol headers and blocks direct
+  access; it cannot authenticate a chain of proxy hops or source CIDRs. Direct-TLS refresh now
+  supports explicit `cookie.secure` / `NETSCRIPT_AUTH_COOKIE_SECURE`; automatic host TLS metadata
+  propagation into URL-less `AuthnRequest` remains deferred against #2191.
+- **Owner:** Auth package and plugin maintainers.
+- **Target:** Backlog / Triage; before recommending trust in multi-hop deployments.
+- **Linked plan:** #2026 option A decision; follow-up #2191.
+- **Created:** 2026-10-10.
+- **Status:** open; option B deferred by coordinator, option C rejected as spoofable.
+- **Gate:** F-2/F-3 trusted-hop/CIDR contract and spoofing regression tests covering both flow and
+  cookie derivation, with documented migration from boolean trust. Outbound OAuth transport stays
+  independent.
+
+## Auth integration — unchanged raw documentation lint baseline (`auth-doc-baseline-2026`)
+
+- **Reason:** The #2026 transport fix preserves the complete raw doc-lint reports from pristine
+  baseline `e876d98847298ee8a902a6ab95942ec912e1e3aa`: plugin-auth-core has four combined private
+  type references; plugins/auth has thirteen. Every entrypoint count and exit is identical.
+  auth-kv-oauth has zero findings. The findings include the existing private contract shape and
+  upstream oRPC implementer plus stream types. No type erasure, lint suppression, gate relaxation,
+  or additional slow-types flag is introduced.
+- **Owner:** Auth and streams public-surface maintainers; coordinator adjudicates readiness.
+- **Target:** Before raw all-export documentation gates are claimed green.
+- **Linked plan:** #2026; PR #2188. Raw baseline/final reports kept in the run record.
+- **Created:** 2026-10-10.
+- **Status:** open; raw doc-lint remains exit 1. Coordinator accepted the baseline-identical debt
+  for PR #2188 readiness; the independent evaluator confirmed no new lint findings.
+- **Gate:** F-7 raw all-export doc-lint exits zero with sound public contracts and no vendor
+  re-export or erased types.
+
+## packages/auth-workos — AUTH-WORKOS-BEARER-PARITY
+
+- **ID:** `AUTH-WORKOS-BEARER-PARITY`
+- **Title:** The WorkOS backend `authenticate` does not yet meet the bearer/cookie resolution-parity
+  port contract.
+- **Reason:** PR #2178 (fixing #2120) states on `AuthBackendPort.authenticate`
+  (`packages/plugin-auth-core/src/ports/mod.ts`) that a request credential must resolve exactly as
+  `sessions.getSession({ token: readBearerCredential(request), request })` does, so a well-formed
+  bearer beats the session cookie. `kv-oauth` conforms in #2178, and `better-auth` already conforms
+  because both of its paths read the request headers. `createWorkosBackend().authenticate` delegates
+  to `createWorkosAuthenticator`, which reads only the sealed-session cookie, while its `getSession`
+  honours `lookup.token`. On `workos`, a bearer-only `me` therefore stays signed out while
+  `/session` accepts the same bearer.
+- **Why deferred:** #2120 is scoped to `kv-oauth`. Conforming `workos` means either changing the
+  published standalone `createWorkosAuthenticator` cookie semantics or adding a backend-only
+  credential path with its own refresh/`Set-Cookie` rule. Either one needs its own decision and
+  backend tests.
+- **Owner:** Auth backend maintainers (`@netscript/auth-workos`).
+- **Target:** Before the 0.0.9 release, no later than 2026-11-15.
+- **Linked issue:** [#2180](https://github.com/rickylabs/netscript/issues/2180).
+- **Created:** 2026-10-10
+- **Status:** open; pending DEBT_ACCEPTED adjudication by the independent IMPL-EVAL of PR #2178.
+- **Gate:** Close when a backend-level conformance test in `packages/auth-workos/tests/`, failing on
+  its base commit, proves that `createWorkosBackend().authenticate` resolves the same session as
+  `sessions.getSession` given `token: readBearerCredential(request)` and the request, for cookie,
+  bearer, competing cookie+bearer, and malformed bearer requests, and that a bearer-borne refresh
+  emits no `Set-Cookie`.
+
+## packages/service — residual F-1 builder and type-module size (#1386 L2)
+
+- **Reason:** The service builder and public type module already exceeded their F-1 size caps before
+  #1386 L2. The CORS contract and middleware registration add lines to those existing modules. CORS
+  policy itself is extracted to the focused `src/middleware/service-cors.ts`; further decomposition
+  of the existing builder and public types remains separate work.
+- **Owner:** NetScript service maintainers / architecture follow-up.
+- **Target:** Next service architecture decomposition pass, before the stable public API line.
+- **Linked change:** [Leaf X-1386, PR #2193](https://github.com/rickylabs/netscript/pull/2193).
+- **Created:** 2026-10-10.
+- **Status:** open; residual size debt recorded, no closure claimed by this leaf.
+- **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
+  `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
+  green. `arch:check` currently exits zero with these size warnings.
