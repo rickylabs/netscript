@@ -2629,3 +2629,31 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   for PR #2188 readiness; the independent evaluator confirmed no new lint findings.
 - **Gate:** F-7 raw all-export doc-lint exits zero with sound public contracts and no vendor
   re-export or erased types.
+
+## packages/auth-workos — AUTH-WORKOS-BEARER-PARITY
+
+- **ID:** `AUTH-WORKOS-BEARER-PARITY`
+- **Title:** The WorkOS backend `authenticate` does not yet meet the bearer/cookie resolution-parity
+  port contract.
+- **Reason:** PR #2178 (fixing #2120) states on `AuthBackendPort.authenticate`
+  (`packages/plugin-auth-core/src/ports/mod.ts`) that a request credential must resolve exactly as
+  `sessions.getSession({ token: readBearerCredential(request), request })` does, so a well-formed
+  bearer beats the session cookie. `kv-oauth` conforms in #2178, and `better-auth` already conforms
+  because both of its paths read the request headers. `createWorkosBackend().authenticate` delegates
+  to `createWorkosAuthenticator`, which reads only the sealed-session cookie, while its `getSession`
+  honours `lookup.token`. On `workos`, a bearer-only `me` therefore stays signed out while
+  `/session` accepts the same bearer.
+- **Why deferred:** #2120 is scoped to `kv-oauth`. Conforming `workos` means either changing the
+  published standalone `createWorkosAuthenticator` cookie semantics or adding a backend-only
+  credential path with its own refresh/`Set-Cookie` rule. Either one needs its own decision and
+  backend tests.
+- **Owner:** Auth backend maintainers (`@netscript/auth-workos`).
+- **Target:** Before the 0.0.9 release, no later than 2026-11-15.
+- **Linked issue:** [#2180](https://github.com/rickylabs/netscript/issues/2180).
+- **Created:** 2026-10-10
+- **Status:** open; pending DEBT_ACCEPTED adjudication by the independent IMPL-EVAL of PR #2178.
+- **Gate:** Close when a backend-level conformance test in `packages/auth-workos/tests/`, failing on
+  its base commit, proves that `createWorkosBackend().authenticate` resolves the same session as
+  `sessions.getSession` given `token: readBearerCredential(request)` and the request, for cookie,
+  bearer, competing cookie+bearer, and malformed bearer requests, and that a bearer-borne refresh
+  emits no `Set-Cookie`.

@@ -313,3 +313,55 @@ Deno.test('#2026 nested cookie proxy trust applies to both gates unless explicit
     }
   }
 });
+
+Deno.test('#2026 merged bearer precedence preserves trusted custom-cookie refresh', async () => {
+  await using kv = new MemoryKvAdapter();
+  const store = await createKvOAuthStore({ kv, encryptionKey });
+  const name = '__Host-transport_session';
+  const backend = await createKvOAuthBackend({
+    provider,
+    store,
+    fetch: tokenFetch,
+    trustProxyHeaders: true,
+    cookie: { name, trustProxyHeaders: false },
+  });
+  const nearExpiry = async (subject: string) => {
+    const session = await backend.sessions.createSession({
+      userId: subject,
+      subject,
+      expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    });
+    await store.putSession({ session, tokens: { accessToken: 'old', refreshToken: 'refresh' } });
+    return session;
+  };
+  const cookieSession = await nearExpiry('cookie-owner');
+  const bearerSession = await nearExpiry('bearer-owner');
+  const authn = (init: HeadersInit): AuthnRequest => {
+    const headers = new Headers(init);
+    return {
+      method: 'GET',
+      path: '/',
+      headers: () => headers,
+      header: (key) => headers.get(key) ?? undefined,
+      cookie: (key) => key === name ? cookieSession.id : undefined,
+    };
+  };
+  // A competing bearer wins, refreshes, and emits no cookie even without HTTPS metadata.
+  const bearerRequest = authn({ authorization: `Bearer ${bearerSession.id}` });
+  const viaBearer = await backend.authenticate(bearerRequest);
+  assert(viaBearer.ok);
+  assertEquals(viaBearer.principal.subject, bearerSession.subject);
+  assertEquals(viaBearer.setCookies, undefined);
+  assert((await store.getSession(bearerSession.id))?.session.refreshedAt);
+  assertEquals((await store.getSession(cookieSession.id))?.session.refreshedAt, undefined);
+  assertEquals(
+    (await backend.sessions.getSession({ token: bearerSession.id, request: bearerRequest }))?.id,
+    bearerSession.id,
+  );
+  // The cookie path keeps the shared trust policy and custom name from the resolved options.
+  const viaCookie = await backend.authenticate(authn({ 'x-forwarded-proto': 'https' }));
+  assert(viaCookie.ok);
+  assertEquals(viaCookie.principal.subject, cookieSession.subject);
+  assertStringIncludes(viaCookie.setCookies![0], `${name}=${cookieSession.id}`);
+  assertStringIncludes(viaCookie.setCookies![0], 'Secure');
+});
