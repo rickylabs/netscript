@@ -244,12 +244,17 @@ otherwise the `__Host-ns_session` cookie does. Every other procedure stays publi
 - **Nothing on refusal.** A refused signout revokes nothing, emits no `auth.session.revoked`
   event, and records no `success` outcome.
 - **Global logout.** `everywhere: true` revokes every session of the caller's subject and no
-  other subject's. It needs `AuthSessionStorePort.revokeSubjectSessions`: `kv-oauth` implements it;
-  `workos` and `better-auth` return `AUTH_PROVIDER_ERROR`, as they already do for `revokeSession`.
+  other subject's, through `AuthSessionStorePort.revokeSubjectSessions`. That call does a bounded
+  amount of work and never walks the subject's sessions. `kv-oauth` records one per-subject
+  revocation instant: any session issued at or before it stops resolving as active. That includes
+  sessions stored before this release, so no migration is needed. `better-auth` delegates to its
+  own `api.revokeSessions` through the caller's credential. `workos` has no user-wide revocation
+  API and returns `AUTH_PROVIDER_ERROR`; this is tracked in #2190.
 - **Operators.** Revoking somebody else's session is the separate `revokeSession` procedure,
   gated by the `auth:sessions:revoke` scope. A worker or saga calls it with a service identity
   that holds the scope, so no person needs to be signed in. The CLI's
-  `netscript plugin auth session revoke` calls it with the `NETSCRIPT_AUTH_TOKEN` credential.
+  `netscript plugin auth session list` and `session revoke` both refuse to run without a
+  credential. Both read it from `NETSCRIPT_AUTH_TOKEN`.
 
 ```ts
 // Browser: the session cookie authenticates the call and selects the session to end.
@@ -270,8 +275,11 @@ revoked any <code>sessionId</code> it was given, without a credential, and ignor
 belong to the caller, and <code>everywhere</code> revokes all of the caller's sessions. To revoke a
 session you do not own, call <code>revokeSession</code> with a credential holding
 <code>auth:sessions:revoke</code>. A custom <code>AuthSessionStorePort</code> must add
-<code>revokeSubjectSessions</code>, or throw <code>AuthBackendOperationUnsupportedError</code>
-from it. A custom <code>KvOAuthStore</code> must add <code>listSubjectSessionIds</code>.
+<code>revokeSubjectSessions({ subject, request })</code> (bounded work, returning
+<code>{ subject, revokedAt }</code>), or throw <code>AuthBackendOperationUnsupportedError</code>
+from it. A custom <code>KvOAuthStore</code> must add <code>revokeSubject</code> and
+<code>getSubjectRevocation</code>. A custom <code>BetterAuthInstance</code> must expose
+<code>api.revokeSessions</code>. The CLI's <code>session list</code> now needs a credential too.
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}

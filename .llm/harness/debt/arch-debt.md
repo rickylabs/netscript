@@ -1321,6 +1321,23 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when `deno task publish:dry-run` passes for the alpha-1 train after PR1 merges,
   and scaffold output no longer emits forward-looking stable ranges.
 
+## packages/auth-workos — subject-wide revocation unsupported (`auth-workos-subject-revocation`)
+
+- **Reason:** `AuthSessionStorePort.revokeSubjectSessions` (#1384) backs `signout { everywhere:
+  true }` and must do bounded work per call. kv-oauth meets it with a per-subject revocation
+  instant, and better-auth wraps its upstream `api.revokeSessions`. `@workos-inc/node` has no
+  user-wide revocation call, only paginated `listSessions` plus per-session `revokeSession`.
+  WorkOS access tokens are also verified locally until they expire, so `@netscript/auth-workos`
+  still throws `AuthBackendOperationUnsupportedError`. Global logout on a WorkOS deployment
+  therefore returns `AUTH_PROVIDER_ERROR` (502).
+- **Owner:** Auth layer follow-up (#2190).
+- **Created:** 2026-10-10.
+- **Status:** open, DEBT_ACCEPTED.
+- **Target:** 0.0.8 milestone (#2190, triage).
+- **Gate:** Close when the WorkOS backend implements `revokeSubjectSessions`. Every session of the
+  subject must fail authentication immediately, with no per-session work in the request, and
+  `signout { everywhere: true }` must return 200 on a WorkOS deployment under test.
+
 ## plugins/auth — single active backend v1 boundary (`auth-single-active-backend-boundary`)
 
 - **Reason:** `@netscript/plugin-auth` composes exactly one backend selected by
