@@ -55,11 +55,7 @@ Deno.test('credential fault probe task stays alive for repeated Aspire health ev
     }
   } finally {
     if (probe) {
-      try {
-        if (!probeExited) probe.kill('SIGTERM');
-      } catch (error) {
-        if (!(error instanceof Deno.errors.NotFound)) throw error;
-      }
+      if (!probeExited) probe.kill('SIGTERM');
       await probe.status;
     }
     await Deno.remove(projectRoot, { recursive: true });

@@ -7,7 +7,7 @@
  * resource resolution.
  */
 
-import type { CacheEntry, DatabaseEntry } from '@netscript/aspire/types'
+import type { CacheEntry } from '@netscript/aspire/types'
 import type { RegisterInfrastructureOptions } from '../types.ts'
 import { fileHeader } from '../_utils.ts'
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts'
@@ -378,7 +378,9 @@ export function generateRegisterInfrastructure(
   )
 }
 
-function needsPostgresCredentialReadiness(entry: DatabaseEntry): boolean {
+function needsPostgresCredentialReadiness(
+  entry: RegisterInfrastructureOptions['databases'][string],
+): boolean {
   return entry.Engine === 'Postgres' && (entry.Mode ?? 'Container') === 'Container'
 }
 
