@@ -44,6 +44,8 @@ export type {
   AuthSessionCryptoPort,
   AuthSessionLookup,
   AuthSessionStorePort,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
   InteractiveCallbackResult,
   InteractiveFlowPort,
   ResolvedAuthBackendRegistry,

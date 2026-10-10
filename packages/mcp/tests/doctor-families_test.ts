@@ -23,11 +23,11 @@ Deno.test('project family passes valid workspace and generated plugin registry f
   assertStringIncludes(checks[1]?.summary ?? '', '3 module(s)');
 });
 
-Deno.test('project family fails invalid workspace and missing generated registry fixtures', async () => {
+Deno.test('project family fails invalid workspace and warns on unknown registry expectations', async () => {
   const checks = await new ProjectWiringDoctorFamily().check(context(`${fixtureRoot}broken`));
   assertEquals(checks.map((check) => [check.name, check.status]), [
     ['deno_workspace', 'fail'],
-    ['plugin_registry', 'fail'],
+    ['plugin_registry', 'warn'],
     ['docs_root', 'pass'],
   ]);
 });

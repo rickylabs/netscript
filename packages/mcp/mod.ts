@@ -37,6 +37,8 @@ export {
   OPENAPI_CURL_AUTH_NOTE,
 } from './src/application/flows/get-operation-schema-flow.ts';
 export type { GetOperationSchemaResult } from './src/application/flows/get-operation-schema-flow.ts';
+export type { OperationAccessSummary } from './src/domain/openapi/operation-access.ts';
+export type { SchemaViewName } from './src/domain/openapi/schema-views.ts';
 export type {
   DiagnosticEvidencePort,
   DiagnosticEvidenceReceipt,

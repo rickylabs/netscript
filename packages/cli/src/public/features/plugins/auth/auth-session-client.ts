@@ -11,8 +11,13 @@ const bearer = createBearerSdkClientContribution<AuthSessionClientContext>({
   context: { auth: 'optional' },
   resolveCredential: ({ context }) => context.auth?.getAccessToken(),
   responseCache: { mode: 'direct-only' },
-  unmarked: 'optional',
+  unmarked: 'required',
 });
+
+type ProcedureAccessMeta = Readonly<{ access?: { authentication: 'required' } }>;
+
+/** Session listing and operator revocation never run without a credential. */
+const CREDENTIAL_REQUIRED: ProcedureAccessMeta = { access: { authentication: 'required' } };
 
 /** Fetch-backed auth session projection and revocation adapter. */
 export class FetchAuthSessionHttp implements AuthSessionHttpPort {
@@ -29,6 +34,7 @@ export class FetchAuthSessionHttp implements AuthSessionHttpPort {
       undefined,
       options,
       { accept: 'application/json' },
+      CREDENTIAL_REQUIRED,
     );
     const response = await this.request(endpoint, { headers });
     if (!response.ok) throw new Error(`Auth session stream returned HTTP ${response.status}.`);
@@ -41,22 +47,36 @@ export class FetchAuthSessionHttp implements AuthSessionHttpPort {
     options?: AuthSessionRequestOptions,
   ): Promise<string> {
     const input = { sessionId };
-    const endpoint = new URL(`${authUrl.replace(/\/$/, '')}/signout`);
+    const endpoint = new URL(`${authUrl.replace(/\/$/, '')}/sessions/revoke`);
     const headers = await prepareHeaders(
       endpoint,
-      ['signout'],
+      ['revokeSession'],
       input,
       options,
       { 'content-type': 'application/json' },
+      CREDENTIAL_REQUIRED,
     );
     const response = await this.request(endpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify(input),
     });
-    if (!response.ok) throw new Error(`Auth signout returned HTTP ${response.status}.`);
-    const value = await response.json() as { sessionId?: unknown; signedOut?: unknown };
-    if (value.signedOut !== true) throw new Error('Auth signout did not confirm revocation.');
+    const value: unknown = await response.json().catch(() => undefined);
+    if (!response.ok) {
+      if (isRecord(value) && value.code === 'AUTH_PROVIDER_ERROR') {
+        const reason = isRecord(value.data) && typeof value.data.reason === 'string'
+          ? value.data.reason
+          : 'The auth backend could not perform session revocation.';
+        throw new Error(`Auth session revocation failed (AUTH_PROVIDER_ERROR): ${reason}`);
+      }
+      throw new Error(`Auth session revocation returned HTTP ${response.status}.`);
+    }
+    if (isRecord(value) && value.revoked === false) {
+      throw new Error(`Auth session ${sessionId} was not found.`);
+    }
+    if (!isRecord(value) || value.revoked !== true) {
+      throw new Error('Auth session revocation returned an invalid response.');
+    }
     return typeof value.sessionId === 'string' ? value.sessionId : sessionId;
   }
 }
@@ -67,10 +87,11 @@ async function prepareHeaders(
   input: unknown,
   options: AuthSessionRequestOptions | undefined,
   initialHeaders: HeadersInit,
+  meta: ProcedureAccessMeta = {},
 ): Promise<Headers> {
   const patch = await bearer.prepare({
     context: options?.context ?? {},
-    procedure: { path, meta: {} },
+    procedure: { path, meta },
     transport: {
       kind: 'http',
       origin: new URL(endpoint.origin),
