@@ -122,8 +122,15 @@ import type { TransactionClientPort } from './ports/transaction-client.ts';
  * @example
  * ```typescript
  * import { withTransaction } from '@netscript/database';
+ * import type { TransactionClientPort } from '@netscript/database/commands';
  *
- * const result = await withTransaction(await db.getMysql(), async (tx) => {
+ * type Model<TData> = { create(args: { data: TData }): Promise<{ id: number }> };
+ * declare const client: TransactionClientPort<{
+ *   user: Model<{ name: string }>;
+ *   order: Model<{ userId: number }>;
+ * }>;
+ *
+ * const result = await withTransaction(client, async (tx) => {
  *   const user = await tx.user.create({ data: { name: 'John' } });
  *   const order = await tx.order.create({ data: { userId: user.id } });
  *   return { user, order };
