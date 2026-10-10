@@ -1,3 +1,4 @@
+import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 
@@ -44,12 +45,13 @@ describe('public add service flow', () => {
     assertEquals(plan.allocation.source, 'auto');
   });
 
-  it('writes service and contract files with JSR imports', async () => {
+  it('writes guarded service and contract files with JSR imports when auth is installed', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
+    await writeInstalledAuthFixture(fs, '/workspace/alpha');
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
-    const formatter = identityFormatter();
+    const formatter = authFormatter();
     const helperOptions: unknown[] = [];
 
     const result = await addService({
@@ -94,9 +96,15 @@ describe('public add service flow', () => {
       'jsr:@netscript/service',
     );
     assertEquals(appsettings.NetScript.Services.billing.ServiceReferences, ['users']);
+    assertEquals(appsettings.NetScript.Services.billing.PluginReferences, ['auth']);
+    const main = await fs.readFile('/workspace/alpha/services/billing/src/main.ts');
+    assertStringIncludes(main, 'authenticator: browserAuthenticator');
+    assertStringIncludes(main, 'createContractAuthorizer(router)');
+    assertEquals(main.includes('public: true'), false);
     assertEquals(rootDenoJson.workspace.includes('./services/billing'), true);
     assertStringIncludes(contractMod, './billing.contract.ts');
-    assertEquals(result.helperFiles.length, 1);
+    assertEquals(result.helperFiles.includes('/workspace/alpha/auth/service.ts'), true);
+    assertEquals(result.helperFiles.includes('/workspace/alpha/aspire/apphost.mts'), true);
     assertEquals(helperOptions, [{ formatter }]);
     assertEquals(result.clientPath, '/workspace/alpha/apps/web/lib/billing.ts');
     if (!result.clientPath) throw new Error('Expected generated client path.');
@@ -120,7 +128,7 @@ describe('public add service flow', () => {
     const originalWorkspace = await fs.readFile('/workspace/alpha/deno.json');
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
-    const formatter = identityFormatter();
+    const formatter = authFormatter();
 
     const error = await assertRejects(
       () =>
@@ -172,7 +180,7 @@ describe('public add service flow', () => {
   });
 });
 
-function identityFormatter(): GeneratedSourceFormatterPort {
+function authFormatter(): GeneratedSourceFormatterPort {
   return {
     formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (_path, content) => Promise.resolve(content),

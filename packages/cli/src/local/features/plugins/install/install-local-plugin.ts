@@ -1,3 +1,4 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { join } from '@std/path';
 import {
   copyPluginSchemasToRootDb,
@@ -9,7 +10,6 @@ import type { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/
 import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
-import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { installUiRegistryItems } from '../../../../kernel/application/ui/registry.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
@@ -207,7 +207,6 @@ export async function installLocalPlugin(
     { formatter: dependencies.formatter },
   );
   const helperFiles = [...browserAuthFiles, ...aspireFiles];
-
   if (dependencies.processRunner) {
     await formatGeneratedFiles(dependencies.processRunner, plan.projectRoot, [
       join(plan.projectRoot, 'netscript.config.ts'),

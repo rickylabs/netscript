@@ -1,3 +1,5 @@
+import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
+import { readAuthServiceName } from '../../../../../src/kernel/adapters/service/auth-policy.ts';
 import { assertEquals } from '@std/assert';
 import { dirname, join, relative, resolve, toFileUrl } from '@std/path';
 import { SCAFFOLD_APP_IMPORTS } from '../../../../../src/kernel/constants/scaffold/scaffold-app-catalog.ts';
@@ -39,7 +41,7 @@ for (const database of [true, false]) {
         'appsettings.json',
         JSON.stringify({
           NetScript: {
-            Plugins: { auth: {} },
+            Plugins: {},
             Services: { users: { Workdir: 'services/users', Entrypoint: 'src/main.ts' } },
           },
         }),
@@ -134,6 +136,8 @@ const protectedProcedure = implement(privateContract).protected.handler(() => ({
           await fs.readFile(join(root, mainPath)),
         ),
       );
+      await writeInstalledAuthFixture(fs, resolve(root));
+      assertEquals(await readAuthServiceName(resolve(root), fs), 'auth');
       await reconcileBrowserAuth(resolve(root), fs, formatter);
       // Export the handle for deterministic teardown, leaving the reconciled options untouched.
       await write(

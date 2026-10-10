@@ -1,7 +1,7 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { join } from '@std/path';
 
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
-import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { IoError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
@@ -106,8 +106,11 @@ export async function removePlugin(
       dependencies.fs,
       dependencies.formatter,
     );
-    const aspireFiles = await regenerateRemovalHelpers(input.projectRoot, dependencies);
-    const helperFiles = [...browserAuthFiles, ...aspireFiles];
+    const helperFiles = await regenerateRemovalHelpers(
+      input.projectRoot,
+      dependencies,
+      browserAuthFiles,
+    );
     await pruneEmptyGeneratedParents(input.projectRoot, dependencies.fs);
 
     return {
@@ -157,12 +160,15 @@ async function removeExistingDir(path: string, fs: FileSystemPort): Promise<bool
 async function regenerateRemovalHelpers(
   projectRoot: string,
   dependencies: RemovePluginDependencies,
+  browserAuthFiles: readonly string[],
 ): Promise<readonly string[]> {
-  if (!await dependencies.fs.exists(join(projectRoot, 'aspire'))) return [];
+  if (!await dependencies.fs.exists(join(projectRoot, 'aspire'))) {
+    return browserAuthFiles;
+  }
   if (!dependencies.scaffolder || !dependencies.templateAdapter) {
     throw new Error('Removal wiring regeneration dependencies are unavailable.');
   }
-  const helperFiles =
+  const aspireFiles =
     await (dependencies.regenerateHelpers ?? regenerateAspireHelpersWithDependencies)(
       projectRoot,
       dependencies.fs,
@@ -170,6 +176,7 @@ async function regenerateRemovalHelpers(
       dependencies.templateAdapter,
       { formatter: dependencies.formatter },
     );
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
   return helperFiles;
 }
 

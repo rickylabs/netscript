@@ -1,10 +1,11 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
+import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import {
   addServiceWorkspaceMember,
   regenerateAspireHelpersWithDependencies,
   upsertServiceAppsettingsEntry,
 } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import type { PortAllocator } from '../../../../kernel/adapters/service/port-allocator.ts';
-import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import type { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/workspace-resolver.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
@@ -96,6 +97,7 @@ export async function addService(
   const clientPath = clientResult?.planned.find((file) => file.serviceName === plan.serviceName)
     ?.path;
 
+  await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
   const browserAuthFiles = await reconcileBrowserAuth(
     plan.projectRoot,
     dependencies.fs,
@@ -115,7 +117,7 @@ export async function addService(
 
   return {
     ...rendered,
-    helperFiles,
+    helperFiles: [...browserAuthFiles, ...helperFiles],
     clientPath,
   };
 }

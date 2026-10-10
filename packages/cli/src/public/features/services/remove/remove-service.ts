@@ -1,7 +1,8 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
+import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { join } from '@std/path';
 import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/version-registry.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
-import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import {
   regenerateAspireHelpersWithDependencies,
   removeServiceAppsettingsEntry,
@@ -84,6 +85,7 @@ export async function removeService(
     await registry.regenerateRoot(contractsRoot);
   }
 
+  await reconcilePluginReferences(request.projectRoot, dependencies.fs);
   const browserAuthFiles = await reconcileBrowserAuth(
     request.projectRoot,
     dependencies.fs,

@@ -330,6 +330,7 @@ packages/cli/e2e/src/application/gates/scaffold/otlp-headers.ts	e2e	S2/S3/S10	ru
 packages/cli/e2e/src/application/gates/scaffold/package-backed-plugin-doctor-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/probe-generated-guarded-service.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-scripts.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -627,6 +628,7 @@ packages/cli/src/kernel/templates/workspace/generators_test.ts	generator:workspa
 packages/cli/src/kernel/templates/workspace/netscript-config.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/quality-runner_test.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/quality-runner.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
+packages/cli/src/local/composition/local-browser-auth-lifecycle_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -834,6 +836,7 @@ packages/sdk/src/ports/service-client.ts	package:other	S4	mention only (service 
 packages/sdk/src/presets/define-services.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/tests/discovery/env-ordering_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/tests/integration/service-url-resolver_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/service/CHANGELOG.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/service/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/service/src/diagnostics/database-connectivity.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/telemetry/query.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff

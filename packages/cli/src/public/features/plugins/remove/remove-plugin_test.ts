@@ -1,5 +1,5 @@
+import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
-import { assert, assertEquals, assertRejects } from '@std/assert';
 import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { defineConfig } from '@netscript/config';
 
@@ -18,8 +18,73 @@ import { createDoctorPluginCommand } from '../doctor/doctor-plugin-command.ts';
 import { doctorPlugin } from '../doctor/doctor-plugin-use-case.ts';
 import { createPluginInstallCommand } from '../install/install-plugin-command.ts';
 import { createRemovePluginCommand } from './remove-plugin-command.ts';
+import { removePlugin } from './remove-plugin.ts';
+import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
+import { SERVICE_PUBLIC_REASON } from '../../../../kernel/adapters/service/auth-policy.ts';
 
 const REPOSITORY_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
+
+Deno.test('plugin removal rolls back browser reconciliation if helper generation fails', async () => {
+  const root = '/workspace/browser-rollback';
+  const fs = new MemoryFileSystemAdapter();
+  const templateAdapter = new StringTemplateAdapter(fs);
+  const scaffolder = new Scaffolder(templateAdapter, fs);
+  await fs.writeFile(
+    join(root, 'appsettings.json'),
+    JSON.stringify({
+      NetScript: {
+        Services: { users: { Workdir: 'components/users', Entrypoint: 'src/main.ts' } },
+        Apps: { web: { Type: 'app', Workdir: 'frontends/web' } },
+      },
+    }),
+  );
+  await writeInstalledAuthFixture(fs, root);
+  await fs.writeFile(
+    join(root, 'sagas/scaffold.plugin.json'),
+    JSON.stringify({
+      name: '@netscript/plugin-sagas',
+    }),
+  );
+  await fs.writeFile(join(root, 'deno.json'), JSON.stringify({ workspace: [] }));
+  await fs.writeFile(join(root, 'frontends/web/utils.ts'), 'export {};\n');
+  const mainPath = join(root, 'components/users/src/main.ts');
+  const main = `await defineService(router, {
+    name: 'users',
+    auth: { public: true, reason: '${SERVICE_PUBLIC_REASON}' },
+  });\n`;
+  await fs.writeFile(mainPath, main);
+  await fs.writeFile(join(root, 'aspire/apphost.ts'), 'export {};\n');
+  const settings = await fs.readFile(join(root, 'appsettings.json'));
+  await assertRejects(
+    () =>
+      removePlugin({
+        projectRoot: root,
+        pluginName: 'sagas',
+        skipDispatch: true,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
+        processRunner: { exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }) },
+        dispatchPort: { dispatch: () => Promise.reject(new Error('dispatch must be skipped')) },
+        regenerateHelpers: async () => {
+          assertStringIncludes(await fs.readFile(mainPath), 'authenticator: browserAuthenticator');
+          assert(await fs.exists(join(root, 'auth/bff.ts')));
+          throw new Error('injected failure after browser reconciliation');
+        },
+      }),
+    IoError,
+    'Project state was rolled back',
+  );
+  assertEquals(await fs.readFile(mainPath), main);
+  assertEquals(await fs.readFile(join(root, 'appsettings.json')), settings);
+  assert(!await fs.exists(join(root, 'auth/bff.ts')));
+  assert(!await fs.exists(join(root, 'auth/service.ts')));
+  assert(!await fs.exists(join(root, 'frontends/web/routes/auth/[action].ts')));
+  assert(await fs.exists(join(root, 'sagas/scaffold.plugin.json')));
+});
 
 Deno.test('plugin remove resolves a configured bare name before dispatch and preserves state on failure', async () => {
   const projectRoot = '/workspace/app';

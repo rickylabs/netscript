@@ -1,3 +1,4 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import {
   parsePluginManifest,
   type ScaffoldResult as PluginOwnedScaffoldResult,
@@ -10,7 +11,6 @@ import type { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/
 import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
-import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import type {
