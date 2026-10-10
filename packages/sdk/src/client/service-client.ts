@@ -92,6 +92,7 @@ export function createServiceClient<
   apiPath = '/api/rpc',
   apiVersion = 'v1',
   propagateTraceContext = true,
+  resolveServiceUrl,
   contributions,
   transportPolicy: transportPolicyOverride,
 }: CreateServiceClientOptions<TContract, TContributions>): ServiceClient<
@@ -116,6 +117,7 @@ export function createServiceClient<
     rpcPath,
     propagateTraceContext,
     getTraceHeaders,
+    resolveServiceUrl,
     contributions,
   });
 
