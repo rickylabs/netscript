@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "e8a273351",
-  "extractionTimestamp": "2026-10-10T13:33:25.502Z",
+  "sourceCommit": "4d27c791a",
+  "extractionTimestamp": "2026-10-10T13:22:00.582Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -169,7 +169,6 @@
     "pages/web-layer/examples/index.md",
     "pages/web-layer/form/index.md",
     "pages/web-layer/fresh-ui/index.md",
-    "pages/web-layer/generated-surface/index.md",
     "pages/web-layer/how-to/build-a-desktop-frontend/index.md",
     "pages/web-layer/how-to/build-a-server-validated-form/index.md",
     "pages/web-layer/how-to/customize-fresh-ui/index.md",
@@ -188,7 +187,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5112281,
-  "compressedBytes": 1478096,
-  "sha256": "ebf6009a20b392f011ddc2263b2f3ab16b6f205e3e5ccd632a31005f64366b4d"
+  "uncompressedBytes": 5116389,
+  "compressedBytes": 1478836,
+  "sha256": "74e1564e75130e2afb789d676ea9d3de75f8060d5fd5126e34ed15def66f3512"
 }
