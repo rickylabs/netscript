@@ -15,6 +15,7 @@ export async function terminateProcessTree(child: Deno.ChildProcess): Promise<vo
   } else {
     // Snapshot parent-child ownership while parents are still alive. Killing
     // leaves first avoids losing that evidence when children are reparented.
+    // A wrapper can fork after the snapshot; reader cancellation still unblocks completion.
     const descendants: number[] = [];
     const visited = new Set([child.pid]);
     for (const pid of visited) {
