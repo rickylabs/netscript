@@ -58,6 +58,7 @@ function dependenciesFor(generated: string[]) {
     scaffolder: {} as ScaffolderPort,
     templateAdapter: {} as TemplatePort,
     formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
+    validateComposition: () => Promise.resolve(),
     regenerateHelpers: (root: string) => {
       generated.push(root);
       return Promise.resolve<readonly string[]>(['aspire/apphost.mts']);

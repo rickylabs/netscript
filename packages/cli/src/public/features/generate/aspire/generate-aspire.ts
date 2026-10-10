@@ -1,3 +1,4 @@
+import { validateConfiguredPluginComposition } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { UseCase } from '../../../../kernel/application/abstracts/use-case.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
@@ -27,6 +28,13 @@ export interface GenerateAspireDependencies {
 
   /** Injected pre-write canonicalizer for service-generation flows. */
   readonly formatter: GeneratedSourceFormatterPort;
+
+  /**
+   * Optional override for the configured-plugin composition check run before generation.
+   *
+   * Defaults to loading every configured plugin manifest and running `validatePluginComposition`.
+   */
+  readonly validateComposition?: (projectRoot: string) => Promise<void>;
 
   /** Optional helper regeneration override for tests. */
   readonly regenerateHelpers?: (
@@ -61,7 +69,12 @@ export class GenerateAspireUseCase extends UseCase<GenerateAspireRequest, Genera
   }
 }
 
-/** Regenerate Aspire helper files for a project. */
+/**
+ * Regenerate Aspire helper files for a project.
+ *
+ * The configured plugins must first pass the shared `validatePluginComposition` check, the same
+ * one the runtime host bootstrap runs; an invalid composition fails before any helper is written.
+ */
 export async function generateAspire(
   request: GenerateAspireRequest,
   dependencies: GenerateAspireDependencies,
@@ -73,6 +86,10 @@ async function executeGenerateAspire(
   request: GenerateAspireRequest,
   dependencies: GenerateAspireDependencies,
 ): Promise<GenerateAspireResult> {
+  const validateComposition = dependencies.validateComposition ??
+    ((projectRoot: string) => validateConfiguredPluginComposition(projectRoot));
+  await validateComposition(request.projectRoot);
+
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
   const helperFiles = await regenerateHelpers(
     request.projectRoot,

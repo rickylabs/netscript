@@ -1,4 +1,6 @@
 import {
+  DurableStream,
+  FetchError,
   PRODUCER_EPOCH_HEADER,
   PRODUCER_EXPECTED_SEQ_HEADER,
   PRODUCER_ID_HEADER,
@@ -29,16 +31,35 @@ export class DurableStreamProducerTransport implements StreamProducerTransportPo
     input: StreamProducerConnectInputV1,
   ): Promise<StreamProducerTransportResultV1<void>> {
     try {
-      const response = await this.#fetch(input.url, {
-        method: 'PUT',
-        headers: { ...input.headers, 'content-type': 'application/json' },
+      const stream = new DurableStream({
+        url: input.url,
+        headers: { ...input.headers },
+        contentType: 'application/json',
+        fetch: this.#fetch,
         signal: requestSignal(input.signal, input.requestTimeoutMs),
+        backoffOptions: { initialDelay: 0, maxDelay: 0, multiplier: 1, maxRetries: 0 },
       });
-      if (response.ok || response.status === 409) {
-        return { ok: true, value: undefined };
-      }
-      return { ok: false, failure: await classifyResponse(response) };
+      await stream.create(
+        input.retention?.kind === 'ttl'
+          ? { ttlSeconds: input.retention.ttlSeconds }
+          : input.retention?.kind === 'expires-at'
+          ? { expiresAt: input.retention.expiresAt }
+          : {},
+      );
+      return { ok: true, value: undefined };
     } catch (error) {
+      if (error instanceof FetchError) {
+        if (error.status === 409) return { ok: true, value: undefined };
+        return {
+          ok: false,
+          failure: await classifyResponse(
+            new Response(error.text ?? error.message, {
+              status: error.status,
+              headers: error.headers,
+            }),
+          ),
+        };
+      }
       return { ok: false, failure: classifyThrown(error, input.signal) };
     }
   }

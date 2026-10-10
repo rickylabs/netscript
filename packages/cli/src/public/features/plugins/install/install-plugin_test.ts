@@ -132,7 +132,7 @@ const triggerProvider: PluginKindProvider = {
 
 const streamsProvider: PluginKindProvider = {
   kind: 'stream',
-  displayName: 'Durable Streams',
+  displayName: 'Streams (ephemeral by default)',
   category: 'plugin',
   portRangeKey: 'PLUGIN_API',
   defaultPermissions: [
@@ -2337,9 +2337,9 @@ function streamsDescriptor(): ValidatedPluginDescriptor {
       schemaVersion: 1,
       name: '@netscript/plugin-streams',
       version: '0.0.1-alpha.12',
-      displayName: 'Durable Streams',
+      displayName: 'Streams (ephemeral by default)',
       description:
-        'Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.',
+        'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
       peerDependencies: {
         '@netscript/plugin': '0.0.1-alpha.12',
       },
@@ -2386,7 +2386,7 @@ function streamsDescriptor(): ValidatedPluginDescriptor {
     },
     details: {
       description:
-        'Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.',
+        'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
       score: 95,
     },
   };

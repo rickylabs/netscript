@@ -15,17 +15,16 @@
  */
 
 import { health } from './routers/health.ts';
-import { {{serviceName | pascalCase}}V1 } from './routers/v1.ts';
+import { create{{serviceName | pascalCase}}V1 } from './routers/v1.ts';
+import { create{{serviceName | pascalCase}}Application, type {{serviceName | pascalCase}}Repository } from './application/{{entityName}}.ts';
 
-export const v1 = {
-  {{serviceName | camelCase}}: {
-    ...{{serviceName | pascalCase}}V1,
-    health,
-  },
-};
+export function createRouter(repository: {{serviceName | pascalCase}}Repository) {
+  const application = create{{serviceName | pascalCase}}Application(repository);
+  return {
+    v1: {
+      {{serviceName | camelCase}}: { ...create{{serviceName | pascalCase}}V1(application), health },
+    },
+  };
+}
 
-export const router = {
-  v1,
-};
-
-export type Router = typeof router;
+export type Router = ReturnType<typeof createRouter>;

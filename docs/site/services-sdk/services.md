@@ -500,3 +500,14 @@ This hub is intentionally thin — the full generated API lives in the reference
 ] }) }}
 
 {{ comp.nextPrev({ prev: { label: "Capabilities", href: "/capabilities/" }, next: { label: "Background jobs", href: "/background-processing/workers/" } }) }}
+
+## Protect anonymous routes
+
+Use `.withRateLimit({ routes, limit, windowMs, store })` on the builder's middleware seam to reserve
+a per-client quota before routing. The socket peer is propagated to Hono; XFF requires explicit
+proxy trust. Shared production quotas use the `@netscript/kv` atomic adapter, while bounded memory
+storage supports tests/development. Follow
+[Protect an anonymous service route](/services-sdk/how-to/protect-an-anonymous-route/) for a
+device-flow start/poll example and the
+[`@netscript/service` reference](/reference/service/#rate-limits-and-client-addresses) for the
+contracts.

@@ -19,6 +19,7 @@ describe('public generate application flows', () => {
       scaffolder: {} as ScaffolderPort,
       templateAdapter: {} as TemplatePort,
       formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
+      validateComposition: () => Promise.resolve(),
       regenerateHelpers: (projectRoot) =>
         Promise.resolve([
           `${projectRoot}/.aspire/apphost.mts`,

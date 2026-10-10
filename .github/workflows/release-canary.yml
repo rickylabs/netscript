@@ -155,18 +155,6 @@ jobs:
           echo "missing=$missing" >> "$GITHUB_OUTPUT"
           cat "$OUTCOME_FILE"
 
-      - name: Label published canary payload and verify drift
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CANARY_VERSION: ${{ steps.canary.outputs.version }}
-          SOURCE_SHA: ${{ steps.context.outputs.source_sha }}
-        run: |
-          set -euo pipefail
-          deno task release:canary-label -- \
-            --repo "$GITHUB_REPOSITORY" \
-            --published-version "$CANARY_VERSION" \
-            --head "$SOURCE_SHA"
-
       - name: Dispatch exact canary production E2E
         id: dispatch
         env:
@@ -191,6 +179,24 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           E2E_RUN_ID: ${{ steps.dispatch.outputs.run_id }}
         run: bash .llm/tools/release/watch-canary-e2e.sh "$E2E_RUN_ID"
+
+      - name: Label published canary payload and verify drift
+        if: always() && steps.publish.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANARY_VERSION: ${{ steps.canary.outputs.version }}
+          SOURCE_SHA: ${{ steps.context.outputs.source_sha }}
+          E2E_OUTCOME: ${{ steps.e2e.outcome }}
+          E2E_RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          deno task release:canary-label -- \
+            --repo "$GITHUB_REPOSITORY" \
+            --published-version "$CANARY_VERSION" \
+            --head "$SOURCE_SHA" \
+            --publish-run-id "$GITHUB_RUN_ID" \
+            --production-e2e-run-id "$E2E_RUN_ID" \
+            --production-e2e-outcome "$E2E_OUTCOME"
 
       - name: Delete ephemeral canary branch
         id: cleanup

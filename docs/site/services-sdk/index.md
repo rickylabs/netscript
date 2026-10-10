@@ -9,7 +9,7 @@ templateEngine: [vento, md]
 **Declare the API once — as a versioned contract — and the server handler, the typed client, the
 OpenAPI spec, and the query layer all derive from that one object.** That is this pillar in a
 sentence. A [service](/services-sdk/services/) implements the contract; the
-[SDK](/services-sdk/sdk/) consumes it. Because both sides import the *same* contract object, a
+[SDK](/services-sdk/sdk/) consumes it. Because both sides import the _same_ contract object, a
 renamed field or a changed response shape is a compile error on both ends before it can ship —
 there is no hand-written client wrapper to keep in sync, and no separate "update the API docs"
 step.
@@ -35,19 +35,21 @@ via ALPN automatically. See <a href="/services-sdk/services/#tls-http2-opt-in">S
 {{ /comp }}
 
 {{ comp.cardsGrid({ columns: 3, cards: [
-  { eyebrow: "Overview & Concepts", title: "Contracts to service to client", body: "The shared model for service handlers, OpenAPI, RPC, and typed clients.", href: "/explanation/contracts/", icon: "O" },
-  { eyebrow: "Quickstart", title: "Catalog service", body: "Create the first service in the Storefront tutorial.", href: "/tutorials/storefront/02-catalog-service/", icon: "Q" },
-  { eyebrow: "How-To", title: "Add a service", body: "Add a new service to a workspace.", href: "/services-sdk/how-to/add-a-service/", icon: "H" },
-  { eyebrow: "How-To", title: "Discover services", body: "Resolve service URLs and clients from the generated workspace.", href: "/services-sdk/how-to/discover-services/", icon: "H" },
-  { eyebrow: "How-To", title: "OpenAPI and Scalar", body: "Expose the generated OpenAPI document and Scalar UI.", href: "/services-sdk/how-to/expose-openapi-scalar/", icon: "H" },
-  { eyebrow: "API Reference", title: "service and sdk", body: "Generated service, SDK, and contract package symbols.", href: "/reference/service/", icon: "R" }
+{ eyebrow: "Overview & Concepts", title: "Contracts to service to client", body: "The shared model for service handlers, OpenAPI, RPC, and typed clients.", href: "/explanation/contracts/", icon: "O" },
+{ eyebrow: "Quickstart", title: "Catalog service", body: "Create the first service in the Storefront tutorial.", href: "/tutorials/storefront/02-catalog-service/", icon: "Q" },
+{ eyebrow: "How-To", title: "Add a service", body: "Add a new service to a workspace.", href: "/services-sdk/how-to/add-a-service/", icon: "H" },
+{ eyebrow: "How-To", title: "Discover services", body: "Resolve service URLs and clients from the generated workspace.", href: "/services-sdk/how-to/discover-services/", icon: "H" },
+{ eyebrow: "How-To", title: "OpenAPI and Scalar", body: "Expose the generated OpenAPI document and Scalar UI.", href: "/services-sdk/how-to/expose-openapi-scalar/", icon: "H" },
+{ eyebrow: "API Reference", title: "service and sdk", body: "Generated service, SDK, and contract package symbols.", href: "/reference/service/", icon: "R" }
 ] }) }}
 
 ## Learn, do, look up
 
 {{ comp.cardsGrid({ columns: 4, cards: [
-  { eyebrow: "Learn", title: "Storefront tutorial", body: "Define contracts and services, then consume them through the typed SDK.", href: resolveXref("tut:storefront").href },
-  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/services-sdk/how-to/" },
-  { eyebrow: "Look up", title: "`@netscript/service` reference", body: "Generated API reference. Related units: `sdk`, `contracts`.", href: resolveXref("ref:service").href },
-  { eyebrow: "Understand", title: "Contracts & type flow", body: "The design rationale behind this pillar.", href: resolveXref("explain:contracts").href },
+{ eyebrow: "Learn", title: "Storefront tutorial", body: "Define contracts and services, then consume them through the typed SDK.", href: resolveXref("tut:storefront").href },
+{ eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/services-sdk/how-to/" },
+{ eyebrow: "Look up", title: "`@netscript/service` reference", body: "Generated API reference. Related units: `sdk`, `contracts`.", href: resolveXref("ref:service").href },
+{ eyebrow: "Understand", title: "Contracts & type flow", body: "The design rationale behind this pillar.", href: resolveXref("explain:contracts").href },
 ] }) }}
+
+[Service layout](/services-sdk/service-layout/) covers layering and migration.

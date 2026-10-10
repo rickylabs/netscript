@@ -51,10 +51,10 @@ Deno.test('CLI corpus integrity follows canonical content across gzip transport 
   }
 });
 
-Deno.test('MCP fallback is generated from the locked release prose within 258 KiB', async () => {
+Deno.test('MCP fallback is generated from the locked release prose within 288 KiB', async () => {
   const generated = await buildMcpEmbeddedDocs();
   assertEquals(generated.provenance.paths, MCP_EMBEDDED_DOC_PATHS);
-  assertEquals(generated.provenance.documentCount, 12);
+  assertEquals(generated.provenance.documentCount, 13);
   assertEquals(generated.provenance.documentCount, MCP_EMBEDDED_DOC_PATHS.length);
   assertEquals(generated.documents.map((document) => document.path), [...MCP_EMBEDDED_DOC_PATHS]);
   assertEquals(generated.documents[0]?.path, 'llms.txt');
@@ -115,7 +115,7 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
       await Deno.readTextFile(new URL('../assets/agent-docs/provenance.json', import.meta.url)),
     );
     await Promise.all([
-      Deno.mkdir(`${root}/packages/cli`, { recursive: true }),
+      Deno.mkdir(`${root}/packages/cli/src/kernel/assets`, { recursive: true }),
       Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true }),
       Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true }),
     ]);
@@ -133,8 +133,11 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
         `${root}/packages/mcp/README.md`,
       ),
       Deno.copyFile(
-        new URL('../assets/agent-docs/prose.json.gz', import.meta.url),
-        `${root}/.llm/assets/agent-docs/prose.json.gz`,
+        new URL(
+          '../../packages/cli/src/kernel/assets/agent-docs-prose.generated.ts',
+          import.meta.url,
+        ),
+        `${root}/packages/cli/src/kernel/assets/agent-docs-prose.generated.ts`,
       ),
       Deno.writeTextFile(
         `${root}/.llm/assets/agent-docs/provenance.json`,
@@ -174,8 +177,8 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
     );
     assert(generated.includes("MCP_PACKAGE_VERSION: string = '0.0.5-canary.18'"));
     assert(!generated.includes("MCP_PACKAGE_VERSION: string = '0.0.4'"));
-    assert(generated.includes("'frameworkVersion': '0.0.5-canary.18'"));
-    assert(generated.includes("'sourceCommit': 'stale-fixture'"));
+    assert(generated.includes('frameworkVersion: MCP_PACKAGE_VERSION'));
+    assert(generated.includes("sourceCommit: 'content-addressed'"));
   } finally {
     await Deno.remove(root, { recursive: true });
   }
@@ -188,7 +191,7 @@ Deno.test('publish assets consume the genuinely rendered shared corpus without r
   const nextVersion = '0.0.5-canary.99';
   try {
     await Promise.all([
-      Deno.mkdir(`${root}/packages/cli`, { recursive: true }),
+      Deno.mkdir(`${root}/packages/cli/src/kernel/assets`, { recursive: true }),
       Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true }),
       Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true }),
     ]);
@@ -313,3 +316,47 @@ function copiedBuffer(bytes: Uint8Array): ArrayBuffer {
   copy.set(bytes);
   return copy.buffer;
 }
+
+Deno.test('MCP README check and write reuse a different valid gzip encoding of the same text', async () => {
+  const root = await Deno.makeTempDir();
+  const rootUrl = toFileUrl(`${root}/`);
+  try {
+    await Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true });
+    await Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/packages/mcp/deno.json`,
+      JSON.stringify({ version: '0.0.7' }),
+    );
+    await Deno.writeTextFile(`${root}/packages/mcp/README.md`, '# Fixture README\n');
+    const files = Object.fromEntries(MCP_EMBEDDED_DOC_PATHS.map((path) => [path, `# ${path}\n`]));
+    await Deno.writeFile(
+      `${root}/.llm/assets/agent-docs/prose.json.gz`,
+      await gzip(new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }))),
+    );
+    await Deno.writeTextFile(
+      `${root}/.llm/assets/agent-docs/provenance.json`,
+      JSON.stringify({ schemaVersion: 1, version: '0.0.7' }),
+    );
+    await generateMcpAssets(rootUrl, false, []);
+    const path = `${root}/packages/mcp/src/publish-assets.generated.ts`;
+    const source = await Deno.readTextFile(path);
+    const quoted = source.match(/MCP_PACKAGE_README_GZIP_BASE64: string =\s*('([^']+)'|"([^"]+)")/)
+      ?.[1];
+    assert(quoted);
+    const bytes = Uint8Array.fromBase64(quoted.slice(1, -1));
+    bytes[4] ^= 1;
+    const alternate = source.replace(quoted, `${quoted[0]}${bytes.toBase64()}${quoted[0]}`);
+    assert(alternate !== source);
+    await Deno.writeTextFile(path, alternate);
+    const stale: string[] = [];
+    await generateMcpAssets(rootUrl, true, stale);
+    assertEquals(stale, []);
+    await generateMcpAssets(rootUrl, false, stale);
+    assertEquals(await Deno.readTextFile(path), alternate);
+    await Deno.writeTextFile(`${root}/packages/mcp/README.md`, '# Changed\n');
+    await generateMcpAssets(rootUrl, true, stale);
+    assertEquals(stale, ['packages/mcp/src/publish-assets.generated.ts']);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

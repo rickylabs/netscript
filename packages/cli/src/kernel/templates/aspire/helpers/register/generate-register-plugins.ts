@@ -27,6 +27,10 @@ import { renderTemplateAssetSync } from '../../../../adapters/templates/template
 import { withDatabasePermissions } from './database-permissions.ts';
 import { renderHttpEndpointCall } from './render-http-endpoint.ts';
 import { renderDeclaredEnvironmentLines } from './resolve-resource-environment.ts';
+import {
+  renderRegistrationPreamble,
+  resolveRegistrationPreambleNeeds,
+} from './registration-preamble.ts';
 
 const DENO_NO_LEGACY_ABORT_FLAG = '--unstable-no-legacy-abort';
 
@@ -266,21 +270,28 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
   const aspireImport = SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS;
   const aspirePackage = SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT;
 
-  const pass1Body = pass1Blocks.length > 0
-    ? pass1Blocks.join('\n\n')
-    : '  // No plugins configured — nothing to register in Pass 1.';
-
   const pass2Body = pass2Blocks.length > 0
     ? pass2Blocks.join('\n\n')
     : '  // No plugin→plugin cross-references to wire.';
+
+  // Every Pass 1 block wires OTEL unconditionally; database and cache wiring
+  // follow the entry's declared requirements.
+  const preambleNeeds = resolveRegistrationPreambleNeeds(
+    entries.map(([, entry]) => entry),
+    true,
+  );
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterPlugins1, {
     __slot0__: String(fileHeader('register-plugins.mts')),
     __slot1__: String(aspireImport),
     __slot2__: String(aspirePackage),
     __slot3__: String(aspirePackage),
-    __slot4__: String(pass1Body),
+    __slot4__: pass1Blocks.join('\n\n'),
     __slot5__: String(pass2Body),
+    ...renderRegistrationPreamble(preambleNeeds, {
+      sdkModule: aspireImport,
+      cacheImport: 'withCacheReference',
+    }),
   });
 }
 
