@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "d3f1f2b88",
-  "extractionTimestamp": "2026-10-10T16:03:59.722Z",
+  "sourceCommit": "2b7d64c13",
+  "extractionTimestamp": "2026-10-10T16:16:46.904Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -126,7 +126,6 @@
     "pages/services-sdk/how-to/discover-services/index.md",
     "pages/services-sdk/how-to/expose-openapi-scalar/index.md",
     "pages/services-sdk/how-to/index.md",
-    "pages/services-sdk/how-to/protect-an-anonymous-route/index.md",
     "pages/services-sdk/index.md",
     "pages/services-sdk/sdk/index.md",
     "pages/services-sdk/services/index.md",
@@ -172,6 +171,7 @@
     "pages/web-layer/examples/index.md",
     "pages/web-layer/form/index.md",
     "pages/web-layer/fresh-ui/index.md",
+    "pages/web-layer/generated-surface/index.md",
     "pages/web-layer/how-to/build-a-desktop-frontend/index.md",
     "pages/web-layer/how-to/build-a-server-validated-form/index.md",
     "pages/web-layer/how-to/customize-fresh-ui/index.md",
@@ -190,7 +190,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5229076,
-  "compressedBytes": 1519916,
-  "sha256": "777d77e54ece306cfd5c5705322539f39b50c2e8e765059d9a47aae6b31c2609"
+  "uncompressedBytes": 5215129,
+  "compressedBytes": 1514407,
+  "sha256": "9e32161a6cea1fbd4766ad5505dce49dbff2845eb6a6c76ec9dd06272c97a7d8"
 }
