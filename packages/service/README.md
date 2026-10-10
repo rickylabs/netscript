@@ -110,10 +110,11 @@ the existing `/api` protection and anonymous `/health` defaults; custom `protect
 `allowAnonymous` options keep their existing semantics. `createService()` remains the lower-level
 composition API; it installs guards through `.withAuthn()` and `.withAuthz()`.
 
-L1 generated services record a public demo policy with a reason naming
-[#1382 L2](https://github.com/rickylabs/netscript/issues/1382). Wiring guarded scaffolds when auth
-is installed and authenticated generated app calls remain follow-ups. Public examples below
-are demonstrations; choose guards before using them for private operations.
+`netscript service add` generates remote session authentication and a `<service>:access` scope rule
+when an enabled auth plugin is installed. Otherwise it records an explicit public opt-out explaining
+how to install authentication. Existing authored entrypoints retain their policy; migrate public
+services explicitly when adding auth. Public examples below are demonstrations; choose guards before
+using them for private operations.
 
 ## CORS migration (breaking in 0.0.8)
 

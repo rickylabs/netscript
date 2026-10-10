@@ -372,9 +372,12 @@ record a public service's reason. The exact public migration is:
 +});
 ```
 
-Generated L1 service templates include a greppable public demo policy naming #1382 L2; guarded
-scaffolding and authenticated generated app calls are follow-up work. This policy requirement applies
-to the preset; lower-level `createService()` callers still compose their middleware explicitly.
+`netscript service add` generates a guarded policy when an enabled auth plugin is installed, using
+remote session verification and a `<service>:access` scope rule. `/api`, including OpenAPI and RPC,
+requires a bearer session with that scope; `/health` remains anonymous. Without auth installed, the
+generated entrypoint records a greppable public opt-out with a reason explaining how to protect it.
+This policy requirement applies to the preset; lower-level `createService()` callers still compose
+their middleware explicitly.
 
 ```ts
 import { assertServiceAuthPolicy, type ServiceAuthPolicy } from '@netscript/service/auth';

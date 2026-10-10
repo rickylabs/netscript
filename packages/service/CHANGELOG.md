@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- **Breaking (0.0.8, #1382 L1):** `defineService()` now requires `auth: ServiceAuthPolicy` and
+- **Breaking (0.0.8, #1382):** `defineService()` now requires `auth: ServiceAuthPolicy` and
   validates it before configuring the builder or starting IO. Missing policy is a type error and
   a runtime `TypeError` for JavaScript callers. Keep native guards as
   `auth: { authn: { authenticator }, authz: { authorizer } }` (authorization is optional).
@@ -16,9 +16,12 @@
   +});
   ```
 
-  Reasons must be nonblank; public and guarded fields cannot be mixed. CLI templates record
-  an explicit public demo policy pending #1382 L2 guarded scaffolding. Authenticated generated
-  app calls remain #1382 L3. See the README auth policy migration.
+  Reasons must be nonblank; public and guarded fields cannot be mixed. `netscript service add`
+  generates remote auth-session verification and a `<service>:access` scope rule when an enabled
+  auth plugin is installed. `/api`, including OpenAPI and RPC, requires that scope; `/health` remains
+  anonymous. Without auth installed, the generated public reason explains how to protect the API.
+  Existing authored services retain their policy and must be migrated explicitly. See the README
+  auth policy migration.
 
 - **Breaking (0.0.8):** CORS no longer defaults to wildcard access. Configure
   `NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'` for services and plugins, or

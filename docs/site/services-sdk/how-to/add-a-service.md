@@ -234,12 +234,20 @@ the `PORT` env var with a literal fallback so the same code runs locally and und
 ```ts
 // services/users/src/main.ts
 import { defineService } from '@netscript/service';
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
+import { createScopeAuthorizer } from '@netscript/service/auth';
 import { router } from './router.ts';
 
 await defineService(router, {
   auth: {
-    public: true,
-    reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy',
+    authn: {
+      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
+    },
+    authz: {
+      authorizer: createScopeAuthorizer({
+        rules: [{ match: () => true, requireScopes: ['users:access'] }],
+      }),
+    },
   },
   name: 'users',
   version: '1.0.0',
@@ -250,6 +258,25 @@ await defineService(router, {
   bodyLimit: { maxBytes: 1024 * 1024 },
 });
 ```
+
+When the auth plugin is installed and enabled, `netscript service add` generates these native guards
+and records the plugin reference for service discovery. The required scope is `<service>:access`:
+without a bearer session `/api` returns 401, a valid session without that scope receives 403,
+and `/health` remains anonymous. The remote verifier uses the auth service's SDK; the guarded service
+holds no auth backend or provider secret. Authenticated app clients attach the bearer through an SDK
+contribution.
+
+Without an enabled auth plugin, the entrypoint explicitly records its public posture:
+
+```ts
+auth: {
+  public: true,
+  reason: 'Authentication is not installed. Install the auth plugin to protect this service API.',
+},
+```
+
+After installing auth, add a guarded service or update an existing public entrypoint with the guarded
+policy above. An authored service entrypoint is preserved unless you explicitly overwrite it.
 
 New services scaffolded by `netscript service add` opt into a 1 MiB `bodyLimit`. Raise
 `maxBytes` for a service that accepts larger payloads, such as base64 document uploads. Remove the
