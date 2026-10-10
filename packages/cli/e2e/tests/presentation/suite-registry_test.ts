@@ -404,6 +404,17 @@ Deno.test('runtime suites prove the CLI-generated guarded plugin before generate
   }
 });
 
+Deno.test('runtime suites prove guarded service REST/RPC before generated quality', () => {
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
+    const guarded = ids.indexOf(GATE.BEHAVIOR_GENERATED_GUARDED_SERVICE);
+    assertEquals(guarded >= 0, true, `${suiteId} must run the guarded service gate`);
+    assertEquals(ids.indexOf('scaffold.plugin.auth') < guarded, true);
+    assertEquals(guarded < ids.indexOf(GATE.GENERATED_DENO_CHECK), true);
+    assertEquals(guarded < ids.indexOf(GATE.RUNTIME_ASPIRE_RESTORE), true);
+  }
+});
+
 Deno.test('listener failure/recovery gate runs after topology capture and before behavior', () => {
   for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
     const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);

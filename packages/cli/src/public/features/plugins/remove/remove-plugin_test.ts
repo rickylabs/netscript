@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { defineConfig } from '@netscript/config';
 
@@ -17,18 +17,86 @@ import { createDoctorPluginCommand } from '../doctor/doctor-plugin-command.ts';
 import { doctorPlugin } from '../doctor/doctor-plugin-use-case.ts';
 import { createPluginInstallCommand } from '../install/install-plugin-command.ts';
 import { createRemovePluginCommand } from './remove-plugin-command.ts';
+import { removePlugin } from './remove-plugin.ts';
+import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
+import { SERVICE_PUBLIC_REASON } from '../../../../kernel/adapters/service/auth-policy.ts';
 
 const REPOSITORY_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
+
+Deno.test('plugin removal rolls back browser reconciliation if helper generation fails', async () => {
+  const root = '/workspace/browser-rollback';
+  const fs = new MemoryFileSystemAdapter();
+  const templateAdapter = new StringTemplateAdapter(fs);
+  const scaffolder = new Scaffolder(templateAdapter, fs);
+  await fs.writeFile(
+    join(root, 'appsettings.json'),
+    JSON.stringify({
+      NetScript: {
+        Services: { users: { Workdir: 'components/users', Entrypoint: 'src/main.ts' } },
+        Apps: { web: { Type: 'app', Workdir: 'frontends/web' } },
+      },
+    }),
+  );
+  await writeInstalledAuthFixture(fs, root);
+  await fs.writeFile(
+    join(root, 'sagas/scaffold.plugin.json'),
+    JSON.stringify({
+      name: '@netscript/plugin-sagas',
+    }),
+  );
+  await fs.writeFile(join(root, 'deno.json'), JSON.stringify({ workspace: [] }));
+  await fs.writeFile(join(root, 'frontends/web/utils.ts'), 'export {};\n');
+  const mainPath = join(root, 'components/users/src/main.ts');
+  const main = `await defineService(router, {
+    name: 'users',
+    auth: { public: true, reason: '${SERVICE_PUBLIC_REASON}' },
+  });\n`;
+  await fs.writeFile(mainPath, main);
+  await fs.writeFile(join(root, 'aspire/apphost.ts'), 'export {};\n');
+  const settings = await fs.readFile(join(root, 'appsettings.json'));
+  await assertRejects(
+    () =>
+      removePlugin({
+        projectRoot: root,
+        pluginName: 'sagas',
+        skipDispatch: true,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: { exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }) },
+        dispatchPort: { dispatch: () => Promise.reject(new Error('dispatch must be skipped')) },
+        regenerateHelpers: async () => {
+          assertStringIncludes(await fs.readFile(mainPath), 'authenticator: browserAuthenticator');
+          assert(await fs.exists(join(root, 'auth/bff.ts')));
+          throw new Error('injected failure after browser reconciliation');
+        },
+      }),
+    IoError,
+    'Project state was rolled back',
+  );
+  assertEquals(await fs.readFile(mainPath), main);
+  assertEquals(await fs.readFile(join(root, 'appsettings.json')), settings);
+  assert(!await fs.exists(join(root, 'auth/bff.ts')));
+  assert(!await fs.exists(join(root, 'auth/service.ts')));
+  assert(!await fs.exists(join(root, 'frontends/web/routes/auth/[action].ts')));
+  assert(await fs.exists(join(root, 'sagas/scaffold.plugin.json')));
+});
 
 Deno.test('plugin remove resolves a configured bare name before dispatch and preserves state on failure', async () => {
   const projectRoot = '/workspace/app';
   const fs = new MemoryFileSystemAdapter();
-  const appsettings = JSON.stringify({
-    NetScript: {
-      Plugins: { 'sagas-api': { Enabled: true } },
-      BackgroundProcessors: { sagas: { Enabled: true } },
+  const appsettings = JSON.stringify(
+    {
+      NetScript: {
+        Plugins: { 'sagas-api': { Enabled: true } },
+        BackgroundProcessors: { sagas: { Enabled: true } },
+      },
     },
-  }, null, 2) + '\n';
+    null,
+    2,
+  ) + '\n';
   const netscriptConfig = [
     "import { defineConfig } from '@netscript/config';",
     'export default defineConfig({',
@@ -81,24 +149,39 @@ Deno.test('plugin remove rolls back every owned path when regeneration fails aft
   const fs = new MemoryFileSystemAdapter();
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
-  const denoBefore = JSON.stringify({ workspace: ['./apps/web'], imports: { keep: './keep.ts' } }, null, 2) + '\n';
-  const denoAfter = JSON.stringify({
-    workspace: ['./apps/web', './plugins', './plugins/*'],
-    imports: { keep: './keep.ts', managed: netscriptJsrSpecifier('plugin-sagas') },
-  }, null, 2) + '\n';
+  const denoBefore =
+    JSON.stringify({ workspace: ['./apps/web'], imports: { keep: './keep.ts' } }, null, 2) + '\n';
+  const denoAfter = JSON.stringify(
+    {
+      workspace: ['./apps/web', './plugins', './plugins/*'],
+      imports: { keep: './keep.ts', managed: netscriptJsrSpecifier('plugin-sagas') },
+    },
+    null,
+    2,
+  ) + '\n';
   const files = new Map<string, string>([
-    [`${projectRoot}/appsettings.json`, JSON.stringify({
-      NetScript: {
-        Plugins: { 'sagas-api': { Enabled: true } },
-        BackgroundProcessors: { sagas: { Enabled: true } },
-      },
-    }, null, 2) + '\n'],
+    [
+      `${projectRoot}/appsettings.json`,
+      JSON.stringify(
+        {
+          NetScript: {
+            Plugins: { 'sagas-api': { Enabled: true } },
+            BackgroundProcessors: { sagas: { Enabled: true } },
+          },
+        },
+        null,
+        2,
+      ) + '\n',
+    ],
     [`${projectRoot}/netscript.config.ts`, "export default { plugins: ['./sagas/mod.ts'] };\n"],
     [`${projectRoot}/deno.json`, denoAfter],
-    [`${projectRoot}/sagas/scaffold.plugin.json`, JSON.stringify({
-      name: '@netscript/plugin-sagas',
-      netscriptInstall: { rootDenoJsonBefore: denoBefore, rootDenoJsonAfter: denoAfter },
-    })],
+    [
+      `${projectRoot}/sagas/scaffold.plugin.json`,
+      JSON.stringify({
+        name: '@netscript/plugin-sagas',
+        netscriptInstall: { rootDenoJsonBefore: denoBefore, rootDenoJsonAfter: denoAfter },
+      }),
+    ],
     [`${projectRoot}/sagas/mod.ts`, 'export {};\n'],
     [`${projectRoot}/.netscript/generated/plugin-sagas/sagas.registry.ts`, 'export {};\n'],
     [`${projectRoot}/database/postgres/schema/plugins/sagas/sagas.prisma`, 'model Saga {}\n'],
@@ -107,21 +190,22 @@ Deno.test('plugin remove rolls back every owned path when regeneration fails aft
   for (const [path, content] of files) await fs.writeFile(path, content);
 
   const error = await assertRejects(
-    () => createRemovePluginCommand({
-      resolveProjectRoot: () => Promise.resolve(projectRoot),
-      print: () => {},
-      removePluginDependencies: {
-        fs,
-        scaffolder,
-        templateAdapter,
-        workspaceMutator: new PluginWorkspaceMutator(fs),
-        processRunner: { exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }) },
-        dispatchPort: {
-          dispatch: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+    () =>
+      createRemovePluginCommand({
+        resolveProjectRoot: () => Promise.resolve(projectRoot),
+        print: () => {},
+        removePluginDependencies: {
+          fs,
+          scaffolder,
+          templateAdapter,
+          workspaceMutator: new PluginWorkspaceMutator(fs),
+          processRunner: { exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }) },
+          dispatchPort: {
+            dispatch: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+          },
+          regenerateHelpers: () => Promise.reject(new Error('injected regeneration failure')),
         },
-        regenerateHelpers: () => Promise.reject(new Error('injected regeneration failure')),
-      },
-    }).parse(['sagas', '--project-root', projectRoot]),
+      }).parse(['sagas', '--project-root', projectRoot]),
     IoError,
     'Project state was rolled back',
   );
@@ -138,14 +222,18 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
   const process = new DenoProcess();
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
-  const appsettings = JSON.stringify({
-    NetScript: {
-      Name: 'fixture-app',
-      Services: {},
-      Plugins: {},
-      BackgroundProcessors: {},
+  const appsettings = JSON.stringify(
+    {
+      NetScript: {
+        Name: 'fixture-app',
+        Services: {},
+        Plugins: {},
+        BackgroundProcessors: {},
+      },
     },
-  }, null, 2) + '\n';
+    null,
+    2,
+  ) + '\n';
   const denoJson = JSON.stringify({ workspace: [], imports: {} }, null, 2) + '\n';
   const netscriptConfig = [
     "import { defineConfig } from '@netscript/config';",
@@ -232,17 +320,19 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
         read: () => Promise.resolve(undefined),
         write: () => Promise.resolve(),
       }),
-      doctor: (input) => doctorPlugin(input, {
-        fs,
-        process: {
-          exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
-        },
-        loadConfig: () => Promise.resolve(defineConfig({
-          name: 'fixture-app',
-          databases: { config: [] },
-          plugins: [],
-        })),
-      }),
+      doctor: (input) =>
+        doctorPlugin(input, {
+          fs,
+          process: {
+            exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+          },
+          loadConfig: () =>
+            Promise.resolve(defineConfig({
+              name: 'fixture-app',
+              databases: { config: [] },
+              plugins: [],
+            })),
+        }),
     }).parse(['--project-root', projectRoot]);
   } finally {
     await Deno.remove(projectRoot, { recursive: true });

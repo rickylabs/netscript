@@ -23,6 +23,8 @@ import { PortAllocator } from './port-allocator.ts';
 import { ServiceScaffolder } from './scaffolder.ts';
 import { ServiceWorkspaceResolver } from './workspace-resolver.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
+import { SERVICE_PUBLIC_REASON } from './auth-policy.ts';
+import { writeInstalledAuthFixture } from '../../../../tests/installed-auth-fixture.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
@@ -66,7 +68,65 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
   const mainContent = await fs.readFile('/project/services/orders/src/main.ts');
   assertStringIncludes(mainContent, "port: parseInt(Deno.env.get('PORT') || '3000')");
   assertStringIncludes(mainContent, 'public: true');
-  assertStringIncludes(mainContent, '#1382 L2 will wire the guarded auth policy');
+  assertStringIncludes(mainContent, SERVICE_PUBLIC_REASON);
+});
+
+for (const hasDatabase of [false, true]) {
+  Deno.test(`ServiceScaffolder prepares ${hasDatabase ? 'database' : 'memory'} services with installed auth`, async () => {
+    const { fs, scaffolder, templateAdapter } = createHarness();
+    await writeInstalledAuthFixture(fs, '/project');
+    const result = await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
+      projectName: 'my-app',
+      targetPath: '/project',
+      serviceName: 'orders',
+      servicePort: 3000,
+      importMode: 'jsr',
+      force: false,
+      hasDatabase,
+    });
+    const main = await fs.readFile('/project/services/orders/src/main.ts');
+    assertStringIncludes(main, SERVICE_PUBLIC_REASON);
+    assertEquals(main.includes('public: true'), true);
+    assertEquals(main.includes('createScopeAuthorizer'), false);
+    assertEquals(main.includes('allowAnonymous:'), false);
+    assertEquals(main.includes('#1382'), false);
+    assertEquals(result.configEntry.PluginReferences, ['auth']);
+    await fs.writeFile('/project/services/orders/src/main.ts', '// authored service policy');
+    await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
+      projectName: 'my-app',
+      targetPath: '/project',
+      serviceName: 'orders',
+      servicePort: 3000,
+      importMode: 'jsr',
+      force: false,
+      hasDatabase,
+    });
+    assertEquals(
+      await fs.readFile('/project/services/orders/src/main.ts'),
+      '// authored service policy',
+    );
+  });
+}
+
+Deno.test('ServiceScaffolder records public policy when auth is disabled', async () => {
+  const { fs, scaffolder, templateAdapter } = createHarness();
+  await writeInstalledAuthFixture(fs, '/project');
+  const settings = JSON.parse(await fs.readFile('/project/appsettings.json'));
+  settings.NetScript.Plugins.auth.Enabled = false;
+  await fs.writeFile('/project/appsettings.json', JSON.stringify(settings));
+  const result = await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
+    projectName: 'my-app',
+    targetPath: '/project',
+    serviceName: 'orders',
+    servicePort: 3000,
+    importMode: 'jsr',
+    force: false,
+  });
+  assertStringIncludes(
+    await fs.readFile('/project/services/orders/src/main.ts'),
+    SERVICE_PUBLIC_REASON,
+  );
+  assertEquals(result.configEntry.PluginReferences, undefined);
 });
 
 Deno.test('ServiceScaffolder writes canonical content for every generated service file', async () => {

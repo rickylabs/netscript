@@ -1,3 +1,4 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { join } from '@std/path';
 
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
@@ -98,7 +99,12 @@ export async function removePlugin(
       await reverseManagedInstallFiles(input.projectRoot, plan.installState, dependencies.fs);
     }
     await reconcilePluginReferences(input.projectRoot, dependencies.fs);
-    const helperFiles = await regenerateRemovalHelpers(input.projectRoot, dependencies);
+    const browserAuthFiles = await reconcileBrowserAuth(input.projectRoot, dependencies.fs);
+    const helperFiles = await regenerateRemovalHelpers(
+      input.projectRoot,
+      dependencies,
+      browserAuthFiles,
+    );
     await pruneEmptyGeneratedParents(input.projectRoot, dependencies.fs);
 
     return {
@@ -148,17 +154,22 @@ async function removeExistingDir(path: string, fs: FileSystemPort): Promise<bool
 async function regenerateRemovalHelpers(
   projectRoot: string,
   dependencies: RemovePluginDependencies,
+  browserAuthFiles: readonly string[],
 ): Promise<readonly string[]> {
-  if (!await dependencies.fs.exists(join(projectRoot, 'aspire'))) return [];
+  if (!await dependencies.fs.exists(join(projectRoot, 'aspire'))) {
+    await formatGeneratedFiles(dependencies.processRunner, projectRoot, browserAuthFiles);
+    return browserAuthFiles;
+  }
   if (!dependencies.scaffolder || !dependencies.templateAdapter) {
     throw new Error('Removal wiring regeneration dependencies are unavailable.');
   }
-  const helperFiles = await (dependencies.regenerateHelpers ?? regenerateAspireHelpers)(
+  const aspireFiles = await (dependencies.regenerateHelpers ?? regenerateAspireHelpers)(
     projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
   await formatGeneratedFiles(
     dependencies.processRunner,
     projectRoot,
@@ -179,9 +190,9 @@ async function reverseManagedRootDenoJson(
   const before = JSON.parse(state.rootDenoJsonBefore) as DenoConfigShape;
   const after = JSON.parse(state.rootDenoJsonAfter) as DenoConfigShape;
   const current = JSON.parse(await fs.readFile(path)) as DenoConfigShape;
-  const addedMembers = new Set((after.workspace ?? []).filter((member) =>
-    !(before.workspace ?? []).includes(member)
-  ));
+  const addedMembers = new Set(
+    (after.workspace ?? []).filter((member) => !(before.workspace ?? []).includes(member)),
+  );
   current.workspace = (current.workspace ?? []).filter((member) => !addedMembers.has(member));
   current.imports ??= {};
   for (const [key, installedValue] of Object.entries(after.imports ?? {})) {
@@ -225,7 +236,9 @@ async function reverseManagedInstallFiles(
     if (priorContent === null || priorContent === undefined) await fs.remove(path);
     else await fs.writeFile(path, priorContent);
   }
-  for (const directory of [join(projectRoot, 'plugins'), join(projectRoot, 'services', '_shared')]) {
+  for (
+    const directory of [join(projectRoot, 'plugins'), join(projectRoot, 'services', '_shared')]
+  ) {
     if (await fs.exists(directory) && (await fs.readDir(directory)).length === 0) {
       await fs.remove(directory);
     }
@@ -233,10 +246,12 @@ async function reverseManagedInstallFiles(
 }
 
 async function pruneEmptyGeneratedParents(projectRoot: string, fs: FileSystemPort): Promise<void> {
-  for (const directory of [
-    join(projectRoot, '.netscript', 'generated'),
-    join(projectRoot, '.netscript'),
-  ]) {
+  for (
+    const directory of [
+      join(projectRoot, '.netscript', 'generated'),
+      join(projectRoot, '.netscript'),
+    ]
+  ) {
     if (await fs.exists(directory) && (await fs.readDir(directory)).length === 0) {
       await fs.remove(directory);
     }

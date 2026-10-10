@@ -23,6 +23,8 @@ export interface ServiceDenoJsonOptions {
   readonly localBase?: string;
   /** Whether this service imports the scaffolded database facade. */
   readonly hasDatabase?: boolean;
+  /** Enabled auth plugin discovery name, when the generated service is guarded. */
+  readonly authServiceName?: string;
   /**
    * Retained for backward compatibility with older scaffold callers.
    * Resource deno.json files always declare their direct imports now.
@@ -36,11 +38,12 @@ export interface ServiceDenoJsonOptions {
  * Resolves the service's direct imports:
  * - `@<project>/contracts`
  * - `@netscript/service`
+ * - `@netscript/plugin-auth-core` when an enabled auth plugin is installed
  * - `@database` when the service is database-backed
  *
  * `@netscript/telemetry` is intentionally omitted here. The scaffolded service
- * imports only `defineService`, and that preset owns telemetry/tracing
- * behavior internally until a template directly imports a telemetry API.
+ * preset owns telemetry/tracing behavior internally until a template directly
+ * imports a telemetry API.
  *
  * @param options - Project, service, and import-mode options.
  * @returns Serialized JSON string with trailing newline.
@@ -68,6 +71,12 @@ export function generateServiceDenoJson(options: ServiceDenoJsonOptions): string
       [`@${options.projectName}/contracts`]: contractsImport,
       ...(options.hasDatabase ? { '@database': '../../database/mod.ts' } : {}),
       [SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE]: resolvedImports[SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE],
+      ...(options.authServiceName !== undefined
+        ? {
+          [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE]:
+            resolvedImports[SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE],
+        }
+        : {}),
     },
     compilerOptions: {
       lib: ['dom', 'deno.ns', 'deno.unstable'],
