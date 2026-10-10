@@ -1,0 +1,27 @@
+/** {{serviceName}} use-cases and the collapsed repository port. */
+import type {
+  {{serviceName | pascalCase}}ListItemV1 as Entity,
+  {{serviceName | pascalCase}}UpdateStatusInputV1 as UpdateStatusInput,
+} from '@{{projectName}}/contracts';
+import { type ListInput, listQuery, listResult, statusSummary } from '../domain/{{entityName}}.ts';
+
+export interface {{serviceName | pascalCase}}Repository {
+  list(query: ReturnType<typeof listQuery>): Promise<{ items: Entity[]; total: number }>;
+  updateStatus(id: number, status: Entity['status'], summary: string): Promise<Entity | null>;
+}
+
+export function create{{serviceName | pascalCase}}Application(repository: {{serviceName | pascalCase}}Repository) {
+  return {
+    async list(input: ListInput) {
+      const { items, total } = await repository.list(listQuery(input));
+      return listResult(input, items, total);
+    },
+    async updateStatus(input: UpdateStatusInput) {
+      const record = await repository.updateStatus(input.id, input.status, statusSummary(input.status));
+      if (!record) throw new Error(`{{serviceName}} record ${input.id} not found`);
+      return record;
+    },
+  };
+}
+
+export type {{serviceName | pascalCase}}Application = ReturnType<typeof create{{serviceName | pascalCase}}Application>;

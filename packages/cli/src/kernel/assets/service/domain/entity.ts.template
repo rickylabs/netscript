@@ -1,0 +1,30 @@
+/** Pure {{modelName}} list policy; no persistence or transport dependencies. */
+export interface ListInput {
+  readonly page: number;
+  readonly limit: number;
+  readonly sortBy?: string;
+  readonly sortOrder: 'asc' | 'desc';
+}
+
+const SORTABLE_FIELDS = new Set(['id', 'name', 'createdAt', 'updatedAt']);
+
+export function listQuery(input: ListInput) {
+  const field = input.sortBy && SORTABLE_FIELDS.has(input.sortBy) ? input.sortBy : 'id';
+  return {
+    skip: (input.page - 1) * input.limit,
+    take: input.limit,
+    orderBy: { [field]: input.sortOrder },
+  };
+}
+
+export function pagination(input: ListInput, total: number) {
+  const totalPages = Math.ceil(total / input.limit);
+  return {
+    page: input.page,
+    limit: input.limit,
+    total,
+    totalPages,
+    hasNext: input.page < totalPages,
+    hasPrev: input.page > 1,
+  };
+}

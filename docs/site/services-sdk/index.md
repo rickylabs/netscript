@@ -51,3 +51,5 @@ via ALPN automatically. See <a href="/services-sdk/services/#tls-http2-opt-in">S
   { eyebrow: "Look up", title: "`@netscript/service` reference", body: "Generated API reference. Related units: `sdk`, `contracts`.", href: resolveXref("ref:service").href },
   { eyebrow: "Understand", title: "Contracts & type flow", body: "The design rationale behind this pillar.", href: resolveXref("explain:contracts").href },
 ] }) }}
+
+[Service layout](/services-sdk/service-layout/) covers layering and migration.

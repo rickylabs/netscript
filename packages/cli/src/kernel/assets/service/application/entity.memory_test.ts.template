@@ -1,0 +1,17 @@
+import { create{{serviceName | pascalCase}}Application } from './{{entityName}}.ts';
+import { createMemory{{serviceName | pascalCase}}Repository } from '../adapters/memory-{{entityName}}-repository.ts';
+
+Deno.test('{{serviceName}} use-cases page, search and update instance-owned records', async () => {
+  const application = create{{serviceName | pascalCase}}Application(createMemory{{serviceName | pascalCase}}Repository());
+  const first = await application.list({ offset: 0, limit: 1, search: ' LAUNCH ' });
+  if (first.items.length !== 1 || first.total !== 1 || first.hasMore) {
+    throw new Error('Unexpected searched page');
+  }
+  const updated = await application.updateStatus({ id: first.items[0].id, status: 'archived' });
+  if (updated.status !== 'archived' || first.items[0].status !== 'active') {
+    throw new Error('Repository must return snapshots');
+  }
+  const fresh = create{{serviceName | pascalCase}}Application(createMemory{{serviceName | pascalCase}}Repository());
+  const page = await fresh.list({ offset: 0, limit: 1 });
+  if (page.items[0].status !== 'active' || !page.hasMore) throw new Error('Instances must be isolated');
+});

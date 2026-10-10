@@ -82,12 +82,19 @@ and `usersQueries` symbols used by page loaders and islands. Either path lays do
 services/users/
 ├── deno.json              # workspace member; exports ./src/main.ts
 └── src/
-    ├── main.ts            # defineService(router, { name, version, port, openapi })
-    ├── router.ts          # version-namespaced router aggregation
+    ├── main.ts            # compose the adapter and call defineService
+    ├── router.ts          # compose use-cases and aggregate version bindings
+    ├── application/       # one entity module with use-cases and its repository port
+    ├── domain/            # pure policy
+    ├── adapters/          # Prisma or instance-owned seeded memory repository
     └── routers/
-        ├── v1.ts          # binds the contract: v1.users.list.handler(...)
+        ├── v1.ts          # thin contract bindings calling application use-cases
         └── health.ts      # health.check handler
 ```
+
+The generated service includes a colocated `*_test.ts` module; `deno task test` runs it without a
+running database. See [Service layout](/services-sdk/service-layout/) for exact filenames, the
+collapse decision table, and migration from an existing service.
 
 {{ comp callout { type: "tip", title: "Naming and the import alias" } }}
 The service name (<code>users</code>) becomes the workspace folder under <code>services/</code> and the
