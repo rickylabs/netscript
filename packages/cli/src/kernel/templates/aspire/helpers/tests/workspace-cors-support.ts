@@ -17,13 +17,17 @@ DEFAULT_TEMPLATE_REGISTRY.register(TEMPLATE_KEYS.generatedAspireHelpersGenerateR
 });
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
-// Relevant pinned SDK contract: getEndpoint returns an opaque reference; refExpr
-// preserves references (including nested expressions) until AppHost allocation.
+// Relevant restored 13.5.3 SDK contract: aspire.mts re-exports ReferenceExpression
+// from base.mjs. Its create(strings, ...values) tag preserves endpoint references
+// (including nested expressions) until AppHost allocation. The recording double
+// stores those parts so the tests can allocate endpoint values after registration.
 const SDK_DOUBLE = `
 export interface EndpointReference { readonly resourceName: string }
-export interface ReferenceExpression { readonly strings: readonly string[]; readonly values: readonly unknown[] }
-export function refExpr(strings: TemplateStringsArray, ...values: unknown[]): ReferenceExpression {
-  return { strings: [...strings], values };
+export class ReferenceExpression {
+  private constructor(readonly strings: readonly string[], readonly values: readonly unknown[]) {}
+  static create(strings: TemplateStringsArray, ...values: unknown[]): ReferenceExpression {
+    return new ReferenceExpression([...strings], values);
+  }
 }
 export const OtlpProtocol = { HttpProtobuf: 1 };
 export interface Resource {
