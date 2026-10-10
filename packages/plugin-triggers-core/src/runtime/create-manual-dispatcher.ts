@@ -76,6 +76,7 @@ class DefaultManualDispatcher implements ManualDispatcher {
     const event = this.#createEvent(definition, input);
     await this.#eventStore.save(event);
     const result = await this.#processor.process(event, definition);
+    await this.#eventStore.updateStatus(event.id, result.status);
     const status = result.status === 'deferred' ? 'deferred' : 'pending';
     return {
       accepted: true,
