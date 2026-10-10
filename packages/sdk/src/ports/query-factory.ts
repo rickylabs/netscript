@@ -48,6 +48,12 @@ export type ProcedureMeta<
   TAction extends ContractProcedureNames<TContract>,
 > = ProcedureMetaFromNode<TContract[TAction]>;
 
+/** @internal Combine action options with the service client's required or optional context. */
+export type ActionRequestRest<TBase, TContext extends object> = ServiceRequestRest<TContext> extends
+  [options: infer TOptions] ? [options: TBase & TOptions]
+  : ServiceRequestRest<TContext> extends [options?: infer TOptions] ? [options?: TBase & TOptions]
+  : never;
+
 /**
  * Query helper bound to a specific resource action.
  */
@@ -65,11 +71,7 @@ export interface ActionMethod<
    */
   (
     props: ProcedureInput<TContract, TAction>,
-    ...request: ServiceRequestRest<TContext> extends [options: infer TOptions]
-      ? [options: QueryParams & TOptions]
-      : ServiceRequestRest<TContext> extends [options?: infer TOptions]
-        ? [options?: QueryParams & TOptions]
-      : never
+    ...request: ActionRequestRest<QueryParams, TContext>
   ): Promise<ProcedureOutput<TContract, TAction>>;
 
   /** Invalidate all cached queries for this action. */
@@ -84,11 +86,7 @@ export interface ActionMethod<
   /** Prefetch this action in the background. */
   prefetch: (
     props: ProcedureInput<TContract, TAction>,
-    ...request: ServiceRequestRest<TContext> extends [options: infer TOptions]
-      ? [options: QueryParams & TOptions]
-      : ServiceRequestRest<TContext> extends [options?: infer TOptions]
-        ? [options?: QueryParams & TOptions]
-      : never
+    ...request: ActionRequestRest<QueryParams, TContext>
   ) => void;
 
   /** Return cached data without fetching. */
@@ -114,20 +112,12 @@ export interface ActionMethod<
    */
   queryOptions: (
     props: ProcedureInput<TContract, TAction>,
-    ...request: ServiceRequestRest<TContext> extends [options: infer TOptions]
-      ? [options: ActionQueryOptions & TOptions]
-      : ServiceRequestRest<TContext> extends [options?: infer TOptions]
-        ? [options?: ActionQueryOptions & TOptions]
-      : never
+    ...request: ActionRequestRest<ActionQueryOptions, TContext>
   ) => QueryOptionsWithInitialData<ProcedureOutput<TContract, TAction>>;
 
   /** TanStack mutationOptions with typed mutationKey and mutationFn. */
   mutationOptions: (
-    ...request: ServiceRequestRest<TContext> extends [options: infer TOptions]
-      ? [options: ActionMutationOptions & TOptions]
-      : ServiceRequestRest<TContext> extends [options?: infer TOptions]
-        ? [options?: ActionMutationOptions & TOptions]
-      : never
+    ...request: ActionRequestRest<ActionMutationOptions, TContext>
   ) => MutationOptionsResult<
     ProcedureOutput<TContract, TAction>,
     ProcedureInput<TContract, TAction>
