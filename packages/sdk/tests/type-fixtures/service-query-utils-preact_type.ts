@@ -39,7 +39,13 @@ export function consumerAssertions(): void {
     }>
   >;
   type Output = Assert<Equal<typeof query.data, { id: string }[] | undefined>>;
-  type Cancellation = Assert<Equal<Parameters<typeof options.queryFn>[0], QueryFunctionContext>>;
+  type Cancellation = Assert<Equal<Parameters<typeof options.queryFn>[0]['signal'], AbortSignal>>;
+  type QueryClientContext = Assert<
+    Equal<Parameters<typeof options.queryFn>[0]['client'], QueryClient>
+  >;
+  type TanStackContext = Assert<
+    QueryFunctionContext extends Parameters<typeof options.queryFn>[0] ? true : false
+  >;
 
   const securedUtils = createServiceQueryUtils(securedClient);
   const securedOptions = securedUtils.list.queryOptions({
@@ -62,7 +68,14 @@ export function consumerAssertions(): void {
 
   void data;
   void result;
-  const proof: Input & Output & Cancellation & ClientContext & RequiredContext & SecuredOutput =
-    true;
+  const proof:
+    & Input
+    & Output
+    & Cancellation
+    & QueryClientContext
+    & TanStackContext
+    & ClientContext
+    & RequiredContext
+    & SecuredOutput = true;
   void proof;
 }
