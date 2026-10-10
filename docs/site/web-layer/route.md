@@ -257,53 +257,27 @@ Each leaf is `createRouteReference(routePatterns.<key>, { id, kind })`, or
 sidecar. `kind` is `'partial'` for anything under `partials/` and `'page'` otherwise; `id` is the
 dotted key path without the trailing `$route`.
 
-**This is the rename-safety story, and it is narrow enough to state exactly.** Move
-`routes/dashboard/orders/[id].tsx` to `routes/orders/[id].tsx` and the tree is regenerated:
-`routes.dashboard.orders.$id` stops existing, and every call site referencing it fails `deno check`.
-The guarantee applies only to call sites that go through the generated tree. A hand-written
-`createRouteReference('/dashboard/orders/[id]')` holds a string literal and is not rename-tracked —
-prefer the generated accessor wherever a route file can move, and keep `createRouteReference` for
-patterns outside the generated tree.
+After regeneration, moving `routes/dashboard/orders/[id].tsx` to `routes/orders/[id].tsx`
+removes `routes.dashboard.orders.$id`: consumers of that accessor fail `deno check`.
+This guarantee covers only generated-tree consumers. A literal
+`createRouteReference('/dashboard/orders/[id]')` is not rename-tracked; prefer generated accessors
+for filesystem routes.
 
 ## Renaming or Moving a Route
 
-`netscript ui:add page catalog --island --client catalog` registers a string-literal route in
-`router.ts`: `appRoutes['catalog']` uses `createRouteReference('/catalog', ...)`. The page binds
-with `.withRoute(appRoutes['catalog'])`. Moving its directory to `routes/inventory/` does **not**
-update that literal, and `deno check` can still pass while links point to `/catalog`. The generated
-tree guarantee above therefore does not apply to these scaffolded bindings.
+`ui:add page` binds `appRoutes['catalog']` to a string literal in `router.ts`:
+`createRouteReference('/catalog', ...)`. Moving files can leave stale URLs while `deno check` passes.
 
-Route renaming is currently manual. There is no `netscript ui:rename` or `netscript route rename`
-verb, and no `netscript generate routes` command. `netscript ui:remove <name>` removes a copied
-Fresh UI registry item; it does not remove a page or reconcile its route registration.
+- [ ] Move page, owned `query-loaders.ts`/`CatalogIsland.tsx`, and contract sidecar; repair imports.
+- [ ] Reconcile `router.ts` pattern/key/metadata `id`, page binding, and consumers.
+- [ ] Update navigation links, literals, redirects, partials, tests, and path schemas.
+- [ ] Refresh `.generated/manifest.ts` and `.generated/routes.ts` via Vite build/dev; never hand-edit.
+- [ ] Type-check after regeneration.
+- [ ] Visit `/inventory`, test navigation/loader/island/partials, and check the old `/catalog` URL.
 
-For example, to move `routes/catalog/index.tsx` from `/catalog` to `/inventory`:
-
-- [ ] Move the route directory to `routes/inventory/`, including any colocated
-      `(_shared)/query-loaders.ts`, `(_islands)/CatalogIsland.tsx`, and contract sidecar. Review
-      imports to and from the moved files; nesting changes can invalidate relative paths. Component
-      names may stay unchanged unless you also want to rename them.
-- [ ] Reconcile `router.ts`: change the registration's pattern from `/catalog` to `/inventory`. The
-      `appRoutes` key and metadata `id` are identifiers, not URL segments. Keep `catalog` if it is
-      still the desired identifier, or change the key and `id` together to `inventory` and update
-      every consumer, including the page's `.withRoute(appRoutes['inventory'])` binding. Remove
-      obsolete or duplicate registrations.
-- [ ] Search for the old URL, `appRoutes` key, and generated accessor. Update navigation links,
-      redirects, partial pairings, tests, and any string-literal route references. If path
-      parameters changed, reconcile the path schema and every href input too.
-- [ ] Refresh `.generated/manifest.ts` and `.generated/routes.ts` through the app's Vite build or
-      dev server with `routeManifest` enabled. Do not edit these files by hand. Running `deno check`
-      alone does not run the generator.
-- [ ] Type-check the app **after** regeneration and resolve stale generated-tree accessors and
-      imports. This catches type drift but does not prove string-literal URLs match the filesystem.
-- [ ] Visit `/inventory`, follow the app's navigation to it, and exercise any loader/island and
-      paired partial. Check the old `/catalog` URL and decide whether it should return 404 or
-      whether you need to author a redirect for existing links.
-
-For removal, manually remove the page and its owned loader/island files, prune its `router.ts`
-registration and consumers, regenerate, then verify navigation and the old URL. Do not remove shared
-modules still used by other pages. See [Generated web surface](/web-layer/generated-surface/) for
-the distinction between editable scaffold output and regenerated modules.
+[Generated web surface](/web-layer/generated-surface/) explains ownership and manual removal.
+No `ui:rename`, `route rename`, `generate routes`, or `ui:remove page` verb exists;
+`ui:remove` handles registry items only.
 
 ## Three authoring forms, one generated binding
 

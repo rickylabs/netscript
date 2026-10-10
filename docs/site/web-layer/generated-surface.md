@@ -49,6 +49,15 @@ Use the [Renaming or Moving a Route checklist](/web-layer/route/#renaming-or-mov
 reconcile the directory, colocated files, `router.ts`, page binding, navigation, and generated tree.
 Verify the new URL and loader/island behavior in the running app as well as type checking.
 
+For a move from `routes/catalog/` to `routes/inventory/`, change the `router.ts` pattern from
+`/catalog` to `/inventory`. The registry key and metadata `id` are identifiers, not URL segments:
+you may keep `catalog`, or rename both to `inventory` and update the page to
+`.withRoute(appRoutes['inventory'])` and every consumer of the old key. Remove obsolete or
+duplicate registrations. Search for the old URL and generated accessor too; check navigation,
+redirects, and partial pairings. If parameters change, reconcile path schemas and href inputs.
+After refreshing the tree, type-check and visit the new URL, including any loader and island.
+Decide whether the old URL should return 404 or needs an authored redirect for existing links.
+
 There is currently no `netscript ui:rename` or `netscript route rename` command.
 `netscript ui:remove
 <name>` removes a copied Fresh UI registry item, not a page triad;
