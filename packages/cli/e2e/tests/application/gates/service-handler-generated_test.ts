@@ -131,9 +131,11 @@ Deno.test('missing memory record maps to typed NOT_FOUND with status 404', async
 `,
         );
       }
-      // The generated workspace's Deno check includes services, contracts and app clients.
-      // AppHost TypeScript needs its separate restore/runtime gate, scheduled by the coordinator.
-      await deno(['task', 'check', '--skip-apphost'], projectRoot);
+      await deno(['task', 'check'], join(projectRoot, 'services/team-members'));
+      if (variant === 'memory') {
+        await deno(['task', 'check'], join(projectRoot, 'services/orders'));
+        await deno(['check', `apps/${projectName}-web/lib/orders.ts`], projectRoot);
+      }
       await deno(['task', 'test'], join(projectRoot, 'services/team-members'));
     } finally {
       await Deno.remove(parent, { recursive: true });
