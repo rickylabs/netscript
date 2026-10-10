@@ -287,6 +287,7 @@ packages/aspire/tests/runtime/aspire-ns-plugin-contribution_test.ts	aspire-ports
 packages/aspire/tests/runtime/contribution-registry_test.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/tests/schema_test.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/types.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
+packages/cli/assets/schema/aspire-generated-surface.v1.json	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/CHANGELOG.md	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/deno.json	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/e2e/fixtures/desktop-native/src/constants.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -446,6 +447,7 @@ packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter
 packages/cli/src/kernel/adapters/scaffold/import-resolver.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/aspire-surface-checker.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-inventory_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/aspire-surface-inventory.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/aspire-surface-renderer.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/workspace-mutator_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -613,6 +615,7 @@ packages/cli/src/public/features/deploy/target/desktop/package/package-desktop_t
 packages/cli/src/public/features/deploy/target/desktop/package/package-desktop.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/target/run-target-operation.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/generate/aspire/aspire-check-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/check-aspire.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected

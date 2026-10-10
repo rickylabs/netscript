@@ -3,8 +3,8 @@ import {
   ASPIRE_SURFACE_GENERATOR,
   ASPIRE_SURFACE_MARKER,
   ASPIRE_SURFACE_VERSION,
+  type AspireAuthoredInput,
   type AspireSurfaceDrift,
-  type AspireSurfaceEntry,
   type AspireSurfaceReport,
 } from '../../domain/aspire-generated-surface.ts';
 import type { GeneratedFile } from '../../templates/aspire/helpers/types.ts';
@@ -22,8 +22,16 @@ export async function checkAspireSurface(
     // Reject linked input/output roots before selectors or renderer follow them.
     await rejectLinks(projectRoot, 'aspire');
     await rejectLinks(projectRoot, 'appsettings.json');
-    const inputs: AspireSurfaceEntry[] = [];
-    for (const path of ['appsettings.json', 'netscript.config.ts', 'deno.json']) {
+    const inputs: AspireAuthoredInput[] = [];
+    for (
+      const path of [
+        'appsettings.json',
+        'netscript.config.ts',
+        'netscript.config.js',
+        'netscript.config.mjs',
+        'deno.json',
+      ]
+    ) {
       const bytes = await readBoundedFile(projectRoot, path);
       if (!bytes) {
         if (path === 'appsettings.json') throw new Error('Missing authored authority.');

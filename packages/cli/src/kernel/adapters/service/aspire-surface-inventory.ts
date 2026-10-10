@@ -1,10 +1,10 @@
-import { join } from '@std/path';
+import { basename, join } from '@std/path';
 import { normalize } from '@std/path/posix';
 import {
   ASPIRE_SURFACE_GENERATOR,
   ASPIRE_SURFACE_MARKER,
   ASPIRE_SURFACE_VERSION,
-  type AspireSurfaceEntry,
+  type AspireGeneratedOutput,
   type AspireSurfaceInventory,
 } from '../../domain/aspire-generated-surface.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
@@ -25,6 +25,7 @@ export async function canonicalizeAspireOutputs(
       throw new Error('Aspire producer overlap or authored output ownership violation.');
     }
     seen.add(path.toLowerCase());
+    if (file.content.length > 16 * 1024 * 1024) throw new Error('Aspire output capacity exceeded.');
     const content = ASPIRE_SURFACE_MARKER + file.content;
     canonical.push({
       path,
@@ -38,7 +39,8 @@ export async function canonicalizeAspireOutputs(
 
 /** Reserved generation scope; authored config and Aspire SDK modules cannot be claimed. */
 export function isAspireOutputPath(path: string): boolean {
-  return !path.includes('\\') && normalize(path) === path &&
+  return basename(path) !== 'appsettings.json' && !path.includes('\\') &&
+    normalize(path) === path &&
     (path === 'aspire/apphost.mts' ||
       (path.startsWith('aspire/.helpers/') && !path.endsWith('/')));
 }
@@ -54,7 +56,7 @@ export async function aspireContentDigest(bytes: Uint8Array): Promise<string> {
 export async function buildAspireInventory(
   files: readonly GeneratedFile[],
 ): Promise<AspireSurfaceInventory> {
-  const outputs: AspireSurfaceEntry[] = [];
+  const outputs: AspireGeneratedOutput[] = [];
   for (const file of files) {
     outputs.push({
       generator: ASPIRE_SURFACE_GENERATOR,

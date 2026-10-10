@@ -25,6 +25,16 @@ export interface AspireSurfaceEntry {
   /** SHA-256 digest prefixed with its algorithm. */
   readonly digest: string;
 }
+/** Selected producer-owned output; authored authorities cannot inhabit this list. */
+export interface AspireGeneratedOutput extends AspireSurfaceEntry {
+  /** Output ownership. */
+  readonly ownership: 'generated';
+}
+/** Authored input authority; generator writes cannot inhabit this list. */
+export interface AspireAuthoredInput extends AspireSurfaceEntry {
+  /** Input ownership. */
+  readonly ownership: 'authored';
+}
 /** Versioned output inventory and authored input authorities. */
 export interface AspireSurfaceInventory {
   /** Inventory/report wire version. */
@@ -32,9 +42,9 @@ export interface AspireSurfaceInventory {
   /** Generator identifier. */
   readonly generator: typeof ASPIRE_SURFACE_GENERATOR;
   /** Complete selected output surface. */
-  readonly outputs: readonly AspireSurfaceEntry[];
+  readonly outputs: readonly AspireGeneratedOutput[];
   /** Authored selection authorities, including appsettings.json. */
-  readonly inputs: readonly AspireSurfaceEntry[];
+  readonly inputs: readonly AspireAuthoredInput[];
 }
 /** One fail-closed finding. */
 export interface AspireSurfaceDrift {
