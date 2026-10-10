@@ -1,4 +1,5 @@
 import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
+import { KvOAuthError } from '@netscript/auth-kv-oauth';
 import { captureAuthResponseCookies } from '../request-context.ts';
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
 import type {
@@ -266,11 +267,6 @@ export async function revokeSession(
         throw error;
       }
       try {
-        const existing = await backend.sessions.getSession({ sessionId: input.sessionId });
-        if (existing?.id !== input.sessionId) {
-          await audit.setOutcome({ outcome: AuthOutcome.SUCCESS, sessionId: input.sessionId });
-          return { revoked: false, sessionId: input.sessionId };
-        }
         const revoked = await backend.sessions.revokeSession(input.sessionId);
         await audit.setOutcome({
           outcome: AuthOutcome.SUCCESS,
@@ -280,6 +276,10 @@ export async function revokeSession(
         await recordRevokedSessions(audit, { revoked: [revoked] });
         return { revoked: true, sessionId: revoked.id };
       } catch (error) {
+        if (error instanceof KvOAuthError && error.code === 'session_not_found') {
+          await audit.setOutcome({ outcome: AuthOutcome.SUCCESS, sessionId: input.sessionId });
+          return { revoked: false, sessionId: input.sessionId };
+        }
         const authError = providerFailure(error, backend.name);
         await recordAuthFailure(audit, authError.message);
         throw authError;

@@ -9,7 +9,7 @@ order: 1
 
 # Authentication
 
-**One env var and five endpoints separate a scaffolded workspace from a working OAuth sign-in —
+**One env var and six endpoints separate a scaffolded workspace from a working OAuth sign-in —
 and the boundaries fail loud with typed errors instead of degrading to a silent anonymous
 session.** Auth is the part of a backend where "compiles and demos fine" and "actually holds"
 diverge most easily, so NetScript puts the conventions in the contract rather than in notes an
@@ -226,7 +226,7 @@ The plugin's service is named `auth-api` and is built with `@netscript/service`'
     { name: "signin", type: "POST", desc: "Begins the interactive sign-in. Requires backend.interactive; on WorkOS / better-auth it returns AUTH_PROVIDER_ERROR (502) because those backends are non-interactive." },
     { name: "callback", type: "POST", desc: "Completes the OAuth/OIDC redirect, mints the session, sets the session cookie. Interactive-only — same non-interactive caveat as signin." },
     { name: "signout", type: "POST", desc: "Ends the caller's own session and clears the cookie. Requires a credential (session cookie or bearer), else 401. sessionId selects another session of the same subject; everywhere: true revokes every session of the subject." },
-    { name: "revokeSession", type: "POST", desc: "Operator revocation of any session, at /sessions/revoke. Requires the auth:sessions:revoke scope (403 without it); returns { revoked: false } for an unknown id." },
+    { name: "revokeSession", type: "POST", desc: "Operator revocation of any session, at /sessions/revoke. Requires the auth:sessions:revoke scope (403 without it). kv-oauth returns { revoked: false } for a definite unknown id; better-auth and WorkOS return AUTH_PROVIDER_ERROR (502), since revocation by id is unsupported." },
     { name: "session", type: "GET", desc: "Resolves the current AuthSession from the cookie (active | expired | revoked), refreshing on read when policy allows." },
     { name: "me", type: "GET", desc: "Returns { authenticated: true, user, session } when a valid active session exists, or { authenticated: false } (HTTP 200) when there is none." }
   ]
@@ -255,10 +255,19 @@ otherwise the `__Host-ns_session` cookie does. Every other procedure stays publi
   describes the residual window on better-auth's own endpoints. `workos` has no user-wide
   revocation API and returns `AUTH_PROVIDER_ERROR`; this is tracked in #2190.
 - **Operators.** Revoking somebody else's session is the separate `revokeSession` procedure,
-  gated by the `auth:sessions:revoke` scope. A worker or saga calls it with a service identity
-  that holds the scope, so no person needs to be signed in. The CLI's
+  gated by the `auth:sessions:revoke` scope on an authenticated backend session. The auth service's
+  guard currently accepts backend session credentials only; internal service credentials are not
+  composed into this guard. The CLI's
   `netscript plugin auth session list` and `session revoke` both refuse to run without a
   credential. Both read it from `NETSCRIPT_AUTH_TOKEN`.
+- **Revocation by id.** The kv-oauth backend supports operator revocation and same-subject sibling
+  selectors. A definite missing kv-oauth session returns `{ revoked: false }` from the operator
+  route. The better-auth and WorkOS adapters cannot revoke by id: they return `AUTH_PROVIDER_ERROR`
+  (502), never a successful "not found" result. For signout, the request credential can prove
+  ownership of the caller's own selected session, which then gets the same provider error for
+  single-session revocation. These adapters cannot prove ownership of a sibling by id alone, so
+  sibling, foreign and unknown selectors receive the same `401` ownership refusal. On better-auth,
+  omit the sibling selector and use `everywhere: true` for supported subject-wide logout.
 
 ```ts
 // Browser: the session cookie authenticates the call and selects the session to end.

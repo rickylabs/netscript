@@ -70,6 +70,27 @@ Deno.test('auth session adapter reports an unknown session instead of a revocati
   );
 });
 
+Deno.test('auth session adapter reports unsupported provider revocation distinctly from not found', async () => {
+  const client = new FetchAuthSessionHttp(() =>
+    Promise.resolve(Response.json({
+      code: 'AUTH_PROVIDER_ERROR',
+      data: {
+        reason:
+          'better-auth does not support sessions.revokeSession: revocation by id is unavailable.',
+      },
+    }, { status: 502 }))
+  );
+  const error = await assertRejects(
+    () =>
+      client.revoke('https://auth.test/api/v1/auth', 'live-session', {
+        context: { auth: { getAccessToken: () => 'operator-token' } },
+      }),
+    Error,
+    'better-auth does not support sessions.revokeSession',
+  );
+  assertFalse(error.message.includes('not found'));
+});
+
 Deno.test('auth session adapter preserves bearer cleartext guard without disclosure', async () => {
   const credential = crypto.randomUUID();
   const client = new FetchAuthSessionHttp(() => {

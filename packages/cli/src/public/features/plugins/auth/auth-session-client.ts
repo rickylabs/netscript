@@ -61,9 +61,22 @@ export class FetchAuthSessionHttp implements AuthSessionHttpPort {
       headers,
       body: JSON.stringify(input),
     });
-    if (!response.ok) throw new Error(`Auth session revocation returned HTTP ${response.status}.`);
-    const value = await response.json() as { sessionId?: unknown; revoked?: unknown };
-    if (value.revoked !== true) throw new Error(`Auth session ${sessionId} was not found.`);
+    const value: unknown = await response.json().catch(() => undefined);
+    if (!response.ok) {
+      if (isRecord(value) && value.code === 'AUTH_PROVIDER_ERROR') {
+        const reason = isRecord(value.data) && typeof value.data.reason === 'string'
+          ? value.data.reason
+          : 'The auth backend could not perform session revocation.';
+        throw new Error(`Auth session revocation failed (AUTH_PROVIDER_ERROR): ${reason}`);
+      }
+      throw new Error(`Auth session revocation returned HTTP ${response.status}.`);
+    }
+    if (isRecord(value) && value.revoked === false) {
+      throw new Error(`Auth session ${sessionId} was not found.`);
+    }
+    if (!isRecord(value) || value.revoked !== true) {
+      throw new Error('Auth session revocation returned an invalid response.');
+    }
     return typeof value.sessionId === 'string' ? value.sessionId : sessionId;
   }
 }

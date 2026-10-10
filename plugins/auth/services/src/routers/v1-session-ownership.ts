@@ -87,12 +87,12 @@ export async function revokeSignoutSessions(
 ): Promise<SignoutRevocation> {
   const selected = selection.sessionId === undefined
     ? undefined
-    : await requireOwnedSession(backend, principal, selection.sessionId);
+    : await requireOwnedSession(backend, principal, selection.sessionId, request);
   const sessionId = selection.sessionId ?? credentialSessionId(principal);
   if (selection.everywhere) {
     // Resolve the caller's session before the subject is revoked, for its audit and stream event;
-    // a backend that cannot look sessions up by id simply contributes none.
-    const current = selected ?? await ownSessionOrUndefined(backend, principal, sessionId);
+    // request-only backends can prove the caller's session through its credential.
+    const current = selected ?? await ownSessionOrUndefined(backend, principal, sessionId, request);
     const { revokedAt } = await backend.sessions.revokeSubjectSessions({
       subject: principal.subject,
       request,
@@ -106,7 +106,7 @@ export async function revokeSignoutSessions(
   if (sessionId === undefined) {
     throw new AuthServiceHandlerError('UNAUTHORIZED', NO_ACTIVE_SESSION_REASON);
   }
-  const owned = selected ?? await requireOwnedSession(backend, principal, sessionId);
+  const owned = selected ?? await requireOwnedSession(backend, principal, sessionId, request);
   return { sessionId, revoked: [await backend.sessions.revokeSession(owned.id)] };
 }
 
@@ -114,8 +114,9 @@ async function requireOwnedSession(
   backend: AuthBackendPort,
   principal: Principal,
   sessionId: string,
+  request?: AuthnRequest,
 ): Promise<AuthSession> {
-  const found = await ownSessionOrUndefined(backend, principal, sessionId);
+  const found = await ownSessionOrUndefined(backend, principal, sessionId, request);
   if (!found) {
     throw new AuthServiceHandlerError('UNAUTHORIZED', SESSION_NOT_OWNED_REASON);
   }
@@ -126,9 +127,13 @@ async function ownSessionOrUndefined(
   backend: AuthBackendPort,
   principal: Principal,
   sessionId: string | undefined,
+  request?: AuthnRequest,
 ): Promise<AuthSession | undefined> {
   if (sessionId === undefined) return undefined;
-  const found = await backend.sessions.getSession({ sessionId });
+  // A request-only backend may resolve the caller's own session even though id lookup is
+  // unavailable. Both id and subject must still match; a foreign/unknown selector stays refused.
+  const found = await backend.sessions.getSession({ sessionId }) ??
+    (request ? await backend.sessions.getSession({ request }) : undefined);
   return found?.id === sessionId && found.subject === principal.subject ? found : undefined;
 }
 
