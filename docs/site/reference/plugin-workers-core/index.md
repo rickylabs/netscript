@@ -22,10 +22,10 @@ to a NetScript host. Use it directly for custom hosts, libraries, and tests.
 
 ## Job context cancellation
 
-`JobHandlerContext` on the root surface and `JobContext` on the runtime surface
-carry a required `signal: AbortSignal` and optional `deadlineAt: number` (epoch
-milliseconds). `JobDispatchContext` accepts an optional caller signal; the
-`InProcessJobRunner` supplies a separate owned signal to the handler.
+`JobHandlerContext` on the root surface and `JobContext` on the runtime surface carry a required
+`signal: AbortSignal` and optional `deadlineAt: number` (epoch milliseconds). `JobDispatchContext`
+accepts an optional caller signal; the `InProcessJobRunner` supplies a separate owned signal to the
+handler.
 
 | Input or event                       | In-process runner behavior                                                                                       |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
@@ -37,13 +37,13 @@ milliseconds). `JobDispatchContext` accepts an optional caller signal; the
 | Later abort                          | Does not replace the first abort reason.                                                                         |
 | Cleanup exceeds `abortGracePeriodMs` | Dispatch rejects with the abort reason; default budget 1,000 ms, without physical JavaScript termination.        |
 
-Pass the signal into downstream abort-aware APIs and check it at yielding
-checkpoints. Cleanup belongs in `finally`. See
-[handler guidance](/background-processing/workers/#observe-cancellation-and-deadlines)
-and [cleanup tuning](/background-processing/how-to/tune-worker-runtime/#abort-cleanup-budget).
-The Workers API runs router does not expose an operator cancel operation; caller
-signal cancellation here describes custom in-process dispatch, not an HTTP cancel
-endpoint. Other execution modes require their own propagation verification.
+Pass the signal into downstream abort-aware APIs and check it at yielding checkpoints. Cleanup
+belongs in `finally`. See
+[handler guidance](/background-processing/workers/#observe-cancellation-and-deadlines) and
+[cleanup tuning](/background-processing/how-to/tune-worker-runtime/#abort-cleanup-budget). The
+Workers API runs router does not expose an operator cancel operation; caller signal cancellation
+here describes custom in-process dispatch, not an HTTP cancel endpoint. Other execution modes
+require their own propagation verification.
 
 ## Exports
 
