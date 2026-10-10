@@ -100,7 +100,7 @@ accepts `--dry-run`.
 | `netscript plugin install` / `netscript plugin update` / `netscript plugin remove` | Plugin dependency and host registration | Workspace glue, plugin registries, Aspire helpers | AppHost and plugin service/runtime discovery | `install --dry-run`; others no |
 | `netscript generate plugins` | Installed plugin manifests and project source | `.netscript/generated` plugin registries | Plugin host and generated imports | `--dry-run` |
 | `netscript generate runtime-schemas` | Runtime topic declarations | Runtime-config JSON Schema files | Editors, validators, runtime override tooling | `--dry-run` |
-| `netscript generate aspire` | `aspire/appsettings.json` | AppHost helper files | Aspire AppHost | No |
+| `netscript generate aspire` | Root `appsettings.json` | AppHost helper files and `.netscript/aspire-cli.ts` | Aspire AppHost and telemetry tasks | No |
 | `netscript ui:init` / `netscript ui:add` | Registry selection | Workspace-owned components, pages, islands, styles, and tokens | Fresh app and its Vite build | No |
 | `netscript ui:update` / `netscript ui:remove` | Installed registry inventory and unmodified copied files | Updated or removed copy-source UI files | Fresh app and its Vite build | No |
 | `netscript deploy build` / target `plan` | Deployment manifest plus project entrypoints | Target deployment artifacts or an emitted plan | Target runtime or service manager | `plan` is non-deploying |
@@ -142,6 +142,50 @@ Run these commands from inside the `aspire/` folder with the Aspire CLI (13.5.3)
     { name: "Search Aspire docs", type: "aspire docs api search <query> --language typescript", desc: "Query the Aspire documentation CLI for TypeScript and AppHost API references." }
   ]
 }) }}
+
+### Select a pinned Aspire executable
+
+Set `NETSCRIPT_ASPIRE_CLI` to the executable name or path for your pinned toolchain. Unset or empty,
+it defaults to `aspire`. The generated `aspire:otel` and `aspire:export` tasks use it for both the
+primary command and the `aspire ps` dashboard fallback. NetScript's database operation executor and
+`netscript agent init` use the same variable.
+
+The value is one executable, not a shell command with arguments. To activate a version manager,
+create an executable wrapper such as `tools/aspire-pinned`:
+
+```sh
+#!/bin/sh
+exec mise exec -- aspire "$@"
+```
+
+Make it executable (`chmod +x tools/aspire-pinned`), then run from the workspace root:
+
+```sh
+export NETSCRIPT_ASPIRE_CLI="$PWD/tools/aspire-pinned"
+deno task aspire:otel -- traces users
+```
+
+An absolute path also works in non-interactive shells without activating the version manager. Direct
+`aspire` commands and the `aspire:start` tasks still use your shell's PATH.
+
+Refresh the generated helper with `netscript generate aspire`; do not hand-edit
+`.netscript/aspire-cli.ts`. This command also regenerates the AppHost helpers from root
+`appsettings.json`, and refuses a workspace scaffolded with `--no-aspire`. It does not rewrite root
+`deno.json`. Plugin install/update/remove and service add/remove also regenerate this helper.
+Existing workspace tasks with `--allow-run=aspire --allow-read` keep using `aspire` after regeneration,
+even in non-interactive runs: the helper reads the override only when env permission is already
+granted, and otherwise defaults to `aspire` without prompting. For an existing workspace, update its
+two telemetry task grants only when adopting the override:
+
+```json
+{
+  "aspire:otel": "deno run --allow-run --allow-env=NETSCRIPT_ASPIRE_CLI --allow-read .netscript/aspire-cli.ts otel",
+  "aspire:export": "deno run --allow-run --allow-env=NETSCRIPT_ASPIRE_CLI --allow-read .netscript/aspire-cli.ts export"
+}
+```
+
+These two tasks permit subprocess execution without an executable-name restriction so they can run
+the override; environment access is limited to `NETSCRIPT_ASPIRE_CLI`.
 
 ## Run & iterate
 
