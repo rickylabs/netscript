@@ -20,6 +20,9 @@ const env = {
   NETSCRIPT_AUTH_CLIENT_SECRET: 'secret_test',
   NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: 'https://issuer.example.test/authorize',
   NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/token',
+  NETSCRIPT_AUTH_USERINFO_ENDPOINT: 'https://issuer.example.test/userinfo',
+  NETSCRIPT_AUTH_SUBJECT_SOURCE: 'userinfo',
+  NETSCRIPT_AUTH_SUBJECT_CLAIM: 'id',
   NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
   NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
 };
@@ -27,12 +30,12 @@ const request = {
   url: 'http://app.example.test/signin',
   headers: new Headers({ 'x-forwarded-proto': 'https' }),
 };
-const tokenFetch = () =>
-  Promise.resolve(Response.json({
-    access_token: 'access_test',
-    token_type: 'Bearer',
-    expires_in: 3600,
-  }));
+const tokenFetch: typeof fetch = (input) =>
+  Promise.resolve(
+    String(input) === env.NETSCRIPT_AUTH_USERINFO_ENDPOINT
+      ? Response.json({ id: 'transport-user' })
+      : Response.json({ access_token: 'access_test', token_type: 'Bearer', expires_in: 3600 }),
+  );
 
 Deno.test('#2026 plugin proxy env opt-in drives both signin and callback without outbound relaxation', async () => {
   await using kv = new MemoryKvAdapter();
@@ -178,7 +181,10 @@ Deno.test('#2026 plugin direct TLS signin and near-expiry refresh honor the secu
   const registry = await createAuthServiceBackendRegistry({
     kv,
     env: { ...env, NETSCRIPT_AUTH_COOKIE_SECURE: 'true' },
-    fetch: () => {
+    fetch: (input) => {
+      if (String(input) === env.NETSCRIPT_AUTH_USERINFO_ENDPOINT) {
+        return Promise.resolve(Response.json({ id: 'transport-user' }));
+      }
       tokenRequests++;
       return Promise.resolve(Response.json({
         access_token: 'access_test',

@@ -25,13 +25,17 @@ const provider = defineOAuthProvider({
   clientId: 'client_test',
   authorizationEndpoint: 'https://issuer.example.test/authorize',
   tokenEndpoint: 'https://issuer.example.test/token',
+  userInfoEndpoint: 'https://issuer.example.test/userinfo',
+  subject: { source: 'userinfo', claim: 'id' },
   redirectUri: 'https://app.example.test/callback',
   clientAuthMethod: 'none',
 });
 const encryptionKey = new ArrayBuffer(32);
-const tokenFetch = () =>
+const tokenFetch = (url: string | URL) =>
   Promise.resolve(
-    Response.json({ access_token: 'access_test', token_type: 'Bearer', expires_in: 3600 }),
+    String(url) === provider.userInfoEndpoint
+      ? Response.json({ id: 'transport-user' })
+      : Response.json({ access_token: 'access_test', token_type: 'Bearer', expires_in: 3600 }),
   );
 
 function proxiedRequest(
@@ -115,7 +119,7 @@ Deno.test('#2026 proxy trust preserves outbound HTTPS enforcement for discovery 
     trustProxyHeaders: true,
     fetch: () => {
       fetched = true;
-      return tokenFetch();
+      return tokenFetch('https://issuer.example.test/token');
     },
   });
   const error = await assertRejects(() => flow.signIn(proxiedRequest()), Error);
@@ -246,7 +250,7 @@ Deno.test('#2026 trusted proxy does not permit an outbound HTTP token endpoint',
     trustProxyHeaders: true,
     fetch: () => {
       fetched = true;
-      return tokenFetch();
+      return tokenFetch('https://issuer.example.test/token');
     },
   });
   const signin = await flow.signIn(proxiedRequest());

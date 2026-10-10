@@ -11,7 +11,12 @@
  * @module
  */
 
-/** Error code emitted by the KV OAuth backend. */
+/**
+ * Error code emitted by the KV OAuth backend.
+ *
+ * `subject_missing` refuses a sign-in whose configured subject source yielded no stable
+ * identifier; `userinfo_failed` reports a failed or unreadable userinfo request.
+ */
 export type KvOAuthErrorCode =
   | 'oauth_cookie_missing'
   | 'oauth_txn_not_found'
@@ -23,7 +28,9 @@ export type KvOAuthErrorCode =
   | 'session_not_found'
   | 'configuration_error'
   | 'flow_https_required'
-  | 'cookie_https_required';
+  | 'cookie_https_required'
+  | 'subject_missing'
+  | 'userinfo_failed';
 
 /** Structured error thrown for expected OAuth backend failures. */
 export class KvOAuthError extends Error {
