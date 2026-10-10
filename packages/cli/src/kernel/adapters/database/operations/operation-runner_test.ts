@@ -4,7 +4,7 @@ import { join } from '@std/path';
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 
-import type { DbOperationRequest, DiscoveredDatabase } from '../../domain/db-engine.ts';
+import type { DbOperationRequest, DiscoveredDatabase } from '../../../domain/db-engine.ts';
 import type { AppHostLifecycleLease, AppHostLifecycleLock } from './apphost-lifecycle-lock.ts';
 import { DbOperationRunner } from './operation-runner.ts';
 

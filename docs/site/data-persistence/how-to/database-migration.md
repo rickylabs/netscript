@@ -69,7 +69,10 @@ terminal.
 If you scaffolded with `--no-aspire`, you are responsible for pointing the workspace at your own
 Postgres via `POSTGRES_URI` / `DATABASE_URL` (see [Deploy](/orchestration-runtime/how-to/deploy/));
 there is no AppHost to start, so you skip Step 2, but the migration commands in Step 3 are otherwise
-identical and talk to whatever database those variables resolve to.
+identical and talk to whatever database those variables resolve to. Without an `aspire/apphost.mts`,
+each `netscript db <command>` runs the matching task in the database workspace directly
+(`deno task --cwd database/postgres db:<command>:postgres`) with your environment, and the generated
+`appsettings.json` registers the database with `Mode: "External"`.
 
 Run every command from your workspace root unless a step says otherwise. To target a workspace other
 than the current directory, pass `--project-root <path>` — useful in CI or when scripting against a

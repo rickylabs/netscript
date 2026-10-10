@@ -2,7 +2,7 @@
 
 import { dirname, join } from '@std/path';
 
-import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
+import { SCAFFOLD_DIRS } from '../../../constants/scaffold/scaffold-dirs.ts';
 
 interface LockRecord {
   readonly pid: number;

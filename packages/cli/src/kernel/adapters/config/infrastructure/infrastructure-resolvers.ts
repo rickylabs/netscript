@@ -4,8 +4,8 @@ import {
   DB_DEFAULT_PORTS,
   DB_PASSWORD_ENV_VARS,
   DB_PROVIDERS,
-} from '../../constants/providers.ts';
-import type { CacheConfig, DatabaseConfig } from '../../domain/infrastructure-config.ts';
+} from '../../../constants/providers.ts';
+import type { CacheConfig, DatabaseConfig } from '../../../domain/infrastructure-config.ts';
 import { findAspireContainer, inspectDockerContainer } from './infrastructure-docker.ts';
 import {
   buildCacheUri,

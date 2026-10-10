@@ -428,7 +428,7 @@ jobs:
         if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
-          .llm/tools/gates/run-gate.ts --gate lint --id quality-lint
+          .llm/tools/gates/run-gate.ts --gate lint-report --id quality-lint
           --output .llm/tmp/gate-receipts/quality/lint.receipt.json
           --child-report .llm/tmp/gate-receipts/quality/lint.report.json --
           --output .llm/tmp/gate-receipts/quality/lint.report.json
@@ -437,7 +437,7 @@ jobs:
         if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
-          .llm/tools/gates/run-gate.ts --gate fmt-check --id quality-fmt
+          .llm/tools/gates/run-gate.ts --gate fmt-check-report --id quality-fmt
           --output .llm/tmp/gate-receipts/quality/fmt.receipt.json
           --child-report .llm/tmp/gate-receipts/quality/fmt.report.json --
           --output .llm/tmp/gate-receipts/quality/fmt.report.json

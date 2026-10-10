@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { resolveEffectivePluginPermissions } from './deploy-config-resolvers.ts';
+import { resolveEffectivePluginPermissions } from './deploy-config/deploy-config-resolvers.ts';
 
 Deno.test('plugin permission precedence preserves every canonical slot', () => {
   const global = ['--global'];
