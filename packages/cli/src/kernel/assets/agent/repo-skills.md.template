@@ -1,0 +1,14 @@
+---
+name: repo-skills
+description: Load named project skills ({{SKILL_NAMES}}) from their authoritative .agents/skills tree.
+---
+
+# {{PROJECT_NAME}} repository skills
+
+All project skills live in `.agents/skills/`.
+
+When a task names a repository skill, read `.agents/skills/<name>/SKILL.md` completely before
+acting, then resolve its relative references from that skill directory. Do not search for or create
+copies under `.claude/skills/`; this command installs only the `repo-skills` discovery bridge
+in the Claude skill tree. Existing legacy copies and custom skills may remain; legacy copies are
+not refreshed by this command.

@@ -84,7 +84,7 @@ NetScript section in `AGENTS.md`. Host and editor targets add only their own int
 
 | Host or editor target | Additional files written |
 | --- | --- |
-| Claude Code host | `.mcp.json`, a derived mirror of the canonical bundle under `.claude/skills/`, and the conditional `playwright-cli` skill when that skill is absent and Aspire is available (best-effort; failures and timeouts are reported and skipped) |
+| Claude Code host | `.mcp.json`, the single discovery bridge `.claude/skills/repo-skills/SKILL.md`, and `CLAUDE.md` with an `@AGENTS.md` import |
 | VS Code editor | `.vscode/mcp.json`, `.netscript/schema/config-file.v1.json`, `.vscode/settings.json`, `.vscode/extensions.json`, `.vscode/launch.json`, `.vscode/tasks.json` |
 | Zed editor | `.zed/settings.json` with `context_servers`, `.zed/debug.json`, `.zed/tasks.json`, `.netscript/schema/config-file.v1.json` |
 | OpenCode host | `opencode.json` (or an existing `opencode.jsonc`) with `netscript` and `aspire` local MCP servers, the `deno lsp` language server, and the `deno fmt` formatter |
@@ -109,12 +109,21 @@ project. Re-running `agent init` is idempotent: unchanged files are left alone,
 and existing host configuration is preserved alongside the `netscript` server
 entry.
 
+Claude's bridge directs the agent to read skills from the authoritative `.agents/skills/` tree
+and resolve bundled references there. A new `CLAUDE.md` starts with `@AGENTS.md`; an existing
+file receives the import and Claude-specific named-skill routing line once, preserving its content. Upstream Aspire workflow skills are
+installed only in the standard `.agents/skills/` location, so initialization creates no skill
+mirrors. Existing legacy mirrors and custom Claude skills are left in place. Initialization warns
+when known legacy skill directories are present because they are no longer refreshed; automatic removal
+of identical legacy mirrors and divergent-file reporting remain follow-up work.
+
 The marked `AGENTS.md` section states that MCP is the default surface for NetScript work. When no
 `netscript` MCP tools are listed, it tells the agent to call MCP `doctor` if the server is up, or
 otherwise run `netscript plugin doctor` from the shell (there is no bare `netscript doctor`). The
 agent then re-runs `netscript agent init --host <host>` and restarts its host. Skills are named by
-their registered name ("call the `netscript` skill"), so hosts load them through their skill tool
-instead of reading `SKILL.md` files directly.
+their registered name ("call the `netscript` skill"). Hosts that register those names load them
+through their skill tool. On Claude Code, call the `repo-skills` bridge with the requested skill
+name; the bridge permits reading `.agents/skills/<name>/SKILL.md` and its bundled references.
 
 Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
 to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
