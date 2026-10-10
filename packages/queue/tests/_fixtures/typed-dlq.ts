@@ -77,16 +77,22 @@ export async function typedDlqRedelivery(backend: 'memory' | 'kv'): Promise<void
     ? new KvDeadLetterStore({ queueName: 'typed-dlq', denoKv: kv })
     : new MemoryDeadLetterStore();
   const redelivered = Promise.withResolvers<void>();
+  const firstPersisted = Promise.withResolvers<void>();
   const release = Promise.withResolvers<void>();
   const lostAck = new Error('injected lost acknowledgement after DLQ persistence');
   let calls = 0;
   let appendCompleted = false;
   const store: DeadLetterStorePort = {
     async append(record) {
-      calls++;
+      const attempt = ++calls;
+      // Native KV can overlap deliveries. Fix the persistence ordering before injecting loss.
+      if (attempt > 1) await firstPersisted.promise;
       // Different timestamps make duplicate identity independent of wall-clock precision.
-      await deadLetters.append({ ...record, failedAt: `2026-10-01T00:00:0${calls}.000Z` });
-      if (calls === 1) throw lostAck;
+      await deadLetters.append({ ...record, failedAt: `2026-10-01T00:00:0${attempt}.000Z` });
+      if (attempt === 1) {
+        firstPersisted.resolve();
+        throw lostAck;
+      }
       redelivered.resolve();
       await release.promise;
       appendCompleted = true;
@@ -116,6 +122,7 @@ export async function typedDlqRedelivery(backend: 'memory' | 'kv'): Promise<void
     await kv.enqueue(envelope, { backoffSchedule: [0] });
     await deadline(redelivered.promise, 5_000);
     controller.abort();
+    firstPersisted.resolve();
     release.resolve();
     await deadline(listening, 5_000);
     await queue.stop();
@@ -129,6 +136,7 @@ export async function typedDlqRedelivery(backend: 'memory' | 'kv'): Promise<void
     assertEquals(records[0].errorCode, 'VALIDATION_ERROR');
   } finally {
     controller.abort();
+    firstPersisted.resolve();
     release.resolve();
     try {
       await queue.stop();
