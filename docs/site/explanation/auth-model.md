@@ -248,3 +248,20 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
   `AuthenticatorPort`).
 
 {{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next: { label: "Durability model", href: "/explanation/durability-model/" } }) }}
+
+## Generated browser topology
+
+The generated Fresh app uses a backend for frontend (BFF). Installing auth emits
+app-origin signin, callback, session, and signout routes backed by the existing
+auth plugin. The first-party HttpOnly cookie carries the opaque session
+credential. The app reads it only on the server and supplies it to the SDK
+bearer contribution for each guarded service call; the service verifies the
+bearer through the remote auth authenticator. Browser JSON excludes session
+credentials, and credentialed calls use direct-only caching.
+
+The generated service policy keeps demonstration routes public and guards other
+API routes. Authored policies and routes remain authoritative. Background
+processing belongs to workers, sagas, and triggers using service identities. See
+[Add authentication](/identity-access/how-to/add-authentication/) for the
+generated route and client recipe, local cookie behavior, and deployment
+limitations.

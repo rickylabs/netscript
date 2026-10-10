@@ -271,6 +271,17 @@ export function createRuntimeBehaviorGates(
       (context) => pluginProbeCommand(context, 'triggers-api', 'trigger-events'),
     ),
     commandGate(
+      GATE.BEHAVIOR_AUTH_BFF,
+      'Generated BFF cookie-to-bearer conformance with native auth and service fixtures',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'test',
+        '--allow-all',
+        `${context.project.repoRoot}/packages/cli/e2e/tests/application/gates/scaffold/browser-auth-topology_test.ts`,
+      ],
+    ),
+    commandGate(
       GATE.BEHAVIOR_AUTH_LIVE,
       'Auth API liveness',
       GATE_PHASE.BEHAVIOR,

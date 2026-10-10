@@ -11,7 +11,7 @@ oldUrl: /how-to/add-authentication/
 **Scope.** This recipe adds sign-in, sessions, and a `/me` identity endpoint to an existing
 NetScript workspace by installing the official **`auth`** plugin. You will choose an
 authentication backend, set the backend's environment, run the auth database migration, and
-verify a live session through the `auth-api` service on **`:8094`**. By the end you have a
+verify a live session through the generated Fresh app on its Aspire-discovered origin. By the end you have a
 working OAuth/OIDC sign-in flow on the default backend (`kv-oauth`) and a clear picture of what
 the two non-interactive backends (`workos`, `better-auth`) do and do not provide.
 
@@ -293,7 +293,69 @@ The service also exposes liveness/readiness probes at `/health/live` and `/healt
 OpenAPI docs, through the standard `@netscript/service` builder. Watch it come up in the Aspire
 dashboard at [https://localhost:18888](https://localhost:18888) under the `auth-api` resource.
 
-## Step 7 — Verify a session
+## Step 7 — Sign in through the generated app
+
+Installing auth into a generated Fresh workspace emits `auth/bff.ts`,
+`auth/service.ts`, and `apps/<app>/routes/auth/[action].ts`. Helper regeneration
+also wires newly added services to the same auth resource. Register the provider
+callback URI as `<app-origin>/auth/callback`, using the app endpoint reported by
+Aspire. No fixed app port is required.
+
+Submit a same-origin HTML form with `method="post"` and `action="/auth/signin"`.
+The app forwards the signin operation to the existing auth plugin and follows
+its provider authorization redirect. The provider returns to the app's GET
+`/auth/callback` route, which submits the code, state, and transaction cookie as
+typed callback input to the plugin. The app response sets the first-party
+HttpOnly session cookie and redirects to the app. GET `/auth/session` then
+returns `authenticated` and `subject`, without exposing the session id. POST
+`/auth/signout` requires the app's Origin, revokes the session, and expires the
+cookie.
+
+Use HTTPS in production. The generated local adapter issues a Secure
+`__Host-ns_session` cookie on `localhost`, which browsers treat as a secure
+cookie host even with a local HTTP endpoint. Other HTTP hosts are refused. If
+you configure `NETSCRIPT_AUTH_COOKIE_NAME`, export the same value for the app
+and auth service before starting Aspire. Authored routes and service policies
+are preserved during regeneration; custom app layouts must mount the adapter
+themselves.
+
+For a guarded server-side read, attach the generated client to the service
+contract and supply only the incoming request's credential context:
+
+```ts
+import {
+  browserSessionContext,
+  createBrowserSessionClient,
+} from "./auth/bff.ts";
+import { CatalogContractV1 } from "./contracts/catalog/v1/mod.ts";
+
+declare const request: Request;
+const catalog = createBrowserSessionClient(
+  CatalogContractV1,
+  "catalog",
+  "catalog",
+);
+const result = await catalog.list({}, {
+  context: browserSessionContext(request),
+});
+```
+
+The generated bearer contribution uses `direct-only` caching: credentials and
+authenticated responses never enter a shared query cache. Services verify the
+forwarded bearer through the existing remote authenticator; browser cookies are
+never forwarded to guarded services. The scaffold's demonstration service routes
+remain public. Other `/api` paths require a bearer once the CLI installs its
+generated policy. Replace the demo exemptions when making those routes private,
+and keep browser reads in server-side app handlers. Workers, sagas, and triggers
+use a service identity independently of browser sessions.
+
+Generated CORS origins include enabled workspace apps and extend each
+service/plugin's declared `NETSCRIPT_CORS_ORIGINS`. This is a response
+allowlist; it does not authorize cookie callers. Publish-mode endpoint
+references still require a deployment's public app origin configuration; this
+local scaffold recipe does not certify deployment or browser conformance.
+
+### Direct auth service diagnostics
 
 Confirm the service is up and the session endpoint responds. On a fresh, unauthenticated request,
 `session` reports no active session — which proves the endpoint is wired even before you complete a
@@ -359,8 +421,8 @@ input `txn`; a callback without either fails with `oauth_cookie_missing`.
 
 A successful `GET /api/v1/auth/session` after callback returns the active
 session; `GET /api/v1/auth/me` returns the authenticated principal. The callback
-still includes `sessionId` for existing bearer consumers while the browser
-topology is decided; browser callers can rely on the cookie alone.
+includes `sessionId` for server-side bearer consumers. The generated BFF never returns it in
+browser JSON; browser callers use the first-party app cookie.
 
 ### 0.0.8 cookie migration
 

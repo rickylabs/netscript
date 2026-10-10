@@ -1,0 +1,119 @@
+/** Request-time browser authentication adapter. Never import this module into an island. */
+import { getCookies } from 'jsr:@std/http@^1/cookie';
+import { getServiceUrl } from '@netscript/sdk/discovery';
+import {
+  type ContractLike,
+  createServiceClient,
+  type ServiceClient,
+  type ServiceClientContext,
+} from '@netscript/sdk/client';
+import { authContract } from '@netscript/plugin-auth-core/contracts/v1';
+import { createBearerSdkClientContribution } from '@netscript/plugin-auth-core/sdk';
+
+const serviceName = {{authServiceName}};
+const cookieName = Deno.env.get('NETSCRIPT_AUTH_COOKIE_NAME') ?? '__Host-ns_session';
+const bearer = createBearerSdkClientContribution<{ accessToken?: string }>({
+  context: { accessToken: 'optional' },
+  resolveCredential: ({ context }) => context.accessToken,
+  responseCache: { mode: 'direct-only' },
+  unmarked: 'required',
+});
+
+/** Explicit SDK client for server-side calls to a guarded service. */
+export function createBrowserSessionClient<T extends ContractLike>(
+  contract: T,
+  name: string,
+  routerName: string,
+): ServiceClient<T, ServiceClientContext & { accessToken?: string }> {
+  return createServiceClient({
+    contract,
+    serviceName: name,
+    routerName,
+    contributions: [bearer] as const,
+  });
+}
+
+/** Per-request credential context; never retained between requests or cached. */
+export function browserSessionContext(
+  request: Request,
+): { accessToken?: string; signal: AbortSignal } {
+  return { accessToken: getCookies(request.headers)[cookieName], signal: request.signal };
+}
+
+const auth = createBrowserSessionClient(authContract, serviceName, 'auth');
+
+/** Adapt only the interactive auth routes, rather than exposing a generic upstream proxy. */
+export async function handleBrowserAuth(request: Request, action: string): Promise<Response> {
+  const url = new URL(request.url);
+  const headers = new Headers({ 'cache-control': 'no-store' });
+  if (action === 'session' && request.method === 'GET') {
+    if (!browserSessionContext(request).accessToken) {
+      return Response.json({ authenticated: false }, { headers });
+    }
+    try {
+      const result = await auth.session(undefined, { context: browserSessionContext(request) });
+      // Session ids are bearer credentials. Expose only the identity needed by the interface.
+      return Response.json({
+        authenticated: result.authenticated,
+        subject: result.session?.subject,
+      }, { headers });
+    } catch {
+      return Response.json({ authenticated: false }, { status: 401, headers });
+    }
+  }
+  if (!['signin', 'callback', 'signout'].includes(action)) {
+    return new Response(null, { status: 404, headers });
+  }
+  if (request.method !== (action === 'callback' ? 'GET' : 'POST')) {
+    return new Response(null, { status: 405, headers });
+  }
+  // Callback state + transaction binding protects the OAuth return. Mutations require same-origin POST.
+  if (action !== 'callback' && request.headers.get('origin') !== url.origin) {
+    return new Response(null, { status: 403, headers });
+  }
+  if (url.protocol !== 'https:' && url.hostname !== 'localhost') {
+    return new Response(null, { status: 400, headers });
+  }
+  const input = action === 'callback'
+    ? {
+      code: url.searchParams.get('code') ?? undefined,
+      state: url.searchParams.get('state') ?? undefined,
+      error: url.searchParams.get('error') ?? undefined,
+      txn: getCookies(request.headers)[cookieName],
+    }
+    : action === 'signout'
+    ? { sessionId: browserSessionContext(request).accessToken }
+    : {};
+  const endpoint = new URL(`/api/v1/auth/${action}`, getServiceUrl(serviceName));
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    redirect: 'error',
+    signal: request.signal,
+    headers: {
+      'content-type': 'application/json',
+      'x-forwarded-proto': url.hostname === 'localhost' ? 'https' : url.protocol.slice(0, -1),
+    },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) {
+    await response.body?.cancel();
+    return Response.json({ error: 'Authentication failed' }, { status: response.status, headers });
+  }
+  const body = await response.json() as { redirectUrl?: string; redirectTo?: string };
+  for (const cookie of response.headers.getSetCookie()) {
+    if (cookie.startsWith(`${cookieName}=`) || cookie.startsWith(`${cookieName}_txn=`)) {
+      headers.append('set-cookie', cookie);
+    }
+  }
+  const target = action === 'signin' ? body.redirectUrl : body.redirectTo ?? '/';
+  if (target) {
+    const redirect = new URL(target, url);
+    // Provider authorization URLs are external; post-login return paths stay first-party.
+    if (action !== 'signin' && redirect.origin !== url.origin) {
+      return new Response(null, { status: 502, headers });
+    }
+    headers.set('location', redirect.href);
+    return new Response(null, { status: 303, headers });
+  }
+  return new Response(null, { status: 204, headers });
+}

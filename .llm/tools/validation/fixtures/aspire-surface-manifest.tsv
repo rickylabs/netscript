@@ -442,6 +442,7 @@ packages/cli/src/kernel/adapters/database/providers/sqlite.provider.ts	cli-adapt
 packages/cli/src/kernel/adapters/database/scaffolder.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/workspace-mutator.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/plugin/appsettings-entry-builders.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/db-integration.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected

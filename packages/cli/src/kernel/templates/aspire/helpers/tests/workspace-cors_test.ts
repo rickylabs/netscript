@@ -16,7 +16,11 @@ import {
 const config = {
   ...EMPTY_CONFIG,
   Apps: {
-    frontend: { ...UNPINNED_APP, ServiceReferences: ['users'], PluginReferences: ['auth'] },
+    frontend: {
+      ...UNPINNED_APP,
+      ServiceReferences: ['users'],
+      PluginReferences: ['auth'],
+    },
     admin: UNPINNED_APP,
     disabled: { ...UNPINNED_APP, Enabled: false },
     task: TASK_APP,
@@ -35,14 +39,20 @@ Deno.test('generated helper injects deferred app origins into every service and 
     ['admin', 'https://admin.example'],
   ]);
   assertEquals(registered.apps.has('disabled'), false);
-  for (const target of [...registered.services.values(), ...registered.plugins.values()]) {
+  for (
+    const target of [
+      ...registered.services.values(),
+      ...registered.plugins.values(),
+    ]
+  ) {
     assertEquals(
       allocatedValue(corsValue(target), allocated),
       'http://localhost:52137,https://admin.example',
       target.name,
     );
     assertEquals(
-      target.environment.filter((call) => call.key === 'NETSCRIPT_CORS_ORIGINS').length,
+      target.environment.filter((call) => call.key === 'NETSCRIPT_CORS_ORIGINS')
+        .length,
       2,
     );
   }
@@ -63,7 +73,12 @@ Deno.test('generated helper with no enabled web apps injects a deny-cross-origin
     ...config,
     Apps: { disabled: { ...UNPINNED_APP, Enabled: false }, task: TASK_APP },
   });
-  for (const target of [...registered.services.values(), ...registered.plugins.values()]) {
+  for (
+    const target of [
+      ...registered.services.values(),
+      ...registered.plugins.values(),
+    ]
+  ) {
     assertEquals(corsValue(target), '');
   }
 });
@@ -81,7 +96,8 @@ Deno.test('services and plugins accept the generated app origins and refuse fore
   const previous = Deno.env.get('NETSCRIPT_CORS_ORIGINS');
   Deno.env.set('NETSCRIPT_CORS_ORIGINS', generated);
   try {
-    const service = createService({}, { name: 'generated-cors' }).withCors().withHealth().build();
+    const service = createService({}, { name: 'generated-cors' }).withCors()
+      .withHealth().build();
     const plugin = createPluginService({}, {
       name: 'generated-plugin-cors',
       serveRpc: false,
@@ -98,9 +114,15 @@ Deno.test('services and plugins accept the generated app origins and refuse fore
         for (const method of ['GET', 'OPTIONS']) {
           const response = await app.request('/health', {
             method,
-            headers: { origin: origin!, 'access-control-request-method': 'GET' },
+            headers: {
+              origin: origin!,
+              'access-control-request-method': 'GET',
+            },
           });
-          assertEquals(response.headers.get('access-control-allow-origin'), expected);
+          assertEquals(
+            response.headers.get('access-control-allow-origin'),
+            expected,
+          );
           await response.body?.cancel();
         }
       }
@@ -109,4 +131,34 @@ Deno.test('services and plugins accept the generated app origins and refuse fore
     if (previous === undefined) Deno.env.delete('NETSCRIPT_CORS_ORIGINS');
     else Deno.env.set('NETSCRIPT_CORS_ORIGINS', previous);
   }
+});
+
+Deno.test('generated workspace app origins extend declared extra origins for services and plugins', async () => {
+  const registered = await registerWorkspace({
+    ...config,
+    Services: {
+      users: {
+        ...UNPINNED_SERVICE,
+        Environment: { NETSCRIPT_CORS_ORIGINS: 'https://extra.example' },
+      },
+    },
+    Plugins: {
+      auth: {
+        ...UNPINNED_PLUGIN,
+        Env: { NETSCRIPT_CORS_ORIGINS: 'https://admin-extra.example' },
+      },
+    },
+  });
+  const allocated = new Map([['frontend', 'http://localhost:52137'], [
+    'admin',
+    'https://admin.example',
+  ]]);
+  assertEquals(
+    allocatedValue(corsValue(registered.services.get('users')!), allocated),
+    'http://localhost:52137,https://admin.example,https://extra.example',
+  );
+  assertEquals(
+    allocatedValue(corsValue(registered.plugins.get('auth')!), allocated),
+    'http://localhost:52137,https://admin.example,https://admin-extra.example',
+  );
 });

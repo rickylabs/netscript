@@ -66,14 +66,19 @@ export async function registerApps(
 
 {{__slot4__}}
 
-  // Workspace web origins own this generated value, after declared service/plugin environment.
+  // Workspace web origins extend explicitly declared service/plugin origins.
   // Keep endpoint expressions deferred: ports are allocated by Aspire at start/publish time.
-  for (const resources of [_services, _plugins]) {
-    for (const resource of resources.values()) {
+  for (const [resources, entries] of [[_services, config.Services], [_plugins, config.Plugins]] as const) {
+    for (const [name, resource] of resources) {
       if (!isEnvironmentTarget(resource)) {
         throw new TypeError('Service/plugin resource cannot receive the workspace CORS allowlist');
       }
-      await resource.withEnvironment('NETSCRIPT_CORS_ORIGINS', corsOrigins ?? '');
+      const entry = entries[name];
+      const extra = (entry?.Environment ?? entry?.Env)?.NETSCRIPT_CORS_ORIGINS?.trim();
+      const origins = extra && corsOrigins
+        ? ReferenceExpression.create`${corsOrigins},${extra}`
+        : corsOrigins ?? extra ?? '';
+      await resource.withEnvironment('NETSCRIPT_CORS_ORIGINS', origins);
     }
   }
 
