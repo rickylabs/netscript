@@ -39,12 +39,12 @@ export {
 } from '@netscript/plugin-streams-core';
 export type * from '@netscript/plugin-streams-core';
 
-export { createFetchStreamEventSourceV1 } from './streams/application/create-fetch-stream-event-source.ts';
+export { createFetchStreamEventSourceV1 } from './client/stream-source/application/create-fetch-stream-event-source.ts';
 export type {
   FetchStreamEventSourceOptionsV1,
   FetchStreamEventSourceV1,
   StreamFetchV1,
   StreamSourceSchedulerV1,
-} from './streams/ports/fetch-stream-source.ts';
+} from './client/stream-source/ports/fetch-stream-source.ts';
 export { bindStreamEventSourceV1 } from '@netscript/plugin-streams-core/sse';
 export type * from '@netscript/plugin-streams-core/sse';
