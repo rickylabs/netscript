@@ -12,21 +12,21 @@ import {
   DEFAULT_SERVICE_PREFIX,
   DEFAULT_SERVY_CLI_PATH,
   DEFAULT_V8_HEAP_MB,
-} from '../../constants/windows.ts';
+} from '../../../constants/windows.ts';
 import {
   DEFAULT_LINUX_COMPILE_TARGET,
   DEFAULT_LINUX_INSTALL_BASE,
   DEFAULT_LINUX_RUNTIME_DIR,
   DEFAULT_LINUX_UNIT_PREFIX,
   DEFAULT_SYSTEMCTL_PATH,
-} from '../../constants/linux.ts';
+} from '../../../constants/linux.ts';
 import {
   DEFAULT_HEALTH_GATE,
   DEFAULT_OTLP_PROTOCOL,
   DEFAULT_RELEASE_RETENTION,
   DEFAULT_SECRET_ENV_FILE,
   RESTRICTED_SECRET_FILE_MODE,
-} from '../../constants/deploy.ts';
+} from '../../../constants/deploy.ts';
 import type {
   RegisteredPluginConfig,
   ResolvedAppConfig,
@@ -37,8 +37,8 @@ import type {
   ResolvedPluginConfig,
   ResolvedServiceConfig,
   ResolvedWindowsDeployConfig,
-} from '../../domain/resolved-config.ts';
-import { getPluginServiceLookupName } from './plugin-registry.ts';
+} from '../../../domain/resolved-config.ts';
+import { getPluginServiceLookupName } from '../plugin-registry.ts';
 import type {
   NetScriptAppConfig,
   NetScriptSection,

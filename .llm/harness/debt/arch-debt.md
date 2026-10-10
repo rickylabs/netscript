@@ -2003,7 +2003,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Reason:** `netscript db generate` is pure, DB-less codegen (Prisma client + `@database/zod`
   schemas + the `schema/.generated/zod/crud.ts` barrel) but is **Aspire-coupled**: the shared
   `DbOperationRunner.executeDetached`
-  (`packages/cli/src/kernel/adapters/database/operation-runner.ts`) always runs
+  (`packages/cli/src/kernel/adapters/database/operations/operation-runner.ts`) always runs
   `aspire start --apphost apphost.mts` and polls `aspire describe` before executing any db
   operation. So `db generate` cannot run where the aspire CLI / .NET is absent (deno-only CI,
   containerless dev), failing fast (~243ms, `aspire` command-not-found) even though no database,
@@ -2027,6 +2027,11 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Created:** 2026-07-01.
 - **Status:** open — worked around in the e2e harness (C14 `database.codegen` gate); the CLI command
   itself remains Aspire-coupled.
+- **Progress (2026-10-10, #1996 / PR #2170):** projects without `aspire/apphost.mts` (`init
+  --no-aspire`) now run every `db` operation through the database workspace task
+  (`DbWorkspaceTaskRunner`, selected by `selectDbOperationExecutor` in
+  `packages/cli/src/kernel/adapters/database/operations/`). Projects that have an AppHost still route
+  `db generate` through it, so this entry stays open for the Aspire-project codegen path.
 - **Gate:** Close when `netscript db generate` completes DB-less codegen in a deno-only environment
   (no aspire CLI / .NET / docker) and the static suites can invoke the CLI command directly instead
   of the standalone `deno task db:generate` workaround.
@@ -2766,6 +2771,23 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   stream concern while preserving the public consumer subpath and its import-graph guard.
 - **Evidence:** PR #2212; `fetch-stream-source-import_test.ts` proves the consumer excludes telemetry,
   OTel, and modules using Deno APIs. `arch:check` retains the existing F-16 directory-count warning.
+
+## packages/plugin-workers-core — WINDOWS-PROCESS-RUNNER-PARITY
+
+- **ID:** `WINDOWS-PROCESS-RUNNER-PARITY`
+- **Reason:** Deno.Command replaced Dax for bounded stdin/stream control. Windows PATHEXT lookup for
+  bare `.cmd`/`.bat` shims and `taskkill /PID <owned-pid> /T /F` termination lack Windows-host
+  execution evidence; Linux results do not establish Windows parity.
+- **Owner:** Workers maintainers, coordinated through #2103.
+- **Target:** Windows verification by 2026-10-27, before the 0.0.8 stable cut.
+- **Linked review:** PR #2201, IMPL-EVAL at `08421b92f` (finding 4); issue #2110.
+- **Plan:** Run native-executable stdin/EOF, command-shim resolution, and cmd-wrapper abort/timeout
+  fixtures on Windows. Compare bare shim launch to the former Dax behavior; restore PATHEXT-aware
+  resolution if parity fails. Keep batch scripts on the existing CmdRuntimeAdapter meanwhile.
+- **Created:** 2026-10-10.
+- **Status:** open; verification deferred because the implementation host is Linux.
+- **Closing gate:** Windows-backed tests prove stdin isolation/EOF, `.cmd`/`.bat` lookup with
+  arguments, and that cancellation/timeout stop a cmd wrapper and its pipe-holding grandchild.
 
 ## SDK/Fresh stream materializer convergence (#2100)
 

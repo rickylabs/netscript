@@ -23,6 +23,8 @@ export type {
   TaskDefinition,
   TaskExecutionOptions,
   TaskMessage,
+  TaskStdin,
+  TaskStdinJson,
 } from '@netscript/plugin-workers-core/runtime';
 export type {
   DeadLetterReason,
