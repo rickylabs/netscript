@@ -5,6 +5,8 @@ import type {
   AuthSessionCreateInput,
   AuthSessionLookup,
   AuthSessionPrincipalMapping,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
 } from '@netscript/plugin-auth-core';
 import {
   AuthBackendOperationUnsupportedError,
@@ -101,11 +103,27 @@ export function createBetterAuthBackend(options: BetterAuthBackendOptions): Auth
           `better-auth revocation is exposed through its request API surface, not this backend session id "${sessionId}" port.`,
         );
       },
-      revokeSubjectSessions(_subject: string): readonly AuthSession[] {
-        throw unsupportedBetterAuthOperation(
-          'sessions.revokeSubjectSessions',
-          'better-auth subject-wide revocation is exposed through its request API surface, not this backend port.',
-        );
+      async revokeSubjectSessions(
+        { subject, request }: AuthSubjectRevocationInput,
+      ): Promise<AuthSubjectRevocation> {
+        // better-auth's own revokeSessions deletes every session of the user behind the request
+        // credential in one store operation; NetScript only proves the credential is the subject's.
+        const headers = request ? headersFromSessionLookup({ request }) : undefined;
+        if (!headers) {
+          throw unsupportedBetterAuthOperation(
+            'sessions.revokeSubjectSessions',
+            "better-auth revokes a subject's sessions only through a request credential of that subject.",
+          );
+        }
+        const { session } = unwrapSessionResponse(await options.auth.api.getSession({ headers }));
+        if (session?.user.id !== subject) {
+          // Fail closed: never let one subject's credential end another subject's sessions.
+          throw new Error(
+            "better-auth subject revocation refused: the credential is not the subject's.",
+          );
+        }
+        await options.auth.api.revokeSessions({ headers });
+        return { subject, revokedAt: new Date().toISOString() };
       },
     },
     crypto: {

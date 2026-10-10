@@ -91,6 +91,7 @@ async function call(
 }
 
 type Harness = Readonly<{
+  kv: MemoryKvAdapter;
   registry: AuthTestRegistry;
   baseUrl: string;
   tracer: RecordingTracer;
@@ -106,6 +107,7 @@ async function withService(run: (harness: Harness) => Promise<void>): Promise<vo
   await using service = await serveAuthTestService(registry, { telemetry });
   const backend = registry.resolveBackend();
   await run({
+    kv,
     registry,
     baseUrl: service.baseUrl,
     tracer,
@@ -234,6 +236,38 @@ Deno.test('everywhere revokes every session of the subject and no one else', asy
       assertEquals(result.status, 200, transport.name);
       for (const id of own) assertEquals(await stateOf(id), 'revoked', transport.name);
       for (const id of others) assertEquals(await stateOf(id), 'active', transport.name);
+    }
+  });
+});
+
+Deno.test('everywhere also revokes a session persisted before the upgrade', async () => {
+  await withService(async ({ kv, baseUrl, create, stateOf }) => {
+    for (const transport of SIGNOUT_TRANSPORTS) {
+      const subject = `user-${crypto.randomUUID()}`;
+      // Pre-upgrade layout: the bare kv-oauth session record, with no subject-level bookkeeping.
+      const legacyId = `sess_legacy_${crypto.randomUUID().replaceAll('-', '')}`;
+      await kv.set(['auth-kv-oauth', 'session', legacyId], {
+        session: {
+          id: legacyId,
+          userId: subject,
+          state: 'active',
+          subject,
+          scopes: [],
+          roles: [],
+          claims: {},
+          issuedAt: new Date(Date.now() - 60_000).toISOString(),
+          expiresAt: new Date(Date.now() + 60 * 60_000).toISOString(),
+        },
+        tokens: { keyId: 'legacy', sealed: 'legacy' },
+      });
+      const current = await create(subject);
+      assertEquals(await stateOf(legacyId), 'active', transport.name);
+
+      const result = await call(baseUrl, transport, { everywhere: true }, current);
+      assertEquals(result.status, 200, transport.name);
+      assertEquals(await stateOf(legacyId), 'revoked', transport.name);
+      // The legacy credential no longer authenticates anything.
+      assertEquals((await call(baseUrl, transport, {}, legacyId)).status, 401, transport.name);
     }
   });
 });

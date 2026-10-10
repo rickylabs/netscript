@@ -92,13 +92,37 @@ export interface AuthSessionStorePort {
   /** Revokes a session and returns the revoked normalized session. */
   revokeSession(sessionId: string): Promise<AuthSession> | AuthSession;
   /**
-   * Revokes every session owned by `subject` and returns the sessions this call revoked.
+   * Revokes every session of `input.subject`: no session of that subject issued at or before the
+   * returned `revokedAt` may resolve as active afterwards, including sessions persisted before the
+   * adapter supported this operation. Sessions of any other subject stay untouched.
    *
-   * Sessions owned by any other subject must stay untouched. Adapters whose upstream cannot
-   * enumerate a subject's sessions throw {@link AuthBackendOperationUnsupportedError}.
+   * The work per call must be bounded — invalidate at the subject level instead of enumerating the
+   * subject's sessions. Adapters whose upstream has no subject-wide revocation throw
+   * {@link AuthBackendOperationUnsupportedError}.
    */
-  revokeSubjectSessions(subject: string): Promise<readonly AuthSession[]> | readonly AuthSession[];
+  revokeSubjectSessions(
+    input: AuthSubjectRevocationInput,
+  ): Promise<AuthSubjectRevocation> | AuthSubjectRevocation;
 }
+
+/** Input accepted by {@link AuthSessionStorePort.revokeSubjectSessions}. */
+export type AuthSubjectRevocationInput = Readonly<{
+  /** Subject whose sessions are all revoked. */
+  subject: string;
+  /**
+   * Request of the caller acting for `subject`. Adapters whose upstream revokes through the
+   * caller's own credential require it and refuse a credential that belongs to another subject.
+   */
+  request?: AuthnRequest;
+}>;
+
+/** Result of {@link AuthSessionStorePort.revokeSubjectSessions}. */
+export type AuthSubjectRevocation = Readonly<{
+  /** Subject whose sessions were revoked. */
+  subject: string;
+  /** ISO instant at or before which every session of the subject was issued and is now revoked. */
+  revokedAt: string;
+}>;
 
 /** Crypto contract exposed by pure auth backends for token lifecycle work. */
 export interface AuthSessionCryptoPort {

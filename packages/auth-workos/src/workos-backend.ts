@@ -5,6 +5,8 @@ import type {
   AuthSessionCreateInput,
   AuthSessionLookup,
   AuthSessionPrincipalMapping,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
 } from '@netscript/plugin-auth-core';
 import {
   AuthBackendOperationUnsupportedError,
@@ -106,10 +108,12 @@ export function createWorkosBackend(options: WorkosBackendOptions): AuthBackendP
           `WorkOS session revocation is owned by WorkOS APIs outside this request-local backend port for "${sessionId}".`,
         );
       },
-      revokeSubjectSessions(_subject: string): readonly AuthSession[] {
+      revokeSubjectSessions(_input: AuthSubjectRevocationInput): AuthSubjectRevocation {
+        // WorkOS exposes no subject-wide revocation: only per-session revokeSession after paging
+        // listSessions, which is unbounded work, and sealed access tokens stay valid until expiry.
         throw unsupportedWorkosOperation(
           'sessions.revokeSubjectSessions',
-          'WorkOS subject-wide session revocation is owned by WorkOS APIs outside this request-local backend port.',
+          'WorkOS has no subject-wide session revocation API; per-session enumeration is not bounded.',
         );
       },
     },

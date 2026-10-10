@@ -217,14 +217,20 @@ export async function signout(
   return await traceAuth(context, 'signout', backend, undefined, input.sessionId, async (audit) => {
     const principal = await requireAuditedPrincipal(context, audit);
     try {
-      const { sessionId, revoked } = await revokeSignoutSessions(backend, principal, input);
-      await endInteractiveSession(backend, context, revoked);
+      const revocation = await revokeSignoutSessions(
+        backend,
+        principal,
+        input,
+        context.request ? toAuthnRequest(context.request) : undefined,
+      );
+      const { sessionId } = revocation;
+      await endInteractiveSession(backend, context, revocation.revoked);
       await audit.setOutcome({
         outcome: AuthOutcome.SUCCESS,
         sessionId,
         subject: principal.subject,
       });
-      await recordRevokedSessions(audit, revoked);
+      await recordRevokedSessions(audit, revocation, principal.subject);
       return { signedOut: true, sessionId, redirectTo: input.redirectTo };
     } catch (error) {
       const authError = providerFailure(error, backend.name);
@@ -270,7 +276,7 @@ export async function revokeSession(
           sessionId: revoked.id,
           subject: principal.subject,
         });
-        await recordRevokedSessions(audit, [revoked]);
+        await recordRevokedSessions(audit, { revoked: [revoked] });
         return { revoked: true, sessionId: revoked.id };
       } catch (error) {
         const authError = providerFailure(error, backend.name);

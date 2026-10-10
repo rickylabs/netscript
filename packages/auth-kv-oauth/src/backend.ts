@@ -27,6 +27,8 @@ import type {
   AuthSessionCryptoPort,
   AuthSessionLookup,
   AuthSessionStorePort,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
 } from '@netscript/plugin-auth-core';
 import type { AuthnRequest, AuthnResult, Principal } from '@netscript/service/auth';
 import * as oauth from '@panva/oauth4webapi';
@@ -53,6 +55,8 @@ export type {
   AuthSessionPrincipalMapping,
   AuthSessionState,
   AuthSessionStorePort,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
   InteractiveCallbackResult,
   InteractiveFlowPort,
 } from '@netscript/plugin-auth-core';
@@ -128,7 +132,7 @@ export async function createKvOAuthBackend(
       }
       const entry = await store.getSessionEntry(sessionId);
       const record = entry?.record;
-      if (!record || record.session.state !== 'active') {
+      if (!record || (await withSubjectRevocation(store, record.session)).state !== 'active') {
         return { ok: false, reason: 'kv_oauth_session_not_found' };
       }
       const now = Date.now();
@@ -208,7 +212,8 @@ function createSessionStore(
       if (!sessionId) {
         return undefined;
       }
-      return (await store.getSession(sessionId))?.session;
+      const record = await store.getSession(sessionId);
+      return record ? await withSubjectRevocation(store, record.session) : undefined;
     },
     async createSession(input: AuthSessionCreateInput): Promise<AuthSession> {
       const now = new Date().toISOString();
@@ -258,22 +263,32 @@ function createSessionStore(
     },
     revokeSession: (sessionId: string): Promise<AuthSession> =>
       revokeStoredSession(store, sessionId),
-    async revokeSubjectSessions(subject: string): Promise<readonly AuthSession[]> {
-      const revoked: AuthSession[] = [];
-      for await (const sessionId of store.listSubjectSessionIds(subject)) {
-        const record = await store.getSession(sessionId);
-        // The index may lag a deletion; only a live, still-active record of this subject counts.
-        if (record?.session.subject !== subject || record.session.state === 'revoked') continue;
-        try {
-          revoked.push(await revokeStoredSession(store, sessionId));
-        } catch (error) {
-          if (error instanceof KvOAuthError && error.code === 'session_not_found') continue;
-          throw error;
-        }
-      }
-      return revoked;
+    async revokeSubjectSessions(
+      { subject }: AuthSubjectRevocationInput,
+    ): Promise<AuthSubjectRevocation> {
+      // One subject-level write: every session issued up to this instant stops resolving as
+      // active, whether or not this adapter has ever seen it, with no per-session work.
+      const revokedAt = await store.revokeSubject(subject, new Date().toISOString());
+      return { subject, revokedAt };
     },
   };
+}
+
+/**
+ * Presents an active session issued at or before its subject's revocation instant as revoked.
+ *
+ * Costs one KV read per resolution and needs no migration of existing session records.
+ */
+async function withSubjectRevocation(
+  store: KvOAuthStore,
+  session: AuthSession,
+): Promise<AuthSession> {
+  if (session.state !== 'active') return session;
+  const revokedAt = await store.getSubjectRevocation(session.subject);
+  if (revokedAt === undefined || Date.parse(session.issuedAt) > Date.parse(revokedAt)) {
+    return session;
+  }
+  return { ...session, state: 'revoked', revokedAt };
 }
 
 async function revokeStoredSession(store: KvOAuthStore, sessionId: string): Promise<AuthSession> {

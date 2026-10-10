@@ -254,7 +254,7 @@ Deno.test('createBetterAuthBackend throws typed errors for unsupported managed-s
     },
     {
       operation: 'sessions.revokeSubjectSessions',
-      run: () => backend.sessions.revokeSubjectSessions('user_123'),
+      run: () => backend.sessions.revokeSubjectSessions({ subject: 'user_123' }),
     },
   ];
 
@@ -288,6 +288,7 @@ function authInstance(
           headers: result.headers,
           response: result.response,
         }),
+      revokeSessions: () => Promise.resolve({ status: true }),
     },
   };
 }

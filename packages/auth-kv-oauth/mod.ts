@@ -94,6 +94,8 @@ export type {
   AuthSessionPrincipalMapping,
   AuthSessionState,
   AuthSessionStorePort,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
   InteractiveCallbackResult,
   InteractiveFlowPort,
 } from '@netscript/plugin-auth-core';

@@ -459,19 +459,13 @@ function fakeBackend(name = 'kv-oauth'): AuthBackendPort {
         stored.set(sessionId, revoked);
         return revoked;
       },
-      revokeSubjectSessions: (subject) => {
-        const revoked = [];
+      revokeSubjectSessions: ({ subject }) => {
+        const revokedAt = new Date().toISOString();
         for (const current of stored.values()) {
           if (current.subject !== subject || current.state === 'revoked') continue;
-          const next = {
-            ...current,
-            state: 'revoked' as const,
-            revokedAt: new Date().toISOString(),
-          };
-          stored.set(current.id, next);
-          revoked.push(next);
+          stored.set(current.id, { ...current, state: 'revoked', revokedAt });
         }
-        return revoked;
+        return { subject, revokedAt };
       },
     },
     crypto: {

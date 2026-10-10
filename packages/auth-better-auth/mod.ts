@@ -25,6 +25,7 @@ export {
   type BetterAuthInstance,
   type BetterAuthPrismaClient,
   type BetterAuthPrismaProvider,
+  type BetterAuthRevokeSessionsInput,
   type BetterAuthSessionLookupResponse,
   type BetterAuthSessionPayload,
   createBetterAuthAuthenticator,

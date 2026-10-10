@@ -105,8 +105,17 @@ export interface BetterAuthInstance {
     readonly getSession: (
       input: BetterAuthGetSessionInput,
     ) => Promise<BetterAuthSessionLookupResponse>;
+    /** Revokes every session of the user whose session the request headers carry. */
+    readonly revokeSessions: (
+      input: BetterAuthRevokeSessionsInput,
+    ) => Promise<unknown>;
   };
 }
+
+/** Input accepted by better-auth's `api.revokeSessions` method. */
+export type BetterAuthRevokeSessionsInput = Readonly<{
+  headers: Headers;
+}>;
 
 /** Input accepted by better-auth's `api.getSession` method. */
 export type BetterAuthGetSessionInput = Readonly<{

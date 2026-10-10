@@ -112,15 +112,18 @@ export interface KvOAuthStore {
     next: KvOAuthSessionRecord,
     expectedVersionstamp?: string | null,
   ): Promise<boolean>;
-  /** Deletes a session record and its subject index entry. */
+  /** Deletes a session record. */
   deleteSession(id: string): Promise<void>;
   /**
-   * Streams the ids of sessions indexed under `subject`.
+   * Records that every session of `subject` issued at or before `revokedAt` is revoked.
    *
-   * The index is written with every session put or rotation; an id may outlive its session
-   * record, so callers re-read each record before acting on it.
+   * One write per call, whatever the number of sessions. The stored instant only ever moves
+   * forward, so concurrent global logouts never shrink each other; the effective instant is
+   * returned.
    */
-  listSubjectSessionIds(subject: string): AsyncIterable<string>;
+  revokeSubject(subject: string, revokedAt: string): Promise<string>;
+  /** Reads the subject-wide revocation instant recorded by {@link revokeSubject}, if any. */
+  getSubjectRevocation(subject: string): Promise<string | undefined>;
   /** Seals an OAuth token set for KV persistence. */
   sealTokens(tokens: KvOAuthTokenSet): Promise<KvOAuthEncryptedTokens>;
   /** Opens an encrypted token set from KV persistence. */
@@ -137,14 +140,12 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
 
   const txnKey = (id: string): readonly Deno.KvKeyPart[] => [...namespace, 'txn', id];
   const sessionKey = (id: string): readonly Deno.KvKeyPart[] => [...namespace, 'session', id];
-  const subjectPrefix = (subject: string): readonly Deno.KvKeyPart[] => [
+  // Subject revocations carry no TTL: a refreshed session keeps its original issuedAt while its
+  // record TTL is extended, so the marker must outlive any session issued before it.
+  const subjectRevocationKey = (subject: string): readonly Deno.KvKeyPart[] => [
     ...namespace,
-    'subject',
+    'subject-revocation',
     subject,
-  ];
-  const subjectSessionKey = (subject: string, id: string): readonly Deno.KvKeyPart[] => [
-    ...subjectPrefix(subject),
-    id,
   ];
 
   return {
@@ -179,14 +180,7 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
           ? await hashToken(input.tokens.refreshToken)
           : undefined,
       };
-      const { id, subject } = record.session;
-      const result = await requireAtomic(kv).call(kv, [], [
-        { type: 'set', key: sessionKey(id), value: record, expireIn: sessionTtlMs },
-        { type: 'set', key: subjectSessionKey(subject, id), value: id, expireIn: sessionTtlMs },
-      ]);
-      if (!result.ok) {
-        throw new KvOAuthError('configuration_error', `Session ${id} could not be persisted.`);
-      }
+      await kv.set(sessionKey(record.session.id), record, { expireIn: sessionTtlMs });
       return record;
     },
     async getSession(id): Promise<KvOAuthSessionRecord | null> {
@@ -210,27 +204,33 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
         : expectedVersionstamp;
       const result = await requireAtomic(kv).call(kv, [{ key, versionstamp }], [
         { type: 'set', key, value: next, expireIn: sessionTtlMs },
-        // Rotation extends the session TTL, so the subject index entry moves with it.
-        {
-          type: 'set',
-          key: subjectSessionKey(next.session.subject, id),
-          value: id,
-          expireIn: sessionTtlMs,
-        },
       ]);
       return result.ok;
     },
     async deleteSession(id): Promise<void> {
-      const entry = await kv.get<KvOAuthSessionRecord>(sessionKey(id));
       await kv.delete(sessionKey(id));
-      if (entry?.value) {
-        await kv.delete(subjectSessionKey(entry.value.session.subject, id));
-      }
     },
-    async *listSubjectSessionIds(subject): AsyncIterable<string> {
-      for await (const entry of kv.list<string>({ prefix: subjectPrefix(subject) })) {
-        if (typeof entry.value === 'string') yield entry.value;
+    async revokeSubject(subject, revokedAt): Promise<string> {
+      const key = subjectRevocationKey(subject);
+      for (let attempt = 0; attempt < SUBJECT_REVOKE_MAX_ATTEMPTS; attempt += 1) {
+        const entry = await kv.get<string>(key);
+        const current = typeof entry?.value === 'string' ? entry.value : undefined;
+        if (current !== undefined && Date.parse(current) >= Date.parse(revokedAt)) return current;
+        const result = await requireAtomic(kv).call(
+          kv,
+          [{ key, versionstamp: entry?.versionstamp ?? null }],
+          [{ type: 'set', key, value: revokedAt }],
+        );
+        if (result.ok) return revokedAt;
       }
+      throw new KvOAuthError(
+        'revoke_conflict',
+        `Subject-wide revocation could not be recorded after ${SUBJECT_REVOKE_MAX_ATTEMPTS} attempts.`,
+      );
+    },
+    async getSubjectRevocation(subject): Promise<string | undefined> {
+      const entry = await kv.get<string>(subjectRevocationKey(subject));
+      return typeof entry?.value === 'string' ? entry.value : undefined;
     },
     async sealTokens(tokens): Promise<KvOAuthEncryptedTokens> {
       return { keyId: oauthCrypto.keyId, sealed: await oauthCrypto.seal(tokens) };
@@ -240,6 +240,9 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
     },
   };
 }
+
+/** Bounded compare-and-set attempts for a subject-wide revocation racing another one. */
+const SUBJECT_REVOKE_MAX_ATTEMPTS = 5;
 
 /** Hashes a refresh token for reuse detection without storing the raw token outside the sealed blob. */
 export async function hashToken(token: string): Promise<string> {
