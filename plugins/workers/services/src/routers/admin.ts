@@ -1,4 +1,4 @@
-import { router, type WorkersHandlers } from './router-context.ts';
+import { getWorkersRuntime, router, type WorkersHandlers } from './router-context.ts';
 
 type JobRetentionConfig = Readonly<{
   archiveToDb: boolean;
@@ -8,10 +8,11 @@ type JobRetentionConfig = Readonly<{
 export const adminHandlers: WorkersHandlers<
   'cleanup' | 'cleanupDbExecutions' | 'archiveExecutions' | 'seed'
 > = {
-  cleanup: router.cleanup.handler(() => {
+  cleanup: router.cleanup.handler(async ({ context }) => {
+    const deleted = await getWorkersRuntime(context).executionState.cleanupExpired();
     return {
-      deleted: [],
-      count: 0,
+      deleted,
+      count: deleted.length,
       message: 'Cleanup completed',
     };
   }),

@@ -278,10 +278,32 @@ over explicit sources, for runtimes without Vite or Deno.
 
 ## Durable streams (`@netscript/sdk/streams`)
 
-Server-side writers and schema helpers for NetScript durable streams (State Protocol).
+Server-side writers, schema helpers, and a DOM-independent streaming-fetch consumer for NetScript
+durable streams (State Protocol). `createFetchStreamEventSourceV1` implements the existing
+`StreamEventSourceV1` port and accepts a host streaming fetch, an optional per-connect auth
+provider, an abort signal, and finite heartbeat, reconnect, and buffer limits. It delivers plain
+event objects through `bindStreamEventSourceV1`. Data waits for a valid control before delivery and
+replay progress advances; reconnect uses the control's opaque `offset` plus SSE `Last-Event-ID` when
+available. See the
+[SDK README](https://github.com/rickylabs/netscript/blob/main/packages/sdk/README.md) for a complete
+transport example. The React Native live-query binding and Expo reference app are separate work.
+
+Use `@netscript/sdk/streams/consumer` for the fetch source and binding in shared/browser/React Native
+code. Its import graph excludes telemetry, OTel, and modules using `Deno.*`. The wider `./streams`
+facade retains server producer exports. Every non-2xx response (including 401/403/404) retries with
+fresh per-connect credentials. Server `retry:` is clamped to the configured initial back-off floor
+and cap. HTTP 204 and terminal control stop permanently.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
+| `createFetchStreamEventSourceV1` | function | Create a reconnecting source over injected WHATWG streaming fetch. |
+| `FetchStreamEventSourceOptionsV1` | interface | URL, fetch, auth provider, abort signal, timer port, and bounded transport budgets. |
+| `FetchStreamEventSourceV1` | interface | EventSource-compatible source with awaitable `done` shutdown. |
+| `StreamFetchV1` | type alias | Host-injected `(url, init) => Promise<Response>` streaming transport. |
+| `StreamSourceSchedulerV1` | interface | Schedule a timer and return its cancellation function. |
+| `bindStreamEventSourceV1` | function | Bind data/control listeners through the versioned SSE schema authority. |
+| `StreamSourceEventV1` | interface | Structural native or plain event shape. |
+| `StreamSourceListenerV1` | type alias | Listener accepting structural stream events. |
 | `createStreamProducer` | function | Create or reuse a durable stream producer for a stream path. |
 | `createDurableStream` | reference | Re-export alias for the durable stream producer factory. |
 | `defineStreamSchema` | function | Define a type-safe durable stream schema. |
@@ -303,6 +325,12 @@ Server-side writers and schema helpers for NetScript durable streams (State Prot
 | `Operation` | type alias | State Protocol operation names supported by durable streams. |
 | `StreamTopicInspectionInput` | interface | Input accepted by `inspectStreamTopic`. |
 | `StreamTopicInspectionReport` | interface | Diagnostic report returned by `inspectStreamTopic`. |
+
+The streams entry also exposes the SSE type closure from
+[`@netscript/plugin-streams-core/sse`](/reference/plugin-streams-core/#the-sse-contract-netscriptplugin-streams-coresse),
+including `StreamEventSourceV1`, `BindStreamEventSourceOptionsV1`, `StreamEventSourceBindingV1`,
+`StreamSseConsumerEventV1`, `StreamSseReplayStateV1`, and the versioned frame, payload, schema, and
+reduction types. Parsing and schema validation retain one authority in stream core.
 
 ## Telemetry (`@netscript/sdk/telemetry`)
 
@@ -364,6 +392,7 @@ environment-specific adapters and dependencies out of consumers that do not need
 | `@netscript/sdk/query` | `./src/query/mod.ts` | Server-side cache-aware query factories. |
 | `@netscript/sdk/query-client` | `./src/query-client/mod.ts` | TanStack Query integration for browser/island code. |
 | `@netscript/sdk/streams` | `./src/streams.ts` | Durable stream producers and schema helpers. |
+| `@netscript/sdk/streams/consumer` | `./src/client/stream-source/mod.ts` | Fetch consumer and SSE binding without server telemetry. |
 | `@netscript/sdk/telemetry` | `./src/telemetry/mod.ts` | OpenTelemetry middleware for oRPC. |
 
 ---

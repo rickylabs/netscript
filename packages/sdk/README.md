@@ -100,6 +100,47 @@ const ordersQueryUtils = queryUtils.orders;
 Use the side-effect-free `./presets` subpath for `defineServices` in browser/shared modules. Drop to
 `./client`, `./query`, and `./query-client` when an app only needs one of the three pieces.
 
+### Durable streams with an injected fetch
+
+`@netscript/sdk/streams/consumer` provides `createFetchStreamEventSourceV1` for hosts with a
+WHATWG streaming fetch and no DOM event constructors. Supply the host transport and bind the source through the
+existing v1 schema validator:
+
+```ts
+import { bindStreamEventSourceV1, createFetchStreamEventSourceV1 } from '@netscript/sdk/streams/consumer';
+
+const abort = new AbortController();
+const source = createFetchStreamEventSourceV1({
+  url: 'https://api.example.com/v1/stream/netscript/workers/executions?offset=-1',
+  fetch: (url, init) => fetch(url, init), // Use the host's streaming fetch here.
+  signal: abort.signal,
+  authHeaders: () => ({ authorization: 'Bearer example-token' }),
+});
+const binding = bindStreamEventSourceV1({
+  source,
+  onEvent(event) {
+    if (event.event === 'data') console.log(event.payload);
+  },
+});
+
+// Dispose on host teardown; done confirms the reader and timers have stopped.
+binding.dispose();
+await source.done;
+```
+
+The source refreshes credentials on every connect, reconnects after 30 seconds without bytes, and
+retries every non-2xx response (including 401, 403, and 404), refreshing credentials on each attempt.
+Consecutive delays double from one second to a 30-second cap; server `retry:` is clamped between
+the configured initial back-off floor and cap. These bounds and its timer port are configurable.
+Comments and partial bytes renew the heartbeat deadline.
+
+The durable protocol commits progress on a validated `control` frame. The source buffers data until
+that control, then reconnects with its opaque `offset` query parameter and the committed SSE
+`Last-Event-ID` when present. A disconnect before control discards the undelivered data so the
+server can replay it. Framing and pending data each default to a 1 MiB character bound; at most
+1,024 data frames may await control. Exceeding a bound reconnects from committed progress. A
+terminal control or HTTP 204 stops the source. Listener exceptions stop it and reject `done`.
+
 ### Typed request contributions
 
 Use the SDK-owned locale factory or define an application contribution, then attach the literal
@@ -347,6 +388,7 @@ and Linux apply on relaunch.
 | `./cache`        | `KvCacheStore`, `cacheQuery`, explicit cache-provider wiring                      |
 | `./collections`  | `createQueryCollection` — live client-side collections                            |
 | `./streams`      | `createStreamProducer`, `defineStreamSchema`, durable-stream helpers              |
+| `./streams/consumer` | `createFetchStreamEventSourceV1`, `bindStreamEventSourceV1`, consumer contracts |
 | `./telemetry`    | `otelMiddleware` — the outbound-tracing middleware type surface                   |
 | `./auto-update`  | `startAutoUpdate`, `createReleaseClient` — signed native Deno Desktop updates     |
 | `./desktop`      | `createDesktopServiceClient`, `createDesktopRpcLink` — contract-true webview RPC  |

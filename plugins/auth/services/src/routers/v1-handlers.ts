@@ -181,7 +181,6 @@ export async function callback(
         );
         const output = {
           completed: true,
-          sessionId: result.sessionId,
           redirectTo: input.redirectTo ?? responseLocation(result.response),
           subject: result.principal.subject,
         };

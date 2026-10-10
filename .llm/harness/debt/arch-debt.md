@@ -2472,6 +2472,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Remove the compatibility bridge when a native supported seam passes complete-frame,
   fork/cap/sub-offset, restart/producer-state and >=1 GiB RSS regressions at the same memory
   ceiling.
+- **Substrate:** The production composition still uses `DurableStreamTestServer` for its native HTTP
+  protocol implementation. This is accepted within the same named debt; it is not a production
+  durability certification. File mode is startup-probed and producer restart-tested; memory mode is
+  explicitly ephemeral.
+- **Exit condition:** Replace `DurableStreamTestServer` with an upstream supported production
+  server/store-injection API after durable-streams#420 lands, preserving the bounded store, real
+  producer write/process-restart/read, framing, fork and RSS regression proofs.
 - **Cost:** Dependency upgrades require hook-shape and semantic compatibility verification. Runtime
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
   RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades
@@ -2730,3 +2737,32 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
   `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
   green. `arch:check` currently exits zero with these size warnings.
+
+## plugins/sagas — SAGAS-WORKER-DISPATCH-FIXTURE
+
+- **ID:** `SAGAS-WORKER-DISPATCH-FIXTURE`
+- **Reason:** The PostgreSQL publish-process test fixture imports the workers dispatcher, pool
+  factory, and dispatch context across plugin internals to prove real durable worker execution. The
+  public `@netscript/plugin-workers/worker` exports Worker and WorkerPoolOptions, but does not
+  expose these three seams; workers-core exports primitives rather than this plugin dispatcher.
+- **Owner:** Workers runtime maintainers.
+- **Target:** Next workers runtime testing-contract review.
+- **Status:** open, test-only coupling accepted for PR #2213.
+- **Exit condition:** Replace these imports with a supported public execution/testing contract that
+  preserves the physical PostgreSQL effect and durable duplicate-execution proof.
+- **Gate:** Real HTTP/PostgreSQL publish-process conformance and worker idempotency assertions.
+
+## SDK fetch stream-source placement (F-16, #2100)
+
+- **ID:** `sdk-stream-source-placement-2100`
+- **Reason:** The stream transport is a separate concern temporarily placed in
+  `packages/sdk/src/client/stream-source/`. SDK already has 14 source-root directories against
+  F-16's limit of 12; adding another root would worsen that baseline. Nesting under the client
+  concern leaves the concern boundary imperfect and requires an explicit consolidation follow-up.
+- **Owner:** SDK architecture maintainers / #2100.
+- **Target:** Before the 0.0.9 stable SDK release.
+- **Status:** Open; pending independent evaluator acceptance for PR #2212.
+- **Closing gate:** Consolidate SDK source roots to at most 12 and place the transport in a proper
+  stream concern while preserving the public consumer subpath and its import-graph guard.
+- **Evidence:** PR #2212; `fetch-stream-source-import_test.ts` proves the consumer excludes telemetry,
+  OTel, and modules using Deno APIs. `arch:check` retains the existing F-16 directory-count warning.
