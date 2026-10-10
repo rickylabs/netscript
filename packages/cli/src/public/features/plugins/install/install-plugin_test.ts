@@ -1667,6 +1667,7 @@ describe('public install plugin flow', () => {
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         regenerateHelpers: () => Promise.resolve([]),
       };
       const install = (port: number | undefined) =>
@@ -1745,6 +1746,7 @@ describe('public install plugin flow', () => {
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         regenerateHelpers: () => Promise.resolve([]),
       };
 

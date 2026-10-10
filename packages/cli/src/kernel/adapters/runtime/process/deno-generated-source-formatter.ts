@@ -1,4 +1,5 @@
-import { extname } from '@std/path';
+import { extname, resolve } from '@std/path';
+import { tmpdir } from 'node:os';
 import type {
   GeneratedFileFormatPolicy,
   GeneratedSourceContent,
@@ -56,17 +57,19 @@ export class DenoGeneratedSourceFormatter implements GeneratedSourceFormatterPor
       return { extension, content: file.content };
     });
     if (files.length === 0) return [];
+    const temporaryDirectory = resolve(tmpdir());
     const result = await this.process.exec('deno', [
       'run',
       '--no-config',
       '--no-lock',
       '--no-prompt',
       '--allow-read',
-      '--allow-write',
+      `--allow-write=${temporaryDirectory}`,
       '--allow-run=deno',
       '--deny-net',
       '--deny-env',
       new URL('./generated-source-batch-child.ts', import.meta.url).href,
+      temporaryDirectory,
     ], { stdin: JSON.stringify(payload) });
     if (result.code !== 0) {
       const detail = result.stderr.trim() || result.stdout.trim() || `exit ${result.code}`;

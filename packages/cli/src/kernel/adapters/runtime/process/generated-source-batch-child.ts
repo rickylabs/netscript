@@ -17,8 +17,9 @@ interface Source {
 export async function formatStagedSourceBatch(
   files: readonly Source[],
   process: ProcessPort,
+  temporaryDirectory?: string,
 ): Promise<readonly string[]> {
-  const stagingRoot = await Deno.makeTempDir();
+  const stagingRoot = await Deno.makeTempDir({ dir: temporaryDirectory });
   try {
     // Deno accepts forward-slash separators on every supported platform; names contain no paths.
     const paths = files.map((file, index) => `${stagingRoot}/${index}.${file.extension}`);
@@ -85,7 +86,7 @@ async function readSources(): Promise<readonly Source[]> {
   return files;
 }
 
-if (import.meta.main) {
+async function main(): Promise<void> {
   try {
     const native = new DenoProcess();
     let formatterProcesses = 0;
@@ -95,10 +96,13 @@ if (import.meta.main) {
         return native.exec(command, args, options);
       },
     };
-    const contents = await formatStagedSourceBatch(await readSources(), process);
+    const contents = await formatStagedSourceBatch(await readSources(), process, Deno.args[0]);
     console.log(JSON.stringify({ contents, formatterProcesses }));
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
-    Deno.exit(1);
+    Deno.exitCode = 1;
+    return;
   }
 }
+
+if (import.meta.main) await main();
