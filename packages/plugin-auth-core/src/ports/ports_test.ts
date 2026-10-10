@@ -28,6 +28,7 @@ const backend: AuthBackendPort = {
     }),
     refreshSession: () => Promise.reject(new Error('not implemented')),
     revokeSession: () => Promise.reject(new Error('not implemented')),
+    revokeSubjectSessions: () => Promise.reject(new Error('not implemented')),
   },
   crypto: {
     sealSessionToken: () => 'sealed',

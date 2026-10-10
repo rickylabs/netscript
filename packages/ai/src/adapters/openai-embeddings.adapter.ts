@@ -40,6 +40,10 @@ export interface OpenAiEmbeddingsProviderConfig {
  *
  * @example
  * ```ts
+ * import { OpenAiEmbeddingsProvider } from '@netscript/ai/openai-embeddings';
+ *
+ * declare const apiKey: string;
+ *
  * const provider = new OpenAiEmbeddingsProvider({ apiKey });
  * const result = await provider.embed('hello');
  * ```

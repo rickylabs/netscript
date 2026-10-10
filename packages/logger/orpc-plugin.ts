@@ -164,11 +164,14 @@ export interface LoggingPluginOptions {
  * @example
  * ```ts
  * import { LoggingPlugin } from '@netscript/logger/orpc';
+ * import type { ServiceHandlerPlugin } from '@netscript/service';
+ * import type { AnyRouter } from '@orpc/server';
  * import { RPCHandler } from '@orpc/server/fetch';
  *
- * const rpcHandler = new RPCHandler(router, {
- *   plugins: [new LoggingPlugin({ serviceName: 'users' })],
- * });
+ * declare const router: AnyRouter;
+ *
+ * const plugins: ServiceHandlerPlugin[] = [new LoggingPlugin({ serviceName: 'users' })];
+ * const rpcHandler = new RPCHandler(router, { plugins });
  * ```
  */
 export class LoggingPlugin {

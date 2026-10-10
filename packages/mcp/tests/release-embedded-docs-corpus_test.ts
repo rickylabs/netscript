@@ -11,6 +11,7 @@ Deno.test('generated release fallback contains the enumerated intent-guidance do
     'llms',
     'mcp',
     'pages/data-persistence/how-to/use-a-second-database',
+    'pages/durable-workflows/how-to/bound-stream-retention',
     'pages/explanation/contracts',
     'pages/explanation/plugin-system',
     'pages/orchestration-runtime/how-to/author-a-plugin',

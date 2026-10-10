@@ -18,6 +18,11 @@ export interface RunDoctorCommandOptions {
  *
  * @example
  * ```ts
+ * import type { NetScriptPlugin, PluginCommandContext } from '@netscript/plugin/adapter';
+ *
+ * declare const plugin: NetScriptPlugin;
+ * declare const context: PluginCommandContext;
+ *
  * const report = await runDoctorCommand({ plugin, context });
  * console.log(report.plugin);
  * ```

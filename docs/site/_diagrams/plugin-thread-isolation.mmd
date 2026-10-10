@@ -1,19 +1,10 @@
-%% plugin-thread-isolation — worker runtime isolation modes (offline Mermaid source)
+%% Source for assets/diagrams/plugin-thread-isolation.svg
 flowchart TB
-  subgraph InProcess["In-process — same isolate"]
-    HostI["isolate (host)"]
-    WorkerI["worker"]
-    HostI --> WorkerI
+  API["Plugin API service process"] -->|enqueue| Queue["Durable queue"]
+  Queue --> Jobs
+  subgraph Background["Background worker service process"]
+    Jobs["In-process job handlers<br/>Shared isolate and event loop<br/>Cooperative async concurrency"]
+    Tasks["Task executor"]
   end
-
-  subgraph WebWorker["Web-worker — separate V8 isolate"]
-    HostW["host isolate"]
-    WorkerW["worker isolate"]
-    HostW <-->|isolate boundary, same process| WorkerW
-  end
-
-  subgraph Subprocess["Subprocess — separate OS process"]
-    HostP["host process"]
-    WorkerP["worker process"]
-    HostP <-->|process boundary, IPC| WorkerP
-  end
+  Tasks --> Child["Task subprocess<br/>Separate OS process"]
+  Reserved["web-worker / subprocess job-runner modes<br/>Reserved; not implemented"]

@@ -8,9 +8,9 @@ import type {
   WalkerPort,
 } from '@netscript/plugin/sdk';
 
+import { requireValidPluginComposition } from '../../../../kernel/application/plugin/plugin-composition.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import { type ConfigLoaderPort, resolveConfiguredPlugins } from './discover-plugins.ts';
-import { resolvePluginContributions } from './load-plugin-contributions.ts';
 import { resolvePluginManifests } from './resolve-plugin-manifest.ts';
 import { resolveWalkerEmissions } from './trigger-walker.ts';
 
@@ -46,7 +46,7 @@ export interface PluginHostState {
   readonly config: NetScriptConfig;
   /** Resolved plugin manifests. */
   readonly plugins: readonly PluginManifest[];
-  /** Merged plugin contributions. */
+  /** Collection contribution axes merged across the validated plugin composition. */
   readonly contributions: PluginContributions;
   /** Registry emissions produced by the walker stub. */
   readonly emissions: readonly RegistryEmission[];
@@ -75,7 +75,11 @@ export function createPluginHostLoader(
   return new PluginHostLoader(options);
 }
 
-/** Resolve plugin host state from config, manifests, contributions, and walker output. */
+/**
+ * Resolve plugin host state from config, manifests, contributions, and walker output.
+ *
+ * The manifests pass the shared `validatePluginComposition` check before any walker work runs.
+ */
 export async function resolvePluginHostState(
   options: PluginHostLoaderOptions,
 ): Promise<PluginHostState> {
@@ -83,7 +87,7 @@ export async function resolvePluginHostState(
   const plugins = await resolvePluginManifests(discovered.plugins, {
     manifestResolver: options.manifestResolver,
   });
-  const contributions = resolvePluginContributions(plugins);
+  const { contributions } = requireValidPluginComposition(plugins);
   const emissions = await resolveWalkerEmissions({
     projectRoot: options.projectRoot,
     walker: options.walker,
