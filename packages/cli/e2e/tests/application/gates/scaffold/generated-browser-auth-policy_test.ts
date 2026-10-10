@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { join, resolve, toFileUrl } from '@std/path';
+import { dirname, join, relative, resolve, toFileUrl } from '@std/path';
 import { SCAFFOLD_APP_IMPORTS } from '../../../../../src/kernel/constants/scaffold/scaffold-app-catalog.ts';
 import type { RunningService } from '@netscript/service';
 import { DenoFileSystem } from '../../../../../src/kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -7,10 +7,14 @@ import { DenoProcess } from '../../../../../src/kernel/adapters/runtime/process/
 import { DenoGeneratedSourceFormatter } from '../../../../../src/kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { reconcileBrowserAuth } from '../../../../../src/kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { renderTemplateAssetSync } from '../../../../../src/kernel/adapters/templates/template-asset.ts';
-import { TEMPLATE_KEYS, type TemplateKey } from '../../../../../src/kernel/assets/manifest.ts';
+import { TEMPLATE_KEYS } from '../../../../../src/kernel/assets/manifest.ts';
 
-// Render and reconcile the actual main/contract/router carriers. Only the database and CRUD
-// persistence handlers are fixtures: the service bootstrap, paths and policy are generated code.
+import { ServiceScaffolder } from '../../../../../src/kernel/adapters/service/scaffolder.ts';
+import { Scaffolder } from '../../../../../src/kernel/adapters/scaffold/scaffolder.ts';
+import { StringTemplateAdapter } from '../../../../../src/kernel/adapters/scaffold/template-adapter.ts';
+
+// Scaffold and reconcile the actual layered service. Only the database is a fixture:
+// the bootstrap, application, repository adapter, contract bindings and policy are generated code.
 for (const database of [true, false]) {
   Deno.test(`spliced generated ${database ? 'CRUD' : 'memory'} service keeps demo REST/RPC and discovery public`, async () => {
     await Deno.mkdir('.llm/tmp', { recursive: true });
@@ -20,13 +24,6 @@ for (const database of [true, false]) {
     let service: RunningService | undefined;
     const previousPort = Deno.env.get('PORT');
     Deno.env.set('PORT', '0');
-    const render = (key: TemplateKey) =>
-      renderTemplateAssetSync(key, {
-        serviceName: 'users',
-        projectName: 'shop',
-        modelName: 'User',
-        servicePort: '0',
-      });
     const write = async (path: string, content: string) => {
       await fs.createDir(join(root, path, '..'));
       await fs.writeFile(
@@ -48,7 +45,38 @@ for (const database of [true, false]) {
         }),
       );
       const prefix = 'services/users/src/';
-      await write(`${prefix}database.ts`, 'export const db = { getClient: () => undefined };');
+      const templates = new StringTemplateAdapter(fs);
+      const scaffold = await new ServiceScaffolder(
+        new Scaffolder(templates, fs),
+        fs,
+        templates,
+        formatter,
+      ).scaffold({
+        targetPath: root,
+        projectName: 'shop',
+        serviceName: 'users',
+        modelName: 'User',
+        servicePort: 0,
+        hasDatabase: database,
+        importMode: 'local',
+        force: true,
+      });
+      // Inherit the repository's imports; fixture aliases are rewritten below.
+      await Deno.remove(join(scaffold.serviceDir, 'deno.json'));
+      await write(
+        `${prefix}database.ts`,
+        `const user = { id: 1, name: 'Demo' };
+const client = { user: {
+  findMany: (_query: { skip: number; take: number; orderBy: Record<string, string> }) => Promise.resolve([user]),
+  count: () => Promise.resolve(1),
+  findUnique: (_query: { where: { id: number } }) => Promise.resolve(user),
+  create: (_query: { data: { name: string } }) => Promise.resolve(user),
+  update: (_query: { where: { id: number }; data: { name?: string } }) => Promise.resolve(user),
+  delete: (_query: { where: { id: number } }) => Promise.resolve(user),
+} };
+export type PrismaClient = typeof client;
+export const db = { getClient: () => Promise.resolve(client) };`,
+      );
       await write(
         `${prefix}schemas.ts`,
         `import { z } from 'zod';
@@ -58,19 +86,31 @@ export const UserUpdateInput = UserCreateInput.partial();`,
       );
       await write(
         `${prefix}contract.ts`,
-        render(
+        renderTemplateAssetSync(
           database ? TEMPLATE_KEYS.serviceContract : TEMPLATE_KEYS.serviceContractMemory,
+          { serviceName: 'users', projectName: 'shop', modelName: 'User' },
         ).replace("'@database/zod'", "'./schemas.ts'"),
       );
       await write(
         `${prefix}contract-surface.ts`,
         `import { UsersV1 } from './contract.ts';
 export const v1 = { users: UsersV1 };
-export type { UsersListItemV1 } from './contract.ts';`.replace(
-          database ? "export type { UsersListItemV1 } from './contract.ts';" : '',
-          '',
-        ),
+export type * from './contract.ts';`,
       );
+      for (
+        const path of scaffold.scaffoldResult.filesCreated.filter((path) => path.endsWith('.ts'))
+      ) {
+        const local = (name: string) => {
+          const specifier = relative(dirname(path), join(root, prefix, name)).replaceAll('\\', '/');
+          return specifier.startsWith('.') ? specifier : `./${specifier}`;
+        };
+        await write(
+          relative(root, path),
+          (await fs.readFile(path))
+            .replaceAll("'@shop/contracts'", JSON.stringify(local('contract-surface.ts')))
+            .replaceAll("'@database'", JSON.stringify(local('database.ts'))),
+        );
+      }
       const privateProcedure = `import { baseContract } from '@netscript/contracts';
 import { implement } from '@orpc/server';
 import { z } from 'zod';
@@ -79,37 +119,13 @@ const privateContract = { protected: baseContract.route({ method: 'GET', path: '
 const protectedProcedure = implement(privateContract).protected.handler(() => ({ ok: true }));\n`;
       await write(
         `${prefix}router.ts`,
-        privateProcedure + render(TEMPLATE_KEYS.serviceRouter)
-          .replace('...UsersV1,', '...UsersV1, protected: protectedProcedure,'),
-      );
-      await write(
-        `${prefix}routers/health.ts`,
-        render(TEMPLATE_KEYS.serviceRoutersHealth)
-          .replace("'@shop/contracts'", "'../contract-surface.ts'"),
-      );
-      await write(
-        `${prefix}routers/v1.ts`,
-        database
-          ? `import { UsersV1 as contract } from '../contract.ts';
-const user = { id: 1, name: 'Demo' };
-export const UsersV1 = {
-  list: contract.list.handler(() => ({ data: [user], pagination: {
-    page: 1, limit: 10, total: 1, totalPages: 1, hasNext: false, hasPrev: false,
-  } })),
-  getById: contract.getById.handler(() => user),
-  create: contract.create.handler(() => user),
-  update: contract.update.handler(() => user),
-  delete: contract.delete.handler(() => ({ success: true })),
-};`
-          : render(TEMPLATE_KEYS.serviceRoutersV1Memory)
-            .replace("'@shop/contracts'", "'../contract-surface.ts'"),
+        privateProcedure + (await fs.readFile(join(root, prefix, 'router.ts')))
+          .replace(
+            '...createUsersV1(application),',
+            '...createUsersV1(application), protected: protectedProcedure,',
+          ),
       );
       const mainPath = `${prefix}main.ts`;
-      await write(
-        mainPath,
-        render(database ? TEMPLATE_KEYS.serviceMain : TEMPLATE_KEYS.serviceMainMemory)
-          .replace("'@database'", "'./database.ts'"),
-      );
       // Init formats main.ts before plugin install; test that exact L1-emitted shape too.
       await write(
         mainPath,
@@ -137,14 +153,14 @@ const client = createServiceClient(UsersContractV1, { serviceName: 'users' });
 const user: UsersUserV1 = await client.getById({ id: 1 });
 console.log(user.name);`,
         );
-        const checked = await new DenoProcess().exec('deno', [
-          'check',
-          '--unstable-kv',
-          join(root, mainPath),
-          join(root, prefix, 'client-types.ts'),
-        ]);
-        assertEquals(checked.code, 0, checked.stderr);
       }
+      const checked = await new DenoProcess().exec('deno', [
+        'check',
+        '--unstable-kv',
+        join(root, mainPath),
+        ...(database ? [join(root, prefix, 'client-types.ts')] : []),
+      ]);
+      assertEquals(checked.code, 0, checked.stderr);
       const generated: { service: RunningService } = await import(
         toFileUrl(resolve(root, mainPath)).href
       );

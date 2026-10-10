@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "b00548356",
-  "extractionTimestamp": "2026-10-10T17:57:08.409Z",
+  "sourceCommit": "4d9aa23c9",
+  "extractionTimestamp": "2026-10-10T18:02:42.708Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -37,7 +37,6 @@
     "pages/data-persistence/how-to/use-a-second-database/index.md",
     "pages/data-persistence/index.md",
     "pages/data-persistence/kv-queues-cron/index.md",
-    "pages/durable-workflows/expo-streams/index.md",
     "pages/durable-workflows/how-to/bound-stream-retention/index.md",
     "pages/durable-workflows/how-to/build-a-validated-ingestion-queue/index.md",
     "pages/durable-workflows/how-to/index.md",
@@ -130,6 +129,7 @@
     "pages/services-sdk/how-to/protect-an-anonymous-route/index.md",
     "pages/services-sdk/index.md",
     "pages/services-sdk/sdk/index.md",
+    "pages/services-sdk/service-layout/index.md",
     "pages/services-sdk/services/index.md",
     "pages/tutorials/chat/01-scaffold/index.md",
     "pages/tutorials/chat/02-durable-chat-route/index.md",
@@ -192,7 +192,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5288434,
-  "compressedBytes": 1541488,
-  "sha256": "303940c289bf2d3b583b885d7435df8e0586d0129387eca8dcb735a20ec52eba"
+  "uncompressedBytes": 5291703,
+  "compressedBytes": 1542644,
+  "sha256": "5105debeb3913ba4812d368916225020bac38685f35320f50d6d59137256bacf"
 }

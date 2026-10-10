@@ -12,14 +12,13 @@ export function appendServiceHandler(
     throw new Error(`Invalid procedure name "${procedure}". Expected a TypeScript identifier.`);
   }
   const suffix = version.slice(1);
-  const declaration = `export const ${toPascalCase(serviceName)}V${suffix} =`;
-  const declarationIndex = source.indexOf(declaration);
-  if (declarationIndex < 0) throw new Error(`Service router declaration was not found.`);
-  const objectStart = source.indexOf('{', declarationIndex + declaration.length);
+  const objectStart = routerObjectStart(source, `${toPascalCase(serviceName)}V${suffix}`);
   const objectEnd = matchingBrace(source, objectStart);
-  if (new RegExp(`\\b${escapeRegExp(procedure)}\\s*:`).test(
-    source.slice(objectStart, objectEnd),
-  )) {
+  if (
+    new RegExp(`\\b${escapeRegExp(procedure)}\\s*:`).test(
+      source.slice(objectStart, objectEnd),
+    )
+  ) {
     throw new Error(`Handler "${procedure}" already exists in ${serviceName} ${version}.`);
   }
   const camel = toCamelCase(serviceName);
@@ -27,13 +26,35 @@ export function appendServiceHandler(
   const route = new RegExp(`const\\s+${escapeRegExp(contextual)}\\s*=`).test(source)
     ? `${contextual}.${procedure}`
     : `${version}.${camel}.${procedure}`;
+  const linePrefix = source.slice(source.lastIndexOf('\n', objectEnd) + 1, objectEnd);
+  const indentation = /^\s*$/.test(linePrefix) ? linePrefix : '';
   const handler = [
-    `  ${procedure}: ${route}.handler(async ({ input }) => {`,
-    '    void input;',
-    `    throw new Error('Not implemented: ${procedure}');`,
-    '  }),',
+    `${indentation}  ${procedure}: ${route}.handler(async ({ input }) => {`,
+    `${indentation}    void input;`,
+    `${indentation}    throw new Error('Not implemented: ${procedure}');`,
+    `${indentation}  }),`,
   ].join('\n');
-  return `${source.slice(0, objectEnd)}${handler}\n${source.slice(objectEnd)}`;
+  const insertion = source.lastIndexOf('\n', objectEnd) + 1;
+  const insertAt = /^\s*$/.test(linePrefix) ? insertion : objectEnd;
+  return `${source.slice(0, insertAt)}${handler}\n${source.slice(insertAt)}`;
+}
+
+function routerObjectStart(source: string, name: string): number {
+  const declaration = `export const ${name} =`;
+  const declarationIndex = source.indexOf(declaration);
+  if (declarationIndex >= 0) {
+    return source.indexOf('{', declarationIndex + declaration.length);
+  }
+  const factory = new RegExp(
+    `export\\s+function\\s+create${escapeRegExp(name)}\\s*\\([^)]*\\)\\s*\\{`,
+  )
+    .exec(source);
+  if (!factory) throw new Error('Service router declaration was not found.');
+  const bodyStart = factory.index + factory[0].length - 1;
+  const bodyEnd = matchingBrace(source, bodyStart);
+  const returnedObject = /\breturn\s*\{/.exec(source.slice(bodyStart, bodyEnd));
+  if (!returnedObject) throw new Error('Service router returned object was not found.');
+  return bodyStart + returnedObject.index + returnedObject[0].length - 1;
 }
 
 function matchingBrace(source: string, open: number): number {
