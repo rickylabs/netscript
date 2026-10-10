@@ -6,8 +6,11 @@ import type {
   ResourceSliceReportEntry,
   ResourceSliceStagingResult,
   ResourceSliceVariant,
-} from './resource-slice-contract.ts';
-import { parseOwnedResourceSliceLeaf, sha256ResourceSliceBody } from './resource-slice-contract.ts';
+} from '../resource-slice-contract.ts';
+import {
+  parseOwnedResourceSliceLeaf,
+  sha256ResourceSliceBody,
+} from '../resource-slice-contract.ts';
 
 export interface ReconcileResourceSliceInput {
   readonly staging: ResourceSliceStagingResult;

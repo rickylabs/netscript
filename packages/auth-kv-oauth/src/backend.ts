@@ -11,7 +11,6 @@
  *     clientSecret: "secret_test",
  *     redirectUri: "https://app.example.test/auth/callback",
  *   }),
- *   allowInsecureRequests: true,
  * });
  * ```
  *
@@ -27,6 +26,8 @@ import type {
   AuthSessionCryptoPort,
   AuthSessionLookup,
   AuthSessionStorePort,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
 } from '@netscript/plugin-auth-core';
 import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
 import type { AuthnRequest, AuthnResult, Principal } from '@netscript/service/auth';
@@ -53,6 +54,8 @@ export type {
   AuthSessionPrincipalMapping,
   AuthSessionState,
   AuthSessionStorePort,
+  AuthSubjectRevocation,
+  AuthSubjectRevocationInput,
   InteractiveCallbackResult,
   InteractiveFlowPort,
 } from '@netscript/plugin-auth-core';
@@ -110,8 +113,11 @@ export async function createKvOAuthBackend(
 ): Promise<KvOAuthBackend> {
   const store = options.store ?? await createKvOAuthStore();
   const provider = options.provider;
-  const cookie = options.cookie;
-  const cookieName = cookie?.name ?? DEFAULT_SESSION_COOKIE_NAME;
+  const cookie = {
+    ...options.cookie,
+    trustProxyHeaders: options.trustProxyHeaders ?? options.cookie?.trustProxyHeaders ?? false,
+  };
+  const cookieName = cookie.name ?? DEFAULT_SESSION_COOKIE_NAME;
   const flow = createKvOAuthFlow({ ...options, store });
   const sessions = createSessionStore(provider, store, cookieName);
   const principalMapper = createPrincipalMapper();
@@ -134,7 +140,7 @@ export async function createKvOAuthBackend(
       const sessionId = credential.sessionId;
       const entry = await store.getSessionEntry(sessionId);
       const record = entry?.record;
-      if (!record || record.session.state !== 'active') {
+      if (!record || (await withSubjectRevocation(store, record.session)).state !== 'active') {
         return { ok: false, reason: 'kv_oauth_session_not_found' };
       }
       const now = Date.now();
@@ -243,7 +249,8 @@ function createSessionStore(
       if (!credential) {
         return undefined;
       }
-      return (await store.getSession(credential.sessionId))?.session;
+      const record = await store.getSession(credential.sessionId);
+      return record ? await withSubjectRevocation(store, record.session) : undefined;
     },
     async createSession(input: AuthSessionCreateInput): Promise<AuthSession> {
       const now = new Date().toISOString();
@@ -291,39 +298,67 @@ function createSessionStore(
       }
       return refreshed;
     },
-    async revokeSession(sessionId: string): Promise<AuthSession> {
-      let observed: AuthSession | undefined;
-      for (let attempt = 0; attempt < REVOKE_MAX_ATTEMPTS; attempt += 1) {
-        const entry = await store.getSessionEntry(sessionId);
-        const record = entry?.record;
-        if (!record) {
-          if (!observed) {
-            throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
-          }
-          // The record was deleted while revoking; no authority survives, so report the revocation.
-          return { ...observed, state: 'revoked', revokedAt: new Date().toISOString() };
-        }
-        if (record.session.state === 'revoked') {
-          return record.session;
-        }
-        observed = record.session;
-        const revoked: AuthSession = {
-          ...record.session,
-          state: 'revoked',
-          revokedAt: new Date().toISOString(),
-        };
-        if (
-          await store.rotateSession(sessionId, { ...record, session: revoked }, entry!.versionstamp)
-        ) {
-          return revoked;
-        }
-      }
-      throw new KvOAuthError(
-        'revoke_conflict',
-        `Session ${sessionId} could not be revoked after ${REVOKE_MAX_ATTEMPTS} attempts because concurrent updates kept winning the compare-and-set.`,
-      );
+    revokeSession: (sessionId: string): Promise<AuthSession> =>
+      revokeStoredSession(store, sessionId),
+    async revokeSubjectSessions(
+      { subject }: AuthSubjectRevocationInput,
+    ): Promise<AuthSubjectRevocation> {
+      // One subject-level write: every session issued up to this instant stops resolving as
+      // active, whether or not this adapter has ever seen it, with no per-session work.
+      const revokedAt = await store.revokeSubject(subject, new Date().toISOString());
+      return { subject, revokedAt };
     },
   };
+}
+
+/**
+ * Presents an active session issued at or before its subject's revocation instant as revoked.
+ *
+ * Costs one KV read per resolution and needs no migration of existing session records.
+ */
+async function withSubjectRevocation(
+  store: KvOAuthStore,
+  session: AuthSession,
+): Promise<AuthSession> {
+  if (session.state !== 'active') return session;
+  const revokedAt = await store.getSubjectRevocation(session.subject);
+  if (revokedAt === undefined || Date.parse(session.issuedAt) > Date.parse(revokedAt)) {
+    return session;
+  }
+  return { ...session, state: 'revoked', revokedAt };
+}
+
+async function revokeStoredSession(store: KvOAuthStore, sessionId: string): Promise<AuthSession> {
+  let observed: AuthSession | undefined;
+  for (let attempt = 0; attempt < REVOKE_MAX_ATTEMPTS; attempt += 1) {
+    const entry = await store.getSessionEntry(sessionId);
+    const record = entry?.record;
+    if (!record) {
+      if (!observed) {
+        throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
+      }
+      // The record was deleted while revoking; no authority survives, so report the revocation.
+      return { ...observed, state: 'revoked', revokedAt: new Date().toISOString() };
+    }
+    if (record.session.state === 'revoked') {
+      return record.session;
+    }
+    observed = record.session;
+    const revoked: AuthSession = {
+      ...record.session,
+      state: 'revoked',
+      revokedAt: new Date().toISOString(),
+    };
+    if (
+      await store.rotateSession(sessionId, { ...record, session: revoked }, entry!.versionstamp)
+    ) {
+      return revoked;
+    }
+  }
+  throw new KvOAuthError(
+    'revoke_conflict',
+    `Session ${sessionId} could not be revoked after ${REVOKE_MAX_ATTEMPTS} attempts because concurrent updates kept winning the compare-and-set.`,
+  );
 }
 
 function createSessionCrypto(store: KvOAuthStore): AuthSessionCryptoPort {

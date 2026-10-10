@@ -87,7 +87,7 @@ up for this track:
 }) }}
 
 {{ comp callout { type: "note", title: "Only pinned ports are predictable — read the dashboard for the rest" } }}
-<code>orders</code> answers on <code>:3002</code> because you pinned it with <code>--service-port</code> in chapter 1. Nothing else in this graph has a memorizable number, for two different reasons. The Fresh <code>dashboard</code> app pins no host port, so <strong>Aspire allocates one at runtime</strong> — a fresh number each start. A plugin runtime installed without <code>--port</code> does get a pinned host port, but the installer picks it: a hash of your project name over the IANA dynamic range (<code>49152–65535</code>), probing past ports already claimed in this workspace. That spreads projects apart in practice; it is not a guarantee, since the range is finite and workspaces cannot see each other's allocations. The Aspire dashboard's resource list is the authority for both — read every unpinned port from there.
+<code>orders</code> answers on <code>:3002</code> because you pinned it with <code>--service-port</code> in chapter 1. Nothing else in this graph has a memorizable number: the Fresh <code>dashboard</code> app and every plugin runtime installed without <code>--port</code> pin no host port, so <strong>Aspire allocates one at runtime</strong> — a fresh number each start. The Aspire dashboard's resource list is the authority — read every unpinned port from there.
 {{ /comp }}
 
 ## Step 3 — Open the live dashboard

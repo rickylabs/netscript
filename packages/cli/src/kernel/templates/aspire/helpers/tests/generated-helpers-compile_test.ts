@@ -22,12 +22,28 @@ export const InputType = {
   Boolean: 'Boolean',
 };
 
+export const EndpointProperty = {
+  HostAndPort: 'HostAndPort',
+  TargetPort: 'TargetPort',
+} as const;
+
+export interface EndpointReferenceExpression {
+  readonly expression: string;
+}
+
+export interface CommandLineArgsCallbackContext {
+  args(): Promise<{ add(value: string | EndpointReferenceExpression): Promise<void> }>;
+}
+
 export interface EndpointReference {
+  property(property: string): EndpointReferenceExpression;
   host(): Promise<string>;
   port(): Promise<number>;
 }
 
 export interface AspireResource {
+  withEndpoint(options: { name: string; scheme: string; port?: number; targetPort?: number }): AspireResource;
+  withArgsCallback(callback: (context: CommandLineArgsCallbackContext) => Promise<void>): Promise<AspireResource>;
   waitFor(resource: AspireResource): AspireResource;
   withReference(resource: AspireResource): AspireResource;
   withEnvironment(key: string, value: unknown): AspireResource;
@@ -64,7 +80,7 @@ export interface DistributedApplicationBuilder {
     workingDirectory?: string,
     args?: readonly string[],
   ): AspireResource;
-  addContainer(name: string): Promise<AspireResource>;
+  addContainer(name: string, image?: string): AspireResource;
   addParameter(name: string, options: { value: string; secret: boolean }): Promise<AspireResource>;
   addPostgres(name: string, options: { password: AspireResource }): Promise<AspireResource>;
   addHealthCheck(name: string, check: () => unknown): void;
@@ -73,7 +89,22 @@ export interface DistributedApplicationBuilder {
 
 const ASPIRE_COMPAT_CONTRACT = `
 export interface NetScriptConfig {}
-export interface CacheWiring {}
+export interface CacheWiring {
+  resource: unknown;
+  reference: unknown;
+  env: Record<string, unknown>;
+  local: boolean;
+}
+
+export function ensureGarnetToolManifest(_root: string, _version: string): string {
+  return 'fixture-workdir';
+}
+
+export function shouldUseContainerCache(): boolean { return false; }
+
+export function createRespPingCheck(_options: { host: string; port: number }): () => Promise<{ status: string }> {
+  return () => Promise.resolve({ status: 'Healthy' });
+}
 export const RESOURCE_DEFAULTS = { DbCliModeExcludeFromMcp: true };
 
 export function ensureDatabasePassword(_root: string, _name: string): string {
@@ -108,7 +139,10 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
     await Deno.writeTextFile(`${helpersDir}/_aspire-compat.mts`, ASPIRE_COMPAT_CONTRACT);
     const registerInfrastructure = generateRegisterInfrastructure({
       databases: { main: MINIMAL_DATABASE },
-      caches: {},
+      caches: {
+        executable: { Enabled: true, Engine: 'Garnet', Mode: 'Executable' },
+        auto: { Enabled: true, Engine: 'Garnet', Mode: 'Auto', Port: 6385 },
+      },
     });
     assertStringIncludes(registerInfrastructure, 'databases.set("main", db_0)');
     assert(

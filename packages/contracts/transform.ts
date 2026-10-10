@@ -5,6 +5,8 @@
  * ```typescript
  * import { createTransformer } from "@netscript/contracts/transform";
  *
+ * interface UserRecord { id: string; name: string; passwordHash: string }
+ *
  * const publicUser = createTransformer((user: UserRecord) => ({
  *   id: user.id,
  *   name: user.name,
