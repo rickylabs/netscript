@@ -311,6 +311,7 @@ const SagaInstanceResponseZodSchema: z.ZodObject<{
     completed: 'completed';
     failed: 'failed';
     compensating: 'compensating';
+    compensated: 'compensated';
     cancelled: 'cancelled';
   }>;
   createdAt: z.ZodString;
@@ -453,6 +454,7 @@ const InstanceFiltersShape: {
         completed: 'completed';
         failed: 'failed';
         compensating: 'compensating';
+        compensated: 'compensated';
         cancelled: 'cancelled';
       }>
     >

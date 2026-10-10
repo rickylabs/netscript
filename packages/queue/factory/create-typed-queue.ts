@@ -54,6 +54,8 @@ export interface TypedMessageQueue<T> extends MessageQueue<T> {
  * import { z } from 'zod';
  * import { createTypedQueue } from '@netscript/queue';
  *
+ * declare function sendEmail(to: string, body: string): Promise<void>;
+ *
  * const MessageSchema = z.object({
  *   type: z.enum(['email', 'sms']),
  *   to: z.string().email(),

@@ -377,6 +377,10 @@ function correlationIdFromMessage(message: unknown): string | undefined {
  *
  * @example
  * ```ts
+ * import type { MessageQueue } from '@netscript/telemetry/instrumentation';
+ *
+ * declare const innerQueue: MessageQueue<{ jobId: string }>;
+ *
  * const tracedQueue = traceQueue(innerQueue, { queueName: 'jobs' });
  * ```
  */

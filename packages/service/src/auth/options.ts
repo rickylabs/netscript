@@ -3,7 +3,9 @@
  *
  * @example
  * ```ts
- * import type { AuthnOptions } from "@netscript/service/auth";
+ * import type { AuthenticatorPort, AuthnOptions } from "@netscript/service/auth";
+ *
+ * declare const authenticator: AuthenticatorPort;
  *
  * const authn: AuthnOptions = {
  *   authenticator,

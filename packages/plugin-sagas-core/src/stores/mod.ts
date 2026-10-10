@@ -10,6 +10,7 @@
 
 export { SAGA_DURABILITY_TIERS, SAGA_INSTANCE_STATUSES } from '../domain/mod.ts';
 export type {
+  SagaCompensationError,
   SagaCorrelationKey,
   SagaDurabilityTier,
   SagaId,

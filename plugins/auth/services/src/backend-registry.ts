@@ -173,12 +173,17 @@ async function createActiveBackend(
         })
         : undefined,
       fetch: options.fetch,
-      allowInsecureRequests: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true' ||
-        provider.usesLocalDefaults,
+      allowInsecureRequests: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true',
+      allowInsecureHttpRequests: env.NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS === 'true',
+      trustProxyHeaders: env.NETSCRIPT_AUTH_TRUST_PROXY_HEADERS === 'true',
       cookie: {
         name: env.NETSCRIPT_AUTH_COOKIE_NAME,
-        allowInsecureDev: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true' ||
-          provider.usesLocalDefaults,
+        secure: env.NETSCRIPT_AUTH_COOKIE_SECURE === 'true'
+          ? true
+          : env.NETSCRIPT_AUTH_COOKIE_SECURE === 'false'
+          ? false
+          : undefined,
+        allowInsecureDev: env.NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS === 'true',
       },
     });
   }
@@ -273,11 +278,7 @@ function resolveKvOAuthProviderEnv(
   redirectUri: string;
   authorizationEndpoint?: string;
   tokenEndpoint?: string;
-  usesLocalDefaults: boolean;
 }> {
-  const usesLocalDefaults = !env.NETSCRIPT_AUTH_CLIENT_ID || !env.NETSCRIPT_AUTH_REDIRECT_URI ||
-    (!env.NETSCRIPT_AUTH_ISSUER &&
-      (!env.NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT || !env.NETSCRIPT_AUTH_TOKEN_ENDPOINT));
   return {
     clientId: env.NETSCRIPT_AUTH_CLIENT_ID ?? 'netscript-auth-local',
     redirectUri: env.NETSCRIPT_AUTH_REDIRECT_URI ??
@@ -290,7 +291,6 @@ function resolveKvOAuthProviderEnv(
       (env.NETSCRIPT_AUTH_ISSUER
         ? undefined
         : `${localAuthOrigin(env)}/v1/auth/token/not-configured`),
-    usesLocalDefaults,
   };
 }
 
@@ -330,7 +330,7 @@ export async function createInMemoryKvOAuthRegistry(
       NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
       NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
       NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
-      NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
+      NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS: 'true',
       ...(options.env ?? {}),
     },
   });
