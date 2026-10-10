@@ -8,7 +8,7 @@ import { Command } from '@cliffy/command';
 
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { CliCommand } from '../../../../kernel/application/abstracts/cli-command.ts';
-import { selectDbOperationExecutor } from '../../../../kernel/adapters/database/select-operation-executor.ts';
+import { selectDbOperationExecutor } from '../../../../kernel/adapters/database/operations/select-operation-executor.ts';
 import { DbWorkspaceResolver } from '../../../../kernel/adapters/database/workspace-resolver.ts';
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { DbOperation } from '../../../../kernel/domain/db-engine.ts';

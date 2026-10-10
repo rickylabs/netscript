@@ -10,7 +10,7 @@ import { Command } from '@cliffy/command';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { parseContractVersion } from '../../../../kernel/adapters/contracts/types.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
-import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
+import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config/deploy-config.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { ListContractsInput } from './list-contracts-input.ts';
 

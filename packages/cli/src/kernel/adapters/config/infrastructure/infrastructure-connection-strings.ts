@@ -5,7 +5,7 @@ import {
   DB_DEFAULT_PORTS,
   DB_PROVIDERS,
   DB_URI_PREFIXES,
-} from '../../constants/providers.ts';
+} from '../../../constants/providers.ts';
 
 // ============================================================================
 // CONNECTION STRING PARSERS

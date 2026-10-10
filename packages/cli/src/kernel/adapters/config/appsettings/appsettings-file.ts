@@ -8,9 +8,9 @@
 
 import { join } from '@std/path';
 
-import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
-import { ConfigNotFoundError } from '../../domain/errors.ts';
-import type { FileSystemPort } from '../../ports/file-system-port.ts';
+import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
+import { ConfigNotFoundError } from '../../../domain/errors.ts';
+import type { FileSystemPort } from '../../../ports/file-system-port.ts';
 
 const MISSING_APPSETTINGS_REMEDY = `${SCAFFOLD_FILES.APPSETTINGS} is the NetScript ` +
   `infrastructure config; 'netscript init' writes it with or without --no-aspire. ` +

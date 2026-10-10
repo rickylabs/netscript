@@ -1,4 +1,4 @@
-import type { DockerContainerInfo } from '../../domain/infrastructure-config.ts';
+import type { DockerContainerInfo } from '../../../domain/infrastructure-config.ts';
 
 // ============================================================================
 // DOCKER DETECTION

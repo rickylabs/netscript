@@ -5,7 +5,7 @@
  */
 
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
-import { requireAppsettingsPath } from '../config/appsettings-file.ts';
+import { requireAppsettingsPath } from '../config/appsettings/appsettings-file.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { DiscoveredService, ServiceConfigEntry } from '../../domain/service-shape.ts';
 

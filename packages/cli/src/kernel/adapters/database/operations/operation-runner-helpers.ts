@@ -1,4 +1,4 @@
-import type { DbOperationRequest } from '../../domain/db-engine.ts';
+import type { DbOperationRequest } from '../../../domain/db-engine.ts';
 
 interface AspireResourceStatus {
   readonly displayName?: string;

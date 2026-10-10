@@ -1,6 +1,6 @@
 import { inspectConfig, type NetScriptConfig } from '@netscript/config';
 
-import { requireAppsettingsPath } from '../../../../kernel/adapters/config/appsettings-file.ts';
+import { requireAppsettingsPath } from '../../../../kernel/adapters/config/appsettings/appsettings-file.ts';
 import { ConfigInvalidError } from '../../../../kernel/domain/errors.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import { isObject, step } from './read-appsettings-schema.ts';

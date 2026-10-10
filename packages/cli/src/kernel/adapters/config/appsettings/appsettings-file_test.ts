@@ -1,9 +1,9 @@
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 
-import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
-import { ConfigNotFoundError, ExitCode } from '../../domain/errors.ts';
-import { DbWorkspaceResolver } from '../database/workspace-resolver.ts';
-import { ServiceWorkspaceResolver } from '../service/workspace-resolver.ts';
+import { MemoryFileSystemAdapter } from '../../scaffold/memory-fs.ts';
+import { ConfigNotFoundError, ExitCode } from '../../../domain/errors.ts';
+import { DbWorkspaceResolver } from '../../database/workspace-resolver.ts';
+import { ServiceWorkspaceResolver } from '../../service/workspace-resolver.ts';
 import { requireAppsettingsPath } from './appsettings-file.ts';
 
 Deno.test('requireAppsettingsPath returns the project-root appsettings.json path', async () => {

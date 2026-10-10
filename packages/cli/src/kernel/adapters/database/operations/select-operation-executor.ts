@@ -4,10 +4,10 @@
 
 import { join } from '@std/path';
 
-import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
-import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
-import type { DbOperationExecutor } from '../../domain/db-engine.ts';
-import type { FileSystemPort } from '../../ports/file-system-port.ts';
+import { SCAFFOLD_DIRS } from '../../../constants/scaffold/scaffold-dirs.ts';
+import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
+import type { DbOperationExecutor } from '../../../domain/db-engine.ts';
+import type { FileSystemPort } from '../../../ports/file-system-port.ts';
 import { DbOperationRunner } from './operation-runner.ts';
 import { DbWorkspaceTaskRunner } from './workspace-task-runner.ts';
 

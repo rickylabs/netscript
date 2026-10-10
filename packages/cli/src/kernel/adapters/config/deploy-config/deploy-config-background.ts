@@ -3,9 +3,9 @@ import type {
   RegisteredPluginConfig,
   ResolvedBackgroundProcessorConfig,
   ResolvedBackgroundProcessorEntrypointConfig,
-} from '../../domain/resolved-config.ts';
+} from '../../../domain/resolved-config.ts';
 import type { RawBackgroundProcessorConfig } from './deploy-config-types.ts';
-import { resolvePluginEnvironmentVariables } from './plugin-registry.ts';
+import { resolvePluginEnvironmentVariables } from '../plugin-registry.ts';
 import {
   findWorkspaceMemberPath,
   mergeEnvironment,

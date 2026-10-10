@@ -11,11 +11,11 @@ import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
-import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/configured-plugin-manifest-probe.ts';
+import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/plugin-manifest/configured-plugin-manifest-probe.ts';
 import { resolvePluginImportSpecifier } from '../../../../kernel/application/plugin/configured-plugin-specifier.ts';
 import { getPluginServiceLookupName } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { showAuthBackend } from '../auth/auth-config.ts';
-import { resolveEffectivePluginPermissions } from '../../../../kernel/adapters/config/deploy-config-resolvers.ts';
+import { resolveEffectivePluginPermissions } from '../../../../kernel/adapters/config/deploy-config/deploy-config-resolvers.ts';
 import { JsrExportMapHttpError, type JsrExportMapLoader } from './jsr-export-map-loader-port.ts';
 import type { GenerateInstalledPluginRegistries } from '../../generate/plugins/generate-installed-plugin-registries.ts';
 import { checkRuntimeRegistryDrift } from './runtime-registry-drift.ts';

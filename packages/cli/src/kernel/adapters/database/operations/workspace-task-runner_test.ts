@@ -1,8 +1,8 @@
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 
-import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
-import { ScaffoldValidationError } from '../../domain/errors.ts';
-import type { DbOperationRequest, DiscoveredDatabase } from '../../domain/db-engine.ts';
+import { MemoryFileSystemAdapter } from '../../scaffold/memory-fs.ts';
+import { ScaffoldValidationError } from '../../../domain/errors.ts';
+import type { DbOperationRequest, DiscoveredDatabase } from '../../../domain/db-engine.ts';
 import {
   type DenoTaskSpawner,
   DbWorkspaceTaskRunner,

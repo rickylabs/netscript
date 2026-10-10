@@ -2,20 +2,20 @@ import {
   outputError,
   outputText,
   outputWarning,
-} from '../../presentation/output/default-output.ts';
+} from '../../../presentation/output/default-output.ts';
 /**
  * @module infra/database/operation-runner
  */
 
 import { join } from '@std/path';
 
-import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
-import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
+import { SCAFFOLD_DIRS } from '../../../constants/scaffold/scaffold-dirs.ts';
+import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
 import type {
   DbOperationExecutor,
   DbOperationRequest,
   DiscoveredDatabase,
-} from '../../domain/db-engine.ts';
+} from '../../../domain/db-engine.ts';
 import {
   type AppHostLifecycleLease,
   type AppHostLifecycleLock,

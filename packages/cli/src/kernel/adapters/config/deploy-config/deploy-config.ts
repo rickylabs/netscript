@@ -1,4 +1,4 @@
-import { outputWarning } from '../../presentation/output/default-output.ts';
+import { outputWarning } from '../../../presentation/output/default-output.ts';
 /**
  * @module infra/config/deploy-config
  *
@@ -15,13 +15,13 @@ import { outputWarning } from '../../presentation/output/default-output.ts';
 
 import { join, resolve } from '@std/path';
 import { discoverWorkspace, type NetScriptConfig } from '@netscript/config';
-import { DEFAULT_DEPLOY_OUTPUT_DIR } from '../../constants/runtime.ts';
-import { ConfigInvalidError, ConfigNotFoundError } from '../../domain/errors.ts';
-import { detectInfrastructure, type RawInfrastructureEntries } from './infrastructure.ts';
-import { loadRegisteredPlugins } from './plugin-registry.ts';
-import type { ResolvedConfig } from '../../domain/resolved-config.ts';
-import { loadProjectConfig } from './project-config-loader.ts';
-import { DenoProcess } from '../runtime/process/deno-process.ts';
+import { DEFAULT_DEPLOY_OUTPUT_DIR } from '../../../constants/runtime.ts';
+import { ConfigInvalidError, ConfigNotFoundError } from '../../../domain/errors.ts';
+import { detectInfrastructure, type RawInfrastructureEntries } from '../infrastructure/infrastructure.ts';
+import { loadRegisteredPlugins } from '../plugin-registry.ts';
+import type { ResolvedConfig } from '../../../domain/resolved-config.ts';
+import { loadProjectConfig } from '../project-config-loader.ts';
+import { DenoProcess } from '../../runtime/process/deno-process.ts';
 
 import type { AppSettingsJson } from './deploy-config-types.ts';
 import {

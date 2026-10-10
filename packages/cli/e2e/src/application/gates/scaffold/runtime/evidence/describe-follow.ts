@@ -1,6 +1,6 @@
 import { join } from '@std/path';
 import { disableAnonymousDashboard } from '../dashboard-config.ts';
-import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adapters/database/operation-runner-helpers.ts';
+import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adapters/database/operations/operation-runner-helpers.ts';
 
 const READY_STATES: readonly string[] = ['Healthy', 'Ready', 'Running', 'Finished'];
 

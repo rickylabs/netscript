@@ -21,7 +21,7 @@ import {
 } from '../config/plugin-registry.ts';
 import { loadProjectConfig } from '../config/project-config-loader.ts';
 import { DenoProcess } from '../runtime/process/deno-process.ts';
-import { resolveEffectivePluginPermissions } from '../config/deploy-config-resolvers.ts';
+import { resolveEffectivePluginPermissions } from '../config/deploy-config/deploy-config-resolvers.ts';
 import type { RegisteredPluginConfig } from '../../domain/resolved-config.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 

@@ -1,6 +1,6 @@
 import { assertInstanceOf } from 'jsr:@std/assert@^1';
 
-import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
+import { MemoryFileSystemAdapter } from '../../scaffold/memory-fs.ts';
 import { DbOperationRunner } from './operation-runner.ts';
 import { selectDbOperationExecutor } from './select-operation-executor.ts';
 import { DbWorkspaceTaskRunner } from './workspace-task-runner.ts';

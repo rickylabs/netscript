@@ -9,17 +9,17 @@
 
 import { join } from '@std/path';
 
-import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
-import { ScaffoldValidationError } from '../../domain/errors.ts';
+import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
+import { ScaffoldValidationError } from '../../../domain/errors.ts';
 import type {
   DbOperation,
   DbOperationExecutor,
   DbOperationRequest,
   DiscoveredDatabase,
-} from '../../domain/db-engine.ts';
-import type { FileSystemPort } from '../../ports/file-system-port.ts';
-import { outputText } from '../../presentation/output/default-output.ts';
-import { databaseUrlEnvKey } from '../../templates/database/generate-prisma-config.ts';
+} from '../../../domain/db-engine.ts';
+import type { FileSystemPort } from '../../../ports/file-system-port.ts';
+import { outputText } from '../../../presentation/output/default-output.ts';
+import { databaseUrlEnvKey } from '../../../templates/database/generate-prisma-config.ts';
 import { buildDbTaskEnv } from './operation-runner-helpers.ts';
 
 /** Spawns `deno task <name>` with inherited stdio and returns its exit code. */

@@ -8,7 +8,7 @@ import { ScaffoldValidationError } from '../../domain/errors.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { DbEngineRegistry } from '../../application/registries/db-engine-registry.ts';
 import type { DbEngine, DiscoveredDatabase, ResolvedTarget } from '../../domain/db-engine.ts';
-import { requireAppsettingsPath } from '../config/appsettings-file.ts';
+import { requireAppsettingsPath } from '../config/appsettings/appsettings-file.ts';
 
 /** Resolves database workspaces from project configuration. */
 export class DbWorkspaceResolver {
