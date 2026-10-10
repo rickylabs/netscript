@@ -41,7 +41,7 @@ const workerProvider: PluginKindProvider = {
   defaultRequiresKv: true,
   pluginType: 'background-processor',
   supportsConcurrency: true,
-  concurrencyEnvVar: 'WORKER_CONCURRENCY',
+  concurrencyEnvVar: 'WORKERS_CONCURRENCY',
   defaultConcurrency: 2,
   defaultTelemetry: true,
   infrastructureRequires: ['kv'],
