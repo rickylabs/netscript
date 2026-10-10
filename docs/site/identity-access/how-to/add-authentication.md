@@ -129,6 +129,19 @@ set -a
 set +a
 ```
 
+GitHub is OAuth 2.0, so the preset emits no `NETSCRIPT_AUTH_ISSUER` and ignores `--issuer`.
+Re-running the command removes an issuer saved by an older preset. GitHub does not serve an OIDC
+discovery document; sign-in uses these explicit endpoints and derives the stable subject
+`github:<id>` from userinfo instead:
+
+```dotenv
+NETSCRIPT_AUTH_PROVIDER_ID=github
+NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https://github.com/login/oauth/authorize
+NETSCRIPT_AUTH_TOKEN_ENDPOINT=https://github.com/login/oauth/access_token
+NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://api.github.com/user
+NETSCRIPT_AUTH_SCOPES=read:user user:email
+```
+
 Provider credentials and settings are written only to the project `.env`, which must stay outside
 version control. Tracked appsettings receives the non-secret backend selector; reconciliation prunes
 legacy credential copies and retains unrelated benign environment settings. Aspire refuses declared

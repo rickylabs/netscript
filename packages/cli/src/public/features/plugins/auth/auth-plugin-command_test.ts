@@ -1,4 +1,4 @@
-import { assertEquals, assertMatch, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertMatch, assertRejects } from '@std/assert';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import {
@@ -129,6 +129,92 @@ Deno.test('github provider preset writes boot-ready OAuth environment', async ()
     kv: new MemoryKvAdapter(),
   });
   assertEquals(registry.defaultName, 'kv-oauth');
+});
+
+for (const issuer of [undefined, 'https://github.com']) {
+  Deno.test(`GitHub CLI preset skips discovery and resolves userinfo subject (issuer=${issuer})`, async () => {
+    const fs = new MemoryFileSystemAdapter();
+    // Reconfiguring a project must remove its old issuer too.
+    await fs.writeFile('/workspace/.env', "NETSCRIPT_AUTH_ISSUER='https://github.com'\n");
+    await setAuthProvider({
+      projectRoot: '/workspace',
+      preset: 'github',
+      clientId: 'client_test',
+      clientSecret: 'secret_test',
+      redirectUri: 'https://app.test/v1/auth/callback',
+      kvOAuthKey: generateAuthSecret('kv-oauth-key'),
+      issuer,
+    }, fs);
+    const env = Object.fromEntries(
+      (await fs.readFile('/workspace/.env')).trim().split('\n').map((line) => {
+        const separator = line.indexOf('=');
+        return [line.slice(0, separator), line.slice(separator + 1).replaceAll("'", '')];
+      }),
+    );
+    const requests: Request[] = [];
+    const registry = await createAuthServiceBackendRegistry({
+      env,
+      kv: new MemoryKvAdapter(),
+      fetch: (input, init) => {
+        const request = new Request(input, init);
+        requests.push(request);
+        if (request.url === 'https://api.github.com/user') {
+          return Promise.resolve(Response.json({ id: 583231, login: 'octocat' }));
+        }
+        if (request.url === 'https://github.com/login/oauth/access_token') {
+          return Promise.resolve(Response.json({ access_token: 'access', token_type: 'Bearer' }));
+        }
+        throw new Error(`Unexpected provider request: ${request.url}`);
+      },
+    });
+    const started = await signin({}, {
+      registry,
+      request: { url: 'https://app.test/v1/auth/signin' },
+    });
+    const redirect = new URL(started.redirectUrl ?? '');
+    assertEquals(redirect.origin + redirect.pathname, 'https://github.com/login/oauth/authorize');
+    const completed = await callback({
+      code: 'code',
+      state: redirect.searchParams.get('state') ?? undefined,
+    }, {
+      registry,
+      request: { url: `https://app.test/v1/auth/callback?txn=${redirect.searchParams.get('txn')}` },
+    });
+    assertEquals(completed.subject, 'github:583231');
+    assertEquals(env.NETSCRIPT_AUTH_ISSUER, undefined);
+    assertEquals(requests.map((request) => request.url), [
+      'https://github.com/login/oauth/access_token',
+      'https://api.github.com/user',
+    ]);
+    assert(!requests.some((request) => request.url.includes('/.well-known/')));
+    assertEquals(requests[1].headers.get('authorization'), 'Bearer access');
+    assertEquals(requests[1].headers.get('user-agent'), 'netscript-auth-kv-oauth');
+  });
+}
+
+Deno.test('GitHub preset docs describe explicit OAuth endpoints without an issuer', async () => {
+  const docs = await Deno.readTextFile('docs/site/identity-access/how-to/add-authentication.md');
+  assert(docs.includes('GitHub is OAuth 2.0, so the preset emits no `NETSCRIPT_AUTH_ISSUER`'));
+  const fs = new MemoryFileSystemAdapter();
+  await setAuthProvider({
+    projectRoot: '/workspace',
+    preset: 'github',
+    clientId: 'client_test',
+    clientSecret: 'secret_test',
+    redirectUri: 'https://app.test/v1/auth/callback',
+  }, fs);
+  const assignments = (await fs.readFile('/workspace/.env')).replaceAll("'", '').split('\n');
+  for (
+    const key of [
+      'NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT',
+      'NETSCRIPT_AUTH_TOKEN_ENDPOINT',
+      'NETSCRIPT_AUTH_USERINFO_ENDPOINT',
+      'NETSCRIPT_AUTH_SCOPES',
+    ]
+  ) {
+    const assignment = assignments.find((line) => line.startsWith(`${key}=`));
+    assert(assignment && docs.includes(assignment), `GitHub docs must match ${key}`);
+  }
 });
 
 Deno.test('workos and better-auth variants enforce their boot credential contracts', async () => {

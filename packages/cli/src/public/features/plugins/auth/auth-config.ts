@@ -19,7 +19,6 @@ const PRESET_ENV: Readonly<
   Partial<Record<AuthProviderPreset, Readonly<Record<string, string>>>>
 > = {
   github: {
-    NETSCRIPT_AUTH_ISSUER: 'https://github.com',
     NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: 'https://github.com/login/oauth/authorize',
     NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://github.com/login/oauth/access_token',
     NETSCRIPT_AUTH_USERINFO_ENDPOINT: 'https://api.github.com/user',
@@ -139,7 +138,9 @@ function providerEnv(
     NETSCRIPT_AUTH_REDIRECT_URI: required('--redirect-uri', input.redirectUri),
     ...(PRESET_ENV[preset] ?? {}),
   };
-  if (input.issuer) values.NETSCRIPT_AUTH_ISSUER = input.issuer;
+  // GitHub has no OIDC discovery document. Ignore --issuer for this OAuth preset so
+  // the flow always uses its explicit endpoints, including when reconfiguring old projects.
+  if (input.issuer && preset !== 'github') values.NETSCRIPT_AUTH_ISSUER = input.issuer;
   if (input.kvOAuthKey) values.NETSCRIPT_AUTH_KV_OAUTH_KEY = input.kvOAuthKey;
   if (!values.NETSCRIPT_AUTH_ISSUER && !values.NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT) {
     throw new Error(`Provider preset "${preset}" requires --issuer.`);
@@ -171,7 +172,14 @@ async function writeAuthEnv(
 ): Promise<void> {
   const path = join(projectRoot, AUTH_ENV_FILE);
   const current = await fs.exists(path) ? await fs.readFile(path) : '';
-  await fs.writeFile(path, reconcileAuthEnv(current, values));
+  await fs.writeFile(
+    path,
+    reconcileAuthEnv(
+      current,
+      values,
+      values.NETSCRIPT_AUTH_PROVIDER_ID === 'github' ? ['NETSCRIPT_AUTH_ISSUER'] : [],
+    ),
+  );
 }
 
 async function writeAuthConfig(
