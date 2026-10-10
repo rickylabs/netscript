@@ -397,8 +397,10 @@ the transaction cookie; `callback` returns `redirectTo` plus the session cookie.
 Your application follows those JSON redirects and posts the provider's `code`
 and `state` to the callback endpoint. The callback is POST-only: configure your
 application callback route to perform that POST when the provider redirects back
-with a GET. Browser cookie retention across origins is a separate deployment
-concern; see [session lifecycles](/identity-access/session-lifecycles/).
+with a GET. For the approved BFF topology, the app server owns these
+browser-facing routes and sets the first-party cookie on its own origin. It forwards a bearer credential to
+services; browser requests do not use credentialed cross-origin CORS. See
+[session lifecycles](/identity-access/session-lifecycles/).
 
 For this plain-HTTP loopback recipe, set both development overrides in the host environment
 **before starting or restarting `auth-api`**. Use an unprefixed cookie name: clients reject
@@ -443,14 +445,20 @@ input `txn`; a callback without either fails with `oauth_cookie_missing`.
 
 A successful `GET /api/v1/auth/session` after callback returns the active
 session; `GET /api/v1/auth/me` returns the authenticated principal. The callback
-includes `sessionId` for server-side bearer consumers. The generated BFF never returns it in
-browser JSON; browser callers use the first-party app cookie.
+returns `{ completed, redirectTo, subject }` without `sessionId`. The generated
+BFF preserves the backend cookie on the app origin and uses it to forward a
+bearer credential to services; browser callers use that first-party cookie.
 
 ### 0.0.8 cookie migration
 
-The callback input now accepts optional `txn`. The JSON outputs retain their
-existing shape, including `sessionId`; cookie headers are added to both HTTP
-projections. The public `httpOnly` option now accepts only `true` or omission; remove `false` overrides.
+The callback input now accepts optional `txn`. The callback JSON output no
+longer includes `sessionId`. This is a breaking contract change: replace reads of `callback.sessionId` with a cookie jar and an
+empty-input `session` request. The app server must keep the issued cookie on its
+own origin and forward a bearer credential to services. Server-only integrations
+that compose a backend directly may use `InteractiveFlowPort.handleCallback`
+and its session result; do not expose that credential in browser callback JSON.
+Cookie headers are preserved on both HTTP projections. The public `httpOnly`
+option now accepts only `true` or omission; remove `false` overrides.
 Cookie issuance also refuses `httpOnly: false` from untyped callers and refuses insecure
 cookies outside `allowInsecureDev`, including custom cookie names. Treat this
 security policy tightening as a breaking change: remove insecure production
