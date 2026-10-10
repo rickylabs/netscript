@@ -159,6 +159,8 @@ export async function recordRevokedSessions(
 
 /**
  * Clears backend cookie state only when the request's own cookie session was just revoked.
+ * Subject-wide revocation also covers an owned cookie session issued by the revocation instant,
+ * even when an explicit sibling selector supplied the individual audit/stream session.
  *
  * Returns the backend sign-out response, whose cookie-clearing `Set-Cookie` headers the handler
  * propagates to the caller; `undefined` when no interactive sign-out ran.
@@ -166,13 +168,26 @@ export async function recordRevokedSessions(
 export async function endInteractiveSession(
   backend: AuthBackendPort,
   context: AuthServiceContext,
-  revoked: readonly AuthSession[],
+  revocation: SignoutRevocation,
+  principal: Principal,
 ): Promise<Response | undefined> {
   if (!backend.interactive || !context.request) return undefined;
   const request = toRequest(context.request, '/v1/auth/signout', new URLSearchParams());
   const cookieSessionId = await backend.interactive.getSessionId(request);
-  if (cookieSessionId && revoked.some((session) => session.id === cookieSessionId)) {
+  if (!cookieSessionId) return undefined;
+  if (revocation.revoked.some((session) => session.id === cookieSessionId)) {
     return await backend.interactive.signOut(request, { revoke: false });
+  }
+  if (revocation.subjectRevokedAt !== undefined) {
+    // One lookup, independent of session count. The cookie may belong to another subject when
+    // authentication used a bearer credential, or name a session issued after global logout.
+    const cookieSession = await ownSessionOrUndefined(backend, principal, cookieSessionId);
+    if (
+      cookieSession &&
+      Date.parse(cookieSession.issuedAt) <= Date.parse(revocation.subjectRevokedAt)
+    ) {
+      return await backend.interactive.signOut(request, { revoke: false });
+    }
   }
   return undefined;
 }

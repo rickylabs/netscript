@@ -224,7 +224,7 @@ export async function signout(
           : undefined,
       );
       const { sessionId } = revocation;
-      const signOutResponse = await endInteractiveSession(backend, context, revocation.revoked);
+      const signOutResponse = await endInteractiveSession(backend, context, revocation, principal);
       await audit.setOutcome({
         outcome: AuthOutcome.SUCCESS,
         sessionId,
