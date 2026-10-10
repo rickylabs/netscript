@@ -145,7 +145,7 @@ plugin should pick the closest match:
 {{ comp.apiTable({
   caption: "provider.kind by archetype (from the official scaffold.plugin.json files)",
   rows: [
-    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint bin/combined.ts, concurrencyEnvVar WORKER_CONCURRENCY (default 2) in current Aspire metadata; runtime entrypoints read WORKERS_CONCURRENCY, servicePort is dynamically assigned (allocated from the high-range 49152+ at scaffold time)." },
+    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint bin/combined.ts, concurrencyEnvVar WORKERS_CONCURRENCY (default 2), servicePort is dynamically assigned (allocated from the high-range 49152+ at scaffold time)." },
     { name: "saga", type: "background-processor", desc: "Durable message-driven sagas. defaultPermissions ['--unstable-kv','--allow-all'], concurrencyEnvVar SAGA_CONCURRENCY, servicePort is dynamically assigned (allocated from the high-range 49152+ at scaffold time)." },
     { name: "trigger", type: "ingress", desc: "Webhooks / schedules / file-watchers. defaultEntrypoint src/runtime/trigger-processor.ts, concurrencyEnvVar TRIGGER_CONCURRENCY (default 10), servicePort is dynamically assigned (allocated from the high-range 49152+ at scaffold time)." },
     { name: "stream", type: "utility / plugin", desc: "Infra/utility plugin. requiresDb=false, requiresKv=false, portRangeKey PLUGIN_API (the manifest field contains servicePort 4437, but the installer allocates a randomized port from the portRangeKey range, >= 57344, at scaffold time)." }
@@ -160,7 +160,7 @@ third-party plugins; eligibility never depends on `officialSource`:
   {
     label: "scaffold.plugin.json",
     lang: "json",
-    code: "{\n  \"provider\": {\n    \"kind\": \"worker\",\n    \"category\": \"background-processor\",\n    \"defaultEntrypoint\": \"bin/combined.ts\",\n    \"defaultServiceEntrypoint\": \"services/src/main.ts\",\n    \"defaultRequiresDb\": true,\n    \"defaultRequiresKv\": true,\n    \"concurrencyEnvVar\": \"WORKER_CONCURRENCY\"\n  },\n  \"linking\": {\n    \"canonicalName\": \"notifier\",\n    \"resourceConfigKey\": \"notifier-api\",\n    \"backgroundConfigKey\": \"notifier\",\n    \"dependencies\": [\"streams-api\"],\n    \"consumers\": {\n      \"services\": [\"catalog\"],\n      \"apps\": [\"dashboard\"]\n    }\n  }\n}"
+    code: "{\n  \"provider\": {\n    \"kind\": \"worker\",\n    \"category\": \"background-processor\",\n    \"defaultEntrypoint\": \"bin/combined.ts\",\n    \"defaultServiceEntrypoint\": \"services/src/main.ts\",\n    \"defaultRequiresDb\": true,\n    \"defaultRequiresKv\": true,\n    \"concurrencyEnvVar\": \"WORKERS_CONCURRENCY\"\n  },\n  \"linking\": {\n    \"canonicalName\": \"notifier\",\n    \"resourceConfigKey\": \"notifier-api\",\n    \"backgroundConfigKey\": \"notifier\",\n    \"dependencies\": [\"streams-api\"],\n    \"consumers\": {\n      \"services\": [\"catalog\"],\n      \"apps\": [\"dashboard\"]\n    }\n  }\n}"
   },
   {
     label: "What the kernel reads it for",
