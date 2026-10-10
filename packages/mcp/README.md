@@ -91,9 +91,11 @@ Most users never import this package. Install the server into a project with the
 netscript agent init
 ```
 
-That detects your agent host and writes `.mcp.json` (Claude Code) and/or `.vscode/mcp.json` (VS
-Code) pointing at `netscript agent mcp`, and installs the NetScript skills shipped with your CLI
-release. Use `--host claude|vscode|all` to choose explicitly.
+That detects your agent host (from project markers, then the invoking environment, defaulting to
+Claude Code) and writes `.mcp.json` (Claude Code), `.vscode/mcp.json` (VS Code), and/or
+`opencode.json` (OpenCode) pointing at `netscript agent mcp`, and installs the NetScript skills
+shipped with your CLI release. The command prints which source decided the host. Use
+`--host claude|vscode|opencode|all` to choose explicitly.
 
 To embed the server in your own host process, add it as a library:
 
