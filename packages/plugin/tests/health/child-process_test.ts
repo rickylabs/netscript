@@ -49,7 +49,7 @@ async function readUntil(
 
 async function cleanup(child: Deno.ChildProcess): Promise<void> {
   try {
-    child.kill('SIGTERM');
+    child.kill('SIGKILL');
   } catch (cause) {
     if (
       !(cause instanceof Deno.errors.NotFound) &&
@@ -108,3 +108,16 @@ for (const mode of ['registry-failed', 'dependency-failed', 'completed', 'leaked
     }
   });
 }
+
+Deno.test('a ready child drains on SIGTERM and exits successfully', async () => {
+  const child = spawn('ready');
+  const reader = child.stderr.getReader();
+  try {
+    await readUntil(reader, /fixture-ready/);
+    child.kill('SIGTERM');
+    assertEquals((await bounded(child.status)).code, 0);
+  } finally {
+    reader.releaseLock();
+    await cleanup(child);
+  }
+});
