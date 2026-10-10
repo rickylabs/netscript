@@ -3,14 +3,17 @@
  *
  * @example
  * ```typescript
- * import { createRPCHandler, createOpenAPIHandler, createNotFoundHandler } from '@netscript/service';
+ * import type { Hono } from 'hono';
+ * import { createNotFoundHandler, createRPCHandler, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const router: ServiceRouter;
  *
  * const rpcHandler = createRPCHandler(router);
- * const openApiHandler = createOpenAPIHandler(router);
  *
  * app.use('/api/rpc/*', async (c) => {
- *   const response = await rpcHandler.handle(c.req.raw, { prefix: '/api/rpc' });
- *   return response ?? c.notFound();
+ *   const { matched, response } = await rpcHandler.handle(c.req.raw, { prefix: '/api/rpc' });
+ *   return matched ? response : c.notFound();
  * });
  *
  * app.notFound(createNotFoundHandler('users'));
@@ -121,6 +124,12 @@ export function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ * import type { ServiceRouter } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const router: ServiceRouter;
+ *
  * const rpcHandler = createRPCHandler(router, { serviceName: 'users' });
  *
  * app.use('/api/rpc/*', async (c, next) => {
@@ -151,6 +160,12 @@ export function createRPCHandler<T extends ServiceRouter>(
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ * import type { ServiceRouter } from '@netscript/service';
+ *
+ * declare const app: Hono;
+ * declare const router: ServiceRouter;
+ *
  * const openApiHandler = createOpenAPIHandler(router, { serviceName: 'users' });
  *
  * app.use('/api/*', async (c, next) => {
@@ -180,6 +195,10 @@ export function createOpenAPIHandler<T extends ServiceRouter>(
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ *
+ * declare const app: Hono;
+ *
  * app.notFound(createNotFoundHandler('users'));
  * ```
  */
@@ -201,6 +220,10 @@ export function createNotFoundHandler(serviceName: string): ServiceNotFoundHandl
  *
  * @example
  * ```typescript
+ * import type { Hono } from 'hono';
+ *
+ * declare const app: Hono;
+ *
  * app.onError(createErrorHandler('users'));
  * ```
  */

@@ -130,6 +130,7 @@ for (const projection of PROJECTIONS) {
     const running = await defineService(router, {
       name: `body-limit-${projection.name.toLowerCase()}`,
       port: 0,
+      cors: { origin: ['https://app.example'] },
       middleware: [async (c, next) => {
         framing.push({
           contentLength: c.req.header('content-length'),
@@ -142,7 +143,7 @@ for (const projection of PROJECTIONS) {
 
     try {
       const url = `${clientOrigin(running.addr.hostname, running.addr.port)}${projection.path}`;
-      const headers = { 'content-type': 'application/json' };
+      const headers = { 'content-type': 'application/json', origin: 'https://app.example' };
 
       const under = await fetch(url, {
         method: 'POST',
@@ -158,7 +159,7 @@ for (const projection of PROJECTIONS) {
         body: projection.encode('a'.repeat(LIMIT * 2)),
       });
       assertEquals(declared.status, 413);
-      assertEquals(declared.headers.get('access-control-allow-origin'), '*');
+      assertEquals(declared.headers.get('access-control-allow-origin'), 'https://app.example');
       assertEquals(await declared.json(), PAYLOAD_TOO_LARGE);
 
       const chunked = await fetch(url, {

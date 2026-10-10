@@ -84,6 +84,17 @@ const INFRASTRUCTURE_GENERATOR =
   'packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
 const INFRASTRUCTURE_LITERAL_HOST_PORT = /\bport:\s*\d/;
 
+/** Generator source and emitted infrastructure helpers share the executable argv contract. */
+const INFRASTRUCTURE_EXECUTABLE_SOURCE =
+  /(?:^|\/)(?:generate-register-infrastructure(?:\.ts|-\d+\.ts\.template)|register-infrastructure\.mts)$/;
+
+/** A literal process bind port is a host reservation too, including the generator's default. */
+const EXECUTABLE_LITERAL_ARGV_PORT =
+  /(['"])--port\1\s*,\s*(['"`])(?:\d+|\$\{CACHE_DEFAULT_PORT\})\2/;
+const EXECUTABLE_LITERAL_MESSAGE =
+  'Infrastructure executable argv pins a host listen port. Add the endpoint expression ' +
+  '`EndpointProperty.TargetPort` through `withArgsCallback` so Aspire allocates it per run.';
+
 /** Files that compose resource entries for the scaffolded `appsettings.json`. */
 const SCAFFOLD_ENTRY_FILES = [
   'packages/cli/src/kernel/application/scaffold/render-ts-apphost.ts',
@@ -225,6 +236,9 @@ export function scanContent(
 
   const fullTextChecks = [
     { pattern: LITERAL_HOST_PORT, message: ENDPOINT_LITERAL_MESSAGE },
+    ...(INFRASTRUCTURE_EXECUTABLE_SOURCE.test(normalizedPath)
+      ? [{ pattern: EXECUTABLE_LITERAL_ARGV_PORT, message: EXECUTABLE_LITERAL_MESSAGE }]
+      : []),
     ...(checksContribution
       ? [{ pattern: CONTRIBUTION_PORT_FALLBACK, message: CONTRIBUTION_FALLBACK_MESSAGE }]
       : []),

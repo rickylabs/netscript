@@ -33,6 +33,7 @@ import { createDatabaseConnectivityStartupHook } from '../diagnostics/database-c
 import type { ServiceBodyLimitOptions } from '../primitives/body-limit.ts';
 import { healthChecks } from '../primitives/health.ts';
 import type {
+  CorsOptions,
   Database,
   DbContext,
   RunningService,
@@ -115,6 +116,12 @@ function isDisconnectCapableDatabase(value: Database): value is DisconnectCapabl
  * Options for defineService preset.
  */
 export interface DefineServiceOptions extends ServiceConfig {
+  /**
+   * CORS options. An omitted `origin` reads the comma-separated
+   * `NETSCRIPT_CORS_ORIGINS` allowlist at construction; unset means no
+   * cross-origin access. Explicit origins override the environment.
+   */
+  readonly cors?: CorsOptions;
   /**
    * Database context injected into handler context as `context.db`.
    *
@@ -210,11 +217,13 @@ export interface DefineServiceOptions extends ServiceConfig {
  * @example
  * ```typescript
  * // With auth enabled for /api paths
- * import { defineService } from '@netscript/service';
+ * import { defineService, type ServiceRouter } from '@netscript/service';
  * import {
  *   createScopeAuthorizer,
  *   createStaticCredentialAuthenticator,
  * } from '@netscript/service/auth';
+ *
+ * declare const router: ServiceRouter;
  *
  * await defineService(router, {
  *   name: 'users',
@@ -270,7 +279,7 @@ export async function defineService<T extends ServiceRouter>(
     version: options.version,
     port: options.port,
   })
-    .withCors()
+    .withCors(options.cors)
     .withLogger();
 
   for (const middleware of options.middleware ?? []) {

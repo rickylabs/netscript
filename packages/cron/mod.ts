@@ -15,6 +15,9 @@
  * ```ts
  * import { createScheduler, CronPresets } from '@netscript/cron';
  *
+ * declare function cleanupOldRecords(): Promise<void>;
+ * declare function generateDailyReport(): Promise<void>;
+ *
  * // Auto-detect runtime and create scheduler
  * const scheduler = createScheduler();
  *
@@ -166,7 +169,9 @@ let defaultScheduler: CronScheduler | null = null;
  *
  * @example
  * ```ts
- * import { getScheduler } from '@netscript/cron';
+ * import { getScheduler, type JobHandler } from '@netscript/cron';
+ *
+ * declare const handler: JobHandler;
  *
  * const scheduler = getScheduler();
  * await scheduler.schedule('my-job', '0 * * * *', handler);

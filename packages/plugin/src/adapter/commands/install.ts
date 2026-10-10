@@ -20,6 +20,11 @@ export interface RunInstallCommandOptions {
  *
  * @example
  * ```ts
+ * import type { NetScriptPlugin, PluginCommandContext } from '@netscript/plugin/adapter';
+ *
+ * declare const plugin: NetScriptPlugin;
+ * declare const context: PluginCommandContext;
+ *
  * const result = await runInstallCommand({ plugin, context });
  * console.log(result.status);
  * ```
@@ -48,6 +53,11 @@ export async function runInstallCommand(
  *
  * @example
  * ```ts
+ * import type { FileSystemPort, NetScriptPlugin } from '@netscript/plugin/adapter';
+ *
+ * declare const plugin: NetScriptPlugin;
+ * declare const fileSystem: FileSystemPort;
+ *
  * const entrypoint = createInstallScaffoldEntrypoint(plugin, fileSystem);
  * console.log(typeof entrypoint);
  * ```
@@ -79,6 +89,10 @@ export function createInstallScaffoldEntrypoint(
  *
  * @example
  * ```ts
+ * import type { NetScriptPlugin } from '@netscript/plugin/adapter';
+ *
+ * declare const plugin: NetScriptPlugin;
+ *
  * const artifacts = collectInstallArtifacts(plugin);
  * console.log(artifacts.length);
  * ```

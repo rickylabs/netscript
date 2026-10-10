@@ -51,6 +51,8 @@ interface RegisteredJob {
  *
  * @example
  * ```ts
+ * declare function cleanupOldRecords(): Promise<void>;
+ *
  * const scheduler = new DenoCronAdapter();
  *
  * await scheduler.schedule('cleanup', '0 0 * * *', async () => {

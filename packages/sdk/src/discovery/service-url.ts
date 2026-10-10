@@ -66,6 +66,34 @@ function getDenoEnvironment(): ServerEnvironment | undefined {
 
 /**
  * Resolve a service URL from explicit browser and server environment sources.
+ *
+ * Pure counterpart of `getServiceUrl`: it reads only the sources you pass, touches no
+ * runtime global, and returns `undefined` instead of throwing when no key matches. The
+ * browser bag wins over the server reader, with the same key precedence as `getServiceUrl`.
+ *
+ * @param serviceName - Aspire service resource name.
+ * @param protocol - Endpoint protocol; defaults to `'http'`.
+ * @param index - Endpoint index; defaults to `0`.
+ * @param sources - Explicit browser and server environment sources.
+ * @returns The configured URL, or `undefined` when no source provides it.
+ *
+ * @example Back a service client with an explicit environment bag
+ * ```ts
+ * import { createServiceClient } from '@netscript/sdk/client';
+ * import { resolveServiceUrlFromSources } from '@netscript/sdk/discovery';
+ * import { ordersContract } from '@my-app/contracts';
+ *
+ * const browserEnv = { VITE_ORDERS_URL: 'https://api.example.com' };
+ * const orders = createServiceClient({
+ *   contract: ordersContract,
+ *   serviceName: 'orders',
+ *   resolveServiceUrl: (serviceName, protocol) => {
+ *     const url = resolveServiceUrlFromSources(serviceName, protocol, 0, { browserEnv });
+ *     if (url === undefined) throw new Error(`No URL configured for "${serviceName}"`);
+ *     return url;
+ *   },
+ * });
+ * ```
  */
 export function resolveServiceUrlFromSources(
   serviceName: string,
