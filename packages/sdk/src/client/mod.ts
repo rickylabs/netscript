@@ -72,4 +72,5 @@ export type {
   ServiceClientShape,
   ServiceRequestOptions,
   ServiceRequestRest,
+  ServiceUrlResolver,
 } from '../ports/service-client.ts';
