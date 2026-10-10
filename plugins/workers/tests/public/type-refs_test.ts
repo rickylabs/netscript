@@ -62,6 +62,7 @@ export type ConsumerVocabulary = Readonly<{
 Deno.test('workers non-contract entrypoints have no documentation diagnostics', async () => {
   const root = new URL('../../', import.meta.url);
   const paths = Object.entries(manifest.exports)
+    // #1655 owns the four remaining contract references; remove this exclusion when repaired.
     .filter(([subpath]) => subpath !== './contracts')
     .map(([, path]) => new URL(path, root).pathname);
   const output = await new Deno.Command(Deno.execPath(), {

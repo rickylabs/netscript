@@ -41,7 +41,9 @@ export type {
   StreamStandardSchema,
   StreamStateDefinition,
 } from '@netscript/plugin-streams-core';
-export type {
-  ExecutionStatus as CanonicalExecutionStatus,
-  TriggerType,
-} from '@netscript/plugin-workers-core/runtime';
+export type { TriggerType } from '@netscript/plugin-workers-core/runtime';
+/**
+ * Canonical runtime status vocabulary underlying the state-layer ExecutionStatus.
+ * Use ExecutionStatus for state and stream records; use CanonicalExecutionStatus for runtime ports.
+ */
+export type { ExecutionStatus as CanonicalExecutionStatus } from '@netscript/plugin-workers-core/runtime';

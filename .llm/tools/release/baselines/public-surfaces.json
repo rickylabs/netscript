@@ -16644,30 +16644,6 @@
         },
         "./doctor": {
           "symbols": {
-            "artifactText": {
-              "signature": "1cf3796276fcddd036781f9ea28e7f87c9e7f718196a81d89725b791ec87f9ec"
-            },
-            "collectInstallArtifacts": {
-              "signature": "0454bee05fa427b23ce14c6cf4409551b093a10b9bb7830c8eab38e822f63cb7"
-            },
-            "createDenoFileSystem": {
-              "signature": "8c562796203188852eec48b733c29a57a504590779cf63eaf60d7a83137ce435"
-            },
-            "createInstallScaffoldEntrypoint": {
-              "signature": "cf556317add9e898f8dc7f1f3acb75fae6cfddfe08ea433a02d6885d12c8ab9c"
-            },
-            "createPluginAdapter": {
-              "signature": "dbbe974ca785d35712f725a2840bae08eb5ace1ff9e037a2bd807006c8fe1d7e"
-            },
-            "DEFAULT_PLUGIN_HEALTH_ENDPOINT": {
-              "signature": "151b216e0fdfdb2f3c046a0063749dabc35bbf98771ec86709ffe6b1ff61035a"
-            },
-            "DEFAULT_PLUGIN_WORKSPACE_ROOT": {
-              "signature": "151b216e0fdfdb2f3c046a0063749dabc35bbf98771ec86709ffe6b1ff61035a"
-            },
-            "defineStub": {
-              "signature": "7d58f84e2b45e31f9be196e6e1100f3ce223a9c91991a3a297a3058bc2e6352c"
-            },
             "DoctorCheck": {
               "signature": "dab29162d9317ab7ef024344fdd8012c74b73d5e1a9a6fc0aa3e36eac81ac139"
             },
@@ -16701,17 +16677,8 @@
             "NetScriptPlugin": {
               "signature": "cecd1cb730a042de6c9bea09190c1a2b79be3d1af0bcf3cfe324b7b5abfce76c"
             },
-            "PluginAdapter": {
-              "signature": "f4a38d68f0512734e1f23fa049c565b7655cb5c41c21b5699764fc7c6dd45feb"
-            },
             "PluginCliArgs": {
               "signature": "0d979806fe5402c56d8e5e6ede5265e8a3eb6489d1acf1289cd967f95ed472fc"
-            },
-            "PluginCliCommand": {
-              "signature": "270d239953d6698d53f865eb79c4e512a7d5e47dcaa683a4de0bedf3af24d5fe"
-            },
-            "PluginCliEntrypoint": {
-              "signature": "c934619716140d60754d2dc7ed30cfaedc6f78dc99b69fb8b71ab449a014ff33"
             },
             "PluginCliResult": {
               "signature": "0cf61188ff16fe337dc00de62e63432eb83af5df287f27cdf339bd950070af11"
@@ -16728,86 +16695,17 @@
             "PluginCommandValue": {
               "signature": "1942e658826dcac2fd3eeabf2d03d508b935ad01aa695a94e0a625a39122c34e"
             },
-            "PluginInfoReport": {
-              "signature": "a44240f1ec88227b33964ee37ead9a8645bb2999a46274d230e504557b54ad59"
-            },
-            "PluginLogger": {
-              "signature": "ee262a7c11ea87d9e928448375f78622f11f2037dc6031e68f59bbaea9372aa2"
-            },
             "PluginResource": {
               "signature": "d96be2b59ff350887339fe59076b732a4f85faa71036a35cd4216190781ea9df"
             },
-            "PluginScaffoldEntrypoint": {
-              "signature": "e35c08a5a41acfa4eace2212c0fbf54e7034cda0a9e7ef9028d162c574ec84b8"
-            },
             "RemoveSpec": {
               "signature": "e6e038d2ef13fc3cfdbaec1d7fe8915795922917bea24ac2e916f19bac75a2f9"
-            },
-            "resolveWorkspacePath": {
-              "signature": "106c6580cdf61f49951fca204c507890749e3630cc7f57868515821779f8d3c4"
-            },
-            "runDoctorCommand": {
-              "signature": "a4024e8dad4fb04207b5350eb196fc1a484afc56e0d3e712f9624594efc36bb6"
-            },
-            "RunDoctorCommandOptions": {
-              "signature": "d161c47f01003bd36c9b9889612d4d4d3f96c60ad2539386fdf9a197cb977bd9"
-            },
-            "runInfoCommand": {
-              "signature": "7b57860590a605629cdf62484928082775aa9fa758f765e808820c2f76269e46"
-            },
-            "RunInfoCommandOptions": {
-              "signature": "ad483e5d123d406b7e14b01f8018a8a6acec3b1886bcad1aa4dccf0cbed2c1a8"
-            },
-            "runInstallCommand": {
-              "signature": "a3c72c11d4b5d600c210736697f84f5bdea5a7344ca815527a92dfcc3c4b5a37"
-            },
-            "RunInstallCommandOptions": {
-              "signature": "d161c47f01003bd36c9b9889612d4d4d3f96c60ad2539386fdf9a197cb977bd9"
-            },
-            "runPluginCliCommand": {
-              "signature": "da3f7d4f5a5af1ee666eb23706710cc81a5bd8e10fdfdb2d1e43d092a07b0389"
-            },
-            "RunPluginCliCommandOptions": {
-              "signature": "1cd0c6b76af5587537819f88a2b3c3a2f57ab38ad67f22f2243a4274e9848066"
-            },
-            "runPluginScaffoldCli": {
-              "signature": "aa9f462b1132a91713016d6f53d73e07627c12cb0e5039f369787ac419c1a154"
-            },
-            "runRemoveCommand": {
-              "signature": "4a073cfb3b1598fc140540ad946addbe1e9c643e2aa6250d11060037e22b4fac"
-            },
-            "RunRemoveCommandOptions": {
-              "signature": "ad483e5d123d406b7e14b01f8018a8a6acec3b1886bcad1aa4dccf0cbed2c1a8"
-            },
-            "runUpdateCommand": {
-              "signature": "cbc32f3d9b6d3ff70d6f68aa08e17ced6db5a5f69f7655c661a55606b4ebc776"
-            },
-            "RunUpdateCommandOptions": {
-              "signature": "ad483e5d123d406b7e14b01f8018a8a6acec3b1886bcad1aa4dccf0cbed2c1a8"
             },
             "ScaffoldArtifact": {
               "signature": "dba4e50db492577cb104d975e0c01d7240450df228daf439716e2108db1d8005"
             },
             "ScaffoldArtifactBody": {
               "signature": "4c3457f4bd5081928dbf5725ae372b5b84ebc498f2c6731420938a47eb65aea7"
-            },
-            "ScaffolderContext": {
-              "signature": "e7316b8ac518bbebdf5538840260df4ac9e4c1ec409bc5e0721a454d287b3241"
-            },
-            "ScaffoldResult": {
-              "signature": "00ed5cf70eea32a98d4741733cff28468120868cf56e82ad7508349f8c03ae6d"
-            },
-            "StubSource": {
-              "signature": "8bae8dce796352a68c436d8e9fc6bfd3740041ed8155f602a83a23d79a18d535"
-            },
-            "substituteTokens": {
-              "signature": "2b3ac7e9b7acef970bbf6b8e944f8868c8b54acf63e734a9e9cdb243a4482649"
-            },
-            "textArtifact": {
-              "signature": "3edc563f349dbe80ba6dbd0b2fecf91310f67ba7037b349bfd020a58b1c2af29"
-            },
-            "TokenValues": {
-              "signature": "8a53970fb667fe1fefc556eff7d35bfa70ad53194636a13a1136351af7ff923c"
             },
             "UpdateSpec": {
               "signature": "ae990073527ed0cadace1edb297d41bce12b6ffb8a4558b3a77eaa9641919002"
@@ -16978,13 +16876,13 @@
               "signature": "ee262a7c11ea87d9e928448375f78622f11f2037dc6031e68f59bbaea9372aa2"
             },
             "PluginScaffoldEntrypoint": {
-              "signature": "46dfecea24f3d73b23f9e14bf8eaa51400050ec6b0f4843029a72fa3874420c0"
+              "signature": "e35c08a5a41acfa4eace2212c0fbf54e7034cda0a9e7ef9028d162c574ec84b8"
             },
             "ScaffolderContext": {
-              "signature": "0b44db1ad28d58b1369ad40c3592cb8e1a72c372d0c6587c54cf75edfc7eb8a3"
+              "signature": "e7316b8ac518bbebdf5538840260df4ac9e4c1ec409bc5e0721a454d287b3241"
             },
             "ScaffoldResult": {
-              "signature": "336a71a5ca3b447a0891ae538e5373544c6ed20d2f14935f6fae00ae584a11a6"
+              "signature": "00ed5cf70eea32a98d4741733cff28468120868cf56e82ad7508349f8c03ae6d"
             }
           }
         },

@@ -2323,13 +2323,14 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/plan.md`;
   issues #1378, #1545, and #1655; PR #1653.
 - **Created:** 2026-08-15.
-- **Status:** open, DEBT_ACCEPTED for PR #1653 only at the strict baseline of 20 `private-type-ref`
-  diagnostics across 13 export targets. This is a no-increase allowance, not a full-export lint
-  pass.
-- **Gate:** Until #1655 closes, the 13-target full-export audit may report at most the recorded 20
-  `private-type-ref` diagnostics and must report zero `missing-jsdoc` and zero other diagnostics.
-  Any increase or new diagnostic class is `FAIL_DEBT`. Closure requires that audit to exit 0 with
-  zero diagnostics while the scoped Workers publish dry-run and `quality:gate` remain green.
+- **Status:** open, DEBT_ACCEPTED with a ratcheted ceiling of 4 `private-type-ref` diagnostics
+  across the same 13 export targets. The earlier ceiling of 20 is historical and no longer allowed.
+- **Gate:** Until #1655 closes, allow only the four measured references on `./contracts`
+  (`./contracts/v1/mod.ts`): three to `WorkersContractDefinition` and one to upstream oRPC
+  `implement`. Require zero diagnostics on each of the other 12 export targets, zero
+  `missing-jsdoc`, and zero other diagnostic classes. Any additional reference, relocation to
+  another target, or new diagnostic class is `FAIL_DEBT`. Closure requires the full-export audit to
+  exit 0 with zero diagnostics while Workers publish dry-run and `quality:gate` remain green.
 - **Evidence:**
   `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-3/workers-doc-lint.json`
   records the exact baseline at signed Slice 2 head `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`.
@@ -2525,15 +2526,21 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## workers doctor export — unchanged module tag (`workers-doctor-module-baseline-2066`)
 
-- **Reason:** Existing public doctor.ts export lacks @module JSDoc; JSR audit FAIL F-JSR-2 is
-  identical on current main archive and this branch. No doctor source or publish shape changed in
-  the cancellation slice.
+- **Reason:** The historical cancellation baseline lacked `@module` JSDoc on public `doctor.ts`,
+  producing an unchanged F-JSR-2 failure. PR #2218 adds the tag and proves this module gate.
 - **Owner:** Workers plugin public-surface maintainers.
 - **Target:** Before the next stable workers release, no later than 2026-10-15.
 - **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`.
 - **Created:** 2026-10-08.
-- **Status:** open; independent evaluator must adjudicate unchanged baseline debt.
+- **Status:** closed by PR #2218: `doctor.ts` carries `@module`, and the plugin JSR audit passes.
 - **Gate:** F-JSR-2 module tag present and plugin JSR audit passes.
+
+- **Evidence (#2218):**
+  `deno run --allow-all .llm/tools/fitness/audit-jsr-package.ts --root
+  plugins/workers` exits 0
+  with zero FAIL findings. The module-documentation audit reports no F-JSR-2 finding. Existing
+  source-layout and slow-type warnings remain separate from this satisfied module-tag gate. Full
+  output is kept in the run record.
 
 ## workers-core source layout — required adapter directory (`workers-core-layout-2066`)
 
@@ -2636,3 +2643,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `sessions.getSession` given `token: readBearerCredential(request)` and the request, for cookie,
   bearer, competing cookie+bearer, and malformed bearer requests, and that a bearer-borne refresh
   emits no `Set-Cookie`.
+
+## packages/service — residual F-1 builder and type-module size (#1386 L2)
+
+- **Reason:** The service builder and public type module already exceeded their F-1 size caps before
+  #1386 L2. The CORS contract and middleware registration add lines to those existing modules. CORS
+  policy itself is extracted to the focused `src/middleware/service-cors.ts`; further decomposition
+  of the existing builder and public types remains separate work.
+- **Owner:** NetScript service maintainers / architecture follow-up.
+- **Target:** Next service architecture decomposition pass, before the stable public API line.
+- **Linked change:** [Leaf X-1386, PR #2193](https://github.com/rickylabs/netscript/pull/2193).
+- **Created:** 2026-10-10.
+- **Status:** open; residual size debt recorded, no closure claimed by this leaf.
+- **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
+  `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
+  green. `arch:check` currently exits zero with these size warnings.
