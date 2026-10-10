@@ -628,6 +628,7 @@ packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts	agent-in
 packages/cli/src/public/features/agent/init/hosts/opencode-config_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/hosts/opencode-config.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/init-agent_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
+packages/cli/src/public/features/agent/init/init-agent-claude_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/init-agent-command_test.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/init-agent.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/config/project/list-appsettings-paths.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -914,6 +915,7 @@ resources/design/dashboard/screens/01-stack-map.html	archival:design-corpus	arch
 resources/design/dashboard/screens/02-flow-trace.html	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
 resources/design/dashboard/screens/03-service-catalog.html	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
 resources/design/dashboard/screens/04-run-inspector.html	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
+resources/examples/expo-streams/deno.lock	lockfile	N/A	dependency lock; any version literal belongs to an unrelated package; excluded from literal sweeps in both parity phases (lock hygiene per AGENTS.md)
 rfcs/0000-polyglot-task-protocol.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0000-scriptc-task-runtime-adapter.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0002-runtime-versioned-automation.md	archival:rfc	archival	exempt — RFC body; dated addenda only
