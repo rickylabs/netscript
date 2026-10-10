@@ -13,7 +13,7 @@ Deno.test('auth session adapter routes caller context through typed bearer prepa
     const request = new Request(input, init);
     requests.push(request);
     if (request.method === 'POST') {
-      return Promise.resolve(Response.json({ signedOut: true, sessionId: 'session-1' }));
+      return Promise.resolve(Response.json({ revoked: true, sessionId: 'session-1' }));
     }
     return Promise.resolve(
       Response.json([{ id: 'session-1', state: 'active', userId: 'user-1' }]),
@@ -28,16 +28,67 @@ Deno.test('auth session adapter routes caller context through typed bearer prepa
     await client.revoke('https://auth.test/api/v1/auth/', 'session-1', { context }),
     'session-1',
   );
-  await client.list('https://streams.test/auth/sessions');
+  await assertRejects(
+    () => client.list('https://streams.test/auth/sessions'),
+    Error,
+    'Required bearer credential is unavailable.',
+  );
 
   assertEquals(requests[0].url, 'https://streams.test/auth/sessions?projection=active');
   assertEquals(requests[0].headers.get('accept'), 'application/json');
   assertEquals(requests[0].headers.get('authorization'), `Bearer ${credential}`);
-  assertEquals(requests[1].url, 'https://auth.test/api/v1/auth/signout');
+  assertEquals(requests[1].url, 'https://auth.test/api/v1/auth/sessions/revoke');
   assertEquals(requests[1].headers.get('content-type'), 'application/json');
   assertEquals(requests[1].headers.get('authorization'), `Bearer ${credential}`);
   assertEquals(await requests[1].json(), { sessionId: 'session-1' });
-  assertFalse(requests[2].headers.has('authorization'));
+  // The anonymous list was refused before any request left the adapter.
+  assertEquals(requests.length, 2);
+});
+
+Deno.test('auth session adapter never sends an operator revocation without a credential', async () => {
+  const client = new FetchAuthSessionHttp(() => {
+    throw new Error('fetch must not run without a credential');
+  });
+  await assertRejects(
+    () => client.revoke('https://auth.test/api/v1/auth', 'session-1'),
+    Error,
+    'Required bearer credential is unavailable.',
+  );
+});
+
+Deno.test('auth session adapter reports an unknown session instead of a revocation', async () => {
+  const client = new FetchAuthSessionHttp(() =>
+    Promise.resolve(Response.json({ revoked: false, sessionId: 'session-1' }))
+  );
+  await assertRejects(
+    () =>
+      client.revoke('https://auth.test/api/v1/auth', 'session-1', {
+        context: { auth: { getAccessToken: () => 'operator-token' } },
+      }),
+    Error,
+    'Auth session session-1 was not found.',
+  );
+});
+
+Deno.test('auth session adapter reports unsupported provider revocation distinctly from not found', async () => {
+  const client = new FetchAuthSessionHttp(() =>
+    Promise.resolve(Response.json({
+      code: 'AUTH_PROVIDER_ERROR',
+      data: {
+        reason:
+          'better-auth does not support sessions.revokeSession: revocation by id is unavailable.',
+      },
+    }, { status: 502 }))
+  );
+  const error = await assertRejects(
+    () =>
+      client.revoke('https://auth.test/api/v1/auth', 'live-session', {
+        context: { auth: { getAccessToken: () => 'operator-token' } },
+      }),
+    Error,
+    'better-auth does not support sessions.revokeSession',
+  );
+  assertFalse(error.message.includes('not found'));
 });
 
 Deno.test('auth session adapter preserves bearer cleartext guard without disclosure', async () => {

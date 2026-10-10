@@ -214,7 +214,7 @@ the auth plugin composes against, confirmed on the package's public surface:
     { name: "createAuthBackendRegistry / resolveBackend", type: "function", desc: "Build a registry of named backends and resolve the single active one (DEFAULT_AUTH_BACKEND_NAME is the fallback)." },
     { name: "AuthSession", type: "type", desc: "The normalized session the store persists — id, subject, state, scopes, claims, issuedAt / expiresAt." },
     { name: "createHmacSessionTokenCrypto", type: "function", desc: "HMAC-signs the opaque session token so the cookie value cannot be forged." },
-    { name: "authContractV1", type: "contract", desc: "The five-route auth contract: signin, signout, callback, session, me." }
+    { name: "authContractV1", type: "contract", desc: "The six-route auth contract: signin, signout, revokeSession, callback, session, me." }
   ]
 }) }}
 
