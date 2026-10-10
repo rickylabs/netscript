@@ -287,8 +287,8 @@ Deno.test('README examples include checked TypeScript fences', async () => {
       const isFetchSourceExample = block.code.includes('createFetchStreamEventSourceV1');
       const code = isFetchSourceExample
         ? block.code.replace(
-          "'@netscript/sdk/streams'",
-          JSON.stringify(new URL('../src/streams.ts', import.meta.url).href),
+          "'@netscript/sdk/streams/consumer'",
+          JSON.stringify(new URL('../src/client/stream-source/mod.ts', import.meta.url).href),
         )
         : `${DOCTEST_PRELUDE}\n{\n${stripImports(block.code)}\n}\n`;
       await Deno.writeTextFile(file, code);

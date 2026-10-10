@@ -1,6 +1,6 @@
 import type { StreamEventSourceV1 } from '@netscript/plugin-streams-core/sse';
 
-/** WHATWG streaming fetch supplied by the host, such as `expo/fetch`. */
+/** WHATWG streaming fetch supplied by the host. Verify host-specific types through a wrapper. */
 export type StreamFetchV1 = (url: string, init: RequestInit) => Promise<Response>;
 
 /** Timer port for heartbeat deadlines and reconnect delays; tests can advance it manually. */
@@ -21,7 +21,7 @@ export interface FetchStreamEventSourceOptionsV1 {
   readonly authHeaders?: (signal: AbortSignal) => HeadersInit | Promise<HeadersInit>;
   /** Maximum silence during auth, connection, or reading; defaults to 30,000 ms. */
   readonly heartbeatTimeoutMs?: number;
-  /** Initial reconnect delay; defaults to 1,000 ms. Server `retry:` values replace it, clamped to at least 1 ms. */
+  /** Initial reconnect delay; defaults to 1,000 ms. Server `retry:` values replace it, clamped between this configured floor and the cap. */
   readonly reconnectDelayMs?: number;
   /** Hard reconnect cap; defaults to 30,000 ms. */
   readonly maxReconnectDelayMs?: number;

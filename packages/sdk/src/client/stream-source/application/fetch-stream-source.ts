@@ -129,7 +129,10 @@ export class FetchStreamSource implements FetchStreamEventSourceV1 {
         onBlock: (block) => replay.receive(block),
         onRetry: (retry) => {
           if (!Number.isNaN(retry) && retry >= 0) {
-            this.baseDelay = this.delay = Math.min(Math.max(1, retry), this.settings.cap);
+            this.baseDelay = this.delay = Math.min(
+              Math.max(this.settings.initialDelay, retry),
+              this.settings.cap,
+            );
           }
         },
       });

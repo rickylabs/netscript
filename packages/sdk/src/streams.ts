@@ -7,6 +7,8 @@
  *
  * `createFetchStreamEventSourceV1` supplies a DOM-independent consumer transport
  * for the same versioned SSE binding, with injected streaming fetch and auth.
+ * Shared/browser/React Native consumers should use `@netscript/sdk/streams/consumer`
+ * to keep server producer telemetry out of their import graph.
  *
  * The facade keeps stream producer imports colocated with the rest of the SDK
  * without changing stream-core behavior. It also re-exports the plugin-core
@@ -39,12 +41,8 @@ export {
 } from '@netscript/plugin-streams-core';
 export type * from '@netscript/plugin-streams-core';
 
-export { createFetchStreamEventSourceV1 } from './client/stream-source/application/create-fetch-stream-event-source.ts';
-export type {
-  FetchStreamEventSourceOptionsV1,
-  FetchStreamEventSourceV1,
-  StreamFetchV1,
-  StreamSourceSchedulerV1,
-} from './client/stream-source/ports/fetch-stream-source.ts';
-export { bindStreamEventSourceV1 } from '@netscript/plugin-streams-core/sse';
-export type * from '@netscript/plugin-streams-core/sse';
+export {
+  bindStreamEventSourceV1,
+  createFetchStreamEventSourceV1,
+} from './client/stream-source/mod.ts';
+export type * from './client/stream-source/mod.ts';

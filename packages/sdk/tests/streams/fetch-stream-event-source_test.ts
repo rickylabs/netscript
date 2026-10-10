@@ -3,7 +3,7 @@ import type {
   FetchStreamEventSourceOptionsV1,
   StreamFetchV1,
   StreamSourceSchedulerV1,
-} from '../../src/streams.ts';
+} from '../../src/client/stream-source/mod.ts';
 
 class ManualScheduler implements StreamSourceSchedulerV1 {
   now = 0;
@@ -30,7 +30,26 @@ class ManualScheduler implements StreamSourceSchedulerV1 {
   }
 }
 
+interface LogEntry {
+  readonly id: string;
+  readonly offset: string;
+}
+
 class FakeFetch {
+  constructor(private readonly log: readonly LogEntry[] = []) {}
+
+  /** Serve the durable log from the opaque offset supplied by the client. */
+  serve(limit = Infinity, partialNextControl = false): void {
+    const offset = this.connections.at(-1)!.url.searchParams.get('offset');
+    const committed = offset === '-1' ? -1 : this.log.findIndex((entry) => entry.offset === offset);
+    if (committed < 0 && offset !== '-1') throw new Error('unknown replay offset');
+    const pending = this.log.slice(committed + 1);
+    for (const entry of pending.slice(0, limit)) this.send(data(entry.id) + control(entry.offset));
+    if (partialNextControl && pending[limit]) {
+      this.send(data(pending[limit].id) + 'event: control\ndata: {"streamNextOffset":"');
+    }
+  }
+
   readonly connections: Array<{
     url: URL;
     headers: Headers;
@@ -74,9 +93,12 @@ async function settle(): Promise<void> {
   for (let step = 0; step < 60; step++) await Promise.resolve();
 }
 
-async function create(options: Partial<FetchStreamEventSourceOptionsV1> = {}) {
-  const api = await import('../../src/streams.ts');
-  const transport = new FakeFetch();
+async function create(
+  options: Partial<FetchStreamEventSourceOptionsV1> = {},
+  log: readonly LogEntry[] = [],
+) {
+  const api = await import('../../src/client/stream-source/mod.ts');
+  const transport = new FakeFetch(log);
   const scheduler = new ManualScheduler();
   const source = api.createFetchStreamEventSourceV1({
     url: 'https://streams.example/v1/stream/netscript/tasks?offset=-1',
@@ -143,7 +165,11 @@ Deno.test('fetch source and existing binding run without EventSource or DOM even
 });
 
 Deno.test('resume after forced mid-stream disconnect delivers exact IDs with no gap or duplicate', async () => {
-  const { source, transport, scheduler, bindStreamEventSourceV1 } = await create();
+  const { source, transport, scheduler, bindStreamEventSourceV1 } = await create({}, [
+    { id: '1', offset: 'opaque:1/A' },
+    { id: '2', offset: 'opaque:2' },
+    { id: '3', offset: 'opaque:3' },
+  ]);
   const ids: string[] = [];
   const binding = bindStreamEventSourceV1({
     source,
@@ -152,9 +178,7 @@ Deno.test('resume after forced mid-stream disconnect delivers exact IDs with no 
     },
   });
   try {
-    transport.send(data('1') + control('opaque:1/A'));
-    await settle();
-    transport.send(data('2') + 'event: control\ndata: {"streamNextOffset":"');
+    transport.serve(1, true);
     await settle();
     assertEquals(ids, ['1']); // Full data without control is still undelivered.
     transport.drop();
@@ -166,9 +190,7 @@ Deno.test('resume after forced mid-stream disconnect delivers exact IDs with no 
     assertEquals(reconnected.headers.get('last-event-id'), '1');
     assertEquals(reconnected.url.searchParams.get('offset'), 'opaque:1/A');
     assertEquals(reconnected.url.searchParams.get('live'), 'sse');
-    // The fake server replays strictly from the requested committed token.
-    assertEquals(reconnected.url.searchParams.get('offset') === 'opaque:1/A', true);
-    transport.send(data('2') + control('opaque:2') + data('3') + control('opaque:3'));
+    transport.serve();
     await settle();
     assertEquals(ids, ['1', '2', '3']);
     assertEquals(binding.snapshot().lastCommittedOffset, 'opaque:3');
@@ -405,4 +427,48 @@ Deno.test('abort during credential resolution observes rejected IO without recon
   await source.done;
   assertEquals(transport.connections.length, 0);
   assertEquals(scheduler.timers.size, 0);
+});
+
+Deno.test('server retry is clamped to the configured back-off floor and cap', async () => {
+  const { source, transport, scheduler } = await create();
+  try {
+    for (const [retry, expected] of [[0, 10], [1, 10], [15, 15], [1000, 25]]) {
+      transport.send(`retry: ${retry}\n\n`);
+      await settle();
+      transport.drop();
+      await settle();
+      assertEquals(scheduler.delays(), [expected]);
+      scheduler.advance(expected);
+      await settle();
+    }
+  } finally {
+    source.close();
+    await source.done;
+  }
+});
+
+Deno.test('all non-2xx statuses retry and resolve credentials on each connect', async () => {
+  const statuses = [401, 403, 404, 503, 302];
+  const credentials: Array<string | null> = [];
+  let authCalls = 0;
+  const { source, scheduler } = await create({
+    authHeaders: () => ({ authorization: `Bearer token-${++authCalls}` }),
+    fetch: (_url, init) => {
+      credentials.push(new Headers(init.headers).get('authorization'));
+      return Promise.resolve(new Response(null, { status: statuses[credentials.length - 1] }));
+    },
+  });
+  try {
+    for (const delay of [10, 20, 25, 25]) {
+      assertEquals(scheduler.delays(), [delay]);
+      scheduler.advance(delay);
+      await settle();
+    }
+    assertEquals(credentials, statuses.map((_, index) => `Bearer token-${index + 1}`));
+    assertEquals(authCalls, statuses.length);
+  } finally {
+    source.close();
+    await source.done;
+    assertEquals(scheduler.timers.size, 0);
+  }
 });

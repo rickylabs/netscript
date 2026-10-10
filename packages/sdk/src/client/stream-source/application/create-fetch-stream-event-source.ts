@@ -15,8 +15,10 @@ import { FetchStreamSource } from './fetch-stream-source.ts';
  * A server must honor its replay cursor; this transport does not deduplicate arbitrary logs.
  *
  * Every connection resolves credentials anew and has a byte-silence deadline. Consecutive
- * failures double the delay up to the cap; valid control progress resets it. Server `retry:`
- * changes the initial delay within the same bounds. Close/abort discards uncommitted data,
+ * failures double the delay up to the cap; valid control progress resets it. Every non-2xx
+ * response retries, including 401/403/404, so callers must abort persistent failures. HTTP 204
+ * and terminal control stop permanently. Server `retry:` changes the delay, clamped between
+ * the configured initial back-off floor and cap. Close/abort discards uncommitted data,
  * cancels timers and the response reader, and prevents further listeners or reconnects.
  * Listener exceptions terminate the source and reject `done` instead of replaying callbacks.
  *
@@ -24,7 +26,7 @@ import { FetchStreamSource } from './fetch-stream-source.ts';
  * @returns An EventSource-compatible handle. Attach listeners synchronously; await `done` for shutdown.
  * @example
  * ```ts
- * import { bindStreamEventSourceV1, createFetchStreamEventSourceV1 } from '@netscript/sdk/streams';
+ * import { bindStreamEventSourceV1, createFetchStreamEventSourceV1 } from '@netscript/sdk/streams/consumer';
  *
  * const abort = new AbortController();
  * const source = createFetchStreamEventSourceV1({

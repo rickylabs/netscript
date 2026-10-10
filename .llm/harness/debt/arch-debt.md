@@ -2624,3 +2624,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `sessions.getSession` given `token: readBearerCredential(request)` and the request, for cookie,
   bearer, competing cookie+bearer, and malformed bearer requests, and that a bearer-borne refresh
   emits no `Set-Cookie`.
+
+## SDK fetch stream-source placement (F-16, #2100)
+
+- **ID:** `sdk-stream-source-placement-2100`
+- **Reason:** The stream transport is a separate concern temporarily placed in
+  `packages/sdk/src/client/stream-source/`. SDK already has 14 source-root directories against
+  F-16's limit of 12; adding another root would worsen that baseline. Nesting under the client
+  concern leaves the concern boundary imperfect and requires an explicit consolidation follow-up.
+- **Owner:** SDK architecture maintainers / #2100.
+- **Target:** Before the 0.0.9 stable SDK release.
+- **Status:** Open; pending independent evaluator acceptance for PR #2212.
+- **Closing gate:** Consolidate SDK source roots to at most 12 and place the transport in a proper
+  stream concern while preserving the public consumer subpath and its import-graph guard.
+- **Evidence:** PR #2212; `fetch-stream-source-import_test.ts` proves the consumer excludes telemetry,
+  OTel, and modules using Deno APIs. `arch:check` retains the existing F-16 directory-count warning.
