@@ -9,7 +9,11 @@ import { createAuthServiceBackendRegistry } from '../../services/src/backend-reg
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
 import { router } from '../../services/src/router.ts';
 import { currentAuthRequest, withAuthRequest } from '../../services/src/request-context.ts';
-import { authTestUrl } from './auth-fixtures.ts';
+import {
+  AUTH_TEST_USERINFO_SUBJECT_ENV,
+  authTestUrl,
+  syntheticProviderFetch,
+} from './auth-fixtures.ts';
 
 /** Backend registry type returned by the auth service composition root. */
 export type AuthTestRegistry = ResolvedAuthBackendRegistry;
@@ -22,7 +26,7 @@ export interface AuthTestService extends AsyncDisposable {
   readonly serviceName: string;
 }
 
-/** Create a kv-oauth registry whose synthetic provider always grants a token. */
+/** Create a kv-oauth registry whose synthetic provider grants a token and a stable userinfo id. */
 export async function createKvOAuthTestRegistry(kv: MemoryKvAdapter): Promise<AuthTestRegistry> {
   // Synthetic provider configuration mirrors the native in-memory test fixture.
   return await createAuthServiceBackendRegistry({
@@ -36,20 +40,9 @@ export async function createKvOAuthTestRegistry(kv: MemoryKvAdapter): Promise<Au
       NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
       NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
       NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
+      ...AUTH_TEST_USERINFO_SUBJECT_ENV,
     },
-    fetch: () =>
-      Promise.resolve(
-        new Response(
-          JSON.stringify({
-            access_token: 'access_test',
-            refresh_token: 'refresh_test',
-            token_type: 'Bearer',
-            expires_in: 3600,
-            scope: 'profile email',
-          }),
-          { headers: { 'content-type': 'application/json' } },
-        ),
-      ),
+    fetch: syntheticProviderFetch(),
   });
 }
 

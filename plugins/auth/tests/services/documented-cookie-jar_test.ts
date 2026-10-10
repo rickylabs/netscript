@@ -34,14 +34,16 @@ Deno.test('documented localhost curl cookie-jar flow works through the real serv
   await using kv = new MemoryKvAdapter();
   const provider = Deno.serve(
     { hostname: '127.0.0.1', port: 0, onListen: () => {} },
-    () =>
-      Response.json({
-        access_token: 'access_test',
-        refresh_token: 'refresh_test',
-        token_type: 'Bearer',
-        expires_in: 3600,
-        scope: 'profile email',
-      }),
+    (request) =>
+      new URL(request.url).pathname === '/oauth/userinfo'
+        ? Response.json({ id: 4242 })
+        : Response.json({
+          access_token: 'access_test',
+          refresh_token: 'refresh_test',
+          token_type: 'Bearer',
+          expires_in: 3600,
+          scope: 'profile email',
+        }),
   );
   const scratch = await Deno.makeTempDir({ prefix: 'auth-cookie-jar-' });
   const previous = Deno.env.get('NETSCRIPT_AUTH_COOKIE_NAME');
@@ -63,6 +65,9 @@ Deno.test('documented localhost curl cookie-jar flow works through the real serv
     running = await createAuthService(host(kv, {
       ...env,
       NETSCRIPT_AUTH_TOKEN_ENDPOINT: `http://127.0.0.1:${provider.addr.port}/oauth/token`,
+      NETSCRIPT_AUTH_USERINFO_ENDPOINT: `http://127.0.0.1:${provider.addr.port}/oauth/userinfo`,
+      NETSCRIPT_AUTH_SUBJECT_SOURCE: 'userinfo',
+      NETSCRIPT_AUTH_SUBJECT_CLAIM: 'id',
     }));
     const origin = `http://localhost:${running.addr.port}`;
     const block = recipe.match(/```sh\n(# Save the transaction cookie[\s\S]*?)\n```/);
@@ -92,9 +97,12 @@ Deno.test('documented localhost curl cookie-jar flow works through the real serv
         assert(!jar.includes('appsettings_cookie'));
       } else if (index === 1) {
         assertEquals(body.completed, true);
+        assertEquals(body.subject, 'default:4242');
+        assert(body.subject !== body.sessionId);
         assertStringIncludes(jar, '\tns_session_dev\tsess_');
       } else if (index === 2 || index === 3) {
         assertEquals(body.authenticated, true);
+        assertEquals(body.session.subject, 'default:4242');
       } else {
         assertEquals(body.signedOut, true);
         assert(!jar.includes('\tns_session_dev\t'));
