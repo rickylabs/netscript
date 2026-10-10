@@ -8,6 +8,12 @@
  * the assistant chunks share one `(id, epoch, seq)` producer sequence and a
  * stale epoch is rejected by the streams runtime.
  *
+ * Every chunk is sent as its own producer batch, so a chunk's `seq` is its
+ * index in the turn (echo first, then assistant chunks) and never depends on
+ * how fast the source yields. A replay of the same turn under the same
+ * `(id, epoch)` is therefore deduplicated chunk for chunk, and a replay of an
+ * interrupted call appends exactly the chunks the earlier call never stored.
+ *
  * @module
  */
 
@@ -28,10 +34,17 @@ import type { StreamProducerTransportFailureKindV1 } from '@netscript/plugin-str
 import { type NetScriptChatProducer, NetScriptChatProducerError } from './chat-producer.ts';
 
 /**
- * Batches allowed in flight before the assistant pipe waits for acknowledgement.
- * Bounds buffered memory to roughly this many producer batches.
+ * Chunks allowed in flight before the writer waits for acknowledgement. With one
+ * chunk per batch this bounds buffered memory to this many chunks.
  */
 const MAX_IN_FLIGHT_BATCHES = 5;
+
+/**
+ * Any non-empty append reaches this batch size, so `IdempotentProducer` sends each
+ * chunk as its own batch at once instead of letting its linger timer pick batch
+ * boundaries. That pins `seq` to the chunk index, independent of source timing.
+ */
+const ONE_CHUNK_PER_BATCH_BYTES = 1;
 
 /** Compile-time guard: the chat error kinds stay identical to the State Protocol producer kinds. */
 type SameKinds<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never;
@@ -99,7 +112,10 @@ export async function toFencedChatSessionResponse(
   return new Response(null, { status: 202, headers: { 'Cache-Control': 'no-store' } });
 }
 
-/** One writer lifetime: one `IdempotentProducer`, one sequence, first failure wins. */
+/**
+ * One writer lifetime: one `IdempotentProducer`, one sequence where `seq` is the
+ * chunk index, first failure wins.
+ */
 class FencedChatSessionWriter {
   readonly #producer: IdempotentProducer;
   readonly #identity: NetScriptChatProducer;
@@ -111,6 +127,7 @@ class FencedChatSessionWriter {
       epoch: identity.epoch,
       // Never self-heal a stale epoch by claiming epoch + 1: that would defeat fencing.
       autoClaim: false,
+      maxBatchBytes: ONE_CHUNK_PER_BATCH_BYTES,
       maxInFlight: MAX_IN_FLIGHT_BATCHES,
       onError: (error) => {
         this.#failure ??= error;
@@ -120,8 +137,10 @@ class FencedChatSessionWriter {
 
   /** Append the new-message echo and wait for its acknowledgement. */
   async writeEcho(chunks: readonly unknown[]): Promise<void> {
-    for (const chunk of chunks) this.#append(chunk);
     try {
+      for (const chunk of chunks) {
+        if (!await this.#write(chunk)) break;
+      }
       await this.#settle();
     } catch (error) {
       await this.#producer.detach();
@@ -133,9 +152,7 @@ class FencedChatSessionWriter {
   async pipe(source: AsyncIterable<unknown>): Promise<void> {
     try {
       for await (const chunk of source) {
-        if (this.#failure !== undefined) break;
-        this.#append(chunk);
-        if (this.#producer.inFlightCount >= MAX_IN_FLIGHT_BATCHES) await this.#producer.flush();
+        if (!await this.#write(chunk)) break;
       }
       await this.#settle();
     } finally {
@@ -143,8 +160,12 @@ class FencedChatSessionWriter {
     }
   }
 
-  #append(chunk: unknown): void {
+  /** Append one chunk (its own batch, next `seq`); `false` once a failure was reported. */
+  async #write(chunk: unknown): Promise<boolean> {
+    if (this.#failure !== undefined) return false;
     this.#producer.append(JSON.stringify(sanitizeChunkForStorage(chunk)));
+    if (this.#producer.inFlightCount >= MAX_IN_FLIGHT_BATCHES) await this.#producer.flush();
+    return true;
   }
 
   async #settle(): Promise<void> {

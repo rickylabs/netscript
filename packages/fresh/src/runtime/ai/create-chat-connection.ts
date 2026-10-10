@@ -289,15 +289,10 @@ export interface NetScriptChatResponseOptions {
    */
   readonly authorize?: NetScriptChatAuthorize;
   /**
-   * Opt-in writer fencing for an executor that may be reclaimed (a worker or
-   * saga holding a lease). When supplied, the new-message echo and every
-   * assistant chunk are appended under one idempotent-producer sequence
-   * `(id, epoch, seq)`: a writer whose epoch is older than the newest one that
-   * has written is rejected by the streams runtime with a
-   * `NetScriptChatProducerError` (`kind: 'stale-epoch'`), and nothing from the
-   * rejected appends is stored. The epoch is never claimed or bumped
-   * automatically; see {@link NetScriptChatProducer}. Omitted: appends are
-   * unfenced, exactly as before.
+   * Opt-in writer fencing for a reclaimable executor: the echo and assistant
+   * chunks share one idempotent-producer sequence, and a stale epoch rejects with
+   * `NetScriptChatProducerError` without storing anything. See
+   * {@link NetScriptChatProducer}. Omitted: appends are unfenced, as before.
    */
   readonly producer?: NetScriptChatProducer;
   /**
@@ -616,15 +611,9 @@ function defaultMaterialize(input: {
   });
 }
 
-function defaultToResponse(input: {
-  readonly writeUrl: string;
-  readonly headers: Record<string, string>;
-  readonly newMessages: readonly unknown[];
-  readonly source: AsyncIterable<unknown>;
-  readonly mode?: 'immediate' | 'await';
-  readonly waitUntil?: (task: Promise<unknown>) => void;
-  readonly producer?: NetScriptChatProducer;
-}): Promise<Response> {
+function defaultToResponse(
+  input: Parameters<NonNullable<NetScriptChatResponseOptions['toResponse']>>[0],
+): Promise<Response> {
   if (input.producer) {
     return toFencedChatSessionResponse({ ...input, producer: input.producer });
   }

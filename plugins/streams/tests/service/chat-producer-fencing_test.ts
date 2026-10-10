@@ -97,7 +97,7 @@ function assistantChunks(messageId: string, text: string): Record<string, unknow
   ];
 }
 
-/** Yields synchronously, so one turn's chunks land in one producer batch. */
+/** Yields synchronously, so without per-chunk batches a turn's chunks would share one batch. */
 async function* sourceOf(chunks: readonly unknown[]): AsyncIterable<unknown> {
   for (const chunk of chunks) yield chunk;
 }
@@ -172,26 +172,100 @@ Deno.test('fenced chat: a stale epoch is rejected with a typed error and appends
   }
 });
 
-Deno.test('fenced chat: replaying the same (id, epoch, seq) is deduplicated', async () => {
+/** A five-chunk assistant turn: enough chunks for source timing to matter. */
+const REPLAY_CHUNKS = [
+  { type: 'TEXT_MESSAGE_START', messageId: 'a-1', role: 'assistant' },
+  { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a-1', delta: 'one ' },
+  { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a-1', delta: 'two ' },
+  { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a-1', delta: 'three' },
+  { type: 'TEXT_MESSAGE_END', messageId: 'a-1' },
+];
+const ECHO_CHUNK_COUNT = 3;
+
+/** Yields each chunk after `delayMs`, so no two chunks share a producer linger window. */
+async function* paced(chunks: readonly unknown[], delayMs: number): AsyncIterable<unknown> {
+  for (const chunk of chunks) {
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    yield chunk;
+  }
+}
+
+/** An executor that loses its lease after `count` chunks. */
+async function* interruptedAfter(
+  chunks: readonly unknown[],
+  count: number,
+): AsyncIterable<unknown> {
+  yield* sourceOf(chunks.slice(0, count));
+  throw new Error('executor lost its lease');
+}
+
+type ReplaySource = () => AsyncIterable<unknown>;
+
+/**
+ * Writes the turn under one `(id, epoch)` from `first`, replays it from `second`, and returns
+ * the session bytes, the bytes of the same turn written once cleanly, and the replay's acks.
+ */
+async function replayTurn(first: ReplaySource, second: ReplaySource) {
   await using streams = await startStreamsService();
-  const path = sessionPath(streams, 'dedup');
-  const turn = () =>
-    toNetScriptChatResponse({
-      target: target(streams, 'dedup'),
-      newMessages: [USER_TURN],
-      source: sourceOf(assistantChunks('a-1', 'once')),
-      mode: 'await',
-      producer: { id: 'chat-turn:dedup:t1', epoch: 0 },
-    });
+  const realNow = Date.now;
+  Date.now = () => 1_760_000_000_000; // echo chunks carry a timestamp
+  try {
+    const turn = (sessionId: string, source: AsyncIterable<unknown>) =>
+      toNetScriptChatResponse({
+        target: target(streams, sessionId),
+        newMessages: [USER_TURN],
+        source,
+        mode: 'await',
+        producer: { id: 'chat-turn:replay:t1', epoch: 0 },
+      });
+    await turn('clean', sourceOf(REPLAY_CHUNKS));
+    const firstError = await turn('replayed', first()).then(() => undefined, (error) => error);
+    const replayFrom = streams.appends.length;
+    await turn('replayed', second());
+    return {
+      firstError,
+      replayed: await streams.read(sessionPath(streams, 'replayed')),
+      clean: await streams.read(sessionPath(streams, 'clean')),
+      acks: streams.appends.slice(replayFrom).map((append) => [append.seq, append.status]),
+    };
+  } finally {
+    Date.now = realNow;
+  }
+}
 
-  await turn();
-  const first = await streams.read(path);
-  const firstAppends = streams.appends.length;
-  await turn();
+/** The replay's acknowledgements: `duplicates` chunks already stored (204), the rest appended (200). */
+function expectedAcks(duplicates: number): (string | number)[][] {
+  const total = ECHO_CHUNK_COUNT + REPLAY_CHUNKS.length;
+  return Array.from({ length: total }, (_, seq) => [String(seq), seq < duplicates ? 204 : 200]);
+}
 
-  assertEquals(await streams.read(path), first);
-  const replay = streams.appends.slice(firstAppends);
-  assertEquals(replay.map((append) => [append.seq, append.status]), [['0', 204], ['1', 204]]);
+Deno.test('fenced chat: a replay under the same (id, epoch) is deduplicated chunk for chunk', async () => {
+  const result = await replayTurn(() => sourceOf(REPLAY_CHUNKS), () => sourceOf(REPLAY_CHUNKS));
+  assertEquals(result.replayed, result.clean);
+  assertEquals(result.acks, expectedAcks(ECHO_CHUNK_COUNT + REPLAY_CHUNKS.length));
+});
+
+Deno.test('fenced chat: a slow replay of a fast turn stores nothing twice', async () => {
+  const result = await replayTurn(() => sourceOf(REPLAY_CHUNKS), () => paced(REPLAY_CHUNKS, 50));
+  assertEquals(result.replayed, result.clean);
+  assertEquals(result.acks, expectedAcks(ECHO_CHUNK_COUNT + REPLAY_CHUNKS.length));
+});
+
+Deno.test('fenced chat: a fast replay of a slow turn stores nothing twice', async () => {
+  const result = await replayTurn(() => paced(REPLAY_CHUNKS, 50), () => sourceOf(REPLAY_CHUNKS));
+  assertEquals(result.replayed, result.clean);
+  assertEquals(result.acks, expectedAcks(ECHO_CHUNK_COUNT + REPLAY_CHUNKS.length));
+});
+
+Deno.test('fenced chat: replaying an interrupted turn appends exactly the missing chunks', async () => {
+  const result = await replayTurn(
+    () => interruptedAfter(REPLAY_CHUNKS, 2),
+    () => paced(REPLAY_CHUNKS, 20),
+  );
+  assertInstanceOf(result.firstError, Error);
+  assertEquals(result.firstError.message, 'executor lost its lease');
+  assertEquals(result.replayed, result.clean);
+  assertEquals(result.acks, expectedAcks(ECHO_CHUNK_COUNT + 2));
 });
 
 Deno.test('fenced chat: the echo and the assistant chunks share one producer sequence', async () => {
@@ -204,23 +278,25 @@ Deno.test('fenced chat: the echo and the assistant chunks share one producer seq
     producer: { id: 'chat-turn:shared:t1', epoch: 7 },
   });
 
+  // One chunk per producer batch: seq is the chunk index across echo then assistant.
   const appends = streams.appends;
   assertEquals(
     appends.map((append) => [append.producerId, append.epoch, append.seq, append.status]),
-    [['chat-turn:shared:t1', '7', '0', 200], ['chat-turn:shared:t1', '7', '1', 200]],
+    ['0', '1', '2', '3', '4', '5'].map((seq) => ['chat-turn:shared:t1', '7', seq, 200]),
   );
-  assertEquals(appends[0].items.map((item) => [item.type, item.model]), [
-    ['TEXT_MESSAGE_START', 'client'],
-    ['TEXT_MESSAGE_CONTENT', 'client'],
-    ['TEXT_MESSAGE_END', 'client'],
-  ]);
-  assertEquals(appends[1].items.map((item) => item.type), [
-    'TEXT_MESSAGE_START',
-    'TEXT_MESSAGE_CONTENT',
-    'TEXT_MESSAGE_END',
-  ]);
+  assertEquals(
+    appends.map((append) => [append.items.length, append.items[0].type, append.items[0].model]),
+    [
+      [1, 'TEXT_MESSAGE_START', 'client'],
+      [1, 'TEXT_MESSAGE_CONTENT', 'client'],
+      [1, 'TEXT_MESSAGE_END', 'client'],
+      [1, 'TEXT_MESSAGE_START', undefined],
+      [1, 'TEXT_MESSAGE_CONTENT', undefined],
+      [1, 'TEXT_MESSAGE_END', undefined],
+    ],
+  );
   // Sanitized exactly like the unfenced path: stored content deltas drop `content`.
-  assertEquals('content' in appends[1].items[1], false);
+  assertEquals('content' in appends[4].items[0], false);
 });
 
 Deno.test('unfenced chat: omitting producer is byte-identical to the upstream transport', async () => {

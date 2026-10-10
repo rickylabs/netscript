@@ -162,10 +162,16 @@ try {
   increases on every claim of the turn: a claim counter or row version your executor
   increments when it takes the turn. When your job runtime exposes a lease or claim
   generation, use that.
-- **One `(id, epoch)` pair is one call.** The sequence restarts at `0` on every call, so the
-  service treats a second call under the same pair as a replay and drops its appends as
-  duplicates. That makes a retried call safe, but a new turn needs its own id, or a higher
-  epoch.
+- **A replay under the same pair is deduplicated chunk by chunk.** Each chunk is sent as
+  its own producer batch, so its sequence number is its index in the turn (the
+  `newMessages` echo first, then the assistant chunks), however fast the source yields.
+  Replaying the same turn under the same `(id, epoch)` therefore appends only the chunks an
+  earlier call never stored, for example after the executor was interrupted. The service
+  drops an already-stored index without comparing content, so use one id per turn.
+- **A new epoch starts a new sequence.** A newer claim rewrites the turn from index `0`;
+  whatever an older claim stored before it was fenced stays in the transcript.
+- **One request per chunk.** Fenced turns trade batching for that determinism: each chunk is
+  its own request, with at most five in flight.
 - **Fencing starts once the newer claim has written.** Until the new epoch's first append,
   the service has not seen it, so an older writer is still accepted.
 - **Errors are typed.** A rejected append becomes a `NetScriptChatProducerError` whose `kind`

@@ -16,12 +16,16 @@
  *
  * The framework never derives, claims, or bumps an epoch: the executor supplies
  * the epoch from its own lease or claim generation, and a stale epoch is
- * rejected instead of being silently re-claimed. One `(id, epoch)` pair names
- * exactly one writer for one `toNetScriptChatResponse` call — sequences
- * restart at `0` for every call, so reusing a pair makes the server treat the
- * new appends as duplicates of the earlier ones and drop them. Use an id that is
- * stable across retries of one turn (for example `chat-turn:<sessionId>:<turnId>`)
- * and a strictly increasing epoch per claim of that turn.
+ * rejected instead of being silently re-claimed.
+ *
+ * Each chunk's sequence number is its index in the turn (the `newMessages` echo
+ * first, then the assistant chunks), whatever the source timing. Under one
+ * `(id, epoch)` the streams service stores each index at most once: replaying
+ * the same turn appends only the chunks an earlier call never stored. An index
+ * that is already stored is dropped without comparing content, so reuse a pair
+ * only to replay the same turn. A higher epoch starts a new sequence and does
+ * not remove what an older claim stored. Use an id per turn (for example
+ * `chat-turn:<sessionId>:<turnId>`) and a strictly increasing epoch per claim.
  */
 export interface NetScriptChatProducer {
   /** Stable, opaque writer id: the executor's service identity for this turn. */
