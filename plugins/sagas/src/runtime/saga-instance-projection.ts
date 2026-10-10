@@ -197,7 +197,7 @@ export class ProjectingSagaStore implements SagaStorePort {
   ): Promise<void> {
     await this.#delegate.appendTransition(instanceId, record, knownEnvelope);
     const correlation = this.#correlations.get(instanceId);
-    const envelope = knownEnvelope ?? await this.#delegate.load(instanceId);
+    const envelope = await this.#delegate.load(instanceId);
     if (!correlation || !envelope) {
       throw new Error(`Saga projection context is missing for instance ${instanceId}.`);
     }
