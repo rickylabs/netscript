@@ -10,7 +10,7 @@ export type PostgresConnectionStringErrorReason =
  *
  * @example
  * ```ts
- * import { PostgresConnectionStringError } from '@netscript/database/adapters/postgres';
+ * import { PostgresConnectionStringError } from '@netscript/database/connection-strings/postgres';
  * const error = new PostgresConnectionStringError('unsupported-key', 'root certificate');
  * console.log(error.reason, error.key);
  * ```

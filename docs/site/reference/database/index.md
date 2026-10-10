@@ -19,6 +19,8 @@ scripts, the tracing surface, and the test contract harness:
 - [`@netscript/database/ports`](#ports) — adapter contracts and shared types.
 - [`@netscript/database/adapters`](#adapters) — PostgreSQL adapter (default driver surface).
 - [`@netscript/database/adapters/postgres`](#postgresql-adapter) — PostgreSQL driver adapter.
+- [`@netscript/database/connection-strings/postgres`](#postgresql-connection-strings) — dependency-free
+  connection-string normalization.
 - [`@netscript/database/adapters/mssql`](#sql-server-adapter) — SQL Server driver adapter.
 - [`@netscript/database/adapters/mysql`](#mysql-adapter) — MySQL driver adapter.
 - [`@netscript/database/extensions`](#extensions) — Prisma JSON serialization extensions.
@@ -79,9 +81,22 @@ Exported from `@netscript/database/adapters/postgres`.
 | `PostgresDriverAdapter` | interface | `interface PostgresDriverAdapter` | Public structural type returned by PostgreSQL driver adapter factories. |
 | `PostgresConnectionOptions` | interface | `interface PostgresConnectionOptions` | PostgreSQL-specific connection options. |
 
+### PostgreSQL connection strings
+
+Exported from `@netscript/database/connection-strings/postgres`, without loading a database driver.
+`normalizePostgresConnectionString` preserves PostgreSQL URIs byte-for-byte and translates Npgsql
+key/value strings, including explicit TLS modes and encoded credentials. Unsupported settings and
+malformed input throw `PostgresConnectionStringError` with a typed
+`PostgresConnectionStringErrorReason`: `unsupported-key`, `unsupported-value`, or `invalid-format`.
+Certificate settings and `SSL Mode=Allow` are refused. Generated Postgres modules and Prisma config
+inline this maintained implementation; their environment wrapper trims whitespace before conversion.
+
 ### SQL Server adapter
 
 Exported from `@netscript/database/adapters/mssql`.
+
+Malformed input to `parseAdoNetConnectionString` throws the exported
+`AdoNetConnectionStringSyntaxError`; its message does not include connection values.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |

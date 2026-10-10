@@ -1,5 +1,15 @@
-/** Internal syntax failure; never includes input or credentials. */
+/**
+ * Report malformed ADO.NET key=value syntax without exposing credentials.
+ *
+ * @example
+ * ```ts
+ * import { AdoNetConnectionStringSyntaxError } from '@netscript/database/adapters/mssql';
+ * const error = new AdoNetConnectionStringSyntaxError();
+ * console.log(error.name);
+ * ```
+ */
 export class AdoNetConnectionStringSyntaxError extends Error {
+  /** Construct a syntax failure without including the connection string. */
   constructor() {
     super('Invalid ADO.NET connection string syntax.');
     this.name = 'AdoNetConnectionStringSyntaxError';

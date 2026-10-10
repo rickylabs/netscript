@@ -5,7 +5,11 @@ function normalizeDatabaseUrl(value: string): string {
 /* @netscript-provider:end */
 
 /* @netscript-provider:postgres */
-import { normalizePostgresConnectionString as normalizeDatabaseUrl } from '@netscript/database/adapters/postgres';
+/* @netscript-inline:postgres-connection-string */
+
+function normalizeDatabaseUrl(value: string): string {
+  return normalizePostgresConnectionString(value.trim());
+}
 /* @netscript-provider:end */
 
 /* @netscript-provider:mysql */

@@ -1,6 +1,9 @@
 import { assertEquals, assertThrows } from '@std/assert';
-import * as postgres from '../adapters/postgres.adapter.ts';
-import { parseAdoNetConnectionString } from '../adapters/mssql.adapter.ts';
+import * as postgres from '../connection-strings/postgres.ts';
+import {
+  AdoNetConnectionStringSyntaxError,
+  parseAdoNetConnectionString,
+} from '../adapters/mssql.adapter.ts';
 
 Deno.test('Postgres normalizer preserves both URI schemes and TLS query bytes', () => {
   for (
@@ -56,6 +59,28 @@ Deno.test('Postgres normalizer preserves all five explicit TLS modes', () => {
       `postgres://postgres:@db.example:5432/postgres?sslmode=${expected}`,
     );
   }
+});
+
+Deno.test('Postgres normalizer supports Npgsql aliases and bare IPv6 without loading a driver', async () => {
+  for (const userKey of ['User Name', 'UserId']) {
+    assertEquals(
+      postgres.normalizePostgresConnectionString(`Host=::1;${userKey}=app;PSW=secret;DB=app`),
+      'postgres://app:secret@[::1]:5432/app',
+    );
+  }
+  const result = await new Deno.Command('deno', {
+    args: [
+      'info',
+      '--no-config',
+      '--no-lock',
+      '--no-remote',
+      '--no-npm',
+      new URL('../connection-strings/postgres.ts', import.meta.url).href,
+    ],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
 });
 
 Deno.test('Postgres normalizer refuses unsupported keys with a named typed reason', () => {
@@ -160,4 +185,15 @@ Deno.test('MSSQL consumes the shared ADO.NET tokenizer for quoted credentials an
   assertEquals(config.user, 'sa');
   assertEquals(config.password, 'a;"b=c');
   assertEquals(config.options?.trustServerCertificate, true);
+});
+
+Deno.test('MSSQL malformed inputs throw the exported credential-safe syntax error', () => {
+  for (const input of ['Host', 'Server=x;Password="secret', 'Server=x;Password="secret"bad']) {
+    const error = assertThrows(
+      () => parseAdoNetConnectionString(input),
+      AdoNetConnectionStringSyntaxError,
+    );
+    assertEquals(error.name, 'AdoNetConnectionStringSyntaxError');
+    assertEquals(error.message.includes('secret'), false);
+  }
 });

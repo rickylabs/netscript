@@ -253,6 +253,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
     './adapters/postgres',
     './commands',
     './commands/postgres',
+    './connection-strings/postgres',
     './extensions',
     './ports',
     './scripts',

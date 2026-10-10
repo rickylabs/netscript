@@ -7,11 +7,6 @@
  */
 
 import { PrismaPg } from '@prisma/adapter-pg';
-export { normalizePostgresConnectionString } from './postgres-connection-string.ts';
-export {
-  PostgresConnectionStringError,
-  type PostgresConnectionStringErrorReason,
-} from './postgres-connection-string-error.ts';
 import type {
   DatabaseAdapter,
   DatabaseConnectionOptions,

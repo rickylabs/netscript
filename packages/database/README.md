@@ -89,7 +89,7 @@ Both PostgreSQL URI schemes pass through unchanged, including TLS query paramete
 key/value strings, use the Postgres adapter helper before constructing a client:
 
 ```typescript
-import { normalizePostgresConnectionString } from '@netscript/database/adapters/postgres';
+import { normalizePostgresConnectionString } from '@netscript/database/connection-strings/postgres';
 
 const url = normalizePostgresConnectionString(
   'Host=localhost;Database=app;Username=app;Password=secret;SSL Mode=VerifyFull',
@@ -107,22 +107,23 @@ Unsupported keys (including certificate options), unsupported values (including 
 and malformed input throw `PostgresConnectionStringError`. Its `reason` is `unsupported-key`,
 `unsupported-value`, or `invalid-format`; its optional `key` identifies the refused option. Messages
 never include option values or credentials. The scaffolded Postgres module and Prisma config use
-this same helper.
+generated inline code from this same helper, with no runtime package import in Prisma config. The
+scaffold wrapper trims environment values before calling the helper.
 
 ## Public surface
 
-| Entry                 | What it gives you                                                                                                           |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `.`                   | The `DatabaseAdapter` contract, `createPostgresAdapter`, connection-string helpers, `jsonUtils`                             |
-| `./ports`             | Contract types only (`DatabaseAdapter`, `DatabaseAdapterFactory`, provider and status types)                                |
-| `./adapters/postgres` | `PostgresAdapter` over the official Prisma pg driver adapter                                                                |
-| `./adapters/mssql`    | SQL Server adapter over the official Prisma mssql driver adapter                                                            |
-| `./adapters/mysql`    | MySQL/MariaDB adapter over `@netscript/prisma-adapter-mysql`                                                                |
-| `./extensions`        | JSON field registry and serialization utilities                                                                             |
-| `./tracing`           | `enableInstrumentation` for Prisma OpenTelemetry spans                                                                      |
-| `./commands`          | Bound command port, logical rows, store errors and true callback-client boundary                                            |
+| Entry                 | What it gives you                                                                               |
+| --------------------- | ----------------------------------------------------------------------------------------------- |
+| `.`                   | The `DatabaseAdapter` contract, `createPostgresAdapter`, connection-string helpers, `jsonUtils` |
+| `./ports`             | Contract types only (`DatabaseAdapter`, `DatabaseAdapterFactory`, provider and status types)    |
+| `./adapters/postgres` | `PostgresAdapter` over the official Prisma pg driver adapter                                    |
+| `./adapters/mssql`    | SQL Server adapter over the official Prisma mssql driver adapter                                |
+| `./adapters/mysql`    | MySQL/MariaDB adapter over `@netscript/prisma-adapter-mysql`                                    |
+| `./extensions`        | JSON field registry and serialization utilities                                                 |
+| `./tracing`           | `enableInstrumentation` for Prisma OpenTelemetry spans                                          |
+| `./commands` | Bound command port, logical rows, store errors and true callback-client boundary |
 | `./commands/postgres` | `createPostgresCommandStore` and `createPostgresCommandOutboxRelayStore` over the consumer-owned schema and callback bridge |
-| `./testing`           | `runDatabaseAdapterContract`, `createMockDatabaseAdapter`                                                                   |
+| `./testing`           | `runDatabaseAdapterContract`, `createMockDatabaseAdapter`                                       |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/database@<version>`](https://jsr.io/@netscript/database/doc) (pin
@@ -165,63 +166,24 @@ rollback, rather than a retry of the transaction callback.
 
 ### True callback client and schema ownership
 
-`withTransaction(root, work)` preserves a separate callback type through
-`TransactionClientPort<TTx>`. Bind Prisma through its actual callback; never assert a root client
-into the business handle. Consumers generate
-`CommandTransactionClient = Omit<Prisma.TransactionClient, '$transaction' | '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>`.
+`withTransaction(root, work)` preserves a separate callback type through `TransactionClientPort<TTx>`. Bind Prisma through its actual callback; never assert a root client into the business handle. Consumers generate `CommandTransactionClient = Omit<Prisma.TransactionClient, '$transaction' | '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>`.
 
-The reviewed schema, migration and bridge samples in `tests/fixtures/command-store/` show the
-consumer-owned receipt unique key, completion check, audit fields and initial outbox lease fields.
-Generate a Prisma client and bind the callback explicitly. Apply the migration through the
-application's normal review workflow. CLI generation is deferred to RFC 0003 stage 8; importing the
-framework never creates tables or runs a migration.
+The reviewed schema, migration and bridge samples in `tests/fixtures/command-store/` show the consumer-owned receipt unique key, completion check, audit fields and initial outbox lease fields. Generate a Prisma client and bind the callback explicitly. Apply the migration through the application's normal review workflow. CLI generation is deferred to RFC 0003 stage 8; importing the framework never creates tables or runs a migration.
 
 ### PostgreSQL command store
 
-Import `createPostgresCommandStore` from `@netscript/database/commands/postgres`, pass the
-consumer's generated callback bridge, and configure `transactionTimeoutMs`. The store supports
-PostgreSQL ReadCommitted, ReadUncommitted (PostgreSQL treats it as ReadCommitted), RepeatableRead
-and Serializable. Receipt wait is an integer from 1 to 60,000 milliseconds; zero would disable
-PostgreSQL lock_timeout and is refused. The timeout is finite and cancellation is cooperative.
+Import `createPostgresCommandStore` from `@netscript/database/commands/postgres`, pass the consumer's generated callback bridge, and configure `transactionTimeoutMs`. The store supports PostgreSQL ReadCommitted, ReadUncommitted (PostgreSQL treats it as ReadCommitted), RepeatableRead and Serializable. Receipt wait is an integer from 1 to 60,000 milliseconds; zero would disable PostgreSQL lock_timeout and is refused. The timeout is finite and cancellation is cooperative.
 
-Claims use the reviewed unique key with `INSERT ... ON CONFLICT DO NOTHING RETURNING`, then one
-indexed winner select. Successful claims restore the previous transaction-local lock timeout. A lock
-timeout produces terminal busy, rolls back the complete callback, and forbids subsequent side-record
-calls. Serialization/deadlock errors are retryable provider failures; the callback is never retried
-automatically. Each owned receipt must complete before commit. All audit/outbox SQL derives from the
-callback client; root business/lifecycle operations are refused.
+Claims use the reviewed unique key with `INSERT ... ON CONFLICT DO NOTHING RETURNING`, then one indexed winner select. Successful claims restore the previous transaction-local lock timeout. A lock timeout produces terminal busy, rolls back the complete callback, and forbids subsequent side-record calls. Serialization/deadlock errors are retryable provider failures; the callback is never retried automatically. Each owned receipt must complete before commit. All audit/outbox SQL derives from the callback client; root business/lifecycle operations are refused.
 
-Prisma currently exposes nested transactions on its callback proxy. The consumer bridge sample hides
-root operations at runtime as well as in the generated alias. It preserves model delegates and uses
-the actual provider transaction for every side record. Table mappings match the reviewed sample
-migration; explicit mapping changes require a reviewed adapter/bridge migration.
+Prisma currently exposes nested transactions on its callback proxy. The consumer bridge sample hides root operations at runtime as well as in the generated alias. It preserves model delegates and uses the actual provider transaction for every side record. Table mappings match the reviewed sample migration; explicit mapping changes require a reviewed adapter/bridge migration.
 
-`bash .llm/tools/command-postgres-conformance.sh` runs the native generated-client provider gate
-with an isolated temporary Unix socket. The dedicated CI workflow uses Deno 2.9.5. A suite skipped
-without provider configuration never certifies PostgreSQL support. No database credentials,
-connection addresses or operational evidence belong in the public run artifacts.
+`bash .llm/tools/command-postgres-conformance.sh` runs the native generated-client provider gate with an isolated temporary Unix socket. The dedicated CI workflow uses Deno 2.9.5. A suite skipped without provider configuration never certifies PostgreSQL support. No database credentials, connection addresses or operational evidence belong in the public run artifacts.
 
 ### PostgreSQL command outbox relay
 
-`createPostgresCommandOutboxRelayStore` from `@netscript/database/commands/postgres` binds the same
-true generated callback bridge, with an explicit finite transaction timeout.
-`CommandOutboxRelayStore` from `@netscript/database/commands` is raw storage: it owns bounded
-due-row claims, live generation/expiry fencing, retry/terminal retention, and one atomic publication
-plus normalized acceptance write. It imports no queue, service or worker package and runs no
-migration on construction or invocation.
+`createPostgresCommandOutboxRelayStore` from `@netscript/database/commands/postgres` binds the same true generated callback bridge, with an explicit finite transaction timeout. `CommandOutboxRelayStore` from `@netscript/database/commands` is raw storage: it owns bounded due-row claims, live generation/expiry fencing, retry/terminal retention, and one atomic publication plus normalized acceptance write. It imports no queue, service or worker package and runs no migration on construction or invocation.
 
-Apply the reviewed `tests/fixtures/command-store/relay-acceptance-migration.sql` through your
-consumer's migration workflow when upgrading the C3 table. The complete schema/migration fixture
-already contains paired `acceptanceIdentity`/`acceptedAt` columns. Claims require an explicit clock
-instant, opaque fresh `claimToken`, 1–64 rows and a 1–60,000 millisecond lease. Publication and
-release compare row identity, current token, unexpired lease, unpublished and nonterminal state.
-Release's `now` is the actual current instant, distinct from `retryAt`. Retry clears ownership and
-advances availability; terminal retains the row; neither changes message ID or dedupe key. Worker
-receipts persist only normalized identity/time, never raw transport responses.
+Apply the reviewed `tests/fixtures/command-store/relay-acceptance-migration.sql` through your consumer's migration workflow when upgrading the C3 table. The complete schema/migration fixture already contains paired `acceptanceIdentity`/`acceptedAt` columns. Claims require an explicit clock instant, opaque fresh `claimToken`, 1–64 rows and a 1–60,000 millisecond lease. Publication and release compare row identity, current token, unexpired lease, unpublished and nonterminal state. Release's `now` is the actual current instant, distinct from `retryAt`. Retry clears ownership and advances availability; terminal retains the row; neither changes message ID or dedupe key. Worker receipts persist only normalized identity/time, never raw transport responses.
 
-The generic relay acknowledges after the sink's documented acceptance boundary. A crash after
-acceptance and before settlement redelivers the same stable key. A lease expiration fences
-settlement even if nobody has claimed the row again. Consumer operations must remain idempotent;
-this is at-least-once delivery. The native PostgreSQL gate runs both command-store and relay-store
-generated-client conformance and owns its provider cleanup. Supplied provider operations need
-consumer-owned network permissions; framework construction needs none.
+The generic relay acknowledges after the sink's documented acceptance boundary. A crash after acceptance and before settlement redelivers the same stable key. A lease expiration fences settlement even if nobody has claimed the row again. Consumer operations must remain idempotent; this is at-least-once delivery. The native PostgreSQL gate runs both command-store and relay-store generated-client conformance and owns its provider cleanup. Supplied provider operations need consumer-owned network permissions; framework construction needs none.

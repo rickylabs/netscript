@@ -1,9 +1,108 @@
-import {
-  AdoNetConnectionStringSyntaxError,
-  tokenizeAdoNetConnectionString,
-} from './connection-strings/tokenize-ado-net.ts';
-import { PostgresConnectionStringError } from './postgres-connection-string-error.ts';
+// @generated from @netscript/database/connection-strings/postgres.
+// Do not edit. Run deno task gen:assets-barrel to refresh the shared implementation.
 
+// Source: packages/database/adapters/connection-strings/tokenize-ado-net.ts
+/**
+ * Report malformed ADO.NET key=value syntax without exposing credentials.
+ *
+ * @example
+ * ```ts
+ * import { AdoNetConnectionStringSyntaxError } from '@netscript/database/adapters/mssql';
+ * const error = new AdoNetConnectionStringSyntaxError();
+ * console.log(error.name);
+ * ```
+ */
+class AdoNetConnectionStringSyntaxError extends Error {
+  /** Construct a syntax failure without including the connection string. */
+  constructor() {
+    super('Invalid ADO.NET connection string syntax.');
+    this.name = 'AdoNetConnectionStringSyntaxError';
+  }
+}
+
+/** Tokenize semicolon-separated key=value pairs, preserving quoted delimiters. */
+function* tokenizeAdoNetConnectionString(
+  input: string,
+): Generator<{ key: string; value: string }> {
+  let index = 0;
+  while (index < input.length) {
+    while (index < input.length && (input[index] === ';' || /\s/.test(input[index]))) index++;
+    if (index === input.length) return;
+
+    const keyStart = index;
+    while (index < input.length && input[index] !== '=' && input[index] !== ';') index++;
+    const key = input.slice(keyStart, index).trim().toLowerCase();
+    if (!key || input[index] !== '=') throw new AdoNetConnectionStringSyntaxError();
+    index++;
+    while (index < input.length && /\s/.test(input[index])) index++;
+
+    let value: string;
+    const quote = input[index];
+    if (quote === '"' || quote === "'") {
+      index++;
+      value = '';
+      let closed = false;
+      while (index < input.length) {
+        const char = input[index++];
+        if (char !== quote) {
+          value += char;
+        } else if (input[index] === quote) {
+          value += quote;
+          index++;
+        } else {
+          closed = true;
+          break;
+        }
+      }
+      if (!closed) throw new AdoNetConnectionStringSyntaxError();
+      while (index < input.length && /\s/.test(input[index])) index++;
+      if (index < input.length && input[index] !== ';') {
+        throw new AdoNetConnectionStringSyntaxError();
+      }
+    } else {
+      const valueStart = index;
+      while (index < input.length && input[index] !== ';') index++;
+      value = input.slice(valueStart, index).trim();
+    }
+
+    yield { key, value };
+  }
+}
+
+// Source: packages/database/adapters/postgres-connection-string-error.ts
+/** Why a PostgreSQL connection string cannot be translated faithfully. */
+type PostgresConnectionStringErrorReason =
+  | 'unsupported-key'
+  | 'unsupported-value'
+  | 'invalid-format';
+
+/**
+ * Refuses connection settings that cannot be represented without loss.
+ * Messages omit values and connection strings to keep credentials private.
+ *
+ * @example
+ * ```ts
+ * import { PostgresConnectionStringError } from '@netscript/database/connection-strings/postgres';
+ * const error = new PostgresConnectionStringError('unsupported-key', 'root certificate');
+ * console.log(error.reason, error.key);
+ * ```
+ */
+class PostgresConnectionStringError extends Error {
+  /** Machine-readable refusal reason. */
+  readonly reason: PostgresConnectionStringErrorReason;
+  /** Lowercase option key, when the refusal concerns a specific option. */
+  readonly key?: string;
+
+  /** Construct a refusal without including the connection string or option value. */
+  constructor(reason: PostgresConnectionStringErrorReason, key?: string) {
+    super(`Cannot normalize PostgreSQL connection string: ${reason}.`);
+    this.name = 'PostgresConnectionStringError';
+    this.reason = reason;
+    this.key = key;
+  }
+}
+
+// Source: packages/database/adapters/postgres-connection-string.ts
 const OPTION_KEYS: ReadonlyMap<string, string> = new Map([
   ['host', 'host'],
   ['server', 'host'],
@@ -51,7 +150,7 @@ const SSL_MODES: ReadonlyMap<string, string> = new Map([
  * console.log(url); // postgres://app:secret@localhost:5432/app?sslmode=verify-full
  * ```
  */
-export function normalizePostgresConnectionString(connectionString: string): string {
+function normalizePostgresConnectionString(connectionString: string): string {
   if (/^postgres(?:ql)?:\/\//i.test(connectionString)) return connectionString;
 
   const parts = readPostgresOptions(connectionString);

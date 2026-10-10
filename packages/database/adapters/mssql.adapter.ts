@@ -9,6 +9,7 @@
 
 import { PrismaMssql } from '@prisma/adapter-mssql';
 import { tokenizeAdoNetConnectionString } from './connection-strings/tokenize-ado-net.ts';
+export { AdoNetConnectionStringSyntaxError } from './connection-strings/tokenize-ado-net.ts';
 import type {
   DatabaseAdapter,
   DatabaseConnectionOptions,
@@ -108,6 +109,7 @@ export interface MssqlDriverAdapter {
  *
  * @param connectionString - ADO.NET format connection string
  * @returns MssqlAdapterConfig object for PrismaMssql
+ * @throws {AdoNetConnectionStringSyntaxError} For malformed key=value segments or quotes.
  *
  * @example
  * ```typescript
