@@ -15,6 +15,10 @@ export interface RunUpdateCommandOptions {
  *
  * @example
  * ```ts
+ * import type { NetScriptPlugin } from '@netscript/plugin/adapter';
+ *
+ * declare const plugin: NetScriptPlugin;
+ *
  * const result = runUpdateCommand({ plugin });
  * console.log(result.code);
  * ```

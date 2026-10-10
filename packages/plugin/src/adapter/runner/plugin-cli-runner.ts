@@ -24,6 +24,11 @@ export interface RunPluginCliCommandOptions {
  *
  * @example
  * ```ts
+ * import type { NetScriptPlugin, PluginCommandContext } from '@netscript/plugin/adapter';
+ *
+ * declare const plugin: NetScriptPlugin;
+ * declare const context: PluginCommandContext;
+ *
  * const result = await runPluginCliCommand({ plugin, args: { command: 'info' }, context });
  * console.log(result.code);
  * ```

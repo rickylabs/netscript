@@ -138,7 +138,9 @@ type DefinedSafeFailure<TError> = [NarrowDefined<TError>, undefined, true, false
 };
 
 /**
- * Failure branch returned by {@link safe}.
+ * Failure branch returned by {@link safe}; after checking `isSuccess`, use `isDefined` to narrow the error.
+ *
+ * Tuple destructuring remains supported: `[error, undefined, isDefined, false]`.
  */
 export type SafeFailure<TError = Error> =
   | ([
@@ -199,7 +201,9 @@ export type SafeFailure<TError = Error> =
   });
 
 /**
- * Tuple/object result returned by {@link safe}.
+ * Result returned by {@link safe}; narrow with `isSuccess` first, then `isDefined` on failure.
+ *
+ * Tuple destructuring remains supported: `[error, data, isDefined, isSuccess]`.
  */
 export type SafeResult<TOutput, TError = Error> =
   | SafeSuccess<TOutput>
@@ -233,9 +237,12 @@ function createSafeFailure<TError>(error: TError): SafeFailure<TError> {
 }
 
 /**
- * Narrow an unknown error to an oRPC defined error.
+ * Narrow a typed failure error to its defined members; prefer `isSuccess` then `isDefined` on `safe` results.
  *
- * @param error - Unknown thrown value.
+ * Use this predicate when you already have a typed error union. It preserves the
+ * defined members of that union; it does not infer contract errors from `unknown`.
+ *
+ * @param error - Error value to test.
  * @returns `true` when the error is an oRPC defined error.
  */
 export function isDefinedError<T>(error: T): error is
@@ -253,11 +260,39 @@ export function isDefinedError<T>(error: T): error is
 }
 
 /**
- * Resolve a promise into a tuple/object result that mirrors the ergonomics of
- * oRPC's `safe()` helper without exposing its private internal types.
+ * Resolve a promise into a result narrowed with `isSuccess` first, then `isDefined` on failure.
+ *
+ * Tuple destructuring remains supported: `[error, data, isDefined, isSuccess]`.
+ * The named discriminants distinguish success, contract-defined errors and other
+ * failures. A service-client promise preserves the contract error codes and data;
+ * a bare promise without error typing has no statically reachable defined arm.
+ *
+ * @example
+ * ```ts
+ * import { baseContract } from '@netscript/contracts';
+ * import { createServiceClient, safe } from '@netscript/sdk/client';
+ * import { z } from 'zod';
+ *
+ * const contract = {
+ *   getUser: baseContract
+ *     .input(z.object({ id: z.string() }))
+ *     .output(z.object({ name: z.string() })),
+ * };
+ * const client = createServiceClient({ contract, serviceName: 'users' });
+ * const result = await safe(client.getUser({ id: 'user-1' }));
+ * if (result.isSuccess) {
+ *   console.log(result.data.name);
+ * } else if (result.isDefined) {
+ *   if (result.error.code === 'NOT_FOUND') {
+ *     console.error(result.error.data.resourceType, result.error.data.resourceId);
+ *   }
+ * } else {
+ *   throw result.error;
+ * }
+ * ```
  *
  * @param promise - Promise to resolve safely.
- * @returns Safe tuple/object result.
+ * @returns Discriminated result with named properties and supported tuple destructuring.
  */
 export async function safe<TOutput, TError = Error>(
   promise: Promise<TOutput> & { __error?: { type: TError } },

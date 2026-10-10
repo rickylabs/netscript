@@ -141,9 +141,14 @@ export interface TracedDispatchOptions {
  *
  * @example
  * ```ts
+ * import { setSpanOk } from '@netscript/telemetry/tracer';
+ *
+ * declare function dispatchJob(jobId: string): Promise<void>;
+ *
+ * const dueJobs = ['job-1', 'job-2'];
  * const span = startSchedulerTickSpan({
  *   totalJobs: 5,
- *   dueJobs: ['job-1', 'job-2'],
+ *   dueJobs,
  *   tickTime: new Date(),
  * });
  *
@@ -233,6 +238,12 @@ export async function traceSchedulerTick<T>(
  *
  * @example
  * ```ts
+ * import type { MessageQueue, ScheduledJobDefinition } from '@netscript/telemetry/instrumentation';
+ * import { setSpanError, setSpanOk } from '@netscript/telemetry/tracer';
+ *
+ * declare const jobDef: ScheduledJobDefinition;
+ * declare const queue: MessageQueue<{ jobId: string }>;
+ *
  * const { span, headers } = startJobDispatchSpan({
  *   job: jobDef,
  *   triggeredBy: 'cron',
@@ -240,10 +251,10 @@ export async function traceSchedulerTick<T>(
  * });
  *
  * try {
- *   await queue.enqueue(message, { headers });
+ *   await queue.enqueue({ jobId: jobDef.id }, { headers });
  *   setSpanOk(span);
  * } catch (error) {
- *   setSpanError(span, error.message);
+ *   setSpanError(span, error instanceof Error ? error.message : String(error));
  *   throw error;
  * } finally {
  *   span.end();

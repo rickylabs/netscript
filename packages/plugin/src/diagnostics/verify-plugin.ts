@@ -384,6 +384,10 @@ export function verifyPlugin(
  *
  * @example Run a verifier as a CLI
  * ```ts
+ * import type { PluginVerificationResult } from '@netscript/plugin';
+ *
+ * declare function verifyMyPlugin(): PluginVerificationResult;
+ *
  * if (import.meta.main) {
  *   runPluginVerificationCli(verifyMyPlugin());
  * }

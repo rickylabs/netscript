@@ -67,10 +67,13 @@ function baseName(path: string): string {
  *
  * @example
  * ```typescript
+ * import { MemoryFileSystemAdapter } from '@netscript/cli/testing';
+ * import { assertEquals } from '@std/assert';
+ *
  * const fs = new MemoryFileSystemAdapter();
- * await fs.writeFile('/project/src/main.ts', 'outputText("hello");');
+ * await fs.writeFile('/project/src/main.ts', 'console.log("hello");');
  * const content = await fs.readFile('/project/src/main.ts');
- * outputText(content); // 'outputText("hello");'
+ * console.log(content); // 'console.log("hello");'
  *
  * // Inspect all stored files for assertions
  * const files = fs.getFiles();
