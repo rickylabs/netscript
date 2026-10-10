@@ -121,6 +121,7 @@ Deno.test('defineService middleware rejections keep CORS headers and run before 
 Deno.test('defineService middleware runs before the body limit is enforced', async () => {
   const seenPaths: string[] = [];
   const running = await defineService(router, {
+    auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
     name: 'middleware-body-limit',
     port: 0,
     middleware: [async (c, next) => {

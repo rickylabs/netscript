@@ -9,7 +9,7 @@ order: 1
 
 # Authentication
 
-**One env var and five endpoints separate a scaffolded workspace from a working OAuth sign-in —
+**One env var and six endpoints separate a scaffolded workspace from a working OAuth sign-in —
 and the boundaries fail loud with typed errors instead of degrading to a silent anonymous
 session.** Auth is the part of a backend where "compiles and demos fine" and "actually holds"
 diverge most easily, so NetScript puts the conventions in the contract rather than in notes an
@@ -163,7 +163,7 @@ The snippet below is a copy-ready client flow against the REST surface.
   {
     label: "Browser / typed client flow",
     lang: "ts",
-    code: "// app/sign-in.ts — drive the auth-api REST surface from the browser\nconst AUTH = 'http://localhost:8094/api/v1/auth';\n\n// 1. Begin sign-in. The kv-oauth backend responds with a provider redirect;\n//    follow it to authenticate with the IdP.\nlocation.href = `${AUTH}/signin`;\n\n// 2. The IdP redirects back to /api/v1/auth/callback, which mints the\n//    session and sets the __Host-ns_session cookie automatically.\n\n// 3. Resolve the current session on any later request (cookie is sent\n//    automatically; the response is { authenticated, user, session }).\nconst me = await fetch(`${AUTH}/me`, { credentials: 'include' })\n  .then((r) => r.json());\nif (me.authenticated) {\n  console.log('signed in as', me.user.subject, '— state', me.session.state);\n}\n\n// 4. Sign out — revokes the session and clears the cookie.\nawait fetch(`${AUTH}/signout`, { method: 'POST', credentials: 'include' });"
+    code: "// app/sign-in.ts — drive the auth-api REST surface from the browser\nconst AUTH = 'http://localhost:8094/api/v1/auth';\n\n// 1. Begin sign-in. The kv-oauth backend responds with a provider redirect;\n//    follow it to authenticate with the IdP.\nlocation.href = `${AUTH}/signin`;\n\n// 2. The IdP redirects back to /api/v1/auth/callback, which mints the\n//    session and sets the __Host-ns_session cookie automatically.\n\n// 3. Resolve the current session on any later request (cookie is sent\n//    automatically; the response is { authenticated, user, session }).\nconst me = await fetch(`${AUTH}/me`, { credentials: 'include' })\n  .then((r) => r.json());\nif (me.authenticated) {\n  console.log('signed in as', me.user.subject, '— state', me.session.state);\n}\n\n// 4. Sign out — the cookie authenticates the call; it revokes this session and clears the cookie.\nawait fetch(`${AUTH}/signout`, { method: 'POST', credentials: 'include' });"
   },
   {
     label: "Server-side backend port",
@@ -225,11 +225,75 @@ The plugin's service is named `auth-api` and is built with `@netscript/service`'
   rows: [
     { name: "signin", type: "POST", desc: "Begins the interactive sign-in. Requires backend.interactive; on WorkOS / better-auth it returns AUTH_PROVIDER_ERROR (502) because those backends are non-interactive." },
     { name: "callback", type: "POST", desc: "Completes the OAuth/OIDC redirect, mints the session, sets the session cookie. Interactive-only — same non-interactive caveat as signin." },
-    { name: "signout", type: "POST", desc: "Revokes the current session and clears the cookie." },
+    { name: "signout", type: "POST", desc: "Ends the caller's own session and clears the cookie. Requires a credential (session cookie or bearer), else 401. sessionId selects another session of the same subject; everywhere: true revokes every session of the subject." },
+    { name: "revokeSession", type: "POST", desc: "Operator revocation of any session, at /sessions/revoke. Requires the auth:sessions:revoke scope (403 without it). kv-oauth returns { revoked: false } for a definite unknown id; better-auth and WorkOS return AUTH_PROVIDER_ERROR (502), since revocation by id is unsupported." },
     { name: "session", type: "GET", desc: "Resolves the current AuthSession from the cookie (active | expired | revoked), refreshing on read when policy allows." },
     { name: "me", type: "GET", desc: "Returns { authenticated: true, user, session } when a valid active session exists, or { authenticated: false } (HTTP 200) when there is none." }
   ]
 }) }}
+
+### Signout acts only for the caller
+
+`signout` and `revokeSession` are the only guarded procedures. The service authenticates them
+in-process against the active backend: a bearer credential resolves through the session store,
+otherwise the `__Host-ns_session` cookie does. Every other procedure stays public introspection.
+
+- **Ownership.** A `sessionId` must name a session whose subject is the caller's subject. A session
+  that does not exist and a session that belongs to someone else get the same `401 UNAUTHORIZED`
+  body, so signout cannot be used to probe for valid session ids.
+- **Nothing on refusal.** A refused signout revokes nothing, emits no `auth.session.revoked`
+  event, and records no `success` outcome.
+- **Global logout.** `everywhere: true` revokes every session of the caller's subject and no
+  other subject's, through `AuthSessionStorePort.revokeSubjectSessions`. That call does a bounded
+  amount of work and never walks the subject's sessions. `kv-oauth` records one per-subject
+  revocation instant: any session issued at or before it stops resolving as active. That includes
+  sessions stored before this release, so no migration is needed. `better-auth` delegates to its
+  own `api.revokeSessions` through the caller's credential. NetScript reads every better-auth
+  session from the server-side store (`disableCookieCache`), so a cached `session_data` cookie
+  stops authenticating through NetScript on the next request; the
+  [better-auth page](/identity-access/better-auth-plugins/#revocation-and-the-cookie-cache)
+  describes the residual window on better-auth's own endpoints. `workos` has no user-wide
+  revocation API and returns `AUTH_PROVIDER_ERROR`; this is tracked in #2190.
+- **Operators.** Revoking somebody else's session is the separate `revokeSession` procedure,
+  gated by the `auth:sessions:revoke` scope on an authenticated backend session. The auth service's
+  guard currently accepts backend session credentials only; internal service credentials are not
+  composed into this guard. The CLI's
+  `netscript plugin auth session list` and `session revoke` both refuse to run without a
+  credential. Both read it from `NETSCRIPT_AUTH_TOKEN`.
+- **Revocation by id.** The kv-oauth backend supports operator revocation and same-subject sibling
+  selectors. A definite missing kv-oauth session returns `{ revoked: false }` from the operator
+  route. The better-auth and WorkOS adapters cannot revoke by id: they return `AUTH_PROVIDER_ERROR`
+  (502), never a successful "not found" result. For signout, the request credential can prove
+  ownership of the caller's own selected session, which then gets the same provider error for
+  single-session revocation. These adapters cannot prove ownership of a sibling by id alone, so
+  sibling, foreign and unknown selectors receive the same `401` ownership refusal. On better-auth,
+  omit the sibling selector and use `everywhere: true` for supported subject-wide logout.
+
+```ts
+// Browser: the session cookie authenticates the call and selects the session to end.
+await fetch(`${AUTH}/signout`, { method: 'POST', credentials: 'include' });
+
+// Bearer client: end every session of the caller's subject.
+await fetch(`${AUTH}/signout`, {
+  method: 'POST',
+  headers: { authorization: `Bearer ${accessToken}`, 'content-type': 'application/json' },
+  body: JSON.stringify({ everywhere: true }),
+});
+```
+
+{{ comp callout { type: "warning", title: "Breaking in 0.0.8: migrating signout callers" } }}
+<code>SignoutInput</code> keeps its fields, but their meaning changed. Up to 0.0.7, signout
+revoked any <code>sessionId</code> it was given, without a credential, and ignored
+<code>everywhere</code>. Now an anonymous call gets <code>401</code>, a <code>sessionId</code> must
+belong to the caller, and <code>everywhere</code> revokes all of the caller's sessions. To revoke a
+session you do not own, call <code>revokeSession</code> with a credential holding
+<code>auth:sessions:revoke</code>. A custom <code>AuthSessionStorePort</code> must add
+<code>revokeSubjectSessions({ subject, request })</code> (bounded work, returning
+<code>{ subject, revokedAt }</code>), or throw <code>AuthBackendOperationUnsupportedError</code>
+from it. A custom <code>KvOAuthStore</code> must add <code>revokeSubject</code> and
+<code>getSubjectRevocation</code>. A custom <code>BetterAuthInstance</code> must expose
+<code>api.revokeSessions</code>. The CLI's <code>session list</code> now needs a credential too.
+{{ /comp }}
 
 {{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
 NetScript's authentication plugin is architected around a single active backend configuration per deployment, resolved at startup via the <code>NETSCRIPT_AUTH_BACKEND</code> environment variable (or <code>auth.backend</code> settings). This design boundary prioritizes clean, isolated runtime execution for individual identity providers. So features such as dynamic multi-backend routing, cross-backend account linking, and global multi-store session revocation are not supported in this version. For complex multi-tenant or federated identity requirements, routing must be managed upstream or via an external aggregator, as swapping providers requires redeployment with updated credentials.
@@ -362,8 +426,8 @@ not replace it. For general tracing and structured logs see
   rows: [
     { name: "dynamic", type: "port", desc: "auth-api default port fallback (AUTH_API_DEFAULT_PORT is 8094). Note: your scaffold's ports will differ as they are allocated from the high-range (49152+) at scaffold time." },
     { name: "auth-api", type: "service name", desc: "AUTH_API_SERVICE_NAME — the service contribution the auth plugin (AUTH_PLUGIN_ID 'auth') adds." },
-    { name: "/api/v1/auth/*", type: "REST", desc: "Public REST surface: signin, callback, signout, session, me." },
-    { name: "/api/rpc/v1/auth/*", type: "oRPC", desc: "The oRPC surface for the same five operations, for typed NetScript clients." },
+    { name: "/api/v1/auth/*", type: "REST", desc: "REST surface: signin, callback, signout, sessions/revoke, session, me. Only signout and sessions/revoke require a credential." },
+    { name: "/api/rpc/v1/auth/*", type: "oRPC", desc: "The oRPC surface for the same six operations, for typed NetScript clients." },
     { name: "/health/live", type: "HTTP", desc: "Liveness probe; /health/ready for readiness. OpenAPI + docs served via .withOpenAPI()/.withDocs()." },
     { name: "NETSCRIPT_AUTH_BACKEND", type: "env", desc: "Selects the single active backend: kv-oauth (default) | workos | better-auth." }
   ]

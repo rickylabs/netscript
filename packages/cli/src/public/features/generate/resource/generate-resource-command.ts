@@ -46,7 +46,11 @@ export class GenerateResourceCommand extends CliCommand<CliffyCommand> {
       .name('resource')
       .description('Generate a typed Fresh resource slice from a query procedure')
       .arguments('<resource:string>')
-      .option('--procedure <path:string>', 'Named query procedure path', { required: true })
+      .option(
+        '--procedure <path:string>',
+        'Query procedure path on the client query factory (<procedure> or <namespace>.<procedure>)',
+        { required: true },
+      )
       .option('--client <service:string>', 'Generated service client name')
       .option('--app <name:string>', 'Fresh app workspace name')
       .option('--project-root <path:string>', 'Fresh application root')

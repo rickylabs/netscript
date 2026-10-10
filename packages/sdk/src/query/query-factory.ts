@@ -245,6 +245,11 @@ export function createQueryFactory<
 /**
  * Create multiple query factories at once.
  *
+ * Each factory preserves its client's contribution context. Required context
+ * must be supplied to action calls and to `queryOptions(input, { context })`,
+ * using the same request-options contract as `defineServices()`.
+ * Optional contribution context may still be omitted.
+ *
  * @param factories - Resource-to-config mapping.
  * @returns Resource-to-query-factory mapping.
  */
@@ -261,14 +266,18 @@ export function createQueryFactories<
       [K in keyof TFactories]: TFactories[K] extends
         { contract: infer TContract extends ContractLike } ? {
           contract: TContract;
-          client: ServiceClient<TContract>;
+          client: TFactories[K]['client'] extends ServiceClient<TContract, infer TContext>
+            ? ServiceClient<TContract, TContext>
+            : never;
           options?: QueryParams;
         }
         : never;
     },
 ): {
   [K in keyof TFactories]: TFactories[K] extends { contract: infer TContract extends ContractLike }
-    ? QueryFactory<TContract>
+    ? TFactories[K]['client'] extends ServiceClient<TContract, infer TContext>
+      ? QueryFactory<TContract, TContext>
+    : never
     : never;
 } {
   const result: Record<string, unknown> = {};
@@ -279,7 +288,10 @@ export function createQueryFactories<
 
   return result as {
     [K in keyof TFactories]: TFactories[K] extends
-      { contract: infer TContract extends ContractLike } ? QueryFactory<TContract>
+      { contract: infer TContract extends ContractLike }
+      ? TFactories[K]['client'] extends ServiceClient<TContract, infer TContext>
+        ? QueryFactory<TContract, TContext>
+      : never
       : never;
   };
 }

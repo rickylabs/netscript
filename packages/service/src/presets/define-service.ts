@@ -8,7 +8,12 @@
  *
  * declare const router: ServiceRouter;
  *
- * await defineService(router, { name: 'users', port: 3000, db });
+ * await defineService(router, {
+ *   name: 'users',
+ *   port: 3000,
+ *   db,
+ *   auth: { public: true, reason: 'Public database health example' },
+ * });
  * ```
  *
  * This creates a fully-configured service with:
@@ -28,7 +33,8 @@
  */
 
 import { createService, type ServiceConfig } from '../builder/service-builder.ts';
-import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
+import type { ServiceAuthPolicy } from '../auth/options.ts';
+import { assertServiceAuthPolicy } from '../auth/service-auth-policy.ts';
 import { createDatabaseConnectivityStartupHook } from '../diagnostics/database-connectivity.ts';
 import type { ServiceBodyLimitOptions } from '../primitives/body-limit.ts';
 import { healthChecks } from '../primitives/health.ts';
@@ -151,13 +157,11 @@ export interface DefineServiceOptions extends ServiceConfig {
    * defaulting to plain HTTP/1.1.
    */
   tls?: ServiceTlsOptions;
-  /** Optional authentication and authorization stages for guarded service paths. */
-  auth?: {
-    /** Authentication middleware options. */
-    readonly authn: AuthnOptions;
-    /** Optional authorization middleware options. */
-    readonly authz?: AuthzOptions;
-  };
+  /**
+   * Required service posture: native guards or an explicit public opt-out with a
+   * nonblank reason. Validated before configuring the builder or starting IO.
+   */
+  readonly auth: ServiceAuthPolicy;
   /**
    * Caller middleware applied in order via `ServiceBuilder.use()`.
    *
@@ -192,7 +196,11 @@ export interface DefineServiceOptions extends ServiceConfig {
  *
  * declare const router: ServiceRouter;
  *
- * await defineService(router, { name: 'users', port: 3000 });
+ * await defineService(router, {
+ *   name: 'users',
+ *   port: 3000,
+ *   auth: { public: true, reason: 'Public example service' },
+ * });
  * ```
  *
  * @example
@@ -206,6 +214,7 @@ export interface DefineServiceOptions extends ServiceConfig {
  * await defineService(router, {
  *   name: 'users',
  *   port: 3000,
+ *   auth: { public: true, reason: 'Public database health example' },
  *   db,
  *   openapi: {
  *     title: 'Users API',
@@ -259,6 +268,7 @@ export interface DefineServiceOptions extends ServiceConfig {
  *
  * await defineService(router, {
  *   name: 'documents',
+ *   auth: { public: true, reason: 'Public middleware and body-limit example' },
  *   middleware: [async (c, next) => {
  *     c.header('x-served-by', 'documents');
  *     await next();
@@ -274,6 +284,8 @@ export async function defineService<T extends ServiceRouter>(
   router: T,
   options: DefineServiceOptions,
 ): Promise<RunningService> {
+  assertServiceAuthPolicy(options.auth);
+
   const builder = createService(router, {
     name: options.name,
     version: options.version,
@@ -328,7 +340,7 @@ export async function defineService<T extends ServiceRouter>(
     }
   }
 
-  if (options.auth) {
+  if (options.auth.public !== true) {
     builder.withAuthn(options.auth.authn);
     if (options.auth.authz) {
       builder.withAuthz(options.auth.authz);

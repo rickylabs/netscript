@@ -362,6 +362,7 @@ Deno.test('a loopback listener installs, runs, and removes its OS signal handler
 
 Deno.test('defineService forwards hostname to the listener', async (t) => {
   const running = await defineService({}, {
+    auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
     name: 'define-service-hostname',
     port: 0,
     hostname: LOOPBACK,

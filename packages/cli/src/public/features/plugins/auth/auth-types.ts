@@ -65,7 +65,11 @@ export interface AuthSessionHttpPort {
     streamUrl: string,
     options?: AuthSessionRequestOptions,
   ): Promise<readonly AuthSessionProjection[]>;
-  /** Revoke a session through the auth signout procedure. */
+  /**
+   * Revoke any session through the operator `revokeSession` procedure.
+   *
+   * Requires a credential whose principal holds the `auth:sessions:revoke` scope.
+   */
   revoke(
     authUrl: string,
     sessionId: string,

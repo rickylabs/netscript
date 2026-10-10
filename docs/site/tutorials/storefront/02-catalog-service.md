@@ -271,6 +271,7 @@ const database = await db.getClient();
 
 // One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.
 await defineService(router, {
+  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },
   name: 'products',
   version: '1.0.0',
   port: parseInt(Deno.env.get('PORT') || '3001'),
