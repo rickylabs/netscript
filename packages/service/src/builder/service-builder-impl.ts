@@ -18,7 +18,7 @@ import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middl
 import type {
   ContractPolicyAuthorizerPort,
   ProcedurePolicyResolver,
-} from '../auth/contract-policy.ts';
+} from '../auth/contract/contract-policy.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import type { AuthorizerPort } from '../auth/types.ts';
 import {
