@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
@@ -63,6 +63,10 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
     const first = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, {
       formatter,
     });
+    const helperPath = join(root, '.netscript', 'aspire-cli.ts');
+    assertEquals(first.includes(helperPath), true);
+    assertStringIncludes(await fs.readFile(helperPath), 'NETSCRIPT_ASPIRE_CLI');
+    assertStringIncludes(await fs.readFile(helperPath), 'netscript generate aspire');
     const snapshot = await readFiles(fs, first);
     const dryRun = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, {
       dryRun: true,
@@ -84,6 +88,17 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
     assertEquals(forced, first);
     assertEquals(second, []);
     assertEquals(formattedPaths.length, first.length * 4);
+    await fs.writeFile(helperPath, '// stale helper');
+    const preview = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, {
+      dryRun: true,
+      formatter,
+    });
+    assertEquals(preview, [helperPath]);
+    assertEquals(await fs.readFile(helperPath), '// stale helper');
+    assertEquals(
+      await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, { formatter }),
+      [helperPath],
+    );
     for (const path of first) {
       assertEquals((await fs.readFile(path)).startsWith('// canonical\n'), true);
     }
