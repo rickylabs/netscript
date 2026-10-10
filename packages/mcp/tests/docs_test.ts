@@ -1,7 +1,6 @@
 import { assert, assertEquals, assertGreater } from '@std/assert';
 import { join, resolve } from '@std/path';
 import { createDocsFlows } from '../src/application/docs/docs-flows.ts';
-import { createMcpServer } from '../src/application/runner/mcp-server.ts';
 import {
   FilesystemDocsCorpus,
   processDocsSources,
@@ -57,28 +56,17 @@ Deno.test('search to get funnel retrieves a slugified section only', async () =>
     slug: 'reference/jobs',
     title: 'Background Jobs Reference',
     section: 'Retry policy',
+    contractVersion: 2,
+    mode: 'verbatim',
     content:
       'Set the retry count and backoff for transient failures.\n\n### Backoff\n\nBackoff spaces repeated attempts.',
   });
 });
 
-Deno.test('corpus bounds indexed content and runner applies its tighter response policy', async () => {
+Deno.test('corpus rejects oversized sources instead of silently dropping document tails', async () => {
   const corpus = new FilesystemDocsCorpus({ root: fixtureRoot, maxDocumentLength: 80 });
-  const document = await corpus.get('getting-started');
-  assertEquals(document?.content.length, 80);
-  const server = createMcpServer({
-    probe: { probe: () => Promise.resolve({ reachable: true, message: 'ready' }) },
-    flows: createDocsFlows(corpus),
-    truncation: { maxItems: 10, maxStringLength: 24 },
-  });
-  const response = await server.handle({
-    jsonrpc: '2.0',
-    id: 1,
-    method: 'tools/call',
-    params: { name: 'get_doc', arguments: { slug: 'getting-started' } },
-  });
-  const structured = response?.result?.structuredContent as { content: string };
-  assert(structured.content.endsWith('…[truncated]'));
+  const result = await createDocsFlows(corpus).get_doc({ slug: 'getting-started', full: true });
+  assertEquals(result.ok, false);
 });
 
 Deno.test('docs root precedence is flag then environment then an indexable project probe', async () => {

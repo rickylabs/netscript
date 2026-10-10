@@ -67,6 +67,10 @@ export interface ToolDefinition {
   readonly name: ToolName;
   /** Token-disciplined tool description. */
   readonly description: string;
+  /** Whether the tool owns semantic output bounds instead of generic string/item truncation. */
+  readonly truncation?: 'exempt';
+  /** Check the complete JSON-RPC envelope against the transport byte ceiling. */
+  readonly envelopeCheck?: boolean;
   /** Safety classification. */
   readonly kind: ToolKind;
   /** Runtime input contract. */

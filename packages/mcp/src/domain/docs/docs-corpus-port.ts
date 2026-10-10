@@ -1,7 +1,22 @@
 import type { GuidanceResult } from './guidance-contract.ts';
 
-/** Maximum source characters retained for one indexed document. */
-export const MAX_INDEXED_DOC_LENGTH = 100_000;
+/** Source admission ceiling in UTF-16 characters; oversized documents are rejected individually. */
+export const MAX_INDEXED_DOC_LENGTH: number = 4 * 1024 * 1024;
+
+/** One source exceeded admission limits; the remaining corpus stays available. */
+export class DocsDocumentTooLargeError extends Error {
+  /** Stable tool-facing error code. */
+  readonly code = 'doc_too_large';
+  /** Normalized slug of the rejected source. */
+  readonly slug: string;
+
+  /** Identify the source and configured character ceiling without including its content. */
+  constructor(slug: string, maxLength: number) {
+    super(`Documentation source '${slug}' exceeds the ${maxLength}-character admission limit.`);
+    this.name = 'DocsDocumentTooLargeError';
+    this.slug = slug;
+  }
+}
 
 /** Explicit failure raised when a configured filesystem corpus does not exist. */
 export class DocsCorpusUnavailableError extends Error {
@@ -27,7 +42,7 @@ export interface DocsSection {
   readonly slug: string;
   /** Heading depth from one through six. */
   readonly level: number;
-  /** Bounded Markdown belonging to this section. */
+  /** Complete Markdown belonging to this section. */
   readonly content: string;
 }
 
@@ -45,7 +60,7 @@ export interface DocsSummary {
 
 /** Indexed public documentation document. */
 export interface DocsDocument extends DocsSummary {
-  /** Bounded Markdown body without front matter. */
+  /** Complete Markdown body without front matter. */
   readonly content: string;
   /** Indexed section bodies. */
   readonly sectionContents: readonly DocsSection[];

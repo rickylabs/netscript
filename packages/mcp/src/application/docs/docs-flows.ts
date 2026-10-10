@@ -2,10 +2,10 @@ import { isRecord } from '../../domain/schema.ts';
 import {
   type DocsCorpusPort,
   DocsCorpusUnavailableError,
-  slugifyDocsHeading,
 } from '../../domain/docs/docs-corpus-port.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 import { createFindGuidanceFlow } from './find-guidance-flow.ts';
+import { createGetDocFlow } from './get-doc-flow.ts';
 
 const DEFAULT_LIST_LIMIT = 20;
 const DEFAULT_SEARCH_LIMIT = 10;
@@ -58,60 +58,7 @@ export function createDocsFlows(
         return corpusFailure(error);
       }
     },
-    get_doc: async (input): Promise<ToolExecutionResult> => {
-      if (!isRecord(input) || typeof input.slug !== 'string' || !input.slug.trim()) {
-        return invalidInput('slug must be a non-empty string');
-      }
-      let document;
-      try {
-        document = await corpus.get(input.slug);
-      } catch (error) {
-        return corpusFailure(error);
-      }
-      if (!document) {
-        return {
-          ok: false,
-          error: {
-            code: 'doc_not_found',
-            message: `No public document found for slug: ${input.slug}`,
-          },
-        };
-      }
-      if (typeof input.section === 'string' && input.section.trim()) {
-        const sectionSlug = slugifyDocsHeading(input.section);
-        const section = document.sectionContents.find((candidate) =>
-          candidate.slug === sectionSlug
-        );
-        if (!section) {
-          return {
-            ok: false,
-            error: {
-              code: 'section_not_found',
-              message: `No section named ${input.section} exists in ${document.slug}`,
-            },
-          };
-        }
-        return {
-          ok: true,
-          value: {
-            slug: document.slug,
-            title: document.title,
-            section: section.heading,
-            content: section.content,
-            ...(document.redirectedFrom ? { redirectedFrom: document.redirectedFrom } : {}),
-          },
-        };
-      }
-      return {
-        ok: true,
-        value: {
-          slug: document.slug,
-          title: document.title,
-          content: document.content,
-          ...(document.redirectedFrom ? { redirectedFrom: document.redirectedFrom } : {}),
-        },
-      };
-    },
+    get_doc: createGetDocFlow(corpus),
   };
 }
 
