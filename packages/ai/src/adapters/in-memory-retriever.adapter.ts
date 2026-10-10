@@ -58,6 +58,10 @@ interface Candidate {
  *
  * @example
  * ```ts
+ * import { InMemoryRetriever, type InMemoryRetrieverDocument } from '@netscript/ai/testing';
+ *
+ * declare const documents: InMemoryRetrieverDocument[];
+ *
  * const retriever = new InMemoryRetriever({ documents });
  * const hits = await retriever.retrieve('workflow', 3);
  * ```

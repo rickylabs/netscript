@@ -12,6 +12,14 @@ export type SagaStateMetadata<TInstanceId extends string = string> = Readonly<{
   completedAt?: Date;
   traceparent?: string;
   tracestate?: string;
+  /** Error thrown by a `.compensate()` branch; such an instance is persisted as `failed`. */
+  compensationError?: SagaCompensationError;
+}>;
+
+/** Serializable record of an error thrown by a `.compensate()` branch. */
+export type SagaCompensationError = Readonly<{
+  name: string;
+  message: string;
 }>;
 
 /** Base state shape accepted by saga definitions. */

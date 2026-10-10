@@ -28,8 +28,12 @@ export const MCP_EMBEDDED_DOC_PATHS = [
   'pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md',
 ] as const;
 
-/** Maximum UTF-8 source bytes accepted for the generated MCP fallback prose. */
-// Embed the retention recipe alone rather than the entire streams reference page.
+/**
+ * Maximum UTF-8 source bytes accepted for the generated MCP fallback prose.
+ * 288 KiB: #1383 required the guarded plugin-service example on the embedded
+ * plugin-system page (258 KiB), and the streams retention recipe is embedded
+ * alone rather than the entire streams reference page.
+ */
 export const MCP_EMBEDDED_DOCS_MAX_BYTES = 294_912;
 
 export const PUBLISH_ASSET_OUTPUTS = [

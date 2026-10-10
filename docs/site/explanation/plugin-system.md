@@ -214,6 +214,34 @@ manifest and the plugin's Aspire contribution. See
 <a href="/explanation/aspire/">orchestration with Aspire</a> for how the AppHost assembles them.
 {{ /comp }}
 
+## Guarding a plugin's API
+
+`createPluginService` from `@netscript/plugin/service` requires an explicit `auth` posture and
+installs the guard before any RPC, REST, or raw route; `/health` stays anonymous. This is the
+guarded form `netscript plugin new billing` generates, for a plugin that is not the auth plugin:
+
+```ts
+export const billingService = createPluginService(billingRouter, {
+  name: 'billing',
+  auth: {
+    authn: {
+      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
+    },
+    authz: {
+      authorizer: createContractAuthorizer(
+        mountPluginContract(billingContractDefinition, billingContractMount),
+      ),
+    },
+  },
+});
+```
+
+`createAuthServiceAuthenticator` (`@netscript/plugin-auth/authenticator`) verifies each bearer
+session through the auth service, so `billing` embeds no backend, KV handle, or provider secret.
+A public API records `auth: { public: true, reason: '…' }` instead. Background callers run under
+a service identity, never an app session; see
+[verifying sessions from another plugin](/identity-access/auth/#verify-sessions-from-another-plugins-service).
+
 ## Auth: the model at its richest
 
 The **auth** plugin is the clearest single exemplar of every idea on this page, because it

@@ -1,6 +1,9 @@
 import { dirname, relative, resolve } from '@std/path';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
-import { type ClientBinding, selectClientBinding } from '../resource-slice/client-selector.ts';
+import {
+  type ClientBinding,
+  selectClientBinding,
+} from '../resource-slice/selection/client-selector.ts';
 export type UiGeneratedFileRole = 'page' | 'query-loader' | 'island' | 'route-registration';
 export type UiGeneratedFile = Readonly<{
   path: string;

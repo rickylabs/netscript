@@ -117,6 +117,31 @@ The always-current symbol list is
 [`deno doc jsr:@netscript/plugin@<version>`](https://jsr.io/@netscript/plugin/doc) (pin `<version>`
 on the pre-release line, as above).
 
+## Validate a root composition
+
+Hosts compose many manifests. `validatePluginComposition` rejects duplicate plugin names, unknown
+contribution keys, colliding contribution identities, and missing or version-mismatched
+dependencies. It returns structured diagnostics instead of throwing. `createPluginHostBootstrap`,
+the CLI host loader, and `netscript generate aspire` run the same check, so you do not need your own
+axis allowlist.
+
+```ts
+import { definePlugin, validatePluginComposition } from '@netscript/plugin/config';
+
+const result = validatePluginComposition([
+  definePlugin('@example/a', '1.0.0').withService({ name: 'api', entrypoint: './a.ts' }).build(),
+  definePlugin('@example/b', '1.0.0').withService({ name: 'api', entrypoint: './b.ts' }).build(),
+]);
+
+if (!result.ok) {
+  for (const diagnostic of result.diagnostics) console.error(diagnostic.code, diagnostic.message);
+}
+```
+
+**Breaking:** unknown contribution keys now fail validation; they are no longer ignored. Rename a
+misspelled key to the documented one. The per-key identity and scope rules are listed in the
+[plugin reference](https://rickylabs.github.io/netscript/reference/plugin/#root-composition-validation).
+
 ## Extend SDK discovery
 
 Each plugin owns its discovery declaration. Its generated control-plane module exports the factory

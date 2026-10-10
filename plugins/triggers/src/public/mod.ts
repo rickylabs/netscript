@@ -18,12 +18,6 @@ const TRIGGERS_SERVICE_PERMISSIONS = [
   '--allow-read',
 ] as const;
 
-const triggersPluginDependencies = Object.freeze({
-  workersCore: definePlugin('@netscript/plugin-workers-core', '0.0.1-alpha.0').build(),
-  streamsCore: definePlugin('@netscript/plugin-streams-core', '0.0.1-alpha.0').build(),
-  sagasCore: definePlugin('@netscript/plugin-sagas-core', '0.0.1-alpha.0').build(),
-});
-
 const triggersManifest: PluginManifest = definePlugin(
   '@netscript/plugin-triggers',
   TRIGGERS_PLUGIN_VERSION,
@@ -35,7 +29,6 @@ const triggersManifest: PluginManifest = definePlugin(
   .withLicense('Apache-2.0')
   .withTags(['triggers', 'webhooks', 'schedules', 'file-watchers'])
   .withPermissions(TRIGGERS_SERVICE_PERMISSIONS)
-  .withDependencies(triggersPluginDependencies)
   .withService({
     name: TRIGGERS_API_SERVICE_NAME,
     entrypoint: './services/src/main.ts',

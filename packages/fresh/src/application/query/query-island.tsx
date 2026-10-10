@@ -27,6 +27,11 @@ export interface QueryIslandProps {
  *
  * @example
  * ```tsx
+ * import { QueryIsland } from '@netscript/fresh/query';
+ * import type { JSX } from 'preact';
+ *
+ * declare function MyComponent(): JSX.Element;
+ *
  * export default function MyIsland() {
  *   return (
  *     <QueryIsland>

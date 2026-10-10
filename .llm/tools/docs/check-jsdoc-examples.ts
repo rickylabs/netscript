@@ -23,7 +23,6 @@ export function formatDeferredClassesMarkdown(examples: readonly JsdocDeferredEx
     failureClass: JsdocDeferredExample['failureClass'];
     title: string;
   }> = [
-    { failureClass: 'unboundName', title: 'Unbound-name convention class' },
     { failureClass: 'typeError', title: 'Published-API type-error class' },
   ];
   const lines = [
@@ -73,11 +72,11 @@ export async function main(args: readonly string[] = Deno.args): Promise<number>
       badSpecifier: result.failureCensus.badSpecifier,
       unfenced: result.failureCensus.unfenced,
       malformed: result.failureCensus.malformed,
+      unboundName: result.failureCensus.unboundName,
     })
   }`);
   console.log(`deferredCensus=${
     JSON.stringify({
-      unboundName: result.failureCensus.unboundName,
       typeError: result.failureCensus.typeError,
     })
   }`);

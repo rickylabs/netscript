@@ -124,6 +124,7 @@ async function withRevocationHarness(
       }),
     );
     const backend = await createKvOAuthBackend({
+      trustProxyHeaders: true,
       provider: fixtureProvider(),
       store,
       refreshMode: 'never',
@@ -330,6 +331,7 @@ Deno.test('authenticate refresh cannot restore authority after revocation', asyn
     const released = Promise.withResolvers<void>();
     try {
       const refreshing = await createKvOAuthBackend({
+        trustProxyHeaders: true,
         provider: fixtureProvider(),
         store,
         refreshMode: 'always',
@@ -375,6 +377,7 @@ Deno.test('parallel authenticate refreshes keep a valid session available', asyn
     let calls = 0;
     try {
       const refreshing = await createKvOAuthBackend({
+        trustProxyHeaders: true,
         provider: fixtureProvider(),
         store: countedStore,
         refreshMode: 'always',
