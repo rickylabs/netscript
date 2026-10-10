@@ -1,17 +1,16 @@
-import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
+import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { Command } from '@cliffy/command';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
-import {
-  type ProjectRootResolver,
-  requireProjectRoot,
-} from '../../../presentation/support.ts';
+import { type ProjectRootResolver, requireProjectRoot } from '../../../presentation/support.ts';
 import type { RemoveServiceInput } from './remove-service-input.ts';
 import { removeService } from './remove-service.ts';
 
 /** Dependencies for the public `service remove` command. */
 export interface RemoveServiceCommandDependencies {
+  readonly formatter?: GeneratedSourceFormatterPort;
   readonly fs: FileSystemPort;
   readonly scaffolder: ScaffolderPort;
   readonly templateAdapter: TemplatePort;

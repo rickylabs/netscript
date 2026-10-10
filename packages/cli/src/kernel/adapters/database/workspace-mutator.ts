@@ -11,7 +11,7 @@ import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { generateTsAspireConfig } from '../../templates/aspire/generate-aspire-config.ts';
-import { HelpersGeneratorPipeline } from '../../templates/aspire/helpers/helpers-generator-pipeline.ts';
+import { regenerateAspireHelpers } from '../service/workspace-mutator.ts';
 import type { DbEngineChoice } from '../../domain/db-engine.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
@@ -141,7 +141,9 @@ export class DatabaseWorkspaceMutator {
     const root = asMutableRecord(JSON.parse(await this.fs.readFile(path)) as unknown);
     const member = `./${SCAFFOLD_DIRS.DATABASE}/${engineDirName}`;
     if (Array.isArray(root.workspace)) {
-      root.workspace = root.workspace.filter((value) => value !== member && value !== member.slice(2));
+      root.workspace = root.workspace.filter((value) =>
+        value !== member && value !== member.slice(2)
+      );
       await this.fs.writeFile(path, JSON.stringify(root, null, 2) + '\n');
     }
   }
@@ -189,24 +191,13 @@ export class DatabaseWorkspaceMutator {
       return [];
     }
 
-    const { config } = await parseAppSettings(join(projectRoot, SCAFFOLD_FILES.APPSETTINGS));
-    const helpersPipeline = new HelpersGeneratorPipeline(this.templateAdapter);
-    const files = await helpersPipeline.execute({
-      config,
-      configPath: `../${SCAFFOLD_FILES.APPSETTINGS}`,
-      generateAppHost: true,
-    });
-
-    const written: string[] = [];
-    for (const file of files) {
-      const path = join(aspireDir, file.path);
-      if (await this.scaffolder.writeFile(path, file.content, true)) {
-        written.push(path);
-      }
-    }
-    return written;
+    return await regenerateAspireHelpers(
+      projectRoot,
+      this.fs,
+      this.scaffolder,
+      this.templateAdapter,
+    );
   }
-
 }
 
 function toConfigEngine(engine: DbEngine): 'Postgres' | 'Mysql' | 'Mssql' | 'Sqlite' {

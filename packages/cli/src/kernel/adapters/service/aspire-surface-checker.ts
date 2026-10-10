@@ -72,7 +72,7 @@ export async function checkAspireSurface(
       exitCode: drift.length === 0 ? 0 : 1,
       drift,
     };
-  } catch {
+  } catch (error) {
     // A selector, renderer, permission or read failure can never fall back to generation.
     return {
       version: ASPIRE_SURFACE_VERSION,
@@ -81,7 +81,11 @@ export async function checkAspireSurface(
       inputs: [],
       status: 'inspection-failure',
       exitCode: 1,
-      drift: [{ path: ASPIRE_SURFACE_GENERATOR, kind: 'inspection-failure' }],
+      drift: [{
+        path: ASPIRE_SURFACE_GENERATOR,
+        kind: 'inspection-failure',
+        message: error instanceof Error ? error.message : String(error),
+      }],
     };
   }
 }

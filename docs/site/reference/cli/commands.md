@@ -327,14 +327,17 @@ root authorities rather than promising a transitive dependency inventory.
 
 The generator owns `aspire/apphost.mts` and every leaf under `aspire/.helpers/`. SDK modules, Aspire
 settings, and the init-owned `.netscript/aspire-cli.ts` are outside this command's output scope.
-Every selected output carries `// @netscript-generated public.generate.aspire`. Regenerate once to
-establish that producer declaration in projects created with older versions.
+Every selected output carries `// @netscript-generated public.generate.aspire`. Init and database,
+service and plugin mutations use the same producer declaration and canonical formatting. Regenerate
+once if existing outputs lack that declaration or canonical formatting.
 
 `status: current` exits 0. Missing outputs, extra helper leaves, a missing or foreign producer
 declaration, and byte drift produce `status: drift`, exit 1, with `missing`, `extra`, `ownership`
 and/or `bytes` findings. Linked files/directories, failed selection/rendering/formatting, permission
 failures and exceeded inspection limits produce `status: inspection-failure`, exit 1; this report
-certifies no outputs. Configuration and metadata probes deny writes and subprocess launches. An
+certifies no outputs. Inspection findings include an optional `message` carrying the failure cause.
+Inspection configuration and metadata probes deny writes and subprocess launches. Normal generation
+retains recoverable degradation when a plugin metadata probe fails or times out. An
 inspection failure never retries through generation. The reader bounds each file to 16 MiB and the
 helper tree to 1,024 entries; rendering permits at most 256 outputs.
 

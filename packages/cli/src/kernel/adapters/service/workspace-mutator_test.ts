@@ -1,4 +1,7 @@
-import { assertEquals } from '@std/assert';
+import { DenoProcess } from '../runtime/process/deno-process.ts';
+import type { ProcessPort } from '../../ports/process-port.ts';
+import { checkAspire } from '../../../public/features/generate/aspire/check-aspire.ts';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
@@ -98,3 +101,62 @@ async function readFiles(
     await Promise.all(paths.map(async (path) => [path, await fs.readFile(path)] as const)),
   );
 }
+
+Deno.test('plugin-add helper regeneration degrades on probe timeout; inspection retains its typed cause', async () => {
+  const root = await Deno.makeTempDir();
+  const fs = new DenoFileSystem();
+  const templateAdapter = new StringTemplateAdapter(fs);
+  const nativeProcess = new DenoProcess();
+  let timeouts = 0;
+  const process: ProcessPort = {
+    exec: (command, args, options) => {
+      if (args.some((arg) => arg.endsWith('/configured-plugin-manifest-probe-child.ts'))) {
+        timeouts++;
+        return Promise.resolve({ code: 124, stdout: '', stderr: '', timedOut: true });
+      }
+      return nativeProcess.exec(command, args, options);
+    },
+  };
+  try {
+    await fs.writeFile(
+      join(root, 'deno.json'),
+      JSON.stringify({
+        catalog: SCAFFOLD_WORKSPACE_CATALOG,
+        imports: {
+          '@netscript/config':
+            new URL('../../../../../../packages/config/mod.ts', import.meta.url).href,
+        },
+      }),
+    );
+    await fs.writeFile(
+      join(root, 'netscript.config.ts'),
+      `import { defineConfig } from '@netscript/config';
+export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: ['@fixture/plugin-timeout'] });
+`,
+    );
+    await fs.writeFile(join(root, 'appsettings.json'), appsettings());
+    await fs.createDir(join(root, 'aspire'));
+    // This is the same helper boundary called after plugin installation/reconciliation.
+    const written = await regenerateAspireHelpers(
+      root,
+      fs,
+      new Scaffolder(templateAdapter, fs),
+      templateAdapter,
+      { process },
+    );
+    assertEquals(written.length, 13);
+    const before = await readFiles(fs, written);
+    const report = await checkAspire(root, { fs, templateAdapter, process });
+    assertEquals(timeouts, 2);
+    assertEquals(report.status, 'inspection-failure');
+    assertEquals(report.exitCode, 1);
+    assertEquals(report.outputs, []);
+    assertEquals(report.drift[0].kind, 'inspection-failure');
+    assertStringIncludes(report.drift[0].message ?? '', '@fixture/plugin-timeout');
+    assertStringIncludes(report.drift[0].message ?? '', 'timed out');
+    assertStringIncludes(report.drift[0].message ?? '', '30000');
+    assertEquals(await readFiles(fs, written), before);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

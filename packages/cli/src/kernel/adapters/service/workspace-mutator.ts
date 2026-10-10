@@ -1,5 +1,3 @@
-import { ScaffoldValidationError } from '../../domain/errors.ts';
-import { renderAspireSurface } from './aspire-surface-renderer.ts';
 /**
  * @module infra/service/workspace-mutator
  *
@@ -7,16 +5,15 @@ import { renderAspireSurface } from './aspire-surface-renderer.ts';
  */
 
 import { basename, join } from '@std/path';
+import { ScaffoldValidationError } from '../../domain/errors.ts';
+import { type AspireSurfaceRenderOptions, renderAspireSurface } from './aspire-surface-renderer.ts';
 
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
-
 import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace-writer.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { ServiceConfigEntry } from '../../domain/service-shape.ts';
-
-import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 /** Project metadata needed to scaffold service resources. */
 export interface ServiceProjectMetadata {
@@ -140,10 +137,9 @@ export async function regenerateAspireHelpers(
   fs: FileSystemPort,
   scaffolder: ScaffolderPort,
   templateAdapter: TemplatePort,
-  options: {
+  options: AspireSurfaceRenderOptions & {
     readonly dryRun?: boolean;
     readonly force?: boolean;
-    readonly formatter?: GeneratedSourceFormatterPort;
   } = {},
 ): Promise<readonly string[]> {
   const files = await renderAspireSurface(projectRoot, fs, templateAdapter, options);

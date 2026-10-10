@@ -52,6 +52,8 @@ export interface AspireSurfaceDrift {
   readonly path: string;
   /** Machine-readable drift classification. */
   readonly kind: AspireDriftKind;
+  /** Cause when inspection cannot certify the surface. */
+  readonly message?: string;
 }
 /** Typed check result, emitted even if inspection fails. */
 export interface AspireSurfaceReport extends AspireSurfaceInventory {

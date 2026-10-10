@@ -448,6 +448,7 @@ packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts	cli:other	S4	grep-v
 packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/scaffold/import-resolver.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-checker_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/aspire-surface-checker.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/aspire-surface-inventory_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/aspire-surface-inventory.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -619,6 +620,7 @@ packages/cli/src/public/features/deploy/target/desktop/package/package-desktop.t
 packages/cli/src/public/features/deploy/target/run-target-operation.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/aspire-check-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/generate/aspire/aspire-lifecycle-check-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/check-aspire.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected

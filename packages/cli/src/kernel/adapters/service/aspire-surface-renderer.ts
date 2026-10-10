@@ -1,5 +1,9 @@
 import { join } from '@std/path';
-import { loadProjectConfigForInspection } from '../config/project-config-loader.ts';
+import {
+  loadProjectConfig,
+  loadProjectConfigForInspection,
+} from '../config/project-config-loader.ts';
+import type { ProcessPort } from '../../ports/process-port.ts';
 import { canonicalizeAspireOutputs } from './aspire-surface-inventory.ts';
 import { parseAppSettings } from '@netscript/aspire/config';
 import { HelpersGeneratorPipeline } from '../../templates/aspire/helpers/helpers-generator-pipeline.ts';
@@ -18,12 +22,56 @@ import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-
 import type { TemplatePort } from '../../ports/template-port.ts';
 import type { GeneratedFile } from '../../templates/aspire/helpers/types.ts';
 
-/** Render every generate-aspire output without invoking a project writer. */
-export async function renderAspireSurface(
+/** Process and canonical formatting boundaries shared by the Aspire selectors. */
+export interface AspireSurfaceRenderOptions {
+  /** Generated content formatter; the canonical Deno policy is the default. */
+  readonly formatter?: GeneratedSourceFormatterPort;
+  /** Configuration and plugin probe process boundary. */
+  readonly process?: ProcessPort;
+}
+
+/** Render generation bytes, retaining recoverable plugin probe degradation. */
+export function renderAspireSurface(
   projectRoot: string,
   fs: FileSystemPort,
   templateAdapter: TemplatePort,
-  options: { readonly formatter?: GeneratedSourceFormatterPort } = {},
+  options: AspireSurfaceRenderOptions = {},
+): Promise<readonly GeneratedFile[]> {
+  return renderWithSelectors(projectRoot, fs, templateAdapter, options, {
+    loadConfig: loadProjectConfig,
+    loadPlugins: loadRegisteredPluginMetadata,
+  });
+}
+
+/** Inspect through the same renderer with read-only config and certified plugin metadata. */
+export function renderAspireSurfaceForInspection(
+  projectRoot: string,
+  fs: FileSystemPort,
+  templateAdapter: TemplatePort,
+  options: AspireSurfaceRenderOptions = {},
+): Promise<readonly GeneratedFile[]> {
+  return renderWithSelectors(projectRoot, fs, templateAdapter, options, {
+    loadConfig: loadProjectConfigForInspection,
+    loadPlugins: async (...args) => {
+      const plugins = await loadRegisteredPluginMetadata(...args);
+      const failed = Object.values(plugins).find((plugin) => plugin.manifestError);
+      if (failed) {
+        throw new Error(`Cannot inspect Aspire plugin ${failed.name}: ${failed.manifestError}`);
+      }
+      return plugins;
+    },
+  });
+}
+
+async function renderWithSelectors(
+  projectRoot: string,
+  fs: FileSystemPort,
+  templateAdapter: TemplatePort,
+  options: AspireSurfaceRenderOptions,
+  selectors: {
+    readonly loadConfig: typeof loadProjectConfig;
+    readonly loadPlugins: typeof loadRegisteredPluginMetadata;
+  },
 ): Promise<readonly GeneratedFile[]> {
   const appsettingsPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
   if (!await fs.exists(appsettingsPath)) {
@@ -43,13 +91,9 @@ export async function renderAspireSurface(
 
   const parsed = await parseAppSettings(appsettingsPath);
   const rawAppsettings = JSON.parse(await fs.readFile(appsettingsPath)) as unknown;
-  const projectConfig = await loadProjectConfigForInspection({ cwd: projectRoot }, {
-    process: new DenoProcess(),
-  });
-  const registeredPlugins = await loadRegisteredPluginMetadata(projectRoot, projectConfig);
-  if (Object.values(registeredPlugins).some((plugin) => plugin.manifestError)) {
-    throw new Error('Cannot render Aspire surface with unresolved plugin metadata.');
-  }
+  const process = options.process ?? new DenoProcess();
+  const projectConfig = await selectors.loadConfig({ cwd: projectRoot }, { process });
+  const registeredPlugins = await selectors.loadPlugins(projectRoot, projectConfig, process);
   const config = applyRegisteredPluginPermissions(
     preservePluginEnvironment(parsed.config, rawAppsettings),
     registeredPlugins,

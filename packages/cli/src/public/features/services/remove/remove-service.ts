@@ -1,3 +1,4 @@
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import { join } from '@std/path';
 import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/version-registry.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
@@ -25,6 +26,7 @@ export interface RemoveServiceDependencies {
   readonly fs: FileSystemPort;
   readonly scaffolder: ScaffolderPort;
   readonly templateAdapter: TemplatePort;
+  readonly formatter?: GeneratedSourceFormatterPort;
   readonly regenerateHelpers?: typeof regenerateAspireHelpers;
 }
 
@@ -87,6 +89,7 @@ export async function removeService(
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
+    { formatter: dependencies.formatter },
   );
   return { serviceDir, removedContracts, helperFiles };
 }

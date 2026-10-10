@@ -37,7 +37,11 @@ export function createGenerateAspireCommand(
         });
         if (options.format === 'json') outputJson(report);
         else {
-          for (const finding of report.drift) outputText(`${finding.kind}: ${finding.path}`);
+          for (const finding of report.drift) {
+            outputText(
+              `${finding.kind}: ${finding.path}${finding.message ? `: ${finding.message}` : ''}`,
+            );
+          }
           outputText(`Aspire surface ${report.status}: ${report.outputs.length} selected outputs.`);
         }
         if (report.exitCode !== 0) throw new IoError(1, `Aspire surface ${report.status}.`);

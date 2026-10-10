@@ -103,6 +103,9 @@
           "path": {
             "type": "string"
           },
+          "message": {
+            "type": "string"
+          },
           "kind": {
             "enum": [
               "missing",
