@@ -1,3 +1,4 @@
+import { loadSagaRetention } from './load-saga-retention.ts';
 import type {
   SagaCorrelationIndexEntry,
   SagaStorePort,
@@ -63,19 +64,35 @@ export type SagaInstanceReadModel = Readonly<{
 /** KV implementation used when the generated Prisma client has no saga delegates. */
 export class KvSagaInstanceProjection implements SagaInstanceProjectionPort {
   readonly #injectedKv?: WatchableKv;
+  readonly #completedDays?: (envelope: SagaStateEnvelope) => number;
+  #policy?: ReturnType<typeof loadSagaRetention>;
 
   /** Create a projector around an injected or environment-discovered KV backend. */
-  constructor(kv?: WatchableKv) {
+  constructor(kv?: WatchableKv, completedDays?: (envelope: SagaStateEnvelope) => number) {
     this.#injectedKv = kv;
+    this.#completedDays = completedDays;
   }
 
   /** Persist one API read-model document under the `saga_instances` prefix. */
   async upsert(projection: SagaInstanceProjection): Promise<void> {
     const kv = this.#injectedKv ?? await getKv();
-    await kv.set(
-      ['saga_instances', projection.sagaId, projection.instanceId],
-      readModel(projection),
+    const policy = this.#completedDays ??
+      (await (this.#policy ??= loadSagaRetention())).completedDays;
+    const terminal = ['completed', 'failed', 'cancelled', 'compensated'].includes(
+      projection.envelope.metadata.status,
     );
+    const settled = projectionDates(projection.envelope.metadata);
+    const expireIn = terminal
+      ? (settled.completedAt ?? settled.updatedAt).getTime() +
+        policy(projection.envelope) * 86_400_000 - Date.now()
+      : undefined;
+    const key = ['saga_instances', projection.sagaId, projection.instanceId];
+    if (expireIn !== undefined && expireIn <= 0) await kv.delete(key);
+    else {await kv.set(
+        key,
+        readModel(projection),
+        expireIn === undefined ? undefined : { expireIn },
+      );}
   }
 }
 
@@ -89,14 +106,20 @@ export type PrismaSagaInstanceProjectionClient = Readonly<{
 /** Prisma implementation of the API-facing saga instance projection. */
 export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort {
   readonly #prisma: PrismaSagaInstanceProjectionClient;
+  readonly #archiveToDb: (sagaId: string) => boolean;
 
   /** Create a projector around the host-owned Prisma client. */
-  constructor(prisma: PrismaSagaInstanceProjectionClient) {
+  constructor(
+    prisma: PrismaSagaInstanceProjectionClient,
+    archiveToDb: (sagaId: string) => boolean = () => true,
+  ) {
     this.#prisma = prisma;
+    this.#archiveToDb = archiveToDb;
   }
 
   /** Upsert a stable row keyed by saga definition and engine instance id. */
   async upsert(projection: SagaInstanceProjection): Promise<void> {
+    if (!this.#archiveToDb(projection.sagaId)) return;
     const state = projectionState(projection);
     const dates = projectionDates(projection.envelope.metadata);
     const create = {

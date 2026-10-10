@@ -1,3 +1,5 @@
+import { executionRetentionRemaining, validateRetentionDays } from './execution-retention.ts';
+import type { KvKey } from '@netscript/kv';
 import { DEFAULT_TOPIC, ExecutionRecordSchema } from '../domain/mod.ts';
 import type {
   ExecutionStatus as DomainExecutionStatus,
@@ -140,12 +142,28 @@ export class KvExecutionState {
   readonly #kv: RegistryKvStore;
   readonly #workerId: string;
   #onMutation?: ExecutionMutationHook;
+  readonly #now: () => Date;
+  readonly #kvRetentionDays?: number;
+  #cleanupStart?: KvKey;
 
   /** Creates a KV-backed execution state store. */
-  constructor(options: Readonly<{ id?: string; kv: RegistryKvStore; workerId?: string }>) {
+  constructor(
+    options: Readonly<{
+      id?: string;
+      kv: RegistryKvStore;
+      workerId?: string;
+      /** Clock used for completion and retention deadlines. */
+      now?: () => Date;
+      /** Override the job definition's KV retention window; defaults to three days. */
+      kvRetentionDays?: number;
+    }>,
+  ) {
     this.id = options.id ?? 'kv-execution-state';
     this.#kv = options.kv;
     this.#workerId = options.workerId ?? crypto.randomUUID();
+    this.#now = options.now ?? (() => new Date());
+    this.#kvRetentionDays = options.kvRetentionDays;
+    if (options.kvRetentionDays !== undefined) validateRetentionDays(options.kvRetentionDays);
   }
 
   /** Registers a callback for execution state mutations. */
@@ -155,7 +173,7 @@ export class KvExecutionState {
 
   /** Creates and persists a pending execution record. */
   async create(options: CreateExecutionOptions): Promise<ExecutionRecord> {
-    const now = new Date().toISOString();
+    const now = this.#now().toISOString();
     const record = validateExecution({
       id: crypto.randomUUID(),
       concept: options.concept ?? 'job',
@@ -193,7 +211,7 @@ export class KvExecutionState {
   start(executionId: string): Promise<ExecutionRecord | null> {
     return this.#transition(executionId, {
       status: 'running',
-      startedAt: new Date().toISOString(),
+      startedAt: this.#now().toISOString(),
       workerId: this.#workerId,
     });
   }
@@ -217,7 +235,7 @@ export class KvExecutionState {
   ): Promise<ExecutionRecord | null> {
     const current = await this.get(executionId);
     if (!current) return null;
-    const now = new Date();
+    const now = this.#now();
     const startedAt = current.startedAt ? new Date(current.startedAt) : now;
     return await this.#transition(executionId, {
       status: options.status,
@@ -307,6 +325,69 @@ export class KvExecutionState {
     return true;
   }
 
+  /**
+   * Delete a bounded page of expired terminal executions, preserving live and fresh records.
+   *
+   * Requires an atomic KV adapter so a concurrent update cannot be deleted after inspection.
+   * Repeated calls advance through the keyspace and restart after the final page.
+   *
+   * @example
+   * ```ts
+   * import { KvExecutionState } from '@netscript/plugin-workers-core/state';
+   * import { MemoryKvAdapter } from '@netscript/kv';
+   * await using kv = new MemoryKvAdapter();
+   * const state = new KvExecutionState({ kv });
+   * const deleted = await state.cleanupExpired();
+   * console.log(deleted.length);
+   * ```
+   */
+  async cleanupExpired(limit = 1000): Promise<string[]> {
+    if (!Number.isSafeInteger(limit) || limit <= 0 || limit > 1000) {
+      throw new RangeError('Execution cleanup limit must be between 1 and 1000.');
+    }
+    if (!this.#kv.atomic) throw new Error('Execution cleanup requires atomic KV support.');
+    const deleted: string[] = [];
+    let scanned = 0;
+    const policies = new Map<string, number>();
+    for await (
+      const entry of this.#kv.list<ExecutionRecord>({
+        prefix: EXECUTION_PREFIX,
+        limit,
+        start: this.#cleanupStart,
+      })
+    ) {
+      scanned++;
+      if (!entry.value) continue;
+      const key: KvKey = [...EXECUTION_PREFIX, entry.value.id];
+      this.#cleanupStart = key;
+      const remaining = await executionRetentionRemaining(
+        entry.value,
+        this.#kv,
+        this.#now(),
+        this.#kvRetentionDays,
+        policies,
+      );
+      if (remaining === undefined || remaining > 0) continue;
+      if (entry.versionstamp === undefined) {
+        throw new Error('Execution cleanup requires versioned KV entries.');
+      }
+      const result = await this.#kv.atomic(
+        [{ key, versionstamp: entry.versionstamp }],
+        [{ type: 'delete', key }],
+      );
+      if (result.ok) {
+        deleted.push(entry.value.id);
+        this.#onMutation?.({ type: 'deleted', execution: entry.value });
+      }
+    }
+    if (scanned < limit) this.#cleanupStart = undefined;
+    return deleted;
+  }
+
+  #remainingRetention(record: ExecutionRecord): Promise<number | undefined> {
+    return executionRetentionRemaining(record, this.#kv, this.#now(), this.#kvRetentionDays);
+  }
+
   /** Applies partial execution updates through validation and persistence. */
   async #transition(
     executionId: string,
@@ -321,7 +402,18 @@ export class KvExecutionState {
 
   /** Persists an execution record and emits the mutation hook. */
   async #save(record: ExecutionRecord, type: 'created' | 'updated'): Promise<void> {
-    await this.#kv.set([...EXECUTION_PREFIX, record.id], record);
+    const expireIn = await this.#remainingRetention(record);
+    if (expireIn !== undefined && expireIn <= 0) {
+      await this.#kv.delete([...EXECUTION_PREFIX, record.id]);
+      this.#onMutation?.({ type: 'deleted', execution: record });
+      return;
+    } else {
+      await this.#kv.set(
+        [...EXECUTION_PREFIX, record.id],
+        record,
+        expireIn === undefined ? undefined : { expireIn },
+      );
+    }
     this.#onMutation?.({ type, execution: record });
   }
 

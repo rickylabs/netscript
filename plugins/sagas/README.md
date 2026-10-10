@@ -32,8 +32,8 @@ them to a NetScript host.
   `generate-registry`, and `publish` cover authoring and inspection; `inspect` degrades gracefully
   to a local source scan when the Saga API is not running.
 - **Stable identity constants** — `SAGAS_PLUGIN_ID` and `SAGAS_API_SERVICE_NAME` identify the
-  contribution. `SAGAS_API_DEFAULT_PORT` remains a deprecated compatibility-only export and is not
-  a runtime fallback.
+  contribution. `SAGAS_API_DEFAULT_PORT` remains a deprecated compatibility-only export and is not a
+  runtime fallback.
 - **Durable streams + Aspire** — `./streams` publishes saga entities to durable stream topics;
   `./aspire` contributes the saga resources to the AppHost.
 
@@ -155,3 +155,30 @@ The manifest itself is plain data and can be imported anywhere TypeScript runs.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## KV retention
+
+Topic groups declare `retention.completedDays` (default 7) and `retention.archiveToDb` (default
+false). Open `pending`, `running`, and `compensating` instances retain canonical state,
+correlations, transition history, applied replay keys, and the KV query projection until they become
+terminal. `activeDays` is a legacy active-window hint; it does not expire live replay data.
+
+Terminal `completed`, `failed`, `cancelled`, and `compensated` instances expire after
+`completedDays`, measured from the terminal timestamp. Canonical state, forward and reverse
+correlations, new terminal transitions, and `saga_instances` query documents use KV `expireIn`. The
+saga service applies the same deadline to earlier transitions and applied keys in atomic pages of at
+most 100 entries. A persistent `sagas/retention` cursor resumes that work after restart and is
+deleted once all history has received its TTL. Low-level `KvSagaStore` callers must drive
+`cleanupRetention()`; the shipped durable runtime drives it in the background and drains it on stop.
+A backlog can delay migration of historical keys, so backend expiry alone is guaranteed only after
+their terminal deadline has been assigned. No API read or owner app session drives cleanup.
+
+Transport reservations already use their separate deduplication TTL. `archiveToDb: false` keeps
+runtime query projections in KV even when a Prisma client is available; the runner does not write
+the optional Prisma projection for those definitions.
+
+Delayed saga messages remain owned by the queue adapter. The queue scheduling port currently has no
+terminal-instance cancellation/expiry contract, so their retention window is not proven by this
+change. Terminal records written before this policy was installed also need a migration/backfill;
+this change assigns deadlines when a terminal state is written. These remaining acceptance items
+keep issue #2109 open.

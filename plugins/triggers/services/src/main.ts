@@ -1,3 +1,4 @@
+import { loadTriggerRetention } from '../../src/runtime/load-trigger-retention.ts';
 /**
  * Triggers service entrypoint.
  *
@@ -155,6 +156,8 @@ export type TriggersServiceOptions = Readonly<{
   eventSubscription?: TriggerEventSubscriptionPort;
   /** Pre-opened KV adapter; defaults to the runtime KV. */
   kv?: KvStore;
+  /** Override terminal history retention; otherwise uses configured group kvDays. */
+  kvRetentionDays?: number | ((triggerId: string) => number);
 }>;
 type TriggerServiceContextSource = TriggerServiceContext | (() => TriggerServiceContext);
 
@@ -169,14 +172,16 @@ export async function createTriggersServiceContext(
   const needsKv = options.eventStore === undefined || options.enabledState === undefined ||
     options.processor === undefined;
   const kv: KvStore | undefined = needsKv ? options.kv ?? await openTriggerRuntimeKv() : options.kv;
+  const kvRetentionDays = options.kvRetentionDays ?? await loadTriggerRetention();
   const eventStore = options.eventStore ??
-    new KvTriggerEventStore({ kv: requireKv(kv) });
+    new KvTriggerEventStore({ kv: requireKv(kv), kvRetentionDays });
   const enabledState = options.enabledState ??
     createKvTriggerEnabledStateStore({ kv: requireKv(kv) });
   const eventSubscription = options.eventSubscription ?? createEventSubscription();
   const processor = options.processor ??
     await createRuntimeTriggerProcessor({
       kv,
+      kvRetentionDays,
       eventSubscription,
       enabledState,
       definitions,

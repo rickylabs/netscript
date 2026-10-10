@@ -1,3 +1,4 @@
+import { loadSagaRetention } from './load-saga-retention.ts';
 import type { SagaDefinition } from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
@@ -174,9 +175,14 @@ async function resolveProjection(
   const imported = await import(bootstrapModule) as SagaRunnerBootstrap;
   const context = await imported.createPluginServiceContext('sagas');
   const client = await context.db.getClient();
+  const retention = await loadSagaRetention();
+  const kvProjection = new KvSagaInstanceProjection(undefined, retention.completedDays);
   const readModelProjection = isProjectionClient(client)
-    ? new PrismaSagaInstanceProjection(client)
-    : new KvSagaInstanceProjection();
+    ? new CompositeSagaInstanceProjection([
+      kvProjection,
+      new PrismaSagaInstanceProjection(client, retention.archiveToDb),
+    ])
+    : kvProjection;
   return withStreamProjection(readModelProjection);
 }
 

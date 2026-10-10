@@ -542,6 +542,7 @@ export class SagaEngine implements SagaBusPort {
     const envelope: SagaStateEnvelope = Object.freeze({
       metadata: Object.freeze({
         instanceId: input.instanceId,
+        sagaId: input.definition.id,
         version: nextVersion,
         status: input.status,
         durability: input.definition.durability,

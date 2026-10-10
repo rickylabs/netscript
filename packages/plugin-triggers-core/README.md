@@ -174,3 +174,19 @@ permissions.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## KV retention
+
+Trigger groups declare `retention.kvDays` (default 7). Runtime startup resolves that policy per
+trigger and applies it to terminal event records, their `triggers/by-trigger` indexes, DLQ entries,
+and their `triggers/dlq/by-trigger` indexes. Store callers can inject `kvRetentionDays` and a clock
+for a custom composition. Each record/index pair receives the same `expireIn` in one atomic write.
+Event TTL starts at terminal `updatedAt`; DLQ TTL starts at `failedAt`, so rewriting old failures
+does not extend their window. Manual fire now persists its processing outcome before returning.
+
+Pending, in-flight, and deferred events keep their durable state until processing settles. Active
+idempotency claims and completed deduplication markers retain their existing claim/deduplication
+TTLs. Deferred replay records are removed on successful replay or explicit cancellation; enabled
+state remains configuration. Existing terminal records written without TTL need a migration; this
+policy applies when records are written or their status changes. Runtime/backend expiry does not
+depend on an API read or a phone/web app being open.

@@ -1,3 +1,4 @@
+import { loadTriggerRetention } from './load-trigger-retention.ts';
 import { createQueue } from '@netscript/queue';
 import { DEFAULT_TOPIC, type JobMessage } from '@netscript/plugin-workers-core/runtime';
 import type {
@@ -52,6 +53,8 @@ import {
 /** Options for constructing the plugin trigger processor runtime. */
 export type RuntimeTriggerProcessorOptions = Readonly<{
   kv?: KvStore;
+  /** Terminal KV history retention resolved once at process startup. */
+  kvRetentionDays?: number | ((triggerId: string) => number);
   idempotency?: TriggerIdempotencyPort;
   dlq?: TriggerDlqPort;
   jobQueue?: ReturnType<typeof createQueue<JobMessage>>;
@@ -71,12 +74,14 @@ export async function createRuntimeTriggerProcessor(
   const needsKv = options.idempotency === undefined || options.dlq === undefined ||
     options.deferScheduler === undefined;
   const kv = needsKv ? options.kv ?? await openTriggerRuntimeKv() : options.kv;
+  const kvRetentionDays = options.kvRetentionDays ?? await loadTriggerRetention();
   const queue = options.jobQueue ?? createQueue<JobMessage>('jobs');
   const deferScheduler = options.deferScheduler ??
     new KvTriggerDeferScheduler({ kv: requireKv(kv), clock: options.clock });
   const processor = createTriggerProcessor({
     idempotency: options.idempotency ?? new KvTriggerIdempotencyStore({ kv: requireKv(kv) }),
-    dlq: options.dlq ?? new KvTriggerDlqStore({ kv: requireKv(kv) }),
+    dlq: options.dlq ??
+      new KvTriggerDlqStore({ kv: requireKv(kv), kvRetentionDays }),
     dispatchAction: async (action, event, definition) => {
       await dispatchTriggerAction(action, event, definition, queue, deferScheduler);
     },
