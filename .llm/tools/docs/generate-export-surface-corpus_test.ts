@@ -1,4 +1,5 @@
 import { assert, assertEquals, assertMatch } from '@std/assert';
+import { EmbeddedExportSurfaceCorpus } from '../../../packages/mcp/mod.ts';
 import {
   colorInvariantChildEnv,
   createGeneratedAsset,
@@ -351,4 +352,18 @@ Deno.test('write mode warns and continues when git is unavailable', async () => 
     assertMatch(generated.stderr, /warning.*git.*unavailable/is);
     await assertArtifactWasWritten(worktree, oldTime);
   });
+});
+
+Deno.test('embedded query factory documentation matches the live required-context API', async () => {
+  const corpus = await new EmbeddedExportSurfaceCorpus().load();
+  // Multi-entrypoint deno doc keeps this declaration's JSDoc on the canonical root export.
+  const live = (await realEntries('packages/sdk/mod.ts', '@netscript/sdk', '.'))
+    .find((entry) => entry.symbol === 'createQueryFactories');
+  const embedded = corpus.entries.find((entry) =>
+    entry.packageName === '@netscript/sdk' && entry.subpath === '.' &&
+    entry.symbol === 'createQueryFactories'
+  );
+  assert(live, 'Missing live createQueryFactories entry');
+  assert(embedded, 'Missing embedded createQueryFactories entry');
+  assertEquals(embedded.jsDoc, live.jsDoc, 'Stale SDK query factory documentation');
 });
