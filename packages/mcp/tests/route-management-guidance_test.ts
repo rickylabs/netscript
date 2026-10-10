@@ -55,6 +55,7 @@ for (
     const checklist = document?.sectionContents.find(({ slug }) =>
       slug === 'renaming-or-moving-a-route'
     )?.content;
+    assert(checklist?.includes('/web-layer/generated-surface/'));
     assert(checklist?.includes('query-loaders.ts'));
     assert(checklist?.includes('.generated/manifest.ts'));
     assert(checklist?.includes('Type-check after regeneration'));
