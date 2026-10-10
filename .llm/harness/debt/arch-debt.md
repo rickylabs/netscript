@@ -2596,3 +2596,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   check, all 42 AI tests, peer guard, frozen install, Fresh lint and touched-source formatting
   exit 0. Focused doc lint exit 1 with only the two named references. Project
   runs/2026-10-08-fix-ai-peer-types/ai-doc-lint.log retains the raw failure.
+
+## packages/service — residual F-1 builder and type-module size (#1386 L2)
+
+- **Reason:** The service builder and public type module already exceeded their F-1 size caps before
+  #1386 L2. The CORS contract and middleware registration add lines to those existing modules. CORS
+  policy itself is extracted to the focused `src/middleware/service-cors.ts`; further decomposition
+  of the existing builder and public types remains separate work.
+- **Owner:** NetScript service maintainers / architecture follow-up.
+- **Target:** Next service architecture decomposition pass, before the stable public API line.
+- **Linked change:** [Leaf X-1386, PR #2193](https://github.com/rickylabs/netscript/pull/2193).
+- **Created:** 2026-10-10.
+- **Status:** open; residual size debt recorded, no closure claimed by this leaf.
+- **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
+  `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
+  green. `arch:check` currently exits zero with these size warnings.
