@@ -175,7 +175,7 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
   }
 });
 
-Deno.test('Aspire regeneration formats all 13 outputs in one process with byte-identical results', async () => {
+Deno.test('Aspire regeneration formats all 13 outputs with two bounded subprocesses with byte-identical results', async () => {
   const controlModule = Deno.env.get('NETSCRIPT_ASPIRE_REGEN_MODULE');
   const regenerate: typeof regenerateAspireHelpers = controlModule
     ? (await import(controlModule)).regenerateAspireHelpers
@@ -186,9 +186,17 @@ Deno.test('Aspire regeneration formats all 13 outputs in one process with byte-i
   const nativeProcess = new DenoProcess();
   let formattingProcesses = 0;
   const process: ProcessPort = {
-    exec: (command, args, options) => {
+    exec: async (command, args, options) => {
       if (command === 'deno' && args[0] === 'fmt') formattingProcesses++;
-      return nativeProcess.exec(command, args, options);
+      const result = await nativeProcess.exec(command, args, options);
+      if (args.some((arg) => arg.endsWith('/generated-source-batch-child.ts'))) {
+        formattingProcesses++;
+        if (result.code === 0) {
+          const response: { formatterProcesses: number } = JSON.parse(result.stdout);
+          formattingProcesses += response.formatterProcesses;
+        }
+      }
+      return result;
     },
   };
   const formatter = new DenoGeneratedSourceFormatter(process);
@@ -217,7 +225,7 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
       process,
     });
     assertEquals(files.length, 13);
-    assertEquals(formattingProcesses, 1);
+    assertEquals(formattingProcesses, 2);
     const parsed = await parseAppSettings(join(root, 'appsettings.json'));
     const raw = await new HelpersGeneratorPipeline(templates).execute({
       config: parsed.config,
@@ -237,10 +245,10 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
       await regenerate(root, fs, scaffolder, templates, { formatter, process }),
       [],
     );
-    assertEquals(formattingProcesses, 2);
+    assertEquals(formattingProcesses, 4);
     const report = await checkAspire(root, { fs, templateAdapter: templates, formatter, process });
     assertEquals(report.status, 'current');
-    assertEquals(formattingProcesses, 3);
+    assertEquals(formattingProcesses, 6);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

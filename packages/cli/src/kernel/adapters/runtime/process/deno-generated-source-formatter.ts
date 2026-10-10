@@ -1,46 +1,15 @@
-import { extname, join } from '@std/path';
+import { extname } from '@std/path';
 import type {
   GeneratedFileFormatPolicy,
   GeneratedSourceContent,
   GeneratedSourceFormatterPort,
 } from '../../../ports/generated-source-formatter-port.ts';
 import type { ProcessPort, ProcessResult } from '../../../ports/process-port.ts';
-
-const GENERATED_FORMAT_ARGS = [
-  '--no-config',
-  '--line-width',
-  '100',
-  '--single-quote',
-] as const;
-
-const SUPPORTED_EXTENSIONS = new Set([
-  'ts',
-  'tsx',
-  'js',
-  'jsx',
-  'mts',
-  'mjs',
-  'cts',
-  'cjs',
-  'md',
-  'json',
-  'jsonc',
-  'css',
-  'scss',
-  'less',
-  'html',
-  'xml',
-  'svg',
-  'svelte',
-  'vue',
-  'astro',
-  'yml',
-  'yaml',
-  'ipynb',
-  'sql',
-  'vto',
-  'njk',
-]);
+import {
+  GENERATED_FORMAT_ARGS,
+  MAX_BATCH_CHARACTERS,
+  SUPPORTED_EXTENSIONS,
+} from './generated-source-format-policy.ts';
 
 /** Deno-backed canonicalizer for generated source and exact file sets. */
 export class DenoGeneratedSourceFormatter implements GeneratedSourceFormatterPort {
@@ -69,38 +38,45 @@ export class DenoGeneratedSourceFormatter implements GeneratedSourceFormatterPor
     return result.stdout;
   }
 
-  /** Format a source batch in one process without touching consumer paths. */
+  /** Format a batch with one staging child and one formatter, even in a write-denied caller. */
   async formatContents(files: readonly GeneratedSourceContent[]): Promise<readonly string[]> {
-    if (files.length > 256 || files.some((file) => file.content.length > 16 * 1024 * 1024)) {
+    if (
+      files.length > 256 || files.some((file) => file.content.length > 16 * 1024 * 1024) ||
+      files.reduce((total, file) => total + file.content.length, 0) > MAX_BATCH_CHARACTERS
+    ) {
       throw new Error('Generated source batch exceeds its bounded capacity.');
     }
-    for (const file of files) {
-      if (!SUPPORTED_EXTENSIONS.has(extname(file.targetPath).slice(1).toLowerCase())) {
+    const payload = files.map((file) => {
+      const extension = extname(file.targetPath).slice(1).toLowerCase();
+      if (!SUPPORTED_EXTENSIONS.has(extension)) {
         throw new Error(
           `Unable to format generated source for ${file.targetPath}: unsupported or missing target extension.`,
         );
       }
-    }
+      return { extension, content: file.content };
+    });
     if (files.length === 0) return [];
-    const stagingRoot = await Deno.makeTempDir();
-    try {
-      const paths = files.map((file, index) =>
-        join(stagingRoot, `${index}${extname(file.targetPath).toLowerCase()}`)
-      );
-      for (let index = 0; index < files.length; index++) {
-        await Deno.writeTextFile(paths[index], files[index].content);
-      }
-      const result = await this.formatFiles(stagingRoot, paths, 'generated');
-      if (result.code !== 0) {
-        const detail = result.stderr.trim() || result.stdout.trim() || `exit ${result.code}`;
-        throw new Error(`Unable to format generated source batch: ${detail}`);
-      }
-      const contents: string[] = [];
-      for (const path of paths) contents.push(await Deno.readTextFile(path));
-      return contents;
-    } finally {
-      await Deno.remove(stagingRoot, { recursive: true });
+    const result = await this.process.exec('deno', [
+      'run',
+      '--no-config',
+      '--no-lock',
+      '--no-prompt',
+      '--allow-read',
+      '--allow-write',
+      '--allow-run=deno',
+      '--deny-net',
+      '--deny-env',
+      new URL('./generated-source-batch-child.ts', import.meta.url).href,
+    ], { stdin: JSON.stringify(payload) });
+    if (result.code !== 0) {
+      const detail = result.stderr.trim() || result.stdout.trim() || `exit ${result.code}`;
+      throw new Error(`Unable to format generated source batch: ${detail}`);
     }
+    const response: unknown = JSON.parse(result.stdout);
+    if (!isBatchResponse(response, files.length)) {
+      throw new Error('Invalid generated formatting response.');
+    }
+    return response.contents;
   }
 
   /** Format exact generated paths using either generated or project policy. */
@@ -116,4 +92,15 @@ export class DenoGeneratedSourceFormatter implements GeneratedSourceFormatterPor
       { cwd: projectRoot },
     );
   }
+}
+
+function isBatchResponse(value: unknown, count: number): value is { contents: string[] } {
+  if (typeof value !== 'object' || value === null) return false;
+  const result = value as Record<string, unknown>;
+  return result.formatterProcesses === 1 && Array.isArray(result.contents) &&
+    result.contents.length === count &&
+    result.contents.every((content) =>
+      typeof content === 'string' && content.length <= 16 * 1024 * 1024
+    ) &&
+    result.contents.reduce((total, content) => total + content.length, 0) <= MAX_BATCH_CHARACTERS;
 }

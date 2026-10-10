@@ -1,3 +1,4 @@
+import { formatStagedSourceBatch } from './generated-source-batch-child.ts';
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import type { ProcessPort, ProcessResult } from '../../../ports/process-port.ts';
 import { DenoGeneratedSourceFormatter } from './deno-generated-source-formatter.ts';
@@ -99,12 +100,11 @@ Deno.test('generated source formatter failure names the target and preserves std
 
 Deno.test('generated batch formatter cleans staging on failure and never writes consumer paths', async () => {
   const process = new RecordingProcess({ code: 1, stdout: '', stderr: 'parse failed' });
-  const formatter = new DenoGeneratedSourceFormatter(process);
   await assertRejects(
     () =>
-      formatter.formatContents([
-        { targetPath: '/consumer/aspire/apphost.mts', content: 'invalid source' },
-      ]),
+      formatStagedSourceBatch([
+        { extension: 'mts', content: 'invalid source' },
+      ], process),
     Error,
     'parse failed',
   );

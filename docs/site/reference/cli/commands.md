@@ -339,7 +339,9 @@ certifies no outputs. Inspection findings include an optional `message` carrying
 Inspection configuration and metadata probes deny writes and subprocess launches. Normal generation
 retains recoverable degradation when a plugin metadata probe fails or times out. An
 inspection failure never retries through generation. The reader bounds each file to 16 MiB and the
-helper tree to 1,024 entries; rendering permits at most 256 outputs.
+helper tree to 1,024 entries; rendering permits at most 256 outputs. Canonical formatting bounds
+the whole batch to 64 MiB of source characters, using one staging child and one Deno formatter.
+Staging stays outside the consumer project, including when inspection denies all writes.
 
 This command covers Aspire generation. Inspection of `generate plugins` registries and published
 Windows/Linux release smoke remain follow-up work under #1912.
