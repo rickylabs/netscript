@@ -8,7 +8,7 @@ import {
 /**
  * Tracks child readiness and bounded restart history using an injectable clock.
  *
- * Crash-looping stays latched until explicit shutdown; a brief successful restart
+ * Crash-looping clears after a full window of uninterrupted running; a brief successful restart
  * cannot make a restart storm green. Raw exception details never enter this monitor.
  *
  * @example
@@ -29,6 +29,7 @@ export class ChildHealthMonitor {
   #lastFatalError: ChildFatalError | null = null;
   #restarts: number[] = [];
   #crashLooping = false;
+  #runningSince: number | undefined;
   readonly #now: () => number;
 
   /** Create a monitor; the clock supplies epoch milliseconds. */
@@ -38,12 +39,13 @@ export class ChildHealthMonitor {
 
   /** Begin a new bootstrap attempt while retaining restart history. */
   starting(): void {
+    this.#runningSince = undefined;
     this.#registryReady = false;
     this.#dependencyReady = false;
     this.#state = this.#crashLooping ? 'crash-looping' : 'starting';
   }
 
-  /** Record successful registry load and registration. */
+  /** Record successful static registry load and validation. */
   registryLoaded(): void {
     this.#registryReady = true;
   }
@@ -56,11 +58,13 @@ export class ChildHealthMonitor {
   /** Mark listeners running; readiness still requires registry and dependencies. */
   running(): void {
     if (this.#state === 'stopped') return;
+    this.#runningSince ??= this.#now();
     this.#state = this.#crashLooping ? 'crash-looping' : 'ready';
   }
 
   /** Record one attempted restart and latch a restart storm. */
   restarting(): void {
+    this.#runningSince = undefined;
     const now = this.#now();
     this.#restartCount = Math.min(Number.MAX_SAFE_INTEGER, this.#restartCount + 1);
     this.#restarts = this.#restarts.filter((at) => now - at <= CHILD_CRASH_LOOP_THRESHOLD.windowMs);
@@ -74,6 +78,7 @@ export class ChildHealthMonitor {
 
   /** Record a fatal startup or listener failure without exposing raw details. */
   failed(): void {
+    this.#runningSince = undefined;
     this.#state = this.#crashLooping ? 'crash-looping' : 'failed';
     this.#dependencyReady = false;
     this.#recordIncident(this.#now());
@@ -81,12 +86,22 @@ export class ChildHealthMonitor {
 
   /** Record clean shutdown while preserving bounded incident history. */
   stopped(): void {
+    this.#runningSince = undefined;
     this.#state = 'stopped';
     this.#dependencyReady = false;
   }
 
   /** Return an immutable public payload. */
   snapshot(): ChildHealthSnapshot {
+    if (
+      this.#crashLooping && this.#runningSince !== undefined &&
+      this.#registryReady && this.#dependencyReady &&
+      this.#now() - this.#runningSince >= CHILD_CRASH_LOOP_THRESHOLD.windowMs
+    ) {
+      this.#crashLooping = false;
+      this.#restarts = [];
+      this.#state = 'ready';
+    }
     const state = this.#state === 'ready' && (!this.#registryReady || !this.#dependencyReady)
       ? 'degraded'
       : this.#state;

@@ -35,6 +35,8 @@ export type SagaRuntimeFactory = (
 
 /** Supervisor construction options. */
 export type SagaRuntimeSupervisorOptions = Readonly<{
+  /** Shared process monitor, including bootstrap failures before start returns. */
+  health?: ChildHealthMonitor;
   definitions?: readonly SagaDefinition[];
   loadDefinitions?: SagaDefinitionRegistryLoader;
   runtimeOptions?: CreateSagaRuntimeOptions;
@@ -60,7 +62,7 @@ export class SagaRuntimeSupervisor {
   private startup?: Promise<SagaRuntimeSupervisorSnapshot>;
   private definitions: readonly SagaDefinition[] = Object.freeze([]);
   private failure?: string;
-  private readonly childHealth = new ChildHealthMonitor();
+  private readonly childHealth: ChildHealthMonitor;
 
   /** Frozen supervisor options used for lifecycle operations. */
   readonly options: SagaRuntimeSupervisorOptions;
@@ -68,6 +70,7 @@ export class SagaRuntimeSupervisor {
   /** Create a supervisor for generated saga definitions and a runtime factory. */
   constructor(options: SagaRuntimeSupervisorOptions = {}) {
     this.options = Object.freeze({ ...options });
+    this.childHealth = options.health ?? new ChildHealthMonitor();
   }
 
   /** Start the runtime, register generated definitions, and return a state snapshot. */
@@ -94,6 +97,7 @@ export class SagaRuntimeSupervisor {
 
     try {
       const definitions = await this.resolveDefinitions();
+      this.childHealth.registryLoaded();
       const runtime = this.options.createRuntime
         ? await this.options.createRuntime(this.options.runtimeOptions ?? {})
         : await createDefaultRuntime(
@@ -102,7 +106,6 @@ export class SagaRuntimeSupervisor {
         );
       this.runtime = runtime;
       await runtime.register(definitions);
-      this.childHealth.registryLoaded();
       await runtime.start();
       await this.options.delivery?.start(runtime);
       this.definitions = definitions;

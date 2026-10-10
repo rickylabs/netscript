@@ -1,5 +1,5 @@
 import { assertEquals, assertFalse } from '@std/assert';
-import { childHealthResponse, type ChildHealthSnapshot } from '@netscript/plugin/health';
+import { CHILD_CRASH_LOOP_THRESHOLD, childHealthResponse } from '@netscript/plugin/health';
 import { WorkerListenerSupervisor } from './listener-supervisor.ts';
 
 Deno.test('injected listener crash loop turns the child health route red and stays red on restart', async () => {
@@ -21,17 +21,15 @@ Deno.test('injected listener crash loop turns the child health route red and sta
   listener.start();
   await fourthAttempt.promise;
   try {
-    // Optional structural lookup keeps this assertion runnable against the baseline supervisor.
-    const health =
-      (listener.snapshot() as unknown as { childHealth?: ChildHealthSnapshot }).childHealth;
-    assertEquals(health?.state, 'crash-looping');
+    const health = listener.snapshot().childHealth;
+    assertEquals(health.state, 'crash-looping');
     assertFalse(listener.snapshot().healthy);
-    const response = childHealthResponse(new Request('http://localhost/health'), health!);
+    const response = childHealthResponse(new Request('http://localhost/health'), health);
     assertEquals(response.status, 503);
     const payload = await response.text();
     assertFalse(payload.includes('secret-token'));
     assertFalse(payload.includes('password'));
-    assertEquals(health?.restartCount, 3);
+    assertEquals(health.restartCount, 3);
   } finally {
     await listener.stop();
   }
@@ -75,4 +73,34 @@ Deno.test('listener shutdown during restart backoff drains without a detached re
   await listener.stop();
   assertEquals(listener.snapshot().childHealth.state, 'stopped');
   assertFalse(listener.snapshot().healthy);
+});
+
+Deno.test('a recovered worker listener becomes healthy after a full clean running minute', async () => {
+  let now = 0;
+  let attempts = 0;
+  const running = Promise.withResolvers<void>();
+  const listener = new WorkerListenerSupervisor({
+    name: 'transient-failover',
+    now: () => now,
+    maxRestarts: 5,
+    sleep: () => Promise.resolve(),
+    run: async (signal) => {
+      if (++attempts <= 3) throw new Error('temporary dependency failure');
+      running.resolve();
+      await new Promise<void>((resolve) =>
+        signal.addEventListener('abort', () => resolve(), { once: true })
+      );
+    },
+  });
+  listener.start();
+  await running.promise;
+  try {
+    assertFalse(listener.snapshot().healthy);
+    now = CHILD_CRASH_LOOP_THRESHOLD.windowMs;
+    assertEquals(listener.snapshot().healthy, true);
+    assertEquals(listener.snapshot().childHealth.state, 'ready');
+    assertEquals(listener.snapshot().childHealth.restartCount, 3);
+  } finally {
+    await listener.stop();
+  }
 });

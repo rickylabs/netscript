@@ -419,17 +419,23 @@ default; the factory does not merge another policy into it.
 
 ### `@netscript/plugin/health`
 
-| Symbol                       | Kind       | Description                                                                               |
-| ---------------------------- | ---------- | ----------------------------------------------------------------------------------------- |
-| `ChildHealthState`           | type alias | Closed child state vocabulary: starting, ready, degraded, crash-looping, stopped, failed. |
-| `ChildHealthSnapshot`        | type alias | State, registry/dependency readiness, restart count, and redacted fatal incident.         |
-| `ChildFatalError`            | type alias | Fixed redacted message and epoch-millisecond capture timestamp.                           |
-| `CHILD_CRASH_LOOP_THRESHOLD` | variable   | Three restarts within 60 seconds latch crash-looping until shutdown.                      |
-| `ChildHealthMonitor`         | class      | Tracks readiness and bounded restart history with an injectable clock.                    |
-| `childHealthResponse`        | function   | Returns HTTP 200 only for ready with both readiness checks complete; otherwise 503.       |
-| `runChildHealthProcess`      | function   | Starts health before bootstrap and retains a red surface after child failure.             |
+| Symbol                       | Kind       | Description                                                                                            |
+| ---------------------------- | ---------- | ------------------------------------------------------------------------------------------------------ |
+| `ChildHealthState`           | type alias | Closed child state vocabulary: starting, ready, degraded, crash-looping, stopped, failed.              |
+| `ChildHealthSnapshot`        | type alias | State, registry/dependency readiness, restart count, and redacted fatal incident.                      |
+| `ChildFatalError`            | type alias | Fixed redacted message and epoch-millisecond capture timestamp.                                        |
+| `CHILD_CRASH_LOOP_THRESHOLD` | variable   | Three restarts in 60 seconds; recovery requires a clean running minute.                                |
+| `ChildHealthMonitor`         | class      | Tracks readiness and bounded restart history with an injectable clock.                                 |
+| `childHealthResponse`        | function   | Returns HTTP 200 only for ready with both readiness checks complete; otherwise 503.                    |
+| `runChildHealthProcess`      | function   | Starts health before bootstrap; fatal errors log and exit nonzero after a one-second red health grace. |
 
 Workers, triggers, and sagas runtime entrypoints also re-export the shared health types.
 The child health payload is bounded and excludes raw exception messages and stacks. Dependency
 readiness records startup checks and listener failures; continuous backing-service heartbeat,
 AppHost probes, and doctor/MCP aggregation belong to subsequent slices of #1366.
+
+Registry readiness records loaded and validated definitions; runtime registration belongs to
+dependency readiness. Crash-loop recovery requires a full 60 seconds of uninterrupted running with
+both readiness fields true. Fatal causes remain in server stderr, while public incidents stay redacted.
+The child exits with code 1 after a one-second failure grace period. Without PORT, its listener uses
+an ephemeral port on Deno's default interface; AppHost wiring and probes remain follow-up scope.

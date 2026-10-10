@@ -3,10 +3,11 @@ import { ChildHealthMonitor } from '../runtime/child-health-monitor.ts';
 import { childHealthResponse } from './child-health-response.ts';
 
 /**
- * Start health before bootstrap and retain a red surface after a child fails.
+ * Start health before bootstrap and expose failure for one second before exiting.
  *
  * Signal handlers and the health listener are owned by this process, independent
- * of a frontend session. The child must drain when its signal is aborted.
+ * of a frontend session. Fatal causes remain in server logs, never in the payload,
+ * and set the process exit code to one. The child must drain when its signal is aborted.
  *
  * @example
  * ```ts
@@ -30,6 +31,7 @@ export async function runChildHealthProcess(
   const health = new ChildHealthMonitor();
   const controller = new AbortController();
   let terminal: ChildHealthSnapshot | undefined;
+  let failureTimer: ReturnType<typeof setTimeout> | undefined;
   const server = Deno.serve(
     { port },
     (request) => childHealthResponse(request, terminal ?? snapshot?.() ?? health.snapshot()),
@@ -39,7 +41,9 @@ export async function runChildHealthProcess(
     : ['SIGINT', 'SIGTERM'];
   const stop = () => controller.abort();
   for (const signal of signals) Deno.addSignalListener(signal, stop);
-  const failed = () => {
+  const failed = (cause: unknown) => {
+    console.error('Background child failed:', cause);
+    Deno.exitCode = 1;
     const child = snapshot?.();
     health.failed();
     terminal = Object.freeze({
@@ -48,10 +52,13 @@ export async function runChildHealthProcess(
       dependencyReady: false,
       lastFatalError: child?.lastFatalError ?? health.snapshot().lastFatalError,
     });
+    failureTimer = setTimeout(stop, 1_000);
   };
   const completion = Promise.resolve().then(() => run(health, controller.signal)).then(
     () => {
-      if (!controller.signal.aborted) failed();
+      if (!controller.signal.aborted) {
+        failed(new Error('Background child stopped before process shutdown.'));
+      }
     },
     failed,
   );
@@ -62,6 +69,7 @@ export async function runChildHealthProcess(
     await completion;
     health.stopped();
   } finally {
+    clearTimeout(failureTimer);
     for (const signal of signals) Deno.removeSignalListener(signal, stop);
     await server.shutdown();
   }

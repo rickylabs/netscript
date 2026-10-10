@@ -117,17 +117,19 @@ console.log(health.snapshot().state); // ready
 The closed state vocabulary is `starting | ready | degraded | crash-looping | stopped | failed`. The
 payload also reports `registryReady`, `dependencyReady`, cumulative `restartCount`, and
 `lastFatalError` (a fixed redacted message plus an epoch-millisecond timestamp, or `null`). Registry
-readiness means every definition was registered; dependency readiness describes startup checks and
-listener failures, rather than a continuous backing-service heartbeat.
+readiness means the generated definitions were loaded and validated. Dependency readiness includes
+runtime registration, startup checks, and listener failures, rather than a continuous backing-service
+heartbeat.
 
-Three restarts within 60 seconds latch `crash-looping` for the child lifetime. A successful retry
-cannot turn that child green; clean shutdown reports `stopped`. Restart history retains at most
+Three restarts within 60 seconds latch `crash-looping`. Recovery requires a full 60 seconds of
+uninterrupted running with both readiness fields true; a brief retry cannot turn the child green.
+A new failure resets the clean window, and clean shutdown reports `stopped`. Restart history retains at most
 three timestamps. Health responses return HTTP 200 only for `ready` with both readiness fields true;
 all other states return HTTP 503. Raw exception messages, stacks, credentials, and definition data
 never enter this payload.
 
 Generated workers, triggers, and sagas glue starts the health listener before bootstrap and keeps a
-failed child observable until process shutdown. These processes run under their service identity
+failed child observable during a one-second grace period before exiting nonzero. These processes run under their service identity
 without an app or owner session. AppHost probe generation and doctor/MCP aggregation consume this
 contract in subsequent slices of #1366.
 
@@ -274,3 +276,8 @@ The existing first-party public declarations record unfinished adoption, not pro
 services are guarded. Their credential propagation, session seeding, per-service access policy and
 auth discovery work remain under #1383; auth signout authorization remains under #1384. This source
 change does not imply availability in an existing published package.
+
+Fatal bootstrap causes are logged to server stderr and set exit code 1. The process retains a red
+health response for one second, then closes its listener and exits; it does not require an operator
+signal. PORT selects the health listener port; without it, Deno binds an ephemeral port on its default
+interface. Rule-based AppHost port wiring and probes remain a subsequent slice of #1366.

@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { ChildHealthMonitor } from '@netscript/plugin/health';
+import { type KvEntry, type KvKey, MemoryKvAdapter } from '@netscript/kv';
 import { startTriggerProcessorRuntime } from './trigger-processor.ts';
 
 Deno.test('trigger background health includes startup readiness and clean shutdown', async () => {
@@ -47,12 +48,17 @@ Deno.test('trigger background health includes startup readiness and clean shutdo
 
 Deno.test('trigger dependency unavailable cannot turn background health green', async () => {
   const health = new ChildHealthMonitor();
-  const kv = { get: () => Promise.reject(new Error('secret dependency failure')) };
+  class UnavailableKv extends MemoryKvAdapter {
+    override get<T>(_key: KvKey): Promise<KvEntry<T> | null> {
+      return Promise.reject(new Error('secret dependency failure'));
+    }
+  }
+  const kv = new UnavailableKv();
   await assertRejects(() =>
     startTriggerProcessorRuntime({
       health,
       definitions: [],
-      kv: kv as never,
+      kv,
     })
   );
   assertEquals(health.snapshot().registryReady, true);

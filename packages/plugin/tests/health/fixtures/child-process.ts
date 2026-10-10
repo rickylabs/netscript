@@ -11,6 +11,8 @@ await runChildHealthProcess(async (health, signal) => {
     health.dependenciesReady();
     health.running();
   }
+  if (Deno.args[0] === 'completed') return;
+  console.error('fixture-ready');
   await new Promise<void>((resolve) => {
     if (signal.aborted) resolve();
     else signal.addEventListener('abort', () => resolve(), { once: true });

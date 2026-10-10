@@ -1,5 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { createSagaRuntime, type SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
+import { ChildHealthMonitor } from '@netscript/plugin/health';
+import { startSagaRunner } from './saga-runner.ts';
 import { SagaRuntimeSupervisor } from './saga-supervisor.ts';
 
 function runtime(start?: () => Promise<void>): SagaRuntime {
@@ -79,4 +81,35 @@ Deno.test('concurrent saga startup shares registry load and shutdown waits for b
   await first;
   await stopped;
   assertEquals(supervisor.snapshot().childHealth.state, 'stopped');
+});
+
+Deno.test('saga factory failure preserves loaded registry readiness', async () => {
+  const supervisor = new SagaRuntimeSupervisor({
+    loadDefinitions: () => Promise.resolve([]),
+    createRuntime: () => Promise.reject(new Error('secret KV unavailable')),
+  });
+  await assertRejects(() => supervisor.start());
+  assertEquals(supervisor.snapshot().childHealth.registryReady, true);
+  assertEquals(supervisor.snapshot().childHealth.dependencyReady, false);
+  assertEquals(supervisor.snapshot().childHealth.state, 'failed');
+});
+
+Deno.test('saga runner startup failure updates the process monitor before returning a supervisor', async () => {
+  const health = new ChildHealthMonitor();
+  await assertRejects(() =>
+    startSagaRunner({
+      registryModule: 'file:///generated-sagas.ts',
+      importer: () => Promise.resolve({ sagaRegistry: [] }),
+      readEnv: () => undefined,
+      projection: false,
+      supervisor: {
+        health,
+        createRuntime: () => Promise.reject(new Error('secret KV unavailable')),
+      },
+    })
+  );
+  assertEquals(health.snapshot().registryReady, true);
+  assertEquals(health.snapshot().dependencyReady, false);
+  assertEquals(health.snapshot().state, 'failed');
+  assertEquals(JSON.stringify(health.snapshot()).includes('secret'), false);
 });

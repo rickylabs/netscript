@@ -48,7 +48,7 @@ export type ChildFatalError = Readonly<{
 export type ChildHealthSnapshot = Readonly<{
   /** Named lifecycle state; only ready is healthy. */
   state: ChildHealthState;
-  /** All generated definitions have been loaded and registered. */
+  /** Generated definitions have been loaded and validated. */
   registryReady: boolean;
   /** Startup dependency checks succeeded and no listener failure is active. */
   dependencyReady: boolean;
@@ -59,7 +59,7 @@ export type ChildHealthSnapshot = Readonly<{
 }>;
 
 /**
- * Three restarts within sixty seconds latch the child into crash-looping.
+ * Three restarts within sixty seconds latch crash-looping until a clean running window.
  *
  * @example
  * ```ts

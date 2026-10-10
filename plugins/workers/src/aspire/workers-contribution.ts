@@ -75,7 +75,10 @@ export class WorkersAspireContribution extends AspireNSPluginContribution {
     };
   }
 
-  /** Declare health checks used by plugin doctor commands. */
+  /**
+   * Legacy health declarations; production does not consume this hook.
+   * @deprecated Since 0.0.8; removal next release. Use generated AppHost child probes and payloads.
+   */
   override declareHealthChecks(ctx: ContributionContext): readonly HealthCheckSpec[] {
     const apiPort = ctx.port(WORKERS_API_RESOURCE);
     return [{
