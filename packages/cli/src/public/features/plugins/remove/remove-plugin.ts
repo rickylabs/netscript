@@ -1,6 +1,7 @@
 import { join } from '@std/path';
 
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { IoError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
@@ -100,7 +101,13 @@ export async function removePlugin(
       await reverseManagedInstallFiles(input.projectRoot, plan.installState, dependencies.fs);
     }
     await reconcilePluginReferences(input.projectRoot, dependencies.fs);
-    const helperFiles = await regenerateRemovalHelpers(input.projectRoot, dependencies);
+    const browserAuthFiles = await reconcileBrowserAuth(
+      input.projectRoot,
+      dependencies.fs,
+      dependencies.formatter,
+    );
+    const aspireFiles = await regenerateRemovalHelpers(input.projectRoot, dependencies);
+    const helperFiles = [...browserAuthFiles, ...aspireFiles];
     await pruneEmptyGeneratedParents(input.projectRoot, dependencies.fs);
 
     return {

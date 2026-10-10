@@ -1,6 +1,7 @@
 import { join } from '@std/path';
 import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/version-registry.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import {
   regenerateAspireHelpers,
   removeServiceAppsettingsEntry,
@@ -83,13 +84,19 @@ export async function removeService(
     await registry.regenerateRoot(contractsRoot);
   }
 
+  const browserAuthFiles = await reconcileBrowserAuth(
+    request.projectRoot,
+    dependencies.fs,
+    dependencies.formatter,
+  );
   const regenerate = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
-  const helperFiles = await regenerate(
+  const aspireFiles = await regenerate(
     request.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
     { formatter: dependencies.formatter },
   );
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
   return { serviceDir, removedContracts, helperFiles };
 }

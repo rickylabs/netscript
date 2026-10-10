@@ -278,3 +278,41 @@ Deno.test('Aspire generation preserves authored appsettings byte formatting', as
     assertEquals(await Deno.readTextFile(path), authored);
   });
 });
+
+Deno.test('Aspire generation with auth preserves authored configuration and service bytes', async () => {
+  await withProject(async (root) => {
+    const settingsPath = join(root, 'appsettings.json');
+    const settings = JSON.parse(await Deno.readTextFile(settingsPath));
+    settings.NetScript.Plugins = {
+      auth: { Runtime: 'deno', Workdir: 'plugins/auth', Entrypoint: 'services/main.ts' },
+    };
+    settings.NetScript.Apps = { web: { Type: 'app', Workdir: 'apps/web' } };
+    settings.NetScript.Services = {
+      users: { Runtime: 'deno', Workdir: 'services/users', Entrypoint: 'src/main.ts' },
+    };
+    const authored = '  ' + JSON.stringify(settings) + '\n\n';
+    await Deno.writeTextFile(settingsPath, authored);
+    const sourcePath = join(root, 'services/users/src/main.ts');
+    await Deno.mkdir(dirname(sourcePath), { recursive: true });
+    const source = `import { defineService } from '@netscript/service';
+await defineService(router, {
+  auth: { public: true, reason: 'Scaffold demo is public; #1382 L2 will wire the guarded auth policy' },
+  name: 'users' });
+`;
+    await Deno.writeTextFile(sourcePath, source);
+    await Deno.mkdir(join(root, 'apps/web'), { recursive: true });
+    await Deno.writeTextFile(join(root, 'apps/web/utils.ts'), '// authored Fresh utilities\n');
+
+    const generated = await command(root);
+    assertEquals(generated.code, 0, new TextDecoder().decode(generated.stderr));
+    assertEquals(await Deno.readTextFile(settingsPath), authored);
+    assertEquals(await Deno.readTextFile(sourcePath), source);
+    const before = await snapshot(root);
+    assertEquals((await inspect(root)).status, 'current');
+    assertEquals((await command(root)).code, 0);
+    assertEquals((await inspect(root)).status, 'current');
+    assertEquals(await snapshot(root), before);
+    assert(!Object.keys(before).some((path) => path.startsWith('/auth/')));
+    assert(!('/apps/web/routes/auth/[action].ts' in before));
+  });
+});

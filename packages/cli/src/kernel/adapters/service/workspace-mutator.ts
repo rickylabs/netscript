@@ -14,7 +14,6 @@ import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { ServiceConfigEntry } from '../../domain/service-shape.ts';
-import { reconcileBrowserAuth } from '../plugin/browser-auth-reconciler.ts';
 
 /** Project metadata needed to scaffold service resources. */
 export interface ServiceProjectMetadata {
@@ -143,11 +142,8 @@ export async function regenerateAspireHelpers(
     readonly force?: boolean;
   },
 ): Promise<readonly string[]> {
-  const browserAuthFiles = options.dryRun
-    ? []
-    : await reconcileBrowserAuth(projectRoot, fs, options.formatter);
   const files = await renderAspireSurface(projectRoot, fs, templateAdapter, options);
-  const written: string[] = [...browserAuthFiles];
+  const written: string[] = [];
   for (const file of files) {
     const path = join(projectRoot, file.path);
     const changed = options.force || !await fs.exists(path) ||

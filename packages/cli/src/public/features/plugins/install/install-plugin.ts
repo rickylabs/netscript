@@ -10,6 +10,7 @@ import type { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import type {
@@ -248,14 +249,21 @@ export async function installPlugin(
     rootDenoJsonBefore,
   });
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
+  const browserAuthFiles = await reconcileBrowserAuth(
+    plan.projectRoot,
+    dependencies.fs,
+    dependencies.formatter,
+  );
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
-  const helperFiles = await regenerateHelpers(
+  const aspireFiles = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
     { formatter: dependencies.formatter },
   );
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
+
   if (dependencies.processRunner) {
     await formatGeneratedFiles(dependencies.processRunner, plan.projectRoot, [
       join(plan.projectRoot, 'netscript.config.ts'),

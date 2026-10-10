@@ -4,6 +4,7 @@ import {
   upsertServiceAppsettingsEntry,
 } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { PortAllocator } from '../../../../kernel/adapters/service/port-allocator.ts';
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/workspace-resolver.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
@@ -95,14 +96,21 @@ export async function addService(
   const clientPath = clientResult?.planned.find((file) => file.serviceName === plan.serviceName)
     ?.path;
 
+  const browserAuthFiles = await reconcileBrowserAuth(
+    plan.projectRoot,
+    dependencies.fs,
+    dependencies.formatter,
+  );
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
-  const helperFiles = await regenerateHelpers(
+  const aspireFiles = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
     { formatter: dependencies.formatter },
   );
+
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
 
   return {
     ...rendered,
