@@ -274,6 +274,42 @@ for (const mode of STORE_MODES) {
     );
   });
 
+  Deno.test(`${mode.name}: a broadcast result is not rolled back by an earlier result's cascade`, async () => {
+    // Both sagas handle `Start`, so one engine call commits both before the bridge dispatches.
+    // A's cascade moves B to version 2 before B's own result (version 1) is dispatched; B's
+    // compensation must still commit version 3 rather than race its own stale snapshot.
+    const toucher = defineSaga('toucher').state<SagaState>({});
+    const refund = defineSaga(SAGA_ID).state<SagaState>({ touched: false, undone: false });
+    const definitions = [
+      (mode.atomic ? toucher.durableWorkerCommands() : toucher)
+        .on('Start', () => [send('TouchRefund', {})])
+        .build() as SagaDefinition,
+      (mode.atomic ? refund.durableWorkerCommands() : refund)
+        .correlate(() => CORRELATION_KEY)
+        .on('Start', () => [sagaCompensate({ type: 'Undo', payload: {} })])
+        .on('TouchRefund', (saga) => {
+          saga.state = { ...saga.state, touched: true };
+          return [];
+        })
+        .compensate('Undo', (saga) => {
+          saga.state = { ...saga.state, undone: true };
+          return [sagaFail('order cancelled')];
+        })
+        .build() as SagaDefinition,
+    ];
+
+    const store = await runSaga(definitions, [{ type: 'Start', payload: {} }]);
+
+    const loaded = await store.load(INSTANCE_ID);
+    assertEquals(loaded?.metadata.status, 'failed');
+    assertEquals(loaded?.metadata.version, 3);
+    assertEquals(loaded?.state, { touched: true, undone: true });
+    assertEquals(
+      store.transitions(INSTANCE_ID).map((record) => record.transition.status),
+      ['compensating', 'compensating', 'failed'],
+    );
+  });
+
   Deno.test(`${mode.name}: sagaFail from .on() persists the outcome of its compensate branch`, async () => {
     const builder = defineSaga(SAGA_ID).state<SagaState>({ payment: 'captured' });
     const definition = (mode.atomic ? builder.durableWorkerCommands() : builder)
