@@ -256,7 +256,7 @@ function coreDenoJson(
       '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
       '@orpc/server': 'npm:@orpc/server@^1.14.6',
       '@std/assert': 'jsr:@std/assert@^1',
-      'zod': 'npm:zod@^4.4.3',
+      'zod': 'npm:zod@^4.6.5',
     },
     tasks: {
       check:
