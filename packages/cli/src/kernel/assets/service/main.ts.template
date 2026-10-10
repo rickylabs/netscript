@@ -7,9 +7,12 @@
 import { defineService } from '@netscript/service';
 {{authImports}}
 import { db } from '@database';
-import { router } from './router.ts';
+import { createRouter } from './router.ts';
+import { createPrisma{{serviceName | pascalCase}}Repository } from './adapters/prisma-{{entityName}}-repository.ts';
 
 const database = await db.getClient();
+
+const router = createRouter(createPrisma{{serviceName | pascalCase}}Repository(database));
 
 await defineService(router, {
   {{authPolicy}}

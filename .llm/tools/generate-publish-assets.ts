@@ -1,5 +1,6 @@
 /** Generates registry-safe TypeScript constants for publish-time package assets. */
 
+import { AGENT_DOCS_PAGE_CARRIER, readAgentDocsPages } from './docs/agent-docs-page-carrier.ts';
 import { normalizeDocsSlug } from '../../packages/mcp/src/domain/docs/docs-corpus-port.ts';
 import { rewriteNetScriptVersion } from './deps/bump-version.ts';
 
@@ -36,12 +37,14 @@ export const MCP_EMBEDDED_DOC_PATHS = [
  */
 export const MCP_EMBEDDED_DOCS_MAX_BYTES = 294_912;
 
-export const PUBLISH_ASSET_OUTPUTS = [
-  '.llm/assets/agent-docs/prose.json.gz',
+export const PUBLISH_ASSET_OUTPUTS: readonly string[] = [
+  AGENT_DOCS_PAGE_CARRIER,
+  'packages/cli/src/kernel/assets/llms-policy.generated.ts',
   '.llm/assets/agent-docs/provenance.json',
   'packages/cli/src/kernel/assets/agent-tools.generated.ts',
   'packages/cli/src/kernel/assets/agent-docs.generated.ts',
   'packages/cli/src/kernel/assets/embedded.generated.ts',
+  'packages/cli/src/kernel/assets/generated/database/postgres-connection-string.ts.template',
   'packages/cli/src/kernel/assets/skills.generated.ts',
   'packages/plugin/src/kernel/assets/embedded.generated.ts',
   'packages/fresh-ui/registry.generated.ts',
@@ -211,9 +214,20 @@ export async function refreshAgentDocsProvenance(
   const path = '.llm/assets/agent-docs/provenance.json';
   const url = new URL(path, root);
   const parsed: unknown = JSON.parse(await Deno.readTextFile(url));
-  const provenance = closeAgentDocsProvenance(parsed);
+  if (
+    typeof parsed !== 'object' || parsed === null || Reflect.get(parsed, 'schemaVersion') !== 1 ||
+    typeof Reflect.get(parsed, 'version') !== 'string'
+  ) throw new Error('Agent docs provenance must use schema version 1');
+  const provenance = parsed as { readonly version: string };
+  const legacy = Reflect.get(parsed as object, 'sha256');
   const expected = `${
-    JSON.stringify(closeAgentDocsProvenance(provenance, { version }), null, 2)
+    JSON.stringify(
+      typeof legacy === 'string'
+        ? closeAgentDocsProvenance(parsed, { version })
+        : { schemaVersion: 1, version },
+      null,
+      2,
+    )
   }\n`;
   if (check) {
     if (await Deno.readTextFile(url) !== expected) recordStalePath(stalePaths, path);
@@ -299,15 +313,23 @@ export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedM
   ) as AgentDocsProvenance;
   if (
     releaseProvenance.schemaVersion !== 1 || releaseProvenance.version !== frameworkVersion ||
-    typeof releaseProvenance.sourceCommit !== 'string'
+    typeof releaseProvenance.version !== 'string'
   ) {
     throw new Error(`${provenancePath} must match MCP framework version ${frameworkVersion}`);
   }
-  const compressed = await Deno.readFile(new URL('.llm/assets/agent-docs/prose.json.gz', root));
-  const copied = new Uint8Array(compressed.byteLength);
-  copied.set(compressed);
-  const stream = new Blob([copied.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
-  const payload = JSON.parse(await new Response(stream).text()) as AgentDocsPayload;
+  let payload: AgentDocsPayload;
+  try {
+    payload = {
+      schemaVersion: 1,
+      files: await readAgentDocsPages(new URL(AGENT_DOCS_PAGE_CARRIER, root), frameworkVersion),
+    };
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+    const compressed = await Deno.readFile(new URL('.llm/assets/agent-docs/prose.json.gz', root));
+    payload = JSON.parse(
+      new TextDecoder().decode(await decompressGzip(compressed)),
+    ) as AgentDocsPayload;
+  }
   if (payload.schemaVersion !== 1 || !payload.files || typeof payload.files !== 'object') {
     throw new Error('agent docs prose payload must use schema version 1');
   }
@@ -332,7 +354,7 @@ export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedM
     provenance: {
       schemaVersion: 1,
       frameworkVersion,
-      sourceCommit: releaseProvenance.sourceCommit,
+      sourceCommit: 'content-addressed',
       paths: [...MCP_EMBEDDED_DOC_PATHS],
       sourceBytes,
       documentCount: documents.length,
@@ -348,6 +370,21 @@ export async function generateMcpAssets(
 ): Promise<void> {
   const version = await readVersion('packages/mcp/deno.json', root);
   const readme = await Deno.readTextFile(new URL('packages/mcp/README.md', root));
+  const current = await Deno.readTextFile(
+    new URL('packages/mcp/src/publish-assets.generated.ts', root),
+  ).catch(() => '');
+  const previous = current.match(/MCP_PACKAGE_README_GZIP_BASE64: string =\s*("[^"]*"|'[^']*')/)
+    ?.[1];
+  let readmeCompressed: Uint8Array | undefined;
+  if (previous) {
+    try {
+      const bytes = Uint8Array.fromBase64(previous.slice(1, -1));
+      if (new TextDecoder().decode(await decompressGzip(bytes)) === readme) {
+        readmeCompressed = bytes;
+      }
+    } catch { /* Regenerate a corrupt transport. */ }
+  }
+  readmeCompressed ??= await compressGzip(new TextEncoder().encode(readme));
   const embedded = await buildMcpEmbeddedDocs(root);
   await write(
     'packages/mcp/src/publish-assets.generated.ts',
@@ -355,13 +392,21 @@ export async function generateMcpAssets(
 export const MCP_PACKAGE_VERSION: string = ${JSON.stringify(version)};
 
 /** Published MCP README embedded as the default documentation corpus. */
-export const MCP_PACKAGE_README: string = ${JSON.stringify(readme)};
+const MCP_PACKAGE_README_GZIP_BASE64: string = ${JSON.stringify(readmeCompressed.toBase64())};
+export const MCP_PACKAGE_README: string = await new Response(new Blob([Uint8Array.fromBase64(MCP_PACKAGE_README_GZIP_BASE64).buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
 
 /** Generated golden-path prose used when no project documentation corpus resolves. */
-export const MCP_EMBEDDED_DOCS = ${JSON.stringify(embedded.documents)} as const;
+// deno-fmt-ignore
+export const MCP_EMBEDDED_DOCS = [\n${
+      embedded.documents.map((document) => `  ${JSON.stringify(document)},`).join('\n\n')
+    }\n] as const;
 
 /** Release identity, cardinality, size, and integrity of the generated fallback prose. */
-export const MCP_EMBEDDED_DOCS_PROVENANCE = ${JSON.stringify(embedded.provenance)} as const;
+export const MCP_EMBEDDED_DOCS_PROVENANCE: import('./infrastructure/release-embedded-docs-corpus.ts').ReleaseEmbeddedDocsProvenance = { schemaVersion: 1, frameworkVersion: MCP_PACKAGE_VERSION, sourceCommit: 'content-addressed',
+  paths: MCP_EMBEDDED_DOCS.map((doc) => doc.path), sourceBytes: MCP_EMBEDDED_DOCS.reduce((sum, doc) => sum + new TextEncoder().encode(doc.source).byteLength, 0),
+  documentCount: MCP_EMBEDDED_DOCS.length,
+  sha256: new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(MCP_EMBEDDED_DOCS.map(({ path, source }) => \`\${path}\0\${source}\`).join('\0')))).toHex(),
+} as const;
 `,
     root,
     check,

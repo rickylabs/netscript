@@ -18,3 +18,18 @@ Deno.test('streamsPlugin manifest exposes service, telemetry, E2E, Aspire, and h
   assertEquals(verification.findings, []);
   assertEquals(verification.inspection.details.contributionGroups, 4);
 });
+
+Deno.test('streams manifest declares ephemeral memory and the probed file opt-in', async () => {
+  assertEquals(streamsPlugin.metadata?.storage, {
+    defaultMode: 'memory',
+    ephemeral: true,
+    fileOptInEnv: 'STREAMS_DATA_DIR',
+    startupProbe: 'write-read',
+    restartGuarantee: 'orderly-process-restart',
+  });
+  assert(streamsPlugin.description?.includes('Ephemeral'));
+  assert(denoJson.description.includes('Ephemeral'));
+  const descriptor = JSON.parse(await Deno.readTextFile('plugins/streams/scaffold.plugin.json'));
+  assert(descriptor.description.includes('Ephemeral'));
+  assert(descriptor.description.includes('STREAMS_DATA_DIR'));
+});

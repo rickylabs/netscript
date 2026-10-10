@@ -12,11 +12,12 @@ const repositoryRoot = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.u
 Deno.test('published JSDoc TypeScript examples compile against shipped entrypoints', async () => {
   const analysis = await analyzeJsdocExamples(repositoryRoot);
   const result = await compileJsdocExamples(analysis, repositoryRoot);
+  assertEquals(result.failureCensus.typeError, 0, result.diagnostics);
   const census = {
     ...analysis.census,
     failures: result.enforcedFailureCount,
   };
-  const ratchetFailures = jsdocExampleRatchetFailures(analysis.census, result.deferredExamples);
+  const ratchetFailures = jsdocExampleRatchetFailures(analysis.census);
   assertEquals(
     { code: result.code, ratchetFailures },
     { code: 0, ratchetFailures: [] },

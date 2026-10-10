@@ -119,21 +119,23 @@ export interface TraceContext {
  *
  * @example
  * ```ts
- * // In an oRPC handler
- * getById: v1.users.getById.handler(async ({ input }) => {
- *   const trace = createTraceContext();
+ * import { notFound, type NotFoundOptions } from '@netscript/contracts';
  *
- *   trace.addEvent('user.lookup.start', { userId: input.id });
- *   const user = await db.mssql.user.findUnique({ where: { id: input.id } });
- *   trace.addEvent('user.lookup.complete', { found: !!user });
+ * declare const input: { id: string };
+ * declare const errors: NotFoundOptions['errors'];
+ * declare const db: { user: { findUnique(args: { where: { id: string } }): Promise<{ id: string } | null> } };
  *
- *   if (!user) {
- *     trace.setAttributes({ 'user.notFound': true });
- *     throw new NotFoundError('User not found');
- *   }
+ * // Inside a handler, after its input has been validated:
+ * const trace = createTraceContext();
+ * trace.addEvent('user.lookup.start', { userId: input.id });
+ * const user = await db.user.findUnique({ where: { id: input.id } });
+ * trace.addEvent('user.lookup.complete', { found: !!user });
  *
- *   return user;
- * }),
+ * if (!user) {
+ *   trace.setAttributes({ 'user.notFound': true });
+ *   notFound({ errors, path: ['users', 'getById'], resourceId: input.id });
+ * }
+ * console.log(user.id);
  * ```
  */
 export function createTraceContext(): TraceContext {

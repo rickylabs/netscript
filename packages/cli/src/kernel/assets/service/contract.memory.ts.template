@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { oc } from '@orpc/contract';
+import { baseContract } from '@netscript/contracts';
 import { implement } from '@orpc/server';
 
 export const {{serviceName | pascalCase}}HealthSchemaV1 = z.object({
@@ -72,17 +72,20 @@ export type {{serviceName | pascalCase}}UpdateStatusResponseV1 = z.infer<
  */
 export const {{serviceName | pascalCase}}ContractV1 = {
   health: {
-    check: oc
+    check: baseContract
       .route({ method: 'GET' })
+      .meta({ access: { authentication: 'none' } })
       .input(z.object({}).optional())
       .output({{serviceName | pascalCase}}HealthSchemaV1),
   },
-  list: oc
+  list: baseContract
     .route({ method: 'POST' })
+    .meta({ access: { authentication: 'none' } })
     .input({{serviceName | pascalCase}}ListInputSchemaV1)
     .output({{serviceName | pascalCase}}ListResponseSchemaV1),
-  updateStatus: oc
+  updateStatus: baseContract
     .route({ method: 'POST' })
+    .meta({ access: { authentication: 'none' } })
     .input({{serviceName | pascalCase}}UpdateStatusInputSchemaV1)
     .output({{serviceName | pascalCase}}UpdateStatusResponseSchemaV1),
 };

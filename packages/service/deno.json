@@ -10,10 +10,11 @@
     "./internal-credential": "./src/auth/internal-credential/mod.ts",
     "./commands": "./commands.ts",
     "./commands/testing": "./commands-testing.ts",
-    "./commands/relay": "./commands-relay.ts"
+    "./commands/relay": "./commands-relay.ts",
+    "./rate-limit": "./src/rate-limit/mod.ts"
   },
   "tasks": {
-    "check": "deno check --unstable-kv ./mod.ts commands.ts commands-testing.ts commands-relay.ts ./src/auth/internal-credential/mod.ts",
+    "check": "deno check --unstable-kv ./mod.ts commands.ts commands-testing.ts commands-relay.ts ./src/auth/internal-credential/mod.ts ./src/rate-limit/mod.ts",
     "test": "deno test --allow-all ./tests/",
     "lint": "deno lint",
     "fmt": "deno fmt --check",
@@ -34,7 +35,8 @@
     "zod": "catalog:",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "@netscript/database": "jsr:@netscript/database@0.0.7",
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7"
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.7"
   },
   "publish": {
     "include": [

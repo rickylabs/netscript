@@ -149,6 +149,7 @@ const PLUGIN_KIND_SOURCE_IMPORTS: Readonly<Record<string, Readonly<Record<string
     '@netscript/fresh': netscriptJsrSpecifier('fresh'),
   },
   auth: {
+    '@netscript/plugin-auth-core': netscriptJsrSpecifier('plugin-auth-core'),
     '@netscript/plugin-auth': netscriptJsrSpecifier('plugin-auth'),
   },
   saga: {

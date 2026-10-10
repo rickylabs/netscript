@@ -83,7 +83,7 @@ export async function writeOfficialPluginManifests(sourceRoot: string): Promise<
     JSON.stringify({
       provider: {
         kind: 'stream',
-        displayName: 'Durable Streams',
+        displayName: 'Streams (ephemeral by default)',
         category: 'plugin',
         portRangeKey: 'PLUGIN_API',
         defaultPermissions: ['--allow-net'],

@@ -3,6 +3,7 @@ import {
   type DocsCorpusPort,
   DocsCorpusUnavailableError,
   type DocsDocument,
+  DocsDocumentTooLargeError,
   type DocsSearchMatch,
   type DocsSection,
   type DocsSummary,
@@ -10,6 +11,7 @@ import {
   normalizeDocsSlug,
   slugifyDocsHeading,
 } from '../domain/docs/docs-corpus-port.ts';
+import { docSourceBlocks } from '../domain/docs/faithful-extraction.ts';
 import { GuidanceIndex } from '../domain/docs/guidance-index.ts';
 import type { GuidanceResult } from '../domain/docs/guidance-contract.ts';
 
@@ -24,7 +26,7 @@ interface CachedSource {
 export interface FilesystemDocsCorpusOptions {
   /** Absolute or working-directory-relative root containing public Markdown. */
   readonly root: string;
-  /** Maximum Markdown characters retained per document. */
+  /** Source admission ceiling; oversized documents are rejected individually, never truncated. */
   readonly maxDocumentLength?: number;
 }
 
@@ -38,6 +40,7 @@ export interface RawDocsSource {
 export interface DocsCorpusIndexedState {
   readonly documents: Map<string, DocsDocument>;
   readonly aliases: Map<string, string>;
+  readonly rejected: Map<string, DocsDocumentTooLargeError>;
 }
 
 /** Lazily index a public Markdown tree with per-file mtime reuse. */
@@ -47,6 +50,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
   #cache = new Map<string, CachedSource>();
   #documents = new Map<string, DocsDocument>();
   #aliases = new Map<string, string>();
+  #rejected = new Map<string, DocsDocumentTooLargeError>();
   #guidance = new GuidanceIndex([]);
   #fingerprint: string | undefined;
 
@@ -64,6 +68,12 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
     );
   }
 
+  /** Capture complete indexed documents after one refresh for offline batch consumers. */
+  async snapshot(): Promise<readonly DocsDocument[]> {
+    await this.#refresh();
+    return [...this.#documents.values()];
+  }
+
   /** Rank current public documents using weighted lexical matches. */
   async search(query: string): Promise<readonly DocsSearchMatch[]> {
     await this.#refresh();
@@ -79,6 +89,8 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
     await this.#refresh();
     const normalized = normalizeDocsSlug(slug);
     const canonicalSlug = this.#aliases.get(normalized) ?? normalized;
+    const rejection = this.#rejected.get(canonicalSlug);
+    if (rejection) throw rejection;
     const document = this.#documents.get(canonicalSlug);
     if (!document) return undefined;
     if (canonicalSlug !== normalized) {
@@ -106,6 +118,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
     const seen = new Set<string>();
     const sources: RawDocsSource[] = [];
     const versions: string[] = [];
+    const oversized = new Map<string, DocsDocumentTooLargeError>();
     for await (const path of walkDocsSources(rootReal)) {
       const relativePath = relative(rootReal, path);
       if (!isPublicDocsSource(relativePath) || !isPublicDocsPath(relativePath)) continue;
@@ -113,31 +126,41 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
       if (!isWithinRoot(rootReal, realPath)) continue;
       seen.add(realPath);
       const stat = await Deno.stat(realPath);
+      const slug = docsSlugFromPath(relativePath);
       const mtime = stat.mtime?.getTime() ?? 0;
+      versions.push(`${slug}\0${realPath}\0${mtime}\0${stat.size}`);
+      if (stat.size > this.#maxDocumentLength * 4) {
+        oversized.set(slug, new DocsDocumentTooLargeError(slug, this.#maxDocumentLength));
+        this.#cache.delete(realPath);
+        continue;
+      }
       let cached = this.#cache.get(realPath);
       if (!cached || cached.mtime !== mtime) {
         const source = await Deno.readTextFile(realPath);
         cached = { mtime, source };
         this.#cache.set(realPath, cached);
       }
-      const slug = docsSlugFromPath(relativePath);
       sources.push({ slug, source: cached.source });
-      versions.push(`${slug}\0${realPath}\0${mtime}`);
     }
     for (const path of this.#cache.keys()) if (!seen.has(path)) this.#cache.delete(path);
-    if (sources.length === 0) {
+    if (sources.length === 0 && oversized.size === 0) {
       throw new DocsCorpusUnavailableError(this.#root);
     }
     // Re-index only when a source was added, removed, renamed, or modified: parsing documents and
     // building the guidance index (IDF table, link graph) is per corpus load, not per request.
     const fingerprint = versions.join('\n');
     if (fingerprint === this.#fingerprint) return;
-    const { documents, aliases } = processDocsSources(sources, this.#maxDocumentLength);
-    if (documents.size === 0) {
+    const { documents, aliases, rejected } = processDocsSources(
+      sources,
+      this.#maxDocumentLength,
+      oversized,
+    );
+    if (documents.size === 0 && rejected.size === 0) {
       throw new DocsCorpusUnavailableError(this.#root);
     }
     this.#documents = documents;
     this.#aliases = aliases;
+    this.#rejected = rejected;
     this.#guidance = new GuidanceIndex(documents.values());
     this.#fingerprint = fingerprint;
   }
@@ -176,6 +199,7 @@ export function isIndexableDocsRoot(root: string): boolean {
     if (!isPublicDocsSource(relativePath) || !isPublicDocsPath(relativePath)) continue;
     const realPath = Deno.realPathSync(path);
     if (!isWithinRoot(rootReal, realPath)) continue;
+    if (Deno.statSync(realPath).size > MAX_INDEXED_DOC_LENGTH * 4) continue;
     sources.push({
       slug: docsSlugFromPath(relativePath),
       source: Deno.readTextFileSync(realPath),
@@ -209,12 +233,18 @@ function* walkDocsSourcesSync(directory: string): Generator<string> {
 export function processDocsSources(
   sources: readonly RawDocsSource[],
   maxDocumentLength: number = MAX_INDEXED_DOC_LENGTH,
+  rejectedSources: ReadonlyMap<string, DocsDocumentTooLargeError> = new Map(),
 ): DocsCorpusIndexedState {
   const documents = new Map<string, DocsDocument>();
   const rawAliases = new Map<string, string>();
+  const rejected = new Map(rejectedSources);
 
   for (const entry of sources) {
     const rawSlug = normalizeDocsSlug(entry.slug);
+    if (entry.source.length > maxDocumentLength) {
+      rejected.set(rawSlug, new DocsDocumentTooLargeError(rawSlug, maxDocumentLength));
+      continue;
+    }
     const fm = parseFrontMatter(entry.source);
 
     if (fm.layout === 'layouts/redirect.vto' || (fm.redirectTo && !fm.body.trim())) {
@@ -265,12 +295,12 @@ export function processDocsSources(
       visited.push(current);
       current = rawAliases.get(current)!;
     }
-    if (documents.has(current)) {
+    if (documents.has(current) || rejected.has(current)) {
       resolvedAliases.set(aliasSlug, current);
     }
   }
 
-  return { documents, aliases: resolvedAliases };
+  return { documents, aliases: resolvedAliases, rejected };
 }
 
 /** Parse one Markdown source into the shared docs document contract. */
@@ -280,7 +310,10 @@ export function parseMarkdownDocument(
   maxLength: number,
 ): DocsDocument {
   const { attributes, body } = parseFrontMatter(source);
-  const content = body.slice(0, maxLength);
+  if (source.length > maxLength) {
+    throw new DocsDocumentTooLargeError(normalizeDocsSlug(slug), maxLength);
+  }
+  const content = body;
   const sections = parseSections(content);
   const firstHeading = sections.find((section) => section.level === 1)?.heading;
   const title = attributes.title || firstHeading || titleFromSlug(slug);
@@ -313,17 +346,17 @@ export function parseFrontMatter(source: string): ParsedFrontMatter {
   if (!source.startsWith('---\n') && !source.startsWith('---\r\n')) {
     return { attributes: {}, body: source };
   }
-  const lines = source.split(/\r?\n/);
-  const end = lines.indexOf('---', 1);
-  if (end < 0) return { attributes: {}, body: source };
+  const match = /^---\r?\n([\s\S]*?)^---(?:\r?\n|$)/m.exec(source);
+  if (!match) return { attributes: {}, body: source };
+  const lines = match[1]!.split(/\r?\n/);
   const attributes: Record<string, string> = {};
-  for (const line of lines.slice(1, end)) {
+  for (const line of lines) {
     const match = /^([a-zA-Z0-9_-]+):\s*(.*)$/.exec(line);
     if (match?.[1] && match[2] !== undefined) attributes[match[1]] = unquote(match[2].trim());
   }
   return {
     attributes,
-    body: lines.slice(end + 1).join('\n').trimStart(),
+    body: source.slice(match[0].length),
     layout: attributes['layout'],
     redirectTo: attributes['redirectTo'],
     oldUrl: attributes['oldUrl'],
@@ -331,21 +364,37 @@ export function parseFrontMatter(source: string): ParsedFrontMatter {
 }
 
 function parseSections(content: string): DocsSection[] {
-  const matches = [...content.matchAll(/^(#{1,6})\s+(.+?)\s*#*\s*$/gm)];
-  return matches.map((match, index) => {
+  const headings: Array<
+    { heading: string; slug: string; level: number; start: number; end: number }
+  > = [];
+  const stack: number[] = [];
+  let offset = 0;
+  for (const block of docSourceBlocks(content)) {
+    const start = content.indexOf(block.text, offset);
+    offset = start + block.text.length;
+    if (block.fenced) continue;
+    const match = /^(#{1,6})\s+(.+?)\s*#*\s*$/.exec(block.text.trimEnd());
+    if (!match) continue;
+    const level = match[1]!.length;
+    while (stack.length && headings[stack.at(-1)!]!.level >= level) {
+      headings[stack.pop()!]!.end = start;
+    }
     const heading = match[2]!.trim();
-    const start = (match.index ?? 0) + match[0].length;
-    const next = matches.slice(index + 1).find((candidate) =>
-      candidate[1]!.length <= match[1]!.length
-    );
-    const end = next?.index ?? content.length;
-    return {
+    headings.push({
       heading,
       slug: slugifyDocsHeading(heading),
-      level: match[1]!.length,
-      content: content.slice(start, end).trim(),
-    };
-  });
+      level,
+      start: offset,
+      end: content.length,
+    });
+    stack.push(headings.length - 1);
+  }
+  return headings.map(({ heading, slug, level, start, end }) => ({
+    heading,
+    slug,
+    level,
+    content: content.slice(start, end).trim(),
+  }));
 }
 
 /** Rank one parsed document against normalized lexical search terms. */

@@ -6,7 +6,10 @@
 
 import { defineService } from '@netscript/service';
 {{authImports}}
-import { router } from './router.ts';
+import { createRouter } from './router.ts';
+import { createMemory{{serviceName | pascalCase}}Repository } from './adapters/memory-{{entityName}}-repository.ts';
+
+const router = createRouter(createMemory{{serviceName | pascalCase}}Repository());
 
 await defineService(router, {
   {{authPolicy}}

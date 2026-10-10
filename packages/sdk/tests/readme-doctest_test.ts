@@ -282,10 +282,26 @@ Deno.test('README examples include checked TypeScript fences', async () => {
   try {
     for (const [index, block] of tsBlocks.entries()) {
       const file = `${tempDir}/snippet-${index}.ts`;
-      await Deno.writeTextFile(file, `${DOCTEST_PRELUDE}\n{\n${stripImports(block.code)}\n}\n`);
-      const result = await new Deno.Command(Deno.execPath(), {
-        args: ['check', '--no-config', file],
-      }).output();
+      // The fetch-source example is self-contained: prove its real public imports rather
+      // than extending the legacy ambient prelude with another simulated SDK signature.
+      const isFetchSourceExample = block.code.includes('createFetchStreamEventSourceV1');
+      const code = isFetchSourceExample
+        ? block.code.replace(
+          "'@netscript/sdk/streams/consumer'",
+          JSON.stringify(new URL('../src/client/stream-source/mod.ts', import.meta.url).href),
+        )
+        : `${DOCTEST_PRELUDE}\n{\n${stripImports(block.code)}\n}\n`;
+      await Deno.writeTextFile(file, code);
+      const args = isFetchSourceExample
+        ? [
+          'check',
+          '--unstable-kv',
+          '--config',
+          new URL('../../../deno.json', import.meta.url).pathname,
+          file,
+        ]
+        : ['check', '--no-config', file];
+      const result = await new Deno.Command(Deno.execPath(), { args }).output();
 
       if (result.code !== 0) {
         const stderr = new TextDecoder().decode(result.stderr);
