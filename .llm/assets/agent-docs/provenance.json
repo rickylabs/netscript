@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.7",
-  "sourceCommit": "53ab6023b",
-  "extractionTimestamp": "2026-10-10T14:15:48.727Z",
+  "sourceCommit": "84aa41690",
+  "extractionTimestamp": "2026-10-10T15:05:18.381Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -37,6 +37,7 @@
     "pages/data-persistence/how-to/use-a-second-database/index.md",
     "pages/data-persistence/index.md",
     "pages/data-persistence/kv-queues-cron/index.md",
+    "pages/durable-workflows/how-to/bound-stream-retention/index.md",
     "pages/durable-workflows/how-to/build-a-validated-ingestion-queue/index.md",
     "pages/durable-workflows/how-to/index.md",
     "pages/durable-workflows/how-to/publish-a-durable-stream/index.md",
@@ -187,7 +188,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 5140513,
-  "compressedBytes": 1486698,
-  "sha256": "ffbcc37806cf6d9aee25954da6b598ed1a9b37d28217585a65a6c16a2773ccd5"
+  "uncompressedBytes": 5168507,
+  "compressedBytes": 1496488,
+  "sha256": "80a07ca4257b7a298418fd3219875b76ac1f6454038da728bea3cc6b15e5d456"
 }
