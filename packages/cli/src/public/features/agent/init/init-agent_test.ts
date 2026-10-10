@@ -7,12 +7,14 @@ import {
   assertStringIncludes,
 } from '@std/assert';
 import { dirname, join } from '@std/path';
+import { parse as parseJsonc } from '@std/jsonc';
 import { format, increment, parse } from '@std/semver';
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { EMBEDDED_SKILL_FILES } from '../../../../kernel/assets/skills.generated.ts';
 import { DenoAgentInitFileSystem } from './agent-init-file-system.ts';
 import { ASPIRE_WORKFLOW_SKILLS, type AspireAgentInitializer } from './aspire-agent-initializer.ts';
 import { initAgent } from './init-agent.ts';
+import { describeAgentInitResolution } from './hosts/agent-host-resolution.ts';
 import type { AgentDocsGenerator } from './agent-docs-generator.ts';
 
 const SUCCESSFUL_ASPIRE_INITIALIZER: AspireAgentInitializer = {
@@ -165,7 +167,7 @@ Deno.test('#1672 root guidance teaches Deno inspection before implementation', a
         '`deno task lint`',
         '`deno task fmt:check`',
         'A run is not finished until `deno task test` has run.',
-        '`.agents/skills/deno/SKILL.md`',
+        'call the `deno` skill',
       ]
     ) {
       assertStringIncludes(agents, expected);
@@ -201,7 +203,7 @@ Deno.test('#1675 installs canonical skills and derives Claude mirrors', async ()
     assertFalse(await fs.exists(join(nonClaudeRoot, '.claude')));
     const agents = await Deno.readTextFile(join(nonClaudeRoot, 'AGENTS.md'));
     for (const skill of ['netscript', 'netscript-build', 'netscript-operate', 'aspire', 'deno']) {
-      assertStringIncludes(agents, `.agents/skills/${skill}/SKILL.md`);
+      assertStringIncludes(agents, `Call the \`${skill}\` skill`);
     }
   } finally {
     await Deno.remove(allRoot, { recursive: true });
@@ -221,7 +223,8 @@ Deno.test('agent init selects VS Code and detect-or-all host table', async () =>
       fs,
       aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
     });
-    assertEquals(all.hosts, ['claude', 'vscode']);
+    assertEquals(all.hosts, ['claude', 'vscode', 'opencode']);
+    assert(await fs.exists(join(root, 'opencode.json')));
     const vscode = JSON.parse(
       await Deno.readTextFile(join(root, '.vscode/mcp.json')),
     );
@@ -882,7 +885,7 @@ Deno.test('generated project search_docs reaches its installed corpus after host
   }
 });
 
-Deno.test('agent init --with-docs gives Claude, VS Code, and Zed the same docs root', async () => {
+Deno.test('agent init --with-docs gives Claude, VS Code, OpenCode, and Zed the same docs root', async () => {
   const vscodeRoot = await Deno.makeTempDir();
   const zedRoot = await Deno.makeTempDir();
   try {
@@ -900,6 +903,8 @@ Deno.test('agent init --with-docs gives Claude, VS Code, and Zed the same docs r
     const vscode = JSON.parse(await Deno.readTextFile(join(vscodeRoot, '.vscode', 'mcp.json')));
     assertEquals(claude.mcpServers.netscript.args.slice(-2), ['--docs-root', vscodeDocsRoot]);
     assertEquals(vscode.servers.netscript.args.slice(-2), ['--docs-root', vscodeDocsRoot]);
+    const opencode = JSON.parse(await Deno.readTextFile(join(vscodeRoot, 'opencode.json')));
+    assertEquals(opencode.mcp.netscript.command.slice(-2), ['--docs-root', vscodeDocsRoot]);
 
     await initAgent(
       { projectRoot: zedRoot, host: 'claude', editor: 'zed', withDocs: true },
@@ -936,6 +941,358 @@ Deno.test('offline docs failure occurs before any project write', async () => {
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('#2007 agent init resolves the host from the invoking environment and prints the source', async () => {
+  const fs = new DenoAgentInitFileSystem();
+  const roots = await Promise.all([
+    Deno.makeTempDir(),
+    Deno.makeTempDir(),
+    Deno.makeTempDir(),
+    Deno.makeTempDir(),
+  ]);
+  const [vscodeRoot, claudeZedRoot, projectRoot, defaultRoot] = roots;
+  try {
+    const vscode = await initAgent({ projectRoot: vscodeRoot }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      environment: { TERM_PROGRAM: 'vscode', VSCODE_PID: '42' },
+    });
+    assertEquals(vscode.hosts, ['vscode']);
+    assertEquals(vscode.resolution.hosts.source, 'environment');
+    assertStringIncludes(
+      describeAgentInitResolution(vscode.resolution).join('\n'),
+      'Agent hosts: vscode (from environment: TERM_PROGRAM=vscode).',
+    );
+    assert(await fs.exists(join(vscodeRoot, '.vscode/mcp.json')));
+    assertFalse(await fs.exists(join(vscodeRoot, '.mcp.json')));
+
+    const claudeZed = await initAgent({ projectRoot: claudeZedRoot }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      environment: { CLAUDECODE: '1', ZED_TERM: 'true' },
+    });
+    assertEquals(claudeZed.hosts, ['claude']);
+    assertEquals(describeAgentInitResolution(claudeZed.resolution), [
+      'Agent hosts: claude (from environment: CLAUDECODE).',
+      'Editor: zed (from environment: ZED_TERM).',
+    ]);
+    assert(await fs.exists(join(claudeZedRoot, '.mcp.json')));
+    assert(await fs.exists(join(claudeZedRoot, '.zed/settings.json')));
+
+    await Deno.mkdir(join(projectRoot, '.claude'));
+    const project = await initAgent({ projectRoot }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      environment: { OPENCODE: '1' },
+    });
+    assertEquals(project.hosts, ['claude']);
+    assertEquals(
+      describeAgentInitResolution(project.resolution)[0],
+      'Agent hosts: claude (from project: .claude).',
+    );
+    assertFalse(await fs.exists(join(projectRoot, 'opencode.json')));
+
+    const fallback = await initAgent({ projectRoot: defaultRoot }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assertEquals(fallback.hosts, ['claude']);
+    assertEquals(
+      describeAgentInitResolution(fallback.resolution)[0],
+      'Agent hosts: claude (default: no flag, project marker, or environment signal).',
+    );
+  } finally {
+    await Promise.all(roots.map((root) => Deno.remove(root, { recursive: true })));
+  }
+});
+
+Deno.test('#2007 OpenCode host writes opencode.json and merges an existing one idempotently', async () => {
+  const fs = new DenoAgentInitFileSystem();
+  const freshRoot = await Deno.makeTempDir();
+  const mergeRoot = await Deno.makeTempDir();
+  try {
+    const fresh = await initAgent({ projectRoot: freshRoot }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      environment: { OPENCODE: '1' },
+    });
+    assertEquals(fresh.hosts, ['opencode']);
+    assertEquals(describeAgentInitResolution(fresh.resolution)[0], 'Agent hosts: opencode (from environment: OPENCODE).');
+    const config = JSON.parse(await Deno.readTextFile(join(freshRoot, 'opencode.json')));
+    assertEquals(config.mcp.netscript.type, 'local');
+    assertEquals(config.mcp.netscript.command, [
+      'deno',
+      'run',
+      '--no-lock',
+      '--minimum-dependency-age=0',
+      '--config',
+      join(freshRoot, 'deno.json'),
+      '-A',
+      `jsr:@netscript/cli@${NETSCRIPT_RELEASE_VERSION}`,
+      'agent',
+      'mcp',
+      '--project-root',
+      freshRoot,
+    ]);
+    assertEquals(config.mcp.aspire.command, ['aspire', 'agent', 'mcp']);
+    assert(config.mcp.netscript.timeout > 5_000 && config.mcp.aspire.timeout > 5_000);
+    assertEquals(config.lsp.deno.command, ['deno', 'lsp']);
+    assertEquals(config.formatter.deno.command, ['deno', 'fmt', '$FILE']);
+    assertFalse(await fs.exists(join(freshRoot, '.mcp.json')));
+    assertFalse(await fs.exists(join(freshRoot, '.claude')));
+    assert(await fs.exists(join(freshRoot, '.agents/skills/netscript/SKILL.md')));
+    const rerun = await initAgent({ projectRoot: freshRoot }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      environment: { OPENCODE: '1' },
+    });
+    assertEquals(rerun.changedFiles, []);
+
+    await fs.writeText(
+      join(mergeRoot, 'opencode.json'),
+      '{"model":"local/model","mcp":{"other":{"type":"remote","url":"https://mcp.example.test"}}}\n',
+    );
+    const merged = await initAgent({ projectRoot: mergeRoot }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assertEquals(merged.hosts, ['opencode']);
+    assertEquals(merged.resolution.hosts.signals, [{ source: 'project', name: 'opencode.json' }]);
+    const mergedConfig = JSON.parse(await Deno.readTextFile(join(mergeRoot, 'opencode.json')));
+    assertEquals(mergedConfig.model, 'local/model');
+    assertEquals(mergedConfig.mcp.other, { type: 'remote', url: 'https://mcp.example.test' });
+    assertEquals(mergedConfig.mcp.netscript.command.at(-1), mergeRoot);
+    assert(mergedConfig.lsp.deno);
+    assertEquals(
+      (await initAgent({ projectRoot: mergeRoot }, {
+        fs,
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      })).changedFiles,
+      [],
+    );
+  } finally {
+    await Deno.remove(freshRoot, { recursive: true });
+    await Deno.remove(mergeRoot, { recursive: true });
+  }
+});
+
+Deno.test('#2007 OpenCode host merges a commented opencode.json with trailing commas', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    await fs.writeText(
+      join(root, 'opencode.json'),
+      '// project settings\n{\n  "model": "local/model", // keep\n  "mcp": {},\n}\n',
+    );
+    const first = await initAgent({ projectRoot: root }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assertEquals(first.hosts, ['opencode']);
+    const text = await Deno.readTextFile(join(root, 'opencode.json'));
+    assertStringIncludes(text, '// project settings');
+    assertStringIncludes(text, '// keep');
+    const config = parseJsonc(text);
+    assertEquals(jsonAt(config, 'model'), 'local/model');
+    assertEquals(jsonAt(config, 'mcp', 'netscript', 'command', '0'), 'deno');
+    assertEquals(
+      (await initAgent({ projectRoot: root }, {
+        fs,
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      })).changedFiles,
+      [],
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('#2007 OpenCode host refreshes a stale opencode.jsonc server so the effective command is current', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    await fs.writeText(
+      join(root, 'opencode.json'),
+      '{"mcp":{"netscript":{"type":"local","command":["deno","run","jsr:@netscript/cli@old"]}}}\n',
+    );
+    await fs.writeText(
+      join(root, 'opencode.jsonc'),
+      '// pinned by the team\n{\n  "mcp": {\n    "netscript": { "type": "local", "command": ["stale"], },\n  },\n}\n',
+    );
+    const result = await initAgent({ projectRoot: root }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assertEquals(result.hosts, ['opencode']);
+    const expected = [
+      'deno',
+      'run',
+      '--no-lock',
+      '--minimum-dependency-age=0',
+      '--config',
+      join(root, 'deno.json'),
+      '-A',
+      `jsr:@netscript/cli@${NETSCRIPT_RELEASE_VERSION}`,
+      'agent',
+      'mcp',
+      '--project-root',
+      root,
+    ];
+    const jsoncText = await Deno.readTextFile(join(root, 'opencode.jsonc'));
+    assertStringIncludes(jsoncText, '// pinned by the team');
+    const jsonc = parseJsonc(jsoncText);
+    const json = parseJsonc(await Deno.readTextFile(join(root, 'opencode.json')));
+    // OpenCode merges both project files; whichever wins, the effective command is current.
+    assertEquals(jsonAt(jsonc, 'mcp', 'netscript', 'command'), expected);
+    assertEquals(jsonAt(json, 'mcp', 'netscript', 'command'), expected);
+    assertEquals(jsonAt(jsonc, 'lsp', 'deno', 'command'), ['deno', 'lsp']);
+    assertEquals(jsonAt(json, 'lsp'), undefined);
+    assertEquals(
+      (await initAgent({ projectRoot: root }, {
+        fs,
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      })).changedFiles,
+      [],
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('#2007 OpenCode host honours lsp and formatter settings inherited from opencode.json', async () => {
+  const fs = new DenoAgentInitFileSystem();
+  const optOutRoot = await Deno.makeTempDir();
+  const customRoot = await Deno.makeTempDir();
+  const custom = {
+    lsp: { deno: { command: ['deno', 'lsp', '--custom'] } },
+    formatter: { deno: { command: ['deno', 'fmt', '--custom', '$FILE'] } },
+  };
+  try {
+    for (
+      const [root, json] of [
+        [optOutRoot, '{"lsp":false,"formatter":false}\n'],
+        [customRoot, `${JSON.stringify(custom)}\n`],
+      ] as const
+    ) {
+      await fs.writeText(join(root, 'opencode.json'), json);
+      await fs.writeText(join(root, 'opencode.jsonc'), '{ "model": "local/model" }\n');
+      await initAgent({ projectRoot: root }, {
+        fs,
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      });
+      const jsonc = parseJsonc(await Deno.readTextFile(join(root, 'opencode.jsonc')));
+      // Nothing in opencode.jsonc may override the inherited choice.
+      assertEquals(jsonAt(jsonc, 'lsp'), undefined);
+      assertEquals(jsonAt(jsonc, 'formatter'), undefined);
+      assertEquals(jsonAt(jsonc, 'model'), 'local/model');
+      assertEquals(jsonAt(jsonc, 'mcp', 'netscript', 'command', '0'), 'deno');
+      assertEquals(await Deno.readTextFile(join(root, 'opencode.json')), json);
+      assertEquals(
+        (await initAgent({ projectRoot: root }, {
+          fs,
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+        })).changedFiles,
+        [],
+      );
+    }
+  } finally {
+    await Deno.remove(optOutRoot, { recursive: true });
+    await Deno.remove(customRoot, { recursive: true });
+  }
+});
+
+Deno.test('#2007 a malformed OpenCode config aborts before any project write', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(join(root, 'opencode.json'), '{ "mcp": ');
+    await assertRejects(
+      () =>
+        initAgent({ projectRoot: root }, {
+          fs: new DenoAgentInitFileSystem(),
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+        }),
+      Error,
+      'is not valid JSONC',
+    );
+    assertEquals(
+      (await Array.fromAsync(Deno.readDir(root))).map((entry) => entry.name),
+      ['opencode.json'],
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+function jsonAt(value: unknown, ...path: readonly string[]): unknown {
+  return path.reduce<unknown>(
+    (current, key) =>
+      current !== null && typeof current === 'object' ? Reflect.get(current, key) : undefined,
+    value,
+  );
+}
+
+Deno.test('#2007 AGENTS.md states MCP as the default surface with the doctor-then-reinit recovery path', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await initAgent({ projectRoot: root, host: 'opencode' }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const section = markedAgentsSection(await Deno.readTextFile(join(root, 'AGENTS.md')));
+    for (
+      const expected of [
+        'MCP is the default surface for NetScript work, not one option among several',
+        'If no `netscript` MCP tools are listed, stop and recover before writing framework code',
+        'call MCP `doctor`',
+        'run `netscript plugin doctor` from the shell; there is no bare `netscript doctor`.',
+        'Re-run `netscript agent init --host <host>` for your agent host (`claude`, `vscode`, or `opencode`)',
+      ]
+    ) {
+      assertStringIncludes(section, expected);
+    }
+    assert(
+      section.indexOf('`netscript plugin doctor`') <
+        section.indexOf('`netscript agent init --host <host>`'),
+      'recovery must run the doctor before re-running agent init',
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('#2007 AGENTS.md addresses skills by registered name, never by SKILL.md path', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await initAgent({ projectRoot: root, host: 'claude' }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const section = markedAgentsSection(await Deno.readTextFile(join(root, 'AGENTS.md')));
+    assertFalse(section.includes('SKILL.md'), 'AGENTS.md routes a skill by its SKILL.md path');
+    assertStringIncludes(
+      section,
+      'Call the skill by name and its body, with its bundled references, loads on demand',
+    );
+    const manifest = JSON.parse(EMBEDDED_SKILL_FILES['manifest.json']) as {
+      readonly skills: readonly string[];
+    };
+    for (const skill of manifest.skills) {
+      assertMatch(section, new RegExp(`[Cc]all the \`${skill}\` skill`));
+    }
+    for (const skill of ASPIRE_WORKFLOW_SKILLS) {
+      assertStringIncludes(section, `\`${skill}\``);
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+function markedAgentsSection(agents: string): string {
+  const start = agents.indexOf('<!-- netscript-agent:start -->');
+  const end = agents.indexOf('<!-- netscript-agent:end -->');
+  assert(start >= 0 && end > start, 'AGENTS.md has no marked NetScript section');
+  return agents.slice(start, end);
+}
 
 async function listToolsAfterHostRestart(projectRoot: string): Promise<readonly string[]> {
   const cliPath = new URL('../../../../../bin/netscript.ts', import.meta.url).pathname;
