@@ -299,7 +299,7 @@ Deno.test('fenced chat: the echo and the assistant chunks share one producer seq
   assertEquals('content' in appends[4].items[0], false);
 });
 
-Deno.test('unfenced chat: omitting producer is byte-identical to the upstream transport', async () => {
+Deno.test('unfenced chat: native batches retain upstream chunk bytes without producer headers', async () => {
   await using streams = await startStreamsService();
   const realNow = Date.now;
   Date.now = () => 1_760_000_000_000;
@@ -324,8 +324,16 @@ Deno.test('unfenced chat: omitting producer is byte-identical to the upstream tr
     Date.now = realNow;
   }
 
+  const stored = parseItems(await streams.read(sessionPath(streams, 'netscript')));
+  const nativeBatches = stored.filter((chunk) => chunk.name === 'netscript.chat.messages');
+  assertEquals(nativeBatches.length, 1, 'main persists one complete native message batch');
+  assertEquals(nativeBatches[0].value, [{
+    ...USER_TURN,
+    parts: [{ type: 'text', text: 'Hello' }],
+  }]);
+  // Main adds the native batch; the compatible text echoes and assistant bytes stay upstream-exact.
   assertEquals(
-    await streams.read(sessionPath(streams, 'netscript')),
+    JSON.stringify(stored.filter((chunk) => chunk.name !== 'netscript.chat.messages')),
     await streams.read(sessionPath(streams, 'upstream')),
   );
   for (const append of streams.appends) {
