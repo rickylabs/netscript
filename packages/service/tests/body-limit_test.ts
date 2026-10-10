@@ -128,6 +128,7 @@ for (const projection of PROJECTIONS) {
   Deno.test(`defineService bodyLimit rejects ${projection.name} bodies over a real listener`, async () => {
     const framing: { contentLength?: string; transferEncoding?: string }[] = [];
     const running = await defineService(router, {
+      auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
       name: `body-limit-${projection.name.toLowerCase()}`,
       port: 0,
       cors: { origin: ['https://app.example'] },
@@ -178,7 +179,11 @@ for (const projection of PROJECTIONS) {
 }
 
 Deno.test('defineService without bodyLimit keeps accepting large bodies', async () => {
-  const running = await defineService(router, { name: 'body-limit-default', port: 0 });
+  const running = await defineService(router, {
+    auth: { public: true, reason: 'Public fixture for behavior unrelated to authentication' },
+    name: 'body-limit-default',
+    port: 0,
+  });
 
   try {
     const response = await fetch(
