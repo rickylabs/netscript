@@ -170,7 +170,18 @@ export const GATE = {
   BEHAVIOR_TRIGGERS_EVENTS: 'behavior.triggers-events',
   BEHAVIOR_AUTH_LIVE: 'behavior.auth-live',
   BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
-  BEHAVIOR_AUTH_SESSION: 'behavior.auth-session',
+  /**
+   * Unauthenticated `GET /api/v1/auth/session` serves the designed public introspection
+   * contract: exactly 200 `{ "authenticated": false }`. It proves no refusal; refusal gates
+   * target guarded auth routes.
+   */
+  BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED: 'behavior.auth-session-unauthenticated',
+  /**
+   * @deprecated Use {@link GATE.BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED}; this key only aliases
+   * the renamed gate id while suite definitions migrate. The old `behavior.auth-session` id is
+   * gone.
+   */
+  BEHAVIOR_AUTH_SESSION: 'behavior.auth-session-unauthenticated',
   BEHAVIOR_STREAMS_PRODUCER_RECONNECT: 'behavior.streams.producer-reconnect',
   BEHAVIOR_AI_CHAT_ROUTE: 'behavior.ai-chat-route',
   BEHAVIOR_PLUGINS_HEALTH: 'behavior.plugins-health',
