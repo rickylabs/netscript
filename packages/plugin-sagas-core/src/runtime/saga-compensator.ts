@@ -29,6 +29,11 @@ export type SagaCompensationRequest<TState extends SagaState = SagaState> = Read
   correlationKey?: SagaCorrelationKey;
   parent?: SagaTraceParent;
   instrumentation?: SagaInstrumentation;
+  /**
+   * Persisted version of the instance when compensation was requested. The bus bridge persists
+   * the compensation outcome only when it is known; the compensator itself never writes a store.
+   */
+  version?: number;
 }>;
 
 /** Compensation execution result. */
@@ -107,12 +112,15 @@ export class SagaCompensator {
           'Compensation execution requires an engine-resolved correlationKey.',
         );
       }
-      const saga = { state: request.state };
+      // The handler works on a private copy, so a branch that mutates in place and then throws
+      // leaves the caller's pre-compensation snapshot untouched.
+      const state = structuredClone(request.state);
+      const saga = { state };
       const context: SagaContext<TState, SagaMessage> = {
         sagaId: request.definition.id,
         instanceId: request.instanceId,
         correlationKey: request.correlationKey,
-        state: request.state,
+        state,
         message: request.message,
         attempt: request.attempt ?? 1,
         now: this.#clock.now(),

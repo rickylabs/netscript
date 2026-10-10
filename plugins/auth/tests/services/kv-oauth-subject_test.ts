@@ -147,6 +147,8 @@ Deno.test('the local-defaults stub never issues a session-id subject', async () 
     NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
     NETSCRIPT_AUTH_KV_OAUTH_KEY: KV_KEY,
     PORT: SYNTHETIC_PORT,
+    // This subject-only test deliberately exercises the stub's HTTP token endpoint.
+    NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
   };
   // Even if the stub's placeholder token endpoint answered, the subject is still required.
   const registry = await createAuthServiceBackendRegistry({
@@ -177,6 +179,7 @@ for (const providerId of ['github', 'discord', 'spotify', 'facebook', 'twitter']
       kv: new MemoryKvAdapter(),
       env: {
         NETSCRIPT_AUTH_PROVIDER_ID: providerId,
+        NETSCRIPT_AUTH_TRUST_PROXY_HEADERS: 'true',
         NETSCRIPT_AUTH_CLIENT_ID: 'client_test',
         NETSCRIPT_AUTH_CLIENT_SECRET: 'secret_test',
         NETSCRIPT_AUTH_REDIRECT_URI: authTestUrl('/v1/auth/callback'),

@@ -5,7 +5,11 @@
  * ```typescript
  * import { createTransformer } from '@netscript/contracts/transform';
  *
- * const userTransformer = createTransformer((dbUser) => ({
+ * interface DbUser { id: number; name: string; email: string; password: string }
+ * declare const dbUser: DbUser;
+ * declare const dbUsers: DbUser[];
+ *
+ * const userTransformer = createTransformer((dbUser: DbUser) => ({
  *   id: dbUser.id,
  *   name: dbUser.name,
  *   email: dbUser.email,
@@ -64,6 +68,11 @@ export type OmitTransformerFactory<T extends Record<string, unknown>> = <
  *
  * @example
  * ```typescript
+ * interface DbUser { id: number; firstName: string; lastName: string; email: string; createdAt: Date }
+ * declare const dbUser: DbUser;
+ * declare const dbUsers: DbUser[];
+ * declare const db: { user: { findUnique(args: { where: { id: number } }): Promise<DbUser | null> } };
+ *
  * // Define transform once
  * const userTransformer = createTransformer((dbUser: DbUser) => ({
  *   id: dbUser.id,
@@ -75,7 +84,7 @@ export type OmitTransformerFactory<T extends Record<string, unknown>> = <
  * // Use in handlers
  * const user = userTransformer.one(dbUser);
  * const users = userTransformer.many(dbUsers);
- * const maybeUser = userTransformer.optional(await db.user.findUnique(...));
+ * const maybeUser = userTransformer.optional(await db.user.findUnique({ where: { id: dbUser.id } }));
  * ```
  */
 export function createTransformer<TInput, TOutput>(
@@ -98,6 +107,11 @@ export function createTransformer<TInput, TOutput>(
  *
  * @example
  * ```typescript
+ * import { createPickTransformer } from '@netscript/contracts/transform';
+ *
+ * type User = { id: number; name: string; email: string; password: string };
+ * declare const user: User;
+ *
  * const publicUserTransformer = createPickTransformer<User>()('id', 'name', 'email');
  * const publicUser = publicUserTransformer.one(user);
  * // { id: 1, name: 'John', email: 'john@example.com' }
@@ -122,6 +136,11 @@ export function createPickTransformer<T extends Record<string, unknown>>(): Pick
  *
  * @example
  * ```typescript
+ * import { createOmitTransformer } from '@netscript/contracts/transform';
+ *
+ * type User = { id: number; name: string; email: string; password: string; secretKey: string };
+ * declare const user: User;
+ *
  * const safeUserTransformer = createOmitTransformer<User>()('password', 'secretKey');
  * const safeUser = safeUserTransformer.one(user);
  * // { id: 1, name: 'John', email: 'john@example.com' } (no password/secretKey)
@@ -149,6 +168,10 @@ export function createOmitTransformer<T extends Record<string, unknown>>(): Omit
  *
  * @example
  * ```typescript
+ * import { composeTransformers } from '@netscript/contracts/transform';
+ *
+ * interface DbUser { firstName: string; lastName: string; createdAt: Date }
+ *
  * const transformer = composeTransformers(
  *   (user: DbUser) => ({ ...user, fullName: `${user.firstName} ${user.lastName}` }),
  *   (user) => ({ ...user, createdAt: user.createdAt.toISOString() }),

@@ -64,10 +64,14 @@ export class AspireAppHostDoctorInspector implements AppHostInspector {
 }
 
 function readResource(value: unknown): readonly AppHostResourceState[] {
-  const name = readString(value, 'displayName') ?? readString(value, 'name');
+  const instanceName = readString(value, 'name');
+  const name = readString(value, 'displayName') ?? instanceName;
   if (!name) return [];
+  const resourceType = readString(value, 'resourceType');
   return [{
     name,
+    ...(instanceName ? { instanceName } : {}),
+    ...(resourceType ? { resourceType } : {}),
     state: readString(value, 'state'),
     healthStatus: readString(value, 'healthStatus'),
     healthReports: readHealthReports(value),

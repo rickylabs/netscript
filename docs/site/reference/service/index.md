@@ -355,7 +355,26 @@ public opt-out (`{ public: true, reason }`). `ServiceGuardedAuthPolicy` and
 ports with a redacted `TypeError`. It preserves the original options: a custom
 `allowAnonymous` list replaces the native default; the assertion does not add `/health`.
 It validates configuration only and does not authenticate requests or install middleware.
-The existing `defineService` preset has not yet adopted this required posture contract.
+`DefineServiceOptions.auth` requires this policy. `defineService()` runs the shared assertion
+before builder configuration, database startup, or listener creation, so JavaScript callers receive
+an actionable `TypeError` as well as TypeScript callers receiving a missing-field error.
+Guarded policies install the existing native stages unchanged; public policies deliberately skip
+them. `/api` is guarded and `/health` stays anonymous with native defaults.
+
+In 0.0.8, search existing entrypoints for `defineService(` and choose native guards or explicitly
+record a public service's reason. The exact public migration is:
+
+```diff
+-await defineService(router, { name: 'status' });
++await defineService(router, {
++  name: 'status',
++  auth: { public: true, reason: 'Public status service with no protected operations' },
++});
+```
+
+Generated L1 service templates include a greppable public demo policy naming #1382 L2; guarded
+scaffolding and authenticated generated app calls are follow-up work. This policy requirement applies
+to the preset; lower-level `createService()` callers still compose their middleware explicitly.
 
 ```ts
 import { assertServiceAuthPolicy, type ServiceAuthPolicy } from '@netscript/service/auth';

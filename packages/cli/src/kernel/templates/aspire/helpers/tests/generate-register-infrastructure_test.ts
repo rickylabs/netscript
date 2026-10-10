@@ -204,7 +204,9 @@ describe('generateRegisterInfrastructure', () => {
 
     assert(!unpinned.includes('port: 6379'))
     assertStringIncludes(pinned, 'port: 16379')
-    assertStringIncludes(pinned, 'targetPort: 6379')
+    assertStringIncludes(unpinned, 'targetPort: 6379')
+    assert(!pinned.includes('targetPort: 6379'))
+    assertStringIncludes(pinned, 'EndpointProperty.TargetPort')
   })
 
   it('uses session lifetime for configured-persistent databases only under isolated starts', () => {
@@ -279,7 +281,7 @@ describe('generateRegisterInfrastructure', () => {
 
     assertStringIncludes(
       output,
-      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:1.1.10")',
+      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:2.2.1")',
     )
     assertStringIncludes(
       output,
@@ -305,22 +307,31 @@ describe('generateRegisterInfrastructure', () => {
     )
   })
 
-  it('keeps the default Garnet container tag aligned with the executable tool pin', () => {
-    const output = generateRegisterInfrastructure({
-      databases: {},
-      caches: {
-        garnet: {
-          Enabled: true,
-          Engine: 'Garnet',
-          Mode: 'Container',
-        },
-      },
-    })
-
-    assertStringIncludes(
-      output,
-      `builder.addContainer("garnet", "ghcr.io/microsoft/garnet:${SCAFFOLD_VERSIONS.GARNET_TOOL}")`,
-    )
+  it('pins Garnet 2.2.1 and the same RESP check in Container, Executable, and Auto modes', () => {
+    assertEquals(SCAFFOLD_VERSIONS.GARNET_TOOL, '2.2.1')
+    for (const Mode of ['Container', 'Executable', 'Auto'] as const) {
+      const output = generateRegisterInfrastructure({
+        databases: {},
+        caches: { garnet: { Enabled: true, Engine: 'Garnet', Mode } },
+      })
+      if (Mode !== 'Executable') {
+        assertStringIncludes(
+          output,
+          `builder.addContainer("garnet", "ghcr.io/microsoft/garnet:${SCAFFOLD_VERSIONS.GARNET_TOOL}")`,
+        )
+      }
+      if (Mode !== 'Container') {
+        assertStringIncludes(
+          output,
+          `ensureGarnetToolManifest(appHostDir, "${SCAFFOLD_VERSIONS.GARNET_TOOL}")`,
+        )
+      }
+      assertEquals(
+        countOccurrences(output, 'return createRespPingCheck({ host, port })();'),
+        Mode === 'Auto' ? 2 : 1,
+      )
+      assert(!output.includes('addGarnet('))
+    }
   })
 
   it('emits deno-kv Local cache as in-process wiring without an Aspire resource', () => {
@@ -401,23 +412,47 @@ describe('generateRegisterInfrastructure', () => {
     // Self-provisions the garnet-server tool manifest, then runs it via dotnet.
     assertStringIncludes(
       output,
-      'cache_0_workdir = ensureGarnetToolManifest(appHostDir, "1.1.10");',
+      'cache_0_workdir = ensureGarnetToolManifest(appHostDir, "2.2.1");',
     )
     assertStringIncludes(
       output,
-      "builder.addExecutable(\"garnet\", 'dotnet', cache_0_workdir, ['tool', 'run', 'garnet-server', '--port', '6379'])",
+      "builder.addExecutable(\"garnet\", 'dotnet', cache_0_workdir, ['tool', 'run', 'garnet-server'])",
     )
     assertStringIncludes(
       output,
-      "withEndpoint({ name: 'tcp', targetPort: 6379, scheme: 'tcp' })",
+      "withEndpoint({ name: 'tcp', scheme: 'tcp' })",
     )
     assertStringIncludes(
       output,
       'cache_0_hostPort = cache_0_tcpEndpoint.property(EndpointProperty.HostAndPort)',
     )
+    assertStringIncludes(output, 'await cache_0.withArgsCallback(async (context) => {')
+    assertStringIncludes(output, 'const args = await context.args();')
+    assertStringIncludes(output, "await args.add('--port');")
+    assertStringIncludes(
+      output,
+      'await args.add(cache_0_tcpEndpoint.property(EndpointProperty.TargetPort));',
+    )
+    assert(!output.includes('targetPort: 6379'))
     assertStringIncludes(output, 'cacheWiring.set("garnet", {')
     assertStringIncludes(output, 'GARNET_URI: cache_0_hostPort')
     assertStringIncludes(output, "CACHE_PROVIDER: 'garnet'")
+  })
+
+  it('keeps explicit executable cache Port on the host endpoint only', () => {
+    for (const Mode of ['Executable', 'Auto'] as const) {
+      const output = generateRegisterInfrastructure({
+        databases: {},
+        caches: { garnet: { Enabled: true, Engine: 'Garnet', Mode, Port: 6385 } },
+      })
+      assertStringIncludes(output, "withEndpoint({ port: 6385, name: 'tcp', scheme: 'tcp' })")
+      assertStringIncludes(
+        output,
+        'await args.add(cache_0_tcpEndpoint.property(EndpointProperty.TargetPort));',
+      )
+      assert(!output.includes("'--port', '6385'"))
+      assert(!output.includes('targetPort: 6385'))
+    }
   })
 
   it('honors an explicit ToolVersion pin for the garnet Executable arm', () => {
@@ -459,12 +494,19 @@ describe('generateRegisterInfrastructure', () => {
     // Docker present → Redis-compatible Garnet container (default engine kept).
     assertStringIncludes(
       output,
-      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:1.1.10")',
+      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:2.2.1")',
     )
     // Docker absent → self-provisioned Garnet dotnet-tool executable.
     assertStringIncludes(
       output,
-      "builder.addExecutable(\"garnet\", 'dotnet', cache_0_workdir, ['tool', 'run', 'garnet-server', '--port', '6379'])",
+      "builder.addExecutable(\"garnet\", 'dotnet', cache_0_workdir, ['tool', 'run', 'garnet-server'])",
+    )
+    assertStringIncludes(output, "withEndpoint({ name: 'tcp', scheme: 'tcp' })")
+    assertStringIncludes(output, "withEndpoint({ name: 'tcp', targetPort: 6379, scheme: 'tcp' })")
+    assertStringIncludes(output, 'await cache_0.withArgsCallback(async (context) => {')
+    assertStringIncludes(
+      output,
+      'await args.add(cache_0_tcpEndpoint.property(EndpointProperty.TargetPort));',
     )
     assertStringIncludes(output, 'ensureGarnetToolManifest(appHostDir')
     assertStringIncludes(output, 'cacheWiring.set("garnet", cache_0_wiring);')

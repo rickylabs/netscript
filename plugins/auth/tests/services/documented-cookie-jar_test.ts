@@ -24,6 +24,7 @@ function host(kv: MemoryKvAdapter, env: Record<string, string>): AuthPluginServi
       NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
       NETSCRIPT_AUTH_REDIRECT_URI: 'http://localhost:8094/api/v1/auth/callback',
       NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
+      NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS: 'true',
       ...env,
     },
     appsettings: { auth: { environment: { NETSCRIPT_AUTH_COOKIE_NAME: 'appsettings_cookie' } } },
@@ -52,7 +53,7 @@ Deno.test('documented localhost curl cookie-jar flow works through the real serv
   try {
     const recipe = await Deno.readTextFile(recipePath);
     const localPolicy = recipe.match(
-      /```sh\n(export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true\nexport NETSCRIPT_AUTH_COOKIE_NAME=\w+)\n```/,
+      /```sh\n(export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true\nexport NETSCRIPT_AUTH_COOKIE_NAME=\w+)\n```/,
     );
     assert(localPolicy, 'The recipe must provide a working local cookie policy before startup.');
     const env = Object.fromEntries(

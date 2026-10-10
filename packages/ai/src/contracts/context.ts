@@ -39,7 +39,10 @@
  *
  * @example Attach app state to a run
  * ```ts
- * import { createAgentLoop } from "@netscript/ai/agent";
+ * import { type ChatModelProviderPort, createAgentLoop, type ToolRegistryPort } from "@netscript/ai/agent";
+ *
+ * declare const modelProvider: ChatModelProviderPort;
+ * declare const tools: ToolRegistryPort;
  *
  * const loop = createAgentLoop({ modelProvider, tools });
  * for await (

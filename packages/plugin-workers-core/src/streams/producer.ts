@@ -15,7 +15,18 @@ export type WorkersStreamProducer = Readonly<{
   delete(entity: 'execution' | 'job', id: string): void | Promise<void>;
 }>;
 
-type WorkerStreamEntities = Readonly<{
+/**
+ * Entity map accepted by the workers durable stream producer.
+ *
+ * @example
+ * ```ts
+ * import type { WorkerStreamEntities } from '@netscript/plugin-workers-core/streams';
+ * const execution: WorkerStreamEntities['execution'] = {
+ *   id: 'execution-1', jobId: 'health-check', status: 'running',
+ * };
+ * ```
+ */
+export type WorkerStreamEntities = Readonly<{
   execution: WorkerExecution;
   job: WorkerJob;
 }>;

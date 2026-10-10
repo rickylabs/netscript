@@ -8,9 +8,9 @@ import {
 } from '../../../../../../../plugins/auth/services/src/backend-registry.ts';
 import { MemoryKvAdapter } from '@netscript/kv';
 import {
+  revokeSession,
   session,
   signin,
-  signout,
 } from '../../../../../../../plugins/auth/services/src/routers/v1-handlers.ts';
 import {
   generateAuthSecret,
@@ -291,22 +291,120 @@ Deno.test('session projection parser exposes active sessions', () => {
   assertEquals(sessions.map((session) => session.id), ['session-active', 'session-revoked']);
 });
 
-Deno.test('fetch session adapter lists projections and revokes through signout', async () => {
+Deno.test('fetch session adapter lists projections and revokes through the operator route', async () => {
   const requests: Request[] = [];
   const client = new FetchAuthSessionHttp((input, init) => {
     const request = new Request(input, init);
     requests.push(request);
     if (request.method === 'POST') {
-      return Promise.resolve(Response.json({ signedOut: true, sessionId: 'session-1' }));
+      return Promise.resolve(Response.json({ revoked: true, sessionId: 'session-1' }));
     }
     return Promise.resolve(
       Response.json([{ id: 'session-1', state: 'active', userId: 'user-1' }]),
     );
   });
-  assertEquals((await client.list('http://streams/auth/sessions'))[0].id, 'session-1');
-  assertEquals(await client.revoke('http://auth/api/v1/auth', 'session-1'), 'session-1');
-  assertEquals(requests[1].url, 'http://auth/api/v1/auth/signout');
+  assertEquals(
+    (await client.list('https://streams/auth/sessions', {
+      context: { auth: { getAccessToken: () => 'operator-token' } },
+    }))[0].id,
+    'session-1',
+  );
+  assertEquals(
+    await client.revoke('https://auth/api/v1/auth', 'session-1', {
+      context: { auth: { getAccessToken: () => 'operator-token' } },
+    }),
+    'session-1',
+  );
+  assertEquals(requests[1].url, 'https://auth/api/v1/auth/sessions/revoke');
+  assertEquals(requests[1].headers.get('authorization'), 'Bearer operator-token');
   assertEquals(await requests[1].json(), { sessionId: 'session-1' });
+});
+
+Deno.test('session revoke refuses to run without an operator credential', async () => {
+  let revokeCalls = 0;
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: {
+      list: () => Promise.resolve([]),
+      revoke: (_url, id) => {
+        revokeCalls++;
+        return Promise.resolve(id);
+      },
+    },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+  });
+  const previous = Deno.env.get('NETSCRIPT_AUTH_TOKEN');
+  Deno.env.delete('NETSCRIPT_AUTH_TOKEN');
+  try {
+    await assertRejects(
+      () => command.parse(['session', 'revoke', 'id-1', '--auth-url', 'https://auth.test/api']),
+      Error,
+      'auth:sessions:revoke scope. Set NETSCRIPT_AUTH_TOKEN.',
+    );
+  } finally {
+    if (previous !== undefined) Deno.env.set('NETSCRIPT_AUTH_TOKEN', previous);
+  }
+  assertEquals(revokeCalls, 0);
+});
+
+Deno.test('session list refuses to run without a credential', async () => {
+  let listCalls = 0;
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: {
+      list: () => {
+        listCalls++;
+        return Promise.resolve([]);
+      },
+      revoke: (_url, id) => Promise.resolve(id),
+    },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+  });
+  const previous = Deno.env.get('NETSCRIPT_AUTH_TOKEN');
+  Deno.env.delete('NETSCRIPT_AUTH_TOKEN');
+  try {
+    await assertRejects(
+      () =>
+        command.parse(['session', 'list', '--stream-url', 'https://streams.test/auth/sessions']),
+      Error,
+      'Listing sessions needs a credential. Set NETSCRIPT_AUTH_TOKEN.',
+    );
+  } finally {
+    if (previous !== undefined) Deno.env.set('NETSCRIPT_AUTH_TOKEN', previous);
+  }
+  assertEquals(listCalls, 0);
+});
+
+Deno.test('session commands send the NETSCRIPT_AUTH_TOKEN credential by default', async () => {
+  const credentials: Array<string | undefined> = [];
+  const record = async (options?: AuthSessionRequestOptions) =>
+    credentials.push(await options?.context?.auth?.getAccessToken());
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: {
+      list: async (_url, options) => {
+        await record(options);
+        return [];
+      },
+      revoke: async (_url, id, options) => {
+        await record(options);
+        return id;
+      },
+    },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+    print: () => {},
+  });
+  const token = crypto.randomUUID();
+  const previous = Deno.env.get('NETSCRIPT_AUTH_TOKEN');
+  Deno.env.set('NETSCRIPT_AUTH_TOKEN', token);
+  try {
+    await command.parse(['session', 'list', '--stream-url', 'https://streams.test/auth/sessions']);
+    await command.parse(['session', 'revoke', 'id-1', '--auth-url', 'https://auth.test/api']);
+  } finally {
+    if (previous === undefined) Deno.env.delete('NETSCRIPT_AUTH_TOKEN');
+    else Deno.env.set('NETSCRIPT_AUTH_TOKEN', previous);
+  }
+  assertEquals(credentials, [token, token]);
 });
 
 Deno.test('plugin auth parser drives backend and session verbs', async () => {
@@ -433,17 +531,24 @@ Deno.test('session CLI lists a signed-in backend session and revoke invalidates 
         : [];
     },
     async revoke(_url, sessionId) {
-      const result = await signout({ sessionId }, {
+      const result = await revokeSession({ sessionId }, {
         registry,
-        request: { url: 'https://app.test/v1/auth/signout' },
+        principal: {
+          subject: 'svc-operator',
+          scopes: ['auth:sessions:revoke'],
+          roles: [],
+          scheme: 'bearer',
+          claims: {},
+        },
       });
-      return result.sessionId ?? sessionId;
+      return result.sessionId;
     },
   };
   const output: string[] = [];
   const command = createAuthPluginCommand({
     fs: new MemoryFileSystemAdapter(),
     sessions,
+    resolveSessionContext: () => ({ auth: { getAccessToken: () => 'operator-token' } }),
     resolveProjectRoot: () => Promise.resolve('/workspace'),
     print: (line) => output.push(line),
   });

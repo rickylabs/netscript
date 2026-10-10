@@ -105,14 +105,45 @@ export interface BetterAuthInstance {
     readonly getSession: (
       input: BetterAuthGetSessionInput,
     ) => Promise<BetterAuthSessionLookupResponse>;
+    /** Revokes every session of the user whose session the request headers carry. */
+    readonly revokeSessions: (
+      input: BetterAuthRevokeSessionsInput,
+    ) => Promise<unknown>;
   };
 }
+
+/** Input accepted by better-auth's `api.revokeSessions` method. */
+export type BetterAuthRevokeSessionsInput = Readonly<{
+  headers: Headers;
+}>;
 
 /** Input accepted by better-auth's `api.getSession` method. */
 export type BetterAuthGetSessionInput = Readonly<{
   headers: Headers;
   returnHeaders?: boolean;
+  /** better-auth query flags; NetScript always sets `disableCookieCache`. */
+  query?: Readonly<{ disableCookieCache?: boolean }>;
 }>;
+
+/**
+ * Reads the request's session from better-auth's server-side store, never from the signed
+ * `session_data` cookie cache.
+ *
+ * better-auth's own guidance for sensitive reads is to pass `disableCookieCache` so a revoked but
+ * still-cached session cannot authorize anything; NetScript applies it to every lookup, so a
+ * revocation (single or subject-wide) takes effect on the next request instead of after the cache
+ * cookie's `maxAge`.
+ */
+export function getAuthoritativeSession(
+  auth: BetterAuthInstance,
+  headers: Headers,
+): Promise<BetterAuthSessionLookupResponse> {
+  return auth.api.getSession({
+    headers,
+    returnHeaders: true,
+    query: { disableCookieCache: true },
+  });
+}
 
 /** Session lookup response shape consumed by NetScript better-auth adapters. */
 export type BetterAuthSessionLookupResponse =
@@ -136,7 +167,10 @@ export interface BetterAuthAuthenticatorOptions {
  *
  * @example
  * ```ts
+ * import { type BetterAuthPrismaClient, createNetscriptBetterAuth } from '@netscript/auth-better-auth';
  * import { organization } from 'better-auth/plugins';
+ *
+ * declare const prisma: BetterAuthPrismaClient;
  *
  * const auth = createNetscriptBetterAuth({
  *   prisma,
@@ -190,6 +224,10 @@ export function configureNetscriptBetterAuthOptions(
  *
  * @example
  * ```ts
+ * import { type BetterAuthInstance, createBetterAuthAuthenticator } from '@netscript/auth-better-auth';
+ *
+ * declare const auth: BetterAuthInstance;
+ *
  * const authenticator = createBetterAuthAuthenticator({ auth });
  * ```
  */
@@ -200,10 +238,7 @@ export function createBetterAuthAuthenticator(
     async authenticate(request: AuthnRequest): Promise<AuthnResult> {
       let resolved: unknown;
       try {
-        resolved = await options.auth.api.getSession({
-          headers: request.headers(),
-          returnHeaders: true,
-        });
+        resolved = await getAuthoritativeSession(options.auth, request.headers());
       } catch (error) {
         return {
           ok: false,

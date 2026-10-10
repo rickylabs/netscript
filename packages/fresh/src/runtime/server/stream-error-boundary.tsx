@@ -44,6 +44,13 @@ interface StreamErrorBoundaryState {
  *
  * @example
  * ```tsx
+ * import { Deferred } from '@netscript/fresh/defer';
+ * import { StreamErrorBoundary } from '@netscript/fresh/server';
+ * import type { JSX } from 'preact';
+ *
+ * declare const expensiveQuery: Promise<{ rows: string[][] }>;
+ * declare function DataTable(props: { rows: string[][] }): JSX.Element;
+ *
  * <StreamErrorBoundary fallback={<p>Section unavailable.</p>}>
  *   <Deferred promise={expensiveQuery}>
  *     {(data) => <DataTable rows={data.rows} />}

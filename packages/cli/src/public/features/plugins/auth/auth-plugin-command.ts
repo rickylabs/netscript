@@ -151,7 +151,8 @@ export function createAuthPluginCommand(
           'Auth durable stream URL (find the streams HTTP endpoint with ' +
             '`aspire describe streams --format Json`, then append `/auth/sessions`)',
         )
-        .action(async (options: { streamUrl?: string }) => {
+        .env(AUTH_TOKEN_ENV, AUTH_TOKEN_ENV_DESCRIPTION, { prefix: 'NETSCRIPT_AUTH_' })
+        .action(async (options: { streamUrl?: string; token?: string }) => {
           if (!options.streamUrl) {
             throw new Error(
               'The legacy fixed stream URL is no longer inferred. ' +
@@ -161,7 +162,7 @@ export function createAuthPluginCommand(
           }
           const active = (await dependencies.sessions.list(
             options.streamUrl,
-            await resolveSessionRequestOptions(dependencies),
+            await requireSessionRequestOptions(dependencies, options.token, 'Listing sessions'),
           ))
             .filter((item) => item.state === 'active');
           print('Session\tUser\tProvider\tState\tExpires');
@@ -180,11 +181,17 @@ export function createAuthPluginCommand(
         .option('--auth-url <url:string>', 'Aspire-discovered Auth REST base URL', {
           required: true,
         })
-        .action(async (options: { authUrl: string }, id: string) => {
+        .env(AUTH_TOKEN_ENV, AUTH_TOKEN_ENV_DESCRIPTION, { prefix: 'NETSCRIPT_AUTH_' })
+        .action(async (options: { authUrl: string; token?: string }, id: string) => {
           print(`Revoked ${await dependencies.sessions.revoke(
             options.authUrl,
             id,
-            await resolveSessionRequestOptions(dependencies),
+            await requireSessionRequestOptions(
+              dependencies,
+              options.token,
+              'Revoking a session',
+              ` whose principal holds the ${AUTH_SESSIONS_REVOKE_SCOPE} scope`,
+            ),
           )}.`);
         }),
     );
@@ -199,9 +206,27 @@ export function createAuthPluginCommand(
     .command('session', session);
 }
 
-async function resolveSessionRequestOptions(
+const AUTH_TOKEN_ENV = 'NETSCRIPT_AUTH_TOKEN=<value:string>';
+const AUTH_TOKEN_ENV_DESCRIPTION = 'Bearer credential sent to the auth session endpoints';
+const AUTH_SESSIONS_REVOKE_SCOPE = 'auth:sessions:revoke';
+
+/**
+ * Resolves the credential every session command sends: application-owned context wins, otherwise
+ * the `NETSCRIPT_AUTH_TOKEN` credential. Refuses before any request when neither exists.
+ */
+async function requireSessionRequestOptions(
   dependencies: AuthPluginCommandDependencies,
-): Promise<AuthSessionRequestOptions | undefined> {
-  const context = await dependencies.resolveSessionContext?.();
-  return context === undefined ? undefined : { context };
+  token: string | undefined,
+  action: string,
+  requirement = '',
+): Promise<AuthSessionRequestOptions> {
+  const context = await dependencies.resolveSessionContext?.() ?? tokenContext(token);
+  if (context === undefined) {
+    throw new Error(`${action} needs a credential${requirement}. Set NETSCRIPT_AUTH_TOKEN.`);
+  }
+  return { context };
+}
+
+function tokenContext(token: string | undefined): AuthSessionClientContext | undefined {
+  return token ? { auth: { getAccessToken: () => token } } : undefined;
 }
