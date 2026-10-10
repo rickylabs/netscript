@@ -350,6 +350,39 @@ KV write</em> — it never persists an <code>undefined</code>-keyed run. Handle 
 typed error on the client, not a generic <code>500</code>.
 {{ /comp }}
 
+## Observe cancellation and deadlines
+
+The handler's `ctx.signal` is an executor-owned `AbortSignal`. With
+`InProcessJobRunner`, pass it to abort-aware I/O such as `fetch`, and call
+`ctx.signal.throwIfAborted()` at checkpoints in long loops. Yield between chunks so
+cancellation can be delivered. The worker owns this lifetime; it does not require
+an app or an owner session to remain open.
+
+`ctx.deadlineAt` is an optional epoch-millisecond deadline. The in-process runner
+uses its clock at dispatch plus `job.timeout`, or the earlier caller-supplied
+`deadlineAt` when both exist. With neither configured, the deadline is absent.
+Use the remaining time to bound downstream work rather than starting a fresh full
+job timeout for every operation.
+
+Inspect `ctx.signal.reason.name` after abort: `TimeoutError` means the deadline
+elapsed, `ShutdownError` means the runner began stopping, and `AbortError` means
+caller cancellation. The first abort cause is preserved. An abort-aware handler
+should release resources in `finally` and propagate the abort rather than report
+success. See [the cancellation reference](/reference/plugin-workers-core/#job-context-cancellation)
+for the dispatch contract and [runtime tuning](/background-processing/how-to/tune-worker-runtime/#abort-cleanup-budget)
+for the cleanup budget.
+
+### Operator cancellation limit
+
+The shipped Workers API runs router exposes inspection operations only; it has no
+operator cancel operation wired to the handler signal. A stored `cancelled`
+execution status is not evidence that a handler was aborted. For a custom host
+using `InProcessJobRunner`, supply a caller `signal` to `dispatch` and abort its
+controller to request cancellation. Do not assume that closing a UI, disconnecting
+an HTTP request, or deleting a job definition cancels a running job. This contract
+is verified for the in-process runner; it does not establish equivalent propagation
+for every isolated or external task executor.
+
 ## Graceful shutdown
 
 Background runners must drain in flight work before they exit, or a redeploy loses jobs
