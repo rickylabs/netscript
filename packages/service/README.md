@@ -83,6 +83,54 @@ console.log(`listening on :${service.addr.port}`);
 await service.stop();
 ```
 
+## CORS migration (breaking in 0.0.8)
+
+`withCors()` and `defineService()` no longer grant `Access-Control-Allow-Origin: *` by default. An
+omitted `origin` reads `NETSCRIPT_CORS_ORIGINS` once when the builder is configured. Supply
+comma-separated exact HTTP(S) origins, with no path or trailing slash:
+
+```sh
+export NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'
+```
+
+Until CLI/Aspire origin injection lands, configure this variable in each service's launch
+environment. An unset or blank value allows no cross-origin browser reads. The existing
+`createPluginService()` factory delegates its `config.cors` to this same builder, so omitted origins
+consume the workspace allowlist without separate plugin policy. `enableCors: false` continues to
+skip plugin CORS. Explicit origins override the environment, including an empty array to deny all
+cross-origin access:
+
+```ts
+import { defineService, type ServiceRouter } from '@netscript/service';
+
+declare const router: ServiceRouter;
+const service = await defineService(router, {
+  name: 'users',
+  cors: { origin: ['https://app.example'] },
+});
+await service.stop();
+```
+
+Builder callers use `.withCors({ origin: ['https://app.example'] })`; plugin callers use
+`cors: { origin: ['https://app.example'] }`. Options such as `allowHeaders` without an `origin`
+still inherit the environment allowlist. Environment entries must be exact origins; wildcard, opaque
+`null`, malformed URLs, and URL paths fail configuration. Reading defaults requires
+`--allow-env=NETSCRIPT_CORS_ORIGINS`; explicit origins need no environment permission.
+
+Public APIs can opt into `.withCors({ origin: '*' })` without credentials. `build()` rejects
+wildcard plus `credentials: true`, including wildcard entries in arrays. Origin resolver callbacks
+remain supported; a credentialed callback returning `'*'` grants no ACAO header. Allowlisted origins
+receive their exact ACAO; other origins receive none, so the browser refuses access to the response.
+CORS is a browser response policy, not authentication or CSRF protection.
+
+The owner-approved browser auth topology is a BFF: the Fresh app owns sign-in/callback and its
+first-party session cookie, and its server forwards a bearer through the SDK contribution to
+services. Browser-to-service credentialed CORS is not part of this topology. Generated BFF routes,
+Aspire origin injection and a real browser session round trip are follow-up scope of
+[#1386](https://github.com/rickylabs/netscript/issues/1386).
+
+## Runtime shutdown
+
 Compose every in-process runtime behind one bounded shutdown handle without replacing its own drain:
 
 ```ts
@@ -355,10 +403,10 @@ preventing a response from changing when a stored receipt is decoded.
 ## Command execution
 
 Compose `createCommandExecutor({ store, clock?, ids?, telemetry?, receiptClaimWaitMs?, limits? })`
-with a database-owned `CommandStorePort<TTx>`. The focused `/commands` export keeps the root
-surface unchanged. Execution performs one local interactive transaction; it never retries its
-handler or sends buffered messages. Authorize the actor before calling it and keep remote effects
-outside the handler. The testing store demonstrates semantics and certifies no real provider.
+with a database-owned `CommandStorePort<TTx>`. The focused `/commands` export keeps the root surface
+unchanged. Execution performs one local interactive transaction; it never retries its handler or
+sends buffered messages. Authorize the actor before calling it and keep remote effects outside the
+handler. The testing store demonstrates semantics and certifies no real provider.
 
 ```typescript
 import { createCommandExecutor, defineCommand, jsonCodec } from '@netscript/service/commands';
@@ -368,9 +416,11 @@ import { z } from 'zod';
 type Business = { update(id: string): Promise<void> };
 declare const store: CommandStorePort<Business>;
 const update = defineCommand<'items.update', { id: string }, { updated: boolean }, Business>({
-  name: 'items.update', definitionVersion: 1,
+  name: 'items.update',
+  definitionVersion: 1,
   idempotency: {
-    scope: () => 'items', fingerprint: (input) => input,
+    scope: () => 'items',
+    fingerprint: (input) => input,
     response: jsonCodec(z.object({ updated: z.boolean() })),
   },
   records: { audit: 'required', outbox: 'optional' },
@@ -382,28 +432,30 @@ const update = defineCommand<'items.update', { id: string }, { updated: boolean 
 });
 const executor = createCommandExecutor({ store });
 const result = await executor.execute(update, {
-  input: { id: 'item' }, actor: { kind: 'system', subject: 'maintenance' },
-  correlationId: 'update', idempotencyKey: 'fixture-key-00001',
+  input: { id: 'item' },
+  actor: { kind: 'system', subject: 'maintenance' },
+  correlationId: 'update',
+  idempotencyKey: 'fixture-key-00001',
 });
 result.value;
 ```
 
-The executor validates, detaches and deeply freezes bounded I-JSON input and a narrowed actor
-before calling scope and fingerprint once. Request SHA-256 covers command, definitionVersion,
-scope, selected input, actor kind/subject and expectedVersion or null. A separate SHA-256 hashes
-the key. Scheme, correlation, W3C context and raw key are excluded from request material. Keys
-are 16–256 UTF-8 bytes; scope and remaining identity/header strings are 1–256 bytes. Trace context
-uses W3C known-field validation, retains opaque future fields, and permits empty tracestate members.
-Traceparent rejects HTTP control bytes (including CR, LF, NUL and DEL), while preserving
-allowed HTAB, SP and opaque obs-text in unknown future fields.
+The executor validates, detaches and deeply freezes bounded I-JSON input and a narrowed actor before
+calling scope and fingerprint once. Request SHA-256 covers command, definitionVersion, scope,
+selected input, actor kind/subject and expectedVersion or null. A separate SHA-256 hashes the key.
+Scheme, correlation, W3C context and raw key are excluded from request material. Keys are 16–256
+UTF-8 bytes; scope and remaining identity/header strings are 1–256 bytes. Trace context uses W3C
+known-field validation, retains opaque future fields, and permits empty tracestate members.
+Traceparent rejects HTTP control bytes (including CR, LF, NUL and DEL), while preserving allowed
+HTAB, SP and opaque obs-text in unknown future fields.
 
 Defaults are 64 audit intents, 64 delivery intents and 64 KiB **aggregate** canonical side-row
 bytes, including persisted metadata. Configuration only tightens those ceilings. Each transaction
-receives a finite five-second timeout and validated provider claim-wait policy. Recorders perform
-no IO and detach canonical JSON immediately. Required/forbidden/count/byte policy and response
-codec validation all precede flush. Audit, outbox and receipt completion flush in that order using
-one bound handle; their execution ID is the winning receipt ID. Optional unkeyed attempts still
-have an execution ID but skip claim/completion.
+receives a finite five-second timeout and validated provider claim-wait policy. Recorders perform no
+IO and detach canonical JSON immediately. Required/forbidden/count/byte policy and response codec
+validation all precede flush. Audit, outbox and receipt completion flush in that order using one
+bound handle; their execution ID is the winning receipt ID. Optional unkeyed attempts still have an
+execution ID but skip claim/completion.
 
 Replay rechecks hash, version, completeness, canonical text and decoding, then returns the original
 correlation and performs no handler or side writes. Busy issues no later query and surfaces
@@ -446,15 +498,15 @@ private per-instance seam; a controller binds once and keeps only its latest 128
 business, receipt, audit and outbox together. `after_commit_before_return` models a lost response:
 all rows remain committed and the same-key retry replays without another handler or side record.
 
-`runCommandConformance(createFixture)` accepts a fresh `CommandConformanceFixture<TTx>` factory.
-The store and row types belong to the database package; the business handle stays generic. Supply
-bound write/CAS operations, detached committed inspection, corrupt receipt seeding and an explicit
+`runCommandConformance(createFixture)` accepts a fresh `CommandConformanceFixture<TTx>` factory. The
+store and row types belong to the database package; the business handle stays generic. Supply bound
+write/CAS operations, detached committed inspection, corrupt receipt seeding and an explicit
 outside-write negative control. `createMemoryCommandConformanceFixture()` is the simulated default.
-The finite matrix covers named faults, replay/mismatch, scope/name/version changes, malformed replay,
-cancellation, CAS, callback re-entry, no retry, terminal busy, isolation, policies and ordered flush.
-It includes concurrent replay and recovery after a rolled-back leader. Replacing the fixture's bound
-write with its outside-write control must fail the same-commit assertion. Real adapters still need
-provider-specific driver, lock, timeout and pooled session qualification.
+The finite matrix covers named faults, replay/mismatch, scope/name/version changes, malformed
+replay, cancellation, CAS, callback re-entry, no retry, terminal busy, isolation, policies and
+ordered flush. It includes concurrent replay and recovery after a rolled-back leader. Replacing the
+fixture's bound write with its outside-write control must fail the same-commit assertion. Real
+adapters still need provider-specific driver, lock, timeout and pooled session qualification.
 
 ```ts
 import {
@@ -464,18 +516,18 @@ import {
 const report = await runCommandConformance(createMemoryCommandConformanceFixture);
 ```
 
-`assertCommandDeterminism(definition, envelope, samples)` evaluates actual identity logic 2–32
-times (default four), each over equivalent detached deeply frozen input/actor material. It detects
-scope or fingerprint closure changes that affect sampled identity, without executing the handler
-or store. Its `sampled_equivalence` report is finite evidence, not a universal purity guarantee;
-command authors remain responsible for excluding clocks, randomness, mutable globals and IO.
+`assertCommandDeterminism(definition, envelope, samples)` evaluates actual identity logic 2–32 times
+(default four), each over equivalent detached deeply frozen input/actor material. It detects scope
+or fingerprint closure changes that affect sampled identity, without executing the handler or store.
+Its `sampled_equivalence` report is finite evidence, not a universal purity guarantee; command
+authors remain responsible for excluding clocks, randomness, mutable globals and IO.
 
 ## Durable command outbox relay
 
-Import `createCommandOutboxRelay` and its options from `@netscript/service/commands/relay`.
-Database owns raw persistence; service decodes bounded canonical I-JSON, validates W3C fields,
-resolves a copied sink registry and supervises a bounded drain. Construction starts no timer,
-resource or queue. Schedule `drainOnce` with your existing scheduler and await `stop` on shutdown.
+Import `createCommandOutboxRelay` and its options from `@netscript/service/commands/relay`. Database
+owns raw persistence; service decodes bounded canonical I-JSON, validates W3C fields, resolves a
+copied sink registry and supervises a bounded drain. Construction starts no timer, resource or
+queue. Schedule `drainOnce` with your existing scheduler and await `stop` on shutdown.
 
 ```ts
 import { createCommandOutboxRelay } from '@netscript/service/commands/relay';
@@ -484,10 +536,15 @@ import type { CommandOutboxRelayStore, CommandOutboxSink } from '@netscript/serv
 declare const store: CommandOutboxRelayStore;
 declare const sink: CommandOutboxSink;
 const relay = createCommandOutboxRelay({
-  store, sinks: new Map([[sink.id, sink]]),
-  clock: { now: () => new Date() }, ids: { next: () => crypto.randomUUID() },
-  batchSize: 16, concurrency: 4, leaseMs: 30000,
-  maxAttempts: 10, maxRetryDelayMs: 60000,
+  store,
+  sinks: new Map([[sink.id, sink]]),
+  clock: { now: () => new Date() },
+  ids: { next: () => crypto.randomUUID() },
+  batchSize: 16,
+  concurrency: 4,
+  leaseMs: 30000,
+  maxAttempts: 10,
+  maxRetryDelayMs: 60000,
   classify: () => 'unavailable',
   retryAt: (attempt, now) => new Date(now.getTime() + Math.min(1000 * attempt, 60000)),
 });
@@ -495,11 +552,11 @@ await relay.drainOnce();
 await relay.stop();
 ```
 
-Overlapping drains serialize under one concurrency ceiling. Stop prevents new claims, signals
-active publishers and waits for all active and queued drains, including publishers that ignore
+Overlapping drains serialize under one concurrency ceiling. Stop prevents new claims, signals active
+publishers and waits for all active and queued drains, including publishers that ignore
 cancellation. Aborted claimed rows are released only through their owned token; expired ownership
-remains for a later claim. Caller cancellation is cooperative and passed to provider/sink operations.
-Finite provider timeouts and sink timeouts belong to their supplied boundaries.
+remains for a later claim. Caller cancellation is cooperative and passed to provider/sink
+operations. Finite provider timeouts and sink timeouts belong to their supplied boundaries.
 
 A generic sink may resolve void at its documented acceptance boundary. Checked worker sinks return
 only normalized `{ identity, acceptedAt }`; service validates and snapshots both before database
