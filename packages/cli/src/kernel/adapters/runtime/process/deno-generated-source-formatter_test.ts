@@ -36,9 +36,12 @@ Deno.test('generated batch child write permission is scoped to its staging base'
     stderr: '',
   });
   const formatter = new DenoGeneratedSourceFormatter(process);
-  assertEquals(await formatter.formatContents([{ targetPath: '/consumer/file.ts', content: 'raw' }]), [
-    'formatted\n',
-  ]);
+  assertEquals(
+    await formatter.formatContents([{ targetPath: '/consumer/file.ts', content: 'raw' }]),
+    [
+      'formatted\n',
+    ],
+  );
   const args = process.calls[0].args;
   const temporaryDirectory = resolve(tmpdir());
   assertEquals(args.filter((arg) => arg.startsWith('--allow-write')), [
