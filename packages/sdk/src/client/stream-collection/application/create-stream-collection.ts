@@ -45,9 +45,10 @@ export function createStreamCollectionV1<T extends object>(
   options: StreamCollectionOptionsV1<T>,
 ): StreamCollectionBindingV1<T> {
   if (!options.type.trim()) throw new TypeError('A stream collection type is required');
-  const source = createFetchStreamEventSourceV1(options);
+  let source!: ReturnType<typeof createFetchStreamEventSourceV1>;
   let binding: ReturnType<typeof bindStreamEventSourceV1>;
   let started = false;
+  let ready = false;
   let failure: Error | undefined;
   const errorListeners = new Set<() => void>();
   const collection = createCollection<T, string, StreamCollectionUtilsV1>({
@@ -70,6 +71,10 @@ export function createStreamCollectionV1<T extends object>(
       sync: ({ collection, begin, write, commit, markReady }) => {
         if (started) throw new Error('Stream collection is closed; create a new binding');
         started = true;
+        // Construct the transport only after upstream collection initialization.
+        // Deno's lazy Node globals can drain microtasks during that initialization;
+        // an eager injected response must not finish before listeners are attached.
+        source = createFetchStreamEventSourceV1(options);
         binding = bindStreamEventSourceV1({
           source,
           onEvent(event) {
@@ -78,7 +83,10 @@ export function createStreamCollectionV1<T extends object>(
               return;
             }
             if (event.event !== 'data') {
-              if (event.payload.upToDate || event.payload.streamClosed) markReady();
+              if (event.payload.upToDate || event.payload.streamClosed) {
+                ready = true;
+                markReady();
+              }
               return;
             }
             const changes = event.payload.filter((change) => change.type === options.type).map(
@@ -114,7 +122,7 @@ export function createStreamCollectionV1<T extends object>(
   const done = source.done.then(
     async () => {
       // Cancellation or HTTP 204 before readiness must also settle pending preload calls.
-      if (collection.status === 'loading') await collection.cleanup();
+      if (!ready) await collection.cleanup();
     },
     async (error: unknown) => {
       failure = error instanceof Error
@@ -133,7 +141,13 @@ export function createStreamCollectionV1<T extends object>(
   const preload = collection.preload.bind(collection);
   collection.preload = async () => {
     if (failure) throw failure;
-    await Promise.race([preload(), done]);
+    try {
+      await Promise.race([preload(), done]);
+    } catch (error) {
+      // Cleanup can reject upstream readiness before done finishes rejecting.
+      // Preserve the source failure already recorded by the supervisor.
+      throw failure ?? error;
+    }
     if (failure) throw failure;
   };
   let disposal: Promise<void> | undefined;

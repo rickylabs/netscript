@@ -87,10 +87,10 @@
     "jsr:@std/text@^1.0.19": "1.0.19",
     "jsr:@std/ulid@1": "1.0.0",
     "jsr:@std/uuid@^1.0.9": "1.1.1",
-    "npm:@durable-streams/client@0.2.6": "0.2.6",
-    "npm:@durable-streams/server@~0.3.7": "0.3.7_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2",
-    "npm:@durable-streams/state@0.3.1": "0.3.1_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2",
-    "npm:@durable-streams/tanstack-ai-transport@^0.0.8": "0.0.8",
+    "npm:@durable-streams/client@0.2.7": "0.2.7",
+    "npm:@durable-streams/server@0.3.9": "0.3.9_@tanstack+db@0.13.0__typescript@7.0.2_typescript@7.0.2",
+    "npm:@durable-streams/state@0.3.2": "0.3.2_@tanstack+db@0.13.0__typescript@7.0.2_typescript@7.0.2",
+    "npm:@durable-streams/tanstack-ai-transport@0.0.10": "0.0.10",
     "npm:@multiformats/base-x@^4.0.1": "4.0.1",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
     "npm:@opentelemetry/api@^1.9.1": "1.9.1",
@@ -126,14 +126,11 @@
     "npm:@tanstack/ai-preact@~0.14.4": "0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2_@opentelemetry+api@1.9.1_zod@4.4.3",
     "npm:@tanstack/ai@0.52": "0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
     "npm:@tanstack/ai@0.66.0": "0.66.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/db@0.6.17": "0.6.17_typescript@7.0.2",
-    "npm:@tanstack/db@~0.6.8": "0.6.17_typescript@7.0.2",
+    "npm:@tanstack/db@0.13.0": "0.13.0_typescript@7.0.2",
     "npm:@tanstack/preact-query@^5.101.0": "5.101.1_preact@10.29.2",
     "npm:@tanstack/query-core@^5.101.0": "5.101.1",
-    "npm:@tanstack/query-db-collection@1.2.1": "1.2.1_@tanstack+query-core@5.101.1_typescript@7.0.2",
-    "npm:@tanstack/query-db-collection@^1.2.1": "1.2.1_@tanstack+query-core@5.101.1_typescript@7.0.2",
-    "npm:@tanstack/react-db@0.1.95": "0.1.95_react@19.2.8_typescript@7.0.2",
-    "npm:@tanstack/react-db@~0.1.95": "0.1.95_react@19.2.8_typescript@7.0.2",
+    "npm:@tanstack/query-db-collection@1.4.3": "1.4.3_@tanstack+query-core@5.101.1_typescript@7.0.2",
+    "npm:@tanstack/react-db@0.5.8": "0.5.8_react@19.2.8_typescript@7.0.2",
     "npm:@types/amqplib@~0.10.7": "0.10.8",
     "npm:@workos-inc/node@^10.4.0": "10.6.0",
     "npm:amqplib@^2.0.1": "2.0.1",
@@ -819,16 +816,15 @@
         "undici"
       ]
     },
-    "@durable-streams/client@0.2.6": {
-      "integrity": "sha512-uHKKbWpsKLhFMeGjG0PgM6LXE3oEIi7FHKlJZkmYGxcqd4Yjjd/QEvnQnDzteRP4Av1uJVM8qjTL7kfKsgeS/w==",
+    "@durable-streams/client@0.2.7": {
+      "integrity": "sha512-oxWbPEo8NO1Ruv9UgUVu3OswdE2z5ERhjccaujlpwe4tWuVd+Y/kdx+HtrkOnwN+bnRHTlxKYUNY8JTyrnhKew==",
       "dependencies": [
-        "@microsoft/fetch-event-source",
-        "fastq"
+        "@microsoft/fetch-event-source"
       ],
       "bin": true
     },
-    "@durable-streams/server@0.3.7_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2": {
-      "integrity": "sha512-3vF1EjCn+DhqZn5f7/aqW/E9sN4UGUhhYVn5LoeD7lP7sAdCy1M5sFCdI+tUe6B+5l7ORKNxU9lhgY7HfYa+Zw==",
+    "@durable-streams/server@0.3.9_@tanstack+db@0.13.0__typescript@7.0.2_typescript@7.0.2": {
+      "integrity": "sha512-jjUzuRu2VtJFl9wdSFrsowE/yQKhtxx12WWLQ2W0e68AwjSlerGW45nPvt2LNoXxTS0ObSJpRmxOYICpC61ztA==",
       "dependencies": [
         "@durable-streams/client",
         "@durable-streams/state",
@@ -836,8 +832,8 @@
         "lmdb"
       ]
     },
-    "@durable-streams/state@0.3.1_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2": {
-      "integrity": "sha512-HYhw520Bfl9+L3MJgWpzLQjByP5y/uNNasOqSSFfyWhFxZeaKHM6Go2P79YFfTJPmXh4ZHEh1jOgIfrumqT6hA==",
+    "@durable-streams/state@0.3.2_@tanstack+db@0.13.0__typescript@7.0.2_typescript@7.0.2": {
+      "integrity": "sha512-pFj09315ARvyJR6iCt6p1CP6HW6tw/JsKgD1pfyjduveOzqxq3v01aXPSlUMb83ncwWjtMTuzwyfP6JsywbaJg==",
       "dependencies": [
         "@durable-streams/client",
         "@standard-schema/spec",
@@ -848,8 +844,8 @@
       ],
       "bin": true
     },
-    "@durable-streams/tanstack-ai-transport@0.0.8": {
-      "integrity": "sha512-fefWoIwTqnLEEkmNqcznDfcm4eY4yxbeP1S2MGu5xTCmpGCccid364iglzPjGdKhHHWfuuyE+3xNt5yT+q/iAw==",
+    "@durable-streams/tanstack-ai-transport@0.0.10": {
+      "integrity": "sha512-6ZTRHEF3la8XLdkxX0UjJJlqZm021MJwfwCogp4Z8TQD5Ifs/cACQItrbJbFRPuvsQE1NyJ6bTaiGPERa3x2jA==",
       "dependencies": [
         "@durable-streams/client"
       ],
@@ -1167,38 +1163,38 @@
         "tslib"
       ]
     },
-    "@lmdb/lmdb-darwin-arm64@3.5.6": {
-      "integrity": "sha512-mY5FG4TjPAkY4P0w+OhHaUka5mDh2TX2WKYIwuKzJ1zeW3VvRgxdam/lGJTquI+bthTx5CSHDW+BAQCnNAzkEA==",
+    "@lmdb/lmdb-darwin-arm64@3.5.7": {
+      "integrity": "sha512-Y0CUvoj3ToaPQGdiqtodR0yrbAToNV74ylGQGSsNzmACO6iqKIUdU2OyFhkB+AAYpyfCA6oYh8hxbtc7eZhklA==",
       "os": ["darwin"],
       "cpu": ["arm64"]
     },
-    "@lmdb/lmdb-darwin-x64@3.5.6": {
-      "integrity": "sha512-foa+pwitysO8k+xhs7psBFfTKnVgR69NlZRRTHaFVDqphh7AdGpLeyRzKw/ofatr/sN6TiHRRW6mmop0ZrrppQ==",
+    "@lmdb/lmdb-darwin-x64@3.5.7": {
+      "integrity": "sha512-6WBLAMJxEJU7mhqvGmajtr9DKljh8Gd3uw4seeCnBLHsOsTOFZQ3evREZPiaz//wVamR/m9pFeexJZqWn6epfA==",
       "os": ["darwin"],
       "cpu": ["x64"]
     },
-    "@lmdb/lmdb-linux-arm64@3.5.6": {
-      "integrity": "sha512-HmiyFFdJa38s1heCMSooSPaBSFTHJ3C+ERPp28xAPlDX1YiALJVOgbry065nXd8Y7KISWjnw05zpG1RX8IfftA==",
+    "@lmdb/lmdb-linux-arm64@3.5.7": {
+      "integrity": "sha512-Lt+Iu1FY4zfxEI35WnjvfyF5tC7r4jif6lcujjBsdyyCPtzJorPFCu983tGmroqo2yyBPhOzKFq9r1BFfuDO+Q==",
       "os": ["linux"],
       "cpu": ["arm64"]
     },
-    "@lmdb/lmdb-linux-arm@3.5.6": {
-      "integrity": "sha512-QR4YRyR5h5Z8eGXrNQjiyo2NNDfqi3tCc9dQG5Is1blCt+qWw1ZoBWhlWAr5d+jshkifMIJjVHzHGKbkKzF8Tw==",
+    "@lmdb/lmdb-linux-arm@3.5.7": {
+      "integrity": "sha512-G7S80aRTbTwJ8b2HvnPu6aUQHqylKrThp7RjFtqpsicozHN8YBm/tGM0GOJTk/e2XKc1ohTB3nke6fi6BZSPjA==",
       "os": ["linux"],
       "cpu": ["arm"]
     },
-    "@lmdb/lmdb-linux-x64@3.5.6": {
-      "integrity": "sha512-ADzCuCF2cTNiX9kDScqcz1fjnAkxPpQNneV3KFTdV3wWtVlI2sTGzySoMTgDpinkMMFj1NTJlxA6XR8fwc4hlA==",
+    "@lmdb/lmdb-linux-x64@3.5.7": {
+      "integrity": "sha512-9wv08LC1zp9JNxOegfNIwvL1AScx+EM8+hJF52uZl+CbwlYV24NdFibB+Jn8ZvOxCqqDGOUZfy0+XQ3qd3cuQQ==",
       "os": ["linux"],
       "cpu": ["x64"]
     },
-    "@lmdb/lmdb-win32-arm64@3.5.6": {
-      "integrity": "sha512-J7A9aEQsQiv0TYtBGL7NDIPp2lOS8nnl+zm4sWZm1xlsTTaQ4PgD096Adzdrk27rw3UxCkDXdCUa4ax41oztBQ==",
+    "@lmdb/lmdb-win32-arm64@3.5.7": {
+      "integrity": "sha512-+qU4H80gI3OiWcka+2wDZ/KV89ZKKfvWz9aAZ64WYMhczPsn7BQqYvI5by/AdOcWSQL1tT0LLwmVM3QIbubwqQ==",
       "os": ["win32"],
       "cpu": ["arm64"]
     },
-    "@lmdb/lmdb-win32-x64@3.5.6": {
-      "integrity": "sha512-1g7G0knRX2iV/voDu54yxrGqw5Dk0w2oIYb7dgJq8IkOi+m7wbD8Q3QpPFjh0C01G58S88dqGn03len6UPCXsg==",
+    "@lmdb/lmdb-win32-x64@3.5.7": {
+      "integrity": "sha512-iKT8EOWsWFihWe8UdUFAVfd6tvqACY9UC76f3MbkgPFEzMaKG2QUwWXP9GZibEeBCHajXf0nigKLrlFIsjYm3g==",
       "os": ["win32"],
       "cpu": ["x64"]
     },
@@ -1851,16 +1847,16 @@
         "@opentelemetry/api"
       ]
     },
-    "@tanstack/db-ivm@0.1.18_typescript@7.0.2": {
-      "integrity": "sha512-+pZJiRKdoKRM5Epq9T7otD9ZJl82pRFauo7LKuJGrarjVKQ7r+QQlPe3kGdN9LEKSnuNGIWjX9OOY4M8kH4eLw==",
+    "@tanstack/db-ivm@0.1.26_typescript@7.0.2": {
+      "integrity": "sha512-Td2HbR68RfpMPv4zyMNQk83z/5gTjGl/I1LA/07A26LXMEPGh+hTsNbfPSr5YPZhq6KXX9lDFjDzv3Qz3DjV5w==",
       "dependencies": [
         "fractional-indexing",
         "sorted-btree",
         "typescript"
       ]
     },
-    "@tanstack/db@0.6.17_typescript@7.0.2": {
-      "integrity": "sha512-/i6+dedEkOCVQbTQtCjQHx3Nqlkqe6zvi+9/JPnSgm47o+akoaPqcSwxTmesDZxc/efHokUtzeD2ocow257RdQ==",
+    "@tanstack/db@0.13.0_typescript@7.0.2": {
+      "integrity": "sha512-Opp8m9K/5cw2N8WXK59W0WeV0yD+hV8zreqQv6U8GLSQAssnOPvrC5j0UwIyl8SfT6LslGFYNFGfnVN5V0oWmg==",
       "dependencies": [
         "@standard-schema/spec",
         "@tanstack/db-ivm",
@@ -1901,8 +1897,8 @@
     "@tanstack/query-core@5.101.1": {
       "integrity": "sha512-Y6Y92dkXtNqx67m2pMSxUsA3zOCwv862JexZRP8/EPwvKXMPu9m8rv43spiXWzOUIggQ3SQApttALStzhA8B4g=="
     },
-    "@tanstack/query-db-collection@1.2.1_@tanstack+query-core@5.101.1_typescript@7.0.2": {
-      "integrity": "sha512-2IwtxdolgPMwLoV7TKaB+1qVGU7ukulacCQqhCt1/50+x/r9sLXF2668fy6OnLd0mEkkEthzCa+J3ZbiA4kNbg==",
+    "@tanstack/query-db-collection@1.4.3_@tanstack+query-core@5.101.1_typescript@7.0.2": {
+      "integrity": "sha512-vTmt/nA/z+NlSQggFH8/847VTfn3uGw51xYSWzcQuEe71O1gOnhMee0mBkIB4sHEM6sq1Rmgj4A9tYfr2W/Dfg==",
       "dependencies": [
         "@standard-schema/spec",
         "@tanstack/db",
@@ -1910,12 +1906,11 @@
         "typescript"
       ]
     },
-    "@tanstack/react-db@0.1.95_react@19.2.8_typescript@7.0.2": {
-      "integrity": "sha512-Om2qgKtoK+iTcE3nR+MaPQsM4JUsDWB8LqFt4yFjwuSawwMJ7bcPnc7gP0V06YKOtm5MzrIu8IV/OexMJbraKQ==",
+    "@tanstack/react-db@0.5.8_react@19.2.8_typescript@7.0.2": {
+      "integrity": "sha512-CpNBCW+jdAwTCJTP9b6u8S5ZfX+x5KtAKwcJ4hb+Y4zDJptbFy2teGxYk7oaIguGXdZreMd7lJH7jm3+NZBECA==",
       "dependencies": [
         "@tanstack/db",
-        "react",
-        "use-sync-external-store"
+        "react"
       ]
     },
     "@tediousjs/connection-string@1.1.0": {
@@ -2528,12 +2523,6 @@
     "fast-uri@3.1.6": {
       "integrity": "sha512-7Ical1vFEMr0onbVzEDIreM22I4khW+fzyQPwvAFWBp1iwdshSZRsL4jjRvPG9JP1uiqMHRto+YU6R2/CzDz5Q=="
     },
-    "fastq@1.20.1": {
-      "integrity": "sha512-GGToxJ/w1x32s/D2EKND7kTil4n8OVk/9mycTc4VDza13lOvpUZTGX3mFSCtV9ksdGBVzvsyAVLM6mHFThxXxw==",
-      "dependencies": [
-        "reusify"
-      ]
-    },
     "fdir@6.5.0_picomatch@4.0.4": {
       "integrity": "sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==",
       "dependencies": [
@@ -2862,8 +2851,8 @@
     "kysely@0.29.2": {
       "integrity": "sha512-s6WVJyEZrbm6jhBpiKHsGHyePMrVQKJ85wZCFCr9W4QHv6WTjWIrdvTmO9hDEA3bNK0xkrE2DqrHsXMLWuZpQg=="
     },
-    "lmdb@3.5.6": {
-      "integrity": "sha512-j3uE8ReKNyUWDjhfEFSJqE/1DLtfTR5Z8yFzVHvBjAk37wNg7HdScjcv8ttPHRvrdgPQMPWxFFI0SsdBzI5lBw==",
+    "lmdb@3.5.7": {
+      "integrity": "sha512-cSXt4RnfRAaGRXVI3hiJS3fQPQebj/c7RCRBvUL2cH5gTLpgvuGFqGJbH+ZkI2sFgvSlzwJw3GTw6ffFmN/uUw==",
       "dependencies": [
         "@harperfast/extended-iterable",
         "msgpackr",
@@ -3120,8 +3109,8 @@
     "openapi-types@12.1.3": {
       "integrity": "sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw=="
     },
-    "ordered-binary@1.6.1": {
-      "integrity": "sha512-QkCdPooczexPLiXIrbVOPYkR3VO3T6v2OyKRkR1Xbhpy7/LAVXwahnRCgRp78Oe/Ehf0C/HATAxfSr6eA1oX+w=="
+    "ordered-binary@1.6.2": {
+      "integrity": "sha512-BY+qgDArmYpvvmij141xbkB4Cw8RFLBQM5Zj4MODFb1SyXBRE/xO4Xj/QWbR7aUEBxbkjuNdsFVCL2TmbYrlNg=="
     },
     "parseurl@1.3.3": {
       "integrity": "sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ=="
@@ -3341,9 +3330,6 @@
         "debug",
         "module-details-from-path"
       ]
-    },
-    "reusify@1.1.0": {
-      "integrity": "sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw=="
     },
     "rollup@4.62.2": {
       "integrity": "sha512-RFnrW4lhXA3s3eqHDZvN654g8OTjzRfqpIRJYczCGB6HzphckVAi/Qh4tbPUbRuDi7s1Llv8g/NspLkttY3gTA==",
@@ -3677,12 +3663,6 @@
         "qs"
       ]
     },
-    "use-sync-external-store@1.6.0_react@19.2.8": {
-      "integrity": "sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==",
-      "dependencies": [
-        "react"
-      ]
-    },
     "util@0.10.4": {
       "integrity": "sha512-0Pm9hTQ3se5ll1XihRic3FDIku70C+iHUdT/W926rSgHV5QgXsYbKZN8MSC3tJtSkhuROzvsQjAaFENRXr+19A==",
       "dependencies": [
@@ -3924,9 +3904,9 @@
           "jsr:@std/http@1",
           "jsr:@std/path@1",
           "jsr:@std/text@1",
-          "npm:@durable-streams/client@0.2.6",
-          "npm:@durable-streams/state@0.3.1",
-          "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
+          "npm:@durable-streams/client@0.2.7",
+          "npm:@durable-streams/state@0.3.2",
+          "npm:@durable-streams/tanstack-ai-transport@0.0.10",
           "npm:@orpc/server@^1.15.0",
           "npm:@preact/signals@2.9.2",
           "npm:@tanstack/ai-client@0.39.0",
@@ -3934,7 +3914,7 @@
           "npm:@tanstack/ai@0.66.0",
           "npm:@tanstack/preact-query@^5.101.0",
           "npm:@tanstack/query-core@^5.101.0",
-          "npm:@tanstack/react-db@0.1.95",
+          "npm:@tanstack/react-db@0.5.8",
           "npm:preact-render-to-string@^6.7.0",
           "npm:preact@^10.29.2",
           "npm:vite@7.2.2",
@@ -3942,12 +3922,12 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/client@0.2.6",
-            "npm:@durable-streams/state@0.3.1",
+            "npm:@durable-streams/client@0.2.7",
+            "npm:@durable-streams/state@0.3.2",
             "npm:@preact/signals@2.9.2",
             "npm:@tanstack/preact-query@^5.101.0",
             "npm:@tanstack/query-core@^5.101.0",
-            "npm:@tanstack/react-db@0.1.95",
+            "npm:@tanstack/react-db@0.5.8",
             "npm:preact-render-to-string@^6.7.0",
             "npm:preact@^10.29.2",
             "npm:vite@7.2.2"
@@ -4062,8 +4042,8 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/client@0.2.6",
-            "npm:@durable-streams/state@0.3.1"
+            "npm:@durable-streams/client@0.2.7",
+            "npm:@durable-streams/state@0.3.2"
           ]
         }
       },
@@ -4145,10 +4125,10 @@
           "npm:@orpc/server@^1.15.0",
           "npm:@orpc/tanstack-query@^1.15.0",
           "npm:@orpc/zod@^1.15.0",
-          "npm:@tanstack/db@0.6.17",
+          "npm:@tanstack/db@0.13.0",
           "npm:@tanstack/query-core@^5.101.0",
-          "npm:@tanstack/query-db-collection@1.2.1",
-          "npm:@tanstack/react-db@0.1.95",
+          "npm:@tanstack/query-db-collection@1.4.3",
+          "npm:@tanstack/react-db@0.5.8",
           "npm:react@^19.2.3"
         ],
         "packageJson": {
@@ -4159,9 +4139,9 @@
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/tanstack-query@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
-            "npm:@tanstack/db@0.6.17",
+            "npm:@tanstack/db@0.13.0",
             "npm:@tanstack/query-core@^5.101.0",
-            "npm:@tanstack/query-db-collection@1.2.1"
+            "npm:@tanstack/query-db-collection@1.4.3"
           ]
         }
       },
@@ -4235,7 +4215,7 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/state@0.3.1",
+            "npm:@durable-streams/state@0.3.2",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
@@ -4260,13 +4240,13 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/client@0.2.6",
-            "npm:@durable-streams/state@0.3.1",
+            "npm:@durable-streams/client@0.2.7",
+            "npm:@durable-streams/state@0.3.2",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/openapi@^1.15.0",
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
-            "npm:@tanstack/db@0.6.17"
+            "npm:@tanstack/db@0.13.0"
           ]
         }
       },
@@ -4284,8 +4264,8 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/client@0.2.6",
-            "npm:@durable-streams/server@~0.3.7",
+            "npm:@durable-streams/client@0.2.7",
+            "npm:@durable-streams/server@0.3.9",
             "npm:@orpc/server@^1.15.0"
           ]
         }
@@ -4309,7 +4289,7 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/state@0.3.1",
+            "npm:@durable-streams/state@0.3.2",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/server@^1.15.0"
           ]
@@ -4335,14 +4315,14 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/client@0.2.6",
-            "npm:@durable-streams/state@0.3.1",
+            "npm:@durable-streams/client@0.2.7",
+            "npm:@durable-streams/state@0.3.2",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/openapi@^1.15.0",
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
-            "npm:@tanstack/db@0.6.17",
-            "npm:@tanstack/react-db@0.1.95"
+            "npm:@tanstack/db@0.13.0",
+            "npm:@tanstack/react-db@0.5.8"
           ]
         }
       }

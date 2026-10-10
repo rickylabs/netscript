@@ -149,8 +149,8 @@ Deno.test({
               zod: '^4.4.3',
             },
             imports: {
-              '@durable-streams/client': 'npm:@durable-streams/client@^0.2.6',
-              '@durable-streams/state': 'npm:@durable-streams/state@^0.3.1',
+              '@durable-streams/client': 'npm:@durable-streams/client@0.2.7',
+              '@durable-streams/state': 'npm:@durable-streams/state@0.3.2',
               '@netscript/plugin-streams-core':
                 new URL('packages/plugin-streams-core/mod.ts', repoRoot).href,
               '@netscript/plugin-streams-core/sse':
@@ -162,7 +162,7 @@ Deno.test({
               '@netscript/telemetry/otel':
                 new URL('packages/telemetry/src/adapters/otel/mod.ts', repoRoot).href,
               '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
-              '@tanstack/react-db': 'npm:@tanstack/react-db@^0.1.86',
+              '@tanstack/react-db': 'npm:@tanstack/react-db@0.5.8',
               fresh: 'jsr:@fresh/core@^2.3.3',
               preact: 'npm:preact@^10.29.2',
               'preact/hooks': 'npm:preact@^10.29.2/hooks',
