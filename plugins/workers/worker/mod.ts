@@ -59,3 +59,18 @@ export type {
   WorkerTaskResult,
 } from './worker.ts';
 export type { WorkerPoolOptions } from './job-runner-pool.ts';
+
+export type {
+  ExecutionStatus,
+  JobFailure,
+  JobPayloadSchema,
+  JobSuccess,
+  PublicStandardSchema,
+  TriggerType,
+} from '@netscript/plugin-workers-core/runtime';
+export type {
+  WorkerIdempotencyClaim,
+  WorkerIdempotencyInput,
+  WorkerIdempotencyPort,
+  WorkerIdempotencySource,
+} from '@netscript/plugin-workers-core/stores';

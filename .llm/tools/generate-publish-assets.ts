@@ -14,6 +14,7 @@ const stalePaths: string[] = [];
 /** Golden-path prose embedded in the MCP package when no filesystem corpus resolves. */
 export const MCP_EMBEDDED_DOC_PATHS = [
   'llms.txt',
+  'pages/durable-workflows/how-to/bound-stream-retention/index.md',
   'pages/explanation/contracts/index.md',
   'pages/explanation/plugin-system/index.md',
   'pages/orchestration-runtime/how-to/author-a-plugin/index.md',
@@ -29,10 +30,11 @@ export const MCP_EMBEDDED_DOC_PATHS = [
 
 /**
  * Maximum UTF-8 source bytes accepted for the generated MCP fallback prose.
- * 258 KiB: #1383 required the guarded plugin-service example on the embedded
- * plugin-system page when the corpus had 44 bytes of headroom under 256 KiB.
+ * 288 KiB: #1383 required the guarded plugin-service example on the embedded
+ * plugin-system page (258 KiB), and the streams retention recipe is embedded
+ * alone rather than the entire streams reference page.
  */
-export const MCP_EMBEDDED_DOCS_MAX_BYTES = 264_192;
+export const MCP_EMBEDDED_DOCS_MAX_BYTES = 294_912;
 
 export const PUBLISH_ASSET_OUTPUTS = [
   '.llm/assets/agent-docs/prose.json.gz',

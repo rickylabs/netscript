@@ -159,7 +159,12 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   doctor: objectSchema({ endpoint: stringProperty, resource: stringProperty }),
   search_docs: objectSchema({ query: stringProperty, limit: searchLimitProperty }, ['query']),
   list_docs: objectSchema({ limit: limitProperty }),
-  get_doc: objectSchema({ slug: stringProperty, section: stringProperty }, ['slug']),
+  get_doc: objectSchema({
+    slug: { type: 'string', minLength: 1, maxLength: 2000 },
+    section: { type: 'string', minLength: 1, maxLength: 2000 },
+    full: { type: 'boolean' },
+    cursor: { type: 'string', minLength: 1, maxLength: 128 },
+  }, ['slug']),
   find_guidance: objectSchema({
     intent: {
       type: 'string',
@@ -295,6 +300,22 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     },
   }, ['count', 'corpus', 'docs']),
   get_doc: objectSchema({
+    contractVersion: { enum: [2] },
+    mode: { enum: ['verbatim', 'extract', 'full'] },
+    description: stringProperty,
+    outline: {
+      type: 'array',
+      items: objectSchema({
+        heading: stringProperty,
+        slug: stringProperty,
+        characters: { type: 'integer', minimum: 0 },
+      }, ['heading', 'slug', 'characters']),
+    },
+    omitted: objectSchema({
+      blocks: { type: 'integer', minimum: 0 },
+      characters: { type: 'integer', minimum: 0 },
+    }, ['blocks', 'characters']),
+    nextCursor: { type: 'string', maxLength: 128 },
     slug: stringProperty,
     title: stringProperty,
     section: stringProperty,
@@ -304,6 +325,8 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     'slug',
     'title',
     'content',
+    'mode',
+    'contractVersion',
   ]),
   find_guidance: objectSchema({
     intent: { type: 'string', maxLength: GUIDANCE_MAX_INTENT_CHARACTERS },

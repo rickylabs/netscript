@@ -1,0 +1,1180 @@
+{
+  "source": "v0.0.8-canary.3 release body; included GitHub PR titles/labels and relevant migration/reference sections; issue state captured 2026-10-10",
+  "publishedVersion": "0.0.8-canary.3",
+  "previous": "6d1eaf5a221ce29fa55c0bfd10e3b5c7d66101e3",
+  "context": {
+    "latestStableTag": "v0.0.7",
+    "publishedPackageCount": 35,
+    "publishRunId": "38059950011",
+    "productionE2ERunId": "38060469468",
+    "productionE2EOutcome": "success"
+  },
+  "payload": {
+    "commitCount": 61,
+    "outcome": "populated",
+    "pullRequests": [
+      2092,
+      2078,
+      2091,
+      2088,
+      2090,
+      2093,
+      2089,
+      2087,
+      2096,
+      2094,
+      2097,
+      2126,
+      2122,
+      2116,
+      2121,
+      2119,
+      2131,
+      2123,
+      2169,
+      2135,
+      2137,
+      2136,
+      2133,
+      2124,
+      2127,
+      2129,
+      2130,
+      2178,
+      2192,
+      2167,
+      2198,
+      2140,
+      2183,
+      2196,
+      2189,
+      2166,
+      2141,
+      2193,
+      2195,
+      2117,
+      2211,
+      2188,
+      2186,
+      2139,
+      2182,
+      2199,
+      2163,
+      2197,
+      2175,
+      2171,
+      2205,
+      2204,
+      2177,
+      2173,
+      2220,
+      2134,
+      2128,
+      2125,
+      2216,
+      2209,
+      2236
+    ],
+    "issues": [
+      1383,
+      1484,
+      1485,
+      1486,
+      1670,
+      1681,
+      1682,
+      1688,
+      1690,
+      1708,
+      1765,
+      1767,
+      1786,
+      1825,
+      1826,
+      1893,
+      1896,
+      1932,
+      1939,
+      1990,
+      1999,
+      2013,
+      2018,
+      2024,
+      2028,
+      2030,
+      2031,
+      2032,
+      2065,
+      2095,
+      2099,
+      2101,
+      2102,
+      2105,
+      2107,
+      2111,
+      2120,
+      2164,
+      2210
+    ],
+    "pullRequestTitles": {
+      "2078": "fix(ai): support explicit Anthropic model IDs and current wire options",
+      "2087": "fix(ai): keep published adapters peer-compatible with AI core",
+      "2088": "fix(workers): propagate job cancellation and deadlines",
+      "2089": "fix(fresh/sdk): qualify one TanStack DB Collection runtime",
+      "2090": "fix(fresh): keep typed route URL helpers pure",
+      "2091": "fix(desktop): reconnect native RPC after document reload",
+      "2092": "fix(fresh): preserve complete native chat messages in send",
+      "2093": "feat(database): PostgreSQL command store and true transaction client",
+      "2094": "feat(telemetry): add bounded command tracing and privacy conformance",
+      "2096": "feat(command): relay durable outbox through checked sinks",
+      "2097": "feat(sagas): commit typed worker effects atomically with transitions",
+      "2116": "feat(service): add a middleware slot and an opt-in request-body limit to defineService",
+      "2117": "fix(cli): prove guarded plugin services in scaffold.runtime and document plugin API protection",
+      "2119": "fix(auth): accept empty OpenAPI GET input for auth me",
+      "2121": "test(cli-e2e): assert exact HTTP status in scaffold runtime gates",
+      "2122": "fix(logger): request-scoped correlation and configurable RPC debug redaction",
+      "2123": "fix(sdk): let native oRPC safe/isDefinedError narrow on createServiceClient errors",
+      "2124": "fix(mcp): rank find_guidance on content terms with IDF weighting",
+      "2125": "feat(plugin): validate root composition collisions and dependency closure",
+      "2126": "fix(ai): realign TanStack AI family to a peer-compatible set",
+      "2127": "fix(fresh-ui): open Dialog, Sheet and Drawer modally via showModal()",
+      "2128": "test(contracts): harden the baseContract initializer pin",
+      "2129": "fix(tooling): apply aspire loopback-URL rule to plugin runtime source",
+      "2130": "fix(cli): report contract service-directory state truthfully",
+      "2131": "docs(sdk): align cache-first loaders on action-then-metadata and document warm-stale persistence failure",
+      "2133": "fix(auth): derive a stable non-OIDC subject from provider userinfo",
+      "2134": "fix(mcp): clear private-type-ref errors across the export map",
+      "2135": "fix(kv): conform memory and Redis adapters on atomic versionstamps, combine ops and watch",
+      "2136": "fix(workers): forward correlation and trace context into queue task subprocess env",
+      "2137": "fix(service): declared fail-closed raw-route seam for createContractAuthorizer",
+      "2139": "fix(sagas): persist .compensate() outcomes and add terminal compensated status",
+      "2140": "fix(queue): isolate named queues sharing one Deno KV database",
+      "2141": "fix(sagas): actionable no-endpoint rejection diagnostic",
+      "2163": "fix(database): classify PostgreSQL command errors by SQLSTATE",
+      "2166": "feat(service): internal-audience procedures and a file-reference service credential",
+      "2167": "fix(workers): emit one canonical WORKERS_CONCURRENCY env name",
+      "2169": "fix(docs): derive the @app/router.ts README fence stub from the scaffold template",
+      "2171": "fix(cli): resolve generate resource procedures against the client, support multi-namespace clients",
+      "2173": "fix(cli): diagnose remote Docker daemon topology for Aspire AppHosts",
+      "2175": "fix(cli): preserve plugin HostPort across re-installs and document plugin port pinning",
+      "2177": "fix(auth)!: enforce signout session ownership, subject-scoped everywhere and scoped operator revocation",
+      "2178": "fix(auth): resolve bearer credentials in me like /session",
+      "2182": "docs(jsdoc): bind every name in published examples and enforce unbound names",
+      "2183": "feat(sdk): injectable resolveServiceUrl on createServiceClient; export the pure discovery resolver",
+      "2186": "ci(e2e): diagnose startup and pre-pull runtime images",
+      "2188": "fix(auth): unify trusted proxy transport policy",
+      "2189": "fix(auth): propagate backend cookies on REST and RPC",
+      "2192": "ci(e2e): key scaffold runtime tiers per PR instead of a repo-wide mutex",
+      "2193": "fix(service): require explicit CORS and inject workspace app origins",
+      "2195": "ci(tooling): shard check-test and cache dependencies",
+      "2196": "fix(auth): omit GitHub preset OIDC issuer",
+      "2197": "docs(sdk): emphasize discriminant error narrowing",
+      "2198": "test(sagas): prove sample publish failure and HTTP idempotency",
+      "2199": "fix(aspire): allocate Garnet executable endpoint port",
+      "2204": "docs(workers): document JobContext cancellation and deadlines",
+      "2205": "docs(workers): describe implemented runner modes",
+      "2209": "fix(sdk): preserve required context in query factories",
+      "2211": "test(queue): make named isolation delivery deterministic",
+      "2216": "fix(mcp): warn on unknown plugin registry expectations",
+      "2220": "fix(service): require explicit auth policy in defineService",
+      "2236": "docs(ai): state the published version without a stale package pin"
+    },
+    "closedIssuesByPullRequest": {
+      "2078": [],
+      "2087": [],
+      "2088": [],
+      "2089": [],
+      "2090": [],
+      "2091": [],
+      "2092": [],
+      "2093": [
+        1484
+      ],
+      "2094": [
+        1485
+      ],
+      "2096": [
+        1486
+      ],
+      "2097": [
+        1932
+      ],
+      "2116": [
+        2065
+      ],
+      "2117": [
+        1383
+      ],
+      "2119": [
+        1999
+      ],
+      "2121": [],
+      "2122": [
+        1786,
+        2107
+      ],
+      "2123": [
+        2031
+      ],
+      "2124": [
+        2102
+      ],
+      "2125": [
+        1896
+      ],
+      "2126": [],
+      "2127": [
+        1688
+      ],
+      "2128": [
+        1767
+      ],
+      "2129": [
+        1893
+      ],
+      "2130": [
+        2013
+      ],
+      "2131": [
+        1670
+      ],
+      "2133": [
+        2032
+      ],
+      "2134": [
+        1708
+      ],
+      "2135": [
+        2099,
+        2101
+      ],
+      "2136": [
+        1681
+      ],
+      "2137": [
+        2105
+      ],
+      "2139": [
+        1990
+      ],
+      "2140": [
+        1682
+      ],
+      "2141": [
+        1825
+      ],
+      "2163": [
+        2095
+      ],
+      "2166": [],
+      "2167": [],
+      "2169": [
+        1939
+      ],
+      "2171": [
+        2030
+      ],
+      "2173": [
+        2024
+      ],
+      "2175": [
+        2028
+      ],
+      "2177": [],
+      "2178": [
+        2120
+      ],
+      "2182": [
+        1765
+      ],
+      "2183": [
+        2018
+      ],
+      "2186": [],
+      "2188": [],
+      "2189": [],
+      "2192": [],
+      "2193": [],
+      "2195": [],
+      "2196": [
+        2164
+      ],
+      "2197": [
+        1690
+      ],
+      "2198": [
+        1826
+      ],
+      "2199": [],
+      "2204": [],
+      "2205": [],
+      "2209": [
+        2111
+      ],
+      "2211": [
+        2210
+      ],
+      "2216": [],
+      "2220": [],
+      "2236": []
+    },
+    "pullRequestDetails": {
+      "2078": {
+        "title": "fix(ai): support explicit Anthropic model IDs and current wire options",
+        "labels": [
+          "area:ai-core",
+          "canary:0.0.8-canary.3",
+          "status:impl-eval",
+          "type:fix"
+        ],
+        "body": "Refs #2063"
+      },
+      "2087": {
+        "title": "fix(ai): keep published adapters peer-compatible with AI core",
+        "labels": [
+          "area:ai-core",
+          "area:cli",
+          "area:deps",
+          "canary:0.0.8-canary.3",
+          "e2e-cli-gate",
+          "priority:p1",
+          "status:augment-review",
+          "type:fix"
+        ],
+        "body": "Refs #2036"
+      },
+      "2088": {
+        "title": "fix(workers): propagate job cancellation and deadlines",
+        "labels": [
+          "area:plugins",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:augment-review",
+          "type:fix"
+        ],
+        "body": "Refs #2066"
+      },
+      "2089": {
+        "title": "fix(fresh/sdk): qualify one TanStack DB Collection runtime",
+        "labels": [
+          "area:cli",
+          "area:deps",
+          "area:fresh",
+          "area:sdk",
+          "canary:0.0.8-canary.3",
+          "e2e-cli-gate",
+          "priority:p1",
+          "status:impl-eval",
+          "type:fix"
+        ],
+        "body": "Refs #2039"
+      },
+      "2090": {
+        "title": "fix(fresh): keep typed route URL helpers pure",
+        "labels": [
+          "area:cli",
+          "area:fresh",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:augment-review",
+          "type:fix"
+        ],
+        "body": "Refs #2040"
+      },
+      "2091": {
+        "title": "fix(desktop): reconnect native RPC after document reload",
+        "labels": [
+          "area:fresh",
+          "area:sdk",
+          "canary:0.0.8-canary.3",
+          "desktop-native-gate",
+          "priority:p1",
+          "status:augment-review",
+          "type:fix"
+        ],
+        "body": "Refs #2041"
+      },
+      "2092": {
+        "title": "fix(fresh): preserve complete native chat messages in send",
+        "labels": [
+          "area:fresh",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:augment-review",
+          "type:fix"
+        ],
+        "body": "Refs #2068"
+      },
+      "2093": {
+        "title": "feat(database): PostgreSQL command store and true transaction client",
+        "labels": [
+          "area:database",
+          "area:service",
+          "canary:0.0.8-canary.3",
+          "epic:command-composition",
+          "priority:p1",
+          "status:impl-eval",
+          "type:feat"
+        ],
+        "body": "Closes #1484"
+      },
+      "2094": {
+        "title": "feat(telemetry): add bounded command tracing and privacy conformance",
+        "labels": [
+          "area:service",
+          "area:telemetry",
+          "canary:0.0.8-canary.3",
+          "e2e-cli-gate",
+          "epic:command-composition",
+          "priority:p1",
+          "status:ready-merge",
+          "type:feat"
+        ],
+        "body": "Closes #1485"
+      },
+      "2096": {
+        "title": "feat(command): relay durable outbox through checked sinks",
+        "labels": [
+          "area:database",
+          "area:service",
+          "canary:0.0.8-canary.3",
+          "e2e-cli-gate",
+          "epic:command-composition",
+          "priority:p1",
+          "status:ready-merge",
+          "type:feat"
+        ],
+        "body": "Closes #1486"
+      },
+      "2097": {
+        "title": "feat(sagas): commit typed worker effects atomically with transitions",
+        "labels": [
+          "area:database",
+          "area:plugins",
+          "canary:0.0.8-canary.3",
+          "ci:full",
+          "epic:command-composition",
+          "priority:p1",
+          "status:impl-eval",
+          "type:feat"
+        ],
+        "body": "Closes #1932"
+      },
+      "2116": {
+        "title": "feat(service): add a middleware slot and an opt-in request-body limit to defineService",
+        "labels": [
+          "area:service",
+          "canary:0.0.8-canary.3",
+          "status:ready-merge",
+          "type:feat"
+        ],
+        "body": "Closes #2065"
+      },
+      "2117": {
+        "title": "fix(cli): prove guarded plugin services in scaffold.runtime and document plugin API protection",
+        "labels": [
+          "area:auth",
+          "area:cli",
+          "area:plugins",
+          "canary:0.0.8-canary.3",
+          "priority:p0",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1383"
+      },
+      "2119": {
+        "title": "fix(auth): accept empty OpenAPI GET input for auth me",
+        "labels": [
+          "area:auth",
+          "area:service",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1999"
+      },
+      "2121": {
+        "title": "test(cli-e2e): assert exact HTTP status in scaffold runtime gates",
+        "labels": [
+          "area:auth",
+          "area:tooling",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:test"
+        ],
+        "body": "Refs #1388"
+      },
+      "2122": {
+        "title": "fix(logger): request-scoped correlation and configurable RPC debug redaction",
+        "labels": [
+          "area:telemetry",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1786\nCloses #2107"
+      },
+      "2123": {
+        "title": "fix(sdk): let native oRPC safe/isDefinedError narrow on createServiceClient errors",
+        "labels": [
+          "area:sdk",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2031"
+      },
+      "2124": {
+        "title": "fix(mcp): rank find_guidance on content terms with IDF weighting",
+        "labels": [
+          "area:tooling",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2102"
+      },
+      "2125": {
+        "title": "feat(plugin): validate root composition collisions and dependency closure",
+        "labels": [
+          "area:plugins",
+          "breaking",
+          "canary:0.0.8-canary.3",
+          "status:ready-merge",
+          "type:feat"
+        ],
+        "body": "Closes #1896"
+      },
+      "2126": {
+        "title": "fix(ai): realign TanStack AI family to a peer-compatible set",
+        "labels": [
+          "area:ai-core",
+          "area:deps",
+          "canary:0.0.8-canary.3",
+          "priority:p0",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Refs #2036"
+      },
+      "2127": {
+        "title": "fix(fresh-ui): open Dialog, Sheet and Drawer modally via showModal()",
+        "labels": [
+          "area:fresh-ui",
+          "canary:0.0.8-canary.3",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1688"
+      },
+      "2128": {
+        "title": "test(contracts): harden the baseContract initializer pin",
+        "labels": [
+          "area:contracts",
+          "canary:0.0.8-canary.3",
+          "priority:p3",
+          "status:ready-merge",
+          "type:test"
+        ],
+        "body": "Closes #1767"
+      },
+      "2129": {
+        "title": "fix(tooling): apply aspire loopback-URL rule to plugin runtime source",
+        "labels": [
+          "area:aspire",
+          "area:tooling",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1893"
+      },
+      "2130": {
+        "title": "fix(cli): report contract service-directory state truthfully",
+        "labels": [
+          "area:cli",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2013"
+      },
+      "2131": {
+        "title": "docs(sdk): align cache-first loaders on action-then-metadata and document warm-stale persistence failure",
+        "labels": [
+          "area:docs",
+          "area:sdk",
+          "canary:0.0.8-canary.3",
+          "ci:skip-e2e",
+          "priority:p3",
+          "status:ready-merge",
+          "type:docs"
+        ],
+        "body": "Closes #1670"
+      },
+      "2133": {
+        "title": "fix(auth): derive a stable non-OIDC subject from provider userinfo",
+        "labels": [
+          "area:auth",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2032"
+      },
+      "2134": {
+        "title": "fix(mcp): clear private-type-ref errors across the export map",
+        "labels": [
+          "area:mcp",
+          "area:tooling",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1708"
+      },
+      "2135": {
+        "title": "fix(kv): conform memory and Redis adapters on atomic versionstamps, combine ops and watch",
+        "labels": [
+          "area:kv",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2099\nCloses #2101"
+      },
+      "2136": {
+        "title": "fix(workers): forward correlation and trace context into queue task subprocess env",
+        "labels": [
+          "area:plugins",
+          "area:telemetry",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1681"
+      },
+      "2137": {
+        "title": "fix(service): declared fail-closed raw-route seam for createContractAuthorizer",
+        "labels": [
+          "area:auth",
+          "area:service",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2105"
+      },
+      "2139": {
+        "title": "fix(sagas): persist .compensate() outcomes and add terminal compensated status",
+        "labels": [
+          "area:plugins",
+          "area:sagas",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Refs #1372\nCloses #1990"
+      },
+      "2140": {
+        "title": "fix(queue): isolate named queues sharing one Deno KV database",
+        "labels": [
+          "area:kv",
+          "area:queue",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1682"
+      },
+      "2141": {
+        "title": "fix(sagas): actionable no-endpoint rejection diagnostic",
+        "labels": [
+          "area:plugins",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1825"
+      },
+      "2163": {
+        "title": "fix(database): classify PostgreSQL command errors by SQLSTATE",
+        "labels": [
+          "area:database",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2095"
+      },
+      "2166": {
+        "title": "feat(service): internal-audience procedures and a file-reference service credential",
+        "labels": [
+          "area:auth",
+          "area:service",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:feat"
+        ],
+        "body": "Refs #2064"
+      },
+      "2167": {
+        "title": "fix(workers): emit one canonical WORKERS_CONCURRENCY env name",
+        "labels": [
+          "area:plugins",
+          "area:workers",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Refs #1369"
+      },
+      "2169": {
+        "title": "fix(docs): derive the @app/router.ts README fence stub from the scaffold template",
+        "labels": [
+          "area:docs",
+          "area:tooling",
+          "canary:0.0.8-canary.3",
+          "ci:skip-e2e",
+          "priority:p3",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #1939"
+      },
+      "2171": {
+        "title": "fix(cli): resolve generate resource procedures against the client, support multi-namespace clients",
+        "labels": [
+          "area:cli",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2030"
+      },
+      "2173": {
+        "title": "fix(cli): diagnose remote Docker daemon topology for Aspire AppHosts",
+        "labels": [
+          "area:aspire",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2024"
+      },
+      "2175": {
+        "title": "fix(cli): preserve plugin HostPort across re-installs and document plugin port pinning",
+        "labels": [
+          "area:cli",
+          "area:config",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2028"
+      },
+      "2177": {
+        "title": "fix(auth)!: enforce signout session ownership, subject-scoped everywhere and scoped operator revocation",
+        "labels": [
+          "area:auth",
+          "area:plugins",
+          "breaking",
+          "canary:0.0.8-canary.3",
+          "priority:p0",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "## Breaking change and migration\n`SignoutInput` keeps its shape, but its behavior changed:\n\n- an anonymous signout now gets `401`;\n- `sessionId` must name one of the caller's own sessions;\n- `everywhere` revokes all of the caller's sessions (it used to be ignored).\n\nTo revoke a session you do not own, call `revokeSession` with a credential that holds `auth:sessions:revoke`.\n\nFor custom implementations:\n\n- a custom `AuthSessionStorePort` must add `revokeSubjectSessions({ subject, request })`, with bounded work and returning `{ subject, revokedAt }`, or throw `AuthBackendOperationUnsupportedError` from it;\n- a custom `KvOAuthStore` must add `revokeSubject` and `getSubjectRevocation`;\n- a custom `BetterAuthInstance` must expose `api.revokeSessions` (every real better-auth instance does).\n\n`netscript plugin auth session list` now needs a credential. The same note is in `docs/site/identity-access/auth.md` (callout \"Breaking in 0.0.8: migrating signout callers\"). Labelled `breaking`.\nRefs #1384\nRefs #2190"
+      },
+      "2178": {
+        "title": "fix(auth): resolve bearer credentials in me like /session",
+        "labels": [
+          "area:auth",
+          "area:service",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2120"
+      },
+      "2182": {
+        "title": "docs(jsdoc): bind every name in published examples and enforce unbound names",
+        "labels": [
+          "area:docs",
+          "area:tooling",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:docs"
+        ],
+        "body": "Closes #1765"
+      },
+      "2183": {
+        "title": "feat(sdk): injectable resolveServiceUrl on createServiceClient; export the pure discovery resolver",
+        "labels": [
+          "area:sdk",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:feat"
+        ],
+        "body": "Closes #2018"
+      },
+      "2186": {
+        "title": "ci(e2e): diagnose startup and pre-pull runtime images",
+        "labels": [
+          "area:aspire",
+          "area:tooling",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:chore"
+        ],
+        "body": "Refs #2185"
+      },
+      "2188": {
+        "title": "fix(auth): unify trusted proxy transport policy",
+        "labels": [
+          "area:auth",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Refs #2026"
+      },
+      "2189": {
+        "title": "fix(auth): propagate backend cookies on REST and RPC",
+        "labels": [
+          "area:auth",
+          "breaking",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Refs #1385"
+      },
+      "2192": {
+        "title": "ci(e2e): key scaffold runtime tiers per PR instead of a repo-wide mutex",
+        "labels": [
+          "area:tooling",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:chore"
+        ],
+        "body": "Refs #2103"
+      },
+      "2193": {
+        "title": "fix(service): require explicit CORS and inject workspace app origins",
+        "labels": [
+          "area:auth",
+          "area:cli",
+          "area:service",
+          "breaking",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Refs #1386"
+      },
+      "2195": {
+        "title": "ci(tooling): shard check-test and cache dependencies",
+        "labels": [
+          "area:tooling",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:chore"
+        ],
+        "body": "Refs #2194"
+      },
+      "2196": {
+        "title": "fix(auth): omit GitHub preset OIDC issuer",
+        "labels": [
+          "area:auth",
+          "area:cli",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2164"
+      },
+      "2197": {
+        "title": "docs(sdk): emphasize discriminant error narrowing",
+        "labels": [
+          "area:docs",
+          "area:sdk",
+          "canary:0.0.8-canary.3",
+          "ci:skip-e2e",
+          "ci:skip-scaffold",
+          "priority:p3",
+          "status:ready-merge",
+          "type:docs"
+        ],
+        "body": "Closes #1690"
+      },
+      "2198": {
+        "title": "test(sagas): prove sample publish failure and HTTP idempotency",
+        "labels": [
+          "area:sagas",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:test"
+        ],
+        "body": "Refs #1826"
+      },
+      "2199": {
+        "title": "fix(aspire): allocate Garnet executable endpoint port",
+        "labels": [
+          "area:aspire",
+          "area:cli",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Refs #1742"
+      },
+      "2204": {
+        "title": "docs(workers): document JobContext cancellation and deadlines",
+        "labels": [
+          "area:docs",
+          "area:workers",
+          "canary:0.0.8-canary.3",
+          "ci:skip-e2e",
+          "ci:skip-scaffold",
+          "priority:p2",
+          "status:ready-merge",
+          "type:docs"
+        ],
+        "body": "Refs #2066"
+      },
+      "2205": {
+        "title": "docs(workers): describe implemented runner modes",
+        "labels": [
+          "area:docs",
+          "area:workers",
+          "canary:0.0.8-canary.3",
+          "ci:skip-e2e",
+          "ci:skip-scaffold",
+          "priority:p3",
+          "status:ready-merge",
+          "type:docs"
+        ],
+        "body": "Refs #1684"
+      },
+      "2209": {
+        "title": "fix(sdk): preserve required context in query factories",
+        "labels": [
+          "area:sdk",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Closes #2111"
+      },
+      "2211": {
+        "title": "test(queue): make named isolation delivery deterministic",
+        "labels": [
+          "area:queue",
+          "canary:0.0.8-canary.3",
+          "priority:p1",
+          "status:ready-merge",
+          "type:test"
+        ],
+        "body": "Closes #2210"
+      },
+      "2216": {
+        "title": "fix(mcp): warn on unknown plugin registry expectations",
+        "labels": [
+          "area:cli",
+          "area:mcp",
+          "canary:0.0.8-canary.3",
+          "priority:p2",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Refs #2027"
+      },
+      "2220": {
+        "title": "fix(service): require explicit auth policy in defineService",
+        "labels": [
+          "area:auth",
+          "area:cli",
+          "area:service",
+          "breaking",
+          "canary:0.0.8-canary.3",
+          "priority:p0",
+          "status:ready-merge",
+          "type:fix"
+        ],
+        "body": "Refs #1382"
+      },
+      "2236": {
+        "title": "docs(ai): state the published version without a stale package pin",
+        "labels": [
+          "area:docs",
+          "canary:0.0.8-canary.3",
+          "ci:skip-e2e",
+          "ci:skip-scaffold",
+          "priority:p0",
+          "status:ready-merge",
+          "type:docs"
+        ],
+        "body": ""
+      }
+    },
+    "followUps": [
+      {
+        "number": 1369,
+        "title": "fix(plugins): two defects shipped as documented caveats — WORKER_CONCURRENCY never reaches the runtime, and @netscript/plugin-streams root exports always throw",
+        "state": "open"
+      },
+      {
+        "number": 1372,
+        "title": "test(e2e): the merge-readiness gate probes API health only — background children and streams go unverified, and a saga stuck compensating is reported COMPENSATED",
+        "state": "open"
+      },
+      {
+        "number": 1382,
+        "title": "fix(scaffold): the generated service ships `/api` unprotected and a framework test codifies public API routes as correct",
+        "state": "open"
+      },
+      {
+        "number": 1384,
+        "title": "fix(auth): `POST /api/v1/auth/signout` revokes any session id an unauthenticated caller supplies",
+        "state": "open"
+      },
+      {
+        "number": 1385,
+        "title": "fix(auth): oRPC `signin`/`callback` discard the backend `Set-Cookie`, so the interactive browser flow can never establish a session",
+        "state": "open"
+      },
+      {
+        "number": 1386,
+        "title": "fix(service): the default CORS policy is `origin: '*'`, which makes credentialed browser calls impossible on every generated and plugin service",
+        "state": "open"
+      },
+      {
+        "number": 1388,
+        "title": "test(e2e): the scaffold runtime auth gate proves only that an unauthenticated request succeeds",
+        "state": "open"
+      },
+      {
+        "number": 1684,
+        "title": "fix(workers): documented web-worker/subprocess runner modes are unimplemented — docs truthing or Tier-3 pool implementation",
+        "state": "open"
+      },
+      {
+        "number": 1742,
+        "title": "fix(cli): Garnet executable arm binds host port 6379 regardless of Aspire allocation",
+        "state": "open"
+      },
+      {
+        "number": 1826,
+        "title": "test(sagas): no coverage proves publish survives unavailable API, restart, duplicate publish, or out-of-order delivery",
+        "state": "open"
+      },
+      {
+        "number": 2026,
+        "title": "auth-kv-oauth: assertHttps is proxy-blind while deriveHttps is proxy-aware, so the OAuth flow refuses any TLS-terminating-proxy deployment",
+        "state": "open"
+      },
+      {
+        "number": 2027,
+        "title": "doctor: `plugin_registry` reports a missing registry and prescribes a remedy the generator provably cannot satisfy",
+        "state": "open"
+      },
+      {
+        "number": 2036,
+        "title": "fix(ai): keep published TanStack adapter ranges peer-compatible with AI core",
+        "state": "open"
+      },
+      {
+        "number": 2039,
+        "title": "fix(fresh/sdk): align TanStack DB adapter family; mixed Collection runtimes crash stream-query SSR",
+        "state": "closed"
+      },
+      {
+        "number": 2040,
+        "title": "fix(fresh): route.href hides useContext and corrupts island hook order / navigation",
+        "state": "closed"
+      },
+      {
+        "number": 2041,
+        "title": "Desktop SDK 0.0.7: window-scoped pending receive prevents client reconnection after document reload",
+        "state": "closed"
+      },
+      {
+        "number": 2063,
+        "title": "fix(ai/anthropic): Claude 5.5 IDs rejected locally on 0.0.7; qualify forward-compatible model support",
+        "state": "closed"
+      },
+      {
+        "number": 2064,
+        "title": "service/sdk: no documented internal (service-to-service) procedure lane; nothing provisions the credential and the OpenAPI projection is an easy bypass",
+        "state": "open"
+      },
+      {
+        "number": 2066,
+        "title": "plugin-workers-core: JobContext has no AbortSignal or deadline, so handlers cannot observe timeout, shutdown or cancel",
+        "state": "open"
+      },
+      {
+        "number": 2068,
+        "title": "fresh/ai: createNetScriptChatConnection.send narrows UIMessages to text, blocking adoption of the #1583 single-subscriber fix",
+        "state": "open"
+      },
+      {
+        "number": 2103,
+        "title": "0.0.8 milestone run: orchestrated delivery of milestone 25",
+        "state": "open"
+      },
+      {
+        "number": 2185,
+        "title": "ci(e2e): make scaffold.runtime tiers robust to slow container image pulls and Aspire convergence on GitHub runners",
+        "state": "open"
+      },
+      {
+        "number": 2190,
+        "title": "fix(auth-workos): implement subject-wide session revocation for signout everywhere",
+        "state": "open"
+      },
+      {
+        "number": 2194,
+        "title": "ci: shard check-test and cache dependencies and images to cut CI wall time",
+        "state": "open"
+      }
+    ]
+  },
+  "releaseBody": "# NetScript 0.0.8-canary.3\n\n**What this canary is for.** canary.3 is the third release candidate on the way to NetScript 0.0.8. It bundles the 61 pull requests merged since canary.2 so downstream apps can try them against real published packages before 0.0.8 ships. It is a **pre-release**: normal semver resolution never selects it, and **Latest stays v0.0.7**. All 35 `@netscript/*` packages are published at exactly `0.0.8-canary.3`, and the canary's publish run and its version-pinned production E2E both passed ([publish](https://github.com/rickylabs/netscript/actions/runs/38059950011), [production E2E](https://github.com/rickylabs/netscript/actions/runs/38060469468)).\n\n## Highlights\n\n- **Durable commands, end to end.** A PostgreSQL command store with a true transaction client (#2093), a durable outbox relayed through checked sinks (#2096), bounded command tracing with privacy conformance (#2094), and sagas that commit typed worker effects atomically with their state transitions (#2097). Sagas also persist `.compensate()` outcomes with a terminal compensated status (#2139).\n- **Secure-by-default services and auth.** Services must declare their auth policy (#2220) and their CORS origins (#2193). Signout is owner-scoped (#2177), auth cookies are stricter and propagate on REST and RPC (#2189), trusted-proxy policy is unified (#2188), and services gain internal-audience procedures and a file-reference service credential (#2166).\n- **Plugins compose safely.** Root composition rejects identity collisions, unknown contribution keys and missing dependencies (#2125); plugin host ports survive re-installs (#2175).\n- **Fresh, SDK and desktop fixes reported by downstream apps.** One TanStack DB Collection runtime across Fresh and the SDK (#2089), pure typed route `href` helpers that no longer hide hooks (#2090), desktop RPC reconnects after a document reload (#2091), complete native chat messages (#2092), an injectable `resolveServiceUrl` (#2183), and query factories that keep required context (#2209).\n- **AI.** Explicitly configured Anthropic model IDs, including Claude Opus 5.5, Sonnet 5.5 and Fable 5.1, with current wire options (#2078), on a peer-compatible TanStack AI family (#2087, #2126).\n- **Workers, queue and KV.** Job cancellation and deadlines (#2088, documented in #2204), trace context forwarded into queue subprocesses (#2136), named queues isolated within one Deno KV database (#2140), and memory/Redis KV adapters conformant on atomic versionstamps (#2135).\n- **CLI and Aspire.** Generated resources resolve multi-namespace clients (#2171), remote Docker daemon topology is diagnosed (#2173), the Garnet executable gets an allocated port (#2199), and the MCP server ranks guidance by content (#2124) and warns on unknown plugin registry expectations (#2216).\n\n## Breaking changes and migration\n\n- **Explicit CORS (#2193).** Services no longer default to wildcard CORS. Set `NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'` for services and plugins, or pass `cors: { origin: [...] }` to `defineService` / `createPluginService` (`.withCors({ origin: [...] })` on builders). Unset origins deny cross-origin browser calls, and wildcard plus credentials fails `build()`. Generated CLI/Aspire helpers inject your enabled web apps' origins, so scaffolded projects keep working.\n- **Explicit service auth policy (#2220).** `defineService()` no longer treats a missing policy as public. Pass `auth: { authn: { authenticator }, authz: { authorizer } }` (authorization is optional). For a genuinely public service, pass `auth: { public: true, reason: '…' }` with a non-blank reason. The service README and CHANGELOG show the before and after.\n- **Owner-scoped signout (#2177).** Anonymous signout returns `401`, `sessionId` must be one of the caller's own sessions, and `everywhere` revokes all of the caller's sessions. Revoking another user's session needs `revokeSession` with `auth:sessions:revoke`. Custom `AuthSessionStorePort`, `KvOAuthStore` and `BetterAuthInstance` implementations each gain one method; see the auth docs callout \"Breaking in 0.0.8: migrating signout callers\". `plugin auth session list` now needs a credential.\n- **Validated plugin composition (#2125).** Unknown contribution keys fail, every declared plugin dependency must be composed, and `@netscript/plugin-triggers` no longer declares pseudo-dependencies on the `*-core` libraries. Migration notes are in the plugin README and reference page.\n- **Stricter auth cookies (#2189).** `HttpOnly=false` and insecure custom-name cookies are refused outside an explicit development policy, and `KvOAuthCookieOptions.httpOnly` is typed `true`.\n\n## Known open follow-ups\n\n- **Scaffolded auth wiring.** `service add` does not yet wire the authenticator automatically when the auth plugin is installed (#1382, in review), and the scaffolded browser-to-backend auth topology is queued for canary.4 (#1386).\n- **Callback session credential.** Its removal from the public callback JSON is queued for canary.4 (#1385).\n- **Downstream-reported fixes.** Qualification against these published packages is in progress, and the issues close as each one is proven: #2039, #2040, #2041, #2068, #2066, #2036.\n- **Saga process-restart and ordering proof.** Queued for canary.4 (#1826).\n\n## Trying this canary\n\nPin exact versions, for example `jsr:@netscript/service@0.0.8-canary.3`. Deno 2.9 applies a default 24-hour minimum dependency age, so a canary less than a day old will not resolve until that window passes. For testing before then, set `minimumDependencyAge: 0` in the consumer's configuration; that changes only admission timing, not versions. The generated list below includes partial-scope PRs as \"closes no linked issues\": they reference their issues without closing them, and the remaining scope stays tracked there.\n\n---\n\nCanary payload derived from merge-aware history after `6d1eaf5a221ce29fa55c0bfd10e3b5c7d66101e3` (61 commit(s) inspected; outcome: populated).\n\n## Included pull requests\n\n- [#2092](https://github.com/rickylabs/netscript/pull/2092) fix(fresh): preserve complete native chat messages in send — closes no linked issues\n- [#2078](https://github.com/rickylabs/netscript/pull/2078) fix(ai): support explicit Anthropic model IDs and current wire options — closes no linked issues\n- [#2091](https://github.com/rickylabs/netscript/pull/2091) fix(desktop): reconnect native RPC after document reload — closes no linked issues\n- [#2088](https://github.com/rickylabs/netscript/pull/2088) fix(workers): propagate job cancellation and deadlines — closes no linked issues\n- [#2090](https://github.com/rickylabs/netscript/pull/2090) fix(fresh): keep typed route URL helpers pure — closes no linked issues\n- [#2093](https://github.com/rickylabs/netscript/pull/2093) feat(database): PostgreSQL command store and true transaction client — closes [#1484](https://github.com/rickylabs/netscript/issues/1484)\n- [#2089](https://github.com/rickylabs/netscript/pull/2089) fix(fresh/sdk): qualify one TanStack DB Collection runtime — closes no linked issues\n- [#2087](https://github.com/rickylabs/netscript/pull/2087) fix(ai): keep published adapters peer-compatible with AI core — closes no linked issues\n- [#2096](https://github.com/rickylabs/netscript/pull/2096) feat(command): relay durable outbox through checked sinks — closes [#1486](https://github.com/rickylabs/netscript/issues/1486)\n- [#2094](https://github.com/rickylabs/netscript/pull/2094) feat(telemetry): add bounded command tracing and privacy conformance — closes [#1485](https://github.com/rickylabs/netscript/issues/1485)\n- [#2097](https://github.com/rickylabs/netscript/pull/2097) feat(sagas): commit typed worker effects atomically with transitions — closes [#1932](https://github.com/rickylabs/netscript/issues/1932)\n- [#2126](https://github.com/rickylabs/netscript/pull/2126) fix(ai): realign TanStack AI family to a peer-compatible set — closes no linked issues\n- [#2122](https://github.com/rickylabs/netscript/pull/2122) fix(logger): request-scoped correlation and configurable RPC debug redaction — closes [#1786](https://github.com/rickylabs/netscript/issues/1786), [#2107](https://github.com/rickylabs/netscript/issues/2107)\n- [#2116](https://github.com/rickylabs/netscript/pull/2116) feat(service): add a middleware slot and an opt-in request-body limit to defineService — closes [#2065](https://github.com/rickylabs/netscript/issues/2065)\n- [#2121](https://github.com/rickylabs/netscript/pull/2121) test(cli-e2e): assert exact HTTP status in scaffold runtime gates — closes no linked issues\n- [#2119](https://github.com/rickylabs/netscript/pull/2119) fix(auth): accept empty OpenAPI GET input for auth me — closes [#1999](https://github.com/rickylabs/netscript/issues/1999)\n- [#2131](https://github.com/rickylabs/netscript/pull/2131) docs(sdk): align cache-first loaders on action-then-metadata and document warm-stale persistence failure — closes [#1670](https://github.com/rickylabs/netscript/issues/1670)\n- [#2123](https://github.com/rickylabs/netscript/pull/2123) fix(sdk): let native oRPC safe/isDefinedError narrow on createServiceClient errors — closes [#2031](https://github.com/rickylabs/netscript/issues/2031)\n- [#2169](https://github.com/rickylabs/netscript/pull/2169) fix(docs): derive the @app/router.ts README fence stub from the scaffold template — closes [#1939](https://github.com/rickylabs/netscript/issues/1939)\n- [#2135](https://github.com/rickylabs/netscript/pull/2135) fix(kv): conform memory and Redis adapters on atomic versionstamps, combine ops and watch — closes [#2099](https://github.com/rickylabs/netscript/issues/2099), [#2101](https://github.com/rickylabs/netscript/issues/2101)\n- [#2137](https://github.com/rickylabs/netscript/pull/2137) fix(service): declared fail-closed raw-route seam for createContractAuthorizer — closes [#2105](https://github.com/rickylabs/netscript/issues/2105)\n- [#2136](https://github.com/rickylabs/netscript/pull/2136) fix(workers): forward correlation and trace context into queue task subprocess env — closes [#1681](https://github.com/rickylabs/netscript/issues/1681)\n- [#2133](https://github.com/rickylabs/netscript/pull/2133) fix(auth): derive a stable non-OIDC subject from provider userinfo — closes [#2032](https://github.com/rickylabs/netscript/issues/2032)\n- [#2124](https://github.com/rickylabs/netscript/pull/2124) fix(mcp): rank find_guidance on content terms with IDF weighting — closes [#2102](https://github.com/rickylabs/netscript/issues/2102)\n- [#2127](https://github.com/rickylabs/netscript/pull/2127) fix(fresh-ui): open Dialog, Sheet and Drawer modally via showModal() — closes [#1688](https://github.com/rickylabs/netscript/issues/1688)\n- [#2129](https://github.com/rickylabs/netscript/pull/2129) fix(tooling): apply aspire loopback-URL rule to plugin runtime source — closes [#1893](https://github.com/rickylabs/netscript/issues/1893)\n- [#2130](https://github.com/rickylabs/netscript/pull/2130) fix(cli): report contract service-directory state truthfully — closes [#2013](https://github.com/rickylabs/netscript/issues/2013)\n- [#2178](https://github.com/rickylabs/netscript/pull/2178) fix(auth): resolve bearer credentials in me like /session — closes [#2120](https://github.com/rickylabs/netscript/issues/2120)\n- [#2192](https://github.com/rickylabs/netscript/pull/2192) ci(e2e): key scaffold runtime tiers per PR instead of a repo-wide mutex — closes no linked issues\n- [#2167](https://github.com/rickylabs/netscript/pull/2167) fix(workers): emit one canonical WORKERS_CONCURRENCY env name — closes no linked issues\n- [#2198](https://github.com/rickylabs/netscript/pull/2198) test(sagas): prove sample publish failure and HTTP idempotency — closes [#1826](https://github.com/rickylabs/netscript/issues/1826)\n- [#2140](https://github.com/rickylabs/netscript/pull/2140) fix(queue): isolate named queues sharing one Deno KV database — closes [#1682](https://github.com/rickylabs/netscript/issues/1682)\n- [#2183](https://github.com/rickylabs/netscript/pull/2183) feat(sdk): injectable resolveServiceUrl on createServiceClient; export the pure discovery resolver — closes [#2018](https://github.com/rickylabs/netscript/issues/2018)\n- [#2196](https://github.com/rickylabs/netscript/pull/2196) fix(auth): omit GitHub preset OIDC issuer — closes [#2164](https://github.com/rickylabs/netscript/issues/2164)\n- [#2189](https://github.com/rickylabs/netscript/pull/2189) fix(auth): propagate backend cookies on REST and RPC — closes no linked issues\n- [#2166](https://github.com/rickylabs/netscript/pull/2166) feat(service): internal-audience procedures and a file-reference service credential — closes no linked issues\n- [#2141](https://github.com/rickylabs/netscript/pull/2141) fix(sagas): actionable no-endpoint rejection diagnostic — closes [#1825](https://github.com/rickylabs/netscript/issues/1825)\n- [#2193](https://github.com/rickylabs/netscript/pull/2193) fix(service): require explicit CORS and inject workspace app origins — closes no linked issues\n- [#2195](https://github.com/rickylabs/netscript/pull/2195) ci(tooling): shard check-test and cache dependencies — closes no linked issues\n- [#2117](https://github.com/rickylabs/netscript/pull/2117) fix(cli): prove guarded plugin services in scaffold.runtime and document plugin API protection — closes [#1383](https://github.com/rickylabs/netscript/issues/1383)\n- [#2211](https://github.com/rickylabs/netscript/pull/2211) test(queue): make named isolation delivery deterministic — closes [#2210](https://github.com/rickylabs/netscript/issues/2210)\n- [#2188](https://github.com/rickylabs/netscript/pull/2188) fix(auth): unify trusted proxy transport policy — closes no linked issues\n- [#2186](https://github.com/rickylabs/netscript/pull/2186) ci(e2e): diagnose startup and pre-pull runtime images — closes no linked issues\n- [#2139](https://github.com/rickylabs/netscript/pull/2139) fix(sagas): persist .compensate() outcomes and add terminal compensated status — closes [#1990](https://github.com/rickylabs/netscript/issues/1990)\n- [#2182](https://github.com/rickylabs/netscript/pull/2182) docs(jsdoc): bind every name in published examples and enforce unbound names — closes [#1765](https://github.com/rickylabs/netscript/issues/1765)\n- [#2199](https://github.com/rickylabs/netscript/pull/2199) fix(aspire): allocate Garnet executable endpoint port — closes no linked issues\n- [#2163](https://github.com/rickylabs/netscript/pull/2163) fix(database): classify PostgreSQL command errors by SQLSTATE — closes [#2095](https://github.com/rickylabs/netscript/issues/2095)\n- [#2197](https://github.com/rickylabs/netscript/pull/2197) docs(sdk): emphasize discriminant error narrowing — closes [#1690](https://github.com/rickylabs/netscript/issues/1690)\n- [#2175](https://github.com/rickylabs/netscript/pull/2175) fix(cli): preserve plugin HostPort across re-installs and document plugin port pinning — closes [#2028](https://github.com/rickylabs/netscript/issues/2028)\n- [#2171](https://github.com/rickylabs/netscript/pull/2171) fix(cli): resolve generate resource procedures against the client, support multi-namespace clients — closes [#2030](https://github.com/rickylabs/netscript/issues/2030)\n- [#2205](https://github.com/rickylabs/netscript/pull/2205) docs(workers): describe implemented runner modes — closes no linked issues\n- [#2204](https://github.com/rickylabs/netscript/pull/2204) docs(workers): document JobContext cancellation and deadlines — closes no linked issues\n- [#2177](https://github.com/rickylabs/netscript/pull/2177) fix(auth)!: enforce signout session ownership, subject-scoped everywhere and scoped operator revocation — closes no linked issues\n- [#2173](https://github.com/rickylabs/netscript/pull/2173) fix(cli): diagnose remote Docker daemon topology for Aspire AppHosts — closes [#2024](https://github.com/rickylabs/netscript/issues/2024)\n- [#2220](https://github.com/rickylabs/netscript/pull/2220) fix(service): require explicit auth policy in defineService — closes no linked issues\n- [#2134](https://github.com/rickylabs/netscript/pull/2134) fix(mcp): clear private-type-ref errors across the export map — closes [#1708](https://github.com/rickylabs/netscript/issues/1708)\n- [#2128](https://github.com/rickylabs/netscript/pull/2128) test(contracts): harden the baseContract initializer pin — closes [#1767](https://github.com/rickylabs/netscript/issues/1767)\n- [#2125](https://github.com/rickylabs/netscript/pull/2125) feat(plugin): validate root composition collisions and dependency closure — closes [#1896](https://github.com/rickylabs/netscript/issues/1896)\n- [#2216](https://github.com/rickylabs/netscript/pull/2216) fix(mcp): warn on unknown plugin registry expectations — closes no linked issues\n- [#2209](https://github.com/rickylabs/netscript/pull/2209) fix(sdk): preserve required context in query factories — closes [#2111](https://github.com/rickylabs/netscript/issues/2111)\n- [#2236](https://github.com/rickylabs/netscript/pull/2236) docs(ai): state the published version without a stale package pin — closes no linked issues\n\n"
+}

@@ -94,12 +94,11 @@ export interface OllamaModelProviderConfig {
  * A {@linkcode ModelProviderPort} backed by `@tanstack/ai-openai/compatible`,
  * pinned to a local Ollama daemon with a reachability preflight.
  *
- * @example Preflight before a turn, then stream
+ * @example Preflight before a turn
  * ```ts
- * import '@netscript/ai/ollama'; // self-registers the provider
- * import { getModelProvider } from '@netscript/ai';
+ * import { OllamaModelProvider } from '@netscript/ai/ollama';
  *
- * const provider = getModelProvider('ollama', { models: ['llama3.2'] });
+ * const provider = new OllamaModelProvider({ models: ['llama3.2'] });
  * const health = await provider.checkReachable();
  * if (!health.reachable) {
  *   console.warn(`Ollama is down: ${health.detail}`);
