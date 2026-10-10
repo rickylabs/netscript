@@ -100,13 +100,13 @@ export function buildCookieHeader(
   if (options.httpOnly !== undefined && options.httpOnly !== true) {
     throw new KvOAuthError('configuration_error', 'Auth cookies require HttpOnly.');
   }
+  assertCookiePolicy(name, path, options.domain);
   if (!secure && !options.allowInsecureDev) {
     throw new KvOAuthError(
       'cookie_https_required',
       'Session cookie gate requires HTTPS; configure trusted proxy headers or explicit cookie.allowInsecureDev for development.',
     );
   }
-  assertCookiePolicy(name, path, options.domain);
   const parts = [
     `${name}=${encodeURIComponent(value)}`,
     `Path=${path}`,
