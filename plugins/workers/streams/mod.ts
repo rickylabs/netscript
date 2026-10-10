@@ -34,4 +34,4 @@ export type {
   StreamStateDefinition,
 } from '@netscript/plugin-streams-core';
 
-export { createStreamDB, type StreamCollection } from '@netscript/plugin-streams-core';
+export type { StreamCollection, StreamDBFactory } from '@netscript/plugin-streams-core';

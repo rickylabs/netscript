@@ -85,4 +85,4 @@ export type {
   StreamAdminPort,
 } from '../ports/stream-admin-port.ts';
 
-export { createStreamDB, type StreamCollection } from '../domain/stream-collection.ts';
+export type { StreamCollection, StreamDBFactory } from '../domain/stream-collection.ts';

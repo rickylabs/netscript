@@ -8,9 +8,9 @@
  * @module
  */
 
+import { createStreamDB } from '@durable-streams/state/db';
 import {
   buildStreamUrl,
-  createStreamDB,
   getStreamsAuth,
   type StreamCollection,
 } from '@netscript/plugin-streams-core';

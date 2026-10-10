@@ -7,10 +7,10 @@
  * @module
  */
 
+import { createStreamDB } from '@durable-streams/state/db';
 import { createStateSchema } from '@durable-streams/state';
 import {
   buildStreamUrl,
-  createStreamDB,
   getStreamsAuth,
   type StreamCollection,
 } from '@netscript/plugin-streams-core';

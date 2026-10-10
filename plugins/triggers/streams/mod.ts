@@ -72,7 +72,7 @@ export type {
   TriggerStreamEntity,
 } from './schema.ts';
 
-export { createStreamDB, type StreamCollection } from '@netscript/plugin-streams-core';
+export type { StreamCollection, StreamDBFactory } from '@netscript/plugin-streams-core';
 
 export type {
   CollectionDefinition,

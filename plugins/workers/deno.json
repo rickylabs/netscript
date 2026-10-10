@@ -29,13 +29,11 @@
     "@netscript/queue": "jsr:@netscript/queue@0.0.7",
     "@netscript/service": "jsr:@netscript/service@0.0.7",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7",
-    "@std/testing": "jsr:@std/testing@^1",
     "@std/async": "jsr:@std/async@^1",
     "@std/path": "jsr:@std/path@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "hono": "jsr:@hono/hono@4.12.24",
     "hono/cors": "jsr:@hono/hono@4.12.24/cors",
-    "@tanstack/react-db": "catalog:",
     "zod": "catalog:"
   },
   "tasks": {

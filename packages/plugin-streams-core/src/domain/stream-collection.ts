@@ -1,27 +1,26 @@
-import { createStreamDB as upstreamCreateStreamDB } from '@durable-streams/state/db';
 import type { CollectionDefinition } from './stream-schema.ts';
 
 /**
- * Create the upstream durable stream database without changing its schema inference.
+ * Type-only signature of the upstream durable stream database factory.
  *
- * This shared public constructor also defines the nominal collection handle used
- * by `StreamCollection`; collections retain TanStack query and lifecycle support.
+ * Import this symbol with `import type` and use `typeof StreamDBFactory` when
+ * describing a supplied factory. It has no runtime export or implementation;
+ * `StreamCollection` uses its generic return type to retain TanStack's nominal
+ * collection contract without loading the upstream client through this module.
  *
  * @example
  * ```ts
- * import { createStreamDB, defineStreamSchema } from '@netscript/plugin-streams-core';
- * import { z } from 'zod';
+ * import type { StreamDBFactory } from '@netscript/plugin-streams-core';
  *
- * const schema = defineStreamSchema({
- *   sessions: { schema: z.object({ id: z.string() }), type: 'session', primaryKey: 'id' },
- * });
- * declare const streamUrl: string;
- * const db = createStreamDB({ streamOptions: { url: streamUrl }, state: schema });
- * console.log(db.collections.sessions.status);
+ * type Factory = typeof StreamDBFactory;
+ * declare const factory: Factory;
+ * declare const options: Parameters<Factory>[0];
+ * const db = factory(options);
+ * console.log(db.collections);
  * ```
  */
-export const createStreamDB: (typeof import('@durable-streams/state/db'))['createStreamDB'] =
-  upstreamCreateStreamDB;
+declare const StreamDBFactory: (typeof import('@durable-streams/state/db'))['createStreamDB'];
+export type { StreamDBFactory };
 
 /**
  * Live TanStack collection handle for validated durable stream entities.
@@ -36,5 +35,5 @@ export const createStreamDB: (typeof import('@durable-streams/state/db'))['creat
  * ```
  */
 export type StreamCollection<T extends object> = ReturnType<
-  typeof createStreamDB<{ item: CollectionDefinition<T> }>
+  typeof StreamDBFactory<{ item: CollectionDefinition<T> }>
 >['collections']['item'];

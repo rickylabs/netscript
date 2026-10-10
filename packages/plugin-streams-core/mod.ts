@@ -79,4 +79,4 @@ export type {
   StreamRetentionPolicyV1,
 } from './src/public/mod.ts';
 
-export { createStreamDB, type StreamCollection } from './src/domain/stream-collection.ts';
+export type { StreamCollection, StreamDBFactory } from './src/domain/stream-collection.ts';
