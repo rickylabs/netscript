@@ -351,7 +351,7 @@ async function writeConsumerFixture(root: string): Promise<void> {
           '@preact/signals': 'npm:@preact/signals@2.9.2',
           'preact': 'npm:preact@^10.29.2',
           'preact/': 'npm:/preact@^10.29.2/',
-          'zod': 'npm:zod@^4.4.3',
+          'zod': 'npm:zod@^4.6.5',
         },
         compilerOptions: {
           strict: true,

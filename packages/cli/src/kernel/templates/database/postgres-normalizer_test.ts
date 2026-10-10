@@ -112,7 +112,7 @@ async function probe(
 }
 
 const prismaProbe = `
-import { loadConfigFromFile } from 'npm:@prisma/config@^7.4.2';
+import { loadConfigFromFile } from 'npm:@prisma/config@^7.10.0';
 // Resolve the same npm config package the generated file imports before using jiti.
 import 'prisma/config';
 const result = await loadConfigFromFile({ configFile: 'prisma.config.ts', configRoot: Deno.cwd() });
