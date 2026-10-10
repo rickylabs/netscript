@@ -1,7 +1,7 @@
 import { KvJobRegistry } from '../registry/kv-job-registry.ts';
 import { assertEquals } from 'jsr:@std/assert@^1';
 import { FakeTime } from 'jsr:@std/testing@^1/time';
-import { MemoryKvAdapter } from '@netscript/kv';
+import { DenoKvAdapter, MemoryKvAdapter } from '@netscript/kv';
 import { KvExecutionState } from './execution-state.ts';
 
 Deno.test('worker retention expires settled execution and preserves live execution beyond window', async () => {
@@ -68,4 +68,24 @@ Deno.test('worker cleanup preserves an execution changed concurrently after insp
   };
   assertEquals(await state.cleanupExpired(), []);
   assertEquals((await state.get(record.id))?.status, 'pending');
+});
+
+Deno.test('real Deno KV worker cleanup advances one-entry pages past live records', async () => {
+  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+  const state = new KvExecutionState({ kv });
+  const record = await state.create({ jobId: 'job', triggeredBy: 'manual' });
+  await kv.delete(['workers', 'executions', record.id]);
+  await kv.set(['workers', 'executions', 'a'], { ...record, id: 'a' });
+  await kv.set(['workers', 'executions', 'b'], {
+    ...record,
+    id: 'b',
+    status: 'completed',
+    completedAt: new Date(Date.now() - 4 * 86_400_000).toISOString(),
+  });
+  await kv.set(['workers', 'executions', 'c'], { ...record, id: 'c' });
+  assertEquals(await state.cleanupExpired(1), []);
+  assertEquals(await state.cleanupExpired(1), ['b']);
+  assertEquals(await state.cleanupExpired(1), []);
+  assertEquals((await state.get('a'))?.status, 'pending');
+  assertEquals((await state.get('c'))?.status, 'pending');
 });

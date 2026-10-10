@@ -359,7 +359,7 @@ export class KvExecutionState {
       scanned++;
       if (!entry.value) continue;
       const key: KvKey = [...EXECUTION_PREFIX, entry.value.id];
-      this.#cleanupStart = key;
+      this.#cleanupStart = [...key, ''];
       const remaining = await executionRetentionRemaining(
         entry.value,
         this.#kv,
