@@ -2624,3 +2624,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `sessions.getSession` given `token: readBearerCredential(request)` and the request, for cookie,
   bearer, competing cookie+bearer, and malformed bearer requests, and that a bearer-borne refresh
   emits no `Set-Cookie`.
+
+## packages/plugin-workers-core — WINDOWS-PROCESS-RUNNER-PARITY
+
+- **ID:** `WINDOWS-PROCESS-RUNNER-PARITY`
+- **Reason:** Deno.Command replaced Dax for bounded stdin/stream control. Windows PATHEXT lookup
+  for bare `.cmd`/`.bat` shims and `taskkill /PID <owned-pid> /T /F` termination lack Windows-host
+  execution evidence; Linux results do not establish Windows parity.
+- **Owner:** Workers maintainers, coordinated through #2103.
+- **Target:** Windows verification by 2026-10-27, before the 0.0.8 stable cut.
+- **Linked review:** PR #2201, IMPL-EVAL at `08421b92f` (finding 4); issue #2110.
+- **Plan:** Run native-executable stdin/EOF, command-shim resolution, and cmd-wrapper abort/timeout
+  fixtures on Windows. Compare bare shim launch to the former Dax behavior; restore PATHEXT-aware
+  resolution if parity fails. Keep batch scripts on the existing CmdRuntimeAdapter meanwhile.
+- **Created:** 2026-10-10.
+- **Status:** open; verification deferred because the implementation host is Linux.
+- **Closing gate:** Windows-backed tests prove stdin isolation/EOF, `.cmd`/`.bat` lookup with
+  arguments, and that cancellation/timeout stop a cmd wrapper and its pipe-holding grandchild.

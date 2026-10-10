@@ -1,4 +1,5 @@
-import { assertEquals, assertMatch, assertThrows } from '@std/assert';
+import { assertEquals, assertInstanceOf, assertMatch, assertThrows } from '@std/assert';
+import type { TaskStdinJson } from '../../src/executor/mod.ts';
 import { defineTask as defineRootTask } from '../../mod.ts';
 import { defineTask } from '../../src/builders/mod.ts';
 import {
@@ -74,13 +75,14 @@ Deno.test('stdin payload: exactly 1 MiB bytes is delivered with backpressure', a
 Deno.test('stdin payload: root builder exposes the same bounded channel', () => {
   const task = defineRootTask('root-stdin').runtime('python').entrypoint('script.py')
     .stdin({ enabled: true }).build();
-  assertEquals(new TextDecoder().decode(task.stdin as Uint8Array), '{"enabled":true}');
+  assertInstanceOf(task.stdin, Uint8Array);
+  assertEquals(new TextDecoder().decode(task.stdin), '{"enabled":true}');
 });
 
 Deno.test('stdin payload: invalid JSON fails closed without leaking payload', () => {
-  const cycle: Record<string, unknown> = {};
+  const cycle: Record<string, TaskStdinJson> = {};
   cycle.self = cycle;
-  assertThrows(() => pythonTask().stdin(cycle as never), Error, 'InvalidStdinPayload');
+  assertThrows(() => pythonTask().stdin(cycle), Error, 'InvalidStdinPayload');
   assertThrows(() => pythonTask().stdin(NaN), Error, 'InvalidStdinPayload');
 });
 
@@ -267,7 +269,7 @@ Deno.test('stdin payload: adapter passes the builder snapshot directly to the ru
   const builder = pythonTask().stdin(source);
   source.fill(0);
   const task = builder.build();
-  assertEquals(task.stdin === builder.build().stdin, true);
+  assertEquals(task.stdin === builder.build().stdin, false);
   const adapter = new ExecutableRuntimeAdapter({
     runner: {
       run(input) {

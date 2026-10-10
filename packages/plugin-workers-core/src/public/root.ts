@@ -1,5 +1,4 @@
 import type { TaskStdin } from '../domain/task.ts';
-export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';
 import { defineJob as defineJobImpl } from '../builders/job-builder.ts';
 import { defineTask as defineTaskImpl } from '../builders/task-builder.ts';
 import { defineWorkflow as defineWorkflowImpl } from '../builders/workflow-builder.ts';
@@ -11,12 +10,13 @@ import {
 import { permissions as permissionsImpl } from '../domain/permissions.ts';
 import { createJobHandlerDefinition as createJobHandlerDefinitionImpl } from '../domain/job-handler.ts';
 import type { PublicStandardSchema } from '../domain/public-schema.ts';
-export type { PublicStandardSchema } from '../domain/public-schema.ts';
 import { startWorkers as startWorkersImpl } from '../presets/mod.ts';
 import {
   createWorkersRuntime as createWorkersRuntimeImpl,
   type WorkersRuntimeOptions as RuntimeOptions,
 } from '../runtime/mod.ts';
+export type { PublicStandardSchema } from '../domain/public-schema.ts';
+export type { TaskStdin, TaskStdinJson } from '../domain/task.ts';
 export type {
   WorkerIdempotencyClaim,
   WorkerIdempotencyInput,

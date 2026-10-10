@@ -1,5 +1,6 @@
 import { validateTaskStdinBytes } from '../task-stdin.ts';
 import { OutputTail } from '../output-tail.ts';
+import { terminateProcessTree } from '../process-tree.ts';
 import type {
   ResolvedTaskExecutionOptions,
   TaskDefinition,
@@ -38,8 +39,8 @@ export class DaxProcessRunner implements ProcessRunner {
 /** Run a subprocess with bounded stdin, output capture, and log callbacks. */
 export async function runProcess(input: ProcessRunInput): Promise<TaskResult> {
   const startedAt = Date.now();
-  let stdout = new OutputTail();
-  let stderr = new OutputTail();
+  let stdout: OutputTail | undefined;
+  let stderr: OutputTail | undefined;
   const env = buildEnvironment(input);
 
   if (input.options.signal?.aborted) {
@@ -80,8 +81,6 @@ export async function runProcess(input: ProcessRunInput): Promise<TaskResult> {
       stdin: stdin === undefined ? 'null' : 'piped',
       stdout: 'piped',
       stderr: 'piped',
-      // A dedicated POSIX group lets cancellation kill wrapper descendants too.
-      detached: Deno.build.os !== 'windows',
     }).spawn();
     input.options.signal?.addEventListener('abort', cancel, { once: true });
     if (input.options.signal?.aborted) cancel();
@@ -226,18 +225,18 @@ function createProcessResult(
   task: TaskDefinition,
   startedAt: number,
   exitCode: number,
-  stdout: OutputTail,
-  stderr: OutputTail,
+  stdout: OutputTail | undefined,
+  stderr: OutputTail | undefined,
   status: TaskResult['status'],
   error: string | null,
 ): TaskResult {
-  const stdoutText = stdout.text();
+  const stdoutText = stdout?.text() ?? '';
   return {
     taskId: task.id,
     status,
     exitCode,
     stdout: stdoutText,
-    stderr: stderr.text(),
+    stderr: stderr?.text() ?? '',
     duration: Date.now() - startedAt,
     success: status === 'completed',
     error,
@@ -267,24 +266,4 @@ function buildErrorMessage(exitCode: number, command: string, stderr: string): s
   if (exitCode === 127) message += ` (command not found: '${command}')`;
   const firstLine = stderr.trim().split('\n')[0];
   return firstLine && firstLine.length < 200 ? `${message}. stderr: ${firstLine}` : message;
-}
-
-async function terminateProcessTree(child: Deno.ChildProcess): Promise<void> {
-  try {
-    if (Deno.build.os === 'windows') {
-      // taskkill /T operates only on the tree rooted at this owned child PID.
-      await new Deno.Command('taskkill', {
-        args: ['/PID', String(child.pid), '/T', '/F'],
-        stdout: 'null',
-        stderr: 'null',
-      }).output();
-    } else {
-      Deno.kill(-child.pid, 'SIGKILL');
-    }
-  } catch {
-    // The group may already have exited; retain the direct-child fallback.
-  }
-  try {
-    child.kill('SIGKILL');
-  } catch { /* Already exited. */ }
 }

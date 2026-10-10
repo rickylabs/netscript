@@ -1,18 +1,20 @@
 const RETAINED_OUTPUT_BYTES = 1024 * 1024;
+const decoder = new TextDecoder();
 
-/** Fixed-capacity byte ring: retain the tail without limiting total output. */
+/** Growing byte ring: retain a bounded tail without limiting total output. */
 export class OutputTail {
-  readonly #bytes: Uint8Array;
+  readonly #limit: number;
+  #bytes = new Uint8Array(0);
   #end = 0;
   #size = 0;
 
   constructor(totalLimit?: number) {
-    this.#bytes = new Uint8Array(
-      Math.min(totalLimit ?? RETAINED_OUTPUT_BYTES, RETAINED_OUTPUT_BYTES),
-    );
+    this.#limit = Math.min(totalLimit ?? RETAINED_OUTPUT_BYTES, RETAINED_OUTPUT_BYTES);
   }
 
   append(bytes: Uint8Array): void {
+    if (bytes.length === 0) return;
+    this.#reserve(Math.min(this.#limit, this.#size + bytes.length));
     const capacity = this.#bytes.length;
     if (bytes.length >= capacity) {
       this.#bytes.set(bytes.subarray(bytes.length - capacity));
@@ -27,12 +29,31 @@ export class OutputTail {
     this.#size = Math.min(capacity, this.#size + bytes.length);
   }
 
+  #reserve(size: number): void {
+    if (size <= this.#bytes.length) return;
+    const grown = new Uint8Array(
+      Math.min(this.#limit, Math.max(1024, size, this.#bytes.length * 2)),
+    );
+    if (this.#size) {
+      const start = (this.#end - this.#size + this.#bytes.length) % this.#bytes.length;
+      const first = Math.min(this.#size, this.#bytes.length - start);
+      grown.set(this.#bytes.subarray(start, start + first));
+      grown.set(this.#bytes.subarray(0, this.#size - first), first);
+    }
+    this.#bytes = grown;
+    this.#end = this.#size % grown.length;
+  }
+
   text(): string {
+    if (!this.#size) return '';
     const bytes = new Uint8Array(this.#size);
     const start = (this.#end - this.#size + this.#bytes.length) % this.#bytes.length;
     const first = Math.min(this.#size, this.#bytes.length - start);
     bytes.set(this.#bytes.subarray(start, start + first));
     bytes.set(this.#bytes.subarray(0, this.#size - first), first);
-    return new TextDecoder().decode(bytes).split('\n').filter((line) => line.trim()).join('\n');
+    let boundary = 0;
+    while (boundary < bytes.length && (bytes[boundary] & 0xc0) === 0x80) boundary++;
+    return decoder.decode(bytes.subarray(boundary)).split('\n')
+      .filter((line) => line.trim()).join('\n');
   }
 }

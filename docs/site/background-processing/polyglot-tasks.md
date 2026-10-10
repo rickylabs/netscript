@@ -217,7 +217,8 @@ print(json.dumps({'accepted': len(payload['roots'])}))
 ```
 
 Stdin is capped at **1 MiB of encoded bytes**, including JSON punctuation and escaping. Builder
-input is validated and copied when `.stdin()` is called; execution input is validated before
+input is validated and snapshotted when `.stdin()` is called; each `.build()` receives its own
+byte buffer, which the adapter passes directly to the runner. Execution input is validated before
 spawning. Oversized input produces `StdinPayloadTooLarge`. JSON accepts finite numbers, strings,
 booleans, null, arrays, and plain objects with at most 64 levels of nesting; cycles, accessors, and
 unsupported values produce `InvalidStdinPayload`. A subprocess that closes stdin before accepting
@@ -233,7 +234,8 @@ cap. Exceeding an explicit cap terminates the process tree and returns `status: 
 `success: false`, and `StdoutLimitExceeded` or `StderrLimitExceeded`; explicit caps also apply with
 `streamLogs: false`. Runtime validation and write errors return failed task results; builder
 validation throws before building the task. Running aborts return `cancelled`, and timeouts return
-`timeout`, both with exit code `-1`.
+`timeout`, both with exit code `-1`. Subprocesses inherit the worker's process group so terminal and supervisor
+signals also reach active tasks.
 
 Builder `.stdin()` applies only to direct executor calls. KV task registration validates through a
 schema that strips this runtime field, and queue dispatch does not carry it. Supply private
