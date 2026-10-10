@@ -166,9 +166,22 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
         }
         throw error;
       }
+      // A rejecting competitor may have restored this row's identity during the callback.
+      // Check its current version even when it points elsewhere, so a concurrent restore
+      // cannot leave an identity pointing to a row we delete after this read.
+      const remainingIdentity = await kv.get<KvKey>(identityKey);
+      const removesIdentity = remainingIdentity !== null &&
+        remainingIdentity.value.length === entry.key.length &&
+        remainingIdentity.value.every((part, index) => part === entry.key[index]);
       const removed = await kv.atomic(
-        [{ key: entry.key, versionstamp: entry.versionstamp }],
-        [{ type: 'delete', key: entry.key }],
+        [
+          { key: entry.key, versionstamp: entry.versionstamp },
+          { key: identityKey, versionstamp: remainingIdentity?.versionstamp ?? null },
+        ],
+        [
+          { type: 'delete', key: entry.key },
+          ...(removesIdentity ? [{ type: 'delete' as const, key: identityKey }] : []),
+        ],
       );
       if (!removed.ok) continue;
       count++;

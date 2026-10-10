@@ -386,6 +386,42 @@ Deno.test('KvDeadLetterStore skips a stale CAS before invoking the requeue callb
   }
 });
 
+Deno.test('KvDeadLetterStore removes a restored identity when a competing requeue succeeds', async () => {
+  const kv = await Deno.openKv(':memory:');
+  const store = new KvDeadLetterStore({ queueName: 'jobs', denoKv: kv });
+  const competitor = new KvDeadLetterStore({ queueName: 'jobs', denoKv: kv });
+  const observed = Promise.withResolvers<void>();
+  const release = Promise.withResolvers<void>();
+  let competing: Promise<number> | undefined;
+  try {
+    const first = createRecord('same-id', '2026-06-20T00:00:01.000Z');
+    await store.append(first);
+    await assertRejects(
+      () =>
+        store.reprocess(async () => {
+          competing = competitor.reprocess(async () => {
+            observed.resolve();
+            await release.promise;
+          });
+          await deadline(observed.promise, 5000);
+          throw new Error('first transfer failed');
+        }),
+      Error,
+      'first transfer failed',
+    );
+    release.resolve();
+    assertEquals(await competing, 1);
+    const next = { ...first, failedAt: '2026-06-20T00:00:02.000Z' };
+    await store.append(next);
+    assertEquals(await store.list(), [next], 'a restored identity must not suppress a new failure');
+  } finally {
+    release.resolve();
+    // Join the competitor even when an assertion fails, preserving the original test failure.
+    if (competing) await Promise.allSettled([competing]);
+    kv.close();
+  }
+});
+
 Deno.test('KvDeadLetterStore restores a legacy row after a rejected requeue', async () => {
   const kv = await Deno.openKv(':memory:');
   try {
