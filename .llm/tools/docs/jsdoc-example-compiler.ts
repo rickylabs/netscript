@@ -1,10 +1,10 @@
-import { dirname, join, relative, toFileUrl } from '@std/path';
-import {
-  type JsdocDeferredExample,
-  type JsdocExampleAnalysis,
-  type JsdocExampleBlock,
-  type JsdocExampleCompilationResult,
-  type JsdocFailureCensus,
+import { join, toFileUrl } from '@std/path';
+import type {
+  JsdocExampleAnalysis,
+  JsdocExampleBlock,
+  JsdocExampleCompilationResult,
+  JsdocFailureCensus,
+  JsdocTypeErrorExample,
 } from './jsdoc-example-contract.ts';
 import {
   materializeSharedSupports,
@@ -27,11 +27,11 @@ interface PrecompileDiagnostic {
 
 interface DiagnosticClassification {
   census: Pick<JsdocFailureCensus, 'badSpecifier' | 'typeError' | 'unboundName'>;
-  deferredExamples: JsdocDeferredExample[];
+  typeErrorExamples: JsdocTypeErrorExample[];
 }
 
 const IMPORT_SPECIFIER = /(?:\bfrom\s*|\bimport\s*\(|\bimport\s*)['"]([^'"]+)['"]/g;
-const ANSI_PATTERN = /\u001b\[[0-9;]*m/g;
+const ANSI_PATTERN = new RegExp(`${String.fromCharCode(0x1b)}\\[[0-9;]*m`, 'g');
 
 function stripAnsi(text: string): string {
   return text.replaceAll(ANSI_PATTERN, '');
@@ -47,9 +47,10 @@ function emptyFailureCensus(analysis: JsdocExampleAnalysis): JsdocFailureCensus 
   };
 }
 
-/** Failure classes the gate enforces; `typeError` alone stays deferred to its ratchet. */
+/** Every classified example failure is enforced, including published-API type errors. */
 function enforcedFailures(census: JsdocFailureCensus): number {
-  return census.badSpecifier + census.unboundName + census.unfenced + census.malformed;
+  return census.badSpecifier + census.typeError + census.unboundName + census.unfenced +
+    census.malformed;
 }
 
 function ownerLabel(block: JsdocExampleBlock): string {
@@ -204,7 +205,6 @@ async function materializeModules(
   tempRoot: string,
   blocks: JsdocExampleBlock[],
   imports: Record<string, string>,
-  repositoryRoot: string,
 ): Promise<{ modules: SyntheticExampleModule[]; policyDiagnostics: PrecompileDiagnostic[] }> {
   const modules: SyntheticExampleModule[] = [];
   const policyDiagnostics: PrecompileDiagnostic[] = [];
@@ -271,13 +271,13 @@ function classifyDiagnostics(
   analysis: JsdocExampleAnalysis,
 ): {
   failureCensus: JsdocFailureCensus;
-  deferredExamples: JsdocDeferredExample[];
+  typeErrorExamples: JsdocTypeErrorExample[];
   classifiedCompilerFailureCount: number;
 } {
   const census = emptyFailureCensus(analysis);
-  const precompiledDeferred = policyDiagnostics
+  const precompiledTypeErrors = policyDiagnostics
     .filter((finding) => finding.failureClass === 'typeError')
-    .map((finding): JsdocDeferredExample => ({
+    .map((finding): JsdocTypeErrorExample => ({
       failureClass: 'typeError',
       owner: finding.block.owner,
       exampleOrdinal: finding.block.exampleOrdinal,
@@ -286,14 +286,14 @@ function classifyDiagnostics(
     }));
   census.badSpecifier =
     policyDiagnostics.filter((finding) => finding.failureClass === 'badSpecifier').length;
-  census.typeError = precompiledDeferred.length;
+  census.typeError = precompiledTypeErrors.length;
   const compiler = classifyDenoCheckDiagnostics(raw, modules);
   census.badSpecifier += compiler.census.badSpecifier;
   census.typeError += compiler.census.typeError;
   census.unboundName += compiler.census.unboundName;
   return {
     failureCensus: census,
-    deferredExamples: [...precompiledDeferred, ...compiler.deferredExamples],
+    typeErrorExamples: [...precompiledTypeErrors, ...compiler.typeErrorExamples],
     classifiedCompilerFailureCount: Object.values(compiler.census).reduce(
       (sum, count) => sum + count,
       0,
@@ -330,15 +330,15 @@ export function unattributedDiagnostics(
 /**
  * Classify each synthetic module from deterministic, ANSI-independent Deno diagnostics.
  *
- * Bad specifiers and unbound names are enforced failures; only published-API type errors are
- * returned as deferred examples.
+ * All classes are enforced failures. Published-API type errors also retain their owner and
+ * diagnostic codes for the attributable census.
  */
 export function classifyDenoCheckDiagnostics(
   raw: string,
   modules: ReadonlyArray<{ path: string; block: JsdocExampleBlock }>,
 ): DiagnosticClassification {
   const census = { badSpecifier: 0, typeError: 0, unboundName: 0 };
-  const deferredExamples: JsdocDeferredExample[] = [];
+  const typeErrorExamples: JsdocTypeErrorExample[] = [];
   const normalized = stripAnsi(raw);
   for (const module of modules) {
     const paths = [module.path, toFileUrl(module.path).href];
@@ -355,7 +355,7 @@ export function classifyDenoCheckDiagnostics(
       census.unboundName += 1;
     } else {
       census.typeError += 1;
-      deferredExamples.push({
+      typeErrorExamples.push({
         failureClass: 'typeError',
         owner: module.block.owner,
         exampleOrdinal: module.block.exampleOrdinal,
@@ -364,7 +364,7 @@ export function classifyDenoCheckDiagnostics(
       });
     }
   }
-  return { census, deferredExamples };
+  return { census, typeErrorExamples };
 }
 
 /** Compile published JSDoc examples in isolated modules without importing or executing them. */
@@ -383,7 +383,7 @@ export async function compileJsdocExamples(
       diagnostics: `empty selection refused: ${condition}; deno check was not spawned`,
       failureCensus,
       enforcedFailureCount: enforcedFailures(failureCensus),
-      deferredExamples: [],
+      typeErrorExamples: [],
       rootLockUnchanged: true,
       temporaryLockRewritten: false,
       denoCheckSpawned: false,
@@ -402,7 +402,6 @@ export async function compileJsdocExamples(
       tempRoot,
       analysis.blocks,
       workspace.imports,
-      repositoryRoot,
     );
     if (modules.length === 0) {
       const classified = classifyDiagnostics('', modules, policyDiagnostics, analysis);
@@ -414,7 +413,7 @@ export async function compileJsdocExamples(
         ].join('\n'),
         failureCensus: classified.failureCensus,
         enforcedFailureCount: enforcedFailures(classified.failureCensus),
-        deferredExamples: classified.deferredExamples,
+        typeErrorExamples: classified.typeErrorExamples,
         rootLockUnchanged: true,
         temporaryLockRewritten: false,
         denoCheckSpawned: false,
@@ -496,7 +495,7 @@ export async function compileJsdocExamples(
       diagnostics,
       failureCensus: classified.failureCensus,
       enforcedFailureCount,
-      deferredExamples: classified.deferredExamples,
+      typeErrorExamples: classified.typeErrorExamples,
       rootLockUnchanged,
       temporaryLockRewritten: rootLockBefore !== tempLockAfter,
       denoCheckSpawned: true,

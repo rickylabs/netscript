@@ -6,8 +6,10 @@
 
 import { DenoKvAdapter, getKv, type KvKey, type WatchableKv } from '@netscript/kv';
 import type { DeadLetterRecord, DeadLetterStorePort } from '../ports/dead-letter.ts';
+import { QueueConfigurationError } from '../ports/errors.ts';
 
 const DLQ_PREFIX = 'queue:dlq';
+const DLQ_IDENTITY_PREFIX = 'queue:dlq:identity';
 
 /**
  * Options for {@link KvDeadLetterStore}.
@@ -19,7 +21,7 @@ export interface KvDeadLetterStoreOptions {
   queueName: string;
 
   /**
-   * Caller-owned `@netscript/kv` adapter.
+   * Caller-owned `@netscript/kv` adapter supporting atomic compare-and-swap.
    */
   kv?: WatchableKv;
 
@@ -52,13 +54,24 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
   }
 
   /**
-   * Persist a dead-letter record using the stable queue DLQ key layout.
+   * Persist the first terminal record for a message, retaining the ordered DLQ key layout.
    *
    * @param record - Record to append.
    */
   async append(record: DeadLetterRecord<T>): Promise<void> {
     const kv = await this.ensureKv();
-    await kv.set(this.recordKey(record), record);
+    if (!kv.atomic) {
+      throw new QueueConfigurationError('KV dead-letter storage requires atomic compare-and-swap');
+    }
+    // A redelivery has a new failedAt; the identity index makes concurrent appends idempotent.
+    // Both writes commit together, so no marker can suppress a record that was never persisted.
+    await kv.atomic(
+      [{ key: this.identityKey(record.messageId), versionstamp: null }],
+      [
+        { type: 'set', key: this.identityKey(record.messageId), value: this.recordKey(record) },
+        { type: 'set', key: this.recordKey(record), value: record },
+      ],
+    );
   }
 
   /**
@@ -82,7 +95,8 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
   }
 
   /**
-   * Re-enqueue stored records and delete each record after successful requeue.
+   * Release each identity before requeue, retaining its row until requeue succeeds.
+   * Reprocessing is at-least-once; immediate re-failures keep their new terminal record.
    *
    * @param reenqueue - Adapter-owned requeue callback.
    * @param options - Optional maximum number of records.
@@ -93,15 +107,83 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
     options: { limit?: number } = {},
   ): Promise<number> {
     const kv = await this.ensureKv();
+    if (!kv.atomic) {
+      throw new QueueConfigurationError('KV dead-letter storage requires atomic compare-and-swap');
+    }
+    // Bound the streaming traversal to the current tail. Later failures stay for the next call,
+    // even when the KV iterator fetches another batch after a requeue callback runs.
+    let end: KvKey | undefined;
+    for await (const entry of kv.list({ prefix: this.prefix, reverse: true, limit: 1 })) {
+      end = [...entry.key, ''];
+    }
+    if (!end) return 0;
     let count = 0;
     for await (
       const entry of kv.list<DeadLetterRecord<T>>({
         prefix: this.prefix,
         limit: options.limit,
+        end,
       })
     ) {
-      await reenqueue(entry.value);
-      await kv.delete(entry.key);
+      const identityKey = this.identityKey(entry.value.messageId);
+      const identity = await kv.get<KvKey>(identityKey);
+      // Legacy rows have no index. Never delete an index that points to a different row.
+      const ownsIdentity = identity !== null &&
+        identity.value.length === entry.key.length &&
+        identity.value.every((part, index) => part === entry.key[index]);
+      if (ownsIdentity) {
+        const claimed = await kv.atomic(
+          [
+            { key: entry.key, versionstamp: entry.versionstamp },
+            { key: identityKey, versionstamp: identity.versionstamp },
+          ],
+          [{ type: 'delete', key: identityKey }],
+        );
+        // Stale identity claims skip before requeue. The row stays durable throughout the
+        // transfer; a competing legacy-row reprocessor may still requeue it at least once.
+        if (!claimed.ok) continue;
+      }
+      try {
+        await reenqueue(entry.value);
+      } catch (error) {
+        if (ownsIdentity) {
+          try {
+            // Never overwrite a newer failure's identity or point to a row already removed
+            // by a competitor. If this write fails, the original row remains as a legacy row.
+            await kv.atomic(
+              [
+                { key: entry.key, versionstamp: entry.versionstamp },
+                { key: identityKey, versionstamp: null },
+              ],
+              [{ type: 'set', key: identityKey, value: entry.key }],
+            );
+          } catch (restoreError) {
+            throw new AggregateError(
+              [error, restoreError],
+              'DLQ requeue and identity restore failed',
+            );
+          }
+        }
+        throw error;
+      }
+      // A rejecting competitor may have restored this row's identity during the callback.
+      // Check its current version even when it points elsewhere, so a concurrent restore
+      // cannot leave an identity pointing to a row we delete after this read.
+      const remainingIdentity = await kv.get<KvKey>(identityKey);
+      const removesIdentity = remainingIdentity !== null &&
+        remainingIdentity.value.length === entry.key.length &&
+        remainingIdentity.value.every((part, index) => part === entry.key[index]);
+      const removed = await kv.atomic(
+        [
+          { key: entry.key, versionstamp: entry.versionstamp },
+          { key: identityKey, versionstamp: remainingIdentity?.versionstamp ?? null },
+        ],
+        [
+          { type: 'delete', key: entry.key },
+          ...(removesIdentity ? [{ type: 'delete' as const, key: identityKey }] : []),
+        ],
+      );
+      if (!removed.ok) continue;
       count++;
     }
     return count;
@@ -155,5 +237,10 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
    */
   private recordKey(record: DeadLetterRecord<T>): KvKey {
     return [DLQ_PREFIX, this.queueName, record.failedAt, record.messageId];
+  }
+
+  /** Identity index lives only as long as its stored dead-letter record. */
+  private identityKey(messageId: string): KvKey {
+    return [DLQ_IDENTITY_PREFIX, this.queueName, messageId];
   }
 }

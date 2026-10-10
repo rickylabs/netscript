@@ -189,6 +189,10 @@ export const xref: Record<string, XrefTarget> = {
     href: '/orchestration-runtime/how-to/roll-out-runtime-overrides/',
     label: 'Roll out runtime overrides',
   },
+  'howto:outbound-webhooks': {
+    href: '/orchestration-runtime/how-to/outbound-webhooks/',
+    label: 'Deliver outbound webhooks',
+  },
   'howto:add-a-task-runtime-adapter': {
     href: '/background-processing/how-to/add-a-task-runtime-adapter/',
     label: 'Add a task runtime adapter',

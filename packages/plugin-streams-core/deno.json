@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
+    "./admin": "./admin.ts",
     "./sse": "./src/sse/mod.ts",
     "./telemetry": "./src/telemetry/mod.ts",
     "./testing": "./src/testing/mod.ts",
@@ -16,7 +17,7 @@
     "@netscript/service": "jsr:@netscript/service@0.0.7"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/sse/mod.ts src/telemetry/mod.ts src/testing/mod.ts commands.ts",
+    "check": "deno check --unstable-kv mod.ts admin.ts src/sse/mod.ts src/telemetry/mod.ts src/testing/mod.ts commands.ts",
     "test": "deno test --allow-all tests/",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
@@ -26,7 +27,8 @@
       "deno.json",
       "mod.ts",
       "src/**/*.ts",
-      "commands.ts"
+      "commands.ts",
+      "admin.ts"
     ],
     "exclude": [
       "**/*_test.ts",
