@@ -335,6 +335,7 @@ packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-scripts.ts	e2e	
 packages/cli/e2e/src/application/gates/scaffold/runtime/capture-db-endpoint-allocation.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/credential-fault-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/credential-readiness-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/credential-secret-surfaces.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
