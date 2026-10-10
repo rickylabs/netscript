@@ -1,14 +1,38 @@
 import { CommandStoreError } from '../../../ports/command-store-error.ts';
 
-import { PrismaClientKnownRequestError } from 'npm:@prisma/client@^7.8.0/runtime/client';
-import { DriverAdapterError } from 'npm:@prisma/driver-adapter-utils@^7.8.0';
+// Prisma errors are matched by shape, never `instanceof`, and nothing is imported from Prisma:
+// a consumer's generated client may load its own `@prisma/client` / driver-adapter instance,
+// whose classes differ from any copy this package could resolve.
+type KnownRequestError = Readonly<{ code: string; meta?: Readonly<Record<string, unknown>> }>;
 
+// Prisma request codes are `P` plus four digits; every known-request error carries a client
+// version. Callback errors that only borrow the name stay unclassified and pass through.
+const PRISMA_REQUEST_CODE = /^P\d{4}$/;
+
+function isKnownRequestError(error: object): error is KnownRequestError {
+  const code: unknown = Reflect.get(error, 'code');
+  return Reflect.get(error, 'name') === 'PrismaClientKnownRequestError' &&
+    typeof code === 'string' && PRISMA_REQUEST_CODE.test(code) &&
+    typeof Reflect.get(error, 'clientVersion') === 'string';
+}
+
+/** Same predicate as `isDriverAdapterError` in `@prisma/driver-adapter-utils`, null-safe. */
+function driverAdapterCode(error: unknown): string | undefined {
+  if (typeof error !== 'object' || error === null) return;
+  if (Reflect.get(error, 'name') !== 'DriverAdapterError') return;
+  const cause: unknown = Reflect.get(error, 'cause');
+  if (typeof cause !== 'object' || cause === null) return;
+  const code: unknown = Reflect.get(cause, 'originalCode');
+  return typeof code === 'string' ? code : undefined;
+}
+
+/** SQLSTATE of a Prisma PostgreSQL failure from any module instance, else `undefined`. */
 export function postgresCommandCode(error: unknown): string | undefined {
-  if (error instanceof DriverAdapterError) return error.cause.originalCode;
-  if (!(error instanceof PrismaClientKnownRequestError)) return;
+  if (typeof error !== 'object' || error === null) return;
+  if (!isKnownRequestError(error)) return driverAdapterCode(error);
   if (error.code === 'P2034') return '40001';
-  const nested = error.meta?.driverAdapterError;
-  if (nested instanceof DriverAdapterError) return nested.cause.originalCode;
+  const nested = driverAdapterCode(error.meta?.driverAdapterError);
+  if (nested) return nested;
   return typeof error.meta?.code === 'string' ? error.meta.code : undefined;
 }
 

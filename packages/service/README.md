@@ -13,9 +13,10 @@ shutdown path that drains in-flight work. This package materializes all of it fr
 you already have: `defineService()` stands up the full runtime in one call, and `createService()`
 composes the same stages explicitly when a service needs a bespoke stack.
 
-Authentication and authorization ship as an opt-in subpath with provider-agnostic ports, so a
-service that needs guarding adds it without dragging auth machinery into every service that does
-not.
+`defineService()` requires an explicit `ServiceAuthPolicy`: native authentication with optional
+authorization, or `auth: { public: true, reason: 'Public status service' }`. Missing or malformed
+policies fail before configuration, database startup, or listener creation. Provider-agnostic auth
+ports and factories are available through `./auth`.
 
 ## Why teams use it
 
@@ -39,9 +40,9 @@ not.
 - **Tracing on every request** — the builder registers tracing middleware as the outermost layer on
   every service, so each request gets a server span with W3C propagation and the service name
   recorded, with no per-service wiring.
-- **Opt-in auth** — `./auth` ships authentication and authorization ports plus static-credential,
-  trusted-header, contract-policy, and scope-authorizer factories, kept off the import graph until
-  used.
+- **Explicit auth policy** — the preset requires native guards or a public opt-out with a reason.
+  `./auth` ships provider-agnostic ports plus static-credential, trusted-header, contract-policy,
+  and scope-authorizer factories.
 
 ## Architecture
 
@@ -72,6 +73,7 @@ import { router } from './router.ts';
 // One call materializes the Hono + oRPC runtime and starts the listener:
 // CORS, request logging, OpenAPI JSON, Scalar docs, RPC, service info, and health.
 const service = await defineService(router, {
+  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },
   name: 'users',
   version: '1.0.0',
   port: 3001,
@@ -82,6 +84,86 @@ const service = await defineService(router, {
 console.log(`listening on :${service.addr.port}`);
 await service.stop();
 ```
+
+## Auth policy migration (breaking in 0.0.8)
+
+`DefineServiceOptions.auth` is required. Omission is a type error; JavaScript callers also receive
+an actionable `TypeError` before builder configuration, database startup, or listener creation.
+Search for `defineService(` in existing entrypoints and choose native guards
+`auth: { authn: { authenticator }, authz: { authorizer } }` (authorization is optional), or record
+why the entire service is deliberately public. A public reason must be nonblank and cannot be
+combined with `authn` or `authz`.
+
+For a genuinely public status service, the exact migration is:
+
+```diff
+-await defineService(router, { name: 'status' });
++await defineService(router, {
++  name: 'status',
++  auth: { public: true, reason: 'Public status service with no protected operations' },
++});
+```
+
+The policy and its validator are the shared `ServiceAuthPolicy` / `assertServiceAuthPolicy`
+contract from `@netscript/service/auth`, also used by plugin services. Guarded policies preserve
+the existing `/api` protection and anonymous `/health` defaults; custom `protect` and
+`allowAnonymous` options keep their existing semantics. `createService()` remains the lower-level
+composition API; it installs guards through `.withAuthn()` and `.withAuthz()`.
+
+L1 generated services record a public demo policy with a reason naming
+[#1382 L2](https://github.com/rickylabs/netscript/issues/1382). Wiring guarded scaffolds when auth
+is installed and authenticated generated app calls remain follow-ups. Public examples below
+are demonstrations; choose guards before using them for private operations.
+
+## CORS migration (breaking in 0.0.8)
+
+`withCors()` and `defineService()` no longer grant `Access-Control-Allow-Origin: *` by default. An
+omitted `origin` reads `NETSCRIPT_CORS_ORIGINS` once when the builder is configured. Supply
+comma-separated exact HTTP(S) origins, with no path or trailing slash:
+
+```sh
+export NETSCRIPT_CORS_ORIGINS='https://app.example,https://admin.example'
+```
+
+Generated CLI/Aspire helpers inject the enabled web apps' allocated endpoint origins into every
+service and plugin API resource. For independently launched services, configure this variable in
+each service's launch environment. An unset or blank value allows no cross-origin browser reads. The
+existing `createPluginService()` factory delegates its `config.cors` to this same builder, so
+omitted origins consume the workspace allowlist without separate plugin policy. `enableCors: false`
+continues to skip plugin CORS. Explicit origins override the environment, including an empty array
+to deny all cross-origin access:
+
+```ts
+import { defineService, type ServiceRouter } from '@netscript/service';
+
+declare const router: ServiceRouter;
+const service = await defineService(router, {
+  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },
+  name: 'users',
+  cors: { origin: ['https://app.example'] },
+});
+await service.stop();
+```
+
+Builder callers use `.withCors({ origin: ['https://app.example'] })`; plugin callers use
+`cors: { origin: ['https://app.example'] }`. Options such as `allowHeaders` without an `origin`
+still inherit the environment allowlist. Environment entries must be exact origins; wildcard, opaque
+`null`, malformed URLs, and URL paths fail configuration. Reading defaults requires
+`--allow-env=NETSCRIPT_CORS_ORIGINS`; explicit origins need no environment permission.
+
+Public APIs can opt into `.withCors({ origin: '*' })` without credentials. `build()` rejects
+wildcard plus `credentials: true`, including wildcard entries in arrays. Origin resolver callbacks
+remain supported; a credentialed callback returning `'*'` grants no ACAO header. Allowlisted origins
+receive their exact ACAO; other origins receive none, so the browser refuses access to the response.
+CORS is a browser response policy, not authentication or CSRF protection.
+
+The owner-approved browser auth topology is a BFF: the Fresh app owns sign-in/callback and its
+first-party session cookie, and its server forwards a bearer through the SDK contribution to
+services. Browser-to-service credentialed CORS is not part of this topology. Generated BFF routes
+and a real browser session round trip are follow-up scope of
+[#1386](https://github.com/rickylabs/netscript/issues/1386).
+
+## Runtime shutdown
 
 Compose every in-process runtime behind one bounded shutdown handle without replacing its own drain:
 
