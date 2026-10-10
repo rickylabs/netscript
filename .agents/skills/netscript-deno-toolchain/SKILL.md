@@ -20,8 +20,8 @@ Repo is on **Deno 2.9.5** (Windows + WSL). Targeted `deno check` must pass `--un
 
 ## Fresh explicit prereleases
 
-Deno's default 24-hour dependency-age policy can block a freshly published explicit prerelease.
-For the release-verification path that deliberately consumes a just-published canary, use the exact
+Deno's default 24-hour dependency-age policy can block a freshly published explicit prerelease. For
+the release-verification path that deliberately consumes a just-published canary, use the exact
 version with a narrowly scoped bypass. Set `NETSCRIPT_CANARY_VERSION` to that exact just-published
 canary version, then run:
 
@@ -29,10 +29,10 @@ canary version, then run:
 deno add --minimum-dependency-age=0 "jsr:@netscript/service@${NETSCRIPT_CANARY_VERSION:?set to the exact just-published canary version}"
 ```
 
-Deno 2.9.3 rejects `--minimum-dependency-age`; denoland/deno PR #36099 (commit `5dd39c7458`)
-fixed the flag in 2.9.4, and the fix is included in 2.9.5. On 2.9.5 the command above writes the
-exact prerelease. Do not add the bypass broadly: it intentionally overrides the age policy only
-where release verification must install an artifact published moments earlier.
+Deno 2.9.3 rejects `--minimum-dependency-age`; denoland/deno PR #36099 (commit `5dd39c7458`) fixed
+the flag in 2.9.4, and the fix is included in 2.9.5. On 2.9.5 the command above writes the exact
+prerelease. Do not add the bypass broadly: it intentionally overrides the age policy only where
+release verification must install an artifact published moments earlier.
 
 JSR does **not** provide an `@canary` tag. `jsr:@netscript/service@canary` still fails on Deno
 2.9.5, so release docs and automation must retain an explicit `releaseSpecifier` / exact canary
@@ -70,6 +70,22 @@ the import-map entry is safe to delete.
 | `deno ci --prod [--frozen] [--skip-types]` | frozen install of the **production** surface only — proves the _published_ surface installs without dev deps. Additive, not a replacement. `deno task deps:prod-install` |
 
 Never pass a reload flag (`--reload` / `deno cache --reload`) or delete lock files without approval.
+
+### Nested reference lock after dependency changes
+
+`resources/examples/expo-streams/deno.lock` freezes the React fixture in the reference compiler
+context. Its local imports resolve workspace source, so dependency ranges outside the reference can
+also invalidate it. Refresh this lock with every dependency change affecting that graph. From
+`resources/examples/expo-streams`, use the normal install flow:
+
+```sh
+deno install --lock=deno.lock --frozen=false --entrypoint stream-react.fixture.ts
+```
+
+Commit the resulting lock delta with the dependency change. `deno task deps:check` starts with
+`deps:check:reference-locks`, a native frozen entrypoint install that fails before the other
+dependency audits and prints the repair command. It neither executes the fixture nor rewrites the
+lock. This guard supplements the SDK suite's frozen fixture test; it does not replace it.
 
 ## Catalogs (2.9; member resolution needs ≥ 2.8.3)
 
@@ -139,10 +155,9 @@ Deno 2.9 makes two `deno task` features first-class; the repo uses both in root 
 7. "My run failed and I do not know what is still running", "`behavior.service-health` timed out",
    "ports are already in use", or "there is a `postgres-*` container I did not start" → the
    read-only `deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>`; preview
-   positively owned cleanup with `deno task maint:teardown -- ...` and require `--apply` to
-   mutate.
-8. Dogfood the current consumer agent bundle → `deno task maint:dogfood-skills`; output is owned
-   by the local CLI under `.agents/generated/consumer-skills/`, not hand-authored here.
+   positively owned cleanup with `deno task maint:teardown -- ...` and require `--apply` to mutate.
+8. Dogfood the current consumer agent bundle → `deno task maint:dogfood-skills`; output is owned by
+   the local CLI under `.agents/generated/consumer-skills/`, not hand-authored here.
 
 For repo-native validation wrappers, gate evidence, and git ground-truth, see the
 **netscript-tools** skill. For the toolbelt source, see `.llm/tools/entry.md` § Dependency toolbelt.
