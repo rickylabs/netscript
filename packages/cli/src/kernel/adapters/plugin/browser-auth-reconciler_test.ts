@@ -103,7 +103,13 @@ Deno.test('helper regeneration leaves scaffold policies and authored inputs unch
     );
     await fs.writeFile(
       join(root, 'appsettings.json'),
-      JSON.stringify(settings),
+      JSON.stringify({
+        NetScript: {
+          ...settings.NetScript,
+          Apps: { web: { ...settings.NetScript.Apps.web, PluginReferences: ['auth'] } },
+          Services: { users: { ...settings.NetScript.Services.users, PluginReferences: ['auth'] } },
+        },
+      }),
     );
     await fs.createDir(join(root, 'aspire'));
     await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
