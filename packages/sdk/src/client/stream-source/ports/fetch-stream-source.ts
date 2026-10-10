@@ -1,7 +1,10 @@
 import type { StreamEventSourceV1 } from '@netscript/plugin-streams-core/sse';
 
-/** WHATWG streaming fetch supplied by the host. Verify host-specific types through a wrapper. */
-export type StreamFetchV1 = (url: string, init: RequestInit) => Promise<Response>;
+/** Streaming response subset used by the consumer; excludes host-only Response methods. */
+export type StreamFetchResponseV1 = Pick<Response, 'ok' | 'status' | 'headers' | 'body'>;
+
+/** WHATWG streaming fetch supplied by the host. Verify host-specific request types through a wrapper. */
+export type StreamFetchV1 = (url: string, init: RequestInit) => Promise<StreamFetchResponseV1>;
 
 /** Timer port for heartbeat deadlines and reconnect delays; tests can advance it manually. */
 export interface StreamSourceSchedulerV1 {
