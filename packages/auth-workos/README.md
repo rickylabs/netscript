@@ -46,12 +46,14 @@ and `WORKOS_COOKIE_PASSWORD` in the environment.
 
 ```typescript
 import { createService, type ServiceRouter } from '@netscript/service';
-import { createWorkosBackend, type WorkosSessionClient } from '@netscript/auth-workos';
+import { WorkOS } from '@workos-inc/node';
+import { createWorkosBackend } from '@netscript/auth-workos';
 
-// Your oRPC router, and a WorkOS client adapted to the session-client port —
-// the NetScript auth plugin builds this adapter over @workos-inc/node for you.
+// Your oRPC router and a configured WorkOS AuthKit SDK client.
 declare const router: ServiceRouter;
-declare const workos: WorkosSessionClient;
+const workos = new WorkOS(Deno.env.get('WORKOS_API_KEY')!, {
+  clientId: Deno.env.get('WORKOS_CLIENT_ID')!,
+});
 
 const service = createService(router, { name: 'private-api' })
   .withAuthn({
@@ -92,8 +94,9 @@ The always-current symbol list is
 ## Compatibility
 
 Designed for Deno; needs `--allow-net` (WorkOS API and JWKS) and `--allow-env` (credentials). The
-package consumes any `WorkosSessionClient` — a small structural port over the sealed-session API —
-and NetScript's auth plugin adapts the official `@workos-inc/node` SDK to it for you.
+package accepts the official `@workos-inc/node` SDK directly through its structural sealed-session
+port. Session types accept a user type parameter for SDK-specific fields; omitting it preserves
+extra-field access as `unknown` for existing consumers.
 
 ## License
 
