@@ -267,7 +267,15 @@ export interface AuthBackendPort extends AuthenticatorPort {
    * ```
    */
   readonly interactive?: InteractiveFlowPort;
-  /** Authenticates a service request through the backend. */
+  /**
+   * Authenticates a service request through the backend.
+   *
+   * The request credential must resolve exactly as
+   * `sessions.getSession({ token: readBearerCredential(request), request })` resolves it: a
+   * well-formed `Authorization: Bearer <credential>` takes precedence over the backend session
+   * cookie, and a malformed header is no credential. The auth service `me` and `session`
+   * operations rely on this to answer browsers and service identities alike.
+   */
   authenticate(request: AuthnRequest): Promise<AuthnResult> | AuthnResult;
 }
 

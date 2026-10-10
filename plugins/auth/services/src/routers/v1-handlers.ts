@@ -302,12 +302,7 @@ export async function session(
     async (audit) => {
       let resolved: AuthSession | undefined;
       try {
-        const request = toAuthnRequest(context.request, input?.sessionId);
-        resolved = await backend.sessions.getSession({
-          sessionId: input?.sessionId,
-          token: readBearerCredential(request),
-          request,
-        });
+        resolved = await lookupSession(backend, context.request, input?.sessionId);
       } catch (error) {
         const authError = providerFailure(error, backend.name);
         await recordAuthFailure(audit, authError.message);
@@ -364,10 +359,7 @@ export async function me(context: AuthServiceContext): Promise<MeResponse> {
       : undefined;
     let resolved: AuthSession | undefined;
     try {
-      resolved = await backend.sessions.getSession({
-        sessionId,
-        request: toAuthnRequest(context.request, sessionId),
-      });
+      resolved = await lookupSession(backend, context.request, sessionId);
     } catch (error) {
       const authError = providerFailure(error, backend.name);
       await recordAuthFailure(audit, authError.message);
@@ -396,6 +388,25 @@ export async function me(context: AuthServiceContext): Promise<MeResponse> {
     });
     emitObservedRefresh(resolved, audit.traceContext());
     return output;
+  });
+}
+
+/**
+ * Look a session up from the request credential, as every credential-reading operation must.
+ *
+ * `session` and `me` share this one lookup so a bearer credential, the session cookie, and an
+ * explicit session id resolve identically for browsers and service identities.
+ */
+async function lookupSession(
+  backend: AuthBackendPort,
+  serviceRequest: AuthServiceContext['request'],
+  sessionId: string | undefined,
+): Promise<AuthSession | undefined> {
+  const request = toAuthnRequest(serviceRequest, sessionId);
+  return await backend.sessions.getSession({
+    sessionId,
+    token: readBearerCredential(request),
+    request,
   });
 }
 
