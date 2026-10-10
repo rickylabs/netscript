@@ -8,9 +8,9 @@ import { AtomicFileReceiptStore } from './receipt-store.ts';
 
 const ROOT = new URL('../../../', import.meta.url);
 const CASES = [
-  { gate: 'lint', task: 'lint', wrapper: 'run-deno-lint.ts', invalid: 'debugger;\n' },
+  { gate: 'lint-report', task: 'lint', wrapper: 'run-deno-lint.ts', invalid: 'debugger;\n' },
   {
-    gate: 'fmt-check',
+    gate: 'fmt-check-report',
     task: 'fmt:check',
     wrapper: 'run-deno-fmt.ts',
     invalid: 'export const value=1;\n',
@@ -46,6 +46,18 @@ Deno.test('lint and format receipt gates preserve local task scope and caching',
   }
 });
 
+Deno.test('CI selects fresh report gates while package-scoped task gates stay unchanged', async () => {
+  const ci = await Deno.readTextFile(new URL('.github/workflows/ci.yml', ROOT));
+  assertStringIncludes(ci, '--gate lint-report --id quality-lint');
+  assertStringIncludes(ci, '--gate fmt-check-report --id quality-fmt');
+  assertStringIncludes(ci, '--child-report .llm/tmp/gate-receipts/quality/lint.report.json');
+  assertStringIncludes(ci, '--child-report .llm/tmp/gate-receipts/quality/fmt.report.json');
+  assertEquals(gateArgv('lint'), ['deno', 'task', 'lint']);
+  assertEquals(gateArgv('fmt-check'), ['deno', 'task', 'fmt:check']);
+  const fresh = await Deno.readTextFile(new URL('.github/workflows/fresh-ui-quality.yml', ROOT));
+  assertStringIncludes(fresh, '--gate lint --id fresh-ui-lint\n          --cwd packages/fresh-ui');
+});
+
 async function runGate(
   root: string,
   gate: string,
@@ -79,6 +91,10 @@ for (const { gate, task, wrapper, invalid } of CASES) {
     const root = await Deno.makeTempDir({ prefix: 'lint-fmt-cache-' });
     try {
       const workspace = await config();
+      const ci = await Deno.readTextFile(new URL('.github/workflows/ci.yml', ROOT));
+      const id = task === 'lint' ? 'quality-lint' : 'quality-fmt';
+      const selectedGate = ci.match(new RegExp(`--gate ([\\w-]+) --id ${id}`))?.[1];
+      assert(selectedGate, `CI must select a gate for ${id}`);
       await Deno.mkdir(join(root, 'packages', 'cache-fixture'), { recursive: true });
       await Deno.mkdir(join(root, 'plugins'));
       await Deno.mkdir(join(root, '.llm', 'tools'), { recursive: true });
@@ -114,7 +130,7 @@ for (const { gate, task, wrapper, invalid } of CASES) {
       // Each restored CI checkout lacks the prior report but retains unchanged task inputs.
       for (const attempt of [1, 2]) {
         await Deno.remove(report);
-        const receipt = await runGate(root, gate, attempt, report);
+        const receipt = await runGate(root, selectedGate, attempt, report);
         assertEquals(receipt.outcome, 'PASS', receipt.reason);
         assertEquals(receipt.exitCode, 0);
         assert(receipt.childReportEvidence, 'fresh child report must be hashed into the receipt');
@@ -125,18 +141,18 @@ for (const { gate, task, wrapper, invalid } of CASES) {
       }
 
       await Deno.writeTextFile(report, '{"stale":true}');
-      const refreshed = await runGate(root, gate, 3, report);
+      const refreshed = await runGate(root, selectedGate, 3, report);
       assertEquals(refreshed.outcome, 'PASS', refreshed.reason);
       assert(refreshed.childReportEvidence);
       assertEquals(JSON.parse(await Deno.readTextFile(report)).stale, undefined);
 
       await Deno.writeTextFile(source, invalid);
-      const failed = await runGate(root, gate, 4, report);
+      const failed = await runGate(root, selectedGate, 4, report);
       assertEquals(failed.outcome, 'FAIL');
       assert(failed.exitCode !== undefined && failed.exitCode > 0);
       assert(failed.childReportEvidence, 'violations must still produce a fresh failure report');
       const child = JSON.parse(await Deno.readTextFile(report));
-      const findings = gate === 'lint' ? child.summary.totalOccurrences : child.summary.findings;
+      const findings = task === 'lint' ? child.summary.totalOccurrences : child.summary.findings;
       assert(findings > 0, 'the real lint/format violation must appear in the report');
       assertEquals(await Deno.readTextFile(source), invalid, 'checks must never fix violations');
     } finally {

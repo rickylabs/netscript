@@ -29,9 +29,11 @@ export const GATE_CATALOG = {
   'check-test-job': ['deno', 'task', 'check'],
   'quality-job': ['deno', 'task', 'ci:quality'],
   check: ['deno', 'task', 'check'],
+  lint: ['deno', 'task', 'lint'],
+  'fmt-check': ['deno', 'task', 'fmt:check'],
   // Receipt gates need a fresh child report even when local task inputs are unchanged.
   // Keep these wrapper scopes aligned with the cached tasks in deno.json.
-  lint: [
+  'lint-report': [
     'deno',
     'run',
     '--allow-read',
@@ -47,7 +49,7 @@ export const GATE_CATALOG = {
     '--exclude',
     '^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)',
   ],
-  'fmt-check': [
+  'fmt-check-report': [
     'deno',
     'run',
     '--allow-read',
