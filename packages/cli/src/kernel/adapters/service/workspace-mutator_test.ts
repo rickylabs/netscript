@@ -6,14 +6,15 @@ import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
 import { regenerateAspireHelpers } from './workspace-mutator.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
+import { SCAFFOLD_VERSIONS } from '../../constants/scaffold/scaffold-versions.ts';
 
-function appsettings(): string {
+function appsettings(databases: Record<string, unknown> = {}): string {
   return JSON.stringify({
     NetScript: {
       Name: 'shop',
       Version: '1.0.0',
       Otel: { HttpEndpoint: 'http://localhost:4318', Protocol: 'http/protobuf' },
-      Databases: {},
+      Databases: databases,
       Cache: {},
       Services: {},
       Plugins: {},
@@ -38,25 +39,8 @@ Deno.test('Aspire helper regeneration compares and writes canonical content', as
   };
 
   try {
-    const repoRoot = new URL('../../../../../../', import.meta.url);
-    await fs.writeFile(
-      join(root, 'deno.json'),
-      JSON.stringify({
-        catalog: SCAFFOLD_WORKSPACE_CATALOG,
-        imports: {
-          '@netscript/config': new URL('packages/config/mod.ts', repoRoot).href,
-        },
-      }),
-    );
-    await fs.writeFile(
-      join(root, 'netscript.config.ts'),
-      `import { defineConfig } from '@netscript/config';
-
-export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: [] });
-`,
-    );
+    await writeProject(fs, root);
     await fs.writeFile(join(root, 'appsettings.json'), appsettings());
-    await fs.createDir(join(root, 'aspire'));
     const scaffolder = new Scaffolder(templateAdapter, fs);
     const first = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, {
       formatter,
@@ -97,4 +81,68 @@ async function readFiles(
   return Object.fromEntries(
     await Promise.all(paths.map(async (path) => [path, await fs.readFile(path)] as const)),
   );
+}
+
+Deno.test('Aspire helper regeneration declares pg for an existing PostgreSQL AppHost', async () => {
+  // Regression (#1726 IMPL-EVAL): the regenerated helpers emit `postgres_auth`, which loads `pg`;
+  // an AppHost scaffolded before this check existed must gain the dependency on the same path.
+  const root = await Deno.makeTempDir();
+  const fs = new DenoFileSystem();
+  const templateAdapter = new StringTemplateAdapter(fs);
+  const scaffolder = new Scaffolder(templateAdapter, fs);
+  try {
+    await writeProject(fs, root);
+    await fs.writeFile(
+      join(root, 'appsettings.json'),
+      appsettings({ main: { Engine: 'Postgres', Mode: 'Container', DatabaseName: 'main' } }),
+    );
+    const packageJsonPath = join(root, 'aspire', 'package.json');
+    const legacyPackageJson = JSON.stringify({
+      name: 'shop-apphost',
+      dependencies: { 'vscode-jsonrpc': '8.2.0', 'left-pad': '1.3.0' },
+    });
+    await fs.writeFile(packageJsonPath, legacyPackageJson);
+
+    const dryRun = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter, {
+      dryRun: true,
+    });
+    assertEquals(dryRun.includes(packageJsonPath), true);
+    assertEquals(await fs.readFile(packageJsonPath), legacyPackageJson);
+
+    const written = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter);
+    const helper = await fs.readFile(join(root, 'aspire', '.helpers', 'register-infrastructure.mts'));
+    assertEquals(helper.includes('withHealthCheck("main_auth")'), true);
+    assertEquals(written.includes(packageJsonPath), true);
+    assertEquals(JSON.parse(await fs.readFile(packageJsonPath)).dependencies, {
+      'vscode-jsonrpc': '8.2.0',
+      'left-pad': '1.3.0',
+      pg: SCAFFOLD_VERSIONS.APPHOST_PG,
+    });
+
+    const again = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter);
+    assertEquals(again.includes(packageJsonPath), false);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+async function writeProject(fs: DenoFileSystem, root: string): Promise<void> {
+  const repoRoot = new URL('../../../../../../', import.meta.url);
+  await fs.writeFile(
+    join(root, 'deno.json'),
+    JSON.stringify({
+      catalog: SCAFFOLD_WORKSPACE_CATALOG,
+      imports: {
+        '@netscript/config': new URL('packages/config/mod.ts', repoRoot).href,
+      },
+    }),
+  );
+  await fs.writeFile(
+    join(root, 'netscript.config.ts'),
+    `import { defineConfig } from '@netscript/config';
+
+export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: [] });
+`,
+  );
+  await fs.createDir(join(root, 'aspire'));
 }

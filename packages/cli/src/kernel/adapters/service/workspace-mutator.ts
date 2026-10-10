@@ -7,6 +7,7 @@
 import { basename, join } from '@std/path';
 import { parseAppSettings } from '@netscript/aspire/config';
 import { HelpersGeneratorPipeline } from '../../templates/aspire/helpers/helpers-generator-pipeline.ts';
+import { reconcileAppHostPackageDependencies } from '../aspire/apphost-package-dependencies.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
@@ -200,6 +201,12 @@ export async function regenerateAspireHelpers(
     written.push(path);
     if (!options.dryRun) await scaffolder.writeFile(path, content, true);
   }
+
+  // The regenerated helpers may load npm packages an older AppHost never declared.
+  const packageJson = await reconcileAppHostPackageDependencies(fs, aspireDir, config.Databases, {
+    dryRun: options.dryRun,
+  });
+  if (packageJson) written.push(packageJson);
 
   return written;
 }
