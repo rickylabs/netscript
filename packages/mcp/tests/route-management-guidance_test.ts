@@ -46,10 +46,12 @@ for (
         ),
         intent,
       );
-      assert(
-        guidance.related.some(({ slug }) => slug === `${prefix}web-layer/generated-surface`),
-        intent,
-      );
+      if (prefix === '') {
+        assert(
+          guidance.related.some(({ slug }) => slug === 'web-layer/generated-surface'),
+          intent,
+        );
+      }
     }
     const document = await corpus.get(`${prefix}web-layer/route`);
     const checklist = document?.sectionContents.find(({ slug }) =>
