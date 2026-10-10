@@ -298,7 +298,9 @@ for (const mode of STORE_MODES) {
         .build() as SagaDefinition,
     ];
 
-    const store = await runSaga(definitions, [{ type: 'Start', payload: {} }]);
+    // The keyed broadcast is delivered twice; the replay must write nothing to either instance.
+    const start = { type: 'Start', payload: {}, idempotencyKey: 'start-1' };
+    const store = await runSaga(definitions, [start, start]);
 
     const loaded = await store.load(INSTANCE_ID);
     assertEquals(loaded?.metadata.status, 'failed');

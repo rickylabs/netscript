@@ -190,8 +190,9 @@ saved unless the branch returns.
 
 When one handler returns several effects, they run in order. Each `sagaCompensate(...)` runs against
 the latest state and version saved for its instance during that dispatch, and saves its own outcome
-as the next version. That includes an earlier compensation and any transition a `send(...)` caused,
-whether the instance handled the message itself or it came back through other sagas. So for `[sagaCompensate(releaseStock), sagaCompensate(refundPayment)]`, both branches'
+as the next version. That includes an earlier compensation, other sagas that handled the same
+message, and any transition a `send(...)` caused, whether the instance handled the message itself or
+it came back through other sagas. So for `[sagaCompensate(releaseStock), sagaCompensate(refundPayment)]`, both branches'
 state changes are kept, and the last outcome sets the final status.
 
 A `sagaFail(...)` returned from `.on()` saves `failed` first. If a `.compensate()` branch is

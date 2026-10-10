@@ -187,8 +187,11 @@ export class SagaBusBridge implements SagaBusPort {
     ledger: InstanceLedger,
   ): Promise<void> {
     const results = await this.#engine.handle(message, { correlationId });
+    // The engine commits every matching handler before returning, so the whole batch is recorded
+    // first: a cascade dispatched for one result may move another result's instance, and that
+    // newer entry must not be overwritten by the older batch snapshot.
+    for (const result of results) ledger.record(result.instanceId, result.state, result.version);
     for (const result of results) {
-      ledger.record(result.instanceId, result.state, result.version);
       const definition = this.#definitions.get(result.sagaId);
       if (!definition) {
         throw SagasError.sagaNotFound(result.sagaId);
