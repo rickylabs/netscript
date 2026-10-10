@@ -11,7 +11,10 @@ Deno.test('registry enumerates the complete v1 contract surface', () => {
     assertEquals(tool.outputSchema, TOOL_OUTPUT_SCHEMAS[tool.name]);
     assertEquals(tool.inputSchema.jsonSchema.type, 'object');
     assertEquals(tool.outputSchema.jsonSchema.type, 'object');
-    assertMatch(tool.description, /bounded summary/);
+    assertMatch(
+      tool.description,
+      tool.name === 'get_doc' ? /faithful documentation/ : /bounded summary/,
+    );
   }
 });
 
@@ -139,4 +142,14 @@ Deno.test('public docs activate intent guidance before unfamiliar implementation
       `${name} does not distinguish intent guidance from literal and exact retrieval`,
     );
   }
+});
+
+Deno.test('registry declares semantic truncation and envelope policies per tool', () => {
+  const registry = createToolRegistry();
+  const getDoc = registry.find((tool) => tool.name === 'get_doc')!;
+  assertEquals(getDoc.truncation, 'exempt');
+  assertEquals(getDoc.envelopeCheck, true);
+  const search = registry.find((tool) => tool.name === 'search_docs')!;
+  assertEquals(search.truncation, undefined);
+  assertEquals(search.envelopeCheck, undefined);
 });
