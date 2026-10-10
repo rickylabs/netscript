@@ -8,7 +8,7 @@ export interface StreamCollectionChangeV1<T extends object> {
   /** Row operation applied by the sync transaction. */
   readonly type: 'insert' | 'update' | 'delete';
   /** Entity primary key. */
-  readonly key: string;
+  readonly key: string | number;
   /** Entity state; delete changes carry the removed row. */
   readonly value: T;
 }

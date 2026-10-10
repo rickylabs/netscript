@@ -32,7 +32,7 @@ control reports `upToDate` or `streamClosed`.
 ## Inject Expo fetch
 
 The
-[Expo reference app](https://github.com/rickylabs/netscript/tree/main/packages/sdk/examples/expo-streams)
+[Expo reference app](https://github.com/rickylabs/netscript/tree/main/resources/examples/expo-streams)
 contains the complete screen, typed execution contract, and a checked `expo/fetch` wrapper. Its data
 layer needs only NetScript imports. The host wrapper forwards GET, headers, and the abort signal;
 Expo's request body type is narrower than WHATWG `RequestInit`, so do not forward arbitrary request

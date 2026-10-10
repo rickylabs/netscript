@@ -486,7 +486,7 @@ provides `collection`, `done`, `snapshot()`, and idempotent `dispose()`.
 `@netscript/sdk/streams/react`'s `useStreamLiveQueryV1` subscribes a React Native screen through
 TanStack DB without loading Fresh.
 
-The [Expo reference](./examples/expo-streams/README.md) includes checked fetch types, a complete
-React Native screen, and an executable Hermes probe. See the
+The [Expo reference](../../resources/examples/expo-streams/README.md) includes checked fetch types,
+a complete React Native screen, and an executable Hermes probe. See the
 [streams how-to](https://netscript.dev/durable-workflows/expo-streams/) for replay and lifecycle.
 Native Hermes and Expo network integration still require the recorded device acceptance run.

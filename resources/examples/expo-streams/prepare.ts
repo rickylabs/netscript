@@ -2,8 +2,8 @@
 // Metro compiles TypeScript and the host resolves one TanStack DB and React instance.
 import { copy } from '@std/fs/copy';
 
-const sdk = new URL('../../', import.meta.url);
-const core = new URL('../../../plugin-streams-core/', import.meta.url);
+const sdk = new URL('../../../packages/sdk/', import.meta.url);
+const core = new URL('../../../packages/plugin-streams-core/', import.meta.url);
 const output = new URL('./.generated/', import.meta.url);
 const entries = {
   consumer: 'stream-source',

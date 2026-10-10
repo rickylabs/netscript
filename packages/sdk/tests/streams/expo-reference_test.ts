@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { createCockpitStream } from '../../examples/expo-streams/cockpit.ts';
+import { createCockpitStream } from '../../../../resources/examples/expo-streams/cockpit.ts';
 import type { StreamFetchV1 } from '@netscript/sdk/streams/consumer';
 
 Deno.test('Expo reference factory consumes cockpit execution stream using only SDK imports and injected fetch', async () => {

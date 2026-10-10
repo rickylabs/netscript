@@ -8,9 +8,9 @@ state under server service identities. Keeping this screen open never runs backe
 From the repository root:
 
 ```sh
-deno task --cwd packages/sdk/examples/expo-streams prepare
-deno task --cwd packages/sdk/examples/expo-streams check
-cd packages/sdk/examples/expo-streams
+deno task --cwd resources/examples/expo-streams prepare
+deno task --cwd resources/examples/expo-streams check
+cd resources/examples/expo-streams
 npm install
 npm run typecheck
 EXPO_PUBLIC_STREAM_URL=https://api.example.com/v1/stream/netscript/workers/executions?offset=-1 npm start

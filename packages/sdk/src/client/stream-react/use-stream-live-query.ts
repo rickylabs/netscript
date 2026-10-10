@@ -1,5 +1,5 @@
 import { useLiveQuery } from '@tanstack/react-db';
-import type { Collection } from '@tanstack/db';
+import type { Collection, NonSingleResult } from '@tanstack/db';
 import type { StreamCollectionV1 } from '../stream-collection/mod.ts';
 
 /** Reactive rows and readiness returned by the React Native stream hook. */
@@ -35,6 +35,6 @@ export function useStreamLiveQueryV1<TData extends object>(
 ): StreamLiveQueryResultV1<TData> {
   // The factory returns a concrete Collection. Match the existing SDK collection
   // boundary: callers see the owned structural port, this adapter uses upstream types.
-  const result = useLiveQuery(collection as unknown as Collection<TData, string>);
+  const result = useLiveQuery(collection as unknown as Collection<TData, string> & NonSingleResult);
   return { data: result.data, status: result.status, isLoading: result.isLoading };
 }

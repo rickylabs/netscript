@@ -16,10 +16,10 @@
     "lineWidth": 100
   },
   "imports": {
-    "@netscript/sdk/streams/consumer": "../../src/client/stream-source/mod.ts",
-    "@netscript/sdk/streams/collections": "../../src/client/stream-collection/mod.ts",
-    "@netscript/sdk/streams/react": "../../src/client/stream-react/mod.ts",
-    "@netscript/plugin-streams-core/sse": "../../../plugin-streams-core/src/sse/mod.ts",
+    "@netscript/sdk/streams/consumer": "../../../packages/sdk/src/client/stream-source/mod.ts",
+    "@netscript/sdk/streams/collections": "../../../packages/sdk/src/client/stream-collection/mod.ts",
+    "@netscript/sdk/streams/react": "../../../packages/sdk/src/client/stream-react/mod.ts",
+    "@netscript/plugin-streams-core/sse": "../../../packages/plugin-streams-core/src/sse/mod.ts",
     "@tanstack/db": "npm:@tanstack/db@0.6.17",
     "@tanstack/react-db": "npm:@tanstack/react-db@0.1.95",
     "expo/fetch": "npm:expo@57.0.27/fetch",
@@ -30,5 +30,6 @@
   "nodeModulesDir": "none",
   "catalog": {
     "zod": "^4.4.3"
-  }
+  },
+  "lock": false
 }

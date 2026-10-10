@@ -53,8 +53,7 @@
     "exclude": [
       "tests/",
       "**/*_test.ts",
-      "**/*.test.ts",
-      "examples/"
+      "**/*.test.ts"
     ]
   }
 }
