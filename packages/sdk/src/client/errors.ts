@@ -138,7 +138,7 @@ type DefinedSafeFailure<TError> = [NarrowDefined<TError>, undefined, true, false
 };
 
 /**
- * Failure branch returned by `safe`; after checking `isSuccess`, use `isDefined` to narrow the error.
+ * Failure branch returned by {@link safe}; after checking `isSuccess`, use `isDefined` to narrow the error.
  *
  * Tuple destructuring remains supported: `[error, undefined, isDefined, false]`.
  */
@@ -201,7 +201,7 @@ export type SafeFailure<TError = Error> =
   });
 
 /**
- * Result returned by `safe`; narrow with `isSuccess` first, then `isDefined` on failure.
+ * Result returned by {@link safe}; narrow with `isSuccess` first, then `isDefined` on failure.
  *
  * Tuple destructuring remains supported: `[error, data, isDefined, isSuccess]`.
  */
