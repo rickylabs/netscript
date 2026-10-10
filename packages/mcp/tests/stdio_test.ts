@@ -49,7 +49,7 @@ Deno.test('stdio initialize, list, and unreachable doctor round trip', async () 
     );
     assertStringIncludes(
       responses[0].result.instructions,
-      'Before implementing an unfamiliar NetScript API or architecture, call find_guidance with the task. Use search_docs for literal lookup and get_doc for exact retrieval.',
+      'Before implementing an unfamiliar NetScript API or architecture, call find_guidance with the task. Use search_docs for literal lookup and get_doc for faithful retrieval; check mode and use full: true with nextCursor for exact complete text.',
     );
     for (
       const name of [
