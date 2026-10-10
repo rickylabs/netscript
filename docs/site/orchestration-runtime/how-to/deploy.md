@@ -199,7 +199,7 @@ handled in `database/postgres/prisma.config.ts`.
   { name: "OTEL_EXPORTER_OTLP_ENDPOINT", type: "string (url)", desc: "OTLP collector. Dev defaults to <code>http://localhost:4318</code> (http/protobuf) via the Aspire dashboard." },
   { name: "NETSCRIPT_SAGA_STORE", type: "kv | prisma", desc: "Durable saga store backend (mandatory when sagas run). Also settable via appsettings <code>sagas.store.backend</code>." },
   { name: "NETSCRIPT_AUTH_BACKEND", type: "string", desc: "Active auth backend if the auth plugin is installed. Default <code>kv-oauth</code>." },
-  { name: "WORKERS_CONCURRENCY", type: "number", desc: "Workers runtime process pool size. Current Aspire metadata also emits <code>WORKER_CONCURRENCY</code>, but the runtime honors <code>WORKERS_CONCURRENCY</code>; set the runtime var." },
+  { name: "WORKERS_CONCURRENCY", type: "number", desc: "Workers runtime process pool size (default 2)." },
   { name: "SAGA_CONCURRENCY", type: "number", desc: "Sagas background processor concurrency (default 2)." },
   { name: "TRIGGER_CONCURRENCY", type: "number", desc: "Triggers background processor concurrency (default 10)." }
 ] }) }}
