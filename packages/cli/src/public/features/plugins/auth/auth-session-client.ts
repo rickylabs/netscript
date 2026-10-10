@@ -11,12 +11,12 @@ const bearer = createBearerSdkClientContribution<AuthSessionClientContext>({
   context: { auth: 'optional' },
   resolveCredential: ({ context }) => context.auth?.getAccessToken(),
   responseCache: { mode: 'direct-only' },
-  unmarked: 'optional',
+  unmarked: 'required',
 });
 
 type ProcedureAccessMeta = Readonly<{ access?: { authentication: 'required' } }>;
 
-/** Operator revocation mirrors the auth contract: it never runs without a credential. */
+/** Session listing and operator revocation never run without a credential. */
 const CREDENTIAL_REQUIRED: ProcedureAccessMeta = { access: { authentication: 'required' } };
 
 /** Fetch-backed auth session projection and revocation adapter. */
@@ -34,6 +34,7 @@ export class FetchAuthSessionHttp implements AuthSessionHttpPort {
       undefined,
       options,
       { accept: 'application/json' },
+      CREDENTIAL_REQUIRED,
     );
     const response = await this.request(endpoint, { headers });
     if (!response.ok) throw new Error(`Auth session stream returned HTTP ${response.status}.`);

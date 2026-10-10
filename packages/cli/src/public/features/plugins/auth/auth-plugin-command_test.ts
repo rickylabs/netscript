@@ -194,7 +194,12 @@ Deno.test('fetch session adapter lists projections and revokes through the opera
       Response.json([{ id: 'session-1', state: 'active', userId: 'user-1' }]),
     );
   });
-  assertEquals((await client.list('http://streams/auth/sessions'))[0].id, 'session-1');
+  assertEquals(
+    (await client.list('https://streams/auth/sessions', {
+      context: { auth: { getAccessToken: () => 'operator-token' } },
+    }))[0].id,
+    'session-1',
+  );
   assertEquals(
     await client.revoke('https://auth/api/v1/auth', 'session-1', {
       context: { auth: { getAccessToken: () => 'operator-token' } },
@@ -231,6 +236,34 @@ Deno.test('session revoke refuses to run without an operator credential', async 
     if (previous !== undefined) Deno.env.set('NETSCRIPT_AUTH_TOKEN', previous);
   }
   assertEquals(revokeCalls, 0);
+});
+
+Deno.test('session list refuses to run without a credential', async () => {
+  let listCalls = 0;
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: {
+      list: () => {
+        listCalls++;
+        return Promise.resolve([]);
+      },
+      revoke: (_url, id) => Promise.resolve(id),
+    },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+  });
+  const previous = Deno.env.get('NETSCRIPT_AUTH_TOKEN');
+  Deno.env.delete('NETSCRIPT_AUTH_TOKEN');
+  try {
+    await assertRejects(
+      () =>
+        command.parse(['session', 'list', '--stream-url', 'https://streams.test/auth/sessions']),
+      Error,
+      'Listing sessions needs a credential. Set NETSCRIPT_AUTH_TOKEN.',
+    );
+  } finally {
+    if (previous !== undefined) Deno.env.set('NETSCRIPT_AUTH_TOKEN', previous);
+  }
+  assertEquals(listCalls, 0);
 });
 
 Deno.test('session commands send the NETSCRIPT_AUTH_TOKEN credential by default', async () => {

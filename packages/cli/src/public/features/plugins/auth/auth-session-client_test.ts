@@ -28,7 +28,11 @@ Deno.test('auth session adapter routes caller context through typed bearer prepa
     await client.revoke('https://auth.test/api/v1/auth/', 'session-1', { context }),
     'session-1',
   );
-  await client.list('https://streams.test/auth/sessions');
+  await assertRejects(
+    () => client.list('https://streams.test/auth/sessions'),
+    Error,
+    'Required bearer credential is unavailable.',
+  );
 
   assertEquals(requests[0].url, 'https://streams.test/auth/sessions?projection=active');
   assertEquals(requests[0].headers.get('accept'), 'application/json');
@@ -37,7 +41,8 @@ Deno.test('auth session adapter routes caller context through typed bearer prepa
   assertEquals(requests[1].headers.get('content-type'), 'application/json');
   assertEquals(requests[1].headers.get('authorization'), `Bearer ${credential}`);
   assertEquals(await requests[1].json(), { sessionId: 'session-1' });
-  assertFalse(requests[2].headers.has('authorization'));
+  // The anonymous list was refused before any request left the adapter.
+  assertEquals(requests.length, 2);
 });
 
 Deno.test('auth session adapter never sends an operator revocation without a credential', async () => {

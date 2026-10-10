@@ -156,7 +156,7 @@ export function createAuthPluginCommand(
           }
           const active = (await dependencies.sessions.list(
             options.streamUrl,
-            await resolveSessionRequestOptions(dependencies, options.token),
+            await requireSessionRequestOptions(dependencies, options.token, 'Listing sessions'),
           ))
             .filter((item) => item.state === 'active');
           print('Session\tUser\tProvider\tState\tExpires');
@@ -177,17 +177,15 @@ export function createAuthPluginCommand(
         })
         .env(AUTH_TOKEN_ENV, AUTH_TOKEN_ENV_DESCRIPTION, { prefix: 'NETSCRIPT_AUTH_' })
         .action(async (options: { authUrl: string; token?: string }, id: string) => {
-          const requestOptions = await resolveSessionRequestOptions(dependencies, options.token);
-          if (requestOptions === undefined) {
-            throw new Error(
-              'Revoking a session needs an operator credential whose principal holds the ' +
-                `${AUTH_SESSIONS_REVOKE_SCOPE} scope. Set NETSCRIPT_AUTH_TOKEN.`,
-            );
-          }
           print(`Revoked ${await dependencies.sessions.revoke(
             options.authUrl,
             id,
-            requestOptions,
+            await requireSessionRequestOptions(
+              dependencies,
+              options.token,
+              'Revoking a session',
+              ` whose principal holds the ${AUTH_SESSIONS_REVOKE_SCOPE} scope`,
+            ),
           )}.`);
         }),
     );
@@ -206,13 +204,21 @@ const AUTH_TOKEN_ENV = 'NETSCRIPT_AUTH_TOKEN=<value:string>';
 const AUTH_TOKEN_ENV_DESCRIPTION = 'Bearer credential sent to the auth session endpoints';
 const AUTH_SESSIONS_REVOKE_SCOPE = 'auth:sessions:revoke';
 
-/** Application-owned context wins; otherwise the `NETSCRIPT_AUTH_TOKEN` credential is used. */
-async function resolveSessionRequestOptions(
+/**
+ * Resolves the credential every session command sends: application-owned context wins, otherwise
+ * the `NETSCRIPT_AUTH_TOKEN` credential. Refuses before any request when neither exists.
+ */
+async function requireSessionRequestOptions(
   dependencies: AuthPluginCommandDependencies,
   token: string | undefined,
-): Promise<AuthSessionRequestOptions | undefined> {
+  action: string,
+  requirement = '',
+): Promise<AuthSessionRequestOptions> {
   const context = await dependencies.resolveSessionContext?.() ?? tokenContext(token);
-  return context === undefined ? undefined : { context };
+  if (context === undefined) {
+    throw new Error(`${action} needs a credential${requirement}. Set NETSCRIPT_AUTH_TOKEN.`);
+  }
+  return { context };
 }
 
 function tokenContext(token: string | undefined): AuthSessionClientContext | undefined {
