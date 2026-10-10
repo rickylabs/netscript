@@ -310,6 +310,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
+      # Retain the existing 300s convergence ceiling pending measured head/main stability runs.
+      # Pre-pull and convergence timings are emitted separately; no suite assertion retries.
+      ASPIRE_CLI_START_TIMEOUT: "300"
       RUN: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'ci:full') || (contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate') && (needs.classify.result != 'success' || needs.classify.outputs.run_runtime == 'true')) }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
@@ -363,6 +366,10 @@ jobs:
         if: env.RUN == 'true'
         run: deno install
 
+      - name: Pre-pull scaffold runtime images
+        if: env.RUN == 'true'
+        run: deno run --allow-read --allow-write --allow-run=dotnet,docker --allow-env .llm/tools/e2e/prepull-runtime-images.ts postgres
+
       - name: Full scaffold runtime E2E (one pass, with cleanup)
         if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime.json
@@ -379,6 +386,7 @@ jobs:
           path: |
             .llm/tmp/e2e-report-scaffold-runtime*.json
             .llm/tmp/e2e-report-scaffold-runtime*.ndjson
+            .llm/tmp/e2e-image-pulls.json
             .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
             .llm/tmp/gate-receipts/scaffold-runtime/agent.aspire-mcp-smoke*
           include-hidden-files: true
@@ -399,6 +407,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
+      # Retain the existing 300s convergence ceiling pending measured head/main stability runs.
+      # Pre-pull and convergence timings are emitted separately; no suite assertion retries.
+      ASPIRE_CLI_START_TIMEOUT: "300"
       RUN: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'ci:full') || (contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate') && (needs.classify.result != 'success' || needs.classify.outputs.run_runtime_sqlite == 'true')) }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
@@ -452,6 +463,10 @@ jobs:
         if: env.RUN == 'true'
         run: deno install
 
+      - name: Pre-pull scaffold runtime images
+        if: env.RUN == 'true'
+        run: deno run --allow-read --allow-write --allow-run=dotnet,docker --allow-env .llm/tools/e2e/prepull-runtime-images.ts sqlite
+
       - name: SQLite scaffold runtime E2E (one pass, with cleanup)
         if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.runtime.sqlite --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime-sqlite.json
@@ -468,6 +483,7 @@ jobs:
           path: |
             .llm/tmp/e2e-report-scaffold-runtime-sqlite*.json
             .llm/tmp/e2e-report-scaffold-runtime-sqlite*.ndjson
+            .llm/tmp/e2e-image-pulls.json
             .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
             .llm/tmp/gate-receipts/scaffold-runtime-sqlite/agent.aspire-mcp-smoke*
           include-hidden-files: true
