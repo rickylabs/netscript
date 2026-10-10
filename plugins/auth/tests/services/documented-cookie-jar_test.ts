@@ -100,6 +100,17 @@ Deno.test('documented localhost curl cookie-jar flow works through the real serv
         assertEquals(body.subject, 'default:4242');
         assert(body.subject !== body.sessionId);
         assertStringIncludes(jar, '\tns_session_dev\tsess_');
+        // Main's bearer parity must coexist with the recipe's custom cookie policy.
+        for (const route of ['session', 'me']) {
+          const bearer = await fetch(`${origin}/api/v1/auth/${route}`, {
+            headers: { authorization: `Bearer ${body.sessionId}` },
+          });
+          assertEquals(bearer.status, 200);
+          const resolved = await bearer.json();
+          assertEquals(resolved.authenticated, true);
+          assertEquals(resolved.session.id, body.sessionId);
+          assertEquals(resolved.session.subject, 'default:4242');
+        }
       } else if (index === 2 || index === 3) {
         assertEquals(body.authenticated, true);
         assertEquals(body.session.subject, 'default:4242');
