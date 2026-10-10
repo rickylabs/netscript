@@ -95,6 +95,7 @@
     "jsr:@std/streams@^1.1.0": "1.2.0",
     "jsr:@std/streams@^1.2.0": "1.2.0",
     "jsr:@std/tar@~0.1.10": "0.1.10",
+    "jsr:@std/testing@*": "1.0.21",
     "jsr:@std/testing@1": "1.0.21",
     "jsr:@std/text@1": "1.1.0",
     "jsr:@std/text@^1.0.19": "1.1.0",
