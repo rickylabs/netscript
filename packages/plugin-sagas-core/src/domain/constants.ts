@@ -14,15 +14,21 @@ export const CASCADED_MESSAGE_KINDS: readonly [
   'compensate',
 ] = ['send', 'scheduled', 'spawn', 'complete', 'fail', 'compensate'];
 
-/** Saga instance lifecycle statuses. */
+/**
+ * Saga instance lifecycle statuses.
+ *
+ * `compensating` is in flight: a `.compensate()` branch was requested and its outcome is not yet
+ * persisted. `compensated` is terminal: the branch finished without a terminal effect of its own.
+ */
 export const SAGA_INSTANCE_STATUSES: readonly [
   'pending',
   'running',
   'completed',
   'failed',
   'compensating',
+  'compensated',
   'cancelled',
-] = ['pending', 'running', 'completed', 'failed', 'compensating', 'cancelled'];
+] = ['pending', 'running', 'completed', 'failed', 'compensating', 'compensated', 'cancelled'];
 
 /** Default durability tier for saga definitions. */
 export const DEFAULT_SAGA_DURABILITY_TIER: SagaDurabilityTier = 't1';
