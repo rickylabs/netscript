@@ -218,7 +218,7 @@ app with the fluent builder and opts the RPC layer into trace context explicitly
   {
     label: "One-shot service (defineService)",
     lang: "ts",
-    code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Local services use the one-call form. Tracing is enabled by the framework;\n// debug: true surfaces verbose request/trace logs while you wire things up.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});"
+    code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Local services use the one-call form. Tracing is enabled by the framework;\n// debug: true surfaces verbose request/trace logs while you wire things up.\nawait defineService(router, {\n  auth: { public: true, reason: 'Public example service; add guards before exposing private data' },\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});"
   },
   {
     label: "Propagate across a call",

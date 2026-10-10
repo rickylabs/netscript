@@ -25,6 +25,10 @@ import { RESOURCE_DEFAULTS } from '../../constants.ts';
  *
  * @example
  * ```ts
+ * import { resolvePermissions } from '@netscript/aspire/application';
+ *
+ * const defaultPerms = ['--allow-net', '--allow-env', '--allow-read', '--allow-sys'];
+ *
  * // Entry overrides defaults
  * resolvePermissions(['--allow-all'], defaultPerms, false);
  * // ['--allow-all']

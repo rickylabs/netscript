@@ -175,6 +175,9 @@ const KvPrefixes = {
  *
  * @example
  * ```ts
+ * interface MyMessage { type: string }
+ * declare function processMessage(message: MyMessage): Promise<void>;
+ *
  * const queue = new KvPollingAdapter<MyMessage>({ queueName: 'jobs' });
  *
  * // Enqueue with delay

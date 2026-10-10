@@ -15,6 +15,8 @@ export type PluginCommandConfig = Readonly<Record<string, PluginCommandValue>>;
  *
  * @example
  * ```ts
+ * import type { PluginCommandConfig } from '@netscript/plugin/adapter';
+ *
  * const config: PluginCommandConfig = { enabled: true };
  * console.log(config.enabled);
  * ```

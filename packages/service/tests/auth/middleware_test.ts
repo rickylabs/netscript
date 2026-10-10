@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { type Context, Hono } from 'hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../../src/auth/auth-middleware.ts';
-import type { ProcedurePolicyResolver } from '../../src/auth/contract-policy.ts';
+import type { ProcedurePolicyResolver } from '../../src/auth/contract/contract-policy.ts';
 import type { AuthenticatorPort, AuthorizerPort, Principal } from '../../src/auth/types.ts';
 
 type AuthTestEnv = {
