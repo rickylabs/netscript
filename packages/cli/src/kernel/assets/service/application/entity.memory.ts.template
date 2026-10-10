@@ -18,7 +18,6 @@ export function create{{serviceName | pascalCase}}Application(repository: {{serv
     },
     async updateStatus(input: UpdateStatusInput) {
       const record = await repository.updateStatus(input.id, input.status, statusSummary(input.status));
-      if (!record) throw new Error(`{{serviceName}} record ${input.id} not found`);
       return record;
     },
   };

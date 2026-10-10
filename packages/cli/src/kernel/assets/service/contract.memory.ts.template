@@ -9,6 +9,7 @@
 import { z } from 'zod';
 import { oc } from '@orpc/contract';
 import { implement } from '@orpc/server';
+import { baseContract } from '@netscript/contracts';
 
 export const {{serviceName | pascalCase}}HealthSchemaV1 = z.object({
   status: z.enum(['healthy', 'unhealthy', 'degraded']).describe('Service health status'),
@@ -81,7 +82,7 @@ export const {{serviceName | pascalCase}}ContractV1 = {
     .route({ method: 'POST' })
     .input({{serviceName | pascalCase}}ListInputSchemaV1)
     .output({{serviceName | pascalCase}}ListResponseSchemaV1),
-  updateStatus: oc
+  updateStatus: baseContract
     .route({ method: 'POST' })
     .input({{serviceName | pascalCase}}UpdateStatusInputSchemaV1)
     .output({{serviceName | pascalCase}}UpdateStatusResponseSchemaV1),

@@ -1,10 +1,17 @@
 /** Thin {{serviceName}} contract bindings for v1. */
+import { notFound } from '@netscript/contracts';
 import { v1 } from '@{{projectName}}/contracts';
 import type { {{serviceName | pascalCase}}Application } from '../application/{{entityName}}.ts';
 
 export function create{{serviceName | pascalCase}}V1(application: {{serviceName | pascalCase}}Application) {
   return {
     list: v1.{{serviceName | camelCase}}.list.handler(({ input }) => application.list(input)),
-    updateStatus: v1.{{serviceName | camelCase}}.updateStatus.handler(({ input }) => application.updateStatus(input)),
+    updateStatus: v1.{{serviceName | camelCase}}.updateStatus.handler(async ({ input, errors }) => {
+      const record = await application.updateStatus(input);
+      if (!record) {
+        notFound({ errors, resourceId: input.id, message: `{{serviceName}} record ${input.id} not found` });
+      }
+      return record;
+    }),
   };
 }

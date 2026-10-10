@@ -172,13 +172,20 @@ and map transport errors. The memory variant's bindings look like this:
 
 ```ts
 // services/users/src/routers/v1.ts
+import { notFound } from '@netscript/contracts';
 import { v1 } from '@my-app/contracts';
 import type { UsersApplication } from '../application/users.ts';
 
 export function createUsersV1(application: UsersApplication) {
   return {
     list: v1.users.list.handler(({ input }) => application.list(input)),
-    updateStatus: v1.users.updateStatus.handler(({ input }) => application.updateStatus(input)),
+    updateStatus: v1.users.updateStatus.handler(async ({ input, errors }) => {
+      const record = await application.updateStatus(input);
+      if (!record) {
+        notFound({ errors, resourceId: input.id, message: `users record ${input.id} not found` });
+      }
+      return record;
+    }),
   };
 }
 ```
@@ -203,9 +210,11 @@ The Prisma variant uses the model's filename, such as `application/user.ts`, and
 procedures instead. Its repository implements the same layering rule. See
 [Service layout](/services-sdk/service-layout/) for the full vocabulary and migration steps.
 
-`service add-handler` still writes a legacy stub; generation of a use-case plus a thin binding is
-tracked in [#2113](https://github.com/rickylabs/netscript/issues/2113). For the layered scaffold, add
-new use-cases and bindings manually until that command slice lands.
+`service add-handler <service> <procedure>` inserts a compiling stub into the generated factory's
+returned object, bound through the existing contract's `.handler()`. It also supports existing
+services with an exported router object. Replace the stub's throw with a call to an application
+use-case. Generation of the use-case alongside its thin binding is tracked in
+[#2113](https://github.com/rickylabs/netscript/issues/2113).
 
 ## Step 4 — Serve it with `defineService`
 

@@ -8,7 +8,7 @@ Deno.test('{{serviceName}} use-cases page, search and update instance-owned reco
     throw new Error('Unexpected searched page');
   }
   const updated = await application.updateStatus({ id: first.items[0].id, status: 'archived' });
-  if (updated.status !== 'archived' || first.items[0].status !== 'active') {
+  if (!updated || updated.status !== 'archived' || first.items[0].status !== 'active') {
     throw new Error('Repository must return snapshots');
   }
   const fresh = create{{serviceName | pascalCase}}Application(createMemory{{serviceName | pascalCase}}Repository());
