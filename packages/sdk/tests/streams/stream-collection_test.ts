@@ -1,6 +1,7 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
+import { deadline } from 'jsr:@std/async@^1/deadline';
 import { createStreamCollectionV1 } from '@netscript/sdk/streams/collections';
-import { createLiveQueryCollection } from '@tanstack/db';
+import { createLiveQueryCollection, eq, isCollection } from '@tanstack/db';
 import type { Collection } from '@tanstack/db';
 import type { StreamFetchV1, StreamSourceSchedulerV1 } from '@netscript/sdk/streams/consumer';
 
@@ -70,9 +71,12 @@ Deno.test('non-DOM stream collection updates a real TanStack live query without 
   Object.defineProperty(globalThis, 'EventSource', { value: undefined, configurable: true });
   const transport = new Transport();
   const binding = create(transport);
+  const collection = binding.collection;
+  if (!isCollection(collection)) throw new TypeError('Expected a TanStack collection');
+  const tasks: Collection<Task, string> = collection;
   const live = createLiveQueryCollection({
     query: (q) =>
-      q.from({ task: binding.collection as unknown as Collection<Task, string> }).select((
+      q.from({ task: tasks }).select((
         { task },
       ) => ({
         id: task.id,
@@ -150,14 +154,94 @@ Deno.test('invalid entity batch rejects done before any collection writes', asyn
   const transport = new Transport();
   const binding = create(transport);
   const rejected = assertRejects(() => binding.done, TypeError, 'Invalid task');
+  const preloadRejected = assertRejects(
+    () => deadline(binding.collection.preload(), 1_000),
+    TypeError,
+    'Invalid task',
+  );
   await settle();
   transport.send(
     data([change('1', 'valid'), { ...change('2', 'invalid'), value: { id: '2' } }]) +
       control('opaque:2'),
   );
   await rejected;
+  await preloadRejected;
+  assertEquals(binding.collection.status, 'cleaned-up');
+  assertEquals(binding.collection.utils.getError()?.message, 'Invalid task');
   assertEquals(binding.collection.size, 0);
   await assertRejects(() => binding.dispose(), TypeError);
+});
+
+Deno.test('consumer collection types preserve cast-free filtered and projected live queries', async () => {
+  const transport = new Transport();
+  const binding = create(transport);
+  const collection = binding.collection;
+  if (!isCollection(collection)) throw new TypeError('Expected a TanStack collection');
+  const tasks: Collection<Task, string> = collection;
+  const live = createLiveQueryCollection({
+    query: (q) =>
+      q.from({ task: tasks })
+        .where(({ task }) => eq(task.title, 'active'))
+        .select(({ task }) => ({ id: task.id, title: task.title })),
+    startSync: true,
+    gcTime: Infinity,
+  });
+  try {
+    await settle();
+    transport.send(data([change('1', 'active'), change('2', 'inactive')]) + control('opaque:2'));
+    await live.preload();
+    const rows: { id: string; title: string }[] = live.toArray;
+    // @ts-expect-error A projected title is a string, never an untyped number.
+    const invalidTitle: number = live.toArray[0].title;
+    void invalidTitle;
+    assertEquals(rows.map(({ id, title }) => ({ id, title })), [{ id: '1', title: 'active' }]);
+    transport.send(data([change('1', 'inactive'), change('2', 'active')]) + control('opaque:4'));
+    await settle();
+    assertEquals(live.toArray.map(({ id, title }) => ({ id, title })), [{
+      id: '2',
+      title: 'active',
+    }]);
+  } finally {
+    await live.cleanup();
+    await binding.dispose();
+  }
+});
+
+Deno.test('fatal protocol failure before first control settles preload and exposes the error', async () => {
+  const transport = new Transport();
+  const binding = create(transport);
+  const doneRejected = assertRejects(() => binding.done, TypeError);
+  const preloadRejected = assertRejects(
+    () => deadline(binding.collection.preload(), 1_000),
+    TypeError,
+  );
+  await settle();
+  transport.send('event: data\ndata: {}\n\nevent: control\ndata: {"streamNextOffset":"bad"}\n\n');
+  await doneRejected;
+  await preloadRejected;
+  assertEquals(binding.collection.status, 'cleaned-up');
+  assertEquals(binding.collection.utils.getError() instanceof TypeError, true);
+  await assertRejects(() => binding.collection.preload(), TypeError);
+  await assertRejects(() => binding.dispose(), TypeError);
+});
+
+Deno.test('cleanup forbids rebinding the cancelled single-use source', async () => {
+  const transport = new Transport();
+  const binding = create(transport);
+  await settle();
+  const collection = binding.collection;
+  if (!isCollection(collection)) throw new TypeError('Expected a TanStack collection');
+  const pending = binding.collection.preload();
+  await binding.collection.cleanup();
+  await pending;
+  assertThrows(
+    () => collection.startSyncImmediate(),
+    Error,
+    'Stream collection is closed; create a new binding',
+  );
+  await assertRejects(() => binding.collection.preload(), Error);
+  await binding.dispose();
+  assertEquals(transport.urls.length, 1);
 });
 Deno.test('batch-local insert update delete order and full replacement remain server-owned', async () => {
   const transport = new Transport();

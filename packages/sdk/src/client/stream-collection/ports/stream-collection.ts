@@ -19,12 +19,26 @@ export interface StreamCollectionSubscriptionV1 {
   unsubscribe(): void;
 }
 
-/** Structural read/lifecycle port over a real TanStack DB collection. */
+/** Stream-specific diagnostics attached through TanStack's adapter utility seam. */
+export type StreamCollectionUtilsV1 = {
+  /** Read the terminal consumption failure, if any. */
+  getError(): Error | undefined;
+  /** Observe a terminal failure; returns an unsubscribe function. */
+  subscribeError(listener: () => void): () => void;
+};
+
+/**
+ * Typed SDK read/lifecycle port over a real TanStack DB collection.
+ * Narrow with TanStack's isCollection guard before using its query-builder API.
+ * Cleanup is terminal; create a fresh binding before subscribing again.
+ */
 export interface StreamCollectionV1<T extends object> {
   /** Collection identifier. */
   readonly id: string;
-  /** Upstream sync status. */
+  /** Upstream sync status. Fatal failures transition to cleaned-up. */
   readonly status: string;
+  /** Stream-specific terminal-error utilities. */
+  readonly utils: StreamCollectionUtilsV1;
   /** Number of currently materialized rows. */
   readonly size: number;
   /** Number of active observers, including live queries. */
@@ -35,13 +49,13 @@ export interface StreamCollectionV1<T extends object> {
   get(key: string): T | undefined;
   /** Test for an existing row. */
   has(key: string): boolean;
-  /** Wait for an up-to-date or terminal stream control. */
+  /** Wait for initial readiness, rejecting on a fatal stream failure. */
   preload(): Promise<void>;
   /** Subscribe to direct sync changes. */
   subscribeChanges(
     listener: (changes: StreamCollectionChangeV1<T>[]) => void,
   ): StreamCollectionSubscriptionV1;
-  /** Release the collection and close its stream; prefer the binding's awaitable dispose. */
+  /** Release the collection. This single-use binding cannot be restarted. */
   cleanup(): Promise<void>;
 }
 

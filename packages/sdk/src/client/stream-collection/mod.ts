@@ -8,6 +8,7 @@ export type {
   StreamCollectionChangeV1,
   StreamCollectionOptionsV1,
   StreamCollectionSubscriptionV1,
+  StreamCollectionUtilsV1,
   StreamCollectionV1,
 } from './ports/stream-collection.ts';
 // Consumer type closure for transport options and replay state.

@@ -41,6 +41,7 @@ await Deno.writeTextFile(
         ) => [`./streams/${name}`, `./src/client/${folder}/mod.ts`]),
       ),
       dependencies: { '@tanstack/db': '0.6.17', '@tanstack/react-db': '0.1.95' },
+      peerDependencies: { react: '^19.2.3' },
     },
     null,
     2,

@@ -405,11 +405,19 @@ Back to the [reference overview](/reference/).
 
 `createStreamCollectionV1` returns a stable `collection`, awaitable `done`, replay `snapshot`, and
 idempotent async `dispose`. `StreamCollectionOptionsV1<T>` extends the injected-source options with
-`type`, `parse`, and `getKey`. `StreamCollectionV1<T>` is a real TanStack DB collection, and
-`StreamCollectionBindingV1<T>` describes its connection lifecycle.
+`type`, `parse`, and `getKey`. `StreamCollectionV1<T>` is the SDK's typed read/lifecycle port over a
+real TanStack collection. Narrow it with TanStack's `isCollection` guard and assign a typed
+`Collection<T, string>` local before passing it to `q.from(...)`; filters, joins, and projections
+then preserve the entity types without assertions. `StreamCollectionUtilsV1` exposes terminal-error
+inspection/subscription through the collection's `utils`, and `StreamCollectionBindingV1<T>`
+describes its connection lifecycle.
 
 `useStreamLiveQueryV1` from `@netscript/sdk/streams/react` wraps the upstream live-query hook with a
 `StreamCollectionV1<TData>` and returns `StreamLiveQueryResultV1<TData>` with `data`, `status`, and
-`isLoading`. The focused entry imports React, without the Fresh runtime. See the
+`isLoading`, and `error`. Fatal consumption failures reject pending preloads, clean up the
+collection, and leave the hook at `status: 'error'` with `isLoading: false`. A cleaned-up binding
+cannot restart; create a fresh binding before subscribing again. The focused entry imports React,
+without the Fresh runtime. This is a single-type State Protocol adapter, distinct from Fresh's
+multi-type schema-based StreamDB and its finite recovery policy. See the
 [Expo how-to](/durable-workflows/expo-streams/) for lifecycle, fetch compatibility, and native proof
 requirements.

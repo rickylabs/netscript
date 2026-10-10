@@ -14,7 +14,7 @@ function ExecutionRows({ binding }: { binding: StreamCollectionBindingV1<Executi
   const result = useStreamLiveQueryV1(binding.collection);
   return (
     <View>
-      <Text>{result.status}</Text>
+      <Text>{result.error?.message ?? result.status}</Text>
       {result.data.map((execution) => (
         <Text key={execution.id}>{execution.id}: {execution.status}</Text>
       ))}

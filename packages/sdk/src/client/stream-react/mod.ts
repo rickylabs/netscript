@@ -4,5 +4,6 @@ export type { StreamLiveQueryResultV1 } from './use-stream-live-query.ts';
 export type {
   StreamCollectionChangeV1,
   StreamCollectionSubscriptionV1,
+  StreamCollectionUtilsV1,
   StreamCollectionV1,
 } from '../stream-collection/mod.ts';

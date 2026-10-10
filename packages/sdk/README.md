@@ -484,7 +484,12 @@ Protocol entities into a real TanStack DB collection. Configure the existing inj
 `type`, `parse`, and `getKey`; validated control-committed batches update rows directly. The handle
 provides `collection`, `done`, `snapshot()`, and idempotent `dispose()`.
 `@netscript/sdk/streams/react`'s `useStreamLiveQueryV1` subscribes a React Native screen through
-TanStack DB without loading Fresh.
+TanStack DB without loading Fresh. Narrow the SDK port with TanStack's `isCollection` guard and
+retain `Collection<T, string>` in a typed local for cast-free filters, joins, and projections, as
+shown in the how-to. Fatal consumption rejects pending `preload()` calls, cleans up the collection,
+and exposes the failure as the hook's `error` with `status: 'error'` and `isLoading: false`. Cleanup
+is terminal; create a fresh binding before resubscribing. The how-to compares this single-type
+adapter with Fresh's multi-type StreamDB, including their different schema and recovery contracts.
 
 The [Expo reference](../../resources/examples/expo-streams/README.md) includes checked fetch types,
 a complete React Native screen, and an executable Hermes probe. See the
