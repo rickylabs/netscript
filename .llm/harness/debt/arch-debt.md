@@ -2367,16 +2367,25 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/plan.md`;
   issues #1378, #1545, and #1655; PR #1653.
 - **Created:** 2026-08-15.
-- **Status:** open, DEBT_ACCEPTED for PR #1653 only at the strict baseline of 20 `private-type-ref`
-  diagnostics across 13 export targets. This is a no-increase allowance, not a full-export lint
-  pass.
-- **Gate:** Until #1655 closes, the 13-target full-export audit may report at most the recorded 20
-  `private-type-ref` diagnostics and must report zero `missing-jsdoc` and zero other diagnostics.
-  Any increase or new diagnostic class is `FAIL_DEBT`. Closure requires that audit to exit 0 with
-  zero diagnostics while the scoped Workers publish dry-run and `quality:gate` remain green.
+- **Status:** open, DEBT_ACCEPTED with a ratcheted ceiling of 4 `private-type-ref` diagnostics
+  across the same 13 export targets. The earlier ceiling of 20 is historical and no longer allowed.
+- **Gate:** Until #1655 closes, allow only the four measured references on `./contracts`
+  (`./contracts/v1/mod.ts`): three to `WorkersContractDefinition` and one to upstream oRPC
+  `implement`. Require zero diagnostics on each of the other 12 export targets, zero
+  `missing-jsdoc`, and zero other diagnostic classes. Any additional reference, relocation to
+  another target, or new diagnostic class is `FAIL_DEBT`. Closure requires the full-export audit to
+  exit 0 with zero diagnostics while Workers publish dry-run and `quality:gate` remain green.
 - **Evidence:**
   `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-3/workers-doc-lint.json`
   records the exact baseline at signed Slice 2 head `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`.
+
+- **0.0.8 reconciliation (#2218):** The current main full-export baseline is 20; the type-only
+  vocabulary repair reduces the combined total to 4 across the same 13 targets. All 12 non-contract
+  targets are clean. The contract target retains three references to the precise
+  `WorkersContractDefinition` and one oRPC `implement` reference. This row remains open: exporting
+  the definition exposes its private route/schema graph, and the oRPC reference falls under doctrine
+  02's sanctioned boundary exception. Neither a zero-diagnostic claim nor closure of #1655 is
+  proven. Evidence is kept in the run record and PR #2218.
 
 ## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
 
@@ -2468,6 +2477,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Remove the compatibility bridge when a native supported seam passes complete-frame,
   fork/cap/sub-offset, restart/producer-state and >=1 GiB RSS regressions at the same memory
   ceiling.
+- **Substrate:** The production composition still uses `DurableStreamTestServer` for its native HTTP
+  protocol implementation. This is accepted within the same named debt; it is not a production
+  durability certification. File mode is startup-probed and producer restart-tested; memory mode is
+  explicitly ephemeral.
+- **Exit condition:** Replace `DurableStreamTestServer` with an upstream supported production
+  server/store-injection API after durable-streams#420 lands, preserving the bounded store, real
+  producer write/process-restart/read, framing, fork and RSS regression proofs.
 - **Cost:** Dependency upgrades require hook-shape and semantic compatibility verification. Runtime
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
   RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades
@@ -2555,17 +2571,27 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   baseline.
 - **Gate:** F-7: all worker export doc-lint diagnostics zero.
 
+- **0.0.8 reconciliation (#2218):** Runtime and streams vocabulary is exported without type erasure.
+  The workers contract repair is still pending under #1655, so this zero-diagnostic closing gate
+  remains open; the earlier cancellation baseline does not authorize any growth.
+
 ## workers doctor export — unchanged module tag (`workers-doctor-module-baseline-2066`)
 
-- **Reason:** Existing public doctor.ts export lacks @module JSDoc; JSR audit FAIL F-JSR-2 is
-  identical on current main archive and this branch. No doctor source or publish shape changed in
-  the cancellation slice.
+- **Reason:** The historical cancellation baseline lacked `@module` JSDoc on public `doctor.ts`,
+  producing an unchanged F-JSR-2 failure. PR #2218 adds the tag and proves this module gate.
 - **Owner:** Workers plugin public-surface maintainers.
 - **Target:** Before the next stable workers release, no later than 2026-10-15.
 - **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`.
 - **Created:** 2026-10-08.
-- **Status:** open; independent evaluator must adjudicate unchanged baseline debt.
+- **Status:** closed by PR #2218: `doctor.ts` carries `@module`, and the plugin JSR audit passes.
 - **Gate:** F-JSR-2 module tag present and plugin JSR audit passes.
+
+- **Evidence (#2218):**
+  `deno run --allow-all .llm/tools/fitness/audit-jsr-package.ts --root
+  plugins/workers` exits 0
+  with zero FAIL findings. The module-documentation audit reports no F-JSR-2 finding. Existing
+  source-layout and slow-type warnings remain separate from this satisfied module-tag gate. Full
+  output is kept in the run record.
 
 ## workers-core source layout — required adapter directory (`workers-core-layout-2066`)
 
@@ -2716,3 +2742,32 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
   `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
   green. `arch:check` currently exits zero with these size warnings.
+
+## plugins/sagas — SAGAS-WORKER-DISPATCH-FIXTURE
+
+- **ID:** `SAGAS-WORKER-DISPATCH-FIXTURE`
+- **Reason:** The PostgreSQL publish-process test fixture imports the workers dispatcher, pool
+  factory, and dispatch context across plugin internals to prove real durable worker execution. The
+  public `@netscript/plugin-workers/worker` exports Worker and WorkerPoolOptions, but does not
+  expose these three seams; workers-core exports primitives rather than this plugin dispatcher.
+- **Owner:** Workers runtime maintainers.
+- **Target:** Next workers runtime testing-contract review.
+- **Status:** open, test-only coupling accepted for PR #2213.
+- **Exit condition:** Replace these imports with a supported public execution/testing contract that
+  preserves the physical PostgreSQL effect and durable duplicate-execution proof.
+- **Gate:** Real HTTP/PostgreSQL publish-process conformance and worker idempotency assertions.
+
+## SDK fetch stream-source placement (F-16, #2100)
+
+- **ID:** `sdk-stream-source-placement-2100`
+- **Reason:** The stream transport is a separate concern temporarily placed in
+  `packages/sdk/src/client/stream-source/`. SDK already has 14 source-root directories against
+  F-16's limit of 12; adding another root would worsen that baseline. Nesting under the client
+  concern leaves the concern boundary imperfect and requires an explicit consolidation follow-up.
+- **Owner:** SDK architecture maintainers / #2100.
+- **Target:** Before the 0.0.9 stable SDK release.
+- **Status:** Open; pending independent evaluator acceptance for PR #2212.
+- **Closing gate:** Consolidate SDK source roots to at most 12 and place the transport in a proper
+  stream concern while preserving the public consumer subpath and its import-graph guard.
+- **Evidence:** PR #2212; `fetch-stream-source-import_test.ts` proves the consumer excludes telemetry,
+  OTel, and modules using Deno APIs. `arch:check` retains the existing F-16 directory-count warning.

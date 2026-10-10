@@ -7,11 +7,11 @@
 //import 'dotenv/config';
 import { {{__slot3__}} } from 'prisma/config';
 
-// The fallback is a thunk: Prisma's env() throws for an unset variable, so it
-// must only run when neither the engine-specific URI nor DATABASE_URL is set.
+{{__slot4__}}
+
 const databaseUrl = resolveDatabaseUrl(
   '{{__slot1__}}_URI',
-  () => {{__slot2__}},
+  {{__slot2__}},
 );
 
 export default defineConfig({
@@ -26,10 +26,8 @@ export default defineConfig({
 
 function resolveDatabaseUrl(
   envKey: string,
-  fallback: () => string,
+  fallback: string,
 ): string {
-  const rawValue = Deno.env.get(envKey) ?? Deno.env.get('DATABASE_URL') ?? fallback();
+  const rawValue = Deno.env.get(envKey) ?? Deno.env.get('DATABASE_URL') ?? fallback;
   return normalizeDatabaseUrl(rawValue);
 }
-
-{{__slot4__}}

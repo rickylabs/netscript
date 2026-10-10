@@ -48,8 +48,8 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
     force: false,
   });
 
-  assertEquals(result.scaffoldResult.filesCreated.length, 5);
-  assertEquals(result.scaffoldResult.directoriesCreated.length, 3);
+  assertEquals(result.scaffoldResult.filesCreated.length, 9);
+  assertEquals(result.scaffoldResult.directoriesCreated.length, 6);
   assertEquals(result.configEntry.Port, undefined);
   assertEquals(result.configEntry.HostPort, undefined);
   assertEquals(result.configEntry.Workdir, 'services/orders');
@@ -65,6 +65,8 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
 
   const mainContent = await fs.readFile('/project/services/orders/src/main.ts');
   assertStringIncludes(mainContent, "port: parseInt(Deno.env.get('PORT') || '3000')");
+  assertStringIncludes(mainContent, 'public: true');
+  assertStringIncludes(mainContent, '#1382 L2 will wire the guarded auth policy');
 });
 
 Deno.test('ServiceScaffolder writes canonical content for every generated service file', async () => {
@@ -93,6 +95,10 @@ Deno.test('ServiceScaffolder writes canonical content for every generated servic
     '/project/services/payments/src/router.ts',
     '/project/services/payments/src/routers/health.ts',
     '/project/services/payments/src/routers/v1.ts',
+    '/project/services/payments/src/domain/payments.ts',
+    '/project/services/payments/src/application/payments.ts',
+    '/project/services/payments/src/adapters/memory-payments-repository.ts',
+    '/project/services/payments/src/application/payments_test.ts',
   ]);
   assertEquals(
     (await fs.readFile('/project/services/payments/src/routers/v1.ts')).startsWith(
@@ -220,11 +226,11 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       ),
       Deno.writeTextFile(
         join(compileRoot, 'stubs', 'contracts.ts'),
-        'export const baseContract = { route: (_route: unknown) => ({ output: <T>(schema: T): T => schema }) };\n',
+        'export const baseContract = { route: (_route: unknown) => ({ meta(_meta: unknown) { return this; }, output: <T>(schema: T): T => schema }) };\n',
       ),
       Deno.writeTextFile(
         join(compileRoot, 'stubs', 'crud.ts'),
-        'export function createCrudContract(_options: unknown): Record<string, unknown> { return {}; }\n',
+        'export function createCrudContract(_options: unknown) { const procedure = { meta(_meta: unknown) { return this; } }; return { list: procedure, getById: procedure, create: procedure, update: procedure, delete: procedure }; }\n',
       ),
     ]);
     await writeCrudZodBarrel({ zodOutputDir, modelName: 'Cycle' });

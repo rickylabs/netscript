@@ -24,7 +24,7 @@ signatures before writing.
 
 - Compose your implemented contracts into a router, e.g.
   `{ v1: { products: ProductsImpl, orders: OrdersImpl } }`.
-- Stand the service up with `defineService(router, { name, port })` — the
+- Stand the service up with `defineService(router, { name, port, auth })` — the
   one-call preset wires Hono + oRPC + OpenAPI + RPC + health + graceful
   shutdown. For finer control, `createService(router, config)` returns a fluent
   builder (`.withOpenAPI()`, `.withHealth()`, `.serve({ port })`).
@@ -53,3 +53,6 @@ signatures before writing.
 - Products and orders persist via `getKv()`.
 - Orders validate that the referenced product exists before creating.
 - The service starts with one command and binds a port.
+
+- Choose an explicit service auth policy. This public benchmark uses
+  `auth: { public: true, reason: 'Public benchmark API; authentication is outside this benchmark' }`.

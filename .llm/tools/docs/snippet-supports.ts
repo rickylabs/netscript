@@ -1,5 +1,9 @@
 import { dirname, join, toFileUrl } from '@std/path';
 import { materializeAppRouterSupport } from './app-router-support.ts';
+import {
+  materializeServiceScaffoldSupport,
+  renderUsersContractSupport,
+} from './service-scaffold-support.ts';
 
 export interface JsdocScaffoldAliasRule {
   readonly prefix: string;
@@ -106,6 +110,7 @@ export const ordersContract = {
 };
 `,
   );
+  await writeSnippetFile(join(supportRoot, 'users.contract.ts'), renderUsersContractSupport());
   await writeSnippetFile(
     supports['@my-app/contracts'],
     `import { oc } from '@orpc/contract';
@@ -127,17 +132,9 @@ export const ordersContract = {
     .output(z.array(z.object({ id: z.string() }))),
 };
 
-const UsersContractV1 = {
-  health: {
-    check: oc.route({ method: 'GET' })
-      .input(z.object({}).optional())
-      .output(z.object({ status: z.literal('healthy'), service: z.string() })),
-  },
-  list: oc.route({ method: 'POST' })
-    .input(z.object({ limit: z.number().int().positive().optional() }))
-    .output(z.object({ items: z.array(z.object({ id: z.number(), name: z.string() })) })),
-};
-export const v1 = { users: implement(UsersContractV1) };
+export * from './users.contract.ts';
+import { UsersV1 } from './users.contract.ts';
+export const v1 = { users: UsersV1 };
 `,
   );
   await writeSnippetFile(
@@ -186,6 +183,7 @@ export const myStreamSchema = createStateSchema({
 
 /** Materialize page-relative, public-factory-derived support modules for complete examples. */
 export async function materializePageSupports(pageRoot: string): Promise<void> {
+  await materializeServiceScaffoldSupport(pageRoot);
   await writeSnippetFile(
     join(pageRoot, 'lib/docs.ts'),
     `import { oc } from '@orpc/contract';

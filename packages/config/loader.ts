@@ -35,10 +35,10 @@ let cachedConfig: NetScriptConfig | null = null;
  * const config = await loadConfig();
  *
  * // Load from specific directory
- * const config = await loadConfig({ cwd: './my-project' });
+ * const directoryConfig = await loadConfig({ cwd: './my-project' });
  *
  * // Load from specific file
- * const config = await loadConfig({ configFile: 'custom.config.ts' });
+ * const fileConfig = await loadConfig({ configFile: 'custom.config.ts' });
  * ```
  *
  * @param options - Loading options

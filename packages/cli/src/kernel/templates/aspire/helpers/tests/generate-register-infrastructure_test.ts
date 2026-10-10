@@ -281,7 +281,7 @@ describe('generateRegisterInfrastructure', () => {
 
     assertStringIncludes(
       output,
-      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:1.1.10")',
+      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:2.2.1")',
     )
     assertStringIncludes(
       output,
@@ -307,22 +307,31 @@ describe('generateRegisterInfrastructure', () => {
     )
   })
 
-  it('keeps the default Garnet container tag aligned with the executable tool pin', () => {
-    const output = generateRegisterInfrastructure({
-      databases: {},
-      caches: {
-        garnet: {
-          Enabled: true,
-          Engine: 'Garnet',
-          Mode: 'Container',
-        },
-      },
-    })
-
-    assertStringIncludes(
-      output,
-      `builder.addContainer("garnet", "ghcr.io/microsoft/garnet:${SCAFFOLD_VERSIONS.GARNET_TOOL}")`,
-    )
+  it('pins Garnet 2.2.1 and the same RESP check in Container, Executable, and Auto modes', () => {
+    assertEquals(SCAFFOLD_VERSIONS.GARNET_TOOL, '2.2.1')
+    for (const Mode of ['Container', 'Executable', 'Auto'] as const) {
+      const output = generateRegisterInfrastructure({
+        databases: {},
+        caches: { garnet: { Enabled: true, Engine: 'Garnet', Mode } },
+      })
+      if (Mode !== 'Executable') {
+        assertStringIncludes(
+          output,
+          `builder.addContainer("garnet", "ghcr.io/microsoft/garnet:${SCAFFOLD_VERSIONS.GARNET_TOOL}")`,
+        )
+      }
+      if (Mode !== 'Container') {
+        assertStringIncludes(
+          output,
+          `ensureGarnetToolManifest(appHostDir, "${SCAFFOLD_VERSIONS.GARNET_TOOL}")`,
+        )
+      }
+      assertEquals(
+        countOccurrences(output, 'return createRespPingCheck({ host, port })();'),
+        Mode === 'Auto' ? 2 : 1,
+      )
+      assert(!output.includes('addGarnet('))
+    }
   })
 
   it('emits deno-kv Local cache as in-process wiring without an Aspire resource', () => {
@@ -403,7 +412,7 @@ describe('generateRegisterInfrastructure', () => {
     // Self-provisions the garnet-server tool manifest, then runs it via dotnet.
     assertStringIncludes(
       output,
-      'cache_0_workdir = ensureGarnetToolManifest(appHostDir, "1.1.10");',
+      'cache_0_workdir = ensureGarnetToolManifest(appHostDir, "2.2.1");',
     )
     assertStringIncludes(
       output,
@@ -485,7 +494,7 @@ describe('generateRegisterInfrastructure', () => {
     // Docker present → Redis-compatible Garnet container (default engine kept).
     assertStringIncludes(
       output,
-      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:1.1.10")',
+      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:2.2.1")',
     )
     // Docker absent → self-provisioned Garnet dotnet-tool executable.
     assertStringIncludes(

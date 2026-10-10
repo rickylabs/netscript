@@ -199,7 +199,7 @@ export function getMysqlConfigFromEnv(resourceName = 'MYSQL'): MysqlAdapterConfi
  *
  * // Or with connection string:
  * // MYSQLDB_URI=mysql://root:password@localhost:3306/mydb
- * const config = getMysqlConfig('MYSQLDB_URI');
+ * const connectionStringConfig = getMysqlConfig('MYSQLDB_URI');
  * ```
  */
 export function getMysqlConfig(connectionStringEnvVar = 'MYSQLDB_URI'): MysqlAdapterConfig {
