@@ -445,6 +445,9 @@ packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts	cli:other	S4	grep-v
 packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/scaffold/import-resolver.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-checker.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-inventory.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-renderer.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/workspace-mutator_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/workspace-mutator.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -511,6 +514,7 @@ packages/cli/src/kernel/constants/scaffold/scaffold-packages.ts	scaffold-constan
 packages/cli/src/kernel/constants/scaffold/scaffold-validation.ts	scaffold-constants	S1	atomic 13.5.3 pin bump (A-SCAFFOLD); parity phase 1 enforce
 packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts	scaffold-constants	S1	atomic 13.5.3 pin bump (A-SCAFFOLD); parity phase 1 enforce
 packages/cli/src/kernel/constants/scaffold/scaffold-workspace-packages.ts	scaffold-constants	S1	atomic 13.5.3 pin bump (A-SCAFFOLD); parity phase 1 enforce
+packages/cli/src/kernel/domain/aspire-generated-surface.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/db-engine.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/compile-target.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/deploy-target-port_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -609,6 +613,7 @@ packages/cli/src/public/features/deploy/target/desktop/package/package-desktop_t
 packages/cli/src/public/features/deploy/target/desktop/package/package-desktop.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/target/run-target-operation.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/generate/aspire/check-aspire.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
