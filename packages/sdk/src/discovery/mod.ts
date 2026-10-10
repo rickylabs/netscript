@@ -12,6 +12,12 @@
  * pulling in unrelated database helpers. This barrel curates the public subset;
  * internal env-key builders stay module-private.
  *
+ * `getServiceUrl` reads the runtime globals (`import.meta.env`, then `Deno.env`).
+ * `resolveServiceUrlFromSources` and `getBrowserServiceUrlFromEnv` are the pure
+ * equivalents over explicit sources: they touch no runtime global and return
+ * `undefined` instead of throwing, so a runtime without Vite or Deno can compose
+ * them into the `resolveServiceUrl` option of `createServiceClient`.
+ *
  * @module
  */
 
@@ -27,11 +33,15 @@ export {
   type MysqlConnectionInfo,
   type PostgresConnectionInfo,
 } from './kv-connection.ts';
+export { type BrowserEnvironment, getBrowserServiceUrlFromEnv } from './browser-env.ts';
 export {
   getAllServices,
   getServiceInfo,
   getServiceUrl,
   isServiceAvailable,
+  resolveServiceUrlFromSources,
+  type ServerEnvironment,
   type ServiceInfo,
   type ServiceProtocol,
+  type ServiceUrlEnvironmentSources,
 } from './service-url.ts';
