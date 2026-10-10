@@ -1,3 +1,4 @@
+import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { dirname, join, toFileUrl } from '@std/path';
 import { MemoryFileSystemAdapter } from '../../../../../src/kernel/adapters/scaffold/memory-fs.ts';
@@ -18,12 +19,7 @@ Deno.test('generated guarded service: native sessions enforce REST/RPC/discovery
   const scaffolder = new Scaffolder(templateAdapter, fs);
   const formatter = new DenoGeneratedSourceFormatter(new DenoProcess());
   await fs.writeFile('/project/deno.json', JSON.stringify({ workspace: [], imports: {} }));
-  await fs.writeFile(
-    '/project/appsettings.json',
-    JSON.stringify({
-      NetScript: { Plugins: { auth: { PackageSpecifier: '@netscript/plugin-auth' } } },
-    }),
-  );
+  await writeInstalledAuthFixture(fs, '/project');
   await createContractScaffolder({
     scaffolder,
     templateAdapter,
@@ -107,6 +103,7 @@ Deno.test('generated guarded service: native sessions enforce REST/RPC/discovery
     const execution = await new Deno.Command(Deno.execPath(), {
       args: [
         'run',
+        '--no-lock',
         '-A',
         '--unstable-kv',
         '--config',

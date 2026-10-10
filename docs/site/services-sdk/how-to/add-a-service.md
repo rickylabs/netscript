@@ -259,20 +259,31 @@ await defineService(router, {
 });
 ```
 
-When the auth plugin is installed and enabled, `netscript service add` generates these native guards
-and records the plugin reference for service discovery. The required scope is `<service>:access`:
-without a bearer session `/api` returns 401, a valid session without that scope receives 403, and
-`/health` remains anonymous. The remote verifier uses the auth service's SDK; the guarded service
-holds no auth backend or provider secret. Authenticated app clients attach the bearer through an SDK
-contribution.
+When the auth plugin is installed with `--name auth` and enabled, `netscript service add` generates
+these native guards and records the plugin reference for service discovery. The required scope is
+`<service>:access`: without a bearer session `/api` returns 401, a valid session without that scope
+receives 403, and `/health` remains anonymous. The remote verifier uses the auth service's SDK; the
+guarded service holds no auth backend or provider secret. Authenticated app clients attach the
+bearer through an SDK contribution.
+
+Renamed auth keys are not supported by `service add`; an inconsistent installed auth manifest
+produces a configuration error.
 
 Without an enabled auth plugin, the entrypoint explicitly records its public posture:
 
 ```ts
-auth: {
-  public: true,
-  reason: 'Authentication is not installed. Install the auth plugin to protect this service API.',
-},
+// services/users/src/public-main.ts
+import { defineService } from '@netscript/service';
+import { router } from './router.ts';
+
+await defineService(router, {
+  name: 'users',
+  auth: {
+    public: true,
+    reason:
+      'Service authentication is not configured. Install or enable the auth plugin to protect this API.',
+  },
+});
 ```
 
 After installing auth, add a guarded service or update an existing public entrypoint with the

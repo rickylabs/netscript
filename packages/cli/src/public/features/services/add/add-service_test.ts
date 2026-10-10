@@ -1,3 +1,4 @@
+import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 
@@ -47,13 +48,10 @@ describe('public add service flow', () => {
   it('writes guarded service and contract files with JSR imports when auth is installed', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
-    const settingsPath = '/workspace/alpha/appsettings.json';
-    const settings = JSON.parse(await fs.readFile(settingsPath));
-    settings.NetScript.Plugins = { auth: { PackageSpecifier: '@netscript/plugin-auth' } };
-    await fs.writeFile(settingsPath, JSON.stringify(settings));
+    await writeInstalledAuthFixture(fs, '/workspace/alpha');
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
-    const formatter = identityFormatter();
+    const formatter = authFormatter();
     const helperOptions: unknown[] = [];
 
     const result = await addService({
@@ -101,7 +99,7 @@ describe('public add service flow', () => {
     assertEquals(appsettings.NetScript.Services.billing.PluginReferences, ['auth']);
     const main = await fs.readFile('/workspace/alpha/services/billing/src/main.ts');
     assertStringIncludes(main, 'createAuthServiceAuthenticator');
-    assertStringIncludes(main, 'requireScopes: ["billing:access"]');
+    assertStringIncludes(main, "requireScopes: ['billing:access']");
     assertEquals(main.includes('public: true'), false);
     assertEquals(rootDenoJson.workspace.includes('./services/billing'), true);
     assertStringIncludes(contractMod, './billing.contract.ts');
@@ -129,7 +127,7 @@ describe('public add service flow', () => {
     const originalWorkspace = await fs.readFile('/workspace/alpha/deno.json');
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
-    const formatter = identityFormatter();
+    const formatter = authFormatter();
 
     const error = await assertRejects(
       () =>
@@ -181,7 +179,7 @@ describe('public add service flow', () => {
   });
 });
 
-function identityFormatter(): GeneratedSourceFormatterPort {
+function authFormatter(): GeneratedSourceFormatterPort {
   return {
     formatContent: (_path, content) => Promise.resolve(content),
     formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),

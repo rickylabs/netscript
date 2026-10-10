@@ -6,8 +6,52 @@ export async function probeGeneratedGuardedService(
   projectPath: string,
   repoPath: string,
 ): Promise<void> {
-  const projectRoot = resolve(projectPath);
-  const repoRoot = resolve(repoPath);
+  // The runtime suite's shared project is only an existence precondition. Every
+  // command below targets our own temporary project, including helper generation.
+  await Deno.stat(resolve(projectPath));
+  const scratch = await Deno.makeTempDir({ prefix: 'guarded-service-probe-' });
+  try {
+    await probeInScratch(scratch, resolve(repoPath));
+  } finally {
+    await Deno.remove(scratch, { recursive: true });
+  }
+}
+
+async function probeInScratch(scratch: string, repoRoot: string): Promise<void> {
+  const projectRoot = join(scratch, 'guard-probe');
+  const cli = join(repoRoot, 'packages/cli/bin/netscript.ts');
+  await run([
+    'run',
+    '-A',
+    join(repoRoot, 'packages/cli/bin/netscript.ts'),
+    'init',
+    'guard-probe',
+    '--path',
+    scratch,
+    '--db',
+    'none',
+    '--app-name',
+    'web',
+    '--ci',
+    '--yes',
+    '--no-git',
+    '--force',
+    '--editor',
+    'none',
+  ], repoRoot);
+  await run([
+    'run',
+    '-A',
+    cli,
+    'plugin',
+    'install',
+    'auth',
+    '--name',
+    'auth',
+    '--project-root',
+    projectRoot,
+    '--force',
+  ], repoRoot);
   await run([
     'run',
     '-A',
@@ -45,6 +89,7 @@ export async function probeGeneratedGuardedService(
               target.startsWith('.') ? toFileUrl(resolve(projectRoot, target)).href : target,
             ]),
           ),
+          '@guard-probe/contracts': toFileUrl(join(projectRoot, 'contracts/mod.ts')).href,
           '@std/assert': repoConfig.imports['@std/assert'],
           '@std/assert/equal': `${repoConfig.imports['@std/assert']}/equal`,
         },
@@ -73,7 +118,7 @@ export async function probeGeneratedGuardedService(
         '-A',
         '--unstable-kv',
         '--config',
-        join(projectRoot, 'deno.json'),
+        join(repoRoot, 'deno.json'),
         '--import-map',
         importMap,
         probe,
@@ -93,7 +138,7 @@ export async function probeGeneratedGuardedService(
 
 async function run(args: string[], cwd: string): Promise<void> {
   const result = await new Deno.Command(Deno.execPath(), {
-    args,
+    args: args[0] === 'run' ? ['run', '--no-lock', ...args.slice(1)] : args,
     cwd,
     stdout: 'inherit',
     stderr: 'inherit',

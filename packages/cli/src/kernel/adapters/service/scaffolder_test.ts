@@ -24,6 +24,7 @@ import { ServiceScaffolder } from './scaffolder.ts';
 import { ServiceWorkspaceResolver } from './workspace-resolver.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import { SERVICE_PUBLIC_REASON } from './auth-policy.ts';
+import { writeInstalledAuthFixture } from '../../../../tests/installed-auth-fixture.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
@@ -73,12 +74,7 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
 for (const hasDatabase of [false, true]) {
   Deno.test(`ServiceScaffolder guards ${hasDatabase ? 'database' : 'memory'} services with installed auth`, async () => {
     const { fs, scaffolder, templateAdapter } = createHarness();
-    await fs.writeFile(
-      '/project/appsettings.json',
-      JSON.stringify({
-        NetScript: { Plugins: { identity: { PackageSpecifier: '@netscript/plugin-auth' } } },
-      }),
-    );
+    await writeInstalledAuthFixture(fs, '/project');
     const result = await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
       projectName: 'my-app',
       targetPath: '/project',
@@ -90,12 +86,12 @@ for (const hasDatabase of [false, true]) {
     });
     const main = await fs.readFile('/project/services/orders/src/main.ts');
     assertStringIncludes(main, "from '@netscript/plugin-auth-core/authenticator'");
-    assertStringIncludes(main, 'createAuthServiceAuthenticator({ serviceName: "identity"');
-    assertStringIncludes(main, 'requireScopes: ["orders:access"]');
+    assertStringIncludes(main, "createAuthServiceAuthenticator({ serviceName: 'auth'");
+    assertStringIncludes(main, "requireScopes: ['orders:access']");
     assertEquals(main.includes('public: true'), false);
     assertEquals(main.includes('allowAnonymous:'), false);
     assertEquals(main.includes('#1382'), false);
-    assertEquals(result.configEntry.PluginReferences, ['identity']);
+    assertEquals(result.configEntry.PluginReferences, ['auth']);
     await fs.writeFile('/project/services/orders/src/main.ts', '// authored service policy');
     await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
       projectName: 'my-app',
@@ -115,12 +111,10 @@ for (const hasDatabase of [false, true]) {
 
 Deno.test('ServiceScaffolder records public policy when auth is disabled', async () => {
   const { fs, scaffolder, templateAdapter } = createHarness();
-  await fs.writeFile(
-    '/project/appsettings.json',
-    JSON.stringify({
-      NetScript: { Plugins: { auth: { Enabled: false } } },
-    }),
-  );
+  await writeInstalledAuthFixture(fs, '/project');
+  const settings = JSON.parse(await fs.readFile('/project/appsettings.json'));
+  settings.NetScript.Plugins.auth.Enabled = false;
+  await fs.writeFile('/project/appsettings.json', JSON.stringify(settings));
   const result = await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
     projectName: 'my-app',
     targetPath: '/project',
