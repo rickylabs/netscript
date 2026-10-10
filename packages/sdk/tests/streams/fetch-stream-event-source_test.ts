@@ -392,3 +392,17 @@ Deno.test('pre-abort never fetches, invalid limits reject, listener failures sto
   assertEquals(failing.scheduler.timers.size, 0);
   assert(failing.transport.connections[0].cancelled);
 });
+
+Deno.test('abort during credential resolution observes rejected IO without reconnecting', async () => {
+  const abort = new AbortController();
+  const { source, scheduler, transport } = await create({
+    signal: abort.signal,
+    authHeaders: () => {
+      abort.abort();
+      return Promise.reject(new Error('cancelled credential request'));
+    },
+  });
+  await source.done;
+  assertEquals(transport.connections.length, 0);
+  assertEquals(scheduler.timers.size, 0);
+});

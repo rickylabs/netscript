@@ -4,7 +4,12 @@ import { SseParser } from './sse-parser.ts';
 
 /** Await injected IO while releasing the abort listener on every settlement. */
 export async function untilAborted<T>(operation: Promise<T>, signal: AbortSignal): Promise<T> {
-  signal.throwIfAborted();
+  if (signal.aborted) {
+    // Injected IO can abort synchronously while returning a rejected promise.
+    // Observe that promise even when cancellation wins before the race is installed.
+    void operation.catch(() => {});
+    throw signal.reason;
+  }
   let abort: () => void = () => {};
   const cancelled = new Promise<never>((_resolve, reject) => {
     abort = () => reject(signal.reason);
