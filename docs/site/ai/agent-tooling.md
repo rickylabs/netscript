@@ -87,7 +87,7 @@ NetScript section in `AGENTS.md`. Host and editor targets add only their own int
 | Claude Code host | `.mcp.json`, a derived mirror of the canonical bundle under `.claude/skills/`, and the conditional `playwright-cli` skill when that skill is absent and Aspire is available (best-effort; failures and timeouts are reported and skipped) |
 | VS Code editor | `.vscode/mcp.json`, `.netscript/schema/config-file.v1.json`, `.vscode/settings.json`, `.vscode/extensions.json`, `.vscode/launch.json`, `.vscode/tasks.json` |
 | Zed editor | `.zed/settings.json` with `context_servers`, `.zed/debug.json`, `.zed/tasks.json`, `.netscript/schema/config-file.v1.json` |
-| OpenCode host | `opencode.json` with `netscript` and `aspire` local MCP servers, the `deno lsp` language server, and the `deno fmt` formatter |
+| OpenCode host | `opencode.json` (or an existing `opencode.jsonc`) with `netscript` and `aspire` local MCP servers, the `deno lsp` language server, and the `deno fmt` formatter |
 
 OpenCode reads `opencode.json` from the project root and never reads `.mcp.json`, so it gets its
 own writer. Each MCP server entry carries an explicit `timeout` (180 s for `netscript`, 120 s for
@@ -96,6 +96,12 @@ leaves language servers and formatters off when `lsp` and `formatter` are omitte
 Deno formatter, so the file also declares `lsp.deno` and `formatter.deno`. An existing `deno` entry
 and an explicit `false` are kept. OpenCode discovers `.agents/skills/` itself, so no extra skill
 tree is written for it.
+
+Both project files are read as JSONC and edited in place, so comments, trailing commas, and
+unrelated settings survive. OpenCode merges both files and lets `opencode.jsonc` override
+`opencode.json`, so an existing `opencode.jsonc` receives the full wiring. A `netscript` or
+`aspire` server already declared in `opencode.json` is refreshed too, which keeps the effective
+command current. A malformed file stops `agent init` before it writes anything.
 
 The generated MCP configuration runs `netscript agent mcp` for the current
 project. Re-running `agent init` is idempotent: unchanged files are left alone,
