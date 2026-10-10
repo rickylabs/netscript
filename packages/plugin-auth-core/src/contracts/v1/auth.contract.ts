@@ -73,6 +73,16 @@ const validationErrorDataSchema: z.ZodObject<{
 const AUTH_SPECIFIC_ERRORS: Readonly<{
   UNAUTHORIZED: { status: number; message: string; data: z.ZodType<{ reason: string }> };
   FORBIDDEN: { status: number; message: string; data: z.ZodType<{ reason: string }> };
+  AUTH_TRANSPORT_ERROR: {
+    status: number;
+    message: string;
+    data: z.ZodType<{ providerId?: string; reason: string }>;
+  };
+  AUTH_CONFIGURATION_ERROR: {
+    status: number;
+    message: string;
+    data: z.ZodType<{ providerId?: string; reason: string }>;
+  };
   AUTH_PROVIDER_ERROR: {
     status: number;
     message: string;
@@ -89,6 +99,16 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
     status: 403,
     message: 'Forbidden',
     data: z.object({ reason: z.string() }),
+  },
+  AUTH_TRANSPORT_ERROR: {
+    status: 400,
+    message: 'Auth request requires secure transport',
+    data: z.object({ providerId: z.string().optional(), reason: z.string() }),
+  },
+  AUTH_CONFIGURATION_ERROR: {
+    status: 400,
+    message: 'Auth configuration refused',
+    data: z.object({ providerId: z.string().optional(), reason: z.string() }),
   },
   AUTH_PROVIDER_ERROR: {
     status: 502,
