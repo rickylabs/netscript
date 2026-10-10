@@ -16,7 +16,7 @@ A **route contract** is the schema half of that pair: it owns a route's path and
 independently of any concrete URL. Binding it to a pattern produces a **route reference** — one
 object that parses a request *and* builds hrefs, from the same schemas. This page is about what each
 piece actually guarantees, and about the third piece that closes the loop: a generated `routes` tree
-derived from the filesystem, so a moved route file is a compile error at every call site.
+derived from the filesystem, so a moved route file can invalidate call sites that use that tree.
 
 Import the surface from `@netscript/fresh/route`.
 
@@ -83,8 +83,8 @@ the contract to a concrete Fresh pattern and returns a **route reference**: the 
 bound `Link` component, `nav`, and `withPartial()`. `createRouteReference(pattern)` produces the same
 reference shape without a contract, inferring path params from the pattern itself.
 
-The generated `routes` tree binds every route file in the app to one of those references, so the
-pattern string appears exactly once in the whole codebase — inside a generated module.
+The generated `routes` tree binds discovered route files to those references. Call sites using the
+tree share generated patterns; separately authored string-literal references still need manual updates.
 
 ```ts
 import { defineRouteContract, enumPathParamSchema, paginationSearchSchema } from '@netscript/fresh/route';
@@ -257,13 +257,27 @@ Each leaf is `createRouteReference(routePatterns.<key>, { id, kind })`, or
 sidecar. `kind` is `'partial'` for anything under `partials/` and `'page'` otherwise; `id` is the
 dotted key path without the trailing `$route`.
 
-**This is the rename-safety story, and it is narrow enough to state exactly.** Move
-`routes/dashboard/orders/[id].tsx` to `routes/orders/[id].tsx` and the tree is regenerated:
-`routes.dashboard.orders.$id` stops existing, and every call site referencing it fails `deno check`.
-The guarantee applies only to call sites that go through the generated tree. A hand-written
-`createRouteReference('/dashboard/orders/[id]')` holds a string literal and is not rename-tracked —
-prefer the generated accessor wherever a route file can move, and keep `createRouteReference` for
-patterns outside the generated tree.
+After regeneration, moving `routes/dashboard/orders/[id].tsx` to `routes/orders/[id].tsx`
+removes `routes.dashboard.orders.$id`: consumers of that accessor fail `deno check`.
+This guarantee covers only generated-tree consumers. A literal
+`createRouteReference('/dashboard/orders/[id]')` is not rename-tracked; prefer generated accessors
+for filesystem routes.
+
+## Renaming or Moving a Route
+
+`ui:add page` binds `appRoutes['catalog']` to a string literal in `router.ts`:
+`createRouteReference('/catalog', ...)`. Moving files can leave stale URLs while `deno check` passes.
+
+- [ ] Move page, owned `query-loaders.ts`/`CatalogIsland.tsx`, and contract sidecar; repair imports.
+- [ ] Reconcile `router.ts` pattern/key/metadata `id`, page binding, and consumers.
+- [ ] Update navigation links, literals, redirects, partials, tests, and path schemas.
+- [ ] Refresh `.generated/manifest.ts` and `.generated/routes.ts` via Vite build/dev; never hand-edit.
+- [ ] Type-check after regeneration.
+- [ ] Visit `/inventory`, test navigation/loader/island/partials, and check the old `/catalog` URL.
+
+[Generated web surface](/web-layer/generated-surface/) explains ownership and manual removal.
+No `ui:rename`, `route rename`, `generate routes`, or `ui:remove page` verb exists;
+`ui:remove` handles registry items only.
 
 ## Three authoring forms, one generated binding
 
