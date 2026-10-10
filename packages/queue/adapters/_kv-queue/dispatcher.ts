@@ -95,11 +95,6 @@ export class KvQueueDispatcher {
     this.#policy = policy;
   }
 
-  /** Whether a listen loop is consuming the database queue. */
-  get isListening(): boolean {
-    return this.#loop !== null;
-  }
-
   /**
    * Shared connection used for enqueue and dead-letter writes.
    *
@@ -215,7 +210,8 @@ export class KvQueueDispatcher {
 
   /** Stop a dedicated listen loop once no registration remains and in-flight work settled. */
   async #stopLoopWhenIdle(): Promise<void> {
-    if (!this.#connection.dedicatedListener) {
+    // The departing registration already drained its own work; other names keep the loop.
+    if (!this.#connection.dedicatedListener || !this.#routes.isEmpty) {
       return;
     }
     await this.#settleInFlight();
@@ -303,6 +299,8 @@ export interface KvQueueDispatcherLease {
 
 interface DispatcherEntry {
   readonly dispatcher: KvQueueDispatcher;
+  /** Caller-owned handles keep their entry: the loop lives as long as the caller's handle. */
+  readonly retained: boolean;
   leases: number;
 }
 
@@ -319,8 +317,10 @@ const dispatchersByInstance = new WeakMap<Deno.Kv, DispatcherEntry>();
  * Claim the process-wide dispatcher for a KV database, creating it on first claim.
  *
  * Databases are identified by caller-owned instance, or by the configured path string (an
- * omitted path is Deno's default location). A dispatcher whose loop still consumes a
- * caller-owned handle stays registered after its last claim, so a later claim reuses that loop.
+ * omitted path is Deno's default location). A dispatcher on a caller-owned handle stays
+ * registered after its last claim, so a later claim reuses its loop. Any other dispatcher leaves
+ * the registry when its last claim is released, before it closes, so a concurrent claim starts a
+ * fresh one; an in-memory database therefore does not outlive its last claim.
  *
  * @param target - Caller-owned instance or path to open.
  * @returns Lease that must be released when the caller stops using the queue.
@@ -338,7 +338,11 @@ function acquire<K>(
 ): KvQueueDispatcherLease {
   let entry = registry.get(key);
   if (!entry) {
-    entry = { dispatcher: new KvQueueDispatcher(createKvQueueConnection(target)), leases: 0 };
+    entry = {
+      dispatcher: new KvQueueDispatcher(createKvQueueConnection(target)),
+      retained: 'kv' in target,
+      leases: 0,
+    };
     registry.set(key, entry);
   }
   entry.leases += 1;
@@ -352,14 +356,15 @@ function acquire<K>(
       }
       released = true;
       claimed.leases -= 1;
-      if (claimed.leases > 0) {
+      if (claimed.leases > 0 || claimed.retained) {
         return;
       }
-      await claimed.dispatcher.close();
-      const idle = claimed.leases === 0 && !claimed.dispatcher.isListening;
-      if (idle && registry.get(key) === claimed) {
+      // Leave the registry before closing, so a concurrent claim gets a fresh dispatcher
+      // instead of one whose connections this close is about to invalidate.
+      if (registry.get(key) === claimed) {
         registry.delete(key);
       }
+      await claimed.dispatcher.close();
     },
   };
 }
