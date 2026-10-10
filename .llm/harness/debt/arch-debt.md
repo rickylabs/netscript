@@ -2334,6 +2334,14 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-3/workers-doc-lint.json`
   records the exact baseline at signed Slice 2 head `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`.
 
+- **0.0.8 reconciliation (#2218):** The current main full-export baseline is 20; the type-only
+  vocabulary repair reduces the combined total to 4 across the same 13 targets. All 12 non-contract
+  targets are clean. The contract target retains three references to the precise
+  `WorkersContractDefinition` and one oRPC `implement` reference. This row remains open: exporting
+  the definition exposes its private route/schema graph, and the oRPC reference falls under doctrine
+  02's sanctioned boundary exception. Neither a zero-diagnostic claim nor closure of #1655 is
+  proven. Evidence is kept in the run record and PR #2218.
+
 ## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
 
 - **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
@@ -2510,6 +2518,10 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open; independent evaluator must adjudicate DEBT_ACCEPTED for this unchanged source
   baseline.
 - **Gate:** F-7: all worker export doc-lint diagnostics zero.
+
+- **0.0.8 reconciliation (#2218):** Runtime and streams vocabulary is exported without type erasure.
+  The workers contract repair is still pending under #1655, so this zero-diagnostic closing gate
+  remains open; the earlier cancellation baseline does not authorize any growth.
 
 ## workers doctor export — unchanged module tag (`workers-doctor-module-baseline-2066`)
 
