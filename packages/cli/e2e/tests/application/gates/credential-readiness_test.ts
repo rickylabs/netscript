@@ -62,7 +62,9 @@ Deno.test('credential fault splice reuses the generated postgres_auth server bin
 
 Deno.test('credential fault splice fails closed without exactly one postgres_auth marker', () => {
   const sqlite = generateRegisterInfrastructure({
-    databases: { sqlite: { Enabled: true, Engine: 'Sqlite', DataPath: '.data/app.sqlite', Persistent: false } },
+    databases: {
+      sqlite: { Enabled: true, Engine: 'Sqlite', DataPath: '.data/app.sqlite', Persistent: false },
+    },
     caches: {},
   });
   assertThrows(

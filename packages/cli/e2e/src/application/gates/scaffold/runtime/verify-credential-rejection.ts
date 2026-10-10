@@ -13,7 +13,10 @@ import {
 } from './credential-fault-fixture.ts';
 import { RESOURCE_TRANSITION_FAILURE_CEILING_MS } from './listener-unreachable-fixture.ts';
 import { type ResourceUpdate, watchResourceUpdates } from './resource-state-stream.ts';
-import { type ListenerHealthReport, readListenerHealthReport } from './verify-listener-readiness.ts';
+import {
+  type ListenerHealthReport,
+  readListenerHealthReport,
+} from './verify-listener-readiness.ts';
 
 const POSTGRES_RESOURCE = 'postgres';
 const POSTGRES_LISTENER_HEALTH_KEY = 'postgres_listener';
@@ -97,7 +100,9 @@ export function assertBoundedWaitRejected(
     );
   }
   if (result.durationMs > BOUNDED_WAIT_CEILING_MS) {
-    throw new Error(`aspire wait took ${result.durationMs}ms for a ${BOUNDED_WAIT_SECONDS}s budget`);
+    throw new Error(
+      `aspire wait took ${result.durationMs}ms for a ${BOUNDED_WAIT_SECONDS}s budget`,
+    );
   }
 }
 

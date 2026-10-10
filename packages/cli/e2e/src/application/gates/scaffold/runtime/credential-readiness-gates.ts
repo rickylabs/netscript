@@ -3,8 +3,8 @@ import type { GateDefinition } from '../../../../domain/gate-definition.ts';
 import { commandGate } from '../gate-factory.ts';
 import { POSTGRES_AUTH_HEALTH_KEY } from './credential-fault-fixture.ts';
 import {
-  listenerReadinessExpectation,
   type ListenerReadinessExpectation,
+  listenerReadinessExpectation,
   listenerReadinessWaitCommand,
 } from './listener-readiness-gates.ts';
 
