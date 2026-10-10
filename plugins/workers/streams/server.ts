@@ -28,3 +28,22 @@ export type {
   WorkerStreamEntitySchema,
   WorkerStreamStandardSchema,
 } from '@netscript/plugin-workers-core/streams';
+
+export type { WorkerStreamEntities } from '@netscript/plugin-workers-core/streams';
+export type {
+  CollectionDefinition,
+  CollectionEventHelpers,
+  CollectionWithHelpers,
+  StateSchema,
+  StreamSchemaIssue,
+  StreamSchemaValidationOptions,
+  StreamSchemaValidationResult,
+  StreamStandardSchema,
+  StreamStateDefinition,
+} from '@netscript/plugin-streams-core';
+export type { TriggerType } from '@netscript/plugin-workers-core/runtime';
+/**
+ * Canonical runtime status vocabulary underlying the state-layer ExecutionStatus.
+ * Use ExecutionStatus for state and stream records; use CanonicalExecutionStatus for runtime ports.
+ */
+export type { ExecutionStatus as CanonicalExecutionStatus } from '@netscript/plugin-workers-core/runtime';

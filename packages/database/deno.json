@@ -18,7 +18,7 @@
     "./commands/postgres": "./commands-postgres.ts"
   },
   "tasks": {
-    "check": "deno check --unstable-kv ./mod.ts ./ports/mod.ts ./adapters/mod.ts ./adapters/postgres.adapter.ts ./adapters/mssql.adapter.ts ./adapters/mysql.adapter.ts ./extensions/mod.ts ./scripts/mod.ts ./prisma-tracing.ts ./testing/mod.ts commands.ts",
+    "check": "deno check --unstable-kv ./mod.ts ./ports/mod.ts ./adapters/mod.ts ./adapters/postgres.adapter.ts ./adapters/mssql.adapter.ts ./adapters/mysql.adapter.ts ./extensions/mod.ts ./scripts/mod.ts ./prisma-tracing.ts ./testing/mod.ts commands.ts ./commands-postgres.ts",
     "test": "deno test --allow-all ./tests/",
     "lint": "deno lint",
     "fmt": "deno fmt --check",

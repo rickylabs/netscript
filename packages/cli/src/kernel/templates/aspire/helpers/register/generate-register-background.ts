@@ -22,6 +22,10 @@ import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { withDatabasePermissions } from './database-permissions.ts';
+import {
+  renderRegistrationPreamble,
+  resolveRegistrationPreambleNeeds,
+} from './registration-preamble.ts';
 
 /**
  * Generates the register-background.mts file content.
@@ -270,16 +274,22 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     registrationBlocks.push(lines.join('\n'));
   }
 
+  const processorEntries = entries.map(([, entry]) => entry);
+  const preambleNeeds = resolveRegistrationPreambleNeeds(
+    processorEntries,
+    processorEntries.some((entry) => entry.Telemetry !== false),
+  );
+
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterBackground1, {
     __slot0__: String(fileHeader('register-background.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
-    __slot4__: String(
-      registrationBlocks.length > 0
-        ? registrationBlocks.join('\n\n')
-        : '  // No background processors configured',
-    ),
+    __slot4__: registrationBlocks.join('\n\n'),
+    ...renderRegistrationPreamble(preambleNeeds, {
+      sdkModule: SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS,
+      cacheImport: 'withCacheReference as _withCacheReference',
+    }),
   });
 }
 

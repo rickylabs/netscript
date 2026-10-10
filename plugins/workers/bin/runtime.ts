@@ -154,3 +154,28 @@ export async function startCombinedProcess(
   await worker.start();
   return Object.freeze({ scheduler, worker });
 }
+
+export type { GeneratedJobRegistryStatus } from '../src/runtime/generated-jobs.ts';
+export type {
+  ExecutionStatus,
+  JobContext,
+  JobDefinition,
+  JobFailure,
+  JobHandler,
+  JobPayloadSchema,
+  JobResult,
+  JobSuccess,
+  PublicStandardSchema,
+  RegisterJobInput,
+  RuntimePermissions,
+  RuntimePermissionValue,
+  StaticJobRegistry,
+  TriggerType,
+} from '@netscript/plugin-workers-core/runtime';
+export type {
+  WorkerIdempotencyClaim,
+  WorkerIdempotencyInput,
+  WorkerIdempotencyPort,
+  WorkerIdempotencySource,
+} from '@netscript/plugin-workers-core/stores';
+export type { ScheduledJobInfo, Scheduler, Worker, WorkerHealthStatus } from '../worker/mod.ts';

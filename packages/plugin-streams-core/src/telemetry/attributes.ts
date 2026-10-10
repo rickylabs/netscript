@@ -3,6 +3,8 @@ export type StreamSpanNamesMap = Readonly<{
   PUBLISH: 'stream.publish';
   CONSUME: 'stream.consume';
   SUBSCRIBE: 'stream.subscribe';
+  HEAD: 'stream.head';
+  DELETE: 'stream.delete';
 }>;
 
 /** Span names emitted by stream producers and consumers. */
@@ -10,6 +12,8 @@ export const StreamSpanNames: StreamSpanNamesMap = {
   PUBLISH: 'stream.publish',
   CONSUME: 'stream.consume',
   SUBSCRIBE: 'stream.subscribe',
+  HEAD: 'stream.head',
+  DELETE: 'stream.delete',
 };
 
 /** Attribute keys used by stream telemetry. */

@@ -50,6 +50,7 @@ Deno.test('resource help exposes the static-route, selector, safety, and output 
       '--json',
     ]
   ) assertStringIncludes(help, token);
+  assertStringIncludes(help, '<procedure> or <namespace>.<procedure>');
   assertStringIncludes(help, 'Static absolute route');
   assertStringIncludes(help, 'generator-owned leaves only');
 });
