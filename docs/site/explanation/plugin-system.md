@@ -202,7 +202,7 @@ The reason this is structural rather than incidental is three-fold:
    resource. The HTTP API keeps serving; other processors keep running.
 2. **Independent scaling.** The API and the processors have different load profiles — request
    latency versus queue depth — so they are tuned and scaled independently
-   (`WORKER_CONCURRENCY` on the background resource never touches the API).
+   (`WORKERS_CONCURRENCY` on the background resource never touches the API).
 3. **Least privilege.** The API gets a narrow permission set (serve HTTP); background resources
    get the wider set they need (queues, database, file watching). Splitting the processes lets
    each one run with only the permissions its job requires.

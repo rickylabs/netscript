@@ -13,6 +13,7 @@ import {
   textArtifact,
 } from '@netscript/plugin/adapter';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
+import { WORKERS_CONCURRENCY_ENV } from '../runtime/concurrency.ts';
 import { WORKERS_JOB_REGISTRY_PATH } from '../runtime/generated-jobs.ts';
 import {
   barrelScaffolder,
@@ -131,7 +132,7 @@ export const workersAdapterPlugin: NetScriptPlugin = {
   install: {
     dependencySpecifier: `jsr:@netscript/plugin-workers@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: workersStarterResources,
-    configParams: ['WORKERS_API_URL', 'WORKER_CONCURRENCY'],
+    configParams: ['WORKERS_API_URL', WORKERS_CONCURRENCY_ENV],
     wiringEntry: '@netscript/plugin-workers/worker',
   },
   doctor: {
