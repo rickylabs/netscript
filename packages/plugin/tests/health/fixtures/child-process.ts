@@ -1,6 +1,10 @@
 import { runChildHealthProcess } from '../../../src/health/mod.ts';
 
 await runChildHealthProcess(async (health, signal) => {
+  if (Deno.args[0] === 'leaked-handle') {
+    setInterval(() => undefined, 60_000);
+    throw new Error('dependency startup left a live handle');
+  }
   if (Deno.args[0] === 'registry-failed') throw new Error('secret-token=registry-password');
   health.registryLoaded();
   if (Deno.args[0] === 'dependency-failed') throw new Error('secret-token=dependency-password');

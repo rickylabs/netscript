@@ -93,7 +93,7 @@ for (const mode of ['ready', 'registry-failed', 'dependency-failed', 'crash-loop
   });
 }
 
-for (const mode of ['registry-failed', 'dependency-failed', 'completed']) {
+for (const mode of ['registry-failed', 'dependency-failed', 'completed', 'leaked-handle']) {
   Deno.test(`fatal ${mode} exits nonzero without an operator signal`, async () => {
     const child = spawn(mode);
     const reader = child.stderr.getReader();

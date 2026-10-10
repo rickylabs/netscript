@@ -73,4 +73,6 @@ export async function runChildHealthProcess(
     for (const signal of signals) Deno.removeSignalListener(signal, stop);
     await server.shutdown();
   }
+  // Bootstrap may leave dependency handles alive; a fatal process must still terminate.
+  if (terminal) Deno.exit(1);
 }
