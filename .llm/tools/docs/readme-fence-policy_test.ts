@@ -25,11 +25,11 @@ Deno.test('the measured baseline passes and every ceiling sits at its exact cens
 Deno.test('one more type error, or one more failing README, fails the ratchet', () => {
   assertEquals(
     readmeFenceRatchetFailures({ ...baseline, typeErrors: baseline.typeErrors + 1 }),
-    ['type errors 8 > 7'],
+    ['type errors 6 > 5'],
   );
   assertEquals(
     readmeFenceRatchetFailures({ ...baseline, failingReadmes: baseline.failingReadmes + 1 }),
-    ['failing readmes 6 > 5'],
+    ['failing readmes 5 > 4'],
   );
   assertEquals(
     readmeFenceRatchetFailures({ ...baseline, syntaxInvalid: baseline.syntaxInvalid + 1 }),
@@ -62,7 +62,7 @@ Deno.test('every violation is reported, not just the first', () => {
       typeErrors: 99,
       failingReadmes: 30,
     }),
-    ['readmes 1 < 36', 'failing readmes 30 > 5', 'type errors 99 > 7'],
+    ['readmes 1 < 36', 'failing readmes 30 > 4', 'type errors 99 > 5'],
   );
 });
 
@@ -70,7 +70,7 @@ Deno.test('the census line is printed on pass and fail alike', () => {
   assertEquals(
     formatReadmeFenceCensus(baseline, 'PASS'),
     'readme fences: PASS readmes=36 fences=168 ts_like=73 exempt=0 checked=73 ' +
-      'syntax_invalid=0 type_errors=7 failing_readmes=5 unattributed_failure=false',
+      'syntax_invalid=0 type_errors=5 failing_readmes=4 unattributed_failure=false',
   );
   assertEquals(formatReadmeFenceCensus(baseline, 'FAIL').startsWith('readme fences: FAIL'), true);
 });
