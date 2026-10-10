@@ -112,7 +112,9 @@ Deno.test('Aspire helper regeneration declares pg for an existing PostgreSQL App
     assertEquals(await fs.readFile(packageJsonPath), legacyPackageJson);
 
     const written = await regenerateAspireHelpers(root, fs, scaffolder, templateAdapter);
-    const helper = await fs.readFile(join(root, 'aspire', '.helpers', 'register-infrastructure.mts'));
+    const helper = await fs.readFile(
+      join(root, 'aspire', '.helpers', 'register-infrastructure.mts'),
+    );
     assertEquals(helper.includes('withHealthCheck("main_auth")'), true);
     assertEquals(written.includes(packageJsonPath), true);
     assertEquals(JSON.parse(await fs.readFile(packageJsonPath)).dependencies, {
