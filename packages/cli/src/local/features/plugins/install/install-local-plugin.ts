@@ -4,9 +4,9 @@ import {
   copyPluginSchemasToRootDb,
   provisionDatabaseIfNeeded,
 } from '../../../../kernel/adapters/plugin/db-integration.ts';
-import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
-import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
-import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
+import type { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
+import type { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
+import type { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
