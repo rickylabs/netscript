@@ -387,8 +387,19 @@ Deno.test('session list fails loudly when the stream URL is omitted', async () =
 });
 
 Deno.test('session CLI lists a signed-in backend session and revoke invalidates it', async () => {
+  const userInfoEndpoint = 'https://issuer.example.test/oauth/userinfo';
   const registry = await createInMemoryKvOAuthRegistry({
-    fetch: () => Promise.resolve(Response.json({ access_token: 'access', token_type: 'Bearer' })),
+    env: {
+      NETSCRIPT_AUTH_USERINFO_ENDPOINT: userInfoEndpoint,
+      NETSCRIPT_AUTH_SUBJECT_SOURCE: 'userinfo',
+      NETSCRIPT_AUTH_SUBJECT_CLAIM: 'id',
+    },
+    fetch: (input) =>
+      Promise.resolve(
+        String(input) === userInfoEndpoint
+          ? Response.json({ id: 'user-1' })
+          : Response.json({ access_token: 'access', token_type: 'Bearer' }),
+      ),
   });
   const started = await signin({}, {
     registry,

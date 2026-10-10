@@ -6,13 +6,26 @@ import {
 } from './guidance-contract.ts';
 import type { DocsDocument, DocsSection } from './docs-corpus-port.ts';
 import { normalizeDocsSlug, slugifyDocsHeading } from './docs-corpus-port.ts';
-import { tokenizeGuidance } from './guidance-result.ts';
+import { type GuidanceTerm, guidanceTerms, tokenizeGuidance } from './guidance-terms.ts';
 
 /** One normalized direct internal documentation route. */
 export interface GuidanceLinkEdge {
   readonly targetSlug: string;
   readonly targetSection?: string;
   readonly relation: GuidanceLinkRelation;
+}
+
+/**
+ * Words that name a section, parsed once at index time and scored field by field.
+ *
+ * Page-level names (title, page slug) belong only to the page's first section, the one that is
+ * the page. Later sections keep the title in their body tokens but not as identity, so one
+ * page's title cannot lift every section of that page above an exact heading elsewhere.
+ */
+export interface GuidanceSectionIdentity {
+  readonly title: readonly GuidanceTerm[];
+  readonly heading: readonly GuidanceTerm[];
+  readonly slug: readonly GuidanceTerm[];
 }
 
 /** One parsed section consumed by the deterministic ranker. */
@@ -26,6 +39,7 @@ export interface IndexedGuidanceSection {
   readonly content: string;
   readonly tokens: readonly string[];
   readonly tokenCounts: ReadonlyMap<string, number>;
+  readonly identity: GuidanceSectionIdentity;
   readonly code: readonly GuidanceCodeExcerpt[];
   readonly links: readonly GuidanceLinkEdge[];
 }
@@ -41,10 +55,14 @@ function indexDocument(document: DocsDocument): IndexedGuidanceSection[] {
   const sections = document.sectionContents.length > 0
     ? document.sectionContents
     : [{ heading: document.title, slug: 'overview', level: 1, content: document.content }];
-  return sections.map((section) => indexSection(document, section));
+  return sections.map((section, index) => indexSection(document, section, index === 0));
 }
 
-function indexSection(document: DocsDocument, section: DocsSection): IndexedGuidanceSection {
+function indexSection(
+  document: DocsDocument,
+  section: DocsSection,
+  namesPage: boolean,
+): IndexedGuidanceSection {
   const slug = normalizeDocsSlug(document.slug);
   const citation = { slug, section: section.slug, heading: section.heading };
   const tokens = tokenizeGuidance(
@@ -60,6 +78,11 @@ function indexSection(document: DocsDocument, section: DocsSection): IndexedGuid
     content: section.content,
     tokens,
     tokenCounts: tokenCounts(tokens),
+    identity: {
+      title: namesPage ? guidanceTerms(document.title) : [],
+      heading: guidanceTerms(section.heading),
+      slug: guidanceTerms(namesPage ? `${slug} ${section.slug}` : section.slug),
+    },
     code: parseCodeExcerpts(section.content, citation),
     links: parseInternalLinks(section.content, slug, inferLinkRelation(section.heading)),
   };

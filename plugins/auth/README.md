@@ -25,6 +25,11 @@ them to a NetScript host.
   and exposes `signin`, `callback`, `signout`, `revokeSession`, `session`, and `me` over a versioned
   v1 contract, backed by a single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth`
   (interactive OAuth/OIDC), `workos`, or `better-auth`.
+- **Stable user subjects** — on `kv-oauth`, `NETSCRIPT_AUTH_SUBJECT_SOURCE` (`id_token` |
+  `userinfo`) and `NETSCRIPT_AUTH_SUBJECT_CLAIM` choose where the subject comes from. A preset named
+  by `NETSCRIPT_AUTH_PROVIDER_ID` supplies its default (GitHub: userinfo `id`, as `github:<id>`). A
+  provider without a stable identifier refuses sign-in rather than issuing a new subject per
+  sign-in.
 - **Capability differences surface, not crash** — operations a backend does not support return typed
   auth-provider errors at the API boundary instead of failing deep in a handler.
 - **Schema included** — the plugin ships the auth-owned Prisma schema, so generated workspaces

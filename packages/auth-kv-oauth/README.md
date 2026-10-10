@@ -36,6 +36,11 @@ plaintext tokens are never written.
 - **Encrypted token storage** — `createKvOAuthCrypto()` seals token sets with AES-256-GCM and
   prefixes sealed values with a key id, enabling key rotation; token plaintext is never written to
   KV.
+- **Stable subjects for non-OIDC providers** — each provider declares a `subject` source: an
+  ID-token claim (OIDC `sub`, unchanged) or a userinfo field namespaced by provider (`github:<id>`).
+  GitHub uses its immutable numeric `id`. A configured source that yields nothing refuses sign-in
+  with `subject_missing`. Custom `normalizePrincipal` mappers compose on `defaultPrincipal()` and
+  receive the flow's injected `fetch`.
 - **PKCE and OIDC by default** — every flow uses authorization-code with PKCE S256 and exact state
   validation; OIDC providers add nonce and ID-token validation.
 
@@ -102,6 +107,7 @@ const result = await backend.authenticate(request);
 | `./flow`                | `createKvOAuthFlow` — the interactive signIn/callback/signOut primitives                 |
 | `./cookies`             | Cookie header helpers (`buildCookieHeader`, `parseCookieHeader`, …)                      |
 | `./backend`, `./errors` | Backend composition and the `KvOAuthError` taxonomy                                      |
+| `./subject`             | `resolvePrincipalSubject` — stable subject from the ID token or provider userinfo        |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/auth-kv-oauth@<version>`](https://jsr.io/@netscript/auth-kv-oauth/doc)

@@ -37,24 +37,18 @@ import {
 import { MemoryKvAdapter } from '@netscript/kv';
 import { callback, me, session, signin, signout } from '../../services/src/routers/v1-handlers.ts';
 import { AuthServiceHandlerError } from '../../services/src/routers/v1-types.ts';
-import { authTestUrl } from '../testing/auth-fixtures.ts';
+import {
+  AUTH_TEST_PROVIDER_USER_ID,
+  AUTH_TEST_USERINFO_SUBJECT_ENV,
+  authTestUrl,
+  syntheticProviderFetch,
+} from '../testing/auth-fixtures.ts';
 import { principalForSession } from '../testing/auth-service-fixture.ts';
 
 Deno.test('kv-oauth handlers complete signin callback session me signout round-trip', async () => {
   const registry = await createInMemoryKvOAuthRegistry({
-    fetch: () =>
-      Promise.resolve(
-        new Response(
-          JSON.stringify({
-            access_token: 'access_test',
-            refresh_token: 'refresh_test',
-            token_type: 'Bearer',
-            expires_in: 3600,
-            scope: 'profile email',
-          }),
-          { headers: { 'content-type': 'application/json' } },
-        ),
-      ),
+    env: AUTH_TEST_USERINFO_SUBJECT_ENV,
+    fetch: syntheticProviderFetch(),
   });
 
   const started = await signin({ redirectTo: '/dashboard' }, {
@@ -80,7 +74,7 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
   });
   assertEquals(completed.completed, true);
   assert(completed.sessionId);
-  assertEquals(completed.subject, completed.sessionId);
+  assertEquals(completed.subject, `default:${AUTH_TEST_PROVIDER_USER_ID}`);
 
   const activeSession = await session({ sessionId: completed.sessionId }, { registry });
   assertEquals(activeSession.authenticated, true);
@@ -95,7 +89,7 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
   });
   assertEquals(currentUser.authenticated, true);
   assertEquals(currentUser.session?.id, completed.sessionId);
-  assertEquals(currentUser.user?.id, completed.sessionId);
+  assertEquals(currentUser.user?.id, completed.subject);
 
   const signedOut = await signout({ sessionId: completed.sessionId }, {
     registry,
@@ -119,19 +113,8 @@ Deno.test('auth handlers emit audit-safe telemetry attributes per operation', as
     subjectHashSalt: 'deployment_salt',
   });
   const registry = await createInMemoryKvOAuthRegistry({
-    fetch: () =>
-      Promise.resolve(
-        new Response(
-          JSON.stringify({
-            access_token: 'access_test',
-            refresh_token: 'refresh_test',
-            token_type: 'Bearer',
-            expires_in: 3600,
-            scope: 'profile email',
-          }),
-          { headers: { 'content-type': 'application/json' } },
-        ),
-      ),
+    env: AUTH_TEST_USERINFO_SUBJECT_ENV,
+    fetch: syntheticProviderFetch(),
   });
   const baseContext = {
     registry,
