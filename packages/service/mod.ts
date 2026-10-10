@@ -82,6 +82,7 @@ export type {
   AuthnOptions,
   AuthzOptions,
   ContractAuthorizerOptions,
+  ContractAuthorizerRawRoute,
   ServiceAuthPolicy,
   ServiceGuardedAuthPolicy,
   ServicePublicAuthPolicy,
@@ -98,7 +99,7 @@ export type {
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
 } from './src/auth/contract-policy.ts';
-export { createContractAuthorizer } from './src/auth/contract-authorizer.ts';
+export { createContractAuthorizer } from './src/auth/contract/contract-authorizer.ts';
 export type {
   AuthenticatorPort,
   AuthnRequest,
@@ -127,6 +128,13 @@ export {
   createRPCPlugins,
   type RPCHandlerConfig,
 } from './src/primitives/handlers.ts';
+
+export {
+  createBodyLimitMiddleware,
+  PAYLOAD_TOO_LARGE_ERROR,
+  type PayloadTooLargeResponse,
+  type ServiceBodyLimitOptions,
+} from './src/primitives/body-limit.ts';
 
 export {
   buildServiceRpcPath,
