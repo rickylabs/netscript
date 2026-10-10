@@ -65,10 +65,10 @@ export interface ActionMethod<
    */
   (
     props: ProcedureInput<TContract, TAction>,
-    ...request: ServiceRequestRest<TContext> extends [options?: infer TOptions]
-      ? [options?: QueryParams & TOptions]
-      : ServiceRequestRest<TContext> extends [options: infer TOptions]
-        ? [options: QueryParams & TOptions]
+    ...request: ServiceRequestRest<TContext> extends [options: infer TOptions]
+      ? [options: QueryParams & TOptions]
+      : ServiceRequestRest<TContext> extends [options?: infer TOptions]
+        ? [options?: QueryParams & TOptions]
       : never
   ): Promise<ProcedureOutput<TContract, TAction>>;
 
@@ -84,10 +84,10 @@ export interface ActionMethod<
   /** Prefetch this action in the background. */
   prefetch: (
     props: ProcedureInput<TContract, TAction>,
-    ...request: ServiceRequestRest<TContext> extends [options?: infer TOptions]
-      ? [options?: QueryParams & TOptions]
-      : ServiceRequestRest<TContext> extends [options: infer TOptions]
-        ? [options: QueryParams & TOptions]
+    ...request: ServiceRequestRest<TContext> extends [options: infer TOptions]
+      ? [options: QueryParams & TOptions]
+      : ServiceRequestRest<TContext> extends [options?: infer TOptions]
+        ? [options?: QueryParams & TOptions]
       : never
   ) => void;
 
@@ -114,19 +114,19 @@ export interface ActionMethod<
    */
   queryOptions: (
     props: ProcedureInput<TContract, TAction>,
-    ...request: ServiceRequestRest<TContext> extends [options?: infer TOptions]
-      ? [options?: ActionQueryOptions & TOptions]
-      : ServiceRequestRest<TContext> extends [options: infer TOptions]
-        ? [options: ActionQueryOptions & TOptions]
+    ...request: ServiceRequestRest<TContext> extends [options: infer TOptions]
+      ? [options: ActionQueryOptions & TOptions]
+      : ServiceRequestRest<TContext> extends [options?: infer TOptions]
+        ? [options?: ActionQueryOptions & TOptions]
       : never
   ) => QueryOptionsWithInitialData<ProcedureOutput<TContract, TAction>>;
 
   /** TanStack mutationOptions with typed mutationKey and mutationFn. */
   mutationOptions: (
-    ...request: ServiceRequestRest<TContext> extends [options?: infer TOptions]
-      ? [options?: ActionMutationOptions & TOptions]
-      : ServiceRequestRest<TContext> extends [options: infer TOptions]
-        ? [options: ActionMutationOptions & TOptions]
+    ...request: ServiceRequestRest<TContext> extends [options: infer TOptions]
+      ? [options: ActionMutationOptions & TOptions]
+      : ServiceRequestRest<TContext> extends [options?: infer TOptions]
+        ? [options?: ActionMutationOptions & TOptions]
       : never
   ) => MutationOptionsResult<
     ProcedureOutput<TContract, TAction>,
