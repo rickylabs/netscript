@@ -280,7 +280,7 @@ export function getMssqlConfigFromEnv(resourceName = 'MSSQL'): MssqlAdapterConfi
  *
  * // Or with connection string:
  * // MSSQLDB_URI=Server=localhost,1433;Database=mydb;...
- * const config = getMssqlConfig('MSSQLDB_URI');
+ * const connectionStringConfig = getMssqlConfig('MSSQLDB_URI');
  * ```
  */
 export function getMssqlConfig(connectionStringEnvVar = 'MSSQLDB_URI'): MssqlAdapterConfig {

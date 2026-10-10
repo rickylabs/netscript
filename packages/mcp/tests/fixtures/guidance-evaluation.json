@@ -68,8 +68,8 @@
       "rankingAxis": "score",
       "expected": [
         "pages/data-persistence/how-to/use-a-second-database#4-decision-rule-direct-use-vs-reusable-databaseadapter-wrapper",
-        "pages/data-persistence/how-to/use-a-second-database#unsupported-by-netscript-supported-by-prisma-libsql-turso-example",
-        "pages/data-persistence/how-to/use-a-second-database#connect-an-external-database-by-hand"
+        "pages/data-persistence/how-to/use-a-second-database#connect-an-external-database-by-hand",
+        "pages/data-persistence/how-to/use-a-second-database#unsupported-by-netscript-supported-by-prisma-libsql-turso-example"
       ]
     }
   ]

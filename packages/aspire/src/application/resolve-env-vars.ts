@@ -44,11 +44,11 @@ export type OtelMode = 'denoApp' | 'denoTask' | 'executable';
  * @example
  * ```ts
  * // For addDenoApp with WithDenoDefaults() — only 3 vars needed
- * const vars = buildOtelEnvVars('users', '1.0.0', 'denoApp');
+ * const denoAppVars = buildOtelEnvVars('users', '1.0.0', 'denoApp');
  * // { OTEL_DENO: "true", OTEL_SERVICE_NAME: "users", OTEL_RESOURCE_ATTRIBUTES: "service.version=1.0.0" }
  *
  * // For addExecutable — all 10 vars
- * const vars = buildOtelEnvVars('users', '1.0.0', 'executable');
+ * const executableVars = buildOtelEnvVars('users', '1.0.0', 'executable');
  * // { OTEL_DENO: "true", OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4318", ... }
  * ```
  */

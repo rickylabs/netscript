@@ -2362,16 +2362,25 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/plan.md`;
   issues #1378, #1545, and #1655; PR #1653.
 - **Created:** 2026-08-15.
-- **Status:** open, DEBT_ACCEPTED for PR #1653 only at the strict baseline of 20 `private-type-ref`
-  diagnostics across 13 export targets. This is a no-increase allowance, not a full-export lint
-  pass.
-- **Gate:** Until #1655 closes, the 13-target full-export audit may report at most the recorded 20
-  `private-type-ref` diagnostics and must report zero `missing-jsdoc` and zero other diagnostics.
-  Any increase or new diagnostic class is `FAIL_DEBT`. Closure requires that audit to exit 0 with
-  zero diagnostics while the scoped Workers publish dry-run and `quality:gate` remain green.
+- **Status:** open, DEBT_ACCEPTED with a ratcheted ceiling of 4 `private-type-ref` diagnostics
+  across the same 13 export targets. The earlier ceiling of 20 is historical and no longer allowed.
+- **Gate:** Until #1655 closes, allow only the four measured references on `./contracts`
+  (`./contracts/v1/mod.ts`): three to `WorkersContractDefinition` and one to upstream oRPC
+  `implement`. Require zero diagnostics on each of the other 12 export targets, zero
+  `missing-jsdoc`, and zero other diagnostic classes. Any additional reference, relocation to
+  another target, or new diagnostic class is `FAIL_DEBT`. Closure requires the full-export audit to
+  exit 0 with zero diagnostics while Workers publish dry-run and `quality:gate` remain green.
 - **Evidence:**
   `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-3/workers-doc-lint.json`
   records the exact baseline at signed Slice 2 head `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`.
+
+- **0.0.8 reconciliation (#2218):** The current main full-export baseline is 20; the type-only
+  vocabulary repair reduces the combined total to 4 across the same 13 targets. All 12 non-contract
+  targets are clean. The contract target retains three references to the precise
+  `WorkersContractDefinition` and one oRPC `implement` reference. This row remains open: exporting
+  the definition exposes its private route/schema graph, and the oRPC reference falls under doctrine
+  02's sanctioned boundary exception. Neither a zero-diagnostic claim nor closure of #1655 is
+  proven. Evidence is kept in the run record and PR #2218.
 
 ## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
 
@@ -2550,17 +2559,27 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   baseline.
 - **Gate:** F-7: all worker export doc-lint diagnostics zero.
 
+- **0.0.8 reconciliation (#2218):** Runtime and streams vocabulary is exported without type erasure.
+  The workers contract repair is still pending under #1655, so this zero-diagnostic closing gate
+  remains open; the earlier cancellation baseline does not authorize any growth.
+
 ## workers doctor export — unchanged module tag (`workers-doctor-module-baseline-2066`)
 
-- **Reason:** Existing public doctor.ts export lacks @module JSDoc; JSR audit FAIL F-JSR-2 is
-  identical on current main archive and this branch. No doctor source or publish shape changed in
-  the cancellation slice.
+- **Reason:** The historical cancellation baseline lacked `@module` JSDoc on public `doctor.ts`,
+  producing an unchanged F-JSR-2 failure. PR #2218 adds the tag and proves this module gate.
 - **Owner:** Workers plugin public-surface maintainers.
 - **Target:** Before the next stable workers release, no later than 2026-10-15.
 - **Linked plan:** `.llm/runs/fix-worker-job-cancellation--c2/plan.md`.
 - **Created:** 2026-10-08.
-- **Status:** open; independent evaluator must adjudicate unchanged baseline debt.
+- **Status:** closed by PR #2218: `doctor.ts` carries `@module`, and the plugin JSR audit passes.
 - **Gate:** F-JSR-2 module tag present and plugin JSR audit passes.
+
+- **Evidence (#2218):**
+  `deno run --allow-all .llm/tools/fitness/audit-jsr-package.ts --root
+  plugins/workers` exits 0
+  with zero FAIL findings. The module-documentation audit reports no F-JSR-2 finding. Existing
+  source-layout and slow-type warnings remain separate from this satisfied module-tag gate. Full
+  output is kept in the run record.
 
 ## workers-core source layout — required adapter directory (`workers-core-layout-2066`)
 

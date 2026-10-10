@@ -8,14 +8,13 @@ import {
 } from '../../mod.ts';
 import { verifyTriggersPlugin } from '../../verify-plugin.ts';
 
-Deno.test('triggersPlugin manifest exposes core dependencies, service, contract, config, and Aspire axes', () => {
+Deno.test('triggersPlugin manifest exposes service, contract, config, and Aspire axes without plugin dependencies', () => {
   assertEquals(triggersPlugin.name, '@netscript/plugin-triggers');
   assertEquals(triggersPlugin.version, TRIGGERS_PLUGIN_VERSION);
   assertEquals(triggersPlugin['type'], 'background-processor');
 
-  assert(triggersPlugin.dependencies?.workersCore);
-  assert(triggersPlugin.dependencies?.streamsCore);
-  assert(triggersPlugin.dependencies?.sagasCore);
+  // Core runtimes are deno.json imports, not plugins a host composes.
+  assertEquals(triggersPlugin.dependencies, undefined);
   assert(
     triggersPlugin.contributions.services?.some((service) =>
       service.name === TRIGGERS_API_SERVICE_NAME &&

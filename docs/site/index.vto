@@ -63,7 +63,7 @@ shapes; the handler and page remain application code, but their boundary types c
   {
     label: "2 · The service",
     lang: "ts",
-    code: "// services/users/src/routers/v1.ts\nimport { UsersV1 as usersContract } from '@my-app/contracts';\n\n// `input` is typed from the contract. The return value must\n// satisfy the contract's output schema — or it does not compile.\nexport const UsersV1 = {\n  list: usersContract.list.handler(async ({ input }) => {\n    const items = await listUsers({ limit: input.limit });\n    return { items };\n  }),\n};\n\n// services/users/src/main.ts\n// defineService() serves the router with OpenAPI, typed RPC,\n// health endpoints, and request logging wired in.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, { name: 'users', version: '1.0.0' });"
+    code: "// services/users/src/routers/v1.ts\nimport { UsersV1 as usersContract } from '@my-app/contracts';\n\n// `input` is typed from the contract. The return value must\n// satisfy the contract's output schema — or it does not compile.\nexport const UsersV1 = {\n  list: usersContract.list.handler(async ({ input }) => {\n    const items = await listUsers({ limit: input.limit });\n    return { items };\n  }),\n};\n\n// services/users/src/main.ts\n// defineService() serves the router with OpenAPI, typed RPC,\n// health endpoints, and request logging wired in.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, { auth: { public: true, reason: 'Public example service; add guards before exposing private data' }, name: 'users', version: '1.0.0' });"
   },
   {
     label: "3 · The page",
