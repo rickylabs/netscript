@@ -7,6 +7,7 @@ import {
 } from '@netscript/plugin-workers-core/runtime';
 import { isAbsolute, relative, resolve, SEPARATOR, toFileUrl } from '@std/path';
 import type { WorkerDispatchContext, WorkerJobResult } from './worker-options.ts';
+import { toSubprocessTraceOptions } from './subprocess-trace-context.ts';
 
 /** Execute a worker job with the correct runtime strategy. */
 export async function executeWorkerJob(
@@ -30,7 +31,7 @@ export async function executeWorkerJob(
       signal,
     );
   }
-  return await executePolyglotTask(context, jobDef, payload, signal, traceHeaders);
+  return await executePolyglotTask(context, jobDef, payload, signal, traceHeaders, correlationId);
 }
 
 async function executeDenoJob(
@@ -152,6 +153,7 @@ async function executePolyglotTask(
   payload: Record<string, unknown> | undefined,
   signal: AbortSignal,
   traceHeaders: Record<string, string>,
+  correlationId?: string,
 ): Promise<WorkerJobResult> {
   const entrypoint = resolveTaskEntrypoint(context, jobDef);
   const taskDef: TaskDefinition = {
@@ -183,8 +185,7 @@ async function executePolyglotTask(
   const execOptions: TaskExecutionOptions = {
     timeout: jobDef.timeout,
     signal,
-    traceparent: traceHeaders['traceparent'],
-    tracestate: traceHeaders['tracestate'],
+    ...toSubprocessTraceOptions(traceHeaders, correlationId),
     env: {
       JOB_ID: jobDef.id,
       JOB_PAYLOAD: payload ? JSON.stringify(payload) : '{}',

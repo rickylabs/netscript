@@ -13,7 +13,7 @@ export const AUTH_API_SERVICE_NAME = 'auth-api' as const;
  * @deprecated Not a runtime fallback; removed in 0.0.8 — see
  * "chore(plugins): remove deprecated default-port compatibility exports in 0.0.8".
  */
-export const AUTH_API_DEFAULT_PORT = 8094 as const;
+export const AUTH_API_DEFAULT_PORT = 8094 as const; // aspire-host-port-ok: deprecated compatibility export, never read at runtime
 
 /** Literal type for the auth plugin identifier. */
 export type AuthPluginId = typeof AUTH_PLUGIN_ID;
