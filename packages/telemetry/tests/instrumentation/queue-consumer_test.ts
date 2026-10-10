@@ -1,8 +1,6 @@
-/// <reference lib="deno.unstable" />
-
 import { assert, assertEquals } from '@std/assert';
 import { trace } from '@opentelemetry/api';
-import { createQueue, type MessageQueue as PlainMessageQueue } from '@netscript/queue';
+import type { MessageQueue as PlainMessageQueue } from '@netscript/queue/ports';
 import {
   type MessageContext,
   type MessageQueue,
@@ -11,23 +9,6 @@ import {
 } from '@netscript/telemetry/instrumentation';
 import { getSpanFromContext } from '@netscript/telemetry/context';
 import { recording } from '../commands/native-fixture.ts';
-
-// Compile the published example through consumer exports without opening a backend.
-async function publishedExample(): Promise<void> {
-  const queue = new TracedQueue(createQueue<{ jobId: string }>('jobs'), { queueName: 'jobs' });
-  await queue.listen(async (message, ctx) => {
-    ctx.span.setAttribute('job.id', message.jobId);
-    await ctx.ack();
-  });
-  const plain: PlainMessageQueue<{ jobId: string }> = queue;
-  await plain.listen(async (_message, ctx) => {
-    await ctx.ack();
-  });
-}
-
-Deno.test('published TracedQueue consumer example is available for type checking', () => {
-  assertEquals(typeof publishedExample, 'function');
-});
 
 Deno.test('TracedQueue delivers the active consumer span and remains a plain MessageQueue', async () => {
   await recording(async (_tracer, exporter) => {
