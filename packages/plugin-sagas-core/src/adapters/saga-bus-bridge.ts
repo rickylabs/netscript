@@ -110,11 +110,16 @@ export class SagaBusBridge implements SagaBusPort {
       return;
     }
 
-    await this.#handleAndDispatch(withPublishOptions(message, options));
+    await this.#handleAndDispatch(
+      withPublishOptions(message, options),
+      undefined,
+      new InstanceLedger(),
+    );
   }
 
   /** Dispatch cascaded messages through engine, scheduler, or compensator. */
   async dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void> {
+    const ledger = new InstanceLedger();
     for (const message of messages) {
       if (
         message.idempotencyKey &&
@@ -125,7 +130,7 @@ export class SagaBusBridge implements SagaBusPort {
           continue;
         }
       }
-      await this.#dispatchOne(message);
+      await this.#dispatchOne(message, undefined, ledger);
     }
   }
 
@@ -143,30 +148,29 @@ export class SagaBusBridge implements SagaBusPort {
     return this.#engine.query(dispatch);
   }
 
-  /**
-   * Dispatch one cascade and return the instance context the next sibling must run against.
-   * A compensation step, or a send handled by the same instance, moves it to a new state and
-   * version; every other cascade leaves it unchanged.
-   */
   async #dispatchOne(
     message: CascadedMessage,
-    compensation?: SagaCompensationRequest,
-  ): Promise<SagaCompensationRequest | undefined> {
+    compensation: SagaCompensationRequest | undefined,
+    ledger: InstanceLedger,
+  ): Promise<void> {
     switch (message.kind) {
       case 'send':
-        return await this.#dispatchSend(message, compensation);
+        await this.#dispatchSend(message, compensation, ledger);
+        return;
       case 'scheduled':
         await this.#dispatchScheduled(message, compensation);
-        return compensation;
+        return;
       case 'complete':
-        return compensation;
+        return;
       case 'fail':
-        return await this.#compensate(message, compensation);
+        await this.#compensate(message, compensation, ledger);
+        return;
       case 'compensate':
-        return await this.#compensate(message, compensation);
+        await this.#compensate(message, compensation, ledger);
+        return;
       case 'spawn':
         await this.#dispatchSpawn(message, compensation);
-        return compensation;
+        return;
       default:
         throw SagasError.notImplemented(
           `Unhandled saga cascade effect kind "${
@@ -176,14 +180,15 @@ export class SagaBusBridge implements SagaBusPort {
     }
   }
 
-  /** Handle one message and its cascades; returns each touched instance's settled context. */
+  /** Handle one message, record each resulting transition, then dispatch its cascades. */
   async #handleAndDispatch(
     message: SagaMessage,
-    correlationId?: string,
-  ): Promise<readonly SagaCompensationRequest[]> {
+    correlationId: string | undefined,
+    ledger: InstanceLedger,
+  ): Promise<void> {
     const results = await this.#engine.handle(message, { correlationId });
-    const settled: SagaCompensationRequest[] = [];
     for (const result of results) {
+      ledger.record(result.instanceId, result.state, result.version);
       const definition = this.#definitions.get(result.sagaId);
       if (!definition) {
         throw SagasError.sagaNotFound(result.sagaId);
@@ -199,25 +204,24 @@ export class SagaBusBridge implements SagaBusPort {
         instrumentation: this.#instrumentation,
         version: result.version,
       };
-      settled.push(await this.#dispatchSequence(result.cascaded, request));
+      await this.#dispatchSequence(result.cascaded, request, ledger);
     }
-    return settled;
   }
 
   /**
-   * Dispatch sibling cascades in order, threading the latest committed state and version so each
-   * compensation step commits against the instance its predecessor left (and so carries its own
-   * version-derived replay identity).
+   * Dispatch sibling cascades in order. Each one starts from its instance's latest entry in the
+   * ledger, so a compensation step commits against whatever an earlier sibling (or any cascade it
+   * reached, directly or through other sagas) left, and carries its own version-derived replay
+   * identity.
    */
   async #dispatchSequence(
     messages: readonly CascadedMessage[],
     context: SagaCompensationRequest,
-  ): Promise<SagaCompensationRequest> {
-    let current = context;
+    ledger: InstanceLedger,
+  ): Promise<void> {
     for (const message of messages) {
-      current = await this.#dispatchOne(message, current) ?? current;
+      await this.#dispatchOne(message, ledger.current(context), ledger);
     }
-    return current;
   }
 
   #usesAtomicReplay(messageType: string): boolean {
@@ -239,20 +243,22 @@ export class SagaBusBridge implements SagaBusPort {
 
   async #compensate(
     message: CascadedMessage<'fail' | 'compensate'>,
-    context?: SagaCompensationRequest,
-  ): Promise<SagaCompensationRequest> {
+    context: SagaCompensationRequest | undefined,
+    ledger: InstanceLedger,
+  ): Promise<void> {
     if (!this.#compensator) {
       throw SagasError.notImplemented(
         'compensation cascades require the compensator option.',
       );
     }
 
-    const request = context ?? await this.#resolveCompensation?.(message);
-    if (!request) {
+    const resolved = context ?? await this.#resolveCompensation?.(message);
+    if (!resolved) {
       throw SagasError.notImplemented(
         'externally dispatched compensation cascades require the resolveCompensation option.',
       );
     }
+    const request = ledger.current(resolved);
 
     const executionRequest: SagaCompensationRequest = {
       ...request,
@@ -281,18 +287,18 @@ export class SagaBusBridge implements SagaBusPort {
       throw error;
     }
     // A sagaFail without a matching branch ran nothing; its `failed` status is already persisted.
-    if (!result.compensated) return request;
+    if (!result.compensated) return;
 
     const commit = await this.#commitCompensation(request, {
       message: result.message,
       state: result.state,
       cascaded: result.cascaded,
     });
-    // A replayed outcome was dispatched when it was first committed; later siblings still advance
-    // past its version so their own replay identities line up with the original run.
-    if (commit?.committed === false) {
-      return { ...request, state: result.state, version: commit.version };
-    }
+    // Later siblings start past this step's version, so on a replay their own replay identities
+    // line up with the original run.
+    ledger.record(request.instanceId, result.state, commit?.version ?? request.version);
+    // A replayed outcome was dispatched when it was first committed.
+    if (commit?.committed === false) return;
 
     const nextRequest: SagaCompensationRequest = {
       ...request,
@@ -305,11 +311,11 @@ export class SagaBusBridge implements SagaBusPort {
       version: commit?.version,
     };
     // The branch's sagaFail is its persisted outcome; dispatching it would re-enter the branch.
-    const settled = await this.#dispatchSequence(
+    await this.#dispatchSequence(
       result.cascaded.filter((cascaded) => cascaded.kind !== 'fail'),
       nextRequest,
+      ledger,
     );
-    return { ...request, state: settled.state, version: settled.version };
   }
 
   /** Persist a compensation outcome through the engine; undefined when there is no version. */
@@ -330,8 +336,9 @@ export class SagaBusBridge implements SagaBusPort {
 
   async #dispatchSend(
     message: CascadedMessage<'send'>,
-    execution?: SagaCompensationRequest,
-  ): Promise<SagaCompensationRequest | undefined> {
+    execution: SagaCompensationRequest | undefined,
+    ledger: InstanceLedger,
+  ): Promise<void> {
     const span = this.#instrumentation?.startCascadeSendSpan({
       ...cascadeContext(execution),
       targetJobId: message.target.id,
@@ -342,16 +349,19 @@ export class SagaBusBridge implements SagaBusPort {
     });
     try {
       const child = span && this.#instrumentation?.spanContext(span);
-      const settled = await this.#handleAndDispatch({
-        type: message.target.id,
-        payload: message.payload,
-        idempotencyKey: message.idempotencyKey,
-        concurrencyKey: message.concurrencyKey,
-        traceparent: child?.traceparent,
-        tracestate: child?.tracestate,
-      }, execution?.correlationId);
+      await this.#handleAndDispatch(
+        {
+          type: message.target.id,
+          payload: message.payload,
+          idempotencyKey: message.idempotencyKey,
+          concurrencyKey: message.concurrencyKey,
+          traceparent: child?.traceparent,
+          tracestate: child?.tracestate,
+        },
+        execution?.correlationId,
+        ledger,
+      );
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.SUCCESS);
-      return advanceContext(execution, settled);
     } catch (error) {
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);
       throw error;
@@ -417,14 +427,24 @@ function withPublishOptions(message: SagaMessage, options: SagaPublishOptions): 
   });
 }
 
-/** Move a context to its instance's latest settled state when a dispatch touched that instance. */
-function advanceContext(
-  context: SagaCompensationRequest | undefined,
-  settled: readonly SagaCompensationRequest[],
-): SagaCompensationRequest | undefined {
-  if (!context) return undefined;
-  const latest = settled.findLast((item) => item.instanceId === context.instanceId);
-  return latest ? { ...context, state: latest.state, version: latest.version } : context;
+/**
+ * Latest committed state and version of every instance one synchronous dispatch tree touched.
+ * Scoped to a single `publish`/`dispatchCascaded` call, so it holds at most one entry per instance
+ * that call reached.
+ */
+class InstanceLedger {
+  readonly #entries = new Map<string, Readonly<{ state: SagaState; version?: number }>>();
+
+  /** Record the state and version a transition or compensation commit left an instance at. */
+  record(instanceId: string, state: SagaState, version: number | undefined): void {
+    this.#entries.set(instanceId, Object.freeze({ state, version }));
+  }
+
+  /** The context moved to its instance's latest recorded state and version. */
+  current(context: SagaCompensationRequest): SagaCompensationRequest {
+    const latest = this.#entries.get(context.instanceId);
+    return latest ? { ...context, state: latest.state, version: latest.version } : context;
+  }
 }
 
 function compensationMessage(
