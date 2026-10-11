@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
 import { DenoFileSystem } from '../../../../src/kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -131,10 +132,10 @@ Deno.test('missing memory record maps to typed NOT_FOUND with status 404', async
 `,
         );
       }
-      await deno(['task', 'check'], join(projectRoot, 'services/team-members'));
+      await check(['task', 'check'], join(projectRoot, 'services/team-members'));
       if (variant === 'memory') {
-        await deno(['task', 'check'], join(projectRoot, 'services/orders'));
-        await deno(['check', `apps/${projectName}-web/lib/orders.ts`], projectRoot);
+        await check(['task', 'check'], join(projectRoot, 'services/orders'));
+        await check(['check', `apps/${projectName}-web/lib/orders.ts`], projectRoot);
       }
       await deno(['task', 'test'], join(projectRoot, 'services/team-members'));
     } finally {
@@ -154,6 +155,14 @@ async function deno(args: string[], cwd: string): Promise<void> {
     stdout: 'piped',
     stderr: 'piped',
   }).output();
+  assertSuccess(output);
+}
+
+async function check(args: string[], cwd: string): Promise<void> {
+  assertSuccess(await checkGeneratedFiles({ args, cwd }));
+}
+
+function assertSuccess(output: Deno.CommandOutput): void {
   const decoder = new TextDecoder();
   assertEquals(
     output.code,

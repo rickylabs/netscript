@@ -1,5 +1,6 @@
 {{__slot0__}}
 
+import { registerInstallationSecret } from './installation-secret.mts';
 import { resolve } from 'node:path';
 import { parseAppSettings } from '{{__slot1__}}';
 import type { DistributedApplicationBuilder } from '{{__slot2__}}';
@@ -52,17 +53,24 @@ export async function createNetScriptAppHost(
     return;
   }
 
+  // Provision once before backend registration. Apps and tools never receive this identity.
+  const hasBackends = [config.Services, config.Plugins, config.BackgroundProcessors]
+    .some((entries) => Object.values(entries).some((entry) => entry.Enabled !== false));
+  const installationSecretFile = hasBackends
+    ? await registerInstallationSecret(builder, appHostDir)
+    : undefined;
+
   // 4. Register services
-  const services = await registerServices(builder, config, infrastructure, appHostDir);
+  const services = await registerServices(builder, config, infrastructure, appHostDir, installationSecretFile);
 
   // 5. Register plugins (two-pass: create all, then wire plugin→plugin refs)
-  const plugins = await registerPlugins(builder, config, infrastructure, services, appHostDir);
+  const plugins = await registerPlugins(builder, config, infrastructure, services, appHostDir, installationSecretFile);
 
   // 6. Wire service references after plugin APIs exist
   await wireServiceReferences(config, services, plugins);
 
   // 7. Register background processors
-  await registerBackgroundProcessors(builder, config, infrastructure, services, plugins, appHostDir);
+  await registerBackgroundProcessors(builder, config, infrastructure, services, plugins, appHostDir, installationSecretFile);
 
   // 8. Register applications
   await registerApps(builder, config, infrastructure, services, plugins, appHostDir);

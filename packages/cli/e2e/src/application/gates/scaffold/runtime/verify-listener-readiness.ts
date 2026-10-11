@@ -260,9 +260,27 @@ function findListenerResource(
   const resources = isRecord(topology) && Array.isArray(topology.resources)
     ? topology.resources
     : [];
-  return resources.find((candidate): candidate is Readonly<Record<string, unknown>> =>
-    isRecord(candidate) && resourceMatches(candidate, resourceName)
+  const expected = resourceName.toLowerCase();
+  // A whole-AppHost snapshot also contains postgres-cli and postgres-password.
+  // Their prefix is not the server's identity, regardless of snapshot order.
+  const exact = resources.find((candidate): candidate is Readonly<Record<string, unknown>> =>
+    isRecord(candidate) &&
+    ['displayName', 'name', 'resourceName'].some((key) =>
+      typeof candidate[key] === 'string' && candidate[key].toLowerCase() === expected
+    )
   );
+  if (exact) return exact;
+
+  // Older resource-scoped evidence may carry only an allocated physical name.
+  // An explicit, different displayName must never supply the requested reports.
+  const allocated = resources.filter((candidate): candidate is Readonly<Record<string, unknown>> =>
+    isRecord(candidate) && typeof candidate.displayName !== 'string' &&
+    resourceMatches(candidate, resourceName)
+  );
+  if (allocated.length > 1) {
+    throw new Error(`resource ${resourceName} has ambiguous allocated names`);
+  }
+  return allocated[0];
 }
 
 function parseListenerHealthReports(

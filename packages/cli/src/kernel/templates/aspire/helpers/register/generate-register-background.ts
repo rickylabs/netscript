@@ -132,13 +132,15 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     lines.push(
       `    const ${id} = builder.addExecutable(${
         JSON.stringify(name)
-      }, 'deno', ${id}_workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...${id}_perms, ${
+      }, 'deno', ${id}_workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...installationSecretPermissions(${id}_perms, installationSecretFile), ${
         JSON.stringify(entrypoint)
       }]);`,
     );
-    if (isSagasBackgroundResource(name, entrypoint)) {
+    // KV-backed Deno children share the child /health transport. Capability
+    // metadata survives renaming and does not depend on telemetry or plugin kind.
+    if (entry.Runtime === 'deno' && entry.RequiresKv) {
       lines.push(``);
-      lines.push(`    // Saga supervisor health endpoint and real Aspire probe.`);
+      lines.push(`    // Shared background child health endpoint and Aspire probe.`);
       lines.push(`    await ${id}.withHttpEndpoint({ env: 'PORT' });`);
       lines.push(
         `    await ${id}.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
@@ -164,6 +166,12 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         });`,
       );
     }
+
+    lines.push(`    if (installationSecretFile) {`);
+    lines.push(
+      `      await ${id}.withEnvironment('NETSCRIPT_INSTALLATION_SECRET_FILE', installationSecretFile);`,
+    );
+    lines.push(`    }`);
 
     // Telemetry env vars
     if (telemetry) {
@@ -295,8 +303,4 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
 
 function isTriggersBackgroundResource(name: string, entrypoint: string): boolean {
   return name === 'triggers' || entrypoint === 'triggers/runtime.ts';
-}
-
-function isSagasBackgroundResource(name: string, entrypoint: string): boolean {
-  return name === 'sagas' || entrypoint === 'sagas/runtime.ts';
 }

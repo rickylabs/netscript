@@ -496,6 +496,22 @@ if (import.meta.main) {
     check,
   );
   await writeOrCheckGeneratedAsset(
+    new URL(
+      '../../packages/cli/src/kernel/assets/generated/aspire/helpers/installation-secret.ts.template',
+      import.meta.url,
+    ),
+    await formatTypeScript(
+      '// @generated from adapters/secrets/installation-secret-file.ts. Do not edit.\n' +
+        await Deno.readTextFile(
+          new URL(
+            '../../packages/cli/src/kernel/adapters/secrets/installation-secret-file.ts',
+            import.meta.url,
+          ),
+        ),
+    ),
+    check,
+  );
+  await writeOrCheckGeneratedAsset(
     CLI_OUTPUT_URL,
     await formatTypeScript(await renderCliEmbeddedContent()),
     check,

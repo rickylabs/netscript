@@ -29,6 +29,7 @@ import {
   planOpenCodeConfig,
 } from './hosts/opencode-config.ts';
 import { mergeClaudeGuidance } from './hosts/claude-guidance.ts';
+import { cleanClaudeSkillMirrors } from './hosts/claude-skill-mirrors.ts';
 
 const START_MARKER = '<!-- netscript-agent:start -->';
 const END_MARKER = '<!-- netscript-agent:end -->';
@@ -174,7 +175,12 @@ export async function initAgent(
       ]),
     ];
     messages.push(
-      ...await legacyClaudeSkillWarnings(input.projectRoot, skillNames, dependencies.fs),
+      ...await cleanClaudeSkillMirrors(
+        input.projectRoot,
+        skillNames,
+        dependencies.fs,
+        changedFiles,
+      ),
     );
     await writeHostConfig(
       dependencies.fs,
@@ -256,19 +262,6 @@ export async function initAgent(
     );
   }
   return { hosts, resolution, changedFiles, messages };
-}
-
-async function legacyClaudeSkillWarnings(
-  projectRoot: string,
-  skillNames: readonly string[],
-  fs: AgentInitFileSystem,
-): Promise<string[]> {
-  const present = await Promise.all(
-    skillNames.map((name) => fs.exists(join(projectRoot, '.claude', 'skills', name))),
-  );
-  return skillNames.filter((_, index) => present[index]).map((name) =>
-    `Legacy .claude/skills/${name} is no longer refreshed; use the canonical .agents/skills/${name} through repo-skills. The legacy directory was preserved.`
-  );
 }
 
 async function hasAspireWorkflowSkills(

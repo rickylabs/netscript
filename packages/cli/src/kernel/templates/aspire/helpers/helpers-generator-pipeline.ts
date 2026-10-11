@@ -56,6 +56,11 @@ export class HelpersGeneratorPipeline {
       content: templates.aspireCompatTemplate,
     });
 
+    files.push({
+      path: SCAFFOLD_DIRS.HELPERS + '/installation-secret.mts',
+      content: templates.installationSecretTemplate,
+    });
+
     // 1. Tier 2: Configure dashboard (always generated)
     files.push(await this.renderConfigureDashboard(templates));
 
@@ -130,10 +135,12 @@ export class HelpersGeneratorPipeline {
 
     // 11. Tier 2: AppHost entry point (optional — default true)
     if (generateAppHost !== false) {
-      files.push(await this.renderAppHost(
-        configPath ?? `../${SCAFFOLD_FILES.APPSETTINGS}`,
-        templates,
-      ));
+      files.push(
+        await this.renderAppHost(
+          configPath ?? `../${SCAFFOLD_FILES.APPSETTINGS}`,
+          templates,
+        ),
+      );
     }
 
     return files;
@@ -224,7 +231,10 @@ export class HelpersGeneratorPipeline {
       ? await this.#templateAdapter.render(resolvedTemplates.apphostTemplate, vars)
       : renderSimple(resolvedTemplates.apphostTemplate, vars);
     if (imports?.prelude) {
-      content = content.replace('const builder = await createBuilder();', `${imports.prelude}\n\nconst builder = await createBuilder();`);
+      content = content.replace(
+        'const builder = await createBuilder();',
+        `${imports.prelude}\n\nconst builder = await createBuilder();`,
+      );
     }
 
     return {

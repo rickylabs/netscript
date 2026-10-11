@@ -8,6 +8,7 @@
  * This rationale lives here rather than in `deno.json` because the repo's publish-asset generator
  * parses that manifest as strict JSON, so a JSONC comment breaks `deno task check:publish-assets`.
  */
+import { checkGeneratedFiles } from '../../../../.llm/tools/testing/check-generated-files.ts';
 import { assert, assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from 'jsr:@std/path@^1';
 
@@ -32,7 +33,10 @@ async function run(
     stdout: 'piped',
     stderr: 'piped',
   }).output();
+  return commandResult(output);
+}
 
+function commandResult(output: Deno.CommandOutput): CommandResult {
   return {
     code: output.code,
     stdout: decoder.decode(output.stdout),
@@ -105,11 +109,12 @@ Deno.test('copied Markdown type-checks and renders directly through Preact', asy
     assertFalse('react' in imports);
     assertFalse('react-dom' in imports);
 
-    const check = await run(projectRoot, [
-      'check',
-      '--unstable-kv',
-      'components/ui/markdown.tsx',
-    ]);
+    const check = commandResult(
+      await checkGeneratedFiles({
+        cwd: projectRoot,
+        args: ['check', '--unstable-kv', 'components/ui/markdown.tsx'],
+      }),
+    );
     assertEquals(check.code, 0, check.stderr || check.stdout);
 
     const verifySource = [
@@ -214,12 +219,17 @@ export default function MarkdownHydrationPage() {
 `,
     );
 
-    const check = await run(dashboardRoot, [
-      'check',
-      '--unstable-kv',
-      'islands/MarkdownHydrationFixture.tsx',
-      'routes/markdown-hydration.tsx',
-    ]);
+    const check = commandResult(
+      await checkGeneratedFiles({
+        cwd: dashboardRoot,
+        args: [
+          'check',
+          '--unstable-kv',
+          'islands/MarkdownHydrationFixture.tsx',
+          'routes/markdown-hydration.tsx',
+        ],
+      }),
+    );
     assertEquals(check.code, 0, check.stderr || check.stdout);
 
     const buildArgs = ['task', 'build'] as const;
