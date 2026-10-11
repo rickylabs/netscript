@@ -11,6 +11,7 @@ import type {
 } from '../runtime/mod.ts';
 
 import {
+  isPrismaSagaStoreClient,
   PrismaSagaStore,
   type PrismaSagaStoreClient,
   SAGA_RUNTIME_CORRELATION_SELECTOR,
@@ -296,3 +297,33 @@ function compoundUniqueSelector(
   const explicitClientName = unique[2].match(/\bname\s*:\s*"([^"]+)"/);
   return explicitClientName?.[1] ?? fields.join('_');
 }
+
+Deno.test('isPrismaSagaStoreClient validates every canonical-store delegate method', () => {
+  assertEquals(isPrismaSagaStoreClient(new MemoryPrismaSagaClient()), true);
+  for (
+    const [delegate, methods] of [
+      ['sagaRuntimeState', [
+        'findUnique',
+        'findMany',
+        'create',
+        'upsert',
+        'updateMany',
+        'deleteMany',
+      ]],
+      ['sagaRuntimeTransition', ['findMany', 'create', 'deleteMany']],
+      ['sagaRuntimeCorrelation', ['findUnique', 'upsert', 'deleteMany']],
+    ] as const
+  ) {
+    for (const method of methods) {
+      const client = new MemoryPrismaSagaClient();
+      Reflect.deleteProperty(client[delegate], method);
+      assertEquals(isPrismaSagaStoreClient(client), false, `${delegate}.${method} is required`);
+    }
+  }
+  const client = new MemoryPrismaSagaClient();
+  Object.defineProperty(client, '$transaction', { value: undefined });
+  assertEquals(isPrismaSagaStoreClient(client), false);
+  for (const value of [null, [], {}, { sagaRuntimeState: {} }]) {
+    assertEquals(isPrismaSagaStoreClient(value), false);
+  }
+});
