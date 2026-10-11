@@ -23,9 +23,16 @@ export function aggregatePluginHealth(
   const observed = new Map(observations.map((resource) => [resource.name, resource]));
   return declarations.map((declaration) => {
     const apis = declaration.apiResources.map((name) => resourceHealth(name, observed.get(name)));
-    const children = declaration.childResources.map((name) =>
-      resourceHealth(name, observed.get(name))
-    );
+    const children = declaration.childResources.map((name) => {
+      const observation = observed.get(name);
+      return resourceHealth(
+        name,
+        observation && {
+          ...observation,
+          childHealthUnavailable: observation.childHealthUnavailable || !observation.childHealth,
+        },
+      );
+    });
     const status = apis.some((api) => api.status === 'unhealthy')
       ? 'unhealthy'
       : apis.some((api) => api.status === 'unknown')

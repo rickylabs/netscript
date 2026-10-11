@@ -8,6 +8,13 @@ const child = {
   state: 'Running',
   healthStatus: 'Healthy',
   healthReports: { http: {} },
+  childHealth: {
+    state: 'ready' as const,
+    registryReady: true,
+    dependencyReady: true,
+    restartCount: 0,
+    lastFatalError: null,
+  },
 };
 
 for (const field of ['registryReady', 'dependencyReady'] as const) {
@@ -27,6 +34,10 @@ for (const field of ['registryReady', 'dependencyReady'] as const) {
   });
 }
 Deno.test('aggregation never certifies wrapper-only or unsubstantiated readiness', () => {
+  assertEquals(
+    aggregatePluginHealth([declaration], [api, { ...child, childHealth: undefined }])[0]?.status,
+    'degraded',
+  );
   assertEquals(
     aggregatePluginHealth([declaration], [api, { ...child, childHealthUnavailable: true }])[0]
       ?.status,
