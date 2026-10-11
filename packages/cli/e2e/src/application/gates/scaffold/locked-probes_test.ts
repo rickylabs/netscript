@@ -9,30 +9,30 @@ Deno.test('scratch probe rejects npm requirement drift without rewriting its ref
       await Deno.readTextFile(new URL('../../../../../../../deno.lock', import.meta.url)),
     );
     // Keep the committed npm resolutions; this isolated fixture has no workspace members.
-    const specifier = 'npm:zod@^4.6.5';
+    const specifier = 'npm:@orpc/client@1.15.0';
     const version = committed.specifiers[specifier];
     const lock = {
       version: committed.version,
       specifiers: { [specifier]: version },
-      npm: { [`zod@${version}`]: committed.npm[`zod@${version}`] },
+      npm: committed.npm,
       workspace: { dependencies: [specifier] },
     };
     const lockPath = join(root, 'deno.lock');
     await Deno.writeTextFile(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
-    const config = { imports: { dependency: 'npm:zod@^4.6.5' } };
+    const config = { imports: { dependency: 'npm:@orpc/client@1.15.0' } };
     const configPath = join(root, 'deno.json');
     await Deno.writeTextFile(configPath, JSON.stringify(config));
     const probe = join(root, 'probe.ts');
     await Deno.writeTextFile(
       probe,
-      "import { z } from 'dependency'; z.string().parse('locked');\n",
+      "import 'dependency';\n",
     );
     const locked = await Deno.readTextFile(lockPath);
     await runLockedProbe([probe], root, root);
     assertEquals(await Deno.readTextFile(lockPath), locked);
-    // The exact npm requirement is absent from the reference lock. Frozen resolution must
+    // The newer exact npm requirement is absent from the reference lock. Frozen resolution must
     // reject it even when the registry/cache could satisfy it; no age-policy timing is involved.
-    config.imports.dependency = 'npm:zod@4.6.5';
+    config.imports.dependency = 'npm:@orpc/client@1.15.5';
     await Deno.writeTextFile(configPath, JSON.stringify(config));
     await assertRejects(
       () => runLockedProbe([probe], root, root),

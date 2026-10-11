@@ -40,22 +40,22 @@ Deno.test('reference lock guard checks scratch-probe entrypoints and rejects npm
     const committed = JSON.parse(
       await Deno.readTextFile(new URL('../../../deno.lock', import.meta.url)),
     );
-    const specifier = 'npm:zod@^4.6.5';
+    const specifier = 'npm:@orpc/client@1.15.0';
     const version = committed.specifiers[specifier];
     const lock = {
       version: committed.version,
       specifiers: { [specifier]: version },
-      npm: { [`zod@${version}`]: committed.npm[`zod@${version}`] },
+      npm: committed.npm,
       workspace: { dependencies: [specifier] },
     };
     const lockPath = join(reference, 'deno.lock');
     await Deno.writeTextFile(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
-    const config = { imports: { dependency: 'npm:zod@^4.6.5' } };
+    const config = { imports: { dependency: 'npm:@orpc/client@1.15.0' } };
     await Deno.writeTextFile(join(reference, 'deno.json'), JSON.stringify(config));
     await Deno.writeTextFile(join(reference, 'probe.ts'), "import 'dependency';\n");
     const locked = await Deno.readTextFile(lockPath);
     assertEquals(await checkReferenceLock(reference, ['probe.ts']), true);
-    config.imports.dependency = 'npm:zod@4.6.5';
+    config.imports.dependency = 'npm:@orpc/client@1.15.5';
     await Deno.writeTextFile(join(reference, 'deno.json'), JSON.stringify(config));
     assertEquals(await checkReferenceLock(reference, ['probe.ts']), false);
     assertEquals(await Deno.readTextFile(lockPath), locked);
