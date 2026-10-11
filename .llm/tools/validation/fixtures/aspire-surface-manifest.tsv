@@ -210,6 +210,7 @@ docs/site/reference/streams/index.md	doc:public-page	S11	prose sweep + #1000 ter
 docs/site/reference/triggers/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/workers/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/how-to/add-a-service.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/services-sdk/how-to/call-internal-procedures.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/how-to/discover-services.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/how-to/expose-openapi-scalar.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/sdk.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
