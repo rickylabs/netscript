@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 /**
  * @module infra/service/scaffolder_test
  *
@@ -316,12 +317,10 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       }),
     );
 
-    const checked = await new Deno.Command(Deno.execPath(), {
+    const checked = await checkGeneratedFiles({
       cwd: compileRoot,
       args: ['check', 'contracts/versions/v1/cycles.contract.ts'],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
   } finally {
     await Deno.remove(compileRoot, { recursive: true });

@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertNotEquals, assertStringIncludes } from '@std/assert';
 import { renderTemplateAssetSync } from '../../../../kernel/adapters/templates/template-asset.ts';
 import { TEMPLATE_KEYS } from '../../../../kernel/assets/manifest.ts';
@@ -73,12 +74,10 @@ export function createQueryFactories<
       }),
     );
 
-    const output = await new Deno.Command(Deno.execPath(), {
+    const output = await checkGeneratedFiles({
       cwd: root,
       args: ['check', '--unstable-kv', 'generated.ts'],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     return {
       code: output.code,
       stderr: new TextDecoder().decode(output.stderr),

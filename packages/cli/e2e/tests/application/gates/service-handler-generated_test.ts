@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
 import { DenoFileSystem } from '../../../../src/kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -148,12 +149,14 @@ async function cli(args: string[]): Promise<void> {
 }
 
 async function deno(args: string[], cwd: string): Promise<void> {
-  const output = await new Deno.Command(Deno.execPath(), {
-    args,
-    cwd,
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
+  const output = args[0] === 'check' || (args[0] === 'task' && args[1] === 'check')
+    ? await checkGeneratedFiles({ args, cwd })
+    : await new Deno.Command(Deno.execPath(), {
+      args,
+      cwd,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
   const decoder = new TextDecoder();
   assertEquals(
     output.code,

@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../.llm/tools/testing/check-generated-files.ts';
 /**
  * Capability contract for `deno task test` in this package.
  *
@@ -26,12 +27,14 @@ async function run(
   cwd: string,
   args: readonly string[],
 ): Promise<CommandResult> {
-  const output = await new Deno.Command(Deno.execPath(), {
-    args: [...args],
-    cwd,
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
+  const output = args[0] === 'check'
+    ? await checkGeneratedFiles({ args, cwd })
+    : await new Deno.Command(Deno.execPath(), {
+      args: [...args],
+      cwd,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
 
   return {
     code: output.code,

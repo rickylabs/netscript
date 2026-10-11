@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../.llm/tools/testing/check-generated-files.ts';
 import { assert, assertEquals, assertFalse } from '@std/assert';
 
 const PRIVATE_ADAPTER_NAMES = [
@@ -79,7 +80,9 @@ async function runCommand(
 }
 
 function runDeno(args: readonly string[], cwd?: string): Promise<Deno.CommandOutput> {
-  return runCommand(Deno.execPath(), args, cwd);
+  return args[0] === 'check'
+    ? checkGeneratedFiles({ args, cwd })
+    : runCommand(Deno.execPath(), args, cwd);
 }
 
 function outputText(output: Deno.CommandOutput): string {
