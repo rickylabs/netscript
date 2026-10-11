@@ -57,7 +57,9 @@ async function main(projectRoot: string): Promise<void> {
         ),
       );
       console.info(
-        `Generated workers concurrency PASS: declared=${entry.Concurrency}, observed=${entry.Concurrency}`,
+        `Generated workers concurrency PASS: declared=${entry.Concurrency}, observed=${
+          span.attributes[WorkerAttributes.WORKER_CONCURRENCY]
+        }`,
       );
       return;
     } catch (error) {

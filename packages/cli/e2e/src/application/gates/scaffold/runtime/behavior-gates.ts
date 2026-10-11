@@ -219,6 +219,22 @@ export function createRuntimeBehaviorGates(
       (context) => pluginProbeCommand(context, 'workers-api', 'workers-executions'),
     ),
     commandGate(
+      GATE.BEHAVIOR_WORKERS_CONCURRENCY,
+      'Prove generated worker concurrency through completed job telemetry',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-all',
+        '--unsafely-ignore-certificate-errors=localhost',
+        new URL('../verify-workers-concurrency.ts', import.meta.url).pathname,
+        context.project.projectRoot,
+      ],
+      undefined,
+      'capture',
+      'The generated background worker did not report its declared concurrency; no manual environment override is permitted.',
+    ),
+    commandGate(
       GATE.BEHAVIOR_SAGAS_HEALTH,
       'Sagas API health',
       GATE_PHASE.BEHAVIOR,
