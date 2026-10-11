@@ -262,9 +262,13 @@ is cooperative around completion; the supplied producer retains lifecycle and pe
 | `CommandOutboxSink`             | interface  | Service-owned documented acceptance boundary.        |
 | `CommandOutboxAcceptance`       | type alias | Service-owned normalized identity/time.              |
 
-## Discovery metadata
+## Exports: discovery metadata
 
 The `@netscript/plugin-streams-core/discovery` entrypoint (`./src/builders/discovery.ts`) exports
 `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns through the plugin SDK
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
+
+| Export specifier                           | Module                        |
+| ------------------------------------------ | ----------------------------- |
+| `@netscript/plugin-streams-core/discovery` | `./src/builders/discovery.ts` |

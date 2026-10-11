@@ -277,9 +277,13 @@ state remains configuration. Existing terminal records written without TTL need 
 policy applies when records are written or their status changes. Runtime/backend expiry does not
 depend on an API read or a phone/web app being open.
 
-## Discovery metadata
+## Exports: discovery metadata
 
 The `@netscript/plugin-triggers-core/discovery` entrypoint (`./src/builders/discovery.ts`) exports
 `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns through the plugin SDK
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
+
+| Export specifier                            | Module                        |
+| ------------------------------------------- | ----------------------------- |
+| `@netscript/plugin-triggers-core/discovery` | `./src/builders/discovery.ts` |

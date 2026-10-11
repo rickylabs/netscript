@@ -298,9 +298,13 @@ Terminal records written before the retention policy was installed still need a 
 This leaf proves new scoped delayed-message cancellation; legacy saga/trigger terminal-family
 backfill and legacy delayed messages remain separate acceptance scope for issue #2109.
 
-## Discovery metadata
+## Exports: discovery metadata
 
 The `@netscript/plugin-sagas-core/discovery` entrypoint (`./src/builders/discovery.ts`) exports
 `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns through the plugin SDK
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
+
+| Export specifier                         | Module                        |
+| ---------------------------------------- | ----------------------------- |
+| `@netscript/plugin-sagas-core/discovery` | `./src/builders/discovery.ts` |

@@ -222,9 +222,13 @@ records and open executions are preserved. This endpoint also removes legacy exe
 written without TTL; normal new-record expiry is performed by the KV backend and needs no app
 session. Job/task definitions remain configuration rather than expiring execution history.
 
-## Discovery metadata
+## Exports: discovery metadata
 
 The `@netscript/plugin-workers-core/discovery` entrypoint (`./src/builders/discovery.ts`) exports
 `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns through the plugin SDK
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
+
+| Export specifier                           | Module                        |
+| ------------------------------------------ | ----------------------------- |
+| `@netscript/plugin-workers-core/discovery` | `./src/builders/discovery.ts` |
