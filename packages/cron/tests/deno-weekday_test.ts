@@ -58,8 +58,8 @@ Deno.test('native Deno registration accepts EVERY_WEEK with translation and reje
 });
 
 Deno.test('Deno adapter uses native OR preview and reports native OR after trigger', async () => {
-  using time = new FakeTime('2026-10-11T10:17:43Z');
-  using cron = stub(Deno, 'cron', () => Promise.resolve());
+  using _time = new FakeTime('2026-10-11T10:17:43Z');
+  using _cron = stub(Deno, 'cron', () => Promise.resolve());
   const scheduler = new DenoCronAdapter();
   try {
     const job = await scheduler.schedule('either-day', '* * 1 * 0', () => {});
