@@ -107,7 +107,7 @@ Deno.test('CLI makes non-test process failures structurally visible', async () =
   }
 });
 
-Deno.test('CLI attributes the deliberate duplicate typed-queue DLQ invariant failure', async () => {
+Deno.test('CLI attributes the reconstructed historical typed-queue DLQ invariant failure', async () => {
   const root = await Deno.makeTempDir({ prefix: 'typed-dlq-control-' });
   try {
     const fixture = join(root, 'duplicate-dlq_test.ts');
@@ -116,16 +116,16 @@ Deno.test('CLI attributes the deliberate duplicate typed-queue DLQ invariant fai
       '../../packages/queue/tests/_fixtures/typed-dlq.ts',
       import.meta.url,
     ).href;
+    const historicalModule = new URL(
+      '../../packages/queue/tests/_fixtures/historical-typed-dlq.ts',
+      import.meta.url,
+    ).href;
     await Deno.writeTextFile(
       fixture,
       [
         `import { typedDlqRedelivery } from ${JSON.stringify(fixtureModule)};`,
-        "Deno.test('duplicate DLQ negative control', () => typedDlqRedelivery('memory', (store) => ({",
-        '  append: (record) => store.append({ ...record, messageId: crypto.randomUUID() }),',
-        '  list: (options) => store.list(options),',
-        '  depth: () => store.depth(),',
-        '  reprocess: (enqueue, options) => store.reprocess(enqueue, options),',
-        '})));',
+        `import { createHistoricalTypedDlqStore } from ${JSON.stringify(historicalModule)};`,
+        "Deno.test('historical DLQ negative control', () => typedDlqRedelivery('memory', createHistoricalTypedDlqStore));",
       ].join('\n'),
     );
     const output = await new Deno.Command(Deno.execPath(), {
@@ -154,13 +154,13 @@ Deno.test('CLI attributes the deliberate duplicate typed-queue DLQ invariant fai
     assertEquals(report.processFailure, undefined);
     const failure = report.failures[0];
     assertEquals(failure.count, 1);
-    assertEquals(failure.tests[0].name, 'duplicate DLQ negative control');
+    assertEquals(failure.tests[0].name, 'historical DLQ negative control');
     assertEquals(
       failure.tests[0].file.endsWith('duplicate-dlq_test.ts'),
       true,
       JSON.stringify(failure),
     );
-    assertEquals(failure.tests[0].line, 2);
+    assertEquals(failure.tests[0].line, 3);
     assertEquals(failure.message.includes('one terminal record per message'), true);
     assertEquals(failure.message.includes('-   2\n+   1'), true);
   } finally {
