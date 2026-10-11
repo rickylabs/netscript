@@ -678,7 +678,8 @@ Deno.test('PluginWorkspaceMutator keeps package id separate from the instance na
   );
 });
 
-Deno.test('PluginWorkspaceMutator writes saga store backend appsettings for saga plugins', async () => {
+for (const backend of [undefined, 'kv', 'prisma'] as const) {
+Deno.test(`PluginWorkspaceMutator aligns DB-enabled saga projection with ${backend ?? 'default'} store`, async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
     '/project/appsettings.json',
@@ -704,25 +705,28 @@ Deno.test('PluginWorkspaceMutator writes saga store backend appsettings for saga
       serviceConfigKey: 'sagas-api',
     },
     sagaProvider,
-    { sagaStoreBackend: 'prisma' },
+    { requiresDb: true, sagaStoreBackend: backend },
   );
 
   const config = JSON.parse(await fs.readFile('/project/appsettings.json')) as {
     NetScript: {
-      Plugins: Record<string, { Sagas?: unknown }>;
-      BackgroundProcessors: Record<string, { Sagas?: unknown }>;
+      Plugins: Record<string, { RequiresDb: boolean; Sagas?: unknown }>;
+      BackgroundProcessors: Record<string, { RequiresDb: boolean; Sagas?: unknown }>;
     };
   };
 
+  assertEquals(config.NetScript.Plugins['sagas-api'].RequiresDb, true);
+  assertEquals(config.NetScript.BackgroundProcessors.sagas.RequiresDb, true);
   assertEquals(config.NetScript.Plugins['sagas-api'].Sagas, {
-    Store: { Backend: 'prisma' },
-    Projection: { Backend: 'prisma' },
+    Store: { Backend: backend ?? 'kv' },
+    Projection: { Backend: backend ?? 'kv' },
   });
   assertEquals(config.NetScript.BackgroundProcessors.sagas.Sagas, {
-    Store: { Backend: 'prisma' },
-    Projection: { Backend: 'prisma' },
+    Store: { Backend: backend ?? 'kv' },
+    Projection: { Backend: backend ?? 'kv' },
   });
 });
+}
 
 Deno.test('PluginWorkspaceMutator provisions shared Garnet cache when missing', async () => {
   const fs = new MemoryFileSystemAdapter();

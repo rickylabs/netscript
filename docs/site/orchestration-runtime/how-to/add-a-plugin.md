@@ -177,8 +177,11 @@ helpers to correct existing DB-dependent metadata. Preserve your user-owned conf
 samples when applying the generated changes. For existing saga entries without a projection
 selector, the query backend follows `Sagas.Store.Backend` (or `NETSCRIPT_SAGA_STORE`), defaulting
 to KV when neither is set. Select `prisma` explicitly when relational query storage is required;
-select `kv` on both entries when using `--no-db`. A new DB-enabled saga install emits a Prisma
-projection; a new `--no-db` saga install emits a KV projection.
+select `kv` on both entries when using `--no-db`. New saga installs default the projection to the
+selected store backend, which defaults to KV. A DB-enabled install can use KV queries: database
+availability alone does not imply that the host Prisma client contains saga models. To use a Prisma
+projection, provision the saga models and regenerate the host client before selecting `prisma` on
+both entries.
 
 These install and runner paths have focused tests. The complete KV-only generated runtime across
 workers, sagas, and triggers is a separate release acceptance gate.

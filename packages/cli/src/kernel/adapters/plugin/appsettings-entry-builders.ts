@@ -206,6 +206,6 @@ function applySagaStoreBackend(
   };
   mutable.Sagas = {
     Store: { Backend: backend ?? 'kv' },
-    Projection: { Backend: entry.RequiresDb ? 'prisma' : 'kv' },
+    Projection: { Backend: backend ?? 'kv' },
   };
 }
