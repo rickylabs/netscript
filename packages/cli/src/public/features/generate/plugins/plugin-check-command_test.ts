@@ -302,3 +302,19 @@ Deno.test('plugin check freezes a configured consumer lock and never repairs an 
     assertEquals(await snapshot(root), before);
   });
 });
+
+Deno.test('plugin check detects edits to an existing AI source that change generator selection', async () => {
+  await withProject(async (root) => {
+    await write(root, 'ai/tools/custom.ts', 'export function helper() { return {}; }\n');
+    const before = await snapshot(root);
+    const report = await inspect(root);
+    assertEquals(report.status, 'drift');
+    assert(
+      report.drift.some((finding) =>
+        finding.path === '.netscript/generated/plugin-ai/tools.registry.ts' &&
+        finding.kind === 'extra'
+      ),
+    );
+    assertEquals(await snapshot(root), before);
+  }, ['ai']);
+});
