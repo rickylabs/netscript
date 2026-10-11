@@ -118,6 +118,11 @@ async function registryLeaves(projectRoot: string): Promise<readonly string[]> {
     try {
       for await (const entry of Deno.readDir(join(projectRoot, path))) {
         if (++count > 4096) throw new Error('Plugin registry scan capacity exceeded.');
+        // The plugin SDK emitter also writes axis registries beside these producer directories.
+        if (
+          path === '.netscript/generated' &&
+          (!entry.name.startsWith('plugin-') || (!entry.isDirectory && !entry.isSymlink))
+        ) continue;
         const child = `${path}/${entry.name}`;
         if (entry.isSymlink) throw new Error('Linked registry has no generated ownership.');
         if (entry.isDirectory) pending.push(child);

@@ -1,5 +1,4 @@
 import { join } from '@std/path';
-import { parse as parseJsonc } from '@std/jsonc';
 import type {
   RenderedPluginRegistry,
   RenderPluginRegistries,
@@ -51,6 +50,7 @@ export function createInstalledRuntimeRegistryRenderer(
           resolved,
           manifest,
           dependencies,
+          ['--no-lock'],
         ),
       );
       if (rendered.length > MAX_OUTPUTS) throw new Error('Plugin output capacity exceeded.');
@@ -66,6 +66,7 @@ export async function renderRuntimeRegistryPlan(
   resolved: ResolvedRuntimeManifest,
   manifest: RuntimeRegistryManifest,
   dependencies: InstalledRuntimeRegistryGeneratorDependencies,
+  lockArgs: readonly string[],
 ): Promise<readonly RenderedPluginRegistry[]> {
   const generator = manifest.runtimeRegistryGenerator;
   if (!generator || generator.inspectionProtocol !== 2) {
@@ -101,7 +102,7 @@ export async function renderRuntimeRegistryPlan(
     'run',
     '--config',
     join(projectRoot, 'deno.json'),
-    ...await inspectionLockArgs(projectRoot, dependencies),
+    ...lockArgs,
     '--no-prompt',
     '--allow-read',
     '--deny-write',
@@ -129,7 +130,7 @@ export async function renderRuntimeRegistryPlan(
       }`,
     );
   }
-  if (result.stdout.length > MAX_CONTENT) {
+  if (new TextEncoder().encode(result.stdout).byteLength > MAX_CONTENT) {
     throw new Error('Plugin inspection response capacity exceeded.');
   }
   const document = strictRecord(JSON.parse(result.stdout), ['inspectionProtocol', 'registries']);
@@ -154,7 +155,8 @@ export async function renderRuntimeRegistryPlan(
     if (
       !Array.isArray(entry.sourceFiles) || entry.sourceFiles.length > MAX_SOURCES ||
       (entry.content !== null &&
-        (typeof entry.content !== 'string' || entry.content.length > MAX_CONTENT))
+        (typeof entry.content !== 'string' ||
+          new TextEncoder().encode(entry.content).byteLength > MAX_CONTENT))
     ) {
       throw new Error('Invalid plugin rendered content or source evidence.');
     }
@@ -183,7 +185,8 @@ export async function renderRuntimeRegistryPlan(
 
 /** Reserved registry namespace; authored authorities cannot be claimed by a producer. */
 export function isPluginOutputPath(path: string): boolean {
-  return isProjectPath(path) && /^\.netscript\/generated\/[^/]+\/.+\.(?:ts|mts|js|mjs)$/.test(path);
+  return isProjectPath(path) &&
+    /^\.netscript\/generated\/plugin-[^/]+\/.+\.(?:ts|mts|js|mjs)$/.test(path);
 }
 
 /** Canonical relative paths avoid traversal, URLs, Windows aliases and case ambiguity. */
@@ -216,7 +219,7 @@ export async function canonicalizePluginOutputs(
     }
     paths.add(file.path.toLowerCase());
     if (file.content === null) continue;
-    if ((size += file.content.length) > MAX_CONTENT) {
+    if ((size += new TextEncoder().encode(file.content).byteLength) > MAX_CONTENT) {
       throw new Error('Plugin content capacity exceeded.');
     }
     selected.push({ ...file, content: pluginSurfaceMarker(file.plugin) + file.content });
@@ -237,18 +240,4 @@ function strictRecord(value: unknown, keys: readonly string[]): Record<string, u
     Object.keys(record).length !== keys.length || !keys.every((key) => Object.hasOwn(record, key))
   ) throw new Error('Invalid plugin inspection fields.');
   return record;
-}
-
-async function inspectionLockArgs(
-  projectRoot: string,
-  dependencies: InstalledRuntimeRegistryGeneratorDependencies,
-): Promise<readonly string[]> {
-  const config = parseJsonc(
-    await dependencies.fs.readFile(join(projectRoot, 'deno.json')),
-  ) as Record<string, unknown>;
-  if (config.lock === false) return ['--no-lock'];
-  const path = typeof config.lock === 'string' ? config.lock : 'deno.lock';
-  if (!isProjectPath(path)) throw new Error('Invalid consumer lock path.');
-  await rejectInspectionLinks(projectRoot, path);
-  return await dependencies.fs.exists(join(projectRoot, path)) ? ['--frozen'] : ['--no-lock'];
 }

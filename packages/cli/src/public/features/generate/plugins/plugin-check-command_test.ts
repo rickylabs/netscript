@@ -53,7 +53,11 @@ async function snapshot(root: string) {
   }
   return files;
 }
-async function withProject(run: (root: string) => Promise<void>, plugins = ['triggers']) {
+async function withProject(
+  run: (root: string) => Promise<void>,
+  plugins = ['triggers'],
+  prepare?: (root: string) => Promise<void>,
+) {
   const root = await Deno.makeTempDir();
   try {
     const rootConfig = JSON.parse(await Deno.readTextFile(join(REPO, 'deno.json')));
@@ -107,6 +111,7 @@ async function withProject(run: (root: string) => Promise<void>, plugins = ['tri
       'export default { descriptor: { name: "custom" }, schema: {}, execute: async () => ({}) };\n',
     );
     await write(root, 'ai/agents/custom.ts', 'export default () => ({});\n');
+    await prepare?.(root);
     const generated = await command(root, false);
     assertEquals(generated.code, 0, new TextDecoder().decode(generated.stderr));
     await run(root);
@@ -280,7 +285,9 @@ for (
 Deno.test('plugin check excludes skipped AI targets and inventories only bytes generation writes', async () => {
   await withProject(async (root) => {
     await Deno.remove(join(root, 'ai/agents/custom.ts'));
-    await Deno.remove(join(root, '.netscript/generated/plugin-ai/agents.registry.ts'));
+    const stale = await inspect(root);
+    assertEquals(stale.status, 'drift');
+    assertEquals((await command(root, false)).code, 0);
     const before = await snapshot(root);
     const report = await inspect(root);
     assertEquals(report.status, 'current');
@@ -292,19 +299,47 @@ Deno.test('plugin check excludes skipped AI targets and inventories only bytes g
   }, ['ai']);
 });
 
-Deno.test('plugin check freezes a configured consumer lock and never repairs an outdated lock', async () => {
-  await withProject(async (root) => {
-    const config = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
-    config.lock = 'consumer.lock';
-    await write(root, 'deno.json', JSON.stringify(config));
-    await write(root, 'consumer.lock', '{"version":"5","specifiers":{}}\n');
-    const before = await snapshot(root);
-    const report = await inspect(root);
-    assertEquals(report.status, 'inspection-failure');
-    assert(report.drift.some((finding) => finding.message?.includes('lockfile is out of date')));
-    assertEquals(await snapshot(root), before);
+for (const lock of ['deno.lock', 'consumer.lock']) {
+  Deno.test(`plugin generation extends a real app lock (${lock}) and check leaves it unchanged`, async () => {
+    let appLock = '';
+    await withProject(
+      async (root) => {
+        const generatedLock = await Deno.readTextFile(join(root, lock));
+        assert(generatedLock !== appLock, 'normal generation must resolve its graph into the lock');
+        const graph = JSON.parse(generatedLock).specifiers;
+        assert(Object.keys(graph).some((key) => key.startsWith('jsr:@std/fs@')));
+        const before = await snapshot(root);
+        assertEquals((await inspect(root)).status, 'current');
+        assertEquals(await snapshot(root), before);
+      },
+      ['workers'],
+      async (root) => {
+        const config = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+        config.lock = lock;
+        await write(root, 'deno.json', JSON.stringify(config));
+        await write(root, 'app.ts', 'import { assert } from "@std/assert"; assert(true);\n');
+        const cached = await new Deno.Command(Deno.execPath(), {
+          args: ['cache', '--config', join(root, 'deno.json'), join(root, 'app.ts')],
+          cwd: root,
+          stdout: 'piped',
+          stderr: 'piped',
+        }).output();
+        assertEquals(cached.code, 0, new TextDecoder().decode(cached.stderr));
+        appLock = await Deno.readTextFile(join(root, lock));
+        assert(
+          !Object.keys(JSON.parse(appLock).specifiers).some((key) =>
+            key.startsWith('jsr:@std/fs@')
+          ),
+        );
+        const before = await snapshot(root);
+        const report = await inspect(root);
+        assertEquals(report.status, 'drift');
+        assert(report.drift.every((finding) => finding.kind === 'missing'));
+        assertEquals(await snapshot(root), before);
+      },
+    );
   });
-});
+}
 
 Deno.test('plugin check detects edits to an existing AI source that change generator selection', async () => {
   await withProject(async (root) => {
@@ -319,7 +354,83 @@ Deno.test('plugin check detects edits to an existing AI source that change gener
       ),
     );
     assertEquals(await snapshot(root), before);
+    assertEquals((await command(root, false)).code, 0);
+    assertEquals((await inspect(root)).status, 'current');
+    await assertMissing(root, '.netscript/generated/plugin-ai/tools.registry.ts');
   }, ['ai']);
+});
+
+async function assertMissing(root: string, path: string) {
+  let missing = false;
+  try {
+    await Deno.lstat(join(root, path));
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+    missing = true;
+  }
+  assert(missing, 'inactive producer-owned output should be removed');
+}
+
+Deno.test('plugin generation removes the last workers registry when its source disappears', async () => {
+  await withProject(async (root) => {
+    await Deno.remove(join(root, 'workers/jobs/custom.ts'));
+    assertEquals((await inspect(root)).status, 'drift');
+    assertEquals((await command(root, false)).code, 0);
+    await assertMissing(root, '.netscript/generated/plugin-workers/job-registry.ts');
+    const before = await snapshot(root);
+    assertEquals((await inspect(root)).status, 'current');
+    assertEquals(await snapshot(root), before);
+  }, ['workers']);
+});
+
+for (
+  const content of [
+    'export const authored = true;\n',
+    '// @netscript-generated public.generate.plugins:@acme/other\nexport {};\n',
+  ]
+) {
+  Deno.test(`plugin generation preserves inactive target with foreign ownership (${content.split('\n')[0]})`, async () => {
+    await withProject(async (root) => {
+      const path = '.netscript/generated/plugin-ai/tools.registry.ts';
+      await write(root, 'ai/tools/custom.ts', 'export function helper() {}\n');
+      await write(root, path, content);
+      assertEquals((await command(root, false)).code, 0);
+      assertEquals(await Deno.readTextFile(join(root, path)), content);
+      const before = await snapshot(root);
+      assertEquals((await inspect(root)).status, 'drift');
+      assertEquals(await snapshot(root), before);
+    }, ['ai']);
+  });
+}
+
+Deno.test('plugin check excludes SDK axis registries but still detects removed plugin producers', async () => {
+  await withProject(async (root) => {
+    await write(root, '.netscript/generated/jobs.registry.ts', 'export {};\n');
+    await write(root, '.netscript/generated/plugin-jobs.registry.ts', 'export {};\n');
+    const before = await snapshot(root);
+    assertEquals((await inspect(root)).status, 'current');
+    assertEquals(await snapshot(root), before);
+    await write(root, '.netscript/generated/plugin-removed/stale.registry.ts', 'export {};\n');
+    const report = await inspect(root);
+    assertEquals(report.status, 'drift');
+    assertEquals(report.drift, [{
+      path: '.netscript/generated/plugin-removed/stale.registry.ts',
+      kind: 'extra',
+    }]);
+  });
+});
+
+Deno.test('plugin generation and check both reject missing installed runtime manifests', async () => {
+  await withProject(async (root) => {
+    await replaceProducer(root, {}, '');
+    await Deno.remove(join(root, 'plugins/custom/scaffold.runtime.json'));
+    const before = await snapshot(root);
+    const generated = await command(root, false);
+    assertEquals(generated.code, 1);
+    assertMatch(new TextDecoder().decode(generated.stderr), /Missing runtime manifest/);
+    assertEquals((await inspect(root)).status, 'inspection-failure');
+    assertEquals(await snapshot(root), before);
+  });
 });
 
 for (const entrypoint of [null, './plugins/custom/mod.ts']) {

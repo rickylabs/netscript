@@ -21,6 +21,7 @@ import {
   canonicalizePluginOutputs,
   renderRuntimeRegistryPlan,
 } from './plugin-registry-renderer.ts';
+import { removeInactivePluginRegistries } from './plugin-registry-writer.ts';
 import {
   EmptyPluginRegistryError,
   type GeneratedPluginRegistry,
@@ -44,7 +45,7 @@ export function createInstalledRuntimeRegistryGenerator(
         installed,
         dependencies,
       );
-      if (!resolvedManifest) continue;
+      if (!resolvedManifest) throw new Error(`Missing runtime manifest for ${installed.name}.`);
       const manifest = readRuntimeManifest(resolvedManifest.value, installed.name);
       const generator = manifest.runtimeRegistryGenerator;
       const targets = manifest.runtimeRegistries;
@@ -61,6 +62,7 @@ export function createInstalledRuntimeRegistryGenerator(
           resolvedManifest,
           manifest,
           dependencies,
+          input.dryRun ? ['--no-lock'] : [],
         );
         rendered.push(...files);
         continue;
@@ -142,6 +144,7 @@ export function createInstalledRuntimeRegistryGenerator(
       });
     }
     if (!input.dryRun) {
+      await removeInactivePluginRegistries(input.projectRoot, rendered, dependencies.fs);
       for (const file of canonical) {
         await dependencies.fs.writeFile(join(input.projectRoot, file.path), file.content);
       }
