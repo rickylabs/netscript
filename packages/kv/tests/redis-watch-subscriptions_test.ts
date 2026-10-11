@@ -80,3 +80,42 @@ Deno.test({
     }
   },
 });
+
+Deno.test({
+  name: 'Redis watch leases: acquiring the same callback twice creates independent leases',
+  ignore: !redisUrl,
+  async fn() {
+    assert(redisUrl);
+    const manager = new RedisConnectionManager(redisUrl, {});
+    const channel = `same-listener-${crypto.randomUUID()}`;
+    const subscriptions = new WatchSubscriptions(
+      () => manager.ensureSubscriber(),
+      (message: string) => message,
+    );
+    const received: string[] = [];
+    let delivered = Promise.withResolvers<void>();
+    const notify = (message: string): void => {
+      received.push(message);
+      delivered.resolve();
+    };
+    try {
+      const client = await manager.ensureClient();
+      const first = await subscriptions.acquire(channel, notify);
+      const second = await subscriptions.acquire(channel, notify);
+      await client.publish(channel, 'both');
+      await deadline(delivered.promise, 5_000);
+      assertEquals(received, ['both', 'both']);
+      await first();
+      await first();
+      assertEquals(await client.pubsub('NUMSUB', channel), [channel, 1]);
+      delivered = Promise.withResolvers<void>();
+      await client.publish(channel, 'second');
+      await deadline(delivered.promise, 5_000);
+      assertEquals(received, ['both', 'both', 'second']);
+      await second();
+      assertEquals(await client.pubsub('NUMSUB', channel), [channel, 0]);
+    } finally {
+      await manager.close();
+    }
+  },
+});

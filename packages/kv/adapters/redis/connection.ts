@@ -101,11 +101,19 @@ export class RedisConnectionManager {
     }
 
     if (!this.clientPromise) {
-      this.clientPromise = this.connect();
+      this.clientPromise = this.connect().then(async (client) => {
+        if (this.closed) {
+          await client.quit();
+          throw new KvClosedError('RedisKvAdapter is closed.');
+        }
+        this.client = client;
+        return client;
+      });
     }
 
-    this.client = await this.clientPromise;
-    return this.client;
+    const client = await this.clientPromise;
+    if (this.closed) throw new KvClosedError('RedisKvAdapter is closed.');
+    return client;
   }
 
   /**
@@ -127,12 +135,20 @@ export class RedisConnectionManager {
     this.subscriberPromise ??= retry(
       () => this.connectSubscriberOnce(),
       RETRY_OPTIONS,
-    ).catch((error: unknown) => {
+    ).then(async (subscriber) => {
+      if (this.closed) {
+        await subscriber.quit();
+        throw new KvClosedError('RedisKvAdapter is closed.');
+      }
+      this.subscriber = subscriber;
+      return subscriber;
+    }).catch((error: unknown) => {
       this.subscriberPromise = null;
       throw error;
     });
-    this.subscriber = await this.subscriberPromise;
-    return this.subscriber;
+    const subscriber = await this.subscriberPromise;
+    if (this.closed) throw new KvClosedError('RedisKvAdapter is closed.');
+    return subscriber;
   }
 
   /**

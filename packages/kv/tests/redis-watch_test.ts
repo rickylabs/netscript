@@ -73,6 +73,12 @@ Deno.test({
     await kv.set(A, 'before');
     const captured = Promise.withResolvers<void>();
     const resume = Promise.withResolvers<void>();
+    const buffered = Promise.withResolvers<void>();
+    const originalPush = WatchBatchQueue.prototype.push;
+    const pushStub = stub(WatchBatchQueue.prototype, 'push', function (event) {
+      originalPush.call(this, event);
+      buffered.resolve();
+    });
     const original = kv.getMany.bind(kv);
     const originalGet = kv.get.bind(kv);
     const singleGetStub = stub(kv, 'get', async function <T>(key: KvKey) {
@@ -92,15 +98,25 @@ Deno.test({
     try {
       await deadline(captured.promise, TIMEOUT_MS);
       await kv.set(A, 'during-startup');
+      await deadline(buffered.promise, TIMEOUT_MS);
       resume.resolve();
-      assertEquals(await values(pending), ['during-startup']);
+      const startup = await deadline(pending, TIMEOUT_MS);
+      assert(!startup.done);
+      assertEquals(startup.value.map((event) => event.value), ['during-startup']);
+      // A subscribed message preceding baseline completion has no established
+      // prior state. The baseline might already contain this write or a newer one.
+      assertEquals(startup.value[0].previousValue, null);
       getStub.restore();
       singleGetStub.restore();
       const next = iterator.next();
       await kv.set(A, 'after');
-      assertEquals(await values(next), ['after']);
+      const after = await deadline(next, TIMEOUT_MS);
+      assert(!after.done);
+      assertEquals(after.value[0].value, 'after');
+      assertEquals(after.value[0].previousValue, 'during-startup');
     } finally {
       resume.resolve();
+      pushStub.restore();
       if (!getStub.restored) getStub.restore();
       if (!singleGetStub.restored) singleGetStub.restore();
       controller.abort();
@@ -182,6 +198,12 @@ for (const skipInitial of [false, true]) {
       await kv.set(A, 'before');
       const captured = Promise.withResolvers<void>();
       const resume = Promise.withResolvers<void>();
+      const buffered = Promise.withResolvers<void>();
+      const originalPush = WatchBatchQueue.prototype.push;
+      const pushStub = stub(WatchBatchQueue.prototype, 'push', function (event) {
+        originalPush.call(this, event);
+        buffered.resolve();
+      });
       const original = kv.list.bind(kv);
       let scans = 0;
       const listStub = stub(kv, 'list', async function* <T>(options: KvListOptions) {
@@ -192,24 +214,25 @@ for (const skipInitial of [false, true]) {
         await resume.promise;
         yield* entries;
       });
-      const iterator = kv.watchPrefix(['prepared'], { signal: controller.signal, skipInitial })
+      const iterator = kv.watchPrefix(['prepared'], {
+        signal: controller.signal,
+        skipInitial,
+        pollInterval: 60_000,
+      })
         [Symbol.asyncIterator]();
       const pending = iterator.next();
       try {
         await deadline(captured.promise, TIMEOUT_MS);
         await kv.set(A, 'during-startup');
+        await deadline(buffered.promise, TIMEOUT_MS);
         resume.resolve();
-        if (!skipInitial) {
-          const initial = await deadline(pending, TIMEOUT_MS);
-          assert(!initial.done);
-          assertEquals(initial.value.value, 'before');
-        }
-        const change = await deadline(skipInitial ? pending : iterator.next(), TIMEOUT_MS);
+        const change = await deadline(pending, TIMEOUT_MS);
         assert(!change.done);
         assertEquals(change.value.value, 'during-startup');
         assertEquals(change.value.versionstamp, (await kv.get(A))?.versionstamp);
       } finally {
         resume.resolve();
+        pushStub.restore();
         listStub.restore();
         controller.abort();
         await iterator.return?.();
@@ -232,7 +255,10 @@ Deno.test({
       await resume.promise;
       yield* original<T>(options);
     });
-    const iterator = kv.watchPrefix(['prepared'], { signal: controller.signal })
+    const iterator = kv.watchPrefix(['prepared'], {
+      signal: controller.signal,
+      pollInterval: 60_000,
+    })
       [Symbol.asyncIterator]();
     const pending = iterator.next();
     try {

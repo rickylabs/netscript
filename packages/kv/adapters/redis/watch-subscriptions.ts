@@ -1,9 +1,15 @@
+/**
+ * Shared Redis channel subscriptions with independent watch leases.
+ *
+ * @module
+ */
+
 import type { Redis } from 'ioredis';
 
 type Listener<T> = (message: T) => void;
 
 interface Subscription<T> {
-  readonly listeners: Set<Listener<T>>;
+  readonly listeners: Map<symbol, Listener<T>>;
   readonly subscriber: Redis;
   readonly handler: (channel: string, message: string) => void;
 }
@@ -20,19 +26,20 @@ export class WatchSubscriptions<T> {
 
   /** Install a listener before SUBSCRIBE acknowledgement and return its release. */
   async acquire(channel: string, listener: Listener<T>): Promise<() => Promise<void>> {
+    const lease = Symbol();
     await this.#serialize(async () => {
       let subscription = this.#channels.get(channel);
       if (subscription) {
-        subscription.listeners.add(listener);
+        subscription.listeners.set(lease, listener);
         return;
       }
 
       const subscriber = await this.subscriber();
-      const listeners = new Set([listener]);
+      const listeners = new Map([[lease, listener]]);
       const handler = (receivedChannel: string, message: string): void => {
         if (receivedChannel !== channel) return;
         const parsed = this.parse(message);
-        if (parsed) { for (const notify of listeners) notify(parsed); }
+        if (parsed) { for (const notify of listeners.values()) notify(parsed); }
       };
       subscription = { subscriber, listeners, handler };
       subscriber.on('message', handler);
@@ -51,7 +58,7 @@ export class WatchSubscriptions<T> {
       released = true;
       return this.#serialize(async () => {
         const subscription = this.#channels.get(channel);
-        if (!subscription?.listeners.delete(listener) || subscription.listeners.size > 0) return;
+        if (!subscription?.listeners.delete(lease) || subscription.listeners.size > 0) return;
         this.#channels.delete(channel);
         subscription.subscriber.off('message', subscription.handler);
         await subscription.subscriber.unsubscribe(channel);

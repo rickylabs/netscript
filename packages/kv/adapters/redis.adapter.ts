@@ -674,6 +674,8 @@ export class RedisKvAdapter implements WatchableKv {
     try {
       // Messages received during these reads remain queued. A read must not
       // overwrite the previous value already advanced by a startup message.
+      // Its first previousValue is null: the baseline may already contain that
+      // write (or a newer write), so it cannot establish the preceding value.
       const entries = await this.getMany<T>(keys);
       for (const [index, key] of keys.entries()) {
         const entry = entries[index];
@@ -712,16 +714,13 @@ export class RedisKvAdapter implements WatchableKv {
     const knownVersions = new Map<string, string>();
 
     const queue = new WatchBatchQueue<WatchEvent<T>>();
-    const startupVersions = new Map<string, Set<string>>();
+    const startupKeys = new Set<string>();
     let initializing = true;
     const messageHandler = (data: WatchMessage): void => {
       if (!keyHasPrefix(data.key, prefix)) return;
       const versionstamp = data.versionstamp ?? generateVersionstamp();
       if (initializing) {
-        const keyStr = keyToString(data.key);
-        const versions = startupVersions.get(keyStr) ?? new Set<string>();
-        versions.add(versionstamp);
-        startupVersions.set(keyStr, versions);
+        startupKeys.add(keyToString(data.key));
       }
       queue.push({
         key: data.key,
@@ -738,7 +737,7 @@ export class RedisKvAdapter implements WatchableKv {
         const versionstamp = entry.versionstamp ?? generateVersionstamp();
         // Buffered writes own this key's startup history. Yielding a newer
         // snapshot before that history would move the consumer backwards.
-        if (startupVersions.get(keyStr)?.has(versionstamp)) continue;
+        if (startupKeys.has(keyStr)) continue;
         knownVersions.set(keyStr, versionstamp);
         if (!options?.skipInitial) {
           yield {
@@ -752,19 +751,23 @@ export class RedisKvAdapter implements WatchableKv {
       }
       // skipInitial suppresses the baseline only, never a subscribed change.
       if (options?.skipInitial) {
-        for (const key of startupVersions.keys()) knownVersions.delete(key);
+        for (const key of startupKeys) knownVersions.delete(key);
       }
       initializing = false;
-      startupVersions.clear();
+      startupKeys.clear();
+      let nextScanAt = Date.now() + pollInterval;
       while (!options?.signal?.aborted) {
         const poll = new AbortController();
-        const timeout = setTimeout(() => poll.abort(), pollInterval);
+        const timeout = setTimeout(() => poll.abort(), Math.max(0, nextScanAt - Date.now()));
         let events: WatchEvent<T>[];
         try {
           const signal = options?.signal
             ? AbortSignal.any([options.signal, poll.signal])
             : poll.signal;
-          events = await queue.next(options?.debounce, signal);
+          // Discovery bounds the empty wait, not the debounce or queued events.
+          // Drain notifications before scanning so a queued delete is not
+          // first synthesized by the scan and then delivered a second time.
+          events = await queue.next(options?.debounce, options?.signal, signal);
         } finally {
           clearTimeout(timeout);
         }
@@ -780,7 +783,7 @@ export class RedisKvAdapter implements WatchableKv {
         if (options?.signal?.aborted) {
           break;
         }
-        if (!poll.signal.aborted) continue;
+        if (Date.now() < nextScanAt) continue;
 
         const seenKeys = new Set<string>();
 
@@ -818,6 +821,7 @@ export class RedisKvAdapter implements WatchableKv {
             versionstamp: null,
           };
         }
+        nextScanAt = Date.now() + pollInterval;
       }
     } finally {
       await release();
