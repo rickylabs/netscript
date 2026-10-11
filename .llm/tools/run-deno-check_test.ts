@@ -1,6 +1,38 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 import { join } from 'jsr:@std/path@^1';
 
+Deno.test('runner command mode fails when deno check excludes every generated target', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(join(root, 'deno.json'), '{"exclude":["generated/"]}\n');
+    await Deno.mkdir(join(root, 'generated'));
+    await Deno.writeTextFile(join(root, 'generated', 'broken.ts'), 'const value: string = 1;\n');
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-run',
+        new URL('./run-deno-check.ts', import.meta.url).pathname,
+        '--cwd',
+        root,
+        '--',
+        Deno.execPath(),
+        'check',
+        'generated/broken.ts',
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 2);
+    const report = JSON.parse(new TextDecoder().decode(output.stdout));
+    assertEquals(report.source.mode, 'command');
+    assertEquals(report.source.exitCode, 2);
+    assertEquals(report.failures.length, 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('runner fails when deno check excludes every explicit target despite exit 0', async () => {
   const root = await Deno.makeTempDir();
   try {

@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../testing/check-generated-files.ts';
 import { assertEquals, assertNotEquals, assertStringIncludes } from '@std/assert';
 
 interface WorkflowEventConfig {
@@ -116,12 +117,10 @@ Deno.test('frozen Fresh UI check rejects lock drift without rewriting the lock',
     }\n`;
     await Deno.writeTextFile(`${root}/deno.lock`, staleLock);
 
-    const result = await new Deno.Command(Deno.execPath(), {
+    const result = await checkGeneratedFiles({
       args: ['check', '--lock=deno.lock', '--frozen', 'mod.ts'],
       cwd: root,
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
 
     assertNotEquals(result.code, 0);
     assertStringIncludes(new TextDecoder().decode(result.stderr), 'The lockfile is out of date');

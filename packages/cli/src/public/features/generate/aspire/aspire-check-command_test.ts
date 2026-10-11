@@ -86,7 +86,7 @@ Deno.test('Aspire check inventories every selected output, uses canonical genera
     const report = await inspect(root);
     assertEquals(report.status, 'current');
     assertEquals(report.version, 1);
-    assertEquals(report.outputs.length, 14);
+    assertEquals(report.outputs.length, 15);
     assert(report.outputs.some((entry) => entry.path === 'aspire/apphost.mts'));
     assertEquals(
       report.outputs.map((entry) => entry.path).sort(),

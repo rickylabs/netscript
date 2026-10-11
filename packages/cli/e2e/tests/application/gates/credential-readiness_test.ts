@@ -147,6 +147,50 @@ Deno.test('rejection evidence requires an auth-classified report beside a Health
   assertEquals(evidence.accepted.status, 'Healthy');
 });
 
+Deno.test('rejection evidence selects PostgreSQL beside its CLI tool and secret parameter', () => {
+  const topology = JSON.parse(snapshot());
+  topology.resources[0].name = 'postgres-f012abcd';
+  topology.resources[0].displayName = 'postgres';
+  topology.resources.unshift(
+    { name: 'postgres-cli-command', displayName: 'postgres-cli', healthReports: {} },
+    { name: 'postgres-password', displayName: 'postgres-password', healthReports: {} },
+  );
+  const evidence = assertCredentialRejectionEvidence(JSON.stringify(topology), SECRETS);
+  assertEquals(evidence.listener.status, 'Healthy');
+  assertEquals(evidence.accepted.status, 'Healthy');
+});
+
+Deno.test('rejection evidence does not borrow healthy reports from PostgreSQL sibling resources', () => {
+  const topology = JSON.parse(snapshot());
+  const postgres = topology.resources.find((resource: { name: string }) =>
+    resource.name === 'postgres'
+  );
+  postgres.name = 'postgres-f012abcd';
+  postgres.displayName = 'postgres';
+  topology.resources.unshift({
+    name: 'postgres-cli-command',
+    displayName: 'postgres-cli',
+    healthReports: postgres.healthReports,
+  });
+  postgres.healthReports = {};
+  assertThrows(
+    () => assertCredentialRejectionEvidence(JSON.stringify(topology), SECRETS),
+    Error,
+    'resource postgres health key postgres_listener was never published',
+  );
+});
+
+Deno.test('rejection evidence requires PostgreSQL itself even if a sibling has healthy checks', () => {
+  const topology = JSON.parse(snapshot());
+  topology.resources[0].name = 'postgres-cli-command';
+  topology.resources[0].displayName = 'postgres-cli';
+  assertThrows(
+    () => assertCredentialRejectionEvidence(JSON.stringify(topology), SECRETS),
+    Error,
+    'resource postgres was never published',
+  );
+});
+
 Deno.test('rejection evidence refuses a non-auth failure or a degraded real server', () => {
   assertThrows(
     () =>

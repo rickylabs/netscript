@@ -4,6 +4,9 @@
  * Executes the generated compatibility helper against real local Node sockets.
  */
 
+import { writeGeneratedHelperFixture } from './generated-helper-fixture.ts'
+import { EMPTY_CONFIG } from './generators-test-support.ts'
+import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/check-generated-files.ts'
 import { assert, assertEquals, assertMatch } from 'jsr:@std/assert@^1'
 import { afterAll, describe, it } from 'jsr:@std/testing@^1/bdd'
 import { createServer, type Server, type Socket } from 'node:net'
@@ -24,7 +27,7 @@ const generatedRoot = resolve(
 )
 const helpersDir = `${generatedRoot}/.helpers`
 const modulesDir = `${generatedRoot}/.aspire/modules`
-await Deno.mkdir(helpersDir, { recursive: true })
+await writeGeneratedHelperFixture(generatedRoot, EMPTY_CONFIG)
 await Deno.mkdir(modulesDir, { recursive: true })
 await Deno.writeTextFile(
   `${modulesDir}/aspire.mts`,
@@ -68,23 +71,29 @@ const generatedConfigPath = `${generatedRoot}/deno.json`
 const zodSpecifier = import.meta.resolve('zod')
 await Deno.writeTextFile(
   generatedConfigPath,
-  `${JSON.stringify({
-    lock: false,
-    imports: { zod: zodSpecifier },
-    compilerOptions: {
-      strict: true,
-      noImplicitAny: true,
-      noImplicitReturns: true,
-      isolatedDeclarations: false,
-    },
-    fmt: {
-      useTabs: false,
-      lineWidth: 100,
-      indentWidth: 2,
-      semiColons: true,
-      singleQuote: true,
-    },
-  }, null, 2)}\n`,
+  `${
+    JSON.stringify(
+      {
+        lock: false,
+        imports: { zod: zodSpecifier },
+        compilerOptions: {
+          strict: true,
+          noImplicitAny: true,
+          noImplicitReturns: true,
+          isolatedDeclarations: false,
+        },
+        fmt: {
+          useTabs: false,
+          lineWidth: 100,
+          indentWidth: 2,
+          semiColons: true,
+          singleQuote: true,
+        },
+      },
+      null,
+      2,
+    )
+  }\n`,
 )
 await Deno.writeTextFile(compatPath, compatContent)
 // The generated helper loads `pg` from the AppHost's node_modules; the test resolves the
@@ -124,7 +133,7 @@ afterAll(async () => {
 
 describe('generated Aspire listener readiness helpers', () => {
   it('type-checks the emitted helper in a generated workspace shape', async () => {
-    const result = await new Deno.Command(Deno.execPath(), {
+    const result = await checkGeneratedFiles({
       args: [
         'check',
         '--config',
@@ -132,9 +141,7 @@ describe('generated Aspire listener readiness helpers', () => {
         '--no-lock',
         compatPath,
       ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output()
+    })
 
     assertEquals(result.code, 0, new TextDecoder().decode(result.stderr))
   })
@@ -172,9 +179,7 @@ describe('generated Aspire listener readiness helpers', () => {
 
       assertEquals(result, {
         status: 'Healthy',
-        description: `postgres listener ready on 127.0.0.1:${
-          serverPort(server)
-        }`,
+        description: `postgres listener ready on 127.0.0.1:${serverPort(server)}`,
       })
     } finally {
       await closeServer(server)
