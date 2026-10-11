@@ -26,6 +26,21 @@ finding into a debt entry.
 - **Gate:** Close when env construction moves behind an auth-core contract and all configured
   backends pass compatibility and service boot tests.
 
+## packages/cli — CLI-BROWSER-SESSION-CONTRACT-DETECTION
+
+- **ID:** `CLI-BROWSER-SESSION-CONTRACT-DETECTION`
+- **Reason:** Browser auth reconciliation identifies generated session contracts by matching
+  `session: baseContract` in source. Renamed builders can miss detection; comments or strings can
+  produce false positives. Authored-contract capability detection needs a structural marker.
+- **Why deferred:** PR #2274 scopes the generated app/service proof; review accepts this bounded
+  heuristic pending a structural capability contract.
+- **Owner:** CLI auth reconciliation follow-up under #1382.
+- **Target:** Before extending session-route reconciliation to authored contracts.
+- **Created:** 2026-10-11
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Replace source sniffing with a template-owned capability or manifest field; verify
+  renamed/reformatted builders and comments/strings cannot silently skip or invent a route.
+
 ## packages/cli — PLUGIN-USERLAND-SOURCE-COPY
 
 - **Reason:** Maintainer/local `plugin add` copied full first-party plugin source into generated

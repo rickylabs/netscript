@@ -41,6 +41,8 @@ Deno.test('public guarded service probe leaves the shared project unchanged and 
       '--ci',
       '--yes',
       '--no-git',
+      // Service probes do not bootstrap host agents or their shared temp state.
+      '--no-agent',
       '--editor',
       'none',
     ]);
