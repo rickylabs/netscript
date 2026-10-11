@@ -12,6 +12,7 @@
     "./adapters": "./src/adapters/mod.ts",
     "./transports": "./src/transports/mod.ts",
     "./stores": "./src/stores/mod.ts",
+    "./stores/backends": "./src/stores/saga-store-backend.ts",
     "./middleware": "./src/middleware/mod.ts",
     "./integration/workers": "./src/integration/workers/mod.ts",
     "./integration/publisher": "./src/integration/publisher/mod.ts",

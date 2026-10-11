@@ -21,6 +21,7 @@
     "test": "deno test --allow-all"
   },
   "imports": {
+    "@netscript/plugin-sagas-core": "jsr:@netscript/plugin-sagas-core@0.0.7",
     "@netscript/aspire": "jsr:@netscript/aspire@0.0.7",
     "@netscript/config": "jsr:@netscript/config@0.0.7",
     "@netscript/fresh": "jsr:@netscript/fresh@0.0.7",

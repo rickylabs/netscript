@@ -51,7 +51,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/plugin-sagas": [".","./adapter-cli","./aspire","./cli","./contracts","./doctor","./e2e","./plugin","./public","./runtime","./scaffold","./services","./streams","./streams/server"],
 
-  "@netscript/plugin-sagas-core": [".","./abstracts","./adapters","./agent","./builders","./config","./contracts/v1","./domain","./integration/commands","./integration/publisher","./integration/workers","./middleware","./ports","./presets","./runtime","./stores","./streams","./telemetry","./testing","./transports"],
+  "@netscript/plugin-sagas-core": [".","./abstracts","./adapters","./agent","./builders","./config","./contracts/v1","./domain","./integration/commands","./integration/publisher","./integration/workers","./middleware","./ports","./presets","./runtime","./stores","./stores/backends","./streams","./telemetry","./testing","./transports"],
 
   "@netscript/plugin-streams": [".","./adapter-cli","./aspire","./cli","./e2e","./scaffold","./services"],
 

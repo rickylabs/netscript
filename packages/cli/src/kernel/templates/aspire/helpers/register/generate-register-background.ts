@@ -15,6 +15,7 @@
  * registration is needed.
  */
 
+import { SAGA_PROJECTION_BACKEND_ENV } from '@netscript/plugin-sagas-core/stores/backends';
 import type { RegisterBackgroundOptions } from '../types.ts';
 import { extractSagaStoreBackend, fileHeader } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
@@ -163,6 +164,15 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(
         `    await ${id}.withEnvironment('NETSCRIPT_SAGA_STORE', ${
           JSON.stringify(sagaStoreBackend)
+        });`,
+      );
+    }
+
+    const sagaProjectionBackend = extractSagaStoreBackend(entry, 'Projection');
+    if (sagaProjectionBackend) {
+      lines.push(
+        `    await ${id}.withEnvironment('${SAGA_PROJECTION_BACKEND_ENV}', ${
+          JSON.stringify(sagaProjectionBackend)
         });`,
       );
     }

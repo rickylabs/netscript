@@ -195,6 +195,7 @@
       },
       "jsr:@netscript/auth-workos@0.0.7": {
         "dependencies": [
+          "jsr:@netscript/kv@0.0.7",
           "jsr:@std/assert@1"
         ]
       },
@@ -228,6 +229,7 @@
           "jsr:@netscript/fresh-ui@0.0.7",
           "jsr:@netscript/fresh@0.0.7",
           "jsr:@netscript/mcp@0.0.7",
+          "jsr:@netscript/plugin-sagas-core@0.0.7",
           "jsr:@netscript/plugin@0.0.7",
           "jsr:@netscript/sdk@0.0.7",
           "jsr:@std/async@1",
@@ -359,9 +361,11 @@
           "jsr:@netscript/kv@0.0.7",
           "jsr:@netscript/plugin-auth-core@0.0.7",
           "jsr:@netscript/plugin-streams-core@0.0.7",
+          "jsr:@netscript/plugin-workers-core@0.0.7",
           "jsr:@netscript/plugin@0.0.7",
           "jsr:@netscript/service@0.0.7",
-          "jsr:@netscript/telemetry@0.0.7"
+          "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@std/async@1"
         ]
       },
       "jsr:@netscript/plugin-sagas-core@0.0.7": {

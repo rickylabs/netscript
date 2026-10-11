@@ -29,6 +29,7 @@ export function safeIdentifier(name: string): string {
 
 type SagaStoreBackendCarrier = {
   readonly Sagas?: {
+    readonly Projection?: { readonly Backend?: unknown };
     readonly Store?: {
       readonly Backend?: unknown;
     };
@@ -43,8 +44,11 @@ type SagaStoreBackendCarrier = {
  * preserve that metadata into executable environment without widening the
  * shared Aspire config contract.
  */
-export function extractSagaStoreBackend(entry: unknown): string | undefined {
-  const backend = (entry as SagaStoreBackendCarrier).Sagas?.Store?.Backend;
+export function extractSagaStoreBackend(
+  entry: unknown,
+  purpose: 'Store' | 'Projection' = 'Store',
+): string | undefined {
+  const backend = (entry as SagaStoreBackendCarrier).Sagas?.[purpose]?.Backend;
   return typeof backend === 'string' ? backend : undefined;
 }
 
