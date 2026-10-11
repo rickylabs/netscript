@@ -410,7 +410,11 @@ export async function runAccuracyCheck(): Promise<void> {
   const shippedCorpus = await readShippedAgentDocsCorpus();
   for (const [path, content] of Object.entries(shippedCorpus.files)) {
     checkForbiddenGoldenPathTerms(content, `${AGENT_DOCS_PAGE_CARRIER}:${path}`);
-    checkResolvedPluginCaveats(content, `${AGENT_DOCS_PAGE_CARRIER}:${path}`);
+    // llms-full.txt is derived from these same checked pages by agentDocsFullCorpus.
+    // Validate the originals so the migration exception retains its page identity.
+    if (path !== 'llms-full.txt') {
+      checkResolvedPluginCaveats(content, `${AGENT_DOCS_PAGE_CARRIER}:${path}`);
+    }
   }
   checkMutationMapColumns(cliReference);
 
