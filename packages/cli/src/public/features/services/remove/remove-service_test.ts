@@ -1,3 +1,5 @@
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { Scaffolder } from '../../../../kernel/adapters/scaffold/scaffolder.ts';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
@@ -10,12 +12,18 @@ Deno.test('service remove reverses workspace, appsettings, contract, and helper 
   const fs = new MemoryFileSystemAdapter();
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
-  await fs.writeFile('/app/deno.json', JSON.stringify({
-    workspace: ['./apps/dashboard', './contracts', './services/orders'],
-  }));
-  await fs.writeFile('/app/appsettings.json', JSON.stringify({
-    NetScript: { Services: { orders: { Enabled: true } } },
-  }));
+  await fs.writeFile(
+    '/app/deno.json',
+    JSON.stringify({
+      workspace: ['./apps/dashboard', './contracts', './services/orders'],
+    }),
+  );
+  await fs.writeFile(
+    '/app/appsettings.json',
+    JSON.stringify({
+      NetScript: { Services: { orders: { Enabled: true } } },
+    }),
+  );
   await fs.writeFile('/app/services/orders/src/main.ts', 'export {};\n');
   await fs.writeFile('/app/apps/dashboard/lib/orders.ts', 'export {};\n');
   await fs.writeFile('/app/contracts/versions/v1/orders.contract.ts', 'export {};\n');
@@ -26,6 +34,7 @@ Deno.test('service remove reverses workspace, appsettings, contract, and helper 
   }, {
     fs,
     scaffolder,
+    formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
     templateAdapter,
     regenerateHelpers: () => Promise.resolve(['/app/aspire/apphost.ts']),
   });

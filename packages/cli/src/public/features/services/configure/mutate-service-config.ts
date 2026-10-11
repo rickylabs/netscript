@@ -1,4 +1,5 @@
 import { join } from '@std/path';
+import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { GenerateAspireDependencies } from '../../generate/aspire/generate-aspire.ts';
@@ -20,7 +21,9 @@ export async function mutateServiceReference(
   return await mutateServices(dependencies, projectRoot, (services) => {
     const source = requireService(services, caller);
     requireService(services, callee);
-    const references = new Set(Array.isArray(source.ServiceReferences) ? source.ServiceReferences : []);
+    const references = new Set(
+      Array.isArray(source.ServiceReferences) ? source.ServiceReferences : [],
+    );
     operation === 'add' ? references.add(callee) : references.delete(callee);
     source.ServiceReferences = [...references].sort();
   });
@@ -62,7 +65,10 @@ async function mutateServices(
   if (!services) throw new Error('NetScript.Services is missing from appsettings.json');
   mutate(services);
   await dependencies.fs.writeFile(path, `${JSON.stringify(document, null, 2)}\n`);
-  return (await generateAspire({ projectRoot }, dependencies)).helperFiles;
+  return (await generateAspire({ projectRoot }, {
+    ...dependencies,
+    regenerateHelpers: dependencies.regenerateHelpers ?? regenerateAspireHelpersWithDependencies,
+  })).helperFiles;
 }
 
 function requireService(services: Record<string, MutableService>, name: string): MutableService {

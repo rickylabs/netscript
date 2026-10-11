@@ -182,6 +182,7 @@ describe('public add service flow', () => {
 
 function authFormatter(): GeneratedSourceFormatterPort {
   return {
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (_path, content) => Promise.resolve(content),
     formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
   };

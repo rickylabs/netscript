@@ -7,12 +7,13 @@ import {
 import type { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
 import type { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
 import type { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
-import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
+import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { installUiRegistryItems } from '../../../../kernel/application/ui/registry.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
@@ -61,6 +62,8 @@ export interface InstallLocalPluginDependencies {
   readonly scaffolder: ScaffolderPort;
   /** Template renderer used by starter and DB flows. */
   readonly templateAdapter: TemplatePort;
+  /** Injected canonical formatter for shared Aspire outputs. */
+  readonly formatter: GeneratedSourceFormatterPort;
   /** Plugin kind registry. */
   readonly registry?: PluginKindRegistry;
   /** Starter plugin scaffolder. */
@@ -85,6 +88,7 @@ export interface InstallLocalPluginDependencies {
     fs: FileSystemPort,
     scaffolder: ScaffolderPort,
     templateAdapter: TemplatePort,
+    options: { readonly formatter: GeneratedSourceFormatterPort },
   ) => Promise<readonly string[]>;
 }
 
@@ -188,18 +192,23 @@ export async function installLocalPlugin(
     await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
   }
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
-  const browserAuthFiles = await reconcileBrowserAuth(plan.projectRoot, dependencies.fs);
-  const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
+  const browserAuthFiles = await reconcileBrowserAuth(
+    plan.projectRoot,
+    dependencies.fs,
+    dependencies.formatter,
+  );
+  const regenerateHelpers = dependencies.regenerateHelpers ??
+    regenerateAspireHelpersWithDependencies;
   const aspireFiles = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
+    { formatter: dependencies.formatter },
   );
   const helperFiles = [...browserAuthFiles, ...aspireFiles];
   if (dependencies.processRunner) {
     await formatGeneratedFiles(dependencies.processRunner, plan.projectRoot, [
-      ...helperFiles,
       join(plan.projectRoot, 'netscript.config.ts'),
     ], (path) => dependencies.fs.exists(path));
   }
@@ -259,6 +268,7 @@ async function renderLocalPlugin(
       fs: dependencies.fs,
       scaffolder: dependencies.scaffolder,
       templateAdapter: dependencies.templateAdapter,
+      formatter: dependencies.formatter,
     },
   );
   const wroteServiceContext = await ensurePluginServiceContext(

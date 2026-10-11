@@ -1,4 +1,5 @@
 import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { defineConfig } from '@netscript/config';
 
@@ -65,6 +66,7 @@ Deno.test('plugin removal rolls back browser reconciliation if helper generation
         scaffolder,
         templateAdapter,
         workspaceMutator: new PluginWorkspaceMutator(fs),
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         processRunner: { exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }) },
         dispatchPort: { dispatch: () => Promise.reject(new Error('dispatch must be skipped')) },
         regenerateHelpers: async () => {
@@ -118,6 +120,7 @@ Deno.test('plugin remove resolves a configured bare name before dispatch and pre
     resolveProjectRoot: () => Promise.resolve(projectRoot),
     print: () => {},
     removePluginDependencies: {
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       fs,
       workspaceMutator: new PluginWorkspaceMutator(fs),
       processRunner: {
@@ -195,6 +198,7 @@ Deno.test('plugin remove rolls back every owned path when regeneration fails aft
         resolveProjectRoot: () => Promise.resolve(projectRoot),
         print: () => {},
         removePluginDependencies: {
+          formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
           fs,
           scaffolder,
           templateAdapter,
@@ -254,6 +258,7 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
       resolveProjectRoot: () => Promise.resolve(projectRoot),
       print: () => {},
       installPluginDependencies: {
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         fs,
         scaffolder,
         templateAdapter,
@@ -289,6 +294,7 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
       resolveProjectRoot: () => Promise.resolve(projectRoot),
       print: () => {},
       removePluginDependencies: {
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         fs,
         scaffolder,
         templateAdapter,
