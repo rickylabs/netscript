@@ -172,6 +172,7 @@ export const GATE = {
   BEHAVIOR_TRIGGERS_WEBHOOK: 'behavior.triggers-webhook',
   BEHAVIOR_TRIGGERS_EVENTS: 'behavior.triggers-events',
   BEHAVIOR_AUTH_LIVE: 'behavior.auth-live',
+  BEHAVIOR_AUTH_COOKIE_JAR: 'behavior.auth-cookie-jar',
   BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
   /**
    * Unauthenticated `GET /api/v1/auth/session` serves the designed public introspection
@@ -179,6 +180,13 @@ export const GATE = {
    * target guarded auth routes.
    */
   BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED: 'behavior.auth-session-unauthenticated',
+  BEHAVIOR_AUTH_ME_UNAUTHENTICATED: 'behavior.auth-me-unauthenticated',
+  BEHAVIOR_AUTH_SESSION_AUTHENTICATED: 'behavior.auth-session-authenticated',
+  BEHAVIOR_AUTH_SIGNOUT_UNAUTHENTICATED: 'behavior.auth-signout-unauthenticated',
+  BEHAVIOR_AUTH_RPC_UNAUTHENTICATED: 'behavior.auth-rpc-unauthenticated',
+  BEHAVIOR_SERVICE_API_UNAUTHENTICATED: 'behavior.service-api-unauthenticated',
+  BEHAVIOR_SERVICE_API_AUTHENTICATED: 'behavior.service-api-authenticated',
+  BEHAVIOR_AUTH_SIGNOUT_FOREIGN_SESSION: 'behavior.auth-signout-foreign-session',
   /**
    * @deprecated Use {@link GATE.BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED}; this key only aliases
    * the renamed gate id while suite definitions migrate. The old `behavior.auth-session` id is
