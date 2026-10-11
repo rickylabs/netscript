@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
+import { assertEquals, assertRejects } from '@std/assert';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import { validateOptions } from '../../../kernel/application/scaffold/validate-init.ts';
 import type { PromptPort } from '../../../kernel/ports/prompt-port.ts';
