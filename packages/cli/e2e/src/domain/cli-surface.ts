@@ -151,6 +151,8 @@ export const GATE = {
   BEHAVIOR_ISLAND_HYDRATION: 'behavior.island-hydration',
   BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
+  BEHAVIOR_BACKGROUND_CHILDREN_HEALTH: 'behavior.background-children-health',
+  BEHAVIOR_STREAMS_HEALTH: 'behavior.streams-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',
   BEHAVIOR_WORKERS_TASKS: 'behavior.workers-tasks',
   BEHAVIOR_WORKERS_SEED: 'behavior.workers-seed',

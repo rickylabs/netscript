@@ -363,14 +363,13 @@ export function resourceMatches(
   resource: Readonly<Record<string, unknown>>,
   expected: string,
 ): boolean {
-  for (const key of ['displayName', 'name', 'resourceName']) {
+  for (const key of ['displayName', 'resourceName', 'name']) {
     const candidate = resource[key];
     if (
       typeof candidate === 'string' &&
-      (candidate.toLowerCase() === expected.toLowerCase() ||
-        candidate.toLowerCase().startsWith(`${expected.toLowerCase()}-`))
+      candidate.length > 0
     ) {
-      return true;
+      return candidate.toLowerCase() === expected.toLowerCase();
     }
   }
   return false;
