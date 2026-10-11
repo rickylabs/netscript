@@ -23,6 +23,11 @@ export const IMAGE_PULL_POLICY = {
   backoffMs: [5_000, 10_000],
 } as const;
 
+/** Maximum timed pull/backoff budget per image; process-launch overhead is additional. */
+export const IMAGE_PULL_MAX_DURATION_MS: number =
+  IMAGE_PULL_POLICY.maxAttempts * IMAGE_PULL_POLICY.attemptTimeoutMs +
+  IMAGE_PULL_POLICY.backoffMs.reduce((total, ms) => total + ms, 0);
+
 /** Use the scaffold's cache image and the pinned SDK's actual database model. */
 export async function runtimeTierImages(
   tier: string,
@@ -125,7 +130,8 @@ if (import.meta.main) {
     await Deno.mkdir('.llm/tmp', { recursive: true });
     await Deno.writeTextFile(report, `${JSON.stringify(measurements, null, 2)}\n`);
     console.info(
-      `Image pull ${image}: ${measurement.durationMs}ms (${measurement.attempts.length} attempts)`,
+      `Image pull ${image}: ${measurement.durationMs}ms (${measurement.attempts.length} attempts; ` +
+        `budget ${IMAGE_PULL_MAX_DURATION_MS}ms)`,
     );
     if (measurement.attempts.at(-1)?.exitCode !== 0) {
       throw new Error(`Image pull exhausted ${IMAGE_PULL_POLICY.maxAttempts} attempts: ${image}`);

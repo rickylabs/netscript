@@ -73,6 +73,41 @@ for replicating the `agentic/` cleanup standard on other folders.
 - Use [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md) when cleaning up any `.llm/tools/` folder to
   the agentic suite's standard.
 
+## Runtime tier timeout calibration
+
+Both runtime CI tiers retain `ASPIRE_CLI_START_TIMEOUT: "300"` through the existing knob. Image
+preparation runs before the unchanged one-pass suite; it does not spend the startup window or retry
+suite assertions. The shared scaffold cache catalog and pinned database SDK remain the image
+authorities.
+
+Measured calibration sample:
+[run 38097613757](https://github.com/rickylabs/netscript/actions/runs/38097613757), 2026-10-11,
+attempt 1, both runtime tiers executed successfully. Values below come from `e2e-image-pulls.json`
+and each tier's E2E report artifact, rather than whole-job durations.
+
+| Tier     | Image pull durations (seconds; one attempt each) | `runtime.aspire-start` duration | Subsequent `runtime.wait.*` total |
+| -------- | ------------------------------------------------ | ------------------------------- | --------------------------------- |
+| Postgres | Postgres 7.585; Redis 3.194; Garnet 3.527        | 51.775 s                        | 0.955 s                           |
+| SQLite   | Redis 11.371; Garnet 5.173                       | 30.210 s                        | 0.695 s                           |
+
+The startup gate includes AppHost startup and its health checks. Subsequent resource waits are
+separate gates; these figures exclude intervening discovery, database work, and the rest of the
+suite. The existing 300-second ceiling exceeds five times the slower measured startup plus
+resource-wait total (52.730 seconds). Retaining that ceiling allows runner variation without
+extending a failed convergence indefinitely. This single paired sample justifies the selection; it
+does not establish a percentile or prove stability. Issue #2185 still requires three consecutive
+passes of both tiers without reruns on one PR head and on main, plus a local full-runtime receipt,
+supplied by the coordinator under the runtime lease.
+
+Pulls retain three attempts of at most 120 seconds with 5- and 10-second backoffs: a 375-second
+timed budget per image, excluding process-launch overhead. The pre-pull tool emits that budget
+alongside each measured duration and preserves nonzero exhaustion. Serial pulls therefore have timed
+budgets of 1,125 seconds for Postgres and 750 seconds for SQLite, plus up to 180 seconds for pinned
+database SDK inspection on Postgres. CI's 60-minute job deadline bounds preparation and the entire
+suite, including process overhead. A simulated stalled-pull test proves the timed budget and nonzero
+failure; existing failure-injection tests continue to prove unconverged-resource diagnostics. No
+application or local-suite semantics change.
+
 ## Common Commands
 
 ```powershell
