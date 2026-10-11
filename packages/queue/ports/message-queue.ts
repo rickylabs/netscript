@@ -99,6 +99,14 @@ export interface MessageQueue<T = unknown> {
    * @throws {QueueError} If enqueue operation fails
    */
   enqueue(message: T, options?: EnqueueOptions): Promise<void>;
+  /**
+   * Cancel a bounded page of pending messages by their originating retention identity.
+   * The resolver receives at most 100 unique identities; true means another page remains.
+   * Providers without durable cancellable keys omit this capability.
+   */
+  cancelPending?(
+    resolve: (ids: readonly string[]) => Promise<readonly string[]>,
+  ): Promise<boolean>;
 
   /**
    * Enqueue multiple messages in a batch.
@@ -136,6 +144,8 @@ export interface MessageQueue<T = unknown> {
  * Options for enqueueing messages.
  */
 export interface EnqueueOptions {
+  /** Originating durable identity for adapters supporting pending-message cancellation. */
+  retentionId?: string;
   /**
    * Delay in milliseconds before the message becomes available for processing.
    * Useful for scheduling and implementing cron-like patterns.

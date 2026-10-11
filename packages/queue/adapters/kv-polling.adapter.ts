@@ -30,6 +30,7 @@ import type {
 import { QueueError, QueueErrorCode } from '../ports/mod.ts';
 import { toDeadLetterRecord } from './_envelope.ts';
 import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
+import { cancelPendingPage } from './_pending-retention.ts';
 
 export type {
   AtomicCheck,
@@ -77,6 +78,8 @@ interface QueueMessage<T> {
   claimedBy?: string;
   /** Visibility timeout (when the claim expires) */
   visibilityTimeout?: string;
+  /** Originating durable identity, independent of payload/deduplication identity. */
+  retentionId?: string;
 }
 
 /**
@@ -370,6 +373,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
         priority: options?.priority ?? 50,
         headers: options?.headers ?? {},
         deduplicationId: options?.deduplicationId,
+        retentionId: options?.retentionId,
       };
 
       const key = this.pendingKey(
@@ -405,6 +409,13 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
     for (const message of messages) {
       await this.enqueue(message, options);
     }
+  }
+
+  /** Cancel at most 100 pending keys and persist progress for the next cleanup pass. */
+  async cancelPending(
+    resolve: (ids: readonly string[]) => Promise<readonly string[]>,
+  ): Promise<boolean> {
+    return await cancelPendingPage(await this.ensureKv(), this.queueName, resolve);
   }
 
   /**

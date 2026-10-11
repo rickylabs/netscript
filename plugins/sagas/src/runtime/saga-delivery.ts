@@ -1,10 +1,15 @@
 import { createQueue } from '@netscript/queue';
-import type { CascadedMessage, SagaMessage } from '@netscript/plugin-sagas-core/domain';
+import type {
+  CascadedMessage,
+  SagaInstanceId,
+  SagaMessage,
+} from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
   SagaPublishOptions,
   SagaRuntime,
   SagaSchedulerPort,
+  SagaStorePort,
 } from '@netscript/plugin-sagas-core/runtime';
 import { getTraceContext } from '@netscript/telemetry/context';
 
@@ -23,6 +28,8 @@ export type SagaDeliveryMessage = Readonly<{
   occurredAt?: string;
   traceparent?: string;
   tracestate?: string;
+  /** Durable originating instance for scheduled deliveries only. */
+  scheduledFrom?: SagaInstanceId;
 }>;
 
 /** Queue metadata made available while the runner handles one delivery. */
@@ -48,8 +55,13 @@ export interface SagaDeliveryQueuePort {
       delay?: number;
       deduplicationId?: string;
       headers?: Record<string, string>;
+      retentionId?: string;
     }>,
   ): Promise<void>;
+  /** Cancel one bounded page of pending messages using canonical instance identities. */
+  cancelPending?(
+    resolve: (ids: readonly string[]) => Promise<readonly string[]>,
+  ): Promise<boolean>;
   /** Consume messages until stopped or aborted. */
   listen(
     handler: (
@@ -110,12 +122,14 @@ export function createSagaDeliveryPublisher(
 /** Queue listener that delivers accepted API messages to the saga engine. */
 export class SagaQueueDelivery implements SagaRuntimeDeliveryPort {
   readonly #queue: SagaDeliveryQueuePort;
+  readonly #scheduler?: Readonly<{ wait(): Promise<void> }>;
   #controller?: AbortController;
   #completion?: Promise<void>;
 
   /** Create delivery around a queue owned by this component. */
-  constructor(queue: SagaDeliveryQueuePort) {
+  constructor(queue: SagaDeliveryQueuePort, scheduler?: Readonly<{ wait(): Promise<void> }>) {
     this.#queue = queue;
+    this.#scheduler = scheduler;
   }
 
   /** Start one queue listener for the supplied started runtime. */
@@ -139,6 +153,9 @@ export class SagaQueueDelivery implements SagaRuntimeDeliveryPort {
 
   /** Wait for the queue listener to stop or fail. */
   wait(): Promise<void> {
+    if (this.#completion && this.#scheduler) {
+      return Promise.race([this.#completion, this.#scheduler.wait()]);
+    }
     return this.#completion ?? Promise.reject(
       SagasError.validationFailed('Saga delivery has not been started.'),
     );
@@ -168,37 +185,104 @@ export class SagaQueueScheduler implements SagaSchedulerPort {
   /** Stable identifier used by runtime diagnostics. */
   readonly id = 'saga-delivery-queue-scheduler';
   readonly #queue: SagaDeliveryQueuePort;
+  readonly #scheduledQueue?: SagaDeliveryQueuePort;
+  #store?: SagaStorePort;
+  #controller?: AbortController;
+  #completion?: Promise<void>;
   #running = false;
 
   /** Create a scheduler that shares the runner delivery queue. */
-  constructor(queue: SagaDeliveryQueuePort) {
+  constructor(queue: SagaDeliveryQueuePort, scheduledQueue?: SagaDeliveryQueuePort) {
     this.#queue = queue;
+    this.#scheduledQueue = scheduledQueue;
+  }
+
+  /** Bind canonical state before starting a cancellable scheduling queue. */
+  bindRetentionStore(store: SagaStorePort): void {
+    this.#store = store;
   }
 
   /** Enable scheduled cascade acceptance. */
   start(): Promise<void> {
+    if (this.#scheduledQueue) {
+      if (!this.#store || !this.#scheduledQueue.cancelPending) {
+        throw SagasError.validationFailed(
+          'Cancellable scheduling requires canonical state and queue cancellation.',
+        );
+      }
+      this.#controller = new AbortController();
+      this.#completion = this.#scheduledQueue.listen(async (message) => {
+        if (message.scheduledFrom && (await this.#cancelled([message.scheduledFrom])).length > 0) {
+          return;
+        }
+        await this.#queue.enqueue(message, {
+          deduplicationId: message.idempotencyKey,
+          headers: traceHeaders(message),
+        });
+      }, { signal: this.#controller.signal });
+      // stop() observes errors; suppress detached rejections while the supervisor is running.
+      this.#completion.catch(() => undefined);
+    }
     this.#running = true;
     return Promise.resolve();
   }
 
+  /** Observe the scheduled listener through the runner's existing delivery supervision. */
+  wait(): Promise<void> {
+    return this.#completion ?? new Promise<void>(() => {});
+  }
+
   /** Disable scheduled cascade acceptance. */
-  stop(): Promise<void> {
+  async stop(): Promise<void> {
     this.#running = false;
-    return Promise.resolve();
+    this.#controller?.abort();
+    await this.#scheduledQueue?.stop();
+    await this.#completion;
+    this.#completion = undefined;
+  }
+
+  /** Cancel at most 100 pending messages; persisted queue progress survives scheduler restart. */
+  async cleanupRetention(): Promise<boolean> {
+    if (!this.#scheduledQueue) return false;
+    return await this.#scheduledQueue.cancelPending!((ids) => this.#cancelled(ids));
+  }
+
+  async #cancelled(ids: readonly string[]): Promise<readonly string[]> {
+    const store = this.#store!;
+    const instanceIds = ids as readonly SagaInstanceId[];
+    const envelopes = store.loadMany
+      ? await store.loadMany(instanceIds)
+      : await Promise.all(instanceIds.map((id) => store.load(id)));
+    return ids.filter((_id, index) => {
+      const envelope = envelopes[index];
+      return envelope === undefined ||
+        ['completed', 'failed', 'cancelled', 'compensated'].includes(envelope.metadata.status);
+    });
   }
 
   /** Enqueue a scheduled cascade with a provider-native delay. */
-  async scheduleCascaded(message: CascadedMessage<'scheduled'>): Promise<void> {
+  async scheduleCascaded(
+    message: CascadedMessage<'scheduled'>,
+    context?: Readonly<{ instanceId: SagaInstanceId }>,
+  ): Promise<void> {
     if (!this.#running) {
       throw SagasError.validationFailed(
         'Saga queue scheduler must be started before scheduling messages.',
       );
     }
     const scheduled = scheduledSagaMessage(message.message);
-    await this.#queue.enqueue(toDeliveryMessage(scheduled), {
+    if (!Number.isFinite(message.scheduledFor.getTime())) {
+      throw SagasError.validationFailed('Scheduled message date must be valid.');
+    }
+    if (context && this.#store && (await this.#cancelled([context.instanceId])).length > 0) return;
+    await (this.#scheduledQueue ?? this.#queue).enqueue({
+      ...toDeliveryMessage(scheduled),
+      ...(context ? { scheduledFrom: context.instanceId } : {}),
+    }, {
       delay: Math.max(0, message.scheduledFor.getTime() - Date.now()),
       deduplicationId: scheduled.idempotencyKey,
       headers: traceHeaders(scheduled),
+      retentionId: context?.instanceId,
     });
   }
 }
