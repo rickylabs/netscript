@@ -230,8 +230,11 @@ export class SagaEngine implements SagaBusPort {
    */
   async commitCompensation(
     outcome: SagaCompensationOutcome,
-    execution: Readonly<{ attempt?: number; correlationId?: string; parent?: SagaTraceParent }> =
-      {},
+    execution: Readonly<{
+      attempt?: number;
+      correlationId?: string;
+      parent?: Readonly<{ traceparent?: string; tracestate?: string }>;
+    }> = {},
   ): Promise<SagaCompensationCommit> {
     if (!this.#running) {
       throw SagasError.validationFailed('SagaEngine must be started before committing outcomes.');
