@@ -251,9 +251,16 @@ for (const state of ['stopped', 'crash-looping'] as const) {
                   },
                   {
                     name: 'runner',
-                    state: 'Stopped',
+                    state: 'Running',
                     healthStatus: 'Unhealthy',
                     healthReports: { http: {} },
+                    childHealth: {
+                      state,
+                      registryReady: true,
+                      dependencyReady: true,
+                      restartCount: state === 'crash-looping' ? 3 : 0,
+                      lastFatalError: null,
+                    },
                   },
                 ],
               }),
