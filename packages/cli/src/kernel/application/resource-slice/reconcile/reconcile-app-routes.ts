@@ -225,8 +225,9 @@ export function removeScaffoldedAppRoute(
   }
   const entries = splitTopLevelEntries(source.slice(open + 1, close));
   if (!entries) throw new Error('Refusing removal: unsupported appRoutes entries.');
-  const expected =
-    `'${routeId}': createRouteReference('/${segment}', { id: '${routeId}', kind: 'page' })`;
+  const generatedEntry =
+    /^(?:'[^']+'|"[^"]+"|[\w$]+)\s*:\s*createRouteReference\(\s*(['"])([^'"]+)\1\s*,\s*\{\s*id\s*:\s*(['"])([^'"]+)\3\s*,\s*kind\s*:\s*(['"])page\5\s*,?\s*\}\s*,?\s*\)$/;
+
   let removed = 0;
   const kept: string[] = [];
   for (let index = 0; index < entries.length; index++) {
@@ -234,7 +235,10 @@ export function removeScaffoldedAppRoute(
     const candidate = stripLeadingTrivia(entry);
     const key = /^(?:'([^']+)'|"([^"]+)"|([\w$]+))\s*:/.exec(candidate);
     if ((key?.[1] ?? key?.[2] ?? key?.[3]) === routeId) {
-      if (candidate !== expected || ++removed > 1) {
+      const generated = generatedEntry.exec(candidate);
+      if (
+        !generated || generated[2] !== `/${segment}` || generated[4] !== routeId || ++removed > 1
+      ) {
         throw new Error('Refusing removal: page route registration has diverged.');
       }
       // Preserve authored leading comments while dropping the generated property.
@@ -244,6 +248,7 @@ export function removeScaffoldedAppRoute(
       kept.push(entry + (index < entries.length - 1 ? ',' : ''));
     }
   }
-  if (removed !== 1) throw new Error('Refusing removal: page route registration is missing.');
+  // A validated unchanged page may outlive its registration after an interrupted removal.
+  if (removed === 0) return source;
   return source.slice(0, open + 1) + kept.join('') + source.slice(close);
 }

@@ -1,3 +1,4 @@
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import { Command } from '@cliffy/command';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { removeUiPage } from '../../../../kernel/application/ui/remove-ui-page.ts';
@@ -8,6 +9,7 @@ import { requireUiAppRoot, type UiAppRootResolver } from '../../../presentation/
 export function createUiRemoveCommand(deps: {
   readonly installDependencies: UiInstallDependencies;
   readonly resolveUiAppRoot: UiAppRootResolver;
+  readonly formatter?: Pick<GeneratedSourceFormatterPort, 'formatContents'>;
   readonly writeManifest?: (appRoot: string) => Promise<unknown>;
   readonly print?: (message: string) => void;
 }) {
@@ -34,14 +36,25 @@ export function createUiRemoveCommand(deps: {
         });
         if (kind === 'page') {
           if (!path) throw new Error('ui:remove page requires <path>.');
-          if (!deps.writeManifest) {
-            throw new Error('Page removal requires the route manifest writer.');
+          if (!deps.writeManifest || !deps.formatter) {
+            throw new Error(
+              'Page removal requires the route manifest writer and source formatter.',
+            );
           }
           const result = await removeUiPage(
             { projectRoot: root, path, client: options.client, dryRun: options.dryRun },
             deps.installDependencies.fs,
             deps.writeManifest,
+            deps.formatter,
           );
+          if (result.status === 'absent') {
+            print(
+              `Nothing to remove for page '${path}'.${
+                options.dryRun ? '' : ' Derived route modules refreshed.'
+              }`,
+            );
+            return;
+          }
           for (const file of result.files) {
             print(`${options.dryRun ? 'Planned removal' : 'Removed'}: ${file}`);
           }

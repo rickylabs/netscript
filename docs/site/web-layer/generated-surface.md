@@ -63,9 +63,11 @@ There is currently no `netscript ui:rename` or `netscript route rename` command.
 `netscript ui:remove <name>` removes a copied Fresh UI registry item. Use
 `netscript ui:remove page catalog --dry-run` to validate and preview a page removal. Without
 `--dry-run`, it deletes only unchanged `ui:add page` output (page plus optional loader/island),
-prunes its exact string-literal router registration, and regenerates the derived route modules. It
+prunes its generated string-literal router registration, and regenerates the derived route modules. It
 preserves authored siblings, sidecars and unrelated routes. Use `--client <service>` when the
-original data client is ambiguous. Modified or missing scaffold parts and customized registrations
-are refused; there is no force override. Remove customized pages manually, prune their registration
+original data client is ambiguous. Formatting with the scaffold’s `deno task fmt` is accepted:
+scaffold files are compared after Deno formatting, and wrapped router entries are recognized.
+Code or comment edits, missing scaffold parts and customized registrations are refused; there is no force override. Remove customized pages manually, prune their registration
 and consumers, then run `netscript generate routes`. Idempotent reruns rebuild missing derived
-modules without deleting authored files. Update links and type-check after removal.
+modules without deleting authored files and report “Nothing to remove” for an absent page. Empty
+parent directories are pruned without removing the routes root or authored siblings. Update links and type-check after removal.

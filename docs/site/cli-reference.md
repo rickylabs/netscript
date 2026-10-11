@@ -102,7 +102,7 @@ accepts `--dry-run`.
 | `netscript generate runtime-schemas` | Runtime topic declarations | Runtime-config JSON Schema files | Editors, validators, runtime override tooling | `--dry-run` |
 | `netscript generate aspire` | None; reads authored root `appsettings.json` and project config | AppHost helper files and `.netscript/aspire-cli.ts` | Aspire AppHost and telemetry tasks | `--check --format json` (read-only parity) |
 | `netscript ui:init` / `netscript ui:add` | Registry selection | Workspace-owned components, pages, islands, styles, and tokens | Fresh app and its Vite build | No |
-| `netscript ui:remove page <path>` | Unchanged ui:add page and its exact router registration | Removed page/loader/island; refreshed route manifest and routes | Fresh app and route consumers | `--dry-run` |
+| `netscript ui:remove page <path>` | Unchanged ui:add page (formatting accepted) and its generated router registration | Removed page/loader/island; refreshed route manifest and routes | Fresh app and route consumers | `--dry-run` |
 | `netscript ui:update` / `netscript ui:remove` | Installed registry inventory and unmodified copied files | Updated or removed copy-source UI files | Fresh app and its Vite build | No |
 | `netscript deploy build` / target `plan` | Deployment manifest plus project entrypoints | Target deployment artifacts or an emitted plan | Target runtime or service manager | `plan` is non-deploying |
 | `netscript deploy up` / `deploy install` / lifecycle verbs | Deployment target or service-manager state | Provider/service-manager state; target-dependent local artifacts | Deployed services | Target-dependent; check `--help` |
@@ -301,7 +301,7 @@ The frontend is copy-source: components are copied into your repo under
   rows: [
     { name: "Initialize the design system", type: "netscript ui:init --project-root apps/dashboard", desc: "Copy the fresh-ui components and tokens into the dashboard app." },
     { name: "Add a component", type: "netscript ui:add <item> --project-root apps/dashboard", desc: "Copy an additional registry item — you own the copied source from that point." },
-    { name: "Remove page", type: "netscript ui:remove page <path>", desc: "Validate unchanged page/loader/island output, remove its router entry and rebuild derived routes. Preview with --dry-run; select --app or --project-root and --client when needed. Authored files are preserved; customized scaffolds are refused." },
+    { name: "Remove page", type: "netscript ui:remove page <path>", desc: "Validate unchanged page/loader/island output (formatting accepted), remove its router entry and rebuild derived routes. Preview with --dry-run; select --app or --project-root and --client when needed. Authored files are preserved; customized scaffolds are refused." },
     { name: "List & maintain", type: "netscript ui:list · netscript ui:update · netscript ui:remove <name>", desc: "List registry items, update only files you have not modified, or remove a copied item." }
   ]
 }) }}

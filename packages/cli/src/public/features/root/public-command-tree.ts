@@ -127,6 +127,7 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
         installDependencies: dependencies.uiInstallDependencies,
         resolveUiAppRoot: dependencies.resolveUiAppRoot,
         writeManifest: dependencies.generateRoutesCommandDependencies.writeManifest,
+        formatter: dependencies.uiPageFormatter,
       }),
   });
 

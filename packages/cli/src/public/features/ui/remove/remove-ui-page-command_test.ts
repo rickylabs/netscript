@@ -1,5 +1,7 @@
+import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
+import { createUiRemoveCommand } from './remove-ui-command.ts';
 import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
-import { join, resolve } from '@std/path';
+import { dirname, join, resolve } from '@std/path';
 import { createPublicCommandDependencies } from '../../root/public-command-dependencies.ts';
 import {
   createPublicCommandRegistry,
@@ -15,7 +17,7 @@ async function fixture(
     await Deno.mkdir(join(root, 'lib'));
     await Deno.writeTextFile(
       join(root, 'deno.json'),
-      JSON.stringify({ workspace: ['apps/dashboard'] }),
+      JSON.stringify({ workspace: ['apps/dashboard'], fmt: { singleQuote: true, lineWidth: 100 } }),
     );
     await Deno.writeTextFile(join(root, 'appsettings.json'), '{}');
     await Deno.writeTextFile(
@@ -38,6 +40,7 @@ export const ordersQueries = createQueryFactories({}).service;
     // Use a workspace fixture within this temp directory, rather than touching a shared temp parent.
     const app = join(root, 'apps/dashboard');
     await Deno.mkdir(join(app, 'routes'), { recursive: true });
+    await Deno.writeTextFile(join(app, 'deno.json'), '{}');
     for (const file of ['router.ts']) await Deno.copyFile(join(root, file), join(app, file));
     await Deno.mkdir(join(app, 'lib'));
     await Deno.copyFile(join(root, 'lib/orders.ts'), join(app, 'lib/orders.ts'));
@@ -158,6 +161,8 @@ Deno.test('ui:remove page supports plain pages, custom route ids, nested paths a
     await run('ui:remove', 'page', 'admin/catalog');
     const router = await Deno.readTextFile(join(root, 'router.ts'));
     assert(!router.includes('inventory'));
+    await assertRejects(() => Deno.stat(join(root, 'routes/admin')), Deno.errors.NotFound);
+    assert((await Deno.stat(join(root, 'routes'))).isDirectory);
     await run('ui:remove', 'page', 'admin/catalog');
     assertEquals(await Deno.readTextFile(join(root, 'router.ts')), router);
     await assertRejects(() => run('ui:remove', 'page', '../catalog'), Error, 'Invalid page path');
@@ -187,4 +192,101 @@ Deno.test('ui:remove live help explains page safety and preview options', () => 
       'ui:remove page catalog',
     ]
   ) assertStringIncludes(help, text);
+});
+
+async function formatApp(root: string): Promise<void> {
+  const result = await new Deno.Command(Deno.execPath(), {
+    args: ['fmt', '--config', join(dirname(dirname(root)), 'deno.json'), root],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+}
+
+for (const island of [false, true]) {
+  Deno.test(`ui:remove page accepts project-formatted ${island ? 'triad' : 'plain page'} and wrapped route ids`, async () => {
+    await fixture(async (root, run) => {
+      const path = 'admin/order-history';
+      const route =
+        'admin.order-history.with-a-deliberately-long-route-id-to-exercise-formatter-wrapping';
+      await run('ui:add', 'page', path, '--route', route, ...(island ? ['--island'] : []));
+      const originalRouter = await Deno.readTextFile(join(root, 'router.ts'));
+      const originalPage = await Deno.readTextFile(join(root, 'routes', path, 'index.tsx'));
+      await formatApp(root);
+      const formattedRouter = await Deno.readTextFile(join(root, 'router.ts'));
+      const formattedPage = await Deno.readTextFile(join(root, 'routes', path, 'index.tsx'));
+      assert(formattedRouter !== originalRouter);
+      if (!island) assert(formattedPage !== originalPage);
+      await run('ui:remove', 'page', path, '--dry-run');
+      assertEquals(await Deno.readTextFile(join(root, 'router.ts')), formattedRouter);
+      assertEquals(await Deno.readTextFile(join(root, 'routes', path, 'index.tsx')), formattedPage);
+      await run('ui:remove', 'page', path);
+      await assertRejects(() => Deno.stat(join(root, 'routes/admin')), Deno.errors.NotFound);
+      const router = await Deno.readTextFile(join(root, 'router.ts'));
+      assert(!router.includes(route));
+      assertStringIncludes(router, 'authored: customRoute({ nested: { keep: true } })');
+      assertStringIncludes(router, '// authored trailing content');
+      assert(!(await Deno.readTextFile(join(root, '.generated/manifest.ts'))).includes(path));
+    });
+  });
+}
+
+Deno.test('ui:remove page preserves nested authored siblings and refuses formatted code edits', async () => {
+  await fixture(async (root, run) => {
+    await run('ui:add', 'page', 'admin/catalog');
+    await Deno.writeTextFile(join(root, 'routes/admin/notes.txt'), 'authored parent sibling');
+    await formatApp(root);
+    const pagePath = join(root, 'routes/admin/catalog/index.tsx');
+    const page = await Deno.readTextFile(pagePath);
+    await Deno.writeTextFile(pagePath, page.replace('<h1>Catalog</h1>', '<h1>Authored</h1>'));
+    const router = await Deno.readTextFile(join(root, 'router.ts'));
+    await assertRejects(() => run('ui:remove', 'page', 'admin/catalog'), Error, 'Refusing removal');
+    assertEquals(await Deno.readTextFile(join(root, 'router.ts')), router);
+    await Deno.writeTextFile(pagePath, page);
+    await run('ui:remove', 'page', 'admin/catalog');
+    assertEquals(
+      await Deno.readTextFile(join(root, 'routes/admin/notes.txt')),
+      'authored parent sibling',
+    );
+    await assertRejects(() => Deno.stat(join(root, 'routes/admin/catalog')), Deno.errors.NotFound);
+  });
+});
+
+Deno.test('ui:remove page gives a removal-specific missing router diagnostic', async () => {
+  await fixture(async (root, run) => {
+    await Deno.remove(join(root, 'router.ts'));
+    await assertRejects(
+      () => run('ui:remove', 'page', 'catalog'),
+      Error,
+      'Cannot remove page: router.ts is missing',
+    );
+  });
+});
+
+Deno.test('absent page reports nothing to remove, refreshes manifests only outside dry run', async () => {
+  const root = '/workspace/app';
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(`${root}/router.ts`, 'export const appRoutes = {\n} as const;\n');
+  const before = new Map(fs.getFiles());
+  const output: string[] = [];
+  let manifests = 0;
+  const command = () =>
+    createUiRemoveCommand({
+      installDependencies: { fs },
+      resolveUiAppRoot: () => Promise.resolve(root),
+      formatter: { formatContents: (files) => Promise.resolve(files.map((file) => file.content)) },
+      writeManifest: () => {
+        manifests++;
+        return Promise.resolve();
+      },
+      print: (message) => output.push(message),
+    });
+  await command().parse(['page', 'typo']);
+  assertEquals(output, ["Nothing to remove for page 'typo'. Derived route modules refreshed."]);
+  assertEquals(manifests, 1);
+  output.length = 0;
+  await command().parse(['page', 'typo', '--dry-run']);
+  assertEquals(output, ["Nothing to remove for page 'typo'."]);
+  assertEquals(manifests, 1);
+  assertEquals(fs.getFiles(), before);
 });
