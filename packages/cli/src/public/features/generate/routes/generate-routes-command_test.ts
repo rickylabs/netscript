@@ -99,6 +99,11 @@ Deno.test('generate routes rejects ambiguous, unknown, and invalid targets befor
 
 Deno.test('generate routes is byte deterministic and idempotent without rewriting derived modules', async () => {
   await withFixture(async ({ app, run }) => {
+    const routesRoot = join(app('alpha'), 'routes');
+    for (const name of ['zebra', 'ant']) {
+      await Deno.mkdir(join(routesRoot, name));
+      await Deno.writeTextFile(join(routesRoot, name, 'index.tsx'), 'export default {}\n');
+    }
     await run(['--app', 'alpha']);
     const first = await generated(app('alpha'));
     const paths = ['manifest.ts', 'routes.ts'].map((file) =>
@@ -111,6 +116,14 @@ Deno.test('generate routes is byte deterministic and idempotent without rewritin
     assertEquals(await generated(app('alpha')), first);
     for (const path of paths) assertEquals((await Deno.stat(path)).mtime, sentinel);
     await Deno.remove(join(app('alpha'), '.generated'), { recursive: true });
+    // Recreate in the opposite insertion order to prove filesystem order is irrelevant.
+    for (const name of ['ant', 'zebra']) {
+      await Deno.remove(join(routesRoot, name), { recursive: true });
+    }
+    for (const name of ['ant', 'zebra']) {
+      await Deno.mkdir(join(routesRoot, name));
+      await Deno.writeTextFile(join(routesRoot, name, 'index.tsx'), 'export default {}\n');
+    }
     await run(['--app', 'alpha']);
     assertEquals(await generated(app('alpha')), first);
   });
