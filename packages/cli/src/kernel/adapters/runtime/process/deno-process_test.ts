@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 
 import { DenoProcess } from './deno-process.ts';
 
@@ -39,4 +39,25 @@ Deno.test('DenoProcess closes piped stdin before timeout kills and awaits the ch
   assertEquals(result.stdout.trim(), 'stdin-closed');
   assertEquals(result.timedOut, true);
   assertEquals(performance.now() - startedAt < 2_000, true);
+});
+
+Deno.test('DenoProcess bounds child output and fails when the capture capacity is exceeded', async () => {
+  const process = new DenoProcess();
+  const result = await process.exec(Deno.execPath(), ['eval', 'console.log("x".repeat(10000));'], {
+    maxOutputBytes: 1024,
+    timeoutMs: 5000,
+  });
+  assertEquals(result.code, 1);
+  assertEquals(result.stderr, 'Process output capacity exceeded.');
+  assert(result.stdout.length <= 1024);
+});
+
+Deno.test('DenoProcess retains exact output within its capture capacity', async () => {
+  const result = await new DenoProcess().exec(Deno.execPath(), [
+    'eval',
+    'console.log("within"); console.error("error");',
+  ], { maxOutputBytes: 1024 });
+  assertEquals(result.code, 0);
+  assertEquals(result.stdout, 'within\n');
+  assertEquals(result.stderr, 'error\n');
 });

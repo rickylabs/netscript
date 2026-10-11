@@ -16496,9 +16496,6 @@
             "ContractSchemaResult": {
               "signature": "ffb223562f0f144982139569fae061b1e2c381fb2b24575e3001044aaec9f2b0"
             },
-            "createWorkersContract": {
-              "signature": "2fea7b7eee6711c4ab3a56e19b364e02997b120fb4b2529f31866da075adcaf5"
-            },
             "ExecutionFiltersSchema": {
               "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
             },
@@ -16580,11 +16577,11 @@
             "RegisterTaskInput": {
               "signature": "6eebad6d9d810cb0badeb0f11ca0c987fe9fa5df5b24ec959188a270773ac0d4"
             },
-            "RuntimePermissions": {
-              "signature": "a4bc96f5c929896dcb5989b227cef6d85fa22f64895a3d647b3d85cfaeb6118c"
-            },
             "RuntimePermissionValue": {
               "signature": "cdc9856fa4e59783f666d812b21615ea00a52891c64d80aed9aa953ac86f76d0"
+            },
+            "RuntimePermissions": {
+              "signature": "a4bc96f5c929896dcb5989b227cef6d85fa22f64895a3d647b3d85cfaeb6118c"
             },
             "SSEEvent": {
               "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
@@ -16631,11 +16628,11 @@
             "WorkersCapabilities": {
               "signature": "f72e398cc0112923adb19b64bf796f5524486ee0b89b423a698b2a616d50e00f"
             },
-            "workersContract": {
-              "signature": "bd82cb833d400d1aabe776540913f77d17ed01498778486f73a1bc9a9470de49"
-            },
             "WorkersContract": {
               "signature": "5984144d3beb521c91c8b94a6f1e3de5a762ca687e9688918b3a9d4dafb4d5ef"
+            },
+            "WorkersContractImplementer": {
+              "signature": "16e2fc1c433b116839eedf431c80b6582ce7abdd07f4be7c3914a02db4484845"
             },
             "WorkersContractRoute": {
               "signature": "62d32a07fe4d1c99e52af6c1aeeacca6f2c35599563c178c47134bb585da1e84"
@@ -16646,14 +16643,20 @@
             "WorkersContractRouteSchemas": {
               "signature": "09d4837895d6101e2fd3aed7ce5dfc15a7c05e3d82e1bd68302c5d63f53dbd12"
             },
-            "workersContractV1": {
-              "signature": "7a86a6eb0b1d10a15f483823bf1fa837adc85e18b2033f603840b9c380f156ea"
-            },
             "WorkersContractV1": {
-              "signature": "138c5bbee757b25adb0a556703a5be74c36e3ae08572f95722ae9215e5ea12d8"
+              "signature": "2679ae985413bb0a766f919992d75d13c093ee710ee3eb631c8e514dc40a9149"
             },
             "WorkersRouter": {
               "signature": "b8bbd50a945c0d938ef8442ab0a8751584b85802807115fa1ed53940bda95be6"
+            },
+            "createWorkersContract": {
+              "signature": "2fea7b7eee6711c4ab3a56e19b364e02997b120fb4b2529f31866da075adcaf5"
+            },
+            "workersContract": {
+              "signature": "bd82cb833d400d1aabe776540913f77d17ed01498778486f73a1bc9a9470de49"
+            },
+            "workersContractV1": {
+              "signature": "0d1d4afb01167f1087a6c0beda349cdd77098ec45c726a2def25771be23c5d91"
             }
           }
         },
@@ -17457,9 +17460,6 @@
             "ContractSchemaResult": {
               "signature": "ffb223562f0f144982139569fae061b1e2c381fb2b24575e3001044aaec9f2b0"
             },
-            "createWorkersContract": {
-              "signature": "2fea7b7eee6711c4ab3a56e19b364e02997b120fb4b2529f31866da075adcaf5"
-            },
             "ExecutionFiltersSchema": {
               "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
             },
@@ -17526,11 +17526,11 @@
             "WorkersCapabilities": {
               "signature": "f72e398cc0112923adb19b64bf796f5524486ee0b89b423a698b2a616d50e00f"
             },
-            "workersContract": {
-              "signature": "bd82cb833d400d1aabe776540913f77d17ed01498778486f73a1bc9a9470de49"
-            },
             "WorkersContract": {
               "signature": "5984144d3beb521c91c8b94a6f1e3de5a762ca687e9688918b3a9d4dafb4d5ef"
+            },
+            "WorkersContractImplementer": {
+              "signature": "16e2fc1c433b116839eedf431c80b6582ce7abdd07f4be7c3914a02db4484845"
             },
             "WorkersContractRoute": {
               "signature": "62d32a07fe4d1c99e52af6c1aeeacca6f2c35599563c178c47134bb585da1e84"
@@ -17541,14 +17541,20 @@
             "WorkersContractRouteSchemas": {
               "signature": "09d4837895d6101e2fd3aed7ce5dfc15a7c05e3d82e1bd68302c5d63f53dbd12"
             },
-            "workersContractV1": {
-              "signature": "7a86a6eb0b1d10a15f483823bf1fa837adc85e18b2033f603840b9c380f156ea"
-            },
             "WorkersContractV1": {
-              "signature": "138c5bbee757b25adb0a556703a5be74c36e3ae08572f95722ae9215e5ea12d8"
+              "signature": "2679ae985413bb0a766f919992d75d13c093ee710ee3eb631c8e514dc40a9149"
             },
             "WorkersRouter": {
               "signature": "b8bbd50a945c0d938ef8442ab0a8751584b85802807115fa1ed53940bda95be6"
+            },
+            "createWorkersContract": {
+              "signature": "2fea7b7eee6711c4ab3a56e19b364e02997b120fb4b2529f31866da075adcaf5"
+            },
+            "workersContract": {
+              "signature": "bd82cb833d400d1aabe776540913f77d17ed01498778486f73a1bc9a9470de49"
+            },
+            "workersContractV1": {
+              "signature": "0d1d4afb01167f1087a6c0beda349cdd77098ec45c726a2def25771be23c5d91"
             }
           }
         },

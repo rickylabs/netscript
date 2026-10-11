@@ -141,17 +141,34 @@ export async function compileAiRegistry(
   files: ProjectFiles,
   target: AiRegistryTarget,
 ): Promise<AiRegistryCompileResult> {
-  const inputs = await selectAiRegistrySources(files, target);
+  const rendered = await renderAiRegistry(files, target);
+  if (rendered.content !== null) await files.writeTextFile(target.registryPath, rendered.content);
+  return {
+    files: rendered.sourceFiles,
+    registryPath: target.registryPath,
+    count: rendered.sourceFiles.length,
+    written: rendered.content !== null,
+  };
+}
 
-  if (inputs.length === 0) {
-    return { files: inputs, registryPath: target.registryPath, count: 0, written: false };
+/** Render with the compiler's selector, without invoking a project writer. */
+export async function renderAiRegistry(
+  files: ProjectFiles,
+  target: AiRegistryTarget,
+): Promise<
+  {
+    readonly registryPath: string;
+    readonly sourceFiles: readonly string[];
+    readonly content: string | null;
   }
-
-  const source = target.kind === 'ai-agents'
+> {
+  const inputs = await selectAiRegistrySources(files, target);
+  const content = inputs.length === 0
+    ? null
+    : target.kind === 'ai-agents'
     ? renderAgentRegistry(target, inputs)
     : renderToolRegistry(target, inputs);
-  await files.writeTextFile(target.registryPath, source);
-  return { files: inputs, registryPath: target.registryPath, count: inputs.length, written: true };
+  return { registryPath: target.registryPath, sourceFiles: inputs, content };
 }
 
 async function selectToolDefinitionModules(
