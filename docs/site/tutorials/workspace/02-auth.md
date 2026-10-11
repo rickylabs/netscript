@@ -239,7 +239,7 @@ For the plain-HTTP loopback recipe, set these host environment variables before 
 restarting `auth-api`, alongside the provider configuration in Step 4:
 
 ```sh
-export NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS=true
+export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true
 export NETSCRIPT_AUTH_COOKIE_NAME=ns_session_dev
 ```
 
