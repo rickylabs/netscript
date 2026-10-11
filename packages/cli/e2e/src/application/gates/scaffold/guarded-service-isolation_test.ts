@@ -8,7 +8,7 @@ Deno.test('public guarded service probe leaves the shared project unchanged and 
   const shared = join(root, 'shared');
   const run = async (args: string[], env?: Record<string, string>) => {
     const result = await new Deno.Command(Deno.execPath(), {
-      args: ['run', '--no-lock', '-A', ...args],
+      args: ['run', '--lock', join(repo, 'deno.lock'), '--frozen', '-A', ...args],
       cwd: repo,
       env,
       stdout: 'piped',

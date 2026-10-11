@@ -114,7 +114,9 @@ Deno.test('generated guarded service: native sessions enforce public discovery/d
     const execution = await new Deno.Command(Deno.execPath(), {
       args: [
         'run',
-        '--no-lock',
+        '--lock',
+        new URL('deno.lock', repo).pathname,
+        '--frozen',
         '-A',
         '--unstable-kv',
         '--config',

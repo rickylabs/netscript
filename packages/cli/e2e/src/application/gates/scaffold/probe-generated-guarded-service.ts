@@ -3,6 +3,7 @@ import { DenoFileSystem } from '../../../../../src/kernel/adapters/runtime/file-
 import { readAuthServiceName } from '../../../../../src/kernel/adapters/service/auth-policy.ts';
 import { join, resolve, toFileUrl } from '@std/path';
 import { GUARDED_SERVICE_PROBE_SOURCE } from './guarded-service-probe-source.ts';
+import { runLockedProbe } from './run-locked-probe.ts';
 
 /** Boot and probe the service emitted by the public service-add command. */
 export async function probeGeneratedGuardedService(
@@ -34,8 +35,8 @@ async function probeInScratch(
   await Deno.mkdir(orderRoot, { recursive: true });
   const projectRoot = join(orderRoot, 'guard-probe');
   const cli = join(repoRoot, 'packages/cli/bin/netscript.ts');
+  const run = (args: readonly string[], cwd: string) => runLockedProbe(args, cwd, repoRoot);
   await run([
-    'run',
     '-A',
     join(repoRoot, 'packages/cli/bin/netscript.ts'),
     'init',
@@ -55,7 +56,6 @@ async function probeInScratch(
   ], repoRoot);
   const installAuth = () =>
     run([
-      'run',
       '-A',
       cli,
       'plugin',
@@ -69,7 +69,6 @@ async function probeInScratch(
     ], repoRoot);
   const addService = () =>
     run([
-      'run',
       '-A',
       cli,
       'service',
@@ -107,7 +106,7 @@ async function probeInScratch(
   const before = await Promise.all(
     authored.map((path) => Deno.readTextFile(join(projectRoot, path))),
   );
-  await run(['run', '-A', cli, 'generate', 'aspire', '--project-root', projectRoot], repoRoot);
+  await run(['-A', cli, 'generate', 'aspire', '--project-root', projectRoot], repoRoot);
   assertEquals(
     await Promise.all(authored.map((path) => Deno.readTextFile(join(projectRoot, path)))),
     before,
@@ -160,11 +159,8 @@ async function probeInScratch(
     );
     await run(
       [
-        'run',
         '-A',
         '--unstable-kv',
-        '--config',
-        join(repoRoot, 'deno.json'),
         '--import-map',
         importMap,
         probe,
@@ -210,16 +206,6 @@ export async function addProtectedProbeProcedure(projectRoot: string): Promise<v
       '...createGuardedV1(application), health, protected: v1.guarded.protected.handler(() => ({ ok: true }))',
     ),
   );
-}
-
-async function run(args: string[], cwd: string): Promise<void> {
-  const result = await new Deno.Command(Deno.execPath(), {
-    args: args[0] === 'run' ? ['run', '--no-lock', ...args.slice(1)] : args,
-    cwd,
-    stdout: 'inherit',
-    stderr: 'inherit',
-  }).output();
-  if (!result.success) throw new Error('Generated guarded service command failed: ' + result.code);
 }
 
 if (import.meta.main) {

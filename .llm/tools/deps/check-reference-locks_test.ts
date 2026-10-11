@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
-import { checkReferenceLock } from './check-reference-locks.ts';
+import { checkDesktopReferenceLock, checkReferenceLock } from './check-reference-locks.ts';
 
 Deno.test('reference lock guard rejects range drift without rewriting the lock', async () => {
   const reference = await Deno.makeTempDir();
@@ -32,4 +32,42 @@ Deno.test('committed Expo reference lock matches its current workspace source gr
     new URL('../../../resources/examples/expo-streams', import.meta.url),
   );
   assertEquals(await checkReferenceLock(reference), true);
+});
+
+Deno.test('reference lock guard checks scratch-probe entrypoints and rejects npm drift', async () => {
+  const reference = await Deno.makeTempDir({ prefix: 'probe-reference-lock-' });
+  try {
+    const committed = JSON.parse(
+      await Deno.readTextFile(new URL('../../../deno.lock', import.meta.url)),
+    );
+    const specifier = 'npm:zod@^4.6.5';
+    const version = committed.specifiers[specifier];
+    const lock = {
+      version: committed.version,
+      specifiers: { [specifier]: version },
+      npm: { [`zod@${version}`]: committed.npm[`zod@${version}`] },
+      workspace: { dependencies: [specifier] },
+    };
+    const lockPath = join(reference, 'deno.lock');
+    await Deno.writeTextFile(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
+    const config = { imports: { dependency: 'npm:zod@^4.6.5' } };
+    await Deno.writeTextFile(join(reference, 'deno.json'), JSON.stringify(config));
+    await Deno.writeTextFile(join(reference, 'probe.ts'), "import 'dependency';\n");
+    const locked = await Deno.readTextFile(lockPath);
+    assertEquals(await checkReferenceLock(reference, ['probe.ts']), true);
+    config.imports.dependency = 'npm:zod@4.6.5';
+    await Deno.writeTextFile(join(reference, 'deno.json'), JSON.stringify(config));
+    assertEquals(await checkReferenceLock(reference, ['probe.ts']), false);
+    assertEquals(await Deno.readTextFile(lockPath), locked);
+  } finally {
+    await Deno.remove(reference, { recursive: true });
+  }
+});
+
+Deno.test('desktop scratch reference lock matches its prepared source and catalog graph', async () => {
+  const repoRoot = fromFileUrl(new URL('../../../', import.meta.url));
+  const lockPath = join(repoRoot, 'packages/cli/e2e/fixtures/desktop-native/deno.lock');
+  const locked = await Deno.readTextFile(lockPath);
+  assertEquals(await checkDesktopReferenceLock(repoRoot), true);
+  assertEquals(await Deno.readTextFile(lockPath), locked);
 });

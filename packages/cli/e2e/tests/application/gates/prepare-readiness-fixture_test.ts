@@ -287,7 +287,7 @@ export async function withCacheReference(
     );
 
     const output = await new Deno.Command(Deno.execPath(), {
-      args: ['check', '--no-config', '--no-lock', '--unstable-kv', `${helpers}/register-apps.mts`],
+      args: ['check', '--no-config', '--frozen', '--unstable-kv', `${helpers}/register-apps.mts`],
       stdout: 'piped',
       stderr: 'piped',
     }).output();

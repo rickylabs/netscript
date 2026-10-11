@@ -38,6 +38,9 @@ console.info('Generated auth cookie-jar PASS: provider callback, cookie-only ses
     const result = await new Deno.Command(Deno.execPath(), {
       args: [
         'run',
+        '--lock',
+        join(projectRoot, 'deno.lock'),
+        '--frozen',
         '-A',
         '--unstable-kv',
         '--config',

@@ -197,11 +197,30 @@ export async function probeGeneratedServiceClients(
   await Deno.writeTextFile(probePath, serviceClientConsumerSource());
   try {
     const check = await runCommand(
-      ['deno', 'check', '--unstable-kv', `lib/${PROBE_FILE}`],
+      [
+        'deno',
+        'check',
+        '--lock',
+        join(projectRoot, 'deno.lock'),
+        '--frozen',
+        '--unstable-kv',
+        `lib/${PROBE_FILE}`,
+      ],
       appRoot,
     );
     requireSuccess(check, 'two-service consumer type-check');
-    const execution = await runCommand(['deno', 'run', '-A', `lib/${PROBE_FILE}`], appRoot);
+    const execution = await runCommand(
+      [
+        'deno',
+        'run',
+        '--lock',
+        join(projectRoot, 'deno.lock'),
+        '--frozen',
+        '-A',
+        `lib/${PROBE_FILE}`,
+      ],
+      appRoot,
+    );
     requireSuccess(execution, 'two-service key probe');
     const marked = execution.stdout.split('\n').find((line) => line.startsWith(EVIDENCE_MARKER));
     if (!marked) throw new Error(`two-service key probe emitted no evidence\n${execution.stdout}`);
