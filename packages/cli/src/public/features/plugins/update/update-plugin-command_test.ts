@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { walk } from '@std/fs';
-import { fromFileUrl, join } from '@std/path';
+import { fromFileUrl, join, relative, resolve } from '@std/path';
 import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
 import { DenoProjectStage } from '../../../../kernel/adapters/runtime/file-system/deno-project-stage.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -194,14 +194,143 @@ async function snapshot(root: string): Promise<readonly (readonly [string, numbe
   return files.sort(([left], [right]) => left.localeCompare(right));
 }
 
+Deno.test('plugin update local-source workers writes resolvable runtime imports at a different live root depth', async () => {
+  const parent = await Deno.makeTempDir();
+  const root = join(parent, 'nested', 'consumer', 'app');
+  const fixture = await createFixture(new RegistryEmitter(), 'workers', {
+    'workers/plugin.ts': `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+      { callee: 'defineJob', axis: 'jobs' },
+    ] as const;`,
+  }, { root });
+  try {
+    await Deno.mkdir(join(root, 'packages/cli'), { recursive: true });
+    await Deno.writeTextFile(join(root, 'packages/cli/deno.json'), '{}\n');
+    await fixture.command.parse(['workers']);
+    assertEquals(fixture.scaffoldRoots.length, 1);
+    assertEquals(
+      fixture.scaffoldRoots[0].split(/[/\\]/).length === root.split(/[/\\]/).length,
+      false,
+    );
+    const config = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+    for (const target of Object.values(config.imports as Record<string, string>)) {
+      if (target.startsWith('.')) {
+        assertEquals((await Deno.stat(resolve(root, target))).isFile, true, target);
+      }
+    }
+    for (
+      const specifier of [
+        '@netscript/plugin-workers/runtime',
+        'jsr:@netscript/plugin-workers/jobs/health-check.ts',
+      ]
+    ) {
+      assertEquals(typeof config.imports[specifier], 'string');
+      assertEquals((await Deno.stat(resolve(root, config.imports[specifier]))).isFile, true);
+    }
+  } finally {
+    await Deno.remove(parent, { recursive: true });
+  }
+});
+
+Deno.test('plugin update preserves existing and scaffold-created external imports and removal snapshots across root depths', async () => {
+  const parent = await Deno.makeTempDir();
+  const root = join(parent, 'nested', 'consumer', 'app');
+  const external = fromFileUrl(
+    new URL('../../../../../../../packages/plugin/mod.ts', import.meta.url),
+  );
+  const fixture = await createFixture(new RegistryEmitter(), 'workers', {
+    'workers/plugin.ts': `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+      { callee: 'defineJob', axis: 'jobs' },
+    ] as const;`,
+  }, {
+    root,
+    onScaffold: async (stageRoot) => {
+      assertEquals(stageRoot.split(/[/\\]/).length === root.split(/[/\\]/).length, false);
+      const config = JSON.parse(await Deno.readTextFile(join(stageRoot, 'deno.json')));
+      assertEquals(resolve(stageRoot, config.imports['@fixture/external']), external);
+      assertEquals(
+        await Deno.readTextFile(resolve(stageRoot, config.imports['@fixture/internal'])),
+        'export const value = 1;\n',
+      );
+      // A scaffold subprocess may itself add a project-external relative import.
+      config.imports['@fixture/scaffold'] = relative(stageRoot, external);
+      await Deno.writeTextFile(join(stageRoot, 'deno.json'), JSON.stringify(config));
+    },
+  });
+  try {
+    await Deno.mkdir(join(root, 'packages/cli'), { recursive: true });
+    await Deno.writeTextFile(join(root, 'packages/cli/deno.json'), '{}\n');
+    await Deno.writeTextFile(join(root, 'local.ts'), 'export const value = 1;\n');
+    const existingImports = {
+      '@fixture/external': relative(root, external),
+      '@fixture/internal': './local.ts',
+    };
+    await Deno.writeTextFile(
+      join(root, 'deno.json'),
+      JSON.stringify({
+        workspace: [],
+        imports: existingImports,
+        scopes: { './workers/': { '@fixture/scoped': relative(root, external) } },
+      }),
+    );
+    await Deno.writeTextFile(
+      join(root, 'undeclared.ts'),
+      `import { defineSaga } from '@netscript/plugin-sagas-core';
+export const saga = defineSaga({});`,
+    );
+    const before = await snapshot(root);
+    await assertRejects(
+      () => fixture.command.parse(['workers']),
+      TypeError,
+      'Contribution factory "defineSaga" has no declared axis',
+    );
+    assertEquals(await snapshot(root), before);
+    await Deno.remove(join(root, 'undeclared.ts'));
+    await fixture.command.parse(['workers']);
+    const config = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+    assertEquals(config.imports['@fixture/external'], existingImports['@fixture/external']);
+    assertEquals(config.imports['@fixture/internal'], existingImports['@fixture/internal']);
+    for (const imports of [config.imports, ...Object.values(config.scopes)]) {
+      for (const target of Object.values(imports as Record<string, string>)) {
+        if (!target.startsWith('.') && !target.startsWith('/') && !target.startsWith('file:')) {
+          continue;
+        }
+        const path = target.startsWith('file:') ? fromFileUrl(target) : resolve(root, target);
+        assertEquals((await Deno.stat(path)).isFile, true, target);
+      }
+    }
+    for (
+      const specifier of [
+        '@netscript/plugin-workers/runtime',
+        'jsr:@netscript/plugin-workers/jobs/health-check.ts',
+      ]
+    ) {
+      assertEquals(typeof config.imports[specifier], 'string');
+      assertEquals((await Deno.stat(resolve(root, config.imports[specifier]))).isFile, true);
+    }
+    assertEquals(resolve(root, config.imports['@fixture/scaffold']), external);
+    const metadata = JSON.parse(
+      await Deno.readTextFile(join(root, 'workers/scaffold.plugin.json')),
+    );
+    assertEquals(JSON.parse(metadata.netscriptInstall.rootDenoJsonBefore).imports, existingImports);
+    assertEquals(JSON.parse(metadata.netscriptInstall.rootDenoJsonAfter), config);
+    assertEquals(fixture.scaffoldCalls(), 2);
+    for (const stageRoot of fixture.scaffoldRoots) {
+      await assertRejects(() => Deno.stat(stageRoot), Deno.errors.NotFound);
+    }
+  } finally {
+    await Deno.remove(parent, { recursive: true });
+  }
+});
+
 async function createFixture(
   emitter: EmitterPort = new RegistryEmitter(),
   kind = 'streams',
   updatedFiles: Readonly<Record<string, string>> = {
     'streams/plugin.ts': '// updated control module\n',
   },
+  fixtureOptions: { root?: string; onScaffold?: (stageRoot: string) => Promise<void> } = {},
 ) {
-  const root = await Deno.makeTempDir();
+  const root = fixtureOptions.root ?? await Deno.makeTempDir();
   const fs = new DenoFileSystem();
   const registry = new PluginKindRegistry();
   const pluginPath = fromFileUrl(new URL(`../../../../../../../plugins/${kind}`, import.meta.url));
@@ -271,6 +400,7 @@ async function createFixture(
             const context: { workspaceRoot: string } = JSON.parse(contextArg);
             assertEquals(context.workspaceRoot, options?.cwd);
             scaffoldRoots.push(context.workspaceRoot);
+            await fixtureOptions.onScaffold?.(context.workspaceRoot);
             for (const [path, text] of Object.entries(updatedFiles)) {
               await fs.writeFile(join(context.workspaceRoot, path), text);
             }
