@@ -1,4 +1,5 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
+import { DenoKvAdapter } from '@netscript/kv';
 
 import { defineSaga, sagaCompensate, sagaComplete, sagaFail } from '../../mod.ts';
 import type {
@@ -10,8 +11,9 @@ import type {
   SagaStateEnvelope,
 } from '../../src/domain/mod.ts';
 import type { SagaStoreWriteOptions } from '../../src/ports/mod.ts';
-import { createSagaEngine, createSagaRuntime } from '../../src/runtime/mod.ts';
-import { MemorySagaStore } from '../../src/testing/mod.ts';
+import { createSagaEngine, createSagaRuntime, SagaCompensator } from '../../src/runtime/mod.ts';
+import { MemorySagaStore, TestSagaClock } from '../../src/testing/mod.ts';
+import { KvSagaAppliedKeyStore, KvSagaStore } from '../../src/stores/mod.ts';
 import {
   SagaAttributes,
   SagaInstrumentation,
@@ -56,7 +58,6 @@ for (
     const definition = defineSaga('telemetry-compensation')
       .state<SagaState>({ payment: 'captured' })
       .on('FulfillmentFailed', () => [sagaCompensate({ type: 'RefundPayment', payload: {} })])
-      .on('Inspect', () => [])
       .build() as SagaDefinition;
     await engine.register([definition]);
     await engine.start();
@@ -75,7 +76,7 @@ for (
       );
 
       assert(requested.version !== undefined);
-      const committed = await engine.commitCompensation({
+      const compensation = {
         sagaId: requested.sagaId,
         instanceId: requested.instanceId,
         correlationKey: requested.correlationKey,
@@ -83,16 +84,12 @@ for (
         state: { payment: 'refunded' },
         message: { type: 'RefundPayment', payload: {} },
         cascaded: scenario.cascaded,
-      });
+      };
+      const committed = await engine.commitCompensation(compensation);
       assertEquals(committed.committed, true);
       assertEquals((await store.load(requested.instanceId))?.metadata.status, scenario.status);
-      // This probes status mapping on a later handle, not outcome emission at commit time.
-      // The existing engine accepts ordinary handlers on terminal instances; see PR debt note.
-      await engine.handle({
-        type: 'Inspect',
-        payload: {},
-        correlationKey: requested.correlationKey,
-      });
+      assertEquals(telemetry.spans.length, 2);
+      assertEquals(telemetry.durations.length, 2);
       const span = telemetry.spans.at(-1)!;
       assertEquals(span.attributes[SagaAttributes.OUTCOME], scenario.outcome);
       assertEquals(span.events.at(-1)?.attributes?.[SagaAttributes.STATUS], scenario.status);
@@ -102,8 +99,164 @@ for (
         telemetry.durations.at(-1)?.attributes?.[SagaAttributes.OUTCOME],
         scenario.outcome,
       );
+      assertEquals((await engine.commitCompensation(compensation)).committed, false);
+      assertEquals(telemetry.spans.length, 2);
+      assertEquals(telemetry.durations.length, 2);
     } finally {
       await engine.stop('compensation telemetry test complete');
+    }
+  });
+}
+
+for (const atomic of [false, true]) {
+  for (const throws of [false, true]) {
+    Deno.test(`SagaEngine ${atomic ? 'atomic' : 'Deno KV'} compensation telemetry is immediate and replay-safe (${throws ? 'thrown failure' : 'finished undo'})`, async () => {
+      await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+      const store = atomic ? new MemorySagaStore() : new KvSagaStore({ kv });
+      const telemetry = new RecordingTelemetry();
+      const builder = defineSaga('atomic-telemetry-compensation')
+        .state<SagaState>({ payment: 'captured' });
+      const definition = (atomic ? builder.durableWorkerCommands() : builder)
+        .on('Start', () => [sagaCompensate({ type: 'Undo', payload: {} })])
+        .build() as SagaDefinition;
+      const engine = createSagaEngine({
+        store,
+        instrumentation: telemetry.instrumentation,
+        appliedKeys: new KvSagaAppliedKeyStore({ kv }),
+      });
+      await engine.register([definition]);
+      await engine.start();
+      try {
+        const [requested] = await engine.handle({
+          type: 'Start',
+          payload: {},
+          correlationKey: 'order-1' as SagaCorrelationKey,
+        });
+        const error = throws ? new RangeError('undo failed') : undefined;
+        const outcome = {
+          sagaId: requested.sagaId,
+          instanceId: requested.instanceId,
+          correlationKey: requested.correlationKey,
+          message: { type: 'Undo', payload: {} },
+          version: requested.version!,
+          state: throws ? requested.state : { payment: 'refunded' },
+          cascaded: [],
+          error,
+        };
+        const committed = await engine.commitCompensation(outcome);
+        assertEquals(committed.committed, true);
+        const status = throws ? 'failed' : 'compensated';
+        assertEquals((await store.load(requested.instanceId))?.metadata.status, status);
+        assertEquals(telemetry.spans.length, 2);
+        const span = telemetry.spans.at(-1)!;
+        assertEquals(span.events.at(-1)?.attributes?.[SagaAttributes.STATUS], status);
+        assertEquals(span.attributes[SagaAttributes.OUTCOME], throws ? 'error' : 'compensated');
+        assertEquals(span.exceptions, throws ? [error] : []);
+        assertEquals(span.ended, true);
+        assertEquals(telemetry.durations.length, 2);
+        assertEquals((await engine.commitCompensation(outcome)).committed, false);
+        assertEquals(telemetry.spans.length, 2);
+        assertEquals(telemetry.durations.length, 2);
+      } finally {
+        await engine.stop();
+      }
+    });
+  }
+}
+
+Deno.test('SagaEngine reports no compensation outcome for a failed atomic write and reports a successful retry once', async () => {
+  const telemetry = new RecordingTelemetry();
+  const store = new RetryableCompensationStore();
+  const engine = createSagaEngine({ store, instrumentation: telemetry.instrumentation });
+  const definition = defineSaga('retry-compensation-telemetry')
+    .state<SagaState>({})
+    .durableWorkerCommands()
+    .on('Start', () => [sagaCompensate({ type: 'Undo', payload: {} })])
+    .build() as SagaDefinition;
+  await engine.register([definition]);
+  await engine.start();
+  try {
+    const [requested] = await engine.handle({ type: 'Start', payload: {} });
+    const outcome = {
+      sagaId: requested.sagaId,
+      instanceId: requested.instanceId,
+      correlationKey: requested.correlationKey,
+      version: requested.version!,
+      message: { type: 'Undo', payload: {} },
+      state: {},
+      cascaded: [],
+    };
+    const failure = await assertRejects(
+      () => engine.commitCompensation(outcome),
+      Error,
+      'write unavailable',
+    );
+    assertEquals(engine.classifyRetry(failure, 1).retryable, true);
+    assertEquals(telemetry.spans.length, 1);
+    assertEquals(telemetry.durations.length, 1);
+    assertEquals((await store.load(requested.instanceId))?.metadata.status, 'compensating');
+    assertEquals((await engine.commitCompensation(outcome)).committed, true);
+    assertEquals(telemetry.spans.length, 2);
+    assertEquals(telemetry.spans[1].attributes[SagaAttributes.OUTCOME], 'compensated');
+    assertEquals((await engine.commitCompensation(outcome)).committed, false);
+    assertEquals(telemetry.spans.length, 2);
+    assertEquals(telemetry.durations.length, 2);
+  } finally {
+    await engine.stop();
+  }
+});
+
+for (const returnedFailure of [false, true]) {
+  Deno.test(`runtime committed compensation telemetry preserves span and correlation ownership (${returnedFailure ? 'returned' : 'thrown'} failure)`, async () => {
+    const telemetry = new RecordingTelemetry();
+    const store = new MemorySagaStore();
+    const definition = defineSaga('runtime-compensation-outcome')
+      .state<SagaState>({})
+      .correlate(() => 'domain-order-1' as SagaCorrelationKey)
+      .on('Start', () => [sagaCompensate({ type: 'Undo', payload: {} })])
+      .compensate('Undo', () => {
+        if (returnedFailure) return [sagaFail('refund rejected')];
+        throw new RangeError('refund rejected');
+      })
+      .build() as SagaDefinition;
+    const runtime = createSagaRuntime({
+      native: {
+        store,
+        instrumentation: telemetry.instrumentation,
+        compensator: new SagaCompensator({ clock: new TestSagaClock() }),
+      },
+    });
+    await runtime.register([definition]);
+    await runtime.start();
+    try {
+      const publish = () =>
+        runtime.publish({
+          type: 'Start',
+          payload: {},
+          correlationKey: 'flow-b-order-1' as SagaCorrelationKey,
+          idempotencyKey: 'start-1',
+        });
+      if (returnedFailure) await publish();
+      else await assertRejects(publish, RangeError, 'refund rejected');
+      assertEquals(telemetry.spans.length, 3);
+      const [handle, compensate, committed] = telemetry.spans;
+      assertEquals(compensate.name, SagaSpanNames.CASCADE_COMPENSATE);
+      assertEquals(compensate.attributes[SagaAttributes.OUTCOME], 'error');
+      assertEquals(committed.name, SagaSpanNames.HANDLE);
+      assertEquals(committed.attributes[SagaAttributes.OUTCOME], 'error');
+      assertEquals(committed.events.at(-1)?.attributes?.[SagaAttributes.STATUS], 'failed');
+      assertEquals(compensate.parent, handle.spanContext());
+      assertEquals(committed.parent, handle.spanContext());
+      for (const span of telemetry.spans) {
+        assertEquals(span.attributes[SagaAttributes.CORRELATION_ID], 'flow-b-order-1');
+        assertEquals(span.attributes[SagaAttributes.SAGA_CORRELATION_KEY], 'domain-order-1');
+        assertEquals(span.ended, true);
+      }
+      await publish();
+      assertEquals(telemetry.spans.length, 3);
+      assertEquals(telemetry.durations.length, 2);
+    } finally {
+      await runtime.stop();
     }
   });
 }
@@ -465,5 +618,20 @@ class FailingSagaStore extends MemorySagaStore {
     _options?: SagaStoreWriteOptions,
   ): Promise<void> {
     return Promise.reject(new Error('persistence unavailable'));
+  }
+}
+
+class RetryableCompensationStore extends MemorySagaStore {
+  #failed = false;
+
+  override commitTransition(
+    request: Parameters<MemorySagaStore['commitTransition']>[0],
+    signal?: AbortSignal,
+  ): ReturnType<MemorySagaStore['commitTransition']> {
+    if (request.envelope.metadata.version === 2 && !this.#failed) {
+      this.#failed = true;
+      return Promise.reject(new Error('write unavailable'));
+    }
+    return super.commitTransition(request, signal);
   }
 }

@@ -340,6 +340,10 @@ export class SagaBusBridge implements SagaBusPort {
       instanceId: request.instanceId,
       correlationKey: request.correlationKey,
       version: request.version,
+    }, {
+      attempt: request.attempt,
+      correlationId: request.correlationId,
+      parent: request.parent,
     });
   }
 
