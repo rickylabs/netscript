@@ -225,7 +225,14 @@ async function createDefaultRuntime(
     },
   });
 
-  return withDurableDispose(durable.runtime, durable.dispose);
+  return withDurableDispose(durable.runtime, async () => {
+    try {
+      await durable.dispose();
+    } finally {
+      // Injected canonical stores own their lifecycle separately from replay KV.
+      if (native.store) await kv.close();
+    }
+  });
 }
 
 function hasInjectedNativeEngine(options: CreateSagaRuntimeOptions): boolean {
