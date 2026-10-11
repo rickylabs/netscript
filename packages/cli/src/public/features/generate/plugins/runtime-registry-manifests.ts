@@ -242,15 +242,18 @@ export async function discoverInstalledRuntimePackages(
   const found = new Map<string, InstalledRuntimePackage>();
   for (const raw of Object.values(plugins)) {
     const entrypoint = asRecord(raw).Entrypoint;
-    if (typeof entrypoint !== 'string') continue;
+    if (typeof entrypoint !== 'string') {
+      throw new Error('Installed plugin declaration is missing its entrypoint.');
+    }
     const parsed = parseJsrEntrypoint(entrypoint);
-    if (parsed) found.set(`${parsed.packageName}@${parsed.version}`, parsed);
+    if (!parsed) throw new Error('Installed plugin entrypoint must be a versioned JSR specifier.');
+    found.set(`${parsed.packageName}@${parsed.version}`, parsed);
   }
   return [...found.values()];
 }
 
 function parseJsrEntrypoint(entrypoint: string): InstalledRuntimePackage | undefined {
-  const match = /^jsr:(@[^/]+\/[^/@]+)@([^/]+)(?:\/.*)?$/.exec(entrypoint);
+  const match = /^jsr:(@[a-z0-9-]+\/[a-z0-9-]+)@([^/\s]+)(?:\/.*)?$/.exec(entrypoint);
   if (!match) return undefined;
   return { name: match[1], packageName: match[1], version: match[2] };
 }

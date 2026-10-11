@@ -88,7 +88,7 @@ async function withProject(run: (root: string) => Promise<void>, plugins = ['tri
             plugins.map((
               plugin,
             ) => [plugin, {
-              Entrypoint: netscriptJsrSpecifier(`@netscript/plugin-${plugin}`, 'runtime'),
+              Entrypoint: netscriptJsrSpecifier(`plugin-${plugin}`, '/runtime'),
             }]),
           ),
         },
@@ -321,3 +321,18 @@ Deno.test('plugin check detects edits to an existing AI source that change gener
     assertEquals(await snapshot(root), before);
   }, ['ai']);
 });
+
+for (const entrypoint of [null, './plugins/custom/mod.ts']) {
+  Deno.test(`plugin check refuses unsupported installed entrypoint ${String(entrypoint)} instead of certifying an empty surface`, async () => {
+    await withProject(async (root) => {
+      await write(
+        root,
+        'appsettings.json',
+        JSON.stringify({ NetScript: { Plugins: { custom: { Entrypoint: entrypoint } } } }),
+      );
+      const before = await snapshot(root);
+      assertEquals((await inspect(root)).status, 'inspection-failure');
+      assertEquals(await snapshot(root), before);
+    });
+  });
+}
