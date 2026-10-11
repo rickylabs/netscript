@@ -4,6 +4,7 @@ import {
   locateWorkersResourceBlock,
 } from './locate-workers-resource-block.ts';
 import { prepareLocalSourceFixture } from './local-source-fixture.ts';
+import { hasLocalJobDefinition } from './has-local-job-definition.ts';
 import { installGeneratedProbe } from './install-generated-probe.ts';
 
 const projectRoot = Deno.args[0];
@@ -424,12 +425,7 @@ await runDeno(
 const registryPath = `${projectRoot}/.netscript/generated/plugin-workers/job-registry.ts`;
 const registrySource = await Deno.readTextFile(registryPath);
 const flowBEntrypoint = `./${flowBJobId}.ts`;
-const quotedEntrypoints = [JSON.stringify(flowBEntrypoint), `'${flowBEntrypoint}'`];
-const flowBDefinitionLine = registrySource.split('\n').find((line) =>
-  line.includes('createLocalJobDefinition(') &&
-  quotedEntrypoints.some((entrypoint) => line.includes(entrypoint))
-);
-if (!flowBDefinitionLine) {
+if (!hasLocalJobDefinition(registrySource, flowBJobId, flowBEntrypoint)) {
   throw new Error('generated workers registry did not contain the Flow-B callback job');
 }
 
