@@ -1,6 +1,7 @@
 import { checkGeneratedFiles } from '../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
+import { AstExtractor, RegistryEmitter } from '@netscript/plugin/sdk';
 import { streamsAdapterPlugin } from '../plugin.ts';
 import {
   DEFAULT_STREAM_INPUT,
@@ -197,4 +198,18 @@ Deno.test({
       await Deno.remove(root, { recursive: true });
     }
   },
+});
+
+Deno.test('streams install control metadata excludes schema maps from id registries', async () => {
+  const artifacts = collectInstallArtifacts(streamsAdapterPlugin);
+  const contributions = await new AstExtractor().extract([
+    ...artifacts.map((artifact) => ({ path: artifact.path, text: artifactText(artifact) })),
+    {
+      path: 'schemas.ts',
+      text: `import { defineStreamSchema } from '@netscript/plugin-streams-core';
+export const schema = defineStreamSchema({ invoice: { primaryKey: 'invoiceId' } });`,
+    },
+  ]);
+  assertEquals(contributions, []);
+  assertEquals(await new RegistryEmitter().emit(contributions), []);
 });

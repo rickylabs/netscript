@@ -93,6 +93,7 @@ export function createPluginCommand(
     .command(
       "update",
       createUpdatePluginCommand({
+        projectStage: dependencies.projectStage,
         resolveProjectRoot: dependencies.resolveProjectRoot,
         installPluginDependencies: dependencies.pluginInstallDependencies,
         registryDependencies:

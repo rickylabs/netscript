@@ -11,7 +11,7 @@ const CONTRIBUTION_BUILDERS_START = /\bexport\s+const\s+NETSCRIPT_CONTRIBUTION_B
 const CONTRIBUTION_BUILDERS_DECLARATION =
   /\bexport\s+const\s+NETSCRIPT_CONTRIBUTION_BUILDERS\s*=\s*\[([\s\S]*?)\]\s*as\s+const\s*;?/g;
 const CONTRIBUTION_BUILDER_ENTRY =
-  /\{\s*callee\s*:\s*(['"])([^'"\r\n]*)\1\s*,\s*axis\s*:\s*(['"])([^'"\r\n]*)\3\s*,?\s*\}/g;
+  /\{\s*callee\s*:\s*(['"])([^'"\r\n]*)\1\s*,\s*axis\s*:\s*(?:(['"])([^'"\r\n]*)\3|(null))\s*,?\s*\}/g;
 const NAMED_IMPORT = /\bimport\s*\{([\s\S]*?)\}\s*from\s*(['"])([^'"]+)\2/g;
 const PLUGIN_CORE_MODULE = /(?:^|\/)plugin-[^/]+-core(?:\/builders)?$/;
 const CONTRIBUTION_FACTORY_IDENTIFIER = /^define(?!.*(?:Config|Handler)$)[A-Z][\w$]*$/;
@@ -55,21 +55,23 @@ export class AstExtractor implements ExtractorPort {
 function createContributionBuilders(
   builders: readonly ContributionBuilderPattern[],
 ): readonly ContributionBuilderPattern[] {
-  const callees = new Set<string>();
-  const snapshots = builders.map((builder) => {
+  const callees = new Map<string, string | null>();
+  const snapshots: ContributionBuilderPattern[] = [];
+  for (const builder of builders) {
     if (!TYPESCRIPT_IDENTIFIER.test(builder.callee)) {
       throw new TypeError(`Invalid contribution builder callee "${builder.callee}"`);
     }
-    if (builder.axis.trim().length === 0) {
+    if (builder.axis !== null && builder.axis.trim().length === 0) {
       throw new TypeError(`Contribution builder axis for "${builder.callee}" must not be blank`);
     }
-    if (callees.has(builder.callee)) {
+    if (callees.has(builder.callee) && callees.get(builder.callee) !== builder.axis) {
       throw new TypeError(`Duplicate contribution builder callee "${builder.callee}"`);
     }
 
-    callees.add(builder.callee);
-    return Object.freeze({ callee: builder.callee, axis: builder.axis });
-  });
+    if (callees.has(builder.callee)) continue;
+    callees.set(builder.callee, builder.axis);
+    snapshots.push(Object.freeze({ callee: builder.callee, axis: builder.axis }));
+  }
 
   return Object.freeze(snapshots);
 }
@@ -91,7 +93,10 @@ function readContributionBuilderDeclarations(file: WalkedFile): ContributionBuil
       throw malformedContributionBuildersDeclaration(file.path);
     }
 
-    return entries.map((entry) => ({ callee: entry[2], axis: entry[4] }));
+    return entries.map((entry) => ({
+      callee: entry[2],
+      axis: entry[5] === 'null' ? null : entry[4],
+    }));
   });
 }
 
@@ -145,6 +150,7 @@ function extractFromFile(
   const contributions: ExtractedContribution[] = [];
 
   for (const builder of builders) {
+    if (builder.axis === null) continue;
     contributions.push(...extractNamedExports(file.path, text, builder.callee, builder.axis));
     contributions.push(...extractDefaultExports(file.path, text, builder.callee, builder.axis));
   }
