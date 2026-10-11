@@ -124,7 +124,8 @@ subscription API to keep in sync.
   {
     label: "Consume over HTTP/SSE (Fresh client)",
     lang: "ts",
-    code: "// islands/ExecutionsView.tsx — read the durable log directly\nimport { buildStreamUrl, getStreamsUrl } from '@netscript/plugin-streams-core';\nimport { bindStreamEventSourceV1 } from '@netscript/fresh/streams';\n\n// Native EventSource needs the real stream route, an opaque replay offset, and\n// live=sse. It cannot attach arbitrary authorization headers, so use this from\n// a same-origin/cookie-compatible route or proxy when the service is protected.\nconst url = new URL(buildStreamUrl('/workers/executions', getStreamsUrl()));\nurl.searchParams.set('offset', '-1');\nurl.searchParams.set('live', 'sse');\nconst source = new EventSource(url);\n\nconst latest = new Map<string, unknown>();\nconst binding = bindStreamEventSourceV1({\n  source,\n  onEvent(event) {\n    // The helper registers named data/control listeners and validates both\n    // payload schemas before delivering this exhaustive outcome union.\n    if (event.event === 'error') { latest.set('$error', event.payload); return; }\n    if (event.event !== 'data') return; // control / derived heartbeat\n    for (const change of event.payload) { // data is always an ordered array\n      if (change.headers.operation === 'delete') latest.delete(change.key);\n      else latest.set(change.key, change.value);\n    }\n  },\n});\n\n// An island should call binding.dispose() from its effect cleanup. This plain\n// browser example closes on page teardown; W3-A owns reconnect policy.\naddEventListener('pagehide', () => binding.dispose(), { once: true });" }
+    code: "// islands/ExecutionsView.tsx — read the durable log directly\nimport { buildStreamUrl, getStreamsUrl } from '@netscript/plugin-streams-core';\nimport { bindStreamEventSourceV1 } from '@netscript/fresh/streams';\n\n// Native EventSource needs the real stream route, an opaque replay offset, and\n// live=sse. It cannot attach arbitrary authorization headers, so use this from\n// a same-origin/cookie-compatible route or proxy when the service is protected.\nconst url = new URL(buildStreamUrl('/workers/executions', getStreamsUrl()));\nurl.searchParams.set('offset', '-1');\nurl.searchParams.set('live', 'sse');\nconst source = new EventSource(url);\n\nconst latest = new Map<string, unknown>();\nconst binding = bindStreamEventSourceV1({\n  source,\n  onEvent(event) {\n    // The helper registers named data/control listeners and validates both\n    // payload schemas before delivering this exhaustive outcome union.\n    if (event.event === 'error') { latest.set('$error', event.payload); return; }\n    if (event.event !== 'data') return; // control / derived heartbeat\n    for (const change of event.payload) { // data is always an ordered array\n      if (change.headers.operation === 'delete') latest.delete(change.key);\n      else latest.set(change.key, change.value);\n    }\n  },\n});\n\n// An island should call binding.dispose() from its effect cleanup. This plain\n// browser example closes on page teardown; W3-A owns reconnect policy.\naddEventListener('pagehide', () => binding.dispose(), { once: true });"
+  }
 ] }) }}
 
 ## Breaking migration in 0.0.8
@@ -237,7 +238,9 @@ immediately** rather than blocking or silently dropping writes.
 ```ts
 // services/ingestion/emit-completion.ts
 import {
-  createServiceStreamProducer, defineStreamSchema } from "@netscript/plugin-streams-core";
+  createServiceStreamProducer,
+  defineStreamSchema,
+} from "@netscript/plugin-streams-core";
 import { z } from "zod";
 
 const completions = defineStreamSchema({
@@ -343,7 +346,9 @@ remain the 0.0.9 enhancement [#2114](https://github.com/rickylabs/netscript/issu
 
 ## Known limitations
 
-Be deliberate about what the alpha producer does and does not guarantee. {{ comp callout { type: "warning", title: "Writes are dropped after a connect failure (no reconnect)" } }}
+Be deliberate about what the alpha producer does and does not guarantee.
+
+{{ comp callout { type: "warning", title: "Writes are dropped after a connect failure (no reconnect)" } }}
 If the producer cannot reach the durable-stream server (on its assigned port) at startup, it logs a
 <code>console.warn</code> and then <strong>silently skips every subsequent <code>upsert</code>/<code>delete</code></strong>
 — there is no reconnect loop in the current alpha. <code>flush()</code> rethrows that connect error so a
@@ -388,7 +393,7 @@ through it. The port is overridable via `STREAMS_PORT` or `PORT`.
     ["Plugin location", "<code>plugins/streams/</code>"],
     ["Producer package", "<code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>, <code>createServiceStreamProducer</code>, <code>defineStreamSchema</code>)"],
     ["Manifest import", "<code>@netscript/plugin-streams</code> — <code>streamsPlugin</code> and typed topic definitions"],
-["Transport client", "<code>@durable-streams/client</code> (<code>IdempotentProducer</code>)"],
+    ["Transport client", "<code>@durable-streams/client</code> (<code>IdempotentProducer</code>)"],
     ["Dev service port", "its assigned port (durable-stream Aspire service; override with <code>STREAMS_PORT</code>/<code>PORT</code>)"],
     ["provider.kind", "<code>stream</code> · category <code>plugin</code> · pluginType <code>utility</code>"],
     ["Requires DB / KV", "<code>false</code> / <code>false</code>"],

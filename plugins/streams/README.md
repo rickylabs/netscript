@@ -219,13 +219,13 @@ the binding on teardown. There is no in-process topic subscription replacement. 
 
 ## Public surface
 
-| Entry        | What it gives you                                                                                                           |
+| Entry        | What it gives you                                                                          |
 | ------------ | ------------------------------------------------------------------------------------------ |
 | `.`          | `streamsPlugin`, `defineStreamTopic`, topic/schema types, and the manifest type vocabulary |
-| `./cli`      | The streams command group (`list-topics`, `inspect`, `stats`, `subscribe`, …)                                               |
-| `./services` | The Durable Streams service composition                                                                                     |
-| `./aspire`   | The streams Aspire contribution for the AppHost                                                                             |
-| `./scaffold` | The plugin-owned scaffolder `netscript plugin install stream` executes                                                      |
+| `./cli`      | The streams command group (`list-topics`, `inspect`, `stats`, `subscribe`, …)              |
+| `./services` | The Durable Streams service composition                                                    |
+| `./aspire`   | The streams Aspire contribution for the AppHost                                            |
+| `./scaffold` | The plugin-owned scaffolder `netscript plugin install stream` executes                     |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-streams@<version>`](https://jsr.io/@netscript/plugin-streams/doc)

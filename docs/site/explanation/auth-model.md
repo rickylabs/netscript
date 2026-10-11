@@ -138,8 +138,7 @@ Under non-interactive backends (WorkOS and better-auth), NetScript enforces a st
 When a backend cannot do something its sub-port nominally exposes, it does not return `undefined`,
 log a warning, or no-op. It throws a **typed** `AuthBackendOperationUnsupportedError(name, op,
 reason)` — naming the backend, the operation, and why. This is the same fail-loud discipline the
-rest of the framework follows for backend capability
-failures: an
+rest of the framework follows for backend capability failures: an
 unsupported capability is a *visible, typed boundary*, never a quiet surprise in production.
 
 {{ comp.tabbedCode({ tabs: [
@@ -229,7 +228,7 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
 - **single-active-backend** — the v1 rule that exactly one backend is active per deployment; no
   multi-active routing, cross-backend linking, global logout, or replay.
 - **`Principal` / `scheme: "custom"`** — the framework-neutral identity from
-  [`@netscript/service`](/reference/service/) `/auth`; auth adapters stamp principals with
+  [`@netscript/service`](/reference/service/)`/auth`; auth adapters stamp principals with
   `scheme: "custom"`.
 - **`AuthBackendOperationUnsupportedError`** — the typed error a backend throws when an operation is
   outside its capability matrix (for example session mutation on a non-interactive backend).
