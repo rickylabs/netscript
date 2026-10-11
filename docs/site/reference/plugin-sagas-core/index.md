@@ -26,7 +26,7 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 | Export specifier                                     | Module                               | Exports | Purpose                                                                                                                                              |
 | ---------------------------------------------------- | ------------------------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@netscript/plugin-sagas-core`                       | `./mod.ts`                           | 45      | The userland saga DSL — `defineSaga`, the cascaded-message constructors, signals, queries, and the definition types they produce (documented below). |
-| `@netscript/plugin-sagas-core/discovery` | `./src/builders/discovery.ts` | 1 | Immutable factory-owned discovery axes and explicit exclusions. |
+| `@netscript/plugin-sagas-core/discovery`             | `./src/builders/discovery.ts`        | 1       | Immutable factory-owned discovery axes and explicit exclusions.                                                                                      |
 | `@netscript/plugin-sagas-core/builders`              | `./src/builders/mod.ts`              | 31      | The builder layer behind the DSL, for tooling that constructs definitions programmatically.                                                          |
 | `@netscript/plugin-sagas-core/domain`                | `./src/domain/mod.ts`                | 48      | Saga domain vocabulary and policy defaults (`DEFAULT_RETRY_POLICY`, `DEFAULT_IDEMPOTENCY_WINDOW_MS`, `DEFAULT_RETRY_MAX_ATTEMPTS`).                  |
 | `@netscript/plugin-sagas-core/ports`                 | `./src/ports/mod.ts`                 | 70      | The port interfaces the runtime depends on — store, bus, transport, clock, idempotency, telemetry.                                                   |
@@ -296,6 +296,6 @@ backfill and legacy delayed messages remain separate acceptance scope for issue 
 
 ## Discovery metadata
 
-The `/discovery` entrypoint exports `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable
-patterns through the plugin SDK `additionalBuilders` option. The CLI composes first-party metadata
-before walking the project, so single-plugin updates succeed regardless of workers/streams order.
+The `/discovery` entrypoint exports `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns
+through the plugin SDK `additionalBuilders` option. The CLI composes first-party metadata before
+walking the project, so single-plugin updates succeed regardless of workers/streams order.

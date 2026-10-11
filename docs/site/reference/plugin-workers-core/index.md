@@ -52,7 +52,7 @@ subpaths expose the runtime layers a host composes.
 
 | Export specifier                                      | Module                          | Exports | Purpose                                                                                                                                                                        |
 | ----------------------------------------------------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@netscript/plugin-workers-core/discovery` | `./src/builders/discovery.ts` | 1 | Immutable factory-owned discovery axes and explicit exclusions. |
+| `@netscript/plugin-workers-core/discovery`            | `./src/builders/discovery.ts`   | 1       | Immutable factory-owned discovery axes and explicit exclusions.                                                                                                                |
 | `@netscript/plugin-workers-core/integration/commands` | `./commands.ts`                 | 14      | Thin checked command sink and its supplied worker boundary.                                                                                                                    |
 | `@netscript/plugin-workers-core`                      | `./mod.ts`                      | 32      | The authoring surface — the three typestate builders, handler results and tools, schedule and permission presets, inspection, and the runtime entry points (documented below). |
 | `@netscript/plugin-workers-core/builders`             | `./src/builders/mod.ts`         | 28      | The builder layer behind the DSL, including the builder-state types tooling needs.                                                                                             |
@@ -225,6 +225,6 @@ session. Job/task definitions remain configuration rather than expiring executio
 
 ## Discovery metadata
 
-The `/discovery` entrypoint exports `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable
-patterns through the plugin SDK `additionalBuilders` option. The CLI composes first-party metadata
-before walking the project, so single-plugin updates succeed regardless of workers/streams order.
+The `/discovery` entrypoint exports `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns
+through the plugin SDK `additionalBuilders` option. The CLI composes first-party metadata before
+walking the project, so single-plugin updates succeed regardless of workers/streams order.
