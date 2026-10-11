@@ -142,6 +142,11 @@ for (const backend of ['real-kv', 'memory'] as const) {
       );
     }
     assertEquals((await records(kv)).length, 4);
+    const due = [];
+    for await (const entry of kv.list({ prefix: ['sagas', 'scheduler', 'due'] })) {
+      due.push(entry);
+    }
+    assertEquals(due.length, 4); // terminal expiry removes both record and due-index families
   });
 }
 
@@ -278,11 +283,17 @@ Deno.test('core scheduler real-kv: cancellation and retention CAS preserve concu
     return [BASE];
   }, BASE);
   await observedPromise;
-  await kv.set(key, { ...rewritten, revision: 'newer', status: 'pending' });
+  await kv.set(key, { ...rewritten, revision: 'newer' });
   resume();
   await sweep;
-  assertEquals((await kv.get<SagaScheduledMessageRecord>(key))?.value.revision, 'newer');
-  const latest = (await kv.get<SagaScheduledMessageRecord>(key))!.value;
+  assertEquals(
+    Reflect.get((await kv.get<SagaScheduledMessageRecord>(key))!.value, 'revision'),
+    'newer',
+  );
+  f.advance(30_001);
+  const [latest] = await f.store.claimDue(f.clock.now(), 10);
+  assert(latest);
+  assertEquals('revision' in latest, false);
   assertEquals(await f.store.cancel(latest), true);
   await f.store.markFailed(record.id, BASE, 'late', claim);
   await f.store.markDispatched(record.id, BASE, claim);

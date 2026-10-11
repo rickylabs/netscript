@@ -4,7 +4,10 @@
 
 - Add `KvSagaSchedulerStore` at `./stores` and bind the core `SagaScheduler` to originating instance
   deadlines. Bounded background sweeps preserve open sagas, expire every scoped scheduler outcome,
-  resume after restart, and avoid replay deadline renewal or concurrent-claim cancellation.
+  resume after restart, and avoid replay deadline renewal or concurrent-claim cancellation. A
+  time-ordered due index honors batch limits, skips retained outcomes, and recovers expired leases.
+  Deadline updates preserve in-flight claims; idle claims make no writes and CAS tokens stay private
+  to the adapter. New and legacy unscoped schedules remain durable without TTL.
 
 - Retain applied replay keys for open sagas. `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and
   no longer expires open markers; migrate callers to `completedRetentionDays`, aligned with the

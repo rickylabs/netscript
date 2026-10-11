@@ -29,8 +29,6 @@ export type SagaScheduledMessageRecord = Readonly<{
   instanceId?: SagaInstanceId;
   /** Absolute originating terminal deadline; replay never renews this window. */
   expiresAt?: Date;
-  /** Adapter revision used to avoid cancelling a concurrently rewritten claim. */
-  revision?: string;
 }>;
 
 /** Store boundary for Redis sorted-set, KV TTL, or database scheduler backends. */
@@ -52,7 +50,7 @@ export interface SagaSchedulerStorePort {
     error: string,
     claim?: SagaScheduledMessageRecord,
   ): Promise<void>;
-  /** Compare and delete the supplied snapshot; missing or rewritten records return false. */
+  /** Compare and delete the supplied claim snapshot; missing or rewritten records return false. */
   cancel?(record: SagaScheduledMessageRecord): Promise<boolean>;
   /** Inspect a bounded page, assigning terminal deadlines or deleting expired scoped records. */
   cleanupRetention?(

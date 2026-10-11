@@ -289,18 +289,23 @@ canonical state and the matching `completedRetentionDays` policy before startup;
 drive `cleanupRetention()` from a background service loop. The shipped durable runtime drives this
 hook for an injected scheduler. A pass inspects at most ten records and persists its cursor across
 restart. Pending, claimed, dispatched, and failed records receive KV TTL anchored to the origin's
-terminal deadline; expired scoped records are deleted with CAS. Open instances and legacy unscoped
-records survive. Due delivery checks canonical origin state; missing state cancels scoped records.
-Replay keyed by origin, message idempotency key (or message id), and scheduled time does not renew
-the deadline or replace outcomes. Unkeyed schedules have distinct identities. Claim leases recover
-after 30 seconds; stale claim outcomes cannot replace newer claims or recreate deleted records. The
-host owns the KV adapter and injects the same clock into scheduler and adapter. Custom stores need
-the optional cancellation and cleanup capabilities when binding retention. Unbound low-level
-schedulers keep their prior behavior. No database archive or app read drives this path. KV canonical
-reads are batched in native pages of at most ten keys. Only explicitly scoped new messages are
-cancellation candidates; legacy unscoped queue messages and native-provider delayed entries need
+terminal deadline; expired scoped records are deleted with CAS. Open instances and all unscoped
+records, including new schedules without an origin, survive without TTL. Due delivery checks
+canonical origin state; missing state cancels scoped records. Replay keyed by origin, message
+idempotency key (or message id), and scheduled time does not renew the deadline or replace outcomes.
+Unkeyed schedules have distinct identities. Claim leases recover after 30 seconds; stale claim
+outcomes cannot replace newer claims or recreate deleted records. The host owns the KV adapter and
+injects the same clock into scheduler and adapter. A time-ordered due index honors the caller's
+batch limit and atomically re-keys claims to their lease deadline; retained outcomes never delay due
+work. Adapter-private claim tokens survive deadline updates, and empty claims make no KV writes.
+Custom stores need the optional cancellation and cleanup capabilities when binding retention. All
+core schedulers, including unbound ones, use content-hashed replay identities; unbound schedulers do
+not enforce originating-instance retention. No database archive or app read drives this path. KV
+canonical reads are batched in native pages of at most ten keys. Only explicitly scoped new messages
+are cancellation candidates; legacy unscoped queue messages and native-provider delayed entries need
 separate migration.
 
 Terminal records written before the retention policy was installed still need a migration/backfill.
 This leaf proves new scoped delayed-message cancellation; legacy saga/trigger terminal-family
-backfill and legacy delayed messages remain separate acceptance scope for issue #2109.
+backfill, new and legacy unscoped schedules, and native-provider delayed messages remain separate
+acceptance scope for issue #2109.

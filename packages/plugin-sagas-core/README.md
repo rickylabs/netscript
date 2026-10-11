@@ -321,13 +321,17 @@ before startup, and drive `cleanupRetention()` from a background service loop. T
 runtime already drives that hook for an injected scheduler. Match the scheduler policy to the
 canonical store's policy. Each pass inspects at most ten records, persists its cursor, and assigns
 KV TTL or deletes records after the origin's terminal deadline. All scheduler outcomes (pending,
-claimed, dispatched, failed) share that deadline. Open instances and legacy records without an
-origin remain durable. Due delivery checks canonical origin state before forwarding; missing
-canonical state cancels explicitly scoped records. Replay identified by origin, message idempotency
-key (or message id), and scheduled time cannot overwrite existing outcomes or renew a deadline.
-Unkeyed schedules receive distinct identities. CAS cancellation preserves concurrent rewrites,
-expired claims recover after a 30-second lease, and late outcomes cannot recreate deleted records.
-The host owns the KV adapter and injects the same clock into scheduler and adapter.
+claimed, dispatched, failed) share that deadline. Open instances and all unscoped records, including
+new schedules without an origin, remain durable without TTL. Due delivery checks canonical origin
+state before forwarding; missing canonical state cancels explicitly scoped records. Replay
+identified by origin, message idempotency key (or message id), and scheduled time cannot overwrite
+existing outcomes or renew a deadline. Unkeyed schedules receive distinct identities. CAS
+cancellation preserves concurrent rewrites, expired claims recover after a 30-second lease, and late
+outcomes cannot recreate deleted records. A time-ordered due index honors the caller's batch limit
+and moves claims to their lease deadline atomically with the record; retained outcomes never delay
+due work. Claim tokens stay private to the adapter; settlement and cancellation use its returned
+claim snapshot. Empty claims make no KV writes. The host owns the KV adapter and injects the same
+clock into scheduler and adapter.
 
 ```ts
 import { DenoKvAdapter } from '@netscript/kv';
@@ -350,7 +354,8 @@ await scheduler.stop();
 ```
 
 Custom scheduler stores retain their existing API; binding canonical retention requires their
-optional `cancel` and `cleanupRetention` capabilities. Low-level unbound schedulers preserve their
-prior behavior. This core store does not archive to a database. Legacy unscoped schedules,
+optional `cancel` and `cleanupRetention` capabilities. All core schedulers, including unbound ones,
+use content-hashed replay identities; unbound schedulers do not enforce originating-instance
+retention. This core store does not archive to a database. New and legacy unscoped schedules,
 native-provider delayed entries, and terminal-family migration evidence remain acceptance scope for
 issue #2109.
