@@ -10,6 +10,7 @@ import type {
   SagaState,
 } from '../domain/mod.ts';
 import { SagasError } from '../domain/mod.ts';
+import { resolveCompensationStatus } from '../domain/saga-status.ts';
 import type { SagaClockPort } from '../ports/mod.ts';
 import {
   type SagaInstrumentation,
@@ -131,7 +132,12 @@ export class SagaCompensator {
       for (const effect of cascaded) assertLegacyCascade(effect);
       if (span) {
         instrumentation?.recordCompensationCascadeSize(span, cascaded.length);
-        instrumentation?.finishSpan(span, SagaTelemetryOutcomes.SUCCESS);
+        instrumentation?.finishSpan(
+          span,
+          resolveCompensationStatus(cascaded) === 'failed'
+            ? SagaTelemetryOutcomes.ERROR
+            : SagaTelemetryOutcomes.SUCCESS,
+        );
       }
 
       return Object.freeze({
