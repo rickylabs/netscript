@@ -1,3 +1,4 @@
+import { agentHostFreeDenoArgs } from '../../../tests/support/agent-host-free-deno.ts';
 import { assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
 import { DenoFileSystem } from '../../kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -20,7 +21,7 @@ const BFF_FILES = ['auth/bff.ts', 'auth/service.ts', 'apps/web/routes/auth/[acti
 
 async function run(args: string[]): Promise<void> {
   const result = await new Deno.Command(Deno.execPath(), {
-    args: ['run', '--no-lock', '-A', CLI, ...args],
+    args: agentHostFreeDenoArgs(['run', '--no-lock', '-A', CLI, ...args]),
     cwd: REPO,
     stdout: 'piped',
     stderr: 'piped',
@@ -35,7 +36,6 @@ async function withProject(probe: (root: string) => Promise<void>): Promise<void
   try {
     await run([
       'init',
-      '--no-agent',
       'local-auth',
       '--path',
       scratch,

@@ -1,3 +1,4 @@
+import { agentHostFreeDenoArgs } from '../../../../../tests/support/agent-host-free-deno.ts';
 import { join, resolve } from '@std/path';
 import { deriveDefaultAppName } from '../../../../../src/kernel/domain/scaffold/app-name.ts';
 
@@ -21,7 +22,6 @@ async function main(repoRoot: string): Promise<void> {
       '-A',
       join(repoRoot, 'packages', 'cli', 'bin', 'netscript-dev.ts'),
       'init',
-      '--no-agent',
       projectName,
       '--path',
       sourceParent,
@@ -91,7 +91,7 @@ export async function runCommand(
   let output: Deno.CommandOutput;
   try {
     output = await new Deno.Command(command, {
-      args: [...args],
+      args: command === 'deno' ? agentHostFreeDenoArgs(args) : [...args],
       cwd,
       stdout: 'piped',
       stderr: 'piped',

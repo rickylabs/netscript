@@ -1,3 +1,4 @@
+import { agentHostFreeDenoArgs } from '../../../../tests/support/agent-host-free-deno.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
 
@@ -22,7 +23,6 @@ Deno.test('post-init service generation leaves the exact 12 owned outputs format
   try {
     await assertCommand(runCli([
       'init',
-      '--no-agent',
       projectName,
       '--path',
       parent,
@@ -103,7 +103,7 @@ async function runCli(args: readonly string[]): Promise<CommandResult> {
 
 async function runDeno(args: readonly string[], cwd: string): Promise<CommandResult> {
   const output = await new Deno.Command(Deno.execPath(), {
-    args: [...args],
+    args: agentHostFreeDenoArgs(args),
     cwd,
     stdout: 'piped',
     stderr: 'piped',

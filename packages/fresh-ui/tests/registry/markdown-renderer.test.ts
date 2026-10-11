@@ -1,3 +1,4 @@
+import { agentHostFreeDenoArgs } from '../../../cli/tests/support/agent-host-free-deno.ts';
 /**
  * Capability contract for `deno task test` in this package.
  *
@@ -27,7 +28,7 @@ async function run(
   args: readonly string[],
 ): Promise<CommandResult> {
   const output = await new Deno.Command(Deno.execPath(), {
-    args: [...args],
+    args: agentHostFreeDenoArgs(args),
     cwd,
     stdout: 'piped',
     stderr: 'piped',
@@ -155,7 +156,6 @@ Deno.test('generated Fresh Markdown island production-builds for hydration', asy
       '-A',
       CLI_ENTRY,
       'init',
-      '--no-agent',
       projectName,
       '--path',
       parent,

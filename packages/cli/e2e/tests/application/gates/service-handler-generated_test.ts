@@ -1,3 +1,4 @@
+import { agentHostFreeDenoArgs } from '../../../../tests/support/agent-host-free-deno.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
 import { DenoFileSystem } from '../../../../src/kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -21,7 +22,6 @@ for (const variant of ['memory', 'prisma'] as const) {
     try {
       await cli([
         'init',
-        '--no-agent',
         projectName,
         '--path',
         parent,
@@ -150,7 +150,7 @@ async function cli(args: string[]): Promise<void> {
 
 async function deno(args: string[], cwd: string): Promise<void> {
   const output = await new Deno.Command(Deno.execPath(), {
-    args,
+    args: agentHostFreeDenoArgs(args),
     cwd,
     stdout: 'piped',
     stderr: 'piped',

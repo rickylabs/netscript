@@ -1,3 +1,4 @@
+import { agentHostFreeDenoArgs } from '../../../tests/support/agent-host-free-deno.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { dirname, fromFileUrl, join } from '@std/path';
 
@@ -9,12 +10,11 @@ Deno.test('netscript init --json emits a single structured object', async () => 
   const root = repoRoot();
   const command = new Deno.Command(Deno.execPath(), {
     cwd: root,
-    args: [
+    args: agentHostFreeDenoArgs([
       'run',
       '-A',
       'packages/cli/bin/netscript-dev.ts',
       'init',
-      '--no-agent',
       'json-smoke',
       '--path',
       join(root, '.llm/tmp/init-json-smoke'),
@@ -27,7 +27,7 @@ Deno.test('netscript init --json emits a single structured object', async () => 
       '--force',
       '--dry-run',
       '--json',
-    ],
+    ]),
   });
 
   const output = await command.output();
