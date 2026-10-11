@@ -4,11 +4,24 @@ import type { TelemetrySpan } from '@netscript/telemetry/query';
 import { join } from '@std/path';
 import { createLiveAspireTelemetryQuery } from './aspire-dashboard-telemetry.ts';
 
+function parseConcurrency(value: unknown, side: 'declared' | 'observed'): number {
+  const numeric = typeof value === 'number' || typeof value === 'string' ? Number(value) : NaN;
+  if (!Number.isSafeInteger(numeric) || numeric < 1) {
+    throw new Error(
+      `Invalid workers concurrency: ${side}=${
+        String(value)
+      } (type=${typeof value}); expected a positive safe integer`,
+    );
+  }
+  return numeric;
+}
+
 /** Require a completed job in the generated background service to report its declared concurrency. */
 export function assertWorkersConcurrency(
   spans: readonly TelemetrySpan[],
-  declared: number,
+  declared: number | string,
 ): TelemetrySpan {
+  const expected = parseConcurrency(declared, 'declared');
   const executions = spans.filter((span) =>
     span.name === 'job.execute' && span.attributes['netscript.job.id'] === 'health-check'
   );
@@ -17,13 +30,24 @@ export function assertWorkersConcurrency(
   }
   for (const span of executions) {
     const actual = span.attributes[WorkerAttributes.WORKER_CONCURRENCY];
-    if (actual !== declared) {
+    const observed = parseConcurrency(actual, 'observed');
+    if (observed !== expected) {
       throw new Error(
-        `Generated workers concurrency mismatch: declared=${declared}, observed=${actual}`,
+        `Generated workers concurrency mismatch: declared=${declared} (type=${typeof declared}), observed=${actual} (type=${typeof actual})`,
       );
     }
   }
-  return executions[executions.length - 1]!;
+  const span = executions[executions.length - 1]!;
+  return {
+    ...span,
+    attributes: {
+      ...span.attributes,
+      [WorkerAttributes.WORKER_CONCURRENCY]: parseConcurrency(
+        span.attributes[WorkerAttributes.WORKER_CONCURRENCY],
+        'observed',
+      ),
+    },
+  };
 }
 
 /** Read the workers declaration from the generated project's root configuration. */
@@ -34,7 +58,10 @@ export async function readWorkersConcurrency(projectRoot: string) {
   if (entry?.ConcurrencyEnvVar !== 'WORKERS_CONCURRENCY' || !entry.Concurrency) {
     throw new Error('Generated workers metadata must declare WORKERS_CONCURRENCY and concurrency');
   }
-  return { Concurrency: entry.Concurrency, ConcurrencyEnvVar: entry.ConcurrencyEnvVar };
+  return {
+    Concurrency: parseConcurrency(entry.Concurrency, 'declared'),
+    ConcurrencyEnvVar: entry.ConcurrencyEnvVar,
+  };
 }
 
 async function main(projectRoot: string): Promise<void> {

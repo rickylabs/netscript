@@ -2,7 +2,7 @@ import { assert, assertEquals, assertThrows } from '@std/assert';
 import type { TelemetrySpan } from '@netscript/telemetry/query';
 import { assertWorkersConcurrency, readWorkersConcurrency } from './verify-workers-concurrency.ts';
 
-function execution(concurrency?: number): TelemetrySpan {
+function execution(concurrency?: TelemetrySpan['attributes'][string]): TelemetrySpan {
   return {
     traceId: 'generated-worker-proof',
     spanId: 'completed-job',
@@ -29,7 +29,11 @@ Deno.test('generated workers receipt rejects main telemetry without concurrency'
 });
 
 Deno.test('generated workers receipt rejects silent runtime fallback to one', () => {
-  assertThrows(() => assertWorkersConcurrency([execution(1)], 2), Error, 'declared=2, observed=1');
+  assertThrows(
+    () => assertWorkersConcurrency([execution(1)], 2),
+    Error,
+    'declared=2 (type=number), observed=1 (type=number)',
+  );
 });
 
 Deno.test('generated workers receipt requires execution evidence and rejects mixed values', () => {
@@ -76,5 +80,58 @@ Deno.test('workers receipt reads appsettings from the generated project root', a
     assertEquals(entry.ConcurrencyEnvVar, 'WORKERS_CONCURRENCY');
   } finally {
     await Deno.remove(projectRoot, { recursive: true });
+  }
+});
+
+Deno.test('workers receipt normalizes numeric strings and emits a numeric observed value', () => {
+  for (const declared of [2, '2']) {
+    for (const observed of [2, '2']) {
+      const span = assertWorkersConcurrency([execution(observed)], declared);
+      assertEquals(span.attributes['netscript.worker.concurrency'], 2);
+    }
+  }
+});
+
+Deno.test('workers receipt rejects genuinely different numeric strings with their original types', () => {
+  assertThrows(
+    () => assertWorkersConcurrency([execution('1')], 2),
+    Error,
+    'declared=2 (type=number), observed=1 (type=string)',
+  );
+  assertThrows(
+    () => assertWorkersConcurrency([execution(2)], '3'),
+    Error,
+    'declared=3 (type=string)',
+  );
+});
+
+Deno.test('workers receipt rejects invalid or fractional concurrency without coercing other types', () => {
+  for (
+    const value of [
+      '2.5',
+      2.5,
+      '',
+      'nope',
+      'Infinity',
+      NaN,
+      Infinity,
+      0,
+      -1,
+      true,
+      Number.MAX_SAFE_INTEGER + 1,
+    ]
+  ) {
+    assertThrows(
+      () => assertWorkersConcurrency([execution(value)], 2),
+      Error,
+      'expected a positive safe integer',
+    );
+  }
+  for (const declared of ['2.5', 2.5, '', 'NaN', 0, -1, Number.MAX_SAFE_INTEGER + 1]) {
+    assertThrows(
+      () => assertWorkersConcurrency([execution(2)], declared),
+      Error,
+      'expected a positive safe integer',
+    );
   }
 });
