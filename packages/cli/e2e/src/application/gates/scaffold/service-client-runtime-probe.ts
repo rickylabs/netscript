@@ -5,6 +5,7 @@ import { partialMatchKey } from 'npm:@tanstack/query-core@^5.104.1';
 import type { SettledRefetchEvidence } from './service-client-browser-probe.ts';
 import { generatedAppHomeUrlsFromAppHost, readPinnedAppPort } from './generated-app-endpoint.ts';
 import { probeResourceQueryRefetch } from './runtime/probe-island-hydration.ts';
+import { installGeneratedProbe } from './install-generated-probe.ts';
 
 const EVIDENCE_MARKER = '__NETSCRIPT_SERVICE_CLIENT_EVIDENCE__';
 const PROBE_FILE = '__service_client_e2e_probe.ts';
@@ -196,6 +197,9 @@ export async function probeGeneratedServiceClients(
   const probePath = join(appRoot, 'lib', PROBE_FILE);
   await Deno.writeTextFile(probePath, serviceClientConsumerSource());
   try {
+    // service add, plugin install, and codegen legitimately extend the generated graph.
+    // Install that graph once, then prove both consumers without further lock changes.
+    await installGeneratedProbe(projectRoot, [probePath]);
     const check = await runCommand(
       [
         'deno',
