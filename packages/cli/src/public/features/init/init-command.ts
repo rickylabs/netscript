@@ -1,4 +1,11 @@
-import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
+import {
+  AGENT_HOSTS,
+  type InitAgentInput,
+  type InitAgentResult,
+} from '../agent/init/init-agent-input.ts';
+import { describeAgentInitResolution } from '../agent/init/hosts/agent-host-resolution.ts';
+import { outputText } from '../../../kernel/presentation/output/default-output.ts';
+import type { CliffyCommand } from '../../../kernel/presentation/command-types.ts';
 import { Command } from '@cliffy/command';
 import {
   CACHE_BACKEND_CHOICES,
@@ -22,6 +29,8 @@ import { resolveInteractiveInitInput } from './init-interactive.ts';
 export interface InitCommandDependencies {
   /** Application context for the scaffold pipeline. */
   readonly initContext: InitPipelineContext;
+  /** Existing agent installer, wired by the public composition root. */
+  readonly initAgent: (input: InitAgentInput) => Promise<InitAgentResult>;
   /** Create the scaffold pipeline context for a parsed init invocation. */
   readonly createInitContext?: (options: { readonly dryRun: boolean }) => InitPipelineContext;
   /** Default name when the command is invoked without an argument. */
@@ -84,6 +93,12 @@ export function createInitCommand(
       `Shared cache backend (${CACHE_BACKEND_CHOICES.join(' | ')})`,
     )
     .option('--editor <editor:string>', `Editor config (${EDITOR_CHOICES.join(' | ')})`)
+    .option('--no-agent', 'Skip MCP configuration, agent skills, and guidance installation')
+    .option(
+      '--host <host:string>',
+      `Agent host (${[...AGENT_HOSTS, 'all'].join(' | ')}); inferred when omitted`,
+    )
+    .option('--with-docs', 'Opt in to offline agent documentation; ignored with --no-agent')
     .option('--no-aspire', 'Skip Aspire orchestration layer')
     .option('--no-git', 'Skip git init after scaffolding')
     .option('--force', 'Overwrite existing target directory', { default: false })
@@ -95,6 +110,7 @@ export function createInitCommand(
     .option('--json', 'Emit a single machine-readable JSON result', { default: false })
     .option('--from <preset:string>', 'Apply a named scaffold preset')
     .action(async (options: InitCommandInput, nameArg?: string): Promise<void> => {
+      const host = agentHost(options.host);
       await DEFAULT_TEMPLATE_REGISTRY.hydrate();
       if (options.from !== undefined) {
         const presets = new PresetRegistry();
@@ -121,7 +137,7 @@ export function createInitCommand(
         resolvedOptions.servicePort !== undefined;
       const dryRun = resolvedOptions.dryRun ?? false;
       const initContext = dependencies.createInitContext?.({ dryRun }) ?? dependencies.initContext;
-      await executeInit(initContext, {
+      const result = await executeInit(initContext, {
         name: resolved.name,
         appName: resolvedOptions.appName,
         path: resolvedOptions.path,
@@ -143,5 +159,27 @@ export function createInitCommand(
         modelName: resolvedOptions.modelName,
         servicePort: resolvedOptions.servicePort,
       });
+      if (!result.dryRun && resolvedOptions.agent !== false) {
+        const installed = await dependencies.initAgent({
+          projectRoot: result.targetPath,
+          host,
+          editor: editor(resolvedOptions.editor),
+          withDocs: resolvedOptions.withDocs,
+        });
+        if (!resolvedOptions.json) {
+          for (const line of describeAgentInitResolution(installed.resolution)) outputText(line);
+          for (const message of installed.messages) outputText(message);
+        }
+      }
     });
+}
+
+function agentHost(raw: string | undefined): InitAgentInput['host'] {
+  if (raw === undefined) return undefined;
+  if (raw === 'all') return raw;
+  const host = AGENT_HOSTS.find((host) => host === raw);
+  if (host === undefined) {
+    throw new Error(`--host must be one of: ${[...AGENT_HOSTS, 'all'].join(', ')}`);
+  }
+  return host;
 }

@@ -1,5 +1,10 @@
 import { createInstalledRuntimeRegistryRenderer } from '../generate/plugins/plugin-registry-renderer.ts';
 import { checkPluginRegistries } from '../generate/plugins/check-plugin-registries.ts';
+import type { InitCommandDependencies } from '../init/init-command.ts';
+import { initAgent } from '../agent/init/init-agent.ts';
+import { DenoAgentInitFileSystem } from '../agent/init/agent-init-file-system.ts';
+import { DenoAspireAgentInitializer } from '../../adapters/agent/deno-aspire-agent-initializer.ts';
+import { DenoAgentDocsGenerator } from '../../adapters/agent/deno-agent-docs-generator.ts';
 import { regenerateAspireHelpersWithDependencies } from '../../../kernel/adapters/service/workspace-mutator.ts';
 import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
 import { copy } from '@std/fs';
@@ -110,14 +115,7 @@ export interface PublicCommandDependencies {
   /** Resolve a UI command to one Fresh application root. */
   readonly resolveUiAppRoot: UiAppRootResolver;
   /** Dependencies for public init. */
-  readonly initCommandDependencies: {
-    readonly defaultProjectName: () => string;
-    readonly prompt: CliffyPrompt;
-    readonly initContext: InitPipelineContext;
-    readonly createInitContext: (
-      options: { readonly dryRun: boolean },
-    ) => InitPipelineContext;
-  };
+  readonly initCommandDependencies: InitCommandDependencies;
   /** Dependencies for Fresh UI registry installation commands. */
   readonly uiInstallDependencies: {
     readonly fs: DenoFileSystem;
@@ -316,6 +314,13 @@ export function createPublicCommandDependencies(
     resolveProjectRoot,
     resolveUiAppRoot,
     initCommandDependencies: {
+      initAgent: (input) =>
+        initAgent(input, {
+          fs: new DenoAgentInitFileSystem(),
+          aspireAgentInitializer: new DenoAspireAgentInitializer(),
+          docsGenerator: new DenoAgentDocsGenerator(),
+          environment: Deno.env.toObject(),
+        }),
       defaultProjectName: () => host.cwd().split(/[/\\]/).pop() ?? 'my-app',
       prompt,
       initContext,

@@ -37,6 +37,9 @@ the [quickstart](/quickstart/); every flag is:
 | `--cache-backend <backend>` | Shared cache backend: `redis`, `garnet`, or `deno-kv`. |
 | `--editor <editor>` | Editor config: `none`, `zed`, or `vscode`. |
 | `--no-aspire` | Skip the Aspire orchestration layer. |
+| `--no-agent` | Skip agent MCP configuration, skills, and guidance (including offline docs). |
+| `--host <host>` | Select `claude`, `vscode`, `opencode`, or `all` for agent installation; inferred when omitted. |
+| `--with-docs` | Opt in to the offline agent documentation corpus; ignored with `--no-agent`. |
 | `--no-git` | Skip `git init` after scaffolding. |
 | `--force` | Overwrite an existing target directory (default `false`). |
 | `--ci` | Non-interactive mode (default `false`). |
@@ -45,6 +48,13 @@ the [quickstart](/quickstart/); every flag is:
 | `--dry-run` | Preview the scaffold plan without writing files (default `false`). |
 | `--json` | Emit a single machine-readable JSON result (default `false`). |
 | `--from <preset>` | Apply a named scaffold preset. |
+
+Project init runs the existing agent installer after scaffolding by default, using the generated
+project root. Host detection honours project markers before the invoking environment and defaults
+to Claude Code; `--host` overrides detection. The deciding source is printed in text mode. Dry runs
+write no agent files, and `--json` retains its single scaffold result. Offline docs remain opt-in.
+The optional Aspire agent setup keeps its bounded timeout and reports a skip if unavailable.
+For an existing project, use `netscript agent init` to refresh integration idempotently.
 
 ## `agent` — install and run agent tooling
 
