@@ -47,11 +47,16 @@ Deno.test('Aspire helper regeneration compares and writes canonical content', as
     formatContents: (files) =>
       Promise.resolve(files.map((file) => {
         formattedPaths.push(file.targetPath);
-        return `// canonical\n${file.content}`;
+        return file.content.replace(
+          ASPIRE_SURFACE_MARKER,
+          `${ASPIRE_SURFACE_MARKER}// canonical\n`,
+        );
       })),
     formatContent: (path, content) => {
       formattedPaths.push(path);
-      return Promise.resolve(`// canonical\n${content}`);
+      return Promise.resolve(
+        content.replace(ASPIRE_SURFACE_MARKER, `${ASPIRE_SURFACE_MARKER}// canonical\n`),
+      );
     },
     formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
   };
@@ -100,7 +105,10 @@ Deno.test('Aspire helper regeneration compares and writes canonical content', as
       [helperPath],
     );
     for (const path of first) {
-      assertEquals((await fs.readFile(path)).startsWith('// canonical\n'), true);
+      assertEquals(
+        (await fs.readFile(path)).startsWith(`${ASPIRE_SURFACE_MARKER}// canonical\n`),
+        true,
+      );
     }
   } finally {
     await Deno.remove(root, { recursive: true });

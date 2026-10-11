@@ -1,3 +1,6 @@
+import schema from '../../../../../assets/schema/aspire-generated-surface.v1.json' with {
+  type: 'json',
+};
 import { assert, assertEquals, assertMatch } from '@std/assert';
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from '@std/path';
 import { walk } from '@std/fs';
@@ -19,7 +22,19 @@ interface Report {
 
 async function command(root: string, ...flags: string[]) {
   return await new Deno.Command(Deno.execPath(), {
-    args: ['run', '--no-lock', '-A', CLI, 'generate', 'aspire', '--project-root', root, ...flags],
+    args: [
+      'run',
+      `--lock=${join(REPO_ROOT, 'deno.lock')}`,
+      '--frozen',
+      '--node-modules-dir=none',
+      '-A',
+      CLI,
+      'generate',
+      'aspire',
+      '--project-root',
+      root,
+      ...flags,
+    ],
     stdout: 'piped',
     stderr: 'piped',
   }).output();
@@ -96,6 +111,7 @@ Deno.test('Aspire check inventories every selected output, uses canonical genera
         .sort(),
     );
     for (const entry of report.outputs) {
+      assertMatch(entry.path, new RegExp(schema.properties.outputs.items.properties.path.pattern));
       assertEquals(entry.generator, 'public.generate.aspire');
       assertEquals(entry.ownership, 'generated');
       assertMatch(entry.digest, /^sha256:[0-9a-f]{64}$/);
@@ -259,7 +275,9 @@ Deno.test('Aspire public check works when the inspecting process is denied all p
     const output = await new Deno.Command(Deno.execPath(), {
       args: [
         'run',
-        '--no-lock',
+        `--lock=${join(REPO_ROOT, 'deno.lock')}`,
+        '--frozen',
+        '--node-modules-dir=none',
         '--allow-read',
         '--allow-run',
         '--allow-env',
@@ -364,7 +382,9 @@ Deno.test('Postgres generation and inspection preserve authored AppHost dependen
       new Deno.Command(Deno.execPath(), {
         args: [
           'run',
-          '--no-lock',
+          `--lock=${join(REPO_ROOT, 'deno.lock')}`,
+          '--frozen',
+          '--node-modules-dir=none',
           '-A',
           CLI,
           'service',
