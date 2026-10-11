@@ -25,6 +25,7 @@ import type {
   SchedulerEventMap,
 } from '../ports/types.ts';
 import { isValidCronExpression, parseCronExpression } from '../ports/types.ts';
+import { calculateNextRun } from '../internal/next-run.ts';
 import type { CronScheduler, JobEventListener, SchedulerEvent } from '../ports/scheduler.ts';
 import {
   createLifecycleEvent,
@@ -422,8 +423,6 @@ export class MemoryCronAdapter implements CronScheduler {
    * Calculate the next run time for a cron expression
    */
   private calculateNextRun(expression: CronExpression): Date | null {
-    const intervalMs = this.cronToInterval(expression);
-    const now = new Date();
-    return new Date(now.getTime() + intervalMs);
+    return calculateNextRun(expression, new Date());
   }
 }
