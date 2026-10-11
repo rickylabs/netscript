@@ -155,6 +155,7 @@ Deno.test('generated Fresh Markdown island production-builds for hydration', asy
       '-A',
       CLI_ENTRY,
       'init',
+      '--no-agent',
       projectName,
       '--path',
       parent,
