@@ -77,6 +77,15 @@ export async function reconcileBrowserAuth(
   ) as BrowserAuthSettings;
   const config = settings.NetScript;
   if (!config) return [];
+  const sessionContracts = new Map<string, string>();
+  for (const service of Object.keys(config.Services ?? {})) {
+    const contract = join(projectRoot, 'contracts/versions/v1', `${service}.contract.ts`);
+    if (!await fs.exists(contract)) continue;
+    // Older or authored contracts need not implement the generated identity proof.
+    if (/\bsession:\s*baseContract\b/.test(await fs.readFile(contract))) {
+      sessionContracts.set(service, contract);
+    }
+  }
   const authServiceName = `'${auth}'`;
   const files: BrowserAuthFile[] = [
     {
@@ -104,11 +113,7 @@ export async function reconcileBrowserAuth(
       path,
       content: renderTemplateAssetSync(TEMPLATE_KEYS.authRoute, { bffImport }),
     });
-    for (const service of Object.keys(config.Services ?? {})) {
-      const contract = join(projectRoot, 'contracts/versions/v1', `${service}.contract.ts`);
-      if (!await fs.exists(contract)) continue;
-      // Older or authored contracts need not implement the generated identity proof.
-      if (!/\bsession:\s*baseContract\b/.test(await fs.readFile(contract))) continue;
+    for (const [service, contract] of sessionContracts) {
       const route = appServiceSessionRoute(projectRoot, name, entry, service);
       const importFrom = (target: string) => {
         const specifier = relative(dirname(route), target).replaceAll('\\', '/');

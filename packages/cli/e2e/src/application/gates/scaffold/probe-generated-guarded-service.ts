@@ -102,6 +102,7 @@ async function probeInScratch(
     'netscript.config.ts',
     'auth/service.ts',
     'auth/bff.ts',
+    'apps/web/routes/examples/guarded/session.ts',
     'services/guarded/src/main.ts',
   ];
   const before = await Promise.all(
@@ -119,6 +120,11 @@ async function probeInScratch(
     const config = JSON.parse(await Deno.readTextFile(join(projectRoot, 'deno.json'))) as {
       imports?: Record<string, string>;
     };
+    const appConfig = JSON.parse(
+      await Deno.readTextFile(join(projectRoot, 'apps/web/deno.json')),
+    ) as {
+      imports: Record<string, string>;
+    };
     const repoConfig = JSON.parse(await Deno.readTextFile(join(repoRoot, 'deno.json'))) as {
       imports: Record<string, string>;
     };
@@ -132,6 +138,7 @@ async function probeInScratch(
               target.startsWith('.') ? toFileUrl(resolve(projectRoot, target)).href : target,
             ]),
           ),
+          fresh: appConfig.imports.fresh,
           '@guard-probe/contracts': toFileUrl(join(projectRoot, 'contracts/mod.ts')).href,
           '@std/assert': repoConfig.imports['@std/assert'],
           '@std/assert/equal': `${repoConfig.imports['@std/assert']}/equal`,
@@ -150,6 +157,10 @@ async function probeInScratch(
       GUARDED_SERVICE_PROBE_SOURCE
         .replaceAll('__AUTH_SOURCE__', toFileUrl(join(repoRoot, 'plugins/auth/services/src')).href)
         .replaceAll('__SERVICE_MAIN__', toFileUrl(main).href)
+        .replaceAll(
+          '__APP_SESSION_ROUTE__',
+          toFileUrl(join(projectRoot, 'apps/web/routes/examples/guarded/session.ts')).href,
+        )
         .replaceAll(
           '__HTTP_CONTRACT__',
           new URL('../../../domain/http-contract.ts', import.meta.url).href,

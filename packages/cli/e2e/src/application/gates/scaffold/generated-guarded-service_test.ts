@@ -1,3 +1,4 @@
+import { SCAFFOLD_APP_IMPORTS } from '../../../../../src/kernel/constants/scaffold/scaffold-app-catalog.ts';
 import { reconcileBrowserAuth } from '../../../../../src/kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { addProtectedProbeProcedure } from './probe-generated-guarded-service.ts';
 import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
@@ -52,8 +53,14 @@ Deno.test('generated guarded service: native sessions enforce public discovery/d
       NetScript: {
         ...JSON.parse(await fs.readFile('/project/appsettings.json')).NetScript,
         Services: { guarded: result.configEntry },
+        Apps: { web: { Type: 'app', Workdir: 'apps/web' } },
       },
     }),
+  );
+  await fs.writeFile(
+    '/project/apps/web/utils.ts',
+    `import { createDefine } from 'fresh';
+export const define = createDefine();`,
   );
   await reconcileBrowserAuth('/project', fs, formatter);
   const root = await Deno.makeTempDir({ prefix: 'guarded-service-' });
@@ -61,6 +68,9 @@ Deno.test('generated guarded service: native sessions enforce public discovery/d
     for (
       const path of [
         'auth/service.ts',
+        'auth/bff.ts',
+        'apps/web/utils.ts',
+        'apps/web/routes/examples/guarded/session.ts',
         'contracts/mod.ts',
         'contracts/versions/v1/mod.ts',
         'contracts/versions/v1/guarded.contract.ts',
@@ -96,6 +106,7 @@ Deno.test('generated guarded service: native sessions enforce public discovery/d
               name,
             ) => [name, `npm:${name}@${config.catalog[name]}`]),
           ),
+          fresh: SCAFFOLD_APP_IMPORTS.fresh,
           '@guard-probe/contracts': toFileUrl(join(root, 'contracts/mod.ts')).href,
         },
       }),
@@ -106,6 +117,10 @@ Deno.test('generated guarded service: native sessions enforce public discovery/d
       GUARDED_SERVICE_PROBE_SOURCE
         .replaceAll('__AUTH_SOURCE__', new URL('plugins/auth/services/src', repo).href)
         .replaceAll('__SERVICE_MAIN__', toFileUrl(join(root, 'services/guarded/src/main.ts')).href)
+        .replaceAll(
+          '__APP_SESSION_ROUTE__',
+          toFileUrl(join(root, 'apps/web/routes/examples/guarded/session.ts')).href,
+        )
         .replaceAll(
           '__HTTP_CONTRACT__',
           new URL('../../../domain/http-contract.ts', import.meta.url).href,
@@ -132,6 +147,10 @@ Deno.test('generated guarded service: native sessions enforce public discovery/d
     assertStringIncludes(
       output,
       'Generated guarded service PASS: discovery/demo public200; protected REST/RPC anonymous401, denied403, permitted200; anonymous health200',
+    );
+    assertStringIncludes(
+      output,
+      'Generated app guarded call PASS: SDK bearer contribution; request-scoped cookie; anonymous401, authenticated200, anonymous401',
     );
     assertEquals(result.configEntry.PluginReferences, ['auth']);
   } finally {

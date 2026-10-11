@@ -61,6 +61,8 @@ const auth = await createPluginService(router, {
 const discoveryKey = 'services__auth__http__0';
 const previousEndpoint = Deno.env.get(discoveryKey);
 const previousPort = Deno.env.get('PORT');
+const serviceKey = 'services__guarded__http__0';
+const previousService = Deno.env.get(serviceKey);
 Deno.env.set(discoveryKey, 'http://127.0.0.1:' + auth.addr.port);
 Deno.env.set('PORT', '0');
 try {
@@ -68,6 +70,18 @@ try {
   const { running } = await import('__SERVICE_MAIN__');
   try {
     const endpoint = 'http://127.0.0.1:' + running.addr.port;
+    Deno.env.set(serviceKey, endpoint);
+    const appRoute = await import('__APP_SESSION_ROUTE__');
+    for (const [token, expectStatus] of [[undefined, 401], [permitted, 200], [undefined, 401]] as const) {
+      const req = new Request('https://app.example.test/examples/guarded/session', {
+        headers: token ? { cookie: '__Host-ns_session=' + token } : {},
+      });
+      const response = await appRoute.handler.GET({ req });
+      assertEquals(response.status, expectStatus, 'Generated app session route');
+      assertEquals(response.headers.get('cache-control'), 'no-store');
+      assertEquals(await response.json(), { authenticated: expectStatus === 200 });
+    }
+    console.info('Generated app guarded call PASS: SDK bearer contribution; request-scoped cookie; anonymous401, authenticated200, anonymous401; no credentials emitted.');
     const exchange = async (path: string, contract: HttpExchangeContract) => {
       const init = httpExchangeInit(contract, AbortSignal.timeout(10_000));
       const response = await fetch(endpoint + path, {
@@ -98,6 +112,8 @@ try {
   await auth.stop();
   if (previousEndpoint === undefined) Deno.env.delete(discoveryKey);
   else Deno.env.set(discoveryKey, previousEndpoint);
+  if (previousService === undefined) Deno.env.delete(serviceKey);
+  else Deno.env.set(serviceKey, previousService);
   if (previousPort === undefined) Deno.env.delete('PORT');
   else Deno.env.set('PORT', previousPort);
 }

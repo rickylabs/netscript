@@ -349,8 +349,10 @@ Deno.test('browser auth emits a server SDK session route and snapshots it while 
   await fs.writeFile(join(root, 'appsettings.json'), JSON.stringify(settings));
   await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
   await fs.writeFile(join(root, 'services/users/src/main.ts'), main);
-  await fs.writeFile(join(root, 'contracts/versions/v1/users.contract.ts'),
-    'export const UsersContractV1 = { session: baseContract };');
+  await fs.writeFile(
+    join(root, 'contracts/versions/v1/users.contract.ts'),
+    'export const UsersContractV1 = { session: baseContract };',
+  );
   await writeInstalledAuthFixture(fs, root);
   const path = join(root, 'apps/web/routes/examples/users/session.ts');
   assert((await browserAuthReconciliationPaths(root, fs)).includes(path));
