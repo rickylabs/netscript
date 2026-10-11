@@ -18,7 +18,7 @@
  * processors which use `--watch`).
  */
 
-import { SAGA_PROJECTION_BACKEND_ENV } from '@netscript/plugin-sagas-core/stores';
+import { SAGA_PROJECTION_BACKEND_ENV } from '@netscript/plugin-sagas-core/stores/backends';
 import type { RegisterPluginsOptions } from '../types.ts';
 import { extractSagaStoreBackend, fileHeader } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';

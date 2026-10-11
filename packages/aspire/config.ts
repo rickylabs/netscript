@@ -17,7 +17,7 @@
  */
 
 import { z } from 'zod';
-import type { SagaProjectionBackend } from '@netscript/plugin-sagas-core/stores';
+import type { SagaProjectionBackend } from '@netscript/plugin-sagas-core/stores/backends';
 import {
   ASPIRE_RESOURCE_NAME_PATTERN,
   ASPIRE_RESOURCE_NAME_RULE,
