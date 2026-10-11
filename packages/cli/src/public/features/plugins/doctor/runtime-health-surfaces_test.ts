@@ -212,85 +212,87 @@ Deno.test('runtime declarations skip disabled children and unrelated non-health 
   assertEquals(checks[0]?.runtimeHealth?.children, []);
 });
 
-for (const surface of ['doctor-report', 'cli-exit', 'mcp-doctor', 'mcp-health']) {
-  Deno.test(`negative-control: stopped child makes ${surface} degraded or red`, async () => {
-    const fs = new MemoryFileSystemAdapter();
-    await fs.writeFile(
-      '/project/appsettings.json',
-      JSON.stringify({
-        NetScript: {
-          Plugins: { api: { Port: 8000, InstalledVersion: '0.0.7', InstalledFrom: 'jobs' } },
-          BackgroundProcessors: {
-            runner: {
-              Runtime: 'deno',
-              RequiresKv: true,
-              InstalledVersion: '0.0.7',
-              InstalledFrom: 'jobs',
+for (const state of ['stopped', 'crash-looping'] as const) {
+  for (const surface of ['doctor-report', 'cli-exit', 'mcp-doctor', 'mcp-health']) {
+    Deno.test(`negative-control: ${state} child makes ${surface} degraded or red`, async () => {
+      const fs = new MemoryFileSystemAdapter();
+      await fs.writeFile(
+        '/project/appsettings.json',
+        JSON.stringify({
+          NetScript: {
+            Plugins: { api: { Port: 8000, InstalledVersion: '0.0.7', InstalledFrom: 'jobs' } },
+            BackgroundProcessors: {
+              runner: {
+                Runtime: 'deno',
+                RequiresKv: true,
+                InstalledVersion: '0.0.7',
+                InstalledFrom: 'jobs',
+              },
             },
           },
-        },
-      }),
-    );
-    const operation = () =>
-      doctorPlugin({ projectRoot: '/project' }, {
-        fs,
-        loadConfig: () =>
-          Promise.resolve(defineConfig({ name: 'test', databases: { config: [] } })),
-        process: { exec: () => Promise.reject(new Error('Unexpected process')) },
-        inspectAppHost: {
-          inspect: () =>
-            Promise.resolve({
-              status: 'running',
-              resources: [
-                {
-                  name: 'api',
-                  state: 'Running',
-                  healthStatus: 'Healthy',
-                  healthReports: { http: {} },
-                },
-                {
-                  name: 'runner',
-                  state: 'Stopped',
-                  healthStatus: 'Unhealthy',
-                  healthReports: { http: {} },
-                },
-              ],
-            }),
-        },
-      });
-    if (surface === 'doctor-report') {
-      assert((await operation()).some((report) => report.status === 'degraded'));
-    } else if (surface === 'cli-exit') {
-      const command = createDoctorPluginCommand({
-        doctor: operation,
-        resolveProjectRoot: () => Promise.resolve('/project'),
-        print: () => {},
-        diagnosticEvidence: () => ({
-          read: () => Promise.resolve(undefined),
-          write: () => Promise.resolve(),
-          appendDrift: () => Promise.resolve(),
         }),
-      });
-      await assertRejects(() => command.parse([]), RemoteError);
-    } else {
-      const adapter = new CliProjectDoctor(operation);
-      const name = surface === 'mcp-doctor' ? 'doctor' : 'get_app_status';
-      const server = createMcpServer({
-        probe,
-        flows: {
-          doctor: createDoctorFlow(probe, {}, [new PluginDoctorFamily(adapter)], '/project'),
-          get_app_status: createGetAppStatusFlow(query, adapter, '/project'),
-        },
-      });
-      const response = await server.handle({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'tools/call',
-        params: { name, arguments: {} },
-      });
-      assert(response && 'result' in response);
-      const result = response.result as { structuredContent: { status: string } };
-      assertEquals(result.structuredContent.status, 'fail');
-    }
-  });
+      );
+      const operation = () =>
+        doctorPlugin({ projectRoot: '/project' }, {
+          fs,
+          loadConfig: () =>
+            Promise.resolve(defineConfig({ name: 'test', databases: { config: [] } })),
+          process: { exec: () => Promise.reject(new Error('Unexpected process')) },
+          inspectAppHost: {
+            inspect: () =>
+              Promise.resolve({
+                status: 'running',
+                resources: [
+                  {
+                    name: 'api',
+                    state: 'Running',
+                    healthStatus: 'Healthy',
+                    healthReports: { http: {} },
+                  },
+                  {
+                    name: 'runner',
+                    state: 'Stopped',
+                    healthStatus: 'Unhealthy',
+                    healthReports: { http: {} },
+                  },
+                ],
+              }),
+          },
+        });
+      if (surface === 'doctor-report') {
+        assert((await operation()).some((report) => report.status === 'degraded'));
+      } else if (surface === 'cli-exit') {
+        const command = createDoctorPluginCommand({
+          doctor: operation,
+          resolveProjectRoot: () => Promise.resolve('/project'),
+          print: () => {},
+          diagnosticEvidence: () => ({
+            read: () => Promise.resolve(undefined),
+            write: () => Promise.resolve(),
+            appendDrift: () => Promise.resolve(),
+          }),
+        });
+        await assertRejects(() => command.parse([]), RemoteError);
+      } else {
+        const adapter = new CliProjectDoctor(operation);
+        const name = surface === 'mcp-doctor' ? 'doctor' : 'get_app_status';
+        const server = createMcpServer({
+          probe,
+          flows: {
+            doctor: createDoctorFlow(probe, {}, [new PluginDoctorFamily(adapter)], '/project'),
+            get_app_status: createGetAppStatusFlow(query, adapter, '/project'),
+          },
+        });
+        const response = await server.handle({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/call',
+          params: { name, arguments: {} },
+        });
+        assert(response && 'result' in response);
+        const result = response.result as { structuredContent: { status: string } };
+        assertEquals(result.structuredContent.status, 'fail');
+      }
+    });
+  }
 }
