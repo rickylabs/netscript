@@ -504,15 +504,24 @@ capabilities to add the endpoint and readiness probe.
 
 `aggregatePluginHealth` from `@netscript/plugin/health` is the shared verdict function for
 `netscript plugin doctor` and the MCP `doctor` and `get_app_status` health report. Generated
-`appsettings.json` declares API and child resource names; `InstalledFrom` groups their plugin
-ownership. Enabled background processors with `Runtime: deno` and `RequiresKv: true` use the shared
-child health transport, matching the AppHost generator's capability rule. Disabled children do not
-participate. A renamed resource retains its declaration and ownership.
+`appsettings.json` declares API and child resource names. Discovery uses the AppHost's public entry
+schemas, so installation metadata and pinned ports are optional. Enabled background processors with
+`Runtime: deno` and `RequiresKv: true` use the shared child health transport, matching the AppHost
+generator's capability rule. Disabled children do not participate.
 
-Runtime declaration discovery validates entries individually and skips entries without valid
-installation metadata or the required runtime capabilities. Generated scaffolds can contain such
-entries; one atypical plugin or processor must not fail the whole doctor. Invalid JSON, a malformed
-`NetScript` section, or non-object plugin/processor sections still produce an inspection failure.
+The installer reconciles each child's `PluginReferences` to its owning API plus that API's
+dependencies. Discovery finds the API whose own reference set equals the child's references minus
+that API. The child resource key names the resulting plugin group; API-only groups use their API
+resource key. Thus the generated workers, sagas and triggers entries retain their own children
+without assigning dependency APIs to those groups. Renaming resources preserves the reference link.
+An explicit `InstalledFrom` on a child or its API overrides the group name, without requiring
+`InstalledVersion`. Ambiguous ownership emits a warning and still reports the child separately.
+
+Entries are validated individually. An invalid enabled API or an invalid child that declares Deno
+and KV capability emits a named warning check instead of disappearing silently. Unsupported or
+disabled children do not participate. Invalid JSON, a malformed `NetScript` section, or non-object
+plugin/processor sections still produce an inspection failure. Doctor and MCP expose these warning
+checks; status polling keeps telemetry and reports `warn` even if no valid runtime entry remains.
 
 | API readiness         | Declared child readiness                                         | Plugin verdict |
 | --------------------- | ---------------------------------------------------------------- | -------------- |

@@ -28,7 +28,11 @@ export function createGetAppStatusFlow(
         !service || report.pluginName === service || report.apiResources.includes(service) ||
         report.childResources.includes(service)
       );
-    const runtimeChecks = checks.filter((check) => !check.runtimeHealth && check.status === 'fail')
+    const runtimeChecks = checks.filter((check) =>
+      !check.runtimeHealth && (check.status === 'fail' ||
+        (doctor.readRuntimeHealth && check.status === 'warn'))
+    )
+      .sort((left, right) => Number(right.status === 'fail') - Number(left.status === 'fail'))
       .slice(0, 20);
     // No runtime declarations (including unwired hosts) must leave telemetry's verdict intact.
     if (health.length === 0 && runtimeChecks.length === 0) return { ok: true, value: telemetry };
@@ -38,9 +42,11 @@ export function createGetAppStatusFlow(
       value: {
         ...telemetry,
         status: healthStatus === 'unhealthy' || healthStatus === 'degraded' ||
-            runtimeChecks.length > 0
+            runtimeChecks.some((check) => check.status === 'fail')
           ? 'fail'
-          : healthStatus === 'unknown' && telemetry.status === 'pass'
+          : (healthStatus === 'unknown' ||
+              runtimeChecks.some((check) => check.status === 'warn')) &&
+              telemetry.status === 'pass'
           ? 'warn'
           : telemetry.status,
         healthStatus,

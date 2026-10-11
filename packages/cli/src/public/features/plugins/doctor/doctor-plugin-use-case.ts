@@ -31,7 +31,7 @@ import type {
   PluginHealthObservation,
   PluginHealthSummary,
 } from '@netscript/plugin/health';
-import { diagnosePluginRuntime, readPluginHealthDeclarations } from './plugin-runtime-health.ts';
+import { diagnosePluginRuntime, readPluginRuntimeDeclarations } from './plugin-runtime-health.ts';
 import { checkRuntimeRegistryDrift } from './runtime-registry-drift.ts';
 
 export const CONFIGURED_MODULE_RESOLVES_CHECK = 'configured-module-resolves';
@@ -144,9 +144,12 @@ export async function doctorPlugin(
   const runtimeRegistryReport = await diagnoseRuntimeRegistries(input.projectRoot, dependencies);
   let runtimeDeclarations: readonly PluginHealthDeclaration[] = [];
   let runtimeDeclarationError: PluginDoctorReport | undefined;
+  let runtimeDeclarationWarnings: readonly PluginDoctorReport[] = [];
   if (dependencies.inspectAppHost) {
     try {
-      runtimeDeclarations = await readPluginHealthDeclarations(input.projectRoot, dependencies.fs);
+      const discovery = await readPluginRuntimeDeclarations(input.projectRoot, dependencies.fs);
+      runtimeDeclarations = discovery.declarations;
+      runtimeDeclarationWarnings = discovery.warnings;
     } catch (error) {
       runtimeDeclarationError = workspaceErrorReport(
         'runtime-health:declarations',
@@ -178,6 +181,7 @@ export async function doctorPlugin(
       dockerReport,
       runtimeRegistryReport,
       runtimeDeclarationError,
+      ...runtimeDeclarationWarnings,
       ...runtimeReports,
       serviceReport,
     ].filter(
@@ -219,6 +223,7 @@ export async function doctorPlugin(
     dockerReport,
     runtimeRegistryReport,
     runtimeDeclarationError,
+    ...runtimeDeclarationWarnings,
     ...runtimeReports,
     ...reports,
     unmatchedServiceReport,

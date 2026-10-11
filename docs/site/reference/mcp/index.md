@@ -323,6 +323,14 @@ These inspection failures are intentional `fail` verdicts even when polling a st
 app. Legacy adapters without a runtime-health operation use static doctor findings; their failures
 also remain visible when a service filter is supplied.
 
+Runtime ownership follows the generated child/API reference links described in the
+[plugin health reference](/reference/plugin/#plugin-runtime-health-aggregation), with optional
+`InstalledFrom` overrides. Installation metadata is not required. Invalid health-capable child
+entries produce named warning checks in both tools; `get_app_status` includes those warnings in
+`runtimeChecks` and reports `warn` while retaining telemetry. Failed findings take priority within
+the bounded checks list. Static-only adapter warnings retain their existing telemetry verdict;
+standalone MCP's unwired diagnostic warning remains visible in `doctor`.
+
 A dead child remains `degraded` when a declared API has disabled health probes. A child-only plugin
 with a dead child is `unhealthy`. Cross-plugin precedence comes from `summarizePluginHealth` in the
 same shared package, so other consumers can use the identical roll-up.

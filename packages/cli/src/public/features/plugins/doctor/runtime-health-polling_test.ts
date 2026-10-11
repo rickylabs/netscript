@@ -175,6 +175,49 @@ Deno.test('legacy static doctor failures remain fail with service filters', asyn
   }
 });
 
+Deno.test('declaration warning: polling retains warnings and telemetry under service filters', async () => {
+  const baseline = await createGetAppStatusFlow(query)({});
+  assert(baseline.ok);
+  const warning = {
+    name: 'runtime:declaration',
+    status: 'warn' as const,
+    summary: 'Malformed child declaration.',
+  };
+  const doctor: ProjectDoctorPort = {
+    diagnose: () => Promise.reject(new Error('Unexpected static doctor')),
+    readRuntimeHealth: () => Promise.resolve([warning]),
+  };
+  for (const service of [undefined, 'api']) {
+    const value = await status(doctor, service);
+    assertEquals(value.status, 'warn');
+    assertEquals(value.runtimeChecks, [warning]);
+    assertEquals(value.counts, Reflect.get(baseline.value as object, 'counts'));
+    assertEquals(value.domains, Reflect.get(baseline.value as object, 'domains'));
+  }
+});
+
+Deno.test('runtime polling prioritizes a failed inspection ahead of bounded declaration warnings', async () => {
+  const doctor: ProjectDoctorPort = {
+    diagnose: () => Promise.resolve([]),
+    readRuntimeHealth: () =>
+      Promise.resolve([
+        ...Array.from(
+          { length: 25 },
+          (_, index) => ({
+            name: `warning-${index}`,
+            status: 'warn' as const,
+            summary: 'Malformed declaration.',
+          }),
+        ),
+        { name: 'runtime-health', status: 'fail' as const, summary: 'Runtime not running.' },
+      ]),
+  };
+  const value = await status(doctor);
+  assertEquals(value.status, 'fail');
+  assertEquals((value.runtimeChecks as readonly unknown[]).length, 20);
+  assertEquals((value.runtimeChecks as readonly { status: string }[])[0].status, 'fail');
+});
+
 for (
   const snapshot of [
     { status: 'not-running' },
