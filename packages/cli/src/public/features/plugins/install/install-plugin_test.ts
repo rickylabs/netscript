@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import {
@@ -805,12 +806,15 @@ describe('public install plugin flow', () => {
         aiDenoJson.imports,
         rootDenoJson.imports,
       );
-      const check = await new DenoProcess().exec(
-        'deno',
-        ['check', '--unstable-kv', '--minimum-dependency-age=0', ...aiSources],
-        { cwd: projectRoot },
+      const check = await checkGeneratedFiles({
+        args: ['check', '--unstable-kv', '--minimum-dependency-age=0', ...aiSources],
+        cwd: projectRoot,
+      });
+      assertEquals(
+        check.code,
+        0,
+        new TextDecoder().decode(check.stderr) || new TextDecoder().decode(check.stdout),
       );
-      assertEquals(check.code, 0, check.stderr || check.stdout);
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }

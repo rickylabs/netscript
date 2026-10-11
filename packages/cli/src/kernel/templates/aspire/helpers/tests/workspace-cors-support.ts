@@ -1,4 +1,5 @@
 /** Test boundary for executed app registration; no Aspire process is started. */
+import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assert, assertEquals } from '@std/assert';
 import { toFileUrl } from '@std/path';
 import type { NetScriptConfig } from '@netscript/aspire/types';
@@ -147,11 +148,9 @@ export async function registerWorkspace(config: NetScriptConfig) {
         denoDefaults: config.Defaults.Deno,
       }),
     );
-    const checked = await new Deno.Command(Deno.execPath(), {
+    const checked = await checkGeneratedFiles({
       args: ['check', '--no-config', '--no-lock', '--unstable-kv', path],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
     const module: unknown = await import(toFileUrl(path).href);
     assert(isGeneratedModule(module));
