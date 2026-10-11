@@ -153,6 +153,39 @@ own Prisma models (<code>auth_users</code>, <code>auth_sessions</code>,
 before the service starts.
 {{ /comp }}
 
+### KV-only installs and projection migration
+
+Install workers, sagas, or triggers with `--no-db --no-samples` to skip Prisma schema and
+migration contributions and emit `RequiresDb: false` for both the API and background processor.
+The processes still require KV. Their background work runs independently of the web app.
+
+Saga query storage is selected separately with `sagas.projection.backend` (`kv`, `prisma`,
+or `none`). In `appsettings.json`, put `Sagas.Projection.Backend` on both the saga API entry in
+`NetScript.Plugins` and the saga runner entry in `NetScript.BackgroundProcessors`. Generated
+helpers forward the selector as `NETSCRIPT_SAGA_PROJECTION`; that environment value takes
+precedence over settings. `kv` writes the KV query model, `prisma` writes the Prisma query model,
+and `none` disables both the instance query projection and durable saga-stream hydration while
+canonical saga state remains durable. An explicitly selected `prisma` projection requires the host's
+saga Prisma delegates; the API fails before listening and the runner fails before starting delivery
+if those delegates are missing. With `kv`, `retention.archiveToDb: true` remains an explicit database
+archive opt-in for the configured saga group: the runner requests a host Prisma client and archives
+that group's instances while retaining KV queries. The default `archiveToDb: false` keeps KV-only
+installs DB-free. `none` also disables database archival.
+
+**Migration in 0.0.8:** re-run each plugin install with `--no-db --no-samples --force` and regenerate
+helpers to correct existing DB-dependent metadata. Preserve your user-owned configuration and
+samples when applying the generated changes. For existing saga entries without a projection
+selector, the query backend follows `Sagas.Store.Backend` (or `NETSCRIPT_SAGA_STORE`), defaulting
+to KV when neither is set. Select `prisma` explicitly when relational query storage is required;
+select `kv` on both entries when using `--no-db`. New saga installs default the projection to the
+selected store backend, which defaults to KV. A DB-enabled install can use KV queries: database
+availability alone does not imply that the host Prisma client contains saga models. To use a Prisma
+projection, provision the saga models and regenerate the host client before selecting `prisma` on
+both entries.
+
+These install and runner paths have focused tests. The complete KV-only generated runtime across
+workers, sagas, and triggers is a separate release acceptance gate.
+
 ## Step 3 — Generate registries and wire the database
 
 After adding plugins, regenerate the plugin registries so the runtime can discover them:

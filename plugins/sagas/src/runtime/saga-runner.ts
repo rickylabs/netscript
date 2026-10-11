@@ -1,5 +1,6 @@
 import {
-  resolveSagaStoreBackend,
+  resolveSagaProjectionBackend,
+  SAGA_PROJECTION_BACKEND_ENV,
   SAGA_STORE_BACKEND_ENV,
 } from '@netscript/plugin-sagas-core/stores';
 import { loadSagaRetention } from './load-saga-retention.ts';
@@ -190,32 +191,49 @@ async function resolveProjection(
   }
   const bootstrapModule = readEnv('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
   if (!bootstrapModule) {
-    return withStreamProjection(new KvSagaInstanceProjection());
+    const backend = resolveSagaProjectionBackend({
+      env: {
+        [SAGA_STORE_BACKEND_ENV]: readEnv(SAGA_STORE_BACKEND_ENV),
+        [SAGA_PROJECTION_BACKEND_ENV]: readEnv(SAGA_PROJECTION_BACKEND_ENV),
+      },
+    });
+    if (backend === 'none') return undefined;
+    if (backend === 'prisma') {
+      throw new Error('Prisma saga projection requires a plugin service bootstrap module.');
+    }
+    const retention = await loadSagaRetention();
+    if (retention.requiresDatabaseArchive) {
+      throw new Error('Saga database archive requires a plugin service bootstrap module.');
+    }
+    return withStreamProjection(new KvSagaInstanceProjection(undefined, retention.completedDays));
   }
   const imported = await import(bootstrapModule) as SagaRunnerBootstrap;
   const context = await imported.createPluginServiceContext('sagas');
-  const client = await context.db.getClient();
   const retention = await loadSagaRetention();
   const configuredBackend = context.env?.[SAGA_STORE_BACKEND_ENV] ??
     readEnv(SAGA_STORE_BACKEND_ENV);
   const appsettings = context.appsettings ?? context.settings ?? context.config;
-  const querySource = configuredBackend === undefined && appsettings === undefined
-    ? 'kv'
-    : resolveSagaStoreBackend({
-      env: { [SAGA_STORE_BACKEND_ENV]: configuredBackend },
-      appsettings,
-    });
+  const projectionBackend = resolveSagaProjectionBackend({
+    env: {
+      [SAGA_STORE_BACKEND_ENV]: configuredBackend,
+      [SAGA_PROJECTION_BACKEND_ENV]: context.env?.[SAGA_PROJECTION_BACKEND_ENV] ??
+        readEnv(SAGA_PROJECTION_BACKEND_ENV),
+    },
+    appsettings,
+  });
+  if (projectionBackend === 'none') return undefined;
   const kvProjection = new KvSagaInstanceProjection(undefined, retention.completedDays);
-  const readModelProjection = isProjectionClient(client)
-    ? new CompositeSagaInstanceProjection([
-      kvProjection,
-      new PrismaSagaInstanceProjection(
-        client,
-        retention.archiveToDb,
-        querySource,
-      ),
-    ])
-    : kvProjection;
+  if (projectionBackend === 'kv' && !retention.requiresDatabaseArchive) {
+    return withStreamProjection(kvProjection);
+  }
+  const client = await context.db.getClient();
+  if (!isProjectionClient(client)) {
+    throw new Error('Sagas database client is missing required Prisma delegates.');
+  }
+  const readModelProjection = new CompositeSagaInstanceProjection([
+    kvProjection,
+    new PrismaSagaInstanceProjection(client, retention.archiveToDb, projectionBackend),
+  ]);
   return withStreamProjection(readModelProjection);
 }
 

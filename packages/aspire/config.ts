@@ -22,6 +22,9 @@ import {
   ASPIRE_RESOURCE_NAME_RULE,
 } from './src/domain/aspire-resource-name.ts';
 
+/** Saga query projection backend accepted by hosting configuration. */
+export type SagaProjectionBackend = 'kv' | 'prisma' | 'none';
+
 /** Public parser contract exposed by Aspire schema constants. */
 export interface AspireSchema<Output> {
   /** Structural metadata consumed by Zod inference utilities. */
@@ -158,6 +161,11 @@ export interface SagaResourceConfig {
   Store?: {
     /** Durable saga state backend. */
     Backend?: SagaStoreBackend;
+  };
+  /** Query projection backend; omitted follows Store.Backend, defaulting to KV. */
+  Projection?: {
+    /** KV query model, Prisma query model, or disabled query projection. */
+    Backend?: SagaProjectionBackend;
   };
 }
 
@@ -501,6 +509,9 @@ const EnvironmentFields = {
 } as const satisfies z.ZodRawShape;
 
 const SagaResourceConfigZod = z.object({
+  Projection: z.object({
+    Backend: z.enum(['kv', 'prisma', 'none']).optional(),
+  }).optional(),
   Store: z.object({
     Backend: z.enum(['kv', 'prisma']).optional(),
   }).optional(),
