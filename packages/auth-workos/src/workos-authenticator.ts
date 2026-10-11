@@ -4,7 +4,8 @@ import type {
   AuthnResult,
   Principal,
 } from '@netscript/service/auth';
-import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { createRemoteJWKSet, decodeJwt, jwtVerify } from 'jose';
+import type { WorkosRevocationStore } from './ports/revocation-store.ts';
 import type { JWTPayload } from 'jose';
 
 /** Controls whether the authenticator refreshes the WorkOS sealed session after verification. */
@@ -130,6 +131,8 @@ export interface WorkosAuthenticatorOptions<
   readonly cookie?: WorkosCookieOptions;
   /** Whether to refresh a valid session after authentication. Defaults to `never`. */
   readonly refresh?: WorkosRefreshMode;
+  /** Shared durable fence used by the backend and background revocation worker. */
+  readonly revocations?: WorkosRevocationStore;
 }
 
 /** Options for creating a WorkOS bearer access-token authenticator. */
@@ -140,6 +143,8 @@ export interface WorkosAccessTokenAuthenticatorOptions {
   readonly jwksUrl?: string | URL;
   /** Expected JWT issuer. Omit when a WorkOS environment uses a custom issuer. */
   readonly issuer?: string;
+  /** Use the same durable fence as the sealed-session backend for global logout. */
+  readonly revocations?: WorkosRevocationStore;
 }
 
 const DEFAULT_COOKIE_NAME = 'wos-session';
@@ -196,6 +201,10 @@ export function createWorkosAuthenticator<
         return { ok: false, reason: `workos_${authenticated.reason}` };
       }
 
+      if (await isWorkosSessionRevoked(authenticated, options.revocations)) {
+        return { ok: false, reason: 'workos_subject_revoked' };
+      }
+
       if (options.refresh === 'always') {
         return await authenticateWithRefresh(session, authenticated, options);
       }
@@ -249,9 +258,18 @@ export function createWorkosAccessTokenAuthenticator(
       }
 
       try {
+        const principal = principalFromAccessToken(payload);
+        if (
+          options.revocations && await options.revocations.isRevoked(
+            principal.subject,
+            stringClaim(payload.sid),
+            typeof payload.iat === 'number' ? payload.iat * 1000 : undefined,
+            typeof payload.exp === 'number' ? payload.exp * 1000 : NaN,
+          )
+        ) return { ok: false, reason: 'workos_subject_revoked' };
         return {
           ok: true,
-          principal: principalFromAccessToken(payload),
+          principal,
         };
       } catch (error) {
         return {
@@ -283,6 +301,22 @@ async function authenticateWithRefresh(
 
   if (!refreshed.authenticated) {
     return { ok: false, reason: `workos_${refreshed.reason}` };
+  }
+
+  // Recheck the original verified credential after refresh: a concurrent logout wins.
+  if (
+    options.revocations && (
+      await isWorkosSessionRevoked(authenticated, options.revocations)
+    )
+  ) {
+    return { ok: false, reason: 'workos_subject_revoked' };
+  }
+
+  if (
+    options.revocations && (refreshed.user.id !== authenticated.user.id ||
+      refreshed.sessionId !== authenticated.sessionId)
+  ) {
+    return { ok: false, reason: 'workos_session_identity_changed' };
   }
 
   const setCookies = refreshed.sealedSession
@@ -420,4 +454,22 @@ function normalizeProviderError(error: unknown, fallback: string): string {
     return `${fallback}: ${error.message}`;
   }
   return fallback;
+}
+
+/** Check only the access token WorkOS has already verified; missing iat fails closed after logout. */
+export async function isWorkosSessionRevoked(
+  session: WorkosSessionAuthenticationSuccess<{ readonly id: string }>,
+  store: WorkosRevocationStore | undefined,
+): Promise<boolean> {
+  if (!store) return false;
+  let issuedAt: number | undefined;
+  let expiresAt = NaN;
+  try {
+    const payload = decodeJwt(session.accessToken);
+    issuedAt = typeof payload.iat === 'number' ? payload.iat * 1000 : undefined;
+    expiresAt = typeof payload.exp === 'number' ? payload.exp * 1000 : NaN;
+  } catch {
+    // The upstream verifier is authoritative. A missing time claim cannot bypass our fence.
+  }
+  return await store.isRevoked(session.user.id, session.sessionId, issuedAt, expiresAt);
 }

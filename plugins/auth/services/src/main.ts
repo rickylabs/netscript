@@ -8,44 +8,26 @@
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import type { DbContext, ServiceApp } from '@netscript/service';
-import { createPluginService } from '@netscript/plugin/service';
+import { initializeAuthService } from './init.ts';
+import { serveAuthService } from './auth-service-runtime.ts';
+import type { DbContext } from '@netscript/service';
 import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import { AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
-import { router } from './router.ts';
-import { type AuthPluginServiceContext, initializeAuthService } from './init.ts';
-import { currentAuthRequest, withAuthRequest } from './request-context.ts';
 import { createAuthServiceGuard } from './auth-guard.ts';
-
+import { currentAuthRequest, withAuthRequest } from './request-context.ts';
+import type { AuthPluginServiceContext } from './init.ts';
+import type { AuthRunningService } from './auth-service-types.ts';
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 export type { ServiceApp, ServiceEnvironment } from '@netscript/service';
+export type {
+  AuthRunningService,
+  AuthRunningServiceAddress,
+  AuthServiceApp,
+} from './auth-service-types.ts';
 
 type PluginServiceBootstrap = {
   createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
 };
-
-/** Network address assigned to the running auth service listener. */
-export type AuthRunningServiceAddress = Readonly<{
-  /** Listener hostname. */
-  hostname: string;
-  /** Listener port. */
-  port: number;
-  /** Listener transport. */
-  transport: 'tcp' | 'unix';
-}>;
-
-/** Mountable fetch surface backing the running auth service. */
-export type AuthServiceApp = Readonly<ServiceApp>;
-
-/** Runtime handle returned after the auth service starts. */
-export type AuthRunningService = Readonly<{
-  /** Mountable service app backing the running listener. */
-  app: AuthServiceApp;
-  /** Address selected by Deno for the listener. */
-  addr: AuthRunningServiceAddress;
-  /** Stops the auth service listener and waits for shutdown to finish. */
-  stop(): Promise<void>;
-}>;
 
 /** Starts the Auth API service using host-provided infrastructure. */
 export default async function createAuthService(
@@ -69,7 +51,7 @@ export default async function createAuthService(
   // withServiceInfo — which is exactly the previous chain's order, so behavior
   // is preserved. The registry is resolved above (via `initializeAuthService`)
   // and captured by the context closure; no startup work is deferred.
-  return await createPluginService(router, {
+  return await serveAuthService(ctx, registry, {
     // Only signout and operator revocation are guarded; the guard authenticates in-process
     // because the auth service cannot verify sessions by calling itself.
     auth: createAuthServiceGuard(registry),
@@ -85,34 +67,7 @@ export default async function createAuthService(
     middleware: [withAuthRequest],
     context: () => ({ registry, telemetry, cookieName, request: currentAuthRequest() }),
     traceContext: true,
-  }).serve();
-}
-
-function resolveAuditSalt(ctx: PluginServiceContext): string | undefined {
-  const env = { ...Deno.env.toObject(), ...ctx.env };
-  return env.NETSCRIPT_AUTH_AUDIT_SALT ?? serviceAuditSalt(ctx);
-}
-
-function serviceAuditSalt(ctx: PluginServiceContext): string | undefined {
-  if (!hasAuthAppsettings(ctx)) {
-    return undefined;
-  }
-  return ctx.appsettings?.auth?.audit?.salt ?? ctx.appsettings?.Auth?.Audit?.Salt;
-}
-
-function hasAuthAppsettings(ctx: PluginServiceContext): ctx is AuthPluginServiceContext {
-  return 'appsettings' in ctx;
-}
-
-function toDbContext(value: unknown): DbContext {
-  if (isDbContext(value)) {
-    return value;
-  }
-  return { value };
-}
-
-function isDbContext(value: unknown): value is DbContext {
-  return typeof value === 'object' && value !== null;
+  });
 }
 
 async function loadAuthServiceContext(): Promise<PluginServiceContext> {
@@ -142,4 +97,31 @@ function isPluginServiceBootstrap(value: unknown): value is PluginServiceBootstr
 if (import.meta.main) {
   const ctx = await loadAuthServiceContext();
   await createAuthService(ctx);
+}
+
+function resolveAuditSalt(ctx: PluginServiceContext): string | undefined {
+  const env = { ...Deno.env.toObject(), ...ctx.env };
+  return env.NETSCRIPT_AUTH_AUDIT_SALT ?? serviceAuditSalt(ctx);
+}
+
+function serviceAuditSalt(ctx: PluginServiceContext): string | undefined {
+  if (!hasAuthAppsettings(ctx)) {
+    return undefined;
+  }
+  return ctx.appsettings?.auth?.audit?.salt ?? ctx.appsettings?.Auth?.Audit?.Salt;
+}
+
+function hasAuthAppsettings(ctx: PluginServiceContext): ctx is AuthPluginServiceContext {
+  return 'appsettings' in ctx;
+}
+
+function toDbContext(value: unknown): DbContext {
+  if (isDbContext(value)) {
+    return value;
+  }
+  return { value };
+}
+
+function isDbContext(value: unknown): value is DbContext {
+  return typeof value === 'object' && value !== null;
 }

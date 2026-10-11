@@ -103,7 +103,7 @@ The active backend is selected by the `NETSCRIPT_AUTH_BACKEND` environment varia
 caption: "Auth backends — capability matrix (NETSCRIPT_AUTH_BACKEND)",
 rows: [
 { name: "kv-oauth", type: "interactive (default)", desc: "Full OAuth/OIDC redirect flow. Real signin + callback, KV-backed sessions with refresh-on-read, signout. The only backend that implements InteractiveFlowPort. Package @netscript/auth-kv-oauth." },
-{ name: "workos", type: "non-interactive", desc: "WorkOS AuthKit sealed wos-session cookie. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR (no interactive flow). Package @netscript/auth-workos." },
+{ name: "workos", type: "non-interactive", desc: "WorkOS AuthKit sealed cookie under NETSCRIPT_AUTH_COOKIE_NAME (default __Host-ns_session). The CLI WorkOS preset explicitly selects wos-session to match AuthKit. Subject-wide logout uses a durable KV fence and background upstream cleanup. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR (no interactive flow). Package @netscript/auth-workos." },
 { name: "better-auth", type: "non-interactive", desc: "better-auth over Prisma. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-better-auth." }
 ]
 }) }}
@@ -200,7 +200,7 @@ code: "# Selects the interactive OAuth/OIDC backend\nexport NETSCRIPT_AUTH_BACKE
 {
 label: "workos (non-interactive)",
 lang: "sh",
-code: "export NETSCRIPT_AUTH_BACKEND=workos\n\nexport WORKOS_API_KEY=sk_...\nexport WORKOS_CLIENT_ID=client_...\nexport WORKOS_COOKIE_PASSWORD=at-least-32-characters-of-entropy\n\n# signin/callback return AUTH_PROVIDER_ERROR on this backend.\n# It validates an existing WorkOS AuthKit session (session/me).\nexport PORT=8094"
+code: "export NETSCRIPT_AUTH_BACKEND=workos\nexport NETSCRIPT_AUTH_COOKIE_NAME=__Host-ns_session\n# Configure the AuthKit issuer with the same cookie name.\n# Bound retained access tokens by the longest configured WorkOS duration.\nexport WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS=86400000\n\nexport WORKOS_API_KEY=sk_...\nexport WORKOS_CLIENT_ID=client_...\nexport WORKOS_COOKIE_PASSWORD=at-least-32-characters-of-entropy\n\n# signin/callback return AUTH_PROVIDER_ERROR on this backend.\n# It validates an existing WorkOS AuthKit session (session/me).\nexport PORT=8094"
 },
 {
 label: "better-auth (non-interactive)",
@@ -239,7 +239,8 @@ rows: [
 {{ comp callout { type: "note", title: "Which backends actually use these tables" } }}
 <code>auth.prisma</code> is provisioned for every install so the schema is consistent, but storage
 differs by backend: <strong>kv-oauth</strong> stores sessions in Deno KV (not these tables),
-<strong>WorkOS</strong> is effectively stateless (sealed cookie), and <strong>better-auth</strong> is
+<strong>WorkOS</strong> verifies sealed cookies and stores revocation fences, outbox jobs, and
+per-session tombstones in host KV, and <strong>better-auth</strong> is
 the backend that reads/writes <code>auth_users</code>/<code>auth_sessions</code>/<code>auth_accounts</code>/<code>auth_verifications</code>
 through Prisma. The migration runs regardless; it is the persistence path for the Prisma-backed
 backend.
@@ -343,17 +344,14 @@ For a guarded server-side read, attach the generated client to the service
 contract and supply only the incoming request's credential context:
 
 ```ts
-import {
-  browserSessionContext,
-  createBrowserSessionClient,
-} from "./auth/bff.ts";
-import { CatalogContractV1 } from "./contracts/catalog/v1/mod.ts";
+import { browserSessionContext, createBrowserSessionClient } from './auth/bff.ts';
+import { CatalogContractV1 } from './contracts/catalog/v1/mod.ts';
 
 declare const request: Request;
 const catalog = createBrowserSessionClient(
   CatalogContractV1,
-  "catalog",
-  "catalog",
+  'catalog',
+  'catalog',
 );
 const result = await catalog.list({}, {
   context: browserSessionContext(request),
