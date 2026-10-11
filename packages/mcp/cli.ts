@@ -175,7 +175,11 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
         warnEvidence,
       ),
       get_app_status: withReceipt(
-        createGetAppStatusFlow(query),
+        createGetAppStatusFlow(
+          query,
+          options.projectDoctor ?? new UnwiredProjectDoctor(),
+          options.projectRoot ?? '.',
+        ),
         evidence,
         'mcp get_app_status',
         warnEvidence,
@@ -227,7 +231,15 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
           environment,
           [
             new AspireDoctorFamily(),
-            new ProjectWiringDoctorFamily(),
+            new ProjectWiringDoctorFamily(
+              undefined,
+              new SpawnCommandExecutor({
+                cliCommand: commandExecutor.identity.command,
+                mode: commandExecutor.identity.mode,
+                version: commandExecutor.identity.version,
+                outputTailBytes: 1_048_576,
+              }),
+            ),
             new PluginDoctorFamily(
               options.projectDoctor ?? new UnwiredProjectDoctor(),
             ),

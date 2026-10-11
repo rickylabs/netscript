@@ -15,7 +15,6 @@ export type {
   TriggersDenoBackgroundSpec,
   TriggersDenoServiceSpec,
   TriggersEnvSource,
-  TriggersHealthCheckSpec,
 } from './triggers-contribution.ts';
 export {
   TRIGGERS_API_DEFAULT_PORT,

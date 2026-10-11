@@ -43,6 +43,7 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
   });
   await scaffold.parse([
     'init',
+    '--no-agent',
     projectName,
     '--path',
     parent,

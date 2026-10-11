@@ -9,6 +9,43 @@ import {
 } from '../testing/auth-service-fixture.ts';
 
 for (const projection of ['rest', 'rpc'] as const) {
+  Deno.test(`${projection}: unexpected callback errors stay masked`, async () => {
+    await using kv = new MemoryKvAdapter();
+    const registry = await createKvOAuthTestRegistry(kv);
+    await using service = await serveAuthTestService({
+      ...registry,
+      resolveBackend: () => {
+        throw new Error('private unexpected backend diagnostic');
+      },
+    });
+    const response = await fetch(
+      `${service.baseUrl}/api/${projection === 'rpc' ? 'rpc/' : ''}v1/auth/callback`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-forwarded-proto': 'https' },
+        body: JSON.stringify(
+          projection === 'rpc' ? { json: { code: 'code_test' } } : {
+            code: 'code_test',
+          },
+        ),
+      },
+    );
+    const payload = await response.json();
+    const error = projection === 'rpc' ? payload.json : payload;
+    assertEquals(response.status, 500);
+    assertEquals(error.code, 'INTERNAL_SERVER_ERROR');
+    // This assertion applies in production; development deliberately exposes diagnostics.
+    if ((Deno.env.get('DENO_ENV') || Deno.env.get('NODE_ENV')) === 'production') {
+      assertEquals(error.message, 'Internal server error');
+      assertEquals(
+        JSON.stringify(payload).includes('private unexpected backend diagnostic'),
+        false,
+      );
+    }
+    assertEquals(Object.hasOwn(error, 'cause'), false);
+    assertEquals(response.headers.getSetCookie(), []);
+  });
+
   Deno.test(`${projection}: backend cookies survive signin, callback, session and signout`, async () => {
     await using kv = new MemoryKvAdapter();
     const original = await createKvOAuthTestRegistry(kv);
@@ -35,7 +72,11 @@ for (const projection of ['rest', 'rpc'] as const) {
           remember('callback', result.response);
           return result;
         } catch (error) {
-          if (error instanceof KvOAuthError) callbackError = error.code;
+          if (error instanceof KvOAuthError) {
+            callbackError = error.code;
+            // Backend diagnostics must not become the public error message or data.
+            throw new KvOAuthError(error.code, 'private backend diagnostic', { cause: error });
+          }
           throw error;
         }
       },
@@ -80,7 +121,17 @@ for (const projection of ['rest', 'rpc'] as const) {
     const missing = await call('callback', input);
     assertEquals(missing.response.status, 502);
     assertEquals(callbackError, 'oauth_cookie_missing');
-    assertStringIncludes(JSON.stringify(missing.body), 'OAuth transaction cookie is missing');
+    const missingError = projection === 'rpc' ? missing.body.json : missing.body;
+    assertEquals(missingError.code, 'oauth_cookie_missing');
+    assertEquals(missingError.defined, true);
+    assertEquals(missingError.message, 'OAuth transaction cookie is missing. Restart sign-in.');
+    assertEquals(missingError.data, {
+      providerId: 'kv-oauth',
+      reason: 'OAuth transaction cookie is missing. Restart sign-in.',
+    });
+    assertEquals(JSON.stringify(missing.body).includes('private backend diagnostic'), false);
+    assertEquals(Object.hasOwn(missingError, 'cause'), false);
+    assertEquals(missing.response.headers.getSetCookie(), []);
     const completed = await call('callback', input, txnCookie.split(';')[0]);
     assertEquals(completed.response.status, 200);
     assertEquals(completed.response.headers.getSetCookie(), emitted.get('callback'));

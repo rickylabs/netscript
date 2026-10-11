@@ -1,8 +1,10 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
+import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { join } from '@std/path';
 import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/version-registry.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
 import {
-  regenerateAspireHelpers,
+  regenerateAspireHelpersWithDependencies,
   removeServiceAppsettingsEntry,
   removeServiceWorkspaceMember,
 } from '../../../../kernel/adapters/service/workspace-mutator.ts';
@@ -10,6 +12,7 @@ import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-di
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import { findServiceClientPath } from '../../../../kernel/adapters/service/client-scaffolder.ts';
 import { validateResourceName } from '../../../../kernel/adapters/scaffold/workspace-writer.ts';
 
@@ -25,7 +28,8 @@ export interface RemoveServiceDependencies {
   readonly fs: FileSystemPort;
   readonly scaffolder: ScaffolderPort;
   readonly templateAdapter: TemplatePort;
-  readonly regenerateHelpers?: typeof regenerateAspireHelpers;
+  readonly formatter: GeneratedSourceFormatterPort;
+  readonly regenerateHelpers?: typeof regenerateAspireHelpersWithDependencies;
 }
 
 /** Result of removing a service workspace. */
@@ -81,12 +85,20 @@ export async function removeService(
     await registry.regenerateRoot(contractsRoot);
   }
 
-  const regenerate = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
-  const helperFiles = await regenerate(
+  await reconcilePluginReferences(request.projectRoot, dependencies.fs);
+  const browserAuthFiles = await reconcileBrowserAuth(
+    request.projectRoot,
+    dependencies.fs,
+    dependencies.formatter,
+  );
+  const regenerate = dependencies.regenerateHelpers ?? regenerateAspireHelpersWithDependencies;
+  const aspireFiles = await regenerate(
     request.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
+    { formatter: dependencies.formatter },
   );
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
   return { serviceDir, removedContracts, helperFiles };
 }

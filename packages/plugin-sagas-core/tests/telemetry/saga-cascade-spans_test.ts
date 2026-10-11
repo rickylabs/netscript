@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
 
-import { defineSaga, sagaCompensate, schedule, send } from '../../mod.ts';
+import { defineSaga, sagaCompensate, sagaFail, schedule, send } from '../../mod.ts';
 import {
   type CascadedMessage,
   type SagaCorrelationKey,
@@ -333,6 +333,34 @@ Deno.test('SagaCompensator rejects a registered handler when engine correlation 
   assertEquals(span.attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.ERROR);
   assertEquals(span.status, 'error');
   assertEquals(span.ended, true);
+});
+
+Deno.test('SagaCompensator reports returned sagaFail as an error without rethrowing or changing effects', async () => {
+  const tracer = new RecordingTracer();
+  const compensator = new SagaCompensator({
+    clock: new TestSagaClock(),
+    instrumentation: new SagaInstrumentation({ tracer }),
+  });
+  const failure = sagaFail('refund rejected');
+  const definition = defineSaga('returned-compensation-failure')
+    .state<SagaState>({})
+    .on('Undo', () => [])
+    .compensate('Undo', () => [failure])
+    .build() as SagaDefinition;
+  const result = await compensator.compensate({
+    definition,
+    instanceId: 'returned-compensation-failure:42' as SagaInstanceId,
+    state: {},
+    message: { type: 'Undo', payload: {} },
+    correlationId: 'flow-b-42',
+    correlationKey: 'domain-42' as SagaCorrelationKey,
+  });
+  assertEquals(result.compensated, true);
+  assertEquals(result.cascaded, [failure]);
+  assertEquals(tracer.spans.length, 1);
+  assertEquals(tracer.spans[0].attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.ERROR);
+  assertEquals(tracer.spans[0].status, 'error');
+  assertEquals(tracer.spans[0].ended, true);
 });
 
 Deno.test('SagaCompensator preserves message trace context when no span context exists', async () => {

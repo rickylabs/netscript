@@ -75,7 +75,7 @@ export interface IncrementalStreamChunk {
 }
 
 const defaultStreamingRenderer: StreamingRenderer = (vnode, context) => {
-  return renderToReadableStream(vnode as VNode, context) as StreamingRenderStream;
+  return renderToReadableStream(vnode as VNode, {}, context) as StreamingRenderStream;
 };
 
 // ============================================================================

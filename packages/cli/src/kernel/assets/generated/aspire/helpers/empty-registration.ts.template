@@ -13,6 +13,7 @@ export function {{functionName}}(
   _infrastructure: InfrastructureContext,
   _services: Map<string, ExecutableResource>,
 {{pluginParameter}}  _appHostDir: string,
+  _installationSecretFile: string | undefined = undefined,
 ): Promise<Map<string, ExecutableResource>> {
   return Promise.resolve(new Map<string, ExecutableResource>());
 }

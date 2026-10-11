@@ -26,6 +26,21 @@ finding into a debt entry.
 - **Gate:** Close when env construction moves behind an auth-core contract and all configured
   backends pass compatibility and service boot tests.
 
+## packages/cli — CLI-BROWSER-SESSION-CONTRACT-DETECTION
+
+- **ID:** `CLI-BROWSER-SESSION-CONTRACT-DETECTION`
+- **Reason:** Browser auth reconciliation identifies generated session contracts by matching
+  `session: baseContract` in source. Renamed builders can miss detection; comments or strings can
+  produce false positives. Authored-contract capability detection needs a structural marker.
+- **Why deferred:** PR #2274 scopes the generated app/service proof; review accepts this bounded
+  heuristic pending a structural capability contract.
+- **Owner:** CLI auth reconciliation follow-up under #1382.
+- **Target:** Before extending session-route reconciliation to authored contracts.
+- **Created:** 2026-10-11
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Replace source sniffing with a template-owned capability or manifest field; verify
+  renamed/reformatted builders and comments/strings cannot silently skip or invent a route.
+
 ## packages/cli — PLUGIN-USERLAND-SOURCE-COPY
 
 - **Reason:** Maintainer/local `plugin add` copied full first-party plugin source into generated
@@ -730,13 +745,11 @@ finding into a debt entry.
 
 ## plugins/streams — durable topic publish/subscribe transport deferred (`streams-manifest-helpers-unsupported`)
 
-- **Reason:** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer helpers in the
-  Tier 2 plugin package. The existing real transport is `@netscript/plugin-streams-core`
-  `createDurableStream`, which publishes State Protocol upsert/delete events through
-  `@durable-streams/client`; it does not expose a generic topic consumer/subscriber channel that can
-  deliver `StreamTopicDefinition<TPayload>` payloads. Building that durable topic transport requires
-  a new cross-package runtime contract and consumer SDK, which exceeds the S3 M-sized slice. S3
-  replaced the silent no-op helper behavior with typed unsupported-operation failures.
+- **Reason:** Generic durable topic publish/subscribe transport remains deferred. The existing
+  `@netscript/plugin-streams-core` `createDurableStream` transport publishes State Protocol
+  upsert/delete events through `@durable-streams/client`; it does not expose a generic topic
+  consumer/subscriber channel for `StreamTopicDefinition<TPayload>` payloads. That capability
+  requires a cross-package runtime contract and consumer SDK, beyond entity-state replication.
 - **Owner:** `@netscript/plugin-streams` / `@netscript/plugin-streams-core` maintainers.
 - **Target:** Runtime transport rescope before advertising generic plugin topic publish/subscribe.
 - **Linked plan:** `.llm/tmp/run/cap-s3-streams/brief.md`.
@@ -745,6 +758,14 @@ finding into a debt entry.
 - **Gate:** Close when a real durable topic transport exists with producer delivery, consumer
   subscription/unsubscribe semantics, and runtime tests proving a published payload reaches a
   subscribed handler without relying on manifest-layer no-ops.
+
+- **0.0.8 remediation (#1369):** Removed the unconditional-throw producer/consumer helpers, handle
+  types, and unsupported-operation error factories from the plugin root and implementation. The
+  public-consumer regression rejects those root exports; README and streams documentation migrate
+  publishing to `@netscript/plugin-streams-core` and consumption to HTTP/SSE. The generic topic
+  transport remains deferred under this entry's existing gate. Documenting a caveat does not close a
+  defect; removing the unsupported public contract resolves the root honesty defect without claiming
+  a new topic transport.
 
 ## packages/watchers — AP-13 console.warn runtime reporting
 
@@ -1354,7 +1375,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   therefore returns `AUTH_PROVIDER_ERROR` (502).
 - **Owner:** Auth layer follow-up (#2190).
 - **Created:** 2026-10-10.
-- **Status:** open, DEBT_ACCEPTED.
+- **Status:** closed, 2026-10-11 (PR #2316).
+- **Resolution:** Atomic KV subject fence/outbox and a service-owned bounded page worker. Cookie,
+  session lookup, and configured bearer authenticators share the fence. Session
+  tombstones retain refreshed-token protection through upstream success plus maximum token lifetime
+  and clock skew. Provider and storage failures retry indefinitely with capped backoff. Tests in
+  `packages/auth-workos/tests/subject-revocation_test.ts`,
+  `packages/auth-workos/tests/workos-access-token_test.ts`,
+  `plugins/auth/tests/services/workos-global-logout-http_test.ts`, and
+  `plugins/auth/tests/services/workos-revocation-worker_test.ts` prove immediate sibling refusal,
+  subject isolation, bounded paging/retry, recovery after prolonged outages, shipped registry/main
+  composition, signal-triggered shutdown drain, tombstone TTL, clock skew, and REST/both RPC signout 200.
+  Shipped lifecycle proofs are in `plugins/auth/tests/services/workos-composition_test.ts`.
 - **Target:** 0.0.8 milestone (#2190, triage).
 - **Gate:** Close when the WorkOS backend implements `revokeSubjectSessions`. Every session of the
   subject must fail authentication immediately, with no per-session work in the request, and
@@ -2387,6 +2419,26 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   02's sanctioned boundary exception. Neither a zero-diagnostic claim nor closure of #1655 is
   proven. Evidence is kept in the run record and PR #2218.
 
+- **0.0.8 public contract graph (#2292):** Public values now name the owned `WorkersContract`
+  contract. New owned route and schema aliases preserve all 22 procedures, concrete schema methods,
+  literal payload binding, and handler inference. The full 13-target plugin lint falls from four to
+  two existing references: `WorkersContract` still names the private precise definition, and
+  `workersContractV1` still names oRPC `implement`. Both debt entries remain open; exact zero,
+  publication and quality evidence are still required for closure. No upstream internals are
+  re-exported and no signatures are erased. Consumer controls are in
+  `plugins/workers/tests/public/contract-graph_test.ts`.
+
+- **0.0.8 named implementer annotation (#2313):** The context-bindable value now names the owned
+  `WorkersContractV1` contract, backed by the additive `WorkersContractImplementer<TContext>` alias.
+  Bidirectional upstream compatibility and consumer rejection controls preserve all 22 routes and
+  the middleware, router, lazy-router, configuration, and context-binding capabilities. Full-export
+  lint remains at two findings: the private `WorkersContractDefinition` and oRPC `implement` now
+  referenced by the named implementer alias. Merely publishing the definition exposes its private
+  route/schema graph; substituting oRPC's `Implementer` annotation also retains a private reference.
+  Neither diagnostic is suppressed, and no zero-diagnostic acceptance is claimed. This row and
+  `workers-doc-baseline-2066` remain open with their existing closing gates. Evidence is kept in the
+  run record and PR #2313.
+
 ## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
 
 - **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
@@ -2839,3 +2891,37 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   Preserve the SDK non-DOM import-graph guard, Fresh schema/recovery tests, and Expo-pinned React
   lifecycle tests; verify native Hermes/Expo acceptance separately before claiming cross-runtime
   equivalence.
+
+## Fresh chat — retain Deno fetch response until subscription teardown (`fresh-chat-response-gc-2324`)
+
+- **Owner:** NetScript Fresh maintainers; issue #2324.
+- **Target:** Remove retention after
+  [denoland/deno#37006](https://github.com/denoland/deno/issues/37006) is fixed in the supported
+  Deno release and the forced-GC cancellation regression still passes.
+- **Gate:** `chat-response-gc_test.ts` runs the public chat connection with real streaming fetch,
+  forced GC and no fixture retention, then waits for the server body's cancellation event.
+- **Status:** Temporary upstream workaround. `chat-stream-subscription.ts` retains one response per
+  physical subscription, replaces it on reconnect, and releases it after cancellation. The public
+  subscription hub continues to own sharing, last-reader cancellation and disposal. The upstream
+  JSON stream owns parsing and backpressure; its consumed offset owns resume.
+- **Audit:**
+  - SDK `src/client/stream-source/internal/connection.ts`: unaffected. The abort listener explicitly
+    calls `reader.cancel()` and the finally block cancels/releases the reader, so cleanup does not
+    depend on Deno's lost fetch abort link. The SDK forced-GC regression proves server cancellation.
+  - SDK stream collections and React bindings: use the same fetch event source and its `close()`;
+    collection disposal closes that source. No independent body parser.
+  - Expo/React Native reference transport `resources/examples/expo-streams/expo-fetch.ts`: injects
+    `expo/fetch` into that SDK consumer. Hermes is outside the Deno bug, and the SDK still
+    explicitly cancels its reader. This audit makes no claim of new native-device execution.
+  - Fresh StreamDB recovery: deliberately uses finite `live: false` reads with `live=long-poll`
+    parameters, then `session.text()`. No detached SSE reader; the upstream response session retains
+    its finite response during body consumption, and recovery cancels/releases each attempt.
+  - Fresh chat proxy: passes the upstream body unbuffered into a server response rather than parsing
+    it. Downstream body cancellation propagates to that same stream; it does not rely solely on
+    fetch-signal cancellation. Existing proxy tests cover signal forwarding and byte passthrough.
+  - Snapshot materialization and chat writes: finite JSON/text or bodyless responses, rather than
+    detached long-lived SSE parsing. Snapshot reads retain the stream session until `json()`
+    settles.
+- **Fixture:** Main merged PR #2318 during this leaf. Its event-driven cancellation fixture and
+  diagnostics are preserved, with only status and signal observations in the fixture; the runtime
+  now retains the Response. No fixture-only Response retention remains.

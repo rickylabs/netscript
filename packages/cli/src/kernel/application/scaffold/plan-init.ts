@@ -1,4 +1,5 @@
 import { dirname, join } from '@std/path';
+import { ASPIRE_SURFACE_MARKER } from '../../domain/aspire-generated-surface.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
@@ -290,7 +291,10 @@ export async function scaffoldRoot(
     if (
       await context.scaffolder.writeFile(
         aspireCliTaskPath,
-        generateAspireCliTaskRunner(),
+        await context.formatter.formatContent(
+          aspireCliTaskPath,
+          ASPIRE_SURFACE_MARKER + generateAspireCliTaskRunner(),
+        ),
         options.force,
       )
     ) {

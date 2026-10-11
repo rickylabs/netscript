@@ -38,7 +38,7 @@ describe('database template generators', () => {
       config.tasks['db:clear-seeded-client'],
       'deno run --allow-write=schema/.generated scripts/clear-seeded-client.ts',
     );
-    assertStringIncludes(config.tasks['db:generate'], 'npm:prisma@^7.4.2 generate');
+    assertStringIncludes(config.tasks['db:generate'], 'npm:prisma@^7.10.0 generate');
     assertEquals(
       config.tasks['db:init'],
       'deno run -A --minimum-dependency-age=0 scripts/migrate.ts --name=init',
@@ -55,7 +55,7 @@ describe('database template generators', () => {
       config.imports['@netscript/database/scripts'],
       '../../packages/database/scripts/mod.ts',
     );
-    assertEquals(config.imports['@prisma/adapter-pg'], 'npm:@prisma/adapter-pg@^7.4.2');
+    assertEquals(config.imports['@prisma/adapter-pg'], 'npm:@prisma/adapter-pg@^7.10.0');
   });
 
   it('includes patch-client and fix-zod tasks for sqlite', () => {
@@ -267,7 +267,7 @@ describe('database template generators', () => {
 
     assertEquals(
       config.imports['@prisma/adapter-libsql'],
-      'npm:@prisma/adapter-libsql@^7.4.2',
+      'npm:@prisma/adapter-libsql@^7.10.0',
     );
   });
 

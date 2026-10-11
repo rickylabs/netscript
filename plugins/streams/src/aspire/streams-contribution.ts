@@ -4,7 +4,6 @@ import {
   type AspireResource,
   type ContributionContext,
   type EnvSource,
-  type HealthCheckSpec,
 } from '@netscript/aspire/public';
 
 /** Aspire contribution for the ephemeral-by-default Durable Streams protocol service. */
@@ -43,16 +42,5 @@ export class StreamsAspireContribution extends AspireNSPluginContribution {
     return {
       DURABLE_STREAMS_URL: { kind: 'resource', resource: 'streams', key: 'url' },
     };
-  }
-
-  /** Declare health checks used by plugin doctor commands. */
-  override declareHealthChecks(ctx: ContributionContext): readonly HealthCheckSpec[] {
-    const servicePort = ctx.port('streams');
-    return [{
-      resource: 'streams',
-      url: `http://localhost:${servicePort}/health`,
-      expect: 200,
-      timeoutMs: 3000,
-    }];
   }
 }

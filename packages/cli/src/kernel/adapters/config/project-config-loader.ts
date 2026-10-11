@@ -36,10 +36,33 @@ export async function loadProjectConfig(
   options: ProjectConfigLoaderOptions,
   dependencies: ProjectConfigLoaderDependencies,
 ): Promise<NetScriptConfig> {
+  return await runProjectConfigLoader(options, dependencies, ['--allow-all']);
+}
+
+/** Load authored configuration with project mutation and subprocesses denied. */
+export async function loadProjectConfigForInspection(
+  options: ProjectConfigLoaderOptions,
+  dependencies: ProjectConfigLoaderDependencies,
+): Promise<NetScriptConfig> {
+  return await runProjectConfigLoader(options, dependencies, [
+    '--allow-read',
+    '--allow-env',
+    '--allow-net',
+    '--deny-write',
+    '--deny-run',
+    '--no-prompt',
+  ]);
+}
+
+async function runProjectConfigLoader(
+  options: ProjectConfigLoaderOptions,
+  dependencies: ProjectConfigLoaderDependencies,
+  permissions: readonly string[],
+): Promise<NetScriptConfig> {
   const args = [
     'run',
     '--no-lock',
-    '--allow-all',
+    ...permissions,
     '--minimum-dependency-age=0',
   ];
   const denoConfigPath = join(options.cwd, 'deno.json');

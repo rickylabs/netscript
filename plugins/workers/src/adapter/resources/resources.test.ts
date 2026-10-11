@@ -94,6 +94,14 @@ Deno.test('workers install emits only userland glue under workers', () => {
     artifactText(controlPlane!),
     "{ callee: 'defineJob', axis: 'jobs' }",
   );
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineTask', axis: 'tasks' }",
+  );
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineWorkflow', axis: 'workflows' }",
+  );
 });
 
 Deno.test('workers task scaffolder preserves multi-runtime task emission', () => {

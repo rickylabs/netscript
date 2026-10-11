@@ -11,7 +11,7 @@ import {
 } from '../openai-compatible.ts';
 import { getModelProvider, listModelProviders } from '../mod.ts';
 import { AiError } from '../src/contracts/mod.ts';
-import type { ChatClientPort } from '../src/ports/chat-client.ts';
+import type { ChatClientEvent, ChatClientPort } from '../src/ports/chat-client.ts';
 
 const CONFIG = {
   baseURL: 'https://api.deepseek.example/v1',
@@ -132,4 +132,65 @@ Deno.test({
 Deno.test('openai-compatible: an unconfigured client can receive connection values per request', () => {
   const provider = new OpenAiCompatibleModelProvider({ models: ['m1'] });
   assertEquals(provider.createChatClient('m1').kind, 'text');
+});
+
+Deno.test({
+  name: 'openai-compatible: malformed content and unknown finish reasons yield errors',
+  sanitizeOps: false,
+  sanitizeResources: false,
+  async fn(t) {
+    const originalFetch = globalThis.fetch;
+    try {
+      for (
+        const choice of [
+          { delta: { content: { unexpected: 'object' } }, finish_reason: null },
+          { delta: { content: ['unexpected'] }, finish_reason: null },
+          { delta: {}, finish_reason: 'unknown-provider-reason' },
+        ]
+      ) {
+        await t.step(JSON.stringify(choice), async () => {
+          let requests = 0;
+          globalThis.fetch = () => {
+            requests++;
+            const chunks = [
+              { delta: { role: 'assistant', content: '' }, finish_reason: null },
+              choice,
+            ].map((value) => ({
+              id: 'chatcmpl-invalid',
+              object: 'chat.completion.chunk',
+              created: 1,
+              model: 'deepseek-chat',
+              choices: [{ index: 0, ...value }],
+            }));
+            return Promise.resolve(
+              new Response(
+                chunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join('') +
+                  'data: [DONE]\n\n',
+                { headers: { 'content-type': 'text/event-stream' } },
+              ),
+            );
+          };
+          const client = new OpenAiCompatibleModelProvider({ ...CONFIG, api: 'chat-completions' })
+            .createChatClient('deepseek-chat');
+          const events: ChatClientEvent[] = [];
+          for await (
+            const event of client.stream({ messages: [{ role: 'user', content: 'hello' }] })
+          ) {
+            events.push(event);
+          }
+          assertEquals(requests, 1);
+          assert(events.some((event) => event.type === 'error'), JSON.stringify(choice));
+          assert(!events.some((event) => event.type === 'finish'));
+          assert(
+            !events.some((event) =>
+              event.type === 'text' &&
+              (typeof event.delta !== 'string' || event.delta.includes('[object Object]'))
+            ),
+          );
+        });
+      }
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  },
 });

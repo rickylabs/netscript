@@ -144,12 +144,14 @@ class WorkersContribution extends AspireNSPluginContribution {
     return [/* AspireResource[] */];
   }
 
-  // Optional: extra env this contribution needs, and health checks the
-  // plugin doctor will probe.
+  // Optional: extra environment this contribution needs.
   declareEnv(ctx: ContributionContext) { return {}; }
-  declareHealthChecks(ctx: ContributionContext) { return []; }
 }
 ```
+
+Health probes come from scaffold capability and `healthEndpoint` metadata. The unused
+`declareHealthChecks` hook was removed in 0.0.8; see the
+[child health contract](/orchestration-runtime/child-health/) for the vocabulary and migration.
 
 The host side composes those contributions. `composeAppHost` walks the plugin manifests, finds the
 ones that declare an `aspire` contribution, instantiates each, and collects the resources:

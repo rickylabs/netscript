@@ -237,11 +237,17 @@ export class SagaBusBridge implements SagaBusPort {
     return (await this.#idempotency.reserve(target, idempotencyKey)).accepted;
   }
 
-  async #schedule(message: CascadedMessage<'scheduled'>): Promise<void> {
+  async #schedule(
+    message: CascadedMessage<'scheduled'>,
+    execution?: SagaCompensationRequest,
+  ): Promise<void> {
     if (!this.#scheduler) {
       throw SagasError.notImplemented('schedule cascades require SagaScheduler.');
     }
-    await this.#scheduler.scheduleCascaded(message);
+    await this.#scheduler.scheduleCascaded(
+      message,
+      execution ? { instanceId: execution.instanceId } : undefined,
+    );
   }
 
   async #compensate(
@@ -334,6 +340,10 @@ export class SagaBusBridge implements SagaBusPort {
       instanceId: request.instanceId,
       correlationKey: request.correlationKey,
       version: request.version,
+    }, {
+      attempt: request.attempt,
+      correlationId: request.correlationId,
+      parent: request.parent,
     });
   }
 
@@ -381,7 +391,10 @@ export class SagaBusBridge implements SagaBusPort {
     });
     try {
       const child = span && this.#instrumentation?.spanContext(span);
-      await this.#schedule(withScheduledContext(message, execution?.correlationId, child));
+      await this.#schedule(
+        withScheduledContext(message, execution?.correlationId, child),
+        execution,
+      );
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.SUCCESS);
     } catch (error) {
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);

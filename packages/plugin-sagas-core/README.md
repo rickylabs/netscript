@@ -305,17 +305,65 @@ prevent runtime startup. A backlog can delay migration of historical keys, so ba
 is guaranteed only after their terminal deadline has been assigned. No API read or owner app session
 drives cleanup.
 
-Transport reservations already use their separate deduplication TTL. With the KV backend,
-`archiveToDb: false` skips the optional Prisma archive even when a Prisma client is available. With
-`--saga-store-backend prisma`, the Prisma query model remains required runtime state so
+Transport reservations already use their separate deduplication TTL. With a KV query projection,
+`archiveToDb: true` explicitly enables the optional Prisma archive for that saga group and requires
+a host Prisma client. The default `archiveToDb: false` skips it, keeping KV-only installs DB-free.
+With `Sagas.Projection.Backend: prisma`, the Prisma query model remains required runtime state so
 `listInstances`, `getInstance`, and stream hydration stay populated independently of archival.
 
 Migration: `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and no longer expires open replay
 markers. Configure `completedRetentionDays` to match the canonical terminal window instead. Markers
 survive open instances and receive their deadline only after terminal state.
 
-Delayed saga messages remain owned by the queue adapter. The queue scheduling port currently has no
-terminal-instance cancellation/expiry contract, so their retention window is not proven by this
-change. Terminal records written before this policy was installed also need a migration/backfill;
-this change assigns deadlines when a terminal state is written. These remaining acceptance items
-keep issue #2109 open.
+The independent core `SagaScheduler` uses `KvSagaSchedulerStore` from `./stores` for durable
+scheduled records. Bind canonical state with `bindRetentionStore(store, { completedRetentionDays })`
+before startup, and drive `cleanupRetention()` from a background service loop. The shipped durable
+runtime already drives that hook for an injected scheduler. Match the scheduler policy to the
+canonical store's policy. Each pass inspects at most ten records, persists its cursor, and assigns
+KV TTL or deletes records after the origin's terminal deadline. All scheduler outcomes (pending,
+claimed, dispatched, failed) share that deadline. Open instances and all unscoped records, including
+new schedules without an origin, remain durable without TTL. Due delivery checks canonical origin
+state before forwarding; missing canonical state cancels explicitly scoped records. Replay
+identified by origin, message idempotency key (or message id), and scheduled time cannot overwrite
+existing outcomes or renew a deadline. Unkeyed schedules receive distinct identities. CAS
+cancellation preserves concurrent rewrites, expired claims recover after a 30-second lease, and late
+outcomes cannot recreate deleted records. A time-ordered due index honors the caller's batch limit
+and moves claims to their lease deadline atomically with the record; retained outcomes never delay
+due work. Claim tokens stay private to the adapter; settlement and cancellation use its returned
+claim snapshot. Empty claims make no KV writes. The host owns the KV adapter and injects the same
+clock into scheduler and adapter.
+
+```ts
+import { DenoKvAdapter } from '@netscript/kv';
+import { SagaScheduler } from '@netscript/plugin-sagas-core/runtime';
+import { KvSagaSchedulerStore, KvSagaStore } from '@netscript/plugin-sagas-core/stores';
+import type { SagaClockPort } from '@netscript/plugin-sagas-core/ports';
+
+declare const clock: SagaClockPort;
+await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+const canonical = new KvSagaStore({ kv, now: () => clock.now(), completedRetentionDays: 7 });
+const scheduler = new SagaScheduler({
+  clock,
+  store: new KvSagaSchedulerStore({ kv, now: () => clock.now() }),
+  dispatch: async () => {}, // Supply the host's delivery port.
+});
+scheduler.bindRetentionStore(canonical, { completedRetentionDays: 7 });
+await scheduler.start();
+await scheduler.cleanupRetention(); // The background host drains pages and backs off when idle.
+await scheduler.stop();
+```
+
+Custom scheduler stores retain their existing API; binding canonical retention requires their
+optional `cancel` and `cleanupRetention` capabilities. All core schedulers, including unbound ones,
+use content-hashed replay identities; unbound schedulers do not enforce originating-instance
+retention. This core store does not archive to a database. New and legacy unscoped schedules,
+native-provider delayed entries, and terminal-family migration evidence remain acceptance scope for
+issue #2109.
+
+## Discovery metadata
+
+`@netscript/plugin-sagas-core/discovery` exports immutable `NETSCRIPT_CONTRIBUTION_BUILDERS`
+patterns for the plugin SDK `additionalBuilders` option. `defineSaga` → `sagas`, `defineSignal` →
+excluded (no independent contribution id), `defineQuery` → excluded (no independent contribution
+id). The CLI composes first-party metadata before walking the project, independently of plugin
+update order.

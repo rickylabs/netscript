@@ -1,3 +1,5 @@
+import { checkGeneratedFiles } from '../../../../../../../.llm/tools/testing/check-generated-files.ts';
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import {
   assert,
@@ -281,6 +283,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry: new PluginKindRegistry(),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -386,6 +389,7 @@ describe('public install plugin flow', () => {
         }, {
           fs,
           scaffolder,
+          formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
           templateAdapter,
           registry,
           registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -422,6 +426,7 @@ describe('public install plugin flow', () => {
         }, {
           fs,
           scaffolder,
+          formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
           templateAdapter,
           registry,
           registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -465,6 +470,7 @@ describe('public install plugin flow', () => {
     }, {
       fs,
       scaffolder,
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       templateAdapter,
       registry: new PluginKindRegistry(),
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -520,6 +526,7 @@ describe('public install plugin flow', () => {
         }, {
           fs,
           scaffolder,
+          formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
           templateAdapter,
           registry: new PluginKindRegistry(),
           registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -564,6 +571,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -626,6 +634,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry: new PluginKindRegistry(),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -674,6 +683,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry: new PluginKindRegistry(),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -758,7 +768,8 @@ describe('public install plugin flow', () => {
       });
 
       const styles = await Deno.readTextFile(join(projectRoot, 'ai/assets/styles.css'));
-      const perItemStyles = styles.split('/* Per-item CSS - ui:init writes these @import lines. */')[1] ?? '';
+      const perItemStyles =
+        styles.split('/* Per-item CSS - ui:init writes these @import lines. */')[1] ?? '';
       assertEquals(
         [...perItemStyles.matchAll(/@import ['"]([^'"]+)['"]/g)].map((match) => match[1]),
         [
@@ -795,12 +806,15 @@ describe('public install plugin flow', () => {
         aiDenoJson.imports,
         rootDenoJson.imports,
       );
-      const check = await new DenoProcess().exec(
-        'deno',
-        ['check', '--unstable-kv', '--minimum-dependency-age=0', ...aiSources],
-        { cwd: projectRoot },
+      const check = await checkGeneratedFiles({
+        args: ['check', '--unstable-kv', '--minimum-dependency-age=0', ...aiSources],
+        cwd: projectRoot,
+      });
+      assertEquals(
+        check.code,
+        0,
+        new TextDecoder().decode(check.stderr) || new TextDecoder().decode(check.stdout),
       );
-      assertEquals(check.code, 0, check.stderr || check.stdout);
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -839,6 +853,7 @@ describe('public install plugin flow', () => {
         }, {
           fs,
           scaffolder,
+          formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
           templateAdapter,
           registry: new PluginKindRegistry(),
           registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -950,6 +965,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -970,7 +986,7 @@ describe('public install plugin flow', () => {
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'workers/runtime.ts')),
-        "@netscript/plugin-workers/runtime",
+        '@netscript/plugin-workers/runtime',
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'workers/scaffold.plugin.json')),
@@ -1020,6 +1036,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1098,6 +1115,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1122,7 +1140,7 @@ describe('public install plugin flow', () => {
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'sagas/runtime.ts')),
-        "@netscript/plugin-sagas/runtime",
+        '@netscript/plugin-sagas/runtime',
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
@@ -1157,6 +1175,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1234,6 +1253,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1264,7 +1284,7 @@ describe('public install plugin flow', () => {
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'triggers/runtime.ts')),
-        "@netscript/plugin-triggers/runtime",
+        '@netscript/plugin-triggers/runtime',
       );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
@@ -1295,6 +1315,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1372,6 +1393,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1423,6 +1445,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1527,6 +1550,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1574,6 +1598,7 @@ describe('public install plugin flow', () => {
       }, {
         fs,
         scaffolder,
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         templateAdapter,
         registry,
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1646,6 +1671,7 @@ describe('public install plugin flow', () => {
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         regenerateHelpers: () => Promise.resolve([]),
       };
       const install = (port: number | undefined) =>
@@ -1724,6 +1750,7 @@ describe('public install plugin flow', () => {
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         regenerateHelpers: () => Promise.resolve([]),
       };
 
@@ -1858,17 +1885,21 @@ function assertGeneratedListenerPortsAreHigh(content: string): void {
 async function writeConfiguredPostgres(fs: MemoryFileSystemAdapter): Promise<void> {
   await fs.writeFile(
     '/workspace/alpha/appsettings.json',
-    JSON.stringify({
-      NetScript: {
-        Name: 'alpha-app',
-        Services: {},
-        Plugins: {},
-        BackgroundProcessors: {},
-        Databases: {
-          postgres: { Enabled: true, Engine: 'Postgres', DatabaseName: 'alpha' },
+    JSON.stringify(
+      {
+        NetScript: {
+          Name: 'alpha-app',
+          Services: {},
+          Plugins: {},
+          BackgroundProcessors: {},
+          Databases: {
+            postgres: { Enabled: true, Engine: 'Postgres', DatabaseName: 'alpha' },
+          },
         },
       },
-    }, null, 2) + '\n',
+      null,
+      2,
+    ) + '\n',
   );
 }
 
@@ -1876,9 +1907,11 @@ async function checksum(bytes: Uint8Array): Promise<string> {
   const input = new ArrayBuffer(bytes.byteLength);
   new Uint8Array(input).set(bytes);
   const digest = await crypto.subtle.digest('SHA-256', input);
-  return `sha256-${Array.from(new Uint8Array(digest))
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('')}`;
+  return `sha256-${
+    Array.from(new Uint8Array(digest))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('')
+  }`;
 }
 
 function successfulPluginScaffoldProcess(): {
@@ -1938,6 +1971,7 @@ async function installOfficialPlugins(
   const dependencies = {
     fs,
     scaffolder,
+    formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
     templateAdapter,
     registry,
     registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -1961,7 +1995,9 @@ async function installOfficialPlugins(
     }, dependencies);
   }
 
-  const appsettings = JSON.parse(await Deno.readTextFile(join(projectRoot, 'appsettings.json'))) as {
+  const appsettings = JSON.parse(
+    await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
+  ) as {
     NetScript: PluginEntriesSnapshot;
   };
   return appsettings.NetScript;
@@ -1989,6 +2025,7 @@ async function installOfficialPluginWithoutSamples(
   }, {
     fs,
     scaffolder,
+    formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
     templateAdapter,
     registry: new PluginKindRegistry(),
     registryScaffolder: new PluginRegistryScaffolder(scaffolder),
@@ -2428,4 +2465,33 @@ function authDescriptor(): ValidatedPluginDescriptor {
       score: 95,
     },
   };
+}
+
+for (const pluginName of ['workers', 'sagas', 'triggers'] as const) {
+  Deno.test(`official ${pluginName} no-db install emits DB-free API/background metadata and no Prisma imports`, async () => {
+    const projectRoot = await Deno.makeTempDir();
+    try {
+      await installOfficialPluginWithoutSamples(projectRoot, pluginName);
+      const config =
+        JSON.parse(await Deno.readTextFile(join(projectRoot, 'appsettings.json'))).NetScript;
+      assertEquals(config.Plugins[`${pluginName}-api`].RequiresDb, false);
+      assertEquals(config.BackgroundProcessors[pluginName].RequiresDb, false);
+      assertEquals(config.Plugins[`${pluginName}-api`].RequiresKv, true);
+      assertEquals(config.BackgroundProcessors[pluginName].RequiresKv, true);
+      if (pluginName === 'sagas') {
+        assertEquals(config.Plugins['sagas-api'].Sagas.Projection.Backend, 'kv');
+        assertEquals(config.BackgroundProcessors.sagas.Sagas.Projection.Backend, 'kv');
+      }
+      assertEquals(await pathExists(join(projectRoot, 'database')), false);
+      const files = await collectTypeScriptFiles(join(projectRoot, pluginName));
+      for (const file of files) {
+        const source = await Deno.readTextFile(file);
+        assertFalse(
+          /(?:from|import\s*\(?)\s*['"][^'"]*(?:prisma|database\/generated)/i.test(source),
+        );
+      }
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
 }

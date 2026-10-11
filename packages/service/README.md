@@ -104,16 +104,21 @@ For a genuinely public status service, the exact migration is:
 +});
 ```
 
-The policy and its validator are the shared `ServiceAuthPolicy` / `assertServiceAuthPolicy`
-contract from `@netscript/service/auth`, also used by plugin services. Guarded policies preserve
-the existing `/api` protection and anonymous `/health` defaults; custom `protect` and
-`allowAnonymous` options keep their existing semantics. `createService()` remains the lower-level
-composition API; it installs guards through `.withAuthn()` and `.withAuthz()`.
+The policy and its validator are the shared `ServiceAuthPolicy` / `assertServiceAuthPolicy` contract
+from `@netscript/service/auth`, also used by plugin services. Guarded policies preserve the existing
+`/api` protection and anonymous `/health` defaults; custom `protect` and `allowAnonymous` options
+keep their existing semantics. `createService()` remains the lower-level composition API; it
+installs guards through `.withAuthn()` and `.withAuthz()`.
 
-L1 generated services record a public demo policy with a reason naming
-[#1382 L2](https://github.com/rickylabs/netscript/issues/1382). Wiring guarded scaffolds when auth
-is installed and authenticated generated app calls remain follow-ups. Public examples below
-are demonstrations; choose guards before using them for private operations.
+`netscript service add` and auth installation share the BFF composition: `browserAuthenticator`
+verifies remote sessions and `createContractAuthorizer(router)` enforces procedure-local access.
+`/health`, `/api/openapi.json`, `/api/docs` and contract-declared public demo procedures remain
+anonymous. Contract-protected procedures return 401 without a session and 403 when authorization
+denies it; authorized calls succeed. Without an enabled auth plugin, generation records an explicit
+public opt-out explaining how to install authentication. Authored entrypoints retain their policy;
+only scaffold-owned opt-outs are reconciled by service add or plugin installation. `generate aspire`
+leaves authored inputs unchanged. Public examples below are demonstrations; declare contract access
+before using them for private operations.
 
 ## CORS migration (breaking in 0.0.8)
 

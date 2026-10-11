@@ -5,46 +5,55 @@ title: "netscript command reference"
 
 # `netscript` command reference
 
-The detailed verb-and-flag companion for the published `netscript` binary
-(`@netscript/cli`). Together with the curated [CLI reference](/cli-reference/), these two
-pages cover every public command group and direct subcommand; this page concentrates the extended
-groups and flags while the curated page carries the everyday flows. For the package API surface
-(the embeddable helpers, not the command tree) see the
-[`@netscript/cli` package page](/reference/cli/).
+The detailed verb-and-flag companion for the published `netscript` binary (`@netscript/cli`).
+Together with the curated [CLI reference](/cli-reference/), these two pages cover every public
+command group and direct subcommand; this page concentrates the extended groups and flags while the
+curated page carries the everyday flows. For the package API surface (the embeddable helpers, not
+the command tree) see the [`@netscript/cli` package page](/reference/cli/).
 
-This page documents the **public `netscript` binary** — the CLI published as
-`@netscript/cli` and installed on your PATH — not any maintainer-only tree. Everything here
-is verified against `netscript <group> --help`. To confirm the exact spelling in your
-installed version, run `netscript --help` or `netscript <group> --help`.
+This page documents the **public `netscript` binary** — the CLI published as `@netscript/cli` and
+installed on your PATH — not any maintainer-only tree. Everything here is verified against
+`netscript <group> --help`. To confirm the exact spelling in your installed version, run
+`netscript --help` or `netscript <group> --help`.
 
 The top-level groups are `agent`, `config`, `deploy`, `init`, `contract`, `db`, `generate`,
 `marketplace`, `plugin`, `service`, and the `ui:*` commands — each has a section below.
 
 ## `init` — scaffold a workspace
 
-`netscript init [name]` scaffolds a new NetScript workspace. The everyday walk-through is in
-the [quickstart](/quickstart/); every flag is:
+`netscript init [name]` scaffolds a new NetScript workspace. The everyday walk-through is in the
+[quickstart](/quickstart/); every flag is:
 
-| Flag | Description |
-| --- | --- |
-| `--app-name <name>` | Frontend application name (kebab-case). |
-| `--db <engine>` | Database engine: `postgres`, `mysql`, `mssql`, `sqlite`, or `none`. |
-| `--service [enabled]` | Scaffold an example oRPC service. |
-| `--service-name <name>` | Example service name. |
-| `--model-name <name>` | Prisma model name for the scaffolded CRUD surface. |
-| `--service-port <port>` | Example service port. |
-| `--cache [enabled]` | Scaffold a shared cache resource. |
-| `--cache-backend <backend>` | Shared cache backend: `redis`, `garnet`, or `deno-kv`. |
-| `--editor <editor>` | Editor config: `none`, `zed`, or `vscode`. |
-| `--no-aspire` | Skip the Aspire orchestration layer. |
-| `--no-git` | Skip `git init` after scaffolding. |
-| `--force` | Overwrite an existing target directory (default `false`). |
-| `--ci` | Non-interactive mode (default `false`). |
-| `-y, --yes` | Accept defaults without prompting (default `false`). |
-| `--path <path>` | Target directory for scaffold output. |
-| `--dry-run` | Preview the scaffold plan without writing files (default `false`). |
-| `--json` | Emit a single machine-readable JSON result (default `false`). |
-| `--from <preset>` | Apply a named scaffold preset. |
+| Flag                        | Description                                                                                    |
+| --------------------------- | ---------------------------------------------------------------------------------------------- |
+| `--app-name <name>`         | Frontend application name (kebab-case).                                                        |
+| `--db <engine>`             | Database engine: `postgres`, `mysql`, `mssql`, `sqlite`, or `none`.                            |
+| `--service [enabled]`       | Scaffold an example oRPC service.                                                              |
+| `--service-name <name>`     | Example service name.                                                                          |
+| `--model-name <name>`       | Prisma model name for the scaffolded CRUD surface.                                             |
+| `--service-port <port>`     | Example service port.                                                                          |
+| `--cache [enabled]`         | Scaffold a shared cache resource.                                                              |
+| `--cache-backend <backend>` | Shared cache backend: `redis`, `garnet`, or `deno-kv`.                                         |
+| `--editor <editor>`         | Editor config: `none`, `zed`, or `vscode`.                                                     |
+| `--no-aspire`               | Skip the Aspire orchestration layer.                                                           |
+| `--no-agent`                | Skip agent MCP configuration, skills, and guidance (including offline docs).                   |
+| `--host <host>`             | Select `claude`, `vscode`, `opencode`, or `all` for agent installation; inferred when omitted. |
+| `--with-docs`               | Opt in to the offline agent documentation corpus; ignored with `--no-agent`.                   |
+| `--no-git`                  | Skip `git init` after scaffolding.                                                             |
+| `--force`                   | Overwrite an existing target directory (default `false`).                                      |
+| `--ci`                      | Non-interactive mode (default `false`).                                                        |
+| `-y, --yes`                 | Accept defaults without prompting (default `false`).                                           |
+| `--path <path>`             | Target directory for scaffold output.                                                          |
+| `--dry-run`                 | Preview the scaffold plan without writing files (default `false`).                             |
+| `--json`                    | Emit a single machine-readable JSON result (default `false`).                                  |
+| `--from <preset>`           | Apply a named scaffold preset.                                                                 |
+
+Project init runs the existing agent installer after scaffolding by default, using the generated
+project root. Host detection honours project markers before the invoking environment and defaults to
+Claude Code; `--host` overrides detection. The deciding source is printed in text mode. Dry runs
+write no agent files, and `--json` retains its single scaffold result. Offline docs remain opt-in.
+The optional Aspire agent setup keeps its bounded timeout and reports a skip if unavailable. For an
+existing project, use `netscript agent init` to refresh integration idempotently.
 
 ## `agent` — install and run agent tooling
 
@@ -52,78 +61,148 @@ the [quickstart](/quickstart/); every flag is:
 [Agent tooling](/ai/agent-tooling/) for the mental model and the
 [`@netscript/mcp` reference](/reference/mcp/) for the server's tool surface.
 
-| Command | Description |
-| --- | --- |
-| `netscript agent init` | Install NetScript MCP, consumer diagnostic tools, and the canonical skill bundle, add integrations for detected agent hosts, and apply editor setup to a new or existing project. Every host receives the canonical skill bundle under `.agents/skills/` and a marked NetScript section in `AGENTS.md`; Claude Code additionally writes `.mcp.json`, the single `.claude/skills/repo-skills/SKILL.md` discovery bridge, and a `CLAUDE.md` import of `@AGENTS.md` while preserving existing instructions; the VS Code editor writes `.vscode/mcp.json`; the Zed editor writes `.zed/settings.json` `context_servers`; the OpenCode host edits `opencode.json`, or an existing `opencode.jsonc`, in place as JSONC (`netscript` and `aspire` MCP servers with explicit timeouts, `lsp.deno`, `formatter.deno`). Flags: `--host <host>` (`claude`, `vscode`, `opencode`, or `all`; when omitted, resolved from project markers, then the invoking environment, then the `claude` default, and the deciding source is printed); `--editor <editor>` (`none`, `zed`, or `vscode`, inferred from one existing editor directory when omitted); `--with-docs` installs the expanded exact-version corpus. Unsupported editors fail with manual-configuration guidance. |
-| `netscript agent mcp` | Start the stdio MCP server for an MCP client. Interactive use prints Zed/VS Code setup guidance; see [Agent tooling](/ai/agent-tooling/). Flags: `--endpoint <url>` (telemetry endpoint), `--project-root <path>`, `--docs-root <path>` (public documentation root). |
-| `netscript agent drift <sub>` | Manage evidence-gated agent drift records. The group itself prints help; `record` is its only subcommand. |
+| Command                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `netscript agent init`        | Install NetScript MCP, consumer diagnostic tools, and the canonical skill bundle, add integrations for detected agent hosts, and apply editor setup to a new or existing project. Every host receives the canonical skill bundle under `.agents/skills/` and a marked NetScript section in `AGENTS.md`; Claude Code additionally writes `.mcp.json`, the single `.claude/skills/repo-skills/SKILL.md` discovery bridge, and a `CLAUDE.md` import of `@AGENTS.md` while preserving existing instructions; the VS Code editor writes `.vscode/mcp.json`; the Zed editor writes `.zed/settings.json` `context_servers`; the OpenCode host edits `opencode.json`, or an existing `opencode.jsonc`, in place as JSONC (`netscript` and `aspire` MCP servers with explicit timeouts, `lsp.deno`, `formatter.deno`). Flags: `--host <host>` (`claude`, `vscode`, `opencode`, or `all`; when omitted, resolved from project markers, then the invoking environment, then the `claude` default, and the deciding source is printed); `--editor <editor>` (`none`, `zed`, or `vscode`, inferred from one existing editor directory when omitted); `--with-docs` installs the expanded exact-version corpus. Unsupported editors fail with manual-configuration guidance. |
+| `netscript agent mcp`         | Start the stdio MCP server for an MCP client. Interactive use prints Zed/VS Code setup guidance; see [Agent tooling](/ai/agent-tooling/). Flags: `--endpoint <url>` (telemetry endpoint), `--project-root <path>`, `--docs-root <path>` (public documentation root).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `netscript agent drift <sub>` | Manage evidence-gated agent drift records. The group itself prints help; `record` is its only subcommand.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ### `agent drift` subcommands
 
-| Command | Description |
-| --- | --- |
+| Command                        | Description                                                                                                                                              |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `netscript agent drift record` | Record drift after a fresh successful diagnostic pass. Flags: `--resource <name>` (**required**), `--summary <text>` (**required**), `--details <text>`. |
 
-The gate is the point. `record` appends an entry only when a diagnostic **receipt** for
-`--resource` exists, exited `0`, and is **less than 15 minutes old**; the receipt itself is
-embedded in the entry. Anything else — no receipt, a failed one, a future timestamp, or a
-stale one — is refused with a non-zero exit and a message naming how to produce a fresh
-receipt (`netscript plugin doctor --resource <name>`, or the MCP `doctor`, telemetry, API
-introspection, or `execute_command` tools). A drift note therefore cannot be written from
-an agent's recollection of a run it did not just perform.
+The gate is the point. `record` appends an entry only when a diagnostic **receipt** for `--resource`
+exists, exited `0`, and is **less than 15 minutes old**; the receipt itself is embedded in the
+entry. Anything else — no receipt, a failed one, a future timestamp, or a stale one — is refused
+with a non-zero exit and a message naming how to produce a fresh receipt
+(`netscript plugin doctor --resource <name>`, or the MCP `doctor`, telemetry, API introspection, or
+`execute_command` tools). A drift note therefore cannot be written from an agent's recollection of a
+run it did not just perform.
 
 The same gate backs the MCP `record_drift` tool, so both surfaces refuse identically.
 
 ## `config` — inspect and mutate configuration
 
-`netscript config` reads and writes the resolved project configuration and manages
-runtime overrides.
+`netscript config` reads and writes the resolved project configuration and manages runtime
+overrides.
 
-| Command | Description |
-| --- | --- |
-| `netscript config inspect` | Inspect the resolved project configuration. Flags: `--project-root <path>`, `--json` (emit the JSON-stable inspection report). |
-| `netscript config list [filter]` | List the canonical `appsettings` paths the generator reads, with each path's current value. The optional positional `[filter]` narrows the listing. Paths present in `appsettings.json` but **not** read by the generator are marked `(not read by the generator)` — which is what makes this the command for finding a setting that is being ignored. Flags: `--project-root <path>`, `--json`. |
-| `netscript config get <path>` | Read a resolved configuration value. Flags: `--project-root <path>`, `--json`. |
-| `netscript config set <path> <value>` | Set a generated `appsettings` configuration value. Flag: `--project-root <path>`. |
-| `netscript config override <sub>` | Manage runtime overrides (see below). |
-| `netscript config runtime <sub>` | Compatibility lifecycle aliases for runtime override snapshots — carries the `publish` and `rollback` subcommands only. |
+| Command                               | Description                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `netscript config inspect`            | Inspect the resolved project configuration. Flags: `--project-root <path>`, `--json` (emit the JSON-stable inspection report).                                                                                                                                                                                                                                                                   |
+| `netscript config list [filter]`      | List the canonical `appsettings` paths the generator reads, with each path's current value. The optional positional `[filter]` narrows the listing. Paths present in `appsettings.json` but **not** read by the generator are marked `(not read by the generator)` — which is what makes this the command for finding a setting that is being ignored. Flags: `--project-root <path>`, `--json`. |
+| `netscript config get <path>`         | Read a resolved configuration value. Flags: `--project-root <path>`, `--json`.                                                                                                                                                                                                                                                                                                                   |
+| `netscript config set <path> <value>` | Set a generated `appsettings` configuration value. Flag: `--project-root <path>`.                                                                                                                                                                                                                                                                                                                |
+| `netscript config override <sub>`     | Manage runtime overrides (see below).                                                                                                                                                                                                                                                                                                                                                            |
+| `netscript config runtime <sub>`      | Compatibility lifecycle aliases for runtime override snapshots — carries the `publish` and `rollback` subcommands only.                                                                                                                                                                                                                                                                          |
 
 ### `config override` subcommands
 
-| Command | Description |
-| --- | --- |
-| `netscript config override publish <topic> <file>` | Publish and atomically activate a versioned runtime topic file. Flag: `--version <version>` (defaults to the source filename). |
-| `netscript config override rollback <topic> <version>` | Atomically point a runtime topic at an existing version. |
-| `netscript config override list` | List active versions and payloads. |
-| `netscript config override get <path>` | Read an override value at `<path>`. |
-| `netscript config override set <path> [value]` | Set an override value. Flag: `--rollout <percent>`. |
-| `netscript config override clear <path> [value]` | Clear an override value. Flag: `--rollout <percent>`. |
-| `netscript config override enable <path> [value]` | Enable an override. Flag: `--rollout <percent>`. |
-| `netscript config override disable <path> [value]` | Disable an override. Flag: `--rollout <percent>`. |
+| Command                                                | Description                                                                                                                    |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `netscript config override publish <topic> <file>`     | Publish and atomically activate a versioned runtime topic file. Flag: `--version <version>` (defaults to the source filename). |
+| `netscript config override rollback <topic> <version>` | Atomically point a runtime topic at an existing version.                                                                       |
+| `netscript config override list`                       | List active versions and payloads.                                                                                             |
+| `netscript config override get <path>`                 | Read an override value at `<path>`.                                                                                            |
+| `netscript config override set <path> [value]`         | Set an override value. Flag: `--rollout <percent>`.                                                                            |
+| `netscript config override clear <path> [value]`       | Clear an override value. Flag: `--rollout <percent>`.                                                                          |
+| `netscript config override enable <path> [value]`      | Enable an override. Flag: `--rollout <percent>`.                                                                               |
+| `netscript config override disable <path> [value]`     | Disable an override. Flag: `--rollout <percent>`.                                                                              |
 
 `netscript config runtime publish <topic> <file>` and
-`netscript config runtime rollback <topic> <version>` are lifecycle aliases for the
-matching `config override` verbs.
+`netscript config runtime rollback <topic> <version>` are lifecycle aliases for the matching
+`config override` verbs.
 
 ## `marketplace` — discover and publish plugins
 
-| Command | Description |
-| --- | --- |
-| `netscript marketplace search <query>` | Search the NetScript plugin marketplace. |
-| `netscript marketplace publish` | Publish a NetScript plugin to the marketplace. |
+| Command                                | Description                                    |
+| -------------------------------------- | ---------------------------------------------- |
+| `netscript marketplace search <query>` | Search the NetScript plugin marketplace.       |
+| `netscript marketplace publish`        | Publish a NetScript plugin to the marketplace. |
 
 ## `generate` — code generation
 
 Beyond `generate plugins` and `generate runtime-schemas` (covered in the
-[CLI reference](/cli-reference/#generate)), the group also regenerates the Aspire
-helper layer.
+[CLI reference](/cli-reference/#generate)), the group also regenerates the Aspire helper layer.
 
-| Command | Description |
-| --- | --- |
-| `netscript generate aspire` | Regenerate Aspire AppHost helpers from `appsettings.json`. Flag: `--project-root <path>`. |
-| `netscript generate runtime-schemas` | Generate JSON Schema files for runtime config topics. Flags: `--project-root <path>`, `--dry-run`, `--force`, `--verbose`. |
-| `netscript generate plugins` | Authoritative command: run each installed plugin's declared runtime registry generator under the project configuration. The workers generator discovers project-authored top-level `workers/jobs/*.ts` modules independently of official samples, excluding declared helper files such as `job-tools.ts`. Flags: `--project-root <path>`, `--dry-run`, `--verbose`. |
-| `netscript generate resource <resource>` | Generate a typed Fresh resource slice from a named query procedure. Required flag: `--procedure <path>`. Selection flags: `--client <service>`, `--app <name>`, `--project-root <path>`, `--route <path>`. Optional layers: `--form`, `--partial`, `--stream`. Application flags: `--dry-run`, `--force`, `--json`. |
+| Command                                  | Description                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `netscript generate aspire`              | Regenerate the Aspire AppHost and helpers from authored root `appsettings.json`. Flags: `--project-root <path>`, `--check`, `--format <text\|json>` (check only).                                                                                                                                                                                                                                                    |
+| `netscript generate runtime-schemas`     | Generate JSON Schema files for runtime config topics. Flags: `--project-root <path>`, `--dry-run`, `--force`, `--verbose`.                                                                                                                                                                                                                                                                                           |
+| `netscript generate plugins`             | Authoritative command: run each installed plugin's declared runtime registry generator under the project configuration. The workers generator discovers project-authored top-level `workers/jobs/*.ts` modules independently of official samples, excluding declared helper files such as `job-tools.ts`. Flags: `--project-root <path>`, `--dry-run`, `--verbose`, `--check`, `--format <text\|json>` (check only). |
+| `netscript generate routes`              | Reconstruct `.generated/manifest.ts` and `.generated/routes.ts` from the Fresh application route tree without a Vite build. Flags: `--app <name>`, `--project-root <path>` (explicit Fresh application root).                                                                                                                                                                                                        |
+| `netscript generate resource <resource>` | Generate a typed Fresh resource slice from a named query procedure. Required flag: `--procedure <path>`. Selection flags: `--client <service>`, `--app <name>`, `--project-root <path>`, `--route <path>`. Optional layers: `--form`, `--partial`, `--stream`. Application flags: `--dry-run`, `--force`, `--json`.                                                                                                  |
+
+For route generation, `--project-root` selects an explicit Fresh application directory and takes
+precedence over `--app`. Otherwise, `--app` selects a workspace member under `apps/`; from inside an
+app, that app is inferred, and a workspace with one app selects it automatically. Multiple apps
+require a selector. Missing or unknown targets fail before generation. Run
+`netscript generate
+routes --app dashboard` after adding, moving, or removing route files. Repeated
+runs leave unchanged outputs untouched. The command regenerates only the two derived modules; it
+does not reconcile authored `router.ts` entries or page bindings. See
+[route lifecycle](/web-layer/route/).
+
+### Plugin generated-surface check
+
+Run `netscript generate plugins --check --project-root . --format json` to check every selected
+installed-plugin registry against the canonical bytes normal generation would write. The version-1
+report contains producer, normalized project-relative path, ownership and SHA-256 digest for each
+output. `producers` includes every installed package and immutable version, including producers with
+zero outputs. `inputs` lists authored root authorities (including `appsettings.json`) and selected
+project source files with their digests. Authored inputs never appear as outputs.
+
+Generation and check share installed-plugin manifest resolution, each plugin's selector and
+renderer, and the generated-source formatter. Output modules carry a producer marker. Missing
+output, extra files under the reserved `.netscript/generated/plugin-*/` producer directories,
+changed producer or bytes return exit 1. SDK axis registries such as
+`.netscript/generated/jobs.registry.ts` are outside this check's scope. A removed producer's
+remaining files are extra outputs. Symlinks, invalid paths, producer overlaps, missing local
+manifests, unsupported inspection or failed rendering return a typed `inspection-failure`, also
+exit 1. `current` returns exit 0. No inspection failure falls back to normal generation. Check
+denies writes to the consumer project; canonical formatting stages only in the system temporary
+directory. `--dry-run` and `--check` are mutually exclusive.
+
+Plugin manifests advertise byte inspection with `runtimeRegistryGenerator.inspectionProtocol: 2`.
+The CLI invokes the declared command with `--inspect --inspection-protocol 2 --manifest-json <json>`
+and the same generation arguments. The command emits one JSON document to stdout:
+
+```json
+{
+  "inspectionProtocol": 2,
+  "registries": [
+    {
+      "registryPath": ".netscript/generated/plugin-example/items.registry.ts",
+      "sourceFiles": ["items/example.ts"],
+      "content": "export const registry = new Map();\n"
+    }
+  ]
+}
+```
+
+Every declared target must appear exactly once; `content: null` means the shared selector would skip
+that target in normal generation. Regeneration removes an existing inactive target only when its
+bytes begin with that producer's exact marker; foreign or unmarked files are preserved and continue
+to report drift. Registry paths stay within the reserved producer directories and cannot claim
+authored configuration. The host validates and formats the returned module bytes before any project
+writes. Workers, triggers, sagas and AI implement protocol 2. Auth and streams declare an empty
+registry surface in their runtime manifests. An immutable published version returning HTTP 404 for
+its runtime manifest also declares zero outputs, including auth and streams 0.0.7. Missing local or
+source-member manifests and other HTTP failures fail closed. Protocol-1 source-only and legacy
+generators retain normal generation support; `--check` refuses them because source paths alone
+cannot certify output bytes. The inspection child runs with read permission and denies write,
+subprocess, network, environment, FFI and system permissions. Imports may resolve through Deno's
+module loader. Normal generation uses the consumer's configured lock semantics and may extend its
+module graph, just as other generator invocations do. Check and protocol-2 dry-run copy the
+configured consumer lock into the system temporary directory and use `--frozen` with
+`--node-modules-dir=none`. They retain locked dependency versions without modifying the lock or
+installing packages into the consumer project. A missing lock or generator graph returns an
+inspection failure with instructions to run `netscript generate plugins` first. Consumers must
+enable a project lock to certify registry bytes; inspection never resolves a fresh graph. Limits
+bound UTF-8 rendered bytes, source/output counts and child runtime. This check certifies generated
+bytes, not installed runtime health or every transitive import. Published-version Windows/Linux
+verification belongs to release validation.
 
 Generated registries are derived artifacts. Add or replace job modules in `workers/jobs/`, then run
 `netscript generate plugins`; do not hand-edit `.netscript/generated/**`. Removing the official
@@ -131,178 +210,225 @@ workers samples does not disable custom-job discovery.
 
 ## `plugin` — extended verbs
 
-The common `plugin` verbs (`install`, `new`, `list`, `doctor`, `info`, `remove`) are in
-the [CLI reference](/cli-reference/#plugins). The full group also carries:
+The common `plugin` verbs (`install`, `new`, `list`, `doctor`, `info`, `remove`) are in the
+[CLI reference](/cli-reference/#plugins). The full group also carries:
 
-| Command | Description |
-| --- | --- |
-| `netscript plugin scaffold <name>` | Scaffold a NetScript plugin package. Flags: `--target <path>`, `--project-root <path>`, `--force`. |
-| `netscript plugin sync` | Compatibility alias that delegates registry synchronization to `netscript generate plugins`. Flag: `--project-root <path>`. |
-| `netscript plugin update <name>` | Re-pin and regenerate an installed plugin. Flag: `--project-root <path>`. |
-| `netscript plugin item-add <name> <item> [args...]` | Scaffold an item with a custom plugin. Flag: `--project-root <path>`. |
-| `netscript plugin enable <pkg> [args...]` | Run a plugin's published `enable` command. Flag: `--project-root <path>`. |
-| `netscript plugin disable <pkg> [args...]` | Run a plugin's published `disable` command. Flag: `--project-root <path>`. |
-| `netscript plugin setup <pkg> [args...]` | Run a plugin's published `setup` command. Flag: `--project-root <path>`. |
-| `netscript plugin auth <sub>` | Configure auth and manage sessions (see below). |
-| `netscript plugin ai <verb> [...args]` | Configure AI tools, agents, models, providers, and MCP servers. Flag: `--project-root <path>` (the only flag NetScript consumes). |
+| Command                                             | Description                                                                                                                       |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `netscript plugin scaffold <name>`                  | Scaffold a NetScript plugin package. Flags: `--target <path>`, `--project-root <path>`, `--force`.                                |
+| `netscript plugin sync`                             | Compatibility alias that delegates registry synchronization to `netscript generate plugins`. Flag: `--project-root <path>`.       |
+| `netscript plugin update <name>`                    | Re-pin and regenerate an installed plugin. Flag: `--project-root <path>`.                                                         |
+| `netscript plugin item-add <name> <item> [args...]` | Scaffold an item with a custom plugin. Flag: `--project-root <path>`.                                                             |
+| `netscript plugin enable <pkg> [args...]`           | Run a plugin's published `enable` command. Flag: `--project-root <path>`.                                                         |
+| `netscript plugin disable <pkg> [args...]`          | Run a plugin's published `disable` command. Flag: `--project-root <path>`.                                                        |
+| `netscript plugin setup <pkg> [args...]`            | Run a plugin's published `setup` command. Flag: `--project-root <path>`.                                                          |
+| `netscript plugin auth <sub>`                       | Configure auth and manage sessions (see below).                                                                                   |
+| `netscript plugin ai <verb> [...args]`              | Configure AI tools, agents, models, providers, and MCP servers. Flag: `--project-root <path>` (the only flag NetScript consumes). |
 
 `plugin ai` is a **pass-through**, not a command group with its own verbs. NetScript strips
-`--project-root`, then runs the installed `@netscript/plugin-ai` package's CLI in a child
-`deno run` process and forwards every remaining argument verbatim, printing its output and
-propagating its exit code. The verb vocabulary therefore belongs to that plugin's release,
-not to this reference; see the
+`--project-root`, then runs the installed `@netscript/plugin-ai` package's CLI in a child `deno run`
+process and forwards every remaining argument verbatim, printing its output and propagating its exit
+code. The verb vocabulary therefore belongs to that plugin's release, not to this reference; see the
 [`@netscript/plugin-ai` reference](/reference/plugin-ai/). Invoking it with no verb is an error.
 
 ### `plugin auth` subcommands
 
-| Command | Description |
-| --- | --- |
-| `netscript plugin auth backend set <backend>` | Select the active auth backend. Flag: `--project-root <path>`. |
-| `netscript plugin auth backend show` | Show the currently selected auth backend. Flag: `--project-root <path>`. |
-| `netscript plugin auth provider set` | Configure an auth provider. Flags: `--preset <preset>`, `--client-id <id>`, `--client-secret <secret>`, `--redirect-uri <uri>`, `--issuer <issuer>`, `--api-key <key>`, `--cookie-password <password>`, `--secret <secret>`, `--kv-oauth-key <key>`, `--project-root <path>`. |
-| `netscript plugin auth secret generate [kind]` | Generate auth secret material. |
-| `netscript plugin auth session list` | List auth sessions. Flag: `--stream-url <url>`. Needs a credential in `NETSCRIPT_AUTH_TOKEN`. |
-| `netscript plugin auth session revoke <id>` | Revoke any auth session by id through the operator `revokeSession` route. Flag: `--auth-url <url>`. Needs `NETSCRIPT_AUTH_TOKEN` holding the `auth:sessions:revoke` scope. |
+| Command                                        | Description                                                                                                                                                                                                                                                                   |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `netscript plugin auth backend set <backend>`  | Select the active auth backend. Flag: `--project-root <path>`.                                                                                                                                                                                                                |
+| `netscript plugin auth backend show`           | Show the currently selected auth backend. Flag: `--project-root <path>`.                                                                                                                                                                                                      |
+| `netscript plugin auth provider set`           | Configure an auth provider. Flags: `--preset <preset>`, `--client-id <id>`, `--client-secret <secret>`, `--redirect-uri <uri>`, `--issuer <issuer>`, `--api-key <key>`, `--cookie-password <password>`, `--secret <secret>`, `--kv-oauth-key <key>`, `--project-root <path>`. |
+| `netscript plugin auth secret generate [kind]` | Generate auth secret material.                                                                                                                                                                                                                                                |
+| `netscript plugin auth session list`           | List auth sessions. Flag: `--stream-url <url>`. Needs a credential in `NETSCRIPT_AUTH_TOKEN`.                                                                                                                                                                                 |
+| `netscript plugin auth session revoke <id>`    | Revoke any auth session by id through the operator `revokeSession` route. Flag: `--auth-url <url>`. Needs `NETSCRIPT_AUTH_TOKEN` holding the `auth:sessions:revoke` scope.                                                                                                    |
 
-The backends selectable here are the same ones read at runtime by
-`NETSCRIPT_AUTH_BACKEND` — see [add authentication](/identity-access/how-to/add-authentication/).
+The backends selectable here are the same ones read at runtime by `NETSCRIPT_AUTH_BACKEND` — see
+[add authentication](/identity-access/how-to/add-authentication/).
 
 ## `service` — extended verbs
 
 The common `service add`, `service list`, and `service generate` verbs are in the
 [CLI reference](/cli-reference/#services-contracts). The full group also carries:
 
-| Command | Description |
-| --- | --- |
-| `netscript service add` | Add a service workspace, v1 contract, and Aspire registration. Flags: `--name <name>` (kebab-case), `--port <port>`, `--refs <refs>` (comma-separated service references), `--project-root <path>`, `--force`, `--with-client` (scaffold app-workspace client and query helpers). |
-| `netscript service set <name>` | Update an existing service and regenerate Aspire helpers. Flags: `--port <port>`, `--enabled <enabled>`, `--project-root <path>`. |
-| `netscript service remove <name>` | Remove a service workspace and reverse its registrations. Flags: `--keep-contract` (retain paired contract files), `--project-root <path>`. |
-| `netscript service add-handler <service> <procedure>` | Bind a contract procedure with a compiling service handler stub. Flags: `--version <version>` (default `v1`), `--project-root <path>`. |
-| `netscript service ref add <caller> <callee>` | Add a service reference from `<caller>` to `<callee>`. Flag: `--project-root <path>`. |
-| `netscript service ref remove <caller> <callee>` | Remove a service reference. Flag: `--project-root <path>`. |
+| Command                                               | Description                                                                                                                                                                                                                                                                       |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `netscript service add`                               | Add a service workspace, v1 contract, and Aspire registration. Flags: `--name <name>` (kebab-case), `--port <port>`, `--refs <refs>` (comma-separated service references), `--project-root <path>`, `--force`, `--with-client` (scaffold app-workspace client and query helpers). |
+| `netscript service set <name>`                        | Update an existing service and regenerate Aspire helpers. Flags: `--port <port>`, `--enabled <enabled>`, `--project-root <path>`.                                                                                                                                                 |
+| `netscript service remove <name>`                     | Remove a service workspace and reverse its registrations. Flags: `--keep-contract` (retain paired contract files), `--project-root <path>`.                                                                                                                                       |
+| `netscript service add-handler <service> <procedure>` | Bind a contract procedure with a compiling service handler stub. Flags: `--version <version>` (default `v1`), `--project-root <path>`.                                                                                                                                            |
+| `netscript service ref add <caller> <callee>`         | Add a service reference from `<caller>` to `<callee>`. Flag: `--project-root <path>`.                                                                                                                                                                                             |
+| `netscript service ref remove <caller> <callee>`      | Remove a service reference. Flag: `--project-root <path>`.                                                                                                                                                                                                                        |
 
 ## `contract` — extended verbs
 
 The common `contract add` and `contract list` verbs are in the
 [CLI reference](/cli-reference/#services-contracts). The full group also carries:
 
-| Command | Description |
-| --- | --- |
+| Command                                                                                | Description                                                                                                                                                                                                           |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `netscript contract add-route <contract> <procedure> --method <method> --path <route>` | Append a typed oRPC procedure to a contract. Required flags: `--method <method>`, `--path <route>`. Optional: `--input <schema>`, `--output <schema>`, `--version <version>` (default `v1`), `--project-root <path>`. |
-| `netscript contract inspect <name>` | Inspect contract procedures and schema expressions. Flags: `--version <version>` (default `v1`), `--json`, `--path <path>`. |
-| `netscript contract remove <name>` | Remove a contract and regenerate version aggregates. Flags: `--version <version>` (remove only the named version), `--path <path>`. |
-| `netscript contract version add <name> --from <version> --to <version>` | Promote a contract into a new version directory. Required flags: `--from <version>`, `--to <version>`. Optional: `--path <path>`, `--force`. |
+| `netscript contract inspect <name>`                                                    | Inspect contract procedures and schema expressions. Flags: `--version <version>` (default `v1`), `--json`, `--path <path>`.                                                                                           |
+| `netscript contract remove <name>`                                                     | Remove a contract and regenerate version aggregates. Flags: `--version <version>` (remove only the named version), `--path <path>`.                                                                                   |
+| `netscript contract version add <name> --from <version> --to <version>`                | Promote a contract into a new version directory. Required flags: `--from <version>`, `--to <version>`. Optional: `--path <path>`, `--force`.                                                                          |
 
 ## `db` — extended verbs
 
-The everyday database workflow (`init`, `generate`, `migrate`, `seed`, `status`,
-`studio`, `introspect`, `reset`) is in the
-[CLI reference](/cli-reference/#database) — and all `db` commands require Aspire to be
-running (`cd aspire && aspire start`) unless you scaffolded a file-backed `sqlite`
-engine. The full group also carries the target-management and migration-history verbs:
+The everyday database workflow (`init`, `generate`, `migrate`, `seed`, `status`, `studio`,
+`introspect`, `reset`) is in the [CLI reference](/cli-reference/#database) — and all `db` commands
+require Aspire to be running (`cd aspire && aspire start`) unless you scaffolded a file-backed
+`sqlite` engine. The full group also carries the target-management and migration-history verbs:
 
-| Command | Description |
-| --- | --- |
-| `netscript db add <engine>` | Add a database workspace to an existing project. `<engine>` is `postgres`, `mysql`, `mssql`, or `sqlite`. Flags: `--name <key>` (config key), `--project-root <path>`, `--force`. |
-| `netscript db list` | List registered database targets. Flags: `--project-root <path>`, `--json`. |
-| `netscript db remove <configKey>` | Deregister a database target. Flags: `--project-root <path>`, `--purge` (delete the workspace when no target still uses it). |
-| `netscript db deploy` | Apply pending migrations without creating one. Flags: `--db <target>` (config key, database name, or `all`), `--project-root <path>`. |
-| `netscript db validate` | Validate database schemas. Flags: `--db <target>`, `--project-root <path>`. |
-| `netscript db resolve` | Resolve migration history state. Flags: `--db <target>`, `--project-root <path>`, `--applied <migration>` (mark as applied), `--rolled-back <migration>` (mark as rolled back). |
+| Command                           | Description                                                                                                                                                                       |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `netscript db add <engine>`       | Add a database workspace to an existing project. `<engine>` is `postgres`, `mysql`, `mssql`, or `sqlite`. Flags: `--name <key>` (config key), `--project-root <path>`, `--force`. |
+| `netscript db list`               | List registered database targets. Flags: `--project-root <path>`, `--json`.                                                                                                       |
+| `netscript db remove <configKey>` | Deregister a database target. Flags: `--project-root <path>`, `--purge` (delete the workspace when no target still uses it).                                                      |
+| `netscript db deploy`             | Apply pending migrations without creating one. Flags: `--db <target>` (config key, database name, or `all`), `--project-root <path>`.                                             |
+| `netscript db validate`           | Validate database schemas. Flags: `--db <target>`, `--project-root <path>`.                                                                                                       |
+| `netscript db resolve`            | Resolve migration history state. Flags: `--db <target>`, `--project-root <path>`, `--applied <migration>` (mark as applied), `--rolled-back <migration>` (mark as rolled back).   |
 
 ## `ui:*` — Fresh UI registry
 
-`ui:init` and `ui:add` are in the [CLI reference](/cli-reference/#fresh-ui). The full set
-also lists, updates, and removes copied registry items:
+`ui:init` and `ui:add` are in the [CLI reference](/cli-reference/#fresh-ui). The full set also
+lists, updates, and removes copied registry items:
 
-| Command | Description |
-| --- | --- |
-| `netscript ui:list` | List Fresh UI registry items. Flags: `--project-root <path>`, `--json`, `--collections` (include collections). |
-| `netscript ui:update [name]` | Update unmodified Fresh UI registry files. Flag: `--project-root <path>`. |
-| `netscript ui:remove <name>` | Remove a copied Fresh UI registry item. Flag: `--project-root <path>`. |
+| Command                      | Description                                                                                                    |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `netscript ui:list`          | List Fresh UI registry items. Flags: `--project-root <path>`, `--json`, `--collections` (include collections). |
+| `netscript ui:update [name]` | Update unmodified Fresh UI registry files. Flag: `--project-root <path>`.                                      |
+| `netscript ui:remove <name>` | Remove a copied Fresh UI registry item. Flag: `--project-root <path>`.                                         |
 
-Because Fresh UI is copy-source, `ui:update` only touches registry files you have not
-modified — your edits are never overwritten. See
-[customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
+Because Fresh UI is copy-source, `ui:update` only touches registry files you have not modified —
+your edits are never overwritten. See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 
 ## `deploy` — cloud and container targets
 
-The [CLI reference](/cli-reference/#deploy) covers the Deno Deploy and OS service (Servy)
-paths. The `deploy` group also exposes a family of routed cloud and container targets, the
-packaging verbs, and artifact-copy and log verbs.
+The [CLI reference](/cli-reference/#deploy) covers the Deno Deploy and OS service (Servy) paths. The
+`deploy` group also exposes a family of routed cloud and container targets, the packaging verbs, and
+artifact-copy and log verbs.
 
 ### Discovering targets
 
-| Command | Description |
-| --- | --- |
+| Command                 | Description                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `netscript deploy list` | List registered deploy targets and operations. Prints `key`, advertised operations, and label per line. Flag: `--json` (emit machine-readable target descriptors). |
 
 `deploy list` reads the live registry, so it is the authoritative answer to which targets are
-registered and which operations their adapters advertise. The advertised set can be wider than
-the router's callable command set; use each target's help output or the routed-verb table below to
-see which verbs the CLI exposes. Ten targets are
-registered by default: `azure-aca`, `azure-aks`, `azure-app-service`, `cloud-run`,
-`compose`, `deno-deploy`, `docker`, `kubernetes`, `linux-service`, `windows-service`.
+registered and which operations their adapters advertise. The advertised set can be wider than the
+router's callable command set; use each target's help output or the routed-verb table below to see
+which verbs the CLI exposes. Ten targets are registered by default: `azure-aca`, `azure-aks`,
+`azure-app-service`, `cloud-run`, `compose`, `deno-deploy`, `docker`, `kubernetes`, `linux-service`,
+`windows-service`.
 
 ### Routed cloud and container targets
 
 These seven groups are generated by one router. Each is a thin command that parses flags and
 dispatches to a registry-resolved adapter; the adapter holds all target-specific logic.
 
-| Command group | Verbs | Description |
-| --- | --- | --- |
-| `netscript deploy docker <verb>` | `plan` `up` `down` `status` `logs` | Manage the Docker image deployment target. |
-| `netscript deploy compose <verb>` | `plan` `up` `down` `status` `logs` | Manage the Docker Compose deployment target. |
-| `netscript deploy kubernetes <verb>` | `plan` `up` `down` | Manage the Kubernetes deployment target. |
-| `netscript deploy azure-aca <verb>` | `plan` `up` `down` | Manage the Azure Container Apps deployment target. |
-| `netscript deploy azure-app-service <verb>` | `plan` `up` `down` | Manage the Azure App Service deployment target. |
-| `netscript deploy azure-aks <verb>` | `plan` `up` `down` | Manage the Azure Kubernetes Service deployment target. |
-| `netscript deploy cloud-run <verb>` | `plan` `up` `down` | Manage the Google Cloud Run deployment target. |
+| Command group                               | Verbs                              | Description                                            |
+| ------------------------------------------- | ---------------------------------- | ------------------------------------------------------ |
+| `netscript deploy docker <verb>`            | `plan` `up` `down` `status` `logs` | Manage the Docker image deployment target.             |
+| `netscript deploy compose <verb>`           | `plan` `up` `down` `status` `logs` | Manage the Docker Compose deployment target.           |
+| `netscript deploy kubernetes <verb>`        | `plan` `up` `down`                 | Manage the Kubernetes deployment target.               |
+| `netscript deploy azure-aca <verb>`         | `plan` `up` `down`                 | Manage the Azure Container Apps deployment target.     |
+| `netscript deploy azure-app-service <verb>` | `plan` `up` `down`                 | Manage the Azure App Service deployment target.        |
+| `netscript deploy azure-aks <verb>`         | `plan` `up` `down`                 | Manage the Azure Kubernetes Service deployment target. |
+| `netscript deploy cloud-run <verb>`         | `plan` `up` `down`                 | Manage the Google Cloud Run deployment target.         |
 
-The verb lists differ because **a target only gets a subcommand for an operation it
-advertises**. The router walks a fixed candidate list — `plan`, `up`, `down`, `status`,
-`logs`, `rollback`, `secrets` — and skips any operation missing from the adapter's
-`operations`, so a target never exposes a verb it cannot perform. The two container targets
-advertise `status` and `logs`; the five cloud targets do not.
+The verb lists differ because **a target only gets a subcommand for an operation it advertises**.
+The router walks a fixed candidate list — `plan`, `up`, `down`, `status`, `logs`, `rollback`,
+`secrets` — and skips any operation missing from the adapter's `operations`, so a target never
+exposes a verb it cannot perform. The two container targets advertise `status` and `logs`; the five
+cloud targets do not.
 
-Running a target group with no verb prints help, as every command group in the CLI does.
-That is the group's default action, not a sign that the target is unimplemented.
+Running a target group with no verb prints help, as every command group in the CLI does. That is the
+group's default action, not a sign that the target is unimplemented.
 
-| Verb | Description |
-| --- | --- |
-| `plan` | Emit or preflight deployment artifacts. |
-| `up` | Bring the deployment up. |
-| `down` | Bring the deployment down. |
-| `status` | Show deployment status. |
-| `logs` | Show deployment logs. |
+| Verb     | Description                             |
+| -------- | --------------------------------------- |
+| `plan`   | Emit or preflight deployment artifacts. |
+| `up`     | Bring the deployment up.                |
+| `down`   | Bring the deployment down.              |
+| `status` | Show deployment status.                 |
+| `logs`   | Show deployment logs.                   |
 
 Every routed verb on every target shares the same flags: `--project-root <dir>`,
-`--output-dir <dir>` (directory for emitted deployment artifacts),
-`--environment <name>` (deployment environment passed to the target), `--clear-cache`
-(clear target deployment state and do not persist new values), and `--non-interactive`.
+`--output-dir <dir>` (directory for emitted deployment artifacts), `--environment <name>`
+(deployment environment passed to the target), `--clear-cache` (clear target deployment state and do
+not persist new values), and `--non-interactive`.
 
 ### Packaging
 
-| Command | Description |
-| --- | --- |
-| `netscript deploy desktop <sub>` | Package and publish native Deno Desktop applications. The group prints help; `package` and `release` do the work. |
-| `netscript deploy desktop package` | Package an enabled desktop app into Deno Desktop native formats. Flags: `--project-root <path>`, `--app <id>`, `--target <triple>`, `--all-targets`, repeatable `--format <format>`, `--compression <algorithm>` (default `xz`), `-o, --output-dir <dir>` (default `.deploy/desktop/packages`). Without a target flag it uses the host OS and architecture; an unsupported target fails rather than producing a wrong artifact. |
-| `netscript deploy desktop release <sub>` | Prepare or serve a native release. The group prints help for its two subcommands. |
-| `netscript deploy desktop release prepare` | Prepare and sign release metadata. Required flags: `--target <target>`, `--version <version>`, `--sequence <n>`, `--current-runtime <path>`, repeatable `--from <version>=<runtime-path>`, `--private-key-file <path>`. Optional: `--project-root <path>`, `--channel <name>` (default `stable`), `--release-dir <dir>` (default `.deploy/desktop/releases`). |
-| `netscript deploy desktop release serve` | Serve a prepared release directory. Flags: `--project-root <path>`, `--release-dir <dir>` (default `.deploy/desktop/releases`), `--hostname <host>` (default `127.0.0.1`), `--port <port>` (default `8787`), `--base-path <path>` (default `/`). |
-| `netscript deploy package-cli` | Compile the NetScript CLI itself into a self-shippable Windows `.exe`. Flags: `-o, --output-dir <dir>` (default `./.deploy/windows`; a `scripts/` subdirectory is used), `--target <triple>` (default `x86_64-pc-windows-msvc`), `--no-bundle` (compile directly from source — larger output), `-v, --verbose`. |
+| Command                                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `netscript deploy desktop <sub>`           | Package and publish native Deno Desktop applications. The group prints help; `package` and `release` do the work.                                                                                                                                                                                                                                                                                                               |
+| `netscript deploy desktop package`         | Package an enabled desktop app into Deno Desktop native formats. Flags: `--project-root <path>`, `--app <id>`, `--target <triple>`, `--all-targets`, repeatable `--format <format>`, `--compression <algorithm>` (default `xz`), `-o, --output-dir <dir>` (default `.deploy/desktop/packages`). Without a target flag it uses the host OS and architecture; an unsupported target fails rather than producing a wrong artifact. |
+| `netscript deploy desktop release <sub>`   | Prepare or serve a native release. The group prints help for its two subcommands.                                                                                                                                                                                                                                                                                                                                               |
+| `netscript deploy desktop release prepare` | Prepare and sign release metadata. Required flags: `--target <target>`, `--version <version>`, `--sequence <n>`, `--current-runtime <path>`, repeatable `--from <version>=<runtime-path>`, `--private-key-file <path>`. Optional: `--project-root <path>`, `--channel <name>` (default `stable`), `--release-dir <dir>` (default `.deploy/desktop/releases`).                                                                   |
+| `netscript deploy desktop release serve`   | Serve a prepared release directory. Flags: `--project-root <path>`, `--release-dir <dir>` (default `.deploy/desktop/releases`), `--hostname <host>` (default `127.0.0.1`), `--port <port>` (default `8787`), `--base-path <path>` (default `/`).                                                                                                                                                                                |
+| `netscript deploy package-cli`             | Compile the NetScript CLI itself into a self-shippable Windows `.exe`. Flags: `-o, --output-dir <dir>` (default `./.deploy/windows`; a `scripts/` subdirectory is used), `--target <triple>` (default `x86_64-pc-windows-msvc`), `--no-bundle` (compile directly from source — larger output), `-v, --verbose`.                                                                                                                 |
 
-`package-cli` bundles before compiling by default and falls back to compiling from source if
-the bundle step fails, so `--no-bundle` is a size/behaviour trade-off rather than a repair.
+`package-cli` bundles before compiling by default and falls back to compiling from source if the
+bundle step fails, so `--no-bundle` is a size/behaviour trade-off rather than a repair.
 
 ### Artifact copy, logs, and upgrade
 
-| Command | Description |
-| --- | --- |
-| `netscript deploy copy` | Copy build artifacts to the install directory (no Servy registration). Flags: `--deploy-dir <path>` (default `./.deploy/windows`), `--install-dir <path>` (default auto-resolved from the manifest), `--verbose`, `--dry-run`. |
-| `netscript deploy start [service]` | Start all registered Windows services, or one named service, via Servy. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--servy-cli <path>`, `--no-health-check`, `--verbose`. |
-| `netscript deploy stop [service]` | Stop all registered Windows services in reverse manifest order, or stop one named service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--servy-cli <path>`, `--verbose`. |
-| `netscript deploy status [service]` | Show Servy status for all registered Windows services, or one named service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--servy-cli <path>`, `--verbose`. |
-| `netscript deploy logs <service>` | Show recent logs for a service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>` (default `./.deploy/windows`), `-n, --lines <n>` (default 50), `--errors` (show the error log instead of stdout), `--list` (list available log files), `-f, --follow` (tail the log). |
-| `netscript deploy uninstall [service]` | Stop and remove all registered Windows services, or one named service, from the service manager. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--no-stop`. |
-| `netscript deploy upgrade` | Build, sync, reinstall, and restart services in one step. Flags: `--deploy-dir <path>` (default `./.deploy/windows`), `--install-dir <path>`, `--servy-cli <path>`, `--skip-compile`, `--skip-install`, `--skip-start`, `--verbose`, `--dry-run`. |
+| Command                                | Description                                                                                                                                                                                                                                                              |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `netscript deploy copy`                | Copy build artifacts to the install directory (no Servy registration). Flags: `--deploy-dir <path>` (default `./.deploy/windows`), `--install-dir <path>` (default auto-resolved from the manifest), `--verbose`, `--dry-run`.                                           |
+| `netscript deploy start [service]`     | Start all registered Windows services, or one named service, via Servy. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--servy-cli <path>`, `--no-health-check`, `--verbose`.                                                                                      |
+| `netscript deploy stop [service]`      | Stop all registered Windows services in reverse manifest order, or stop one named service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--servy-cli <path>`, `--verbose`.                                                                                        |
+| `netscript deploy status [service]`    | Show Servy status for all registered Windows services, or one named service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--servy-cli <path>`, `--verbose`.                                                                                                      |
+| `netscript deploy logs <service>`      | Show recent logs for a service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>` (default `./.deploy/windows`), `-n, --lines <n>` (default 50), `--errors` (show the error log instead of stdout), `--list` (list available log files), `-f, --follow` (tail the log). |
+| `netscript deploy uninstall [service]` | Stop and remove all registered Windows services, or one named service, from the service manager. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--no-stop`.                                                                                                        |
+| `netscript deploy upgrade`             | Build, sync, reinstall, and restart services in one step. Flags: `--deploy-dir <path>` (default `./.deploy/windows`), `--install-dir <path>`, `--servy-cli <path>`, `--skip-compile`, `--skip-install`, `--skip-start`, `--verbose`, `--dry-run`.                        |
+
+## Aspire generated-surface check
+
+Run `netscript generate aspire --check --project-root . --format json` to compare the selected
+AppHost, helpers and `.netscript/aspire-cli.ts` against their canonical generated bytes. The checker
+uses the same configuration selectors, template pipeline and formatter as
+`netscript generate aspire`. It does not invoke a project writer or format consumer files on disk.
+Root `appsettings.json` remains an authored authority; plugin install/remove owns plugin-reference
+reconciliation. Plugin install/remove and service add/remove own browser-auth wiring; generation
+reads the authored configuration and service sources without reconciling them. The AppHost's
+`aspire/package.json` is also project-owned: plugin, service and database mutation flows maintain
+its runtime dependencies, and `netscript service
+generate` repairs missing dependencies. Plain
+Aspire generation and inspection leave it unchanged. A current source inventory certifies generated
+bytes, not installed runtime dependencies or health.
+
+The JSON Schema ships as `@netscript/cli` asset `assets/schema/aspire-generated-surface.v1.json`.
+Aspire and plugin checks share the versioned inventory entry contract, bounded reader, path
+validation, SHA-256 hashing and producer/byte comparison. The Aspire version 1 report contains
+`version`, `generator`, `outputs`, `inputs`, `status`, `exitCode` and `drift`. Each inventory entry
+contains `generator`, a normalized project-relative `path`, `ownership` (`generated` for outputs,
+`authored` for inputs), and `digest` (`sha256:<hex>`). Output digests include the producer
+declaration and exact UTF-8 bytes. Input authorities include root `appsettings.json`, existing
+`netscript.config.ts`/`.js`/`.mjs`, and `deno.json`. Plugin metadata and transitive configuration
+imports are also used by the shared selector; the input list names its root authorities rather than
+promising a transitive dependency inventory.
+
+The generator owns `aspire/apphost.mts`, every leaf under `aspire/.helpers/`, and
+`.netscript/aspire-cli.ts`. SDK modules and Aspire settings are outside this command's output scope.
+Every selected output carries `// @netscript-generated public.generate.aspire`. The inventory
+rejects duplicate paths (including case overlaps), traversal and Windows path aliases, authored
+appsettings paths, missing AppHost or CLI runner producers, and declarations lost during formatting
+before any output can be certified or written. Init and database, service and plugin mutations use
+the same producer declaration and canonical formatting. Regenerate once if existing outputs lack
+that declaration or canonical formatting.
+
+`status: current` exits 0. Missing outputs, extra helper leaves, a missing or foreign producer
+declaration, and byte drift produce `status: drift`, exit 1, with `missing`, `extra`, `ownership`
+and/or `bytes` findings. Linked files/directories, failed selection/rendering/formatting, permission
+failures and exceeded inspection limits produce `status: inspection-failure`, exit 1; this report
+certifies no outputs. Inspection findings include an optional `message` carrying the failure cause.
+Inspection configuration and metadata probes deny writes and subprocess launches. Normal generation
+retains recoverable degradation when a plugin metadata probe fails or times out. An inspection
+failure never retries through generation. The reader bounds each file to 16 MiB and the helper tree
+to 1,024 entries; rendering permits at most 256 outputs. Canonical formatting bounds the whole batch
+to 64 MiB of source characters, using one staging child and one Deno formatter. Staging stays
+outside the consumer project, including when inspection denies all writes.
+
+This command covers Aspire generation; `generate plugins --check` covers installed-plugin
+registries. Published Windows/Linux release smoke remains follow-up work under #1912.

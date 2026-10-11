@@ -404,6 +404,17 @@ Deno.test('runtime suites prove the CLI-generated guarded plugin before generate
   }
 });
 
+Deno.test('runtime suites prove guarded service REST/RPC before generated quality', () => {
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
+    const guarded = ids.indexOf(GATE.BEHAVIOR_GENERATED_GUARDED_SERVICE);
+    assertEquals(guarded >= 0, true, `${suiteId} must run the guarded service gate`);
+    assertEquals(ids.indexOf('scaffold.plugin.auth') < guarded, true);
+    assertEquals(guarded < ids.indexOf(GATE.GENERATED_DENO_CHECK), true);
+    assertEquals(guarded < ids.indexOf(GATE.RUNTIME_ASPIRE_RESTORE), true);
+  }
+});
+
 Deno.test('listener failure/recovery gate runs after topology capture and before behavior', () => {
   for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
     const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
@@ -516,6 +527,8 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
     GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
     GATE.RUNTIME_TYPED_DB_PHASE_B,
     GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
+    GATE.RUNTIME_HEALTH_CREDENTIAL_ACCEPTED,
+    GATE.RUNTIME_HEALTH_CREDENTIAL_REJECTED,
   ]);
   const databaseWaits = new Set<GateId>([
     GATE.RUNTIME_WAIT_POSTGRES,
@@ -551,6 +564,8 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
         GATE.RUNTIME_TYPED_DB_PHASE_B,
         GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
+        GATE.RUNTIME_HEALTH_CREDENTIAL_ACCEPTED,
+        GATE.RUNTIME_HEALTH_CREDENTIAL_REJECTED,
       ])).has(gate)
     ),
   );
@@ -723,5 +738,20 @@ Deno.test('existing built-in suites preserve their exact resolved options', () =
     const options = expected.get(suite.id);
     if (!options) throw new Error(`Missing options baseline for "${suite.id}".`);
     assertEquals(resolveSuite(suite.id, overrides).defaultOptions, options, suite.id);
+  }
+});
+
+Deno.test('outbound webhook adoption is bounded and registered in both scaffold runtime tiers', () => {
+  for (const id of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const suite = resolveSuite(id);
+    const gates = suite.gates.map((gate) => gate.id);
+    const worker = gates.indexOf('scaffold.plugin.worker');
+    const executed = gates.indexOf('behavior.outbound-webhook' as GateId);
+    assert(worker >= 0);
+    assert(executed > worker);
+    assert(executed < gates.indexOf(GATE.GENERATED_DENO_CHECK));
+    const probe = suite.gates[executed];
+    assertEquals(probe.kind, 'command');
+    if (probe.kind === 'command') assertEquals(probe.timeoutMs, 120_000);
   }
 });

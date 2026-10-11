@@ -241,9 +241,15 @@ Do not replace that command with separate `gates` or individual scaffold command
 runtime verdict is requested. The `scaffold.runtime` suite creates a local-source project, adds the
 first-party plugins (`workers`, `sagas`, `triggers`, `streams`), initializes/generates/seeds the
 database, generates plugin registries, type-checks the generated workspaces, restores and starts
-Aspire, validates plugin endpoints/background paths, and cleans up when `--cleanup` is present.
-`scaffold.plugins` is narrower: it stops after plugin scaffold, registry generation, and plugin
-doctor.
+Aspire, validates plugin endpoints/background paths, and cleans up when `--cleanup` is present. Both
+runtime tiers resolve exact logical resource names from Aspire for the background children
+`workers`, `sagas`, and `triggers`, then require `/health` to return HTTP 200 with `state: ready`,
+`registryReady: true`, and `dependencyReady: true`. Streams must serve HTTP 200 with `ready: true`
+at its resolved `/health/ready` endpoint. Focused negative controls cover crash-looping children,
+false readiness payloads, prefix sibling resources, and removal of the streams probe from the suite.
+These readiness checks complement the durable-work behavior gates; local focused tests alone do not
+prove a clean scaffold's full runtime or cleanup. `scaffold.plugins` is narrower: it stops after
+plugin scaffold, registry generation, and plugin doctor.
 
 OpenHands PR trigger template for this gate:
 

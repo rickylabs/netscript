@@ -522,7 +522,7 @@ function parseArgs(args: readonly string[]): Options {
   let json = false;
   let dryRun = false;
   let fixture: string | undefined;
-  let publishRunId = Deno.env.get('GITHUB_RUN_ID') ?? '';
+  let publishRunId: string | undefined;
   let productionE2ERunId = '';
   let productionE2EOutcome: CanaryNoteContext['productionE2EOutcome'] = 'skipped';
   for (let index = 0; index < args.length; index++) {
@@ -562,7 +562,7 @@ function parseArgs(args: readonly string[]): Options {
     json,
     dryRun,
     fixture,
-    publishRunId,
+    publishRunId: publishRunId ?? Deno.env.get('GITHUB_RUN_ID') ?? '',
     productionE2ERunId,
     productionE2EOutcome,
   };
@@ -604,7 +604,11 @@ async function main(): Promise<void> {
           fixture.previous,
           fixture.payload,
           options.repo,
-          fixture.context,
+          {
+            ...fixture.context,
+            // Exercise the production composer's filesystem permissions in fixture runs too.
+            publishedPackageCount: (await discoverWorkspaceMembers()).length,
+          },
         ),
       );
       return;

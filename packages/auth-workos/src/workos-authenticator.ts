@@ -4,7 +4,8 @@ import type {
   AuthnResult,
   Principal,
 } from '@netscript/service/auth';
-import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { createRemoteJWKSet, decodeJwt, jwtVerify } from 'jose';
+import type { WorkosRevocationStore } from './ports/revocation-store.ts';
 import type { JWTPayload } from 'jose';
 
 /** Controls whether the authenticator refreshes the WorkOS sealed session after verification. */
@@ -29,30 +30,36 @@ export interface WorkosCookieOptions {
 }
 
 /** Minimal WorkOS SDK surface consumed by the sealed-session authenticator. */
-export interface WorkosSessionClient {
+export interface WorkosSessionClient<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+> {
   /** WorkOS User Management client. */
   readonly userManagement: {
     /** Loads a sealed session from a WorkOS AuthKit cookie. */
     loadSealedSession(options: {
       readonly sessionData: string;
       readonly cookiePassword: string;
-    }): WorkosCookieSession;
+    }): WorkosCookieSession<TUser>;
   };
 }
 
 /** Minimal WorkOS sealed-session surface consumed by the authenticator. */
-export interface WorkosCookieSession {
+export interface WorkosCookieSession<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+> {
   /** Authenticates the current sealed session. */
-  authenticate(): Promise<WorkosSessionAuthenticationResult>;
+  authenticate(): Promise<WorkosSessionAuthenticationResult<TUser>>;
   /** Refreshes the session and returns a rotated sealed session when WorkOS issues one. */
   refresh(options?: {
     readonly cookiePassword?: string;
     readonly organizationId?: string;
-  }): Promise<WorkosSessionRefreshResult>;
+  }): Promise<WorkosSessionRefreshResult<TUser>>;
 }
 
 /** Successful WorkOS sealed-session authentication result. */
-export interface WorkosSessionAuthenticationSuccess {
+export interface WorkosSessionAuthenticationSuccess<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+> {
   /** Indicates WorkOS accepted the sealed session. */
   readonly authenticated: true;
   /** Verified WorkOS access token embedded in the sealed session. */
@@ -73,8 +80,8 @@ export interface WorkosSessionAuthenticationSuccess {
   readonly entitlements?: readonly string[];
   /** WorkOS feature flags present on the token. */
   readonly featureFlags?: readonly string[];
-  /** WorkOS user object. */
-  readonly user: { readonly id: string; readonly [key: string]: unknown };
+  /** WorkOS user object, preserved in claims. Defaults to an open record for extra-field access. */
+  readonly user: TUser;
   /** WorkOS impersonator metadata when the session is impersonated. */
   readonly impersonator?: unknown;
 }
@@ -88,13 +95,17 @@ export interface WorkosSessionAuthenticationFailure {
 }
 
 /** WorkOS sealed-session authentication result. */
-export type WorkosSessionAuthenticationResult =
-  | WorkosSessionAuthenticationSuccess
+export type WorkosSessionAuthenticationResult<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+> =
+  | WorkosSessionAuthenticationSuccess<TUser>
   | WorkosSessionAuthenticationFailure;
 
 /** Successful WorkOS sealed-session refresh result. */
-export type WorkosSessionRefreshSuccess =
-  & Omit<WorkosSessionAuthenticationSuccess, 'accessToken'>
+export type WorkosSessionRefreshSuccess<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+> =
+  & Omit<WorkosSessionAuthenticationSuccess<TUser>, 'accessToken'>
   & {
     readonly authenticated: true;
     readonly sealedSession?: string;
@@ -102,20 +113,26 @@ export type WorkosSessionRefreshSuccess =
   };
 
 /** WorkOS sealed-session refresh result. */
-export type WorkosSessionRefreshResult =
-  | WorkosSessionRefreshSuccess
+export type WorkosSessionRefreshResult<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+> =
+  | WorkosSessionRefreshSuccess<TUser>
   | WorkosSessionAuthenticationFailure;
 
 /** Options for creating a WorkOS AuthKit sealed-session authenticator. */
-export interface WorkosAuthenticatorOptions {
+export interface WorkosAuthenticatorOptions<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+> {
   /** Configured WorkOS SDK client. */
-  readonly workos: WorkosSessionClient;
+  readonly workos: WorkosSessionClient<TUser>;
   /** Password used by WorkOS to unseal and reseal session cookie data. */
   readonly cookiePassword: string;
   /** Cookie attributes for reading and writing the WorkOS sealed session. */
   readonly cookie?: WorkosCookieOptions;
   /** Whether to refresh a valid session after authentication. Defaults to `never`. */
   readonly refresh?: WorkosRefreshMode;
+  /** Shared durable fence used by the backend and background revocation worker. */
+  readonly revocations?: WorkosRevocationStore;
 }
 
 /** Options for creating a WorkOS bearer access-token authenticator. */
@@ -126,6 +143,8 @@ export interface WorkosAccessTokenAuthenticatorOptions {
   readonly jwksUrl?: string | URL;
   /** Expected JWT issuer. Omit when a WorkOS environment uses a custom issuer. */
   readonly issuer?: string;
+  /** Use the same durable fence as the sealed-session backend for global logout. */
+  readonly revocations?: WorkosRevocationStore;
 }
 
 const DEFAULT_COOKIE_NAME = 'wos-session';
@@ -149,8 +168,10 @@ const DEFAULT_COOKIE_NAME = 'wos-session';
  * });
  * ```
  */
-export function createWorkosAuthenticator(
-  options: WorkosAuthenticatorOptions,
+export function createWorkosAuthenticator<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+>(
+  options: WorkosAuthenticatorOptions<TUser>,
 ): AuthenticatorPort {
   const cookieName = options.cookie?.name ?? DEFAULT_COOKIE_NAME;
 
@@ -166,7 +187,7 @@ export function createWorkosAuthenticator(
         cookiePassword: options.cookiePassword,
       });
 
-      let authenticated: WorkosSessionAuthenticationResult;
+      let authenticated: WorkosSessionAuthenticationResult<{ readonly id: string }>;
       try {
         authenticated = await session.authenticate();
       } catch (error) {
@@ -178,6 +199,10 @@ export function createWorkosAuthenticator(
 
       if (!authenticated.authenticated) {
         return { ok: false, reason: `workos_${authenticated.reason}` };
+      }
+
+      if (await isWorkosSessionRevoked(authenticated, options.revocations)) {
+        return { ok: false, reason: 'workos_subject_revoked' };
       }
 
       if (options.refresh === 'always') {
@@ -233,9 +258,18 @@ export function createWorkosAccessTokenAuthenticator(
       }
 
       try {
+        const principal = principalFromAccessToken(payload);
+        if (
+          options.revocations && await options.revocations.isRevoked(
+            principal.subject,
+            stringClaim(payload.sid),
+            typeof payload.iat === 'number' ? payload.iat * 1000 : undefined,
+            typeof payload.exp === 'number' ? payload.exp * 1000 : NaN,
+          )
+        ) return { ok: false, reason: 'workos_subject_revoked' };
         return {
           ok: true,
-          principal: principalFromAccessToken(payload),
+          principal,
         };
       } catch (error) {
         return {
@@ -248,11 +282,11 @@ export function createWorkosAccessTokenAuthenticator(
 }
 
 async function authenticateWithRefresh(
-  session: WorkosCookieSession,
-  authenticated: WorkosSessionAuthenticationSuccess,
-  options: WorkosAuthenticatorOptions,
+  session: WorkosCookieSession<{ readonly id: string }>,
+  authenticated: WorkosSessionAuthenticationSuccess<{ readonly id: string }>,
+  options: WorkosAuthenticatorOptions<{ readonly id: string }>,
 ): Promise<AuthnResult> {
-  let refreshed: WorkosSessionRefreshResult;
+  let refreshed: WorkosSessionRefreshResult<{ readonly id: string }>;
   try {
     refreshed = await session.refresh({
       cookiePassword: options.cookiePassword,
@@ -269,6 +303,22 @@ async function authenticateWithRefresh(
     return { ok: false, reason: `workos_${refreshed.reason}` };
   }
 
+  // Recheck the original verified credential after refresh: a concurrent logout wins.
+  if (
+    options.revocations && (
+      await isWorkosSessionRevoked(authenticated, options.revocations)
+    )
+  ) {
+    return { ok: false, reason: 'workos_subject_revoked' };
+  }
+
+  if (
+    options.revocations && (refreshed.user.id !== authenticated.user.id ||
+      refreshed.sessionId !== authenticated.sessionId)
+  ) {
+    return { ok: false, reason: 'workos_session_identity_changed' };
+  }
+
   const setCookies = refreshed.sealedSession
     ? [serializeSessionCookie(refreshed.sealedSession, options.cookie)]
     : undefined;
@@ -281,7 +331,9 @@ async function authenticateWithRefresh(
 }
 
 function principalFromWorkosSession(
-  session: WorkosSessionAuthenticationSuccess | WorkosSessionRefreshSuccess,
+  session:
+    | WorkosSessionAuthenticationSuccess<{ readonly id: string }>
+    | WorkosSessionRefreshSuccess<{ readonly id: string }>,
 ): Principal {
   return {
     subject: session.user.id,
@@ -301,7 +353,9 @@ function principalFromWorkosSession(
 }
 
 function collectRoles(
-  session: WorkosSessionAuthenticationSuccess | WorkosSessionRefreshSuccess,
+  session:
+    | WorkosSessionAuthenticationSuccess<{ readonly id: string }>
+    | WorkosSessionRefreshSuccess<{ readonly id: string }>,
 ): readonly string[] {
   const roles = new Set<string>();
   if (session.role) {
@@ -400,4 +454,22 @@ function normalizeProviderError(error: unknown, fallback: string): string {
     return `${fallback}: ${error.message}`;
   }
   return fallback;
+}
+
+/** Check only the access token WorkOS has already verified; missing iat fails closed after logout. */
+export async function isWorkosSessionRevoked(
+  session: WorkosSessionAuthenticationSuccess<{ readonly id: string }>,
+  store: WorkosRevocationStore | undefined,
+): Promise<boolean> {
+  if (!store) return false;
+  let issuedAt: number | undefined;
+  let expiresAt = NaN;
+  try {
+    const payload = decodeJwt(session.accessToken);
+    issuedAt = typeof payload.iat === 'number' ? payload.iat * 1000 : undefined;
+    expiresAt = typeof payload.exp === 'number' ? payload.exp * 1000 : NaN;
+  } catch {
+    // The upstream verifier is authoritative. A missing time claim cannot bypass our fence.
+  }
+  return await store.isRevoked(session.user.id, session.sessionId, issuedAt, expiresAt);
 }

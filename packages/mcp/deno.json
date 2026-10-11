@@ -9,6 +9,7 @@
     "./openapi-projection": "./openapi-projection.ts"
   },
   "imports": {
+    "@netscript/plugin/health": "jsr:@netscript/plugin@0.0.7/health",
     "@netscript/aspire": "jsr:@netscript/aspire@0.0.7",
     "@netscript/telemetry/attributes": "jsr:@netscript/telemetry@0.0.7/attributes",
     "@netscript/telemetry/query": "jsr:@netscript/telemetry@0.0.7/query",

@@ -6,6 +6,7 @@ import {
 } from '../src/infrastructure/plugin-doctor-family.ts';
 import { ProjectWiringDoctorFamily } from '../src/infrastructure/project-wiring-doctor-family.ts';
 import type { DoctorCheckContext } from '../mod.ts';
+import { SpawnCommandExecutor } from '../src/infrastructure/spawn-command-executor.ts';
 
 const fixtureRoot = new URL('./fixtures/doctor/', import.meta.url).pathname;
 const context = (projectRoot: string): DoctorCheckContext => ({
@@ -13,22 +14,28 @@ const context = (projectRoot: string): DoctorCheckContext => ({
   explicitTelemetryEndpoint: false,
 });
 
-Deno.test('project family passes valid workspace and generated plugin registry fixtures', async () => {
-  const checks = await new ProjectWiringDoctorFamily().check(context(`${fixtureRoot}healthy`));
+Deno.test('project family does not certify fixture registries without an inventory', async () => {
+  const checks = await new ProjectWiringDoctorFamily(
+    undefined,
+    new SpawnCommandExecutor({ cliCommand: ['missing-inventory-fixture-command'] }),
+  ).check(context(`${fixtureRoot}healthy`));
   assertEquals(checks.map((check) => [check.name, check.status]), [
     ['deno_workspace', 'pass'],
-    ['plugin_registry', 'pass'],
+    ['plugin_registry', 'warn'],
     ['docs_root', 'pass'],
   ]);
-  assertStringIncludes(checks[1]?.summary ?? '', '3 module(s)');
+  assertStringIncludes(checks[1]?.summary ?? '', 'could not be determined');
 });
 
 Deno.test('project family fails invalid workspace and warns on unknown registry expectations', async () => {
-  const checks = await new ProjectWiringDoctorFamily().check(context(`${fixtureRoot}broken`));
+  const checks = await new ProjectWiringDoctorFamily(
+    undefined,
+    new SpawnCommandExecutor({ cliCommand: ['missing-inventory-fixture-command'] }),
+  ).check(context(`${fixtureRoot}broken`));
   assertEquals(checks.map((check) => [check.name, check.status]), [
     ['deno_workspace', 'fail'],
     ['plugin_registry', 'warn'],
-    ['docs_root', 'pass'],
+    ['docs_root', 'warn'],
   ]);
 });
 

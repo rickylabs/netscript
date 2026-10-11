@@ -1,6 +1,5 @@
+import { checkResolvedPluginCaveats } from './plugin-caveat-policy.ts';
 import { AGENT_DOCS_PAGE_CARRIER, readAgentDocsPages } from './agent-docs-page-carrier.ts';
-/** Guards genuinely textual documentation policy against surface drift. */
-
 import { resolve } from '@std/path';
 import { SCAFFOLD_ASPIRE_INTEGRATIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
@@ -8,6 +7,8 @@ import {
   CACHE_FIRST_LOADER_DOC_PATHS,
   checkCacheFirstLoaderDocs,
 } from './cache-first-loader-docs.ts';
+
+/** Guards genuinely textual documentation policy against surface drift. */
 
 const root = new URL('../../../', import.meta.url);
 
@@ -139,7 +140,7 @@ export const COMMAND_REFERENCE_PATHS: readonly string[] = [
 ];
 
 /** Ratified root plus direct-child command census for the current public tree. */
-export const EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT = 92;
+export const EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT = 93;
 
 export interface GoldenPathDocsResult {
   readonly pageCount: number;
@@ -248,6 +249,7 @@ export async function checkGoldenPathDocs(
   const queryUtilsPages: string[] = [];
   for (const page of pages) {
     checkForbiddenGoldenPathTerms(page.content, page.path);
+    checkResolvedPluginCaveats(page.content, page.path);
     if (/apps\/[^/\s`]+\/client\.ts/.test(page.content)) {
       throw new Error(`${page.path}: apps/<app>/client.ts is the CSS entry, not a data client`);
     }
@@ -408,6 +410,11 @@ export async function runAccuracyCheck(): Promise<void> {
   const shippedCorpus = await readShippedAgentDocsCorpus();
   for (const [path, content] of Object.entries(shippedCorpus.files)) {
     checkForbiddenGoldenPathTerms(content, `${AGENT_DOCS_PAGE_CARRIER}:${path}`);
+    // llms-full.txt is derived from these same checked pages by agentDocsFullCorpus.
+    // Validate the originals so the migration exception retains its page identity.
+    if (path !== 'llms-full.txt') {
+      checkResolvedPluginCaveats(content, `${AGENT_DOCS_PAGE_CARRIER}:${path}`);
+    }
   }
   checkMutationMapColumns(cliReference);
 

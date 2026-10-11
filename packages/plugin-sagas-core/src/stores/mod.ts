@@ -48,10 +48,16 @@ export type {
 } from '@netscript/kv';
 export { MemorySagaAppliedKeyStore } from '../runtime/mod.ts';
 export { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
+export { sagaRetentionRemaining } from './saga-kv-retention.ts';
 export { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
+export { KvSagaSchedulerStore } from './kv-saga-scheduler-store.ts';
+export type { KvSagaSchedulerStoreOptions } from './kv-saga-scheduler-store.ts';
 export { PrismaSagaStore, SAGA_RUNTIME_CORRELATION_SELECTOR } from './prisma-saga-store.ts';
 export {
+  resolveSagaProjectionBackend,
   resolveSagaStoreBackend,
+  SAGA_PROJECTION_BACKEND_ENV,
+  SAGA_PROJECTION_BACKENDS,
   SAGA_STORE_BACKEND_ENV,
   SAGA_STORE_BACKENDS,
 } from './saga-store-backend.ts';
@@ -76,8 +82,10 @@ export type {
   SagaRuntimeTransitionWrite,
   WriteResult,
 } from './prisma-saga-store.ts';
+export { isPrismaSagaStoreClient } from './prisma-saga-store.ts';
 export type {
   DurableSagaStoreBackend,
+  SagaProjectionBackend,
   SagaStoreBackendResolutionInput,
 } from './saga-store-backend.ts';
 

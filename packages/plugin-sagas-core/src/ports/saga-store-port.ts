@@ -29,6 +29,10 @@ export interface SagaStorePort {
   load<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined>;
+  /** Batch-load canonical state for bounded background scheduling retention. */
+  loadMany?(
+    instanceIds: readonly SagaInstanceId[],
+  ): Promise<readonly (SagaStateEnvelope | undefined)[]>;
   /** Save a saga state envelope, optionally using optimistic write constraints. */
   save<TState extends SagaState>(
     envelope: SagaStateEnvelope<TState>,

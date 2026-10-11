@@ -11,6 +11,7 @@ import { StringTemplateAdapter } from '../../adapters/scaffold/template-adapter.
 import { generateServiceDenoJson } from './generate-service-deno-json.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
+import { SERVICE_PUBLIC_REASON, serviceAuthTemplate } from '../../adapters/service/auth-policy.ts';
 const serviceMainTemplate = EMBEDDED_TEMPLATE_CONTENT['service/main.memory.ts.template'];
 const serviceRouterTemplate = EMBEDDED_TEMPLATE_CONTENT['service/router.ts.template'];
 
@@ -19,6 +20,7 @@ const SAMPLE_SERVICE_VARS: Record<string, string> = {
   serviceName: 'team-members',
   entityName: 'team-members',
   servicePort: '3000',
+  ...serviceAuthTemplate(),
 };
 
 function makeAdapter(): StringTemplateAdapter {
@@ -38,6 +40,25 @@ describe('generateServiceDenoJson', () => {
     assertEquals(config.imports['@test-project/contracts'], '../../contracts/mod.ts');
     assertEquals(config.imports['@netscript/service'], netscriptJsrSpecifier('service'));
     assert(!('@netscript/telemetry' in config.imports));
+    assert(!('@netscript/plugin-auth-core' in config.imports));
+  });
+
+  it('declares the guarded service authenticator dependency in both source modes', () => {
+    for (const importMode of ['jsr', 'local'] as const) {
+      const config = JSON.parse(generateServiceDenoJson({
+        projectName: 'test-project',
+        serviceName: 'team-members',
+        importMode,
+        localBase: '../..',
+        authServiceName: 'auth',
+      }));
+      assertEquals(
+        config.imports['@netscript/plugin-auth-core'],
+        importMode === 'jsr'
+          ? netscriptJsrSpecifier('plugin-auth-core')
+          : '../../packages/plugin-auth-core/mod.ts',
+      );
+    }
   });
 
   it('should resolve service imports against local packages when using copied workspace members', () => {
@@ -113,12 +134,12 @@ describe('service template rendering', () => {
     }
   });
 
-  it('both shipped service entrypoints record a greppable public opt-out pending #1382 L2', async () => {
+  it('both shipped service entrypoints record a user-facing public opt-out', async () => {
     const adapter = makeAdapter();
     for (const key of ['service/main.ts.template', 'service/main.memory.ts.template'] as const) {
       const output = await adapter.render(EMBEDDED_TEMPLATE_CONTENT[key], SAMPLE_SERVICE_VARS);
       assertStringIncludes(output, 'auth: { public: true, reason:', key);
-      assertStringIncludes(output, '#1382 L2 will wire the guarded auth policy', key);
+      assertStringIncludes(output, SERVICE_PUBLIC_REASON, key);
     }
   });
 

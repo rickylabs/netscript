@@ -40,11 +40,16 @@ export class WatchBatchQueue<T> {
    *
    * @param debounceMs - Coalescing window in milliseconds.
    * @param signal - Aborting ends a pending wait or debounce window at once.
+   * @param arrivalSignal - Bounds only an empty wait; queued events still debounce and drain.
    * @returns Every queued event, oldest first; empty when aborted.
    */
-  async next(debounceMs?: number, signal?: AbortSignal): Promise<T[]> {
+  async next(
+    debounceMs?: number,
+    signal?: AbortSignal,
+    arrivalSignal: AbortSignal | undefined = signal,
+  ): Promise<T[]> {
     if (this.#events.length === 0) {
-      await this.#arrival(signal);
+      await this.#arrival(arrivalSignal);
     }
     if (debounceMs && this.#events.length > 0 && !signal?.aborted) {
       await delay(debounceMs, { signal }).catch((error: unknown) => {

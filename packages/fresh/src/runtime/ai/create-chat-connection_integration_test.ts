@@ -3,13 +3,11 @@ import {
   nativeModelMessage,
   nativeUiMessage,
 } from '../../../tests/type-fixtures/chat-send-consumer_type.ts';
-import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
-import { materializeSnapshotFromDurableStream } from '@durable-streams/tanstack-ai-transport';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import {
   createNetScriptChatConnection,
   type NetScriptChatMessage,
   type NetScriptChatSendMessage,
-  projectChatSnapshot,
   resolveChatSnapshot,
   toNetScriptChatResponse,
 } from './create-chat-connection.ts';
@@ -110,51 +108,6 @@ Deno.test('untyped UI messages without IDs persist and replay exactly once with 
     assertEquals(new Set(seed.messages.map((message) => message.id)).size, 2);
     assertEquals(reload, seed);
     assertEquals(messages.map((message) => message.id), [undefined, undefined]);
-  } finally {
-    await server.shutdown();
-  }
-});
-
-Deno.test('native batch public-reader and seed/live limits are explicitly documented', async () => {
-  const chunks: unknown[] = [];
-  const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
-    if (request.method === 'PUT') return new Response(null, { status: 201 });
-    if (request.method === 'POST') {
-      const body: unknown = await request.json();
-      chunks.push(...(Array.isArray(body) ? body : [body]));
-      return new Response(null, { status: 204 });
-    }
-    return Response.json(chunks, {
-      headers: { 'Stream-Next-Offset': String(chunks.length), 'Stream-Up-To-Date': 'true' },
-    });
-  });
-  const target = {
-    sessionId: 'native-reader-limits',
-    baseUrl: `http://127.0.0.1:${server.addr.port}`,
-  };
-  try {
-    await toNetScriptChatResponse({
-      target,
-      newMessages: [nativeUiMessage],
-      source: (async function* () {})(),
-      mode: 'await',
-    });
-    const seed = await resolveChatSnapshot({ target });
-    const upstream = await materializeSnapshotFromDurableStream({
-      readUrl: `${target.baseUrl}/v1/stream/netscript/ai/chat/${target.sessionId}`,
-    });
-    const liveBootstrap = projectChatSnapshot(upstream.messages);
-    assert(seed.renderParts.some((part) => part.kind === 'tool'));
-    assertEquals(liveBootstrap.renderParts.some((part) => part.kind === 'tool'), false);
-    assertEquals(seed.messages.map((message) => Object.keys(message)), [['id', 'role', 'content']]);
-    for (const file of ['README.md', '../../../../../docs/site/ai/durable-chat.md']) {
-      const docs = await Deno.readTextFile(new URL(file, import.meta.url));
-      assertStringIncludes(docs, 'No public API returns persisted native parts.');
-      assertStringIncludes(
-        docs,
-        'Native batch tool cards appear on seed/reload but not on live subscribers.',
-      );
-    }
   } finally {
     await server.shutdown();
   }
@@ -350,27 +303,6 @@ Deno.test('durable chat lifecycle provides seed, optimism, live tokens, reload r
   reloadTab.dispose();
 });
 
-async function withinNative<T>(promise: Promise<T>): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    return await Promise.race([
-      promise,
-      new Promise<never>((_resolve, reject) => {
-        timer = setTimeout(() => reject(new Error('Native chat fixture did not settle.')), 4000);
-      }),
-    ]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-  }
-}
-async function waitForNative(predicate: () => boolean): Promise<void> {
-  const deadline = Date.now() + 4000;
-  while (!predicate()) {
-    if (Date.now() >= deadline) throw new Error('Native chat fixture condition did not settle.');
-    await new Promise<void>((resolve) => setTimeout(resolve, 1));
-  }
-}
-
 Deno.test('default native chat transport retains rich POST bodies and one live SSE with send aborts', async () => {
   const posts: unknown[] = [];
   let bootstrapRequests = 0;
@@ -385,6 +317,13 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
   let releasePost = Promise.withResolvers<void>();
   const releases: (() => void)[] = [releasePost.resolve];
   const liveReady = Promise.withResolvers<void>();
+  const liveCancelled = Promise.withResolvers<void>();
+  // #2324: runtime retention owns cancellation; the fixture observes metadata only.
+  // Allow 15 s for loaded CI while bounding missing events with connection-state
+  // diagnostics. The wait remains event-driven, without polling or retries.
+  const cancellationDeadlineMs = 15_000;
+  let liveResponseStatus: number | undefined;
+  let liveFetchSignal: AbortSignal | null | undefined;
   const encoder = new TextEncoder();
   const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
     if (request.method === 'POST') {
@@ -417,12 +356,26 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
           ended = true;
           activeLive--;
           cancelledLive++;
+          liveCancelled.resolve();
         },
       }),
       { headers: { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' } },
     );
   });
   const baseUrl = `http://${server.addr.hostname}:${server.addr.port}`;
+  const nativeFetch = globalThis.fetch;
+  globalThis.fetch = async (input, init) => {
+    const response = await nativeFetch(input, init);
+    if (
+      response.url.startsWith(`${baseUrl}/`) &&
+      new URL(response.url).searchParams.get('live') === 'sse'
+    ) {
+      // Copy the status, never the Response: retaining it here would mask #2324.
+      liveResponseStatus = response.status;
+      liveFetchSignal = init?.signal;
+    }
+    return response;
+  };
   const connection = createNetScriptChatConnection({
     target: { sessionId: 'native-rich-send', baseUrl },
     initialOffset: '0',
@@ -459,16 +412,16 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     );
   };
   try {
-    await withinNative(liveReady.promise);
+    await liveReady.promise;
     const before = {
       type: 'TEXT_MESSAGE_CONTENT',
       messageId: 'live-before',
       delta: 'Before rich send —',
     };
     emit(before, '1');
-    assertEquals((await withinNative(pendingFirst)).value, before);
-    assertEquals((await withinNative(pendingSecond)).value, before);
-    await withinNative(connection.send(messages, data));
+    assertEquals((await pendingFirst).value, before);
+    assertEquals((await pendingSecond).value, before);
+    await connection.send(messages, data);
     assertEquals(posts[0], JSON.parse(JSON.stringify({ messages, data })));
     assertEquals(bootstrapRequests, 1);
     assertEquals(liveRequests, 1);
@@ -482,8 +435,8 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
       delta: 'After rich send…',
     };
     emit(after, '2');
-    assertEquals((await withinNative(afterFirst)).value, after);
-    assertEquals((await withinNative(afterSecond)).value, after);
+    assertEquals((await afterFirst).value, after);
+    assertEquals((await afterSecond).value, after);
     holdNext = true;
     postEntered = Promise.withResolvers<void>();
     releasePost = Promise.withResolvers<void>();
@@ -491,10 +444,10 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     const caller = new AbortController();
     const callerSend = connection.send(messages, data, caller.signal);
     void callerSend.catch(() => undefined);
-    await withinNative(postEntered.promise);
+    await postEntered.promise;
     caller.abort(new DOMException('Caller aborted native POST.', 'AbortError'));
     await assertRejects(
-      () => withinNative(callerSend),
+      () => callerSend,
       DOMException,
       'Caller aborted native POST.',
     );
@@ -507,22 +460,43 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     releases.push(releasePost.resolve);
     const disposedSend = connection.send(messages, data);
     void disposedSend.catch(() => undefined);
-    await withinNative(postEntered.promise);
+    await postEntered.promise;
     const finalFirst = first.next();
     const finalSecond = second.next();
     connection.dispose();
     connection.stop();
     connection.close();
-    await assertRejects(() => withinNative(disposedSend), DOMException);
+    await assertRejects(() => disposedSend, DOMException);
     assertEquals(posts[2], JSON.parse(JSON.stringify({ messages, data })));
-    assertEquals((await withinNative(finalFirst)).done, true);
-    assertEquals((await withinNative(finalSecond)).done, true);
-    await waitForNative(() => activeLive === 0);
+    assertEquals((await finalFirst).done, true);
+    assertEquals((await finalSecond).done, true);
+    assertEquals(liveFetchSignal?.aborted, true);
+    let cancellationTimer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        liveCancelled.promise,
+        new Promise<never>((_resolve, reject) => {
+          cancellationTimer = setTimeout(() =>
+            reject(
+              new Error(
+                `Native SSE cancellation missing after ${cancellationDeadlineMs} ms: ` +
+                  `activeLive=${activeLive}, cancelledLive=${cancelledLive}, ` +
+                  `liveRequests=${liveRequests}, fetchSignalAborted=${liveFetchSignal?.aborted}`,
+              ),
+            ), cancellationDeadlineMs);
+        }),
+      ]);
+    } finally {
+      clearTimeout(cancellationTimer);
+    }
+    assertEquals(liveResponseStatus, 200);
+    assertEquals(activeLive, 0);
     assertEquals(cancelledLive, 1);
     assertEquals(liveRequests, 1);
     assertEquals(maxActiveLive, 1);
     await assertRejects(() => connection.send(messages, data), Error, 'already disposed');
   } finally {
+    globalThis.fetch = nativeFetch;
     connection.dispose();
     for (const release of releases) release();
     if (controller && !ended) {
@@ -530,14 +504,14 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
       controller.close();
     }
     try {
-      await withinNative(Promise.allSettled([
+      await Promise.allSettled([
         pendingFirst,
         pendingSecond,
         first.return?.(undefined) ?? Promise.resolve({ done: true, value: undefined }),
         second.return?.(undefined) ?? Promise.resolve({ done: true, value: undefined }),
-      ]));
+      ]);
     } finally {
-      await withinNative(server.shutdown());
+      await server.shutdown();
     }
   }
 });

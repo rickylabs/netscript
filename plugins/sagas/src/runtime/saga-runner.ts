@@ -1,13 +1,22 @@
 import {
+  isPrismaSagaStoreClient,
+  PrismaSagaStore,
+  resolveSagaProjectionBackend,
   resolveSagaStoreBackend,
+  SAGA_PROJECTION_BACKEND_ENV,
   SAGA_STORE_BACKEND_ENV,
+  type SagaStoreBackendResolutionInput,
 } from '@netscript/plugin-sagas-core/stores';
+import { SCAFFOLD_FILES } from '@netscript/config/paths';
+import { SAGAS_PLUGIN_ID } from '../constants.ts';
 import { loadSagaRetention } from './load-saga-retention.ts';
+import { KvPollingAdapter } from '@netscript/queue/adapters/kv-polling';
 import type { SagaDefinition } from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
   CreateSagaRuntimeOptions,
   SagaRuntimeAdapter,
+  SagaStorePort,
 } from '@netscript/plugin-sagas-core/runtime';
 
 import {
@@ -16,7 +25,7 @@ import {
   type SagaRuntimeSupervisorSnapshot,
 } from './saga-supervisor.ts';
 import { createSagaTelemetry } from '@netscript/plugin-sagas-core/telemetry';
-import { resolveProjectRegistryModule } from './project-registry-module.ts';
+import { projectFileUrl, resolveProjectRegistryModule } from './project-registry-module.ts';
 import {
   createSagaDeliveryQueue,
   type SagaDeliveryQueuePort,
@@ -46,6 +55,8 @@ export type StartSagaRunnerOptions = Readonly<{
   readEnv?: SagaRunnerEnvReader;
   cwd?: () => string;
   deliveryQueue?: SagaDeliveryQueuePort;
+  /** Cancellable pending-message queue; defaults to KV polling for the production runner. */
+  scheduledQueue?: SagaDeliveryQueuePort;
   projection?: SagaInstanceProjectionPort | false;
   supervisor?: Omit<SagaRuntimeSupervisorOptions, 'loadDefinitions' | 'runtimeOptions'>;
   runtimeOptions?: Omit<CreateSagaRuntimeOptions, 'adapter'>;
@@ -59,6 +70,11 @@ export type RunSagaRunnerOptions =
   }>;
 
 type SagaRegistryModule = Readonly<Record<string, unknown>>;
+type SagaRunnerContext = Awaited<ReturnType<SagaRunnerBootstrap['createPluginServiceContext']>>;
+type SagaRunnerConfiguration = Readonly<{
+  context?: SagaRunnerContext;
+  input: SagaStoreBackendResolutionInput;
+}>;
 type SagaRunnerBootstrap = Readonly<{
   createPluginServiceContext(pluginName: string): Promise<
     Readonly<{
@@ -96,17 +112,39 @@ export async function startSagaRunner(
     cwd: options.cwd,
   });
   const importer = options.importer ?? defaultImporter;
+  const bootstrapModule = readEnv('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
+  let configurationPromise: Promise<SagaRunnerConfiguration> | undefined;
+  const loadConfiguration = (): Promise<SagaRunnerConfiguration> => {
+    return configurationPromise ??= resolveRunnerConfiguration(options, readEnv, bootstrapModule);
+  };
+  const store = options.supervisor?.createRuntime || options.runtimeOptions?.native?.engine
+    ? options.runtimeOptions?.native?.store
+    : options.runtimeOptions?.native?.store ??
+      await resolveCanonicalStore(await loadConfiguration());
   const queue = options.deliveryQueue ?? createSagaDeliveryQueue();
-  const delivery = options.supervisor?.delivery ?? new SagaQueueDelivery(queue);
+  const queueScheduler = new SagaQueueScheduler(
+    queue,
+    options.scheduledQueue ??
+      (options.deliveryQueue ? undefined : new KvPollingAdapter({ queueName: 'sagas-scheduled' })),
+  );
+  const scheduler = options.runtimeOptions?.native?.scheduler ?? queueScheduler;
+  const delivery = options.supervisor?.delivery ?? new SagaQueueDelivery(
+    queue,
+    scheduler === queueScheduler ? queueScheduler : undefined,
+  );
   const runtimeOptions = {
     ...options.runtimeOptions,
     native: {
       ...withDefaultTelemetry(options.runtimeOptions?.native),
-      scheduler: options.runtimeOptions?.native?.scheduler ?? new SagaQueueScheduler(queue),
+      store,
+      scheduler,
     },
     adapter,
   };
-  const projection = options.supervisor?.projection ?? await resolveProjection(options, readEnv);
+  const projection = options.supervisor?.projection ??
+    (options.projection === false
+      ? undefined
+      : options.projection ?? await resolveProjection(await loadConfiguration()));
   const supervisor = new SagaRuntimeSupervisor({
     ...options.supervisor,
     loadDefinitions: () => loadSagaRegistryModule(registryModule, importer),
@@ -166,44 +204,102 @@ function defaultImporter(specifier: string): Promise<unknown> {
   return import(specifier) as Promise<unknown>;
 }
 
-async function resolveProjection(
+async function loadRunnerContext(specifier: string): Promise<SagaRunnerContext> {
+  const imported = await import(specifier) as SagaRunnerBootstrap;
+  return await imported.createPluginServiceContext('sagas');
+}
+
+async function resolveRunnerConfiguration(
   options: StartSagaRunnerOptions,
   readEnv: SagaRunnerEnvReader,
-): Promise<SagaInstanceProjectionPort | undefined> {
-  if (options.projection === false) {
-    return undefined;
+  bootstrapModule?: string,
+): Promise<SagaRunnerConfiguration> {
+  const context = bootstrapModule ? await loadRunnerContext(bootstrapModule) : undefined;
+  const appsettings = context
+    ? context.appsettings ?? context.settings ?? context.config
+    : await loadProjectAppsettings(
+      readEnv('NETSCRIPT_PROJECT_ROOT') ?? (options.cwd ?? Deno.cwd)(),
+    );
+  return { context, input: backendInput(readEnv, context, appsettings) };
+}
+
+async function loadProjectAppsettings(projectRoot: string): Promise<unknown> {
+  let document: unknown;
+  try {
+    document = JSON.parse(
+      await Deno.readTextFile(projectFileUrl(SCAFFOLD_FILES.APPSETTINGS, projectRoot)),
+    );
+  } catch (cause) {
+    if (cause instanceof Deno.errors.NotFound) return undefined;
+    throw cause;
   }
-  if (options.projection) {
-    return options.projection;
+  // Install-owned processor settings take precedence over project-wide saga settings.
+  if (
+    isRecord(document) && isRecord(document.NetScript) &&
+    isRecord(document.NetScript.BackgroundProcessors)
+  ) {
+    const processor = document.NetScript.BackgroundProcessors[SAGAS_PLUGIN_ID];
+    if (isRecord(processor)) return { ...document, ...processor };
   }
-  const bootstrapModule = readEnv('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
-  if (!bootstrapModule) {
-    return withStreamProjection(new KvSagaInstanceProjection());
+  return document;
+}
+
+function backendInput(
+  readEnv: SagaRunnerEnvReader,
+  context?: SagaRunnerContext,
+  appsettings?: unknown,
+): SagaStoreBackendResolutionInput {
+  return {
+    env: {
+      [SAGA_STORE_BACKEND_ENV]: context?.env?.[SAGA_STORE_BACKEND_ENV] ??
+        readEnv(SAGA_STORE_BACKEND_ENV),
+      [SAGA_PROJECTION_BACKEND_ENV]: context?.env?.[SAGA_PROJECTION_BACKEND_ENV] ??
+        readEnv(SAGA_PROJECTION_BACKEND_ENV),
+    },
+    appsettings,
+  };
+}
+
+async function resolveCanonicalStore(
+  { context, input }: SagaRunnerConfiguration,
+): Promise<SagaStorePort | undefined> {
+  const backend = resolveSagaStoreBackend({ ...input, defaultBackend: 'kv' });
+  if (backend === 'kv') return undefined;
+  if (!context) {
+    throw new Error('Prisma saga store backend requires a plugin service bootstrap module.');
   }
-  const imported = await import(bootstrapModule) as SagaRunnerBootstrap;
-  const context = await imported.createPluginServiceContext('sagas');
   const client = await context.db.getClient();
+  if (!isPrismaSagaStoreClient(client)) {
+    throw new Error('Sagas database client is missing required Prisma runtime delegates.');
+  }
+  return new PrismaSagaStore({ prisma: client });
+}
+
+async function resolveProjection(
+  { context, input }: SagaRunnerConfiguration,
+): Promise<SagaInstanceProjectionPort | undefined> {
+  const projectionBackend = resolveSagaProjectionBackend(input);
+  if (projectionBackend === 'none') return undefined;
   const retention = await loadSagaRetention();
-  const configuredBackend = context.env?.[SAGA_STORE_BACKEND_ENV] ??
-    readEnv(SAGA_STORE_BACKEND_ENV);
-  const appsettings = context.appsettings ?? context.settings ?? context.config;
-  const querySource = configuredBackend === undefined && appsettings === undefined
-    ? 'kv'
-    : resolveSagaStoreBackend({
-      env: { [SAGA_STORE_BACKEND_ENV]: configuredBackend },
-      appsettings,
-    });
   const kvProjection = new KvSagaInstanceProjection(undefined, retention.completedDays);
-  const readModelProjection = isProjectionClient(client)
-    ? new CompositeSagaInstanceProjection([
-      kvProjection,
-      new PrismaSagaInstanceProjection(
-        client,
-        retention.archiveToDb,
-        querySource,
-      ),
-    ])
-    : kvProjection;
+  if (projectionBackend === 'kv' && !retention.requiresDatabaseArchive) {
+    return withStreamProjection(kvProjection);
+  }
+  if (!context) {
+    throw new Error(
+      projectionBackend === 'prisma'
+        ? 'Prisma saga projection requires a plugin service bootstrap module.'
+        : 'Saga database archive requires a plugin service bootstrap module.',
+    );
+  }
+  const client = await context.db.getClient();
+  if (!isProjectionClient(client)) {
+    throw new Error('Sagas database client is missing required Prisma delegates.');
+  }
+  const readModelProjection = new CompositeSagaInstanceProjection([
+    kvProjection,
+    new PrismaSagaInstanceProjection(client, retention.archiveToDb, projectionBackend),
+  ]);
   return withStreamProjection(readModelProjection);
 }
 

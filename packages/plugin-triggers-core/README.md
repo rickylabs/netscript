@@ -193,3 +193,10 @@ TTLs. Deferred replay records are removed on successful replay or explicit cance
 state remains configuration. Existing terminal records written without TTL need a migration; this
 policy applies when records are written or their status changes. Runtime/backend expiry does not
 depend on an API read or a phone/web app being open.
+
+## Discovery metadata
+
+`@netscript/plugin-triggers-core/discovery` exports immutable `NETSCRIPT_CONTRIBUTION_BUILDERS`
+patterns for the plugin SDK `additionalBuilders` option. `defineWebhook` → `triggers`,
+`defineScheduledTrigger` → `triggers`, `defineFileWatch` → `triggers`. The CLI composes first-party
+metadata before walking the project, independently of plugin update order.

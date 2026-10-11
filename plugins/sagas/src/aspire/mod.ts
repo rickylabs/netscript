@@ -12,6 +12,5 @@ export type {
   SagasDenoBackgroundSpec,
   SagasDenoServiceSpec,
   SagasEnvSource,
-  SagasHealthCheckSpec,
 } from './sagas-contribution.ts';
 export { SAGAS_API_DEFAULT_PORT, SAGAS_API_SERVICE_NAME, SAGAS_PLUGIN_ID } from '../constants.ts';

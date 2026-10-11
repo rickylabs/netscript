@@ -1,15 +1,16 @@
 /**
  * WorkOS AuthKit authenticators for NetScript services.
  *
- * Supply the exported sealed-session client port. Direct WorkOS SDK compatibility is tracked in
- * {@link https://github.com/rickylabs/netscript/issues/2231 | issue #2231}.
+ * Supply a configured WorkOS SDK client to authenticate AuthKit sealed sessions.
  *
  * @example
  * ```ts
- * import { createWorkosBackend, type WorkosSessionClient } from '@netscript/auth-workos';
+ * import { WorkOS } from '@workos-inc/node';
+ * import { createWorkosBackend } from '@netscript/auth-workos';
  *
- * // Supply the application's sealed-session client through the published port.
- * declare const workos: WorkosSessionClient;
+ * const workos = new WorkOS(Deno.env.get('WORKOS_API_KEY')!, {
+ *   clientId: Deno.env.get('WORKOS_CLIENT_ID')!,
+ * });
  * const backend = createWorkosBackend({
  *   workos,
  *   cookiePassword: Deno.env.get('WORKOS_COOKIE_PASSWORD')!,
@@ -65,3 +66,25 @@ export type {
   InteractiveFlowPort,
   Principal,
 } from '@netscript/plugin-auth-core';
+
+export type { WorkosRevocationRetention } from './src/ports/revocation-store.ts';
+export { createWorkosRevocationStore } from './src/adapters/kv-revocation-store.ts';
+export { revokeWorkosSubjectPage } from './src/application/revoke-subject-page.ts';
+export type {
+  WorkosRevocationClient,
+  WorkosRevocationDelivery,
+  WorkosRevocationJob,
+  WorkosRevocationStore,
+} from './src/ports/revocation-store.ts';
+
+// Deno doc requires the foreign signature's transitively referenced types to be public.
+export type {
+  AtomicCheck,
+  AtomicMutation,
+  AtomicResult,
+  KvEntry,
+  KvKey,
+  KvListOptions,
+  KvSetOptions,
+  KvStore,
+} from '@netscript/kv';

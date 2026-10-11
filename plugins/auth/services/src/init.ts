@@ -10,6 +10,7 @@ import {
   type AuthServiceAppsettings,
   type AuthServiceBackendRegistry,
   createAuthServiceBackendRegistry,
+  type CreateAuthServiceBackendRegistryOptions,
 } from './backend-registry.ts';
 export type { AuthServiceBackendRegistry } from './backend-registry.ts';
 
@@ -17,6 +18,8 @@ export type { AuthServiceBackendRegistry } from './backend-registry.ts';
 export interface AuthPluginServiceContext extends PluginServiceContext {
   /** Host-provided appsettings contribution for the auth runtime-config topic. */
   readonly appsettings?: AuthServiceAppsettings;
+  /** Optional host-supplied official WorkOS SDK boundary. */
+  readonly workos?: CreateAuthServiceBackendRegistryOptions['workos'];
 }
 
 /** Resolve and construct the auth backend registry from host service context. */
@@ -30,7 +33,34 @@ export async function initializeAuthService(
     appsettings: serviceAppsettings(ctx),
     dbClient,
     kv,
+    workos: serviceWorkos(ctx),
   });
+}
+
+function serviceWorkos(
+  ctx: PluginServiceContext,
+): CreateAuthServiceBackendRegistryOptions['workos'] {
+  if (!('workos' in ctx)) return undefined;
+  const workos = ctx.workos;
+  if (typeof workos !== 'object' || workos === null || !('userManagement' in workos)) {
+    throw new TypeError('Auth host WorkOS client requires userManagement.');
+  }
+  const userManagement = workos.userManagement;
+  if (
+    typeof userManagement !== 'object' || userManagement === null ||
+    !('loadSealedSession' in userManagement) ||
+    typeof userManagement.loadSealedSession !== 'function' ||
+    !('listSessions' in userManagement) || typeof userManagement.listSessions !== 'function' ||
+    !('revokeSession' in userManagement) || typeof userManagement.revokeSession !== 'function'
+  ) {
+    throw new TypeError('Auth host WorkOS client requires session operations.');
+  }
+  if (isWorkosHost(ctx)) return ctx.workos;
+  return undefined;
+}
+
+function isWorkosHost(ctx: PluginServiceContext): ctx is AuthPluginServiceContext {
+  return 'workos' in ctx;
 }
 
 function serviceAppsettings(ctx: PluginServiceContext): AuthServiceAppsettings | undefined {

@@ -54,7 +54,10 @@ path	class	owner	disposition
 .llm/tools/docs/check-docs-contract-derivation.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-exports-drift.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/fixtures/legacy-carrier-parity/digests.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/fixtures/resolved-plugin-caveats.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/generate-child-health-docs.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/generated-carriers.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/jsdoc-example-corpus_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/publish-carrier-repair.mjs	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/e2e/prepull-runtime-images_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/e2e/prepull-runtime-images.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -65,6 +68,7 @@ path	class	owner	disposition
 .llm/tools/fitness/check-public-jsdoc-codenames_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/gates/catalog.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/gates/run-aspire-mcp-smoke.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/generate-cli-assets-barrel.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/harness/render-milestone-status_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/harness/render-milestone-status.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/harness/validate-milestone-cluster_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -85,6 +89,7 @@ path	class	owner	disposition
 .llm/tools/maint/teardown/probes.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/maint/teardown/teardown_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/maint/teardown/teardown.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
+.llm/tools/README.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/release/baselines/public-surfaces.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/release/release-canary-workflow_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/release/tests/fixtures/canary.3-notes.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -181,6 +186,7 @@ docs/site/index.vto	doc:public-page	S11	prose sweep + #1000 terminology; doc:lin
 docs/site/observability/how-to/add-opentelemetry.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/observability/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/observability/telemetry.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/orchestration-runtime/child-health.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/cli-scaffold.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/add-a-plugin.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/author-a-plugin.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
@@ -207,6 +213,7 @@ docs/site/reference/streams/index.md	doc:public-page	S11	prose sweep + #1000 ter
 docs/site/reference/triggers/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/workers/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/how-to/add-a-service.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/services-sdk/how-to/call-internal-procedures.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/how-to/discover-services.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/how-to/expose-openapi-scalar.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/services-sdk/sdk.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
@@ -296,9 +303,12 @@ packages/aspire/tests/runtime/aspire-ns-plugin-contribution_test.ts	aspire-ports
 packages/aspire/tests/runtime/contribution-registry_test.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/tests/schema_test.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/types.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
+packages/cli/assets/schema/aspire-generated-surface.v1.json	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/CHANGELOG.md	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/deno.json	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/e2e/fixtures/desktop-native/deno.lock	lockfile	N/A	dependency lock; any version literal belongs to an unrelated package; excluded from literal sweeps in both parity phases (lock hygiene per AGENTS.md)
 packages/cli/e2e/fixtures/desktop-native/src/constants.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/fixtures/outbound-webhook/run-adoption.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/mod.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/README.md	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/adapters/commands/docker-resource-cleaner.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -322,6 +332,8 @@ packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts	e2e	S2/
 packages/cli/e2e/src/application/gates/scaffold/database-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/find-job-execute-identity_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/garnet-coexistence_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/garnet-coexistence-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/generated-app-endpoint.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/otel-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -329,10 +341,14 @@ packages/cli/e2e/src/application/gates/scaffold/otlp-headers.ts	e2e	S2/S3/S10	ru
 packages/cli/e2e/src/application/gates/scaffold/package-backed-plugin-doctor-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/probe-generated-guarded-service.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-scripts.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/capture-db-endpoint-allocation.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/credential-fault-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/credential-readiness-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/credential-secret-surfaces.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -345,9 +361,11 @@ packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates
 packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/owned-container-log.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/prepare-readiness-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/probe-background-children.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/probe-plugin-resource.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/resource-state-stream.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/runtime-scripts.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/verify-credential-rejection.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/scaffold-capability-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -372,6 +390,8 @@ packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts	e2e	S
 packages/cli/e2e/src/application/gates/scaffold/verify-mcp-endpoint-directory.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/verify-saga-publish-process.ts	e2e:provider-conformance	X-1826-2	PR #2213; repository saga HTTP process proof borrows the described users PostgreSQL allocation; owned schema/PIDs; not generated sagas-api coverage
+packages/cli/e2e/src/application/gates/scaffold/verify-workers-concurrency_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/verify-workers-concurrency.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/cli-surface.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/evidence.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/extension-axes.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -392,13 +412,17 @@ packages/cli/e2e/tests/application/gates/aspire-dashboard-telemetry_test.ts	e2e	
 packages/cli/e2e/tests/application/gates/aspire-mcp-smoke_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/aspire-start-diagnostics_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/aspire-structured-evidence_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/background-children-health_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/background-health-coverage_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/capture-db-endpoint-allocation_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/command-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/credential-readiness_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/fixtures/aspire-describe-follow-13.5.3-capture.ndjson	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/fixtures/aspire-doctor-13.5.3.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/fixtures/aspire-post-stop-probe.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/fixtures/aspire-stop-transcript.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
+packages/cli/e2e/tests/application/gates/generated-auth-runtime-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/http-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/listener-unreachable-fixture_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -409,8 +433,10 @@ packages/cli/e2e/tests/application/gates/quickstart-aspire-walk_test.ts	e2e	S2/S
 packages/cli/e2e/tests/application/gates/resource-command-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/resource-state-stream_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/scaffold/auth-cookie-jar-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/behavior-plugins-health-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/scaffold/outbound-webhook-adoption_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/plugin-contract-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/typed-db-background-restart_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/ui-ai-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -432,6 +458,8 @@ packages/cli/e2e/tests/presentation/suite-registry_test.ts	e2e	S2/S3/S10	runtime
 packages/cli/README.md	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/aspire/apphost-doctor-inspector_test.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
 packages/cli/src/kernel/adapters/aspire/apphost-doctor-inspector.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
+packages/cli/src/kernel/adapters/aspire/apphost-package-dependencies_test.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
+packages/cli/src/kernel/adapters/aspire/apphost-package-dependencies.ts	cli-adapter:doctor	S4	aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table
 packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target_test.ts	cli-adapter:deploy	S4	verify the 13.5 aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; docs also list --yes, --clear-cache, --pipeline-log-level, --include-exception-details) against sources; adapter tests updated; S2 V12 --help receipts (D-15)
 packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target.ts	cli-adapter:deploy	S4	verify the 13.5 aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; docs also list --yes, --clear-cache, --pipeline-log-level, --include-exception-details) against sources; adapter tests updated; S2 V12 --help receipts (D-15)
 packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts	cli-adapter:deploy	S4	verify the 13.5 aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; docs also list --yes, --clear-cache, --pipeline-log-level, --include-exception-details) against sources; adapter tests updated; S2 V12 --help receipts (D-15)
@@ -461,15 +489,27 @@ packages/cli/src/kernel/adapters/database/providers/mysql.provider.ts	cli-adapte
 packages/cli/src/kernel/adapters/database/providers/postgres.provider.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/providers/sqlite.provider.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/scaffolder.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/workspace-mutator_apphost-deps_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/workspace-mutator.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/plugin/appsettings-entry-builders.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/db-integration.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/runtime/file-system/deno-project-stage_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/runtime/file-system/deno-project-stage.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/runtime/process/resolve-aspire-executable.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/scaffold/import-resolver.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/secrets/installation-secret-file_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/secrets/installation-secret-file.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-inventory-contract_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-checker_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-checker.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-inventory_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-inventory.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-surface-renderer.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/workspace-mutator_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/workspace-mutator.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -520,6 +560,7 @@ packages/cli/src/kernel/assets/generated/aspire/helpers/generate-register-infras
 packages/cli/src/kernel/assets/generated/aspire/helpers/generate-register-plugins-1.ts.template	template:generator-snapshot	derived	snapshot of generator output; regenerated by whichever generator slice lands (S4/S5/S6/S8) + gen:assets-barrel
 packages/cli/src/kernel/assets/generated/aspire/helpers/generate-register-services-1.ts.template	template:generator-snapshot	derived	snapshot of generator output; regenerated by whichever generator slice lands (S4/S5/S6/S8) + gen:assets-barrel
 packages/cli/src/kernel/assets/generated/aspire/helpers/generate-register-tools-1.ts.template	template:generator-snapshot	derived	snapshot of generator output; regenerated by whichever generator slice lands (S4/S5/S6/S8) + gen:assets-barrel
+packages/cli/src/kernel/assets/generated/aspire/helpers/installation-secret.ts.template	template:generator-snapshot	derived	snapshot of generator output; regenerated by whichever generator slice lands (S4/S5/S6/S8) + gen:assets-barrel
 packages/cli/src/kernel/assets/generated/workspace/netscript-config-1.ts.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/manifest.ts	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/skills.generated.ts	generated:barrel	derived	deno task gen:assets-barrel; gate check:assets-barrel
@@ -537,10 +578,12 @@ packages/cli/src/kernel/constants/scaffold/scaffold-packages.ts	scaffold-constan
 packages/cli/src/kernel/constants/scaffold/scaffold-validation.ts	scaffold-constants	S1	atomic 13.5.3 pin bump (A-SCAFFOLD); parity phase 1 enforce
 packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts	scaffold-constants	S1	atomic 13.5.3 pin bump (A-SCAFFOLD); parity phase 1 enforce
 packages/cli/src/kernel/constants/scaffold/scaffold-workspace-packages.ts	scaffold-constants	S1	atomic 13.5.3 pin bump (A-SCAFFOLD); parity phase 1 enforce
+packages/cli/src/kernel/domain/aspire-generated-surface.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/db-engine.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/compile-target.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/deploy-target-port_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/deploy-target-port.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/domain/deploy/packaged-installation-credential.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/rollback-convention.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/secrets-convention.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/docker-topology_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -553,6 +596,8 @@ packages/cli/src/kernel/domain/scaffold/scaffold-plan.ts	cli:other	S4	grep-verif
 packages/cli/src/kernel/domain/service-manifest.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/service-shape.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/templates/app/route-templates_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/templates/aspire/generate-apphost-package-json_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/generate-apphost-package-json.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/generate-appsettings.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/generate-aspire-config.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
@@ -576,10 +621,14 @@ packages/cli/src/kernel/templates/aspire/helpers/register/registration-preamble.
 packages/cli/src/kernel/templates/aspire/helpers/register/render-http-endpoint.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/register/resolve-resource-environment.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-health-checks_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-tool-manifest_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/background-infrastructure-health_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/fake-postgres-server.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-background_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-source-safety_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helper-fixture.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helpers-compile_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
@@ -587,6 +636,8 @@ packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-test-support.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/installation-provisioning_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/installation-secret-sdk-compile_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/register-http-endpoint_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/registration-preamble_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/registration-variant-lint_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
@@ -609,6 +660,7 @@ packages/cli/src/kernel/templates/workspace/generators_test.ts	generator:workspa
 packages/cli/src/kernel/templates/workspace/netscript-config.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/quality-runner_test.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
 packages/cli/src/kernel/templates/workspace/quality-runner.ts	generator:workspace	S11/S13	deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)
+packages/cli/src/local/composition/local-browser-auth-lifecycle_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/local/features/plugins/install/install-local-plugin.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -625,6 +677,8 @@ packages/cli/src/maintainer/features/root/maintainer-services_test.ts	cli:other	
 packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts	agent-init	S9	aspire agent init delegation flags
 packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer.ts	agent-init	S9	aspire agent init delegation flags
 packages/cli/src/public/adapters/jsr-import-resolver.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/adapters/packaged-deployment-bootstrap_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/adapters/packaged-deployment-bootstrap.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/domain/scaffold-plan_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/agent/agent-group.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
@@ -650,11 +704,15 @@ packages/cli/src/public/features/deploy/target/desktop/package/package-desktop_t
 packages/cli/src/public/features/deploy/target/desktop/package/package-desktop.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/target/run-target-operation.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/generate/aspire/aspire-check-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/generate/aspire/aspire-lifecycle-check-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/generate/aspire/check-aspire.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/aspire/generate-aspire.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/generate-group.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/init/init-agent-integration_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-input.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -663,13 +721,17 @@ packages/cli/src/public/features/plugins/auth/auth-config.ts	cli:other	S4	grep-v
 packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/doctor/browser-topology-check.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/doctor/plugin-runtime-health.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/doctor/runtime-health-polling_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/host/plugin-loader_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/install/render-plugin.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/new/new-plugin-use-case.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/plugins-group.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/remove/plugin-removal-plan.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -693,6 +755,7 @@ packages/cli/src/public/features/services/remove/remove-service.ts	cli:other	S4	
 packages/cli/src/public/features/services/services-group.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/infra/permissions/plugin-scaffold-permissions.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/tests/authored-browser-topology_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/config/mod.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-root-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-section-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
@@ -812,6 +875,7 @@ packages/sdk/src/ports/service-client.ts	package:other	S4	mention only (service 
 packages/sdk/src/presets/define-services.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/tests/discovery/env-ordering_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/tests/integration/service-url-resolver_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/service/CHANGELOG.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/service/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/service/src/diagnostics/database-connectivity.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/telemetry/query.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff

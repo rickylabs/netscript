@@ -152,6 +152,42 @@ Deno.test('resource subscription terminates its child when line parsing throws',
   }
 });
 
+Deno.test('resource observer receives transient updates while no predicate wait is active', async () => {
+  const controlled = createControlledFollower();
+  const observed: unknown[] = [];
+  const subscription = await watchResourceUpdates(
+    '/workspace/app/aspire/apphost.mts',
+    'garnet',
+    () => controlled.follower,
+    (update) => observed.push(update.resource.healthStatus),
+  );
+  try {
+    for (const healthStatus of ['Unhealthy', 'Healthy', 'Unhealthy']) {
+      await controlled.emit(JSON.stringify({ displayName: 'garnet', healthStatus }));
+    }
+    await subscription.waitFor(() => true, UNIT_WAIT_FAILURE_CEILING_MS);
+  } finally {
+    await subscription.close(true);
+  }
+  assertEquals(observed, ['Unhealthy', 'Healthy', 'Unhealthy']);
+});
+
+Deno.test('continuous observation fails closed if its follower terminates early', async () => {
+  const controlled = createControlledFollower();
+  const subscription = await watchResourceUpdates(
+    '/workspace/app/aspire/apphost.mts',
+    'garnet',
+    () => controlled.follower,
+  );
+  await controlled.emit('not-json');
+  await assertRejects(
+    () => subscription.waitFor(() => true, UNIT_WAIT_FAILURE_CEILING_MS),
+    Error,
+    'Unrecognized Aspire resource update line',
+  );
+  await assertRejects(() => subscription.close(true), Error, 'ended before bounded observation');
+});
+
 async function childStatusWithin(
   child: Deno.ChildProcess,
   ceilingMs: number,

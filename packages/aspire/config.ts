@@ -22,6 +22,9 @@ import {
   ASPIRE_RESOURCE_NAME_RULE,
 } from './src/domain/aspire-resource-name.ts';
 
+/** Saga query projection backend accepted by hosting configuration. */
+export type SagaProjectionBackend = 'kv' | 'prisma' | 'none';
+
 /** Public parser contract exposed by Aspire schema constants. */
 export interface AspireSchema<Output> {
   /** Structural metadata consumed by Zod inference utilities. */
@@ -159,6 +162,11 @@ export interface SagaResourceConfig {
     /** Durable saga state backend. */
     Backend?: SagaStoreBackend;
   };
+  /** Query projection backend; omitted follows Store.Backend, defaulting to KV. */
+  Projection?: {
+    /** KV query model, Prisma query model, or disabled query projection. */
+    Backend?: SagaProjectionBackend;
+  };
 }
 
 /** Backend service resource entry. */
@@ -208,6 +216,14 @@ export interface AppEntry extends Omit<BaseEntry, 'Enabled'>, ReferenceEntry, Ho
   Prebuild?: string;
   /** App working directory. */
   Workdir?: string;
+  /**
+   * Browser authentication scaffold ownership. Omit for the generated BFF topology;
+   * use `authored` when the app owns its browser authentication routes and bridge.
+   */
+  Auth?: {
+    /** `scaffold` (default) emits browser helpers; `authored` preserves app-owned topology. */
+    BrowserTopology: 'scaffold' | 'authored';
+  };
   /** Optional remote URL for externally hosted apps. */
   Remote?: string;
   /** Deno task name for task apps. */
@@ -493,6 +509,9 @@ const EnvironmentFields = {
 } as const satisfies z.ZodRawShape;
 
 const SagaResourceConfigZod = z.object({
+  Projection: z.object({
+    Backend: z.enum(['kv', 'prisma', 'none']).optional(),
+  }).optional(),
   Store: z.object({
     Backend: z.enum(['kv', 'prisma']).optional(),
   }).optional(),
@@ -526,6 +545,9 @@ const AppEntryZod = z.object({
   WatchMode: z.boolean().default(false),
   Prebuild: z.string().optional(),
   Workdir: z.string().optional(),
+  Auth: z.object({
+    BrowserTopology: z.enum(['scaffold', 'authored']).default('scaffold'),
+  }).optional(),
   Remote: z.string().optional(),
   TaskName: z.string().optional(),
   PackageTaskName: z.string().optional(),

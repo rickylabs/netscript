@@ -78,7 +78,7 @@ Deno.test("shipped manifests preserve their declared appsettings projections", a
       RequiresDb: provider.defaultRequiresDb,
       Permissions: [...provider.defaultPermissions],
       ...(provider.kind === "saga"
-        ? { Sagas: { Store: { Backend: "kv" } } }
+        ? { Sagas: { Store: { Backend: "kv" }, Projection: { Backend: "kv" } } }
         : {}),
     }, `${pluginName} service appsettings projection changed`);
 
@@ -104,7 +104,7 @@ Deno.test("shipped manifests preserve their declared appsettings projections", a
         RequiresDb: provider.defaultRequiresDb,
         Permissions: [...provider.defaultPermissions],
         ...(provider.kind === "saga"
-          ? { Sagas: { Store: { Backend: "kv" } } }
+          ? { Sagas: { Store: { Backend: "kv" }, Projection: { Backend: "kv" } } }
           : {}),
       },
       `${pluginName} published service appsettings projection changed`,
@@ -122,7 +122,7 @@ Deno.test("shipped manifests preserve their declared appsettings projections", a
         RequiresDb: provider.defaultRequiresDb,
         Permissions: [...provider.defaultPermissions],
         ...(provider.kind === "saga"
-          ? { Sagas: { Store: { Backend: "kv" } } }
+          ? { Sagas: { Store: { Backend: "kv" }, Projection: { Backend: "kv" } } }
           : {}),
       },
       `${pluginName} explicit host-port projection changed`,
@@ -151,7 +151,7 @@ Deno.test("shipped manifests preserve their declared appsettings projections", a
             : {}),
           PluginReferences: expectedPluginReferences,
           ...(provider.kind === "saga"
-            ? { Sagas: { Store: { Backend: "kv" } } }
+            ? { Sagas: { Store: { Backend: "kv" }, Projection: { Backend: "kv" } } }
             : {}),
         },
         `${pluginName} background appsettings projection changed`,

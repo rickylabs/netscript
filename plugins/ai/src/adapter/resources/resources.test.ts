@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl, join } from '@std/path';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
@@ -255,12 +256,10 @@ Deno.test('ai MCP tool emitted source type-checks against the public AI surface'
     const sourcePath = join(workspace, 'skill-loader.ts');
     await Deno.writeTextFile(sourcePath, artifactText(artifact));
 
-    const result = await new Deno.Command(Deno.execPath(), {
+    const result = await checkGeneratedFiles({
       cwd: pluginRoot,
       args: ['check', '--unstable-kv', sourcePath],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
 
     assert(
       result.success,

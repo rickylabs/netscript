@@ -1,0 +1,102 @@
+import { readInspectionFile, rejectInspectionLinks } from './generated-surface-reader.ts';
+import { join } from '@std/path';
+import {
+  ASPIRE_SURFACE_GENERATOR,
+  ASPIRE_SURFACE_VERSION,
+  type AspireAuthoredInput,
+  type AspireSurfaceDrift,
+  type AspireSurfaceReport,
+} from '../../domain/aspire-generated-surface.ts';
+import type { GeneratedFile } from '../../templates/aspire/helpers/types.ts';
+import { buildAspireInventory } from './aspire-surface-inventory.ts';
+import { generatedContentDigest, inspectGeneratedOutputs } from './generated-surface-inventory.ts';
+
+const MAX_HELPER_ENTRIES = 1024;
+
+/** Inspect rendered bytes using read-only Deno operations, never a scaffolder. */
+export async function checkAspireSurface(
+  projectRoot: string,
+  render: () => Promise<readonly GeneratedFile[]>,
+): Promise<AspireSurfaceReport> {
+  try {
+    // Reject linked input/output roots before selectors or renderer follow them.
+    await rejectInspectionLinks(projectRoot, 'aspire');
+    await rejectInspectionLinks(projectRoot, 'appsettings.json');
+    const inputs: AspireAuthoredInput[] = [];
+    for (
+      const path of [
+        'appsettings.json',
+        'netscript.config.ts',
+        'netscript.config.js',
+        'netscript.config.mjs',
+        'deno.json',
+      ]
+    ) {
+      const bytes = await readInspectionFile(projectRoot, path);
+      if (!bytes) {
+        if (path === 'appsettings.json') throw new Error('Missing authored authority.');
+        continue;
+      }
+      inputs.push({
+        generator: ASPIRE_SURFACE_GENERATOR,
+        path,
+        ownership: 'authored',
+        digest: await generatedContentDigest(bytes),
+      });
+    }
+    const files = await render();
+    const inventory = await buildAspireInventory(files);
+    const drift: AspireSurfaceDrift[] = await inspectGeneratedOutputs(
+      projectRoot,
+      inventory.outputs,
+    );
+    const selected = new Set(inventory.outputs.map((entry) => entry.path));
+    for (const path of await helperLeaves(projectRoot)) {
+      if (!selected.has(path)) drift.push({ path, kind: 'extra' });
+    }
+    return {
+      ...inventory,
+      inputs,
+      status: drift.length === 0 ? 'current' : 'drift',
+      exitCode: drift.length === 0 ? 0 : 1,
+      drift,
+    };
+  } catch (error) {
+    // A selector, renderer, permission or read failure can never fall back to generation.
+    return {
+      version: ASPIRE_SURFACE_VERSION,
+      generator: ASPIRE_SURFACE_GENERATOR,
+      outputs: [],
+      inputs: [],
+      status: 'inspection-failure',
+      exitCode: 1,
+      drift: [{
+        path: ASPIRE_SURFACE_GENERATOR,
+        kind: 'inspection-failure',
+        message: error instanceof Error ? error.message : String(error),
+      }],
+    };
+  }
+}
+
+async function helperLeaves(projectRoot: string): Promise<readonly string[]> {
+  const pending = ['aspire/.helpers'];
+  const leaves: string[] = [];
+  let count = 0;
+  while (pending.length > 0) {
+    const path = pending.pop()!;
+    await rejectInspectionLinks(projectRoot, path);
+    try {
+      for await (const entry of Deno.readDir(join(projectRoot, path))) {
+        if (++count > MAX_HELPER_ENTRIES) throw new Error('Helper inspection capacity exceeded.');
+        const child = `${path}/${entry.name}`;
+        if (entry.isSymlink) throw new Error('Linked helper has no generated ownership.');
+        if (entry.isDirectory) pending.push(child);
+        else leaves.push(child);
+      }
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
+  }
+  return leaves.sort();
+}

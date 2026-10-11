@@ -46,12 +46,14 @@ and `WORKOS_COOKIE_PASSWORD` in the environment.
 
 ```typescript
 import { createService, type ServiceRouter } from '@netscript/service';
-import { createWorkosBackend, type WorkosSessionClient } from '@netscript/auth-workos';
+import { WorkOS } from '@workos-inc/node';
+import { createWorkosBackend } from '@netscript/auth-workos';
 
-// Your oRPC router, and a WorkOS client adapted to the session-client port —
-// the NetScript auth plugin builds this adapter over @workos-inc/node for you.
+// Your oRPC router and a configured WorkOS AuthKit SDK client.
 declare const router: ServiceRouter;
-declare const workos: WorkosSessionClient;
+const workos = new WorkOS(Deno.env.get('WORKOS_API_KEY')!, {
+  clientId: Deno.env.get('WORKOS_CLIENT_ID')!,
+});
 
 const service = createService(router, { name: 'private-api' })
   .withAuthn({
@@ -63,6 +65,71 @@ const service = createService(router, { name: 'private-api' })
     }),
   });
 ```
+
+## Subject-wide logout
+
+The official auth plugin wires a durable WorkOS revocation store and a service-owned background
+worker automatically. `signout { everywhere: true }` atomically writes a subject fence and a durable
+work item; it never lists or revokes individual WorkOS sessions inside the request.
+
+The worker uses the service's WorkOS API key, processes at most 50 sessions per delivery, and
+checkpoints each page. Partial failures retry automatically without an attempt limit, with
+exponential backoff capped at 60 seconds. Storage errors are supervised with the same cap and
+reported through the service logger and telemetry using identifier-free classifications. Idle
+workers back off to one KV read per minute; a committed logout wakes the local service worker
+immediately, with idle polling retained as a recovery fallback. A process restart resumes pending
+work; the service's shutdown hook aborts admission and drains an active delivery on SIGTERM, SIGINT,
+or manual stop.
+
+If a storage failure follows upstream success, a bounded, durable retention-repair pass sets expiry
+before the subject fence clears; it never touches a newer job's tombstones. Outstanding repair
+markers are written atomically with tombstones and removed atomically with retention confirmation.
+Each repair delivery consumes at most 50 markers, in any list order. Delivery selection filters out
+future retries before choosing the earliest job in a window of at most 50 due entries, so Redis SCAN
+order cannot hide due work behind a future retry.
+
+Per-session tombstones have no expiry until upstream revocation succeeds. Then they expire after
+`maxAccessTokenLifetimeMs + clockSkewMs`, measured from that success, so a long outage cannot
+shorten retention. Defaults are one day and one minute. Configure
+`WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS` in the plugin to cover the longest access-token duration in
+your [WorkOS application settings](https://workos.com/docs/authkit/sessions). After a subject
+logout, verified tokens missing expiry or exceeding the configured lifetime fail closed even after
+tombstone expiry. `WORKOS_CLOCK_SKEW_MS` controls both retention padding and the upstream session
+cutoff margin. Sessions created within that margin are conservatively revoked; sessions beyond it
+are preserved. During cleanup, **all** NetScript credentials of that subject are refused, including
+new sessions; they become usable automatically when upstream cleanup succeeds. Other subjects stay
+usable.
+
+Standalone compositions must pass the same `revocations` store to their backend and any bearer or
+sealed-session authenticators. Use `createWorkosRevocationStore(hostKv)` with an atomic `KvStore`.
+Run `revokeWorkosSubjectPage(store, workos, delivery, signal)` in a background worker against
+`store.nextDelivery(now)`, retry failed pages with capped backoff until recovery, and drain it on
+shutdown. Without a store, subject-wide revocation remains explicitly unsupported. Never run the
+page function inside signout. The official plugin's service worker supplies this lifecycle for
+deployed auth APIs.
+
+### Migration in 0.0.8
+
+The revocation outbox storage format changes: pending keys use compact ISO timestamp strings and
+retention repair uses per-job outstanding markers. Before upgrading an existing 0.0.8 canary
+installation, stop admitting new global logouts and let its old worker drain all pending revocations
+and retention repair. Then stop all old auth replicas and upgrade them together before resuming
+logouts. Keep subject fences and session tombstones; do not delete revocation state or run old and
+new workers together. Existing completed fences and retained tombstones remain compatible.
+`WorkosRevocationJob.tombstoneAfter` is now a repair-phase marker, not a key-order cursor.
+
+No existing option is removed. Standalone callers that enable subject-wide logout must configure the
+durable store and its worker, then share the store with every authenticator; leaving a standalone
+bearer authenticator unconfigured would bypass the local fence. The official plugin requires an
+atomic host KV store for WorkOS and now reads its configured session-cookie name consistently. Set
+`NETSCRIPT_AUTH_COOKIE_NAME=wos-session` to retain an existing AuthKit cookie, or configure your
+AuthKit issuer to write the plugin default `__Host-ns_session`. The CLI WorkOS preset explicitly
+sets `wos-session` to match AuthKit's existing SDK default; direct plugin installations keep the
+`__Host-ns_session` default. Configure the maximum token lifetime to match your WorkOS application.
+`WorkosRevocationStore` implementations expose `clockSkewMs` and implement `confirmSessionRevoked`
+for retention after upstream success; the terminal `fail` operation is removed. Refresh identity
+changes return `workos_session_identity_changed`; a concurrent subject fence still returns
+`workos_subject_revoked`.
 
 ## Public surface
 
@@ -92,8 +159,9 @@ The always-current symbol list is
 ## Compatibility
 
 Designed for Deno; needs `--allow-net` (WorkOS API and JWKS) and `--allow-env` (credentials). The
-package consumes any `WorkosSessionClient` — a small structural port over the sealed-session API —
-and NetScript's auth plugin adapts the official `@workos-inc/node` SDK to it for you.
+package accepts the official `@workos-inc/node` SDK directly through its structural sealed-session
+port. Session types accept a user type parameter for SDK-specific fields; omitting it preserves
+extra-field access as `unknown` for existing consumers.
 
 ## License
 

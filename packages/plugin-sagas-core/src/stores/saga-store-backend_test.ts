@@ -43,3 +43,39 @@ Deno.test('resolveSagaStoreBackend requires explicit selection', () => {
     'Saga store backend is required',
   );
 });
+
+Deno.test('resolveSagaStoreBackend uses a caller default only when selection is absent', () => {
+  assertEquals(resolveSagaStoreBackend({ defaultBackend: 'kv' }), 'kv');
+  assertEquals(
+    resolveSagaStoreBackend({
+      defaultBackend: 'kv',
+      appsettings: { Sagas: { Store: { Backend: 'prisma' } } },
+    }),
+    'prisma',
+  );
+  assertEquals(
+    resolveSagaStoreBackend({
+      defaultBackend: 'prisma',
+      env: { NETSCRIPT_SAGA_STORE: 'kv' },
+    }),
+    'kv',
+  );
+  assertThrows(
+    () =>
+      resolveSagaStoreBackend({
+        defaultBackend: 'kv',
+        env: { NETSCRIPT_SAGA_STORE: 'sqlite' },
+      }),
+    Error,
+    'Invalid saga store backend',
+  );
+  assertThrows(
+    () =>
+      resolveSagaStoreBackend({
+        defaultBackend: 'kv',
+        appsettings: { Sagas: { Store: { Backend: 'sqlite' } } },
+      }),
+    Error,
+    'Invalid saga store backend',
+  );
+});

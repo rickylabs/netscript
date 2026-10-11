@@ -1,3 +1,5 @@
+import { DenoGeneratedSourceFormatter } from '../../adapters/runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../../adapters/runtime/process/deno-process.ts';
 import { assertEquals } from '@std/assert';
 import { join } from '@std/path';
 import { regenerateAspireHelpers } from '../../adapters/service/workspace-mutator.ts';
@@ -96,7 +98,9 @@ export default defineConfig({ name: 'fixture', databases: { config: [] }, plugin
           );
           const fs = new DenoFileSystem();
           const templates = new StringTemplateAdapter(fs);
-          await regenerateAspireHelpers(root, fs, new Scaffolder(templates, fs), templates);
+          await regenerateAspireHelpers(root, fs, new Scaffolder(templates, fs), templates, {
+            formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
+          });
           // Run the real regenerated helper/reader; change only its package import to avoid a fetch.
           const reader = new URL(
             '../../../../../mcp/src/infrastructure/aspire-ps-dashboard-reader.ts',

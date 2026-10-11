@@ -1,4 +1,14 @@
-import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
+import { createContributionExtractor } from '../../../kernel/adapters/plugin/contribution-extractor.ts';
+import { DenoProjectStage } from '../../../kernel/adapters/runtime/file-system/deno-project-stage.ts';
+import type { ProjectStagePort } from '../../../kernel/ports/project-stage-port.ts';
+import type { GenerateRoutesCommandDependencies } from '../generate/routes/generate-routes-command.ts';
+import type { InitCommandDependencies } from '../init/init-command.ts';
+import { initAgent } from '../agent/init/init-agent.ts';
+import { DenoAgentInitFileSystem } from '../agent/init/agent-init-file-system.ts';
+import { DenoAspireAgentInitializer } from '../../adapters/agent/deno-aspire-agent-initializer.ts';
+import { DenoAgentDocsGenerator } from '../../adapters/agent/deno-agent-docs-generator.ts';
+import { regenerateAspireHelpersWithDependencies } from '../../../kernel/adapters/service/workspace-mutator.ts';
+import { FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
 import { copy } from '@std/fs';
 import { dirname, join } from '@std/path';
 
@@ -49,6 +59,8 @@ import type { OsServicePort } from '../../ports/os-service-port.ts';
 import type { ServiceManifest } from '../../ports/service-manifest-port.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../generate/plugins/generate-plugin-registries-command.ts';
 import { createInstalledRuntimeRegistryGenerator } from '../generate/plugins/installed-runtime-registry-generator.ts';
+import { createInstalledRuntimeRegistryRenderer } from '../generate/plugins/plugin-registry-renderer.ts';
+import { checkPluginRegistries } from '../generate/plugins/check-plugin-registries.ts';
 import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runtime-schemas/generate-runtime-schemas-command.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
@@ -61,6 +73,7 @@ import type { DoctorPluginCommandDependencies } from '../plugins/doctor/doctor-p
 import type { JsrPluginValidatorPort } from '../plugins/install/jsr-plugin-validator-port.ts';
 import type { JsrPackageFileFetcher } from '../../infra/jsr/verify-jsr-package-integrity.ts';
 import { doctorPlugin } from '../plugins/doctor/doctor-plugin-use-case.ts';
+import { inspectPluginRuntime } from '../plugins/doctor/plugin-runtime-health.ts';
 import type { RemovePluginDependencies } from '../plugins/remove/remove-plugin.ts';
 import type { PluginScaffoldDependencies } from '../plugins/scaffold/scaffold-plugin-use-case.ts';
 import type { NewPluginDependencies } from '../plugins/new/new-plugin-use-case.ts';
@@ -84,6 +97,8 @@ import type {
 
 /** Dependencies shared by public command groups. */
 export interface PublicCommandDependencies {
+  /** Isolated project staging for validated plugin updates. */
+  readonly projectStage: ProjectStagePort;
   /** Filesystem adapter used by scaffold and config flows. */
   readonly fs: DenoFileSystem;
   /** Process adapter used by init and deployment flows. */
@@ -107,18 +122,13 @@ export interface PublicCommandDependencies {
   /** Resolve a UI command to one Fresh application root. */
   readonly resolveUiAppRoot: UiAppRootResolver;
   /** Dependencies for public init. */
-  readonly initCommandDependencies: {
-    readonly defaultProjectName: () => string;
-    readonly prompt: CliffyPrompt;
-    readonly initContext: InitPipelineContext;
-    readonly createInitContext: (
-      options: { readonly dryRun: boolean },
-    ) => InitPipelineContext;
-  };
+  readonly initCommandDependencies: InitCommandDependencies;
   /** Dependencies for Fresh UI registry installation commands. */
   readonly uiInstallDependencies: {
     readonly fs: DenoFileSystem;
   };
+  /** Canonical source formatting shared by page-removal validation. */
+  readonly uiPageFormatter: GeneratedSourceFormatterPort;
   /** Dependencies for DB lifecycle commands. */
   readonly dbOperationDependencies: {
     readonly cwd: () => string;
@@ -144,6 +154,7 @@ export interface PublicCommandDependencies {
   };
   /** Dependencies for plugin install. */
   readonly pluginInstallDependencies: {
+    readonly formatter: GeneratedSourceFormatterPort;
     readonly fs: DenoFileSystem;
     readonly scaffolder: Scaffolder;
     readonly templateAdapter: StringTemplateAdapter;
@@ -170,10 +181,15 @@ export interface PublicCommandDependencies {
   /** Dependencies for host-side plugin removal. */
   readonly pluginRemoveDependencies: RemovePluginDependencies;
   /** Dependencies for host-side plugin diagnostics. */
-  readonly pluginDoctorDependencies: Pick<
-    DoctorPluginCommandDependencies,
-    'doctor'
-  >;
+  readonly pluginDoctorDependencies:
+    & Pick<
+      DoctorPluginCommandDependencies,
+      'doctor'
+    >
+    & {
+      /** Inspect declared runtime health without static plugin validation. */
+      readonly runtimeDoctor?: DoctorPluginCommandDependencies['doctor'];
+    };
   /** HTTP adapter used by auth session projection and revocation commands. */
   readonly authSessionHttp: AuthSessionHttpPort;
   /** Regenerate Aspire helpers after auth configuration changes. */
@@ -186,6 +202,8 @@ export interface PublicCommandDependencies {
   readonly generateRuntimeSchemasCommandDependencies: GenerateRuntimeSchemasCommandDependencies;
   /** Dependencies for plugin registry generation. */
   readonly generatePluginRegistriesCommandDependencies: GeneratePluginRegistriesCommandDependencies;
+  /** Dependencies for Fresh route manifest generation. */
+  readonly generateRoutesCommandDependencies: GenerateRoutesCommandDependencies;
   /** Dependencies for canonical Fresh resource generation. */
   readonly generateResourceCommandDependencies: GenerateResourceCommandDependencies;
   /** Dependencies for deploy build. */
@@ -221,6 +239,7 @@ export function createPublicCommandDependencies(
 ): PublicCommandDependencies {
   const fs = new DenoFileSystem();
   const process = new DenoProcess();
+  const appHostInspector = new AspireAppHostDoctorInspector(process);
   const generatedSourceFormatter = new DenoGeneratedSourceFormatter(process);
   const prompt = new CliffyPrompt();
   const templateAdapter = new StringTemplateAdapter(fs);
@@ -239,11 +258,13 @@ export function createPublicCommandDependencies(
       resolvePath: (path) => host.resolvePath(path),
       resolveWorkspaceRoot: findDeployProjectRoot,
     });
-  const generatePluginRegistries = createInstalledRuntimeRegistryGenerator({
-    fetchManifest: (url) => fetch(url, { headers: { Accept: 'application/json' } }),
+  const registryDependencies = {
+    fetchManifest: (url: string) => fetch(url, { headers: { Accept: 'application/json' } }),
     fs,
     process,
-  });
+  };
+  const generatePluginRegistries = createInstalledRuntimeRegistryGenerator(registryDependencies);
+  const renderPluginRegistries = createInstalledRuntimeRegistryRenderer(registryDependencies);
   const serviceAddDependencies = {
     fs,
     scaffolder,
@@ -281,6 +302,7 @@ export function createPublicCommandDependencies(
       scaffolder: initScaffolder,
       fs: initFs,
       templateAdapter: initTemplateAdapter,
+      formatter: generatedSourceFormatter,
       process,
       jsrResolver: new JsrImportResolver(),
       cwd: host.cwd,
@@ -294,6 +316,7 @@ export function createPublicCommandDependencies(
     fs,
     scaffolder,
     templateAdapter,
+    generatedSourceFormatter,
   );
 
   return {
@@ -308,12 +331,20 @@ export function createPublicCommandDependencies(
     resolveProjectRoot,
     resolveUiAppRoot,
     initCommandDependencies: {
+      initAgent: (input) =>
+        initAgent(input, {
+          fs: new DenoAgentInitFileSystem(),
+          aspireAgentInitializer: new DenoAspireAgentInitializer(),
+          docsGenerator: new DenoAgentDocsGenerator(),
+          environment: Deno.env.toObject(),
+        }),
       defaultProjectName: () => host.cwd().split(/[/\\]/).pop() ?? 'my-app',
       prompt,
       initContext,
       createInitContext: ({ dryRun }) =>
         dryRun ? createInitContext(new DryRunFileSystemAdapter(fs)) : initContext,
     },
+    uiPageFormatter: generatedSourceFormatter,
     uiInstallDependencies: { fs },
     dbOperationDependencies: {
       cwd: host.cwd,
@@ -331,6 +362,7 @@ export function createPublicCommandDependencies(
     },
     serviceAddDependencies,
     pluginInstallDependencies: {
+      formatter: generatedSourceFormatter,
       fs,
       scaffolder,
       templateAdapter,
@@ -350,6 +382,7 @@ export function createPublicCommandDependencies(
       dispatchPort: createPluginDispatchPort(process),
     },
     pluginRemoveDependencies: {
+      formatter: generatedSourceFormatter,
       fs,
       scaffolder,
       templateAdapter,
@@ -358,13 +391,15 @@ export function createPublicCommandDependencies(
       processRunner: process,
     },
     pluginDoctorDependencies: {
+      runtimeDoctor: async ({ projectRoot }) =>
+        await inspectPluginRuntime(projectRoot, fs, appHostInspector),
       doctor: async (input) =>
         await doctorPlugin(input, {
           fs,
           loadConfig,
           process,
           loadJsrExportMap: fetchJsrExportMap,
-          inspectAppHost: new AspireAppHostDoctorInspector(process),
+          inspectAppHost: appHostInspector,
           inspectDockerTopology: new DockerCliTopologyInspector(process),
           inspectRuntimeRegistries: generatePluginRegistries,
         }),
@@ -372,6 +407,8 @@ export function createPublicCommandDependencies(
     authSessionHttp: new FetchAuthSessionHttp(),
     authRegenerateAspire: async (projectRoot) => {
       const result = await generateAspire({ projectRoot }, {
+        regenerateHelpers: regenerateAspireHelpersWithDependencies,
+        formatter: generatedSourceFormatter,
         fs,
         scaffolder,
         templateAdapter,
@@ -405,13 +442,29 @@ export function createPublicCommandDependencies(
         };
       },
     },
+    projectStage: new DenoProjectStage(),
     generatePluginRegistriesCommandDependencies: {
       resolveProjectRoot,
       walker: new FilesystemWalker(),
-      extractor: new AstExtractor(),
+      extractor: createContributionExtractor(),
       emitter: new RegistryEmitter(),
       fs,
       generate: generatePluginRegistries,
+      check: (projectRoot) =>
+        checkPluginRegistries(
+          projectRoot,
+          renderPluginRegistries,
+          new DenoGeneratedSourceFormatter(process),
+        ),
+    },
+    generateRoutesCommandDependencies: {
+      resolveUiAppRoot,
+      writeManifest: async (appRoot) => {
+        const { writeFreshRouteManifestSync } = await import(
+          '../../../kernel/adapters/scaffold/fresh-route-manifest.ts'
+        );
+        return writeFreshRouteManifestSync(appRoot).result;
+      },
     },
     generateResourceCommandDependencies: {
       generateResourceDependencies: {

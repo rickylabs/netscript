@@ -2,6 +2,7 @@ import type {
   DurableSagaStoreBackend,
   PrismaSagaStoreClient,
 } from '@netscript/plugin-sagas-core/stores';
+import { isPrismaSagaStoreClient } from '@netscript/plugin-sagas-core/stores';
 import type { SagaStreamPrismaClient } from '../../streams/server.ts';
 import type { SagaServiceDatabaseClient } from './routers/v1-types.ts';
 
@@ -32,24 +33,17 @@ export function resolveSagaServicePrismaClient(
 }
 
 function isSagaServicePrismaClient(value: unknown): value is SagaServicePrismaClient {
-  if (!isObject(value)) return false;
+  if (!isPrismaSagaStoreClient(value)) return false;
 
   const sagaInstance = Reflect.get(value, 'sagaInstance');
   const sagaExecutionHistory = Reflect.get(value, 'sagaExecutionHistory');
-  const sagaRuntimeState = Reflect.get(value, 'sagaRuntimeState');
-  const sagaRuntimeTransition = Reflect.get(value, 'sagaRuntimeTransition');
-  const sagaRuntimeCorrelation = Reflect.get(value, 'sagaRuntimeCorrelation');
 
   return isObject(sagaInstance) &&
     hasMethod(sagaInstance, 'findMany') &&
     hasMethod(sagaInstance, 'count') &&
     isObject(sagaExecutionHistory) &&
     hasMethod(sagaExecutionHistory, 'findMany') &&
-    hasMethod(sagaExecutionHistory, 'count') &&
-    isObject(sagaRuntimeState) &&
-    isObject(sagaRuntimeTransition) &&
-    isObject(sagaRuntimeCorrelation) &&
-    hasMethod(value, '$transaction');
+    hasMethod(sagaExecutionHistory, 'count');
 }
 
 function hasMethod(value: object, key: string): boolean {

@@ -20,7 +20,7 @@ a NetScript host. Use it directly for custom hosts, libraries, and tests.
 
 ## Exports
 
-The package publishes twenty entrypoints. The root path carries the userland DSL; the remaining
+The package publishes twenty-one entrypoints. The root path carries the userland DSL; the remaining
 subpaths expose the layers a host, adapter author, or test harness composes.
 
 | Export specifier                                     | Module                               | Exports | Purpose                                                                                                                                              |
@@ -32,7 +32,8 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 | `@netscript/plugin-sagas-core/runtime`               | `./src/runtime/mod.ts`               | 87      | The engine: `createSagaRuntime`, `createSagaEngine`, `createSagaCompensator`, `createSagaScheduler`, and the idempotency-key helpers.                |
 | `@netscript/plugin-sagas-core/adapters`              | `./src/adapters/mod.ts`              | 72      | Concrete port adapters, including `createSagaBusBridge`.                                                                                             |
 | `@netscript/plugin-sagas-core/transports`            | `./src/transports/mod.ts`            | 49      | Saga bus transports (`createNetScriptRedisTransport`, `createGarnetListTransport`) with their message and delayed-entry codecs.                      |
-| `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 72      | KV-backed instance and applied-key stores, `openSagaRuntimeKv`, and `resolveSagaStoreBackend`.                                                       |
+| `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 81      | KV-backed instance, scheduler, and applied-key stores, `openSagaRuntimeKv`, and the shared canonical-store selectors and Prisma-client predicate.    |
+| `@netscript/plugin-sagas-core/stores/backends`       | `./src/stores/saga-store-backend.ts` | 9       | Backend selectors and projection env/value/type contracts without importing persistent adapters.                                                     |
 | `@netscript/plugin-sagas-core/middleware`            | `./src/middleware/mod.ts`            | 30      | Host middleware — `createSagaMiddleware`, `createSSEEventsMiddleware`, `emitSagaEvent`.                                                              |
 | `@netscript/plugin-sagas-core/integration/workers`   | `./src/integration/workers/mod.ts`   | 23      | Selected-schema pure worker effect constructors plus explicit trigger helpers for callers outside synchronous handlers.                              |
 | `@netscript/plugin-sagas-core/integration/publisher` | `./src/integration/publisher/mod.ts` | 11      | Non-throwing publisher contracts plus `publishSagaOrThrow` for an explicit exception boundary.                                                       |
@@ -48,6 +49,13 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 
 Export counts are the symbol counts `deno doc` reports for each entrypoint; subpaths overlap where a
 type is re-exported through more than one layer.
+
+The stores subpath exposes `isPrismaSagaStoreClient(value)` for the canonical-store delegate
+contract shared by API and runner bootstrap validation. Query delegates remain a separate API
+requirement. `resolveSagaStoreBackend` accepts an optional `defaultBackend` used only when neither
+environment nor appsettings selects a backend; invalid configured values always fail. Runner backend
+selection controls canonical state; Prisma selection keeps replay reservations and applied keys in a
+separate KV handle that is closed on shutdown.
 
 ## Root surface (`@netscript/plugin-sagas-core`)
 
@@ -249,17 +257,73 @@ prevent runtime startup. A backlog can delay migration of historical keys, so ba
 is guaranteed only after their terminal deadline has been assigned. No API read or owner app session
 drives cleanup.
 
-Transport reservations already use their separate deduplication TTL. With the KV backend,
-`archiveToDb: false` skips the optional Prisma archive even when a Prisma client is available. With
-`--saga-store-backend prisma`, the Prisma query model remains required runtime state so
+Transport reservations already use their separate deduplication TTL. With a KV query projection,
+`archiveToDb: true` explicitly enables the optional Prisma archive for that saga group and requires
+a host Prisma client. The default `archiveToDb: false` skips it, keeping KV-only installs DB-free.
+With `Sagas.Projection.Backend: prisma`, the Prisma query model remains required runtime state so
 `listInstances`, `getInstance`, and stream hydration stay populated independently of archival.
 
 Migration: `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and no longer expires open replay
 markers. Configure `completedRetentionDays` to match the canonical terminal window instead. Markers
 survive open instances and receive their deadline only after terminal state.
 
-Delayed saga messages remain owned by the queue adapter. The queue scheduling port currently has no
-terminal-instance cancellation/expiry contract, so their retention window is not proven by this
-change. Terminal records written before this policy was installed also need a migration/backfill;
-this change assigns deadlines when a terminal state is written. These remaining acceptance items
-keep issue #2109 open.
+The default saga runner stores new scheduled cascades in the existing KV polling queue under
+`queue:pending/sagas-scheduled`; ready messages still use the configured delivery provider. Each
+scheduled cascade carries its originating durable instance id separately from the destination
+correlation. Pending, running, and compensating instances keep their timers. Terminal transitions,
+including `sagaComplete()` alongside `schedule()`, still enqueue follow-ups. Timers remain eligible
+for delivery until the origin's `completedAt` (or terminal `updatedAt`) plus `completedDays`
+deadline, regardless of their destination. After that deadline, or once canonical state has expired,
+pending and due timers are cancelled. `SagaQueueScheduler.retentionDrops` counts every successful
+pending key deletion and every due-message drop; lost CAS races do not increase it. A cancellable
+scheduler binds canonical state and its retention policy before startup; the existing background
+retention loop inspects at most 101 pending keys and cancels at most 100 per pass. A persistent
+queue cursor resumes across restart and prevents an active prefix from starving terminal cleanup.
+Cancellation uses per-key CAS, so it does not remove a concurrently rewritten message. Backlog is
+drained without an idle delay; idle and failure waits use the existing 100 ms to 30 second backoff.
+Cleanup requires no API read or owner session. Due timers check canonical state before forwarding to
+the delivery queue; an already forwarded/in-flight delivery remains subject to the engine's existing
+terminal checks.
+
+Custom runner delivery queues preserve their existing native-delay behavior unless the host supplies
+`scheduledQueue` with the `cancelPending` capability. Low-level `SagaQueueScheduler` callers supply
+that queue, bind the canonical store with matching `completedRetentionDays`, and drive
+`cleanupRetention()`. Without a bound store or cancellation capability, startup logs a warning and
+uses the ready queue's native delays. This preserves injected-engine and custom-factory runner
+configurations. Cleanup before binding returns false; a second start is rejected. The independent
+core `SagaScheduler` uses `KvSagaSchedulerStore` from `./stores` for bounded retention. Bind
+canonical state and the matching `completedRetentionDays` policy before startup; low-level callers
+drive `cleanupRetention()` from a background service loop. The shipped durable runtime drives this
+hook for an injected scheduler. A pass inspects at most ten records and persists its cursor across
+restart. Pending, claimed, dispatched, and failed records receive KV TTL anchored to the origin's
+terminal deadline; expired scoped records are deleted with CAS. Open instances and all unscoped
+records, including new schedules without an origin, survive without TTL. Due delivery checks
+canonical origin state; missing state cancels scoped records. Replay keyed by origin, message
+idempotency key (or message id), and scheduled time does not renew the deadline or replace outcomes.
+Unkeyed schedules have distinct identities. Claim leases recover after 30 seconds; stale claim
+outcomes cannot replace newer claims or recreate deleted records. The host owns the KV adapter and
+injects the same clock into scheduler and adapter. A time-ordered due index honors the caller's
+batch limit and atomically re-keys claims to their lease deadline; retained outcomes never delay due
+work. Adapter-private claim tokens survive deadline updates, and empty claims make no KV writes.
+Custom stores need the optional cancellation and cleanup capabilities when binding retention. All
+core schedulers, including unbound ones, use content-hashed replay identities; unbound schedulers do
+not enforce originating-instance retention. No database archive or app read drives this path. KV
+canonical reads are batched in native pages of at most ten keys. Only explicitly scoped new messages
+are cancellation candidates; legacy unscoped queue messages and native-provider delayed entries need
+separate migration.
+
+Terminal records written before the retention policy was installed still need a migration/backfill.
+This leaf proves new scoped delayed-message cancellation; legacy saga/trigger terminal-family
+backfill, new and legacy unscoped schedules, and native-provider delayed messages remain separate
+acceptance scope for issue #2109.
+
+## Exports: discovery metadata
+
+The `@netscript/plugin-sagas-core/discovery` entrypoint (`./src/builders/discovery.ts`) exports
+`NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable patterns through the plugin SDK
+`additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
+single-plugin updates succeed regardless of workers/streams order.
+
+| Export specifier                         | Module                        |
+| ---------------------------------------- | ----------------------------- |
+| `@netscript/plugin-sagas-core/discovery` | `./src/builders/discovery.ts` |

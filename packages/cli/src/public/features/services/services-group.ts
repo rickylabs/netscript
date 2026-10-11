@@ -34,6 +34,7 @@ export function createServiceCommand(
     .command(
       'remove',
       createServiceRemoveCommand({
+        formatter: dependencies.serviceAddDependencies.formatter,
         fs: dependencies.fs,
         scaffolder: dependencies.scaffolder,
         templateAdapter: dependencies.templateAdapter,

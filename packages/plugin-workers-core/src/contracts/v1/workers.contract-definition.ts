@@ -32,7 +32,7 @@ import {
   TaskTriggerInputZodSchema,
 } from './workers.contract-schemas.ts';
 import type { JobPayloadRegistry, JobTriggerInput } from './job-trigger-contract.ts';
-import type { WorkersContract } from './workers.contract-types.ts';
+import type { WorkersContract, WorkersContractV1 } from './workers.contract-types.ts';
 
 // Converge onto the shared plugin error vocabulary: NOT_FOUND, VALIDATION_ERROR,
 // and INTERNAL are reported with identical status codes, messages, and payload
@@ -576,7 +576,7 @@ export type { WorkersContractDefinition };
  *
  * Carries the real, precise oRPC contract router type — no erasure cast.
  */
-export const workersContract: WorkersContractDefinition = workersContractDefinition;
+export const workersContract: WorkersContract = workersContractDefinition;
 
 /**
  * Return the v1 workers contract narrowed to an application's literal job payload registry.
@@ -605,6 +605,6 @@ export function createWorkersContract<
  * so every `router.<route>.handler(...)` is checked for input/output/error
  * conformance. The type is the real `implement` return type — no erasure cast.
  */
-export const workersContractV1: ReturnType<typeof implement<WorkersContractDefinition>> = implement(
+export const workersContractV1: WorkersContractV1 = implement(
   workersContractDefinition,
 );

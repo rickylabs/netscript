@@ -8,6 +8,7 @@ Deno.test('contract version registry writes canonical aggregates', async () => {
   await fs.writeFile('/project/contracts/versions/v1/users.contract.ts', 'export {};\n');
   const formattedPaths: string[] = [];
   const formatter: GeneratedSourceFormatterPort = {
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (path, content) => {
       formattedPaths.push(path);
       return Promise.resolve(`// canonical\n${content}`);

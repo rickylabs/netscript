@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../.llm/tools/testing/check-generated-files.ts';
 import {
   baseContract,
   type BaseContractMeta,
@@ -301,7 +302,7 @@ Deno.test('README examples include checked TypeScript fences', async () => {
           file,
         ]
         : ['check', '--no-config', file];
-      const result = await new Deno.Command(Deno.execPath(), { args }).output();
+      const result = await checkGeneratedFiles({ args });
 
       if (result.code !== 0) {
         const stderr = new TextDecoder().decode(result.stderr);

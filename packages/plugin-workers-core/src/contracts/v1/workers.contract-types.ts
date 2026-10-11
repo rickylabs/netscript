@@ -1,3 +1,4 @@
+import type { implement } from '@orpc/server';
 import type {
   WorkersContractDefinition,
   workersContractV1,
@@ -67,12 +68,29 @@ export type WorkersContract<
 /**
  * Context-binding implementer for the v1 worker contract.
  *
- * Derived from the {@link workersContractV1} value (`implement(definition)`),
+ * Names the precise default-context {@link WorkersContractImplementer} annotation,
  * so `WorkersContractV1['$context']<Ctx>()` returns the precisely-typed router
  * implementer whose `<route>.handler(...)` calls are checked against the
  * contract IO. Replaces the previous `$context: <T>() => WorkersRouter` shim.
  */
-export type WorkersContractV1 = typeof workersContractV1;
+export type WorkersContractV1 = WorkersContractImplementer;
+
+/**
+ * Exact workers contract implementer with an application's initial request context.
+ *
+ * Keeps the upstream middleware, router, lazy-router, configuration, and context-binding
+ * capabilities as well as every procedure's input/output/error inference.
+ *
+ * @example
+ * ```ts
+ * import { type WorkersContractImplementer, workersContractV1 } from '@netscript/plugin-workers-core/contracts/v1';
+ * const router: WorkersContractImplementer<{ service: string }> = workersContractV1
+ *   .$context<{ service: string }>();
+ * ```
+ */
+export type WorkersContractImplementer<
+  TContext extends Record<string, unknown> = Record<never, never>,
+> = ReturnType<typeof implement<WorkersContract, TContext>>;
 
 /**
  * The context-bound worker router implementer.
@@ -99,3 +117,64 @@ export interface WorkersCapabilities {
   /** Capability tags advertised by the plugin. */
   readonly capabilities: readonly string[];
 }
+
+/**
+ * Named procedures supported by the workers v1 service.
+ *
+ * @example
+ * ```ts
+ * import type { WorkersContractRouteName } from '@netscript/plugin-workers-core/contracts/v1';
+ * const route: WorkersContractRouteName = 'triggerJob';
+ * ```
+ */
+export type WorkersContractRouteName =
+  | 'describe'
+  | 'listJobs'
+  | 'getJob'
+  | 'createJob'
+  | 'updateJob'
+  | 'deleteJob'
+  | 'triggerJob'
+  | 'listExecutions'
+  | 'getExecution'
+  | 'batchQueryExecutions'
+  | 'listExecutionsByCorrelationId'
+  | 'listTasks'
+  | 'getTask'
+  | 'triggerTask'
+  | 'listTaskExecutions'
+  | 'getTaskExecution'
+  | 'cleanup'
+  | 'cleanupDbExecutions'
+  | 'archiveExecutions'
+  | 'seed'
+  | 'subscribe'
+  | 'listTopics';
+
+/**
+ * Exact builder contract for a named workers procedure, including schema methods and errors.
+ *
+ * @example
+ * ```ts
+ * import { type WorkersContractRoute, workersContract } from '@netscript/plugin-workers-core/contracts/v1';
+ * const route: WorkersContractRoute<'getJob'> = workersContract.getJob;
+ * ```
+ */
+export type WorkersContractRoute<
+  TName extends WorkersContractRouteName,
+  TPayloads extends JobPayloadRegistry = JobPayloadRegistry,
+> = WorkersContract<TPayloads>[TName];
+
+/**
+ * Exact input/output schema contracts carried by a named workers procedure.
+ *
+ * @example
+ * ```ts
+ * import { type WorkersContractRouteSchemas, workersContract } from '@netscript/plugin-workers-core/contracts/v1';
+ * const schemas: WorkersContractRouteSchemas<'getJob'> = workersContract.getJob['~orpc'];
+ * ```
+ */
+export type WorkersContractRouteSchemas<
+  TName extends WorkersContractRouteName,
+  TPayloads extends JobPayloadRegistry = JobPayloadRegistry,
+> = Pick<WorkersContractRoute<TName, TPayloads>['~orpc'], 'inputSchema' | 'outputSchema'>;

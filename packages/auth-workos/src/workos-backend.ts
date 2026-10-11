@@ -15,6 +15,7 @@ import {
 import type { AuthnRequest, AuthnResult } from '@netscript/service/auth';
 import {
   createWorkosAuthenticator,
+  isWorkosSessionRevoked,
   type WorkosAuthenticatorOptions,
   type WorkosSessionAuthenticationResult,
   type WorkosSessionAuthenticationSuccess,
@@ -36,11 +37,15 @@ export interface WorkosProviderOptions {
 }
 
 /** Options for creating a pure WorkOS auth backend. */
-export interface WorkosBackendOptions extends WorkosAuthenticatorOptions {
+export interface WorkosBackendOptions<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+> extends WorkosAuthenticatorOptions<TUser> {
   /** Configured WorkOS connections exposed through the provider registry. */
   readonly providers?: readonly WorkosProviderOptions[];
   /** Secret used to sign backend-owned opaque session tokens. Defaults to `cookiePassword`. */
   readonly sessionTokenSecret?: string;
+  /** Injectable logout clock; defaults to the system clock. */
+  readonly now?: () => Date;
 }
 
 const DEFAULT_COOKIE_NAME = 'wos-session';
@@ -66,7 +71,9 @@ const WORKOS_BACKEND_NAME = 'workos';
  * });
  * ```
  */
-export function createWorkosBackend(options: WorkosBackendOptions): AuthBackendPort {
+export function createWorkosBackend<
+  TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+>(options: WorkosBackendOptions<TUser>): AuthBackendPort {
   const authenticator = createWorkosAuthenticator(options);
   const providers = normalizeWorkosProviders(options.providers);
   const tokenSecret = options.sessionTokenSecret ?? options.cookiePassword;
@@ -90,7 +97,7 @@ export function createWorkosBackend(options: WorkosBackendOptions): AuthBackendP
           return undefined;
         }
         const result = await authenticateSealedSessionToken(token, options);
-        if (!result.authenticated) {
+        if (!result.authenticated || await isWorkosSessionRevoked(result, options.revocations)) {
           return undefined;
         }
         return authSessionFromWorkos(result);
@@ -113,13 +120,20 @@ export function createWorkosBackend(options: WorkosBackendOptions): AuthBackendP
           `WorkOS session revocation is owned by WorkOS APIs outside this request-local backend port for "${sessionId}".`,
         );
       },
-      revokeSubjectSessions(_input: AuthSubjectRevocationInput): AuthSubjectRevocation {
-        // WorkOS exposes no subject-wide revocation: only per-session revokeSession after paging
-        // listSessions, which is unbounded work, and sealed access tokens stay valid until expiry.
-        throw unsupportedWorkosOperation(
-          'sessions.revokeSubjectSessions',
-          'WorkOS has no subject-wide session revocation API; per-session enumeration is not bounded.',
+      async revokeSubjectSessions(
+        input: AuthSubjectRevocationInput,
+      ): Promise<AuthSubjectRevocation> {
+        if (!options.revocations) {
+          throw unsupportedWorkosOperation(
+            'sessions.revokeSubjectSessions',
+            'Configure a durable WorkOS revocation store and its background worker.',
+          );
+        }
+        const job = await options.revocations.revokeSubject(
+          input.subject,
+          (options.now?.() ?? new Date()).toISOString(),
         );
+        return { subject: job.subject, revokedAt: job.revokedAt };
       },
     },
     crypto: {
@@ -143,8 +157,8 @@ export function createWorkosBackend(options: WorkosBackendOptions): AuthBackendP
 
 async function authenticateSealedSessionToken(
   sessionData: string,
-  options: WorkosAuthenticatorOptions,
-): Promise<WorkosSessionAuthenticationResult> {
+  options: WorkosAuthenticatorOptions<{ readonly id: string }>,
+): Promise<WorkosSessionAuthenticationResult<{ readonly id: string }>> {
   const session = options.workos.userManagement.loadSealedSession({
     sessionData,
     cookiePassword: options.cookiePassword,
@@ -171,7 +185,9 @@ function normalizeWorkosProviders(
   }));
 }
 
-function authSessionFromWorkos(session: WorkosSessionAuthenticationSuccess): AuthSession {
+function authSessionFromWorkos(
+  session: WorkosSessionAuthenticationSuccess<{ readonly id: string }>,
+): AuthSession {
   const payload = decodeJwtPayload(session.accessToken);
   const issuedAt = dateFromSecondsClaim(payload.iat) ?? new Date(0).toISOString();
   const expiresAt = dateFromSecondsClaim(payload.exp) ?? new Date(8640000000000000).toISOString();
@@ -198,7 +214,9 @@ function authSessionFromWorkos(session: WorkosSessionAuthenticationSuccess): Aut
   };
 }
 
-function collectRoles(session: WorkosSessionAuthenticationSuccess): readonly string[] {
+function collectRoles(
+  session: WorkosSessionAuthenticationSuccess<{ readonly id: string }>,
+): readonly string[] {
   const roles = new Set<string>();
   if (session.role) {
     roles.add(session.role);

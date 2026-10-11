@@ -1,4 +1,4 @@
-import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
+import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { Command } from '@cliffy/command';
 
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
@@ -24,12 +24,21 @@ export function createServiceConfigCommands(dependencies: PublicCommandDependenc
     .option('--port <port:number>', 'HTTP port')
     .option('--enabled <enabled:boolean>', 'Whether the service is enabled')
     .option('--project-root <path:string>', 'Project root directory')
-    .action(async (options: { port?: number; enabled?: boolean; projectRoot?: string }, name: string) => {
-      await DEFAULT_TEMPLATE_REGISTRY.hydrate();
-      const root = await requireProjectRoot(dependencies.resolveProjectRoot, options.projectRoot);
-      const files = await setServiceConfig(generateDependencies(dependencies), root, name, options);
-      outputText(`Updated service '${name}' and regenerated ${files.length} Aspire helper files.`);
-    });
+    .action(
+      async (options: { port?: number; enabled?: boolean; projectRoot?: string }, name: string) => {
+        await DEFAULT_TEMPLATE_REGISTRY.hydrate();
+        const root = await requireProjectRoot(dependencies.resolveProjectRoot, options.projectRoot);
+        const files = await setServiceConfig(
+          generateDependencies(dependencies),
+          root,
+          name,
+          options,
+        );
+        outputText(
+          `Updated service '${name}' and regenerated ${files.length} Aspire helper files.`,
+        );
+      },
+    );
   return { ref, set };
 }
 
@@ -49,12 +58,17 @@ function referenceCommand(
         callee,
         operation,
       );
-      outputText(`${operation === 'add' ? 'Added' : 'Removed'} ${caller} -> ${callee}; regenerated ${files.length} Aspire helper files.`);
+      outputText(
+        `${
+          operation === 'add' ? 'Added' : 'Removed'
+        } ${caller} -> ${callee}; regenerated ${files.length} Aspire helper files.`,
+      );
     });
 }
 
 function generateDependencies(dependencies: PublicCommandDependencies) {
   return {
+    formatter: dependencies.serviceAddDependencies.formatter,
     fs: dependencies.fs,
     scaffolder: dependencies.scaffolder,
     templateAdapter: dependencies.templateAdapter,

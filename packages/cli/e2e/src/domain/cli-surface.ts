@@ -103,6 +103,7 @@ export const GATE = {
   GENERATED_RUNTIME_SCHEMAS: 'generated.runtime-schemas',
   GENERATED_PLUGINS_CHECK: 'generated.plugins-check',
   BEHAVIOR_PLUGINS_UNHEALTHY: 'behavior.plugins-unhealthy',
+  BEHAVIOR_OUTBOUND_WEBHOOK: 'behavior.outbound-webhook',
   GENERATED_WORKERS_REGISTRY: 'generated.workers-registry',
   GENERATED_SAGAS_REGISTRY: 'generated.sagas-registry',
   GENERATED_DENO_CHECK: 'generated.deno-check',
@@ -142,6 +143,8 @@ export const GATE = {
   RUNTIME_RESOURCE_COMMAND: 'runtime.resource-command',
   AGENT_ASPIRE_MCP_SMOKE,
   RUNTIME_HEALTH_LISTENER_UNREACHABLE: 'runtime.health.listener-unreachable',
+  RUNTIME_HEALTH_CREDENTIAL_ACCEPTED: 'runtime.health.credential-accepted',
+  RUNTIME_HEALTH_CREDENTIAL_REJECTED: 'runtime.health.credential-rejected',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
   BEHAVIOR_APP_DYNAMIC_ROUTE: 'behavior.app-dynamic-route',
   BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',
@@ -149,6 +152,8 @@ export const GATE = {
   BEHAVIOR_ISLAND_HYDRATION: 'behavior.island-hydration',
   BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
+  BEHAVIOR_BACKGROUND_CHILDREN_HEALTH: 'behavior.background-children-health',
+  BEHAVIOR_STREAMS_HEALTH: 'behavior.streams-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',
   BEHAVIOR_WORKERS_TASKS: 'behavior.workers-tasks',
   BEHAVIOR_WORKERS_SEED: 'behavior.workers-seed',
@@ -170,6 +175,7 @@ export const GATE = {
   BEHAVIOR_TRIGGERS_WEBHOOK: 'behavior.triggers-webhook',
   BEHAVIOR_TRIGGERS_EVENTS: 'behavior.triggers-events',
   BEHAVIOR_AUTH_LIVE: 'behavior.auth-live',
+  BEHAVIOR_AUTH_COOKIE_JAR: 'behavior.auth-cookie-jar',
   BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
   /**
    * Unauthenticated `GET /api/v1/auth/session` serves the designed public introspection
@@ -177,6 +183,13 @@ export const GATE = {
    * target guarded auth routes.
    */
   BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED: 'behavior.auth-session-unauthenticated',
+  BEHAVIOR_AUTH_ME_UNAUTHENTICATED: 'behavior.auth-me-unauthenticated',
+  BEHAVIOR_AUTH_SESSION_AUTHENTICATED: 'behavior.auth-session-authenticated',
+  BEHAVIOR_AUTH_SIGNOUT_UNAUTHENTICATED: 'behavior.auth-signout-unauthenticated',
+  BEHAVIOR_AUTH_RPC_UNAUTHENTICATED: 'behavior.auth-rpc-unauthenticated',
+  BEHAVIOR_SERVICE_API_UNAUTHENTICATED: 'behavior.service-api-unauthenticated',
+  BEHAVIOR_SERVICE_API_AUTHENTICATED: 'behavior.service-api-authenticated',
+  BEHAVIOR_AUTH_SIGNOUT_FOREIGN_SESSION: 'behavior.auth-signout-foreign-session',
   /**
    * @deprecated Use {@link GATE.BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED}; this key only aliases
    * the renamed gate id while suite definitions migrate. The old `behavior.auth-session` id is
@@ -187,6 +200,7 @@ export const GATE = {
   BEHAVIOR_AI_CHAT_ROUTE: 'behavior.ai-chat-route',
   BEHAVIOR_PLUGINS_HEALTH: 'behavior.plugins-health',
   BEHAVIOR_GENERATED_GUARDED_PLUGIN: 'behavior.generated-guarded-plugin',
+  BEHAVIOR_GENERATED_GUARDED_SERVICE: 'behavior.generated-guarded-service',
   BEHAVIOR_PACKAGE_BACKED_PLUGIN_DOCTOR: 'behavior.package-backed-plugin-doctor',
   DEPLOY_DENO_DEPLOY_PLAN: 'deploy.deno-deploy.plan',
   DEPLOY_COMPOSE_RESOLUTION: 'deploy.compose-resolution',
@@ -196,6 +210,7 @@ export const GATE = {
   DEPLOY_DESKTOP_WINDOWS_NATIVE: 'deploy.desktop.windows-native',
   DEPLOY_DESKTOP_DARWIN_NATIVE: 'deploy.desktop.darwin-native',
   USERLAND_INSTALL_ASSERTIONS: 'userland-install.assertions',
+  BEHAVIOR_WORKERS_CONCURRENCY: 'behavior.workers-concurrency',
   BEHAVIOR_OTEL_WEBHOOK: 'behavior.otel.webhook',
   BEHAVIOR_OTEL_STREAM_CONSUMER: 'behavior.otel.stream-consumer',
   BEHAVIOR_OTEL_TRACES: 'behavior.otel.traces',

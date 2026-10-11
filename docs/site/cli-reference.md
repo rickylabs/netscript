@@ -100,8 +100,9 @@ accepts `--dry-run`.
 | `netscript plugin install` / `netscript plugin update` / `netscript plugin remove` | Plugin dependency and host registration | Workspace glue, plugin registries, Aspire helpers | AppHost and plugin service/runtime discovery | `install --dry-run`; others no |
 | `netscript generate plugins` | Installed plugin manifests and project source | `.netscript/generated` plugin registries | Plugin host and generated imports | `--dry-run` |
 | `netscript generate runtime-schemas` | Runtime topic declarations | Runtime-config JSON Schema files | Editors, validators, runtime override tooling | `--dry-run` |
-| `netscript generate aspire` | Root `appsettings.json` | AppHost helper files and `.netscript/aspire-cli.ts` | Aspire AppHost and telemetry tasks | No |
+| `netscript generate aspire` | None; reads authored root `appsettings.json` and project config | AppHost helper files and `.netscript/aspire-cli.ts` | Aspire AppHost and telemetry tasks | `--check --format json` (read-only parity) |
 | `netscript ui:init` / `netscript ui:add` | Registry selection | Workspace-owned components, pages, islands, styles, and tokens | Fresh app and its Vite build | No |
+| `netscript ui:remove page <path>` | Unchanged ui:add page (formatting accepted) and its generated router registration | Removed page/loader/island; refreshed route manifest and routes | Fresh app and route consumers | `--dry-run` |
 | `netscript ui:update` / `netscript ui:remove` | Installed registry inventory and unmodified copied files | Updated or removed copy-source UI files | Fresh app and its Vite build | No |
 | `netscript deploy build` / target `plan` | Deployment manifest plus project entrypoints | Target deployment artifacts or an emitted plan | Target runtime or service manager | `plan` is non-deploying |
 | `netscript deploy up` / `deploy install` / lifecycle verbs | Deployment target or service-manager state | Provider/service-manager state; target-dependent local artifacts | Deployed services | Target-dependent; check `--help` |
@@ -244,6 +245,40 @@ The extended verbs — `plugin sync`, `enable` / `disable` / `setup`, `item-add`
 `plugin auth` backend/provider/session subcommands — are in the
 [command reference](/reference/cli/commands/).
 
+### App-owned browser authentication
+
+Auth installation defaults to the generated BFF topology. For an app that already owns its backend,
+session routes, and authentication bridge, set this in `appsettings.json` before installing auth or
+regenerating helpers:
+
+```json
+{
+  "NetScript": {
+    "Apps": {
+      "web": { "Auth": { "BrowserTopology": "authored" } }
+    }
+  }
+}
+```
+
+`BrowserTopology` accepts `scaffold` (the default when omitted) or `authored`. With `authored`,
+plugin installation and lifecycle reconciliation skip that app's `/auth` action route and
+service-session example routes. They neither create nor replace its browser helpers. Pure
+`netscript generate aspire` regeneration also preserves the authored files, including when they are
+absent. `netscript plugin doctor` reports the app as using an authored browser topology; this
+reports ownership, not verification of your authentication implementation.
+
+Only browser apps (`Type: "app"`, including an omitted `Type`) select browser topology. Task, Tauri,
+and desktop entries do not cause shared helpers to be created alongside an authored browser app.
+Workspaces with no browser apps retain the legacy helper generation behavior.
+
+In a multi-app workspace, browser apps using `scaffold` still receive the shared `auth/bff.ts` and
+`auth/service.ts` helpers. A scaffold-owned service policy still receives its bearer verifier and
+`auth/service.ts`; an authored service policy remains authoritative independently of the app
+setting. Switching to `authored` preserves existing generated files; remove unwanted files only
+after your own topology replaces their callers. See the
+[0.0.8 cookie migration](/identity-access/how-to/add-authentication/#008-cookie-migration).
+
 ## Database
 
 The database workflow uses Prisma with a Deno runtime, and every command below requires
@@ -278,6 +313,7 @@ consumes.
 {{ comp.apiTable({
   caption: "Code generation",
   rows: [
+    { name: "Fresh routes", type: "netscript generate routes", desc: "Rebuild .generated/manifest.ts and .generated/routes.ts from route files without a Vite build. Select with --app or an explicit app --project-root." },
     { name: "Plugin registries", type: "netscript generate plugins", desc: "Regenerate the plugin registries from project source — the post-install step." },
     { name: "Runtime config schemas", type: "netscript generate runtime-schemas", desc: "Generate JSON Schema files for runtime configuration topics." },
     { name: "Aspire helpers", type: "netscript generate aspire", desc: "Regenerate the Aspire AppHost helpers from <code>appsettings.json</code> without re-scaffolding." }
@@ -299,6 +335,7 @@ The frontend is copy-source: components are copied into your repo under
   rows: [
     { name: "Initialize the design system", type: "netscript ui:init --project-root apps/dashboard", desc: "Copy the fresh-ui components and tokens into the dashboard app." },
     { name: "Add a component", type: "netscript ui:add <item> --project-root apps/dashboard", desc: "Copy an additional registry item — you own the copied source from that point." },
+    { name: "Remove page", type: "netscript ui:remove page <path>", desc: "Validate unchanged page/loader/island output (formatting accepted), remove its router entry and rebuild derived routes. Preview with --dry-run; select --app or --project-root and --client when needed. Authored files are preserved; customized scaffolds are refused." },
     { name: "List & maintain", type: "netscript ui:list · netscript ui:update · netscript ui:remove <name>", desc: "List registry items, update only files you have not modified, or remove a copied item." }
   ]
 }) }}

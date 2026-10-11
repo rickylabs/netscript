@@ -73,7 +73,6 @@ The following entrypoints are published alongside the root export.
 | `TriggersContributionContext` | interface | Contribution context required by the triggers Aspire contribution. |
 | `TriggersDenoServiceSpec` | interface | Deno service resource spec used by the triggers Aspire contribution. |
 | `TriggersDenoBackgroundSpec` | interface | Deno background resource spec used by the triggers Aspire contribution. |
-| `TriggersHealthCheckSpec` | interface | Health check declaration emitted by the triggers Aspire contribution. |
 | `TriggersEnvSource` | type alias | Environment source reference accepted by triggers Aspire declarations. |
 
 ---

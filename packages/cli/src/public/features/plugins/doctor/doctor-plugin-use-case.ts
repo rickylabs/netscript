@@ -22,10 +22,17 @@ import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config
 import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/plugin-manifest/configured-plugin-manifest-probe.ts';
 import { resolvePluginImportSpecifier } from '../../../../kernel/application/plugin/configured-plugin-specifier.ts';
 import { getPluginServiceLookupName } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import { checkBrowserTopology } from './browser-topology-check.ts';
 import { showAuthBackend } from '../auth/auth-config.ts';
 import { resolveEffectivePluginPermissions } from '../../../../kernel/adapters/config/deploy-config/deploy-config-resolvers.ts';
 import { JsrExportMapHttpError, type JsrExportMapLoader } from './jsr-export-map-loader-port.ts';
 import type { GenerateInstalledPluginRegistries } from '../../generate/plugins/generate-installed-plugin-registries.ts';
+import type {
+  PluginHealthDeclaration,
+  PluginHealthObservation,
+  PluginHealthSummary,
+} from '@netscript/plugin/health';
+import { diagnosePluginRuntime, readPluginRuntimeDeclarations } from './plugin-runtime-health.ts';
 import { checkRuntimeRegistryDrift } from './runtime-registry-drift.ts';
 
 export const CONFIGURED_MODULE_RESOLVES_CHECK = 'configured-module-resolves';
@@ -37,7 +44,7 @@ const CONFIGURED_MODULE_EXPORTS_MANIFEST_TITLE = 'Configured module exports mani
 const SERVICE_ENTRYPOINT_RESOLVES_TITLE = 'Service entrypoint resolves';
 
 /** Health status for one plugin doctor check. */
-export type PluginDoctorCheckStatus = 'healthy' | 'warning' | 'error';
+export type PluginDoctorCheckStatus = 'healthy' | 'degraded' | 'warning' | 'error';
 
 /** One host-side plugin doctor check. */
 export interface PluginDoctorCheck {
@@ -49,6 +56,8 @@ export interface PluginDoctorCheck {
   readonly status: PluginDoctorCheckStatus;
   /** Optional diagnostic detail. */
   readonly message?: string;
+  /** Canonical runtime verdict for CLI and monitoring consumers. */
+  readonly runtimeHealth?: PluginHealthSummary;
 }
 
 /** Doctor report for one installed plugin. */
@@ -93,7 +102,7 @@ export interface PluginDoctorDependencies {
 }
 
 /** One named resource observed from a running AppHost. */
-export interface AppHostResourceState {
+export interface AppHostResourceState extends PluginHealthObservation {
   readonly name: string;
   /** Unique per-AppHost instance name (`aspire describe` `name`); DCP names containers with it. */
   readonly instanceName?: string;
@@ -113,7 +122,7 @@ export type AppHostInspection =
 
 /** Runtime observation port used by plugin doctor. */
 export interface AppHostInspector {
-  inspect(projectRoot: string): Promise<AppHostInspection>;
+  inspect(projectRoot: string, childResources?: readonly string[]): Promise<AppHostInspection>;
 }
 
 /** Run host-side health checks for configured plugins. */
@@ -132,12 +141,36 @@ export async function doctorPlugin(
   const configuredModuleChecks = await Promise.all(
     pluginSpecs.map((spec) => checkConfiguredModule(input.projectRoot, spec, dependencies)),
   );
+  const browserTopologyReport = await diagnoseBrowserTopology(input.projectRoot, dependencies.fs);
   const serviceChecks = await checkServiceEntrypoints(input.projectRoot, dependencies);
   const runtimeRegistryReport = await diagnoseRuntimeRegistries(input.projectRoot, dependencies);
+  let runtimeDeclarations: readonly PluginHealthDeclaration[] = [];
+  let runtimeDeclarationError: PluginDoctorReport | undefined;
+  let runtimeDeclarationWarnings: readonly PluginDoctorReport[] = [];
+  if (dependencies.inspectAppHost) {
+    try {
+      const discovery = await readPluginRuntimeDeclarations(input.projectRoot, dependencies.fs);
+      runtimeDeclarations = discovery.declarations;
+      runtimeDeclarationWarnings = discovery.warnings;
+    } catch (error) {
+      runtimeDeclarationError = workspaceErrorReport(
+        'runtime-health:declarations',
+        'Could not read plugin runtime declarations.',
+        error,
+      );
+    }
+  }
   const appHostSnapshot = dependencies.inspectAppHost
-    ? await inspectAppHost(input.projectRoot, dependencies.inspectAppHost)
+    ? await inspectAppHost(
+      input.projectRoot,
+      dependencies.inspectAppHost,
+      runtimeDeclarations.flatMap((entry) => entry.childResources),
+    )
     : undefined;
   const appHostReport = appHostSnapshot ? diagnoseAppHost(config, appHostSnapshot) : undefined;
+  const runtimeReports = appHostSnapshot && appHostSnapshot.status !== 'failed'
+    ? diagnosePluginRuntime(runtimeDeclarations, appHostSnapshot)
+    : [];
   const dockerReport = dependencies.inspectDockerTopology
     ? await diagnoseDockerTopology(appHostSnapshot, dependencies.inspectDockerTopology)
     : undefined;
@@ -145,7 +178,16 @@ export async function doctorPlugin(
     const serviceReport = serviceChecks.some((entry) => entry.check.status === 'error')
       ? workspaceChecksReport(serviceChecks)
       : undefined;
-    return [appHostReport, dockerReport, runtimeRegistryReport, serviceReport].filter(
+    return [
+      browserTopologyReport,
+      appHostReport,
+      dockerReport,
+      runtimeRegistryReport,
+      runtimeDeclarationError,
+      ...runtimeDeclarationWarnings,
+      ...runtimeReports,
+      serviceReport,
+    ].filter(
       isPluginDoctorReport,
     );
   }
@@ -180,12 +222,30 @@ export async function doctorPlugin(
     ? workspaceChecksReport(unmatchedServiceChecks)
     : undefined;
   return [
+    browserTopologyReport,
     appHostReport,
     dockerReport,
     runtimeRegistryReport,
+    runtimeDeclarationError,
+    ...runtimeDeclarationWarnings,
+    ...runtimeReports,
     ...reports,
     unmatchedServiceReport,
   ].filter(isPluginDoctorReport);
+}
+
+async function diagnoseBrowserTopology(
+  projectRoot: string,
+  fs: FileSystemPort,
+): Promise<PluginDoctorReport | undefined> {
+  try {
+    const checks = await checkBrowserTopology(projectRoot, fs);
+    return checks.length
+      ? { pluginName: 'workspace', status: aggregateStatus(checks), checks }
+      : undefined;
+  } catch (error) {
+    return workspaceErrorReport('browser-topology', 'Could not read browser auth topology.', error);
+  }
 }
 
 async function diagnoseRuntimeRegistries(
@@ -222,9 +282,10 @@ type AppHostObservation = AppHostInspection | {
 async function inspectAppHost(
   projectRoot: string,
   inspector: AppHostInspector,
+  childResources: readonly string[],
 ): Promise<AppHostObservation> {
   try {
-    return await inspector.inspect(projectRoot);
+    return await inspector.inspect(projectRoot, childResources);
   } catch (error) {
     return { status: 'failed', error };
   }
@@ -810,6 +871,7 @@ function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
 
 function aggregateStatus(checks: readonly PluginDoctorCheck[]): PluginDoctorCheckStatus {
   if (checks.some((check) => check.status === 'error')) return 'error';
+  if (checks.some((check) => check.status === 'degraded')) return 'degraded';
   if (checks.some((check) => check.status === 'warning')) return 'warning';
   return 'healthy';
 }

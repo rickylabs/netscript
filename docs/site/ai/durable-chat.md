@@ -124,15 +124,36 @@ Model content is also exposed as replay parts. Validate any client input before 
 seam and give the model the same prompt that is persisted. The plugin-AI scaffold
 builds its own user turn from `message.text` and ignores client transcript fields.
 
-No public API returns persisted native parts. `resolveChatSnapshot` exposes only
-reduced text and tool cards; attachments remain in the durable log. A public native
-reader remains part of #2068's follow-up scope, along with publication, a published
-consumer check and the EIS live one-SSE-per-pane confirmation.
+`resolveChatSnapshot().nativeMessages` exposes complete persisted messages, including attachments,
+tools, structured data, metadata and opaque future parts. `messages` and `renderParts` remain the
+reduced rendering projection. Seed and live share the native replay reducer: native appends become
+standard TanStack `MESSAGES_SNAPSHOT` chunks containing the complete state, while ordinary assistant
+chunks pass through. Message IDs reconcile text echoes and native batches without duplicating
+messages.
 
-Native batch tool cards appear on seed/reload but not on live subscribers.
-The upstream live reader ignores `CUSTOM netscript.chat.messages` and sees text echoes.
-The paths use the same projection with different inputs: native live replay remains
-an exception to the one-projection law. Ordinary assistant tool chunks still stream live.
+```ts
+import { createNetScriptChatConnection, resolveChatSnapshot } from '@netscript/fresh/ai';
+
+const target = { sessionId: 'chat-session' };
+const seed = await resolveChatSnapshot({ target });
+const connection = createNetScriptChatConnection({
+  target,
+  initialMessages: seed.nativeMessages,
+  initialOffset: seed.offset ?? undefined,
+});
+// Also initialize the island's TanStack message state from seed.nativeMessages.
+connection.dispose();
+```
+
+Pair the seed's native messages with its offset so the next native snapshot retains history. An
+offset alone reads only the suffix. Without an offset, the connection replays the complete stored
+log and follows live updates. Logical readers share one physical SSE; cancelling one leaves its
+peers active, cancelling the last closes SSE, and disposal cancels all reads and sends. A later
+subscription on the same connection resumes at the transport cursor with the existing replay state.
+A reader joining an active subscription receives subsequent chunks only, as before.
+
+Publication, the published-consumer proof and downstream EIS adapter removal with a live
+one-SSE-per-pane check remain release/adoption steps for #2068.
 
 {{ comp callout { type: "warning", title: "authorize is required in production — there is no default allow-all" } }}
 <code>NetScriptChatAuthorize = (request, sessionId) =&gt; boolean | Promise&lt;boolean&gt;</code>

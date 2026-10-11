@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals } from '@std/assert';
 
 Deno.test('generated Prisma bridge retains model delegates and excludes all root operations', async () => {
@@ -10,7 +11,7 @@ Deno.test('generated Prisma bridge retains model delegates and excludes all root
         'run',
         '--no-lock',
         '-A',
-        'npm:prisma@7.8.0',
+        'npm:prisma@7.10.0',
         'generate',
         '--schema',
         temp + '/schema.prisma',
@@ -33,14 +34,12 @@ Deno.test('generated Prisma bridge retains model delegates and excludes all root
       temp + '/deno.json',
       JSON.stringify({
         compilerOptions: { strict: true, isolatedDeclarations: false },
-        imports: { '@prisma/client': 'npm:@prisma/client@7.8.0' },
+        imports: { '@prisma/client': 'npm:@prisma/client@7.10.0' },
       }),
     );
-    const checked = await new Deno.Command(Deno.execPath(), {
+    const checked = await checkGeneratedFiles({
       args: ['check', '--no-lock', '--config', temp + '/deno.json', temp + '/transaction-type.ts'],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
   } finally {
     await Deno.remove(temp, { recursive: true });

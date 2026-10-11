@@ -20,7 +20,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
       author: 'NetScript',
       tags: ['lib', 'class-names', 'support'],
       files: [{ source: 'registry/lib/cn.ts', target: '@lib/cn.ts' }],
-      dependencies: ['npm:clsx@^2.1.1', 'npm:tailwind-merge@^3.5.0'],
+      dependencies: ['npm:clsx@^2.1.1', 'npm:tailwind-merge@^3.7.0'],
     },
     {
       name: 'public-types',

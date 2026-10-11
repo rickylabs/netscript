@@ -1,4 +1,7 @@
+import { checkGeneratedFiles } from '../../../../.llm/tools/testing/check-generated-files.ts';
+import { useLocalWorkspaceImports } from '../../../../packages/cli/tests/support/local-workspace-imports.ts';
 import { assert, assertStringIncludes } from '@std/assert';
+import { fromFileUrl, resolve } from '@std/path';
 
 const DOC_PATH = 'docs/site/durable-workflows/streams.md';
 
@@ -28,19 +31,27 @@ Deno.test('official native EventSource example is copy-exact and type-checks', a
   });
   const examplePath = `${temporaryRoot}/native-event-source-example.ts`;
   try {
+    const repoRoot = fromFileUrl(new URL('../../../../', import.meta.url));
+    const freshConfig = JSON.parse(await Deno.readTextFile('packages/fresh/deno.json'));
+    await Deno.writeTextFile(
+      `${temporaryRoot}/deno.json`,
+      JSON.stringify({
+        imports: freshConfig.imports,
+        compilerOptions: freshConfig.compilerOptions,
+      }),
+    );
+    await useLocalWorkspaceImports(resolve(temporaryRoot), repoRoot);
     await Deno.writeTextFile(examplePath, source);
-    const checked = await new Deno.Command(Deno.execPath(), {
+    const checked = await checkGeneratedFiles({
       args: [
         'check',
         '--no-lock',
         '--unstable-kv',
         '--config',
-        'packages/fresh/deno.json',
+        `${temporaryRoot}/deno.json`,
         examplePath,
       ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     if (!checked.success) {
       throw new Error(new TextDecoder().decode(checked.stderr));
     }

@@ -77,7 +77,7 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
 
     // Register via addExecutable with HTTP endpoint
     lines.push(
-      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
+      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...installationSecretPermissions(perms, installationSecretFile), '${entrypoint}'])`,
     );
     lines.push(`      .${renderHttpEndpointCall(entry)};`);
 
@@ -98,6 +98,12 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
       lines.push(`    // Declared environment (config \`Services.${name}\`)`);
       lines.push(...declaredEnvironmentLines);
     }
+
+    lines.push(`    if (installationSecretFile) {`);
+    lines.push(
+      `      await resource.withEnvironment('NETSCRIPT_INSTALLATION_SECRET_FILE', installationSecretFile);`,
+    );
+    lines.push(`    }`);
 
     // OTEL telemetry (full executable env set)
     lines.push(``);

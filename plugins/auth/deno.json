@@ -16,6 +16,7 @@
     "./authenticator": "./src/public/authenticator.ts"
   },
   "imports": {
+    "@std/async": "jsr:@std/async@^1",
     "@netscript/contracts": "jsr:@netscript/contracts@0.0.7",
     "@netscript/auth-better-auth": "jsr:@netscript/auth-better-auth@0.0.7",
     "@netscript/auth-kv-oauth": "jsr:@netscript/auth-kv-oauth@0.0.7",
@@ -26,7 +27,8 @@
     "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.7",
     "@netscript/service": "jsr:@netscript/service@0.0.7",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@netscript/plugin-workers-core": "jsr:@netscript/plugin-workers-core@0.0.7"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts scaffold.ts cli.ts src/public/mod.ts src/adapter/plugin.ts src/adapter/resources/mod.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts src/public/authenticator.ts",
@@ -42,6 +44,7 @@
       "README.md",
       "deno.json",
       "scaffold.plugin.json",
+      "scaffold.runtime.json",
       "package.json",
       "scaffold.ts",
       "cli.ts",

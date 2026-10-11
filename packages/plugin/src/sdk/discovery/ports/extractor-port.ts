@@ -14,8 +14,8 @@ export interface ExtractedContribution {
 export interface ContributionBuilderPattern {
   /** Direct-call factory identifier to discover in exported declarations. */
   readonly callee: string;
-  /** Registry axis assigned to contributions produced by the factory. */
-  readonly axis: string;
+  /** Registry axis assigned to contributions, or null for non-registry schema factories. */
+  readonly axis: string | null;
 }
 
 /** Port for extracting plugin contributions from walked files. */

@@ -228,7 +228,14 @@ export class SagaEngine implements SagaBusPort {
    * compensation ran against, bumps it, and carries a replay identity derived from that version,
    * so a redelivered outcome reports `committed: false` instead of being applied twice.
    */
-  async commitCompensation(outcome: SagaCompensationOutcome): Promise<SagaCompensationCommit> {
+  async commitCompensation(
+    outcome: SagaCompensationOutcome,
+    execution: Readonly<{
+      attempt?: number;
+      correlationId?: string;
+      parent?: Readonly<{ traceparent?: string; tracestate?: string }>;
+    }> = {},
+  ): Promise<SagaCompensationCommit> {
     if (!this.#running) {
       throw SagasError.validationFailed('SagaEngine must be started before committing outcomes.');
     }
@@ -247,6 +254,7 @@ export class SagaEngine implements SagaBusPort {
     }
     const loaded = await this.#store.load(outcome.instanceId);
     if (!loaded) throw SagasError.sagaInstanceNotFound(outcome.instanceId);
+    const startedAt = performance.now();
     const committed = await this.#persistTransition({
       definition,
       commands: [],
@@ -270,6 +278,37 @@ export class SagaEngine implements SagaBusPort {
         ? undefined
         : toCompensationError(outcome.error),
     });
+    // A replay or failed write has no new state transition to report. Keep compensation
+    // dispatch spans owned by the compensator; this handle records only the committed outcome.
+    if (committed) {
+      const input = {
+        sagaId: outcome.sagaId,
+        instanceId: outcome.instanceId,
+        eventType: outcome.message.type,
+        attempt: execution.attempt ?? 1,
+        durabilityTier: definition.durability,
+        correlationId: execution.correlationId,
+        correlationKey: outcome.correlationKey,
+        parent: execution.parent ?? {
+          traceparent: outcome.message.traceparent,
+          tracestate: outcome.message.tracestate,
+        },
+      };
+      const span = this.#instrumentation.startHandleSpan(input);
+      this.#instrumentation.recordStateBefore(span, {
+        [SagaAttributes.STATUS]: loaded.metadata.status,
+      });
+      this.#instrumentation.recordStateAfter(span, {
+        [SagaAttributes.STATUS]: status,
+      });
+      const telemetryOutcome = telemetryOutcomeFromStatus(status);
+      this.#instrumentation.finishSpan(span, telemetryOutcome, outcome.error);
+      this.#instrumentation.recordHandleDuration({
+        ...input,
+        outcome: telemetryOutcome,
+        durationMs: performance.now() - startedAt,
+      });
+    }
     return Object.freeze({ committed, status, version });
   }
 
@@ -682,7 +721,7 @@ function toCompensationError(error: unknown): SagaCompensationError {
 
 function telemetryOutcomeFromStatus(status: SagaInstanceStatus): SagaTelemetryOutcome {
   if (status === 'failed') return SagaTelemetryOutcomes.ERROR;
-  if (status === 'compensating') return SagaTelemetryOutcomes.COMPENSATED;
+  if (status === 'compensated') return SagaTelemetryOutcomes.COMPENSATED;
   return SagaTelemetryOutcomes.SUCCESS;
 }
 

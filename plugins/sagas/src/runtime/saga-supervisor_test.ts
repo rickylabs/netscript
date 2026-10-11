@@ -27,6 +27,13 @@ Deno.test('SagaRuntimeSupervisor default native runtime persists correlated stat
 
     assertEquals(observedCounts, [1, 2]);
     assertEquals(supervisor.snapshot(), {
+      childHealth: {
+        state: 'ready',
+        registryReady: true,
+        dependencyReady: true,
+        restartCount: 0,
+        lastFatalError: null,
+      },
       status: 'running',
       adapter: 'native',
       definitionCount: 1,

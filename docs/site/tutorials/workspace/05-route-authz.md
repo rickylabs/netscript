@@ -8,9 +8,9 @@ next: { label: "6 · Deploy", href: "/tutorials/workspace/06-deploy/" }
 
 # Protect routes with authz
 
-Your `workspace` service still answers anyone — and after chapters 3 and 4 it fronts data with real
-consequences: the member list of a specific team. The route that returns it has to do two things at
-once, and both must be typed. It has to know *which* team is being asked for — a `workspace` id in
+Your generated `workspace` service declares its demo procedures public. After chapters 3 and 4 it
+fronts data with real consequences: the member list of a specific team. The route that returns it
+has to do two things at once, and both must be typed. It has to know *which* team is being asked for — a `workspace` id in
 the path, not a string you fish out of the URL by hand — and it has to **fail closed**: no credential
 means `401` before the handler runs, and a valid credential without the right scope means `403`.
 
@@ -180,9 +180,36 @@ export const authorizer = createContractAuthorizer(WorkspaceContractV1);
   ]
 }) }}
 
-This opt-in is the migration boundary. Existing unguarded services, generated scaffolds, and
-standalone `createScopeAuthorizer()` users are unchanged. Contract enforcement starts only when the
-application passes a `createContractAuthorizer(...)` result to `.withAuthz()`.
+`defineService()` requires an explicit `auth` policy and refuses to start when it is missing. With
+auth installed, `netscript service add` wires `browserAuthenticator` and
+`createContractAuthorizer(router)` into the generated entrypoint. Procedures declaring
+`access: { authentication: 'none' }` remain public; a protected procedure declares
+`authentication: 'required'`, as our members procedure does. `/health`, `/api/openapi.json`, and
+`/api/docs` remain anonymous health and discovery endpoints in that generated posture. Public
+discovery does not grant access to protected REST or RPC handlers.
+
+The static `read` and `write` credentials above are local test fixtures. For signed-in users, retain
+the generated `browserAuthenticator` from `auth/service.ts`; it verifies the session bearer with the
+auth service. The low-level builder below installs its guards explicitly. Existing standalone
+`createScopeAuthorizer()` consumers can still use their path rules.
+
+For a deliberately public service, record the exact opt-out in its `defineService()` options:
+
+```ts
+// Explicit public policy (not a policy for the protected members service).
+import type { ServiceAuthPolicy } from '@netscript/service/auth';
+
+const auth = {
+  public: true,
+  reason: 'Public status service with no protected operations',
+} satisfies ServiceAuthPolicy;
+```
+
+Pass that value as `auth` to `defineService(router, { name: 'status', auth })`. This disables the
+service guards, so use it only when every operation may be anonymous. Find opted-out services by
+searching their source for `public: true`. See
+[explicit service posture](/reference/service/#explicit-service-posture) for the migration from
+omitted `auth`.
 
 If you are migrating older path rules, pass `createScopeAuthorizer()` as `fallback`. Contract
 metadata always wins on disagreement. The fallback is consulted only for a matched procedure with
@@ -248,6 +275,63 @@ prefix. That is why the service's <code>/health</code> endpoint kept working thr
 chapter while <code>/api/workspace/:workspace/members</code> is now guarded.
 {{ /comp }}
 
+## Step 4 — Call the guarded service with the generated typed client
+
+After chapter 2 installs auth, the generated `auth/bff.ts` supplies `createBrowserSessionClient()`
+and `browserSessionContext()`. Use them in the app's server-side request handler. The contract still
+supplies the procedure input and output types:
+
+```ts
+// apps/dashboard/routes/examples/workspace/(_lib)/workspace-session.ts
+import { WorkspaceContractV1 } from '@my-workspace/contracts';
+import { browserSessionContext, createBrowserSessionClient } from '../../../../../../auth/bff.ts';
+
+const workspaceClient = createBrowserSessionClient(WorkspaceContractV1, 'workspace', 'workspace');
+
+export async function loadWorkspaceMembers(request: Request, workspace: string) {
+  return await workspaceClient.members(
+    { workspace, limit: 20, offset: 0 },
+    { context: browserSessionContext(request) },
+  );
+}
+
+// The same response boundary used by generated server-side session routes.
+export async function handleWorkspaceMembers(request: Request, workspace: string) {
+  const headers = { 'cache-control': 'no-store' };
+  if (!browserSessionContext(request).accessToken) {
+    return Response.json({ authenticated: false }, { status: 401, headers });
+  }
+  try {
+    return Response.json(await loadWorkspaceMembers(request, workspace), { headers });
+  } catch (error) {
+    if (error instanceof Error && 'status' in error && (error.status === 401 || error.status === 403)) {
+      return Response.json({ authenticated: false }, { status: error.status, headers });
+    }
+    throw error;
+  }
+}
+```
+
+Replace `@my-workspace/contracts` with your generated workspace's contracts package name. The helper
+reads the HttpOnly session cookie on the server, then contributes its opaque bearer to the SDK call.
+The client owns discovery, RPC serialization, transport, and error handling; no custom `fetch` or
+Authorization header wrapper is needed. Never import `auth/bff.ts` into an island or return the
+bearer to the browser. Invoke `handleWorkspaceMembers()` from the current request to return only
+member data or a redacted authentication failure. It follows the generated session route's response
+boundary: no session returns HTTP `401`, an upstream authorization denial returns `403`, and an
+allowed call returns `200`. Never retain the request's credential context between users.
+
+The [SDK credential reference](/reference/sdk/#authenticated-generated-service-calls) shows the
+public contribution API that the generated helper composes. A required procedure with no bearer
+fails locally before transport; an anonymous caller that reaches the service receives `401`. A valid
+session that lacks `workspace:read` receives `403`, and an authorized session returns the typed
+members result. For the static fixture above, the equivalent SDK call uses `read` or `write` as its
+`accessToken`; these strings are not production sessions.
+
+This interactive call belongs to the app interface. Workers, sagas, and triggers run independently
+under the [installation service identity](/services-sdk/how-to/call-internal-procedures/), rather
+than depending on an open app or a user's session.
+
 ## Test it out
 
 The guard produces three distinct responses, each a real assertion in the framework's
@@ -298,8 +382,9 @@ The contract authorizer evaluates the flat scope and role strings declared in pr
 
 ## Verify your progress
 
-The three `curl` calls above are the verification. The unauthenticated call must fail closed, and the
-scoped call must succeed with a typed body:
+The three `curl` calls above verify the service guard. The Step 4 app handler verifies the same
+policy through the generated BFF client. The unauthenticated calls must fail closed, and the scoped
+calls must succeed with typed member data:
 
 - [ ] `contracts/versions/v1/workspace.contract.ts` exports `WorkspaceContractV1` with typed input,
       output, and `.meta({ access: ... })` requiring `workspace:read`.
@@ -313,6 +398,11 @@ scoped call must succeed with a typed body:
 - [ ] `Bearer write` returns `403 FORBIDDEN` (`authz.missing-scope:workspace:read`).
 - [ ] `Bearer read` returns `200` with a body carrying `workspace`, `limit`, and `subject`.
 - [ ] `GET /health` still answers without a credential.
+- [ ] The Step 4 `handleWorkspaceMembers()` app response returns `401` without a session cookie,
+      `403` with the static fixture cookie `__Host-ns_session=write`, and `200` with
+      `__Host-ns_session=read`, through the generated typed BFF client and without custom `fetch`.
+- [ ] Production calls use the current verified session's opaque bearer, rather than the static
+      fixture credentials, and return only member data to the browser.
 
 ## What you built
 

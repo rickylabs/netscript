@@ -100,6 +100,13 @@ export function providerFailure(error: unknown, providerId?: string): AuthServic
     return error;
   }
   if (error instanceof KvOAuthError) {
+    if (error.code === 'oauth_cookie_missing') {
+      return new AuthServiceHandlerError(
+        'oauth_cookie_missing',
+        'OAuth transaction cookie is missing. Restart sign-in.',
+        { providerId },
+      );
+    }
     if (error.code === 'flow_https_required' || error.code === 'cookie_https_required') {
       return new AuthServiceHandlerError('AUTH_TRANSPORT_ERROR', error.message, { providerId });
     }

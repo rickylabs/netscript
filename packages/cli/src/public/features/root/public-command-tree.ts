@@ -104,9 +104,32 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
         resolveUiAppRoot: dependencies.resolveUiAppRoot,
       }),
   });
-  for (const [id, create] of [
-    ['ui:list', createUiListCommand], ['ui:update', createUiUpdateCommand], ['ui:remove', createUiRemoveCommand],
-  ] as const) registry.register(id, { id, create: ({ dependencies }) => create({ installDependencies: dependencies.uiInstallDependencies, resolveUiAppRoot: dependencies.resolveUiAppRoot }) });
+  for (
+    const [id, create] of [
+      ['ui:list', createUiListCommand],
+      ['ui:update', createUiUpdateCommand],
+    ] as const
+  ) {
+    registry.register(id, {
+      id,
+      create: ({ dependencies }) =>
+        create({
+          installDependencies: dependencies.uiInstallDependencies,
+          resolveUiAppRoot: dependencies.resolveUiAppRoot,
+        }),
+    });
+  }
+
+  registry.register('ui:remove', {
+    id: 'ui:remove',
+    create: ({ dependencies }) =>
+      createUiRemoveCommand({
+        installDependencies: dependencies.uiInstallDependencies,
+        resolveUiAppRoot: dependencies.resolveUiAppRoot,
+        writeManifest: dependencies.generateRoutesCommandDependencies.writeManifest,
+        formatter: dependencies.uiPageFormatter,
+      }),
+  });
 
   return registry;
 }

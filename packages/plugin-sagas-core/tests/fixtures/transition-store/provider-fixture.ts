@@ -22,7 +22,7 @@ export async function runSagaProviderFixture(profile: ProviderFixtureProfile): P
           'run',
           '--no-lock',
           '-A',
-          'npm:prisma@7.8.0',
+          'npm:prisma@7.10.0',
           'generate',
           '--schema',
           temp + '/schema.prisma',
@@ -85,7 +85,7 @@ export async function runSagaProviderFixture(profile: ProviderFixtureProfile): P
         }
       }
     }
-    imports['@prisma/client'] = 'npm:@prisma/client@7.8.0';
+    imports['@prisma/client'] = 'npm:@prisma/client@7.10.0';
     await Deno.writeTextFile(
       temp + '/deno.json',
       JSON.stringify({

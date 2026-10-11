@@ -130,6 +130,83 @@ await client.echo(
 );
 ```
 
+### Authenticated generated service calls
+
+`defineService()` refuses a missing `auth` policy. When auth is installed, `netscript service add`
+generates a browser-session authenticator and `createContractAuthorizer(router)`. The contract marks
+protected procedures with `access: { authentication: 'required', authorization: ... }`; anonymous
+protected REST/RPC calls return `401`, and authenticated authorization denials return `403`.
+Procedures declaring `authentication: 'none'` stay public. The generated policy also leaves
+`/health`, `/api/openapi.json`, and `/api/docs` anonymous. Discovery is public; it does not bypass
+procedure authorization.
+
+The generated app's server-only `auth/bff.ts` composes `createBrowserSessionClient()` with
+`browserSessionContext(request)`. See the
+[workspace tutorial](/tutorials/workspace/05-route-authz/#step-4-call-the-guarded-service-with-the-generated-typed-client)
+for a request-handler call. To compose the same shipped seam directly, use
+`createBearerSdkClientContribution` from `@netscript/plugin-auth-core/sdk`:
+
+```ts
+// Authenticated workspace SDK client.
+import { WorkspaceContractV1 } from '@my-workspace/contracts';
+import { createBearerSdkClientContribution } from '@netscript/plugin-auth-core/sdk';
+import { createServiceClient } from '@netscript/sdk/client';
+
+const bearer = createBearerSdkClientContribution<{ accessToken?: string }>({
+  context: { accessToken: 'optional' },
+  resolveCredential: ({ context }) => context.accessToken,
+  responseCache: { mode: 'direct-only' },
+  unmarked: 'required',
+});
+
+const workspaceClient = createServiceClient({
+  contract: WorkspaceContractV1,
+  serviceName: 'workspace',
+  routerName: 'workspace',
+  contributions: [bearer] as const,
+});
+
+export async function listWorkspaceMembers(accessToken: string) {
+  return await workspaceClient.members(
+    { workspace: 'ws-1', limit: 20, offset: 0 },
+    { context: { accessToken } },
+  );
+}
+```
+
+`WorkspaceContractV1` is the shared contract from the tutorial; replace the workspace package name
+with your generated name. Pass the current verified session's opaque bearer to
+`listWorkspaceMembers()` on the server. Keep the literal contribution tuple and let both generic
+parameters infer: supplying only `createServiceClient<typeof WorkspaceContractV1>` selects the empty
+contribution default and loses the contributed context type.
+
+The contribution owns `authorization`, emits `Bearer`, and resolves credentials only for protected
+procedures. Public (`authentication: 'none'`) procedures receive no bearer; unmarked procedures in
+this example require one. A missing bearer for a required procedure rejects locally before any HTTP
+request, while service-side anonymous probes still return `401`. `direct-only` keeps credentialed
+responses out of shared query caches. Credentials require HTTPS outside local development unless the
+caller explicitly permits insecure transport. Do not put tokens in cache keys, URLs, browser-visible
+data, or a shared client closure; supply them per call.
+
+For a service whose entire surface is intentionally public, the exact policy opt-out is:
+
+```ts
+// Explicit public policy.
+import type { ServiceAuthPolicy } from '@netscript/service/auth';
+
+const auth = {
+  public: true,
+  reason: 'Public status service with no protected operations',
+} satisfies ServiceAuthPolicy;
+```
+
+Pass `auth` in `defineService(router, { name: 'status', auth })`. This is an explicit, greppable
+migration from omitted `auth`, and disables service guards. It is separate from declaring one public
+procedure in a guarded contract. See
+[explicit service posture](/reference/service/#explicit-service-posture). Background callers use the
+installation credential contribution below under their own service identity; they do not depend on a
+browser session.
+
 ### Internal service credential contribution
 
 `createInternalCredentialSdkClientContribution({ service, secret?, allowInsecureTransport? })` sends

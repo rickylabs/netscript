@@ -33,7 +33,18 @@ export async function probeConfiguredPluginManifest(
   } = {},
 ): Promise<ConfiguredPluginManifestProbeResult> {
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const args = ['run', '--no-check', '--allow-all', '--minimum-dependency-age=0'];
+  const args = [
+    'run',
+    '--no-check',
+    '--no-lock',
+    '--allow-read',
+    '--allow-env',
+    '--allow-net',
+    '--deny-write',
+    '--deny-run',
+    '--no-prompt',
+    '--minimum-dependency-age=0',
+  ];
   const denoConfig = join(projectRoot, 'deno.json');
   if (await fileExists(denoConfig)) args.push('--config', denoConfig);
   args.push(
@@ -75,7 +86,9 @@ async function fileExists(path: string): Promise<boolean> {
 }
 
 function readProbePayload(stdout: string): ConfiguredPluginManifestProbeResult | undefined {
-  const line = stdout.split('\n').findLast((candidate) => candidate.startsWith(PROBE_RESULT_PREFIX));
+  const line = stdout.split('\n').findLast((candidate) =>
+    candidate.startsWith(PROBE_RESULT_PREFIX)
+  );
   if (!line) return undefined;
   let value: unknown;
   try {
@@ -92,7 +105,10 @@ function readProbePayload(stdout: string): ConfiguredPluginManifestProbeResult |
     return { status: 'malformed-payload', message: 'Probe payload is not an object.' };
   }
   if (Reflect.get(value, 'schemaVersion') !== CONFIGURED_PLUGIN_PROBE_SCHEMA_VERSION) {
-    return { status: 'malformed-payload', message: 'Probe payload has an unsupported schema version.' };
+    return {
+      status: 'malformed-payload',
+      message: 'Probe payload has an unsupported schema version.',
+    };
   }
   const status = Reflect.get(value, 'status');
   if (status === 'missing') return { status };

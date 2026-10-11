@@ -172,12 +172,12 @@ Deno.test('config', async (t) => {
         Plugins: {
           'sagas-api': {
             Port: 8092,
-            Sagas: { Store: { Backend: 'prisma' } },
+            Sagas: { Store: { Backend: 'prisma' }, Projection: { Backend: 'none' } },
           },
         },
         BackgroundProcessors: {
           sagas: {
-            Sagas: { Store: { Backend: 'kv' } },
+            Sagas: { Store: { Backend: 'kv' }, Projection: { Backend: 'kv' } },
           },
         },
       },
@@ -185,6 +185,13 @@ Deno.test('config', async (t) => {
 
     assertEquals(result.NetScript.Plugins['sagas-api']?.Sagas?.Store?.Backend, 'prisma');
     assertEquals(result.NetScript.BackgroundProcessors.sagas?.Sagas?.Store?.Backend, 'kv');
+    assertEquals(result.NetScript.Plugins['sagas-api']?.Sagas?.Projection, {
+      Backend: 'none',
+    });
+    assertEquals(
+      result.NetScript.BackgroundProcessors.sagas?.Sagas?.Projection,
+      { Backend: 'kv' },
+    );
   });
 
   await t.step('AppSettingsSchema: preserves host-side Aspire parameters', () => {
@@ -535,3 +542,17 @@ async function cacheMatrixWarnings(
     await Deno.remove(tmpPath);
   }
 }
+
+Deno.test('app browser topology accepts scaffold and authored, defaults, and rejects invalid values', () => {
+  assertEquals(AppEntrySchema.parse({}).Auth, undefined);
+  assertEquals(AppEntrySchema.parse({ Auth: {} }).Auth?.BrowserTopology, 'scaffold');
+  for (const BrowserTopology of ['scaffold', 'authored']) {
+    const settings = AppSettingsSchema.parse({
+      NetScript: { Name: 'shop', Apps: { web: { Auth: { BrowserTopology } } } },
+    });
+    assertEquals(settings.NetScript.Apps.web?.Auth?.BrowserTopology, BrowserTopology);
+  }
+  for (const BrowserTopology of ['custom', '', false, null, 1]) {
+    assertEquals(AppEntrySchema.safeParse({ Auth: { BrowserTopology } }).success, false);
+  }
+});

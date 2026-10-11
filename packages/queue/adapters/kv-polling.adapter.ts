@@ -30,6 +30,7 @@ import type {
 import { QueueError, QueueErrorCode } from '../ports/mod.ts';
 import { toDeadLetterRecord } from './_envelope.ts';
 import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
+import { cancelPendingPage } from './_pending-retention.ts';
 
 export type {
   AtomicCheck,
@@ -77,6 +78,8 @@ interface QueueMessage<T> {
   claimedBy?: string;
   /** Visibility timeout (when the claim expires) */
   visibilityTimeout?: string;
+  /** Originating durable identity, independent of payload/deduplication identity. */
+  retentionId?: string;
 }
 
 /**
@@ -195,6 +198,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
   private kvPromise: Promise<WatchableKv> | null = null;
   private running = false;
   private abortController?: AbortController;
+  private recoveryStart?: KvKey;
 
   private readonly queueName: string;
   private readonly pollInterval: number;
@@ -370,6 +374,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
         priority: options?.priority ?? 50,
         headers: options?.headers ?? {},
         deduplicationId: options?.deduplicationId,
+        retentionId: options?.retentionId,
       };
 
       const key = this.pendingKey(
@@ -405,6 +410,14 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
     for (const message of messages) {
       await this.enqueue(message, options);
     }
+  }
+
+  /** Cancel at most 100 pending keys and persist progress for the next cleanup pass. */
+  async cancelPending(
+    resolve: (ids: readonly string[]) => Promise<readonly string[]>,
+    onCancelled?: (retentionId: string) => void,
+  ): Promise<boolean> {
+    return await cancelPendingPage(await this.ensureKv(), this.queueName, resolve, onCancelled);
   }
 
   /**
@@ -569,7 +582,17 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
     const now = new Date();
     const prefix: KvKey = [KvPrefixes.processing, this.queueName];
 
-    for await (const entry of kv.list<QueueMessage<T>>({ prefix })) {
+    let inspected = 0;
+    for await (
+      const entry of kv.list<QueueMessage<T>>({
+        prefix,
+        start: this.recoveryStart,
+        limit: 100,
+      })
+    ) {
+      inspected++;
+      // Processing keys have no children; extending the key makes the next start exclusive.
+      this.recoveryStart = [...entry.key, ''];
       const message = entry.value;
 
       if (message.visibilityTimeout && new Date(message.visibilityTimeout) < now) {
@@ -577,6 +600,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
         await this.nack(message, { requeue: true });
       }
     }
+    if (inspected < 100) this.recoveryStart = undefined;
   }
 
   /**

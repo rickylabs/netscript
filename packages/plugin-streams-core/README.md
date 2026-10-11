@@ -205,3 +205,10 @@ and server-side listing are not implemented.
 
 See the
 [retention how-to](https://rickylabs.github.io/netscript/durable-workflows/how-to/bound-stream-retention/).
+
+## Discovery metadata
+
+`@netscript/plugin-streams-core/discovery` exports immutable `NETSCRIPT_CONTRIBUTION_BUILDERS`
+patterns for the plugin SDK `additionalBuilders` option. `defineStreamSchema` → excluded (no
+independent contribution id). The CLI composes first-party metadata before walking the project,
+independently of plugin update order.

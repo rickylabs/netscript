@@ -88,6 +88,11 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
     message: string;
     data: z.ZodType<{ providerId?: string; reason: string }>;
   };
+  oauth_cookie_missing: {
+    status: number;
+    message: string;
+    data: z.ZodType<{ providerId?: string; reason: string }>;
+  };
   VALIDATION_ERROR: { status: number; message: string; data: typeof validationErrorDataSchema };
 }> = {
   UNAUTHORIZED: {
@@ -117,6 +122,11 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
       providerId: z.string().optional(),
       reason: z.string(),
     }),
+  },
+  oauth_cookie_missing: {
+    status: 502,
+    message: 'OAuth transaction cookie is missing. Restart sign-in.',
+    data: z.object({ providerId: z.string().optional(), reason: z.string() }),
   },
   VALIDATION_ERROR: {
     status: 422,

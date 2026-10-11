@@ -8,6 +8,27 @@ import { cli, commandGate, denoCommand } from './gate-factory.ts';
 export function createPluginContractGates(): readonly GateDefinition[] {
   return [
     commandGate(
+      GATE.BEHAVIOR_OUTBOUND_WEBHOOK,
+      'Generate and execute webhook adoption in a disposable project copy',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        denoCommand(
+          context,
+          'run',
+          '-A',
+          join(
+            context.project.repoRoot,
+            'packages/cli/e2e/fixtures/outbound-webhook/run-adoption.ts',
+          ),
+          context.project.projectRoot,
+        ),
+      (context) => context.project.repoRoot,
+      'capture',
+      'The bounded generated job must preserve signing, identity, endpoint configuration and durable exhaustion.',
+      undefined,
+      120_000,
+    ),
+    commandGate(
       GATE.SCAFFOLD_PLUGIN_AI_APPSETTINGS,
       'Reject synthesized service configuration for the AI plugin',
       GATE_PHASE.SCAFFOLD,

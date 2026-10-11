@@ -260,6 +260,8 @@ function findListenerResource(
   const resources = isRecord(topology) && Array.isArray(topology.resources)
     ? topology.resources
     : [];
+  // A whole-AppHost snapshot also contains postgres-cli and postgres-password.
+  // Their prefix is not the server's identity, regardless of snapshot order.
   return resources.find((candidate): candidate is Readonly<Record<string, unknown>> =>
     isRecord(candidate) && resourceMatches(candidate, resourceName)
   );
@@ -345,14 +347,13 @@ export function resourceMatches(
   resource: Readonly<Record<string, unknown>>,
   expected: string,
 ): boolean {
-  for (const key of ['displayName', 'name', 'resourceName']) {
+  for (const key of ['displayName', 'resourceName', 'name']) {
     const candidate = resource[key];
     if (
       typeof candidate === 'string' &&
-      (candidate.toLowerCase() === expected.toLowerCase() ||
-        candidate.toLowerCase().startsWith(`${expected.toLowerCase()}-`))
+      candidate.length > 0
     ) {
-      return true;
+      return candidate.toLowerCase() === expected.toLowerCase();
     }
   }
   return false;

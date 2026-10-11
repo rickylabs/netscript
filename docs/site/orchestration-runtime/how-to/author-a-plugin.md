@@ -215,7 +215,7 @@ your `provider.kind`:
     { name: "worker", type: "defineJobHandler", desc: "A job: defineJobHandler(async (ctx) => …) + createSuccessResult/createFailureResult; id via Object.assign(handler, { id }). Lives in jobs/." },
     { name: "saga", type: "defineSaga(id)…build()", desc: "Fluent builder: .durability('t1').state<S>({…}).on<Type,Payload>(type, fn).build(); effects via sagaComplete({…}). Durable store is kv | prisma." },
     { name: "trigger", type: "defineWebhook", desc: "defineWebhook(handler, { id, path, verifier, tags }); handler returns enqueueJob(jobRef, { payload, priority })[]. The service speaks a typed v1 oRPC contract for trigger/event introspection and management; the webhook ingress endpoint stays a raw signature-verifying route by design. enqueueJob is live; defer throws + routes to DLQ." },
-    { name: "stream", type: "createDurableStream / defineStreamSchema", desc: "Real producer runtime via @netscript/plugin-streams-core. The @netscript/plugin-streams manifest helpers (defineStreamProducer/Consumer) fail loud — they throw StreamUnsupportedOperationError." }
+    { name: "stream", type: "createDurableStream / defineStreamSchema", desc: "Producer runtime via @netscript/plugin-streams-core; @netscript/plugin-streams carries the service manifest and typed topic definitions. Consumers read HTTP/SSE." }
   ]
 }) }}
 
@@ -250,13 +250,11 @@ client) POST to that plain URL. Trigger handlers may <code>enqueueJob</code> imm
 <code>defer</code> a durable one-shot replay until a future timestamp. <strong>Streams</strong> are
 split: the <strong>producer runtime is real</strong> via
 <code>@netscript/plugin-streams-core</code>'s <code>createDurableStream</code> (served as an Aspire
-service on its assigned port and used by the workers, auth, and sagas plugins). Only the
-<code>@netscript/plugin-streams</code> manifest helpers
-(<code>defineStreamProducer</code> / <code>defineStreamConsumer</code>) are unsupported — they
-<strong>fail loud</strong>, throwing <code>StreamUnsupportedOperationError</code>, and redirect you
-to the core package. There is no in-process consumer <code>subscribe()</code>; consume over HTTP/SSE.
-See <a href="/capabilities/streams/">Streams</a> for the producer-vs-helper split.
-{{ /comp }}
+service on its assigned port and used by the workers, auth, and sagas plugins).
+<code>@netscript/plugin-streams</code> carries the manifest and typed topic definitions. Consumers
+read streams over HTTP/SSE.
+See <a href="/durable-workflows/streams/#breaking-migration-in-008">the
+0.0.8 migration</a> for the removed root producer/consumer helpers. {{ /comp }}
 
 ## Step 5 — Register the plugin in `netscript.config.ts`
 
@@ -378,9 +376,8 @@ source of truth.</li>
 <li><strong>Mismatched archetype expectations</strong> — a <code>trigger</code> plugin serves a typed
 v1 oRPC contract for introspection/management while keeping the webhook ingress endpoint a raw
 signature-verifying route, and only the <code>enqueueJob</code> action is live; a <code>stream</code>
-plugin's real runtime is the <em>producer</em> in <code>@netscript/plugin-streams-core</code>, while
-the <code>@netscript/plugin-streams</code> manifest helpers throw
-<code>StreamUnsupportedOperationError</code>. Match your plugin's behavior to its declared
+plugin's producer runtime lives in <code>@netscript/plugin-streams-core</code>, and consumers
+read HTTP/SSE. <code>@netscript/plugin-streams</code> carries its manifest and typed topic definitions. Match your plugin's behavior to its declared
 <code>provider.kind</code>.</li>
 <li><strong>Unstated dependencies</strong> — if your plugin needs another plugin wired ahead of it,
 declare it with <code>.withDependencies({...})</code> on the runtime manifest and in
@@ -429,3 +426,13 @@ Aspire graph use the same explicit resource keys.</li>
 }) }}
 
 </div>
+
+## Declare health through metadata
+
+The adapter scaffold declares `doctor.healthEndpoint` for its API diagnostics. The AppHost service
+probe uses `HealthCheckPath` in appsettings, defaulting to `/health`. Background Deno children
+with `RequiresKv: true` serve the shared `/health` contract; the generator selects them by capability,
+including renamed resources. The unused `declareHealthChecks` contribution hook and its spec types
+were removed in 0.0.8. Remove legacy overrides and imports, retain capability and health endpoint
+metadata, and see [Background child health](/orchestration-runtime/child-health/) for state meanings
+and the crash-loop threshold.

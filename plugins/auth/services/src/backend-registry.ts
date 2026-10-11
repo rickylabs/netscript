@@ -13,11 +13,13 @@ import {
 } from '@netscript/auth-kv-oauth';
 import {
   createWorkosBackend,
+  createWorkosRevocationStore,
   type WorkosCookieSession,
+  type WorkosRevocationClient,
   type WorkosSessionAuthenticationResult,
   type WorkosSessionRefreshResult,
 } from '@netscript/auth-workos';
-import { MemoryKvAdapter, type WatchableKv } from '@netscript/kv';
+import { getKv, MemoryKvAdapter, type WatchableKv } from '@netscript/kv';
 import { AuthConfigSchema } from '@netscript/plugin-auth-core/config';
 import {
   AuthBackendNotFoundError,
@@ -25,6 +27,11 @@ import {
   createAuthBackendRegistry,
   type ResolvedAuthBackendRegistry,
 } from '@netscript/plugin-auth-core/ports';
+import {
+  createWorkosRevocationWorker,
+  type WorkosRevocationWorker,
+  type WorkosRevocationWorkerOptions,
+} from './workos-revocation-worker.ts';
 import { resolveKvOAuthSubjectSource } from './kv-oauth-subject.ts';
 
 /** Backend names supported by the auth plugin v1 service. */
@@ -51,6 +58,16 @@ export type CreateAuthServiceBackendRegistryOptions = Readonly<{
   dbClient?: unknown;
   kv?: WatchableKv;
   fetch?: typeof fetch;
+  /** Scheduling dependencies for the service-owned WorkOS worker. */
+  workosRevocationWorkerOptions?: WorkosRevocationWorkerOptions;
+  /** Official WorkOS SDK seam, supplied by hosts or contract tests. */
+  workos?: WorkosRevocationClient & {
+    readonly userManagement: {
+      loadSealedSession(
+        options: { sessionData: string; cookiePassword: string },
+      ): WorkosSdkCookieSession;
+    };
+  };
 }>;
 
 type WorkosSdkAuthenticationFailure = Readonly<{
@@ -101,6 +118,8 @@ export type AuthServiceBackendRegistry =
   & Readonly<{
     /** Cookie name resolved from the backend's effective environment. */
     cookieName: string;
+    /** Service-owned worker for the selected WorkOS backend. */
+    background?: WorkosRevocationWorker;
   }>;
 
 /** Creates a single-active auth backend registry and its resolved cookie policy. */
@@ -123,6 +142,7 @@ export async function createAuthServiceBackendRegistry(
       activeName,
     ),
     cookieName: env.NETSCRIPT_AUTH_COOKIE_NAME,
+    background: backend.background,
   };
 }
 
@@ -145,7 +165,7 @@ export function resolveActiveBackendName(
 async function createActiveBackend(
   backendName: AuthPluginBackendName,
   options: CreateAuthServiceBackendRegistryOptions,
-): Promise<AuthBackendPort> {
+): Promise<AuthBackendPort & { readonly background?: WorkosRevocationWorker }> {
   const env = options.env ?? Deno.env.toObject();
   if (backendName === 'kv-oauth') {
     const provider = resolveKvOAuthProviderEnv(env);
@@ -188,11 +208,31 @@ async function createActiveBackend(
     });
   }
   if (backendName === 'workos') {
-    const { WorkOS } = await import('@workos-inc/node');
-    const workos = new WorkOS(requiredEnv(env, 'WORKOS_API_KEY'), {
-      clientId: requiredEnv(env, 'WORKOS_CLIENT_ID'),
+    const workos = options.workos ?? await createWorkosSdk(env);
+    const clockSkewMs = positiveMilliseconds(env.WORKOS_CLOCK_SKEW_MS, 60_000);
+    const revocations = createWorkosRevocationStore(options.kv ?? await getKv(), {
+      maxAccessTokenLifetimeMs: positiveMilliseconds(
+        env.WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS,
+        86_400_000,
+      ),
+      clockSkewMs,
     });
-    return createWorkosBackend({
+    const background = createWorkosRevocationWorker(
+      revocations,
+      workos,
+      Date.now,
+      options.workosRevocationWorkerOptions,
+    );
+    const backend = createWorkosBackend({
+      revocations: {
+        ...revocations,
+        async revokeSubject(subject, revokedAt) {
+          const job = await revocations.revokeSubject(subject, revokedAt);
+          background.wake();
+          return job;
+        },
+      },
+      cookie: { name: env.NETSCRIPT_AUTH_COOKIE_NAME },
       workos: {
         userManagement: {
           loadSealedSession: (sessionOptions) =>
@@ -201,6 +241,9 @@ async function createActiveBackend(
       },
       cookiePassword: requiredEnv(env, 'WORKOS_COOKIE_PASSWORD'),
       providers: [{ id: 'workos', displayName: 'WorkOS' }],
+    });
+    return Object.assign(backend, {
+      background,
     });
   }
 
@@ -213,6 +256,21 @@ async function createActiveBackend(
     sessionTokenSecret: requiredEnv(env, 'BETTER_AUTH_SECRET'),
     providers: [{ id: 'better-auth', displayName: 'better-auth' }],
   });
+}
+
+async function createWorkosSdk(env: Readonly<Record<string, string | undefined>>) {
+  const { WorkOS } = await import('@workos-inc/node');
+  return new WorkOS(requiredEnv(env, 'WORKOS_API_KEY'), {
+    clientId: requiredEnv(env, 'WORKOS_CLIENT_ID'),
+  });
+}
+
+function positiveMilliseconds(value: string | undefined, fallback: number): number {
+  const parsed = value === undefined ? fallback : Number(value);
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+    throw new RangeError('WorkOS lifetime and skew must be positive integer milliseconds.');
+  }
+  return parsed;
 }
 
 function createWorkosCookieSession(

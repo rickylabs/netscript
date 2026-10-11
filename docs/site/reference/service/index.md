@@ -432,9 +432,25 @@ record a public service's reason. The exact public migration is:
 +});
 ```
 
-Generated L1 service templates include a greppable public demo policy naming #1382 L2; guarded
-scaffolding and authenticated generated app calls are follow-up work. This policy requirement applies
-to the preset; lower-level `createService()` callers still compose their middleware explicitly.
+`netscript service add` uses the same BFF composition as auth installation: `browserAuthenticator`
+plus `createContractAuthorizer(router)`. `/health`, `/api/openapi.json`, `/api/docs` and
+contract-declared public demo procedures remain anonymous. A contract-protected REST or RPC
+procedure requires a bearer session (401 when absent) and a successful contract authorization
+decision (403 when denied). Authorized calls succeed. Without enabled auth, the generated entrypoint
+records a greppable public opt-out with a reason explaining how to protect it. Lifecycle commands
+reconcile scaffold-owned opt-outs; authored policies remain authoritative, and `generate aspire`
+leaves authored inputs unchanged.
+
+Generated contracts include a `session` identity probe with `authentication: 'required'`.
+That metadata describes the guarded posture and remains visible in OpenAPI/discovery even when
+auth is not installed. An explicit service-wide public opt-out skips authentication and
+authorization, including this contract requirement: anonymous `session` calls then return
+200 with `{ authenticated: false }`. The metadata alone does not install guards. Install auth
+or configure a guarded service policy to enforce it; the probe reports whether the runtime
+provided a principal.
+
+This policy requirement applies to the preset; lower-level `createService()` callers still compose
+their middleware explicitly.
 
 ```ts
 import { assertServiceAuthPolicy, type ServiceAuthPolicy } from '@netscript/service/auth';
