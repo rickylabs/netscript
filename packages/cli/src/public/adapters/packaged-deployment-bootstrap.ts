@@ -40,6 +40,10 @@ export class PackagedDeploymentBootstrap implements DeploymentBootstrapPort {
     }
     try {
       if (this.platform === 'windows') {
+        const data = join(root, '.data');
+        await Deno.mkdir(data, { recursive: true, mode: 0o700 });
+        const dataMetadata = await Deno.lstat(data);
+        if (!dataMetadata.isDirectory || dataMetadata.isSymlink) throw new Error();
         await Deno.mkdir(directory, { recursive: true, mode: 0o700 });
         const metadata = await Deno.lstat(directory);
         if (!metadata.isDirectory || metadata.isSymlink) throw new Error();

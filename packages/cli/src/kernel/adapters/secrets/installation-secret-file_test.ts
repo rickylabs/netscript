@@ -220,4 +220,5 @@ Deno.test('installation provisioning refuses a symlinked managed data directory'
     await Deno.mkdir(installation);
     await Deno.symlink(foreign, join(installation, '.data'));
     assertThrows(() => ensureInstallationSecretFile(installation));
+    assertEquals(Array.from(Deno.readDirSync(foreign)), []);
   }));

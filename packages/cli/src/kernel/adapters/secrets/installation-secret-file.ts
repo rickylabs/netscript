@@ -51,9 +51,10 @@ export function ensureInstallationSecretFile(
     }
     // Match ensureDatabasePassword: credentials travel with the git-ignored project data.
     const directory = resolve(installationRoot, '.data', 'aspire-secrets');
-    mkdirSync(directory, { recursive: true, mode: 0o700 });
+    mkdirSync(dirname(directory), { recursive: true, mode: 0o700 });
     const data = lstatSync(dirname(directory));
     if (!data.isDirectory() || data.isSymbolicLink()) throw new Error();
+    mkdirSync(directory, { recursive: true, mode: 0o700 });
     assertOwnerOnly(directory, true);
     const file = join(directory, 'installation.secret');
     try {

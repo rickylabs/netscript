@@ -96,7 +96,10 @@ export class InstallServiceDeployStep extends PipelineStep<
     const os = this.dependencies.os ?? detectServiceOs();
     const configDir = join(resolved.installDir, 'config');
     if (os === 'windows') {
-      await this.dependencies.bootstrap.prepare(resolved.installDir, serviceNames);
+      await this.dependencies.bootstrap.prepare(
+        resolved.installDir,
+        Object.keys(resolved.manifest.services),
+      );
     }
     const installed: string[] = [];
     const failed: string[] = [];
