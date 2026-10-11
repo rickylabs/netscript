@@ -15,6 +15,8 @@ export type WorkosWorkerFailure = 'delivery' | 'storage';
 export interface WorkosRevocationWorker {
   /** Consume durable jobs until stopped; storage and provider failures are supervised. */
   start(onFailure?: (stage: WorkosWorkerFailure) => Promise<void> | void): Promise<void>;
+  /** Wake admission after a durable job commit; multiple notifications coalesce. */
+  wake(): void;
   /** Abort admission and drain the worker runner. */
   stop(): Promise<void>;
 }
@@ -43,6 +45,8 @@ export function createWorkosRevocationWorker(
       return { success: true };
     },
   };
+  let wakePending = false;
+  let waiting: AbortController | undefined;
   let completion: Promise<void> | undefined;
   let onFailure: ((stage: WorkosWorkerFailure) => Promise<void> | void) | undefined;
 
@@ -55,10 +59,19 @@ export function createWorkosRevocationWorker(
   }
 
   async function pause(milliseconds: number): Promise<void> {
+    if (wakePending) {
+      wakePending = false;
+      return;
+    }
+    const pauseController = new AbortController();
+    waiting = pauseController;
     try {
-      await wait(milliseconds, controller.signal);
+      await wait(milliseconds, AbortSignal.any([controller.signal, pauseController.signal]));
     } catch {
-      // Abort cancels admission; the next loop checks the shutdown signal.
+      // Shutdown cancels admission; a postcommit notification interrupts only this wait.
+    } finally {
+      waiting = undefined;
+      wakePending = false;
     }
   }
 
@@ -106,6 +119,10 @@ export function createWorkosRevocationWorker(
   }
 
   return {
+    wake(): void {
+      wakePending = true;
+      waiting?.abort();
+    },
     start(observer): Promise<void> {
       onFailure ??= observer;
       return completion ??= consume();

@@ -29,6 +29,9 @@ await serveAuthService(
     ...registry,
     cookieName: '__Host-ns_session',
     background: {
+      wake() {
+        // This fixture holds an active delivery; it has no idle wait to interrupt.
+      },
       start() {
         started = true;
         console.log('worker-started');

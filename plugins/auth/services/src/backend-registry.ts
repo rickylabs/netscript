@@ -30,6 +30,7 @@ import {
 import {
   createWorkosRevocationWorker,
   type WorkosRevocationWorker,
+  type WorkosRevocationWorkerOptions,
 } from './workos-revocation-worker.ts';
 import { resolveKvOAuthSubjectSource } from './kv-oauth-subject.ts';
 
@@ -57,6 +58,8 @@ export type CreateAuthServiceBackendRegistryOptions = Readonly<{
   dbClient?: unknown;
   kv?: WatchableKv;
   fetch?: typeof fetch;
+  /** Scheduling dependencies for the service-owned WorkOS worker. */
+  workosRevocationWorkerOptions?: WorkosRevocationWorkerOptions;
   /** Official WorkOS SDK seam, supplied by hosts or contract tests. */
   workos?: WorkosRevocationClient & {
     readonly userManagement: {
@@ -214,8 +217,21 @@ async function createActiveBackend(
       ),
       clockSkewMs,
     });
-    const backend = createWorkosBackend({
+    const background = createWorkosRevocationWorker(
       revocations,
+      workos,
+      Date.now,
+      options.workosRevocationWorkerOptions,
+    );
+    const backend = createWorkosBackend({
+      revocations: {
+        ...revocations,
+        async revokeSubject(subject, revokedAt) {
+          const job = await revocations.revokeSubject(subject, revokedAt);
+          background.wake();
+          return job;
+        },
+      },
       cookie: { name: env.NETSCRIPT_AUTH_COOKIE_NAME },
       workos: {
         userManagement: {
@@ -227,7 +243,7 @@ async function createActiveBackend(
       providers: [{ id: 'workos', displayName: 'WorkOS' }],
     });
     return Object.assign(backend, {
-      background: createWorkosRevocationWorker(revocations, workos),
+      background,
     });
   }
 

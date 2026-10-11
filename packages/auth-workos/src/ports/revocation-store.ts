@@ -18,7 +18,7 @@ export interface WorkosRevocationJob {
   readonly revokedAt: string;
   /** Cursor of the next upstream page. */
   readonly after?: string;
-  /** Cursor for bounded repair of tombstone retention after upstream cleanup. */
+  /** Continuation marker for bounded retention repair after upstream cleanup; not a key cursor. */
   readonly tombstoneAfter?: string;
   /** Failed deliveries of the current page. */
   readonly attempt: number;
@@ -51,7 +51,7 @@ export interface WorkosRevocationStore {
     issuedAt: number | undefined,
     expiresAt?: number,
   ): Promise<boolean>;
-  /** Return at most one due job; never enumerate all jobs. */
+  /** Return one due job from a bounded due-only window, independent of list order. */
   nextDelivery(now: number): Promise<WorkosRevocationDelivery | undefined>;
   /** Persist a tombstone without expiry before ending a session upstream. */
   revokeSession(subject: string, sessionId: string, jobId: string): Promise<void>;
