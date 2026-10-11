@@ -314,6 +314,38 @@ export function createRuntimeBehaviorGates(
         ),
     ),
     commandGate(
+      GATE.BEHAVIOR_AUTH_ME_UNAUTHENTICATED,
+      'Auth me introspection serves exactly 200 { authenticated: false } without a session',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(
+          context,
+          'auth',
+          '/api/v1/auth/me',
+          AUTH_SESSION_UNAUTHENTICATED_CONTRACT,
+        ),
+    ),
+    commandGate(
+      GATE.BEHAVIOR_AUTH_SIGNOUT_UNAUTHENTICATED,
+      'Resident AppHost auth REST signout refuses anonymous requests',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(context, 'auth', '/api/v1/auth/signout', {
+          method: 'POST',
+          expectStatus: 401,
+        }),
+    ),
+    commandGate(
+      GATE.BEHAVIOR_AUTH_RPC_UNAUTHENTICATED,
+      'Resident AppHost auth RPC signout refuses anonymous requests',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(context, 'auth', '/api/rpc/v1/auth/signout', {
+          method: 'POST',
+          expectStatus: 401,
+        }),
+    ),
+    commandGate(
       GATE.BEHAVIOR_APP_HOME,
       'Generated app serves its home page',
       GATE_PHASE.BEHAVIOR,

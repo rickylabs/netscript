@@ -2,18 +2,16 @@
 export const GUARDED_SERVICE_PROBE_SOURCE: string = String.raw`
 import { assert, assertEquals } from '@std/assert';
 import { DenoKvAdapter } from '@netscript/kv';
-import { createPluginService } from '@netscript/plugin/service';
+import { checkGeneratedAuthCase, parseGeneratedAuthCase } from '__AUTH_CHECKS__';
+import createAuthService from '__AUTH_MAIN__';
 import { createAuthServiceBackendRegistry } from '__AUTH_SOURCE__/backend-registry.ts';
 import { signin } from '__AUTH_SOURCE__/routers/v1-handlers.ts';
-import { router } from '__AUTH_SOURCE__/router.ts';
-import { currentAuthRequest, withAuthRequest } from '__AUTH_SOURCE__/request-context.ts';
 import { httpExchangeInit, judgeHttpResponse, type HttpExchangeContract } from '__HTTP_CONTRACT__';
 
 await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
-let scope = 'guarded:read';
-const registry = await createAuthServiceBackendRegistry({
-  kv,
-  env: {
+let scope = 'users:read';
+let subject = 4242;
+const env = {
     NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
     NETSCRIPT_AUTH_CLIENT_ID: 'client_test',
     NETSCRIPT_AUTH_CLIENT_SECRET: 'secret_test',
@@ -25,10 +23,12 @@ const registry = await createAuthServiceBackendRegistry({
     NETSCRIPT_AUTH_USERINFO_ENDPOINT: 'https://issuer.example.test/oauth/userinfo',
     NETSCRIPT_AUTH_SUBJECT_SOURCE: 'userinfo',
     NETSCRIPT_AUTH_SUBJECT_CLAIM: 'id',
-  },
+};
+const registry = await createAuthServiceBackendRegistry({
+  kv, env,
   fetch: (input) => Promise.resolve(
     String(input instanceof Request ? input.url : input).endsWith('/oauth/userinfo')
-      ? Response.json({ id: 4242 })
+      ? Response.json({ id: subject })
       : Response.json({
         access_token: 'access_test', refresh_token: 'refresh_test', token_type: 'Bearer',
         expires_in: 3600, scope,
@@ -50,14 +50,16 @@ async function mintSession(scopes: string): Promise<string> {
   assert(completed.sessionId);
   return completed.sessionId;
 }
-const permitted = await mintSession('guarded:read');
+const permitted = await mintSession('users:read');
 const insufficient = await mintSession('other:read');
-const auth = await createPluginService(router, {
-  name: 'auth', auth: { public: true, reason: 'Native session verification fixture' },
-  middleware: [withAuthRequest],
-  context: () => ({ registry, request: currentAuthRequest() }),
-  traceContext: false,
-}).serve({ port: 0 });
+subject = 9898;
+const foreign = await mintSession('users:read');
+// Exercise the shipped auth entrypoint; the harness supplies only host infrastructure.
+const auth = await createAuthService({
+  kv, env: { ...env, PORT: '0' },
+  db: { getClient: () => Promise.resolve(undefined) },
+  contracts: {}, logger: console,
+});
 const discoveryKey = 'services__auth__http__0';
 const previousEndpoint = Deno.env.get(discoveryKey);
 const previousPort = Deno.env.get('PORT');
@@ -68,29 +70,36 @@ try {
   const { running } = await import('__SERVICE_MAIN__');
   try {
     const endpoint = 'http://127.0.0.1:' + running.addr.port;
-    const exchange = async (path: string, contract: HttpExchangeContract) => {
-      const init = httpExchangeInit(contract, AbortSignal.timeout(10_000));
-      const response = await fetch(endpoint + path, {
-        ...init,
-        ...(contract.method === 'POST' ? { body: JSON.stringify({ json: { limit: 2, offset: 0 } }) } : {}),
+    if (Deno.args.length) {
+      for (const id of Deno.args) await checkGeneratedAuthCase(parseGeneratedAuthCase(id), {
+        authUrl: 'http://127.0.0.1:' + auth.addr.port, serviceUrl: endpoint,
+        caller: permitted, denied: insufficient, foreign,
       });
-      const outcome = await judgeHttpResponse(contract, response);
-      assertEquals(outcome.kind, 'matched', 'Generated service broke HTTP contract: ' + path + ' expected ' + contract.expectStatus + ', served ' + outcome.status);
-    };
-    // Discovery and the generated demo contract remain public under the BFF posture.
-    await exchange('/api/openapi.json', { method: 'GET', expectStatus: 200 });
-    await exchange('/api/docs', { method: 'GET', expectStatus: 200 });
-    await exchange('/api/v1/guarded/health/check', { method: 'GET', expectStatus: 200 });
-    await exchange('/api/rpc/v1/guarded/list', { method: 'POST', headers: { 'content-type': 'application/json' }, expectStatus: 200 });
-    for (const [token, expectStatus] of [
-      [undefined, 401], [insufficient, 403], [permitted, 200],
-    ] as const) {
-      const headers = token ? { authorization: 'Bearer ' + token } : {};
-      await exchange('/api/guarded/private', { method: 'GET', headers, expectStatus });
-      await exchange('/api/rpc/v1/guarded/protected', { method: 'GET', headers, expectStatus });
+    } else {
+      const exchange = async (path: string, contract: HttpExchangeContract) => {
+        const init = httpExchangeInit(contract, AbortSignal.timeout(10_000));
+        const response = await fetch(endpoint + path, {
+          ...init,
+          ...(contract.method === 'POST' ? { body: JSON.stringify({ json: { limit: 2, offset: 0 } }) } : {}),
+        });
+        const outcome = await judgeHttpResponse(contract, response);
+        assertEquals(outcome.kind, 'matched', 'Generated service broke HTTP contract: ' + path + ' expected ' + contract.expectStatus + ', served ' + outcome.status);
+      };
+      // Discovery and the generated demo contract remain public under the BFF posture.
+      await exchange('/api/openapi.json', { method: 'GET', expectStatus: 200 });
+      await exchange('/api/docs', { method: 'GET', expectStatus: 200 });
+      await exchange('/api/v1/users/health/check', { method: 'GET', expectStatus: 200 });
+      await exchange('/api/rpc/v1/users/list', { method: 'POST', headers: { 'content-type': 'application/json' }, expectStatus: 200 });
+      for (const [token, expectStatus] of [
+        [undefined, 401], [insufficient, 403], [permitted, 200],
+      ] as const) {
+        const headers = token ? { authorization: 'Bearer ' + token } : {};
+        await exchange('/api/users/private', { method: 'GET', headers, expectStatus });
+        await exchange('/api/rpc/v1/users/protected', { method: 'GET', headers, expectStatus });
+      }
+      await exchange('/health', { method: 'GET', expectStatus: 200 });
+      console.info('Generated guarded service PASS: discovery/demo public200; protected REST/RPC anonymous401, denied403, permitted200; anonymous health200; no credentials emitted.');
     }
-    await exchange('/health', { method: 'GET', expectStatus: 200 });
-    console.info('Generated guarded service PASS: discovery/demo public200; protected REST/RPC anonymous401, denied403, permitted200; anonymous health200; no credentials emitted.');
   } finally {
     await running.stop();
   }

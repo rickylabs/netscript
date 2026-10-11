@@ -21,6 +21,6 @@ export function createGeneratedGuardedServiceGate(): GateDefinition {
     outputMode: 'capture',
     timeoutMs: 120_000,
     failureHint:
-      'Generated service REST/RPC and OpenAPI must return 401/403/200; health stays anonymous.',
+      'Generated protected users REST/RPC must return 401/403/200; discovery, demo and health stay public.',
   };
 }
