@@ -1,4 +1,5 @@
 import { dirname, relative, resolve } from '@std/path';
+import { cleanUiPagePath } from './page-path.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import {
   type ClientBinding,
@@ -29,7 +30,7 @@ export async function scaffoldUiPage(
   input: UiPageScaffoldInput,
   fs: FileSystemPort,
 ): Promise<UiScaffoldResult> {
-  const segment = cleanPath(input.path);
+  const segment = cleanUiPagePath(input.path);
   const routeId = cleanRouteId(input.route ?? segment.replaceAll('/', '.'));
   const dir = resolve(input.projectRoot, 'routes', segment);
   const name = pascalCase(segment.split('/').at(-1) ?? 'Page');
@@ -108,14 +109,13 @@ async function routeRegistration(
     );
   }
   const block = source.slice(start, end);
-  const exact = block.includes(
-    `createRouteReference('/${segment}', { id: '${routeId}'`,
-  );
-  if (
-    !exact &&
-    (block.includes(`'${routeId}':`) ||
-      block.includes(`createRouteReference('/${segment}'`))
-  ) {
+  const escapedRoute = routeId.replaceAll('.', '\\.');
+  const exact = new RegExp(
+    `createRouteReference\\(\\s*(['"])/${segment}\\1\\s*,\\s*\\{\\s*id\\s*:\\s*(['"])${escapedRoute}\\2\\s*[,}]`,
+  ).test(block);
+  const existingKey = new RegExp(`(?:['"]${escapedRoute}['"]|\\b${escapedRoute})\\s*:`);
+  const existingPath = new RegExp(`createRouteReference\\(\\s*(['"])/${segment}\\1\\s*[,)]`);
+  if (!exact && (existingKey.test(block) || existingPath.test(block))) {
     throw new Error(
       `Cannot register '${routeId}' in ${path}: route id or path already exists`,
     );
@@ -174,13 +174,6 @@ function signalTemplate(name: string): string {
 function specifier(from: string, target: string): string {
   const path = relative(dirname(from), target).replaceAll('\\', '/');
   return path.startsWith('.') ? path : `./${path}`;
-}
-function cleanPath(path: string): string {
-  const value = path.replace(/^\/+|\/+$/g, '');
-  if (!value || value.split('/').some((part) => !/^[\w][\w-]*$/.test(part))) {
-    throw new Error(`Invalid page path: ${path}`);
-  }
-  return value;
 }
 function cleanRouteId(id: string): string {
   if (!/^[\w][\w.-]*$/.test(id)) throw new Error(`Invalid route id: ${id}`);

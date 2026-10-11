@@ -1,4 +1,4 @@
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertMatch } from '@std/assert';
 import { activatedGuidanceConcepts } from '../src/domain/docs/guidance-result.ts';
 import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corpus.ts';
 import { ReleaseEmbeddedDocsCorpus } from '../src/infrastructure/release-embedded-docs-corpus.ts';
@@ -61,9 +61,10 @@ for (
     assert(checklist?.includes('query-loaders.ts'));
     assert(checklist?.includes('.generated/manifest.ts'));
     assert(checklist?.includes('Type-check after regeneration'));
-    assert(
-      checklist?.includes('No `ui:rename`, `route rename`, `generate routes`, or `ui:remove page`'),
-    );
-    assert(checklist?.includes('`ui:remove` handles registry items only'));
+    assert(checklist);
+    assert(checklist.includes('`netscript ui:remove page catalog --dry-run`'));
+    assertMatch(checklist, /Route renames\s+remain\s+manual\./);
+    assert(checklist.includes('`netscript generate routes`'));
+    assertMatch(checklist, /`ui:remove <name>` continues to remove copied\s+registry items\./);
   });
 }
