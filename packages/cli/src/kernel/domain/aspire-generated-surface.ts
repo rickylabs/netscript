@@ -1,7 +1,15 @@
+import {
+  GENERATED_SURFACE_VERSION,
+  type GeneratedSurfaceDrift,
+  type GeneratedSurfaceEntry,
+  type GeneratedSurfaceInput,
+  type GeneratedSurfaceOutput,
+} from './generated-surface.ts';
+
 /** Identity shared by Aspire generation and inspection. */
 export const ASPIRE_SURFACE_GENERATOR = 'public.generate.aspire';
 /** Wire contract version; digests cover UTF-8 output bytes including ownership markers. */
-export const ASPIRE_SURFACE_VERSION = 1;
+export const ASPIRE_SURFACE_VERSION = GENERATED_SURFACE_VERSION;
 /** Producer declaration stored in each generated output. */
 export const ASPIRE_SURFACE_MARKER = `// @netscript-generated ${ASPIRE_SURFACE_GENERATOR}\n`;
 /** Finite reasons why a generated surface cannot be certified. */
@@ -15,26 +23,11 @@ export const ASPIRE_DRIFT_KINDS = [
 /** Typed failure reason. */
 export type AspireDriftKind = typeof ASPIRE_DRIFT_KINDS[number];
 /** One output or authored authority in the versioned inventory. */
-export interface AspireSurfaceEntry {
-  /** Producer for outputs, authority reader for inputs. */
-  readonly generator: typeof ASPIRE_SURFACE_GENERATOR;
-  /** Normalized project-relative path. */
-  readonly path: string;
-  /** Authored authorities are never outputs. */
-  readonly ownership: 'generated' | 'authored';
-  /** SHA-256 digest prefixed with its algorithm. */
-  readonly digest: string;
-}
+export type AspireSurfaceEntry = GeneratedSurfaceEntry<typeof ASPIRE_SURFACE_GENERATOR>;
 /** Selected producer-owned output; authored authorities cannot inhabit this list. */
-export interface AspireGeneratedOutput extends AspireSurfaceEntry {
-  /** Output ownership. */
-  readonly ownership: 'generated';
-}
+export type AspireGeneratedOutput = GeneratedSurfaceOutput<typeof ASPIRE_SURFACE_GENERATOR>;
 /** Authored input authority; generator writes cannot inhabit this list. */
-export interface AspireAuthoredInput extends AspireSurfaceEntry {
-  /** Input ownership. */
-  readonly ownership: 'authored';
-}
+export type AspireAuthoredInput = GeneratedSurfaceInput<typeof ASPIRE_SURFACE_GENERATOR>;
 /** Versioned output inventory and authored input authorities. */
 export interface AspireSurfaceInventory {
   /** Inventory/report wire version. */
@@ -47,14 +40,7 @@ export interface AspireSurfaceInventory {
   readonly inputs: readonly AspireAuthoredInput[];
 }
 /** One fail-closed finding. */
-export interface AspireSurfaceDrift {
-  /** Project-relative location, or the generator id for selection failure. */
-  readonly path: string;
-  /** Machine-readable drift classification. */
-  readonly kind: AspireDriftKind;
-  /** Cause when inspection cannot certify the surface. */
-  readonly message?: string;
-}
+export type AspireSurfaceDrift = GeneratedSurfaceDrift;
 /** Typed check result, emitted even if inspection fails. */
 export interface AspireSurfaceReport extends AspireSurfaceInventory {
   /** Whether all selected outputs match their producer and bytes. */

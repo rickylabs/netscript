@@ -2,14 +2,14 @@ import { readInspectionFile, rejectInspectionLinks } from './generated-surface-r
 import { join } from '@std/path';
 import {
   ASPIRE_SURFACE_GENERATOR,
-  ASPIRE_SURFACE_MARKER,
   ASPIRE_SURFACE_VERSION,
   type AspireAuthoredInput,
   type AspireSurfaceDrift,
   type AspireSurfaceReport,
 } from '../../domain/aspire-generated-surface.ts';
 import type { GeneratedFile } from '../../templates/aspire/helpers/types.ts';
-import { aspireContentDigest, buildAspireInventory } from './aspire-surface-inventory.ts';
+import { buildAspireInventory } from './aspire-surface-inventory.ts';
+import { generatedContentDigest, inspectGeneratedOutputs } from './generated-surface-inventory.ts';
 
 const MAX_HELPER_ENTRIES = 1024;
 
@@ -41,27 +41,16 @@ export async function checkAspireSurface(
         generator: ASPIRE_SURFACE_GENERATOR,
         path,
         ownership: 'authored',
-        digest: await aspireContentDigest(bytes),
+        digest: await generatedContentDigest(bytes),
       });
     }
     const files = await render();
     const inventory = await buildAspireInventory(files);
-    const drift: AspireSurfaceDrift[] = [];
+    const drift: AspireSurfaceDrift[] = await inspectGeneratedOutputs(
+      projectRoot,
+      inventory.outputs,
+    );
     const selected = new Set(inventory.outputs.map((entry) => entry.path));
-    for (const entry of inventory.outputs) {
-      const bytes = await readInspectionFile(projectRoot, entry.path);
-      if (!bytes) {
-        drift.push({ path: entry.path, kind: 'missing' });
-        continue;
-      }
-      const marker = new TextEncoder().encode(ASPIRE_SURFACE_MARKER);
-      if (!marker.every((byte, index) => bytes[index] === byte)) {
-        drift.push({ path: entry.path, kind: 'ownership' });
-      }
-      if (await aspireContentDigest(bytes) !== entry.digest) {
-        drift.push({ path: entry.path, kind: 'bytes' });
-      }
-    }
     for (const path of await helperLeaves(projectRoot)) {
       if (!selected.has(path)) drift.push({ path, kind: 'extra' });
     }

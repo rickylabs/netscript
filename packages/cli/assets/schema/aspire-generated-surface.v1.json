@@ -37,7 +37,7 @@
           },
           "path": {
             "type": "string",
-            "pattern": "^aspire/(apphost\\.mts|\\.helpers/[^\\\\]+)$"
+            "pattern": "^([.]netscript/aspire-cli[.]ts|aspire/(apphost[.]mts|[.]helpers/[^\\\\]+))$"
           },
           "ownership": {
             "const": "generated"
