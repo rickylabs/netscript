@@ -83,6 +83,21 @@ export function resolveIdentifierOrigin(source: string, identifier: string): Ide
   return declaration.test(source) || parameter.test(source) ? 'locally-bound' : 'unresolved';
 }
 
+/** Checks an exported backend factory's explicit return type, including generic declarations. */
+export function hasExplicitFactoryReturn(
+  source: string,
+  name: string,
+  returnType: string,
+): boolean {
+  const declaration = new RegExp(
+    `export\\s+(?:async\\s+)?function\\s+${
+      escapeRegExp(name)
+    }\\s*(?:<[^()]*>\\s*)?\\([^)]*\\)\\s*:\\s*${escapeRegExp(returnType)}\\s*(?:\\{|;)`,
+    's',
+  );
+  return declaration.test(source);
+}
+
 async function main(): Promise<void> {
   const args = parseArgs(Deno.args, {
     string: ['root', 'out'],
@@ -706,13 +721,7 @@ async function main(): Promise<void> {
 
     for (const factory of AUTH_BACKEND_FACTORIES) {
       const factoryText = await readText(factory.path);
-      const declaration = new RegExp(
-        `export\\s+(?:async\\s+)?function\\s+${factory.name}\\s*\\([^)]*\\)\\s*:\\s*${
-          factory.returnType.replace(/[()<>]/g, String.raw`\$&`)
-        }`,
-        's',
-      );
-      if (!declaration.test(factoryText)) {
+      if (!hasExplicitFactoryReturn(factoryText, factory.name, factory.returnType)) {
         findings.push({
           ref: 'AS7/F-AUTH-BACKEND-FACTORY',
           level: 'FAIL',

@@ -4,6 +4,7 @@ import { Command } from '@cliffy/command';
 import { createGeneratePluginRegistriesCommand } from './plugins/generate-plugin-registries-command.ts';
 import { createGenerateRuntimeSchemasCommand } from './runtime-schemas/generate-runtime-schemas-command.ts';
 import { createGenerateAspireCommand } from './aspire/generate-aspire-command.ts';
+import { createGenerateRoutesCommand } from './routes/generate-routes-command.ts';
 import { createGenerateResourceCommand } from './resource/generate-resource-command.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
@@ -35,5 +36,6 @@ export function createGenerateCommand(
       createGenerateResourceCommand(
         dependencies.generateResourceCommandDependencies,
       ),
-    );
+    )
+    .command('routes', createGenerateRoutesCommand(dependencies.generateRoutesCommandDependencies));
 }

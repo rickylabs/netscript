@@ -101,6 +101,30 @@ export function createRuntimeBehaviorGates(
 ): readonly GateDefinition[] {
   return [
     commandGate(
+      GATE.BEHAVIOR_BACKGROUND_CHILDREN_HEALTH,
+      'Background children report registry and dependency readiness',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-run=aspire',
+        '--allow-net=localhost,127.0.0.1',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-background-children.ts`,
+        context.project.appHost,
+      ],
+    ),
+    commandGate(
+      GATE.BEHAVIOR_STREAMS_HEALTH,
+      'Streams dependency readiness',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(context, 'streams', '/health/ready', {
+          method: 'GET',
+          expectStatus: 200,
+          expectBody: { kind: 'json-equals', value: { ready: true } },
+        }),
+    ),
+    commandGate(
       GATE.BEHAVIOR_DB_STATUS_PRESERVES_APPHOST,
       'DB status preserves resident AppHost identity',
       GATE_PHASE.BEHAVIOR,

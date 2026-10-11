@@ -17,11 +17,12 @@ export function chatMessageChunks(messages: readonly unknown[]): readonly unknow
 }
 
 /** Replay native appends and ordinary chunks through one upstream reducer. */
-export function createChatMessageReplay(): {
+export function createChatMessageReplay(initialMessages: readonly unknown[] = []): {
   readonly apply: (chunk: unknown) => unknown;
   readonly messages: () => readonly unknown[];
 } {
   const processor = new StreamProcessor();
+  processor.setMessages(structuredClone(initialMessages) as UIMessage[]);
   return {
     messages: () => processor.getMessages(),
     apply(chunk) {
@@ -35,7 +36,16 @@ export function createChatMessageReplay(): {
         // Consumers speak the standard snapshot protocol, not the storage extension.
         return { type: 'MESSAGES_SNAPSHOT', messages: processor.getMessages() };
       }
+      const previousLength = processor.getMessages().length;
       processor.processChunk(chunk as StreamChunk);
+      if (record.type !== 'MESSAGES_SNAPSHOT') {
+        // StreamProcessor stamps newly synthesized messages with the reader's
+        // wall clock. That is not persisted data and changes on every reload.
+        const messages = processor.getMessages();
+        for (let index = previousLength; index < messages.length; index++) {
+          delete messages[index].createdAt;
+        }
+      }
       return chunk;
     },
   };
