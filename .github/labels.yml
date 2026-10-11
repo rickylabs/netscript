@@ -243,6 +243,9 @@
 - name: "wave:defer"
   color: "c2e0c6"
   description: "Deferred to stable or backlog"
+- name: "wave:carryover-0.0.8"
+  color: "c2e0c6"
+  description: "Carried over from 0.0.8 at the stable scope call; kept separate from native 0.0.9 work"
 
 # ── cross-cutting flags ──────────────────────────────────────────────────────
 - name: "rfc"

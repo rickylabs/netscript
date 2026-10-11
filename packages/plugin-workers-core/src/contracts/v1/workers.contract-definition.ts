@@ -576,7 +576,7 @@ export type { WorkersContractDefinition };
  *
  * Carries the real, precise oRPC contract router type — no erasure cast.
  */
-export const workersContract: WorkersContractDefinition = workersContractDefinition;
+export const workersContract: WorkersContract = workersContractDefinition;
 
 /**
  * Return the v1 workers contract narrowed to an application's literal job payload registry.
@@ -605,6 +605,6 @@ export function createWorkersContract<
  * so every `router.<route>.handler(...)` is checked for input/output/error
  * conformance. The type is the real `implement` return type — no erasure cast.
  */
-export const workersContractV1: ReturnType<typeof implement<WorkersContractDefinition>> = implement(
+export const workersContractV1: ReturnType<typeof implement<WorkersContract>> = implement(
   workersContractDefinition,
 );

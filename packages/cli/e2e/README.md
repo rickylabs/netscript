@@ -131,6 +131,23 @@ and requested PR checks should use
 
 ### Structured Aspire evidence gates
 
+Both `scaffold.runtime` and `scaffold.runtime.sqlite` include critical
+`behavior.background-children-health` and `behavior.streams-health` gates after resource
+convergence. The child probe resolves the declared HTTP endpoints for the exact logical resources
+`workers`, `sagas`, and `triggers` through Aspire, then requires `/health` to serve HTTP 200 with
+`state: ready`, `registryReady: true`, and `dependencyReady: true`. Streams must serve HTTP 200 with
+`{ "ready": true }` at its resolved `/health/ready` endpoint. API health cannot substitute for child
+health; prefix siblings such as `workers-api` or `postgres-cli` cannot satisfy a resource lookup. A
+served 503, redirect, malformed payload, or false readiness fails immediately.
+
+`tests/application/gates/background-children-health_test.ts` uses real loopback HTTP listeners and
+the shared child-health monitor/response to prove each crash-looping child fails the critical gate.
+`background-health-coverage_test.ts` checks both runtime tiers and deliberately removes the streams
+probe to prove the coverage assertion fails. These focused controls prove the detector; the full
+`scaffold.runtime --cleanup` receipt is still required to prove readiness on a clean scaffold,
+durable-work behavior, and cleanup together. The probes run under service-owned processes and
+require no phone or web session.
+
 | Gate                       | Evidence contract                                                                                                                                              |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `preflight.aspire`         | `aspire doctor --format Json --non-interactive --nologo`; warnings remain in the child receipt, while `fail` and unknown statuses fail closed                  |

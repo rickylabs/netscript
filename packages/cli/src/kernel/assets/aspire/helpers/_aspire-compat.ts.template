@@ -942,10 +942,12 @@ export function ensureGarnetToolManifest(
     manifest = { version: 1, isRoot: true, tools: {} };
   }
 
-  if (!manifest.tools['garnet-server']) {
+  const garnetTool = manifest.tools['garnet-server'];
+  if (!garnetTool || garnetTool.version !== version) {
     manifest.tools['garnet-server'] = {
+      ...garnetTool,
       version,
-      commands: ['garnet-server'],
+      commands: garnetTool?.commands ?? ['garnet-server'],
     };
     mkdirSync(configDir, { recursive: true });
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
