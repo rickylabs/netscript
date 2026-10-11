@@ -15,7 +15,8 @@
     "./runtime": "./src/runtime/mod.ts",
     "./stores": "./src/stores/mod.ts",
     "./telemetry": "./src/telemetry/mod.ts",
-    "./testing": "./src/testing/mod.ts"
+    "./testing": "./src/testing/mod.ts",
+    "./discovery": "./src/builders/discovery.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",

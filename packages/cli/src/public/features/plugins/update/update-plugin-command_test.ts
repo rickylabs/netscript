@@ -1,7 +1,10 @@
+import { workersStarterResources } from '../../../../../../../plugins/workers/src/adapter/plugin.ts';
+import { streamsStarterResources } from '../../../../../../../plugins/streams/src/adapter/plugin.ts';
+import { createContributionExtractor } from '../../../../kernel/adapters/plugin/contribution-extractor.ts';
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { walk } from '@std/fs';
 import { fromFileUrl, join, relative, resolve } from '@std/path';
-import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
+import { FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
 import { DenoProjectStage } from '../../../../kernel/adapters/runtime/file-system/deno-project-stage.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
@@ -15,7 +18,7 @@ import { resolveLocalPluginDescriptor } from '../install/install-plugin.ts';
 import { createUpdatePluginCommand } from './update-plugin-command.ts';
 import type { EmitterPort } from '@netscript/plugin/sdk';
 
-for (const factory of ['defineSaga', 'defineStreamSchema', 'defineExample']) {
+for (const factory of ['defineExample']) {
   Deno.test(`plugin update rejects undeclared ${factory} before writes and leaves every file byte-identical`, async () => {
     const fixture = await createFixture();
     try {
@@ -41,6 +44,29 @@ export const definition = ${factory}({});`,
       assertEquals(fixture.scaffoldRoots.every((path) => path !== fixture.root), true);
       for (const path of fixture.scaffoldRoots) {
         await assertRejects(() => Deno.stat(path), Deno.errors.NotFound);
+      }
+    } finally {
+      await Deno.remove(fixture.root, { recursive: true });
+    }
+  });
+}
+
+for (
+  const declaration of [
+    "export const NETSCRIPT_CONTRIBUTION_BUILDERS = [{ callee: 'defineTask', axis: 'jobs' }] as const;",
+    "export const NETSCRIPT_CONTRIBUTION_BUILDERS = [{ callee: 'defineTask', axis: 42 }] as const;",
+  ]
+) {
+  Deno.test(`plugin update keeps all bytes on invalid first-party metadata: ${declaration}`, async () => {
+    const fixture = await createFixture(new RegistryEmitter(), 'streams', {
+      'streams/plugin.ts': declaration,
+    });
+    try {
+      const before = await snapshot(fixture.root);
+      await assertRejects(() => fixture.command.parse(['streams']), TypeError);
+      assertEquals(await snapshot(fixture.root), before);
+      for (const stagedRoot of fixture.scaffoldRoots) {
+        await assertRejects(() => Deno.stat(stagedRoot), Deno.errors.NotFound);
       }
     } finally {
       await Deno.remove(fixture.root, { recursive: true });
@@ -274,14 +300,14 @@ Deno.test('plugin update preserves existing and scaffold-created external import
     );
     await Deno.writeTextFile(
       join(root, 'undeclared.ts'),
-      `import { defineSaga } from '@netscript/plugin-sagas-core';
-export const saga = defineSaga({});`,
+      `import { defineExample } from '@acme/plugin-example-core';
+export const example = defineExample({});`,
     );
     const before = await snapshot(root);
     await assertRejects(
       () => fixture.command.parse(['workers']),
       TypeError,
-      'Contribution factory "defineSaga" has no declared axis',
+      'Contribution factory "defineExample" has no declared axis',
     );
     assertEquals(await snapshot(root), before);
     await Deno.remove(join(root, 'undeclared.ts'));
@@ -322,13 +348,89 @@ export const saga = defineSaga({});`,
   }
 });
 
+for (const order of [['streams', 'workers'], ['workers', 'streams']] as const) {
+  Deno.test(`plugin update legacy workers and streams succeeds in ${order.join(' then ')} order with authored defineTask`, async () => {
+    const root = await Deno.makeTempDir();
+    try {
+      for (const [index, kind] of order.entries()) {
+        const starter = kind === 'workers' ? workersStarterResources : streamsStarterResources;
+        const control = starter.find((resource) =>
+          resource.scaffolder.name === 'control-plane-module'
+        );
+        if (!control) throw new Error('Missing control-plane scaffolder');
+        const artifact = control.scaffolder.emit({})[0];
+        if (artifact.body.kind !== 'text') throw new Error('Expected text control module');
+        const fixture = await createFixture(new RegistryEmitter(), kind, {
+          [`${kind}/plugin.ts`]: artifact.body.text,
+        }, { root, initialized: index > 0 });
+        if (index === 0) {
+          await fixtureFs.writeFile(
+            join(root, 'workers/plugin.ts'),
+            `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [{ callee: 'defineJob', axis: 'jobs' }] as const;
+export { workersPlugin } from '@netscript/plugin-workers';`,
+          );
+          await fixtureFs.writeFile(
+            join(root, 'streams/plugin.ts'),
+            `export { streamsPlugin } from '@netscript/plugin-streams';`,
+          );
+          await fixtureFs.writeFile(join(root, 'workers/scaffold.plugin.json'), '{}\n');
+          await fixtureFs.writeFile(join(root, 'streams/scaffold.plugin.json'), '{}\n');
+          for (const id of ['cli-probe', 'matrix-probe', 'managed-git']) {
+            await fixtureFs.writeFile(
+              join(root, `workers/tasks/${id}.ts`),
+              `import { defineTask } from '@netscript/plugin-workers-core/builders';
+export default defineTask('${id}').entrypoint('task.ts').build();`,
+            );
+          }
+          await fixtureFs.writeFile(
+            join(root, 'streams/document-schema.ts'),
+            `import { defineStreamSchema } from '@netscript/plugin-streams-core';
+export const documents = defineStreamSchema({});`,
+          );
+        }
+        const other = kind === 'workers' ? 'streams' : 'workers';
+        const otherControl = await Deno.readFile(join(root, `${other}/plugin.ts`));
+        const otherMetadata = await Deno.readFile(join(root, `${other}/scaffold.plugin.json`));
+        await fixture.command.parse([kind]);
+        assertEquals(await Deno.readFile(join(root, `${other}/plugin.ts`)), otherControl);
+        assertEquals(
+          await Deno.readFile(join(root, `${other}/scaffold.plugin.json`)),
+          otherMetadata,
+        );
+        const registry = await Deno.readTextFile(
+          join(root, '.netscript/generated/tasks.registry.ts'),
+        );
+        for (const id of ['cli-probe', 'matrix-probe', 'managed-git']) {
+          assertStringIncludes(registry, `workers/tasks/${id}.ts`);
+        }
+        assertStringIncludes(registry, 'String(tasks0.id)');
+        assertEquals(
+          (await snapshot(root)).some(([path]) => path.includes('schemas.registry')),
+          false,
+        );
+        for (const stagedRoot of fixture.scaffoldRoots) {
+          await assertRejects(() => Deno.stat(stagedRoot), Deno.errors.NotFound);
+        }
+      }
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  });
+}
+
+const fixtureFs = new DenoFileSystem();
+
 async function createFixture(
   emitter: EmitterPort = new RegistryEmitter(),
   kind = 'streams',
   updatedFiles: Readonly<Record<string, string>> = {
     'streams/plugin.ts': '// updated control module\n',
   },
-  fixtureOptions: { root?: string; onScaffold?: (stageRoot: string) => Promise<void> } = {},
+  fixtureOptions: {
+    root?: string;
+    onScaffold?: (stageRoot: string) => Promise<void>;
+    initialized?: boolean;
+  } = {},
 ) {
   const root = fixtureOptions.root ?? await Deno.makeTempDir();
   const fs = new DenoFileSystem();
@@ -355,27 +457,29 @@ async function createFixture(
   const messages: string[] = [];
   let scaffoldCalls = 0;
   const scaffoldRoots: string[] = [];
-  await fs.writeFile(
-    join(root, 'appsettings.json'),
-    JSON.stringify({
-      NetScript: {
-        Name: 'fixture-app',
-        Services: {},
-        Plugins: {},
-        BackgroundProcessors: {},
-      },
-    }) + '\n',
-  );
-  await fs.writeFile(join(root, 'deno.json'), '{"workspace":[],"imports":{}}\n');
-  await fs.writeFile(
-    join(root, 'netscript.config.ts'),
-    "export default { name: 'fixture-app', databases: { config: [] }, plugins: [] };\n",
-  );
-  await fs.writeFile(join(root, `${kind}/plugin.ts`), '// previously installed control module\n');
-  await fs.writeFile(
-    join(root, '.netscript/generated/existing.registry.ts'),
-    '// existing bytes\r\n',
-  );
+  if (!fixtureOptions.initialized) {
+    await fs.writeFile(
+      join(root, 'appsettings.json'),
+      JSON.stringify({
+        NetScript: {
+          Name: 'fixture-app',
+          Services: {},
+          Plugins: {},
+          BackgroundProcessors: {},
+        },
+      }) + '\n',
+    );
+    await fs.writeFile(join(root, 'deno.json'), '{"workspace":[],"imports":{}}\n');
+    await fs.writeFile(
+      join(root, 'netscript.config.ts'),
+      "export default { name: 'fixture-app', databases: { config: [] }, plugins: [] };\n",
+    );
+    await fs.writeFile(join(root, `${kind}/plugin.ts`), '// previously installed control module\n');
+    await fs.writeFile(
+      join(root, '.netscript/generated/existing.registry.ts'),
+      '// existing bytes\r\n',
+    );
+  }
   const command = createUpdatePluginCommand({
     projectStage: new DenoProjectStage(),
     resolveProjectRoot: () => Promise.resolve(root),
@@ -423,7 +527,7 @@ async function createFixture(
       resolveProjectRoot: () => Promise.resolve(root),
       generate: () => Promise.resolve([]),
       walker: new FilesystemWalker(),
-      extractor: new AstExtractor(),
+      extractor: createContributionExtractor(),
       emitter,
       fs,
     },

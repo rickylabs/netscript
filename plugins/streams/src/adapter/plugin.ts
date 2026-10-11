@@ -10,6 +10,7 @@ import {
   type ScaffoldArtifact,
   textArtifact,
 } from '@netscript/plugin/adapter';
+import { NETSCRIPT_CONTRIBUTION_BUILDERS } from '@netscript/plugin-streams-core/discovery';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   barrelScaffolder,
@@ -29,7 +30,13 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
     return [
       textArtifact(
         'streams/plugin.ts',
-        `/** Generated streams control-plane module. Storage is ephemeral by default; opt in through NetScript.Plugins.streams.Environment.STREAMS_DATA_DIR with an existing persistent directory. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n  { callee: 'defineStreamSchema', axis: null },\n] as const;\n\nexport { streamsPlugin } from '@netscript/plugin-streams';\n`,
+        `/** Generated streams control-plane module. Storage is ephemeral by default; opt in through NetScript.Plugins.streams.Environment.STREAMS_DATA_DIR with an existing persistent directory. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n${
+          NETSCRIPT_CONTRIBUTION_BUILDERS.map((builder) =>
+            `  { callee: '${builder.callee}', axis: ${
+              builder.axis === null ? 'null' : `'${builder.axis}'`
+            } },`
+          ).join('\n')
+        }\n] as const;\n\nexport { streamsPlugin } from '@netscript/plugin-streams';\n`,
       ),
     ];
   },

@@ -9,7 +9,8 @@
     "./sse": "./src/sse/mod.ts",
     "./telemetry": "./src/telemetry/mod.ts",
     "./testing": "./src/testing/mod.ts",
-    "./integration/commands": "./commands.ts"
+    "./integration/commands": "./commands.ts",
+    "./discovery": "./src/builders/discovery.ts"
   },
   "imports": {
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7",

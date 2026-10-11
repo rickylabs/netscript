@@ -209,7 +209,9 @@ const options = {
 const registries = await startWalker('.', options);
 ```
 
-Official plugins emit the same declaration during install or sync; the generic SDK contains no
+Official core packages publish factory-owned patterns at their `/discovery` subpath. The CLI
+composes these patterns through `additionalBuilders` before walking any project; install and sync
+render each plugin's control-plane declaration from the same metadata. The generic SDK contains no
 plugin-specific factory table. Published core dependencies are not walked. Additional mappings are
 snapshotted per extractor instance. Malformed identifiers, blank axes, conflicting declarations for
 a callee, and a recognizable contribution factory call without a matching declaration throw a
@@ -243,14 +245,16 @@ streams control-plane module now emits this exclusion during installation. Ident
 host and a control module is accepted; conflicting axes still fail. Tooling can also pass either
 declaration through `additionalBuilders`.
 
-A core-only saga host still supplies its own saga declaration above. Installed plugins receive their
-metadata from the update; a canary.4 streams installation acquires the schema exclusion
-automatically. `plugin update` runs installation in an isolated copy of the project, then walks that
-updated tree and resolves every registry emission before applying changes to the live project. New
-declarations and contribution files participate in the same walk. An undeclared factory, malformed
-declaration, or extraction/emission failure leaves existing files byte-identical and creates no
-installation files in the live project. The temporary tree is removed on success or failure. This
-guarantee covers discovery failures; applying files retains normal filesystem error behavior.
+The CLI supplies first-party metadata even for core-only hosts and older installed control modules.
+Single-plugin updates succeed in either order: `plugin update streams` then `plugin update workers`,
+or workers then streams. No bulk update or host workaround is required. Standalone SDK tooling still
+passes the core package patterns through `additionalBuilders` or supplies literal declarations.
+`plugin update` runs installation in an isolated copy of the project, then walks that updated tree
+and resolves every registry emission before applying changes to the live project. New declarations
+and contribution files participate in the same walk. An undeclared factory, malformed declaration,
+or extraction/emission failure leaves existing files byte-identical and creates no installation
+files in the live project. The temporary tree is removed on success or failure. This guarantee
+covers discovery failures; applying files retains normal filesystem error behavior.
 
 SDK compatibility: `ContributionBuilderPattern.axis` is now `string | null`; tooling reading this
 property must narrow `axis !== null` before using it as a string.

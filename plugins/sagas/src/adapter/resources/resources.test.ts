@@ -88,6 +88,14 @@ Deno.test('sagas install emits only userland glue under sagas', () => {
     artifactText(controlPlane!),
     "{ callee: 'defineSaga', axis: 'sagas' }",
   );
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineSignal', axis: null }",
+  );
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineQuery', axis: null }",
+  );
 });
 
 Deno.test('sagas install runtime glue registers Redis before starting the runner', () => {

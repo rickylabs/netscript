@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Publish factory-owned discovery axes and exclusions through `./discovery`.
 - Add `KvSagaSchedulerStore` at `./stores` and bind the core `SagaScheduler` to originating instance
   deadlines. Bounded background sweeps preserve open sagas, expire every scoped scheduler outcome,
   resume after restart, and avoid replay deadline renewal or concurrent-claim cancellation. A

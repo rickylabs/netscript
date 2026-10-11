@@ -21,7 +21,8 @@
     "./testing": "./src/testing/mod.ts",
     "./config": "./src/config/mod.ts",
     "./runtime": "./src/runtime/mod.ts",
-    "./integration/commands": "./commands.ts"
+    "./integration/commands": "./commands.ts",
+    "./discovery": "./src/builders/discovery.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",

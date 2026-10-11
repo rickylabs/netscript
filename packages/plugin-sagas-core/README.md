@@ -359,3 +359,11 @@ use content-hashed replay identities; unbound schedulers do not enforce originat
 retention. This core store does not archive to a database. New and legacy unscoped schedules,
 native-provider delayed entries, and terminal-family migration evidence remain acceptance scope for
 issue #2109.
+
+## Discovery metadata
+
+`@netscript/plugin-sagas-core/discovery` exports immutable `NETSCRIPT_CONTRIBUTION_BUILDERS`
+patterns for the plugin SDK `additionalBuilders` option. `defineSaga` → `sagas`, `defineSignal` →
+excluded (no independent contribution id), `defineQuery` → excluded (no independent contribution
+id). The CLI composes first-party metadata before walking the project, independently of plugin
+update order.

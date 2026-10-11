@@ -12,6 +12,7 @@ import {
   type ScaffoldArtifact,
   textArtifact,
 } from '@netscript/plugin/adapter';
+import { NETSCRIPT_CONTRIBUTION_BUILDERS } from '@netscript/plugin-sagas-core/discovery';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import { SAGAS_REGISTRY_PATH } from '../cli/registry-generator.ts';
 import {
@@ -31,7 +32,13 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
     return [
       textArtifact(
         'sagas/plugin.ts',
-        `/** Generated sagas control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n  { callee: 'defineSaga', axis: 'sagas' },\n] as const;\n\nexport { sagasPlugin } from '@netscript/plugin-sagas';\n`,
+        `/** Generated sagas control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n${
+          NETSCRIPT_CONTRIBUTION_BUILDERS.map((builder) =>
+            `  { callee: '${builder.callee}', axis: ${
+              builder.axis === null ? 'null' : `'${builder.axis}'`
+            } },`
+          ).join('\n')
+        }\n] as const;\n\nexport { sagasPlugin } from '@netscript/plugin-sagas';\n`,
       ),
     ];
   },

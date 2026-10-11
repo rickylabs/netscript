@@ -1,3 +1,4 @@
+import { createContributionExtractor } from '../../../kernel/adapters/plugin/contribution-extractor.ts';
 import { DenoProjectStage } from '../../../kernel/adapters/runtime/file-system/deno-project-stage.ts';
 import type { ProjectStagePort } from '../../../kernel/ports/project-stage-port.ts';
 import type { GenerateRoutesCommandDependencies } from '../generate/routes/generate-routes-command.ts';
@@ -7,7 +8,7 @@ import { DenoAgentInitFileSystem } from '../agent/init/agent-init-file-system.ts
 import { DenoAspireAgentInitializer } from '../../adapters/agent/deno-aspire-agent-initializer.ts';
 import { DenoAgentDocsGenerator } from '../../adapters/agent/deno-agent-docs-generator.ts';
 import { regenerateAspireHelpersWithDependencies } from '../../../kernel/adapters/service/workspace-mutator.ts';
-import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
+import { FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
 import { copy } from '@std/fs';
 import { dirname, join } from '@std/path';
 
@@ -445,7 +446,7 @@ export function createPublicCommandDependencies(
     generatePluginRegistriesCommandDependencies: {
       resolveProjectRoot,
       walker: new FilesystemWalker(),
-      extractor: new AstExtractor(),
+      extractor: createContributionExtractor(),
       emitter: new RegistryEmitter(),
       fs,
       generate: generatePluginRegistries,
