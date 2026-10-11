@@ -2,12 +2,14 @@ import { assertEquals, assertStringIncludes } from '@std/assert';
 import { DenoFileSystem } from '../../../../../src/kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { readAuthServiceName } from '../../../../../src/kernel/adapters/service/auth-policy.ts';
 import { join, resolve, toFileUrl } from '@std/path';
+import { type GeneratedAuthCase, parseGeneratedAuthCase } from './generated-auth-checks.ts';
 import { GUARDED_SERVICE_PROBE_SOURCE } from './guarded-service-probe-source.ts';
 
 /** Boot and probe the service emitted by the public service-add command. */
 export async function probeGeneratedGuardedService(
   projectPath: string,
   repoPath: string,
+  authCase?: GeneratedAuthCase,
 ): Promise<void> {
   // The runtime suite's shared project is only an existence precondition. Every
   // command below targets our own temporary project, including helper generation.
@@ -15,10 +17,12 @@ export async function probeGeneratedGuardedService(
   const scratch = await Deno.makeTempDir({ prefix: 'guarded-service-probe-' });
   try {
     const postures: string[] = [];
-    for (const authFirst of [true, false]) {
-      postures.push(await probeInScratch(scratch, resolve(repoPath), authFirst));
+    for (const authFirst of authCase ? [true] : [true, false]) {
+      postures.push(await probeInScratch(scratch, resolve(repoPath), authFirst, authCase));
     }
-    assertEquals(postures[0], postures[1], 'Auth installation order changed the service policy');
+    if (!authCase) {
+      assertEquals(postures[0], postures[1], 'Auth installation order changed the service policy');
+    }
   } finally {
     await Deno.remove(scratch, { recursive: true });
   }
@@ -28,6 +32,7 @@ async function probeInScratch(
   scratch: string,
   repoRoot: string,
   authFirst: boolean,
+  authCase?: GeneratedAuthCase,
 ): Promise<string> {
   // Distinct projects prove both public CLI orders with the real installed manifest/layout.
   const orderRoot = join(scratch, authFirst ? 'auth-first' : 'service-first');
@@ -75,7 +80,7 @@ async function probeInScratch(
       'service',
       'add',
       '--name',
-      'guarded',
+      'users',
       '--project-root',
       projectRoot,
       '--force',
@@ -89,8 +94,8 @@ async function probeInScratch(
   }
   assertEquals(await readAuthServiceName(projectRoot, new DenoFileSystem()), 'auth');
   await addProtectedProbeProcedure(projectRoot);
-  const source = join(projectRoot, 'services/guarded/src/main.ts');
-  const main = join(projectRoot, 'services/guarded/src/__auth_probe_main.ts');
+  const source = join(projectRoot, 'services/users/src/main.ts');
+  const main = join(projectRoot, 'services/users/src/__auth_probe_main.ts');
   const probe = join(projectRoot, 'guarded-service-auth-probe.ts');
   const importMap = join(projectRoot, 'guarded-service-auth-imports.json');
   const entrypoint = await Deno.readTextFile(source);
@@ -102,7 +107,7 @@ async function probeInScratch(
     'netscript.config.ts',
     'auth/service.ts',
     'auth/bff.ts',
-    'services/guarded/src/main.ts',
+    'services/users/src/main.ts',
   ];
   const before = await Promise.all(
     authored.map((path) => Deno.readTextFile(join(projectRoot, path))),
@@ -150,6 +155,7 @@ async function probeInScratch(
       GUARDED_SERVICE_PROBE_SOURCE
         .replaceAll('__AUTH_SOURCE__', toFileUrl(join(repoRoot, 'plugins/auth/services/src')).href)
         .replaceAll('__SERVICE_MAIN__', toFileUrl(main).href)
+        .replaceAll('__AUTH_CHECKS__', new URL('./generated-auth-checks.ts', import.meta.url).href)
         .replaceAll(
           '__HTTP_CONTRACT__',
           new URL('../../../domain/http-contract.ts', import.meta.url).href,
@@ -168,6 +174,7 @@ async function probeInScratch(
         '--import-map',
         importMap,
         probe,
+        ...(authCase ? [authCase] : []),
       ],
       projectRoot,
     );
@@ -187,27 +194,27 @@ async function probeInScratch(
 
 /** Add a contract-protected control without changing generated authentication options. */
 export async function addProtectedProbeProcedure(projectRoot: string): Promise<void> {
-  const contract = join(projectRoot, 'contracts/versions/v1/guarded.contract.ts');
+  const contract = join(projectRoot, 'contracts/versions/v1/users.contract.ts');
   const source = await Deno.readTextFile(contract);
-  assertStringIncludes(source, 'export const GuardedContractV1 = {');
+  assertStringIncludes(source, 'export const UsersContractV1 = {');
   await Deno.writeTextFile(
     contract,
     source.replace(
-      'export const GuardedContractV1 = {',
-      `export const GuardedContractV1 = {
-  protected: baseContract.route({ method: 'GET', path: '/guarded/private' })
-    .meta({ access: { authentication: 'required', authorization: { scopes: ['guarded:read'] } } })
+      'export const UsersContractV1 = {',
+      `export const UsersContractV1 = {
+  protected: baseContract.route({ method: 'GET', path: '/users/private' })
+    .meta({ access: { authentication: 'required', authorization: { scopes: ['users:read'] } } })
     .output(z.object({ ok: z.boolean() })),`,
     ),
   );
-  const router = join(projectRoot, 'services/guarded/src/router.ts');
+  const router = join(projectRoot, 'services/users/src/router.ts');
   const current = await Deno.readTextFile(router);
-  assertStringIncludes(current, '...createGuardedV1(application), health');
+  assertStringIncludes(current, '...createUsersV1(application), health');
   await Deno.writeTextFile(
     router,
     "import { v1 } from '@guard-probe/contracts';\n" + current.replace(
-      '...createGuardedV1(application), health',
-      '...createGuardedV1(application), health, protected: v1.guarded.protected.handler(() => ({ ok: true }))',
+      '...createUsersV1(application), health',
+      '...createUsersV1(application), health, protected: v1.users.protected.handler(() => ({ ok: true }))',
     ),
   );
 }
@@ -223,9 +230,13 @@ async function run(args: string[], cwd: string): Promise<void> {
 }
 
 if (import.meta.main) {
-  const [projectRoot, repoRoot] = Deno.args;
+  const [projectRoot, repoRoot, authCase] = Deno.args;
   if (!projectRoot || !repoRoot) {
     throw new Error('Generated project and source repository are required.');
   }
-  await probeGeneratedGuardedService(projectRoot, repoRoot);
+  await probeGeneratedGuardedService(
+    projectRoot,
+    repoRoot,
+    authCase ? parseGeneratedAuthCase(authCase) : undefined,
+  );
 }

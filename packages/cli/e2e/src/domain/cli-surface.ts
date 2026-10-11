@@ -179,6 +179,13 @@ export const GATE = {
    * target guarded auth routes.
    */
   BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED: 'behavior.auth-session-unauthenticated',
+  BEHAVIOR_AUTH_ME_UNAUTHENTICATED: 'behavior.auth-me-unauthenticated',
+  BEHAVIOR_AUTH_SESSION_AUTHENTICATED: 'behavior.auth-session-authenticated',
+  BEHAVIOR_AUTH_SIGNOUT_UNAUTHENTICATED: 'behavior.auth-signout-unauthenticated',
+  BEHAVIOR_AUTH_RPC_UNAUTHENTICATED: 'behavior.auth-rpc-unauthenticated',
+  BEHAVIOR_SERVICE_API_UNAUTHENTICATED: 'behavior.service-api-unauthenticated',
+  BEHAVIOR_SERVICE_API_AUTHENTICATED: 'behavior.service-api-authenticated',
+  BEHAVIOR_AUTH_SIGNOUT_FOREIGN_SESSION: 'behavior.auth-signout-foreign-session',
   /**
    * @deprecated Use {@link GATE.BEHAVIOR_AUTH_SESSION_UNAUTHENTICATED}; this key only aliases
    * the renamed gate id while suite definitions migrate. The old `behavior.auth-session` id is
