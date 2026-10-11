@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/check-generated-files.ts';
 /**
  * @module templates/aspire/helpers/generated-helpers-compile_test
  *
@@ -176,7 +177,7 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
       `${helpersDir}/run-tool.mts`,
     );
 
-    const output = await new Deno.Command(Deno.execPath(), {
+    const output = await checkGeneratedFiles({
       args: [
         'check',
         '--no-lock',
@@ -185,9 +186,7 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
         `${helpersDir}/db-cli-mode.mts`,
         `${helpersDir}/run-tool.mts`,
       ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     const stdout = new TextDecoder().decode(output.stdout);
     const stderr = new TextDecoder().decode(output.stderr);
 

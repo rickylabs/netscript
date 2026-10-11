@@ -57,7 +57,7 @@ async function assertCurrent(root: string) {
     ),
   );
   assertEquals(report.status, 'current');
-  assertEquals(report.outputs.length, 14);
+  assertEquals(report.outputs.length, 15);
   assertEquals(report.drift, []);
 }
 
