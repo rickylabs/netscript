@@ -6,7 +6,7 @@ import { captureDescribeFollow } from './runtime/evidence/describe-capture.ts';
 import { evaluateDescribeFollow } from './runtime/evidence/describe-follow.ts';
 import { pathContained, stopCommand } from './runtime/evidence/cleanup.ts';
 import { disableAnonymousDashboard } from './runtime/dashboard-config.ts';
-import { requireResourceProcesses, scanResourceProcesses } from './service-env/process-evidence.ts';
+import { SCAFFOLD_VERSIONS } from '../../../../../src/kernel/constants/scaffold/scaffold-versions.ts';
 import {
   type GarnetCoexistenceDriver,
   type GarnetFixtureSide,
@@ -30,6 +30,13 @@ export function pinGarnetListenPort(source: string, port: number): string {
   return source.replace(marker, `args.add('${port}')`);
 }
 
+/** Require the actual Garnet bind error at the owned port, not an unrelated startup failure. */
+export function assertGarnetBindCollision(waitCode: number, logs: string, port: number): void {
+  if (waitCode === 0 || !logs.includes(`Could not bind 127.0.0.1:${port} (AddressAlreadyInUse)`)) {
+    throw new Error('literal-port negative control did not prove a Garnet bind collision');
+  }
+}
+
 /** Cache-only projects use the shipped CLI generation path and the same runtime ownership seams. */
 export function createGarnetCoexistenceFixture(
   repoRoot: string,
@@ -42,7 +49,7 @@ export function createGarnetCoexistenceFixture(
   const helper = (side: GarnetFixtureSide) =>
     join(root(side), 'aspire', '.helpers', 'register-infrastructure.mts');
   const started = new Set<GarnetFixtureSide>();
-  const pids = new Map<GarnetFixtureSide, number>();
+  let pinnedPort: number | undefined;
   const run = async (
     command: readonly string[],
     cwd = repoRoot,
@@ -122,6 +129,22 @@ export function createGarnetCoexistenceFixture(
       config.profiles.https.environmentVariables.NETSCRIPT_CACHE_MODE = 'Executable';
       await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
       await Deno.mkdir(state(side), { recursive: true });
+      await Deno.mkdir(join(root(side), '.config'), { recursive: true });
+      await Deno.writeTextFile(
+        join(root(side), '.config', 'dotnet-tools.json'),
+        JSON.stringify({
+          version: 1,
+          isRoot: true,
+          tools: {
+            'garnet-server': {
+              version: SCAFFOLD_VERSIONS.GARNET_TOOL,
+              commands: ['garnet-server'],
+            },
+          },
+        }),
+      );
+      // Surface restore failures before startup; the shipped helper's restore is best-effort.
+      await run(['dotnet', 'tool', 'restore'], root(side));
       await run([
         'aspire',
         'restore',
@@ -164,19 +187,19 @@ export function createGarnetCoexistenceFixture(
       if (resource.healthReports?.garnet_resp?.status !== 'Healthy') {
         throw new Error('runtime.wait.garnet: real RESP health report is not Healthy');
       }
-      const processes = requireResourceProcesses(
-        await scanResourceProcesses(root(side), 'garnet'),
-        'garnet',
-        root(side),
-      );
-      const pid = resource.properties?.['executable.pid'];
-      if (!Number.isSafeInteger(pid) || !processes.some((process) => process.pid === pid)) {
-        throw new Error('Garnet PID is not proven by the owned workdir and resource identity');
+      const pid: unknown = resource.properties?.['executable.pid'];
+      if (
+        typeof pid !== 'number' || !Number.isSafeInteger(pid) || pid <= 0 ||
+        await Deno.realPath(`/proc/${pid}/cwd`) !== await Deno.realPath(root(side))
+      ) {
+        throw new Error('Garnet PID is not proven by the owned workdir and resource model');
       }
-      pids.set(side, pid);
       const argv = new TextDecoder().decode(await Deno.readFile(`/proc/${pid}/cmdline`)).split(
         '\0',
       );
+      if (!argv.includes('garnet-server') || !argv.includes('--port')) {
+        throw new Error('owned process is not the generated Garnet executable');
+      }
       const listenPort = Number(argv[argv.indexOf('--port') + 1]);
       const published = resource.urls?.find((entry: Record<string, unknown>) =>
         entry.name === 'tcp'
@@ -194,24 +217,16 @@ export function createGarnetCoexistenceFixture(
       if (!started.has(side)) return;
       if (!pathContained(appHost(side), fixtureRoot)) throw new Error('AppHost ownership lost');
       await run(stopCommand(appHost(side), false), repoRoot, 30_000);
-      const pid = pids.get(side);
-      if (pid !== undefined) {
-        // A bounded exact-PID liveness check; never signal a discovered foreign process.
-        for (let attempt = 0; attempt < 20; attempt++) {
-          try {
-            await Deno.stat(`/proc/${pid}`);
-          } catch (error) {
-            if (error instanceof Deno.errors.NotFound) break;
-            throw error;
-          }
-          if (attempt === 19) throw new Error('owned Garnet process survived scoped stop');
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
+      // Check process ownership even when startup/observation failed before a PID was captured.
+      for (let attempt = 0; attempt < 20; attempt++) {
+        if ((await ownedGarnetPids(root(side))).length === 0) break;
+        if (attempt === 19) throw new Error('owned Garnet process survived scoped stop');
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
       started.delete(side);
-      pids.delete(side);
     },
     async pinSecondListenPort(port) {
+      pinnedPort = port;
       await Deno.writeTextFile(
         helper('second'),
         pinGarnetListenPort(await Deno.readTextFile(helper('second')), port),
@@ -255,17 +270,47 @@ export function createGarnetCoexistenceFixture(
         10_000,
       );
       await Deno.writeTextFile(join(state('second'), 'literal-port-control.log'), logs);
-      if (waited.code === 0 || !/address already in use|addressinuse|EADDRINUSE/i.test(logs)) {
-        throw new Error('literal-port negative control did not prove a Garnet bind collision');
-      }
+      if (pinnedPort === undefined) throw new Error('negative control omitted owned port');
+      assertGarnetBindCollision(waited.code, logs, pinnedPort);
     },
   };
+}
+
+async function ownedGarnetPids(projectRoot: string): Promise<readonly number[]> {
+  const expected = await Deno.realPath(projectRoot);
+  const owned: number[] = [];
+  let examined = 0;
+  for await (const entry of Deno.readDir('/proc')) {
+    if (++examined > 32768) throw new Error('process scan exceeded fixture budget');
+    const pid = Number(entry.name);
+    if (!Number.isSafeInteger(pid) || pid <= 0) continue;
+    try {
+      if (await Deno.realPath(`/proc/${pid}/cwd`) !== expected) continue;
+      const argv = new TextDecoder().decode(await Deno.readFile(`/proc/${pid}/cmdline`)).split(
+        '\0',
+      );
+      if (
+        argv.includes('garnet-server') ||
+        argv.some((arg) => /(?:^|[/\\])GarnetServer(?:\.dll)?$/.test(arg))
+      ) {
+        owned.push(pid);
+      }
+    } catch (error) {
+      if (
+        !(error instanceof Deno.errors.NotFound) && !(error instanceof Deno.errors.PermissionDenied)
+      ) throw error;
+    }
+  }
+  return owned;
 }
 
 if (import.meta.main) {
   const [repoArg, receiptArg] = Deno.args;
   if (!repoArg || !receiptArg) throw new Error('requires repository root and receipt path');
   if (Deno.build.os !== 'linux') throw new Error('owned process proof requires Linux /proc');
+  if (!Deno.env.get('ASPIRE_CLI_START_TIMEOUT')) {
+    Deno.env.set('ASPIRE_CLI_START_TIMEOUT', String(CONVERGENCE_CEILING_SECONDS));
+  }
   const repoRoot = resolve(repoArg);
   const receiptPath = resolve(receiptArg);
   await Deno.mkdir(dirname(receiptPath), { recursive: true });
@@ -273,11 +318,26 @@ if (import.meta.main) {
     dir: dirname(receiptPath),
     prefix: 'garnet-coexistence-',
   });
+  const head = await new Deno.Command('git', { args: ['rev-parse', 'HEAD'], cwd: repoRoot })
+    .output();
+  if (!head.success) throw new Error('fixture could not establish Git head');
+  const headSha = new TextDecoder().decode(head.stdout).trim();
+  const startedAt = new Date().toISOString();
   await runGarnetCoexistence(
     repoRoot,
     createDefaultSuiteLeaseManager(),
     createGarnetCoexistenceFixture(repoRoot, fixtureRoot, new DenoCommandAdapter()),
-    (receipt) => Deno.writeTextFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`),
+    (receipt) =>
+      Deno.writeTextFile(
+        receiptPath,
+        `${
+          JSON.stringify(
+            { ...receipt, headSha, startedAt, completedAt: new Date().toISOString() },
+            null,
+            2,
+          )
+        }\n`,
+      ),
   );
   console.info(
     'Garnet coexistence: PASS; both RESP endpoints distinct; literal-port control rejected; owned cleanup complete',

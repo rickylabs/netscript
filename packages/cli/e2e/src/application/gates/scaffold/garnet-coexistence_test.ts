@@ -6,7 +6,7 @@ import {
   type GarnetEndpointEvidence,
   runGarnetCoexistence,
 } from './garnet-coexistence.ts';
-import { pinGarnetListenPort } from './garnet-coexistence-fixture.ts';
+import { assertGarnetBindCollision, pinGarnetListenPort } from './garnet-coexistence-fixture.ts';
 import { garnetPong } from './garnet-coexistence-resp.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../../src/kernel/application/registries/template-registry.ts';
 import { generateRegisterInfrastructure } from '../../../../../src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
@@ -242,4 +242,13 @@ Deno.test('RESP proof rejects a listener that accepts TCP but never answers PING
     listener.close();
     await serve;
   }
+});
+
+Deno.test('literal-port control accepts Garnet AddressAlreadyInUse and rejects unrelated failures', () => {
+  const logs =
+    'Unable to initialize server due to exception: Could not bind 127.0.0.1:12001 (AddressAlreadyInUse). Another process is already listening there.';
+  assertGarnetBindCollision(1, logs, 12001);
+  assertThrows(() => assertGarnetBindCollision(0, logs, 12001));
+  assertThrows(() => assertGarnetBindCollision(1, logs, 12002));
+  assertThrows(() => assertGarnetBindCollision(1, 'Run dotnet tool restore', 12001));
 });
