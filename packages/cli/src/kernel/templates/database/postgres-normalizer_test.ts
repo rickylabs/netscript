@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import { DbEngineRegistry } from '../../application/registries/db-engine-registry.ts';
@@ -150,7 +151,7 @@ for (const mode of ['local', 'jsr'] as const) {
 
 Deno.test('Postgres generated engine type-checks and runs with its generated local import map', async () => {
   await withFixture('local', async (root, database) => {
-    const check = await new Deno.Command('deno', {
+    const check = await checkGeneratedFiles({
       args: [
         'check',
         '--unstable-kv',
@@ -161,9 +162,7 @@ Deno.test('Postgres generated engine type-checks and runs with its generated loc
         'prisma.config.ts',
       ],
       cwd: database,
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(check.code, 0, new TextDecoder().decode(check.stderr));
     const engineProbe = `
 import { getPostgres } from './mod.ts';

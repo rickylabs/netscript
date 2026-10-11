@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
 import { streamsAdapterPlugin } from '../plugin.ts';
@@ -179,7 +180,7 @@ Deno.test({
           2,
         ),
       );
-      const output = await new Deno.Command(Deno.execPath(), {
+      const output = await checkGeneratedFiles({
         args: [
           'check',
           '--no-lock',
@@ -188,9 +189,7 @@ Deno.test({
           `${root}/deno.json`,
           ...files.map((file) => `${root}/${file}`),
         ],
-        stdout: 'piped',
-        stderr: 'piped',
-      }).output();
+      });
       if (output.code !== 0) {
         throw new Error(new TextDecoder().decode(output.stderr));
       }

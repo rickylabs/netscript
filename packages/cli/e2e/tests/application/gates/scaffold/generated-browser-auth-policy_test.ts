@@ -1,3 +1,5 @@
+import { checkGeneratedFiles } from '../../../../../../../.llm/tools/testing/check-generated-files.ts';
+import { useLocalWorkspaceImports } from '../../../../../tests/support/local-workspace-imports.ts';
 import { MemoryKvAdapter } from '@netscript/kv';
 import {
   createKvOAuthTestRegistry,
@@ -7,7 +9,7 @@ import {
 import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
 import { readAuthServiceName } from '../../../../../src/kernel/adapters/service/auth-policy.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { dirname, join, relative, resolve, toFileUrl } from '@std/path';
+import { dirname, fromFileUrl, join, relative, resolve, toFileUrl } from '@std/path';
 import { SCAFFOLD_APP_IMPORTS } from '../../../../../src/kernel/constants/scaffold/scaffold-app-catalog.ts';
 import type { RunningService } from '@netscript/service';
 import { DenoFileSystem } from '../../../../../src/kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -84,8 +86,15 @@ export const define = createDefine();`,
           importMode: 'local',
           force: true,
         });
-        // Inherit the repository's imports; fixture aliases are rewritten below.
+        // Preserve generated compiler settings and establish a checked fixture boundary.
+        const serviceConfig = JSON.parse(await fs.readFile(join(scaffold.serviceDir, 'deno.json')));
         await Deno.remove(join(scaffold.serviceDir, 'deno.json'));
+        const repoRoot = fromFileUrl(new URL('../../../../../../../', import.meta.url));
+        await write(
+          'deno.json',
+          JSON.stringify({ compilerOptions: serviceConfig.compilerOptions }),
+        );
+        await useLocalWorkspaceImports(resolve(root), repoRoot);
         await write(
           `${prefix}database.ts`,
           `const user = { id: 1, name: 'Demo' };
@@ -205,10 +214,27 @@ const deniedProcedure = implement(privateContract).denied.handler(() => { throw 
         const appSource = await fs.readFile(appRoutePath);
         assertStringIncludes(appSource, 'createBrowserSessionClient');
         assertEquals(appSource.includes('fetch('), false);
-        // This spliced fixture proves runtime behavior only. The inherited root config
-        // excludes .llm/tmp, so deno check here returned "No matching files found" with
-        // exit 0. service-handler-generated_test.ts checks both real scaffolds using
-        // their own configs and unmodified contract/database aliases instead.
+        if (database) {
+          await write(
+            `${prefix}client-types.ts`,
+            `import { createServiceClient } from '@netscript/sdk/client';
+  import { UsersContractV1, type UsersUserV1 } from './contract.ts';
+  const client = createServiceClient({ contract: UsersContractV1, serviceName: 'users' });
+  const user: UsersUserV1 = await client.getById({ id: 1 });
+  console.log(user.name);`,
+          );
+        }
+        const checked = await checkGeneratedFiles({
+          args: [
+            'check',
+            '--unstable-kv',
+            '--config',
+            join(root, 'deno.json'),
+            join(root, mainPath),
+            ...(database ? [join(root, prefix, 'client-types.ts')] : []),
+          ],
+        });
+        assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
         const generated: { service: RunningService } = await import(
           toFileUrl(resolve(root, mainPath)).href
         );

@@ -4,6 +4,7 @@
  * Executes the generated compatibility helper against real local Node sockets.
  */
 
+import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/check-generated-files.ts'
 import { assert, assertEquals, assertMatch } from 'jsr:@std/assert@^1'
 import { afterAll, describe, it } from 'jsr:@std/testing@^1/bdd'
 import { createServer, type Server, type Socket } from 'node:net'
@@ -124,7 +125,7 @@ afterAll(async () => {
 
 describe('generated Aspire listener readiness helpers', () => {
   it('type-checks the emitted helper in a generated workspace shape', async () => {
-    const result = await new Deno.Command(Deno.execPath(), {
+    const result = await checkGeneratedFiles({
       args: [
         'check',
         '--config',
@@ -132,9 +133,7 @@ describe('generated Aspire listener readiness helpers', () => {
         '--no-lock',
         compatPath,
       ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output()
+    })
 
     assertEquals(result.code, 0, new TextDecoder().decode(result.stderr))
   })
