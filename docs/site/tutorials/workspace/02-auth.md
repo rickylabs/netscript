@@ -2,8 +2,8 @@
 layout: layouts/base.vto
 title: Add auth and a session
 templateEngine: [vento, md]
-prev: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" }
-next: { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" }
+prev: { label: '1 · Scaffold', href: '/tutorials/workspace/01-scaffold/' }
+next: { label: '3 · Workspace data', href: '/tutorials/workspace/03-workspace-data/' }
 ---
 
 # Add auth and a session
@@ -12,7 +12,7 @@ You have a running workspace, but anyone can hit it — and for the app this tra
 is not a cosmetic gap. A team workspace exists to hold things the whole internet must not read:
 member lists, project records, the operational context a team accumulates while something is on
 fire. Before any of that data lands (chapter 3), the app needs to answer one question reliably:
-*who is this?* This chapter gives it that identity layer: you add the official `auth` plugin, choose
+_who is this?_ This chapter gives it that identity layer: you add the official `auth` plugin, choose
 an authentication **backend**, run its database migration, and verify a live **session** through the
 `auth-api` service on `:8094`. The lesson underneath the steps: **auth in NetScript is a pluggable
 backend plus a session** — you pick the backend with one environment variable, and the contract is
@@ -20,12 +20,12 @@ identical no matter which one you pick. Swapping providers later is a config cha
 you carry through every route.
 
 {{ comp.learningPath({ steps: [
-  { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
-  { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" },
-  { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" },
-  { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" },
-  { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" },
-  { label: "6 · Deploy", href: "/tutorials/workspace/06-deploy/" }
+{ label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
+{ label: "2 · Auth", href: "/tutorials/workspace/02-auth/" },
+{ label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" },
+{ label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" },
+{ label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" },
+{ label: "6 · Deploy", href: "/tutorials/workspace/06-deploy/" }
 ] }) }}
 
 ## What you will build
@@ -86,7 +86,9 @@ netscript plugin list
 
 {{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
 The <code>@netscript/plugin-auth</code> plugin composes a single active backend adapter at runtime (configured via <code>NETSCRIPT_AUTH_BACKEND</code>). By design, the NetScript runtime isolates identity provider environments to keep session verification simple and predictable, so running multiple active backends simultaneously or linking accounts across them is not supported. For this tutorial, we will configure a single provider, but in production, any provider swapping is performed at the environment level rather than through runtime routing.
+
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
+
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "Alpha package pins" } }}
@@ -103,15 +105,15 @@ The active backend is selected by the `NETSCRIPT_AUTH_BACKEND` environment varia
 that drives an interactive sign-in.
 
 {{ comp.apiTable({
-  caption: "Auth backends — capability matrix (NETSCRIPT_AUTH_BACKEND)",
-  rows: [
-    { name: "kv-oauth", type: "interactive (default)", desc: "Full OAuth/OIDC redirect flow. Real signin + callback, KV-backed sessions with refresh-on-read, signout. The only backend that implements InteractiveFlowPort. Package @netscript/auth-kv-oauth." },
-    { name: "workos", type: "non-interactive", desc: "WorkOS AuthKit sealed wos-session cookie. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-workos." },
-    { name: "better-auth", type: "non-interactive", desc: "better-auth over Prisma. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-better-auth." }
-  ]
+caption: "Auth backends — capability matrix (NETSCRIPT_AUTH_BACKEND)",
+rows: [
+{ name: "kv-oauth", type: "interactive (default)", desc: "Full OAuth/OIDC redirect flow. Real signin + callback, KV-backed sessions with refresh-on-read, signout. The only backend that implements InteractiveFlowPort. Package @netscript/auth-kv-oauth." },
+{ name: "workos", type: "non-interactive", desc: "WorkOS AuthKit sealed cookie under NETSCRIPT_AUTH_COOKIE_NAME (default __Host-ns_session). The CLI WorkOS preset explicitly selects wos-session to match AuthKit. Subject-wide logout uses a durable KV fence and background upstream cleanup. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-workos." },
+{ name: "better-auth", type: "non-interactive", desc: "better-auth over Prisma. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-better-auth." }
+]
 }) }}
 
-A team workspace needs users to *log in*, so this track uses the interactive default. Make the choice
+A team workspace needs users to _log in_, so this track uses the interactive default. Make the choice
 explicit in your environment:
 
 ```sh
@@ -191,16 +193,16 @@ that satisfies the `AuthBackendPort` seam that `@netscript/plugin-auth-core` def
 is `kv-oauth`, the optional `InteractiveFlowPort` too):
 
 {{ comp.tabbedCode({ tabs: [
-  {
-    label: "Compose the kv-oauth backend",
-    lang: "ts",
-    code: "// services/auth/src/backend.ts\nimport { createKvOAuthBackend, getRequiredEnv, providers } from '@netscript/auth-kv-oauth';\n\n// providers.google(...) is a preset that fills the OIDC endpoints for you.\nexport const backend = await createKvOAuthBackend({\n  provider: providers.google({\n    clientId: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_ID'),\n    clientSecret: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_SECRET'),\n    redirectUri: getRequiredEnv('NETSCRIPT_AUTH_REDIRECT_URI'),\n  }),\n});\n\n// backend implements AuthBackendPort AND the optional InteractiveFlowPort,\n// so the auth-api signin + callback endpoints are live on this backend.\nconsole.log(backend.name); // 'kv-oauth'"
-  },
-  {
-    label: "Custom OIDC provider",
-    lang: "ts",
-    code: "// Same factory, but define the OIDC provider yourself when your IdP is\n// not one of the built-in presets.\nimport { createKvOAuthBackend, defineOAuthProvider, getRequiredEnv } from '@netscript/auth-kv-oauth';\n\nconst provider = defineOAuthProvider({\n  id: 'my-idp',\n  clientId: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_ID'),\n  clientSecret: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_SECRET'),\n  authorizationEndpoint: getRequiredEnv('NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT'),\n  tokenEndpoint: getRequiredEnv('NETSCRIPT_AUTH_TOKEN_ENDPOINT'),\n  userInfoEndpoint: getRequiredEnv('NETSCRIPT_AUTH_USERINFO_ENDPOINT'),\n  redirectUri: getRequiredEnv('NETSCRIPT_AUTH_REDIRECT_URI'),\n  scopes: ['openid', 'profile', 'email'],\n});\n\nexport const backend = await createKvOAuthBackend({ provider });"
-  }
+{
+label: "Compose the kv-oauth backend",
+lang: "ts",
+code: "// services/auth/src/backend.ts\nimport { createKvOAuthBackend, getRequiredEnv, providers } from '@netscript/auth-kv-oauth';\n\n// providers.google(...) is a preset that fills the OIDC endpoints for you.\nexport const backend = await createKvOAuthBackend({\n provider: providers.google({\n clientId: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_ID'),\n clientSecret: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_SECRET'),\n redirectUri: getRequiredEnv('NETSCRIPT_AUTH_REDIRECT_URI'),\n }),\n});\n\n// backend implements AuthBackendPort AND the optional InteractiveFlowPort,\n// so the auth-api signin + callback endpoints are live on this backend.\nconsole.log(backend.name); // 'kv-oauth'"
+},
+{
+label: "Custom OIDC provider",
+lang: "ts",
+code: "// Same factory, but define the OIDC provider yourself when your IdP is\n// not one of the built-in presets.\nimport { createKvOAuthBackend, defineOAuthProvider, getRequiredEnv } from '@netscript/auth-kv-oauth';\n\nconst provider = defineOAuthProvider({\n id: 'my-idp',\n clientId: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_ID'),\n clientSecret: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_SECRET'),\n authorizationEndpoint: getRequiredEnv('NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT'),\n tokenEndpoint: getRequiredEnv('NETSCRIPT_AUTH_TOKEN_ENDPOINT'),\n userInfoEndpoint: getRequiredEnv('NETSCRIPT_AUTH_USERINFO_ENDPOINT'),\n redirectUri: getRequiredEnv('NETSCRIPT_AUTH_REDIRECT_URI'),\n scopes: ['openid', 'profile', 'email'],\n});\n\nexport const backend = await createKvOAuthBackend({ provider });"
+}
 ] }) }}
 
 The core seam is small and contract-only. `@netscript/plugin-auth-core` defines the
@@ -208,14 +210,14 @@ The core seam is small and contract-only. `@netscript/plugin-auth-core` defines 
 the auth plugin composes against, confirmed on the package's public surface:
 
 {{ comp.apiTable({
-  caption: "@netscript/plugin-auth-core — the seam the backend satisfies",
-  rows: [
-    { name: "AuthBackendPort", type: "type", desc: "The contract every backend implements — the auth-api surface is identical across all three backends because they all satisfy this port." },
-    { name: "createAuthBackendRegistry / resolveBackend", type: "function", desc: "Build a registry of named backends and resolve the single active one (DEFAULT_AUTH_BACKEND_NAME is the fallback)." },
-    { name: "AuthSession", type: "type", desc: "The normalized session the store persists — id, subject, state, scopes, claims, issuedAt / expiresAt." },
-    { name: "createHmacSessionTokenCrypto", type: "function", desc: "HMAC-signs the opaque session token so the cookie value cannot be forged." },
-    { name: "authContractV1", type: "contract", desc: "The six-route auth contract: signin, signout, revokeSession, callback, session, me." }
-  ]
+caption: "@netscript/plugin-auth-core — the seam the backend satisfies",
+rows: [
+{ name: "AuthBackendPort", type: "type", desc: "The contract every backend implements — the auth-api surface is identical across all three backends because they all satisfy this port." },
+{ name: "createAuthBackendRegistry / resolveBackend", type: "function", desc: "Build a registry of named backends and resolve the single active one (DEFAULT_AUTH_BACKEND_NAME is the fallback)." },
+{ name: "AuthSession", type: "type", desc: "The normalized session the store persists — id, subject, state, scopes, claims, issuedAt / expiresAt." },
+{ name: "createHmacSessionTokenCrypto", type: "function", desc: "HMAC-signs the opaque session token so the cookie value cannot be forged." },
+{ name: "authContractV1", type: "contract", desc: "The six-route auth contract: signin, signout, revokeSession, callback, session, me." }
+]
 }) }}
 
 ## Step 6 — Verify a session

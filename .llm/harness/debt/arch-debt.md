@@ -1375,7 +1375,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   therefore returns `AUTH_PROVIDER_ERROR` (502).
 - **Owner:** Auth layer follow-up (#2190).
 - **Created:** 2026-10-10.
-- **Status:** open, DEBT_ACCEPTED.
+- **Status:** closed, 2026-10-11 (PR #2316).
+- **Resolution:** Atomic KV subject fence/outbox and a service-owned bounded page worker. Cookie,
+  session lookup, and configured bearer authenticators share the fence. Session
+  tombstones retain refreshed-token protection through upstream success plus maximum token lifetime
+  and clock skew. Provider and storage failures retry indefinitely with capped backoff. Tests in
+  `packages/auth-workos/tests/subject-revocation_test.ts`,
+  `packages/auth-workos/tests/workos-access-token_test.ts`,
+  `plugins/auth/tests/services/workos-global-logout-http_test.ts`, and
+  `plugins/auth/tests/services/workos-revocation-worker_test.ts` prove immediate sibling refusal,
+  subject isolation, bounded paging/retry, recovery after prolonged outages, shipped registry/main
+  composition, signal-triggered shutdown drain, tombstone TTL, clock skew, and REST/both RPC signout 200.
+  Shipped lifecycle proofs are in `plugins/auth/tests/services/workos-composition_test.ts`.
 - **Target:** 0.0.8 milestone (#2190, triage).
 - **Gate:** Close when the WorkOS backend implements `revokeSubjectSessions`. Every session of the
   subject must fail authentication immediately, with no per-session work in the request, and

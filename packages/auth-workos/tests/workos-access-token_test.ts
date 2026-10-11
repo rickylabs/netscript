@@ -78,3 +78,44 @@ function requestWithAuthorization(value: string | undefined): AuthnRequest {
     path: '/private',
   };
 }
+
+Deno.test('WorkOS bearer fence refuses two unexpired signed tokens and preserves unrelated subjects', async () => {
+  const { DenoKvAdapter } = await import('@netscript/kv');
+  const { createWorkosRevocationStore } = await import('../mod.ts');
+  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+  const revocations = createWorkosRevocationStore(kv);
+  const { publicKey, privateKey } = await generateKeyPair('RS256');
+  const jwk = await exportJWK(publicKey);
+  const server = Deno.serve(
+    { port: 0 },
+    () => Response.json({ keys: [{ ...jwk, kid: 'fence', alg: 'RS256', use: 'sig' }] }),
+  );
+  try {
+    const authenticator = createWorkosAccessTokenAuthenticator({
+      clientId: 'client_123',
+      jwksUrl: `http://127.0.0.1:${server.addr.port}/jwks`,
+      revocations,
+    });
+    const token = async (subject: string, sid: string) =>
+      await new SignJWT({ sid })
+        .setProtectedHeader({ alg: 'RS256', kid: 'fence' }).setSubject(subject).setAudience(
+          'client_123',
+        )
+        .setIssuedAt().setExpirationTime('1h').sign(privateKey);
+    const alice = [await token('alice', 'a'), await token('alice', 'b')];
+    const bob = await token('bob', 'c');
+    for (const value of [...alice, bob]) {
+      assert((await authenticator.authenticate(requestWithAuthorization(`Bearer ${value}`))).ok);
+    }
+    await revocations.revokeSubject('alice', new Date().toISOString());
+    for (const value of alice) {
+      assertEquals(
+        (await authenticator.authenticate(requestWithAuthorization(`Bearer ${value}`))).ok,
+        false,
+      );
+    }
+    assert((await authenticator.authenticate(requestWithAuthorization(`Bearer ${bob}`))).ok);
+  } finally {
+    await server.shutdown();
+  }
+});
