@@ -1635,6 +1635,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   upstream the preview semantics into the canonical cron primitive or replace this helper with an
   equivalent shared engine once the cron subsystem decision is made, without regressing the #181 DST
   table.
+- **Candidate shared engine:** `@netscript/cron` UTC helper; unlike the triggers preview engine, it rejects Sunday `7` and numeric steps such as `0/2`, and its Deno path uses OR for restricted day fields.
 - **Owner:** `@netscript/plugin-triggers-core` runtime + cron subsystem maintainers.
 - **Target:** Cron subsystem unification follow-up after #181.
 - **Linked plan:** `.llm/tmp/run/feat-triggers-feature-backing--181/plan.md` Slice 5 / L6.

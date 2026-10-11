@@ -24,7 +24,8 @@ import type {
   SchedulerEventMap,
 } from '../ports/types.ts';
 import { isValidCronExpression } from '../ports/types.ts';
-import { calculateNextRun } from '../internal/next-run.ts';
+import { calculateNextDenoRun } from '../internal/next-run.ts';
+import { translateDenoCronExpression } from '../internal/deno-expression.ts';
 import type { CronScheduler, JobEventListener, SchedulerEvent } from '../ports/scheduler.ts';
 import {
   createLifecycleEvent,
@@ -88,6 +89,8 @@ export class DenoCronAdapter implements CronScheduler {
       throw new Error(`Job with id '${id}' already exists`);
     }
 
+    const denoSchedule = translateDenoCronExpression(schedule);
+
     if (!this.isValid(schedule)) {
       throw new Error(`Invalid cron expression: ${schedule}`);
     }
@@ -112,7 +115,7 @@ export class DenoCronAdapter implements CronScheduler {
     // Register with Deno.cron
     Deno.cron(
       id,
-      schedule,
+      denoSchedule,
       { signal: abortController.signal },
       async () => {
         if (!this.running || !job.enabled) {
@@ -263,6 +266,6 @@ export class DenoCronAdapter implements CronScheduler {
 
   /** Calculate the next UTC occurrence; unsupported expressions have no diagnostic next run. */
   private calculateNextRun(expression: CronExpression): Date | null {
-    return calculateNextRun(expression, new Date());
+    return calculateNextDenoRun(expression, new Date());
   }
 }
