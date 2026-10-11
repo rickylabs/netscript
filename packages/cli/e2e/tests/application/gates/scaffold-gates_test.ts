@@ -1,4 +1,7 @@
 import { assertEquals, assertThrows } from '@std/assert';
+import { createMaintainerInitCommand } from '../../../../src/maintainer/features/init/init-command.ts';
+import { createInitCommand } from '../../../../src/public/features/init/init-command.ts';
+import { agentHostFreeDenoArgs } from '../../../../tests/support/agent-host-free-deno.ts';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
 import { createGeneratedCheckGates } from '../../../src/application/gates/scaffold/database-gates.ts';
@@ -23,6 +26,54 @@ import type { CommandGateDefinition } from '../../../src/domain/gate-definition.
 import type { RunContext, RunOptions } from '../../../src/domain/run-context.ts';
 
 const PUBLISHED_TEST_VERSION = ['0', '0', '2'].join('.');
+
+for (const maintainer of [true, false]) {
+  Deno.test(`scaffold init argv parses with the real ${maintainer ? 'maintainer' : 'public'} command`, async () => {
+    for (const cache of [true, false]) {
+      for (const database of [DATABASE.POSTGRES, DATABASE.SQLITE, DATABASE.MYSQL, DATABASE.MSSQL]) {
+        const context = createContext(
+          `/repo/packages/cli/bin/netscript${maintainer ? '-dev' : ''}.ts`,
+          maintainer ? PACKAGE_SOURCE.LOCAL : PACKAGE_SOURCE.JSR,
+          cache,
+          database,
+        );
+        const argv = scaffoldInitGate().command(context);
+        if (maintainer) {
+          assertEquals(argv.slice(0, 5), ['deno', ...agentHostFreeDenoArgs([])]);
+          assertEquals(argv.includes('--no-agent'), false);
+        }
+        const command = maintainer
+          ? createMaintainerInitCommand({ initDependencies: {} as never })
+          : createInitCommand({
+            initContext: {} as never,
+            initAgent: () => Promise.reject(new Error('Agent installation must not run')),
+            defaultProjectName: () => 'unused',
+            prompt: {} as never,
+          });
+        // Replace execution only: keep the production option and positional argument schema.
+        const parsed = await command.action(() => {}).throwErrors().parse(
+          [...argv.slice(argv.indexOf('init') + 1)],
+        );
+        assertEquals(parsed.args, [context.project.projectName]);
+        assertEquals(parsed.options, {
+          ...(maintainer ? { service: true } : { agent: false, service: true }),
+          path: context.project.smokeRoot,
+          db: database,
+          ...(cache ? {} : { cache: false }),
+          serviceName: 'users',
+          ci: true,
+          yes: true,
+          git: false,
+          force: true,
+          dryRun: false,
+          aspire: true,
+          nonInteractive: false,
+          json: false,
+        });
+      }
+    }
+  });
+}
 
 Deno.test('Aspire preflight runs structured doctor through the durable receipt path', () => {
   const gate = createPreflightGates().find((entry) => entry.id === GATE.PREFLIGHT_ASPIRE);
@@ -99,8 +150,8 @@ Deno.test('scaffold init command disables ambient agent initialization', () => {
       '-A',
       '/repo/packages/cli/bin/netscript.ts',
       'init',
-      '--no-agent',
       'prod-local-test',
+      '--no-agent',
       '--path',
       '/repo/.llm/tmp/cli-e2e',
       '--db',
@@ -282,13 +333,14 @@ function createContext(
   cliEntrypoint: string,
   packageSource: RunOptions['packageSource'],
   cache = true,
+  database: RunOptions['database'] = DATABASE.POSTGRES,
 ): RunContext {
   const options: RunOptions = {
     repoRoot: '/repo',
     cliEntrypoint,
     smokeRoot: '/repo/.llm/tmp/cli-e2e',
     projectName: 'prod-local-test',
-    database: DATABASE.POSTGRES,
+    database,
     packageSource,
     plugins: [],
     samples: false,
