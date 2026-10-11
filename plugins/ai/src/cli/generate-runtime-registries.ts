@@ -15,6 +15,7 @@ import {
   type AiRegistryTarget,
   compileAiRegistry,
   inspectAiRegistries,
+  renderAiRegistry,
 } from './ai-registry-compiler.ts';
 
 const DEFAULT_MANIFEST_PATH = 'plugins/ai/scaffold.runtime.json';
@@ -42,14 +43,21 @@ export async function main(argv: readonly string[]): Promise<void> {
   const args = parseArgs(argv);
   const files = new LocalProjectFiles(args.projectRoot);
   if (args.inspect) {
-    if (args.inspectionProtocol !== '1') {
-      throw new Error('Inspect mode requires --inspection-protocol 1.');
+    if (!['1', '2'].includes(args.inspectionProtocol ?? '')) {
+      throw new Error('Inspect mode requires --inspection-protocol 1 or 2.');
     }
     if (args.manifestJson === undefined) {
       throw new Error('Inspect mode requires --manifest-json.');
     }
     const targets = readTargetsFromValue(JSON.parse(args.manifestJson));
-    console.log(JSON.stringify(await inspectAiRegistries(files, targets)));
+    console.log(
+      JSON.stringify(
+        args.inspectionProtocol === '1' ? await inspectAiRegistries(files, targets) : {
+          inspectionProtocol: 2,
+          registries: await Promise.all(targets.map((target) => renderAiRegistry(files, target))),
+        },
+      ),
+    );
     return;
   }
   if (args.inspectionProtocol !== undefined || args.manifestJson !== undefined) {

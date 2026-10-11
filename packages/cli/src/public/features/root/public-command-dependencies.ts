@@ -56,6 +56,8 @@ import type { OsServicePort } from '../../ports/os-service-port.ts';
 import type { ServiceManifest } from '../../ports/service-manifest-port.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../generate/plugins/generate-plugin-registries-command.ts';
 import { createInstalledRuntimeRegistryGenerator } from '../generate/plugins/installed-runtime-registry-generator.ts';
+import { createInstalledRuntimeRegistryRenderer } from '../generate/plugins/plugin-registry-renderer.ts';
+import { checkPluginRegistries } from '../generate/plugins/check-plugin-registries.ts';
 import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runtime-schemas/generate-runtime-schemas-command.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
@@ -244,11 +246,13 @@ export function createPublicCommandDependencies(
       resolvePath: (path) => host.resolvePath(path),
       resolveWorkspaceRoot: findDeployProjectRoot,
     });
-  const generatePluginRegistries = createInstalledRuntimeRegistryGenerator({
-    fetchManifest: (url) => fetch(url, { headers: { Accept: 'application/json' } }),
+  const registryDependencies = {
+    fetchManifest: (url: string) => fetch(url, { headers: { Accept: 'application/json' } }),
     fs,
     process,
-  });
+  };
+  const generatePluginRegistries = createInstalledRuntimeRegistryGenerator(registryDependencies);
+  const renderPluginRegistries = createInstalledRuntimeRegistryRenderer(registryDependencies);
   const serviceAddDependencies = {
     fs,
     scaffolder,
@@ -431,6 +435,12 @@ export function createPublicCommandDependencies(
       emitter: new RegistryEmitter(),
       fs,
       generate: generatePluginRegistries,
+      check: (projectRoot) =>
+        checkPluginRegistries(
+          projectRoot,
+          renderPluginRegistries,
+          new DenoGeneratedSourceFormatter(process),
+        ),
     },
     generateRoutesCommandDependencies: {
       resolveUiAppRoot,

@@ -5,8 +5,8 @@ import { dirname, fromFileUrl, join, toFileUrl } from '@std/path';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import {
-  netscriptJsrSpecifier,
   NETSCRIPT_RELEASE_VERSION,
+  netscriptJsrSpecifier,
 } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../kernel/constants/scaffold/scaffold-app-catalog.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
@@ -56,7 +56,9 @@ export const triggersPlugin = {
 
     await generate({ dryRun: false, projectRoot });
 
-    const module = await import(`${toFileUrl(join(projectRoot, TRIGGER_REGISTRY_PATH)).href}?loading`);
+    const module = await import(
+      `${toFileUrl(join(projectRoot, TRIGGER_REGISTRY_PATH)).href}?loading`
+    );
     assert(module.registry instanceof Map);
     assertEquals(module.registry.has('generic-inbound-webhook'), true);
     assertEquals(module.registry.size, 1);
@@ -141,7 +143,9 @@ export default handler;
 
     await generate({ dryRun: false, projectRoot });
 
-    const module = await import(`${toFileUrl(join(projectRoot, WORKERS_REGISTRY_PATH)).href}?workers`);
+    const module = await import(
+      `${toFileUrl(join(projectRoot, WORKERS_REGISTRY_PATH)).href}?workers`
+    );
     assert(module.registry instanceof Map);
     assertEquals(module.registry.has('custom-claim-job'), true);
     assertEquals(module.registry.has('excluded-job-tools'), false);
@@ -280,7 +284,9 @@ export default defineSaga('${id}');
 // resolution is owned by the post-publish production smoke (`e2e-cli-prod.yml`), not this lane.
 Deno.test('packaged runtime export starts a saga runtime with a project-owned non-empty registry', async () => {
   await withTempProject(async (projectRoot) => {
-    await write(join(projectRoot, SAGAS_REGISTRY_PATH), `
+    await write(
+      join(projectRoot, SAGAS_REGISTRY_PATH),
+      `
 const definition = {
   id: 'published-dependency',
   durability: 't1',
@@ -289,8 +295,11 @@ const definition = {
   handlers: new Map(),
 };
 export const sagaRegistry = new Map([[definition.id, definition]]);
-`);
-    await write(join(projectRoot, 'run-published-saga.ts'), `
+`,
+    );
+    await write(
+      join(projectRoot, 'run-published-saga.ts'),
+      `
 import { startSagaRunner } from '@netscript/plugin-sagas/runtime';
 let stopListening = () => {};
 const deliveryQueue = {
@@ -309,7 +318,8 @@ const deliveryQueue = {
 const supervisor = await startSagaRunner({ cwd: () => Deno.cwd(), deliveryQueue });
 console.log(JSON.stringify(supervisor.snapshot()));
 await supervisor.stop('dependency integration complete');
-`);
+`,
+    );
 
     const result = await new Deno.Command(Deno.execPath(), {
       args: [
@@ -459,7 +469,23 @@ class RecordingGeneratorProcess implements ProcessPort {
     options?: { readonly cwd?: string; readonly env?: Readonly<Record<string, string>> },
   ): Promise<ProcessResult> {
     assertEquals(command, 'deno');
+    if (args.includes('--no-config')) return await new DenoProcess().exec(command, args, options);
     assertEquals(options?.cwd !== undefined, true);
+    if (args.includes('--inspect')) {
+      this.generator = args[args.indexOf('--deny-sys') + 1];
+      return {
+        code: 0,
+        stdout: JSON.stringify({
+          inspectionProtocol: 2,
+          registries: [{
+            registryPath: TRIGGER_REGISTRY_PATH,
+            sourceFiles: ['triggers/generic.ts'],
+            content: 'export const registry = new Map();\n',
+          }],
+        }),
+        stderr: '',
+      };
+    }
     this.generator = args[args.indexOf('--allow-write') + 1];
     const projectRoot = args[args.indexOf('--project-root') + 1];
     await write(
@@ -562,11 +588,13 @@ async function writeAppSettings(
   ]));
   await write(
     join(projectRoot, 'appsettings.json'),
-    `${JSON.stringify({
-      NetScript: {
-        Plugins: plugins,
-      },
-    })}\n`,
+    `${
+      JSON.stringify({
+        NetScript: {
+          Plugins: plugins,
+        },
+      })
+    }\n`,
   );
 }
 
