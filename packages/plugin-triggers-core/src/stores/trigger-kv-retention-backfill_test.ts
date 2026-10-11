@@ -139,9 +139,20 @@ Deno.test('real KV trigger migration caps full-value pages and respects custom o
   assertEquals(await kv.get(['triggers', 'dlq', 'by-trigger', 'legacy', 'terminal-0']), null);
 });
 
-Deno.test('real KV backfill assigns backend TTL to recent trigger record/index pairs at settlement', async () => {
-  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
-  const settledAt = new Date(Date.now() - 86_400_000 + 800).toISOString();
+Deno.test('real KV trigger backfill assigns original TTL and deletes expired record/index pairs', async () => {
+  class RecordingKv extends DenoKvAdapter {
+    ttls = new Map<string, number>();
+    override async atomic(checks: AtomicCheck[], mutations: AtomicMutation[]) {
+      for (const mutation of mutations) {
+        if (mutation.type === 'set' && mutation.expireIn !== undefined) {
+          this.ttls.set(JSON.stringify(mutation.key), mutation.expireIn);
+        }
+      }
+      return await super.atomic(checks, mutations);
+    }
+  }
+  await using kv = new RecordingKv(await Deno.openKv(':memory:'));
+  const settledAt = new Date(now.getTime() - 86_400_000 + 800).toISOString();
   await seed(kv, 'recent', 'completed');
   await kv.set(['triggers', 'events', 'recent'], {
     ...event('recent', 'completed'),
@@ -153,12 +164,16 @@ Deno.test('real KV backfill assigns backend TTL to recent trigger record/index p
     event: event('recent', 'completed'),
     failedAt: settledAt,
   });
-  for (let i = 0; i < 10; i++) await backfillTriggerRetention({ kv, kvRetentionDays: 1 }, 'ttl');
-  assert(await kv.get(['triggers', 'events', 'recent']));
-  assert(await kv.get(['triggers', 'dlq', 'entries', 'recent']));
-  // Native backend expiry is asynchronous; wait a bounded five seconds for its sweep.
-  for (let attempt = 0; attempt < 50 && await kv.has(['triggers', 'events', 'recent']); attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  for (let i = 0; i < 10; i++) {
+    await backfillTriggerRetention({ kv, kvRetentionDays: 1, now: () => now }, 'ttl');
+  }
+  assertEquals([...kv.ttls.values()], [800, 800, 800, 800]);
+  for (let i = 0; i < 10; i++) {
+    await backfillTriggerRetention({
+      kv,
+      kvRetentionDays: 1,
+      now: () => new Date(now.getTime() + 1000),
+    }, 'ttl-expired');
   }
   assertEquals(await kv.get(['triggers', 'events', 'recent']), null);
   assertEquals(await kv.get(['triggers', 'by-trigger', 'legacy', 'recent']), null);

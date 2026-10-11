@@ -1,6 +1,6 @@
 import type { AtomicCheck, AtomicMutation, KvEntry, KvListOptions } from '@netscript/kv';
 import { SagaKvRetention } from './saga-kv-retention.ts';
-import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 import { FakeTime } from 'jsr:@std/testing@^1/time';
 import { DenoKvAdapter, MemoryKvAdapter } from '@netscript/kv';
 import { defineSaga, sagaComplete } from '../../mod.ts';
@@ -400,22 +400,31 @@ Deno.test('real KV saga backfill caps reads and mutation bytes, uses original pe
   assertEquals(await kv.get(['sagas', 'transition', 'terminal-0', 1]), null);
 });
 
-Deno.test('real KV backfill assigns backend TTL to recent legacy saga families without extending settlement', async () => {
-  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
-  const settled = new Date(Date.now() - 86_400_000 + 800);
+Deno.test('real KV saga backfill assigns original TTL and deletes when the settlement deadline elapses', async () => {
+  class RecordingKv extends DenoKvAdapter {
+    ttls = new Map<string, number>();
+    override async atomic(checks: AtomicCheck[], mutations: AtomicMutation[]) {
+      for (const mutation of mutations) {
+        if (mutation.type === 'set' && mutation.expireIn !== undefined) {
+          this.ttls.set(JSON.stringify(mutation.key), mutation.expireIn);
+        }
+      }
+      return await super.atomic(checks, mutations);
+    }
+  }
+  await using kv = new RecordingKv(await Deno.openKv(':memory:'));
+  const settled = new Date(now.getTime() - 86_400_000 + 800);
   await seed(kv, 'recent', 'completed');
   await kv.set(['sagas', 'state', 'recent'], {
     ...envelope('recent', 'completed'),
     metadata: { ...envelope('recent', 'completed').metadata, updatedAt: settled },
   });
-  const retention = new SagaKvRetention(kv, ['sagas'], () => new Date());
+  const retention = new SagaKvRetention(kv, ['sagas'], () => now);
   for (let i = 0; i < 12; i++) await retention.backfill(1, 'ttl');
-  assert(await kv.get(['sagas', 'state', 'recent']));
-  assert(await kv.get(['sagas', 'transition', 'recent', 1]));
-  // Native backend expiry is asynchronous; wait a bounded five seconds for its sweep.
-  for (let attempt = 0; attempt < 50 && await kv.has(['sagas', 'state', 'recent']); attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
+  assertEquals([...kv.ttls.values()], [800, 800, 800, 800, 800]);
+  // TTL is best effort in native KV; an expired discovery pass deterministically deletes instead.
+  const later = new SagaKvRetention(kv, ['sagas'], () => new Date(now.getTime() + 1000));
+  for (let i = 0; i < 12; i++) await later.backfill(1, 'ttl-expired');
   assertEquals(await kv.get(['sagas', 'state', 'recent']), null);
   assertEquals(await kv.get(['sagas', 'transition', 'recent', 1]), null);
   assertEquals(await kv.get(['sagas', 'applied', 'recent', 'first']), null);

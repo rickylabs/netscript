@@ -48,9 +48,12 @@ forward correlations (including legacy entries without a reverse index), reverse
 transitions, applied replay keys, `saga_instances` documents, and canonical state. Trigger passes
 use the forward-write deadline policy for event/index and DLQ/index families. Expired terminal
 entries are deleted; terminal entries still within their window receive only the remaining absolute
-TTL. Pending, running, compensating, in-flight, and deferred state remains durable. A DLQ entry is
-retained while its canonical event is open. Idempotency, defer scheduling, workers, and
-delayed-message queues are outside this migration.
+TTL. [Deno KV expiry](https://docs.deno.com/deploy/kv/key_expiration/) is best effort: a key can
+remain visible after its deadline. An expired migration pass deletes immediately; this tool does not
+claim a strict wall-clock expiry guarantee for recent keys assigned TTL. Pending, running,
+compensating, in-flight, and deferred state remains durable. A DLQ entry is retained while its
+canonical event is open. Idempotency, defer scheduling, workers, and delayed-message queues are
+outside this migration.
 
 The checkpoint lives under each plugin's `retention-backfill/<migration>` key. A completed migration
 is a no-op on subsequent invocations. To audit again (for example after importing another legacy
