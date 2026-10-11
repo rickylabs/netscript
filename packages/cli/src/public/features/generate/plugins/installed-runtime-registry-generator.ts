@@ -62,7 +62,6 @@ export function createInstalledRuntimeRegistryGenerator(
           installed,
           resolvedManifest,
           manifest,
-          dependencies,
           input.dryRun ? frozenPluginInspection(dependencies.process) : dependencies.process,
         );
         rendered.push(...files);

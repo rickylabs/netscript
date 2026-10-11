@@ -62,7 +62,6 @@ export function createInstalledRuntimeRegistryRenderer(
           installed,
           resolved,
           manifest,
-          dependencies,
           frozenPluginInspection(dependencies.process),
         ),
       );
@@ -83,7 +82,6 @@ export async function renderRuntimeRegistryPlan(
   installed: InstalledRuntimePackage,
   resolved: ResolvedRuntimeManifest,
   manifest: RuntimeRegistryManifest,
-  dependencies: InstalledRuntimeRegistryGeneratorDependencies,
   process: InstalledRuntimeRegistryGeneratorDependencies['process'],
 ): Promise<readonly RenderedPluginRegistry[]> {
   const generator = manifest.runtimeRegistryGenerator;
