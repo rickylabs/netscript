@@ -3,6 +3,7 @@ import {
   SAGA_STORE_BACKEND_ENV,
 } from '@netscript/plugin-sagas-core/stores';
 import { loadSagaRetention } from './load-saga-retention.ts';
+import { KvPollingAdapter } from '@netscript/queue/adapters/kv-polling';
 import type { SagaDefinition } from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
@@ -46,6 +47,8 @@ export type StartSagaRunnerOptions = Readonly<{
   readEnv?: SagaRunnerEnvReader;
   cwd?: () => string;
   deliveryQueue?: SagaDeliveryQueuePort;
+  /** Cancellable pending-message queue; defaults to KV polling for the production runner. */
+  scheduledQueue?: SagaDeliveryQueuePort;
   projection?: SagaInstanceProjectionPort | false;
   supervisor?: Omit<SagaRuntimeSupervisorOptions, 'loadDefinitions' | 'runtimeOptions'>;
   runtimeOptions?: Omit<CreateSagaRuntimeOptions, 'adapter'>;
@@ -97,12 +100,21 @@ export async function startSagaRunner(
   });
   const importer = options.importer ?? defaultImporter;
   const queue = options.deliveryQueue ?? createSagaDeliveryQueue();
-  const delivery = options.supervisor?.delivery ?? new SagaQueueDelivery(queue);
+  const queueScheduler = new SagaQueueScheduler(
+    queue,
+    options.scheduledQueue ??
+      (options.deliveryQueue ? undefined : new KvPollingAdapter({ queueName: 'sagas-scheduled' })),
+  );
+  const scheduler = options.runtimeOptions?.native?.scheduler ?? queueScheduler;
+  const delivery = options.supervisor?.delivery ?? new SagaQueueDelivery(
+    queue,
+    scheduler === queueScheduler ? queueScheduler : undefined,
+  );
   const runtimeOptions = {
     ...options.runtimeOptions,
     native: {
       ...withDefaultTelemetry(options.runtimeOptions?.native),
-      scheduler: options.runtimeOptions?.native?.scheduler ?? new SagaQueueScheduler(queue),
+      scheduler,
     },
     adapter,
   };
