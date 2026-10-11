@@ -11,6 +11,7 @@
  * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --repo . --name plugin-smoke-manual --strict-telemetry
  */
 
+import { agentHostFreeDenoArgs } from '../../../packages/cli/tests/support/agent-host-free-deno.ts';
 import { delay } from 'jsr:@std/async@1/delay';
 import { ensureDir } from 'jsr:@std/fs@1/ensure-dir';
 import { exists } from 'jsr:@std/fs@1/exists';
@@ -762,7 +763,7 @@ class SmokeRunner {
 
   #commandArgs(...args: string[]): string[] {
     const releaseFlags = this.#options.cli.startsWith('jsr:') ? ['--minimum-dependency-age=0'] : [];
-    return ['run', '-A', ...releaseFlags, this.#options.cli, ...args];
+    return agentHostFreeDenoArgs(['run', '-A', ...releaseFlags, this.#options.cli, ...args]);
   }
 
   async #preflight(): Promise<void> {
