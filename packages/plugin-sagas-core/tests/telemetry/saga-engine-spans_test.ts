@@ -5,6 +5,7 @@ import type {
   CascadedMessage,
   SagaCorrelationKey,
   SagaDefinition,
+  SagaInstanceStatus,
   SagaState,
   SagaStateEnvelope,
 } from '../../src/domain/mod.ts';
@@ -17,6 +18,7 @@ import {
   SagaSpanEvents,
   SagaSpanNames,
   type SagaTelemetryAttributes,
+  type SagaTelemetryOutcome,
   SagaTelemetryOutcomes,
   type SagaTelemetrySpan,
   type SagaTelemetrySpanKind,
@@ -43,8 +45,8 @@ for (
   ] satisfies readonly {
     name: string;
     cascaded: readonly CascadedMessage[];
-    status: string;
-    outcome: string;
+    status: SagaInstanceStatus;
+    outcome: SagaTelemetryOutcome;
   }[]
 ) {
   Deno.test(`SagaEngine compensation telemetry distinguishes ${scenario.name}`, async () => {
@@ -84,6 +86,8 @@ for (
       });
       assertEquals(committed.committed, true);
       assertEquals((await store.load(requested.instanceId))?.metadata.status, scenario.status);
+      // This probes status mapping on a later handle, not outcome emission at commit time.
+      // The existing engine accepts ordinary handlers on terminal instances; see PR debt note.
       await engine.handle({
         type: 'Inspect',
         payload: {},
