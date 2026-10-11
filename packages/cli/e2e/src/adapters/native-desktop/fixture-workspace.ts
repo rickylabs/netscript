@@ -28,6 +28,8 @@ export async function prepareDesktopFixture(
   config.version = version;
   config.workspace = [];
   config.catalog = rootConfig.catalog;
+  // Retain the fixture's frozen reference lock in every staged scratch workspace.
+  config.lock = { path: 'deno.lock', frozen: true };
   config.imports = {
     '@netscript/fresh/desktop': localModule(repoRoot, 'packages/fresh/src/runtime/desktop/mod.ts'),
     '@netscript/sdk/auto-update': localModule(repoRoot, 'packages/sdk/src/auto-update/mod.ts'),

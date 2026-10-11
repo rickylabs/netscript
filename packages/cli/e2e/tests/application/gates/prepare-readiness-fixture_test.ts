@@ -1,3 +1,5 @@
+import { writeGeneratedHelperFixture } from '../../../../src/kernel/templates/aspire/helpers/tests/generated-helper-fixture.ts';
+import { EMPTY_CONFIG } from '../../../../src/kernel/templates/aspire/helpers/tests/generators-test-support.ts';
 import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 
@@ -225,7 +227,7 @@ async function assertGeneratedModuleChecks(source: string): Promise<void> {
   try {
     const helpers = `${root}/aspire/.helpers`;
     const modules = `${root}/aspire/.aspire/modules`;
-    await Deno.mkdir(helpers, { recursive: true });
+    await writeGeneratedHelperFixture(`${root}/aspire`, EMPTY_CONFIG);
     await Deno.mkdir(modules, { recursive: true });
     await Deno.writeTextFile(`${helpers}/register-apps.mts`, source);
     // Mirror the generated module's local imports so this stays a compile check, not a runtime test.
@@ -288,7 +290,7 @@ export async function withCacheReference(
     );
 
     const output = await checkGeneratedFiles({
-      args: ['check', '--no-config', '--no-lock', '--unstable-kv', `${helpers}/register-apps.mts`],
+      args: ['check', '--no-config', '--frozen', '--unstable-kv', `${helpers}/register-apps.mts`],
     });
     assertEquals(
       output.code,
