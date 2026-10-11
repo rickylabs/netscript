@@ -327,3 +327,65 @@ Deno.test('provisioned internal calls reject anonymous, wrong, user-session and 
     await Deno.remove(file);
     await assertRejects(() => loadInstallationSecret({ path: file }));
   }));
+
+Deno.test('documented internal recipe executes in the generated carrier project and catches a missing overlay', () =>
+  generatedCarrier(async (_resources, file) => {
+    const repoRoot = new URL('../../../../../../../../', import.meta.url);
+    const recipe = await Deno.readTextFile(
+      new URL('docs/site/services-sdk/how-to/call-internal-procedures.md', repoRoot),
+    );
+    const snippets = [...recipe.matchAll(/```ts\n([\s\S]*?)\n```/g)].map((match) => match[1]);
+    assertEquals(snippets.length, 3, 'the executable recipe must contain all three modules');
+    const root = join(dirname(file), 'recipe');
+    await Deno.mkdir(root);
+    for (
+      const [index, name] of ['internal-contract', 'internal-service', 'internal-client'].entries()
+    ) {
+      await Deno.writeTextFile(join(root, `${name}.ts`), snippets[index]);
+    }
+    await Deno.copyFile(
+      new URL('./fixtures/internal-recipe/proof.ts.template', import.meta.url),
+      join(root, 'proof.ts'),
+    );
+    const config: { imports: Record<string, string> } = JSON.parse(
+      await Deno.readTextFile(new URL('deno.json', repoRoot)),
+    );
+    const serviceConfig: { imports: Record<string, string> } = JSON.parse(
+      await Deno.readTextFile(new URL('packages/service/deno.json', repoRoot)),
+    );
+    await Deno.writeTextFile(
+      join(root, 'imports.json'),
+      JSON.stringify({
+        imports: { ...config.imports, '@orpc/server': serviceConfig.imports['@orpc/server'] },
+      }),
+    );
+    const run = () =>
+      new Deno.Command(Deno.execPath(), {
+        args: [
+          'run',
+          '--no-lock',
+          '--allow-all',
+          '--unstable-kv',
+          '--config',
+          new URL('deno.json', repoRoot).pathname,
+          '--import-map',
+          join(root, 'imports.json'),
+          join(root, 'proof.ts'),
+        ],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+    const positive = await run();
+    // Do not print child output: a failing assertion could include credential material.
+    assertEquals(positive.code, 0, 'documented recipe execution must succeed');
+    assert(new TextDecoder().decode(positive.stdout).includes('rotation PASS'));
+    const unguarded = snippets[1].replace('.withAuthz(auth.authz)', '');
+    assert(unguarded !== snippets[1], 'negative control must remove the contract overlay');
+    await Deno.writeTextFile(join(root, 'internal-service.ts'), unguarded);
+    const negative = await run();
+    assert(negative.code !== 0, 'the proof must reject the historical unguarded OpenAPI lane');
+    assert(
+      new TextDecoder().decode(negative.stderr).includes('anonymous'),
+      'negative control must fail on anonymous access, not an unrelated startup error',
+    );
+  }));
