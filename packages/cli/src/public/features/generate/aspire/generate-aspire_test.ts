@@ -1,5 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { join } from '@std/path';
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import { generateAspire } from './generate-aspire.ts';
@@ -14,6 +16,7 @@ import { PLUGIN_COMPOSITION_INVALID_EXIT_CODE } from '../../../../kernel/applica
 Deno.test('generateAspire applies dry-run and force to helper regeneration', async () => {
   const calls: unknown[] = [];
   const formatter: GeneratedSourceFormatterPort = {
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (_path, content) => Promise.resolve(content),
     formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
   };
@@ -84,7 +87,13 @@ export default defineConfig({
     const scaffolder = new Scaffolder(templateAdapter, fs);
 
     const error = await assertRejects(
-      () => generateAspire({ projectRoot: root }, { fs, scaffolder, templateAdapter }),
+      () =>
+        generateAspire({ projectRoot: root }, {
+          fs,
+          scaffolder,
+          templateAdapter,
+          formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
+        }),
       ConfigError,
     );
     assertEquals(error.exitCode, PLUGIN_COMPOSITION_INVALID_EXIT_CODE);

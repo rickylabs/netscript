@@ -1,13 +1,27 @@
 import { writeInstalledAuthFixture } from '../../../../tests/installed-auth-fixture.ts';
 import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
-import { join } from '@std/path';
+import { fromFileUrl, join } from '@std/path';
+import { DenoGeneratedSourceFormatter } from '../runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../runtime/process/deno-process.ts';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
 import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
 import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
-import { regenerateAspireHelpers } from '../service/workspace-mutator.ts';
+import { installPlugin } from '../../../public/features/plugins/install/install-plugin.ts';
+import { addService } from '../../../public/features/services/add/add-service.ts';
+import { PluginWorkspaceMutator } from './workspace-mutator.ts';
+import { PluginRegistryScaffolder } from './registry-scaffolder.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
+import { PortAllocator } from '../service/port-allocator.ts';
+import { ServiceWorkspaceResolver } from '../service/workspace-resolver.ts';
+import { ServiceScaffolder } from '../service/scaffolder.ts';
+import { createContractScaffolder } from '../contracts/contract-scaffolder.ts';
+import { DefaultContractTemplateRegistry } from '../contracts/templates/contract-template-registry.ts';
+import { ContractVersionRegistry } from '../contracts/version-registry.ts';
+import { ContractWorkspaceResolver } from '../contracts/workspace-resolver.ts';
 import { reconcileBrowserAuth } from './browser-auth-reconciler.ts';
+import { regenerateAspireHelpers } from '../service/workspace-mutator.ts';
 import { SERVICE_PUBLIC_REASON, serviceAuthTemplate } from '../service/auth-policy.ts';
 
 const settings = {
@@ -82,6 +96,105 @@ Deno.test('auth scaffold is request-scoped, idempotent, and preserves authored p
   );
 });
 
+Deno.test('auth install and subsequent service add emit the BFF topology before Aspire regeneration', async () => {
+  await DEFAULT_TEMPLATE_REGISTRY.hydrate();
+  const root = await Deno.makeTempDir();
+  const fs = new DenoFileSystem();
+  const templates = new StringTemplateAdapter(fs);
+  try {
+    const repo = new URL('../../../../../../', import.meta.url);
+    await fs.writeFile(
+      join(root, 'deno.json'),
+      JSON.stringify({
+        catalog: SCAFFOLD_WORKSPACE_CATALOG,
+        imports: {
+          '@netscript/config': new URL('packages/config/mod.ts', repo).href,
+        },
+      }),
+    );
+    await fs.writeFile(
+      join(root, 'netscript.config.ts'),
+      "import { defineConfig } from '@netscript/config';\nexport default defineConfig({ name: 'shop', databases: { config: [] }, plugins: [] });",
+    );
+    await fs.writeFile(
+      join(root, 'appsettings.json'),
+      JSON.stringify({ NetScript: { ...settings.NetScript, Plugins: {} } }),
+    );
+    await fs.createDir(join(root, 'aspire'));
+    await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
+    await fs.writeFile(join(root, 'services/users/src/main.ts'), main);
+    const processRunner = new DenoProcess();
+    const formatter = new DenoGeneratedSourceFormatter(processRunner);
+    const scaffolder = new Scaffolder(templates, fs);
+    const installed = await installPlugin({
+      kind: 'auth',
+      pluginName: 'auth',
+      serviceReferences: [],
+      pluginReferences: [],
+      noDb: true,
+      includeSamples: false,
+      localPath: fromFileUrl(new URL('plugins/auth', repo)),
+      projectRoot: root,
+      overwrite: false,
+    }, {
+      fs,
+      scaffolder,
+      templateAdapter: templates,
+      formatter,
+      processRunner,
+      workspaceMutator: new PluginWorkspaceMutator(fs),
+      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+    });
+    assert(installed.helperFiles.includes(join(root, 'auth/bff.ts')));
+    assertStringIncludes(
+      await fs.readFile(join(root, 'services/users/src/main.ts')),
+      'authenticator: browserAuthenticator',
+    );
+    await fs.writeFile(
+      join(root, 'contracts/deno.json'),
+      JSON.stringify({ name: '@shop/contracts' }),
+    );
+    const added = await addService({
+      serviceName: 'billing',
+      serviceReferences: [],
+      projectRoot: root,
+      overwrite: false,
+    }, {
+      fs,
+      scaffolder,
+      templateAdapter: templates,
+      formatter,
+      portAllocator: new PortAllocator(fs),
+      serviceResolver: new ServiceWorkspaceResolver(fs),
+      serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templates, formatter),
+      contractScaffolder: createContractScaffolder({
+        scaffolder,
+        templateAdapter: templates,
+        templateRegistry: new DefaultContractTemplateRegistry(),
+        versionRegistry: new ContractVersionRegistry(fs, formatter),
+        workspaceResolver: new ContractWorkspaceResolver(fs),
+        formatter,
+      }),
+    });
+    const billingPath = join(root, 'services/billing/src/main.ts');
+    assert(added.helperFiles.includes(billingPath));
+    assertStringIncludes(await fs.readFile(billingPath), 'authenticator: browserAuthenticator');
+    const config = JSON.parse(await fs.readFile(join(root, 'appsettings.json')));
+    assertEquals(config.NetScript.Services.billing.PluginReferences, ['auth']);
+    assert(await fs.exists(join(root, 'apps/web/routes/auth/[action].ts')));
+    assertStringIncludes(
+      await fs.readFile(join(root, 'aspire/.helpers/register-apps.mts')),
+      'services__auth__http__0',
+    );
+    assertStringIncludes(
+      await fs.readFile(join(root, 'aspire/.helpers/register-services.mts')),
+      'extractPluginReferences(entry)',
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('helper regeneration leaves scaffold policies and authored inputs unchanged', async () => {
   const root = await Deno.makeTempDir();
   const fs = new DenoFileSystem();
@@ -132,6 +245,7 @@ Deno.test('helper regeneration leaves scaffold policies and authored inputs unch
       fs,
       new Scaffolder(templates, fs),
       templates,
+      { formatter: new DenoGeneratedSourceFormatter(new DenoProcess()) },
     );
     assertEquals(written.includes(join(root, 'auth/bff.ts')), false);
     assertEquals(await Promise.all(authored.map((path) => fs.readFile(join(root, path)))), before);

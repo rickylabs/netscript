@@ -1,3 +1,4 @@
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { InitOptions, ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
@@ -15,6 +16,8 @@ export interface InitPipelineContext {
   readonly templateAdapter: TemplatePort;
   /** External process runner. */
   readonly process: ProcessPort;
+  /** Canonical formatter supplied by the command composition root. */
+  readonly formatter: GeneratedSourceFormatterPort;
   /** Registry import resolver for public scaffold output. */
   readonly jsrResolver: JsrResolverPort;
   /** Current working directory provider. */
