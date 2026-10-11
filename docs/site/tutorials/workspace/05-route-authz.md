@@ -119,13 +119,15 @@ The `.meta({ access: ... })` block is the source of truth for the guard. It uses
 and `authorization` may declare readonly `scopes` and `roles`. There is no separate path-policy map
 to keep aligned with this route.
 
-{{ comp.apiTable({ caption: "@netscript/contracts — procedure access metadata", rows: [ { name:
-".meta({ access })", type: "NetScriptProcedureMeta", desc: "Stores access policy on the procedure
-that owns the route and schemas." }, { name: "authentication", type: "'none' | 'optional' |
-'required'", desc: "Declares whether the operation is public, optional-auth, or authenticated." }, {
-name: "authorization.scopes", type: "readonly string[]", desc: "Every declared scope must be present
-on the authenticated Principal." }, { name: "authorization.roles", type: "readonly string[]", desc:
-"Every declared role must be present on the authenticated Principal." } ] }) }}
+{{ comp.apiTable({
+  caption: "@netscript/contracts — procedure access metadata",
+  rows: [
+    { name: ".meta({ access })", type: "NetScriptProcedureMeta", desc: "Stores access policy on the procedure that owns the route and schemas." },
+    { name: "authentication", type: "'none' | 'optional' | 'required'", desc: "Declares whether the operation is public, optional-auth, or authenticated." },
+    { name: "authorization.scopes", type: "readonly string[]", desc: "Every declared scope must be present on the authenticated Principal." },
+    { name: "authorization.roles", type: "readonly string[]", desc: "Every declared role must be present on the authenticated Principal." }
+  ]
+}) }}
 
 {{ comp callout { type: "important", title: "Optional is declared for future support" } }}
 <code>authentication: 'optional'</code> is part of the metadata vocabulary and appears honestly in
@@ -165,19 +167,16 @@ export const authenticator = createStaticCredentialAuthenticator({
 export const authorizer = createContractAuthorizer(WorkspaceContractV1);
 ```
 
-{{ comp.apiTable({ caption: "@netscript/service/auth — the route-authz surface", rows: [ { name:
-"createStaticCredentialAuthenticator(opts)", type: "AuthenticatorPort", desc: "Maps bearer tokens to
-principals — each credential carries a subject, scopes, and roles. Good for tests and
-machine-to-machine callers." }, { name: "createContractAuthorizer(contract, { fallback?, rawRoutes?
-})", type: "ContractPolicyAuthorizerPort", desc: "Traverses procedure-local access metadata and
-binds it to the builder's real REST/RPC paths and aliases. rawRoutes declares exact,
-authentication-required raw routes; any other unmatched route is denied." }, { name:
-"createScopeAuthorizer(opts)", type: "MatchAwareAuthorizerPort", desc: "Supported legacy path-rule
-authorizer; standalone, or a fallback only when a matched procedure has no metadata." }, { name:
-".withAuthn({ authenticator, protect?, allowAnonymous? })", type: "builder stage", desc: "protect
-defaults to ['/api']; allowAnonymous defaults to ['/health']." }, { name: ".withAuthz({ authorizer,
-denyByDefault? })", type: "builder stage", desc: "denyByDefault defaults to true — fail closed when
-no decision is reachable." } ] }) }}
+{{ comp.apiTable({
+  caption: "@netscript/service/auth — the route-authz surface",
+  rows: [
+    { name: "createStaticCredentialAuthenticator(opts)", type: "AuthenticatorPort", desc: "Maps bearer tokens to principals — each credential carries a subject, scopes, and roles. Good for tests and machine-to-machine callers." },
+    { name: "createContractAuthorizer(contract, { fallback?, rawRoutes? })", type: "ContractPolicyAuthorizerPort", desc: "Traverses procedure-local access metadata and binds it to the builder's real REST/RPC paths and aliases. rawRoutes declares exact, authentication-required raw routes; any other unmatched route is denied." },
+    { name: "createScopeAuthorizer(opts)", type: "MatchAwareAuthorizerPort", desc: "Supported legacy path-rule authorizer; standalone, or a fallback only when a matched procedure has no metadata." },
+    { name: ".withAuthn({ authenticator, protect?, allowAnonymous? })", type: "builder stage", desc: "protect defaults to ['/api']; allowAnonymous defaults to ['/health']." },
+    { name: ".withAuthz({ authorizer, denyByDefault? })", type: "builder stage", desc: "denyByDefault defaults to true — fail closed when no decision is reachable." }
+  ]
+}) }}
 
 `defineService()` requires an explicit `auth` policy and refuses to start when it is missing. With
 auth installed, `netscript service add` wires `browserAuthenticator` and
@@ -319,93 +318,21 @@ The guard produces three distinct responses, each a real assertion in the framew
 (`aspire start` from `aspire/`), then call the route for team `ws-1` (note: this tutorial assumes
 port 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports):
 
-{{ comp.tabbedCode({ tabs: [ { label: "401 — no credential", lang: "sh", code: "# No Authorization
-header -> authn rejects before the handler runs.\ncurl -i
-http://localhost:3001/api/workspace/ws-1/members\n\n# HTTP/1.1 401 Unauthorized\n# { \"error\":
-\"UNAUTHORIZED\", \"message\": \"missing-credential\" }" }, { label: "403 — wrong scope", lang:
-"sh", code: "# 'write' authenticates (valid credential) but lacks workspace:read,\n# so authz denies
-the scope-guarded route.\ncurl -i -H 'authorization: Bearer write' \\\n
-http://localhost:3001/api/workspace/ws-1/members\n\n# HTTP/1.1 403 Forbidden\n# { \"error\":
-\"FORBIDDEN\", \"message\": \"authz.missing-scope:workspace:read\" }" }, { label: "200 —
-authenticated + scoped", lang: "sh", code: "# 'read' carries workspace:read -> authn resolves the
-principal, authz allows it.\n# The contract parses ?limit=2 into a typed page.\ncurl -i -H
-'authorization: Bearer read' \\\n 'http://localhost:3001/api/workspace/ws-1/members?limit=2'" } ] })
-}}
-
-The `200` body echoes the values the contract parsed — the typed `workspace` path param, the typed
-`limit`/`offset` page, the authenticated `subject`, and the member rows from chapter 3:
-
-```json
-{
-  "workspace": "ws-1",
-  "limit": 2,
-  "offset": 0,
-  "subject": "user:reader",
-  "members": [
-    { "id": "mem_01", "workspaceId": "ws-1", "subject": "user:alice", "role": "member" }
-  ]
-}
-```
-
-An empty `members` array is still a `200` — it means the guard passed and the team simply has no
-rows yet (provision one with the [chapter 4](/tutorials/workspace/04-provision-job/) job). A `401`
-or `403` means the request never reached the query at all.
-
-{{ comp callout { type: "important", title: "Route-Level Scope Authorization Boundary" } }} The
-contract authorizer evaluates the flat scope and role strings declared in procedure metadata against
-the <code>Principal</code>. This design boundary separates route gating from complex
-tenant-ownership check logic. The framework does not automatically evaluate role hierarchies (such
-as admin permission inheritance) or verify organization-specific boundaries (such as confirming the
-caller is a member of the requested <code>workspace</code>). Currently, you must perform
-tenant-membership checks manually within your queries. Integrating typed organization helpers and
-plugin-aware principal mapping is planned under roadmap items R3 and R5.
-
-<!-- caveat: arch-debt:seamless-auth-roadmap -->
-
-{{ /comp }}
-
-## Verify your progress
-
-The three `curl` calls above are the verification. The unauthenticated call must fail closed, and
-the scoped call must succeed with a typed body:
-
-- [ ] `contracts/versions/v1/workspace.contract.ts` exports `WorkspaceContractV1` with typed input,
-      output, and `.meta({ access: ... })` requiring `workspace:read`.
-- [ ] `services/workspace/src/auth.ts` defines the authenticator and constructs the authorizer from
-      `WorkspaceContractV1`.
-- [ ] The `workspace` service implements `WorkspaceV1.members`, calls `.withRPC()`, and applies
-      `.withAuthn()` and `.withAuthz()`.
-- [ ] The handler reads typed `input.workspace`, `input.limit`, and `input.offset`; it does not
-      parse the URL by hand.
-- [ ] An unauthenticated request returns `401 UNAUTHORIZED` (`missing-credential`).
-- [ ] `Bearer write` returns `403 FORBIDDEN` (`authz.missing-scope:workspace:read`).
-- [ ] `Bearer read` returns `200` with a body carrying `workspace`, `limit`, and `subject`.
-- [ ] `GET /health` still answers without a credential.
-- [ ] The generated session client calls `members` with per-request credential context and no custom
-      `fetch`; authorized results preserve the contract types.
-
-## What you built
-
-A guarded, typed members procedure: `WorkspaceContractV1.members` owns the HTTP path, typed input
-and output, and required `workspace:read` scope; the service implements that procedure and opts into
-its policy with `createContractAuthorizer()` — proven by a `401` for an anonymous request, a `403`
-for the wrong scope, and a `200` for a correctly-scoped one. That is the differentiator this chapter
-exists to show: the URL, its typed data, and its authorization gate are **not three hand-maintained
-facts that can drift** — they are projections of one contract, checked by the compiler and by the
-framework's own auth tests. You also saw the boundary: this is route-level scope authz, not org/role
-RBAC — the tenancy stays yours.
-
-## Next Steps
-
-- **Ship it.** [Chapter 6 · Deploy](/tutorials/workspace/06-deploy/) runs the whole authenticated
-  workspace locally under Aspire and takes it to production.
-- **Reuse the contract on the client.** A typed SDK derived from `WorkspaceContractV1` exposes the
-  same `members` procedure and metadata. If that procedure key is renamed, its contract-local
-  metadata follows it and a stale SDK reference to the old key fails to type-check.
-- **Go deeper on identity.** The [auth plugin guide](/tutorials/workspace/02-auth/) covers resolving
-  real human sessions into the `Principal` this guard authorizes.
-
-{{ comp.nextPrev({ prev: { label: "4 · Provision job", href:
-"/tutorials/workspace/04-provision-job/" }, next: { label: "6 · Deploy", href:
-"/tutorials/workspace/06-deploy/" } }) }}
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "401 — no credential",
+    lang: "sh",
+    code: "# No Authorization header -> authn rejects before the handler runs.\ncurl -i http://localhost:3001/api/workspace/ws-1/members\n\n# HTTP/1.1 401 Unauthorized\n# { \"error\": \"UNAUTHORIZED\", \"message\": \"missing-credential\" }"
+  },
+  {
+    label: "403 — wrong scope",
+    lang: "sh",
+    code: "# 'write' authenticates (valid credential) but lacks workspace:read,\n# so authz denies the scope-guarded route.\ncurl -i -H 'authorization: Bearer write' \\\n  http://localhost:3001/api/workspace/ws-1/members\n\n# HTTP/1.1 403 Forbidden\n# { \"error\": \"FORBIDDEN\", \"message\": \"authz.missing-scope:workspace:read\" }"
+  },
+  {
+    label: "200 — authenticated + scoped",
+    lang: "sh",
+    code: "# 'read' carries workspace:read -> authn resolves the principal, authz allows it.\n# The contract parses ?limit=2 into a typed page.\ncurl -i -H 'authorization: Bearer read' \\\n  'http://localhost:3001/api/workspace/ws-1/members?limit=2'"
+  }
+] }) }}
 </content>
