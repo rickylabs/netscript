@@ -133,7 +133,16 @@ helper layer.
 | `netscript generate aspire` | Regenerate the Aspire AppHost and helpers from authored root `appsettings.json`. Flags: `--project-root <path>`, `--check`, `--format <text\|json>` (check only). |
 | `netscript generate runtime-schemas` | Generate JSON Schema files for runtime config topics. Flags: `--project-root <path>`, `--dry-run`, `--force`, `--verbose`. |
 | `netscript generate plugins` | Authoritative command: run each installed plugin's declared runtime registry generator under the project configuration. The workers generator discovers project-authored top-level `workers/jobs/*.ts` modules independently of official samples, excluding declared helper files such as `job-tools.ts`. Flags: `--project-root <path>`, `--dry-run`, `--verbose`. |
+| `netscript generate routes` | Reconstruct `.generated/manifest.ts` and `.generated/routes.ts` from the Fresh application route tree without a Vite build. Flags: `--app <name>`, `--project-root <path>` (explicit Fresh application root). |
 | `netscript generate resource <resource>` | Generate a typed Fresh resource slice from a named query procedure. Required flag: `--procedure <path>`. Selection flags: `--client <service>`, `--app <name>`, `--project-root <path>`, `--route <path>`. Optional layers: `--form`, `--partial`, `--stream`. Application flags: `--dry-run`, `--force`, `--json`. |
+
+For route generation, `--project-root` selects an explicit Fresh application directory and takes
+precedence over `--app`. Otherwise, `--app` selects a workspace member under `apps/`; from inside
+an app, that app is inferred, and a workspace with one app selects it automatically. Multiple apps
+require a selector. Missing or unknown targets fail before generation. Run `netscript generate
+routes --app dashboard` after adding, moving, or removing route files. Repeated runs leave unchanged
+outputs untouched. The command regenerates only the two derived modules; it does not reconcile
+authored `router.ts` entries or page bindings. See [route lifecycle](/web-layer/route/).
 
 Generated registries are derived artifacts. Add or replace job modules in `workers/jobs/`, then run
 `netscript generate plugins`; do not hand-edit `.netscript/generated/**`. Removing the official

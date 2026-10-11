@@ -119,6 +119,9 @@ function resourceNameMatches(value: Record<string, unknown>, name: string): bool
     if (typeof candidate === 'string' && candidate.toLowerCase() === name.toLowerCase()) {
       return true;
     }
+    if (key === 'displayName' && typeof candidate === 'string' && candidate.length > 0) {
+      return false;
+    }
   }
   return false;
 }
@@ -136,15 +139,7 @@ function findResource(value: unknown, name: string): Record<string, unknown> | u
 
   const resources = value['resources'];
   if (Array.isArray(resources)) {
-    const exact = resources.filter(isRecord).find((entry) => resourceNameMatches(entry, name));
-    if (exact) return exact;
-    // DCP suffixes instance ids (`dashboard-sayhwbds`); accept that when nothing matched exactly.
-    return resources
-      .filter(isRecord)
-      .find((entry) =>
-        typeof entry['name'] === 'string' &&
-        (entry['name'] as string).toLowerCase().startsWith(`${name.toLowerCase()}-`)
-      );
+    return resources.filter(isRecord).find((entry) => resourceNameMatches(entry, name));
   }
 
   if (resourceNameMatches(value, name)) return value;
