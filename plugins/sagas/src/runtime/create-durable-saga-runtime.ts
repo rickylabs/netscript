@@ -140,7 +140,9 @@ async function resolveStoreResources(
     });
   }
 
-  if (options.backend === 'prisma' || options.prisma !== undefined) {
+  if (
+    options.backend === 'prisma' || (options.backend === undefined && options.prisma !== undefined)
+  ) {
     if (!options.prisma) {
       throw new Error('Prisma saga store backend requires a Prisma client.');
     }

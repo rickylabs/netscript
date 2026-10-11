@@ -1,4 +1,5 @@
 import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
+import { ORPCError } from '@orpc/contract';
 import { KvOAuthError } from '@netscript/auth-kv-oauth';
 import { captureAuthResponseCookies } from '../request-context.ts';
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
@@ -85,7 +86,23 @@ export const authV1: AuthHandlers<AuthV1RouteKey> = {
   /** Mandatory base seam `describe` route. */
   describe: router.describe.handler(() => authCapabilities),
   signin: router.signin.handler(async ({ input, context }) => await signin(input, context)),
-  callback: router.callback.handler(async ({ input, context }) => await callback(input, context)),
+  callback: router.callback.handler(async ({ input, context }) => {
+    try {
+      return await callback(input, context);
+    } catch (error) {
+      if (error instanceof AuthServiceHandlerError && error.code === 'oauth_cookie_missing') {
+        // providerFailure has replaced backend diagnostics with this safe contract
+        // message. Keep it defined so production masking cannot erase the remedy.
+        throw new ORPCError('oauth_cookie_missing', {
+          defined: true,
+          status: error.status,
+          message: error.message,
+          data: { providerId: error.providerId, reason: error.message },
+        });
+      }
+      throw error;
+    }
+  }),
   signout: router.signout.handler(async ({ input, context }) => await signout(input, context)),
   revokeSession: router.revokeSession.handler(async ({ input, context }) =>
     await revokeSession(input, context)

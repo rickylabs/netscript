@@ -32,7 +32,7 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 | `@netscript/plugin-sagas-core/runtime`               | `./src/runtime/mod.ts`               | 87      | The engine: `createSagaRuntime`, `createSagaEngine`, `createSagaCompensator`, `createSagaScheduler`, and the idempotency-key helpers.                |
 | `@netscript/plugin-sagas-core/adapters`              | `./src/adapters/mod.ts`              | 72      | Concrete port adapters, including `createSagaBusBridge`.                                                                                             |
 | `@netscript/plugin-sagas-core/transports`            | `./src/transports/mod.ts`            | 49      | Saga bus transports (`createNetScriptRedisTransport`, `createGarnetListTransport`) with their message and delayed-entry codecs.                      |
-| `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 78      | KV-backed instance and applied-key stores, `openSagaRuntimeKv`, and `resolveSagaStoreBackend`.                                                       |
+| `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 81      | KV-backed instance, scheduler, and applied-key stores, `openSagaRuntimeKv`, and the shared canonical-store selectors and Prisma-client predicate.    |
 | `@netscript/plugin-sagas-core/stores/backends`       | `./src/stores/saga-store-backend.ts` | 9       | Backend selectors and projection env/value/type contracts without importing persistent adapters.                                                     |
 | `@netscript/plugin-sagas-core/middleware`            | `./src/middleware/mod.ts`            | 30      | Host middleware — `createSagaMiddleware`, `createSSEEventsMiddleware`, `emitSagaEvent`.                                                              |
 | `@netscript/plugin-sagas-core/integration/workers`   | `./src/integration/workers/mod.ts`   | 23      | Selected-schema pure worker effect constructors plus explicit trigger helpers for callers outside synchronous handlers.                              |
@@ -49,6 +49,13 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 
 Export counts are the symbol counts `deno doc` reports for each entrypoint; subpaths overlap where a
 type is re-exported through more than one layer.
+
+The stores subpath exposes `isPrismaSagaStoreClient(value)` for the canonical-store delegate
+contract shared by API and runner bootstrap validation. Query delegates remain a separate API
+requirement. `resolveSagaStoreBackend` accepts an optional `defaultBackend` used only when neither
+environment nor appsettings selects a backend; invalid configured values always fail. Runner backend
+selection controls canonical state; Prisma selection keeps replay reservations and applied keys in a
+separate KV handle that is closed on shutdown.
 
 ## Root surface (`@netscript/plugin-sagas-core`)
 
@@ -283,12 +290,29 @@ Custom runner delivery queues preserve their existing native-delay behavior unle
 that queue, bind the canonical store with matching `completedRetentionDays`, and drive
 `cleanupRetention()`. Without a bound store or cancellation capability, startup logs a warning and
 uses the ready queue's native delays. This preserves injected-engine and custom-factory runner
-configurations. Cleanup before binding returns false; a second start is rejected. The core
-`SagaScheduler` records origin identity but does not implement retention: its scheduler-store path
-remains acceptance scope for issue #2109. KV canonical reads are batched in native pages of at most
-ten keys. Only explicitly scoped new messages are cancellation candidates; legacy unscoped queue
-messages and native-provider delayed entries need separate migration.
+configurations. Cleanup before binding returns false; a second start is rejected. The independent
+core `SagaScheduler` uses `KvSagaSchedulerStore` from `./stores` for bounded retention. Bind
+canonical state and the matching `completedRetentionDays` policy before startup; low-level callers
+drive `cleanupRetention()` from a background service loop. The shipped durable runtime drives this
+hook for an injected scheduler. A pass inspects at most ten records and persists its cursor across
+restart. Pending, claimed, dispatched, and failed records receive KV TTL anchored to the origin's
+terminal deadline; expired scoped records are deleted with CAS. Open instances and all unscoped
+records, including new schedules without an origin, survive without TTL. Due delivery checks
+canonical origin state; missing state cancels scoped records. Replay keyed by origin, message
+idempotency key (or message id), and scheduled time does not renew the deadline or replace outcomes.
+Unkeyed schedules have distinct identities. Claim leases recover after 30 seconds; stale claim
+outcomes cannot replace newer claims or recreate deleted records. The host owns the KV adapter and
+injects the same clock into scheduler and adapter. A time-ordered due index honors the caller's
+batch limit and atomically re-keys claims to their lease deadline; retained outcomes never delay due
+work. Adapter-private claim tokens survive deadline updates, and empty claims make no KV writes.
+Custom stores need the optional cancellation and cleanup capabilities when binding retention. All
+core schedulers, including unbound ones, use content-hashed replay identities; unbound schedulers do
+not enforce originating-instance retention. No database archive or app read drives this path. KV
+canonical reads are batched in native pages of at most ten keys. Only explicitly scoped new messages
+are cancellation candidates; legacy unscoped queue messages and native-provider delayed entries need
+separate migration.
 
 Terminal records written before the retention policy was installed still need a migration/backfill.
 This leaf proves new scoped delayed-message cancellation; legacy saga/trigger terminal-family
-backfill and legacy delayed messages remain separate acceptance scope for issue #2109.
+backfill, new and legacy unscoped schedules, and native-provider delayed messages remain separate
+acceptance scope for issue #2109.
