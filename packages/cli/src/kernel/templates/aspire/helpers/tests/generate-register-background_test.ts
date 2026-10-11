@@ -1,3 +1,5 @@
+import { readTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 /**
  * @module templates/aspire/helpers/generate-register-background_test
  *
@@ -133,6 +135,7 @@ async function loadGeneratedModule(
   await Deno.mkdir(helpersDir, { recursive: true });
   await Deno.mkdir(sdkDir, { recursive: true });
 
+  await Deno.writeTextFile(`${helpersDir}/installation-secret.mts`, readTemplateAssetSync(TEMPLATE_KEYS.aspireHelpersInstallationSecret));
   await Deno.writeTextFile(
     `${sdkDir}/aspire.mts`,
     [

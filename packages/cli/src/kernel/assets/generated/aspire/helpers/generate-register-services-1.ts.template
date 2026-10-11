@@ -1,5 +1,6 @@
 {{__slot0__}}
 
+import { installationSecretPermissions } from './installation-secret.mts';
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
 import { OtlpProtocol } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
@@ -38,6 +39,7 @@ export async function registerServices(
   config: NetScriptConfig,
   infrastructure: InfrastructureContext,
   appHostDir: string,
+  installationSecretFile: string | undefined = undefined,
 ): Promise<Map<string, ExecutableResource>> {
   const services = new Map<string, ExecutableResource>();
   const databaseEnvKey = buildDatabaseUriEnvKey(config);

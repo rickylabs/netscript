@@ -1,3 +1,5 @@
+import { readTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 /**
  * @module templates/aspire/helpers/service-environment-runtime_test
  *
@@ -307,6 +309,7 @@ async function runGeneratedRegistration(
   await Deno.mkdir(helpersDir, { recursive: true });
   await Deno.mkdir(sdkDir, { recursive: true });
 
+  await Deno.writeTextFile(`${helpersDir}/installation-secret.mts`, readTemplateAssetSync(TEMPLATE_KEYS.aspireHelpersInstallationSecret));
   await Deno.writeTextFile(`${sdkDir}/aspire.mts`, ASPIRE_SDK_DOUBLE);
   await Deno.writeTextFile(`${helpersDir}/_aspire-compat.mts`, aspireCompatDouble());
 

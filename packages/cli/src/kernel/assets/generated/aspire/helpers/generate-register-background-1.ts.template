@@ -1,5 +1,6 @@
 {{__slot0__}}
 
+import { installationSecretPermissions } from './installation-secret.mts';
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
 {{otlpImport}}import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
@@ -35,6 +36,7 @@ export async function registerBackgroundProcessors(
   _services: Map<string, ExecutableResource>,
   _plugins: Map<string, ExecutableResource>,
   appHostDir: string,
+  installationSecretFile: string | undefined = undefined,
 ): Promise<Map<string, ExecutableResource>> {
   const backgroundProcessors = new Map<string, ExecutableResource>();
 {{databaseBindings}}

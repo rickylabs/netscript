@@ -132,7 +132,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     lines.push(
       `    const ${id} = builder.addExecutable(${
         JSON.stringify(name)
-      }, 'deno', ${id}_workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...${id}_perms, ${
+      }, 'deno', ${id}_workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...installationSecretPermissions(${id}_perms, installationSecretFile), ${
         JSON.stringify(entrypoint)
       }]);`,
     );
@@ -164,6 +164,12 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         });`,
       );
     }
+
+    lines.push(`    if (installationSecretFile) {`);
+    lines.push(
+      `      await ${id}.withEnvironment('NETSCRIPT_INSTALLATION_SECRET_FILE', installationSecretFile);`,
+    );
+    lines.push(`    }`);
 
     // Telemetry env vars
     if (telemetry) {
