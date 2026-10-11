@@ -12,6 +12,24 @@ function fence(markdown: string, marker: string): string {
   return block[1];
 }
 
+Deno.test('route authorization tutorial retains completion sections and tracked debt caveat', async () => {
+  const tutorial = await Deno.readTextFile(new URL(tutorialPath, root));
+  for (
+    const marker of [
+      'The `200` body echoes',
+      'An empty `members` array is still a `200`',
+      'Route-Level Scope Authorization Boundary',
+      '<!-- caveat: arch-debt:seamless-auth-roadmap -->',
+      '## Verify your progress',
+      '## What you built',
+      '## Next Steps',
+      '{{ comp.nextPrev(',
+    ]
+  ) {
+    assert(tutorial.includes(marker), `Missing tutorial completion content: ${marker}`);
+  }
+});
+
 Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401/403/200', async () => {
   const tutorial = await Deno.readTextFile(new URL(tutorialPath, root));
   const sdk = await Deno.readTextFile(new URL(sdkPath, root));
@@ -26,8 +44,10 @@ Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401
   const template = await Deno.readTextFile(
     new URL('packages/cli/src/kernel/assets/auth/bff.ts.template', root),
   );
+  const temporaryRoot = new URL('.llm/tmp/', root);
+  await Deno.mkdir(temporaryRoot, { recursive: true });
   const directory = await Deno.makeTempDir({
-    dir: new URL('.llm/tmp/', root).pathname,
+    dir: temporaryRoot.pathname,
     prefix: 'guarded-client-docs-',
   });
   try {
@@ -99,7 +119,7 @@ import { createContractAuthorizer, createStaticCredentialAuthenticator } from '@
 import { createServiceClient } from '@netscript/sdk/client';
 import { WorkspaceContractV1, WorkspaceV1 } from './contract.ts';
 import { workspaceClient, listWorkspaceMembers } from './sdk.ts';
-import { loadWorkspaceMembers } from './tutorial.ts';
+import { handleWorkspaceMembers, loadWorkspaceMembers } from './tutorial.ts';
 
 const router = WorkspaceV1.$context<ServiceHandlerContext>().router({
   members: WorkspaceV1.$context<ServiceHandlerContext>().members.handler(({ input, context }) => {
@@ -124,6 +144,7 @@ const app = createService(router, { name: 'workspace' })
 const server = Deno.serve({ hostname: '127.0.0.1', port: 0, onListen() {} }, (request) => app.fetch(request));
 const key = 'services__workspace__http__0';
 const previous = Deno.env.get(key);
+// Set discovery once for every sequential and concurrent call; restore it only after all finish.
 Deno.env.set(key, 'http://127.0.0.1:' + server.addr.port);
 const anonymous = createServiceClient({ contract: WorkspaceContractV1, serviceName: 'workspace' });
 const input = { workspace: 'ws-1', limit: 20, offset: 0 };
@@ -156,6 +177,17 @@ async function verify() {
         ...input, subject: 'user:reader', members: [],
       });
     }
+  }
+  for (const [token, status] of [[undefined, 401], ['write', 403], ['read', 200]] as const) {
+    const request = new Request('https://example.test/members', {
+      headers: token ? { cookie: '__Host-ns_session=' + token } : {},
+    });
+    const response = await handleWorkspaceMembers(request, 'ws-1');
+    assertEquals(response.status, status);
+    assertEquals(response.headers.get('cache-control'), 'no-store');
+    assertEquals(await response.json(), status === 200
+      ? { ...input, subject: 'user:reader', members: [] }
+      : { authenticated: false });
   }
   const health = await app.request('/health');
   assertEquals(health.status, 200);
