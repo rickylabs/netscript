@@ -1,3 +1,4 @@
+import type { PluginHealthSummary } from '@netscript/plugin/health';
 import { createToolSchema, isRecord, type ToolSchema } from './schema.ts';
 import type { ToolName } from './tool-types.ts';
 import { CLI_EXECUTION_IDENTITY_JSON_SCHEMA } from './command-executor-port.ts';
@@ -55,12 +56,26 @@ const doctorCountsShape = objectSchema({
   warn: { type: 'integer' },
   fail: { type: 'integer' },
 }, ['pass', 'warn', 'fail']);
+const resourceHealthShape = objectSchema({
+  name: stringProperty,
+  status: { enum: ['healthy', 'unhealthy', 'unknown'] },
+  state: stringProperty,
+}, ['name', 'status', 'state']);
+const pluginHealthShape = objectSchema({
+  pluginName: stringProperty,
+  status: { enum: ['healthy', 'degraded', 'unhealthy', 'unknown'] },
+  apiResources: { type: 'array', items: stringProperty },
+  childResources: { type: 'array', items: stringProperty },
+  apis: { type: 'array', items: resourceHealthShape },
+  children: { type: 'array', items: resourceHealthShape },
+}, ['pluginName', 'status', 'apiResources', 'childResources', 'apis', 'children']);
 const doctorCheckShape = objectSchema({
   name: stringProperty,
   status: { enum: ['pass', 'warn', 'fail'] },
   summary: stringProperty,
   fix: stringProperty,
   operationSchemaHint: stringProperty,
+  runtimeHealth: pluginHealthShape,
 }, ['name', 'status', 'summary']);
 const doctorFamilyShape = objectSchema({
   name: { enum: ['telemetry', 'aspire', 'project', 'plugins'] },
@@ -107,6 +122,8 @@ export interface DoctorCheck {
   /** Action that can resolve a warning or failure. */ readonly fix?: string;
   /** Next diagnostic step when the finding involves a service endpoint. */
   readonly operationSchemaHint?: string;
+  /** Shared runtime verdict supplied by the host plugin doctor. */
+  readonly runtimeHealth?: PluginHealthSummary;
 }
 /** Doctor check counts grouped by severity. */
 export interface DoctorCounts {
@@ -203,6 +220,8 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     status: { enum: ['pass', 'warn', 'fail'] },
     counts: { type: 'object' },
     domains: { type: 'array', maxItems: 5 },
+    pluginHealth: { type: 'array', maxItems: 20, items: pluginHealthShape },
+    healthStatus: { enum: ['healthy', 'degraded', 'unhealthy', 'unknown'] },
   }, ['status', 'counts', 'domains']),
   list_runs: objectSchema({ count: { type: 'integer' }, runs: { type: 'array', maxItems: 100 } }, [
     'count',

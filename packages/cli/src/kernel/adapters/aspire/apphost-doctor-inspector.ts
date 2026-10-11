@@ -1,3 +1,4 @@
+import { readChildHealth } from './child-health-reader.ts';
 import { resolve } from '@std/path';
 import type { ProcessPort } from '../../ports/process-port.ts';
 import type {
@@ -8,24 +9,34 @@ import type {
 
 /** Aspire CLI-backed inspection of the AppHost belonging to one project. */
 export class AspireAppHostDoctorInspector implements AppHostInspector {
-  constructor(private readonly process: ProcessPort) {}
+  constructor(
+    private readonly process: ProcessPort,
+    private readonly fetchFn: typeof fetch = fetch,
+  ) {}
 
   /** Return an explicit absent/running snapshot; never infer liveness from `describe` exit code. */
-  async inspect(projectRoot: string): Promise<AppHostInspection> {
+  async inspect(
+    projectRoot: string,
+    childResources: readonly string[] = [],
+  ): Promise<AppHostInspection> {
     try {
-      return await this.inspectAvailableCli(projectRoot);
+      return await this.inspectAvailableCli(projectRoot, childResources);
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {
         return {
           status: 'unavailable',
-          reason: `AppHost inspection was skipped because Aspire could not be executed: ${error.message}`,
+          reason:
+            `AppHost inspection was skipped because Aspire could not be executed: ${error.message}`,
         };
       }
       throw error;
     }
   }
 
-  private async inspectAvailableCli(projectRoot: string): Promise<AppHostInspection> {
+  private async inspectAvailableCli(
+    projectRoot: string,
+    childResources: readonly string[],
+  ): Promise<AppHostInspection> {
     const appHostPath = resolve(projectRoot, 'aspire/apphost.mts');
     const ps = await this.process.exec('aspire', [
       'ps',
@@ -52,14 +63,37 @@ export class AspireAppHostDoctorInspector implements AppHostInspector {
       '--non-interactive',
       '--nologo',
     ], { cwd: resolve(projectRoot, 'aspire') });
-    if (describe.code !== 0) throw commandError('aspire describe', describe.stderr || describe.stdout);
+    if (describe.code !== 0) {
+      throw commandError('aspire describe', describe.stderr || describe.stdout);
+    }
 
     const document = JSON.parse(describe.stdout) as unknown;
     const rawResources = document && typeof document === 'object'
       ? Reflect.get(document, 'resources')
       : undefined;
-    if (!Array.isArray(rawResources)) throw new Error('aspire describe JSON has no resources array');
-    return { status: 'running', resources: rawResources.flatMap(readResource) };
+    if (!Array.isArray(rawResources)) {
+      throw new Error('aspire describe JSON has no resources array');
+    }
+    const resources = rawResources.flatMap(readResource);
+    const rawByName = new Map(
+      rawResources.map((raw) => [readString(raw, 'displayName') ?? readString(raw, 'name'), raw]),
+    );
+    const declared = new Set(childResources);
+    const pending = resources.filter((resource) => declared.has(resource.name));
+    let next = 0;
+    await Promise.all(Array.from({ length: Math.min(4, pending.length) }, async () => {
+      while (next < pending.length) {
+        const resource = pending[next++];
+        if (!resource) continue;
+        const url = childEndpoint(rawByName.get(resource.name));
+        const health = url ? await readChildHealth(url, this.fetchFn) : undefined;
+        Object.assign(
+          resource,
+          health ? { childHealth: health } : { childHealthUnavailable: true },
+        );
+      }
+    }));
+    return { status: 'running', resources };
   }
 }
 
@@ -101,4 +135,19 @@ function readHealthReports(
 
 function commandError(command: string, detail: string): Error {
   return new Error(`${command} failed: ${detail.trim() || 'unknown error'}`);
+}
+
+function childEndpoint(value: unknown): string | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const urls: unknown = Reflect.get(value, 'urls');
+  if (!Array.isArray(urls)) return undefined;
+  for (const entry of urls) {
+    const url = readString(entry, 'url');
+    if (!url) continue;
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return url;
+    } catch { /* Invalid endpoint evidence is unavailable. */ }
+  }
+  return undefined;
 }

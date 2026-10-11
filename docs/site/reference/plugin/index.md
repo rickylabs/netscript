@@ -6,14 +6,14 @@ title: '@netscript/plugin'
 # `@netscript/plugin`
 
 Plugin manifest, validation, discovery, and host-context contracts for NetScript. This page is
-written against the package's public surface reported by `deno doc`. For the full index of
-packages and plugins return to the [reference overview](/reference/).
+written against the package's public surface reported by `deno doc`. For the full index of packages
+and plugins return to the [reference overview](/reference/).
 
-The root entrypoint (`@netscript/plugin`) is the plugin authoring contract: the
-`definePlugin` builder DSL, the manifest and contribution types, the plugin error classes,
-the contribution base class, and the `inspectPlugin` diagnostic. Host tooling, CLI
-integration, SDK discovery, abstract contribution bases, runtime loaders, testing fixtures,
-and template assets live on the sub-path exports listed at the end of this page.
+The root entrypoint (`@netscript/plugin`) is the plugin authoring contract: the `definePlugin`
+builder DSL, the manifest and contribution types, the plugin error classes, the contribution base
+class, and the `inspectPlugin` diagnostic. Host tooling, CLI integration, SDK discovery, abstract
+contribution bases, runtime loaders, testing fixtures, and template assets live on the sub-path
+exports listed at the end of this page.
 
 ## Plugin definition
 
@@ -64,11 +64,11 @@ and template assets live on the sub-path exports listed at the end of this page.
 
 ## Root composition validation
 
-`validatePluginComposition(plugins)` (from `@netscript/plugin/config`) is the one check a root
-host runs over its plugin manifests. It returns `{ ok: true, composition }` or
-`{ ok: false, diagnostics }` and reports every failure in one pass. `createPluginHostBootstrap`,
-the CLI host loader, `loadRegisteredPlugins`, and `generate aspire` all call it, so runtime
-bootstrap and generation agree.
+`validatePluginComposition(plugins)` (from `@netscript/plugin/config`) is the one check a root host
+runs over its plugin manifests. It returns `{ ok: true, composition }` or
+`{ ok: false, diagnostics }` and reports every failure in one pass. `createPluginHostBootstrap`, the
+CLI host loader, `loadRegisteredPlugins`, and `generate aspire` all call it, so runtime bootstrap
+and generation agree.
 
 | Diagnostic `code`             | Rejected when                                                                  |
 | ----------------------------- | ------------------------------------------------------------------------------ |
@@ -99,10 +99,9 @@ Each contribution key has one identity and scope:
 
 Root-scoped identities must be unique across the whole composition. Plugin-scoped identities only
 need to be unique within their plugin, so every plugin can contribute contract version `v1`. The
-composition's merged `contributions` holds every collection key, including `cli.doctorChecks`, in one
-linear pass. `aspire` and `doctor` stay on each
-plugin's manifest, and `mergeContributions` throws instead of silently keeping the last value when
-both inputs set one of them.
+composition's merged `contributions` holds every collection key, including `cli.doctorChecks`, in
+one linear pass. `aspire` and `doctor` stay on each plugin's manifest, and `mergeContributions`
+throws instead of silently keeping the last value when both inputs set one of them.
 
 Every declared dependency must be composed. Its `version` is read as a semver range, so an exact
 version matches only itself. Library packages that are not plugins belong in `deno.json` imports,
@@ -394,8 +393,8 @@ This entrypoint also re-exports the root `PluginLogger` type.
 
 This entrypoint also re-exports the root/config symbols `BackgroundProcessorContribution`,
 `ContractVersionContribution`, `DbSchemaContribution`, `E2eContribution`, `MigrationContribution`,
-`PluginContext`, `PluginContributions`, `PluginDependencies`, `PluginLifecycleHooks`, `PluginLogger`,
-`PluginManifest`, `PluginMetadata`, `PluginMetadataValue`, `PluginType`,
+`PluginContext`, `PluginContributions`, `PluginDependencies`, `PluginLifecycleHooks`,
+`PluginLogger`, `PluginManifest`, `PluginMetadata`, `PluginMetadataValue`, `PluginType`,
 `RuntimeConfigTopicContribution`, `ServiceContribution`, `StreamTopicContribution`, and
 `TelemetryContribution`; the SDK symbols `EmitterPort`, `ExtractedContribution`,
 `ManifestResolverPort`, `RegistryEmission`, `WalkedFile`, and `WalkerPort`; and the CLI symbols
@@ -463,36 +462,67 @@ the existing compatibility mapping.
 
 `createPluginService(router, { name, auth })` requires an explicit posture:
 `auth: { authn: { authenticator }, authz: { authorizer } }` installs native guards, while
-`auth: { public: true, reason: 'Public status API' }` records a deliberate public service.
-The canonical `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy` and `ServicePublicAuthPolicy`
-types come from `@netscript/service/auth` and are re-exported by `@netscript/plugin/service`.
-Missing, malformed and mixed postures throw before service construction. See the
+`auth: { public: true, reason: 'Public status API' }` records a deliberate public service. The
+canonical `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy` and `ServicePublicAuthPolicy` types come
+from `@netscript/service/auth` and are re-exported by `@netscript/plugin/service`. Missing,
+malformed and mixed postures throw before service construction. See the
 [service auth reference](/reference/service/#explicit-service-posture) for the validation boundary.
 
-The factory passes native auth options unchanged and installs them after context, before RPC.
-The builder installs auth middleware before deferred RPC, REST and raw routes. Its built-in health
+The factory passes native auth options unchanged and installs them after context, before RPC. The
+builder installs auth middleware before deferred RPC, REST and raw routes. Its built-in health
 routes retain their native public behavior. A custom nonempty anonymous-prefix list replaces the
 default; the factory does not merge another policy into it.
 
 ### `@netscript/plugin/health`
 
-| Symbol                       | Kind       | Description                                                                                            |
-| ---------------------------- | ---------- | ------------------------------------------------------------------------------------------------------ |
-| `ChildHealthState`           | type alias | Closed child state vocabulary: starting, ready, degraded, crash-looping, stopped, failed.              |
-| `ChildHealthSnapshot`        | type alias | State, registry/dependency readiness, restart count, and redacted fatal incident.                      |
-| `ChildFatalError`            | type alias | Fixed redacted message and epoch-millisecond capture timestamp.                                        |
-| `CHILD_CRASH_LOOP_THRESHOLD` | variable   | Three restarts in 60 seconds; recovery requires a clean running minute.                                |
-| `ChildHealthMonitor`         | class      | Tracks readiness and bounded restart history with an injectable clock.                                 |
-| `childHealthResponse`        | function   | Returns HTTP 200 only for ready with both readiness checks complete; otherwise 503.                    |
-| `runChildHealthProcess`      | function   | Starts health before bootstrap; fatal errors log and exit nonzero after a one-second red health grace. |
+| Symbol                       | Kind       | Description                                                                                               |
+| ---------------------------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| `ChildHealthState`           | type alias | Closed child state vocabulary: starting, ready, degraded, crash-looping, stopped, failed.                 |
+| `ChildHealthSnapshot`        | type alias | State, registry/dependency readiness, restart count, and redacted fatal incident.                         |
+| `ChildFatalError`            | type alias | Fixed redacted message and epoch-millisecond capture timestamp.                                           |
+| `CHILD_CRASH_LOOP_THRESHOLD` | variable   | Three restarts in 60 seconds; recovery requires a clean running minute.                                   |
+| `aggregatePluginHealth`      | function   | Shared API/child aggregation: healthy, degraded, unhealthy, or unknown; missing children cannot be green. |
+| `PluginHealthSummary`        | interface  | Plugin identity, declared names, per-resource states, and one canonical verdict.                          |
+| `ChildHealthMonitor`         | class      | Tracks readiness and bounded restart history with an injectable clock.                                    |
+| `childHealthResponse`        | function   | Returns HTTP 200 only for ready with both readiness checks complete; otherwise 503.                       |
+| `runChildHealthProcess`      | function   | Starts health before bootstrap; fatal errors log and exit nonzero after a one-second red health grace.    |
 
-Workers, triggers, and sagas runtime entrypoints also re-export the shared health types.
-The child health payload is bounded and excludes raw exception messages and stacks. Dependency
-readiness records startup checks and listener failures; continuous backing-service heartbeat,
-AppHost probes, and doctor/MCP aggregation belong to subsequent slices of #1366.
+Workers, triggers, and sagas runtime entrypoints also re-export the shared health types. The child
+health payload is bounded and excludes raw exception messages and stacks. Dependency readiness
+records startup checks and listener failures; continuous backing-service heartbeat remains follow-up
+scope. Generated AppHost probes and doctor/MCP aggregation consume the same child contract.
 
 Registry readiness records loaded and validated definitions; runtime registration belongs to
 dependency readiness. Crash-loop recovery requires a full 60 seconds of uninterrupted running with
-both readiness fields true. Fatal causes remain in server stderr, while public incidents stay redacted.
-The child exits with code 1 after a one-second failure grace period. Without PORT, its listener uses
-an ephemeral port on Deno's default interface; AppHost wiring and probes remain follow-up scope.
+both readiness fields true. Fatal causes remain in server stderr, while public incidents stay
+redacted. The child exits with code 1 after a one-second failure grace period. Without PORT, its
+listener uses an ephemeral port on Deno's default interface; AppHost wiring uses declared runtime
+capabilities to add the endpoint and readiness probe.
+
+## Plugin runtime health aggregation
+
+`aggregatePluginHealth` from `@netscript/plugin/health` is the shared verdict function for
+`netscript plugin doctor` and the MCP `doctor` and `get_app_status` health report. Generated
+`appsettings.json` declares API and child resource names; `InstalledFrom` groups their plugin
+ownership. Enabled background processors with `Runtime: deno` and `RequiresKv: true` use the shared
+child health transport, matching the AppHost generator's capability rule. Disabled children do not
+participate. A renamed resource retains its declaration and ownership.
+
+| API readiness         | Declared child readiness                                         | Plugin verdict |
+| --------------------- | ---------------------------------------------------------------- | -------------- |
+| Healthy               | All children healthy                                             | `healthy`      |
+| Healthy               | Unhealthy, starting, stopped, crash-looping, unknown, or missing | `degraded`     |
+| Unhealthy or missing  | Any                                                              | `unhealthy`    |
+| No readiness evidence | Any                                                              | `unknown`      |
+
+A ready child also needs registry and dependency readiness. A process reporting Healthy without
+readiness evidence cannot certify readiness. Doctor reads each declared child endpoint with a
+bounded timeout and payload; unavailable or malformed payloads cannot make a wrapper green. The
+report names each child and retains `crash-looping`. Historical traffic and error-free spans cannot
+override a dead child. Degraded runtime reports make plugin doctor exit nonzero and MCP health
+severity `fail`; `get_app_status` also exposes the named `healthStatus` and `pluginHealth` reports.
+Standalone MCP without the CLI project adapter reports runtime health as unknown.
+
+These are diagnostic reads. Child processing and its health listener run under the background
+service identity, independently of a phone, browser, or owner session. Dashboard panels consume the
+health report; panel rendering and integrated scaffold failure injection remain separate scope.

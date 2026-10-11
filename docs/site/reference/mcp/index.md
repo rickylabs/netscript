@@ -302,3 +302,16 @@ the resolved endpoint.
 ---
 
 Back to the [reference overview](/reference/).
+
+## Declared plugin runtime health
+
+The CLI-hosted MCP `doctor` and `get_app_status` tools consume the plugin doctor's shared
+`@netscript/plugin/health` verdict. A healthy API with an unhealthy or missing declared child yields
+`degraded`, with monitoring severity `fail`. `get_app_status` returns `healthStatus` and bounded
+`pluginHealth` reports; each report includes API and child names, verdicts, and lifecycle states
+including `crash-looping`. Filtering an API retains its declared children. A standalone MCP process
+without the CLI project adapter reports runtime health as `unknown`.
+
+The package forwards `PluginHealthDeclaration`, `PluginHealthStatus`, `PluginHealthSummary`, and
+`PluginResourceHealth` to document the types used by `DoctorCheck.runtimeHealth`. Their contract and
+aggregation implementation remain owned by `@netscript/plugin/health`.

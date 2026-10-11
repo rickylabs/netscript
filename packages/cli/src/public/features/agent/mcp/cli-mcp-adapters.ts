@@ -3,8 +3,8 @@ import type {
   CommandDescriptor,
   DoctorCheck,
   ProjectDoctorPort,
-} from "@netscript/mcp";
-import type { PluginDoctorReport } from "../../plugins/doctor/doctor-plugin-use-case.ts";
+} from '@netscript/mcp';
+import type { PluginDoctorReport } from '../../plugins/doctor/doctor-plugin-use-case.ts';
 
 interface EnumerableCommand {
   getName(): string;
@@ -27,7 +27,7 @@ function walkCommands(root: EnumerableCommand): readonly CommandDescriptor[] {
     command: EnumerableCommand,
     parents: readonly string[],
   ): void => {
-    const path = [...parents, command.getName()].join(" ");
+    const path = [...parents, command.getName()].join(' ');
     descriptors.push({
       path,
       description: command.getDescription().slice(0, 512),
@@ -63,21 +63,22 @@ export class CliProjectDoctor implements ProjectDoctorPort {
     const reports = await this.doctor({ projectRoot });
     if (reports.length === 0) {
       return [{
-        name: "plugin_configuration",
-        status: "pass",
-        summary: "No plugins configured.",
+        name: 'plugin_configuration',
+        status: 'pass',
+        summary: 'No plugins configured.',
       }];
     }
     return reports.flatMap((report) =>
       report.checks.map((check) => ({
         name: `${report.pluginName}:${check.id}`,
-        status: check.status === "healthy"
-          ? "pass" as const
-          : check.status === "warning"
-          ? "warn" as const
-          : "fail" as const,
+        status: check.status === 'healthy'
+          ? 'pass' as const
+          : check.status === 'warning'
+          ? 'warn' as const
+          : 'fail' as const,
         summary: check.message ?? check.title,
-        ...(check.status === "healthy" ? {} : {
+        ...(check.runtimeHealth ? { runtimeHealth: check.runtimeHealth } : {}),
+        ...(check.status === 'healthy' ? {} : {
           fix: `Resolve ${check.title.toLowerCase()} for ${report.pluginName}.`,
         }),
       }))
