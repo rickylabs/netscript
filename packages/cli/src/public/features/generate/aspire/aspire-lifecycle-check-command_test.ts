@@ -21,6 +21,7 @@ async function withInitializedProject(run: (root: string) => Promise<void>) {
   try {
     await invoke(
       'init',
+      '--no-agent',
       'surface-demo',
       '--path',
       parent,

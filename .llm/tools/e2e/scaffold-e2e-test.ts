@@ -830,6 +830,9 @@ class SmokeRunner {
         ...this.#commandArgs(
           'init',
           this.#options.name,
+          ...(this.#options.cli.replaceAll('\\', '/').endsWith('netscript-dev.ts')
+            ? []
+            : ['--no-agent']),
           '--ci',
           '--path',
           this.#options.smokeRoot,
