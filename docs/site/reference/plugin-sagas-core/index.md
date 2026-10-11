@@ -20,7 +20,7 @@ a NetScript host. Use it directly for custom hosts, libraries, and tests.
 
 ## Exports
 
-The package publishes twenty entrypoints. The root path carries the userland DSL; the remaining
+The package publishes twenty-one entrypoints. The root path carries the userland DSL; the remaining
 subpaths expose the layers a host, adapter author, or test harness composes.
 
 | Export specifier                                     | Module                               | Exports | Purpose                                                                                                                                              |
@@ -33,6 +33,7 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 | `@netscript/plugin-sagas-core/adapters`              | `./src/adapters/mod.ts`              | 72      | Concrete port adapters, including `createSagaBusBridge`.                                                                                             |
 | `@netscript/plugin-sagas-core/transports`            | `./src/transports/mod.ts`            | 49      | Saga bus transports (`createNetScriptRedisTransport`, `createGarnetListTransport`) with their message and delayed-entry codecs.                      |
 | `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 72      | KV-backed instance and applied-key stores, `openSagaRuntimeKv`, and `resolveSagaStoreBackend`.                                                       |
+| `@netscript/plugin-sagas-core/stores/backends` | `./src/stores/saga-store-backend.ts` | 9 | Lightweight store/projection selectors, `SAGA_PROJECTION_BACKEND_ENV`, `SAGA_PROJECTION_BACKENDS`, and `SagaProjectionBackend`, without loading persistent adapters. |
 | `@netscript/plugin-sagas-core/middleware`            | `./src/middleware/mod.ts`            | 30      | Host middleware — `createSagaMiddleware`, `createSSEEventsMiddleware`, `emitSagaEvent`.                                                              |
 | `@netscript/plugin-sagas-core/integration/workers`   | `./src/integration/workers/mod.ts`   | 23      | Selected-schema pure worker effect constructors plus explicit trigger helpers for callers outside synchronous handlers.                              |
 | `@netscript/plugin-sagas-core/integration/publisher` | `./src/integration/publisher/mod.ts` | 11      | Non-throwing publisher contracts plus `publishSagaOrThrow` for an explicit exception boundary.                                                       |
