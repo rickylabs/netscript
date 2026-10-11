@@ -30,6 +30,26 @@ for (const path of ['/api/v1/auth/signout', '/api/rpc/v1/auth/signout', '/api/rp
     };
     for (const token of ['alice:a', 'alice:b', 'bob:c']) assertEquals(await me(token), true);
     const rpc = path.includes('/rpc/');
+    const refuse = async (sessionId: string, authenticated = true) => {
+      const response = await fetch(`${service.baseUrl}${path}`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          ...(authenticated ? { cookie: '__Host-ns_session=alice:a' } : {}),
+        },
+        body: JSON.stringify(
+          rpc ? { json: { sessionId, everywhere: true } } : { sessionId, everywhere: true },
+        ),
+      });
+      return { status: response.status, body: await response.json() };
+    };
+    assertEquals((await refuse('c', false)).status, 401);
+    const foreign = await refuse('c');
+    const unknown = await refuse('unknown');
+    assertEquals(foreign.status, 401);
+    assertEquals(foreign, unknown);
+    assertEquals(await revocations.nextDelivery(Date.parse(cutoff)), undefined);
+    for (const token of ['alice:a', 'alice:b', 'bob:c']) assertEquals(await me(token), true);
     const response = await fetch(`${service.baseUrl}${path}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', cookie: '__Host-ns_session=alice:a' },
