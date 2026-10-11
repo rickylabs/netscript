@@ -2,7 +2,7 @@
 export type DurableSagaStoreBackend = 'kv' | 'prisma';
 
 /** Saga query projection backend, independently selected from canonical state. */
-export type SagaProjectionBackend = DurableSagaStoreBackend | 'none';
+export type SagaProjectionBackend = 'kv' | 'prisma' | 'none';
 
 /** Environment variable used to select saga query projection and hydration. */
 export const SAGA_PROJECTION_BACKEND_ENV = 'NETSCRIPT_SAGA_PROJECTION';
