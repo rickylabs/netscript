@@ -1,11 +1,11 @@
 import { basename, join } from '@std/path';
-import { normalize } from '@std/path/posix';
+import { buildGeneratedOutputs, isProjectPath } from './generated-surface-inventory.ts';
+export { generatedContentDigest as aspireContentDigest } from './generated-surface-inventory.ts';
 import { generateAspireCliTaskRunner } from '../../templates/workspace/aspire-cli-task.ts';
 import {
   ASPIRE_SURFACE_GENERATOR,
   ASPIRE_SURFACE_MARKER,
   ASPIRE_SURFACE_VERSION,
-  type AspireGeneratedOutput,
   type AspireSurfaceInventory,
 } from '../../domain/aspire-generated-surface.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
@@ -40,36 +40,33 @@ export async function canonicalizeAspireOutputs(
     content: file.content,
   })));
   if (contents.length !== canonical.length) throw new Error('Incomplete Aspire formatting batch.');
-  return canonical.map((file, index) => ({ path: file.path, content: contents[index] }));
+  const formatted = canonical.map((file, index) => ({ path: file.path, content: contents[index] }));
+  await buildAspireInventory(formatted);
+  return formatted;
 }
 
 /** Reserved generation scope; authored config and Aspire SDK modules cannot be claimed. */
 export function isAspireOutputPath(path: string): boolean {
-  return basename(path) !== 'appsettings.json' && !path.includes('\\') &&
-    normalize(path) === path &&
+  return basename(path).toLowerCase() !== 'appsettings.json' && isProjectPath(path) &&
     (path === '.netscript/aspire-cli.ts' || path === 'aspire/apphost.mts' ||
       (path.startsWith('aspire/.helpers/') && !path.endsWith('/')));
-}
-
-/** Hash exact bytes with a Web Platform digest. */
-export async function aspireContentDigest(bytes: Uint8Array): Promise<string> {
-  const digest = await crypto.subtle.digest('SHA-256', Uint8Array.from(bytes));
-  return 'sha256:' +
-    Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 /** Describe all selected files; authored inputs are appended by the reader. */
 export async function buildAspireInventory(
   files: readonly GeneratedFile[],
 ): Promise<AspireSurfaceInventory> {
-  const outputs: AspireGeneratedOutput[] = [];
-  for (const file of files) {
-    outputs.push({
-      generator: ASPIRE_SURFACE_GENERATOR,
-      path: file.path,
-      ownership: 'generated' as const,
-      digest: await aspireContentDigest(new TextEncoder().encode(file.content)),
-    });
+  const outputs = await buildGeneratedOutputs(
+    files.map((file) => ({
+      ...file,
+      generator: ASPIRE_SURFACE_GENERATOR as typeof ASPIRE_SURFACE_GENERATOR,
+    })),
+    isAspireOutputPath,
+  );
+  for (const path of ['aspire/apphost.mts', '.netscript/aspire-cli.ts']) {
+    if (!outputs.some((entry) => entry.path === path)) {
+      throw new Error('Incomplete Aspire output inventory.');
+    }
   }
   return {
     version: ASPIRE_SURFACE_VERSION,

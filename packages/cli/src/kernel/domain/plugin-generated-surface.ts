@@ -1,23 +1,18 @@
-import type {
-  AspireAuthoredInput,
-  AspireGeneratedOutput,
-  AspireSurfaceDrift,
-} from './aspire-generated-surface.ts';
+import {
+  GENERATED_SURFACE_VERSION,
+  type GeneratedSurfaceDrift,
+  type GeneratedSurfaceInput,
+  type GeneratedSurfaceOutput,
+} from './generated-surface.ts';
 
 /** Identity of the installed-plugin registry generation command. */
 export const PLUGIN_SURFACE_GENERATOR = 'public.generate.plugins';
 /** Wire version of the registry inventory and check report. */
-export const PLUGIN_SURFACE_VERSION = 1;
+export const PLUGIN_SURFACE_VERSION = GENERATED_SURFACE_VERSION;
 /** An output identifies its specific installed plugin producer. */
-export interface PluginGeneratedOutput extends Omit<AspireGeneratedOutput, 'generator'> {
-  /** Command and installed package that rendered this registry. */
-  readonly generator: string;
-}
+export type PluginGeneratedOutput = GeneratedSurfaceOutput;
 /** Authored selection authority or selected project source. */
-export interface PluginAuthoredInput extends Omit<AspireAuthoredInput, 'generator'> {
-  /** Command reading the authority. */
-  readonly generator: typeof PLUGIN_SURFACE_GENERATOR;
-}
+export type PluginAuthoredInput = GeneratedSurfaceInput<typeof PLUGIN_SURFACE_GENERATOR>;
 /** Installed producer, including immutable published versions with no registry manifest. */
 export interface PluginSurfaceProducer {
   /** Command and installed package identity. */
@@ -51,7 +46,7 @@ export interface PluginSurfaceReport {
   /** Process verdict. */
   readonly exitCode: 0 | 1;
   /** Missing, extra, ownership, byte, or inspection findings. */
-  readonly drift: readonly AspireSurfaceDrift[];
+  readonly drift: readonly GeneratedSurfaceDrift[];
 }
 /** One generator-owned rendered registry before canonical formatting. */
 export interface RenderedPluginRegistry {
