@@ -601,6 +601,7 @@ packages/cli/src/kernel/templates/aspire/helpers/register/registration-preamble.
 packages/cli/src/kernel/templates/aspire/helpers/register/render-http-endpoint.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/register/resolve-resource-environment.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-health-checks_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-tool-manifest_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/background-infrastructure-health_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/fake-postgres-server.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
