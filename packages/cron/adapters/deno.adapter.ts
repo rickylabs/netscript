@@ -89,12 +89,11 @@ export class DenoCronAdapter implements CronScheduler {
       throw new Error(`Job with id '${id}' already exists`);
     }
 
-    const denoSchedule = translateDenoCronExpression(schedule);
-
-    if (!this.isValid(schedule)) {
+    if (!isValidCronExpression(schedule)) {
       throw new Error(`Invalid cron expression: ${schedule}`);
     }
 
+    const denoSchedule = translateDenoCronExpression(schedule);
     const abortController = new AbortController();
     const timezone = options?.timezone ?? 'UTC';
     const enabled = options?.enabled ?? true;
@@ -221,7 +220,13 @@ export class DenoCronAdapter implements CronScheduler {
 
   /** Validate a cron expression for this adapter. */
   isValid(expression: CronExpression): boolean {
-    return isValidCronExpression(expression);
+    if (!isValidCronExpression(expression)) return false;
+    try {
+      translateDenoCronExpression(expression);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /** Register an event listener. */

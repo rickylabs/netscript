@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { fromFileUrl } from '@std/path';
 
 Deno.test({
   name: 'Deno real runtime fires translated UTC weekdays and uses day constraint OR',
@@ -11,7 +12,7 @@ Deno.test({
         args: [
           'run',
           '--unstable-cron',
-          new URL('./fixtures/deno-weekday-probe.ts', import.meta.url).pathname,
+          fromFileUrl(new URL('./fixtures/deno-weekday-probe.ts', import.meta.url)),
         ],
         signal: controller.signal,
         stdout: 'piped',
