@@ -13,7 +13,6 @@ export type {
   DatabaseSpec,
   DenoBackgroundSpec,
   DenoServiceSpec,
-  HealthCheckSpec,
 } from '../domain/mod.ts';
 export type { AspireBuilder } from '../ports/mod.ts';
 export { AspireNSPluginContribution } from '../runtime/mod.ts';

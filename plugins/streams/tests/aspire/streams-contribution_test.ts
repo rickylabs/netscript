@@ -41,10 +41,5 @@ Deno.test('StreamsAspireContribution registers the streams service and health ch
   assertEquals(contribution.declareEnv(ctx), {
     DURABLE_STREAMS_URL: { kind: 'resource', resource: 'streams', key: 'url' },
   });
-  assertEquals(contribution.declareHealthChecks(ctx), [{
-    resource: 'streams',
-    url: 'http://localhost:9437/health',
-    expect: 200,
-    timeoutMs: 3000,
-  }]);
+  assertEquals('declareHealthChecks' in contribution, false);
 });

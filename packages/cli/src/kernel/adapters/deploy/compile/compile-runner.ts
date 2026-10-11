@@ -15,6 +15,8 @@ import { bundleTarget } from './compile-bundler.ts';
 import { formatSize } from './compile-format.ts';
 import { binaryExtensionForTarget, defaultCompileTarget } from './compile-platform.ts';
 import { formatV8CompileArg, getV8Profile } from '../../windows/runtime/v8-profiles.ts';
+import { PACKAGED_INSTALLATION_SECRET_FILE } from '../../../domain/deploy/packaged-installation-credential.ts';
+import { installationSecretPermissions } from '../../secrets/installation-secret-file.ts';
 
 // ============================================================================
 // SINGLE TARGET COMPILATION
@@ -62,7 +64,10 @@ export async function compileTarget(
 ): Promise<CompileResult> {
   const startTime = performance.now();
   const arch = options.target ?? defaultCompileTarget();
-  const outputPath = join(options.binDir, `${target.name}${binaryExtensionForTarget(arch)}`);
+  const outputPath = join(
+    options.binDir,
+    `${target.name}${binaryExtensionForTarget(arch)}`,
+  );
   const entrypointPath = join(options.projectRoot, target.entrypoint);
   const v8Profile = getV8Profile(target);
   const timeoutMs = options.timeoutMs ?? DEFAULT_COMPILE_TIMEOUT_MS;
@@ -86,7 +91,9 @@ export async function compileTarget(
   } else {
     // Bundle failed — fall back to direct compile (larger binary but still works)
     if (options.verbose) {
-      outputText(`  [bundle] ✗ ${bundleResult.error} — falling back to direct compile`);
+      outputText(
+        `  [bundle] ✗ ${bundleResult.error} — falling back to direct compile`,
+      );
     }
   }
 
@@ -109,8 +116,12 @@ export async function compileTarget(
   // workspace. Including them pulls npm: specifiers that fail with
   // nodeModulesDir: "none". Use a minimal workspace with only the app itself.
   // Always write for pre-built apps to avoid stale configs from previous runs.
-  const isPrebuiltApp = target.type === 'app' && target.entrypoint.endsWith('.js');
-  const configAlreadyExists = await Deno.stat(compileConfigPath).then(() => true, () => false);
+  const isPrebuiltApp = target.type === 'app' &&
+    target.entrypoint.endsWith('.js');
+  const configAlreadyExists = await Deno.stat(compileConfigPath).then(
+    () => true,
+    () => false,
+  );
 
   if (isPrebuiltApp || !configAlreadyExists) {
     try {
@@ -133,7 +144,10 @@ export async function compileTarget(
     }
   }
 
-  const compileConfigExists = await Deno.stat(compileConfigPath).then(() => true, () => false);
+  const compileConfigExists = await Deno.stat(compileConfigPath).then(
+    () => true,
+    () => false,
+  );
   const configFlag = compileConfigExists ? compileConfigFilename : 'deno.json';
 
   const includeFlags = (target.include ?? []).flatMap((p) => [
@@ -159,7 +173,10 @@ export async function compileTarget(
     // (Fresh/Vite use DOM types that fail strict deno compile checking)
     ...(bundlePath || target.type === 'app' ? ['--no-check'] : []),
     ...includeFlags,
-    ...target.permissions,
+    ...installationSecretPermissions(
+      target.permissions,
+      target.type === 'app' ? undefined : PACKAGED_INSTALLATION_SECRET_FILE,
+    ),
     compileEntrypoint,
   ];
 
@@ -225,7 +242,8 @@ export async function compileTarget(
   } catch (error) {
     clearTimeout(timeoutHandle);
     await cleanup();
-    const isTimeout = error instanceof DOMException && error.name === 'AbortError';
+    const isTimeout = error instanceof DOMException &&
+      error.name === 'AbortError';
     return {
       name: target.name,
       success: false,

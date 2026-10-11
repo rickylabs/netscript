@@ -19,6 +19,8 @@ import process from 'node:process';
 export interface InstallationSecretFileOptions {
   /** Explicit existing file; absent files fail rather than silently changing identity. */
   readonly file?: string;
+  /** Environment supplying an explicit reference; defaults to the current process. */
+  readonly environment?: Readonly<Record<string, string | undefined>>;
 }
 
 /** Minimal upstream secret-parameter seam; the value must remain a direct parameter. */
@@ -39,7 +41,8 @@ export function ensureInstallationSecretFile(
   options: InstallationSecretFileOptions = {},
 ): string {
   try {
-    const explicit = options.file ?? process.env[FILE_ENV];
+    const explicit = options.file ??
+      (options.environment ?? process.env)[FILE_ENV];
     if (explicit !== undefined) {
       if (!explicit) throw new Error();
       const file = resolve(explicit);
@@ -48,6 +51,9 @@ export function ensureInstallationSecretFile(
     }
     // Match ensureDatabasePassword: credentials travel with the git-ignored project data.
     const directory = resolve(installationRoot, '.data', 'aspire-secrets');
+    mkdirSync(dirname(directory), { recursive: true, mode: 0o700 });
+    const data = lstatSync(dirname(directory));
+    if (!data.isDirectory() || data.isSymbolicLink()) throw new Error();
     mkdirSync(directory, { recursive: true, mode: 0o700 });
     assertOwnerOnly(directory, true);
     const file = join(directory, 'installation.secret');
@@ -179,7 +185,9 @@ function assertOwnerOnly(path: string, directory: boolean): void {
   }
   if (
     process.platform !== 'win32' &&
-    ((metadata.mode & 0o077) !== 0 || metadata.uid !== process.getuid?.())
+    ((metadata.mode & 0o077) !== 0 || metadata.uid !== process.getuid?.() ||
+      (metadata.mode & (directory ? 0o700 : 0o600)) !==
+        (directory ? 0o700 : 0o600))
   ) throw new Error();
 }
 

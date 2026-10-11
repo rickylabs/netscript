@@ -70,10 +70,5 @@ Deno.test('WorkersAspireContribution publishes one dependency-aware workers runt
     WORKERS_API_URL: { kind: 'resource', resource: 'workers-api', key: 'url' },
     WORKERS_CONCURRENCY: '2',
   });
-  assertEquals(contribution.declareHealthChecks(ctx), [{
-    resource: 'workers-api',
-    url: 'http://localhost:9191/health',
-    expect: 200,
-    timeoutMs: 3000,
-  }]);
+  assertEquals('declareHealthChecks' in contribution, false);
 });

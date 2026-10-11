@@ -14,7 +14,7 @@ class EmptyContribution extends AspireNSPluginContribution {
   }
 }
 
-Deno.test('AspireNSPluginContribution: default hooks return empty declarations', () => {
+Deno.test('AspireNSPluginContribution: environment hook defaults to empty; no unconsumed health hook', () => {
   const contribution = new EmptyContribution();
   const ctx = {
     projectRoot: '.',
@@ -26,5 +26,5 @@ Deno.test('AspireNSPluginContribution: default hooks return empty declarations',
   } satisfies ContributionContext;
 
   assertEquals(contribution.declareEnv(ctx), {});
-  assertEquals(contribution.declareHealthChecks(ctx), []);
+  assertEquals('declareHealthChecks' in contribution, false);
 });

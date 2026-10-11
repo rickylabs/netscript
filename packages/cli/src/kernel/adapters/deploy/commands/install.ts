@@ -174,8 +174,8 @@ export async function updateXmlPaths(
       if (verbose) {
         outputText(`   ${name}.xml: updating paths ${currentPath} → ${installDir}`);
       }
-      const sourcePattern = currentPath.replace(/\\/g, '\\\\');
-      content = content.replace(new RegExp(sourcePattern, 'g'), installDir);
+      const sourcePattern = currentPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      content = content.replace(new RegExp(sourcePattern, 'g'), () => installDir);
       await Deno.writeTextFile(xmlPath, content);
       xmlUpdated++;
     }

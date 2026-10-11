@@ -10,6 +10,10 @@ import type { CompileTarget } from '../../../domain/deploy/compile-target.ts';
 import type { InfrastructureConfig } from '../../../domain/infrastructure-config.ts';
 import { observabilityEnv } from '../../../domain/deploy/observability-convention.ts';
 import { getManifestEnvVars, type ManifestContext } from '../manifest/manifest-resolver.ts';
+import {
+  INSTALLATION_SECRET_FILE_ENV,
+  PACKAGED_INSTALLATION_SECRET_FILE,
+} from '../../../domain/deploy/packaged-installation-credential.ts';
 
 // ============================================================================
 // ENVIRONMENT VARIABLE BUILDER
@@ -217,7 +221,8 @@ export function buildServiceEnvironment(
       endpoint: infra.otlpEndpoint,
       protocol: 'http/protobuf',
       serviceVersion: version,
-      emitServiceVersionVar: target.type === 'plugin' || target.type === 'worker',
+      emitServiceVersionVar: target.type === 'plugin' ||
+        target.type === 'worker',
     }),
   );
   // SERVY/Aspire runtime tuning (not part of the shared identity/exporter seam).
@@ -260,5 +265,10 @@ export function buildServiceEnvironment(
     env.WORKER_ID = `${target.name}-1`;
   }
 
+  // Never carry the development host's reference into a relocated installation or an app.
+  delete env[INSTALLATION_SECRET_FILE_ENV];
+  if (target.type !== 'app') {
+    env[INSTALLATION_SECRET_FILE_ENV] = PACKAGED_INSTALLATION_SECRET_FILE;
+  }
   return env;
 }
