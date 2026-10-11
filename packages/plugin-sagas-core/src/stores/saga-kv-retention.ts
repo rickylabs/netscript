@@ -1,3 +1,4 @@
+import { backfillSagaRetention, type SagaBackfillResult } from './saga-kv-retention-backfill.ts';
 import type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';
 import type { SagaInstanceId, SagaStateEnvelope } from '../domain/mod.ts';
 
@@ -100,6 +101,26 @@ export class SagaKvRetention {
     const wrapped = this.#start !== undefined;
     this.#start = undefined;
     return wrapped;
+  }
+
+  /** Discover legacy families in a bounded operator pass using the live-write policy. */
+  backfill(
+    days: number | ((envelope: SagaStateEnvelope) => number),
+    migration = 'legacy-terminal-v1',
+    limit = 10,
+  ): Promise<SagaBackfillResult> {
+    return backfillSagaRetention(
+      this.#kv,
+      this.#prefix,
+      (envelope) =>
+        sagaRetentionRemaining(
+          envelope,
+          typeof days === 'number' ? days : days(envelope),
+          this.#now(),
+        ),
+      migration,
+      limit,
+    );
   }
 
   #atomic(checks: Parameters<NonNullable<KvStore['atomic']>>[0], mutations: AtomicMutation[]) {
