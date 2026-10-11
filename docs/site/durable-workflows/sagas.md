@@ -350,8 +350,8 @@ builder knob to serialize work on a single business entity (one order, one tenan
 
 Authoring a saga decides *what* it does. The **durable store backend** decides *where
 its runtime state lives between messages and across crashes*. NetScript ships two
-backends, and the choice is **explicit and mandatory** — the runtime refuses to start
-without one.
+backends. The runner defaults to **KV** when no backend is configured; select the
+backend explicitly for deployments so durable state lands where you intend.
 
 - **`kv`** — durable saga state in Deno KV (the orchestration store stood up by
   Aspire). Zero extra schema; the natural default for a single-service app and for
@@ -364,15 +364,26 @@ without one.
   path in your relational database alongside the rest of your data, with SQL-level
   inspection of in-flight state and transition history.
 
-You select the backend with the `NETSCRIPT_SAGA_STORE` environment variable (`kv` | `prisma`) or the appsettings key `sagas.store.backend`. The plugin service resolves this on startup via `resolveSagaStoreBackend(...)`, which **throws** if neither is set — there is no silent default in the resolver, by design, so a deployment can never guess wrong about where durable state lands. (Calling `createDurableSagaRuntime(...)` directly without a `backend` falls back to the KV store; the mandatory-selection guarantee comes from the resolver the service runs at startup.)
+You select the backend with `NETSCRIPT_SAGA_STORE` (`kv` | `prisma`) or appsettings
+`sagas.store.backend` / `Sagas.Store.Backend`; the environment takes precedence. The runner
+uses the host bootstrap's settings when supplied. Without a bootstrap, it reads the project's
+`appsettings.json` from `NETSCRIPT_PROJECT_ROOT` or the working directory, including the installed
+`NetScript.BackgroundProcessors.sagas.Sagas` settings. Direct `sagas/runtime.ts` and packaged
+runtime launches use the same resolution and retain the KV default when nothing is configured.
+Invalid configured values always fail startup. Prisma still requires a bootstrap-supplied client.
+
+The shared `resolveSagaStoreBackend(...)` resolver throws when selection is absent unless the
+caller supplies `defaultBackend`; the runner supplies `kv` for compatibility. The low-level
+`createDurableSagaRuntime(...)` factory also defaults to KV when neither a backend nor a Prisma
+client is supplied. An explicit `backend: 'kv'` wins over an optional Prisma client.
 
 {{ comp.apiTable({
   caption: "Durable saga store backends — trait matrix",
   rows: [
     { name: "kv", type: "Deno KV", desc: "Default for local/single-service. No extra schema. Provisioned by Aspire (Redis/KV). Resolved via NETSCRIPT_SAGA_STORE=kv or sagas.store.backend=kv." },
     { name: "prisma", type: "Relational / Prisma", desc: "Writes saga_runtime_state, saga_runtime_transition, saga_runtime_correlation. Requires a Prisma client passed to createDurableSagaRuntime — so it follows whatever engine you scaffolded (Postgres in the recommended setup; mysql / mssql / sqlite all work). SQL-inspectable in-flight state. Resolved via NETSCRIPT_SAGA_STORE=prisma or sagas.store.backend=prisma." },
-    { name: "selection", type: "mandatory", desc: "No implicit default. resolveSagaStoreBackend(...) throws when neither NETSCRIPT_SAGA_STORE nor sagas.store.backend is set." },
-    { name: "client requirement", type: "prisma only", desc: "backend: 'prisma' (or passing prisma) without a Prisma client throws 'Prisma saga store backend requires a Prisma client.'" }
+    { name: "selection", type: "kv runner default", desc: "The runner defaults to KV only when no backend is configured. resolveSagaStoreBackend(...) remains strict unless a caller supplies defaultBackend. Invalid configured values fail." },
+    { name: "client requirement", type: "prisma only", desc: "backend: 'prisma' without a Prisma client throws 'Prisma saga store backend requires a Prisma client.'" }
   ]
 }) }}
 

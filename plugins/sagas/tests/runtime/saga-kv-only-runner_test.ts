@@ -131,7 +131,7 @@ Deno.test('Prisma projection runner rejects missing host delegates before delive
   await Deno.writeTextFile(
     `${directory}/bootstrap.ts`,
     `export async function createPluginServiceContext() {
-      return { appsettings: { Sagas: { Projection: { Backend: 'prisma' } } },
+      return { appsettings: { Sagas: { Store: { Backend: 'kv' }, Projection: { Backend: 'prisma' } } },
         db: { getClient: () => Promise.resolve({ user: {} }) } };
     }`,
   );
