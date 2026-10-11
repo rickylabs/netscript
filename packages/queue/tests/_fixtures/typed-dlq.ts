@@ -69,13 +69,17 @@ export async function typedDlqDrain(): Promise<void> {
 }
 
 /** Force a persisted nack to lose its acknowledgement, then abort during native redelivery. */
-export async function typedDlqRedelivery(backend: 'memory' | 'kv'): Promise<void> {
+export async function typedDlqRedelivery(
+  backend: 'memory' | 'kv',
+  decorateStore: (store: DeadLetterStorePort) => DeadLetterStorePort = (store) => store,
+): Promise<void> {
   const dir = await Deno.makeTempDir({ prefix: 'typed-dlq-redelivery-' });
   const path = `${dir}/kv.sqlite`;
   const kv = await Deno.openKv(path);
-  const deadLetters: DeadLetterStorePort = backend === 'kv'
+  const backingStore: DeadLetterStorePort = backend === 'kv'
     ? new KvDeadLetterStore({ queueName: 'typed-dlq', denoKv: kv })
     : new MemoryDeadLetterStore();
+  const deadLetters = decorateStore(backingStore);
   const redelivered = Promise.withResolvers<void>();
   const firstPersisted = Promise.withResolvers<void>();
   const release = Promise.withResolvers<void>();
