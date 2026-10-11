@@ -8,6 +8,7 @@ import { basename, join } from '@std/path';
 import { parseAppSettings } from '@netscript/aspire/config';
 import { generateAspireCliTaskRunner } from '../../templates/workspace/aspire-cli-task.ts';
 import { HelpersGeneratorPipeline } from '../../templates/aspire/helpers/helpers-generator-pipeline.ts';
+import { reconcileAppHostPackageDependencies } from '../aspire/apphost-package-dependencies.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
@@ -15,8 +16,6 @@ import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { ServiceConfigEntry } from '../../domain/service-shape.ts';
-import { reconcileBrowserAuth } from '../plugin/browser-auth-reconciler.ts';
-import { reconcilePluginReferences } from '../plugin/plugin-reference-reconciler.ts';
 import {
   getPluginServiceLookupName,
   loadRegisteredPluginMetadata,
@@ -173,12 +172,6 @@ export async function regenerateAspireHelpers(
     );
   }
 
-  let browserAuthFiles: readonly string[] = [];
-  if (!options.dryRun) {
-    await reconcilePluginReferences(projectRoot, fs);
-    browserAuthFiles = await reconcileBrowserAuth(projectRoot, fs, options.formatter);
-  }
-
   const parsed = await parseAppSettings(appsettingsPath);
   const rawAppsettings = JSON.parse(await fs.readFile(appsettingsPath)) as unknown;
   const projectConfig = await loadProjectConfig({ cwd: projectRoot }, {
@@ -203,7 +196,7 @@ export async function regenerateAspireHelpers(
       content: generateAspireCliTaskRunner(),
     },
   ];
-  const written: string[] = [...browserAuthFiles];
+  const written: string[] = [];
   for (const file of workspaceFiles) {
     const path = file.path;
     const content = options.formatter
@@ -215,6 +208,12 @@ export async function regenerateAspireHelpers(
     written.push(path);
     if (!options.dryRun) await scaffolder.writeFile(path, content, true);
   }
+
+  // The regenerated helpers may load npm packages an older AppHost never declared.
+  const packageJson = await reconcileAppHostPackageDependencies(fs, aspireDir, config.Databases, {
+    dryRun: options.dryRun,
+  });
+  if (packageJson) written.push(packageJson);
 
   return written;
 }

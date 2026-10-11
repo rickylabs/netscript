@@ -10,6 +10,7 @@ import {
   TEST_ONLY_GARNET_HEALTH_KEY,
   TEST_ONLY_POSTGRES_HEALTH_KEY,
 } from './listener-fault-controller.ts';
+import { prepareCredentialFaultFixture } from './credential-fault-fixture.ts';
 import { DATABASE, type DatabaseEngine } from '../../../../domain/extension-axes.ts';
 import {
   listenerFaultExpectations,
@@ -23,7 +24,10 @@ const FIXTURE_APP_IDENTIFIER_PREFIX = 'readiness_fixture_';
 const POSTGRES_REAL_HEALTH_KEY = 'postgres_listener';
 const GARNET_REAL_HEALTH_KEY = 'garnet_resp';
 
-/** Prepare the dead-port app and D-101 synthetic listener controller before Aspire starts. */
+/**
+ * Prepare the dead-port app, the D-101 synthetic listener controller and, on the PostgreSQL
+ * tier, the #1726 wrong-credential probe before Aspire starts.
+ */
 export async function prepareReadinessFixture(
   projectRoot: string,
   database: DatabaseEngine,
@@ -39,9 +43,12 @@ export async function prepareReadinessFixture(
   const registerApps = await Deno.readTextFile(registerAppsPath);
   await Deno.writeTextFile(registerAppsPath, injectReadinessFixtureApps(registerApps));
 
+  const withListenerFaults = injectListenerFaultHealthChecks(registerInfrastructure, database);
   await Deno.writeTextFile(
     registerInfrastructurePath,
-    injectListenerFaultHealthChecks(registerInfrastructure, database),
+    database === DATABASE.POSTGRES
+      ? await prepareCredentialFaultFixture(projectRoot, withListenerFaults)
+      : withListenerFaults,
   );
 }
 

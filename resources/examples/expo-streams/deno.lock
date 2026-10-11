@@ -256,10 +256,10 @@
         "dependencies": [
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@tanstack/ai-anthropic@0.20.0",
-          "npm:@tanstack/ai-mcp@0.8.1",
-          "npm:@tanstack/ai-openai@0.28.0",
-          "npm:@tanstack/ai@0.66.0"
+          "npm:@tanstack/ai-anthropic@0.21.1",
+          "npm:@tanstack/ai-mcp@0.8.3",
+          "npm:@tanstack/ai-openai@0.29.1",
+          "npm:@tanstack/ai@0.68.0"
         ]
       },
       "jsr:@netscript/aspire@0.0.7": {
@@ -374,9 +374,9 @@
           "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
           "npm:@orpc/server@^1.15.5",
           "npm:@preact/signals@2.11.3",
-          "npm:@tanstack/ai-client@0.39.0",
-          "npm:@tanstack/ai-preact@0.20.1",
-          "npm:@tanstack/ai@0.66.0",
+          "npm:@tanstack/ai-client@0.39.2",
+          "npm:@tanstack/ai-preact@0.20.3",
+          "npm:@tanstack/ai@0.68.0",
           "npm:@tanstack/preact-query@^5.104.1",
           "npm:@tanstack/query-core@^5.104.1",
           "npm:@tanstack/react-db@0.1.95",

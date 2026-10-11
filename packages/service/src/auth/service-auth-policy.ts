@@ -58,7 +58,7 @@ export function assertServiceAuthPolicy(value: unknown): asserts value is Servic
   ) {
     throw new TypeError(POLICY_ERROR);
   }
-  if ('authz' in value) {
+  if ('authz' in value && value.authz !== undefined) {
     const authz = value.authz;
     if (
       typeof authz !== 'object' || authz === null || Array.isArray(authz) ||

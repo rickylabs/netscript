@@ -98,6 +98,9 @@ export const RUNTIME_GATES = [
   // runs before the generated quality gates so the plugin it authors is also
   // type-checked, linted and format-checked; it is never an AppHost resource.
   GATE.BEHAVIOR_GENERATED_GUARDED_PLUGIN,
+  // Both public CLI service/auth installation orders run in isolated projects,
+  // removed after their BFF probes; neither adds an AppHost resource to this fixture.
+  GATE.BEHAVIOR_GENERATED_GUARDED_SERVICE,
   GATE.RUNTIME_ASPIRE_RESTORE,
   // Declared service environment is wired here, not next to the other pre-start
   // fixtures: it regenerates every helper from appsettings.json, so it has to
@@ -132,6 +135,8 @@ export const RUNTIME_GATES = [
   GATE.RUNTIME_WAIT_STREAMS,
   GATE.RUNTIME_WAIT_APP,
   GATE.AGENT_ASPIRE_MCP_SMOKE,
+  GATE.RUNTIME_HEALTH_CREDENTIAL_ACCEPTED,
+  GATE.RUNTIME_HEALTH_CREDENTIAL_REJECTED,
   GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE,
   GATE.RUNTIME_TYPED_DB_PHASE_B,
   GATE.BEHAVIOR_DB_STATUS_PRESERVES_APPHOST,
@@ -185,6 +190,9 @@ const POSTGRES_ONLY_RUNTIME_GATES = new Set<GateId>([
   GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
   GATE.RUNTIME_TYPED_DB_PHASE_B,
   GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
+  // #1726: credential readiness is PostgreSQL-only; SQLite has no credentialed service.
+  GATE.RUNTIME_HEALTH_CREDENTIAL_ACCEPTED,
+  GATE.RUNTIME_HEALTH_CREDENTIAL_REJECTED,
 ]);
 
 const RUNTIME_SQLITE_GATES = RUNTIME_GATES.filter((gate) => !POSTGRES_ONLY_RUNTIME_GATES.has(gate));

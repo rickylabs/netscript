@@ -13,6 +13,13 @@ const authn = {
 };
 const authz = { authorizer: createScopeAuthorizer({ rules: [] }), denyByDefault: true };
 
+Deno.test('service auth policy accepts authz undefined as absent', () => {
+  const guarded: ServiceAuthPolicy = { authn, authz: undefined };
+  assertServiceAuthPolicy(guarded);
+  assertStrictEquals(guarded.authn, authn);
+  assertEquals(guarded.authz, undefined);
+});
+
 Deno.test('service auth policy preserves native option identity and explicit public reason', () => {
   const guarded: ServiceAuthPolicy = { authn, authz };
   assertServiceAuthPolicy(guarded);
@@ -54,7 +61,6 @@ const invalidPolicies: readonly { name: string; value: unknown }[] = [
   { name: 'authenticator null', value: { authn: { authenticator: null } } },
   { name: 'authenticate missing', value: { authn: { authenticator: {} } } },
   { name: 'authenticate noncallable', value: { authn: { authenticator: { authenticate: 1 } } } },
-  { name: 'authz undefined', value: { authn, authz: undefined } },
   { name: 'authz null', value: { authn, authz: null } },
   { name: 'authz array', value: { authn, authz: [] } },
   { name: 'authz primitive', value: { authn, authz: false } },

@@ -1,11 +1,12 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { join } from '@std/path';
 import {
   copyPluginSchemasToRootDb,
   provisionDatabaseIfNeeded,
 } from '../../../../kernel/adapters/plugin/db-integration.ts';
-import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
-import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
-import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
+import type { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
+import type { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
+import type { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
@@ -164,9 +165,7 @@ export async function installLocalPlugin(
   await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
     plan.projectRoot,
     plan.pluginName,
-    pluginOwned === undefined
-      ? rendered.plugin.pluginDir
-      : pluginConfigDirectory,
+    pluginOwned === undefined ? rendered.plugin.pluginDir : pluginConfigDirectory,
     pluginOwned === undefined ? 'mod.ts' : 'plugin.ts',
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
@@ -180,19 +179,24 @@ export async function installLocalPlugin(
       toWorkspaceRelativePath(plan.projectRoot, pluginConfigDirectory),
     ])
     : rendered.workspaceMembers;
-  await dependencies.workspaceMutator.ensureWorkspaceMember(plan.projectRoot, pluginWorkspaceMembers);
+  await dependencies.workspaceMutator.ensureWorkspaceMember(
+    plan.projectRoot,
+    pluginWorkspaceMembers,
+  );
 
   if (pluginOwned !== undefined && resolvedPlugin !== undefined) {
     await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
   }
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
+  const browserAuthFiles = await reconcileBrowserAuth(plan.projectRoot, dependencies.fs);
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
-  const helperFiles = await regenerateHelpers(
+  const aspireFiles = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
   if (dependencies.processRunner) {
     await formatGeneratedFiles(dependencies.processRunner, plan.projectRoot, [
       ...helperFiles,
