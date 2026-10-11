@@ -193,6 +193,6 @@ Deno.test('init integration: json emits one scaffold result while still installi
     }
     assertEquals(inputs.length, 1);
     assertEquals(lines.length, 1);
-    assertEquals(JSON.parse(lines[0]).name, 'agent-project');
+    assertEquals(JSON.parse(lines[0]).project.name, 'agent-project');
   });
 });
