@@ -2,45 +2,46 @@
 layout: layouts/base.vto
 title: The pure-backend auth model
 templateEngine: [vento, md]
-prev: { label: "The plugin system", href: "/explanation/plugin-system/" }
-next: { label: "Durability model", href: "/explanation/durability-model/" }
+prev: { label: 'The plugin system', href: '/explanation/plugin-system/' }
+next: { label: 'Durability model', href: '/explanation/durability-model/' }
 order: 4
 ---
 
 # The pure-backend auth model
 
-*This essay is the **why** — the model and its trade-offs. The day-to-day *how* (guides, recipes, API) lives in **Build › [Identity & Access](/identity-access/)**.*
+_This essay is the **why** — the model and its trade-offs. The day-to-day _how_ (guides, recipes,
+API) lives in **Build › [Identity & Access](/identity-access/)**._
 
-This page explains *what* NetScript authentication actually is, *why* it is designed as a
-**pure-backend seam** rather than a built-in identity provider, and *how* a single typed port lets
+This page explains _what_ NetScript authentication actually is, _why_ it is designed as a
+**pure-backend seam** rather than a built-in identity provider, and _how_ a single typed port lets
 you swap GitHub OAuth for WorkOS or better-auth without touching one line of application code. It is
 understanding-oriented — read it to build the mental model before you wire authentication into a
 project. When you want the headline API and endpoints, see the
 [auth capability](/capabilities/auth/); when you want to do the task, follow
-[Add authentication](/identity-access/how-to/add-authentication/); when you want exact exported symbols, follow
-[`reference/service/`](/reference/service/) and the auth adapter references it links to.
+[Add authentication](/identity-access/how-to/add-authentication/); when you want exact exported
+symbols, follow [`reference/service/`](/reference/service/) and the auth adapter references it links
+to.
 
-{{ comp callout { type: "important", title: "Alpha status" } }}
-The CLI scaffold pins exact alpha specifiers like
+{{ comp callout { type: "important", title: "Alpha status" } }} The CLI scaffold pins exact alpha
+specifiers like
 <code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code>. Auth telemetry is real: an
 opt-in, redacted audit surface ships via <code>createAuthTelemetry</code>, enabled when a
 <code>subjectHashSalt</code> is configured. The model below is the authentication seam; for that
-audit surface and its salt requirement see
-{{ comp.xref({ key: "explain:observability" }) }}.
-{{ /comp }}
+audit surface and its salt requirement see {{ comp.xref({ key: "explain:observability" }) }}. {{
+/comp }}
 
 ## The thesis: NetScript owns the seam, not the identity provider
 
-Most backend frameworks make a choice for you. They either bundle a session store, a password
-table, and a set of OAuth strategies — and you live inside their opinions forever — or they hand you
+Most backend frameworks make a choice for you. They either bundle a session store, a password table,
+and a set of OAuth strategies — and you live inside their opinions forever — or they hand you
 nothing and you reassemble cookies, token verification, and provider redirects by hand in every
-project. Both extremes leak the *integration tax* NetScript exists to remove: the first couples your
+project. Both extremes leak the _integration tax_ NetScript exists to remove: the first couples your
 app to one identity vendor; the second makes you the integration.
 
 NetScript takes the same stance on authentication that it takes on
 [contracts](/explanation/contracts/) and [plugins](/explanation/plugin-system/): the cross-cutting
 concern belongs to a **typed boundary the framework owns**, and the concrete provider is an adapter
-that plugs into that boundary. The framework defines *the shape of an authenticator* — a port — and
+that plugs into that boundary. The framework defines _the shape of an authenticator_ — a port — and
 ships several **pure backends** that satisfy it. Your application depends on the port; it never
 depends on GitHub, WorkOS, or better-auth directly.
 
@@ -51,58 +52,63 @@ one environment variable, not your code.**
 
 The core package [`@netscript/plugin-auth-core`](/capabilities/auth/) defines a single port,
 **`AuthBackendPort`**, that every backend must satisfy. It is not a god-interface — it is composed
-of small, single-responsibility **sub-ports**, so a backend implements exactly the concerns it
-owns and nothing more.
+of small, single-responsibility **sub-ports**, so a backend implements exactly the concerns it owns
+and nothing more.
 
-{{ comp.apiTable({
-  caption: "AuthBackendPort — the seam every backend satisfies (from `@netscript/plugin-auth-core/ports`)",
-  rows: [
-    { name: "name", type: "string", desc: "The backend's stable identifier — `kv-oauth`, `workos`, or `better-auth`. Used by the registry to resolve the one active backend." },
-    { name: "providers", type: "AuthProviderRegistryPort", desc: "The set of identity providers this backend understands (GitHub, Google, Okta, …). Resolves a named provider to its OAuth/OIDC configuration." },
-    { name: "sessions", type: "AuthSessionStorePort", desc: "Create, read, refresh, and revoke sessions. The mutation surface — and the one non-interactive backends decline." },
-    { name: "crypto", type: "AuthSessionCryptoPort", desc: "Signs and verifies the opaque session token. The default is a WebCrypto HMAC-SHA256 token (`createHmacSessionTokenCrypto`) — an opaque string, not a JWT you parse." },
-    { name: "principalMapper", type: "AuthPrincipalMapperPort", desc: "Maps a backend-specific identity into the framework's neutral `Principal` shape, so the rest of the app never sees vendor types." },
-    { name: "interactive?", type: "InteractiveFlowPort (optional)", desc: "The redirect-based sign-in flow: `signIn`, `handleCallback`, `getSessionId`, `signOut`. OPTIONAL — only a backend that drives its own OAuth redirect implements it." },
-    { name: "authenticate(request)", type: "(AuthnRequest) => AuthnResult", desc: "The non-interactive verify step inherited from `AuthenticatorPort`: given a request (cookie/header), return a `Principal` or a typed failure." }
-  ]
-}) }}
+{{ comp.apiTable({ caption: "AuthBackendPort — the seam every backend satisfies (from
+`@netscript/plugin-auth-core/ports`)", rows: [ { name: "name", type: "string", desc: "The backend's
+stable identifier — `kv-oauth`, `workos`, or `better-auth`. Used by the registry to resolve the one
+active backend." }, { name: "providers", type: "AuthProviderRegistryPort", desc: "The set of
+identity providers this backend understands (GitHub, Google, Okta, …). Resolves a named provider to
+its OAuth/OIDC configuration." }, { name: "sessions", type: "AuthSessionStorePort", desc: "Create,
+read, refresh, and revoke sessions. The mutation surface — and the one non-interactive backends
+decline." }, { name: "crypto", type: "AuthSessionCryptoPort", desc: "Signs and verifies the opaque
+session token. The default is a WebCrypto HMAC-SHA256 token (`createHmacSessionTokenCrypto`) — an
+opaque string, not a JWT you parse." }, { name: "principalMapper", type: "AuthPrincipalMapperPort",
+desc: "Maps a backend-specific identity into the framework's neutral `Principal` shape, so the rest
+of the app never sees vendor types." }, { name: "interactive?", type: "InteractiveFlowPort
+(optional)", desc: "The redirect-based sign-in flow: `signIn`, `handleCallback`, `getSessionId`,
+`signOut`. OPTIONAL — only a backend that drives its own OAuth redirect implements it." }, { name:
+"authenticate(request)", type: "(AuthnRequest) => AuthnResult", desc: "The non-interactive verify
+step inherited from `AuthenticatorPort`: given a request (cookie/header), return a `Principal` or a
+typed failure." } ] }) }}
 
-Two things make this a *seam* rather than a base class. First, every member is a port — a small
+Two things make this a _seam_ rather than a base class. First, every member is a port — a small
 interface — so a backend is **composition, not inheritance**: it assembles four required sub-ports
 (plus one optional one) instead of subclassing framework internals. Second, the optional
 `interactive` member is where the whole capability matrix below comes from: a backend that owns its
 redirect flow provides it; a backend that delegates sign-in to a hosted page leaves it out.
 
-{{ comp callout { type: "note", title: "Why a port and not a base class" } }}
-A base class would force every backend to inherit a session store, a crypto scheme, and a flow it
-might not have. A <strong>port</strong> lets each backend supply only the sub-ports it
-owns — WorkOS brings its AuthKit sealed cookie and skips <code>interactive</code> entirely, while
-kv-oauth brings a full KV-backed session store and a real OAuth redirect. Same seam, different
-fills. This is the doctrine's <em>composition over inheritance</em> applied to identity.
-{{ /comp }}
+{{ comp callout { type: "note", title: "Why a port and not a base class" } }} A base class would
+force every backend to inherit a session store, a crypto scheme, and a flow it might not have. A
+<strong>port</strong> lets each backend supply only the sub-ports it owns — WorkOS brings its
+AuthKit sealed cookie and skips <code>interactive</code> entirely, while kv-oauth brings a full
+KV-backed session store and a real OAuth redirect. Same seam, different fills. This is the
+doctrine's <em>composition over inheritance</em> applied to identity. {{ /comp }}
 
 ## The neutral currency: `Principal` and `AuthnResult` with `scheme: "custom"`
 
-A backend's job is to turn *its* notion of an authenticated user into *NetScript's* notion. That
+A backend's job is to turn _its_ notion of an authenticated user into _NetScript's_ notion. That
 neutral currency lives one layer down, in [`@netscript/service`](/reference/service/) under the
-`/auth` subpath, and it is the same authentication contract the rest of the framework already
-speaks — API keys, bearer tokens, trusted headers. Auth backends produce the same `Principal` shape.
+`/auth` subpath, and it is the same authentication contract the rest of the framework already speaks
+— API keys, bearer tokens, trusted headers. Auth backends produce the same `Principal` shape.
 
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "The neutral shapes (@netscript/service/auth)",
-    lang: "ts",
-    code: "// A backend never returns vendor types to your app. It returns these.\n\n// Who the request is, in framework-neutral terms.\ninterface Principal {\n  readonly subject: string;          // stable user id\n  readonly scheme: \"api-key\" | \"bearer\" | \"trusted-header\" | \"custom\";\n  readonly claims: Readonly<Record<string, unknown>>;\n  // ...\n}\n\n// The result of authenticating a request: success xor typed failure.\ntype AuthnResult =\n  | { ok: true; principal: Principal; readonly setCookies?: readonly string[] }\n  | { ok: false; reason: string };"
-  },
-  {
-    label: "What a backend produces",
-    lang: "ts",
-    code: "// Every OAuth/OIDC backend stamps its principals with scheme: \"custom\" —\n// distinguishing an interactively-authenticated user from an api-key or\n// bearer caller, while still flowing through the SAME AuthnResult seam.\n\nconst result: AuthnResult = {\n  ok: true,\n  principal: {\n    subject: \"user_01H...\",\n    scheme: \"custom\",            // <- auth adapters always use \"custom\"\n    claims: { email: \"a@b.dev\", provider: \"github\" },\n  },\n  setCookies: [\"__Host-ns_session=...; HttpOnly; Secure; SameSite=Lax\"],\n};"
-  }
-] }) }}
+{{ comp.tabbedCode({ tabs: [ { label: "The neutral shapes (@netscript/service/auth)", lang: "ts",
+code: "// A backend never returns vendor types to your app. It returns these.\n\n// Who the request
+is, in framework-neutral terms.\ninterface Principal {\n readonly subject: string; // stable user
+id\n readonly scheme: \"api-key\" | \"bearer\" | \"trusted-header\" | \"custom\";\n readonly claims:
+Readonly<Record<string, unknown>>;\n // ...\n}\n\n// The result of authenticating a request: success
+xor typed failure.\ntype AuthnResult =\n | { ok: true; principal: Principal; readonly setCookies?:
+readonly string[] }\n | { ok: false; reason: string };" }, { label: "What a backend produces", lang:
+"ts", code: "// Every OAuth/OIDC backend stamps its principals with scheme: \"custom\" —\n//
+distinguishing an interactively-authenticated user from an api-key or\n// bearer caller, while still
+flowing through the SAME AuthnResult seam.\n\nconst result: AuthnResult = {\n ok: true,\n principal:
+{\n subject: \"user_01H...\",\n scheme: \"custom\", // <- auth adapters always use \"custom\"\n
+claims: { email: \"a@b.dev\", provider: \"github\" },\n },\n setCookies: [\"__Host-ns_session=...;
+HttpOnly; Secure; SameSite=Lax\"],\n};" } ] }) }}
 
 The discipline here is what makes provider-swapping real. The `principalMapper` sub-port is the
-*only* place a backend's vendor identity touches NetScript types; everywhere downstream — your
+_only_ place a backend's vendor identity touches NetScript types; everywhere downstream — your
 service handlers, your contract middleware, your authorization checks — sees a `Principal` with
 `scheme: "custom"` and never imports a WorkOS or kv-oauth type. Change the backend and the
 `Principal` your code reads does not change shape.
@@ -111,45 +117,63 @@ service handlers, your contract middleware, your authorization checks — sees a
 
 The framework ships three pure backends. They satisfy the **same** `AuthBackendPort`, but they fill
 the **optional** `interactive` slot differently — and that single difference produces three distinct
-capability profiles. Only **kv-oauth** is a full interactive backend; WorkOS and
-better-auth are **non-interactive by design**.
+capability profiles. Only **kv-oauth** is a full interactive backend; WorkOS and better-auth are
+**non-interactive by design**.
 
-{{ comp.apiTable({
-  caption: "The three backends and where they diverge",
-  rows: [
-    { name: "@netscript/auth-kv-oauth", type: "interactive", desc: "Drives its own OAuth/OIDC redirect flow. Full `interactive` port (`signIn`/`handleCallback`/`signOut`), KV-backed sessions with real create/refresh/revoke, refresh-on-read, default cookie `__Host-ns_session`. The default backend. Provider presets: github, google, gitlab, discord, slack, spotify, facebook, twitter, plus tenant-based auth0, okta, awsCognito, azureAd, logto, clerk." },
-    { name: "@netscript/auth-workos", type: "non-interactive", desc: "Delegates sign-in to WorkOS AuthKit's hosted flow; verifies the sealed `wos-session` cookie. NO `interactive` port. Session mutations throw `AuthBackendOperationUnsupportedError`." },
-    { name: "@netscript/auth-better-auth", type: "non-interactive", desc: "Wraps a better-auth instance over Prisma; verifies its session. NO `interactive` port. Session mutations throw `AuthBackendOperationUnsupportedError`." }
-  ]
-}) }}
+{{ comp.apiTable({ caption: "The three backends and where they diverge", rows: [ { name:
+"@netscript/auth-kv-oauth", type: "interactive", desc: "Drives its own OAuth/OIDC redirect flow.
+Full `interactive` port (`signIn`/`handleCallback`/`signOut`), KV-backed sessions with real
+create/refresh/revoke, refresh-on-read, default cookie `__Host-ns_session`. The default backend.
+Provider presets: github, google, gitlab, discord, slack, spotify, facebook, twitter, plus
+tenant-based auth0, okta, awsCognito, azureAd, logto, clerk." }, { name: "@netscript/auth-workos",
+type: "non-interactive", desc: "Delegates sign-in to WorkOS AuthKit's hosted flow; verifies the
+sealed `wos-session` cookie. NO `interactive` port. Session mutations throw
+`AuthBackendOperationUnsupportedError`." }, { name: "@netscript/auth-better-auth", type:
+"non-interactive", desc: "Wraps a better-auth instance over Prisma; verifies its session. NO
+`interactive` port. Session mutations throw `AuthBackendOperationUnsupportedError`." } ] }) }}
 
 This is not a missing-feature apology — it is the seam working as intended. A hosted provider like
-WorkOS *owns* the sign-in page and session lifecycle; asking NetScript to also mutate that session
+WorkOS _owns_ the sign-in page and session lifecycle; asking NetScript to also mutate that session
 would be wrong, so the backend declines it loudly rather than pretending. The next section explains
 exactly how it declines.
 
-{{ comp callout { type: "important", title: "Non-Interactive Adapter Design Boundary" } }}
-Under non-interactive backends (WorkOS and better-auth), NetScript enforces a strict verification-only boundary: the runtime verifies existing sessions via the <code>session</code>, <code>me</code>, and <code>signout</code> endpoints, but does not drive user-facing sign-in redirects or execute session mutations. This design isolates redirect-based authentication from core verification logic. So calling <code>/api/v1/auth/signin</code> or <code>/api/v1/auth/callback</code> returns a typed <code>AUTH_PROVIDER_ERROR</code> (HTTP 502), and mutations throw <code>AuthBackendOperationUnsupportedError</code>. For direct redirect management, use the <code>kv-oauth</code> backend, or implement sign-in client-side using your provider's SDK before verification. Extending interactive flow capability to the better-auth backend is tracked under roadmap item R2.
+{{ comp callout { type: "important", title: "Non-Interactive Adapter Design Boundary" } }} Under
+non-interactive backends (WorkOS and better-auth), NetScript enforces a strict verification-only
+boundary: the runtime verifies existing sessions via the <code>session</code>, <code>me</code>, and
+<code>signout</code> endpoints, but does not drive user-facing sign-in redirects or execute session
+mutations. This design isolates redirect-based authentication from core verification logic. So
+calling <code>/api/v1/auth/signin</code> or <code>/api/v1/auth/callback</code> returns a typed
+<code>AUTH_PROVIDER_ERROR</code> (HTTP 502), and mutations throw
+<code>AuthBackendOperationUnsupportedError</code>. For direct redirect management, use the
+<code>kv-oauth</code> backend, or implement sign-in client-side using your provider's SDK before
+verification. Extending interactive flow capability to the better-auth backend is tracked under
+roadmap item R2.
+
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
+
 {{ /comp }}
 
 ## The capability boundary is a typed error, not a silent gap
 
 When a backend cannot do something its sub-port nominally exposes, it does not return `undefined`,
-log a warning, or no-op. It throws a **typed** `AuthBackendOperationUnsupportedError(name, op,
-reason)` — naming the backend, the operation, and why. This is the same fail-loud discipline the
-rest of the framework follows (streams helpers throw `StreamUnsupportedOperationError`): an
-unsupported capability is a *visible, typed boundary*, never a quiet surprise in production.
+log a warning, or no-op. It throws a **typed**
+`AuthBackendOperationUnsupportedError(name, op,
+reason)` — naming the backend, the operation, and
+why. This is the same fail-loud discipline the rest of the framework follows for backend capability
+failures: an unsupported capability is a _visible, typed boundary_, never a quiet surprise in
+production.
 
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "The capability boundary is explicit",
-    lang: "ts",
-    code: "// A non-interactive backend declining a session mutation. The error names\n// the backend, the operation, and the reason — you find out at the call site,\n// not three hops later from a malformed cookie.\n\nconst revoke = async (sessionId: string): Promise<void> => {\n  throw new AuthBackendOperationUnsupportedError(\n    \"workos\",                 // backend name\n    \"sessions.revoke\",        // the operation\n    \"WorkOS AuthKit owns session lifecycle; revoke via the WorkOS dashboard or API.\",\n  );\n};\n\n// At the service edge, the interactive endpoints translate the same boundary\n// into a typed HTTP error rather than a stack trace:\n//   POST /api/v1/auth/signin  -> AUTH_PROVIDER_ERROR (502)\n//   POST /api/v1/auth/callback -> AUTH_PROVIDER_ERROR (502)"
-  }
-] }) }}
+{{ comp.tabbedCode({ tabs: [ { label: "The capability boundary is explicit", lang: "ts", code: "// A
+non-interactive backend declining a session mutation. The error names\n// the backend, the
+operation, and the reason — you find out at the call site,\n// not three hops later from a malformed
+cookie.\n\nconst revoke = async (sessionId: string): Promise<void> => {\n throw new
+AuthBackendOperationUnsupportedError(\n \"workos\", // backend name\n \"sessions.revoke\", // the
+operation\n \"WorkOS AuthKit owns session lifecycle; revoke via the WorkOS dashboard or API.\",\n
+);\n};\n\n// At the service edge, the interactive endpoints translate the same boundary\n// into a
+typed HTTP error rather than a stack trace:\n// POST /api/v1/auth/signin -> AUTH_PROVIDER_ERROR
+(502)\n// POST /api/v1/auth/callback -> AUTH_PROVIDER_ERROR (502)" } ] }) }}
 
-Because the boundary is typed, you can *program against it*. A handler that wants to support both
+Because the boundary is typed, you can _program against it_. A handler that wants to support both
 interactive and hosted backends can branch on whether `backend.interactive` is present rather than
 catching errors after the fact — the optionality of the port and the typed error are two views of
 the same fact: this backend does not own sign-in.
@@ -159,45 +183,51 @@ the same fact: this backend does not own sign-in.
 The unifying plugin [`@netscript/plugin-auth`](/capabilities/auth/) composes **exactly one** active
 backend. It reads `NETSCRIPT_AUTH_BACKEND` (or `auth.backend` in appsettings), resolves it through a
 registry — valid values `kv-oauth` | `workos` | `better-auth`, **default `kv-oauth`** — and serves
-the `auth-api` oRPC service on **:8094** with six endpoints under `/api/v1/auth/`:
-`signin`, `callback`, `signout`, `sessions/revoke`, `session`, `me`.
+the `auth-api` oRPC service on **:8094** with six endpoints under `/api/v1/auth/`: `signin`,
+`callback`, `signout`, `sessions/revoke`, `session`, `me`.
 
 ```text
-                    NETSCRIPT_AUTH_BACKEND  (default: kv-oauth)
-                                 │
-                                 ▼
-        ┌──────────────────────────────────────────────┐
-        │  @netscript/plugin-auth  (auth-api :8094)     │
-        │  resolves ONE active backend from the registry│
-        └──────────────────────────────────────────────┘
-                                 │  exactly one of:
-        ┌────────────────────────┼─────────────────────────┐
-        ▼                        ▼                          ▼
-  auth-kv-oauth            auth-workos              auth-better-auth
-  (interactive)            (non-interactive)        (non-interactive)
-  full redirect flow       verify wos-session       verify better-auth
-  KV sessions              hosted AuthKit           Prisma-backed
-        │                        │                          │
-        └────────────── all satisfy AuthBackendPort ────────┘
-                                 │
-                                 ▼
-                 Principal (scheme: "custom")  →  your app
+                  NETSCRIPT_AUTH_BACKEND  (default: kv-oauth)
+                               │
+                               ▼
+      ┌──────────────────────────────────────────────┐
+      │  @netscript/plugin-auth  (auth-api :8094)     │
+      │  resolves ONE active backend from the registry│
+      └──────────────────────────────────────────────┘
+                               │  exactly one of:
+      ┌────────────────────────┼─────────────────────────┐
+      ▼                        ▼                          ▼
+auth-kv-oauth            auth-workos              auth-better-auth
+(interactive)            (non-interactive)        (non-interactive)
+full redirect flow       verify wos-session       verify better-auth
+KV sessions              hosted AuthKit           Prisma-backed
+      │                        │                          │
+      └────────────── all satisfy AuthBackendPort ────────┘
+                               │
+                               ▼
+               Principal (scheme: "custom")  →  your app
 ```
 
 **Single-active-backend is a deliberate v1 boundary**, not an incidental limitation. It means there
-is exactly one authenticator answering at a time. This boundary is drawn to keep the identity model coherent: a single `Principal` source, a single session authority, and a single place to reason about who is signed in. Multi-backend identity synchronization (e.g. cross-provider logout, account linking, conflicting session lifetimes) requires a complex state orchestrator that is decoupled from NetScript's core validation layer.
+is exactly one authenticator answering at a time. This boundary is drawn to keep the identity model
+coherent: a single `Principal` source, a single session authority, and a single place to reason
+about who is signed in. Multi-backend identity synchronization (e.g. cross-provider logout, account
+linking, conflicting session lifetimes) requires a complex state orchestrator that is decoupled from
+NetScript's core validation layer.
 
 The following table details what lies on either side of this v1 deployment boundary:
 
-{{ comp.apiTable({
-  caption: "V1 Boundary Mapping (single-active-backend)",
-  rows: [
-    { name: "Multi-active routing", type: "Out of scope", desc: "Routing requests across multiple backends simultaneously is not supported. Use a single active backend configuration per deployment." },
-    { name: "Cross-backend account linking", type: "Out of scope", desc: "Identity association between separate providers must be handled upstream; each adapter manages its own independent identities." },
-    { name: "Global logout", type: "Out of scope", desc: "Session revocation is local to the active backend store. Cross-backend token revocation must be handled by the provider's management console." },
-    { name: "Historical replay / session mirroring", type: "Out of scope", desc: "Synchronizing historical login logs or mirroring session state between backends is deferred to future identity orchestration layers." }
-  ]
-}) }}
+{{ comp.apiTable({ caption: "V1 Boundary Mapping (single-active-backend)", rows: [ { name:
+"Multi-active routing", type: "Out of scope", desc: "Routing requests across multiple backends
+simultaneously is not supported. Use a single active backend configuration per deployment." }, {
+name: "Cross-backend account linking", type: "Out of scope", desc: "Identity association between
+separate providers must be handled upstream; each adapter manages its own independent identities."
+}, { name: "Global logout", type: "Out of scope", desc: "Session revocation is local to the active
+backend store. Cross-backend token revocation must be handled by the provider's management console."
+}, { name: "Historical replay / session mirroring", type: "Out of scope", desc: "Synchronizing
+historical login logs or mirroring session state between backends is deferred to future identity
+orchestration layers." } ] }) }}
+
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 
 ## Why this seam — the design in one sentence
@@ -220,15 +250,15 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
 
 ## Glossary
 
-- **`AuthBackendPort`** — the seam every auth backend satisfies; composed of `providers`, `sessions`,
-  `crypto`, `principalMapper` sub-ports plus an optional `interactive` flow. Defined in
+- **`AuthBackendPort`** — the seam every auth backend satisfies; composed of `providers`,
+  `sessions`, `crypto`, `principalMapper` sub-ports plus an optional `interactive` flow. Defined in
   `@netscript/plugin-auth-core`.
 - **`InteractiveFlowPort`** — the optional redirect flow (`signIn`/`handleCallback`/`getSessionId`/
   `signOut`). Present only on **kv-oauth**; absent on WorkOS and better-auth.
 - **single-active-backend** — the v1 rule that exactly one backend is active per deployment; no
   multi-active routing, cross-backend linking, global logout, or replay.
 - **`Principal` / `scheme: "custom"`** — the framework-neutral identity from
-  [`@netscript/service`](/reference/service/)`/auth`; auth adapters stamp principals with
+  [`@netscript/service`](/reference/service/) `/auth`; auth adapters stamp principals with
   `scheme: "custom"`.
 - **`AuthBackendOperationUnsupportedError`** — the typed error a backend throws when an operation is
   outside its capability matrix (for example session mutation on a non-interactive backend).
@@ -239,8 +269,8 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
 
 - **The capability:** [Authentication](/capabilities/auth/) — the headline API, the `auth-api`
   service on :8094, the five endpoints, and the backend matrix at a glance.
-- **Do it:** [Add authentication](/identity-access/how-to/add-authentication/) — add the `auth` plugin, choose a
-  backend with `NETSCRIPT_AUTH_BACKEND`, run the migration, and wire provider env.
+- **Do it:** [Add authentication](/identity-access/how-to/add-authentication/) — add the `auth`
+  plugin, choose a backend with `NETSCRIPT_AUTH_BACKEND`, run the migration, and wire provider env.
 - **Related model:** [The plugin system](/explanation/plugin-system/) — why a thin plugin composes a
   pure capability, the same shape this auth seam follows.
 - **Reference:** the neutral authentication contract lives in
@@ -249,21 +279,20 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
 
 ## Generated browser topology
 
-The generated Fresh app uses a backend for frontend (BFF). Installing auth emits
-app-origin signin, callback, session, and signout routes backed by the existing
-auth plugin. The first-party HttpOnly cookie carries the opaque session
-credential. The app reads it only on the server and supplies it to the SDK
-bearer contribution for each guarded service call; the service verifies the
-bearer through the remote auth authenticator. Browser JSON excludes session
-credentials, and credentialed calls use direct-only caching.
+The generated Fresh app uses a backend for frontend (BFF). Installing auth emits app-origin signin,
+callback, session, and signout routes backed by the existing auth plugin. The first-party HttpOnly
+cookie carries the opaque session credential. The app reads it only on the server and supplies it to
+the SDK bearer contribution for each guarded service call; the service verifies the bearer through
+the remote auth authenticator. Browser JSON excludes session credentials, and credentialed calls use
+direct-only caching.
 
-The generated demo procedures declare `access: { authentication: 'none' }` and
-remain public on REST and RPC. The generated service policy also leaves
-`/api/openapi.json` and `/api/docs` public for discovery; other API routes require
-a bearer and a contract authorization decision. Authored policies and routes remain authoritative. Background
-processing belongs to workers, sagas, and triggers using service identities. See
-[Add authentication](/identity-access/how-to/add-authentication/) for the
-generated route and client recipe, local cookie behavior, and deployment
-limitations.
+The generated demo procedures declare `access: { authentication: 'none' }` and remain public on REST
+and RPC. The generated service policy also leaves `/api/openapi.json` and `/api/docs` public for
+discovery; other API routes require a bearer and a contract authorization decision. Authored
+policies and routes remain authoritative. Background processing belongs to workers, sagas, and
+triggers using service identities. See
+[Add authentication](/identity-access/how-to/add-authentication/) for the generated route and client
+recipe, local cookie behavior, and deployment limitations.
 
-{{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next: { label: "Durability model", href: "/explanation/durability-model/" } }) }}
+{{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next:
+{ label: "Durability model", href: "/explanation/durability-model/" } }) }}

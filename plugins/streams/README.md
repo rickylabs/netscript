@@ -106,8 +106,8 @@ regression sit beside it.
   process.
 - **Explicit storage choice** — memory is ephemeral; the opt-in file backend is proven to replay
   real producer writes after an orderly service process restart.
-- **Typed topic definitions** — `defineStreamTopic`, `defineStreamProducer`, and
-  `defineStreamConsumer` give producers and consumers payload types checked at compile time.
+- **Typed topic definitions** — `defineStreamTopic` describes manifest topics;
+  `@netscript/plugin-streams-core` defines typed collections and publishes their entity state.
 - **An operations CLI** — `list-topics`, `inspect`, `stats`, `subscribe`, `add-schema`,
   `add-producer`, and `clear` cover inspecting and operating the stream surface.
 - **Zero extra infrastructure** — no migrations, no KV, no external broker; the service is a
@@ -177,46 +177,54 @@ $ deno x -A jsr:@netscript/plugin-streams@<version>/cli list-topics
 }
 ```
 
-As a library, define a typed topic and derive its producer and consumer handles. The handles are
-wiring stubs — runtime IO throws `StreamUnsupportedOperationError`, so bind
-`@netscript/plugin-streams-core` for actual publishing:
+## Breaking migration in 0.0.8
+
+The root no longer exports `defineStreamProducer`, `defineStreamConsumer`, `StreamProducerHandle`,
+`StreamConsumerHandle`, `StreamUnsupportedOperationError`, or `unsupportedStreamOperation`.
+`defineStreamTopic` remains a frozen manifest definition with no IO.
+
+Replace producer imports with `defineStreamSchema` and `createDurableStream` (or
+`createServiceStreamProducer` for backend services) from `@netscript/plugin-streams-core`. Convert
+each topic payload into a collection with a primary key; replace `publish(payload)` with
+`upsert(collection, payload)` or `delete(collection, key)`, then flush and close on shutdown. This
+publishes entity state, so model generic messages as entities with stable ids if appropriate.
 
 ```typescript
-import {
-  defineStreamConsumer,
-  defineStreamProducer,
-  defineStreamTopic,
-} from '@netscript/plugin-streams';
+import { createDurableStream, defineStreamSchema } from '@netscript/plugin-streams-core';
+import { z } from 'zod';
 
-type OrderPlaced = { orderId: string; total: number };
-
-// Any Standard Schema validator works here (Zod, Valibot, or hand-rolled).
-const topic = defineStreamTopic<OrderPlaced>('orders.placed', {
-  '~standard': {
-    version: 1,
-    vendor: 'orders',
-    validate: (value: unknown) => ({ value: value as OrderPlaced }),
+const schema = defineStreamSchema({
+  order: {
+    schema: z.object({ orderId: z.string(), total: z.number() }),
+    type: 'order',
+    primaryKey: 'orderId',
   },
 });
-
-const producer = defineStreamProducer(topic);
-const consumer = defineStreamConsumer(topic);
-
-console.log(topic.name); // "orders.placed"
-// `producer.publish` / `consumer.subscribe` are typed to `OrderPlaced`.
-void producer;
-void consumer;
+const producer = createDurableStream({
+  streamPath: '/orders/placed',
+  schema,
+  producerId: 'orders-service',
+});
+producer.upsert('order', { orderId: 'order-1', total: 42 });
+await producer.flush();
+await producer.close();
 ```
+
+Replace consumer `subscribe(handler)` with HTTP/SSE reads of the same stream path. Resolve the URL
+with `buildStreamUrl` / `getStreamsUrl` from `@netscript/plugin-streams-core`; browser clients can
+use `bindStreamEventSourceV1` from `@netscript/fresh/streams` to validate named SSE events. Dispose
+the binding on teardown. There is no in-process topic subscription replacement. See the
+[streams migration guide](https://netscript.dev/durable-workflows/streams/#breaking-migration-in-008).
 
 ## Public surface
 
-| Entry        | What it gives you                                                                                                           |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `.`          | `streamsPlugin` plus `defineStreamTopic` / `defineStreamProducer` / `defineStreamConsumer` and the manifest type vocabulary |
-| `./cli`      | The streams command group (`list-topics`, `inspect`, `stats`, `subscribe`, …)                                               |
-| `./services` | The Durable Streams service composition                                                                                     |
-| `./aspire`   | The streams Aspire contribution for the AppHost                                                                             |
-| `./scaffold` | The plugin-owned scaffolder `netscript plugin install stream` executes                                                      |
+| Entry        | What it gives you                                                                          |
+| ------------ | ------------------------------------------------------------------------------------------ |
+| `.`          | `streamsPlugin`, `defineStreamTopic`, topic/schema types, and the manifest type vocabulary |
+| `./cli`      | The streams command group (`list-topics`, `inspect`, `stats`, `subscribe`, …)              |
+| `./services` | The Durable Streams service composition                                                    |
+| `./aspire`   | The streams Aspire contribution for the AppHost                                            |
+| `./scaffold` | The plugin-owned scaffolder `netscript plugin install stream` executes                     |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-streams@<version>`](https://jsr.io/@netscript/plugin-streams/doc)
