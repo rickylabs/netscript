@@ -231,7 +231,15 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
           environment,
           [
             new AspireDoctorFamily(),
-            new ProjectWiringDoctorFamily(),
+            new ProjectWiringDoctorFamily(
+              undefined,
+              new SpawnCommandExecutor({
+                cliCommand: commandExecutor.identity.command,
+                mode: commandExecutor.identity.mode,
+                version: commandExecutor.identity.version,
+                outputTailBytes: 1_048_576,
+              }),
+            ),
             new PluginDoctorFamily(
               options.projectDoctor ?? new UnwiredProjectDoctor(),
             ),
