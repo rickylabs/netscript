@@ -4,8 +4,8 @@
     "zod": "^4.6.5"
   },
   "imports": {
-    "@durable-streams/client": "npm:@durable-streams/client@0.2.6",
-    "@durable-streams/state": "npm:@durable-streams/state@0.3.1",
+    "@durable-streams/client": "npm:@durable-streams/client@0.2.7",
+    "@durable-streams/state": "npm:@durable-streams/state@0.3.2",
     "@netscript/plugin-streams-core": "../../mod.ts",
     "@netscript/plugin-streams-core/testing": "../../src/testing/mod.ts",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.4",

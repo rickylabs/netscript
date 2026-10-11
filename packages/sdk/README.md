@@ -465,9 +465,9 @@ JSR with cryptographically verified provenance.
 
 ## Supported Collection runtime
 
-SDK query collections and Fresh live queries share TanStack DB **0.6.17** with
-`@tanstack/query-db-collection` **1.2.1**, `@tanstack/react-db` **0.1.95**, and
-`@durable-streams/state` **0.3.1**. These exact declarations are intentional: compatible version
+SDK query collections and Fresh live queries share TanStack DB **0.13.0** with
+`@tanstack/query-db-collection` **1.4.3**, `@tanstack/react-db` **0.5.8**, and
+`@durable-streams/state` **0.3.2**. These exact declarations are intentional: compatible version
 ranges alone can admit different Collection constructors. Upgrade the family together and run
 `deno task deps:check:db`, which resolves both a mixed SDK/Fresh consumer and a Fresh-only consumer
 without a workspace lock or warm cache and rejects multiple complete DB identities, including peer

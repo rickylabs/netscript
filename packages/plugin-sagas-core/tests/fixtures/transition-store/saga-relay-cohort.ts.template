@@ -128,7 +128,7 @@ Deno.test('saga commands reuse C5 lease ownership malformed receipt retry and sh
 });
 
 // This is a consumer composition example: every runtime, progress mapper, producer and publisher helper is first party.
-import { DurableStreamTestServer } from 'npm:@durable-streams/server@0.3.7';
+import { DurableStreamTestServer } from 'npm:@durable-streams/server@0.3.9';
 import { DenoKvAdapter } from '@netscript/kv';
 import { KvExecutionState } from '@netscript/plugin-workers-core/state';
 import { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';

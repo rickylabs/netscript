@@ -4,8 +4,8 @@
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/async@1": "1.5.1",
     "jsr:@std/internal@^1.0.12": "1.0.14",
-    "npm:@tanstack/db@0.6.17": "0.6.17_typescript@7.0.2",
-    "npm:@tanstack/react-db@0.1.95": "0.1.95_react@19.2.3_typescript@7.0.2",
+    "npm:@tanstack/db@0.13.0": "0.13.0_typescript@7.0.2",
+    "npm:@tanstack/react-db@0.5.8": "0.5.8_react@19.2.3_typescript@7.0.2",
     "npm:@types/react-test-renderer@19.1.0": "19.1.0",
     "npm:@types/react@19.2.17": "19.2.17",
     "npm:react-test-renderer@19.2.3": "19.2.3_react@19.2.3",
@@ -30,16 +30,16 @@
     "@standard-schema/spec@1.1.0": {
       "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="
     },
-    "@tanstack/db-ivm@0.1.18_typescript@7.0.2": {
-      "integrity": "sha512-+pZJiRKdoKRM5Epq9T7otD9ZJl82pRFauo7LKuJGrarjVKQ7r+QQlPe3kGdN9LEKSnuNGIWjX9OOY4M8kH4eLw==",
+    "@tanstack/db-ivm@0.1.26_typescript@7.0.2": {
+      "integrity": "sha512-Td2HbR68RfpMPv4zyMNQk83z/5gTjGl/I1LA/07A26LXMEPGh+hTsNbfPSr5YPZhq6KXX9lDFjDzv3Qz3DjV5w==",
       "dependencies": [
         "fractional-indexing",
         "sorted-btree",
         "typescript"
       ]
     },
-    "@tanstack/db@0.6.17_typescript@7.0.2": {
-      "integrity": "sha512-/i6+dedEkOCVQbTQtCjQHx3Nqlkqe6zvi+9/JPnSgm47o+akoaPqcSwxTmesDZxc/efHokUtzeD2ocow257RdQ==",
+    "@tanstack/db@0.13.0_typescript@7.0.2": {
+      "integrity": "sha512-Opp8m9K/5cw2N8WXK59W0WeV0yD+hV8zreqQv6U8GLSQAssnOPvrC5j0UwIyl8SfT6LslGFYNFGfnVN5V0oWmg==",
       "dependencies": [
         "@standard-schema/spec",
         "@tanstack/db-ivm",
@@ -50,12 +50,11 @@
     "@tanstack/pacer-lite@0.2.2": {
       "integrity": "sha512-eQ1MyLKCHyXiH7NbdmB80W77OhiMgGBUb+qDx/8WMGbwg5Lf/NlfD0TfNYAqY77i8V3AxoDoYdICrQE5ADw4Yw=="
     },
-    "@tanstack/react-db@0.1.95_react@19.2.3_typescript@7.0.2": {
-      "integrity": "sha512-Om2qgKtoK+iTcE3nR+MaPQsM4JUsDWB8LqFt4yFjwuSawwMJ7bcPnc7gP0V06YKOtm5MzrIu8IV/OexMJbraKQ==",
+    "@tanstack/react-db@0.5.8_react@19.2.3_typescript@7.0.2": {
+      "integrity": "sha512-CpNBCW+jdAwTCJTP9b6u8S5ZfX+x5KtAKwcJ4hb+Y4zDJptbFy2teGxYk7oaIguGXdZreMd7lJH7jm3+NZBECA==",
       "dependencies": [
         "@tanstack/db",
-        "react",
-        "use-sync-external-store"
+        "react"
       ]
     },
     "@types/react-test-renderer@19.1.0": {
@@ -221,12 +220,6 @@
         "@typescript/typescript-win32-x64"
       ],
       "bin": true
-    },
-    "use-sync-external-store@1.7.0_react@19.2.3": {
-      "integrity": "sha512-6L+EeigHMQhdaIPNIFUKwfWJSwWFQ8gJbJ2DLOs5sDIegTwR9fRxvnM3uciHKjIZhFz+KAv2emhWMRvDmMcY8A==",
-      "dependencies": [
-        "react"
-      ]
     }
   },
   "workspace": {
@@ -234,8 +227,8 @@
       "jsr:@std/assert@1",
       "jsr:@std/async@1",
       "jsr:@std/fs@1",
-      "npm:@tanstack/db@0.6.17",
-      "npm:@tanstack/react-db@0.1.95",
+      "npm:@tanstack/db@0.13.0",
+      "npm:@tanstack/react-db@0.5.8",
       "npm:@types/react@19.2.17",
       "npm:expo@57.0.27",
       "npm:react-native@0.86.3",
@@ -374,9 +367,9 @@
           "jsr:@std/http@1",
           "jsr:@std/path@1",
           "jsr:@std/text@1",
-          "npm:@durable-streams/client@0.2.6",
-          "npm:@durable-streams/state@0.3.1",
-          "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
+          "npm:@durable-streams/client@0.2.7",
+          "npm:@durable-streams/state@0.3.2",
+          "npm:@durable-streams/tanstack-ai-transport@0.0.10",
           "npm:@orpc/server@^1.15.5",
           "npm:@preact/signals@2.11.3",
           "npm:@tanstack/ai-client@0.39.2",
@@ -384,7 +377,7 @@
           "npm:@tanstack/ai@0.68.0",
           "npm:@tanstack/preact-query@^5.104.1",
           "npm:@tanstack/query-core@^5.104.1",
-          "npm:@tanstack/react-db@0.1.95",
+          "npm:@tanstack/react-db@0.5.8",
           "npm:preact-render-to-string@^6.8.0",
           "npm:preact@^10.29.2",
           "npm:vite@7.2.2"
@@ -601,10 +594,10 @@
           "npm:@orpc/server@^1.15.5",
           "npm:@orpc/tanstack-query@^1.15.5",
           "npm:@orpc/zod@^1.15.5",
-          "npm:@tanstack/db@0.6.17",
+          "npm:@tanstack/db@0.13.0",
           "npm:@tanstack/query-core@^5.104.1",
-          "npm:@tanstack/query-db-collection@1.2.1",
-          "npm:@tanstack/react-db@0.1.95",
+          "npm:@tanstack/query-db-collection@1.4.3",
+          "npm:@tanstack/react-db@0.5.8",
           "npm:react@^19.2.3"
         ]
       },

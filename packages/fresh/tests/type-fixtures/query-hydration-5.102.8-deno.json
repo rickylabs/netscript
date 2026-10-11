@@ -2,6 +2,6 @@
   "extends": "../../deno.json",
   "imports": {
     "@tanstack/query-core": "npm:@tanstack/query-core@5.102.8",
-    "@tanstack/react-db": "npm:@tanstack/react-db@0.1.95"
+    "@tanstack/react-db": "npm:@tanstack/react-db@0.5.8"
   }
 }

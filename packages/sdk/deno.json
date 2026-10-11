@@ -39,10 +39,10 @@
     "@orpc/server": "npm:@orpc/server@^1.15.5",
     "@orpc/tanstack-query": "npm:@orpc/tanstack-query@^1.15.5",
     "@orpc/zod": "npm:@orpc/zod@^1.15.5",
-    "@tanstack/db": "npm:@tanstack/db@0.6.17",
+    "@tanstack/db": "npm:@tanstack/db@0.13.0",
     "@tanstack/query-core": "npm:@tanstack/query-core@^5.104.1",
-    "@tanstack/query-db-collection": "npm:@tanstack/query-db-collection@1.2.1",
-    "@tanstack/react-db": "npm:@tanstack/react-db@0.1.95",
+    "@tanstack/query-db-collection": "npm:@tanstack/query-db-collection@1.4.3",
+    "@tanstack/react-db": "npm:@tanstack/react-db@0.5.8",
     "react": "npm:react@^19.2.3"
   },
   "publish": {
