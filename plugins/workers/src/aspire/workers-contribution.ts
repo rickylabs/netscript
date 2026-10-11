@@ -73,5 +73,4 @@ export class WorkersAspireContribution extends AspireNSPluginContribution {
       [WORKERS_CONCURRENCY_ENV]: WORKERS_DEFAULT_CONCURRENCY,
     };
   }
-
 }

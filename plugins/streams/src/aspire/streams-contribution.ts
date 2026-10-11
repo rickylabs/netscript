@@ -43,5 +43,4 @@ export class StreamsAspireContribution extends AspireNSPluginContribution {
       DURABLE_STREAMS_URL: { kind: 'resource', resource: 'streams', key: 'url' },
     };
   }
-
 }

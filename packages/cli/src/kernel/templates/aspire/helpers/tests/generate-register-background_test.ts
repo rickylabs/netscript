@@ -488,8 +488,11 @@ describe('generated background child probes (#1366)', () => {
       const renamed = 'renamed-notifier';
       const scaffoldResult = {
         scaffoldResult: {
-          filesCreated: [], directoriesCreated: [], filesSkipped: [],
-          totalOperations: 0, durationMs: 0,
+          filesCreated: [],
+          directoriesCreated: [],
+          filesSkipped: [],
+          totalOperations: 0,
+          durationMs: 0,
         },
         pluginDir: `plugins/${pluginName}`,
         kind: provider.kind,
@@ -504,7 +507,9 @@ describe('generated background child probes (#1366)', () => {
       assertEquals(installed.PluginReferences, ['renamed-notifier-api']);
       assertEquals(installed.RequiresKv, true);
       const withoutCapability = buildBackgroundProcessorEntry(
-        scaffoldResult, { ...provider, defaultRequiresKv: false }, {},
+        scaffoldResult,
+        { ...provider, defaultRequiresKv: false },
+        {},
       );
       const processors = {
         [renamed]: { ...installed, RequiresDb: false, PluginReferences: [] },
@@ -514,8 +519,12 @@ describe('generated background child probes (#1366)', () => {
       const loaded = await loadGeneratedModule(processors);
       try {
         const resources = await loaded.module.registerBackgroundProcessors(
-          createRecordingBuilder(), configForProcessors(processors), {},
-          new Map(), new Map(), '/apphost',
+          createRecordingBuilder(),
+          configForProcessors(processors),
+          {},
+          new Map(),
+          new Map(),
+          '/apphost',
         );
         assertEquals(resources.get(renamed)?.probes, [{ path: '/health', endpointName: 'http' }]);
         assertEquals(resources.get('same-kind-without-kv')?.probes, []);

@@ -127,5 +127,4 @@ export class SagasAspireContribution {
       [SAGAS_RUNNER_CONCURRENCY_ENV]: SAGAS_DEFAULT_RUNNER_CONCURRENCY,
     };
   }
-
 }

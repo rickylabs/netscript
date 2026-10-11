@@ -131,5 +131,4 @@ export class TriggersAspireContribution {
       [TRIGGERS_PROCESSOR_CONCURRENCY_ENV]: TRIGGERS_DEFAULT_PROCESSOR_CONCURRENCY,
     };
   }
-
 }
