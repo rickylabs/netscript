@@ -121,6 +121,8 @@ export interface PublicCommandDependencies {
   readonly uiInstallDependencies: {
     readonly fs: DenoFileSystem;
   };
+  /** Canonical source formatting shared by page-removal validation. */
+  readonly uiPageFormatter: GeneratedSourceFormatterPort;
   /** Dependencies for DB lifecycle commands. */
   readonly dbOperationDependencies: {
     readonly cwd: () => string;
@@ -330,6 +332,7 @@ export function createPublicCommandDependencies(
       createInitContext: ({ dryRun }) =>
         dryRun ? createInitContext(new DryRunFileSystemAdapter(fs)) : initContext,
     },
+    uiPageFormatter: generatedSourceFormatter,
     uiInstallDependencies: { fs },
     dbOperationDependencies: {
       cwd: host.cwd,

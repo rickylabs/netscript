@@ -303,27 +303,6 @@ Deno.test('durable chat lifecycle provides seed, optimism, live tokens, reload r
   reloadTab.dispose();
 });
 
-async function withinNative<T>(promise: Promise<T>): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    return await Promise.race([
-      promise,
-      new Promise<never>((_resolve, reject) => {
-        timer = setTimeout(() => reject(new Error('Native chat fixture did not settle.')), 4000);
-      }),
-    ]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-  }
-}
-async function waitForNative(predicate: () => boolean): Promise<void> {
-  const deadline = Date.now() + 4000;
-  while (!predicate()) {
-    if (Date.now() >= deadline) throw new Error('Native chat fixture condition did not settle.');
-    await new Promise<void>((resolve) => setTimeout(resolve, 1));
-  }
-}
-
 Deno.test('default native chat transport retains rich POST bodies and one live SSE with send aborts', async () => {
   const posts: unknown[] = [];
   let bootstrapRequests = 0;
@@ -338,6 +317,13 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
   let releasePost = Promise.withResolvers<void>();
   const releases: (() => void)[] = [releasePost.resolve];
   const liveReady = Promise.withResolvers<void>();
+  const liveCancelled = Promise.withResolvers<void>();
+  // With a retained response, forced-GC parallel suites cancelled in 1.6–2.3 ms.
+  // Allow 15 s for loaded CI while bounding missing events with connection-state
+  // diagnostics. The wait remains event-driven, without polling or retries.
+  const cancellationDeadlineMs = 15_000;
+  let liveResponse: Response | undefined;
+  let liveFetchSignal: AbortSignal | null | undefined;
   const encoder = new TextEncoder();
   const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
     if (request.method === 'POST') {
@@ -370,12 +356,28 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
           ended = true;
           activeLive--;
           cancelledLive++;
+          liveCancelled.resolve();
         },
       }),
       { headers: { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' } },
     );
   });
   const baseUrl = `http://${server.addr.hostname}:${server.addr.port}`;
+  const nativeFetch = globalThis.fetch;
+  globalThis.fetch = async (input, init) => {
+    const response = await nativeFetch(input, init);
+    if (
+      response.url.startsWith(`${baseUrl}/`) &&
+      new URL(response.url).searchParams.get('live') === 'sse'
+    ) {
+      // Deno 2.9.5 can lose fetch-body abort propagation if this Response is
+      // collected while upstream retains only its body reader (denoland/deno#37006).
+      // Keep the real response reachable through the cancellation assertions.
+      liveResponse = response;
+      liveFetchSignal = init?.signal;
+    }
+    return response;
+  };
   const connection = createNetScriptChatConnection({
     target: { sessionId: 'native-rich-send', baseUrl },
     initialOffset: '0',
@@ -412,16 +414,16 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     );
   };
   try {
-    await withinNative(liveReady.promise);
+    await liveReady.promise;
     const before = {
       type: 'TEXT_MESSAGE_CONTENT',
       messageId: 'live-before',
       delta: 'Before rich send —',
     };
     emit(before, '1');
-    assertEquals((await withinNative(pendingFirst)).value, before);
-    assertEquals((await withinNative(pendingSecond)).value, before);
-    await withinNative(connection.send(messages, data));
+    assertEquals((await pendingFirst).value, before);
+    assertEquals((await pendingSecond).value, before);
+    await connection.send(messages, data);
     assertEquals(posts[0], JSON.parse(JSON.stringify({ messages, data })));
     assertEquals(bootstrapRequests, 1);
     assertEquals(liveRequests, 1);
@@ -435,8 +437,8 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
       delta: 'After rich send…',
     };
     emit(after, '2');
-    assertEquals((await withinNative(afterFirst)).value, after);
-    assertEquals((await withinNative(afterSecond)).value, after);
+    assertEquals((await afterFirst).value, after);
+    assertEquals((await afterSecond).value, after);
     holdNext = true;
     postEntered = Promise.withResolvers<void>();
     releasePost = Promise.withResolvers<void>();
@@ -444,10 +446,10 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     const caller = new AbortController();
     const callerSend = connection.send(messages, data, caller.signal);
     void callerSend.catch(() => undefined);
-    await withinNative(postEntered.promise);
+    await postEntered.promise;
     caller.abort(new DOMException('Caller aborted native POST.', 'AbortError'));
     await assertRejects(
-      () => withinNative(callerSend),
+      () => callerSend,
       DOMException,
       'Caller aborted native POST.',
     );
@@ -460,22 +462,43 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     releases.push(releasePost.resolve);
     const disposedSend = connection.send(messages, data);
     void disposedSend.catch(() => undefined);
-    await withinNative(postEntered.promise);
+    await postEntered.promise;
     const finalFirst = first.next();
     const finalSecond = second.next();
     connection.dispose();
     connection.stop();
     connection.close();
-    await assertRejects(() => withinNative(disposedSend), DOMException);
+    await assertRejects(() => disposedSend, DOMException);
     assertEquals(posts[2], JSON.parse(JSON.stringify({ messages, data })));
-    assertEquals((await withinNative(finalFirst)).done, true);
-    assertEquals((await withinNative(finalSecond)).done, true);
-    await waitForNative(() => activeLive === 0);
+    assertEquals((await finalFirst).done, true);
+    assertEquals((await finalSecond).done, true);
+    assertEquals(liveFetchSignal?.aborted, true);
+    let cancellationTimer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        liveCancelled.promise,
+        new Promise<never>((_resolve, reject) => {
+          cancellationTimer = setTimeout(() =>
+            reject(
+              new Error(
+                `Native SSE cancellation missing after ${cancellationDeadlineMs} ms: ` +
+                  `activeLive=${activeLive}, cancelledLive=${cancelledLive}, ` +
+                  `liveRequests=${liveRequests}, fetchSignalAborted=${liveFetchSignal?.aborted}`,
+              ),
+            ), cancellationDeadlineMs);
+        }),
+      ]);
+    } finally {
+      clearTimeout(cancellationTimer);
+    }
+    assertEquals(liveResponse?.status, 200);
+    assertEquals(activeLive, 0);
     assertEquals(cancelledLive, 1);
     assertEquals(liveRequests, 1);
     assertEquals(maxActiveLive, 1);
     await assertRejects(() => connection.send(messages, data), Error, 'already disposed');
   } finally {
+    globalThis.fetch = nativeFetch;
     connection.dispose();
     for (const release of releases) release();
     if (controller && !ended) {
@@ -483,14 +506,14 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
       controller.close();
     }
     try {
-      await withinNative(Promise.allSettled([
+      await Promise.allSettled([
         pendingFirst,
         pendingSecond,
         first.return?.(undefined) ?? Promise.resolve({ done: true, value: undefined }),
         second.return?.(undefined) ?? Promise.resolve({ done: true, value: undefined }),
-      ]));
+      ]);
     } finally {
-      await withinNative(server.shutdown());
+      await server.shutdown();
     }
   }
 });

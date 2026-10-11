@@ -309,7 +309,7 @@ export class Worker {
             );
           }
         },
-        { signal },
+        { signal, concurrency: this.concurrency },
       );
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -357,6 +357,7 @@ export class Worker {
   private dispatchContext(): WorkerDispatchContext {
     return {
       workerId: this.workerId,
+      concurrency: this.concurrency,
       registry: this.registry,
       executionState: this.executionState,
       taskExecutor: this.taskExecutor,
