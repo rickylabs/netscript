@@ -34,7 +34,9 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
         'sagas/plugin.ts',
         `/** Generated sagas control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n${
           NETSCRIPT_CONTRIBUTION_BUILDERS.map((builder) =>
-            `  { callee: '${builder.callee}', axis: ${JSON.stringify(builder.axis)} },`
+            `  { callee: '${builder.callee}', axis: ${
+              builder.axis === null ? 'null' : `'${builder.axis}'`
+            } },`
           ).join('\n')
         }\n] as const;\n\nexport { sagasPlugin } from '@netscript/plugin-sagas';\n`,
       ),

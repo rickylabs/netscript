@@ -14,7 +14,7 @@
  * ```
  *
  * Pass these immutable patterns through the plugin SDK's `additionalBuilders` option.
- * Schema maps, saga signals, and saga queries are consumed by their owning definitions;
+ * Saga signals and queries are consumed by their owning saga definitions;
  * they are not independent id-based registry entries.
  */
 export const NETSCRIPT_CONTRIBUTION_BUILDERS: readonly Readonly<{

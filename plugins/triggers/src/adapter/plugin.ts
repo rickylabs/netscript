@@ -35,7 +35,9 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
         'triggers/plugin.ts',
         `/** Generated triggers control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n${
           NETSCRIPT_CONTRIBUTION_BUILDERS.map((builder) =>
-            `  { callee: '${builder.callee}', axis: ${JSON.stringify(builder.axis)} },`
+            `  { callee: '${builder.callee}', axis: ${
+              builder.axis === null ? 'null' : `'${builder.axis}'`
+            } },`
           ).join('\n')
         }\n] as const;\n\nexport { triggersPlugin } from '@netscript/plugin-triggers';\n`,
       ),

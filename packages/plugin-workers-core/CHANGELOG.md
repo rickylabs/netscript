@@ -3,7 +3,6 @@
 ## Unreleased
 
 - Publish factory-owned discovery axes and exclusions through `./discovery`.
-
 - Add bounded bytes/JSON stdin to task builders and execution options; close stdin after delivery
   and use null stdin when no payload is supplied.
 - Retain the last 1 MiB of stdout/stderr by default without failing chatty tasks; explicit output

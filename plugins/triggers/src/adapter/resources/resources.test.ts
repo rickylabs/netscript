@@ -141,6 +141,14 @@ Deno.test('triggers install emits only userland glue under triggers', () => {
     artifactText(controlPlane!),
     "{ callee: 'defineWebhook', axis: 'triggers' }",
   );
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineScheduledTrigger', axis: 'triggers' }",
+  );
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineFileWatch', axis: 'triggers' }",
+  );
 });
 
 Deno.test('generated triggers runtime activates the selected Redis adapter', async () => {
