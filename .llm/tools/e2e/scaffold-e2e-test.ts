@@ -11,7 +11,6 @@
  * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --repo . --name plugin-smoke-manual --strict-telemetry
  */
 
-import { agentHostFreeDenoArgs } from '../../../packages/cli/tests/support/agent-host-free-deno.ts';
 import { delay } from 'jsr:@std/async@1/delay';
 import { ensureDir } from 'jsr:@std/fs@1/ensure-dir';
 import { exists } from 'jsr:@std/fs@1/exists';
@@ -592,12 +591,20 @@ async function withTimeout<T>(
 
 class SmokeRunner {
   readonly #options: Options;
+  readonly #environment: Record<string, string>;
   readonly #steps: StepResult[] = [];
   #startedAspire = false;
   #stoppedAspire = false;
 
   constructor(options: Options) {
     this.#options = options;
+    this.#environment = Deno.env.toObject();
+    for (const name of Object.keys(this.#environment)) {
+      if (
+        name === 'CLAUDECODE' || name === 'OPENCODE' || name === 'TERM_PROGRAM' ||
+        name === 'ZED_TERM' || /^(OPENCODE_|VSCODE_|CURSOR_)/.test(name)
+      ) delete this.#environment[name];
+    }
   }
 
   #appendLog(message: string): void {
@@ -763,7 +770,7 @@ class SmokeRunner {
 
   #commandArgs(...args: string[]): string[] {
     const releaseFlags = this.#options.cli.startsWith('jsr:') ? ['--minimum-dependency-age=0'] : [];
-    return agentHostFreeDenoArgs(['run', '-A', ...releaseFlags, this.#options.cli, ...args]);
+    return ['run', '-A', ...releaseFlags, this.#options.cli, ...args];
   }
 
   async #preflight(): Promise<void> {
@@ -1506,7 +1513,8 @@ class SmokeRunner {
           new Deno.Command(command, {
             args,
             cwd: options.cwd,
-            env: options.env,
+            env: { ...this.#environment, ...options.env },
+            clearEnv: true,
             stdout: 'piped',
             stderr: 'piped',
             signal,
