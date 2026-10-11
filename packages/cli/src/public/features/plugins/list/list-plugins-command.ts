@@ -1,3 +1,4 @@
+import { createContributionExtractor } from '../../../../kernel/adapters/plugin/contribution-extractor.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 /**
  * @module public/features/plugin-list-command
@@ -7,7 +8,7 @@ import { outputText } from '../../../../kernel/presentation/output/default-outpu
 
 import { Command } from '@cliffy/command';
 import type { NetScriptConfig } from '@netscript/config';
-import { AstExtractor, FilesystemWalker } from '@netscript/plugin/sdk';
+import { FilesystemWalker } from '@netscript/plugin/sdk';
 import { resolve } from '@std/path';
 import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config/deploy-config.ts';
 import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
@@ -70,7 +71,7 @@ async function discoverContributionCounts(
   projectRoot: string,
 ): Promise<ReadonlyMap<string, number>> {
   const files = await new FilesystemWalker().walk(projectRoot);
-  const contributions = await new AstExtractor().extract(files);
+  const contributions = await createContributionExtractor().extract(files);
   const counts = new Map<string, number>();
   for (const contribution of contributions) {
     counts.set(contribution.axis, (counts.get(contribution.axis) ?? 0) + 1);

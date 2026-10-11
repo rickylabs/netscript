@@ -320,3 +320,11 @@ terminal-instance cancellation/expiry contract, so their retention window is not
 change. Terminal records written before this policy was installed also need a migration/backfill;
 this change assigns deadlines when a terminal state is written. These remaining acceptance items
 keep issue #2109 open.
+
+## Discovery metadata
+
+`@netscript/plugin-sagas-core/discovery` exports immutable `NETSCRIPT_CONTRIBUTION_BUILDERS`
+patterns for the plugin SDK `additionalBuilders` option. `defineSaga` → `sagas`, `defineSignal` →
+excluded (no independent contribution id), `defineQuery` → excluded (no independent contribution
+id). The CLI composes first-party metadata before walking the project, independently of plugin
+update order.

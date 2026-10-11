@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Publish factory-owned discovery axes and exclusions through `./discovery`.
+
 - Retain applied replay keys for open sagas. `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and
   no longer expires open markers; migrate callers to `completedRetentionDays`, aligned with the
   canonical store's terminal retention window. This changes the former active-key TTL behavior.

@@ -12,6 +12,7 @@ import {
   type ScaffoldArtifact,
   textArtifact,
 } from '@netscript/plugin/adapter';
+import { NETSCRIPT_CONTRIBUTION_BUILDERS } from '@netscript/plugin-workers-core/discovery';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import { WORKERS_CONCURRENCY_ENV } from '../runtime/concurrency.ts';
 import { WORKERS_JOB_REGISTRY_PATH } from '../runtime/generated-jobs.ts';
@@ -35,7 +36,11 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
     return [
       textArtifact(
         'workers/plugin.ts',
-        `/** Generated workers control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n  { callee: 'defineJob', axis: 'jobs' },\n] as const;\n\nexport { workersPlugin } from '@netscript/plugin-workers';\n`,
+        `/** Generated workers control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n${
+          NETSCRIPT_CONTRIBUTION_BUILDERS.map((builder) =>
+            `  { callee: '${builder.callee}', axis: ${JSON.stringify(builder.axis)} },`
+          ).join('\n')
+        }\n] as const;\n\nexport { workersPlugin } from '@netscript/plugin-workers';\n`,
       ),
     ];
   },

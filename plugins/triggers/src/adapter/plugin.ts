@@ -10,6 +10,7 @@ import {
   type ScaffoldArtifact,
   textArtifact,
 } from '@netscript/plugin/adapter';
+import { NETSCRIPT_CONTRIBUTION_BUILDERS } from '@netscript/plugin-triggers-core/discovery';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   barrelScaffolder,
@@ -32,7 +33,11 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
     return [
       textArtifact(
         'triggers/plugin.ts',
-        `/** Generated triggers control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n  { callee: 'defineWebhook', axis: 'triggers' },\n] as const;\n\nexport { triggersPlugin } from '@netscript/plugin-triggers';\n`,
+        `/** Generated triggers control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n${
+          NETSCRIPT_CONTRIBUTION_BUILDERS.map((builder) =>
+            `  { callee: '${builder.callee}', axis: ${JSON.stringify(builder.axis)} },`
+          ).join('\n')
+        }\n] as const;\n\nexport { triggersPlugin } from '@netscript/plugin-triggers';\n`,
       ),
     ];
   },

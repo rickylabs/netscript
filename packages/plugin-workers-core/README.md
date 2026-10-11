@@ -218,3 +218,10 @@ Atomic version checks prevent it from deleting a record updated after inspection
 records and open executions are preserved. This endpoint also removes legacy execution records
 written without TTL; normal new-record expiry is performed by the KV backend and needs no app
 session. Job/task definitions remain configuration rather than expiring execution history.
+
+## Discovery metadata
+
+`@netscript/plugin-workers-core/discovery` exports immutable `NETSCRIPT_CONTRIBUTION_BUILDERS`
+patterns for the plugin SDK `additionalBuilders` option. `defineJob` → `jobs`, `defineTask` →
+`tasks`, `defineWorkflow` → `workflows`. The CLI composes first-party metadata before walking the
+project, independently of plugin update order.
