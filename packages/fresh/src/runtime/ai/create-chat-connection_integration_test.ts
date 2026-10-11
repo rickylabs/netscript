@@ -318,6 +318,12 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
   const releases: (() => void)[] = [releasePost.resolve];
   const liveReady = Promise.withResolvers<void>();
   const liveCancelled = Promise.withResolvers<void>();
+  // With a retained response, forced-GC parallel suites cancelled in 1.6–2.3 ms.
+  // Allow 15 s for loaded CI while bounding missing events with connection-state
+  // diagnostics. The wait remains event-driven, without polling or retries.
+  const cancellationDeadlineMs = 15_000;
+  let liveResponse: Response | undefined;
+  let liveFetchSignal: AbortSignal | null | undefined;
   const encoder = new TextEncoder();
   const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
     if (request.method === 'POST') {
@@ -357,6 +363,21 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     );
   });
   const baseUrl = `http://${server.addr.hostname}:${server.addr.port}`;
+  const nativeFetch = globalThis.fetch;
+  globalThis.fetch = async (input, init) => {
+    const response = await nativeFetch(input, init);
+    if (
+      response.url.startsWith(`${baseUrl}/`) &&
+      new URL(response.url).searchParams.get('live') === 'sse'
+    ) {
+      // Deno 2.9.5 can lose fetch-body abort propagation if this Response is
+      // collected while upstream retains only its body reader (denoland/deno#37006).
+      // Keep the real response reachable through the cancellation assertions.
+      liveResponse = response;
+      liveFetchSignal = init?.signal;
+    }
+    return response;
+  };
   const connection = createNetScriptChatConnection({
     target: { sessionId: 'native-rich-send', baseUrl },
     initialOffset: '0',
@@ -451,15 +472,33 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     assertEquals(posts[2], JSON.parse(JSON.stringify({ messages, data })));
     assertEquals((await finalFirst).done, true);
     assertEquals((await finalSecond).done, true);
-    // Logical subscribers can finish before the server observes the HTTP abort.
-    // Wait for that handoff, without a wall-clock deadline tied to shard load.
-    await liveCancelled.promise;
+    assertEquals(liveFetchSignal?.aborted, true);
+    let cancellationTimer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        liveCancelled.promise,
+        new Promise<never>((_resolve, reject) => {
+          cancellationTimer = setTimeout(() =>
+            reject(
+              new Error(
+                `Native SSE cancellation missing after ${cancellationDeadlineMs} ms: ` +
+                  `activeLive=${activeLive}, cancelledLive=${cancelledLive}, ` +
+                  `liveRequests=${liveRequests}, fetchSignalAborted=${liveFetchSignal?.aborted}`,
+              ),
+            ), cancellationDeadlineMs);
+        }),
+      ]);
+    } finally {
+      clearTimeout(cancellationTimer);
+    }
+    assertEquals(liveResponse?.status, 200);
     assertEquals(activeLive, 0);
     assertEquals(cancelledLive, 1);
     assertEquals(liveRequests, 1);
     assertEquals(maxActiveLive, 1);
     await assertRejects(() => connection.send(messages, data), Error, 'already disposed');
   } finally {
+    globalThis.fetch = nativeFetch;
     connection.dispose();
     for (const release of releases) release();
     if (controller && !ended) {
