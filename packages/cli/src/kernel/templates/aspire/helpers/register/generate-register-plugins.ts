@@ -143,6 +143,15 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       );
     }
 
+    const sagaProjectionBackend = extractSagaStoreBackend(entry, 'Projection');
+    if (sagaProjectionBackend) {
+      lines.push(
+        `    await resource.withEnvironment('NETSCRIPT_SAGA_PROJECTION', ${
+          JSON.stringify(sagaProjectionBackend)
+        });`,
+      );
+    }
+
     lines.push(`    if (installationSecretFile) {`);
     lines.push(
       `      await resource.withEnvironment('NETSCRIPT_INSTALLATION_SECRET_FILE', installationSecretFile);`,

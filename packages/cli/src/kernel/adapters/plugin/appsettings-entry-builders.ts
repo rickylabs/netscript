@@ -12,6 +12,8 @@ import { resolveHostPort } from '../../templates/aspire/helpers/register/render-
 const PROJECT_ROOT_WORKDIR = '.';
 
 interface PluginWorkspaceMutationOptions {
+  /** Resolved database requirement for this installation. */
+  readonly requiresDb?: boolean;
   readonly enabled?: boolean;
   readonly serviceReferences?: readonly string[];
   readonly pluginReferences?: readonly string[];
@@ -90,7 +92,7 @@ export function buildBackgroundProcessorEntry(
     Workdir: scaffoldResult.backgroundWorkdir ?? PROJECT_ROOT_WORKDIR,
     Telemetry: provider.defaultTelemetry,
     WatchMode: true,
-    RequiresDb: provider.defaultRequiresDb,
+    RequiresDb: options.requiresDb ?? provider.defaultRequiresDb,
     RequiresKv: provider.defaultRequiresKv,
     Permissions: [...provider.defaultPermissions],
   };
@@ -138,7 +140,7 @@ function buildBasePluginEntry(
     Entrypoint: entrypoint,
     Workdir: scaffoldResult.serviceWorkdir ?? PROJECT_ROOT_WORKDIR,
     RequiresKv: provider.defaultRequiresKv,
-    RequiresDb: provider.defaultRequiresDb,
+    RequiresDb: options.requiresDb ?? provider.defaultRequiresDb,
     Permissions: [...provider.defaultPermissions],
   };
 
@@ -197,7 +199,13 @@ function applySagaStoreBackend(
     return;
   }
   const mutable = entry as (PluginEntry | BackgroundProcessorEntry) & {
-    Sagas?: { Store: { Backend: SagaStoreBackend } };
+    Sagas?: {
+      Store: { Backend: SagaStoreBackend };
+      Projection: { Backend: 'kv' | 'prisma' };
+    };
   };
-  mutable.Sagas = { Store: { Backend: backend ?? 'kv' } };
+  mutable.Sagas = {
+    Store: { Backend: backend ?? 'kv' },
+    Projection: { Backend: entry.RequiresDb ? 'prisma' : 'kv' },
+  };
 }

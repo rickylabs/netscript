@@ -2466,3 +2466,32 @@ function authDescriptor(): ValidatedPluginDescriptor {
     },
   };
 }
+
+for (const pluginName of ['workers', 'sagas', 'triggers'] as const) {
+  Deno.test(`official ${pluginName} no-db install emits DB-free API/background metadata and no Prisma imports`, async () => {
+    const projectRoot = await Deno.makeTempDir();
+    try {
+      await installOfficialPluginWithoutSamples(projectRoot, pluginName);
+      const config =
+        JSON.parse(await Deno.readTextFile(join(projectRoot, 'appsettings.json'))).NetScript;
+      assertEquals(config.Plugins[`${pluginName}-api`].RequiresDb, false);
+      assertEquals(config.BackgroundProcessors[pluginName].RequiresDb, false);
+      assertEquals(config.Plugins[`${pluginName}-api`].RequiresKv, true);
+      assertEquals(config.BackgroundProcessors[pluginName].RequiresKv, true);
+      if (pluginName === 'sagas') {
+        assertEquals(config.Plugins['sagas-api'].Sagas.Projection.Backend, 'kv');
+        assertEquals(config.BackgroundProcessors.sagas.Sagas.Projection.Backend, 'kv');
+      }
+      assertEquals(await pathExists(join(projectRoot, 'database')), false);
+      const files = await collectTypeScriptFiles(join(projectRoot, pluginName));
+      for (const file of files) {
+        const source = await Deno.readTextFile(file);
+        assertFalse(
+          /(?:from|import\s*\()\s*['"][^'"]*(?:prisma|database\/generated)/i.test(source),
+        );
+      }
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+}

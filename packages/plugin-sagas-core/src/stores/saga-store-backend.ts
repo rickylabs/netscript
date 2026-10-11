@@ -35,6 +35,22 @@ export function resolveSagaStoreBackend(
   );
 }
 
+/** Resolve the query projection independently of durable state; env overrides appsettings. */
+export function resolveSagaProjectionBackend(
+  input: SagaStoreBackendResolutionInput = {},
+): DurableSagaStoreBackend | 'none' {
+  const value = input.env?.NETSCRIPT_SAGA_PROJECTION ||
+    stringAt(input.appsettings, ['sagas', 'projection', 'backend']) ||
+    stringAt(input.appsettings, ['Sagas', 'Projection', 'Backend']);
+  if (value !== undefined) {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'none') return normalized;
+    return parseSagaStoreBackend(value, 'sagas.projection.backend');
+  }
+  const store = input.env?.[SAGA_STORE_BACKEND_ENV] || findAppsettingsBackend(input.appsettings);
+  return store ? parseSagaStoreBackend(store, 'sagas.store.backend') : 'kv';
+}
+
 function parseSagaStoreBackend(value: string, source: string): DurableSagaStoreBackend {
   const normalized = value.trim().toLowerCase();
   if (normalized === 'kv' || normalized === 'prisma') {

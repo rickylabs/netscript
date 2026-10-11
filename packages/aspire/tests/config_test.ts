@@ -172,12 +172,12 @@ Deno.test('config', async (t) => {
         Plugins: {
           'sagas-api': {
             Port: 8092,
-            Sagas: { Store: { Backend: 'prisma' } },
+            Sagas: { Store: { Backend: 'prisma' }, Projection: { Backend: 'none' } },
           },
         },
         BackgroundProcessors: {
           sagas: {
-            Sagas: { Store: { Backend: 'kv' } },
+            Sagas: { Store: { Backend: 'kv' }, Projection: { Backend: 'kv' } },
           },
         },
       },
@@ -185,6 +185,13 @@ Deno.test('config', async (t) => {
 
     assertEquals(result.NetScript.Plugins['sagas-api']?.Sagas?.Store?.Backend, 'prisma');
     assertEquals(result.NetScript.BackgroundProcessors.sagas?.Sagas?.Store?.Backend, 'kv');
+    assertEquals(Reflect.get(result.NetScript.Plugins['sagas-api']?.Sagas ?? {}, 'Projection'), {
+      Backend: 'none',
+    });
+    assertEquals(
+      Reflect.get(result.NetScript.BackgroundProcessors.sagas?.Sagas ?? {}, 'Projection'),
+      { Backend: 'kv' },
+    );
   });
 
   await t.step('AppSettingsSchema: preserves host-side Aspire parameters', () => {

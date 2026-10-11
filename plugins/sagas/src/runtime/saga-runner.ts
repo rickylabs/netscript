@@ -1,5 +1,5 @@
 import {
-  resolveSagaStoreBackend,
+  resolveSagaProjectionBackend,
   SAGA_STORE_BACKEND_ENV,
 } from '@netscript/plugin-sagas-core/stores';
 import { loadSagaRetention } from './load-saga-retention.ts';
@@ -190,29 +190,44 @@ async function resolveProjection(
   }
   const bootstrapModule = readEnv('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
   if (!bootstrapModule) {
-    return withStreamProjection(new KvSagaInstanceProjection());
+    const backend = resolveSagaProjectionBackend({
+      env: {
+        [SAGA_STORE_BACKEND_ENV]: readEnv(SAGA_STORE_BACKEND_ENV),
+        NETSCRIPT_SAGA_PROJECTION: readEnv('NETSCRIPT_SAGA_PROJECTION'),
+      },
+    });
+    if (backend === 'none') return undefined;
+    if (backend === 'prisma') {
+      throw new Error('Prisma saga projection requires a plugin service bootstrap module.');
+    }
+    const retention = await loadSagaRetention();
+    return withStreamProjection(new KvSagaInstanceProjection(undefined, retention.completedDays));
   }
   const imported = await import(bootstrapModule) as SagaRunnerBootstrap;
   const context = await imported.createPluginServiceContext('sagas');
-  const client = await context.db.getClient();
   const retention = await loadSagaRetention();
   const configuredBackend = context.env?.[SAGA_STORE_BACKEND_ENV] ??
     readEnv(SAGA_STORE_BACKEND_ENV);
   const appsettings = context.appsettings ?? context.settings ?? context.config;
-  const querySource = configuredBackend === undefined && appsettings === undefined
-    ? 'kv'
-    : resolveSagaStoreBackend({
-      env: { [SAGA_STORE_BACKEND_ENV]: configuredBackend },
-      appsettings,
-    });
+  const projectionBackend = resolveSagaProjectionBackend({
+    env: {
+      [SAGA_STORE_BACKEND_ENV]: configuredBackend,
+      NETSCRIPT_SAGA_PROJECTION: context.env?.NETSCRIPT_SAGA_PROJECTION ??
+        readEnv('NETSCRIPT_SAGA_PROJECTION'),
+    },
+    appsettings,
+  });
+  if (projectionBackend === 'none') return undefined;
   const kvProjection = new KvSagaInstanceProjection(undefined, retention.completedDays);
+  if (projectionBackend === 'kv') return withStreamProjection(kvProjection);
+  const client = await context.db.getClient();
   const readModelProjection = isProjectionClient(client)
     ? new CompositeSagaInstanceProjection([
       kvProjection,
       new PrismaSagaInstanceProjection(
         client,
         retention.archiveToDb,
-        querySource,
+        projectionBackend,
       ),
     ])
     : kvProjection;

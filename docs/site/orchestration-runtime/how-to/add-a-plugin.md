@@ -153,6 +153,31 @@ own Prisma models (<code>auth_users</code>, <code>auth_sessions</code>,
 before the service starts.
 {{ /comp }}
 
+### KV-only installs and projection migration
+
+Install workers, sagas, or triggers with `--no-db --no-samples` to skip Prisma schema and
+migration contributions and emit `RequiresDb: false` for both the API and background processor.
+The processes still require KV. Their background work runs independently of the web app.
+
+Saga query storage is selected separately with `sagas.projection.backend` (`kv`, `prisma`,
+or `none`). In `appsettings.json`, put `Sagas.Projection.Backend` on both the saga API entry in
+`NetScript.Plugins` and the saga runner entry in `NetScript.BackgroundProcessors`. Generated
+helpers forward the selector as `NETSCRIPT_SAGA_PROJECTION`; that environment value takes
+precedence over settings. `kv` writes the KV query model, `prisma` writes the Prisma query model,
+and `none` disables the instance query projection while canonical saga state remains durable.
+The runner and API request a DB client only for a Prisma projection.
+
+**Migration in 0.0.8:** re-run each plugin install with `--no-db --no-samples --force` and regenerate
+helpers to correct existing DB-dependent metadata. Preserve your user-owned configuration and
+samples when applying the generated changes. For existing saga entries without a projection
+selector, the query backend follows `Sagas.Store.Backend` (or `NETSCRIPT_SAGA_STORE`), defaulting
+to KV when neither is set. Select `prisma` explicitly when relational query storage is required;
+select `kv` on both entries when using `--no-db`. A new DB-enabled saga install emits a Prisma
+projection; a new `--no-db` saga install emits a KV projection.
+
+These install and runner paths have focused tests. The complete KV-only generated runtime across
+workers, sagas, and triggers is a separate release acceptance gate.
+
 ## Step 3 — Generate registries and wire the database
 
 After adding plugins, regenerate the plugin registries so the runtime can discover them:

@@ -716,9 +716,11 @@ Deno.test('PluginWorkspaceMutator writes saga store backend appsettings for saga
 
   assertEquals(config.NetScript.Plugins['sagas-api'].Sagas, {
     Store: { Backend: 'prisma' },
+    Projection: { Backend: 'prisma' },
   });
   assertEquals(config.NetScript.BackgroundProcessors.sagas.Sagas, {
     Store: { Backend: 'prisma' },
+    Projection: { Backend: 'prisma' },
   });
 });
 

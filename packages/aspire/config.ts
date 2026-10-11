@@ -159,6 +159,11 @@ export interface SagaResourceConfig {
     /** Durable saga state backend. */
     Backend?: SagaStoreBackend;
   };
+  /** Query projection backend; omitted follows Store.Backend, defaulting to KV. */
+  Projection?: {
+    /** KV query model, Prisma query model, or disabled query projection. */
+    Backend?: 'kv' | 'prisma' | 'none';
+  };
 }
 
 /** Backend service resource entry. */
@@ -493,6 +498,9 @@ const EnvironmentFields = {
 } as const satisfies z.ZodRawShape;
 
 const SagaResourceConfigZod = z.object({
+  Projection: z.object({
+    Backend: z.enum(['kv', 'prisma', 'none']).optional(),
+  }).optional(),
   Store: z.object({
     Backend: z.enum(['kv', 'prisma']).optional(),
   }).optional(),

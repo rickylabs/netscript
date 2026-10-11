@@ -167,6 +167,15 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       );
     }
 
+    const sagaProjectionBackend = extractSagaStoreBackend(entry, 'Projection');
+    if (sagaProjectionBackend) {
+      lines.push(
+        `    await ${id}.withEnvironment('NETSCRIPT_SAGA_PROJECTION', ${
+          JSON.stringify(sagaProjectionBackend)
+        });`,
+      );
+    }
+
     lines.push(`    if (installationSecretFile) {`);
     lines.push(
       `      await ${id}.withEnvironment('NETSCRIPT_INSTALLATION_SECRET_FILE', installationSecretFile);`,

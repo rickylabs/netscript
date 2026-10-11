@@ -25,6 +25,8 @@ import { resolveNetScriptImports } from '../scaffold/import-resolver.ts';
 /** Optional overrides when mutating workspace plugin config. */
 export interface PluginWorkspaceMutationOptions {
   /** Whether the new config entry should be enabled. */
+  /** Resolved database requirement for this installation. */
+  readonly requiresDb?: boolean;
   readonly enabled?: boolean;
   /** Optional service references for the generated appsettings entry. */
   readonly serviceReferences?: readonly string[];

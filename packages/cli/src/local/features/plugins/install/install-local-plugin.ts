@@ -163,6 +163,7 @@ export async function installLocalPlugin(
     {
       serviceReferences: mergeUniqueReferences(plan.serviceReferences, rendered.serviceReferences),
       pluginReferences: mergeUniqueReferences(plan.pluginReferences, rendered.pluginReferences),
+      requiresDb: plan.dbDetection.requiresDb,
       sagaStoreBackend: plan.sagaStoreBackend,
     },
   );

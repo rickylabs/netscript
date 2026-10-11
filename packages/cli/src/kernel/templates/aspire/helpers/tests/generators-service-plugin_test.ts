@@ -464,7 +464,7 @@ describe('generateRegisterPlugins', () => {
   it('should pass saga store backend appsettings to plugin env', () => {
     const sagaPlugin = {
       ...fixtures.MINIMAL_PLUGIN,
-      Sagas: { Store: { Backend: 'prisma' } },
+      Sagas: { Store: { Backend: 'prisma' }, Projection: { Backend: 'none' } },
     } as PluginEntry;
     const output = generateRegisterPlugins({
       ...emptyOptions,
@@ -474,6 +474,7 @@ describe('generateRegisterPlugins', () => {
       output,
       'resource.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
     );
+    assertStringIncludes(output, 'resource.withEnvironment(\'NETSCRIPT_SAGA_PROJECTION\', "none")');
   });
 
   it('should point triggers API at the generated trigger registry module', () => {
