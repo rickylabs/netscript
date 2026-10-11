@@ -50,6 +50,8 @@ export { MemorySagaAppliedKeyStore } from '../runtime/mod.ts';
 export { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
 export { sagaRetentionRemaining } from './saga-kv-retention.ts';
 export { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
+export { KvSagaSchedulerStore } from './kv-saga-scheduler-store.ts';
+export type { KvSagaSchedulerStoreOptions } from './kv-saga-scheduler-store.ts';
 export { PrismaSagaStore, SAGA_RUNTIME_CORRELATION_SELECTOR } from './prisma-saga-store.ts';
 export {
   resolveSagaProjectionBackend,
