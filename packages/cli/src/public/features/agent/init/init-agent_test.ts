@@ -1,3 +1,4 @@
+import { EMBEDDED_AGENT_TOOL_FILES } from '../../../../kernel/assets/agent-tools.generated.ts';
 import {
   assert,
   assertEquals,
@@ -1396,3 +1397,41 @@ function extractSkillReferences(markdown: string): ReadonlySet<string> {
   }
   return references;
 }
+
+Deno.test('embedded consumer check runner is self-contained and rejects excluded generated files', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(join(root, 'deno.json'), '{"exclude":["generated/"]}\n');
+    await Deno.mkdir(join(root, 'generated'));
+    const target = join(root, 'generated', 'probe.ts');
+    await Deno.writeTextFile(target, 'export const value: string = 1;\n');
+    const runner = join(root, 'run-deno-check.ts');
+    await Deno.writeTextFile(runner, EMBEDDED_AGENT_TOOL_FILES['run-deno-check.ts']);
+    const run = () =>
+      new Deno.Command(Deno.execPath(), {
+        args: [
+          'run',
+          '--allow-read',
+          '--allow-run',
+          runner,
+          '--cwd',
+          root,
+          '--',
+          Deno.execPath(),
+          'check',
+          target,
+        ],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+    assertEquals((await run()).code, 2);
+    await Deno.writeTextFile(join(root, 'deno.json'), '{}\n');
+    const broken = await run();
+    assertEquals(broken.code, 1);
+    assertEquals(JSON.parse(new TextDecoder().decode(broken.stdout)).groups[0].code, 'TS2322');
+    await Deno.writeTextFile(target, 'export const value: string = "valid";\n');
+    assertEquals((await run()).code, 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

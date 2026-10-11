@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 
 import { generateRegisterInfrastructure } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
@@ -286,11 +287,9 @@ export async function withCacheReference(
       'export interface InfrastructureContext { readonly primaryCacheWiring?: unknown; }\n',
     );
 
-    const output = await new Deno.Command(Deno.execPath(), {
+    const output = await checkGeneratedFiles({
       args: ['check', '--no-config', '--frozen', '--unstable-kv', `${helpers}/register-apps.mts`],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(
       output.code,
       0,
