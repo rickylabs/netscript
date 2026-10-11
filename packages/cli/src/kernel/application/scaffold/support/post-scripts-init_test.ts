@@ -1,3 +1,4 @@
+import { DenoGeneratedSourceFormatter } from '../../../adapters/runtime/process/deno-generated-source-formatter.ts';
 import { assertEquals } from '@std/assert';
 import { MemoryFileSystemAdapter } from '../../../adapters/scaffold/memory-fs.ts';
 import { Scaffolder } from '../../../adapters/scaffold/scaffolder.ts';
@@ -28,6 +29,7 @@ function createContext(process: ProcessPort): InitPipelineContext {
   return {
     fs,
     process,
+    formatter: new DenoGeneratedSourceFormatter(process),
     templateAdapter,
     scaffolder: new Scaffolder(templateAdapter, fs),
     jsrResolver: {

@@ -1,10 +1,11 @@
 import { join } from '@std/path';
 
 import { provisionDatabaseIfNeeded } from '../../../../kernel/adapters/plugin/db-integration.ts';
-import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
+import type { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import { generatePluginServiceContext } from '../../../../kernel/templates/plugins/plugin-generators.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import type {
@@ -22,6 +23,8 @@ export interface RenderPluginDependencies {
 
   /** Template renderer used by database provisioning. */
   readonly templateAdapter: TemplatePort;
+  /** Injected formatter for database Aspire regeneration. */
+  readonly formatter: GeneratedSourceFormatterPort;
 
   /** Empty plugin registry scaffolder. */
   readonly registryScaffolder: PluginRegistryScaffolder;
@@ -49,6 +52,7 @@ export async function renderPluginSupport(
       fs: dependencies.fs,
       scaffolder: dependencies.scaffolder,
       templateAdapter: dependencies.templateAdapter,
+      formatter: dependencies.formatter,
     },
   );
   const wroteServiceContext = await ensurePluginServiceContext(

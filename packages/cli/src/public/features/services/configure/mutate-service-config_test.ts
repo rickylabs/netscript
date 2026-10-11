@@ -1,6 +1,8 @@
 import { assertEquals } from '@std/assert';
 import { join } from '@std/path';
 
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import { mutateServiceReference, setServiceConfig } from './mutate-service-config.ts';
@@ -32,14 +34,17 @@ async function withProject(
 ): Promise<void> {
   const root = await Deno.makeTempDir();
   const generated: string[] = [];
-  await Deno.writeTextFile(join(root, 'appsettings.json'), JSON.stringify({
-    NetScript: {
-      Services: {
-        api: { Port: 3000, Enabled: true, ServiceReferences: [] },
-        users: { Port: 3001, Enabled: true },
+  await Deno.writeTextFile(
+    join(root, 'appsettings.json'),
+    JSON.stringify({
+      NetScript: {
+        Services: {
+          api: { Port: 3000, Enabled: true, ServiceReferences: [] },
+          users: { Port: 3001, Enabled: true },
+        },
       },
-    },
-  }));
+    }),
+  );
   try {
     await run(root, dependenciesFor(generated), generated);
   } finally {
@@ -52,6 +57,7 @@ function dependenciesFor(generated: string[]) {
     fs: new DenoFileSystem(),
     scaffolder: {} as ScaffolderPort,
     templateAdapter: {} as TemplatePort,
+    formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
     validateComposition: () => Promise.resolve(),
     regenerateHelpers: (root: string) => {
       generated.push(root);

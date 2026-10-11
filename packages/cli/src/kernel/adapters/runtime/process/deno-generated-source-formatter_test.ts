@@ -1,4 +1,7 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { resolve } from '@std/path';
+import { tmpdir } from 'node:os';
+import { formatStagedSourceBatch } from './generated-source-batch-child.ts';
 import type { ProcessPort, ProcessResult } from '../../../ports/process-port.ts';
 import { DenoGeneratedSourceFormatter } from './deno-generated-source-formatter.ts';
 import { DenoProcess } from './deno-process.ts';
@@ -25,6 +28,28 @@ class RecordingProcess implements ProcessPort {
     return Promise.resolve(this.result);
   }
 }
+
+Deno.test('generated batch child write permission is scoped to its staging base', async () => {
+  const process = new RecordingProcess({
+    code: 0,
+    stdout: JSON.stringify({ contents: ['formatted\n'], formatterProcesses: 1 }),
+    stderr: '',
+  });
+  const formatter = new DenoGeneratedSourceFormatter(process);
+  assertEquals(
+    await formatter.formatContents([{ targetPath: '/consumer/file.ts', content: 'raw' }]),
+    [
+      'formatted\n',
+    ],
+  );
+  const args = process.calls[0].args;
+  const temporaryDirectory = resolve(tmpdir());
+  assertEquals(args.filter((arg) => arg.startsWith('--allow-write')), [
+    `--allow-write=${temporaryDirectory}`,
+  ]);
+  assertEquals(args.at(-1), temporaryDirectory);
+  assertEquals(args.includes('/consumer/file.ts'), false);
+});
 
 Deno.test('generated source formatter canonicalizes stdin with target-derived dialect', async () => {
   const formatter = new DenoGeneratedSourceFormatter(new DenoProcess());
@@ -95,4 +120,21 @@ Deno.test('generated source formatter failure names the target and preserves std
   );
   assertStringIncludes(error.message, '/workspace/broken.ts');
   assertStringIncludes(error.message, 'parse failed');
+});
+
+Deno.test('generated batch formatter cleans staging on failure and never writes consumer paths', async () => {
+  const process = new RecordingProcess({ code: 1, stdout: '', stderr: 'parse failed' });
+  await assertRejects(
+    () =>
+      formatStagedSourceBatch([
+        { extension: 'mts', content: 'invalid source' },
+      ], process),
+    Error,
+    'parse failed',
+  );
+  assertEquals(process.calls.length, 1);
+  assertEquals(process.calls[0].args.includes('/consumer/aspire/apphost.mts'), false);
+  const staging = process.calls[0].cwd;
+  if (!staging) throw new Error('Expected a staging directory.');
+  await assertRejects(() => Deno.stat(staging), Deno.errors.NotFound);
 });

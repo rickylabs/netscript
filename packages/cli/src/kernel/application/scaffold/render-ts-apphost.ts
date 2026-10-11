@@ -1,5 +1,6 @@
 import { join } from '@std/path';
 import type { NetScriptConfig } from '@netscript/aspire/types';
+import { canonicalizeAspireOutputs } from '../../adapters/service/aspire-surface-inventory.ts';
 import { PORT_RANGES } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
@@ -236,8 +237,13 @@ export async function scaffoldTsAppHost(
   });
 
   // 7. Write all generated files under aspire/ (apphost.mts + .helpers/*.mts)
-  for (const file of generatedFiles) {
-    const filePath = join(aspireDir, file.path);
+  const canonicalFiles = await canonicalizeAspireOutputs(
+    targetPath,
+    generatedFiles,
+    context.formatter,
+  );
+  for (const file of canonicalFiles) {
+    const filePath = join(targetPath, file.path);
     if (await context.scaffolder.writeFile(filePath, file.content, options.force)) {
       filesCreated.push(filePath);
     } else {

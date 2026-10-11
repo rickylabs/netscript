@@ -2,9 +2,9 @@ import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser
 import { join } from '@std/path';
 
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
-import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
-import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
+import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { IoError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
@@ -60,8 +60,10 @@ export interface RemovePluginDependencies {
   readonly scaffolder?: ScaffolderPort;
   /** Template renderer used to regenerate shared wiring. */
   readonly templateAdapter?: TemplatePort;
+  /** Injected canonical formatter for shared Aspire outputs. */
+  readonly formatter: GeneratedSourceFormatterPort;
   /** Optional regeneration override for contract tests. */
-  readonly regenerateHelpers?: typeof regenerateAspireHelpers;
+  readonly regenerateHelpers?: typeof regenerateAspireHelpersWithDependencies;
 }
 
 /** Remove a plugin from host configuration and dispatch the plugin remove verb. */
@@ -99,7 +101,11 @@ export async function removePlugin(
       await reverseManagedInstallFiles(input.projectRoot, plan.installState, dependencies.fs);
     }
     await reconcilePluginReferences(input.projectRoot, dependencies.fs);
-    const browserAuthFiles = await reconcileBrowserAuth(input.projectRoot, dependencies.fs);
+    const browserAuthFiles = await reconcileBrowserAuth(
+      input.projectRoot,
+      dependencies.fs,
+      dependencies.formatter,
+    );
     const helperFiles = await regenerateRemovalHelpers(
       input.projectRoot,
       dependencies,
@@ -157,25 +163,20 @@ async function regenerateRemovalHelpers(
   browserAuthFiles: readonly string[],
 ): Promise<readonly string[]> {
   if (!await dependencies.fs.exists(join(projectRoot, 'aspire'))) {
-    await formatGeneratedFiles(dependencies.processRunner, projectRoot, browserAuthFiles);
     return browserAuthFiles;
   }
   if (!dependencies.scaffolder || !dependencies.templateAdapter) {
     throw new Error('Removal wiring regeneration dependencies are unavailable.');
   }
-  const aspireFiles = await (dependencies.regenerateHelpers ?? regenerateAspireHelpers)(
-    projectRoot,
-    dependencies.fs,
-    dependencies.scaffolder,
-    dependencies.templateAdapter,
-  );
+  const aspireFiles =
+    await (dependencies.regenerateHelpers ?? regenerateAspireHelpersWithDependencies)(
+      projectRoot,
+      dependencies.fs,
+      dependencies.scaffolder,
+      dependencies.templateAdapter,
+      { formatter: dependencies.formatter },
+    );
   const helperFiles = [...browserAuthFiles, ...aspireFiles];
-  await formatGeneratedFiles(
-    dependencies.processRunner,
-    projectRoot,
-    helperFiles,
-    (path) => dependencies.fs.exists(path),
-  );
   return helperFiles;
 }
 

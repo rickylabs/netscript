@@ -3,6 +3,7 @@ import { fromFileUrl, join } from '@std/path';
 import { DenoFileSystem } from '../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { readAuthServiceName } from '../../kernel/adapters/service/auth-policy.ts';
 import { DenoProcess } from '../../kernel/adapters/runtime/process/deno-process.ts';
+import { DenoGeneratedSourceFormatter } from '../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { Scaffolder } from '../../kernel/adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../kernel/adapters/scaffold/template-adapter.ts';
 import { PluginKindRegistry } from '../../kernel/application/registries/plugin-kind-registry.ts';
@@ -121,6 +122,7 @@ Deno.test('local installer returns rewritten browser files and formats them befo
     const scaffolder = new Scaffolder(templateAdapter, fs);
     const registry = new PluginKindRegistry();
     const process = new DenoProcess();
+    const formatter = new DenoGeneratedSourceFormatter(process);
     const formatted: string[] = [];
     const result = await installLocalPlugin({
       kind: 'auth',
@@ -136,6 +138,15 @@ Deno.test('local installer returns rewritten browser files and formats them befo
       fs,
       scaffolder,
       templateAdapter,
+      formatter: {
+        formatContent: (path, content) => {
+          formatted.push(path);
+          return formatter.formatContent(path, content);
+        },
+        formatContents: (files) => formatter.formatContents(files),
+        formatFiles: (projectRoot, files, policy) =>
+          formatter.formatFiles(projectRoot, files, policy),
+      },
       registry,
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),

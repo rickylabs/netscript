@@ -1,3 +1,4 @@
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { dirname, join, resolve } from '@std/path';
@@ -71,6 +72,7 @@ describe('local contributor install plugin flow', () => {
     }, {
       fs,
       scaffolder,
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       templateAdapter,
       registry,
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
@@ -111,6 +113,7 @@ describe('local contributor install plugin flow', () => {
     }, {
       fs,
       scaffolder,
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       templateAdapter,
       registry,
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
@@ -157,6 +160,7 @@ describe('local contributor install plugin flow', () => {
     }, {
       fs,
       scaffolder,
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       templateAdapter,
       registry,
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
@@ -229,6 +233,7 @@ describe('local contributor install plugin flow', () => {
         }, {
           fs,
           scaffolder,
+          formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
           templateAdapter,
           registry,
           pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
@@ -294,6 +299,7 @@ describe('local contributor install plugin flow', () => {
         new StringTemplateAdapter(new MemoryFileSystemAdapter()),
         new MemoryFileSystemAdapter(),
       ),
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       templateAdapter: new StringTemplateAdapter(new MemoryFileSystemAdapter()),
       pluginScaffolder: {} as PluginScaffolder,
       registryScaffolder: {} as PluginRegistryScaffolder,
