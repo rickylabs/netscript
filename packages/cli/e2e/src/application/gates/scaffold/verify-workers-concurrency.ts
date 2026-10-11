@@ -26,13 +26,19 @@ export function assertWorkersConcurrency(
   return executions[executions.length - 1]!;
 }
 
-async function main(projectRoot: string): Promise<void> {
+/** Read the workers declaration from the generated project's root configuration. */
+export async function readWorkersConcurrency(projectRoot: string) {
   if (!projectRoot) throw new Error('Generated project root is required');
-  const { config } = await parseAppSettings(join(projectRoot, 'aspire', 'appsettings.json'));
+  const { config } = await parseAppSettings(join(projectRoot, 'appsettings.json'));
   const entry = config.BackgroundProcessors.workers;
   if (entry?.ConcurrencyEnvVar !== 'WORKERS_CONCURRENCY' || !entry.Concurrency) {
     throw new Error('Generated workers metadata must declare WORKERS_CONCURRENCY and concurrency');
   }
+  return { Concurrency: entry.Concurrency, ConcurrencyEnvVar: entry.ConcurrencyEnvVar };
+}
+
+async function main(projectRoot: string): Promise<void> {
+  const entry = await readWorkersConcurrency(projectRoot);
   const query = await createLiveAspireTelemetryQuery(projectRoot);
   let lastFailure = 'No telemetry read completed';
   for (let attempt = 0; attempt < 30; attempt++) {

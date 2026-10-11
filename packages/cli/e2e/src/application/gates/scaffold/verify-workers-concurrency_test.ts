@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertThrows } from '@std/assert';
 import type { TelemetrySpan } from '@netscript/telemetry/query';
-import { assertWorkersConcurrency } from './verify-workers-concurrency.ts';
+import { assertWorkersConcurrency, readWorkersConcurrency } from './verify-workers-concurrency.ts';
 
 function execution(concurrency?: number): TelemetrySpan {
   return {
@@ -54,5 +54,27 @@ Deno.test('runtime tiers execute the generated concurrency receipt after the hea
     const gate = suite.gates.find((gate) => gate.id === 'behavior.workers-concurrency');
     assert(gate?.kind === 'command');
     assertEquals(gate.critical, true);
+  }
+});
+
+Deno.test('workers receipt reads appsettings from the generated project root', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  try {
+    const settings = JSON.parse(
+      await Deno.readTextFile(
+        new URL('../../../../../../aspire/tests/_fixtures/appsettings.json', import.meta.url),
+      ),
+    );
+    settings.NetScript.BackgroundProcessors.workers = {
+      Entrypoint: 'workers/main.ts',
+      Concurrency: 2,
+      ConcurrencyEnvVar: 'WORKERS_CONCURRENCY',
+    };
+    await Deno.writeTextFile(`${projectRoot}/appsettings.json`, JSON.stringify(settings));
+    const entry = await readWorkersConcurrency(projectRoot);
+    assertEquals(entry.Concurrency, 2);
+    assertEquals(entry.ConcurrencyEnvVar, 'WORKERS_CONCURRENCY');
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
   }
 });
