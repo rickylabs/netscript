@@ -172,6 +172,7 @@ export const GATE = {
   BEHAVIOR_TRIGGERS_WEBHOOK: 'behavior.triggers-webhook',
   BEHAVIOR_TRIGGERS_EVENTS: 'behavior.triggers-events',
   BEHAVIOR_AUTH_LIVE: 'behavior.auth-live',
+  BEHAVIOR_AUTH_COOKIE_JAR: 'behavior.auth-cookie-jar',
   BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
   /**
    * Unauthenticated `GET /api/v1/auth/session` serves the designed public introspection
