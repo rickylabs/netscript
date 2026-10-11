@@ -11,6 +11,8 @@
  * - deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/plugin-triggers-core/mod.ts --deno-arg --doc
  */
 
+import { assertCheckMatched } from './testing/check-generated-files.ts';
+
 interface Options {
   input?: string;
   stdin: boolean;
@@ -381,10 +383,15 @@ async function runBatch(files: string[], options: Options): Promise<BatchResult>
   }).output();
 
   const output = new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
-  const excludedAllTargets = /No matching files found/i.test(output);
+  let exitCode = result.code;
+  try {
+    assertCheckMatched(output);
+  } catch {
+    exitCode = exitCode || 2;
+  }
   return {
     files,
-    exitCode: result.code === 0 && excludedAllTargets ? 2 : result.code,
+    exitCode,
     output,
   };
 }
@@ -398,10 +405,17 @@ async function runCommand(command: string[], options: Options): Promise<BatchRes
     stderr: 'piped',
   }).output();
 
+  const output = new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
+  let exitCode = result.code;
+  try {
+    assertCheckMatched(output);
+  } catch {
+    exitCode = exitCode || 2;
+  }
   return {
     files: [],
-    exitCode: result.code,
-    output: new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr),
+    exitCode,
+    output,
   };
 }
 
