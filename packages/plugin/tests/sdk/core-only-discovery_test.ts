@@ -1,4 +1,6 @@
 import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import { defineStreamSchema } from '../../../plugin-streams-core/mod.ts';
+import { z } from 'zod';
 import { AstExtractor, RegistryEmitter } from '../../src/sdk/mod.ts';
 
 Deno.test('core-only saga discovery uses metadata owned by the factory without a saga service', async () => {
@@ -23,6 +25,15 @@ export const onboarding = defineSaga('onboarding').state({ status: 'pending' })
 });
 
 Deno.test('stream schema map discovery is explicitly excluded by its factory metadata', async () => {
+  const schema = defineStreamSchema({
+    invoice: {
+      schema: z.object({ invoiceId: z.string() }),
+      type: 'invoice',
+      primaryKey: 'invoiceId',
+    },
+  });
+  assertEquals(Object.keys(schema), ['invoice']);
+  assertEquals('id' in schema, false);
   const declaration = await Deno.readTextFile(
     new URL('../../../plugin-streams-core/src/builders/define-stream-schema.ts', import.meta.url),
   );

@@ -217,9 +217,9 @@ factory call without a matching declaration throw a `TypeError` instead of silen
 contributions.
 
 This changes the migration boundary for projects scaffolded before `0.0.7`: re-run plugin sync or
-update so each plugin's control-plane module receives its declaration before using no-argument
-discovery. Passing `additionalBuilders` is the explicit compatibility path when regeneration is not
-available.
+update (after adding the host declarations below) so each plugin's control-plane module receives its
+declaration before using no-argument discovery. Passing `additionalBuilders` is the explicit
+compatibility path when regeneration is not available.
 
 ### Core-only hosts and schema maps
 
