@@ -3,8 +3,13 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
 import { generateHelpers, HelpersGeneratorPipeline } from '../helpers-generator-pipeline.ts';
+import {
+  assertHelperImportsEmitted,
+  writeGeneratedHelperFixture,
+} from './generated-helper-fixture.ts';
+import { join } from '@std/path';
 import * as fixtures from './generators-test-support.ts';
 
 describe('HelpersGeneratorPipeline', () => {
@@ -351,4 +356,30 @@ describe('generateHelpers', () => {
       assert(file.content.length > 0, `content empty for ${file.path}`);
     }
   });
+});
+
+Deno.test('canonical helper fixtures emit every generated relative import, including new dependencies', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'canonical-helper-fixture-' });
+  try {
+    const files = await writeGeneratedHelperFixture(root, fixtures.POPULATED_CONFIG);
+    for (const file of files) {
+      assertEquals(await Deno.readTextFile(join(root, file.path)), file.content);
+    }
+    assertHelperImportsEmitted(files);
+    const omitted = files.filter((file) => file.path !== '.helpers/installation-secret.mts');
+    const error = assertThrows(() => assertHelperImportsEmitted(omitted), Error);
+    assertStringIncludes(error.message, 'installation-secret.mts');
+
+    const future = {
+      path: '.helpers/future.mts',
+      content: "export { value } from './future-dependency.mts';\n",
+    };
+    assertThrows(() => assertHelperImportsEmitted([...files, future]));
+    assertHelperImportsEmitted([...files, future, {
+      path: '.helpers/future-dependency.mts',
+      content: 'export const value = 1;\n',
+    }]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
