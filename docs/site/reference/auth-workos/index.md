@@ -1,6 +1,6 @@
 ---
 layout: layouts/base.vto
-title: "@netscript/auth-workos"
+title: '@netscript/auth-workos'
 ---
 
 # `@netscript/auth-workos`
@@ -10,39 +10,37 @@ the package's public surface reported by `deno doc`.
 
 ## Exports
 
-| Export | Path |
-| --- | --- |
+| Export                   | Path       |
+| ------------------------ | ---------- |
 | `@netscript/auth-workos` | `./mod.ts` |
 
 ## Factories
 
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `createWorkosBackend` | function | Create an `AuthBackendPort` adapter backed by WorkOS. |
-| `createWorkosAuthenticator` | function | Create a WorkOS session authenticator. |
-| `createWorkosAccessTokenAuthenticator` | function | Create a WorkOS access-token authenticator. |
-
-| `createWorkosRevocationStore` | function | Create a durable subject fence and outbox on host KV. |
-| `revokeWorkosSubjectPage` | function | Process one bounded upstream revocation page in a worker. |
+| Symbol                                 | Kind     | Description                                               |
+| -------------------------------------- | -------- | --------------------------------------------------------- |
+| `createWorkosBackend`                  | function | Create an `AuthBackendPort` adapter backed by WorkOS.     |
+| `createWorkosAuthenticator`            | function | Create a WorkOS session authenticator.                    |
+| `createWorkosAccessTokenAuthenticator` | function | Create a WorkOS access-token authenticator.               |
+| `createWorkosRevocationStore`          | function | Create a durable subject fence and outbox on host KV.     |
+| `revokeWorkosSubjectPage`              | function | Process one bounded upstream revocation page in a worker. |
 
 ## Options and result types
 
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `WorkosBackendOptions` | interface | Options for `createWorkosBackend`. |
-| `WorkosAuthenticatorOptions` | interface | Options for `createWorkosAuthenticator`. |
-| `WorkosAccessTokenAuthenticatorOptions` | interface | Options for `createWorkosAccessTokenAuthenticator`. |
-| `WorkosProviderOptions` | interface | Provider descriptor options for WorkOS. |
-| `WorkosCookieOptions` | interface | WorkOS cookie configuration. |
-| `WorkosCookieSession` | interface | Cookie-backed WorkOS session payload. |
-| `WorkosSessionClient` | interface | WorkOS session client boundary. |
-| `WorkosSessionAuthenticationResult` | type alias | Authentication result returned by WorkOS session authentication. |
-| `WorkosSessionRefreshResult` | type alias | Session refresh result. |
-
-| `WorkosRevocationStore` | interface | Durable fence and revocation delivery port. |
-| `WorkosRevocationJob` | interface | Subject cutoff and paginated work item. |
-| `WorkosRevocationDelivery` | interface | Work item and optimistic storage version. |
-| `WorkosRevocationClient` | interface | Official SDK list/revoke boundary used by workers. |
+| Symbol                                  | Kind       | Description                                                      |
+| --------------------------------------- | ---------- | ---------------------------------------------------------------- |
+| `WorkosBackendOptions`                  | interface  | Options for `createWorkosBackend`.                               |
+| `WorkosAuthenticatorOptions`            | interface  | Options for `createWorkosAuthenticator`.                         |
+| `WorkosAccessTokenAuthenticatorOptions` | interface  | Options for `createWorkosAccessTokenAuthenticator`.              |
+| `WorkosProviderOptions`                 | interface  | Provider descriptor options for WorkOS.                          |
+| `WorkosCookieOptions`                   | interface  | WorkOS cookie configuration.                                     |
+| `WorkosCookieSession`                   | interface  | Cookie-backed WorkOS session payload.                            |
+| `WorkosSessionClient`                   | interface  | WorkOS session client boundary.                                  |
+| `WorkosSessionAuthenticationResult`     | type alias | Authentication result returned by WorkOS session authentication. |
+| `WorkosSessionRefreshResult`            | type alias | Session refresh result.                                          |
+| `WorkosRevocationStore`                 | interface  | Durable fence and revocation delivery port.                      |
+| `WorkosRevocationJob`                   | interface  | Subject cutoff and paginated work item.                          |
+| `WorkosRevocationDelivery`              | interface  | Work item and optimistic storage version.                        |
+| `WorkosRevocationClient`                | interface  | Official SDK list/revoke boundary used by workers.               |
 
 ## Subject-wide revocation
 
@@ -74,13 +72,13 @@ shared store into every authenticator.
 
 ## Re-exported auth contracts
 
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `AuthBackendPort` | interface | Backend adapter port implemented by `createWorkosBackend`. |
-| `AuthenticatorPort` | interface | Authenticator port used by request authentication. |
-| `AuthnRequest` | interface | Authentication request shape. |
-| `Principal` | interface | Principal payload returned by authenticators. |
-| `AuthBackendOperationUnsupportedError` | class | Error for unsupported upstream operations. |
-| `InteractiveFlowPort` | interface | Interactive-flow port re-exported from the core auth package. |
+| Symbol                                 | Kind      | Description                                                   |
+| -------------------------------------- | --------- | ------------------------------------------------------------- |
+| `AuthBackendPort`                      | interface | Backend adapter port implemented by `createWorkosBackend`.    |
+| `AuthenticatorPort`                    | interface | Authenticator port used by request authentication.            |
+| `AuthnRequest`                         | interface | Authentication request shape.                                 |
+| `Principal`                            | interface | Principal payload returned by authenticators.                 |
+| `AuthBackendOperationUnsupportedError` | class     | Error for unsupported upstream operations.                    |
+| `InteractiveFlowPort`                  | interface | Interactive-flow port re-exported from the core auth package. |
 
 Back to the [auth reference hub](/reference/auth/).
