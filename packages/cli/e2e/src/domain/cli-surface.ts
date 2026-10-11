@@ -103,6 +103,7 @@ export const GATE = {
   GENERATED_RUNTIME_SCHEMAS: 'generated.runtime-schemas',
   GENERATED_PLUGINS_CHECK: 'generated.plugins-check',
   BEHAVIOR_PLUGINS_UNHEALTHY: 'behavior.plugins-unhealthy',
+  BEHAVIOR_OUTBOUND_WEBHOOK: 'behavior.outbound-webhook',
   GENERATED_WORKERS_REGISTRY: 'generated.workers-registry',
   GENERATED_SAGAS_REGISTRY: 'generated.sagas-registry',
   GENERATED_DENO_CHECK: 'generated.deno-check',

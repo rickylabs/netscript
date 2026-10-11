@@ -74,6 +74,7 @@ export const RUNTIME_GATES = [
   'scaffold.plugin.auth',
   'scaffold.plugin.ai',
   'scaffold.plugin.ai.mcp',
+  GATE.BEHAVIOR_OUTBOUND_WEBHOOK,
   GATE.SCAFFOLD_PLUGIN_AI_LIFECYCLE,
   GATE.SCAFFOLD_PLUGIN_LIST,
   GATE.SCAFFOLD_PLUGIN_AI_APPSETTINGS,
