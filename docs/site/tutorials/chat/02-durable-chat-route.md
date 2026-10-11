@@ -103,7 +103,7 @@ export const handler = {
     const { sessionId } = chatTurnRoute.parsePath(ctx.params);
     const target = { sessionId } as const;
 
-    // History so far, reduced through the SAME projection the island seeds from.
+    // This text-only example uses the same reduced projection the island seeds from.
     const snapshot = await resolveChatSnapshot({ target });
     const messages = snapshot.messages.map((m) => ({ role: m.role, content: m.content }));
 
@@ -130,10 +130,13 @@ That input accepts server-trusted TanStack UI/Model messages as `NetScriptChatSe
 including original parts, attachments, metadata and tool calls. Validate any client
 input and give the model that same prompt; the plugin-AI scaffold instead builds a
 user turn from `message.text` and ignores client transcript fields. The legacy
-content-string input remains valid. Native batches survive storage and seed replay,
-but no public API returns their native parts: `NetScriptChatMessage` is the reduced
-rendering projection. Native batch tool cards appear on seed/reload but not live;
-the public native reader and native live replay remain follow-up scope for #2068.
+content-string input remains valid. `snapshot.nativeMessages` exposes
+the complete persisted messages for native consumers; `NetScriptChatMessage` remains the reduced
+rendering projection used by this text-only example. For a multimodal model, validate and supply
+supported native parts instead of mapping to text. Pair `initialMessages: snapshot.nativeMessages`
+with `initialOffset: snapshot.offset` on the live connection so native `MESSAGES_SNAPSHOT` chunks
+retain stored history. Native tool and data parts now replay on both seed and live paths.
+Publication and downstream EIS adoption with a live one-SSE-per-pane check remain release steps.
 
 ## Step 3 — The one stream proxy
 
