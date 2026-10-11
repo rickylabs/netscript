@@ -87,7 +87,7 @@ Deno.test('ui:remove page removes generated triad and reconstructs manifest whil
     const router = await Deno.readTextFile(join(root, 'router.ts'));
     assertEquals(
       router.replace(/\n\n/g, '\n'),
-      routerBefore.replace(/  'catalog':[^\n]+\n/, '').replace(/\n\n/g, '\n'),
+      routerBefore.replace(/ {2}'catalog':[^\n]+\n/, '').replace(/\n\n/g, '\n'),
     );
     for (const file of ['manifest.ts', 'routes.ts']) {
       const source = await Deno.readTextFile(join(root, '.generated', file));
