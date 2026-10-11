@@ -1,15 +1,9 @@
 import { definePlugin, PLUGIN_TYPES } from '@netscript/plugin';
 import type { PluginManifest } from '@netscript/plugin';
 import {
-  defineStreamConsumer,
-  defineStreamProducer,
   defineStreamTopic,
-  type StreamConsumerHandle,
   type StreamPayloadSchema,
-  type StreamProducerHandle,
   type StreamTopicDefinition,
-  StreamUnsupportedOperationError,
-  unsupportedStreamOperation,
 } from './stream-api.ts';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 
@@ -91,18 +85,7 @@ export const streamsPlugin: PluginManifest = definePlugin('@netscript/plugin-str
   })
   .build();
 
-export {
-  defineStreamConsumer,
-  defineStreamProducer,
-  defineStreamTopic,
-  PLUGIN_TYPES,
-  type StreamConsumerHandle,
-  type StreamPayloadSchema,
-  type StreamProducerHandle,
-  type StreamTopicDefinition,
-  StreamUnsupportedOperationError,
-  unsupportedStreamOperation,
-};
+export { defineStreamTopic, PLUGIN_TYPES, type StreamPayloadSchema, type StreamTopicDefinition };
 export type {
   BackgroundProcessorContribution,
   ContractVersionContribution,

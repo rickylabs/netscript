@@ -13,7 +13,7 @@ Deno.test('public guarded service probe isolates ambient agent hosts and removes
   const shared = join(root, 'shared');
   const run = async (args: string[], env?: Record<string, string>) => {
     const result = await new Deno.Command(Deno.execPath(), {
-      args: ['run', '--no-lock', '-A', ...args],
+      args: ['run', '--lock', join(repo, 'deno.lock'), '--frozen', '-A', ...args],
       cwd: repo,
       // These are the parent environment inherited by every CLI spawned by the probe.
       env: {

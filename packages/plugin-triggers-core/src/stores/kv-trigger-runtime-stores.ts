@@ -1,3 +1,4 @@
+import { remainingRetention } from './trigger-kv-retention.ts';
 import { getKv } from '@netscript/kv';
 import type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';
 import type { TriggerEvent, TriggerEventId, TriggerEventStatus } from '../domain/mod.ts';
@@ -290,19 +291,4 @@ async function payloadHash(payload: unknown): Promise<string> {
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('');
   return `sha256:${hex}`;
-}
-
-function remainingRetention(
-  retention: number | ((triggerId: string) => number),
-  triggerId: string,
-  settledAt: string,
-  now: Date,
-): number {
-  const days = typeof retention === 'number' ? retention : retention(triggerId);
-  if (!Number.isFinite(days) || days <= 0) {
-    throw new RangeError('Trigger kvRetentionDays must be positive and finite.');
-  }
-  const settled = Date.parse(settledAt);
-  if (!Number.isFinite(settled)) throw new TypeError('Trigger settled timestamp must be valid.');
-  return settled + days * 86_400_000 - now.getTime();
 }

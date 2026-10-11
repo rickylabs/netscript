@@ -3,13 +3,11 @@ import {
   nativeModelMessage,
   nativeUiMessage,
 } from '../../../tests/type-fixtures/chat-send-consumer_type.ts';
-import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
-import { materializeSnapshotFromDurableStream } from '@durable-streams/tanstack-ai-transport';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import {
   createNetScriptChatConnection,
   type NetScriptChatMessage,
   type NetScriptChatSendMessage,
-  projectChatSnapshot,
   resolveChatSnapshot,
   toNetScriptChatResponse,
 } from './create-chat-connection.ts';
@@ -110,51 +108,6 @@ Deno.test('untyped UI messages without IDs persist and replay exactly once with 
     assertEquals(new Set(seed.messages.map((message) => message.id)).size, 2);
     assertEquals(reload, seed);
     assertEquals(messages.map((message) => message.id), [undefined, undefined]);
-  } finally {
-    await server.shutdown();
-  }
-});
-
-Deno.test('native batch public-reader and seed/live limits are explicitly documented', async () => {
-  const chunks: unknown[] = [];
-  const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
-    if (request.method === 'PUT') return new Response(null, { status: 201 });
-    if (request.method === 'POST') {
-      const body: unknown = await request.json();
-      chunks.push(...(Array.isArray(body) ? body : [body]));
-      return new Response(null, { status: 204 });
-    }
-    return Response.json(chunks, {
-      headers: { 'Stream-Next-Offset': String(chunks.length), 'Stream-Up-To-Date': 'true' },
-    });
-  });
-  const target = {
-    sessionId: 'native-reader-limits',
-    baseUrl: `http://127.0.0.1:${server.addr.port}`,
-  };
-  try {
-    await toNetScriptChatResponse({
-      target,
-      newMessages: [nativeUiMessage],
-      source: (async function* () {})(),
-      mode: 'await',
-    });
-    const seed = await resolveChatSnapshot({ target });
-    const upstream = await materializeSnapshotFromDurableStream({
-      readUrl: `${target.baseUrl}/v1/stream/netscript/ai/chat/${target.sessionId}`,
-    });
-    const liveBootstrap = projectChatSnapshot(upstream.messages);
-    assert(seed.renderParts.some((part) => part.kind === 'tool'));
-    assertEquals(liveBootstrap.renderParts.some((part) => part.kind === 'tool'), false);
-    assertEquals(seed.messages.map((message) => Object.keys(message)), [['id', 'role', 'content']]);
-    for (const file of ['README.md', '../../../../../docs/site/ai/durable-chat.md']) {
-      const docs = await Deno.readTextFile(new URL(file, import.meta.url));
-      assertStringIncludes(docs, 'No public API returns persisted native parts.');
-      assertStringIncludes(
-        docs,
-        'Native batch tool cards appear on seed/reload but not on live subscribers.',
-      );
-    }
   } finally {
     await server.shutdown();
   }

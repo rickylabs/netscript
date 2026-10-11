@@ -41,6 +41,7 @@ Deno.test('public generate group exposes resource fourth with composed dependenc
     'runtime-schemas',
     'plugins',
     'resource',
+    'routes',
   ]);
   const resource = generate.getCommands().at(3);
   const help = resource?.getHelp({ colors: false, width: 160 }) ?? '';
