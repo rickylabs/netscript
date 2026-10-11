@@ -1,5 +1,9 @@
 import { assertEquals } from '@std/assert';
-import { aggregatePluginHealth, type ChildHealthSnapshot } from '../health/mod.ts';
+import {
+  aggregatePluginHealth,
+  type ChildHealthSnapshot,
+  summarizePluginHealth,
+} from '../health/mod.ts';
 
 const declaration = { pluginName: 'jobs', apiResources: ['api'], childResources: ['child'] };
 const api = { name: 'api', state: 'Running', healthStatus: 'Healthy', healthReports: { http: {} } };
@@ -64,4 +68,42 @@ Deno.test('aggregation ignores unrelated unhealthy resources and preserves input
       ?.status,
     'unknown',
   );
+});
+
+for (const state of ['stopped', 'crash-looping'] as const) {
+  Deno.test(`aggregation keeps ${state} child red when API has no probe evidence`, () => {
+    assertEquals(
+      aggregatePluginHealth([declaration], [
+        { ...api, healthReports: {} },
+        { ...child, childHealth: { ...child.childHealth, state } },
+      ])[0]?.status,
+      'degraded',
+    );
+  });
+  Deno.test(`aggregation reports child-only ${state} as unhealthy`, () => {
+    assertEquals(
+      aggregatePluginHealth([{ ...declaration, apiResources: [] }], [
+        { ...child, childHealth: { ...child.childHealth, state } },
+      ])[0]?.status,
+      'unhealthy',
+    );
+  });
+}
+
+Deno.test('shared plugin roll-up preserves severity precedence and empty-set uncertainty', () => {
+  const reports = aggregatePluginHealth([declaration], [api, child]);
+  assertEquals(summarizePluginHealth([]), 'unknown');
+  for (
+    const [statuses, expected] of [
+      [['healthy'], 'healthy'],
+      [['healthy', 'unknown'], 'unknown'],
+      [['unknown', 'degraded', 'healthy'], 'degraded'],
+      [['healthy', 'unhealthy', 'degraded', 'unknown'], 'unhealthy'],
+    ] as const
+  ) {
+    assertEquals(
+      summarizePluginHealth(statuses.map((status) => ({ ...reports[0]!, status }))),
+      expected,
+    );
+  }
 });

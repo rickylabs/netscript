@@ -140,3 +140,24 @@ Deno.test('AppHost inspector probes only declared children and preserves crash-l
     'crash-looping',
   );
 });
+
+for (const command of ['ps', 'describe']) {
+  Deno.test(`AppHost inspector gives ${command} a process deadline and reports timeout`, async () => {
+    const process: ProcessPort = {
+      exec: (_executable, args, options) => {
+        assertEquals(options?.timeoutMs, 5000);
+        if (args[0] === command) {
+          return Promise.resolve({ ...ok(''), timedOut: true });
+        }
+        return Promise.resolve(ok(JSON.stringify([
+          { appHostPath: '/workspace/aspire/apphost.mts', status: 'Running' },
+        ])));
+      },
+    };
+    await assertRejects(
+      () => new AspireAppHostDoctorInspector(process).inspect('/workspace'),
+      Error,
+      `aspire ${command} timed out after 5000ms`,
+    );
+  });
+}

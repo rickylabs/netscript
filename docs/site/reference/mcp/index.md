@@ -312,7 +312,16 @@ runtime-health operation without repeating static module validation. Both tools 
 `degraded`, with monitoring severity `fail`. `get_app_status` returns `healthStatus` and bounded
 `pluginHealth` reports; each report includes API and child names, verdicts, and lifecycle states
 including `crash-looping`. Filtering an API retains its declared children. A standalone MCP process
-without the CLI project adapter reports runtime health as `unknown`.
+without the CLI project adapter, or a CLI project with no runtime declarations, retains the
+telemetry verdict and omits runtime health fields. Runtime inspection failures preserve telemetry
+counts/domains, report `healthStatus: unknown`, and include a bounded failed `runtimeChecks`
+finding. Declared runtimes with an absent/unavailable AppHost report an inspection failure rather
+than being mistaken for a no-plugin project. Each Aspire inspection command has a five-second
+deadline.
+
+A dead child remains `degraded` when a declared API has disabled health probes. A child-only plugin
+with a dead child is `unhealthy`. Cross-plugin precedence comes from `summarizePluginHealth` in the
+same shared package, so other consumers can use the identical roll-up.
 
 The package forwards `PluginHealthDeclaration`, `PluginHealthStatus`, `PluginHealthSummary`, and
 `PluginResourceHealth` to document the types used by `DoctorCheck.runtimeHealth`. Their contract and

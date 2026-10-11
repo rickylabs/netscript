@@ -222,6 +222,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     domains: { type: 'array', maxItems: 5 },
     pluginHealth: { type: 'array', maxItems: 20, items: pluginHealthShape },
     healthStatus: { enum: ['healthy', 'degraded', 'unhealthy', 'unknown'] },
+    runtimeChecks: { type: 'array', maxItems: 20, items: doctorCheckShape },
   }, ['status', 'counts', 'domains']),
   list_runs: objectSchema({ count: { type: 'integer' }, runs: { type: 'array', maxItems: 100 } }, [
     'count',

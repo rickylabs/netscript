@@ -7,6 +7,8 @@ import type {
   AppHostResourceState,
 } from '../../../public/features/plugins/doctor/doctor-plugin-use-case.ts';
 
+const PROCESS_TIMEOUT_MS = 5000;
+
 /** Aspire CLI-backed inspection of the AppHost belonging to one project. */
 export class AspireAppHostDoctorInspector implements AppHostInspector {
   constructor(
@@ -44,7 +46,8 @@ export class AspireAppHostDoctorInspector implements AppHostInspector {
       'Json',
       '--non-interactive',
       '--nologo',
-    ], { cwd: resolve(projectRoot, 'aspire') });
+    ], { cwd: resolve(projectRoot, 'aspire'), timeoutMs: PROCESS_TIMEOUT_MS });
+    if (ps.timedOut) throw new Error(`aspire ps timed out after ${PROCESS_TIMEOUT_MS}ms`);
     if (ps.code !== 0) throw commandError('aspire ps', ps.stderr || ps.stdout);
 
     const appHosts = parseJsonArray(ps.stdout, 'aspire ps');
@@ -62,7 +65,10 @@ export class AspireAppHostDoctorInspector implements AppHostInspector {
       'Json',
       '--non-interactive',
       '--nologo',
-    ], { cwd: resolve(projectRoot, 'aspire') });
+    ], { cwd: resolve(projectRoot, 'aspire'), timeoutMs: PROCESS_TIMEOUT_MS });
+    if (describe.timedOut) {
+      throw new Error(`aspire describe timed out after ${PROCESS_TIMEOUT_MS}ms`);
+    }
     if (describe.code !== 0) {
       throw commandError('aspire describe', describe.stderr || describe.stdout);
     }

@@ -481,6 +481,7 @@ default; the factory does not merge another policy into it.
 | `ChildHealthSnapshot`        | type alias | State, registry/dependency readiness, restart count, and redacted fatal incident.                         |
 | `ChildFatalError`            | type alias | Fixed redacted message and epoch-millisecond capture timestamp.                                           |
 | `CHILD_CRASH_LOOP_THRESHOLD` | variable   | Three restarts in 60 seconds; recovery requires a clean running minute.                                   |
+| `summarizePluginHealth`      | function   | Shared cross-plugin precedence: unhealthy, degraded, unknown, then healthy; an empty set is unknown.      |
 | `aggregatePluginHealth`      | function   | Shared API/child aggregation: healthy, degraded, unhealthy, or unknown; missing children cannot be green. |
 | `PluginHealthSummary`        | interface  | Plugin identity, declared names, per-resource states, and one canonical verdict.                          |
 | `ChildHealthMonitor`         | class      | Tracks readiness and bounded restart history with an injectable clock.                                    |
@@ -512,16 +513,26 @@ participate. A renamed resource retains its declaration and ownership.
 | --------------------- | ---------------------------------------------------------------- | -------------- |
 | Healthy               | All children healthy                                             | `healthy`      |
 | Healthy               | Unhealthy, starting, stopped, crash-looping, unknown, or missing | `degraded`     |
+| No readiness evidence | Unhealthy or missing                                             | `degraded`     |
 | Unhealthy or missing  | Any                                                              | `unhealthy`    |
-| No readiness evidence | Any                                                              | `unknown`      |
+| No readiness evidence | Healthy or unknown                                               | `unknown`      |
+| No API declared       | Unhealthy or missing                                             | `unhealthy`    |
+| No API declared       | All children healthy                                             | `healthy`      |
+| No API declared       | Unknown readiness or no children                                 | `unknown`      |
 
 A ready child also needs registry and dependency readiness. A process reporting Healthy without
 readiness evidence cannot certify readiness. Doctor reads each declared child endpoint with a
-bounded timeout and payload; unavailable or malformed payloads cannot make a wrapper green. The
-report names each child and retains `crash-looping`. Historical traffic and error-free spans cannot
-override a dead child. Degraded runtime reports make plugin doctor exit nonzero and MCP health
-severity `fail`; `get_app_status` also exposes the named `healthStatus` and `pluginHealth` reports.
-Standalone MCP without the CLI project adapter reports runtime health as unknown.
+five-second deadline per Aspire command and bounded child timeout/payload; unavailable or malformed
+payloads cannot make a wrapper green. The report names each child and retains `crash-looping`.
+Historical traffic and error-free spans cannot override a dead child. Degraded runtime reports make
+plugin doctor exit nonzero and MCP health severity `fail`; `get_app_status` also exposes the named
+`healthStatus` and `pluginHealth` reports. A child-only plugin has no surviving API to degrade, so a
+dead child makes it unhealthy. `summarizePluginHealth` owns the cross-plugin roll-up used by MCP and
+available to dashboard consumers. If no runtime reports apply, telemetry retains its verdict,
+including standalone MCP and no-plugin projects. Runtime inspection errors instead preserve
+telemetry counts/domains and add a failed `runtimeChecks` finding with `healthStatus: unknown`.
+Declared runtimes whose AppHost is absent or unavailable also produce an inspection finding; they
+are not treated as no-plugin projects.
 
 These are diagnostic reads. Child processing and its health listener run under the background
 service identity, independently of a phone, browser, or owner session. Dashboard panels consume the

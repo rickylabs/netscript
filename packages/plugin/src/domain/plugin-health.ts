@@ -1,6 +1,6 @@
 import type { ChildHealthSnapshot } from './child-health.ts';
 
-/** Plugin runtime verdict; degraded means APIs are ready but a child is not.
+/** Plugin runtime verdict; degraded means APIs are declared but a child is not ready.
  * @example
  * ```ts
  * import type { PluginHealthStatus } from '@netscript/plugin/health';

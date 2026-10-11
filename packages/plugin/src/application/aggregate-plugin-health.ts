@@ -1,6 +1,7 @@
 import type {
   PluginHealthDeclaration,
   PluginHealthObservation,
+  PluginHealthStatus,
   PluginHealthSummary,
   PluginResourceHealth,
 } from '../domain/plugin-health.ts';
@@ -35,15 +36,42 @@ export function aggregatePluginHealth(
     });
     const status = apis.some((api) => api.status === 'unhealthy')
       ? 'unhealthy'
+      : children.some((child) => child.status === 'unhealthy')
+      ? apis.length === 0 ? 'unhealthy' : 'degraded'
       : apis.some((api) => api.status === 'unknown')
       ? 'unknown'
-      : children.some((child) => child.status !== 'healthy')
-      ? 'degraded'
+      : children.some((child) => child.status === 'unknown')
+      ? apis.length === 0 ? 'unknown' : 'degraded'
       : apis.length + children.length === 0
       ? 'unknown'
       : 'healthy';
     return { ...declaration, status, apis, children };
   });
+}
+
+const HEALTH_PRIORITY: readonly PluginHealthStatus[] = [
+  'unhealthy',
+  'degraded',
+  'unknown',
+  'healthy',
+];
+
+/** Summarize plugin reports with shared unhealthy/degraded/unknown/healthy precedence.
+ * An empty report set is unknown; callers decide whether runtime health applies to their surface.
+ * @example
+ * ```ts
+ * import { aggregatePluginHealth, summarizePluginHealth } from '@netscript/plugin/health';
+ * const reports = aggregatePluginHealth(
+ *   [{ pluginName: 'jobs', apiResources: ['api'], childResources: [] }], [],
+ * );
+ * console.log(summarizePluginHealth(reports)); // unhealthy
+ * ```
+ */
+export function summarizePluginHealth(
+  reports: readonly PluginHealthSummary[],
+): PluginHealthStatus {
+  return HEALTH_PRIORITY.find((status) => reports.some((report) => report.status === status)) ??
+    'unknown';
 }
 
 function resourceHealth(name: string, observation?: PluginHealthObservation): PluginResourceHealth {

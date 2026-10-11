@@ -23,6 +23,20 @@ export async function inspectPluginRuntime(
     projectRoot,
     declarations.flatMap((declaration) => declaration.childResources),
   );
+  if (snapshot.status !== 'running') {
+    return [{
+      pluginName: 'runtime',
+      status: 'error',
+      checks: [{
+        id: 'runtime-health',
+        title: 'Declared plugin runtime health',
+        status: 'error',
+        message: snapshot.status === 'not-running'
+          ? 'The declared plugin runtime is not running.'
+          : 'The declared plugin runtime health is unavailable.',
+      }],
+    }];
+  }
   return diagnosePluginRuntime(declarations, snapshot);
 }
 

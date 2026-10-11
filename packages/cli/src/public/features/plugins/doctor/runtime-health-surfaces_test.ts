@@ -30,17 +30,18 @@ const states = [
 ] as const;
 
 for (const plugin of ['workers', 'sagas', 'triggers']) {
-  for (const apiReady of [true, false]) {
+  for (const apiMode of ['healthy', 'unhealthy', 'unprobed', 'absent'] as const) {
     for (const childState of states) {
-      Deno.test(`health surfaces: ${plugin} API ${apiReady ? 'healthy' : 'unhealthy'} child ${childState}`, async () => {
+      Deno.test(`health surfaces: ${plugin} API ${apiMode} child ${childState}`, async () => {
         const fs = new MemoryFileSystemAdapter();
         await fs.writeFile(
           '/project/appsettings.json',
           JSON.stringify({
             NetScript: {
-              Plugins: {
+              Plugins: apiMode === 'absent' ? {} : {
                 'renamed-api': {
                   Port: 8000,
+                  HealthCheckPath: apiMode === 'unprobed' ? false : '/health',
                   InstalledVersion: '0.0.7',
                   InstalledFrom: `@netscript/plugin-${plugin}`,
                 },
@@ -61,12 +62,12 @@ for (const plugin of ['workers', 'sagas', 'triggers']) {
           ? 'ready'
           : childState;
         const resources = [
-          {
+          ...(apiMode === 'absent' ? [] : [{
             name: 'renamed-api',
             state: 'Running',
-            healthStatus: apiReady ? 'Healthy' : 'Unhealthy',
-            healthReports: { http: {} },
-          },
+            healthStatus: apiMode === 'unhealthy' ? 'Unhealthy' : 'Healthy',
+            healthReports: apiMode === 'unprobed' ? {} : { http: {} },
+          }]),
           ...(childState === 'missing' ? [] : [{
             name: 'renamed-runner',
             state: 'Running',
@@ -90,7 +91,15 @@ for (const plugin of ['workers', 'sagas', 'triggers']) {
             process: { exec: () => Promise.reject(new Error('Unexpected process')) },
             inspectAppHost: { inspect: () => Promise.resolve({ status: 'running', resources }) },
           });
-        const expected = !apiReady ? 'unhealthy' : childState === 'ready' ? 'healthy' : 'degraded';
+        const expected = apiMode === 'unhealthy'
+          ? 'unhealthy'
+          : apiMode === 'unprobed' && (childState === 'ready' || childState === 'probe-missing')
+          ? 'unknown'
+          : childState === 'ready'
+          ? 'healthy'
+          : apiMode === 'absent'
+          ? childState === 'probe-missing' ? 'unknown' : 'unhealthy'
+          : 'degraded';
         const reports = await operation();
         const runtime = reports.flatMap((report) => report.checks).find((check) =>
           check.id === 'runtime-health'
@@ -111,7 +120,7 @@ for (const plugin of ['workers', 'sagas', 'triggers']) {
             appendDrift: () => Promise.resolve(),
           }),
         });
-        if (expected === 'healthy') await command.parse([]);
+        if (expected === 'healthy' || expected === 'unknown') await command.parse([]);
         else await assertRejects(() => command.parse([]), RemoteError);
         assertStringIncludes(output.join('\n'), expected);
 
@@ -142,7 +151,10 @@ for (const plugin of ['workers', 'sagas', 'triggers']) {
             structuredContent: Record<string, unknown>;
           };
           assertEquals(result.isError ?? false, false);
-          assertEquals(result.structuredContent.status, expected === 'healthy' ? 'pass' : 'fail');
+          assertEquals(
+            result.structuredContent.status,
+            expected === 'healthy' ? 'pass' : expected === 'unknown' ? 'warn' : 'fail',
+          );
           if (name === 'get_app_status') {
             assertEquals(result.structuredContent.healthStatus, expected);
             assertEquals(result.structuredContent.pluginHealth, [runtime.runtimeHealth]);
@@ -159,7 +171,7 @@ for (const plugin of ['workers', 'sagas', 'triggers']) {
         }
         // A service filter must retain sibling child evidence.
         const filtered = await createGetAppStatusFlow(query, adapter, '/project')({
-          service: 'renamed-api',
+          service: apiMode === 'absent' ? 'renamed-runner' : 'renamed-api',
         });
         assert(filtered.ok);
         assertEquals(Reflect.get(filtered.value as object, 'healthStatus'), expected);
