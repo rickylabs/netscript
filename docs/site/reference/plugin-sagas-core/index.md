@@ -20,7 +20,7 @@ a NetScript host. Use it directly for custom hosts, libraries, and tests.
 
 ## Exports
 
-The package publishes twenty entrypoints. The root path carries the userland DSL; the remaining
+The package publishes twenty-one entrypoints. The root path carries the userland DSL; the remaining
 subpaths expose the layers a host, adapter author, or test harness composes.
 
 | Export specifier                                     | Module                               | Exports | Purpose                                                                                                                                              |
@@ -32,7 +32,8 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 | `@netscript/plugin-sagas-core/runtime`               | `./src/runtime/mod.ts`               | 87      | The engine: `createSagaRuntime`, `createSagaEngine`, `createSagaCompensator`, `createSagaScheduler`, and the idempotency-key helpers.                |
 | `@netscript/plugin-sagas-core/adapters`              | `./src/adapters/mod.ts`              | 72      | Concrete port adapters, including `createSagaBusBridge`.                                                                                             |
 | `@netscript/plugin-sagas-core/transports`            | `./src/transports/mod.ts`            | 49      | Saga bus transports (`createNetScriptRedisTransport`, `createGarnetListTransport`) with their message and delayed-entry codecs.                      |
-| `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 72      | KV-backed instance and applied-key stores, `openSagaRuntimeKv`, and `resolveSagaStoreBackend`.                                                       |
+| `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 78      | KV-backed instance and applied-key stores, `openSagaRuntimeKv`, and `resolveSagaStoreBackend`.                                                       |
+| `@netscript/plugin-sagas-core/stores/backends`       | `./src/stores/saga-store-backend.ts` | 9       | Backend selectors and projection env/value/type contracts without importing persistent adapters.                                                     |
 | `@netscript/plugin-sagas-core/middleware`            | `./src/middleware/mod.ts`            | 30      | Host middleware — `createSagaMiddleware`, `createSSEEventsMiddleware`, `emitSagaEvent`.                                                              |
 | `@netscript/plugin-sagas-core/integration/workers`   | `./src/integration/workers/mod.ts`   | 23      | Selected-schema pure worker effect constructors plus explicit trigger helpers for callers outside synchronous handlers.                              |
 | `@netscript/plugin-sagas-core/integration/publisher` | `./src/integration/publisher/mod.ts` | 11      | Non-throwing publisher contracts plus `publishSagaOrThrow` for an explicit exception boundary.                                                       |
@@ -249,9 +250,10 @@ prevent runtime startup. A backlog can delay migration of historical keys, so ba
 is guaranteed only after their terminal deadline has been assigned. No API read or owner app session
 drives cleanup.
 
-Transport reservations already use their separate deduplication TTL. With the KV backend,
-`archiveToDb: false` skips the optional Prisma archive even when a Prisma client is available. With
-`--saga-store-backend prisma`, the Prisma query model remains required runtime state so
+Transport reservations already use their separate deduplication TTL. With a KV query projection,
+`archiveToDb: true` explicitly enables the optional Prisma archive for that saga group and requires
+a host Prisma client. The default `archiveToDb: false` skips it, keeping KV-only installs DB-free.
+With `Sagas.Projection.Backend: prisma`, the Prisma query model remains required runtime state so
 `listInstances`, `getInstance`, and stream hydration stay populated independently of archival.
 
 Migration: `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and no longer expires open replay

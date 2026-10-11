@@ -211,6 +211,7 @@ export async function installPlugin(
     {
       serviceReferences: plan.serviceReferences,
       pluginReferences,
+      requiresDb: plan.dbDetection.requiresDb,
       sagaStoreBackend: plan.sagaStoreBackend,
       packageSpecifier: resolvedPlugin.descriptor.package.packageSpecifier,
       packageVersion: resolvedPlugin.descriptor.version,

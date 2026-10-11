@@ -92,6 +92,10 @@ describe('local contributor install plugin flow', () => {
       '../../packages/plugin/mod.ts',
     );
     assertEquals(result.plugin.configKey, 'worker');
+    const settings = JSON.parse(await fs.readFile('/workspace/alpha/appsettings.json')).NetScript;
+    assertEquals(settings.Plugins['worker-api'].RequiresDb, false);
+    assertEquals(settings.BackgroundProcessors.worker.RequiresDb, false);
+    assertEquals(settings.Plugins['worker-api'].RequiresKv, true);
   });
 
   it('renders canonical plugins without copying source when no local path is supplied', async () => {
