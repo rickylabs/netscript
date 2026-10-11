@@ -2417,6 +2417,17 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   re-exported and no signatures are erased. Consumer controls are in
   `plugins/workers/tests/public/contract-graph_test.ts`.
 
+- **0.0.8 named implementer annotation (#2313):** The context-bindable value now names the owned
+  `WorkersContractV1` contract, backed by the additive `WorkersContractImplementer<TContext>` alias.
+  Bidirectional upstream compatibility and consumer rejection controls preserve all 22 routes and
+  the middleware, router, lazy-router, configuration, and context-binding capabilities. Full-export
+  lint remains at two findings: the private `WorkersContractDefinition` and oRPC `implement` now
+  referenced by the named implementer alias. Merely publishing the definition exposes its private
+  route/schema graph; substituting oRPC's `Implementer` annotation also retains a private reference.
+  Neither diagnostic is suppressed, and no zero-diagnostic acceptance is claimed. This row and
+  `workers-doc-baseline-2066` remain open with their existing closing gates. Evidence is kept in the
+  run record and PR #2313.
+
 ## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
 
 - **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
@@ -2900,6 +2911,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   - Snapshot materialization and chat writes: finite JSON/text or bodyless responses, rather than
     detached long-lived SSE parsing. Snapshot reads retain the stream session until `json()`
     settles.
-- **Fixture:** PR #2318 was still open during this leaf. Its event-driven cancellation fixture is
-  incorporated without the fixture fetch override or retained response; the runtime now owns the
-  workaround. Coordinate the overlapping fixture edit before merging the two PRs.
+- **Fixture:** Main merged PR #2318 during this leaf. Its event-driven cancellation fixture and
+  diagnostics are preserved, with only status and signal observations in the fixture; the runtime
+  now retains the Response. No fixture-only Response retention remains.

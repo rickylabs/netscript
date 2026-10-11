@@ -1,0 +1,8 @@
+{
+  "description": "Immutable historical releases without scaffold.runtime.json; these are regression inputs, not current-release scaffold pins.",
+  "version": "0.0.7",
+  "plugins": {
+    "auth": "jsr:@netscript/plugin-auth@0.0.7/runtime",
+    "streams": "jsr:@netscript/plugin-streams@0.0.7/runtime"
+  }
+}

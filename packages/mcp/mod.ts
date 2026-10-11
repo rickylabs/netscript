@@ -56,6 +56,13 @@ export type {
   DoctorFamilyName,
   DoctorFamilyResult,
 } from './src/domain/doctor-check-family.ts';
+// Runtime health types retain their ownership in @netscript/plugin/health.
+export type {
+  PluginHealthDeclaration,
+  PluginHealthStatus,
+  PluginHealthSummary,
+  PluginResourceHealth,
+} from '@netscript/plugin/health';
 export type { ProjectDoctorPort } from './src/domain/project-doctor-port.ts';
 export type { CommandCatalogPort, CommandDescriptor } from './src/domain/command-catalog-port.ts';
 export type {

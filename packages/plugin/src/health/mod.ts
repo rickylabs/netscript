@@ -8,3 +8,14 @@ export type {
 export { ChildHealthMonitor } from '../runtime/child-health-monitor.ts';
 export { childHealthResponse } from '../presentation/child-health-response.ts';
 export { runChildHealthProcess } from '../presentation/run-child-health-process.ts';
+export {
+  aggregatePluginHealth,
+  summarizePluginHealth,
+} from '../application/aggregate-plugin-health.ts';
+export type {
+  PluginHealthDeclaration,
+  PluginHealthObservation,
+  PluginHealthStatus,
+  PluginHealthSummary,
+  PluginResourceHealth,
+} from '../domain/plugin-health.ts';

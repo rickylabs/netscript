@@ -1,3 +1,4 @@
+import type { implement } from '@orpc/server';
 import type {
   WorkersContractDefinition,
   workersContractV1,
@@ -67,12 +68,29 @@ export type WorkersContract<
 /**
  * Context-binding implementer for the v1 worker contract.
  *
- * Derived from the {@link workersContractV1} value (`implement(definition)`),
+ * Names the precise default-context {@link WorkersContractImplementer} annotation,
  * so `WorkersContractV1['$context']<Ctx>()` returns the precisely-typed router
  * implementer whose `<route>.handler(...)` calls are checked against the
  * contract IO. Replaces the previous `$context: <T>() => WorkersRouter` shim.
  */
-export type WorkersContractV1 = typeof workersContractV1;
+export type WorkersContractV1 = WorkersContractImplementer;
+
+/**
+ * Exact workers contract implementer with an application's initial request context.
+ *
+ * Keeps the upstream middleware, router, lazy-router, configuration, and context-binding
+ * capabilities as well as every procedure's input/output/error inference.
+ *
+ * @example
+ * ```ts
+ * import { type WorkersContractImplementer, workersContractV1 } from '@netscript/plugin-workers-core/contracts/v1';
+ * const router: WorkersContractImplementer<{ service: string }> = workersContractV1
+ *   .$context<{ service: string }>();
+ * ```
+ */
+export type WorkersContractImplementer<
+  TContext extends Record<string, unknown> = Record<never, never>,
+> = ReturnType<typeof implement<WorkersContract, TContext>>;
 
 /**
  * The context-bound worker router implementer.

@@ -318,9 +318,12 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
   const releases: (() => void)[] = [releasePost.resolve];
   const liveReady = Promise.withResolvers<void>();
   const liveCancelled = Promise.withResolvers<void>();
-  // #2324: cancellation is owned by the runtime; no fixture fetch/Response retention.
-  // Bound a missing cancellation event while allowing loaded CI to settle.
+  // #2324: runtime retention owns cancellation; the fixture observes metadata only.
+  // Allow 15 s for loaded CI while bounding missing events with connection-state
+  // diagnostics. The wait remains event-driven, without polling or retries.
   const cancellationDeadlineMs = 15_000;
+  let liveResponseStatus: number | undefined;
+  let liveFetchSignal: AbortSignal | null | undefined;
   const encoder = new TextEncoder();
   const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
     if (request.method === 'POST') {
@@ -360,6 +363,19 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     );
   });
   const baseUrl = `http://${server.addr.hostname}:${server.addr.port}`;
+  const nativeFetch = globalThis.fetch;
+  globalThis.fetch = async (input, init) => {
+    const response = await nativeFetch(input, init);
+    if (
+      response.url.startsWith(`${baseUrl}/`) &&
+      new URL(response.url).searchParams.get('live') === 'sse'
+    ) {
+      // Copy the status, never the Response: retaining it here would mask #2324.
+      liveResponseStatus = response.status;
+      liveFetchSignal = init?.signal;
+    }
+    return response;
+  };
   const connection = createNetScriptChatConnection({
     target: { sessionId: 'native-rich-send', baseUrl },
     initialOffset: '0',
@@ -454,6 +470,7 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     assertEquals(posts[2], JSON.parse(JSON.stringify({ messages, data })));
     assertEquals((await finalFirst).done, true);
     assertEquals((await finalSecond).done, true);
+    assertEquals(liveFetchSignal?.aborted, true);
     let cancellationTimer: ReturnType<typeof setTimeout> | undefined;
     try {
       await Promise.race([
@@ -464,7 +481,7 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
               new Error(
                 `Native SSE cancellation missing after ${cancellationDeadlineMs} ms: ` +
                   `activeLive=${activeLive}, cancelledLive=${cancelledLive}, ` +
-                  `liveRequests=${liveRequests}`,
+                  `liveRequests=${liveRequests}, fetchSignalAborted=${liveFetchSignal?.aborted}`,
               ),
             ), cancellationDeadlineMs);
         }),
@@ -472,12 +489,14 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     } finally {
       clearTimeout(cancellationTimer);
     }
+    assertEquals(liveResponseStatus, 200);
     assertEquals(activeLive, 0);
     assertEquals(cancelledLive, 1);
     assertEquals(liveRequests, 1);
     assertEquals(maxActiveLive, 1);
     await assertRejects(() => connection.send(messages, data), Error, 'already disposed');
   } finally {
+    globalThis.fetch = nativeFetch;
     connection.dispose();
     for (const release of releases) release();
     if (controller && !ended) {

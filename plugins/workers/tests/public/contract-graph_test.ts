@@ -1,14 +1,17 @@
 import { assertEquals } from '@std/assert';
+import type { implement } from '@orpc/server';
 import {
   createWorkersContract,
   type WorkersContract,
   workersContract,
+  type WorkersContractImplementer,
   type WorkersContractRoute,
   type WorkersContractRouteName,
   type WorkersContractRouteSchemas,
   workersContractV1,
 } from '@netscript/plugin-workers/contracts';
 import type {
+  WorkersContractImplementer as CoreImplementer,
   WorkersContractRoute as CoreRoute,
   WorkersContractRouteSchemas as CoreSchemas,
 } from '@netscript/plugin-workers-core/contracts/v1';
@@ -102,4 +105,37 @@ Deno.test('public workers graph preserves literal payload and handler inference'
   void invalidInput;
   void invalidOutput;
   void invalidRoute;
+});
+
+Deno.test('public workers implementer preserves the complete upstream binding surface', () => {
+  const plugin: WorkersContractImplementer<{ service: string }> = workersContractV1
+    .$context<{ service: string }>();
+  type Upstream = ReturnType<typeof implement<WorkersContract, { service: string }>>;
+  const upstream: Upstream = plugin;
+  const core: CoreImplementer<{ service: string }> = upstream;
+  const rebound: CoreImplementer<{ tenant: number }> = core.$context<{ tenant: number }>();
+  const configured: CoreImplementer<{ service: string }> = core.$config({});
+  const route = configured.triggerJob.handler(({ input, context }) => {
+    const id: string | undefined = input.id;
+    const service: string = context.service;
+    return { jobId: id ?? service, triggered: true };
+  });
+  configured.triggerJob.handler(({ context }) => {
+    // @ts-expect-error The exported implementer retains the exact application context.
+    const missing = context.missing;
+    void missing;
+    return { jobId: context.service, triggered: true };
+  });
+  // @ts-expect-error Procedure outputs retain their exact boolean field type.
+  configured.triggerJob.handler(({ input }) => ({ jobId: input.id ?? 'job', triggered: 'yes' }));
+  type GetJobInput = SchemaInput<NonNullable<WorkersContractRouteSchemas<'getJob'>['inputSchema']>>;
+  // @ts-expect-error Known route inputs retain the concrete string id.
+  const invalid: GetJobInput = { id: 7 };
+  void invalid;
+  assertEquals(typeof route, 'object');
+  assertEquals(typeof rebound.getJob.handler, 'function');
+  assertEquals(typeof core.middleware, 'function');
+  assertEquals(typeof core.use, 'function');
+  assertEquals(typeof core.router, 'function');
+  assertEquals(typeof core.lazy, 'function');
 });
