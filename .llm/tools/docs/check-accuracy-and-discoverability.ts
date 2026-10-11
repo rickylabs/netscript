@@ -1,7 +1,5 @@
 import { checkResolvedPluginCaveats } from './plugin-caveat-policy.ts';
 import { AGENT_DOCS_PAGE_CARRIER, readAgentDocsPages } from './agent-docs-page-carrier.ts';
-/** Guards genuinely textual documentation policy against surface drift. */
-
 import { resolve } from '@std/path';
 import { SCAFFOLD_ASPIRE_INTEGRATIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
@@ -9,6 +7,8 @@ import {
   CACHE_FIRST_LOADER_DOC_PATHS,
   checkCacheFirstLoaderDocs,
 } from './cache-first-loader-docs.ts';
+
+/** Guards genuinely textual documentation policy against surface drift. */
 
 const root = new URL('../../../', import.meta.url);
 
