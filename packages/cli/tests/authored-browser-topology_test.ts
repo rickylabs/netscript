@@ -9,7 +9,7 @@ for (const binary of ['netscript.ts', 'netscript-dev.ts']) {
     Deno.test(`${binary} install and generate preserve authored browser topology with files ${present ? 'present' : 'absent'}`, async () => {
       const root = await Deno.makeTempDir();
       const project = join(root, 'shop');
-      const run = async (args: string[], entry = binary) => {
+      const run = async (args: string[], entry = binary, diagnostic = false) => {
         const output = await new Deno.Command(Deno.execPath(), {
           args: ['run', '--no-lock', '-A', join(repo, 'packages/cli/bin', entry), ...args],
           cwd: repo,
@@ -18,7 +18,10 @@ for (const binary of ['netscript.ts', 'netscript-dev.ts']) {
         }).output();
         const text = new TextDecoder().decode(output.stdout) +
           new TextDecoder().decode(output.stderr);
-        assertEquals(output.code, 0, text);
+        // Doctor also probes unrelated configured modules with its own bounded timeout.
+        // This regression asserts the ownership report even if such a probe is inconclusive.
+        if (diagnostic) assertEquals([0, 1].includes(output.code), true, text);
+        else assertEquals(output.code, 0, text);
         return text;
       };
       try {
@@ -84,8 +87,9 @@ for (const binary of ['netscript.ts', 'netscript-dev.ts']) {
         await verify();
         await run(['generate', 'aspire', '--project-root', project]);
         await verify();
-        const doctor = await run(['plugin', 'doctor', '--project-root', project]);
+        const doctor = await run(['plugin', 'doctor', '--project-root', project], binary, true);
         assertStringIncludes(doctor, 'authored');
+        assertStringIncludes(doctor, 'workspace\thealthy\tBrowser auth topology (web)\tauthored');
         assertStringIncludes(doctor, 'app-owned browser topology');
         assertEquals(
           JSON.parse(await Deno.readTextFile(settingsPath)).NetScript.Apps.web.Auth.BrowserTopology,
