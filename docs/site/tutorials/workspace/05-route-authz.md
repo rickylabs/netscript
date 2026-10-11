@@ -279,9 +279,9 @@ and `browserSessionContext()`. Use them in the app's server-side request handler
 supplies the procedure input and output types:
 
 ```ts
-// app/routes/examples/service/(_lib)/workspace-session.ts
+// apps/dashboard/routes/examples/workspace/(_lib)/workspace-session.ts
 import { WorkspaceContractV1 } from '@my-workspace/contracts';
-import { browserSessionContext, createBrowserSessionClient } from '../../../../../auth/bff.ts';
+import { browserSessionContext, createBrowserSessionClient } from '../../../../../../auth/bff.ts';
 
 const workspaceClient = createBrowserSessionClient(WorkspaceContractV1, 'workspace', 'workspace');
 

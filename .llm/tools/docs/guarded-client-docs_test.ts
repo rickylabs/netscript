@@ -18,7 +18,7 @@ Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401
   const contract = fence(tutorial, '// contracts/versions/v1/workspace.contract.ts');
   const generatedClient = fence(
     tutorial,
-    '// app/routes/examples/service/(_lib)/workspace-session.ts',
+    '// apps/dashboard/routes/examples/workspace/(_lib)/workspace-session.ts',
   );
   const sdkClient = fence(sdk, '// Authenticated workspace SDK client.');
   const tutorialPolicy = fence(tutorial, '// Explicit public policy');
@@ -43,7 +43,7 @@ Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401
       'bff.ts': template.replace('{{authServiceName}}', "'auth'"),
       'tutorial.ts': generatedClient
         .replace("'@my-workspace/contracts'", "'./contract.ts'")
-        .replace("'../../../../../auth/bff.ts'", "'./bff.ts'"),
+        .replace("'../../../../../../auth/bff.ts'", "'./bff.ts'"),
       'sdk.ts': sdkClient.replace("'@my-workspace/contracts'", "'./contract.ts'") +
         '\nexport { workspaceClient };\n',
       'tutorial-policy.ts': tutorialPolicy,
