@@ -5,7 +5,26 @@ import {
 } from '@netscript/config/schema/plugins';
 import { aggregatePluginHealth, type PluginHealthDeclaration } from '@netscript/plugin/health';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
-import type { AppHostInspection, PluginDoctorReport } from './doctor-plugin-use-case.ts';
+import type {
+  AppHostInspection,
+  AppHostInspector,
+  PluginDoctorReport,
+} from './doctor-plugin-use-case.ts';
+
+/** Read live declared resources without loading plugin modules or probing static configuration. */
+export async function inspectPluginRuntime(
+  projectRoot: string,
+  fs: FileSystemPort,
+  inspector: AppHostInspector,
+): Promise<readonly PluginDoctorReport[]> {
+  const declarations = await readPluginHealthDeclarations(projectRoot, fs);
+  if (declarations.length === 0) return [];
+  const snapshot = await inspector.inspect(
+    projectRoot,
+    declarations.flatMap((declaration) => declaration.childResources),
+  );
+  return diagnosePluginRuntime(declarations, snapshot);
+}
 
 /** Read generated runtime declarations once; ownership is InstalledFrom, never a plugin-name rule. */
 export async function readPluginHealthDeclarations(

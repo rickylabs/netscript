@@ -57,10 +57,24 @@ export type PluginDoctorOperation = (
 
 /** Maps the CLI's typed plugin reports into MCP doctor checks. */
 export class CliProjectDoctor implements ProjectDoctorPort {
-  constructor(private readonly doctor: PluginDoctorOperation) {}
+  constructor(
+    private readonly doctor: PluginDoctorOperation,
+    private readonly runtimeDoctor: PluginDoctorOperation = doctor,
+  ) {}
 
   async diagnose(projectRoot: string): Promise<readonly DoctorCheck[]> {
-    const reports = await this.doctor({ projectRoot });
+    return await this.runDiagnostics(this.doctor, projectRoot);
+  }
+
+  async readRuntimeHealth(projectRoot: string): Promise<readonly DoctorCheck[]> {
+    return await this.runDiagnostics(this.runtimeDoctor, projectRoot);
+  }
+
+  private async runDiagnostics(
+    operation: PluginDoctorOperation,
+    projectRoot: string,
+  ): Promise<readonly DoctorCheck[]> {
+    const reports = await operation({ projectRoot });
     if (reports.length === 0) {
       return [{
         name: 'plugin_configuration',

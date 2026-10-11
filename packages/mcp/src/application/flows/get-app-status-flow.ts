@@ -17,7 +17,9 @@ export function createGetAppStatusFlow(
       query.queryResources(service ? { serviceName: service } : undefined),
       query.querySpans(filter),
       query.queryLogs(filter),
-      doctor?.diagnose(projectRoot),
+      doctor?.readRuntimeHealth
+        ? doctor.readRuntimeHealth(projectRoot)
+        : doctor?.diagnose(projectRoot),
     ]);
     const telemetry = aggregateAppStatus(resources, spans, logs);
     if (!doctor) return { ok: true, value: telemetry };

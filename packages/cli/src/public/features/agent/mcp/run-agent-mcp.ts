@@ -79,6 +79,7 @@ export function createAgentMcpOptions(
     }),
     projectDoctor: new CliProjectDoctor(
       dependencies.pluginDoctorDependencies.doctor,
+      dependencies.pluginDoctorDependencies.runtimeDoctor,
     ),
     embeddedDocs: [{ slug: "help", source: EMBEDDED_SKILL_FILES["help.md"] }],
   };

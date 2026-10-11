@@ -305,7 +305,9 @@ Back to the [reference overview](/reference/).
 
 ## Declared plugin runtime health
 
-The CLI-hosted MCP `doctor` and `get_app_status` tools consume the plugin doctor's shared
+The CLI-hosted MCP `doctor` and `get_app_status` tools consume the plugin doctor's shared runtime
+aggregation. Status polling reads fresh declared resources through `ProjectDoctorPort`'s
+runtime-health operation without repeating static module validation. Both tools use the same
 `@netscript/plugin/health` verdict. A healthy API with an unhealthy or missing declared child yields
 `degraded`, with monitoring severity `fail`. `get_app_status` returns `healthStatus` and bounded
 `pluginHealth` reports; each report includes API and child names, verdicts, and lifecycle states

@@ -8,6 +8,7 @@ import { CliProjectDoctor } from '../../agent/mcp/cli-mcp-adapters.ts';
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import { doctorPlugin } from './doctor-plugin-use-case.ts';
 import { createDoctorPluginCommand } from './doctor-plugin-command.ts';
+import { inspectPluginRuntime } from './plugin-runtime-health.ts';
 
 const probe = { probe: () => Promise.resolve({ reachable: true, message: 'online' }) };
 const query = new FakeTelemetryQuery([span({ statusCode: 0 })], [], [{
@@ -114,7 +115,13 @@ for (const plugin of ['workers', 'sagas', 'triggers']) {
         else await assertRejects(() => command.parse([]), RemoteError);
         assertStringIncludes(output.join('\n'), expected);
 
-        const adapter = new CliProjectDoctor(operation);
+        const adapter = new CliProjectDoctor(
+          operation,
+          () =>
+            inspectPluginRuntime('/project', fs, {
+              inspect: () => Promise.resolve({ status: 'running', resources }),
+            }),
+        );
         const server = createMcpServer({
           probe,
           flows: {
@@ -350,4 +357,88 @@ Deno.test('negative-control: MCP doctor retains named degraded health ahead of m
   assertEquals(result.structuredContent.status, 'fail');
   assertStringIncludes(JSON.stringify(result.structuredContent), '"state":"stopped"');
   assertStringIncludes(JSON.stringify(result.structuredContent), '"status":"degraded"');
+});
+
+Deno.test('negative-control: MCP status polls live children without invoking static doctor', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify({
+      NetScript: {
+        Plugins: { api: { Port: 8000, InstalledVersion: '0.0.7', InstalledFrom: 'jobs' } },
+        BackgroundProcessors: {
+          runner: {
+            Runtime: 'deno',
+            RequiresKv: true,
+            InstalledVersion: '0.0.7',
+            InstalledFrom: 'jobs',
+          },
+        },
+      },
+    }),
+  );
+  let observations = 0;
+  const adapter = new CliProjectDoctor(
+    () => Promise.reject(new Error('Status polling must not invoke static doctor')),
+    () =>
+      inspectPluginRuntime('/project', fs, {
+        inspect: (_root, children) => {
+          assertEquals(children, ['runner']);
+          observations++;
+          return Promise.resolve({
+            status: 'running',
+            resources: [
+              {
+                name: 'api',
+                state: 'Running',
+                healthStatus: 'Healthy',
+                healthReports: { http: {} },
+              },
+              ...(observations === 1 ? [] : [{
+                name: 'runner',
+                state: 'Running',
+                healthStatus: 'Healthy',
+                healthReports: { http: {} },
+                childHealth: {
+                  state: 'ready' as const,
+                  registryReady: true,
+                  dependencyReady: true,
+                  restartCount: 0,
+                  lastFatalError: null,
+                },
+              }]),
+            ],
+          });
+        },
+      }),
+  );
+  const server = createMcpServer({
+    probe,
+    flows: {
+      get_app_status: createGetAppStatusFlow(query, adapter, '/project'),
+    },
+  });
+  for (const expected of ['degraded', 'healthy']) {
+    const response = await server.handle({
+      jsonrpc: '2.0',
+      id: observations + 1,
+      method: 'tools/call',
+      params: { name: 'get_app_status', arguments: {} },
+    });
+    assert(response && 'result' in response);
+    const result = response.result as { structuredContent: Record<string, unknown> };
+    assertEquals(result.structuredContent.healthStatus, expected);
+    assertEquals(result.structuredContent.status, expected === 'healthy' ? 'pass' : 'fail');
+  }
+  assertEquals(observations, 2);
+});
+
+Deno.test('runtime polling skips AppHost inspection when no enabled declarations exist', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  assertEquals(
+    await inspectPluginRuntime('/project', fs, {
+      inspect: () => Promise.reject(new Error('No declared runtime to inspect')),
+    }),
+    [],
+  );
 });
