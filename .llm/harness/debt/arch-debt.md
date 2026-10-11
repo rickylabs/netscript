@@ -1346,15 +1346,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## packages/auth-better-auth — cookie-cache residual window outside NetScript (`auth-better-auth-cookie-cache-window`)
 
-- **Reason:** better-auth's optional `session.cookieCache` keeps a signed `session_data` cookie that
-  its own reads trust until `maxAge` (default 300 s). `@netscript/auth-better-auth` reads every
+- **Reason:** better-auth's optional `session.cookieCache` keeps a signed `session_data` cookie
+  that its own reads trust until `maxAge` (default 300 s). `@netscript/auth-better-auth` reads every
   session with `disableCookieCache` (#1384), so revocation is immediate for everything behind
   NetScript. Two gaps remain:
   - better-auth's own `/api/auth/*` endpoints and client helpers still accept a revoked session's
     cache cookie until `maxAge`;
-  - the NetScript signout response does not clear the caller's better-auth cookies. The auth service
-    forwards backend `Set-Cookie` from interactive sign-out flows (#2189), but better-auth's
-    `revokeSessions` sets none, and better-auth has no interactive sign-out port.
+  - the NetScript signout response does not clear the caller's better-auth cookies. The auth
+    service forwards backend `Set-Cookie` from interactive sign-out flows (#2189), but
+    better-auth's `revokeSessions` sets none, and better-auth has no interactive sign-out port.
 - **Owner:** Auth layer follow-up.
 - **Created:** 2026-10-10.
 - **Status:** open, DEBT_ACCEPTED.
@@ -1368,14 +1368,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## packages/auth-workos — subject-wide revocation unsupported (`auth-workos-subject-revocation`)
 
-- **Reason:** `AuthSessionStorePort.revokeSubjectSessions` (#1384) backs
-  `signout { everywhere:
-  true }` and must do bounded work per call. kv-oauth meets it with a
-  per-subject revocation instant, and better-auth wraps its upstream `api.revokeSessions`.
-  `@workos-inc/node` has no user-wide revocation call, only paginated `listSessions` plus
-  per-session `revokeSession`. WorkOS access tokens are also verified locally until they expire, so
-  `@netscript/auth-workos` still throws `AuthBackendOperationUnsupportedError`. Global logout on a
-  WorkOS deployment therefore returns `AUTH_PROVIDER_ERROR` (502).
+- **Reason:** `AuthSessionStorePort.revokeSubjectSessions` (#1384) backs `signout { everywhere:
+  true }` and must do bounded work per call. kv-oauth meets it with a per-subject revocation
+  instant, and better-auth wraps its upstream `api.revokeSessions`. `@workos-inc/node` has no
+  user-wide revocation call, only paginated `listSessions` plus per-session `revokeSession`.
+  WorkOS access tokens are also verified locally until they expire, so `@netscript/auth-workos`
+  still throws `AuthBackendOperationUnsupportedError`. Global logout on a WorkOS deployment
+  therefore returns `AUTH_PROVIDER_ERROR` (502).
 - **Owner:** Auth layer follow-up (#2190).
 - **Created:** 2026-10-10.
 - **Status:** open, DEBT_ACCEPTED.
@@ -2051,12 +2050,11 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Created:** 2026-07-01.
 - **Status:** open — worked around in the e2e harness (C14 `database.codegen` gate); the CLI command
   itself remains Aspire-coupled.
-- **Progress (2026-10-10, #1996 / PR #2170):** projects without `aspire/apphost.mts`
-  (`init
+- **Progress (2026-10-10, #1996 / PR #2170):** projects without `aspire/apphost.mts` (`init
   --no-aspire`) now run every `db` operation through the database workspace task
   (`DbWorkspaceTaskRunner`, selected by `selectDbOperationExecutor` in
-  `packages/cli/src/kernel/adapters/database/operations/`). Projects that have an AppHost still
-  route `db generate` through it, so this entry stays open for the Aspire-project codegen path.
+  `packages/cli/src/kernel/adapters/database/operations/`). Projects that have an AppHost still route
+  `db generate` through it, so this entry stays open for the Aspire-project codegen path.
 - **Gate:** Close when `netscript db generate` completes DB-less codegen in a deno-only environment
   (no aspire CLI / .NET / docker) and the static suites can invoke the CLI command directly instead
   of the standalone `deno task db:generate` workaround.
@@ -2817,9 +2815,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** Open; pending independent evaluator acceptance for PR #2212.
 - **Closing gate:** Consolidate SDK source roots to at most 12 and place the transport in a proper
   stream concern while preserving the public consumer subpath and its import-graph guard.
-- **Evidence:** PR #2212; `fetch-stream-source-import_test.ts` proves the consumer excludes
-  telemetry, OTel, and modules using Deno APIs. `arch:check` retains the existing F-16
-  directory-count warning.
+- **Evidence:** PR #2212; `fetch-stream-source-import_test.ts` proves the consumer excludes telemetry,
+  OTel, and modules using Deno APIs. `arch:check` retains the existing F-16 directory-count warning.
 
 ## packages/plugin-workers-core — WINDOWS-PROCESS-RUNNER-PARITY
 
