@@ -3,9 +3,11 @@ import { join } from '@std/path';
 import { DenoProjectStage } from './deno-project-stage.ts';
 
 Deno.test('project staging isolates binary edits and removals, preserves unchanged files and excludes runtime trees', async () => {
-  const projectRoot = await Deno.makeTempDir();
+  const parent = await Deno.makeTempDir();
+  const projectRoot = join(parent, 'build', 'app');
   const bytes = Uint8Array.from({ length: 150_000 }, (_, index) => index % 256);
   try {
+    await Deno.mkdir(projectRoot, { recursive: true });
     await Deno.mkdir(join(projectRoot, '.data'));
     await Deno.mkdir(join(projectRoot, 'empty'));
     await Deno.writeFile(join(projectRoot, 'binary.dat'), bytes);
@@ -38,6 +40,6 @@ Deno.test('project staging isolates binary edits and removals, preserves unchang
     }
     await assertRejects(() => Deno.stat(stage.root), Deno.errors.NotFound);
   } finally {
-    await Deno.remove(projectRoot, { recursive: true });
+    await Deno.remove(parent, { recursive: true });
   }
 });

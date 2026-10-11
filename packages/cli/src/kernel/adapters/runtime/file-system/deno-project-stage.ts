@@ -1,5 +1,5 @@
 import { ensureDir, walk } from '@std/fs';
-import { dirname, join, relative } from '@std/path';
+import { dirname, join, relative, resolve } from '@std/path';
 import type { ProjectStage, ProjectStagePort } from '../../../ports/project-stage-port.ts';
 import { copyFilePortable } from './deno-file-system.ts';
 
@@ -14,25 +14,24 @@ const SKIPPED = new Set([
   'build',
   'coverage',
 ]);
-const SKIP_PATHS = [...SKIPPED].map((name) =>
-  new RegExp(`(?:^|[/\\\\])${name.replaceAll('.', '\\.')}(?:[/\\\\]|$)`)
-);
 
 /** Deno staging adapter; copies bytes rather than linking to the live installation. */
 export class DenoProjectStage implements ProjectStagePort {
   /** Copy the project into an isolated tree and return its commit/disposal operations. */
   async stage(projectRoot: string): Promise<ProjectStage> {
+    const liveRoot = resolve(projectRoot);
     const root = await Deno.makeTempDir({ prefix: 'netscript-plugin-update-' });
     const original = new Set<string>();
     try {
       for await (
-        const entry of walk(projectRoot, {
+        const entry of walk(liveRoot, {
           includeSymlinks: false,
           followSymlinks: false,
-          skip: SKIP_PATHS,
+          // Avoid copying our own stage if TMPDIR is inside the project.
+          skip: [...skipPaths(liveRoot), new RegExp(`^${escapePattern(root)}(?:[/\\\\]|$)`)],
         })
       ) {
-        const path = relative(projectRoot, entry.path);
+        const path = relative(liveRoot, entry.path);
         const target = join(root, path);
         if (entry.isDirectory) {
           await ensureDir(target);
@@ -41,7 +40,7 @@ export class DenoProjectStage implements ProjectStagePort {
         if (!entry.isFile) continue;
         original.add(path);
         await ensureDir(dirname(target));
-        await copyFilePortable(join(projectRoot, path), target);
+        await copyFilePortable(join(liveRoot, path), target);
       }
     } catch (error) {
       await Deno.remove(root, { recursive: true });
@@ -54,12 +53,12 @@ export class DenoProjectStage implements ProjectStagePort {
         for await (const path of files(root)) {
           remaining.delete(path);
           const source = join(root, path);
-          const target = join(projectRoot, path);
+          const target = join(liveRoot, path);
           if (await identical(source, target)) continue;
           await ensureDir(dirname(target));
           await copyFilePortable(source, target);
         }
-        for (const path of remaining) await Deno.remove(join(projectRoot, path));
+        for (const path of remaining) await Deno.remove(join(liveRoot, path));
       },
       dispose: () => Deno.remove(root, { recursive: true }),
     };
@@ -72,11 +71,22 @@ async function* files(root: string): AsyncIterable<string> {
       includeDirs: false,
       includeSymlinks: false,
       followSymlinks: false,
-      skip: SKIP_PATHS,
+      skip: skipPaths(root),
     })
   ) {
     if (entry.isFile) yield relative(root, entry.path);
   }
+}
+
+function skipPaths(root: string): RegExp[] {
+  const prefix = escapePattern(root);
+  return [...SKIPPED].map((name) =>
+    new RegExp(`^${prefix}[/\\\\](?:.*[/\\\\])?${escapePattern(name)}(?:[/\\\\]|$)`)
+  );
+}
+
+function escapePattern(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // Compare one file at a time with bounded buffers; unchanged files keep their original bytes/mtime.
