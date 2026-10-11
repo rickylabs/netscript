@@ -43,19 +43,39 @@ export function createWorkosRevocationStore(
   const atomic = kv.atomic.bind(kv);
   const prefix = ['auth-workos', 'revocation'];
   const fenceKey = (subject: string): KvKey => [...prefix, 'subject', subject];
-  const jobKey = (job: WorkosRevocationJob): KvKey => [...prefix, 'pending', job.dueAt, job.id];
+  // Colons delimit Redis key parts; a compact ISO string preserves lexical time order.
+  const dueKey = (time: number): string => new Date(time).toISOString().replaceAll(':', '');
+  const jobKey = (job: WorkosRevocationJob): KvKey => [
+    ...prefix,
+    'pending',
+    dueKey(job.dueAt),
+    job.id,
+  ];
+  const repairKey = (jobId: string, sessionId: string): KvKey => [
+    ...prefix,
+    'repair',
+    jobId,
+    sessionId,
+  ];
 
   async function confirm(subject: string, sessionId: string, jobId: string): Promise<void> {
     const key: KvKey = [...prefix, 'session', subject, sessionId];
     const entry = await kv.get<SessionTombstone>(key);
-    if (!entry || entry.value.jobId !== jobId || entry.value.expiresAt !== undefined) return;
-    const expireIn = lifetime + skew;
+    if (!entry || entry.value.jobId !== jobId) {
+      const result = await atomic([{ key, versionstamp: entry?.versionstamp ?? null }], [
+        { type: 'delete', key: repairKey(jobId, sessionId) },
+      ]);
+      if (!result.ok) throw new Error('WorkOS tombstone repair contention; replay required.');
+      return;
+    }
+    const expiresAt = entry.value.expiresAt ?? now() + lifetime + skew;
+    const expireIn = Math.max(1, expiresAt - now());
     const result = await atomic([{ key, versionstamp: entry.versionstamp }], [{
       type: 'set',
       key,
-      value: { ...entry.value, expiresAt: now() + expireIn },
+      value: { ...entry.value, expiresAt },
       expireIn,
-    }]);
+    }, { type: 'delete', key: repairKey(jobId, sessionId) }]);
     if (!result.ok) throw new Error('WorkOS tombstone retention contention; replay required.');
   }
 
@@ -108,20 +128,26 @@ export function createWorkosRevocationStore(
         (tombstone.value.expiresAt === undefined || tombstone.value.expiresAt > now());
     },
     async nextDelivery(now): Promise<WorkosRevocationDelivery | undefined> {
+      let selected: WorkosRevocationDelivery | undefined;
       for await (
         const entry of kv.list<WorkosRevocationJob>({
           prefix: [...prefix, 'pending'],
-          limit: 1,
+          end: [...prefix, 'pending', dueKey(now + 1), ''],
+          limit: 50,
         })
       ) {
-        return entry.value.dueAt <= now
-          ? { job: entry.value, versionstamp: entry.versionstamp }
-          : undefined;
+        if (entry.value.dueAt <= now && (!selected || entry.value.dueAt < selected.job.dueAt)) {
+          selected = { job: entry.value, versionstamp: entry.versionstamp };
+        }
       }
-      return undefined;
+      return selected;
     },
     async revokeSession(subject, sessionId, jobId): Promise<void> {
-      await kv.set([...prefix, 'session', subject, sessionId], { jobId });
+      const result = await atomic([], [
+        { type: 'set', key: [...prefix, 'session', subject, sessionId], value: { jobId } },
+        { type: 'set', key: repairKey(jobId, sessionId), value: sessionId },
+      ]);
+      if (!result.ok) throw new Error('WorkOS tombstone commit failed; replay required.');
     },
     confirmSessionRevoked: confirm,
     async checkpoint(delivery, next): Promise<boolean> {
@@ -131,29 +157,18 @@ export function createWorkosRevocationStore(
       if (!next) {
         // If upstream success was followed by a KV failure, the provider may omit that session on
         // replay. Repair retained tombstones before admitting fresh credentials, in bounded pages.
-        const sessionPrefix: KvKey = [...prefix, 'session', delivery.job.subject];
         let count = 0;
-        let last: string | undefined;
         for await (
-          const entry of kv.list<SessionTombstone>({
-            prefix: sessionPrefix,
-            start: delivery.job.tombstoneAfter
-              ? [...sessionPrefix, delivery.job.tombstoneAfter]
-              : undefined,
-            limit: 51,
+          const entry of kv.list<string>({
+            prefix: [...prefix, 'repair', delivery.job.id],
+            limit: 50,
           })
         ) {
-          const sessionId = entry.key.at(-1);
-          if (typeof sessionId !== 'string') throw new Error('Invalid WorkOS tombstone key.');
-          if (sessionId === delivery.job.tombstoneAfter) continue;
-          if (entry.value.jobId === delivery.job.id && entry.value.expiresAt === undefined) {
-            await confirm(delivery.job.subject, sessionId, delivery.job.id);
-          }
-          last = sessionId;
-          if (++count === 50) break;
+          await confirm(delivery.job.subject, entry.value, delivery.job.id);
+          count++;
         }
         if (count === 50) {
-          next = { ...delivery.job, tombstoneAfter: last, attempt: 0, dueAt: now() };
+          next = { ...delivery.job, tombstoneAfter: 'repair', attempt: 0, dueAt: now() };
         }
       }
       if (next) {

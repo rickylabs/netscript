@@ -236,10 +236,7 @@ Deno.test('WorkOS tombstones survive upstream outages and expire after the maxim
       return await kv.atomic(checks, mutations);
     },
     [Symbol.asyncDispose]: kv[Symbol.asyncDispose].bind(kv),
-    async set(key, value, options) {
-      ttls.push(options?.expireIn);
-      await kv.set(key, value, options);
-    },
+    set: kv.set.bind(kv),
   }, { now: () => clock, maxAccessTokenLifetimeMs: 3600_000, clockSkewMs: 60_000 });
   await store.revokeSubject('alice', cutoff);
   const delivery = await store.nextDelivery(clock);
@@ -406,7 +403,10 @@ Deno.test('WorkOS recovers retention after upstream success and KV failure even 
     [Symbol.asyncDispose]: kv[Symbol.asyncDispose].bind(kv),
     async atomic(checks, mutations) {
       if (
-        failConfirmation && mutations.some((m) => m.type === 'set' && m.key.includes('session'))
+        failConfirmation &&
+        mutations.some((m) =>
+          m.type === 'set' && m.key.includes('session') && m.expireIn !== undefined
+        )
       ) {
         failConfirmation = false;
         throw new Error('KV transient failure after upstream success');
@@ -465,7 +465,7 @@ Deno.test('WorkOS retention repair is bounded, durable across restart, and exclu
     'auth-workos',
     'revocation',
     'pending',
-    job.dueAt,
+    new Date(job.dueAt).toISOString().replaceAll(':', ''),
     job.id,
   ]);
   assert(entry);
@@ -483,7 +483,7 @@ Deno.test('WorkOS retention repair is bounded, durable across restart, and exclu
     'auth-workos',
     'revocation',
     'pending',
-    job.dueAt,
+    new Date(job.dueAt).toISOString().replaceAll(':', ''),
     job.id,
   ]);
   assert(pending?.value.tombstoneAfter);
