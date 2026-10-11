@@ -52,6 +52,7 @@ async function installAuth(name: string): Promise<InstalledAuthFixture> {
   try {
     await run([
       'init',
+      '--no-agent',
       'auth-fixture',
       '--path',
       root,
