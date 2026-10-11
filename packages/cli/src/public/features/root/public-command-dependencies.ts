@@ -56,6 +56,8 @@ import type { OsServicePort } from '../../ports/os-service-port.ts';
 import type { ServiceManifest } from '../../ports/service-manifest-port.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../generate/plugins/generate-plugin-registries-command.ts';
 import { createInstalledRuntimeRegistryGenerator } from '../generate/plugins/installed-runtime-registry-generator.ts';
+import { createInstalledRuntimeRegistryRenderer } from '../generate/plugins/plugin-registry-renderer.ts';
+import { checkPluginRegistries } from '../generate/plugins/check-plugin-registries.ts';
 import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runtime-schemas/generate-runtime-schemas-command.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
@@ -68,6 +70,7 @@ import type { DoctorPluginCommandDependencies } from '../plugins/doctor/doctor-p
 import type { JsrPluginValidatorPort } from '../plugins/install/jsr-plugin-validator-port.ts';
 import type { JsrPackageFileFetcher } from '../../infra/jsr/verify-jsr-package-integrity.ts';
 import { doctorPlugin } from '../plugins/doctor/doctor-plugin-use-case.ts';
+import { inspectPluginRuntime } from '../plugins/doctor/plugin-runtime-health.ts';
 import type { RemovePluginDependencies } from '../plugins/remove/remove-plugin.ts';
 import type { PluginScaffoldDependencies } from '../plugins/scaffold/scaffold-plugin-use-case.ts';
 import type { NewPluginDependencies } from '../plugins/new/new-plugin-use-case.ts';
@@ -173,10 +176,15 @@ export interface PublicCommandDependencies {
   /** Dependencies for host-side plugin removal. */
   readonly pluginRemoveDependencies: RemovePluginDependencies;
   /** Dependencies for host-side plugin diagnostics. */
-  readonly pluginDoctorDependencies: Pick<
-    DoctorPluginCommandDependencies,
-    'doctor'
-  >;
+  readonly pluginDoctorDependencies:
+    & Pick<
+      DoctorPluginCommandDependencies,
+      'doctor'
+    >
+    & {
+      /** Inspect declared runtime health without static plugin validation. */
+      readonly runtimeDoctor?: DoctorPluginCommandDependencies['doctor'];
+    };
   /** HTTP adapter used by auth session projection and revocation commands. */
   readonly authSessionHttp: AuthSessionHttpPort;
   /** Regenerate Aspire helpers after auth configuration changes. */
@@ -226,6 +234,7 @@ export function createPublicCommandDependencies(
 ): PublicCommandDependencies {
   const fs = new DenoFileSystem();
   const process = new DenoProcess();
+  const appHostInspector = new AspireAppHostDoctorInspector(process);
   const generatedSourceFormatter = new DenoGeneratedSourceFormatter(process);
   const prompt = new CliffyPrompt();
   const templateAdapter = new StringTemplateAdapter(fs);
@@ -244,11 +253,13 @@ export function createPublicCommandDependencies(
       resolvePath: (path) => host.resolvePath(path),
       resolveWorkspaceRoot: findDeployProjectRoot,
     });
-  const generatePluginRegistries = createInstalledRuntimeRegistryGenerator({
-    fetchManifest: (url) => fetch(url, { headers: { Accept: 'application/json' } }),
+  const registryDependencies = {
+    fetchManifest: (url: string) => fetch(url, { headers: { Accept: 'application/json' } }),
     fs,
     process,
-  });
+  };
+  const generatePluginRegistries = createInstalledRuntimeRegistryGenerator(registryDependencies);
+  const renderPluginRegistries = createInstalledRuntimeRegistryRenderer(registryDependencies);
   const serviceAddDependencies = {
     fs,
     scaffolder,
@@ -375,13 +386,15 @@ export function createPublicCommandDependencies(
       processRunner: process,
     },
     pluginDoctorDependencies: {
+      runtimeDoctor: async ({ projectRoot }) =>
+        await inspectPluginRuntime(projectRoot, fs, appHostInspector),
       doctor: async (input) =>
         await doctorPlugin(input, {
           fs,
           loadConfig,
           process,
           loadJsrExportMap: fetchJsrExportMap,
-          inspectAppHost: new AspireAppHostDoctorInspector(process),
+          inspectAppHost: appHostInspector,
           inspectDockerTopology: new DockerCliTopologyInspector(process),
           inspectRuntimeRegistries: generatePluginRegistries,
         }),
@@ -431,6 +444,12 @@ export function createPublicCommandDependencies(
       emitter: new RegistryEmitter(),
       fs,
       generate: generatePluginRegistries,
+      check: (projectRoot) =>
+        checkPluginRegistries(
+          projectRoot,
+          renderPluginRegistries,
+          new DenoGeneratedSourceFormatter(process),
+        ),
     },
     generateRoutesCommandDependencies: {
       resolveUiAppRoot,

@@ -3,8 +3,8 @@ import type {
   CommandDescriptor,
   DoctorCheck,
   ProjectDoctorPort,
-} from "@netscript/mcp";
-import type { PluginDoctorReport } from "../../plugins/doctor/doctor-plugin-use-case.ts";
+} from '@netscript/mcp';
+import type { PluginDoctorReport } from '../../plugins/doctor/doctor-plugin-use-case.ts';
 
 interface EnumerableCommand {
   getName(): string;
@@ -27,7 +27,7 @@ function walkCommands(root: EnumerableCommand): readonly CommandDescriptor[] {
     command: EnumerableCommand,
     parents: readonly string[],
   ): void => {
-    const path = [...parents, command.getName()].join(" ");
+    const path = [...parents, command.getName()].join(' ');
     descriptors.push({
       path,
       description: command.getDescription().slice(0, 512),
@@ -57,30 +57,50 @@ export type PluginDoctorOperation = (
 
 /** Maps the CLI's typed plugin reports into MCP doctor checks. */
 export class CliProjectDoctor implements ProjectDoctorPort {
-  constructor(private readonly doctor: PluginDoctorOperation) {}
+  constructor(
+    private readonly doctor: PluginDoctorOperation,
+    private readonly runtimeDoctor: PluginDoctorOperation = doctor,
+  ) {}
 
   async diagnose(projectRoot: string): Promise<readonly DoctorCheck[]> {
-    const reports = await this.doctor({ projectRoot });
+    return await this.runDiagnostics(this.doctor, projectRoot);
+  }
+
+  async readRuntimeHealth(projectRoot: string): Promise<readonly DoctorCheck[]> {
+    return await this.runDiagnostics(this.runtimeDoctor, projectRoot);
+  }
+
+  private async runDiagnostics(
+    operation: PluginDoctorOperation,
+    projectRoot: string,
+  ): Promise<readonly DoctorCheck[]> {
+    const reports = await operation({ projectRoot });
     if (reports.length === 0) {
       return [{
-        name: "plugin_configuration",
-        status: "pass",
-        summary: "No plugins configured.",
+        name: 'plugin_configuration',
+        status: 'pass',
+        summary: 'No plugins configured.',
       }];
     }
-    return reports.flatMap((report) =>
+    const checks = reports.flatMap((report) =>
       report.checks.map((check) => ({
         name: `${report.pluginName}:${check.id}`,
-        status: check.status === "healthy"
-          ? "pass" as const
-          : check.status === "warning"
-          ? "warn" as const
-          : "fail" as const,
+        status: check.status === 'healthy'
+          ? 'pass' as const
+          : check.status === 'warning'
+          ? 'warn' as const
+          : 'fail' as const,
         summary: check.message ?? check.title,
-        ...(check.status === "healthy" ? {} : {
+        ...(check.runtimeHealth ? { runtimeHealth: check.runtimeHealth } : {}),
+        ...(check.status === 'healthy' ? {} : {
           fix: `Resolve ${check.title.toLowerCase()} for ${report.pluginName}.`,
         }),
       }))
     );
+    // Runtime verdicts must remain visible within the MCP doctor's bounded family report.
+    return [
+      ...checks.filter((check) => check.runtimeHealth !== undefined),
+      ...checks.filter((check) => check.runtimeHealth === undefined),
+    ];
   }
 }

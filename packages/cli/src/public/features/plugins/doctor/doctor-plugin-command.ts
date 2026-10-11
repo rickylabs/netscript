@@ -1,4 +1,4 @@
-import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
+import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 /**
  * @module
  *
@@ -8,20 +8,14 @@ import type { CliffyCommand } from "../../../../kernel/presentation/command-type
  * generated plugin metadata. The public CLI binary requires `--allow-read`.
  */
 
-import { Command } from "@cliffy/command";
+import { Command } from '@cliffy/command';
 
-import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
-import { RemoteError } from "../../../../kernel/domain/errors/cli-exit-error.ts";
-import {
-  type ProjectRootResolver,
-  requireProjectRoot,
-} from "../../../presentation/support.ts";
-import type {
-  PluginDoctorInput,
-  PluginDoctorReport,
-} from "./doctor-plugin-use-case.ts";
-import { FilesystemDiagnosticEvidence } from "@netscript/mcp";
-import type { DiagnosticEvidencePort } from "@netscript/mcp";
+import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
+import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
+import { type ProjectRootResolver, requireProjectRoot } from '../../../presentation/support.ts';
+import type { PluginDoctorInput, PluginDoctorReport } from './doctor-plugin-use-case.ts';
+import { FilesystemDiagnosticEvidence } from '@netscript/mcp';
+import type { DiagnosticEvidencePort } from '@netscript/mcp';
 
 /** Dependencies for the public plugin doctor command. */
 export interface DoctorPluginCommandDependencies {
@@ -51,13 +45,13 @@ export function createDoctorPluginCommand(
 ): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
-    .name("doctor")
-    .description("Check local-workdir and package-backed NetScript plugin health")
-    .option("--project-root <path:string>", "Project root directory")
+    .name('doctor')
+    .description('Check local-workdir and package-backed NetScript plugin health')
+    .option('--project-root <path:string>', 'Project root directory')
     .option(
-      "--resource <name:string>",
-      "Resource name for the diagnostic evidence receipt",
-      { default: "project" },
+      '--resource <name:string>',
+      'Resource name for the diagnostic evidence receipt',
+      { default: 'project' },
     )
     .action(async (options: DoctorPluginCommandInput): Promise<void> => {
       const projectRoot = await requireProjectRoot(
@@ -66,13 +60,15 @@ export function createDoctorPluginCommand(
       );
       const reports = await dependencies.doctor({ projectRoot });
       renderDoctorReports(reports, print);
-      const errored = reports.filter((report) => report.status === "error");
-      const resource = options.resource ?? "project";
+      const errored = reports.filter((
+        report,
+      ) => (report.status === 'error' || report.status === 'degraded'));
+      const resource = options.resource ?? 'project';
       try {
         await (dependencies.diagnosticEvidence?.(projectRoot) ??
           new FilesystemDiagnosticEvidence(projectRoot)).write({
             resource,
-            command: "netscript plugin doctor",
+            command: 'netscript plugin doctor',
             timestamp: new Date().toISOString(),
             exitStatus: errored.length > 0 ? 1 : 0,
           });
@@ -84,9 +80,8 @@ export function createDoctorPluginCommand(
         );
       }
       if (errored.length > 0) {
-        const names = errored.map((report) => report.pluginName).join(", ");
-        const summary =
-          `Plugin doctor failed: ${names}. Follow the remediation commands above.`;
+        const names = errored.map((report) => report.pluginName).join(', ');
+        const summary = `Plugin doctor failed: ${names}. Follow the remediation commands above.`;
         print(summary);
         throw new RemoteError(1, summary, { context: { plugins: names } });
       }
@@ -98,17 +93,15 @@ function renderDoctorReports(
   print: (message: string) => void,
 ): void {
   if (reports.length === 0) {
-    print("No plugins configured.");
+    print('No plugins configured.');
     return;
   }
 
-  print("Plugin\tStatus\tCheck\tMessage");
+  print('Plugin\tStatus\tCheck\tMessage');
   for (const report of reports) {
     for (const check of report.checks) {
       print(
-        `${report.pluginName}\t${check.status}\t${check.title}\t${
-          check.message ?? "-"
-        }`,
+        `${report.pluginName}\t${check.status}\t${check.title}\t${check.message ?? '-'}`,
       );
     }
   }

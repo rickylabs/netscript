@@ -1,0 +1,225 @@
+{
+  "NetScript": {
+    "Name": "health-regression-before",
+    "Version": "1.0.0",
+    "Otel": {
+      "HttpEndpoint": "http://localhost:4318",
+      "Protocol": "http/protobuf"
+    },
+    "PrimaryDatabase": "postgres",
+    "PrimaryCache": "redis",
+    "Databases": {
+      "postgres": {
+        "Engine": "Postgres",
+        "Mode": "Container",
+        "DatabaseName": "health-regression-before-db",
+        "Persistent": true,
+        "DataPath": ".data/postgres"
+      }
+    },
+    "Cache": {
+      "redis": {
+        "Engine": "Redis",
+        "Mode": "Container",
+        "DataPath": ".data/redis"
+      },
+      "garnet": {
+        "Enabled": true,
+        "Engine": "Garnet",
+        "Mode": "Auto"
+      }
+    },
+    "Services": {
+      "users": {
+        "Runtime": "deno",
+        "Entrypoint": "src/main.ts",
+        "PluginReferences": [
+          "auth"
+        ]
+      }
+    },
+    "Plugins": {
+      "auth": {
+        "Enabled": true,
+        "Runtime": "deno",
+        "Entrypoint": "jsr:@netscript/plugin-auth@0.0.7/services",
+        "Workdir": ".",
+        "RequiresKv": true,
+        "RequiresDb": true,
+        "Permissions": [
+          "--unstable-kv",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-sys",
+          "--allow-ffi"
+        ]
+      },
+      "sagas-api": {
+        "Enabled": true,
+        "Runtime": "deno",
+        "Entrypoint": "jsr:@netscript/plugin-sagas@0.0.7/services",
+        "Workdir": ".",
+        "RequiresKv": true,
+        "RequiresDb": true,
+        "Permissions": [
+          "--unstable-kv",
+          "--allow-all"
+        ],
+        "PluginReferences": [
+          "streams",
+          "workers-api"
+        ],
+        "Sagas": {
+          "Store": {
+            "Backend": "kv"
+          }
+        }
+      },
+      "streams": {
+        "Enabled": true,
+        "Runtime": "deno",
+        "Entrypoint": "jsr:@netscript/plugin-streams@0.0.7/services",
+        "Workdir": ".",
+        "RequiresKv": false,
+        "RequiresDb": false,
+        "Permissions": [
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-write",
+          "--allow-sys",
+          "--allow-ffi"
+        ]
+      },
+      "triggers-api": {
+        "Enabled": true,
+        "Runtime": "deno",
+        "Entrypoint": "jsr:@netscript/plugin-triggers@0.0.7/services",
+        "Workdir": ".",
+        "RequiresKv": true,
+        "RequiresDb": true,
+        "Permissions": [
+          "--unstable-kv",
+          "--allow-all"
+        ],
+        "PluginReferences": [
+          "streams",
+          "workers-api"
+        ]
+      },
+      "workers-api": {
+        "Enabled": true,
+        "Runtime": "deno",
+        "Entrypoint": "jsr:@netscript/plugin-workers@0.0.7/services",
+        "Workdir": ".",
+        "RequiresKv": true,
+        "RequiresDb": true,
+        "Permissions": [
+          "--unstable-kv",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-write",
+          "--allow-run"
+        ],
+        "PluginReferences": [
+          "streams"
+        ]
+      }
+    },
+    "BackgroundProcessors": {
+      "sagas": {
+        "Enabled": true,
+        "Runtime": "deno",
+        "Entrypoint": "sagas/runtime.ts",
+        "Workdir": ".",
+        "Telemetry": true,
+        "WatchMode": true,
+        "RequiresDb": true,
+        "RequiresKv": true,
+        "Permissions": [
+          "--unstable-kv",
+          "--allow-all"
+        ],
+        "Concurrency": 2,
+        "ConcurrencyEnvVar": "SAGA_CONCURRENCY",
+        "PluginReferences": [
+          "sagas-api",
+          "streams",
+          "workers-api"
+        ],
+        "Sagas": {
+          "Store": {
+            "Backend": "kv"
+          }
+        }
+      },
+      "triggers": {
+        "Enabled": true,
+        "Runtime": "deno",
+        "Entrypoint": "triggers/runtime.ts",
+        "Workdir": ".",
+        "Telemetry": true,
+        "WatchMode": true,
+        "RequiresDb": true,
+        "RequiresKv": true,
+        "Permissions": [
+          "--unstable-kv",
+          "--allow-all"
+        ],
+        "Concurrency": 10,
+        "ConcurrencyEnvVar": "TRIGGER_CONCURRENCY",
+        "PluginReferences": [
+          "streams",
+          "triggers-api",
+          "workers-api"
+        ]
+      },
+      "workers": {
+        "Enabled": true,
+        "Runtime": "deno",
+        "Entrypoint": "workers/runtime.ts",
+        "Workdir": ".",
+        "Telemetry": true,
+        "WatchMode": true,
+        "RequiresDb": true,
+        "RequiresKv": true,
+        "Permissions": [
+          "--unstable-kv",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-write",
+          "--allow-run"
+        ],
+        "Concurrency": 2,
+        "ConcurrencyEnvVar": "WORKERS_CONCURRENCY",
+        "PluginReferences": [
+          "streams",
+          "workers-api"
+        ]
+      }
+    },
+    "Apps": {
+      "health-regression-before-web": {
+        "Runtime": "deno",
+        "Type": "app",
+        "ServiceReferences": [
+          "users"
+        ],
+        "PluginReferences": [
+          "auth"
+        ]
+      }
+    },
+    "Tools": {
+      "prisma-studio": {
+        "Enabled": true,
+        "TaskName": "db:studio",
+        "Database": "postgres",
+        "Description": "Prisma Studio for database management"
+      }
+    }
+  }
+}
