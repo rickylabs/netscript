@@ -50,6 +50,7 @@ export class AuthServiceHandlerError extends Error {
     | 'AUTH_TRANSPORT_ERROR'
     | 'AUTH_CONFIGURATION_ERROR'
     | 'AUTH_PROVIDER_ERROR'
+    | 'oauth_cookie_missing'
     | 'VALIDATION_ERROR';
   /** HTTP status emitted by the central oRPC error plugin. */
   readonly status: 400 | 401 | 403 | 422 | 500 | 502;
@@ -117,7 +118,7 @@ function authErrorData(
   }
   if (
     code === 'AUTH_PROVIDER_ERROR' || code === 'AUTH_TRANSPORT_ERROR' ||
-    code === 'AUTH_CONFIGURATION_ERROR'
+    code === 'AUTH_CONFIGURATION_ERROR' || code === 'oauth_cookie_missing'
   ) {
     return {
       providerId: options.providerId,
