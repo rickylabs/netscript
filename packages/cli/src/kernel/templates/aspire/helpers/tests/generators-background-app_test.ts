@@ -238,10 +238,11 @@ describe('generateRegisterBackground', () => {
     );
   });
 
-  it('should register the saga supervisor health endpoint and probe', () => {
+  it('should register the KV-backed child health endpoint and probe', () => {
     const sagaProcessor = {
       ...fixtures.MINIMAL_BACKGROUND,
       Entrypoint: 'sagas/runtime.ts',
+      RequiresKv: true,
       Sagas: { Store: { Backend: 'kv' } },
     } as BackgroundProcessorEntry;
     const output = generateRegisterBackground({

@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
-import { walk } from '@std/fs';
+import { copy, walk } from '@std/fs';
 import { basename, join, relative } from '@std/path';
 import { DenoAgentInitFileSystem } from './agent-init-file-system.ts';
 import { ASPIRE_WORKFLOW_SKILLS, type AspireAgentInitializer } from './aspire-agent-initializer.ts';
@@ -191,7 +191,7 @@ Deno.test('#2008 review: combined Claude guidance permits a coherent named-skill
   }
 });
 
-Deno.test('#2008 review: legacy NetScript and Aspire directories warn without mutation', async () => {
+Deno.test('#2008 review: divergent legacy NetScript and Aspire directories report without mutation', async () => {
   const root = await Deno.makeTempDir();
   try {
     const fs = new DenoAgentInitFileSystem();
@@ -210,12 +210,16 @@ Deno.test('#2008 review: legacy NetScript and Aspire directories warn without mu
     const dependencies = { fs, aspireAgentInitializer: NO_ASPIRE };
     for (let iteration = 0; iteration < 2; iteration++) {
       const result = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
-      assertEquals(
-        result.messages,
-        legacy.map((name) =>
-          `Legacy .claude/skills/${name} is no longer refreshed; use the canonical .agents/skills/${name} through repo-skills. The legacy directory was preserved.`
-        ),
-      );
+      for (const name of legacy) {
+        assert(
+          result.messages.some((message) => message.includes(`.claude/skills/${name}/SKILL.md`)),
+        );
+        assert(
+          result.messages.some((message) =>
+            message.includes(`.claude/skills/${name}/references/custom.md`)
+          ),
+        );
+      }
       for (const name of legacy) {
         assertEquals(
           await fs.readText(join(root, '.claude/skills', name, 'SKILL.md')),
@@ -234,6 +238,188 @@ Deno.test('#2008 review: legacy NetScript and Aspire directories warn without mu
     }
     const otherHost = await initAgent({ projectRoot: root, host: 'vscode' }, dependencies);
     assertEquals(otherHost.messages, []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('#2008 cleanup: complete owned mirrors are removed and reruns keep bridge and import stable', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    const dependencies = { fs, aspireAgentInitializer: NO_ASPIRE };
+    await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    const skillsRoot = join(root, '.claude/skills');
+    const bridgePath = join(skillsRoot, 'repo-skills/SKILL.md');
+    const bridge = await fs.readText(bridgePath);
+    const guidance = await fs.readText(join(root, 'CLAUDE.md'));
+    // Recreate the old installer layout, including reference subtrees and binary assets.
+    for (
+      const name of [
+        'netscript',
+        'netscript-build',
+        'netscript-operate',
+        'aspire',
+        'deno',
+        ...ASPIRE_WORKFLOW_SKILLS,
+      ]
+    ) {
+      const canonical = join(root, '.agents/skills', name);
+      if (ASPIRE_WORKFLOW_SKILLS.includes(name)) {
+        await fs.writeText(join(canonical, 'SKILL.md'), `# ${name}\n`);
+      }
+      await fs.writeText(join(canonical, 'references/nested/example.md'), '# Reference\n');
+      const binary = new Uint8Array(150_001).fill(255);
+      await Deno.writeFile(join(canonical, 'references/nested/asset.bin'), binary);
+      await Deno.mkdir(join(canonical, 'references/empty'), { recursive: true });
+      await Deno.mkdir(skillsRoot, { recursive: true });
+      await copy(canonical, join(skillsRoot, name));
+    }
+    const first = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    assertEquals(first.messages, []);
+    for (
+      const name of [
+        'netscript',
+        'netscript-build',
+        'netscript-operate',
+        'aspire',
+        'deno',
+        ...ASPIRE_WORKFLOW_SKILLS,
+      ]
+    ) {
+      assertFalse(await fs.exists(join(skillsRoot, name)));
+      assert(first.changedFiles.includes(join(skillsRoot, name)));
+    }
+    const files = [];
+    for await (const entry of walk(skillsRoot, { includeDirs: false })) {
+      files.push(relative(skillsRoot, entry.path));
+    }
+    assertEquals(files, [join('repo-skills', 'SKILL.md')]);
+    assertEquals(await fs.readText(bridgePath), bridge);
+    assertEquals(await fs.readText(join(root, 'CLAUDE.md')), guidance);
+    const second = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    assertEquals(second.changedFiles, []);
+    assertEquals(second.messages, []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('#2008 cleanup: nested extra missing and divergent files preserve whole trees and report paths', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    const dependencies = { fs, aspireAgentInitializer: NO_ASPIRE };
+    await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    const names = ['netscript', 'netscript-build', 'netscript-operate', 'deno'];
+    for (const name of names) {
+      const canonical = join(root, '.agents/skills', name);
+      await fs.writeText(join(canonical, 'references/nested/keep.md'), '# Canonical\n');
+      await copy(canonical, join(root, '.claude/skills', name));
+    }
+    await fs.writeText(
+      join(root, '.claude/skills/netscript/references/nested/keep.md'),
+      '# Edited\n',
+    );
+    await fs.writeText(
+      join(root, '.claude/skills/netscript-build/extra/nested/custom.md'),
+      '# Extra\n',
+    );
+    await Deno.remove(join(root, '.claude/skills/netscript-operate/references/nested/keep.md'));
+    await Deno.mkdir(join(root, '.claude/skills/deno/extra-empty'));
+    // Even a byte-identical foreign canonical counterpart is outside our ownership allowlist.
+    await fs.writeText(join(root, '.agents/skills/custom/SKILL.md'), '# Foreign\n');
+    await copy(join(root, '.agents/skills/custom'), join(root, '.claude/skills/custom'));
+    const before = new Map<string, Uint8Array>();
+    for await (const entry of walk(join(root, '.claude/skills'), { includeDirs: false })) {
+      before.set(entry.path, await Deno.readFile(entry.path));
+    }
+    for (let iteration = 0; iteration < 2; iteration++) {
+      const result = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+      for (
+        const path of [
+          'netscript/references/nested/keep.md',
+          'netscript-build/extra/nested/custom.md',
+          'netscript-operate/references/nested/keep.md',
+          'deno/extra-empty',
+        ]
+      ) {
+        assert(result.messages.some((message) => message.includes(`.claude/skills/${path}`)), path);
+      }
+      assertFalse(result.messages.some((message) => message.includes('/custom/')));
+      assertEquals(result.changedFiles, []);
+      for (const [path, content] of before) assertEquals(await Deno.readFile(path), content);
+      for (const name of names) assert(await fs.exists(join(root, '.claude/skills', name)));
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('#2008 cleanup: linked skill trees and references are retained without touching their targets', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    const dependencies = { fs, aspireAgentInitializer: NO_ASPIRE };
+    await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    const canonical = join(root, '.agents/skills/netscript');
+    await Deno.symlink(canonical, join(root, '.claude/skills/netscript'), { type: 'dir' });
+    await copy(join(root, '.agents/skills/deno'), join(root, '.claude/skills/deno'));
+    await Deno.symlink(join(canonical, 'SKILL.md'), join(root, '.claude/skills/deno/linked.md'), {
+      type: 'file',
+    });
+    const original = await fs.readText(join(canonical, 'SKILL.md'));
+    const result = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    assert(
+      result.messages.some((message) => message.includes('divergent .claude/skills/netscript.')),
+    );
+    assert(
+      result.messages.some((message) =>
+        message.includes('divergent .claude/skills/deno/linked.md.')
+      ),
+    );
+    assert((await Deno.lstat(join(root, '.claude/skills/netscript'))).isSymlink);
+    assert((await Deno.lstat(join(root, '.claude/skills/deno/linked.md'))).isSymlink);
+    assertEquals(await fs.readText(join(canonical, 'SKILL.md')), original);
+    assertEquals(result.changedFiles, []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('#2008 cleanup: binary divergence and missing canonical skills never prove ownership', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    const dependencies = { fs, aspireAgentInitializer: NO_ASPIRE };
+    await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    const canonical = join(root, '.agents/skills/deno');
+    await copy(canonical, join(root, '.claude/skills/deno'));
+    // Different invalid UTF-8 bytes decode alike; cleanup must compare bytes, even after a chunk boundary.
+    const original = new Uint8Array(150_001).fill(255);
+    const edited = original.slice();
+    edited[150_000] = 254;
+    await Deno.writeFile(join(canonical, 'asset.bin'), original);
+    await Deno.writeFile(join(root, '.claude/skills/deno/asset.bin'), edited);
+    await fs.writeText(
+      join(root, '.claude/skills/aspire-init/SKILL.md'),
+      '# Legacy without canonical\n',
+    );
+    const result = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    assert(
+      result.messages.some((message) =>
+        message.includes('divergent .claude/skills/deno/asset.bin.')
+      ),
+    );
+    assert(
+      result.messages.some((message) => message.includes('.claude/skills/aspire-init/SKILL.md')),
+    );
+    assertEquals(await Deno.readFile(join(root, '.claude/skills/deno/asset.bin')), edited);
+    assertEquals(
+      await fs.readText(join(root, '.claude/skills/aspire-init/SKILL.md')),
+      '# Legacy without canonical\n',
+    );
+    assertEquals(result.changedFiles, []);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
