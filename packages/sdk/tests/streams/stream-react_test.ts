@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { fromFileUrl } from '@std/path';
 
 interface RendererExportProbe {
   namedAct: string;
@@ -100,16 +101,28 @@ Deno.test('Expo-pinned React hook regressions run in the reference compiler cont
 });
 
 Deno.test('Expo-pinned React fixture ignores parent production mode and forced colour', async () => {
-  const previousMode = Deno.env.get('NODE_ENV');
-  const previousColor = Deno.env.get('FORCE_COLOR');
-  try {
-    Deno.env.set('NODE_ENV', 'production');
-    Deno.env.set('FORCE_COLOR', '1');
-    await assertExpoReactFixture();
-  } finally {
-    if (previousMode === undefined) Deno.env.delete('NODE_ENV');
-    else Deno.env.set('NODE_ENV', previousMode);
-    if (previousColor === undefined) Deno.env.delete('FORCE_COLOR');
-    else Deno.env.set('FORCE_COLOR', previousColor);
-  }
+  const parentEnv = { mode: Deno.env.get('NODE_ENV'), color: Deno.env.get('FORCE_COLOR') };
+  // Exercise the fixture runner itself under production settings without changing
+  // the environment shared by parallel test workers.
+  const result = await new Deno.Command(Deno.execPath(), {
+    env: { NODE_ENV: 'production', FORCE_COLOR: '1' },
+    args: [
+      'test',
+      '--allow-all',
+      '--filter',
+      'reference compiler context',
+      fromFileUrl(import.meta.url),
+    ],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  const output = new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
+  assertEquals(result.code, 0, output);
+  assertEquals(output.includes('1 passed | 0 failed'), true, output);
+  assertEquals({ mode: Deno.env.get('NODE_ENV'), color: Deno.env.get('FORCE_COLOR') }, parentEnv);
+});
+
+Deno.test('React fixture tests never write the shared process environment', async () => {
+  const source = await Deno.readTextFile(new URL(import.meta.url));
+  assertEquals(/\bDeno\.env\.(?:set|delete)\s*\(/.test(source), false);
 });

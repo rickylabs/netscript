@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertRejects, assertStrictEquals } from 'jsr:@std/assert@^1';
 
-import { MemoryKvAdapter } from '@netscript/kv';
+import { DenoKvAdapter, MemoryKvAdapter } from '@netscript/kv';
 import { defineSaga, sagaCompensate, sagaFail, send } from '@netscript/plugin-sagas-core';
 import type {
   SagaCorrelationIndexEntry,
@@ -63,6 +63,22 @@ Deno.test('createDurableSagaRuntime creates Prisma store without opening KV', as
   } finally {
     await durable.runtime.stop('durable runtime prisma store test complete');
     await durable.dispose();
+  }
+});
+
+Deno.test('createDurableSagaRuntime explicit KV wins over a supplied Prisma client', async () => {
+  const kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+  const durable = await createDurableSagaRuntime({
+    backend: 'kv',
+    kv,
+    prisma: createUnusedPrismaClient(),
+  });
+  try {
+    assert(durable.store instanceof KvSagaStore);
+    assertStrictEquals(durable.kv, kv);
+  } finally {
+    await durable.dispose();
+    await kv.close();
   }
 });
 
