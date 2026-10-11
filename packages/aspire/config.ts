@@ -17,13 +17,13 @@
  */
 
 import { z } from 'zod';
-import type { SagaProjectionBackend } from '@netscript/plugin-sagas-core/stores/backends';
 import {
   ASPIRE_RESOURCE_NAME_PATTERN,
   ASPIRE_RESOURCE_NAME_RULE,
 } from './src/domain/aspire-resource-name.ts';
 
-export type { SagaProjectionBackend } from '@netscript/plugin-sagas-core/stores/backends';
+/** Saga query projection backend accepted by hosting configuration. */
+export type SagaProjectionBackend = 'kv' | 'prisma' | 'none';
 
 /** Public parser contract exposed by Aspire schema constants. */
 export interface AspireSchema<Output> {

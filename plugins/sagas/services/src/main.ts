@@ -60,7 +60,6 @@ export default async function createSagasService(
     : undefined;
   const dbClient: SagaServiceDatabaseClient = sagaDbClient ?? emptySagaDatabaseClient;
   const useKvProjection = projectionBackend === 'kv';
-  await registerSagas();
   const sagaPublisher = createSagaDeliveryPublisher();
 
   const service = await createPluginService(router, {
@@ -80,12 +79,19 @@ export default async function createSagasService(
     onShutdown: [() => sagaPublisher.stop()],
   }).serve();
 
-  if (sagaDbClient) {
-    void startSagasStreamMirror({ prisma: sagaDbClient })
-      .catch((error) => {
-        console.warn('[Sagas API] Durable stream hook skipped:', error);
-      });
-  }
+  queueMicrotask(async () => {
+    try {
+      await registerSagas();
+      if (sagaDbClient) {
+        void startSagasStreamMirror({ prisma: sagaDbClient })
+          .catch((error) => {
+            console.warn('[Sagas API] Durable stream hook skipped:', error);
+          });
+      }
+    } catch (error) {
+      console.error('[Sagas API] Failed to finish post-listen startup:', error);
+    }
+  });
   console.log(`[Sagas API] Running on http://localhost:${port}`);
 
   return service;
