@@ -319,6 +319,10 @@ finding. Declared runtimes with an absent/unavailable AppHost report an inspecti
 than being mistaken for a no-plugin project. Each Aspire inspection command has a five-second
 deadline.
 
+These inspection failures are intentional `fail` verdicts even when polling a stopped development
+app. Legacy adapters without a runtime-health operation use static doctor findings; their failures
+also remain visible when a service filter is supplied.
+
 A dead child remains `degraded` when a declared API has disabled health probes. A child-only plugin
 with a dead child is `unhealthy`. Cross-plugin precedence comes from `summarizePluginHealth` in the
 same shared package, so other consumers can use the identical roll-up.

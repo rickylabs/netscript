@@ -61,8 +61,8 @@ for (
   const failure of [
     'inspector throws',
     'invalid JSON',
-    'invalid plugin schema',
-    'invalid child schema',
+    'invalid plugin section',
+    'invalid child section',
     'ps fails',
     'describe fails',
     'ps malformed',
@@ -76,10 +76,10 @@ for (
     const fs = new MemoryFileSystemAdapter();
     const content = failure === 'invalid JSON'
       ? '{invalid'
-      : failure === 'invalid plugin schema'
-      ? JSON.stringify({ NetScript: { Plugins: { api: { Port: 'invalid' } } } })
-      : failure === 'invalid child schema'
-      ? JSON.stringify({ NetScript: { BackgroundProcessors: { runner: { Runtime: 10 } } } })
+      : failure === 'invalid plugin section'
+      ? JSON.stringify({ NetScript: { Plugins: [] } })
+      : failure === 'invalid child section'
+      ? JSON.stringify({ NetScript: { BackgroundProcessors: [] } })
       : settings;
     await fs.writeFile('/project/appsettings.json', content);
     const results = [running, { code: 0, stdout: '{"resources":[]}', stderr: '' }];
@@ -152,6 +152,27 @@ Deno.test('runtime polling keeps healthy standalone unwired telemetry passing', 
   assertEquals(value.status, 'pass');
   assertEquals(value.healthStatus, undefined);
   assertEquals(value.pluginHealth, undefined);
+});
+
+Deno.test('legacy static doctor failures remain fail with service filters', async () => {
+  const doctor: ProjectDoctorPort = {
+    diagnose: () =>
+      Promise.resolve([{
+        name: 'configuration',
+        status: 'fail',
+        summary: 'Invalid configuration.',
+      }]),
+  };
+  for (const service of [undefined, 'api']) {
+    const value = await status(doctor, service);
+    assertEquals(value.status, 'fail');
+    assertEquals(value.healthStatus, 'unknown');
+    assertEquals(value.runtimeChecks, [{
+      name: 'configuration',
+      status: 'fail',
+      summary: 'Invalid configuration.',
+    }]);
+  }
 });
 
 for (

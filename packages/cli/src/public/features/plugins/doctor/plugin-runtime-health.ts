@@ -63,11 +63,15 @@ export async function readPluginHealthDeclarations(
     return entry;
   };
   for (const [name, raw] of Object.entries(readEntries(section.Plugins))) {
-    const entry = pluginEntrySchema.parse(raw);
+    const parsed = pluginEntrySchema.safeParse(raw);
+    if (!parsed.success) continue;
+    const entry = parsed.data;
     if (entry.Enabled) group(entry.InstalledFrom).apiResources.push(name);
   }
   for (const [name, raw] of Object.entries(readEntries(section.BackgroundProcessors))) {
-    const entry = backgroundProcessorEntrySchema.parse(raw);
+    const parsed = backgroundProcessorEntrySchema.safeParse(raw);
+    if (!parsed.success) continue;
+    const entry = parsed.data;
     if (entry.Enabled && entry.Runtime === 'deno' && entry.RequiresKv) {
       group(entry.InstalledFrom).childResources.push(name);
     }

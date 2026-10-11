@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Keep legacy project-doctor failures visible even with a service filter. A declared runtime with a
+  stopped or unavailable AppHost intentionally reports `fail`, rather than `warn`, while keeping
+  telemetry. Entries without valid installation/runtime metadata do not declare plugin health.
+
 - Preserve telemetry when runtime inspection fails, expose failed inspection findings, and keep
   no-plugin and standalone telemetry verdicts unchanged. Use the shared cross-plugin roll-up.
 

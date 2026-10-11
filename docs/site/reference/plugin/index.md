@@ -509,6 +509,11 @@ ownership. Enabled background processors with `Runtime: deno` and `RequiresKv: t
 child health transport, matching the AppHost generator's capability rule. Disabled children do not
 participate. A renamed resource retains its declaration and ownership.
 
+Runtime declaration discovery validates entries individually and skips entries without valid
+installation metadata or the required runtime capabilities. Generated scaffolds can contain such
+entries; one atypical plugin or processor must not fail the whole doctor. Invalid JSON, a malformed
+`NetScript` section, or non-object plugin/processor sections still produce an inspection failure.
+
 | API readiness         | Declared child readiness                                         | Plugin verdict |
 | --------------------- | ---------------------------------------------------------------- | -------------- |
 | Healthy               | All children healthy                                             | `healthy`      |
