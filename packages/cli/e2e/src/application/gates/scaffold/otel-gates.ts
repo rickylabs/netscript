@@ -5,6 +5,22 @@ import { commandGate } from './gate-factory.ts';
 export function createOtelGates(): readonly GateDefinition[] {
   return [
     commandGate(
+      GATE.BEHAVIOR_WORKERS_CONCURRENCY,
+      'Prove generated worker concurrency through completed job telemetry',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-all',
+        '--unsafely-ignore-certificate-errors=localhost',
+        new URL('./verify-workers-concurrency.ts', import.meta.url).pathname,
+        context.project.projectRoot,
+      ],
+      undefined,
+      'capture',
+      'The generated background worker did not report its declared concurrency; no manual environment override is permitted.',
+    ),
+    commandGate(
       GATE.BEHAVIOR_OTEL_WEBHOOK,
       'Fire webhook for OTEL trace capture',
       GATE_PHASE.BEHAVIOR,

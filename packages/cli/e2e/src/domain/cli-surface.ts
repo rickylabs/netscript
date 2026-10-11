@@ -207,6 +207,7 @@ export const GATE = {
   DEPLOY_DESKTOP_WINDOWS_NATIVE: 'deploy.desktop.windows-native',
   DEPLOY_DESKTOP_DARWIN_NATIVE: 'deploy.desktop.darwin-native',
   USERLAND_INSTALL_ASSERTIONS: 'userland-install.assertions',
+  BEHAVIOR_WORKERS_CONCURRENCY: 'behavior.workers-concurrency',
   BEHAVIOR_OTEL_WEBHOOK: 'behavior.otel.webhook',
   BEHAVIOR_OTEL_STREAM_CONSUMER: 'behavior.otel.stream-consumer',
   BEHAVIOR_OTEL_TRACES: 'behavior.otel.traces',

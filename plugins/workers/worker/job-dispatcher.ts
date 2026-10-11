@@ -120,6 +120,7 @@ export async function processWorkerJob(
         parentContext,
       },
       async (span) => {
+        span.setAttribute(WorkerAttributes.WORKER_CONCURRENCY, context.concurrency);
         const active: JobExecutionContext = {
           jobId,
           topic,
