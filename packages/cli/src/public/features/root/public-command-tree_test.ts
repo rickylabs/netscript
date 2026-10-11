@@ -83,6 +83,7 @@ Deno.test('public init --dry-run leaves the target directory absent', async () =
 
     await command.parse([
       'init',
+      '--no-agent',
       projectName,
       '--path',
       parent,
@@ -335,6 +336,7 @@ async function scaffoldFixture(
   });
   await command.parse([
     'init',
+    '--no-agent',
     projectName,
     '--path',
     parent,

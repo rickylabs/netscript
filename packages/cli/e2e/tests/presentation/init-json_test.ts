@@ -14,6 +14,7 @@ Deno.test('netscript init --json emits a single structured object', async () => 
       '-A',
       'packages/cli/bin/netscript-dev.ts',
       'init',
+      '--no-agent',
       'json-smoke',
       '--path',
       join(root, '.llm/tmp/init-json-smoke'),

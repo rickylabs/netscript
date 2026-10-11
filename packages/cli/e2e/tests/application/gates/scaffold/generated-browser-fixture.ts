@@ -72,6 +72,7 @@ export async function withGeneratedBrowserFixture(
   try {
     await runCli([
       'init',
+      '--no-agent',
       'browser-app',
       '--path',
       scratch,

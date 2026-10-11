@@ -22,6 +22,7 @@ Deno.test('post-init service generation leaves the exact 12 owned outputs format
   try {
     await assertCommand(runCli([
       'init',
+      '--no-agent',
       projectName,
       '--path',
       parent,

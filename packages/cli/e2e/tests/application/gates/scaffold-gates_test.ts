@@ -88,7 +88,7 @@ Deno.test('--source jsr accepts the local public CLI binary', () => {
   assertEquals(command.slice(0, 4), ['deno', 'run', '-A', '/repo/packages/cli/bin/netscript.ts']);
 });
 
-Deno.test('scaffold init default command remains byte-identical', () => {
+Deno.test('scaffold init command disables ambient agent initialization', () => {
   assertEquals(
     scaffoldInitGate().command(
       createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL),
@@ -99,6 +99,7 @@ Deno.test('scaffold init default command remains byte-identical', () => {
       '-A',
       '/repo/packages/cli/bin/netscript.ts',
       'init',
+      '--no-agent',
       'prod-local-test',
       '--path',
       '/repo/.llm/tmp/cli-e2e',

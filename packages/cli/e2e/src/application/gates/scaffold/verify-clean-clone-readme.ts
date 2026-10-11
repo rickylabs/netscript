@@ -21,6 +21,7 @@ async function main(repoRoot: string): Promise<void> {
       '-A',
       join(repoRoot, 'packages', 'cli', 'bin', 'netscript-dev.ts'),
       'init',
+      '--no-agent',
       projectName,
       '--path',
       sourceParent,

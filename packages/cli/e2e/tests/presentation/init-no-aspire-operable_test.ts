@@ -62,6 +62,7 @@ Deno.test({
     try {
       const init = await cli(root, [
         'init',
+        '--no-agent',
         PROJECT,
         '--path',
         targetPath,
@@ -160,6 +161,7 @@ Deno.test({
     try {
       const init = await cli(root, [
         'init',
+        '--no-agent',
         SQLITE_PROJECT,
         '--path',
         targetPath,

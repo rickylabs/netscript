@@ -35,6 +35,7 @@ async function withProject(probe: (root: string) => Promise<void>): Promise<void
   try {
     await run([
       'init',
+      '--no-agent',
       'local-auth',
       '--path',
       scratch,

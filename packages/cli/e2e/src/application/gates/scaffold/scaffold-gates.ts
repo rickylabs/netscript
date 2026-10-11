@@ -63,6 +63,7 @@ function scaffoldInitCommand(context: RunContext): readonly string[] {
   return cli(
     context,
     'init',
+    '--no-agent',
     context.project.projectName,
     '--path',
     context.project.smokeRoot,

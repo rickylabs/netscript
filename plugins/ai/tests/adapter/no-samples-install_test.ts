@@ -19,6 +19,7 @@ Deno.test({
         '-A',
         cli,
         'init',
+        '--no-agent',
         projectName,
         '--path',
         smokeRoot,

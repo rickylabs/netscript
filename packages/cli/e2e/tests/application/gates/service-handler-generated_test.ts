@@ -21,6 +21,7 @@ for (const variant of ['memory', 'prisma'] as const) {
     try {
       await cli([
         'init',
+        '--no-agent',
         projectName,
         '--path',
         parent,
