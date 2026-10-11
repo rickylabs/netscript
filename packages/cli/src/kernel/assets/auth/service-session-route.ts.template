@@ -1,0 +1,29 @@
+// Server-only example: the cookie credential stays in request context, never in browser JSON.
+import { define } from '{{utilsImport}}';
+import { {{serviceName | pascalCase}}ContractV1 } from '{{contractImport}}';
+import { browserSessionContext, createBrowserSessionClient } from '{{bffImport}}';
+
+const client = createBrowserSessionClient(
+  {{serviceName | pascalCase}}ContractV1,
+  '{{serviceName}}',
+  '{{serviceName | camelCase}}',
+);
+
+export const handler = define.handlers({
+  async GET(ctx) {
+    const headers = { 'cache-control': 'no-store' };
+    const context = browserSessionContext(ctx.req);
+    if (!context.accessToken) {
+      return Response.json({ authenticated: false }, { status: 401, headers });
+    }
+    try {
+      const result = await client.session(undefined, { context });
+      return Response.json(result, { headers });
+    } catch (error) {
+      if (error instanceof Error && 'status' in error && (error.status === 401 || error.status === 403)) {
+        return Response.json({ authenticated: false }, { status: error.status, headers });
+      }
+      throw error;
+    }
+  },
+});
