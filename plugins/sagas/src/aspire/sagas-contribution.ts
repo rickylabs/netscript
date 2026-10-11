@@ -82,18 +82,6 @@ export interface SagasContributionContext {
   readonly port: (key: string, fallback?: number) => number;
 }
 
-/** Health check declaration emitted by the sagas Aspire contribution. */
-export interface SagasHealthCheckSpec {
-  /** Resource name checked by the health probe. */
-  readonly resource: string;
-  /** URL to probe. */
-  readonly url: string;
-  /** Expected HTTP status code. */
-  readonly expect: number;
-  /** Optional timeout in milliseconds. */
-  readonly timeoutMs?: number;
-}
-
 /** Aspire contribution for the NetScript sagas plugin. */
 export class SagasAspireContribution {
   /** Plugin package name owning this contribution. */
@@ -138,19 +126,5 @@ export class SagasAspireContribution {
       ).href,
       [SAGAS_RUNNER_CONCURRENCY_ENV]: SAGAS_DEFAULT_RUNNER_CONCURRENCY,
     };
-  }
-
-  /**
-   * Legacy health declarations; production does not consume this hook.
-   * @deprecated Since 0.0.8; removal next release. Use generated AppHost child probes and payloads.
-   */
-  declareHealthChecks(ctx: SagasContributionContext): readonly SagasHealthCheckSpec[] {
-    const apiPort = ctx.port(SAGAS_API_SERVICE_NAME);
-    return [{
-      resource: SAGAS_API_SERVICE_NAME,
-      url: `http://localhost:${apiPort}/health`,
-      expect: 200,
-      timeoutMs: 3000,
-    }];
   }
 }

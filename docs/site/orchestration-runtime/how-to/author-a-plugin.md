@@ -426,3 +426,13 @@ Aspire graph use the same explicit resource keys.</li>
 }) }}
 
 </div>
+
+## Declare health through metadata
+
+The adapter scaffold declares `doctor.healthEndpoint` for its API diagnostics. The AppHost service
+probe uses `HealthCheckPath` in appsettings, defaulting to `/health`. Background Deno children
+with `RequiresKv: true` serve the shared `/health` contract; the generator selects them by capability,
+including renamed resources. The unused `declareHealthChecks` contribution hook and its spec types
+were removed in 0.0.8. Remove legacy overrides and imports, retain capability and health endpoint
+metadata, and see [Background child health](/orchestration-runtime/child-health/) for state meanings
+and the crash-loop threshold.

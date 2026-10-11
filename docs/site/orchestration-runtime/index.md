@@ -46,6 +46,8 @@ New here, start with the concept, then the practical wiring, then the reference:
   covers the two-pass reference resolution — including how a service now declares
   `pluginReferences`/`dependsOn` — and {{ comp.xref({ key: "howto:roll-out-runtime-overrides", text: "Roll out runtime overrides" }) }}
   covers configuration across resources.
+- **Inspect child readiness:** [Background child health](/orchestration-runtime/child-health/)
+  describes the generated lifecycle vocabulary, restart threshold, and authoring metadata.
 - **See it observed:** {{ comp.xref({ key: "cap:telemetry", text: "Telemetry & logging" }) }} is the
   dashboard side of the same graph — the spans and logs `aspire start` collects.
 - **Look up exact symbols:** {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }} and

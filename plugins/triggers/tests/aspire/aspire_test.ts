@@ -78,10 +78,5 @@ Deno.test('TriggersAspireContribution registers API and processor resources', ()
     TRIGGERS_DURABILITY_TIER: 't1',
     TRIGGERS_PROCESSOR_CONCURRENCY: '2',
   });
-  assertEquals(contribution.declareHealthChecks(ctx), [{
-    resource: TRIGGERS_API_SERVICE_NAME,
-    url: 'http://localhost:9193/health',
-    expect: 200,
-    timeoutMs: 3000,
-  }]);
+  assertEquals('declareHealthChecks' in contribution, false);
 });
