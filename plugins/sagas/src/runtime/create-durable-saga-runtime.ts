@@ -53,6 +53,17 @@ export async function createDurableSagaRuntime(
   options: DurableSagaRuntimeOptions = {},
 ): Promise<DurableSagaRuntime> {
   const resources = await resolveStoreResources(options);
+  const scheduler = options.native?.scheduler;
+  scheduler?.bindRetentionStore?.(resources.store, {
+    completedRetentionDays: options.completedRetentionDays,
+  });
+  let scheduledController: AbortController | undefined;
+  let scheduledCleanup: Promise<void> | undefined;
+  const stopScheduledCleanup = async (): Promise<void> => {
+    scheduledController?.abort();
+    await scheduledCleanup;
+    scheduledCleanup = undefined;
+  };
   const store = options.projection
     ? new ProjectingSagaStore(resources.store, options.projection)
     : resources.store;
@@ -77,18 +88,29 @@ export async function createDurableSagaRuntime(
       start: async (): Promise<void> => {
         await runtime.start();
         resources.startCleanup?.();
+        if (scheduler?.cleanupRetention && scheduledCleanup === undefined) {
+          scheduledController = new AbortController();
+          scheduledCleanup = runSagaRetentionCleanup(
+            { cleanupRetention: () => scheduler.cleanupRetention!() },
+            scheduledController.signal,
+          );
+        }
       },
       stop: async (reason?: string): Promise<void> => {
         try {
           await runtime.stop(reason);
         } finally {
           await resources.stopCleanup?.();
+          await stopScheduledCleanup();
         }
       },
     },
     store,
     kv: resources.kv,
-    dispose: resources.dispose,
+    dispose: async () => {
+      await stopScheduledCleanup();
+      await resources.dispose();
+    },
   });
 }
 

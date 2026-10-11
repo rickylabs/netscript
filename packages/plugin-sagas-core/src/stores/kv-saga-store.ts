@@ -71,6 +71,22 @@ export class KvSagaStore implements SagaStorePort {
     return entry?.value ?? undefined;
   }
 
+  /** Batch-read canonical state in native KV pages of at most ten identities. */
+  async loadMany(
+    instanceIds: readonly SagaInstanceId[],
+  ): Promise<readonly (SagaStateEnvelope | undefined)[]> {
+    const keys = instanceIds.map((id) => this.#stateKey(id));
+    const envelopes: (SagaStateEnvelope | undefined)[] = [];
+    for (let offset = 0; offset < keys.length; offset += 10) {
+      const page = keys.slice(offset, offset + 10);
+      const entries = this.#kv.getMany
+        ? await this.#kv.getMany<SagaStateEnvelope>(page)
+        : await Promise.all(page.map((key) => this.#kv.get<SagaStateEnvelope>(key)));
+      envelopes.push(...entries.map((entry) => entry?.value ?? undefined));
+    }
+    return envelopes;
+  }
+
   /** Save a saga state envelope with optimistic version checking. */
   async save<TState extends SagaState>(
     envelope: SagaStateEnvelope<TState>,
