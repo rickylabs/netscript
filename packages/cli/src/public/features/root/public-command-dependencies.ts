@@ -1,3 +1,5 @@
+import { createInstalledRuntimeRegistryRenderer } from '../generate/plugins/plugin-registry-renderer.ts';
+import { checkPluginRegistries } from '../generate/plugins/check-plugin-registries.ts';
 import { regenerateAspireHelpersWithDependencies } from '../../../kernel/adapters/service/workspace-mutator.ts';
 import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
 import { copy } from '@std/fs';
@@ -241,11 +243,13 @@ export function createPublicCommandDependencies(
       resolvePath: (path) => host.resolvePath(path),
       resolveWorkspaceRoot: findDeployProjectRoot,
     });
-  const generatePluginRegistries = createInstalledRuntimeRegistryGenerator({
-    fetchManifest: (url) => fetch(url, { headers: { Accept: 'application/json' } }),
+  const registryDependencies = {
+    fetchManifest: (url: string) => fetch(url, { headers: { Accept: 'application/json' } }),
     fs,
     process,
-  });
+  };
+  const generatePluginRegistries = createInstalledRuntimeRegistryGenerator(registryDependencies);
+  const renderPluginRegistries = createInstalledRuntimeRegistryRenderer(registryDependencies);
   const serviceAddDependencies = {
     fs,
     scaffolder,
@@ -420,6 +424,12 @@ export function createPublicCommandDependencies(
       emitter: new RegistryEmitter(),
       fs,
       generate: generatePluginRegistries,
+      check: (projectRoot) =>
+        checkPluginRegistries(
+          projectRoot,
+          renderPluginRegistries,
+          new DenoGeneratedSourceFormatter(process),
+        ),
     },
     generateResourceCommandDependencies: {
       generateResourceDependencies: {

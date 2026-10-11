@@ -33,6 +33,22 @@ export async function generateSagaRegistry(
   files: ProjectFiles,
   options: GenerateSagaRegistryOptions = {},
 ): Promise<GenerateSagaRegistryResult> {
+  const rendered = await renderSagaRegistry(files, options);
+  await files.writeTextFile(rendered.registryPath, rendered.content);
+  return { registryPath: rendered.registryPath, sagas: rendered.sourceFiles };
+}
+
+/** Render a static saga registry without invoking project writers. */
+export async function renderSagaRegistry(
+  files: ProjectFiles,
+  options: GenerateSagaRegistryOptions = {},
+): Promise<
+  {
+    readonly registryPath: string;
+    readonly sourceFiles: readonly string[];
+    readonly content: string;
+  }
+> {
   const registryPath = options.registryPath ?? SAGAS_REGISTRY_PATH;
   const inspected = await inspectSagasProject(files, { roots: options.roots });
   const sourcePaths = inspected.entries.map((entry) => entry.sourcePath).filter((path) =>
@@ -40,10 +56,10 @@ export async function generateSagaRegistry(
   );
   const sagaFiles = await toEntries(files, sourcePaths);
   const source = renderSagaRegistrySource(registryPath, sagaFiles);
-  await files.writeTextFile(registryPath, source);
   return Object.freeze({
     registryPath,
-    sagas: Object.freeze(sagaFiles.map((entry) => entry.relativePath)),
+    sourceFiles: Object.freeze(sagaFiles.map((entry) => entry.relativePath)),
+    content: source,
   });
 }
 

@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "runtimeRegistryGenerator": {
     "command": "src/cli/generate-runtime-registries.ts",
+    "inspectionProtocol": 2,
     "args": ["--profile", "scaffold"]
   },
   "backgroundSampleRules": [

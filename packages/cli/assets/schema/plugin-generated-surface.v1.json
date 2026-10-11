@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://netscript.dev/schema/plugin-generated-surface.v1.json",
+  "title": "Plugin generated-surface report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "generator",
+    "outputs",
+    "inputs",
+    "status",
+    "exitCode",
+    "drift"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "generator": {
+      "const": "public.generate.plugins"
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "generator",
+          "path",
+          "ownership",
+          "digest"
+        ],
+        "properties": {
+          "generator": {
+            "type": "string",
+            "pattern": "^public\\.generate\\.plugins:@[^/]+/[^/]+$"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^\\.netscript/generated/[^/]+/.+\\.(ts|mts|js|mjs)$"
+          },
+          "ownership": {
+            "const": "generated"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "generator",
+          "path",
+          "ownership",
+          "digest"
+        ],
+        "properties": {
+          "generator": {
+            "const": "public.generate.plugins"
+          },
+          "path": {
+            "type": "string"
+          },
+          "ownership": {
+            "const": "authored"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "current",
+        "drift",
+        "inspection-failure"
+      ]
+    },
+    "exitCode": {
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "drift": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "kind"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "missing",
+              "extra",
+              "ownership",
+              "bytes",
+              "inspection-failure"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
