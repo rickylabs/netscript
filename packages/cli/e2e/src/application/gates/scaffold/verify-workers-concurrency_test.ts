@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from '@std/assert';
+import { assert, assertEquals, assertThrows } from '@std/assert';
 import type { TelemetrySpan } from '@netscript/telemetry/query';
 import { assertWorkersConcurrency } from './verify-workers-concurrency.ts';
 
@@ -39,4 +39,20 @@ Deno.test('generated workers receipt requires execution evidence and rejects mix
     Error,
     'observed=1',
   );
+});
+
+Deno.test('runtime tiers execute the generated concurrency receipt after the health-check job', async () => {
+  const { resolveSuite } = await import('../../../presentation/cli/suites/registry.ts');
+  for (const database of ['postgres', 'sqlite'] as const) {
+    const suite = resolveSuite('scaffold.runtime', { database });
+    const ids = suite.gates.map((gate) => String(gate.id));
+    assert(ids.indexOf('behavior.workers-executions') >= 0);
+    assert(
+      ids.indexOf('behavior.workers-concurrency') > ids.indexOf('behavior.workers-executions'),
+    );
+    assertEquals(ids.filter((id) => id === 'behavior.workers-concurrency').length, 1);
+    const gate = suite.gates.find((gate) => gate.id === 'behavior.workers-concurrency');
+    assert(gate?.kind === 'command');
+    assertEquals(gate.critical, true);
+  }
 });
