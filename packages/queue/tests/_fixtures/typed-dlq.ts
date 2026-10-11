@@ -116,14 +116,17 @@ export async function typedDlqRedelivery(
   });
   const controller = new AbortController();
   const envelope = createEnvelope({ id: 123 }, undefined, 'typed-dlq');
-  const listening = queue.listen(() => {
-    throw new Error('handler should not receive invalid message');
-  }, { signal: controller.signal }).then(() => {
-    assertEquals(appendCompleted, true, 'redelivery must drain before listen returns');
-  });
+  let listening = Promise.resolve();
   try {
     // Deno owns the retry; zero backoff is an ordering fixture, never a retry-until-pass loop.
+    // Populate the database before opening its separate listener connection. Enqueuing during
+    // listener startup can miss its initial read and depend on Deno's cross-connection poll.
     await kv.enqueue(envelope, { backoffSchedule: [0] });
+    listening = queue.listen(() => {
+      throw new Error('handler should not receive invalid message');
+    }, { signal: controller.signal }).then(() => {
+      assertEquals(appendCompleted, true, 'redelivery must drain before listen returns');
+    });
     await deadline(redelivered.promise, 5_000);
     controller.abort();
     firstPersisted.resolve();
