@@ -82,6 +82,8 @@ export async function reconcileBrowserAuth(
     const contract = join(projectRoot, 'contracts/versions/v1', `${service}.contract.ts`);
     if (!await fs.exists(contract)) continue;
     // Older or authored contracts need not implement the generated identity proof.
+    // Debt CLI-BROWSER-SESSION-CONTRACT-DETECTION: replace source sniffing with a
+    // structural capability marker before extending authored-contract support.
     if (/\bsession:\s*baseContract\b/.test(await fs.readFile(contract))) {
       sessionContracts.set(service, contract);
     }

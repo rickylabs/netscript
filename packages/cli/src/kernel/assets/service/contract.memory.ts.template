@@ -72,6 +72,8 @@ export type {{serviceName | pascalCase}}UpdateStatusResponseV1 = z.infer<
  */
 export const {{serviceName | pascalCase}}ContractV1 = {
   // Request-time identity proof; demo data procedures below remain public.
+  // Access metadata describes guarded posture. An explicit service-wide public opt-out
+  // skips those guards: session returns 200 with authenticated: false without a principal.
   session: baseContract
     .route({ method: 'POST', path: '/{{serviceName}}/session' })
     .meta({ access: { authentication: 'required' } })

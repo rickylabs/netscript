@@ -201,28 +201,14 @@ const deniedProcedure = implement(privateContract).denied.handler(() => { throw 
               'export const service = await defineService(router, {',
             ),
         );
-        if (database) {
-          await write(
-            `${prefix}client-types.ts`,
-            `import { createServiceClient } from '@netscript/sdk/client';
-import { UsersContractV1, type UsersUserV1 } from './contract.ts';
-const client = createServiceClient(UsersContractV1, { serviceName: 'users' });
-const user: UsersUserV1 = await client.getById({ id: 1 });
-console.log(user.name);`,
-          );
-        }
         const appRoutePath = join(root, 'apps/web/routes/examples/users/session.ts');
         const appSource = await fs.readFile(appRoutePath);
         assertStringIncludes(appSource, 'createBrowserSessionClient');
         assertEquals(appSource.includes('fetch('), false);
-        const checked = await new DenoProcess().exec('deno', [
-          'check',
-          '--unstable-kv',
-          join(root, mainPath),
-          appRoutePath,
-          ...(database ? [join(root, prefix, 'client-types.ts')] : []),
-        ]);
-        assertEquals(checked.code, 0, checked.stderr);
+        // This spliced fixture proves runtime behavior only. The inherited root config
+        // excludes .llm/tmp, so deno check here returned "No matching files found" with
+        // exit 0. service-handler-generated_test.ts checks both real scaffolds using
+        // their own configs and unmodified contract/database aliases instead.
         const generated: { service: RunningService } = await import(
           toFileUrl(resolve(root, mainPath)).href
         );
