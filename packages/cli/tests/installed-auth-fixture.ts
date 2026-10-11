@@ -36,8 +36,10 @@ async function installAuth(name: string): Promise<InstalledAuthFixture> {
   const cli = join(repo, 'packages/cli/bin/netscript.ts');
   const project = join(root, 'auth-fixture');
   const run = async (args: string[]) => {
+    // Resolve the checked-in CLI graph deterministically; floating no-lock resolution
+    // can select freshly published packages rejected by the workspace minimum-age policy.
     const result = await new Deno.Command(Deno.execPath(), {
-      args: ['run', '--no-lock', '-A', cli, ...args],
+      args: ['run', '--frozen', '-A', cli, ...args],
       cwd: repo,
       stdout: 'piped',
       stderr: 'piped',

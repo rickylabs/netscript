@@ -491,6 +491,7 @@ packages/cli/src/kernel/adapters/database/workspace-mutator_apphost-deps_test.ts
 packages/cli/src/kernel/adapters/database/workspace-mutator.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/plugin/appsettings-entry-builders.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/db-integration.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/runtime/file-system/deno-project-stage_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -715,6 +716,7 @@ packages/cli/src/public/features/plugins/auth/auth-config.ts	cli:other	S4	grep-v
 packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/doctor/browser-topology-check.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/plugin-runtime-health.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -748,6 +750,7 @@ packages/cli/src/public/features/services/remove/remove-service.ts	cli:other	S4	
 packages/cli/src/public/features/services/services-group.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/infra/permissions/plugin-scaffold-permissions.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/tests/authored-browser-topology_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/config/mod.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-root-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-section-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts

@@ -50,3 +50,11 @@ Deno.test('schema', async (t) => {
     assertEquals(json.includes('Sqlite'), true);
   });
 });
+
+Deno.test('appsettings JSON Schema advertises the browser topology enum and default', () => {
+  const schema = generateAppSettingsJsonSchema();
+  const json = JSON.stringify(schema);
+  assertEquals(json.includes('BrowserTopology'), true);
+  assertEquals(json.includes('"enum":["scaffold","authored"]'), true);
+  assertEquals(json.includes('"default":"scaffold"'), true);
+});

@@ -1,4 +1,5 @@
 import { dirname, join, relative, resolve } from '@std/path';
+import { type AppEntry, AppEntrySchema } from '@netscript/aspire/config';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
@@ -9,6 +10,7 @@ interface BrowserAuthEntry {
   readonly Type?: string;
   readonly Workdir?: string;
   readonly Entrypoint?: string;
+  readonly Auth?: AppEntry['Auth'];
   PluginReferences?: string[];
 }
 interface BrowserAuthSettings {
@@ -49,9 +51,9 @@ export async function browserAuthReconciliationPaths(
   return [
     join(projectRoot, 'auth/bff.ts'),
     join(projectRoot, 'auth/service.ts'),
-    ...Object.entries(settings.NetScript?.Apps ?? {}).filter(([, entry]) =>
-      !entry.Type || entry.Type === 'app'
-    ).flatMap(([name, entry]) => [
+    ...browserApps(settings.NetScript?.Apps).filter(({ ownership }) =>
+      ownership.Auth?.BrowserTopology !== 'authored'
+    ).flatMap(({ name, entry }) => [
       dirname(appAuthRoute(projectRoot, name, entry)),
       ...Object.keys(settings.NetScript?.Services ?? {}).map((service) =>
         appServiceSessionRoute(projectRoot, name, entry, service)
@@ -63,7 +65,7 @@ export async function browserAuthReconciliationPaths(
   ];
 }
 
-/** Reconcile install-time browser auth using the CLI's injected filesystem boundary. */
+/** Reconcile browser auth across lifecycle paths using the CLI's injected filesystem boundary. */
 export async function reconcileBrowserAuth(
   projectRoot: string,
   fs: FileSystemPort,
@@ -88,23 +90,31 @@ export async function reconcileBrowserAuth(
       sessionContracts.set(service, contract);
     }
   }
+  const apps = browserApps(config.Apps);
+  const scaffoldApps = apps.filter(({ ownership }) =>
+    ownership.Auth?.BrowserTopology !== 'authored'
+  );
+  // Preserve the legacy helper-only flow when no browser apps are configured.
+  // Task and desktop entries cannot opt an authored browser app back into scaffolding.
+  const scaffoldBrowser = apps.length === 0 || scaffoldApps.length > 0;
   const authServiceName = `'${auth}'`;
-  const files: BrowserAuthFile[] = [
-    {
-      path: join(projectRoot, 'auth/bff.ts'),
-      content: renderTemplateAssetSync(TEMPLATE_KEYS.authBff, {
-        authServiceName,
-      }),
-    },
-    {
-      path: join(projectRoot, 'auth/service.ts'),
-      content: renderTemplateAssetSync(TEMPLATE_KEYS.authService, {
-        authServiceName,
-      }),
-    },
-  ];
-  for (const [name, entry] of Object.entries(config.Apps ?? {})) {
-    if (entry.Type && entry.Type !== 'app') continue;
+  const files: BrowserAuthFile[] = scaffoldBrowser
+    ? [
+      {
+        path: join(projectRoot, 'auth/bff.ts'),
+        content: renderTemplateAssetSync(TEMPLATE_KEYS.authBff, {
+          authServiceName,
+        }),
+      },
+      {
+        path: join(projectRoot, 'auth/service.ts'),
+        content: renderTemplateAssetSync(TEMPLATE_KEYS.authService, {
+          authServiceName,
+        }),
+      },
+    ]
+    : [];
+  for (const { name, entry } of scaffoldApps) {
     const appRoot = workspacePath(projectRoot, entry.Workdir ?? `apps/${name}`);
     const path = appAuthRoute(projectRoot, name, entry);
     // Custom layouts are left to their author; this route is for generated Fresh apps.
@@ -177,6 +187,12 @@ export async function reconcileBrowserAuth(
       ...new Set([...(entry.PluginReferences ?? []), auth]),
     ];
   }
+  if (!scaffoldBrowser && files.some((file) => file.overwrite)) {
+    files.push({
+      path: join(projectRoot, 'auth/service.ts'),
+      content: renderTemplateAssetSync(TEMPLATE_KEYS.authService, { authServiceName }),
+    });
+  }
   const written: string[] = [];
   for (const file of files) {
     if (await fs.exists(file.path)) {
@@ -196,6 +212,16 @@ export async function reconcileBrowserAuth(
     await fs.writeFile(settingsPath, content);
   }
   return written;
+}
+
+function browserApps(apps: Record<string, BrowserAuthEntry> | undefined) {
+  return Object.entries(apps ?? {}).map(([name, entry]) => ({
+    name,
+    entry,
+    // Validate only the ownership projection with the existing settings contract.
+    // Unrelated fields must not turn this reconciler into a full settings validator.
+    ownership: AppEntrySchema.parse({ Type: entry.Type, Auth: entry.Auth }),
+  })).filter(({ ownership }) => ownership.Type === 'app');
 }
 
 function appAuthRoute(root: string, name: string, entry: BrowserAuthEntry): string {

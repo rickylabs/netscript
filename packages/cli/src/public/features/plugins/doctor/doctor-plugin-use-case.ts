@@ -22,6 +22,7 @@ import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config
 import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/plugin-manifest/configured-plugin-manifest-probe.ts';
 import { resolvePluginImportSpecifier } from '../../../../kernel/application/plugin/configured-plugin-specifier.ts';
 import { getPluginServiceLookupName } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import { checkBrowserTopology } from './browser-topology-check.ts';
 import { showAuthBackend } from '../auth/auth-config.ts';
 import { resolveEffectivePluginPermissions } from '../../../../kernel/adapters/config/deploy-config/deploy-config-resolvers.ts';
 import { JsrExportMapHttpError, type JsrExportMapLoader } from './jsr-export-map-loader-port.ts';
@@ -140,6 +141,7 @@ export async function doctorPlugin(
   const configuredModuleChecks = await Promise.all(
     pluginSpecs.map((spec) => checkConfiguredModule(input.projectRoot, spec, dependencies)),
   );
+  const browserTopologyReport = await diagnoseBrowserTopology(input.projectRoot, dependencies.fs);
   const serviceChecks = await checkServiceEntrypoints(input.projectRoot, dependencies);
   const runtimeRegistryReport = await diagnoseRuntimeRegistries(input.projectRoot, dependencies);
   let runtimeDeclarations: readonly PluginHealthDeclaration[] = [];
@@ -177,6 +179,7 @@ export async function doctorPlugin(
       ? workspaceChecksReport(serviceChecks)
       : undefined;
     return [
+      browserTopologyReport,
       appHostReport,
       dockerReport,
       runtimeRegistryReport,
@@ -219,6 +222,7 @@ export async function doctorPlugin(
     ? workspaceChecksReport(unmatchedServiceChecks)
     : undefined;
   return [
+    browserTopologyReport,
     appHostReport,
     dockerReport,
     runtimeRegistryReport,
@@ -228,6 +232,20 @@ export async function doctorPlugin(
     ...reports,
     unmatchedServiceReport,
   ].filter(isPluginDoctorReport);
+}
+
+async function diagnoseBrowserTopology(
+  projectRoot: string,
+  fs: FileSystemPort,
+): Promise<PluginDoctorReport | undefined> {
+  try {
+    const checks = await checkBrowserTopology(projectRoot, fs);
+    return checks.length
+      ? { pluginName: 'workspace', status: aggregateStatus(checks), checks }
+      : undefined;
+  } catch (error) {
+    return workspaceErrorReport('browser-topology', 'Could not read browser auth topology.', error);
+  }
 }
 
 async function diagnoseRuntimeRegistries(
