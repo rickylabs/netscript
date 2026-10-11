@@ -68,7 +68,13 @@ export async function diagnosePluginRegistryInventory(
       return warning('unsupported or inconsistent generator inventory.');
     }
     if (value.status === 'inspection-failure') {
-      return warning(value.drift.map((finding) => finding.message ?? finding.kind).join('; '));
+      return warning(
+        value.drift.map((finding) =>
+          // A generator failure can carry bootstrap advice even when rendering itself failed.
+          // Preserve the cause without promoting that unverified advice into a doctor remedy.
+          (finding.message ?? finding.kind).replace(/; run generate plugins[^\n]*/g, '')
+        ).join('; '),
+      );
     }
     if (value.status === 'current') {
       return {

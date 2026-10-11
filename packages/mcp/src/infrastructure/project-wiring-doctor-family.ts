@@ -36,7 +36,7 @@ export class ProjectWiringDoctorFamily implements DoctorCheckFamily {
     }),
   ) {}
 
-  /** Inspect project configuration without loading or executing user source. */
+  /** Inspect project metadata and the generator's read-only registry inventory. */
   async check(context: DoctorCheckContext): Promise<readonly DoctorCheck[]> {
     const root = context.projectRoot;
     const checks: DoctorCheck[] = [];

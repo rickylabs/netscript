@@ -243,3 +243,24 @@ for (
     assertEquals(check?.fix, undefined);
   });
 }
+
+Deno.test('project inventory does not promote a failed renderer bootstrap hint into a remedy', async () => {
+  const check = await inspect(
+    '/fixture',
+    inventoryExecutor({
+      ...current,
+      status: 'inspection-failure',
+      exitCode: 1,
+      drift: [{
+        path: 'public.generate.plugins',
+        kind: 'inspection-failure',
+        message:
+          'Invalid workers configuration; run generate plugins to prepare the consumer lock.',
+      }],
+    }),
+  );
+  assertStringIncludes(check?.summary ?? '', 'Invalid workers configuration');
+  assertEquals(check?.summary.includes('run generate plugins'), false);
+  assertEquals(check?.status, 'warn');
+  assertEquals(check?.fix, undefined);
+});
