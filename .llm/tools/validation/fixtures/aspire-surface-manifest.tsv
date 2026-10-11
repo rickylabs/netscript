@@ -499,6 +499,7 @@ packages/cli/src/kernel/adapters/scaffold/import-resolver.ts	cli:other	S4	grep-v
 packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/secrets/installation-secret-file_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/secrets/installation-secret-file.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/service/aspire-inventory-contract_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/aspire-surface-checker_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/aspire-surface-checker.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/aspire-surface-inventory_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
