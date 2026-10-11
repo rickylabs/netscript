@@ -202,10 +202,14 @@ Deno.test({
 
 Deno.test('streams install control metadata excludes schema maps from id registries', async () => {
   const artifacts = collectInstallArtifacts(streamsAdapterPlugin);
-  const contributions = await new AstExtractor().extract(artifacts.map((artifact) => ({
-    path: artifact.path,
-    text: artifactText(artifact),
-  })));
+  const contributions = await new AstExtractor().extract([
+    ...artifacts.map((artifact) => ({ path: artifact.path, text: artifactText(artifact) })),
+    {
+      path: 'schemas.ts',
+      text: `import { defineStreamSchema } from '@netscript/plugin-streams-core';
+export const schema = defineStreamSchema({ invoice: { primaryKey: 'invoiceId' } });`,
+    },
+  ]);
   assertEquals(contributions, []);
   assertEquals(await new RegistryEmitter().emit(contributions), []);
 });
