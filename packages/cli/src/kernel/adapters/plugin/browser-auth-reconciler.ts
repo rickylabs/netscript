@@ -51,20 +51,21 @@ export async function browserAuthReconciliationPaths(
   return [
     join(projectRoot, 'auth/bff.ts'),
     join(projectRoot, 'auth/service.ts'),
-    ...Object.entries(settings.NetScript?.Apps ?? {}).filter(([, entry]) => isScaffoldApp(entry))
-      .flatMap(([name, entry]) => [
-        dirname(appAuthRoute(projectRoot, name, entry)),
-        ...Object.keys(settings.NetScript?.Services ?? {}).map((service) =>
-          appServiceSessionRoute(projectRoot, name, entry, service)
-        ),
-      ]),
+    ...browserApps(settings.NetScript?.Apps).filter(({ ownership }) =>
+      ownership.Auth?.BrowserTopology !== 'authored'
+    ).flatMap(({ name, entry }) => [
+      dirname(appAuthRoute(projectRoot, name, entry)),
+      ...Object.keys(settings.NetScript?.Services ?? {}).map((service) =>
+        appServiceSessionRoute(projectRoot, name, entry, service)
+      ),
+    ]),
     ...Object.entries(settings.NetScript?.Services ?? {}).map(([name, entry]) =>
       serviceEntrypoint(projectRoot, name, entry)
     ),
   ];
 }
 
-/** Reconcile install-time browser auth using the CLI's injected filesystem boundary. */
+/** Reconcile browser auth across lifecycle paths using the CLI's injected filesystem boundary. */
 export async function reconcileBrowserAuth(
   projectRoot: string,
   fs: FileSystemPort,
@@ -89,12 +90,13 @@ export async function reconcileBrowserAuth(
       sessionContracts.set(service, contract);
     }
   }
-  const apps = Object.entries(config.Apps ?? {});
-  const scaffoldApps = apps.filter(([, entry]) => isScaffoldApp(entry));
-  // Preserve the legacy helper-only flow when no apps are configured. An authored app
-  // must not cause missing shared browser files to be recreated.
-  const scaffoldBrowser = apps.length === 0 ||
-    apps.some(([, entry]) => entry.Auth?.BrowserTopology !== 'authored');
+  const apps = browserApps(config.Apps);
+  const scaffoldApps = apps.filter(({ ownership }) =>
+    ownership.Auth?.BrowserTopology !== 'authored'
+  );
+  // Preserve the legacy helper-only flow when no browser apps are configured.
+  // Task and desktop entries cannot opt an authored browser app back into scaffolding.
+  const scaffoldBrowser = apps.length === 0 || scaffoldApps.length > 0;
   const authServiceName = `'${auth}'`;
   const files: BrowserAuthFile[] = scaffoldBrowser
     ? [
@@ -112,7 +114,7 @@ export async function reconcileBrowserAuth(
       },
     ]
     : [];
-  for (const [name, entry] of scaffoldApps) {
+  for (const { name, entry } of scaffoldApps) {
     const appRoot = workspacePath(projectRoot, entry.Workdir ?? `apps/${name}`);
     const path = appAuthRoute(projectRoot, name, entry);
     // Custom layouts are left to their author; this route is for generated Fresh apps.
@@ -212,9 +214,14 @@ export async function reconcileBrowserAuth(
   return written;
 }
 
-function isScaffoldApp(entry: BrowserAuthEntry): boolean {
-  const app = AppEntrySchema.parse(entry);
-  return app.Type === 'app' && app.Auth?.BrowserTopology !== 'authored';
+function browserApps(apps: Record<string, BrowserAuthEntry> | undefined) {
+  return Object.entries(apps ?? {}).map(([name, entry]) => ({
+    name,
+    entry,
+    // Validate only the ownership projection with the existing settings contract.
+    // Unrelated fields must not turn this reconciler into a full settings validator.
+    ownership: AppEntrySchema.parse({ Type: entry.Type, Auth: entry.Auth }),
+  })).filter(({ ownership }) => ownership.Type === 'app');
 }
 
 function appAuthRoute(root: string, name: string, entry: BrowserAuthEntry): string {

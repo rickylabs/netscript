@@ -484,3 +484,68 @@ Deno.test('default browser helpers remain scaffold-owned for non-browser app typ
   assertEquals(await fs.exists(join(root, 'apps/build/routes/auth/[action].ts')), false);
   assertEquals(await reconcileBrowserAuth(root, fs), []);
 });
+
+Deno.test('authored browser topology with non-browser apps creates no shared helpers', async () => {
+  for (const type of ['task', 'tauri', 'desktop']) {
+    const fs = new MemoryFileSystemAdapter();
+    const root = '/workspace';
+    await fs.writeFile(
+      join(root, 'appsettings.json'),
+      JSON.stringify({
+        NetScript: {
+          ...settings.NetScript,
+          Apps: {
+            web: { Type: 'app', Auth: { BrowserTopology: 'authored' } },
+            shell: { Type: type },
+          },
+          Services: {},
+        },
+      }),
+    );
+    await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
+    await writeInstalledAuthFixture(fs, root);
+    for (let rerun = 0; rerun < 2; rerun++) {
+      assertEquals(await reconcileBrowserAuth(root, fs), [], type);
+      for (const path of ['auth/bff.ts', 'auth/service.ts', 'apps/web/routes/auth/[action].ts']) {
+        assertEquals(await fs.exists(join(root, path)), false, `${type}: ${path}`);
+      }
+    }
+    assertEquals(
+      (await browserAuthReconciliationPaths(root, fs)).includes(
+        join(root, 'apps/web/routes/auth'),
+      ),
+      false,
+    );
+  }
+});
+
+Deno.test('browser ownership ignores unrelated invalid app fields', async () => {
+  for (const topology of [undefined, {}, { BrowserTopology: 'authored' }]) {
+    const fs = new MemoryFileSystemAdapter();
+    const root = '/workspace';
+    await fs.writeFile(
+      join(root, 'appsettings.json'),
+      JSON.stringify({
+        NetScript: {
+          ...settings.NetScript,
+          Apps: { web: { Type: 'app', Port: 'abc', Auth: topology } },
+          Services: {},
+        },
+      }),
+    );
+    await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
+    await writeInstalledAuthFixture(fs, root);
+    const scaffold = topology?.BrowserTopology !== 'authored';
+    assertEquals(
+      (await browserAuthReconciliationPaths(root, fs)).includes(
+        join(root, 'apps/web/routes/auth'),
+      ),
+      scaffold,
+    );
+    await reconcileBrowserAuth(root, fs);
+    assertEquals(await fs.exists(join(root, 'auth/bff.ts')), scaffold);
+    assertEquals(await fs.exists(join(root, 'auth/service.ts')), scaffold);
+    assertEquals(await fs.exists(join(root, 'apps/web/routes/auth/[action].ts')), scaffold);
+    assertEquals(await reconcileBrowserAuth(root, fs), []);
+  }
+});

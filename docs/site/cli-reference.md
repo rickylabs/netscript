@@ -268,7 +268,11 @@ service-session example routes. They neither create nor replace its browser help
 absent. `netscript plugin doctor` reports the app as using an authored browser topology; this
 reports ownership, not verification of your authentication implementation.
 
-In a multi-app workspace, apps using `scaffold` still receive the shared `auth/bff.ts` and
+Only browser apps (`Type: "app"`, including an omitted `Type`) select browser topology. Task, Tauri,
+and desktop entries do not cause shared helpers to be created alongside an authored browser app.
+Workspaces with no browser apps retain the legacy helper generation behavior.
+
+In a multi-app workspace, browser apps using `scaffold` still receive the shared `auth/bff.ts` and
 `auth/service.ts` helpers. A scaffold-owned service policy still receives its bearer verifier and
 `auth/service.ts`; an authored service policy remains authoritative independently of the app
 setting. Switching to `authored` preserves existing generated files; remove unwanted files only

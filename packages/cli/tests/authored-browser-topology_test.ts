@@ -44,6 +44,7 @@ for (const binary of ['netscript.ts', 'netscript-dev.ts']) {
         const settingsPath = join(project, 'appsettings.json');
         const settings = JSON.parse(await Deno.readTextFile(settingsPath));
         settings.NetScript.Apps.web.Auth = { BrowserTopology: 'authored' };
+        settings.NetScript.Apps.build = { Type: 'task' };
         await Deno.writeTextFile(settingsPath, JSON.stringify(settings, null, 2) + '\n');
         if (present) {
           await Deno.mkdir(join(project, 'auth'), { recursive: true });
@@ -81,12 +82,18 @@ for (const binary of ['netscript.ts', 'netscript-dev.ts']) {
         if (binary === 'netscript.ts') install.push('--local-path', join(repo, 'plugins/auth'));
         await run(install);
         await verify();
-        await run(install);
-        await verify();
+        // Present-file scenarios also prove rerun preservation; absent-file scenarios
+        // avoid duplicate subprocesses. Reconciler unit tests cover both reruns.
+        if (present) {
+          await run(install);
+          await verify();
+        }
         await run(['generate', 'aspire', '--project-root', project]);
         await verify();
-        await run(['generate', 'aspire', '--project-root', project]);
-        await verify();
+        if (present) {
+          await run(['generate', 'aspire', '--project-root', project]);
+          await verify();
+        }
         const doctor = await run(['plugin', 'doctor', '--project-root', project], binary, true);
         assertStringIncludes(doctor, 'authored');
         assertStringIncludes(doctor, 'workspace\thealthy\tBrowser auth topology (web)\tauthored');
