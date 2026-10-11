@@ -155,7 +155,7 @@ export const DEFAULT_BUNDLE_EXTERNAL_IMPORTS: Record<string, string> = {
   '@orpc/server': 'npm:@orpc/server@^1.15.5',
   '@orpc/contract': 'npm:@orpc/contract@^1.15.5',
   'lmdb': 'npm:lmdb@^3.5.3',
-  '@durable-streams/server': 'npm:@durable-streams/server@^0.2.3',
+  '@durable-streams/server': 'npm:@durable-streams/server@0.3.9',
 };
 
 /**
@@ -194,7 +194,7 @@ export const COMPILE_CONFIG: { readonly content: string } = {
         '@orpc/server': 'npm:@orpc/server@^1.15.5',
         '@orpc/contract': 'npm:@orpc/contract@^1.15.5',
         'lmdb': 'npm:lmdb@^3.5.3',
-        '@durable-streams/server': 'npm:@durable-streams/server@^0.2.3',
+        '@durable-streams/server': 'npm:@durable-streams/server@0.3.9',
       },
       unstable: ['kv', 'temporal', 'tsgo', 'worker-options', 'raw-imports'],
       compilerOptions: {
