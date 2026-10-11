@@ -11,7 +11,12 @@
  * - deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/plugin-triggers-core/mod.ts --deno-arg --doc
  */
 
-import { assertCheckMatched } from './testing/check-generated-files.ts';
+/** Reject Deno's successful exit when its configuration excludes every target. */
+export function assertCheckMatched(output: string): void {
+  if (/No matching files found/i.test(output)) {
+    throw new Error('Generated type-check matched no files: No matching files found');
+  }
+}
 
 interface Options {
   input?: string;
@@ -633,4 +638,4 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+if (import.meta.main) await main();

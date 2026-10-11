@@ -1,9 +1,5 @@
-/** Internal policy for type-checking generated and temporary test sources. */
-export function assertCheckMatched(output: string): void {
-  if (/No matching files found/i.test(output)) {
-    throw new Error('Generated type-check matched no files: No matching files found');
-  }
-}
+import { assertCheckMatched } from '../run-deno-check.ts';
+export { assertCheckMatched } from '../run-deno-check.ts';
 
 /** Preserve type errors for negative assertions, but never accept an empty check. */
 export async function checkGeneratedFiles(options: {
