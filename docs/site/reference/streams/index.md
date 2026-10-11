@@ -31,14 +31,14 @@ canonical reference page.
 ## Plugin manifest
 
 | Symbol | Kind | Signature | Description |
-| --------------- | -------- | ------------------------------------- | ---------------------------------------------------------- |
+| --- | --- | --- | --- |
 | `streamsPlugin` | variable | `const streamsPlugin: PluginManifest` | Plugin manifest for the NetScript Durable Streams service. |
 
 ## Topic authoring
 
 | Symbol | Kind | Signature | Description |
-| ----------------------- | --------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `defineStreamTopic` | function | `function defineStreamTopic(name, schema): StreamTopicDefinition` | Define a typed stream topic.                                                  |
+| --- | --- | --- | --- |
+| `defineStreamTopic` | function | `function defineStreamTopic(name, schema): StreamTopicDefinition` | Define a typed stream topic. |
 | `StreamTopicDefinition` | interface | `interface StreamTopicDefinition` | Typed stream topic definition. |
 | `StreamPayloadSchema` | interface | `interface StreamPayloadSchema` | Package-owned structural payload schema accepted by stream topic definitions. |
 
@@ -48,11 +48,11 @@ producer/consumer helpers and their unsupported-operation types were removed in 
 [the breaking migration](/durable-workflows/streams/#breaking-migration-in-008) for the collection
 model and HTTP/SSE consumption path.
 
-> **Browser consumers read over HTTP/SSE.** There is no in-process `subscribe()`; a browser consumes
-> a stream by reading its HTTP/SSE endpoint (for example with `EventSource`). The local AppHost
-> serves the generated app over `http://`, and under HTTP/1.1 browsers typically allow only about
-> **six concurrent connections per origin** — so several long-lived stream subscriptions from one
-> page can starve later requests. Serve over HTTPS (HTTP/2) when a page needs many simultaneous
+> **Browser consumers read over HTTP/SSE.** There is no in-process `subscribe()`; a browser
+> consumes a stream by reading its HTTP/SSE endpoint (for example with `EventSource`). The local
+> AppHost serves the generated app over `http://`, and under HTTP/1.1 browsers typically allow only
+> about **six concurrent connections per origin** — so several long-lived stream subscriptions from
+> one page can starve later requests. Serve over HTTPS (HTTP/2) when a page needs many simultaneous
 > stream consumers.
 
 ### Re-exported plugin framework types
@@ -62,7 +62,7 @@ The root export re-exports the shared NetScript plugin-framework contribution ty
 for their full definitions.
 
 | Symbol | Kind |
-| --------------------------------- | ---------- |
+| --- | --- |
 | `PluginManifest` | interface |
 | `PluginContributions` | interface |
 | `PluginContext` | interface |
@@ -86,8 +86,8 @@ for their full definitions.
 ## Sub-path exports
 
 | Export | Entrypoint | Purpose |
-| --------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
-| `@netscript/plugin-streams` | `./mod.ts` | Plugin manifest and typed topic, producer, and consumer authoring helpers. |
+| --- | --- | --- |
+| `@netscript/plugin-streams` | `./mod.ts` | Plugin manifest and typed topic definitions. |
 | `@netscript/plugin-streams/scaffold` | `./scaffold.ts` | Executable plugin scaffolder entrypoint and its shared scaffolding protocol types. |
 | `@netscript/plugin-streams/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
 | `@netscript/plugin-streams/cli` | `./src/cli/composition/main.ts` | Plugin CLI command group. |
@@ -100,7 +100,7 @@ for their full definitions.
 CLI command group for the plugin, mounted under `deno x -A jsr:@netscript/plugin-streams{{ releaseSpecifier }}/cli`.
 
 | Symbol | Kind | Signature | Description |
-| ------------ | -------- | ------------------------------ | -------------------------------------------------- |
+| --- | --- | --- | --- |
 | `streamsCli` | variable | `const streamsCli: StreamsCli` | Default CLI instance for the streams plugin. |
 | `StreamsCli` | class | `class StreamsCli` | CLI command group for `@netscript/plugin-streams`. |
 
@@ -111,14 +111,14 @@ re-exported from [`@netscript/plugin`](/reference/plugin/) and document the base
 ### `@netscript/plugin-streams/scaffold` {#sub-path-scaffolding}
 
 | Symbol | Kind | Signature | Description |
-| ------------------- | --------- | -------------------------------------------- | ---------------------------------------------------------- |
+| --- | --- | --- | --- |
 | `streamsScaffolder` | variable | `const streamsScaffolder: StreamsScaffolder` | Minimal scaffolder descriptor for streams plugin packages. |
 | `StreamsScaffolder` | interface | `interface StreamsScaffolder` | Scaffolding descriptor for the streams plugin package. |
 
 ### `@netscript/plugin-streams/e2e` {#sub-path-e2e}
 
 | Symbol | Kind | Signature | Description |
-| -------------------- | --------- | ------------------------------- | -------------------------------------------------------- |
+| --- | --- | --- | --- |
 | `getStreamsE2eGates` | function | `function getStreamsE2eGates()` | Return E2E gate definitions owned by the streams plugin. |
 | `StreamsE2eGate` | interface | `interface StreamsE2eGate` | E2E gate definition for the streams plugin. |
 
@@ -129,7 +129,7 @@ an Aspire AppHost. File storage requires an explicit, existing writable director
 startup write/read probe; invalid opt-ins fail startup.
 
 | Symbol | Kind | Signature | Description |
-| --------------------------- | ----- | --------------------------------- | ---------------------------------------------------------------------------------- |
+| --- | --- | --- | --- |
 | `StreamsAspireContribution` | class | `class StreamsAspireContribution` | Aspire contribution for the ephemeral-by-default Durable Streams protocol service. |
 
 The remaining symbols on this entrypoint (`AspireBuilder`, `AspireResource`, `AspireResourceKind`,

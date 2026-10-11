@@ -329,9 +329,9 @@ production credentials. Promote the same reviewed commit through each environmen
 from a different branch between staging and production.
 
 {{ comp callout { type: "warning", title: "Do not persist Aspire deployment state in CI" } }}
-Aspire deployment state is cached under <code>~~/.aspire/deployments/{AppHostSha}/{environment}.json</code>
+Aspire deployment state is cached under <code>~/.aspire/deployments/{AppHostSha}/{environment}.json</code>
 and may contain plaintext values entered during deployment prompts. The generated Compose/GHCR
-workflow does not cache <code>~~/.aspire/deployments</code> and passes <code>--clear-cache</code>
+workflow does not cache <code>~/.aspire/deployments</code> and passes <code>--clear-cache</code>
 to <code>netscript deploy docker up</code>, which forwards it to <code>aspire deploy --clear-cache</code>.
 Keep that behavior in CI. If you need durable values, store them in GitHub environment secrets or
 your platform's secret manager, not in the Aspire deployment cache.
@@ -383,7 +383,6 @@ for the removed root producer/consumer helpers.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>
 </ul>
 <!-- caveat: arch-debt:cli-deploy-artifacts-missing -->
-<!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
 {{ /comp }}
 
 ## Step 7 — Verify the deployment

@@ -745,13 +745,11 @@ finding into a debt entry.
 
 ## plugins/streams — durable topic publish/subscribe transport deferred (`streams-manifest-helpers-unsupported`)
 
-- **Reason:** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer helpers in the
-  Tier 2 plugin package. The existing real transport is `@netscript/plugin-streams-core`
-  `createDurableStream`, which publishes State Protocol upsert/delete events through
-  `@durable-streams/client`; it does not expose a generic topic consumer/subscriber channel that can
-  deliver `StreamTopicDefinition<TPayload>` payloads. Building that durable topic transport requires
-  a new cross-package runtime contract and consumer SDK, which exceeds the S3 M-sized slice. S3
-  replaced the silent no-op helper behavior with typed unsupported-operation failures.
+- **Reason:** Generic durable topic publish/subscribe transport remains deferred. The existing
+  `@netscript/plugin-streams-core` `createDurableStream` transport publishes State Protocol
+  upsert/delete events through `@durable-streams/client`; it does not expose a generic topic
+  consumer/subscriber channel for `StreamTopicDefinition<TPayload>` payloads. That capability
+  requires a cross-package runtime contract and consumer SDK, beyond entity-state replication.
 - **Owner:** `@netscript/plugin-streams` / `@netscript/plugin-streams-core` maintainers.
 - **Target:** Runtime transport rescope before advertising generic plugin topic publish/subscribe.
 - **Linked plan:** `.llm/tmp/run/cap-s3-streams/brief.md`.

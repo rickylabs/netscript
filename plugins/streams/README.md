@@ -189,6 +189,9 @@ each topic payload into a collection with a primary key; replace `publish(payloa
 `upsert(collection, payload)` or `delete(collection, key)`, then flush and close on shutdown. This
 publishes entity state, so model generic messages as entities with stable ids if appropriate.
 
+This example requires `zod` as an installed dependency; `defineStreamSchema` accepts any Standard
+Schema validator, so you can use your existing validator instead.
+
 ```typescript
 import { createDurableStream, defineStreamSchema } from '@netscript/plugin-streams-core';
 import { z } from 'zod';

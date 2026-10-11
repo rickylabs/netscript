@@ -80,8 +80,6 @@ from <code>@netscript/plugin-streams-core</code>; consumers read the same stream
 definitions. See {{ comp.xref({ key: "cap:streams", text: "durable streams" }) }} for the producer
 contract and the 0.0.8 migration from the removed root producer/consumer helpers.
 
-<!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
-
 This two-tier shape is not reserved for the official plugins. When you scaffold a custom plugin with
 `netscript plugin new <name>`, the generator emits the same pair: a JSR-publishable core engine
 package under `packages/plugin-<name>-core/` (its domain, ports, application orchestration,

@@ -213,7 +213,7 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     symbolCoverage: {
       mode: 'entrypoints-only',
       reason:
-        'All seven entrypoints were checked with deno doc; the page documents 33 of 55 exported symbols and omits adapter CLI and scaffold protocol types, shared CLI and E2E contracts, the unsupportedStreamOperation helper, and Aspire contribution contracts.',
+        'All seven entrypoints were checked with deno doc; the page documents 28 of 50 unique exported symbol names and omits adapter CLI and scaffold protocol types, shared CLI and E2E contracts, default executable entrypoints, and Aspire contribution contracts.',
     },
   },
   {
