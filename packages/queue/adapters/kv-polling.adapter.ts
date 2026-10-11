@@ -198,6 +198,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
   private kvPromise: Promise<WatchableKv> | null = null;
   private running = false;
   private abortController?: AbortController;
+  private recoveryStart?: KvKey;
 
   private readonly queueName: string;
   private readonly pollInterval: number;
@@ -580,7 +581,17 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
     const now = new Date();
     const prefix: KvKey = [KvPrefixes.processing, this.queueName];
 
-    for await (const entry of kv.list<QueueMessage<T>>({ prefix })) {
+    let inspected = 0;
+    for await (
+      const entry of kv.list<QueueMessage<T>>({
+        prefix,
+        start: this.recoveryStart,
+        limit: 100,
+      })
+    ) {
+      inspected++;
+      // Processing keys have no children; extending the key makes the next start exclusive.
+      this.recoveryStart = [...entry.key, ''];
       const message = entry.value;
 
       if (message.visibilityTimeout && new Date(message.visibilityTimeout) < now) {
@@ -588,6 +599,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
         await this.nack(message, { requeue: true });
       }
     }
+    if (inspected < 100) this.recoveryStart = undefined;
   }
 
   /**
