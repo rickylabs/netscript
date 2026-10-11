@@ -116,6 +116,7 @@ function createQuickstartGates(): readonly GateDefinition[] {
         cli(
           context,
           'init',
+          '--no-agent',
           context.project.projectName,
           '--path',
           context.project.smokeRoot,

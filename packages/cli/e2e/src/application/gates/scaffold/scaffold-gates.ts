@@ -59,11 +59,13 @@ function scaffoldInitCommand(context: RunContext): readonly string[] {
   }
 
   const cacheArgs = context.request.options.cache ? [] : [DISABLE_CACHE_ARGUMENT];
+  const publicCli = isJsrCompatibleCliEntrypoint(context.project.cliEntrypoint);
 
-  return cli(
+  const command = cli(
     context,
     'init',
     context.project.projectName,
+    ...(publicCli ? ['--no-agent'] : []),
     '--path',
     context.project.smokeRoot,
     '--db',
@@ -77,6 +79,8 @@ function scaffoldInitCommand(context: RunContext): readonly string[] {
     '--no-git',
     '--force',
   );
+  // Contributor init has no agent installer, so its original argv is already host-independent.
+  return command;
 }
 
 function isJsrCompatibleCliEntrypoint(cliEntrypoint: string): boolean {
