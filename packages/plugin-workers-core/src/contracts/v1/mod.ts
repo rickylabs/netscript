@@ -36,6 +36,7 @@ export type {
   TaskTriggerOutput,
   WorkersCapabilities,
   WorkersContract,
+  WorkersContractImplementer,
   WorkersContractRoute,
   WorkersContractRouteName,
   WorkersContractRouteSchemas,

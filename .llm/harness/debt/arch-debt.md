@@ -2417,6 +2417,17 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   re-exported and no signatures are erased. Consumer controls are in
   `plugins/workers/tests/public/contract-graph_test.ts`.
 
+- **0.0.8 named implementer annotation (#2313):** The context-bindable value now names the owned
+  `WorkersContractV1` contract, backed by the additive `WorkersContractImplementer<TContext>` alias.
+  Bidirectional upstream compatibility and consumer rejection controls preserve all 22 routes and
+  the middleware, router, lazy-router, configuration, and context-binding capabilities. Full-export
+  lint remains at two findings: the private `WorkersContractDefinition` and oRPC `implement` now
+  referenced by the named implementer alias. Merely publishing the definition exposes its private
+  route/schema graph; substituting oRPC's `Implementer` annotation also retains a private reference.
+  Neither diagnostic is suppressed, and no zero-diagnostic acceptance is claimed. This row and
+  `workers-doc-baseline-2066` remain open with their existing closing gates. Evidence is kept in the
+  run record and PR #2313.
+
 ## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
 
 - **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
