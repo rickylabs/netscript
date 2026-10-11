@@ -136,9 +136,11 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         JSON.stringify(entrypoint)
       }]);`,
     );
-    if (isSagasBackgroundResource(name, entrypoint)) {
+    // KV-backed Deno children share the child /health transport. Capability
+    // metadata survives renaming and does not depend on telemetry or plugin kind.
+    if (entry.Runtime === 'deno' && entry.RequiresKv) {
       lines.push(``);
-      lines.push(`    // Saga supervisor health endpoint and real Aspire probe.`);
+      lines.push(`    // Shared background child health endpoint and Aspire probe.`);
       lines.push(`    await ${id}.withHttpEndpoint({ env: 'PORT' });`);
       lines.push(
         `    await ${id}.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
@@ -295,8 +297,4 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
 
 function isTriggersBackgroundResource(name: string, entrypoint: string): boolean {
   return name === 'triggers' || entrypoint === 'triggers/runtime.ts';
-}
-
-function isSagasBackgroundResource(name: string, entrypoint: string): boolean {
-  return name === 'sagas' || entrypoint === 'sagas/runtime.ts';
 }
