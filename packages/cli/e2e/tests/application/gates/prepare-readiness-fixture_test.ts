@@ -290,7 +290,7 @@ export async function withCacheReference(
     );
 
     const output = await checkGeneratedFiles({
-      args: ['check', '--no-config', '--no-lock', '--unstable-kv', `${helpers}/register-apps.mts`],
+      args: ['check', '--no-config', '--frozen', '--unstable-kv', `${helpers}/register-apps.mts`],
     });
     assertEquals(
       output.code,
