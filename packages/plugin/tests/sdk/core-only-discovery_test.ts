@@ -3,12 +3,12 @@ import { defineStreamSchema } from '../../../plugin-streams-core/mod.ts';
 import { z } from 'zod';
 import { AstExtractor, RegistryEmitter } from '../../src/sdk/mod.ts';
 
-Deno.test('core-only saga discovery uses metadata owned by the factory without a saga service', async () => {
-  const declaration = await Deno.readTextFile(
-    new URL('../../../plugin-sagas-core/src/builders/define-saga.ts', import.meta.url),
-  );
+Deno.test('core-only saga discovery uses a walked host declaration without a saga service', async () => {
+  const declaration = `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+    { callee: 'defineSaga', axis: 'sagas' },
+  ] as const;`;
   const contributions = await new AstExtractor().extract([
-    { path: 'packages/plugin-sagas-core/define-saga.ts', text: declaration },
+    { path: 'discovery.ts', text: declaration },
     {
       path: 'app/onboarding.ts',
       text: `import { defineSaga } from '@netscript/plugin-sagas-core';
@@ -24,7 +24,7 @@ export const onboarding = defineSaga('onboarding').state({ status: 'pending' })
   assertStringIncludes(emissions[0].text, 'String(sagas0.id)');
 });
 
-Deno.test('stream schema map discovery is explicitly excluded by its factory metadata', async () => {
+Deno.test('stream schema map discovery is explicitly excluded by a walked host declaration', async () => {
   const schema = defineStreamSchema({
     invoice: {
       schema: z.object({ invoiceId: z.string() }),
@@ -34,11 +34,11 @@ Deno.test('stream schema map discovery is explicitly excluded by its factory met
   });
   assertEquals(Object.keys(schema), ['invoice']);
   assertEquals('id' in schema, false);
-  const declaration = await Deno.readTextFile(
-    new URL('../../../plugin-streams-core/src/builders/define-stream-schema.ts', import.meta.url),
-  );
+  const declaration = `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+    { callee: 'defineStreamSchema', axis: null },
+  ] as const;`;
   const contributions = await new AstExtractor().extract([
-    { path: 'packages/plugin-streams-core/define-stream-schema.ts', text: declaration },
+    { path: 'discovery.ts', text: declaration },
     {
       path: 'app/schemas.ts',
       text: `import { defineStreamSchema } from '@netscript/plugin-streams-core';
@@ -70,14 +70,14 @@ export const schema = defineStreamSchema({});`,
   assertEquals(contributions, [{ file: 'app/definitions.ts', symbol: 'saga', axis: 'sagas' }]);
 });
 
-Deno.test('metadata repeated by core source and control module is idempotent', async () => {
+Deno.test('metadata repeated by host and control modules is idempotent', async () => {
   const declaration = `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
   { callee: 'defineSaga', axis: 'sagas' },
   { callee: 'defineStreamSchema', axis: null },
 ] as const;`;
   assertEquals(
     await new AstExtractor().extract([
-      { path: 'core.ts', text: declaration },
+      { path: 'discovery.ts', text: declaration },
       { path: 'plugin.ts', text: declaration },
     ]),
     [],

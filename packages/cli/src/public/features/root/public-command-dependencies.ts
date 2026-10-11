@@ -1,3 +1,5 @@
+import { DenoProjectStage } from '../../../kernel/adapters/runtime/file-system/deno-project-stage.ts';
+import type { ProjectStagePort } from '../../../kernel/ports/project-stage-port.ts';
 import type { GenerateRoutesCommandDependencies } from '../generate/routes/generate-routes-command.ts';
 import type { InitCommandDependencies } from '../init/init-command.ts';
 import { initAgent } from '../agent/init/init-agent.ts';
@@ -93,6 +95,8 @@ import type {
 
 /** Dependencies shared by public command groups. */
 export interface PublicCommandDependencies {
+  /** Isolated project staging for validated plugin updates. */
+  readonly projectStage: ProjectStagePort;
   /** Filesystem adapter used by scaffold and config flows. */
   readonly fs: DenoFileSystem;
   /** Process adapter used by init and deployment flows. */
@@ -428,6 +432,7 @@ export function createPublicCommandDependencies(
         };
       },
     },
+    projectStage: new DenoProjectStage(),
     generatePluginRegistriesCommandDependencies: {
       resolveProjectRoot,
       walker: new FilesystemWalker(),

@@ -210,16 +210,16 @@ const registries = await startWalker('.', options);
 ```
 
 Official plugins emit the same declaration during install or sync; the generic SDK contains no
-plugin-specific factory table. Core factory sources also carry their own metadata when those sources
-are included in the walk. Additional mappings are snapshotted per extractor instance. Malformed
-identifiers, blank axes, conflicting declarations for a callee, and a recognizable contribution
-factory call without a matching declaration throw a `TypeError` instead of silently omitting
-contributions.
+plugin-specific factory table. Published core dependencies are not walked. Additional mappings are
+snapshotted per extractor instance. Malformed identifiers, blank axes, conflicting declarations for
+a callee, and a recognizable contribution factory call without a matching declaration throw a
+`TypeError` instead of silently omitting contributions.
 
 This changes the migration boundary for projects scaffolded before `0.0.7`: re-run plugin sync or
-update (after adding the host declarations below) so each plugin's control-plane module receives its
-declaration before using no-argument discovery. Passing `additionalBuilders` is the explicit
-compatibility path when regeneration is not available.
+update so each installed plugin's control-plane module receives its declaration before using
+no-argument discovery. Updates validate the staged, regenerated modules, so older workers and
+triggers installations can acquire their missing declarations during the update itself. Passing
+`additionalBuilders` is the explicit compatibility path when regeneration is not available.
 
 ### Core-only hosts and schema maps
 
@@ -240,15 +240,20 @@ returns a collection schema map consumed by the durable stream producer; it has 
 `axis: null` explicitly declares a non-registry factory: discovery validates its declaration and
 excludes its values before the id-based registry emitter. Do not invent a schema axis or an id. The
 streams control-plane module now emits this exclusion during installation. Identical metadata from a
-host, a copied core source, and a control module is accepted; conflicting axes still fail. Tooling
-can also pass either declaration through `additionalBuilders`.
+host and a control module is accepted; conflicting axes still fail. Tooling can also pass either
+declaration through `additionalBuilders`.
 
-Before updating an older installation, add any missing declarations to a walked host module,
-including the schema exclusion if its streams control module predates this metadata. `plugin update`
-validates the walk and resolves all registry emissions **before** running installation or writing
-project files. An undeclared factory, malformed declaration, or extraction/emission failure leaves
-existing files byte-identical and creates no installation files. This guarantee covers discovery
-failures; installation and filesystem failures retain their own error behavior.
+A core-only saga host still supplies its own saga declaration above. Installed plugins receive their
+metadata from the update; a canary.4 streams installation acquires the schema exclusion
+automatically. `plugin update` runs installation in an isolated copy of the project, then walks that
+updated tree and resolves every registry emission before applying changes to the live project. New
+declarations and contribution files participate in the same walk. An undeclared factory, malformed
+declaration, or extraction/emission failure leaves existing files byte-identical and creates no
+installation files in the live project. The temporary tree is removed on success or failure. This
+guarantee covers discovery failures; applying files retains normal filesystem error behavior.
+
+SDK compatibility: `ContributionBuilderPattern.axis` is now `string | null`; tooling reading this
+property must narrow `axis !== null` before using it as a string.
 
 ## Docs
 

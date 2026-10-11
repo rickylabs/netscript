@@ -2,6 +2,7 @@ import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { walk } from '@std/fs';
 import { fromFileUrl, join } from '@std/path';
 import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
+import { DenoProjectStage } from '../../../../kernel/adapters/runtime/file-system/deno-project-stage.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
@@ -36,7 +37,11 @@ export const definition = ${factory}({});`,
         `Contribution factory "${factory}" has no declared axis`,
       );
       assertEquals(await snapshot(fixture.root), before);
-      assertEquals(fixture.scaffoldCalls(), 0);
+      assertEquals(fixture.scaffoldCalls(), 1);
+      assertEquals(fixture.scaffoldRoots.every((path) => path !== fixture.root), true);
+      for (const path of fixture.scaffoldRoots) {
+        await assertRejects(() => Deno.stat(path), Deno.errors.NotFound);
+      }
     } finally {
       await Deno.remove(fixture.root, { recursive: true });
     }
@@ -51,7 +56,7 @@ Deno.test('plugin update validates emitter failure before any installation write
     const before = await snapshot(fixture.root);
     await assertRejects(() => fixture.command.parse(['streams']), Error, 'invalid registry');
     assertEquals(await snapshot(fixture.root), before);
-    assertEquals(fixture.scaffoldCalls(), 0);
+    assertEquals(fixture.scaffoldCalls(), 1);
   } finally {
     await Deno.remove(fixture.root, { recursive: true });
   }
@@ -92,6 +97,95 @@ export const schema = defineStreamSchema({});`,
   }
 });
 
+for (
+  const { kind, factory, axis, importPath } of [
+    {
+      kind: 'streams',
+      factory: 'defineStreamSchema',
+      axis: null,
+      importPath: '@netscript/plugin-streams-core',
+    },
+    {
+      kind: 'workers',
+      factory: 'defineJob',
+      axis: 'jobs',
+      importPath: '@netscript/plugin-workers-core',
+    },
+  ]
+) {
+  Deno.test(`plugin update ${kind} repairs a legacy control module before discovering ${factory}`, async () => {
+    const declaration = `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+      { callee: '${factory}', axis: ${JSON.stringify(axis)} },
+    ] as const;`;
+    const fixture = await createFixture(new RegistryEmitter(), kind, {
+      [`${kind}/plugin.ts`]: declaration,
+    });
+    try {
+      await Deno.writeTextFile(
+        join(fixture.root, 'authored.ts'),
+        `import { ${factory} } from '${importPath}';
+export const definition = ${factory}({});`,
+      );
+      await fixture.command.parse([kind]);
+      assertEquals(fixture.scaffoldCalls(), 1);
+      assertEquals(fixture.scaffoldRoots.every((path) => path !== fixture.root), true);
+      for (const path of fixture.scaffoldRoots) {
+        await assertRejects(() => Deno.stat(path), Deno.errors.NotFound);
+      }
+      assertEquals(await Deno.readTextFile(join(fixture.root, `${kind}/plugin.ts`)), declaration);
+      assertEquals(
+        await Deno.stat(join(fixture.root, '.netscript/generated/existing.registry.ts')).then(
+          (info) => info.isFile,
+        ),
+        true,
+      );
+      if (axis !== null) {
+        assertStringIncludes(
+          await Deno.readTextFile(join(fixture.root, `.netscript/generated/${axis}.registry.ts`)),
+          'authored.ts',
+        );
+      } else {
+        assertEquals(
+          (await snapshot(fixture.root)).filter(([path]) => path.endsWith('.registry.ts')).length,
+          1,
+        );
+      }
+    } finally {
+      await Deno.remove(fixture.root, { recursive: true });
+    }
+  });
+}
+
+Deno.test('plugin update discovers changed declarations and contributions created by the scaffold', async () => {
+  const fixture = await createFixture(new RegistryEmitter(), 'streams', {
+    'streams/plugin.ts': `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+      { callee: 'defineExample', axis: 'newItems' },
+    ] as const;`,
+    'streams/new.ts': `import { defineExample } from '@acme/plugin-example-core';
+export const added = defineExample({ id: 'new' });`,
+  });
+  try {
+    await Deno.writeTextFile(
+      join(fixture.root, 'streams/plugin.ts'),
+      `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [{ callee: 'defineExample', axis: 'oldItems' }] as const;`,
+    );
+    await fixture.command.parse(['streams']);
+    assertStringIncludes(
+      await Deno.readTextFile(join(fixture.root, '.netscript/generated/newitems.registry.ts')),
+      'newitems0.id',
+    );
+    assertEquals(
+      await new DenoFileSystem().exists(
+        join(fixture.root, '.netscript/generated/olditems.registry.ts'),
+      ),
+      false,
+    );
+    assertEquals(fixture.scaffoldCalls(), 1);
+  } finally {
+    await Deno.remove(fixture.root, { recursive: true });
+  }
+});
+
 async function snapshot(root: string): Promise<readonly (readonly [string, number[]])[]> {
   const files: Array<readonly [string, number[]]> = [];
   for await (const entry of walk(root, { includeDirs: false })) {
@@ -100,16 +194,38 @@ async function snapshot(root: string): Promise<readonly (readonly [string, numbe
   return files.sort(([left], [right]) => left.localeCompare(right));
 }
 
-async function createFixture(emitter: EmitterPort = new RegistryEmitter()) {
+async function createFixture(
+  emitter: EmitterPort = new RegistryEmitter(),
+  kind = 'streams',
+  updatedFiles: Readonly<Record<string, string>> = {
+    'streams/plugin.ts': '// updated control module\n',
+  },
+) {
   const root = await Deno.makeTempDir();
   const fs = new DenoFileSystem();
   const registry = new PluginKindRegistry();
-  const pluginPath = fromFileUrl(new URL('../../../../../../../plugins/streams', import.meta.url));
+  const pluginPath = fromFileUrl(new URL(`../../../../../../../plugins/${kind}`, import.meta.url));
   const resolved = await resolveLocalPluginDescriptor(pluginPath, registry, fs);
+  const schemaBytes = kind === 'workers'
+    ? await Deno.readFile(join(pluginPath, 'database/workers.prisma'))
+    : new Uint8Array();
+  const digest = await crypto.subtle.digest('SHA-256', schemaBytes);
+  const checksum = 'sha256-' +
+    Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+  const descriptor = kind === 'workers'
+    ? {
+      ...resolved.descriptor,
+      versionMetadata: {
+        ...resolved.descriptor.versionMetadata,
+        files: { '/database/workers.prisma': checksum },
+      },
+    }
+    : resolved.descriptor;
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
   const messages: string[] = [];
   let scaffoldCalls = 0;
+  const scaffoldRoots: string[] = [];
   await fs.writeFile(
     join(root, 'appsettings.json'),
     JSON.stringify({
@@ -126,12 +242,13 @@ async function createFixture(emitter: EmitterPort = new RegistryEmitter()) {
     join(root, 'netscript.config.ts'),
     "export default { name: 'fixture-app', databases: { config: [] }, plugins: [] };\n",
   );
-  await fs.writeFile(join(root, 'streams/plugin.ts'), '// previously installed control module\n');
+  await fs.writeFile(join(root, `${kind}/plugin.ts`), '// previously installed control module\n');
   await fs.writeFile(
     join(root, '.netscript/generated/existing.registry.ts'),
     '// existing bytes\r\n',
   );
   const command = createUpdatePluginCommand({
+    projectStage: new DenoProjectStage(),
     resolveProjectRoot: () => Promise.resolve(root),
     print: (message) => messages.push(message),
     installPluginDependencies: {
@@ -143,20 +260,27 @@ async function createFixture(emitter: EmitterPort = new RegistryEmitter()) {
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
       pluginValidator: {
-        validate: () => Promise.resolve({ ok: true, descriptor: resolved.descriptor }),
+        validate: () => Promise.resolve({ ok: true, descriptor }),
       },
+      packageFileFetcher: { fetchFile: () => Promise.resolve(schemaBytes) },
       processRunner: {
-        exec: async (_command, args) => {
+        exec: async (_command, args, options) => {
           if (args.some((arg) => arg.endsWith('/scaffold'))) {
             scaffoldCalls += 1;
-            await fs.writeFile(join(root, 'streams/plugin.ts'), '// updated control module\n');
+            const contextArg = args[args.indexOf('--context-json') + 1];
+            const context: { workspaceRoot: string } = JSON.parse(contextArg);
+            assertEquals(context.workspaceRoot, options?.cwd);
+            scaffoldRoots.push(context.workspaceRoot);
+            for (const [path, text] of Object.entries(updatedFiles)) {
+              await fs.writeFile(join(context.workspaceRoot, path), text);
+            }
           }
           return {
             code: 0,
             stdout: JSON.stringify({
               status: 'applied',
               createdFiles: [],
-              modifiedFiles: ['streams/plugin.ts'],
+              modifiedFiles: Object.keys(updatedFiles),
               databaseMigrationsAdded: false,
             }),
             stderr: '',
@@ -178,7 +302,8 @@ async function createFixture(emitter: EmitterPort = new RegistryEmitter()) {
     root,
     command,
     scaffoldCalls: () => scaffoldCalls,
+    scaffoldRoots,
     messages: () => messages,
-    completionMessage: `Updated streams to ${resolved.descriptor.version}; generated 1 registries.`,
+    completionMessage: `Updated ${kind} to ${resolved.descriptor.version}; generated 1 registries.`,
   };
 }

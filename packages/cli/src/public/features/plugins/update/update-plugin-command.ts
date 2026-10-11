@@ -6,11 +6,13 @@ import { type ProjectRootResolver, requireProjectRoot } from '../../../presentat
 import { installPlugin, type InstallPluginDependencies } from '../install/install-plugin.ts';
 import { resolveWalkerEmissions } from '../host/trigger-walker.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../../generate/plugins/generate-plugin-registries-command.ts';
+import type { ProjectStagePort } from '../../../../kernel/ports/project-stage-port.ts';
 
 export interface UpdatePluginCommandDependencies {
   readonly resolveProjectRoot: ProjectRootResolver;
   readonly installPluginDependencies: InstallPluginDependencies;
   readonly registryDependencies: GeneratePluginRegistriesCommandDependencies;
+  readonly projectStage: ProjectStagePort;
   readonly print?: (message: string) => void;
 }
 
@@ -34,33 +36,39 @@ export function createUpdatePluginCommand(
         options.projectRoot,
       );
       const generator = dependencies.registryDependencies;
-      const emissions = await resolveWalkerEmissions({
-        projectRoot,
-        walker: generator.walker,
-        extractor: generator.extractor,
-        emitter: generator.emitter,
-      });
-      const result = await installPlugin({
-        kind: name,
-        pluginName: name,
-        serviceReferences: [],
-        pluginReferences: [],
-        noDb: false,
-        includeSamples: false,
-        skipConfirmation: true,
-        ci: true,
-        projectRoot,
-        overwrite: true,
-      }, dependencies.installPluginDependencies);
-      for (const emission of emissions) {
-        await generator.fs.writeFile(
-          join(projectRoot, emission.path),
-          emission.text,
+      const stage = await dependencies.projectStage.stage(projectRoot);
+      try {
+        const result = await installPlugin({
+          kind: name,
+          pluginName: name,
+          serviceReferences: [],
+          pluginReferences: [],
+          noDb: false,
+          includeSamples: false,
+          skipConfirmation: true,
+          ci: true,
+          projectRoot: stage.root,
+          overwrite: true,
+        }, dependencies.installPluginDependencies);
+        const emissions = await resolveWalkerEmissions({
+          projectRoot: stage.root,
+          walker: generator.walker,
+          extractor: generator.extractor,
+          emitter: generator.emitter,
+        });
+        for (const emission of emissions) {
+          await generator.fs.writeFile(
+            join(stage.root, emission.path),
+            emission.text,
+          );
+        }
+        await stage.commit();
+        const version = result.resolvedPlugin?.version ?? 'local';
+        print(
+          `Updated ${name} to ${version}; generated ${emissions.length} registries.`,
         );
+      } finally {
+        await stage.dispose();
       }
-      const version = result.resolvedPlugin?.version ?? 'local';
-      print(
-        `Updated ${name} to ${version}; generated ${emissions.length} registries.`,
-      );
     });
 }
