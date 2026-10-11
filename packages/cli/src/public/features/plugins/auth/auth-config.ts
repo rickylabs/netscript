@@ -119,7 +119,7 @@ function providerEnv(
   if (preset === 'workos') {
     return {
       NETSCRIPT_AUTH_BACKEND: 'workos',
-      NETSCRIPT_AUTH_COOKIE_NAME: '__Host-ns_session',
+      NETSCRIPT_AUTH_COOKIE_NAME: 'wos-session',
       WORKOS_API_KEY: required('--api-key', input.apiKey),
       WORKOS_CLIENT_ID: required('--client-id', input.clientId),
       WORKOS_COOKIE_PASSWORD: required('--cookie-password', input.cookiePassword),

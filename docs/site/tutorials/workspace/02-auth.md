@@ -108,7 +108,7 @@ that drives an interactive sign-in.
 caption: "Auth backends — capability matrix (NETSCRIPT_AUTH_BACKEND)",
 rows: [
 { name: "kv-oauth", type: "interactive (default)", desc: "Full OAuth/OIDC redirect flow. Real signin + callback, KV-backed sessions with refresh-on-read, signout. The only backend that implements InteractiveFlowPort. Package @netscript/auth-kv-oauth." },
-{ name: "workos", type: "non-interactive", desc: "WorkOS AuthKit sealed cookie under NETSCRIPT_AUTH_COOKIE_NAME (default __Host-ns_session). Subject-wide logout uses a durable KV fence and background upstream cleanup. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-workos." },
+{ name: "workos", type: "non-interactive", desc: "WorkOS AuthKit sealed cookie under NETSCRIPT_AUTH_COOKIE_NAME (default __Host-ns_session). The CLI WorkOS preset explicitly selects wos-session to match AuthKit. Subject-wide logout uses a durable KV fence and background upstream cleanup. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-workos." },
 { name: "better-auth", type: "non-interactive", desc: "better-auth over Prisma. Validates an existing session; signin/callback return AUTH_PROVIDER_ERROR. Package @netscript/auth-better-auth." }
 ]
 }) }}

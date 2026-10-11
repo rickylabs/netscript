@@ -105,8 +105,8 @@ No existing option is removed. Standalone callers that enable subject-wide logou
 durable store and its worker, then share the store with every authenticator; leaving a standalone
 bearer authenticator unconfigured would bypass the local fence. The official plugin requires an
 atomic host KV store for WorkOS and now reads its configured session-cookie name consistently. Set `NETSCRIPT_AUTH_COOKIE_NAME=wos-session` to retain an existing AuthKit cookie, or configure your
-AuthKit issuer to write the plugin default `__Host-ns_session`. The CLI WorkOS preset now sets that
-same name explicitly. Configure the maximum token lifetime to match your WorkOS application.
+AuthKit issuer to write the plugin default `__Host-ns_session`. The CLI WorkOS preset explicitly sets `wos-session` to match AuthKit's
+existing SDK default; direct plugin installations keep the `__Host-ns_session` default. Configure the maximum token lifetime to match your WorkOS application.
 `WorkosRevocationStore` implementations expose `clockSkewMs` and implement `confirmSessionRevoked` for retention after
 upstream success; the terminal `fail` operation is removed. Refresh identity changes return
 `workos_session_identity_changed`; a concurrent subject fence still returns `workos_subject_revoked`.

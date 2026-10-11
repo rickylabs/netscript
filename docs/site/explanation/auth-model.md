@@ -118,7 +118,7 @@ better-auth are **non-interactive by design**.
 caption: "The three backends and where they diverge",
 rows: [
 { name: "@netscript/auth-kv-oauth", type: "interactive", desc: "Drives its own OAuth/OIDC redirect flow. Full `interactive` port (`signIn`/`handleCallback`/`signOut`), KV-backed sessions with real create/refresh/revoke, refresh-on-read, default cookie `__Host-ns_session`. The default backend. Provider presets: github, google, gitlab, discord, slack, spotify, facebook, twitter, plus tenant-based auth0, okta, awsCognito, azureAd, logto, clerk." },
-{ name: "@netscript/auth-workos", type: "non-interactive", desc: "Delegates sign-in to WorkOS AuthKit's hosted flow; verifies a sealed cookie under `NETSCRIPT_AUTH_COOKIE_NAME` (plugin default `__Host-ns_session`). NO `interactive` port. Subject-wide revocation uses a durable KV fence and service-owned WorkOS cleanup worker; session creation, explicit refresh, and revocation by opaque id remain unsupported." },
+{ name: "@netscript/auth-workos", type: "non-interactive", desc: "Delegates sign-in to WorkOS AuthKit's hosted flow; verifies a sealed cookie under `NETSCRIPT_AUTH_COOKIE_NAME` (direct plugin default `__Host-ns_session`, CLI WorkOS preset `wos-session`). NO `interactive` port. Subject-wide revocation uses a durable KV fence and service-owned WorkOS cleanup worker; session creation, explicit refresh, and revocation by opaque id remain unsupported." },
 { name: "@netscript/auth-better-auth", type: "non-interactive", desc: "Wraps a better-auth instance over Prisma; verifies its session. NO `interactive` port. Session creation and explicit refresh remain unsupported; session and subject revocation delegate to better-auth." }
 ]
 }) }}

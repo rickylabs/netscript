@@ -77,7 +77,8 @@ that same margin, conservatively ending sessions within it while preserving late
 ### Migration in 0.0.8
 
 The plugin requires atomic host KV for WorkOS. It reads `NETSCRIPT_AUTH_COOKIE_NAME`, defaulting to
-`__Host-ns_session`; the CLI WorkOS preset sets that name explicitly. Configure your AuthKit issuer
+`__Host-ns_session`. The CLI WorkOS preset explicitly sets `wos-session` to match AuthKit's SDK
+default. Configure your AuthKit issuer
 with the same name, or set `NETSCRIPT_AUTH_COOKIE_NAME=wos-session` for an existing cookie.
 Standalone callers must share the store across all authenticators and run the cleanup worker.
 Custom stores expose `clockSkewMs` and implement `confirmSessionRevoked` after upstream success; terminal `fail` is removed.
