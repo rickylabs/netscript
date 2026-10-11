@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals } from '@std/assert';
 import { join, resolve } from '@std/path';
 import { useLocalWorkspaceImports } from '../../../../packages/cli/tests/support/local-workspace-imports.ts';
@@ -83,12 +84,14 @@ Deno.test({
 });
 
 async function run(cwd: string, args: readonly string[]): Promise<void> {
-  const output = await new Deno.Command(Deno.execPath(), {
-    args: [...args],
-    cwd,
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
+  const output = args[0] === 'check'
+    ? await checkGeneratedFiles({ args, cwd })
+    : await new Deno.Command(Deno.execPath(), {
+      args: [...args],
+      cwd,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
   if (output.success) return;
   const decoder = new TextDecoder();
   throw new Error(
