@@ -10,9 +10,9 @@ databases, plugins, Fresh UI, deployment — with verbs that regenerate the deri
 Most scaffolds hand you a starting point and walk away; from then on, every added service or plugin
 means hand-editing orchestration files. The `netscript` binary works the other way around. `init`
 lays down a complete, running backend workspace — contracts, an example oRPC service, a
-Prisma-backed database, the Fresh app, and the Aspire orchestration host — and every later verb
-that changes the workspace's shape regenerates what is derived from it: the AppHost helpers, the
-plugin registries, the contract version aggregates. You never hand-maintain the wiring.
+Prisma-backed database, the Fresh app, and the Aspire orchestration host — and every later verb that
+changes the workspace's shape regenerates what is derived from it: the AppHost helpers, the plugin
+registries, the contract version aggregates. You never hand-maintain the wiring.
 
 The same command tree is also a library: mount the full public surface inside your own binary while
 NetScript owns the verbs and you own the process boundary.
@@ -34,8 +34,8 @@ NetScript owns the verbs and you own the process boundary.
   subprocesses.
 - **Agent tooling in one command** — `netscript agent init` installs the MCP server configuration
   and the matching skills into Claude Code and VS Code.
-- **Native desktop packaging** — `deploy desktop package` builds Deno Desktop installers per OS,
-  and `deploy desktop release prepare`/`serve` sign and host native update manifests and patches.
+- **Native desktop packaging** — `deploy desktop package` builds Deno Desktop installers per OS, and
+  `deploy desktop release prepare`/`serve` sign and host native update manifests and patches.
 
 ## Architecture
 
@@ -61,8 +61,8 @@ Or as a library, for the embeddable command tree:
 deno add jsr:@netscript/cli@<version>
 ```
 
-Pin `<version>` to the release you want to install; bare `jsr:@netscript/*` specifiers do not resolve on
-the pre-release line.
+Pin `<version>` to the release you want to install; bare `jsr:@netscript/*` specifiers do not
+resolve on the pre-release line.
 
 ## Quick example
 
@@ -93,29 +93,29 @@ $ netscript init my-app --db postgres --service --yes --dry-run
 
 ## Command map
 
-| Group         | What it owns                                                                                                                            |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `init`        | Scaffold a new workspace (`--db`, `--service`, `--no-aspire`, `--dry-run`).                                                             |
-| `contract`    | `add`, `add-route`, `version`, `inspect`, `list`, `remove` — the typed oRPC contract surface.                                           |
-| `service`     | `add`, `add-handler`, `ref`, `set`, `list`, `remove`, `generate` — service workspaces and their orchestration registration.             |
-| `db`          | `add`, `init`, `migrate`, `generate`, `seed`, `status`, `studio`, `introspect`, `reset`, `deploy` — Prisma lifecycle.                   |
-| `plugin`      | `new`, `scaffold`, `install`, `remove`, `sync`, `update`, `doctor`, `list`, `info`, `ai`, `auth` — first- and third-party plugins.      |
-| `ui:*`        | `ui:init`, `ui:add`, `ui:list`, `ui:update`, `ui:remove` — the Fresh UI registry (pages, islands, collections).                         |
-| `generate`    | `aspire`, `plugins`, `runtime-schemas` — regenerate derived artifacts on demand.                                                        |
-| `config`      | `inspect`, `get`, `set`, `override`, `runtime` — resolved configuration and runtime overrides.                                          |
-| `agent`       | `init`, `mcp` — install and run the agent tooling.                                                                                      |
-| `deploy`      | Bare-metal, Deno Deploy, Kubernetes, Azure, Cloud Run, and native desktop targets (see below).                                          |
-| `marketplace` | `search`, `publish` — plugin discovery and distribution.                                                                                |
+| Group         | What it owns                                                                                                                       |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `init`        | Scaffold a new workspace (`--db`, `--service`, `--no-aspire`, `--dry-run`).                                                        |
+| `contract`    | `add`, `add-route`, `version`, `inspect`, `list`, `remove` — the typed oRPC contract surface.                                      |
+| `service`     | `add`, `add-handler`, `ref`, `set`, `list`, `remove`, `generate` — service workspaces and their orchestration registration.        |
+| `db`          | `add`, `init`, `migrate`, `generate`, `seed`, `status`, `studio`, `introspect`, `reset`, `deploy` — Prisma lifecycle.              |
+| `plugin`      | `new`, `scaffold`, `install`, `remove`, `sync`, `update`, `doctor`, `list`, `info`, `ai`, `auth` — first- and third-party plugins. |
+| `ui:*`        | `ui:init`, `ui:add`, `ui:list`, `ui:update`, `ui:remove` — the Fresh UI registry (pages, islands, collections).                    |
+| `generate`    | `aspire`, `plugins`, `runtime-schemas` — regenerate derived artifacts on demand.                                                   |
+| `config`      | `inspect`, `get`, `set`, `override`, `runtime` — resolved configuration and runtime overrides.                                     |
+| `agent`       | `init`, `mcp` — install and run the agent tooling.                                                                                 |
+| `deploy`      | Bare-metal, Deno Deploy, Kubernetes, Azure, Cloud Run, and native desktop targets (see below).                                     |
+| `marketplace` | `search`, `publish` — plugin discovery and distribution.                                                                           |
 
-`netscript <group> --help` prints the live tree for any group; it is generated from the same
-command definitions this package exports, so it never drifts from the binary you installed.
+`netscript <group> --help` prints the live tree for any group; it is generated from the same command
+definitions this package exports, so it never drifts from the binary you installed.
 
 ### Regenerate service clients
 
 `netscript service generate` reconciles every manifest service into the generator-owned module
 `apps/<app>/lib/<service>.ts` and regenerates Aspire helpers in the same command. Client modules use
-the query-factory L1/L2 dialect: factory keys are service-scoped and the generated list
-invalidation filter comes from `<service>Queries.list.clientKey()`.
+the query-factory L1/L2 dialect: factory keys are service-scoped and the generated list invalidation
+filter comes from `<service>Queries.list.clientKey()`.
 
 The command validates every manifest entry before writing anything. Each service must have
 `contracts/versions/v1/<service>.contract.ts` exporting `<PascalService>ContractV1`; otherwise the
@@ -123,8 +123,8 @@ error names the service and expected path/export, and neither client modules nor
 written. Disabled entries (`Enabled: false`) still receive owned client modules so generation is a
 deterministic projection of the whole manifest.
 
-Generated modules are reconciled rather than treated as user-owned: missing or differing content
-is written without `--force`, identical content is skipped, and `--force` rewrites even identical
+Generated modules are reconciled rather than treated as user-owned: missing or differing content is
+written without `--force`, identical content is skipped, and `--force` rewrites even identical
 outputs. `--dry-run` reports the complete client-and-Aspire plan without writes. Both flags govern
 the whole command, including Aspire helpers.
 
@@ -144,8 +144,8 @@ not regenerate keep their existing generated code unchanged.
 installs. Relative, absolute, and `file:` plugin specifiers opt into a local-workdir contract;
 package and import-map specifiers use their published manifest and do not require a copied
 `plugins/<name>` directory. If both a package specifier and an incidental directory exist, the
-configured package wins. Configure an explicit filesystem specifier when local-workdir behaviour
-is intended.
+configured package wins. Configure an explicit filesystem specifier when local-workdir behaviour is
+intended.
 
 Published manifest permissions feed the generated runtime configuration. An explicit appsettings
 permission list still wins, followed by contribution-specific permissions, plugin-wide manifest
@@ -164,17 +164,16 @@ netscript agent init --with-docs
 ```
 
 Claude Code receives `.mcp.json`, the NetScript skill bundle, and a marked section in `AGENTS.md`;
-VS Code receives `.vscode/mcp.json`, and Zed receives `context_servers` in
-`.zed/settings.json`. Apply or re-apply editor setup to any existing project with
-`--editor none|zed|vscode`; when omitted, a single existing `.zed` or `.vscode` directory selects
-the target. Unsupported editors fail with the supported list and may use `--editor none` plus a
-manual MCP configuration. Agent hosts remain selectable with `--host claude|vscode|all`. The
-installed server entry runs `netscript agent mcp`
-([`@netscript/mcp`](https://jsr.io/@netscript/mcp)); its data boundary covers telemetry, project
-metadata, generated registries, and public docs — never project source, environment values,
-credentials, or secrets. The generated Deno invocation disables consumer lock discovery for both
-the server and its diagnostic child processes, so starting or using MCP leaves the application's
-`deno.lock` byte-identical.
+VS Code receives `.vscode/mcp.json`, and Zed receives `context_servers` in `.zed/settings.json`.
+Apply or re-apply editor setup to any existing project with `--editor none|zed|vscode`; when
+omitted, a single existing `.zed` or `.vscode` directory selects the target. Unsupported editors
+fail with the supported list and may use `--editor none` plus a manual MCP configuration. Agent
+hosts remain selectable with `--host claude|vscode|all`. The installed server entry runs
+`netscript agent mcp` ([`@netscript/mcp`](https://jsr.io/@netscript/mcp)); its data boundary covers
+telemetry, project metadata, generated registries, and public docs — never project source,
+environment values, credentials, or secrets. The generated Deno invocation disables consumer lock
+discovery for both the server and its diagnostic child processes, so starting or using MCP leaves
+the application's `deno.lock` byte-identical.
 
 `--with-docs` is deliberately opt-in because it expands to several megabytes. It installs the
 release task router/prose and generates API text for every export subpath of the exact NetScript
@@ -186,17 +185,54 @@ package versions present in the project; a version mismatch aborts rather than w
 `plan` / `emit` / `up` / `down` / `status` / `logs` operations; a target never advertises a verb it
 cannot honour.
 
-| Target                                                      | Mechanism                                                                                                                        |
-| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| **bare metal**                                              | `deno compile` → single binary managed as an OS service: Servy on Windows, systemd on Linux.                                     |
-| `deno-deploy`                                               | `deno deploy [--prod]`, with a guard that refuses a `--prod` push when the project uses APIs Deno Deploy rejects.                |
-| `kubernetes`, `azure-aca`, `azure-app-service`, `azure-aks` | Validates the generated AppHost declares the matching hosting integration, then delegates to `aspire publish` / `deploy`.        |
-| `cloud-run`                                                 | Docker-image lane: `docker build` → `docker push` → `gcloud run deploy`.                                                          |
-| `desktop`                                                   | `package` builds native Deno Desktop installers; `release prepare`/`serve` sign and host native updates (see below).             |
+| Target                                                      | Mechanism                                                                                                                 |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **bare metal**                                              | `deno compile` → single binary managed as an OS service: Servy on Windows, systemd on Linux.                              |
+| `deno-deploy`                                               | `deno deploy [--prod]`, with a guard that refuses a `--prod` push when the project uses APIs Deno Deploy rejects.         |
+| `kubernetes`, `azure-aca`, `azure-app-service`, `azure-aks` | Validates the generated AppHost declares the matching hosting integration, then delegates to `aspire publish` / `deploy`. |
+| `cloud-run`                                                 | Docker-image lane: `docker build` → `docker push` → `gcloud run deploy`.                                                  |
+| `desktop`                                                   | `package` builds native Deno Desktop installers; `release prepare`/`serve` sign and host native updates (see below).      |
 
 Cloud authentication and RBAC stay operator-owned: NetScript mints no credentials and hand-authors
 no Helm, Bicep, or Kubernetes manifests. Compiled binaries are unsigned — signing is a deliberate
 manual hook between `deploy build` and `deploy install`.
+
+### Packaged installation service identity
+
+The existing Servy packaging lane provisions the internal service credential on the target:
+
+```sh
+netscript deploy build
+netscript deploy copy --install-dir <target-directory>
+netscript deploy install --install-dir <target-directory>
+netscript deploy start --install-dir <target-directory>
+```
+
+`deploy install` creates or validates `.data/aspire-secrets/installation.secret` under the target
+directory before registering services. It reuses the file on subsequent installs and preserves it
+when artifacts are copied again; `.data/` is never copied from the build host. Move the installation
+with its `.data/` directory and reinstall to relocate the service definitions without changing its
+identity. An invalid or unreadable existing secret aborts registration rather than replacing it.
+
+Services, plugin APIs, workers, sagas, and triggers receive `NETSCRIPT_INSTALLATION_SECRET_FILE`
+pointing to `../.data/aspire-secrets/installation.secret` from their `bin/` working directory.
+Compilation preserves declared permissions and adds only that read path and environment key. Apps
+receive no installation credential reference or additional credential permissions. Keep backend
+working directories at `bin/`; changing them also changes the meaning of the scoped read grant. The
+file contents stay out of service definitions, process arguments, and environment variables.
+
+The provisioning primitive requires owner-only mode `0700` for the directory and `0600` for the file
+on POSIX. On Windows the bootstrap replaces inherited and explicit DACL grants: the installing
+identity and SYSTEM receive full control, and configured service accounts receive read access.
+Installation must run as the credential owner. Native Windows ACL behavior and Servy startup still
+require separate platform qualification; the focused tests exercise the policy through the process
+port and execute a relocated native binary on the test host.
+
+Compose service authentication and SDK callers as described in the
+[internal procedure recipe](../../docs/site/services-sdk/how-to/call-internal-procedures.md). For
+rotation, stop all backends, replace only the secret file with fresh cryptographically random text
+(32–4096 bytes), preserve its restrictions, and restart every backend and its SDK clients. Workers
+use this installation identity independently of any browser, phone app, or user session.
 
 ### Native desktop packaging
 
@@ -267,9 +303,9 @@ netscript deploy desktop release serve \
 ```
 
 For `baseUrl: "https://releases.example.com/application"`, the native manifest resolves to
-`/application/<channel>/<os>-<arch>/latest.json`. Terminate public HTTPS at a trusted reverse
-proxy; the built-in listener is transport-neutral and intended for a protected origin. It serves
-only GET/HEAD allowlisted manifests, patches, and installers — private high-water files, dot paths,
+`/application/<channel>/<os>-<arch>/latest.json`. Terminate public HTTPS at a trusted reverse proxy;
+the built-in listener is transport-neutral and intended for a protected origin. It serves only
+GET/HEAD allowlisted manifests, patches, and installers — private high-water files, dot paths,
 traversal, encoded separators, and symlink escapes are never served.
 
 Windows native apply remains unsupported upstream, so applications handle the SDK seam's
@@ -309,11 +345,11 @@ A host binary embedding the deploy surface must grant:
 
 ## Library surface
 
-| Subpath         | What it gives you                                                                    |
-| --------------- | ------------------------------------------------------------------------------------- |
+| Subpath         | What it gives you                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------------- |
 | `.`             | `createPublicCli`, `runPublicCli`, `dispatchPluginVerb`, `createPluginHostLoader`, `scaffoldPluginPackage` |
-| `./scaffolding` | The `Scaffolder` template-rendering engine for plugin package scaffolds              |
-| `./testing`     | In-memory ports (`createInMemoryFileSystem`, `createInMemoryProcess`, …) + fixture builders |
+| `./scaffolding` | The `Scaffolder` template-rendering engine for plugin package scaffolds                                    |
+| `./testing`     | In-memory ports (`createInMemoryFileSystem`, `createInMemoryProcess`, …) + fixture builders                |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/cli@<version>`](https://jsr.io/@netscript/cli/doc).
@@ -335,9 +371,9 @@ The always-current symbol list is
 ## Compatibility
 
 Requires Deno 2.x; the binary is installed with `--allow-all` because scaffolding, database, and
-deployment verbs read and write the workspace, spawn tools (`prisma`, `aspire`, `docker`,
-`gcloud`), and probe local services. Generated workspaces additionally use the .NET SDK for the
-Aspire orchestration host.
+deployment verbs read and write the workspace, spawn tools (`prisma`, `aspire`, `docker`, `gcloud`),
+and probe local services. Generated workspaces additionally use the .NET SDK for the Aspire
+orchestration host.
 
 ## License
 

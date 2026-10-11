@@ -1,4 +1,4 @@
-import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
+import type { CliffyCommand } from '../../../kernel/presentation/command-types.ts';
 import { Command } from '@cliffy/command';
 
 import { buildWindowsDeployment } from './build/build-windows-strategy.ts';
@@ -17,6 +17,7 @@ import { createTargetDeployCommand } from './target/target-deploy-command.ts';
 import { createListDeployTargetsCommand } from './list/list-deploy-targets-command.ts';
 import { createDesktopDeployCommand } from './target/desktop/desktop-group.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
+import { PackagedDeploymentBootstrap } from '../../adapters/packaged-deployment-bootstrap.ts';
 
 /** Create the public deploy command group. */
 export function createDeployCommand(
@@ -67,6 +68,7 @@ export function createDeployCommand(
       'install',
       createDeployInstallCommand({
         installDeployDependencies: {
+          bootstrap: new PackagedDeploymentBootstrap(dependencies.process),
           manifests: dependencies.manifestPort,
           services: dependencies.osServices,
         },
@@ -90,9 +92,15 @@ export function createDeployCommand(
     // Added alongside the legacy flat Windows verbs; full convergence is S12/#348.
     .command('docker', createTargetDeployCommand('docker', dependencies))
     .command('compose', createTargetDeployCommand('compose', dependencies))
-    .command('kubernetes', createTargetDeployCommand('kubernetes', dependencies))
+    .command(
+      'kubernetes',
+      createTargetDeployCommand('kubernetes', dependencies),
+    )
     .command('azure-aca', createTargetDeployCommand('azure-aca', dependencies))
-    .command('azure-app-service', createTargetDeployCommand('azure-app-service', dependencies))
+    .command(
+      'azure-app-service',
+      createTargetDeployCommand('azure-app-service', dependencies),
+    )
     .command('azure-aks', createTargetDeployCommand('azure-aks', dependencies))
     .command('cloud-run', createTargetDeployCommand('cloud-run', dependencies));
 }

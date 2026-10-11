@@ -60,6 +60,7 @@ describe('public deploy application flows', () => {
       force: true,
     }, {
       manifests: manifestPort(['users', 'orders']),
+      bootstrap: { prepare: () => Promise.resolve() },
       services,
       os: 'windows',
     });
@@ -69,10 +70,13 @@ describe('public deploy application flows', () => {
       'NetScript.users',
       'NetScript.orders',
     ]);
-    assertEquals(services.installs.map((entry) => entry.configPath.replaceAll('\\', '/')), [
-      '/install/config/users.xml',
-      '/install/config/orders.xml',
-    ]);
+    assertEquals(
+      services.installs.map((entry) => entry.configPath.replaceAll('\\', '/')),
+      [
+        '/install/config/users.xml',
+        '/install/config/orders.xml',
+      ],
+    );
   });
 
   it('routes install naming through the linux (systemd) lane', async () => {
@@ -83,6 +87,7 @@ describe('public deploy application flows', () => {
       force: false,
     }, {
       manifests: manifestPort(['users', 'orders']),
+      bootstrap: { prepare: () => Promise.resolve() },
       services,
       os: 'linux',
     });
@@ -92,10 +97,13 @@ describe('public deploy application flows', () => {
       'netscript-users.service',
       'netscript-orders.service',
     ]);
-    assertEquals(services.installs.map((entry) => entry.configPath.replaceAll('\\', '/')), [
-      '/install/config/users.service',
-      '/install/config/orders.service',
-    ]);
+    assertEquals(
+      services.installs.map((entry) => entry.configPath.replaceAll('\\', '/')),
+      [
+        '/install/config/users.service',
+        '/install/config/orders.service',
+      ],
+    );
   });
 
   it('uninstalls manifest services in reverse manifest order', async () => {
@@ -164,7 +172,14 @@ describe('public deploy application flows', () => {
       },
       {
         command: 'C:/tools/servy-cli.exe',
-        args: ['install', '-n', 'NetScript.orders', '-c', 'C:/app/config/orders.xml', '-q'],
+        args: [
+          'install',
+          '-n',
+          'NetScript.orders',
+          '-c',
+          'C:/app/config/orders.xml',
+          '-q',
+        ],
       },
       {
         command: 'C:/tools/servy-cli.exe',
@@ -214,7 +229,10 @@ class RecordingOsServicePort implements OsServicePort {
     return Promise.resolve({ success: true, message: 'OK', code: 0 });
   }
 
-  run(operation: 'start' | 'stop' | 'status' | 'uninstall', serviceName: string) {
+  run(
+    operation: 'start' | 'stop' | 'status' | 'uninstall',
+    serviceName: string,
+  ) {
     this.runs.push({ operation, serviceName });
     return Promise.resolve({ success: true, message: 'OK', code: 0 });
   }
