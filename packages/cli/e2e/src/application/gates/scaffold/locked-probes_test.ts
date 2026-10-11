@@ -54,11 +54,17 @@ Deno.test('scratch probe commands declare a frozen lock and never bypass it', as
       'guarded-service-isolation_test.ts',
       'probe-auth-cookie-jar.ts',
       'service-client-runtime-probe.ts',
+      'prepare-flow-b-fixture.ts',
+      'verify-clean-clone-readme.ts',
     ]
   ) {
     const source = await Deno.readTextFile(join(scaffold, name));
     assertEquals(source.includes('--no-lock'), false, name);
-    if (name === 'probe-generated-guarded-service.ts') {
+    if (name === 'verify-clean-clone-readme.ts') {
+      assertStringIncludes(source, 'runLockedProbe');
+      assertStringIncludes(source, 'installGeneratedProbe');
+      assertStringIncludes(source, "config.lock = { path: 'deno.lock', frozen: true }");
+    } else if (name === 'probe-generated-guarded-service.ts') {
       assertStringIncludes(source, 'runLockedProbe');
     } else {
       assertStringIncludes(source, '--frozen');
