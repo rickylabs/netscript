@@ -35,7 +35,7 @@ Deno.test('ready background children pass through endpoint-resolved real HTTP he
 });
 
 for (const child of KV_BACKGROUND_RUNTIME_RESOURCES) {
-  Deno.test(`crash-looping ${child} turns the registered runtime gate red while APIs stay green`, async () => {
+  Deno.test(`crash-looping ${child} turns the registered runtime gate red`, async () => {
     await withChildren(child, async (resolveUrls) => {
       const gate = readinessGates(SCAFFOLD.RUNTIME).find((gate) =>
         gate.id === 'behavior.background-children-health'
@@ -153,7 +153,7 @@ async function withChildren(
     }
     const resolved: string[] = [];
     await test((appHost, resource) =>
-      resolveResourceUrlsFromAppHost(appHost, resource, async (_host, name) => {
+      resolveResourceUrlsFromAppHost(appHost, resource, (_host, name) => {
         resolved.push(name);
         const server = servers.get(name);
         if (!server) throw new Error(`fixture omitted ${name}`);
@@ -165,7 +165,10 @@ async function withChildren(
           }),
           name,
         );
-        return { waitFor: () => Promise.resolve(update), close: () => Promise.resolve() };
+        return Promise.resolve({
+          waitFor: () => Promise.resolve(update),
+          close: () => Promise.resolve(),
+        });
       })
     );
     assertEquals(
