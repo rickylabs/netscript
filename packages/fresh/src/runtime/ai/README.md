@@ -78,7 +78,7 @@ same `projectChatSnapshot` applied to the same session log.
 | `NetScriptChatSendMessage`                                                                       | type     | Complete native UI parts or Model content, forwarded unchanged by `send`.                      |
 | `NetScriptChatMessage`                                                                           | type     | Projected message: `{ id, role, content }`.                                                    |
 | `RenderPart`                                                                                     | type     | Minimal renderable unit (`text` \| `tool` card) emitted by the reducer. FB2 widens it.         |
-| `NetScriptChatSnapshot`                                                                          | type     | `{ messages, renderParts, offset }` — the reducer's output plus the replay cursor.             |
+| `NetScriptChatSnapshot`                                                                          | type     | `{ nativeMessages, messages, renderParts, offset }` — the reducer's output plus the replay cursor.             |
 | `NetScriptChatAuthorize`                                                                         | type     | `(request, sessionId) => boolean \| Promise<boolean>`.                                         |
 | `NetScriptChatStreamPath`                                                                        | type     | Static prefix or per-session subpath resolver for durable chat streams.                        |
 | `NetScriptChatConnectionOptions`, `NetScriptChatResponseOptions`, `NetScriptChatSnapshotOptions` | type     | Option bags for the three functions.                                                           |
@@ -247,8 +247,7 @@ export const streamHandler = createNetScriptChatStreamProxy({
 
 Seed (`resolveChatSnapshot`) and live (`createNetScriptChatConnection.subscribe`)
 share `projectChatSnapshot`, so tool cards rendered on first paint survive the
-first live chunk unchanged for ordinary assistant chunks — the ONE-PROJECTION LAW
-in practice. See the native-batch exception below.
+first live chunk unchanged — the ONE-PROJECTION LAW in practice.
 
 ## Complete client sends
 
@@ -270,16 +269,38 @@ supported. Native batches are persisted as `CUSTOM` events named
 NetScript seed replay restores complete batches through TanStack's `StreamProcessor`
 before applying the rendering projection.
 
-No public API returns persisted native parts. `resolveChatSnapshot` exposes only
-reduced text and tool cards; attachments and other native fields remain in storage.
-The public native-parts reader is remaining scope for #2068, alongside publication,
-a published-consumer check and the downstream EIS one-SSE-per-pane confirmation.
+`resolveChatSnapshot().nativeMessages` returns complete persisted messages, including attachments,
+tools, structured data, metadata and future opaque parts. `messages` and `renderParts` remain the
+reduced rendering projection. Both seed and live use the same native replay reducer before
+projecting; live native appends are emitted as standard TanStack `MESSAGES_SNAPSHOT` chunks, while
+ordinary assistant chunks pass through unchanged. Message IDs reconcile native batches with text
+echoes and replace repeated appends rather than duplicating them.
 
-Native batch tool cards appear on seed/reload but not on live subscribers.
-The upstream live reducer ignores the native `CUSTOM` batch and consumes its text
-echoes only. Both paths use `projectChatSnapshot`, but their input messages differ;
-this is a known exception to the one-projection law until native live replay lands.
-Tool-call chunks from the assistant stream continue through the upstream live reducer.
+Pair the native seed with its offset when resuming a connection:
+
+```ts
+import { createNetScriptChatConnection, resolveChatSnapshot } from '@netscript/fresh/ai';
+
+const target = { sessionId: 'chat-session' };
+const seed = await resolveChatSnapshot({ target });
+const connection = createNetScriptChatConnection({
+  target,
+  initialMessages: seed.nativeMessages,
+  initialOffset: seed.offset ?? undefined,
+});
+// Hand seed.nativeMessages to the TanStack island's initial state as well.
+// Native snapshots retain that history when the next live append arrives.
+connection.dispose();
+```
+
+An offset without `initialMessages` is a suffix-only read: the connection cannot recover skipped
+history. Without an offset it replays the stored log, including native append batches, then follows
+live updates. Concurrent logical subscribers share one SSE and receive the same chunks after
+attaching. Cancelling one leaves other readers active; cancelling the last reader closes the
+physical subscription. Connection disposal cancels all readers and sends. A retired subscription
+resumes from the transport cursor on its next open, retaining connection replay state. Publication,
+a published-consumer check and downstream EIS adapter removal with a live one-SSE-per-pane
+confirmation remain separate release/adoption steps for #2068.
 
 Only pass server-trusted `newMessages` after validating roles and parts and giving
 that same prompt to the model. The plugin-AI scaffold builds its own user message

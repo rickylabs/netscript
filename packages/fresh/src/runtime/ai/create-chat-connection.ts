@@ -31,6 +31,8 @@ import {
 import { stream } from '@durable-streams/client';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 import type { ModelMessage, UIMessage } from '@tanstack/ai';
+import { projectChatSnapshot } from './project-chat-snapshot.ts';
+export { projectChatSnapshot } from './project-chat-snapshot.ts';
 import { createChatSubscriptionHub } from '../../internal/chat-subscription-hub.ts';
 import type { NetScriptChatProducer } from './chat-producer.ts';
 import { assertChatProducer, toFencedChatSessionResponse } from './fenced-chat-session-writer.ts';
@@ -190,6 +192,8 @@ export interface NetScriptChatConnectionOptions {
   readonly authorize?: NetScriptChatAuthorize;
   /** Replay offset to begin the live subscription from (default: from start). */
   readonly initialOffset?: string;
+  /** Native SSR seed paired with `initialOffset`; retained in subsequent native snapshots. */
+  readonly initialMessages?: readonly NetScriptChatSendMessage[];
   /**
    * SR2 tuning: how the subscribe path tolerates a first-subscribe that races a
    * not-yet-created session stream (transient empty / up-to-date live poll). The
@@ -237,11 +241,15 @@ export interface NetScriptChatConnection {
    * Subscribe to live chunks for the session. SR2-tolerant: a first-subscribe
    * that races a not-yet-created stream is re-polled with backoff rather than
    * throwing. The stream ends when the caller aborts `signal`, the connection is
-   * disposed, or (post-establishment) the upstream subscription completes. A
+   * disposed, or (post-establishment) the upstream subscription completes.
+   * Native appends emit standard TanStack `MESSAGES_SNAPSHOT` chunks containing
+   * the complete replay state, including `initialMessages`; ordinary assistant
+   * chunks pass through unchanged. Without a seed, `initialOffset` reads only
+   * the suffix. A
    * subscriber joining an active subscription receives only the suffix emitted
-   * after it attaches; there is no in-memory replay. Inconsistently, joining
-   * after the prior subscription retires opens a fresh upstream subscription,
-   * which may replay from `initialOffset`.
+   * after it attaches; there is no per-subscriber replay. Joining after the prior
+   * subscription retires resumes from the default transport cursor, retaining
+   * the connection replay state.
    */
   readonly subscribe: (signal?: AbortSignal) => AsyncIterable<unknown>;
   /** Append complete UI/Model messages and data unchanged, with linked cancellation. */
@@ -311,6 +319,8 @@ export interface NetScriptChatResponseOptions {
  * live subscription so seed and live share one continuous chunk log.
  */
 export interface NetScriptChatSnapshot {
+  /** Complete persisted messages, including native parts and metadata, for seed and model context. */
+  readonly nativeMessages: readonly NetScriptChatSendMessage[];
   /** Ordered chat messages reduced from the durable session chunk log. */
   readonly messages: ReadonlyArray<NetScriptChatMessage>;
   /** Render parts (text + tool cards) reduced from the same chunk log. */
@@ -339,58 +349,6 @@ export interface NetScriptChatSnapshotOptions {
     readonly headers: Record<string, string>;
     readonly offset?: string;
   }) => Promise<{ readonly messages: readonly unknown[]; readonly offset?: string }>;
-}
-
-// The ONE projection reducer (seed + live share this — see mod.ts @module doc).
-
-/**
- * The single chat projection reducer. Both the seed snapshot
- * ({@link resolveChatSnapshot}) and the live island projection (FB2) MUST route
- * through this function so tool cards and message text never diverge between
- * first paint and the first live chunk (the ONE-PROJECTION LAW). It reduces the
- * materialized session `messages` into NetScript-owned messages plus renderable
- * parts; it is deterministic and side-effect free.
- */
-export function projectChatSnapshot(
-  messages: readonly unknown[],
-): Pick<NetScriptChatSnapshot, 'messages' | 'renderParts'> {
-  const outMessages: NetScriptChatMessage[] = [];
-  const renderParts: RenderPart[] = [];
-
-  messages.forEach((raw, index) => {
-    const record = asRecord(raw);
-    const id = asString(record.id) ?? `message-${index}`;
-    const role = normalizeRole(record.role);
-    const parts = Array.isArray(record.parts) ? record.parts : [];
-
-    const textSegments: string[] = [];
-    parts.forEach((rawPart, partIndex) => {
-      const part = asRecord(rawPart);
-      const type = asString(part.type) ?? 'text';
-      if (type.includes('tool')) {
-        renderParts.push({
-          kind: 'tool',
-          id: asString(part.toolCallId) ?? `${id}:tool:${partIndex}`,
-          role,
-          toolName: asString(part.toolName) ?? asString(part.name) ?? 'tool',
-          toolState: normalizeToolState(part.state),
-          input: part.input,
-          output: part.output,
-        });
-        return;
-      }
-      const text = asString(part.text) ?? asString(part.content);
-      if (text) textSegments.push(text);
-    });
-
-    const content = textSegments.join('') || asString(record.content) || '';
-    outMessages.push({ id, role, content });
-    if (content) {
-      renderParts.push({ kind: 'text', id: `${id}:text`, role, text: content });
-    }
-  });
-
-  return { messages: outMessages, renderParts };
 }
 
 // FA1 factory functions.
@@ -440,10 +398,15 @@ export function createNetScriptChatConnection(
   });
 
   const subscribe = createChatSubscriptionHub(
-    (signal) => upstream.subscribe(signal),
+    replayChunks,
     controller.signal,
     options.subscribeRetry,
   );
+
+  const replay = createChatMessageReplay(options.initialMessages);
+  async function* replayChunks(signal: AbortSignal): AsyncIterable<unknown> {
+    for await (const chunk of upstream.subscribe(signal)) yield replay.apply(chunk);
+  }
 
   const linkSignal = (caller?: AbortSignal): AbortSignal =>
     caller ? AbortSignal.any([controller.signal, caller]) : controller.signal;
@@ -539,10 +502,23 @@ export async function toNetScriptChatResponse(
  *
  * Replays the durable session with TanStack's `StreamProcessor`, retaining native
  * message append parts, and reduces it through {@link projectChatSnapshot} — the SAME reducer the live
- * island path uses (ONE-PROJECTION LAW). Native batch tool parts currently appear
- * only on seed/reload: the upstream live reader consumes text echoes, not the
- * native append extension. No public reader returns the original attachment parts. The returned `offset` seeds the live
- * subscription so seed and live read one continuous chunk log.
+ * island path uses (ONE-PROJECTION LAW). `nativeMessages` retains complete parts
+ * and metadata. Pair it with the returned `offset` as the connection's
+ * `initialMessages` and `initialOffset` so seed and live read one continuous log.
+ *
+ * @example Seed a live connection without dropping native history
+ * ```ts
+ * import { createNetScriptChatConnection, resolveChatSnapshot } from '@netscript/fresh/ai';
+ *
+ * const target = { sessionId: 'chat-session' };
+ * const seed = await resolveChatSnapshot({ target });
+ * const connection = createNetScriptChatConnection({
+ *   target,
+ *   initialMessages: seed.nativeMessages,
+ *   initialOffset: seed.offset ?? undefined,
+ * });
+ * connection.dispose();
+ * ```
  */
 export async function resolveChatSnapshot(
   options: NetScriptChatSnapshotOptions,
@@ -555,6 +531,7 @@ export async function resolveChatSnapshot(
   });
   const projected = projectChatSnapshot(raw.messages);
   return {
+    nativeMessages: raw.messages as readonly NetScriptChatSendMessage[],
     messages: projected.messages,
     renderParts: projected.renderParts,
     offset: raw.offset ?? null,
@@ -581,6 +558,8 @@ function defaultCreateConnection(input: {
     readUrl: input.readUrl,
     headers: input.headers,
     initialOffset: input.initialOffset,
+    // Let NetScript's native replay reducer see bootstrap chunks as well as live chunks.
+    emitSnapshotOnSubscribe: false,
   });
   return {
     subscribe: (signal?: AbortSignal): AsyncIterable<unknown> => connection.subscribe(signal),
@@ -663,20 +642,4 @@ function toDurableMessage(message: NetScriptChatSendMessage): NetScriptChatSendM
       ? [{ type: 'text', text: message.content }]
       : message.content ?? [],
   };
-}
-
-function asRecord(value: unknown): Record<string, unknown> {
-  return value !== null && typeof value === 'object' ? value as Record<string, unknown> : {};
-}
-
-function asString(value: unknown): string | undefined {
-  return typeof value === 'string' ? value : undefined;
-}
-
-function normalizeRole(value: unknown): NetScriptChatMessage['role'] {
-  return value === 'system' || value === 'user' || value === 'tool' ? value : 'assistant';
-}
-
-function normalizeToolState(value: unknown): RenderPart['toolState'] {
-  return value === 'pending' || value === 'streaming' || value === 'error' ? value : 'complete';
 }
