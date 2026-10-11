@@ -54,6 +54,8 @@ async function probeInScratch(
     '--ci',
     '--yes',
     '--no-git',
+    // Service probes do not bootstrap host agents or their shared temp state.
+    '--no-agent',
     '--force',
     '--editor',
     'none',
