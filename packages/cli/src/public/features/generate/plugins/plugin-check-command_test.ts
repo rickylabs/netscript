@@ -5,6 +5,9 @@ import { walk } from '@std/fs';
 import schema from '../../../../../assets/schema/plugin-generated-surface.v1.json' with {
   type: 'json',
 };
+import publishedManifestFree from '../../../../../e2e/fixtures/plugin-manifest-free/published.json' with {
+  type: 'json',
+};
 import type { PluginSurfaceReport } from '../../../../kernel/domain/plugin-generated-surface.ts';
 
 const REPO = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
@@ -459,10 +462,8 @@ Deno.test('plugin public check inventories published auth and streams 0.0.7 with
     }
     await write(root, 'deno.json', JSON.stringify(config));
     const settings = JSON.parse(await Deno.readTextFile(join(root, 'appsettings.json')));
-    for (const plugin of ['auth', 'streams']) {
-      settings.NetScript.Plugins[plugin] = {
-        Entrypoint: `jsr:@netscript/plugin-${plugin}@0.0.7/runtime`,
-      };
+    for (const [plugin, Entrypoint] of Object.entries(publishedManifestFree.plugins)) {
+      settings.NetScript.Plugins[plugin] = { Entrypoint };
     }
     await write(root, 'appsettings.json', JSON.stringify(settings));
     const generated = await command(root, false);
@@ -477,7 +478,7 @@ Deno.test('plugin public check inventories published auth and streams 0.0.7 with
         ),
         {
           generator: `public.generate.plugins:@netscript/plugin-${plugin}`,
-          version: '0.0.7',
+          version: publishedManifestFree.version,
           outputs: [],
         },
       );
