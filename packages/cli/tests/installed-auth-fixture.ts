@@ -37,7 +37,7 @@ async function installAuth(name: string): Promise<InstalledAuthFixture> {
   const project = join(root, 'auth-fixture');
   const run = async (args: string[]) => {
     const result = await new Deno.Command(Deno.execPath(), {
-      args: ['run', '--no-lock', '-A', cli, ...args],
+      args: ['run', '--frozen', '-A', cli, ...args],
       cwd: repo,
       stdout: 'piped',
       stderr: 'piped',

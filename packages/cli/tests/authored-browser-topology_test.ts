@@ -11,7 +11,7 @@ for (const binary of ['netscript.ts', 'netscript-dev.ts']) {
       const project = join(root, 'shop');
       const run = async (args: string[], entry = binary, diagnostic = false) => {
         const output = await new Deno.Command(Deno.execPath(), {
-          args: ['run', '--no-lock', '-A', join(repo, 'packages/cli/bin', entry), ...args],
+          args: ['run', '--frozen', '-A', join(repo, 'packages/cli/bin', entry), ...args],
           cwd: repo,
           stdout: 'piped',
           stderr: 'piped',
