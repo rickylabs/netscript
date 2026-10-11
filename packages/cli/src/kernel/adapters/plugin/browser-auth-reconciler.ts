@@ -51,7 +51,12 @@ export async function browserAuthReconciliationPaths(
     join(projectRoot, 'auth/service.ts'),
     ...Object.entries(settings.NetScript?.Apps ?? {}).filter(([, entry]) =>
       !entry.Type || entry.Type === 'app'
-    ).map(([name, entry]) => dirname(appAuthRoute(projectRoot, name, entry))),
+    ).flatMap(([name, entry]) => [
+      dirname(appAuthRoute(projectRoot, name, entry)),
+      ...Object.keys(settings.NetScript?.Services ?? {}).map((service) =>
+        appServiceSessionRoute(projectRoot, name, entry, service)
+      ),
+    ]),
     ...Object.entries(settings.NetScript?.Services ?? {}).map(([name, entry]) =>
       serviceEntrypoint(projectRoot, name, entry)
     ),
@@ -99,6 +104,26 @@ export async function reconcileBrowserAuth(
       path,
       content: renderTemplateAssetSync(TEMPLATE_KEYS.authRoute, { bffImport }),
     });
+    for (const service of Object.keys(config.Services ?? {})) {
+      const contract = join(projectRoot, 'contracts/versions/v1', `${service}.contract.ts`);
+      if (!await fs.exists(contract)) continue;
+      // Older or authored contracts need not implement the generated identity proof.
+      if (!/\bsession:\s*baseContract\b/.test(await fs.readFile(contract))) continue;
+      const route = appServiceSessionRoute(projectRoot, name, entry, service);
+      const importFrom = (target: string) => {
+        const specifier = relative(dirname(route), target).replaceAll('\\', '/');
+        return specifier.startsWith('.') ? specifier : `./${specifier}`;
+      };
+      files.push({
+        path: route,
+        content: renderTemplateAssetSync(TEMPLATE_KEYS.authServiceSessionRoute, {
+          serviceName: service,
+          utilsImport: importFrom(join(appRoot, 'utils.ts')),
+          contractImport: importFrom(contract),
+          bffImport: importFrom(join(projectRoot, 'auth/bff.ts')),
+        }),
+      });
+    }
     entry.PluginReferences = [
       ...new Set([...(entry.PluginReferences ?? []), auth]),
     ];
@@ -168,6 +193,20 @@ export async function reconcileBrowserAuth(
 
 function appAuthRoute(root: string, name: string, entry: BrowserAuthEntry): string {
   return join(workspacePath(root, entry.Workdir ?? `apps/${name}`), 'routes/auth/[action].ts');
+}
+
+function appServiceSessionRoute(
+  root: string,
+  name: string,
+  entry: BrowserAuthEntry,
+  service: string,
+): string {
+  return join(
+    workspacePath(root, entry.Workdir ?? `apps/${name}`),
+    'routes/examples',
+    service,
+    'session.ts',
+  );
 }
 
 function serviceEntrypoint(root: string, name: string, entry: BrowserAuthEntry): string {

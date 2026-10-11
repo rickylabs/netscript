@@ -1,6 +1,7 @@
 /** Typed manifest for checked-in CLI template assets. */
 export const TEMPLATE_KEYS = {
   authBff: 'auth/bff.ts.template',
+  authServiceSessionRoute: 'auth/service-session-route.ts.template',
   authRoute: 'auth/route.ts.template',
   authService: 'auth/service.ts.template',
   generatedAspireEmptyRegistration: 'generated/aspire/helpers/empty-registration.ts.template',

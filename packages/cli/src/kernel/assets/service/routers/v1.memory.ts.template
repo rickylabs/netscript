@@ -5,6 +5,7 @@ import type { {{serviceName | pascalCase}}Application } from '../application/{{e
 
 export function create{{serviceName | pascalCase}}V1(application: {{serviceName | pascalCase}}Application) {
   return {
+    session: v1.{{serviceName | camelCase}}.session.handler(() => ({ authenticated: true })),
     list: v1.{{serviceName | camelCase}}.list.handler(({ input }) => application.list(input)),
     updateStatus: v1.{{serviceName | camelCase}}.updateStatus.handler(async ({ input, errors }) => {
       const record = await application.updateStatus(input);
