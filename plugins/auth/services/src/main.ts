@@ -69,7 +69,7 @@ export default async function createAuthService(
   // withServiceInfo — which is exactly the previous chain's order, so behavior
   // is preserved. The registry is resolved above (via `initializeAuthService`)
   // and captured by the context closure; no startup work is deferred.
-  return await createPluginService(router, {
+  const service = await createPluginService(router, {
     // Only signout and operator revocation are guarded; the guard authenticates in-process
     // because the auth service cannot verify sessions by calling itself.
     auth: createAuthServiceGuard(registry),
@@ -86,6 +86,18 @@ export default async function createAuthService(
     context: () => ({ registry, telemetry, cookieName, request: currentAuthRequest() }),
     traceContext: true,
   }).serve();
+  // The worker runs under the service's WorkOS API identity, independently of HTTP requests.
+  const background = registry.background?.start();
+  void background?.catch((error: unknown) => {
+    console.error('Auth WorkOS revocation worker stopped:', error);
+  });
+  return {
+    ...service,
+    async stop(): Promise<void> {
+      await service.stop();
+      await registry.background?.stop();
+    },
+  };
 }
 
 function resolveAuditSalt(ctx: PluginServiceContext): string | undefined {

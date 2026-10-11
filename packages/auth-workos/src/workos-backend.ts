@@ -15,6 +15,7 @@ import {
 import type { AuthnRequest, AuthnResult } from '@netscript/service/auth';
 import {
   createWorkosAuthenticator,
+  isWorkosSessionRevoked,
   type WorkosAuthenticatorOptions,
   type WorkosSessionAuthenticationResult,
   type WorkosSessionAuthenticationSuccess,
@@ -43,6 +44,8 @@ export interface WorkosBackendOptions<
   readonly providers?: readonly WorkosProviderOptions[];
   /** Secret used to sign backend-owned opaque session tokens. Defaults to `cookiePassword`. */
   readonly sessionTokenSecret?: string;
+  /** Injectable logout clock; defaults to the system clock. */
+  readonly now?: () => Date;
 }
 
 const DEFAULT_COOKIE_NAME = 'wos-session';
@@ -94,7 +97,7 @@ export function createWorkosBackend<
           return undefined;
         }
         const result = await authenticateSealedSessionToken(token, options);
-        if (!result.authenticated) {
+        if (!result.authenticated || await isWorkosSessionRevoked(result, options.revocations)) {
           return undefined;
         }
         return authSessionFromWorkos(result);
@@ -117,13 +120,20 @@ export function createWorkosBackend<
           `WorkOS session revocation is owned by WorkOS APIs outside this request-local backend port for "${sessionId}".`,
         );
       },
-      revokeSubjectSessions(_input: AuthSubjectRevocationInput): AuthSubjectRevocation {
-        // WorkOS exposes no subject-wide revocation: only per-session revokeSession after paging
-        // listSessions, which is unbounded work, and sealed access tokens stay valid until expiry.
-        throw unsupportedWorkosOperation(
-          'sessions.revokeSubjectSessions',
-          'WorkOS has no subject-wide session revocation API; per-session enumeration is not bounded.',
+      async revokeSubjectSessions(
+        input: AuthSubjectRevocationInput,
+      ): Promise<AuthSubjectRevocation> {
+        if (!options.revocations) {
+          throw unsupportedWorkosOperation(
+            'sessions.revokeSubjectSessions',
+            'Configure a durable WorkOS revocation store and its background worker.',
+          );
+        }
+        const job = await options.revocations.revokeSubject(
+          input.subject,
+          (options.now?.() ?? new Date()).toISOString(),
         );
+        return { subject: job.subject, revokedAt: job.revokedAt };
       },
     },
     crypto: {

@@ -66,6 +66,37 @@ const service = createService(router, { name: 'private-api' })
   });
 ```
 
+## Subject-wide logout
+
+The official auth plugin wires a durable WorkOS revocation store and a service-owned background
+worker automatically. `signout { everywhere: true }` atomically writes a subject fence and a durable
+work item; it never lists or revokes individual WorkOS sessions inside the request.
+
+The worker uses the service's WorkOS API key, processes at most 50 sessions per delivery, and
+checkpoints each page. Partial failure replays the page, with at most eight attempts and exponential
+backoff capped at 60 seconds. A process restart resumes pending work. Completed pages leave
+permanent session tombstones, so access tokens refreshed after the logout cutoff cannot resurrect an
+old session. Sessions created after the cutoff are preserved upstream. During cleanup, **all**
+NetScript credentials of that subject are refused, including newly created sessions; they become
+usable when cleanup succeeds. Other subjects stay usable. Terminal failures remain under the KV
+prefix `auth-workos/revocation/failed` and keep the subject fenced. An operator can retry cleanup by
+calling `backend.sessions.revokeSubjectSessions({ subject })` under a trusted service identity.
+
+Standalone compositions must pass the same `revocations` store to their backend and any bearer or
+sealed-session authenticators. Use `createWorkosRevocationStore(hostKv)` with an atomic `KvStore`.
+Run `revokeWorkosSubjectPage(store, workos, delivery, signal)` in a background worker against
+`store.nextDelivery(now)`, checkpoint retries with a bounded budget, and drain it on shutdown.
+Without a store, subject-wide revocation remains explicitly unsupported. Never run the page function
+inside signout. The official plugin's service worker supplies this lifecycle for deployed auth APIs.
+
+### Migration in 0.0.8
+
+No existing option is removed. Standalone callers that enable subject-wide logout must configure the
+durable store and its worker, then share the store with every authenticator; leaving a standalone
+bearer authenticator unconfigured would bypass the local fence. The official plugin requires an
+atomic host KV store for WorkOS and now reads its configured session-cookie name consistently. The
+first eight failed page attempts leave durable failure evidence for operator recovery.
+
 ## Public surface
 
 | Symbol                                                                    | What it gives you                                    |

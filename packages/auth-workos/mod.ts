@@ -66,3 +66,12 @@ export type {
   InteractiveFlowPort,
   Principal,
 } from '@netscript/plugin-auth-core';
+
+export { createWorkosRevocationStore } from './src/adapters/kv-revocation-store.ts';
+export { revokeWorkosSubjectPage } from './src/application/revoke-subject-page.ts';
+export type {
+  WorkosRevocationClient,
+  WorkosRevocationDelivery,
+  WorkosRevocationJob,
+  WorkosRevocationStore,
+} from './src/ports/revocation-store.ts';
