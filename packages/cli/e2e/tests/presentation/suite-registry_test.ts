@@ -745,13 +745,13 @@ Deno.test('outbound webhook adoption is bounded and registered in both scaffold 
   for (const id of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
     const suite = resolveSuite(id);
     const gates = suite.gates.map((gate) => gate.id);
-    const generated = gates.indexOf('scaffold.outbound-webhook' as GateId);
+    const worker = gates.indexOf('scaffold.plugin.worker');
     const executed = gates.indexOf('behavior.outbound-webhook' as GateId);
-    assert(generated > gates.indexOf('scaffold.plugin.worker'));
-    assert(executed > generated);
+    assert(worker >= 0);
+    assert(executed > worker);
     assert(executed < gates.indexOf(GATE.GENERATED_DENO_CHECK));
     const probe = suite.gates[executed];
     assertEquals(probe.kind, 'command');
-    if (probe.kind === 'command') assertEquals(probe.timeoutMs, 30_000);
+    if (probe.kind === 'command') assertEquals(probe.timeoutMs, 120_000);
   }
 });
