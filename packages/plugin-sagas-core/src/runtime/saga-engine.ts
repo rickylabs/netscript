@@ -682,7 +682,7 @@ function toCompensationError(error: unknown): SagaCompensationError {
 
 function telemetryOutcomeFromStatus(status: SagaInstanceStatus): SagaTelemetryOutcome {
   if (status === 'failed') return SagaTelemetryOutcomes.ERROR;
-  if (status === 'compensating') return SagaTelemetryOutcomes.COMPENSATED;
+  if (status === 'compensated') return SagaTelemetryOutcomes.COMPENSATED;
   return SagaTelemetryOutcomes.SUCCESS;
 }
 
