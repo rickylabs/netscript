@@ -28,19 +28,9 @@ producer with `createDurableStream` (or the Service-facing
 over a durable-stream server that runs as an Aspire resource on its assigned port.
 
 The producer runtime in `@netscript/plugin-streams-core` writes through
-`@durable-streams/client` with idempotent delivery. The topic-centric
-**manifest sugar** in `@netscript/plugin-streams`
-(`defineStreamProducer` / `defineStreamConsumer`) operates as a design boundary;
-because a broker-agnostic topic transport is deferred, these helpers are stubs
-whose endpoints reject (`publish()`) or throw (`subscribe()`) with
-`StreamUnsupportedOperationError`. Similarly, in-process subscription handling
-is deferred; consumption is routed over the durable-stream server's HTTP/SSE
-protocol (which Fresh clients read to materialize state). Applications must wire
-against the core producer package directly.
-
-{{ comp callout { type: "important", title: "Stream Manifest and Pub/Sub Design Boundary" } }}
-NetScript's stream architecture separates entity-state change replication from generic message topic publishing. The active stream engine is accessed via <code>createDurableStream(...)</code> in <code>@netscript/plugin-streams-core</code> (writing <code>upsert</code>/<code>delete</code>/<code>flush</code> events to the streams service). The manifest-layer topic helpers (<code>defineStreamProducer</code>/<code>defineStreamConsumer</code> in <code>@netscript/plugin-streams</code>) throw a <code>StreamUnsupportedOperationError</code>. This boundary is drawn because a unified, broker-agnostic topic routing transport is a future feature-scale design. Today, use the core package for state-change publishing, and read events over the durable-stream service's HTTP/SSE endpoint.
-{{ /comp }}
+`@durable-streams/client` with idempotent delivery. `@netscript/plugin-streams` carries the service manifest and
+`defineStreamTopic` definitions. Runtime producers use the core package; consumers read the durable-stream server's HTTP/SSE
+protocol to materialize state.
 
 ## What it is
 
@@ -135,25 +125,28 @@ subscription API to keep in sync.
     label: "Consume over HTTP/SSE (Fresh client)",
     lang: "ts",
     code: "// islands/ExecutionsView.tsx — read the durable log directly\nimport { buildStreamUrl, getStreamsUrl } from '@netscript/plugin-streams-core';\nimport { bindStreamEventSourceV1 } from '@netscript/fresh/streams';\n\n// Native EventSource needs the real stream route, an opaque replay offset, and\n// live=sse. It cannot attach arbitrary authorization headers, so use this from\n// a same-origin/cookie-compatible route or proxy when the service is protected.\nconst url = new URL(buildStreamUrl('/workers/executions', getStreamsUrl()));\nurl.searchParams.set('offset', '-1');\nurl.searchParams.set('live', 'sse');\nconst source = new EventSource(url);\n\nconst latest = new Map<string, unknown>();\nconst binding = bindStreamEventSourceV1({\n  source,\n  onEvent(event) {\n    // The helper registers named data/control listeners and validates both\n    // payload schemas before delivering this exhaustive outcome union.\n    if (event.event === 'error') { latest.set('$error', event.payload); return; }\n    if (event.event !== 'data') return; // control / derived heartbeat\n    for (const change of event.payload) { // data is always an ordered array\n      if (change.headers.operation === 'delete') latest.delete(change.key);\n      else latest.set(change.key, change.value);\n    }\n  },\n});\n\n// An island should call binding.dispose() from its effect cleanup. This plain\n// browser example closes on page teardown; W3-A owns reconnect policy.\naddEventListener('pagehide', () => binding.dispose(), { once: true });"
-  },
-  {
-    label: "Manifest helpers (fail loud)",
-    lang: "ts",
-    code: "// @netscript/plugin-streams (the manifest root) re-exports topic-centric\n// helpers that are NOT implemented. They fail loud, by design.\nimport {\n  defineStreamProducer,\n  defineStreamConsumer,\n} from '@netscript/plugin-streams';\n\n// The producer handle is returned, but publish() rejects.\nconst producer = defineStreamProducer(/* topic */);\n// await producer.publish(event) // -> rejects with StreamUnsupportedOperationError\n\n// The consumer's subscribe() throws synchronously the moment you call it.\nconst consumer = defineStreamConsumer(/* topic */);\n// consumer.subscribe(handler) // -> throws StreamUnsupportedOperationError\n\n// Correct path: import createDurableStream / defineStreamSchema from\n// '@netscript/plugin-streams-core' instead (see the other tabs)."
   }
 ] }) }}
 
-{{ comp callout { type: "warning", title: "Do not call the manifest topic helpers" } }}
-<code>defineStreamProducer</code> and <code>defineStreamConsumer</code> exported from
-<code>@netscript/plugin-streams</code> are <strong>not</strong> implemented: a producer's
-<code>publish()</code> returns a <strong>rejected</strong> promise and a consumer's
-<code>subscribe()</code> <strong>throws</strong> synchronously, both with
-<code>StreamUnsupportedOperationError</code> — they are not silent no-ops and they will not publish
-anything. Always reach
-for <code>createDurableStream</code> / <code>defineStreamSchema</code> from
-<code>@netscript/plugin-streams-core</code> for real producer work. See the
-<a href="/reference/streams/">streams reference</a> for the full export map.
-{{ /comp }}
+## Breaking migration in 0.0.8
+
+`@netscript/plugin-streams` no longer exports `defineStreamProducer`, `defineStreamConsumer`,
+`StreamProducerHandle`, `StreamConsumerHandle`, `StreamUnsupportedOperationError`, or
+`unsupportedStreamOperation`. `streamsPlugin`, `defineStreamTopic`, `StreamTopicDefinition`, and
+`StreamPayloadSchema` remain available for manifest declarations.
+
+For producers, import `defineStreamSchema` and `createDurableStream` (or
+`createServiceStreamProducer` in backend services) from `@netscript/plugin-streams-core`. Convert
+the topic payload schema to a named collection with a `primaryKey`, as shown above. Replace
+`publish(payload)` with `upsert(collection, payload)` or `delete(collection, key)`; call `flush()`
+and `close()` during shutdown. This is an entity-state transport: generic message payloads need
+stable entity ids and an appropriate collection model.
+
+For consumers, replace `subscribe(handler)` with HTTP/SSE reads of the same stream path.
+`buildStreamUrl` and `getStreamsUrl` from `@netscript/plugin-streams-core` resolve that URL;
+`bindStreamEventSourceV1` from `@netscript/fresh/streams` validates named SSE events in browser
+clients, as shown above. Dispose the binding when the client tears down. There is no in-process
+topic subscription replacement.
 
 ## Key types first — the stream definition API
 
@@ -354,11 +347,6 @@ remain the 0.0.9 enhancement [#2114](https://github.com/rickylabs/netscript/issu
 ## Known limitations
 
 Be deliberate about what the alpha producer does and does not guarantee.
-<!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
-
-{{ comp callout { type: "warning", title: "Stream Manifest and Pub/Sub Design Boundary" } }}
-The topic-centric helpers (<code>defineStreamProducer</code> / <code>defineStreamConsumer</code>) in <code>@netscript/plugin-streams</code> are unsupported stub APIs that throw a <code>StreamUnsupportedOperationError</code> at runtime. A broker-agnostic topic pub/sub model is a future roadmap design; today, you must implement state-change replication using <code>@netscript/plugin-streams-core</code> and consume streams via HTTP/SSE.
-{{ /comp }}
 
 {{ comp callout { type: "warning", title: "Writes are dropped after a connect failure (no reconnect)" } }}
 If the producer cannot reach the durable-stream server (on its assigned port) at startup, it logs a
@@ -404,7 +392,7 @@ through it. The port is overridable via `STREAMS_PORT` or `PORT`.
   rows: [
     ["Plugin location", "<code>plugins/streams/</code>"],
     ["Producer package", "<code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>, <code>createServiceStreamProducer</code>, <code>defineStreamSchema</code>)"],
-    ["Manifest import", "<code>@netscript/plugin-streams</code> — topic helpers <strong>throw</strong> <code>StreamUnsupportedOperationError</code>"],
+    ["Manifest import", "<code>@netscript/plugin-streams</code> — <code>streamsPlugin</code> and typed topic definitions"],
     ["Transport client", "<code>@durable-streams/client</code> (<code>IdempotentProducer</code>)"],
     ["Dev service port", "its assigned port (durable-stream Aspire service; override with <code>STREAMS_PORT</code>/<code>PORT</code>)"],
     ["provider.kind", "<code>stream</code> · category <code>plugin</code> · pluginType <code>utility</code>"],
@@ -423,12 +411,9 @@ and its service comes up so dependent producers have somewhere to write.
 
 {{ comp callout { type: "important", title: "Footguns before you ship" } }}
 <ul>
-<li><strong>Build on the core package, not the manifest helpers.</strong>
+<li><strong>Use the producer contract.</strong> Import
 <code>createDurableStream</code> / <code>defineStreamSchema</code> from
-<code>@netscript/plugin-streams-core</code> are real; the
-<code>defineStreamProducer</code>/<code>defineStreamConsumer</code> helpers in
-<code>@netscript/plugin-streams</code> fail loud with
-<code>StreamUnsupportedOperationError</code>.</li>
+<code>@netscript/plugin-streams-core</code> and write entity state keyed by collection primary key.</li>
 <li><strong>A healthy streams server is a hard precondition.</strong> A startup connect
 failure drops every later write with no reconnect — bring Aspire (or an explicit
 <code>DURABLE_STREAMS_URL</code>) up first, and treat a <code>flush()</code> rejection on shutdown as a
@@ -469,7 +454,7 @@ The producer you build on lives in <code>@netscript/plugin-streams-core</code>:
 the <code>buildStreamUrl</code>/<code>getStreamsUrl</code>/<code>getStreamsAuth</code> resolvers,
 <code>inspectStreamTopic</code>, and the <code>StreamProducerPort</code> /
 <code>DurableStreamProducerOptions</code> types. The <code>@netscript/plugin-streams</code> manifest
-re-exports <code>streamsPlugin</code> plus the fail-loud topic helpers. See the
+re-exports <code>streamsPlugin</code> plus typed topic definitions. See the
 <a href="/reference/streams/">full reference</a> for every exported symbol and the
 <code>cli</code> / <code>scaffolding</code> / <code>e2e</code> / <code>aspire</code> sub-paths.
 {{ /comp }}
