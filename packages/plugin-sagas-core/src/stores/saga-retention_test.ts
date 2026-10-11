@@ -291,6 +291,13 @@ Deno.test('legacy saga backfill retires all proven terminal families, resumes an
     await seed(kv, status, status);
   }
   await kv.set(['sagas', 'applied', 'unknown-owner', 'keep'], { value: 1 });
+  // A mismatched legacy read model must never redirect the canonical open-state guard.
+  await kv.set(['saga_instances', 'legacy', 'running'], {
+    instanceId: 'missing',
+    sagaId: 'legacy',
+    status: 'completed',
+    updatedAt: '2030-10-01',
+  });
   await kv.set(['saga_instances', 'legacy', 'orphan-terminal'], {
     instanceId: 'orphan-terminal',
     sagaId: 'legacy',

@@ -207,7 +207,7 @@ export async function backfillSagaRetention(
       : family === 'correlation-instance'
       ? String(entry.key.at(-1))
       : family === 'projection'
-      ? String((entry.value as Projection).instanceId)
+      ? String(entry.key.at(-1))
       : String(entry.key[prefix.length + 1]),
   ]);
   const owners = kv.getMany
@@ -223,6 +223,10 @@ export async function backfillSagaRetention(
       versionstamp: owner?.versionstamp ?? null,
     });
     let envelope = owner?.value;
+    if (family === 'projection' && (entry.value as Projection).instanceId !== entry.key.at(-1)) {
+      receipt.retained++;
+      continue;
+    }
     // A terminal read model is evidence even if old canonical TTL has already elapsed.
     if (!envelope && family === 'projection') {
       const projection = entry.value as Projection;
