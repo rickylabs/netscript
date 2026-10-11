@@ -74,8 +74,11 @@ package itself stays thin: its <code>mod.ts</code> re-exports only the manifest 
 intact in source.
 {{ /comp }}
 
-This two-tier architecture is also why certain plugin surfaces enforce strict behavior boundaries. In `@netscript/plugin-streams`, the manifest-layer helper functions (<code>defineStreamProducer</code> and <code>defineStreamConsumer</code>) act as stub declarations that throw a <code>StreamUnsupportedOperationError</code> when invoked. This design boundary ensures that declarative manifest definitions remain decoupled from the active execution runtime. So dynamic stream routing must be driven using the core engine in <code>@netscript/plugin-streams-core</code> (via <code>createDurableStream</code>) directly. For more details on this layout, see {{ comp.xref({ key: "cap:streams", text: "durable streams" }) }} for the producer-versus-manifest framing.
-<!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
+Runtime stream producers use <code>defineStreamSchema</code> and <code>createDurableStream</code>
+from <code>@netscript/plugin-streams-core</code>; consumers read the same stream over HTTP/SSE. The
+<code>@netscript/plugin-streams</code> root carries the service manifest and typed topic
+definitions. See {{ comp.xref({ key: "cap:streams", text: "durable streams" }) }} for the producer
+contract and the 0.0.8 migration from the removed root producer/consumer helpers.
 
 This two-tier shape is not reserved for the official plugins. When you scaffold a custom plugin with
 `netscript plugin new <name>`, the generator emits the same pair: a JSR-publishable core engine

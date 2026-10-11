@@ -5,6 +5,7 @@ import {
 } from './locate-workers-resource-block.ts';
 import { prepareLocalSourceFixture } from './local-source-fixture.ts';
 import { hasLocalJobDefinition } from './has-local-job-definition.ts';
+import { installGeneratedProbe } from './install-generated-probe.ts';
 
 const projectRoot = Deno.args[0];
 if (!projectRoot) {
@@ -457,9 +458,13 @@ await Deno.writeTextFile(
   warmupEntrypoint,
   `import ${JSON.stringify(servicesEntrypoint)};\n`,
 );
+await installGeneratedProbe(projectRoot, [warmupEntrypoint]);
 const warm = await new Deno.Command('deno', {
   args: [
     'cache',
+    '--lock',
+    `${projectRoot}/deno.lock`,
+    '--frozen',
     '--minimum-dependency-age=0',
     '--config',
     flowBConfigPath,
