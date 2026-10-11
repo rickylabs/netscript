@@ -2402,6 +2402,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   02's sanctioned boundary exception. Neither a zero-diagnostic claim nor closure of #1655 is
   proven. Evidence is kept in the run record and PR #2218.
 
+- **0.0.8 public contract graph (#2292):** Public values now name the owned `WorkersContract`
+  contract. New owned route and schema aliases preserve all 22 procedures, concrete schema methods,
+  literal payload binding, and handler inference. The full 13-target plugin lint falls from four to
+  two existing references: `WorkersContract` still names the private precise definition, and
+  `workersContractV1` still names oRPC `implement`. Both debt entries remain open; exact zero,
+  publication and quality evidence are still required for closure. No upstream internals are
+  re-exported and no signatures are erased. Consumer controls are in
+  `plugins/workers/tests/public/contract-graph_test.ts`.
+
 ## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
 
 - **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
