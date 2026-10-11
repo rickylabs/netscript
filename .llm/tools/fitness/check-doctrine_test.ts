@@ -1,6 +1,6 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
-import { discoverDoctrineRoots } from './check-doctrine.ts';
+import { discoverDoctrineRoots, hasExplicitFactoryReturn } from './check-doctrine.ts';
 
 async function expectedDoctrineRoots(repoRoot: string): Promise<string[]> {
   const roots: string[] = [];
@@ -75,4 +75,52 @@ Deno.test('A14 distinguishes imported, locally-bound, and unresolved test identi
       assertEquals(stdout.includes('FAIL A14'), false, fixture.name);
     }
   }
+});
+
+Deno.test('backend factory return gate recognizes generics without accepting missing or wrong returns', () => {
+  const generic = `export function createWorkosBackend<
+    TUser extends { readonly id: string } = { readonly id: string; readonly [key: string]: unknown },
+  >(options: WorkosBackendOptions<TUser>)`;
+  const nestedGeneric = `export function createWorkosBackend<TUser extends Pick<User, 'id'>>(
+    options: WorkosBackendOptions<TUser>,
+  )`;
+  const ordinary = 'export function createWorkosBackend(options: WorkosBackendOptions)';
+  for (const signature of [generic, nestedGeneric, ordinary]) {
+    assertEquals(
+      hasExplicitFactoryReturn(
+        `${signature}: AuthBackendPort {}`,
+        'createWorkosBackend',
+        'AuthBackendPort',
+      ),
+      true,
+    );
+    assertEquals(
+      hasExplicitFactoryReturn(`${signature} {}`, 'createWorkosBackend', 'AuthBackendPort'),
+      false,
+    );
+    assertEquals(
+      hasExplicitFactoryReturn(
+        `${signature}: unknown {}`,
+        'createWorkosBackend',
+        'AuthBackendPort',
+      ),
+      false,
+    );
+    assertEquals(
+      hasExplicitFactoryReturn(
+        `${signature}: AuthBackendPortOther {}`,
+        'createWorkosBackend',
+        'AuthBackendPort',
+      ),
+      false,
+    );
+  }
+  assertEquals(
+    hasExplicitFactoryReturn(
+      'export async function createWorkosBackend(options: WorkosBackendOptions): Promise<AuthBackendPort> {}',
+      'createWorkosBackend',
+      'Promise<AuthBackendPort>',
+    ),
+    true,
+  );
 });
