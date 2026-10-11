@@ -1,4 +1,3 @@
-import { agentHostFreeDenoArgs } from '../../../../../tests/support/agent-host-free-deno.ts';
 import { assert, assertEquals } from '@std/assert';
 import { fromFileUrl, join, toFileUrl } from '@std/path';
 import type { Middleware } from 'jsr:@fresh/core@^2.3.3';
@@ -244,13 +243,7 @@ export async function withGeneratedBrowserFixture(
 
 async function runCli(args: string[]): Promise<void> {
   const result = await new Deno.Command(Deno.execPath(), {
-    args: agentHostFreeDenoArgs([
-      'run',
-      '--no-lock',
-      '-A',
-      join(REPO, 'packages/cli/bin/netscript-dev.ts'),
-      ...args,
-    ]),
+    args: ['run', '--no-lock', '-A', join(REPO, 'packages/cli/bin/netscript-dev.ts'), ...args],
     cwd: REPO,
     stdout: 'piped',
     stderr: 'piped',

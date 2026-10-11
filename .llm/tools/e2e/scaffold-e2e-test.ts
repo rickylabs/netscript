@@ -591,20 +591,12 @@ async function withTimeout<T>(
 
 class SmokeRunner {
   readonly #options: Options;
-  readonly #environment: Record<string, string>;
   readonly #steps: StepResult[] = [];
   #startedAspire = false;
   #stoppedAspire = false;
 
   constructor(options: Options) {
     this.#options = options;
-    this.#environment = Deno.env.toObject();
-    for (const name of Object.keys(this.#environment)) {
-      if (
-        name === 'CLAUDECODE' || name === 'OPENCODE' || name === 'TERM_PROGRAM' ||
-        name === 'ZED_TERM' || /^(OPENCODE_|VSCODE_|CURSOR_)/.test(name)
-      ) delete this.#environment[name];
-    }
   }
 
   #appendLog(message: string): void {
@@ -838,6 +830,9 @@ class SmokeRunner {
         ...this.#commandArgs(
           'init',
           this.#options.name,
+          ...(this.#options.cli.replaceAll('\\', '/').endsWith('netscript-dev.ts')
+            ? []
+            : ['--no-agent']),
           '--ci',
           '--path',
           this.#options.smokeRoot,
@@ -1513,8 +1508,7 @@ class SmokeRunner {
           new Deno.Command(command, {
             args,
             cwd: options.cwd,
-            env: { ...this.#environment, ...options.env },
-            clearEnv: true,
+            env: options.env,
             stdout: 'piped',
             stderr: 'piped',
             signal,

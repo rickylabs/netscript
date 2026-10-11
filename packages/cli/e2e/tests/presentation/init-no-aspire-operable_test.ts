@@ -1,4 +1,3 @@
-import { agentHostFreeDenoArgs } from '../../../tests/support/agent-host-free-deno.ts';
 /**
  * #1996: a project scaffolded with `netscript init --no-aspire` must be
  * operable by the CLI commands the initializer advertises. Pins exit codes for
@@ -28,12 +27,7 @@ async function cli(cwd: string, args: readonly string[]): Promise<CliRun> {
   env.POSTGRES_URI = 'postgres://probe:probe@127.0.0.1:1/probe';
   const result = await new Deno.Command(Deno.execPath(), {
     cwd,
-    args: agentHostFreeDenoArgs([
-      'run',
-      '-A',
-      join(repoRoot(), 'packages/cli/bin/netscript-dev.ts'),
-      ...args,
-    ]),
+    args: ['run', '-A', join(repoRoot(), 'packages/cli/bin/netscript-dev.ts'), ...args],
     env,
     clearEnv: true,
     stdin: 'null',

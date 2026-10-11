@@ -1,4 +1,3 @@
-import { agentHostFreeDenoArgs } from '../../../../../tests/support/agent-host-free-deno.ts';
 import { join, resolve } from '@std/path';
 import { deriveDefaultAppName } from '../../../../../src/kernel/domain/scaffold/app-name.ts';
 import { installGeneratedProbe } from './install-generated-probe.ts';
@@ -118,7 +117,7 @@ export async function runCommand(
   let output: Deno.CommandOutput;
   try {
     output = await new Deno.Command(command, {
-      args: command === 'deno' ? agentHostFreeDenoArgs(args) : [...args],
+      args: [...args],
       cwd,
       stdout: 'piped',
       stderr: 'piped',

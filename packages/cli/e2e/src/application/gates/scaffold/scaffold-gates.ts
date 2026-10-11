@@ -7,7 +7,6 @@ import { generatedAppName } from './runtime/generated-app-name.ts';
 import { cli, commandGate } from './gate-factory.ts';
 import { createPluginInstallGates } from './plugin-install-gates.ts';
 import { createResourceSliceGates } from './resource-slice-gates.ts';
-import { agentHostFreeDenoArgs } from '../../../../../tests/support/agent-host-free-deno.ts';
 
 const DISABLE_CACHE_ARGUMENT = '--cache=false';
 
@@ -80,8 +79,8 @@ function scaffoldInitCommand(context: RunContext): readonly string[] {
     '--no-git',
     '--force',
   );
-  // The contributor init has no agent flags. Scrub its child environment instead.
-  return publicCli ? command : ['deno', ...agentHostFreeDenoArgs(command.slice(1))];
+  // Contributor init has no agent installer, so its original argv is already host-independent.
+  return command;
 }
 
 function isJsrCompatibleCliEntrypoint(cliEntrypoint: string): boolean {

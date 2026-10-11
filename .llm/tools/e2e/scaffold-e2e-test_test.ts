@@ -168,20 +168,26 @@ Deno.test('legacy scaffold smoke isolates init host detection without starting r
   try {
     for (const [name, value] of Object.entries(markers)) Deno.env.set(name, value);
     Deno.env.set('NETSCRIPT_TEST_RETAINED', 'retained');
-    const report = await runSmoke({
-      ...defaultOptions(),
-      format: 'json',
-      smokeRoot: scratch,
-      name: 'hermetic-smoke',
-      logFile: join(scratch, 'smoke.log'),
-    });
-    assertEquals(report.startedAspire, false);
-    assertEquals(observed.length, 1);
-    assertEquals(observed[0].clearEnv, true);
-    const env = observed[0].env;
-    assert(env);
-    for (const name of Object.keys(markers)) assertEquals(env[name], undefined, name);
-    assertEquals(env.NETSCRIPT_TEST_RETAINED, 'retained');
+    for (const binary of ['netscript-dev.ts', 'netscript.ts']) {
+      const options = defaultOptions();
+      const report = await runSmoke({
+        ...options,
+        cli: join(options.repo, 'packages', 'cli', 'bin', binary),
+        format: 'json',
+        smokeRoot: scratch,
+        name: 'hermetic-smoke',
+        logFile: join(scratch, 'smoke.log'),
+      });
+      assertEquals(report.startedAspire, false);
+      const init = observed.at(-1);
+      assert(init);
+      assertEquals(init.args?.includes('--no-agent'), binary === 'netscript.ts');
+      assertEquals(init.clearEnv, undefined);
+      assertEquals(init.env, undefined);
+      for (const [name, value] of Object.entries(markers)) assertEquals(Deno.env.get(name), value);
+      assertEquals(Deno.env.get('NETSCRIPT_TEST_RETAINED'), 'retained');
+    }
+    assertEquals(observed.length, 2);
   } finally {
     Deno.Command = NativeCommand;
     for (const [name, value] of previous) {

@@ -1,4 +1,3 @@
-import { agentHostFreeDenoArgs } from '../../../cli/tests/support/agent-host-free-deno.ts';
 /**
  * Capability contract for `deno task test` in this package.
  *
@@ -29,7 +28,7 @@ async function run(
   args: readonly string[],
 ): Promise<CommandResult> {
   const output = await new Deno.Command(Deno.execPath(), {
-    args: agentHostFreeDenoArgs(args),
+    args: [...args],
     cwd,
     stdout: 'piped',
     stderr: 'piped',

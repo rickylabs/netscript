@@ -1,7 +1,9 @@
-import { assertEquals, assertThrows } from '@std/assert';
+import { assertEquals, assertLess, assertRejects, assertThrows } from '@std/assert';
+import { join } from '@std/path';
+import { DenoCommandAdapter } from '../../../src/adapters/commands/deno-command-adapter.ts';
 import { createMaintainerInitCommand } from '../../../../src/maintainer/features/init/init-command.ts';
 import { createInitCommand } from '../../../../src/public/features/init/init-command.ts';
-import { agentHostFreeDenoArgs } from '../../../../tests/support/agent-host-free-deno.ts';
+import type { InitPipelineContext } from '../../../../src/kernel/application/scaffold/context.ts';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
 import { createGeneratedCheckGates } from '../../../src/application/gates/scaffold/database-gates.ts';
@@ -27,6 +29,75 @@ import type { RunContext, RunOptions } from '../../../src/domain/run-context.ts'
 
 const PUBLISHED_TEST_VERSION = ['0', '0', '2'].join('.');
 
+function unexpectedInitExecution(): never {
+  throw new Error('Parser regression must not execute scaffold dependencies');
+}
+
+const parserContext: InitPipelineContext = {
+  scaffolder: {
+    scaffold: unexpectedInitExecution,
+    scaffoldFile: unexpectedInitExecution,
+    writeFile: unexpectedInitExecution,
+    createDir: unexpectedInitExecution,
+    exists: unexpectedInitExecution,
+  },
+  fs: {
+    readFile: unexpectedInitExecution,
+    writeFile: unexpectedInitExecution,
+    exists: unexpectedInitExecution,
+    stat: unexpectedInitExecution,
+    createDir: unexpectedInitExecution,
+    readDir: unexpectedInitExecution,
+    remove: unexpectedInitExecution,
+    copy: unexpectedInitExecution,
+    walk: unexpectedInitExecution,
+  },
+  templateAdapter: {
+    engine: 'parser-only',
+    render: unexpectedInitExecution,
+    renderFile: unexpectedInitExecution,
+  },
+  process: { exec: unexpectedInitExecution },
+  formatter: {
+    formatContent: unexpectedInitExecution,
+    formatContents: unexpectedInitExecution,
+    formatFiles: unexpectedInitExecution,
+  },
+  jsrResolver: { resolveImport: unexpectedInitExecution, resolveImports: unexpectedInitExecution },
+  cwd: unexpectedInitExecution,
+  resolveModeFields: unexpectedInitExecution,
+  packagesAsWorkspaceMembers: unexpectedInitExecution,
+  scaffoldWorkspacePackages: unexpectedInitExecution,
+};
+
+Deno.test('contributor scaffold init timeout terminates the child before it finishes', async () => {
+  const root = await Deno.makeTempDir();
+  const entrypoint = join(root, 'netscript-dev.ts');
+  const finished = join(root, 'finished');
+  try {
+    await Deno.writeTextFile(
+      entrypoint,
+      `
+await new Promise((resolve) => setTimeout(resolve, 8000));
+await Deno.writeTextFile(${JSON.stringify(finished)}, 'finished');
+console.log('grandchild-finished');
+`,
+    );
+    const started = performance.now();
+    const result = await new DenoCommandAdapter().run({
+      command: scaffoldInitGate().command(createContext(entrypoint, PACKAGE_SOURCE.LOCAL)),
+      cwd: Deno.cwd(),
+      timeoutMs: 1000,
+    });
+    assertLess(performance.now() - started, 4000);
+    assertEquals(result.code === 0, false);
+    assertEquals(result.stdout.includes('grandchild-finished'), false);
+    await assertRejects(() => Deno.stat(finished), Deno.errors.NotFound);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 for (const maintainer of [true, false]) {
   Deno.test(`scaffold init argv parses with the real ${maintainer ? 'maintainer' : 'public'} command`, async () => {
     for (const cache of [true, false]) {
@@ -39,16 +110,27 @@ for (const maintainer of [true, false]) {
         );
         const argv = scaffoldInitGate().command(context);
         if (maintainer) {
-          assertEquals(argv.slice(0, 5), ['deno', ...agentHostFreeDenoArgs([])]);
+          assertEquals(argv.slice(0, 4), ['deno', 'run', '-A', context.project.cliEntrypoint]);
           assertEquals(argv.includes('--no-agent'), false);
         }
         const command = maintainer
-          ? createMaintainerInitCommand({ initDependencies: {} as never })
+          ? createMaintainerInitCommand({
+            initDependencies: {
+              cwd: unexpectedInitExecution,
+              detectMonorepoRoot: unexpectedInitExecution,
+              runInit: unexpectedInitExecution,
+              syncPackages: unexpectedInitExecution,
+            },
+          })
           : createInitCommand({
-            initContext: {} as never,
+            initContext: parserContext,
             initAgent: () => Promise.reject(new Error('Agent installation must not run')),
             defaultProjectName: () => 'unused',
-            prompt: {} as never,
+            prompt: {
+              input: unexpectedInitExecution,
+              confirm: unexpectedInitExecution,
+              select: unexpectedInitExecution,
+            },
           });
         // Replace execution only: keep the production option and positional argument schema.
         const parsed = await command.action(() => {}).throwErrors().parse(

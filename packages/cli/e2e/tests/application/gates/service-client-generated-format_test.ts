@@ -1,4 +1,3 @@
-import { agentHostFreeDenoArgs } from '../../../../tests/support/agent-host-free-deno.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
 
@@ -103,7 +102,7 @@ async function runCli(args: readonly string[]): Promise<CommandResult> {
 
 async function runDeno(args: readonly string[], cwd: string): Promise<CommandResult> {
   const output = await new Deno.Command(Deno.execPath(), {
-    args: agentHostFreeDenoArgs(args),
+    args: [...args],
     cwd,
     stdout: 'piped',
     stderr: 'piped',
