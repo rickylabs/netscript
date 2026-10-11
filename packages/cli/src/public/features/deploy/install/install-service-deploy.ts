@@ -99,6 +99,9 @@ export class InstallServiceDeployStep extends PipelineStep<
       await this.dependencies.bootstrap.prepare(
         resolved.installDir,
         Object.keys(resolved.manifest.services),
+        Object.entries(resolved.manifest.services)
+          .filter(([, entry]) => entry.type !== 'app')
+          .map(([name]) => name),
       );
     }
     const installed: string[] = [];

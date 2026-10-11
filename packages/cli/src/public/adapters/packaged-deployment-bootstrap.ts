@@ -17,13 +17,18 @@ export class PackagedDeploymentBootstrap implements DeploymentBootstrapPort {
   async prepare(
     installDir: string,
     serviceNames: readonly string[],
+    backendServiceNames: readonly string[] = serviceNames,
   ): Promise<void> {
     if (serviceNames.length === 0) return;
     const root = resolve(installDir);
     const directory = join(root, '.data', 'aspire-secrets');
     const configDir = join(root, 'config');
+    if (backendServiceNames.length === 0) {
+      await updateXmlPaths(configDir, root, [...serviceNames], false);
+      return;
+    }
     const accounts = new Set<string>();
-    for (const name of serviceNames) {
+    for (const name of backendServiceNames) {
       const xml = await Deno.readTextFile(join(configDir, `${name}.xml`));
       const account = xml.match(/<UserAccount>([^<]+)<\/UserAccount>/)?.[1];
       if (account) {

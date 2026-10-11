@@ -100,6 +100,14 @@ Deno.test('packaged Windows access policy restricts before material exists and r
         '<RunAsLocalSystem>false</RunAsLocalSystem><UserAccount>DOMAIN\\worker</UserAccount>',
       ),
     );
+    const appConfig = join(root, 'config', 'web.xml');
+    await Deno.writeTextFile(
+      appConfig,
+      (await Deno.readTextFile(appConfig)).replace(
+        '<RunAsLocalSystem>true</RunAsLocalSystem>',
+        '<RunAsLocalSystem>false</RunAsLocalSystem><UserAccount>DOMAIN\\web</UserAccount>',
+      ),
+    );
     const scripts: string[] = [];
     const file = join(root, '.data', 'aspire-secrets', 'installation.secret');
     const bootstrap = new PackagedDeploymentBootstrap({
@@ -112,13 +120,14 @@ Deno.test('packaged Windows access policy restricts before material exists and r
         return { code: 0, stdout: '', stderr: '' };
       },
     }, 'windows');
-    await bootstrap.prepare(root, ['workers']);
+    await bootstrap.prepare(root, ['workers', 'web'], ['workers']);
     assertEquals(scripts.length, 2);
     const material = await Deno.readTextFile(file);
     for (const script of scripts) {
       assert(script.includes('SetAccessRuleProtection($true, $false)'));
       assert(script.includes('S-1-5-18'));
       assert(script.includes("'DOMAIN\\worker', 'ReadAndExecute'"));
+      assert(!script.includes('DOMAIN\\web'));
       assert(!script.includes(material));
     }
     const failed = new PackagedDeploymentBootstrap({
