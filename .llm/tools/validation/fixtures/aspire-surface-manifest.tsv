@@ -608,6 +608,7 @@ packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-background_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-source-safety_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helper-fixture.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helpers-compile_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
