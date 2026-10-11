@@ -1,9 +1,11 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
 
-import { defineSaga, sagaComplete, sagaFail } from '../../mod.ts';
+import { defineSaga, sagaCompensate, sagaComplete, sagaFail } from '../../mod.ts';
 import type {
+  CascadedMessage,
   SagaCorrelationKey,
   SagaDefinition,
+  SagaInstanceStatus,
   SagaState,
   SagaStateEnvelope,
 } from '../../src/domain/mod.ts';
@@ -16,12 +18,137 @@ import {
   SagaSpanEvents,
   SagaSpanNames,
   type SagaTelemetryAttributes,
+  type SagaTelemetryOutcome,
   SagaTelemetryOutcomes,
   type SagaTelemetrySpan,
   type SagaTelemetrySpanKind,
   type SagaTelemetryStatus,
   type SagaTraceParent,
 } from '../../src/telemetry/mod.ts';
+
+for (
+  const scenario of [
+    { name: 'finished undo', cascaded: [], status: 'compensated', outcome: 'compensated' },
+    {
+      name: 'failed undo',
+      cascaded: [sagaFail('refund rejected')],
+      status: 'failed',
+      outcome: 'error',
+    },
+    { name: 'completed saga', cascaded: [sagaComplete()], status: 'completed', outcome: 'success' },
+    {
+      name: 'nested undo still pending',
+      cascaded: [sagaCompensate({ type: 'RefundPayment', payload: {} })],
+      status: 'compensating',
+      outcome: 'success',
+    },
+  ] satisfies readonly {
+    name: string;
+    cascaded: readonly CascadedMessage[];
+    status: SagaInstanceStatus;
+    outcome: SagaTelemetryOutcome;
+  }[]
+) {
+  Deno.test(`SagaEngine compensation telemetry distinguishes ${scenario.name}`, async () => {
+    const telemetry = new RecordingTelemetry();
+    const store = new MemorySagaStore();
+    const engine = createSagaEngine({ store, instrumentation: telemetry.instrumentation });
+    const definition = defineSaga('telemetry-compensation')
+      .state<SagaState>({ payment: 'captured' })
+      .on('FulfillmentFailed', () => [sagaCompensate({ type: 'RefundPayment', payload: {} })])
+      .on('Inspect', () => [])
+      .build() as SagaDefinition;
+    await engine.register([definition]);
+    await engine.start();
+    try {
+      const [requested] = await engine.handle({
+        type: 'FulfillmentFailed',
+        payload: {},
+        correlationKey: 'order-1' as SagaCorrelationKey,
+      });
+      assertEquals((await store.load(requested.instanceId))?.metadata.status, 'compensating');
+      assertEquals(telemetry.spans[0].attributes[SagaAttributes.OUTCOME], 'success');
+      assertEquals(telemetry.durations[0].attributes?.[SagaAttributes.OUTCOME], 'success');
+      assertEquals(
+        telemetry.spans[0].events.at(-1)?.attributes?.[SagaAttributes.STATUS],
+        'compensating',
+      );
+
+      assert(requested.version !== undefined);
+      const committed = await engine.commitCompensation({
+        sagaId: requested.sagaId,
+        instanceId: requested.instanceId,
+        correlationKey: requested.correlationKey,
+        version: requested.version,
+        state: { payment: 'refunded' },
+        message: { type: 'RefundPayment', payload: {} },
+        cascaded: scenario.cascaded,
+      });
+      assertEquals(committed.committed, true);
+      assertEquals((await store.load(requested.instanceId))?.metadata.status, scenario.status);
+      // This probes status mapping on a later handle, not outcome emission at commit time.
+      // The existing engine accepts ordinary handlers on terminal instances; see PR debt note.
+      await engine.handle({
+        type: 'Inspect',
+        payload: {},
+        correlationKey: requested.correlationKey,
+      });
+      const span = telemetry.spans.at(-1)!;
+      assertEquals(span.attributes[SagaAttributes.OUTCOME], scenario.outcome);
+      assertEquals(span.events.at(-1)?.attributes?.[SagaAttributes.STATUS], scenario.status);
+      assertEquals(span.status?.status, scenario.status === 'failed' ? 'error' : 'ok');
+      assertEquals(span.ended, true);
+      assertEquals(
+        telemetry.durations.at(-1)?.attributes?.[SagaAttributes.OUTCOME],
+        scenario.outcome,
+      );
+    } finally {
+      await engine.stop('compensation telemetry test complete');
+    }
+  });
+}
+
+Deno.test('SagaEngine reads a legacy stuck compensating row without reporting compensated', async () => {
+  const telemetry = new RecordingTelemetry();
+  const store = new MemorySagaStore();
+  const definition = defineSaga('legacy-compensation')
+    .state<SagaState>({ payment: 'captured' })
+    .on('Inspect', () => [])
+    .build() as SagaDefinition;
+  const instanceId = 'legacy-compensation:order-1' as SagaStateEnvelope['metadata']['instanceId'];
+  const now = new Date('2026-01-01T00:00:00Z');
+  await store.save({
+    metadata: {
+      instanceId,
+      sagaId: definition.id,
+      status: 'compensating',
+      version: 7,
+      durability: definition.durability,
+      createdAt: now,
+      updatedAt: now,
+    },
+    state: { payment: 'captured' },
+  });
+  const engine = createSagaEngine({ store, instrumentation: telemetry.instrumentation });
+  await engine.register([definition]);
+  await engine.start();
+  try {
+    await engine.handle({
+      type: 'Inspect',
+      payload: {},
+      correlationKey: 'order-1' as SagaCorrelationKey,
+    });
+    const loaded = await store.load(instanceId);
+    assertEquals(loaded?.metadata.status, 'compensating');
+    assertEquals(loaded?.metadata.version, 8);
+    assertEquals(loaded?.state, { payment: 'captured' });
+    assertEquals(telemetry.spans[0].events[0].attributes?.[SagaAttributes.STATUS], 'compensating');
+    assertEquals(telemetry.spans[0].attributes[SagaAttributes.OUTCOME], 'success');
+    assertEquals(telemetry.durations[0].attributes?.[SagaAttributes.OUTCOME], 'success');
+  } finally {
+    await engine.stop('legacy compensation telemetry test complete');
+  }
+});
 
 Deno.test('SagaEngine emits one successful saga.handle span for a handled message', async () => {
   const telemetry = new RecordingTelemetry();

@@ -441,6 +441,14 @@ records a greppable public opt-out with a reason explaining how to protect it. L
 reconcile scaffold-owned opt-outs; authored policies remain authoritative, and `generate aspire`
 leaves authored inputs unchanged.
 
+Generated contracts include a `session` identity probe with `authentication: 'required'`.
+That metadata describes the guarded posture and remains visible in OpenAPI/discovery even when
+auth is not installed. An explicit service-wide public opt-out skips authentication and
+authorization, including this contract requirement: anonymous `session` calls then return
+200 with `{ authenticated: false }`. The metadata alone does not install guards. Install auth
+or configure a guarded service policy to enforce it; the probe reports whether the runtime
+provided a principal.
+
 This policy requirement applies to the preset; lower-level `createService()` callers still compose
 their middleware explicitly.
 
