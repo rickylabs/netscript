@@ -451,16 +451,17 @@ bearer credential to services; browser callers use that first-party cookie.
 
 ### 0.0.8 cookie migration
 
-Projects with their own backend, session routes, and browser bridge can opt out of generated
-browser topology before installing auth or running lifecycle commands. Set
-`NetScript.Apps.<app>.Auth.BrowserTopology` to `"authored"` in `appsettings.json`.
-The default remains `"scaffold"`. Authored apps keep their `/auth` routes and browser helper
-files untouched, even when those files do not exist; generated service-session example routes
-are also skipped. `netscript generate aspire` preserves that topology and `netscript plugin doctor`
-reports its authored ownership. Other scaffold apps still use shared helpers, and independently
-scaffold-owned service policies still receive their bearer verifier. The setting does not delete
-previously generated files. See [app-owned browser authentication](/cli-reference/#app-owned-browser-authentication)
-for the configuration example and mixed-workspace behavior.
+Projects with their own backend, session routes, and browser bridge can opt out of generated browser
+topology before installing auth or running lifecycle commands. Set
+`NetScript.Apps.<app>.Auth.BrowserTopology` to `"authored"` in `appsettings.json`. The default
+remains `"scaffold"`. Authored apps keep their `/auth` routes and browser helper files untouched,
+even when those files do not exist; generated service-session example routes are also skipped.
+`netscript generate aspire` preserves that topology and `netscript plugin doctor` reports its
+authored ownership. Other scaffold apps still use shared helpers, and independently scaffold-owned
+service policies still receive their bearer verifier. The setting does not delete previously
+generated files. See
+[app-owned browser authentication](/cli-reference/#app-owned-browser-authentication) for the
+configuration example and mixed-workspace behavior.
 
 The callback input now accepts optional `txn`. The callback JSON output no
 longer includes `sessionId`. This is a breaking contract change: replace reads of `callback.sessionId` with a cookie jar and an
