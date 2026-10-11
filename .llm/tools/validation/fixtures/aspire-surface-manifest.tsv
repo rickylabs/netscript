@@ -715,6 +715,7 @@ packages/cli/src/public/features/plugins/auth/auth-config.ts	cli:other	S4	grep-v
 packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/doctor/browser-topology-check.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/plugin-runtime-health.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -748,6 +749,7 @@ packages/cli/src/public/features/services/remove/remove-service.ts	cli:other	S4	
 packages/cli/src/public/features/services/services-group.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/infra/permissions/plugin-scaffold-permissions.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/tests/authored-browser-topology_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/config/mod.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-root-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-section-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
