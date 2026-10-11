@@ -132,7 +132,9 @@ export const define = createDefine();`,
       const execution = await new Deno.Command(Deno.execPath(), {
         args: [
           'run',
-          '--no-lock',
+          '--lock',
+          new URL('deno.lock', repo).pathname,
+          '--frozen',
           '-A',
           '--unstable-kv',
           '--config',
