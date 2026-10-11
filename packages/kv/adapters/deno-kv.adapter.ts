@@ -88,12 +88,28 @@ export class DenoKvAdapter implements WatchableKv {
   }
 
   /**
-   * Store a value.
+   * Batch-read entries in native pages of at most ten keys, preserving order and missing entries.
    *
-   * @param key - Key to write
-   * @param value - Value to store
-   * @param options - Optional TTL settings
+   * @param keys - Keys to resolve in order
+   * @returns Entries aligned with the input, with null for missing keys
    */
+  async getMany<T = unknown>(keys: KvKey[]): Promise<(KvEntry<T> | null)[]> {
+    const kv = await this.ensureOpen();
+    const result: (KvEntry<T> | null)[] = [];
+    for (let offset = 0; offset < keys.length; offset += 10) {
+      const entries = await kv.getMany<T[]>(keys.slice(offset, offset + 10));
+      result.push(...entries.map((entry) =>
+        entry.versionstamp === null ? null : {
+          key: entry.key as KvKey,
+          value: entry.value,
+          versionstamp: entry.versionstamp,
+        }
+      ));
+    }
+    return result;
+  }
+
+  /** Store a value with optional backend expiry. */
   async set(key: KvKey, value: unknown, options?: KvSetOptions): Promise<void> {
     const kv = await this.ensureOpen();
     await kv.set(key, value, { expireIn: options?.expireIn });
