@@ -110,14 +110,15 @@ Deno.test('published unhealthy listener report retains actionable diagnostic det
   );
 });
 
-Deno.test('allocated-name fallback requires a unique resource without a different logical name', () => {
+Deno.test('allocated-name prefixes cannot substitute for an exact logical resource', () => {
   const allocated = {
     name: 'postgres-a1b2c3',
     healthReports: { postgres_listener: { status: 'Healthy' } },
   };
-  assertEquals(
-    readListenerHealthReport({ resources: [allocated] }, 'postgres', 'postgres_listener').status,
-    'Healthy',
+  assertThrows(
+    () => readListenerHealthReport({ resources: [allocated] }, 'postgres', 'postgres_listener'),
+    Error,
+    'resource postgres was never published',
   );
   assertThrows(
     () =>
@@ -127,7 +128,15 @@ Deno.test('allocated-name fallback requires a unique resource without a differen
         'postgres_listener',
       ),
     Error,
-    'resource postgres has ambiguous allocated names',
+    'resource postgres was never published',
+  );
+  assertEquals(
+    readListenerHealthReport(
+      { resources: [{ ...allocated, displayName: 'postgres' }] },
+      'postgres',
+      'postgres_listener',
+    ).status,
+    'Healthy',
   );
 });
 

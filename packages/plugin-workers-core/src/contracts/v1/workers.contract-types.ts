@@ -99,3 +99,64 @@ export interface WorkersCapabilities {
   /** Capability tags advertised by the plugin. */
   readonly capabilities: readonly string[];
 }
+
+/**
+ * Named procedures supported by the workers v1 service.
+ *
+ * @example
+ * ```ts
+ * import type { WorkersContractRouteName } from '@netscript/plugin-workers-core/contracts/v1';
+ * const route: WorkersContractRouteName = 'triggerJob';
+ * ```
+ */
+export type WorkersContractRouteName =
+  | 'describe'
+  | 'listJobs'
+  | 'getJob'
+  | 'createJob'
+  | 'updateJob'
+  | 'deleteJob'
+  | 'triggerJob'
+  | 'listExecutions'
+  | 'getExecution'
+  | 'batchQueryExecutions'
+  | 'listExecutionsByCorrelationId'
+  | 'listTasks'
+  | 'getTask'
+  | 'triggerTask'
+  | 'listTaskExecutions'
+  | 'getTaskExecution'
+  | 'cleanup'
+  | 'cleanupDbExecutions'
+  | 'archiveExecutions'
+  | 'seed'
+  | 'subscribe'
+  | 'listTopics';
+
+/**
+ * Exact builder contract for a named workers procedure, including schema methods and errors.
+ *
+ * @example
+ * ```ts
+ * import { type WorkersContractRoute, workersContract } from '@netscript/plugin-workers-core/contracts/v1';
+ * const route: WorkersContractRoute<'getJob'> = workersContract.getJob;
+ * ```
+ */
+export type WorkersContractRoute<
+  TName extends WorkersContractRouteName,
+  TPayloads extends JobPayloadRegistry = JobPayloadRegistry,
+> = WorkersContract<TPayloads>[TName];
+
+/**
+ * Exact input/output schema contracts carried by a named workers procedure.
+ *
+ * @example
+ * ```ts
+ * import { type WorkersContractRouteSchemas, workersContract } from '@netscript/plugin-workers-core/contracts/v1';
+ * const schemas: WorkersContractRouteSchemas<'getJob'> = workersContract.getJob['~orpc'];
+ * ```
+ */
+export type WorkersContractRouteSchemas<
+  TName extends WorkersContractRouteName,
+  TPayloads extends JobPayloadRegistry = JobPayloadRegistry,
+> = Pick<WorkersContractRoute<TName, TPayloads>['~orpc'], 'inputSchema' | 'outputSchema'>;

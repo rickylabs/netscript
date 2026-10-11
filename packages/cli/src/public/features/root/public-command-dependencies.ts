@@ -1,3 +1,4 @@
+import type { GenerateRoutesCommandDependencies } from '../generate/routes/generate-routes-command.ts';
 import type { InitCommandDependencies } from '../init/init-command.ts';
 import { initAgent } from '../agent/init/init-agent.ts';
 import { DenoAgentInitFileSystem } from '../agent/init/agent-init-file-system.ts';
@@ -192,6 +193,8 @@ export interface PublicCommandDependencies {
   readonly generateRuntimeSchemasCommandDependencies: GenerateRuntimeSchemasCommandDependencies;
   /** Dependencies for plugin registry generation. */
   readonly generatePluginRegistriesCommandDependencies: GeneratePluginRegistriesCommandDependencies;
+  /** Dependencies for Fresh route manifest generation. */
+  readonly generateRoutesCommandDependencies: GenerateRoutesCommandDependencies;
   /** Dependencies for canonical Fresh resource generation. */
   readonly generateResourceCommandDependencies: GenerateResourceCommandDependencies;
   /** Dependencies for deploy build. */
@@ -434,6 +437,15 @@ export function createPublicCommandDependencies(
       emitter: new RegistryEmitter(),
       fs,
       generate: generatePluginRegistries,
+    },
+    generateRoutesCommandDependencies: {
+      resolveUiAppRoot,
+      writeManifest: async (appRoot) => {
+        const { writeFreshRouteManifestSync } = await import(
+          '../../../kernel/adapters/scaffold/fresh-route-manifest.ts'
+        );
+        return writeFreshRouteManifestSync(appRoot).result;
+      },
     },
     generateResourceCommandDependencies: {
       generateResourceDependencies: {

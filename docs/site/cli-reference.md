@@ -278,6 +278,7 @@ consumes.
 {{ comp.apiTable({
   caption: "Code generation",
   rows: [
+    { name: "Fresh routes", type: "netscript generate routes", desc: "Rebuild .generated/manifest.ts and .generated/routes.ts from route files without a Vite build. Select with --app or an explicit app --project-root." },
     { name: "Plugin registries", type: "netscript generate plugins", desc: "Regenerate the plugin registries from project source — the post-install step." },
     { name: "Runtime config schemas", type: "netscript generate runtime-schemas", desc: "Generate JSON Schema files for runtime configuration topics." },
     { name: "Aspire helpers", type: "netscript generate aspire", desc: "Regenerate the Aspire AppHost helpers from <code>appsettings.json</code> without re-scaffolding." }
