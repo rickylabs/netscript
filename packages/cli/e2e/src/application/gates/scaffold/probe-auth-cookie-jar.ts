@@ -21,8 +21,8 @@ export async function probeAuthCookieJar(projectPath: string, repoPath: string):
     );
     await Deno.writeTextFile(
       join(root, 'consumer.ts'),
-      source.replace("from '@std/assert'", `from '${config.imports['@std/assert']}'`)
-        .replace("from '@netscript/plugin-auth/services'", `from '${entrypoint}'`),
+      source.replace("'@std/assert'", JSON.stringify(config.imports['@std/assert']))
+        .replace("'@netscript/plugin-auth/services'", JSON.stringify(entrypoint)),
     );
     const runner = join(root, 'run.ts');
     await Deno.writeTextFile(
