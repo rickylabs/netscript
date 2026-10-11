@@ -4,8 +4,7 @@ import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { toFileUrl } from 'jsr:@std/path@^1';
 import type { BackgroundProcessorEntry, NetScriptConfig } from '@netscript/aspire/types';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
-import { generateRegisterBackground } from '../register/generate-register-background.ts';
-import { generateRegisterInfrastructure } from '../register/generate-register-infrastructure.ts';
+import { writeGeneratedHelperFixture } from './generated-helper-fixture.ts';
 import { EMPTY_CONFIG, MINIMAL_DENO_DEFAULTS } from './generators-test-support.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
@@ -107,6 +106,33 @@ Deno.test('generated child probes preserve PostgreSQL listener/auth checks and d
     await Deno.mkdir(`${root}/.helpers`, { recursive: true });
     await Deno.mkdir(`${root}/.aspire/modules`, { recursive: true });
     await Deno.writeTextFile(`${root}/.aspire/modules/aspire.mts`, 'export {};\n');
+    const processors: Record<string, BackgroundProcessorEntry> = Object.fromEntries(
+      ['workers', 'sagas', 'triggers'].map((name) => [name, {
+        Enabled: true,
+        Runtime: 'deno' as const,
+        Entrypoint: `${name}/runtime.ts`,
+        RequiresDb: true,
+        RequiresKv: true,
+        Telemetry: false,
+        WatchMode: false,
+      }]),
+    );
+    const config: NetScriptConfig = {
+      ...EMPTY_CONFIG,
+      Defaults: { ...EMPTY_CONFIG.Defaults, Deno: MINIMAL_DENO_DEFAULTS },
+      Databases: {
+        postgres: {
+          Enabled: true,
+          Engine: 'Postgres',
+          Mode: 'Container',
+          DatabaseName: 'app',
+          Persistent: false,
+        },
+      },
+      PrimaryDatabase: 'postgres',
+      BackgroundProcessors: processors,
+    };
+    await writeGeneratedHelperFixture(root, config);
     // Only the SDK and compat seams are doubled. Both generated registration
     // modules execute in their normal order on the same builder.
     await Deno.writeTextFile(
@@ -122,48 +148,6 @@ Deno.test('generated child probes preserve PostgreSQL listener/auth checks and d
         'export function resolveWorkspacePath(root, path) { return root + "/" + path; }',
         'export function withCacheReference(resource) { return resource; }',
       ].join('\n'),
-    );
-    const processors: Record<string, BackgroundProcessorEntry> = Object.fromEntries(
-      ['workers', 'sagas', 'triggers'].map((name) => [name, {
-        Enabled: true,
-        Runtime: 'deno' as const,
-        Entrypoint: `${name}/runtime.ts`,
-        RequiresDb: true,
-        RequiresKv: true,
-        Telemetry: false,
-        WatchMode: false,
-      }]),
-    );
-    const config: NetScriptConfig = {
-      ...EMPTY_CONFIG,
-      Databases: {
-        postgres: {
-          Enabled: true,
-          Engine: 'Postgres',
-          Mode: 'Container',
-          DatabaseName: 'app',
-          Persistent: false,
-        },
-      },
-      PrimaryDatabase: 'postgres',
-      BackgroundProcessors: processors,
-    };
-    await Deno.writeTextFile(
-      `${root}/.helpers/register-infrastructure.mts`,
-      generateRegisterInfrastructure({
-        databases: config.Databases,
-        caches: {},
-        primaryDatabase: config.PrimaryDatabase,
-      }),
-    );
-    await Deno.writeTextFile(
-      `${root}/.helpers/register-background.mts`,
-      generateRegisterBackground({
-        processors,
-        version: config.Version,
-        denoDefaults: MINIMAL_DENO_DEFAULTS,
-        databaseEngine: 'Postgres',
-      }),
     );
     const infrastructureModule = await import(
       toFileUrl(`${root}/.helpers/register-infrastructure.mts`).href

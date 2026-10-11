@@ -106,3 +106,64 @@ Deno.test('CLI makes non-test process failures structurally visible', async () =
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('CLI attributes the deliberate duplicate typed-queue DLQ invariant failure', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'typed-dlq-control-' });
+  try {
+    const fixture = join(root, 'duplicate-dlq_test.ts');
+    const reportPath = join(root, 'report.json');
+    const fixtureModule = new URL(
+      '../../packages/queue/tests/_fixtures/typed-dlq.ts',
+      import.meta.url,
+    ).href;
+    await Deno.writeTextFile(
+      fixture,
+      [
+        `import { typedDlqRedelivery } from ${JSON.stringify(fixtureModule)};`,
+        "Deno.test('duplicate DLQ negative control', () => typedDlqRedelivery('memory', (store) => ({",
+        '  append: (record) => store.append({ ...record, messageId: crypto.randomUUID() }),',
+        '  list: (options) => store.list(options),',
+        '  depth: () => store.depth(),',
+        '  reprocess: (enqueue, options) => store.reprocess(enqueue, options),',
+        '})));',
+      ].join('\n'),
+    );
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+        new URL('./run-deno-test.ts', import.meta.url).pathname,
+        '--output',
+        reportPath,
+        '--',
+        '--frozen',
+        '--no-check',
+        '--allow-all',
+        fixture,
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 1);
+    const report = JSON.parse(await Deno.readTextFile(reportPath));
+    assertEquals(report.exitCode, 1);
+    assertEquals(report.summary.failed, 1, JSON.stringify(report));
+    assertEquals(report.summary.uniqueFailures, 1);
+    assertEquals(report.processFailure, undefined);
+    const failure = report.failures[0];
+    assertEquals(failure.count, 1);
+    assertEquals(failure.tests[0].name, 'duplicate DLQ negative control');
+    assertEquals(
+      failure.tests[0].file.endsWith('duplicate-dlq_test.ts'),
+      true,
+      JSON.stringify(failure),
+    );
+    assertEquals(failure.tests[0].line, 2);
+    assertEquals(failure.message.includes('one terminal record per message'), true);
+    assertEquals(failure.message.includes('-   2\n+   1'), true);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

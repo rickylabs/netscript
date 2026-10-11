@@ -13,7 +13,7 @@ page is written against the plugin public surface reported by `deno doc`. For th
 packages and plugins return to the [reference overview](/reference/).
 
 The plugin ships seven published entrypoints. The root export (`@netscript/plugin-streams`) carries
-the manifest and the typed topic/producer/consumer authoring helpers; six sub-path exports carry
+the manifest and the typed topic definition helper; six sub-path exports carry
 the framework integrations:
 
 - [`@netscript/plugin-streams/cli`](#sub-path-cli) — plugin CLI command group.
@@ -39,20 +39,14 @@ canonical reference page.
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `defineStreamTopic` | function | `function defineStreamTopic(name, schema): StreamTopicDefinition` | Define a typed stream topic. |
-| `defineStreamProducer` | function | `function defineStreamProducer(topic): StreamProducerHandle` | Return a manifest-layer producer handle. Not wired to a transport: the returned `publish()` **rejects** with `StreamUnsupportedOperationError`. |
-| `defineStreamConsumer` | function | `function defineStreamConsumer(topic): StreamConsumerHandle` | Return a manifest-layer consumer handle. Not wired to a transport: the returned `subscribe()` **throws** `StreamUnsupportedOperationError` synchronously. |
-| `StreamUnsupportedOperationError` | class | `class StreamUnsupportedOperationError extends Error` | Raised by the manifest topic helpers when asked to perform runtime IO; points callers at `@netscript/plugin-streams-core`. |
 | `StreamTopicDefinition` | interface | `interface StreamTopicDefinition` | Typed stream topic definition. |
 | `StreamPayloadSchema` | interface | `interface StreamPayloadSchema` | Package-owned structural payload schema accepted by stream topic definitions. |
-| `StreamProducerHandle` | interface | `interface StreamProducerHandle` | Stub producer handle for downstream plugin manifests; its `publish()` rejects (see above). |
-| `StreamConsumerHandle` | interface | `interface StreamConsumerHandle` | Stub consumer handle for downstream plugin manifests; its `subscribe()` throws (see above). |
 
-> **Not yet wired.** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer stubs.
-> A producer's `publish()` returns a rejected promise and a consumer's `subscribe()` throws
-> synchronously, both with `StreamUnsupportedOperationError`. For real producer work use
-> `createDurableStream` (or the Service-facing `createServiceStreamProducer`) and `defineStreamSchema`
-> from [`@netscript/plugin-streams-core`](/reference/plugin-streams-core/). See the
-> [durable streams capability page](/capabilities/streams/) for the full producer/consumer model.
+Runtime producers live in [`@netscript/plugin-streams-core`](/reference/plugin-streams-core/): use
+`defineStreamSchema` with `createDurableStream` or `createServiceStreamProducer`. The former root
+producer/consumer helpers and their unsupported-operation types were removed in 0.0.8. See
+[the breaking migration](/durable-workflows/streams/#breaking-migration-in-008) for the collection
+model and HTTP/SSE consumption path.
 
 > **Browser consumers read over HTTP/SSE.** There is no in-process `subscribe()`; a browser
 > consumes a stream by reading its HTTP/SSE endpoint (for example with `EventSource`). The local
@@ -93,7 +87,7 @@ for their full definitions.
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
-| `@netscript/plugin-streams` | `./mod.ts` | Plugin manifest and typed topic, producer, and consumer authoring helpers. |
+| `@netscript/plugin-streams` | `./mod.ts` | Plugin manifest and typed topic definitions. |
 | `@netscript/plugin-streams/scaffold` | `./scaffold.ts` | Executable plugin scaffolder entrypoint and its shared scaffolding protocol types. |
 | `@netscript/plugin-streams/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
 | `@netscript/plugin-streams/cli` | `./src/cli/composition/main.ts` | Plugin CLI command group. |

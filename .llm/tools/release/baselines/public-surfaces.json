@@ -16491,154 +16491,169 @@
         "./contracts": {
           "symbols": {
             "ContractSchema": {
-              "signature": "d481030b6bc5d86da50e83b5b7362d35f765b080c0c55a0c00cf73045ef60123"
+              "signature": "17d7ca06e47513e844e70bb480df6af4c17e9468e2de5f28c604e749b5e6e5d0"
             },
             "ContractSchemaResult": {
-              "signature": "03fc111aaa90f4e9eaa6e50bd573a85618b18b6a021ba1ed3f8006194ce6e5e4"
+              "signature": "ffb223562f0f144982139569fae061b1e2c381fb2b24575e3001044aaec9f2b0"
             },
             "createWorkersContract": {
-              "signature": "31468656a19da089a91b7a90da170f69edf826ef31df61ea15d68d00ab4b0de4"
+              "signature": "2fea7b7eee6711c4ab3a56e19b364e02997b120fb4b2529f31866da075adcaf5"
             },
             "ExecutionFiltersSchema": {
-              "signature": "de04e61b326a58d1af63cabbd2d036aa64d736e5982fdc80fc2d04176e7c8ce4"
+              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
             },
             "ExecutionRecord": {
-              "signature": "310fa84d8286630757c023fef64e93ff26ec9f0306508320db80d6c432ae2d9c"
+              "signature": "73bbed9f87dd9346c8164124cd34288489c4dca2cd31c3a7e6a49c2d57025e54"
             },
             "ExecutionRecordResponse": {
-              "signature": "db73544a90ae597b1484ef7319c7f2e6d37ab98cee92a2611d4487ec11716351"
+              "signature": "58f346cd6fa05520d12ed235a63eabe16d16b6a64f05b07eff9df281e4d0f45f"
             },
             "ExecutionRecordResponseSchema": {
-              "signature": "3288433f71943119d6833eece948dddbead3efd141c676bc39b43ef6c34ee5ff"
+              "signature": "6c64ac7904a16db0f08750437891409cd59b8e701755fa4c290b891f6f9949cd"
             },
             "ExecutionStatus": {
-              "signature": "d45d34b17ff1d780c7af3c74ebed42ece729ba6630ccbdcc50131e02e9d7a1e8"
+              "signature": "5f72983473025caf7913925661fc4e4acbdb617d0fd72896c04ec7c2fadca5a1"
             },
             "JobContext": {
-              "signature": "f1481dcd251bf5da834c3bdcb6a1173dbc2710706e74995b3e6b94333a2c7889"
+              "signature": "d9d36ccc9a35f69bb74f56384996a45e56acbd54d20aeeca1e96ca07287c1b11"
             },
             "JobCreateInputSchema": {
-              "signature": "029ba56279870785e67b8d2bb77952e5f4d434f2add74b8813092089991f0bed"
+              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
             },
             "JobDefinition": {
-              "signature": "e8c1e8efd136cc0116b02cce93bb90e8ceb8a75d695e00a146c64cb50b8acf7a"
+              "signature": "cd8a1f21f56d02cdfa643c6f5949f924788aa05ffad4a3ce3121e88436631d65"
             },
             "JobDefinitionResponse": {
-              "signature": "8ef4c5e6ef9591e37b5b612a1d073add09f8e334b4b46e41cb524df0aff40f1d"
+              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
             },
             "JobDefinitionResponseSchema": {
-              "signature": "93b774f56ab3d54309417928d95d1caf79c9f9f1c11fd051dd547e8ad3af367e"
+              "signature": "cb5a6be1ae6ca6e388585dfbc583ec3019926d65a9092a000d87dfdec6428e18"
             },
             "JobFailure": {
-              "signature": "552932e6690a1a672092ff544891e009c9e9e297ace618be5c1db359c71bf758"
+              "signature": "b68dc70e2d373b92474dc185c4a88df8d56c965f249339a7a105254bfacbb263"
             },
             "JobFiltersSchema": {
-              "signature": "bfd031e610847f5f0929f65b5670ded20af267f8f397299fb613a180cfb78948"
+              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
             },
             "JobHandler": {
-              "signature": "0a852f0067f858c75702fc2fd4c4d258c99da3c205f1da6a779ce4dc74142f64"
+              "signature": "67d3de45f379cdd206fe5e919a572dadce99a7f541a358dd8aa4660655650244"
             },
             "JobMessage": {
-              "signature": "0077aacebecd49dfb35bc7915012ad3658bbf3146eda6841efc5fdb61cfb6cd6"
+              "signature": "3d04fee5dd72dd9e14be2e4e73d19d402ace9b8f02275ab11d88200a26f69539"
             },
             "JobPayloadRecord": {
-              "signature": "9d4a6f9d8b747ae851c4c160dfc58bc6e702766127c89cc6098ee5e70e0ddc9f"
+              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
             },
             "JobPayloadRegistry": {
-              "signature": "22f8cca78e879a2d895d2da84969e3b50def3da8418844426cc3a139dc5ae565"
+              "signature": "2b235d8dc7ff34dc5b1c44b0171d90d88e1722c0a32c9814857e107f88ffc8c9"
             },
             "JobPayloadSchema": {
-              "signature": "a60b654bd759e0cf14e462d1644e2f33b889d9ccf067cf5490bbbf0cdc5345d7"
+              "signature": "b9fa7d06c457c497f7f8b8a999977a9793ed4ecd6568e942eec54ccf75b37e5c"
             },
             "JobResult": {
-              "signature": "daa510641597e0083e32ea1078c5fcef1f3b44f770935b72fd41e77857345f2d"
+              "signature": "c63c4d1417ccfeb654ac366a965af4753799b1d6925e054e05b4f456ef30e0e5"
             },
             "JobSuccess": {
-              "signature": "4a462382d604a4eaabcc4d4ff6579d5a2d098b5a5b43d75d2b933861ddb024c6"
+              "signature": "f752faccd8e5a71b835ade9bcdf23f72eacbd6befae34ade3cf7d70e3c514cd3"
             },
             "JobTriggerInput": {
-              "signature": "b04ad7617d267a8bbbfffb7bc37b165ad8a1cab36af87b93b39e8065f693f6f2"
+              "signature": "860520de3603b2ee58544fb38ae41eb3caf937affc5ce5ff363aef4ffd06d9c9"
             },
             "JobTriggerInputSchema": {
-              "signature": "d4a630101f35b8478df3e5bcaf78b9905a9a38a218634b937aba8c1be621e504"
+              "signature": "a307885abf75b26f3843b76e1200ee85900b09382ce3bbb62076b09bfd89d6df"
             },
             "JobTriggerOutput": {
-              "signature": "c345141d14961d205c55e2ca653b8739a635ef77ea1085a83f9851449efc30c4"
+              "signature": "fddcbef32870e239c72395fcf1a2725c5c7c6f45d154a40761ace70f77658d6d"
             },
             "JobUpdateInputSchema": {
-              "signature": "82e9a98c899e5525a94f39eb3155e032d3d68a01286fda41ba2e6ad2e27adfd2"
+              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
             },
             "JobUpdateWithIdSchema": {
-              "signature": "d61eb239035a61da51e6cbf36e5f9a92a4181c928a6ca67bde9566c6628ec222"
+              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
             },
             "PublicStandardSchema": {
-              "signature": "a59dcac4a79120621039e00878dcb36f2970f4f1055eb4b6f40bbafc70b96005"
+              "signature": "82247be594d4b33ab9b5d944699a7071de84d314d638ecb182f15a7bc0cdf875"
             },
             "RegisterJobInput": {
-              "signature": "07adefc89d1abfbf6281b7fe48ac0cfedda8ef34275c7a24be62b0a718e5c699"
+              "signature": "4ab660669f2354cb97813e0e3805b9bdcfd6fd1c9e21a758024e447352af0931"
             },
             "RegisterTaskInput": {
-              "signature": "8973b587f1bebca49739608cabb98c5c81a9ea43f273c3dd9c8d20f50cb164d9"
+              "signature": "6eebad6d9d810cb0badeb0f11ca0c987fe9fa5df5b24ec959188a270773ac0d4"
             },
             "RuntimePermissions": {
-              "signature": "5ebe78bbc91eb1230e91108316e9432ec695bd88246bd76f540e3c4d07e30cb1"
+              "signature": "a4bc96f5c929896dcb5989b227cef6d85fa22f64895a3d647b3d85cfaeb6118c"
             },
             "RuntimePermissionValue": {
-              "signature": "1246d1d558be7042e9fbc4d1f961a6383854fa2ca3e91af5a7c8ffe34b3c5bc7"
+              "signature": "cdc9856fa4e59783f666d812b21615ea00a52891c64d80aed9aa953ac86f76d0"
             },
             "SSEEvent": {
-              "signature": "d210889b9aaecca3464ca331b2b90611715ab45a9d58e5cd0ad45a33caefc034"
+              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
             },
             "SSEEventSchema": {
-              "signature": "e51f4b472010408e03eff67c5c083a9a4e27a1a00da2f9067374c970e10f3b7a"
+              "signature": "a79315058dffd3a10f51047bda4c8c169d6a221e02b1556a830ba334774e1ac1"
             },
             "TaskDefinition": {
-              "signature": "5ca44d83e607e646855cb0abe8a5ee5da2b275389e4687387ebc759164ac4499"
+              "signature": "d8e7e11ced4156d53de97753744f4442a7f7c7fe2b144f6eb22e45d1b551754e"
             },
             "TaskDefinitionResponse": {
-              "signature": "820996e46b218aff4f22f7eb4ba477f437a883eb5e4c1c987629916bbd02f047"
+              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
             },
             "TaskDefinitionResponseSchema": {
-              "signature": "bce0474c3f4c28d32c7178deb2a4157f178bb8034abe1a8428c72b101da059a5"
+              "signature": "c8693b72f233253a1e93d211dc3e944aa521630711f0fb8ca98ea2b73b4196c1"
             },
             "TaskExecutionOptions": {
-              "signature": "d04582002a4d9b8ad9a20bfa343fd0abd205d58b41f933c801d05ec72c4c24fe"
+              "signature": "cf36ca2b6adf88d99d58308f642d01bdabbc27f9e355ca313b8f7b8b12d84097"
             },
             "TaskFiltersSchema": {
-              "signature": "747c878a9ca920028ca0696edb7017da00c990899baa5579e3991ee8c06dc216"
+              "signature": "e5a8d416da7530555367280cb7854d7b15bff5ffcb51cd2ec285da9e6f656208"
             },
             "TaskMessage": {
-              "signature": "a5b343ba63a76cfd19eb40e660206cb58e9849eb2b35de57d40b3088f0345e15"
+              "signature": "735cdb04b6bf13d8885c6938bd39d91fed497fd4f3c4acc79694b5e8f77af632"
             },
             "TaskResult": {
-              "signature": "99cde2891af8102ccfa39b0a729830e8743feb7a6daffcd10a0c0790bb286749"
+              "signature": "d436f99f4957957efa23df37f413bd2d34f6220a8091ceed2be1bbc359a90a1b"
+            },
+            "TaskStdin": {
+              "signature": "df3342afb176fa2ad9a744c49f6fe3dba1c57717752a8ce86f06a9306eb1170e"
+            },
+            "TaskStdinJson": {
+              "signature": "f4f3f0f1507a65f51483bb48924c3fefa75b7ff6b6c64a89efa91f59519b540e"
             },
             "TaskTriggerInput": {
-              "signature": "984ac5332ec244ec17fa4bf760dd3788af8b79e4d7e78f9f6c4a6972d3b811fc"
+              "signature": "809b19db8c47c6c780c36e6ca0a493b08325c7371fc0d36d0682aa7292609775"
             },
             "TaskTriggerOutput": {
-              "signature": "ddf3979d9bfe0f7b3240590202ad11c17567ed423331b65f13ca30375d6bbc57"
+              "signature": "3527da980fd0d35922c201eebe638cb2a01f5b33cef6cc6776b5c1dd69582367"
             },
             "TriggerType": {
-              "signature": "6ddddce5bd0c2301161f60884d316c5e902f6e1e1a0601446553012734e227e0"
+              "signature": "e44cf532661dae623ecb03b301e65ee30c2b0ac36a47bd09fd5fd1d2280b1352"
             },
             "WorkersCapabilities": {
-              "signature": "77e7b9a0b1ac9c292ba82950ba5b903af831e9bddf0fd63961204ee9bf8fa615"
+              "signature": "f72e398cc0112923adb19b64bf796f5524486ee0b89b423a698b2a616d50e00f"
             },
             "workersContract": {
-              "signature": "f039af049977f0032dfacc9920b6ebd10424a70e9d07acd2dc41ce2df4ad313b"
+              "signature": "bd82cb833d400d1aabe776540913f77d17ed01498778486f73a1bc9a9470de49"
             },
             "WorkersContract": {
-              "signature": "f1d4194ccfe3e8b52f286d6aaa3ecf7424a89d7608ad2a7f59526c53bc8488ab"
+              "signature": "5984144d3beb521c91c8b94a6f1e3de5a762ca687e9688918b3a9d4dafb4d5ef"
+            },
+            "WorkersContractRoute": {
+              "signature": "62d32a07fe4d1c99e52af6c1aeeacca6f2c35599563c178c47134bb585da1e84"
+            },
+            "WorkersContractRouteName": {
+              "signature": "330f277ddd297a1dfad10b6331a3a339056768aa9256460ba67e3255be91a125"
+            },
+            "WorkersContractRouteSchemas": {
+              "signature": "09d4837895d6101e2fd3aed7ce5dfc15a7c05e3d82e1bd68302c5d63f53dbd12"
             },
             "workersContractV1": {
-              "signature": "812a35c05e58c4b223ada0bb90e477be69f24ec5dfbacc6bd752fed09cdbd9cb"
+              "signature": "7a86a6eb0b1d10a15f483823bf1fa837adc85e18b2033f603840b9c380f156ea"
             },
             "WorkersContractV1": {
-              "signature": "673e1fea1ff64e1947f6003dcf8f9608b97b8440325075ab2efb7802da93afe0"
+              "signature": "138c5bbee757b25adb0a556703a5be74c36e3ae08572f95722ae9215e5ea12d8"
             },
             "WorkersRouter": {
-              "signature": "7881e06897fb460157862f7c9cd1b98e2f81a6583b5db3531814a901c4beb235"
+              "signature": "b8bbd50a945c0d938ef8442ab0a8751584b85802807115fa1ed53940bda95be6"
             }
           }
         },
@@ -17512,10 +17527,19 @@
               "signature": "f72e398cc0112923adb19b64bf796f5524486ee0b89b423a698b2a616d50e00f"
             },
             "workersContract": {
-              "signature": "c403f20a073e6634012b54594842ee1f185d92e6a00bbee64bc56dc8f9629cdb"
+              "signature": "bd82cb833d400d1aabe776540913f77d17ed01498778486f73a1bc9a9470de49"
             },
             "WorkersContract": {
               "signature": "5984144d3beb521c91c8b94a6f1e3de5a762ca687e9688918b3a9d4dafb4d5ef"
+            },
+            "WorkersContractRoute": {
+              "signature": "62d32a07fe4d1c99e52af6c1aeeacca6f2c35599563c178c47134bb585da1e84"
+            },
+            "WorkersContractRouteName": {
+              "signature": "330f277ddd297a1dfad10b6331a3a339056768aa9256460ba67e3255be91a125"
+            },
+            "WorkersContractRouteSchemas": {
+              "signature": "09d4837895d6101e2fd3aed7ce5dfc15a7c05e3d82e1bd68302c5d63f53dbd12"
             },
             "workersContractV1": {
               "signature": "7a86a6eb0b1d10a15f483823bf1fa837adc85e18b2033f603840b9c380f156ea"
