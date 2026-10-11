@@ -13,3 +13,5 @@ recipes]({{ "howto:index" |> xref |> url }}).
 
 - [Protect an anonymous service route](/services-sdk/how-to/protect-an-anonymous-route/) with a
   shared client-address quota and explicit proxy trust.
+- [Call internal procedures from a service or worker](/services-sdk/how-to/call-internal-procedures/)
+  with the provisioned installation credential and a policy covering both projections.
