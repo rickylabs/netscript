@@ -4322,6 +4322,7 @@
       },
       "packages/aspire": {
         "dependencies": [
+          "jsr:@netscript/plugin-sagas-core@0.0.7",
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
@@ -4376,6 +4377,7 @@
           "jsr:@netscript/fresh-ui@0.0.7",
           "jsr:@netscript/fresh@0.0.7",
           "jsr:@netscript/mcp@0.0.7",
+          "jsr:@netscript/plugin-sagas-core@0.0.7",
           "jsr:@netscript/plugin@0.0.7",
           "jsr:@netscript/sdk@0.0.7",
           "jsr:@std/async@1",

@@ -1,6 +1,19 @@
 /** Durable saga store backend variants supported by the plugin runtime. */
 export type DurableSagaStoreBackend = 'kv' | 'prisma';
 
+/** Saga query projection backend, independently selected from canonical state. */
+export type SagaProjectionBackend = DurableSagaStoreBackend | 'none';
+
+/** Environment variable used to select saga query projection and hydration. */
+export const SAGA_PROJECTION_BACKEND_ENV = 'NETSCRIPT_SAGA_PROJECTION';
+
+/** Supported saga query projection backend values. */
+export const SAGA_PROJECTION_BACKENDS: readonly SagaProjectionBackend[] = Object.freeze([
+  'kv',
+  'prisma',
+  'none',
+]);
+
 /** Environment variable used to select the durable saga state backend. */
 export const SAGA_STORE_BACKEND_ENV = 'NETSCRIPT_SAGA_STORE';
 
@@ -38,14 +51,20 @@ export function resolveSagaStoreBackend(
 /** Resolve the query projection independently of durable state; env overrides appsettings. */
 export function resolveSagaProjectionBackend(
   input: SagaStoreBackendResolutionInput = {},
-): DurableSagaStoreBackend | 'none' {
-  const value = input.env?.NETSCRIPT_SAGA_PROJECTION ||
+): SagaProjectionBackend {
+  const value = input.env?.[SAGA_PROJECTION_BACKEND_ENV] ||
     stringAt(input.appsettings, ['sagas', 'projection', 'backend']) ||
     stringAt(input.appsettings, ['Sagas', 'Projection', 'Backend']);
   if (value !== undefined) {
     const normalized = value.trim().toLowerCase();
-    if (normalized === 'none') return normalized;
-    return parseSagaStoreBackend(value, 'sagas.projection.backend');
+    if (normalized === 'kv' || normalized === 'prisma' || normalized === 'none') {
+      return normalized;
+    }
+    throw new Error(
+      `Invalid saga projection backend "${value}"; expected ${
+        SAGA_PROJECTION_BACKENDS.join(', ')
+      }.`,
+    );
   }
   const store = input.env?.[SAGA_STORE_BACKEND_ENV] || findAppsettingsBackend(input.appsettings);
   return store ? parseSagaStoreBackend(store, 'sagas.store.backend') : 'kv';

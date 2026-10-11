@@ -4,6 +4,7 @@ import type { SagaStateEnvelope } from '@netscript/plugin-sagas-core/domain';
 /** Resolve the configured per-definition terminal and archive policies at startup. */
 export async function loadSagaRetention(): Promise<
   Readonly<{
+    requiresDatabaseArchive: boolean;
     completedDays(envelope: SagaStateEnvelope): number;
     archiveToDb(sagaId: string): boolean;
   }>
@@ -13,7 +14,7 @@ export async function loadSagaRetention(): Promise<
     config = await loadConfig();
   } catch (error) {
     if (error instanceof Error && error.message.startsWith('No config file found.')) {
-      return { completedDays: () => 7, archiveToDb: () => false };
+      return { requiresDatabaseArchive: false, completedDays: () => 7, archiveToDb: () => false };
     }
     throw error;
   }
@@ -27,6 +28,7 @@ export async function loadSagaRetention(): Promise<
     }
   }
   return {
+    requiresDatabaseArchive: [...policies.values()].some((policy) => policy.archiveToDb),
     completedDays: (envelope) => policies.get(envelope.metadata.sagaId ?? '')?.completedDays ?? 7,
     archiveToDb: (sagaId) => policies.get(sagaId)?.archiveToDb ?? false,
   };

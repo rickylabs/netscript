@@ -15,6 +15,7 @@
     "./public": "./src/public/mod.ts"
   },
   "imports": {
+    "@netscript/plugin-sagas-core": "jsr:@netscript/plugin-sagas-core@0.0.7",
     "zod": "catalog:",
     "@std/path": "jsr:@std/path@^1",
     "@std/fs": "jsr:@std/fs@^1",

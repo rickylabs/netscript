@@ -17,6 +17,7 @@
  */
 
 import { z } from 'zod';
+import type { SagaProjectionBackend } from '@netscript/plugin-sagas-core/stores';
 import {
   ASPIRE_RESOURCE_NAME_PATTERN,
   ASPIRE_RESOURCE_NAME_RULE,
@@ -162,7 +163,7 @@ export interface SagaResourceConfig {
   /** Query projection backend; omitted follows Store.Backend, defaulting to KV. */
   Projection?: {
     /** KV query model, Prisma query model, or disabled query projection. */
-    Backend?: 'kv' | 'prisma' | 'none';
+    Backend?: SagaProjectionBackend;
   };
 }
 

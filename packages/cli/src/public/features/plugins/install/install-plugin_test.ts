@@ -2487,7 +2487,7 @@ for (const pluginName of ['workers', 'sagas', 'triggers'] as const) {
       for (const file of files) {
         const source = await Deno.readTextFile(file);
         assertFalse(
-          /(?:from|import\s*\()\s*['"][^'"]*(?:prisma|database\/generated)/i.test(source),
+          /(?:from|import\s*\(?)\s*['"][^'"]*(?:prisma|database\/generated)/i.test(source),
         );
       }
     } finally {

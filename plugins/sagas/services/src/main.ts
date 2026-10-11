@@ -55,8 +55,12 @@ export default async function createSagasService(
     env: { ...Deno.env.toObject(), ...ctx.env },
     appsettings: serviceAppsettings(ctx),
   });
-  let dbClient: SagaServiceDatabaseClient = emptySagaDatabaseClient;
-  let useKvProjection = projectionBackend === 'kv';
+  const sagaDbClient = projectionBackend === 'prisma'
+    ? resolveSagaServicePrismaClient(await ctx.db.getClient(), 'prisma')
+    : undefined;
+  const dbClient: SagaServiceDatabaseClient = sagaDbClient ?? emptySagaDatabaseClient;
+  const useKvProjection = projectionBackend === 'kv';
+  await registerSagas();
   const sagaPublisher = createSagaDeliveryPublisher();
 
   const service = await createPluginService(router, {
@@ -76,32 +80,13 @@ export default async function createSagasService(
     onShutdown: [() => sagaPublisher.stop()],
   }).serve();
 
-  queueMicrotask(async () => {
-    try {
-      const sagaDbClient = projectionBackend === 'prisma'
-        ? resolveSagaServicePrismaClient(await ctx.db.getClient(), 'prisma')
-        : undefined;
-      if (sagaDbClient) {
-        dbClient = sagaDbClient;
-        useKvProjection = false;
-      }
-      await registerSagas();
-      if (sagaDbClient) {
-        void startSagasStreamMirror({ prisma: sagaDbClient })
-          .catch((error) => {
-            console.warn('[Sagas API] Durable stream hook skipped:', error);
-          });
-      } else {
-        console.warn(
-          '[Sagas API] Saga Prisma delegates unavailable; KV runtime continues without DB query projections.',
-        );
-      }
-
-      console.log(`[Sagas API] Running on http://localhost:${port}`);
-    } catch (error) {
-      console.error('[Sagas API] Failed to finish post-listen startup:', error);
-    }
-  });
+  if (sagaDbClient) {
+    void startSagasStreamMirror({ prisma: sagaDbClient })
+      .catch((error) => {
+        console.warn('[Sagas API] Durable stream hook skipped:', error);
+      });
+  }
+  console.log(`[Sagas API] Running on http://localhost:${port}`);
 
   return service;
 }

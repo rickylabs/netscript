@@ -23,7 +23,10 @@ export interface SagaRetentionConfigData {
   readonly activeDays: number;
   /** Number of days completed saga instances remain available. */
   readonly completedDays: number;
-  /** Whether completed saga instances are archived to the database. */
+  /**
+   * Opt into a host Prisma archive with KV query projections (default false).
+   * Prisma projections persist all instances independently; `none` disables archival.
+   */
   readonly archiveToDb: boolean;
 }
 

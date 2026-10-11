@@ -164,8 +164,13 @@ or `none`). In `appsettings.json`, put `Sagas.Projection.Backend` on both the sa
 `NetScript.Plugins` and the saga runner entry in `NetScript.BackgroundProcessors`. Generated
 helpers forward the selector as `NETSCRIPT_SAGA_PROJECTION`; that environment value takes
 precedence over settings. `kv` writes the KV query model, `prisma` writes the Prisma query model,
-and `none` disables the instance query projection while canonical saga state remains durable.
-The runner and API request a DB client only for a Prisma projection.
+and `none` disables both the instance query projection and durable saga-stream hydration while
+canonical saga state remains durable. An explicitly selected `prisma` projection requires the host's
+saga Prisma delegates; the API fails before listening and the runner fails before starting delivery
+if those delegates are missing. With `kv`, `retention.archiveToDb: true` remains an explicit database
+archive opt-in for the configured saga group: the runner requests a host Prisma client and archives
+that group's instances while retaining KV queries. The default `archiveToDb: false` keeps KV-only
+installs DB-free. `none` also disables database archival.
 
 **Migration in 0.0.8:** re-run each plugin install with `--no-db --no-samples --force` and regenerate
 helpers to correct existing DB-dependent metadata. Preserve your user-owned configuration and

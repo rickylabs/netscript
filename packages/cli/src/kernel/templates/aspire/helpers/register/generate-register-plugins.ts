@@ -18,6 +18,7 @@
  * processors which use `--watch`).
  */
 
+import { SAGA_PROJECTION_BACKEND_ENV } from '@netscript/plugin-sagas-core/stores';
 import type { RegisterPluginsOptions } from '../types.ts';
 import { extractSagaStoreBackend, fileHeader } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
@@ -146,7 +147,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     const sagaProjectionBackend = extractSagaStoreBackend(entry, 'Projection');
     if (sagaProjectionBackend) {
       lines.push(
-        `    await resource.withEnvironment('NETSCRIPT_SAGA_PROJECTION', ${
+        `    await resource.withEnvironment('${SAGA_PROJECTION_BACKEND_ENV}', ${
           JSON.stringify(sagaProjectionBackend)
         });`,
       );

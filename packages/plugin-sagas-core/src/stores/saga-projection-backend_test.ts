@@ -1,11 +1,17 @@
 import { assertEquals, assertThrows } from '@std/assert';
-import * as stores from './saga-store-backend.ts';
+import {
+  resolveSagaProjectionBackend as resolve,
+  SAGA_PROJECTION_BACKEND_ENV,
+  SAGA_PROJECTION_BACKENDS,
+  type SagaProjectionBackend,
+} from './saga-store-backend.ts';
 
 Deno.test('projection selector honors env, PascalCase/lowercase settings, none and KV default', () => {
-  const resolve = Reflect.get(stores, 'resolveSagaProjectionBackend');
-  if (typeof resolve !== 'function') throw new Error('Projection selector missing');
+  const defaultBackend: SagaProjectionBackend = resolve();
+  assertEquals(defaultBackend, 'kv');
+  assertEquals(SAGA_PROJECTION_BACKENDS, ['kv', 'prisma', 'none']);
   assertEquals(resolve(), 'kv');
-  for (const backend of ['kv', 'prisma', 'none']) {
+  for (const backend of SAGA_PROJECTION_BACKENDS) {
     assertEquals(resolve({ appsettings: { sagas: { projection: { backend } } } }), backend);
     assertEquals(
       resolve({ appsettings: { Sagas: { Projection: { Backend: backend } } } }),
@@ -13,7 +19,7 @@ Deno.test('projection selector honors env, PascalCase/lowercase settings, none a
     );
     assertEquals(
       resolve({
-        env: { NETSCRIPT_SAGA_PROJECTION: backend },
+        env: { [SAGA_PROJECTION_BACKEND_ENV]: backend },
         appsettings: { Sagas: { Projection: { Backend: 'prisma' } } },
       }),
       backend,
@@ -21,5 +27,9 @@ Deno.test('projection selector honors env, PascalCase/lowercase settings, none a
   }
   assertEquals(resolve({ env: { NETSCRIPT_SAGA_STORE: 'kv' } }), 'kv');
   assertEquals(resolve({ env: { NETSCRIPT_SAGA_STORE: 'prisma' } }), 'prisma');
-  assertThrows(() => resolve({ env: { NETSCRIPT_SAGA_PROJECTION: 'typo' } }));
+  assertThrows(
+    () => resolve({ env: { [SAGA_PROJECTION_BACKEND_ENV]: 'typo' } }),
+    Error,
+    'expected kv, prisma, none',
+  );
 });

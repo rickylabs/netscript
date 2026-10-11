@@ -54,6 +54,8 @@ export { PrismaSagaStore, SAGA_RUNTIME_CORRELATION_SELECTOR } from './prisma-sag
 export {
   resolveSagaProjectionBackend,
   resolveSagaStoreBackend,
+  SAGA_PROJECTION_BACKEND_ENV,
+  SAGA_PROJECTION_BACKENDS,
   SAGA_STORE_BACKEND_ENV,
   SAGA_STORE_BACKENDS,
 } from './saga-store-backend.ts';
@@ -80,6 +82,7 @@ export type {
 } from './prisma-saga-store.ts';
 export type {
   DurableSagaStoreBackend,
+  SagaProjectionBackend,
   SagaStoreBackendResolutionInput,
 } from './saga-store-backend.ts';
 
