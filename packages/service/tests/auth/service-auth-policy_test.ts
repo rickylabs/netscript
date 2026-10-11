@@ -84,3 +84,78 @@ Deno.test('service auth policy diagnostics never serialize caller data', () => {
   assertEquals(error.message.includes('private-sensitive-value'), false);
   assertEquals(error.message.includes('secret-reason'), false);
 });
+
+Deno.test('guarded policy composes contract access across REST and RPC without exposing protected handlers', async () => {
+  const { baseContract } = await import('@netscript/contracts');
+  const { implement } = await import('@orpc/server');
+  const { z } = await import('zod');
+  const { defineService } = await import('../../mod.ts');
+  const { createContractAuthorizer } = await import('../../src/auth/mod.ts');
+  const contract = {
+    public: baseContract.route({ method: 'POST', path: '/public' })
+      .meta({ access: { authentication: 'none' } }).output(z.boolean()),
+    protected: baseContract.route({ method: 'POST', path: '/protected' })
+      .meta({ access: { authentication: 'required' } }).output(z.boolean()),
+    denied: baseContract.route({ method: 'POST', path: '/denied' })
+      .meta({ access: { authentication: 'required', authorization: { scopes: ['admin'] } } })
+      .output(z.boolean()),
+  };
+  let protectedCalls = 0;
+  let deniedCalls = 0;
+  const binding = implement(contract);
+  const router = {
+    v1: {
+      proof: {
+        public: binding.public.handler(() => true),
+        protected: binding.protected.handler(() => {
+          protectedCalls++;
+          return true;
+        }),
+        denied: binding.denied.handler(() => {
+          deniedCalls++;
+          return true;
+        }),
+      },
+    },
+  };
+  const policy: ServiceAuthPolicy = {
+    authn: {
+      authenticator: createStaticCredentialAuthenticator({
+        credentials: { reader: { subject: 'reader', scopes: [] } },
+      }),
+      allowAnonymous: ['/health', '/api/docs', '/api/openapi.json'],
+    },
+    authz: { authorizer: createContractAuthorizer(router) },
+  };
+  assertServiceAuthPolicy(policy);
+  const service = await defineService(router, { name: 'policy-proof', port: 0, auth: policy });
+  try {
+    for (const path of ['/health', '/api/docs', '/api/openapi.json']) {
+      const response = await service.app.request(path);
+      assertEquals(response.status, 200, path);
+      await response.body?.cancel();
+    }
+    for (const prefix of ['/api/', '/api/rpc/v1/proof/']) {
+      for (
+        const [procedure, credential, expected] of [
+          ['public', undefined, 200],
+          ['protected', undefined, 401],
+          ['protected', 'reader', 200],
+          ['denied', undefined, 401],
+          ['denied', 'reader', 403],
+        ] as const
+      ) {
+        const response = await service.app.request(`${prefix}${procedure}`, {
+          method: 'POST',
+          headers: credential ? { authorization: `Bearer ${credential}` } : {},
+        });
+        assertEquals(response.status, expected, `${prefix}${procedure}`);
+        await response.body?.cancel();
+      }
+    }
+    assertEquals(protectedCalls, 2);
+    assertEquals(deniedCalls, 0);
+  } finally {
+    await service.stop();
+  }
+});

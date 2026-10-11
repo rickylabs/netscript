@@ -61,6 +61,11 @@ export const {{serviceName | pascalCase}}CrudContractV1 = {
  * Extend this with your own procedures as the service grows.
  */
 export const {{serviceName | pascalCase}}ContractV1 = {
+  // Request-time identity proof; demo data procedures below remain public.
+  session: baseContract
+    .route({ method: 'POST', path: '/{{serviceName}}/session' })
+    .meta({ access: { authentication: 'required' } })
+    .output(z.object({ authenticated: z.boolean() })),
   health: {
     check: baseContract
       .route({ method: 'GET', path: '/{{serviceName}}/health' })

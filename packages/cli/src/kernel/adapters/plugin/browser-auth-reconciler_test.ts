@@ -20,7 +20,7 @@ import { createContractScaffolder } from '../contracts/contract-scaffolder.ts';
 import { DefaultContractTemplateRegistry } from '../contracts/templates/contract-template-registry.ts';
 import { ContractVersionRegistry } from '../contracts/version-registry.ts';
 import { ContractWorkspaceResolver } from '../contracts/workspace-resolver.ts';
-import { reconcileBrowserAuth } from './browser-auth-reconciler.ts';
+import { browserAuthReconciliationPaths, reconcileBrowserAuth } from './browser-auth-reconciler.ts';
 import { regenerateAspireHelpers } from '../service/workspace-mutator.ts';
 import { SERVICE_PUBLIC_REASON, serviceAuthTemplate } from '../service/auth-policy.ts';
 
@@ -341,4 +341,30 @@ Deno.test('browser auth preserves the scaffold public opt-out when auth is disab
   assertEquals(await reconcileBrowserAuth(root, fs), []);
   assertEquals(await fs.readFile(path), publicMain);
   assertEquals(await fs.exists(join(root, 'auth/service.ts')), false);
+});
+
+Deno.test('browser auth emits a server SDK session route and snapshots it while preserving authored routes', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const root = '/workspace';
+  await fs.writeFile(join(root, 'appsettings.json'), JSON.stringify(settings));
+  await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
+  await fs.writeFile(join(root, 'services/users/src/main.ts'), main);
+  await fs.writeFile(
+    join(root, 'contracts/versions/v1/users.contract.ts'),
+    'export const UsersContractV1 = { session: baseContract };',
+  );
+  await writeInstalledAuthFixture(fs, root);
+  const path = join(root, 'apps/web/routes/examples/users/session.ts');
+  assert((await browserAuthReconciliationPaths(root, fs)).includes(path));
+  assert((await reconcileBrowserAuth(root, fs)).includes(path));
+  const content = await fs.readFile(path);
+  assertStringIncludes(content, 'createBrowserSessionClient');
+  assertStringIncludes(content, 'browserSessionContext(ctx.req)');
+  assertStringIncludes(content, 'client.session(undefined, { context })');
+  assertStringIncludes(content, "'../../../../../auth/bff.ts'");
+  assertEquals(content.includes('fetch('), false);
+  assertEquals(await reconcileBrowserAuth(root, fs), []);
+  await fs.writeFile(path, '// authored route');
+  await reconcileBrowserAuth(root, fs);
+  assertEquals(await fs.readFile(path), '// authored route');
 });
