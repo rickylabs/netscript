@@ -1,5 +1,6 @@
 import { join } from '@std/path';
 import type {
+  PluginSurfaceProducer,
   RenderedPluginRegistry,
   RenderPluginRegistries,
 } from '../../../../kernel/domain/plugin-generated-surface.ts';
@@ -20,6 +21,8 @@ import {
   validateInspectionDirectories,
 } from '../../../../kernel/adapters/service/generated-surface-reader.ts';
 
+import { frozenPluginInspection } from '../../../../kernel/adapters/runtime/process/frozen-plugin-inspection.ts';
+
 const MAX_OUTPUTS = 256;
 const MAX_CONTENT = 16 * 1024 * 1024;
 const MAX_SOURCES = 4096;
@@ -32,14 +35,24 @@ export function createInstalledRuntimeRegistryRenderer(
     await rejectInspectionLinks(projectRoot, 'appsettings.json');
     await rejectInspectionLinks(projectRoot, 'deno.json');
     const rendered: RenderedPluginRegistry[] = [];
+    const producers: PluginSurfaceProducer[] = [];
     const packages = await discoverInstalledRuntimePackages(projectRoot, dependencies.fs);
     if (packages.length > MAX_OUTPUTS) throw new Error('Plugin inspection capacity exceeded.');
     for (const installed of packages) {
       const resolved = await resolveRuntimeManifest(projectRoot, installed, dependencies);
-      // Absence cannot establish that an installed producer has no output.
-      if (!resolved) throw new Error(`Missing runtime manifest for ${installed.name}.`);
+      const producer = {
+        generator: `${PLUGIN_SURFACE_GENERATOR}:${installed.name}`,
+        version: installed.version,
+      };
+      if (!resolved) {
+        producers.push({ ...producer, outputs: [] });
+        continue;
+      }
       const manifest = readRuntimeManifest(resolved.value, installed.name);
-      if (!manifest.runtimeRegistries?.length) continue;
+      if (!manifest.runtimeRegistries?.length) {
+        producers.push({ ...producer, outputs: [] });
+        continue;
+      }
       if (manifest.runtimeRegistryGenerator?.inspectionProtocol !== 2) {
         throw new Error(`Plugin ${installed.name} requires byte inspection protocol 2.`);
       }
@@ -50,12 +63,17 @@ export function createInstalledRuntimeRegistryRenderer(
           resolved,
           manifest,
           dependencies,
-          ['--no-lock'],
+          frozenPluginInspection(dependencies.process),
         ),
       );
+      producers.push({
+        ...producer,
+        outputs: rendered.filter((file) => file.plugin === installed.name && file.content !== null)
+          .map((file) => file.path),
+      });
       if (rendered.length > MAX_OUTPUTS) throw new Error('Plugin output capacity exceeded.');
     }
-    return rendered;
+    return { registries: rendered, producers };
   };
 }
 
@@ -66,7 +84,7 @@ export async function renderRuntimeRegistryPlan(
   resolved: ResolvedRuntimeManifest,
   manifest: RuntimeRegistryManifest,
   dependencies: InstalledRuntimeRegistryGeneratorDependencies,
-  lockArgs: readonly string[],
+  process: InstalledRuntimeRegistryGeneratorDependencies['process'],
 ): Promise<readonly RenderedPluginRegistry[]> {
   const generator = manifest.runtimeRegistryGenerator;
   if (!generator || generator.inspectionProtocol !== 2) {
@@ -98,11 +116,11 @@ export async function renderRuntimeRegistryPlan(
   const command = resolved.generatorBase.startsWith('https:')
     ? new URL(generator.command, resolved.generatorBase).href
     : join(resolved.generatorBase, generator.command);
-  const result = await dependencies.process.exec('deno', [
+  const result = await process.exec('deno', [
     'run',
     '--config',
     join(projectRoot, 'deno.json'),
-    ...lockArgs,
+    '--node-modules-dir=none',
     '--no-prompt',
     '--allow-read',
     '--deny-write',
@@ -126,7 +144,8 @@ export async function renderRuntimeRegistryPlan(
   if (result.code !== 0) {
     throw new Error(
       `Plugin byte inspection failed for ${installed.name}: ${
-        result.stderr.trim() || `exit ${result.code}`
+        (result.stderr.trim() || `exit ${result.code}`) +
+        '; run generate plugins to prepare the consumer lock.'
       }`,
     );
   }

@@ -16,7 +16,9 @@ async function command(root: string, check = true) {
   return await new Deno.Command(Deno.execPath(), {
     args: [
       'run',
-      '--no-lock',
+      `--lock=${join(REPO, 'deno.lock')}`,
+      '--frozen',
+      '--node-modules-dir=none',
       '--no-prompt',
       ...(check
         ? ['--allow-read', '--allow-run=deno', '--allow-env', '--allow-net', `--deny-write=${root}`]
@@ -129,6 +131,7 @@ Deno.test('plugin check inventories every selected first-party registry with can
     assertEquals(Object.keys(report).sort(), schema.required.toSorted());
     assertEquals(report.generator, schema.properties.generator.const);
     assertEquals(report.outputs.length, 5);
+    assertEquals(report.producers.length, 6);
     assert(report.inputs.some((entry) => entry.path === 'sagas/custom-saga.ts'));
     assert(report.inputs.some((entry) => entry.path === 'workers/jobs/custom.ts'));
     assert(report.inputs.some((entry) => entry.path === 'ai/tools/custom.ts'));
@@ -333,8 +336,8 @@ for (const lock of ['deno.lock', 'consumer.lock']) {
         );
         const before = await snapshot(root);
         const report = await inspect(root);
-        assertEquals(report.status, 'drift');
-        assert(report.drift.every((finding) => finding.kind === 'missing'));
+        assertEquals(report.status, 'inspection-failure');
+        assertMatch(report.drift[0].message ?? '', /run generate plugins/);
         assertEquals(await snapshot(root), before);
       },
     );
@@ -447,3 +450,101 @@ for (const entrypoint of [null, './plugins/custom/mod.ts']) {
     });
   });
 }
+
+Deno.test('plugin public check inventories published auth and streams 0.0.7 without runtime manifests', async () => {
+  await withProject(async (root) => {
+    const config = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+    for (const plugin of ['auth', 'streams']) {
+      delete config.imports[`@netscript/plugin-${plugin}/runtime`];
+    }
+    await write(root, 'deno.json', JSON.stringify(config));
+    const settings = JSON.parse(await Deno.readTextFile(join(root, 'appsettings.json')));
+    for (const plugin of ['auth', 'streams']) {
+      settings.NetScript.Plugins[plugin] = {
+        Entrypoint: `jsr:@netscript/plugin-${plugin}@0.0.7/runtime`,
+      };
+    }
+    await write(root, 'appsettings.json', JSON.stringify(settings));
+    const generated = await command(root, false);
+    assertEquals(generated.code, 0, new TextDecoder().decode(generated.stderr));
+    const before = await snapshot(root);
+    const report = await inspect(root);
+    assertEquals(report.status, 'current', JSON.stringify(report));
+    for (const plugin of ['auth', 'streams']) {
+      assertEquals(
+        report.producers.find((entry) =>
+          entry.generator === `public.generate.plugins:@netscript/plugin-${plugin}`
+        ),
+        {
+          generator: `public.generate.plugins:@netscript/plugin-${plugin}`,
+          version: '0.0.7',
+          outputs: [],
+        },
+      );
+    }
+    assertEquals(await snapshot(root), before);
+  });
+});
+
+Deno.test('plugin public check and dry-run freeze stale npm versions without lock or node_modules writes', async () => {
+  await withProject(async (root) => {
+    const config = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+    config.nodeModulesDir = 'auto';
+    config.minimumDependencyAge = 'P1D';
+    // Seed a real immutable historical resolution, then retain it under the application's range.
+    config.imports = { zod: 'npm:zod@4.0.0' };
+    await write(root, 'deno.json', JSON.stringify(config));
+    await write(root, 'app-zod.ts', 'import "zod";\n');
+    const cached = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'cache',
+        '--config',
+        join(root, 'deno.json'),
+        '--node-modules-dir=none',
+        join(root, 'app-zod.ts'),
+      ],
+      cwd: root,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(cached.code, 0, new TextDecoder().decode(cached.stderr));
+    const lock = JSON.parse(await Deno.readTextFile(join(root, 'deno.lock')));
+    lock.specifiers['npm:zod@^4.0.0'] = lock.specifiers['npm:zod@4.0.0'];
+    lock.workspace.dependencies = ['npm:zod@^4.0.0'];
+    config.imports.zod = 'npm:zod@^4.0.0';
+    await write(root, 'deno.json', JSON.stringify(config));
+    await write(root, 'deno.lock', JSON.stringify(lock));
+    const script = `import pkg from "zod/package.json" with { type: "json" };
+console.log(JSON.stringify({inspectionProtocol:2,registries:[{registryPath:${
+      JSON.stringify(OUTPUT)
+    },sourceFiles:['triggers/custom.ts'],content:'export const version = '+JSON.stringify(pkg.version)+';\\n'}]}));`;
+    await replaceProducer(root, manifest(), script);
+    const generated = await command(root, false);
+    assertEquals(generated.code, 0, new TextDecoder().decode(generated.stderr));
+    assertMatch(await Deno.readTextFile(join(root, OUTPUT)), /version = ['"]4\.0\.0['"]/);
+    await write(root, 'node_modules/sentinel.txt', 'consumer installation remains unchanged\n');
+    const before = await snapshot(root);
+    const report = await inspect(root);
+    assertEquals(report.status, 'current', JSON.stringify(report));
+    assertEquals(await snapshot(root), before);
+    const dry = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        `--lock=${join(REPO, 'deno.lock')}`,
+        '--frozen',
+        '--node-modules-dir=none',
+        '-A',
+        CLI,
+        'generate',
+        'plugins',
+        '--project-root',
+        root,
+        '--dry-run',
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(dry.code, 0, new TextDecoder().decode(dry.stderr));
+    assertEquals(await snapshot(root), before);
+  });
+});

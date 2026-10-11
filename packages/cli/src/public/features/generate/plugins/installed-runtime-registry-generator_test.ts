@@ -547,3 +547,55 @@ class MemoryFileSystem implements FileSystemPort {
 
   async *walk(_dir: string): AsyncIterable<WalkEntry> {}
 }
+
+for (const status of [404, 503]) {
+  Deno.test(`published runtime manifest HTTP ${status} only permits immutable 404 absence`, async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': appsettings(
+        'custom',
+        'jsr:@acme/plugin-custom@1.2.3/runtime',
+      ),
+      '/workspace/app/deno.json': '{}',
+    });
+    const process = new RecordingProcess(fs);
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process,
+      fetchManifest: () =>
+        Promise.resolve({
+          ok: false,
+          status,
+          json: () => Promise.reject(new Error('must not decode missing manifest')),
+        }),
+    });
+    if (status === 404) {
+      assertEquals(await generate({ projectRoot: '/workspace/app', dryRun: false }), []);
+    } else {await assertRejects(
+        () => generate({ projectRoot: '/workspace/app', dryRun: false }),
+        Error,
+        'HTTP 503',
+      );}
+    assertEquals(process.calls, []);
+  });
+}
+
+Deno.test('published runtime manifest 404 does not certify a mutable version range', async () => {
+  const fs = new MemoryFileSystem({
+    '/workspace/app/appsettings.json': appsettings(
+      'custom',
+      'jsr:@acme/plugin-custom@^1.2.3/runtime',
+    ),
+    '/workspace/app/deno.json': '{}',
+  });
+  const generate = createInstalledRuntimeRegistryGenerator({
+    fs,
+    process: new RecordingProcess(fs),
+    fetchManifest: () =>
+      Promise.resolve({ ok: false, status: 404, json: () => Promise.resolve({}) }),
+  });
+  await assertRejects(
+    () => generate({ projectRoot: '/workspace/app', dryRun: false }),
+    Error,
+    'HTTP 404',
+  );
+});

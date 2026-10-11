@@ -52,7 +52,8 @@ export async function checkPluginRegistries(
       });
     };
     for (const path of authorities) await addInput(path);
-    const rendered = await render(projectRoot);
+    const surface = await render(projectRoot);
+    const rendered = surface.registries;
     for (const registry of rendered) {
       for (const path of registry.sourceFiles) await addInput(path);
     }
@@ -87,6 +88,7 @@ export async function checkPluginRegistries(
     return {
       ...base,
       inputs,
+      producers: surface.producers,
       outputs,
       drift,
       status: drift.length ? 'drift' : 'current',
@@ -95,6 +97,7 @@ export async function checkPluginRegistries(
   } catch (error) {
     return {
       ...base,
+      producers: [],
       inputs: [],
       outputs: [],
       status: 'inspection-failure',

@@ -21,6 +21,7 @@ import {
   canonicalizePluginOutputs,
   renderRuntimeRegistryPlan,
 } from './plugin-registry-renderer.ts';
+import { frozenPluginInspection } from '../../../../kernel/adapters/runtime/process/frozen-plugin-inspection.ts';
 import { removeInactivePluginRegistries } from './plugin-registry-writer.ts';
 import {
   EmptyPluginRegistryError,
@@ -45,7 +46,7 @@ export function createInstalledRuntimeRegistryGenerator(
         installed,
         dependencies,
       );
-      if (!resolvedManifest) throw new Error(`Missing runtime manifest for ${installed.name}.`);
+      if (!resolvedManifest) continue;
       const manifest = readRuntimeManifest(resolvedManifest.value, installed.name);
       const generator = manifest.runtimeRegistryGenerator;
       const targets = manifest.runtimeRegistries;
@@ -62,7 +63,7 @@ export function createInstalledRuntimeRegistryGenerator(
           resolvedManifest,
           manifest,
           dependencies,
-          input.dryRun ? ['--no-lock'] : [],
+          input.dryRun ? frozenPluginInspection(dependencies.process) : dependencies.process,
         );
         rendered.push(...files);
         continue;

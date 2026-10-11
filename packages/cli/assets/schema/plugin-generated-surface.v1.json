@@ -7,6 +7,7 @@
   "required": [
     "version",
     "generator",
+    "producers",
     "outputs",
     "inputs",
     "status",
@@ -115,6 +116,33 @@
               "bytes",
               "inspection-failure"
             ]
+          }
+        }
+      }
+    },
+    "producers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "generator",
+          "version",
+          "outputs"
+        ],
+        "properties": {
+          "generator": {
+            "type": "string",
+            "pattern": "^public\\.generate\\.plugins:@[^/]+/[^/]+$"
+          },
+          "version": {
+            "type": "string"
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       }

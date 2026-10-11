@@ -74,6 +74,7 @@ export async function resolveRuntimeManifest(
         value: JSON.parse(await dependencies.fs.readFile(manifestPath)),
       };
     }
+    throw new Error(`Missing runtime manifest for ${installed.name}.`);
   }
 
   const sourceRoot = await readMarkedSourceRoot(projectRoot, dependencies.fs);
@@ -91,12 +92,15 @@ export async function resolveRuntimeManifest(
           value: JSON.parse(await dependencies.fs.readFile(manifestPath)),
         };
       }
+      throw new Error(`Missing runtime manifest for ${installed.name}.`);
     }
   }
 
   const manifestUrl = publishedPackageFileUrl(installed, 'scaffold.runtime.json');
   const response = await dependencies.fetchManifest(manifestUrl);
-  if (response.status === 404) return undefined;
+  if (response.status === 404 && /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(installed.version)) {
+    return undefined;
+  }
   if (!response.ok) {
     throw new Error(
       `Failed to load runtime registry manifest for "${installed.name}" (HTTP ${response.status}).`,
