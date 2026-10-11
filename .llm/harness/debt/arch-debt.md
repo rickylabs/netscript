@@ -2880,3 +2880,37 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   Preserve the SDK non-DOM import-graph guard, Fresh schema/recovery tests, and Expo-pinned React
   lifecycle tests; verify native Hermes/Expo acceptance separately before claiming cross-runtime
   equivalence.
+
+## Fresh chat — retain Deno fetch response until subscription teardown (`fresh-chat-response-gc-2324`)
+
+- **Owner:** NetScript Fresh maintainers; issue #2324.
+- **Target:** Remove retention after
+  [denoland/deno#37006](https://github.com/denoland/deno/issues/37006) is fixed in the supported
+  Deno release and the forced-GC cancellation regression still passes.
+- **Gate:** `chat-response-gc_test.ts` runs the public chat connection with real streaming fetch,
+  forced GC and no fixture retention, then waits for the server body's cancellation event.
+- **Status:** Temporary upstream workaround. `chat-stream-subscription.ts` retains one response per
+  physical subscription, replaces it on reconnect, and releases it after cancellation. The public
+  subscription hub continues to own sharing, last-reader cancellation and disposal. The upstream
+  JSON stream owns parsing and backpressure; its consumed offset owns resume.
+- **Audit:**
+  - SDK `src/client/stream-source/internal/connection.ts`: unaffected. The abort listener explicitly
+    calls `reader.cancel()` and the finally block cancels/releases the reader, so cleanup does not
+    depend on Deno's lost fetch abort link. The SDK forced-GC regression proves server cancellation.
+  - SDK stream collections and React bindings: use the same fetch event source and its `close()`;
+    collection disposal closes that source. No independent body parser.
+  - Expo/React Native reference transport `resources/examples/expo-streams/expo-fetch.ts`: injects
+    `expo/fetch` into that SDK consumer. Hermes is outside the Deno bug, and the SDK still
+    explicitly cancels its reader. This audit makes no claim of new native-device execution.
+  - Fresh StreamDB recovery: deliberately uses finite `live: false` reads with `live=long-poll`
+    parameters, then `session.text()`. No detached SSE reader; the upstream response session retains
+    its finite response during body consumption, and recovery cancels/releases each attempt.
+  - Fresh chat proxy: passes the upstream body unbuffered into a server response rather than parsing
+    it. Downstream body cancellation propagates to that same stream; it does not rely solely on
+    fetch-signal cancellation. Existing proxy tests cover signal forwarding and byte passthrough.
+  - Snapshot materialization and chat writes: finite JSON/text or bodyless responses, rather than
+    detached long-lived SSE parsing. Snapshot reads retain the stream session until `json()`
+    settles.
+- **Fixture:** Main merged PR #2318 during this leaf. Its event-driven cancellation fixture and
+  diagnostics are preserved, with only status and signal observations in the fixture; the runtime
+  now retains the Response. No fixture-only Response retention remains.
