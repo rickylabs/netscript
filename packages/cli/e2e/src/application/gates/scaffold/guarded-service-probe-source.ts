@@ -3,20 +3,15 @@ export const GUARDED_SERVICE_PROBE_SOURCE: string = String.raw`
 import { assert, assertEquals } from '@std/assert';
 import { DenoKvAdapter } from '@netscript/kv';
 import { checkGeneratedAuthCase, parseGeneratedAuthCase } from '__AUTH_CHECKS__';
-import { createAuthServiceGuard } from '__AUTH_SOURCE__/auth-guard.ts';
-import { createPluginService } from '@netscript/plugin/service';
+import createAuthService from '__AUTH_MAIN__';
 import { createAuthServiceBackendRegistry } from '__AUTH_SOURCE__/backend-registry.ts';
 import { signin } from '__AUTH_SOURCE__/routers/v1-handlers.ts';
-import { router } from '__AUTH_SOURCE__/router.ts';
-import { currentAuthRequest, withAuthRequest } from '__AUTH_SOURCE__/request-context.ts';
 import { httpExchangeInit, judgeHttpResponse, type HttpExchangeContract } from '__HTTP_CONTRACT__';
 
 await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
 let scope = 'users:read';
 let subject = 4242;
-const registry = await createAuthServiceBackendRegistry({
-  kv,
-  env: {
+const env = {
     NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
     NETSCRIPT_AUTH_CLIENT_ID: 'client_test',
     NETSCRIPT_AUTH_CLIENT_SECRET: 'secret_test',
@@ -28,7 +23,9 @@ const registry = await createAuthServiceBackendRegistry({
     NETSCRIPT_AUTH_USERINFO_ENDPOINT: 'https://issuer.example.test/oauth/userinfo',
     NETSCRIPT_AUTH_SUBJECT_SOURCE: 'userinfo',
     NETSCRIPT_AUTH_SUBJECT_CLAIM: 'id',
-  },
+};
+const registry = await createAuthServiceBackendRegistry({
+  kv, env,
   fetch: (input) => Promise.resolve(
     String(input instanceof Request ? input.url : input).endsWith('/oauth/userinfo')
       ? Response.json({ id: subject })
@@ -57,12 +54,12 @@ const permitted = await mintSession('users:read');
 const insufficient = await mintSession('other:read');
 subject = 9898;
 const foreign = await mintSession('users:read');
-const auth = await createPluginService(router, {
-  name: 'auth', auth: createAuthServiceGuard(registry),
-  middleware: [withAuthRequest],
-  context: () => ({ registry, request: currentAuthRequest() }),
-  traceContext: false,
-}).serve({ port: 0 });
+// Exercise the shipped auth entrypoint; the harness supplies only host infrastructure.
+const auth = await createAuthService({
+  kv, env: { ...env, PORT: '0' },
+  db: { getClient: () => Promise.resolve(undefined) },
+  contracts: {}, logger: console,
+});
 const discoveryKey = 'services__auth__http__0';
 const previousEndpoint = Deno.env.get(discoveryKey);
 const previousPort = Deno.env.get('PORT');
@@ -73,8 +70,8 @@ try {
   const { running } = await import('__SERVICE_MAIN__');
   try {
     const endpoint = 'http://127.0.0.1:' + running.addr.port;
-    if (Deno.args[0]) {
-      await checkGeneratedAuthCase(parseGeneratedAuthCase(Deno.args[0]), {
+    if (Deno.args.length) {
+      for (const id of Deno.args) await checkGeneratedAuthCase(parseGeneratedAuthCase(id), {
         authUrl: 'http://127.0.0.1:' + auth.addr.port, serviceUrl: endpoint,
         caller: permitted, denied: insufficient, foreign,
       });

@@ -13,6 +13,12 @@ export const GENERATED_AUTH_CASES = [
   GATE.BEHAVIOR_AUTH_SIGNOUT_FOREIGN_SESSION,
 ] as const;
 
+/** Cases sharing one pre-start scaffold and native-session mint. */
+export const GENERATED_AUTH_CREDENTIAL_CASES = GENERATED_AUTH_CASES.filter((id) =>
+  id !== GATE.BEHAVIOR_AUTH_SIGNOUT_UNAUTHENTICATED &&
+  id !== GATE.BEHAVIOR_AUTH_RPC_UNAUTHENTICATED
+);
+
 export type GeneratedAuthCase = typeof GENERATED_AUTH_CASES[number];
 
 /** Credentials stay in-process; only named case verdicts reach the command output. */
@@ -85,6 +91,20 @@ export async function checkGeneratedAuthCase(
         await assertActive(context.authUrl, 'session', context.caller);
         await assertActive(context.authUrl, 'session', context.foreign);
       }
+      // Prove the real composition also accepts its guard-authenticated owner.
+      // Otherwise removing the guard could make every signout return 401 in the handler.
+      await probeExchange([context.authUrl], '/api/v1/auth/signout', {
+        method: 'POST',
+        expectStatus: 200,
+        headers: { authorization: 'Bearer ' + context.caller },
+      });
+      await probeExchange([context.authUrl], '/api/v1/auth/session', {
+        method: 'GET',
+        expectStatus: 200,
+        headers: { authorization: 'Bearer ' + context.caller },
+        expectBody: { kind: 'json-equals', value: { authenticated: false } },
+      });
+      await assertActive(context.authUrl, 'session', context.foreign);
       break;
   }
   console.info(id + ' PASS; native credentials kept in-process');
@@ -107,9 +127,9 @@ async function assertActive(baseUrl: string, route: string, credential: string) 
     signal: AbortSignal.timeout(5_000),
   });
   if (response.status !== 200) {
-    await judgeHttpResponse({ method: 'GET', expectStatus: 200 }, response);
+    const outcome = await judgeHttpResponse({ method: 'GET', expectStatus: 200 }, response);
+    assertEquals(outcome.kind, 'matched', route + ': authenticated introspection status');
   }
-  assertEquals(response.status, 200, route + ': authenticated introspection status');
   const { body, bodyTruncated } = await readBoundedBody(response);
   assertEquals(bodyTruncated, false);
   const result = JSON.parse(body);

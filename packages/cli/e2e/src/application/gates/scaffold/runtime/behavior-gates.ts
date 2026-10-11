@@ -8,7 +8,6 @@ import { generatedAppName } from './generated-app-name.ts';
 import { PROBE_SERVICE_HEALTH_SCRIPT, VALIDATE_AI_CHAT_ROUTE_SCRIPT } from './behavior-scripts.ts';
 import type { HttpExchangeContract } from '../../../../domain/http-contract.ts';
 import { EXCHANGE_ACTION } from './probe-plugin-resource.ts';
-import { GENERATED_AUTH_CASES } from '../generated-auth-checks.ts';
 
 /**
  * Why the probe takes a project root and an AppHost instead of a URL: since #952 the pristine
@@ -326,26 +325,26 @@ export function createRuntimeBehaviorGates(
           AUTH_SESSION_UNAUTHENTICATED_CONTRACT,
         ),
     ),
-    ...GENERATED_AUTH_CASES.map((id): GateDefinition => ({
-      id,
-      title: `${id}: native sessions through generated auth and users REST/RPC`,
-      phase: GATE_PHASE.BEHAVIOR,
-      kind: 'command',
-      critical: true,
-      command: (context) => [
-        'deno',
-        'run',
-        '-A',
-        '--unstable-kv',
-        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/probe-generated-guarded-service.ts`,
-        context.project.projectRoot,
-        context.project.repoRoot,
-        id,
-      ],
-      cwd: (context) => context.project.repoRoot,
-      outputMode: 'capture',
-      timeoutMs: 120_000,
-    })),
+    commandGate(
+      GATE.BEHAVIOR_AUTH_SIGNOUT_UNAUTHENTICATED,
+      'Resident AppHost auth REST signout refuses anonymous requests',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(context, 'auth', '/api/v1/auth/signout', {
+          method: 'POST',
+          expectStatus: 401,
+        }),
+    ),
+    commandGate(
+      GATE.BEHAVIOR_AUTH_RPC_UNAUTHENTICATED,
+      'Resident AppHost auth RPC signout refuses anonymous requests',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(context, 'auth', '/api/rpc/v1/auth/signout', {
+          method: 'POST',
+          expectStatus: 401,
+        }),
+    ),
     commandGate(
       GATE.BEHAVIOR_APP_HOME,
       'Generated app serves its home page',

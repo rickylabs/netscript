@@ -53,7 +53,7 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
     JSON.stringify({
       NetScript: {
         ...JSON.parse(await fs.readFile('/project/appsettings.json')).NetScript,
-        Services: { guarded: result.configEntry },
+        Services: { users: result.configEntry },
       },
     }),
   );
@@ -104,6 +104,7 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
     );
     const probe = join(root, 'probe.ts');
     const probeSource = GUARDED_SERVICE_PROBE_SOURCE
+      .replaceAll('__AUTH_MAIN__', new URL('plugins/auth/services/src/main.ts', repo).href)
       .replaceAll('__AUTH_SOURCE__', new URL('plugins/auth/services/src', repo).href)
       .replaceAll('__AUTH_CHECKS__', new URL('./generated-auth-checks.ts', import.meta.url).href)
       .replaceAll('__SERVICE_MAIN__', toFileUrl(join(root, 'services/users/src/main.ts')).href)
@@ -143,8 +144,13 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
           : 'Generated guarded service PASS: discovery/demo public200; protected REST/RPC anonymous401, denied403, permitted200; anonymous health200',
       );
     }
-    // Negative controls at this leaf's base use the native listener and generated
-    // contract: deliberately remove the guard, then demand the same refusal case.
+    // Public controls mutate the shipped composition, never a harness-composed listener.
+    const authMainUrl = new URL('plugins/auth/services/src/main.ts', repo);
+    const authMain = (await Deno.readTextFile(authMainUrl)).replace(
+      /from '(\.\.?\/[^']+)'/g,
+      (_match, path: string) => "from '" + new URL(path, authMainUrl).href + "'",
+    );
+    const authControlPath = join(root, 'auth-main-control.ts');
     const mainPath = join(root, 'services/users/src/main.ts');
     const guardedMain = await Deno.readTextFile(mainPath);
     for (const authCase of GENERATED_AUTH_CASES) {
@@ -163,16 +169,29 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
           'Control must remove generated service guard',
         );
         await Deno.writeTextFile(mainPath, publicMain);
-      } else if (authCase === GATE.BEHAVIOR_AUTH_SESSION_AUTHENTICATED) {
-        controlSource = probeSource.replace('request: currentAuthRequest()', 'request: undefined');
       } else {
-        controlSource = probeSource.replace(
-          'middleware: [withAuthRequest]',
-          `middleware: [async (context, next) => {
-            if (new URL(context.req.url).pathname.endsWith('/signout')) return context.json({ signedOut: true });
-            await next();
-          }, withAuthRequest]`,
+        let controlMain = authMain;
+        if (authCase === GATE.BEHAVIOR_AUTH_SESSION_AUTHENTICATED) {
+          controlMain = controlMain.replace('request: currentAuthRequest()', 'request: undefined');
+        } else {
+          controlMain = controlMain.replace(
+            'auth: createAuthServiceGuard(registry)',
+            "auth: { public: true, reason: 'Guarded-to-public negative control' }",
+          ).replace(
+            'middleware: [withAuthRequest]',
+            `middleware: [async (context, next) => {
+              if (new URL(context.req.url).pathname.endsWith('/signout')) return context.json({ signedOut: true });
+              await next();
+            }, withAuthRequest]`,
+          );
+        }
+        assertEquals(
+          controlMain === authMain,
+          false,
+          'Control must mutate shipped auth entrypoint',
         );
+        await Deno.writeTextFile(authControlPath, controlMain);
+        controlSource = controlSource.replace(authMainUrl.href, toFileUrl(authControlPath).href);
       }
       await Deno.writeTextFile(probe, controlSource);
       const control = await runProbe(authCase);
@@ -191,6 +210,29 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
       );
       await Deno.writeTextFile(mainPath, guardedMain);
     }
+    // With no composition guard the handler still refuses absent principals. An owned
+    // signout must succeed too, so deleting only main.ts's guard cannot stay green.
+    const missingGuard = authMain.replace('auth: createAuthServiceGuard(registry),', '');
+    assertEquals(missingGuard === authMain, false);
+    await Deno.writeTextFile(authControlPath, missingGuard);
+    await Deno.writeTextFile(
+      probe,
+      probeSource.replace(authMainUrl.href, toFileUrl(authControlPath).href),
+    );
+    const missingGuardControl = await runProbe(GATE.BEHAVIOR_AUTH_SIGNOUT_FOREIGN_SESSION);
+    assertEquals(missingGuardControl.code, 1, missingGuardControl.output);
+    assertStringIncludes(missingGuardControl.output, 'Service auth requires');
+    // Explicitly making the entrypoint public still must fail the owned-signout check.
+    await Deno.writeTextFile(
+      authControlPath,
+      authMain.replace(
+        'auth: createAuthServiceGuard(registry)',
+        "auth: { public: true, reason: 'Guarded-to-public negative control' }",
+      ),
+    );
+    const publicCompositionControl = await runProbe(GATE.BEHAVIOR_AUTH_SIGNOUT_FOREIGN_SESSION);
+    assertEquals(publicCompositionControl.code, 1, publicCompositionControl.output);
+    assertStringIncludes(publicCompositionControl.output, 'expected HTTP 200, served 401');
     assertEquals(result.configEntry.PluginReferences, ['auth']);
   } finally {
     await Deno.remove(root, { recursive: true });

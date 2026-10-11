@@ -18,6 +18,7 @@ import { createGeneratedPluginCheckGates } from './generated-plugins-check-gate.
 import { createGeneratedQualityGates } from './generated-quality-gate.ts';
 import { createOtelGates } from './otel-gates.ts';
 import { createGeneratedGuardedPluginGate } from './generated-guarded-plugin-gate.ts';
+import { createGeneratedAuthGates } from './generated-auth-gates.ts';
 import { createGeneratedGuardedServiceGate } from './generated-guarded-service-gate.ts';
 import { createPluginContractGates } from './plugin-contract-gates.ts';
 import {
@@ -77,6 +78,7 @@ export function createScaffoldCapabilityGates(
     ...createPackageBackedPluginDoctorGates(),
     createGeneratedGuardedPluginGate(),
     createGeneratedGuardedServiceGate(),
+    ...createGeneratedAuthGates(),
     ...createOtelGates(),
     // Registration only — the suite gate lists in `capability-suites.ts` decide
     // where the fixture and the verification run relative to AppHost start.

@@ -9,7 +9,7 @@ import { GUARDED_SERVICE_PROBE_SOURCE } from './guarded-service-probe-source.ts'
 export async function probeGeneratedGuardedService(
   projectPath: string,
   repoPath: string,
-  authCase?: GeneratedAuthCase,
+  authCases?: readonly GeneratedAuthCase[],
 ): Promise<void> {
   // The runtime suite's shared project is only an existence precondition. Every
   // command below targets our own temporary project, including helper generation.
@@ -17,10 +17,10 @@ export async function probeGeneratedGuardedService(
   const scratch = await Deno.makeTempDir({ prefix: 'guarded-service-probe-' });
   try {
     const postures: string[] = [];
-    for (const authFirst of authCase ? [true] : [true, false]) {
-      postures.push(await probeInScratch(scratch, resolve(repoPath), authFirst, authCase));
+    for (const authFirst of authCases ? [true] : [true, false]) {
+      postures.push(await probeInScratch(scratch, resolve(repoPath), authFirst, authCases));
     }
-    if (!authCase) {
+    if (!authCases) {
       assertEquals(postures[0], postures[1], 'Auth installation order changed the service policy');
     }
   } finally {
@@ -32,7 +32,7 @@ async function probeInScratch(
   scratch: string,
   repoRoot: string,
   authFirst: boolean,
-  authCase?: GeneratedAuthCase,
+  authCases?: readonly GeneratedAuthCase[],
 ): Promise<string> {
   // Distinct projects prove both public CLI orders with the real installed manifest/layout.
   const orderRoot = join(scratch, authFirst ? 'auth-first' : 'service-first');
@@ -153,6 +153,10 @@ async function probeInScratch(
     await Deno.writeTextFile(
       probe,
       GUARDED_SERVICE_PROBE_SOURCE
+        .replaceAll(
+          '__AUTH_MAIN__',
+          toFileUrl(join(repoRoot, 'plugins/auth/services/src/main.ts')).href,
+        )
         .replaceAll('__AUTH_SOURCE__', toFileUrl(join(repoRoot, 'plugins/auth/services/src')).href)
         .replaceAll('__SERVICE_MAIN__', toFileUrl(main).href)
         .replaceAll('__AUTH_CHECKS__', new URL('./generated-auth-checks.ts', import.meta.url).href)
@@ -174,7 +178,7 @@ async function probeInScratch(
         '--import-map',
         importMap,
         probe,
-        ...(authCase ? [authCase] : []),
+        ...(authCases ?? []),
       ],
       projectRoot,
     );
@@ -230,13 +234,13 @@ async function run(args: string[], cwd: string): Promise<void> {
 }
 
 if (import.meta.main) {
-  const [projectRoot, repoRoot, authCase] = Deno.args;
+  const [projectRoot, repoRoot, ...authCases] = Deno.args;
   if (!projectRoot || !repoRoot) {
     throw new Error('Generated project and source repository are required.');
   }
   await probeGeneratedGuardedService(
     projectRoot,
     repoRoot,
-    authCase ? parseGeneratedAuthCase(authCase) : undefined,
+    authCases.length ? authCases.map(parseGeneratedAuthCase) : undefined,
   );
 }
