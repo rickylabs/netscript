@@ -13,6 +13,7 @@ const noopPrompt: PromptPort = {
 
 Deno.test('init --from reports the empty Wave 6 preset registry', async () => {
   const command = createInitCommand({
+    initAgent: () => Promise.reject(new Error('agent init must not run')),
     initContext: {} as never,
     defaultProjectName: () => 'preset-smoke',
     prompt: noopPrompt,
@@ -171,7 +172,9 @@ Deno.test('interactive init prompts for all missing scaffold choices', async () 
     },
     select(message, options, config) {
       calls.push(`select:${message}:${config?.defaultValue ?? ''}`);
-      if (message === 'Database engine') return Promise.resolve('postgres' as typeof options[number]);
+      if (message === 'Database engine') {
+        return Promise.resolve('postgres' as typeof options[number]);
+      }
       if (message === 'Cache backend') return Promise.resolve('garnet' as typeof options[number]);
       return Promise.resolve(options[0]);
     },
