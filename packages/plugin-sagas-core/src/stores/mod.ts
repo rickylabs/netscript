@@ -82,6 +82,7 @@ export type {
   SagaRuntimeTransitionWrite,
   WriteResult,
 } from './prisma-saga-store.ts';
+export { isPrismaSagaStoreClient } from './prisma-saga-store.ts';
 export type {
   DurableSagaStoreBackend,
   SagaProjectionBackend,

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createTypedQueue } from '../factory/create-typed-queue.ts';
 import { QueueProvider, QueueValidationError } from '../ports/mod.ts';
 import { typedDlqDrain, typedDlqRedelivery } from './_fixtures/typed-dlq.ts';
+import { historicalTypedDlqDuplicate } from './_fixtures/historical-typed-dlq.ts';
 
 Deno.test('createTypedQueue exposes the schema and native retrial flag', () => {
   const schema = z.object({ id: z.string() });
@@ -36,3 +37,8 @@ for (const backend of ['memory', 'kv'] as const) {
   Deno.test(`createTypedQueue ${backend} DLQ deduplicates native redelivery across abort`, () =>
     typedDlqRedelivery(backend));
 }
+
+Deno.test(
+  'createTypedQueue historical append-only DLQ duplicates a controlled persisted-nack redelivery',
+  historicalTypedDlqDuplicate,
+);

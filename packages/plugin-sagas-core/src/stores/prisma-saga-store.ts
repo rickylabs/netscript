@@ -122,6 +122,30 @@ export type PrismaSagaStoreClient = Readonly<{
   $transaction<T>(handler: (tx: PrismaSagaStoreClient) => Promise<T>): Promise<T>;
 }>;
 
+/** Validate all runtime delegates before constructing a Prisma-backed saga store. */
+export function isPrismaSagaStoreClient(candidate: unknown): candidate is PrismaSagaStoreClient {
+  return isClientRecord(candidate) && typeof candidate.$transaction === 'function' &&
+    hasDelegateMethods(candidate.sagaRuntimeState, [
+      'findUnique',
+      'findMany',
+      'create',
+      'upsert',
+      'updateMany',
+      'deleteMany',
+    ]) &&
+    hasDelegateMethods(candidate.sagaRuntimeTransition, ['findMany', 'create', 'deleteMany']) &&
+    hasDelegateMethods(candidate.sagaRuntimeCorrelation, ['findUnique', 'upsert', 'deleteMany']);
+}
+
+function hasDelegateMethods(candidate: unknown, methods: readonly string[]): boolean {
+  return isClientRecord(candidate) &&
+    methods.every((method) => typeof candidate[method] === 'function');
+}
+
+function isClientRecord(candidate: unknown): candidate is Readonly<Record<string, unknown>> {
+  return typeof candidate === 'object' && candidate !== null && !Array.isArray(candidate);
+}
+
 /** Options for the Prisma-backed saga runtime store. */
 export type PrismaSagaStoreOptions = Readonly<{
   prisma: PrismaSagaStoreClient;
