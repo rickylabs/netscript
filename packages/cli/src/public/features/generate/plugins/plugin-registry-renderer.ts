@@ -1,3 +1,5 @@
+import { isProjectPath } from '../../../../kernel/adapters/service/generated-surface-inventory.ts';
+export { isProjectPath } from '../../../../kernel/adapters/service/generated-surface-inventory.ts';
 import { join } from '@std/path';
 import type {
   PluginSurfaceProducer,
@@ -204,15 +206,6 @@ export async function renderRuntimeRegistryPlan(
 export function isPluginOutputPath(path: string): boolean {
   return isProjectPath(path) &&
     /^\.netscript\/generated\/plugin-[^/]+\/.+\.(?:ts|mts|js|mjs)$/.test(path);
-}
-
-/** Canonical relative paths avoid traversal, URLs, Windows aliases and case ambiguity. */
-export function isProjectPath(path: string): boolean {
-  return path.length > 0 && !/[\\:*?"<>|#]/.test(path) &&
-    !Array.from(path).some((character) => character.charCodeAt(0) < 32) &&
-    path.split('/').every((part) =>
-      part.length > 0 && part !== '.' && part !== '..' && !/[. ]$/.test(part)
-    );
 }
 
 /** Exact producer marker participates in the byte digest. */

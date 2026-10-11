@@ -3,18 +3,21 @@ import {
   PLUGIN_SURFACE_GENERATOR,
   PLUGIN_SURFACE_VERSION,
   type PluginAuthoredInput,
-  type PluginGeneratedOutput,
   type PluginSurfaceReport,
   type RenderPluginRegistries,
 } from '../../../../kernel/domain/plugin-generated-surface.ts';
-import type { AspireSurfaceDrift } from '../../../../kernel/domain/aspire-generated-surface.ts';
+import type { GeneratedSurfaceDrift } from '../../../../kernel/domain/generated-surface.ts';
 import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
-import { aspireContentDigest } from '../../../../kernel/adapters/service/aspire-surface-inventory.ts';
+import {
+  buildGeneratedOutputs,
+  generatedContentDigest,
+  inspectGeneratedOutputs,
+} from '../../../../kernel/adapters/service/generated-surface-inventory.ts';
 import {
   readInspectionFile,
   rejectInspectionLinks,
 } from '../../../../kernel/adapters/service/generated-surface-reader.ts';
-import { canonicalizePluginOutputs, pluginSurfaceMarker } from './plugin-registry-renderer.ts';
+import { canonicalizePluginOutputs, isPluginOutputPath } from './plugin-registry-renderer.ts';
 
 /** Check the shared plugin renderer's canonical bytes without invoking a project writer. */
 export async function checkPluginRegistries(
@@ -48,7 +51,7 @@ export async function checkPluginRegistries(
         generator: PLUGIN_SURFACE_GENERATOR,
         path,
         ownership: 'authored',
-        digest: await aspireContentDigest(bytes),
+        digest: await generatedContentDigest(bytes),
       });
     };
     for (const path of authorities) await addInput(path);
@@ -58,29 +61,14 @@ export async function checkPluginRegistries(
       for (const path of registry.sourceFiles) await addInput(path);
     }
     const files = await canonicalizePluginOutputs(projectRoot, rendered, formatter);
-    const outputs: PluginGeneratedOutput[] = [];
-    const drift: AspireSurfaceDrift[] = [];
-    for (const file of files) {
-      const digest = await aspireContentDigest(new TextEncoder().encode(file.content));
-      outputs.push({
+    const outputs = await buildGeneratedOutputs(
+      files.map((file) => ({
+        ...file,
         generator: `${PLUGIN_SURFACE_GENERATOR}:${file.plugin}`,
-        path: file.path,
-        ownership: 'generated',
-        digest,
-      });
-      const bytes = await readInspectionFile(projectRoot, file.path);
-      if (!bytes) {
-        drift.push({ path: file.path, kind: 'missing' });
-        continue;
-      }
-      const marker = new TextEncoder().encode(pluginSurfaceMarker(file.plugin));
-      if (!marker.every((byte, index) => bytes[index] === byte)) {
-        drift.push({ path: file.path, kind: 'ownership' });
-      }
-      if (await aspireContentDigest(bytes) !== digest) {
-        drift.push({ path: file.path, kind: 'bytes' });
-      }
-    }
+      })),
+      isPluginOutputPath,
+    );
+    const drift: GeneratedSurfaceDrift[] = await inspectGeneratedOutputs(projectRoot, outputs);
     const selected = new Set(outputs.map((entry) => entry.path));
     for (const path of await registryLeaves(projectRoot)) {
       if (!selected.has(path)) drift.push({ path, kind: 'extra' });
