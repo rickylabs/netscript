@@ -5,7 +5,7 @@ import {
   assertStringIncludes,
   assertThrows,
 } from '@std/assert';
-import { fromFileUrl } from '@std/path';
+import { fromFileUrl, toFileUrl } from '@std/path';
 import { artifactText, defineStub } from '@netscript/plugin/adapter';
 import { LocalProjectFiles } from '@netscript/plugin/cli';
 import type { JobHandlerDefinition } from '@netscript/plugin-workers-core';
@@ -133,7 +133,75 @@ Deno.test('generated webhook delivery compiles and executes signature, retry and
       stderr: 'piped',
     }).output();
     assertEquals(check.code, 0, new TextDecoder().decode(check.stderr));
-    const module: DeliveryModule = await import('file://' + path);
+    await t.step(
+      'scaffold adoption probe executes the default job and rejects broken controls',
+      async () => {
+        const probe = root + '/packages/cli/e2e/fixtures/outbound-webhook/probe.ts';
+        const runProbe = (jobPath: string) =>
+          new Deno.Command(Deno.execPath(), {
+            args: [
+              'run',
+              '-A',
+              '--unstable-kv',
+              '--config',
+              root + '/deno.json',
+              '--lock=' + root + '/deno.lock',
+              probe,
+              jobPath,
+            ],
+            stdout: 'piped',
+            stderr: 'piped',
+          }).output();
+        const healthy = await runProbe(path);
+        assertEquals(healthy.code, 0, new TextDecoder().decode(healthy.stderr));
+        assertStringIncludes(
+          new TextDecoder().decode(healthy.stdout),
+          'persisted DLQ and success verified',
+        );
+        const generated = await Deno.readTextFile(path);
+        const mutations = [
+          [
+            'endpoint',
+            "const url = requiredConfig('WEBHOOK_ENDPOINT_URL');",
+            "const url = 'https://hardcoded.invalid/events';",
+            'Values are not equal',
+          ],
+          [
+            'signature',
+            "'webhook-signature': 'v1=' + signature,",
+            "'webhook-signature': 'v1=' + '0'.repeat(64),",
+            'independently verify',
+          ],
+          [
+            'identity',
+            "'idempotency-key': payload.deliveryId,",
+            "'idempotency-key': ctx.id,",
+            'Values are not equal',
+          ],
+          [
+            'attempt-cap',
+            "maxAttempts: Number(Deno.env.get('WEBHOOK_MAX_ATTEMPTS') ?? '5'),",
+            'maxAttempts: 1,',
+            'Values are not equal',
+          ],
+          [
+            'dlq',
+            'await config.deadLetters.append({',
+            'await Promise.resolve({',
+            'Values are not equal',
+          ],
+        ];
+        for (const [name, before, after, diagnostic] of mutations) {
+          assertStringIncludes(generated, before);
+          const faultyPath = directory + '/faulty-' + name + '.ts';
+          await Deno.writeTextFile(faultyPath, generated.replace(before, after));
+          const faulty = await runProbe(faultyPath);
+          assertEquals(faulty.code, 1, 'adoption probe must reject broken ' + name);
+          assertStringIncludes(new TextDecoder().decode(faulty.stderr), diagnostic);
+        }
+      },
+    );
+    const module: DeliveryModule = await import(toFileUrl(path).href);
     assertEquals(module.deliveryJob.id, 'deliver-webhook');
     assertEquals(module.deliveryJob.maxRetries, 0);
     const registry: { definitions: ReadonlyMap<string, { maxRetries: number }> } = await import(

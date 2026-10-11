@@ -740,3 +740,18 @@ Deno.test('existing built-in suites preserve their exact resolved options', () =
     assertEquals(resolveSuite(suite.id, overrides).defaultOptions, options, suite.id);
   }
 });
+
+Deno.test('outbound webhook adoption is bounded and registered in both scaffold runtime tiers', () => {
+  for (const id of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const suite = resolveSuite(id);
+    const gates = suite.gates.map((gate) => gate.id);
+    const generated = gates.indexOf('scaffold.outbound-webhook' as GateId);
+    const executed = gates.indexOf('behavior.outbound-webhook' as GateId);
+    assert(generated > gates.indexOf('scaffold.plugin.worker'));
+    assert(executed > generated);
+    assert(executed < gates.indexOf(GATE.GENERATED_DENO_CHECK));
+    const probe = suite.gates[executed];
+    assertEquals(probe.kind, 'command');
+    if (probe.kind === 'command') assertEquals(probe.timeoutMs, 30_000);
+  }
+});

@@ -8,6 +8,34 @@ import { cli, commandGate, denoCommand } from './gate-factory.ts';
 export function createPluginContractGates(): readonly GateDefinition[] {
   return [
     commandGate(
+      GATE.SCAFFOLD_OUTBOUND_WEBHOOK,
+      'Generate the configuration-injected outbound webhook job',
+      GATE_PHASE.SCAFFOLD,
+      (context) =>
+        denoCommand(
+          context,
+          'run',
+          '-A',
+          '@netscript/plugin-workers/cli',
+          'add',
+          'job',
+          'deliver-webhook-adoption',
+          '--template=webhook-delivery',
+        ),
+      (context) => context.project.projectRoot,
+    ),
+    commandGate(
+      GATE.BEHAVIOR_OUTBOUND_WEBHOOK,
+      'Execute the generated webhook entrypoint with persisted dead letters',
+      GATE_PHASE.BEHAVIOR,
+      (context) => denoCommand(context, 'eval', outboundProbeScript(context.project.repoRoot)),
+      (context) => context.project.projectRoot,
+      'capture',
+      'The bounded generated job must preserve signing, identity, endpoint configuration and durable exhaustion.',
+      undefined,
+      30_000,
+    ),
+    commandGate(
       GATE.SCAFFOLD_PLUGIN_AI_APPSETTINGS,
       'Reject synthesized service configuration for the AI plugin',
       GATE_PHASE.SCAFFOLD,
@@ -94,5 +122,23 @@ function doctorMissingModuleScript(
     '} finally {',
     '  await Deno.rename(backupPath, modulePath);',
     '}',
+  ].join('\n');
+}
+
+function outboundProbeScript(repoRoot: string): string {
+  return [
+    `const source = ${
+      JSON.stringify(join(repoRoot, 'packages/cli/e2e/fixtures/outbound-webhook/probe.ts'))
+    };`,
+    'const probe = "workers/outbound-webhook-probe.ts";',
+    'await Deno.writeTextFile(probe, await Deno.readTextFile(source));',
+    'try {',
+    '  const result = await new Deno.Command(Deno.execPath(), {',
+    '    args: ["run", "-A", "--unstable-kv", "--lock=deno.lock", probe, "workers/jobs/deliver-webhook-adoption.ts"],',
+    '  }).output();',
+    '  await Deno.stdout.write(result.stdout);',
+    '  await Deno.stderr.write(result.stderr);',
+    '  Deno.exitCode = result.code;',
+    '} finally { await Deno.remove(probe); }',
   ].join('\n');
 }
