@@ -23,11 +23,11 @@ export interface InstallationSecretFileOptions {
 
 /** Minimal upstream secret-parameter seam; the value must remain a direct parameter. */
 export interface InstallationSecretParameterBuilder {
-  /** Registers a direct secret parameter for upstream exact-match redaction. */
+  /** Registers a direct secret parameter; Aspire returns an awaitable resource builder. */
   addParameter(
     name: string,
     options: { value: string; secret: boolean },
-  ): Promise<unknown>;
+  ): PromiseLike<unknown>;
 }
 
 const FILE_ENV = 'NETSCRIPT_INSTALLATION_SECRET_FILE';
