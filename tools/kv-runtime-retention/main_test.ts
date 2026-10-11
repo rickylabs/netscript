@@ -111,3 +111,19 @@ Deno.test('operator rejects invalid retention policies before opening a store', 
     RangeError,
   );
 });
+
+Deno.test('backfill on an already-clean real KV store changes no runtime data', async () => {
+  const { DenoKvAdapter } = await import('@netscript/kv');
+  const { SagaKvRetention } = await import(
+    '../../packages/plugin-sagas-core/src/stores/saga-kv-retention.ts'
+  );
+  const { backfillTriggerRetention } = await import(
+    '../../packages/plugin-triggers-core/src/stores/trigger-kv-retention.ts'
+  );
+  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+  const saga = new SagaKvRetention(kv, ['sagas'], () => new Date());
+  for (let i = 0; i < 6; i++) assertEquals((await saga.backfill(7)).changed, 0);
+  for (let i = 0; i < 4; i++) assertEquals((await backfillTriggerRetention({ kv })).changed, 0);
+  assertEquals((await saga.backfill(7)).done, true);
+  assertEquals((await backfillTriggerRetention({ kv })).done, true);
+});

@@ -138,3 +138,30 @@ Deno.test('real KV trigger migration caps full-value pages and respects custom o
   assertEquals(await kv.get(['triggers', 'events', 'terminal-0']), null);
   assertEquals(await kv.get(['triggers', 'dlq', 'by-trigger', 'legacy', 'terminal-0']), null);
 });
+
+Deno.test('real KV backfill assigns backend TTL to recent trigger record/index pairs at settlement', async () => {
+  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+  const settledAt = new Date(Date.now() - 86_400_000 + 800).toISOString();
+  await seed(kv, 'recent', 'completed');
+  await kv.set(['triggers', 'events', 'recent'], {
+    ...event('recent', 'completed'),
+    updatedAt: settledAt,
+  });
+  await kv.set(['triggers', 'dlq', 'entries', 'recent'], {
+    id: 'recent',
+    triggerId: 'legacy',
+    event: event('recent', 'completed'),
+    failedAt: settledAt,
+  });
+  for (let i = 0; i < 10; i++) await backfillTriggerRetention({ kv, kvRetentionDays: 1 }, 'ttl');
+  assert(await kv.get(['triggers', 'events', 'recent']));
+  assert(await kv.get(['triggers', 'dlq', 'entries', 'recent']));
+  // Native backend expiry is asynchronous; wait a bounded five seconds for its sweep.
+  for (let attempt = 0; attempt < 50 && await kv.has(['triggers', 'events', 'recent']); attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  assertEquals(await kv.get(['triggers', 'events', 'recent']), null);
+  assertEquals(await kv.get(['triggers', 'by-trigger', 'legacy', 'recent']), null);
+  assertEquals(await kv.get(['triggers', 'dlq', 'entries', 'recent']), null);
+  assertEquals(await kv.get(['triggers', 'dlq', 'by-trigger', 'legacy', 'recent']), null);
+});
