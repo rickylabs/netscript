@@ -1,4 +1,5 @@
 import { dirname, join, relative, resolve } from '@std/path';
+import { type AppEntry, AppEntrySchema } from '@netscript/aspire/config';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
@@ -9,6 +10,7 @@ interface BrowserAuthEntry {
   readonly Type?: string;
   readonly Workdir?: string;
   readonly Entrypoint?: string;
+  readonly Auth?: AppEntry['Auth'];
   PluginReferences?: string[];
 }
 interface BrowserAuthSettings {
@@ -49,14 +51,13 @@ export async function browserAuthReconciliationPaths(
   return [
     join(projectRoot, 'auth/bff.ts'),
     join(projectRoot, 'auth/service.ts'),
-    ...Object.entries(settings.NetScript?.Apps ?? {}).filter(([, entry]) =>
-      !entry.Type || entry.Type === 'app'
-    ).flatMap(([name, entry]) => [
-      dirname(appAuthRoute(projectRoot, name, entry)),
-      ...Object.keys(settings.NetScript?.Services ?? {}).map((service) =>
-        appServiceSessionRoute(projectRoot, name, entry, service)
-      ),
-    ]),
+    ...Object.entries(settings.NetScript?.Apps ?? {}).filter(([, entry]) => isScaffoldApp(entry))
+      .flatMap(([name, entry]) => [
+        dirname(appAuthRoute(projectRoot, name, entry)),
+        ...Object.keys(settings.NetScript?.Services ?? {}).map((service) =>
+          appServiceSessionRoute(projectRoot, name, entry, service)
+        ),
+      ]),
     ...Object.entries(settings.NetScript?.Services ?? {}).map(([name, entry]) =>
       serviceEntrypoint(projectRoot, name, entry)
     ),
@@ -88,23 +89,29 @@ export async function reconcileBrowserAuth(
       sessionContracts.set(service, contract);
     }
   }
+  const apps = Object.entries(config.Apps ?? {});
+  const scaffoldApps = apps.filter(([, entry]) => isScaffoldApp(entry));
+  // Preserve the legacy helper-only flow when no apps are configured. An authored app
+  // must not cause missing shared browser files to be recreated.
+  const scaffoldBrowser = apps.length === 0 || scaffoldApps.length > 0;
   const authServiceName = `'${auth}'`;
-  const files: BrowserAuthFile[] = [
-    {
-      path: join(projectRoot, 'auth/bff.ts'),
-      content: renderTemplateAssetSync(TEMPLATE_KEYS.authBff, {
-        authServiceName,
-      }),
-    },
-    {
-      path: join(projectRoot, 'auth/service.ts'),
-      content: renderTemplateAssetSync(TEMPLATE_KEYS.authService, {
-        authServiceName,
-      }),
-    },
-  ];
-  for (const [name, entry] of Object.entries(config.Apps ?? {})) {
-    if (entry.Type && entry.Type !== 'app') continue;
+  const files: BrowserAuthFile[] = scaffoldBrowser
+    ? [
+      {
+        path: join(projectRoot, 'auth/bff.ts'),
+        content: renderTemplateAssetSync(TEMPLATE_KEYS.authBff, {
+          authServiceName,
+        }),
+      },
+      {
+        path: join(projectRoot, 'auth/service.ts'),
+        content: renderTemplateAssetSync(TEMPLATE_KEYS.authService, {
+          authServiceName,
+        }),
+      },
+    ]
+    : [];
+  for (const [name, entry] of scaffoldApps) {
     const appRoot = workspacePath(projectRoot, entry.Workdir ?? `apps/${name}`);
     const path = appAuthRoute(projectRoot, name, entry);
     // Custom layouts are left to their author; this route is for generated Fresh apps.
@@ -177,6 +184,12 @@ export async function reconcileBrowserAuth(
       ...new Set([...(entry.PluginReferences ?? []), auth]),
     ];
   }
+  if (!scaffoldBrowser && files.some((file) => file.overwrite)) {
+    files.push({
+      path: join(projectRoot, 'auth/service.ts'),
+      content: renderTemplateAssetSync(TEMPLATE_KEYS.authService, { authServiceName }),
+    });
+  }
   const written: string[] = [];
   for (const file of files) {
     if (await fs.exists(file.path)) {
@@ -196,6 +209,11 @@ export async function reconcileBrowserAuth(
     await fs.writeFile(settingsPath, content);
   }
   return written;
+}
+
+function isScaffoldApp(entry: BrowserAuthEntry): boolean {
+  const app = AppEntrySchema.parse(entry);
+  return app.Type === 'app' && app.Auth?.BrowserTopology !== 'authored';
 }
 
 function appAuthRoute(root: string, name: string, entry: BrowserAuthEntry): string {

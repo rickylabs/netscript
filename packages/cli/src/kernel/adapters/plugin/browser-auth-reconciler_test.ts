@@ -368,3 +368,97 @@ Deno.test('browser auth emits a server SDK session route and snapshots it while 
   await reconcileBrowserAuth(root, fs);
   assertEquals(await fs.readFile(path), '// authored route');
 });
+
+for (const present of [false, true]) {
+  Deno.test(`authored browser topology preserves ${present ? 'present' : 'absent'} app files`, async () => {
+    const fs = new MemoryFileSystemAdapter();
+    const root = '/workspace';
+    const config = {
+      NetScript: {
+        ...settings.NetScript,
+        Apps: { web: { ...settings.NetScript.Apps.web, Auth: { BrowserTopology: 'authored' } } },
+      },
+    };
+    await fs.writeFile(join(root, 'appsettings.json'), JSON.stringify(config));
+    await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
+    await fs.writeFile(
+      join(root, 'services/users/src/main.ts'),
+      'await defineService(router, { auth: customPolicy });',
+    );
+    await fs.writeFile(
+      join(root, 'contracts/versions/v1/users.contract.ts'),
+      'export const UsersContractV1 = { session: baseContract };',
+    );
+    await writeInstalledAuthFixture(fs, root);
+    const paths = [
+      'auth/bff.ts',
+      'auth/service.ts',
+      'apps/web/routes/auth/[action].ts',
+      'apps/web/routes/examples/users/session.ts',
+    ];
+    if (present) {
+      for (const path of paths) await fs.writeFile(join(root, path), `// authored ${path}\n`);
+    }
+    for (let rerun = 0; rerun < 2; rerun++) {
+      assertEquals(await reconcileBrowserAuth(root, fs), []);
+      for (const path of paths) {
+        assertEquals(await fs.exists(join(root, path)), present);
+        if (present) assertEquals(await fs.readFile(join(root, path)), `// authored ${path}\n`);
+      }
+    }
+    const saved = JSON.parse(await fs.readFile(join(root, 'appsettings.json')));
+    assertEquals(saved.NetScript.Apps.web.PluginReferences, undefined);
+    assertEquals(
+      (await browserAuthReconciliationPaths(root, fs)).includes(join(root, 'apps/web/routes/auth')),
+      false,
+    );
+  });
+}
+
+Deno.test('mixed browser topology scaffolds only the opted-in app and preserves shared helpers', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const root = '/workspace';
+  await fs.writeFile(
+    join(root, 'appsettings.json'),
+    JSON.stringify({
+      NetScript: {
+        ...settings.NetScript,
+        Apps: {
+          web: { ...settings.NetScript.Apps.web, Auth: { BrowserTopology: 'authored' } },
+          admin: { Type: 'app', Workdir: 'apps/admin', Auth: { BrowserTopology: 'scaffold' } },
+        },
+      },
+    }),
+  );
+  for (const app of ['web', 'admin']) await fs.writeFile(join(root, `apps/${app}/utils.ts`), '');
+  await writeInstalledAuthFixture(fs, root);
+  await reconcileBrowserAuth(root, fs);
+  assertEquals(await fs.exists(join(root, 'apps/web/routes/auth/[action].ts')), false);
+  assertEquals(await fs.exists(join(root, 'apps/admin/routes/auth/[action].ts')), true);
+  assertEquals(await fs.exists(join(root, 'auth/bff.ts')), true);
+  assertEquals(await reconcileBrowserAuth(root, fs), []);
+});
+
+Deno.test('authored app topology still wires an independently scaffold-owned service policy', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const root = '/workspace';
+  await fs.writeFile(
+    join(root, 'appsettings.json'),
+    JSON.stringify({
+      NetScript: {
+        ...settings.NetScript,
+        Apps: { web: { ...settings.NetScript.Apps.web, Auth: { BrowserTopology: 'authored' } } },
+      },
+    }),
+  );
+  await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
+  await fs.writeFile(join(root, 'services/users/src/main.ts'), main);
+  await writeInstalledAuthFixture(fs, root);
+  await reconcileBrowserAuth(root, fs);
+  assertEquals(await fs.exists(join(root, 'auth/bff.ts')), false);
+  assertEquals(await fs.exists(join(root, 'auth/service.ts')), true);
+  assertStringIncludes(
+    await fs.readFile(join(root, 'services/users/src/main.ts')),
+    'authenticator: browserAuthenticator',
+  );
+});

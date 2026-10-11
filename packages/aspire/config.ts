@@ -208,6 +208,14 @@ export interface AppEntry extends Omit<BaseEntry, 'Enabled'>, ReferenceEntry, Ho
   Prebuild?: string;
   /** App working directory. */
   Workdir?: string;
+  /**
+   * Browser authentication scaffold ownership. Omit for the generated BFF topology;
+   * use `authored` when the app owns its browser authentication routes and bridge.
+   */
+  Auth?: {
+    /** `scaffold` (default) emits browser helpers; `authored` preserves app-owned topology. */
+    BrowserTopology: 'scaffold' | 'authored';
+  };
   /** Optional remote URL for externally hosted apps. */
   Remote?: string;
   /** Deno task name for task apps. */
@@ -526,6 +534,9 @@ const AppEntryZod = z.object({
   WatchMode: z.boolean().default(false),
   Prebuild: z.string().optional(),
   Workdir: z.string().optional(),
+  Auth: z.object({
+    BrowserTopology: z.enum(['scaffold', 'authored']).default('scaffold'),
+  }).optional(),
   Remote: z.string().optional(),
   TaskName: z.string().optional(),
   PackageTaskName: z.string().optional(),
