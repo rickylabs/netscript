@@ -24,6 +24,7 @@ binds to a NetScript host. Use it directly for custom hosts, libraries, and test
 | Export specifier                               | Module                      | Exports | Purpose                                                                                                                                              |
 | ---------------------------------------------- | --------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@netscript/plugin-triggers-core`              | `./mod.ts`                  | 106     | The full public surface — builders, runtime factories, ports, and the event model (documented below).                                                |
+| `@netscript/plugin-triggers-core/discovery` | `./src/builders/discovery.ts` | 1 | Immutable factory-owned discovery axes and explicit exclusions. |
 | `@netscript/plugin-triggers-core/public`       | `./src/public/mod.ts`       | 106     | The same curated public surface the root re-exports, for consumers that prefer to name it explicitly.                                                |
 | `@netscript/plugin-triggers-core/builders`     | `./src/builders/mod.ts`     | 50      | The three definition builders and the handler-action constructors (`enqueueJob`).                                                                    |
 | `@netscript/plugin-triggers-core/domain`       | `./src/domain/mod.ts`       | 69      | Trigger domain vocabulary and policy defaults (concurrency limit, idempotency TTL, circuit-breaker thresholds, backoff multiplier).                  |
@@ -276,3 +277,9 @@ TTLs. Deferred replay records are removed on successful replay or explicit cance
 state remains configuration. Existing terminal records written without TTL need a migration; this
 policy applies when records are written or their status changes. Runtime/backend expiry does not
 depend on an API read or a phone/web app being open.
+
+## Discovery metadata
+
+The `/discovery` entrypoint exports `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable
+patterns through the plugin SDK `additionalBuilders` option. The CLI composes first-party metadata
+before walking the project, so single-plugin updates succeed regardless of workers/streams order.

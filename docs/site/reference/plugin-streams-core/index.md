@@ -25,6 +25,7 @@ instances, sessions — into durable topics.
 | Export specifier                                      | Module                   | Exports | Purpose                                                                                                                              |
 | ----------------------------------------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `@netscript/plugin-streams-core`                      | `./mod.ts`               | 62      | Schema definition, the durable producer, endpoint resolution, diagnostics, and the v1 producer port vocabulary (documented below).   |
+| `@netscript/plugin-streams-core/discovery` | `./src/builders/discovery.ts` | 1 | Immutable factory-owned discovery axes and explicit exclusions. |
 | `@netscript/plugin-streams-core/admin`                | `./admin.ts`             | 8       | Upstream whole-stream administrative adapter and signature types; helpers live in the root.                                          |
 | `@netscript/plugin-streams-core/sse`                  | `./src/sse/mod.ts`       | 35      | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. |
 | `@netscript/plugin-streams-core/telemetry`            | `./src/telemetry/mod.ts` | 33      | Telemetry registration, span names, attribute keys, and the meter/counter/gauge ports used by reconnect metrics.                     |
@@ -261,3 +262,9 @@ is cooperative around completion; the supplied producer retains lifecycle and pe
 | `CommandOutboxDelivery`         | type alias | Service-owned decoded delivery.                      |
 | `CommandOutboxSink`             | interface  | Service-owned documented acceptance boundary.        |
 | `CommandOutboxAcceptance`       | type alias | Service-owned normalized identity/time.              |
+
+## Discovery metadata
+
+The `/discovery` entrypoint exports `NETSCRIPT_CONTRIBUTION_BUILDERS`. Pass these immutable
+patterns through the plugin SDK `additionalBuilders` option. The CLI composes first-party metadata
+before walking the project, so single-plugin updates succeed regardless of workers/streams order.
