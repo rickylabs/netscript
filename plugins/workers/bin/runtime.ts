@@ -6,6 +6,8 @@
 
 // Register Redis/Garnet KV adapter before createWorkersServiceRuntime() calls getKv().
 import '@netscript/kv/redis';
+import { getKv } from '@netscript/kv';
+import type { ChildHealthMonitor, ChildHealthSnapshot } from '@netscript/plugin/health';
 import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
 import type { StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
 export {
@@ -85,7 +87,17 @@ export type StartSchedulerProcessOptions = Readonly<{
 }>;
 
 /** Options for starting worker execution and scheduling in one process. */
-export type StartCombinedProcessOptions = StartWorkerProcessOptions & StartSchedulerProcessOptions;
+export type StartCombinedProcessOptions =
+  & StartWorkerProcessOptions
+  & StartSchedulerProcessOptions
+  & Readonly<{
+    /** Startup health monitor owned by generated glue. */
+    health?: ChildHealthMonitor;
+    /** Observe the runtime before awaiting its long-running listener. */
+    onStarted?: (snapshot: () => ChildHealthSnapshot) => void;
+    /** Stop worker and scheduler when the owning process shuts down. */
+    signal?: AbortSignal;
+  }>;
 
 /** Start the plugin worker process. */
 export async function startWorkerProcess(options: StartWorkerProcessOptions = {}): Promise<Worker> {
@@ -131,6 +143,9 @@ export async function startCombinedProcess(
   const runtime = await createWorkersServiceRuntime();
   runtime.executionState.setMutationHook(createStreamMutationHook());
   const generated = await registerProjectJobs(runtime, options.definitions);
+  options.health?.registryLoaded();
+  await (await getKv()).get(['netscript', 'child-health', 'workers']);
+  options.health?.dependenciesReady();
   const poolRegistry = options.registry ?? generated?.registry;
   const taskExecutor = createDefaultTaskExecutor();
   const scheduler = new Scheduler({
@@ -151,10 +166,28 @@ export async function startCombinedProcess(
     workerPoolOptions: poolRegistry ? { registry: poolRegistry } : undefined,
   });
   await scheduler.start();
-  await worker.start();
-  return Object.freeze({ scheduler, worker });
+  const runtimeHandle = Object.freeze({ scheduler, worker });
+  const stop = () => {
+    void Promise.all([worker.stop(), scheduler.stop()]).catch(() => options.health?.failed());
+  };
+  options.signal?.addEventListener('abort', stop, { once: true });
+  try {
+    options.onStarted?.(() => worker.healthStatus.childHealth);
+    if (options.signal?.aborted) return runtimeHandle;
+    await worker.start();
+    return runtimeHandle;
+  } finally {
+    options.signal?.removeEventListener('abort', stop);
+    await Promise.all([worker.stop(), scheduler.stop()]);
+  }
 }
 
+export type {
+  ChildFatalError,
+  ChildHealthMonitor,
+  ChildHealthSnapshot,
+  ChildHealthState,
+} from '@netscript/plugin/health';
 export type { GeneratedJobRegistryStatus } from '../src/runtime/generated-jobs.ts';
 export type {
   ExecutionStatus,

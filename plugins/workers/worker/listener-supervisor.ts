@@ -1,3 +1,4 @@
+import { ChildHealthMonitor, type ChildHealthSnapshot } from '@netscript/plugin/health';
 import { delay } from '@std/async';
 
 export type WorkerListenerStatus = 'idle' | 'running' | 'restarting' | 'failed' | 'stopped';
@@ -8,6 +9,7 @@ export interface WorkerListenerSnapshot {
   readonly healthy: boolean;
   readonly restartCount: number;
   readonly lastError?: string;
+  readonly childHealth: ChildHealthSnapshot;
 }
 
 export interface WorkerListenerSupervisorOptions {
@@ -18,6 +20,7 @@ export interface WorkerListenerSupervisorOptions {
   readonly initialBackoffMs?: number;
   readonly maxBackoffMs?: number;
   readonly sleep?: (ms: number, signal: AbortSignal) => Promise<void>;
+  readonly now?: () => number;
   readonly onFailure?: (error: unknown, snapshot: WorkerListenerSnapshot) => void;
 }
 
@@ -29,6 +32,7 @@ export class WorkerListenerSupervisor {
   #status: WorkerListenerStatus = 'idle';
   #restartCount = 0;
   #lastError: string | undefined;
+  readonly #health: ChildHealthMonitor;
   #completionResolve!: () => void;
   #started = false;
   #localAbort = new AbortController();
@@ -43,6 +47,8 @@ export class WorkerListenerSupervisor {
 
   constructor(options: WorkerListenerSupervisorOptions) {
     this.name = options.name;
+    this.#health = new ChildHealthMonitor(options.now);
+    this.#health.registryLoaded();
     this.#run = options.run;
     this.#abortSignal = options.abortSignal;
     this.#maxRestarts = options.maxRestarts ?? 3;
@@ -68,6 +74,9 @@ export class WorkerListenerSupervisor {
       return;
     }
     this.#status = 'stopped';
+    if (!['failed', 'crash-looping'].includes(this.#health.snapshot().state)) {
+      this.#health.stopped();
+    }
     this.#localAbort.abort();
     await this.completion;
   }
@@ -76,7 +85,8 @@ export class WorkerListenerSupervisor {
     return {
       name: this.name,
       status: this.#status,
-      healthy: this.#status !== 'failed',
+      healthy: this.#health.snapshot().state === 'ready',
+      childHealth: this.#health.snapshot(),
       restartCount: this.#restartCount,
       lastError: this.#lastError,
     };
@@ -87,6 +97,8 @@ export class WorkerListenerSupervisor {
     try {
       while (!signal.aborted) {
         this.#status = 'running';
+        this.#health.dependenciesReady();
+        this.#health.running();
         try {
           await this.#run(signal);
           if (signal.aborted) {
@@ -102,17 +114,28 @@ export class WorkerListenerSupervisor {
 
           if (this.#restartCount >= this.#maxRestarts) {
             this.#status = 'failed';
+            this.#health.failed();
             this.#onFailure?.(error, this.snapshot());
             return;
           }
 
           this.#restartCount += 1;
+          this.#health.restarting();
           this.#status = 'restarting';
           this.#onFailure?.(error, this.snapshot());
-          await this.#sleep(this.#nextBackoffMs(), signal);
+          try {
+            await this.#sleep(this.#nextBackoffMs(), signal);
+          } catch (sleepError) {
+            if (signal.aborted || isAbortError(sleepError)) break;
+            this.#status = 'failed';
+            this.#health.failed();
+            this.#onFailure?.(sleepError, this.snapshot());
+            return;
+          }
         }
       }
       this.#status = 'stopped';
+      this.#health.stopped();
     } finally {
       this.#completionResolve();
     }

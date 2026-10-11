@@ -1,3 +1,4 @@
+import { ChildHealthMonitor, type ChildHealthSnapshot } from '@netscript/plugin/health';
 import { loadSagaRetention } from './load-saga-retention.ts';
 import type { SagaDefinition } from '@netscript/plugin-sagas-core/domain';
 import {
@@ -35,6 +36,8 @@ export type SagaRuntimeFactory = (
 
 /** Supervisor construction options. */
 export type SagaRuntimeSupervisorOptions = Readonly<{
+  /** Shared process monitor, including bootstrap failures before start returns. */
+  health?: ChildHealthMonitor;
   definitions?: readonly SagaDefinition[];
   loadDefinitions?: SagaDefinitionRegistryLoader;
   runtimeOptions?: CreateSagaRuntimeOptions;
@@ -45,6 +48,8 @@ export type SagaRuntimeSupervisorOptions = Readonly<{
 
 /** Immutable runtime supervisor state snapshot. */
 export type SagaRuntimeSupervisorSnapshot = Readonly<{
+  /** Shared background child health payload. */
+  childHealth: ChildHealthSnapshot;
   status: SagaRuntimeSupervisorStatus;
   adapter?: SagaRuntimeAdapter;
   definitionCount: number;
@@ -55,8 +60,10 @@ export type SagaRuntimeSupervisorSnapshot = Readonly<{
 export class SagaRuntimeSupervisor {
   private status: SagaRuntimeSupervisorStatus = 'idle';
   private runtime?: SagaRuntime;
+  private startup?: Promise<SagaRuntimeSupervisorSnapshot>;
   private definitions: readonly SagaDefinition[] = Object.freeze([]);
   private failure?: string;
+  private readonly childHealth: ChildHealthMonitor;
 
   /** Frozen supervisor options used for lifecycle operations. */
   readonly options: SagaRuntimeSupervisorOptions;
@@ -64,43 +71,75 @@ export class SagaRuntimeSupervisor {
   /** Create a supervisor for generated saga definitions and a runtime factory. */
   constructor(options: SagaRuntimeSupervisorOptions = {}) {
     this.options = Object.freeze({ ...options });
+    this.childHealth = options.health ?? new ChildHealthMonitor();
   }
 
   /** Start the runtime, register generated definitions, and return a state snapshot. */
-  async start(): Promise<SagaRuntimeSupervisorSnapshot> {
+  start(): Promise<SagaRuntimeSupervisorSnapshot> {
+    if (this.startup) return this.startup;
+    const startup = this.startRuntime();
+    this.startup = startup;
+    void startup.finally(() => {
+      this.startup = undefined;
+    }).catch(() => undefined);
+    return startup;
+  }
+
+  /** Bootstrap one owned runtime and roll back partial startup on failure. */
+  private async startRuntime(): Promise<SagaRuntimeSupervisorSnapshot> {
     if (this.status === 'running') {
       return this.snapshot();
     }
 
+    if (this.status === 'failed') this.childHealth.restarting();
+    this.childHealth.starting();
     this.status = 'starting';
     this.failure = undefined;
 
     try {
       const definitions = await this.resolveDefinitions();
+      this.childHealth.registryLoaded();
       const runtime = this.options.createRuntime
         ? await this.options.createRuntime(this.options.runtimeOptions ?? {})
         : await createDefaultRuntime(
           this.options.runtimeOptions ?? {},
           this.options.projection,
         );
+      this.runtime = runtime;
       await runtime.register(definitions);
       await runtime.start();
       await this.options.delivery?.start(runtime);
       this.definitions = definitions;
       this.runtime = runtime;
       this.status = 'running';
+      this.childHealth.dependenciesReady();
+      this.childHealth.running();
+      if (this.options.delivery) {
+        void this.options.delivery.wait().then(
+          () => this.deliveryFailed(),
+          () => this.deliveryFailed(),
+        );
+      }
       return this.snapshot();
     } catch (cause) {
       this.status = 'failed';
+      this.childHealth.failed();
       this.failure = formatFailure(cause);
+      await Promise.allSettled([
+        this.options.delivery?.stop(),
+        this.runtime?.stop('startup-failed'),
+      ]);
+      this.runtime = undefined;
       throw cause;
     }
   }
 
   /** Stop the runtime if it has started. */
   async stop(reason = 'sagas-runtime-stop'): Promise<SagaRuntimeSupervisorSnapshot> {
+    await this.startup?.catch(() => undefined);
     if (this.runtime === undefined) {
       this.status = 'stopped';
+      this.childHealth.stopped();
       return this.snapshot();
     }
 
@@ -110,6 +149,7 @@ export class SagaRuntimeSupervisor {
     } finally {
       await this.runtime.stop(reason);
       this.status = 'stopped';
+      this.childHealth.stopped();
     }
     return this.snapshot();
   }
@@ -122,11 +162,19 @@ export class SagaRuntimeSupervisor {
   /** Return the current immutable supervisor state. */
   snapshot(): SagaRuntimeSupervisorSnapshot {
     return Object.freeze({
+      childHealth: this.childHealth.snapshot(),
       status: this.status,
       adapter: this.runtime?.adapter,
       definitionCount: this.definitions.length,
       failure: this.failure,
     });
+  }
+
+  /** Mark an unexpectedly completed delivery listener unhealthy. */
+  private deliveryFailed(): void {
+    if (this.status !== 'running') return;
+    this.status = 'failed';
+    this.childHealth.failed();
   }
 
   /** Resolve static or lazily loaded saga definitions before runtime startup. */
@@ -159,6 +207,7 @@ async function createDefaultRuntime(
 
   const native = withDefaultTelemetry(options.native);
   const kv = await openSagaRuntimeKv();
+  await kv.get(['netscript', 'child-health', 'sagas']);
   const retention = await loadSagaRetention();
   const durable = await createDurableSagaRuntime({
     backend: 'kv',
