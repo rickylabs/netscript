@@ -134,7 +134,7 @@ startup write/read probe; invalid opt-ins fail startup.
 
 The remaining symbols on this entrypoint (`AspireBuilder`, `AspireResource`, `AspireResourceKind`,
 `AspireNSPluginContribution`, `ContributionContext`, `CacheSpec`, `ContainerSpec`, `DatabaseSpec`,
-`DenoServiceSpec`, `DenoBackgroundSpec`, `HealthCheckSpec`, `EnvSource`) are re-exported unchanged
+`DenoServiceSpec`, `DenoBackgroundSpec`, `EnvSource`) are re-exported unchanged
 from [`@netscript/aspire`](/reference/aspire/); see that reference page for their definitions.
 
 ## Core package

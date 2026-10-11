@@ -309,7 +309,6 @@ authors writing Aspire composition tests.
 | `DatabaseSpec` | interface | — | Database resource spec consumed by `AspireBuilder`. |
 | `DenoServiceSpec` | interface | — | Deno service resource spec consumed by `AspireBuilder`. |
 | `DenoBackgroundSpec` | interface | — | Deno background process spec consumed by `AspireBuilder`. |
-| `HealthCheckSpec` | interface | — | Health check expectation declared by a plugin contribution. |
 | `MemoryAspireReference` | interface | — | Recorded relationship between two in-memory Aspire resources. |
 | `AspireResourceKind` | type alias | — | Aspire resource kinds produced by plugin contributions. |
 

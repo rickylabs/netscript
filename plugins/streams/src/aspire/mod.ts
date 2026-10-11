@@ -17,5 +17,4 @@ export type {
   DenoBackgroundSpec,
   DenoServiceSpec,
   EnvSource,
-  HealthCheckSpec,
 } from '@netscript/aspire/public';

@@ -63,7 +63,6 @@ from its own `deno doc` surface.
 | `DenoBackgroundSpec` | interface | Deno background process spec consumed by AspireBuilder. |
 | `DenoServiceSpec` | interface | Deno service resource spec consumed by AspireBuilder. |
 | `EnvSource` | type alias | Source for an environment variable value in an AppHost composition. |
-| `HealthCheckSpec` | interface | Health check expectation declared by a plugin contribution. |
 
 ### `@netscript/plugin-workers/cli`
 

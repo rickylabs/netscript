@@ -4,7 +4,6 @@ import {
   type AspireResource,
   type ContributionContext,
   type EnvSource,
-  type HealthCheckSpec,
 } from '@netscript/aspire/public';
 import { WORKERS_CONCURRENCY_ENV } from '../runtime/concurrency.ts';
 
@@ -75,17 +74,4 @@ export class WorkersAspireContribution extends AspireNSPluginContribution {
     };
   }
 
-  /**
-   * Legacy health declarations; production does not consume this hook.
-   * @deprecated Since 0.0.8; removal next release. Use generated AppHost child probes and payloads.
-   */
-  override declareHealthChecks(ctx: ContributionContext): readonly HealthCheckSpec[] {
-    const apiPort = ctx.port(WORKERS_API_RESOURCE);
-    return [{
-      resource: WORKERS_API_RESOURCE,
-      url: `http://localhost:${apiPort}/health`,
-      expect: 200,
-      timeoutMs: 3000,
-    }];
-  }
 }

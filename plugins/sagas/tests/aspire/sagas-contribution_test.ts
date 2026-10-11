@@ -66,10 +66,5 @@ Deno.test('SagasAspireContribution registers API and background resources', () =
       'file:///workspace/netscript-app/.netscript/generated/plugin-sagas/sagas.registry.ts',
     SAGAS_RUNNER_CONCURRENCY: '2',
   });
-  assertEquals(contribution.declareHealthChecks(ctx), [{
-    resource: 'sagas-api',
-    url: 'http://localhost:9192/health',
-    expect: 200,
-    timeoutMs: 3000,
-  }]);
+  assertEquals('declareHealthChecks' in contribution, false);
 });

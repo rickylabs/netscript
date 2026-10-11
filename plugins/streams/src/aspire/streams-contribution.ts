@@ -4,7 +4,6 @@ import {
   type AspireResource,
   type ContributionContext,
   type EnvSource,
-  type HealthCheckSpec,
 } from '@netscript/aspire/public';
 
 /** Aspire contribution for the ephemeral-by-default Durable Streams protocol service. */
@@ -45,17 +44,4 @@ export class StreamsAspireContribution extends AspireNSPluginContribution {
     };
   }
 
-  /**
-   * Legacy health declarations; production does not consume this hook.
-   * @deprecated Since 0.0.8; removal next release. Use generated AppHost child probes and payloads.
-   */
-  override declareHealthChecks(ctx: ContributionContext): readonly HealthCheckSpec[] {
-    const servicePort = ctx.port('streams');
-    return [{
-      resource: 'streams',
-      url: `http://localhost:${servicePort}/health`,
-      expect: 200,
-      timeoutMs: 3000,
-    }];
-  }
 }

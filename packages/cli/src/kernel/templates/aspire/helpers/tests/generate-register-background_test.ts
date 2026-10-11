@@ -476,6 +476,57 @@ describe('generateRegisterBackground declared references (#1371)', () => {
 
 describe('generated background child probes (#1366)', () => {
   for (const pluginName of ['workers', 'sagas', 'triggers']) {
+    it(`preserves ${pluginName} capability controls after renaming its installed child`, async () => {
+      const registry = new PluginKindRegistry([]);
+      const descriptor = await resolveLocalPluginDescriptor(
+        fromFileUrl(new URL(`../../../../../../../../plugins/${pluginName}/`, import.meta.url)),
+        registry,
+        new DenoFileSystem(),
+      );
+      assert(descriptor.planningKind);
+      const provider = registry.get(descriptor.planningKind);
+      const renamed = 'renamed-notifier';
+      const scaffoldResult = {
+        scaffoldResult: {
+          filesCreated: [], directoriesCreated: [], filesSkipped: [],
+          totalOperations: 0, durationMs: 0,
+        },
+        pluginDir: `plugins/${pluginName}`,
+        kind: provider.kind,
+        port: 0,
+        servicePort: 0,
+        configSection: 'BackgroundProcessors' as const,
+        configKey: renamed,
+        serviceConfigKey: 'renamed-notifier-api',
+      };
+      const installed = buildBackgroundProcessorEntry(scaffoldResult, provider, {});
+      assertEquals(installed.Entrypoint, 'renamed-notifier/runtime.ts');
+      assertEquals(installed.PluginReferences, ['renamed-notifier-api']);
+      assertEquals(installed.RequiresKv, true);
+      const withoutCapability = buildBackgroundProcessorEntry(
+        scaffoldResult, { ...provider, defaultRequiresKv: false }, {},
+      );
+      const processors = {
+        [renamed]: { ...installed, RequiresDb: false, PluginReferences: [] },
+        'same-kind-without-kv': { ...withoutCapability, RequiresDb: false, PluginReferences: [] },
+        'same-kind-disabled': { ...installed, Enabled: false },
+      };
+      const loaded = await loadGeneratedModule(processors);
+      try {
+        const resources = await loaded.module.registerBackgroundProcessors(
+          createRecordingBuilder(), configForProcessors(processors), {},
+          new Map(), new Map(), '/apphost',
+        );
+        assertEquals(resources.get(renamed)?.probes, [{ path: '/health', endpointName: 'http' }]);
+        assertEquals(resources.get('same-kind-without-kv')?.probes, []);
+        assertEquals(resources.has('same-kind-disabled'), false);
+      } finally {
+        await loaded.dispose();
+      }
+    });
+  }
+
+  for (const pluginName of ['workers', 'sagas', 'triggers']) {
     it(`probes ${pluginName} child registry/dependency failures, restart storms and shutdown`, async () => {
       const registry = new PluginKindRegistry([]);
       const pluginsRoot = fromFileUrl(

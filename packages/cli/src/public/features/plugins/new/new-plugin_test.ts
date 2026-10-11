@@ -12,6 +12,22 @@ import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/works
 import { generateDenoJson } from '../../../../kernel/templates/workspace/deno-json.ts';
 
 describe('plugin new use case', () => {
+  it('authors renamed plugins with health endpoint and capability metadata without a ghost hook', async () => {
+    for (const kind of ['proxy', 'feature'] as const) {
+      const fs = new MemoryFileSystemAdapter();
+      await createNewPlugin({ name: 'renamed-notifier', kind, projectRoot: '/workspace/app' }, { fs });
+      const root = '/workspace/app/plugins/renamed-notifier';
+      const adapter = await fs.readFile(`${root}/adapter.ts`);
+      const descriptor = JSON.parse(await fs.readFile(`${root}/scaffold.plugin.json`));
+      assertStringIncludes(adapter, "healthEndpoint: '/health'");
+      assertStringIncludes(adapter, `capabilities: ['${kind}']`);
+      assertEquals(descriptor.capabilities.hasRoutes, kind === 'feature');
+      for (const [path, source] of fs.getFiles()) {
+        if (path.endsWith('.ts')) assertEquals(source.includes('declareHealthChecks'), false, path);
+      }
+    }
+  });
+
   it('registers a generated plugin by default', async () => {
     const fs = new MemoryFileSystemAdapter();
     await fs.writeFile('/workspace/app/deno.json', '{}');

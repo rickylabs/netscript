@@ -84,18 +84,6 @@ export interface TriggersContributionContext {
   readonly port: (key: string, fallback?: number) => number;
 }
 
-/** Health check declaration emitted by the triggers Aspire contribution. */
-export interface TriggersHealthCheckSpec {
-  /** Resource name checked by the health probe. */
-  readonly resource: string;
-  /** URL to probe. */
-  readonly url: string;
-  /** Expected HTTP status code. */
-  readonly expect: number;
-  /** Optional timeout in milliseconds. */
-  readonly timeoutMs?: number;
-}
-
 /** Aspire contribution for the NetScript triggers plugin. */
 export class TriggersAspireContribution {
   /** Plugin package name owning this contribution. */
@@ -144,17 +132,4 @@ export class TriggersAspireContribution {
     };
   }
 
-  /**
-   * Legacy health declarations; production does not consume this hook.
-   * @deprecated Since 0.0.8; removal next release. Use generated AppHost child probes and payloads.
-   */
-  declareHealthChecks(ctx: TriggersContributionContext): readonly TriggersHealthCheckSpec[] {
-    const apiPort = ctx.port(TRIGGERS_API_SERVICE_NAME);
-    return [{
-      resource: TRIGGERS_API_SERVICE_NAME,
-      url: `http://localhost:${apiPort}/health`,
-      expect: 200,
-      timeoutMs: 3000,
-    }];
-  }
 }
