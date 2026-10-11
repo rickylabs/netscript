@@ -27,14 +27,12 @@
  * value as expected without also pinning call order.
  */
 
-import { readTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
-import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
+import { writeGeneratedHelperFixture } from './generated-helper-fixture.ts';
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { toFileUrl } from 'jsr:@std/path@^1';
 import type { NetScriptConfig, ServiceEntry } from '@netscript/aspire/types';
-import { generateRegisterServices } from '../register/generate-register-services.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 
@@ -309,23 +307,11 @@ async function runGeneratedRegistration(
   await Deno.mkdir(helpersDir, { recursive: true });
   await Deno.mkdir(sdkDir, { recursive: true });
 
-  await Deno.writeTextFile(
-    `${helpersDir}/installation-secret.mts`,
-    readTemplateAssetSync(TEMPLATE_KEYS.aspireHelpersInstallationSecret),
-  );
+  await writeGeneratedHelperFixture(root, config);
   await Deno.writeTextFile(`${sdkDir}/aspire.mts`, ASPIRE_SDK_DOUBLE);
   await Deno.writeTextFile(`${helpersDir}/_aspire-compat.mts`, aspireCompatDouble());
 
   const generatedPath = `${helpersDir}/register-services.mts`;
-  await Deno.writeTextFile(
-    generatedPath,
-    generateRegisterServices({
-      services: config.Services,
-      version: config.Version,
-      denoDefaults: config.Defaults.Deno,
-      databaseEngine: 'Postgres',
-    }),
-  );
 
   try {
     const namespace: unknown = await import(toFileUrl(generatedPath).href);

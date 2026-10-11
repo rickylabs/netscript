@@ -6,8 +6,7 @@
  * generated-module boundary.
  */
 
-import { readTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
-import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
+import { writeGeneratedHelperFixture } from './generated-helper-fixture.ts';
 
 import { assert, assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
@@ -177,10 +176,11 @@ async function loadGeneratedModule(
   await Deno.mkdir(helpersDir, { recursive: true });
   await Deno.mkdir(sdkDir, { recursive: true });
 
-  await Deno.writeTextFile(
-    `${helpersDir}/installation-secret.mts`,
-    readTemplateAssetSync(TEMPLATE_KEYS.aspireHelpersInstallationSecret),
-  );
+  await writeGeneratedHelperFixture(root, {
+    ...EMPTY_CONFIG,
+    BackgroundProcessors: processors,
+    Defaults: { ...EMPTY_CONFIG.Defaults, Deno: MINIMAL_DENO_DEFAULTS },
+  });
   await Deno.writeTextFile(
     `${sdkDir}/aspire.mts`,
     [
@@ -214,14 +214,6 @@ async function loadGeneratedModule(
   );
 
   const generatedPath = `${helpersDir}/register-background.mts`;
-  await Deno.writeTextFile(
-    generatedPath,
-    generateRegisterBackground({
-      processors,
-      version: EMPTY_CONFIG.Version,
-      denoDefaults: MINIMAL_DENO_DEFAULTS,
-    }),
-  );
 
   try {
     const namespace: unknown = await import(toFileUrl(generatedPath).href);
