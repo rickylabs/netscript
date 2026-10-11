@@ -1,6 +1,6 @@
-import { assertEquals } from 'jsr:@std/assert@^1';
-import { join, toFileUrl } from 'jsr:@std/path@^1';
-import { afterAll } from 'jsr:@std/testing@^1/bdd';
+import { assertEquals } from '@std/assert';
+import { join, toFileUrl } from '@std/path';
+import { afterAll } from '@std/testing/bdd';
 import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts';
 
 // Execute the shipped helper with real filesystem IO. Only the process edge is replaced:
