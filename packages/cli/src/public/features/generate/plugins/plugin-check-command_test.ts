@@ -1,3 +1,4 @@
+import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { assert, assertEquals, assertMatch } from '@std/assert';
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from '@std/path';
 import { walk } from '@std/fs';
@@ -86,7 +87,9 @@ async function withProject(run: (root: string) => Promise<void>, plugins = ['tri
           Plugins: Object.fromEntries(
             plugins.map((
               plugin,
-            ) => [plugin, { Entrypoint: `jsr:@netscript/plugin-${plugin}@0.0.7/runtime` }]),
+            ) => [plugin, {
+              Entrypoint: netscriptJsrSpecifier(`@netscript/plugin-${plugin}`, 'runtime'),
+            }]),
           ),
         },
       }),
