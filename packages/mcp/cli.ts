@@ -175,7 +175,11 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
         warnEvidence,
       ),
       get_app_status: withReceipt(
-        createGetAppStatusFlow(query),
+        createGetAppStatusFlow(
+          query,
+          options.projectDoctor ?? new UnwiredProjectDoctor(),
+          options.projectRoot ?? '.',
+        ),
         evidence,
         'mcp get_app_status',
         warnEvidence,

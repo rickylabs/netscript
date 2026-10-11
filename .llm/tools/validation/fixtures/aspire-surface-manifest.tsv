@@ -56,6 +56,7 @@ path	class	owner	disposition
 .llm/tools/docs/fixtures/legacy-carrier-parity/digests.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/fixtures/resolved-plugin-caveats.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/generated-carriers.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/jsdoc-example-corpus_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/publish-carrier-repair.mjs	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/e2e/prepull-runtime-images_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/e2e/prepull-runtime-images.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -715,6 +716,8 @@ packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts	cli:other	S
 packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/doctor/plugin-runtime-health.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/doctor/runtime-health-polling_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/host/plugin-loader_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
