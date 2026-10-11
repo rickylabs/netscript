@@ -1,6 +1,8 @@
 import { assertEquals } from '@std/assert';
 import { join } from '@std/path';
 import { SCAFFOLD_VERSIONS } from '../../constants/scaffold/scaffold-versions.ts';
+import { DenoGeneratedSourceFormatter } from '../runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../runtime/process/deno-process.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
 import { DatabaseWorkspaceMutator } from './workspace-mutator.ts';
 
@@ -29,7 +31,12 @@ Deno.test('regenerating Aspire config declares pg once a PostgreSQL database is 
     await writeProject(root, {
       main: { Engine: 'Postgres', Mode: 'Container', DatabaseName: 'main' },
     });
-    const mutator = new DatabaseWorkspaceMutator(new DenoFileSystem(), {} as never, {} as never);
+    const mutator = new DatabaseWorkspaceMutator(
+      new DenoFileSystem(),
+      {} as never,
+      {} as never,
+      new DenoGeneratedSourceFormatter(new DenoProcess()),
+    );
 
     await mutator.regenerateAspireConfig(root);
 
@@ -49,7 +56,12 @@ Deno.test('regenerating Aspire config leaves a SQLite AppHost package.json untou
     await writeProject(root, { main: { Engine: 'Sqlite', DatabaseName: 'main.sqlite' } });
     const packagePath = join(root, 'aspire', 'package.json');
     const before = await Deno.readTextFile(packagePath);
-    const mutator = new DatabaseWorkspaceMutator(new DenoFileSystem(), {} as never, {} as never);
+    const mutator = new DatabaseWorkspaceMutator(
+      new DenoFileSystem(),
+      {} as never,
+      {} as never,
+      new DenoGeneratedSourceFormatter(new DenoProcess()),
+    );
 
     await mutator.regenerateAspireConfig(root);
 

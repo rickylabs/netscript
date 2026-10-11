@@ -1,3 +1,5 @@
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 
@@ -52,7 +54,12 @@ describe('public add database flow', () => {
       fs,
       registry,
       databaseScaffolder: new DatabaseScaffolder(scaffolder, fs, templateAdapter, registry),
-      workspaceMutator: new DatabaseWorkspaceMutator(fs, scaffolder, templateAdapter),
+      workspaceMutator: new DatabaseWorkspaceMutator(
+        fs,
+        scaffolder,
+        templateAdapter,
+        new DenoGeneratedSourceFormatter(new DenoProcess()),
+      ),
     });
 
     const appsettings = JSON.parse(

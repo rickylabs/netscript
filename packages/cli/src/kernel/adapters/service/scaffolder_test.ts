@@ -133,6 +133,7 @@ Deno.test('ServiceScaffolder writes canonical content for every generated servic
   const { fs, scaffolder, templateAdapter } = createHarness();
   const formattedPaths: string[] = [];
   const formatter: GeneratedSourceFormatterPort = {
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (path, content) => {
       formattedPaths.push(path);
       return Promise.resolve(path.endsWith('.json') ? content : `// canonical\n${content}`);
@@ -332,6 +333,7 @@ Deno.test('shared contract scaffolder canonicalizes the service contract and ver
   await fs.createDir('/project/contracts/versions/v1');
   const formattedPaths: string[] = [];
   const formatter: GeneratedSourceFormatterPort = {
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (path, content) => {
       formattedPaths.push(path);
       return Promise.resolve(`// canonical\n${content}`);

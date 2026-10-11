@@ -1,3 +1,4 @@
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { assert, assertEquals } from '@std/assert';
 import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -74,6 +75,7 @@ async function runStreamsInstall(hostPort?: number): Promise<string[]> {
       resolveProjectRoot: () => Promise.resolve(projectRoot),
       print: (message) => messages.push(message),
       installPluginDependencies: {
+        formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
         fs,
         scaffolder,
         templateAdapter,

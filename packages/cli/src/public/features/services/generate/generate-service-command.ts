@@ -1,3 +1,4 @@
+import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
@@ -55,7 +56,11 @@ export function createServiceGenerateCommand(
       const generateHelpers = dependencies.generateHelpers ?? generateAspire;
       const helpers = await generateHelpers(
         { projectRoot, dryRun, force },
-        dependencies.generateAspireDependencies,
+        {
+          ...dependencies.generateAspireDependencies,
+          regenerateHelpers: dependencies.generateAspireDependencies.regenerateHelpers ??
+            regenerateAspireHelpersWithDependencies,
+        },
       );
       const clientVerb = dryRun ? 'Would write' : 'Wrote';
       const helperVerb = dryRun ? 'Would write' : 'Wrote';

@@ -2,7 +2,7 @@ import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import {
   addServiceWorkspaceMember,
-  regenerateAspireHelpers,
+  regenerateAspireHelpersWithDependencies,
   upsertServiceAppsettingsEntry,
 } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import type { PortAllocator } from '../../../../kernel/adapters/service/port-allocator.ts';
@@ -103,14 +103,17 @@ export async function addService(
     dependencies.fs,
     dependencies.formatter,
   );
-  const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
-  const helperFiles = await regenerateHelpers(
+  const regenerateHelpers = dependencies.regenerateHelpers ??
+    regenerateAspireHelpersWithDependencies;
+  const aspireFiles = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
     { formatter: dependencies.formatter },
   );
+
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
 
   return {
     ...rendered,

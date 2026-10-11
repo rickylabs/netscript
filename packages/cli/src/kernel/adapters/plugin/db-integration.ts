@@ -5,6 +5,7 @@
  */
 
 import { join } from '@std/path';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
@@ -56,6 +57,8 @@ export interface PluginDbProvisioningAdapters {
   readonly fs: FileSystemPort;
   /** Template renderer. */
   readonly templateAdapter: TemplatePort;
+  /** Canonical formatter supplied by the command composition root. */
+  readonly formatter: GeneratedSourceFormatterPort;
 }
 
 /** Package-resolved Prisma schema content supplied by an external package adapter. */
@@ -155,6 +158,7 @@ export async function provisionDatabaseIfNeeded(
     adapters.fs,
     adapters.scaffolder,
     adapters.templateAdapter,
+    adapters.formatter,
   );
   await mutator.addDatabaseToAppsettings(projectRoot, {
     configKey,
@@ -212,30 +216,34 @@ export async function copyPluginSchemasToRootDb(
   const packageFragments = options.packageFragments ?? [];
   if (packageFragments.length > 0) {
     for (const fragment of packageFragments) {
-      results.push(await writePluginSchemaFragment(
-        projectRoot,
-        pluginName,
-        provider.dirName,
-        fragment.path,
-        fragment.content,
-        adapters.fs,
-        adapters.scaffolder,
-        options.overwrite ?? false,
-      ));
+      results.push(
+        await writePluginSchemaFragment(
+          projectRoot,
+          pluginName,
+          provider.dirName,
+          fragment.path,
+          fragment.content,
+          adapters.fs,
+          adapters.scaffolder,
+          options.overwrite ?? false,
+        ),
+      );
     }
   } else if (await adapters.fs.exists(sourceRoot)) {
     for await (const entry of adapters.fs.walk(sourceRoot)) {
       if (!entry.isFile || !entry.path.endsWith('.prisma')) continue;
-      results.push(await writePluginSchemaFragment(
-        projectRoot,
-        pluginName,
-        provider.dirName,
-        entry.path,
-        await adapters.fs.readFile(entry.path),
-        adapters.fs,
-        adapters.scaffolder,
-        options.overwrite ?? false,
-      ));
+      results.push(
+        await writePluginSchemaFragment(
+          projectRoot,
+          pluginName,
+          provider.dirName,
+          entry.path,
+          await adapters.fs.readFile(entry.path),
+          adapters.fs,
+          adapters.scaffolder,
+          options.overwrite ?? false,
+        ),
+      );
     }
   }
 
