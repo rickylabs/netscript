@@ -23,7 +23,10 @@ async function fixture(use: (root: string) => Promise<void>): Promise<void> {
 Deno.test('installation provisioning creates once per project, with restrictive permissions', () =>
   fixture(async (root) => {
     const file = ensureInstallationSecretFile(root);
-    assertEquals(file, join(root, '.data', 'aspire-secrets', 'installation.secret'));
+    assertEquals(
+      file,
+      join(root, '.data', 'aspire-secrets', 'installation.secret'),
+    );
     const material = await Deno.readTextFile(file);
     assertEquals(material.length, 64);
     assertEquals(ensureInstallationSecretFile(root), file);
@@ -46,7 +49,10 @@ Deno.test('installation provisioning stays in the project with an unusable home 
   fixture(async (root) => {
     const project = join(root, 'project');
     const foreignHome = join(root, 'unusable-home');
-    await Deno.writeTextFile(foreignHome, 'a home that cannot contain a directory');
+    await Deno.writeTextFile(
+      foreignHome,
+      'a home that cannot contain a directory',
+    );
     const previousHome = Deno.env.get('HOME');
     Deno.env.set('HOME', foreignHome);
     try {
@@ -56,11 +62,17 @@ Deno.test('installation provisioning stays in the project with an unusable home 
       await Deno.rename(project, moved);
       const movedFile = ensureInstallationSecretFile(moved);
       assertEquals(await Deno.readTextFile(movedFile), material);
-      assertEquals(await Deno.readTextFile(foreignHome), 'a home that cannot contain a directory');
-      assertEquals(Array.from(Deno.readDirSync(root), (entry) => entry.name).sort(), [
-        'moved-project',
-        'unusable-home',
-      ]);
+      assertEquals(
+        await Deno.readTextFile(foreignHome),
+        'a home that cannot contain a directory',
+      );
+      assertEquals(
+        Array.from(Deno.readDirSync(root), (entry) => entry.name).sort(),
+        [
+          'moved-project',
+          'unusable-home',
+        ],
+      );
     } finally {
       if (previousHome === undefined) Deno.env.delete('HOME');
       else Deno.env.set('HOME', previousHome);
@@ -182,3 +194,31 @@ Deno.test('installation file carrier extends scoped permissions without narrowin
     '--allow-read',
   ]);
 });
+
+Deno.test('installation provisioning refuses an unreadable managed file without replacing identity', () =>
+  fixture(async (root) => {
+    if (Deno.build.os === 'windows') return;
+    const file = ensureInstallationSecretFile(root);
+    const material = await Deno.readTextFile(file);
+    await Deno.chmod(file, 0o000);
+    try {
+      const error = assertThrows(() => ensureInstallationSecretFile(root));
+      assert(!String(error).includes(material));
+      assert(!String(error).includes(root));
+    } finally {
+      await Deno.chmod(file, 0o600);
+    }
+    assertEquals(await Deno.readTextFile(file), material);
+  }));
+
+Deno.test('installation provisioning refuses a symlinked managed data directory', () =>
+  fixture(async (root) => {
+    if (Deno.build.os === 'windows') return;
+    const foreign = join(root, 'foreign');
+    await Deno.mkdir(foreign, { mode: 0o700 });
+    const installation = join(root, 'target');
+    await Deno.mkdir(installation);
+    await Deno.symlink(foreign, join(installation, '.data'));
+    assertThrows(() => ensureInstallationSecretFile(installation));
+    assertEquals(Array.from(Deno.readDirSync(foreign)), []);
+  }));

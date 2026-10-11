@@ -583,6 +583,7 @@ packages/cli/src/kernel/domain/db-engine.ts	cli:other	S4	grep-verified in the S4
 packages/cli/src/kernel/domain/deploy/compile-target.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/deploy-target-port_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/deploy-target-port.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/domain/deploy/packaged-installation-credential.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/rollback-convention.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/deploy/secrets-convention.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/docker-topology_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -676,6 +677,8 @@ packages/cli/src/maintainer/features/root/maintainer-services_test.ts	cli:other	
 packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts	agent-init	S9	aspire agent init delegation flags
 packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer.ts	agent-init	S9	aspire agent init delegation flags
 packages/cli/src/public/adapters/jsr-import-resolver.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/adapters/packaged-deployment-bootstrap_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/adapters/packaged-deployment-bootstrap.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/domain/scaffold-plan_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/agent/agent-group.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke
 packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts	agent-init	S9	explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke

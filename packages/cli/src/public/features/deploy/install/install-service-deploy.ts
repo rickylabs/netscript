@@ -2,8 +2,8 @@ import { join } from '@std/path';
 import {
   detectServiceOs,
   fullServiceNameForOs,
-  type ServiceOs,
   serviceConfigPath,
+  type ServiceOs,
 } from '../../../../kernel/adapters/deploy/runtime-detect.ts';
 import { Pipeline } from '../../../../kernel/application/abstracts/pipeline.ts';
 import {
@@ -15,6 +15,7 @@ import type {
   ServiceManifestPort,
 } from '../../../ports/service-manifest-port.ts';
 import type { OsServicePort } from '../../../ports/os-service-port.ts';
+import type { DeploymentBootstrapPort } from '../../../ports/deployment-bootstrap-port.ts';
 
 /** Request for installing services from deployment artifacts. */
 export interface InstallServiceDeployRequest {
@@ -33,6 +34,8 @@ export interface InstallServiceDeployRequest {
 
 /** Dependencies for the public service install flow. */
 export interface InstallServiceDeployDependencies {
+  /** Target installation preparation; completes before any service registration. */
+  readonly bootstrap: DeploymentBootstrapPort;
   /** Deployment manifest resolver. */
   readonly manifests: ServiceManifestPort;
 
@@ -56,8 +59,10 @@ export interface InstallServiceDeployResult {
 }
 
 /** Deploy install step that registers manifest services. */
-export class InstallServiceDeployStep
-  extends PipelineStep<InstallServiceDeployRequest, InstallServiceDeployResult> {
+export class InstallServiceDeployStep extends PipelineStep<
+  InstallServiceDeployRequest,
+  InstallServiceDeployResult
+> {
   readonly id = 'public.deploy.install.register-services';
 
   constructor(private readonly dependencies: InstallServiceDeployDependencies) {
@@ -76,14 +81,29 @@ export class InstallServiceDeployStep
     return input;
   }
 
-  async execute(request: InstallServiceDeployRequest): Promise<InstallServiceDeployResult> {
+  async execute(
+    request: InstallServiceDeployRequest,
+  ): Promise<InstallServiceDeployResult> {
     const resolved = await this.dependencies.manifests.resolve({
       installDir: request.installDir,
       deployDir: request.deployDir,
     });
-    const serviceNames = selectServiceNames(resolved.manifest.services, 'start', request.service);
+    const serviceNames = selectServiceNames(
+      resolved.manifest.services,
+      'start',
+      request.service,
+    );
     const os = this.dependencies.os ?? detectServiceOs();
     const configDir = join(resolved.installDir, 'config');
+    if (os === 'windows') {
+      await this.dependencies.bootstrap.prepare(
+        resolved.installDir,
+        Object.keys(resolved.manifest.services),
+        Object.entries(resolved.manifest.services)
+          .filter(([, entry]) => entry.type !== 'app')
+          .map(([name]) => name),
+      );
+    }
     const installed: string[] = [];
     const failed: string[] = [];
 
@@ -118,7 +138,8 @@ export async function installServiceDeploy(
   request: InstallServiceDeployRequest,
   dependencies: InstallServiceDeployDependencies,
 ): Promise<InstallServiceDeployResult> {
-  return (await new InstallServiceDeployPipeline(dependencies).execute(request)).output;
+  return (await new InstallServiceDeployPipeline(dependencies).execute(request))
+    .output;
 }
 
 function selectServiceNames(
@@ -129,7 +150,9 @@ function selectServiceNames(
   if (singleService) {
     if (!services[singleService]) {
       const available = Object.keys(services).join(', ');
-      throw new Error(`Service "${singleService}" not found in manifest. Available: ${available}`);
+      throw new Error(
+        `Service "${singleService}" not found in manifest. Available: ${available}`,
+      );
     }
     return [singleService];
   }
