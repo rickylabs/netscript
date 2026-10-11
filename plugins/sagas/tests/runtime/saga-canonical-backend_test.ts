@@ -16,6 +16,7 @@ for (const backend of ['kv', 'prisma'] as const) {
       await resetKv();
       const kv = await getKv({ provider: 'deno-kv', path: ':memory:', skipServiceDiscovery: true });
       assert(kv instanceof DenoKvAdapter);
+      const rawKv = await kv.getRawKv();
       const directory = await Deno.makeTempDir();
       const fixtureUrl = new URL('./fixtures/runner-prisma-client.ts', import.meta.url).href;
       const bootstrap = toFileUrl(`${directory}/bootstrap.ts`).href;
@@ -128,7 +129,13 @@ for (const backend of ['kv', 'prisma'] as const) {
       } finally {
         await api?.stop();
         await supervisor?.stop();
-        await resetKv();
+        try {
+          if (supervisor) {
+            await assertRejects(async () => await rawKv.get(['shutdown-probe']), Error, 'closed');
+          }
+        } finally {
+          await resetKv();
+        }
         if (registryEnv === undefined) Deno.env.delete('SAGAS_REGISTRY_MODULE');
         else Deno.env.set('SAGAS_REGISTRY_MODULE', registryEnv);
         await Deno.remove(directory, { recursive: true });
