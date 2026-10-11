@@ -305,9 +305,10 @@ prevent runtime startup. A backlog can delay migration of historical keys, so ba
 is guaranteed only after their terminal deadline has been assigned. No API read or owner app session
 drives cleanup.
 
-Transport reservations already use their separate deduplication TTL. With the KV backend,
-`archiveToDb: false` skips the optional Prisma archive even when a Prisma client is available. With
-`--saga-store-backend prisma`, the Prisma query model remains required runtime state so
+Transport reservations already use their separate deduplication TTL. With a KV query projection,
+`archiveToDb: true` explicitly enables the optional Prisma archive for that saga group and requires
+a host Prisma client. The default `archiveToDb: false` skips it, keeping KV-only installs DB-free.
+With `Sagas.Projection.Backend: prisma`, the Prisma query model remains required runtime state so
 `listInstances`, `getInstance`, and stream hydration stay populated independently of archival.
 
 Migration: `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and no longer expires open replay

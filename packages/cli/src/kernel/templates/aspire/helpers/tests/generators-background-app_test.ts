@@ -226,7 +226,7 @@ describe('generateRegisterBackground', () => {
   it('should pass saga store backend appsettings to background env', () => {
     const sagaProcessor = {
       ...fixtures.MINIMAL_BACKGROUND,
-      Sagas: { Store: { Backend: 'prisma' } },
+      Sagas: { Store: { Backend: 'prisma' }, Projection: { Backend: 'none' } },
     } as BackgroundProcessorEntry;
     const output = generateRegisterBackground({
       ...emptyOptions,
@@ -236,6 +236,7 @@ describe('generateRegisterBackground', () => {
       output,
       'bg_0.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
     );
+    assertStringIncludes(output, 'bg_0.withEnvironment(\'NETSCRIPT_SAGA_PROJECTION\', "none")');
   });
 
   it('should register the KV-backed child health endpoint and probe', () => {

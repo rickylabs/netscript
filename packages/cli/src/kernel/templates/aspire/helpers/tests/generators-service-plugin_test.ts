@@ -3,8 +3,11 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
+import { assertType, type IsExact } from 'jsr:@std/testing@^1/types';
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import type { PluginEntry } from '@netscript/aspire/types';
+import type { SagaProjectionBackend as HostingSagaProjectionBackend } from '@netscript/aspire/config';
+import type { SagaProjectionBackend } from '@netscript/plugin-sagas-core/stores/backends';
 import { generateRegisterServices } from '../register/generate-register-services.ts';
 import { generateRegisterPlugins } from '../register/generate-register-plugins.ts';
 import * as fixtures from './generators-test-support.ts';
@@ -16,6 +19,10 @@ import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 // awaited registry hydration. The tests exercise them directly (outside the CLI
 // dispatch path), so hydrate at module load.
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
+
+Deno.test('saga projection hosting and runtime selector types stay equal', () => {
+  assertType<IsExact<HostingSagaProjectionBackend, SagaProjectionBackend>>(true);
+});
 
 describe('generateRegisterServices', () => {
   const emptyOptions = {
@@ -464,7 +471,7 @@ describe('generateRegisterPlugins', () => {
   it('should pass saga store backend appsettings to plugin env', () => {
     const sagaPlugin = {
       ...fixtures.MINIMAL_PLUGIN,
-      Sagas: { Store: { Backend: 'prisma' } },
+      Sagas: { Store: { Backend: 'prisma' }, Projection: { Backend: 'none' } },
     } as PluginEntry;
     const output = generateRegisterPlugins({
       ...emptyOptions,
@@ -474,6 +481,7 @@ describe('generateRegisterPlugins', () => {
       output,
       'resource.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
     );
+    assertStringIncludes(output, 'resource.withEnvironment(\'NETSCRIPT_SAGA_PROJECTION\', "none")');
   });
 
   it('should point triggers API at the generated trigger registry module', () => {
