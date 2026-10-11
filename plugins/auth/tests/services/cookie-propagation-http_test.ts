@@ -35,7 +35,11 @@ for (const projection of ['rest', 'rpc'] as const) {
           remember('callback', result.response);
           return result;
         } catch (error) {
-          if (error instanceof KvOAuthError) callbackError = error.code;
+          if (error instanceof KvOAuthError) {
+            callbackError = error.code;
+            // Backend diagnostics must not become the public error message or data.
+            throw new KvOAuthError(error.code, 'private backend diagnostic', { cause: error });
+          }
           throw error;
         }
       },
@@ -80,7 +84,16 @@ for (const projection of ['rest', 'rpc'] as const) {
     const missing = await call('callback', input);
     assertEquals(missing.response.status, 502);
     assertEquals(callbackError, 'oauth_cookie_missing');
-    assertStringIncludes(JSON.stringify(missing.body), 'OAuth transaction cookie is missing');
+    const missingError = projection === 'rpc' ? missing.body.json : missing.body;
+    assertEquals(missingError.code, 'oauth_cookie_missing');
+    assertEquals(missingError.message, 'OAuth transaction cookie is missing. Restart sign-in.');
+    assertEquals(missingError.data, {
+      providerId: 'kv-oauth',
+      reason: 'OAuth transaction cookie is missing. Restart sign-in.',
+    });
+    assertEquals(JSON.stringify(missing.body).includes('private backend diagnostic'), false);
+    assertEquals(Object.hasOwn(missingError, 'cause'), false);
+    assertEquals(missing.response.headers.getSetCookie(), []);
     const completed = await call('callback', input, txnCookie.split(';')[0]);
     assertEquals(completed.response.status, 200);
     assertEquals(completed.response.headers.getSetCookie(), emitted.get('callback'));
