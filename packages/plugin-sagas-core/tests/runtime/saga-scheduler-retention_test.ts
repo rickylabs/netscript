@@ -12,6 +12,9 @@ import {
 } from '../../src/runtime/saga-scheduler.ts';
 import { KvSagaSchedulerStore } from '../../src/stores/kv-saga-scheduler-store.ts';
 import { KvSagaStore } from '../../src/stores/kv-saga-store.ts';
+import { KvSagaAppliedKeyStore } from '../../src/stores/kv-saga-runtime-stores.ts';
+import { defineSaga } from '../../mod.ts';
+import { SagaEngine } from '../../src/runtime/saga-engine.ts';
 
 const DAY = 86_400_000;
 const BASE = new Date('2030-01-01T00:00:00Z');
@@ -48,7 +51,7 @@ function fixture(kv: KvStore) {
         return Promise.resolve();
       },
     });
-    scheduler.bindRetentionStore(canonical, { completedRetentionDays: 1 });
+    scheduler.bindRetentionStore?.(canonical, { completedRetentionDays: 1 });
     return scheduler;
   };
   return {
@@ -88,7 +91,7 @@ for (const backend of ['real-kv', 'memory'] as const) {
     for (const status of statuses) {
       // Schedule while open, then transition; a sweep must discover the terminal deadline.
       await f.canonical.save(envelope(status, 'running'));
-      await scheduler.schedule(
+      const scheduled = await scheduler.schedule(
         {
           type: status,
           payload: {},
@@ -99,9 +102,18 @@ for (const backend of ['real-kv', 'memory'] as const) {
         status as SagaInstanceId,
       );
       await f.canonical.save(envelope(status, status));
+      if (['completed', 'failed', 'cancelled', 'compensated'].includes(status)) {
+        for (const outcome of ['claimed', 'dispatched', 'failed'] as const) {
+          await f.store.save({
+            ...scheduled,
+            id: `${scheduled.id}:${outcome}` as SagaMessageId,
+            status: outcome,
+          });
+        }
+      }
     }
     await scheduler.schedule({ type: 'legacy', payload: {} }, BASE);
-    await f.create().cleanupRetention();
+    while (await f.create().cleanupRetention?.()) { /* assign deadlines in bounded pages */ }
     const before = await records(kv);
     for (const status of statuses) {
       const record = before.find((record) => record.instanceId === status)!;
@@ -112,7 +124,9 @@ for (const backend of ['real-kv', 'memory'] as const) {
     }
     f.advance(DAY + 1);
     // Re-create the scheduler for every pass: cleanup progress is durable, no app read drives it.
-    while (await f.create().cleanupRetention()) { /* each awaited pass advances a bounded page */ }
+    while (await f.create().cleanupRetention?.()) {
+      /* each awaited pass advances a bounded page */
+    }
     assertEquals(
       (await records(kv)).map((record) => 'type' in record.message ? record.message.type : '')
         .sort(),
@@ -200,7 +214,7 @@ Deno.test('core scheduler real-kv: replay preserves dispatched and failed outcom
   );
   assertEquals((await records(kv)).find((record) => record.id === failure.id)?.status, 'failed');
   f.advance(DAY + 1);
-  while (await f.create().cleanupRetention()) { /* durable pages */ }
+  while (await f.create().cleanupRetention?.()) { /* durable pages */ }
   assertEquals(await records(kv), []);
   await scheduler.stop();
 });
@@ -223,11 +237,11 @@ Deno.test('core scheduler real-kv: bounded pages advance past an active prefix a
     await f.store.save(record);
   }
   f.advance(DAY + 1);
-  assertEquals(await f.create().cleanupRetention(), true);
+  assertEquals(await f.create().cleanupRetention?.(), true);
   assertEquals((await records(kv)).length, 23); // first ten are active
-  assertEquals(await f.create().cleanupRetention(), true);
+  assertEquals(await f.create().cleanupRetention?.(), true);
   assertEquals((await records(kv)).length, 15); // bounded second page removes eight
-  assertEquals(await f.create().cleanupRetention(), false);
+  assertEquals(await f.create().cleanupRetention?.(), false);
   assertEquals((await records(kv)).length, 12);
   assertEquals((await records(kv)).every((record) => record.instanceId === 'active'), true);
 });
@@ -302,5 +316,81 @@ Deno.test('core scheduler real-kv: failed canonical reads retain recoverable cla
   assertEquals((await records(kv))[0]?.attempts, 2);
   assertThrows(() => restarted.bindRetentionStore(f.canonical), Error, 'before startup');
   assertThrows(() => restarted.start(), Error, 'already running');
+  await restarted.stop();
+});
+
+Deno.test('core scheduler real-kv: outer cascade keys replay stably and separate identical timers from different origins', async () => {
+  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+  const f = fixture(kv);
+  await f.canonical.save(envelope('one', 'running'));
+  await f.canonical.save(envelope('two', 'running'));
+  const scheduler = f.create();
+  const cascade = {
+    kind: 'scheduled' as const,
+    message: { type: 'same', payload: {} },
+    scheduledFor: new Date(BASE.getTime() + 30 * DAY),
+    idempotencyKey: 'outer-key',
+  };
+  const one = await scheduler.scheduleCascaded(cascade, { instanceId: 'one' as SagaInstanceId });
+  const two = await scheduler.scheduleCascaded(cascade, { instanceId: 'two' as SagaInstanceId });
+  assert(one.id !== two.id);
+  f.advance(DAY);
+  const replay = await f.create().scheduleCascaded(cascade, {
+    instanceId: 'one' as SagaInstanceId,
+  });
+  assertEquals(replay.id, one.id);
+  assertEquals((await records(kv)).length, 2);
+  assertEquals(
+    (await records(kv)).every((record) => record.message.idempotencyKey === 'outer-key'),
+    true,
+  );
+});
+
+Deno.test('core scheduler real-kv: open timers preserve engine replay markers and transition history beyond the terminal window', async () => {
+  await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
+  const f = fixture(kv);
+  const definition = defineSaga('retained-open')
+    .state({ count: 0 })
+    .on('Tick', (saga) => {
+      saga.state = { count: saga.state.count + 1 };
+      return [];
+    })
+    .build();
+  const createEngine = () =>
+    new SagaEngine({
+      store: f.canonical,
+      appliedKeys: new KvSagaAppliedKeyStore({ kv, now: f.clock.now, completedRetentionDays: 1 }),
+    });
+  const inbound = {
+    type: 'Tick',
+    payload: {},
+    correlationKey: 'one' as SagaCorrelationKey,
+    idempotencyKey: 'first',
+  };
+  const engine = createEngine();
+  await engine.register([definition]);
+  await engine.start();
+  await engine.handle(inbound);
+  await engine.stop();
+  const origin = 'retained-open:one' as SagaInstanceId;
+  await f.create().schedule(
+    { type: 'timer', payload: {} },
+    new Date(BASE.getTime() + 60 * DAY),
+    origin,
+  );
+  f.advance(30 * DAY);
+  while (await f.create().cleanupRetention?.()) { /* durable pages */ }
+  const restarted = createEngine();
+  await restarted.register([definition]);
+  await restarted.start();
+  const [result] = await restarted.handle(inbound);
+  assertEquals(result?.alreadyApplied, true);
+  assertEquals((await f.canonical.load(origin))?.state.count, 1);
+  assertEquals((await records(kv)).length, 1);
+  const history = [];
+  for await (const entry of kv.list({ prefix: ['sagas', 'transition', origin] })) {
+    history.push(entry);
+  }
+  assertEquals(history.length, 1);
   await restarted.stop();
 });

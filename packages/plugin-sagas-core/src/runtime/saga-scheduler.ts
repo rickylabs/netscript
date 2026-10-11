@@ -230,7 +230,14 @@ export class SagaScheduler implements SagaSchedulerPort {
     message: CascadedMessage<'scheduled'>,
     context?: Readonly<{ instanceId: SagaInstanceId }>,
   ): Promise<SagaScheduledMessageRecord> {
-    return await this.schedule(message.message, message.scheduledFor, context?.instanceId);
+    return await this.schedule(
+      {
+        ...message.message,
+        idempotencyKey: message.idempotencyKey ?? message.message.idempotencyKey,
+      },
+      message.scheduledFor,
+      context?.instanceId,
+    );
   }
 
   /** Claim and dispatch due scheduled messages once. */
