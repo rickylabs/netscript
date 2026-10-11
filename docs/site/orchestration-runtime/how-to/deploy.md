@@ -374,12 +374,15 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 <li>Cloud Run uses the Docker-image provider lane (<code>docker build</code>, <code>docker push</code>, <code>gcloud run deploy</code>) and requires <code>registry</code> plus <code>imageName</code> in config.</li>
 <li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block unless you configure a target. Generated workflows are starter CI definitions; you still provide registry, host, cloud, and secret-manager configuration before they are production release jobs.</li>
 <li>Cluster/cloud auth, registry access, RBAC, subscriptions, regions, and provider quotas are operator prerequisites. The CLI shells to Aspire, Docker, or gcloud; it does not create credentials.</li>
-<li><strong>Stream Manifest Helpers and Pub/Sub Boundary</strong>: The manifest-level <code>defineStreamProducer</code> and <code>defineStreamConsumer</code> helpers in the <code>@netscript/plugin-streams</code> package are deliberate stubs that throw <code>StreamUnsupportedOperationError</code>. This boundary is drawn because a generic, broker-agnostic topic pub/sub model is a future feature-scale design. Today, you must publish stream events using the <code>@netscript/plugin-streams-core</code> API directly, and consume events over HTTP/SSE.</li>
+<li><strong>Stream runtime</strong>: Publish entity state with <code>defineStreamSchema</code> and
+<code>createDurableStream</code> from <code>@netscript/plugin-streams-core</code>. Consumers read the
+stream path over HTTP/SSE. <code>@netscript/plugin-streams</code> exports the service manifest and
+typed topic definitions; see the <a href="/durable-workflows/streams/#breaking-migration-in-008">0.0.8 migration</a>
+for the removed root producer/consumer helpers.</li>
 <li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers add events, progress, and child spans to the automatic job dispatch/execution trace in Aspire. The <code>log.*</code> helpers remain console-backed.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>
 </ul>
 <!-- caveat: arch-debt:cli-deploy-artifacts-missing -->
-<!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
 {{ /comp }}
 
 ## Step 7 — Verify the deployment
