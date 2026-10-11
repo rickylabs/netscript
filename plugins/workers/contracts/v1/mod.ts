@@ -28,5 +28,7 @@ export type {
   TaskExecutionOptions,
   TaskMessage,
   TaskResult,
+  TaskStdin,
+  TaskStdinJson,
   TriggerType,
 } from '@netscript/plugin-workers-core/runtime';

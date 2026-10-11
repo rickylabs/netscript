@@ -11,13 +11,23 @@ import type { Principal } from './auth/types.ts';
 /** Router definition accepted by the service builder and handler factories. */
 export type ServiceRouter = Record<string, unknown>;
 
+/** Socket connection metadata supplied by the listener or a mounting host. */
+export interface ServiceEnvironment {
+  /** Socket peer address, preserved for Hono's Deno getConnInfo adapter. */
+  readonly remoteAddr?: Deno.Addr;
+}
+
 /** Minimal mountable service application returned by `build()`. */
 export interface ServiceApp {
   /** Handles a Web Platform request without starting a listener. */
-  fetch(request: Request): Response | Promise<Response>;
+  fetch(request: Request, env?: ServiceEnvironment): Response | Promise<Response>;
 
   /** Executes an in-memory request against the service app. */
-  request(input: Request | string | URL, init?: RequestInit): Response | Promise<Response>;
+  request(
+    input: Request | string | URL,
+    init?: RequestInit,
+    env?: ServiceEnvironment,
+  ): Response | Promise<Response>;
 }
 
 /** Network address assigned to a running service listener. */

@@ -7,6 +7,7 @@ import { ServiceClientScaffolder } from './client-scaffolder.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 const formatter: GeneratedSourceFormatterPort = {
+  formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
   formatContent: (_path, content) => Promise.resolve(`// canonical\n${content}`),
   formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
 };

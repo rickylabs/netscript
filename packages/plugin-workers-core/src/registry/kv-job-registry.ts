@@ -1,3 +1,4 @@
+import { executionRetentionRemaining } from '../state/execution-retention.ts';
 import { DEFAULT_TOPIC, JobDefinitionSchema } from '../domain/mod.ts';
 import type {
   ExecutionRecord,
@@ -164,7 +165,10 @@ export class KvJobRegistry extends Registry<string, JobDefinition>
 
   /** Save a job execution record. */
   async saveExecution(record: ExecutionRecord): Promise<void> {
-    await this.#kv.set([...EXECUTION_PREFIX, record.id], record);
+    const expireIn = await executionRetentionRemaining(record, this.#kv, new Date());
+    const key = [...EXECUTION_PREFIX, record.id];
+    if (expireIn !== undefined && expireIn <= 0) await this.#kv.delete(key);
+    else await this.#kv.set(key, record, expireIn === undefined ? undefined : { expireIn });
   }
 
   /** Find a job execution record by id. */

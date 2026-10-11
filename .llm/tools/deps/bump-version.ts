@@ -36,6 +36,24 @@ export const GENERATED_CONSUMER_VERSION_FILES: readonly string[] = [
   '.agents/generated/consumer-skills/.mcp.json',
 ];
 
+const RELEASE_SCAN_EXCLUSIONS: RegExp[] = [
+  /(?:^|[/\\])\.git(?:[/\\]|$)/,
+  /(?:^|[/\\])node_modules(?:[/\\]|$)/,
+  /(?:^|[/\\])\.llm[/\\]tmp(?:[/\\]|$)/,
+  /(?:^|[/\\])\.llm[/\\]runs(?:[/\\]|$)/,
+  /(?:^|[/\\])\.claude[/\\]worktrees(?:[/\\]|$)/,
+  /(?:^|[/\\])\.data(?:[/\\]|$)/,
+  // Captured public-surface snapshots legitimately embed the version they
+  // were taken at (the baseline the NEXT release diffs against); they are
+  // not live version manifests and must not be treated as bump residue.
+  /(?:^|[/\\])\.llm[/\\]tools[/\\]release[/\\]baselines(?:[/\\]|$)/,
+  // Test fixtures pin prior published releases on purpose (a prior-release
+  // config capture, a consumer control that isolates a wrapper against the
+  // published package). The bump never rewrites them, so the residue scan
+  // must not flag them either.
+  /(?:^|[/\\])(?:fixtures|type-fixtures)(?:[/\\]|$)/,
+];
+
 /** Apply an exact release version to root, every declared workspace member, scaffolds, and lock. */
 export async function coordinateVersionBump(
   root: string,
@@ -56,23 +74,7 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
   for await (
     const entry of walk(root, {
       includeDirs: false,
-      skip: [
-        /(?:^|[/\\])\.git(?:[/\\]|$)/,
-        /(?:^|[/\\])node_modules(?:[/\\]|$)/,
-        /(?:^|[/\\])\.llm[/\\]tmp(?:[/\\]|$)/,
-        /(?:^|[/\\])\.llm[/\\]runs(?:[/\\]|$)/,
-        /(?:^|[/\\])\.claude[/\\]worktrees(?:[/\\]|$)/,
-        /(?:^|[/\\])\.data(?:[/\\]|$)/,
-        // Captured public-surface snapshots legitimately embed the version they
-        // were taken at (the baseline the NEXT release diffs against); they are
-        // not live version manifests and must not be treated as bump residue.
-        /(?:^|[/\\])\.llm[/\\]tools[/\\]release[/\\]baselines(?:[/\\]|$)/,
-        // Test fixtures pin prior published releases on purpose (a prior-release
-        // config capture, a consumer control that isolates a wrapper against the
-        // published package). The bump never rewrites them, so the residue scan
-        // must not flag them either.
-        /(?:^|[/\\])(?:fixtures|type-fixtures)(?:[/\\]|$)/,
-      ],
+      skip: RELEASE_SCAN_EXCLUSIONS,
     })
   ) {
     const generatedTypeScript = entry.name === 'generated.ts' ||
@@ -168,16 +170,33 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
   }
 
   const trackedFiles = await listTrackedFiles(root);
-  const rootLock = normalize(join(root, 'deno.lock'));
   const files = new Set<string>([rootDenoJson, ...memberManifests]);
-  if (await includesTrackedOrExistingFile(rootLock, trackedFiles)) files.add(rootLock);
+  // Locks outside declared workspace members (for example reference apps) still mirror
+  // the release train. Use the residue scan's existing scope so historical captures stay intact.
+  if (trackedFiles) {
+    for (const path of trackedFiles) {
+      if (
+        basename(path) === 'deno.lock' && !RELEASE_SCAN_EXCLUSIONS.some((skip) => skip.test(path))
+      ) {
+        files.add(path);
+      }
+    }
+  } else {
+    for await (
+      const entry of walk(root, {
+        includeDirs: false,
+        match: [/deno\.lock$/],
+        skip: RELEASE_SCAN_EXCLUSIONS,
+      })
+    ) {
+      if (entry.name === 'deno.lock') files.add(entry.path);
+    }
+  }
   for (const relativePath of GENERATED_CONSUMER_VERSION_FILES) {
     const path = normalize(join(root, relativePath));
     if (await includesTrackedOrExistingFile(path, trackedFiles)) files.add(path);
   }
   for (const manifest of memberManifests) {
-    const memberLock = normalize(join(dirname(manifest), 'deno.lock'));
-    if (await includesTrackedOrExistingFile(memberLock, trackedFiles)) files.add(memberLock);
     for await (
       const entry of walk(dirname(manifest), {
         includeDirs: false,

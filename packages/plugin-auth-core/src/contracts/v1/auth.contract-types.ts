@@ -35,10 +35,9 @@ export type CallbackInput = Readonly<{
   redirectTo?: string;
 }>;
 
-/** Response returned by the callback endpoint. */
+/** Callback status; the session credential is delivered only through Set-Cookie. */
 export type CallbackResponse = Readonly<{
   completed: boolean;
-  sessionId?: string;
   redirectTo?: string;
   subject?: string;
 }>;

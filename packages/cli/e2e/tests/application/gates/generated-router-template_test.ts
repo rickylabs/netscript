@@ -17,7 +17,7 @@ Deno.test('persistent router maps all missing by-id operations to defined NOT_FO
   assertStringIncludes(routerTemplate, "import { notFound } from '@netscript/contracts';");
   assertStringIncludes(
     routerTemplate,
-    'getById.handler(async ({ input, context, errors })',
+    'getById.handler(async ({ input, errors })',
   );
   assertStringIncludes(routerTemplate, 'resourceId: input.id');
   assertEquals(routerTemplate.match(/notFound\(\{/g)?.length, 3);
@@ -27,14 +27,18 @@ Deno.test('persistent router maps all missing by-id operations to defined NOT_FO
   );
 });
 
-Deno.test('persistent router translates only Prisma P2025 and rethrows other failures', () => {
-  assertStringIncludes(
-    routerTemplate,
-    'function isPrismaNotFound(error: unknown): boolean',
-  );
-  assertStringIncludes(routerTemplate, "error.code === 'P2025'");
-  assertEquals(routerTemplate.match(/if \(isPrismaNotFound\(error\)\)/g)?.length, 2);
-  assertEquals(routerTemplate.match(/throw error;/g)?.length, 2);
+const repositoryTemplate = await Deno.readTextFile(
+  new URL(
+    '../../../../src/kernel/assets/service/adapters/prisma-entity-repository.ts.template',
+    import.meta.url,
+  ),
+);
+
+Deno.test('persistent repository translates only Prisma P2025 and rethrows other failures', () => {
+  assertStringIncludes(repositoryTemplate, "error.code === 'P2025'");
+  assertStringIncludes(repositoryTemplate, 'return null;');
+  assertEquals(repositoryTemplate.match(/missingAsNull\(\(\)/g)?.length, 2);
+  assertStringIncludes(repositoryTemplate, 'throw error;');
 });
 
 Deno.test('generated CRUD contract retains the common 404 OpenAPI projection', () => {

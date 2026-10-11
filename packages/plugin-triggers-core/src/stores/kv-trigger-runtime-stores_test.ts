@@ -43,7 +43,11 @@ Deno.test('KvTriggerIdempotencyStore rejects duplicate active and completed clai
 
 Deno.test('KvTriggerDlqStore enqueues, lists, filters, and replays entries with MemoryKvAdapter', async () => {
   const kv = new MemoryKvAdapter();
-  const store = new KvTriggerDlqStore({ kv, prefix: prefix() });
+  const store = new KvTriggerDlqStore({
+    kv,
+    prefix: prefix(),
+    now: () => new Date('2026-06-20T10:00:00.000Z'),
+  });
   const event = webhookEvent();
   const entry = {
     id: event.id,

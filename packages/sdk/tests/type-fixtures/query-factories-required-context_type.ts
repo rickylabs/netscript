@@ -1,5 +1,5 @@
 import { oc } from '@orpc/contract';
-import { z } from 'npm:zod@^4.4.3';
+import { z } from 'npm:zod@^4.6.5';
 import { createBearerSdkClientContribution } from '@netscript/plugin-auth-core/sdk';
 import { createServiceClient } from '../../src/client/mod.ts';
 import { createQueryFactories, createQueryFactory } from '../../src/query/mod.ts';

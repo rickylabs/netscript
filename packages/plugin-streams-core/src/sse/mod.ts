@@ -43,6 +43,8 @@ export type {
   BindStreamEventSourceOptionsV1,
   StreamEventSourceBindingV1,
   StreamEventSourceV1,
+  StreamSourceEventV1,
+  StreamSourceListenerV1,
   StreamSseParseInputV1,
   StreamSseParseResultV1,
   StreamSseReductionV1,

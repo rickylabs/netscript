@@ -241,7 +241,7 @@ export interface SagaScalingConfig {
 
 /** Per-topic saga retention configuration. */
 export interface SagaRetentionConfig {
-  /** Days to keep active saga state. */
+  /** Legacy active-window hint; open saga state and replay data remain durable until terminal. */
   activeDays: number;
   /** Days to keep completed saga state. */
   completedDays: number;

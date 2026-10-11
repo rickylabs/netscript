@@ -16,7 +16,7 @@ import { DEFAULT_CONTRACT_VERSION } from '../../../../kernel/adapters/contracts/
 import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/version-registry.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
-import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
+import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config/deploy-config.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { AddContractInput } from './add-contract-input.ts';
 import { addContract } from './add-contract.ts';

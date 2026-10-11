@@ -7,6 +7,7 @@
 import { dirname, join, relative, resolve } from '@std/path';
 import type { NetScriptConfig, PathsConfig } from '@netscript/config';
 import type { PluginManifest } from '@netscript/plugin';
+import type { ProcessPort } from '../../ports/process-port.ts';
 import type {
   RegisteredPluginConfig,
   RegisteredPluginEnvironmentVariableValue,
@@ -17,32 +18,34 @@ import { DenoProcess } from '../runtime/process/deno-process.ts';
 import { resolveExportedPluginManifest } from '../../application/plugin/exported-plugin-manifest.ts';
 import { resolvePluginImportSpecifier } from '../../application/plugin/configured-plugin-specifier.ts';
 import { resolveRegisteredPluginSource } from '../../application/plugin/registered-plugin-source.ts';
-import { probeConfiguredPluginManifest } from './configured-plugin-manifest-probe.ts';
+import { probeConfiguredPluginManifest } from './plugin-manifest/configured-plugin-manifest-probe.ts';
+import type { ConfiguredPluginManifestSummary } from './plugin-manifest/configured-plugin-manifest-summary.ts';
 import { requireValidPluginComposition } from '../../application/plugin/plugin-composition.ts';
-import type { ConfiguredPluginManifestSummary } from './configured-plugin-manifest-summary.ts';
 
 const SCAFFOLD_PLUGIN_MANIFEST = 'scaffold.plugin.json';
 const CONFIGURED_PLUGIN_MANIFEST_RESULT_PREFIX = 'NETSCRIPT_CONFIGURED_PLUGIN_MANIFESTS=';
 const CONFIGURED_PLUGIN_MANIFEST_LOAD_TIMEOUT_MS = 30_000;
 const CONFIGURED_PLUGIN_MANIFEST_LOADER = new URL(
-  './configured-plugin-manifest-loader-child.ts',
+  './plugin-manifest/configured-plugin-manifest-loader-child.ts',
   import.meta.url,
 ).href;
 
-type RegisteredPluginSnapshot = Pick<
-  RegisteredPluginConfig,
-  | 'name'
-  | 'displayName'
-  | 'type'
-  | 'permissions'
-  | 'service'
-  | 'infrastructure'
-  | 'entrypoints'
-  | 'runtime'
-  | 'runtimeConfig'
-  | 'doctor'
-  | 'cli'
-> & { readonly configuredSpecifier: string };
+type RegisteredPluginSnapshot =
+  & Pick<
+    RegisteredPluginConfig,
+    | 'name'
+    | 'displayName'
+    | 'type'
+    | 'permissions'
+    | 'service'
+    | 'infrastructure'
+    | 'entrypoints'
+    | 'runtime'
+    | 'runtimeConfig'
+    | 'doctor'
+    | 'cli'
+  >
+  & { readonly configuredSpecifier: string };
 
 type NetScriptConfigWithPlugins = NetScriptConfig & {
   readonly plugins?: readonly string[];
@@ -214,7 +217,9 @@ async function resolvePluginManifestsWithProjectConfig(
     );
   }
   if (result.code !== 0) {
-    throw new Error(result.stderr.trim() || result.stdout.trim() || 'Configured plugin load failed.');
+    throw new Error(
+      result.stderr.trim() || result.stdout.trim() || 'Configured plugin load failed.',
+    );
   }
 
   const line = result.stdout.split('\n').findLast((candidate) =>
@@ -264,6 +269,7 @@ export async function loadRegisteredPlugins(
 export async function loadRegisteredPluginMetadata(
   projectRoot: string,
   config: NetScriptConfig,
+  process: ProcessPort = new DenoProcess(),
 ): Promise<Record<string, RegisteredPluginConfig>> {
   const plugins: Record<string, RegisteredPluginConfig> = {};
   for (const spec of resolvePluginSpecs(config)) {
@@ -277,7 +283,7 @@ export async function loadRegisteredPluginMetadata(
           resolvedMetadata.moduleDirectory,
           spec,
         )
-        : await normalizePluginSpecMetadata(projectRoot, spec);
+        : await normalizePluginSpecMetadata(projectRoot, spec, process);
     } catch (error) {
       plugin = {
         ...normalizeUnresolvedPluginSpecMetadata(projectRoot, spec),
@@ -387,10 +393,13 @@ function normalizeScaffoldPluginMetadata(
 async function normalizePluginSpecMetadata(
   projectRoot: string,
   spec: string,
+  process: ProcessPort,
 ): Promise<RegisteredPluginConfig> {
   const source = resolveRegisteredPluginSource(projectRoot, spec);
-  if (source.kind === 'local-workdir') return normalizeUnresolvedPluginSpecMetadata(projectRoot, spec);
-  const probe = await probeConfiguredPluginManifest(projectRoot, spec, new DenoProcess(), {
+  if (source.kind === 'local-workdir') {
+    return normalizeUnresolvedPluginSpecMetadata(projectRoot, spec);
+  }
+  const probe = await probeConfiguredPluginManifest(projectRoot, spec, process, {
     timeoutMs: CONFIGURED_PLUGIN_MANIFEST_LOAD_TIMEOUT_MS,
   });
   if (probe.status !== 'resolved') {

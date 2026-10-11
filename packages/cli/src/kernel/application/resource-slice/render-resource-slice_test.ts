@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assert, assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
@@ -296,7 +297,7 @@ Deno.test('full render type-checks as a consumer without starting a server', asy
     await writeConsumerFixture(fixtureRoot);
 
     const checkedFiles = candidates.map((candidate) => join(fixtureRoot, candidate.path));
-    const result = await new Deno.Command(Deno.execPath(), {
+    const result = await checkGeneratedFiles({
       cwd: fixtureRoot,
       args: [
         'check',
@@ -306,9 +307,7 @@ Deno.test('full render type-checks as a consumer without starting a server', asy
         join(fixtureRoot, 'deno.json'),
         ...checkedFiles,
       ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     const output = new TextDecoder().decode(result.stdout) +
       new TextDecoder().decode(result.stderr);
     assertEquals(result.code, 0, output);
@@ -351,7 +350,7 @@ async function writeConsumerFixture(root: string): Promise<void> {
           '@preact/signals': 'npm:@preact/signals@2.9.2',
           'preact': 'npm:preact@^10.29.2',
           'preact/': 'npm:/preact@^10.29.2/',
-          'zod': 'npm:zod@^4.4.3',
+          'zod': 'npm:zod@^4.6.5',
         },
         compilerOptions: {
           strict: true,

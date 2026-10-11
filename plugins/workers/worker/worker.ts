@@ -4,6 +4,7 @@
  * @module
  */
 
+import { ChildHealthMonitor, type ChildHealthSnapshot } from '@netscript/plugin/health';
 import { delay } from '@std/async';
 import { createQueue, type MessageQueue } from '@netscript/queue';
 import type { WorkerIdempotencyPort } from '@netscript/plugin-workers-core/runtime';
@@ -47,6 +48,8 @@ export type {
 export interface WorkerHealthStatus {
   /** Aggregate worker health state. */
   readonly status: 'healthy' | 'degraded';
+  /** Shared child health contract for the background health route. */
+  readonly childHealth: ChildHealthSnapshot;
   /** Queue listener health snapshots. */
   readonly listeners: readonly {
     /** Listener name. */
@@ -86,6 +89,8 @@ export class Worker {
   private queue: MessageQueue<JobMessage> | null = null;
   private taskQueue: MessageQueue<TaskMessage> | null = null;
   private running = false;
+  private readonly childHealth = new ChildHealthMonitor();
+  private stoppedListeners: readonly WorkerListenerSnapshot[] = [];
   private stopCompletion: Promise<void> | null = null;
   private abortController: AbortController | null = null;
   private workerSpan: Span | null = null;
@@ -138,9 +143,31 @@ export class Worker {
 
   /** Current listener health for runtime liveness checks. */
   get healthStatus(): WorkerHealthStatus {
-    const listeners = this.listenerSupervisors.map((supervisor) => supervisor.snapshot());
+    const listeners = this.listenerSupervisors.length > 0
+      ? this.listenerSupervisors.map((supervisor) => supervisor.snapshot())
+      : this.stoppedListeners;
+    const base = this.childHealth.snapshot();
+    const unhealthy =
+      listeners.find((listener) => listener.childHealth.state === 'crash-looping') ??
+        listeners.find((listener) => listener.childHealth.state === 'failed') ??
+        listeners.find((listener) => !listener.healthy);
+    const latestIncident = listeners.reduce<ChildHealthSnapshot['lastFatalError']>(
+      (latest, listener) => {
+        const incident = listener.childHealth.lastFatalError;
+        return incident && (!latest || incident.timestamp > latest.timestamp) ? incident : latest;
+      },
+      base.lastFatalError,
+    );
+    const childHealth: ChildHealthSnapshot = Object.freeze({
+      ...base,
+      state: unhealthy?.childHealth.state ?? base.state,
+      dependencyReady: base.dependencyReady && listeners.every((listener) => listener.healthy),
+      restartCount: listeners.reduce((count, listener) => count + listener.restartCount, 0),
+      lastFatalError: latestIncident,
+    });
     return {
-      status: listeners.some((listener) => !listener.healthy) ? 'degraded' : 'healthy',
+      status: childHealth.state === 'ready' ? 'healthy' : 'degraded',
+      childHealth,
       listeners,
     };
   }
@@ -157,6 +184,7 @@ export class Worker {
     );
 
     this.running = true;
+    this.childHealth.registryLoaded();
     this.abortController = new AbortController();
     await this.workerPool.initialize();
 
@@ -184,6 +212,8 @@ export class Worker {
     });
     this.listenerSupervisors.push(jobListener);
     jobListener.start();
+    this.childHealth.dependenciesReady();
+    this.childHealth.running();
 
     try {
       await jobListener.completion;
@@ -229,7 +259,9 @@ export class Worker {
         this.workerPool.shutdown(),
         ...this.listenerSupervisors.map((supervisor) => supervisor.stop()),
       ]);
+      this.stoppedListeners = this.listenerSupervisors.map((supervisor) => supervisor.snapshot());
       this.listenerSupervisors.length = 0;
+      this.childHealth.stopped();
       await this.stopTriggerQueues();
       await this.waitForActiveJobs();
 

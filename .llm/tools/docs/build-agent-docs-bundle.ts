@@ -1,5 +1,5 @@
 /**
- * Build the checked-in compressed prose source consumed by the CLI asset generator.
+ * Build the checked-in, independently compressed pages shipped by the CLI.
  *
  * Normal repository generation reads the rendered Markdown twins in `docs/site/_site`. The legacy
  * external-bundle input remains supported for release tooling. API docs are deliberately excluded:
@@ -7,10 +7,15 @@
  */
 
 import { dirname, fromFileUrl, join, relative, resolve } from 'jsr:@std/path@^1';
-
+import { buildLlmsFull, DOCS_SITE_LOCATION } from '../../../docs/site/_plugins/llms-policy.ts';
+import {
+  AGENT_DOCS_PAGE_CARRIER,
+  readAgentDocsPages,
+  renderAgentDocsPages,
+} from './agent-docs-page-carrier.ts';
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../..');
 const OUTPUT_ROOT = join(REPO_ROOT, '.llm', 'assets', 'agent-docs');
-const PROSE_PATH = join(OUTPUT_ROOT, 'prose.json.gz');
+const PROSE_PATH = join(REPO_ROOT, AGENT_DOCS_PAGE_CARRIER);
 const PROVENANCE_PATH = join(OUTPUT_ROOT, 'provenance.json');
 
 interface AgentDocsProseCorpus {
@@ -21,17 +26,17 @@ interface AgentDocsProseCorpus {
 /** Stable metadata supplied when rebuilding the site-derived portion of the corpus. */
 export interface AgentDocsSiteMetadata {
   readonly version: string;
-  readonly sourceCommit: string;
-  readonly extractionTimestamp: string;
+  readonly sourceCommit?: string;
+  readonly extractionTimestamp?: string;
   readonly preservedCorpusPath?: string;
 }
 
-/** Metadata kept beside the compressed prose source for reproducible CLI asset generation. */
+/** Generation report; only schema and version are written to the deterministic sidecar. */
 export interface AgentDocsProseProvenance {
   readonly schemaVersion: 1;
   readonly version: string;
-  readonly sourceCommit: string;
-  readonly extractionTimestamp: string;
+  readonly sourceCommit?: string;
+  readonly extractionTimestamp?: string;
   readonly files: readonly string[];
   readonly uncompressedBytes: number;
   readonly compressedBytes: number;
@@ -59,13 +64,6 @@ function hex(bytes: ArrayBuffer): string {
   return [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-async function gzip(bytes: Uint8Array): Promise<Uint8Array> {
-  const copied = new Uint8Array(bytes.byteLength);
-  copied.set(bytes);
-  const stream = new Blob([copied.buffer]).stream().pipeThrough(new CompressionStream('gzip'));
-  return new Uint8Array(await new Response(stream).arrayBuffer());
-}
-
 async function gunzip(bytes: Uint8Array): Promise<Uint8Array> {
   const copied = new Uint8Array(bytes.byteLength);
   copied.set(bytes);
@@ -75,13 +73,12 @@ async function gunzip(bytes: Uint8Array): Promise<Uint8Array> {
   return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
-async function readCorpus(path: string): Promise<AgentDocsProseCorpus> {
+async function readCorpus(path: string, version: string): Promise<AgentDocsProseCorpus> {
+  if (!path.endsWith('.gz')) {
+    return { schemaVersion: 1, files: await readAgentDocsPages(path, version) };
+  }
   const decoded = new TextDecoder().decode(await gunzip(await Deno.readFile(path)));
   return JSON.parse(decoded) as AgentDocsProseCorpus;
-}
-
-function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
-  return left.byteLength === right.byteLength && left.every((byte, index) => byte === right[index]);
 }
 
 async function sha256(bytes: Uint8Array): Promise<string> {
@@ -102,46 +99,10 @@ function canonicalCorpus(contents: Readonly<Record<string, string>>): {
   };
 }
 
-async function expectedProvenance(
-  files: readonly string[],
-  encoded: Uint8Array,
-  compressedBytes: number,
-  metadata: AgentDocsSiteMetadata,
-): Promise<AgentDocsProseProvenance> {
-  return {
-    schemaVersion: 1,
-    version: metadata.version,
-    sourceCommit: metadata.sourceCommit,
-    extractionTimestamp: metadata.extractionTimestamp,
-    files,
-    uncompressedBytes: encoded.byteLength,
-    compressedBytes,
-    sha256: await sha256(encoded),
-  };
-}
-
-function sameSemanticProvenance(
-  actual: AgentDocsProseProvenance,
-  expected: AgentDocsProseProvenance,
-): boolean {
-  return actual.schemaVersion === expected.schemaVersion && actual.version === expected.version &&
-    actual.sourceCommit === expected.sourceCommit &&
-    actual.extractionTimestamp === expected.extractionTimestamp &&
-    JSON.stringify(actual.files) === JSON.stringify(expected.files) &&
-    actual.uncompressedBytes === expected.uncompressedBytes && actual.sha256 === expected.sha256;
-}
-
-async function existingEquivalentTransport(
-  path: string,
-  encoded: Uint8Array,
-): Promise<Uint8Array | undefined> {
-  try {
-    const compressed = await Deno.readFile(path);
-    return bytesEqual(await gunzip(compressed), encoded) ? compressed : undefined;
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return undefined;
-    return undefined;
-  }
+function carrierPath(outputRoot: string): string {
+  return outputRoot === OUTPUT_ROOT
+    ? PROSE_PATH
+    : join(outputRoot, 'agent-docs-prose.generated.ts');
 }
 
 async function writeCorpus(
@@ -149,39 +110,23 @@ async function writeCorpus(
   metadata: AgentDocsSiteMetadata,
   outputRoot: string,
 ): Promise<AgentDocsProseProvenance> {
-  const { files, encoded } = canonicalCorpus(contents);
-  const prosePath = join(outputRoot, 'prose.json.gz');
-  const existing = await existingEquivalentTransport(prosePath, encoded);
-  const compressed = existing ?? await gzip(encoded);
-  let stableMetadata = metadata;
-  if (existing) {
-    try {
-      const previous = JSON.parse(
-        await Deno.readTextFile(join(outputRoot, 'provenance.json')),
-      ) as AgentDocsProseProvenance;
-      stableMetadata = {
-        ...metadata,
-        sourceCommit: previous.sourceCommit,
-        extractionTimestamp: previous.extractionTimestamp,
-      };
-    } catch {
-      // A missing or malformed sidecar is repaired from the supplied metadata.
-    }
-  }
-  const provenance = await expectedProvenance(
-    files,
-    encoded,
-    compressed.byteLength,
-    stableMetadata,
-  );
-
+  const existing = await Deno.readTextFile(carrierPath(outputRoot)).catch(() => '');
+  const source = await renderAgentDocsPages(contents, existing);
+  const provenance = { schemaVersion: 1 as const, version: metadata.version };
   await Deno.mkdir(outputRoot, { recursive: true });
-  await Deno.writeFile(prosePath, compressed);
+  await Deno.writeTextFile(carrierPath(outputRoot), source);
   await Deno.writeTextFile(
     join(outputRoot, 'provenance.json'),
     `${JSON.stringify(provenance, null, 2)}\n`,
   );
-  return provenance;
+  const { files, encoded } = canonicalCorpus(contents);
+  return {
+    ...provenance,
+    files,
+    uncompressedBytes: encoded.byteLength,
+    compressedBytes: new TextEncoder().encode(source).byteLength,
+    sha256: await sha256(encoded),
+  };
 }
 
 async function checkCorpus(
@@ -189,28 +134,26 @@ async function checkCorpus(
   metadata: AgentDocsSiteMetadata,
   outputRoot: string,
 ): Promise<AgentDocsProseFreshness> {
-  const { files, encoded } = canonicalCorpus(contents);
-  const prosePath = join(outputRoot, 'prose.json.gz');
-  const provenancePath = join(outputRoot, 'provenance.json');
+  const existing = await Deno.readTextFile(carrierPath(outputRoot)).catch(() => '');
+  const source = await renderAgentDocsPages(contents, existing);
   const stalePaths: string[] = [];
-  let compressedBytes = 0;
-  try {
-    const compressed = await Deno.readFile(prosePath);
-    compressedBytes = compressed.byteLength;
-    if (!bytesEqual(await gunzip(compressed), encoded)) stalePaths.push('prose.json.gz');
-  } catch {
-    stalePaths.push('prose.json.gz');
+  if (await Deno.readTextFile(carrierPath(outputRoot)).catch(() => '') !== source) {
+    stalePaths.push('agent-docs-prose.generated.ts');
   }
-  const expected = await expectedProvenance(files, encoded, compressedBytes, metadata);
-  try {
-    const actual = JSON.parse(
-      await Deno.readTextFile(provenancePath),
-    ) as AgentDocsProseProvenance;
-    if (!sameSemanticProvenance(actual, expected)) stalePaths.push('provenance.json');
-  } catch {
+  const sidecar = `${JSON.stringify({ schemaVersion: 1, version: metadata.version }, null, 2)}\n`;
+  if (await Deno.readTextFile(join(outputRoot, 'provenance.json')).catch(() => '') !== sidecar) {
     stalePaths.push('provenance.json');
   }
-  return { fresh: stalePaths.length === 0, stalePaths, provenance: expected };
+  const { files, encoded } = canonicalCorpus(contents);
+  const provenance = {
+    schemaVersion: 1 as const,
+    version: metadata.version,
+    files,
+    uncompressedBytes: encoded.byteLength,
+    compressedBytes: new TextEncoder().encode(source).byteLength,
+    sha256: await sha256(encoded),
+  };
+  return { fresh: stalePaths.length === 0, stalePaths, provenance };
 }
 
 function manifestValue(manifest: string, label: string): string {
@@ -218,6 +161,30 @@ function manifestValue(manifest: string, label: string): string {
   const value = row?.split('|')[2]?.trim();
   if (!value) throw new Error(`External docs MANIFEST.md is missing ${label}`);
   return value.replaceAll('`', '').split(/\s+/)[0];
+}
+
+function siteFullCorpus(contents: Readonly<Record<string, string>>, version: string): string {
+  return buildLlmsFull(
+    Object.keys(contents).filter((path) => path.startsWith('pages/')).map((path) => ({
+      url: '/' + path.slice('pages/'.length).replace(/index\.md$/, ''),
+      markdown: contents[path],
+    })),
+    new URL(DOCS_SITE_LOCATION),
+    version,
+  );
+}
+
+/** Publish the site's pure composition source without a runtime dependency on the site tree. */
+async function syncCompositionPolicy(check: boolean): Promise<void> {
+  const source = await Deno.readTextFile(join(REPO_ROOT, 'docs/site/_plugins/llms-policy.ts'));
+  const expected =
+    '// @generated from docs/site/_plugins/llms-policy.ts by gen:agent-docs-prose.\n' + source;
+  const output = join(REPO_ROOT, 'packages/cli/src/kernel/assets/llms-policy.generated.ts');
+  if (check) {
+    if (await Deno.readTextFile(output).catch(() => '') !== expected) {
+      throw new Error('CLI llms composition policy is stale; run deno task gen:agent-docs-prose');
+    }
+  } else await Deno.writeTextFile(output, expected);
 }
 
 /** Refresh the checked-in compressed prose source from an external docs bundle. */
@@ -263,7 +230,7 @@ export async function buildAgentDocsProseFromSite(
     throw new Error('Rendered docs site must contain llms.txt and llms-full.txt');
   }
 
-  const preserved = await readCorpus(metadata.preservedCorpusPath ?? PROSE_PATH);
+  const preserved = await readCorpus(metadata.preservedCorpusPath ?? PROSE_PATH, metadata.version);
   const contents: Record<string, string> = {};
   for (const [path, content] of Object.entries(preserved.files)) {
     if (path !== 'llms.txt' && path !== 'llms-full.txt' && !path.startsWith('pages/')) {
@@ -277,6 +244,11 @@ export async function buildAgentDocsProseFromSite(
   }
   if (!/^## Task router$/m.test(contents['llms.txt'])) {
     throw new Error('Rendered docs site does not contain the #1068 task router in llms.txt');
+  }
+  if (siteFullCorpus(contents, metadata.version) !== contents['llms-full.txt']) {
+    throw new Error(
+      'Derived full corpus does not match the rendered site; update the page composition policy',
+    );
   }
   return await writeCorpus(contents, metadata, outputRoot);
 }
@@ -292,7 +264,7 @@ export async function checkAgentDocsProseFromSite(
   if (!allFiles.includes('llms.txt') || !allFiles.includes('llms-full.txt')) {
     throw new Error('Rendered docs site must contain llms.txt and llms-full.txt');
   }
-  const preserved = await readCorpus(metadata.preservedCorpusPath ?? PROSE_PATH);
+  const preserved = await readCorpus(metadata.preservedCorpusPath ?? PROSE_PATH, metadata.version);
   const contents: Record<string, string> = {};
   for (const [path, content] of Object.entries(preserved.files)) {
     if (path !== 'llms.txt' && path !== 'llms-full.txt' && !path.startsWith('pages/')) {
@@ -307,19 +279,12 @@ export async function checkAgentDocsProseFromSite(
   if (!/^## Task router$/m.test(contents['llms.txt'])) {
     throw new Error('Rendered docs site does not contain the #1068 task router in llms.txt');
   }
+  if (siteFullCorpus(contents, metadata.version) !== contents['llms-full.txt']) {
+    throw new Error(
+      'Derived full corpus does not match the rendered site; update the page composition policy',
+    );
+  }
   return await checkCorpus(contents, metadata, outputRoot);
-}
-
-async function gitSourceCommit(): Promise<string> {
-  const command = new Deno.Command('git', {
-    args: ['rev-parse', '--short=9', 'HEAD'],
-    cwd: REPO_ROOT,
-    stdout: 'piped',
-    stderr: 'inherit',
-  });
-  const output = await command.output();
-  if (!output.success) throw new Error('git rev-parse failed while recording corpus provenance');
-  return new TextDecoder().decode(output.stdout).trim();
 }
 
 if (import.meta.main) {
@@ -336,6 +301,7 @@ if (import.meta.main) {
   if ((bundleRoot ? 1 : 0) + (siteRoot ? 1 : 0) !== 1) {
     throw new Error('exactly one of --bundle-dir <path> or --site-dir <path> is required');
   }
+  await syncCompositionPolicy(Deno.args.includes('--check'));
   if (bundleRoot) {
     console.log(JSON.stringify(await buildAgentDocsProse(bundleRoot)));
   } else {
@@ -348,8 +314,6 @@ if (import.meta.main) {
     ) as { readonly version?: string };
     const metadata = {
       version: check ? previous.version : (rootConfig.version ?? previous.version),
-      sourceCommit: check ? previous.sourceCommit : await gitSourceCommit(),
-      extractionTimestamp: check ? previous.extractionTimestamp : new Date().toISOString(),
     };
     if (check) {
       const freshness = await checkAgentDocsProseFromSite(siteRoot!, metadata);

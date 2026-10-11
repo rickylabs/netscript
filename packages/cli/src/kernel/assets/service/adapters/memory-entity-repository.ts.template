@@ -1,0 +1,49 @@
+/** Instance-owned, seeded memory implementation of the repository port. */
+import type { {{serviceName | pascalCase}}ListItemV1 } from '@{{projectName}}/contracts';
+import type { {{serviceName | pascalCase}}Repository } from '../application/{{entityName}}.ts';
+
+export function createMemory{{serviceName | pascalCase}}Repository(): {{serviceName | pascalCase}}Repository {
+  const records: {{serviceName | pascalCase}}ListItemV1[] = [
+    {
+      id: 1,
+      name: 'Launch checklist',
+      summary: 'Tracks the first release milestones for the scaffolded service.',
+      status: 'active',
+      createdAt: '2026-04-21T08:00:00.000Z',
+    },
+    {
+      id: 2,
+      name: 'Integration handshake',
+      summary: 'Verifies the frontend route can hydrate from the generated service.',
+      status: 'draft',
+      createdAt: '2026-04-20T12:30:00.000Z',
+    },
+    {
+      id: 3,
+      name: 'Telemetry follow-up',
+      summary: 'Reserved for the later rollout step that wires end-to-end tracing.',
+      status: 'archived',
+      createdAt: '2026-04-19T15:45:00.000Z',
+    },
+  ];
+
+  return {
+    list(query) {
+      const search = query.search;
+      const filtered = search
+        ? records.filter((record) => record.name.toLowerCase().includes(search))
+        : records;
+      return Promise.resolve({
+        items: filtered.slice(query.offset, query.offset + query.limit).map((record) => ({ ...record })),
+        total: filtered.length,
+      });
+    },
+    updateStatus(id, status, summary) {
+      const record = records.find((entry) => entry.id === id);
+      if (!record) return Promise.resolve(null);
+      record.status = status;
+      record.summary = summary;
+      return Promise.resolve({ ...record });
+    },
+  };
+}

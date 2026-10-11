@@ -1,4 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
+import { MemoryKvAdapter } from '@netscript/kv';
+import { FakeTime } from 'jsr:@std/testing@^1/time';
+import { KvTriggerEventStore } from '@netscript/plugin-triggers-core/stores';
 import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
 import { defineJob } from '@netscript/plugin-workers-core';
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
@@ -66,6 +69,62 @@ Deno.test('runtime processor schedules defer actions without routing them to DLQ
   assertEquals(idempotency.completed.length, 2);
   assertEquals(idempotency.released.length, 0);
   await processor.stop();
+});
+
+Deno.test('deferred replay settles the original event and expires both event indexes after repeated deferral', async () => {
+  using time = new FakeTime(fixedNow());
+  await using kv = new MemoryKvAdapter();
+  const clock = new TriggerTestClock(fixedNow());
+  const store = new KvTriggerEventStore({ kv, kvRetentionDays: 1, now: () => clock.now() });
+  const scheduler = new MemoryTriggerDeferScheduler(clock);
+  const definition = defineWebhook(
+    (event): Promise<readonly TriggerActionResult[]> =>
+      Promise.resolve(
+        event.attempt < 2
+          ? [{ kind: 'defer', until: new Date(clock.now().getTime() + 300_000).toISOString() }]
+          : [],
+      ),
+    { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
+  );
+  const processor = await createRuntimeTriggerProcessor({
+    kv,
+    eventStore: store,
+    kvRetentionDays: 1,
+    idempotency: new MemoryIdempotency(),
+    dlq: new MemoryDlq(),
+    jobQueue: new RecordingJobQueue() as never,
+    deferScheduler: scheduler,
+    definitions: [definition],
+    clock,
+  });
+  try {
+    const event = webhookEvent();
+    await store.save(event);
+    const first = await processor.process(event, definition);
+    await store.updateStatus(event.id, first.status);
+    clock.advanceTo(new Date(clock.now().getTime() + 300_000));
+    assertEquals((await scheduler.fireDue()).map((entry) => entry.status), ['replayed']);
+    assertEquals((await store.load(event.id))?.status, 'completed');
+    const pending = await scheduler.list();
+    assertEquals(pending.length, 1);
+    assertEquals((await store.load(pending[0]!.event.id))?.status, 'deferred');
+    clock.advanceTo(new Date(clock.now().getTime() + 300_000));
+    assertEquals((await scheduler.fireDue()).map((entry) => entry.status), ['replayed']);
+    assertEquals((await store.list()).map((entry) => entry.status), [
+      'completed',
+      'completed',
+      'completed',
+    ]);
+    time.tick(86_400_001);
+    assertEquals(await store.list(), []);
+    const indexes = [];
+    for await (const entry of kv.list({ prefix: ['triggers', 'by-trigger'] })) {
+      indexes.push(entry.key);
+    }
+    assertEquals(indexes, []);
+  } finally {
+    await processor.stop();
+  }
 });
 
 Deno.test('runtime processor stamps idempotency key onto enqueued worker job body', async () => {

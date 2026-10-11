@@ -15,7 +15,7 @@
     "./subject": "./src/subject.ts"
   },
   "imports": {
-    "@panva/oauth4webapi": "jsr:@panva/oauth4webapi@^3.8.6",
+    "@panva/oauth4webapi": "jsr:@panva/oauth4webapi@^3.8.8",
     "@std/assert": "jsr:@std/assert@^1"
   },
   "tasks": {

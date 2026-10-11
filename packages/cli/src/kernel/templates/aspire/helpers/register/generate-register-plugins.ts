@@ -102,7 +102,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(
       `    const resource = builder.addExecutable(${
         JSON.stringify(name)
-      }, 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${DENO_NO_LEGACY_ABORT_FLAG}', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, ${
+      }, 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${DENO_NO_LEGACY_ABORT_FLAG}', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...installationSecretPermissions(perms, installationSecretFile), ${
         JSON.stringify(entrypoint)
       }])`,
     );
@@ -142,6 +142,12 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
         });`,
       );
     }
+
+    lines.push(`    if (installationSecretFile) {`);
+    lines.push(
+      `      await resource.withEnvironment('NETSCRIPT_INSTALLATION_SECRET_FILE', installationSecretFile);`,
+    );
+    lines.push(`    }`);
 
     // OTEL telemetry (full executable env set)
     lines.push(``);

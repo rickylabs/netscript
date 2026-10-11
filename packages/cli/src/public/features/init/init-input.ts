@@ -1,3 +1,4 @@
+import type { InitAgentInput } from '../agent/init/init-agent-input.ts';
 import type { DbEngineChoice } from '../../../kernel/domain/db-engine.ts';
 import type { CacheBackendChoice } from '../../../kernel/domain/cache-backend.ts';
 import type { EditorChoice } from '../../../kernel/domain/scaffold/workspace-config.ts';
@@ -13,6 +14,9 @@ export interface InitCommandInput {
   readonly cache?: boolean;
   readonly cacheBackend?: CacheBackendChoice | string;
   readonly editor?: EditorChoice | string;
+  readonly agent?: boolean;
+  readonly host?: InitAgentInput['host'] | string;
+  readonly withDocs?: boolean;
   readonly aspire?: boolean;
   readonly git?: boolean;
   readonly force?: boolean;

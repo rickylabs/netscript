@@ -155,5 +155,7 @@ export type {
   TaskResponse,
   TaskResult,
   TaskSpec,
+  TaskStdin,
+  TaskStdinJson,
   TaskSystem,
 } from './task.ts';

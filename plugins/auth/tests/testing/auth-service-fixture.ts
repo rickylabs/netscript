@@ -5,6 +5,8 @@ import type { MemoryKvAdapter } from '@netscript/kv';
 import type { Principal } from '@netscript/plugin-auth-core/domain';
 import type { ResolvedAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
 import type { AuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
+import type { CallbackInput, CallbackResponse } from '@netscript/plugin-auth-core/contracts/v1';
+import type { AuthServiceContext } from '../../services/src/routers/v1-types.ts';
 import { createPluginService } from '../../../../packages/plugin/src/service/mod.ts';
 import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
@@ -61,7 +63,7 @@ export async function mintTestSession(registry: AuthTestRegistry): Promise<strin
   });
   assert(started.redirectUrl);
   const redirect = new URL(started.redirectUrl);
-  const completed = await callback({
+  const completed = await completeTestCallback({
     code: 'c',
     state: redirect.searchParams.get('state') ?? undefined,
   }, {
@@ -73,6 +75,26 @@ export async function mintTestSession(registry: AuthTestRegistry): Promise<strin
   });
   assert(completed.sessionId);
   return completed.sessionId;
+}
+
+/** Capture the callback's actual cookie through the same middleware used by HTTP projections. */
+export async function completeTestCallback(
+  input: CallbackInput,
+  context: AuthServiceContext,
+): Promise<Readonly<{ output: CallbackResponse; cookie: string; sessionId: string }>> {
+  const http = {
+    req: { raw: new Request(context.request?.url ?? authTestUrl('/v1/auth/callback')) },
+    res: new Response(),
+  };
+  let output: CallbackResponse = { completed: false };
+  await withAuthRequest(http, async () => {
+    output = await callback(input, context);
+  });
+  const cookie = http.res.headers.getSetCookie()[0]?.split(';')[0];
+  assert(cookie, 'Successful callback must issue a session cookie');
+  const sessionId = cookie.slice(cookie.indexOf('=') + 1);
+  assert(sessionId);
+  return { output, cookie, sessionId };
 }
 
 /** Serve the real auth router (RPC + OpenAPI) on an ephemeral port, as `main.ts` wires it. */

@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from 'jsr:@std/assert@^1';
-import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
+import { PrismaPg } from 'npm:@prisma/adapter-pg@7.10.0';
 
 import type {
   SagaCorrelationKey,
@@ -11,7 +11,7 @@ import type {
 import { PrismaSagaStore } from './prisma-saga-store.ts';
 
 const TEST_DATABASE_URL = Deno.env.get('SAGA_PRISMA_TEST_DATABASE_URL');
-const PRISMA_VERSION = '7.8.0';
+const PRISMA_VERSION = '7.10.0';
 const PRISMA_CLI_SPECIFIER = `npm:prisma@${PRISMA_VERSION}`;
 const PRISMA_CLIENT_RUNTIME_PREFIX = `"npm:@prisma/client@${PRISMA_VERSION}/runtime/`;
 

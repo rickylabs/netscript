@@ -7,8 +7,9 @@
  */
 
 import { AmqpMessageQueue } from '@fedify/amqp';
-import { connect } from 'npm:amqplib@^0.10.3';
-import type { ChannelModel } from 'npm:amqplib@^0.10.3';
+// Fedify 2.4 uses this type surface; its channel operations remain supported by amqplib 2.
+// @ts-types="npm:@types/amqplib@^0.10.7"
+import { connect } from 'amqplib';
 import type {
   DeadLetterStorePort,
   EnqueueOptions,
@@ -35,7 +36,7 @@ export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from
  */
 export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
   private queue!: AmqpMessageQueue;
-  private readonly connection: Promise<ChannelModel>;
+  private readonly connection: ReturnType<typeof connect>;
   private listening = false;
   private abortController?: AbortController;
   private deadLetterStore: DeadLetterStorePort<T> | null = null;

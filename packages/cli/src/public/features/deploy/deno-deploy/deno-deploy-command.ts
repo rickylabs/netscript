@@ -19,7 +19,7 @@ import { red } from '@std/fmt/colors';
 import { failDeployCommand } from '../../../../kernel/adapters/deploy/deploy-exit.ts';
 import { outputError, outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { createDenoDeployTarget } from '../../../../kernel/adapters/deno-deploy/create-deno-deploy-target.ts';
-import { resolveDenoDeployTarget } from '../../../../kernel/adapters/config/deploy-config-resolvers.ts';
+import { resolveDenoDeployTarget } from '../../../../kernel/adapters/config/deploy-config/deploy-config-resolvers.ts';
 import type {
   DeployTargetOperation,
   DeployTargetPort,

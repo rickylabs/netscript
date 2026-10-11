@@ -26,6 +26,21 @@ finding into a debt entry.
 - **Gate:** Close when env construction moves behind an auth-core contract and all configured
   backends pass compatibility and service boot tests.
 
+## packages/cli — CLI-BROWSER-SESSION-CONTRACT-DETECTION
+
+- **ID:** `CLI-BROWSER-SESSION-CONTRACT-DETECTION`
+- **Reason:** Browser auth reconciliation identifies generated session contracts by matching
+  `session: baseContract` in source. Renamed builders can miss detection; comments or strings can
+  produce false positives. Authored-contract capability detection needs a structural marker.
+- **Why deferred:** PR #2274 scopes the generated app/service proof; review accepts this bounded
+  heuristic pending a structural capability contract.
+- **Owner:** CLI auth reconciliation follow-up under #1382.
+- **Target:** Before extending session-route reconciliation to authored contracts.
+- **Created:** 2026-10-11
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Replace source sniffing with a template-owned capability or manifest field; verify
+  renamed/reformatted builders and comments/strings cannot silently skip or invent a route.
+
 ## packages/cli — PLUGIN-USERLAND-SOURCE-COPY
 
 - **Reason:** Maintainer/local `plugin add` copied full first-party plugin source into generated
@@ -730,13 +745,11 @@ finding into a debt entry.
 
 ## plugins/streams — durable topic publish/subscribe transport deferred (`streams-manifest-helpers-unsupported`)
 
-- **Reason:** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer helpers in the
-  Tier 2 plugin package. The existing real transport is `@netscript/plugin-streams-core`
-  `createDurableStream`, which publishes State Protocol upsert/delete events through
-  `@durable-streams/client`; it does not expose a generic topic consumer/subscriber channel that can
-  deliver `StreamTopicDefinition<TPayload>` payloads. Building that durable topic transport requires
-  a new cross-package runtime contract and consumer SDK, which exceeds the S3 M-sized slice. S3
-  replaced the silent no-op helper behavior with typed unsupported-operation failures.
+- **Reason:** Generic durable topic publish/subscribe transport remains deferred. The existing
+  `@netscript/plugin-streams-core` `createDurableStream` transport publishes State Protocol
+  upsert/delete events through `@durable-streams/client`; it does not expose a generic topic
+  consumer/subscriber channel for `StreamTopicDefinition<TPayload>` payloads. That capability
+  requires a cross-package runtime contract and consumer SDK, beyond entity-state replication.
 - **Owner:** `@netscript/plugin-streams` / `@netscript/plugin-streams-core` maintainers.
 - **Target:** Runtime transport rescope before advertising generic plugin topic publish/subscribe.
 - **Linked plan:** `.llm/tmp/run/cap-s3-streams/brief.md`.
@@ -745,6 +758,14 @@ finding into a debt entry.
 - **Gate:** Close when a real durable topic transport exists with producer delivery, consumer
   subscription/unsubscribe semantics, and runtime tests proving a published payload reaches a
   subscribed handler without relying on manifest-layer no-ops.
+
+- **0.0.8 remediation (#1369):** Removed the unconditional-throw producer/consumer helpers, handle
+  types, and unsupported-operation error factories from the plugin root and implementation. The
+  public-consumer regression rejects those root exports; README and streams documentation migrate
+  publishing to `@netscript/plugin-streams-core` and consumption to HTTP/SSE. The generic topic
+  transport remains deferred under this entry's existing gate. Documenting a caveat does not close a
+  defect; removing the unsupported public contract resolves the root honesty defect without claiming
+  a new topic transport.
 
 ## packages/watchers — AP-13 console.warn runtime reporting
 
@@ -2003,7 +2024,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Reason:** `netscript db generate` is pure, DB-less codegen (Prisma client + `@database/zod`
   schemas + the `schema/.generated/zod/crud.ts` barrel) but is **Aspire-coupled**: the shared
   `DbOperationRunner.executeDetached`
-  (`packages/cli/src/kernel/adapters/database/operation-runner.ts`) always runs
+  (`packages/cli/src/kernel/adapters/database/operations/operation-runner.ts`) always runs
   `aspire start --apphost apphost.mts` and polls `aspire describe` before executing any db
   operation. So `db generate` cannot run where the aspire CLI / .NET is absent (deno-only CI,
   containerless dev), failing fast (~243ms, `aspire` command-not-found) even though no database,
@@ -2027,6 +2048,11 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Created:** 2026-07-01.
 - **Status:** open — worked around in the e2e harness (C14 `database.codegen` gate); the CLI command
   itself remains Aspire-coupled.
+- **Progress (2026-10-10, #1996 / PR #2170):** projects without `aspire/apphost.mts` (`init
+  --no-aspire`) now run every `db` operation through the database workspace task
+  (`DbWorkspaceTaskRunner`, selected by `selectDbOperationExecutor` in
+  `packages/cli/src/kernel/adapters/database/operations/`). Projects that have an AppHost still route
+  `db generate` through it, so this entry stays open for the Aspire-project codegen path.
 - **Gate:** Close when `netscript db generate` completes DB-less codegen in a deno-only environment
   (no aspire CLI / .NET / docker) and the static suites can invoke the CLI command directly instead
   of the standalone `deno task db:generate` workaround.
@@ -2382,6 +2408,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   02's sanctioned boundary exception. Neither a zero-diagnostic claim nor closure of #1655 is
   proven. Evidence is kept in the run record and PR #2218.
 
+- **0.0.8 public contract graph (#2292):** Public values now name the owned `WorkersContract`
+  contract. New owned route and schema aliases preserve all 22 procedures, concrete schema methods,
+  literal payload binding, and handler inference. The full 13-target plugin lint falls from four to
+  two existing references: `WorkersContract` still names the private precise definition, and
+  `workersContractV1` still names oRPC `implement`. Both debt entries remain open; exact zero,
+  publication and quality evidence are still required for closure. No upstream internals are
+  re-exported and no signatures are erased. Consumer controls are in
+  `plugins/workers/tests/public/contract-graph_test.ts`.
+
 ## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
 
 - **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
@@ -2472,6 +2507,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Remove the compatibility bridge when a native supported seam passes complete-frame,
   fork/cap/sub-offset, restart/producer-state and >=1 GiB RSS regressions at the same memory
   ceiling.
+- **Substrate:** The production composition still uses `DurableStreamTestServer` for its native HTTP
+  protocol implementation. This is accepted within the same named debt; it is not a production
+  durability certification. File mode is startup-probed and producer restart-tested; memory mode is
+  explicitly ephemeral.
+- **Exit condition:** Replace `DurableStreamTestServer` with an upstream supported production
+  server/store-injection API after durable-streams#420 lands, preserving the bounded store, real
+  producer write/process-restart/read, framing, fork and RSS regression proofs.
 - **Cost:** Dependency upgrades require hook-shape and semantic compatibility verification. Runtime
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
   RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades
@@ -2655,6 +2697,29 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   exit 0. Focused doc lint exit 1 with only the two named references. Project
   runs/2026-10-08-fix-ai-peer-types/ai-doc-lint.log retains the raw failure.
 
+## packages/fresh — `create-chat-connection.ts` grows further past the 500-line cap (`fresh-ai-chat-connection-a8-2067`)
+
+- **Reason:** PR #2138 (issue #2067) adds the optional `producer` member to
+  `NetScriptChatResponseOptions` and to the `toResponse` seam input, plus the fenced-turn JSDoc
+  example on `toNetScriptChatResponse`. That takes
+  `packages/fresh/src/runtime/ai/create-chat-connection.ts` from **652 to 684 lines** (as counted by
+  `arch:check`) against the 500-line A8/AP-1/F-1 cap. The file was already 152 lines over at
+  baseline (same doctrine WARN on `origin/main`). The fenced writer itself lives in the separate
+  `fenced-chat-session-writer.ts`, and the producer contract and error in `chat-producer.ts`; only
+  the option member, the seam field and their documentation are added to the over-cap module. The
+  remediation trimmed the duplicated seam input type to keep the growth to those lines.
+- **Owner:** Fresh AI public-surface maintainers (`@netscript/fresh/ai`).
+- **Target:** Before the next public member is added to `create-chat-connection.ts`, and before
+  stable Fresh AI publication readiness is claimed.
+- **Linked plan:** Issue #2067; PR #2138 (IMPL-EVAL finding 2).
+- **Created:** 2026-10-10
+- **Status:** open, DEBT_ACCEPTED for #2138 pending independent IMPL-EVAL.
+- **Gate:** Split `create-chat-connection.ts` into role-named modules behind the unchanged `./ai`
+  barrel (session addressing and connection, durable session response, snapshot and the
+  one-projection reducer), each under 500 lines. The exported symbol set and `deno doc` output of
+  `src/runtime/ai/mod.ts` stay identical; `deno test packages/fresh/src/runtime/ai`, the
+  streams-service fencing regression, doc-lint, publish dry-run and `arch:check` stay green.
+
 ## auth-kv-oauth — explicit boolean proxy trust (`auth-trusted-proxy-hops-2026`)
 
 - **Reason:** #2026 adopts a default-off boolean `trustProxyHeaders` opt-in for one shared inbound
@@ -2730,3 +2795,77 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
   `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
   green. `arch:check` currently exits zero with these size warnings.
+
+## plugins/sagas — SAGAS-WORKER-DISPATCH-FIXTURE
+
+- **ID:** `SAGAS-WORKER-DISPATCH-FIXTURE`
+- **Reason:** The PostgreSQL publish-process test fixture imports the workers dispatcher, pool
+  factory, and dispatch context across plugin internals to prove real durable worker execution. The
+  public `@netscript/plugin-workers/worker` exports Worker and WorkerPoolOptions, but does not
+  expose these three seams; workers-core exports primitives rather than this plugin dispatcher.
+- **Owner:** Workers runtime maintainers.
+- **Target:** Next workers runtime testing-contract review.
+- **Status:** open, test-only coupling accepted for PR #2213.
+- **Exit condition:** Replace these imports with a supported public execution/testing contract that
+  preserves the physical PostgreSQL effect and durable duplicate-execution proof.
+- **Gate:** Real HTTP/PostgreSQL publish-process conformance and worker idempotency assertions.
+
+## SDK fetch stream-source placement (F-16, #2100)
+
+- **ID:** `sdk-stream-source-placement-2100`
+- **Reason:** The stream transport is a separate concern temporarily placed in
+  `packages/sdk/src/client/stream-source/`. SDK already has 14 source-root directories against
+  F-16's limit of 12; adding another root would worsen that baseline. Nesting under the client
+  concern leaves the concern boundary imperfect and requires an explicit consolidation follow-up.
+- **Owner:** SDK architecture maintainers / #2100.
+- **Target:** Before the 0.0.9 stable SDK release.
+- **Status:** Open; pending independent evaluator acceptance for PR #2212.
+- **Closing gate:** Consolidate SDK source roots to at most 12 and place the transport in a proper
+  stream concern while preserving the public consumer subpath and its import-graph guard.
+- **Evidence:** PR #2212; `fetch-stream-source-import_test.ts` proves the consumer excludes telemetry,
+  OTel, and modules using Deno APIs. `arch:check` retains the existing F-16 directory-count warning.
+
+## packages/plugin-workers-core — WINDOWS-PROCESS-RUNNER-PARITY
+
+- **ID:** `WINDOWS-PROCESS-RUNNER-PARITY`
+- **Reason:** Deno.Command replaced Dax for bounded stdin/stream control. Windows PATHEXT lookup for
+  bare `.cmd`/`.bat` shims and `taskkill /PID <owned-pid> /T /F` termination lack Windows-host
+  execution evidence; Linux results do not establish Windows parity.
+- **Owner:** Workers maintainers, coordinated through #2103.
+- **Target:** Windows verification by 2026-10-27, before the 0.0.8 stable cut.
+- **Linked review:** PR #2201, IMPL-EVAL at `08421b92f` (finding 4); issue #2110.
+- **Plan:** Run native-executable stdin/EOF, command-shim resolution, and cmd-wrapper abort/timeout
+  fixtures on Windows. Compare bare shim launch to the former Dax behavior; restore PATHEXT-aware
+  resolution if parity fails. Keep batch scripts on the existing CmdRuntimeAdapter meanwhile.
+- **Created:** 2026-10-10.
+- **Status:** open; verification deferred because the implementation host is Linux.
+- **Closing gate:** Windows-backed tests prove stdin isolation/EOF, `.cmd`/`.bat` lookup with
+  arguments, and that cancellation/timeout stop a cmd wrapper and its pipe-holding grandchild.
+
+## SDK/Fresh stream materializer convergence (#2100)
+
+- **ID:** `sdk-fresh-stream-materializer-convergence-2100`
+- **Reason:** `@netscript/sdk/streams/collections` materializes one State Protocol entity type with
+  `parse` and `getKey`, while `@netscript/fresh` `createNetScriptStreamDB` uses multi-type
+  `StateSchema` and `@durable-streams/state`. They share TanStack DB but duplicate the materializer
+  seam, with different URL/auth resolution, retry policy, readiness, failure, and disposal
+  contracts.
+- **Why deferred:** The injected Expo transport must remain DOM-independent. Replacing either
+  adapter without reconciling its schema and recovery semantics would change an existing consumer
+  contract; PR #2244 preserves both and documents their differences.
+- **Owner:** SDK and Fresh architecture maintainers / #2100.
+- **Target:** Before the 0.0.9 stable SDK release, no later than 2026-11-15.
+- **Plan:** Specify one platform-neutral entity/schema and lifecycle contract; reconcile auth/URL
+  resolution, replay, readiness, fatal failure, and finite retry policy explicitly. Move shared
+  materialization into one core seam with thin injected-transport SDK and Fresh adapters, preserving
+  the published single-type and multi-type entrypoints through compatibility adapters and migration
+  documentation. Do not make native consumers import Fresh or server telemetry.
+- **Linked change:** [PR #2244](https://github.com/rickylabs/netscript/pull/2244).
+- **Created:** 2026-10-10.
+- **Status:** Open; recorded for independent evaluator adjudication, no convergence claimed here.
+- **Closing gate:** Both adapters use the shared materializer and pass the same conformance matrix
+  for inserts/updates/deletes, schema/key validation, filtered live queries, control-committed
+  replay, reconnect without gaps/duplicates, preload/fatal errors, cancellation, and disposal.
+  Preserve the SDK non-DOM import-graph guard, Fresh schema/recovery tests, and Expo-pinned React
+  lifecycle tests; verify native Hermes/Expo acceptance separately before claiming cross-runtime
+  equivalence.

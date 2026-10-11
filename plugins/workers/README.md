@@ -196,3 +196,18 @@ those interpreters must be present on the machine that runs such tasks.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## KV retention
+
+Each job's `retention.kvRetentionDays` (default 3) bounds terminal execution records under
+`workers/executions`. The execution state store and the registry execution-write port both set KV
+`expireIn` from `completedAt`; rewriting a result or progress record does not extend that deadline.
+Pending, queued, and running executions remain durable while they are open. An explicit
+`archiveToDb: false` never causes a database archive in these KV write or cleanup paths.
+
+`DELETE /cleanup` now deletes expired terminal execution records instead of returning a stubbed
+success. It inspects at most 1000 entries per call and advances to the next page on later calls.
+Atomic version checks prevent it from deleting a record updated after inspection. Fresh terminal
+records and open executions are preserved. This endpoint also removes legacy execution records
+written without TTL; normal new-record expiry is performed by the KV backend and needs no app
+session. Job/task definitions remain configuration rather than expiring execution history.

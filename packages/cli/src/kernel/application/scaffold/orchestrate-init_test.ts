@@ -90,7 +90,9 @@ Deno.test('initNextSteps includes local database preparation steps for maintaine
   ]);
 });
 
-Deno.test('initNextSteps tells no-Aspire Postgres users to self-provision', () => {
+// #1996: every advertised db step runs without an AppHost (workspace tasks),
+// and the connection it needs is named before the first db command.
+Deno.test('initNextSteps tells no-Aspire Postgres users to self-provision first', () => {
   const steps = initNextSteps(baseOptions({
     noAspire: true,
     dbEngine: 'postgres',
@@ -98,10 +100,26 @@ Deno.test('initNextSteps tells no-Aspire Postgres users to self-provision', () =
 
   assertEquals(steps, [
     'cd smoke-test',
-    'netscript db generate  # generate database client after configuring DATABASE_URL',
-    'netscript db seed  # seed after the generated client exists',
-    'deno task --cwd apps/frontend dev  # start Fresh dev server',
     '# Provision Postgres yourself and set POSTGRES_URI or DATABASE_URL',
+    'netscript db init --name init',
+    'netscript db generate',
+    'netscript db seed',
+    'deno task --cwd apps/frontend dev  # start Fresh dev server',
+  ]);
+});
+
+Deno.test('initNextSteps needs no provisioning step for a no-Aspire SQLite workspace', () => {
+  const steps = initNextSteps(baseOptions({
+    noAspire: true,
+    dbEngine: 'sqlite',
+  }));
+
+  assertEquals(steps, [
+    'cd smoke-test',
+    'netscript db init --name init',
+    'netscript db generate',
+    'netscript db seed',
+    'deno task --cwd apps/frontend dev  # start Fresh dev server',
   ]);
 });
 

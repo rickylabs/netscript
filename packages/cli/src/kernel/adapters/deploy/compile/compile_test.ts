@@ -1,5 +1,5 @@
 import { join, resolve } from '@std/path';
-import { loadDeployConfig } from '../../config/deploy-config.ts';
+import { loadDeployConfig } from '../../config/deploy-config/deploy-config.ts';
 import { extractCompileTargets } from './compile-targets.ts';
 
 function assert(condition: unknown, message: string): asserts condition {

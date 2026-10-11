@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../.llm/tools/testing/check-generated-files.ts';
 import { assert, assertEquals, assertFalse, assertRejects } from '@std/assert';
 import { oc } from '@orpc/contract';
 import { z } from 'zod';
@@ -474,12 +475,10 @@ Deno.test('packed auth core exposes the SDK bearer factory to an npm consumer', 
       `${consumer}/probe.ts`,
       "import { createBearerSdkClientContribution } from '@netscript/plugin-auth-core/sdk';\nvoid createBearerSdkClientContribution;\n",
     );
-    const checked = await new Deno.Command(Deno.execPath(), {
+    const checked = await checkGeneratedFiles({
       args: ['check', 'probe.ts'],
       cwd: consumer,
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assert(checked.success, `auth-core consumer check failed with exit ${checked.code}`);
   } finally {
     await Deno.remove(temporaryRoot, { recursive: true });

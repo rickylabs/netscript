@@ -26,7 +26,7 @@ instances, sessions — into durable topics.
 | ----------------------------------------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `@netscript/plugin-streams-core`                      | `./mod.ts`               | 62      | Schema definition, the durable producer, endpoint resolution, diagnostics, and the v1 producer port vocabulary (documented below).   |
 | `@netscript/plugin-streams-core/admin`                | `./admin.ts`             | 8       | Upstream whole-stream administrative adapter and signature types; helpers live in the root.                                          |
-| `@netscript/plugin-streams-core/sse`                  | `./src/sse/mod.ts`       | 33      | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. |
+| `@netscript/plugin-streams-core/sse`                  | `./src/sse/mod.ts`       | 35      | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. |
 | `@netscript/plugin-streams-core/telemetry`            | `./src/telemetry/mod.ts` | 33      | Telemetry registration, span names, attribute keys, and the meter/counter/gauge ports used by reconnect metrics.                     |
 | `@netscript/plugin-streams-core/testing`              | `./src/testing/mod.ts`   | 4       | An in-memory producer and a small schema fixture for tests that must not open network sockets.                                       |
 | `@netscript/plugin-streams-core/integration/commands` | `./commands.ts`          | 18      | Checked producer-delivery sink for the service command relay.                                                                        |
@@ -206,7 +206,9 @@ event names a validated binding delivers, so a consumer never branches on an unv
 | `bindStreamEventSourceV1`            | function   | Bind named `data` and `control` listeners using schema-validated v1 outcomes.    |
 | `createStreamSseReplayStateV1`       | function   | Create an empty or caller-seeded v1 replay snapshot.                             |
 | `reduceStreamSseReplayStateV1`       | function   | Apply one valid frame while committing replay progress only on a control frame.  |
-| `StreamEventSourceV1`                | interface  | Minimal native `EventSource` surface used at the browser edge and in tests.      |
+| `StreamEventSourceV1`                | interface  | Minimal native or DOM-independent EventSource-compatible surface.                |
+| `StreamSourceEventV1`                | interface  | Structural event with a type, optional data, and optional last event ID.         |
+| `StreamSourceListenerV1`             | type alias | Listener accepting structural stream events.                                     |
 | `StreamEventSourceBindingV1`         | interface  | Disposable browser binding and immutable replay snapshot accessor.               |
 | `StreamSseReplayStateV1`             | interface  | Replay snapshot consumed by reconnect policy without owning that policy.         |
 | `StreamSseOffsetV1`                  | type alias | A server-owned replay token — opaque, never parsed or incremented by a consumer. |

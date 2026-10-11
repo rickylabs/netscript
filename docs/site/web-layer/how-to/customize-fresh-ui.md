@@ -163,9 +163,9 @@ the route file and the URL stays clean.
 
 {{ comp callout { type: "tip", title: "Add typed route references in router.ts" } }}
 When you add a permanent page, register it in <code>apps/dashboard/router.ts</code>
-so <code>appRoutes</code> exposes a typed <code>.href()</code> for it. Linking
-through <code>appRoutes</code> instead of hand-written strings means a renamed or
-removed route fails the type-check rather than 404-ing at runtime.
+so <code>appRoutes</code> exposes a typed <code>.href()</code> for it. The CLI registers a string-literal pattern in <code>appRoutes</code>; moving a
+route directory does not update that pattern. Reconcile <code>router.ts</code>
+and its consumers using the <a href="/web-layer/route/#renaming-or-moving-a-route">rename/move checklist</a>.
 {{ /comp }}
 
 ## Add interactivity with an island
@@ -373,11 +373,11 @@ That task runs `deno fmt --check`, `deno lint`, and `deno check` over the app, s
 clean run means your routes, islands, and edited components still type and lint.
 
 {{ comp callout { type: "tip", title: "Type-check is your guardrail" } }}
-Because routes, islands, and UI primitives are all app-owned TypeScript, the
-<code>check</code> task is the single gate that proves a route rename, a changed
-island prop, or an edited primitive still composes. Run it before every commit —
-green here means the Fresh build will not break on a missing import or a drifted
-type.
+Run the <code>check</code> task before committing to catch missing imports and
+type drift in routes, islands, and UI primitives. After a route move, refresh the
+generated route modules first, then check navigation and the new URL in the app:
+a green type-check does not prove <code>router.ts</code> string literals match
+the filesystem.
 {{ /comp }}
 
 ## Next steps

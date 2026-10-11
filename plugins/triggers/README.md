@@ -31,8 +31,8 @@ binds them to a NetScript host.
   acknowledgement, so slow handlers never block the sender and crashes replay from the stored event.
 - **Concurrent by default** — the processor fans out with a default concurrency of 10
   (`TRIGGER_CONCURRENCY`) for bursty workloads.
-- **Triggers API included** — the `triggers-api` service uses an Aspire-allocated endpoint and backs trigger and
-  event introspection over a versioned contract.
+- **Triggers API included** — the `triggers-api` service uses an Aspire-allocated endpoint and backs
+  trigger and event introspection over a versioned contract.
 - **An operations CLI** — `list`, `add-webhook`, `add-scheduled`, `add-file-watch`, `fire`,
   `preview`, `test`, `events`, and `enable`/`disable` cover authoring and operating triggers.
 
@@ -117,7 +117,7 @@ console.log(triggersPlugin.name); // "@netscript/plugin-triggers"
 | `./cli`      | The trigger command group (`list`, `add-webhook`, `fire`, `events`, …)                                                    |
 | `./runtime`  | The processor runtime (`createRuntimeTriggerProcessor`) with KV-backed event store, idempotency, and dead-letter adapters |
 | `./public`   | The typed trigger surface hosts re-export                                                                                 |
-| `./services` | The Triggers API service composition (`triggers-api`, Aspire-allocated port)                                             |
+| `./services` | The Triggers API service composition (`triggers-api`, Aspire-allocated port)                                              |
 | `./streams`  | Durable-stream factory for trigger entities                                                                               |
 | `./aspire`   | The trigger Aspire contribution for the AppHost                                                                           |
 | `./scaffold` | The plugin-owned scaffolder `netscript plugin install trigger` executes                                                   |
@@ -144,3 +144,22 @@ KV APIs). The manifest itself is plain data and can be imported anywhere TypeScr
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## KV retention
+
+Trigger groups declare `retention.kvDays` (default 7). Runtime startup resolves that policy per
+trigger and applies it to terminal event records, their `triggers/by-trigger` indexes, DLQ entries,
+and their `triggers/dlq/by-trigger` indexes. Store callers can inject `kvRetentionDays` and a clock
+for a custom composition. Each record/index pair receives the same `expireIn` in one atomic write.
+Event TTL starts at terminal `updatedAt`; DLQ TTL starts at `failedAt`, so rewriting old failures
+does not extend their window. Manual fire now persists its processing outcome before returning.
+
+Pending, in-flight, and deferred events keep their durable state until processing settles. When a
+deferred action fires, the original event becomes terminal and its event/index pair receives TTL.
+Each replay is persisted separately; a further deferral keeps that replay open until its own action
+fires. The service shares its ingress event store with the background replay processor. Active
+idempotency claims and completed deduplication markers retain their existing claim/deduplication
+TTLs. Deferred replay records are removed on successful replay or explicit cancellation; enabled
+state remains configuration. Existing terminal records written without TTL need a migration; this
+policy applies when records are written or their status changes. Runtime/backend expiry does not
+depend on an API read or a phone/web app being open.

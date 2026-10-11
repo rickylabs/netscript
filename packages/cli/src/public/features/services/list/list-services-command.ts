@@ -10,7 +10,7 @@ import { Command } from '@cliffy/command';
 import { resolve } from '@std/path';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/workspace-resolver.ts';
-import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
+import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config/deploy-config.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { ListServicesInput } from './list-services-input.ts';
 

@@ -181,6 +181,7 @@ describe('plugin new formatting', () => {
       {
         fs,
         formatter: {
+          formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
           formatContent: (path, content) => {
             formatted.push(path);
             return Promise.resolve(content);

@@ -54,6 +54,8 @@ import type {
   ServiceRouter,
   ShutdownHook,
 } from '../types.ts';
+import { createRateLimitMiddleware } from '../rate-limit/middleware/rate-limit-middleware.ts';
+import type { ServiceRateLimitOptions } from '../rate-limit/middleware/options.ts';
 import type { ServiceBuilder, ServiceConfig } from './service-builder.ts';
 import { resolveRpcWiringPaths, type RpcWiringOptions, wireRpc } from './service-rpc.ts';
 import { startServiceListener } from './service-listener.ts';
@@ -294,6 +296,11 @@ export class ServiceBuilderImpl<
   withBodyLimit(options: ServiceBodyLimitOptions): ServiceBuilder<TRouter, TCustom> {
     this.bodyLimitMiddleware = createBodyLimitMiddleware(options);
     return this;
+  }
+
+  /** Adds a route-scoped quota stage through the existing middleware seam. */
+  withRateLimit(options: ServiceRateLimitOptions): ServiceBuilder<TRouter, TCustom> {
+    return this.use(createRateLimitMiddleware(options));
   }
 
   /**

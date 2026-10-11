@@ -194,3 +194,39 @@ Deno.test('createErrorHandler returns production-safe error response', async () 
   assertEquals(response.status, 500);
   assertEquals(body.error, 'INTERNAL_ERROR');
 });
+
+Deno.test('OpenAPI compact input gives route parameters precedence over query parameters', async () => {
+  const router = os.router({
+    user: os.route({ method: 'GET', path: '/users/{id}' })
+      .input(z.object({ id: z.string() }))
+      .output(z.object({ id: z.string() }))
+      .handler(({ input }) => input),
+  });
+  const result = await createOpenAPIHandler(router).handle(
+    new Request('http://localhost/api/users/route-id?id=query-id'),
+    { prefix: '/api' },
+  );
+  assertEquals(result.matched, true);
+  assertEquals(result.response?.status, 200);
+  assertEquals(await result.response?.json(), { id: 'route-id' });
+});
+
+Deno.test('OpenAPI preserves Zod 4.6 numeric and string constraints', async () => {
+  const router = os.router({
+    bounded: os.route({ method: 'GET', path: '/bounded' })
+      .input(z.object({ count: z.number().min(0).max(23).int(), name: z.string().min(2).max(8) }))
+      .output(z.boolean())
+      .handler(() => true),
+  });
+  const app = new Hono();
+  app.get('/spec', createOpenAPISpec(router, { title: 'Bounds', version: '1' }));
+  const response = await app.request('/spec');
+  const spec = await response.json();
+  const params = spec.paths['/bounded'].get.parameters;
+  const count = params.find((param: { name: string }) => param.name === 'count');
+  const name = params.find((param: { name: string }) => param.name === 'name');
+  assertEquals(count.schema.minimum, 0);
+  assertEquals(count.schema.maximum, 23);
+  assertEquals(name.schema.minLength, 2);
+  assertEquals(name.schema.maxLength, 8);
+});

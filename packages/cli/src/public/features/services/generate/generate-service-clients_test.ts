@@ -1,3 +1,5 @@
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { Scaffolder } from '../../../../kernel/adapters/scaffold/scaffolder.ts';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
@@ -140,6 +142,7 @@ Deno.test('service generate withholds Aspire writes when any service contract is
     resolveProjectRoot: () => Promise.resolve('/workspace/shop'),
     generateServiceClientsDependencies: harness.dependencies,
     generateAspireDependencies: {
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       fs: harness.fs,
       scaffolder: {} as ScaffolderPort,
       templateAdapter: {} as TemplatePort,
@@ -166,6 +169,7 @@ Deno.test('service generate applies dry-run and force to clients and Aspire help
     resolveProjectRoot: () => Promise.resolve('/workspace/shop'),
     generateServiceClientsDependencies: harness.dependencies,
     generateAspireDependencies: {
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       fs: harness.fs,
       scaffolder: {} as ScaffolderPort,
       templateAdapter: {} as TemplatePort,
@@ -212,6 +216,7 @@ async function createHarness(
   );
   const template = new StringTemplateAdapter(fs);
   const formatter: GeneratedSourceFormatterPort = {
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (_path, content) => Promise.resolve(`// canonical\n${content}`),
     formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
   };

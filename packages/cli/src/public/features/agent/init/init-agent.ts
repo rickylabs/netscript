@@ -1,4 +1,4 @@
-import { join } from '@std/path';
+import { basename, join } from '@std/path';
 import {
   EMBEDDED_SKILL_BUNDLE_HASH,
   EMBEDDED_SKILL_FILES,
@@ -12,11 +12,24 @@ import {
 } from '../../../../kernel/assets/agent-tools.generated.ts';
 import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { generateEditorConfigFiles } from '../../../../kernel/adapters/scaffold/editor-config.ts';
-import type { EditorChoice } from '../../../../kernel/domain/scaffold/workspace-config.ts';
 import type { AgentDocsGenerator } from './agent-docs-generator.ts';
 import type { AgentInitFileSystem } from './agent-init-file-system.ts';
 import { ASPIRE_WORKFLOW_SKILLS, type AspireAgentInitializer } from './aspire-agent-initializer.ts';
-import type { AgentHost, InitAgentInput, InitAgentResult } from './init-agent-input.ts';
+import type { InitAgentInput, InitAgentResult } from './init-agent-input.ts';
+import {
+  AGENT_PROJECT_MARKERS,
+  type AgentEnvironment,
+  type AgentProjectMarker,
+  resolveAgentInit,
+} from './hosts/agent-host-resolution.ts';
+import {
+  OPENCODE_CONFIG_FILE,
+  OPENCODE_JSONC_CONFIG_FILE,
+  type OpenCodeConfigWrite,
+  planOpenCodeConfig,
+} from './hosts/opencode-config.ts';
+import { mergeClaudeGuidance } from './hosts/claude-guidance.ts';
+import { cleanClaudeSkillMirrors } from './hosts/claude-skill-mirrors.ts';
 
 const START_MARKER = '<!-- netscript-agent:start -->';
 const END_MARKER = '<!-- netscript-agent:end -->';
@@ -52,6 +65,8 @@ export interface InitAgentDependencies {
   readonly docsGenerator?: AgentDocsGenerator;
   /** Exact CLI specifier override used by migration fixtures. */
   readonly cliSpecifier?: string;
+  /** Invoking-environment snapshot used to detect the host; empty when omitted. */
+  readonly environment?: AgentEnvironment;
 }
 
 /** Install MCP host configuration and canonical agent skills without rewriting unchanged files. */
@@ -80,8 +95,27 @@ export async function initAgent(
     throw new Error('Offline documentation generation is not configured');
   }
   const installedDocsRoot = docs ? join(input.projectRoot, '.netscript', 'docs') : undefined;
-  const editor = await resolveEditor(input, dependencies.fs);
-  const hosts = await resolveHosts(input, dependencies.fs, editor);
+  const resolution = resolveAgentInit(
+    input,
+    await findProjectMarkers(input.projectRoot, dependencies.fs),
+    dependencies.environment ?? {},
+  );
+  const editor = resolution.editor.value;
+  const hosts = resolution.hosts.value;
+  const openCodeWrites = hosts.includes('opencode')
+    ? await readOpenCodeConfigPlan(
+      input.projectRoot,
+      dependencies.fs,
+      [
+        'deno',
+        ...netscriptMcpArgs(
+          input.projectRoot,
+          dependencies.cliSpecifier ?? netscriptJsrSpecifier('cli'),
+          installedDocsRoot,
+        ),
+      ],
+    )
+    : [];
   const changedFiles: string[] = [];
   const messages: string[] = [];
   for (const path of toolBundle.paths) {
@@ -132,6 +166,22 @@ export async function initAgent(
     changedFiles,
   );
   if (hosts.includes('claude')) {
+    const skillNames = [
+      ...new Set([
+        ...(skillManifest.files ?? []).filter((path) => path.endsWith('/SKILL.md')).map(
+          (path) => path.split('/')[0],
+        ),
+        ...ASPIRE_WORKFLOW_SKILLS,
+      ]),
+    ];
+    messages.push(
+      ...await cleanClaudeSkillMirrors(
+        input.projectRoot,
+        skillNames,
+        dependencies.fs,
+        changedFiles,
+      ),
+    );
     await writeHostConfig(
       dependencies.fs,
       join(input.projectRoot, '.mcp.json'),
@@ -141,19 +191,25 @@ export async function initAgent(
       dependencies.cliSpecifier,
       installedDocsRoot,
     );
-    for (const [path] of skillFiles) {
-      const canonicalPath = join(input.projectRoot, '.agents', 'skills', path);
-      const content = await dependencies.fs.readText(canonicalPath);
-      if (content == null) {
-        throw new Error(`Canonical skill was not installed: ${canonicalPath}`);
-      }
-      await writeChanged(
-        dependencies.fs,
-        join(input.projectRoot, '.claude', 'skills', path),
-        content,
-        changedFiles,
-      );
-    }
+    await writeChanged(
+      dependencies.fs,
+      join(input.projectRoot, '.claude', 'skills', 'repo-skills', 'SKILL.md'),
+      EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentClaudeSkillBridge].replace(
+        '{{PROJECT_NAME}}',
+        () => basename(input.projectRoot),
+      ).replace('{{SKILL_NAMES}}', () => skillNames.join(', ')),
+      changedFiles,
+    );
+    const claudePath = join(input.projectRoot, 'CLAUDE.md');
+    await writeChanged(
+      dependencies.fs,
+      claudePath,
+      mergeClaudeGuidance(
+        await dependencies.fs.readText(claudePath) ?? '',
+        EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentClaudeGuidance],
+      ),
+      changedFiles,
+    );
   }
   if (editor === 'vscode') {
     await writeHostConfig(
@@ -174,6 +230,9 @@ export async function initAgent(
       dependencies.cliSpecifier,
       installedDocsRoot,
     );
+  }
+  for (const write of openCodeWrites) {
+    await writeChanged(dependencies.fs, write.path, write.content, changedFiles);
   }
   if (
     hosts.includes('claude') &&
@@ -202,7 +261,7 @@ export async function initAgent(
       `Installed offline NetScript ${docs.frameworkVersion} documentation at .netscript/docs (${docs.proseFileCount} prose files, ${docs.apiPackageCount} API packages / ${docs.apiExportCount} export subpaths).`,
     );
   }
-  return { hosts, changedFiles, messages };
+  return { hosts, resolution, changedFiles, messages };
 }
 
 async function hasAspireWorkflowSkills(
@@ -211,44 +270,35 @@ async function hasAspireWorkflowSkills(
 ): Promise<boolean> {
   for (const skill of ASPIRE_WORKFLOW_SKILLS) {
     if (!await fs.exists(join(projectRoot, '.agents', 'skills', skill, 'SKILL.md'))) return false;
-    if (!await fs.exists(join(projectRoot, '.claude', 'skills', skill, 'SKILL.md'))) return false;
   }
   return true;
 }
 
-async function resolveEditor(
-  input: InitAgentInput,
+/** Read both OpenCode config files and plan their writes before any project file is touched. */
+async function readOpenCodeConfigPlan(
+  projectRoot: string,
   fs: AgentInitFileSystem,
-): Promise<EditorChoice> {
-  if (input.editor) return input.editor;
-  if (input.host === 'vscode' || input.host === 'all') return 'vscode';
-  const hasZed = await fs.exists(join(input.projectRoot, '.zed'));
-  const hasVsCode = await fs.exists(join(input.projectRoot, '.vscode'));
-  if (hasZed && hasVsCode) {
-    throw new Error(
-      'Both .zed and .vscode exist; pass --editor zed, --editor vscode, or --editor none.',
-    );
-  }
-  if (hasZed) return 'zed';
-  if (hasVsCode) return 'vscode';
-  return 'none';
+  netscriptCommand: readonly string[],
+): Promise<readonly OpenCodeConfigWrite[]> {
+  const read = async (name: string) => {
+    const path = join(projectRoot, name);
+    return { path, text: await fs.readText(path) };
+  };
+  return planOpenCodeConfig(
+    await read(OPENCODE_CONFIG_FILE),
+    await read(OPENCODE_JSONC_CONFIG_FILE),
+    netscriptCommand,
+  );
 }
 
-async function resolveHosts(
-  input: InitAgentInput,
+async function findProjectMarkers(
+  projectRoot: string,
   fs: AgentInitFileSystem,
-  editor: EditorChoice,
-): Promise<readonly AgentHost[]> {
-  if (input.host === 'all') return ['claude', 'vscode'];
-  if (input.host) return [input.host];
-  const detected: AgentHost[] = [];
-  if (await fs.exists(join(input.projectRoot, '.claude'))) {
-    detected.push('claude');
-  }
-  if (editor === 'vscode') {
-    detected.push('vscode');
-  }
-  return detected.length > 0 ? detected : ['claude'];
+): Promise<ReadonlySet<AgentProjectMarker>> {
+  const present = await Promise.all(
+    AGENT_PROJECT_MARKERS.map((marker) => fs.exists(join(projectRoot, marker))),
+  );
+  return new Set(AGENT_PROJECT_MARKERS.filter((_, index) => present[index]));
 }
 
 async function writeHostConfig(

@@ -205,6 +205,11 @@ Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into r
   await mutator.ensureRootImportsForPluginKind('/project', 'saga');
   await mutator.ensureRootImportsForPluginKind('/project', 'trigger');
   await mutator.ensureRootImportsForPluginKind('/project', 'auth');
+  const authImports = JSON.parse(await fs.readFile('/project/deno.json')).imports;
+  assertEquals(
+    authImports['@netscript/plugin-auth-core'],
+    netscriptJsrSpecifier('plugin-auth-core'),
+  );
 
   const config = JSON.parse(await fs.readFile('/project/deno.json'));
 

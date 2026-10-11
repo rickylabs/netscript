@@ -1,3 +1,4 @@
+import { DenoGeneratedSourceFormatter } from '../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { DenoProcess } from '../../../kernel/adapters/runtime/process/deno-process.ts';
 import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { relative } from '@std/path';
@@ -77,6 +78,7 @@ export function createMaintainerCommandDependencies(
         fs,
         templateAdapter,
         process,
+        formatter: new DenoGeneratedSourceFormatter(process),
         jsrResolver: new JsrImportResolver(),
         cwd: host.cwd,
         resolveModeFields: (options) => ({

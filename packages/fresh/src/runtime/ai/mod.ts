@@ -93,6 +93,9 @@ export {
   toNetScriptChatResponse,
 } from './create-chat-connection.ts';
 
+// #2067 — opt-in writer fencing for `toNetScriptChatResponse({ producer })`.
+export { type NetScriptChatProducer, NetScriptChatProducerError } from './chat-producer.ts';
+
 // ---------------------------------------------------------------------------
 // FA2 — durable chat stream proxy (route handler). Real implementation lives in
 // `./stream-proxy.ts`; re-exported here so `@netscript/fresh/ai` stays a single

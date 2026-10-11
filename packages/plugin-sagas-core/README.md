@@ -229,17 +229,20 @@ JSR with cryptographically verified provenance.
 ## Checked command relay sink
 
 `./integration/commands` exports `createSagaCommandOutboxSink`. Supply an existing
-`SagaPublisherPort` at composition and register the returned sink with the service relay.
-It calls `publishSagaOrThrow` after the local command commit, forwards the stable outbox id as
+`SagaPublisherPort` at composition and register the returned sink with the service relay. It calls
+`publishSagaOrThrow` after the local command commit, forwards the stable outbox id as
 message/idempotency identity, and propagates correlation and W3C fields. Only a checked accepted
 receipt with matching message type and valid time settles the relay; rejected, unavailable or
 malformed responses leave the row unpublished. No queue or relay is added. Cancellation is
-cooperative before/after the awaited publisher because this port has no signal parameter;
-the supplied publisher owns its transport timeout. Publication followed by a crash before local
+cooperative before/after the awaited publisher because this port has no signal parameter; the
+supplied publisher owns its transport timeout. Publication followed by a crash before local
 settlement permits redelivery; downstream processing must be idempotent.
 
 ```ts
-import { createSagaCommandOutboxSink, type SagaPublisherPort } from '@netscript/plugin-sagas-core/integration/commands';
+import {
+  createSagaCommandOutboxSink,
+  type SagaPublisherPort,
+} from '@netscript/plugin-sagas-core/integration/commands';
 declare const publisher: SagaPublisherPort;
 const sink = createSagaCommandOutboxSink({ id: 'sagas', publisher });
 ```
@@ -249,24 +252,24 @@ const sink = createSagaCommandOutboxSink({ id: 'sagas', publisher });
 Ordinary transition handlers can return `workerJobEffect(selectedJob, payload, route)` or
 `workerTaskEffect(selectedTask, payload, route)` from `./integration/workers`. Select
 `.durableWorkerCommands()` on the saga definition. These effects are pure declarations; existing
-`send()` remains an internal saga-message cascade. Worker effects are unavailable in compensation
-or nested scheduled cascades. A task used here requires `.payload(selectedRuntimeSchema)`; the
-legacy type-only task overload remains available for ordinary task execution.
+`send()` remains an internal saga-message cascade. Worker effects are unavailable in compensation or
+nested scheduled cascades. A task used here requires `.payload(selectedRuntimeSchema)`; the legacy
+type-only task overload remains available for ordinary task execution.
 
 The selected schema validates detached bounded JSON before any transition write. Schema
-transformations that change canonical payload identity are refused. Command identities use the
-saga id, instance id, next version and original handler-effect ordinal. The producer forwards
-correlation and W3C context into the existing command outbox. Configure C5's worker sink topic map
-with the same selected job/task id as the effect; destination/topic are host-owned routing policy.
+transformations that change canonical payload identity are refused. Command identities use the saga
+id, instance id, next version and original handler-effect ordinal. The producer forwards correlation
+and W3C context into the existing command outbox. Configure C5's worker sink topic map with the same
+selected job/task id as the effect; destination/topic are host-owned routing policy.
 
 `MemorySagaStore` supplies the atomic transition/replay contract for deterministic tests.
 `createPrismaSagaTransitionStore(root, { transactionTimeoutMs: 5000 })` from `./stores` supplies
 physical PostgreSQL persistence. The root must preserve the actual generated interactive callback
-type, excluding root/lifecycle operations from that callback. The database-owned bound writer appends
-outbox rows on that same callback. State, correlation, history, command intents and the hashed inbound
-marker commit or roll back together. A failed transition can retry its inbound key; a committed
-replay writes nothing. Existing KV and unbound `PrismaSagaStore` refuse this opt-in before handler
-or store work; they retain their ordinary saga behavior.
+type, excluding root/lifecycle operations from that callback. The database-owned bound writer
+appends outbox rows on that same callback. State, correlation, history, command intents and the
+hashed inbound marker commit or roll back together. A failed transition can retry its inbound key; a
+committed replay writes nothing. Existing KV and unbound `PrismaSagaStore` refuse this opt-in before
+handler or store work; they retain their ordinary saga behavior.
 
 Migrate the shipped `plugins/sagas/database/sagas.prisma` runtime models, including
 `SagaRuntimeCommandAppliedKey`, and the command outbox schema before selecting this adapter. The
@@ -276,7 +279,43 @@ covers this command-transition protocol only and does not implement general Pris
 parity. Deleting a saga instance retains committed outbox commands and replay markers for their
 independent delivery lifetime. The host owns provider connections and shutdown.
 
-Use the C5 command relay and its checked worker receipt sink for delivery. Delivery is at least once;
-exactly once effective application additionally requires durable downstream idempotency. The saga
-package adds no relay timer, leasing, retry or settlement loop. Worker progress continues through the
-native durable execution stream; worker completion uses `publishSagaOrThrow()`.
+Use the C5 command relay and its checked worker receipt sink for delivery. Delivery is at least
+once; exactly once effective application additionally requires durable downstream idempotency. The
+saga package adds no relay timer, leasing, retry or settlement loop. Worker progress continues
+through the native durable execution stream; worker completion uses `publishSagaOrThrow()`.
+
+## KV retention
+
+Topic groups declare `retention.completedDays` (default 7) and `retention.archiveToDb` (default
+false). Open `pending`, `running`, and `compensating` instances retain canonical state,
+correlations, transition history, applied replay keys, and the KV query projection until they become
+terminal. `activeDays` is a legacy active-window hint; it does not expire live replay data.
+
+Terminal `completed`, `failed`, `cancelled`, and `compensated` instances expire after
+`completedDays`, measured from the terminal timestamp. Canonical state, forward and reverse
+correlations, new terminal transitions, and `saga_instances` query documents use KV `expireIn`. The
+saga service applies the same deadline to earlier transitions and applied keys in atomic pages of at
+most 10 entries (12 checks and 11 mutations including state and cursor), conservatively bounded for
+Deno KV's mutation byte budget even for full-size values. A persistent `sagas/retention` cursor
+resumes that work after restart and is deleted once all history has received its TTL. Low-level
+`KvSagaStore` callers must drive `cleanupRetention()`; it returns whether work remains. The shipped
+durable runtime drains backlog without a polling delay, backs off from 100 ms to 30 seconds while
+idle, and logs/retries transient sweep failures with exponential backoff. Retention failures do not
+prevent runtime startup. A backlog can delay migration of historical keys, so backend expiry alone
+is guaranteed only after their terminal deadline has been assigned. No API read or owner app session
+drives cleanup.
+
+Transport reservations already use their separate deduplication TTL. With the KV backend,
+`archiveToDb: false` skips the optional Prisma archive even when a Prisma client is available. With
+`--saga-store-backend prisma`, the Prisma query model remains required runtime state so
+`listInstances`, `getInstance`, and stream hydration stay populated independently of archival.
+
+Migration: `KvSagaAppliedKeyStore.activeTtlMs` is deprecated and no longer expires open replay
+markers. Configure `completedRetentionDays` to match the canonical terminal window instead. Markers
+survive open instances and receive their deadline only after terminal state.
+
+Delayed saga messages remain owned by the queue adapter. The queue scheduling port currently has no
+terminal-instance cancellation/expiry contract, so their retention window is not proven by this
+change. Terminal records written before this policy was installed also need a migration/backfill;
+this change assigns deadlines when a terminal state is written. These remaining acceptance items
+keep issue #2109 open.

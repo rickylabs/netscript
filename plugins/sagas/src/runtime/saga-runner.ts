@@ -1,3 +1,9 @@
+import {
+  resolveSagaStoreBackend,
+  SAGA_STORE_BACKEND_ENV,
+} from '@netscript/plugin-sagas-core/stores';
+import { loadSagaRetention } from './load-saga-retention.ts';
+import { KvPollingAdapter } from '@netscript/queue/adapters/kv-polling';
 import type { SagaDefinition } from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
@@ -41,6 +47,8 @@ export type StartSagaRunnerOptions = Readonly<{
   readEnv?: SagaRunnerEnvReader;
   cwd?: () => string;
   deliveryQueue?: SagaDeliveryQueuePort;
+  /** Cancellable pending-message queue; defaults to KV polling for the production runner. */
+  scheduledQueue?: SagaDeliveryQueuePort;
   projection?: SagaInstanceProjectionPort | false;
   supervisor?: Omit<SagaRuntimeSupervisorOptions, 'loadDefinitions' | 'runtimeOptions'>;
   runtimeOptions?: Omit<CreateSagaRuntimeOptions, 'adapter'>;
@@ -58,6 +66,10 @@ type SagaRunnerBootstrap = Readonly<{
   createPluginServiceContext(pluginName: string): Promise<
     Readonly<{
       db: Readonly<{ getClient(): Promise<unknown> }>;
+      env?: Readonly<Record<string, string | undefined>>;
+      appsettings?: unknown;
+      settings?: unknown;
+      config?: unknown;
     }>
   >;
 }>;
@@ -88,12 +100,21 @@ export async function startSagaRunner(
   });
   const importer = options.importer ?? defaultImporter;
   const queue = options.deliveryQueue ?? createSagaDeliveryQueue();
-  const delivery = options.supervisor?.delivery ?? new SagaQueueDelivery(queue);
+  const queueScheduler = new SagaQueueScheduler(
+    queue,
+    options.scheduledQueue ??
+      (options.deliveryQueue ? undefined : new KvPollingAdapter({ queueName: 'sagas-scheduled' })),
+  );
+  const scheduler = options.runtimeOptions?.native?.scheduler ?? queueScheduler;
+  const delivery = options.supervisor?.delivery ?? new SagaQueueDelivery(
+    queue,
+    scheduler === queueScheduler ? queueScheduler : undefined,
+  );
   const runtimeOptions = {
     ...options.runtimeOptions,
     native: {
       ...withDefaultTelemetry(options.runtimeOptions?.native),
-      scheduler: options.runtimeOptions?.native?.scheduler ?? new SagaQueueScheduler(queue),
+      scheduler,
     },
     adapter,
   };
@@ -174,9 +195,27 @@ async function resolveProjection(
   const imported = await import(bootstrapModule) as SagaRunnerBootstrap;
   const context = await imported.createPluginServiceContext('sagas');
   const client = await context.db.getClient();
+  const retention = await loadSagaRetention();
+  const configuredBackend = context.env?.[SAGA_STORE_BACKEND_ENV] ??
+    readEnv(SAGA_STORE_BACKEND_ENV);
+  const appsettings = context.appsettings ?? context.settings ?? context.config;
+  const querySource = configuredBackend === undefined && appsettings === undefined
+    ? 'kv'
+    : resolveSagaStoreBackend({
+      env: { [SAGA_STORE_BACKEND_ENV]: configuredBackend },
+      appsettings,
+    });
+  const kvProjection = new KvSagaInstanceProjection(undefined, retention.completedDays);
   const readModelProjection = isProjectionClient(client)
-    ? new PrismaSagaInstanceProjection(client)
-    : new KvSagaInstanceProjection();
+    ? new CompositeSagaInstanceProjection([
+      kvProjection,
+      new PrismaSagaInstanceProjection(
+        client,
+        retention.archiveToDb,
+        querySource,
+      ),
+    ])
+    : kvProjection;
   return withStreamProjection(readModelProjection);
 }
 

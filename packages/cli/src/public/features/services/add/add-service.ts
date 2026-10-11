@@ -1,17 +1,19 @@
+import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
+import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import {
   addServiceWorkspaceMember,
-  regenerateAspireHelpers,
+  regenerateAspireHelpersWithDependencies,
   upsertServiceAppsettingsEntry,
 } from '../../../../kernel/adapters/service/workspace-mutator.ts';
-import { PortAllocator } from '../../../../kernel/adapters/service/port-allocator.ts';
-import { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/workspace-resolver.ts';
+import type { PortAllocator } from '../../../../kernel/adapters/service/port-allocator.ts';
+import type { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/workspace-resolver.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import type { AddServiceResult } from '../../../domain/service-add-plan.ts';
 import type { AddServiceInput } from './add-service-input.ts';
 import { planServiceAdd } from './plan-service-add.ts';
 import { renderService, type RenderServiceDependencies } from './render-service.ts';
-import { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
+import type { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
 import {
   generateServiceClients,
   validateServiceClientContracts,
@@ -95,8 +97,15 @@ export async function addService(
   const clientPath = clientResult?.planned.find((file) => file.serviceName === plan.serviceName)
     ?.path;
 
-  const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
-  const helperFiles = await regenerateHelpers(
+  await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
+  const browserAuthFiles = await reconcileBrowserAuth(
+    plan.projectRoot,
+    dependencies.fs,
+    dependencies.formatter,
+  );
+  const regenerateHelpers = dependencies.regenerateHelpers ??
+    regenerateAspireHelpersWithDependencies;
+  const aspireFiles = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
@@ -104,9 +113,11 @@ export async function addService(
     { formatter: dependencies.formatter },
   );
 
+  const helperFiles = [...browserAuthFiles, ...aspireFiles];
+
   return {
     ...rendered,
-    helperFiles,
+    helperFiles: [...browserAuthFiles, ...helperFiles],
     clientPath,
   };
 }

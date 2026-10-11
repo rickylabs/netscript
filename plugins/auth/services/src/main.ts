@@ -8,7 +8,7 @@
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import type { DbContext } from '@netscript/service';
+import type { DbContext, ServiceApp } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
 import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import { AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
@@ -18,6 +18,7 @@ import { currentAuthRequest, withAuthRequest } from './request-context.ts';
 import { createAuthServiceGuard } from './auth-guard.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
+export type { ServiceApp, ServiceEnvironment } from '@netscript/service';
 
 type PluginServiceBootstrap = {
   createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
@@ -34,12 +35,7 @@ export type AuthRunningServiceAddress = Readonly<{
 }>;
 
 /** Mountable fetch surface backing the running auth service. */
-export type AuthServiceApp = Readonly<{
-  /** Handles an incoming fetch request. */
-  fetch(input: Request | string | URL, init?: RequestInit): Response | Promise<Response>;
-  /** Convenience request helper exposed by the service runtime. */
-  request(input: Request | string | URL, init?: RequestInit): Response | Promise<Response>;
-}>;
+export type AuthServiceApp = Readonly<ServiceApp>;
 
 /** Runtime handle returned after the auth service starts. */
 export type AuthRunningService = Readonly<{

@@ -21,6 +21,27 @@ export interface GuidanceRouteHint {
 /** Curated general concepts used by the deterministic offline guidance index. */
 export const GUIDANCE_CONCEPTS: readonly GuidanceConcept[] = Object.freeze([
   {
+    name: 'route-management',
+    aliases: [
+      'rename or move a route',
+      'rename a route',
+      'move a route',
+      'renaming a route',
+      'moving a route',
+      'route rename',
+      'route management',
+      'route-management',
+      'router.ts reconciliation',
+    ],
+    terms: ['route', 'rename', 'move', 'router', 'generated', 'surface', 'reconcile'],
+    requiredAnyTerms: ['route', 'router'],
+    routeHints: [
+      { heading: 'renaming or moving a route' },
+      { heading: 'generated web surface' },
+      { heading: 'rename safety and manual lifecycle' },
+    ],
+  },
+  {
     name: 'validated-form',
     aliases: [
       'validated form',

@@ -1,6 +1,12 @@
-import type { CascadedMessage, SagaMessage, SagaMessageId } from '../domain/mod.ts';
+import type {
+  CascadedMessage,
+  SagaInstanceId,
+  SagaMessage,
+  SagaMessageId,
+  SagaStateEnvelope,
+} from '../domain/mod.ts';
 import { SagasError } from '../domain/mod.ts';
-import type { SagaClockPort } from '../ports/mod.ts';
+import type { SagaClockPort, SagaStorePort } from '../ports/mod.ts';
 import { type LoggerPort, NoopLogger } from './logger.ts';
 
 /** Lifecycle status for durable scheduled saga messages. */
@@ -18,6 +24,8 @@ export type SagaScheduledMessageRecord = Readonly<{
   dispatchedAt?: Date;
   failedAt?: Date;
   error?: string;
+  /** Originating durable instance; cancellation never depends on the destination correlation. */
+  instanceId?: SagaInstanceId;
 }>;
 
 /** Store boundary for Redis sorted-set, KV TTL, or database scheduler backends. */
@@ -46,7 +54,19 @@ export interface SagaSchedulerPort {
   /** Stop accepting scheduled cascade messages. */
   stop(): Promise<void>;
   /** Durably arrange delivery of a scheduled cascade. */
-  scheduleCascaded(message: CascadedMessage<'scheduled'>): Promise<unknown>;
+  scheduleCascaded(
+    message: CascadedMessage<'scheduled'>,
+    context?: Readonly<{ instanceId: SagaInstanceId }>,
+  ): Promise<unknown>;
+  /** Bind canonical state before startup so deadline cleanup can recover after a crash. */
+  bindRetentionStore?(
+    store: SagaStorePort,
+    options?: Readonly<{
+      completedRetentionDays?: number | ((envelope: SagaStateEnvelope) => number);
+    }>,
+  ): void;
+  /** Cancel a bounded page of messages past their originating instance retention deadline. */
+  cleanupRetention?(): Promise<boolean>;
 }
 
 /** Options for the durable saga scheduler. */
@@ -117,6 +137,7 @@ export class SagaScheduler implements SagaSchedulerPort {
   async schedule(
     message: SagaMessage | CascadedMessage,
     scheduledFor: Date,
+    instanceId?: SagaInstanceId,
   ): Promise<SagaScheduledMessageRecord> {
     if (Number.isNaN(scheduledFor.getTime())) {
       throw SagasError.validationFailed('Scheduled message date must be valid.');
@@ -130,6 +151,7 @@ export class SagaScheduler implements SagaSchedulerPort {
       status: 'pending',
       attempts: 0,
       createdAt: now,
+      ...(instanceId === undefined ? {} : { instanceId }),
     }) satisfies SagaScheduledMessageRecord;
 
     await this.#store.save(record);
@@ -139,8 +161,9 @@ export class SagaScheduler implements SagaSchedulerPort {
   /** Persist a scheduled cascade message for future dispatch. */
   async scheduleCascaded(
     message: CascadedMessage<'scheduled'>,
+    context?: Readonly<{ instanceId: SagaInstanceId }>,
   ): Promise<SagaScheduledMessageRecord> {
-    return await this.schedule(message.message, message.scheduledFor);
+    return await this.schedule(message.message, message.scheduledFor, context?.instanceId);
   }
 
   /** Claim and dispatch due scheduled messages once. */

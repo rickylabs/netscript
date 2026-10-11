@@ -23,6 +23,8 @@ export type {
   TaskDefinition,
   TaskExecutionOptions,
   TaskMessage,
+  TaskStdin,
+  TaskStdinJson,
 } from '@netscript/plugin-workers-core/runtime';
 export type {
   DeadLetterReason,
@@ -59,6 +61,13 @@ export type {
   WorkerTaskResult,
 } from './worker.ts';
 export type { WorkerPoolOptions } from './job-runner-pool.ts';
+
+export type {
+  ChildFatalError,
+  ChildHealthMonitor,
+  ChildHealthSnapshot,
+  ChildHealthState,
+} from '@netscript/plugin/health';
 
 export type {
   ExecutionStatus,

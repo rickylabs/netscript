@@ -1,4 +1,5 @@
 import { delay } from '@std/async';
+import { runSagaRetentionCleanup } from './saga-retention-loop.ts';
 import type {
   SagaClockPort,
   SagaRuntime,
@@ -26,6 +27,8 @@ import {
 export type DurableSagaRuntimeOptions = Readonly<{
   backend?: DurableSagaStoreBackend;
   kv?: KvStore;
+  /** Terminal KV retention resolved from the host's saga topic configuration. */
+  completedRetentionDays?: number | ((envelope: Parameters<SagaStorePort['save']>[0]) => number);
   prisma?: PrismaSagaStoreClient;
   store?: SagaStorePort;
   projection?: SagaInstanceProjectionPort;
@@ -50,6 +53,17 @@ export async function createDurableSagaRuntime(
   options: DurableSagaRuntimeOptions = {},
 ): Promise<DurableSagaRuntime> {
   const resources = await resolveStoreResources(options);
+  const scheduler = options.native?.scheduler;
+  scheduler?.bindRetentionStore?.(resources.store, {
+    completedRetentionDays: options.completedRetentionDays,
+  });
+  let scheduledController: AbortController | undefined;
+  let scheduledCleanup: Promise<void> | undefined;
+  const stopScheduledCleanup = async (): Promise<void> => {
+    scheduledController?.abort();
+    await scheduledCleanup;
+    scheduledCleanup = undefined;
+  };
   const store = options.projection
     ? new ProjectingSagaStore(resources.store, options.projection)
     : resources.store;
@@ -69,10 +83,34 @@ export async function createDurableSagaRuntime(
   });
 
   return Object.freeze({
-    runtime,
+    runtime: {
+      ...runtime,
+      start: async (): Promise<void> => {
+        await runtime.start();
+        resources.startCleanup?.();
+        if (scheduler?.cleanupRetention && scheduledCleanup === undefined) {
+          scheduledController = new AbortController();
+          scheduledCleanup = runSagaRetentionCleanup(
+            { cleanupRetention: () => scheduler.cleanupRetention!() },
+            scheduledController.signal,
+          );
+        }
+      },
+      stop: async (reason?: string): Promise<void> => {
+        try {
+          await runtime.stop(reason);
+        } finally {
+          await resources.stopCleanup?.();
+          await stopScheduledCleanup();
+        }
+      },
+    },
     store,
     kv: resources.kv,
-    dispose: resources.dispose,
+    dispose: async () => {
+      await stopScheduledCleanup();
+      await resources.dispose();
+    },
   });
 }
 
@@ -83,6 +121,8 @@ const systemSagaClock: SagaClockPort = Object.freeze({
 });
 
 type DurableSagaStoreResources = Readonly<{
+  startCleanup?(): void;
+  stopCleanup?(): Promise<void>;
   store: SagaStorePort;
   kv?: KvStore;
   dispose(): Promise<void>;
@@ -112,11 +152,30 @@ async function resolveStoreResources(
   }
 
   const kv = options.kv ?? await openSagaRuntimeKv();
-  const store = new KvSagaStore({ kv });
+  const store = new KvSagaStore({ kv, completedRetentionDays: options.completedRetentionDays });
+  let controller: AbortController | undefined;
+  let cleanup: Promise<void> | undefined;
+  const stopCleanup = async (): Promise<void> => {
+    controller?.abort();
+    await cleanup;
+    cleanup = undefined;
+  };
   return Object.freeze({
     store,
     kv,
-    dispose: () => closeStore(store),
+    startCleanup: () => {
+      if (cleanup !== undefined) return;
+      controller = new AbortController();
+      cleanup = runSagaRetentionCleanup(store, controller.signal);
+    },
+    stopCleanup,
+    dispose: async () => {
+      try {
+        await stopCleanup();
+      } finally {
+        await closeStore(store);
+      }
+    },
   });
 }
 

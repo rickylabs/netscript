@@ -3,9 +3,10 @@ import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { parseAppSettings } from '@netscript/aspire/config';
 import { join } from '@std/path';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
-import { ConfigInvalidError } from '../../../../kernel/domain/errors.ts';
+import { ConfigInvalidError, ConfigNotFoundError } from '../../../../kernel/domain/errors.ts';
 import {
   getDottedValue,
+  readAppsettingsDocument,
   readAppsettingsValue,
   setProjectConfigValue,
 } from './project-config-ops.ts';
@@ -188,5 +189,23 @@ Deno.test('#955 readAppsettingsValue resolves the same spellings as set', async 
     );
     assertEquals(await readAppsettingsValue(fs, root, 'databases.postgres.persistent'), true);
     assertEquals(await readAppsettingsValue(fs, root, 'telemetry.otlpEndpoint'), 'http://localhost:4318');
+  });
+});
+
+// #1996: `config list`/`get`/`set` read appsettings.json through these; a
+// missing file is a named failure, never an empty listing or a missing path.
+Deno.test('project config readers fail closed when appsettings.json is missing', async () => {
+  await withProject(async ({ root, fs }) => {
+    await Deno.remove(join(root, 'appsettings.json'));
+
+    await assertRejects(() => readAppsettingsDocument(fs, root), ConfigNotFoundError);
+    await assertRejects(
+      () => readAppsettingsValue(fs, root, 'NetScript.Name'),
+      ConfigNotFoundError,
+    );
+    await assertRejects(
+      () => setProjectConfigValue(fs, root, 'NetScript.Name', 'renamed'),
+      ConfigNotFoundError,
+    );
   });
 });

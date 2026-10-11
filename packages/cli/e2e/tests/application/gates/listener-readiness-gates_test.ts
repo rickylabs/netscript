@@ -110,6 +110,36 @@ Deno.test('published unhealthy listener report retains actionable diagnostic det
   );
 });
 
+Deno.test('allocated-name prefixes cannot substitute for an exact logical resource', () => {
+  const allocated = {
+    name: 'postgres-a1b2c3',
+    healthReports: { postgres_listener: { status: 'Healthy' } },
+  };
+  assertThrows(
+    () => readListenerHealthReport({ resources: [allocated] }, 'postgres', 'postgres_listener'),
+    Error,
+    'resource postgres was never published',
+  );
+  assertThrows(
+    () =>
+      readListenerHealthReport(
+        { resources: [allocated, { ...allocated, name: 'postgres-d4e5f6' }] },
+        'postgres',
+        'postgres_listener',
+      ),
+    Error,
+    'resource postgres was never published',
+  );
+  assertEquals(
+    readListenerHealthReport(
+      { resources: [{ ...allocated, displayName: 'postgres' }] },
+      'postgres',
+      'postgres_listener',
+    ).status,
+    'Healthy',
+  );
+});
+
 Deno.test('deadline snapshot distinguishes an unmatched resource', () => {
   const snapshot = readListenerReadinessSnapshot({ resources: [] }, 'postgres');
 

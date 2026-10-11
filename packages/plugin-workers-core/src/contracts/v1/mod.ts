@@ -36,6 +36,9 @@ export type {
   TaskTriggerOutput,
   WorkersCapabilities,
   WorkersContract,
+  WorkersContractRoute,
+  WorkersContractRouteName,
+  WorkersContractRouteSchemas,
   WorkersContractV1,
   WorkersRouter,
 } from './workers.contract.ts';

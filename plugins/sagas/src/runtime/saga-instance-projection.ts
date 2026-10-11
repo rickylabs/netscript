@@ -1,3 +1,4 @@
+import { loadSagaRetention } from './load-saga-retention.ts';
 import type {
   SagaCorrelationIndexEntry,
   SagaStorePort,
@@ -63,19 +64,41 @@ export type SagaInstanceReadModel = Readonly<{
 /** KV implementation used when the generated Prisma client has no saga delegates. */
 export class KvSagaInstanceProjection implements SagaInstanceProjectionPort {
   readonly #injectedKv?: WatchableKv;
+  readonly #completedDays?: (envelope: SagaStateEnvelope) => number;
+  #policy?: ReturnType<typeof loadSagaRetention>;
+  readonly #now: () => Date;
 
   /** Create a projector around an injected or environment-discovered KV backend. */
-  constructor(kv?: WatchableKv) {
+  constructor(
+    kv?: WatchableKv,
+    completedDays?: (envelope: SagaStateEnvelope) => number,
+    now: () => Date = () => new Date(),
+  ) {
     this.#injectedKv = kv;
+    this.#completedDays = completedDays;
+    this.#now = now;
   }
 
   /** Persist one API read-model document under the `saga_instances` prefix. */
   async upsert(projection: SagaInstanceProjection): Promise<void> {
     const kv = this.#injectedKv ?? await getKv();
-    await kv.set(
-      ['saga_instances', projection.sagaId, projection.instanceId],
-      readModel(projection),
+    const policy = this.#completedDays ??
+      (await (this.#policy ??= loadSagaRetention())).completedDays;
+    const terminal = ['completed', 'failed', 'cancelled', 'compensated'].includes(
+      projection.envelope.metadata.status,
     );
+    const settled = projectionDates(projection.envelope.metadata);
+    const expireIn = terminal
+      ? (settled.completedAt ?? settled.updatedAt).getTime() +
+        policy(projection.envelope) * 86_400_000 - this.#now().getTime()
+      : undefined;
+    const key = ['saga_instances', projection.sagaId, projection.instanceId];
+    if (expireIn !== undefined && expireIn <= 0) await kv.delete(key);
+    else {await kv.set(
+        key,
+        readModel(projection),
+        expireIn === undefined ? undefined : { expireIn },
+      );}
   }
 }
 
@@ -89,14 +112,22 @@ export type PrismaSagaInstanceProjectionClient = Readonly<{
 /** Prisma implementation of the API-facing saga instance projection. */
 export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort {
   readonly #prisma: PrismaSagaInstanceProjectionClient;
+  readonly #shouldProject: (sagaId: string) => boolean;
 
   /** Create a projector around the host-owned Prisma client. */
-  constructor(prisma: PrismaSagaInstanceProjectionClient) {
+  constructor(
+    prisma: PrismaSagaInstanceProjectionClient,
+    archiveToDb: (sagaId: string) => boolean = () => true,
+    querySource: 'kv' | 'prisma' = 'kv',
+  ) {
     this.#prisma = prisma;
+    // Prisma query storage is required runtime state, independently of optional archival.
+    this.#shouldProject = querySource === 'prisma' ? () => true : archiveToDb;
   }
 
   /** Upsert a stable row keyed by saga definition and engine instance id. */
   async upsert(projection: SagaInstanceProjection): Promise<void> {
+    if (!this.#shouldProject(projection.sagaId)) return;
     const state = projectionState(projection);
     const dates = projectionDates(projection.envelope.metadata);
     const create = {
@@ -162,8 +193,9 @@ export class ProjectingSagaStore implements SagaStorePort {
   async appendTransition<TState extends SagaState>(
     instanceId: SagaInstanceId,
     record: SagaTransitionRecord<TState>,
+    knownEnvelope?: SagaStateEnvelope<TState>,
   ): Promise<void> {
-    await this.#delegate.appendTransition(instanceId, record);
+    await this.#delegate.appendTransition(instanceId, record, knownEnvelope);
     const correlation = this.#correlations.get(instanceId);
     const envelope = await this.#delegate.load(instanceId);
     if (!correlation || !envelope) {
@@ -187,8 +219,11 @@ export class ProjectingSagaStore implements SagaStorePort {
   }
 
   /** Persist and retain correlation context for the following transition projection. */
-  async saveCorrelation(entry: SagaCorrelationIndexEntry): Promise<void> {
-    await this.#delegate.saveCorrelation(entry);
+  async saveCorrelation(
+    entry: SagaCorrelationIndexEntry,
+    envelope?: SagaStateEnvelope,
+  ): Promise<void> {
+    await this.#delegate.saveCorrelation(entry, envelope);
     this.#correlations.set(entry.instanceId, entry);
   }
 

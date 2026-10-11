@@ -6,7 +6,7 @@ import { createInfoPluginCommand } from '../../../public/features/plugins/info/i
 import { createPluginListCommand } from '../../../public/features/plugins/list/list-plugins-command.ts';
 import { createRemovePluginCommand } from '../../../public/features/plugins/remove/remove-plugin-command.ts';
 import { createUpdatePluginCommand } from '../../../public/features/plugins/update/update-plugin-command.ts';
-import { type PublicCommandDependencies } from '../../../public/features/root/public-command-dependencies.ts';
+import type { PublicCommandDependencies } from '../../../public/features/root/public-command-dependencies.ts';
 import { createLocalPluginInstallCommand } from './install/install-local-plugin-command.ts';
 
 /** Create the local contributor plugin command group. */
@@ -30,6 +30,7 @@ export function createLocalPluginCommand(
           scaffolder: dependencies.scaffolder,
           templateAdapter: dependencies.templateAdapter,
           registry: dependencies.pluginRegistry,
+          formatter: dependencies.pluginInstallDependencies.formatter,
           pluginScaffolder: dependencies.pluginInstallDependencies.pluginScaffolder,
           registryScaffolder: dependencies.pluginInstallDependencies.registryScaffolder,
           workspaceMutator: dependencies.pluginInstallDependencies.workspaceMutator,

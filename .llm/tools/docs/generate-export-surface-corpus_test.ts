@@ -221,29 +221,23 @@ async function runGenerator(
   );
 }
 
-async function withCommittedWorktree(
+async function withCommittedRepository(
   run: (worktree: string) => Promise<void>,
 ): Promise<void> {
   const source = await runCommand('git', ['rev-parse', '--show-toplevel'], Deno.cwd());
   assertEquals(source.code, 0, source.stderr);
   const sourceRoot = source.stdout.trim();
   const worktree = await Deno.makeTempDir({ prefix: 'netscript-mcp-corpus-test-' });
-  await Deno.remove(worktree);
   const added = await runCommand(
     'git',
-    ['worktree', 'add', '--detach', worktree, 'HEAD'],
+    ['clone', '--shared', '--no-hardlinks', '--quiet', sourceRoot, worktree],
     sourceRoot,
   );
   assertEquals(added.code, 0, added.stderr);
   try {
     await run(worktree);
   } finally {
-    const removed = await runCommand(
-      'git',
-      ['worktree', 'remove', '--force', worktree],
-      sourceRoot,
-    );
-    assertEquals(removed.code, 0, removed.stderr);
+    await Deno.remove(worktree, { recursive: true });
   }
 }
 
@@ -263,7 +257,7 @@ async function assertArtifactWasWritten(worktree: string, oldTime: number): Prom
 }
 
 Deno.test('write mode generates the artifact from a clean committed tree', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     const before = await Deno.readFile(corpusPath(worktree));
     const oldTime = await markArtifactOld(worktree);
     const status = await runCommand(
@@ -288,7 +282,7 @@ for (
   ] as const
 ) {
   Deno.test(`write mode refuses a dirty ${label} before modifying the artifact`, async () => {
-    await withCommittedWorktree(async (worktree) => {
+    await withCommittedRepository(async (worktree) => {
       await Deno.writeTextFile(
         `${worktree}/${dirtyPath}`,
         '\n/** Dirty-tree integration probe. */\nexport const mcpCorpusDirtyProbe: boolean = true;\n',
@@ -306,7 +300,7 @@ for (
 }
 
 Deno.test('write mode ignores a dirty path outside the generator read set', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     await Deno.writeTextFile(`${worktree}/AGENTS.md`, '\n<!-- outside-read-set probe -->\n', {
       append: true,
     });
@@ -319,7 +313,7 @@ Deno.test('write mode ignores a dirty path outside the generator read set', asyn
 });
 
 Deno.test('--check remains freshness-only when the generator read set is dirty', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     const dirtyPath = 'packages/sdk/README.md';
     await Deno.writeTextFile(`${worktree}/${dirtyPath}`, '\n<!-- check-mode probe -->\n', {
       append: true,
@@ -332,7 +326,7 @@ Deno.test('--check remains freshness-only when the generator read set is dirty',
 });
 
 Deno.test('--allow-dirty writes and records the offending path on stderr', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     const dirtyPath = 'packages/sdk/README.md';
     await Deno.writeTextFile(`${worktree}/${dirtyPath}`, '\n<!-- allow-dirty probe -->\n', {
       append: true,
@@ -348,7 +342,7 @@ Deno.test('--allow-dirty writes and records the offending path on stderr', async
 });
 
 Deno.test('write mode warns and continues when git is unavailable', async () => {
-  await withCommittedWorktree(async (worktree) => {
+  await withCommittedRepository(async (worktree) => {
     const oldTime = await markArtifactOld(worktree);
     const denoBin = Deno.execPath().slice(0, Deno.execPath().lastIndexOf('/'));
     const env = { ...Deno.env.toObject(), PATH: denoBin };
@@ -372,4 +366,46 @@ Deno.test('embedded query factory documentation matches the live required-contex
   assert(live, 'Missing live createQueryFactories entry');
   assert(embedded, 'Missing embedded createQueryFactories entry');
   assertEquals(embedded.jsDoc, live.jsDoc, 'Stale SDK query factory documentation');
+});
+
+Deno.test('entrypoint generator keeps a valid alternate compressor encoding and rejects decoded drift', async () => {
+  const { deflateRawSync } = await import('node:zlib');
+  const corpus: GeneratedExportSurfaceCorpus = {
+    schemaVersion: 1,
+    frameworkVersion: '0.0.4',
+    surfaces: [{ packageName: '@netscript/fresh', subpath: '.' }],
+    entries: [{
+      packageName: '@netscript/fresh',
+      subpath: '.',
+      symbol: 'fixture',
+      kind: 'function',
+      signature: 'function fixture(): string',
+      jsDoc: 'Repeated documentation text. '.repeat(150),
+    }],
+  };
+  const first = await createGeneratedAsset(corpus);
+  const alternate = await Promise.all(
+    first.source.split('\n').map(async (line) => {
+      if (!line.startsWith('  [')) return line;
+      const row: [string, string, string, string, number, number] = JSON.parse(
+        line.trim().replace(/,$/, ''),
+      );
+      const bytes = new Uint8Array(
+        await new Response(
+          new Blob([Uint8Array.fromBase64(row[2])]).stream().pipeThrough(
+            new DecompressionStream('deflate-raw'),
+          ),
+        ).arrayBuffer(),
+      );
+      const encoded = new Uint8Array(deflateRawSync(bytes, { level: 1 }));
+      row[2] = encoded.toBase64();
+      row[3] = new Uint8Array(await crypto.subtle.digest('SHA-256', encoded)).toBase64();
+      return `  ${JSON.stringify(row)},`;
+    }),
+  );
+  const source = alternate.join('\n');
+  assert(source !== first.source);
+  assertEquals((await createGeneratedAsset(corpus, source)).source, source);
+  const changed = { ...corpus, entries: [{ ...corpus.entries[0], jsDoc: 'Changed' }] };
+  assert((await createGeneratedAsset(changed, source)).source !== source);
 });

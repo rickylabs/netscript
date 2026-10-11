@@ -138,10 +138,11 @@ function isCurrentClaude(model: ModelId | undefined): boolean {
  * Configuration for {@linkcode AnthropicModelProvider}.
  *
  * All fields are optional: when `apiKey` is omitted the wrapped TanStack client
- * falls back to the `ANTHROPIC_API_KEY` environment variable at construction.
+ * checks `ANTHROPIC_AUTH_TOKEN`, then `ANTHROPIC_OAUTH_TOKEN`, then
+ * `ANTHROPIC_API_KEY` when the stream starts. Explicit request/provider keys win.
  */
 export interface AnthropicModelProviderConfig {
-  /** Anthropic API key. Falls back to `ANTHROPIC_API_KEY` when omitted. */
+  /** Anthropic credential. When omitted, uses the wrapped client's environment fallback. */
   readonly apiKey?: string;
   /** Override the API base URL (e.g. to route through a gateway/proxy). */
   readonly baseURL?: string;
@@ -330,7 +331,10 @@ function createAnthropicUsageObserver(): ProviderUsageObserver {
     },
     read() {
       if (Object.keys(counts).length === 0) return undefined;
-      const promptTokens = counts.input_tokens ?? 0;
+      // Messages input_tokens excludes cache reads/writes. The owned total
+      // input contract follows TanStack 0.21 and includes both exactly once.
+      const promptTokens = (counts.input_tokens ?? 0) +
+        (counts.cache_read_input_tokens ?? 0) + (counts.cache_creation_input_tokens ?? 0);
       const completionTokens = counts.output_tokens ?? 0;
       const promptTokensDetails = {
         ...(counts.cache_creation_input_tokens !== undefined &&

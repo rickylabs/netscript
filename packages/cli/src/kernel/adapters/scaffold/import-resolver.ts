@@ -15,7 +15,7 @@ import { JSR_SPECIFIERS } from '../../constants/jsr-specifiers.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.ts';
 
-const TANSTACK_AI_MCP_SPECIFIER = 'npm:@tanstack/ai-mcp@0.8.1';
+const TANSTACK_AI_MCP_SPECIFIER = 'npm:@tanstack/ai-mcp@0.8.3';
 
 /**
  * Maps all scaffold package specifiers to their JSR/npm specifiers.
@@ -117,7 +117,7 @@ const PACKAGE_TO_JSR: Record<string, string> = {
   [SCAFFOLD_PACKAGES.STD_PATH]: 'jsr:@std/path@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_FS]: 'jsr:@std/fs@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_ASSERT]: 'jsr:@std/assert@^1.0.0',
-  [SCAFFOLD_PACKAGES.ZOD]: 'npm:zod@^4.3.6',
+  [SCAFFOLD_PACKAGES.ZOD]: 'npm:zod@^4.6.5',
 };
 
 const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
@@ -199,7 +199,7 @@ const EXTERNAL_DEPS: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.STD_PATH]: 'jsr:@std/path@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_FS]: 'jsr:@std/fs@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_ASSERT]: 'jsr:@std/assert@^1.0.0',
-  [SCAFFOLD_PACKAGES.ZOD]: 'npm:zod@^4.3.6',
+  [SCAFFOLD_PACKAGES.ZOD]: 'npm:zod@^4.6.5',
 };
 
 // ============================================================================

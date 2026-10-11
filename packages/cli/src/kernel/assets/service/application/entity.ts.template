@@ -1,0 +1,30 @@
+/** {{modelName}} use-cases and the collapsed repository port. */
+import type {
+  {{serviceName | pascalCase}}{{modelName}}V1 as Entity,
+  {{serviceName | pascalCase}}{{modelName}}CreateInputV1 as CreateInput,
+  {{serviceName | pascalCase}}{{modelName}}UpdateInputV1 as UpdateInput,
+} from '@{{projectName}}/contracts';
+import { type ListInput, listQuery, pagination } from '../domain/{{entityName}}.ts';
+
+export interface {{serviceName | pascalCase}}Repository {
+  list(query: ReturnType<typeof listQuery>): Promise<{ data: Entity[]; total: number }>;
+  getById(id: Entity['id']): Promise<Entity | null>;
+  create(input: CreateInput): Promise<Entity>;
+  update(id: Entity['id'], input: UpdateInput): Promise<Entity | null>;
+  delete(id: Entity['id']): Promise<Entity | null>;
+}
+
+export function create{{serviceName | pascalCase}}Application(repository: {{serviceName | pascalCase}}Repository) {
+  return {
+    async list(input: ListInput) {
+      const { data, total } = await repository.list(listQuery(input));
+      return { data, pagination: pagination(input, total) };
+    },
+    getById: (id: Entity['id']) => repository.getById(id),
+    create: (input: CreateInput) => repository.create(input),
+    update: (id: Entity['id'], input: UpdateInput) => repository.update(id, input),
+    delete: (id: Entity['id']) => repository.delete(id),
+  };
+}
+
+export type {{serviceName | pascalCase}}Application = ReturnType<typeof create{{serviceName | pascalCase}}Application>;

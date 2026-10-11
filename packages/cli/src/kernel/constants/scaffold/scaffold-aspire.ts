@@ -1,3 +1,6 @@
+/** Project-declared executable override shared by Aspire tasks and CLI adapters. */
+export const NETSCRIPT_ASPIRE_CLI_ENV = 'NETSCRIPT_ASPIRE_CLI';
+
 export const SCAFFOLD_ASPIRE_MODULES = {
   SDK_FILE: 'aspire.mts',
   SDK_IMPORT_FROM_HELPERS: '../.aspire/modules/aspire.mts',

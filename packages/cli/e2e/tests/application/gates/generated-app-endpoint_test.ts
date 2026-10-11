@@ -404,13 +404,13 @@ Deno.test('app-home probe bounds a resource endpoint that never appears', async 
 Deno.test('app-home diagnostics extract the Fresh overlay error and stack', () => {
   const body = `<!DOCTYPE html><html><head><title>Error</title></head><body>
     <script type="module">
-      const error = {"message":"Cannot find module 'npm:@tanstack/preact-query@^5.101.0'","stack":"at fetchModule (vite.js:42)\\nat render (app.tsx:7)","frame":""}
+      const error = {"message":"Cannot find module 'npm:@tanstack/preact-query@^5.104.1'","stack":"at fetchModule (vite.js:42)\\nat render (app.tsx:7)","frame":""}
       try { console.error(error) } catch (_) {}
     </script></body></html>`;
 
   assertEquals(
     diagnosticBody(body),
-    "Fresh error: Cannot find module 'npm:@tanstack/preact-query@^5.101.0'\n" +
+    "Fresh error: Cannot find module 'npm:@tanstack/preact-query@^5.104.1'\n" +
       'at fetchModule (vite.js:42)\nat render (app.tsx:7)',
   );
 });

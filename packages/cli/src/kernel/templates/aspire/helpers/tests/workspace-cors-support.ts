@@ -1,4 +1,5 @@
 /** Test boundary for executed app registration; no Aspire process is started. */
+import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assert, assertEquals } from '@std/assert';
 import { toFileUrl } from '@std/path';
 import type { NetScriptConfig } from '@netscript/aspire/types';
@@ -6,15 +7,18 @@ import { generateRegisterApps } from '../register/generate-register-apps.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 
-DEFAULT_TEMPLATE_REGISTRY.register(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterApps1, {
-  path: TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterApps1,
-  content: await Deno.readTextFile(
-    new URL(
-      '../../../../assets/generated/aspire/helpers/generate-register-apps-1.ts.template',
-      import.meta.url,
+DEFAULT_TEMPLATE_REGISTRY.register(
+  TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterApps1,
+  {
+    path: TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterApps1,
+    content: await Deno.readTextFile(
+      new URL(
+        '../../../../assets/generated/aspire/helpers/generate-register-apps-1.ts.template',
+        import.meta.url,
+      ),
     ),
-  ),
-});
+  },
+);
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 // Relevant restored 13.5.3 SDK contract: aspire.mts re-exports ReferenceExpression
@@ -44,8 +48,18 @@ export interface DistributedApplicationBuilder {
 }
 `;
 
+// Use the shipped config/resource interfaces, whose extension fields are unknown.
+// A narrower Environment double would hide errors in the rendered helper.
+const compatTemplate = await Deno.readTextFile(
+  new URL('../../../../assets/aspire/helpers/_aspire-compat.ts.template', import.meta.url),
+);
+const compatTypes = compatTemplate.match(
+  /export interface NetScriptConfig\s*\{[\s\S]*?(?=export interface ResourceDependencies)/,
+);
+assert(compatTypes, 'The shipped compatibility config interfaces must be present');
+
 const COMPAT_DOUBLE = `
-export interface NetScriptConfig { Apps: Record<string, { Enabled?: boolean }>; Version: string }
+${compatTypes[0]}
 export function buildOtelEnvVars(_name: string, _version: string, _mode: string): Record<string, string> { return {}; }
 export function buildViteEnvVarName(name: string) { return { full: name, shorthand: name }; }
 export function resolveWorkspacePath(root: string, path: string) { return root + '/' + path; }
@@ -99,10 +113,14 @@ function isGeneratedModule(value: unknown): value is GeneratedModule {
 export async function registerWorkspace(config: NetScriptConfig) {
   const root = await Deno.makeTempDir({ prefix: 'netscript-cors-' });
   const services = new Map(
-    Object.keys(config.Services).map((name) => [name, new RecordingResource(name)]),
+    Object.keys(config.Services).map((
+      name,
+    ) => [name, new RecordingResource(name)]),
   );
   const plugins = new Map(
-    Object.keys(config.Plugins).map((name) => [name, new RecordingResource(name)]),
+    Object.keys(config.Plugins).map((
+      name,
+    ) => [name, new RecordingResource(name)]),
   );
   const apps = new Map<string, RecordingResource>();
   // Existing declarations are overridden by the workspace origin policy.
@@ -113,7 +131,10 @@ export async function registerWorkspace(config: NetScriptConfig) {
     await Deno.mkdir(`${root}/.helpers`);
     await Deno.mkdir(`${root}/.aspire/modules`, { recursive: true });
     await Deno.writeTextFile(`${root}/.aspire/modules/aspire.mts`, SDK_DOUBLE);
-    await Deno.writeTextFile(`${root}/.helpers/_aspire-compat.mts`, COMPAT_DOUBLE);
+    await Deno.writeTextFile(
+      `${root}/.helpers/_aspire-compat.mts`,
+      COMPAT_DOUBLE,
+    );
     await Deno.writeTextFile(
       `${root}/.helpers/register-infrastructure.mts`,
       'export interface InfrastructureContext { primaryCacheWiring?: unknown }',
@@ -127,11 +148,9 @@ export async function registerWorkspace(config: NetScriptConfig) {
         denoDefaults: config.Defaults.Deno,
       }),
     );
-    const checked = await new Deno.Command(Deno.execPath(), {
+    const checked = await checkGeneratedFiles({
       args: ['check', '--no-config', '--no-lock', '--unstable-kv', path],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
     const module: unknown = await import(toFileUrl(path).href);
     assert(isGeneratedModule(module));
@@ -156,7 +175,10 @@ export async function registerWorkspace(config: NetScriptConfig) {
 }
 
 /** Resolves the recorded expression only AFTER registration, like AppHost allocation. */
-export function allocatedValue(value: unknown, origins: ReadonlyMap<string, string>): string {
+export function allocatedValue(
+  value: unknown,
+  origins: ReadonlyMap<string, string>,
+): string {
   if (typeof value === 'string') return value;
   assert(value !== null && typeof value === 'object');
   if ('resourceName' in value) {
@@ -170,7 +192,9 @@ export function allocatedValue(value: unknown, origins: ReadonlyMap<string, stri
   let result = '';
   for (let i = 0; i < value.strings.length; i++) {
     result += value.strings[i];
-    if (i < value.values.length) result += allocatedValue(value.values[i], origins);
+    if (i < value.values.length) {
+      result += allocatedValue(value.values[i], origins);
+    }
   }
   return result;
 }

@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { join } from '@std/path';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 import { InMemoryScaffolder } from '../testing/in-memory-scaffolder.ts';
 import { DeployTargetRegistry } from '../registries/deploy-target-registry.ts';
@@ -45,8 +46,14 @@ function options(
 }
 
 function context(scaffolder: InMemoryScaffolder): InitPipelineContext {
+  const formatter: GeneratedSourceFormatterPort = {
+    formatContent: (_path, content) => Promise.resolve(content),
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
+    formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+  };
   return {
     scaffolder,
+    formatter,
     packagesAsWorkspaceMembers: () => false,
   } as unknown as InitPipelineContext;
 }
@@ -369,4 +376,29 @@ Deno.test('scaffoldRoot omits Aspire-backed compose CI when --no-aspire is used'
   assert(
     result.filesCreated.includes(join(workflowsRoot, 'deploy-bare-metal.yml')),
   );
+});
+
+// #1996: --no-aspire projects must carry the config every operating command reads.
+Deno.test('scaffoldRoot writes an Aspire-free appsettings.json when --no-aspire is used', async () => {
+  const scaffolder = new InMemoryScaffolder();
+  const result = await scaffoldRoot(
+    context(scaffolder),
+    options({
+      noAspire: true,
+      dbEngine: 'postgres',
+      includeExampleService: true,
+      serviceName: 'probe-svc',
+      servicePort: 61432,
+    }),
+  );
+  const appsettingsPath = '/workspace/deploy-app/appsettings.json';
+
+  assert(result.filesCreated.includes(appsettingsPath));
+  const netScript = JSON.parse(scaffolder.files.get(appsettingsPath) ?? '{}').NetScript;
+  assertEquals(netScript.Name, 'deploy-app');
+  assertEquals(netScript.Databases.postgres.Mode, 'External');
+  assertEquals(netScript.Services['probe-svc'].Port, 61432);
+  assertEquals(netScript.Apps, undefined);
+  assertEquals(netScript.Tools, undefined);
+  assertEquals(netScript.Otel, undefined);
 });

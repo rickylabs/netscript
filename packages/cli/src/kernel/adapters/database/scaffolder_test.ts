@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 /**
  * @module infra/database/scaffolder_test
  */
@@ -104,11 +105,9 @@ describe('DatabaseScaffolder', () => {
     try {
       const emittedScriptPath = join(emittedScriptRoot, 'clear-seeded-client.ts');
       await Deno.writeTextFile(emittedScriptPath, clearSeededClient);
-      const checked = await new Deno.Command(Deno.execPath(), {
+      const checked = await checkGeneratedFiles({
         args: ['check', '--no-config', '--no-lock', emittedScriptPath],
-        stdout: 'piped',
-        stderr: 'piped',
-      }).output();
+      });
       assertEquals(
         checked.code,
         0,

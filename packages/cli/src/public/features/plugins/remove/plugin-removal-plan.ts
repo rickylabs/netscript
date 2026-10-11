@@ -1,4 +1,5 @@
 import { join } from '@std/path';
+import { browserAuthReconciliationPaths } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 
 import { validateResourceName } from '../../../../kernel/adapters/scaffold/workspace-writer.ts';
 import { ConfigError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
@@ -48,6 +49,7 @@ export async function planPluginRemoval(
     join(projectRoot, 'netscript.config.ts'),
     join(projectRoot, 'deno.json'),
     join(projectRoot, 'aspire'),
+    ...await browserAuthReconciliationPaths(projectRoot, fs),
     installed.pluginDir,
     ...generatedDirs,
     ...schemaDirs,
@@ -86,10 +88,17 @@ async function resolveInstalledPlugin(
     try {
       value = JSON.parse(await fs.readFile(manifestPath));
     } catch (error) {
-      throw removalConfigError(pluginName, `installed metadata is invalid at ${manifestPath}`, error);
+      throw removalConfigError(
+        pluginName,
+        `installed metadata is invalid at ${manifestPath}`,
+        error,
+      );
     }
     if (!isRecord(value) || typeof value.name !== 'string') {
-      throw removalConfigError(pluginName, `installed metadata has no package name at ${manifestPath}`);
+      throw removalConfigError(
+        pluginName,
+        `installed metadata has no package name at ${manifestPath}`,
+      );
     }
     return {
       packageSpecifier: value.name,
@@ -150,7 +159,9 @@ function readInstallState(value: unknown): PluginInstallState | undefined {
     };
 }
 
-function readNullableStringRecord(value: unknown): Readonly<Record<string, string | null>> | undefined {
+function readNullableStringRecord(
+  value: unknown,
+): Readonly<Record<string, string | null>> | undefined {
   if (!isRecord(value)) return undefined;
   const entries = Object.entries(value);
   if (!entries.every(([, item]) => typeof item === 'string' || item === null)) return undefined;

@@ -151,7 +151,7 @@ from the wrapped package's `ANTHROPIC_MODELS`.
 
 | Config field | Type | Default |
 | --- | --- | --- |
-| `apiKey` | `string` | Falls back to the `ANTHROPIC_API_KEY` environment variable at client construction. |
+| `apiKey` | `string` | Explicit request/provider credentials win. Otherwise checks `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_OAUTH_TOKEN`, then `ANTHROPIC_API_KEY` when a turn starts. |
 | `baseURL` | `string` | Anthropic default (override to route through a gateway/proxy). |
 
 ### `@netscript/ai/openai-compatible`
@@ -331,7 +331,9 @@ and providers through their config bags. Two adapters resolve an API key from th
 
 | Environment variable | Read by | When |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | `@netscript/ai/anthropic` | When `apiKey` is omitted (via the wrapped `@tanstack/ai-anthropic` client). |
+| `ANTHROPIC_AUTH_TOKEN` | `@netscript/ai/anthropic` | First environment fallback when `apiKey` is omitted; bearer auth, or OAuth for an `sk-ant-oat` token. |
+| `ANTHROPIC_OAUTH_TOKEN` | `@netscript/ai/anthropic` | Second environment fallback; enables upstream Claude Code OAuth identity headers/system block. |
+| `ANTHROPIC_API_KEY` | `@netscript/ai/anthropic` | Final environment fallback when `apiKey` is omitted (via the wrapped `@tanstack/ai-anthropic` client). |
 | `OPENROUTER_API_KEY` | `@netscript/ai/openrouter` | When `apiKey` is omitted (exported as `OPENROUTER_API_KEY_ENV`). |
 
 > The `openai-compatible`, `openai-embeddings`, and `ollama` providers do **not** read the

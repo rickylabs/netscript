@@ -1,4 +1,10 @@
 import {
+  AGENT_DOCS_PAGE_CARRIER,
+  readAgentDocsPages,
+  renderAgentDocsPages,
+} from '../docs/agent-docs-page-carrier.ts';
+import { agentDocsFullCorpus } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
+import {
   assertEquals,
   assertNotEquals,
   assertRejects,
@@ -12,6 +18,7 @@ import {
   collectReleaseNotes,
   composeReleaseBody,
   formatClosedIssues,
+  isExactAgentDocsPageReplacement,
   isExactAgentDocsProvenanceReplacement,
   isExactVersionReplacement,
   isVersionOnlyReleaseDiff,
@@ -95,7 +102,7 @@ async function gunzipBytes(bytes: Uint8Array): Promise<Uint8Array> {
   return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
-const PAIR_PROSE_PATH = '.llm/assets/agent-docs/prose.json.gz';
+const PAIR_PROSE_PATH = AGENT_DOCS_PAGE_CARRIER;
 const PAIR_PROVENANCE_PATH = '.llm/assets/agent-docs/provenance.json';
 
 interface RenderedCanaryPairFixture {
@@ -121,7 +128,7 @@ async function createRenderedCanaryPairFixture(
   const output = join(root, '.llm', 'assets', 'agent-docs');
   const site = join(source, 'site');
   const bundle = join(source, 'bundle');
-  const prosePath = join(output, 'prose.json.gz');
+  const prosePath = join(output, 'agent-docs-prose.generated.ts');
   const provenancePath = join(output, 'provenance.json');
   const git = async (args: readonly string[], binary = false): Promise<string | Uint8Array> => {
     const result = await new Deno.Command('git', {
@@ -143,7 +150,9 @@ async function createRenderedCanaryPairFixture(
     );
     await Deno.writeTextFile(
       join(site, 'llms-full.txt'),
-      `# Full corpus\n\nInstall jsr:@netscript/cli@${version}. APIs use exact @${version} pins.\n`,
+      agentDocsFullCorpus({
+        'pages/index.md': `# Home\n\nThe package family uses exact @${version} pins.\n`,
+      }, version),
     );
     await Deno.writeTextFile(
       join(site, 'index.md'),
@@ -180,8 +189,16 @@ async function createRenderedCanaryPairFixture(
       preservedCorpusPath: prosePath,
     }, output);
 
-    await Deno.copyFile(prosePath, join(literal, PAIR_PROSE_PATH));
-    await Deno.copyFile(provenancePath, join(literal, PAIR_PROVENANCE_PATH));
+    const legacyProsePath = '.llm/assets/agent-docs/prose.json.gz';
+    const initialFiles = await readAgentDocsPages(prosePath, previousVersion);
+    const initialCompressed = await gzipJson({ schemaVersion: 1, files: initialFiles });
+    await Deno.writeFile(join(literal, legacyProsePath), initialCompressed);
+    await Deno.writeTextFile(
+      join(literal, PAIR_PROVENANCE_PATH),
+      JSON.stringify(await testAgentDocsProvenance(previousVersion, initialCompressed)),
+    );
+    await Deno.mkdir(join(root, 'packages/cli/src/kernel/assets'), { recursive: true });
+    await Deno.copyFile(prosePath, join(root, PAIR_PROSE_PATH));
     await Deno.writeTextFile(
       join(literal, 'packages', 'cli', 'deno.json'),
       JSON.stringify({ version: nextVersion }),
@@ -193,7 +210,7 @@ async function createRenderedCanaryPairFixture(
       [],
     );
     const literalRebaseSha256 = await sha256(
-      await gunzipBytes(await Deno.readFile(join(literal, PAIR_PROSE_PATH))),
+      await gunzipBytes(await Deno.readFile(join(literal, legacyProsePath))),
     );
 
     await git(['init', '--quiet']);
@@ -211,36 +228,21 @@ async function createRenderedCanaryPairFixture(
       extractionTimestamp: '2026-08-13T00:00:00Z',
       preservedCorpusPath: prosePath,
     }, output);
-    const renderedSha256 = await sha256(await gunzipBytes(await Deno.readFile(prosePath)));
+    const renderedSha256 = await sha256(
+      new TextEncoder().encode(
+        JSON.stringify({
+          schemaVersion: 1,
+          files: await readAgentDocsPages(prosePath, nextVersion),
+        }),
+      ),
+    );
 
     if (injectContentDrift) {
-      const raw = await gunzipBytes(await Deno.readFile(prosePath));
-      const payload = JSON.parse(new TextDecoder().decode(raw)) as TestAgentDocsPayload;
-      const files = { ...payload.files, 'llms.txt': `${payload.files['llms.txt']}\nDRIFT\n` };
-      const canonical = new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }));
-      const compressed = await gzipJson({ schemaVersion: 1, files });
-      const provenance = JSON.parse(
-        await Deno.readTextFile(provenancePath),
-      ) as AgentDocsProseProvenance;
-      await Promise.all([
-        Deno.writeFile(prosePath, compressed),
-        Deno.writeTextFile(
-          provenancePath,
-          `${
-            JSON.stringify(
-              {
-                ...provenance,
-                uncompressedBytes: canonical.byteLength,
-                compressedBytes: compressed.byteLength,
-                sha256: await sha256(canonical),
-              },
-              null,
-              2,
-            )
-          }\n`,
-        ),
-      ]);
+      const files = await readAgentDocsPages(prosePath, nextVersion);
+      files['llms.txt'] += '\nDRIFT\n';
+      await Deno.writeTextFile(prosePath, await renderAgentDocsPages(files));
     }
+    await Deno.copyFile(prosePath, join(root, PAIR_PROSE_PATH));
 
     await git(['add', 'deno.json', PAIR_PROSE_PATH, PAIR_PROVENANCE_PATH]);
     await git(['commit', '--quiet', '-m', 'stable cut']);
@@ -504,7 +506,7 @@ Deno.test('version-only diff accepts a realistic coordinated release cut and rej
         'deno.json',
         'deno.lock',
         'packages/a/deno.json',
-        '.llm/assets/agent-docs/prose.json.gz',
+        AGENT_DOCS_PAGE_CARRIER,
         '.llm/assets/agent-docs/provenance.json',
         'packages/cli/src/kernel/assets/agent-tools.generated.ts',
         'packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts',
@@ -654,8 +656,9 @@ Deno.test('parent canary evidence accepts a genuinely re-rendered version-derive
         PAIR_PROVENANCE_PATH,
       ),
     ) as TestAgentDocsProvenance;
-    assertNotEquals(beforeProvenance.sourceCommit, afterProvenance.sourceCommit);
-    assertNotEquals(beforeProvenance.extractionTimestamp, afterProvenance.extractionTimestamp);
+    assertEquals(beforeProvenance.sourceCommit, undefined);
+    assertEquals(afterProvenance.extractionTimestamp, undefined);
+    assertNotEquals(beforeProvenance.version, afterProvenance.version);
     assertNotEquals(
       fixture.literalRebaseSha256,
       fixture.renderedSha256,
@@ -713,6 +716,7 @@ Deno.test('parent canary evidence rejects semantically drifted rebuilt corpus co
 
 Deno.test('parent canary evidence distinguishes permission failure from content drift', async () => {
   const driftFixture = await createRenderedCanaryPairFixture(true);
+  const freshFixture = await createRenderedCanaryPairFixture(false);
   try {
     await assertRejects(
       () =>
@@ -723,8 +727,8 @@ Deno.test('parent canary evidence distinguishes permission failure from content 
 
     await assertRejects(
       () =>
-        verifyGreenCanaryPair('owner/repo', 'token', driftFixture.root, {
-          ...driftFixture.dependencies,
+        verifyGreenCanaryPair('owner/repo', 'token', freshFixture.root, {
+          ...freshFixture.dependencies,
           generatedOutputsFresh: () =>
             Promise.reject(
               new Deno.errors.PermissionDenied(
@@ -737,6 +741,7 @@ Deno.test('parent canary evidence distinguishes permission failure from content 
     );
   } finally {
     await driftFixture.dispose();
+    await freshFixture.dispose();
   }
 });
 
@@ -1230,4 +1235,69 @@ Deno.test('parseArgs: unknown flag and missing value are rejected', () => {
     'Unknown argument',
   );
   assertThrows(() => parseArgs(['v1.0.0', '--message']), Error, 'requires a value');
+});
+
+Deno.test('page canary provenance requires strict versions, page integrity and identical membership', async () => {
+  const before = JSON.stringify({ schemaVersion: 1, version: '0.0.7-canary.1' });
+  const after = JSON.stringify({ schemaVersion: 1, version: '0.0.7' });
+  const pages = await renderAgentDocsPages({ 'llms.txt': '## Task router\n' });
+  assertEquals(
+    await isExactAgentDocsPageReplacement(before, after, pages, pages, '0.0.7-canary.1', '0.0.7'),
+    true,
+  );
+  assertEquals(
+    await isExactAgentDocsPageReplacement(
+      before,
+      JSON.stringify({ schemaVersion: 1, version: '0.0.7', sourceCommit: 'forged' }),
+      pages,
+      pages,
+      '0.0.7-canary.1',
+      '0.0.7',
+    ),
+    false,
+  );
+  assertEquals(
+    await isExactAgentDocsPageReplacement(
+      before,
+      after,
+      pages,
+      pages.replace(/"[a-f0-9]{64}"/, '"' + '0'.repeat(64) + '"'),
+      '0.0.7-canary.1',
+      '0.0.7',
+    ),
+    false,
+  );
+  const changedMembership = await renderAgentDocsPages({
+    'llms.txt': '## Task router\n',
+    'extra.md': '# Extra\n',
+  });
+  assertEquals(
+    await isExactAgentDocsPageReplacement(
+      before,
+      after,
+      pages,
+      changedMembership,
+      '0.0.7-canary.1',
+      '0.0.7',
+    ),
+    false,
+  );
+});
+
+Deno.test('page replacement compares decoded contents after version normalization', async () => {
+  const previous = '0.0.7-canary.1';
+  const next = '0.0.7';
+  const before = JSON.stringify({ schemaVersion: 1, version: previous });
+  const after = JSON.stringify({ schemaVersion: 1, version: next });
+  const oldPages = await renderAgentDocsPages({ 'llms.txt': `NetScript ${previous}\n` });
+  const newPages = await renderAgentDocsPages({ 'llms.txt': `NetScript ${next}\n` });
+  assertEquals(
+    await isExactAgentDocsPageReplacement(before, after, oldPages, newPages, previous, next),
+    true,
+  );
+  const drift = await renderAgentDocsPages({ 'llms.txt': `NetScript ${next}\nChanged prose\n` });
+  assertEquals(
+    await isExactAgentDocsPageReplacement(before, after, oldPages, drift, previous, next),
+    false,
+  );
 });

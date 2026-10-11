@@ -4,11 +4,11 @@
 
 import { join } from '@std/path';
 
-import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { DbEngineRegistry } from '../../application/registries/db-engine-registry.ts';
 import type { DbEngine, DiscoveredDatabase, ResolvedTarget } from '../../domain/db-engine.ts';
+import { requireAppsettingsPath } from '../config/appsettings/appsettings-file.ts';
 
 /** Resolves database workspaces from project configuration. */
 export class DbWorkspaceResolver {
@@ -28,12 +28,10 @@ export class DbWorkspaceResolver {
    *
    * @param projectRoot - Absolute project root.
    * @returns Enabled and disabled database entries.
+   * @throws {ConfigNotFoundError} When `appsettings.json` is absent.
    */
   async discoverDatabases(projectRoot: string): Promise<readonly DiscoveredDatabase[]> {
-    const appsettingsPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
-    if (!(await this.fs.exists(appsettingsPath))) {
-      throw new ScaffoldValidationError('appsettings.json not found.', { projectRoot });
-    }
+    const appsettingsPath = await requireAppsettingsPath(this.fs, projectRoot);
 
     const raw = JSON.parse(await this.fs.readFile(appsettingsPath)) as unknown;
     const netScript = asRecord(asRecord(raw).NetScript);

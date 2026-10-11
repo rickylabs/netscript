@@ -37,6 +37,9 @@ the [quickstart](/quickstart/); every flag is:
 | `--cache-backend <backend>` | Shared cache backend: `redis`, `garnet`, or `deno-kv`. |
 | `--editor <editor>` | Editor config: `none`, `zed`, or `vscode`. |
 | `--no-aspire` | Skip the Aspire orchestration layer. |
+| `--no-agent` | Skip agent MCP configuration, skills, and guidance (including offline docs). |
+| `--host <host>` | Select `claude`, `vscode`, `opencode`, or `all` for agent installation; inferred when omitted. |
+| `--with-docs` | Opt in to the offline agent documentation corpus; ignored with `--no-agent`. |
 | `--no-git` | Skip `git init` after scaffolding. |
 | `--force` | Overwrite an existing target directory (default `false`). |
 | `--ci` | Non-interactive mode (default `false`). |
@@ -46,6 +49,13 @@ the [quickstart](/quickstart/); every flag is:
 | `--json` | Emit a single machine-readable JSON result (default `false`). |
 | `--from <preset>` | Apply a named scaffold preset. |
 
+Project init runs the existing agent installer after scaffolding by default, using the generated
+project root. Host detection honours project markers before the invoking environment and defaults
+to Claude Code; `--host` overrides detection. The deciding source is printed in text mode. Dry runs
+write no agent files, and `--json` retains its single scaffold result. Offline docs remain opt-in.
+The optional Aspire agent setup keeps its bounded timeout and reports a skip if unavailable.
+For an existing project, use `netscript agent init` to refresh integration idempotently.
+
 ## `agent` — install and run agent tooling
 
 `netscript agent` installs and runs the shared CLI × skills × MCP tooling. See
@@ -54,7 +64,7 @@ the [quickstart](/quickstart/); every flag is:
 
 | Command | Description |
 | --- | --- |
-| `netscript agent init` | Install NetScript MCP, consumer diagnostic tools, and the canonical skill bundle, add integrations for detected agent hosts, and apply editor setup to a new or existing project. Every host receives the canonical skill bundle under `.agents/skills/` and a marked NetScript section in `AGENTS.md`; Claude Code additionally writes `.mcp.json` and derives a mirror under `.claude/skills/`; the VS Code editor writes `.vscode/mcp.json`; the Zed editor writes `.zed/settings.json` `context_servers`. Flags: `--host <host>` (`claude`, `vscode`, or `all`); `--editor <editor>` (`none`, `zed`, or `vscode`, inferred from one existing editor directory when omitted); `--with-docs` installs the expanded exact-version corpus. Unsupported editors fail with manual-configuration guidance. |
+| `netscript agent init` | Install NetScript MCP, consumer diagnostic tools, and the canonical skill bundle, add integrations for detected agent hosts, and apply editor setup to a new or existing project. Every host receives the canonical skill bundle under `.agents/skills/` and a marked NetScript section in `AGENTS.md`; Claude Code additionally writes `.mcp.json`, the single `.claude/skills/repo-skills/SKILL.md` discovery bridge, and a `CLAUDE.md` import of `@AGENTS.md` while preserving existing instructions; the VS Code editor writes `.vscode/mcp.json`; the Zed editor writes `.zed/settings.json` `context_servers`; the OpenCode host edits `opencode.json`, or an existing `opencode.jsonc`, in place as JSONC (`netscript` and `aspire` MCP servers with explicit timeouts, `lsp.deno`, `formatter.deno`). Flags: `--host <host>` (`claude`, `vscode`, `opencode`, or `all`; when omitted, resolved from project markers, then the invoking environment, then the `claude` default, and the deciding source is printed); `--editor <editor>` (`none`, `zed`, or `vscode`, inferred from one existing editor directory when omitted); `--with-docs` installs the expanded exact-version corpus. Unsupported editors fail with manual-configuration guidance. |
 | `netscript agent mcp` | Start the stdio MCP server for an MCP client. Interactive use prints Zed/VS Code setup guidance; see [Agent tooling](/ai/agent-tooling/). Flags: `--endpoint <url>` (telemetry endpoint), `--project-root <path>`, `--docs-root <path>` (public documentation root). |
 | `netscript agent drift <sub>` | Manage evidence-gated agent drift records. The group itself prints help; `record` is its only subcommand. |
 
@@ -120,10 +130,19 @@ helper layer.
 
 | Command | Description |
 | --- | --- |
-| `netscript generate aspire` | Regenerate Aspire AppHost helpers from `appsettings.json`. Flag: `--project-root <path>`. |
+| `netscript generate aspire` | Regenerate the Aspire AppHost and helpers from authored root `appsettings.json`. Flags: `--project-root <path>`, `--check`, `--format <text\|json>` (check only). |
 | `netscript generate runtime-schemas` | Generate JSON Schema files for runtime config topics. Flags: `--project-root <path>`, `--dry-run`, `--force`, `--verbose`. |
 | `netscript generate plugins` | Authoritative command: run each installed plugin's declared runtime registry generator under the project configuration. The workers generator discovers project-authored top-level `workers/jobs/*.ts` modules independently of official samples, excluding declared helper files such as `job-tools.ts`. Flags: `--project-root <path>`, `--dry-run`, `--verbose`. |
+| `netscript generate routes` | Reconstruct `.generated/manifest.ts` and `.generated/routes.ts` from the Fresh application route tree without a Vite build. Flags: `--app <name>`, `--project-root <path>` (explicit Fresh application root). |
 | `netscript generate resource <resource>` | Generate a typed Fresh resource slice from a named query procedure. Required flag: `--procedure <path>`. Selection flags: `--client <service>`, `--app <name>`, `--project-root <path>`, `--route <path>`. Optional layers: `--form`, `--partial`, `--stream`. Application flags: `--dry-run`, `--force`, `--json`. |
+
+For route generation, `--project-root` selects an explicit Fresh application directory and takes
+precedence over `--app`. Otherwise, `--app` selects a workspace member under `apps/`; from inside
+an app, that app is inferred, and a workspace with one app selects it automatically. Multiple apps
+require a selector. Missing or unknown targets fail before generation. Run `netscript generate
+routes --app dashboard` after adding, moving, or removing route files. Repeated runs leave unchanged
+outputs untouched. The command regenerates only the two derived modules; it does not reconcile
+authored `router.ts` entries or page bindings. See [route lifecycle](/web-layer/route/).
 
 Generated registries are derived artifacts. Add or replace job modules in `workers/jobs/`, then run
 `netscript generate plugins`; do not hand-edit `.netscript/generated/**`. Removing the official
@@ -306,3 +325,46 @@ the bundle step fails, so `--no-bundle` is a size/behaviour trade-off rather tha
 | `netscript deploy logs <service>` | Show recent logs for a service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>` (default `./.deploy/windows`), `-n, --lines <n>` (default 50), `--errors` (show the error log instead of stdout), `--list` (list available log files), `-f, --follow` (tail the log). |
 | `netscript deploy uninstall [service]` | Stop and remove all registered Windows services, or one named service, from the service manager. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--no-stop`. |
 | `netscript deploy upgrade` | Build, sync, reinstall, and restart services in one step. Flags: `--deploy-dir <path>` (default `./.deploy/windows`), `--install-dir <path>`, `--servy-cli <path>`, `--skip-compile`, `--skip-install`, `--skip-start`, `--verbose`, `--dry-run`. |
+
+## Aspire generated-surface check
+
+Run `netscript generate aspire --check --project-root . --format json` to compare the selected
+AppHost, helpers and `.netscript/aspire-cli.ts` against their canonical generated bytes. The checker uses the same configuration
+selectors, template pipeline and formatter as `netscript generate aspire`. It does not invoke a
+project writer or format consumer files on disk. Root `appsettings.json` remains an authored authority;
+plugin install/remove owns plugin-reference reconciliation. Plugin install/remove and service
+add/remove own browser-auth wiring; generation reads the authored configuration and service sources
+without reconciling them. The AppHost's `aspire/package.json` is also project-owned: plugin,
+service and database mutation flows maintain its runtime dependencies, and `netscript service
+generate` repairs missing dependencies. Plain Aspire generation and inspection leave it unchanged.
+A current source inventory certifies generated bytes, not installed runtime dependencies or health.
+
+The JSON Schema ships as `@netscript/cli` asset `assets/schema/aspire-generated-surface.v1.json`.
+The version 1 report contains `version`, `generator`, `outputs`, `inputs`, `status`, `exitCode` and
+`drift`. Each inventory entry contains `generator`, a normalized project-relative `path`,
+`ownership` (`generated` for outputs, `authored` for inputs), and `digest` (`sha256:<hex>`). Output
+digests include the producer declaration and exact UTF-8 bytes. Input authorities include root
+`appsettings.json`, existing `netscript.config.ts`/`.js`/`.mjs`, and `deno.json`. Plugin metadata
+and transitive configuration imports are also used by the shared selector; the input list names its
+root authorities rather than promising a transitive dependency inventory.
+
+The generator owns `aspire/apphost.mts`, every leaf under `aspire/.helpers/`, and
+`.netscript/aspire-cli.ts`. SDK modules and Aspire settings are outside this command's output scope.
+Every selected output carries `// @netscript-generated public.generate.aspire`. Init and database,
+service and plugin mutations use the same producer declaration and canonical formatting. Regenerate
+once if existing outputs lack that declaration or canonical formatting.
+
+`status: current` exits 0. Missing outputs, extra helper leaves, a missing or foreign producer
+declaration, and byte drift produce `status: drift`, exit 1, with `missing`, `extra`, `ownership`
+and/or `bytes` findings. Linked files/directories, failed selection/rendering/formatting, permission
+failures and exceeded inspection limits produce `status: inspection-failure`, exit 1; this report
+certifies no outputs. Inspection findings include an optional `message` carrying the failure cause.
+Inspection configuration and metadata probes deny writes and subprocess launches. Normal generation
+retains recoverable degradation when a plugin metadata probe fails or times out. An
+inspection failure never retries through generation. The reader bounds each file to 16 MiB and the
+helper tree to 1,024 entries; rendering permits at most 256 outputs. Canonical formatting bounds
+the whole batch to 64 MiB of source characters, using one staging child and one Deno formatter.
+Staging stays outside the consumer project, including when inspection denies all writes.
+
+This command covers Aspire generation. Inspection of `generate plugins` registries and published
+Windows/Linux release smoke remain follow-up work under #1912.

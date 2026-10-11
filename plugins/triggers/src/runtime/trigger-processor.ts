@@ -1,3 +1,5 @@
+import { openTriggerRuntimeKv } from '@netscript/plugin-triggers-core/stores';
+import type { ChildHealthMonitor } from '@netscript/plugin/health';
 import type {
   FileWatchDefinition,
   ScheduledTriggerDefinition,
@@ -18,6 +20,8 @@ import { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
 
 /** Options for starting the background trigger processor runtime. */
 export type TriggerProcessorRuntimeOptions = Readonly<{
+  /** Optional child health monitor owned by generated runtime glue. */
+  health?: ChildHealthMonitor;
   signal?: AbortSignal;
   definitions?: readonly ProcessableTriggerDefinition[];
   processor?: TriggerProcessorPort;
@@ -31,43 +35,44 @@ export type TriggerProcessorRuntimeOptions = Readonly<{
 export async function startTriggerProcessorRuntime(
   options: TriggerProcessorRuntimeOptions = {},
 ): Promise<void> {
-  if (options.signal?.aborted) {
-    return;
-  }
-
-  const definitions = options.definitions ?? await loadProjectTriggerDefinitions();
-  const processor = options.processor ?? await createRuntimeTriggerProcessor({
-    kv: options.kv,
-    definitions,
-  });
-  const scheduler = options.scheduler ?? new CronTriggerSchedulerAdapter();
-  const fileWatcher = options.fileWatcher ?? new WatchersFileWatcherAdapter();
-
-  for (const definition of definitions) {
-    if (isScheduledTriggerDefinition(definition)) {
-      await scheduler.schedule(
-        definition.id,
-        definition,
-        async (event) => {
-          await processor.process(event, definition);
-        },
-      );
-    } else if (isFileWatchDefinition(definition)) {
-      await fileWatcher.watch(
-        definition,
-        async (event) => {
-          await processor.process(event, definition);
-        },
-      );
+  let processor: TriggerProcessorPort | undefined;
+  let scheduler: TriggerSchedulerPort | undefined;
+  let fileWatcher: FileWatcherPort | undefined;
+  try {
+    if (options.signal?.aborted) return;
+    const definitions = options.definitions ?? await loadProjectTriggerDefinitions();
+    options.health?.registryLoaded();
+    const kv = options.kv ?? (!options.processor ? await openTriggerRuntimeKv() : undefined);
+    if (kv) await kv.get(['netscript', 'child-health', 'triggers']);
+    processor = options.processor ?? await createRuntimeTriggerProcessor({ kv, definitions });
+    options.health?.dependenciesReady();
+    scheduler = options.scheduler ?? new CronTriggerSchedulerAdapter();
+    fileWatcher = options.fileWatcher ?? new WatchersFileWatcherAdapter();
+    const activeProcessor = processor;
+    for (const definition of definitions) {
+      if (isScheduledTriggerDefinition(definition)) {
+        await scheduler.schedule(definition.id, definition, async (event) => {
+          await activeProcessor.process(event, definition);
+        });
+      } else if (isFileWatchDefinition(definition)) {
+        await fileWatcher.watch(definition, async (event) => {
+          await activeProcessor.process(event, definition);
+        });
+      }
     }
+    options.health?.running();
+    await waitForAbort(options.signal);
+  } catch (cause) {
+    options.health?.failed();
+    throw cause;
+  } finally {
+    await Promise.all([
+      scheduler?.stop({ drainTimeoutMs: options.drainTimeoutMs }),
+      fileWatcher?.stop(),
+      processor?.stop({ drainTimeoutMs: options.drainTimeoutMs }),
+    ]);
+    if (options.signal?.aborted) options.health?.stopped();
   }
-
-  await waitForAbort(options.signal);
-  await Promise.all([
-    scheduler.stop({ drainTimeoutMs: options.drainTimeoutMs }),
-    fileWatcher.stop(),
-    processor.stop({ drainTimeoutMs: options.drainTimeoutMs }),
-  ]);
 }
 
 /** Start the trigger background processor using the shared runtime-launch verb. */

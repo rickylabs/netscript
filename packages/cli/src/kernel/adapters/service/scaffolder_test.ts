@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 /**
  * @module infra/service/scaffolder_test
  *
@@ -23,6 +24,8 @@ import { PortAllocator } from './port-allocator.ts';
 import { ServiceScaffolder } from './scaffolder.ts';
 import { ServiceWorkspaceResolver } from './workspace-resolver.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
+import { SERVICE_PUBLIC_REASON } from './auth-policy.ts';
+import { writeInstalledAuthFixture } from '../../../../tests/installed-auth-fixture.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
@@ -48,8 +51,8 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
     force: false,
   });
 
-  assertEquals(result.scaffoldResult.filesCreated.length, 5);
-  assertEquals(result.scaffoldResult.directoriesCreated.length, 3);
+  assertEquals(result.scaffoldResult.filesCreated.length, 9);
+  assertEquals(result.scaffoldResult.directoriesCreated.length, 6);
   assertEquals(result.configEntry.Port, undefined);
   assertEquals(result.configEntry.HostPort, undefined);
   assertEquals(result.configEntry.Workdir, 'services/orders');
@@ -66,13 +69,72 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
   const mainContent = await fs.readFile('/project/services/orders/src/main.ts');
   assertStringIncludes(mainContent, "port: parseInt(Deno.env.get('PORT') || '3000')");
   assertStringIncludes(mainContent, 'public: true');
-  assertStringIncludes(mainContent, '#1382 L2 will wire the guarded auth policy');
+  assertStringIncludes(mainContent, SERVICE_PUBLIC_REASON);
+});
+
+for (const hasDatabase of [false, true]) {
+  Deno.test(`ServiceScaffolder prepares ${hasDatabase ? 'database' : 'memory'} services with installed auth`, async () => {
+    const { fs, scaffolder, templateAdapter } = createHarness();
+    await writeInstalledAuthFixture(fs, '/project');
+    const result = await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
+      projectName: 'my-app',
+      targetPath: '/project',
+      serviceName: 'orders',
+      servicePort: 3000,
+      importMode: 'jsr',
+      force: false,
+      hasDatabase,
+    });
+    const main = await fs.readFile('/project/services/orders/src/main.ts');
+    assertStringIncludes(main, SERVICE_PUBLIC_REASON);
+    assertEquals(main.includes('public: true'), true);
+    assertEquals(main.includes('createScopeAuthorizer'), false);
+    assertEquals(main.includes('allowAnonymous:'), false);
+    assertEquals(main.includes('#1382'), false);
+    assertEquals(result.configEntry.PluginReferences, ['auth']);
+    await fs.writeFile('/project/services/orders/src/main.ts', '// authored service policy');
+    await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
+      projectName: 'my-app',
+      targetPath: '/project',
+      serviceName: 'orders',
+      servicePort: 3000,
+      importMode: 'jsr',
+      force: false,
+      hasDatabase,
+    });
+    assertEquals(
+      await fs.readFile('/project/services/orders/src/main.ts'),
+      '// authored service policy',
+    );
+  });
+}
+
+Deno.test('ServiceScaffolder records public policy when auth is disabled', async () => {
+  const { fs, scaffolder, templateAdapter } = createHarness();
+  await writeInstalledAuthFixture(fs, '/project');
+  const settings = JSON.parse(await fs.readFile('/project/appsettings.json'));
+  settings.NetScript.Plugins.auth.Enabled = false;
+  await fs.writeFile('/project/appsettings.json', JSON.stringify(settings));
+  const result = await new ServiceScaffolder(scaffolder, fs, templateAdapter).scaffold({
+    projectName: 'my-app',
+    targetPath: '/project',
+    serviceName: 'orders',
+    servicePort: 3000,
+    importMode: 'jsr',
+    force: false,
+  });
+  assertStringIncludes(
+    await fs.readFile('/project/services/orders/src/main.ts'),
+    SERVICE_PUBLIC_REASON,
+  );
+  assertEquals(result.configEntry.PluginReferences, undefined);
 });
 
 Deno.test('ServiceScaffolder writes canonical content for every generated service file', async () => {
   const { fs, scaffolder, templateAdapter } = createHarness();
   const formattedPaths: string[] = [];
   const formatter: GeneratedSourceFormatterPort = {
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (path, content) => {
       formattedPaths.push(path);
       return Promise.resolve(path.endsWith('.json') ? content : `// canonical\n${content}`);
@@ -95,6 +157,10 @@ Deno.test('ServiceScaffolder writes canonical content for every generated servic
     '/project/services/payments/src/router.ts',
     '/project/services/payments/src/routers/health.ts',
     '/project/services/payments/src/routers/v1.ts',
+    '/project/services/payments/src/domain/payments.ts',
+    '/project/services/payments/src/application/payments.ts',
+    '/project/services/payments/src/adapters/memory-payments-repository.ts',
+    '/project/services/payments/src/application/payments_test.ts',
   ]);
   assertEquals(
     (await fs.readFile('/project/services/payments/src/routers/v1.ts')).startsWith(
@@ -222,11 +288,11 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       ),
       Deno.writeTextFile(
         join(compileRoot, 'stubs', 'contracts.ts'),
-        'export const baseContract = { route: (_route: unknown) => ({ output: <T>(schema: T): T => schema }) };\n',
+        'export const baseContract = { route: (_route: unknown) => ({ meta(_meta: unknown) { return this; }, output: <T>(schema: T): T => schema }) };\n',
       ),
       Deno.writeTextFile(
         join(compileRoot, 'stubs', 'crud.ts'),
-        'export function createCrudContract(_options: unknown): Record<string, unknown> { return {}; }\n',
+        'export function createCrudContract(_options: unknown) { const procedure = { meta(_meta: unknown) { return this; } }; return { list: procedure, getById: procedure, create: procedure, update: procedure, delete: procedure }; }\n',
       ),
     ]);
     await writeCrudZodBarrel({ zodOutputDir, modelName: 'Cycle' });
@@ -246,17 +312,15 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
           '@orpc/server': './stubs/orpc.ts',
           '@netscript/contracts': './stubs/contracts.ts',
           '@netscript/contracts/crud': './stubs/crud.ts',
-          zod: 'npm:zod@^4.3.6',
+          zod: 'npm:zod@^4.6.5',
         },
       }),
     );
 
-    const checked = await new Deno.Command(Deno.execPath(), {
+    const checked = await checkGeneratedFiles({
       cwd: compileRoot,
       args: ['check', 'contracts/versions/v1/cycles.contract.ts'],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
   } finally {
     await Deno.remove(compileRoot, { recursive: true });
@@ -268,6 +332,7 @@ Deno.test('shared contract scaffolder canonicalizes the service contract and ver
   await fs.createDir('/project/contracts/versions/v1');
   const formattedPaths: string[] = [];
   const formatter: GeneratedSourceFormatterPort = {
+    formatContents: (files) => Promise.resolve(files.map((file) => file.content)),
     formatContent: (path, content) => {
       formattedPaths.push(path);
       return Promise.resolve(`// canonical\n${content}`);

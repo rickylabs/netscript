@@ -1,0 +1,24 @@
+{
+  "prisma": [
+    "deno.json",
+    "src/adapters/prisma-team-member-repository.ts",
+    "src/application/team-member.ts",
+    "src/domain/team-member.ts",
+    "src/domain/team-member_test.ts",
+    "src/main.ts",
+    "src/router.ts",
+    "src/routers/health.ts",
+    "src/routers/v1.ts"
+  ],
+  "memory": [
+    "deno.json",
+    "src/adapters/memory-team-members-repository.ts",
+    "src/application/team-members.ts",
+    "src/application/team-members_test.ts",
+    "src/domain/team-members.ts",
+    "src/main.ts",
+    "src/router.ts",
+    "src/routers/health.ts",
+    "src/routers/v1.ts"
+  ]
+}

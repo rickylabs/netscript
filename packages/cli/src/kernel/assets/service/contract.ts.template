@@ -37,12 +37,23 @@ export type {{serviceName | pascalCase}}{{modelName}}UpdateInputV1 = z.infer<
   typeof {{serviceName | pascalCase}}{{modelName}}UpdateInputSchemaV1
 >;
 
-export const {{serviceName | pascalCase}}CrudContractV1 = createCrudContract({
+const demoCrud = createCrudContract({
   resource: '{{serviceName}}',
   entitySchema: {{serviceName | pascalCase}}{{modelName}}SchemaV1,
   createSchema: {{serviceName | pascalCase}}{{modelName}}CreateInputSchemaV1,
   updateSchema: {{serviceName | pascalCase}}{{modelName}}UpdateInputSchemaV1,
 });
+
+// These seeded showcase procedures are intentionally public on REST and RPC.
+// .meta() drops CRUD's phantom __netscriptSchemas and narrowed ~orpc schema types.
+// Restore those unchanged input/output refinements after changing only access metadata.
+export const {{serviceName | pascalCase}}CrudContractV1 = {
+  list: demoCrud.list.meta({ access: { authentication: 'none' } }) as typeof demoCrud.list,
+  getById: demoCrud.getById.meta({ access: { authentication: 'none' } }) as typeof demoCrud.getById,
+  create: demoCrud.create.meta({ access: { authentication: 'none' } }) as typeof demoCrud.create,
+  update: demoCrud.update.meta({ access: { authentication: 'none' } }) as typeof demoCrud.update,
+  delete: demoCrud.delete.meta({ access: { authentication: 'none' } }) as typeof demoCrud.delete,
+};
 
 /**
  * {{serviceName | pascalCase}} contract — Version 1.
@@ -50,9 +61,17 @@ export const {{serviceName | pascalCase}}CrudContractV1 = createCrudContract({
  * Extend this with your own procedures as the service grows.
  */
 export const {{serviceName | pascalCase}}ContractV1 = {
+  // Request-time identity proof; demo data procedures below remain public.
+  // Access metadata describes guarded posture. An explicit service-wide public opt-out
+  // skips those guards: session returns 200 with authenticated: false without a principal.
+  session: baseContract
+    .route({ method: 'POST', path: '/{{serviceName}}/session' })
+    .meta({ access: { authentication: 'required' } })
+    .output(z.object({ authenticated: z.boolean() })),
   health: {
     check: baseContract
       .route({ method: 'GET', path: '/{{serviceName}}/health' })
+      .meta({ access: { authentication: 'none' } })
       .output({{serviceName | pascalCase}}HealthSchemaV1),
   },
   ...{{serviceName | pascalCase}}CrudContractV1,

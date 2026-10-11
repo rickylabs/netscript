@@ -38,7 +38,10 @@ export const NETSCRIPT_WEB_RUNTIME_EXPORTS = {
     './query',
     './query-client',
     './streams',
+    './streams/consumer',
     './telemetry',
+    './streams/collections',
+    './streams/react',
   ],
 } as const;
 

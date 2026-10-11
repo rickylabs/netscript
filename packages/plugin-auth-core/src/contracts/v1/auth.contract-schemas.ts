@@ -87,12 +87,10 @@ export const CallbackInputSchema: AuthSchema<CallbackInput> = CallbackInputZodSc
 
 export const CallbackResponseZodSchema: z.ZodObject<{
   completed: z.ZodBoolean;
-  sessionId: z.ZodOptional<z.ZodString>;
   redirectTo: z.ZodOptional<z.ZodString>;
   subject: z.ZodOptional<z.ZodString>;
 }> = z.object({
   completed: z.boolean(),
-  sessionId: z.string().optional(),
   redirectTo: z.string().optional(),
   subject: z.string().optional(),
 });

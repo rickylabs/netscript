@@ -542,6 +542,7 @@ export class SagaEngine implements SagaBusPort {
     const envelope: SagaStateEnvelope = Object.freeze({
       metadata: Object.freeze({
         instanceId: input.instanceId,
+        sagaId: input.definition.id,
         version: nextVersion,
         status: input.status,
         durability: input.definition.durability,
@@ -583,9 +584,9 @@ export class SagaEngine implements SagaBusPort {
         ...(appliedKeyHash === undefined ? {} : { appliedKeyHash }),
       })).committed;
     }
-    await this.#store.save(envelope, { expectedVersion: input.expectedVersion });
-    await this.#store.saveCorrelation(correlation);
-    await this.#store.appendTransition(input.instanceId, record);
+    await this.#store.save(envelope, { expectedVersion: input.expectedVersion, correlation });
+    await this.#store.saveCorrelation(correlation, envelope);
+    await this.#store.appendTransition(input.instanceId, record, envelope);
     return true;
   }
 
@@ -681,7 +682,7 @@ function toCompensationError(error: unknown): SagaCompensationError {
 
 function telemetryOutcomeFromStatus(status: SagaInstanceStatus): SagaTelemetryOutcome {
   if (status === 'failed') return SagaTelemetryOutcomes.ERROR;
-  if (status === 'compensating') return SagaTelemetryOutcomes.COMPENSATED;
+  if (status === 'compensated') return SagaTelemetryOutcomes.COMPENSATED;
   return SagaTelemetryOutcomes.SUCCESS;
 }
 

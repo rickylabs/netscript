@@ -5,6 +5,7 @@
  */
 
 import { join } from '@std/path';
+import { toKebabCase } from '@std/text';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
@@ -15,6 +16,7 @@ import type { ServiceScaffoldOptions, ServiceScaffoldResult } from '../../domain
 import { TEMPLATE_KEYS, type TemplateKey } from '../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../templates/template-asset.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
+import { readAuthServiceName, serviceAuthTemplate } from './auth-policy.ts';
 
 /** Creates a complete service workspace under `services/<name>/`. */
 export class ServiceScaffolder {
@@ -50,11 +52,17 @@ export class ServiceScaffolder {
     await this.createDir(srcDir, directoriesCreated);
     await this.createDir(routersDir, directoriesCreated);
 
+    const authServiceName = await readAuthServiceName(options.targetPath, this._fs);
+    const entityName = toKebabCase(
+      options.hasDatabase ? (options.modelName ?? options.serviceName) : options.serviceName,
+    );
     const templateVars = {
+      entityName,
       serviceName: options.serviceName,
       modelName: options.modelName ?? '',
       projectName: options.projectName,
       servicePort: String(options.servicePort),
+      ...serviceAuthTemplate(),
     };
     await this.writeGenerated(
       join(serviceDir, SCAFFOLD_FILES.DENO_JSON),
@@ -65,6 +73,7 @@ export class ServiceScaffolder {
         localBase: options.localBase,
         packagesAsWorkspaceMembers: options.packagesAsWorkspaceMembers,
         hasDatabase: options.hasDatabase,
+        authServiceName,
       }),
       options.force,
       filesCreated,
@@ -103,6 +112,33 @@ export class ServiceScaffolder {
       filesSkipped,
     );
 
+    const layers: readonly [string, TemplateKey][] = options.hasDatabase
+      ? [
+        [`domain/${entityName}.ts`, TEMPLATE_KEYS.serviceDomainEntity],
+        [`application/${entityName}.ts`, TEMPLATE_KEYS.serviceApplicationEntity],
+        [`adapters/prisma-${entityName}-repository.ts`, TEMPLATE_KEYS.servicePrismaRepository],
+        [`domain/${entityName}_test.ts`, TEMPLATE_KEYS.serviceDomainEntityTest],
+      ]
+      : [
+        [`domain/${entityName}.ts`, TEMPLATE_KEYS.serviceDomainEntityMemory],
+        [`application/${entityName}.ts`, TEMPLATE_KEYS.serviceApplicationEntityMemory],
+        [`adapters/memory-${entityName}-repository.ts`, TEMPLATE_KEYS.serviceMemoryRepository],
+        [`application/${entityName}_test.ts`, TEMPLATE_KEYS.serviceApplicationEntityMemoryTest],
+      ];
+    for (const role of ['domain', 'application', 'adapters']) {
+      await this.createDir(join(srcDir, role), directoriesCreated);
+    }
+    for (const [path, template] of layers) {
+      await this.writeRendered(
+        template,
+        join(srcDir, path),
+        templateVars,
+        options.force,
+        filesCreated,
+        filesSkipped,
+      );
+    }
+
     const scaffoldResult: ScaffoldResult = {
       filesCreated,
       directoriesCreated,
@@ -121,6 +157,7 @@ export class ServiceScaffolder {
         ...(options.hostPort !== undefined ? { HostPort: options.hostPort } : {}),
         Entrypoint: 'src/main.ts',
         Workdir: `${SCAFFOLD_DIRS.SERVICES}/${options.serviceName}`,
+        ...(authServiceName ? { PluginReferences: [authServiceName] } : {}),
         ...(options.serviceReferences?.length
           ? { ServiceReferences: [...options.serviceReferences] }
           : {}),

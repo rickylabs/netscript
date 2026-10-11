@@ -13,7 +13,7 @@ Deno.test({
           'run',
           '--no-lock',
           '-A',
-          'npm:prisma@7.8.0',
+          'npm:prisma@7.10.0',
           'generate',
           '--schema',
           temp + '/schema.prisma',
@@ -37,7 +37,7 @@ Deno.test({
         temp + '/deno.json',
         JSON.stringify({
           compilerOptions: { strict: true, isolatedDeclarations: false },
-          imports: { '@prisma/client': 'npm:@prisma/client@7.8.0' },
+          imports: { '@prisma/client': 'npm:@prisma/client@7.10.0' },
         }),
       );
       const filter = Deno.env.get('COMMAND_POSTGRES_TEST_FILTER');

@@ -15,3 +15,5 @@ export type {
   StreamSchemaResult,
   StreamStateDefinition,
 } from './schema.ts';
+
+export type { StreamCollection, StreamDBFactory } from '@netscript/plugin-streams-core';

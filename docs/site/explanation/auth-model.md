@@ -138,7 +138,7 @@ Under non-interactive backends (WorkOS and better-auth), NetScript enforces a st
 When a backend cannot do something its sub-port nominally exposes, it does not return `undefined`,
 log a warning, or no-op. It throws a **typed** `AuthBackendOperationUnsupportedError(name, op,
 reason)` — naming the backend, the operation, and why. This is the same fail-loud discipline the
-rest of the framework follows (streams helpers throw `StreamUnsupportedOperationError`): an
+rest of the framework follows for backend capability failures: an
 unsupported capability is a *visible, typed boundary*, never a quiet surprise in production.
 
 {{ comp.tabbedCode({ tabs: [
@@ -246,5 +246,24 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
 - **Reference:** the neutral authentication contract lives in
   [`reference/service/`](/reference/service/) (the `/auth` subpath: `Principal`, `AuthnResult`,
   `AuthenticatorPort`).
+
+## Generated browser topology
+
+The generated Fresh app uses a backend for frontend (BFF). Installing auth emits
+app-origin signin, callback, session, and signout routes backed by the existing
+auth plugin. The first-party HttpOnly cookie carries the opaque session
+credential. The app reads it only on the server and supplies it to the SDK
+bearer contribution for each guarded service call; the service verifies the
+bearer through the remote auth authenticator. Browser JSON excludes session
+credentials, and credentialed calls use direct-only caching.
+
+The generated demo procedures declare `access: { authentication: 'none' }` and
+remain public on REST and RPC. The generated service policy also leaves
+`/api/openapi.json` and `/api/docs` public for discovery; other API routes require
+a bearer and a contract authorization decision. Authored policies and routes remain authoritative. Background
+processing belongs to workers, sagas, and triggers using service identities. See
+[Add authentication](/identity-access/how-to/add-authentication/) for the
+generated route and client recipe, local cookie behavior, and deployment
+limitations.
 
 {{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next: { label: "Durability model", href: "/explanation/durability-model/" } }) }}

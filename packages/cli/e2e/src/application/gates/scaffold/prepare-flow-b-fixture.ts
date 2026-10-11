@@ -4,6 +4,7 @@ import {
   locateWorkersResourceBlock,
 } from './locate-workers-resource-block.ts';
 import { prepareLocalSourceFixture } from './local-source-fixture.ts';
+import { installGeneratedProbe } from './install-generated-probe.ts';
 
 const projectRoot = Deno.args[0];
 if (!projectRoot) {
@@ -57,9 +58,9 @@ const publishedImports = {
 };
 const sharedNpmImports = {
   '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
-  '@orpc/client': 'npm:@orpc/client@^1.14.6',
-  '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
-  '@orpc/otel': 'npm:@orpc/otel@^1.14.7',
+  '@orpc/client': 'npm:@orpc/client@^1.15.5',
+  '@orpc/contract': 'npm:@orpc/contract@^1.15.5',
+  '@orpc/otel': 'npm:@orpc/otel@^1.15.5',
 };
 const localSourcePackages = [
   [
@@ -461,9 +462,13 @@ await Deno.writeTextFile(
   warmupEntrypoint,
   `import ${JSON.stringify(servicesEntrypoint)};\n`,
 );
+await installGeneratedProbe(projectRoot, [warmupEntrypoint]);
 const warm = await new Deno.Command('deno', {
   args: [
     'cache',
+    '--lock',
+    `${projectRoot}/deno.lock`,
+    '--frozen',
     '--minimum-dependency-age=0',
     '--config',
     flowBConfigPath,

@@ -2,6 +2,7 @@ import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-stat
 import { DATABASE, type DatabaseEngine } from '../../../domain/extension-axes.ts';
 import { GATE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
+import { createAuthCookieJarGate } from './auth-cookie-jar-gate.ts';
 import { createAspireMcpSmokeGate } from './aspire-mcp-smoke.ts';
 import {
   createBehaviorPluginHealthGates,
@@ -18,6 +19,8 @@ import { createGeneratedPluginCheckGates } from './generated-plugins-check-gate.
 import { createGeneratedQualityGates } from './generated-quality-gate.ts';
 import { createOtelGates } from './otel-gates.ts';
 import { createGeneratedGuardedPluginGate } from './generated-guarded-plugin-gate.ts';
+import { createGeneratedAuthGates } from './generated-auth-gates.ts';
+import { createGeneratedGuardedServiceGate } from './generated-guarded-service-gate.ts';
 import { createPluginContractGates } from './plugin-contract-gates.ts';
 import {
   createCleanupGates,
@@ -25,6 +28,7 @@ import {
   createRuntimeGates,
 } from './runtime-gates.ts';
 import { createRuntimeBehaviorGates } from './runtime/behavior-gates.ts';
+import { createCredentialReadinessGates } from './runtime/credential-readiness-gates.ts';
 import {
   createListenerReadinessGates,
   createTypedDbPhaseBGate,
@@ -68,11 +72,15 @@ export function createScaffoldCapabilityGates(
     ...runtimeGates.slice(startIndex + 1),
     createAspireMcpSmokeGate(),
     ...createListenerReadinessGates(database),
+    ...createCredentialReadinessGates(),
     createTypedDbPhaseBGate(),
     ...createRuntimeBehaviorGates(database),
     ...createBehaviorPluginHealthGates(),
     ...createPackageBackedPluginDoctorGates(),
     createGeneratedGuardedPluginGate(),
+    createGeneratedGuardedServiceGate(),
+    ...createGeneratedAuthGates(),
+    createAuthCookieJarGate(),
     ...createOtelGates(),
     // Registration only — the suite gate lists in `capability-suites.ts` decide
     // where the fixture and the verification run relative to AppHost start.

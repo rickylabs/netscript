@@ -2,7 +2,11 @@ import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert
 import { fromFileUrl, join } from '@std/path';
 import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
-import { readTemplateAsset, readTemplateAssetSync, renderTemplateAssetSync } from './template-asset.ts';
+import {
+  readTemplateAsset,
+  readTemplateAssetSync,
+  renderTemplateAssetSync,
+} from './template-asset.ts';
 
 const PACKAGE_ROOT = fromFileUrl(new URL('../../../../', import.meta.url));
 const ASSET_ROOT = join(PACKAGE_ROOT, 'src/kernel/assets');
@@ -40,6 +44,7 @@ Deno.test('template asset adapter renders existing template pipes', () => {
   const content = renderTemplateAssetSync(TEMPLATE_KEYS.serviceRouter, {
     projectName: 'my-app',
     serviceName: 'user-profiles',
+    entityName: 'user-profiles',
     servicePort: '3001',
   });
 

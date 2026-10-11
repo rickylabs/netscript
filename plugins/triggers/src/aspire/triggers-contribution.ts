@@ -144,7 +144,10 @@ export class TriggersAspireContribution {
     };
   }
 
-  /** Declare health checks used by plugin doctor commands. */
+  /**
+   * Legacy health declarations; production does not consume this hook.
+   * @deprecated Since 0.0.8; removal next release. Use generated AppHost child probes and payloads.
+   */
   declareHealthChecks(ctx: TriggersContributionContext): readonly TriggersHealthCheckSpec[] {
     const apiPort = ctx.port(TRIGGERS_API_SERVICE_NAME);
     return [{

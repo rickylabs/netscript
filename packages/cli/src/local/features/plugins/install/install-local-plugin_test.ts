@@ -1,3 +1,5 @@
+import { checkGeneratedFiles } from '../../../../../../../.llm/tools/testing/check-generated-files.ts';
+import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { dirname, join, resolve } from '@std/path';
@@ -71,6 +73,7 @@ describe('local contributor install plugin flow', () => {
     }, {
       fs,
       scaffolder,
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       templateAdapter,
       registry,
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
@@ -111,6 +114,7 @@ describe('local contributor install plugin flow', () => {
     }, {
       fs,
       scaffolder,
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       templateAdapter,
       registry,
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
@@ -157,6 +161,7 @@ describe('local contributor install plugin flow', () => {
     }, {
       fs,
       scaffolder,
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       templateAdapter,
       registry,
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
@@ -229,6 +234,7 @@ describe('local contributor install plugin flow', () => {
         }, {
           fs,
           scaffolder,
+          formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
           templateAdapter,
           registry,
           pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
@@ -270,12 +276,15 @@ describe('local contributor install plugin flow', () => {
         jsx: 'precompile',
         jsxImportSource: 'preact',
       });
-      const check = await new DenoProcess().exec(
-        'deno',
-        ['check', '--unstable-kv', './ai/routes/chat.tsx'],
-        { cwd: projectRoot },
+      const check = await checkGeneratedFiles({
+        args: ['check', '--unstable-kv', './ai/routes/chat.tsx'],
+        cwd: projectRoot,
+      });
+      assertEquals(
+        check.code,
+        0,
+        new TextDecoder().decode(check.stderr) || new TextDecoder().decode(check.stdout),
       );
-      assertEquals(check.code, 0, check.stderr || check.stdout);
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -294,6 +303,7 @@ describe('local contributor install plugin flow', () => {
         new StringTemplateAdapter(new MemoryFileSystemAdapter()),
         new MemoryFileSystemAdapter(),
       ),
+      formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       templateAdapter: new StringTemplateAdapter(new MemoryFileSystemAdapter()),
       pluginScaffolder: {} as PluginScaffolder,
       registryScaffolder: {} as PluginRegistryScaffolder,

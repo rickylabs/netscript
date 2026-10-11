@@ -4,6 +4,8 @@
  * @module
  */
 
+import type { QueryClientPort } from './query-client.ts';
+
 import type {
   ContractLike,
   ContractProcedureLike,
@@ -91,8 +93,19 @@ export type ServiceProcedureQueryOptions<
 export interface ServiceProcedureQueryResult<TOutput> {
   /** Full query key tagged by the utility implementation. */
   readonly queryKey: readonly unknown[];
-  /** Query function that invokes the service procedure. */
-  readonly queryFn: (context: never) => Promise<TOutput> | TOutput;
+  /**
+   * Query function that invokes the service procedure with TanStack cancellation.
+   * Derive its context from the existing query-client port; ordinary queries
+   * do not require the infinite-query page parameter or direction.
+   */
+  readonly queryFn: (
+    context: Omit<
+      Parameters<
+        Exclude<NonNullable<Parameters<QueryClientPort['fetchQuery']>[0]['queryFn']>, symbol>
+      >[0],
+      'pageParam' | 'direction'
+    >,
+  ) => Promise<TOutput> | TOutput;
   /** Whether the query should run. */
   readonly enabled?: boolean;
   /** Cache freshness window in milliseconds. */

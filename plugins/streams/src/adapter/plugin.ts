@@ -29,7 +29,7 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
     return [
       textArtifact(
         'streams/plugin.ts',
-        `/** Generated streams control-plane module. */\n\nexport { streamsPlugin } from '@netscript/plugin-streams';\n`,
+        `/** Generated streams control-plane module. Storage is ephemeral by default; opt in through NetScript.Plugins.streams.Environment.STREAMS_DATA_DIR with an existing persistent directory. */\n\nexport { streamsPlugin } from '@netscript/plugin-streams';\n`,
       ),
     ];
   },
@@ -54,7 +54,7 @@ export const streamsStarterResources: readonly InstallStarterResource[] = [
 export const streamsAdapterPlugin: NetScriptPlugin = {
   name: '@netscript/plugin-streams',
   kind: 'streams',
-  displayName: 'Durable Streams',
+  displayName: 'Streams (ephemeral by default)',
   install: {
     dependencySpecifier: `jsr:@netscript/plugin-streams@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: streamsStarterResources,
@@ -67,7 +67,7 @@ export const streamsAdapterPlugin: NetScriptPlugin = {
   },
   info: {
     capabilities: [
-      'durable stream producers',
+      'Durable Streams protocol producers; ephemeral storage by default',
       'stream service endpoints',
       'Aspire service contribution',
       'streams E2E probes',

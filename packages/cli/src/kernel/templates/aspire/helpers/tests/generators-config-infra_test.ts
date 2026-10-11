@@ -159,7 +159,7 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'createEndpointListenerReadinessCheck');
     assertStringIncludes(
       output,
-      "import { type CacheWiring, createEndpointListenerReadinessCheck, ensureDatabasePassword, resolveDataPath } from './_aspire-compat.mts'",
+      "import { type CacheWiring, createEndpointListenerReadinessCheck, createPostgresCredentialReadinessCheck, ensureDatabasePassword, resolveDataPath } from './_aspire-compat.mts'",
     );
   });
 

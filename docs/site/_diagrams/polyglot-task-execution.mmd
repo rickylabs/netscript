@@ -1,14 +1,12 @@
 %% Source for assets/diagrams/polyglot-task-execution.svg
-%% Rendered to a committed static SVG by the SEPARATE dev task in render.ts.
-%% This file is NOT consumed by `deno task build`; the site ships the SVG only.
-%% IPC reality: the handler spawns a subprocess and passes input as command-line
-%% argv + env vars (TRACEPARENT / CORRELATION_ID injected via env). Output is a
-%% JSON object parsed from the LAST line of stdout. There is NO stdin channel.
+%% Render separately with the pinned Mermaid CLI; the site ships the static SVG.
+%% Stdin is runtime-only: direct executor input, not persisted queue metadata.
 flowchart LR
-  worker["Worker runtime<br/>(enqueues task)"] --> handler["TS handler<br/>(task handler)"]
+  worker["Worker runtime<br/>(queued task metadata)"] --> handler["Task executor"]
+  caller["Direct executor call"] -- "optional private stdin" --> handler
   subgraph subprocess
     proc["deno / python / dotnet<br/>cmd / powershell / shell / exe<br/>(spawned process)"]
   end
-  handler -- "spawn &middot; in: argv + env vars" --> proc
-  proc -- "out: last stdout line &rarr; JSON object" --> handler
+  handler -- "spawn &middot; argv + env + optional stdin" --> proc
+  proc -- "last stdout line &rarr; JSON object" --> handler
   handler -- "result" --> sink["Queue / DB<br/>(persist result)"]

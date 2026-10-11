@@ -1,0 +1,32 @@
+/** Prisma implementation of the {{modelName}} repository port. */
+import type { PrismaClient } from '@database';
+import type { {{serviceName | pascalCase}}Repository } from '../application/{{entityName}}.ts';
+
+type Delegate = PrismaClient['{{modelName | camelCase}}'];
+type FindManyArgs = NonNullable<Parameters<Delegate['findMany']>[0]>;
+
+async function missingAsNull<T>(operation: () => Promise<T>): Promise<T | null> {
+  try {
+    return await operation();
+  } catch (error) {
+    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2025') {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export function createPrisma{{serviceName | pascalCase}}Repository(database: PrismaClient): {{serviceName | pascalCase}}Repository {
+  const delegate = database.{{modelName | camelCase}};
+  return {
+    async list(query) {
+      const args = query satisfies FindManyArgs;
+      const [data, total] = await Promise.all([delegate.findMany(args), delegate.count()]);
+      return { data, total };
+    },
+    getById: (id) => delegate.findUnique({ where: { id } }),
+    create: (input) => delegate.create({ data: input }),
+    update: (id, input) => missingAsNull(() => delegate.update({ where: { id }, data: input })),
+    delete: (id) => missingAsNull(() => delegate.delete({ where: { id } })),
+  };
+}

@@ -15,7 +15,7 @@ import { delay } from 'jsr:@std/async@1/delay';
 import { ensureDir } from 'jsr:@std/fs@1/ensure-dir';
 import { exists } from 'jsr:@std/fs@1/exists';
 import { dirname, fromFileUrl, join, resolve } from 'jsr:@std/path@1';
-import { Command } from 'jsr:@cliffy/command@1.0.0';
+import { Command } from 'jsr:@cliffy/command@^1.3.1';
 
 type OutputFormat = 'ndjson' | 'json' | 'pretty';
 type StepKind = 'command' | 'http' | 'tcp' | 'sleep' | 'summary';

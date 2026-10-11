@@ -90,3 +90,11 @@ export interface TracedMessageContext extends MessageContext {
   /** Parent context extracted from message headers. */
   readonly parentContext?: Context;
 }
+
+/**
+ * Context delivered by TracedQueue.listen, with its current consumer span guaranteed.
+ */
+export interface TracedQueueMessageContext extends TracedMessageContext {
+  /** Span representing the current queue message processing operation. */
+  readonly span: Span;
+}

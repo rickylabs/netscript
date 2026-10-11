@@ -40,6 +40,8 @@ export type {
   TaskLogEntry,
   TaskResult,
   TaskRuntimeAdapterLike,
+  TaskStdin,
+  TaskStdinJson,
   TaskType,
   WorkerTaskPermissionField,
   WorkerTaskPermissions,

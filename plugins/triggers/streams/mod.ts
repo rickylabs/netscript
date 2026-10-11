@@ -71,3 +71,13 @@ export type {
   TriggerStreamCollectionHelpers,
   TriggerStreamEntity,
 } from './schema.ts';
+
+export type { StreamCollection, StreamDBFactory } from '@netscript/plugin-streams-core';
+
+export type {
+  CollectionDefinition,
+  StreamSchemaIssue,
+  StreamSchemaValidationOptions,
+  StreamSchemaValidationResult,
+  StreamStandardSchema,
+} from '@netscript/plugin-streams-core';

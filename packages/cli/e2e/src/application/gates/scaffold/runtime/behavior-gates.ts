@@ -101,6 +101,30 @@ export function createRuntimeBehaviorGates(
 ): readonly GateDefinition[] {
   return [
     commandGate(
+      GATE.BEHAVIOR_BACKGROUND_CHILDREN_HEALTH,
+      'Background children report registry and dependency readiness',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-run=aspire',
+        '--allow-net=localhost,127.0.0.1',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-background-children.ts`,
+        context.project.appHost,
+      ],
+    ),
+    commandGate(
+      GATE.BEHAVIOR_STREAMS_HEALTH,
+      'Streams dependency readiness',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(context, 'streams', '/health/ready', {
+          method: 'GET',
+          expectStatus: 200,
+          expectBody: { kind: 'json-equals', value: { ready: true } },
+        }),
+    ),
+    commandGate(
       GATE.BEHAVIOR_DB_STATUS_PRESERVES_APPHOST,
       'DB status preserves resident AppHost identity',
       GATE_PHASE.BEHAVIOR,
@@ -224,6 +248,25 @@ export function createRuntimeBehaviorGates(
       GATE_PHASE.BEHAVIOR,
       (context) => pluginProbeCommand(context, 'sagas-api', 'get', '/health/live'),
     ),
+    ...(database === DATABASE.POSTGRES
+      ? [{
+        ...commandGate(
+          GATE.BEHAVIOR_SAGAS_PUBLISH_PROCESS,
+          'Saga provider-borrowing HTTP/PostgreSQL conformance (repository fixtures)',
+          GATE_PHASE.BEHAVIOR,
+          (context) => [
+            'deno',
+            'run',
+            '--allow-read',
+            '--allow-run=aspire,deno',
+            `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-saga-publish-process.ts`,
+            context.project.appHost,
+            context.project.repoRoot,
+          ],
+        ),
+        critical: false,
+      }]
+      : []),
     commandGate(
       GATE.BEHAVIOR_SAGAS_LIST,
       'List saga definitions',
@@ -293,6 +336,38 @@ export function createRuntimeBehaviorGates(
           '/api/v1/auth/session',
           AUTH_SESSION_UNAUTHENTICATED_CONTRACT,
         ),
+    ),
+    commandGate(
+      GATE.BEHAVIOR_AUTH_ME_UNAUTHENTICATED,
+      'Auth me introspection serves exactly 200 { authenticated: false } without a session',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(
+          context,
+          'auth',
+          '/api/v1/auth/me',
+          AUTH_SESSION_UNAUTHENTICATED_CONTRACT,
+        ),
+    ),
+    commandGate(
+      GATE.BEHAVIOR_AUTH_SIGNOUT_UNAUTHENTICATED,
+      'Resident AppHost auth REST signout refuses anonymous requests',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(context, 'auth', '/api/v1/auth/signout', {
+          method: 'POST',
+          expectStatus: 401,
+        }),
+    ),
+    commandGate(
+      GATE.BEHAVIOR_AUTH_RPC_UNAUTHENTICATED,
+      'Resident AppHost auth RPC signout refuses anonymous requests',
+      GATE_PHASE.BEHAVIOR,
+      (context) =>
+        pluginExchangeCommand(context, 'auth', '/api/rpc/v1/auth/signout', {
+          method: 'POST',
+          expectStatus: 401,
+        }),
     ),
     commandGate(
       GATE.BEHAVIOR_APP_HOME,

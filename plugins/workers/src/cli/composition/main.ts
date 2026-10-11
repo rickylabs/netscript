@@ -22,6 +22,8 @@ export type {
   TaskExecutionOptions,
   TaskLogEntry,
   TaskResult,
+  TaskStdin,
+  TaskStdinJson,
   WorkerTaskPermissionField,
   WorkerTaskPermissions,
 } from '@netscript/plugin-workers-core/executor';

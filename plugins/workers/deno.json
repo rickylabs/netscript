@@ -32,8 +32,8 @@
     "@std/async": "jsr:@std/async@^1",
     "@std/path": "jsr:@std/path@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
-    "hono": "jsr:@hono/hono@4.12.24",
-    "hono/cors": "jsr:@hono/hono@4.12.24/cors",
+    "hono": "jsr:@hono/hono@4.13.13",
+    "hono/cors": "jsr:@hono/hono@4.13.13/cors",
     "zod": "catalog:"
   },
   "tasks": {

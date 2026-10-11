@@ -28,6 +28,8 @@ export async function prepareDesktopFixture(
   config.version = version;
   config.workspace = [];
   config.catalog = rootConfig.catalog;
+  // Retain the fixture's frozen reference lock in every staged scratch workspace.
+  config.lock = { path: 'deno.lock', frozen: true };
   config.imports = {
     '@netscript/fresh/desktop': localModule(repoRoot, 'packages/fresh/src/runtime/desktop/mod.ts'),
     '@netscript/sdk/auto-update': localModule(repoRoot, 'packages/sdk/src/auto-update/mod.ts'),
@@ -38,12 +40,12 @@ export async function prepareDesktopFixture(
       'packages/cli/src/public/features/deploy/target/desktop/release/sign-release.ts',
     ),
     '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
-    '@orpc/client': 'npm:@orpc/client@^1.14.6',
-    '@orpc/contract': 'npm:@orpc/contract@^1.15.0',
-    '@orpc/server': 'npm:@orpc/server@^1.14.6',
+    '@orpc/client': 'npm:@orpc/client@^1.15.5',
+    '@orpc/contract': 'npm:@orpc/contract@^1.15.5',
+    '@orpc/server': 'npm:@orpc/server@^1.15.5',
     '@std/assert': 'jsr:@std/assert@^1',
     '@std/path': 'jsr:@std/path@^1',
-    zod: 'npm:zod@^4.4.3',
+    zod: 'npm:zod@^4.6.5',
   };
   await Deno.writeTextFile(denoPath, `${JSON.stringify(config, null, 2)}\n`);
 

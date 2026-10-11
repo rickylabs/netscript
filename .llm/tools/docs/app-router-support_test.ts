@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../testing/check-generated-files.ts';
 import {
   assert,
   assertEquals,
@@ -134,12 +135,10 @@ export const patterns = appRouter.routePatterns;
   // A private lock copy keeps the tracked root deno.lock untouched, as the snippet compiler does.
   const lockPath = join(tempRoot, 'deno.lock');
   await Deno.copyFile(join(repositoryRoot, 'deno.lock'), lockPath);
-  return await new Deno.Command(Deno.execPath(), {
+  return await checkGeneratedFiles({
     cwd: repositoryRoot,
     args: ['check', '--unstable-kv', '--lock', lockPath, '--config', configPath, probePath],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
+  });
 }
 
 async function withTempRoot(run: (tempRoot: string) => Promise<void>): Promise<void> {

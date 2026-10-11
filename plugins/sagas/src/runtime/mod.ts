@@ -143,3 +143,10 @@ export type {
   SagaRuntimeSupervisorStatus,
 } from './saga-supervisor.ts';
 export { SAGAS_API_DEFAULT_PORT, SAGAS_API_SERVICE_NAME, SAGAS_PLUGIN_ID } from '../constants.ts';
+
+export type {
+  ChildFatalError,
+  ChildHealthMonitor,
+  ChildHealthSnapshot,
+  ChildHealthState,
+} from '@netscript/plugin/health';

@@ -1,0 +1,22 @@
+/** Pure {{serviceName}} list and lifecycle policy. */
+export interface ListInput {
+  readonly limit: number;
+  readonly offset: number;
+  readonly search?: string;
+}
+
+export function listQuery(input: ListInput) {
+  return { ...input, search: input.search?.trim().toLowerCase() };
+}
+
+export function listResult<T>(input: ListInput, items: T[], total: number) {
+  return { items, total, limit: input.limit, offset: input.offset, hasMore: input.offset + input.limit < total };
+}
+
+export function statusSummary(status: 'active' | 'draft' | 'archived'): string {
+  return status === 'archived'
+    ? 'Archived after the optimistic showcase mutation completed.'
+    : status === 'active'
+    ? 'Re-activated through the scaffolded optimistic update flow.'
+    : 'Moved back into draft to demonstrate typed mutation rollbacks.';
+}

@@ -10,6 +10,8 @@ import type {
 /** Optimistic write options for saga state persistence. */
 export type SagaStoreWriteOptions = Readonly<{
   expectedVersion?: number;
+  /** Known engine correlation; avoids a reverse-index read during the state write. */
+  correlation?: SagaCorrelationIndexEntry;
 }>;
 
 /** Correlation index entry used for O(1) saga instance lookup. */
@@ -27,6 +29,10 @@ export interface SagaStorePort {
   load<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined>;
+  /** Batch-load canonical state for bounded background scheduling retention. */
+  loadMany?(
+    instanceIds: readonly SagaInstanceId[],
+  ): Promise<readonly (SagaStateEnvelope | undefined)[]>;
   /** Save a saga state envelope, optionally using optimistic write constraints. */
   save<TState extends SagaState>(
     envelope: SagaStateEnvelope<TState>,
@@ -36,6 +42,7 @@ export interface SagaStorePort {
   appendTransition<TState extends SagaState>(
     instanceId: SagaInstanceId,
     record: SagaTransitionRecord<TState>,
+    envelope?: SagaStateEnvelope<TState>,
   ): Promise<void>;
   /** Resolve an instance id by saga id and correlation key. */
   findByCorrelation(
@@ -43,7 +50,7 @@ export interface SagaStorePort {
     correlationKey: SagaCorrelationKey,
   ): Promise<SagaInstanceId | undefined>;
   /** Save or update the correlation index for an instance. */
-  saveCorrelation(entry: SagaCorrelationIndexEntry): Promise<void>;
+  saveCorrelation(entry: SagaCorrelationIndexEntry, envelope?: SagaStateEnvelope): Promise<void>;
   /** Delete persisted state and indexes for an instance. */
   delete(instanceId: SagaInstanceId): Promise<void>;
 }

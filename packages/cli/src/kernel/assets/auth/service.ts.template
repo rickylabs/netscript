@@ -1,0 +1,7 @@
+/** Bearer-only verification; browser cookies never authenticate a service request. */
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth-core/authenticator';
+
+export const browserAuthenticator = createAuthServiceAuthenticator({
+  serviceName: {{authServiceName}},
+  timeoutMs: 10_000,
+});

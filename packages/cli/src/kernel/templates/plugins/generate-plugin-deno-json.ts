@@ -8,8 +8,8 @@ import { resolveNetScriptImports } from '../../adapters/scaffold/import-resolver
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import type { PluginKindProvider, PluginScaffoldOptions } from '../../domain/plugin-kind.ts';
 
-const ORPC_SERVER_SPECIFIER = 'npm:@orpc/server@^1.14.6';
-const ZOD_SPECIFIER = 'npm:zod@^4.3.6';
+const ORPC_SERVER_SPECIFIER = 'npm:@orpc/server@^1.15.5';
+const ZOD_SPECIFIER = 'npm:zod@^4.6.5';
 
 /**
  * Generate `plugins/<name>/deno.json`.

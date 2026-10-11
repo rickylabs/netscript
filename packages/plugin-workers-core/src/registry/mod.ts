@@ -30,3 +30,5 @@ export type {
   RegistryKvStore,
   RegistryOptions,
 } from './registry-options.ts';
+
+export type { AtomicCheck, AtomicMutation, AtomicResult, KvKey, KvSetOptions } from '@netscript/kv';

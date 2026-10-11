@@ -140,7 +140,10 @@ export class SagasAspireContribution {
     };
   }
 
-  /** Declare health checks used by plugin doctor commands. */
+  /**
+   * Legacy health declarations; production does not consume this hook.
+   * @deprecated Since 0.0.8; removal next release. Use generated AppHost child probes and payloads.
+   */
   declareHealthChecks(ctx: SagasContributionContext): readonly SagasHealthCheckSpec[] {
     const apiPort = ctx.port(SAGAS_API_SERVICE_NAME);
     return [{

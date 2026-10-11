@@ -1,3 +1,5 @@
+import { resolveAspireExecutable } from '../../../kernel/adapters/runtime/process/resolve-aspire-executable.ts';
+import { NETSCRIPT_ASPIRE_CLI_ENV } from '../../../kernel/constants/scaffold/scaffold-aspire.ts';
 import type {
   AspireAgentInitializationResult,
   AspireAgentInitializer,
@@ -14,7 +16,7 @@ export function aspireAgentInitArgs(projectRoot: string): string[] {
     '--workspace-root',
     projectRoot,
     '--skill-locations',
-    'standard,claudecode',
+    'standard',
     '--skills',
     ASPIRE_WORKFLOW_SKILLS.join(','),
   ];
@@ -27,7 +29,7 @@ export class DenoAspireAgentInitializer implements AspireAgentInitializer {
     signal: AbortSignal,
   ): Promise<AspireAgentInitializationResult> {
     try {
-      const output = await new Deno.Command('aspire', {
+      const output = await new Deno.Command(resolveAspireExecutable(), {
         args: aspireAgentInitArgs(projectRoot),
         signal,
         stdout: 'piped',
@@ -41,7 +43,10 @@ export class DenoAspireAgentInitializer implements AspireAgentInitializer {
       };
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {
-        return { ok: false, reason: 'the aspire executable was not found on PATH' };
+        return {
+          ok: false,
+          reason: `the Aspire executable was not found; check ${NETSCRIPT_ASPIRE_CLI_ENV} or PATH`,
+        };
       }
       throw error;
     }

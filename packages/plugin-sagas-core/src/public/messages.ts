@@ -48,7 +48,15 @@ export function send(
   });
 }
 
-/** Create a cascaded scheduled message. */
+/**
+ * Deliver a wrapped message after a delay, including follow-ups emitted alongside completion.
+ *
+ * The plugin's cancellable KV scheduler preserves timers through the originating instance's
+ * completed retention window (default seven days from its terminal timestamp). After that deadline,
+ * or once canonical origin state has expired, pending and due messages are discarded and counted in
+ * `SagaQueueScheduler.retentionDrops`, regardless of their destination. Custom/native-delay
+ * schedulers retain their provider's delivery semantics.
+ */
 export function schedule(
   message: SagaMessage | CascadedMessage,
   delay: SagaScheduleDelay,

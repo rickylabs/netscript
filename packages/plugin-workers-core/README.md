@@ -180,14 +180,17 @@ JSR with cryptographically verified provenance.
 Supply the existing explicit workers trigger client and a topic-to-branded job/task allowlist. The
 factory copies target registration, starts no resource and opens no queue. It forwards decoded
 payload, stable dedupe key, correlation and validated W3C fields. The supplied client's durable
-receipt must match job/task target, contain a nonempty bounded run identity and valid acceptedAt;
-a bare status/queue acknowledgement is refused. Only normalized identity/time reach publication
+receipt must match job/task target, contain a nonempty bounded run identity and valid acceptedAt; a
+bare status/queue acknowledgement is refused. Only normalized identity/time reach publication
 settlement. Native worker progress remains in the execution stream, with no relay progress mirror.
 
 ```ts
 import { defineJob } from '@netscript/plugin-workers-core';
 import { createWorkerCommandOutboxSink } from '@netscript/plugin-workers-core/integration/commands';
-import type { WorkerCommandClientPort, WorkerCommandTarget } from '@netscript/plugin-workers-core/integration/commands';
+import type {
+  WorkerCommandClientPort,
+  WorkerCommandTarget,
+} from '@netscript/plugin-workers-core/integration/commands';
 const job = defineJob('send-email').entrypoint('jobs/send-email.ts').build();
 declare const workers: WorkerCommandClientPort;
 const targets = new Map<string, WorkerCommandTarget>([[job.id, { kind: 'job', id: job.id }]]);
@@ -196,7 +199,22 @@ const sink = createWorkerCommandOutboxSink({ id: 'workers', workers, targets });
 
 Worker applied keys provide at-least-once delivery with an applied-key guard window. A crash after
 an external effect and before `markApplied` can repeat that effect. One effective downstream
-application requires independently idempotent persistence; the claim/effect/mark window alone
-cannot provide it. The command relay publishes before settling, so its acceptance-to-mark crash
-also redelivers the stable key. Supplied clients own their network permissions and cancellation;
+application requires independently idempotent persistence; the claim/effect/mark window alone cannot
+provide it. The command relay publishes before settling, so its acceptance-to-mark crash also
+redelivers the stable key. Supplied clients own their network permissions and cancellation;
 imports/construction need none.
+
+## KV retention
+
+Each job's `retention.kvRetentionDays` (default 3) bounds terminal execution records under
+`workers/executions`. The execution state store and the registry execution-write port both set KV
+`expireIn` from `completedAt`; rewriting a result or progress record does not extend that deadline.
+Pending, queued, and running executions remain durable while they are open. An explicit
+`archiveToDb: false` never causes a database archive in these KV write or cleanup paths.
+
+`DELETE /cleanup` now deletes expired terminal execution records instead of returning a stubbed
+success. It inspects at most 1000 entries per call and advances to the next page on later calls.
+Atomic version checks prevent it from deleting a record updated after inspection. Fresh terminal
+records and open executions are preserved. This endpoint also removes legacy execution records
+written without TTL; normal new-record expiry is performed by the KV backend and needs no app
+session. Job/task definitions remain configuration rather than expiring execution history.

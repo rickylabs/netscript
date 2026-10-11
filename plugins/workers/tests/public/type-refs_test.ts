@@ -1,10 +1,21 @@
 import { assertEquals } from '@std/assert';
-import type { JobResult, PublicStandardSchema } from '@netscript/plugin-workers/contracts';
+import type {
+  TaskStdin as CliTaskStdin,
+  TaskStdinJson as CliTaskStdinJson,
+} from '@netscript/plugin-workers/cli';
+import type {
+  JobResult,
+  PublicStandardSchema,
+  TaskStdin as ContractTaskStdin,
+  TaskStdinJson as ContractTaskStdinJson,
+} from '@netscript/plugin-workers/contracts';
 import type {
   GeneratedJobRegistryStatus,
   StaticJobRegistry,
 } from '@netscript/plugin-workers/runtime';
 import type {
+  TaskStdin as WorkerTaskStdin,
+  TaskStdinJson as WorkerTaskStdinJson,
   TriggerType,
   WorkerIdempotencyClaim,
   WorkerIdempotencyPort,
@@ -50,6 +61,17 @@ Deno.test('workers consumer vocabulary preserves payload and discriminant precis
   void entity;
 });
 
+Deno.test('workers task facades expose compatible stdin bytes and JSON types', () => {
+  const json: CliTaskStdinJson = { values: [7, true, null] };
+  const workerJson: WorkerTaskStdinJson = json;
+  const contractJson: ContractTaskStdinJson = workerJson;
+  const cliInput: CliTaskStdin = contractJson;
+  const workerInput: WorkerTaskStdin = new Uint8Array([7]);
+  const contractInput: ContractTaskStdin = cliInput;
+  assertEquals(contractInput, { values: [7, true, null] });
+  assertEquals(workerInput, new Uint8Array([7]));
+});
+
 // These public imports must resolve without reaching into implementation files.
 export type ConsumerVocabulary = Readonly<{
   schema: PublicStandardSchema<unknown>;
@@ -62,7 +84,7 @@ export type ConsumerVocabulary = Readonly<{
 Deno.test('workers non-contract entrypoints have no documentation diagnostics', async () => {
   const root = new URL('../../', import.meta.url);
   const paths = Object.entries(manifest.exports)
-    // #1655 owns the four remaining contract references; remove this exclusion when repaired.
+    // #1655 owns the remaining contract references; remove this exclusion when repaired.
     .filter(([subpath]) => subpath !== './contracts')
     .map(([, path]) => new URL(path, root).pathname);
   const output = await new Deno.Command(Deno.execPath(), {

@@ -1,8 +1,11 @@
-import { decodeBase64 } from 'jsr:@std/encoding@^1.0.10/base64';
+import {
+  agentDocsFullCorpus,
+  decodeAgentDocsPages,
+} from '../../../kernel/assets/agent-docs-transport.ts';
 import { join, resolve, toFileUrl } from '@std/path';
 import {
-  EMBEDDED_AGENT_DOCS_GZIP_BASE64,
   EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS,
+  EMBEDDED_AGENT_DOCS_PAGES,
   EMBEDDED_AGENT_DOCS_PROVENANCE,
 } from '../../../kernel/assets/agent-docs.generated.ts';
 import { NETSCRIPT_RELEASE_VERSION } from '../../../kernel/constants/jsr-specifiers.ts';
@@ -159,41 +162,13 @@ export async function resolveInstalledNetScriptPackages(
   return [...installed.values()].sort((left, right) => left.name.localeCompare(right.name));
 }
 
-async function sha256(bytes: Uint8Array): Promise<string> {
-  const copied = new Uint8Array(bytes.byteLength);
-  copied.set(bytes);
-  const digest = await crypto.subtle.digest('SHA-256', copied.buffer);
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
 async function inflateProse(): Promise<Readonly<Record<string, string>>> {
-  const compressed = decodeBase64(EMBEDDED_AGENT_DOCS_GZIP_BASE64);
-  const stream = new Blob([new Uint8Array(compressed).buffer]).stream()
-    .pipeThrough(
-      new DecompressionStream('gzip'),
-    );
-  const uncompressed = new Uint8Array(await new Response(stream).arrayBuffer());
-  if (
-    await sha256(uncompressed) !== EMBEDDED_AGENT_DOCS_PROVENANCE.sha256 ||
-    uncompressed.byteLength !== EMBEDDED_AGENT_DOCS_PROVENANCE.uncompressedBytes
-  ) {
-    throw new Error(
-      'Embedded offline documentation prose failed its canonical SHA-256 check',
-    );
+  const files = await decodeAgentDocsPages(EMBEDDED_AGENT_DOCS_PAGES);
+  files['llms-full.txt'] = agentDocsFullCorpus(files, EMBEDDED_AGENT_DOCS_PROVENANCE.version);
+  if (!/^## Task router$/m.test(files['llms.txt'] ?? '')) {
+    throw new Error('Embedded offline documentation prose is missing the #1068 task router');
   }
-  const decoded = JSON.parse(new TextDecoder().decode(uncompressed)) as {
-    readonly schemaVersion: number;
-    readonly files: Readonly<Record<string, string>>;
-  };
-  if (
-    decoded.schemaVersion !== 1 ||
-    !/^## Task router$/m.test(decoded.files['llms.txt'] ?? '')
-  ) {
-    throw new Error(
-      'Embedded offline documentation prose is missing the #1068 task router',
-    );
-  }
-  return decoded.files;
+  return files;
 }
 
 async function apiSpecifier(
@@ -303,7 +278,7 @@ export class DenoAgentDocsGenerator implements AgentDocsGenerator {
     return {
       files,
       frameworkVersion: NETSCRIPT_RELEASE_VERSION,
-      proseFileCount: EMBEDDED_AGENT_DOCS_PROVENANCE.files.length,
+      proseFileCount: EMBEDDED_AGENT_DOCS_PAGES.length + 1,
       apiPackageCount: installed.length,
       apiExportCount,
     };
@@ -319,10 +294,8 @@ export class DenoAgentDocsGenerator implements AgentDocsGenerator {
       `Generated for the exact NetScript packages installed in this project. Start with \`llms.txt\` for the task router and use \`llms-full.txt\` as the grep target.\n\n` +
       `| Field | Value |\n| --- | --- |\n` +
       `| Framework / CLI version | \`${NETSCRIPT_RELEASE_VERSION}\` |\n` +
-      `| Prose source commit | \`${EMBEDDED_AGENT_DOCS_PROVENANCE.sourceCommit}\` |\n` +
-      `| Prose extraction time | \`${EMBEDDED_AGENT_DOCS_PROVENANCE.extractionTimestamp}\` |\n` +
       `| API generation time | \`${this.now().toISOString()}\` |\n` +
-      `| Prose files | ${EMBEDDED_AGENT_DOCS_PROVENANCE.files.length} |\n` +
+      `| Prose files | ${(EMBEDDED_AGENT_DOCS_PAGES.length + 1)} |\n` +
       `| Total files | ${pageCount + 1} |\n` +
       `| API packages / export subpaths | ${installed.length} / ${apiExportCount} |\n\n` +
       `## Documented installed packages\n\n| Package | Exact version |\n| --- | --- |\n${packages}\n`;

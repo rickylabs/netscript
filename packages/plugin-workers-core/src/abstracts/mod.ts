@@ -24,6 +24,8 @@ export type {
   TaskExecutionOptions,
   TaskLogEntry,
   TaskResult,
+  TaskStdin,
+  TaskStdinJson,
   TaskType,
   WorkerTaskPermissionField,
   WorkerTaskPermissions,
