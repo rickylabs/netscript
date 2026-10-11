@@ -13,9 +13,9 @@ machine identity. Workers, sagas and triggers call it without a browser, phone a
 
 ## Use the provisioned file reference
 
-Generate the project's Aspire helpers with `netscript generate aspire`, then start the AppHost.
-The generated carrier creates `.data/aspire-secrets/installation.secret` once under the project
-root, preserves it across starts, and registers a secret parameter. It delivers
+Generate the project's Aspire helpers with `netscript generate aspire`, then start the AppHost. The
+generated carrier creates `.data/aspire-secrets/installation.secret` once under the project root,
+preserves it across starts, and registers a secret parameter. It delivers
 `NETSCRIPT_INSTALLATION_SECRET_FILE` to services, plugin APIs and background processors, with the
 Deno read/environment permissions they need. The variable contains the file path, never the secret.
 For packaged backends, the installation carrier likewise delivers the reference. Keep the file out
@@ -54,9 +54,10 @@ contradiction. An admin role or a user session does not satisfy the internal aud
 ## Compose the explicit service policy
 
 Save this as `internal-service.ts`. The overlay governs access-marked procedures. Unmarked
-procedures keep the path policy, so `/api/v1/ping` stays public in this example. For a guarded service,
-retain its existing `protect`/`allowAnonymous` policy instead of adding the public `/api` exception.
-Pass its session authenticator to the composition below so ordinary session calls still work.
+procedures keep the path policy, so `/api/v1/ping` stays public in this example. For a guarded
+service, retain its existing `protect`/`allowAnonymous` policy instead of adding the public `/api`
+exception. Pass its session authenticator to the composition below so ordinary session calls still
+work.
 
 ```ts
 import { implement } from '@orpc/server';
@@ -73,7 +74,10 @@ import { ordersContract } from './internal-contract.ts';
 
 export async function createOrdersApp(sessionAuthenticator?: AuthenticatorPort) {
   const secret = await loadInstallationSecret();
-  const internalAuthenticator = createInternalCredentialAuthenticator({ secret, service: 'orders' });
+  const internalAuthenticator = createInternalCredentialAuthenticator({
+    secret,
+    service: 'orders',
+  });
   const auth = {
     authn: {
       authenticator: createCompositeAuthenticator([
@@ -99,18 +103,18 @@ export async function createOrdersApp(sessionAuthenticator?: AuthenticatorPort) 
 }
 ```
 
-At the service entrypoint, call `await (await createOrdersApp()).serve({ port: 3001 })` and let
-the supervisor own the returned listener. The same `auth` object is the guarded arm of
+At the service entrypoint, call `await (await createOrdersApp()).serve({ port: 3001 })` and let the
+supervisor own the returned listener. The same `auth` object is the guarded arm of
 `ServiceAuthPolicy` accepted by `defineService(router, { name: 'orders', auth })`. Do not use
 `auth: { public: true, reason: '...' }` for a service containing internal procedures: that posture
-opts out of authentication and authorization. Do not protect just `/api/rpc`; the OpenAPI
-projection must use the same overlay.
+opts out of authentication and authorization. Do not protect just `/api/rpc`; the OpenAPI projection
+must use the same overlay.
 
 ## Call from another backend
 
 Save this as `internal-client.ts`. Create the client once in the calling service or background
-runtime's composition root, then invoke it from a job, saga step or trigger handler. The contribution
-supplies the bearer; no app session or per-request secret read is needed.
+runtime's composition root, then invoke it from a job, saga step or trigger handler. The
+contribution supplies the bearer; no app session or per-request secret read is needed.
 
 ```ts
 import {
@@ -142,13 +146,13 @@ registrations, writes the three snippets above into the generated project, and r
 loopback HTTP listener. It checks these calls for both `sync` (default OpenAPI path) and `reindex`
 (explicit OpenAPI route):
 
-| Caller | RPC `/api/rpc/v1/orders/internal/<procedure>` | OpenAPI `/api/v1/internal/<procedure>` |
-| --- | --- | --- |
-| Anonymous | 401 | 401 |
-| Wrong installation or target-service credential | 401 | 401 |
-| Valid user session, even with service roles | 403 | 403 |
-| Valid installation credential for `orders` | 200 | 200 |
-| Old credential after restart with rotated material | 401 | 401 |
+| Caller                                             | RPC `/api/rpc/v1/orders/internal/<procedure>` | OpenAPI `/api/v1/internal/<procedure>` |
+| -------------------------------------------------- | --------------------------------------------- | -------------------------------------- |
+| Anonymous                                          | 401                                           | 401                                    |
+| Wrong installation or target-service credential    | 401                                           | 401                                    |
+| Valid user session, even with service roles        | 403                                           | 403                                    |
+| Valid installation credential for `orders`         | 200                                           | 200                                    |
+| Old credential after restart with rotated material | 401                                           | 401                                    |
 
 An OpenAPI URL is not a bypass: it accepts the same internal service identity, and refuses anonymous
 or session callers. RPC POST bodies use `{"json":{}}`; OpenAPI POST bodies use `{}`. Public `ping`
@@ -165,15 +169,15 @@ resource startup and service discovery.
 
 ## Rotate the installation credential
 
-Stop the AppHost and all packaged backend processes that share the installation. Replace the
-secret file with fresh cryptographically random textual material (at least 32 bytes, at most 4 KiB),
+Stop the AppHost and all packaged backend processes that share the installation. Replace the secret
+file with fresh cryptographically random textual material (at least 32 bytes, at most 4 KiB),
 keeping restrictive permissions and the same reference path. For a generated local project, remove
 only `.data/aspire-secrets/installation.secret` while stopped and let the next AppHost startup
 provision fresh material. Do not delete the whole secrets directory.
 
-Restart every service, plugin API, worker, saga and trigger sharing the installation. Services retain
-the loaded secret and SDK contributions retain their derived bearer; rewriting a file alone does
-not rotate running instances. Recreate caller clients as part of restart. Verify a fresh backend
-call succeeds and a retained old bearer is refused on both projections, without printing either
-credential. Rotation invalidates credentials for every service derived from that installation;
-it is not a per-user signout operation.
+Restart every service, plugin API, worker, saga and trigger sharing the installation. Services
+retain the loaded secret and SDK contributions retain their derived bearer; rewriting a file alone
+does not rotate running instances. Recreate caller clients as part of restart. Verify a fresh
+backend call succeeds and a retained old bearer is refused on both projections, without printing
+either credential. Rotation invalidates credentials for every service derived from that
+installation; it is not a per-user signout operation.
