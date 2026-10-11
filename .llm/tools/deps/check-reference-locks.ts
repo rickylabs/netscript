@@ -2,6 +2,13 @@
 import { join } from '@std/path';
 import { prepareDesktopFixture } from '../../../packages/cli/e2e/src/adapters/native-desktop/fixture-workspace.ts';
 
+/** Runtime and test entrypoints covered by the staged desktop reference lock. */
+export const DESKTOP_REFERENCE_ENTRYPOINTS: readonly string[] = [
+  'src/main.ts',
+  'src/renderer.ts',
+  'tests/fixture-contract.ts',
+];
+
 /** Use Deno's resolver to check the reference lock without executing fixture code. */
 export async function checkReferenceLock(
   reference: string,
@@ -36,11 +43,14 @@ export async function checkDesktopReferenceLock(repoRoot: string): Promise<boole
   const scratch = await Deno.makeTempDir({ prefix: 'desktop-reference-lock-' });
   try {
     await prepareDesktopFixture(repoRoot, scratch, '1.0.0');
-    return await checkReferenceLock(scratch, [
-      'src/main.ts',
-      'src/renderer.ts',
-      'tests/fixture-contract.ts',
-    ]);
+    const success = await checkReferenceLock(scratch, DESKTOP_REFERENCE_ENTRYPOINTS);
+    if (!success) {
+      console.error(
+        'Desktop scratch reference: run deno task deps:refresh:desktop-lock from the repository root; ' +
+          'commit packages/cli/e2e/fixtures/desktop-native/deno.lock with the dependency change.',
+      );
+    }
+    return success;
   } finally {
     await Deno.remove(scratch, { recursive: true });
   }

@@ -66,6 +66,7 @@
     "deps:census": "deno run --allow-read .llm/tools/deps/census.ts",
     "deps:check": "deno task deps:check:reference-locks && deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno run --allow-read .llm/tools/deps/check-private-lock-workspace.ts && deno task deps:check:zod && deno task deps:check:db",
     "deps:check:reference-locks": "deno run --allow-read --allow-write --allow-run .llm/tools/deps/check-reference-locks.ts",
+    "deps:refresh:desktop-lock": "deno run --allow-read --allow-write --allow-run .llm/tools/deps/refresh-desktop-reference-lock.ts",
     "deps:check:ai-peers": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/deps/check-ai-peers.ts",
     "deps:check:zod": "deno run --allow-read .llm/tools/deps/check-zod-alignment.ts",
     "deps:check:npm-catalog": "deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts",

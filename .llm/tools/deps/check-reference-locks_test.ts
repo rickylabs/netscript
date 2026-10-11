@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
 import { checkDesktopReferenceLock, checkReferenceLock } from './check-reference-locks.ts';
 
@@ -70,4 +70,23 @@ Deno.test('desktop scratch reference lock matches its prepared source and catalo
   const locked = await Deno.readTextFile(lockPath);
   assertEquals(await checkDesktopReferenceLock(repoRoot), true);
   assertEquals(await Deno.readTextFile(lockPath), locked);
+});
+
+Deno.test('reference freshness command checks all three committed resolution contexts', async () => {
+  const result = await new Deno.Command(Deno.execPath(), {
+    args: [
+      'run',
+      '--allow-read',
+      '--allow-write',
+      '--allow-run',
+      fromFileUrl(new URL('./check-reference-locks.ts', import.meta.url)),
+    ],
+    cwd: fromFileUrl(new URL('../../../', import.meta.url)),
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  const stdout = new TextDecoder().decode(result.stdout);
+  const stderr = new TextDecoder().decode(result.stderr);
+  assertEquals(result.code, 0, stderr);
+  assertStringIncludes(stdout, 'reference-lock PASS locks=3');
 });
