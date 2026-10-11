@@ -32,7 +32,8 @@ symbols is optional; updating their imports is necessary whenever the move chang
 With `routeManifest` enabled in `createNetScriptVitePlugin`, the plugin writes the generated route
 modules on initialization and build, and refreshes them on relevant route changes during a dev
 server run. Use the app's configured Vite build or dev task after a move. A standalone `deno check`
-does not refresh these modules, and there is currently no public `netscript generate routes` verb.
+does not refresh these modules. Run `netscript generate routes --app dashboard` to refresh them
+without a Vite build; `--project-root <app-root>` selects an explicit application.
 
 The plugin also manages route-binding seams for the authoring forms described in
 [Routing and route contracts](/web-layer/route/#three-authoring-forms-one-generated-binding). That
@@ -59,8 +60,12 @@ After refreshing the tree, type-check and visit the new URL, including any loade
 Decide whether the old URL should return 404 or needs an authored redirect for existing links.
 
 There is currently no `netscript ui:rename` or `netscript route rename` command.
-`netscript ui:remove
-<name>` removes a copied Fresh UI registry item, not a page triad;
-`netscript ui:remove page <path>` is not available. Remove pages and their owned files manually,
-prune their route registration and consumers, and regenerate before verifying the old URL and
-navigation.
+`netscript ui:remove <name>` removes a copied Fresh UI registry item. Use
+`netscript ui:remove page catalog --dry-run` to validate and preview a page removal. Without
+`--dry-run`, it deletes only unchanged `ui:add page` output (page plus optional loader/island),
+prunes its exact string-literal router registration, and regenerates the derived route modules. It
+preserves authored siblings, sidecars and unrelated routes. Use `--client <service>` when the
+original data client is ambiguous. Modified or missing scaffold parts and customized registrations
+are refused; there is no force override. Remove customized pages manually, prune their registration
+and consumers, then run `netscript generate routes`. Idempotent reruns rebuild missing derived
+modules without deleting authored files. Update links and type-check after removal.

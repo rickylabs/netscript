@@ -209,3 +209,41 @@ function conflict(reason: string): AppRoutesReconcileResult {
 function isIdentifier(value: string): boolean {
   return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(value);
 }
+
+/** Remove only the unchanged string-literal registration emitted by `ui:add page`. */
+export function removeScaffoldedAppRoute(
+  source: string,
+  segment: string,
+  routeId: string,
+): string {
+  const starts = [...source.matchAll(APP_ROUTES_START)];
+  if (starts.length !== 1) throw new Error('Refusing removal: unsupported appRoutes declaration.');
+  const open = source.indexOf('{', starts[0].index);
+  const close = matchingBrace(source, open);
+  if (close < 0 || !/^\} as const;/.test(source.slice(close))) {
+    throw new Error('Refusing removal: unsupported appRoutes closing anchor.');
+  }
+  const entries = splitTopLevelEntries(source.slice(open + 1, close));
+  if (!entries) throw new Error('Refusing removal: unsupported appRoutes entries.');
+  const expected =
+    `'${routeId}': createRouteReference('/${segment}', { id: '${routeId}', kind: 'page' })`;
+  let removed = 0;
+  const kept: string[] = [];
+  for (let index = 0; index < entries.length; index++) {
+    const entry = entries[index];
+    const candidate = stripLeadingTrivia(entry);
+    const key = /^(?:'([^']+)'|"([^"]+)"|([\w$]+))\s*:/.exec(candidate);
+    if ((key?.[1] ?? key?.[2] ?? key?.[3]) === routeId) {
+      if (candidate !== expected || ++removed > 1) {
+        throw new Error('Refusing removal: page route registration has diverged.');
+      }
+      // Preserve authored leading comments while dropping the generated property.
+      const trivia = entry.slice(0, entry.indexOf(candidate));
+      if (trivia.trim()) kept.push(trivia);
+    } else {
+      kept.push(entry + (index < entries.length - 1 ? ',' : ''));
+    }
+  }
+  if (removed !== 1) throw new Error('Refusing removal: page route registration is missing.');
+  return source.slice(0, open + 1) + kept.join('') + source.slice(close);
+}
