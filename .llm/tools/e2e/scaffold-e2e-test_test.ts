@@ -1,4 +1,5 @@
-import { assertEquals, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+import { join } from '@std/path';
 import {
   defaultOptions,
   normalizeCommandOptions,
@@ -127,5 +128,72 @@ Deno.test('generated host-port validation is critical and inspects the final pre
     assertEquals(JSON.stringify(offlineCodegen.details).includes('jsr:@netscript/cli'), false);
   } finally {
     await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('legacy scaffold smoke isolates init host detection without starting resources', async () => {
+  const scratch = await Deno.makeTempDir();
+  const markers = {
+    CLAUDECODE: '1',
+    OPENCODE: '1',
+    OPENCODE_FIXTURE: '1',
+    TERM_PROGRAM: 'vscode',
+    VSCODE_FIXTURE: '1',
+    CURSOR_FIXTURE: '1',
+    ZED_TERM: 'true',
+  };
+  const previous = new Map(
+    [...Object.keys(markers), 'NETSCRIPT_TEST_RETAINED'].map((name) => [name, Deno.env.get(name)]),
+  );
+  const NativeCommand = Deno.Command;
+  const observed: Deno.CommandOptions[] = [];
+  Deno.Command = class extends NativeCommand {
+    readonly options: Deno.CommandOptions;
+    constructor(command: string | URL, options: Deno.CommandOptions = {}) {
+      super(command, options);
+      this.options = options;
+    }
+    override output(): Promise<Deno.CommandOutput> {
+      const init = this.options.args?.includes('init') ?? false;
+      if (init) observed.push(this.options);
+      return Promise.resolve({
+        code: init ? 1 : 0,
+        success: !init,
+        signal: null,
+        stdout: new TextEncoder().encode('fixture version'),
+        stderr: new Uint8Array(),
+      });
+    }
+  };
+  try {
+    for (const [name, value] of Object.entries(markers)) Deno.env.set(name, value);
+    Deno.env.set('NETSCRIPT_TEST_RETAINED', 'retained');
+    for (const binary of ['netscript-dev.ts', 'netscript.ts']) {
+      const options = defaultOptions();
+      const report = await runSmoke({
+        ...options,
+        cli: join(options.repo, 'packages', 'cli', 'bin', binary),
+        format: 'json',
+        smokeRoot: scratch,
+        name: 'hermetic-smoke',
+        logFile: join(scratch, 'smoke.log'),
+      });
+      assertEquals(report.startedAspire, false);
+      const init = observed.at(-1);
+      assert(init);
+      assertEquals(init.args?.includes('--no-agent'), binary === 'netscript.ts');
+      assertEquals(init.clearEnv, undefined);
+      assertEquals(init.env, undefined);
+      for (const [name, value] of Object.entries(markers)) assertEquals(Deno.env.get(name), value);
+      assertEquals(Deno.env.get('NETSCRIPT_TEST_RETAINED'), 'retained');
+    }
+    assertEquals(observed.length, 2);
+  } finally {
+    Deno.Command = NativeCommand;
+    for (const [name, value] of previous) {
+      if (value === undefined) Deno.env.delete(name);
+      else Deno.env.set(name, value);
+    }
+    await Deno.remove(scratch, { recursive: true });
   }
 });
