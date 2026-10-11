@@ -118,25 +118,25 @@ The closed state vocabulary is `starting | ready | degraded | crash-looping | st
 payload also reports `registryReady`, `dependencyReady`, cumulative `restartCount`, and
 `lastFatalError` (a fixed redacted message plus an epoch-millisecond timestamp, or `null`). Registry
 readiness means the generated definitions were loaded and validated. Dependency readiness includes
-runtime registration, startup checks, and listener failures, rather than a continuous backing-service
-heartbeat.
+runtime registration, startup checks, and listener failures, rather than a continuous
+backing-service heartbeat.
 
 Three restarts within 60 seconds latch `crash-looping`. Recovery requires a full 60 seconds of
-uninterrupted running with both readiness fields true; a brief retry cannot turn the child green.
-A new failure resets the clean window, and clean shutdown reports `stopped`. Restart history retains at most
-three timestamps. Health responses return HTTP 200 only for `ready` with both readiness fields true;
-all other states return HTTP 503. Raw exception messages, stacks, credentials, and definition data
-never enter this payload.
+uninterrupted running with both readiness fields true; a brief retry cannot turn the child green. A
+new failure resets the clean window, and clean shutdown reports `stopped`. Restart history retains
+at most three timestamps. Health responses return HTTP 200 only for `ready` with both readiness
+fields true; all other states return HTTP 503. Raw exception messages, stacks, credentials, and
+definition data never enter this payload.
 
 Generated workers, triggers, and sagas glue starts the health listener before bootstrap and keeps a
-failed child observable during a one-second grace period before exiting nonzero. These processes run under their service identity
-without an app or owner session. AppHost probe generation and doctor/MCP aggregation consume this
-contract in subsequent slices of #1366.
+failed child observable during a one-second grace period before exiting nonzero. These processes run
+under their service identity without an app or owner session. AppHost probe generation and
+doctor/MCP aggregation consume this contract in subsequent slices of #1366.
 
 Fatal bootstrap causes are logged to server stderr and set exit code 1. The process retains a red
 health response for one second, then closes its listener and exits; it does not require an operator
-signal. PORT selects the health listener port; without it, Deno binds an ephemeral port on its default
-interface. Rule-based AppHost port wiring and probes remain a subsequent slice of #1366.
+signal. PORT selects the health listener port; without it, Deno binds an ephemeral port on its
+default interface. Rule-based AppHost port wiring and probes remain a subsequent slice of #1366.
 
 ## Public surface
 
@@ -209,15 +209,46 @@ const options = {
 const registries = await startWalker('.', options);
 ```
 
-Official plugins emit the same declaration during install or sync; plugin core contains no
-plugin-specific factory table. Additional mappings are snapshotted per extractor instance. Malformed
-identifiers, blank axes, duplicate callees, and a recognizable contribution factory call without a
-matching declaration throw a `TypeError` instead of silently omitting contributions.
+Official plugins emit the same declaration during install or sync; the generic SDK contains no
+plugin-specific factory table. Core factory sources also carry their own metadata when those sources
+are included in the walk. Additional mappings are snapshotted per extractor instance. Malformed
+identifiers, blank axes, conflicting declarations for a callee, and a recognizable contribution
+factory call without a matching declaration throw a `TypeError` instead of silently omitting
+contributions.
 
 This changes the migration boundary for projects scaffolded before `0.0.7`: re-run plugin sync or
 update so each plugin's control-plane module receives its declaration before using no-argument
 discovery. Passing `additionalBuilders` is the explicit compatibility path when regeneration is not
 available.
+
+### Core-only hosts and schema maps
+
+A host using the published `@netscript/plugin-sagas-core` in-process does not need a saga plugin
+service. Put this literal declaration in a TypeScript module inside the walked project, for example
+`discovery.ts` at the project root. It need not be imported by the application. Discovery reads
+source text; it does not traverse published dependency imports to find metadata.
+
+```typescript
+export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+  { callee: 'defineSaga', axis: 'sagas' },
+  { callee: 'defineStreamSchema', axis: null },
+] as const;
+```
+
+`defineSaga` produces an id-bearing definition for the `sagas` registry. `defineStreamSchema`
+returns a collection schema map consumed by the durable stream producer; it has no contribution id.
+`axis: null` explicitly declares a non-registry factory: discovery validates its declaration and
+excludes its values before the id-based registry emitter. Do not invent a schema axis or an id. The
+streams control-plane module now emits this exclusion during installation. Identical metadata from a
+host, a copied core source, and a control module is accepted; conflicting axes still fail. Tooling
+can also pass either declaration through `additionalBuilders`.
+
+Before updating an older installation, add any missing declarations to a walked host module,
+including the schema exclusion if its streams control module predates this metadata. `plugin update`
+validates the walk and resolves all registry emissions **before** running installation or writing
+project files. An undeclared factory, malformed declaration, or extraction/emission failure leaves
+existing files byte-identical and creates no installation files. This guarantee covers discovery
+failures; installation and filesystem failures retain their own error behavior.
 
 ## Docs
 

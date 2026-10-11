@@ -1,3 +1,8 @@
+/** Source discovery metadata; schema factories use null to opt out of id registries. */
+export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+  { callee: 'defineSaga', axis: 'sagas' },
+] as const;
+
 import type {
   QueryDefinition,
   SagaConcurrencyPolicy,

@@ -1,3 +1,8 @@
+/** Source discovery metadata; schema factories use null to opt out of id registries. */
+export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+  { callee: 'defineStreamSchema', axis: null },
+] as const;
+
 import { createStateSchema } from '@durable-streams/state';
 import type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
 
