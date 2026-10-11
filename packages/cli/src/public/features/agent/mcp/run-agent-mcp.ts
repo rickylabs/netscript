@@ -1,16 +1,13 @@
-import { SpawnCommandExecutor } from "@netscript/mcp";
-import { type McpCliOptions, runMcpStdioServer } from "@netscript/mcp/cli";
-import { resolve } from "@std/path";
-import type { PublicCommandDependencies } from "../../root/public-command-dependencies.ts";
-import { createPublicCommandRegistry } from "../../root/public-command-tree.ts";
-import type { AgentMcpInput } from "./agent-mcp-input.ts";
-import {
-  CliProjectDoctor,
-  PublicCliCommandCatalog,
-} from "./cli-mcp-adapters.ts";
-import { EMBEDDED_SKILL_FILES } from "../../../../kernel/assets/skills.generated.ts";
-import { CLI_PACKAGE_VERSION } from "../../../../kernel/assets/publish-assets.generated.ts";
-import { isCompiledBinary } from "../../../../kernel/adapters/runtime/platform/deno-platform.ts";
+import { SpawnCommandExecutor } from '@netscript/mcp';
+import { type McpCliOptions, runMcpStdioServer } from '@netscript/mcp/cli';
+import { resolve } from '@std/path';
+import type { PublicCommandDependencies } from '../../root/public-command-dependencies.ts';
+import { createPublicCommandRegistry } from '../../root/public-command-tree.ts';
+import type { AgentMcpInput } from './agent-mcp-input.ts';
+import { CliProjectDoctor, PublicCliCommandCatalog } from './cli-mcp-adapters.ts';
+import { EMBEDDED_SKILL_FILES } from '../../../../kernel/assets/skills.generated.ts';
+import { CLI_PACKAGE_VERSION } from '../../../../kernel/assets/publish-assets.generated.ts';
+import { isCompiledBinary } from '../../../../kernel/adapters/runtime/platform/deno-platform.ts';
 
 /** Runtime facts needed to re-enter the CLI process that hosts MCP. */
 export interface HostCliRuntime {
@@ -28,7 +25,7 @@ export interface HostCliRuntime {
 export function resolveHostCliCommand(runtime: HostCliRuntime): readonly string[] {
   return runtime.compiled
     ? Object.freeze([runtime.execPath])
-    : Object.freeze([runtime.execPath, "run", "-A", runtime.mainModule]);
+    : Object.freeze([runtime.execPath, 'run', '-A', runtime.mainModule]);
 }
 
 function currentHostCliRuntime(): HostCliRuntime {
@@ -56,14 +53,14 @@ export function createAgentMcpOptions(
 ): McpCliOptions {
   const registry = createPublicCommandRegistry();
   const program = registry.program({
-    name: "netscript",
+    name: 'netscript',
     version: host.version,
-    description: "NetScript CLI",
+    description: 'NetScript CLI',
     context: {
       dependencies,
       host: {
         cwd: () => input.projectRoot,
-        resolvePath: (path?: string) => resolve(input.projectRoot, path ?? "."),
+        resolvePath: (path?: string) => resolve(input.projectRoot, path ?? '.'),
       },
     },
   });
@@ -74,13 +71,13 @@ export function createAgentMcpOptions(
     commandCatalog: new PublicCliCommandCatalog(program),
     commandExecutor: new SpawnCommandExecutor({
       cliCommand: resolveHostCliCommand(host),
-      mode: "host",
+      mode: 'host',
       version: host.version,
     }),
     projectDoctor: new CliProjectDoctor(
       dependencies.pluginDoctorDependencies.doctor,
       dependencies.pluginDoctorDependencies.runtimeDoctor,
     ),
-    embeddedDocs: [{ slug: "help", source: EMBEDDED_SKILL_FILES["help.md"] }],
+    embeddedDocs: [{ slug: 'help', source: EMBEDDED_SKILL_FILES['help.md'] }],
   };
 }
