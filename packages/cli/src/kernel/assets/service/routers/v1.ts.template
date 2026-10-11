@@ -1,11 +1,14 @@
 /** Thin {{serviceName}} contract bindings for v1. */
 import { notFound } from '@netscript/contracts';
+import type { ServiceHandlerContext } from '@netscript/service';
 import { v1 } from '@{{projectName}}/contracts';
 import type { {{serviceName | pascalCase}}Application } from '../application/{{entityName}}.ts';
 
 export function create{{serviceName | pascalCase}}V1(application: {{serviceName | pascalCase}}Application) {
   return {
-    session: v1.{{serviceName | camelCase}}.session.handler(() => ({ authenticated: true })),
+    session: v1.{{serviceName | camelCase}}.session
+      .$context<ServiceHandlerContext>()
+      .handler(({ context }) => ({ authenticated: Boolean(context.principal) })),
     list: v1.{{serviceName | camelCase}}.list.handler(({ input }) => application.list(input)),
     getById: v1.{{serviceName | camelCase}}.getById.handler(async ({ input, errors }) => {
       const record = await application.getById(input.id);

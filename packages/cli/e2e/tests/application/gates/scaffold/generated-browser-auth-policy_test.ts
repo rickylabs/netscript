@@ -167,6 +167,28 @@ const deniedProcedure = implement(privateContract).denied.handler(() => { throw 
             await fs.readFile(join(root, mainPath)),
           ),
         );
+        // An explicit public opt-out must not claim an anonymous caller is authenticated.
+        const publicMainPath = `${prefix}public-main.ts`;
+        await write(
+          publicMainPath,
+          (await fs.readFile(join(root, mainPath)))
+            .replace(
+              'await defineService(router, {',
+              'export const service = await defineService(router, {',
+            ),
+        );
+        const publicGenerated: { service: RunningService } = await import(
+          toFileUrl(resolve(root, publicMainPath)).href
+        );
+        try {
+          const response = await publicGenerated.service.app.request('/api/users/session', {
+            method: 'POST',
+          });
+          assertEquals(response.status, 200);
+          assertEquals(await response.json(), { authenticated: false });
+        } finally {
+          await publicGenerated.service.stop();
+        }
         if (!authFirst) await writeInstalledAuthFixture(fs, resolve(root));
         assertEquals(await readAuthServiceName(resolve(root), fs), 'auth');
         await reconcileBrowserAuth(resolve(root), fs, formatter);
