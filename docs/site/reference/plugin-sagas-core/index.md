@@ -33,7 +33,7 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 | `@netscript/plugin-sagas-core/runtime`               | `./src/runtime/mod.ts`               | 87      | The engine: `createSagaRuntime`, `createSagaEngine`, `createSagaCompensator`, `createSagaScheduler`, and the idempotency-key helpers.                |
 | `@netscript/plugin-sagas-core/adapters`              | `./src/adapters/mod.ts`              | 72      | Concrete port adapters, including `createSagaBusBridge`.                                                                                             |
 | `@netscript/plugin-sagas-core/transports`            | `./src/transports/mod.ts`            | 49      | Saga bus transports (`createNetScriptRedisTransport`, `createGarnetListTransport`) with their message and delayed-entry codecs.                      |
-| `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 78      | KV-backed instance and applied-key stores, `openSagaRuntimeKv`, and `resolveSagaStoreBackend`.                                                       |
+| `@netscript/plugin-sagas-core/stores`                | `./src/stores/mod.ts`                | 79      | KV-backed instance and applied-key stores, `openSagaRuntimeKv`, and `resolveSagaStoreBackend`.                                                       |
 | `@netscript/plugin-sagas-core/stores/backends`       | `./src/stores/saga-store-backend.ts` | 9       | Backend selectors and projection env/value/type contracts without importing persistent adapters.                                                     |
 | `@netscript/plugin-sagas-core/middleware`            | `./src/middleware/mod.ts`            | 30      | Host middleware — `createSagaMiddleware`, `createSSEEventsMiddleware`, `emitSagaEvent`.                                                              |
 | `@netscript/plugin-sagas-core/integration/workers`   | `./src/integration/workers/mod.ts`   | 23      | Selected-schema pure worker effect constructors plus explicit trigger helpers for callers outside synchronous handlers.                              |
@@ -50,6 +50,11 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 
 Export counts are the symbol counts `deno doc` reports for each entrypoint; subpaths overlap where a
 type is re-exported through more than one layer.
+
+The stores subpath exposes `isPrismaSagaStoreClient(value)` for the canonical-store delegate
+contract shared by API and runner bootstrap validation. Query delegates remain a separate API
+requirement. `resolveSagaStoreBackend` accepts an optional `defaultBackend` used only when neither
+environment nor appsettings selects a backend; invalid configured values always fail.
 
 ## Root surface (`@netscript/plugin-sagas-core`)
 
