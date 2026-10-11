@@ -419,13 +419,3 @@ async function runGenerator(options: {
 function safeName(value: string): string {
   return basename(value).replaceAll(/[^a-zA-Z0-9._-]/g, '-');
 }
-
-function readStrings(value: unknown): readonly string[] | undefined {
-  return Array.isArray(value) && value.every((item) => typeof item === 'string')
-    ? value
-    : undefined;
-}
-
-function asRecord(value: unknown): Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value) ? Object(value) : {};
-}

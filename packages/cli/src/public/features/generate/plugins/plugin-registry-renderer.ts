@@ -18,6 +18,7 @@ import {
 import {
   readInspectionFile,
   rejectInspectionLinks,
+  validateInspectionDirectories,
 } from '../../../../kernel/adapters/service/generated-surface-reader.ts';
 
 const MAX_OUTPUTS = 256;
@@ -86,6 +87,13 @@ export async function renderRuntimeRegistryPlan(
       await rejectInspectionLinks(projectRoot, directory.dir);
     }
   }
+  await validateInspectionDirectories(
+    projectRoot,
+    targets.flatMap((target) => [
+      target.dir,
+      ...(target.pluginDirs ?? []).map((directory) => directory.dir),
+    ]),
+  );
   const command = resolved.generatorBase.startsWith('https:')
     ? new URL(generator.command, resolved.generatorBase).href
     : join(resolved.generatorBase, generator.command);
@@ -93,9 +101,7 @@ export async function renderRuntimeRegistryPlan(
     'run',
     '--config',
     join(projectRoot, 'deno.json'),
-    ...(await dependencies.fs.exists(join(projectRoot, 'deno.lock'))
-      ? ['--frozen']
-      : ['--no-lock']),
+    ...await inspectionLockArgs(projectRoot, dependencies),
     '--no-prompt',
     '--allow-read',
     '--deny-write',
@@ -182,7 +188,8 @@ export function isPluginOutputPath(path: string): boolean {
 
 /** Canonical relative paths avoid traversal, URLs, Windows aliases and case ambiguity. */
 export function isProjectPath(path: string): boolean {
-  return path.length > 0 && !/[\\\x00-\x1f:*?"<>|#]/.test(path) &&
+  return path.length > 0 && !/[\\:*?"<>|#]/.test(path) &&
+    !Array.from(path).some((character) => character.charCodeAt(0) < 32) &&
     path.split('/').every((part) =>
       part.length > 0 && part !== '.' && part !== '..' && !/[. ]$/.test(part)
     );

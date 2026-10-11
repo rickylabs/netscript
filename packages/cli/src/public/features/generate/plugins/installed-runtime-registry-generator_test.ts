@@ -149,7 +149,7 @@ describe('installed runtime registry generator', () => {
     const invalidGenerate = createInstalledRuntimeRegistryGenerator({
       fs,
       process: invalidProcess,
-      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 2))),
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 3))),
     });
     await assertRejects(
       () => invalidGenerate({ dryRun: true, projectRoot: '/workspace/app' }),

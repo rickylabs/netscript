@@ -38,6 +38,7 @@
       "deno.json",
       "package.json",
       "scaffold.plugin.json",
+      "scaffold.runtime.json",
       "scaffold.ts",
       "cli.ts",
       "mod.ts",

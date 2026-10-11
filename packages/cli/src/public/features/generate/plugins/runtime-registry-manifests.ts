@@ -1,14 +1,5 @@
 import { parse as parseJsonc } from '@std/jsonc';
-import {
-  basename,
-  dirname,
-  fromFileUrl,
-  isAbsolute,
-  join,
-  relative,
-  resolve,
-  SEPARATOR,
-} from '@std/path';
+import { dirname, fromFileUrl, isAbsolute, join, resolve, SEPARATOR } from '@std/path';
 
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
