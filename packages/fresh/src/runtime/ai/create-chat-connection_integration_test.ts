@@ -318,11 +318,11 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
   const releases: (() => void)[] = [releasePost.resolve];
   const liveReady = Promise.withResolvers<void>();
   const liveCancelled = Promise.withResolvers<void>();
-  // With a retained response, forced-GC parallel suites cancelled in 1.6–2.3 ms.
+  // #2324: runtime retention owns cancellation; the fixture observes metadata only.
   // Allow 15 s for loaded CI while bounding missing events with connection-state
   // diagnostics. The wait remains event-driven, without polling or retries.
   const cancellationDeadlineMs = 15_000;
-  let liveResponse: Response | undefined;
+  let liveResponseStatus: number | undefined;
   let liveFetchSignal: AbortSignal | null | undefined;
   const encoder = new TextEncoder();
   const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
@@ -370,10 +370,8 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
       response.url.startsWith(`${baseUrl}/`) &&
       new URL(response.url).searchParams.get('live') === 'sse'
     ) {
-      // Deno 2.9.5 can lose fetch-body abort propagation if this Response is
-      // collected while upstream retains only its body reader (denoland/deno#37006).
-      // Keep the real response reachable through the cancellation assertions.
-      liveResponse = response;
+      // Copy the status, never the Response: retaining it here would mask #2324.
+      liveResponseStatus = response.status;
       liveFetchSignal = init?.signal;
     }
     return response;
@@ -491,7 +489,7 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
     } finally {
       clearTimeout(cancellationTimer);
     }
-    assertEquals(liveResponse?.status, 200);
+    assertEquals(liveResponseStatus, 200);
     assertEquals(activeLive, 0);
     assertEquals(cancelledLive, 1);
     assertEquals(liveRequests, 1);

@@ -34,6 +34,7 @@ import type { ModelMessage, UIMessage } from '@tanstack/ai';
 import { projectChatSnapshot } from './project-chat-snapshot.ts';
 export { projectChatSnapshot } from './project-chat-snapshot.ts';
 import { createChatSubscriptionHub } from '../../internal/chat-subscription-hub.ts';
+import { subscribeChatStream } from '../../internal/chat-stream-subscription.ts';
 import type { NetScriptChatProducer } from './chat-producer.ts';
 import { assertChatProducer, toFencedChatSessionResponse } from './fenced-chat-session-writer.ts';
 import { chatMessageChunks, createChatMessageReplay } from '../../internal/chat-message-replay.ts';
@@ -561,8 +562,18 @@ function defaultCreateConnection(input: {
     // Let NetScript's native replay reducer see bootstrap chunks as well as live chunks.
     emitSnapshotOnSubscribe: false,
   });
+  let offset = input.initialOffset;
   return {
-    subscribe: (signal?: AbortSignal): AsyncIterable<unknown> => connection.subscribe(signal),
+    subscribe: (signal?: AbortSignal): AsyncIterable<unknown> =>
+      subscribeChatStream({
+        url: input.readUrl,
+        headers: input.headers,
+        offset,
+        signal,
+        onOffset: (next) => {
+          offset = next;
+        },
+      }),
     // Adapt the upstream mutable-array `send` to our readonly contract.
     send: (messages: readonly unknown[], data?: unknown, signal?: AbortSignal): Promise<void> =>
       connection.send([...messages], data, signal),
