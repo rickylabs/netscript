@@ -7,6 +7,7 @@ Deno.test('pending cancellation CAS preserves a concurrently changed KV delayed 
   try {
     const queue = new KvPollingAdapter({ kv, queueName: 'race' });
     await queue.enqueue({ body: 'old' }, { delay: 60_000, retentionId: 'terminal' });
+    let cancelled = 0;
     await queue.cancelPending(async (ids) => {
       for await (
         const entry of kv.list<Record<string, unknown>>({ prefix: ['queue:pending', 'race'] })
@@ -18,7 +19,10 @@ Deno.test('pending cancellation CAS preserves a concurrently changed KV delayed 
         });
       }
       return ids;
+    }, () => {
+      cancelled++;
     });
+    assertEquals(cancelled, 0);
     const entries = await Array.fromAsync(
       kv.list<{ retentionId: string }>({ prefix: ['queue:pending', 'race'] }),
     );
@@ -49,7 +53,9 @@ Deno.test('pending cancellation advances past an active KV prefix after adapter 
       Promise.resolve(ids.filter((id) => id === 'terminal'));
     assertEquals(await queue.cancelPending(resolve), true);
     const restarted = new KvPollingAdapter({ kv, queueName: 'prefix' });
-    assertEquals(await restarted.cancelPending(resolve), false);
+    const cancelled: string[] = [];
+    assertEquals(await restarted.cancelPending(resolve, (id) => cancelled.push(id)), false);
+    assertEquals(cancelled, ['terminal']);
     const entries = await Array.fromAsync(
       kv.list<{ retentionId: string }>({ prefix: ['queue:pending', 'prefix'] }),
     );

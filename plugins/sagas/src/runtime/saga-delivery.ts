@@ -3,6 +3,7 @@ import type {
   CascadedMessage,
   SagaInstanceId,
   SagaMessage,
+  SagaStateEnvelope,
 } from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
@@ -11,6 +12,7 @@ import type {
   SagaSchedulerPort,
   SagaStorePort,
 } from '@netscript/plugin-sagas-core/runtime';
+import { sagaRetentionRemaining } from '@netscript/plugin-sagas-core/stores';
 import { getTraceContext } from '@netscript/telemetry/context';
 
 /** Shared queue name used by saga API publishers and background runners. */
@@ -61,6 +63,7 @@ export interface SagaDeliveryQueuePort {
   /** Cancel one bounded page of pending messages using canonical instance identities. */
   cancelPending?(
     resolve: (ids: readonly string[]) => Promise<readonly string[]>,
+    onCancelled?: (retentionId: string) => void,
   ): Promise<boolean>;
   /** Consume messages until stopped or aborted. */
   listen(
@@ -187,6 +190,9 @@ export class SagaQueueScheduler implements SagaSchedulerPort {
   readonly #queue: SagaDeliveryQueuePort;
   readonly #scheduledQueue?: SagaDeliveryQueuePort;
   #store?: SagaStorePort;
+  #completedRetentionDays: number | ((envelope: SagaStateEnvelope) => number) = 7;
+  #cancellable = false;
+  #retentionDrops = 0;
   #controller?: AbortController;
   #completion?: Promise<void>;
   #running = false;
@@ -198,21 +204,37 @@ export class SagaQueueScheduler implements SagaSchedulerPort {
   }
 
   /** Bind canonical state before starting a cancellable scheduling queue. */
-  bindRetentionStore(store: SagaStorePort): void {
+  bindRetentionStore(
+    store: SagaStorePort,
+    options: Readonly<{
+      completedRetentionDays?: number | ((envelope: SagaStateEnvelope) => number);
+    }> = {},
+  ): void {
     this.#store = store;
+    this.#completedRetentionDays = options.completedRetentionDays ?? 7;
+  }
+
+  /** Number of messages deleted or dropped after their origin's retention deadline. */
+  get retentionDrops(): number {
+    return this.#retentionDrops;
   }
 
   /** Enable scheduled cascade acceptance. */
   start(): Promise<void> {
-    if (this.#scheduledQueue) {
-      if (!this.#store || !this.#scheduledQueue.cancelPending) {
-        throw SagasError.validationFailed(
-          'Cancellable scheduling requires canonical state and queue cancellation.',
-        );
-      }
+    if (this.#running) {
+      throw SagasError.validationFailed('Saga queue scheduler is already running.');
+    }
+    this.#cancellable = !!(this.#scheduledQueue?.cancelPending && this.#store);
+    if (this.#scheduledQueue && !this.#cancellable) {
+      console.warn(
+        '[Sagas Scheduler] Canonical retention or queue cancellation unavailable; using native delays.',
+      );
+    }
+    if (this.#scheduledQueue && this.#cancellable) {
       this.#controller = new AbortController();
       this.#completion = this.#scheduledQueue.listen(async (message) => {
         if (message.scheduledFrom && (await this.#cancelled([message.scheduledFrom])).length > 0) {
+          this.#retentionDrops++;
           return;
         }
         await this.#queue.enqueue(message, {
@@ -243,20 +265,28 @@ export class SagaQueueScheduler implements SagaSchedulerPort {
 
   /** Cancel at most 100 pending messages; persisted queue progress survives scheduler restart. */
   async cleanupRetention(): Promise<boolean> {
-    if (!this.#scheduledQueue) return false;
-    return await this.#scheduledQueue.cancelPending!((ids) => this.#cancelled(ids));
+    const queue = this.#scheduledQueue;
+    if (!this.#store || !queue?.cancelPending) return false;
+    return await queue.cancelPending((ids) => this.#cancelled(ids), () => {
+      this.#retentionDrops++;
+    });
   }
 
   async #cancelled(ids: readonly string[]): Promise<readonly string[]> {
-    const store = this.#store!;
+    const store = this.#store;
+    if (!store) return [];
     const instanceIds = ids as readonly SagaInstanceId[];
     const envelopes = store.loadMany
       ? await store.loadMany(instanceIds)
       : await Promise.all(instanceIds.map((id) => store.load(id)));
     return ids.filter((_id, index) => {
       const envelope = envelopes[index];
-      return envelope === undefined ||
-        ['completed', 'failed', 'cancelled', 'compensated'].includes(envelope.metadata.status);
+      if (envelope === undefined) return true;
+      const days = typeof this.#completedRetentionDays === 'function'
+        ? this.#completedRetentionDays(envelope)
+        : this.#completedRetentionDays;
+      const remaining = sagaRetentionRemaining(envelope, days, new Date());
+      return remaining !== undefined && remaining <= 0;
     });
   }
 
@@ -274,8 +304,9 @@ export class SagaQueueScheduler implements SagaSchedulerPort {
     if (!Number.isFinite(message.scheduledFor.getTime())) {
       throw SagasError.validationFailed('Scheduled message date must be valid.');
     }
-    if (context && this.#store && (await this.#cancelled([context.instanceId])).length > 0) return;
-    await (this.#scheduledQueue ?? this.#queue).enqueue({
+    const queue = this.#cancellable ? this.#scheduledQueue : this.#queue;
+    if (!queue) throw SagasError.validationFailed('Scheduled queue is unavailable.');
+    await queue.enqueue({
       ...toDeliveryMessage(scheduled),
       ...(context ? { scheduledFrom: context.instanceId } : {}),
     }, {

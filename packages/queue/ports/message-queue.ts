@@ -102,10 +102,12 @@ export interface MessageQueue<T = unknown> {
   /**
    * Cancel a bounded page of pending messages by their originating retention identity.
    * The resolver receives at most 100 unique identities; true means another page remains.
+   * The optional observer runs once per successful CAS deletion, never on a lost race.
    * Providers without durable cancellable keys omit this capability.
    */
   cancelPending?(
     resolve: (ids: readonly string[]) => Promise<readonly string[]>,
+    onCancelled?: (retentionId: string) => void,
   ): Promise<boolean>;
 
   /**

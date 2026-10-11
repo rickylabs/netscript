@@ -1,4 +1,10 @@
-import type { CascadedMessage, SagaInstanceId, SagaMessage, SagaMessageId } from '../domain/mod.ts';
+import type {
+  CascadedMessage,
+  SagaInstanceId,
+  SagaMessage,
+  SagaMessageId,
+  SagaStateEnvelope,
+} from '../domain/mod.ts';
 import { SagasError } from '../domain/mod.ts';
 import type { SagaClockPort, SagaStorePort } from '../ports/mod.ts';
 import { type LoggerPort, NoopLogger } from './logger.ts';
@@ -32,8 +38,6 @@ export interface SagaSchedulerStorePort {
   markDispatched(id: SagaMessageId, dispatchedAt: Date): Promise<void>;
   /** Mark a scheduled message as failed. */
   markFailed(id: SagaMessageId, failedAt: Date, error: string): Promise<void>;
-  /** Cancel at most `limit` records for a terminal instance; true means more work remains. */
-  cancelCorrelation?(instanceId: SagaInstanceId, limit: number): Promise<boolean>;
 }
 
 /** Dispatch function used by the scheduler when a record becomes due. */
@@ -54,9 +58,14 @@ export interface SagaSchedulerPort {
     message: CascadedMessage<'scheduled'>,
     context?: Readonly<{ instanceId: SagaInstanceId }>,
   ): Promise<unknown>;
-  /** Bind canonical state before startup so terminal cleanup can recover after a crash. */
-  bindRetentionStore?(store: SagaStorePort): void;
-  /** Cancel a bounded page of messages belonging to terminal or expired originating instances. */
+  /** Bind canonical state before startup so deadline cleanup can recover after a crash. */
+  bindRetentionStore?(
+    store: SagaStorePort,
+    options?: Readonly<{
+      completedRetentionDays?: number | ((envelope: SagaStateEnvelope) => number);
+    }>,
+  ): void;
+  /** Cancel a bounded page of messages past their originating instance retention deadline. */
   cleanupRetention?(): Promise<boolean>;
 }
 
@@ -155,14 +164,6 @@ export class SagaScheduler implements SagaSchedulerPort {
     context?: Readonly<{ instanceId: SagaInstanceId }>,
   ): Promise<SagaScheduledMessageRecord> {
     return await this.schedule(message.message, message.scheduledFor, context?.instanceId);
-  }
-
-  /** Cancel one bounded page for a terminal correlation through its scheduler backend. */
-  async cancelCorrelation(instanceId: SagaInstanceId): Promise<boolean> {
-    if (!this.#store.cancelCorrelation) {
-      throw SagasError.notImplemented('Scheduler store does not support correlation cancellation.');
-    }
-    return await this.#store.cancelCorrelation(instanceId, this.#batchSize);
   }
 
   /** Claim and dispatch due scheduled messages once. */

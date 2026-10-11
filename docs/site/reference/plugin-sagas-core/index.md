@@ -261,9 +261,13 @@ survive open instances and receive their deadline only after terminal state.
 The default saga runner stores new scheduled cascades in the existing KV polling queue under
 `queue:pending/sagas-scheduled`; ready messages still use the configured delivery provider. Each
 scheduled cascade carries its originating durable instance id separately from the destination
-correlation. Pending, running, and compensating instances keep their timers. Terminal or expired
-originating instances cancel their pending timers, and a late schedule cannot revive a terminal
-timer. A cancellable scheduler binds canonical state before startup; the existing background
+correlation. Pending, running, and compensating instances keep their timers. Terminal transitions,
+including `sagaComplete()` alongside `schedule()`, still enqueue follow-ups. Timers remain eligible
+for delivery until the origin's `completedAt` (or terminal `updatedAt`) plus `completedDays`
+deadline, regardless of their destination. After that deadline, or once canonical state has expired,
+pending and due timers are cancelled. `SagaQueueScheduler.retentionDrops` counts every successful
+pending key deletion and every due-message drop; lost CAS races do not increase it. A cancellable
+scheduler binds canonical state and its retention policy before startup; the existing background
 retention loop inspects at most 101 pending keys and cancels at most 100 per pass. A persistent
 queue cursor resumes across restart and prevents an active prefix from starving terminal cleanup.
 Cancellation uses per-key CAS, so it does not remove a concurrently rewritten message. Backlog is
@@ -274,10 +278,14 @@ terminal checks.
 
 Custom runner delivery queues preserve their existing native-delay behavior unless the host supplies
 `scheduledQueue` with the `cancelPending` capability. Low-level `SagaQueueScheduler` callers supply
-that queue, bind the canonical store, and drive `cleanupRetention()`; custom scheduler stores can
-implement bounded `cancelCorrelation(instanceId, limit)`. KV canonical reads are batched in native
-pages of at most ten keys. Only explicitly scoped new messages are cancellation candidates; legacy
-unscoped queue messages and native-provider delayed entries need separate migration.
+that queue, bind the canonical store with matching `completedRetentionDays`, and drive
+`cleanupRetention()`. Without a bound store or cancellation capability, startup logs a warning and
+uses the ready queue's native delays. This preserves injected-engine and custom-factory runner
+configurations. Cleanup before binding returns false; a second start is rejected. The core
+`SagaScheduler` records origin identity but does not implement retention: its scheduler-store path
+remains acceptance scope for issue #2109. KV canonical reads are batched in native pages of at most
+ten keys. Only explicitly scoped new messages are cancellation candidates; legacy unscoped queue
+messages and native-provider delayed entries need separate migration.
 
 Terminal records written before the retention policy was installed still need a migration/backfill.
 This leaf proves new scoped delayed-message cancellation; legacy saga/trigger terminal-family

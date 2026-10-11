@@ -415,8 +415,9 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
   /** Cancel at most 100 pending keys and persist progress for the next cleanup pass. */
   async cancelPending(
     resolve: (ids: readonly string[]) => Promise<readonly string[]>,
+    onCancelled?: (retentionId: string) => void,
   ): Promise<boolean> {
-    return await cancelPendingPage(await this.ensureKv(), this.queueName, resolve);
+    return await cancelPendingPage(await this.ensureKv(), this.queueName, resolve, onCancelled);
   }
 
   /**

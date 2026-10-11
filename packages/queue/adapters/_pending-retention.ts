@@ -5,6 +5,7 @@ export async function cancelPendingPage(
   kv: WatchableKv,
   queueName: string,
   resolve: (ids: readonly string[]) => Promise<readonly string[]>,
+  onCancelled?: (retentionId: string) => void,
 ): Promise<boolean> {
   if (!kv.atomic) throw new TypeError('Pending cancellation requires atomic KV operations.');
   const cursorKey = ['queue:retention-cursor', queueName];
@@ -33,9 +34,10 @@ export async function cancelPendingPage(
   // One CAS per key avoids Deno KV check limits and never copies full-size queue values.
   for (const entry of page) {
     if (entry.value.retentionId !== undefined && cancelled.has(entry.value.retentionId)) {
-      await kv.atomic([{ key: entry.key, versionstamp: entry.versionstamp }], [
+      const deletion = await kv.atomic([{ key: entry.key, versionstamp: entry.versionstamp }], [
         { type: 'delete', key: entry.key },
       ]);
+      if (deletion.ok) onCancelled?.(entry.value.retentionId);
     }
   }
   const more = page.length === 100;

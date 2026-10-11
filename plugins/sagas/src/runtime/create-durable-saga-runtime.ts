@@ -54,7 +54,9 @@ export async function createDurableSagaRuntime(
 ): Promise<DurableSagaRuntime> {
   const resources = await resolveStoreResources(options);
   const scheduler = options.native?.scheduler;
-  scheduler?.bindRetentionStore?.(resources.store);
+  scheduler?.bindRetentionStore?.(resources.store, {
+    completedRetentionDays: options.completedRetentionDays,
+  });
   let scheduledController: AbortController | undefined;
   let scheduledCleanup: Promise<void> | undefined;
   const stopScheduledCleanup = async (): Promise<void> => {
