@@ -280,7 +280,11 @@ describe('local contributor install plugin flow', () => {
         args: ['check', '--unstable-kv', './ai/routes/chat.tsx'],
         cwd: projectRoot,
       });
-      assertEquals(check.code, 0, new TextDecoder().decode(check.stderr));
+      assertEquals(
+        check.code,
+        0,
+        new TextDecoder().decode(check.stderr) || new TextDecoder().decode(check.stdout),
+      );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }

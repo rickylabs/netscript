@@ -132,10 +132,10 @@ Deno.test('missing memory record maps to typed NOT_FOUND with status 404', async
 `,
         );
       }
-      await deno(['task', 'check'], join(projectRoot, 'services/team-members'));
+      await check(['task', 'check'], join(projectRoot, 'services/team-members'));
       if (variant === 'memory') {
-        await deno(['task', 'check'], join(projectRoot, 'services/orders'));
-        await deno(['check', `apps/${projectName}-web/lib/orders.ts`], projectRoot);
+        await check(['task', 'check'], join(projectRoot, 'services/orders'));
+        await check(['check', `apps/${projectName}-web/lib/orders.ts`], projectRoot);
       }
       await deno(['task', 'test'], join(projectRoot, 'services/team-members'));
     } finally {
@@ -149,14 +149,20 @@ async function cli(args: string[]): Promise<void> {
 }
 
 async function deno(args: string[], cwd: string): Promise<void> {
-  const output = args[0] === 'check' || (args[0] === 'task' && args[1] === 'check')
-    ? await checkGeneratedFiles({ args, cwd })
-    : await new Deno.Command(Deno.execPath(), {
-      args,
-      cwd,
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+  const output = await new Deno.Command(Deno.execPath(), {
+    args,
+    cwd,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertSuccess(output);
+}
+
+async function check(args: string[], cwd: string): Promise<void> {
+  assertSuccess(await checkGeneratedFiles({ args, cwd }));
+}
+
+function assertSuccess(output: Deno.CommandOutput): void {
   const decoder = new TextDecoder();
   assertEquals(
     output.code,

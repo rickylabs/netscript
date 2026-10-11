@@ -68,7 +68,7 @@ Deno.test({
       // release branch (the version is not published until the release merges); the
       // published-artifact resolution of scaffolded projects is owned by the post-publish
       // production smoke (`e2e-cli-prod.yml`), not this lane.
-      await run(projectRoot, [
+      const checkArgs = [
         'check',
         '--unstable-kv',
         '--config',
@@ -76,7 +76,8 @@ Deno.test({
         'ai/ai.ts',
         'ai/models.ts',
         'ai/mcp/registry.ts',
-      ]);
+      ];
+      assertSuccess(await checkGeneratedFiles({ cwd: projectRoot, args: checkArgs }), checkArgs);
     } finally {
       await Deno.remove(smokeRoot, { recursive: true });
     }
@@ -84,14 +85,16 @@ Deno.test({
 });
 
 async function run(cwd: string, args: readonly string[]): Promise<void> {
-  const output = args[0] === 'check'
-    ? await checkGeneratedFiles({ args, cwd })
-    : await new Deno.Command(Deno.execPath(), {
-      args: [...args],
-      cwd,
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+  const output = await new Deno.Command(Deno.execPath(), {
+    args: [...args],
+    cwd,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertSuccess(output, args);
+}
+
+function assertSuccess(output: Deno.CommandOutput, args: readonly string[]): void {
   if (output.success) return;
   const decoder = new TextDecoder();
   throw new Error(

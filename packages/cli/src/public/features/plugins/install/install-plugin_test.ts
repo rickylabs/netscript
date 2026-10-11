@@ -810,7 +810,11 @@ describe('public install plugin flow', () => {
         args: ['check', '--unstable-kv', '--minimum-dependency-age=0', ...aiSources],
         cwd: projectRoot,
       });
-      assertEquals(check.code, 0, new TextDecoder().decode(check.stderr));
+      assertEquals(
+        check.code,
+        0,
+        new TextDecoder().decode(check.stderr) || new TextDecoder().decode(check.stdout),
+      );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -2338,7 +2342,8 @@ function streamsDescriptor(): ValidatedPluginDescriptor {
       name: '@netscript/plugin-streams',
       version: '0.0.1-alpha.12',
       displayName: 'Streams (ephemeral by default)',
-      description: 'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
+      description:
+        'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
       peerDependencies: {
         '@netscript/plugin': '0.0.1-alpha.12',
       },
@@ -2384,7 +2389,8 @@ function streamsDescriptor(): ValidatedPluginDescriptor {
       files: { '/scaffold.plugin.json': 'sha256-good' },
     },
     details: {
-      description: 'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
+      description:
+        'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
       score: 95,
     },
   };

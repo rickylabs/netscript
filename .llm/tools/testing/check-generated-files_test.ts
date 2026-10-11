@@ -61,7 +61,7 @@ Deno.test('generated type-check rejects empty directories and empty check tasks'
   }
 });
 
-Deno.test('generated type-check match policy recognizes both output streams and rejects other verbs', async () => {
+Deno.test('generated type-check match policy is case-insensitive and rejects other verbs', async () => {
   assertThrows(() => assertCheckMatched('No matching files found\n'), Error, 'matched no files');
   assertThrows(() => assertCheckMatched('no matching files found\n'), Error, 'matched no files');
   await assertRejects(() => checkGeneratedFiles({ args: ['run', 'probe.ts'] }), Error, 'requires');

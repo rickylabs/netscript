@@ -1,10 +1,10 @@
-import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/check-generated-files.ts'
 /**
  * @module templates/aspire/helpers/aspire-compat-health-checks_test
  *
  * Executes the generated compatibility helper against real local Node sockets.
  */
 
+import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/check-generated-files.ts'
 import { assert, assertEquals, assertMatch } from 'jsr:@std/assert@^1'
 import { afterAll, describe, it } from 'jsr:@std/testing@^1/bdd'
 import { createServer, type Server, type Socket } from 'node:net'
@@ -69,29 +69,23 @@ const generatedConfigPath = `${generatedRoot}/deno.json`
 const zodSpecifier = import.meta.resolve('zod')
 await Deno.writeTextFile(
   generatedConfigPath,
-  `${
-    JSON.stringify(
-      {
-        lock: false,
-        imports: { zod: zodSpecifier },
-        compilerOptions: {
-          strict: true,
-          noImplicitAny: true,
-          noImplicitReturns: true,
-          isolatedDeclarations: false,
-        },
-        fmt: {
-          useTabs: false,
-          lineWidth: 100,
-          indentWidth: 2,
-          semiColons: true,
-          singleQuote: true,
-        },
-      },
-      null,
-      2,
-    )
-  }\n`,
+  `${JSON.stringify({
+    lock: false,
+    imports: { zod: zodSpecifier },
+    compilerOptions: {
+      strict: true,
+      noImplicitAny: true,
+      noImplicitReturns: true,
+      isolatedDeclarations: false,
+    },
+    fmt: {
+      useTabs: false,
+      lineWidth: 100,
+      indentWidth: 2,
+      semiColons: true,
+      singleQuote: true,
+    },
+  }, null, 2)}\n`,
 )
 await Deno.writeTextFile(compatPath, compatContent)
 // The generated helper loads `pg` from the AppHost's node_modules; the test resolves the
@@ -177,7 +171,9 @@ describe('generated Aspire listener readiness helpers', () => {
 
       assertEquals(result, {
         status: 'Healthy',
-        description: `postgres listener ready on 127.0.0.1:${serverPort(server)}`,
+        description: `postgres listener ready on 127.0.0.1:${
+          serverPort(server)
+        }`,
       })
     } finally {
       await closeServer(server)

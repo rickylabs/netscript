@@ -80,9 +80,7 @@ async function runCommand(
 }
 
 function runDeno(args: readonly string[], cwd?: string): Promise<Deno.CommandOutput> {
-  return args[0] === 'check'
-    ? checkGeneratedFiles({ args, cwd })
-    : runCommand(Deno.execPath(), args, cwd);
+  return runCommand(Deno.execPath(), args, cwd);
 }
 
 function outputText(output: Deno.CommandOutput): string {
@@ -167,7 +165,7 @@ Deno.test('packed SDK rejects all client-contribution private subpaths', async (
       `${consumer}/probe.ts`,
       "import { createServiceClient } from '@netscript/sdk/client';\nvoid createServiceClient;\n",
     );
-    const positive = await runDeno(['check', 'probe.ts'], consumer);
+    const positive = await checkGeneratedFiles({ args: ['check', 'probe.ts'], cwd: consumer });
     assertEquals(positive.code, 0, outputText(positive));
 
     for (const specifier of REJECTED_PACKED_IMPORTS) {
@@ -175,7 +173,7 @@ Deno.test('packed SDK rejects all client-contribution private subpaths', async (
         `${consumer}/probe.ts`,
         `import '${specifier}';\n`,
       );
-      const negative = await runDeno(['check', 'probe.ts'], consumer);
+      const negative = await checkGeneratedFiles({ args: ['check', 'probe.ts'], cwd: consumer });
       assert(negative.code !== 0, `${specifier} unexpectedly imported from the packed SDK`);
     }
   } finally {

@@ -1,5 +1,11 @@
-import { assertCheckMatched } from '../run-deno-check.ts';
-export { assertCheckMatched } from '../run-deno-check.ts';
+import { matchedNoFiles } from '../run-deno-check.ts';
+
+/** Reject an excluded or empty generated-file check. */
+export function assertCheckMatched(output: string): void {
+  if (matchedNoFiles(output)) {
+    throw new Error('Generated type-check matched no files: No matching files found');
+  }
+}
 
 /** Preserve type errors for negative assertions, but never accept an empty check. */
 export async function checkGeneratedFiles(options: {

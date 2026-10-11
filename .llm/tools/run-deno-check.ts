@@ -11,11 +11,13 @@
  * - deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/plugin-triggers-core/mod.ts --deno-arg --doc
  */
 
-/** Reject Deno's successful exit when its configuration excludes every target. */
-export function assertCheckMatched(output: string): void {
-  if (/No matching files found/i.test(output)) {
-    throw new Error('Generated type-check matched no files: No matching files found');
-  }
+/** Detect Deno's empty check even when the process reports success. */
+export function matchedNoFiles(output: string): boolean {
+  return /No matching files found/i.test(output);
+}
+
+function resolveExitCode(code: number, output: string): number {
+  return code || (matchedNoFiles(output) ? 2 : 0);
 }
 
 interface Options {
@@ -388,15 +390,9 @@ async function runBatch(files: string[], options: Options): Promise<BatchResult>
   }).output();
 
   const output = new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
-  let exitCode = result.code;
-  try {
-    assertCheckMatched(output);
-  } catch {
-    exitCode = exitCode || 2;
-  }
   return {
     files,
-    exitCode,
+    exitCode: resolveExitCode(result.code, output),
     output,
   };
 }
@@ -411,15 +407,9 @@ async function runCommand(command: string[], options: Options): Promise<BatchRes
   }).output();
 
   const output = new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
-  let exitCode = result.code;
-  try {
-    assertCheckMatched(output);
-  } catch {
-    exitCode = exitCode || 2;
-  }
   return {
     files: [],
-    exitCode,
+    exitCode: resolveExitCode(result.code, output),
     output,
   };
 }
