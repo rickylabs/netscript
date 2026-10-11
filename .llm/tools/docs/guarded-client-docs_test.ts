@@ -30,7 +30,23 @@ Deno.test('route authorization tutorial retains completion sections and tracked 
   }
 });
 
-Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401/403/200', async () => {
+Deno.test(
+  'guarded client docs compile public entrypoints and prove REST/RPC 401/403/200',
+  runDocExamples,
+);
+
+Deno.test('guarded docs subprocess leaves the parent environment unchanged', async () => {
+  const snapshot = () => JSON.stringify(Object.entries(Deno.env.toObject()).sort());
+  const before = snapshot();
+  try {
+    await runDocExamples();
+  } finally {
+    // Compare without printing environment values, which may contain credentials.
+    assert(snapshot() === before, 'Documentation subprocess changed the parent environment');
+  }
+});
+
+async function runDocExamples(): Promise<void> {
   const tutorial = await Deno.readTextFile(new URL(tutorialPath, root));
   const sdk = await Deno.readTextFile(new URL(sdkPath, root));
   const contract = fence(tutorial, '// contracts/versions/v1/workspace.contract.ts');
@@ -69,6 +85,7 @@ Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401
       'tutorial-policy.ts': tutorialPolicy,
       'sdk-policy.ts': sdkPolicy,
       'controls.ts': controls,
+      'calls.ts': calls,
     };
     for (const [name, contents] of Object.entries(files)) {
       await Deno.writeTextFile(join(directory, name), contents);
@@ -77,6 +94,7 @@ Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401
       const args of [
         [
           'check',
+          '--frozen',
           '--import-map',
           importMap,
           '--unstable-kv',
@@ -84,11 +102,13 @@ Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401
         ],
         [
           'run',
+          '--frozen',
           '--import-map',
           importMap,
           '--unstable-kv',
           '--allow-all',
           join(directory, 'controls.ts'),
+          importMap,
         ],
       ]
     ) {
@@ -97,6 +117,8 @@ Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401
         cwd: root,
         stdout: 'piped',
         stderr: 'piped',
+        clearEnv: true,
+        env: toolEnvironment(),
       }).output();
       assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
       if (args[0] === 'run') {
@@ -108,18 +130,24 @@ Deno.test('guarded client docs compile public entrypoints and prove REST/RPC 401
   } finally {
     await Deno.remove(directory, { recursive: true });
   }
-});
+}
+
+// Preserve only tool/cache locations; no service URLs, cookies, or credentials are inherited.
+function toolEnvironment(): Record<string, string> {
+  const environment: Record<string, string> = {};
+  for (const key of ['HOME', 'DENO_DIR', 'XDG_CACHE_HOME', 'XDG_CONFIG_HOME', 'PATH', 'TMPDIR']) {
+    const value = Deno.env.get(key);
+    if (value !== undefined) environment[key] = value;
+  }
+  return environment;
+}
 
 // Run the actual extracted examples, including the shipped generated BFF helper.
 const controls = `
-import { assert, assertEquals, assertRejects } from '@std/assert';
-import { ORPCError } from '@orpc/client';
+import { assert, assertEquals } from '@std/assert';
 import { createService, type ServiceHandlerContext } from '@netscript/service';
 import { createContractAuthorizer, createStaticCredentialAuthenticator } from '@netscript/service/auth';
-import { createServiceClient } from '@netscript/sdk/client';
 import { WorkspaceContractV1, WorkspaceV1 } from './contract.ts';
-import { workspaceClient, listWorkspaceMembers } from './sdk.ts';
-import { handleWorkspaceMembers, loadWorkspaceMembers } from './tutorial.ts';
 
 const router = WorkspaceV1.$context<ServiceHandlerContext>().router({
   members: WorkspaceV1.$context<ServiceHandlerContext>().members.handler(({ input, context }) => {
@@ -142,15 +170,45 @@ const app = createService(router, { name: 'workspace' })
   .withDocs()
   .build();
 const server = Deno.serve({ hostname: '127.0.0.1', port: 0, onListen() {} }, (request) => app.fetch(request));
-const key = 'services__workspace__http__0';
-const previous = Deno.env.get(key);
-// Set discovery once for every sequential and concurrent call; restore it only after all finish.
-Deno.env.set(key, 'http://127.0.0.1:' + server.addr.port);
+try {
+  const env: Record<string, string> = {
+    services__workspace__http__0: 'http://127.0.0.1:' + server.addr.port,
+  };
+  for (const key of ['HOME', 'DENO_DIR', 'XDG_CACHE_HOME', 'XDG_CONFIG_HOME', 'PATH', 'TMPDIR']) {
+    const value = Deno.env.get(key);
+    if (value !== undefined) env[key] = value;
+  }
+  // Supply discovery at process creation, never through a process-wide environment mutation.
+  const result = await new Deno.Command(Deno.execPath(), {
+    args: ['run', '--frozen', '--import-map', Deno.args[0], '--unstable-kv', '--allow-all',
+      new URL('./calls.ts', import.meta.url).pathname],
+    clearEnv: true,
+    env,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+  console.log(new TextDecoder().decode(result.stdout));
+} finally {
+  await server.shutdown();
+}
+`;
+
+// All SDK/BFF calls share one immutable child environment, isolated from the shard and server.
+const calls = `
+import { assert, assertEquals, assertRejects } from '@std/assert';
+import { ORPCError } from '@orpc/client';
+import { createServiceClient } from '@netscript/sdk/client';
+import { WorkspaceContractV1 } from './contract.ts';
+import { workspaceClient, listWorkspaceMembers } from './sdk.ts';
+import { handleWorkspaceMembers, loadWorkspaceMembers } from './tutorial.ts';
+const origin = Deno.env.get('services__workspace__http__0');
+assert(origin);
 const anonymous = createServiceClient({ contract: WorkspaceContractV1, serviceName: 'workspace' });
 const input = { workspace: 'ws-1', limit: 20, offset: 0 };
 async function verify() {
   for (const [token, status] of [[undefined, 401], ['write', 403], ['read', 200]] as const) {
-    const response = await app.request('/api/workspace/ws-1/members', {
+    const response = await fetch(origin + '/api/workspace/ws-1/members', {
       headers: token ? { authorization: 'Bearer ' + token } : {},
     });
     assertEquals(response.status, status);
@@ -189,21 +247,16 @@ async function verify() {
       ? { ...input, subject: 'user:reader', members: [] }
       : { authenticated: false });
   }
-  const health = await app.request('/health');
+  const health = await fetch(origin + '/health');
   assertEquals(health.status, 200);
   await health.arrayBuffer();
   for (const path of ['/api/openapi.json', '/api/docs']) {
-    const discovery = await app.request(path);
+    const discovery = await fetch(origin + path);
     assertEquals(discovery.status, 200);
     await discovery.arrayBuffer();
   }
 }
-try {
-  for (let iteration = 0; iteration < 20; iteration++) await verify();
-  await Promise.all(Array.from({ length: 5 }, () => verify()));
-  console.log('20 sequential + 5 parallel controls');
-} finally {
-  if (previous === undefined) Deno.env.delete(key); else Deno.env.set(key, previous);
-  await server.shutdown();
-}
+for (let iteration = 0; iteration < 20; iteration++) await verify();
+await Promise.all(Array.from({ length: 5 }, () => verify()));
+console.log('20 sequential + 5 parallel controls');
 `;
