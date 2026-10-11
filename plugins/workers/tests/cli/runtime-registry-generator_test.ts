@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { dirname, fromFileUrl, join, toFileUrl } from '@std/path';
 import { type WorkersConfigData, WorkersConfigSchema } from '@netscript/plugin-workers-core/config';
@@ -421,7 +422,7 @@ await transcribeImage({
 `,
     );
 
-    const output = await new Deno.Command(Deno.execPath(), {
+    const output = await checkGeneratedFiles({
       args: [
         'check',
         '--no-lock',
@@ -430,9 +431,7 @@ await transcribeImage({
         join(projectRoot, 'payload-consumer.ts'),
       ],
       cwd: projectRoot,
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     const stderr = new TextDecoder().decode(output.stderr);
     assertEquals(output.code, 0, stderr);
   });
@@ -453,7 +452,7 @@ void exact;
 createWorkersContract<GeneratedJobPayloadMap>();
 `,
     );
-    const output = await new Deno.Command(Deno.execPath(), {
+    const output = await checkGeneratedFiles({
       args: [
         'check',
         '--no-lock',
@@ -462,9 +461,7 @@ createWorkersContract<GeneratedJobPayloadMap>();
         join(projectRoot, 'compiled-consumer.ts'),
       ],
       cwd: projectRoot,
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
   });
 });
@@ -512,7 +509,7 @@ void exact;
 createWorkersContract<GeneratedJobPayloadMap>();
 `,
     );
-    const output = await new Deno.Command(Deno.execPath(), {
+    const output = await checkGeneratedFiles({
       args: [
         'check',
         '--unstable-kv',
@@ -522,9 +519,7 @@ createWorkersContract<GeneratedJobPayloadMap>();
         join(projectRoot, 'compiler-consumer.ts'),
       ],
       cwd: projectRoot,
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
   });
 });

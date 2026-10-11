@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/check-generated-files.ts';
 /**
  * @module templates/aspire/helpers/generated-helpers-compile_test
  *
@@ -7,9 +8,8 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { resolve } from 'jsr:@std/path@^1';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
-import { generateDbCliMode } from '../generate-db-cli-mode.ts';
-import { generateRegisterInfrastructure } from '../register/generate-register-infrastructure.ts';
-import { MINIMAL_DATABASE } from './generators-test-support.ts';
+import { writeGeneratedHelperFixture } from './generated-helper-fixture.ts';
+import { EMPTY_CONFIG, MINIMAL_DATABASE } from './generators-test-support.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
@@ -145,15 +145,19 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
   await Deno.mkdir(modulesDir, { recursive: true });
 
   try {
-    await Deno.writeTextFile(`${modulesDir}/aspire.mts`, RESTORED_ASPIRE_SDK_CONTRACT);
-    await Deno.writeTextFile(`${helpersDir}/_aspire-compat.mts`, ASPIRE_COMPAT_CONTRACT);
-    const registerInfrastructure = generateRegisterInfrastructure({
-      databases: { main: MINIMAL_DATABASE },
-      caches: {
+    await writeGeneratedHelperFixture(root, {
+      ...EMPTY_CONFIG,
+      Databases: { main: MINIMAL_DATABASE },
+      Cache: {
         executable: { Enabled: true, Engine: 'Garnet', Mode: 'Executable' },
         auto: { Enabled: true, Engine: 'Garnet', Mode: 'Auto', Port: 6385 },
       },
     });
+    await Deno.writeTextFile(`${modulesDir}/aspire.mts`, RESTORED_ASPIRE_SDK_CONTRACT);
+    await Deno.writeTextFile(`${helpersDir}/_aspire-compat.mts`, ASPIRE_COMPAT_CONTRACT);
+    const registerInfrastructure = await Deno.readTextFile(
+      `${helpersDir}/register-infrastructure.mts`,
+    );
     assertStringIncludes(registerInfrastructure, 'databases.set("main", db_0)');
     assertStringIncludes(registerInfrastructure, 'withHealthCheck("main_auth")');
     assert(
@@ -161,22 +165,12 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
       'compile-clean Container emission must not call an unsupported runtime capability',
     );
     assert(!registerInfrastructure.includes('.getValue()'));
-    const dbCliMode = generateDbCliMode({ databases: { main: MINIMAL_DATABASE } });
+    const dbCliMode = await Deno.readTextFile(`${helpersDir}/db-cli-mode.mts`);
     assertStringIncludes(dbCliMode, ".withEnvironment('DATABASE_URL', target.resource)");
     assertStringIncludes(dbCliMode, 'return await executeDbCliResource(');
     assert(!dbCliMode.includes('connectionStringExpression()'));
     assert(!dbCliMode.includes('.getValue()'));
-    await Deno.writeTextFile(
-      `${helpersDir}/register-infrastructure.mts`,
-      registerInfrastructure,
-    );
-    await Deno.writeTextFile(`${helpersDir}/db-cli-mode.mts`, dbCliMode);
-    await Deno.copyFile(
-      new URL('../../../../assets/aspire/helpers/run-tool.ts.template', import.meta.url),
-      `${helpersDir}/run-tool.mts`,
-    );
-
-    const output = await new Deno.Command(Deno.execPath(), {
+    const output = await checkGeneratedFiles({
       args: [
         'check',
         '--no-lock',
@@ -185,9 +179,7 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
         `${helpersDir}/db-cli-mode.mts`,
         `${helpersDir}/run-tool.mts`,
       ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     const stdout = new TextDecoder().decode(output.stdout);
     const stderr = new TextDecoder().decode(output.stderr);
 
