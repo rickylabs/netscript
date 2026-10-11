@@ -93,7 +93,8 @@ export async function reconcileBrowserAuth(
   const scaffoldApps = apps.filter(([, entry]) => isScaffoldApp(entry));
   // Preserve the legacy helper-only flow when no apps are configured. An authored app
   // must not cause missing shared browser files to be recreated.
-  const scaffoldBrowser = apps.length === 0 || scaffoldApps.length > 0;
+  const scaffoldBrowser = apps.length === 0 ||
+    apps.some(([, entry]) => entry.Auth?.BrowserTopology !== 'authored');
   const authServiceName = `'${auth}'`;
   const files: BrowserAuthFile[] = scaffoldBrowser
     ? [

@@ -462,3 +462,25 @@ Deno.test('authored app topology still wires an independently scaffold-owned ser
     'authenticator: browserAuthenticator',
   );
 });
+
+Deno.test('default browser helpers remain scaffold-owned for non-browser app types', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const root = '/workspace';
+  await fs.writeFile(
+    join(root, 'appsettings.json'),
+    JSON.stringify({
+      NetScript: {
+        ...settings.NetScript,
+        Apps: { build: { Type: 'task', Workdir: 'apps/build' } },
+        Services: {},
+      },
+    }),
+  );
+  await writeInstalledAuthFixture(fs, root);
+  assertEquals(await reconcileBrowserAuth(root, fs), [
+    join(root, 'auth/bff.ts'),
+    join(root, 'auth/service.ts'),
+  ]);
+  assertEquals(await fs.exists(join(root, 'apps/build/routes/auth/[action].ts')), false);
+  assertEquals(await reconcileBrowserAuth(root, fs), []);
+});
