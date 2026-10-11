@@ -14,7 +14,6 @@
  * @module
  */
 
-import { delay } from '@std/async';
 import { createPackageLogger } from '@netscript/logger';
 import { combineAtomicValue } from '../application/atomic-combine.ts';
 import { generateVersionstamp, keyHasPrefix, keyToString } from '../application/keys.ts';
@@ -41,6 +40,7 @@ import {
 import { RedisConnectionManager } from './redis/connection.ts';
 import { keyToRedisKey, redisKeyToKey } from './redis/serialization.ts';
 import { WatchBatchQueue } from './redis/watch-batch-queue.ts';
+import { WatchSubscriptions } from './redis/watch-subscriptions.ts';
 import {
   DEFAULT_REDIS_NAMESPACE,
   DEFAULT_REDIS_URL,
@@ -94,6 +94,7 @@ function isCombineMutation(mutation: AtomicMutation): mutation is CombineMutatio
 export class RedisKvAdapter implements WatchableKv {
   private readonly connection: RedisConnectionManager;
   private readonly namespace: string;
+  private readonly subscriptions: WatchSubscriptions<WatchMessage>;
   private atomicTail: Promise<void> = Promise.resolve();
 
   /**
@@ -114,6 +115,10 @@ export class RedisKvAdapter implements WatchableKv {
     this.namespace = config.namespace ?? DEFAULT_REDIS_NAMESPACE;
     const options = (config.options as import('ioredis').RedisOptions | undefined) ?? {};
     this.connection = new RedisConnectionManager(url, options);
+    this.subscriptions = new WatchSubscriptions(
+      () => this.connection.ensureSubscriber(),
+      (message) => this.parseWatchMessage(message),
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -641,48 +646,42 @@ export class RedisKvAdapter implements WatchableKv {
     keys: KvKey[],
     options?: WatchOptions,
   ): AsyncIterable<WatchEvent<T>[]> {
-    const subscriber = await this.connection.ensureSubscriber();
+    if (options?.signal?.aborted) return;
     const channel = this.getWatchChannel();
     const previousValues = new Map<string, T | null>();
+    const knownVersions = new Map<string, string>();
     const watchedKeys = new Set(keys.map(keyToString));
-
-    for (const key of keys) {
-      const entry = await this.get<T>(key);
-      previousValues.set(keyToString(key), entry?.value ?? null);
-    }
-
-    await subscriber.subscribe(channel);
-
     const queue = new WatchBatchQueue<WatchEvent<T>>();
-    const messageHandler = (receivedChannel: string, message: string): void => {
-      if (receivedChannel !== channel) {
-        return;
-      }
-
-      const data = this.parseWatchMessage<T>(message);
-      if (!data) {
-        return;
-      }
-
+    const messageHandler = (data: WatchMessage): void => {
       const keyStr = keyToString(data.key);
       if (!watchedKeys.has(keyStr)) {
         return;
       }
-
+      const versionstamp = data.versionstamp ?? generateVersionstamp();
+      if (knownVersions.get(keyStr) === versionstamp) return;
+      knownVersions.set(keyStr, versionstamp);
       queue.push({
         key: data.key,
         previousValue: previousValues.get(keyStr) ?? null,
         timestamp: new Date(data.timestamp),
         type: data.type,
-        value: data.value,
-        versionstamp: data.versionstamp ?? generateVersionstamp(),
+        value: data.value as T | null,
+        versionstamp,
       });
-      previousValues.set(keyStr, data.value);
+      previousValues.set(keyStr, data.value as T | null);
     };
-
-    subscriber.on('message', messageHandler);
-
+    const release = await this.subscriptions.acquire(channel, messageHandler);
     try {
+      // Messages received during these reads remain queued. A read must not
+      // overwrite the previous value already advanced by a startup message.
+      // Its first previousValue is null: the baseline may already contain that
+      // write (or a newer write), so it cannot establish the preceding value.
+      const entries = await this.getMany<T>(keys);
+      for (const [index, key] of keys.entries()) {
+        const entry = entries[index];
+        const keyStr = keyToString(key);
+        if (!knownVersions.has(keyStr)) previousValues.set(keyStr, entry?.value ?? null);
+      }
       while (!options?.signal?.aborted) {
         const events = await queue.next(options?.debounce, options?.signal);
         if (events.length > 0 && !options?.signal?.aborted) {
@@ -690,8 +689,7 @@ export class RedisKvAdapter implements WatchableKv {
         }
       }
     } finally {
-      subscriber.off('message', messageHandler);
-      await subscriber.unsubscribe(channel);
+      await release();
     }
   }
 
@@ -710,68 +708,82 @@ export class RedisKvAdapter implements WatchableKv {
     prefix: KvKey,
     options?: WatchPrefixOptions,
   ): AsyncIterable<WatchEvent<T>> {
-    const subscriber = await this.connection.ensureSubscriber();
+    if (options?.signal?.aborted) return;
     const channel = this.getWatchChannel();
     const pollInterval = options?.pollInterval ?? 1000;
     const knownVersions = new Map<string, string>();
 
-    if (!options?.skipInitial) {
-      for await (const entry of this.list<T>({ prefix })) {
-        const keyStr = keyToString(entry.key);
-        const versionstamp = entry.versionstamp ?? generateVersionstamp();
-        knownVersions.set(keyStr, versionstamp);
-        yield {
-          key: entry.key,
-          timestamp: new Date(),
-          type: 'set',
-          value: entry.value,
-          versionstamp,
-        };
-      }
-    } else {
-      for await (const entry of this.list<T>({ prefix })) {
-        knownVersions.set(keyToString(entry.key), entry.versionstamp ?? generateVersionstamp());
-      }
-    }
-
-    await subscriber.subscribe(channel);
-    const eventQueue: WatchEvent<T>[] = [];
-    const messageHandler = (_channel: string, message: string): void => {
-      const data = this.parseWatchMessage<T>(message);
-      if (!data || !keyHasPrefix(data.key, prefix)) {
-        return;
-      }
-
-      const keyStr = keyToString(data.key);
+    const queue = new WatchBatchQueue<WatchEvent<T>>();
+    const startupKeys = new Set<string>();
+    let initializing = true;
+    const messageHandler = (data: WatchMessage): void => {
+      if (!keyHasPrefix(data.key, prefix)) return;
       const versionstamp = data.versionstamp ?? generateVersionstamp();
-      eventQueue.push({
+      if (initializing) {
+        startupKeys.add(keyToString(data.key));
+      }
+      queue.push({
         key: data.key,
         timestamp: new Date(data.timestamp),
         type: data.type,
-        value: data.value,
+        value: data.value as T | null,
         versionstamp,
       });
-
-      if (data.type === 'delete') {
-        knownVersions.delete(keyStr);
-      } else {
-        knownVersions.set(keyStr, versionstamp);
-      }
     };
-
-    subscriber.on('message', messageHandler);
-
+    const release = await this.subscriptions.acquire(channel, messageHandler);
     try {
-      while (!options?.signal?.aborted) {
-        while (eventQueue.length > 0) {
-          yield eventQueue.shift()!;
+      for await (const entry of this.list<T>({ prefix })) {
+        const keyStr = keyToString(entry.key);
+        const versionstamp = entry.versionstamp ?? generateVersionstamp();
+        // Buffered writes own this key's startup history. Yielding a newer
+        // snapshot before that history would move the consumer backwards.
+        if (startupKeys.has(keyStr)) continue;
+        knownVersions.set(keyStr, versionstamp);
+        if (!options?.skipInitial) {
+          yield {
+            key: entry.key,
+            timestamp: new Date(),
+            type: 'set',
+            value: entry.value,
+            versionstamp,
+          };
         }
-
-        await delay(pollInterval);
+      }
+      // skipInitial suppresses the baseline only, never a subscribed change.
+      if (options?.skipInitial) {
+        for (const key of startupKeys) knownVersions.delete(key);
+      }
+      initializing = false;
+      startupKeys.clear();
+      let nextScanAt = Date.now() + pollInterval;
+      while (!options?.signal?.aborted) {
+        const poll = new AbortController();
+        const timeout = setTimeout(() => poll.abort(), Math.max(0, nextScanAt - Date.now()));
+        let events: WatchEvent<T>[];
+        try {
+          const signal = options?.signal
+            ? AbortSignal.any([options.signal, poll.signal])
+            : poll.signal;
+          // Discovery bounds the empty wait, not the debounce or queued events.
+          // Drain notifications before scanning so a queued delete is not
+          // first synthesized by the scan and then delivered a second time.
+          events = await queue.next(options?.debounce, options?.signal, signal);
+        } finally {
+          clearTimeout(timeout);
+        }
+        for (const event of events) {
+          if (options?.signal?.aborted) break;
+          const keyStr = keyToString(event.key);
+          if (knownVersions.get(keyStr) === event.versionstamp) continue;
+          if (event.type === 'delete') knownVersions.delete(keyStr);
+          else knownVersions.set(keyStr, event.versionstamp!);
+          yield event;
+        }
 
         if (options?.signal?.aborted) {
           break;
         }
+        if (Date.now() < nextScanAt) continue;
 
         const seenKeys = new Set<string>();
 
@@ -809,10 +821,10 @@ export class RedisKvAdapter implements WatchableKv {
             versionstamp: null,
           };
         }
+        nextScanAt = Date.now() + pollInterval;
       }
     } finally {
-      subscriber.off('message', messageHandler);
-      await subscriber.unsubscribe(channel);
+      await release();
     }
   }
 
