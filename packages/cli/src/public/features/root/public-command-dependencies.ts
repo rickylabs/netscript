@@ -1,5 +1,3 @@
-import { createInstalledRuntimeRegistryRenderer } from '../generate/plugins/plugin-registry-renderer.ts';
-import { checkPluginRegistries } from '../generate/plugins/check-plugin-registries.ts';
 import type { InitCommandDependencies } from '../init/init-command.ts';
 import { initAgent } from '../agent/init/init-agent.ts';
 import { DenoAgentInitFileSystem } from '../agent/init/agent-init-file-system.ts';
@@ -57,6 +55,8 @@ import type { OsServicePort } from '../../ports/os-service-port.ts';
 import type { ServiceManifest } from '../../ports/service-manifest-port.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../generate/plugins/generate-plugin-registries-command.ts';
 import { createInstalledRuntimeRegistryGenerator } from '../generate/plugins/installed-runtime-registry-generator.ts';
+import { createInstalledRuntimeRegistryRenderer } from '../generate/plugins/plugin-registry-renderer.ts';
+import { checkPluginRegistries } from '../generate/plugins/check-plugin-registries.ts';
 import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runtime-schemas/generate-runtime-schemas-command.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
