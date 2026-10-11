@@ -138,7 +138,7 @@ Under non-interactive backends (WorkOS and better-auth), NetScript enforces a st
 When a backend cannot do something its sub-port nominally exposes, it does not return `undefined`,
 log a warning, or no-op. It throws a **typed** `AuthBackendOperationUnsupportedError(name, op,
 reason)` — naming the backend, the operation, and why. This is the same fail-loud discipline the
-rest of the framework follows (streams helpers throw `StreamUnsupportedOperationError`): an
+rest of the framework follows for backend capability failures: an
 unsupported capability is a *visible, typed boundary*, never a quiet surprise in production.
 
 {{ comp.tabbedCode({ tabs: [
