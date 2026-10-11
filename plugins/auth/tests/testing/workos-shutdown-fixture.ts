@@ -1,6 +1,8 @@
 /** Signal test child: a held delivery must drain through the shipped service's hook. */
 import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 import { serveAuthService } from '../../services/src/auth-service-runtime.ts';
+import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
+import { createAuthServiceGuard } from '../../services/src/auth-guard.ts';
 import { MemoryKvAdapter } from '@netscript/kv';
 
 const kv = new MemoryKvAdapter();
@@ -23,7 +25,6 @@ await serveAuthService(
     contracts: {},
     db: { getClient: () => Promise.resolve({}) },
   },
-  {},
   {
     ...registry,
     cookieName: '__Host-ns_session',
@@ -40,7 +41,16 @@ await serveAuthService(
       },
     },
   },
-  0,
+  {
+    name: 'auth',
+    port: 0,
+    auth: createAuthServiceGuard(registry),
+    context: () => ({
+      registry,
+      telemetry: createAuthTelemetry(),
+      cookieName: '__Host-ns_session',
+    }),
+  },
 );
 if (!started) throw new Error('Shipped runtime did not start its background worker.');
 await kv.close();
