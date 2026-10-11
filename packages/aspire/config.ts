@@ -23,6 +23,8 @@ import {
   ASPIRE_RESOURCE_NAME_RULE,
 } from './src/domain/aspire-resource-name.ts';
 
+export type { SagaProjectionBackend } from '@netscript/plugin-sagas-core/stores/backends';
+
 /** Public parser contract exposed by Aspire schema constants. */
 export interface AspireSchema<Output> {
   /** Structural metadata consumed by Zod inference utilities. */
