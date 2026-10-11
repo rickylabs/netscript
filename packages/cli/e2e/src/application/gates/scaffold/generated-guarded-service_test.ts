@@ -1,3 +1,4 @@
+import { SCAFFOLD_APP_IMPORTS } from '../../../../../src/kernel/constants/scaffold/scaffold-app-catalog.ts';
 import { reconcileBrowserAuth } from '../../../../../src/kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { addProtectedProbeProcedure } from './probe-generated-guarded-service.ts';
 import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
@@ -54,8 +55,14 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
       NetScript: {
         ...JSON.parse(await fs.readFile('/project/appsettings.json')).NetScript,
         Services: { users: result.configEntry },
+        Apps: { web: { Type: 'app', Workdir: 'apps/web' } },
       },
     }),
+  );
+  await fs.writeFile(
+    '/project/apps/web/utils.ts',
+    `import { createDefine } from 'fresh';
+export const define = createDefine();`,
   );
   await reconcileBrowserAuth('/project', fs, formatter);
   const root = await Deno.makeTempDir({ prefix: 'guarded-service-' });
@@ -63,6 +70,9 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
     for (
       const path of [
         'auth/service.ts',
+        'auth/bff.ts',
+        'apps/web/utils.ts',
+        'apps/web/routes/examples/users/session.ts',
         'contracts/mod.ts',
         'contracts/versions/v1/mod.ts',
         'contracts/versions/v1/users.contract.ts',
@@ -98,6 +108,7 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
               name,
             ) => [name, `npm:${name}@${config.catalog[name]}`]),
           ),
+          fresh: SCAFFOLD_APP_IMPORTS.fresh,
           '@guard-probe/contracts': toFileUrl(join(root, 'contracts/mod.ts')).href,
         },
       }),
@@ -108,6 +119,10 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
       .replaceAll('__AUTH_SOURCE__', new URL('plugins/auth/services/src', repo).href)
       .replaceAll('__AUTH_CHECKS__', new URL('./generated-auth-checks.ts', import.meta.url).href)
       .replaceAll('__SERVICE_MAIN__', toFileUrl(join(root, 'services/users/src/main.ts')).href)
+      .replaceAll(
+        '__APP_SESSION_ROUTE__',
+        toFileUrl(join(root, 'apps/web/routes/examples/users/session.ts')).href,
+      )
       .replaceAll(
         '__HTTP_CONTRACT__',
         new URL('../../../domain/http-contract.ts', import.meta.url).href,
@@ -145,6 +160,12 @@ Deno.test('generated auth/users: native sessions pass every runtime case and pub
           ? authCase + ' PASS'
           : 'Generated guarded service PASS: discovery/demo public200; protected REST/RPC anonymous401, denied403, permitted200; anonymous health200',
       );
+      if (!authCase) {
+        assertStringIncludes(
+          output,
+          'Generated app guarded call PASS: SDK bearer contribution; request-scoped cookie; anonymous401, authenticated200, anonymous401',
+        );
+      }
     }
     // Public controls mutate the shipped composition, never a harness-composed listener.
     const authMainUrl = new URL('plugins/auth/services/src/main.ts', repo);
