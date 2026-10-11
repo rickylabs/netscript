@@ -1,3 +1,4 @@
+import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 import {
   assert,
   assertEquals,
@@ -120,7 +121,7 @@ Deno.test('generated webhook delivery compiles and executes signature, retry and
       stderr: 'piped',
     }).output();
     assertEquals(format.code, 0, new TextDecoder().decode(format.stderr));
-    const check = await new Deno.Command(Deno.execPath(), {
+    const check = await checkGeneratedFiles({
       args: [
         'check',
         '--unstable-kv',
@@ -129,9 +130,7 @@ Deno.test('generated webhook delivery compiles and executes signature, retry and
         path,
         directory + '/.netscript/generated/plugin-workers/job-registry.ts',
       ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
+    });
     assertEquals(check.code, 0, new TextDecoder().decode(check.stderr));
     await t.step(
       'scaffold adoption probe executes the default job and rejects broken controls',
@@ -224,11 +223,9 @@ Deno.test('generated webhook delivery compiles and executes signature, retry and
             samplePath,
             sample + (index === 1 ? '\nexport { verifyDelivery };\n' : ''),
           );
-          const output = await new Deno.Command(Deno.execPath(), {
+          const output = await checkGeneratedFiles({
             args: ['check', '--unstable-kv', '--config', root + '/deno.json', samplePath],
-            stdout: 'piped',
-            stderr: 'piped',
-          }).output();
+          });
           assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
         }
         const receiver: {
