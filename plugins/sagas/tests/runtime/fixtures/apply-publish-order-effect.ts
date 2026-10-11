@@ -45,6 +45,7 @@ export async function applyPublishOrderEffect<TTx extends PostgresCommandClient>
   };
   const dispatchContext: WorkerDispatchContext = {
     workerId: 'publish-order-consumer',
+    concurrency: 1,
     registry: { get: () => Promise.resolve(job) },
     executionState: executions,
     idempotency: new KvWorkerIdempotencyStore({ kv }),

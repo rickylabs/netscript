@@ -1,5 +1,5 @@
-import { assertEquals, assertStringIncludes } from '@std/assert';
-import { reconcileAppRoutes } from './reconcile-app-routes.ts';
+import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import { reconcileAppRoutes, removeScaffoldedAppRoute } from './reconcile-app-routes.ts';
 
 const STOCK_POST_SLICE_F_ROUTER = `import { createRouteReference } from '@netscript/fresh/route';
 import { routePatterns } from './.generated/manifest.ts';
@@ -97,5 +97,50 @@ Deno.test('fails closed for customized imports and appRoutes object shapes', () 
   ];
   for (const fixture of fixtures) {
     assertEquals(reconcileAppRoutes(fixture, REQUIREMENT).status, 'conflict');
+  }
+});
+
+Deno.test('removes formatted scaffold registrations while preserving unrelated bytes and leading comments', () => {
+  const entry = `  // authored comment survives
+  catalog: createRouteReference(
+    "/admin/catalog",
+    {
+      id: "catalog",
+      kind: "page",
+    },
+  ),`;
+  const source = STOCK_POST_SLICE_F_ROUTER.replace(
+    '  home: routes.$route,',
+    `${entry}
+  home: routes.$route,`,
+  );
+  const result = removeScaffoldedAppRoute(source, 'admin/catalog', 'catalog');
+  assertEquals(result, source.replace(entry, '  // authored comment survives\n  '));
+  assertEquals(removeScaffoldedAppRoute(result, 'admin/catalog', 'catalog'), result);
+});
+
+Deno.test('formatted registration removal refuses authored metadata, comments, literal changes and duplicates', () => {
+  const generated =
+    "  'catalog': createRouteReference('/catalog', { id: 'catalog', kind: 'page' }),";
+  const variants = [
+    generated.replace("'/catalog'", "'/ catalog'"),
+    generated.replace("id: 'catalog'", "id: 'other'"),
+    generated.replace("kind: 'page'", "kind: 'handler'"),
+    generated.replace("kind: 'page'", "kind: 'page', extra: true"),
+    generated.replace('id:', '/* authored */ id:'),
+    `${generated}
+${generated}`,
+  ];
+  for (const entry of variants) {
+    const source = STOCK_POST_SLICE_F_ROUTER.replace(
+      '  home: routes.$route,',
+      `${entry}
+  home: routes.$route,`,
+    );
+    assertThrows(
+      () => removeScaffoldedAppRoute(source, 'catalog', 'catalog'),
+      Error,
+      'Refusing removal',
+    );
   }
 });

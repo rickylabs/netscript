@@ -183,7 +183,7 @@ Deno.test('saga worker recovery observes native durable progress and checked com
   };
   async function dispatch(request:WorkerJobCommandRequest) {
     requests.push(request);activeCommandKey=request.idempotencyKey;
-    const context:WorkerDispatchContext={workerId:'consumer-worker',registry:{get:()=>Promise.resolve(runtimeJob)},executionState:executions,
+    const context:WorkerDispatchContext={workerId:'consumer-worker',concurrency:1,registry:{get:()=>Promise.resolve(runtimeJob)},executionState:executions,
       idempotency:new KvWorkerIdempotencyStore({kv}),workerPool:pool,jobsDir:'.',activeJobs:new Map(),workerSpan:null,
       taskRegistry:{get:()=>Promise.resolve(undefined)},taskExecutor:{execute:()=>Promise.reject(new Error('unexpected task'))},
     };

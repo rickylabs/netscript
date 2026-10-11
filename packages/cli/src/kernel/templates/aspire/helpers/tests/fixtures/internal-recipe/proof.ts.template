@@ -1,0 +1,85 @@
+/** Runs the exact recipe snippets with the generated carrier's file reference. */
+import { assertEquals, assertRejects } from '@std/assert';
+import {
+  createStaticCredentialAuthenticator,
+  createInstallationSecret,
+  deriveInternalCredential,
+  loadInstallationSecret,
+} from '@netscript/service/auth';
+// These modules are extracted from the recipe into the generated project before execution.
+import { createOrdersApp } from './internal-service.ts';
+import { createOrdersClient } from './internal-client.ts';
+
+const file = Deno.env.get('NETSCRIPT_INSTALLATION_SECRET_FILE');
+if (!file) throw new Error('The generated carrier must deliver the file reference');
+const session = createStaticCredentialAuthenticator({
+  credentials: {
+    'recipe-user-session': { subject: 'user:recipe', roles: ['service'], scopes: ['*'] },
+  },
+});
+const secret = await loadInstallationSecret();
+const bearer = await deriveInternalCredential(secret, 'orders');
+const foreign = await deriveInternalCredential(
+  await createInstallationSecret(crypto.getRandomValues(new Uint8Array(32))), 'orders',
+);
+const crossService = await deriveInternalCredential(secret, 'billing');
+const original = await Deno.readTextFile(file);
+let running = await (await createOrdersApp(session)).serve({ hostname: '127.0.0.1', port: 0 });
+let origin = `http://127.0.0.1:${running.addr.port}`;
+Deno.env.set('services__orders__http__0', origin);
+const client = createOrdersClient();
+
+async function status(path: string, token?: string): Promise<number> {
+  const response = await fetch(`${origin}${path}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+    body: path.includes('/rpc/') ? '{"json":{}}' : '{}',
+  });
+  await response.body?.cancel();
+  return response.status;
+}
+
+const paths = ['sync', 'reindex'].flatMap((procedure) => [
+  `/api/rpc/v1/orders/internal/${procedure}`,
+  `/api/v1/internal/${procedure}`,
+]);
+
+try {
+  assertEquals(await client.internal.sync({}), { success: true });
+  assertEquals(await client.internal.reindex({}), { success: true });
+  for (const path of paths) {
+    assertEquals(await status(path), 401, `${path}: anonymous`);
+    assertEquals(await status(path, 'invalid-recipe-credential'), 401, `${path}: wrong`);
+    assertEquals(await status(path, foreign), 401, `${path}: foreign installation`);
+    assertEquals(await status(path, crossService), 401, `${path}: other service`);
+    assertEquals(await status(path, 'recipe-user-session'), 403, `${path}: user session`);
+    assertEquals(await status(path, bearer), 200, `${path}: internal`);
+  }
+  for (const path of ['/api/rpc/v1/orders/public/ping', '/api/v1/ping']) {
+    assertEquals(await status(path), 200, `${path}: public`);
+  }
+  const port = running.addr.port;
+  await running.stop();
+  await Deno.writeTextFile(file, Array.from(crypto.getRandomValues(new Uint8Array(32)))
+    .map((byte) => byte.toString(16).padStart(2, '0')).join(''));
+  running = await (await createOrdersApp(session)).serve({ hostname: '127.0.0.1', port });
+  origin = `http://127.0.0.1:${running.addr.port}`;
+  Deno.env.set('services__orders__http__0', origin);
+  for (const path of paths) assertEquals(await status(path, bearer), 401, `${path}: rotated`);
+  // The old contribution cached its bearer; even a new service endpoint cannot refresh it.
+  await assertRejects(() => client.internal.sync({}));
+  const freshClient = createOrdersClient();
+  assertEquals(await freshClient.internal.sync({}), { success: true });
+  const fresh = await deriveInternalCredential(await loadInstallationSecret(), 'orders');
+  for (const path of paths) assertEquals(await status(path, fresh), 200, `${path}: fresh`);
+  await Deno.remove(file);
+  await assertRejects(() => loadInstallationSecret());
+  console.info('Recipe proof: both projections, SDK, public policy, session refusal and rotation PASS');
+} finally {
+  const port = running.addr.port;
+  await running.stop();
+  await Deno.writeTextFile(file, original);
+}
