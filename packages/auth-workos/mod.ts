@@ -76,4 +76,13 @@ export type {
   WorkosRevocationStore,
 } from './src/ports/revocation-store.ts';
 
-export type { KvStore } from '@netscript/kv';
+export type {
+  AtomicCheck,
+  AtomicMutation,
+  AtomicResult,
+  KvEntry,
+  KvKey,
+  KvListOptions,
+  KvSetOptions,
+  KvStore,
+} from '@netscript/kv';
