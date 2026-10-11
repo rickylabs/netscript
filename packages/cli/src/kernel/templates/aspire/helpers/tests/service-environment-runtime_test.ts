@@ -211,8 +211,7 @@ function createRecordingBuilder(): RecordingBuilder {
           resource.waits.push(target);
           return resource;
         },
-        getEndpoint: (endpointName) =>
-          Promise.resolve(`http://127.0.0.1/${name}/${endpointName}`),
+        getEndpoint: (endpointName) => Promise.resolve(`http://127.0.0.1/${name}/${endpointName}`),
       };
       resources.set(name, resource);
       return resource;
@@ -309,7 +308,10 @@ async function runGeneratedRegistration(
   await Deno.mkdir(helpersDir, { recursive: true });
   await Deno.mkdir(sdkDir, { recursive: true });
 
-  await Deno.writeTextFile(`${helpersDir}/installation-secret.mts`, readTemplateAssetSync(TEMPLATE_KEYS.aspireHelpersInstallationSecret));
+  await Deno.writeTextFile(
+    `${helpersDir}/installation-secret.mts`,
+    readTemplateAssetSync(TEMPLATE_KEYS.aspireHelpersInstallationSecret),
+  );
   await Deno.writeTextFile(`${sdkDir}/aspire.mts`, ASPIRE_SDK_DOUBLE);
   await Deno.writeTextFile(`${helpersDir}/_aspire-compat.mts`, aspireCompatDouble());
 

@@ -135,7 +135,10 @@ async function loadGeneratedModule(
   await Deno.mkdir(helpersDir, { recursive: true });
   await Deno.mkdir(sdkDir, { recursive: true });
 
-  await Deno.writeTextFile(`${helpersDir}/installation-secret.mts`, readTemplateAssetSync(TEMPLATE_KEYS.aspireHelpersInstallationSecret));
+  await Deno.writeTextFile(
+    `${helpersDir}/installation-secret.mts`,
+    readTemplateAssetSync(TEMPLATE_KEYS.aspireHelpersInstallationSecret),
+  );
   await Deno.writeTextFile(
     `${sdkDir}/aspire.mts`,
     [
