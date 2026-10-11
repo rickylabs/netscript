@@ -4,6 +4,7 @@ import {
   pullRuntimeImage,
   runtimeTierImages,
 } from './prepull-runtime-images.ts';
+import * as runtimePulls from './prepull-runtime-images.ts';
 import { SCAFFOLD_CACHE_CONTAINER_IMAGES } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-container-images.ts';
 
 Deno.test('tier images use the scaffold cache owner and query the database SDK only for postgres', async () => {
@@ -96,4 +97,21 @@ Deno.test('scaffold generator reads the shared cache image source rather than a 
   );
   assertStringIncludes(generator, 'SCAFFOLD_CACHE_CONTAINER_IMAGES[entry.Engine]');
   assertEquals(generator.includes("image: 'ghcr.io/microsoft/garnet'"), false);
+});
+
+Deno.test('calibrated pull budget bounds an exhausted timed pull without changing its failure', async () => {
+  let clock = 0;
+  const measurement = await pullRuntimeImage('stalled-image', (_image, timeoutMs) => {
+    clock += timeoutMs;
+    return Promise.resolve(137);
+  }, (ms) => {
+    clock += ms;
+    return Promise.resolve();
+  }, () => clock);
+  assertEquals('IMAGE_PULL_MAX_DURATION_MS' in runtimePulls, true);
+  if ('IMAGE_PULL_MAX_DURATION_MS' in runtimePulls) {
+    assertEquals(runtimePulls.IMAGE_PULL_MAX_DURATION_MS, 375_000);
+    assertEquals(measurement.durationMs, runtimePulls.IMAGE_PULL_MAX_DURATION_MS);
+  }
+  assertEquals(measurement.attempts.map((attempt) => attempt.exitCode), [137, 137, 137]);
 });

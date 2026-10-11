@@ -310,8 +310,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      # Retain the existing 300s convergence ceiling pending measured head/main stability runs.
-      # Pre-pull and convergence timings are emitted separately; no suite assertion retries.
+      # Calibrated against run 38097613757: startup gates 51.775s / 30.210s.
+      # 300s retains >5x the slower sample; see .llm/tools/README.md runtime calibration.
+      # Image pulls have a separate 375s/image bound; no suite assertion retries.
       ASPIRE_CLI_START_TIMEOUT: "300"
       RUN: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'ci:full') || (contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate') && (needs.classify.result != 'success' || needs.classify.outputs.run_runtime == 'true')) }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
@@ -407,8 +408,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      # Retain the existing 300s convergence ceiling pending measured head/main stability runs.
-      # Pre-pull and convergence timings are emitted separately; no suite assertion retries.
+      # Calibrated against run 38097613757: startup gates 51.775s / 30.210s.
+      # 300s retains >5x the slower sample; see .llm/tools/README.md runtime calibration.
+      # Image pulls have a separate 375s/image bound; no suite assertion retries.
       ASPIRE_CLI_START_TIMEOUT: "300"
       RUN: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'ci:full') || (contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate') && (needs.classify.result != 'success' || needs.classify.outputs.run_runtime_sqlite == 'true')) }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
