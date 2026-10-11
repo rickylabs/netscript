@@ -145,7 +145,7 @@ Browser-safe stream exports for the sagas plugin.
 | --- | --- |
 | `@netscript/plugin-sagas/cli` | `SagasCli`, `SAGAS_CLI_COMMANDS`, `generateSagaRegistry`, `codemodSagaImports`, `inspectSagasProject` |
 | `@netscript/plugin-sagas/scaffolding` | `createSagasItemScaffolders`, `SAGAS_RUNTIME_SCAFFOLD_MANIFEST`, `SagaDefinitionScaffolder`, `SagaConfigScaffolder` |
-| `@netscript/plugin-sagas/aspire` | `SagasAspireContribution`, `SagasAspireBuilder`, `SagasAspireResource`, `SagasHealthCheckSpec` |
+| `@netscript/plugin-sagas/aspire` | `SagasAspireContribution`, `SagasAspireBuilder`, `SagasAspireResource` |
 
 ---
 

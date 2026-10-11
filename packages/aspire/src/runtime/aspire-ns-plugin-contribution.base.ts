@@ -1,9 +1,4 @@
-import type {
-  AspireResource,
-  ContributionContext,
-  EnvSource,
-  HealthCheckSpec,
-} from '../domain/mod.ts';
+import type { AspireResource, ContributionContext, EnvSource } from '../domain/mod.ts';
 import type { AspireBuilder } from '../ports/mod.ts';
 
 /** Base class plugins extend to contribute Aspire resources to an AppHost. */
@@ -41,18 +36,5 @@ export abstract class AspireNSPluginContribution {
    */
   declareEnv(_ctx: ContributionContext): Record<string, EnvSource | string> {
     return {};
-  }
-
-  /**
-   * Legacy declaration retained for compatibility with existing contributions.
-   *
-   * @deprecated Since 0.0.8; removal next release. Use generated AppHost child probes
-   * and the child `/health` payload. Production wiring does not consume this method.
-   *
-   * @param _ctx - Contribution context supplied by the host.
-   * @returns Health check specs for contributed resources.
-   */
-  declareHealthChecks(_ctx: ContributionContext): readonly HealthCheckSpec[] {
-    return [];
   }
 }

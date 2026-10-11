@@ -1,6 +1,13 @@
 /**
  * Closed background child lifecycle vocabulary.
  *
+ * - `starting`: Bootstrap is in progress; the child cannot accept durable work yet.
+ * - `ready`: Listeners are running, the registry is loaded, and dependencies are ready.
+ * - `degraded`: Listeners lack registry or dependency readiness, or a restart is underway.
+ * - `crash-looping`: The restart threshold is latched; brief successful starts stay unhealthy.
+ * - `stopped`: Clean shutdown completed; processing has stopped.
+ * - `failed`: A fatal bootstrap or listener failure prevents processing.
+ *
  * @example
  * ```ts
  * import type { ChildHealthState } from '@netscript/plugin/health';
@@ -36,6 +43,11 @@ export type ChildFatalError = Readonly<{
 /**
  * Bounded JSON health payload for one background child.
  *
+ * `registryReady` confirms the generated definitions loaded and validated. `dependencyReady`
+ * confirms startup checks succeeded and no listener failure is active. `restartCount` is cumulative
+ * for this child instance. `lastFatalError` contains only a fixed redacted message and an epoch
+ * timestamp; the raw exception and stack never leave the process.
+ *
  * @example
  * ```ts
  * import type { ChildHealthSnapshot } from '@netscript/plugin/health';
@@ -59,7 +71,10 @@ export type ChildHealthSnapshot = Readonly<{
 }>;
 
 /**
- * Three restarts within sixty seconds latch crash-looping until a clean running window.
+ * Restarts at or above the threshold within the window latch crash-looping.
+ *
+ * Recovery requires a full window of uninterrupted running with registry and dependencies ready.
+ * A restart or fatal failure resets that running window; a brief ready interval cannot hide a storm.
  *
  * @example
  * ```ts

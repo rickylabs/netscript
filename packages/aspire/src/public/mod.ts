@@ -65,7 +65,6 @@ export type {
   DenoBackgroundSpec,
   DenoServiceSpec,
   EnvSource,
-  HealthCheckSpec,
 } from '../domain/mod.ts';
 export type { ReferenceSpec } from '../domain/reference-spec.ts';
 export type { AspireBuilder } from '../ports/mod.ts';
