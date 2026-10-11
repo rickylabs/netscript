@@ -98,7 +98,12 @@ Deno.test('process evidence: reads a real process environment through /proc', as
   // /proc/<pid>/environ is what the kernel recorded at exec time, which is exactly
   // why it is the evidence this gate trusts.
   const child = new Deno.Command(Deno.execPath(), {
-    args: ['eval', '--no-lock', 'await new Promise((resolve) => setTimeout(resolve, 30_000));'],
+    args: [
+      'eval',
+      '--no-config',
+      '--frozen',
+      'await new Promise((resolve) => setTimeout(resolve, 30_000));',
+    ],
     cwd: workdir,
     env: { OTEL_SERVICE_NAME: identity, NETSCRIPT_E2E_SERVICE_MODE: 'http' },
     stdout: 'null',

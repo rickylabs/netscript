@@ -2,7 +2,7 @@
   "name": "@netscript/desktop-native-e2e-fixture",
   "version": "1.0.0",
   "private": true,
-  "lock": false,
+  "lock": { "path": "deno.lock", "frozen": true },
   "exports": "./src/main.ts",
   "tasks": {
     "desktop:renderer": "deno bundle --platform browser --output dist/renderer.js src/renderer.ts",

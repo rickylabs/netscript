@@ -1,5 +1,7 @@
 import { join, resolve } from '@std/path';
 import { deriveDefaultAppName } from '../../../../../src/kernel/domain/scaffold/app-name.ts';
+import { installGeneratedProbe } from './install-generated-probe.ts';
+import { runLockedProbe } from './run-locked-probe.ts';
 
 if (import.meta.main) await main(resolve(Deno.args[0] ?? '.'));
 
@@ -16,22 +18,44 @@ async function main(repoRoot: string): Promise<void> {
   });
 
   try {
-    await runCommand('deno', [
-      'run',
-      '-A',
-      join(repoRoot, 'packages', 'cli', 'bin', 'netscript-dev.ts'),
-      'init',
-      projectName,
-      '--path',
-      sourceParent,
-      '--db',
-      'none',
-      '--no-aspire',
-      '--ci',
-      '--yes',
-      '--no-git',
-      '--force',
-    ], repoRoot);
+    await runLockedProbe(
+      [
+        '-A',
+        join(repoRoot, 'packages', 'cli', 'bin', 'netscript-dev.ts'),
+        'init',
+        projectName,
+        '--path',
+        sourceParent,
+        '--db',
+        'none',
+        '--no-aspire',
+        '--ci',
+        '--yes',
+        '--no-git',
+        '--force',
+      ],
+      repoRoot,
+      repoRoot,
+    );
+
+    const lockPath = join(projectRoot, 'deno.lock');
+    try {
+      await Deno.stat(lockPath);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+      await Deno.copyFile(join(repoRoot, 'deno.lock'), lockPath);
+    }
+    // A new workspace needs an install; its clean-clone consumer must keep that resolution.
+    await installGeneratedProbe(projectRoot, [
+      join(projectRoot, 'netscript.config.ts'),
+      join(projectRoot, 'apps', appName, 'main.ts'),
+      join(projectRoot, 'apps', appName, 'vite.config.ts'),
+    ]);
+    const configPath = join(projectRoot, 'deno.json');
+    const config = JSON.parse(await Deno.readTextFile(configPath));
+    config.lock = { path: 'deno.lock', frozen: true };
+    await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
+    const installedLock = await Deno.readTextFile(lockPath);
 
     const readme = await Deno.readTextFile(`${projectRoot}/README.md`);
     const documentedCommand = 'deno task check';
@@ -71,6 +95,9 @@ async function main(repoRoot: string): Promise<void> {
     }
 
     await runCommand('deno', ['task', 'check'], cloneRoot);
+    if (await Deno.readTextFile(join(cloneRoot, 'deno.lock')) !== installedLock) {
+      throw new Error('clean-clone README check changed the installed lock');
+    }
     console.info(`clean clone ran README command verbatim: ${documentedCommand}`);
   } finally {
     await Deno.remove(sourceParent, { recursive: true }).catch((error) => {

@@ -1,4 +1,5 @@
 import { join, resolve, toFileUrl } from '@std/path';
+import { installGeneratedProbe } from './install-generated-probe.ts';
 
 /** Run the shared consumer proof inside the generated package-resolution boundary. */
 export async function probeAuthCookieJar(projectPath: string, repoPath: string): Promise<void> {
@@ -35,9 +36,13 @@ await proveDocumentedCookieJar(recipe);
 console.info('Generated auth cookie-jar PASS: provider callback, cookie-only session/me, missing transaction, revocation, tutorial; no credentials emitted.');
 `,
     );
+    await installGeneratedProbe(projectRoot, [runner]);
     const result = await new Deno.Command(Deno.execPath(), {
       args: [
         'run',
+        '--lock',
+        join(projectRoot, 'deno.lock'),
+        '--frozen',
         '-A',
         '--unstable-kv',
         '--config',

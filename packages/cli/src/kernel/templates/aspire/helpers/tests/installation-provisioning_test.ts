@@ -1,6 +1,6 @@
 /** Focused execution of the generated credential carrier against the builder port. */
 import { assert, assertEquals, assertRejects } from '@std/assert';
-import { dirname, join } from '@std/path';
+import { join } from '@std/path';
 import { os } from 'npm:@orpc/server@^1.15.5';
 import { createService } from '@netscript/service';
 import {
@@ -13,7 +13,7 @@ import {
 import { createInternalCredentialSdkClientContribution } from '@netscript/sdk/client';
 import type { NetScriptConfig } from '@netscript/aspire/types';
 import type { NetScriptProcedureMeta } from '@netscript/contracts';
-import { generateHelpers } from '../helpers-generator-pipeline.ts';
+import { writeGeneratedHelperFixture } from './generated-helper-fixture.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import {
   EMPTY_CONFIG,
@@ -81,12 +81,7 @@ async function generatedCarrier(
         },
       },
     };
-    const files = await generateHelpers({ config });
-    for (const file of files) {
-      const path = join(root, file.path);
-      await Deno.mkdir(dirname(path), { recursive: true });
-      await Deno.writeTextFile(path, file.content);
-    }
+    await writeGeneratedHelperFixture(root, config);
     await Deno.mkdir(join(root, '.aspire/modules'), { recursive: true });
     await Deno.writeTextFile(
       join(root, '.aspire/modules/aspire.mts'),

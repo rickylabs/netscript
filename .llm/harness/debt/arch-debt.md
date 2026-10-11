@@ -745,13 +745,11 @@ finding into a debt entry.
 
 ## plugins/streams — durable topic publish/subscribe transport deferred (`streams-manifest-helpers-unsupported`)
 
-- **Reason:** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer helpers in the
-  Tier 2 plugin package. The existing real transport is `@netscript/plugin-streams-core`
-  `createDurableStream`, which publishes State Protocol upsert/delete events through
-  `@durable-streams/client`; it does not expose a generic topic consumer/subscriber channel that can
-  deliver `StreamTopicDefinition<TPayload>` payloads. Building that durable topic transport requires
-  a new cross-package runtime contract and consumer SDK, which exceeds the S3 M-sized slice. S3
-  replaced the silent no-op helper behavior with typed unsupported-operation failures.
+- **Reason:** Generic durable topic publish/subscribe transport remains deferred. The existing
+  `@netscript/plugin-streams-core` `createDurableStream` transport publishes State Protocol
+  upsert/delete events through `@durable-streams/client`; it does not expose a generic topic
+  consumer/subscriber channel for `StreamTopicDefinition<TPayload>` payloads. That capability
+  requires a cross-package runtime contract and consumer SDK, beyond entity-state replication.
 - **Owner:** `@netscript/plugin-streams` / `@netscript/plugin-streams-core` maintainers.
 - **Target:** Runtime transport rescope before advertising generic plugin topic publish/subscribe.
 - **Linked plan:** `.llm/tmp/run/cap-s3-streams/brief.md`.
@@ -760,6 +758,14 @@ finding into a debt entry.
 - **Gate:** Close when a real durable topic transport exists with producer delivery, consumer
   subscription/unsubscribe semantics, and runtime tests proving a published payload reaches a
   subscribed handler without relying on manifest-layer no-ops.
+
+- **0.0.8 remediation (#1369):** Removed the unconditional-throw producer/consumer helpers, handle
+  types, and unsupported-operation error factories from the plugin root and implementation. The
+  public-consumer regression rejects those root exports; README and streams documentation migrate
+  publishing to `@netscript/plugin-streams-core` and consumption to HTTP/SSE. The generic topic
+  transport remains deferred under this entry's existing gate. Documenting a caveat does not close a
+  defect; removing the unsupported public contract resolves the root honesty defect without claiming
+  a new topic transport.
 
 ## packages/watchers — AP-13 console.warn runtime reporting
 
@@ -2401,6 +2407,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   the definition exposes its private route/schema graph, and the oRPC reference falls under doctrine
   02's sanctioned boundary exception. Neither a zero-diagnostic claim nor closure of #1655 is
   proven. Evidence is kept in the run record and PR #2218.
+
+- **0.0.8 public contract graph (#2292):** Public values now name the owned `WorkersContract`
+  contract. New owned route and schema aliases preserve all 22 procedures, concrete schema methods,
+  literal payload binding, and handler inference. The full 13-target plugin lint falls from four to
+  two existing references: `WorkersContract` still names the private precise definition, and
+  `workersContractV1` still names oRPC `implement`. Both debt entries remain open; exact zero,
+  publication and quality evidence are still required for closure. No upstream internals are
+  re-exported and no signatures are erased. Consumer controls are in
+  `plugins/workers/tests/public/contract-graph_test.ts`.
 
 ## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
 
