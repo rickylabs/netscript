@@ -68,7 +68,7 @@ Deno.test('plugin doctor reports registry entries whose source was removed', asy
     await assertRejects(() => command.parse(['--project-root', projectRoot]), RemoteError);
 
     assertStringIncludes(output.join('\n'), 'sagas/removed-saga.ts');
-    assertStringIncludes(output.join('\n'), 'no manifest-discovered source');
+    assertStringIncludes(output.join('\n'), 'no generator-selected source');
     assertStringIncludes(output.join('\n'), 'netscript generate plugins');
   } finally {
     await Deno.remove(projectRoot, { recursive: true });
@@ -106,7 +106,7 @@ Deno.test('plugin doctor does not count an imported-but-unused source as registe
   }
 });
 
-Deno.test('plugin doctor names the exact healthy manifest-backed registry evidence', async () => {
+Deno.test('plugin doctor names the exact healthy generator-backed registry evidence', async () => {
   const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-doctor-registry-aligned-' });
   try {
     await writeProject(projectRoot);
@@ -121,7 +121,7 @@ Deno.test('plugin doctor names the exact healthy manifest-backed registry eviden
 
     const text = output.join('\n');
     assertStringIncludes(text, '.netscript/generated/plugin-sagas/sagas.registry.ts');
-    assertStringIncludes(text, '1 manifest-declared source file: sagas/registered-saga.ts');
+    assertStringIncludes(text, '1 generator-selected source file: sagas/registered-saga.ts');
     assertStringIncludes(text, 'no non-registry runtime topology was verified');
   } finally {
     await Deno.remove(projectRoot, { recursive: true });

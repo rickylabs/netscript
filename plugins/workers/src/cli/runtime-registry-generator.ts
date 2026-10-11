@@ -1,3 +1,4 @@
+import type { RenderedRuntimeRegistry } from './command-types.ts';
 import { exists } from 'jsr:@std/fs@^1';
 import { basename, dirname, join, relative } from 'jsr:@std/path@^1';
 import { toCamelCase } from 'jsr:@std/text@^1';
@@ -6,6 +7,8 @@ import { resolveConfiguredJobPolicies } from './configured-job-policies.ts';
 
 export interface GenerateRuntimeRegistriesOptions {
   readonly manifestPath: string;
+  /** In-memory manifest supplied by read-only generator inspection. */
+  readonly manifest?: unknown;
   readonly profile?: string;
   readonly projectRoot: string;
   /** Core-normalized project workers policy, when the project declares one. */
@@ -74,11 +77,28 @@ interface GeneratedJobEntry {
   readonly source: 'local' | 'plugin';
 }
 
+/** Generate from the same read-only selector and renderer used by inspection. */
 export async function generateRuntimeRegistries(
   options: GenerateRuntimeRegistriesOptions,
 ): Promise<readonly string[]> {
-  const manifest = JSON.parse(await Deno.readTextFile(options.manifestPath)) as RuntimeManifest;
   const generated: string[] = [];
+  for (const file of await renderRuntimeRegistries(options)) {
+    if (file.content === null) continue;
+    const path = join(options.projectRoot, file.registryPath);
+    await Deno.mkdir(dirname(path), { recursive: true });
+    await Deno.writeTextFile(path, file.content);
+    generated.push(file.registryPath);
+  }
+  return Object.freeze(generated);
+}
+
+/** Render all declared targets without writing project files. */
+export async function renderRuntimeRegistries(
+  options: GenerateRuntimeRegistriesOptions,
+): Promise<readonly RenderedRuntimeRegistry[]> {
+  const manifest = (options.manifest ??
+    JSON.parse(await Deno.readTextFile(options.manifestPath))) as RuntimeManifest;
+  const rendered: RenderedRuntimeRegistry[] = [];
   for (const rawTarget of manifest.runtimeRegistries ?? []) {
     const target = applyProfile(rawTarget, options.profile);
     const targetDir = join(options.projectRoot, target.dir);
@@ -86,8 +106,6 @@ export async function generateRuntimeRegistries(
       (options.workers.jobs.length > 0 ||
         options.workers.groups.some((group) => group.jobs.length));
     const targetDirExists = await exists(targetDir, { isDirectory: true });
-    if (!targetDirExists && !hasConfiguredJobs) continue;
-
     const files = targetDirExists
       ? await discoverRegistryFiles(options.projectRoot, targetDir, {
         fileSuffixes: target.fileSuffixes,
@@ -96,26 +114,21 @@ export async function generateRuntimeRegistries(
         exclude: target.exclude,
       })
       : [];
-    if (files.length === 0 && !hasConfiguredJobs) continue;
-
-    const registryPath = target.registryPath
-      ? join(options.projectRoot, target.registryPath)
-      : join(targetDir, '_registry.ts');
-    await Deno.mkdir(dirname(registryPath), { recursive: true });
-    await Deno.writeTextFile(
-      registryPath,
-      await generateRuntimeRegistry(
-        options.projectRoot,
-        target,
-        registryPath,
-        files,
-        options.workers,
-      ),
+    const registryPath = target.registryPath ?? `${target.dir}/_registry.ts`;
+    if ((!targetDirExists || files.length === 0) && !hasConfiguredJobs) {
+      rendered.push({ registryPath, sourceFiles: [], content: null });
+      continue;
+    }
+    const registry = await generateRuntimeRegistry(
+      options.projectRoot,
+      target,
+      join(options.projectRoot, registryPath),
+      files,
+      options.workers,
     );
-    generated.push(relative(options.projectRoot, registryPath).replaceAll('\\', '/'));
+    rendered.push({ registryPath, ...registry });
   }
-
-  return Object.freeze(generated);
+  return rendered;
 }
 
 function applyProfile(
@@ -184,7 +197,7 @@ async function generateRuntimeRegistry(
   registryPath: string,
   files: readonly string[],
   workers: WorkersConfigData | undefined,
-): Promise<string> {
+): Promise<{ readonly content: string; readonly sourceFiles: readonly string[] }> {
   const lines = createRegistryHeader(target);
   const registryDir = relative(projectRoot, dirname(registryPath)).replaceAll('\\', '/');
   files.forEach((file, index) => {
@@ -236,7 +249,13 @@ async function generateRuntimeRegistry(
     });
     lines.push(']);', '');
   }
-  return lines.join('\n');
+  return {
+    content: lines.join('\n'),
+    sourceFiles: [
+      ...files.map((file) => `${target.dir}/${file}`),
+      ...pluginEntries.map((entry) => entry.path),
+    ],
+  };
 }
 
 function createRegistryHeader(target: RuntimeRegistryTarget): string[] {

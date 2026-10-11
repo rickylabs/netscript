@@ -275,9 +275,24 @@ for filesystem routes.
 - [ ] Type-check after regeneration.
 - [ ] Visit `/inventory`, test navigation/loader/island/partials, and check the old `/catalog` URL.
 
-[Generated web surface](/web-layer/generated-surface/) explains ownership and manual removal.
-No `ui:rename`, `route rename`, `generate routes`, or `ui:remove page` verb exists;
-`ui:remove` handles registry items only.
+[Generated web surface](/web-layer/generated-surface/) explains file ownership. Route renames remain
+manual. Use `netscript ui:remove page catalog --dry-run` to preview removal of an unchanged
+`ui:add page` scaffold. Run without `--dry-run` to delete its page and optional colocated
+loader/island, prune only its generated `router.ts` registration, and rebuild the derived route
+modules using the same writer as `netscript generate routes`. Use `--app <name>` or an explicit app
+`--project-root` to select the application; `--client <service>` selects the original client when
+ambiguous.
+
+Formatting with the scaffold’s `deno task fmt` is accepted, including wrapped router entries.
+Removal compares scaffold files after Deno formatting; code or comment edits, missing scaffold parts
+and customized registrations are refused before writing. There is no force override: reconcile
+edited pages manually. Authored siblings, contract sidecars, other pages and unrelated router
+entries remain intact. Repeating a successful removal is safe and reconstructs missing derived
+modules. An absent page reports “Nothing to remove”; empty route parents are pruned up to the routes
+root while authored siblings remain. The router is written before files are deleted, so an
+interruption cannot leave a registration pointing at a deleted page. Update navigation and consumers
+yourself, then type-check and verify the old URL. `ui:remove <name>` continues to remove copied
+registry items.
 
 ## Three authoring forms, one generated binding
 

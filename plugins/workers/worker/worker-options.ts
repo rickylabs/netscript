@@ -193,6 +193,8 @@ export interface WorkerJobResult {
 /** Context required by worker job dispatch helpers. */
 export interface WorkerDispatchContext {
   readonly workerId: string;
+  /** Configured queue delivery concurrency, also reported on completed job spans. */
+  readonly concurrency: number;
   readonly registry: WorkerJobRegistry;
   readonly executionState: WorkerExecutionState;
   readonly taskExecutor: WorkerTaskExecutor;
