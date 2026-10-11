@@ -78,18 +78,18 @@ try {
         caller: permitted, denied: insufficient, foreign,
       });
     } else {
-    Deno.env.set(serviceKey, endpoint);
-    const appRoute = await import('__APP_SESSION_ROUTE__');
-    for (const [token, expectStatus] of [[undefined, 401], [permitted, 200], [undefined, 401]] as const) {
-      const req = new Request('https://app.example.test/examples/users/session', {
-        headers: token ? { cookie: '__Host-ns_session=' + token } : {},
-      });
-      const response = await appRoute.handler.GET({ req });
-      assertEquals(response.status, expectStatus, 'Generated app session route');
-      assertEquals(response.headers.get('cache-control'), 'no-store');
-      assertEquals(await response.json(), { authenticated: expectStatus === 200 });
-    }
-    console.info('Generated app guarded call PASS: SDK bearer contribution; request-scoped cookie; anonymous401, authenticated200, anonymous401; no credentials emitted.');
+      Deno.env.set(serviceKey, endpoint);
+      const appRoute = await import('__APP_SESSION_ROUTE__');
+      for (const [token, expectStatus] of [[undefined, 401], [permitted, 200], [undefined, 401]] as const) {
+        const req = new Request('https://app.example.test/examples/users/session', {
+          headers: token ? { cookie: '__Host-ns_session=' + token } : {},
+        });
+        const response = await appRoute.handler.GET({ req });
+        assertEquals(response.status, expectStatus, 'Generated app session route');
+        assertEquals(response.headers.get('cache-control'), 'no-store');
+        assertEquals(await response.json(), { authenticated: expectStatus === 200 });
+      }
+      console.info('Generated app guarded call PASS: SDK bearer contribution; request-scoped cookie; anonymous401, authenticated200, anonymous401; no credentials emitted.');
       const exchange = async (path: string, contract: HttpExchangeContract) => {
         const init = httpExchangeInit(contract, AbortSignal.timeout(10_000));
         const response = await fetch(endpoint + path, {
