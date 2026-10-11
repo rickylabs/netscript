@@ -303,3 +303,51 @@ for (const state of ['stopped', 'crash-looping'] as const) {
     });
   }
 }
+
+Deno.test('negative-control: MCP doctor retains named degraded health ahead of many workspace checks', async () => {
+  const runtimeHealth = {
+    pluginName: 'jobs',
+    status: 'degraded' as const,
+    apiResources: ['api'],
+    childResources: ['runner'],
+    apis: [{ name: 'api', status: 'healthy' as const, state: 'Running' }],
+    children: [{ name: 'runner', status: 'unhealthy' as const, state: 'stopped' }],
+  };
+  const adapter = new CliProjectDoctor(() =>
+    Promise.resolve([
+      {
+        pluginName: 'apphost',
+        status: 'healthy',
+        checks: Array.from(
+          { length: 40 },
+          (_, index) => ({ id: `resource-${index}`, title: 'Resource ready', status: 'healthy' }),
+        ),
+      },
+      {
+        pluginName: 'jobs',
+        status: 'degraded',
+        checks: [{
+          id: 'runtime-health',
+          title: 'Runtime health',
+          status: 'degraded',
+          runtimeHealth,
+        }],
+      },
+    ])
+  );
+  const server = createMcpServer({
+    probe,
+    flows: { doctor: createDoctorFlow(probe, {}, [new PluginDoctorFamily(adapter)], '/project') },
+  });
+  const response = await server.handle({
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'tools/call',
+    params: { name: 'doctor', arguments: {} },
+  });
+  assert(response && 'result' in response);
+  const result = response.result as { structuredContent: Record<string, unknown> };
+  assertEquals(result.structuredContent.status, 'fail');
+  assertStringIncludes(JSON.stringify(result.structuredContent), '"state":"stopped"');
+  assertStringIncludes(JSON.stringify(result.structuredContent), '"status":"degraded"');
+});

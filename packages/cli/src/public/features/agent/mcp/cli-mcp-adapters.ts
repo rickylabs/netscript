@@ -68,7 +68,7 @@ export class CliProjectDoctor implements ProjectDoctorPort {
         summary: 'No plugins configured.',
       }];
     }
-    return reports.flatMap((report) =>
+    const checks = reports.flatMap((report) =>
       report.checks.map((check) => ({
         name: `${report.pluginName}:${check.id}`,
         status: check.status === 'healthy'
@@ -83,5 +83,10 @@ export class CliProjectDoctor implements ProjectDoctorPort {
         }),
       }))
     );
+    // Runtime verdicts must remain visible within the MCP doctor's bounded family report.
+    return [
+      ...checks.filter((check) => check.runtimeHealth !== undefined),
+      ...checks.filter((check) => check.runtimeHealth === undefined),
+    ];
   }
 }
