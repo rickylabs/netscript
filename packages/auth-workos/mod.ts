@@ -75,3 +75,5 @@ export type {
   WorkosRevocationJob,
   WorkosRevocationStore,
 } from './src/ports/revocation-store.ts';
+
+export type { KvStore } from '@netscript/kv';

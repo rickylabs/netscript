@@ -1,17 +1,27 @@
 import { assert, assertEquals } from '@std/assert';
 import { DenoKvAdapter } from '@netscript/kv';
 import {
+  createWorkosBackend,
   createWorkosRevocationStore,
   type WorkosRevocationClient,
   type WorkosRevocationStore,
 } from '@netscript/auth-workos';
 import { createWorkosRevocationWorker } from '../../services/src/workos-revocation-worker.ts';
-import { cutoff } from '../../../../packages/auth-workos/tests/testing/revocation-fixture.ts';
+import {
+  cutoff,
+  sessionClient,
+} from '../../../../packages/auth-workos/tests/testing/revocation-fixture.ts';
 
 Deno.test('WorkOS worker consumes durable pages without any app request and drains on shutdown', async () => {
   await using kv = new DenoKvAdapter(await Deno.openKv(':memory:'));
   const store = createWorkosRevocationStore(kv);
-  await store.revokeSubject('alice', cutoff);
+  const backend = createWorkosBackend({
+    workos: sessionClient(),
+    cookiePassword: 'x'.repeat(32),
+    revocations: store,
+    now: () => new Date(cutoff),
+  });
+  await backend.sessions.revokeSubjectSessions({ subject: 'alice' });
   const completed = Promise.withResolvers<void>();
   let lists = 0;
   const revoked: string[] = [];
