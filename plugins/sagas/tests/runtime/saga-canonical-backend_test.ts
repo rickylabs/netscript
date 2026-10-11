@@ -131,7 +131,10 @@ for (const backend of ['kv', 'prisma'] as const) {
         await supervisor?.stop();
         try {
           if (supervisor) {
-            await assertRejects(async () => await rawKv.get(['shutdown-probe']), Error, 'closed');
+            await assertRejects(
+              async () => await rawKv.get(['shutdown-probe']),
+              Deno.errors.BadResource,
+            );
           }
         } finally {
           await resetKv();
