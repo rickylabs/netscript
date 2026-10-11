@@ -27,6 +27,8 @@ export const SAGA_STORE_BACKENDS: readonly DurableSagaStoreBackend[] = Object.fr
 export type SagaStoreBackendResolutionInput = Readonly<{
   env?: Readonly<Record<string, string | undefined>>;
   appsettings?: unknown;
+  /** Compatibility default used only when neither env nor appsettings selects a backend. */
+  defaultBackend?: DurableSagaStoreBackend;
 }>;
 
 /** Resolve the explicit durable saga state backend from env or appsettings. */
@@ -42,6 +44,8 @@ export function resolveSagaStoreBackend(
   if (appsettingsValue !== undefined && appsettingsValue !== '') {
     return parseSagaStoreBackend(appsettingsValue, 'sagas.store.backend');
   }
+
+  if (input.defaultBackend !== undefined) return input.defaultBackend;
 
   throw new Error(
     `Saga store backend is required. Set ${SAGA_STORE_BACKEND_ENV}=kv|prisma or appsettings sagas.store.backend.`,

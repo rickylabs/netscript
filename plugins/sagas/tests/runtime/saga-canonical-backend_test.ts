@@ -149,7 +149,6 @@ for (const backend of ['kv', 'prisma'] as const) {
 
 for (
   const { value, error } of [
-    { value: undefined, error: 'Saga store backend is required.' },
     { value: 'sqlite', error: 'Invalid saga store backend' },
     {
       value: 'prisma',
@@ -205,3 +204,135 @@ Deno.test('canonical Prisma rejects missing runtime delegates despite projection
     'Sagas database client is missing required Prisma runtime delegates.',
   );
 });
+
+for (const source of ['unconfigured', 'project', 'processor', 'env overrides project'] as const) {
+  Deno.test(`direct runner ${source} starts KV without a bootstrap`, async () => {
+    await resetKv();
+    const kv = await getKv({ provider: 'deno-kv', path: ':memory:', skipServiceDiscovery: true });
+    assert(kv instanceof DenoKvAdapter);
+    const directory = await Deno.makeTempDir();
+    const settings = {
+      Sagas: {
+        Store: { Backend: source === 'env overrides project' ? 'prisma' : 'kv' },
+        Projection: { Backend: 'none' },
+      },
+    };
+    if (source !== 'unconfigured') {
+      await Deno.writeTextFile(
+        `${directory}/appsettings.json`,
+        JSON.stringify(
+          source === 'processor'
+            ? { NetScript: { BackgroundProcessors: { sagas: settings } } }
+            : settings,
+        ),
+      );
+    }
+    const listener = Promise.withResolvers<void>();
+    let runtime: SagaRuntime | undefined;
+    let bootstrapReads = 0;
+    let supervisor: Awaited<ReturnType<typeof startSagaRunner>> | undefined;
+    try {
+      supervisor = await startSagaRunner({
+        cwd: () => directory,
+        readEnv: (name) => {
+          if (name === 'NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE') bootstrapReads++;
+          return name === 'NETSCRIPT_SAGA_STORE' && source === 'env overrides project'
+            ? 'kv'
+            : undefined;
+        },
+        deliveryQueue: new MemoryQueueAdapter(),
+        importer: () =>
+          Promise.resolve({
+            definitions: [
+              defineSaga('direct-counter').state({ count: 0 })
+                .on('Increment', (saga) => {
+                  saga.state.count++;
+                  return [];
+                }).build(),
+            ],
+          }),
+        supervisor: {
+          delivery: {
+            start: (running) => {
+              runtime = running;
+              return Promise.resolve();
+            },
+            wait: () => listener.promise,
+            stop: () => {
+              listener.resolve();
+              return Promise.resolve();
+            },
+          },
+        },
+      });
+      assertEquals(bootstrapReads, 1);
+      assertEquals(supervisor.snapshot().childHealth.state, 'ready');
+      assert(runtime);
+      await runtime.publish({
+        type: 'Increment',
+        payload: {},
+        correlationKey: 'direct' as SagaCorrelationKey,
+      });
+      assertEquals(
+        (await kv.get<{ state: { count: number } }>(['sagas', 'state', 'direct-counter:direct']))
+          ?.value.state.count,
+        1,
+      );
+    } finally {
+      await supervisor?.stop();
+      await resetKv();
+      await Deno.remove(directory, { recursive: true });
+    }
+  });
+}
+
+for (const backend of ['prisma', 'sqlite'] as const) {
+  Deno.test(`direct runner honors project ${backend} selection before delivery`, async () => {
+    const directory = await Deno.makeTempDir();
+    await Deno.writeTextFile(
+      `${directory}/appsettings.json`,
+      JSON.stringify({ Sagas: { Store: { Backend: backend } } }),
+    );
+    let started = false;
+    let supervisor: Awaited<ReturnType<typeof startSagaRunner>> | undefined;
+    // Also arrange/clean KV so this test remains safe when main incorrectly starts a KV runner.
+    await resetKv();
+    await getKv({ provider: 'deno-kv', path: ':memory:', skipServiceDiscovery: true });
+    const listener = Promise.withResolvers<void>();
+    try {
+      await assertRejects(
+        async () => {
+          supervisor = await startSagaRunner({
+            cwd: () => directory,
+            readEnv: () => undefined,
+            projection: false,
+            deliveryQueue: new MemoryQueueAdapter(),
+            importer: () => Promise.resolve({ definitions: [] }),
+            supervisor: {
+              delivery: {
+                start: () => {
+                  started = true;
+                  return Promise.resolve();
+                },
+                wait: () => listener.promise,
+                stop: () => {
+                  listener.resolve();
+                  return Promise.resolve();
+                },
+              },
+            },
+          });
+        },
+        Error,
+        backend === 'prisma'
+          ? 'Prisma saga store backend requires a plugin service bootstrap module.'
+          : 'Invalid saga store backend',
+      );
+      assertEquals(started, false);
+    } finally {
+      await supervisor?.stop();
+      await resetKv();
+      await Deno.remove(directory, { recursive: true });
+    }
+  });
+}
