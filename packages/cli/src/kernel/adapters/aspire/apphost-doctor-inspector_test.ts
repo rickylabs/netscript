@@ -19,7 +19,10 @@ Deno.test('AppHost doctor inspector reports unavailable when Aspire cannot execu
 
 Deno.test('AppHost doctor inspector preserves genuine Aspire command failures', async () => {
   await assertRejects(
-    () => new AspireAppHostDoctorInspector(new RecordingProcess([failure('invalid AppHost')])).inspect('/workspace'),
+    () =>
+      new AspireAppHostDoctorInspector(new RecordingProcess([failure('invalid AppHost')])).inspect(
+        '/workspace',
+      ),
     Error,
     'aspire ps failed: invalid AppHost',
   );
@@ -102,4 +105,59 @@ class MissingProcess implements ProcessPort {
   exec(): Promise<ProcessResult> {
     return Promise.reject(new Deno.errors.NotFound('aspire command not found'));
   }
+}
+
+Deno.test('AppHost inspector probes only declared children and preserves crash-looping payload', async () => {
+  const process = new RecordingProcess([
+    ok(JSON.stringify([{ appHostPath: '/workspace/aspire/apphost.mts', status: 'Running' }])),
+    ok(
+      JSON.stringify({
+        resources: ['api', 'renamed-runner'].map((name) => ({
+          displayName: name,
+          state: 'Running',
+          healthStatus: 'Healthy',
+          urls: [{ name: 'http', url: `http://localhost:10000/${name}` }],
+        })),
+      }),
+    ),
+  ]);
+  const requests: string[] = [];
+  const result = await new AspireAppHostDoctorInspector(process, (url) => {
+    requests.push(String(url));
+    return Promise.resolve(
+      Response.json({
+        state: 'crash-looping',
+        registryReady: false,
+        dependencyReady: false,
+        restartCount: 3,
+        lastFatalError: null,
+      }, { status: 503 }),
+    );
+  }).inspect('/workspace', ['renamed-runner']);
+  assertEquals(requests, ['http://localhost:10000/health']);
+  assertEquals(
+    result.status === 'running' ? result.resources[1]?.childHealth?.state : undefined,
+    'crash-looping',
+  );
+});
+
+for (const command of ['ps', 'describe']) {
+  Deno.test(`AppHost inspector gives ${command} a process deadline and reports timeout`, async () => {
+    const process: ProcessPort = {
+      exec: (_executable, args, options) => {
+        assertEquals(options?.timeoutMs, 5000);
+        if (args[0] === command) {
+          return Promise.resolve({ ...ok(''), timedOut: true });
+        }
+        return Promise.resolve(ok(JSON.stringify([
+          { appHostPath: '/workspace/aspire/apphost.mts', status: 'Running' },
+        ])));
+      },
+    };
+    await assertRejects(
+      () => new AspireAppHostDoctorInspector(process).inspect('/workspace'),
+      Error,
+      `aspire ${command} timed out after 5000ms`,
+    );
+  });
 }

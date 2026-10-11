@@ -302,3 +302,39 @@ the resolved endpoint.
 ---
 
 Back to the [reference overview](/reference/).
+
+## Declared plugin runtime health
+
+The CLI-hosted MCP `doctor` and `get_app_status` tools consume the plugin doctor's shared runtime
+aggregation. Status polling reads fresh declared resources through `ProjectDoctorPort`'s
+runtime-health operation without repeating static module validation. Both tools use the same
+`@netscript/plugin/health` verdict. A healthy API with an unhealthy or missing declared child yields
+`degraded`, with monitoring severity `fail`. `get_app_status` returns `healthStatus` and bounded
+`pluginHealth` reports; each report includes API and child names, verdicts, and lifecycle states
+including `crash-looping`. Filtering an API retains its declared children. A standalone MCP process
+without the CLI project adapter, or a CLI project with no runtime declarations, retains the
+telemetry verdict and omits runtime health fields. Runtime inspection failures preserve telemetry
+counts/domains, report `healthStatus: unknown`, and include a bounded failed `runtimeChecks`
+finding. Declared runtimes with an absent/unavailable AppHost report an inspection failure rather
+than being mistaken for a no-plugin project. Each Aspire inspection command has a five-second
+deadline.
+
+These inspection failures are intentional `fail` verdicts even when polling a stopped development
+app. Legacy adapters without a runtime-health operation use static doctor findings; their failures
+also remain visible when a service filter is supplied.
+
+Runtime ownership follows the generated child/API reference links described in the
+[plugin health reference](/reference/plugin/#plugin-runtime-health-aggregation), with optional
+`InstalledFrom` overrides. Installation metadata is not required. Invalid health-capable child
+entries produce named warning checks in both tools; `get_app_status` includes those warnings in
+`runtimeChecks` and reports `warn` while retaining telemetry. Failed findings take priority within
+the bounded checks list. Static-only adapter warnings retain their existing telemetry verdict;
+standalone MCP's unwired diagnostic warning remains visible in `doctor`.
+
+A dead child remains `degraded` when a declared API has disabled health probes. A child-only plugin
+with a dead child is `unhealthy`. Cross-plugin precedence comes from `summarizePluginHealth` in the
+same shared package, so other consumers can use the identical roll-up.
+
+The package forwards `PluginHealthDeclaration`, `PluginHealthStatus`, `PluginHealthSummary`, and
+`PluginResourceHealth` to document the types used by `DoctorCheck.runtimeHealth`. Their contract and
+aggregation implementation remain owned by `@netscript/plugin/health`.

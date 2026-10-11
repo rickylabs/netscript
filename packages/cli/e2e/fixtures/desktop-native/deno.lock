@@ -319,6 +319,7 @@
       "jsr:@netscript/mcp@0.0.7": {
         "dependencies": [
           "jsr:@netscript/aspire@0.0.7",
+          "jsr:@netscript/plugin@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
