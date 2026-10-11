@@ -49,3 +49,34 @@ for (const nextRun of [null, new Date(NaN)]) {
     }
   });
 }
+
+Deno.test('scheduled hour-step trigger registers with native Deno.cron in a child process', async () => {
+  const output = await new Deno.Command(Deno.execPath(), {
+    args: [
+      'eval',
+      '--unstable-cron',
+      `
+      import { CronTriggerSchedulerAdapter } from '@netscript/plugin-triggers-core/adapters';
+      import { defineScheduledTrigger } from '@netscript/plugin-triggers-core/builders';
+      const adapter = new CronTriggerSchedulerAdapter({ schedulerOptions: { provider: 'deno' } });
+      try {
+        for (const [index, cron] of ['0 */12 * * *', '0 */6 * * *', '30 */2 * * *'].entries()) {
+          const definition = defineScheduledTrigger(() => Promise.resolve([]), {
+            id: 'native-hour-step-' + index, cron, timezone: 'UTC',
+          });
+          const handle = await adapter.schedule(definition.id, definition, () => Promise.resolve());
+          if (!handle.nextFireAt || !Number.isFinite(Date.parse(handle.nextFireAt))) {
+            throw new Error('Expected a finite native nextFireAt');
+          }
+        }
+      } finally {
+        await adapter.stop();
+      }
+    `,
+    ],
+    env: { TZ: 'America/New_York' },
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+});

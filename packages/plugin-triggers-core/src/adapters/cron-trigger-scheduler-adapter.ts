@@ -233,7 +233,9 @@ function handleFromJob(
     id: record.id,
     schedule: record.spec,
     persistent: false,
-    nextFireAt: job.nextRun?.toISOString(),
+    nextFireAt: job.nextRun && Number.isFinite(job.nextRun.getTime())
+      ? job.nextRun.toISOString()
+      : undefined,
     paused: !job.enabled,
   };
 }

@@ -24,6 +24,7 @@ import type {
   SchedulerEventMap,
 } from '../ports/types.ts';
 import { isValidCronExpression } from '../ports/types.ts';
+import { calculateNextRun } from '../internal/next-run.ts';
 import type { CronScheduler, JobEventListener, SchedulerEvent } from '../ports/scheduler.ts';
 import {
   createLifecycleEvent,
@@ -260,57 +261,8 @@ export class DenoCronAdapter implements CronScheduler {
     await emitSchedulerEvent(this.eventListeners, event, data);
   }
 
-  /**
-   * Calculate an approximate next run time for a cron expression.
-   *
-   * Deno computes the authoritative schedule internally. This helper is used
-   * only to expose a best-effort `nextRun` value for diagnostics and tests.
-   */
+  /** Calculate the next UTC occurrence; unsupported expressions have no diagnostic next run. */
   private calculateNextRun(expression: CronExpression): Date | null {
-    // For now, return a placeholder - in a real implementation,
-    // you'd parse the cron expression and calculate the next occurrence
-    // Deno.cron handles this internally, so this is mainly for display purposes
-    const now = new Date();
-
-    // Parse the expression to get a rough estimate
-    const parts = expression.split(/\s+/);
-    if (parts.length !== 5) return null;
-
-    const [minute, hour] = parts;
-
-    // Simple heuristic for common patterns
-    const nextRun = new Date(now);
-    nextRun.setSeconds(0);
-    nextRun.setMilliseconds(0);
-
-    if (minute === '*' && hour === '*') {
-      // Every minute
-      nextRun.setMinutes(nextRun.getMinutes() + 1);
-    } else if (minute.startsWith('*/')) {
-      // Every N minutes
-      const interval = parseInt(minute.slice(2));
-      const currentMinute = nextRun.getMinutes();
-      const nextMinute = Math.ceil((currentMinute + 1) / interval) * interval;
-      if (nextMinute >= 60) {
-        nextRun.setHours(nextRun.getHours() + 1);
-        nextRun.setMinutes(nextMinute % 60);
-      } else {
-        nextRun.setMinutes(nextMinute);
-      }
-    } else if (minute !== '*' && hour !== '*') {
-      // Specific time
-      const targetMinute = parseInt(minute);
-      const targetHour = parseInt(hour);
-      nextRun.setMinutes(targetMinute);
-      nextRun.setHours(targetHour);
-      if (nextRun <= now) {
-        nextRun.setDate(nextRun.getDate() + 1);
-      }
-    } else {
-      // Default: add 1 hour
-      nextRun.setHours(nextRun.getHours() + 1);
-    }
-
-    return nextRun;
+    return calculateNextRun(expression, new Date());
   }
 }

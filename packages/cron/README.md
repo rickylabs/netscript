@@ -99,6 +99,12 @@ unstable feature (`--unstable-cron` or `"unstable": ["cron"]` in `deno.json`); w
 auto-detection falls back to the in-memory adapter. The in-memory adapter needs no permissions or
 flags.
 
+`ScheduledJob.nextRun` reports the next matching UTC minute strictly after the current instant.
+The Deno and memory adapters share this calculation for numeric five-field expressions, including
+wildcards, steps, ranges, range steps, and lists. Both day-of-month and day-of-week must match.
+Unsupported expressions or schedules with no possible calendar date return `null`. Native
+`Deno.cron` remains responsible for execution; the memory adapter still uses simplified intervals.
+
 ## License
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
