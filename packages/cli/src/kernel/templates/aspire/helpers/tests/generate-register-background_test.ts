@@ -1,5 +1,3 @@
-import { readTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
-import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 /**
  * @module templates/aspire/helpers/generate-register-background_test
  *
@@ -7,6 +5,9 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
  * doubles so declared service and plugin reference behavior is tested at the
  * generated-module boundary.
  */
+
+import { readTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 
 import { assert, assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';

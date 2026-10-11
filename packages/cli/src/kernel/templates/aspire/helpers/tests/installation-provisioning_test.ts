@@ -54,13 +54,8 @@ async function generatedCarrier(
 ): Promise<void> {
   const root = await Deno.makeTempDir();
   const previous = Deno.env.get('NETSCRIPT_INSTALLATION_SECRET_FILE');
-  const secretFile = join(root, 'installation.secret');
-  await Deno.writeTextFile(
-    secretFile,
-    'fixture-installation-material-'.repeat(3),
-    { mode: 0o600 },
-  );
-  Deno.env.set('NETSCRIPT_INSTALLATION_SECRET_FILE', secretFile);
+  const secretFile = join(root, '.data', 'aspire-secrets', 'installation.secret');
+  Deno.env.delete('NETSCRIPT_INSTALLATION_SECRET_FILE');
   try {
     const config: NetScriptConfig = {
       ...EMPTY_CONFIG,
@@ -87,10 +82,6 @@ async function generatedCarrier(
       },
     };
     const files = await generateHelpers({ config });
-    assert(
-      files.some((file) => file.path === '.helpers/installation-secret.mts'),
-      'generated carrier must contain the maintained provisioning module',
-    );
     for (const file of files) {
       const path = join(root, file.path);
       await Deno.mkdir(dirname(path), { recursive: true });
@@ -160,6 +151,11 @@ export function extractServiceReferences(entry) { return entry.ServiceReferences
       },
     };
     await module.createNetScriptAppHost(builder, configPath);
+    assertEquals(
+      resources.map((resource) => resource.environment.NETSCRIPT_INSTALLATION_SECRET_FILE),
+      Array(5).fill(secretFile),
+      'generated backend resources must receive the provisioned installation credential file reference',
+    );
     assertEquals(parameters.length, 1);
     assertEquals(parameters[0], {
       name: 'netscript-installation-secret',
@@ -186,6 +182,8 @@ export function extractServiceReferences(entry) { return entry.ServiceReferences
       );
       assert(!JSON.stringify(resource).includes(parameters[0].value));
     }
+    // Model the backend's delivered environment only after the AppHost provisions it.
+    Deno.env.set('NETSCRIPT_INSTALLATION_SECRET_FILE', secretFile);
     await use(resources, secretFile);
   } finally {
     if (previous === undefined) {

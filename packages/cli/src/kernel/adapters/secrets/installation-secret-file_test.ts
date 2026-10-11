@@ -20,33 +20,76 @@ async function fixture(use: (root: string) => Promise<void>): Promise<void> {
   }
 }
 
-Deno.test('installation provisioning creates once per installation and owner, with restrictive permissions', () =>
+Deno.test('installation provisioning creates once per project, with restrictive permissions', () =>
   fixture(async (root) => {
-    const options = { ownerSecretDirectory: join(root, 'owner-secrets') };
-    const file = ensureInstallationSecretFile(root, options);
+    const file = ensureInstallationSecretFile(root);
+    assertEquals(file, join(root, '.data', 'aspire-secrets', 'installation.secret'));
     const material = await Deno.readTextFile(file);
     assertEquals(material.length, 64);
-    assertEquals(ensureInstallationSecretFile(root, options), file);
+    assertEquals(ensureInstallationSecretFile(root), file);
     assertEquals(await Deno.readTextFile(file), material);
     const another = ensureInstallationSecretFile(
       join(root, 'other-installation'),
-      options,
     );
     assertNotEquals(another, file);
     assertNotEquals(await Deno.readTextFile(another), material);
     if (Deno.build.os !== 'windows') {
       assertEquals((await Deno.stat(file)).mode! & 0o777, 0o600);
       assertEquals(
-        (await Deno.stat(options.ownerSecretDirectory)).mode! & 0o777,
+        (await Deno.stat(join(root, '.data', 'aspire-secrets'))).mode! & 0o777,
         0o700,
       );
     }
   }));
 
+Deno.test('installation provisioning stays in the project with an unusable home and survives a project move', () =>
+  fixture(async (root) => {
+    const project = join(root, 'project');
+    const foreignHome = join(root, 'unusable-home');
+    await Deno.writeTextFile(foreignHome, 'a home that cannot contain a directory');
+    const previousHome = Deno.env.get('HOME');
+    Deno.env.set('HOME', foreignHome);
+    try {
+      const file = ensureInstallationSecretFile(project);
+      const material = await Deno.readTextFile(file);
+      const moved = join(root, 'moved-project');
+      await Deno.rename(project, moved);
+      const movedFile = ensureInstallationSecretFile(moved);
+      assertEquals(await Deno.readTextFile(movedFile), material);
+      assertEquals(await Deno.readTextFile(foreignHome), 'a home that cannot contain a directory');
+      assertEquals(Array.from(Deno.readDirSync(root), (entry) => entry.name).sort(), [
+        'moved-project',
+        'unusable-home',
+      ]);
+    } finally {
+      if (previousHome === undefined) Deno.env.delete('HOME');
+      else Deno.env.set('HOME', previousHome);
+    }
+  }));
+
+Deno.test('installation provisioning gives a path-free remedy for unusable files and directories', () =>
+  fixture(async (root) => {
+    const directory = join(root, '.data', 'aspire-secrets');
+    await Deno.mkdir(join(root, '.data'));
+    await Deno.writeTextFile(directory, 'not a directory');
+    const error = assertThrows(() => ensureInstallationSecretFile(root));
+    assert(String(error).includes('NETSCRIPT_INSTALLATION_SECRET_FILE'));
+    assert(String(error).includes('mode 0700'));
+    assert(String(error).includes('mode 0600'));
+    assert(!String(error).includes(root));
+    await Deno.remove(directory);
+    await Deno.mkdir(directory, { mode: 0o700 });
+    if (Deno.build.os !== 'windows') {
+      await Deno.chmod(directory, 0o755);
+      const permissionError = assertThrows(() => ensureInstallationSecretFile(root));
+      assert(String(permissionError).includes('mode 0700'));
+      assert(!String(permissionError).includes(root));
+    }
+  }));
+
 Deno.test('installation provisioning preserves rotation and fails for missing explicit references', () =>
   fixture(async (root) => {
-    const options = { ownerSecretDirectory: join(root, 'owner-secrets') };
-    const file = ensureInstallationSecretFile(root, options);
+    const file = ensureInstallationSecretFile(root);
     const rotated = 'rotated-secret-material-'.repeat(3);
     await Deno.writeTextFile(file, rotated);
     const parameters: string[] = [];
@@ -58,7 +101,7 @@ Deno.test('installation provisioning preserves rotation and fails for missing ex
       },
     };
     assertEquals(
-      await registerInstallationSecret(builder, root, options),
+      await registerInstallationSecret(builder, root),
       file,
     );
     assertEquals(parameters, [rotated]);

@@ -1,5 +1,3 @@
-import { readTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
-import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 /**
  * @module templates/aspire/helpers/service-environment-runtime_test
  *
@@ -28,6 +26,9 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
  * the config they are handed as the template does. No assertion treats a double's
  * value as expected without also pinning call order.
  */
+
+import { readTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals } from 'jsr:@std/assert@^1';

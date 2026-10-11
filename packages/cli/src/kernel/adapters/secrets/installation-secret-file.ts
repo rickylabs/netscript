@@ -1,4 +1,4 @@
-/** Owner-scoped installation credential provisioning shared with the generated AppHost. */
+/** Project-scoped installation credential provisioning shared with the generated AppHost. */
 import {
   closeSync,
   constants,
@@ -11,8 +11,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from 'node:fs';
-import { createHash, randomBytes } from 'node:crypto';
-import { homedir } from 'node:os';
+import { randomBytes } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 
@@ -20,8 +19,6 @@ import process from 'node:process';
 export interface InstallationSecretFileOptions {
   /** Explicit existing file; absent files fail rather than silently changing identity. */
   readonly file?: string;
-  /** Owner's secret directory; defaults to the owner's `.secrets` directory. */
-  readonly ownerSecretDirectory?: string;
 }
 
 /** Minimal upstream secret-parameter seam; the value must remain a direct parameter. */
@@ -49,22 +46,10 @@ export function ensureInstallationSecretFile(
       readSecret(file);
       return file;
     }
-    const ownerDirectory = resolve(
-      options.ownerSecretDirectory ?? join(homedir(), '.secrets'),
-    );
-    const installation = createHash('sha256').update(resolve(installationRoot))
-      .digest('hex');
-    const directory = join(ownerDirectory, 'netscript', installation);
-    for (
-      const path of [
-        ownerDirectory,
-        join(ownerDirectory, 'netscript'),
-        directory,
-      ]
-    ) {
-      mkdirSync(path, { recursive: true, mode: 0o700 });
-      assertOwnerOnly(path, true);
-    }
+    // Match ensureDatabasePassword: credentials travel with the git-ignored project data.
+    const directory = resolve(installationRoot, '.data', 'aspire-secrets');
+    mkdirSync(directory, { recursive: true, mode: 0o700 });
+    assertOwnerOnly(directory, true);
     const file = join(directory, 'installation.secret');
     try {
       lstatSync(file);
@@ -94,7 +79,7 @@ export function ensureInstallationSecretFile(
   } catch {
     // Filesystem and decoding errors can contain hostile path/content. Never expose the cause.
     throw new Error(
-      'Installation credential provisioning failed: require an owner-only UTF-8 secret file containing 32 to 4096 bytes.',
+      'Installation credential provisioning failed. Ensure the secret directory is writable and owned by you (mode 0700), and the UTF-8 secret file is readable and owner-only (mode 0600), containing 32 to 4096 bytes; or set NETSCRIPT_INSTALLATION_SECRET_FILE to an existing file meeting these requirements.',
     );
   }
 }
@@ -129,6 +114,7 @@ export function installationSecretPermissions(
   ) {
     return [...permissions];
   }
+  // Scoped Deno permission flags are comma-separated; carrier paths must not contain commas.
   let result = [...permissions];
   for (
     const [flag, value] of [['--allow-read', file], ['--allow-env', FILE_ENV]]
