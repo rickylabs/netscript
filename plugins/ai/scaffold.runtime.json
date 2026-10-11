@@ -3,7 +3,7 @@
   "runtimeRegistryGenerator": {
     "command": "src/cli/generate-runtime-registries.ts",
     "args": ["--profile", "scaffold"],
-    "inspectionProtocol": 1
+    "inspectionProtocol": 2
   },
   "runtimeRegistries": [
     {

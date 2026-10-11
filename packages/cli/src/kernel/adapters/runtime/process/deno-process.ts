@@ -15,6 +15,7 @@ export class DenoProcess implements ProcessPort {
       readonly env?: Readonly<Record<string, string>>;
       readonly clearEnv?: boolean;
       readonly timeoutMs?: number;
+      readonly maxOutputBytes?: number;
       readonly stdin?: string;
     },
   ): Promise<ProcessResult> {
@@ -51,15 +52,51 @@ export class DenoProcess implements ProcessPort {
       }
     }
 
-    const output = await child.output();
+    let capacityExceeded = false;
+    const bounded = async (stream: ReadableStream<Uint8Array>): Promise<Uint8Array> => {
+      const chunks: Uint8Array[] = [];
+      let length = 0;
+      for await (const chunk of stream) {
+        if (length + chunk.length > options!.maxOutputBytes!) {
+          if (!capacityExceeded && !completed) {
+            capacityExceeded = true;
+            try {
+              child.kill('SIGKILL');
+            } catch { /* Child may already have exited. */ }
+          }
+          break;
+        }
+        chunks.push(chunk);
+        length += chunk.length;
+      }
+      const bytes = new Uint8Array(length);
+      let offset = 0;
+      for (const chunk of chunks) {
+        bytes.set(chunk, offset);
+        offset += chunk.length;
+      }
+      return bytes;
+    };
+    const output = options?.maxOutputBytes === undefined
+      ? await child.output()
+      : await (async () => {
+        const [stdout, stderr, status] = await Promise.all([
+          bounded(child.stdout),
+          bounded(child.stderr),
+          child.status,
+        ]);
+        return { ...status, stdout, stderr };
+      })();
     completed = true;
     if (timeout !== undefined) clearTimeout(timeout);
 
     const decoder = new TextDecoder();
     return {
-      code: output.code,
+      code: capacityExceeded ? 1 : output.code,
       stdout: decoder.decode(output.stdout),
-      stderr: decoder.decode(output.stderr),
+      stderr: capacityExceeded
+        ? 'Process output capacity exceeded.'
+        : decoder.decode(output.stderr),
       timedOut,
     };
   }

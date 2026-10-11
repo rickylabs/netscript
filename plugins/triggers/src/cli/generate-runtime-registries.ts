@@ -1,6 +1,9 @@
 import { renderRegistryModule } from '@netscript/plugin/cli';
 
 interface Args {
+  readonly inspect?: boolean;
+  readonly inspectionProtocol?: string;
+  readonly manifestJson?: string;
   readonly manifestPath: string;
   readonly officialSamples: boolean;
   readonly profile?: string;
@@ -25,27 +28,62 @@ interface ProjectFileEntry {
 
 if (import.meta.main) {
   const args = parseArgs(Deno.args);
-  const target = await readTriggerRegistryTarget(args.manifestPath);
+  if (
+    args.inspect &&
+    (!['1', '2'].includes(args.inspectionProtocol ?? '') || args.manifestJson === undefined)
+  ) throw new Error('Inspect mode requires protocol 1 or 2 and --manifest-json.');
+  if (!args.inspect && (args.inspectionProtocol !== undefined || args.manifestJson !== undefined)) {
+    throw new Error('Inspection flags require --inspect.');
+  }
+  const target = args.manifestJson
+    ? (JSON.parse(args.manifestJson) as RuntimeManifest).runtimeRegistries?.find((target) =>
+      target.kind === 'map'
+    )
+    : await readTriggerRegistryTarget(args.manifestPath);
   if (target === undefined) {
     throw new Error(`No trigger registry target found in ${args.manifestPath}.`);
   }
 
   const registryPath = target.registryPath ?? `${target.dir}/_registry.ts`;
-  await generateTriggerRegistry(args.projectRoot, {
+  const entry = await renderTriggerRegistry(args.projectRoot, {
     ...target,
     registryPath,
   });
-  console.log(`generated ${registryPath}`);
+  if (args.inspect) {
+    console.log(
+      JSON.stringify({
+        inspectionProtocol: Number(args.inspectionProtocol),
+        registries: [
+          args.inspectionProtocol === '1'
+            ? { registryPath: entry.registryPath, sourceFiles: entry.sourceFiles }
+            : entry,
+        ],
+      }),
+    );
+  } else {
+    await writeTextFile(args.projectRoot, registryPath, entry.content);
+    console.log(`generated ${registryPath}`);
+  }
 }
 
-async function generateTriggerRegistry(
+async function renderTriggerRegistry(
   projectRoot: string,
   options: RuntimeRegistryTarget & { readonly registryPath: string },
-): Promise<void> {
+): Promise<
+  {
+    readonly registryPath: string;
+    readonly sourceFiles: readonly string[];
+    readonly content: string;
+  }
+> {
   const files = await listRootFiles(projectRoot, options.dir, options.fileSuffixes);
   const triggerFiles = files.filter((file) => isIncludedSourcePath(file.relativePath, options));
   const source = renderTriggerRegistrySource(options.registryPath, triggerFiles);
-  await writeTextFile(projectRoot, options.registryPath, source);
+  return {
+    registryPath: options.registryPath,
+    sourceFiles: triggerFiles.map((file) => file.relativePath),
+    content: source,
+  };
 }
 
 function renderTriggerRegistrySource(
@@ -110,6 +148,9 @@ function renderTriggerRegistrySource(
 }
 
 function parseArgs(args: readonly string[]): Args {
+  let inspect = false;
+  let inspectionProtocol: string | undefined;
+  let manifestJson: string | undefined;
   let projectRoot = Deno.cwd();
   let manifestPath = 'plugins/triggers/scaffold.runtime.json';
   let officialSamples = true;
@@ -119,6 +160,12 @@ function parseArgs(args: readonly string[]): Args {
     const arg = args[index];
     if (arg === '--project-root') {
       projectRoot = requiredValue(args, ++index, arg);
+    } else if (arg === '--inspect') {
+      inspect = true;
+    } else if (arg === '--inspection-protocol') {
+      inspectionProtocol = requiredValue(args, ++index, arg);
+    } else if (arg === '--manifest-json') {
+      manifestJson = requiredValue(args, ++index, arg);
     } else if (arg === '--manifest') {
       manifestPath = requiredValue(args, ++index, arg);
     } else if (arg === '--profile') {
@@ -130,7 +177,15 @@ function parseArgs(args: readonly string[]): Args {
     }
   }
 
-  return { manifestPath, officialSamples, profile, projectRoot };
+  return {
+    inspect,
+    inspectionProtocol,
+    manifestJson,
+    manifestPath,
+    officialSamples,
+    profile,
+    projectRoot,
+  };
 }
 
 async function readTriggerRegistryTarget(
