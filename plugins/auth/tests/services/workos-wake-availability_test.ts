@@ -1,5 +1,6 @@
 import { assert, assertEquals } from '@std/assert';
 import { deadline } from '@std/async';
+import { serveAuthTestService } from '../testing/auth-service-fixture.ts';
 import { MemoryKvAdapter } from '@netscript/kv';
 import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 import { sessionRequest } from '../../../../packages/auth-workos/tests/testing/revocation-fixture.ts';
@@ -72,6 +73,7 @@ Deno.test('WorkOS registry wakes a fully idle worker after sign-out-everywhere a
     },
   });
   const backend = registry.resolveBackend();
+  await using service = await serveAuthTestService(registry);
   assert(registry.background);
   const running = registry.background.start();
   try {
@@ -79,7 +81,13 @@ Deno.test('WorkOS registry wakes a fully idle worker after sign-out-everywhere a
     await deadline(idle.promise, 2000);
     assertEquals(waits, 9);
     const startedAt = performance.now();
-    await backend.sessions.revokeSubjectSessions({ subject: 'alice' });
+    const logout = await fetch(`${service.baseUrl}/api/v1/auth/signout`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie: 'wos-session=alice:a' },
+      body: JSON.stringify({ everywhere: true }),
+    });
+    assertEquals(logout.status, 200);
+    assertEquals((await logout.json()).signedOut, true);
     assertEquals((await backend.authenticate(sessionRequest('alice:a'))).ok, false);
     assertEquals((await backend.authenticate(sessionRequest('alice:b'))).ok, false);
     assertEquals((await backend.authenticate(sessionRequest('alice:fresh'))).ok, false);
@@ -87,7 +95,11 @@ Deno.test('WorkOS registry wakes a fully idle worker after sign-out-everywhere a
     await deadline(entered.promise, 2000);
     release.resolve();
     await deadline(completed.promise, 2000);
-    assertEquals((await backend.authenticate(sessionRequest('alice:fresh'))).ok, true);
+    const fresh = await fetch(`${service.baseUrl}/api/v1/auth/me`, {
+      headers: { cookie: 'wos-session=alice:fresh' },
+    });
+    assertEquals(fresh.status, 200);
+    assertEquals((await fresh.json()).authenticated, true);
     assertEquals((await backend.authenticate(sessionRequest('alice:a'))).ok, false);
     assert(performance.now() - startedAt < 2000);
     assertEquals(lists, 1);
