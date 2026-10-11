@@ -16,6 +16,7 @@
     "./authenticator": "./src/public/authenticator.ts"
   },
   "imports": {
+    "@std/async": "jsr:@std/async@^1",
     "@netscript/contracts": "jsr:@netscript/contracts@0.0.7",
     "@netscript/auth-better-auth": "jsr:@netscript/auth-better-auth@0.0.7",
     "@netscript/auth-kv-oauth": "jsr:@netscript/auth-kv-oauth@0.0.7",

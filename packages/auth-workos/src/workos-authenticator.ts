@@ -264,6 +264,7 @@ export function createWorkosAccessTokenAuthenticator(
             principal.subject,
             stringClaim(payload.sid),
             typeof payload.iat === 'number' ? payload.iat * 1000 : undefined,
+            typeof payload.exp === 'number' ? payload.exp * 1000 : NaN,
           )
         ) return { ok: false, reason: 'workos_subject_revoked' };
         return {
@@ -305,12 +306,17 @@ async function authenticateWithRefresh(
   // Recheck the original verified credential after refresh: a concurrent logout wins.
   if (
     options.revocations && (
-      refreshed.user.id !== authenticated.user.id ||
-      refreshed.sessionId !== authenticated.sessionId ||
       await isWorkosSessionRevoked(authenticated, options.revocations)
     )
   ) {
     return { ok: false, reason: 'workos_subject_revoked' };
+  }
+
+  if (
+    options.revocations && (refreshed.user.id !== authenticated.user.id ||
+      refreshed.sessionId !== authenticated.sessionId)
+  ) {
+    return { ok: false, reason: 'workos_session_identity_changed' };
   }
 
   const setCookies = refreshed.sealedSession
@@ -457,11 +463,13 @@ export async function isWorkosSessionRevoked(
 ): Promise<boolean> {
   if (!store) return false;
   let issuedAt: number | undefined;
+  let expiresAt = NaN;
   try {
     const payload = decodeJwt(session.accessToken);
     issuedAt = typeof payload.iat === 'number' ? payload.iat * 1000 : undefined;
+    expiresAt = typeof payload.exp === 'number' ? payload.exp * 1000 : NaN;
   } catch {
     // The upstream verifier is authoritative. A missing time claim cannot bypass our fence.
   }
-  return await store.isRevoked(session.user.id, session.sessionId, issuedAt);
+  return await store.isRevoked(session.user.id, session.sessionId, issuedAt, expiresAt);
 }

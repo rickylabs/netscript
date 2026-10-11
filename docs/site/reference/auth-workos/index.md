@@ -37,6 +37,7 @@ the package's public surface reported by `deno doc`.
 | `WorkosSessionClient`                   | interface  | WorkOS session client boundary.                                  |
 | `WorkosSessionAuthenticationResult`     | type alias | Authentication result returned by WorkOS session authentication. |
 | `WorkosSessionRefreshResult`            | type alias | Session refresh result.                                          |
+| `WorkosRevocationRetention`             | interface  | Maximum token lifetime, clock-skew margin, and local clock.      |
 | `WorkosRevocationStore`                 | interface  | Durable fence and revocation delivery port.                      |
 | `WorkosRevocationJob`                   | interface  | Subject cutoff and paginated work item.                          |
 | `WorkosRevocationDelivery`              | interface  | Work item and optimistic storage version.                        |
@@ -45,30 +46,42 @@ the package's public surface reported by `deno doc`.
 ## Subject-wide revocation
 
 The official auth plugin composes the KV fence and its background worker. Signout does one atomic
-fence/outbox commit, without WorkOS enumeration. Each worker delivery processes one page of at most
-50 sessions. It uses the service's API identity, persists session tombstones before upstream
-revocation, and checkpoints progress. Delivery is at least once: partial failures replay safely.
-Eight failed attempts move the job into durable failure evidence; the subject stays fenced. Restart
-resumes pending pages without requiring an app or browser session to remain open.
+fence/outbox commit without WorkOS enumeration. Each delivery processes at most 50 sessions using
+the service's API identity. It persists session tombstones before upstream revocation and checkpoints
+progress. Failed pages retry indefinitely with exponential backoff capped at 60 seconds. Storage
+failures are supervised and reported through the service logger and telemetry without raw errors
+or credentials. Idle replicas back off to one KV read per minute. The shutdown hook aborts admission
+and drains an active delivery on SIGTERM, SIGINT, and manual stop; restart resumes pending pages.
 
-Standalone applications compose `createWorkosRevocationStore(hostKv)` on an atomic
-`@netscript/kv` store and pass it as `revocations` to `createWorkosBackend`,
-`createWorkosAuthenticator`, and `createWorkosAccessTokenAuthenticator`. Their worker consumes
-`nextDelivery(now)` and calls `revokeWorkosSubjectPage(store, workos, delivery, signal)` outside
-requests. Share one durable store across all instances and authentication paths. Missing token
-issuance or session claims fail closed after a subject fence exists. Configurations without a store
-continue to report subject-wide revocation as unsupported.
+Standalone applications compose `createWorkosRevocationStore(kv, retention)` over an atomic host
+`@netscript/kv` store and share it with `createWorkosBackend`, `createWorkosAuthenticator`, and any
+`createWorkosAccessTokenAuthenticator`. Run `revokeWorkosSubjectPage(store, workos, delivery, signal)`
+in a service-owned worker, reading `store.nextDelivery(now)` and checkpointing retries. Without a
+store, subject-wide revocation remains explicitly unsupported.
 
-The fence refuses all credentials of the subject while upstream cleanup is pending or failed,
-including new logins. After successful cleanup, sessions created after the cutoff can authenticate;
-tombstones keep old sessions refused even if their access token was refreshed. Other subjects are
-unaffected. Operators inspect `auth-workos/revocation/failed` in host KV and can resubmit cleanup
-through `backend.sessions.revokeSubjectSessions({ subject })` from a trusted service identity.
+The fence refuses every credential of the subject while upstream cleanup is pending. After cleanup,
+the cutoff and session tombstones still refuse old or refreshed credentials; other subjects remain
+usable. Failed cleanup recovers automatically when the provider or storage becomes available.
 
-The new optional store and clock settings require no source migration for existing standalone
-callers. The official plugin now requires an atomic host KV for WorkOS and respects the configured
-session-cookie name. Consumers enabling global logout must add a background worker and wire the
-shared store into every authenticator.
+If a storage failure follows upstream success, a bounded, durable retention-repair pass
+sets expiry before the subject fence clears; it never touches a newer job's tombstones.
+
+Tombstones expire only after upstream revocation succeeds, plus the longest configured access-token
+lifetime and clock-skew padding. `WorkosRevocationRetention.maxAccessTokenLifetimeMs` defaults to
+one day, and `clockSkewMs` to one minute. In the plugin, set `WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS` to
+cover the longest access-token duration in your [WorkOS application settings](https://workos.com/docs/authkit/sessions).
+After a subject logout, tokens missing expiry or exceeding the configured lifetime fail closed even
+after tombstone expiry. Set `WORKOS_CLOCK_SKEW_MS` for the allowed provider/local difference; the upstream cutoff includes
+that same margin, conservatively ending sessions within it while preserving later sessions.
+
+### Migration in 0.0.8
+
+The plugin requires atomic host KV for WorkOS. It reads `NETSCRIPT_AUTH_COOKIE_NAME`, defaulting to
+`__Host-ns_session`; the CLI WorkOS preset sets that name explicitly. Configure your AuthKit issuer
+with the same name, or set `NETSCRIPT_AUTH_COOKIE_NAME=wos-session` for an existing cookie.
+Standalone callers must share the store across all authenticators and run the cleanup worker.
+Custom stores expose `clockSkewMs` and implement `confirmSessionRevoked` after upstream success; terminal `fail` is removed.
+Refresh identity changes use `workos_session_identity_changed`, distinct from concurrent logout.
 
 ## Re-exported auth contracts
 

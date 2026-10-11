@@ -73,19 +73,29 @@ worker automatically. `signout { everywhere: true }` atomically writes a subject
 work item; it never lists or revokes individual WorkOS sessions inside the request.
 
 The worker uses the service's WorkOS API key, processes at most 50 sessions per delivery, and
-checkpoints each page. Partial failure replays the page, with at most eight attempts and exponential
-backoff capped at 60 seconds. A process restart resumes pending work. Completed pages leave
-permanent session tombstones, so access tokens refreshed after the logout cutoff cannot resurrect an
-old session. Sessions created after the cutoff are preserved upstream. During cleanup, **all**
-NetScript credentials of that subject are refused, including newly created sessions; they become
-usable when cleanup succeeds. Other subjects stay usable. Terminal failures remain under the KV
-prefix `auth-workos/revocation/failed` and keep the subject fenced. An operator can retry cleanup by
-calling `backend.sessions.revokeSubjectSessions({ subject })` under a trusted service identity.
+checkpoints each page. Partial failures retry automatically without an attempt limit, with
+exponential backoff capped at 60 seconds. Storage errors are supervised with the same cap and
+reported through the service logger and telemetry using identifier-free classifications. Idle
+workers back off to one KV read per minute. A process restart resumes pending work; the service's
+shutdown hook aborts admission and drains an active delivery on SIGTERM, SIGINT, or manual stop.
+
+If a storage failure follows upstream success, a bounded, durable retention-repair pass
+sets expiry before the subject fence clears; it never touches a newer job's tombstones.
+
+Per-session tombstones have no expiry until upstream revocation succeeds. Then they expire after
+`maxAccessTokenLifetimeMs + clockSkewMs`, measured from that success, so a long outage cannot shorten
+retention. Defaults are one day and one minute. Configure `WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS` in the
+plugin to cover the longest access-token duration in your [WorkOS application settings](https://workos.com/docs/authkit/sessions).
+After a subject logout, verified tokens missing expiry or exceeding the configured lifetime fail
+closed even after tombstone expiry. `WORKOS_CLOCK_SKEW_MS` controls both retention padding and the upstream session cutoff margin.
+Sessions created within that margin are conservatively revoked; sessions beyond it are preserved.
+During cleanup, **all** NetScript credentials of that subject are refused, including new sessions;
+they become usable automatically when upstream cleanup succeeds. Other subjects stay usable.
 
 Standalone compositions must pass the same `revocations` store to their backend and any bearer or
 sealed-session authenticators. Use `createWorkosRevocationStore(hostKv)` with an atomic `KvStore`.
 Run `revokeWorkosSubjectPage(store, workos, delivery, signal)` in a background worker against
-`store.nextDelivery(now)`, checkpoint retries with a bounded budget, and drain it on shutdown.
+`store.nextDelivery(now)`, retry failed pages with capped backoff until recovery, and drain it on shutdown.
 Without a store, subject-wide revocation remains explicitly unsupported. Never run the page function
 inside signout. The official plugin's service worker supplies this lifecycle for deployed auth APIs.
 
@@ -94,8 +104,12 @@ inside signout. The official plugin's service worker supplies this lifecycle for
 No existing option is removed. Standalone callers that enable subject-wide logout must configure the
 durable store and its worker, then share the store with every authenticator; leaving a standalone
 bearer authenticator unconfigured would bypass the local fence. The official plugin requires an
-atomic host KV store for WorkOS and now reads its configured session-cookie name consistently. The
-first eight failed page attempts leave durable failure evidence for operator recovery.
+atomic host KV store for WorkOS and now reads its configured session-cookie name consistently. Set `NETSCRIPT_AUTH_COOKIE_NAME=wos-session` to retain an existing AuthKit cookie, or configure your
+AuthKit issuer to write the plugin default `__Host-ns_session`. The CLI WorkOS preset now sets that
+same name explicitly. Configure the maximum token lifetime to match your WorkOS application.
+`WorkosRevocationStore` implementations expose `clockSkewMs` and implement `confirmSessionRevoked` for retention after
+upstream success; the terminal `fail` operation is removed. Refresh identity changes return
+`workos_session_identity_changed`; a concurrent subject fence still returns `workos_subject_revoked`.
 
 ## Public surface
 

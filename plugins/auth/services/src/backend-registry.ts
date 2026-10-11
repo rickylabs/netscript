@@ -15,6 +15,7 @@ import {
   createWorkosBackend,
   createWorkosRevocationStore,
   type WorkosCookieSession,
+  type WorkosRevocationClient,
   type WorkosSessionAuthenticationResult,
   type WorkosSessionRefreshResult,
 } from '@netscript/auth-workos';
@@ -56,6 +57,14 @@ export type CreateAuthServiceBackendRegistryOptions = Readonly<{
   dbClient?: unknown;
   kv?: WatchableKv;
   fetch?: typeof fetch;
+  /** Official WorkOS SDK seam, supplied by hosts or contract tests. */
+  workos?: WorkosRevocationClient & {
+    readonly userManagement: {
+      loadSealedSession(
+        options: { sessionData: string; cookiePassword: string },
+      ): WorkosSdkCookieSession;
+    };
+  };
 }>;
 
 type WorkosSdkAuthenticationFailure = Readonly<{
@@ -196,11 +205,15 @@ async function createActiveBackend(
     });
   }
   if (backendName === 'workos') {
-    const { WorkOS } = await import('@workos-inc/node');
-    const workos = new WorkOS(requiredEnv(env, 'WORKOS_API_KEY'), {
-      clientId: requiredEnv(env, 'WORKOS_CLIENT_ID'),
+    const workos = options.workos ?? await createWorkosSdk(env);
+    const clockSkewMs = positiveMilliseconds(env.WORKOS_CLOCK_SKEW_MS, 60_000);
+    const revocations = createWorkosRevocationStore(options.kv ?? await getKv(), {
+      maxAccessTokenLifetimeMs: positiveMilliseconds(
+        env.WORKOS_ACCESS_TOKEN_MAX_LIFETIME_MS,
+        86_400_000,
+      ),
+      clockSkewMs,
     });
-    const revocations = createWorkosRevocationStore(options.kv ?? await getKv());
     const backend = createWorkosBackend({
       revocations,
       cookie: { name: env.NETSCRIPT_AUTH_COOKIE_NAME },
@@ -227,6 +240,21 @@ async function createActiveBackend(
     sessionTokenSecret: requiredEnv(env, 'BETTER_AUTH_SECRET'),
     providers: [{ id: 'better-auth', displayName: 'better-auth' }],
   });
+}
+
+async function createWorkosSdk(env: Readonly<Record<string, string | undefined>>) {
+  const { WorkOS } = await import('@workos-inc/node');
+  return new WorkOS(requiredEnv(env, 'WORKOS_API_KEY'), {
+    clientId: requiredEnv(env, 'WORKOS_CLIENT_ID'),
+  });
+}
+
+function positiveMilliseconds(value: string | undefined, fallback: number): number {
+  const parsed = value === undefined ? fallback : Number(value);
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+    throw new RangeError('WorkOS lifetime and skew must be positive integer milliseconds.');
+  }
+  return parsed;
 }
 
 function createWorkosCookieSession(

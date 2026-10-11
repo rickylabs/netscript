@@ -258,8 +258,9 @@ otherwise the `__Host-ns_session` cookie does. Every other procedure stays publi
   authentication refuses the subject immediately, including still-unexpired access tokens. During
   cleanup it also refuses newly created sessions of that subject; they become usable when cleanup
   succeeds. Permanent session tombstones prevent rotated tokens from reviving an old session.
-  Other subjects remain usable. Failed pages retry up to eight times with capped backoff; terminal
-  failures stay in KV and keep the subject fenced until an operator retries cleanup. See the
+  Other subjects remain usable. Failed pages retry automatically until recovery, with backoff capped at 60 seconds.
+  Storage failures are supervised, and shutdown signals drain the worker. Session tombstones expire
+  only after upstream success plus the longest configured token lifetime and clock-skew padding. See the
   [WorkOS reference](/reference/auth-workos/#subject-wide-revocation) for standalone composition.
 - **Operators.** Revoking somebody else's session is the separate `revokeSession` procedure,
   gated by the `auth:sessions:revoke` scope on an authenticated backend session. The auth service's

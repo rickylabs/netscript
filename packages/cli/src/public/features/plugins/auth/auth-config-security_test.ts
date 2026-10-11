@@ -282,3 +282,20 @@ Deno.test('auth CLI reads native environment credentials with flag precedence an
     );
   }
 });
+
+Deno.test('WorkOS CLI configuration pins the same session cookie used by the shipped plugin', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const root = 'workos-cookie-config';
+  await fs.writeFile(join(root, 'appsettings.json'), '{}');
+  await setAuthProvider({
+    projectRoot: root,
+    preset: 'workos',
+    apiKey: 'test-key',
+    clientId: 'test-client',
+    cookiePassword: 'x'.repeat(32),
+  }, fs);
+  const config = JSON.parse(await fs.readFile(join(root, 'appsettings.json')));
+  assertEquals(config.NetScript.Plugins.auth.Environment.NETSCRIPT_AUTH_BACKEND, 'workos');
+  const environment = await fs.readFile(join(root, '.env'));
+  assert(environment.includes("NETSCRIPT_AUTH_COOKIE_NAME='__Host-ns_session'"));
+});

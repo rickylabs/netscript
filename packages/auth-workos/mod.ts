@@ -67,6 +67,7 @@ export type {
   Principal,
 } from '@netscript/plugin-auth-core';
 
+export type { WorkosRevocationRetention } from './src/ports/revocation-store.ts';
 export { createWorkosRevocationStore } from './src/adapters/kv-revocation-store.ts';
 export { revokeWorkosSubjectPage } from './src/application/revoke-subject-page.ts';
 export type {
@@ -76,6 +77,7 @@ export type {
   WorkosRevocationStore,
 } from './src/ports/revocation-store.ts';
 
+// Deno doc requires the foreign signature's transitively referenced types to be public.
 export type {
   AtomicCheck,
   AtomicMutation,

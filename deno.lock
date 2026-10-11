@@ -4763,6 +4763,7 @@
           "jsr:@netscript/plugin@0.0.7",
           "jsr:@netscript/service@0.0.7",
           "jsr:@netscript/telemetry@0.0.7",
+          "jsr:@std/async@1",
           "npm:zod@^4.6.5"
         ],
         "packageJson": {

@@ -9,7 +9,7 @@ import type {
  *
  * At most `pageSize` sequential revocations and one list call per delivery. Throws on upstream
  * failure so the worker supervisor can retry; a crash replays the page safely. Sessions created
- * after the logout cutoff and sessions of another subject are never revoked.
+ * beyond the logout cutoff plus the allowed clock skew are preserved; foreign subjects fail closed.
  */
 export async function revokeWorkosSubjectPage(
   store: WorkosRevocationStore,
@@ -21,8 +21,16 @@ export async function revokeWorkosSubjectPage(
   if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) {
     throw new RangeError('WorkOS pageSize must be an integer from 1 to 100.');
   }
+  const clockSkewMs = store.clockSkewMs;
+  if (!Number.isSafeInteger(clockSkewMs) || clockSkewMs < 0) {
+    throw new RangeError('WorkOS clock skew must be nonnegative milliseconds.');
+  }
   signal.throwIfAborted();
   const { job } = delivery;
+  if (job.tombstoneAfter !== undefined) {
+    await store.checkpoint(delivery);
+    return;
+  }
   const page = await workos.userManagement.listSessions(job.subject, {
     limit: pageSize,
     after: job.after,
@@ -41,10 +49,11 @@ export async function revokeWorkosSubjectPage(
     if (!Number.isFinite(createdAt)) {
       throw new Error('WorkOS returned an invalid session creation time.');
     }
-    if (createdAt > Date.parse(job.revokedAt)) continue;
-    await store.revokeSession(job.subject, session.id);
+    if (createdAt > Date.parse(job.revokedAt) + clockSkewMs) continue;
+    await store.revokeSession(job.subject, session.id, job.id);
     signal.throwIfAborted();
     await workos.userManagement.revokeSession({ sessionId: session.id });
+    await store.confirmSessionRevoked(job.subject, session.id, job.id);
   }
   signal.throwIfAborted();
   await store.checkpoint(delivery, after ? { ...job, after, attempt: 0 } : undefined);

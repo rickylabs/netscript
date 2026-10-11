@@ -1,3 +1,13 @@
+/** Retention policy for credentials issued before upstream revocation completed. */
+export interface WorkosRevocationRetention {
+  /** Longest access-token lifetime configured in WorkOS, in milliseconds. Defaults to one day. */
+  readonly maxAccessTokenLifetimeMs?: number;
+  /** Allowed provider/local clock difference, in milliseconds. Defaults to one minute. */
+  readonly clockSkewMs?: number;
+  /** Local clock used for tombstone expiry. */
+  readonly now?: () => number;
+}
+
 /** Durable subject fence and upstream revocation work item. */
 export interface WorkosRevocationJob {
   /** Unique identity of this global logout. */
@@ -8,6 +18,8 @@ export interface WorkosRevocationJob {
   readonly revokedAt: string;
   /** Cursor of the next upstream page. */
   readonly after?: string;
+  /** Cursor for bounded repair of tombstone retention after upstream cleanup. */
+  readonly tombstoneAfter?: string;
   /** Failed deliveries of the current page. */
   readonly attempt: number;
   /** Earliest delivery time in epoch milliseconds. */
@@ -24,25 +36,29 @@ export interface WorkosRevocationDelivery {
 
 /** Storage seam shared by authentication, logout, and the background worker. */
 export interface WorkosRevocationStore {
+  /** Shared provider/local clock margin for paging and tombstone retention. */
+  readonly clockSkewMs: number;
   /** Atomically persist a monotonic subject fence and a durable pending job. */
   revokeSubject(subject: string, revokedAt: string): Promise<WorkosRevocationJob>;
   /**
-   * Refuse old credentials, or every credential while upstream cleanup is pending/failed.
+   * Refuse old credentials, or every credential while upstream cleanup is pending.
    * Per-session tombstones also refuse access tokens rotated after the subject cutoff.
+   * Authenticators supply token expiry; missing/overlong expiry fails closed against retention.
    */
   isRevoked(
     subject: string,
     sessionId: string | undefined,
     issuedAt: number | undefined,
+    expiresAt?: number,
   ): Promise<boolean>;
   /** Return at most one due job; never enumerate all jobs. */
   nextDelivery(now: number): Promise<WorkosRevocationDelivery | undefined>;
-  /** Persist a permanent tombstone before ending a session upstream. */
-  revokeSession(subject: string, sessionId: string): Promise<void>;
+  /** Persist a tombstone without expiry before ending a session upstream. */
+  revokeSession(subject: string, sessionId: string, jobId: string): Promise<void>;
+  /** Start bounded retention only after upstream revocation succeeds. */
+  confirmSessionRevoked(subject: string, sessionId: string, jobId: string): Promise<void>;
   /** CAS checkpoint/retry, or finish this job without clearing a newer subject fence. */
   checkpoint(delivery: WorkosRevocationDelivery, next?: WorkosRevocationJob): Promise<boolean>;
-  /** Retain terminal failure evidence; authentication stays fenced until an operator retries. */
-  fail(delivery: WorkosRevocationDelivery, reason: string): Promise<boolean>;
 }
 
 /** Minimal official WorkOS SDK boundary needed by the revocation worker. */
