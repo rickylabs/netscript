@@ -1,3 +1,4 @@
+import type { RenderedRuntimeRegistry } from './command-types.ts';
 import { exists } from 'jsr:@std/fs@^1';
 import { basename, dirname, join, relative } from 'jsr:@std/path@^1';
 import { toCamelCase } from 'jsr:@std/text@^1';
@@ -74,16 +75,6 @@ interface GeneratedJobEntry {
   readonly policy?: JobConfig;
   readonly resolvedVariable: string;
   readonly source: 'local' | 'plugin';
-}
-
-/** One rendered target; null means normal generation would skip it. */
-export interface RenderedRuntimeRegistry {
-  /** Declared output path. */
-  readonly registryPath: string;
-  /** Generator-selected project sources. */
-  readonly sourceFiles: readonly string[];
-  /** Unformatted module bytes, or null for an empty selection. */
-  readonly content: string | null;
 }
 
 /** Generate from the same read-only selector and renderer used by inspection. */

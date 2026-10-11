@@ -64,3 +64,13 @@ export interface WorkersCliBackend {
     args: PluginCliArgs,
   ): PluginCliResult | Promise<PluginCliResult>;
 }
+
+/** One rendered target; null means normal generation would skip it. */
+export interface RenderedRuntimeRegistry {
+  /** Declared output path. */
+  readonly registryPath: string;
+  /** Generator-selected project sources. */
+  readonly sourceFiles: readonly string[];
+  /** Unformatted module bytes, or null for an empty selection. */
+  readonly content: string | null;
+}
