@@ -418,6 +418,7 @@ packages/cli/e2e/tests/application/gates/quickstart-aspire-walk_test.ts	e2e	S2/S
 packages/cli/e2e/tests/application/gates/resource-command-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/resource-state-stream_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/scaffold/auth-cookie-jar-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/behavior-plugins-health-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/plugin-contract-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
