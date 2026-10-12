@@ -1,6 +1,11 @@
 import { PrismaClient, type Prisma } from './.generated/client.ts';
 import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
 import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
+import { createDurableSagaRuntime, PrismaSagaInstanceProjection } from '@netscript/plugin-sagas/runtime';
+import { defineSaga } from '@netscript/plugin-sagas-core';
+import { workerJobEffect } from '@netscript/plugin-sagas-core/integration/workers';
+import { defineJob } from '@netscript/plugin-workers-core';
+import { z } from 'zod';
 import { createPrismaSagaTransitionStore } from '@netscript/plugin-sagas-core/stores';
 import type { PostgresCommandClient, TransactionClientPort } from '@netscript/database/commands/postgres';
 import { assertAtomicTransitionConformance, transitionRequest } from 'REPO_URLpackages/plugin-sagas-core/tests/transition-conformance.ts';
@@ -98,5 +103,73 @@ Deno.test('PostgreSQL stale saga writers and replay races commit one command set
   assertEquals(await counts(),[1,1,1,1,1]);
   assertEquals(callbacks,2);
   assert((await store.entries())[0].metadata.createdAt instanceof Date);
+  } finally { await root.$disconnect(); }
+});
+
+Deno.test('PostgreSQL projected atomic runtime commits once and repairs projection without repeating worker intent', async () => {
+  let failProjection = true;
+  const projection = new PrismaSagaInstanceProjection(root);
+  const job = defineJob('projection-job').payload(z.object({ documentId: z.string() })).entrypoint('job.ts').build();
+  const definition = defineSaga('document').durableWorkerCommands().state({ count: 0 }).on('start', saga => {
+    saga.state.count++;
+    return [workerJobEffect(job, { documentId: 'one' }, { destination: 'workers', topic: 'document' })];
+  }).build();
+  const request = transitionRequest();
+  const message = { type: 'start', payload: {}, correlationKey: request.correlation.correlationKey, idempotencyKey: 'projected-one' };
+  const guardedProjection = { async upsert(value: Parameters<typeof projection.upsert>[0]): Promise<void> {
+    assertEquals(await counts(), [1,1,1,1,1]);
+    assertEquals(new Set(observedTxIds).size, 1);
+    if (failProjection) throw new Error('projection unavailable');
+    await projection.upsert(value);
+  } };
+  try {
+    await reset();
+    await root.$executeRawUnsafe('CREATE TABLE IF NOT EXISTS saga_instances (id varchar(100) NOT NULL, saga_name varchar(100) NOT NULL, correlation_id varchar(100) NOT NULL, version integer NOT NULL, is_completed boolean NOT NULL, state jsonb NOT NULL, created_at timestamp(3) NOT NULL, updated_at timestamp(3) NOT NULL, PRIMARY KEY (saga_name,id))');
+    await root.$executeRawUnsafe('DELETE FROM saga_instances');
+    const durable = await createDurableSagaRuntime({ store, projection: guardedProjection });
+    try {
+      await durable.runtime.register([definition]);
+      await durable.runtime.start();
+      await assertRejects(() => durable.runtime.publish(message), Error, 'projection unavailable');
+      assertEquals(callbacks, 1);
+      assertEquals(await counts(), [1,1,1,1,1]);
+      assertEquals(await root.sagaInstance.count(), 0);
+    } finally {
+      await durable.runtime.stop();
+      await durable.dispose();
+    }
+    failProjection = false;
+    const envelope = await store.load(request.correlation.instanceId);
+    assert(envelope);
+    const history = await store.transitions(request.correlation.instanceId);
+    await projection.upsert({ ...request.correlation, envelope, transition: history[0] });
+    const row = await root.sagaInstance.findUniqueOrThrow({ where: { sagaName_id: { sagaName: 'document', id: request.correlation.instanceId } } });
+    assertEquals(row.version, 1);
+    assertEquals((row.state as { count: number }).count, 1);
+    const restarted = await createDurableSagaRuntime({ store, projection: guardedProjection });
+    try {
+      await restarted.runtime.register([definition]);
+      await restarted.runtime.start();
+      await restarted.runtime.publish(message);
+      assertEquals(await counts(), [1,1,1,1,1]);
+      assertEquals(await root.sagaInstance.count(), 1);
+    } finally {
+      await restarted.runtime.stop();
+      await restarted.dispose();
+    }
+    // A new transition also populates the Prisma projection after its canonical commit.
+    const nextRuntime = await createDurableSagaRuntime({ store, projection });
+    try {
+      await nextRuntime.runtime.register([definition]);
+      await nextRuntime.runtime.start();
+      await nextRuntime.runtime.publish({ ...message, idempotencyKey: 'projected-two' });
+      assertEquals(await counts(), [2,2,2,1,1]);
+      const next = await root.sagaInstance.findUniqueOrThrow({ where: { sagaName_id: { sagaName: 'document', id: request.correlation.instanceId } } });
+      assertEquals(next.version, 2);
+      assertEquals((next.state as { count: number }).count, 2);
+    } finally {
+      await nextRuntime.runtime.stop();
+      await nextRuntime.dispose();
+    }
   } finally { await root.$disconnect(); }
 });

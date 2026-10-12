@@ -1,4 +1,10 @@
 import { loadSagaRetention } from './load-saga-retention.ts';
+import {
+  isSagaTransitionStore,
+  type SagaTransitionCommitRequest,
+  type SagaTransitionCommitResult,
+  type SagaTransitionStore,
+} from '@netscript/plugin-sagas-core/ports';
 import type {
   SagaCorrelationIndexEntry,
   SagaStorePort,
@@ -159,7 +165,30 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
   }
 }
 
-/** Store decorator that projects only after the engine transition ledger persists. */
+/**
+ * Decorate a store without hiding its atomic transition and replay capability.
+ * Projection failures propagate after commit, as on the legacy append path.
+ * An already-committed replay writes neither canonical rows nor a projection.
+ */
+export function createProjectingSagaStore(
+  delegate: SagaTransitionStore,
+  projection: SagaInstanceProjectionPort,
+): SagaTransitionStore;
+/** Decorate a granular store without advertising atomic capabilities. */
+export function createProjectingSagaStore(
+  delegate: SagaStorePort,
+  projection: SagaInstanceProjectionPort,
+): SagaStorePort;
+export function createProjectingSagaStore(
+  delegate: SagaStorePort,
+  projection: SagaInstanceProjectionPort,
+): SagaStorePort {
+  return isSagaTransitionStore(delegate)
+    ? new AtomicProjectingSagaStore(delegate, projection)
+    : new ProjectingSagaStore(delegate, projection);
+}
+
+/** Legacy store decorator; use createProjectingSagaStore to retain atomic capabilities. */
 export class ProjectingSagaStore implements SagaStorePort {
   /** Stable decorated-store identifier. */
   readonly id: string;
@@ -231,6 +260,85 @@ export class ProjectingSagaStore implements SagaStorePort {
   delete(instanceId: SagaInstanceId): Promise<void> {
     this.#correlations.delete(instanceId);
     return this.#delegate.delete(instanceId);
+  }
+}
+
+/** Atomic composition over the legacy decorator, with one unchanged delegate commit. */
+class AtomicProjectingSagaStore implements SagaTransitionStore {
+  readonly id: string;
+  readonly transitionCommitCapabilities: SagaTransitionStore['transitionCommitCapabilities'];
+  readonly #legacy: ProjectingSagaStore;
+  readonly #delegate: SagaTransitionStore;
+  readonly #projection: SagaInstanceProjectionPort;
+
+  constructor(delegate: SagaTransitionStore, projection: SagaInstanceProjectionPort) {
+    this.#legacy = new ProjectingSagaStore(delegate, projection);
+    this.id = this.#legacy.id;
+    this.transitionCommitCapabilities = delegate.transitionCommitCapabilities;
+    this.#delegate = delegate;
+    this.#projection = projection;
+  }
+
+  async commitTransition(
+    request: SagaTransitionCommitRequest,
+    signal?: AbortSignal,
+  ): Promise<SagaTransitionCommitResult> {
+    const result = await this.#delegate.commitTransition(request, signal);
+    if (result.committed) {
+      const envelope = await this.#delegate.load(request.correlation.instanceId);
+      if (!envelope) {
+        throw new Error(
+          `Saga projection context is missing for instance ${request.correlation.instanceId}.`,
+        );
+      }
+      await this.#projection.upsert({
+        sagaId: request.correlation.sagaId,
+        instanceId: request.correlation.instanceId,
+        correlationKey: request.correlation.correlationKey,
+        envelope,
+        transition: request.record,
+      });
+    }
+    return result;
+  }
+
+  load<TState extends SagaState>(
+    instanceId: SagaInstanceId,
+  ): Promise<SagaStateEnvelope<TState> | undefined> {
+    return this.#legacy.load<TState>(instanceId);
+  }
+
+  save<TState extends SagaState>(
+    envelope: SagaStateEnvelope<TState>,
+    options?: SagaStoreWriteOptions,
+  ): Promise<void> {
+    return this.#legacy.save(envelope, options);
+  }
+
+  appendTransition<TState extends SagaState>(
+    instanceId: SagaInstanceId,
+    record: SagaTransitionRecord<TState>,
+    knownEnvelope?: SagaStateEnvelope<TState>,
+  ): Promise<void> {
+    return this.#legacy.appendTransition(instanceId, record, knownEnvelope);
+  }
+
+  findByCorrelation(
+    sagaId: Parameters<SagaStorePort['findByCorrelation']>[0],
+    correlationKey: Parameters<SagaStorePort['findByCorrelation']>[1],
+  ): Promise<SagaInstanceId | undefined> {
+    return this.#legacy.findByCorrelation(sagaId, correlationKey);
+  }
+
+  saveCorrelation(
+    entry: SagaCorrelationIndexEntry,
+    envelope?: SagaStateEnvelope,
+  ): Promise<void> {
+    return this.#legacy.saveCorrelation(entry, envelope);
+  }
+
+  delete(instanceId: SagaInstanceId): Promise<void> {
+    return this.#legacy.delete(instanceId);
   }
 }
 

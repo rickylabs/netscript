@@ -33,22 +33,27 @@ export interface SagaTransitionCommitPort {
 /** Read/legacy store with the explicit atomic transition capability. */
 export type SagaTransitionStore = SagaStorePort & SagaTransitionCommitPort;
 
+/** Test the complete atomic capability without accessing storage. */
+export function isSagaTransitionStore(
+  store: SagaStorePort | undefined,
+): store is SagaTransitionStore {
+  const candidate = store as Partial<SagaTransitionStore> | undefined;
+  return candidate?.transitionCommitCapabilities?.transitionOutbox === 'same_commit' &&
+    candidate.transitionCommitCapabilities.optimisticVersion === true &&
+    candidate.transitionCommitCapabilities.replay === 'same_commit' &&
+    typeof candidate.commitTransition === 'function';
+}
+
 /** Refuse unsupported composition before handler execution or store access. */
 export function requireSagaTransitionStore(store: SagaStorePort | undefined): SagaTransitionStore {
-  const candidate = store as Partial<SagaTransitionStore> | undefined;
-  if (
-    candidate?.transitionCommitCapabilities?.transitionOutbox !== 'same_commit' ||
-    candidate.transitionCommitCapabilities.optimisticVersion !== true ||
-    candidate.transitionCommitCapabilities.replay !== 'same_commit' ||
-    typeof candidate.commitTransition !== 'function'
-  ) {
+  if (!isSagaTransitionStore(store)) {
     throw new TypeError(
       `Saga store ${
         store?.id ?? '(missing)'
       } lacks atomic transition/outbox and replay capability.`,
     );
   }
-  return candidate as SagaTransitionStore;
+  return store;
 }
 
 export type { StoredCommandOutbox } from '@netscript/database/commands';
