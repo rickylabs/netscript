@@ -118,7 +118,7 @@ interface RenderedCanaryPairFixture {
 }
 
 async function createRenderedCanaryPairFixture(
-  injectContentDrift: boolean,
+  variant: 'fresh' | 'drifted' | 'stale',
 ): Promise<RenderedCanaryPairFixture> {
   const root = await Deno.makeTempDir({ prefix: 'netscript-rendered-canary-pair-' });
   const source = await Deno.makeTempDir({ prefix: 'netscript-rendered-canary-source-' });
@@ -151,12 +151,13 @@ async function createRenderedCanaryPairFixture(
     await Deno.writeTextFile(
       join(site, 'llms-full.txt'),
       agentDocsFullCorpus({
-        'pages/index.md': `# Home\n\nThe package family uses exact @${version} pins.\n`,
+        'pages/index.md':
+          `# Home\n\nThe package family uses exact @${version} pins.\nHistory: ${previousVersion} introduced these semantics.\n`,
       }, version),
     );
     await Deno.writeTextFile(
       join(site, 'index.md'),
-      `# Home\n\nThe package family uses exact @${version} pins.\n`,
+      `# Home\n\nThe package family uses exact @${version} pins.\nHistory: ${previousVersion} introduced these semantics.\n`,
     );
   };
   try {
@@ -237,10 +238,16 @@ async function createRenderedCanaryPairFixture(
       ),
     );
 
-    if (injectContentDrift) {
+    if (variant === 'drifted') {
       const files = await readAgentDocsPages(prosePath, nextVersion);
       files['llms.txt'] += '\nDRIFT\n';
       await Deno.writeTextFile(prosePath, await renderAgentDocsPages(files));
+    }
+    if (variant === 'stale') {
+      await Deno.writeTextFile(
+        prosePath,
+        await git(['show', `${parent}:${PAIR_PROSE_PATH}`]) as string + '\n',
+      );
     }
     await Deno.copyFile(prosePath, join(root, PAIR_PROSE_PATH));
 
@@ -639,8 +646,8 @@ Deno.test('parent canary evidence checks every release path and reproduces deriv
   assertEquals(generatedChecks, 1);
 });
 
-Deno.test('parent canary evidence accepts a genuinely re-rendered version-derived corpus', async () => {
-  const fixture = await createRenderedCanaryPairFixture(false);
+Deno.test('parent canary evidence accepts regenerated version tokens with authored historical references', async () => {
+  const fixture = await createRenderedCanaryPairFixture('fresh');
   try {
     const beforeProvenance = JSON.parse(
       await fixture.dependencies.fileAtRevision(
@@ -679,7 +686,7 @@ Deno.test('parent canary evidence accepts a genuinely re-rendered version-derive
 });
 
 Deno.test('parent canary evidence refuses a freshness stub without semantic proof', async () => {
-  const fixture = await createRenderedCanaryPairFixture(false);
+  const fixture = await createRenderedCanaryPairFixture('fresh');
   try {
     await assertRejects(
       () =>
@@ -695,8 +702,53 @@ Deno.test('parent canary evidence refuses a freshness stub without semantic proo
   }
 });
 
+Deno.test('parent canary evidence rejects an unchanged stale carrier with an exactly bumped sidecar', async () => {
+  const fixture = await createRenderedCanaryPairFixture('stale');
+  try {
+    assertEquals(
+      (await fixture.dependencies.changedFiles(fixture.root)).includes(PAIR_PROSE_PATH),
+      false,
+    );
+    await assertRejects(
+      () => verifyGreenCanaryPair('owner/repo', 'token', fixture.root, fixture.dependencies),
+      Error,
+      'semantic agent-docs drift',
+    );
+  } finally {
+    await fixture.dispose();
+  }
+});
+
+Deno.test('parent canary evidence rejects invalid page provenance before regeneration', async () => {
+  const fixture = await createRenderedCanaryPairFixture('fresh');
+  let checked = false;
+  try {
+    await assertRejects(
+      () =>
+        verifyGreenCanaryPair('owner/repo', 'token', fixture.root, {
+          ...fixture.dependencies,
+          fileAtRevision: async (root, revision, path) => {
+            const source = await fixture.dependencies.fileAtRevision(root, revision, path);
+            return revision === fixture.current && path === PAIR_PROSE_PATH
+              ? source.replace(/"[a-f0-9]{64}"/, '"' + '0'.repeat(64) + '"')
+              : source;
+          },
+          generatedOutputsFresh: () => {
+            checked = true;
+            return Promise.resolve();
+          },
+        }),
+      Error,
+      'invalid page provenance',
+    );
+    assertEquals(checked, false);
+  } finally {
+    await fixture.dispose();
+  }
+});
+
 Deno.test('parent canary evidence rejects semantically drifted rebuilt corpus content', async () => {
-  const fixture = await createRenderedCanaryPairFixture(true);
+  const fixture = await createRenderedCanaryPairFixture('drifted');
   try {
     await assertRejects(
       () =>
@@ -715,8 +767,8 @@ Deno.test('parent canary evidence rejects semantically drifted rebuilt corpus co
 });
 
 Deno.test('parent canary evidence distinguishes permission failure from content drift', async () => {
-  const driftFixture = await createRenderedCanaryPairFixture(true);
-  const freshFixture = await createRenderedCanaryPairFixture(false);
+  const driftFixture = await createRenderedCanaryPairFixture('drifted');
+  const freshFixture = await createRenderedCanaryPairFixture('fresh');
   try {
     await assertRejects(
       () =>
@@ -1284,20 +1336,19 @@ Deno.test('page canary provenance requires strict versions, page integrity and i
   );
 });
 
-Deno.test('page replacement compares decoded contents after version normalization', async () => {
+Deno.test('page transition provenance permits historical references pending mandatory regeneration proof', async () => {
   const previous = '0.0.7-canary.1';
   const next = '0.0.7';
   const before = JSON.stringify({ schemaVersion: 1, version: previous });
   const after = JSON.stringify({ schemaVersion: 1, version: next });
-  const oldPages = await renderAgentDocsPages({ 'llms.txt': `NetScript ${previous}\n` });
-  const newPages = await renderAgentDocsPages({ 'llms.txt': `NetScript ${next}\n` });
+  const oldPages = await renderAgentDocsPages({
+    'llms.txt': `NetScript ${previous}\nHistory: ${previous} introduced this capability.\n`,
+  });
+  const newPages = await renderAgentDocsPages({
+    'llms.txt': `NetScript ${next}\nHistory: ${previous} introduced this capability.\n`,
+  });
   assertEquals(
     await isExactAgentDocsPageReplacement(before, after, oldPages, newPages, previous, next),
     true,
-  );
-  const drift = await renderAgentDocsPages({ 'llms.txt': `NetScript ${next}\nChanged prose\n` });
-  assertEquals(
-    await isExactAgentDocsPageReplacement(before, after, oldPages, drift, previous, next),
-    false,
   );
 });
