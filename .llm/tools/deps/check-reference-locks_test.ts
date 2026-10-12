@@ -1,6 +1,22 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
-import { checkDesktopReferenceLock, checkReferenceLock } from './check-reference-locks.ts';
+import {
+  checkDesktopReferenceLock,
+  checkReferenceLock,
+  REFERENCE_LOCK_CHECKS,
+} from './check-reference-locks.ts';
+import {
+  coordinateVersionBump,
+  MAINTAINED_REFERENCE_LOCK_FILES,
+  parseSemver,
+} from './bump-version.ts';
+
+Deno.test('frozen reference checks and coordinated bump cover exactly the same lock set', () => {
+  assertEquals(
+    Object.keys(REFERENCE_LOCK_CHECKS).sort(),
+    [...MAINTAINED_REFERENCE_LOCK_FILES].sort(),
+  );
+});
 
 Deno.test('reference lock guard rejects range drift without rewriting the lock', async () => {
   const reference = await Deno.makeTempDir();
@@ -89,4 +105,54 @@ Deno.test('reference freshness command checks all three committed resolution con
   const stderr = new TextDecoder().decode(result.stderr);
   assertEquals(result.code, 0, stderr);
   assertStringIncludes(stdout, 'reference-lock PASS locks=3');
+});
+
+Deno.test('dry-run coordinated bump preserves all frozen reference installs in a disposable copy', async () => {
+  const root = fromFileUrl(new URL('../../../', import.meta.url));
+  const copy = await Deno.makeTempDir({ prefix: 'reference-release-bump-' });
+  try {
+    // Stream only the tracked resolver inputs, excluding run evidence and local build state.
+    const archive = new Deno.Command('git', {
+      cwd: root,
+      args: [
+        'archive',
+        'HEAD',
+        'deno.json',
+        'deno.lock',
+        'packages',
+        'plugins',
+        'resources',
+      ],
+      stdout: 'piped',
+      stderr: 'inherit',
+    }).spawn();
+    const extract = new Deno.Command('tar', {
+      args: ['-x', '-C', copy],
+      stdin: 'piped',
+      stdout: 'null',
+      stderr: 'inherit',
+    }).spawn();
+    await archive.stdout.pipeTo(extract.stdin);
+    assertEquals((await archive.status).code, 0);
+    assertEquals((await extract.status).code, 0);
+    const manifest = JSON.parse(await Deno.readTextFile(join(copy, 'deno.json')));
+    const current = parseSemver(manifest.version);
+    await coordinateVersionBump(copy, `${current.major}.${current.minor}.${current.patch + 1}`);
+    const result = await new Deno.Command(Deno.execPath(), {
+      cwd: copy,
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+        fromFileUrl(new URL('./check-reference-locks.ts', import.meta.url)),
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+    assertStringIncludes(new TextDecoder().decode(result.stdout), 'reference-lock PASS locks=3');
+  } finally {
+    await Deno.remove(copy, { recursive: true });
+  }
 });

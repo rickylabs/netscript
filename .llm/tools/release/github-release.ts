@@ -34,7 +34,11 @@
  *   deno task release:publish -- 0.0.1-alpha.20 --message "One-line intro." --dry-run
  */
 
-import { AGENT_DOCS_PAGE_CARRIER, parseAgentDocsPages } from '../docs/agent-docs-page-carrier.ts';
+import {
+  AGENT_DOCS_PAGE_CARRIER,
+  isSiteGeneratedAgentDocsEntry,
+  parseAgentDocsPages,
+} from '../docs/agent-docs-page-carrier.ts';
 import { decodeAgentDocsPages } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
 import {
   githubField,
@@ -197,32 +201,39 @@ export async function verifyGreenCanaryPair(
     const currentRoot = await dependencies.fileAtRevision(root, current, 'deno.json');
     const previousVersion = readManifestVersion(parentRoot, `${parent}:deno.json`);
     const nextVersion = readManifestVersion(currentRoot, `${current}:deno.json`);
-    const inexactGeneratedPaths: string[] = [];
+    const generatedPaths = changed.filter(isPreparedReleaseGeneratedOutput);
+    const pageCarrierDeclared = releaseFiles.some((path) =>
+      normalizeGitPath(path) === AGENT_DOCS_PAGE_CARRIER ||
+      normalizeGitPath(path).endsWith(`/${AGENT_DOCS_PAGE_CARRIER}`)
+    );
     const exactReplacement = await everyAsync(changed, async (path) => {
       const before = await dependencies.fileAtRevision(root, parent, path);
       const after = await dependencies.fileAtRevision(root, current, path);
       if (isExactVersionReplacement(before, after, previousVersion, nextVersion)) return true;
       if (isPreparedReleaseGeneratedOutput(path)) {
-        inexactGeneratedPaths.push(path);
         return true;
       }
       return false;
     });
     if (exactReplacement) {
-      if (inexactGeneratedPaths.length > 0) {
-        const agentDocsChanged = inexactGeneratedPaths.some((path) => {
+      if (generatedPaths.length > 0 || pageCarrierDeclared) {
+        const agentDocsChanged = pageCarrierDeclared || generatedPaths.some((path) => {
           const normalized = normalizeGitPath(path);
           return normalized === AGENT_DOCS_PROSE_PATH || normalized === AGENT_DOCS_PAGE_CARRIER ||
             normalized === AGENT_DOCS_PROVENANCE_PATH;
         });
         if (agentDocsChanged) {
-          const pageFormat = inexactGeneratedPaths.some((path) =>
+          const [beforeMetadata, afterMetadata] = await Promise.all([
+            dependencies.fileAtRevision(root, parent, AGENT_DOCS_PROVENANCE_PATH),
+            dependencies.fileAtRevision(root, current, AGENT_DOCS_PROVENANCE_PATH),
+          ]);
+          // A stale page carrier can be unchanged while its version sidecar was bumped.
+          // Select the format from metadata rather than requiring a carrier delta.
+          const pageFormat = pageCarrierDeclared || generatedPaths.some((path) =>
             normalizeGitPath(path) === AGENT_DOCS_PAGE_CARRIER
-          );
+          ) || isAgentDocsPageMetadata(afterMetadata, nextVersion);
           if (pageFormat) {
-            const [beforeMetadata, afterMetadata, beforePages, afterPages] = await Promise.all([
-              dependencies.fileAtRevision(root, parent, AGENT_DOCS_PROVENANCE_PATH),
-              dependencies.fileAtRevision(root, current, AGENT_DOCS_PROVENANCE_PATH),
+            const [beforePages, afterPages] = await Promise.all([
               dependencies.fileAtRevision(root, parent, AGENT_DOCS_PAGE_CARRIER),
               dependencies.fileAtRevision(root, current, AGENT_DOCS_PAGE_CARRIER),
             ]);
@@ -241,6 +252,9 @@ export async function verifyGreenCanaryPair(
               );
             }
           } else {
+            // The real release writer always declares the page carrier, so this legacy gzip
+            // branch is unreachable in today's repo. Keep it for legacy callers and fixtures;
+            // retiring that compatibility path is separate from this verifier repair.
             const readBytes = dependencies.fileBytesAtRevision;
             if (!readBytes) {
               throw new Error(
@@ -391,8 +405,19 @@ export async function isExactAgentDocsProvenanceReplacement(
   }
 }
 
-/** Compare verified page contents after the declared version substitution. Writer freshness still
- * proves that the resulting pages came from the version-only source tree. */
+function isAgentDocsPageMetadata(source: string, version: string): boolean {
+  try {
+    const value: unknown = JSON.parse(source);
+    return isRecord(value) && value.schemaVersion === 1 && value.version === version &&
+      Object.keys(value).sort().join(',') === 'schemaVersion,version';
+  } catch {
+    return false;
+  }
+}
+
+/** Validate provenance and preserved entries against the parent. Site-generated entries require
+ * the mandatory regeneration proof instead: their authored historical references stay intact.
+ * Regeneration copies preserved entries from its own carrier, so it cannot prove those unchanged. */
 export async function isExactAgentDocsPageReplacement(
   beforeSource: string,
   afterSource: string,
@@ -403,20 +428,17 @@ export async function isExactAgentDocsPageReplacement(
 ): Promise<boolean> {
   try {
     if (previousVersion === nextVersion) return false;
-    const metadataMatches = (source: string, version: string): boolean => {
-      const value: unknown = JSON.parse(source);
-      return isRecord(value) && value.schemaVersion === 1 && value.version === version &&
-        Object.keys(value).sort().join(',') === 'schemaVersion,version';
-    };
     if (
-      !metadataMatches(beforeSource, previousVersion) || !metadataMatches(afterSource, nextVersion)
+      !isAgentDocsPageMetadata(beforeSource, previousVersion) ||
+      !isAgentDocsPageMetadata(afterSource, nextVersion)
     ) return false;
     const before = await decodeAgentDocsPages(parseAgentDocsPages(beforePages));
     const after = await decodeAgentDocsPages(parseAgentDocsPages(afterPages));
     return JSON.stringify(Object.keys(before).sort()) ===
         JSON.stringify(Object.keys(after).sort()) &&
       Object.keys(before).every((path) =>
-        before[path].replaceAll(previousVersion, nextVersion) === after[path]
+        isSiteGeneratedAgentDocsEntry(path) || before[path] === after[path] ||
+        rewriteNetScriptVersion(before[path], previousVersion, nextVersion) === after[path]
       );
   } catch {
     return false;

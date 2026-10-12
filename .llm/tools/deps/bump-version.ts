@@ -36,6 +36,13 @@ export const GENERATED_CONSUMER_VERSION_FILES: readonly string[] = [
   '.agents/generated/consumer-skills/.mcp.json',
 ];
 
+/** Live frozen resolution contexts checked by deps:check:reference-locks, including fixtures. */
+export const MAINTAINED_REFERENCE_LOCK_FILES: readonly string[] = [
+  'deno.lock',
+  'resources/examples/expo-streams/deno.lock',
+  'packages/cli/e2e/fixtures/desktop-native/deno.lock',
+];
+
 const RELEASE_SCAN_EXCLUSIONS: RegExp[] = [
   /(?:^|[/\\])\.git(?:[/\\]|$)/,
   /(?:^|[/\\])node_modules(?:[/\\]|$)/,
@@ -70,7 +77,7 @@ export async function coordinateVersionBump(
 
 /** Return version-bearing release files that still contain the old version. */
 export async function findVersionResidue(root: string, oldVersion: string): Promise<string[]> {
-  const residue: string[] = [];
+  const residue = new Set<string>();
   for await (
     const entry of walk(root, {
       includeDirs: false,
@@ -83,10 +90,17 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
       continue;
     }
     if (containsExactVersion(await Deno.readTextFile(entry.path), oldVersion)) {
-      residue.push(normalize(entry.path));
+      residue.add(normalize(entry.path));
     }
   }
-  return residue.sort();
+  // Live reference locks are exceptions to the historical-fixture exclusion above.
+  for (const relativePath of MAINTAINED_REFERENCE_LOCK_FILES) {
+    const path = normalize(join(root, relativePath));
+    if (await exists(path) && containsExactVersion(await Deno.readTextFile(path), oldVersion)) {
+      residue.add(path);
+    }
+  }
+  return [...residue].sort();
 }
 
 function containsExactVersion(text: string, version: string): boolean {
@@ -192,7 +206,9 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
       if (entry.name === 'deno.lock') files.add(entry.path);
     }
   }
-  for (const relativePath of GENERATED_CONSUMER_VERSION_FILES) {
+  for (
+    const relativePath of [...GENERATED_CONSUMER_VERSION_FILES, ...MAINTAINED_REFERENCE_LOCK_FILES]
+  ) {
     const path = normalize(join(root, relativePath));
     if (await includesTrackedOrExistingFile(path, trackedFiles)) files.add(path);
   }

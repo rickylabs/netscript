@@ -1,6 +1,7 @@
 /** Verify frozen source graphs used by isolated reference fixtures and runtime probes. */
 import { join } from '@std/path';
 import { prepareDesktopFixture } from '../../../packages/cli/e2e/src/adapters/native-desktop/fixture-workspace.ts';
+import { MAINTAINED_REFERENCE_LOCK_FILES } from './bump-version.ts';
 
 /** Runtime and test entrypoints covered by the staged desktop reference lock. */
 export const DESKTOP_REFERENCE_ENTRYPOINTS: readonly string[] = [
@@ -56,19 +57,22 @@ export async function checkDesktopReferenceLock(repoRoot: string): Promise<boole
   }
 }
 
-if (import.meta.main) {
-  if (!(await checkReferenceLock(join(Deno.cwd(), 'resources/examples/expo-streams')))) {
-    Deno.exit(1);
-  }
-  if (
-    !(await checkReferenceLock(Deno.cwd(), [
+/** Entrypoint-specific checks; keys must match the coordinated bump's maintained lock set. */
+export const REFERENCE_LOCK_CHECKS: Readonly<Record<string, (root: string) => Promise<boolean>>> = {
+  'deno.lock': (root) =>
+    checkReferenceLock(root, [
       'packages/cli/e2e/src/application/gates/scaffold/guarded-service-reference.ts',
-    ]))
-  ) {
-    Deno.exit(1);
+    ]),
+  'resources/examples/expo-streams/deno.lock': (root) =>
+    checkReferenceLock(join(root, 'resources/examples/expo-streams')),
+  'packages/cli/e2e/fixtures/desktop-native/deno.lock': checkDesktopReferenceLock,
+};
+
+if (import.meta.main) {
+  for (const lock of MAINTAINED_REFERENCE_LOCK_FILES) {
+    const check = REFERENCE_LOCK_CHECKS[lock];
+    if (!check) throw new Error(`Missing frozen resolution context for maintained lock: ${lock}`);
+    if (!(await check(Deno.cwd()))) Deno.exit(1);
   }
-  if (!(await checkDesktopReferenceLock(Deno.cwd()))) {
-    Deno.exit(1);
-  }
-  console.log('reference-lock PASS locks=3');
+  console.log(`reference-lock PASS locks=${MAINTAINED_REFERENCE_LOCK_FILES.length}`);
 }

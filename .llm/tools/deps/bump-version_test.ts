@@ -529,3 +529,45 @@ for (const mode of ['stable', 'canary'] as const) {
     }
   });
 }
+
+Deno.test('coordinated bump includes maintained fixture locks but preserves historical fixtures', async () => {
+  const { coordinateVersionBump, discoverVersionFiles, findVersionResidue } = await import(
+    './bump-version.ts'
+  );
+  const root = await Deno.makeTempDir({ prefix: 'ns-maintained-fixture-bump-' });
+  const maintained = 'packages/cli/e2e/fixtures/desktop-native/deno.lock';
+  const historical = 'packages/cli/e2e/fixtures/prior-release/deno.lock';
+  const untracked = 'packages/cli/e2e/fixtures/local/deno.lock';
+  const lock =
+    '{"version":"5","workspace":{"dependencies":["jsr:@netscript/sdk@1.2.3","npm:react@1.2.3"]}}\n';
+  try {
+    await Deno.writeTextFile(
+      `${root}/deno.json`,
+      '{"version":"1.2.3","workspace":[]}\n',
+    );
+    for (const path of [maintained, historical, untracked]) {
+      await Deno.mkdir(`${root}/${path.slice(0, path.lastIndexOf('/'))}`, { recursive: true });
+      await Deno.writeTextFile(`${root}/${path}`, lock);
+    }
+    assertEquals((await run('git', ['init'], root)).code, 0);
+    assertEquals((await run('git', ['add', maintained, historical], root)).code, 0);
+    const discovered = await discoverVersionFiles(root);
+    assertEquals(discovered.includes(`${root}/${maintained}`), true);
+    assertEquals(discovered.includes(`${root}/${historical}`), false);
+    assertEquals(discovered.includes(`${root}/${untracked}`), false);
+    assertEquals(await findVersionResidue(root, '1.2.3'), [
+      `${root}/deno.json`,
+      `${root}/${maintained}`,
+    ]);
+    await coordinateVersionBump(root, '1.3.0');
+    assertEquals(
+      await Deno.readTextFile(`${root}/${maintained}`),
+      lock.replace('jsr:@netscript/sdk@1.2.3', 'jsr:@netscript/sdk@1.3.0'),
+    );
+    assertEquals(await Deno.readTextFile(`${root}/${historical}`), lock);
+    assertEquals(await Deno.readTextFile(`${root}/${untracked}`), lock);
+    assertEquals(await findVersionResidue(root, '1.2.3'), []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
