@@ -71,6 +71,36 @@ the import-map entry is safe to delete.
 
 Never pass a reload flag (`--reload` / `deno cache --reload`) or delete lock files without approval.
 
+### Moving locks from Deno 2.9.5 or older to 2.9.6+
+
+Deno 2.9.6 changed npm package IDs by flattening single-resolution peers
+([denoland/deno#36608](https://github.com/denoland/deno/pull/36608)). A project with a lock written
+by Deno 2.9.5 or older must refresh that lock with the new runtime before using Deno 2.9.6+.
+Keeping the old peer-suffixed IDs can cause `ERR_MODULE_NOT_FOUND` at runtime even when type-checks
+and frozen installs pass. This is a lock migration, not a dependency upgrade: the resolved
+`package@version` sets and integrity hashes must remain unchanged.
+
+For a consumer workspace, select Deno 2.9.7 and run `deno install --lockfile-only`. Deno reuses
+recorded IDs when no resolution is needed, so an unchanged lock does not prove migration. To force
+native re-resolution, temporarily add a `package.json` npm override for a package already resolved
+to one version, using that **same exact version**. Run `deno install --lockfile-only`, restore the
+original manifest (remove only your temporary manifest if none existed), and run the install again.
+Review the resulting IDs and compare resolved versions and integrity hashes before committing.
+Then run `deno ci` and the project's runtime tests. Do not delete a lock or cache to migrate.
+
+In this repository, the same-version override recomputes the root and Fresh UI npm graphs. Run
+`deno task --cwd packages/fresh-ui lock:update` for the private lock and
+`deno task deps:refresh:desktop-lock` for the prepared desktop reference. Refresh the Expo lock
+with the reference command below and the docs-site lock with
+`deno install --lockfile-only --lock=deno.lock` from `docs/site`. Keep historical run-evidence locks
+unchanged. Compare resolved versions before and after every maintained lock refresh, then require
+the dependency checks and runtime suites to pass on the new runtime.
+
+While a temporary `package.json` exists, it changes Deno's default node_modules mode. Pass
+`--node-modules-dir=none` to checks that normally use the global cache; the private lock task accepts
+this as `deno task --cwd packages/fresh-ui lock:update --deno-arg --node-modules-dir=none`.
+After restoring the manifest, rerun the ordinary lock task to preserve its workspace metadata.
+
 ### Nested reference lock after dependency changes
 
 `resources/examples/expo-streams/deno.lock` freezes the React fixture in the reference compiler

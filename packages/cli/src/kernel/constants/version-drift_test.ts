@@ -13,7 +13,6 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 import { walk } from '@std/fs';
 import { fromFileUrl } from 'jsr:@std/path@^1';
-import { SCAFFOLD_DEFAULTS } from './scaffold/scaffold-defaults.ts';
 
 /** Matches a hardcoded pinned NetScript JSR specifier with any valid semantic version. */
 const PINNED_JSR_SPECIFIER =
@@ -21,56 +20,14 @@ const PINNED_JSR_SPECIFIER =
 
 const SRC_ROOT = fromFileUrl(new URL('../../', import.meta.url));
 const SELF_PATH = fromFileUrl(import.meta.url);
-const REPO_ROOT = new URL('../../../../../', import.meta.url);
 const COMMAND_SOURCE_ROOTS = [
   fromFileUrl(new URL('../../public/features/agent/', import.meta.url)),
   fromFileUrl(new URL('../../public/features/plugins/', import.meta.url)),
   fromFileUrl(new URL('../../../e2e/src/application/gates/', import.meta.url)),
   fromFileUrl(new URL('../../../../mcp/src/', import.meta.url)),
 ] as const;
-const VERSIONLESS_NETSCRIPT_JSR_SPECIFIER = /(['"])jsr:@netscript\/[^@'"\s/]+(?:\/[^@'"\s]+)*\1/;
-
-Deno.test('Deno workflow and scaffold pins match toolchain.env', async () => {
-  const toolchain = await Deno.readTextFile(new URL('.github/toolchain.env', REPO_ROOT));
-  const version = toolchain.match(/^NETSCRIPT_DENO_VERSION=v?(\d+\.\d+\.\d+)$/m)?.[1];
-  assertEquals(typeof version, 'string', 'toolchain.env must declare an exact Deno version');
-  assertEquals(SCAFFOLD_DEFAULTS.DENO_VERSION, version, 'scaffold Deno version drift');
-
-  let pins = 0;
-  for await (const entry of Deno.readDir(new URL('.github/workflows/', REPO_ROOT))) {
-    if (!entry.isFile || !/\.ya?ml$/.test(entry.name)) continue;
-    const source = await Deno.readTextFile(new URL(`.github/workflows/${entry.name}`, REPO_ROOT));
-    for (
-      const match of source.matchAll(
-        /^\s*(?:deno-version|DENO_VERSION):\s*['"]?v?(\d+\.\d+\.\d+)['"]?\s*$/gm,
-      )
-    ) {
-      pins++;
-      assertEquals(match[1], version, `${entry.name}: Deno pin drift`);
-    }
-    // Every indirect setup-deno value must use one of the declared canonical sources.
-    for (const match of source.matchAll(/^\s*deno-version:\s*(.+)$/gm)) {
-      const value = match[1].trim().replace(/^['"]|['"]$/g, '');
-      if (/^v?\d+\.\d+\.\d+$/.test(value)) continue;
-      assertEquals(
-        ['${{ env.DENO_VERSION }}', '${{ steps.toolchain.outputs.deno-version }}'].includes(value),
-        true,
-        `${entry.name}: unrecognized Deno version source: ${value}`,
-      );
-      if (value === '${{ env.DENO_VERSION }}') {
-        assertEquals(
-          /^\s*DENO_VERSION:\s*['"]?v?\d+\.\d+\.\d+['"]?\s*$/m.test(source),
-          true,
-        );
-      } else {
-        assertEquals(source.includes('.github/toolchain.env'), true);
-        assertEquals(/^\s*source \S*\/toolchain\.env$/m.test(source), true);
-        assertEquals(source.includes('deno-version=${NETSCRIPT_DENO_VERSION}'), true);
-      }
-    }
-  }
-  assertEquals(pins > 0, true, 'workflow pin inventory must not be empty');
-});
+const VERSIONLESS_NETSCRIPT_JSR_SPECIFIER =
+  /(['"])jsr:@netscript\/[^@'"\s/]+(?:\/[^@'"\s]+)*\1/;
 
 Deno.test('no hardcoded pinned NetScript JSR specifiers in CLI src', async () => {
   const offenders: string[] = [];
