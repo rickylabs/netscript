@@ -241,7 +241,7 @@ Deno.test({
 });
 
 // Exercise the public harness with a real adapter whose optional readiness is
-// hidden. Each scenario must construct exactly one handle and use its snapshot.
+// hidden. Mandatory default and declared snapshot scenarios each open one handle.
 const { runWatchableKvContract } = await import('../src/testing/mod.ts');
 runWatchableKvContract({
   name: 'watch review: plain iterable contract',

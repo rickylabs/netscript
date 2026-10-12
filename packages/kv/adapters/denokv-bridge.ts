@@ -626,7 +626,7 @@ export class WatchableKvBridge {
                 if (current && current.versionstamp === versionstamp) continue;
                 state.set(key, {
                   key: event.key as DenoKvStrictKey,
-                  value: entry?.value ?? null,
+                  value: entry ? entry.value : null,
                   versionstamp,
                 } as DenoKvEntryMaybe<T>);
                 changed = true;

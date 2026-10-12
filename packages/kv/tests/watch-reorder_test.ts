@@ -145,3 +145,42 @@ runWatchableKvContract({
     return kv;
   },
 });
+
+Deno.test('watch reorder: a stored undefined value remains a present entry', async () => {
+  const kv = new MemoryKvAdapter();
+  await kv.set(key, 'snapshot');
+  const snapshot = await kv.get(key);
+  assert(snapshot);
+  const watch = stub(kv, 'watch', async function* <T>(): AsyncIterable<WatchEvent<T>[]> {
+    yield [{
+      ...snapshot,
+      value: snapshot.value as T,
+      type: 'set',
+      timestamp: new Date(),
+      initial: true,
+    }];
+    await kv.set(key, undefined);
+    const stored = await kv.get(key);
+    assert(stored);
+    yield [{
+      key,
+      value: 'stale-payload' as T,
+      versionstamp: stored.versionstamp,
+      type: 'set',
+      timestamp: new Date(),
+    }];
+  });
+  const reader = new WatchableKvBridge(kv).watch([key]).getReader();
+  try {
+    assertEquals((await wait(reader.read())).value?.[0].value, 'snapshot');
+    const stored = (await wait(reader.read())).value?.[0];
+    assert(stored);
+    assertEquals(stored.value, undefined);
+    assert(stored.versionstamp !== null, 'a present value must not become an absent entry');
+    assertEquals(await wait(reader.read()), { value: undefined, done: true });
+  } finally {
+    await reader.cancel();
+    watch.restore();
+    await kv.close();
+  }
+});
