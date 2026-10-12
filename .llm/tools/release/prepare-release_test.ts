@@ -44,6 +44,7 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
   );
   assertEquals(calls, [
     'bump:0.0.1-canary.1:canary',
+    'deno task deps:check:reference-locks',
     'deno task gen:agent-docs-prose',
     'deno task gen:publish-assets',
     'deno task gen:mcp-export-corpus --allow-dirty',
@@ -131,6 +132,7 @@ Deno.test('shared release preparation regenerates assets then stops when residue
     'Version residue remains',
   );
   assertEquals(calls, [
+    'deno task deps:check:reference-locks',
     'deno task gen:agent-docs-prose',
     'deno task gen:publish-assets',
     'deno task gen:mcp-export-corpus --allow-dirty',
@@ -161,6 +163,7 @@ Deno.test('shared release preparation fails locally when semantic agent-docs fre
     'check:agent-docs-prose failed with exit 1',
   );
   assertEquals(calls, [
+    'deno task deps:check:reference-locks',
     'deno task gen:agent-docs-prose',
     'deno task gen:publish-assets',
     'deno task gen:mcp-export-corpus --allow-dirty',

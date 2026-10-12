@@ -73,6 +73,15 @@ export async function prepareRelease(
 
   await runGate(
     label,
+    'deps:check:reference-locks',
+    'deno',
+    ['task', 'deps:check:reference-locks'],
+    root,
+    dependencies,
+  );
+
+  await runGate(
+    label,
     'gen:agent-docs-prose',
     'deno',
     ['task', 'gen:agent-docs-prose'],
