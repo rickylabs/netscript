@@ -26,7 +26,11 @@ export async function denoChildConfig(
     : undefined;
   const specifier = localCli ?? childSpecifier;
   const childUrl = isAbsolute(specifier) ? toFileUrl(specifier) : new URL(specifier, moduleUrl);
-  if (sourceConfig && childUrl.href.startsWith(new URL('.', toFileUrl(sourceConfig)).href)) {
+  if (
+    sourceConfig &&
+    (childUrl.href.startsWith(new URL('.', toFileUrl(sourceConfig)).href) ||
+      (childUrl.protocol === 'jsr:' && childUrl.pathname.startsWith('@netscript/')))
+  ) {
     const consumer = projectConfig ? await consumerResolution(projectConfig) : undefined;
     return {
       specifier,

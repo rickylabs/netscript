@@ -53,7 +53,7 @@ Deno.test('source child resolves an unpublished pin locally and preserves consum
       JSON.stringify({
         name: '@netscript/config',
         version,
-        exports: { '.': './mod.ts', './identity': './identity.ts' },
+        exports: { '.': './mod.ts', './identity': './identity.ts', './cli': './cli.ts' },
       }),
     );
     await Deno.writeTextFile(join(config, 'mod.ts'), 'export const source = import.meta.url;');
@@ -90,6 +90,17 @@ console.log(JSON.stringify({ source, identity, value, cwd: Deno.cwd() }));`,
     assertEquals(cliResult.code, 0, new TextDecoder().decode(cliResult.stderr));
     assertEquals(
       new TextDecoder().decode(cliResult.stdout).trim(),
+      toFileUrl(join(config, 'cli.ts')).href,
+    );
+    const jsrConfig = await denoChildConfig(
+      projectConfig,
+      toFileUrl(child).href,
+      `${unpublished}/cli`,
+    );
+    const jsrResult = await run(jsrConfig.configArgs, jsrConfig.specifier);
+    assertEquals(jsrResult.code, 0, new TextDecoder().decode(jsrResult.stderr));
+    assertEquals(
+      new TextDecoder().decode(jsrResult.stdout).trim(),
       toFileUrl(join(config, 'cli.ts')).href,
     );
     const publishedCli = await denoChildConfig(
