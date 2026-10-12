@@ -104,6 +104,13 @@ export type {
   SagaStoreWriteOptions,
 } from '@netscript/plugin-sagas-core/runtime';
 export type {
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+  SagaTransitionStore,
+  StoredCommandOutbox,
+} from '@netscript/plugin-sagas-core/ports';
+export type {
   SagaDeliveryContext,
   SagaDeliveryMessage,
   SagaDeliveryPublisher,

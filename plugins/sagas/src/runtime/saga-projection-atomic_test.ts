@@ -15,6 +15,10 @@ import { z } from 'zod';
 import { transitionRequest } from '../../../../packages/plugin-sagas-core/tests/transition-conformance.ts';
 import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
 import {
+  createProjectingSagaStore as publicCreateProjectingSagaStore,
+  type SagaTransitionStore,
+} from '@netscript/plugin-sagas/runtime';
+import {
   createProjectingSagaStore,
   PrismaSagaInstanceProjection,
   ProjectingSagaStore,
@@ -249,4 +253,31 @@ Deno.test('failed atomic commit never projects and projected legacy stores retai
   );
   await legacy.delete(request.correlation.instanceId);
   assertEquals(await legacy.load(request.correlation.instanceId), undefined);
+});
+
+Deno.test('public projecting factory preserves atomic types and refuses atomic types for granular delegates', () => {
+  const atomicDelegate: SagaTransitionStore = new MemorySagaStore();
+  const projection = { upsert: () => Promise.resolve() };
+  const atomic = publicCreateProjectingSagaStore(atomicDelegate, projection);
+  const atomicContract: SagaTransitionStore = atomic;
+  const atomicAsStore: SagaStorePort = atomic;
+  const commit: SagaTransitionStore['commitTransition'] = atomic.commitTransition;
+  const capabilities: SagaTransitionStore['transitionCommitCapabilities'] =
+    atomic.transitionCommitCapabilities;
+  assertStrictEquals(atomicContract, atomicAsStore);
+  assertStrictEquals(commit, atomic.commitTransition);
+  assertStrictEquals(capabilities, atomicDelegate.transitionCommitCapabilities);
+
+  const granularDelegate: SagaStorePort = legacyStore(new MemorySagaStore());
+  const granular = publicCreateProjectingSagaStore(granularDelegate, projection);
+  const granularContract: SagaStorePort = granular;
+  // @ts-expect-error A granular delegate does not expose an atomic transition contract.
+  const invalidAtomicContract: SagaTransitionStore = granular;
+  // @ts-expect-error A granular result has no atomic commit method.
+  const invalidCommit = granular.commitTransition;
+  // @ts-expect-error A granular result has no atomic capability metadata.
+  const invalidCapabilities = granular.transitionCommitCapabilities;
+  assertStrictEquals(granularContract, invalidAtomicContract);
+  assertEquals(invalidCommit, undefined);
+  assertEquals(invalidCapabilities, undefined);
 });
