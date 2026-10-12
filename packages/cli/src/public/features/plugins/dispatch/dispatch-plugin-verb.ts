@@ -2,6 +2,7 @@ import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts'
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import { join } from '@std/path';
+import { denoChildConfigArgs } from '../../../../kernel/adapters/runtime/process/deno-child-config.ts';
 import type { ScaffoldResult } from '@netscript/plugin/protocol';
 import { EXIT_CODES } from '../host/plugin-loader.ts';
 import type { ValidatedPluginDescriptor } from '../install/jsr-plugin-validator-port.ts';
@@ -168,7 +169,7 @@ export async function dispatchPluginScaffold(
   for (const postScript of options.descriptor.manifest.postScripts ?? []) {
     const result = await options.processRunner.exec(
       'deno',
-      buildScriptArgs(
+      await buildScriptArgs(
         options.source,
         postScript.export,
         options.permissionFlags,
@@ -205,7 +206,7 @@ async function runScaffoldEntrypoint(
 ): Promise<ScaffoldResult> {
   const result = await options.processRunner.exec(
     'deno',
-    buildScriptArgs(
+    await buildScriptArgs(
       options.source,
       options.descriptor.manifest.scaffolder.export,
       options.permissionFlags,
@@ -236,14 +237,15 @@ async function runScaffoldEntrypoint(
   return parseScaffoldResult(result.stdout);
 }
 
-function buildScriptArgs(
+async function buildScriptArgs(
   source: PluginScaffoldDispatchSource,
   exportPath: string,
   permissionFlags: readonly string[],
   args: readonly string[],
-): readonly string[] {
+): Promise<readonly string[]> {
   const target = resolvePluginScaffoldTarget(source, exportPath);
-  return ['run', ...permissionFlags, target, ...args];
+  const configArgs = source.kind === 'local-path' ? await denoChildConfigArgs() : [];
+  return ['run', ...configArgs, ...permissionFlags, target, ...args];
 }
 
 function parseScaffoldResult(stdout: string): ScaffoldResult {
