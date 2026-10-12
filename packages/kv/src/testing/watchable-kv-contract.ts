@@ -51,20 +51,26 @@ class WatchProbe {
 
   constructor(kv: WatchableKv, keys: KvKey[], options: Omit<WatchOptions, 'signal'> = {}) {
     this.#kv = kv;
-    let handle = kv.watch(keys, { ...options, signal: this.#controller.signal });
+    const handle = kv.watch(keys, {
+      ...options,
+      initial: true,
+      signal: this.#controller.signal,
+    });
     this.#initialHandshake = !handle.ready;
-    if (this.#initialHandshake) {
-      handle = kv.watch(keys, { ...options, initial: true, signal: this.#controller.signal });
-    }
     this.#ready = handle.ready;
     this.#iterator = handle[Symbol.asyncIterator]();
   }
 
   /** Request the next batch; the stream subscribes on its first request. */
   async next(): Promise<WatchEvent[]> {
-    const result = await deadline(this.#iterator.next(), DELIVERY_TIMEOUT_MS);
-    assert(!result.done, 'watch stream ended early');
-    return result.value;
+    while (true) {
+      const result = await deadline(this.#iterator.next(), DELIVERY_TIMEOUT_MS);
+      assert(!result.done, 'watch stream ended early');
+      // Readiness-capable adapters may also honor initial. Discard that batch
+      // so the existing change assertions see exactly their requested writes.
+      if (!this.#initialHandshake && result.value.every((event) => event.initial)) continue;
+      return result.value;
+    }
   }
 
   /**
@@ -210,6 +216,9 @@ const abortEndsDebounceWindow: WatchScenario = {
  * while the consumer is between batches is delivered on the next request
  * without waiting for a later write; that `debounce` never drops a queued
  * change; and that aborting ends the stream promptly, even mid-debounce.
+ * The harness opens one handle with `initial: true`. Adapters must expose
+ * readiness or honor the initial snapshot; snapshots are consumed before the
+ * existing change assertions.
  *
  * @example
  * ```ts

@@ -122,6 +122,10 @@ listener registration in memory, or the first native Deno KV frame. Startup fail
 readiness and iteration. A watch aborted before readiness rejects `ready` with `AbortError`.
 Third-party adapters may return a plain async iterable without this promise.
 
+When `createLazyKv` wraps an adapter without `ready`, its promise resolves on the first delivered
+batch. A readiness rejection alone never becomes an iteration error: startup abort completes
+cleanly, while an actual adapter failure still rejects iteration.
+
 ## Public surface
 
 | Entry       | What it gives you                                                                                |

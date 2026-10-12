@@ -92,7 +92,9 @@ First-party handles provide an optional `ready` promise. Start iteration before 
 subscriptions are lazy. Redis resolves it on SUBSCRIBE acknowledgement, memory on listener
 registration, and Deno KV on the first native frame. Startup failure or abort before readiness
 rejects the promise. Third-party adapters may return an iterable without `ready`. Prefix watches
-retain their existing `skipInitial` and discovery semantics.
+retain their existing `skipInitial` and discovery semantics. `createLazyKv` uses the first delivered
+batch as readiness when its inner adapter has no promise. A readiness rejection alone does not make
+iteration throw; iteration retains the inner adapter's completion or error behavior.
 
 ## Sub-path exports
 

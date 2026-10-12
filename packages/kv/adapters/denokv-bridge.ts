@@ -560,6 +560,8 @@ export class WatchableKvBridge {
       signal: abortController.signal,
     })[Symbol.asyncIterator]();
     const state = new Map<string, DenoKvEntryMaybe<T>>();
+    // Keep delete stamps separately: kvdex's absent entry must expose null.
+    const versions = new Map<string, string>();
     let ended = false;
 
     return new ReadableStream<DenoKvEntryMaybe<T>[]>({
@@ -573,7 +575,13 @@ export class WatchableKvBridge {
             return;
           }
           for (const event of events) {
-            state.set(keyToString(event.key), {
+            const key = keyToString(event.key);
+            const version = versions.get(key);
+            if (event.versionstamp !== null) {
+              if (version !== undefined && event.versionstamp <= version) continue;
+              versions.set(key, event.versionstamp);
+            }
+            state.set(key, {
               key: event.key as DenoKvStrictKey,
               value: event.value,
               versionstamp: event.type === 'delete' ? null : event.versionstamp,

@@ -81,13 +81,14 @@ class LazyKv implements WatchableKv {
       if (handle.ready) {
         // Observe both failures even if readiness rejects before the first batch.
         void pending.catch(() => {});
-        await handle.ready;
-        ready();
+        // Readiness is a separate signal, not an iteration failure. A startup
+        // abort ends pending cleanly; a real failure is thrown by pending below.
+        await handle.ready.then(ready, () => {});
       }
       while (true) {
         const result = await pending;
         if (result.done) break;
-        if (!handle.ready && options?.initial) ready();
+        if (!handle.ready) ready();
         yield result.value;
         pending = iterator.next();
       }

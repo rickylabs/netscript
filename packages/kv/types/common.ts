@@ -51,9 +51,11 @@ export interface WatchEvent<T = unknown> {
  * A watch iterable with optional subscription readiness.
  *
  * First-party adapters provide `ready`. Start iteration before awaiting it;
- * subscriptions are lazy. It resolves when the backend acknowledges the
- * subscription, and rejects if startup fails or is aborted before readiness.
- * Third-party adapters may continue returning a plain async iterable.
+ * subscriptions are lazy. Direct adapters resolve on backend acknowledgement.
+ * A lazy adapter forwards the inner readiness signal, or resolves on the first
+ * batch if the inner adapter has no signal. Startup failure or an early abort
+ * rejects readiness; iteration retains the underlying adapter's completion or
+ * error behavior. Third-party adapters may return a plain async iterable.
  */
 export type WatchStream<T = unknown> = AsyncIterable<WatchEvent<T>[]> & {
   readonly ready?: Promise<void>;
