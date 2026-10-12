@@ -4,6 +4,7 @@
  * @module
  */
 
+import { createWatchHandle } from '../application/watch-handle.ts';
 import { delay } from '@std/async';
 import { BinaryHeap } from '@std/data-structures';
 import { combineAtomicValue } from '../application/atomic-combine.ts';
@@ -26,6 +27,7 @@ import type {
   WatchEvent,
   WatchOptions,
   WatchPrefixOptions,
+  WatchStream,
 } from '../types/common.ts';
 
 interface StorageEntry<T = unknown> {
@@ -248,9 +250,18 @@ export class MemoryKvAdapter implements WatchableKv {
    * @param options - Watch stream options
    * @returns Async iterable of event batches
    */
-  async *watch<T = unknown>(
+  watch<T = unknown>(
     keys: KvKey[],
     options?: WatchOptions,
+  ): WatchStream<T> {
+    return createWatchHandle((ready) => this.watchKeys<T>(keys, options, ready));
+  }
+
+  /** Subscribe, acknowledge readiness, and deliver fixed-key batches. */
+  private async *watchKeys<T>(
+    keys: KvKey[],
+    options: WatchOptions | undefined,
+    ready: () => void,
   ): AsyncIterable<WatchEvent<T>[]> {
     this.assertOpen();
     const eventQueue: WatchEvent<T>[] = [];
@@ -270,7 +281,26 @@ export class MemoryKvAdapter implements WatchableKv {
       this.watchers.get(keyStr)!.add(handler);
     }
 
+    const onAbort = (): void => {
+      resolveNext?.();
+    };
+    options?.signal?.addEventListener('abort', onAbort, { once: true });
+
     try {
+      if (options?.signal?.aborted) return;
+      ready();
+      if (options?.initial) {
+        const entries = await Promise.all(keys.map((key) => this.get<T>(key)));
+        if (options.signal?.aborted) return;
+        yield keys.map((key, index) => ({
+          key,
+          timestamp: new Date(),
+          type: entries[index] ? 'set' : 'delete',
+          value: entries[index]?.value ?? null,
+          versionstamp: entries[index]?.versionstamp ?? null,
+          initial: true,
+        }));
+      }
       while (!options?.signal?.aborted && !this.closed) {
         if (eventQueue.length === 0) {
           let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -301,6 +331,7 @@ export class MemoryKvAdapter implements WatchableKv {
         yield events;
       }
     } finally {
+      options?.signal?.removeEventListener('abort', onAbort);
       for (const key of keys) {
         const keyStr = keyToString(key);
         const keyWatchers = this.watchers.get(keyStr);

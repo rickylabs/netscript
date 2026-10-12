@@ -14,6 +14,7 @@
  * @module
  */
 
+import { createWatchHandle } from '../application/watch-handle.ts';
 import { createPackageLogger } from '@netscript/logger';
 import { combineAtomicValue } from '../application/atomic-combine.ts';
 import { generateVersionstamp, keyHasPrefix, keyToString } from '../application/keys.ts';
@@ -29,6 +30,7 @@ import type {
   WatchEvent,
   WatchOptions,
   WatchPrefixOptions,
+  WatchStream,
 } from '../types/common.ts';
 
 import {
@@ -642,9 +644,18 @@ export class RedisKvAdapter implements WatchableKv {
    * @param options - Watch stream options
    * @returns Async iterable of event batches
    */
-  async *watch<T = unknown>(
+  watch<T = unknown>(
     keys: KvKey[],
     options?: WatchOptions,
+  ): WatchStream<T> {
+    return createWatchHandle((ready) => this.watchKeys<T>(keys, options, ready));
+  }
+
+  /** Subscribe, acknowledge readiness, and deliver fixed-key batches. */
+  private async *watchKeys<T>(
+    keys: KvKey[],
+    options: WatchOptions | undefined,
+    ready: () => void,
   ): AsyncIterable<WatchEvent<T>[]> {
     if (options?.signal?.aborted) return;
     const channel = this.getWatchChannel();
@@ -672,6 +683,8 @@ export class RedisKvAdapter implements WatchableKv {
     };
     const release = await this.subscriptions.acquire(channel, messageHandler);
     try {
+      if (options?.signal?.aborted) return;
+      ready();
       // Messages received during these reads remain queued. A read must not
       // overwrite the previous value already advanced by a startup message.
       // Its first previousValue is null: the baseline may already contain that
@@ -681,6 +694,19 @@ export class RedisKvAdapter implements WatchableKv {
         const entry = entries[index];
         const keyStr = keyToString(key);
         if (!knownVersions.has(keyStr)) previousValues.set(keyStr, entry?.value ?? null);
+      }
+      if (options?.initial && !options.signal?.aborted) {
+        yield keys.map((key, index) => {
+          const entry = entries[index];
+          return {
+            key,
+            timestamp: new Date(),
+            type: entry ? 'set' : 'delete',
+            value: entry?.value ?? null,
+            versionstamp: entry?.versionstamp ?? null,
+            initial: true,
+          };
+        });
       }
       while (!options?.signal?.aborted) {
         const events = await queue.next(options?.debounce, options?.signal);

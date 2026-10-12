@@ -48,5 +48,6 @@ export type {
   WatchEvent,
   WatchOptions,
   WatchPrefixOptions,
+  WatchStream,
 } from './types/mod.ts';
 export { RedisKvAdapter, type RedisKvOptions } from './adapters/redis.adapter.ts';

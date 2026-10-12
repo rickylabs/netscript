@@ -35,6 +35,7 @@ export type {
   WatchEvent,
   WatchOptions,
   WatchPrefixOptions,
+  WatchStream,
 } from './types/mod.ts';
 
 export { isWatchable } from './types/mod.ts';

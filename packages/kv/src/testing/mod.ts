@@ -41,5 +41,17 @@ export {
   type WatchableKvContractOptions,
 } from './watchable-kv-contract.ts';
 export { MemoryKvAdapter } from '../../adapters/memory.adapter.ts';
-export type { KvStore } from '../../types/kv-store.ts';
+export type { AtomicMutation, KvStore } from '../../types/kv-store.ts';
 export type { WatchableKv } from '../../types/watchable-kv.ts';
+export type {
+  AtomicCheck,
+  AtomicResult,
+  KvEntry,
+  KvKey,
+  KvListOptions,
+  KvSetOptions,
+  WatchEvent,
+  WatchOptions,
+  WatchPrefixOptions,
+  WatchStream,
+} from '../../types/common.ts';

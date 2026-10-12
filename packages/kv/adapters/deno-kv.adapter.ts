@@ -4,6 +4,7 @@
  * @module
  */
 
+import { createWatchHandle } from '../application/watch-handle.ts';
 import { delay } from '@std/async';
 import { chunk } from '@std/collections/chunk';
 import { KvClosedError } from '../application/errors.ts';
@@ -20,6 +21,7 @@ import type {
   WatchEvent,
   WatchOptions,
   WatchPrefixOptions,
+  WatchStream,
 } from '../types/common.ts';
 
 const MAX_WATCH_KEYS = 10;
@@ -244,29 +246,44 @@ export class DenoKvAdapter implements WatchableKv {
    * @param options - Watch stream options
    * @returns Async iterable of event batches
    */
-  async *watch<T = unknown>(
+  watch<T = unknown>(
     keys: KvKey[],
     options?: WatchOptions,
+  ): WatchStream<T> {
+    return createWatchHandle((ready) => this.watchKeys<T>(keys, options, ready));
+  }
+
+  /** Subscribe, acknowledge readiness, and deliver fixed-key batches. */
+  private async *watchKeys<T>(
+    keys: KvKey[],
+    options: WatchOptions | undefined,
+    ready: () => void,
   ): AsyncIterable<WatchEvent<T>[]> {
+    if (options?.signal?.aborted) return;
     const kv = await this.ensureOpen();
     const previousValues = new Map<string, T | null>();
     const reader = kv.watch<T[]>(keys, { raw: options?.raw }).getReader();
-
-    for (const key of keys) {
-      const entry = await kv.get<T>(key);
-      previousValues.set(keyToString(key), entry.value);
-    }
+    const cancel = (): void => {
+      void reader.cancel().catch(() => {});
+    };
+    options?.signal?.addEventListener('abort', cancel, { once: true });
 
     try {
-      while (true) {
+      // Keep the default path's preceding-value and equality behavior intact.
+      // Opt-in snapshots use the native first frame itself, never an earlier read.
+      if (!options?.initial) {
+        for (const key of keys) {
+          const entry = await kv.get<T>(key);
+          previousValues.set(keyToString(key), entry.value);
+        }
+      }
+      let first = true;
+      while (!options?.signal?.aborted) {
         const { done, value: entries } = await reader.read();
-        if (done || !entries) {
-          break;
-        }
-
-        if (options?.signal?.aborted) {
-          break;
-        }
+        if (done || !entries || options?.signal?.aborted) break;
+        if (first) ready();
+        const snapshot = first && options?.initial;
+        first = false;
 
         const events: WatchEvent<T>[] = [];
         for (let index = 0; index < entries.length; index += 1) {
@@ -274,33 +291,33 @@ export class DenoKvAdapter implements WatchableKv {
           const key = keys[index];
           const keyStr = keyToString(key);
           const previousValue = previousValues.get(keyStr) ?? null;
-
-          if (previousValue === entry.value) {
-            continue;
-          }
+          if (!snapshot && previousValue === entry.value) continue;
 
           events.push({
             key,
-            previousValue,
+            ...(!snapshot ? { previousValue } : {}),
             timestamp: new Date(),
-            type: entry.value === null ? 'delete' : 'set',
+            type: (snapshot ? entry.versionstamp === null : entry.value === null)
+              ? 'delete'
+              : 'set',
             value: entry.value,
             versionstamp: entry.versionstamp,
+            ...(snapshot ? { initial: true as const } : {}),
           });
           previousValues.set(keyStr, entry.value);
         }
 
-        if (events.length === 0) {
-          continue;
+        if (events.length === 0 && !snapshot) continue;
+        if (options?.debounce && !snapshot) {
+          await delay(options.debounce, { signal: options.signal }).catch((error: unknown) => {
+            if (!options.signal?.aborted) throw error;
+          });
         }
-
-        if (options?.debounce) {
-          await delay(options.debounce);
-        }
-
-        yield events;
+        if (!options?.signal?.aborted) yield events;
       }
     } finally {
+      options?.signal?.removeEventListener('abort', cancel);
+      await reader.cancel().catch(() => {});
       reader.releaseLock();
     }
   }

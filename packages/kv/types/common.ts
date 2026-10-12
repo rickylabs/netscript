@@ -43,7 +43,28 @@ export interface WatchEvent<T = unknown> {
   timestamp: Date;
   /** Version stamp after the change */
   versionstamp: string | null;
+  /**
+   * True only for events in the opt-in snapshot delivered before changes.
+   * Snapshot events omit previousValue. Deduplicate by equal versionstamp;
+   * Redis stamps are not ordered across writer processes and must not be used
+   * to order their writes.
+   */
+  initial?: true;
 }
+
+/**
+ * A watch iterable with optional subscription readiness.
+ *
+ * First-party adapters provide `ready`. Start iteration before awaiting it;
+ * subscriptions are lazy. Direct adapters resolve on backend acknowledgement.
+ * A lazy adapter forwards the inner readiness signal, or resolves on the first
+ * batch if the inner adapter has no signal. Startup failure or an early abort
+ * rejects readiness; iteration retains the underlying adapter's completion or
+ * error behavior. Third-party adapters may return a plain async iterable.
+ */
+export type WatchStream<T = unknown> = AsyncIterable<WatchEvent<T>[]> & {
+  readonly ready?: Promise<void>;
+};
 
 /**
  * Options for `KvStore.set()`.
@@ -75,6 +96,17 @@ export interface KvListOptions {
  * Options for `WatchableKv.watch()`.
  */
 export interface WatchOptions {
+  /**
+   * Subscribe first, then emit current values as the first batch, marked
+   * `initial: true`. Absent keys emit `delete` with a null value/versionstamp.
+   * Writes after acknowledgement cannot fall into a load/subscribe gap. A
+   * write racing the snapshot may also appear as a change; dedupe by
+   * equal versionstamp. Redis stamps are not ordered across writer processes;
+   * never use them to order writes from different processes. Omitted or false
+   * preserves the backend's default behavior.
+   * This option applies to fixed-key `watch`; prefixes retain `skipInitial`.
+   */
+  initial?: boolean;
   /** Abort signal for cleanup */
   signal?: AbortSignal;
   /** Debounce rapid changes (ms) */

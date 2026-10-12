@@ -14,6 +14,7 @@ export type {
   WatchEvent,
   WatchOptions,
   WatchPrefixOptions,
+  WatchStream,
 } from './common.ts';
 
 export type { AtomicMutation, KvStore } from './kv-store.ts';
