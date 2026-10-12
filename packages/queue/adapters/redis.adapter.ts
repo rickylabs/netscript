@@ -39,10 +39,12 @@ function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, 
 
 const DEFAULT_BLOCK_TIMEOUT_SECONDS = 1;
 const DEFAULT_DELAYED_POLL_MS = 1_000;
+const DELAYED_PROMOTION_BATCH_SIZE = 100;
 
 interface RedisQueueClients {
   readonly commands: Redis;
   readonly blocking: Redis;
+  readonly promotion: Redis;
 }
 
 interface DelayedQueueEntry {
@@ -61,6 +63,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   private clients: RedisQueueClients | null = null;
   private deadLetterStore: DeadLetterStorePort<T> | null = null;
   private delayedTimer?: ReturnType<typeof setInterval>;
+  private delayedPromotion?: Promise<void>;
   private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
 
   /**
@@ -210,6 +213,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     this.stopDelayedProcessor();
     this.clients?.blocking.disconnect();
     this.clients?.commands.disconnect();
+    this.clients?.promotion.disconnect();
     this.clients = null;
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -227,6 +231,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
       this.clients = {
         commands: new Redis(this.url, redisOptions),
         blocking: new Redis(this.url, redisOptions),
+        promotion: new Redis(this.url, redisOptions),
       };
       return this.clients;
     } catch (error) {
@@ -335,13 +340,44 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   /**
    * Move due delayed messages from the sorted set into the ready list.
    */
-  private async moveDueDelayedMessages(): Promise<void> {
-    const clients = this.ensureClients();
-    const entries = await clients.commands.zrangebyscore(this.delayedKey, '-inf', Date.now());
-    for (const entry of entries) {
-      const parsed = JSON.parse(entry) as DelayedQueueEntry;
-      await clients.commands.lpush(parsed.queueKey, parsed.envelope);
-      await clients.commands.zrem(this.delayedKey, entry);
+  private moveDueDelayedMessages(): Promise<void> {
+    // WATCH state is connection-local: overlapping polls must share this pass.
+    if (!this.delayedPromotion) {
+      this.delayedPromotion = this.promoteDelayedBatch().finally(() => {
+        this.delayedPromotion = undefined;
+      });
+    }
+    return this.delayedPromotion;
+  }
+
+  private async promoteDelayedBatch(): Promise<void> {
+    const client = this.ensureClients().promotion;
+    await client.watch(this.delayedKey);
+    try {
+      const entries = await client.zrangebyscore(
+        this.delayedKey,
+        '-inf',
+        Date.now(),
+        'LIMIT',
+        0,
+        DELAYED_PROMOTION_BATCH_SIZE,
+      );
+      if (entries.length === 0) return;
+
+      const transaction = client.multi();
+      for (const entry of entries) {
+        const parsed = JSON.parse(entry) as DelayedQueueEntry;
+        // Membership was read under WATCH. A competing removal aborts the entire
+        // EXEC, so only the transaction that still owns each member can push it.
+        transaction.zrem(this.delayedKey, entry).lpush(parsed.queueKey, parsed.envelope);
+      }
+      const results = await transaction.exec();
+      // A lost WATCH leaves the batch pending for the next poll, with no pushes.
+      for (const [error] of results ?? []) {
+        if (error) throw error;
+      }
+    } finally {
+      await client.unwatch();
     }
   }
 

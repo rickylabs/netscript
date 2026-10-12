@@ -122,15 +122,15 @@ the pre-release line, as above).
 Redis delayed-message promotion is at most once across listeners sharing a delayed key: a watched
 transaction removes each due member and pushes its envelope to the recorded target queue atomically.
 Promotion reads at most 100 due members per pass; a conflicting transaction leaves them pending for
-the next pass. This guarantee covers promotion, while handler retries still require idempotency.
-The adapter uses a dedicated connection for `WATCH`/`MULTI`/`EXEC`, supported by Redis and Garnet,
+the next pass. This guarantee covers promotion, while handler retries still require idempotency. The
+adapter uses a dedicated connection for `WATCH`/`MULTI`/`EXEC`, supported by Redis and Garnet,
 including Garnet servers without Lua enabled. Garnet also supports `EVAL` when started with `--lua`;
 the transaction path preserves compatibility with the scaffold's default configuration.
 
-The existing `netscript:queue:<name>`, `netscript:processing:<name>`, and
-`netscript:delayed:<name>` key layout is unchanged and targets single-node Redis-compatible servers.
-Redis Cluster is outside this adapter's supported scope: these keys have no shared hash tag, so
-multi-key transactions and blocking pop-push operations can cross hash slots.
+The existing `netscript:queue:<name>`, `netscript:processing:<name>`, and `netscript:delayed:<name>`
+key layout is unchanged and targets single-node Redis-compatible servers. Redis Cluster is outside
+this adapter's supported scope: these keys have no shared hash tag, so multi-key transactions and
+blocking pop-push operations can cross hash slots.
 
 Designed for Deno. The Deno KV backend needs the `kv` unstable feature (`--unstable-kv`); Redis,
 RabbitMQ, and PostgreSQL backends need `--allow-net` plus `--allow-env` for discovery. Backend
