@@ -17,7 +17,7 @@ import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
 import {
   createProjectingSagaStore as publicCreateProjectingSagaStore,
   type SagaTransitionStore,
-} from '@netscript/plugin-sagas/runtime';
+} from './mod.ts';
 import {
   createProjectingSagaStore,
   PrismaSagaInstanceProjection,

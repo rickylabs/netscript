@@ -398,6 +398,10 @@ jobs:
           cache: ${{ env.RUN == 'true' }}
           cache-hash: ${{ env.RUN == 'true' && format('{0}-{1}', env.DENO_VERSION, hashFiles('deno.lock')) || '' }}
 
+      - name: Release preflight
+        # Required on every PR, including diffs outside the classified surfaces.
+        run: deno task release:preflight
+
       - name: Record skipped quality receipt
         if: env.RUN != 'true'
         run: >-
