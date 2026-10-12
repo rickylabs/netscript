@@ -34,7 +34,11 @@
  *   deno task release:publish -- 0.0.1-alpha.20 --message "One-line intro." --dry-run
  */
 
-import { AGENT_DOCS_PAGE_CARRIER, parseAgentDocsPages } from '../docs/agent-docs-page-carrier.ts';
+import {
+  AGENT_DOCS_PAGE_CARRIER,
+  isSiteGeneratedAgentDocsEntry,
+  parseAgentDocsPages,
+} from '../docs/agent-docs-page-carrier.ts';
 import { decodeAgentDocsPages } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
 import {
   githubField,
@@ -248,6 +252,9 @@ export async function verifyGreenCanaryPair(
               );
             }
           } else {
+            // The real release writer always declares the page carrier, so this legacy gzip
+            // branch is unreachable in today's repo. Keep it for legacy callers and fixtures;
+            // retiring that compatibility path is separate from this verifier repair.
             const readBytes = dependencies.fileBytesAtRevision;
             if (!readBytes) {
               throw new Error(
@@ -408,9 +415,9 @@ function isAgentDocsPageMetadata(source: string, version: string): boolean {
   }
 }
 
-/** Validate page transition provenance, not content equivalence. The mandatory writer freshness
- * check re-renders the version-only source tree and requires byte equality with the committed
- * carrier; authored historical versions must not be rewritten by this provenance check. */
+/** Validate provenance and preserved entries against the parent. Site-generated entries require
+ * the mandatory regeneration proof instead: their authored historical references stay intact.
+ * Regeneration copies preserved entries from its own carrier, so it cannot prove those unchanged. */
 export async function isExactAgentDocsPageReplacement(
   beforeSource: string,
   afterSource: string,
@@ -428,7 +435,11 @@ export async function isExactAgentDocsPageReplacement(
     const before = await decodeAgentDocsPages(parseAgentDocsPages(beforePages));
     const after = await decodeAgentDocsPages(parseAgentDocsPages(afterPages));
     return JSON.stringify(Object.keys(before).sort()) ===
-      JSON.stringify(Object.keys(after).sort());
+        JSON.stringify(Object.keys(after).sort()) &&
+      Object.keys(before).every((path) =>
+        isSiteGeneratedAgentDocsEntry(path) || before[path] === after[path] ||
+        rewriteNetScriptVersion(before[path], previousVersion, nextVersion) === after[path]
+      );
   } catch {
     return false;
   }

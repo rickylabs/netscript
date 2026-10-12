@@ -1,7 +1,22 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
-import { checkDesktopReferenceLock, checkReferenceLock } from './check-reference-locks.ts';
-import { coordinateVersionBump, parseSemver } from './bump-version.ts';
+import {
+  checkDesktopReferenceLock,
+  checkReferenceLock,
+  REFERENCE_LOCK_CHECKS,
+} from './check-reference-locks.ts';
+import {
+  coordinateVersionBump,
+  MAINTAINED_REFERENCE_LOCK_FILES,
+  parseSemver,
+} from './bump-version.ts';
+
+Deno.test('frozen reference checks and coordinated bump cover exactly the same lock set', () => {
+  assertEquals(
+    Object.keys(REFERENCE_LOCK_CHECKS).sort(),
+    [...MAINTAINED_REFERENCE_LOCK_FILES].sort(),
+  );
+});
 
 Deno.test('reference lock guard rejects range drift without rewriting the lock', async () => {
   const reference = await Deno.makeTempDir();

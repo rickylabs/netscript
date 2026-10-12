@@ -118,7 +118,7 @@ interface RenderedCanaryPairFixture {
 }
 
 async function createRenderedCanaryPairFixture(
-  variant: 'fresh' | 'drifted' | 'stale' | 'omitted',
+  variant: 'fresh' | 'drifted' | 'stale' | 'omitted' | 'context-drifted',
 ): Promise<RenderedCanaryPairFixture> {
   const root = await Deno.makeTempDir({ prefix: 'netscript-rendered-canary-pair-' });
   const source = await Deno.makeTempDir({ prefix: 'netscript-rendered-canary-source-' });
@@ -163,11 +163,13 @@ async function createRenderedCanaryPairFixture(
   try {
     await Promise.all([
       Deno.mkdir(bundle, { recursive: true }),
+      Deno.mkdir(join(bundle, 'context'), { recursive: true }),
       Deno.mkdir(output, { recursive: true }),
       Deno.mkdir(join(literal, 'packages', 'cli'), { recursive: true }),
       Deno.mkdir(join(literal, '.llm', 'assets', 'agent-docs'), { recursive: true }),
     ]);
     await Promise.all([
+      Deno.writeTextFile(join(bundle, 'context', 'history.mdx'), '# Preserved context\n'),
       Deno.writeTextFile(
         join(bundle, 'llms.txt'),
         '# NetScript\n\n## Task router\n\nParent corpus.\n',
@@ -238,9 +240,9 @@ async function createRenderedCanaryPairFixture(
       ),
     );
 
-    if (variant === 'drifted') {
+    if (variant === 'drifted' || variant === 'context-drifted') {
       const files = await readAgentDocsPages(prosePath, nextVersion);
-      files['llms.txt'] += '\nDRIFT\n';
+      files[variant === 'drifted' ? 'llms.txt' : 'context/history.mdx'] += '\nDRIFT\n';
       await Deno.writeTextFile(prosePath, await renderAgentDocsPages(files));
     }
     if (variant === 'stale' || variant === 'omitted') {
@@ -778,6 +780,22 @@ Deno.test('parent canary evidence rejects semantically drifted rebuilt corpus co
           fixture.root,
           fixture.dependencies,
         ),
+      Error,
+      'Stable publication blocked: agent-docs prose contains non-version changes',
+    );
+  } finally {
+    await fixture.dispose();
+  }
+});
+
+Deno.test('parent canary evidence rejects tampered preserved context with valid recomputed integrity', async () => {
+  const fixture = await createRenderedCanaryPairFixture('context-drifted');
+  try {
+    // Site regeneration intentionally preserves context from this same carrier and reports fresh.
+    // Only the parent comparison can reject this validly encoded unrelated content change.
+    await fixture.dependencies.generatedOutputsFresh!(fixture.root);
+    await assertRejects(
+      () => verifyGreenCanaryPair('owner/repo', 'token', fixture.root, fixture.dependencies),
       Error,
       'Stable publication blocked: agent-docs prose contains non-version changes',
     );
@@ -1371,4 +1389,40 @@ Deno.test('page transition provenance permits historical references pending mand
     await isExactAgentDocsPageReplacement(before, after, oldPages, newPages, previous, next),
     true,
   );
+});
+
+Deno.test('preserved carrier entries permit only unchanged bytes or owned NetScript version rewrites', async () => {
+  const previous = '0.0.7';
+  const next = '0.0.8';
+  const beforeMetadata = JSON.stringify({ schemaVersion: 1, version: previous });
+  const afterMetadata = JSON.stringify({ schemaVersion: 1, version: next });
+  const content = `History: ${previous}. Install \`jsr:@netscript/sdk@${previous}\`.\n`;
+  for (const path of ['context/history.mdx', 'external/reference.md']) {
+    const before = await renderAgentDocsPages({ 'llms.txt': '## Task router\n', [path]: content });
+    for (
+      const [afterContent, expected] of [
+        [content, true],
+        [content.replace(`@${previous}`, `@${next}`), true],
+        [content + '\nUnrelated edit.\n', false],
+        [content.replaceAll(previous, next), false],
+      ] as const
+    ) {
+      const after = await renderAgentDocsPages({
+        'llms.txt': '## Task router\n',
+        [path]: afterContent,
+      });
+      assertEquals(
+        await isExactAgentDocsPageReplacement(
+          beforeMetadata,
+          afterMetadata,
+          before,
+          after,
+          previous,
+          next,
+        ),
+        expected,
+        path,
+      );
+    }
+  }
 });

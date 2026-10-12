@@ -10,6 +10,7 @@ import { dirname, fromFileUrl, join, relative, resolve } from 'jsr:@std/path@^1'
 import { buildLlmsFull, DOCS_SITE_LOCATION } from '../../../docs/site/_plugins/llms-policy.ts';
 import {
   AGENT_DOCS_PAGE_CARRIER,
+  isSiteGeneratedAgentDocsEntry,
   readAgentDocsPages,
   renderAgentDocsPages,
 } from './agent-docs-page-carrier.ts';
@@ -195,7 +196,7 @@ export async function buildAgentDocsProse(
   const root = resolve(bundleRoot);
   const allFiles = await collectFiles(root);
   const files = allFiles.filter((path) =>
-    path === 'llms.txt' || path === 'llms-full.txt' || path.startsWith('pages/') ||
+    isSiteGeneratedAgentDocsEntry(path) ||
     path.startsWith('context/')
   ).sort();
   if (!files.includes('llms.txt') || !files.includes('llms-full.txt')) {
@@ -233,7 +234,7 @@ export async function buildAgentDocsProseFromSite(
   const preserved = await readCorpus(metadata.preservedCorpusPath ?? PROSE_PATH, metadata.version);
   const contents: Record<string, string> = {};
   for (const [path, content] of Object.entries(preserved.files)) {
-    if (path !== 'llms.txt' && path !== 'llms-full.txt' && !path.startsWith('pages/')) {
+    if (!isSiteGeneratedAgentDocsEntry(path)) {
       contents[path] = content;
     }
   }
@@ -267,7 +268,7 @@ export async function checkAgentDocsProseFromSite(
   const preserved = await readCorpus(metadata.preservedCorpusPath ?? PROSE_PATH, metadata.version);
   const contents: Record<string, string> = {};
   for (const [path, content] of Object.entries(preserved.files)) {
-    if (path !== 'llms.txt' && path !== 'llms-full.txt' && !path.startsWith('pages/')) {
+    if (!isSiteGeneratedAgentDocsEntry(path)) {
       contents[path] = content;
     }
   }

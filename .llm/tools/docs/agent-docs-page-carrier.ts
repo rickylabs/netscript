@@ -8,6 +8,11 @@ import {
 export const AGENT_DOCS_PAGE_CARRIER =
   'packages/cli/src/kernel/assets/agent-docs-prose.generated.ts';
 
+/** Entries rebuilt from the rendered site; every other entry is preserved from the carrier. */
+export function isSiteGeneratedAgentDocsEntry(path: string): boolean {
+  return path === 'llms.txt' || path === 'llms-full.txt' || path.startsWith('pages/');
+}
+
 /** Render sorted pages with local integrity metadata; aggregates are derived by consumers. */
 export async function renderAgentDocsPages(
   files: Readonly<Record<string, string>>,
