@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { calculateNextRun } from './next-run.ts';
+import { calculateNextDenoRun, calculateNextRun } from './next-run.ts';
 
 Deno.test('UTC next-run calculation rejects unsupported and impossible expressions safely', () => {
   const now = new Date('2026-10-09T10:17:43Z');
@@ -37,4 +37,25 @@ Deno.test('UTC next-run calculation handles sparse leap-day and weekday conjunct
       ?.toISOString(),
     '2026-10-10T08:00:00.000Z',
   );
+});
+
+Deno.test('Deno UTC preview uses OR only when both day fields are restricted', () => {
+  const now = new Date('2026-10-11T10:17:43Z'); // Sunday, the 11th.
+  for (
+    const [expression, expected] of [
+      ['* * 11 * 0', '2026-10-11T10:18:00.000Z'],
+      ['* * 1 * 0', '2026-10-11T10:18:00.000Z'],
+      ['* * 11 * 1', '2026-10-11T10:18:00.000Z'],
+      ['* * 1 * 1', '2026-10-12T00:00:00.000Z'],
+      ['* * * * 1', '2026-10-12T00:00:00.000Z'],
+      ['* * 1 * *', '2026-11-01T00:00:00.000Z'],
+      ['* * 1-31 * 1', '2026-10-11T10:18:00.000Z'],
+      ['* * */1 * 1', '2026-10-11T10:18:00.000Z'],
+      ['* * 1 * */1', '2026-10-11T10:18:00.000Z'],
+      ['0 0 31 2 1', '2027-02-01T00:00:00.000Z'],
+    ]
+  ) {
+    assertEquals(calculateNextDenoRun(expression, now)?.toISOString(), expected, expression);
+  }
+  assertEquals(calculateNextRun('* * 1 * 0', now)?.toISOString(), '2026-11-01T00:00:00.000Z');
 });

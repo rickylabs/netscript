@@ -100,10 +100,33 @@ auto-detection falls back to the in-memory adapter. The in-memory adapter needs 
 flags.
 
 `ScheduledJob.nextRun` reports the next matching UTC minute strictly after the current instant. The
-Deno and memory adapters share this calculation for numeric five-field expressions, including
-wildcards, steps, ranges, range steps, and lists. Both day-of-month and day-of-week must match.
-Unsupported expressions or schedules with no possible calendar date return `null`. Native
-`Deno.cron` remains responsible for execution; the memory adapter still uses simplified intervals.
+Deno and memory adapters share the field expansion and calendar search for numeric five-field
+expressions, including wildcards, steps, ranges, range steps, and lists. On the Deno provider, when
+both day-of-month and day-of-week are restricted, either may match (OR); a literal `*` removes that
+constraint. Explicit full ranges and `*/1` remain restricted fields. The memory preview requires
+both day constraints to match (AND). Unsupported expressions or schedules with no possible calendar
+date return `null`. Native `Deno.cron` remains responsible for execution; the memory adapter still
+uses simplified intervals.
+
+Weekdays use **0–6, Sunday = 0** throughout the NetScript contract; `7` is not accepted. The Deno
+adapter translates the weekday field to Deno's **1–7, Sunday = 1** before registration. Lists,
+ranges, and wildcard/range steps become exact lists (for example, `*/2` becomes `1,3,5,7`); `*`
+stays unchanged. Ambiguous numeric steps such as `0/2` are rejected with a day-of-week error. The
+other four fields and `ScheduledJob.schedule` retain their NetScript expressions. Native Deno
+execution and its next-run preview use UTC; the timezone option is metadata on this provider.
+
+### Breaking change and migration
+
+Weekday schedules now fire on the days written. If you compensated by writing Deno numbering,
+rewrite it in **0–6**: use `0` for Sunday and `1-5` for Monday–Friday. Deno next-run previews now
+reflect native OR semantics when both day fields are restricted; the memory provider retains its AND
+preview and simplified interval execution.
+
+The bounded real-runtime probe is opt-in because it observes two minute boundaries:
+
+```bash
+NETSCRIPT_CRON_RUNTIME_PROBE=1 deno test --allow-all packages/cron/tests/deno-runtime_test.ts
+```
 
 ## License
 
