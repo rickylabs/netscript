@@ -56,8 +56,8 @@ Deno.test('scheduled hour-step trigger registers with native Deno.cron in a chil
       'eval',
       '--unstable-cron',
       `
-      import { CronTriggerSchedulerAdapter } from '@netscript/plugin-triggers-core/adapters';
-      import { defineScheduledTrigger } from '@netscript/plugin-triggers-core/builders';
+      import { CronTriggerSchedulerAdapter } from './mod.ts';
+      import { defineScheduledTrigger } from '../builders/mod.ts';
       const adapter = new CronTriggerSchedulerAdapter({ schedulerOptions: { provider: 'deno' } });
       try {
         for (const [index, cron] of ['0 */12 * * *', '0 */6 * * *', '30 */2 * * *'].entries()) {
@@ -74,6 +74,7 @@ Deno.test('scheduled hour-step trigger registers with native Deno.cron in a chil
       }
     `,
     ],
+    cwd: new URL('.', import.meta.url),
     env: { TZ: 'America/New_York' },
     stdout: 'piped',
     stderr: 'piped',
