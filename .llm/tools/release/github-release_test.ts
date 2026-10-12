@@ -118,7 +118,7 @@ interface RenderedCanaryPairFixture {
 }
 
 async function createRenderedCanaryPairFixture(
-  variant: 'fresh' | 'drifted' | 'stale',
+  variant: 'fresh' | 'drifted' | 'stale' | 'omitted',
 ): Promise<RenderedCanaryPairFixture> {
   const root = await Deno.makeTempDir({ prefix: 'netscript-rendered-canary-pair-' });
   const source = await Deno.makeTempDir({ prefix: 'netscript-rendered-canary-source-' });
@@ -243,11 +243,17 @@ async function createRenderedCanaryPairFixture(
       files['llms.txt'] += '\nDRIFT\n';
       await Deno.writeTextFile(prosePath, await renderAgentDocsPages(files));
     }
-    if (variant === 'stale') {
+    if (variant === 'stale' || variant === 'omitted') {
       await Deno.writeTextFile(
         prosePath,
         await git(['show', `${parent}:${PAIR_PROSE_PATH}`]) as string + '\n',
       );
+      if (variant === 'omitted') {
+        await Deno.writeTextFile(
+          provenancePath,
+          await git(['show', `${parent}:${PAIR_PROVENANCE_PATH}`]) as string + '\n',
+        );
+      }
     }
     await Deno.copyFile(prosePath, join(root, PAIR_PROSE_PATH));
 
@@ -742,6 +748,20 @@ Deno.test('parent canary evidence rejects invalid page provenance before regener
       'invalid page provenance',
     );
     assertEquals(checked, false);
+  } finally {
+    await fixture.dispose();
+  }
+});
+
+Deno.test('parent canary evidence rejects an omitted generator with unchanged pages and sidecar', async () => {
+  const fixture = await createRenderedCanaryPairFixture('omitted');
+  try {
+    assertEquals(await fixture.dependencies.changedFiles(fixture.root), ['deno.json']);
+    await assertRejects(
+      () => verifyGreenCanaryPair('owner/repo', 'token', fixture.root, fixture.dependencies),
+      Error,
+      'invalid page provenance',
+    );
   } finally {
     await fixture.dispose();
   }

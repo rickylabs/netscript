@@ -198,6 +198,10 @@ export async function verifyGreenCanaryPair(
     const previousVersion = readManifestVersion(parentRoot, `${parent}:deno.json`);
     const nextVersion = readManifestVersion(currentRoot, `${current}:deno.json`);
     const generatedPaths = changed.filter(isPreparedReleaseGeneratedOutput);
+    const pageCarrierDeclared = releaseFiles.some((path) =>
+      normalizeGitPath(path) === AGENT_DOCS_PAGE_CARRIER ||
+      normalizeGitPath(path).endsWith(`/${AGENT_DOCS_PAGE_CARRIER}`)
+    );
     const exactReplacement = await everyAsync(changed, async (path) => {
       const before = await dependencies.fileAtRevision(root, parent, path);
       const after = await dependencies.fileAtRevision(root, current, path);
@@ -208,8 +212,8 @@ export async function verifyGreenCanaryPair(
       return false;
     });
     if (exactReplacement) {
-      if (generatedPaths.length > 0) {
-        const agentDocsChanged = generatedPaths.some((path) => {
+      if (generatedPaths.length > 0 || pageCarrierDeclared) {
+        const agentDocsChanged = pageCarrierDeclared || generatedPaths.some((path) => {
           const normalized = normalizeGitPath(path);
           return normalized === AGENT_DOCS_PROSE_PATH || normalized === AGENT_DOCS_PAGE_CARRIER ||
             normalized === AGENT_DOCS_PROVENANCE_PATH;
@@ -221,7 +225,7 @@ export async function verifyGreenCanaryPair(
           ]);
           // A stale page carrier can be unchanged while its version sidecar was bumped.
           // Select the format from metadata rather than requiring a carrier delta.
-          const pageFormat = generatedPaths.some((path) =>
+          const pageFormat = pageCarrierDeclared || generatedPaths.some((path) =>
             normalizeGitPath(path) === AGENT_DOCS_PAGE_CARRIER
           ) || isAgentDocsPageMetadata(afterMetadata, nextVersion);
           if (pageFormat) {
