@@ -15,6 +15,38 @@ The userland saga DSL (`defineSaga`, the cascaded-message constructors) is autho
 [`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/) and re-exported through the runtime
 entrypoint. That separately published package has its own canonical reference page.
 
+## Atomic worker commands with query projection
+
+For `.durableWorkerCommands()` sagas, inject the store returned by `createPrismaSagaTransitionStore`
+from `@netscript/plugin-sagas-core/stores` into `createDurableSagaRuntime({ store, projection })`.
+Use `PrismaSagaInstanceProjection` from `@netscript/plugin-sagas/runtime` for the Prisma query
+model. For the complete background runner, pass `runtimeOptions: { native: { store } }` and
+`projection` to `startSagaRunner`; configure the same canonical store and projection in both API and
+background compositions. Selecting `backend: 'prisma'` alone constructs the granular legacy store
+and does not enable atomic worker commands.
+
+Apply the PostgreSQL migrations for `saga_runtime_state`, `saga_runtime_transition`,
+`saga_runtime_correlation`, `saga_runtime_command_applied_key`, and `netscript_command_outbox`, plus
+`saga_instances` for the Prisma projection. The store uses the host's real interactive Prisma
+transaction callback. State, history, correlation, inbound replay marker, and worker command intents
+commit together. Query projection runs afterward and propagates errors, matching the legacy
+projection path. `createProjectingSagaStore` retains this capability for custom compositions;
+`ProjectingSagaStore` remains the legacy granular decorator.
+
+A failed projection leaves the canonical transition and command intent committed. Redelivery is
+replay: it adds no worker command and performs no projection write. Recover the view explicitly in a
+host-owned background repair task: load the canonical envelope and its matching latest transition
+from the original atomic store, resolve the saga and correlation identity, and pass them to
+`projection.upsert`. Do not replay business effects to rebuild a view. Joining Prisma projection to
+the canonical transaction is a possible follow-up; this composition preserves post-commit behavior.
+
+The generic PostgreSQL command-outbox relay keeps its claim leases, retry attempts, and settlement
+metadata with the PostgreSQL outbox rows; those fields cannot be moved to an unrelated KV store
+while retaining this relay's contract. Worker execution/idempotency state and progress streams may
+use separate durable stores. Delivery remains at least once, with effective deduplication supplied
+by the worker's durable idempotency store. All processing and repair run under a service identity
+and need no phone, web app, or owner session.
+
 ## Exports
 
 The plugin publishes the following entrypoints. Each is documented against its own `deno doc`

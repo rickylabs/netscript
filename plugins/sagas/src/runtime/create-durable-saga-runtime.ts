@@ -19,7 +19,7 @@ import {
   type PrismaSagaStoreClient,
 } from '@netscript/plugin-sagas-core/stores';
 import {
-  ProjectingSagaStore,
+  createProjectingSagaStore,
   type SagaInstanceProjectionPort,
 } from './saga-instance-projection.ts';
 
@@ -65,7 +65,7 @@ export async function createDurableSagaRuntime(
     scheduledCleanup = undefined;
   };
   const store = options.projection
-    ? new ProjectingSagaStore(resources.store, options.projection)
+    ? createProjectingSagaStore(resources.store, options.projection)
     : resources.store;
   const instrumentation = options.native?.instrumentation ??
     options.native?.engineOptions?.instrumentation ?? new SagaInstrumentation();

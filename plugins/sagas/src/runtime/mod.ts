@@ -16,6 +16,7 @@ export {
   SagaQueueScheduler,
 } from './saga-delivery.ts';
 export {
+  createProjectingSagaStore,
   KvSagaInstanceProjection,
   PrismaSagaInstanceProjection,
   ProjectingSagaStore,
@@ -102,6 +103,13 @@ export type {
   SagaStorePort,
   SagaStoreWriteOptions,
 } from '@netscript/plugin-sagas-core/runtime';
+export type {
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+  SagaTransitionStore,
+  StoredCommandOutbox,
+} from '@netscript/plugin-sagas-core/ports';
 export type {
   SagaDeliveryContext,
   SagaDeliveryMessage,
