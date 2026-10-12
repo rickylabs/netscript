@@ -102,7 +102,8 @@ export interface WatchOptions {
    * Writes after acknowledgement cannot fall into a load/subscribe gap. A
    * write racing the snapshot may also appear as a change; dedupe by
    * equal versionstamp. Redis stamps are not ordered across writer processes;
-   * never use them to order writes from different processes. Omitted or false preserves the backend's default behavior.
+   * never use them to order writes from different processes. Omitted or false
+   * preserves the backend's default behavior.
    * This option applies to fixed-key `watch`; prefixes retain `skipInitial`.
    */
   initial?: boolean;

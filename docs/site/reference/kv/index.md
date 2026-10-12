@@ -86,8 +86,8 @@ contains every watched key, including absent keys as `delete`/null events, and m
 `initial: true`. Subsequent batches contain changes. A write committed after subscription
 acknowledgement cannot fall into a startup load/subscribe gap; a write racing the snapshot may
 appear twice, so dedupe by equal versionstamp. Redis writers stamp independently: never use their
-versionstamps to order writes across processes. Deno KV still coalesces native watch updates. Without
-`initial`, the existing backend behavior is preserved.
+versionstamps to order writes across processes. Deno KV still coalesces native watch updates.
+Without `initial`, the existing backend behavior is preserved.
 
 First-party handles provide an optional `ready` promise. Start iteration before awaiting it;
 subscriptions are lazy. Redis resolves it on SUBSCRIBE acknowledgement, memory on listener
