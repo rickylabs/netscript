@@ -1,5 +1,6 @@
 import { walk } from '@std/fs';
 import { join, relative } from '@std/path';
+import { denoChildConfigArgs } from '../../kernel/adapters/runtime/process/deno-child-config.ts';
 
 import {
   copyDirectoryFiltered,
@@ -195,10 +196,11 @@ async function runRuntimeRegistryGenerator(options: {
   readonly includeSamples: boolean;
 }): Promise<void> {
   const commandPath = join(options.pluginDir, ...options.generator.command.split('/'));
+  const configArgs = await denoChildConfigArgs();
   const output = await new Deno.Command(Deno.execPath(), {
     args: [
       'run',
-      '--no-config',
+      ...(configArgs.length ? configArgs : ['--no-config']),
       '--allow-read',
       '--allow-write',
       commandPath,

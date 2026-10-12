@@ -4,6 +4,7 @@
 
 import type { LoadConfigOptions, NetScriptConfig } from '@netscript/config';
 import { join } from '@std/path';
+import { denoChildConfigArgs } from '../runtime/process/deno-child-config.ts';
 import type { ProcessPort } from '../../ports/process-port.ts';
 
 const CHILD_LOADER = new URL('./project-config-loader-child.ts', import.meta.url).href;
@@ -66,9 +67,11 @@ async function runProjectConfigLoader(
     '--minimum-dependency-age=0',
   ];
   const denoConfigPath = join(options.cwd, 'deno.json');
-  if (await fileExists(denoConfigPath)) {
-    args.push('--config', denoConfigPath);
-  }
+  args.push(
+    ...await denoChildConfigArgs(
+      await fileExists(denoConfigPath) ? denoConfigPath : undefined,
+    ),
+  );
   args.push(dependencies.loaderSpecifier ?? CHILD_LOADER, '--project-root', options.cwd);
   if (options.configFile) {
     args.push('--config-file', options.configFile);

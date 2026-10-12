@@ -1,3 +1,4 @@
+import { denoChildConfigArgs } from '../../../../kernel/adapters/runtime/process/deno-child-config.ts';
 import { isProjectPath } from '../../../../kernel/adapters/service/generated-surface-inventory.ts';
 export { isProjectPath } from '../../../../kernel/adapters/service/generated-surface-inventory.ts';
 import { join } from '@std/path';
@@ -118,8 +119,7 @@ export async function renderRuntimeRegistryPlan(
     : join(resolved.generatorBase, generator.command);
   const result = await process.exec('deno', [
     'run',
-    '--config',
-    join(projectRoot, 'deno.json'),
+    ...await denoChildConfigArgs(join(projectRoot, 'deno.json')),
     '--node-modules-dir=none',
     '--no-prompt',
     '--allow-read',

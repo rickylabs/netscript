@@ -1,3 +1,4 @@
+import { denoChildConfigArgs } from '../../../../kernel/adapters/runtime/process/deno-child-config.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import { basename, dirname, isAbsolute, join, relative, resolve } from '@std/path';
@@ -225,8 +226,7 @@ async function inspectRuntimeRegistrySources(options: {
   try {
     result = await options.dependencies.process.exec('deno', [
       'run',
-      '--config',
-      join(options.projectRoot, 'deno.json'),
+      ...await denoChildConfigArgs(join(options.projectRoot, 'deno.json')),
       '--allow-read',
       resolveGeneratorUrl(options.generatorBase, options.generator.command),
       '--project-root',
@@ -387,8 +387,7 @@ async function runGenerator(options: {
   try {
     const result = await options.dependencies.process.exec('deno', [
       'run',
-      '--config',
-      join(options.projectRoot, 'deno.json'),
+      ...await denoChildConfigArgs(join(options.projectRoot, 'deno.json')),
       '--allow-read',
       '--allow-write',
       resolveGeneratorUrl(options.generatorBase, options.generator.command),
