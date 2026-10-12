@@ -56,7 +56,7 @@ for (const forceFallback of [false, true]) {
         const pipeline = client.pipeline.bind(client);
         return stub(client, 'pipeline', (...args: Parameters<typeof pipeline>) => {
           const batch = pipeline(...args);
-          evalCalls.push(spy(batch, 'eval'));
+          evalCalls.push(spy(batch, 'evalsha'));
           return batch;
         });
       });
@@ -132,46 +132,63 @@ for (const forceFallback of [false, true]) {
   });
 }
 
-Deno.test({
-  name: 'RedisAdapter bounds promotion batches and preserves future entries and recorded routing',
-  ignore: !redisUrl,
-  async fn() {
-    assert(redisUrl);
-    const { clients, queues, readyKey, delayedKey, processingKey } = createHarness(
-      redisUrl,
-      `delayed-batch-${crypto.randomUUID()}`,
-      1,
-    );
-    const targetKey = `${readyKey}:recorded-target`;
-    const client = clients[0];
-    const queue = queues[0];
-    const expected = Array.from(
-      { length: 257 },
-      (_, id) =>
-        JSON.stringify({ queueKey: targetKey, envelope: JSON.stringify(createEnvelope({ id })) }),
-    );
-    const future = JSON.stringify({ queueKey: targetKey, envelope: 'future-envelope' });
-    try {
-      await client.zadd(delayedKey, ...expected.flatMap((entry) => [0, entry]));
-      await client.zadd(delayedKey, Date.now() + 60_000, future);
-      const pass = queue['moveDueDelayedMessages']();
-      assertEquals(queue['moveDueDelayedMessages'](), pass, 'overlapping polls share WATCH state');
-      await pass;
-      assertEquals(await client.llen(targetKey), 100);
-      assertEquals(await client.zcard(delayedKey), 158);
-      await queue['moveDueDelayedMessages']();
-      assertEquals(await client.llen(targetKey), 200);
-      await queue['moveDueDelayedMessages']();
-      await queue['moveDueDelayedMessages']();
-      assertEquals(await client.llen(targetKey), 257);
-      assertEquals(await client.zrange(delayedKey, 0, -1), [future]);
-      assertEquals(await client.llen(readyKey), 0, 'route comes from parsed entry');
-    } finally {
-      await client.del(readyKey, delayedKey, processingKey, targetKey);
-      client.disconnect();
-    }
-  },
-});
+for (const forceFallback of [false, true]) {
+  Deno.test({
+    name: `RedisAdapter drains bounded backlogs in one pass and preserves future routing (${
+      forceFallback ? 'transaction' : 'detected backend'
+    })`,
+    ignore: !redisUrl,
+    async fn() {
+      assert(redisUrl);
+      const { clients, queues, readyKey, delayedKey, processingKey } = createHarness(
+        redisUrl,
+        `delayed-batch-${crypto.randomUUID()}`,
+        1,
+      );
+      const targetKey = `${readyKey}:recorded-target`;
+      const client = clients[0];
+      const queue = queues[0];
+      using _capability = forceFallback ? forceTransactionPromotion(client) : undefined;
+      const future = JSON.stringify({ queueKey: targetKey, envelope: 'future-envelope' });
+      const entries = (count: number, offset = 0) =>
+        Array.from(
+          { length: count },
+          (_, id) =>
+            JSON.stringify({
+              queueKey: targetKey,
+              envelope: JSON.stringify(createEnvelope({ id: id + offset })),
+            }),
+        );
+      try {
+        const backlog = entries(257);
+        await client.zadd(delayedKey, ...backlog.flatMap((entry) => [0, entry]));
+        await client.zadd(delayedKey, Date.now() + 60_000, future);
+        const pass = queue['moveDueDelayedMessages']();
+        assertEquals(queue['moveDueDelayedMessages'](), pass, 'overlapping polls share a pass');
+        await pass;
+        assertEquals(await client.llen(targetKey), 257, 'all three batches drain within one pass');
+        assertEquals(await client.zrange(delayedKey, 0, -1), [future]);
+
+        const capped = entries(1_057, 257);
+        await client.zadd(delayedKey, ...capped.flatMap((entry) => [0, entry]));
+        await queue['moveDueDelayedMessages']();
+        assertEquals(
+          await client.llen(targetKey),
+          1_257,
+          'one pass promotes at most ten full batches',
+        );
+        assertEquals(await client.zcard(delayedKey), 58);
+        await queue['moveDueDelayedMessages']();
+        assertEquals(await client.llen(targetKey), 1_314);
+        assertEquals(await client.zrange(delayedKey, 0, -1), [future]);
+        assertEquals(await client.llen(readyKey), 0, 'target comes from the parsed entry');
+      } finally {
+        await client.del(readyKey, delayedKey, processingKey, targetKey);
+        client.disconnect();
+      }
+    },
+  });
+}
 
 Deno.test({
   name: 'RedisAdapter clears WATCH and allows a subsequent pass after invalid JSON',

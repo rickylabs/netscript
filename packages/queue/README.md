@@ -122,10 +122,11 @@ the pre-release line, as above).
 Redis delayed-message promotion is at most once across listeners sharing a delayed key. The adapter
 opens its dedicated promotion connection lazily and caches Lua support once per client (transport
 failures leave capability undetermined). With scripting available, each due member is removed and
-pushed atomically by `EVAL`; only a successful `ZREM` can push its recorded envelope. `redis.pcall`
-catches a failed `LPUSH` and restores the member at its original score inside the same script.
-Immediate ready-list enqueues/dequeues cannot abort this path. Both keys are passed explicitly as
-`KEYS`, and envelope bytes/routing are unchanged.
+pushed atomically by Lua; only a successful `ZREM` can push its recorded envelope. The script is
+loaded once and batches send `EVALSHA`, reloading/retrying once on `NOSCRIPT`. `redis.pcall` catches
+a failed `LPUSH` and restores the member at its original score inside the same script. Immediate
+ready-list enqueues/dequeues cannot abort this path. Both keys are passed explicitly as `KEYS`, and
+envelope bytes/routing are unchanged.
 
 Servers without scripting, including Garnet with Lua disabled, use `WATCH`/`MULTI`/`EXEC`. Only the
 delayed set is watched; hot ready lists are type-checked in a pipelined preflight without WATCH.
@@ -134,15 +135,19 @@ race where a target is changed to a non-list after preflight: Redis does not rol
 race can lose the member. Queue keys must stay absent or lists while consumers operate. A connection
 epoch counts close/end/ready events; a changed epoch abandons the snapshot before MULTI so a
 reconnect cannot commit it without WATCH. Delayed-set writes can still abort this path: each poll
-has three total attempts with 1–5 ms jitter, then defers to the next 1 s poll. Continuous delayed
-writes therefore have no fixed promotion-latency bound.
+has three attempts per batch with 1–5 ms jitter, then defers to the next 1 s poll. Continuous
+delayed writes therefore have no fixed promotion-latency bound.
 
-Both paths read at most 100 due members per attempt. There is no poison-member skip/quarantine: 100
-retained wrongly typed targets can block valid members behind them, and invalid JSON halts its
-batch. Repair those keys/members to resume progress. Handler retries still require idempotency.
-Timer failures are caught. Shutdown disconnects all clients before awaiting the active promotion
-pass, rejecting offline commands so a Redis outage cannot keep stop waiting for reconnection; an
-abandoned server-side operation either committed atomically or wrote nothing.
+Both paths read at most 100 due members per attempt and continue while a full batch is promoted, up
+to ten batches (1,000 members) per pass. Larger backlogs continue on the next 1 s poll; no batch
+allocates or reads the whole backlog. There is no poison-member skip/quarantine: 100 retained
+wrongly typed targets can block valid members behind them, and invalid JSON halts its batch. Repair
+those keys/members to resume progress. Handler retries still require idempotency. The promotion
+client disables the offline queue: best-effort polls fail fast and quietly while connecting or
+reconnecting. Unexpected pass failures are logged once, and timer rejections are caught. Shutdown
+disconnects all clients and races the active pass against its manual-disconnect signal, abandoning
+unresolved work even when ioredis emits no close event. A manually closed client never reconnects;
+abandoned server-side operations either committed atomically or wrote nothing.
 
 The existing `netscript:queue:<name>`, `netscript:processing:<name>`, and `netscript:delayed:<name>`
 key layout is unchanged and targets single-node Redis-compatible servers. Redis Cluster is outside

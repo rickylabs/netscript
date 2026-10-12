@@ -1,82 +1,74 @@
 import { assert, assertEquals } from '@std/assert';
 import { deadline } from '@std/async';
 import { stub } from '@std/testing/mock';
-import { EventEmitter } from 'node:events';
 import { Redis } from 'ioredis';
 import { RedisAdapter } from '../adapters/redis.adapter.ts';
 import { forceTransactionPromotion } from './_fixtures/redis-promotion-capability.ts';
 
-class OfflinePromotionClient extends EventEmitter {
-  status = 'ready';
-  readonly started = Promise.withResolvers<void>();
-  readonly pending = Promise.withResolvers<never>();
-  constructor(private readonly scripting: boolean) {
-    super();
-  }
-  eval(): Promise<number> {
-    return this.scripting
-      ? Promise.resolve(1)
-      : Promise.reject(new Error('ERR unknown command EVAL'));
-  }
-  zrangebyscore(): Promise<string[]> {
-    return Promise.resolve([JSON.stringify({
-      queueKey: 'netscript:queue:default',
-      envelope: 'offline-envelope',
-    })]);
-  }
-  pipeline() {
-    const started = this.started;
-    const pending = this.pending;
-    return {
-      eval() {
-        return this;
-      },
-      exec(): Promise<never> {
-        started.resolve();
-        return pending.promise;
-      },
-    };
-  }
-  watch(): Promise<never> {
-    this.started.resolve();
-    return this.pending.promise;
-  }
-  unwatch(): Promise<never> {
-    throw new Error('Disconnected cleanup must not queue another offline command');
-  }
-  disconnect(): void {
-    this.status = 'end';
-    this.emit('close');
-    this.emit('end');
-    this.pending.reject(new Error('Connection is closed'));
-  }
-}
-
-for (const scripting of [false, true]) {
-  Deno.test(`RedisAdapter stop cancels an offline ${scripting ? 'EVAL' : 'WATCH'} without awaiting reconnect`, async () => {
-    const queue = new RedisAdapter('redis://example');
-    const client = new OfflinePromotionClient(scripting);
-    Object.defineProperty(queue, 'promotionClient', { value: client, writable: true });
+for (const state of ['connecting', 'reconnecting', 'reconnecting-with-queued-command'] as const) {
+  Deno.test(`RedisAdapter stop bounds real ioredis on a refused port (${state})`, async () => {
+    const refused = Deno.listen({ hostname: '127.0.0.1', port: 0 });
+    const port = (refused.addr as Deno.NetAddr).port;
+    refused.close();
+    const queue = new RedisAdapter(`redis://127.0.0.1:${port}`);
     const errors: unknown[][] = [];
     using _log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
-    const pass = queue['moveDueDelayedMessages']().catch((error: unknown) => error);
-    await client.started.promise;
-    const stopped = queue.stop();
+    let unhandled = 0;
+    const observeUnhandled = () => unhandled++;
+    globalThis.addEventListener('unhandledrejection', observeUnhandled);
+    let tick: () => void = () => {};
+    const setInterval = globalThis.setInterval.bind(globalThis);
+    using _interval = stub(globalThis, 'setInterval', (callback) => {
+      assert(typeof callback === 'function');
+      tick = () => callback();
+      return setInterval(() => {}, 60_000);
+    });
+    const client = queue['ensurePromotionClient']();
+    assertEquals(client.options.enableOfflineQueue, false);
     try {
-      // This is a failure deadline, not a polling wait. The command only rejects
-      // when stop disconnects; waiting first reproduces the reviewed outage hang.
-      await deadline(stopped, 1_000);
-      const error = await pass;
-      assert(error instanceof Error);
-      assertEquals(error.message, 'Connection is closed');
-      assertEquals(errors, []);
-      assertEquals(client.status, 'end');
-      assertEquals(client.listenerCount('ready'), 0);
+      if (state !== 'connecting') {
+        await deadline(
+          new Promise<void>((resolve) => client.once('reconnecting', () => resolve())),
+          1_000,
+        );
+        assertEquals(client.status, 'reconnecting');
+      } else {
+        // No yield: exercise the 0 ms connection state.
+        assertEquals(client.status, 'connecting');
+      }
+      if (state === 'reconnecting-with-queued-command') {
+        // Reproduce the old configuration with REAL ioredis: disconnect clears
+        // retry scheduling but neither rejects this command nor emits close.
+        // The adapter must abandon it via its manual-disconnect signal.
+        client.options.enableOfflineQueue = true;
+      }
+      queue['startDelayedProcessor']();
+      tick();
+      const pass = queue['delayedPromotion'];
+      assert(pass);
+      assertEquals(
+        client['offlineQueue'].length,
+        state === 'reconnecting-with-queued-command' ? 1 : 0,
+      );
+      await deadline(queue.stop(), 1_000);
+      await deadline(pass, 1_000);
+      assertEquals(unhandled, 0);
+      assertEquals(errors, [], 'connection refusal and offline polls must stay quiet');
+      assertEquals(client['reconnectTimeout'], null);
+      assertEquals(queue['delayedPromotion'], undefined);
       assertEquals(queue['promotionClient'], undefined);
+      if (state === 'reconnecting-with-queued-command') {
+        assertEquals(client.status, 'reconnecting');
+        assertEquals(
+          client['offlineQueue'].length,
+          1,
+          'real disconnect did not settle the queued command',
+        );
+      }
     } finally {
       client.disconnect();
-      await pass;
-      await stopped;
+      await queue.stop();
+      globalThis.removeEventListener('unhandledrejection', observeUnhandled);
     }
   });
 }
@@ -236,3 +228,62 @@ for (const forceFallback of [false, true]) {
     },
   });
 }
+
+Deno.test({
+  name: 'RedisAdapter caches the promotion SHA and retries NOSCRIPT without duplicate insertion',
+  ignore: !redisUrl,
+  async fn() {
+    assert(redisUrl);
+    const client = new Redis(redisUrl, { lazyConnect: true, enableReadyCheck: false });
+    const queue = new RedisAdapter(redisUrl, `delayed-sha-${crypto.randomUUID()}`);
+    Object.defineProperty(queue, 'promotionClient', { value: client, writable: true });
+    // A real Garnet without scripting exercises the fallback in the other tests.
+    const supportsLua = await client.eval('return 1', 0).then(() => true, () => false);
+    if (!supportsLua) {
+      client.disconnect();
+      return;
+    }
+    const delayedKey = queue['delayedKey'];
+    const readyKey = queue['queueKey'];
+    const script = client.script.bind(client);
+    let loads = 0;
+    using _script = stub(client, 'script', (...args: Parameters<typeof script>) => {
+      loads++;
+      return script(...args);
+    });
+    const pipeline = client.pipeline.bind(client);
+    const execStubs: Array<{ restore(): void }> = [];
+    let evicted = false;
+    using _pipeline = stub(client, 'pipeline', (...args: Parameters<typeof pipeline>) => {
+      const batch = pipeline(...args);
+      const exec = batch.exec.bind(batch);
+      execStubs.push(stub(batch, 'exec', () => {
+        if (!evicted) {
+          evicted = true;
+          // Model NOSCRIPT for an unexecuted command without globally flushing
+          // the shared real backend's script cache during parallel test runs.
+          return Promise.resolve([[new Error('NOSCRIPT No matching script'), null]]);
+        }
+        return exec();
+      }));
+      return batch;
+    });
+    try {
+      const entries = ['first', 'second'].map((envelope) =>
+        JSON.stringify({ queueKey: readyKey, envelope })
+      );
+      await client.zadd(delayedKey, 0, entries[0]);
+      await queue['moveDueDelayedMessages']();
+      assertEquals(loads, 2, 'initial load and one NOSCRIPT reload');
+      await client.zadd(delayedKey, 0, entries[1]);
+      await queue['moveDueDelayedMessages']();
+      assertEquals(loads, 2, 'a later pass reuses the loaded SHA');
+      assertEquals(await client.lrange(readyKey, 0, -1), ['second', 'first']);
+      assertEquals(await client.zcard(delayedKey), 0);
+    } finally {
+      execStubs.forEach((execStub) => execStub.restore());
+      await client.del(readyKey, delayedKey);
+      client.disconnect();
+    }
+  },
+});

@@ -1,10 +1,13 @@
 import type { Redis } from 'ioredis';
 import { tryPromoteDelayedBatch } from './_redis-delayed-promotion.ts';
-import { promoteDelayedScriptBatch } from './_redis-delayed-script.ts';
+import { RedisDelayedScript } from './_redis-delayed-script.ts';
 
 /** Promotion capabilities and connection generation owned by one dedicated client. */
 export class RedisDelayedPromotion {
   #epoch = 0;
+  #stopped = false;
+  readonly #disconnected = Promise.withResolvers<void>();
+  readonly #script: RedisDelayedScript;
   #scripting?: Promise<boolean>;
   readonly #advanceEpoch = (): void => {
     this.#epoch++;
@@ -15,12 +18,13 @@ export class RedisDelayedPromotion {
     private readonly client: Redis,
     private readonly reportError: (error: unknown) => void,
   ) {
+    this.#script = new RedisDelayedScript(client);
     for (const event of ['close', 'end', 'ready']) client.on(event, this.#advanceEpoch);
   }
 
   /** Use cached Lua support, or retry a watched batch on a stable connection. */
-  async promote(delayedKey: string): Promise<boolean> {
-    if (this.client.status === 'end') throw new Error('Connection is closed');
+  async promote(delayedKey: string): Promise<number | null> {
+    if (this.#stopped || this.client.status === 'end') throw new Error('Connection is closed');
     const scripting = await (this.#scripting ??= this.detectScripting().catch((error: unknown) => {
       // A failed connection is not a capability result. Retry only failed probes;
       // a successful supported/unsupported determination is cached for this client.
@@ -28,8 +32,7 @@ export class RedisDelayedPromotion {
       throw error;
     }));
     if (scripting) {
-      await promoteDelayedScriptBatch(this.client, delayedKey);
-      return true;
+      return await this.#script.promote(delayedKey);
     }
     return await tryPromoteDelayedBatch(
       this.client,
@@ -39,7 +42,22 @@ export class RedisDelayedPromotion {
     );
   }
 
-  /** Remove epoch listeners once the disconnected client's pass has settled. */
+  /** Signal manual disconnect even when ioredis emits no close/end event. */
+  get disconnected(): Promise<void> {
+    return this.#disconnected.promise;
+  }
+
+  /** Permanently close the client and release drains independently of pending commands. */
+  disconnect(): void {
+    this.#stopped = true;
+    try {
+      this.client.disconnect();
+    } finally {
+      this.#disconnected.resolve();
+    }
+  }
+
+  /** Remove epoch listeners after the client is manually disconnected. */
   dispose(): void {
     for (const event of ['close', 'end', 'ready']) {
       this.client.off(event, this.#advanceEpoch);

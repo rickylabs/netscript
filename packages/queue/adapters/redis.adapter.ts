@@ -25,6 +25,7 @@ import {
 } from './_envelope.ts';
 import { RedisDeadLetterStore } from './redis-dead-letter-store.ts';
 import { RedisDelayedPromotion } from './_redis-delayed-runtime.ts';
+import { DELAYED_PROMOTION_BATCH_SIZE } from './_redis-delayed-promotion.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
@@ -42,6 +43,7 @@ function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, 
 const DEFAULT_BLOCK_TIMEOUT_SECONDS = 1;
 const DEFAULT_DELAYED_POLL_MS = 1_000;
 const DELAYED_PROMOTION_ATTEMPTS = 3;
+const DELAYED_PROMOTION_BATCHES_PER_PASS = 10;
 const DELAYED_PROMOTION_JITTER_MS = 5;
 
 interface RedisQueueClients {
@@ -212,8 +214,14 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     this.stopDelayedProcessor();
     this.clients?.blocking.disconnect();
     this.clients?.commands.disconnect();
-    this.promotionClient?.disconnect();
-    await this.delayedPromotion?.catch((error: unknown) => this.reportPromotionError(error));
+    if (this.promotionRuntime) this.promotionRuntime.disconnect();
+    else this.promotionClient?.disconnect();
+    // ioredis need not reject queued work or emit close when already reconnecting.
+    // Manual disconnect prevents future execution, so its signal bounds the drain.
+    await Promise.race([
+      this.delayedPromotion?.catch(() => {}),
+      this.promotionRuntime?.disconnected ?? Promise.resolve(),
+    ]);
     this.promotionRuntime?.dispose();
     this.promotionRuntime = undefined;
     this.promotionClient = undefined;
@@ -325,9 +333,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     this.delayedTimer = setInterval(
       () => {
         if (this.delayedPromotion) return;
-        void this.moveDueDelayedMessages().catch((error: unknown) =>
-          this.reportPromotionError(error)
-        );
+        void this.moveDueDelayedMessages().catch(() => {});
       },
       DEFAULT_DELAYED_POLL_MS,
     );
@@ -350,9 +356,16 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   private moveDueDelayedMessages(): Promise<void> {
     // WATCH state is connection-local: overlapping polls must share this pass.
     if (!this.delayedPromotion) {
-      this.delayedPromotion = this.promoteDelayedBatch().finally(() => {
-        this.delayedPromotion = undefined;
+      const promotion = this.promoteDelayedBatch().catch((error: unknown) => {
+        this.reportPromotionError(error);
+        throw error;
       });
+      const disconnected = this.promotionRuntime?.disconnected;
+      const active = disconnected ? Promise.race([promotion, disconnected]) : promotion;
+      const pass = active.finally(() => {
+        if (this.delayedPromotion === pass) this.delayedPromotion = undefined;
+      });
+      this.delayedPromotion = pass;
     }
     return this.delayedPromotion;
   }
@@ -363,22 +376,34 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
       this.ensurePromotionClient(),
       (error) => this.reportPromotionError(error),
     );
-    for (let attempt = 0; attempt < DELAYED_PROMOTION_ATTEMPTS; attempt++) {
-      if (await runtime.promote(this.delayedKey)) return;
-      if (attempt + 1 < DELAYED_PROMOTION_ATTEMPTS) {
-        await delay(1 + Math.floor(Math.random() * DELAYED_PROMOTION_JITTER_MS));
+    for (let batch = 0; batch < DELAYED_PROMOTION_BATCHES_PER_PASS; batch++) {
+      let promoted: number | null = null;
+      for (let attempt = 0; attempt < DELAYED_PROMOTION_ATTEMPTS; attempt++) {
+        promoted = await runtime.promote(this.delayedKey);
+        if (promoted !== null) break;
+        if (attempt + 1 < DELAYED_PROMOTION_ATTEMPTS) {
+          await delay(1 + Math.floor(Math.random() * DELAYED_PROMOTION_JITTER_MS));
+        }
       }
+      if (promoted !== DELAYED_PROMOTION_BATCH_SIZE) return;
     }
   }
 
   /** Create the dedicated WATCH connection only when promotion first runs. */
   private ensurePromotionClient(): Redis {
-    return this.promotionClient ??= new Redis(this.url, getRedisOptions(this.options));
+    if (!this.promotionClient) {
+      this.promotionClient = new Redis(this.url, {
+        ...getRedisOptions(this.options),
+        enableOfflineQueue: false,
+      });
+      this.promotionClient.on('error', (error: unknown) => this.reportPromotionError(error));
+    }
+    return this.promotionClient;
   }
 
   /** Report promotion errors without turning background or shutdown work into a rejection. */
   private reportPromotionError(error: unknown): void {
-    if (!isExpectedStopError(error)) {
+    if (!isExpectedPromotionError(error)) {
       console.error('[RedisAdapter] Delayed promotion failed:', error);
     }
   }
@@ -457,4 +482,10 @@ function isExpectedStopError(error: unknown): boolean {
   return error.name === 'AbortError' ||
     error.message.includes('Connection is closed') ||
     error.message.includes('Connection is disconnected');
+}
+
+function isExpectedPromotionError(error: unknown): boolean {
+  return isExpectedStopError(error) || error instanceof Error &&
+      /enableOfflineQueue options is false|ECONNREFUSED|ECONNRESET|ETIMEDOUT|EHOSTUNREACH|ENETUNREACH/
+        .test(error.message);
 }

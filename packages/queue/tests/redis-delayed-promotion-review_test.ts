@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
 import { stub } from '@std/testing/mock';
+import { deadline } from '@std/async';
 import { Redis } from 'ioredis';
 import { RedisAdapter } from '../adapters/redis.adapter.ts';
 import { forceTransactionPromotion } from './_fixtures/redis-promotion-capability.ts';
@@ -126,8 +127,15 @@ Deno.test({
       await queue.enqueue('producer-message');
       assertEquals(Object.keys(queue['ensureClients']()).sort(), ['blocking', 'commands']);
       assertEquals(queue['promotionClient'], undefined);
+      const first = queue['moveDueDelayedMessages']().catch((error: unknown) => error);
+      const promotion = queue['promotionClient'];
+      assert(promotion instanceof Redis);
+      await deadline(
+        new Promise<void>((resolve) => promotion.once('ready', () => resolve())),
+        1_000,
+      );
+      await first; // The best-effort initial poll may fail before the client is ready.
       await queue['moveDueDelayedMessages']();
-      assert(queue['promotionClient'] instanceof Redis);
       await queue.stop();
       assertEquals(queue['promotionClient'], undefined);
     } finally {
@@ -162,7 +170,7 @@ Deno.test('RedisAdapter preserves the primary failure when UNWATCH also fails', 
 
 for (const outcome of ['successful', 'failing', 'expected-stop'] as const) {
   const fails = outcome !== 'successful';
-  Deno.test(`RedisAdapter timer stop drains an in-flight ${outcome} pass without unhandled rejection`, async () => {
+  Deno.test(`RedisAdapter timer stop handles an in-flight ${outcome} pass without unhandled rejection`, async () => {
     const queue = new RedisAdapter('redis://example');
     const started = Promise.withResolvers<void>();
     const release = Promise.withResolvers<void>();
@@ -217,7 +225,9 @@ for (const outcome of ['successful', 'failing', 'expected-stop'] as const) {
       assertEquals(queue['delayedPromotion'], undefined);
       assertEquals(queue['delayedTimer'], undefined);
       assertEquals(errors.some((args) => args.includes(primary)), outcome === 'failing');
-      if (outcome === 'failing') assertEquals(errors.length, 2, 'one timer and one stop observer');
+      if (outcome === 'failing') {
+        assertEquals(errors.length, 1, 'one shared pass owns error reporting');
+      }
     } finally {
       release.resolve();
       await queue.stop();
