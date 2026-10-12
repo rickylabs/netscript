@@ -118,6 +118,11 @@ current-state watch, not a durable mutation log. Omitting `initial` preserves th
 behavior. Prefix watches retain their separate `skipInitial` and discovery semantics; `initial`
 applies only to fixed-key watches.
 
+The kvdex bridge applies the snapshot directly. For change batches it suppresses equal stamps, then
+reads the distinct affected keys once (using the adapter's batch read when available) and applies
+their stored values. It emits a frame only when the stored state changes; neither stamp order nor
+publication order decides which write wins.
+
 First-party watch handles also expose an optional `ready` promise. Subscriptions start lazily:
 request the first batch before awaiting `ready`. It resolves on Redis SUBSCRIBE acknowledgement,
 listener registration in memory, or the first native Deno KV frame. Startup failures reject both

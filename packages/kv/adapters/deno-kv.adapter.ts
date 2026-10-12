@@ -317,7 +317,7 @@ export class DenoKvAdapter implements WatchableKv {
       }
     } finally {
       options?.signal?.removeEventListener('abort', cancel);
-      await reader.cancel();
+      await reader.cancel().catch(() => {});
       reader.releaseLock();
     }
   }

@@ -11,7 +11,7 @@
 
 import { generateVersionstamp, keyToString } from '../application/keys.ts';
 import type { WatchableKv } from '../types/watchable-kv.ts';
-import type { AtomicCheck, KvKey, KvListOptions } from '../types/common.ts';
+import type { AtomicCheck, KvKey, KvListOptions, WatchEvent } from '../types/common.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
 
 // ---------------------------------------------------------------------------
@@ -548,6 +548,12 @@ export class WatchableKvBridge {
    * Watch keys for changes. Returns a `ReadableStream<DenoKvEntryMaybe[]>`
    * that emits the current values whenever any watched key changes.
    *
+   * The acknowledged snapshot is applied directly. Change batches suppress
+   * exact-equal stamps and read only their distinct affected keys, using the
+   * adapter's batch read when available. Stored values determine the frame;
+   * versionstamps and publication order never determine write order. Batches
+   * whose stored state is unchanged do not produce a frame.
+   *
    * kvdex's `createWatcher` reads from this stream via `.getReader()`.
    */
   watch<T = unknown>(
@@ -579,36 +585,52 @@ export class WatchableKvBridge {
               return;
             }
             let changed = false;
+            const affected = new Map<string, WatchEvent<T>>();
             for (const event of events) {
               const key = keyToString(event.key);
-              const version = versions.get(key);
-              if (event.versionstamp !== null && event.versionstamp === version) continue;
-              if (
-                event.versionstamp !== null && version !== undefined && event.versionstamp < version
-              ) {
-                // Redis writers stamp independently. A lower stamp may be a
-                // replay or a later cross-process write: read only this key.
-                const entry = await kv.get<T>(event.key);
-                if (ended) return;
-                const current = state.get(key);
-                if (current && current.versionstamp === (entry?.versionstamp ?? null)) continue;
-                if (entry?.versionstamp !== null && entry?.versionstamp !== undefined) {
-                  versions.set(key, entry.versionstamp);
-                }
-                state.set(key, {
-                  key: event.key as DenoKvStrictKey,
-                  value: entry?.value ?? null,
-                  versionstamp: entry?.versionstamp ?? null,
-                } as DenoKvEntryMaybe<T>);
-              } else {
-                if (event.versionstamp !== null) versions.set(key, event.versionstamp);
+              if (event.initial) {
+                // Subscription has already been acknowledged. Apply the
+                // snapshot itself; reading again would move its boundary.
                 state.set(key, {
                   key: event.key as DenoKvStrictKey,
                   value: event.value,
                   versionstamp: event.type === 'delete' ? null : event.versionstamp,
                 } as DenoKvEntryMaybe<T>);
+                if (event.versionstamp !== null) versions.set(key, event.versionstamp);
+                changed = true;
+              } else if (event.versionstamp === null || event.versionstamp !== versions.get(key)) {
+                affected.set(key, event);
               }
-              changed = true;
+            }
+            if (affected.size > 0) {
+              // Neither Redis ULID order nor publication order is commit
+              // order. Read each distinct affected key once, as one batch
+              // when the adapter supports it; never apply change payloads.
+              const changes = [...affected.values()];
+              const changedKeys = changes.map((event) => event.key);
+              const entries = kv.getMany
+                ? await kv.getMany<T>(changedKeys)
+                : await Promise.all(changedKeys.map((key) => kv.get<T>(key)));
+              if (ended) return;
+              for (let index = 0; index < changes.length; index++) {
+                const event = changes[index];
+                const key = keyToString(event.key);
+                const entry = entries[index];
+                const versionstamp = entry?.versionstamp ?? null;
+                // Retain a delete's equality token even though kvdex's absent
+                // entry must expose null. Present entries use stored stamps.
+                const duplicateStamp = versionstamp ?? event.versionstamp;
+                if (duplicateStamp !== null) versions.set(key, duplicateStamp);
+                else versions.delete(key);
+                const current = state.get(key);
+                if (current && current.versionstamp === versionstamp) continue;
+                state.set(key, {
+                  key: event.key as DenoKvStrictKey,
+                  value: entry?.value ?? null,
+                  versionstamp,
+                } as DenoKvEntryMaybe<T>);
+                changed = true;
+              }
             }
             if (!changed) continue;
             controller.enqueue(

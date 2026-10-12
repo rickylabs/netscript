@@ -89,6 +89,10 @@ appear twice, so dedupe by equal versionstamp. Redis writers stamp independently
 versionstamps to order writes across processes. Deno KV still coalesces native watch updates.
 Without `initial`, the existing backend behavior is preserved.
 
+The kvdex bridge applies the snapshot directly, suppresses equal-stamp changes, and re-reads each
+change batch's distinct affected keys using a batch read when available. Frames reflect stored
+state, not event payload or stamp order; unchanged state produces no frame.
+
 First-party handles provide an optional `ready` promise. Start iteration before awaiting it;
 subscriptions are lazy. Redis resolves it on SUBSCRIBE acknowledgement, memory on listener
 registration, and Deno KV on the first native frame. Startup failure or abort before readiness
@@ -160,6 +164,10 @@ the write that produced them and deliver values unchanged, that a change receive
 the consumer is between batches is delivered on the next request without waiting for a
 later write, that `debounce` never drops a queued change, and that aborting ends the stream
 promptly, even inside a debounce window.
+
+Default watch scenarios always run, including on adapters without optional readiness or snapshots.
+The harness uses `ready` when exposed and preserves its legacy startup allowance otherwise. Declare
+snapshot support with harness `initial: true` to add snapshot delivery scenarios.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |

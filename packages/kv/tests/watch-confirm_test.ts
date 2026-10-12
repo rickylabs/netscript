@@ -22,7 +22,7 @@ Deno.test('watch confirm: a later cross-process write with a lower ULID is recon
   let reads = 0;
   const get = stub(kv, 'get', async function <T>(requested: KvKey) {
     reads++;
-    assertEquals(requested, key, 'only the ambiguous key is read');
+    assertEquals(requested, key, 'only the affected key is read');
     const entry = await originalGet<T>(requested);
     return entry ? { ...entry, versionstamp } : null;
   });
@@ -58,7 +58,7 @@ Deno.test('watch confirm: a later cross-process write with a lower ULID is recon
       frames.push(result.value[0].value);
     }
     assertEquals(frames, ['snapshot', 'A', 'B-latest']);
-    assertEquals(reads, 1);
+    assertEquals(reads, 2);
   } finally {
     await reader.cancel();
     get.restore();

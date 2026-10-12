@@ -21,7 +21,10 @@ export interface WatchableKvContractOptions {
   readonly make: () => WatchableKv | Promise<WatchableKv>;
   /** Skip every scenario, e.g. when the backing service is not configured. */
   readonly ignore?: boolean;
-  /** Test snapshot mode; defaults to change-only watches requiring `ready`. */
+  /**
+   * Declare snapshot support and add snapshot-mode delivery scenarios.
+   * Default change-only scenarios always run; omitted means no snapshot tests.
+   */
   readonly initial?: boolean;
 }
 
@@ -61,11 +64,7 @@ class WatchProbe {
       ...(initial ? { initial: true } : {}),
       signal: this.#controller.signal,
     });
-    this.#initialHandshake = !handle.ready;
-    assert(
-      handle.ready || initial,
-      'default-path contract requires readiness; use initial: true for snapshot-only adapters',
-    );
+    this.#initialHandshake = this.#initialRequested && !handle.ready;
     this.#ready = handle.ready;
     this.#iterator = handle[Symbol.asyncIterator]();
   }
@@ -99,7 +98,14 @@ class WatchProbe {
       return { batch: this.next() };
     }
     const batch = this.next();
-    await deadline(this.#ready!, DELIVERY_TIMEOUT_MS);
+    if (this.#ready) {
+      await deadline(this.#ready, DELIVERY_TIMEOUT_MS);
+    } else {
+      // Legacy adapters expose no acknowledgement seam. Preserve the public
+      // harness's original startup allowance instead of requiring an optional
+      // feature. Readiness-capable adapters never take this fallback.
+      await delay(DELIVERY_SETTLE_MS);
+    }
     return { batch };
   }
 
@@ -231,10 +237,12 @@ const abortEndsDebounceWindow: WatchScenario = {
  * while the consumer is between batches is delivered on the next request
  * without waiting for a later write; that `debounce` never drops a queued
  * change; and that aborting ends the stream promptly, even mid-debounce.
- * By default the harness opens one change-only handle and requires `ready`.
- * Set the harness option `initial: true` for snapshot-mode coverage or adapters
- * without readiness. Those adapters must honor the initial snapshot, which is
- * consumed before the change assertions. The abort scenario remains change-only.
+ * Default change-only scenarios always run. When a handle exposes `ready`, the
+ * harness awaits its acknowledgement; otherwise it preserves the legacy startup
+ * allowance. Neither optional readiness nor snapshot support is required.
+ * Declare snapshot support with the harness option `initial: true` to add
+ * snapshot-mode delivery scenarios. Their snapshot establishes readiness when
+ * no promise is exposed. The abort scenario remains change-only.
  *
  * @example
  * ```ts
@@ -249,17 +257,21 @@ const abortEndsDebounceWindow: WatchScenario = {
  * @param options - Adapter factory and display name.
  */
 export function runWatchableKvContract(options: WatchableKvContractOptions): void {
+  const delivery = [writeVersionstamp, valueFidelity, noHeldBackEvents, debounceKeepsQueuedEvents];
   registerScenarios(
     options,
-    [
-      writeVersionstamp,
-      valueFidelity,
-      noHeldBackEvents,
-      debounceKeepsQueuedEvents,
-      abortEndsDebounceWindow,
-    ].map((scenario) => ({
+    [...delivery, abortEndsDebounceWindow].map((scenario) => ({
       title: scenario.title,
-      run: (kv: WatchableKv) => scenario.run(kv, options.initial ?? false),
+      run: (kv: WatchableKv) => scenario.run(kv, false),
     })),
   );
+  if (options.initial) {
+    registerScenarios(
+      options,
+      delivery.map((scenario) => ({
+        title: `initial snapshot: ${scenario.title}`,
+        run: (kv: WatchableKv) => scenario.run(kv, true),
+      })),
+    );
+  }
 }
