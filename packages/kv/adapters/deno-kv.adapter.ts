@@ -253,6 +253,7 @@ export class DenoKvAdapter implements WatchableKv {
     return createWatchHandle((ready) => this.watchKeys<T>(keys, options, ready));
   }
 
+  /** Subscribe, acknowledge readiness, and deliver fixed-key batches. */
   private async *watchKeys<T>(
     keys: KvKey[],
     options: WatchOptions | undefined,
