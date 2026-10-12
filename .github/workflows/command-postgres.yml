@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.5'
+          deno-version: '2.9.7'
       - name: Install native PostgreSQL
         run: sudo apt-get update -qq && sudo apt-get install -y postgresql
       - name: Real generated-client PostgreSQL conformance

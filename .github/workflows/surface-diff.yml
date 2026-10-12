@@ -35,7 +35,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.5"
+          deno-version: "2.9.7"
 
       - name: Self-check the classifier
         run: >-
@@ -89,7 +89,7 @@ jobs:
         if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.5"
+          deno-version: "2.9.7"
 
       # Issue #309 remains open and explicitly owns the flip to enforcement.
       - name: Observe public API drift (non-blocking pending #309)

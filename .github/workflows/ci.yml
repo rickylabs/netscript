@@ -52,7 +52,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DENO_VERSION: '2.9.5'
+  DENO_VERSION: '2.9.7'
   CI_REDIS_IMAGE: redis:7-alpine@sha256:ca0acbb137c1dc3339c8b147a58fd6f42775d4599327b50e7b116c23de501af2
 
 jobs:

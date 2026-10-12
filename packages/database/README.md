@@ -198,7 +198,7 @@ the actual provider transaction for every side record. Table mappings match the 
 migration; explicit mapping changes require a reviewed adapter/bridge migration.
 
 `bash .llm/tools/command-postgres-conformance.sh` runs the native generated-client provider gate
-with an isolated temporary Unix socket. The dedicated CI workflow uses Deno 2.9.5. A suite skipped
+with an isolated temporary Unix socket. The dedicated CI workflow uses Deno 2.9.7. A suite skipped
 without provider configuration never certifies PostgreSQL support. No database credentials,
 connection addresses or operational evidence belong in the public run artifacts.
 
