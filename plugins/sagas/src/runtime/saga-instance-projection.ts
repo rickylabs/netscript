@@ -1,4 +1,10 @@
 import { loadSagaRetention } from './load-saga-retention.ts';
+import {
+  isSagaTransitionStore,
+  type SagaTransitionCommitRequest,
+  type SagaTransitionCommitResult,
+  type SagaTransitionStore,
+} from '@netscript/plugin-sagas-core/ports';
 import type {
   SagaCorrelationIndexEntry,
   SagaStorePort,
@@ -159,7 +165,46 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
   }
 }
 
-/** Store decorator that projects only after the engine transition ledger persists. */
+/**
+ * Decorate a store without hiding its atomic transition and replay capability.
+ * Projection failures propagate after commit, as on the legacy append path.
+ * An already-committed replay writes neither canonical rows nor a projection.
+ */
+export function createProjectingSagaStore(
+  delegate: SagaStorePort,
+  projection: SagaInstanceProjectionPort,
+): SagaStorePort {
+  const store = new ProjectingSagaStore(delegate, projection);
+  if (!isSagaTransitionStore(delegate)) return store;
+  const atomic: SagaTransitionStore = Object.assign(store, {
+    transitionCommitCapabilities: delegate.transitionCommitCapabilities,
+    async commitTransition(
+      request: SagaTransitionCommitRequest,
+      signal?: AbortSignal,
+    ): Promise<SagaTransitionCommitResult> {
+      const result = await delegate.commitTransition(request, signal);
+      if (result.committed) {
+        const envelope = await delegate.load(request.correlation.instanceId);
+        if (!envelope) {
+          throw new Error(
+            `Saga projection context is missing for instance ${request.correlation.instanceId}.`,
+          );
+        }
+        await projection.upsert({
+          sagaId: request.correlation.sagaId,
+          instanceId: request.correlation.instanceId,
+          correlationKey: request.correlation.correlationKey,
+          envelope,
+          transition: request.record,
+        });
+      }
+      return result;
+    },
+  });
+  return atomic;
+}
+
+/** Legacy store decorator; use createProjectingSagaStore to retain atomic capabilities. */
 export class ProjectingSagaStore implements SagaStorePort {
   /** Stable decorated-store identifier. */
   readonly id: string;

@@ -71,6 +71,7 @@ export type {
 } from './saga-history-store-port.ts';
 export type { SagaIdempotencyPort } from './saga-idempotency-port.ts';
 export type { SagaOutboxPort, SagaOutboxRecord } from './saga-outbox-port.ts';
+export { isSagaTransitionStore } from './saga-transition-commit-port.ts';
 export type {
   SagaTransitionCommitPort,
   SagaTransitionCommitRequest,

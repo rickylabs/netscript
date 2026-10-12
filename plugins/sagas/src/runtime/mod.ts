@@ -16,6 +16,7 @@ export {
   SagaQueueScheduler,
 } from './saga-delivery.ts';
 export {
+  createProjectingSagaStore,
   KvSagaInstanceProjection,
   PrismaSagaInstanceProjection,
   ProjectingSagaStore,
