@@ -76,10 +76,11 @@ Deno.test('projected atomic runtime commits worker intent and state together, th
   };
   let projected: SagaInstanceProjection | undefined;
   const projection = {
-    async upsert(value: SagaInstanceProjection): Promise<void> {
+    upsert(value: SagaInstanceProjection): Promise<void> {
       assertEquals(delegate.commandIntents().length, 1);
       assertEquals(delegate.transitions(value.envelope.metadata.instanceId).length, 1);
       projected = value;
+      return Promise.resolve();
     },
   };
   const job = defineJob('projection-job').payload(z.object({ documentId: z.string() })).entrypoint(
