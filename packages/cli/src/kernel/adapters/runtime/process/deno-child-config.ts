@@ -3,6 +3,8 @@ import { parse as parseJsonc } from '@std/jsonc';
 
 /** Resolution arguments and the consumer-owned lock for a source child. */
 export interface DenoChildConfig {
+  /** Child entrypoint; lockstep registry CLI URLs become local files in source mode. */
+  readonly specifier: string;
   /** Deno config/import-map arguments. */
   readonly configArgs: readonly string[];
   /** Explicit consumer lock arguments for normal generation; inspection supplies its frozen lock. */
@@ -19,12 +21,15 @@ export async function denoChildConfig(
   childSpecifier: string = moduleUrl,
 ): Promise<DenoChildConfig> {
   const sourceConfig = await sourceWorkspaceConfig(moduleUrl);
-  const childUrl = isAbsolute(childSpecifier)
-    ? toFileUrl(childSpecifier)
-    : new URL(childSpecifier, moduleUrl);
+  const localCli = sourceConfig
+    ? await sourceCliSpecifier(sourceConfig, childSpecifier)
+    : undefined;
+  const specifier = localCli ?? childSpecifier;
+  const childUrl = isAbsolute(specifier) ? toFileUrl(specifier) : new URL(specifier, moduleUrl);
   if (sourceConfig && childUrl.href.startsWith(new URL('.', toFileUrl(sourceConfig)).href)) {
     const consumer = projectConfig ? await consumerResolution(projectConfig) : undefined;
     return {
+      specifier,
       configArgs: [
         '--config',
         sourceConfig,
@@ -33,7 +38,11 @@ export async function denoChildConfig(
       consumerLockArgs: consumer?.lockArgs ?? [],
     };
   }
-  return { configArgs: projectConfig ? ['--config', projectConfig] : [], consumerLockArgs: [] };
+  return {
+    specifier,
+    configArgs: projectConfig ? ['--config', projectConfig] : [],
+    consumerLockArgs: [],
+  };
 }
 
 async function sourceWorkspaceConfig(
@@ -100,4 +109,30 @@ async function consumerResolution(projectConfig: string): Promise<{
         : []),
     ],
   };
+}
+
+async function sourceCliSpecifier(
+  rootConfig: string,
+  specifier: string,
+): Promise<string | undefined> {
+  const match = /^https:\/\/jsr\.io\/@netscript\/([a-z0-9-]+)\/([^/]+)\/cli\.ts$/.exec(specifier);
+  if (!match) return undefined;
+  const [, name, version] = match;
+  const root = dirname(rootConfig);
+  const candidates = [resolve(root, 'packages', name)];
+  if (name.startsWith('plugin-')) candidates.push(resolve(root, 'plugins', name.slice(7)));
+  for (const directory of candidates) {
+    try {
+      const manifest = parseJsonc(await Deno.readTextFile(resolve(directory, 'deno.json')));
+      if (!manifest || typeof manifest !== 'object') continue;
+      const cli = resolve(directory, 'cli.ts');
+      if (
+        Reflect.get(manifest, 'name') === `@netscript/${name}` &&
+        Reflect.get(manifest, 'version') === version && (await Deno.stat(cli)).isFile
+      ) return toFileUrl(cli).href;
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
+  }
+  return undefined;
 }

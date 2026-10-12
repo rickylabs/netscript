@@ -102,13 +102,15 @@ export async function dispatchPluginVerb(
   options: DispatchPluginVerbOptions,
 ): Promise<PluginDispatchResult> {
   const lockstepTarget = resolveLockstepPluginCliUrl(pkg);
-  const commandArgs = lockstepTarget
+  const childConfig = lockstepTarget
+    ? await denoChildConfig(join(options.projectRoot, 'deno.json'), import.meta.url, lockstepTarget)
+    : undefined;
+  const commandArgs = childConfig
     ? [
       'run',
-      '--config',
-      join(options.projectRoot, 'deno.json'),
+      ...childConfig.configArgs,
       '-A',
-      lockstepTarget,
+      childConfig.specifier,
       verb,
       ...args,
     ]

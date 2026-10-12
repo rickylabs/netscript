@@ -1,6 +1,6 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@^1';
-import { dirname, fromFileUrl, join, resolve } from '@std/path';
+import { dirname, fromFileUrl, join, resolve, toFileUrl } from '@std/path';
 
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
@@ -101,7 +101,7 @@ describe('plugin verb dispatch', () => {
     );
   });
 
-  it('runs an unversioned first-party plugin through the lockstep config and direct JSR target', async () => {
+  it('runs an unversioned first-party plugin through the source workspace config and local lockstep target', async () => {
     const processRunner = new RecordingProcess(0);
 
     await dispatchPluginVerb('doctor', '@netscript/plugin-ai', [], {
@@ -114,9 +114,11 @@ describe('plugin verb dispatch', () => {
       args: [
         'run',
         '--config',
+        repoPath('deno.json'),
+        '--import-map',
         '/workspace/app/deno.json',
         '-A',
-        `https://jsr.io/@netscript/plugin-ai/${NETSCRIPT_RELEASE_VERSION}/cli.ts`,
+        toFileUrl(repoPath('plugins/ai/cli.ts')).href,
         'doctor',
       ],
       cwd: '/workspace/app',
@@ -138,9 +140,11 @@ describe('plugin verb dispatch', () => {
       args: [
         'run',
         '--config',
+        repoPath('deno.json'),
+        '--import-map',
         '/workspace/app/deno.json',
         '-A',
-        `https://jsr.io/@netscript/plugin-workers/${NETSCRIPT_RELEASE_VERSION}/cli.ts`,
+        toFileUrl(repoPath('plugins/workers/cli.ts')).href,
         'sync',
         '--json',
       ],
@@ -156,8 +160,8 @@ describe('plugin verb dispatch', () => {
       `@netscript/plugin-ai@${EXPLICIT_NON_LOCKSTEP_VERSION}`,
       [],
       {
-      projectRoot: '/workspace/app',
-      processRunner,
+        projectRoot: '/workspace/app',
+        processRunner,
       },
     );
 

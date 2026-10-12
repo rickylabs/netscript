@@ -76,13 +76,28 @@ import { identity } from '@netscript/config/identity';
 import { value } from '@consumer/alias.ts';
 console.log(JSON.stringify({ source, identity, value, cwd: Deno.cwd() }));`,
     );
-    const run = async (configArgs: readonly string[]) =>
+    await Deno.writeTextFile(join(config, 'cli.ts'), 'console.log(import.meta.url);');
+    const run = async (configArgs: readonly string[], entrypoint = child) =>
       await new Deno.Command(Deno.execPath(), {
-        args: ['run', '--cached-only', '--no-lock', '--allow-read', ...configArgs, child],
+        args: ['run', '--cached-only', '--no-lock', '--allow-read', ...configArgs, entrypoint],
         cwd: consumer,
         stdout: 'piped',
         stderr: 'piped',
       }).output();
+    const cliUrl = `https://jsr.io/@netscript/config/${version}/cli.ts`;
+    const cliConfig = await denoChildConfig(projectConfig, toFileUrl(child).href, cliUrl);
+    const cliResult = await run(cliConfig.configArgs, cliConfig.specifier);
+    assertEquals(cliResult.code, 0, new TextDecoder().decode(cliResult.stderr));
+    assertEquals(
+      new TextDecoder().decode(cliResult.stdout).trim(),
+      toFileUrl(join(config, 'cli.ts')).href,
+    );
+    const publishedCli = await denoChildConfig(
+      projectConfig,
+      'https://jsr.io/@netscript/cli/release/mod.ts',
+      cliUrl,
+    );
+    assertEquals(publishedCli.specifier, cliUrl);
     const negative = await run(['--config', projectConfig]);
     assertEquals(negative.success, false);
     assertStringIncludes(new TextDecoder().decode(negative.stderr), '@netscript/config');
