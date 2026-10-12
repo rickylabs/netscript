@@ -7,6 +7,7 @@
  */
 
 import { Redis } from 'ioredis';
+import { delay } from '@std/async';
 import type {
   DeadLetterStorePort,
   EnqueueOptions,
@@ -23,6 +24,7 @@ import {
   toDeadLetterRecord,
 } from './_envelope.ts';
 import { RedisDeadLetterStore } from './redis-dead-letter-store.ts';
+import { tryPromoteDelayedBatch } from './_redis-delayed-promotion.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
@@ -39,17 +41,12 @@ function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, 
 
 const DEFAULT_BLOCK_TIMEOUT_SECONDS = 1;
 const DEFAULT_DELAYED_POLL_MS = 1_000;
-const DELAYED_PROMOTION_BATCH_SIZE = 100;
+const DELAYED_PROMOTION_ATTEMPTS = 3;
+const DELAYED_PROMOTION_JITTER_MS = 5;
 
 interface RedisQueueClients {
   readonly commands: Redis;
   readonly blocking: Redis;
-  readonly promotion: Redis;
-}
-
-interface DelayedQueueEntry {
-  readonly queueKey: string;
-  readonly envelope: string;
 }
 
 /**
@@ -64,6 +61,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   private deadLetterStore: DeadLetterStorePort<T> | null = null;
   private delayedTimer?: ReturnType<typeof setInterval>;
   private delayedPromotion?: Promise<void>;
+  private promotionClient?: Redis;
   private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
 
   /**
@@ -212,8 +210,10 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     this.listening = false;
     this.stopDelayedProcessor();
     this.clients?.blocking.disconnect();
+    await this.delayedPromotion?.catch((error: unknown) => this.reportPromotionError(error));
     this.clients?.commands.disconnect();
-    this.clients?.promotion.disconnect();
+    this.promotionClient?.disconnect();
+    this.promotionClient = undefined;
     this.clients = null;
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -231,7 +231,6 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
       this.clients = {
         commands: new Redis(this.url, redisOptions),
         blocking: new Redis(this.url, redisOptions),
-        promotion: new Redis(this.url, redisOptions),
       };
       return this.clients;
     } catch (error) {
@@ -321,7 +320,10 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
       return;
     }
     this.delayedTimer = setInterval(
-      () => void this.moveDueDelayedMessages(),
+      () =>
+        void this.moveDueDelayedMessages().catch((error: unknown) =>
+          this.reportPromotionError(error)
+        ),
       DEFAULT_DELAYED_POLL_MS,
     );
   }
@@ -352,33 +354,29 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
 
   /** Promote one bounded batch under a connection-local optimistic transaction. */
   private async promoteDelayedBatch(): Promise<void> {
-    const client = this.ensureClients().promotion;
-    await client.watch(this.delayedKey);
-    try {
-      const entries = await client.zrangebyscore(
-        this.delayedKey,
-        '-inf',
-        Date.now(),
-        'LIMIT',
-        0,
-        DELAYED_PROMOTION_BATCH_SIZE,
-      );
-      if (entries.length === 0) return;
+    for (let attempt = 0; attempt < DELAYED_PROMOTION_ATTEMPTS; attempt++) {
+      if (
+        await tryPromoteDelayedBatch(
+          this.ensurePromotionClient(),
+          this.delayedKey,
+          (error) => this.reportPromotionError(error),
+        )
+      ) return;
+      if (attempt + 1 < DELAYED_PROMOTION_ATTEMPTS) {
+        await delay(1 + Math.floor(Math.random() * DELAYED_PROMOTION_JITTER_MS));
+      }
+    }
+  }
 
-      const transaction = client.multi();
-      for (const entry of entries) {
-        const parsed = JSON.parse(entry) as DelayedQueueEntry;
-        // Membership was read under WATCH. A competing removal aborts the entire
-        // EXEC, so only the transaction that still owns each member can push it.
-        transaction.zrem(this.delayedKey, entry).lpush(parsed.queueKey, parsed.envelope);
-      }
-      const results = await transaction.exec();
-      // A lost WATCH leaves the batch pending for the next poll, with no pushes.
-      for (const [error] of results ?? []) {
-        if (error) throw error;
-      }
-    } finally {
-      await client.unwatch();
+  /** Create the dedicated WATCH connection only when promotion first runs. */
+  private ensurePromotionClient(): Redis {
+    return this.promotionClient ??= new Redis(this.url, getRedisOptions(this.options));
+  }
+
+  /** Report promotion errors without turning background or shutdown work into a rejection. */
+  private reportPromotionError(error: unknown): void {
+    if (!isExpectedStopError(error)) {
+      console.error('[RedisAdapter] Delayed promotion failed:', error);
     }
   }
 

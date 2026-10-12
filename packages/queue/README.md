@@ -121,11 +121,17 @@ the pre-release line, as above).
 
 Redis delayed-message promotion is at most once across listeners sharing a delayed key: a watched
 transaction removes each due member and pushes its envelope to the recorded target queue atomically.
-Promotion reads at most 100 due members per pass; a conflicting transaction leaves them pending for
-the next pass. This guarantee covers promotion, while handler retries still require idempotency. The
-adapter uses a dedicated connection for `WATCH`/`MULTI`/`EXEC`, supported by Redis and Garnet,
-including Garnet servers without Lua enabled. Garnet also supports `EVAL` when started with `--lua`;
-the transaction path preserves compatibility with the scaffold's default configuration.
+Promotion reads at most 100 due members per attempt. Each poll retries a conflicting transaction up
+to three total attempts, with 1–5 ms jitter between attempts. Delayed enqueues and target-list
+writes can invalidate WATCH; sustained contention can exhaust this budget and defer promotion to the
+next 1 s poll, so there is no fixed delivery-latency bound under continuous writes. Target keys are
+also watched and type-checked: a target that is neither absent nor a list is logged and its members
+stay delayed until the key is repaired. Shutdown catches timer failures and drains the active
+promotion pass before releasing its connection, which is opened only when promotion first runs. This
+guarantee covers promotion, while handler retries still require idempotency. The adapter uses a
+dedicated connection for `WATCH`/`MULTI`/`EXEC`, supported by Redis and Garnet, including Garnet
+servers without Lua enabled. Garnet also supports `EVAL` when started with `--lua`; the transaction
+path preserves compatibility with the scaffold's default configuration.
 
 The existing `netscript:queue:<name>`, `netscript:processing:<name>`, and `netscript:delayed:<name>`
 key layout is unchanged and targets single-node Redis-compatible servers. Redis Cluster is outside

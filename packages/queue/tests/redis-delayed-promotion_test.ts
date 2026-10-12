@@ -23,8 +23,9 @@ function createHarness(url: string, name: string, count: number) {
     const queue = new RedisAdapter<{ id: number }>(url, name);
     // Reuse the existing adapter seam and drive promotion directly, without timers.
     Object.defineProperty(queue, 'clients', {
-      value: { commands: client, blocking: client, promotion: client },
+      value: { commands: client, blocking: client },
     });
+    Object.defineProperty(queue, 'promotionClient', { value: client, writable: true });
     return queue;
   });
   const readyKey = `netscript:queue:${name}`;
@@ -47,10 +48,14 @@ Deno.test({
     let readers = 0;
     const readStubs = clients.map((client) => {
       const read = client.zrangebyscore.bind(client);
+      let firstRead = true;
       return stub(client, 'zrangebyscore', async (...args: Parameters<typeof read>) => {
         const entries = await read(...args);
-        if (++readers === clients.length) readerBarrier.resolve();
-        await readerBarrier.promise;
+        if (firstRead) {
+          firstRead = false;
+          if (++readers === clients.length) readerBarrier.resolve();
+          await readerBarrier.promise;
+        }
         return entries;
       });
     });

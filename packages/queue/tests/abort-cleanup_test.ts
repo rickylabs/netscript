@@ -105,13 +105,13 @@ Deno.test('redis listener disconnects blocking client on abort', async () => {
         releaseBlocking?.();
       },
     },
-    promotion: {
-      watch: () => Promise.resolve('OK'),
-      zrangebyscore: () => Promise.resolve([]),
-      unwatch: () => Promise.resolve('OK'),
-      disconnect: () => {
-        promotionDisconnected = true;
-      },
+  };
+  queue['promotionClient'] = {
+    watch: () => Promise.resolve('OK'),
+    zrangebyscore: () => Promise.resolve([]),
+    unwatch: () => Promise.resolve('OK'),
+    disconnect: () => {
+      promotionDisconnected = true;
     },
   };
   const controller = new AbortController();
