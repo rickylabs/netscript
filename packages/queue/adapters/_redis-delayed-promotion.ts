@@ -21,7 +21,6 @@ export async function tryPromoteDelayedBatch(
   onCleanupError: (error: unknown) => void,
 ): Promise<boolean> {
   await client.watch(delayedKey);
-  let failed = false;
   try {
     const entries = await client.zrangebyscore(
       delayedKey,
@@ -70,15 +69,7 @@ export async function tryPromoteDelayedBatch(
       if (error) throw error;
     }
     return results !== null;
-  } catch (error) {
-    failed = true;
-    throw error;
   } finally {
-    try {
-      await client.unwatch();
-    } catch (error) {
-      if (!failed) throw error;
-      onCleanupError(error);
-    }
+    await client.unwatch().catch(onCleanupError);
   }
 }

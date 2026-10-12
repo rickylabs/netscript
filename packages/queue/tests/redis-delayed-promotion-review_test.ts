@@ -35,7 +35,7 @@ for (const abortCount of [2, 3]) {
       let attempts = 0;
       const multi = client.multi.bind(client);
       const execStubs: Array<{ restore(): void }> = [];
-      using multiStub = stub(client, 'multi', () => {
+      using _multiStub = stub(client, 'multi', () => {
         const transaction = multi();
         const exec = transaction.exec.bind(transaction);
         execStubs.push(stub(transaction, 'exec', async () => {
@@ -80,7 +80,7 @@ Deno.test({
     const invalidKey = `${readyKey}:wrong-type`;
     const invalidEntry = JSON.stringify({ queueKey: invalidKey, envelope: 'retained-envelope' });
     const errors: unknown[][] = [];
-    using log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
+    using _log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
     try {
       await client.set(invalidKey, 'wrong-type');
       await client.zadd(delayedKey, 0, entry, 0, invalidEntry);
@@ -109,10 +109,10 @@ Deno.test({
     const { client, queue, readyKey, delayedKey, entry } = createHarness(redisUrl);
     const writer = new Redis(redisUrl, { lazyConnect: true, enableReadyCheck: false });
     const errors: unknown[][] = [];
-    using log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
+    using _log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
     const multi = client.multi.bind(client);
     const execStubs: Array<{ restore(): void }> = [];
-    using multiStub = stub(client, 'multi', () => {
+    using _multiStub = stub(client, 'multi', () => {
       const transaction = multi();
       const exec = transaction.exec.bind(transaction);
       execStubs.push(stub(transaction, 'exec', async () => {
@@ -165,7 +165,7 @@ Deno.test('RedisAdapter preserves the primary failure when UNWATCH also fails', 
   const cleanup = new Error('unwatch failed');
   const queue = new RedisAdapter('redis://example');
   const errors: unknown[][] = [];
-  using log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
+  using _log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
   Object.defineProperty(queue, 'promotionClient', {
     value: {
       watch: () => Promise.resolve('OK'),
@@ -178,26 +178,29 @@ Deno.test('RedisAdapter preserves the primary failure when UNWATCH also fails', 
   assertEquals(errors[0][1], cleanup);
 });
 
-for (const fails of [false, true]) {
-  Deno.test(`RedisAdapter timer stop drains an in-flight ${fails ? 'failing' : 'successful'} pass without unhandled rejection`, async () => {
+for (const outcome of ['successful', 'failing', 'expected-stop'] as const) {
+  const fails = outcome !== 'successful';
+  Deno.test(`RedisAdapter timer stop drains an in-flight ${outcome} pass without unhandled rejection`, async () => {
     const queue = new RedisAdapter('redis://example');
     const started = Promise.withResolvers<void>();
     const release = Promise.withResolvers<void>();
-    const primary = new Error('promotion read failed');
+    const primary = new Error(
+      outcome === 'expected-stop' ? 'Connection is closed' : 'promotion read failed',
+    );
     let disconnects = 0;
     let unhandled = 0;
     let tick: () => void = () => {
       throw new Error('timer callback not registered');
     };
     const setInterval = globalThis.setInterval.bind(globalThis);
-    using interval = stub(globalThis, 'setInterval', (callback) => {
+    using _interval = stub(globalThis, 'setInterval', (callback) => {
       assert(typeof callback === 'function');
       tick = () => callback();
       // Keep a real disposable timer handle, but drive its callback explicitly.
       return setInterval(() => {}, 60_000);
     });
     const errors: unknown[][] = [];
-    using log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
+    using _log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
     const observeUnhandled = () => unhandled++;
     globalThis.addEventListener('unhandledrejection', observeUnhandled);
     Object.defineProperty(queue, 'promotionClient', {
@@ -226,7 +229,7 @@ for (const fails of [false, true]) {
       assertEquals(unhandled, 0);
       assertEquals(queue['delayedPromotion'], undefined);
       assertEquals(queue['delayedTimer'], undefined);
-      assertEquals(errors.some((args) => args.includes(primary)), fails);
+      assertEquals(errors.some((args) => args.includes(primary)), outcome === 'failing');
     } finally {
       release.resolve();
       await queue.stop();
