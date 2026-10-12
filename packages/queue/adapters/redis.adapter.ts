@@ -7,6 +7,7 @@
  */
 
 import { Redis } from 'ioredis';
+import { delay } from '@std/async';
 import type {
   DeadLetterStorePort,
   EnqueueOptions,
@@ -23,6 +24,8 @@ import {
   toDeadLetterRecord,
 } from './_envelope.ts';
 import { RedisDeadLetterStore } from './redis-dead-letter-store.ts';
+import { RedisDelayedPromotion } from './_redis-delayed-runtime.ts';
+import { DELAYED_PROMOTION_BATCH_SIZE } from './_redis-delayed-promotion.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
@@ -39,15 +42,13 @@ function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, 
 
 const DEFAULT_BLOCK_TIMEOUT_SECONDS = 1;
 const DEFAULT_DELAYED_POLL_MS = 1_000;
+const DELAYED_PROMOTION_ATTEMPTS = 3;
+const DELAYED_PROMOTION_BATCHES_PER_PASS = 10;
+const DELAYED_PROMOTION_JITTER_MS = 5;
 
 interface RedisQueueClients {
   readonly commands: Redis;
   readonly blocking: Redis;
-}
-
-interface DelayedQueueEntry {
-  readonly queueKey: string;
-  readonly envelope: string;
 }
 
 /**
@@ -61,6 +62,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   private clients: RedisQueueClients | null = null;
   private deadLetterStore: DeadLetterStorePort<T> | null = null;
   private delayedTimer?: ReturnType<typeof setInterval>;
+  private delayedPromotion?: Promise<void>;
+  private promotionClient?: Redis;
+  private promotionRuntime?: RedisDelayedPromotion;
   private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
 
   /**
@@ -210,6 +214,17 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     this.stopDelayedProcessor();
     this.clients?.blocking.disconnect();
     this.clients?.commands.disconnect();
+    if (this.promotionRuntime) this.promotionRuntime.disconnect();
+    else this.promotionClient?.disconnect();
+    // ioredis need not reject queued work or emit close when already reconnecting.
+    // Manual disconnect prevents future execution, so its signal bounds the drain.
+    await Promise.race([
+      this.delayedPromotion?.catch(() => {}),
+      this.promotionRuntime?.disconnected ?? Promise.resolve(),
+    ]);
+    this.promotionRuntime?.dispose();
+    this.promotionRuntime = undefined;
+    this.promotionClient = undefined;
     this.clients = null;
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -316,7 +331,10 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
       return;
     }
     this.delayedTimer = setInterval(
-      () => void this.moveDueDelayedMessages(),
+      () => {
+        if (this.delayedPromotion) return;
+        void this.moveDueDelayedMessages().catch(() => {});
+      },
       DEFAULT_DELAYED_POLL_MS,
     );
   }
@@ -335,13 +353,58 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   /**
    * Move due delayed messages from the sorted set into the ready list.
    */
-  private async moveDueDelayedMessages(): Promise<void> {
-    const clients = this.ensureClients();
-    const entries = await clients.commands.zrangebyscore(this.delayedKey, '-inf', Date.now());
-    for (const entry of entries) {
-      const parsed = JSON.parse(entry) as DelayedQueueEntry;
-      await clients.commands.lpush(parsed.queueKey, parsed.envelope);
-      await clients.commands.zrem(this.delayedKey, entry);
+  private moveDueDelayedMessages(): Promise<void> {
+    // WATCH state is connection-local: overlapping polls must share this pass.
+    if (!this.delayedPromotion) {
+      const promotion = this.promoteDelayedBatch().catch((error: unknown) => {
+        this.reportPromotionError(error);
+        throw error;
+      });
+      const disconnected = this.promotionRuntime?.disconnected;
+      const active = disconnected ? Promise.race([promotion, disconnected]) : promotion;
+      const pass = active.finally(() => {
+        if (this.delayedPromotion === pass) this.delayedPromotion = undefined;
+      });
+      this.delayedPromotion = pass;
+    }
+    return this.delayedPromotion;
+  }
+
+  /** Promote a bounded batch with Lua or retry the checked transaction fallback. */
+  private async promoteDelayedBatch(): Promise<void> {
+    const runtime = this.promotionRuntime ??= new RedisDelayedPromotion(
+      this.ensurePromotionClient(),
+      (error) => this.reportPromotionError(error),
+    );
+    for (let batch = 0; batch < DELAYED_PROMOTION_BATCHES_PER_PASS; batch++) {
+      let promoted: number | null = null;
+      for (let attempt = 0; attempt < DELAYED_PROMOTION_ATTEMPTS; attempt++) {
+        promoted = await runtime.promote(this.delayedKey);
+        if (promoted !== null) break;
+        if (attempt + 1 < DELAYED_PROMOTION_ATTEMPTS) {
+          await delay(1 + Math.floor(Math.random() * DELAYED_PROMOTION_JITTER_MS));
+        }
+      }
+      if (promoted !== DELAYED_PROMOTION_BATCH_SIZE) return;
+    }
+  }
+
+  /** Create the dedicated WATCH connection only when promotion first runs. */
+  private ensurePromotionClient(): Redis {
+    if (!this.promotionClient) {
+      this.promotionClient = new Redis(this.url, {
+        ...getRedisOptions(this.options),
+        enableOfflineQueue: false,
+      });
+      this.promotionClient.on('error', (error: unknown) => this.reportPromotionError(error));
+    }
+    return this.promotionClient;
+  }
+
+  /** Report promotion errors without turning background or shutdown work into a rejection. */
+  private reportPromotionError(error: unknown): void {
+    if (!isExpectedPromotionError(error)) {
+      console.error('[RedisAdapter] Delayed promotion failed:', error);
     }
   }
 
@@ -419,4 +482,10 @@ function isExpectedStopError(error: unknown): boolean {
   return error.name === 'AbortError' ||
     error.message.includes('Connection is closed') ||
     error.message.includes('Connection is disconnected');
+}
+
+function isExpectedPromotionError(error: unknown): boolean {
+  return isExpectedStopError(error) || error instanceof Error &&
+      /enableOfflineQueue options is false|ECONNREFUSED|ECONNRESET|ETIMEDOUT|EHOSTUNREACH|ENETUNREACH/
+        .test(error.message);
 }

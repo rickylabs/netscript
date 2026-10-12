@@ -74,6 +74,8 @@ Deno.test('amqp listener closes connection when stopped', async () => {
 Deno.test('redis listener disconnects blocking client on abort', async () => {
   let blockingDisconnected = false;
   let commandsDisconnected = false;
+  let promotionDisconnected = false;
+  const blockingStarted = Promise.withResolvers<void>();
   let releaseBlocking: (() => void) | undefined;
   const queue = Object.create(RedisAdapter.prototype) as RedisHarness;
   queue['url'] = 'redis://example';
@@ -96,6 +98,7 @@ Deno.test('redis listener disconnects blocking client on abort', async () => {
       brpoplpush: () =>
         new Promise<null>((resolve) => {
           releaseBlocking = () => resolve(null);
+          blockingStarted.resolve();
         }),
       disconnect: () => {
         blockingDisconnected = true;
@@ -103,16 +106,25 @@ Deno.test('redis listener disconnects blocking client on abort', async () => {
       },
     },
   };
+  queue['promotionClient'] = {
+    watch: () => Promise.resolve('OK'),
+    zrangebyscore: () => Promise.resolve([]),
+    unwatch: () => Promise.resolve('OK'),
+    disconnect: () => {
+      promotionDisconnected = true;
+    },
+  };
   const controller = new AbortController();
 
   const listening = queue.listen(async () => {}, { signal: controller.signal });
-  await nextTurn();
+  await blockingStarted.promise;
   controller.abort();
   await listening;
   await queue.stop();
 
   assertEquals(blockingDisconnected, true);
   assertEquals(commandsDisconnected, true);
+  assertEquals(promotionDisconnected, true);
   assertEquals(queue['clients'], null);
   assertEquals(queue['listening'], false);
   assertEquals(queue['delayedTimer'], undefined);
