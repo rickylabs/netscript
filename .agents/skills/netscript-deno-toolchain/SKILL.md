@@ -16,7 +16,7 @@ never `deno outdated --latest` for "latest" (see the trap below). This skill is 
 home** for the command map and the gotchas; other skills (e.g. `netscript-tools`) cross-reference
 here rather than restate them.
 
-Repo is on **Deno 2.9.5** (Windows + WSL). Targeted `deno check` must pass `--unstable-kv`.
+Repo is on **Deno 2.9.7** (Windows + WSL). Targeted `deno check` must pass `--unstable-kv`.
 
 ## Fresh explicit prereleases
 

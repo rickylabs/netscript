@@ -64,7 +64,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.5'
+          deno-version: '2.9.7'
       - name: Self-check the classifier
         run: >-
           deno test --allow-read --allow-write --allow-env
@@ -134,7 +134,7 @@ jobs:
         if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.5'
+          deno-version: '2.9.7'
 
       - name: Frozen package type-check
         if: env.RUN == 'true'
