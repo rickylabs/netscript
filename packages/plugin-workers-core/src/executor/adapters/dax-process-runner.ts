@@ -174,6 +174,11 @@ async function streamOutput(
       }
     }
     emitLine(partial + decoder.decode(), input, source);
+  } catch (error) {
+    // The guard stops the child only after this reader releases its lock.
+    // Close the failed pipe while we still own it, preserving the original error.
+    await reader.cancel(error).catch(() => {});
+    throw error;
   } finally {
     signal.removeEventListener('abort', cancel);
     reader.releaseLock();
