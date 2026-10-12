@@ -7,37 +7,52 @@ interface DelayedQueueEntry {
   readonly envelope: string;
 }
 
+/** A parsed delayed member, preserving its exact sorted-set bytes. */
+export interface ParsedDelayedEntry {
+  /** Serialized sorted-set member used for conditional removal. */
+  readonly entry: string;
+  /** Recorded target and encoded envelope, unchanged by promotion. */
+  readonly parsed: DelayedQueueEntry;
+}
+
+/** Read at most 100 due members from the existing delayed key. */
+export async function readDelayedEntries(
+  client: Redis,
+  delayedKey: string,
+): Promise<ParsedDelayedEntry[]> {
+  const entries = await client.zrangebyscore(
+    delayedKey,
+    '-inf',
+    Date.now(),
+    'LIMIT',
+    0,
+    DELAYED_PROMOTION_BATCH_SIZE,
+  );
+  return entries.map((entry) => ({ entry, parsed: JSON.parse(entry) as DelayedQueueEntry }));
+}
+
 /**
- * Commit a bounded delayed batch while watching membership and target types.
+ * Commit a bounded delayed batch while watching membership on one connection epoch.
  *
  * @param client - Dedicated promotion connection, not shared with other commands.
  * @param delayedKey - Sorted-set key containing the recorded target/envelope pairs.
  * @param onCleanupError - Reports a cleanup failure without hiding the original error.
+ * @param connectionEpoch - Current connection generation, changed by close/end/ready.
  * @returns False if WATCH aborted the transaction; true if no retry is needed.
  */
 export async function tryPromoteDelayedBatch(
   client: Redis,
   delayedKey: string,
   onCleanupError: (error: unknown) => void,
+  connectionEpoch: () => number,
 ): Promise<boolean> {
+  if (client.status !== 'ready') return false;
+  const epoch = connectionEpoch();
   await client.watch(delayedKey);
   try {
-    const entries = await client.zrangebyscore(
-      delayedKey,
-      '-inf',
-      Date.now(),
-      'LIMIT',
-      0,
-      DELAYED_PROMOTION_BATCH_SIZE,
-    );
-    if (entries.length === 0) return true;
-
-    const parsedEntries = entries.map((entry) => ({
-      entry,
-      parsed: JSON.parse(entry) as DelayedQueueEntry,
-    }));
+    const parsedEntries = await readDelayedEntries(client, delayedKey);
+    if (parsedEntries.length === 0) return true;
     const targetKeys = [...new Set(parsedEntries.map(({ parsed }) => parsed.queueKey))];
-    await client.watch(...targetKeys);
     const types = await client.pipeline(targetKeys.map((key) => ['type', key])).exec();
     if (!types) throw new Error('Redis did not return target queue types');
     const validTargets = new Set<string>();
@@ -53,6 +68,9 @@ export async function tryPromoteDelayedBatch(
       }
     }
 
+    // No await may separate this guard from MULTI/EXEC dispatch. Reconnecting
+    // drops WATCH, so a snapshot read on another epoch must never be committed.
+    if (epoch !== connectionEpoch() || client.status !== 'ready') return false;
     const transaction = client.multi();
     let mutations = 0;
     for (const { entry, parsed } of parsedEntries) {
@@ -70,6 +88,8 @@ export async function tryPromoteDelayedBatch(
     }
     return results !== null;
   } finally {
-    await client.unwatch().catch(onCleanupError);
+    if (epoch === connectionEpoch() && client.status === 'ready') {
+      await client.unwatch().catch(onCleanupError);
+    }
   }
 }

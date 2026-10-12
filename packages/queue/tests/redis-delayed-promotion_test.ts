@@ -1,8 +1,9 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
-import { stub } from '@std/testing/mock';
+import { spy, stub } from '@std/testing/mock';
 import { Redis } from 'ioredis';
 import { RedisAdapter } from '../adapters/redis.adapter.ts';
 import { createEnvelope } from '../adapters/_envelope.ts';
+import { forceTransactionPromotion } from './_fixtures/redis-promotion-capability.ts';
 
 const redisUrl = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
 
@@ -34,74 +35,102 @@ function createHarness(url: string, name: string, count: number) {
   return { clients, queues, readyKey, delayedKey, processingKey };
 }
 
-Deno.test({
-  name: 'RedisAdapter eight concurrent movers promote and deliver each due message exactly once',
-  ignore: !redisUrl,
-  async fn() {
-    assert(redisUrl);
-    const { clients, queues, readyKey, delayedKey, processingKey } = createHarness(
-      redisUrl,
-      `delayed-race-${crypto.randomUUID()}`,
-      8,
-    );
-    const readerBarrier = Promise.withResolvers<void>();
-    let readers = 0;
-    const readStubs = clients.map((client) => {
-      const read = client.zrangebyscore.bind(client);
-      let firstRead = true;
-      return stub(client, 'zrangebyscore', async (...args: Parameters<typeof read>) => {
-        const entries = await read(...args);
-        if (firstRead) {
-          firstRead = false;
-          if (++readers === clients.length) readerBarrier.resolve();
-          await readerBarrier.promise;
-        }
-        return entries;
-      });
-    });
-    const expected = Array.from(
-      { length: 80 },
-      (_, id) => JSON.stringify(createEnvelope({ id }, { headers: { source: 'delayed-race' } })),
-    );
-    try {
-      await clients[0].zadd(
-        delayedKey,
-        ...expected.flatMap((envelope) => [0, JSON.stringify({ queueKey: readyKey, envelope })]),
+for (const forceFallback of [false, true]) {
+  Deno.test({
+    name:
+      `RedisAdapter eight concurrent movers promote and deliver each due message exactly once (${
+        forceFallback ? 'transaction' : 'detected backend'
+      })`,
+    ignore: !redisUrl,
+    async fn() {
+      assert(redisUrl);
+      const { clients, queues, readyKey, delayedKey, processingKey } = createHarness(
+        redisUrl,
+        `delayed-race-${crypto.randomUUID()}`,
+        8,
       );
-      await Promise.all(queues.map((queue) => queue['moveDueDelayedMessages']()));
-      assertEquals(readers, 8);
-      assertEquals(await clients[0].zcard(delayedKey), 0, 'no lost or pending due members');
-      assertEquals(await clients[0].llen(readyKey), expected.length, 'one insertion per member');
+      const capabilities = forceFallback ? clients.map(forceTransactionPromotion) : [];
+      const evalProbe = forceFallback ? undefined : spy(clients[0], 'eval');
+      const evalCalls: Array<{ calls: readonly unknown[]; restore(): void }> = [];
+      const pipelineStubs = clients.map((client) => {
+        const pipeline = client.pipeline.bind(client);
+        return stub(client, 'pipeline', (...args: Parameters<typeof pipeline>) => {
+          const batch = pipeline(...args);
+          evalCalls.push(spy(batch, 'eval'));
+          return batch;
+        });
+      });
+      const readerBarrier = Promise.withResolvers<void>();
+      let readers = 0;
+      const readStubs = clients.map((client) => {
+        const read = client.zrangebyscore.bind(client);
+        let firstRead = true;
+        return stub(client, 'zrangebyscore', async (...args: Parameters<typeof read>) => {
+          const entries = await read(...args);
+          if (firstRead) {
+            firstRead = false;
+            if (++readers === clients.length) readerBarrier.resolve();
+            await readerBarrier.promise;
+          }
+          return entries;
+        });
+      });
+      const expected = Array.from(
+        { length: 80 },
+        (_, id) => JSON.stringify(createEnvelope({ id }, { headers: { source: 'delayed-race' } })),
+      );
+      try {
+        await clients[0].zadd(
+          delayedKey,
+          ...expected.flatMap((envelope) => [0, JSON.stringify({ queueKey: readyKey, envelope })]),
+        );
+        await Promise.all(queues.map((queue) => queue['moveDueDelayedMessages']()));
+        assertEquals(readers, 8);
+        assertEquals(await clients[0].zcard(delayedKey), 0, 'no lost or pending due members');
+        assertEquals(await clients[0].llen(readyKey), expected.length, 'one insertion per member');
+        const supportsLua = evalProbe
+          ? await evalProbe.calls[0].returned?.then(() => true, () => false)
+          : false;
+        assertEquals(
+          evalCalls.reduce((sum, call) => sum + call.calls.length, 0),
+          supportsLua ? 640 : 0,
+        );
+        assertEquals(evalProbe?.calls.length ?? 1, 1, 'one capability detection per client');
 
-      const delivered: number[] = [];
-      const claims: string[] = [];
-      const counts: number[] = [];
-      await Promise.all(queues.map(async (queue, index) => {
-        // Finite nonblocking pop-push calls exercise the same atomic pickup as listen().
-        for (;;) {
-          const encoded = await clients[index].rpoplpush(readyKey, processingKey);
-          if (encoded === null) return;
-          assert(expected.includes(encoded), 'envelope bytes are preserved');
-          await queue['handleEncodedMessage'](encoded, async (message, context) => {
-            delivered.push(message.id);
-            claims.push(context.messageId);
-            counts.push(context.deliveryCount);
-            assertEquals(context.headers, { source: 'delayed-race' });
-            await context.ack();
-          });
-        }
-      }));
-      assertEquals(delivered.sort((a, b) => a - b), expected.map((_, id) => id));
-      assertEquals(new Set(claims).size, expected.length, 'one concurrent pickup per message id');
-      assertEquals(counts, expected.map(() => 1));
-      assertEquals(await clients[0].llen(processingKey), 0);
-    } finally {
-      readStubs.forEach((readStub) => readStub.restore());
-      await clients[0].del(readyKey, delayedKey, processingKey);
-      clients.forEach((client) => client.disconnect());
-    }
-  },
-});
+        const delivered: number[] = [];
+        const claims: string[] = [];
+        const counts: number[] = [];
+        await Promise.all(queues.map(async (queue, index) => {
+          // Finite nonblocking pop-push calls exercise the same atomic pickup as listen().
+          for (;;) {
+            const encoded = await clients[index].rpoplpush(readyKey, processingKey);
+            if (encoded === null) return;
+            assert(expected.includes(encoded), 'envelope bytes are preserved');
+            await queue['handleEncodedMessage'](encoded, async (message, context) => {
+              delivered.push(message.id);
+              claims.push(context.messageId);
+              counts.push(context.deliveryCount);
+              assertEquals(context.headers, { source: 'delayed-race' });
+              await context.ack();
+            });
+          }
+        }));
+        assertEquals(delivered.sort((a, b) => a - b), expected.map((_, id) => id));
+        assertEquals(new Set(claims).size, expected.length, 'one concurrent pickup per message id');
+        assertEquals(counts, expected.map(() => 1));
+        assertEquals(await clients[0].llen(processingKey), 0);
+      } finally {
+        evalProbe?.restore();
+        evalCalls.forEach((call) => call.restore());
+        pipelineStubs.forEach((call) => call.restore());
+        capabilities.forEach((capability) => capability[Symbol.dispose]());
+        readStubs.forEach((readStub) => readStub.restore());
+        await clients[0].del(readyKey, delayedKey, processingKey);
+        clients.forEach((client) => client.disconnect());
+      }
+    },
+  });
+}
 
 Deno.test({
   name: 'RedisAdapter bounds promotion batches and preserves future entries and recorded routing',

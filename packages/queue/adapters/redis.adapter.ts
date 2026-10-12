@@ -24,7 +24,7 @@ import {
   toDeadLetterRecord,
 } from './_envelope.ts';
 import { RedisDeadLetterStore } from './redis-dead-letter-store.ts';
-import { tryPromoteDelayedBatch } from './_redis-delayed-promotion.ts';
+import { RedisDelayedPromotion } from './_redis-delayed-runtime.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
@@ -62,6 +62,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   private delayedTimer?: ReturnType<typeof setInterval>;
   private delayedPromotion?: Promise<void>;
   private promotionClient?: Redis;
+  private promotionRuntime?: RedisDelayedPromotion;
   private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
 
   /**
@@ -210,9 +211,11 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     this.listening = false;
     this.stopDelayedProcessor();
     this.clients?.blocking.disconnect();
-    await this.delayedPromotion?.catch((error: unknown) => this.reportPromotionError(error));
     this.clients?.commands.disconnect();
     this.promotionClient?.disconnect();
+    await this.delayedPromotion?.catch((error: unknown) => this.reportPromotionError(error));
+    this.promotionRuntime?.dispose();
+    this.promotionRuntime = undefined;
     this.promotionClient = undefined;
     this.clients = null;
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -320,10 +323,12 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
       return;
     }
     this.delayedTimer = setInterval(
-      () =>
+      () => {
+        if (this.delayedPromotion) return;
         void this.moveDueDelayedMessages().catch((error: unknown) =>
           this.reportPromotionError(error)
-        ),
+        );
+      },
       DEFAULT_DELAYED_POLL_MS,
     );
   }
@@ -352,16 +357,14 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     return this.delayedPromotion;
   }
 
-  /** Promote one bounded batch under a connection-local optimistic transaction. */
+  /** Promote a bounded batch with Lua or retry the checked transaction fallback. */
   private async promoteDelayedBatch(): Promise<void> {
+    const runtime = this.promotionRuntime ??= new RedisDelayedPromotion(
+      this.ensurePromotionClient(),
+      (error) => this.reportPromotionError(error),
+    );
     for (let attempt = 0; attempt < DELAYED_PROMOTION_ATTEMPTS; attempt++) {
-      if (
-        await tryPromoteDelayedBatch(
-          this.ensurePromotionClient(),
-          this.delayedKey,
-          (error) => this.reportPromotionError(error),
-        )
-      ) return;
+      if (await runtime.promote(this.delayedKey)) return;
       if (attempt + 1 < DELAYED_PROMOTION_ATTEMPTS) {
         await delay(1 + Math.floor(Math.random() * DELAYED_PROMOTION_JITTER_MS));
       }

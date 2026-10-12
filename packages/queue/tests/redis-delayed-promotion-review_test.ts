@@ -2,6 +2,7 @@ import { assert, assertEquals, assertRejects } from '@std/assert';
 import { stub } from '@std/testing/mock';
 import { Redis } from 'ioredis';
 import { RedisAdapter } from '../adapters/redis.adapter.ts';
+import { forceTransactionPromotion } from './_fixtures/redis-promotion-capability.ts';
 
 const redisUrl = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
 
@@ -26,11 +27,13 @@ function createHarness(url: string) {
 
 for (const abortCount of [2, 3]) {
   Deno.test({
-    name: `RedisAdapter bounds retry attempts with ${abortCount} concurrent delayed enqueues`,
+    name:
+      `RedisAdapter transaction bounds retry attempts with ${abortCount} concurrent delayed enqueues`,
     ignore: !redisUrl,
     async fn() {
       assert(redisUrl);
       const { client, queue, readyKey, delayedKey, entry, name } = createHarness(redisUrl);
+      using _capability = forceTransactionPromotion(client);
       const producer = new RedisAdapter<{ id: number }>(redisUrl, name);
       let attempts = 0;
       const multi = client.multi.bind(client);
@@ -71,70 +74,45 @@ for (const abortCount of [2, 3]) {
   });
 }
 
-Deno.test({
-  name: 'RedisAdapter retains wrongly typed targets while promoting valid members',
-  ignore: !redisUrl,
-  async fn() {
-    assert(redisUrl);
-    const { client, queue, readyKey, delayedKey, entry } = createHarness(redisUrl);
-    const invalidKey = `${readyKey}:wrong-type`;
-    const invalidEntry = JSON.stringify({ queueKey: invalidKey, envelope: 'retained-envelope' });
-    const errors: unknown[][] = [];
-    using _log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
-    try {
-      await client.set(invalidKey, 'wrong-type');
-      await client.zadd(delayedKey, 0, entry, 0, invalidEntry);
-      await queue['moveDueDelayedMessages']();
-      assertEquals(await client.zrange(delayedKey, 0, -1), [invalidEntry]);
-      assertEquals(await client.get(invalidKey), 'wrong-type');
-      assertEquals(await client.lrange(readyKey, 0, -1), ['due-envelope']);
-      assertEquals(errors.length, 1);
-      assertEquals(errors[0][1], { queueKey: invalidKey, type: 'string' });
-      await client.del(invalidKey);
-      await queue['moveDueDelayedMessages']();
-      assertEquals(await client.lrange(invalidKey, 0, -1), ['retained-envelope']);
-      assertEquals(await client.zcard(delayedKey), 0);
-    } finally {
-      await client.del(readyKey, delayedKey, invalidKey);
-      client.disconnect();
-    }
-  },
-});
-
-Deno.test({
-  name: 'RedisAdapter WATCH catches target type changes after preflight without losing a member',
-  ignore: !redisUrl,
-  async fn() {
-    assert(redisUrl);
-    const { client, queue, readyKey, delayedKey, entry } = createHarness(redisUrl);
-    const writer = new Redis(redisUrl, { lazyConnect: true, enableReadyCheck: false });
-    const errors: unknown[][] = [];
-    using _log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
-    const multi = client.multi.bind(client);
-    const execStubs: Array<{ restore(): void }> = [];
-    using _multiStub = stub(client, 'multi', () => {
-      const transaction = multi();
-      const exec = transaction.exec.bind(transaction);
-      execStubs.push(stub(transaction, 'exec', async () => {
-        await writer.set(readyKey, 'changed-after-type-check');
-        return await exec();
-      }));
-      return transaction;
-    });
-    try {
-      await client.zadd(delayedKey, 0, entry);
-      await queue['moveDueDelayedMessages']();
-      assertEquals(await client.zrange(delayedKey, 0, -1), [entry]);
-      assertEquals(await client.get(readyKey), 'changed-after-type-check');
-      assertEquals(errors.length, 1, 'retry detects and logs the changed target type');
-    } finally {
-      execStubs.forEach((execStub) => execStub.restore());
-      await client.del(readyKey, delayedKey);
-      client.disconnect();
-      writer.disconnect();
-    }
-  },
-});
+for (const forceFallback of [false, true]) {
+  Deno.test({
+    name: `RedisAdapter retains wrongly typed targets while promoting valid members (${
+      forceFallback ? 'transaction' : 'detected backend'
+    })`,
+    ignore: !redisUrl,
+    async fn() {
+      assert(redisUrl);
+      const { client, queue, readyKey, delayedKey, entry } = createHarness(redisUrl);
+      using _capability = forceFallback ? forceTransactionPromotion(client) : undefined;
+      const invalidKey = `${readyKey}:wrong-type`;
+      const invalidEntry = JSON.stringify({ queueKey: invalidKey, envelope: 'retained-envelope' });
+      const errors: unknown[][] = [];
+      using _log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
+      try {
+        await client.set(invalidKey, 'wrong-type');
+        await client.zadd(delayedKey, 0, entry, 17, invalidEntry);
+        await queue['moveDueDelayedMessages']();
+        assertEquals(await client.zrange(delayedKey, 0, -1), [invalidEntry]);
+        assertEquals(await client.get(invalidKey), 'wrong-type');
+        assertEquals(await client.lrange(readyKey, 0, -1), ['due-envelope']);
+        assertEquals(errors.length, 1);
+        assertEquals(
+          await client.zscore(delayedKey, invalidEntry),
+          '17',
+          'original score preserved',
+        );
+        assert(String(errors[0][0]).includes('member retained'));
+        await client.del(invalidKey);
+        await queue['moveDueDelayedMessages']();
+        assertEquals(await client.lrange(invalidKey, 0, -1), ['retained-envelope']);
+        assertEquals(await client.zcard(delayedKey), 0);
+      } finally {
+        await client.del(readyKey, delayedKey, invalidKey);
+        client.disconnect();
+      }
+    },
+  });
+}
 
 Deno.test({
   name: 'RedisAdapter producer creates its promotion connection only on the first pass',
@@ -168,6 +146,10 @@ Deno.test('RedisAdapter preserves the primary failure when UNWATCH also fails', 
   using _log = stub(console, 'error', (...args: unknown[]) => errors.push(args));
   Object.defineProperty(queue, 'promotionClient', {
     value: {
+      status: 'ready',
+      on() {},
+      off() {},
+      eval: () => Promise.reject(new Error('ERR unknown command EVAL')),
       watch: () => Promise.resolve('OK'),
       zrangebyscore: () => Promise.reject(primary),
       unwatch: () => Promise.reject(cleanup),
@@ -205,6 +187,10 @@ for (const outcome of ['successful', 'failing', 'expected-stop'] as const) {
     globalThis.addEventListener('unhandledrejection', observeUnhandled);
     Object.defineProperty(queue, 'promotionClient', {
       value: {
+        status: 'ready',
+        on() {},
+        off() {},
+        eval: () => Promise.reject(new Error('ERR unknown command EVAL')),
         watch: () => Promise.resolve('OK'),
         zrangebyscore: async () => {
           started.resolve();
@@ -220,9 +206,10 @@ for (const outcome of ['successful', 'failing', 'expected-stop'] as const) {
     try {
       queue['startDelayedProcessor']();
       tick();
+      tick(); // A pending pass must not accumulate another timer rejection handler.
       await started.promise;
       const stopped = queue.stop();
-      assertEquals(disconnects, 0, 'stop must wait until the watched pass settles');
+      assertEquals(disconnects, 1, 'stop disconnects before awaiting the pass');
       release.resolve();
       await stopped;
       assertEquals(disconnects, 1);
@@ -230,6 +217,7 @@ for (const outcome of ['successful', 'failing', 'expected-stop'] as const) {
       assertEquals(queue['delayedPromotion'], undefined);
       assertEquals(queue['delayedTimer'], undefined);
       assertEquals(errors.some((args) => args.includes(primary)), outcome === 'failing');
+      if (outcome === 'failing') assertEquals(errors.length, 2, 'one timer and one stop observer');
     } finally {
       release.resolve();
       await queue.stop();

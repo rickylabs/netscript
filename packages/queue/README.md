@@ -119,19 +119,30 @@ the pre-release line, as above).
 
 ## Compatibility
 
-Redis delayed-message promotion is at most once across listeners sharing a delayed key: a watched
-transaction removes each due member and pushes its envelope to the recorded target queue atomically.
-Promotion reads at most 100 due members per attempt. Each poll retries a conflicting transaction up
-to three total attempts, with 1–5 ms jitter between attempts. Delayed enqueues and target-list
-writes can invalidate WATCH; sustained contention can exhaust this budget and defer promotion to the
-next 1 s poll, so there is no fixed delivery-latency bound under continuous writes. Target keys are
-also watched and type-checked: a target that is neither absent nor a list is logged and its members
-stay delayed until the key is repaired. Shutdown catches timer failures and drains the active
-promotion pass before releasing its connection, which is opened only when promotion first runs. This
-guarantee covers promotion, while handler retries still require idempotency. The adapter uses a
-dedicated connection for `WATCH`/`MULTI`/`EXEC`, supported by Redis and Garnet, including Garnet
-servers without Lua enabled. Garnet also supports `EVAL` when started with `--lua`; the transaction
-path preserves compatibility with the scaffold's default configuration.
+Redis delayed-message promotion is at most once across listeners sharing a delayed key. The adapter
+opens its dedicated promotion connection lazily and caches Lua support once per client (transport
+failures leave capability undetermined). With scripting available, each due member is removed and
+pushed atomically by `EVAL`; only a successful `ZREM` can push its recorded envelope. `redis.pcall`
+catches a failed `LPUSH` and restores the member at its original score inside the same script.
+Immediate ready-list enqueues/dequeues cannot abort this path. Both keys are passed explicitly as
+`KEYS`, and envelope bytes/routing are unchanged.
+
+Servers without scripting, including Garnet with Lua disabled, use `WATCH`/`MULTI`/`EXEC`. Only the
+delayed set is watched; hot ready lists are type-checked in a pipelined preflight without WATCH.
+Wrongly typed targets found in preflight are logged and retained. This fallback accepts the narrow
+race where a target is changed to a non-list after preflight: Redis does not roll back EXEC, so that
+race can lose the member. Queue keys must stay absent or lists while consumers operate. A connection
+epoch counts close/end/ready events; a changed epoch abandons the snapshot before MULTI so a
+reconnect cannot commit it without WATCH. Delayed-set writes can still abort this path: each poll
+has three total attempts with 1–5 ms jitter, then defers to the next 1 s poll. Continuous delayed
+writes therefore have no fixed promotion-latency bound.
+
+Both paths read at most 100 due members per attempt. There is no poison-member skip/quarantine: 100
+retained wrongly typed targets can block valid members behind them, and invalid JSON halts its
+batch. Repair those keys/members to resume progress. Handler retries still require idempotency.
+Timer failures are caught. Shutdown disconnects all clients before awaiting the active promotion
+pass, rejecting offline commands so a Redis outage cannot keep stop waiting for reconnection; an
+abandoned server-side operation either committed atomically or wrote nothing.
 
 The existing `netscript:queue:<name>`, `netscript:processing:<name>`, and `netscript:delayed:<name>`
 key layout is unchanged and targets single-node Redis-compatible servers. Redis Cluster is outside
