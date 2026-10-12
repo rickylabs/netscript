@@ -1,4 +1,7 @@
-import { join } from '@std/path';
+import { assertEquals } from '@std/assert';
+import { fromFileUrl, join } from '@std/path';
+import cliMeta from '../deno.json' with { type: 'json' };
+import { useLocalWorkspaceImports } from './support/local-workspace-imports.ts';
 import type { FileSystemPort } from '../src/kernel/ports/file-system-port.ts';
 
 interface InstalledAuthFixture {
@@ -32,7 +35,7 @@ export async function writeInstalledAuthFixture(
 
 async function installAuth(name: string): Promise<InstalledAuthFixture> {
   const root = await Deno.makeTempDir({ prefix: 'installed-auth-fixture-' });
-  const repo = new URL('../../../', import.meta.url).pathname;
+  const repo = fromFileUrl(new URL('../../../', import.meta.url));
   const cli = join(repo, 'packages/cli/bin/netscript.ts');
   const project = join(root, 'auth-fixture');
   const run = async (args: string[]) => {
@@ -69,6 +72,10 @@ async function installAuth(name: string): Promise<InstalledAuthFixture> {
       '--editor',
       'none',
     ]);
+    const config = JSON.parse(await Deno.readTextFile(join(project, 'deno.json')));
+    assertEquals(config.imports['@netscript/config'], `jsr:@netscript/config@${cliMeta.version}`);
+    // Assert the public release pin before resolving unpublished fixtures from this checkout.
+    await useLocalWorkspaceImports(project, repo);
     await run(['plugin', 'install', 'auth', '--name', name, '--project-root', project, '--force']);
     const settings = JSON.parse(await Deno.readTextFile(join(project, 'appsettings.json')));
     return {

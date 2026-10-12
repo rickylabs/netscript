@@ -71,12 +71,28 @@ Deno.test('public guarded service probe isolates ambient agent hosts and removes
     // Execute the suite's real init arguments through the local Deno executable.
     await run([...command.slice(3)]);
     const before = await snapshot();
+    // Keep runtime-tier probes unchanged. Only this test redirects the command
+    // runner to assert each public init pin and localize the fixture before use.
+    const importMap = join(root, 'probe-imports.json');
+    await Deno.writeTextFile(
+      importMap,
+      JSON.stringify({
+        imports: {
+          ...JSON.parse(await Deno.readTextFile(join(repo, 'deno.json'))).imports,
+          [new URL('./run-locked-probe.ts', import.meta.url).href]:
+            new URL('../../../../../tests/support/local-workspace-probe.ts', import.meta.url).href,
+        },
+      }),
+    );
     await run([
       '--unstable-kv',
+      '--import-map',
+      importMap,
       new URL('./probe-generated-guarded-service.ts', import.meta.url).pathname,
       shared,
       repo,
     ], { TMPDIR: root });
+    await Deno.remove(importMap);
     assertEquals(await snapshot(), before);
     const entries: string[] = [];
     for await (const entry of Deno.readDir(root)) entries.push(entry.name);

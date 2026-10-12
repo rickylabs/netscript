@@ -1,5 +1,7 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
+import cliMeta from '../deno.json' with { type: 'json' };
+import { useLocalWorkspaceImports } from './support/local-workspace-imports.ts';
 
 const repo = fromFileUrl(new URL('../../../', import.meta.url));
 const browserFiles = ['auth/bff.ts', 'auth/service.ts', 'apps/web/routes/auth/[action].ts'];
@@ -41,6 +43,13 @@ for (const binary of ['netscript.ts', 'netscript-dev.ts']) {
           '--editor',
           'none',
         ], 'netscript.ts');
+        const config = JSON.parse(await Deno.readTextFile(join(project, 'deno.json')));
+        assertEquals(
+          config.imports['@netscript/config'],
+          `jsr:@netscript/config@${cliMeta.version}`,
+        );
+        // Preserve the public pin assertion, then run fixtures against the checkout under test.
+        await useLocalWorkspaceImports(project, repo);
         const settingsPath = join(project, 'appsettings.json');
         const settings = JSON.parse(await Deno.readTextFile(settingsPath));
         settings.NetScript.Apps.web.Auth = { BrowserTopology: 'authored' };
