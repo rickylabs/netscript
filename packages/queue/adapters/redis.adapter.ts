@@ -350,6 +350,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     return this.delayedPromotion;
   }
 
+  /** Promote one bounded batch under a connection-local optimistic transaction. */
   private async promoteDelayedBatch(): Promise<void> {
     const client = this.ensureClients().promotion;
     await client.watch(this.delayedKey);
