@@ -266,7 +266,7 @@ cancellation checks framework boundaries and the finite provider timeout bounds 
 diagnostics stay in the trusted cause.
 
 The isolated native provider command is `bash .llm/tools/command-postgres-conformance.sh`. Its
-dedicated CI workflow runs Deno 2.9.5 and exercises the real generated-client lock/fault matrix. A
+dedicated CI workflow runs Deno 2.9.7 and exercises the real generated-client lock/fault matrix. A
 skipped provider suite is not provider conformance evidence. Package import/construction runs no DDL
 and has no queue dependency.
 

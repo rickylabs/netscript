@@ -25,7 +25,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.5'
+          deno-version: '2.9.7'
 
       - name: Breaking change migration gate
         env:
