@@ -1,4 +1,4 @@
-import { denoChildConfigArgs } from '../../../kernel/adapters/runtime/process/deno-child-config.ts';
+import { denoChildConfig } from '../../../kernel/adapters/runtime/process/deno-child-config.ts';
 import {
   agentDocsFullCorpus,
   decodeAgentDocsPages,
@@ -201,7 +201,12 @@ async function apiSpecifier(
 export class DenoAgentDocsCommandRunner implements AgentDocsCommandRunner {
   async run(specifier: string, cwd: string): Promise<AgentDocsCommandResult> {
     const output = await new Deno.Command(Deno.execPath(), {
-      args: ['doc', '--unstable-kv', ...await denoChildConfigArgs(), specifier],
+      args: [
+        'doc',
+        '--unstable-kv',
+        ...(await denoChildConfig(undefined, import.meta.url, specifier)).configArgs,
+        specifier,
+      ],
       cwd,
       env: { NO_COLOR: '1' },
       stdout: 'piped',

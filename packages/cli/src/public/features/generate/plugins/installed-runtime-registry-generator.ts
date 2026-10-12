@@ -1,4 +1,4 @@
-import { denoChildConfigArgs } from '../../../../kernel/adapters/runtime/process/deno-child-config.ts';
+import { denoChildConfig } from '../../../../kernel/adapters/runtime/process/deno-child-config.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import { basename, dirname, isAbsolute, join, relative, resolve } from '@std/path';
@@ -58,12 +58,18 @@ export function createInstalledRuntimeRegistryGenerator(
         outputOwners.add(path);
       }
       if (generator.inspectionProtocol === 2) {
+        const childConfig = input.dryRun ? undefined : await denoChildConfig(
+          join(input.projectRoot, 'deno.json'),
+          import.meta.url,
+          resolveGeneratorUrl(resolvedManifest.generatorBase, generator.command),
+        );
         const files = await renderRuntimeRegistryPlan(
           input.projectRoot,
           installed,
           resolvedManifest,
           manifest,
           input.dryRun ? frozenPluginInspection(dependencies.process) : dependencies.process,
+          childConfig?.consumerLockArgs,
         );
         rendered.push(...files);
         continue;
@@ -226,7 +232,11 @@ async function inspectRuntimeRegistrySources(options: {
   try {
     result = await options.dependencies.process.exec('deno', [
       'run',
-      ...await denoChildConfigArgs(join(options.projectRoot, 'deno.json')),
+      ...(await denoChildConfig(
+        join(options.projectRoot, 'deno.json'),
+        import.meta.url,
+        resolveGeneratorUrl(options.generatorBase, options.generator.command),
+      )).configArgs,
       '--allow-read',
       resolveGeneratorUrl(options.generatorBase, options.generator.command),
       '--project-root',
@@ -385,9 +395,15 @@ async function runGenerator(options: {
   );
   await options.dependencies.fs.writeFile(manifestPath, `${JSON.stringify(options.rawManifest)}\n`);
   try {
+    const childConfig = await denoChildConfig(
+      join(options.projectRoot, 'deno.json'),
+      import.meta.url,
+      resolveGeneratorUrl(options.generatorBase, options.generator.command),
+    );
     const result = await options.dependencies.process.exec('deno', [
       'run',
-      ...await denoChildConfigArgs(join(options.projectRoot, 'deno.json')),
+      ...childConfig.configArgs,
+      ...childConfig.consumerLockArgs,
       '--allow-read',
       '--allow-write',
       resolveGeneratorUrl(options.generatorBase, options.generator.command),

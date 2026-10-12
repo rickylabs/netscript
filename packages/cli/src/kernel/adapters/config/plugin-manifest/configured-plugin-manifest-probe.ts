@@ -1,5 +1,5 @@
 import { join } from '@std/path';
-import { denoChildConfigArgs } from '../../runtime/process/deno-child-config.ts';
+import { denoChildConfig } from '../../runtime/process/deno-child-config.ts';
 import type { ProcessPort } from '../../../ports/process-port.ts';
 import { resolvePluginImportSpecifier } from '../../../application/plugin/configured-plugin-specifier.ts';
 import {
@@ -48,9 +48,9 @@ export async function probeConfiguredPluginManifest(
   ];
   const denoConfig = join(projectRoot, 'deno.json');
   args.push(
-    ...await denoChildConfigArgs(
+    ...(await denoChildConfig(
       await fileExists(denoConfig) ? denoConfig : undefined,
-    ),
+    )).configArgs,
   );
   args.push(
     options.childSpecifier ?? CHILD_PROBE,

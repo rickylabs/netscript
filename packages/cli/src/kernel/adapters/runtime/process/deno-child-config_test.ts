@@ -1,21 +1,22 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { join, toFileUrl } from '@std/path';
-import { denoChildConfigArgs } from './deno-child-config.ts';
+import { denoChildConfig } from './deno-child-config.ts';
 
 Deno.test('published child configuration keeps the consumer config', async () => {
   assertEquals(
-    await denoChildConfigArgs('consumer/deno.json', 'https://jsr.io/@netscript/cli/0.0.8/mod.ts'),
+    (await denoChildConfig('consumer/deno.json', 'https://jsr.io/@netscript/cli/0.0.8/mod.ts'))
+      .configArgs,
     ['--config', 'consumer/deno.json'],
   );
   assertEquals(
-    await denoChildConfigArgs(undefined, 'https://jsr.io/@netscript/cli/0.0.8/mod.ts'),
+    (await denoChildConfig(undefined, 'https://jsr.io/@netscript/cli/0.0.8/mod.ts')).configArgs,
     [],
   );
 });
 
 Deno.test('standalone file CLI does not adopt an unrelated workspace', async () => {
   assertEquals(
-    await denoChildConfigArgs('consumer/deno.json', toFileUrl('/standalone/cli.ts').href),
+    (await denoChildConfig('consumer/deno.json', toFileUrl('/standalone/cli.ts').href)).configArgs,
     [
       '--config',
       'consumer/deno.json',
@@ -37,12 +38,13 @@ Deno.test('source child resolves an unpublished pin locally and preserves consum
       join(workspace, 'deno.json'),
       JSON.stringify({ workspace: ['packages/*'] }),
     );
-    const unpublished = 'jsr:@netscript/config@0.0.0-unpublished';
+    const version = '0.0.0-unpublished';
+    const unpublished = `jsr:@netscript/config@${version}`;
     await Deno.writeTextFile(
       join(cli, 'deno.json'),
       JSON.stringify({
         name: '@netscript/cli',
-        version: '0.0.0-unpublished',
+        version,
         imports: { '@netscript/config': unpublished },
       }),
     );
@@ -50,7 +52,7 @@ Deno.test('source child resolves an unpublished pin locally and preserves consum
       join(config, 'deno.json'),
       JSON.stringify({
         name: '@netscript/config',
-        version: '0.0.0-unpublished',
+        version,
         exports: { '.': './mod.ts', './identity': './identity.ts' },
       }),
     );
@@ -84,7 +86,9 @@ console.log(JSON.stringify({ source, identity, value, cwd: Deno.cwd() }));`,
     const negative = await run(['--config', projectConfig]);
     assertEquals(negative.success, false);
     assertStringIncludes(new TextDecoder().decode(negative.stderr), '@netscript/config');
-    const positive = await run(await denoChildConfigArgs(projectConfig, toFileUrl(child).href));
+    const positive = await run(
+      (await denoChildConfig(projectConfig, toFileUrl(child).href)).configArgs,
+    );
     assertEquals(positive.code, 0, new TextDecoder().decode(positive.stderr));
     const expected = {
       source: toFileUrl(join(config, 'mod.ts')).href,
@@ -98,9 +102,27 @@ console.log(JSON.stringify({ source, identity, value, cwd: Deno.cwd() }));`,
       projectConfig,
       '// consumer config with a separate map\n' + JSON.stringify({ importMap: './imports.json' }),
     );
-    const externalMap = await run(await denoChildConfigArgs(projectConfig, toFileUrl(child).href));
+    const externalMap = await run(
+      (await denoChildConfig(projectConfig, toFileUrl(child).href)).configArgs,
+    );
     assertEquals(externalMap.code, 0, new TextDecoder().decode(externalMap.stderr));
     assertEquals(JSON.parse(new TextDecoder().decode(externalMap.stdout)), expected);
+    assertEquals(
+      (await denoChildConfig(
+        projectConfig,
+        toFileUrl(child).href,
+        toFileUrl(join(consumer, 'generator.ts')).href,
+      )).configArgs,
+      ['--config', projectConfig],
+    );
+    assertEquals(
+      (await denoChildConfig(
+        projectConfig,
+        toFileUrl(child).href,
+        'https://example.invalid/generator.ts',
+      )).configArgs,
+      ['--config', projectConfig],
+    );
   } finally {
     await Deno.remove(root, { recursive: true });
   }

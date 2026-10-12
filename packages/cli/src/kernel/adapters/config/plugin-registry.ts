@@ -4,7 +4,7 @@
  * Helpers for loading and normalizing the local plugin registry.
  */
 
-import { denoChildConfigArgs } from '../runtime/process/deno-child-config.ts';
+import { denoChildConfig } from '../runtime/process/deno-child-config.ts';
 
 import { dirname, join, relative, resolve } from '@std/path';
 import type { NetScriptConfig, PathsConfig } from '@netscript/config';
@@ -202,7 +202,7 @@ async function resolvePluginManifestsWithProjectConfig(
       '--allow-net',
       '--deny-env',
       '--minimum-dependency-age=0',
-      ...await denoChildConfigArgs(join(projectRoot, 'deno.json')),
+      ...(await denoChildConfig(join(projectRoot, 'deno.json'))).configArgs,
       CONFIGURED_PLUGIN_MANIFEST_LOADER,
       JSON.stringify(moduleSpecifiers),
     ],

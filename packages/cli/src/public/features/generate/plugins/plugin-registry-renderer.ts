@@ -1,4 +1,4 @@
-import { denoChildConfigArgs } from '../../../../kernel/adapters/runtime/process/deno-child-config.ts';
+import { denoChildConfig } from '../../../../kernel/adapters/runtime/process/deno-child-config.ts';
 import { isProjectPath } from '../../../../kernel/adapters/service/generated-surface-inventory.ts';
 export { isProjectPath } from '../../../../kernel/adapters/service/generated-surface-inventory.ts';
 import { join } from '@std/path';
@@ -86,6 +86,7 @@ export async function renderRuntimeRegistryPlan(
   resolved: ResolvedRuntimeManifest,
   manifest: RuntimeRegistryManifest,
   process: InstalledRuntimeRegistryGeneratorDependencies['process'],
+  lockArgs: readonly string[] = [],
 ): Promise<readonly RenderedPluginRegistry[]> {
   const generator = manifest.runtimeRegistryGenerator;
   if (!generator || generator.inspectionProtocol !== 2) {
@@ -119,7 +120,8 @@ export async function renderRuntimeRegistryPlan(
     : join(resolved.generatorBase, generator.command);
   const result = await process.exec('deno', [
     'run',
-    ...await denoChildConfigArgs(join(projectRoot, 'deno.json')),
+    ...(await denoChildConfig(join(projectRoot, 'deno.json'), import.meta.url, command)).configArgs,
+    ...lockArgs,
     '--node-modules-dir=none',
     '--no-prompt',
     '--allow-read',

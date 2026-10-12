@@ -2,7 +2,7 @@ import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts'
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import { join } from '@std/path';
-import { denoChildConfigArgs } from '../../../../kernel/adapters/runtime/process/deno-child-config.ts';
+import { denoChildConfig } from '../../../../kernel/adapters/runtime/process/deno-child-config.ts';
 import type { ScaffoldResult } from '@netscript/plugin/protocol';
 import { EXIT_CODES } from '../host/plugin-loader.ts';
 import type { ValidatedPluginDescriptor } from '../install/jsr-plugin-validator-port.ts';
@@ -244,7 +244,9 @@ async function buildScriptArgs(
   args: readonly string[],
 ): Promise<readonly string[]> {
   const target = resolvePluginScaffoldTarget(source, exportPath);
-  const configArgs = source.kind === 'local-path' ? await denoChildConfigArgs() : [];
+  const configArgs = source.kind === 'local-path'
+    ? (await denoChildConfig(undefined, import.meta.url, target)).configArgs
+    : [];
   return ['run', ...configArgs, ...permissionFlags, target, ...args];
 }
 
