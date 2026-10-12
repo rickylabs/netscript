@@ -46,6 +46,7 @@ for (const backend of backends) {
         await wait(handle.ready);
         const batch = await wait(pending);
         assert(!batch.done);
+        assert(batch.value.every((event) => !Object.hasOwn(event, 'previousValue')));
         assertEquals(
           batch.value.map((event) => ({
             key: event.key,

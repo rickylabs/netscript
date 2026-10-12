@@ -171,6 +171,20 @@ Deno.test({
       await release.promise;
       return await getMany<T>(keys);
     });
+    let requests = 0;
+    const requested = new Map<number, ReturnType<typeof Promise.withResolvers<void>>>();
+    const request = (count: number): Promise<void> => {
+      if (requests >= count) return Promise.resolve();
+      const signal = Promise.withResolvers<void>();
+      requested.set(count, signal);
+      return signal.promise;
+    };
+    const next = WatchBatchQueue.prototype.next;
+    const drain = stub(WatchBatchQueue.prototype, 'next', function (...args) {
+      requests++;
+      requested.get(requests)?.resolve();
+      return next.apply(this, args);
+    });
     const push = WatchBatchQueue.prototype.push;
     let replayOlder = (): void => {};
     let deliverNewer = (): void => {};
@@ -198,22 +212,28 @@ Deno.test({
       const newer = await kv.get(key);
       release.resolve();
       assertEquals((await wait(pending)).value?.[0].value, 'newer');
-      const replay = await wait(reader.read());
-      assertEquals(replay.value?.[0].value, 'newer');
-      assertEquals(replay.value?.[0].versionstamp, newer?.versionstamp);
+      const afterReplays = reader.read();
+      // A fresh queue wait proves the older replay has been reconciled and
+      // suppressed, without relying on a sleep or a pending-promise timeout.
+      await wait(request(2));
       deliverNewer();
-      assertEquals((await wait(reader.read())).value?.[0].value, 'newer');
+      await wait(request(3));
       await kv.delete(key);
-      const deleted = await wait(reader.read());
+      const deleted = await wait(afterReplays);
       assertEquals(deleted.value?.[0].value, null);
       assertEquals(deleted.value?.[0].versionstamp, null);
+      assert(newer?.versionstamp);
+      const afterDeleteReplay = reader.read();
       replayOlder();
-      assertEquals((await wait(reader.read())).value?.[0].value, null);
+      await wait(request(5));
+      await kv.set(key, 'latest');
+      assertEquals((await wait(afterDeleteReplay)).value?.[0].value, 'latest');
     } finally {
       release.resolve();
       await pending.catch(() => {});
       await reader.cancel();
       queue.restore();
+      drain.restore();
       read.restore();
       await kv.close();
     }
@@ -225,6 +245,7 @@ Deno.test({
 const { runWatchableKvContract } = await import('../src/testing/mod.ts');
 runWatchableKvContract({
   name: 'watch review: plain iterable contract',
+  initial: true,
   make() {
     const kv = new MemoryKvAdapter();
     const originalWatch = kv.watch.bind(kv);

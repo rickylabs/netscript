@@ -85,7 +85,8 @@ Call `watch(keys, { initial: true })` to subscribe before receiving current stat
 contains every watched key, including absent keys as `delete`/null events, and marks its events with
 `initial: true`. Subsequent batches contain changes. A write committed after subscription
 acknowledgement cannot fall into a startup load/subscribe gap; a write racing the snapshot may
-appear twice, so dedupe by versionstamp. Deno KV still coalesces native watch updates. Without
+appear twice, so dedupe by equal versionstamp. Redis writers stamp independently: never use their
+versionstamps to order writes across processes. Deno KV still coalesces native watch updates. Without
 `initial`, the existing backend behavior is preserved.
 
 First-party handles provide an optional `ready` promise. Start iteration before awaiting it;

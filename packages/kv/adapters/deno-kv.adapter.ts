@@ -295,7 +295,7 @@ export class DenoKvAdapter implements WatchableKv {
 
           events.push({
             key,
-            previousValue,
+            ...(!snapshot ? { previousValue } : {}),
             timestamp: new Date(),
             type: (snapshot ? entry.versionstamp === null : entry.value === null)
               ? 'delete'

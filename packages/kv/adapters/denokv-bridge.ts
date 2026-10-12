@@ -555,7 +555,8 @@ export class WatchableKvBridge {
     _options?: DenoKvWatchOptions,
   ): ReadableStream<DenoKvEntryMaybe<T>[]> {
     const abortController = new AbortController();
-    const iterator = this.#kv.watch<T>(keys, {
+    const kv = this.#kv;
+    const iterator = kv.watch<T>(keys, {
       initial: true,
       signal: abortController.signal,
     })[Symbol.asyncIterator]();
@@ -567,31 +568,56 @@ export class WatchableKvBridge {
     return new ReadableStream<DenoKvEntryMaybe<T>[]>({
       async pull(controller) {
         try {
-          const { value: events, done } = await iterator.next();
-          if (ended) return;
-          if (done) {
-            ended = true;
-            controller.close();
+          // Suppressed replays do not produce an identical kvdex frame. Keep
+          // pulling until state changes, the source ends, or cancellation wins.
+          while (!ended) {
+            const { value: events, done } = await iterator.next();
+            if (ended) return;
+            if (done) {
+              ended = true;
+              controller.close();
+              return;
+            }
+            let changed = false;
+            for (const event of events) {
+              const key = keyToString(event.key);
+              const version = versions.get(key);
+              if (event.versionstamp !== null && event.versionstamp === version) continue;
+              if (
+                event.versionstamp !== null && version !== undefined && event.versionstamp < version
+              ) {
+                // Redis writers stamp independently. A lower stamp may be a
+                // replay or a later cross-process write: read only this key.
+                const entry = await kv.get<T>(event.key);
+                if (ended) return;
+                const current = state.get(key);
+                if (current && current.versionstamp === (entry?.versionstamp ?? null)) continue;
+                if (entry?.versionstamp !== null && entry?.versionstamp !== undefined) {
+                  versions.set(key, entry.versionstamp);
+                }
+                state.set(key, {
+                  key: event.key as DenoKvStrictKey,
+                  value: entry?.value ?? null,
+                  versionstamp: entry?.versionstamp ?? null,
+                } as DenoKvEntryMaybe<T>);
+              } else {
+                if (event.versionstamp !== null) versions.set(key, event.versionstamp);
+                state.set(key, {
+                  key: event.key as DenoKvStrictKey,
+                  value: event.value,
+                  versionstamp: event.type === 'delete' ? null : event.versionstamp,
+                } as DenoKvEntryMaybe<T>);
+              }
+              changed = true;
+            }
+            if (!changed) continue;
+            controller.enqueue(
+              keys.map((key) =>
+                state.get(keyToString(key)) ?? { key, value: null, versionstamp: null }
+              ),
+            );
             return;
           }
-          for (const event of events) {
-            const key = keyToString(event.key);
-            const version = versions.get(key);
-            if (event.versionstamp !== null) {
-              if (version !== undefined && event.versionstamp <= version) continue;
-              versions.set(key, event.versionstamp);
-            }
-            state.set(key, {
-              key: event.key as DenoKvStrictKey,
-              value: event.value,
-              versionstamp: event.type === 'delete' ? null : event.versionstamp,
-            } as DenoKvEntryMaybe<T>);
-          }
-          controller.enqueue(
-            keys.map((key) =>
-              state.get(keyToString(key)) ?? { key, value: null, versionstamp: null }
-            ),
-          );
         } catch (error) {
           if (!ended) {
             ended = true;

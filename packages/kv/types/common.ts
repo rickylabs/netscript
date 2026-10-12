@@ -43,7 +43,12 @@ export interface WatchEvent<T = unknown> {
   timestamp: Date;
   /** Version stamp after the change */
   versionstamp: string | null;
-  /** True only for events in the opt-in snapshot delivered before changes. */
+  /**
+   * True only for events in the opt-in snapshot delivered before changes.
+   * Snapshot events omit previousValue. Deduplicate by equal versionstamp;
+   * Redis stamps are not ordered across writer processes and must not be used
+   * to order their writes.
+   */
   initial?: true;
 }
 
@@ -96,7 +101,8 @@ export interface WatchOptions {
    * `initial: true`. Absent keys emit `delete` with a null value/versionstamp.
    * Writes after acknowledgement cannot fall into a load/subscribe gap. A
    * write racing the snapshot may also appear as a change; dedupe by
-   * versionstamp. Omitted or false preserves the backend's default behavior.
+   * equal versionstamp. Redis stamps are not ordered across writer processes;
+   * never use them to order writes from different processes. Omitted or false preserves the backend's default behavior.
    * This option applies to fixed-key `watch`; prefixes retain `skipInitial`.
    */
   initial?: boolean;

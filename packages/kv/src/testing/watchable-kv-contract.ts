@@ -21,6 +21,8 @@ export interface WatchableKvContractOptions {
   readonly make: () => WatchableKv | Promise<WatchableKv>;
   /** Skip every scenario, e.g. when the backing service is not configured. */
   readonly ignore?: boolean;
+  /** Test snapshot mode; defaults to change-only watches requiring `ready`. */
+  readonly initial?: boolean;
 }
 
 /**
@@ -48,15 +50,22 @@ class WatchProbe {
   readonly #iterator: AsyncIterator<WatchEvent[]>;
   readonly #ready: Promise<void> | undefined;
   readonly #initialHandshake: boolean;
+  readonly #initialRequested: boolean;
 
   constructor(kv: WatchableKv, keys: KvKey[], options: Omit<WatchOptions, 'signal'> = {}) {
     this.#kv = kv;
+    const { initial, ...watchOptions } = options;
+    this.#initialRequested = initial === true;
     const handle = kv.watch(keys, {
-      ...options,
-      initial: true,
+      ...watchOptions,
+      ...(initial ? { initial: true } : {}),
       signal: this.#controller.signal,
     });
     this.#initialHandshake = !handle.ready;
+    assert(
+      handle.ready || initial,
+      'default-path contract requires readiness; use initial: true for snapshot-only adapters',
+    );
     this.#ready = handle.ready;
     this.#iterator = handle[Symbol.asyncIterator]();
   }
@@ -68,7 +77,11 @@ class WatchProbe {
       assert(!result.done, 'watch stream ended early');
       // Readiness-capable adapters may also honor initial. Discard that batch
       // so the existing change assertions see exactly their requested writes.
-      if (!this.#initialHandshake && result.value.every((event) => event.initial)) continue;
+      if (
+        this.#initialRequested && !this.#initialHandshake &&
+        result.value.every((event) => event.initial)
+      ) continue;
+      if (!this.#initialRequested) assert(result.value.every((event) => !event.initial));
       return result.value;
     }
   }
@@ -107,12 +120,14 @@ class WatchProbe {
   }
 }
 
-type WatchScenario = Scenario<WatchableKv>;
+type WatchScenario = Omit<Scenario<WatchableKv>, 'run'> & {
+  run: (kv: WatchableKv, initial: boolean) => Promise<void>;
+};
 
 const writeVersionstamp: WatchScenario = {
   title: 'watch events carry the versionstamp of the write',
-  async run(kv) {
-    const probe = new WatchProbe(kv, [A]);
+  async run(kv, initial) {
+    const probe = new WatchProbe(kv, [A], { initial });
     try {
       const pending = await probe.open();
       await kv.set(A, 'a1');
@@ -127,8 +142,8 @@ const writeVersionstamp: WatchScenario = {
 
 const valueFidelity: WatchScenario = {
   title: 'watch delivers marker-shaped JSON values unchanged',
-  async run(kv) {
-    const probe = new WatchProbe(kv, [A]);
+  async run(kv, initial) {
+    const probe = new WatchProbe(kv, [A], { initial });
     try {
       const first = await probe.open();
       const sentinel = 'done';
@@ -148,8 +163,8 @@ const valueFidelity: WatchScenario = {
 
 const noHeldBackEvents: WatchScenario = {
   title: 'watch delivers a change received between batches without a later write',
-  async run(kv) {
-    const probe = new WatchProbe(kv, [A, B]);
+  async run(kv, initial) {
+    const probe = new WatchProbe(kv, [A, B], { initial });
     try {
       const first = await probe.open();
       await kv.set(A, 'A');
@@ -167,8 +182,8 @@ const noHeldBackEvents: WatchScenario = {
 
 const debounceKeepsQueuedEvents: WatchScenario = {
   title: 'watch with debounce never drops an event queued between batches',
-  async run(kv) {
-    const probe = new WatchProbe(kv, [A, B, C], { debounce: DEBOUNCE_MS });
+  async run(kv, initial) {
+    const probe = new WatchProbe(kv, [A, B, C], { debounce: DEBOUNCE_MS, initial });
     try {
       const first = await probe.open();
       await kv.set(A, 'A');
@@ -216,9 +231,10 @@ const abortEndsDebounceWindow: WatchScenario = {
  * while the consumer is between batches is delivered on the next request
  * without waiting for a later write; that `debounce` never drops a queued
  * change; and that aborting ends the stream promptly, even mid-debounce.
- * The harness opens one handle with `initial: true`. Adapters must expose
- * readiness or honor the initial snapshot; snapshots are consumed before the
- * existing change assertions.
+ * By default the harness opens one change-only handle and requires `ready`.
+ * Set the harness option `initial: true` for snapshot-mode coverage or adapters
+ * without readiness. Those adapters must honor the initial snapshot, which is
+ * consumed before the change assertions. The abort scenario remains change-only.
  *
  * @example
  * ```ts
@@ -233,11 +249,17 @@ const abortEndsDebounceWindow: WatchScenario = {
  * @param options - Adapter factory and display name.
  */
 export function runWatchableKvContract(options: WatchableKvContractOptions): void {
-  registerScenarios(options, [
-    writeVersionstamp,
-    valueFidelity,
-    noHeldBackEvents,
-    debounceKeepsQueuedEvents,
-    abortEndsDebounceWindow,
-  ]);
+  registerScenarios(
+    options,
+    [
+      writeVersionstamp,
+      valueFidelity,
+      noHeldBackEvents,
+      debounceKeepsQueuedEvents,
+      abortEndsDebounceWindow,
+    ].map((scenario) => ({
+      title: scenario.title,
+      run: (kv: WatchableKv) => scenario.run(kv, options.initial ?? false),
+    })),
+  );
 }

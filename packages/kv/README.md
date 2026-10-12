@@ -111,10 +111,12 @@ for await (
 
 Writes committed after subscription acknowledgement cannot fall into a startup load/subscribe gap.
 Delivery is at least once: a write racing the snapshot read may appear in both the snapshot and a
-later change batch. Deduplicate repeated versions by versionstamp. Deno KV retains its native watch
-coalescing semantics; this is a current-state watch, not a durable mutation log. Omitting `initial`
-preserves the existing backend behavior. Prefix watches retain their separate `skipInitial` and
-discovery semantics; `initial` applies only to fixed-key watches.
+later change batch. Deduplicate events by equal versionstamp. Redis writers generate their stamps
+independently: versionstamps are not ordered across writer processes, so never use them to order
+writes from different processes. Deno KV retains its native watch coalescing semantics; this is a
+current-state watch, not a durable mutation log. Omitting `initial` preserves the existing backend
+behavior. Prefix watches retain their separate `skipInitial` and discovery semantics; `initial`
+applies only to fixed-key watches.
 
 First-party watch handles also expose an optional `ready` promise. Subscriptions start lazily:
 request the first batch before awaiting `ready`. It resolves on Redis SUBSCRIBE acknowledgement,

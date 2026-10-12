@@ -12,11 +12,13 @@ export function createWatchHandle<T>(
 ): AsyncGenerator<T> & { readonly ready: Promise<void> } {
   const readiness = Promise.withResolvers<void>();
   let acknowledged = false;
+  let started = false;
   const ready = (): void => {
     acknowledged = true;
     readiness.resolve();
   };
   const iterator = (async function* () {
+    started = true;
     try {
       yield* start(ready);
     } catch (error) {
@@ -30,6 +32,14 @@ export function createWatchHandle<T>(
       }
     }
   })();
+  const finish = iterator.return.bind(iterator);
+  iterator.return = (value) => {
+    // Returning an unstarted generator never enters its finally block.
+    if (!started) {
+      readiness.reject(new DOMException('Watch ended before subscription readiness', 'AbortError'));
+    }
+    return finish(value);
+  };
   void readiness.promise.catch(() => {});
   return Object.defineProperty(iterator, 'ready', { value: readiness.promise }) as
     & AsyncGenerator<T>
