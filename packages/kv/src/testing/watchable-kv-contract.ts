@@ -46,11 +46,18 @@ class WatchProbe {
   readonly #kv: WatchableKv;
   readonly #controller = new AbortController();
   readonly #iterator: AsyncIterator<WatchEvent[]>;
+  readonly #ready: Promise<void> | undefined;
+  readonly #initialHandshake: boolean;
 
   constructor(kv: WatchableKv, keys: KvKey[], options: Omit<WatchOptions, 'signal'> = {}) {
     this.#kv = kv;
-    this.#iterator = kv.watch(keys, { ...options, signal: this.#controller.signal })
-      [Symbol.asyncIterator]();
+    let handle = kv.watch(keys, { ...options, signal: this.#controller.signal });
+    this.#initialHandshake = !handle.ready;
+    if (this.#initialHandshake) {
+      handle = kv.watch(keys, { ...options, initial: true, signal: this.#controller.signal });
+    }
+    this.#ready = handle.ready;
+    this.#iterator = handle[Symbol.asyncIterator]();
   }
 
   /** Request the next batch; the stream subscribes on its first request. */
@@ -67,8 +74,13 @@ class WatchProbe {
    * also await the batch itself.
    */
   async open(): Promise<{ readonly batch: Promise<WatchEvent[]> }> {
+    if (this.#initialHandshake) {
+      const snapshot = await this.next();
+      assert(snapshot.every((event) => event.initial), 'initial batch must establish readiness');
+      return { batch: this.next() };
+    }
     const batch = this.next();
-    await delay(DELIVERY_SETTLE_MS);
+    await deadline(this.#ready!, DELIVERY_TIMEOUT_MS);
     return { batch };
   }
 

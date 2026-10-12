@@ -43,7 +43,21 @@ export interface WatchEvent<T = unknown> {
   timestamp: Date;
   /** Version stamp after the change */
   versionstamp: string | null;
+  /** True only for events in the opt-in snapshot delivered before changes. */
+  initial?: true;
 }
+
+/**
+ * A watch iterable with optional subscription readiness.
+ *
+ * First-party adapters provide `ready`. Start iteration before awaiting it;
+ * subscriptions are lazy. It resolves when the backend acknowledges the
+ * subscription, and rejects if startup fails or is aborted before readiness.
+ * Third-party adapters may continue returning a plain async iterable.
+ */
+export type WatchStream<T = unknown> = AsyncIterable<WatchEvent<T>[]> & {
+  readonly ready?: Promise<void>;
+};
 
 /**
  * Options for `KvStore.set()`.
@@ -75,6 +89,15 @@ export interface KvListOptions {
  * Options for `WatchableKv.watch()`.
  */
 export interface WatchOptions {
+  /**
+   * Subscribe first, then emit current values as the first batch, marked
+   * `initial: true`. Absent keys emit `delete` with a null value/versionstamp.
+   * Writes after acknowledgement cannot fall into a load/subscribe gap. A
+   * write racing the snapshot may also appear as a change; dedupe by
+   * versionstamp. Omitted or false preserves the backend's default behavior.
+   * This option applies to fixed-key `watch`; prefixes retain `skipInitial`.
+   */
+  initial?: boolean;
   /** Abort signal for cleanup */
   signal?: AbortSignal;
   /** Debounce rapid changes (ms) */

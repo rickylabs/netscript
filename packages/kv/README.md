@@ -81,6 +81,47 @@ for await (const events of kv.watch([['users', 'alice']])) {
 }
 ```
 
+## Startup consistency
+
+Use `watch(keys, { initial: true })` when a consumer needs current state followed by changes. The
+adapter subscribes before delivering the first snapshot batch. Each watched key appears: existing
+keys emit `set` with their value and versionstamp; absent keys emit `delete` with a null value and
+versionstamp. Snapshot events carry `initial: true`.
+
+```ts
+import { getKv } from '@netscript/kv';
+
+const kv = await getKv();
+const controller = new AbortController();
+const versions = new Map<string, string | null>();
+for await (
+  const batch of kv.watch([['config', 'theme']], {
+    initial: true,
+    signal: controller.signal,
+  })
+) {
+  for (const event of batch) {
+    const key = JSON.stringify(event.key);
+    if (versions.has(key) && versions.get(key) === event.versionstamp) continue;
+    versions.set(key, event.versionstamp);
+    console.log(event.initial ? 'snapshot' : 'change', event.type, event.value);
+  }
+}
+```
+
+Writes committed after subscription acknowledgement cannot fall into a startup load/subscribe gap.
+Delivery is at least once: a write racing the snapshot read may appear in both the snapshot and a
+later change batch. Deduplicate repeated versions by versionstamp. Deno KV retains its native watch
+coalescing semantics; this is a current-state watch, not a durable mutation log. Omitting `initial`
+preserves the existing backend behavior. Prefix watches retain their separate `skipInitial` and
+discovery semantics; `initial` applies only to fixed-key watches.
+
+First-party watch handles also expose an optional `ready` promise. Subscriptions start lazily:
+request the first batch before awaiting `ready`. It resolves on Redis SUBSCRIBE acknowledgement,
+listener registration in memory, or the first native Deno KV frame. Startup failures reject both
+readiness and iteration. A watch aborted before readiness rejects `ready` with `AbortError`.
+Third-party adapters may return a plain async iterable without this promise.
+
 ## Public surface
 
 | Entry       | What it gives you                                                                                |

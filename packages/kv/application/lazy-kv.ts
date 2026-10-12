@@ -1,3 +1,4 @@
+import { createWatchHandle } from './watch-handle.ts';
 import type {
   KvEntry,
   KvKey,
@@ -7,6 +8,7 @@ import type {
   WatchEvent,
   WatchOptions,
   WatchPrefixOptions,
+  WatchStream,
 } from '../types/mod.ts';
 import { getKv, type SharedKvConfig } from './shared.ts';
 
@@ -39,8 +41,8 @@ class LazyKv implements WatchableKv {
   watch<T = unknown>(
     keys: KvKey[],
     options?: WatchOptions,
-  ): AsyncIterable<WatchEvent<T>[]> {
-    return this.watchResolved<T>(keys, options);
+  ): WatchStream<T> {
+    return createWatchHandle((ready) => this.watchResolved<T>(keys, options, ready));
   }
 
   watchPrefix<T = unknown>(
@@ -69,9 +71,29 @@ class LazyKv implements WatchableKv {
 
   private async *watchResolved<T>(
     keys: KvKey[],
-    options?: WatchOptions,
+    options: WatchOptions | undefined,
+    ready: () => void,
   ): AsyncIterable<WatchEvent<T>[]> {
-    yield* (await this.resolve()).watch<T>(keys, options);
+    const handle = (await this.resolve()).watch<T>(keys, options);
+    const iterator = handle[Symbol.asyncIterator]();
+    try {
+      let pending = iterator.next();
+      if (handle.ready) {
+        // Observe both failures even if readiness rejects before the first batch.
+        void pending.catch(() => {});
+        await handle.ready;
+        ready();
+      }
+      while (true) {
+        const result = await pending;
+        if (result.done) break;
+        if (!handle.ready && options?.initial) ready();
+        yield result.value;
+        pending = iterator.next();
+      }
+    } finally {
+      await iterator.return?.();
+    }
   }
 
   private async *watchPrefixResolved<T>(

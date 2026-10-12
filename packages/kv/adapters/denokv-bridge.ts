@@ -9,13 +9,10 @@
  * @module
  */
 
-import { createPackageLogger } from '@netscript/logger';
-import { generateVersionstamp } from '../application/keys.ts';
+import { generateVersionstamp, keyToString } from '../application/keys.ts';
 import type { WatchableKv } from '../types/watchable-kv.ts';
 import type { AtomicCheck, KvKey, KvListOptions } from '../types/common.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
-
-const logger = createPackageLogger('kv:bridge');
 
 // ---------------------------------------------------------------------------
 // kvdex-compatible types
@@ -557,69 +554,47 @@ export class WatchableKvBridge {
     keys: DenoKvStrictKey[],
     _options?: DenoKvWatchOptions,
   ): ReadableStream<DenoKvEntryMaybe<T>[]> {
-    // deno-lint-ignore no-this-alias
-    const bridge = this;
-    let abortController: AbortController | null = null;
-    let watchIterator: AsyncIterator<unknown[]> | null = null;
+    const abortController = new AbortController();
+    const iterator = this.#kv.watch<T>(keys, {
+      initial: true,
+      signal: abortController.signal,
+    })[Symbol.asyncIterator]();
+    const state = new Map<string, DenoKvEntryMaybe<T>>();
+    let ended = false;
 
     return new ReadableStream<DenoKvEntryMaybe<T>[]>({
-      async start(controller) {
-        // Emit initial state
+      async pull(controller) {
         try {
-          const initial = await Promise.all(
-            keys.map((k) => bridge.get<T>(k)),
+          const { value: events, done } = await iterator.next();
+          if (ended) return;
+          if (done) {
+            ended = true;
+            controller.close();
+            return;
+          }
+          for (const event of events) {
+            state.set(keyToString(event.key), {
+              key: event.key as DenoKvStrictKey,
+              value: event.value,
+              versionstamp: event.type === 'delete' ? null : event.versionstamp,
+            } as DenoKvEntryMaybe<T>);
+          }
+          controller.enqueue(
+            keys.map((key) =>
+              state.get(keyToString(key)) ?? { key, value: null, versionstamp: null }
+            ),
           );
-          controller.enqueue(initial);
-        } catch (err) {
-          logger.error('Bridge watch initial read failed', { error: String(err) });
-          controller.error(err);
-          return;
-        }
-
-        // Subscribe to changes via WatchableKv.watch()
-        abortController = new AbortController();
-        try {
-          const iterable = bridge.#kv.watch<T>(keys, {
-            signal: abortController.signal,
-          });
-          watchIterator = iterable[Symbol.asyncIterator]() as AsyncIterator<unknown[]>;
-
-          // Pump events from the watch iterator into the stream
-          (async () => {
-            try {
-              while (true) {
-                const { value, done } = await watchIterator!.next();
-                if (done) break;
-
-                // Re-fetch current values for all watched keys to get the
-                // DenoKvEntryMaybe shape that kvdex expects
-                const current = await Promise.all(
-                  keys.map((k) => bridge.get<T>(k)),
-                );
-                controller.enqueue(current);
-
-                // Suppress unused variable warning — value is consumed
-                void value;
-              }
-              controller.close();
-            } catch (err) {
-              // AbortError is expected on cancel
-              if (err instanceof DOMException && err.name === 'AbortError') {
-                controller.close();
-              } else if (abortController && !abortController.signal.aborted) {
-                controller.error(err);
-              }
-            }
-          })();
-        } catch (err) {
-          logger.error('Bridge watch subscription failed', { error: String(err) });
-          controller.error(err);
+        } catch (error) {
+          if (!ended) {
+            ended = true;
+            controller.error(error);
+          }
         }
       },
-
-      cancel() {
-        abortController?.abort();
-        watchIterator = null;
+      async cancel() {
+        ended = true;
+        abortController.abort();
+        await iterator.return?.();
       },
     });
   }

@@ -8,7 +8,7 @@
  */
 
 import type { KvStore } from './kv-store.ts';
-import type { KvKey, WatchEvent, WatchOptions, WatchPrefixOptions } from './common.ts';
+import type { KvKey, WatchEvent, WatchOptions, WatchPrefixOptions, WatchStream } from './common.ts';
 
 /**
  * Extended KV interface with reactive watch capabilities.
@@ -40,21 +40,31 @@ export interface WatchableKv extends KvStore {
   /**
    * Watch specific keys for changes.
    *
-   * Uses Deno.Kv.watch() under the hood for efficient native watching.
-   * Returns an async iterator that yields arrays of events when any
-   * watched key changes.
+   * With `initial: true`, subscribe before emitting a snapshot of every key
+   * as the first batch. Present keys emit `set`; absent keys emit `delete`
+   * with a null value. Snapshot events carry `initial: true`. Changes follow,
+   * including writes committed after subscription acknowledgement. A write
+   * racing the snapshot may appear twice; dedupe by versionstamp. Without
+   * `initial`, the backend's existing behavior is preserved.
+   *
+   * First-party handles expose an optional `ready` promise. Start iteration
+   * before awaiting it; it resolves on backend subscription acknowledgement
+   * (the first native frame for Deno KV), before the snapshot is delivered.
    *
    * @param keys - Array of keys to watch
-   * @param options - Watch options (signal, debounce)
+   * @param options - Watch options (initial, signal, debounce)
    * @returns Async iterable that yields arrays of watch events
    *
    * @example
    * ```ts
+   * import { getKv } from '@netscript/kv';
+   *
+   * const kv = await getKv();
    * const controller = new AbortController();
    *
    * for await (const events of kv.watch(
    *   [['config', 'theme'], ['config', 'locale']],
-   *   { signal: controller.signal }
+   *   { initial: true, signal: controller.signal }
    * )) {
    *   for (const event of events) {
    *     if (event.type === 'set') {
@@ -67,7 +77,7 @@ export interface WatchableKv extends KvStore {
   watch<T = unknown>(
     keys: KvKey[],
     options?: WatchOptions,
-  ): AsyncIterable<WatchEvent<T>[]>;
+  ): WatchStream<T>;
 
   /**
    * Watch all keys under a prefix.

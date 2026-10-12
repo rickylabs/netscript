@@ -79,6 +79,21 @@ hands back a `WatchableKv` for the rest of the process.
 | `WatchOptions` | interface | `interface WatchOptions` | Options for `WatchableKv.watch()`. |
 | `WatchPrefixOptions` | interface | `interface WatchPrefixOptions extends WatchOptions` | Options for `WatchableKv.watchPrefix()`. |
 
+### Current state followed by changes
+
+Call `watch(keys, { initial: true })` to subscribe before receiving current state. The first batch
+contains every watched key, including absent keys as `delete`/null events, and marks its events with
+`initial: true`. Subsequent batches contain changes. A write committed after subscription
+acknowledgement cannot fall into a startup load/subscribe gap; a write racing the snapshot may
+appear twice, so dedupe by versionstamp. Deno KV still coalesces native watch updates. Without
+`initial`, the existing backend behavior is preserved.
+
+First-party handles provide an optional `ready` promise. Start iteration before awaiting it;
+subscriptions are lazy. Redis resolves it on SUBSCRIBE acknowledgement, memory on listener
+registration, and Deno KV on the first native frame. Startup failure or abort before readiness
+rejects the promise. Third-party adapters may return an iterable without `ready`. Prefix watches
+retain their existing `skipInitial` and discovery semantics.
+
 ## Sub-path exports
 
 The following entrypoints are published alongside the root export. Each is generated from
