@@ -30,3 +30,8 @@
   evaluator/merge-readiness, per AGENTS.md, rather than blocking S1 source sign-off. S1 still requires
   complete affected suites, structured source gates, quality:gate and independent substantive review.
   No functional gate was removed and no merge readiness is claimed before S2.
+- 2026-10-18: pinned Deno 2.9.7 full smoke terminated with 50 passing gates and the same
+  runtime.aspire-start convergence failure: real Postgres/cache loopback listeners were unreachable.
+  Cleanup passed and final leak inspection found zero proven run-owned survivors. Full runtime
+  acceptance is UNPROVEN. Ready-for-review transition follows the operator's explicit delivery
+  instruction; status:impl-eval and unchecked full-runtime DoD preserve the ready-merge block.

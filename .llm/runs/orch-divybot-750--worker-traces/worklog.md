@@ -106,3 +106,49 @@ S1 is complete and signed off by the independent supervisor, who owns this sign-
   evidence set — smoke outcome, quality:gate, publish dry runs, doc-lint baseline comparison and
   final cleanup evidence.
 - Only after both: ready-merge, PR #2399 out of draft, close-gate handling for #2393.
+
+## S2 final gate execution — 2026-10-18
+
+The final one-pass scaffold.runtime command selected the current repository pin (Deno 2.9.7),
+installed .NET SDK 10.0.400, Aspire 13.5.3 and existing DinD 28.5.2:
+
+```
+DOCKER_HOST=tcp://netscript-dind:2375 MISE_DENO_VERSION=2.9.7 MISE_DOTNET_VERSION=10.0.400 mise exec deno@2.9.7 dotnet@10.0.400 -- deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report /home/agent/projects/orchid/runs/2026-10-18-worker-traces/e2e-final.json
+```
+
+Actual result: **exit 1, 50 passed / 1 failed / 0 skipped**. `runtime.aspire-start` timed out at
+service convergence. The generated Postgres resource's real checks reported connection refused on
+the allocated loopback port; Redis/Garnet listener checks timed out. Dependent workers/triggers
+and services remained waiting. This is **unproven full runtime acceptance**, not a passing gate.
+The same failure was observed on the earlier Deno 2.9.5 debug run, so the final pin removes that
+tool-version confound. No networking workaround or product source change was introduced.
+
+`cleanup.aspire-stop` **passed**. Final read-only leak inspection reported **zero proven run-owned
+survivors**. Existing foreign/unknown-owner resources were reviewed in the retained leak report and
+left untouched. See receipts/e2e-final-summary.json, receipts/e2e-final-health.json and
+receipts/cleanup-summary.json; raw domain report/log remain in the operational evidence directory.
+The report hash is retained without copying generated environment values into Git.
+
+Source stays at supervisor sign-off commit `cd244c24a420f2fa5677967de4b755b192f1e1b9`; the eight
+source hashes remain unchanged. PR #2399 is ready **for review** per the operator's delivery
+instruction, with status:impl-eval and full-runtime DoD unchecked. **Ready-merge remains blocked**.
+This supersedes the earlier wording that coupled leaving draft to ready-merge; no gate was waived.
+Final independent IMPL-EVAL has been requested in the same Opus session against this terminal evidence.
+
+## Final independent verdict and handoff
+
+Same-session Opus IMPL-EVAL returned **FAIL_FIX**: the functional source change is accepted, no source
+defect was found, but mandatory runtime acceptance is unproven. Source manifest and committed content
+were independently re-verified. This is the first terminal IMPL-EVAL failure, not a rescope or debt
+failure. The stricter dispatcher leaf stops after two consecutive terminal failures.
+
+Reporting corrections preserve that same verdict. Doc-lint commands remain pre-existing FAIL
+(exit 1); only the unchanged-baseline comparison passes. The closed-port probe from after an earlier
+cleanup is excluded from live-network diagnosis. Gate totals include cleanup: 49 steps passed before
+the convergence failure and cleanup was the 50th passing step.
+
+PR #2399 and upstream #2393 have status:impl-eval; PR is ready for review, full-runtime DoD unchecked.
+Final-evaluation-recorded DoD is satisfied by evaluate.md, without asserting PASS. Closing keywords
+are retained for an eventual evidence-backed merge. No issue was closed and no merge-ready label
+was applied. No independent implementation scope remains to fan out. Source and lockfiles are
+unchanged after supervisor sign-off; only final run evidence is added in S2.

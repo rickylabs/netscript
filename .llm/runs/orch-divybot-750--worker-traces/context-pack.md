@@ -1,31 +1,46 @@
 # Resume worker trace isolation
 
-Issue #2393 / inbox harness#750. Branch `orch/divybot-750`, baseline a833dfa8. Draft PR #2399.
-Root cause: inbound extraction fell back to ambient worker context, and without a registered
-propagator that ambient span even masked valid message headers.
+- Issue: netscript#2393; assignment harness#750.
+- PR: https://github.com/rickylabs/netscript/pull/2399 — open, ready for review, status:impl-eval, milestone 0.0.9. Full-runtime DoD unchecked; no ready-merge label.
+- Branch/worktree: `orch/divybot-750`, `/home/agent/projects/orchid/worktrees/issue-750`.
+- Baseline: `a833dfa8a3095bb6434cf7ae8bf24f954cf2f1bd`.
+- Implementation/supervisor sign-off commit: `cd244c24a420f2fa5677967de4b755b192f1e1b9`.
 
-## State: S1 complete and signed off
+The functional fix is complete and independently accepted. Incoming extraction starts from
+ROOT_CONTEXT; absent/malformed message carriers root instead of inheriting a worker lifetime trace;
+trigger ingress uses the same resolver; full tracestate lists survive normalization. Valid producer
+parents and queue → job → handler / ingress → detect → process ancestry remain intact. All eight
+source files match receipts/source-manifest.json and are unchanged since supervisor sign-off.
 
-Fix landed in `packages/telemetry/src/context/{w3c,message}.ts` (extract from ROOT_CONTEXT, keep the
-full tracestate list) and `plugins/triggers/src/runtime/trigger-runtime-processor.ts` (every
-delivery follows its durable carrier). Eight reviewed files are pinned by
-`receipts/source-manifest.json`. Independent substantive review by Claude Opus 5
-(`claude-opus-5`, Anthropic), xhigh, session `0faa9365-3561-462c-96f1-45c3216cd292` — different
-vendor and session from the Codex implementation — returned PASS_SLICE_REVIEW, then reaffirmed it
-after verifying the F1-F6 repair delta. Details in `slice-review.md`; gate table in `worklog.md`.
-The supervisor owns the S1 sign-off commit; the implementer pushes it and posts the S1 scope and
-evidence comment on #2399.
+Validation: 400 affected-suite tests passed (13 existing ignored), 46 additional consumer tests
+passed, structured check/lint/fmt and repo quality/architecture/dependency gates passed, and both
+package publish dry runs passed. Independent reviewer runs passed 34, 144 (4 existing ignored),
+then 34 tests after repair. Doc-lint commands exit 1 with baseline-identical errors (telemetry 7,
+triggers 27); the regression comparison passes, not the failing commands themselves.
 
-## Next: S2 only
+Final full scaffold.runtime: Deno 2.9.7, .NET 10.0.400, Aspire 13.5.3, DinD 28.5.2; exit 1,
+50 passing gates total (49 before the failure, plus cleanup). runtime.aspire-start failed because
+real database/cache listener probes could not reach allocated loopback ports; in-process fixture
+listeners were healthy. Dependent workers/triggers/services never started, so runtime acceptance
+is UNPROVEN. Cleanup passed; final leak report has zero proven run-owned survivors. All 26 persistent
+foreign/unknown entries existed at preflight; the 27th was the inventory's transient aspire ps.
+None were mutated. See receipts/e2e-final-summary.json, e2e-final-health.json, cleanup-summary.json
+and the retained leak-report.md. A post-cleanup closed-port probe is excluded from live diagnosis.
 
-1. Full `deno task e2e:cli run scaffold.runtime --cleanup` merge-readiness smoke — the final gate
-   per AGENTS.md, not a per-slice implementation gate. It was still running at sign-off and is
-   **not** claimed green.
-2. Final IMPL-EVAL in that same reviewer session once the smoke terminates, over the full evidence
-   set: smoke outcome, quality:gate, publish dry runs, doc-lint baseline comparison, cleanup.
-3. Only then ready-merge, PR out of draft, and close-gate handling for #2393. `release-note.md`
-   carries the published-behaviour text the PR body must state.
+Final independent IMPL-EVAL: **FAIL_FIX**, functional source accepted, no source defect found;
+ready-merge blocked on runtime acceptance. Evaluator: Claude Opus 5 (`claude-opus-5`, Anthropic),
+requested effort xhigh, session `0faa9365-3561-462c-96f1-45c3216cd292`, separate from Codex/OpenAI.
+Read evaluate.md and slice-review.md. Documentary corrections do not consume another cycle.
+This is terminal IMPL-EVAL failure 1. The dispatcher leaf stops after TWO consecutive terminal
+failures even though the outer feature matrix allows at most five cycles. Do not attempt a third
+consecutive failure or substitute a fresh evaluator session.
 
-No self-certification at any step. Do not commit assignment or final-report files
-(`.divybot-goal.md` stays excluded). Operational evidence and memory live outside the repo in
-`/home/agent/projects/orchid/runs/2026-10-18-worker-traces/`.
+No independent implementation work remains to fan out. For merge readiness, restore a runner whose
+container ports are visible to probes and run the full one-pass scaffold.runtime --cleanup gate
+against the PR source, then re-steer the SAME evaluator with real terminal evidence. Do not weaken
+tests, waive the gate, self-certify, or close #2393 prematurely. Ready for review follows the owner's
+delivery instruction and does not claim full acceptance.
+
+Operational evidence, evaluator prompts/logs and several specific memory notes:
+`/home/agent/projects/orchid/runs/2026-10-18-worker-traces/` (memory/ subdirectory).
+Keep assignment/final-report files excluded from Git. Retain tracked run artifacts.
