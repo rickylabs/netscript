@@ -8,8 +8,10 @@ be a fallback. Trigger ingress follows the same rule; nested job/trigger spans r
    queue-consumer tests; explicit root in `plugins/triggers/src/runtime/trigger-runtime-processor.ts`
    with real SDK regression tests, worker dispatcher regression tests and telemetry README.
    Gate: structured check/test/lint/fmt for affected surfaces; whole telemetry/workers-core/triggers-core
-   and workers/triggers plugin suites; quality:gate; JSR audit/doc lint; full `e2e:cli`.
-2. S2: independent different-family IMPL-EVAL, substantive review, evidence, lesson and final handoff.
+   and workers/triggers plugin suites; quality:gate; JSR audit/doc lint.
+2. S2: full `e2e:cli` scaffold.runtime merge-readiness gate, independent different-family IMPL-EVAL,
+   substantive review, evidence, lesson and final handoff. The expensive full smoke is a final gate,
+   following AGENTS.md's evaluator/merge-readiness placement; it is not relaxed or replaced.
 
 PLAN-EVAL: N/A. This is a bounded correction to three existing ingress fallback paths. The expected
 parenting rule is prescribed by the issue and existing tests (#405); no new public API, data model,
