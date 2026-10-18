@@ -1,0 +1,10 @@
+{
+  "packages/telemetry/README.md": "ec264ee3830e6bb345ad163666da593aa5bcc0731a17c498f5252c727c38408d",
+  "packages/telemetry/src/context/message.ts": "c0ac968b78e2aef7e2c87e2d191841895e51b86e78740bbc9374af30b33e9d2c",
+  "packages/telemetry/src/context/w3c.ts": "30b0bdd6767f68dccc97c956b8702db6ecb2fbe07c9ecff6c291fc04b81f6669",
+  "packages/telemetry/tests/context/message-parenting_test.ts": "9c6e6f72ece780267b3af6a9e5fee3b061c84f2f9ed8e54d485ae2351d0f8b94",
+  "packages/telemetry/tests/instrumentation/queue-parenting_test.ts": "58947b7c46706a18286d39af13dc3998389b3c5aab1205d020288bc9192cc47e",
+  "plugins/triggers/src/runtime/trigger-runtime-parenting_test.ts": "361db3fe93902fd86c263e01fc3e100e1710209ff413849203c0ff7c56d345c6",
+  "plugins/triggers/src/runtime/trigger-runtime-processor.ts": "f4433047152fed3dbb4c6940d706dd7bcf8f00fc29a44a8be07fe7ef8652ca67",
+  "plugins/workers/worker/job-dispatcher_test.ts": "8e529b147d9518560f0b70d5c8a01a43d366ba89a4f919c2497b3e54157b8f56"
+}

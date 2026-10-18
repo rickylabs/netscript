@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-10-18T09:21:34.347Z",
+  "probes": {
+    "aspire": {
+      "state": "ok"
+    },
+    "docker": {
+      "state": "ok"
+    },
+    "volumes": {
+      "state": "ok"
+    },
+    "networks": {
+      "state": "ok"
+    },
+    "process": {
+      "state": "ok"
+    }
+  },
+  "survivorsByOwnership": {
+    "unproven": 27
+  },
+  "ownedSurvivors": []
+}

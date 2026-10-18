@@ -1,0 +1,252 @@
+{
+  "appHost": "/home/agent/projects/orchid/worktrees/issue-750/.llm/tmp/cli-e2e/plugin-smoke-20261018-111127/aspire/apphost.mts",
+  "resources": [
+    {
+      "name": "auth-vsbcvhnd",
+      "displayName": "auth",
+      "state": "Waiting",
+      "healthReports": {
+        "auth_http_/health_200_check": {}
+      }
+    },
+    {
+      "name": "credential-fault-dependent-jkxhpdrg",
+      "displayName": "credential-fault-dependent",
+      "state": "Waiting",
+      "healthReports": {}
+    },
+    {
+      "name": "credential-fault-probe-qvksjpwf",
+      "displayName": "credential-fault-probe",
+      "state": "Running",
+      "healthStatus": "Unhealthy",
+      "healthReports": {
+        "test_only_postgres_auth_rejected": {
+          "status": "Unhealthy",
+          "description": "postgres credential check failed: listener ECONNREFUSED at localhost:28698 after 1 ms"
+        }
+      }
+    },
+    {
+      "name": "garnet-hwerzsyn",
+      "displayName": "garnet",
+      "state": "Running",
+      "healthStatus": "Unhealthy",
+      "healthReports": {
+        "garnet_resp": {
+          "status": "Unhealthy",
+          "description": "RESP listener unhealthy: ETIMEDOUT at localhost:42467 after 2000 ms; received=\"\""
+        },
+        "test_only_garnet_resp": {
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:18999"
+        }
+      }
+    },
+    {
+      "name": "listener-fault-controller-pncusbrp",
+      "displayName": "listener-fault-controller",
+      "state": "Running",
+      "healthStatus": "Healthy",
+      "healthReports": {}
+    },
+    {
+      "name": "netscript-installation-secret",
+      "displayName": "netscript-installation-secret",
+      "state": "Running",
+      "healthStatus": "Healthy",
+      "healthReports": {}
+    },
+    {
+      "name": "payments-amgmumsh",
+      "displayName": "payments",
+      "state": "Waiting",
+      "healthReports": {
+        "payments_http_/health_200_check": {}
+      }
+    },
+    {
+      "name": "plugin-smoke-20261018-111127-db",
+      "displayName": "plugin-smoke-20261018-111127-db",
+      "state": "Running",
+      "healthStatus": "Unhealthy",
+      "healthReports": {
+        "plugin-smoke-20261018-111127-db_check": {
+          "status": "Unhealthy",
+          "description": "Failed to connect to 127.0.0.1:28698",
+          "exceptionMessage": "Npgsql.NpgsqlException (0x80004005): Failed to connect to 127.0.0.1:28698\n ---> System.Net.Sockets.SocketException (111): Connection refused\n   at System.Threading.Tasks.ValueTask.ValueTaskSourceAsTask.<>c.<.cctor>b__4_0(Object state)\n--- End of stack trace from previous location ---\n   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync(Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)\n   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)\n   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)\n   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)\n   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|213_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)\n   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n   at Npgsql.PoolingDataSource.<Get>g__RentAsync|34_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)\n   at HealthChecks.NpgSql.NpgSqlHealthCheck.CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken) in /home/runner/work/AspNetCore.Diagnostics.HealthChecks/AspNetCore.Diagnostics.HealthChecks/src/HealthChecks.NpgSql/NpgSqlHealthCheck.cs:line 31\n   at HealthChecks.NpgSql.NpgSqlHealthCheck.CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken) in /home/runner/work/AspNetCore.Diagnostics.HealthChecks/AspNetCore.Diagnostics.HealthChecks/src/HealthChecks.NpgSql/NpgSqlHealthCheck.cs:line 37"
+        },
+        "postgres_auth": {
+          "status": "Unhealthy",
+          "description": "postgres credential check failed: listener ECONNREFUSED at localhost:28698 after 1 ms"
+        },
+        "postgres_check": {
+          "status": "Unhealthy",
+          "description": "Failed to connect to 127.0.0.1:28698",
+          "exceptionMessage": "Npgsql.NpgsqlException (0x80004005): Failed to connect to 127.0.0.1:28698\n ---> System.Net.Sockets.SocketException (111): Connection refused\n   at System.Threading.Tasks.ValueTask.ValueTaskSourceAsTask.<>c.<.cctor>b__4_0(Object state)\n--- End of stack trace from previous location ---\n   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync(Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)\n   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)\n   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)\n   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)\n   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|213_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)\n   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n   at Npgsql.PoolingDataSource.<Get>g__RentAsync|34_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)\n   at HealthChecks.NpgSql.NpgSqlHealthCheck.CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken) in /home/runner/work/AspNetCore.Diagnostics.HealthChecks/AspNetCore.Diagnostics.HealthChecks/src/HealthChecks.NpgSql/NpgSqlHealthCheck.cs:line 31\n   at HealthChecks.NpgSql.NpgSqlHealthCheck.CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken) in /home/runner/work/AspNetCore.Diagnostics.HealthChecks/AspNetCore.Diagnostics.HealthChecks/src/HealthChecks.NpgSql/NpgSqlHealthCheck.cs:line 37"
+        },
+        "postgres_listener": {
+          "status": "Unhealthy",
+          "description": "postgres listener unreachable: ECONNREFUSED"
+        },
+        "test_only_postgres_listener": {
+          "status": "Healthy",
+          "description": "tcp listener ready on localhost:18998"
+        }
+      }
+    },
+    {
+      "name": "plugin-smoke-20261018-111127-web-browser-logs",
+      "displayName": "plugin-smoke-20261018-111127-web-browser-logs",
+      "state": "NotStarted",
+      "healthReports": {}
+    },
+    {
+      "name": "plugin-smoke-20261018-111127-web-nxamcquv",
+      "displayName": "plugin-smoke-20261018-111127-web",
+      "state": "Running",
+      "healthStatus": "Healthy",
+      "healthReports": {
+        "plugin-smoke-20261018-111127-web_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      }
+    },
+    {
+      "name": "postgres-2e79f620",
+      "displayName": "postgres",
+      "state": "Running",
+      "healthStatus": "Unhealthy",
+      "healthReports": {
+        "postgres_auth": {
+          "status": "Unhealthy",
+          "description": "postgres credential check failed: listener ECONNREFUSED at localhost:28698 after 1 ms"
+        },
+        "postgres_check": {
+          "status": "Unhealthy",
+          "description": "Failed to connect to 127.0.0.1:28698",
+          "exceptionMessage": "Npgsql.NpgsqlException (0x80004005): Failed to connect to 127.0.0.1:28698\n ---> System.Net.Sockets.SocketException (111): Connection refused\n   at System.Threading.Tasks.ValueTask.ValueTaskSourceAsTask.<>c.<.cctor>b__4_0(Object state)\n--- End of stack trace from previous location ---\n   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync(Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)\n   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)\n   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)\n   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)\n   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|213_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)\n   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n   at Npgsql.PoolingDataSource.<Get>g__RentAsync|34_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)\n   at HealthChecks.NpgSql.NpgSqlHealthCheck.CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken) in /home/runner/work/AspNetCore.Diagnostics.HealthChecks/AspNetCore.Diagnostics.HealthChecks/src/HealthChecks.NpgSql/NpgSqlHealthCheck.cs:line 31\n   at HealthChecks.NpgSql.NpgSqlHealthCheck.CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken) in /home/runner/work/AspNetCore.Diagnostics.HealthChecks/AspNetCore.Diagnostics.HealthChecks/src/HealthChecks.NpgSql/NpgSqlHealthCheck.cs:line 37"
+        },
+        "postgres_listener": {
+          "status": "Unhealthy",
+          "description": "postgres listener unreachable: ECONNREFUSED"
+        },
+        "test_only_postgres_listener": {
+          "status": "Healthy",
+          "description": "tcp listener ready on localhost:18998"
+        }
+      }
+    },
+    {
+      "name": "postgres-cli-phqmxmxh",
+      "displayName": "postgres-cli",
+      "state": "NotStarted",
+      "healthReports": {}
+    },
+    {
+      "name": "postgres-password",
+      "displayName": "postgres-password",
+      "state": "Running",
+      "healthStatus": "Healthy",
+      "healthReports": {}
+    },
+    {
+      "name": "prisma-studio-sptmrqfg",
+      "displayName": "prisma-studio",
+      "state": "Waiting",
+      "healthReports": {}
+    },
+    {
+      "name": "readiness-dead-port-jzapuyxb",
+      "displayName": "readiness-dead-port",
+      "state": "Running",
+      "healthStatus": "Unhealthy",
+      "healthReports": {
+        "readiness-dead-port_http_/health_200_check": {
+          "status": "Unhealthy",
+          "description": "Request to http://localhost:18997/health timed out",
+          "exceptionMessage": "System.Threading.Tasks.TaskCanceledException: The operation was canceled.\n ---> System.Threading.Tasks.TaskCanceledException: The operation was canceled.\n ---> System.IO.IOException: Unable to read data from the transport connection: Operation canceled.\n ---> System.Net.Sockets.SocketException (125): Operation canceled\n   --- End of inner exception stack trace ---\n   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)\n   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource<System.Int32>.GetResult(Int16 token)\n   at System.Net.Http.HttpConnection.InitialFillAsync(Boolean async)\n   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   --- End of inner exception stack trace ---\n   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)\n   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)\n   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)\n   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n   --- End of inner exception stack trace ---\n   at System.Net.Http.HttpClient.HandleFailure(Exception e, Boolean telemetryStarted, HttpResponseMessage response, CancellationTokenSource cts, CancellationToken cancellationToken, CancellationTokenSource pendingRequestsCts)\n   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n   at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351"
+        }
+      }
+    },
+    {
+      "name": "redis-nqqtnhbj",
+      "displayName": "redis",
+      "state": "Running",
+      "healthStatus": "Unhealthy",
+      "healthReports": {
+        "redis_resp": {
+          "status": "Unhealthy",
+          "description": "RESP listener unhealthy: ETIMEDOUT at localhost:40379 after 2001 ms; received=\"\""
+        }
+      }
+    },
+    {
+      "name": "sagas-api-mcgmncma",
+      "displayName": "sagas-api",
+      "state": "Waiting",
+      "healthReports": {
+        "sagas-api_http_/health_200_check": {}
+      }
+    },
+    {
+      "name": "sagas-vfdntgrc",
+      "displayName": "sagas",
+      "state": "Waiting",
+      "healthReports": {
+        "sagas_http_/health_200_check": {}
+      }
+    },
+    {
+      "name": "streams-bwabrgub",
+      "displayName": "streams",
+      "state": "Running",
+      "healthStatus": "Healthy",
+      "healthReports": {
+        "streams_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      }
+    },
+    {
+      "name": "triggers-api-wsyhvqtv",
+      "displayName": "triggers-api",
+      "state": "Waiting",
+      "healthReports": {
+        "triggers-api_http_/health_200_check": {}
+      }
+    },
+    {
+      "name": "triggers-nbkxacgk",
+      "displayName": "triggers",
+      "state": "Waiting",
+      "healthReports": {
+        "triggers_http_/health_200_check": {}
+      }
+    },
+    {
+      "name": "users-gxrvrttk",
+      "displayName": "users",
+      "state": "Waiting",
+      "healthReports": {
+        "users_http_/health_200_check": {}
+      }
+    },
+    {
+      "name": "workers-api-emrydnjy",
+      "displayName": "workers-api",
+      "state": "Waiting",
+      "healthReports": {
+        "workers-api_http_/health_200_check": {}
+      }
+    },
+    {
+      "name": "workers-wdxpqppa",
+      "displayName": "workers",
+      "state": "Waiting",
+      "healthReports": {
+        "workers_http_/health_200_check": {}
+      }
+    }
+  ]
+}
