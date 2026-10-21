@@ -125,3 +125,34 @@ No high/medium findings. No doctrine violations. No debt entries required.
 | Rationale | Approved scope (items 2+3: derived theme primitive, design guide + theme chain, MCP corpus + routing, app AGENTS.md/WEB-LAYER.md) is complete; every gate in the brief's suite re-run green by the evaluator, including token reproducibility, the 0.0.8 negative control, and temp-config CLI fmt/lint; token derivation, inheritance, default-look preservation, all factual claims (incl. WCAG contrast recomputed), MCP reachability without hijack, and generated-guidance safety verified against code; two low doc nits are follow-up material, not merge-blockers; `scaffold.runtime` unavailability is brief-scoped and recorded; no debt or close-gate issues (`Refs #2406` partial, sibling split honored). |
 
 VERDICT: PASS
+
+## Round 2 (delta re-steer, same evaluator session)
+
+| Field | Value |
+| --- | --- |
+| Evaluated head | `703a9530415ac2a828162ed5f67182522fc46b1c` ("docs(web-layer): correct the EmptyState and withForm guidance") |
+| Delta range | `git diff f1442f3..HEAD` — product files: `docs/site/web-layer/how-to/design-with-fresh-ui.md` (3 lines), `packages/cli/src/kernel/assets/agent-docs-prose.generated.ts`, `packages/mcp/src/publish-assets.generated.ts` (regenerated carriers); rest is run-dir bookkeeping |
+| Evaluator route (observed) | same session, Muse Spark (`meta/muse-spark-1.3`) via OpenCode/OpenRouter |
+
+### Wording fixes verified true against code
+
+1. **EmptyState** (`design-with-fresh-ui.md:198`): now "EmptyState takes a heading; put the next step or a Button in its children." TRUE — `packages/fresh-ui/registry/components/ui/empty-state.tsx:5-9` declares `EmptyStateProps` with `children: Renderable` (required) and `heading?: Renderable`, no action prop. The recipe at lines 300-304 passes heading + children text, consistent with the new wording.
+2. **withForm** (`design-with-fresh-ui.md:196`): now "For server validation, bind the form on the page with definePage().withForm()." TRUE — `withForm<` is a `PageBuilder` method (`packages/fresh/src/application/builders/define-page/builder/mod.tsx:314`), and the target guide opens with "Use `definePage().withForm()`…" (`build-a-server-validated-form.md:11`).
+3. **Next-steps bullet** (line ~387): now "`FormField` and the controls bound through `definePage().withForm()`." TRUE, same grounding as (2).
+
+### Gates re-run on `703a953`
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| `deno task check:agent-docs-prose` | PASS | exit 0, fresh, 237 HTML files |
+| `deno task check:publish-assets` | PASS | exit 0, `gen:publish-assets --check` clean (carriers regenerated, no drift) |
+| `deno task test` in `packages/mcp` | PASS | 199 passed, 0 failed (embedded corpus with corrected prose intact) |
+
+Evaluator touched no product files (`git status` clean outside `.llm/`). Both Round 1 low findings are resolved; no new findings in the delta; all prior verdict conditions still hold.
+
+| Field | Value |
+| --- | --- |
+| Verdict | `PASS` |
+| Rationale | The delta fixes exactly the two low doc nits with wording verified true against `empty-state.tsx`, the `definePage` builder, and the server-validated-form guide; regenerated carriers are check-clean and the MCP suite stays green at 199/199. |
+
+VERDICT: PASS

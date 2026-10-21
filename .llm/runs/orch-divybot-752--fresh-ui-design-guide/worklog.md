@@ -162,3 +162,20 @@ Slice review (supervisor): every component/prop/class named in the guide was che
   carriers regenerated, `check:agent-docs-prose` / `check:publish-assets` / `check:assets-barrel` 0/0/0, MCP tests
   199/199, `docs:links` 0 broken. Same evaluator session re-steered for a delta confirmation (round 2). Info item
   left as-is (activation and ranking gates already bound the collision risk; noted in #2410's spirit, not filed).
+
+## IMPL-EVAL round 2 (same session `ses_ea08ab886ffeD4MI4Ly0kKJlRJ`)
+
+- Delta re-steer on head `703a953` (fresh snapshot, `--estimated-cost-usd 1`, receipt `impl-eval-launch-r2.jsonl`).
+  **Verdict: PASS**. Both round-1 lows verified fixed against `empty-state.tsx` and the `definePage` builder;
+  `check:agent-docs-prose`, `check:publish-assets`, MCP tests 199/199 re-run green. Lease released.
+
+## Close (2026-10-21)
+
+- Leak check (`maint:leak-check --owned-root <scaffold>`): 48 survivors, all `ownership: unproven / owner: unknown`
+  (Aspire apphosts + processes from `~/projects/deploy-d3327a7` and `~/projects/llm-bench`). Reported, not mutated.
+  This run's only long-lived resource (the scaffold's Vite dev server on :5873) was stopped by PID after matching
+  `/proc/<pid>/cwd`; the temp scaffold and the rootless Chromium library dir in `$TMPDIR` were removed.
+- Debt: none added. Follow-ups filed as rickylabs/netscript#2410.
+- Lesson: `.llm/2026-10-21-fresh-ui-design-guide.md`.
+- Sibling: #2407 not merged at close. Second merger adds the `navigation.ts` / `--nav` / `--no-nav` cross-references
+  (list in `context-pack.md`).
