@@ -133,3 +133,32 @@ Slice review (supervisor): every component/prop/class named in the guide was che
 | `deno task test` (packages/mcp) after slug fix | 199 passed, 0 failed |
 | Fresh `netscript init` render of `apps/dashboard/AGENTS.md` / `WEB-LAYER.md` | sections present, reviewed |
 | `check:assets-barrel` | exit 0 |
+
+## Repository gates on head `f1442f3` (`run-gate.ts`, receipts `.llm/tmp/gate-receipts/752/`)
+
+| Gate (catalog id) | Result |
+| --- | --- |
+| `check` (root `deno task check`) | PASS, 241 s |
+| `lint-report` (packages + plugins, cli excluded by catalog) | PASS |
+| `fmt-check-report` | PASS |
+| `arch-check` | PASS |
+| `fresh-ui-lock-regression` | PASS |
+| `mcp-export-corpus` | PASS |
+| `publish-dry-run` | PASS, 45 s |
+| `quality-gate` | PASS |
+| `doc-lint` | catalog form exits 1 on a missing `--root` (invocation error, not a finding). Per package: `packages/mcp` 0 errors, `packages/cli` 0 errors, `packages/fresh-ui` 123 errors, all in untouched `src/runtime/*` and `src/ai/render-ui.ts` (pre-existing namespace-type debt; overlap with this diff: none) |
+| `scaffold.runtime` / `e2e:cli` | **unproven here**: no Docker daemon on this host (`docker info` cannot connect) |
+
+## IMPL-EVAL round 1 (2026-10-21)
+
+- Route: `muse_spark_1_3` = `openrouter/meta/muse-spark-1.3`, variant `xhigh`, via `deno task agentic:opencode`
+  (`--workload-tier feature --workload-role implementation_evaluation --estimated-cost-usd 3`), usage snapshot
+  `openrouter-usage-snapshot.json` (balance 9.36 USD at 17:14Z), receipt `impl-eval-launch.jsonl`. Family meta ≠
+  generator anthropic; `opus_5` fallback skipped as same-family.
+- Head `f1442f3`. **Verdict: PASS** (`evaluate.md`). No high/medium findings. Two lows (both doc truth nits in
+  `design-with-fresh-ui.md`): `EmptyState` has no action prop; `withForm` is `definePage().withForm()`. One info
+  (no mixed-concept ranking test).
+- Supervisor disposition: both lows fixed in this round's follow-up commit (one-line apiTable edits + next-steps bullet),
+  carriers regenerated, `check:agent-docs-prose` / `check:publish-assets` / `check:assets-barrel` 0/0/0, MCP tests
+  199/199, `docs:links` 0 broken. Same evaluator session re-steered for a delta confirmation (round 2). Info item
+  left as-is (activation and ranking gates already bound the collision risk; noted in #2410's spirit, not filed).

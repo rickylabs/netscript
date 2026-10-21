@@ -193,9 +193,9 @@ export default function OrdersView() {
     { name: "DataTable + Pagination", type: "custom tables", desc: "Compound tables for custom row markup, with Pagination.Meta and Pagination.Actions." },
     { name: "FilterForm", type: "filters", desc: "A GET form with FilterForm.Body and FilterForm.Actions. Put FormField + Input or Select inside." },
     { name: "DetailLayout + SectionDivider", type: "record detail", desc: "DetailLayout.Main and DetailLayout.Aside, with labeled dividers between groups." },
-    { name: "FormField, Input, Select, Textarea, Checkbox, Switch", type: "forms", desc: "FormField takes label, name, required, error, and helpText. Pair it with withForm for server validation." },
+    { name: "FormField, Input, Select, Textarea, Checkbox, Switch", type: "forms", desc: "FormField takes label, name, required, error, and helpText. For server validation, bind the form on the page with definePage().withForm()." },
     { name: "Badge, Alert, InlineNotice, Progress", type: "status", desc: "Variants: primary, secondary, success, warning, destructive (Badge adds muted; Alert and InlineNotice use info)." },
-    { name: "Skeleton, EmptyState, Spinner", type: "loading + empty", desc: "Skeleton takes variant 'table' | 'stats' | 'detail' | 'form'. EmptyState takes a heading and a next action." }
+    { name: "Skeleton, EmptyState, Spinner", type: "loading + empty", desc: "Skeleton takes variant 'table' | 'stats' | 'detail' | 'form'. EmptyState takes a heading; put the next step or a Button in its children." }
   ]
 }) }}
 
@@ -384,5 +384,5 @@ export default function OrderDetailView({ id }: { readonly id: string }) {
   components, edit routes and islands, and see what each app folder owns.
 - [Fresh UI & design](/web-layer/fresh-ui/): the copy-source model and the component layers.
 - [Build a server-validated form](/web-layer/how-to/build-a-server-validated-form/):
-  `FormField` and the controls wired to `withForm`.
+  `FormField` and the controls bound through `definePage().withForm()`.
 - Reference: [`@netscript/fresh-ui`](/reference/fresh-ui/).
