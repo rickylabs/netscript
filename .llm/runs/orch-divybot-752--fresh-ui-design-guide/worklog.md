@@ -179,3 +179,13 @@ Slice review (supervisor): every component/prop/class named in the guide was che
 - Lesson: `.llm/2026-10-21-fresh-ui-design-guide.md`.
 - Sibling: #2407 not merged at close. Second merger adds the `navigation.ts` / `--nav` / `--no-nav` cross-references
   (list in `context-pack.md`).
+
+## CI on #2408 (2026-10-21)
+
+- Head `ab8695a`: every check passed. `ci` included close-gate, quality, all 8 check/test shards, browser, and check-test.
+  Also passed: `code-quality`, `fresh-ui-quality`, the docs Pages build, `close-gate`, and `breaking-migration` (run 39644234117).
+- Two earlier `pr-metadata-gates` runs on the same head (39644227100, 39644232991) were **cancelled** by the
+  workflow's per-PR `cancel-in-progress` concurrency group. `gh pr ready` and the `status:ready-merge` label edit
+  fired three runs within seconds. GitHub reported the PR `CLEAN`/`MERGEABLE`, but the rollup kept the CANCELLED
+  `breaking-migration` entries, and the orchestrator read them as red. `gh run rerun` is not permitted for this
+  token. Resolution: this commit gives the PR a fresh head with a single `synchronize` run, and no label edits follow it.
