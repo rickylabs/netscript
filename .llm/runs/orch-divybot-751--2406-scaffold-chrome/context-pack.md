@@ -17,11 +17,12 @@ Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 
 ## Completed
 
-- Slice 0: run dir, research, plan, design checkpoint.
+- Slice 0: run dir, research, plan, design checkpoint (6b370ab); draft PR #2407.
+- Slice 1: `_layout.tsx` opt-out chrome + `navigation.ts` template.
 
 ## In Progress
 
-- Slice 1: chrome on every page via `navigation.ts`.
+- Slice 2: `ui:add page` nav registration + house-layout page + hints; `ui:remove page` reconcile.
 
 ## Next Steps
 
@@ -43,6 +44,8 @@ Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/orch-divybot-751--2406-scaffold-chrome/*` | new | run artifacts |
+| `packages/cli/src/kernel/assets/app/navigation.ts.template` | new | app-owned nav data + chrome opt-out |
+| `packages/cli/src/kernel/assets/app/routes/_layout.tsx.template` | changed | opt-out chrome |
 
 ## Gates
 

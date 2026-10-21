@@ -17,6 +17,7 @@ export const TEMPLATE_KEYS = {
   appRoutesExamplesServiceLibServiceQuery:
     'app/routes/examples/service/(_lib)/service-query.ts.template',
   appMain: 'app/main.ts.template',
+  appNavigation: 'app/navigation.ts.template',
   appRouter: 'app/router.ts.template',
   appRoutesComponentsHealthView: 'app/routes/(_components)/health-view.tsx.template',
   appRoutesComponentsDashboardView: 'app/routes/(_components)/dashboard-view.tsx.template',

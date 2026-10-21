@@ -50,4 +50,22 @@ the one new public knob (`--nav`/`--no-nav`) is additive. Tier-A slice review an
 
 ## Slices
 
-(appended per slice)
+### S1 — chrome on every page via `navigation.ts`
+
+- Files: `assets/app/navigation.ts.template` (new), `assets/app/routes/_layout.tsx.template`,
+  `assets/manifest.ts`, `adapters/templates/scaffold-template-assets.ts`,
+  `application/scaffold/writers/write-app-files.ts`, `templates/app/route-templates_test.ts`,
+  `templates/app/app-template-test-support.ts`, `assets/embedded.generated.ts` (regenerated).
+- Gate: `run-deno-test.ts` route-templates 23/23; template-registry + template-asset + writer +
+  `templates/app/` 58/58; rendered `_layout.tsx` + `navigation.ts` pass `deno fmt --check
+  --no-config --single-quote --line-width 100` and `deno lint --no-config` (generated workspace
+  options). The navigation test imports the template against a stub router and exercises
+  `rendersAppChrome` / `isCurrentNavigation` for real.
+- Tier-A review: single-agent leaf (owner dispatch), so the generator session reviewed its own
+  slice; independent verification is IMPL-EVAL's. Checked: one `page` partial in both branches,
+  `/design` stays out (its SidebarShell would otherwise stack under the top bar), `/health` now
+  inside the chrome (it is linked from the nav), prefix matching is segment-aware (`/designer`).
+  Noted for the design follow-up: `health-view` keeps `min-h-screen`, so under the top bar the
+  page scrolls by the bar's height.
+- Reconcile: PR #2407 opened as draft (plan state); #752 split acknowledged by message; no new
+  comments on #2406.
