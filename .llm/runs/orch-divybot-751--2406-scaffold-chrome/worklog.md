@@ -161,3 +161,33 @@ the one new public knob (`--nav`/`--no-nav`) is additive. Tier-A slice review an
   app `check` exit 0.
 - Unproven on this host: browser screenshots / 390 px pass (cached Chromium lacks
   `libnspr4.so`, no root) and `scaffold.runtime` (no Docker daemon).
+
+## IMPL-EVAL
+
+- Launched 2026-10-21T17:07Z on head `85e5a783f6334e2a3805a8eb82b441e793b2116e` via `deno task agentic:opencode`:
+  model `openrouter/meta/muse-spark-1.3` (logical `muse_spark_1_3`, family meta), variant `xhigh`,
+  `--workload-tier feature --workload-role implementation_evaluation`, `--estimated-cost-usd 3`
+  against `openrouter-usage-snapshot.json` (available balance 10.77 USD), cwd = this worktree,
+  receipt `impl-eval-launch.jsonl`. Brief: `evaluate-implementation-brief.md`. Generator family
+  anthropic ≠ evaluator family meta; `opus_5` fallback skipped as same-family.
+- Run in parallel with the full `packages/cli/src` unit suite on the same head; a fix found by
+  either goes back to the same evaluator session (re-steer), not a fresh one.
+- Full suite on the evaluated head: `run-deno-test.ts -- --allow-all packages/cli/src` →
+  **2109 passed / 0 failed** (exit 0).
+- **Verdict: `PASS`** (`evaluate.md`), round 1 of 5, on head `85e5a78`. Evaluator re-ran 222 UI/agent
+  tests, the 863-file check, per-file lint/fmt, `check:assets-barrel`, `check:publish-assets`,
+  `quality:scan`, `arch:check` (FAIL=0, cli WARN=64 = baseline) and verified the skill claim by claim.
+  Findings: none high/medium. Low: (1) pre-existing fmt drift in 4 untouched `ui/` command files —
+  left alone; (2) worktree-local `deno.lock` line (`npm:pg@^8.21.0`) from the parallel full-suite
+  run — restored with `git checkout -- deno.lock`, never committed. Info: `Refs #2406` correct for
+  the split; `/health` min-h-screen and long-name loader fmt handed to #752.
+- Lease released: single round, no re-steer needed.
+
+## Close
+
+- Leak check: the only resources this run started were the proof app's `deno serve` / Vite dev
+  servers under `~/projects/orchid/runs/2026-10-21-issue-751-scaffold-proof/`; all stopped by PID
+  (identified by `/proc/<pid>/cwd`), none left listening. No containers (no Docker daemon).
+- Debt: none created (`.llm/harness/debt/arch-debt.md` unchanged).
+- Lesson (run-local, not promoted): run long test suites and evaluators on the same frozen head;
+  side-effect lock churn from a parallel run must be dropped, not committed.

@@ -6,13 +6,13 @@
 | -------------- | -------------------------------------------- |
 | Run ID         | `orch-divybot-751--2406-scaffold-chrome`     |
 | Branch         | `orch/divybot-751`                           |
-| Current phase  | `plan` → `implement`                         |
+| Current phase  | `close` (IMPL-EVAL PASS)                     |
 | Archetype      | `6 - CLI tooling`                            |
 | Scope overlays | `frontend` (scaffold output), `docs` (skill) |
 
 ## Current State
 
-Slices 0–2 landed on `orch/divybot-751` (PR #2407, draft). `PLAN-EVAL: N/A` recorded.
+Slices 0–5 landed on `orch/divybot-751` (PR #2407). `PLAN-EVAL: N/A`; IMPL-EVAL `PASS` (Muse Spark 1.3, round 1).
 Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 
 ## Completed
@@ -26,13 +26,15 @@ Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 
 ## In Progress
 
-- Final gate sweep, then IMPL-EVAL (Muse Spark 1.3 via OpenCode/OpenRouter).
+- Nothing in progress. PR #2407 ready for merge.
 
 ## Next Steps
 
-1. Slices 1–4 per `worklog.md` § Design, each committed + pushed + PR-commented.
-2. Slice 5 consumer proof (local scaffold, `/notes` renders inside the chrome).
-3. IMPL-EVAL on `muse_spark_1_3` via OpenCode/OpenRouter (separate session).
+1. After #2407 / #2408 merge: whichever lands second adds the cross-references (`navigation.ts` +
+   `--nav`/`--no-nav` in `agent-conventions.ts` `## Design and theming`; the
+   `web-layer/how-to/design-with-fresh-ui` slug in `skills/netscript-build/SKILL.md`).
+2. #2409 (Fresh duplicate route binding) — once fixed, `withoutGeneratedRouteBinding` in
+   `ui/page/remove-ui-page.ts` may become dead code.
 
 ## Key Decisions
 
@@ -57,10 +59,10 @@ Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static      | pending        |          |
-| Fitness     | pending        |          |
+| Static      | PASS           | worklog S1–S5; evaluate.md |
+| Fitness     | PASS           | quality:scan 0; arch:check FAIL=0, cli WARN=64 |
 | Runtime     | partial        | consumer-proof.md (build+serve HTML); screenshots + scaffold.runtime unproven on host |
-| Consumer    | pending        |          |
+| Consumer    | PASS           | full CLI suite 2109/2109; consumer-proof.md |
 
 ## Open Questions
 
