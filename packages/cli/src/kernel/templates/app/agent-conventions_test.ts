@@ -40,6 +40,11 @@ Deno.test('service app convention references are exact and rendered', () => {
     'routes/(_components)/dashboard-view.tsx',
     'components/ui/mod.ts',
     '/design/composition',
+    'assets/tokens.css',
+    'client.ts',
+    'routes/_app.tsx',
+    'routes/_layout.tsx',
+    '/design/components',
   ]);
 
   const rendered = `${buildAppAgentsMarkdown(input)}\n${buildWebLayerMarkdown(input)}`;
@@ -58,9 +63,41 @@ Deno.test('service-free app conventions retain only shared resolvable references
     'routes/(_components)/dashboard-view.tsx',
     'components/ui/mod.ts',
     '/design/composition',
+    'assets/tokens.css',
+    'client.ts',
+    'routes/_app.tsx',
+    'routes/_layout.tsx',
+    '/design/components',
   ]);
   assertStringIncludes(buildAppAgentsMarkdown(input), GUIDANCE);
   assertStringIncludes(buildWebLayerMarkdown(input), GUIDANCE);
+});
+
+Deno.test('app conventions give agents one app-wide theme and chrome model', () => {
+  const agents = buildAppAgentsMarkdown(serviceInput());
+  const webLayer = buildWebLayerMarkdown(serviceInput());
+
+  assertStringIncludes(agents, '## Design and theming');
+  for (
+    const fact of [
+      '`assets/tokens.css`',
+      "`[data-theme='dark']`",
+      '`--ns-primary`',
+      '`routes/_layout.tsx`',
+      'There is no `data-ns-theme`',
+      'web-layer/how-to/design-with-fresh-ui',
+      'web-layer/how-to/customize-fresh-ui',
+    ]
+  ) {
+    assertStringIncludes(agents, fact);
+  }
+  assert(
+    agents.indexOf('## Design and theming') > agents.indexOf('## Copy versus delete'),
+    'design guidance must follow the data architecture it decorates',
+  );
+  assertStringIncludes(webLayer, '## Look and feel');
+  assertStringIncludes(webLayer, '`assets/tokens.css`');
+  assertStringIncludes(webLayer, '`routes/_layout.tsx`');
 });
 
 function serviceInput(): AppConventionsInput {
