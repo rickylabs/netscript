@@ -23,6 +23,8 @@ export const MCP_EMBEDDED_DOC_PATHS = [
   'pages/services-sdk/services/index.md',
   'pages/web-layer/builders/index.md',
   'pages/web-layer/how-to/build-a-server-validated-form/index.md',
+  'pages/web-layer/how-to/customize-fresh-ui/index.md',
+  'pages/web-layer/how-to/design-with-fresh-ui/index.md',
   'pages/web-layer/query/index.md',
   'pages/web-layer/route/index.md',
   'pages/web-layer/generated-surface/index.md',
@@ -32,11 +34,13 @@ export const MCP_EMBEDDED_DOC_PATHS = [
 
 /**
  * Maximum UTF-8 source bytes accepted for the generated MCP fallback prose.
- * 288 KiB: #1383 required the guarded plugin-service example on the embedded
+ * 328 KiB: #1383 required the guarded plugin-service example on the embedded
  * plugin-system page (258 KiB), and the streams retention recipe is embedded
- * alone rather than the entire streams reference page.
+ * alone rather than the entire streams reference page. #2406 added the two
+ * Fresh UI theming/design how-tos (~42 KiB) because agents without the
+ * filesystem corpus otherwise had no guidance for app chrome or app-wide themes.
  */
-export const MCP_EMBEDDED_DOCS_MAX_BYTES = 294_912;
+export const MCP_EMBEDDED_DOCS_MAX_BYTES = 335_872;
 
 export const PUBLISH_ASSET_OUTPUTS: readonly string[] = [
   AGENT_DOCS_PAGE_CARRIER,

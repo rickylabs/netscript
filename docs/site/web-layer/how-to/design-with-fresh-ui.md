@@ -63,7 +63,8 @@ because those are computed on the html element.
 
 ## Rebrand the whole app
 
-The brand lives in a few **knobs**. Everything else derives from them:
+The brand lives in a few **knobs**, above all `--ns-primary` and `--ns-primary-fg` in the `:root`
+block of `assets/tokens.css`. Everything else derives from them:
 
 {{ comp.apiTable({
   caption: "Brand knobs in assets/tokens.css",

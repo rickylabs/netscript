@@ -148,11 +148,10 @@ it renders in one typed chain. To change the home page, edit
 ] }) }}
 
 The HTML shell (`<html>`, `<head>`, fonts, the theme-seed script) is
-`routes/_app.tsx`. The app chrome (top bar, navigation, theme toggle) is rendered by
-`routes/_layout.tsx` around your pages. Read it before you add a page: it decides which
-routes get the chrome and where the navigation links come from. Both files use the
+`routes/_app.tsx`, and the app chrome around pages is `routes/_layout.tsx` (see
+[App chrome and navigation](#app-chrome-and-navigation)). Both use the
 `define.page(...)` / `define.layout(...)` helpers from `createDefine<State>()`. Edit them
-to change the global frame instead of repeating a header in each page.
+to change the global frame instead of repeating markup in each page.
 
 {{ comp callout { type: "tip", title: "Co-location folders don't become URLs" } }}
 Folders wrapped in parentheses — <code>(_components)</code>,
@@ -168,6 +167,22 @@ so <code>appRoutes</code> exposes a typed <code>.href()</code> for it. The CLI r
 route directory does not update that pattern. Reconcile <code>router.ts</code>
 and its consumers using the <a href="/web-layer/route/#renaming-or-moving-a-route">rename/move checklist</a>.
 {{ /comp }}
+
+## App chrome and navigation
+
+`routes/_layout.tsx` renders the app chrome around your pages: the top bar, the brand, the
+navigation links, and the `ThemeToggle` island. Every page that gets the chrome gets the same
+frame, so the chrome is what makes the app look like one product. Before you add a page:
+
+1. Read `routes/_layout.tsx` to see which routes it wraps and where its navigation links come
+   from.
+2. Check that your new route gets the chrome, and give it a navigation link if it is a top-level
+   destination.
+3. Keep the page view to its own content: one `<main>`, a `PageHeader`, then sections.
+
+Never copy a header, nav, or theme toggle into a page view to make it match the others. Duplicated
+chrome drifts and breaks client navigation; fix the layout instead. The `/design` showcase is
+the exception: it has its own `SidebarShell` layout in `routes/(design)/design/_layout.tsx`.
 
 ## Add interactivity with an island
 
