@@ -20,11 +20,12 @@ Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 - Slice 0: run dir, research, plan, design checkpoint (6b370ab); draft PR #2407.
 - Slice 1: `_layout.tsx` opt-out chrome + `navigation.ts` template (cc5517e).
 - Slice 2: `ui:add page` nav registration, house-layout page, `Next:` hints; `ui:remove page` unlinks; page lifecycle moved to `kernel/application/ui/page/` (10766ea).
-- Slice 3: `styles.css` app-owned tail survives `ui:add`.
+- Slice 3: `styles.css` app-owned tail survives `ui:add` (88b6d0e).
+- Slice 4: `netscript-build` skill refresh + `skills.generated.ts`.
 
 ## In Progress
 
-- Slice 4: `netscript-build` skill refresh + carriers.
+- Slice 5: consumer proof (local scaffold renders `/notes` inside the chrome), then IMPL-EVAL.
 
 ## Next Steps
 

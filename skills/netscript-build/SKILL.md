@@ -1,6 +1,6 @@
 ---
 name: netscript-build
-description: 'Scaffold and build NetScript applications with the `netscript` CLI. USE FOR: init a project, contract-first flow, database lifecycle (init/generate/migrate/seed/status), add and sync plugins, add services, add UI, route renaming/moving and router.ts reconciliation, generate registries. DO NOT USE FOR: monitoring, debugging, or performance analysis (use netscript-operate); Aspire orchestration (use the aspire skill).'
+description: 'Scaffold and build NetScript applications with the `netscript` CLI. USE FOR: init a project, contract-first flow, database lifecycle (init/generate/migrate/seed/status), add and sync plugins, add services, add UI pages and components, app chrome/navigation and theming, route renaming/moving/removal and router.ts reconciliation, generate registries. DO NOT USE FOR: monitoring, debugging, or performance analysis (use netscript-operate); Aspire orchestration (use the aspire skill).'
 ---
 
 # NetScript Build
@@ -26,6 +26,8 @@ current verb surface with the `list_commands` MCP tool if unsure.
 | List / inspect plugins     | `netscript plugin list` / `netscript plugin info` |
 | Initialize UI              | `netscript ui:init`                               |
 | Add a UI page/component    | `netscript ui:add`                                |
+| Remove a generated page    | `netscript ui:remove page <path>`                 |
+| Regenerate route modules   | `netscript generate routes`                       |
 
 ## Database lifecycle
 
@@ -83,23 +85,51 @@ regenerate with `netscript generate plugins` only if the diagnostic identifies s
 
 **Add a service.** `netscript service add` → `netscript service generate` to produce wiring.
 
+## Pages, chrome, navigation, and theme
+
+Every page renders inside the app chrome in `routes/_layout.tsx`: the top bar, whose links are the
+`appNavigation` list in the app's `navigation.ts`. Do not build a per-page header or nav.
+
+- `netscript ui:add page <path>` links one-segment pages in the top bar automatically. Pass
+  `--nav <label>` to link a nested page or set the label, and `--no-nav` for pages that should not
+  be linked. Its `Next:` lines name the files that own the frame.
+- A page that needs its own full-screen frame (a sign-in screen) opts out by adding its prefix to
+  `chromelessRoutePrefixes` in `navigation.ts`; `/design` is the scaffold's example.
+- Start each page from `<main class='ns-shell ns-section ns-stack ns-stack--lg'>` plus `PageHeader`,
+  which `ui:add page` writes, and compose the app-owned primitives from `@app/components/ui/mod.ts`.
+  Browse the running app's `/design` routes for the component gallery and tokens.
+- There is one app-wide theme. `assets/styles.css` imports `tokens.css` (the `--ns-*` tokens: light
+  on `:root`, dark on `[data-theme='dark']`, which `routes/_app.tsx` and `ThemeToggle` set on
+  `<html>`) and `theme-bridge.css` (Tailwind `*-ns-*` utilities over the same tokens). Restyle by
+  overriding tokens on `:root` then `[data-theme='dark']`, in `tokens.css` or below the
+  `App-specific custom styles below.` marker in `styles.css`, which `ui:add` preserves. Never scope
+  theme variables to one page's wrapper; there is no per-page theme attribute.
+
+Read `web-layer/how-to/customize-fresh-ui` through MCP `get_doc` before restyling or reshaping the
+frame. An app without `navigation.ts` was scaffolded before shared navigation: its
+`routes/_layout.tsx` shows the top bar only for an allowlist of routes, so add new pages there.
+
 ## Route lifecycle: rename, move, or remove a page
 
 For route renaming or moving, read `web-layer/route` ("Renaming or Moving a Route") and
 `web-layer/generated-surface` through MCP `get_doc` before editing. `ui:add page` writes an editable
-page and a string-literal registration in `router.ts`; it does not bind through the
-filesystem-generated `routes` tree. Moving a directory can leave a stale URL while type checking
-passes.
+page, a string-literal registration in `router.ts`, and (for linked pages) an `appNavigation` entry;
+it does not bind through the filesystem-generated `routes` tree. Moving a directory can leave a
+stale URL while type checking passes.
 
 Follow the checklist: move the page with its owned loader/island and sidecar, repair imports,
-reconcile the `appRoutes` pattern/key/id and page binding, update consumers, refresh the generated
-route modules through the app's Vite build or dev server, then type-check and verify navigation,
-new/old URLs, and loader/island behavior. For removal, prune the owned files, registration, and
-consumers manually, preserving shared modules still in use.
+reconcile the `appRoutes` pattern/key/id, the page binding and its `navigation.ts` entry, update
+consumers, run `netscript generate routes` to refresh `.generated/manifest.ts` and
+`.generated/routes.ts` without a Vite build, then type-check and verify navigation, new/old URLs,
+and loader/island behavior.
 
-There is currently no route rename verb, `netscript generate routes`, or `netscript ui:remove page`
-command. `netscript ui:remove <name>` handles copied Fresh UI registry items only. Do not guess a
-CLI route lifecycle verb or hand-edit `.generated/manifest.ts` and `.generated/routes.ts`.
+To remove a page that `ui:add page` generated and you have not edited, run
+`netscript ui:remove page <path>` (preview with `--dry-run`). It deletes the page triad, its
+`router.ts` registration and its `navigation.ts` link, then refreshes the derived route modules; it
+refuses edited files, so prune an edited page, its registration, link, and consumers by hand,
+preserving shared modules still in use. `netscript ui:remove <name>` handles copied Fresh UI
+registry items. There is no route rename verb: do not guess one, and never hand-edit
+`.generated/manifest.ts` or `.generated/routes.ts`.
 
 ## Safety rules
 
