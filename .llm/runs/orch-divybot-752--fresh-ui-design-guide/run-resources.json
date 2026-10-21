@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "worktreeRoot": "/home/agent/projects/orchid/worktrees/issue-752",
+  "appHosts": [],
+  "containers": [],
+  "ownedRoots": [
+    "/ephemeral/tmp/tmp.Tmg64CTO0W"
+  ]
+}

@@ -6,22 +6,21 @@
 | -------------- | ------------------------------------------------------------------------- |
 | Run ID         | `orch-divybot-752--fresh-ui-design-guide`                                 |
 | Branch / PR    | `orch/divybot-752` / rickylabs/netscript#2408 (`Refs #2406`)              |
-| Current phase  | `evaluate` (IMPL-EVAL round 1, Muse Spark 1.3 via OpenCode/OpenRouter)    |
+| Current phase  | `close` — IMPL-EVAL PASS (round 1 + delta round 2, same session)          |
 | Archetype      | 4 — DSL/Builder (`packages/fresh-ui`), 6 — CLI tooling (guidance builder) |
 | Scope overlays | frontend, docs                                                            |
 
 ## Current State
 
-All implementation slices landed (S1 tokens, S2 docs, S3 MCP, S4 app guidance + standalone get_doc slugs).
-IMPL-EVAL brief: `evaluate-implementation-brief.md`; evaluated head in `impl-eval-head.txt`; launch receipt
-`impl-eval-launch.jsonl`; verdict will land in `evaluate.md`. Repo gates run through `run-gate.ts` with receipts
+All slices landed and IMPL-EVAL passed (`evaluate.md`: round 1 PASS on `f1442f3`, two low doc nits fixed in
+`703a953`, round 2 PASS in the same session `ses_ea08ab886ffeD4MI4Ly0kKJlRJ`). PR #2408 marked ready. Repo gates run through `run-gate.ts` with receipts
 under `.llm/tmp/gate-receipts/752/` (summary copied into `worklog.md` § Close).
 Complementary caveats issue: rickylabs/netscript#2410 (from `caveats.md`, includes harness#751's CLI items).
 
 ## Next Steps
 
-1. Read `evaluate.md`; on `FAIL_FIX` fix and re-steer the SAME OpenCode session (`-s <session>`), max 5 rounds,
-   two consecutive terminal failures end the loop.
+1. Respond to review comments / CI on #2408 (orchestrator follow-ups). Any product change → re-steer the same
+   evaluator session (`impl-eval-session.txt`) with a fresh usage snapshot.
 2. If #2407 (harness#751) merged first: rebase on main, take main's generated carriers and regenerate
    (`gen:assets-barrel`, `gen:agent-docs-prose`, `gen:publish-assets`), then add the cross-references:
    - `agent-conventions.ts` `## Design and theming`: `navigation.ts` + `--nav` / `--no-nav`, reference
