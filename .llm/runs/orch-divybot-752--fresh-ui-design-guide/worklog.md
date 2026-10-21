@@ -110,3 +110,26 @@ Slice review (supervisor): every component/prop/class named in the guide was che
 | `deno fmt --check` / `deno lint` changed TS | clean |
 | `check:agent-docs-prose` / `check:publish-assets` / `check:assets-barrel` | 0 / 0 / 0 |
 | `docs/site check:links`, `docs:links` | exit 0 / 0 broken links or anchors |
+
+## S4 — App guidance + standalone get_doc slugs (2026-10-21)
+
+- `54166ef` fix(mcp): `ReleaseEmbeddedDocsCorpus.get` resolves an unprefixed docs-site slug to its `pages/` page
+  (`redirectedFrom` set). Probe before the fix: `get('web-layer/how-to/design-with-fresh-ui')` → `undefined`.
+- `agent-conventions.ts`: `DESIGN_REFERENCES` (`assets/tokens.css`, `client.ts`, `routes/_app.tsx`,
+  `routes/_layout.tsx`, `/design/components`) appended to the declared references (not to the canonical data-screen
+  example list); new `## Design and theming` section in `apps/<app>/AGENTS.md` and `## Look and feel` in `WEB-LAYER.md`;
+  doc slugs as constants (`DESIGN_GUIDE_SLUG`, `CUSTOMIZE_GUIDE_SLUG`) rendered unbackticked (the conventions test
+  treats any backticked token with `/` as a path that must resolve in the scaffold).
+- Tests: updated exact reference lists; new "one app-wide theme and chrome model" case; `/design/components` route map
+  in `public-command-tree_test.ts`.
+
+### Gate evidence (S4)
+
+| Gate | Result |
+| --- | --- |
+| `deno test --allow-all --unstable-kv` agent-conventions + public-command-tree tests | 9 passed (includes real-scaffold path resolution) |
+| `deno task check` (packages/cli) | exit 0 |
+| fmt / lint (temp no-exclude config; packages/cli is excluded from root fmt/lint) | clean / clean |
+| `deno task test` (packages/mcp) after slug fix | 199 passed, 0 failed |
+| Fresh `netscript init` render of `apps/dashboard/AGENTS.md` / `WEB-LAYER.md` | sections present, reviewed |
+| `check:assets-barrel` | exit 0 |

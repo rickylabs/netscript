@@ -21,7 +21,12 @@ interface ConventionReference {
     | 'service-shared'
     | 'service-form'
     | 'service-partial'
-    | 'telemetry-route';
+    | 'telemetry-route'
+    | 'app-tokens'
+    | 'app-client'
+    | 'app-shell'
+    | 'app-layout'
+    | 'design-gallery-route';
   readonly path: string;
   readonly purpose: string;
 }
@@ -48,6 +53,39 @@ const COMMON_REFERENCES: readonly ConventionReference[] = [
     purpose: 'the live L0-L4 ownership and layout guide',
   },
 ];
+
+/** App-wide theme and chrome files named by the Design and theming guidance. */
+const DESIGN_REFERENCES: readonly ConventionReference[] = [
+  {
+    id: 'app-tokens',
+    path: 'assets/tokens.css',
+    purpose: 'every --ns-* token for both themes; the one place to restyle the app',
+  },
+  {
+    id: 'app-client',
+    path: 'client.ts',
+    purpose: 'loads assets/styles.css (tokens, Tailwind bridge, component CSS) on every route',
+  },
+  {
+    id: 'app-shell',
+    path: 'routes/_app.tsx',
+    purpose: 'the HTML shell that sets data-theme on <html> and loads fonts',
+  },
+  {
+    id: 'app-layout',
+    path: 'routes/_layout.tsx',
+    purpose: 'the app chrome (top bar, navigation, theme toggle) around pages',
+  },
+  {
+    id: 'design-gallery-route',
+    path: '/design/components',
+    purpose: 'the live gallery of app-owned components under the active theme',
+  },
+];
+
+/** Docs slugs agents fetch with MCP `get_doc` for page design and the theme chain. */
+const DESIGN_GUIDE_SLUG = 'web-layer/how-to/design-with-fresh-ui';
+const CUSTOMIZE_GUIDE_SLUG = 'web-layer/how-to/customize-fresh-ui';
 
 const RESOURCE_GENERATION_GUIDANCE =
   'Before manually constructing this path, run `netscript generate resource <resource> --procedure <query> --client <service> --partial --app <app>`.';
@@ -106,7 +144,7 @@ function serviceReferences(
 function references(
   input: AppConventionsInput,
 ): readonly ConventionReference[] {
-  return [...serviceReferences(input), ...COMMON_REFERENCES];
+  return [...serviceReferences(input), ...COMMON_REFERENCES, ...DESIGN_REFERENCES];
 }
 
 function referencePath(
@@ -129,9 +167,10 @@ export function appConventionsReferencedPaths(
 
 /** Build the app-scoped dashboard conventions read by coding agents. */
 export function buildAppAgentsMarkdown(input: AppConventionsInput): string {
-  const localExamples = references(input)
+  const localExamples = [...serviceReferences(input), ...COMMON_REFERENCES]
     .map((reference) => `- \`${reference.path}\` - ${reference.purpose}`)
     .join('\n');
+  const all = references(input);
   const dataMode = input.dbEngine === 'none'
     ? 'The generated service example uses in-memory sample data.'
     : `The generated service example uses the ${input.dbEngine} scaffold for sample data.`;
@@ -167,6 +206,32 @@ Do not hand-write Button, Input, Card, or Badge equivalents. Use:
 
 Copy the contract-to-query flow, page layers, island boundary, mutation/query-key pattern, partial refresh, live-stream boundary, and app-owned UI composition. Delete or replace the example records, labels, service-specific prose, and demonstration-only controls.${serviceNote}
 Before finishing, record which canonical surfaces you used or deliberately rejected. A page-sized island requires an explicit reason.
+
+## Design and theming
+
+Every page shares one theme and one chrome. Never style or theme a page on its own.
+
+- **Theme:** \`${
+    referencePath(all, 'app-tokens')
+  }\` holds every \`--ns-*\` token (\`:root\` is light, \`[data-theme='dark']\` is dark). \`${
+    referencePath(all, 'app-client')
+  }\` loads it on every route, and \`${
+    referencePath(all, 'app-shell')
+  }\` sets \`data-theme\` on \`<html>\`. To rebrand, set \`--ns-primary\` and \`--ns-primary-fg\` in \`:root\`; tints, borders, hover states, the accent, and the focus ring derive from them. There is no \`data-ns-theme\`, no themes folder, and no per-page theme, so never set tokens or \`data-theme\` on a page wrapper.
+- **Chrome:** \`${
+    referencePath(all, 'app-layout')
+  }\` renders the top bar, navigation, and theme toggle around pages. Never copy a header or theme toggle into a page. If a new page renders without the top bar, fix the layout, not the page.
+- **Composition:** give each page one \`<main class='ns-shell ns-section ns-stack ns-stack--lg'>\`, then a \`PageHeader\` with one \`<h1>\`, then sections built from the \`${
+    referencePath(all, 'ui-barrel')
+  }\` blocks (\`StatsGrid\`, \`Card\`, \`Panel\`, \`ResponsiveTable\`, \`FilterForm\`, \`DetailLayout\`, \`EmptyState\`, \`Skeleton\`). Copy the composition in \`${
+    referencePath(all, 'dashboard-view')
+  }\`.
+- **No literals:** use tokens and the Tailwind \`ns-*\` utilities (\`bg-ns-surface\`, \`text-ns-muted-fg\`, \`p-ns-4\`), not hex colors or pixel values.
+- **Verify:** open \`${
+    referencePath(all, 'design-gallery-route')
+  }\` and every page you touched in light and dark, including the empty, loading, and error states.
+
+For brand presets, page recipes, and the do/don't list, call MCP \`get_doc\` with slug ${DESIGN_GUIDE_SLUG}. For the full theme chain and the chrome, use ${CUSTOMIZE_GUIDE_SLUG}.
 `;
 }
 
@@ -208,5 +273,15 @@ Use \`${referencePath(all, 'dashboard-view')}\` and \`${
 **Copy:** contract-derived query factories, named page layers, server/island boundaries, mutation invalidation, partial refresh, live-stream cache updates, and app-owned UI primitives.
 
 **Delete or replace:** sample records, example names and labels, seeded statuses, explanatory demo controls, and any domain prose that is not true for your product.
+
+## Look and feel
+
+One theme applies app-wide from \`${
+    referencePath(all, 'app-tokens')
+  }\` (\`:root\` light, \`[data-theme='dark']\` dark), and \`${
+    referencePath(all, 'app-layout')
+  }\` owns the chrome. Pages compose \`${
+    referencePath(all, 'ui-barrel')
+  }\` blocks inside one \`<main class='ns-shell ns-section ns-stack ns-stack--lg'>\`. They never re-theme or re-implement the chrome. The Design and theming section of AGENTS.md has the rules, and MCP \`get_doc\` ${DESIGN_GUIDE_SLUG} has the recipes.
 `;
 }
