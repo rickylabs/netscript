@@ -21,6 +21,8 @@ Deno.test('generated release fallback contains the enumerated intent-guidance do
     'pages/web-layer/builders',
     'pages/web-layer/generated-surface',
     'pages/web-layer/how-to/build-a-server-validated-form',
+    'pages/web-layer/how-to/customize-fresh-ui',
+    'pages/web-layer/how-to/design-with-fresh-ui',
     'pages/web-layer/query',
     'pages/web-layer/route',
   ]);

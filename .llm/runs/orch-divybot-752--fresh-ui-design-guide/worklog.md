@@ -84,3 +84,29 @@ default theme computes the same hue family (copper tint at 10%/8% alpha) — acc
 
 Slice review (supervisor): every component/prop/class named in the guide was checked against
 `packages/fresh-ui/registry/**`; presets computed for WCAG (text ≥ 4.5:1, ring ≥ 3:1 on both backgrounds).
+
+## S3 — MCP corpus + find_guidance routing (2026-10-21)
+
+- `.llm/tools/generate-publish-assets.ts`: `customize-fresh-ui` and `design-with-fresh-ui` added to
+  `MCP_EMBEDDED_DOC_PATHS`; `MCP_EMBEDDED_DOCS_MAX_BYTES` 294,912 → 335,872 (328 KiB) with the rationale at the
+  constant. Embedded total after this run ≈ 325.8 KB (headroom ≈ 10 KB, close to the previous margin).
+- `packages/mcp/src/domain/docs/guidance-concepts.ts`: three concepts — `app-theming` (no bare "theme" alias, so
+  Scalar's `theme:` option stays unaffected), `page-design`, `app-chrome` — route to `rebrand-the-whole-app`,
+  `the-rules`, and the new customize section `app-chrome-and-navigation`.
+- `customize-fresh-ui.md`: new `## App chrome and navigation` section (route-hint target), phrased so it stays true
+  before and after harness#751's universal chrome. Design guide lead sentence names the brand knobs (the
+  filesystem corpus strips Vento tables from excerpts).
+- Tests: new `packages/mcp/tests/theming-guidance_test.ts` (filesystem + standalone embedded corpus); updated
+  enumerations in `tests/release-embedded-docs-corpus_test.ts` and `.llm/tools/generate-publish-assets_test.ts`.
+  Negative control: with the 0.0.8 concept table, 3 of 6 new tests fail.
+
+### Gate evidence (S3)
+
+| Gate | Result |
+| --- | --- |
+| `deno task test` (packages/mcp) | 198 passed, 0 failed |
+| `deno task check` (packages/mcp) | exit 0 |
+| `deno test .llm/tools/generate-publish-assets_test.ts` | 6 passed |
+| `deno fmt --check` / `deno lint` changed TS | clean |
+| `check:agent-docs-prose` / `check:publish-assets` / `check:assets-barrel` | 0 / 0 / 0 |
+| `docs/site check:links`, `docs:links` | exit 0 / 0 broken links or anchors |
