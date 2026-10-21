@@ -101,3 +101,21 @@ the one new public knob (`--nav`/`--no-nav`) is additive. Tier-A slice review an
   very long page names (pre-existing).
 - Reconcile: #752 replied (design guide slug `web-layer/how-to/design-with-fresh-ui`, PR #2408;
   "whoever merges second adds the agent-conventions cross-reference").
+
+### S3 — `assets/styles.css` keeps its app-owned tail across `ui:add`
+
+- Files: `kernel/application/ui/registry-styles.ts`, `registry-styles.test.ts`.
+- Behaviour: `writeStylesAggregator` splits the existing aggregator at
+  `APP_CUSTOM_STYLES_MARKER`; the managed head is rebuilt from the registry theme as before
+  (per-item `@import`s preserved), and everything below the marker is written back verbatim.
+  `@import`s inside the tail stay there (not hoisted, not duplicated). A fresh aggregator is
+  byte-identical to before (`…marker\n`).
+- Gate: `run-deno-test.ts packages/cli/src/kernel/application/ui/` 42/42 (two new tests: brand
+  overrides + an app `@import` survive two `ui:add ai` runs; a fresh aggregator still ends with an
+  empty custom section); fmt with the no-exclude config.
+- Tier-A review: the old reader scanned the whole file for `@import`, so restricting it to the
+  managed head is required, or a tail `@import` would be hoisted and duplicated. Confirmed the
+  registry theme's own `styles.css` does not contain the marker (0 hits), so the split cannot
+  misfire on the base.
+- Reconcile: sent #752 the CLI caveat list and the cross-reference rule; their theme recipe can
+  now say "below the marker in `assets/styles.css`".
