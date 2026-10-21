@@ -9,7 +9,7 @@ import {
   scaffoldUiPage,
   type UiGeneratedFileRole,
   type UiScaffoldResult,
-} from '../../../../kernel/application/ui/web-scaffold.ts';
+} from '../../../../kernel/application/ui/page/web-scaffold.ts';
 
 /** Semantic roles emitted by the public data-screen scaffold. */
 export const UI_DATA_SCREEN_FILE_ROLES = [
@@ -17,6 +17,7 @@ export const UI_DATA_SCREEN_FILE_ROLES = [
   'query-loader',
   'island',
   'route-registration',
+  'navigation-registration',
 ] as const satisfies readonly UiGeneratedFileRole[];
 
 const DATA_SCREEN_HELP = `Data-screen roles: ${
@@ -69,6 +70,11 @@ export function createUiAddCommand(
       { default: false },
     )
     .option(
+      '--nav [label:string]',
+      'For page scaffolds, link the page in the top bar (navigation.ts), optionally with a label; top-level pages are linked by default',
+    )
+    .option('--no-nav', 'For page scaffolds, do not link the page in the top bar')
+    .option(
       '--query',
       'For island scaffolds, generate a QueryIsland-based surface for contract-derived queries',
       { default: false },
@@ -90,11 +96,15 @@ export function createUiAddCommand(
           route: options.route,
           island: options.island,
           client: options.client,
+          nav: options.nav,
           force: options.force,
           dryRun: options.dryRun,
         }, dependencies.installDependencies.fs);
         reportScaffold(result, options.dryRun ?? false, print);
         return;
+      }
+      if (options.nav !== undefined) {
+        throw new Error('--nav and --no-nav are supported only for page scaffolds.');
       }
       if (kind === 'island') {
         if (!name) throw new Error('ui:add island requires <Name>.');
@@ -134,4 +144,5 @@ function reportScaffold(
 ): void {
   const verb = dryRun ? 'Planned' : 'Generated';
   for (const file of result.files) print(`${verb} ${file.role}: ${file.path}`);
+  for (const step of result.nextSteps) print(`Next: ${step}`);
 }

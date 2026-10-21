@@ -1,9 +1,10 @@
 import { dirname, resolve } from '@std/path';
 import { cleanUiPagePath } from './page-path.ts';
-import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
-import type { FileSystemPort } from '../../ports/file-system-port.ts';
-import { removeScaffoldedAppRoute } from '../resource-slice/reconcile/reconcile-app-routes.ts';
-import { scaffoldUiPage } from './web-scaffold.ts';
+import type { GeneratedSourceFormatterPort } from '../../../ports/generated-source-formatter-port.ts';
+import type { FileSystemPort } from '../../../ports/file-system-port.ts';
+import { removeScaffoldedAppRoute } from '../../resource-slice/reconcile/reconcile-app-routes.ts';
+import { APP_NAVIGATION_FILE, removeNavigationEntry } from './app-navigation.ts';
+import { scaffoldUiPage, UI_REGISTRATION_ROLES } from './web-scaffold.ts';
 
 /** Safe removal options for an unchanged `ui:add page` scaffold. */
 export interface RemoveUiPageInput {
@@ -25,6 +26,8 @@ export interface RemoveUiPageResult {
   readonly files: readonly string[];
   /** Whether the page registration needs reconciliation. */
   readonly routerChanged: boolean;
+  /** Whether the page's top-bar link in `navigation.ts` needs removal. */
+  readonly navigationChanged: boolean;
 }
 
 /** Validate all scaffold files before deleting, then reconstruct derived routes. */
@@ -51,7 +54,7 @@ export async function removeUiPage(
       );
     }
     if (!input.dryRun) await writeManifest(input.projectRoot);
-    return { status: 'absent', files: [], routerChanged: false };
+    return { status: 'absent', files: [], routerChanged: false, navigationChanged: false };
   }
   const source = await fs.readFile(page);
   const route = source.match(/\.withRoute\(\s*appRoutes\[\s*['"]([\w.-]+)['"]\s*\]\s*,?\s*\)/)?.[1];
@@ -66,7 +69,7 @@ export async function removeUiPage(
     force: true,
     dryRun: true,
   }, fs);
-  const files = plan.files.filter((file) => file.role !== 'route-registration');
+  const files = plan.files.filter((file) => !UI_REGISTRATION_ROLES.has(file.role));
   const comparisons = [];
   for (const file of files) {
     if (!await fs.exists(file.path) || !(await fs.stat(file.path)).isFile) {
@@ -97,13 +100,18 @@ export async function removeUiPage(
     segment,
     route,
   );
+  const navigation = resolve(input.projectRoot, APP_NAVIGATION_FILE);
+  const navigationSource = await fs.exists(navigation) ? await fs.readFile(navigation) : '';
+  const unlinked = removeNavigationEntry(navigationSource, route);
   const result: RemoveUiPageResult = {
     status: 'removed',
     files: files.map((file) => file.path),
     routerChanged: reconciled !== routerSource,
+    navigationChanged: unlinked !== navigationSource,
   };
   if (input.dryRun) return result;
   if (result.routerChanged) await fs.writeFile(router, reconciled);
+  if (result.navigationChanged) await fs.writeFile(navigation, unlinked);
   for (const file of files) await fs.remove(file.path);
   // Never recursively delete a route directory: authored siblings remain intact.
   const dir = resolve(input.projectRoot, 'routes', segment);

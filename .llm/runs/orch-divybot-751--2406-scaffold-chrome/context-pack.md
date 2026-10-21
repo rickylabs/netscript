@@ -12,17 +12,18 @@
 
 ## Current State
 
-Plan & Design written (`plan.md`, `worklog.md` § Design). `PLAN-EVAL: N/A` recorded. No code yet.
+Slices 0–2 landed on `orch/divybot-751` (PR #2407, draft). `PLAN-EVAL: N/A` recorded.
 Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 
 ## Completed
 
 - Slice 0: run dir, research, plan, design checkpoint (6b370ab); draft PR #2407.
-- Slice 1: `_layout.tsx` opt-out chrome + `navigation.ts` template.
+- Slice 1: `_layout.tsx` opt-out chrome + `navigation.ts` template (cc5517e).
+- Slice 2: `ui:add page` nav registration, house-layout page, `Next:` hints; `ui:remove page` unlinks; page lifecycle moved to `kernel/application/ui/page/`.
 
 ## In Progress
 
-- Slice 2: `ui:add page` nav registration + house-layout page + hints; `ui:remove page` reconcile.
+- Slice 3: `styles.css` custom tail survives `ui:add`.
 
 ## Next Steps
 
@@ -46,6 +47,8 @@ Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 | `.llm/runs/orch-divybot-751--2406-scaffold-chrome/*` | new | run artifacts |
 | `packages/cli/src/kernel/assets/app/navigation.ts.template` | new | app-owned nav data + chrome opt-out |
 | `packages/cli/src/kernel/assets/app/routes/_layout.tsx.template` | changed | opt-out chrome |
+| `packages/cli/src/kernel/application/ui/page/*` | new/moved | page lifecycle + `app-navigation.ts` contract |
+| `packages/cli/src/public/features/ui/{add,remove}/*` | changed | `--nav`/`--no-nav`, `Next:` lines, nav reconcile output |
 
 ## Gates
 
