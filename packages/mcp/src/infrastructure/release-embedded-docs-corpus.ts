@@ -1,8 +1,9 @@
-import type {
-  DocsCorpusPort,
-  DocsDocument,
-  DocsSearchMatch,
-  DocsSummary,
+import {
+  type DocsCorpusPort,
+  type DocsDocument,
+  type DocsSearchMatch,
+  type DocsSummary,
+  normalizeDocsSlug,
 } from '../domain/docs/docs-corpus-port.ts';
 import type { GuidanceResult } from '../domain/docs/guidance-contract.ts';
 import {
@@ -45,6 +46,9 @@ export interface ReleaseEmbeddedDocsCorpusOptions {
   readonly additionalDocuments?: readonly EmbeddedDocsSource[];
 }
 
+/** Folder the release carrier stores rendered docs-site pages under (`pages/<site slug>`). */
+const RELEASE_PAGE_PREFIX = 'pages/';
+
 const DEFAULT_SOURCE: ReleaseEmbeddedDocsSource = {
   documents: MCP_EMBEDDED_DOCS,
   provenance: MCP_EMBEDDED_DOCS_PROVENANCE,
@@ -82,10 +86,20 @@ export class ReleaseEmbeddedDocsCorpus implements DocsCorpusPort {
     return await this.#delegate.search(query);
   }
 
-  /** Retrieve one release-matched fallback document after verifying generated integrity. */
+  /**
+   * Retrieve one release-matched fallback document after verifying generated integrity.
+   *
+   * Guidance and the filesystem corpus name site pages by their docs-site slug
+   * (`web-layer/route`); the release carrier stores them under `pages/`. An unprefixed
+   * site slug therefore resolves to its page and reports the slug it was redirected from.
+   */
   async get(slug: string): Promise<DocsDocument | undefined> {
     await this.#verifyIntegrity();
-    return await this.#delegate.get(slug);
+    const document = await this.#delegate.get(slug);
+    const normalized = normalizeDocsSlug(slug);
+    if (document !== undefined || normalized.startsWith(RELEASE_PAGE_PREFIX)) return document;
+    const page = await this.#delegate.get(`${RELEASE_PAGE_PREFIX}${normalized}`);
+    return page === undefined ? undefined : { ...page, redirectedFrom: normalized };
   }
 
   /** Resolve release-matched section guidance after verifying generated integrity. */

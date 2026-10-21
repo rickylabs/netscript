@@ -43,7 +43,11 @@ Anything outside this list is drift, not scope.
 - `packages/fresh-ui/tokens/**/*.tokens.json`, `packages/fresh-ui/scripts/build-tokens.ts`,
   `packages/fresh-ui/registry/theme/{tokens.css,theme-bridge.css,tokens.json}` (generated),
   `packages/fresh-ui/tests/registry/theme-tokens.test.ts` (new), `packages/fresh-ui/README.md` (theme note only).
-- `packages/cli/src/kernel/templates/app/agent-conventions.ts` and its `_test.ts`.
+- `packages/cli/src/kernel/templates/app/agent-conventions.ts` and its `_test.ts`; the conventions case
+  of `packages/cli/src/public/features/root/public-command-tree_test.ts` (route map for `/design/components`).
+- `packages/mcp/src/domain/docs/guidance-concepts.ts`, `packages/mcp/src/infrastructure/release-embedded-docs-corpus.ts`,
+  `packages/mcp/tests/{theming-guidance,release-embedded-docs-corpus}_test.ts`, `.llm/tools/generate-publish-assets_test.ts`
+  (S3/S4 scope extension, see `drift.md`).
 - `docs/site/web-layer/how-to/customize-fresh-ui.md`, new `docs/site/web-layer/how-to/design-with-fresh-ui.md`,
   `docs/site/_data/xref.ts`, `docs/site/how-to/index.md`, `docs/site/web-layer/index.md` (one card).
 - `.llm/tools/generate-publish-assets.ts` (`MCP_EMBEDDED_DOC_PATHS`, budget constant) and the generated
