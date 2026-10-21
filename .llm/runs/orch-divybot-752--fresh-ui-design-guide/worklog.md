@@ -27,3 +27,30 @@
    `packages/fresh-ui/tokens/semantic.tokens.json`.
 
 PLAN-EVAL: not selected (justification in `plan.md`).
+
+## S1 — Derived intent tokens (2026-10-21)
+
+- DTCG sources: `semantic.tokens.json` (dark defaults) and `themes/light.tokens.json` now derive every
+  `--ns-<intent>-subtle` / `-border` with `color-mix(in oklab, var(--ns-<intent>) N%, transparent)` at the
+  previous per-theme alphas; `primary-hover` / `secondary-hover` = `color-mix(in oklab, var(--ns-<intent>) 86%, black)`;
+  `accent` → `var(--ns-primary)`, `accent-fg` → `var(--ns-primary-fg)`, `ring` → `var(--ns-primary)`.
+- `scripts/build-tokens.ts`: replaced the stale "planned direction" header with an agent-facing map of the
+  theme chain + brand knobs (it is copied into every app as `assets/tokens.css`).
+- Regenerated `registry/theme/{tokens.css,tokens.json}` (`theme-bridge.css` unchanged) with the `--no-lock`
+  recipe; `deno task gen:assets-barrel` → `packages/fresh-ui/registry.generated.ts`.
+- New `tests/registry/theme-tokens.test.ts` (5 contract tests). Negative control against the 0.0.8 `tokens.css`: 4/5 fail.
+
+### Gate evidence (S1)
+
+| Gate | Result |
+| --- | --- |
+| `deno task check` (packages/fresh-ui) | exit 0 |
+| `deno task lint` (packages/fresh-ui) | exit 0 |
+| `deno task test` (packages/fresh-ui) | 191 passed, 0 failed |
+| `deno fmt --check` changed TS | clean |
+| `deno task check:assets-barrel` / `check:publish-assets` | exit 0 / exit 0 |
+| Browser render (see `browser-probe.json`) | `/`, `/dashboard`, `/design/tokens`, `/design/components` 200 in light+dark, 0 page errors |
+| Rebrand proof | 2-line `:root` edit → badge tint/border + ring follow indigo in both themes; same edit on 0.0.8 tokens leaves `rgba(200, 149, 108, …)` tints and a copper ring |
+
+Slice review (supervisor): diff limited to token values + generator header + test; component CSS untouched;
+default theme computes the same hue family (copper tint at 10%/8% alpha) — accepted.

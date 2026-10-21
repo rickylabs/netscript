@@ -12,12 +12,13 @@
 
 ## Current State
 
-Plan locked (`plan.md`). Implementation starts at S1 (derived tokens).
+S1 landed: intent tints/borders/hovers/accent/ring derive from their base token; tokens.css header maps the theme chain. Next: S2 docs.
 
 ## Next Steps
 
-1. S1: derive intent tints/borders/hover/accent/ring in the DTCG sources; regenerate with the `--no-lock` recipe.
-2. S2–S4 per `plan.md`; S5 IMPL-EVAL on `muse_spark_1_3` (OpenCode/OpenRouter).
+1. S2: new `design-with-fresh-ui` guide + `customize-fresh-ui` theme chain.
+2. S3 MCP corpus/concept, S4 app guidance; S5 IMPL-EVAL on `muse_spark_1_3` (OpenCode/OpenRouter).
+3. Caveats for the complementary issue: `caveats.md` (includes harness#751's CLI-side list).
 
 ## Key Decisions
 

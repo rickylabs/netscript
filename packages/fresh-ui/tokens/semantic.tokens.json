@@ -84,7 +84,7 @@
     },
     "primary-hover": {
       "$type": "color",
-      "$value": "{color.copper.7}",
+      "$value": "color-mix(in oklab, var(--ns-primary) 86%, black)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-primary-hover"
@@ -93,7 +93,7 @@
     },
     "primary-subtle": {
       "$type": "color",
-      "$value": "rgba(200, 149, 108, 0.08)",
+      "$value": "color-mix(in oklab, var(--ns-primary) 8%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-primary-subtle"
@@ -102,7 +102,7 @@
     },
     "primary-border": {
       "$type": "color",
-      "$value": "rgba(200, 149, 108, 0.18)",
+      "$value": "color-mix(in oklab, var(--ns-primary) 18%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-primary-border"
@@ -129,7 +129,7 @@
     },
     "secondary-hover": {
       "$type": "color",
-      "$value": "{color.slate.6}",
+      "$value": "color-mix(in oklab, var(--ns-secondary) 86%, black)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-secondary-hover"
@@ -138,7 +138,7 @@
     },
     "secondary-subtle": {
       "$type": "color",
-      "$value": "rgba(144, 152, 166, 0.07)",
+      "$value": "color-mix(in oklab, var(--ns-secondary) 7%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-secondary-subtle"
@@ -147,7 +147,7 @@
     },
     "secondary-border": {
       "$type": "color",
-      "$value": "rgba(144, 152, 166, 0.14)",
+      "$value": "color-mix(in oklab, var(--ns-secondary) 14%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-secondary-border"
@@ -174,7 +174,7 @@
     },
     "accent": {
       "$type": "color",
-      "$value": "{color.copper.6}",
+      "$value": "var(--ns-primary)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-accent"
@@ -183,7 +183,7 @@
     },
     "accent-fg": {
       "$type": "color",
-      "$value": "{color.gray.12}",
+      "$value": "var(--ns-primary-fg)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-accent-fg"
@@ -192,7 +192,7 @@
     },
     "accent-subtle": {
       "$type": "color",
-      "$value": "rgba(200, 149, 108, 0.08)",
+      "$value": "color-mix(in oklab, var(--ns-accent) 8%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-accent-subtle"
@@ -201,7 +201,7 @@
     },
     "accent-border": {
       "$type": "color",
-      "$value": "rgba(200, 149, 108, 0.18)",
+      "$value": "color-mix(in oklab, var(--ns-accent) 18%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-accent-border"
@@ -228,7 +228,7 @@
     },
     "success-subtle": {
       "$type": "color",
-      "$value": "rgba(91, 168, 160, 0.07)",
+      "$value": "color-mix(in oklab, var(--ns-success) 7%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-success-subtle"
@@ -237,7 +237,7 @@
     },
     "success-border": {
       "$type": "color",
-      "$value": "rgba(91, 168, 160, 0.15)",
+      "$value": "color-mix(in oklab, var(--ns-success) 15%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-success-border"
@@ -264,7 +264,7 @@
     },
     "warning-subtle": {
       "$type": "color",
-      "$value": "rgba(224, 174, 79, 0.08)",
+      "$value": "color-mix(in oklab, var(--ns-warning) 8%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-warning-subtle"
@@ -273,7 +273,7 @@
     },
     "warning-border": {
       "$type": "color",
-      "$value": "rgba(224, 174, 79, 0.16)",
+      "$value": "color-mix(in oklab, var(--ns-warning) 16%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-warning-border"
@@ -308,7 +308,7 @@
     },
     "destructive-subtle": {
       "$type": "color",
-      "$value": "rgba(224, 69, 69, 0.08)",
+      "$value": "color-mix(in oklab, var(--ns-destructive) 8%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-destructive-subtle"
@@ -317,7 +317,7 @@
     },
     "destructive-border": {
       "$type": "color",
-      "$value": "rgba(224, 69, 69, 0.16)",
+      "$value": "color-mix(in oklab, var(--ns-destructive) 16%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-destructive-border"
@@ -362,7 +362,7 @@
     },
     "ring": {
       "$type": "color",
-      "$value": "{color.copper.6}",
+      "$value": "var(--ns-primary)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-ring"

@@ -88,7 +88,7 @@
     },
     "primary-subtle": {
       "$type": "color",
-      "$value": "rgba(200, 149, 108, 0.1)",
+      "$value": "color-mix(in oklab, var(--ns-primary) 10%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-primary-subtle"
@@ -97,7 +97,7 @@
     },
     "primary-border": {
       "$type": "color",
-      "$value": "rgba(200, 149, 108, 0.25)",
+      "$value": "color-mix(in oklab, var(--ns-primary) 25%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-primary-border"
@@ -106,7 +106,7 @@
     },
     "secondary-subtle": {
       "$type": "color",
-      "$value": "rgba(144, 152, 166, 0.1)",
+      "$value": "color-mix(in oklab, var(--ns-secondary) 10%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-secondary-subtle"
@@ -115,7 +115,7 @@
     },
     "secondary-border": {
       "$type": "color",
-      "$value": "rgba(144, 152, 166, 0.2)",
+      "$value": "color-mix(in oklab, var(--ns-secondary) 20%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-secondary-border"
@@ -142,7 +142,7 @@
     },
     "success-subtle": {
       "$type": "color",
-      "$value": "rgba(91, 168, 160, 0.1)",
+      "$value": "color-mix(in oklab, var(--ns-success) 10%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-success-subtle"
@@ -151,7 +151,7 @@
     },
     "success-border": {
       "$type": "color",
-      "$value": "rgba(91, 168, 160, 0.2)",
+      "$value": "color-mix(in oklab, var(--ns-success) 20%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-success-border"
@@ -160,7 +160,7 @@
     },
     "warning-subtle": {
       "$type": "color",
-      "$value": "rgba(224, 174, 79, 0.1)",
+      "$value": "color-mix(in oklab, var(--ns-warning) 10%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-warning-subtle"
@@ -169,7 +169,7 @@
     },
     "warning-border": {
       "$type": "color",
-      "$value": "rgba(224, 174, 79, 0.2)",
+      "$value": "color-mix(in oklab, var(--ns-warning) 20%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-warning-border"
@@ -178,7 +178,7 @@
     },
     "destructive-subtle": {
       "$type": "color",
-      "$value": "rgba(224, 69, 69, 0.1)",
+      "$value": "color-mix(in oklab, var(--ns-destructive) 10%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-destructive-subtle"
@@ -187,7 +187,7 @@
     },
     "destructive-border": {
       "$type": "color",
-      "$value": "rgba(224, 69, 69, 0.2)",
+      "$value": "color-mix(in oklab, var(--ns-destructive) 20%, transparent)",
       "$extensions": {
         "netscript": {
           "cssVar": "--ns-destructive-border"
