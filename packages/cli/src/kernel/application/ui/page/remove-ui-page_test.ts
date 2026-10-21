@@ -146,3 +146,42 @@ Deno.test('page removal works when the app has no navigation.ts', async () => {
   assertEquals(result.navigationChanged, false);
   assert(!await fs.exists(`${ROOT}/navigation.ts`));
 });
+
+Deno.test('page removal ignores the route binding the Fresh generator injects', async () => {
+  const fs = await fixture();
+  const generated = await fs.readFile(PAGE);
+  // What `generate routes` / the Vite plugin writes into every page module (WI-12 binding pass).
+  await fs.writeFile(
+    PAGE,
+    generated
+      .replace(
+        "import { definePage } from '@app/utils.ts';\n",
+        "import { definePage } from '@app/utils.ts';\nimport { routes } from '@app/.generated/routes.ts';\n",
+      )
+      .replace('definePage()\n', 'definePage()\n  .withRoute(routes.admin.catalog.$route)\n'),
+  );
+  const result = await removeUiPage(
+    { projectRoot: ROOT, path: 'admin/catalog' },
+    fs,
+    () => Promise.resolve(),
+    FORMATTER,
+  );
+  assertEquals(result.status, 'removed');
+  assert(!await fs.exists(PAGE));
+});
+
+Deno.test('page removal still refuses a page the author edited', async () => {
+  const fs = await fixture();
+  await fs.writeFile(PAGE, (await fs.readFile(PAGE)).replace('Start building', 'My notes'));
+  await assertRejects(
+    () =>
+      removeUiPage(
+        { projectRoot: ROOT, path: 'admin/catalog' },
+        fs,
+        () => Promise.resolve(),
+        FORMATTER,
+      ),
+    Error,
+    'has diverged',
+  );
+});

@@ -21,11 +21,12 @@ Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 - Slice 1: `_layout.tsx` opt-out chrome + `navigation.ts` template (cc5517e).
 - Slice 2: `ui:add page` nav registration, house-layout page, `Next:` hints; `ui:remove page` unlinks; page lifecycle moved to `kernel/application/ui/page/` (10766ea).
 - Slice 3: `styles.css` app-owned tail survives `ui:add` (88b6d0e).
-- Slice 4: `netscript-build` skill refresh + `skills.generated.ts`.
+- Slice 4: `netscript-build` skill refresh + `skills.generated.ts` (601e4bd).
+- Slice 5: consumer proof on a real scaffold (`consumer-proof.md`); `ui:remove page` tolerates the generator-injected binding; #2409 filed.
 
 ## In Progress
 
-- Slice 5: consumer proof (local scaffold renders `/notes` inside the chrome), then IMPL-EVAL.
+- Final gate sweep, then IMPL-EVAL (Muse Spark 1.3 via OpenCode/OpenRouter).
 
 ## Next Steps
 
@@ -58,7 +59,7 @@ Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 | ----------- | -------------- | -------- |
 | Static      | pending        |          |
 | Fitness     | pending        |          |
-| Runtime     | pending        |          |
+| Runtime     | partial        | consumer-proof.md (build+serve HTML); screenshots + scaffold.runtime unproven on host |
 | Consumer    | pending        |          |
 
 ## Open Questions

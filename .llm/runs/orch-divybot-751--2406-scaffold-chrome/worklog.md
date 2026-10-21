@@ -141,3 +141,23 @@ the one new public knob (`--nav`/`--no-nav`) is additive. Tier-A slice review an
   routes` rewrites the two derived modules without Vite (`generate-routes-command.ts`); the
   styles tail preservation is S3. The design-guide slug from #752 is NOT referenced yet (the page
   is not on main); merge-order rule: whoever merges second adds it.
+
+### S5 — consumer proof on a real scaffold; `ui:remove page` survives the route generator
+
+- Evidence: `consumer-proof.md`, `consumer-chrome-evidence.txt`, `consumer-ui-add.log`,
+  `consumer-ui-remove.log`. Branch CLI scaffold → `ui:add page notes` (linked) + `admin/audit`
+  (not linked, hint) → `generate routes` → app `deno task check` exit 0 → Vite build + serve:
+  `/`, `/dashboard`, `/notes`, `/admin/audit`, `/health`, `/examples` all render `ns-topbar`
+  with the right `aria-current`; dev `/design/tokens` renders the SidebarShell without the top
+  bar; one `page` partial everywhere.
+- Finding + fix: the Fresh page-binding pass (WI-12) injects `.withRoute(routes.<key>.$route)` +
+  its import into every page that already binds `.withRoute(appRoutes…)`, so on `main`
+  `ui:remove page` refused every page after any dev run. `ui/page/remove-ui-page.ts` now strips
+  exactly that generator-owned binding before the "unchanged" comparison (page role only); an
+  author edit still refuses. Root cause filed as rickylabs/netscript#2409 (fresh, 0.0.9).
+- Gate: `run-deno-test.ts kernel/application/ui/ + public/features/ui/` 81/81 (2 new: generator
+  binding tolerated; author edit still refused); real-project `ui:remove page notes` →
+  `router reconciled; navigation reconciled`, `navigation.ts` byte-identical to the template,
+  app `check` exit 0.
+- Unproven on this host: browser screenshots / 390 px pass (cached Chromium lacks
+  `libnspr4.so`, no root) and `scaffold.runtime` (no Docker daemon).

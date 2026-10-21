@@ -75,7 +75,8 @@ export async function removeUiPage(
     if (!await fs.exists(file.path) || !(await fs.stat(file.path)).isFile) {
       throw new Error(`Refusing removal: scaffold file is missing or has diverged: ${file.path}`);
     }
-    const current = await fs.readFile(file.path);
+    const read = await fs.readFile(file.path);
+    const current = file.role === 'page' ? withoutGeneratedRouteBinding(read) : read;
     if (current !== file.content) {
       comparisons.push({ file, current });
     }
@@ -129,4 +130,15 @@ export async function removeUiPage(
   }
   await writeManifest(input.projectRoot);
   return result;
+}
+
+/**
+ * Drop the binding the Fresh route generator adds to every page on `generate routes` / Vite
+ * dev/build (`import { routes } …/.generated/routes.ts` + `.withRoute(routes.<key>.$route)`), so
+ * a page counts as unchanged when only the generator touched it.
+ */
+function withoutGeneratedRouteBinding(source: string): string {
+  return source
+    .replace(/^import \{ routes \} from '[^'\n]*\.generated\/routes\.ts';\r?\n/m, '')
+    .replace(/^[ \t]*\.withRoute\(routes(?:\.[\w$]+|\[(['"])[^'"\n]+\1\])*\.\$route\)\r?\n/m, '');
 }
