@@ -1,0 +1,46 @@
+import { appRoutes } from '@app/router.ts';
+
+/** How a top-bar link decides that it marks the current page. */
+export type NavigationMatch = 'exact' | 'prefix';
+
+/** One top-bar link rendered by `routes/_layout.tsx`. */
+export interface NavigationItem {
+  /** Typed href from `appRoutes`. */
+  readonly href: string;
+  /** Visible link text. */
+  readonly label: string;
+  /** `prefix` keeps the link current on nested pages such as `/examples/crud`. */
+  readonly match: NavigationMatch;
+}
+
+/**
+ * Top-bar links, in display order. Every page renders inside the app chrome; list a page here to
+ * link it. `netscript ui:add page <path>` appends top-level pages for you.
+ */
+export const appNavigation: readonly NavigationItem[] = [
+  { href: appRoutes.home.href(), label: 'Home', match: 'exact' },
+  { href: appRoutes.dashboard.href(), label: 'Dashboard', match: 'exact' },
+  { href: appRoutes.examples.href(), label: 'Examples', match: 'prefix' },
+  { href: appRoutes.health.href(), label: 'Health', match: 'exact' },
+  { href: appRoutes.design.href(), label: 'Design', match: 'prefix' },
+];
+
+/**
+ * Route prefixes whose pages render their own chrome instead of the app top bar. `/design` ships
+ * its own sidebar shell; add a prefix for a full-screen page such as a sign-in screen.
+ */
+export const chromelessRoutePrefixes: readonly string[] = [appRoutes.design.href()];
+
+function isUnderPrefix(pathname: string, prefix: string): boolean {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
+/** Whether `item` links to the page at `pathname`. */
+export function isCurrentNavigation(item: NavigationItem, pathname: string): boolean {
+  return item.match === 'exact' ? pathname === item.href : isUnderPrefix(pathname, item.href);
+}
+
+/** Whether the page at `pathname` renders inside the app top bar. */
+export function rendersAppChrome(pathname: string): boolean {
+  return !chromelessRoutePrefixes.some((prefix) => isUnderPrefix(pathname, prefix));
+}

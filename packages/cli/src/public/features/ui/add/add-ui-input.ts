@@ -10,4 +10,6 @@ export interface UiAddCommandInput {
   readonly island?: boolean;
   readonly query?: boolean;
   readonly client?: string;
+  /** `--nav [label]` (true or the label) or `--no-nav` (false); page scaffolds only. */
+  readonly nav?: boolean | string;
 }

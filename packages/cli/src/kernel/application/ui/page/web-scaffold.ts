@@ -1,17 +1,32 @@
 import { dirname, relative, resolve } from '@std/path';
 import { cleanUiPagePath } from './page-path.ts';
-import type { FileSystemPort } from '../../ports/file-system-port.ts';
+import { navigationLabel, planNavigationRegistration } from './app-navigation.ts';
+import type { FileSystemPort } from '../../../ports/file-system-port.ts';
 import {
   type ClientBinding,
   selectClientBinding,
-} from '../resource-slice/selection/client-selector.ts';
-export type UiGeneratedFileRole = 'page' | 'query-loader' | 'island' | 'route-registration';
+} from '../../resource-slice/selection/client-selector.ts';
+export type UiGeneratedFileRole =
+  | 'page'
+  | 'query-loader'
+  | 'island'
+  | 'route-registration'
+  | 'navigation-registration';
+/** Roles that edit an existing app-owned module instead of creating a new file. */
+export const UI_REGISTRATION_ROLES: ReadonlySet<UiGeneratedFileRole> = new Set([
+  'route-registration',
+  'navigation-registration',
+]);
 export type UiGeneratedFile = Readonly<{
   path: string;
   content: string;
   role: UiGeneratedFileRole;
 }>;
-export type UiScaffoldResult = Readonly<{ files: readonly UiGeneratedFile[] }>;
+/** Planned files plus the follow-up guidance the CLI prints after them. */
+export type UiScaffoldResult = Readonly<{
+  files: readonly UiGeneratedFile[];
+  nextSteps: readonly string[];
+}>;
 type WriteOptions = Readonly<{ force?: boolean; dryRun?: boolean }>;
 export interface UiPageScaffoldInput extends WriteOptions {
   readonly projectRoot: string;
@@ -19,7 +34,19 @@ export interface UiPageScaffoldInput extends WriteOptions {
   readonly route?: string;
   readonly island?: boolean;
   readonly client?: string;
+  /**
+   * Top-bar link: a label or `true` links the page, `false` skips it, and `undefined` links
+   * top-level pages only.
+   */
+  readonly nav?: boolean | string;
 }
+/** Line width of the generated workspace's `deno fmt` config. */
+const GENERATED_LINE_WIDTH = 100;
+/** Where every scaffolded page gets its frame and theme; printed after `ui:add page`. */
+const PAGE_FRAME_GUIDANCE = [
+  'The page renders inside the app chrome from routes/_layout.tsx; navigation.ts lists the top-bar links, and chromelessRoutePrefixes opts a route out.',
+  "Restyle app-wide through the --ns-* tokens in assets/tokens.css (light on :root, dark on [data-theme='dark']); see MCP get_doc web-layer/how-to/customize-fresh-ui.",
+] as const;
 export interface UiIslandScaffoldInput extends WriteOptions {
   readonly projectRoot: string;
   readonly name: string;
@@ -33,13 +60,15 @@ export async function scaffoldUiPage(
   const segment = cleanUiPagePath(input.path);
   const routeId = cleanRouteId(input.route ?? segment.replaceAll('/', '.'));
   const dir = resolve(input.projectRoot, 'routes', segment);
-  const name = pascalCase(segment.split('/').at(-1) ?? 'Page');
+  const lastSegment = segment.split('/').at(-1) ?? 'page';
+  const name = pascalCase(lastSegment);
+  const title = navigationLabel(lastSegment);
   const binding = input.island
     ? await selectClientBinding(input.projectRoot, fs, input.client)
     : undefined;
   const files: UiGeneratedFile[] = [{
     path: resolve(dir, 'index.tsx'),
-    content: pageTemplate(name, routeId, Boolean(binding)),
+    content: pageTemplate(name, title, routeId, Boolean(binding)),
     role: 'page',
   }];
   if (binding) {
@@ -55,8 +84,13 @@ export async function scaffoldUiPage(
     });
   }
   files.push(await routeRegistration(input.projectRoot, segment, routeId, fs));
+  const navigation = await planNavigationRegistration(
+    { projectRoot: input.projectRoot, segment, routeId, title, nav: input.nav },
+    fs,
+  );
+  if (navigation.edit) files.push({ ...navigation.edit, role: 'navigation-registration' });
   await applyPlan(files, input, fs);
-  return { files };
+  return { files, nextSteps: [...PAGE_FRAME_GUIDANCE, ...navigation.nextSteps] };
 }
 export async function scaffoldUiIsland(
   input: UiIslandScaffoldInput,
@@ -70,7 +104,7 @@ export async function scaffoldUiIsland(
   const content = binding ? queryIslandTemplate(binding, path, name) : signalTemplate(name);
   const files: UiGeneratedFile[] = [{ path, content, role: 'island' }];
   await applyPlan(files, input, fs);
-  return { files };
+  return { files, nextSteps: [] };
 }
 async function applyPlan(
   files: readonly UiGeneratedFile[],
@@ -79,7 +113,7 @@ async function applyPlan(
 ): Promise<void> {
   if (!options.force) {
     for (const file of files) {
-      if (file.role !== 'route-registration' && await fs.exists(file.path)) {
+      if (!UI_REGISTRATION_ROLES.has(file.role) && await fs.exists(file.path)) {
         throw new Error(`Refusing to overwrite existing file: ${file.path}`);
       }
     }
@@ -127,6 +161,7 @@ async function routeRegistration(
 }
 function pageTemplate(
   name: string,
+  title: string,
   routeId: string,
   dataBound: boolean,
 ): string {
@@ -134,10 +169,25 @@ function pageTemplate(
   const imports = dataBound
     ? `import ${name}Island from './(_islands)/${name}Island.tsx';\nimport { load${name}Data } from './(_shared)/query-loaders.ts';\n`
     : '';
-  const layer = dataBound
-    ? `.withLayer('${camel}', ${name}Island, { loader: load${name}Data })`
-    : `.withLayer('${camel}', () => <main><h1>${name}</h1></main>, () => ({}))`;
-  return `import { appRoutes } from '@app/router.ts';\nimport { definePage } from '@app/utils.ts';\n${imports}\nexport const ${camel}Page = definePage()\n  .withRoute(appRoutes['${routeId}'])\n  .withMeta(() => ({ title: '${name}' }))\n  ${layer}\n  .withLayout((slots) => slots.${camel}())\n  .build();\n\nexport const { default: page } = ${camel}Page;\nexport { page as default };\n`;
+  const content = dataBound
+    ? ''
+    : `\nfunction ${name}Content() {\n  return <p>Start building this page here.</p>;\n}\n`;
+  const layer = chainCall('withLayer', [
+    `'${camel}'`,
+    dataBound ? `${name}Island` : `${name}Content`,
+    dataBound ? `{ loader: load${name}Data }` : '() => ({})',
+  ]);
+  const meta = `  .withMeta(() => ({ title: '${title}' }))`;
+  const metaCall = meta.length <= GENERATED_LINE_WIDTH
+    ? meta
+    : `  .withMeta(() => ({\n    title: '${title}',\n  }))`;
+  return `import { PageHeader } from '@app/components/ui/mod.ts';\nimport { appRoutes } from '@app/router.ts';\nimport { definePage } from '@app/utils.ts';\n${imports}${content}\nexport const ${camel}Page = definePage()\n  .withRoute(appRoutes['${routeId}'])\n${metaCall}\n${layer}\n  .withLayout((slots) => (\n    <main class='ns-shell ns-section ns-stack ns-stack--lg'>\n      <PageHeader>\n        <PageHeader.Main>\n          <PageHeader.Intro>\n            <h1>${title}</h1>\n          </PageHeader.Intro>\n        </PageHeader.Main>\n      </PageHeader>\n      {slots.${camel}()}\n    </main>\n  ))\n  .build();\n\nexport const { default: page } = ${camel}Page;\nexport { page as default };\n`;
+}
+/** Emit a `.method(args)` chain link the way `deno fmt` lays it out at the generated width. */
+function chainCall(method: string, args: readonly string[]): string {
+  const line = `  .${method}(${args.join(', ')})`;
+  if (line.length <= GENERATED_LINE_WIDTH) return line;
+  return `  .${method}(\n${args.map((arg) => `    ${arg},\n`).join('')}  )`;
 }
 function loaderTemplate(binding: ClientBinding, path: string, name: string): string {
   const query = binding.queries;

@@ -53,6 +53,7 @@ export const {
   appHomeViewTemplate,
   appIndexRouteTemplate,
   appLayoutTemplate,
+  appNavigationTemplate,
   appRouterTemplate,
   appUtilsTemplate,
 } = appTemplates;

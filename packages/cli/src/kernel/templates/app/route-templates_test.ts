@@ -4,7 +4,7 @@
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { join } from 'jsr:@std/path@^1';
+import { join, toFileUrl } from 'jsr:@std/path@^1';
 import { writeFreshRouteManifestSync } from '../../adapters/scaffold/fresh-route-manifest.ts';
 import { readTemplateAsset } from '../../adapters/templates/template-asset.ts';
 import { DenoProcess } from '../../adapters/runtime/process/deno-process.ts';
@@ -39,6 +39,7 @@ import {
   appHomeViewTemplate,
   appIndexRouteTemplate,
   appLayoutTemplate,
+  appNavigationTemplate,
   appOrderExampleRouteTemplate,
   appRouterTemplate,
   appTelemetryExampleSharedTemplate,
@@ -74,6 +75,34 @@ function assertUniqueDirectAppRouteTargets(source: string): void {
       `appRoutes.${key} duplicates appRoutes.${owner} target ${target}`,
     );
     owners.set(target, key);
+  }
+}
+
+interface NavigationModule {
+  readonly appNavigation: readonly { readonly href: string; readonly label: string }[];
+  readonly isCurrentNavigation: (item: unknown, pathname: string) => boolean;
+  readonly rendersAppChrome: (pathname: string) => boolean;
+}
+
+/** Import the navigation template against a stub router so its matching logic runs for real. */
+async function importNavigationTemplate(): Promise<NavigationModule> {
+  const dir = await Deno.makeTempDir({ prefix: 'ns-navigation-template-' });
+  try {
+    const route = (path: string) => `{ href: () => '${path}' }`;
+    await Deno.writeTextFile(
+      join(dir, 'router.ts'),
+      `export const appRoutes = { home: ${route('/')}, dashboard: ${route('/dashboard')}, ` +
+        `examples: ${route('/examples')}, health: ${route('/health')}, ` +
+        `design: ${route('/design')} };\n`,
+    );
+    const modulePath = join(dir, 'navigation.ts');
+    await Deno.writeTextFile(
+      modulePath,
+      appNavigationTemplate.replace("from '@app/router.ts'", "from './router.ts'"),
+    );
+    return await import(toFileUrl(modulePath).href) as NavigationModule;
+  } finally {
+    await Deno.remove(dir, { recursive: true });
   }
 }
 
@@ -350,40 +379,55 @@ describe('app route template rendering', () => {
     );
   });
 
-  it('layout template keeps define.layout and exposes the examples nav', async () => {
+  it('layout template renders the chrome on every page unless a prefix opts out', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(appLayoutTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(output, "import { Partial } from 'fresh/runtime';");
-    assertStringIncludes(output, "import { appRoutes } from '@app/router.ts';");
+    assertStringIncludes(
+      output,
+      "import { appNavigation, isCurrentNavigation, rendersAppChrome } from '@app/navigation.ts';",
+    );
     assertStringIncludes(output, 'export default define.layout(');
-    assertStringIncludes(output, "<Partial name='page'>");
-    assertStringIncludes(output, 'const homeHref = appRoutes.home.href();');
+    assertStringIncludes(output, 'if (!rendersAppChrome(url.pathname)) {');
+    assertStringIncludes(output, 'appNavigation.map((item) => (');
     assertStringIncludes(
       output,
-      'const dashboardHref = appRoutes.dashboard.href();',
+      "aria-current={isCurrentNavigation(item, url.pathname) ? 'page' : undefined}",
     );
+    assertStringIncludes(output, "<nav class='ns-cluster ns-cluster--sm' aria-label='Primary'>");
+    assertStringIncludes(output, '<ThemeToggle />');
+    assertStringIncludes(output, 'test-project');
+    // Both the chrome and the chromeless branch keep the `page` partial for client navigation.
+    assertEquals(output.split("<Partial name='page'>").length - 1, 2);
+    // Regression (#2406): the chrome used to render only for an allowlist of scaffold routes.
+    assert(!output.includes('showScaffoldChrome'), 'layout must not allowlist chrome routes');
+    assert(!output.includes('url.pathname === homeHref'), 'layout must not hardcode routes');
+  });
+
+  it('navigation template links every scaffold route and opts only /design out of the chrome', async () => {
+    const router = await makeAdapter().render(appRouterTemplate, SAMPLE_APP_VARS);
+    const appRouteKeys = new Set(directAppRouteTargets(router).keys());
+    const linkedKeys = [...appNavigationTemplate.matchAll(/href: appRoutes\.(\w+)\.href\(\)/g)]
+      .map((match) => match[1]);
+    assertEquals(linkedKeys, ['home', 'dashboard', 'examples', 'health', 'design']);
+    for (const key of linkedKeys) assert(appRouteKeys.has(key), `appRoutes.${key} must exist`);
     assertStringIncludes(
-      output,
-      'const examplesHref = appRoutes.examples.href();',
+      appNavigationTemplate,
+      'export const chromelessRoutePrefixes: readonly string[] = [appRoutes.design.href()];',
     );
-    assertStringIncludes(output, 'const designHref = appRoutes.design.href();');
-    assertStringIncludes(output, 'url.pathname.startsWith(examplesHref)');
-    assertStringIncludes(
-      output,
-      "import { Badge, Button } from '@app/components/ui/mod.ts';",
-    );
-    assertStringIncludes(
-      output,
-      "<Button\n            type='link'\n            href={dashboardHref}",
-    );
-    assertStringIncludes(
-      output,
-      "aria-current={url.pathname.startsWith(examplesHref) ? 'page' : undefined}",
-    );
-    assertStringIncludes(
-      output,
-      "aria-current={url.pathname.startsWith(designHref) ? 'page' : undefined}",
-    );
+
+    const navigation = await importNavigationTemplate();
+    assert(navigation.rendersAppChrome('/'));
+    assert(navigation.rendersAppChrome('/notes'), 'pages added later get the chrome');
+    assert(navigation.rendersAppChrome('/health'));
+    assert(navigation.rendersAppChrome('/designer'), 'prefixes match whole segments');
+    assert(!navigation.rendersAppChrome('/design'));
+    assert(!navigation.rendersAppChrome('/design/tokens'));
+    const byLabel = new Map(navigation.appNavigation.map((item) => [item.label, item]));
+    assert(navigation.isCurrentNavigation(byLabel.get('Examples')!, '/examples/crud'));
+    assert(navigation.isCurrentNavigation(byLabel.get('Home')!, '/'));
+    assert(!navigation.isCurrentNavigation(byLabel.get('Home')!, '/notes'));
+    assert(!navigation.isCurrentNavigation(byLabel.get('Dashboard')!, '/dashboard/settings'));
   });
 
   it('design route templates use NetScript page builders and scoped route files', async () => {

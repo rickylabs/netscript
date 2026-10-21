@@ -84,6 +84,7 @@ export async function writeNormalizedAppFiles(
     appIndexRouteTemplate,
     appLayoutTemplate,
     appMainTemplate,
+    appNavigationTemplate,
     appRouterTemplate,
     appUiModTemplate,
     appUtilsTemplate,
@@ -234,6 +235,7 @@ export async function writeNormalizedAppFiles(
     join(appDir, 'router.ts'),
     await context.templateAdapter.render(appRouterTemplate, appTemplateVars),
   );
+  await write(join(appDir, 'navigation.ts'), appNavigationTemplate);
   await write(join(uiComponentsDir, 'mod.ts'), appUiModTemplate);
   await write(join(designSharedDir, 'registry.ts'), appDesignRegistryTemplate);
   await write(join(designSharedDir, 'tokens.ts'), appDesignTokensLibTemplate);

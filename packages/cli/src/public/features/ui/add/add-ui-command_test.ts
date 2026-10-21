@@ -1,14 +1,17 @@
 import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
+import { readTemplateAsset } from '../../../../kernel/adapters/templates/template-asset.ts';
+import { TEMPLATE_KEYS } from '../../../../kernel/assets/manifest.ts';
 import {
   scaffoldUiPage,
   type UiGeneratedFile,
-} from '../../../../kernel/application/ui/web-scaffold.ts';
+} from '../../../../kernel/application/ui/page/web-scaffold.ts';
 import { createUiAddCommand } from './add-ui-command.ts';
 
 const APP_ROOT = '/workspace/shop/apps/dashboard';
 const ROUTER_PATH = `${APP_ROOT}/router.ts`;
+const NAVIGATION_PATH = `${APP_ROOT}/navigation.ts`;
 const HELP_TEST_WIDTH = 80;
 const ROUTER_SOURCE = `import { createRouteReference } from '@netscript/fresh/route';
 
@@ -87,7 +90,7 @@ Deno.test('ui:add page --island --dry-run reports the exact plan and writes noth
   ]);
 
   assertEquals(fs.getFiles(), before);
-  assertReportedRoles(output, 'Planned');
+  assertReportedRoles(output, 'Planned', ['island', 'page', 'query-loader', 'route-registration']);
   for (
     const path of [
       `${APP_ROOT}/routes/admin/status/index.tsx`,
@@ -107,7 +110,41 @@ Deno.test('ui:add page --island reports each generated role and path', async () 
 
   await testCommand(fs, output).parse(['page', 'incidents', '--island']);
 
-  assertReportedRoles(output, 'Generated');
+  assertReportedRoles(output, 'Generated', [
+    'island',
+    'navigation-registration',
+    'page',
+    'query-loader',
+    'route-registration',
+  ]);
+  assert(output.some((line) => line.startsWith('Next: ') && line.includes('routes/_layout.tsx')));
+});
+
+Deno.test('ui:add page --nav <label> links a nested page and --no-nav skips a top-level one', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await seedBindableApp(fs);
+  const output: string[] = [];
+
+  await testCommand(fs, output).parse(['page', 'admin/users', '--nav', 'Users']);
+  await testCommand(fs, output).parse(['page', 'login', '--no-nav']);
+
+  const navigation = await fs.readFile(NAVIGATION_PATH);
+  assertStringIncludes(navigation, "{ href: appRoutes['admin.users'].href(), label: 'Users'");
+  assert(!navigation.includes("appRoutes['login']"));
+  assert(output.some((line) => line.startsWith('Next: Not linked in the top bar')));
+});
+
+Deno.test('ui:add rejects --nav outside page scaffolds', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await seedBindableApp(fs);
+  let error: unknown;
+  try {
+    await testCommand(fs).throwErrors().parse(['island', 'Counter', '--no-nav']);
+  } catch (caught) {
+    error = caught;
+  }
+  assert(error instanceof Error);
+  assertStringIncludes(error.message, '--nav and --no-nav are supported only for page scaffolds.');
 });
 
 Deno.test('ui:add --client forwards service selection to page and island scaffolds', async () => {
@@ -182,6 +219,7 @@ function testCommand(fs: MemoryFileSystemAdapter, output: string[] = []) {
 
 async function seedBindableApp(fs: MemoryFileSystemAdapter): Promise<void> {
   await fs.writeFile(ROUTER_PATH, ROUTER_SOURCE);
+  await fs.writeFile(NAVIGATION_PATH, await readTemplateAsset(TEMPLATE_KEYS.appNavigation));
   await fs.writeFile(
     `${APP_ROOT}/lib/orders.ts`,
     `export const ordersName = 'orders';
@@ -213,14 +251,13 @@ function normalizeHelpText(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
 }
 
-function assertReportedRoles(output: readonly string[], verb: 'Planned' | 'Generated'): void {
+function assertReportedRoles(
+  output: readonly string[],
+  verb: 'Planned' | 'Generated',
+  roles: readonly string[],
+): void {
   assertEquals(
     output.filter((line) => line.startsWith(`${verb} `)).map((line) => line.split(':')[0]).sort(),
-    [
-      `${verb} island`,
-      `${verb} page`,
-      `${verb} query-loader`,
-      `${verb} route-registration`,
-    ],
+    roles.map((role) => `${verb} ${role}`),
   );
 }

@@ -1,6 +1,7 @@
+import { assert, assertEquals } from '@std/assert';
 import { resolve } from '@std/path';
 
-import { writeStylesAggregator } from './registry-styles.ts';
+import { APP_CUSTOM_STYLES_MARKER, writeStylesAggregator } from './registry-styles.ts';
 import type { UiRegistryItem, UiRegistryManifest } from './registry.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 
@@ -118,7 +119,9 @@ Deno.test("writeStylesAggregator registers a collection install's per-item CSS i
   for (const expected of ['avatar', 'message']) {
     if (!imports.includes(`@import './ui/${expected}.css';`)) {
       throw new Error(
-        `Collection install must register @import './ui/${expected}.css'; got: ${imports.join(', ')}`,
+        `Collection install must register @import './ui/${expected}.css'; got: ${
+          imports.join(', ')
+        }`,
       );
     }
   }
@@ -164,6 +167,63 @@ Deno.test('writeStylesAggregator appends a collection install onto an existing a
   // Items shared between both installs (avatar) must not be duplicated.
   const avatarCount = afterAi.filter((line) => line === "@import './ui/avatar.css';").length;
   if (avatarCount !== 1) {
-    throw new Error(`Expected a single avatar.css import, found ${avatarCount}: ${afterAi.join(', ')}`);
+    throw new Error(
+      `Expected a single avatar.css import, found ${avatarCount}: ${afterAi.join(', ')}`,
+    );
   }
+});
+
+Deno.test('writeStylesAggregator keeps the app-owned styles below the custom marker across installs', async () => {
+  const disk = new Map<string, string>();
+  const fs = statefulFs(disk);
+  const install = (collection: string) =>
+    writeStylesAggregator({
+      registryRoot: '/registry',
+      projectRoot: '/app',
+      manifest,
+      items: collectionItems(collection),
+      fs,
+    });
+
+  await install('foundation');
+  const target = resolve('/app', 'assets', 'styles.css').replaceAll('\\', '/');
+  const brand = [
+    "@import './brand.css';",
+    '',
+    ':root {\n  --ns-primary: oklch(62% 0.19 255);\n}',
+    "[data-theme='dark'] {\n  --ns-primary: oklch(72% 0.16 255);\n}",
+    '',
+  ].join('\n');
+  disk.set(
+    target,
+    readStyles(disk).replace(
+      `${APP_CUSTOM_STYLES_MARKER}\n`,
+      `${APP_CUSTOM_STYLES_MARKER}\n${brand}`,
+    ),
+  );
+
+  // Regression (#2406): every `ui:add <item>` rebuilt the aggregator from the theme base and
+  // silently deleted app-wide theme overrides written below the marker.
+  await install('ai');
+  await install('ai');
+  const styles = readStyles(disk);
+  assertEquals(
+    styles.slice(styles.indexOf(APP_CUSTOM_STYLES_MARKER)),
+    `${APP_CUSTOM_STYLES_MARKER}\n${brand}`,
+  );
+  // The tail's own @import is the app's, so it is not hoisted into the managed import block.
+  assertEquals(styles.split("@import './brand.css';").length - 1, 1);
+  assert(perItemImports(styles).includes("@import './ui/message.css';"));
+});
+
+Deno.test('writeStylesAggregator ends a fresh aggregator with an empty custom section', async () => {
+  const disk = new Map<string, string>();
+  await writeStylesAggregator({
+    registryRoot: '/registry',
+    projectRoot: '/app',
+    manifest,
+    items: collectionItems('foundation'),
+    fs: statefulFs(disk),
+  });
+  assert(readStyles(disk).endsWith(`\n\n${APP_CUSTOM_STYLES_MARKER}\n`));
 });
