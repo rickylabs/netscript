@@ -469,6 +469,7 @@ async function assertAppConventionsResolve(
   ]);
   const routeFiles: Readonly<Record<string, string>> = {
     '/design/composition': 'routes/(design)/design/composition.tsx',
+    '/design/components': 'routes/(design)/design/components.tsx',
   };
   const references = [...`${agents}\n${webLayer}`.matchAll(/`([^`\n]+)`/g)]
     .map((match) => match[1])
