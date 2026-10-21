@@ -32,7 +32,12 @@ Sibling session #752 owns the docs/MCP/app-guidance half of #2406.
 
 1. After #2407 / #2408 merge: whichever lands second adds the cross-references (`navigation.ts` +
    `--nav`/`--no-nav` in `agent-conventions.ts` `## Design and theming`; the
-   `web-layer/how-to/design-with-fresh-ui` slug in `skills/netscript-build/SKILL.md`).
+   `web-layer/how-to/design-with-fresh-ui` slug in `skills/netscript-build/SKILL.md`; the
+   `navigation.ts` / `--nav` / `--no-nav` specifics in `customize-fresh-ui.md`
+   `## App chrome and navigation`, which #2408 words neutrally).
+   Note from #752: on the standalone MCP corpus, bare-slug `get_doc web-layer/how-to/...` returned
+   `doc_not_found` on `main` (release carrier keys pages as `pages/...`); #2408 (54166ef) adds a
+   `pages/<slug>` fallback, so the skill's and `ui:add page`'s bare-slug pointers resolve once it merges.
 2. #2409 (Fresh duplicate route binding) — once fixed, `withoutGeneratedRouteBinding` in
    `ui/page/remove-ui-page.ts` may become dead code.
 
