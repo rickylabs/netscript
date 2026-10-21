@@ -79,7 +79,7 @@ file-system routing, with NetScript conventions layered on top:
     { name: "routes/", type: "pages + layouts", desc: "File-system routes. index.tsx, dashboard.tsx, health.tsx, examples/, plus _app.tsx (HTML shell) and _layout.tsx (chrome). Groups like (_components)/, (_shared)/, and (_islands)/ are non-routing co-location folders." },
     { name: "islands/", type: "client interactivity", desc: "Hydrated Preact components (ThemeToggle, SidebarToggle, Toast). Everything else renders on the server only." },
     { name: "components/ui/", type: "app-owned UI", desc: "The copied @netscript/fresh-ui primitives — Button, Card, Badge, PageHeader, StatsGrid, and friends. Edit these freely; they are yours after the copy. Barrel at components/ui/mod.ts." },
-    { name: "assets/", type: "styling + tokens", desc: "tokens.css / tokens.json (the --ns-* design tokens), styles.css, design.css, and per-component CSS under assets/ui/. Tailwind v4 is wired through Vite." },
+    { name: "assets/", type: "styling + tokens", desc: "tokens.css / tokens.json (the --ns-* design tokens), theme-bridge.css (Tailwind ns-* utilities), styles.css (the aggregator client.ts loads on every route), layouts.css, design.css (the /design pages), and per-component CSS under assets/ui/. Tailwind v4 is wired through Vite." },
     { name: "lib/", type: "app helpers", desc: "cn.ts (class merge), example-service.ts, public-types.ts — non-UI utilities the routes import." },
     { name: "router.ts / utils.ts", type: "typed wiring", desc: "router.ts exposes typed route references (appRoutes); utils.ts exports the createDefine<State>() define helper and the definePage() builder." },
     { name: "vite.config.ts / deno.json", type: "build + deps", desc: "Vite + Fresh + Tailwind plugins and the @app/* aliases; deno.json pins fresh, preact, @preact/signals, tailwindcss, and the @netscript/fresh* imports." }
@@ -148,10 +148,11 @@ it renders in one typed chain. To change the home page, edit
 ] }) }}
 
 The HTML shell (`<html>`, `<head>`, fonts, the theme-seed script) is
-`routes/_app.tsx`; the top bar / navigation chrome wrapping content pages is
-`routes/_layout.tsx`. Both use the `define.page(...)` / `define.layout(...)` helpers
-from `createDefine<State>()`. Edit those to change the global frame rather than
-repeating markup per page.
+`routes/_app.tsx`. The app chrome (top bar, navigation, theme toggle) is rendered by
+`routes/_layout.tsx` around your pages. Read it before you add a page: it decides which
+routes get the chrome and where the navigation links come from. Both files use the
+`define.page(...)` / `define.layout(...)` helpers from `createDefine<State>()`. Edit them
+to change the global frame instead of repeating a header in each page.
 
 {{ comp callout { type: "tip", title: "Co-location folders don't become URLs" } }}
 Folders wrapped in parentheses — <code>(_components)</code>,
@@ -214,7 +215,7 @@ NetScript styling has three layers, lightest-touch first:
 
 {{ comp.card({
   title: "1 · Design tokens (theme-wide)",
-  body: "Edit the CSS custom properties in assets/tokens.css (mirrored in tokens.json). Tokens are named --ns-* (e.g. surface, border, foreground, accent) and drive every component plus the light/dark themes selected by the data-theme attribute. Change a token once and the whole app re-themes."
+  body: "Edit the CSS custom properties in assets/tokens.css (mirrored in tokens.json for the /design/tokens page). :root holds the light theme and [data-theme='dark'] the dark overrides. Tokens are named --ns-* (surface, border, fg, primary, …) and drive every component on every page. Change a token once and the whole app re-themes."
 }) }}
 
 {{ comp.card({
@@ -231,11 +232,39 @@ Pick the lightest layer that does the job: reach for a **token** when the change
 should re-theme the whole app, a **Tailwind utility** for one-off element layout,
 and **component CSS** when one primitive should look different everywhere it appears.
 
-Theme switching is already wired: `routes/_app.tsx` seeds `data-theme` from the
-`ns-theme` localStorage key (falling back to the OS preference), and the
-`ThemeToggle` island flips it at runtime. To ship a different default, change the
-`data-theme` attribute on `<html>` in `_app.tsx` and adjust the token values for
-that theme in `assets/tokens.css`.
+### The theme chain
+
+The theme is app-wide by construction. Nothing is scoped to a page:
+
+```text
+assets/tokens.css         :root = light theme; [data-theme='dark'] = dark overrides
+  -> assets/theme-bridge.css  Tailwind v4 @theme inline: bg-ns-*, text-ns-*, border-ns-*,
+                              p-ns-*, gap-ns-*, rounded-ns-*, shadow-ns-* utilities
+  -> assets/styles.css        aggregator: tailwindcss + tokens + bridge + layouts + assets/ui/*.css
+  -> client.ts                imports styles.css, so it is loaded on every route
+routes/_app.tsx           sets data-theme on <html> from localStorage 'ns-theme' or the OS preference
+islands/ui/ThemeToggle    flips data-theme at runtime
+```
+
+`theme-bridge.css` is generated from the tokens. You do not edit it to restyle. To ship a different
+default theme, change the fallback in the `_app.tsx` seed script.
+
+### Make one theme apply app-wide
+
+Edit `assets/tokens.css`, not a page. Set the brand knobs, `--ns-primary` and `--ns-primary-fg`, in
+the `:root` block. The tints (`--ns-*-subtle`), borders (`--ns-*-border`), hover states, accent, and
+focus ring derive from them through `color-mix()` and `var()`, so both themes and every page follow
+the edit. Add a knob to `[data-theme='dark']` only when dark mode needs a different shade.
+[Design with Fresh UI](/web-layer/how-to/design-with-fresh-ui/) has tested brand presets,
+type and radius recipes, and page layouts.
+
+{{ comp callout { type: "warning", title: "There is no per-page theme" } }}
+NetScript has no data-ns-theme attribute, no assets/themes/ folder, and no html:has(...) theme
+selector. Setting tokens or data-theme on a page wrapper restyles only that page, and the derived
+tokens keep their old values there. Agents that did this left every other page on the default
+look. The ui:add --theme flag only chooses which registry theme item is copied, and the registry
+ships one: theme-seed (NS One).
+{{ /comp }}
 
 {{ comp callout { type: "warning", title: "Edit tokens, not magic numbers" } }}
 Reach for a raw hex color or pixel value only when no token fits. Hard-coded values
@@ -336,7 +365,8 @@ list):
 
 - `--project-root <path>` — target a workspace other than the current directory.
 - `--theme <name>` — install against a specific theme registry item instead of the
-  default official theme.
+  default official theme. The registry currently ships one theme item, `theme-seed`.
+  A theme item's files are copied once and apply app-wide.
 - `--registry-root <path>` — override the Fresh UI package root (advanced/local
   development).
 - `--force` — overwrite existing copied UI files when re-running.
@@ -382,6 +412,8 @@ the filesystem.
 
 ## Next steps
 
+- Design guide: [Design with Fresh UI](/web-layer/how-to/design-with-fresh-ui/) — the
+  rules, brand presets, page anatomy, and list/detail recipes for consistent pages.
 - Capability hub: [Fresh UI](/capabilities/fresh-ui/) — the concept, the headline
   API, and the Learn / Do / Reference triplet for the dashboard app.
 - Reference: the generated API for the UI registry and the Fresh runtime —

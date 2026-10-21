@@ -135,6 +135,10 @@ export const xref: Record<string, XrefTarget> = {
     href: '/web-layer/how-to/customize-fresh-ui/',
     label: 'Customize Fresh UI',
   },
+  'howto:design-with-fresh-ui': {
+    href: '/web-layer/how-to/design-with-fresh-ui/',
+    label: 'Design with Fresh UI',
+  },
   'howto:build-a-desktop-frontend': {
     href: '/web-layer/how-to/build-a-desktop-frontend/',
     label: 'Build a desktop frontend',

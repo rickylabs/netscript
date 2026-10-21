@@ -49,6 +49,9 @@ construction, that alternative is an integration escape hatch, not the default N
 - [Customize the Fresh UI]({{ "howto:customize-fresh-ui" |> xref |> url }}) —
   bring the dashboard components into your workspace with `ui:init` / `ui:add`
   and edit them directly.
+- [Design with Fresh UI]({{ "howto:design-with-fresh-ui" |> xref |> url }}) —
+  one app-wide theme, brand presets, page anatomy, and list/detail recipes built
+  from the scaffolded blocks.
 - [Build a server-validated form]({{ "howto:build-a-server-validated-form" |> xref |> url }}) —
   route-bound form state, server validation, mutation, and success handling in
   one typed page definition with `definePage().withForm()`.

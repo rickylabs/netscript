@@ -54,3 +54,33 @@ PLAN-EVAL: not selected (justification in `plan.md`).
 
 Slice review (supervisor): diff limited to token values + generator header + test; component CSS untouched;
 default theme computes the same hue family (copper tint at 10%/8% alpha) — accepted.
+
+## S2 — Design guide + theme chain docs (2026-10-21)
+
+- New `docs/site/web-layer/how-to/design-with-fresh-ui.md`: seven rules, the theme chain, "these do not exist"
+  callout, brand knobs vs derived tokens, contrast-checked presets (NS One, Indigo, Emerald, Rose, Graphite),
+  type/radius recipe, 0.0.8 upgrade note, page anatomy, layout objects, block-by-job table, list + detail recipes,
+  do/don't, verify checklist.
+- `customize-fresh-ui.md`: `assets/` row now names theme-bridge/layouts; `_layout.tsx` text is neutral about which
+  routes get chrome (harness#751 changes that); token card names `:root`/`[data-theme='dark']`; new "The theme chain"
+  and "Make one theme apply app-wide" sections + "There is no per-page theme" callout; `--theme` flag clarified.
+- `_data/xref.ts` key `howto:design-with-fresh-ui`; how-to catalog row; web-layer "Start here" card.
+- Regenerated `agent-docs-prose.generated.ts` (`gen:agent-docs-prose`) and `packages/mcp/src/publish-assets.generated.ts`
+  (embedded `llms.txt` changed).
+- Agent-Markdown quirks found and avoided in my text (xref links double-prefix `/netscript/`, `<code>` inside callouts
+  fragments, `<intent>` in an apiTable string is eaten as a tag). Recorded in `caveats.md` (16, 17).
+
+### Gate evidence (S2)
+
+| Gate | Result |
+| --- | --- |
+| `deno task --cwd docs/site build` (source-format + Lume + rendered-output) | exit 0, 237 HTML files |
+| `deno task --cwd docs/site check:links` / `check:caveats` | 39,167 links resolve / exit 0 |
+| `deno task docs:links` / `docs:accuracy` | 0 broken / PASS |
+| `deno task docs:snippets` | PASS (scanned 660, malformed 0) |
+| Guide recipes type-checked inside the local-source scaffold (`deno check --unstable-kv`) | exit 0 (3 snippets) |
+| Recipes rendered as routes, headless Chromium, light + dark | 200, 0 page errors |
+| `check:agent-docs-prose` / `check:publish-assets` / `check:assets-barrel` | 0 / 0 / 0 |
+
+Slice review (supervisor): every component/prop/class named in the guide was checked against
+`packages/fresh-ui/registry/**`; presets computed for WCAG (text ≥ 4.5:1, ring ≥ 3:1 on both backgrounds).
