@@ -90,8 +90,8 @@ regenerate with `netscript generate plugins` only if the diagnostic identifies s
 Every page renders inside the app chrome in `routes/_layout.tsx`: the top bar, whose links are the
 `appNavigation` list in the app's `navigation.ts`. Do not build a per-page header or nav.
 
-- `netscript ui:add page <path>` links one-segment pages in the top bar automatically. Pass
-  `--nav <label>` to link a nested page or set the label, and `--no-nav` for pages that should not
+- `netscript ui:add page <path>` links one-segment pages in the top bar automatically. Pass `--nav`
+  to link a nested page, `--nav <label>` to set the label, and `--no-nav` for pages that should not
   be linked. Its `Next:` lines name the files that own the frame.
 - A page that needs its own full-screen frame (a sign-in screen) opts out by adding its prefix to
   `chromelessRoutePrefixes` in `navigation.ts`; `/design` is the scaffold's example.
@@ -105,9 +105,14 @@ Every page renders inside the app chrome in `routes/_layout.tsx`: the top bar, w
   `App-specific custom styles below.` marker in `styles.css`, which `ui:add` preserves. Never scope
   theme variables to one page's wrapper; there is no per-page theme attribute.
 
-Read `web-layer/how-to/customize-fresh-ui` through MCP `get_doc` before restyling or reshaping the
-frame. An app without `navigation.ts` was scaffolded before shared navigation: its
-`routes/_layout.tsx` shows the top bar only for an allowlist of routes, so add new pages there.
+To rebrand, set `--ns-primary` and `--ns-primary-fg` on `:root`; tints, borders, hover states, the
+accent, and the focus ring derive from them in both themes.
+
+Read `web-layer/how-to/design-with-fresh-ui` (rules, brand presets, page recipes) and
+`web-layer/how-to/customize-fresh-ui` (the theme chain and the frame) through MCP `get_doc` before
+designing a page, restyling, or reshaping the frame. An app without `navigation.ts` was scaffolded
+before shared navigation: its `routes/_layout.tsx` shows the top bar only for an allowlist of
+routes, so add new pages there.
 
 ## Route lifecycle: rename, move, or remove a page
 

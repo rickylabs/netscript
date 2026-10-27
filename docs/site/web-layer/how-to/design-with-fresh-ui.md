@@ -23,9 +23,11 @@ islands, see [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 2. **Rebrand with the brand knobs.** Set `--ns-primary` and `--ns-primary-fg` in `:root`. Tints,
    borders, hover states, the accent, and the focus ring all derive from them.
 3. **The chrome is not your page's job.** `routes/_layout.tsx` renders the top bar, navigation, and
-   theme toggle around pages. Never add a second header or theme toggle inside a page. If a page
-   you added renders without the top bar, check how `_layout.tsx` decides which routes get the
-   chrome; don't copy the chrome into the page.
+   theme toggle around every page, and the top-bar links are `appNavigation` in `navigation.ts`.
+   `netscript ui:add page` links a new one-segment page for you; pass `--nav` for a nested page,
+   `--nav <label>` to set the label, or `--no-nav` to skip the link. Never add a second header or
+   theme toggle inside a page. A page that needs its own frame opts out through
+   `chromelessRoutePrefixes` in `navigation.ts`.
 4. **Compose blocks; don't hand-roll them.** Import `PageHeader`, `StatsGrid`, `Card`, `Panel`,
    `ResponsiveTable`, `FilterForm`, `DetailLayout`, `EmptyState`, and the form controls from
    `@app/components/ui/mod.ts`. Never write a lookalike `div`.

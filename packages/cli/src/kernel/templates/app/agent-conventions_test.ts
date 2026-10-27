@@ -44,6 +44,7 @@ Deno.test('service app convention references are exact and rendered', () => {
     'client.ts',
     'routes/_app.tsx',
     'routes/_layout.tsx',
+    'navigation.ts',
     '/design/components',
   ]);
 
@@ -67,6 +68,7 @@ Deno.test('service-free app conventions retain only shared resolvable references
     'client.ts',
     'routes/_app.tsx',
     'routes/_layout.tsx',
+    'navigation.ts',
     '/design/components',
   ]);
   assertStringIncludes(buildAppAgentsMarkdown(input), GUIDANCE);
@@ -84,6 +86,9 @@ Deno.test('app conventions give agents one app-wide theme and chrome model', () 
       "`[data-theme='dark']`",
       '`--ns-primary`',
       '`routes/_layout.tsx`',
+      '`appNavigation` in `navigation.ts`',
+      '`--no-nav`',
+      '`chromelessRoutePrefixes`',
       'There is no `data-ns-theme`',
       'web-layer/how-to/design-with-fresh-ui',
       'web-layer/how-to/customize-fresh-ui',
@@ -98,6 +103,7 @@ Deno.test('app conventions give agents one app-wide theme and chrome model', () 
   assertStringIncludes(webLayer, '## Look and feel');
   assertStringIncludes(webLayer, '`assets/tokens.css`');
   assertStringIncludes(webLayer, '`routes/_layout.tsx`');
+  assertStringIncludes(webLayer, '`navigation.ts`');
 });
 
 function serviceInput(): AppConventionsInput {

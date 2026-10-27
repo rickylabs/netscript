@@ -170,19 +170,27 @@ and its consumers using the <a href="/web-layer/route/#renaming-or-moving-a-rout
 
 ## App chrome and navigation
 
-`routes/_layout.tsx` renders the app chrome around your pages: the top bar, the brand, the
-navigation links, and the `ThemeToggle` island. Every page that gets the chrome gets the same
-frame, so the chrome is what makes the app look like one product. Before you add a page:
+`routes/_layout.tsx` renders the app chrome around every page: the top bar, the brand, the
+navigation links, and the `ThemeToggle` island. Every page gets the same frame, so the chrome is
+what makes the app look like one product.
 
-1. Read `routes/_layout.tsx` to see which routes it wraps and where its navigation links come
-   from.
-2. Check that your new route gets the chrome, and give it a navigation link if it is a top-level
-   destination.
-3. Keep the page view to its own content: one `<main>`, a `PageHeader`, then sections.
+- **Links.** The top-bar links are the `appNavigation` list in `navigation.ts`, next to
+  `router.ts`. Each entry has a typed `href` from `appRoutes`, a `label`, and a `match` mode:
+  `exact`, or `prefix` to keep the link current on nested pages.
+- **New pages.** `netscript ui:add page <path>` links a one-segment page in the top bar for you.
+  Pass `--nav` to link a nested page, `--nav <label>` to set the label, and `--no-nav` to skip the
+  link.
+  `netscript ui:remove page <path>` removes the link along with the page.
+- **Opting out.** A page that needs its own full-screen frame, such as a sign-in screen, adds its
+  route prefix to `chromelessRoutePrefixes` in `navigation.ts`. The `/design` showcase is the
+  scaffold's example: it has its own `SidebarShell` layout in `routes/(design)/design/_layout.tsx`.
 
-Never copy a header, nav, or theme toggle into a page view to make it match the others. Duplicated
-chrome drifts and breaks client navigation; fix the layout instead. The `/design` showcase is
-the exception: it has its own `SidebarShell` layout in `routes/(design)/design/_layout.tsx`.
+Keep the page view to its own content: one `<main>`, a `PageHeader`, then sections. Never copy a
+header, nav, or theme toggle into a page view to make it match the others. Duplicated chrome
+drifts and breaks client navigation; fix `navigation.ts` or the layout instead.
+
+An app scaffolded before `navigation.ts` existed (0.0.8 and earlier) shows the top bar only for
+the routes its `routes/_layout.tsx` lists. Add a new page's route to that list.
 
 ## Add interactivity with an island
 

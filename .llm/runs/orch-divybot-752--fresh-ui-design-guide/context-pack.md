@@ -5,8 +5,8 @@
 | Field          | Value                                                                     |
 | -------------- | ------------------------------------------------------------------------- |
 | Run ID         | `orch-divybot-752--fresh-ui-design-guide`                                 |
-| Branch / PR    | `orch/divybot-752` / rickylabs/netscript#2408 (`Refs #2406`)              |
-| Current phase  | `close` — IMPL-EVAL PASS (round 1 + delta round 2, same session)          |
+| Branch / PR    | `orch/divybot-752` / rickylabs/netscript#2408 (`Closes #2406`)            |
+| Current phase  | S5 cross-references after #2407 — IMPL-EVAL delta round 3 (same session)  |
 | Archetype      | 4 — DSL/Builder (`packages/fresh-ui`), 6 — CLI tooling (guidance builder) |
 | Scope overlays | frontend, docs                                                            |
 
@@ -21,13 +21,8 @@ Complementary caveats issue: rickylabs/netscript#2410 (from `caveats.md`, includ
 
 1. Respond to review comments / CI on #2408 (orchestrator follow-ups). Any product change → re-steer the same
    evaluator session (`impl-eval-session.txt`) with a fresh usage snapshot.
-2. If #2407 (harness#751) merged first: rebase on main, take main's generated carriers and regenerate
-   (`gen:assets-barrel`, `gen:agent-docs-prose`, `gen:publish-assets`), then add the cross-references:
-   - `agent-conventions.ts` `## Design and theming`: `navigation.ts` + `--nav` / `--no-nav`, reference
-     `{ id: 'app-navigation', path: 'navigation.ts' }` (update exact lists in `agent-conventions_test.ts`).
-   - `skills/netscript-build/SKILL.md` (#2407's file): add slug `web-layer/how-to/design-with-fresh-ui`.
-   - `customize-fresh-ui.md` `## App chrome and navigation`: `navigation.ts`, `chromelessRoutePrefixes`,
-     `--nav` / `--no-nav`, `ui:remove page` unlinks the nav entry; design guide rule 3 likewise.
+2. Done in S5 (2026-10-27): #2407 merged first (`1582e1c`); rebased, cross-references added, carriers
+   regenerated, PR body moves to `Closes #2406`, `e2e-cli-gate` added before the push so both runtime tiers run.
 3. Mark PR ready; write `.divybot-final-report.md`.
 
 ## Key Decisions

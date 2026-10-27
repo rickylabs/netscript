@@ -26,6 +26,7 @@ interface ConventionReference {
     | 'app-client'
     | 'app-shell'
     | 'app-layout'
+    | 'app-navigation'
     | 'design-gallery-route';
   readonly path: string;
   readonly purpose: string;
@@ -74,7 +75,12 @@ const DESIGN_REFERENCES: readonly ConventionReference[] = [
   {
     id: 'app-layout',
     path: 'routes/_layout.tsx',
-    purpose: 'the app chrome (top bar, navigation, theme toggle) around pages',
+    purpose: 'the app chrome (top bar, navigation, theme toggle) around every page',
+  },
+  {
+    id: 'app-navigation',
+    path: 'navigation.ts',
+    purpose: 'the top-bar links (appNavigation) and the routes that opt out of the chrome',
   },
   {
     id: 'design-gallery-route',
@@ -220,7 +226,9 @@ Every page shares one theme and one chrome. Never style or theme a page on its o
   }\` sets \`data-theme\` on \`<html>\`. To rebrand, set \`--ns-primary\` and \`--ns-primary-fg\` in \`:root\`; tints, borders, hover states, the accent, and the focus ring derive from them. There is no \`data-ns-theme\`, no themes folder, and no per-page theme, so never set tokens or \`data-theme\` on a page wrapper.
 - **Chrome:** \`${
     referencePath(all, 'app-layout')
-  }\` renders the top bar, navigation, and theme toggle around pages. Never copy a header or theme toggle into a page. If a new page renders without the top bar, fix the layout, not the page.
+  }\` renders the top bar, navigation, and theme toggle around every page. The top-bar links are \`appNavigation\` in \`${
+    referencePath(all, 'app-navigation')
+  }\`: \`netscript ui:add page <path>\` links a one-segment page automatically, \`--nav\` links a nested page (\`--nav <label>\` also sets its label), and \`--no-nav\` skips the link. Only \`chromelessRoutePrefixes\` in the same file opts a route out of the chrome (the /design gallery is the example). Never copy a header or theme toggle into a page.
 - **Composition:** give each page one \`<main class='ns-shell ns-section ns-stack ns-stack--lg'>\`, then a \`PageHeader\` with one \`<h1>\`, then sections built from the \`${
     referencePath(all, 'ui-barrel')
   }\` blocks (\`StatsGrid\`, \`Card\`, \`Panel\`, \`ResponsiveTable\`, \`FilterForm\`, \`DetailLayout\`, \`EmptyState\`, \`Skeleton\`). Copy the composition in \`${
@@ -280,7 +288,9 @@ One theme applies app-wide from \`${
     referencePath(all, 'app-tokens')
   }\` (\`:root\` light, \`[data-theme='dark']\` dark), and \`${
     referencePath(all, 'app-layout')
-  }\` owns the chrome. Pages compose \`${
+  }\` owns the chrome, with its top-bar links in \`${
+    referencePath(all, 'app-navigation')
+  }\`. Pages compose \`${
     referencePath(all, 'ui-barrel')
   }\` blocks inside one \`<main class='ns-shell ns-section ns-stack ns-stack--lg'>\`. They never re-theme or re-implement the chrome. The Design and theming section of AGENTS.md has the rules, and MCP \`get_doc\` ${DESIGN_GUIDE_SLUG} has the recipes.
 `;

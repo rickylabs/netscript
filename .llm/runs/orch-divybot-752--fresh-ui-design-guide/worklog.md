@@ -189,3 +189,31 @@ Slice review (supervisor): every component/prop/class named in the guide was che
   fired three runs within seconds. GitHub reported the PR `CLEAN`/`MERGEABLE`, but the rollup kept the CANCELLED
   `breaking-migration` entries, and the orchestrator read them as red. `gh run rerun` is not permitted for this
   token. Resolution: this commit gives the PR a fresh head with a single `synchronize` run, and no label edits follow it.
+
+## S5 — cross-references after #2407 (2026-10-27)
+
+- #2407 squash-merged first (`1582e1c`, 2026-10-27T16:12Z), so this PR owes the agreed cross-references. Rebased
+  `orch/divybot-752` onto `origin/main` (clean, no conflicts; carriers fresh after the rebase).
+- `agent-conventions.ts`: new reference `{ id: 'app-navigation', path: 'navigation.ts' }`. The `## Design and
+  theming` Chrome bullet names `appNavigation`, `ui:add page` auto-linking, `--nav` / `--nav <label>` / `--no-nav`,
+  and `chromelessRoutePrefixes` (the /design gallery, unbackticked per the path rule). `## Look and feel` names
+  `navigation.ts`. Test exact lists and facts updated.
+- `customize-fresh-ui.md` `## App chrome and navigation`: rewritten from the neutral wording to the shipped model
+  (links, new pages, `ui:remove page`, opting out) plus the 0.0.8 allowlist note. Design guide rule 3 likewise.
+- `skills/netscript-build/SKILL.md`: adds the `--ns-primary` / `--ns-primary-fg` rebrand line and the
+  `web-layer/how-to/design-with-fresh-ui` slug next to `customize-fresh-ui`; `--nav` wording corrected (the label is
+  optional, `--nav [label:string]`, a nit from the #751 side). `skills.generated.ts` regenerated.
+- #2406 body: the four checkboxes sit under `## Suggested fixes` (not an acceptance/gate heading), and #2407 + this
+  PR cover all four, so the PR body moves from `Refs #2406` to `Closes #2406`.
+
+| Gate | Result |
+| --- | --- |
+| `check:publish-assets` / `check:agent-docs-prose` | PASS / PASS |
+| `check:assets-barrel` | PASS after commit (it diffs against the index) |
+| CLI tests (agent-conventions, public-command-tree, init-agent*, ui page + ui commands) | 117 passed, 0 failed |
+| `packages/cli` `deno task check` | PASS |
+| MCP `deno task test` | 199 passed, 0 failed |
+| `generate-publish-assets_test.ts` (budget) | 6 passed |
+| `docs:links` / `docs:accuracy` / `docs:snippets` | PASS / PASS / PASS |
+| docs site build + `check:links` | PASS / PASS |
+| fmt / lint on changed TS (temp no-exclude config), SKILL.md fmt | PASS |
