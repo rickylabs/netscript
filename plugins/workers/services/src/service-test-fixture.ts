@@ -9,8 +9,11 @@
  * captured stream is capped, and a child that still fails to settle within the grace period is
  * reported RED with its pid rather than awaited further. The optional `check` mode adds
  * `--check --frozen` in front of the same denied-all argument list so a stdin module is
- * type-checked against the pinned lockfile before it evaluates. This module registers no tests
- * and imports no product code; it exports only the symbols the test owners consume.
+ * type-checked against the pinned lockfile before it evaluates. The opt-in `http` mode is the
+ * always-checked runtime child: loopback net, env, and read/write confined to the sandbox scratch
+ * only, with run/ffi/sys still denied; that allowlist is test authority, not OS confinement. This
+ * module registers no tests and imports no product code; it exports only the symbols the test
+ * owners consume.
  *
  * @module
  */
@@ -29,6 +32,16 @@ const DENY_EVERYTHING: readonly string[] = [
   '--deny-ffi',
 ];
 const CHECK_FROZEN: readonly string[] = ['--check', '--frozen'];
+/** `http` mode: checked, cache-only, KV-enabled, loopback-only net; scratch read/write is appended. */
+const HTTP_RUNTIME: readonly string[] = [
+  ...CHECK_FROZEN,
+  '--cached-only',
+  '--ext=ts',
+  '--unstable-kv',
+  '--allow-env',
+  '--allow-net=127.0.0.1',
+];
+const HTTP_DENIED: readonly string[] = ['--deny-run', '--deny-ffi', '--deny-sys'];
 
 export interface ChildRun {
   readonly code: number;
@@ -47,10 +60,18 @@ interface ChildSpec {
 
 interface Sandbox extends AsyncDisposable {
   readonly scratch: string;
-  /** Runs `source` as a stdin module under every `--deny-*` flag; `check` type-checks it first. */
+  /**
+   * Runs `source` as a stdin module under every `--deny-*` flag; `check` type-checks it first.
+   * `http` selects the always-checked runtime child instead and rejects `check` (no mixing).
+   */
   run(
     source: string,
-    options?: { readonly cwd?: string; readonly deadlineMs?: number; readonly check?: boolean },
+    options?: {
+      readonly cwd?: string;
+      readonly deadlineMs?: number;
+      readonly check?: boolean;
+      readonly http?: boolean;
+    },
   ): Promise<ChildRun>;
 }
 
@@ -78,14 +99,27 @@ export async function createSandbox(): Promise<Sandbox> {
   if (systemRoot !== undefined) env.SystemRoot = systemRoot;
   return {
     scratch,
-    run: (source, options = {}) =>
-      runChild({
-        args: ['run', ...(options.check ? CHECK_FROZEN : []), ...DENY_EVERYTHING, '-'],
+    run: (source, options = {}) => {
+      if (options.http && options.check !== undefined) {
+        return Promise.reject(new Error('http mode is always checked; do not pass check with it'));
+      }
+      return runChild({
+        args: options.http
+          ? [
+            'run',
+            ...HTTP_RUNTIME,
+            `--allow-read=${scratch}`,
+            `--allow-write=${scratch}`,
+            ...HTTP_DENIED,
+            '-',
+          ]
+          : ['run', ...(options.check ? CHECK_FROZEN : []), ...DENY_EVERYTHING, '-'],
         cwd: options.cwd ?? scratch,
         env,
         stdin: source,
         deadlineMs: options.deadlineMs,
-      }),
+      });
+    },
     [Symbol.asyncDispose]: () => Deno.remove(scratch, { recursive: true }),
   };
 }

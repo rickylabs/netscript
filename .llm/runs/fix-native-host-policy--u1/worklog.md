@@ -732,3 +732,59 @@ Root FULLREAD brief4a8d2890/partialhelper/actualdiagnostics/compactionmetadata a
 ## Root accepted S3b checkpoint
 
 Root independently full-read the171/208line source and verified all eight receipt seals/three source hashes; see root-s3b-source-acceptance.md. The two timed-out native authoring turns remain failures. Coordinator completed only the already-authorized existing wrappers in clearEnv+ownedemptyprofile:6/0/0tests9831ms, selected3types/lint/fmt0; no source edits or new inference. Defaultbody/argv equivalence true, original4test frozen,8/8actualworkingbytes and verdicts unchanged. Profile removed empty/nonrecursively, PIDabsence snapshot-only. New51-file audited s3b-evidence archive preserves all raw/failures. Only thisruntime-invalid/typecheckpoint accepted, not wholeS3/security/release. No next model turn authorized; plain-only brief preparation follows checkpoint.
+
+## Root S3c precise scope disposition before source
+
+Root full-read proposal392bcfa5f55b58dadf0c2f1fbaeecf79e13a356de6eb80a9e9030ff1c7261786
+and approved two-owner plain HTTP scope/permissions/caps and SAME Fable450s WRITE-FIRST turn,
+subject to final brief/runner review before launch. Extra mandatory oracle: explicitly stop BOTH
+native handles idempotently, then shared rawKV set/get works BEFORE test-owned closeKv. Keep the
+second handle usable after stopping first, settle responses/client, and stop/rebind priorport before
+closeKv. Original six tests/conformance171line body/default+compiler argv remain frozen. No TLS,
+streams, legacy, new production behavior or extra owner in this turn. No model launched yet; source
+acceptance/checkpoint require actual root diff/gate review. Reference parity is separate afterward.
+Root FULLREAD final briefda43a969/runner e9b59f83/17bindings and authorized ONE exact450s SAME
+Fable S3c turn via the sealed suite before source. No brief/runner change, extension/reset/newSID,
+extraowner/autocommit/nextphase. Exact live HTTP/identity/KV-after-both-stops counts only if actual
+gates pass. Original dispatch-seals worklog snapshot remains retained; this append records the
+subsequent root launch disposition. Actual source still requires root review before checkpoint.
+## S3c actual incomplete candidate and permission RED
+
+Authorized SAME-session450s ended23:27:48.927Z code1/timedOuttrue/failure-null, nativeFable5.1 and
+strictNetScriptMCP qualified; xhigh requested only. Candidate242linehelper/301lineconformance stays
+unaccepted. Native old4 PASS + existing2 PASS/newHTTP FAIL; selected3check/lint/fmt0. First fmt RED
+and both actualHTTP failures retained in original native stream. My initial report absence claim
+looked for wrong filenames; corrected actual conformance-test.json/original4-test.json are retained.
+
+Concrete failure: canonical generated-job registry resolves from PLUGIN_ROOT cwd outside scratch-only
+read authority; stat NotCapable occurs beforelisten. No product failure/HTTP acceptance inferred.
+Source equivalence proves original4 and171lineprefix exact, olddefault/compilerargs+runChild unchanged,
+all15otherbindings match. Six observedcohortPIDs freshabsent; historicalcompleteness remains unproven.
+Root authorizes only gate validation with no edits aftersettlement; existing actualfailure made blind
+repeat unnecessary. Proposed own-project Deno.chdir correction uses existing scratch permission and
+keeps CLIcwd/config/argv, pending rootdisposition. No auto inference/sourceedit/commit/nextphase.
+Root FULLREAD repairbrief64e9ba4d/runnerb575ee81 and authorized ONE exact240s SAME Fable turn before
+source: ownedruntimechdir, KV/import inside cleanup protection, exactly-once marker, actualprimary-
+firstcleanuperrors. Helperbytes/permissions andoriginal6tests remainfrozen; no extraowner/privilege/
+retry/extension. Aftersettlement only7focused/static/equivalence/sourcegates, rootreadsactualresults
+beforeacceptance/commit/nextphase. Prior6/1,firstfmtRED,450stimeout remainunaltered.
+## Root accepted S3c isolated plain-HTTP checkpoint
+
+Root full-read repaired304lineconformance/242linehelper and independently verified13/13receipts plus
+2/2sourcehashes; root-s3c-source-acceptance.md authorizes this checkpoint only. Exact frozen/cached
+owning7/0/0 in12425ms and selected3types/lint/fmt0. Original4owner/171lineprefix/helperafterrepair,
+default+compilerargv/runChild and15retained source/config/lock bindings/verdicts unchanged. Two real
+plain loopbackfactories prove native auth statuses/port receiver+Principalidentity, port0, second
+survivesfirststop, both idempotentstop/rebind, sharedKVstillusableAFTERBOTH before testcloseKv.
+
+Prior6/1 denied-registry stat resolved solely by exactownedscratchruntimecwd withunchanged helper
+permissions; caught missing-synthetic-streams warnings remainvisible. KV/import initialization are
+cleanup-protected, actual errors primary-first, marker exactlyonce aftercleanup. Authoring450s and
+240stimeouts plus firstfmtRED remain failures distinct from later exactsourcegateGREEN. My initial
+report-filename mistake is corrected in the retained raw/context. Ownedemptyprofile removal passed
+nonrecursively;8observedrepair/gatePIDsfreshabsent is snapshot-only, no historicalcensus claim.
+
+Root authorizes one targetedcheckpoint/push/draft2421 update withNEWbyte-auditedarchive. No TLS/
+signal/inflightdrain/legacy/streams/11-jobconsumer/CEF/security/publication/fullU1 orIMPLacceptance.
+Exactworkers22F5remainsDEBT_ACCEPTED;2baselinefullmapdocerrors andmissingworkersreference remain
+blocking. Next tinyreference/trustedTLSbriefs are preparation-only, no modelturn authorized yet.

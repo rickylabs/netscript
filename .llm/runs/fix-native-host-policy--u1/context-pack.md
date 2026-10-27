@@ -142,3 +142,13 @@ Root accepted only exact2-owner extraction in root-s3a-source-acceptance.md afte
 ## Current S3b source checkpoint
 
 Root accepts exact171lineconformance/208linehelper in root-s3b-source-acceptance.md after6/0/0actualtests and selected3staticgates. Original4owner175hash frozen;8actualbyteguards/defaultbodyequivalence/verdicts unchanged.51-file audited newbundle preserves authoring450s/300stimeouts and initialfmtRED separately from currentGREEN. No realworker listener/authsuccess/TLS/lifecycle/legacy/streams/release acceptance. Next plainHTTPproposal is preparation only pending root brief review.
+
+## Current root-accepted S3c checkpoint
+
+Root acceptance: root-s3c-source-acceptance.md. Conformance304 SHA40c02f16190a4f5916a9cec134579110f83b4ab6d32eef434ab1aabed088950a;
+helper242 SHA6f8c0bc3d59ae4c8847097e8f124664238cde352dc0d7bf2a563dcb48d1408d2.7/0/0 frozen/cached tests12425ms,
+selected3types/lint/fmt0; exact original4/171lineprefix/default+compilerargv/15bindings/verdicts stable.
+This proves synthetic plainHTTPauth/principal and independent native listener/sharedKV lifecycle
+only. Prior6/1 permission RED, both authoringtimeouts and initialfmtRED stay innewS3carchive; original
+raws retained. No new permissions/productiondelta. TLS/signal/drain/legacy/streams/consumer/release/
+IMPL remain mandatory. Reference omission and trustedTLS get separate future root-reviewed briefs.

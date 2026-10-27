@@ -169,3 +169,136 @@ Deno.test({
     }
   },
 });
+
+const DESCRIBE_PATH = '/api/v1/workers/describe';
+const HTTP_MARKER = 's3c-plain-http: assertions and cleanup settled';
+/** The HTTP child type-checks the whole factory graph first, so it gets the explicit long deadline. */
+const HTTP_DEADLINE_MS = 30_000;
+
+Deno.test({
+  name:
+    'plain HTTP: guarded and public factories on 127.0.0.1:0 enforce native auth, stop idempotently and never close the shared KV',
+  sanitizeResources: true,
+  sanitizeOps: true,
+  sanitizeExit: true,
+  async fn() {
+    await using sandbox = await createSandbox();
+    const run = await sandbox.run(createPlainHttpProbe(sandbox.scratch), {
+      cwd: PLUGIN_ROOT,
+      http: true,
+      deadlineMs: HTTP_DEADLINE_MS,
+    });
+    assertEquals(run.code, 0, `child failed\nstdout:\n${run.stdout}\nstderr:\n${run.stderr}`);
+    assertEquals(run.stdout.split(HTTP_MARKER).length - 1, 1, `marker once\n${run.stdout}`);
+    assertEquals(run.stdout.trimEnd().endsWith(HTTP_MARKER), true, run.stdout);
+  },
+});
+
+/**
+ * Child module source (checked TS, no casts). The owned scratch becomes the synthetic project
+ * root (`Deno.chdir`) before the owned Deno KV is bound through the public `@netscript/kv` entry
+ * and the product factory is imported, so the generated job registry is legitimately absent
+ * there. The custom ports record `this` and every request they receive. Handles are stopped and
+ * the test-owned KV closed even when initialization or an assertion fails; the primary failure is
+ * rethrown first (aggregated with any cleanup failures), and the marker is printed only once
+ * everything settled cleanly.
+ */
+function createPlainHttpProbe(scratch: string): string {
+  return `import { closeKv, getRawKv } from '@netscript/kv';
+import { assert, assertEquals, assertStrictEquals } from 'jsr:@std/assert@^1';
+import type {
+  AuthenticatorPort, AuthnRequest, AuthnResult, AuthorizerPort, AuthzDecision, AuthzRequest,
+  PluginServiceContext, Principal, RunningService,
+} from '${PUBLIC_SUBPATH}';
+
+const scratch = ${JSON.stringify(scratch)};
+const PATH = '${DESCRIBE_PATH}';
+const context: PluginServiceContext = {
+  db: { getClient: () => Promise.reject(new Error('fixture DB must not run')) },
+  contracts: {}, kv: {}, logger: {}, env: { PORT: 'not-a-port' },
+};
+const allowed: Principal = {
+  subject: 'fixture:allowed', scopes: ['workers:read'], roles: ['fixture'], scheme: 'custom', claims: { fixture: 'allowed' },
+};
+const denied: Principal = { ...allowed, subject: 'fixture:denied', scopes: [], claims: { fixture: 'denied' } };
+const issued: Principal[] = [];
+const authnCalls: { self: unknown; method: string; path: string }[] = [];
+const authzCalls: { self: unknown; request: AuthzRequest }[] = [];
+const authenticator: AuthenticatorPort = {
+  authenticate(request: AuthnRequest): AuthnResult {
+    authnCalls.push({ self: this, method: request.method, path: request.path });
+    const token = request.header('x-fixture-token');
+    if (token === 'outage') throw new Error('fixture authenticator outage');
+    if (token === undefined) return { ok: false, reason: 'missing-credential' };
+    const principal = token === 'allowed' ? allowed : token === 'denied' ? denied : undefined;
+    if (principal === undefined) return { ok: false, reason: 'invalid-credential' };
+    issued.push(principal);
+    return { ok: true, principal };
+  },
+};
+const authorizer: AuthorizerPort = {
+  authorize(request: AuthzRequest): AuthzDecision {
+    authzCalls.push({ self: this, request });
+    return request.principal.scopes.includes('workers:read') ? { allow: true } : { allow: false, reason: 'scope-missing' };
+  },
+};
+const serve = { hostname: '127.0.0.1', port: 0, handleSignals: false };
+async function call(port: number, token?: string): Promise<[number, unknown]> {
+  const response = await fetch(\`http://127.0.0.1:\${port}\${PATH}\`, {
+    headers: token === undefined ? {} : { 'x-fixture-token': token },
+  });
+  return [response.status, await response.json()];
+}
+async function roundTrip(kv: Deno.Kv, key: string): Promise<void> {
+  await kv.set(['s3c', key], key);
+  assertEquals((await kv.get(['s3c', key])).value, key);
+}
+
+let guarded: RunningService | undefined;
+let open: RunningService | undefined;
+const failures: unknown[] = [];
+try {
+  Deno.chdir(scratch);
+  const kv = await getRawKv({ provider: 'deno-kv', path: scratch + '/owned.sqlite', skipServiceDiscovery: true });
+  const { startWorkersService } = await import('${PUBLIC_SUBPATH}');
+  guarded = await startWorkersService(context, { auth: { authn: { authenticator }, authz: { authorizer } }, serve });
+  const firstPort = guarded.addr.port;
+  assertEquals([guarded.addr.hostname, guarded.addr.transport], ['127.0.0.1', 'tcp']);
+  assert(Number.isInteger(firstPort) && firstPort > 0, 'explicit port 0 must allocate a positive port');
+  assertEquals(await call(firstPort), [401, { error: 'UNAUTHORIZED', message: 'missing-credential' }]);
+  assertEquals(await call(firstPort, 'wrong'), [401, { error: 'UNAUTHORIZED', message: 'invalid-credential' }]);
+  assertEquals(await call(firstPort, 'outage'), [503, { error: 'SERVICE_UNAVAILABLE', message: 'Authentication service unavailable' }]);
+  assertEquals(await call(firstPort, 'denied'), [403, { error: 'FORBIDDEN', message: 'scope-missing' }]);
+  const [status, body] = await call(firstPort, 'allowed');
+  assertEquals(status, 200);
+  assert(typeof body === 'object' && body !== null && 'capabilities' in body && Array.isArray(body.capabilities));
+  assert(body.capabilities.includes('background-processor'), 'describe document');
+  assertEquals(authnCalls.map((c) => [c.self === authenticator, c.method, c.path]), Array(5).fill([true, 'GET', PATH]));
+  assertEquals(authzCalls.map((c) => [c.self === authorizer, c.request.method, c.request.path, c.request.principal.claims.fixture]), [[true, 'GET', PATH, 'denied'], [true, 'GET', PATH, 'allowed']]);
+  assertEquals(authzCalls.map((c, i) => c.request.principal === issued[i]), [true, true]);
+  assertStrictEquals(issued[0], denied);
+  assertStrictEquals(issued[1], allowed);
+
+  open = await startWorkersService(context, { auth: { public: true, reason: 'S3c control: second public instance, no credential' }, serve });
+  assert(open.addr.port > 0 && open.addr.port !== firstPort, 'second instance gets its own port');
+  assertEquals((await call(open.addr.port))[0], 200);
+  await guarded.stop();
+  await guarded.stop();
+  Deno.listen({ hostname: '127.0.0.1', port: firstPort }).close();
+  assertEquals((await call(open.addr.port))[0], 200, 'second instance serves after the first stopped');
+  await roundTrip(kv, 'after-first-stop');
+  await open.stop();
+  await open.stop();
+  await roundTrip(kv, 'after-both-stops');
+} catch (error) {
+  failures.push(error);
+}
+for (const handle of [guarded, open]) {
+  try { await handle?.stop(); } catch (error) { failures.push(error); }
+}
+try { await closeKv(); } catch (error) { failures.push(error); }
+if (failures.length === 1) throw failures[0];
+if (failures.length > 1) throw new AggregateError(failures, failures.map(String).join('\\n'));
+console.log('${HTTP_MARKER}');
+`;
+}

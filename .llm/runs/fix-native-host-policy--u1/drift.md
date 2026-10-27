@@ -174,3 +174,10 @@ remains a complete-doc obligation. No whole U1, security, release or S16 accepta
 Root reviewed/accepted exact S3a relocation after actual turn settlement. No cap waiver or conformance behavior:175/204lines,4oracles preserved. Header isolation/settlement overclaim qualified by root; numericF5 remainsDEBT_ACCEPTED and fullmap2baseline findings remain blockers. Newarchive preserves original blob mismatch plus independent8/8actualbyteproof.
 
 S3b authoring was two actualtimeouts, not nativePASS. Exact current171/208source then passed the authorized coordinator wrapper gates without edits/inference; root acceptance is bounded to runtime-invalid+compiler controls. No helperdefaultbehavior/permissions relaxation or publicAPI growth, no age/lock waiver. Both timeouts/compaction/firstfmtRED retained in new51-file archive; all previous archives unchanged.
+
+S3c root accepts only isolatedplainHTTPsource after actual7/0/0 plus3selectedstaticGREEN.450s/240s
+nativeauthoringtimeouts remain failures; latercoordinatorwrappers changednosource. First6/1 failed
+because registry stat usedrepo cwdoutsidescratchread. Exactownedruntimechdir repaired thefixture
+withoutprivilegegrowth/fakeregistry; init/import+cleanup nowprotected withactualprimary-firsterrors.
+No productionpolicy change/newwaiver. Missing syntheticstream warning preserved. FullS3/TLS/legacy/
+streams/consumer/publish/IMPL stillopen; exactworkers22numericF5staysDEBT_ACCEPTED, no doc waiver.
