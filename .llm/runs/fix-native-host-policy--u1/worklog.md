@@ -204,3 +204,43 @@ denoland/deno `tests/testdata/tls/` `localhost.crt`/`localhost.key`/`RootCA.pem`
 empirically on the test date that it names `127.0.0.1` and completes a trusted exchange, then inline
 it in the owned `service_test.ts`. This is a reviewed public-artifact fetch root must approve; it is
 reported, not silently deferred.
+
+S0 checkpoint: commit `e873bb711` (21 paths, run metadata only; explicit adds, no `git add .`).
+
+## S1 — workers RED (native implementation lane, 2026-10-27)
+
+Owned path: `plugins/workers/services/src/service_test.ts` (NEW, 180 lines ≤ 480 budget). No other
+product/config/lock file touched; the six protected blobs above are unchanged.
+
+What the file proves once `./service.ts` exists (S2): (1) `./service` imports under a cleared
+environment with env/net/write/run/sys/ffi denied and read scoped to the plugin root — child env is
+built explicitly (task cache via parent `DENO_DIR` or `deno info --json`; `HOME`/`USERPROFILE`/
+`LOCALAPPDATA`/`TMP`/`TEMP`/`TMPDIR`/`XDG_*` → per-test scratch dir; `SystemRoot` only), stdout and
+stderr must be empty, exit 0; (2) `startWorkersService(context, { auth })` rejects blank and
+whitespace-only public reasons with the native redacted `TypeError` text while `PORT` is unset in
+both `context.env` and the process, so the auth assertion precedes the port read and
+`db.getClient` is never touched; (3) ordering control — a valid public posture with `PORT` unset
+rejects with the exact legacy text `Workers API requires the host-provided PORT environment
+variable.` and still touches no host resource. Context fixture is a typed `PluginServiceContext`
+object literal (no cast, no `@ts-*`, no `quality-allow`, no fake processor). Sanitizers are explicit
+per test (`sanitizeResources/Ops/Exit: true`); no deadline change, no cleanup opt-out.
+
+Bounded by discovery (drift.md): mixed/non-callable runtime rows are compile-time impossible
+without a cast; not written.
+
+RED execution (structured wrapper, receipt `receipts/s0-s1/s1-red-test.json`):
+`run-deno-test.ts -- --allow-env --allow-read --allow-write --allow-run --allow-net=127.0.0.1 --unstable-kv plugins/workers/services/src/service_test.ts`
+→ exit 1, `processFailure` with stderr
+`TS2307 [ERROR]: Cannot find module 'file:///…/plugins/workers/services/src/service.ts'` at
+`service_test.ts:14:37`. Zero tests executed — the failure is the missing NEW subpath module, not a
+permission, fixture or hydration failure. Legacy `./services` is not imported.
+
+Shape gates on the owned file: `run-deno-fmt.ts` (scoped include) → exit 0 after formatting only
+this file; `run-deno-lint.ts` (scoped include) → exit 0, 0 occurrences; `scan-code-quality.ts
+--root plugins/workers` with the test present → exit 0, `findings: []`, allowance count unchanged
+(1, pre-existing). Receipts: `s1-fmt.json`, `s1-lint.json`, `quality-scan-workers-with-s1.json`.
+
+Pending (not claimed): S2 factory GREEN; S3 remaining oracles incl. live 401/503, two-instance,
+stop/drain, TLS (fixture approval above); draft partial PR + per-slice comments (GitHub MCP not
+exposed in this session — trail pending root); root substantive review of S0/S1 before S2;
+IMPL-EVAL separate-family session; production E2E remains UNRUN pending publish.
