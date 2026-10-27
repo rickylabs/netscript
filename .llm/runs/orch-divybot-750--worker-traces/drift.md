@@ -35,3 +35,12 @@
   Cleanup passed and final leak inspection found zero proven run-owned survivors. Full runtime
   acceptance is UNPROVEN. Ready-for-review transition follows the operator's explicit delivery
   instruction; status:impl-eval and unchecked full-runtime DoD preserve the ready-merge block.
+- 2026-10-27 (pr-backlog session): CI at 0b8a0a07b was red on three items the run had not seen.
+  (1) The Fresh defer-island browser bundle aliases `@opentelemetry/api` to a fixture stub that did
+  not export `ROOT_CONTEXT`; the stub now exports it. (2) The MCP export corpus was stale after the
+  telemetry JSDoc change; regenerated. (3) A Codex gpt-6.1-sol caller audit found that Fresh's
+  `createMcpAppCallHandler` parented `mcp.tool.call` from request headers only, so a browser POST
+  with no `traceparent` inside an active request span started an unrelated root. It now uses the
+  active span first, then a valid carrier, then root, with a colocated SDK-backed regression test
+  (implemented by Codex, relocated into Fresh by the supervisor). Full scaffold.runtime acceptance
+  is re-run in CI via `e2e-cli-gate`.
