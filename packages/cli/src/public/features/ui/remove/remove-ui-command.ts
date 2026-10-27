@@ -1,7 +1,7 @@
 import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import { Command } from '@cliffy/command';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
-import { removeUiPage } from '../../../../kernel/application/ui/remove-ui-page.ts';
+import { removeUiPage } from '../../../../kernel/application/ui/page/remove-ui-page.ts';
 import { removeUiRegistryItem, type UiInstallDependencies } from '../registry.ts';
 import { requireUiAppRoot, type UiAppRootResolver } from '../../../presentation/support.ts';
 
@@ -63,7 +63,7 @@ export function createUiRemoveCommand(deps: {
               options.dryRun ? 'Planned' : 'Completed'
             } page removal: ${result.files.length} files; router ${
               result.routerChanged ? 'reconciled' : 'unchanged'
-            }.`,
+            }; navigation ${result.navigationChanged ? 'reconciled' : 'unchanged'}.`,
           );
           return;
         }

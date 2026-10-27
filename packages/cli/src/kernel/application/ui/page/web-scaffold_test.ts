@@ -6,11 +6,18 @@ import {
   assertStringIncludes,
   assertThrows,
 } from '@std/assert';
-import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
+import { MemoryFileSystemAdapter } from '../../../adapters/scaffold/memory-fs.ts';
+import { DenoProcess } from '../../../adapters/runtime/process/deno-process.ts';
+import { DenoGeneratedSourceFormatter } from '../../../adapters/runtime/process/deno-generated-source-formatter.ts';
+import { readTemplateAsset } from '../../../adapters/templates/template-asset.ts';
+import { TEMPLATE_KEYS } from '../../../assets/manifest.ts';
 import { scaffoldUiIsland, scaffoldUiPage } from './web-scaffold.ts';
 
 const APP_ROOT = '/workspace/shop/apps/dashboard';
 const ROUTER_PATH = `${APP_ROOT}/router.ts`;
+const NAVIGATION_PATH = `${APP_ROOT}/navigation.ts`;
+/** The navigation module exactly as `netscript init` writes it. */
+const NAVIGATION_SOURCE = await readTemplateAsset(TEMPLATE_KEYS.appNavigation);
 const ROUTER_SOURCE = `import { createRouteReference } from '@netscript/fresh/route';
 import { routes } from './routes.ts';
 
@@ -423,4 +430,119 @@ Deno.test('semantic golden rejects the old counter and empty-loader emission', (
     { path: 'router.ts', role: 'route-registration', content: ROUTER_SOURCE },
   ];
   assertThrows(() => assertDataScreenPlan(oldFiles), Error);
+});
+
+Deno.test('top-level pages are linked in the scaffold navigation and render inside the page rhythm', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(ROUTER_PATH, ROUTER_SOURCE);
+  await fs.writeFile(NAVIGATION_PATH, NAVIGATION_SOURCE);
+
+  const result = await scaffoldUiPage({ projectRoot: APP_ROOT, path: 'data-screen' }, fs);
+
+  assertEquals(result.files.map((file) => file.role).sort(), [
+    'navigation-registration',
+    'page',
+    'route-registration',
+  ]);
+  const navigation = await fs.readFile(NAVIGATION_PATH);
+  assertStringIncludes(
+    navigation,
+    "  { href: appRoutes.design.href(), label: 'Design', match: 'prefix' },\n" +
+      "  { href: appRoutes['data-screen'].href(), label: 'Data Screen', match: 'prefix' },\n];",
+  );
+  const page = await fs.readFile(`${APP_ROOT}/routes/data-screen/index.tsx`);
+  assertStringIncludes(page, "import { PageHeader } from '@app/components/ui/mod.ts';");
+  assertStringIncludes(page, "<main class='ns-shell ns-section ns-stack ns-stack--lg'>");
+  assertStringIncludes(page, '<h1>Data Screen</h1>');
+  assertStringIncludes(page, '{slots.dataScreen()}');
+  assertStringIncludes(page, ".withMeta(() => ({ title: 'Data Screen' }))");
+  assert(result.nextSteps.some((step) => step.includes('routes/_layout.tsx')));
+  assert(result.nextSteps.some((step) => step.includes('assets/tokens.css')));
+});
+
+Deno.test('nested pages stay out of the navigation unless --nav asks for a label', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(ROUTER_PATH, ROUTER_SOURCE);
+  await fs.writeFile(NAVIGATION_PATH, NAVIGATION_SOURCE);
+
+  const nested = await scaffoldUiPage({ projectRoot: APP_ROOT, path: 'admin/users' }, fs);
+  assertFalse(nested.files.some((file) => file.role === 'navigation-registration'));
+  assertEquals(await fs.readFile(NAVIGATION_PATH), NAVIGATION_SOURCE);
+  assert(nested.nextSteps.some((step) => step.includes("appRoutes['admin.users']")));
+
+  await scaffoldUiPage(
+    { projectRoot: APP_ROOT, path: 'admin/audit', nav: "Owner's audit" },
+    fs,
+  );
+  assertStringIncludes(
+    await fs.readFile(NAVIGATION_PATH),
+    "  { href: appRoutes['admin.audit'].href(), label: 'Owner\\'s audit', match: 'prefix' },",
+  );
+});
+
+Deno.test('--no-nav skips the link and re-running a linked page never duplicates it', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(ROUTER_PATH, ROUTER_SOURCE);
+  await fs.writeFile(NAVIGATION_PATH, NAVIGATION_SOURCE);
+
+  await scaffoldUiPage({ projectRoot: APP_ROOT, path: 'login', nav: false }, fs);
+  assertEquals(await fs.readFile(NAVIGATION_PATH), NAVIGATION_SOURCE);
+
+  await scaffoldUiPage({ projectRoot: APP_ROOT, path: 'notes' }, fs);
+  await scaffoldUiPage({ projectRoot: APP_ROOT, path: 'notes', force: true }, fs);
+  const navigation = await fs.readFile(NAVIGATION_PATH);
+  assertEquals(navigation.split("appRoutes['notes']").length - 1, 1);
+});
+
+Deno.test('apps without navigation.ts get guidance by default and a pre-write failure for --nav', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(ROUTER_PATH, ROUTER_SOURCE);
+
+  const implicit = await scaffoldUiPage(
+    { projectRoot: APP_ROOT, path: 'notes', dryRun: true },
+    fs,
+  );
+  assertFalse(implicit.files.some((file) => file.role === 'navigation-registration'));
+  assert(implicit.nextSteps.some((step) => step.includes('predates scaffold navigation')));
+
+  const before = new Map(fs.getFiles());
+  await assertRejects(
+    () => scaffoldUiPage({ projectRoot: APP_ROOT, path: 'notes', nav: true }, fs),
+    Error,
+    "Cannot link 'notes' in the top bar",
+  );
+  assertEquals(fs.getFiles(), before);
+
+  await fs.writeFile(NAVIGATION_PATH, 'export const appNavigation = [];\n');
+  await assertRejects(
+    () => scaffoldUiPage({ projectRoot: APP_ROOT, path: 'notes', nav: 'Notes' }, fs),
+    Error,
+    "no recognizable 'export const appNavigation' array",
+  );
+});
+
+Deno.test('generated pages and navigation entries are already in deno fmt canonical form', async () => {
+  const formatter = new DenoGeneratedSourceFormatter(new DenoProcess());
+  for (
+    const path of ['notes', 'data-screen', 'quarterly-operational-readiness-review-dashboard']
+  ) {
+    for (const island of [false, true]) {
+      const fs = new MemoryFileSystemAdapter();
+      await seedApp(fs);
+      await fs.writeFile(NAVIGATION_PATH, NAVIGATION_SOURCE);
+      const result = await scaffoldUiPage({ projectRoot: APP_ROOT, path, island }, fs);
+      for (const file of result.files) {
+        if (file.role === 'route-registration') continue;
+        // The query-loader/island templates predate this check and still overflow at very long
+        // names; the page and the navigation entry are pinned for every length.
+        const longName = path.length > 40;
+        if (longName && file.role !== 'page' && file.role !== 'navigation-registration') continue;
+        assertEquals(
+          await formatter.formatContent(file.path, file.content),
+          file.content,
+          `${file.role} for '${path}' (island: ${island}) must survive deno fmt --check`,
+        );
+      }
+    }
+  }
 });

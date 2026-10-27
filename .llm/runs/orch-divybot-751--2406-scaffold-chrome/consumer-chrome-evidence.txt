@@ -1,0 +1,12 @@
+/                200 topbar=True nav=['Home', 'Dashboard', 'Examples', 'Health', 'Design', 'Notes'] current=['Home'] sidebar=False h1=proof751
+/dashboard       200 topbar=True nav=['Home', 'Dashboard', 'Examples', 'Health', 'Design', 'Notes'] current=['Dashboard'] sidebar=False h1=proof751
+/notes           200 topbar=True nav=['Home', 'Dashboard', 'Examples', 'Health', 'Design', 'Notes'] current=['Notes'] sidebar=False h1=Notes
+/admin/audit     200 topbar=True nav=['Home', 'Dashboard', 'Examples', 'Health', 'Design', 'Notes'] current=[] sidebar=False h1=Audit
+/health          200 topbar=True nav=['Home', 'Dashboard', 'Examples', 'Health', 'Design', 'Notes'] current=['Health'] sidebar=False h1=proof751 health
+/examples        200 topbar=True nav=['Home', 'Dashboard', 'Examples', 'Health', 'Design', 'Notes'] current=['Examples'] sidebar=False h1=Examples
+/design          404 topbar=False nav=[] current=[] sidebar=False h1=None
+/design/tokens   404 topbar=False nav=[] current=[] sidebar=False h1=None
+dev /notes          200 topbar=True primaryNav=['Home', 'Dashboard', 'Examples', 'Health', 'Design', 'Notes'] designSidebarShell=False pagePartialMarkers=1
+dev /design         302 topbar=False primaryNav=[] designSidebarShell=False pagePartialMarkers=0
+dev /design/tokens  200 topbar=False primaryNav=[] designSidebarShell=True pagePartialMarkers=1
+dev /admin/audit    200 topbar=True primaryNav=['Home', 'Dashboard', 'Examples', 'Health', 'Design', 'Notes'] designSidebarShell=False pagePartialMarkers=1

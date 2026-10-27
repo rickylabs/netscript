@@ -36,6 +36,7 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appIndexRouteTemplate: TEMPLATE_KEYS.appRoutesIndex,
   appLayoutTemplate: TEMPLATE_KEYS.appRoutesLayout,
   appMainTemplate: TEMPLATE_KEYS.appMain,
+  appNavigationTemplate: TEMPLATE_KEYS.appNavigation,
   appRouterTemplate: TEMPLATE_KEYS.appRouter,
   appUiModTemplate: TEMPLATE_KEYS.appComponentsUiMod,
   appUtilsTemplate: TEMPLATE_KEYS.appUtils,

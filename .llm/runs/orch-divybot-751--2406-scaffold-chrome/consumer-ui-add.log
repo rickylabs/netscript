@@ -1,0 +1,11 @@
+Generated page: <proof>/apps/proof751-web/routes/notes/index.tsx
+Generated route-registration: <proof>/apps/proof751-web/router.ts
+Generated navigation-registration: <proof>/apps/proof751-web/navigation.ts
+Next: The page renders inside the app chrome from routes/_layout.tsx; navigation.ts lists the top-bar links, and chromelessRoutePrefixes opts a route out.
+Next: Restyle app-wide through the --ns-* tokens in assets/tokens.css (light on :root, dark on [data-theme='dark']); see MCP get_doc web-layer/how-to/customize-fresh-ui.
+Generated page: <proof>/apps/proof751-web/routes/admin/audit/index.tsx
+Generated route-registration: <proof>/apps/proof751-web/router.ts
+Next: The page renders inside the app chrome from routes/_layout.tsx; navigation.ts lists the top-bar links, and chromelessRoutePrefixes opts a route out.
+Next: Restyle app-wide through the --ns-* tokens in assets/tokens.css (light on :root, dark on [data-theme='dark']); see MCP get_doc web-layer/how-to/customize-fresh-ui.
+Next: Not linked in the top bar; add appRoutes['admin.audit'] to appNavigation in navigation.ts to link it.
+Route generation complete: 12 routes, updated.

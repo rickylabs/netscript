@@ -1,19 +1,18 @@
 import { Partial } from 'fresh/runtime';
 import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
 import { Badge, Button } from '@app/components/ui/mod.ts';
+import { appNavigation, isCurrentNavigation, rendersAppChrome } from '@app/navigation.ts';
 import { appRoutes } from '@app/router.ts';
 import { define } from '@app/utils.ts';
 
+/**
+ * App chrome for every page: the top bar with the `appNavigation` links from `navigation.ts`.
+ * Pages under `chromelessRoutePrefixes` (such as `/design`, which has its own sidebar shell)
+ * render without it. Both branches keep the `page` partial so client navigation swaps the whole
+ * frame.
+ */
 export default define.layout(function RootLayout({ Component, url }) {
-  const homeHref = appRoutes.home.href();
-  const dashboardHref = appRoutes.dashboard.href();
-  const examplesHref = appRoutes.examples.href();
-  const healthHref = appRoutes.health.href();
-  const designHref = appRoutes.design.href();
-  const showScaffoldChrome = url.pathname === homeHref || url.pathname === dashboardHref ||
-    url.pathname.startsWith(examplesHref);
-
-  if (!showScaffoldChrome) {
+  if (!rendersAppChrome(url.pathname)) {
     return (
       <Partial name='page'>
         <Component />
@@ -25,57 +24,24 @@ export default define.layout(function RootLayout({ Component, url }) {
     <Partial name='page'>
       <header class='ns-topbar'>
         <div class='ns-cluster ns-cluster--sm'>
-          <a href={homeHref} f-client-nav class='ns-topbar__brand'>
+          <a href={appRoutes.home.href()} f-client-nav class='ns-topbar__brand'>
             {{name}}
           </a>
           <Badge variant='muted'>{{appName}}</Badge>
         </div>
-        <nav class='ns-cluster ns-cluster--sm'>
-          <Button
-            type='link'
-            href={homeHref}
-            variant='ghost'
-            size='sm'
-            aria-current={url.pathname === homeHref ? 'page' : undefined}
-          >
-            Home
-          </Button>
-          <Button
-            type='link'
-            href={dashboardHref}
-            variant='ghost'
-            size='sm'
-            aria-current={url.pathname === dashboardHref ? 'page' : undefined}
-          >
-            Dashboard
-          </Button>
-          <Button
-            type='link'
-            href={examplesHref}
-            variant='ghost'
-            size='sm'
-            aria-current={url.pathname.startsWith(examplesHref) ? 'page' : undefined}
-          >
-            Examples
-          </Button>
-          <Button
-            type='link'
-            href={healthHref}
-            variant='ghost'
-            size='sm'
-            aria-current={url.pathname === healthHref ? 'page' : undefined}
-          >
-            Health
-          </Button>
-          <Button
-            type='link'
-            href={designHref}
-            variant='ghost'
-            size='sm'
-            aria-current={url.pathname.startsWith(designHref) ? 'page' : undefined}
-          >
-            Design
-          </Button>
+        <nav class='ns-cluster ns-cluster--sm' aria-label='Primary'>
+          {appNavigation.map((item) => (
+            <Button
+              key={item.href}
+              type='link'
+              href={item.href}
+              variant='ghost'
+              size='sm'
+              aria-current={isCurrentNavigation(item, url.pathname) ? 'page' : undefined}
+            >
+              {item.label}
+            </Button>
+          ))}
           <ThemeToggle />
         </nav>
       </header>
