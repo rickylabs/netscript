@@ -309,3 +309,76 @@ plugins/workers/services/src/service_test.ts` → exit 1, `TS2307 [ERROR]: Canno
 Footprint: product diff vs HEAD = `service_test.ts` only; root/plugin `deno.json` and all tracked
 `deno.lock` byte-identical to HEAD (`git diff --stat HEAD -- deno.json deno.lock plugins/` shows the
 test file only). Protected untracked state untouched. Not done: S2, push, PR, signoff.
+
+## Root second S1 review — 2026-10-27T20:24Z
+
+Root read the399-line candidate at e6ad16f43 and requires capped output, finite error-safe child
+status/stream settlement, and simplification to preserve room within480 lines for all mandatory
+S3 cases. Current helper can leak on stdin failure and unlimited capture is not accepted. SAME
+native session resumes with `implement-s1-lifecycle.md`; no S1 signoff/S2/new owner/waiver. The
+previous correction turn ended20:23:43Z exit0 and all earlier raw/controls/RED bytes remain.
+
+## S1 lifecycle/footprint correction — 2026-10-27 (native lane, same session)
+
+Identity: Claude Code session `78688d7e-3418-4dde-87c6-44df172768d5`, `claude-fable-5-1`, effort
+label `xhigh`; no subagent/new session. Start HEAD `e6ad16f43`; Deno 2.9.7; task `DENO_DIR`; test
+process TMP is the task-owned `.llm/tmp/native-host-policy-u1-implementation/runtime/temp/`.
+
+Qualification (raw, ignored scratch; no product edit):
+
+- Config discovery: a scratch main module OUTSIDE the workspace cannot resolve
+  `@netscript/plugin-workers/*` whatever the cwd (`not a dependency and not in import map`); stdin
+  module + `cwd` inside the plugin root resolves. The stdin chain stays; a file-based child is not a
+  supported replacement. Sibling probe dir created and removed; no worktree touched.
+- `.llm/tools/agentic/runtime/adapters/child-process-environment-adapter.ts` inspected: it drains
+  (discards) output, cancels silently at the cap (truncation, not failure), has no stdin, swallows
+  kill failure without a post-kill settlement bound. Not sufficient for this contract; not reused.
+- A `deno run -` module whose top-level await never resolves with no pending op exits at once
+  (Deno empty-loop exit), so the first stuck-child control was wrong; the control now holds a
+  60 s timer and is killed by the 500 ms watchdog.
+
+Corrected owner `plugins/workers/services/src/service_test.ts` (364 lines, +197/−226 vs HEAD):
+
+1. Capped capture: `readCapped` collects each stream under `CHILD_OUTPUT_CAP` (32 KiB); crossing
+   the cap throws → stream cancelled, child killed, run fails (`stdout: exceeded N bytes`). The
+   original `spawn()` handle is the only child object.
+2. Settlement: `runChild` records every problem (deadline, stdout/stderr overflow, stdin write,
+   stdin close, kill failure) via one `abort`, kills the live child once, then awaits
+   `status` + both streams + stdin together, raced against `deadline + SETTLE_GRACE_MS` (2 s). An
+   unsettled child is reported by pid (primary problems included) and left to the sanitizers to
+   expose; a settled failed run reports problems primary-first with exit/stdout/stderr. Timers are
+   always cleared. The `deno info --json` metadata child goes through the same helper.
+3. Simplification: in-process typed rows and `createUntouchedHost`/`withoutProcessPort` removed as
+   duplicates of the denied-child probe (blank → native `TypeError`; `db.getClient` untouched;
+   valid → denied `PORT` read). The exact legacy missing-PORT text (plan §4.4) is retained as an
+   S3 typed in-process row (GREEN-side factory behavior), not dropped from U1. `createSandbox`
+   (`await using`) replaces per-test scratch/env plumbing. No product import remains in-process,
+   so type-check no longer blocks execution.
+
+Gates (`receipts/s1-lifecycle/`): fmt scoped exit 0/0 findings; lint scoped exit 0/0; quality scan
+`plugins/workers` exit 0, findings [], 1 pre-existing allowance; `run-deno-test.ts -- --allow-env
+--allow-read --allow-write --allow-run --allow-net=127.0.0.1 --unstable-kv <owner>` → exit 1,
+**2 passed / 2 failed, 4 of 4 executed, sanitizers active on all four**:
+
+- PASS `permission controls` (static import loads with `read: denied`; runtime read/env/listen →
+  `NotCapable`). PASS `child controls` (stuck child → `exceeded 500ms`; 32 KiB+1 stdout →
+  `stdout: exceeded 32768 bytes`; both settle under resource/op sanitizers).
+- FAIL `@netscript/plugin-workers/service resolves…` and FAIL `denied child: the auth assertion…`
+  — both with the real `Unknown export './service' for '@netscript/plugin-workers'` from the child:
+  the intended public-contract RED, executed. Raw: `s1l-red-test-raw.txt`.
+
+Historical results untouched: first RED (internal `src/service.ts` TS2307, 0 tests) in `4009854e7`
+and second RED (`services/mod.ts` TS2307, 0 of 5) in `e6ad16f43` + their receipts. No sanitizer
+PASS is claimed for those.
+
+Remaining S3 footprint vs budget (honest estimate, not a plan change): headroom is 480 − 364 =
+116 lines. Mandatory S3 items still owed inside this file: inline trusted TLS PEM (cert + key +
+CA; ≈35 lines ECDSA, ≈70 lines RSA) + TLS oracle (≈25); plain listener/port 0/identity/stop/rebind
+(≈40); 401/503/principal (≈40); two-instance isolation (≈25); no-KV-close (≈15); legacy ctx
+delegate (≈20); missing/mixed/non-callable runtime rows (≈20, child probe table); negative type
+fixtures (≈30); exact legacy PORT text row (≈10). ≈260–295 lines → projected ≈625–660 > 480.
+It does not fit readably without a decision that is not mine: budget change, or a shared test
+helper module (would be a 13th product path), or a second test file (same). Scope preserved; stopped.
+
+Footprint: product diff vs HEAD = `service_test.ts` only; `deno.json`/plugin `deno.json`/all tracked
+`deno.lock` identical to HEAD and baseline. Not done: S2, push, PR, signoff.

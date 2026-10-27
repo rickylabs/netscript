@@ -3,22 +3,21 @@
  *
  * S1 scope: `@netscript/plugin-workers/service` resolves to `services/mod.ts`, imports inertly
  * with every capability (including read) denied, and `startWorkersService` asserts the caller's
- * auth posture before any env, KV, storage or listener work. Every child is a `deno run -`
- * module (stdin) because `deno eval` grants all permissions and ignores `--deny-*`; each child
- * runs with a cleared environment, scratch-only profile/temp roots, the task-owned module cache
- * and a watchdog deadline, so no real user state is reachable and no child can wait forever.
+ * auth posture before any env, KV, storage or listener work. Every product import happens in a
+ * `deno run -` child (stdin module; `deno eval` ignores `--deny-*`) with a cleared environment,
+ * scratch-only profile/temp roots, the task-owned module cache, a watchdog deadline and a byte
+ * cap on captured output, so no real user state is reachable and no child can wait forever.
  */
 
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl } from '@std/path';
-import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import type { ServiceAuthPolicy } from '@netscript/service/auth';
-import { startWorkersService } from '../mod.ts';
 
 const PUBLIC_SUBPATH = '@netscript/plugin-workers/service';
 const PUBLIC_MODULE = new URL('../mod.ts', import.meta.url).href;
 const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
 const CHILD_DEADLINE_MS = 10_000;
+const SETTLE_GRACE_MS = 2_000;
+const CHILD_OUTPUT_CAP = 32 * 1024;
 const DENY_EVERYTHING: readonly string[] = [
   '--cached-only',
   '--deny-read',
@@ -31,15 +30,32 @@ const DENY_EVERYTHING: readonly string[] = [
 ];
 const NATIVE_POLICY_ERROR =
   'Service auth requires { authn: { authenticator }, authz?: { authorizer } } or { public: true, reason: "nonblank explanation" }; do not combine guarded and public fields.';
-const LEGACY_PORT_ERROR = 'Workers API requires the host-provided PORT environment variable.';
 const DENIED_PORT_ERROR = 'Requires env access to "PORT", run again with the --allow-env flag';
 const BLANK_REASONS: readonly string[] = ['', ' \t\n'];
 const VALID_REASON = 'S1 ordering control: valid posture reaches the PORT read';
 
-interface ChildOutput {
+interface ChildRun {
   readonly code: number;
   readonly stdout: string;
   readonly stderr: string;
+}
+
+interface ChildSpec {
+  readonly args: readonly string[];
+  readonly cwd?: string;
+  /** When present the child starts from this environment only. */
+  readonly env?: Record<string, string>;
+  readonly stdin?: string;
+  readonly deadlineMs?: number;
+}
+
+interface Sandbox extends AsyncDisposable {
+  readonly scratch: string;
+  /** Runs `source` as a stdin module under every `--deny-*` flag. */
+  run(
+    source: string,
+    options?: { readonly cwd?: string; readonly deadlineMs?: number },
+  ): Promise<ChildRun>;
 }
 
 Deno.test({
@@ -49,17 +65,10 @@ Deno.test({
   sanitizeOps: true,
   sanitizeExit: true,
   async fn() {
-    const scratch = await Deno.makeTempDir({ prefix: 'workers-service-controls-' });
-    try {
-      await Deno.writeTextFile(`${scratch}/inert.ts`, 'export const inert = true;\n');
-      const denoDir = await resolveDenoDir();
-      const controls: ReadonlyArray<{
-        readonly label: string;
-        readonly source: string;
-        readonly code: number;
-        readonly stdout: string;
-        readonly stderr: string;
-      }> = [
+    await using sandbox = await createSandbox();
+    await Deno.writeTextFile(`${sandbox.scratch}/inert.ts`, 'export const inert = true;\n');
+    const controls: ReadonlyArray<{ readonly label: string; readonly source: string } & ChildRun> =
+      [
         {
           label: 'positive: a static local import loads while read stays denied',
           source: "import './inert.ts';\n" +
@@ -90,15 +99,35 @@ Deno.test({
           stderr: 'NotCapable: Requires net access',
         },
       ];
-      for (const control of controls) {
-        const child = await runDeniedChild(control.source, scratch, scratch, denoDir);
-        assertEquals(child.code, control.code, `${control.label}: exit code\n${child.stderr}`);
-        assertEquals(child.stdout, control.stdout, `${control.label}: stdout`);
-        assertStringIncludes(child.stderr, control.stderr, `${control.label}: stderr`);
-      }
-    } finally {
-      await Deno.remove(scratch, { recursive: true });
+    for (const control of controls) {
+      const run = await sandbox.run(control.source);
+      assertEquals(run.code, control.code, `${control.label}: exit code\n${run.stderr}`);
+      assertEquals(run.stdout, control.stdout, `${control.label}: stdout`);
+      assertStringIncludes(run.stderr, control.stderr, `${control.label}: stderr`);
     }
+  },
+});
+
+Deno.test({
+  name: 'child controls: a stuck child and an over-cap stream are failures that still settle',
+  sanitizeResources: true,
+  sanitizeOps: true,
+  sanitizeExit: true,
+  async fn() {
+    await using sandbox = await createSandbox();
+    await assertRejects(
+      () =>
+        sandbox.run('await new Promise((resolve) => setTimeout(resolve, 60_000));\n', {
+          deadlineMs: 500,
+        }),
+      Error,
+      'exceeded 500ms',
+    );
+    await assertRejects(
+      () => sandbox.run(`console.log('x'.repeat(${CHILD_OUTPUT_CAP}));\n`),
+      Error,
+      `stdout: exceeded ${CHILD_OUTPUT_CAP} bytes`,
+    );
   },
 });
 
@@ -109,67 +138,14 @@ Deno.test({
   sanitizeOps: true,
   sanitizeExit: true,
   async fn() {
-    const scratch = await Deno.makeTempDir({ prefix: 'workers-service-inert-' });
-    try {
-      const child = await runDeniedChild(
-        `import '${PUBLIC_SUBPATH}';\n` +
-          `console.log(import.meta.resolve('${PUBLIC_SUBPATH}'));\n`,
-        PLUGIN_ROOT,
-        scratch,
-        await resolveDenoDir(),
-      );
-      assertEquals(child.stderr, '');
-      assertEquals(child.stdout, `${PUBLIC_MODULE}\n`);
-      assertEquals(child.code, 0);
-    } finally {
-      await Deno.remove(scratch, { recursive: true });
-    }
-  },
-});
-
-Deno.test({
-  name:
-    'startWorkersService rejects a blank public reason before reading PORT or touching host resources',
-  sanitizeResources: true,
-  sanitizeOps: true,
-  sanitizeExit: true,
-  async fn() {
-    await withoutProcessPort(async () => {
-      for (const reason of BLANK_REASONS) {
-        const host = createUntouchedHost();
-        const auth: ServiceAuthPolicy = { public: true, reason };
-        await assertRejects(
-          () => startWorkersService(host.context, { auth }),
-          TypeError,
-          NATIVE_POLICY_ERROR,
-          JSON.stringify(reason),
-        );
-        assertEquals(
-          host.touches,
-          [],
-          `${JSON.stringify(reason)}: host resources must stay untouched`,
-        );
-      }
-    });
-  },
-});
-
-Deno.test({
-  name:
-    'startWorkersService keeps the legacy missing-PORT failure after a valid auth posture, before host resources',
-  sanitizeResources: true,
-  sanitizeOps: true,
-  sanitizeExit: true,
-  async fn() {
-    await withoutProcessPort(async () => {
-      const host = createUntouchedHost();
-      await assertRejects(
-        () => startWorkersService(host.context, { auth: { public: true, reason: VALID_REASON } }),
-        Error,
-        LEGACY_PORT_ERROR,
-      );
-      assertEquals(host.touches, []);
-    });
+    await using sandbox = await createSandbox();
+    const run = await sandbox.run(
+      `import '${PUBLIC_SUBPATH}';\nconsole.log(import.meta.resolve('${PUBLIC_SUBPATH}'));\n`,
+      { cwd: PLUGIN_ROOT },
+    );
+    assertEquals(run.stderr, '');
+    assertEquals(run.stdout, `${PUBLIC_MODULE}\n`);
+    assertEquals(run.code, 0);
   },
 });
 
@@ -179,30 +155,18 @@ Deno.test({
   sanitizeOps: true,
   sanitizeExit: true,
   async fn() {
-    const scratch = await Deno.makeTempDir({ prefix: 'workers-service-auth-' });
-    try {
-      const child = await runDeniedChild(
-        createDeniedAuthProbe(),
-        PLUGIN_ROOT,
-        scratch,
-        await resolveDenoDir(),
-      );
-      assertEquals(child.stderr, '');
-      assertEquals(child.code, 0);
-      const report: unknown = JSON.parse(child.stdout);
-      assertEquals(report, {
-        envControl: 'NotCapable',
-        rows: [
-          ...BLANK_REASONS.map((reason) => ({
-            reason,
-            outcome: ['TypeError', NATIVE_POLICY_ERROR],
-          })),
-          { reason: VALID_REASON, outcome: ['NotCapable', DENIED_PORT_ERROR] },
-        ],
-      });
-    } finally {
-      await Deno.remove(scratch, { recursive: true });
-    }
+    await using sandbox = await createSandbox();
+    const run = await sandbox.run(createDeniedAuthProbe(), { cwd: PLUGIN_ROOT });
+    assertEquals(run.stderr, '');
+    assertEquals(run.code, 0);
+    const report: unknown = JSON.parse(run.stdout);
+    assertEquals(report, {
+      envControl: 'NotCapable',
+      rows: [
+        ...BLANK_REASONS.map((reason) => ({ reason, outcome: ['TypeError', NATIVE_POLICY_ERROR] })),
+        { reason: VALID_REASON, outcome: ['NotCapable', DENIED_PORT_ERROR] },
+      ],
+    });
   },
 });
 
@@ -246,142 +210,47 @@ async function attempt(operation) {
 `;
 }
 
-/** Runs `fn` with `PORT` removed from the test process, restoring any preseeded value. */
-async function withoutProcessPort(fn: () => Promise<void>): Promise<void> {
-  const preseeded = Deno.env.get('PORT');
-  Deno.env.delete('PORT');
-  try {
-    await fn();
-  } finally {
-    if (preseeded !== undefined) Deno.env.set('PORT', preseeded);
+/** Scratch-only profile/temp roots plus the task-owned module cache; disposal removes the roots. */
+async function createSandbox(): Promise<Sandbox> {
+  const env: Record<string, string> = { DENO_DIR: await resolveDenoDir() };
+  const scratch = await Deno.makeTempDir({ prefix: 'workers-service-' });
+  for (
+    const name of [
+      'HOME',
+      'USERPROFILE',
+      'LOCALAPPDATA',
+      'TMP',
+      'TEMP',
+      'TMPDIR',
+      'XDG_CACHE_HOME',
+      'XDG_CONFIG_HOME',
+      'XDG_DATA_HOME',
+      'XDG_STATE_HOME',
+    ]
+  ) {
+    env[name] = scratch;
   }
-}
-
-/** A typed host context whose resolvers record every touch and never resolve. */
-function createUntouchedHost(): {
-  readonly context: PluginServiceContext;
-  readonly touches: string[];
-} {
-  const touches: string[] = [];
-  const context: PluginServiceContext = {
-    db: {
-      getClient(): Promise<unknown> {
-        touches.push('db.getClient');
-        return Promise.reject(new Error('db.getClient must not run before the auth assertion'));
-      },
-    },
-    contracts: Object.freeze({}),
-    kv: Object.freeze({}),
-    logger: Object.freeze({}),
-    env: Object.freeze({}),
-  };
-  return { context, touches };
-}
-
-/**
- * Runs `source` as a stdin module (`deno run -`) with every capability denied, a cleared
- * environment and scratch-only profile roots. Static imports load through the module loader,
- * which the permission controls above prove is not a read grant.
- */
-function runDeniedChild(
-  source: string,
-  cwd: string,
-  scratch: string,
-  denoDir: string,
-): Promise<ChildOutput> {
-  return runBounded(['run', ...DENY_EVERYTHING, '-'], {
-    cwd,
-    clearEnv: true,
-    env: createIsolatedChildEnv(scratch, denoDir),
-    stdin: source,
-  });
-}
-
-/**
- * Spawns this Deno binary with `args`, keeps the original child handle, captures both streams
- * and kills the child when the deadline elapses. A timeout is always reported as a failure.
- */
-async function runBounded(
-  args: readonly string[],
-  options: {
-    readonly cwd?: string;
-    readonly clearEnv?: boolean;
-    readonly env?: Record<string, string>;
-    readonly stdin?: string;
-  },
-): Promise<ChildOutput> {
-  const child = new Deno.Command(Deno.execPath(), {
-    args: [...args],
-    cwd: options.cwd,
-    clearEnv: options.clearEnv,
-    env: options.env,
-    stdin: options.stdin === undefined ? 'null' : 'piped',
-    stdout: 'piped',
-    stderr: 'piped',
-  }).spawn();
-  let timedOut = false;
-  const watchdog = setTimeout(() => {
-    timedOut = true;
-    killQuietly(child);
-  }, CHILD_DEADLINE_MS);
-  try {
-    if (options.stdin !== undefined) {
-      const writer = child.stdin.getWriter();
-      await writer.write(new TextEncoder().encode(options.stdin));
-      await writer.close();
-    }
-    const output = await child.output();
-    if (timedOut) {
-      throw new Error(`deno ${args.join(' ')} exceeded ${CHILD_DEADLINE_MS}ms and was killed`);
-    }
-    const decoder = new TextDecoder();
-    return {
-      code: output.code,
-      stdout: decoder.decode(output.stdout),
-      stderr: decoder.decode(output.stderr),
-    };
-  } catch (error) {
-    killQuietly(child);
-    throw error;
-  } finally {
-    clearTimeout(watchdog);
-  }
-}
-
-/** Kills a child that may already have exited; the caller reports the failure, not the kill. */
-function killQuietly(child: Deno.ChildProcess): void {
-  try {
-    child.kill();
-  } catch {
-    // Already exited: nothing left to stop.
-  }
-}
-
-/** Child environment: task-owned cache plus scratch-only profile and temp roots. */
-function createIsolatedChildEnv(scratch: string, denoDir: string): Record<string, string> {
-  const env: Record<string, string> = {
-    DENO_DIR: denoDir,
-    HOME: scratch,
-    USERPROFILE: scratch,
-    LOCALAPPDATA: scratch,
-    TMP: scratch,
-    TEMP: scratch,
-    TMPDIR: scratch,
-    XDG_CACHE_HOME: scratch,
-    XDG_CONFIG_HOME: scratch,
-    XDG_DATA_HOME: scratch,
-    XDG_STATE_HOME: scratch,
-  };
   const systemRoot = Deno.env.get('SystemRoot');
   if (systemRoot !== undefined) env.SystemRoot = systemRoot;
-  return env;
+  return {
+    scratch,
+    run: (source, options = {}) =>
+      runChild({
+        args: ['run', ...DENY_EVERYTHING, '-'],
+        cwd: options.cwd ?? scratch,
+        env,
+        stdin: source,
+        deadlineMs: options.deadlineMs,
+      }),
+    [Symbol.asyncDispose]: () => Deno.remove(scratch, { recursive: true }),
+  };
 }
 
 /** The module cache this test process already uses; never a guessed profile path. */
 async function resolveDenoDir(): Promise<string> {
   const configured = Deno.env.get('DENO_DIR');
   if (configured !== undefined) return configured;
-  const info = await runBounded(['info', '--json'], {});
+  const info = await runChild({ args: ['info', '--json'] });
   const parsed: unknown = JSON.parse(info.stdout);
   const denoDir = typeof parsed === 'object' && parsed !== null
     ? Reflect.get(parsed, 'denoDir')
@@ -390,4 +259,106 @@ async function resolveDenoDir(): Promise<string> {
     throw new Error('deno info did not report a denoDir; refusing to guess a cache location');
   }
   return denoDir;
+}
+
+/**
+ * Runs this Deno binary once, keeping the original child handle. Both streams are captured
+ * under `CHILD_OUTPUT_CAP`, stdin is written then closed, and a watchdog kills the child at the
+ * deadline. Any problem (deadline, overflow, stdin, kill) aborts the child; the run then waits a
+ * bounded grace for status and streams to settle and reports every recorded problem, primary
+ * first. A child that will not settle is reported by pid, never ignored.
+ */
+async function runChild(spec: ChildSpec): Promise<ChildRun> {
+  const deadlineMs = spec.deadlineMs ?? CHILD_DEADLINE_MS;
+  const child = new Deno.Command(Deno.execPath(), {
+    args: [...spec.args],
+    cwd: spec.cwd,
+    clearEnv: spec.env !== undefined,
+    env: spec.env,
+    stdin: spec.stdin === undefined ? 'null' : 'piped',
+    stdout: 'piped',
+    stderr: 'piped',
+  }).spawn();
+  const problems: string[] = [];
+  let exited = false;
+  const abort = (problem: string): void => {
+    problems.push(problem);
+    if (exited) return;
+    try {
+      child.kill();
+    } catch (error) {
+      problems.push(`kill failed: ${describe(error)}`);
+    }
+  };
+  const watchdog = setTimeout(() => abort(`exceeded ${deadlineMs}ms`), deadlineMs);
+  const settled = Promise.all([
+    child.status.then((status) => {
+      exited = true;
+      return status.code;
+    }),
+    readCapped(child.stdout).catch((error): string => {
+      abort(`stdout: ${describe(error)}`);
+      return '';
+    }),
+    readCapped(child.stderr).catch((error): string => {
+      abort(`stderr: ${describe(error)}`);
+      return '';
+    }),
+    spec.stdin === undefined ? undefined : writeStdin(child.stdin, spec.stdin, abort),
+  ]);
+  let grace: ReturnType<typeof setTimeout> | undefined;
+  const unsettled = new Promise<undefined>((resolve) => {
+    grace = setTimeout(resolve, deadlineMs + SETTLE_GRACE_MS, undefined);
+  });
+  try {
+    const outcome = await Promise.race([settled, unsettled]);
+    const command = `deno ${spec.args.join(' ')}`;
+    if (outcome === undefined) {
+      throw new Error(
+        `${command} (pid ${child.pid}) did not settle within ${deadlineMs + SETTLE_GRACE_MS}ms` +
+          `: ${problems.join('; ') || 'no recorded problem'}`,
+      );
+    }
+    const [code, stdout, stderr] = outcome;
+    if (problems.length > 0) {
+      throw new Error(
+        `${command} failed: ${
+          problems.join('; ')
+        }\nexit ${code}\nstdout:\n${stdout}\nstderr:\n${stderr}`,
+      );
+    }
+    return { code, stdout, stderr };
+  } finally {
+    clearTimeout(watchdog);
+    clearTimeout(grace);
+  }
+}
+
+/** Writes the module source and closes stdin; either failure aborts the run. */
+async function writeStdin(
+  stdin: WritableStream<Uint8Array>,
+  source: string,
+  abort: (problem: string) => void,
+): Promise<void> {
+  const writer = stdin.getWriter();
+  await writer.write(new TextEncoder().encode(source))
+    .catch((error) => abort(`stdin write: ${describe(error)}`));
+  await writer.close().catch((error) => abort(`stdin close: ${describe(error)}`));
+}
+
+/** Collects a child stream as text; more than `CHILD_OUTPUT_CAP` bytes fails, never truncates. */
+async function readCapped(stream: ReadableStream<Uint8Array>): Promise<string> {
+  const decoder = new TextDecoder();
+  let bytes = 0;
+  let text = '';
+  for await (const chunk of stream) {
+    bytes += chunk.byteLength;
+    if (bytes > CHILD_OUTPUT_CAP) throw new Error(`exceeded ${CHILD_OUTPUT_CAP} bytes`);
+    text += decoder.decode(chunk, { stream: true });
+  }
+  return text + decoder.decode();
+}
+
+function describe(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

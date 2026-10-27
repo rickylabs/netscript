@@ -89,3 +89,18 @@ result, not accepted public-subpath or sanitizer proof. Root requires the five c
 - Baseline observation, not S1 scope: the legacy `@netscript/plugin-workers/services` subpath is
   not inert under the full-deny bar (transitive npm `process.env` read at import → `NotCapable`).
   Relevant to S2/S3 graph selection for the new module; not fixed, not relabelled.
+
+## S1 lifecycle/footprint correction — 2026-10-27 (native lane, same session 78688d7e)
+
+- Child lifecycle contract now explicit in the owner: capped capture (overflow = failure), one
+  abort path (deadline/overflow/stdin/kill problems recorded), post-kill settlement bounded by a
+  2 s grace, unsettled child reported by pid. The agentic adapter's drain was inspected and not
+  reused (discards/truncates, no stdin, no post-kill bound).
+- Workspace resolution for child modules depends on config discovery from the main module's
+  directory (file) or cwd (stdin); a scratch file outside the workspace cannot resolve the plugin
+  subpath. Stdin + plugin-root cwd is the supported chain (recorded, not a plan change).
+- In-process typed auth rows removed from S1 as duplicates of the denied-child probe; the exact
+  legacy missing-PORT text moves to the S3 typed table (still inside U1, no deferral/waiver).
+- Budget drift: 364/480 lines after simplification leaves 116 lines for an estimated 260–295
+  lines of mandatory S3 oracles (incl. inline TLS PEM). Projected final ≈625–660 > 480 and > F-10
+  (500). Not resolvable within the 12 owners by the implementation lane; owner decision pending.

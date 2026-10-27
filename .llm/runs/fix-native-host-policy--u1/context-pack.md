@@ -76,3 +76,14 @@ need). Rollback restores pre-change exposure, which is not a security-approved s
   denied `PORT` read). RED: `TS2307 Cannot find module .../services/mod.ts`, zero tests executed.
 - Receipts: `receipts/s1-corrections/`. Missing/mixed/non-callable runtime rows + negative type
   fixtures remain mandatory S3 (no waiver).
+
+## S1 lifecycle/footprint correction — 2026-10-27 (same session; still not signed off)
+
+- `service_test.ts` is 364 lines: `createSandbox` (`await using`) + `runChild` (kept handle,
+  32 KiB per-stream cap with overflow-as-failure, single abort path, 2 s post-kill settlement
+  grace, pid-reported unsettled child) + `readCapped`/`writeStdin`. In-process typed rows removed
+  as duplicates of the denied-child probe; no product import in-process.
+- Executed RED: 2 passed (permission + child-lifecycle controls) / 2 failed with the child's real
+  `Unknown export './service' for '@netscript/plugin-workers'`; sanitizers active on all 4.
+- Open for root: projected final file ≈625–660 lines vs 480 budget after mandatory S3 oracles
+  (worklog has the per-item estimate). S2 untouched.
