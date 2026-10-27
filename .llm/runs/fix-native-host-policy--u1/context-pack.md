@@ -138,3 +138,7 @@ remains a complete-doc obligation. No whole U1, security, release or S16 accepta
 ## Coordinator accepted S3a checkpoint
 
 Root accepted only exact2-owner extraction in root-s3a-source-acceptance.md after actual256.414s/code0 turn;4/0tests and selected2type/lint/fmt clean. New59-file audited s3a-evidence bundle retains timeout/TLS/baseline/raw/byteguards; old S2bundle unchanged. No wholeS3 acceptance. Next proposed checkpoint is narrow runtime-invalid/compiler-type conformance only, not yet launched.
+
+## Current S3b source checkpoint
+
+Root accepts exact171lineconformance/208linehelper in root-s3b-source-acceptance.md after6/0/0actualtests and selected3staticgates. Original4owner175hash frozen;8actualbyteguards/defaultbodyequivalence/verdicts unchanged.51-file audited newbundle preserves authoring450s/300stimeouts and initialfmtRED separately from currentGREEN. No realworker listener/authsuccess/TLS/lifecycle/legacy/streams/release acceptance. Next plainHTTPproposal is preparation only pending root brief review.

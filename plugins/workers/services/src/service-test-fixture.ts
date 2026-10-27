@@ -4,10 +4,13 @@
  * Relocated unchanged from the reviewed S1 helper regions of `service_test.ts`: the bounded child
  * constants, the child run/spec/sandbox types and the scratch/process helpers. Every product
  * import a test makes happens in a `deno run -` child (stdin module; `deno eval` ignores
- * `--deny-*`) with a cleared environment, scratch-only profile/temp roots, the task-owned module
- * cache, a watchdog deadline and a byte cap on captured output, so no real user state is reachable
- * and no child can wait forever. This module registers no tests and imports no product code; it
- * exports only the symbols the test owners consume.
+ * `--deny-*`) with a cleared environment, scratch-only profile/temp roots and the task-owned
+ * module cache. The parent's wait is bounded: a watchdog kills the child at its deadline, each
+ * captured stream is capped, and a child that still fails to settle within the grace period is
+ * reported RED with its pid rather than awaited further. The optional `check` mode adds
+ * `--check --frozen` in front of the same denied-all argument list so a stdin module is
+ * type-checked against the pinned lockfile before it evaluates. This module registers no tests
+ * and imports no product code; it exports only the symbols the test owners consume.
  *
  * @module
  */
@@ -25,6 +28,7 @@ const DENY_EVERYTHING: readonly string[] = [
   '--deny-sys',
   '--deny-ffi',
 ];
+const CHECK_FROZEN: readonly string[] = ['--check', '--frozen'];
 
 export interface ChildRun {
   readonly code: number;
@@ -43,10 +47,10 @@ interface ChildSpec {
 
 interface Sandbox extends AsyncDisposable {
   readonly scratch: string;
-  /** Runs `source` as a stdin module under every `--deny-*` flag. */
+  /** Runs `source` as a stdin module under every `--deny-*` flag; `check` type-checks it first. */
   run(
     source: string,
-    options?: { readonly cwd?: string; readonly deadlineMs?: number },
+    options?: { readonly cwd?: string; readonly deadlineMs?: number; readonly check?: boolean },
   ): Promise<ChildRun>;
 }
 
@@ -76,7 +80,7 @@ export async function createSandbox(): Promise<Sandbox> {
     scratch,
     run: (source, options = {}) =>
       runChild({
-        args: ['run', ...DENY_EVERYTHING, '-'],
+        args: ['run', ...(options.check ? CHECK_FROZEN : []), ...DENY_EVERYTHING, '-'],
         cwd: options.cwd ?? scratch,
         env,
         stdin: source,

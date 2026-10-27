@@ -172,3 +172,5 @@ remains a complete-doc obligation. No whole U1, security, release or S16 accepta
 - Source frozen uncommitted pending root read of the diff and `receipts/s3a/`.
 
 Root reviewed/accepted exact S3a relocation after actual turn settlement. No cap waiver or conformance behavior:175/204lines,4oracles preserved. Header isolation/settlement overclaim qualified by root; numericF5 remainsDEBT_ACCEPTED and fullmap2baseline findings remain blockers. Newarchive preserves original blob mismatch plus independent8/8actualbyteproof.
+
+S3b authoring was two actualtimeouts, not nativePASS. Exact current171/208source then passed the authorized coordinator wrapper gates without edits/inference; root acceptance is bounded to runtime-invalid+compiler controls. No helperdefaultbehavior/permissions relaxation or publicAPI growth, no age/lock waiver. Both timeouts/compaction/firstfmtRED retained in new51-file archive; all previous archives unchanged.

@@ -709,3 +709,26 @@ Corrected baseline receipt physical paths are in the EIS coordinator .netscript/
 source subprocess cwd was source-clean U2 at1582; prior U2 physical-path assertion was incorrect.
 Actual full-map2doc findings remain a publish blocker, not a waiver. No reference correction,
 conformance behavior, S3b, streams, release readiness, IMPL-EVAL or security acceptance is included.
+## Root S3b source turn authorization
+
+Root accepted proposal8786669419c9e96a0a9b1fc3adb904f8d42e3c7dc346495f6e72aeb40d5316be and authorized ONE same-session450s turn before source. Exact two owners: focused conformancecap180 and existingfixturecap300 with optionalcompiler mode/header precision. Original4test175linehash frozen. Any native missingguard remains realFAIL, no policy patch authority. See implement-s3b-runtime-types.md; no commit before root review.
+
+## S3b actual incomplete source turn
+
+The authorized450s SAME-session turn actually ended22:47:58.587Z, code1/timedOuttrue/failure-null.
+Only the approved minimal208line fixture partial exists (SHAc4a574feedd8c95b1ae078c6caf1cbca1368b15d7b5e7a260b4967f30a7fa08e);
+new conformance owner was NOT written and owning/static gates were NOT run. Original4testowner
+remains175lines/SHA789da15e...c08c. No source acceptance, commit or auto continuation.
+
+Actual native compiler prerequisite: positivecode0/typed marker, missingauth TS2741, mixed and
+malformed TS2322 with relevantauthn/authenticate fields. Exact native tool projection and original
+raw retained; these are not owning/sanitizer acceptance. Auto compaction metadata reports168617
+pre/14184post/150892ms. Same actual --resume SID, nofork/reset/no-session-persistence; stream alone
+does not establish persistent checkpoint retention or loss. Original compaction/raw/partial and
+all4recordedPIDabsence (snapshot-only) remain; no private session-store inspection. Write-first
+300s same-session completion brief is prepared for root review, not executed or self-authorized.
+Root FULLREAD brief4a8d2890/partialhelper/actualdiagnostics/compactionmetadata and authorized ONE SAME-session300s WRITE-FIRST completion through prepared816af980 driver before source. No reset/fork/newroute; compaction is observed overhead, not session-loss proof. Root source review still required before commit.
+
+## Root accepted S3b checkpoint
+
+Root independently full-read the171/208line source and verified all eight receipt seals/three source hashes; see root-s3b-source-acceptance.md. The two timed-out native authoring turns remain failures. Coordinator completed only the already-authorized existing wrappers in clearEnv+ownedemptyprofile:6/0/0tests9831ms, selected3types/lint/fmt0; no source edits or new inference. Defaultbody/argv equivalence true, original4test frozen,8/8actualworkingbytes and verdicts unchanged. Profile removed empty/nonrecursively, PIDabsence snapshot-only. New51-file audited s3b-evidence archive preserves all raw/failures. Only thisruntime-invalid/typecheckpoint accepted, not wholeS3/security/release. No next model turn authorized; plain-only brief preparation follows checkpoint.
