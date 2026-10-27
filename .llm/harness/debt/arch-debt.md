@@ -2928,3 +2928,46 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Fixture:** Main merged PR #2318 during this leaf. Its event-driven cancellation fixture and
   diagnostics are preserved, with only status and signal observations in the fixture; the runtime
   now retains the Response. No fixture-only Response retention remains.
+
+
+## plugins/workers/services/mod.ts - F-5 native identity closure (22 symbols)
+
+- **ID:** `WORKERS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261027`
+- **Reason:** The approved workers factory signature requires an exact 22-name public doc-lint
+  closure: 2 own symbols plus 20 existing native type-only identity re-exports. This exceeds the
+  F-5 numeric limit of 20 on this one `mod.ts`. All 22 still count; this is no type-only discount.
+  The authorized 7-name shape produces 5 real recursive `private-type-ref` errors; the exact
+  22-name experiment passes doc-lint. The numerical F-5 violation remains `DEBT_ACCEPTED`, not
+  `PASS`; doc-lint itself and all other F-5 clauses must pass independently.
+- **Exact scope:** Only `plugins/workers/services/mod.ts`. Own: `startWorkersService`,
+  `WorkersServiceOptions`. From `@netscript/plugin/sdk`: `PluginServiceContext`. From
+  `@netscript/service`: `CorsOptions`, `RunningService`, `RunningServiceAddress`, `ServeOptions`,
+  `ServiceApp`, `ServiceEnvironment`, `ServiceTlsOptions`. From `@netscript/service/auth`:
+  `AuthenticatorPort`, `AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`,
+  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ServiceAuthPolicy`,
+  `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`.
+- **Why deferred:** A compatible native doc-lint/public-signature solution needs separate review;
+  a doctrine amendment must also update fitness rules explicitly. This bounded migration does
+  neither implicitly. No doc-lint waiver, extra API, type alias, structural interface, cast,
+  suppression, runtime/policy behavior, dependency or lock change is covered.
+- **Owner:** NetScript native-host policy migration coordinator with repository maintainer
+  `rickylabs`.
+- **Target:** 2026-11-10. No automatic extension; no growth beyond the exact named 22 while open.
+- **Linked plan:** `.llm/runs/fix-native-host-policy--u1/plan.md` and
+  `.llm/runs/fix-native-host-policy--u1/plan-review-addendum.md`.
+- **Linked independent finding:** `.llm/runs/fix-native-host-policy--u1/plan-type-closure-eval.md`
+  (`FAIL_PLAN`, SHA256 `9c249a787acf5c3a00c4c2ee3bf8993a90aa74649a4df9cf28125a0c18fe1bf9`).
+- **Owner disposition:** `.llm/runs/fix-native-host-policy--u1/root-f5-debt-disposition.md`.
+- **Created:** 2026-10-27.
+- **Status:** open, `DEBT_ACCEPTED` by milestone coordinator; independent PLAN re-review pending.
+  This accepts only process debt metadata. Additional 15 exports, S2 source acceptance and commit
+  still require actual same-session independent PLAN PASS plus root substantive review.
+- **Closing gate:** Land a reviewed compatible native doc-lint/public-signature solution that
+  meets the numeric F-5 cap, OR a separately reviewed explicit doctrine amendment with matching
+  fitness updates; prove public type identity, exact exported inventory, doc-lint zero and all
+  retained lifecycle/security gates, then close this entry with evidence. Existing violations or
+  future registry entries are not accepted by analogy.
+- **Excluded:** Streams closure is not judged or covered; it has no `PluginServiceContext`
+  parameter and must derive its own minimal closure. No U2/U3/E1, security, release or production
+  E2E acceptance is implied. Function-level `@example` and every other documentation obligation
+  remain unwaived.

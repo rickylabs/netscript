@@ -104,3 +104,54 @@ result, not accepted public-subpath or sanitizer proof. Root requires the five c
 - Budget drift: 364/480 lines after simplification leaves 116 lines for an estimated 260–295
   lines of mandatory S3 oracles (incl. inline TLS PEM). Projected final ≈625–660 > 480 and > F-10
   (500). Not resolvable within the 12 owners by the implementation lane; owner decision pending.
+
+## S2 surface correction — 2026-10-27 (native lane, same session 78688d7e)
+
+- Plan §3 "2 named re-exports only" meets the real `deno doc --lint` `private-type-ref` rule: the
+  approved signature names `ServiceAuthPolicy`/`ServeOptions`/`RunningService`/`CorsOptions`/
+  `PluginServiceContext`, whose declarations reach 15 further native names. The root-authorized
+  5-name identity re-export shape still fails by 5 edges; the minimal green closure is +15
+  (computed by iteration; raw receipts under `receipts/s2/doc-lint-authorized/`). Owner decision
+  pending; the experimental 22-symbol candidate is sealed under ignored `review/s2-held-candidate/`
+  and not committed.
+- Doc accuracy: the factory reads `context` only for `context.env.PORT`; the runtime keeps the
+  native global `getKv()`. Earlier mod.ts prose/recipe implied a context-owned KV resolver —
+  corrected, no code change.
+- Inertness: the new public graph uses static-specifier dynamic imports after auth + port
+  resolution because the native composition (`@netscript/plugin/service`, `router.ts`) is not inert
+  under `--deny-env` (npm `debug` reads `process.env`). Lazy loading is a graph choice inside the
+  owner, not a behavior change; precedent `packages/queue/factory/create-queue.ts`.
+- Evidence scope: workspace resolution (`file:///…/packages/…`) is what doc-lint and identity
+  proofs exercised; published `0.0.8` metadata shows the same names only.
+
+## S2 finish — 2026-10-27 (native lane, same session 78688d7e)
+
+- Plan §3 "2 named re-exports only / ≤20 symbols" is superseded for `plugins/workers/services/
+  mod.ts` by root's disposition + independent Grok debt PASS (`plan-f5-debt-eval.md`
+  `849d68ec…`): exact 22 symbols (2 own + 20 native type identities). Numeric F-5 is
+  DEBT_ACCEPTED under `WORKERS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261027` (target 2026-11-10,
+  no growth), never PASS. No doc-lint waiver, cast, suppression, alias, new type, dependency, lock
+  or CI change.
+- Function-level F-5 `@example` added to `startWorkersService` JSDoc (module-level examples alone
+  did not satisfy the per-function clause); executable code unchanged.
+- Full-map doc-lint residual (2 refs) belongs to the untouched `contracts/v1` owner in
+  `packages/plugin-workers-core`; recorded, not fixed here.
+- Source frozen uncommitted pending root acceptance; no checkpoint made in this turn.
+
+## Coordinator S2 checkpoint qualification and publication
+
+Root substantive acceptance is `root-s2-source-acceptance.md`; exact accepted source hashes and
+qualifications are preserved there. The canonical named numeric F5 debt is DEBT_ACCEPTED, not PASS;
+original independent PASS, numeric FAIL_PLAN and owner-debt PASS stay immutable. New raw/gate/session
+proof is retained byte-exact in `receipts/s2-evidence.json.gz` plus its audited257-file manifest;
+all original physical files remain. Source checkpoint publication is authorized, with actual
+commit/PR state recorded in the draft PR phase trail.
+
+Recipe checks establish static signature compatibility; subsequent runtime module evaluation was
+DENIED on an environment read through the host Redis adapter. They are not runnable-host or zero-
+evaluation proof. Full-map doc-lint remains FAIL2, and actual1582 baseline comparison is UNRUN in
+this lane (coordinator owns it separately). S7 must dispose those findings before publish readiness.
+No additional test execution was needed after the native actual4/0 wrapper and raw receipt.
+S3's full mandatory matrix and480-line cap remain, with allocation review before source changes;
+no test-budget waiver or dropped TLS/type/cleanup oracle has been accepted. Options-type example
+remains a complete-doc obligation. No whole U1, security, release or S16 acceptance is implied.

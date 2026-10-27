@@ -382,3 +382,242 @@ helper module (would be a 13th product path), or a second test file (same). Scop
 
 Footprint: product diff vs HEAD = `service_test.ts` only; `deno.json`/plugin `deno.json`/all tracked
 `deno.lock` identical to HEAD and baseline. Not done: S2, push, PR, signoff.
+
+## Root S1 RED acceptance / S2 authorization — 2026-10-27
+
+Root full-read testSHA c6ac1af89c9c0f7dd00330727cac61d609406f50db8ec63fccb28f15a6e07b18 and
+s1l raw/JSON. S1 RED scope accepted:2 control PASS/2 expected public-export FAIL with sanitizers;
+unsettled child is failure, not cleanup PASS. Actual native turn settled20:35:40.594Z exit0 at
+7e35c45b6. Root authorizes immediate SAME-session S2, retaining12 product paths/final480 test lines
+and ALL mandatory S3 cases. Size projection is not scope permission. Next brief
+`implement-s2-workers.md` limits source to factory/mod/export entries; no main/streams/S3 work.
+
+## S2 interrupted candidate / root surface hold — 2026-10-27
+
+Actual S2 reached the existing900s limit20:53:19Z, exit1/timedOut true, no completed final model
+result or source commit. HEAD remains7e35c45b6. Unchanged S1 is4/0; candidate runtime semantics
+reviewed by root, but docs/guarded recipe require correction. The experimental22-symbol native
+type closure is NOT accepted. Root's normative `root-s2-public-types-clarification.md` authorizes
+ONLY five named existing native identity re-exports, recorded before the correction. No additional
+public names, structural authority or privateTypeRef waiver. Root requires exact named recursive
+diagnostics and native public-owner/workspace-versus-published evidence before a compatible fix.
+Candidate/raw/gates remain preserved; SAME-session focused correction follows without S3/push.
+
+## S2 workers factory — candidate + surface correction (native lane, same session 78688d7e) — 2026-10-27
+
+Identity: SID `78688d7e-3418-4dde-87c6-44df172768d5`, `claude-fable-5-1`, effort label `xhigh`,
+HEAD `7e35c45b6`, Deno 2.9.7. Owners touched: NEW `plugins/workers/services/src/service.ts`,
+NEW `plugins/workers/services/mod.ts`, `plugins/workers/deno.json` (+`"./service"` export, +2
+`check` task entries). S1 test untouched (`c6ac1af8…07b18`). Nothing else in `plugins/`,
+`packages/`, locks or root config changed. **No S2 commit exists; source is held dirty.**
+
+### Design (first candidate, retained)
+
+- The legacy `./services` graph is not inert: `@netscript/plugin/service`, `./router.ts` and
+  `@netscript/kv/redis` all transitively load npm `debug@4.4.3/src/node.js`, which reads
+  `process.env` at import (`NotCapable` under `--deny-env`). `@netscript/service/auth`, `./init.ts`,
+  `./generated-jobs.ts`, `../../src/runtime/generated-jobs.ts`, `../../streams/server.ts` and
+  `./service-runtime.ts` are inert under full deny.
+- Therefore `service.ts` statically imports only `assertServiceAuthPolicy` + types, and loads the
+  seven composition modules through static-specifier dynamic imports inside `startWorkersService`
+  AFTER `assertServiceAuthPolicy(options?.auth)` and AFTER port resolution (product precedent:
+  `packages/queue/factory/create-queue.ts`). Hence the valid-posture probe stops at the denied
+  `PORT` read with the exact native text. No `@netscript/kv/redis` import in the factory; the
+  runtime keeps resolving the native global `getKv()`; the factory never closes it.
+- Composition lines (runtime → `registerPluginJobs` → `registerGeneratedJobDefinitions` → console
+  registry line → `createPluginService(router, {...}).serve(options.serve)` → post-listen
+  microtask) are verbatim moves from `main.ts` incl. `await createWorkersServiceRuntime()`
+  (`main.ts:53`); `context` is read only for `context.env.PORT ?? Deno.env.get('PORT')` with the
+  legacy parse and exact missing-PORT text; explicit `serve.port` incl. `0` wins.
+
+### Doc-lint sequence (raw per-command stderr/exit under `receipts/s2/doc-lint-authorized/`)
+
+1. First shape (2 named exports only): `deno doc --lint ./services/mod.ts` → exit 1, 5
+   `private-type-ref` (`WorkersServiceOptions["auth"|"cors"|"serve"]`, `startWorkersService`
+   param/return → `ServiceAuthPolicy`, `CorsOptions`, `ServeOptions`, `PluginServiceContext`,
+   `RunningService`). Raw events preserved by root in
+   `.llm/tmp/native-host-policy-u1-implementation/review/s2-doc-diagnostic-events.json`.
+2. Experimental closure (22 symbols = 2 own + 20 type re-exports) went green. Receipts in
+   `receipts/s2/` taken against THAT shape: `s2-doc-lint.json`, `s2-public-symbol-count.json`,
+   `s2-green-test.json`/`-raw.txt`, `s2-fmt/lint/check.json`, `s2-plugin-task-check.txt`,
+   `arch-check-workers-s2.txt` (FAIL=0 WARN=8 INFO=2, findings identical to S0),
+   `quality-scan-workers-with-s2.json` (ok, 1 pre-existing allowance), `s2-protected-hashes.txt`.
+   **Not authorized**; bytes sealed by root under `review/s2-held-candidate/` (`mod.ts`
+   `8b53d328…`, `service.ts` `ca6a1961…`).
+3. Corrected to the exact root-authorized surface (`root-s2-public-types-clarification.md`):
+   `startWorkersService`, `WorkersServiceOptions` + identity re-exports of `PluginServiceContext`,
+   `CorsOptions`, `RunningService`, `ServeOptions`, `ServiceAuthPolicy` only. `mod.ts`
+   `6747874e…73f7`, `service.ts` `ceef299b…fa81` (`owner-hashes-final.txt`).
+   `01-authorized-shape.stderr.txt` (71 lines, untruncated): **exit 1, 5 private-type-ref**:
+   `RunningService["app"]→ServiceApp`, `RunningService["addr"]→RunningServiceAddress`,
+   `ServeOptions["tls"]→ServiceTlsOptions`, `ServiceAuthPolicy→ServiceGuardedAuthPolicy`,
+   `ServiceAuthPolicy→ServicePublicAuthPolicy`. Structured: `s2c-doc-lint-authorized-shape.json`.
+4. Minimal closure computed by iteration (diagnostic script `.llm/tmp/u1-s2/closure-iterate.ts`;
+   owner restored and hash-verified; `02…07-closure-iteration.stderr.txt`, `closure-report.json`):
+   converges at **+15 identity re-exports**, all existing native names —
+   `@netscript/service`: `ServiceApp`, `RunningServiceAddress`, `ServiceTlsOptions`,
+   `ServiceEnvironment`; `@netscript/service/auth`: `ServiceGuardedAuthPolicy`,
+   `ServicePublicAuthPolicy`, `AuthnOptions`, `AuthzOptions`, `AuthenticatorPort`,
+   `AuthorizerPort`, `AuthnRequest`, `AuthnResult`, `AuthzRequest`, `AuthzDecision`, `Principal`.
+   Edge chain: `RunningService→ServiceApp→ServiceEnvironment`; `RunningService→RunningServiceAddress`;
+   `ServeOptions→ServiceTlsOptions`; `ServiceAuthPolicy→ServiceGuardedAuthPolicy→AuthnOptions→
+   AuthenticatorPort→AuthnRequest|AuthnResult→Principal`, `→AuthzOptions→AuthorizerPort→
+   AuthzRequest|AuthzDecision`, `AuthzRequest→Principal`; `ServiceAuthPolicy→ServicePublicAuthPolicy`.
+   The 22-symbol experiment was exactly this closure, not an over-approximation.
+
+### Why this facade needs more than the existing owners (named comparison, `owners/`)
+
+`deno doc --lint` treats "public" per root entrypoint: every type reachable from the entrypoint's
+exports must itself be exported by that entrypoint. The canonical owners pass because they export
+their own closures: `@netscript/service` root (exit 0, 107 symbols), `@netscript/service/auth`
+(exit 0), `@netscript/plugin/sdk` (exit 0), legacy `./services/src/main.ts` (exit 0 — it names
+only `PluginServiceContext` and `RunningService` and re-exports `RunningService`,
+`RunningServiceAddress`, `ServiceApp`, `ServiceEnvironment`), workers root `./mod.ts` (exit 0).
+`PluginServiceContext` does not cascade because its fields are inline/`unknown`
+(`packages/plugin/src/sdk/runtime/plugin-service-context.ts`). `@netscript/plugin/service`
+(exit 1, 5: `ServiceBuilder`, `PluginContractMount`, `AnyRouter`) re-exports the full auth
+closure (its `mod.ts:52-80` comment says so, for this same rule) and deliberately leaves
+`ServiceBuilder` private — evidence of the same mechanism, not a waiver. The new facade names
+`ServiceAuthPolicy` (a union), `ServeOptions` and `RunningService` in its signature; their
+declarations reference the 15 names above. No Deno bug is implied.
+
+### Resolution evidence (`resolution-deno-info.json`)
+
+`deno info --json` for the new entrypoint: `@netscript/plugin/sdk`, `@netscript/service`,
+`@netscript/service/auth`, `@netscript/plugin/service` all resolve to `file:///…/packages/…`
+(workspace members); zero `jsr:@netscript` modules in the graph. All doc-lint/identity evidence
+is therefore workspace-source evidence. Published metadata (owned scratch `DENO_DIR`,
+`--no-config --no-lock`, no lock/cache writes in the repo; `published-*.json`):
+`jsr:@netscript/service@0.0.8` exports all 19 names (5 authorized + 14 closure;
+`PluginServiceContext` on `jsr:@netscript/plugin@0.0.8/sdk`); `/auth` exports the 11 auth-side
+names. Name presence only — identity with workspace source is not asserted; clean-consumer stays S7.
+
+### Public-consumer proof (clear-env children, `deno run --check --cached-only <full deny> -`, cwd plugin root)
+
+- `consumer-identity.check.txt` exit 0: cast-free `Equals<Facade.X, Native.X>` for the five
+  authorized names plus the factory signature and `WorkersServiceOptions` fields.
+- `consumer-identity-negative.check.txt` exit 1 `TS2322` (control: a wrong pair fails).
+- `consumer-recipe-guarded.check.txt`: type-check passed against the real
+  `createPluginServiceContext('workers', { getDatabaseClient, getKv: () => getKv() })`,
+  `createStaticCredentialAuthenticator`, `serve: { hostname, port: 0 }`; execution then stopped at
+  the first runtime import with `NotCapable: Requires env access` (deny bar; no product evaluation).
+- `consumer-recipe-public.check.txt`: type-check passed; execution stopped at the `declare const`
+  `ReferenceError`, as expected. Scratch sources: `.llm/tmp/u1-s2/consumer/*.ts`. A first attempt
+  with `deno check` on `.llm/tmp` files returned "No matching files found" (root `exclude`) — that
+  exit 0 is not proof; discarded for the stdin route (the negative control caught it).
+
+### Doc corrections applied (correction 2)
+
+`service.ts` JSDoc: `context` is read only for the legacy `context.env.PORT` seam and is not
+forwarded; the runtime resolves the native global `getKv()`; the factory never closes it.
+`mod.ts` `@module`: same statement; the guarded recipe now uses `import '@netscript/kv/redis'`,
+`getKv: () => getKv()` and the real constructors (type-checked above); the rejecting `getKv`
+resolver is gone. No code change.
+
+### Gates on the corrected shape (`doc-lint-authorized/`)
+
+S1 unchanged → `s2c-green-test.json` exit 0, **4 passed / 0 failed**, default sanitizers;
+`s2c-fmt.json` 22 files/0; `s2c-lint.json` 0; `s2c-check.json` (`--unstable-kv`) 0;
+`s2c-doc-lint-authorized-shape.json` **exit 1, 5 private-type-ref** (blocker). Locks/root config
+untouched (`git status`: only plugin `deno.json` modified among tracked product files).
+
+### Blocker returned to root (no commit)
+
+The exact authorized surface fails real doc-lint by 5 edges; the only green shape is the +15
+identity closure. Compatible-fix choices as I see them, none taken: (a) authorize the 15 named
+identity re-exports (all existing native names; `mod.ts` would carry 22 symbols vs the F-5 ≤20
+prose; `@netscript/plugin/service` is the closure-re-export precedent); (b) accept the 5 findings
+as the class the existing `@netscript/plugin/service` owner already carries (CI `public-doc-lint`
+covers only `packages/plugin/src/config|protocol`), recorded as debt; (c) change the facade
+signature (not authorized by the plan). Not done: commit, push, PR, S3, signoff.
+
+## S2 finish — authorized 22-symbol surface + function-level example (native lane, same session 78688d7e) — 2026-10-27
+
+Authority: root `implement-s2-finalization.md` after FULL READ of the independent Grok owner-debt
+PASS `plan-f5-debt-eval.md` (sha256 `849d68ec…cde9bf`, matches disk) and registry entry
+`WORKERS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261027` in `.llm/harness/debt/arch-debt.md`
+(read-only here; `e997aec5…` as found, root-authored uncommitted). It supersedes the five-only
+restriction ONLY for the 15 named identity re-exports. Numeric F-5 for `services/mod.ts` is
+**DEBT_ACCEPTED (22 > 20), never PASS**, target 2026-11-10, no growth. No other clause waived.
+HEAD still `7e35c45b6`; **source frozen dirty, no commit/push/PR/S3**.
+
+### Source (receipts/s2-final/owner-hashes.txt)
+
+- `plugins/workers/services/mod.ts` `67d44d87…904d`, 99 lines: current prose/recipe kept (no
+  wholesale restore of the sealed experiment); exports = own `startWorkersService`,
+  `WorkersServiceOptions`; `@netscript/plugin/sdk`: `PluginServiceContext`; `@netscript/service`:
+  `CorsOptions`, `RunningService`, `RunningServiceAddress`, `ServeOptions`, `ServiceApp`,
+  `ServiceEnvironment`, `ServiceTlsOptions`; `@netscript/service/auth`: `AuthenticatorPort`,
+  `AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`, `AuthzDecision`,
+  `AuthzOptions`, `AuthzRequest`, `Principal`, `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy`,
+  `ServicePublicAuthPolicy` — 22 total, `export type` identity only, no wildcard/alias/structure.
+  Comment names the registry ID.
+- `plugins/workers/services/src/service.ts` `bffb5f48…aa12`, 136 lines: executable statements
+  byte-identical to the corrected candidate (diff is JSDoc only); `startWorkersService` now
+  carries its own guarded `@example` (`import '@netscript/kv/redis'`, `getKv: () => getKv()`,
+  `createPluginServiceContext`, `createStaticCredentialAuthenticator`,
+  `serve: { hostname: '127.0.0.1', port: 0 }`, `running.addr.port`, `stop()`).
+- `service_test.ts` `c6ac1af8…07b18` unchanged (explicit `sanitizeResources: true` /
+  `sanitizeOps: true` at lines 64-65 and 113-114); `deno.json` `3dcfff5a…` unchanged since S2.
+
+### Gates (receipts/s2-final/, pinned Deno 2.9.7)
+
+- Public `./service` doc-lint: raw `deno doc --lint ./services/mod.ts` **exit 0**
+  (`doc-lint-public-service.{meta,stdout,stderr}.txt`); wrapper `doc-lint-public-service.json`
+  0 errors. Prior RED (`doc-lint-authorized/01-…` 5 refs) and 22-experiment receipts untouched.
+- Audit `public-symbol-audit.json` (from `deno doc --json`): 22 symbols, every one with a summary;
+  origins exactly `services/src/service.ts` (2), `packages/plugin/src/sdk/runtime/
+  plugin-service-context.ts` (1), `packages/service/src/types.ts` (7), `packages/service/src/auth/
+  types.ts` (7), `packages/service/src/auth/options.ts` (5). Single exported function
+  `startWorkersService`: summary, 2 `@param`, `@returns`, 1 `@example`. F-5 clauses: summaries ✔,
+  function `@param`/`@returns`/`@example` ✔, count ≤20 ✘ → DEBT_ACCEPTED; not a total F-5 PASS.
+- Full export map `doc-lint-full-export-map.json`: 2 `private-type-ref`, both from unchanged
+  `./contracts/v1/mod.ts` → `packages/plugin-workers-core/src/contracts/v1/
+  workers.contract-types.ts:64` (`WorkersContract→WorkersContractDefinition`) and `:91`
+  (`WorkersContractImplementer→implement`); exact text in
+  `doc-lint-contracts-v1-other-owner.txt`; same 2 as the S2 candidate run; `git status` shows that
+  owner and `packages/plugin-workers-core` untouched. Not fixed, not called PASS.
+- Public consumer (clear-env stdin children, `deno run --check --cached-only <full deny> -`, cwd
+  plugin root, `consumer-check.meta.txt`): `identity-22` exit 0 — cast-free `Equals` for all 20
+  native identities + factory signature; `identity-22-negative` exit 1 `TS2322`
+  (`AuthnOptions` vs `AuthzOptions`); `recipe-function-example` (verbatim function `@example`),
+  `recipe-guarded`, `recipe-public`: type-check passed, execution stopped at `NotCapable` /
+  `declare` `ReferenceError` — no runtime evaluation. `deno check -` does not read stdin (TS2307
+  on `-`, first attempt discarded). Resolution `resolution.txt`: workspace `file:///…/packages/…`,
+  0 `jsr:@netscript` modules.
+- Unchanged S1 suite: wrapper `green-test.json` exit 0 **4 passed / 0 failed**; raw
+  `green-test-raw.txt` `ok | 4 passed | 0 failed`; sanitizers explicit in source, no opt-out.
+- `fmt.json` 22 files/0; `lint.json` 0; `check.json` (`--unstable-kv`) 0 across
+  `plugins/workers/services`; `quality-scan-workers.json` ok, 0 findings, 1 pre-existing allowance,
+  0 allowance failures; `arch-check-workers.txt` FAIL=0 WARN=8 INFO=2, findings identical to S0.
+- `protected-hashes.txt`: root `deno.json` `b1ff8e07…`, 5 tracked framework `deno.lock`
+  (`f53f7a5d…`, `e03005b3…`, `adc12628…`, `18693dfe…`, `3ae6c0fe…` — not the EIS shipping set, EIS
+  untouched), legacy `main.ts` `bcca447d…`, README `890918e0…`, streams `deno.json`/`main.ts`,
+  `packages/plugin-workers-core`: all unchanged vs HEAD. Streams not touched or derived.
+
+### Remaining (not claimed)
+
+Root source acceptance → checkpoint authorization; S3 (TLS fixture approval + trusted-TLS in each
+test file, malformed/mixed/non-callable auth rows + negative type fixtures, principal/context
+identity, port 0/stop/rebind, legacy `main.ts` delegate, README; 480-line/12-path budget conflict
+still open); streams S4–S6; S7 publishability incl. `publish --dry-run`, clean-consumer against
+published surface, `scaffold.runtime`; IMPL-EVAL opposite-family; draft PR (GitHub MCP absent);
+production E2E UNRUN; debt target 2026-11-10 for the closure count.
+
+## Coordinator S2 checkpoint qualification and publication
+
+Root substantive acceptance is `root-s2-source-acceptance.md`; exact accepted source hashes and
+qualifications are preserved there. The canonical named numeric F5 debt is DEBT_ACCEPTED, not PASS;
+original independent PASS, numeric FAIL_PLAN and owner-debt PASS stay immutable. New raw/gate/session
+proof is retained byte-exact in `receipts/s2-evidence.json.gz` plus its audited257-file manifest;
+all original physical files remain. Source checkpoint publication is authorized, with actual
+commit/PR state recorded in the draft PR phase trail.
+
+Recipe checks establish static signature compatibility; subsequent runtime module evaluation was
+DENIED on an environment read through the host Redis adapter. They are not runnable-host or zero-
+evaluation proof. Full-map doc-lint remains FAIL2, and actual1582 baseline comparison is UNRUN in
+this lane (coordinator owns it separately). S7 must dispose those findings before publish readiness.
+No additional test execution was needed after the native actual4/0 wrapper and raw receipt.
+S3's full mandatory matrix and480-line cap remain, with allocation review before source changes;
+no test-budget waiver or dropped TLS/type/cleanup oracle has been accepted. Options-type example
+remains a complete-doc obligation. No whole U1, security, release or S16 acceptance is implied.

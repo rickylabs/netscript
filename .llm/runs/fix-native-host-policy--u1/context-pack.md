@@ -87,3 +87,38 @@ need). Rollback restores pre-change exposure, which is not a security-approved s
   `Unknown export './service' for '@netscript/plugin-workers'`; sanitizers active on all 4.
 - Open for root: projected final file ≈625–660 lines vs 480 budget after mandatory S3 oracles
   (worklog has the per-item estimate). S2 untouched.
+
+## S2 workers factory — 2026-10-27 (same session; HELD dirty, no commit)
+
+- `services/src/service.ts` (108 lines) + `services/mod.ts` (authorized 7-symbol shape) +
+  `deno.json` `./service` export: S1 unchanged 4/0 GREEN, fmt/lint/check 0, doctrine identical to
+  S0, quality scan ok. Lazy composition imports after the auth-first assertion + port resolution.
+- Blocker: real `deno doc --lint` on the exact authorized surface → 5 `private-type-ref`; minimal
+  green closure = +15 existing native identity re-exports (22 symbols). Root chooses the
+  compatible fix; receipts `receipts/s2/doc-lint-authorized/`.
+
+## S2 finish — 2026-10-27 (same session; FROZEN dirty, no commit)
+
+- Authorized 22-symbol `services/mod.ts` (`67d44d87…`) + function-level `@example` in `service.ts`
+  (`bffb5f48…`, code unchanged): public `./service` doc-lint 0, S1 4/0 with explicit sanitizers,
+  fmt/lint/check 0, quality ok, doctrine = S0, consumer identity 20/20 + negative control.
+  Numeric F-5 = DEBT_ACCEPTED (`WORKERS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261027`), not PASS.
+- Receipts `receipts/s2-final/`. Awaiting root source acceptance before any checkpoint; S3 open.
+
+## Coordinator S2 checkpoint qualification and publication
+
+Root substantive acceptance is `root-s2-source-acceptance.md`; exact accepted source hashes and
+qualifications are preserved there. The canonical named numeric F5 debt is DEBT_ACCEPTED, not PASS;
+original independent PASS, numeric FAIL_PLAN and owner-debt PASS stay immutable. New raw/gate/session
+proof is retained byte-exact in `receipts/s2-evidence.json.gz` plus its audited257-file manifest;
+all original physical files remain. Source checkpoint publication is authorized, with actual
+commit/PR state recorded in the draft PR phase trail.
+
+Recipe checks establish static signature compatibility; subsequent runtime module evaluation was
+DENIED on an environment read through the host Redis adapter. They are not runnable-host or zero-
+evaluation proof. Full-map doc-lint remains FAIL2, and actual1582 baseline comparison is UNRUN in
+this lane (coordinator owns it separately). S7 must dispose those findings before publish readiness.
+No additional test execution was needed after the native actual4/0 wrapper and raw receipt.
+S3's full mandatory matrix and480-line cap remain, with allocation review before source changes;
+no test-budget waiver or dropped TLS/type/cleanup oracle has been accepted. Options-type example
+remains a complete-doc obligation. No whole U1, security, release or S16 acceptance is implied.
