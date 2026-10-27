@@ -155,3 +155,20 @@ No additional test execution was needed after the native actual4/0 wrapper and r
 S3's full mandatory matrix and480-line cap remain, with allocation review before source changes;
 no test-budget waiver or dropped TLS/type/cleanup oracle has been accepted. Options-type example
 remains a complete-doc obligation. No whole U1, security, release or S16 acceptance is implied.
+## S3a fixture extraction — 2026-10-27 (native lane, same session 78688d7e)
+
+- Plan's single S1 test owner (`service_test.ts`, 364 lines) is split per root's S3 allocation:
+  reviewed helper regions (HEAD 18–30, 37–59, 213–364) now live once in
+  `services/src/service-test-fixture.ts` (204 lines, test-only, no product import, no test
+  registration); the owner keeps the four S1 cases byte-identical at 175 lines. Not a new
+  framework — relocation only.
+- One relocation-forced edit beyond `export`: `CHILD_OUTPUT_CAP: number` because root
+  `deno.json` `isolatedDeclarations: true` rejects an unannotated exported const (TS9010). No
+  cast, suppression, behavior or permission change.
+- Fixture 204 < 220 estimate and owner 175 < 178 estimate: the estimates counted separators the
+  move collapses; no golf, nothing dropped.
+- Prior S3 turn's ignored TLS/prototype material in `.llm/tmp/u1-s3/` is not product input and was
+  not copied; the conformance owner, delegate, docs and every other S3 oracle remain open.
+- Source frozen uncommitted pending root read of the diff and `receipts/s3a/`.
+
+Root reviewed/accepted exact S3a relocation after actual turn settlement. No cap waiver or conformance behavior:175/204lines,4oracles preserved. Header isolation/settlement overclaim qualified by root; numericF5 remainsDEBT_ACCEPTED and fullmap2baseline findings remain blockers. Newarchive preserves original blob mismatch plus independent8/8actualbyteproof.

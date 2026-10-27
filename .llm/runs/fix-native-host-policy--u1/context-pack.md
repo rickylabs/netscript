@@ -122,3 +122,19 @@ No additional test execution was needed after the native actual4/0 wrapper and r
 S3's full mandatory matrix and480-line cap remain, with allocation review before source changes;
 no test-budget waiver or dropped TLS/type/cleanup oracle has been accepted. Options-type example
 remains a complete-doc obligation. No whole U1, security, release or S16 acceptance is implied.
+## S3a fixture extraction — 2026-10-27 (same session; FROZEN dirty, no commit)
+
+- `services/src/service-test-fixture.ts` (NEW, 204 lines) exports exactly `CHILD_OUTPUT_CAP`
+  (`: number`, isolatedDeclarations), `ChildRun`, `createSandbox`; everything else from the moved
+  HEAD regions 18–30 / 37–59 / 213–364 stays private. `service_test.ts` is 175 lines: unchanged
+  four tests + `createDeniedAuthProbe` + one fixture import. Receipts: `receipts/s3a/`
+  (4/0 test, check/lint/fmt 0, equivalence diffs, owner/protected hashes, first-attempt TS9010).
+- Still open for S3: `service-conformance_test.ts` (all runtime/type/plain/TLS/identity/lifecycle
+  oracles), `main.ts` delegate, README/reference/options-type docs, PORT precedence, retained
+  suites, full gates. Ignored raw material from the timed-out S3 turn is under `.llm/tmp/u1-s3/`
+  (TLS generation script + receipt + handshake probe; real-factory prototype) — reference only,
+  not product code.
+
+## Coordinator accepted S3a checkpoint
+
+Root accepted only exact2-owner extraction in root-s3a-source-acceptance.md after actual256.414s/code0 turn;4/0tests and selected2type/lint/fmt clean. New59-file audited s3a-evidence bundle retains timeout/TLS/baseline/raw/byteguards; old S2bundle unchanged. No wholeS3 acceptance. Next proposed checkpoint is narrow runtime-invalid/compiler-type conformance only, not yet launched.

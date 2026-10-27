@@ -621,3 +621,91 @@ No additional test execution was needed after the native actual4/0 wrapper and r
 S3's full mandatory matrix and480-line cap remain, with allocation review before source changes;
 no test-budget waiver or dropped TLS/type/cleanup oracle has been accepted. Options-type example
 remains a complete-doc obligation. No whole U1, security, release or S16 acceptance is implied.
+## Root S3 scope and launch authorization
+
+Root approved exact two focused workers test owners and one900s SAME Fable implementation turn before source. See root-s3-scope-disposition.md and implement-s3-workers.md. S2 checkpoint65b340a7 is published in draftPR2421; no source acceptance for S3 is implied. Actual baseline doclint reproduction is evidence, not waiver. No commit until root review.
+
+## S3a fixture extraction — 2026-10-27 (native lane, same session 78688d7e; FROZEN dirty, no commit)
+
+Authority: root "S3a - exact reviewed fixture extraction ONLY". Two owners touched, nothing else.
+HEAD still `65b340a73905c840bd401469356f6282fb35f00f`. The prior S3 turn (ended 22:25:05Z,
+timed out, no tracked product edit) left ignored raw material under `.llm/tmp/u1-s3/` (offline
+PowerShell `CertificateRequest` CA + 127.0.0.1 IP-SAN leaf with receipt, a real trusted
+`Deno.serve`/`caCerts` handshake probe, and a clear-env real-factory prototype that used
+`as const`); none of it is product code, none was copied, and TLS/prototype work was out of this turn.
+
+### Source (receipts/s3a/owner-and-protected-hashes.txt)
+
+- `plugins/workers/services/src/service-test-fixture.ts` NEW, `a74d2486…3a102`, 204 lines
+  (cap 300; below the 220–260 estimate because it is the moved text plus a 13-line module doc, not
+  golfed). Body = HEAD `service_test.ts` lines 18–30 (bounded child constants), 37–59
+  (`ChildRun`/`ChildSpec`/`Sandbox`), 213–364 (`createSandbox`, `resolveDenoDir`, `runChild`,
+  `writeStdin`, `readCapped`, `describe`) moved once, verbatim. Only edits: `export` on the three
+  consumed symbols `CHILD_OUTPUT_CAP`, `ChildRun`, `createSandbox`, plus `: number` on
+  `CHILD_OUTPUT_CAP` because root `deno.json` sets `isolatedDeclarations: true` (TS9010/TS9027 on
+  the first attempt, kept in `receipts/s3a/first-attempt/`). No product import, no test
+  registration, no new behavior/permission/deadline/cap/cleanup change. `Sandbox`/`ChildSpec`/
+  `DENY_EVERYTHING`/`CHILD_DEADLINE_MS`/`SETTLE_GRACE_MS` stay module-private (not consumed by name).
+- `plugins/workers/services/src/service_test.ts` `c6ac1af8…07b18` → `789da15e…c08c`, 364 → 175
+  lines (estimate 178–210; the three regions plus their now-duplicate blank separator left, one
+  import line entered). Byte-identical otherwise: module doc, `PUBLIC_SUBPATH`/`PUBLIC_MODULE`/
+  `PLUGIN_ROOT`, the four error/reason constants, the four `Deno.test` cases with explicit
+  `sanitizeResources/Ops/Exit: true`, and `createDeniedAuthProbe` (stdin fixture string unchanged).
+  Proof: `receipts/s3a/equivalence-fixture-regions.diff` (3 `export` hunks only) and
+  `equivalence-test-owner.diff` (1 added import, 1 collapsed duplicate blank).
+- Untouched (hash == HEAD): `services/mod.ts` `67d44d87…`, `services/src/service.ts`
+  `bffb5f48…`, `services/src/main.ts` `bcca447d…`, `plugins/workers/deno.json` `3dcfff5a…`,
+  README `890918e0…`, `docs/site/reference/workers/index.md` `a523d688…`, streams
+  `deno.json`/`main.ts`, root `deno.json` `b1ff8e07…`, all seven tracked `deno.lock` files
+  (5 current + 2 historical run locks; `git diff --quiet HEAD` clean for each), `plan.md`,
+  `plan-eval.md`, `plan-f5-debt-eval.md` `849d68ec…`; `arch-debt.md` still `e997aec5…`
+  (root-authored, uncommitted, read-only here). `service-conformance_test.ts` NOT created.
+
+### Gates (receipts/s3a/, pinned Deno 2.9.7, structured wrappers)
+
+- `green-test.json` + `green-test-raw.txt`: `run-deno-test.ts -- --allow-all service_test.ts`
+  exit 0, **4 passed / 0 failed / 0 ignored**, the same four names; sanitizers explicit in source,
+  no opt-out/skip. `check.json` (`--file` both owners, `--deno-arg --unstable-kv`) 0;
+  `lint.json` 0; `fmt.json` 0 findings. `exit-codes.txt`: test 0 / check 0 / lint 0 / fmt 0.
+- `first-attempt/`: test exit 1 with 0 results (type-check failed before any test ran) and check
+  exit 1 TS9010+TS9027 on the unannotated exported constant — recorded, not hidden.
+- Not run (out of this turn by instruction): full workers suite, doc-lint, quality/doctrine scans,
+  consumer recipe checks, any TLS/listener/type-fixture oracle.
+
+### Remaining S3 obligations (unchanged, all still mandatory for later reviewed checkpoints)
+
+`service-conformance_test.ts` (runtime malformed/mixed/non-callable auth rows from owned ignored
+JS fixtures, separately failing compiler fixtures, real factory with typed minimal
+`PluginServiceContext` + clear-env owned KV path, 401/503, principal/authenticator/authorizer
+identity and effects, auth/cors/serve identity, plain HTTP + trusted HTTPS on 127.0.0.1 port 0 with
+inline PUBLIC TEST PEM, signal/idempotent stop/drain/rebind, second factory + global KV after
+stop); `main.ts` thin delegate with the exact legacy reason; README/reference/options-type docs;
+PORT precedence/legacy parity; retained workers suites; full gate set; F-5 22 stays DEBT_ACCEPTED;
+full-map doc-lint FAIL 2 stays the root-reproduced baseline. No self-signoff; root must read the
+actual diff and receipts before accepting this source checkpoint.
+
+## Coordinator S3a source checkpoint qualification
+
+The broad S3 turn actually ended22:25:05.243Z after900.042s with code1/timedOuttrue and NO tracked
+product edits or owning gates. Native compaction time and public offline TLS generation/trusted-
+versus-untrusted primitive are retained; neither is worker acceptance. Original raw/prototype
+assertions are not accepted product source. Its recorded7PID snapshot was absent afterward, with
+historical completeness unproven.
+
+Root then approved the focused SAME-session300s extraction. It completed22:31:57.686Z after256.414s,
+code0/failure-null/no-timeout, actual Fable5.1 and exactly netscript Connected; xhigh requested only.
+The exact2owner candidate is accepted only by root-s3a-source-acceptance.md. All4 original tests
+pass; selected2types/lint/fmt report0. Four test bodies/stdin source and sanitizers remain unchanged.
+The fixture header does not establish stronger isolation or infinite-child settlement guarantees;
+parent wait is bounded and unsettled child is RED withPID. Correct this prose in later S3 docs.
+
+Native Git-blob hash mismatches remain visible; no line-ending causation is inferred from clean
+Git alone. The independent ACTUALworking-byte before/after receipt proves8/8 rootconfig/sevenlocks
+unchanged (five current locks plus two historical run locks). Source/equivalence/raw receipts and
+baseline corrected/setup evidence are preserved in NEW s3a-evidence.json.gz, all original files
+retained and earlier S2 archive untouched. Root acceptance bytes are preserved without rewriting.
+
+Corrected baseline receipt physical paths are in the EIS coordinator .netscript/agent, while its
+source subprocess cwd was source-clean U2 at1582; prior U2 physical-path assertion was incorrect.
+Actual full-map2doc findings remain a publish blocker, not a waiver. No reference correction,
+conformance behavior, S3b, streams, release readiness, IMPL-EVAL or security acceptance is included.
