@@ -1979,3 +1979,4 @@ Generated from the coordinator's append-only event stream; newest last.
 - `2026-10-11T07:23:32Z` **merged** — leaf: X-1372-2; pr: 2283; main: 4050ea5; closes: ; via: conveyor
 - `2026-10-11T07:23:43Z` **merge.posted** — pr: 2283; url: https://github.com/rickylabs/netscript/issues/2103#issuecomment-6106643249
 - `2026-10-11T07:24:48Z` **status.posted** — url: https://github.com/rickylabs/netscript/issues/2103#issuecomment-6106651433
+- `2026-10-27T15:58:38Z` **record.frozen** — by: pr-backlog session (owner-approved 2026-10-27); lastCoordinatorEvent: 2026-10-11T07:24:48Z; cut: v0.0.8 via #2389 (main a833dfa8a, 2026-10-12T14:42Z); note: coordinator events after 2026-10-11T07:25Z, canaries .5–.10 and the stable cut are not in this record (see #2103 and the GitHub releases); open 0.0.8 leftovers move to the next-release plan
