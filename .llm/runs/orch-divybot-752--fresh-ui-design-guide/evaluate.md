@@ -156,3 +156,58 @@ Evaluator touched no product files (`git status` clean outside `.llm/`). Both Ro
 | Rationale | The delta fixes exactly the two low doc nits with wording verified true against `empty-state.tsx`, the `definePage` builder, and the server-validated-form guide; regenerated carriers are check-clean and the MCP suite stays green at 199/199. |
 
 VERDICT: PASS
+
+## Round 3 (post-#2407 rebase + navigation cross-references, same evaluator session)
+
+| Field | Value |
+| --- | --- |
+| Evaluated head | `e165232c503ff71e929e6ca0a5e25089b615836c` ("docs(web-layer): link the navigation.ts chrome model from the design guidance"), rebased onto `origin/main` incl. #2407 squash-merge `1582e1c` |
+| Delta | `e165232` on top of the rebased branch; product files: `agent-conventions.ts` (+`app-navigation` ref, Chrome/Look-and-feel text), `agent-conventions_test.ts`, `customize-fresh-ui.md` (App chrome section), `design-with-fresh-ui.md` (rule 3), `skills/netscript-build/SKILL.md`, + 3 regenerated carriers (`skills.generated.ts`, `agent-docs-prose.generated.ts`, `publish-assets.generated.ts`) |
+| Evaluator route (observed) | same session, Muse Spark (`meta/muse-spark-1.3`) via OpenCode/OpenRouter |
+
+### (1) Chrome bullet + Look and feel vs merged-main code — TRUE in every clause
+
+- `navigation.ts` at the app root next to `router.ts`: `write-app-files.ts:234-238` writes both `router.ts` and `navigation.ts` into `appDir`. Template (`navigation.ts.template:20-26,32`) exports `appNavigation` (href from `appRoutes`, label, `match: exact|prefix`) and `chromelessRoutePrefixes` (ships `[design]`).
+- Auto-link semantics: `planNavigationRegistration` (`app-navigation.ts:55`) links when `nav ?? !segment.includes('/')` — one-segment pages by default; `--nav [label:string]` (`add-ui-command.ts:73-75`) links a nested page with optional label; `--no-nav` maps to `nav: false` (`add-ui-input.ts:13-14`) and skips; `--nav`/`--no-nav` on non-page kinds errors (`add-ui-command.ts:106-108`). End-to-end test `add-ui-command_test.ts:123` proves `--nav <label>` links nested and `--no-nav` skips top-level.
+- Opt-out: `rendersAppChrome` false under `chromelessRoutePrefixes` (`navigation.ts.template:44-46`); current `_layout.tsx.template:4,15` renders chrome around every page except those prefixes; "/design gallery is the example" matches the shipped `[design]` prefix + own `SidebarShell` layout (`(design)/design/_layout.tsx.template:48,72`).
+- "Never copy a header…" retained; `_layout` owns chrome — matches the template's "App chrome for every page" header comment.
+- Backtick-path rule holds: 9/9 CLI tests pass; the only new backticked path `navigation.ts` is a declared ref resolving to a real scaffold file (`write-app-files.ts:238`); `/design/components` route map unchanged. Test exact lists + facts (`appNavigation`, `--no-nav`, `chromelessRoutePrefixes`, `navigation.ts` in WEB-LAYER.md) all pass.
+
+### (2) Docs sections — TRUE, including both cross-checks
+
+- Customize `## App chrome and navigation`: links (`appNavigation` href/label/match incl. `exact` vs `prefix`-keeps-current — template:3-14,21-25), new pages (`--nav`/`--nav <label>`/`--no-nav`), `ui:remove page` removing the link, opt-out via `chromelessRoutePrefixes`, `/design` SidebarShell exception, "fix `navigation.ts` or the layout", 0.0.8 allowlist note.
+- `ui:remove page` claim: `remove-ui-page.ts:104-115` reads `navigation.ts`, applies `removeNavigationEntry` (removes exactly the route's entry, `app-navigation.ts:114-124`), writes back only when changed. TRUE.
+- 0.0.8 allowlist note: `git show a833dfa:…/_layout.tsx.template` shows the `showScaffoldChrome` allowlist (home/dashboard/examples-prefix) with chromeless branch — the note is exactly right.
+- Design guide rule 3: same four facts compressed; `chromelessRoutePrefixes` opt-out named. TRUE.
+
+### (3) SKILL.md edits — accurate; `skills.generated.ts` fresh
+
+- `--nav` wording now "Pass `--nav` to link a nested page, `--nav <label>` to set the label" — matches `--nav [label:string]` optionality and the e2e test (fixes the #751-side nit noted in the worklog).
+- `Next:` lines claim: `add-ui-command.ts:147` prints `Next: ${step}` for `PAGE_FRAME_GUIDANCE` (chrome/navigation.ts/opt-out + tokens) plus nav next-steps — TRUE.
+- Rebrand line (`--ns-primary`/`--ns-primary-fg`, derived tints/borders/hovers/accent/ring in both themes) — TRUE per Round 1 Q1.
+- Marker claim: custom styles below the marker are preserved by the styles writer (`registry-styles.ts:50-54,115`) on any `ui:add` aggregator rewrite — the skill's "`ui:add` preserves" is the accurate generalization. `get_doc` slugs both in the embedded corpus (Round 1 Q3). Pre-existing 0.0.8-allowlist sentence retained and still true.
+- `deno task check:assets-barrel` exit 0 (fresh after commit).
+
+### (4) Carriers / MCP / docs gates — all green, re-run by evaluator
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| CLI slice tests (`agent-conventions_test.ts` + `public-command-tree_test.ts`, `--allow-all --unstable-kv`) | PASS | 9 passed, 0 failed |
+| `deno task check:assets-barrel` | PASS | exit 0 |
+| `deno task check:publish-assets` | PASS | exit 0 |
+| `deno task check:agent-docs-prose` | PASS | `"fresh":true`, exit 0 |
+| `deno task test` in `packages/mcp` | PASS | 199 passed, 0 failed |
+| `deno task docs:links` | PASS | 105 docs, 0 broken links/anchors |
+
+### Closes vs Refs #2406 — YES, `Closes #2406` is now justified
+
+#2406's four checkboxes sit under `## Suggested fixes` (summary + §§1–3 are problem statements; no `Acceptance`/`gate:` heading, no unchecked gate boxes — close-gate rule 12 has nothing to block on). Coverage: box 1 (chrome default + opt-out) by #2407's `navigation.ts`/`rendersAppChrome`/`--nav`/`--no-nav`; box 2 (theme chain + app-wide recipe) by this PR's derived tokens + both guides; box 3 (corpus + AGENTS.md/skills pointers) by the embedded corpus, `find_guidance` concepts, generated AGENTS.md/WEB-LAYER.md sections, and the skill slugs; box 4 (`generate routes` + `ui:remove page` in the skill) by SKILL.md lines 29-30 and the route-lifecycle section (still accurate: remove deletes triad + router registration + nav link + refreshes derived modules). The live PR body still says `Refs #2406` (verified via `gh pr view`) — the S5 note records the intent; the change is a one-line body edit with no code impact. (The body also still carries the spent "Merge order with #2407 / Whichever lands second…" bullet — now that #2407 merged first, delete it in the same body edit.)
+
+No new findings in the delta. No doctrine violations. No debt entries required. Evaluator touched no product files.
+
+| Field | Value |
+| --- | --- |
+| Verdict | `PASS` |
+| Rationale | The e165232 delta adds exactly the navigation specifics the Round 1 brief deferred: every new claim verified true against merged-main code (navigation.ts template, --nav/--no-nav wiring with e2e test, removeNavigationEntry, 0.0.8 allowlist, SKILL.md Next:/marker/slug claims); backtick-path rule holds (9/9 CLI tests); carriers fresh and all re-run gates green (assets-barrel, publish-assets, agent-docs-prose, MCP 199/199, docs:links); `Closes #2406` justified since all four Suggested-fixes boxes are covered across #2407 + this PR with no gate boxes outstanding. Remaining: one-line PR body edit (Refs→Closes + drop the spent merge-order bullet). |
+
+VERDICT: PASS

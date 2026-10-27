@@ -217,3 +217,15 @@ Slice review (supervisor): every component/prop/class named in the guide was che
 | `docs:links` / `docs:accuracy` / `docs:snippets` | PASS / PASS / PASS |
 | docs site build + `check:links` | PASS / PASS |
 | fmt / lint on changed TS (temp no-exclude config), SKILL.md fmt | PASS |
+
+## IMPL-EVAL round 3 (same session `ses_ea08ab886ffeD4MI4Ly0kKJlRJ`)
+
+- Delta re-steer on head `e165232` (fresh snapshot, `--estimated-cost-usd 1.5`, receipt `impl-eval-launch-r3.jsonl`).
+  The first launch failed preflight with `launcher-catalog-unavailable`: OpenCode 2 on PATH (see `drift.md` S5).
+  The relaunch used `OPENCODE_BIN` pointed at the V1 binary that holds the session.
+- **Verdict: PASS**, no new findings. Every navigation claim was verified against merged-main code (`navigation.ts.template`,
+  `--nav [label:string]` / `--no-nav` wiring and its e2e test, `removeNavigationEntry`, the 0.0.8 allowlist). The
+  backtick-path rule holds, carriers are fresh, and MCP is 199/199. `Closes #2406` is justified: all four Suggested-fixes boxes are covered by
+  #2407 plus this PR, with no gate boxes. Body edit done with the push, and the spent merge-order bullet replaced.
+- Before the push: `e2e-cli-gate` added so the postgres and sqlite runtime tiers run on the combined tree. The label goes on first,
+  so the cancelled label-event runs attach to the old head.
