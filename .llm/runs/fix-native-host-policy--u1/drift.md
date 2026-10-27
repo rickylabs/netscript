@@ -60,3 +60,32 @@ Actual PLAN PASS is preserved verbatim. Root authorizes the bounded implementati
   pending reviewed action (worklog S0), not a deferral to E1.
 - GitHub MCP is not available in this session (only `netscript` MCP tools are exposed); draft PR
   and per-slice PR comments are pending root/GitHub surface. Commits are local; remote branch absent.
+
+## Root correction of S1 evidence — 2026-10-27T20:09Z
+
+The preceding native-lane assertion that mixed/non-callable auth rows cannot be written cast-free
+is rejected: public JS runtime inputs and real negative type fixtures remain required S3. No
+test deferral/waiver is granted. Internal-module TS2307 with zero tests is preserved as the first
+result, not accepted public-subpath or sanitizer proof. Root requires the five corrections in
+`implement-s1-corrections.md` before S1 acceptance. SAME session, existing test owner only; no S2.
+
+## S1 corrections — 2026-10-27 (native lane, same session 78688d7e)
+
+- Correction accepted: mixed/non-callable runtime auth rows and negative compiler fixtures ARE
+  writable cast-free (plain runtime JS callers in a child module; negative type fixtures). The
+  earlier "cannot be written cast-free" claim is withdrawn; they stay mandatory S3 public boundary
+  tests. No waiver. S1 does not execute them.
+- `deno eval` ignores every `--deny-*` flag on pinned Deno 2.9.7 (permissions query `granted`
+  with `--deny-env --deny-read`; receipts `permission-primitives-eval.json`,
+  `permission-primitives-run-stdin.txt`). The S0 inert probe and the first S1 oracle therefore
+  denied nothing; neither is leak-clean or inertness proof. Corrected chain: `deno run <deny-*> -`
+  (module from stdin): static local/workspace imports load while read stays `denied`; runtime
+  read/env/listen raise `NotCapable`. Local dynamic `import()` also loads under `--deny-read` on
+  2.9.7 (recorded; the oracle uses static imports anyway).
+- Package name is `@netscript/plugin-workers`, not `@netscript/workers` as the plan prose implies;
+  the public subpath under test is `@netscript/plugin-workers/service` (resolution error before
+  S2: `Unknown export './service' for '@netscript/plugin-workers'`). Self-reference resolves from
+  inside the plugin root.
+- Baseline observation, not S1 scope: the legacy `@netscript/plugin-workers/services` subpath is
+  not inert under the full-deny bar (transitive npm `process.env` read at import → `NotCapable`).
+  Relevant to S2/S3 graph selection for the new module; not fixed, not relabelled.

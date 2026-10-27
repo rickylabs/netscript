@@ -65,3 +65,14 @@ need). Rollback restores pre-change exposure, which is not a security-approved s
   `./service.ts` — the new subpath, not legacy `./services`. Scoped fmt/lint green, scan 0 findings.
 - Next: root substantive review of S0/S1, then S2 workers factory GREEN (`service.ts`, `mod.ts`,
   `deno.json` export). Pending: draft PR (GitHub MCP unavailable here), TLS public fixture approval.
+
+## S1 corrections — 2026-10-27 (same native session; S1 still not signed off)
+
+- `service_test.ts` (393 lines) now targets the public `@netscript/plugin-workers/service` subpath
+  (typed import via `../mod.ts` + child `import.meta.resolve` assertion), uses `deno run <deny-*> -`
+  children (every capability incl. read denied; `deno eval` ignores `--deny-*`), bounded 10 s
+  watchdog on every child incl. `deno info`, owned positive/negative permission controls, and a
+  denied-child auth probe (env-control `NotCapable`, blank rows → native `TypeError`, valid row →
+  denied `PORT` read). RED: `TS2307 Cannot find module .../services/mod.ts`, zero tests executed.
+- Receipts: `receipts/s1-corrections/`. Missing/mixed/non-callable runtime rows + negative type
+  fixtures remain mandatory S3 (no waiver).

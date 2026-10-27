@@ -244,3 +244,68 @@ Pending (not claimed): S2 factory GREEN; S3 remaining oracles incl. live 401/503
 stop/drain, TLS (fixture approval above); draft partial PR + per-slice comments (GitHub MCP not
 exposed in this session — trail pending root); root substantive review of S0/S1 before S2;
 IMPL-EVAL separate-family session; production E2E remains UNRUN pending publish.
+
+## Root S1 review disposition — 2026-10-27T20:09Z
+
+Root reviewed the complete first candidate and has NOT signed off S1. The first TS2307 concerned
+the internal missing module and executed zero tests; sanitizers were not exercised. SAME native
+session78688d7e resumes through the existing suite with the bounded `implement-s1-corrections.md`
+brief: public export/import oracle, denied READ and permission controls, finite child lifecycle,
+actual pre-I/O auth evidence, and restoration of required S3 missing/mixed/non-callable runtime
+and negative type fixtures. The earlier claim that those rows are impossible cast-free is
+withdrawn. No S2 or broader product owner is authorized in this correction turn. Fresh four-PID
+snapshot20:09:12Z found all observed prior driver/native/MCP/conhost identities absent; historical
+cohort completeness remains unproven. Original raw/PLAN/evaluator bytes and first receipts remain.
+
+## S1 corrections — 2026-10-27 (native lane, same session)
+
+Identity: Claude Code session `78688d7e-3418-4dde-87c6-44df172768d5`, model exposed `claude-fable-5-1`,
+effort label `xhigh`; `NETSCRIPT_RUN_ID=fix-native-host-policy--u1-s1-corrections`; no subagent, no new
+session. Start HEAD `4009854e7`, branch `fix/native-host-policy`, Deno 2.9.7, task `DENO_DIR`
+`.llm/tmp/native-host-policy-preflight/cache`. MCP routing unchanged from S0/S1.
+
+Qualification primitives (ignored scratch `.llm/tmp/u1-s1c/`, copied as receipts):
+
+- `receipts/s1-corrections/permission-primitives-eval.json`: ten `deno eval <deny-*>` children,
+  cleared env + scratch roots + task cache + 10 s watchdog. Result: N1–N4 (dynamic import, runtime
+  read, env read, listen) all exit 0 silently — `deno eval` ignores `--deny-*`
+  (`Deno.permissions.querySync` reports `granted`). Finding recorded in drift.
+- `receipts/s1-corrections/permission-primitives-run-stdin.txt`: same operations via
+  `deno run <deny-*> -` (module from stdin): query `denied/denied`; P1 static local import loads with
+  read still `denied`; N2 runtime read → `NotCapable: Requires read access`; N3 env → `NotCapable:
+  Requires env access to "PORT"`; N4 listen → `NotCapable: Requires net access`; P2 self-reference
+  `@netscript/plugin-workers/services` resolves to `services/src/main.ts`; R1/R2 `./service` →
+  `Unknown export './service' for '@netscript/plugin-workers'` (intended RED); P4 static
+  `@netscript/service/auth` import exit 0 silent under full deny; B1 legacy `./services` subpath
+  fails the bar (`process.env` read at import) — baseline observation only.
+
+Corrected `plugins/workers/services/src/service_test.ts` (393 lines, +266/−53 vs HEAD; budget 480):
+
+1. Public contract: typed `startWorkersService` import from `../mod.ts` (public surface owner #4)
+   plus child `import '@netscript/plugin-workers/service'` with `import.meta.resolve` asserted equal
+   to `services/mod.ts`; intended RED preserved (no factory/export written).
+2. Bar: `--cached-only --deny-read --deny-env --deny-net --deny-write --deny-run --deny-sys --deny-ffi`
+   on `deno run -`; owned positive (static import + `read: denied`) and negative (runtime read, env,
+   listen → `NotCapable`) controls in the first test.
+3. Every child via `runBounded`: `spawn()` handle kept, piped stdout/stderr, stdin written then
+   closed, 10 s watchdog kills the child, timeout always rethrown as failure, `clearTimeout` in
+   `finally`, kill-on-error; covers the `deno info --json` metadata child too.
+4. Ordering: in-process typed rows (blank/whitespace reason → native `TypeError`, host untouched;
+   valid reason + unset PORT → legacy error per plan §4.4) plus a denied-child runtime caller:
+   `Deno.env.get('PORT')` control must be `NotCapable`; blank rows must be the native `TypeError`
+   (any env/KV/storage/listen touch before the assertion would surface as `NotCapable`); valid row
+   must stop at the denied `PORT` read (`Requires env access to "PORT", …`) and nothing else.
+5. Mixed/non-callable runtime rows + negative type fixtures: S3, mandatory, no waiver (drift).
+
+Gates (receipts `receipts/s1-corrections/`): `run-deno-fmt.ts` scoped → exit 0, 0 findings;
+`run-deno-lint.ts` scoped → exit 0, 0 occurrences; `scan-code-quality.ts --root plugins/workers
+--max-allow 7` → exit 0, findings [], 1 pre-existing allowance; `run-deno-test.ts -- --allow-env
+--allow-read --allow-write --allow-run --allow-net=127.0.0.1 --unstable-kv
+plugins/workers/services/src/service_test.ts` → exit 1, `TS2307 [ERROR]: Cannot find module
+'file:///…/plugins/workers/services/mod.ts'` at `service_test.ts:16:37`; **executed tests: 0 of 5**
+(type-check RED precedes execution; sanitizers declared, not exercised). First S1 RED (internal
+`src/service.ts`, zero tests) is preserved unchanged in commit `4009854e7` and `receipts/s0-s1/`.
+
+Footprint: product diff vs HEAD = `service_test.ts` only; root/plugin `deno.json` and all tracked
+`deno.lock` byte-identical to HEAD (`git diff --stat HEAD -- deno.json deno.lock plugins/` shows the
+test file only). Protected untracked state untouched. Not done: S2, push, PR, signoff.
