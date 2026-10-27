@@ -42,6 +42,7 @@ from its own `deno doc` surface.
 | `@netscript/plugin-workers/jobs/health-check.ts` | `./jobs/health-check.ts` | Health-check job definition and its context, handler, and result contracts. |
 | `@netscript/plugin-workers/runtime` | `./bin/runtime.ts` | Generated job-registry loading and registration plus worker, scheduler, and combined-process start helpers. |
 | `@netscript/plugin-workers/scaffold` | `./scaffold.ts` | Plugin scaffold entrypoint types, logger, context, and result contracts. |
+| `@netscript/plugin-workers/service` | `./services/mod.ts` | Inert caller-policy Workers API factory and its native policy/listener types. |
 | `@netscript/plugin-workers/services` | `./services/src/main.ts` | Workers API service entrypoint. |
 | `@netscript/plugin-workers/streams` | `./streams/mod.ts` | Browser-facing StreamDB factory and entity schemas. |
 | `@netscript/plugin-workers/streams/server` | `./streams/server.ts` | Server-side durable stream producer wiring. |

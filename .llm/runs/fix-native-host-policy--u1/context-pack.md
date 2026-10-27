@@ -152,3 +152,9 @@ This proves synthetic plainHTTPauth/principal and independent native listener/sh
 only. Prior6/1 permission RED, both authoringtimeouts and initialfmtRED stay innewS3carchive; original
 raws retained. No new permissions/productiondelta. TLS/signal/drain/legacy/streams/consumer/release/
 IMPL remain mandatory. Reference omission and trustedTLS get separate future root-reviewed briefs.
+## Root-accepted exact workers reference row
+
+root-reference-row-acceptance.md accepts one service-entry table row only. CanonicalWindowsdocs
+coverage is RED(all36separator-mismatchedpaths); normalizedcoverage/unmodifieddriftstagePASS is
+supportingonly. No checkeredit/baselinewaiver; LinuxdocsCIpending. Native118.520s/code0 completed
+sourcewithin180s. NextworkersTLSproposalremainsheld untilfreshhead/hashbinding/rootlaunch.

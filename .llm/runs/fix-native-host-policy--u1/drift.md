@@ -181,3 +181,6 @@ because registry stat usedrepo cwdoutsidescratchread. Exactownedruntimechdir rep
 withoutprivilegegrowth/fakeregistry; init/import+cleanup nowprotected withactualprimary-firsterrors.
 No productionpolicy change/newwaiver. Missing syntheticstream warning preserved. FullS3/TLS/legacy/
 streams/consumer/publish/IMPL stillopen; exactworkers22numericF5staysDEBT_ACCEPTED, no doc waiver.
+Exactreference row accepted separately. Windows canonical docs:exports-drift is STILLRED due36
+path-keyseparatorfailures beforedriftstage; normalizedscratchcomponentPASS isNOTcanonicalPASS.
+No checker/sourcepolicywaiver; rootexplicitlyholds checkerfix and requiresLinuxdocsCIqualification.

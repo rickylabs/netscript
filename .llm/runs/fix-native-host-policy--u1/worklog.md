@@ -788,3 +788,41 @@ Root authorizes one targetedcheckpoint/push/draft2421 update withNEWbyte-audited
 signal/inflightdrain/legacy/streams/11-jobconsumer/CEF/security/publication/fullU1 orIMPLacceptance.
 Exactworkers22F5remainsDEBT_ACCEPTED;2baselinefullmapdocerrors andmissingworkersreference remain
 blocking. Next tinyreference/trustedTLSbriefs are preparation-only, no modelturn authorized yet.
+Root FULLREAD referenceproposalab7eed0d and authorizes ONE SAME-session180s exact reference-row
+correction at40f17ff5 with canonical exports-drift/diff/unchanged guards. Exactly one existing doc
+owner; no other source, API, privilege, dependency or lock change. No commit before root actualrow/
+gate review. TLS remains held for separate fresh binding after referencecheckpoint; no TLS model.
+## Workers reference row — 2026-10-28 (native lane, same session 78688d7e; FROZEN dirty, no commit)
+
+Authority: root "Workers reference correction - exact root-authorized row". Base
+`40f17ff59398b90b47bb8d94ecaf76f50f8ec7d5`. One owner, one added line
+(`docs/site/reference/workers/index.md` +1/-0, `git diff --check` clean): the
+`@netscript/plugin-workers/service` → `./services/mod.ts` row inserted immediately before the
+unchanged plural `services` entry. No other document bytes, source, exports, locks, config, CI or
+tooling touched (`receipts/docs-reference-row/diff-and-protected.txt`).
+
+### Gate (receipts/docs-reference-row/)
+
+- `deno task docs:exports-drift` → **exit 1**, raw in `docs-exports-drift-raw.txt`. Not a drift
+  finding: on Windows `discoverReferencePagePaths` keys pages via `@std/path` `join`
+  (`docs\site\reference\...`), so the coverage pre-check reports all 36 pages — every untouched
+  page included — as "in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES" and exits
+  before `checkDrift` runs. Pre-existing checker platform defect in
+  `.llm/tools/docs/check-exports-drift.ts` (not edited; outside this owner) — root disposition.
+- `drift-stage-raw.txt`: read-only scratch (`.llm/tmp/u1-docs-row/drift-stage.ts`) importing the
+  same checker module, slash-normalizing the discovered keys, then running the unmodified
+  `checkDrift(AUTHORITATIVE_MAPPING)`: coverage PASS 36/36, **"Exports & Symbols drift check:
+  PASS", exit 0**; `plugin-workers` reported "All thirteen entrypoints were checked with deno doc"
+  with no workers drift error. This is supporting evidence, not the canonical task verdict.
+- Not run: production tests, doc-lint (full-map baseline FAIL 2 remains separately blocking),
+  `gen:mcp-export-corpus` (different owner, must not run), any TLS/source work.
+
+No self-signoff, commit, push or next phase; root reads the actual row and both raw outputs.
+
+Root read the exactrow/current canonicalWindows36pathfailure and supportingscratchdriftstage; accepts
+ONLY referencecheckpoint in root-reference-row-acceptance.md. Native118.520s/code0/no-timeout
+means authoring completed, NOT canonicalgatePASS. CanonicaltaskRED remains; normalizedcoverage+
+unmodifieddriftstagePASS is supportingonly. Sourcechecker unchanged/no edit allowed. LinuxdocsCI
+mustqualifynewcommit. Root authorizescheckpoint/push/honestdrafttrail. TLSheld forfreshbindingafter
+thischeckpoint; no TLSinference yet. Exactrowreversal restoresoriginaldocbytehash andall17other
+dispatchbindingsmatch;12observedPIDsfreshabsent(snapshotonly), no source edits inthisproof.
