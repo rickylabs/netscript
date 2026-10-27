@@ -211,3 +211,52 @@ No new findings in the delta. No doctrine violations. No debt entries required. 
 | Rationale | The e165232 delta adds exactly the navigation specifics the Round 1 brief deferred: every new claim verified true against merged-main code (navigation.ts template, --nav/--no-nav wiring with e2e test, removeNavigationEntry, 0.0.8 allowlist, SKILL.md Next:/marker/slug claims); backtick-path rule holds (9/9 CLI tests); carriers fresh and all re-run gates green (assets-barrel, publish-assets, agent-docs-prose, MCP 199/199, docs:links); `Closes #2406` justified since all four Suggested-fixes boxes are covered across #2407 + this PR with no gate boxes outstanding. Remaining: one-line PR body edit (Refs→Closes + drop the spent merge-order bullet). |
 
 VERDICT: PASS
+
+## Round 4 (CI runtime-tier regression + corpus guard, same evaluator session)
+
+| Field | Value |
+| --- | --- |
+| Evaluated head | `826339d52d1aad0e49ca19a17da9254fb10d5c0e` ("fix(docs): keep design-route paths out of the MCP corpus that apps bundle") |
+| Failing base | `af6041a` — CI run 40541710537, both scaffold runtime tiers red at `scaffold.design-production-exclusion`; main `1582e1c` green (run 40539973506) |
+| Delta | `826339d`: reworded sentence in `customize-fresh-ui.md`, new `DESIGN_ROUTE_EVIDENCE` guard in `generate-publish-assets_test.ts`, regenerated `publish-assets.generated.ts` + `agent-docs-prose.generated.ts`, caveats entry; rest is run-dir bookkeeping |
+| Evaluator route (observed) | same session, Muse Spark (`meta/muse-spark-1.3`) via OpenCode/OpenRouter |
+
+### (1) Root cause — CONFIRMED exactly as diagnosed
+
+- Import chain: `telemetry-trace.ts.template:2` imports `AspirePsDashboardReader, resolveTelemetryEndpoint` from `@netscript/mcp` (package root), so `publish-assets.generated.ts` (the `MCP_EMBEDDED_DOCS` carrier) bundles into the app server output (`_fresh-route___examples_telemetry_index.mjs` in the CI message).
+- Probe: `findDesignRouteEvidence` (`generated-quality-probes.ts:181-200`) walks `<app>/_fresh/` and flags any file whose path contains `routes/(design)/`, whose content contains `routes/(design)/` (`source-path:`), or contains `Composition rules — NetScript design system` (`route-marker:`) — constants at lines 45-46.
+- Counts: `1582e1c` carrier 0 occurrences of `routes/(design)/`; `af6041a` exactly 1 (the S2 sentence "…layout in `routes/(design)/design/_layout.tsx`"); HEAD 0. Marker count 0 on all three (the marker is a template title in `composition.tsx.template:8`, never docs prose).
+- So the single embedded string rode the telemetry bundle into `_fresh/` and tripped `source-path:`. The worklog's local-probe caveat (no telemetry route in `--no-aspire --db none` scaffolds; JSR-resolved mcp) correctly explains why this only failed in CI runtime tiers.
+
+### (2) Reworded sentence — still TRUE
+
+"`it has its own `SidebarShell` layout inside the `(design)` route group" (`customize-fresh-ui.md:185`): the layout file exists at `routes/(design)/design/_layout.tsx.template` and renders `SidebarShell` (3 hits). The `(design)` group naming is correct Fresh route-group vocabulary, and no `routes/(design)/` literal remains anywhere in the how-to guides (grep empty). The sentence loses the copy-pasteable path but keeps the correct location + component facts; agents needing the file still find it via the sibling "`routes/(design)/design/_layout.tsx`" references elsewhere in the docs corpus (out of the embedded set, probe-safe).
+
+### (3) Guard matches the probe exactly; negative control proven
+
+- `DESIGN_ROUTE_EVIDENCE = ['routes/(design)/', 'Composition rules — NetScript design system']` — byte-identical to the probe's `DESIGN_ROUTE_SOURCE_PATH` / `DESIGN_ROUTE_MARKER` (verified by direct comparison); the doc comment names their home file. The literal-instead-of-import choice is justified in the worklog (importing the probe pulls `packages/cli/e2e` under the root `isolatedDeclarations` config, TS9010).
+- Negative control: scratch worktree at `af6041a` (under `.llm/tmp`, removed afterwards) with HEAD's test file → `FAILED | 5 passed | 1 failed`, `AssertionError: pages/web-layer/how-to/customize-fresh-ui/index.md embeds "routes/(design)/"` — the exact stale-carrier failure, then green after regeneration.
+
+### Gates re-run on `826339d`
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| `deno test --no-lock -A .llm/tools/generate-publish-assets_test.ts` | PASS | 6 passed (incl. new guard); proven red on stale carrier |
+| `deno task check:publish-assets` | PASS | exit 0 |
+| `deno task check:agent-docs-prose` | PASS | `"fresh":true`, exit 0 |
+| `deno task test` in `packages/mcp` | PASS | 199 passed, 0 failed |
+
+### (4) Residual probe-trip risk — NONE found in this PR's scope
+
+- Full-carrier sweep on HEAD for probe-adjacent strings: only `(design)`, `_layout.tsx`, `chromeless`, `appNavigation`, `navigation.ts`, `--nav` remain in the two Fresh UI guides — none matches either evidence literal (`(design)` without the `routes/` prefix is probe-invisible; verified the probe checks the full `routes/(design)/` string).
+- Only `customize-fresh-ui` + `design-with-fresh-ui` are design-path-adjacent carrier docs; both swept clean.
+- Structural note (recorded in `caveats.md` S6 entry, correctly kept out of this PR): ~330 KB of embedded docs still ships in app server bundles via the telemetry root import — a narrow `@netscript/mcp` subpath export or lazy corpus import is the follow-up, filed not fixed. Any future embedded string matching the probe literals would re-trip the tiers; the new guard now fails the build before CI.
+
+No new findings blocking merge. No doctrine violations. No debt entries required. Evaluator touched no product files; scratch worktree removed (`git worktree list` shows only this worktree).
+
+| Field | Value |
+| --- | --- |
+| Verdict | `PASS` |
+| Rationale | Root cause confirmed end-to-end (telemetry root import → carrier in server bundle → single `routes/(design)/` string → probe `source-path:` failure; 0/1/0 counts across 1582e1c/af6041a/HEAD); reworded sentence true against the SidebarShell layout template; guard literals byte-identical to the probe constants with a proven red-on-stale/green-after negative control; all re-run gates green (guard tests 6/6, publish-assets, agent-docs-prose, MCP 199/199); residual sweep finds no other trippable string; the bundle-size follow-up is filed in caveats, not owed here. CI runtime tiers on the new head are the remaining proof, as the worklog states. |
+
+VERDICT: PASS

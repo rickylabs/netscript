@@ -255,3 +255,14 @@ Slice review (supervisor): every component/prop/class named in the guide was che
 | MCP `deno task test` | 199 passed |
 | `docs:links` | PASS |
 | fmt / lint on the changed test | PASS |
+
+## IMPL-EVAL round 4 (same session `ses_ea08ab886ffeD4MI4Ly0kKJlRJ`)
+
+- Delta re-steer on head `826339d` (fresh snapshot, V1 `OPENCODE_BIN`, receipt `impl-eval-launch-r4.jsonl`). At the
+  operator's direction ("fix it, and push"), `826339d` was pushed while this round ran.
+- **Verdict: PASS**, no findings.
+  - Root cause confirmed end to end: 0/1/0 carrier occurrences across `1582e1c`/`af6041a`/`826339d`.
+  - The reworded sentence is true.
+  - The guard literals are byte-identical to the probe constants. The evaluator's own negative control in a scratch
+    worktree at `af6041a` (removed afterwards) was red.
+  - The sweep found no other probe-trippable string. Gates: guard 6/6, `check:publish-assets`, `check:agent-docs-prose`, MCP 199/199.
