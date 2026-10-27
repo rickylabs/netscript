@@ -179,11 +179,10 @@ what makes the app look like one product.
   `exact`, or `prefix` to keep the link current on nested pages.
 - **New pages.** `netscript ui:add page <path>` links a one-segment page in the top bar for you.
   Pass `--nav` to link a nested page, `--nav <label>` to set the label, and `--no-nav` to skip the
-  link.
-  `netscript ui:remove page <path>` removes the link along with the page.
+  link. `netscript ui:remove page <path>` removes the link along with the page.
 - **Opting out.** A page that needs its own full-screen frame, such as a sign-in screen, adds its
   route prefix to `chromelessRoutePrefixes` in `navigation.ts`. The `/design` showcase is the
-  scaffold's example: it has its own `SidebarShell` layout in `routes/(design)/design/_layout.tsx`.
+  scaffold's example: it has its own `SidebarShell` layout inside the `(design)` route group.
 
 Keep the page view to its own content: one `<main>`, a `PageHeader`, then sections. Never copy a
 header, nav, or theme toggle into a page view to make it match the others. Duplicated chrome

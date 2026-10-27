@@ -229,3 +229,29 @@ Slice review (supervisor): every component/prop/class named in the guide was che
   #2407 plus this PR, with no gate boxes. Body edit done with the push, and the spent merge-order bullet replaced.
 - Before the push: `e2e-cli-gate` added so the postgres and sqlite runtime tiers run on the combined tree. The label goes on first,
   so the cancelled label-event runs attach to the old head.
+
+## S6 — runtime tiers red on `af6041a`: design-route evidence in the MCP corpus (2026-10-27)
+
+- With `e2e-cli-gate`, both runtime tiers failed at `scaffold.design-production-exclusion` (run 40541710537):
+  `production build contains developer design route output (source-path:server/_fresh-route___examples_telemetry_index.mjs)`.
+  Main `1582e1c` passes both tiers (run 40539973506), so the regression is this PR's.
+- Cause: the scaffold's telemetry example imports `@netscript/mcp` (`telemetry-trace.ts.template`), so the MCP
+  embedded-docs carrier ships in the app's production server bundle. S3 embedded `customize-fresh-ui`, whose S2
+  sentence named the `/design` layout by its path `routes/(design)/design/_layout.tsx`. The probe treats any
+  `routes/(design)/` string in `_fresh/` as a leaked design route. Main's carrier has 0 occurrences; this branch had 1.
+- Fix: the sentence now says the layout sits "inside the `(design)` route group". New guard in
+  `.llm/tools/generate-publish-assets_test.ts`: no embedded document may contain the probe's evidence strings.
+  Negative control: the guard failed on the stale carrier
+  (`pages/web-layer/how-to/customize-fresh-ui/index.md embeds "routes/(design)/"`) and passes after regeneration.
+- Importing the probe's constants into the root test pulled `packages/cli/e2e` under the root `isolatedDeclarations`
+  config (TS9010 on `ANY_PROBE_SOURCE`). The test keeps the two strings as literals, with a doc comment naming their home.
+- A local probe run was not faithful: a `--no-aspire --db none` scaffold has no telemetry route and resolves
+  `@netscript/mcp` from JSR 0.0.8. CI's runtime tiers on the new head are the proof.
+
+| Gate | Result |
+| --- | --- |
+| `generate-publish-assets_test.ts` | 6 passed (guard red before regen, green after) |
+| `check:publish-assets` / `check:agent-docs-prose` | PASS / PASS |
+| MCP `deno task test` | 199 passed |
+| `docs:links` | PASS |
+| fmt / lint on the changed test | PASS |

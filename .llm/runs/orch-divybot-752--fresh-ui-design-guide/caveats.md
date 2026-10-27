@@ -45,3 +45,10 @@ Collected during this run (theming/primitives/guidance side) and from sibling ha
     passes). Every MCP/offline-docs reader sees broken links on pages that use xref (e.g. `web-layer/fresh-ui` has 5).
 17. `{{ comp callout }}` bodies containing inline `<code>` render to agent Markdown as one fragment per text node
     (each `<code>` becomes its own quoted paragraph), which is hard for agents to read.
+
+## Found in S6 (2026-10-27)
+
+- **App server bundles carry the MCP docs corpus.** The scaffold's telemetry example imports the `@netscript/mcp`
+  root, so roughly 330 KB of embedded docs ship in `_fresh/server/_fresh-route___examples_telemetry_index.mjs`. Any
+  embedded doc text also becomes app build output: here it tripped the design-exclusion probe. A narrow subpath
+  export for the telemetry readers (or a lazy corpus import) would keep docs out of app bundles.
