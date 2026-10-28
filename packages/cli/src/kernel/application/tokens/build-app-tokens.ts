@@ -11,9 +11,10 @@ import {
   readTokenConfig,
   readTokenOverride,
   readTokenSources,
+  tokenOutputFile,
 } from './token-files.ts';
 
-/** Validate the entire build before replacing the five generated application assets. */
+/** Validate the entire build before replacing the declared generated application assets. */
 export async function buildAppTokens(
   input: {
     readonly root: string;
@@ -46,9 +47,9 @@ export async function buildAppTokens(
   const result = await tokenEngine.build({ preset, sources, override });
   for (const name of defaults.outputFiles) {
     if (typeof result.files[name] !== 'string') throw new Error(`Token engine omitted ${name}`);
-    appTokenPath(input.root, join(TOKEN_ASSET_DIR, name));
+    appTokenPath(input.root, tokenOutputFile(name));
   }
-  const files = defaults.outputFiles.map((name) => join(TOKEN_ASSET_DIR, name));
+  const files = defaults.outputFiles.map(tokenOutputFile);
   for (let index = 0; index < files.length; index++) {
     await fs.writeFile(
       appTokenPath(input.root, files[index]),

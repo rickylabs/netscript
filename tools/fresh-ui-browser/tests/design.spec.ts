@@ -61,6 +61,14 @@ for (const route of ROUTES) {
           utility ? 'compact' : 'comfortable',
         );
         if (utility) await expect(page.locator('html')).toHaveAttribute('data-flavor', 'utility');
+        const previewStyles = page.locator('link[rel="stylesheet"][href^="/presets/"]');
+        await expect(previewStyles).toHaveCount(utility ? 1 : 0);
+        if (utility) {
+          await expect(previewStyles).toHaveAttribute('href', '/presets/studio-utility.css');
+          const css = await page.request.get('/presets/studio-utility.css');
+          expect(css.status()).toBe(200);
+          expect(await css.text()).toContain('/* Preset studio-utility/light */');
+        }
         if (utility && testInfo.project.use.viewport?.width === 390) {
           const trigger = page.locator('button.ns-dashboard__mobile-trigger');
           await expect(trigger).toBeVisible();

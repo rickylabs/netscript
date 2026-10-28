@@ -1,42 +1,20 @@
 {
-  "state": "all implementation slices signed off; final IMPL-EVAL pending",
+  "state": "READY \u2014 final independent IMPL-EVAL PASS; sign-off commit/push follows",
   "historicalSourceIteration": "validation-source-stopped.json",
-  "parent": "adb1aa61792b7e174c78aa3cf03d54df6ea6ef13",
+  "parent": "5a5c1a42846bdde395b7fab5820cee716112129e",
   "packageTests": {
-    "rawReportSha256": "9e4e729b384c5d1aceec95ecf0ac98686bda756a21bdd91c3ba3b47bb1cce339",
+    "rawReportSha256": "66089de3ed87f2b56f912e5b96d48f099a1ee7fe2048384fa3253f8a3880af67",
     "summary": {
-      "passed": 209,
+      "passed": 210,
       "failed": 0,
       "ignored": 0,
-      "totalResults": 209,
-      "uniqueFailures": 0
-    },
-    "exitCode": 0
-  },
-  "cliFlowTests": {
-    "rawReportSha256": "941b13704674e3827180fa90f6ea47283a0a1fd125e2b068c62a44b101913328",
-    "summary": {
-      "passed": 14,
-      "failed": 0,
-      "ignored": 0,
-      "totalResults": 14,
-      "uniqueFailures": 0
-    },
-    "exitCode": 0
-  },
-  "cliTemplateTests": {
-    "rawReportSha256": "60d13c20e82b43929f024f39d828cb78282ff73fa0c6e34712fde967a206c023",
-    "summary": {
-      "passed": 29,
-      "failed": 0,
-      "ignored": 0,
-      "totalResults": 29,
+      "totalResults": 210,
       "uniqueFailures": 0
     },
     "exitCode": 0
   },
   "appTypecheck": {
-    "rawReportSha256": "e81e8cdfdae468e450f34f2c1db9edcec5caab2f0903630aa7f8c49f5677554a",
+    "rawReportSha256": "831ff01ec06cee07885242498d8c50bfc8e60a971e654a4d13d26a0560418773",
     "summary": {
       "totalOccurrences": 0,
       "uniqueOccurrences": 0,
@@ -57,17 +35,17 @@
   },
   "qualityGate": {
     "gateId": "quality-gate",
-    "gitHead": "adb1aa61792b7e174c78aa3cf03d54df6ea6ef13",
+    "gitHead": "5a5c1a42846bdde395b7fab5820cee716112129e",
     "outcome": "PASS",
     "exitCode": 0,
-    "rawReceiptSha256": "1d7ebfd403b4ebae6c5e4b1e87b00dc66e30a85fd834ea75da64777cae63189a"
+    "rawReceiptSha256": "093ae77399585eaaa94275fcdd4d4cab620587954b622ccd86e6f26830cc0377"
   },
   "tokenQualityGate": {
     "gateId": "fresh-ui-token-quality",
-    "gitHead": "adb1aa61792b7e174c78aa3cf03d54df6ea6ef13",
+    "gitHead": "5a5c1a42846bdde395b7fab5820cee716112129e",
     "outcome": "PASS",
     "exitCode": 0,
-    "rawReceiptSha256": "29f6c0fc675cda027df0db8fe5b4363a3ea4798cd86739c1772e2955b16c8a44"
+    "rawReceiptSha256": "36e359a95c444f6950f154c953e28e89b7f9ff07cbe3d9c48253a91c51e949d8"
   },
   "dtcg": {
     "result": "PASS",
@@ -76,7 +54,7 @@
     "presets": 18,
     "registeredRoles": 903,
     "styleDictionary": "5.7.1",
-    "outputs": 50
+    "outputs": 68
   },
   "contrast": {
     "result": "PASS_WITH_EXACT_SOURCE_EXCLUSIONS",
@@ -112,13 +90,18 @@
     "axeDelta": "axe-delta.md"
   },
   "cliScaffoldOverride": {
+    "proof": "cli-proof-final.json",
+    "generatedFiles": 23,
+    "coreFiles": 5,
+    "separatePreviewFiles": 18,
     "initExit": 0,
     "buildExit": 0,
     "rawSemanticExit": 1,
-    "existingAssetHashesPreserved": true,
+    "all23HashesPreserved": true,
     "cleanExit": 0,
-    "cleanRemovedOnlyKnownFive": true,
-    "rebuildExit": 0
+    "unknownStaticPreserved": true,
+    "rebuildExit": 0,
+    "registrySelectedCssExact": true
   },
   "publishing": {
     "cliDryRun": "PASS",
@@ -164,6 +147,47 @@
     "skipped": 0,
     "reason": "Aspire doctor exits1; Docker daemon unavailable, including cleanup inspection. Suite stops at preflight."
   },
-  "implementationEvaluation": "PENDING",
-  "ready": false
+  "implementationEvaluation": {
+    "verdict": "PASS",
+    "rounds": [
+      "FAIL_FIX",
+      "PASS"
+    ],
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "vendor": "Anthropic",
+    "readOnly": true,
+    "separateFromPlanAndImplementation": true
+  },
+  "ready": true,
+  "cliTests": {
+    "rawReportSha256": "8f1e7924e6efe8fd920495956845a6705835766b2eabca8080cb51460351c68d",
+    "summary": {
+      "passed": 37,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 37,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "cssBudget": {
+    "proof": "css-size-proof.json",
+    "nsOneContexts": 2,
+    "utilityContextsIncludingCompatibility": 4,
+    "nsOneByteBound": 200000,
+    "otherPresetByteBound": 400000,
+    "nsOneDeclarationBound": 4000,
+    "otherDeclarationBound": 7000
+  },
+  "cliTypecheck": {
+    "rawReportSha256": "4a622650b50af76603f727dfe4f7f554e17f5d5feb4fdb2a4e19ed62ed3d7212",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "exitCode": 0
+  }
 }

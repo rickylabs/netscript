@@ -6,6 +6,7 @@ import type {
   TokenValue,
 } from './token-contract.ts';
 import type { TokenSources } from './resolve-tokens.ts';
+import { TOKEN_PRESETS } from './token-presets.ts';
 
 /** One exported token, compatible with the design route's original manifest. */
 export interface ExportedToken {
@@ -61,11 +62,12 @@ export interface TokenBuildResult {
   readonly preset: TokenPreset;
 }
 
-/** Web files rebuilt inside a consuming application; other outputs serve the registry/Figma. */
-export const APP_TOKEN_FILES = [
+/** Five core web files plus opt-in preview styles; only the active CSS is loaded. */
+export const APP_TOKEN_FILES: readonly string[] = [
   'tokens.css',
   'theme-bridge.css',
   'tokens.json',
   'fonts.json',
   'theme-preset.json',
-] as const;
+  ...TOKEN_PRESETS.map((preset) => `presets/${preset.id}.css`),
+];

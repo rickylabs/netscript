@@ -245,14 +245,15 @@ netscript tokens build --app dashboard
 ```
 
 For a semantic override, edit `tokens/semantic.tokens.json` using aliases only,
-then rebuild. Source copies and `tokens.config.json` are app-owned; the five web
-assets are generated. See the [tokens command reference](/reference/cli/commands/#tokens-fresh-application-design-tokens)
+then rebuild. Source copies and `tokens.config.json` are app-owned; the five core web
+assets and 18 separate preset stylesheets are generated. See the [tokens command reference](/reference/cli/commands/#tokens-fresh-application-design-tokens)
 for precedence, validation and cleanup. Avoid hand-editing generated CSS/JSON.
 
 The development gallery can preview a generated preset without changing the app
 default: open `/design/tokens?preset=studio-utility`. The query is allowlisted
 against generated metadata and applies only under `/design/`; every request gets
-its own view model. Ramps come from the token output. Ordinary app routes retain
+its own view model. The shell links only that preview preset stylesheet; ordinary
+app CSS contains only the configured preset and NS One compatibility. Ramps come from the token output. Ordinary app routes retain
 the configured preset.
 
 ### Migrate existing app-owned copies

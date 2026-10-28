@@ -14,6 +14,7 @@ const OUTPUTS = [
   'tokens.json',
   'fonts.json',
   'theme-preset.json',
+  'presets/studio-utility.css',
 ];
 
 async function fixture() {
@@ -76,7 +77,7 @@ Deno.test('tokens build reads initialized sources and applies explicit override 
     preset: 'studio-utility',
     override: 'custom.tokens.json',
   }, dependencies);
-  assertEquals(result.files.length, 5);
+  assertEquals(result.files.length, 6);
   assertEquals(dependencies.calls[0], {
     preset: 'studio-utility',
     sources: {
@@ -139,10 +140,14 @@ Deno.test('tokens clean removes known files and retains all app-owned files', as
   await buildAppTokens({ root: ROOT }, dependencies);
   await dependencies.fs.writeFile(`${ROOT}/assets/styles.css`, 'app stylesheet');
   await dependencies.fs.writeFile(`${ROOT}/assets/unrelated.json`, 'app data');
-  assertEquals((await cleanAppTokens(ROOT, dependencies)).length, 5);
+  await dependencies.fs.writeFile(`${ROOT}/static/owned.css`, 'app-owned static');
+  assertEquals(await dependencies.fs.exists(`${ROOT}/static/presets/studio-utility.css`), true);
+  assertEquals((await cleanAppTokens(ROOT, dependencies)).length, 6);
   assertEquals(await cleanAppTokens(ROOT, dependencies), []);
   assertEquals(await dependencies.fs.readFile(`${ROOT}/assets/styles.css`), 'app stylesheet');
   assertEquals(await dependencies.fs.readFile(`${ROOT}/assets/unrelated.json`), 'app data');
+  assertEquals(await dependencies.fs.readFile(`${ROOT}/static/owned.css`), 'app-owned static');
+  assertEquals(await dependencies.fs.exists(`${ROOT}/static/presets/studio-utility.css`), false);
   assertStringIncludes(
     await dependencies.fs.readFile(`${ROOT}/${TOKEN_CONFIG_FILE}`),
     'sourceRoot',

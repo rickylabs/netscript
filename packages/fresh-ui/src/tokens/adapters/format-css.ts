@@ -35,48 +35,46 @@ function declarations(tokens: Readonly<Record<string, BuiltToken>>, modern?: Mod
   ).join('\n');
 }
 
-/** Modern language attributes coexist with the complete legacy NS One selector. */
+/** Ship only the configured preset and the NS One compatibility contexts. */
 export function formatTokensCss(
   contexts: readonly TokenContextOutput[],
   defaultPreset: string,
 ): string {
   const unique = effectiveContexts(contexts);
-  const selected = unique.find((context) =>
-    context.preset.id === defaultPreset && context.scheme === 'light'
-  )!;
+  // Compatibility follows configured defaults so legacy selectors beat :root on a tie.
+  const selected = [
+    ...unique.filter((context) => context.preset.id === defaultPreset),
+    ...unique.filter((context) => defaultPreset !== 'ns-one' && context.preset.id === 'ns-one'),
+  ];
   const blocks = [
     '/* Generated through Style Dictionary 5.7.1; edit DTCG sources or semantic app overrides. */',
     legacy.css.trimEnd(),
-    `:root {\n${declarations(selected.tokens)}\n}`,
   ];
-  const modernSelectors: { selector: string; tokens: Readonly<Record<string, BuiltToken>> }[] = [
-    { selector: ':root', tokens: selected.tokens },
-  ];
-  for (const context of unique) {
+  const modernSelectors: { selector: string; tokens: Readonly<Record<string, BuiltToken>> }[] = [];
+  for (const context of selected) {
     const { language, flavor } = context.preset;
     const scheme = context.scheme === 'dark'
       ? "[data-scheme='dark']"
       : ":not([data-scheme='dark'])";
     const base = `[data-theme='${language}']${flavor ? `[data-flavor='${flavor}']` : ''}`;
     const selectors = [`${base}${scheme}`];
+    if (context.preset.id === defaultPreset && context.scheme === 'light') {
+      selectors.unshift(':root');
+    }
     if (context.preset.id === 'studio-utility') {
       selectors.push(`[data-theme='studio']:not([data-flavor])${scheme}`);
     }
-    if (context.preset.id === 'ns-one' && context.scheme === 'dark') {
-      selectors.push("[data-scheme='dark']:not([data-theme])");
+    if (context.preset.id === 'ns-one') {
+      selectors.push(`[data-theme='${context.scheme}']`);
+      if (context.scheme === 'dark') selectors.push("[data-scheme='dark']:not([data-theme])");
     }
     blocks.push(
-      `${selectors.join(',\n')} {\n  color-scheme: ${context.scheme};\n${
-        declarations(context.tokens)
-      }\n}`,
+      `/* Preset ${context.preset.id}/${context.scheme} */\n${
+        selectors.join(',\n')
+      } {\n  color-scheme: ${context.scheme};\n${declarations(context.tokens)}\n}`,
     );
     modernSelectors.push({ selector: selectors.join(',\n'), tokens: context.tokens });
   }
-  const dark = unique.find((context) =>
-    context.preset.id === 'ns-one' && context.scheme === 'dark'
-  )!;
-  blocks.push(`[data-theme='dark'] {\n  color-scheme: dark;\n${declarations(dark.tokens)}\n}`);
-  modernSelectors.push({ selector: "[data-theme='dark']", tokens: dark.tokens });
   for (
     const [kind, condition] of [
       ['oklch', '(color: oklch(50% 0.1 120))'],

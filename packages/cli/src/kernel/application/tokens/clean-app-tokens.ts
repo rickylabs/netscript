@@ -1,6 +1,9 @@
-import { join } from '@std/path';
-import { TOKEN_ASSET_DIR } from '../../domain/tokens/token-config.ts';
-import { type AppTokenDependencies, appTokenPath, assertTokenApp } from './token-files.ts';
+import {
+  type AppTokenDependencies,
+  appTokenPath,
+  assertTokenApp,
+  tokenOutputFile,
+} from './token-files.ts';
 
 /** Remove only known generated files, retaining app CSS, configuration and all sources. */
 export async function cleanAppTokens(
@@ -12,7 +15,7 @@ export async function cleanAppTokens(
   const defaults = await tokenEngine.defaults();
   const removed: string[] = [];
   for (const name of defaults.outputFiles) {
-    const file = join(TOKEN_ASSET_DIR, name);
+    const file = tokenOutputFile(name);
     const path = appTokenPath(root, file);
     if (await fs.exists(path)) {
       if (!(await fs.stat(path)).isFile) {

@@ -1,5 +1,6 @@
 import type { RegistryItemDefinition, RegistryManifest } from './registry.schema.ts';
 import generatedThemes from './registry/theme/theme-items.json' with { type: 'json' };
+import { APP_TOKEN_FILES } from './src/tokens/domain/token-output.ts';
 import { FRESH_UI_PACKAGE_VERSION } from './src/package-metadata.generated.ts';
 
 /**
@@ -164,6 +165,10 @@ export const freshUiRegistryManifest: RegistryManifest = {
         { source: 'registry/theme/tokens.json', target: '@assets/tokens.json' },
         { source: 'registry/theme/fonts.json', target: '@assets/fonts.json' },
         { source: 'registry/theme/theme-preset.json', target: '@assets/theme-preset.json' },
+        ...APP_TOKEN_FILES.filter((file) => file.startsWith('presets/')).map((file) => ({
+          source: `registry/theme/${file}`,
+          target: `static/${file}`,
+        })),
       ],
       registryDependencies: ['cn', 'public-types'],
       cssVars: {

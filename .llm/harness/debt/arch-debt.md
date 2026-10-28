@@ -2932,7 +2932,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## packages/fresh-ui — TOKEN-EXPORT-DIRECTORY-CARDINALITY
 
 - **ID:** `TOKEN-EXPORT-DIRECTORY-CARDINALITY`
-- **Reason:** S1 exports 18 preset configurations and 26 Figma index/collection files in the
+- **Reason:** S1 exports 18 preset configurations, 18 separate preset CSS files and 26 Figma index/collection files in the
   `registry/theme/presets/` and `registry/theme/figma/` directories. Their flat export names exceed
   the generic F-16 directory-child advisory cap. Existing root cardinality also grows by one
   documented public token entrypoint.

@@ -1,8 +1,11 @@
 import { isAbsolute, join, relative, resolve } from '@std/path';
 import type { TokenDocument, TokenResolver, TokenSources } from '@netscript/fresh-ui/tokens';
 import {
+  TOKEN_ASSET_DIR,
   TOKEN_CONFIG_FILE,
+  TOKEN_PREVIEW_PREFIX,
   TOKEN_RESOLVER_FILE,
+  TOKEN_STATIC_DIR,
   TokenConfigSchema,
 } from '../../domain/tokens/token-config.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
@@ -12,6 +15,11 @@ import type { TokenEnginePort } from '../../ports/token-engine-port.ts';
 export interface AppTokenDependencies {
   readonly fs: FileSystemPort;
   readonly tokenEngine: TokenEnginePort;
+}
+
+/** Preview CSS uses Fresh static files; core artifacts remain app imports. */
+export function tokenOutputFile(name: string): string {
+  return join(name.startsWith(TOKEN_PREVIEW_PREFIX) ? TOKEN_STATIC_DIR : TOKEN_ASSET_DIR, name);
 }
 
 /** Bound configurable input paths to the selected application. */

@@ -1,5 +1,5 @@
 import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from '@std/assert';
-import { buildTokens, defaultTokenSources } from '../../tokens.ts';
+import { APP_TOKEN_FILES, buildTokens, defaultTokenSources, TOKEN_PRESETS } from '../../tokens.ts';
 import type {
   DesignToken,
   TokenBuildResult,
@@ -19,10 +19,49 @@ import { defaultContrastCoverage } from '../../src/tokens/adapters/default-token
 let cached: Promise<TokenBuildResult> | undefined;
 const built = () => cached ??= buildTokens();
 
+Deno.test('app CSS contains only its preset and NS One compatibility with bounded size', async () => {
+  const build = await built();
+  assertEquals(APP_TOKEN_FILES.length, 23);
+  const ns = build.files['tokens.css'];
+  const themes = (css: string) =>
+    [...new Set([...css.matchAll(/data-theme='([^']+)'/g)].map((match) => match[1]))].sort();
+  const contexts = (css: string) => [...css.matchAll(/\/\* Preset [^*]+\*\//g)].length;
+  const declarations = (css: string) => [...css.matchAll(/--ns-[a-z0-9-]+:/g)].length;
+  assertEquals(themes(ns), ['dark', 'light', 'ns-one']);
+  assertEquals(contexts(ns), 2);
+  assertEquals(declarations(ns) < 4000, true);
+  assertEquals(new TextEncoder().encode(ns).length < 200_000, true);
+  for (const preset of TOKEN_PRESETS) {
+    const css = build.files[`presets/${preset.id}.css`];
+    assertEquals(contexts(css), preset.id === 'ns-one' ? 2 : 4);
+    assertEquals(declarations(css) < 7000, true, preset.id);
+    assertEquals(new TextEncoder().encode(css).length < 400_000, true, preset.id);
+  }
+  const utility = build.files['presets/studio-utility.css'];
+  assertEquals(themes(utility), ['dark', 'light', 'ns-one', 'studio']);
+  assertEquals([
+    ...new Set([...utility.matchAll(/data-flavor='([^']+)'/g)].map((match) => match[1])),
+  ], ['utility']);
+  const selected = await buildTokens({ preset: 'studio-utility' });
+  assertEquals(selected.files['tokens.css'], utility);
+  const items = JSON.parse(build.files['theme-items.json']);
+  for (const preset of TOKEN_PRESETS) {
+    const item = items.find((entry: { name: string }) => entry.name === `theme-${preset.id}`);
+    assertEquals(
+      new Set(item.files.map((file: { source: string }) => file.source)).size,
+      item.files.length,
+    );
+    assertEquals(
+      item.files.find((file: { target: string }) => file.target === '@assets/tokens.css').source,
+      `registry/theme/presets/${preset.id}.css`,
+    );
+  }
+});
+
 Deno.test('SD formats cover all requested inputs and retain every legacy declaration', async () => {
   const build = await built();
   assertEquals(build.contexts.length, 72);
-  assertEquals(Object.keys(build.files).length, 50);
+  assertEquals(Object.keys(build.files).length, 68);
   assertStringIncludes(build.files['tokens.css'], legacy.css.trim());
   assertStringIncludes(build.files['theme-bridge.css'], legacy.bridge.trim());
   const fallbackCss = build.files['tokens.css'].split('@supports')[0].replace(

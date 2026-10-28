@@ -113,6 +113,9 @@ export async function buildTokens(options: TokenBuildOptions = {}): Promise<Toke
     const name = `netscript/preset/${context.preset.id}`;
     formats[name] = () => json(presetConfiguration(context));
     files.push({ destination: `presets/${context.preset.id}.json`, format: name });
+    const css = `netscript/css/${context.preset.id}`;
+    formats[css] = () => formatTokensCss(contexts, context.preset.id);
+    files.push({ destination: `presets/${context.preset.id}.css`, format: css });
     const figma = `netscript/figma/${context.preset.id}`;
     formats[figma] = () => json(formatFigmaPreset(contexts, context.preset.id));
     files.push({ destination: `figma/${context.preset.id}.json`, format: figma });

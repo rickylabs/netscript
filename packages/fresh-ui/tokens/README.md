@@ -3,7 +3,7 @@
 The canonical inputs live under `v2/`. `deno task tokens:build` uses the public
 `@netscript/fresh-ui/tokens` builder and Style Dictionary 5.7.1 formats to build
 all 72 scheme × preset × requested-density inputs. `tokens:check` compares all
-50 generated outputs without writing or repairing them. `tokens:validate` checks
+68 generated outputs without writing or repairing them. `tokens:validate` checks
 source freshness, official schemas, aliases, registered names and contrast. The
 CLI and route migration are the remaining S1 slices; the draft PR is not READY.
 
@@ -150,7 +150,7 @@ require explicit `--force`. Edit the final alias layer, for example:
 }
 ```
 
-Build validates all contexts before writing the five web assets. The public
+Build validates all contexts before writing five core web assets plus 18 optional preview styles. The public
 builder owns DTCG, alias, reference, type and name validation. CLI application
 logic uses the existing filesystem port; its lazy engine adapter imports this
 package's public `tokens` entrypoint only for token commands. Clean retains app
@@ -166,3 +166,17 @@ preference key. The legacy light/dark data-theme selectors remain supported.
 See docs/site/web-layer/how-to/customize-fresh-ui.md for merging this into an
 existing app-owned shell and registry copies. NS One remains the default;
 `/design/tokens?preset=studio-utility` previews Utility in development only.
+
+
+## CSS loading budget
+
+Every app stylesheet contains its configured light/dark preset and NS One
+compatibility only (two effective contexts for NS One, four for another preset).
+The build also emits `presets/<id>.css` for all 18 presets. A theme registry item
+installs its own CSS as assets/tokens.css. The18 separate preview files live under
+static/presets; the development shell links one only when an allowlisted design
+preview differs from the configured preset. Normal app pages load no preview CSS.
+All 72 inputs still build, and all 68 outputs participate in read-only freshness.
+The CLI manages 23 files (five core plus 18 optional CSS assets), and clean retains
+all settings, source files and app styles. CI bounds app contexts/declarations and
+bytes so unrelated preset CSS cannot return to the default stylesheet.

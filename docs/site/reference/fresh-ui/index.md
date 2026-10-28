@@ -419,7 +419,7 @@ type mismatches, raw semantic values and reference cycles fail before output is 
 | --- | --- | --- |
 | `buildTokens` | async function | Builds all contexts and returns deterministic CSS, bridge, JSON, fonts, registry and Figma output bytes. Accepts optional preset, semantic override and caller-owned sources. |
 | `defaultTokenSources` | function | Returns the bundled resolver and DTCG source documents. Clone before editing caller-owned inputs. |
-| `APP_TOKEN_FILES` | const tuple | The five generated web files copied into an application: tokens.css, theme-bridge.css, tokens.json, fonts.json and theme-preset.json. |
+| `APP_TOKEN_FILES` | readonly string[] | The 23 generated app assets: five core files (tokens.css, theme-bridge.css, tokens.json, fonts.json, theme-preset.json) plus 18 separate opt-in preset stylesheets, copied to the app static/presets directory. |
 | `TOKEN_PRESETS` | const array | The registered language presets and their fixed Figma modes, density and optional Studio flavor. |
 | `TOKEN_SCHEMES` | const tuple | Supported scheme contexts: light and dark. |
 | `TOKEN_DENSITIES` | const tuple | Supported density contexts: comfortable and compact. |

@@ -5,7 +5,7 @@ const THEME_INIT_SCRIPT =
   `(function(){var t;try{t=localStorage.getItem('ns-theme')}catch(e){}if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}document.documentElement.setAttribute('data-scheme',t)})()`;
 
 export default define.page(function AppShell({ Component, url }) {
-  const { preset, fontImports } = appTheme(url);
+  const { preset, fontImports, previewStylesheet } = appTheme(url);
   return (
     <html
       lang='en'
@@ -26,6 +26,7 @@ export default define.page(function AppShell({ Component, url }) {
         <link rel='preconnect' href='https://fonts.googleapis.com' />
         <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
         {fontImports.map((href) => <link key={href} href={href} rel='stylesheet' />)}
+        {previewStylesheet && <link href={previewStylesheet} rel='stylesheet' />}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body f-client-nav>

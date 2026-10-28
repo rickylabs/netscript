@@ -1,7 +1,11 @@
 import legacy from '../../../tokens/legacy.json' with { type: 'json' };
 import fontRequests from '../../../tokens/font-requests.json' with { type: 'json' };
 import type { RegistryItemDefinition } from '../../../registry.schema.ts';
-import type { ExportedToken, TokenContextOutput } from '../domain/token-output.ts';
+import {
+  APP_TOKEN_FILES,
+  type ExportedToken,
+  type TokenContextOutput,
+} from '../domain/token-output.ts';
 import { effectiveContexts } from './format-css.ts';
 
 /** Serialize without the build-only resolved DTCG composites. */
@@ -155,9 +159,17 @@ export function formatThemeItems(
     registryDependencies: ['cn', 'public-types'],
     files: [
       { source: 'registry/theme/styles.css', target: '@assets/styles.css' },
-      ...['tokens.css', 'theme-bridge.css', 'tokens.json', 'fonts.json'].map((file) => ({
+      ...['theme-bridge.css', 'tokens.json', 'fonts.json'].map((file) => ({
         source: `registry/theme/${file}`,
         target: `@assets/${file}`,
+      })),
+      { source: `registry/theme/presets/${context.preset.id}.css`, target: '@assets/tokens.css' },
+      // A registry source has one target; the configured CSS is already installed as tokens.css.
+      ...APP_TOKEN_FILES.filter((file) =>
+        file.startsWith('presets/') && file !== `presets/${context.preset.id}.css`
+      ).map((file) => ({
+        source: `registry/theme/${file}`,
+        target: `static/${file}`,
       })),
       {
         source: `registry/theme/presets/${context.preset.id}.json`,

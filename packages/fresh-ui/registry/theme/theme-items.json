@@ -20,10 +20,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -34,6 +30,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/ns-one.json",
@@ -72,10 +140,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -86,6 +150,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/studio-utility.json",
@@ -124,10 +260,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -138,6 +270,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/studio-cloud.json",
@@ -176,10 +380,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -190,6 +390,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/studio-workshop.json",
@@ -228,10 +500,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -242,6 +510,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/studio-playful.json",
@@ -280,10 +620,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -294,6 +630,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/studio-ledger.json",
@@ -332,10 +740,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -346,6 +750,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/studio-atelier.json",
@@ -384,10 +860,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -398,6 +870,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/studio-signal.json",
@@ -436,10 +980,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -450,6 +990,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/tonal.json",
@@ -488,10 +1100,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -502,6 +1110,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/bloom.json",
@@ -540,10 +1220,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -554,6 +1230,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/cupertino.json",
@@ -592,10 +1340,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -606,6 +1350,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/liquid.json",
@@ -644,10 +1460,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -658,6 +1470,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/fluent.json",
@@ -696,10 +1580,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -710,6 +1590,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/brutal.json",
@@ -748,10 +1700,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -762,6 +1710,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/filigrane.json",
@@ -800,10 +1820,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -814,6 +1830,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/terminal.json",
@@ -852,10 +1940,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -866,6 +1950,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "static/presets/tactile.css"
       },
       {
         "source": "registry/theme/presets/pixel.json",
@@ -904,10 +2060,6 @@
         "target": "@assets/styles.css"
       },
       {
-        "source": "registry/theme/tokens.css",
-        "target": "@assets/tokens.css"
-      },
-      {
         "source": "registry/theme/theme-bridge.css",
         "target": "@assets/theme-bridge.css"
       },
@@ -918,6 +2070,78 @@
       {
         "source": "registry/theme/fonts.json",
         "target": "@assets/fonts.json"
+      },
+      {
+        "source": "registry/theme/presets/tactile.css",
+        "target": "@assets/tokens.css"
+      },
+      {
+        "source": "registry/theme/presets/ns-one.css",
+        "target": "static/presets/ns-one.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-utility.css",
+        "target": "static/presets/studio-utility.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-cloud.css",
+        "target": "static/presets/studio-cloud.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-workshop.css",
+        "target": "static/presets/studio-workshop.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-playful.css",
+        "target": "static/presets/studio-playful.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-ledger.css",
+        "target": "static/presets/studio-ledger.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-atelier.css",
+        "target": "static/presets/studio-atelier.css"
+      },
+      {
+        "source": "registry/theme/presets/studio-signal.css",
+        "target": "static/presets/studio-signal.css"
+      },
+      {
+        "source": "registry/theme/presets/tonal.css",
+        "target": "static/presets/tonal.css"
+      },
+      {
+        "source": "registry/theme/presets/bloom.css",
+        "target": "static/presets/bloom.css"
+      },
+      {
+        "source": "registry/theme/presets/cupertino.css",
+        "target": "static/presets/cupertino.css"
+      },
+      {
+        "source": "registry/theme/presets/liquid.css",
+        "target": "static/presets/liquid.css"
+      },
+      {
+        "source": "registry/theme/presets/fluent.css",
+        "target": "static/presets/fluent.css"
+      },
+      {
+        "source": "registry/theme/presets/brutal.css",
+        "target": "static/presets/brutal.css"
+      },
+      {
+        "source": "registry/theme/presets/filigrane.css",
+        "target": "static/presets/filigrane.css"
+      },
+      {
+        "source": "registry/theme/presets/terminal.css",
+        "target": "static/presets/terminal.css"
+      },
+      {
+        "source": "registry/theme/presets/pixel.css",
+        "target": "static/presets/pixel.css"
       },
       {
         "source": "registry/theme/presets/tactile.json",

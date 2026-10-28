@@ -54,3 +54,11 @@ CLI slice is terminal PASS (slice-4-review.md), ready for supervisor-authorized 
 See slice-5-migration.md, axe-delta.md and component-proof/. All12 browser cases PASS, Utility four cases zero serious/critical allowances, NS One eight specimen pairs pixel-identical with144 styles matching. Fresh app check and29 CLI template/root tests PASS. Fonts/attributes/request-local design data and labels migrated; default stays NS One. One-pass full runtime attempted and unproven: exit1 at Aspire preflight with Docker daemon unavailable; do not claim runtime success. Source/tool/doc/publish quality passes. Next: same-session migration supervisor, sign-off commit/push, then separate mandatory final IMPL-EVAL and READY handoff if approved.
 
 Migration is terminal PASS after its single geometry fix, with both reviews in slice-5-review.md. All12 current browser cases pass, including actual Utility small icon dimensions. Next is the supervisor-authorized commit/push and a separate final IMPL-EVAL session. Runtime host exception stays unproven.
+
+## Final IMPL-EVAL fix candidate
+
+First final evaluator returned FAIL_FIX for all18 presets in app CSS. See impl-fix.md, css-size-proof.json and cli-proof-final.json. App CSS now2/4 contexts (NS/other+compat),130436/259738 bytes; SD outputs68 and app managed files23. Previews use Fresh static/presets and only one optional design link. Registry items honor one-source/one-target by omitting their own redundant preview.210 package tests/37 CLI tests/12 browser cases and repeated8-pair S0 proof PASS; all quality/doc/publish gates PASS. Validation aggregate updated; prior migration summary preserved as validation-migration.json. Same final evaluator's single fix round is next. Full runtime remains unproven at host prerequisites.
+
+## READY disposition
+
+Final independent IMPL-EVAL PASS after the single performance fix (impl-eval.md). All local source/output/CLI/browser/doc/publish quality passes;68 artifacts,23 managed app files,210 package tests,37 CLI tests,12 browser cases. Runtime remains UNPROVEN at host preflight, not waived or claimed passed. Next actions are authorized final sign-off commit/push, PR ready-for-review and atomic canonical READY handoff. No merge/tag/release, no labels, no assignment-file commit.
