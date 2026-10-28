@@ -7,3 +7,5 @@ CSSOM iterates expanded shorthand properties with empty values when the authored
 Full negative controls inject raw-colour or red-role into the ordinary authored-policy gate through DOCS_UI_NEGATIVE_CONTROL; expected command exit is 1, rather than a test that merely asserts the checker returned true.
 
 Playwright default locator text matching ignores noscript descendants even with JavaScript disabled. Assert the noscript paragraph is visible and use the innerText matcher for the fallback message; verify against a freshly built site.
+
+Check undefined shared roles in all shipped CSS, including sibling section.css; source ownership boundaries must not hide token compatibility gaps. Axe and overflow cannot prove that gaps/margins/type sizes resolved. Pair a role-reference scan with a bounding-box gap assertion on real section navigation. Preserve old consumer role vocabulary through generated aliases to authoritative Utility density/type roles.

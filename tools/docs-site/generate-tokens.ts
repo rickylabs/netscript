@@ -40,6 +40,28 @@ const WEIGHTS: Readonly<Record<string, number>> = {
   'Semi Bold': 600,
   Bold: 700,
 };
+// Existing docs consumers use the original spacing/type vocabulary. Resolve it
+// through the exported Utility density and type roles rather than a second scale.
+const COMPATIBILITY_ROLES: Readonly<Record<string, string>> = {
+  '--ns-space-px': 'calc(var(--ns-inline-gap) / 8)',
+  '--ns-space-0-5': 'calc(var(--ns-inline-gap) / 4)',
+  '--ns-space-1': 'calc(var(--ns-inline-gap) / 2)',
+  '--ns-space-2': 'var(--ns-inline-gap)',
+  '--ns-space-3': 'var(--ns-control-padding-x)',
+  '--ns-space-4': 'var(--ns-card-padding)',
+  '--ns-space-6': 'var(--ns-page-padding-x)',
+  '--ns-space-8': 'calc(var(--ns-card-padding) * 2)',
+  '--ns-space-10': 'calc(var(--ns-inline-gap) * 5)',
+  '--ns-text-xs': 'var(--ns-text-label)',
+  '--ns-text-sm': 'var(--ns-text-small)',
+  '--ns-text-base': 'var(--ns-text-body)',
+  '--ns-text-lg': 'var(--ns-studio-prose-lede-size)',
+  '--ns-leading-snug': 'var(--ns-leading-strong)',
+  '--ns-leading-normal': 'var(--ns-leading-small)',
+  '--ns-leading-relaxed': 'var(--ns-studio-prose-lede-line)',
+  '--ns-tracking-wide': 'var(--ns-tracking-label)',
+  '--ns-measure': 'var(--ns-studio-prose-measure)',
+};
 
 /** Resolve aliases in their target collection's context; reject cycles and missing data. */
 export function resolveVariable(
@@ -112,6 +134,13 @@ export function generateTokens(collections: readonly FigmaCollection[]): string 
         const value = resolveVariable(collections, `${collectionName}/${variable.name}`, modes);
         tokens.set(property, cssValue(variable, value));
       }
+    }
+    for (const [property, value] of Object.entries(COMPATIBILITY_ROLES)) {
+      if (tokens.has(property)) throw new Error(`CSS token collision: ${property} (compatibility)`);
+      for (const [, reference] of value.matchAll(/var\((--ns-[\w-]+)\)/g)) {
+        if (!tokens.has(reference)) throw new Error(`Missing compatibility role: ${reference}`);
+      }
+      tokens.set(property, value);
     }
     const declarations = [...tokens].sort(([a], [b]) => a.localeCompare(b, 'en'))
       .map(([name, value]) => `  ${name}: ${value};`).join('\n');

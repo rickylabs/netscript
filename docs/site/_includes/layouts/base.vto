@@ -88,7 +88,6 @@
             {{ comp.breadcrumb({ url, title }) }}
             <a class="ns-md-link" href="{{ (url + 'index.md') |> url }}" data-pagefind-ignore><span aria-hidden="true">▤</span> View as Markdown</a>
           </div>
-          {{ if kind === "landing" }}<div class="docs-theme-context">{{ comp.locationMarker({}) }}{{ comp.eyebrow({ text: "NetScript default" }) }}{{ comp.attributeChip({ name: "data-theme", value: "studio" }) }}{{ comp.attributeChip({ name: "data-flavor", value: "utility" }) }}{{ comp.attributeChip({ name: "data-gray", value: "neutral" }) }}{{ comp.attributeChip({ name: "data-accent", value: "ink" }) }}</div>{{ /if }}
           <p class="ns-eyebrow docs-page-eyebrow">{{ lane.label }}{{ if lane.label === "Build" }} · {{ (nav.breadcrumb(url, navQuery, navSort)[1]?.data?.nav_title || nav.breadcrumb(url, navQuery, navSort)[1]?.data?.title || "Capabilities") }}{{ /if }}</p>
         {{ /if }}
         <nav class="docs-anchor-nav" data-reference-nav aria-label="Reference sections" hidden></nav>

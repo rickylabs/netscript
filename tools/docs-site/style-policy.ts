@@ -6,6 +6,8 @@ export interface StyleSource {
   kind: 'css' | 'html' | 'js';
   source: string;
   tokenLayer?: boolean;
+  /** Generated third-party CSS still must resolve every shared role. Maintained UI gets all checks. */
+  roleCheckOnly?: boolean;
 }
 export interface StyleFinding {
   path: string;
@@ -167,6 +169,7 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
     for (const name of references(value)) {
       if (name.startsWith('--ns-') && !variables.has(name)) finding(entry, 'undefined-role');
     }
+    if (file.roleCheckOnly) continue;
     if (custom || colourProperty.test(property)) {
       if (raw(value) && !(custom && file.tokenLayer)) finding(entry, 'raw-colour');
     }

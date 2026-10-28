@@ -9,6 +9,7 @@
 {{ set laneLabel = getDocsLane(url).label }}
 
 {{ set crumbs = nav.breadcrumb(url, navQuery, navSort) }}
+{{ set hasLaneCrumb = crumbs.some((crumb) => crumb.data && (crumb.data.nav_title || crumb.data.title) === laneLabel) }}
 
 <nav class="ns-breadcrumb" aria-label="Breadcrumb">
   <ol class="ns-breadcrumb__list">
@@ -16,18 +17,21 @@
       <li class="ns-breadcrumb__item" aria-current="page">Home</li>
     {{ else }}
       <li class="ns-breadcrumb__item"><a href="{{ homeUrl }}">Home</a></li>
-      {{ if laneLabel }}
+      {{ if laneLabel && !hasLaneCrumb }}
         <li class="ns-breadcrumb__sep" aria-hidden="true">/</li>
         <li class="ns-breadcrumb__item">{{ laneLabel }}</li>
       {{ /if }}
       {{ set rendered = 0 }}
       {{ for crumb of crumbs }}
         {{ if crumb.data && crumb.data.url !== "/" }}
+          {{ set crumbLabel = crumb.data.nav_title || crumb.data.title || crumb.slug.replaceAll("-", " ").replace(/^./, (letter) => letter.toUpperCase()) }}
           <li class="ns-breadcrumb__sep" aria-hidden="true">/</li>
           {{ if crumb.data.url === url }}
-            <li class="ns-breadcrumb__item" aria-current="page">{{ crumb.data.nav_title || crumb.data.title }}</li>
+            <li class="ns-breadcrumb__item" aria-current="page">{{ crumbLabel }}</li>
+          {{ else if crumb.data.url }}
+            <li class="ns-breadcrumb__item"><a href="{{ crumb.data.url |> url }}">{{ crumbLabel }}</a></li>
           {{ else }}
-            <li class="ns-breadcrumb__item"><a href="{{ crumb.data.url |> url }}">{{ crumb.data.nav_title || crumb.data.title }}</a></li>
+            <li class="ns-breadcrumb__item">{{ crumbLabel }}</li>
           {{ /if }}
           {{ set rendered = rendered + 1 }}
         {{ /if }}

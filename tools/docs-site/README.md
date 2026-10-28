@@ -61,3 +61,9 @@ DOCS_UI_NEGATIVE_CONTROL=red-role npm test -- --config docs.playwright.config.ts
 Pages CI preserves the existing docs gates, adds this browser gate, and uploads screenshots,
 axe/keyboard reports, traces and a durable command receipt even on failure. A real Design system
 page from the parallel section is required; there is no placeholder or link exemption.
+
+The generated layer also preserves the original spacing/type role names consumed by existing docs
+components, resolving them through Utility density and typography roles. The browser policy checks
+undefined shared roles in every shipped stylesheet, including generated third-party CSS. All maintained
+UI styles, including the sibling section stylesheet, receive the raw-colour and red-context checks too. Design system
+acceptance asserts visible navigation gaps so missing layout roles cannot pass on axe alone.

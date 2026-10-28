@@ -79,6 +79,16 @@ for (const route of ROUTES) {
         'href',
         '/netscript/design-system/themes/studio/',
       );
+      const separated = await page.locator('.ns-design__nav a').evaluateAll((links) => {
+        const boxes = links.map((link) => link.getBoundingClientRect());
+        return boxes.length > 1 &&
+          boxes.slice(1).every((box, index) =>
+            box.left - boxes[index].right >= 4 || box.top - boxes[index].bottom >= 4
+          );
+      });
+      expect(separated, 'Design system navigation has a visible gap between links').toBe(true);
+      await expect(page.locator('.docs-theme-context')).toHaveCount(0);
+      await expect(page.locator('.ns-breadcrumb__item')).toHaveText(['Home', 'Design system']);
     }
     if (route.kind === 'search') await search(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
@@ -281,6 +291,18 @@ test('diagram twins, accessible names, two-instance IDs and fileTree compatibili
   await visit(page, 'orchestration-runtime/runtime-config/');
   const tree = page.locator('.ns-file-tree--root').first();
   for (const name of ['runtime', 'current', 'features']) await expect(tree).toContainText(name);
+  await visit(page, 'design-system/themes/studio/');
+  await expect(page.locator('.ns-breadcrumb__item')).toHaveText([
+    'Home',
+    'Design system',
+    'Themes',
+    'Studio',
+  ]);
+  expect(
+    await page.locator('.ns-breadcrumb a').evaluateAll((links) =>
+      links.every((link) => Boolean(link.textContent?.trim()))
+    ),
+  ).toBe(true);
 });
 
 test(
@@ -343,12 +365,12 @@ test(
   },
 );
 
-async function collectFiles(root: string): Promise<string[]> {
+async function collectFiles(root: string, excludeProtectedDesign = false): Promise<string[]> {
   const files: string[] = [];
   for (const entry of await readdir(root, { withFileTypes: true })) {
-    if (entry.name === 'design') continue;
+    if (excludeProtectedDesign && entry.name === 'design') continue;
     const path = resolve(root, entry.name);
-    if (entry.isDirectory()) files.push(...await collectFiles(path));
+    if (entry.isDirectory()) files.push(...await collectFiles(path, excludeProtectedDesign));
     else files.push(path);
   }
   return files;
@@ -357,7 +379,7 @@ async function ownedSources(): Promise<StyleSource[]> {
   const root = resolve(REPO, 'docs/site');
   const files = [resolve(root, 'favicon.svg')];
   for (const dir of ['styles', '_includes', '_components', 'assets/docs']) {
-    files.push(...await collectFiles(resolve(root, dir)));
+    files.push(...await collectFiles(resolve(root, dir), dir === '_components'));
   }
   const sources: StyleSource[] = [];
   for (const file of files) {
@@ -371,6 +393,17 @@ async function ownedSources(): Promise<StyleSource[]> {
     });
   }
   for (const file of await collectFiles(SITE)) {
+    if (file.endsWith('.css')) {
+      const path = relative(SITE, file).replaceAll('\\', '/');
+      sources.push({
+        path: `_site/${path}`,
+        kind: 'css',
+        source: await readFile(file, 'utf8'),
+        tokenLayer: path === 'styles/tokens.css',
+        roleCheckOnly: path.startsWith('pagefind/'),
+      });
+      continue;
+    }
     if (!file.endsWith('.html')) continue;
     const source = await readFile(file, 'utf8');
     if (source.includes('class="ns-diagram"')) {
@@ -471,4 +504,11 @@ test('style policy negative contracts reject literal, named and aliased colours'
         '.docs-logo{background:var(--ns-studio-signal-brand)} .notice[data-state="error"]{color:var(--ns-destructive-text)}',
     }]),
   ).toEqual([]);
+  const unresolvedBuilt = await page.evaluate(analyzeStylePolicy, [...layers, {
+    path: '_site/assets/third-party.css',
+    kind: 'css' as const,
+    source: '.fixture { gap: var(--ns-missing); }',
+    roleCheckOnly: true,
+  }]);
+  expect(unresolvedBuilt.some((finding) => finding.kind === 'undefined-role')).toBe(true);
 });

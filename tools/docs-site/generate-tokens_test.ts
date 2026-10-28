@@ -17,6 +17,9 @@ Deno.test('Utility export resolves target collection contexts and both schemes',
   assert(css.includes('--ns-font-mono: "Fragment Mono", monospace;'));
   assert(css.includes('--ns-studio-prose-measure: 544px;'));
   assert(css.includes('--ns-studio-topbar-rule: #e0e0e0;'));
+  assert(css.includes('--ns-space-3: var(--ns-control-padding-x);'));
+  assert(css.includes('--ns-text-xs: var(--ns-text-label);'));
+  assert(css.includes('--ns-leading-relaxed: var(--ns-studio-prose-lede-line);'));
   assert(!css.includes('--ns-studio-topbar-rule: 1px'));
   assert(!css.includes('--ns-fluent-'));
   assertEquals(css, generateTokens(collections));
