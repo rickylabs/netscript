@@ -34,7 +34,7 @@ to payment. You also write the `process-payment` worker job that a checkout trig
 
 ## Before you begin
 
-You should have finished [chapter 3](/tutorials/storefront/03-cart-contracts/), so:
+From [chapter 3](/tutorials/storefront/03-cart-contracts/), check that:
 
 - `my-shop/` has the `products` service and the `cart` contract;
 - `aspire start` is up (the dashboard answers at [https://localhost:18888](https://localhost:18888)).

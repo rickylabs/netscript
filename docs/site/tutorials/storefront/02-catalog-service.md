@@ -36,7 +36,7 @@ typed `400` before any handler runs. Finally you change `getById` to return a ty
 
 ## Before you begin
 
-You should have finished [chapter 1](/tutorials/storefront/01-scaffold/), so:
+From [chapter 1](/tutorials/storefront/01-scaffold/), check that:
 
 - `my-shop/` exists with `services/products/`, `contracts/` and `database/` directories;
 - `aspire start` is up from the `aspire/` folder, so the dashboard at

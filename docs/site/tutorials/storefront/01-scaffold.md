@@ -51,7 +51,7 @@ replaces an older global `netscript` executable. Confirm it resolves:
 netscript --help
 ```
 
-You should see the public groups: `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`,
+You see the public groups: `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`,
 `marketplace`, `plugin`, `service`, and the `ui:*` group (`ui:list`, `ui:add`, `ui:update`,
 `ui:remove`). If `netscript` is not found, add Deno's install directory (printed by `deno install`)
 to your `PATH` and open a new terminal.

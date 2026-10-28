@@ -31,7 +31,7 @@ recorded and the job run.
 
 ## Before you begin
 
-You should have finished [chapter 4](/tutorials/storefront/04-checkout-saga/), so:
+From [chapter 4](/tutorials/storefront/04-checkout-saga/), check that:
 
 - `my-shop/` has the `products` service, the `cart` contract, and the `sagas` plugin with your
   `CheckoutSaga` and the `process-payment` worker job;

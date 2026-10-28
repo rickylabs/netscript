@@ -40,7 +40,7 @@ schemas here are hand-written Zod. You can generate them from Prisma later if yo
 
 ## Before you begin
 
-You should have finished [chapter 2](/tutorials/storefront/02-catalog-service/), so:
+From [chapter 2](/tutorials/storefront/02-catalog-service/), check that:
 
 - `my-shop/` has a working `products` service on `:3001` and a `contracts/versions/v1/` directory
   with `products.contract.ts` in it;

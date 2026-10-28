@@ -43,7 +43,7 @@ guides.
 
 ## Before you begin
 
-You should have finished [chapter 6](/tutorials/storefront/06-storefront-ui/), so `my-shop/` has:
+After [chapter 6](/tutorials/storefront/06-storefront-ui/), `my-shop/` has:
 
 - The `products` service, the `cart` contract, and the storefront page that reads and mutates through
   the typed clients from chapter 6.
