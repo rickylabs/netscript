@@ -37,11 +37,11 @@ async function runCli(
       'Registry secret reached command output',
     );
   }
-  assertEquals(result.code, 0, stderr);
+  assertEquals(result.code, 0, `${args.join(' ')}\n${stderr}`);
   return stdout;
 }
 
-Deno.test('actual ui:add sends environment auth, records hashes and diff is read-only', async () => {
+Deno.test('actual registry commands preserve auth, hashes, read-only diffs and selected style on update', async () => {
   const app = await Deno.makeTempDir({ prefix: 'netscript-s2-cli-acceptance-' });
   const secret = 'fixture-s2-real-command-secret';
   const headers: Array<string | null> = [];
@@ -55,15 +55,28 @@ Deno.test('actual ui:add sends environment auth, records hashes and diff is read
       content: 'export const X = () => null;\n',
     }],
   };
+  const styled = {
+    ...item,
+    name: 'fixture-x',
+    files: [{
+      ...item.files[0],
+      content: 'export const X = () => "fixture style";\n',
+    }],
+  };
+  const items = [item, styled, {
+    name: 'fixture-style',
+    type: 'registry:style',
+    meta: { components: { x: 'fixture-x' } },
+  }];
   const server = Deno.serve({ hostname: '127.0.0.1', port: 0, onListen() {} }, (request) => {
     const header = request.headers.get('Authorization');
     headers.push(header);
     if (header !== `Bearer ${secret}`) return new Response('Unauthorized', { status: 401 });
-    return Response.json(
-      new URL(request.url).pathname.endsWith('/registry.json')
-        ? { name: 'acme', homepage: 'https://registry.example/', items: [item] }
-        : item,
-    );
+    const name = new URL(request.url).pathname.split('/').at(-1)?.replace(/\.json$/, '');
+    const payload = name === 'registry'
+      ? { name: 'acme', homepage: 'https://registry.example/', items }
+      : items.find((candidate) => candidate.name === name);
+    return payload ? Response.json(payload) : new Response('Not found', { status: 404 });
   });
   const run = (args: string[]) =>
     runCli(app, args, {
@@ -104,6 +117,19 @@ Deno.test('actual ui:add sends environment auth, records hashes and diff is read
     const diff = await run(['ui:add', '@acme/x', '--diff', '--json']);
     assertStringIncludes(diff, 'locally edited');
     assertEquals(await snapshot(app), before);
+    await Deno.writeTextFile(component, item.files[0].content);
+    await run(['ui:add', 'style-utility', '--json']);
+    await run(['ui:add', '@acme/fixture-style', '--json']);
+    assertEquals(await Deno.readTextFile(component), styled.files[0].content);
+    await run(['ui:update']);
+    assertEquals(
+      JSON.parse(await Deno.readTextFile(join(app, 'components.json'))).style,
+      '@acme/fixture-style',
+    );
+    assertEquals(await Deno.readTextFile(component), styled.files[0].content);
+    const updated = JSON.parse(await Deno.readTextFile(join(app, 'fresh-ui.lock.json')));
+    assertEquals(updated.items['@acme/x'].source, url.replace('{name}', 'fixture-x'));
+    assert(!JSON.stringify(await snapshot(app)).includes(secret));
     assert(headers.length >= 2);
     assert(headers.every((value) => value === `Bearer ${secret}`));
   } finally {

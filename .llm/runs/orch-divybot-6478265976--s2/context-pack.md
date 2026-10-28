@@ -1,3 +1,13 @@
+# Post-repair acceptance continuation
+
+Latest retained product repair: d39ed87, integrated through dbcaf92 by fast-forward. The actual CLI HTTP fixture now covers Utility -> @acme/fixture-style -> unnamed ui:update. It fails before repair and passes afterwards, verifying command success, retained configured style, exact component bytes and lock source identity. Both native acceptance tests pass 2/0/0; combined post-repair regressions 357/0/0; all 76 source TS files check/lint/format pass without drops. acceptance-audit.md maps the complete objective to concrete evidence and limitations. New durable post-commit quality/publication receipts are collected at this acceptance checkpoint next.
+
+Final independent review is still unavailable. The pinned public MODEL_CATALOG includes opus_5_5, but only through native Claude; the exact OpenRouter route is rejected under the correct owner logical override too. Fresh balance/expense approval is insufficient to bypass that independent guard, so no paid inference was launched. Keep both retained evaluator sessions for resumption after quota reset. The partial review finding is repaired once; no substantive final verdict, sign-off or READY exists.
+
+Goal remains active and full scope is preserved. No S3 source changes, labels, force push, PR merge, tag, release or assignment-file commit. Main unchanged. Finish post-commit evidence/PR handoff, then wait for evaluator availability before readiness. Runtime/cleanup and existing doc-lint limitations below remain visible.
+
+## Retained earlier context
+
 # Current S2 readiness state
 
 Full implementation and local gates are pushed; final independent whole-change verdict is unavailable, so PR2468 remains draft. Do not mark READY on CI alone. Native Claude is weekly-quota unavailable; retained native Antigravity Opus5.5/high conversation reached individual quota during full review. No model substitution, paid inference or guard bypass. Resume that same evaluator after allowance returns.
