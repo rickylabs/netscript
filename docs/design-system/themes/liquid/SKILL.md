@@ -37,7 +37,7 @@ behind the window. Signature moves:
 - MUST render a wallpaper or colour field behind the window. Never glass over a flat page.
 - MUST keep sidebar selection grey (`--ns-liquid-sidebar-selection`), never accent.
 - MUST use `--ns-liquid-primary-default` (`#0063e1` / `#0058d0`) for filled actions and the selected
-  row, with white text (5.42 / 6.35:1). NEVER white on `#0a84ff` (3.65:1).
+  row, with white text (5.42 / 6.35:1). NEVER white text on `#0a84ff` (3.65:1).
 - MUST keep the colourful avatars: discs in the scheme's Apple hue (`--ns-liquid-tag-*`) with black
   `#000000` initials (minimum 5.08:1 light, 5.76:1 dark). NEVER white initials on these hues
   (2.02–3.65:1), and don't replace the avatars with a pastel template.

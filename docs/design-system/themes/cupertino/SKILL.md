@@ -46,7 +46,8 @@ moves:
 - MUST use the `*-text` roles for tinted text and 2px sparklines, never raw status fills.
 - MUST show an invalid value and its repair as two lines: value, then a 12/16 helper.
 - MUST keep dark mode designed: tinted slate grounds (`#111113`, `#18191b`), rims at 13% white, and
-  dark `#111113` ink on the `#0090ff` primary. Never white on `#0090ff` (3.26:1).
+  dark `#111113` ink on the `#0090ff` primary. Never white text on `#0090ff` (3.26:1). The white
+  tick on a checked selection circle is a graphic and meets the 3:1 non-text minimum.
 - MUST paint the switch knob with its own `switch-thumb` role (pending in #2414; white in light,
   `#111113` in dark), never by binding `--ns-primary-fg`.
 - MUST ship the two accessibility preference variants for every screen: Reduce Transparency (aurora

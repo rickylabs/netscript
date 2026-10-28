@@ -290,8 +290,9 @@ Names are provisional until the token export in #2414.
     (sand/d/2). The panels read as dark slabs on a mid-dark ground, so the black outlines and
     shadows still separate them from the canvas.
 - **Accent policy.** Colour appears only in `block/*` fills: KPI tiles, the notice, avatars,
-  stickers, the selected nav item and the selected row (`block-yellow`). Text on any block is always
-  `block-fg` (`#000000`). Accent never tints text, outlines or shadows.
+  stickers, the selected nav item and the selected row (`block-yellow`). Text on a block is
+  `block-fg` (`#000000`), except on the dark violet `block-purple`, where text uses `text/fg`
+  because black on it is 3.9:1. Accent never tints text, outlines or shadows.
 - **Ink.** `border/ink` and `effect/shadow` are `#000000` in both schemes. The table header, the
   selected filter tab, the delta pills and page key 1 are filled with `border/ink` and labelled with
   `ink/fg` (`#fdfdfc` light, `#eeeeec` dark).
