@@ -5,26 +5,38 @@ title: "@netscript/service"
 
 # `@netscript/service`
 
-Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript
-applications. This page is written against the package's public surface reported by `deno doc`.
-For the full index of packages and plugins return to the
-[reference overview](/reference/).
+Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript services. Use
+it to turn a contract router into a running HTTP service with health, OpenAPI, CORS, rate limits,
+authentication and command execution.
 
-The package has three layers. **Layer 1** exposes small primitives for health, error, RPC,
-OpenAPI, and Scalar docs handlers. **Layer 2** exposes `createService()`, a fluent builder
-that materializes a mountable `ServiceApp` or starts a listener. **Layer 3** exposes
-`defineService()`, the preset used by generated service entrypoints.
+## Sub-path exports
 
-The service router is always an input to the builder. `build()` returns a non-listening
-`ServiceApp`, which keeps the RFC 14 unified-platform seam open for callers that mount
-service apps into another host. `serve()` starts a Deno listener and returns a
-`RunningService` handle with `stop()` for tests, local development, and process supervisors.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/service` | `./mod.ts` | Full service surface: [builder and presets](#builder-and-presets), [health](#health-primitives), [handlers](#rpc-openapi-and-docs-handlers), [limits](#request-body-limit) and types. |
+| `@netscript/service/auth` | `./src/auth/mod.ts` | [Service authentication and authorization handlers](#netscriptserviceauth-surface). |
+| `@netscript/service/rate-limit` | `./src/rate-limit/mod.ts` | [Route quotas, atomic stores, and trusted client-address resolution](#rate-limits-and-client-addresses). |
+| `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
+| `@netscript/service/internal-credential` | `./src/auth/internal-credential/mod.ts` | [Dependency-free installation secret loading and internal credential derivation](#internal-procedures-and-the-internal-service-credential). |
+| `@netscript/service/commands` | `./commands.ts` | [Opaque command definitions, once-only executor and codecs](#command-definitions-and-codecs). |
+| `@netscript/service/commands/relay` | `./commands-relay.ts` | [Decoded bounded relay and checked sink lifecycle](#command-outbox-relay). |
+| `@netscript/service/commands/testing` | `./commands-testing.ts` | [Atomic memory store and explicit test controls](#command-testing). |
 
-Public types are package-owned structural mirrors: callers do not need to import Hono or oRPC
-types to describe a service surface. Runtime interoperability still uses the real Hono app and
-oRPC handlers internally. `LoggerMiddlewareOptions` is re-exported from the sibling
-[`@netscript/logger/middleware`](/reference/logger/) package because it is a first-party
-`@netscript/*` contract, not an upstream vendor surface.
+The package has three layers:
+
+1. Primitives for health, error, RPC, OpenAPI and Scalar docs handlers.
+2. `createService()`, a fluent builder that materializes a mountable `ServiceApp` or starts a
+   listener.
+3. `defineService()`, the preset used by generated service entrypoints.
+
+The service router is always an input to the builder. `build()` returns a non-listening `ServiceApp`
+that callers can mount into another host. `serve()` starts a Deno listener and returns a
+`RunningService` handle with `stop()` for tests, local development and process supervisors.
+
+Public types are package-owned structural mirrors, so you don't import Hono or oRPC types to
+describe a service surface; the runtime still uses the real Hono app and oRPC handlers.
+`LoggerMiddlewareOptions` is re-exported from the first-party
+[`@netscript/logger/middleware`](/reference/logger/) package.
 
 ## Builder and presets
 
@@ -65,9 +77,8 @@ operation and projects access as follows:
 | `authentication: 'optional'` | `security: [{}, { bearerAuth: [] }]` |
 | No authentication declaration | No generated operation-level `security` field |
 
-The generated `bearerAuth` component uses HTTP bearer authentication. Optional access remains
-visible in the generated specification even though the current contract authorizer rejects it at
-construction.
+The generated `bearerAuth` component uses HTTP bearer authentication. Optional access stays visible
+in the generated specification even though the contract authorizer rejects it at construction.
 
 ## Request-body limit
 
@@ -103,9 +114,9 @@ rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
 
 ## Rate limits and client addresses
 
-`createService(...).withRateLimit(options)` adds middleware through the existing `use()` seam. It
-runs in call order, before deferred routes and both RPC/REST projections. Install it before
-immediate health/info routes if those routes should be limited. Repeated calls add stages.
+`createService(...).withRateLimit(options)` adds middleware through `use()`. It runs in call order,
+before deferred routes and both RPC/REST projections. Install it before immediate health/info routes
+if those routes should be limited. Repeated calls add stages.
 
 The root also exports `ServiceRateLimitOptions`, `ServiceProxyTrust`, `RateLimitStore`,
 `RateLimitRequest`, and `RateLimitDecision` for builder/port contracts.
@@ -129,9 +140,8 @@ The `@netscript/service/rate-limit` subpath exposes:
 The subpath also re-exports the first-party integration types `ServiceContext`,
 `ServiceEnvironment`, `ServiceMiddleware`, `KvStore`, `KvKey`, `KvEntry`, `KvListOptions`,
 `KvSetOptions`, `AtomicCheck`, `AtomicMutation`, and `AtomicResult` used by these signatures.
-The six ancillary KV types are intentional: the accepted `KvStore` port references them through
-its public methods. Re-exporting them preserves the upstream port and makes Deno's documentation
-lint resolve its transitive signature types, without introducing a duplicate KV interface.
+The `KvStore` port references the six KV types through its public methods, so they are re-exported
+with it rather than duplicated.
 
 Selected routes share one quota per key and epoch-aligned window. Paths are exact or end in `/*` for
 a subtree (including its root). Rejections return `{ error: 'RATE_LIMITED' }` with `429` and
@@ -149,11 +159,12 @@ and custom keys stay unchanged. This grouping affects quota keys only, not
 socket metadata or proxy trust. A mounted app without metadata uses a shared `unknown` bucket and
 logs a warning once per stage through the request logger or service package logger.
 
-KV counter TTL bounds each key's lifetime, not total live cardinality. Distinct attacker-chosen
-keys can allocate distinct counters until window expiry; use backend admission/capacity controls
-and stable custom keys. The memory store instead rejects new keys when its live-key cap is full.
+> [!CAUTION]
+> KV counter TTL bounds each key's lifetime, not total live cardinality. Distinct attacker-chosen
+> keys can allocate distinct counters until window expiry; use backend admission/capacity controls
+> and stable custom keys. The memory store instead rejects new keys when its live-key cap is full.
 
-Like auth's #2026 transport policy, forwarded headers are ignored by default. Explicit proxy trust
+As in the auth transport policy, forwarded headers are ignored by default. Explicit proxy trust
 identifies permitted socket/hop addresses; malformed or excessive XFF chains fall back to the
 socket. Auth's HTTPS helper is protocol-specific and has no reusable hop resolver, so this client
 address resolver does not alter `deriveHttps` or `trustProxyHeaders`.
@@ -199,8 +210,7 @@ service and plugin service resource. This generated value overrides a declared r
 value; a workspace without enabled web apps supplies an empty allowlist. Independent services must
 configure their launch environment themselves. Origins outside the allowlist receive no
 `Access-Control-Allow-Origin` header. CORS controls browser response access; it does not authenticate
-callers. The chosen [browser authentication topology](https://github.com/rickylabs/netscript/blob/main/docs/architecture/doctrine/07-composition-and-extension.md#browser-authentication-topology-008-owner-decision)
-uses a BFF; scaffolding that topology is separate follow-up scope.
+callers.
 
 ### Listener bind address
 
@@ -306,13 +316,13 @@ metadata and no matching fallback rule denies, regardless of the fallback's stan
 aliases and shares it between authn and authz, so a declared public procedure is not rejected by an
 earlier authentication stage.
 
-`createScopeAuthorizer()` remains a supported standalone legacy path-prefix authorizer and a
-match-aware migration fallback; it is not deprecated.
+`createScopeAuthorizer()` is a supported standalone path-prefix authorizer and a match-aware
+migration fallback; it is not deprecated.
 
-`authentication: 'optional'` is declared for future support, currently rejected.
-`createContractAuthorizer()` throws
-`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` during
-construction, before any request.
+> [!WARNING]
+> `authentication: 'optional'` is declared but rejected. `createContractAuthorizer()` throws
+> `[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` during
+> construction, before any request.
 
 ### Raw routes beside a contract router
 
@@ -365,7 +375,7 @@ value, and for procedures with different access that share one OpenAPI route.
 `createContractOverlayAuthorizer(contract, { fallback?, isInternalCaller? })` governs only
 procedures that declare `meta.access`. Every other request keeps the service's own policy: the
 `protect`/`allowAnonymous` path guard, plus the optional fallback authorizer. Marking a few
-internal procedures therefore never forces authentication onto public ones. To keep an otherwise
+internal procedures never forces authentication onto public ones. To keep an otherwise
 public service public, set `allowAnonymous: ['/api', '/health']`; access-marked procedures are
 resolved before the path guard. `createContractAuthorizer` also enforces the audience, but it
 still governs every procedure in the contract.
@@ -421,8 +431,9 @@ an actionable `TypeError` as well as TypeScript callers receiving a missing-fiel
 Guarded policies install the existing native stages unchanged; public policies deliberately skip
 them. `/api` is guarded and `/health` stays anonymous with native defaults.
 
-In 0.0.8, search existing entrypoints for `defineService(` and choose native guards or explicitly
-record a public service's reason. The exact public migration is:
+> [!IMPORTANT]
+> **Migrating to 0.0.8.** Search existing entrypoints for `defineService(` and either choose native
+> guards or record a public service's reason. The public opt-out looks like this:
 
 ```diff
 -await defineService(router, { name: 'status' });
@@ -449,8 +460,8 @@ authorization, including this contract requirement: anonymous `session` calls th
 or configure a guarded service policy to enforce it; the probe reports whether the runtime
 provided a principal.
 
-This policy requirement applies to the preset; lower-level `createService()` callers still compose
-their middleware explicitly.
+This policy requirement applies to the preset; lower-level `createService()` callers compose their
+middleware explicitly.
 
 ```ts
 import { assertServiceAuthPolicy, type ServiceAuthPolicy } from '@netscript/service/auth';
@@ -483,21 +494,6 @@ assertServiceAuthPolicy(policy);
 | `Principal` | interface | Service-owned identity contract. |
 | `ContractPolicyAuthorizerPort` | interface | Authorizer that binds to the builder's REST/RPC projection paths. |
 | `ContractAuthorizerRawRoute` | interface | Exact, authentication-required raw route declared through `createContractAuthorizer(contract, { rawRoutes })`. |
-
-## Exports
-
-The following entrypoints are published alongside the root export:
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/service` | `./mod.ts` | Full service surface (documented above). |
-| `@netscript/service/commands/relay` | `./commands-relay.ts` | Decoded bounded relay and checked sink lifecycle. |
-| `@netscript/service/commands/testing` | `./commands-testing.ts` | Atomic memory store and explicit test controls. |
-| `@netscript/service/commands` | `./commands.ts` | Opaque command definitions, once-only executor and codecs. |
-| `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
-| `@netscript/service/rate-limit` | `./src/rate-limit/mod.ts` | Route quotas, atomic stores, and trusted client-address resolution. |
-| `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
-| `@netscript/service/internal-credential` | `./src/auth/internal-credential/mod.ts` | Dependency-free installation secret loading and internal credential derivation. |
 
 ## Command definitions and codecs
 
@@ -537,10 +533,6 @@ identity to keep replay stable.
 | `CommandFailure`            | type alias       | Bounded discriminated failure and retry vocabulary.               |
 | `IsolationLevel` | type alias | Database-owned transaction isolation vocabulary, re-exported as a type. |
 
----
-
-Back to the [reference overview](/reference/).
-
 ## Command testing
 
 `@netscript/service/commands/testing` exports `createMemoryCommandStore`, `MemoryCommandStore`,
@@ -577,12 +569,12 @@ byte budget; limits only tighten published defaults. Transactions receive a five
 Replay validates receipt material without handler/side writes. Busy and cancellation surface only
 after rollback; arbitrary business errors retain identity. Provider failures use the database-owned
 `CommandStoreError` contract. Audit, outbox and receipt completion share the winning receipt ID and
-flush in that order. Optional unkeyed attempts skip receipts. The telemetry port prepares the later
-adapter; no transport, hidden retry or production fault option is provided.
+flush in that order. Optional unkeyed attempts skip receipts. Telemetry goes through the
+`CommandTelemetryPort`; no transport, hidden retry or production fault option is provided.
 
 ### Command conformance fixtures
 
-The focused `@netscript/service/commands/testing` subpath provides an instance-bound
+`@netscript/service/commands/testing` also provides an instance-bound
 `CommandFaultController`, `createTestingCommandExecutor()` and a generic
 `CommandConformanceFixture<TTx>`. Production executor options contain no fault controls. The testing
 factory uses the production algorithm and the exact seven command boundaries, including a

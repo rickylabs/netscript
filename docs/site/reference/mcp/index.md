@@ -6,30 +6,28 @@ templateEngine: [vento, md]
 
 # `@netscript/mcp`
 
-The Model Context Protocol server for NetScript workspaces. This page describes the package's public
-surface and is maintained by hand; the authoritative, always-current symbol list is
-[`deno doc jsr:@netscript/mcp{{ releaseSpecifier }}`](https://jsr.io/@netscript/mcp/doc). For the
-full index of packages and plugins return to the [reference overview](/reference/).
-
-`@netscript/mcp` publishes 22 token-bounded MCP tools that let a coding agent monitor a running app,
-debug a correlated execution, read framework-semantic telemetry, run the doctor, search the public
-documentation, discover first-party package exports, and trigger allowlisted CLI commands — over
-newline-delimited JSON-RPC on stdio, with no npm MCP SDK on the dependency graph.
+The Model Context Protocol server for NetScript workspaces. It publishes 22 token-bounded MCP tools
+that let a coding agent monitor a running app, debug a correlated execution, read telemetry, run the
+doctor, search the documentation, discover package exports and trigger allowlisted CLI commands,
+over newline-delimited JSON-RPC on stdio, with no npm MCP SDK in the dependency graph.
 
 Most consumers never import this package: `netscript agent init` installs it as an MCP server and
-`netscript agent mcp` runs it. See [Agent tooling](/ai/agent-tooling/) for the CLI × skills × MCP
-combo, and the package README for the mental model and recipes.
+`netscript agent mcp` runs it. See [Agent tooling](/ai/agent-tooling/) for how the CLI, skills and
+MCP fit together. The complete symbol list is in
+[`deno doc jsr:@netscript/mcp{{ releaseSpecifier }}`](https://jsr.io/@netscript/mcp/doc).
 
-Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
-to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
-faithful retrieval of a known document or section; check `mode` and use `full: true` with
-`nextCursor` for exact retrieval of complete text.
+## Sub-path exports
 
-Two entrypoints carry the surface:
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/mcp` | `./mod.ts` | [Tool contracts](#tool-contracts), the registry, the protocol runner, [ports](#ports) and [default adapters](#default-adapters). |
+| `@netscript/mcp/cli` | `./cli.ts` | [Executable composition](#netscriptmcpcli) that binds the real telemetry, docs, doctor and process adapters. |
+| `@netscript/mcp/openapi-projection` | `./openapi-projection.ts` | OpenAPI operation projection used by the API introspection tools. |
 
-- `@netscript/mcp` — tool contracts, the registry, the protocol runner, ports, and default adapters.
-- [`@netscript/mcp/cli`](#sub-path-exports) — the executable composition that binds the real
-  telemetry, docs, doctor, and process adapters.
+> [!TIP]
+> Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task and follow
+> its ordered citations. Use `search_docs` for literal lookup and `get_doc` for a known document or
+> section; check `mode` and pass `full: true` with `nextCursor` for the complete text.
 
 ## Server composition
 
@@ -55,12 +53,11 @@ Two entrypoints carry the surface:
 
 ### Per-tool field overview
 
-The table below is a **top-level field overview** — input names and result field names per tool,
-taken from the live `tools/list`. It is not the complete contract: types, enum values, numeric
-bounds, array maxima, nested shapes, and required-vs-optional result fields live in the published
-Standard Schema contracts (`TOOL_INPUT_SCHEMAS` / `TOOL_OUTPUT_SCHEMAS`), which every `tools/list`
-response returns in full. **Bold** inputs are required; every other input is optional. Every `limit`
-input caps the result count server-side before truncation applies.
+Input names and result field names per tool, from the live `tools/list`. **Bold** inputs are
+required; every other input is optional. Every `limit` input caps the result count server-side
+before truncation applies. Types, enum values, numeric bounds, array maxima, nested shapes and
+required result fields are in the Standard Schema contracts (`TOOL_INPUT_SCHEMAS` /
+`TOOL_OUTPUT_SCHEMAS`), which every `tools/list` response returns in full.
 
 | Tool                          | Inputs                                                | Result fields                                                                                                                                                     |
 | ----------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -93,13 +90,18 @@ input caps the result count server-side before truncation applies.
 sections whose JSON-escaped UTF-8 content fits 12 KiB return `mode: "verbatim"` with exact text.
 Larger inputs return `mode: "extract"`: title, description, a whole-document navigation outline
 (heading, slug, character count), selected source blocks, and verbatim sentences. Selection uses
-four tiers: whole fences, command lines and config-key lines first (cheapest first); heading lines
-second; sentences containing links or inline code third; plain first sentences last. Selected spans
-are emitted in source order. A fence or sentence that cannot fit is omitted whole. The
+four tiers, in order:
+
+1. Whole fences, command lines and config-key lines, cheapest first.
+2. Heading lines.
+3. Sentences containing links or inline code.
+4. Plain first sentences.
+
+Selected spans are emitted in source order. A fence or sentence that cannot fit is omitted whole. The
 `omitted.blocks` count includes partially omitted paragraphs, and `omitted.characters` counts source
 characters not retained. The extract never paraphrases or cuts a snippet. Section-scoped extracts
-restrict `content` to that section but intentionally retain the whole-document outline to navigate
-to other sections; outline sizes describe the indexed section bodies.
+restrict `content` to that section but keep the whole-document outline for navigating to other
+sections; outline sizes describe the indexed section bodies.
 
 For complete text, call `get_doc` with `full: true`. It returns `mode: "full"`, one exact source
 page, and `nextCursor` when more text remains. Pass that value as `cursor` with the same `slug`,
@@ -117,14 +119,13 @@ retrieving one returns `doc_too_large` naming its slug, while list, search and g
 available for accepted documents. Sources are never silently truncated. Outline/metadata exceeding
 the 64 KiB response ceiling produces an explicit transport error directing the caller to full mode.
 
-The offline benchmark runs with `deno task --cwd packages/mcp benchmark:docs` over public docs site
-sources, or append `--embedded` for the shipped release fallback. It compares lexical token proxies
-including response metadata, independently inventoried fence/command/config/link retention,
-missing-material fallback proxies, and cold retrieval latency against the previous 2,000-character
-truncation. It reports both all-document and extract-mode-only aggregates and checks exact full
-reconstruction for every document. The fallback proxy measures missing source material; observed
-filesystem reads require a separate agent-run receipt. No inference model is used; model
-summarization is tracked in #2112.
+### Documentation sources
+
+Documentation resolves in this order: explicit `--docs-root`, `NETSCRIPT_DOCS_ROOT`, an indexable
+`<projectRoot>/.netscript/docs`, then a generated release-matched embedded fallback. An empty or
+redirect-only project probe falls back to embedded; an invalid explicit/environment root remains a
+structured error. `list_docs.corpus.kind` is `filesystem` or `embedded`, its `root` is the resolved
+filesystem path or `null`, and `documentCount` is the total before the requested list limit.
 
 ### Operation access summary
 
@@ -139,7 +140,7 @@ summarization is tracked in #2112.
 }
 ```
 
-This bounded `OperationAccessSummary` reports declared access facts only. `authentication` is
+`OperationAccessSummary` reports declared access facts only. `authentication` is
 `none`, `optional`, or `required`; each list allows at most 50 non-empty strings, and each string is
 bounded to 2,000 characters. It never contains a principal, token, cookie, secret, or credential
 value.
@@ -152,8 +153,8 @@ value.
 | `security: [{ bearerAuth: ['catalog:read'] }]` | `authentication: 'required'`; scheme and scopes are listed |
 | Required operation with `x-netscript-roles`    | Roles are copied into the bounded `roles` list             |
 
-The root and `./cli` entrypoints export the read-tool result types together with the types they
-reference, so typed consumers never meet a private type:
+The root and `./cli` entrypoints export the read-tool result types with the types they reference, so
+typed consumers never meet a private type:
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -167,44 +168,36 @@ reference, so typed consumers never meet a private type:
 and required operations. Only the required template includes the literal placeholder
 `Authorization: Bearer <credential>`; no real credential is requested or echoed.
 
-**Truncation semantics.** After a flow succeeds, `truncateResult` recursively bounds the result
-using `DEFAULT_TRUNCATION_POLICY` — arrays are capped at 50 elements and strings at 2,000 UTF-16
-code units — before the runner serializes it. `get_doc` is exempt from these recursive cuts; it uses
-the faithful retrieval budget below and checks the complete MCP response against 64 KiB. The
-analytics tools (`analyze_service_performance`, `analyze_db_bottlenecks`) additionally never return
-raw spans: their results are computed aggregates. `execute_command` returns only a bounded combined
-output tail (4,096 bytes by default) and flags `truncated` when output was cut. A failed flow
-returns a structured tool error (a stable `code` plus a message), not a truncated success.
-
-Documentation resolves in this order: explicit `--docs-root`, `NETSCRIPT_DOCS_ROOT`, an indexable
-`<projectRoot>/.netscript/docs`, then a generated release-matched embedded fallback. An empty or
-redirect-only project probe falls back to embedded; an invalid explicit/environment root remains a
-structured error. `list_docs.corpus.kind` is `filesystem` or `embedded`, its `root` is the resolved
-filesystem path or `null`, and `documentCount` is the total before the requested list limit.
-
 ## Record drift
 
 `record_drift` is an evidence-gated mutating tool that appends structured architecture or runtime
 drift entries to `.netscript/agent/drift.jsonl`.
 
-- **Required Evidence**: Must be authorized by a fresh successful diagnostic receipt (created within
-  15 minutes, `exitStatus: 0`) for the target resource. Diagnostic receipts are automatically
-  produced by `doctor`, telemetry tools, API introspection tools, or
-  `netscript plugin doctor --resource <resource>`.
-- **Target & Scope**: `resource` identifies the target component (e.g. plugin name, service name, or
-  `'project'`). Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
-- **Mutation Behavior**: Appends one JSON line to `.netscript/agent/drift.jsonl` containing
-  `timestamp`, `resource`, `summary`, optional `details`, and the attached evidence receipt.
-- **Failure Modes**: If no receipt is found, if the receipt is older than 15 minutes, or if the
-  receipt recorded a non-zero exit status, the tool fails with structured error code
-  `diagnostic_evidence_required`.
-- **Dry-run / Preview**: Inspecting receipt files or invoking `doctor` previews diagnostic state
-  without appending to `drift.jsonl`.
+| Aspect | Behavior |
+| --- | --- |
+| Required evidence | A fresh successful diagnostic receipt for the target resource: created within 15 minutes, `exitStatus: 0`. `doctor`, the telemetry tools, the API introspection tools and `netscript plugin doctor --resource <resource>` produce receipts. |
+| Target | `resource` names the target component, such as a plugin name, a service name or `'project'`. Receipts live at `.netscript/agent/diagnostics/<resource>.json`. |
+| Mutation | Appends one JSON line to `.netscript/agent/drift.jsonl` with `timestamp`, `resource`, `summary`, optional `details`, and the attached evidence receipt. |
+| Failure | No receipt, a receipt older than 15 minutes, or a receipt with a non-zero exit status fails with the structured error code `diagnostic_evidence_required`. |
+| Preview | Inspecting receipt files or invoking `doctor` shows diagnostic state without appending to `drift.jsonl`. |
 
 ## Output bounds
 
 Every successful result is bounded server-side before the runner serializes it, so a tool can never
 flood the model's context.
+
+- After a flow succeeds, `truncateResult` recursively bounds the result using
+  `DEFAULT_TRUNCATION_POLICY`: arrays are capped at 50 elements and strings at 2,000 UTF-16 code
+  units.
+- `get_doc` is exempt from these recursive cuts; it uses the
+  [faithful retrieval](#faithful-documentation-retrieval) budget and checks the complete MCP
+  response against 64 KiB.
+- The analytics tools (`analyze_service_performance`, `analyze_db_bottlenecks`) never return raw
+  spans; their results are computed aggregates.
+- `execute_command` returns only a bounded combined output tail (4,096 bytes by default) and flags
+  `truncated` when output was cut.
+- A failed flow returns a structured tool error (a stable `code` plus a message), not a truncated
+  success.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -214,8 +207,8 @@ flood the model's context.
 
 ## Command policy
 
-`execute_command` is **default-deny**: a normalized command path must match an allow rule and no
-deny rule. Deny beats allow; anything unmatched is denied.
+`execute_command` is default-deny: a normalized command path must match an allow rule and no deny
+rule. Deny beats allow; anything unmatched is denied.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -224,16 +217,16 @@ deny rule. Deny beats allow; anything unmatched is denied.
 | `CommandPolicy` | interface | Ordered `allow` / `deny` prefix rules. |
 | `CommandPolicyDecision` | type alias | The decision returned for a command path. |
 
-The default policy **allows** `db init|generate|migrate|seed|status|introspect`, `generate`,
-`contract`, `service list`, `plugin install|list|sync|doctor`, and
-`ui:add|ui:init|ui:list|ui:update`; it **denies** `deploy`, `init`, `marketplace`, `db reset`,
-`plugin remove`, and `ui:remove`.
+| Default policy | Commands |
+| --- | --- |
+| Allow | `db init\|generate\|migrate\|seed\|status\|introspect`, `generate`, `contract`, `service list`, `plugin install\|list\|sync\|doctor`, `ui:add\|ui:init\|ui:list\|ui:update` |
+| Deny | `deploy`, `init`, `marketplace`, `db reset`, `plugin remove`, `ui:remove` |
 
 ## Ports
 
-Every tool flow depends on a port, never on a concrete client — which is why this package can report
-on the CLI without depending on it. `@netscript/cli` implements the ports and injects them at its
-own composition root.
+Every tool flow depends on a port, never on a concrete client, so this package can report on the
+CLI without depending on it. `@netscript/cli` implements the ports and injects them at its own
+composition root.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -267,18 +260,11 @@ model context.
 | `PluginDoctorFamily` | class | Plugin diagnostics as a doctor check family. |
 | `slugifyDocsHeading` | function | Normalize a Markdown heading into a `get_doc` section slug. |
 
-## Sub-path exports
+## `@netscript/mcp/cli`
 
-| Export                              | Path                      |
-| ----------------------------------- | ------------------------- |
-| `@netscript/mcp`                    | `./mod.ts`                |
-| `@netscript/mcp/cli`                | `./cli.ts`                |
-| `@netscript/mcp/openapi-projection` | `./openapi-projection.ts` |
-
-### `@netscript/mcp/cli`
-
-The executable composition. It binds the real telemetry query, filesystem docs corpus, Aspire /
-project-wiring / plugin doctor families, and the process executor, and runs them over stdio.
+The executable composition. It binds the real telemetry query, the filesystem docs corpus, the
+Aspire, project-wiring and plugin doctor families, and the process executor, and runs them over
+stdio.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -287,10 +273,10 @@ project-wiring / plugin doctor families, and the process executor, and runs them
 | `resolveDocsRoot` | function | Resolve docs by flag, environment, then an indexable `.netscript/docs` project probe. |
 | `McpCliOptions` | interface | Composition seams including `exportSurfaceCorpus`, docs, telemetry, doctor, commands, and project root. |
 
-Telemetry endpoint discovery is ordered: an explicit `endpoint` option, then
-`NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then `http://localhost:18888`. Only
-`http:` and `https:` endpoints are accepted, and an unreachable endpoint yields a structured warning
-rather than a crash.
+Telemetry endpoint discovery tries, in order: an explicit `endpoint` option,
+`NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT`, then `http://localhost:18888`. Only `http:`
+and `https:` endpoints are accepted, and an unreachable endpoint yields a structured warning rather
+than a crash.
 
 ## Data boundary
 
@@ -298,10 +284,6 @@ The server reads telemetry, project metadata, generated registries, public docum
 package-embedded public export corpus. It never returns project source, environment-variable values,
 credentials, or secrets. Stdio is process-local; the only outbound traffic is the telemetry probe to
 the resolved endpoint.
-
----
-
-Back to the [reference overview](/reference/).
 
 ## Declared plugin runtime health
 
@@ -319,7 +301,7 @@ finding. Declared runtimes with an absent/unavailable AppHost report an inspecti
 than being mistaken for a no-plugin project. Each Aspire inspection command has a five-second
 deadline.
 
-These inspection failures are intentional `fail` verdicts even when polling a stopped development
+These inspection failures are `fail` verdicts by design, even when polling a stopped development
 app. Legacy adapters without a runtime-health operation use static doctor findings; their failures
 also remain visible when a service filter is supplied.
 
