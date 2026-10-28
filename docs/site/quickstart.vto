@@ -1,7 +1,11 @@
 ---
 layout: layouts/base.vto
 title: Quickstart
+description: Install the CLI, scaffold a workspace, start it under Aspire, and prepare the database.
 templateEngine: [vento, md]
+prev: { label: "Why NetScript", href: "/why/" }
+next: { label: "Tutorials", href: "/tutorials/" }
+oldUrl: /quickstart/aspire/
 ---
 
 # Quickstart
@@ -15,7 +19,7 @@ write a feature by hand.
 Install <strong><a href="https://docs.deno.com">Deno 2.x</a></strong> and the
 <strong><a href="https://aspire.dev">Aspire CLI</a></strong>, and start Docker. Aspire orchestrates
 the local resources; your application code stays Deno and TypeScript. See
-<a href="/quickstart/aspire/">why NetScript uses Aspire</a> and how to opt out.
+<a href="/explanation/aspire/">why NetScript uses Aspire</a> and how to opt out.
 {{ /comp }}
 
 ## 1. Install the CLI
@@ -144,6 +148,10 @@ Aspire starts Postgres and Redis, injects service discovery, assigns free ports 
 health checks, and collects logs and distributed traces. Because ports are assigned at runtime,
 there is no application or service port to memorise. When a copied port, an old terminal, and the
 running system disagree, trust the dashboard, `aspire describe`, or `list_api_services`.
+
+{{ comp callout { type: "note", title: "Prefer no orchestration?" } }}
+Aspire is the default, not a requirement. The AppHost is generated TypeScript (<code>aspire/apphost.mts</code>) that runs on an isolated Node runtime inside <code>aspire/</code>; you write no C#. To skip it, scaffold with <code>netscript init my-app --db postgres --no-aspire</code> and start the app with <code>deno task --cwd apps/dashboard dev</code>; Postgres, the cache, and every connection string are then yours to provide. <a href="/explanation/aspire/#the---no-aspire-escape-hatch">What you give up</a>.
+{{ /comp }}
 
 Wait until the Fresh app, the `users` service, Postgres, and Redis report healthy. Open a resource
 in the dashboard to read its console logs. After you make a request, open the trace view to follow
@@ -346,4 +354,4 @@ shutdown. To remove the container and free disk space, use `docker stop` and `do
 
 Next: build a complete system, chapter by chapter, in the
 [Storefront tutorial](/tutorials/storefront/). For a single task, such as adding a service, a
-background job, a screen, or sign-in, pick a recipe from [All recipes](/how-to/).
+background job, a screen, or sign-in, pick a recipe in [Build](/how-to/).
