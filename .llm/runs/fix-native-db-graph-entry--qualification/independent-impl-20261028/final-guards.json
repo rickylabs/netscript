@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-28T03:18:30.388Z",
+  "nativeChildStatusAwaited": true,
+  "ownedSettlement": {
+    "spawnCount": 1,
+    "statusAwaited": true,
+    "stdoutSettled": true,
+    "pipesAwaited": true,
+    "failures": []
+  },
+  "stderrPipeAwaited": true,
+  "publicEvents": 32,
+  "omittedPrivateUnknownEvents": 0,
+  "failures": [],
+  "sourceAcceptance": false
+}
