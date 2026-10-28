@@ -1,0 +1,72 @@
+{
+  "selected": "fmt-write",
+  "results": [
+    {
+      "args": [
+        "run",
+        "--frozen",
+        "--allow-all",
+        ".llm/tools/run-deno-fmt.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/create-stream-db.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+        "--file",
+        "packages/fresh/tests/streamdb-headers-contract_test.ts",
+        "--file",
+        "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+        "--ext",
+        "ts",
+        "--write"
+      ],
+      "code": 0,
+      "started": "2026-10-28T00:51:57.652Z",
+      "ended": "2026-10-28T00:51:57.888Z",
+      "originalChildStatusAwaited": true,
+      "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/fmt-write-1793148717652-0.stdout",
+      "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/fmt-write-1793148717652-0.stderr"
+    },
+    {
+      "args": [
+        "fmt",
+        "--no-config",
+        "--single-quote",
+        "--line-width",
+        "100",
+        "packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T00:51:57.889Z",
+      "ended": "2026-10-28T00:51:57.914Z",
+      "originalChildStatusAwaited": true,
+      "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/fmt-write-1793148717652-1.stdout",
+      "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/fmt-write-1793148717652-1.stderr"
+    }
+  ],
+  "credentialFreeClearEnv": true,
+  "environmentNames": [
+    "ProgramFiles",
+    "SystemDrive",
+    "SystemRoot",
+    "ProgramW6432",
+    "HTTPS_PROXY",
+    "PATHEXT",
+    "windir",
+    "ComSpec",
+    "NO_PROXY",
+    "HTTP_PROXY",
+    "ProgramFiles(x86)",
+    "HOME",
+    "USERPROFILE",
+    "TEMP",
+    "TMP",
+    "DENO_TLS_CA_STORE",
+    "DENO_DIR",
+    "PATH",
+    "DENO_NO_PROMPT",
+    "DENO_NO_UPDATE_CHECK",
+    "OTEL_DENO",
+    "NO_COLOR"
+  ],
+  "authoredConsumerNoLockRetained": false
+}

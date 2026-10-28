@@ -1,0 +1,45 @@
+{
+  "selected": "doc",
+  "results": [
+    {
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "code": 1,
+      "started": "2026-10-27T22:40:06.639Z",
+      "ended": "2026-10-27T22:40:06.872Z",
+      "originalChildStatusAwaited": true,
+      "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/doc-1793140806639-0.stdout",
+      "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/doc-1793140806639-0.stderr"
+    }
+  ],
+  "credentialFreeClearEnv": true,
+  "environmentNames": [
+    "NO_PROXY",
+    "ComSpec",
+    "HTTPS_PROXY",
+    "SystemRoot",
+    "windir",
+    "ProgramFiles(x86)",
+    "ProgramW6432",
+    "ProgramFiles",
+    "PATHEXT",
+    "SystemDrive",
+    "HTTP_PROXY",
+    "HOME",
+    "USERPROFILE",
+    "TEMP",
+    "TMP",
+    "DENO_TLS_CA_STORE",
+    "DENO_DIR",
+    "PATH",
+    "DENO_NO_PROMPT",
+    "DENO_NO_UPDATE_CHECK",
+    "OTEL_DENO",
+    "NO_COLOR"
+  ],
+  "authoredConsumerNoLockRetained": false
+}

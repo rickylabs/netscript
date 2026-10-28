@@ -18,6 +18,7 @@ import { createStreamDB } from '@durable-streams/state/db';
 import type { StateSchema, StreamStateDefinition } from '@durable-streams/state';
 import type { StreamDB } from '@durable-streams/state/db';
 import { DurableStream } from '@durable-streams/client';
+import type { HeadersRecord } from '@durable-streams/client';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 import { createStreamDBRecoveryAdapter } from './stream-db-recovery-adapter.ts';
 
@@ -70,8 +71,14 @@ export interface NetScriptStreamDBFactoryInput<TDef extends NetScriptStreamState
     url: string;
     /** Content type sent to the durable streams endpoint. */
     contentType: 'application/json';
-    /** Auth headers sent to the durable streams endpoint. */
-    headers: Record<string, string>;
+    /**
+     * Headers forwarded untouched to the durable streams client; function values resolve per request.
+     *
+     * External adapters that serialize `headers` as plain strings must forward the record
+     * to the upstream client, which owns per-request resolution; the framework
+     * provides no string serializer.
+     */
+    headers: HeadersRecord;
   };
   /** State schema passed to the underlying stream DB adapter. */
   state: NetScriptStateSchema<TDef>;
@@ -103,6 +110,15 @@ export interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefin
   schema: NetScriptStateSchema<TDef>;
   /** Optional factory port for tests or alternate stream DB adapters. */
   createStreamDB?: NetScriptStreamDBFactory<TDef>;
+  /**
+   * Explicit reader headers, forwarded untouched to the durable streams client.
+   *
+   * Any supplied record (including `{}`) replaces env-resolved producer auth
+   * entirely; omit to keep `getStreamsAuth()`. The upstream client owns
+   * per-request resolution of function values; the framework provides no
+   * string serializer for external adapters.
+   */
+  headers?: HeadersRecord;
   /** Bounded reconnect policy; the default adapter resumes the last consumed batch. */
   reconnect?: NetScriptStreamDBReconnectOptions;
 }
@@ -147,7 +163,7 @@ export function createNetScriptStreamDB<TDef extends NetScriptStreamStateDefinit
     streamOptions: {
       url: buildStreamUrl(options.streamPath, baseUrl),
       contentType: 'application/json',
-      headers: getStreamsAuth(),
+      headers: options.headers === undefined ? getStreamsAuth() : options.headers,
     },
     state: options.schema,
     ...(options.reconnect ? { reconnect: options.reconnect } : {}),

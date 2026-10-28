@@ -1,0 +1,45 @@
+{
+  "selected": "consumer",
+  "results": [
+    {
+      "args": [
+        "task",
+        "--cwd",
+        "packages/fresh",
+        "check:streams-types"
+      ],
+      "code": 0,
+      "started": "2026-10-28T00:49:21.300Z",
+      "ended": "2026-10-28T00:49:21.571Z",
+      "originalChildStatusAwaited": true,
+      "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/consumer-1793148561300-0.stdout",
+      "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/consumer-1793148561300-0.stderr"
+    }
+  ],
+  "credentialFreeClearEnv": true,
+  "environmentNames": [
+    "windir",
+    "PATHEXT",
+    "NO_PROXY",
+    "ComSpec",
+    "ProgramW6432",
+    "SystemDrive",
+    "ProgramFiles(x86)",
+    "HTTPS_PROXY",
+    "SystemRoot",
+    "ProgramFiles",
+    "HTTP_PROXY",
+    "HOME",
+    "USERPROFILE",
+    "TEMP",
+    "TMP",
+    "DENO_TLS_CA_STORE",
+    "DENO_DIR",
+    "PATH",
+    "DENO_NO_PROMPT",
+    "DENO_NO_UPDATE_CHECK",
+    "OTEL_DENO",
+    "NO_COLOR"
+  ],
+  "authoredConsumerNoLockRetained": true
+}
