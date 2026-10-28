@@ -98,10 +98,50 @@ export function createBodyLimitMiddleware(options: ServiceBodyLimitOptions): Ser
     maxBytes,
   };
 
-  return bodyLimit({
+  const limit = bodyLimit({
     maxSize: maxBytes,
     onError: (c: Context) => c.json(rejection, 413),
   });
+  return async (c, next) => {
+    const request = c.req.raw;
+    const source = request.body;
+    if (
+      !source ||
+      (request.headers.has('content-length') && !request.headers.has('transfer-encoding'))
+    ) {
+      return await limit(c, next);
+    }
+    // Hono retains its rejected reader. Own its native source without prefetch;
+    // remove this adapter when Hono cancels/releases that reader itself.
+    let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+    let completed = false;
+    const body = new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        reader ??= source.getReader();
+        const { done, value } = await reader.read();
+        if (done) {
+          completed = true;
+          controller.close();
+        } else {
+          controller.enqueue(value);
+        }
+      },
+    }, { highWaterMark: 0 });
+    c.req.raw = new Request(request, { body, signal: request.signal });
+    try {
+      return await limit(c, next);
+    } finally {
+      if (reader) {
+        try {
+          if (!completed) await reader.cancel();
+        } catch {
+          // Preserve Hono's rejection or primary error if transport cleanup fails.
+        } finally {
+          reader.releaseLock();
+        }
+      }
+    }
+  };
 }
 
 function assertMaxBytes(maxBytes: number): number {

@@ -124,3 +124,12 @@ Two Q4 requestBody leaks, mapped-IPv4 Windows refusal and the DB identity prereq
 not waived. Q4 is attribution/proposal only; original owners remain unchanged. Independent IMPL
 and readiness are pending. This entry supersedes historical pending-implementation status only;
 plans and evaluator verdicts remain unchanged.
+
+## Q4 native source ownership checkpoint, 2026-10-28
+
+Root accepted the exact two-owner source and three-line handler-entry correction in
+[root Q4 acceptance](root-q4-source-acceptance.md). See [Q4 checkpoint](q4-checkpoint.md) and its
+byte-audited manifest. Final corrected owning14/0/0 and changed-test static1/1 pass; retained
+same-production whole service630/1, consumers26/0 and publication receipts remain valid within
+root's explicit test-only correction scope. Mapped IPv4 and cold DB remain open/unwaived.
+Independent complete-PR architecture IMPL is preparation only, pending root packet review.

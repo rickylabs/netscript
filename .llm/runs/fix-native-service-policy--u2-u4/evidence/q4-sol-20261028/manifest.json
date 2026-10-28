@@ -1,0 +1,479 @@
+﻿{
+    "baseline":  "7cfa593e198ade668d531d2bdafa336ff6ca5709",
+    "capturedUtc":  "2026-10-28T02:14:28.3291645Z",
+    "records":  [
+                    {
+                        "name":  "accepted-final-audit.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\accepted-final-audit.process.json",
+                        "bytes":  975,
+                        "sha256":  "48f637e4668dec94ddedf3ad3670bd5440101c504174459648f6ddab2a0b865f",
+                        "copiedSha256":  "48f637e4668dec94ddedf3ad3670bd5440101c504174459648f6ddab2a0b865f"
+                    },
+                    {
+                        "name":  "arch-check.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\arch-check.process.json",
+                        "bytes":  1212,
+                        "sha256":  "5d2087ac44d22eb492253bf3fc5b5a00acf7d19c5ad0e0838ef518b1ec799c01",
+                        "copiedSha256":  "5d2087ac44d22eb492253bf3fc5b5a00acf7d19c5ad0e0838ef518b1ec799c01"
+                    },
+                    {
+                        "name":  "arch-check.receipt.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\arch-check.receipt.json",
+                        "bytes":  19904,
+                        "sha256":  "e0be2e7901fd3b74c95a48ff33993cb8c24cf182f04ac92ddde41a4e1a40d28e",
+                        "copiedSha256":  "e0be2e7901fd3b74c95a48ff33993cb8c24cf182f04ac92ddde41a4e1a40d28e"
+                    },
+                    {
+                        "name":  "audit.ts",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\audit.ts",
+                        "bytes":  3196,
+                        "sha256":  "4a768b3ebe596e9b32a4ca6e24cfc9e6b627a1a7985e73bdcee105400b81b126",
+                        "copiedSha256":  "4a768b3ebe596e9b32a4ca6e24cfc9e6b627a1a7985e73bdcee105400b81b126"
+                    },
+                    {
+                        "name":  "check.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\check.json",
+                        "bytes":  340,
+                        "sha256":  "e9a6e0bdf4f688540c17e7edd58e37a4c68617d58b4bc65b08f9c7343c766026",
+                        "copiedSha256":  "e9a6e0bdf4f688540c17e7edd58e37a4c68617d58b4bc65b08f9c7343c766026"
+                    },
+                    {
+                        "name":  "check.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\check.process.json",
+                        "bytes":  1312,
+                        "sha256":  "39fb9b197a392b0a3dddfb22344c3a531c314eb0d276b8200983955934a90609",
+                        "copiedSha256":  "39fb9b197a392b0a3dddfb22344c3a531c314eb0d276b8200983955934a90609"
+                    },
+                    {
+                        "name":  "cleanup.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\cleanup.json",
+                        "bytes":  283,
+                        "sha256":  "9fbd0cce5486a7ad3c99ed7a6f362d9445e126224dc07472f7a79bee27adda90",
+                        "copiedSha256":  "9fbd0cce5486a7ad3c99ed7a6f362d9445e126224dc07472f7a79bee27adda90"
+                    },
+                    {
+                        "name":  "consumers.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\consumers.json",
+                        "bytes":  633,
+                        "sha256":  "c5797802d53099895c02ff7951ada84781673569bfb860dc01e8f53f730742fe",
+                        "copiedSha256":  "c5797802d53099895c02ff7951ada84781673569bfb860dc01e8f53f730742fe"
+                    },
+                    {
+                        "name":  "consumers.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\consumers.process.json",
+                        "bytes":  1717,
+                        "sha256":  "3d2e54814a4ff095794fa7c19befeef7a4bf730f64f0cf9397fe3269a94bcb0c",
+                        "copiedSha256":  "3d2e54814a4ff095794fa7c19befeef7a4bf730f64f0cf9397fe3269a94bcb0c"
+                    },
+                    {
+                        "name":  "corrected-two-owner.diff",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\corrected-two-owner.diff",
+                        "bytes":  6523,
+                        "sha256":  "ded232cdba4b5fa3c7f2483ddb24edc2c447edb53500e440e79812ee523e0270",
+                        "copiedSha256":  "ded232cdba4b5fa3c7f2483ddb24edc2c447edb53500e440e79812ee523e0270"
+                    },
+                    {
+                        "name":  "correction-check.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-check.json",
+                        "bytes":  338,
+                        "sha256":  "179ad90b0e517e0b9acb48c337e4bcfdc32dcb9e770b47c396a2b18477e6c55d",
+                        "copiedSha256":  "179ad90b0e517e0b9acb48c337e4bcfdc32dcb9e770b47c396a2b18477e6c55d"
+                    },
+                    {
+                        "name":  "correction-check.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-check.process.json",
+                        "bytes":  1381,
+                        "sha256":  "ba0d73b8480f4d06d0a7fad9a4eafd9811d607979a923606d673e6f7bb12c349",
+                        "copiedSha256":  "ba0d73b8480f4d06d0a7fad9a4eafd9811d607979a923606d673e6f7bb12c349"
+                    },
+                    {
+                        "name":  "correction-fmt.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-fmt.json",
+                        "bytes":  312,
+                        "sha256":  "a4c9294852f04fd041ecf2d4d357552e6b792641220dfa7c6fefe3954ba7bbe2",
+                        "copiedSha256":  "a4c9294852f04fd041ecf2d4d357552e6b792641220dfa7c6fefe3954ba7bbe2"
+                    },
+                    {
+                        "name":  "correction-fmt.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-fmt.process.json",
+                        "bytes":  1222,
+                        "sha256":  "0a19a39eb25b3881b0a4ea8f9b3da4b16254753f892e05495b9993c2b57c8441",
+                        "copiedSha256":  "0a19a39eb25b3881b0a4ea8f9b3da4b16254753f892e05495b9993c2b57c8441"
+                    },
+                    {
+                        "name":  "correction-format.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-format.process.json",
+                        "bytes":  767,
+                        "sha256":  "781a472450aea5955a7ff697eb588940a061d6a392dc9e3a7d1fd0420d0fff3d",
+                        "copiedSha256":  "781a472450aea5955a7ff697eb588940a061d6a392dc9e3a7d1fd0420d0fff3d"
+                    },
+                    {
+                        "name":  "correction-format.stderr.log",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-format.stderr.log",
+                        "bytes":  824,
+                        "sha256":  "c89d08c55b504dfc0b890601a655fc5863cb143ec22e8637214fb109721b21dc",
+                        "copiedSha256":  "c89d08c55b504dfc0b890601a655fc5863cb143ec22e8637214fb109721b21dc"
+                    },
+                    {
+                        "name":  "correction-handoff.md",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-handoff.md",
+                        "bytes":  1438,
+                        "sha256":  "56d548a3a281c3ac8de85c73ee6dac15026368b69584693f27db37f3b662a36a",
+                        "copiedSha256":  "56d548a3a281c3ac8de85c73ee6dac15026368b69584693f27db37f3b662a36a"
+                    },
+                    {
+                        "name":  "correction-lint.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-lint.json",
+                        "bytes":  363,
+                        "sha256":  "e8a92d759027553e14a30e80dc4299387a41f2e02ac4bb4a97b0622d1803159a",
+                        "copiedSha256":  "e8a92d759027553e14a30e80dc4299387a41f2e02ac4bb4a97b0622d1803159a"
+                    },
+                    {
+                        "name":  "correction-lint.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-lint.process.json",
+                        "bytes":  1227,
+                        "sha256":  "2ed3814a284b3b38fc7dc4bc3255f4d92c649116c153b9e2835433a0f875f915",
+                        "copiedSha256":  "2ed3814a284b3b38fc7dc4bc3255f4d92c649116c153b9e2835433a0f875f915"
+                    },
+                    {
+                        "name":  "correction-owning.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-owning.json",
+                        "bytes":  420,
+                        "sha256":  "e96b6a23b8987d82668940b6fc8a2eccda9fb1cb6c636519c7bb0c3e6a2d1d91",
+                        "copiedSha256":  "e96b6a23b8987d82668940b6fc8a2eccda9fb1cb6c636519c7bb0c3e6a2d1d91"
+                    },
+                    {
+                        "name":  "correction-owning.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-owning.process.json",
+                        "bytes":  1441,
+                        "sha256":  "923dac7aabc390a008218cf4268feffd6c9e8c641f6307419d0aeefdb746ca52",
+                        "copiedSha256":  "923dac7aabc390a008218cf4268feffd6c9e8c641f6307419d0aeefdb746ca52"
+                    },
+                    {
+                        "name":  "correction-source-hashes.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\correction-source-hashes.json",
+                        "bytes":  390,
+                        "sha256":  "9fe80947af2e18b00c9fa77bda71d6ab54e2d00d27122b2f176f4f28e4ad9b52",
+                        "copiedSha256":  "9fe80947af2e18b00c9fa77bda71d6ab54e2d00d27122b2f176f4f28e4ad9b52"
+                    },
+                    {
+                        "name":  "doc-lint.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\doc-lint.process.json",
+                        "bytes":  1426,
+                        "sha256":  "438a9046020900933daadcffe5dedd0135f8506b8a873c63365c4d973a1ffa7d",
+                        "copiedSha256":  "438a9046020900933daadcffe5dedd0135f8506b8a873c63365c4d973a1ffa7d"
+                    },
+                    {
+                        "name":  "doc-lint.receipt.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\doc-lint.receipt.json",
+                        "bytes":  1491,
+                        "sha256":  "cee51389ce2f7722041c6c4995bb0a9cc656319064bc62ca477d18e9a7d66d4b",
+                        "copiedSha256":  "cee51389ce2f7722041c6c4995bb0a9cc656319064bc62ca477d18e9a7d66d4b"
+                    },
+                    {
+                        "name":  "doc-lint-child.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\doc-lint-child.json",
+                        "bytes":  1523,
+                        "sha256":  "725e6eace1572eef59fd26983abde70c49169e146979ef59888b905ca3b873fb",
+                        "copiedSha256":  "725e6eace1572eef59fd26983abde70c49169e146979ef59888b905ca3b873fb"
+                    },
+                    {
+                        "name":  "doctrine.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\doctrine.process.json",
+                        "bytes":  925,
+                        "sha256":  "76a58b4f1eda4a469816745e5ad1c702ce38f25797e5b04b448a1ceb7d694418",
+                        "copiedSha256":  "76a58b4f1eda4a469816745e5ad1c702ce38f25797e5b04b448a1ceb7d694418"
+                    },
+                    {
+                        "name":  "doctrine.stdout.log",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\doctrine.stdout.log",
+                        "bytes":  51236,
+                        "sha256":  "ef334a040efdb5b0ea83beccd5964a302f717df44e2b688edfded055d7206352",
+                        "copiedSha256":  "ef334a040efdb5b0ea83beccd5964a302f717df44e2b688edfded055d7206352"
+                    },
+                    {
+                        "name":  "final-audit.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\final-audit.json",
+                        "bytes":  9062,
+                        "sha256":  "91ed85020ad76ea31f40f288258f99f5f2e8a61c2245a458658d3e9b95b57233",
+                        "copiedSha256":  "91ed85020ad76ea31f40f288258f99f5f2e8a61c2245a458658d3e9b95b57233"
+                    },
+                    {
+                        "name":  "final-audit.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\final-audit.process.json",
+                        "bytes":  948,
+                        "sha256":  "37b9fef726bc3f15c17a00bb3e6b0714a81ab516749295b971a2a42ced2cd94d",
+                        "copiedSha256":  "37b9fef726bc3f15c17a00bb3e6b0714a81ab516749295b971a2a42ced2cd94d"
+                    },
+                    {
+                        "name":  "fmt.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\fmt.json",
+                        "bytes":  318,
+                        "sha256":  "0778e80a739f13c7c675a4e37b3dbc141cc2b29fe7978f678c10a40f32d05f17",
+                        "copiedSha256":  "0778e80a739f13c7c675a4e37b3dbc141cc2b29fe7978f678c10a40f32d05f17"
+                    },
+                    {
+                        "name":  "fmt.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\fmt.process.json",
+                        "bytes":  1153,
+                        "sha256":  "000bdda26946308494a8ac56eba657b705992a0609cae6da3340f3be91fa817c",
+                        "copiedSha256":  "000bdda26946308494a8ac56eba657b705992a0609cae6da3340f3be91fa817c"
+                    },
+                    {
+                        "name":  "format-final.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\format-final.process.json",
+                        "bytes":  824,
+                        "sha256":  "73b2bd403bdaf065ad6dbe69abe86e28df7341dc9bb141799107599497abad9b",
+                        "copiedSha256":  "73b2bd403bdaf065ad6dbe69abe86e28df7341dc9bb141799107599497abad9b"
+                    },
+                    {
+                        "name":  "format-final.stderr.log",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\format-final.stderr.log",
+                        "bytes":  828,
+                        "sha256":  "01185f31d0ceed8dc51fceb5e8c443cbf4ca10789f6b2ec9aa220210d93948db",
+                        "copiedSha256":  "01185f31d0ceed8dc51fceb5e8c443cbf4ca10789f6b2ec9aa220210d93948db"
+                    },
+                    {
+                        "name":  "format-final-owners.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\format-final-owners.process.json",
+                        "bytes":  845,
+                        "sha256":  "87604cae27deeb3eadc4b63c8fc5edfd800bbdae1cd6f811ba8ae18bf3c5784f",
+                        "copiedSha256":  "87604cae27deeb3eadc4b63c8fc5edfd800bbdae1cd6f811ba8ae18bf3c5784f"
+                    },
+                    {
+                        "name":  "format-final-owners.stderr.log",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\format-final-owners.stderr.log",
+                        "bytes":  828,
+                        "sha256":  "01185f31d0ceed8dc51fceb5e8c443cbf4ca10789f6b2ec9aa220210d93948db",
+                        "copiedSha256":  "01185f31d0ceed8dc51fceb5e8c443cbf4ca10789f6b2ec9aa220210d93948db"
+                    },
+                    {
+                        "name":  "format-owners.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\format-owners.process.json",
+                        "bytes":  827,
+                        "sha256":  "8214022cbfa8febc659f6562d9abad726029ac8557178b2bc9d8c7ffbab3b67f",
+                        "copiedSha256":  "8214022cbfa8febc659f6562d9abad726029ac8557178b2bc9d8c7ffbab3b67f"
+                    },
+                    {
+                        "name":  "format-owners.stderr.log",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\format-owners.stderr.log",
+                        "bytes":  1078,
+                        "sha256":  "6307d2cf7c6b321f61fc6976e912e3b3212f5f9acb47c592e9647caebf361b73",
+                        "copiedSha256":  "6307d2cf7c6b321f61fc6976e912e3b3212f5f9acb47c592e9647caebf361b73"
+                    },
+                    {
+                        "name":  "format-reviewed-owners.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\format-reviewed-owners.process.json",
+                        "bytes":  854,
+                        "sha256":  "4bc8919d61e5a8e73d3fee45cc91d2ee34f3b27f8d9fc0ee06c787d1086037a2",
+                        "copiedSha256":  "4bc8919d61e5a8e73d3fee45cc91d2ee34f3b27f8d9fc0ee06c787d1086037a2"
+                    },
+                    {
+                        "name":  "format-reviewed-owners.stderr.log",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\format-reviewed-owners.stderr.log",
+                        "bytes":  828,
+                        "sha256":  "01185f31d0ceed8dc51fceb5e8c443cbf4ca10789f6b2ec9aa220210d93948db",
+                        "copiedSha256":  "01185f31d0ceed8dc51fceb5e8c443cbf4ca10789f6b2ec9aa220210d93948db"
+                    },
+                    {
+                        "name":  "handoff.md",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\handoff.md",
+                        "bytes":  5255,
+                        "sha256":  "2d6200290a213391fc6a90d2bea78ade01d20492e9a3336f2940611dbdf1812e",
+                        "copiedSha256":  "2d6200290a213391fc6a90d2bea78ade01d20492e9a3336f2940611dbdf1812e"
+                    },
+                    {
+                        "name":  "jsr-audit.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\jsr-audit.json",
+                        "bytes":  6816,
+                        "sha256":  "6d94f5a5bd6d794f91c5f13bf56c11d8862c95de6e5668e186604d569e11c1ea",
+                        "copiedSha256":  "6d94f5a5bd6d794f91c5f13bf56c11d8862c95de6e5668e186604d569e11c1ea"
+                    },
+                    {
+                        "name":  "jsr-audit.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\jsr-audit.process.json",
+                        "bytes":  1199,
+                        "sha256":  "dd44bc9b6ba02bd86a8a9202afae998be058299afb71734ea60493bea6ead755",
+                        "copiedSha256":  "dd44bc9b6ba02bd86a8a9202afae998be058299afb71734ea60493bea6ead755"
+                    },
+                    {
+                        "name":  "lint.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\lint.json",
+                        "bytes":  369,
+                        "sha256":  "cfd97e13c88bb22d5b72c20e28cbbc448536eb702e160c7b459993355132c750",
+                        "copiedSha256":  "cfd97e13c88bb22d5b72c20e28cbbc448536eb702e160c7b459993355132c750"
+                    },
+                    {
+                        "name":  "lint.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\lint.process.json",
+                        "bytes":  1158,
+                        "sha256":  "b29d1210d98b205728cc2ee3b58bbd257e80d901afa786fac7fa8a2c0d8c5ba3",
+                        "copiedSha256":  "b29d1210d98b205728cc2ee3b58bbd257e80d901afa786fac7fa8a2c0d8c5ba3"
+                    },
+                    {
+                        "name":  "owning-controls-red.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-controls-red.json",
+                        "bytes":  884,
+                        "sha256":  "7ea5da907e10f0fb0905c45bfde2f0110c771d672c701cef57b2653f7dabf8fc",
+                        "copiedSha256":  "7ea5da907e10f0fb0905c45bfde2f0110c771d672c701cef57b2653f7dabf8fc"
+                    },
+                    {
+                        "name":  "owning-controls-red.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-controls-red.process.json",
+                        "bytes":  1449,
+                        "sha256":  "be4b8afc45dea60802c973489a1efdede04dcf8c8d4f38188ca2876f69eebac0",
+                        "copiedSha256":  "be4b8afc45dea60802c973489a1efdede04dcf8c8d4f38188ca2876f69eebac0"
+                    },
+                    {
+                        "name":  "owning-final.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-final.json",
+                        "bytes":  755,
+                        "sha256":  "1d694416593ea0d89684a1241b12f0185ee4eeac07136772ea4ce745963ee467",
+                        "copiedSha256":  "1d694416593ea0d89684a1241b12f0185ee4eeac07136772ea4ce745963ee467"
+                    },
+                    {
+                        "name":  "owning-final.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-final.process.json",
+                        "bytes":  1421,
+                        "sha256":  "d7a57149e81c94606f56a5d5bc02d8bd83e977e47933e12f58d77fe3a9802348",
+                        "copiedSha256":  "d7a57149e81c94606f56a5d5bc02d8bd83e977e47933e12f58d77fe3a9802348"
+                    },
+                    {
+                        "name":  "owning-final-green.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-final-green.json",
+                        "bytes":  420,
+                        "sha256":  "8089818270f08f3256e1649e3a0c02e14f2f150b5c32bc00fdf7e373cf06dc0a",
+                        "copiedSha256":  "8089818270f08f3256e1649e3a0c02e14f2f150b5c32bc00fdf7e373cf06dc0a"
+                    },
+                    {
+                        "name":  "owning-final-green.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-final-green.process.json",
+                        "bytes":  1445,
+                        "sha256":  "da8d92ae95e6fe9941924d8d1b563359fa6b05eb096553d78d7802462ef3e3bd",
+                        "copiedSha256":  "da8d92ae95e6fe9941924d8d1b563359fa6b05eb096553d78d7802462ef3e3bd"
+                    },
+                    {
+                        "name":  "owning-first-green.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-first-green.json",
+                        "bytes":  420,
+                        "sha256":  "58beca3b2035a1f2d4a66cdb4c1ce668093e47984dd98b2b63aae975b2eb3a98",
+                        "copiedSha256":  "58beca3b2035a1f2d4a66cdb4c1ce668093e47984dd98b2b63aae975b2eb3a98"
+                    },
+                    {
+                        "name":  "owning-first-green.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-first-green.process.json",
+                        "bytes":  1445,
+                        "sha256":  "c586a88bbe2816649640663f6df2deb55496133b712d8f41fae6fc0ba475e358",
+                        "copiedSha256":  "c586a88bbe2816649640663f6df2deb55496133b712d8f41fae6fc0ba475e358"
+                    },
+                    {
+                        "name":  "owning-green.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-green.json",
+                        "bytes":  994,
+                        "sha256":  "3bbdad6d4609c80a6639c35d3c19d45933f403232ff14ea3ba13096ccfa0afad",
+                        "copiedSha256":  "3bbdad6d4609c80a6639c35d3c19d45933f403232ff14ea3ba13096ccfa0afad"
+                    },
+                    {
+                        "name":  "owning-green.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-green.process.json",
+                        "bytes":  1421,
+                        "sha256":  "9cc01efe9c1670d5205e25aa9399af0a3500eb343af74dc25116d09ab67a4dd7",
+                        "copiedSha256":  "9cc01efe9c1670d5205e25aa9399af0a3500eb343af74dc25116d09ab67a4dd7"
+                    },
+                    {
+                        "name":  "owning-unchanged-red.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-unchanged-red.json",
+                        "bytes":  883,
+                        "sha256":  "89dd2b44a77f659c375813ac94e425dae7b5e2c81657d2db015e8e3f85f93a9b",
+                        "copiedSha256":  "89dd2b44a77f659c375813ac94e425dae7b5e2c81657d2db015e8e3f85f93a9b"
+                    },
+                    {
+                        "name":  "owning-unchanged-red.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\owning-unchanged-red.process.json",
+                        "bytes":  1453,
+                        "sha256":  "344faa632d25e31d02b0d990f97e954b9fd17325b8f2512030cd5c775e1b5851",
+                        "copiedSha256":  "344faa632d25e31d02b0d990f97e954b9fd17325b8f2512030cd5c775e1b5851"
+                    },
+                    {
+                        "name":  "pre-correction-final-audit.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\pre-correction-final-audit.json",
+                        "bytes":  9062,
+                        "sha256":  "ea4555713c97ec35349882fb0ea765249cd09cec0e0d29295d3af01d5cc27448",
+                        "copiedSha256":  "ea4555713c97ec35349882fb0ea765249cd09cec0e0d29295d3af01d5cc27448"
+                    },
+                    {
+                        "name":  "publish-dry-run.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\publish-dry-run.process.json",
+                        "bytes":  1242,
+                        "sha256":  "01765bb065ae5b6f8bf97b64a83e3d93ef32218173609a9f21b7930689349550",
+                        "copiedSha256":  "01765bb065ae5b6f8bf97b64a83e3d93ef32218173609a9f21b7930689349550"
+                    },
+                    {
+                        "name":  "publish-dry-run.receipt.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\publish-dry-run.receipt.json",
+                        "bytes":  17636,
+                        "sha256":  "14218d35aa186ce116b33889a049dfe65a41440f67b3823f31af4e0b6c15d562",
+                        "copiedSha256":  "14218d35aa186ce116b33889a049dfe65a41440f67b3823f31af4e0b6c15d562"
+                    },
+                    {
+                        "name":  "publish-scratch-before.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\publish-scratch-before.json",
+                        "bytes":  11,
+                        "sha256":  "84b1c14e68260082e3e79edff0a78f4ebf1942cfd6c593246044ec2149cbb87d",
+                        "copiedSha256":  "84b1c14e68260082e3e79edff0a78f4ebf1942cfd6c593246044ec2149cbb87d"
+                    },
+                    {
+                        "name":  "quality-scan.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\quality-scan.process.json",
+                        "bytes":  1224,
+                        "sha256":  "b9851a6e70aefe1f14a9f13c3f5d2a24726b5d0d75a8e93d829c9828ff71d3c2",
+                        "copiedSha256":  "b9851a6e70aefe1f14a9f13c3f5d2a24726b5d0d75a8e93d829c9828ff71d3c2"
+                    },
+                    {
+                        "name":  "quality-scan.receipt.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\quality-scan.receipt.json",
+                        "bytes":  5844,
+                        "sha256":  "7a8812c1d45a240b835f8e62ecb88d8a750b65e399e11f861f4426e9ac36cc2f",
+                        "copiedSha256":  "7a8812c1d45a240b835f8e62ecb88d8a750b65e399e11f861f4426e9ac36cc2f"
+                    },
+                    {
+                        "name":  "run-deno.ps1",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\run-deno.ps1",
+                        "bytes":  1633,
+                        "sha256":  "5af60a3218ea630c181e0f6b1c96513d16379da70a2c68a2a6b7b7e7b4756d1f",
+                        "copiedSha256":  "5af60a3218ea630c181e0f6b1c96513d16379da70a2c68a2a6b7b7e7b4756d1f"
+                    },
+                    {
+                        "name":  "source-hashes.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\source-hashes.json",
+                        "bytes":  390,
+                        "sha256":  "c262a9ff8eff143630b91cffdd15340706c20dfa50a9f43bb4b9d950b2e2ad80",
+                        "copiedSha256":  "c262a9ff8eff143630b91cffdd15340706c20dfa50a9f43bb4b9d950b2e2ad80"
+                    },
+                    {
+                        "name":  "two-owner.diff",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\two-owner.diff",
+                        "bytes":  6389,
+                        "sha256":  "3d3dd30949c496262ca37b0377868a1571c87e96e1106245f343ee2968ea2206",
+                        "copiedSha256":  "3d3dd30949c496262ca37b0377868a1571c87e96e1106245f343ee2968ea2206"
+                    },
+                    {
+                        "name":  "whole-service.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\whole-service.json",
+                        "bytes":  1315,
+                        "sha256":  "0a392630b100936a21e05f1ce44ecde2b5e4f6793ffb4c5eaf0772f1582658b6",
+                        "copiedSha256":  "0a392630b100936a21e05f1ce44ecde2b5e4f6793ffb4c5eaf0772f1582658b6"
+                    },
+                    {
+                        "name":  "whole-service.process.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\whole-service.process.json",
+                        "bytes":  1407,
+                        "sha256":  "f211844f7c8ff1cc0d66a0836f2301a95ad39468cb5e585617cbf74a3b2527a9",
+                        "copiedSha256":  "f211844f7c8ff1cc0d66a0836f2301a95ad39468cb5e585617cbf74a3b2527a9"
+                    }
+                ],
+    "totalRecords":  67,
+    "totalBytes":  195152,
+    "allCopiesMatch":  true,
+    "status":  "Root source accepted; independent IMPL and mapped-IPv4/coldDB gates remain pending"
+}
