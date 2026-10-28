@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Author a plugin
 description: Build a capability NetScript does not ship, as a core package and a connector.
 templateEngine: [vento, md]
-order: 108
+order: 102
 oldUrl: /how-to/author-a-plugin/
 ---
 

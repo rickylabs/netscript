@@ -1,10 +1,11 @@
 ---
 layout: layouts/base.vto
-title: Orchestration and Runtime
+title: Orchestration & runtime
+description: The CLI scaffold, the Aspire resource graph, runtime configuration, plugins, and deployment.
 templateEngine: [vento, md]
 ---
 
-# Orchestration & Runtime
+# Orchestration & runtime
 
 This section covers how a NetScript workspace runs as one system: the CLI scaffold, the Aspire
 AppHost and its resource graph, generated plugin registries, runtime configuration, deployment and

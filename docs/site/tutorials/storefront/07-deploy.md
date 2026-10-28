@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Run the whole storefront
+title: Run the storefront under Aspire
 templateEngine: [vento, md]
 prev: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" }
 next: { label: "How-to guides", href: "/how-to/" }
 ---
 
-# Run the whole storefront
+# Run the storefront under Aspire
 
 In this chapter you run the **entire** `my-shop/` as one system under a single `aspire start`: the
 products service, the storefront page, the checkout saga, the shipping webhook, Postgres and the
@@ -189,7 +189,7 @@ topology; for production, start from the Deploy guide below.
 - **Add observability** → [Add OpenTelemetry](/observability/how-to/add-opentelemetry/) and the
   [Observability explanation](/explanation/observability/).
 - **Go deeper on the ideas** → [Durability model](/explanation/durability-model/),
-  [Contracts & type flow](/explanation/contracts/), and [The plugin system](/explanation/plugin-system/).
+  [Contracts & type flow](/explanation/contracts/), and [the plugin system](/explanation/plugin-system/).
 - **Solve a specific task** → the full [How-to guides](/how-to/).
 
 {{ comp.nextPrev({ prev: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}

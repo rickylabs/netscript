@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
-title: Services and SDK
+title: Services & SDK
+description: Contract-first oRPC services and the typed SDK that calls them.
 templateEngine: [vento, md]
 ---
 

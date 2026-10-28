@@ -159,7 +159,7 @@ snapshot support with harness `initial: true` to add snapshot delivery scenarios
 
 ## Related pages
 
-- [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/): read, write, and watch a KV store in
+- [Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/): read, write, and watch a KV store in
   a running workspace.
 - [KV, queues & cron](/data-persistence/kv-queues-cron/): the durable-by-default KV model and how it
   backs queues and cron.

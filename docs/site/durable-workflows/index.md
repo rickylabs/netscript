@@ -1,10 +1,11 @@
 ---
 layout: layouts/base.vto
-title: Durable Workflows
+title: Durable workflows
+description: Sagas, event triggers, and durable streams for work that must survive restarts.
 templateEngine: [vento, md]
 ---
 
-# Durable Workflows
+# Durable workflows
 
 This section covers work that must outlive a request and a process. A
 [saga](/durable-workflows/sagas/) carries multi-step state across crashes, a
@@ -28,7 +29,7 @@ an HTTP surface, so you can confirm that a message crossed each step.
 | Your problem | Use |
 | --- | --- |
 | State between steps must survive a crash, with compensation when a step fails | [Durable sagas](/durable-workflows/sagas/) |
-| The outside world starts the work: webhooks, dropped files, cron | [Triggers & ingress](/durable-workflows/triggers/) |
+| The outside world starts the work: webhooks, dropped files, cron | [Event triggers](/durable-workflows/triggers/) |
 | Consumers need the latest state without polling | [Durable streams](/durable-workflows/streams/) |
 
 {{ comp.cardsGrid({ columns: 4, cards: [

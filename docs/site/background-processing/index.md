@@ -1,10 +1,11 @@
 ---
 layout: layouts/base.vto
-title: Background Processing
+title: Background processing
+description: Worker jobs and polyglot tasks that run outside the request path.
 templateEngine: [vento, md]
 ---
 
-# Background Processing
+# Background processing
 
 Background Processing covers work that runs outside the request path: background jobs, polyglot
 tasks, queue providers, scheduled work, runtime adapters and per-task permissions. You write one

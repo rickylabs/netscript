@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Add a plugin
 description: Install an official plugin, register it, and confirm it is healthy.
 templateEngine: [vento, md]
-order: 107
+order: 101
 oldUrl: /how-to/add-a-plugin/
 ---
 

@@ -270,7 +270,7 @@ rows: [
 
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 
-[Operational session lifecycles](/identity-access/session-lifecycles/) shows the HTTP wiring for
+[Session lifecycles](/identity-access/session-lifecycles/) shows the HTTP wiring for
 each backend.
 
 ## How auth integrates with services

@@ -24,7 +24,7 @@ This documentation site is a fourth surface: every page has a Markdown twin, and
 published behind `llms.txt` (see [Reading these docs as an agent](#reading-these-docs-as-an-agent)).
 
 Prefer the CLI when a command already expresses the operation, because it is easier to reproduce in
-a terminal or CI job; the [CLI reference]({{ "cli:reference" |> xref |> url }}) maps what exists.
+a terminal or CI job; the [CLI cheat sheet]({{ "cli:reference" |> xref |> url }}) maps what exists.
 Use MCP for interactive investigation, especially when one framework-aware tool replaces several
 telemetry queries or when an agent needs to discover a document before reading it.
 
@@ -265,6 +265,6 @@ checks docs, exports, diagnostics, unreachable telemetry and command denial.
 Look up each tool's contract and output bounds in the
 [`@netscript/mcp` reference]({{ "ref:mcp" |> xref |> url }}).
 
-- The [CLI reference]({{ "cli:reference" |> xref |> url }}) covers `agent init`, `agent mcp` and
+- The [CLI cheat sheet]({{ "cli:reference" |> xref |> url }}) covers `agent init`, `agent mcp` and
   every other command.
 - The [MCP client stack](/ai/mcp/) consumes external MCP servers inside your own product's agents.

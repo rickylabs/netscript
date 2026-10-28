@@ -209,7 +209,7 @@ netscript db seed               # seed development data (orders, users, products
 ```
 
 These commands talk to the Postgres container Aspire provisioned; without Aspire they fail. The full
-sequence is in [Database & migration](/data-persistence/how-to/database-migration/).
+sequence is in [Migrate the database](/data-persistence/how-to/database-migration/).
 
 ## Verify your progress
 

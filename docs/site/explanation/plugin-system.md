@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.vto
-title: The plugin system
+title: Plugin system
 templateEngine: [vento, md]
 prev: { label: "Contracts & type flow", href: "/explanation/contracts/" }
 next: { label: "Auth model", href: "/explanation/auth-model/" }
 order: 3
 ---
 
-# The plugin system
+# Plugin system
 
 This page explains how a NetScript plugin works: the **core package** behind it, the typed
 **manifest** of contributions it declares, the generated **registries** that wire it into a host,
@@ -141,7 +141,7 @@ independently removable.
 {{ /comp }}
 
 The {{ comp.xref({ key: "howto:add-a-plugin", text: "add-a-plugin how-to" }) }} and the
-{{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }} cover the sequence:
+{{ comp.xref({ key: "cli:reference", text: "CLI cheat sheet" }) }} cover the sequence:
 `netscript plugin install …`, then the registry-generation step that makes the plugin visible to
 the runtime.
 

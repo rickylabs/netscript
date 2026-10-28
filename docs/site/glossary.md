@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Glossary
+description: The terms the NetScript docs use, with the symbol or command behind each one.
 templateEngine: [vento, md]
 prev: null
 next: { label: "CLI reference", href: "/cli-reference/" }

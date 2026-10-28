@@ -16,7 +16,7 @@ migrations and generated client.
 The examples show the common Postgres-primary case, but the steps apply to whichever engine you
 chose with `netscript init --db`. The default scaffold aggregates every plugin's `.prisma` models
 into **one primary datasource** (see
-[Database & migration](/data-persistence/how-to/database-migration/)). A second database is a
+[Migrate the database](/data-persistence/how-to/database-migration/)). A second database is a
 **separate** Prisma schema workspace with its own `generate` output and migration history, and it
 never merges into the primary aggregation.
 

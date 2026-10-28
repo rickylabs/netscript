@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Routing and route contracts
 templateEngine: [vento, md]
-order: 3
+order: 6
 ---
 
 # Routing and route contracts

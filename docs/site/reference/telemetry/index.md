@@ -128,7 +128,7 @@ W3C trace-context propagation across job subprocesses and message headers.
 ## Attributes (`@netscript/telemetry/attributes`)
 
 Semantic attribute keys, span-name constants, and attribute builders. The TC-1..TC-14 checklist is
-in the [telemetry convention](./convention/).
+in the [telemetry conventions](./convention/).
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |

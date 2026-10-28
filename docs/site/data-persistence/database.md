@@ -137,7 +137,7 @@ typed against the old shape until you run `netscript db generate` again.
 | `netscript db status` | Shows which migrations are applied and whether the database is in sync with the schema. |
 | `netscript db migrate --name add_orders` | Creates and applies the next migration after a schema change. Run `netscript db generate` after it. |
 
-[Database & migration](/data-persistence/how-to/database-migration/) runs this cycle step by step.
+[Migrate the database](/data-persistence/how-to/database-migration/) runs this cycle step by step.
 
 ## Plugins contribute models
 
@@ -279,7 +279,7 @@ of them.
 
 ## Next steps
 
-Run the [Database & migration](/data-persistence/how-to/database-migration/) recipe to bring up
+Run the [database migration](/data-persistence/how-to/database-migration/) recipe to bring up
 Postgres and apply your first migration.
 
 - [Use a second database](/data-persistence/how-to/use-a-second-database/): add an MSSQL or MySQL

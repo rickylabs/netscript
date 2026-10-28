@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.vto
-title: Observability
+title: Observability model
 templateEngine: [vento, md]
 prev: { label: "Durability model", href: "/explanation/durability-model/" }
 next: { label: "Orchestration with Aspire", href: "/explanation/aspire/" }
 order: 6
 ---
 
-# Observability
+# Observability model
 
 This page explains how NetScript keeps one logical operation readable as one trace when it crosses
 HTTP, a queue, a saga, and a worker subprocess: the trace context travels with the work, and the

@@ -61,7 +61,7 @@ attribute-preserving span links.
 Attribute names follow one convention: upstream semconv keys (`rpc.*`, `messaging.*`, `gen_ai.*`,
 `server.*`) wherever OpenTelemetry defines them, and NetScript-owned keys under the single
 proprietary root `netscript.*`. Correlated spans share `netscript.correlation.id`. The
-[telemetry convention](/reference/telemetry/convention/) has the full rules for span naming,
+[telemetry conventions](/reference/telemetry/convention/) has the full rules for span naming,
 SpanKind, status and propagation; [Observability](/explanation/observability/) separates what the
 framework emits from what is a scaffold stub.
 
@@ -299,7 +299,7 @@ spans and read them in the dashboard.
   handler telemetry, console logs, health endpoints and Aspire traces fit together.
 - {{ comp.xref({ key: "ref:telemetry" }) }} and [logger](/reference/logger/) references: the full
   generated APIs.
-- [Telemetry convention](/reference/telemetry/convention/): span naming, SpanKind and the
+- [Telemetry conventions](/reference/telemetry/convention/): span naming, SpanKind and the
   `netscript.*` attribute rules.
 
 {{ comp.nextPrev({

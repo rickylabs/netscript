@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Data loading and the query cache
 templateEngine: [vento, md]
-order: 4
+order: 10
 ---
 
 # Data loading and the query cache
@@ -180,7 +180,7 @@ compile error. The same factory supplies the KV-backed server helpers described
 in [Typed SDK & client](/services-sdk/sdk/), so loaders and islands share one
 input shape and one query-key vocabulary. Seeding the island with the loader's
 payload through `initialData` is covered in
-[The query bridge](/web-layer/query-bridge/).
+[the query bridge](/web-layer/query-bridge/).
 
 ### Polling an island with `refetchInterval`
 
@@ -402,7 +402,7 @@ Query subpath (`@netscript/fresh/query`):
 
 ## Next steps
 
-Read [The query bridge](/web-layer/query-bridge/) to hand a server loader's cache
+Read [the query bridge](/web-layer/query-bridge/) to hand a server loader's cache
 entry to an island without a refetch. See also
 [Typed SDK & client](/services-sdk/sdk/) and the
 [live dashboard tutorial](/tutorials/live-dashboard/).

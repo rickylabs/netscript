@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Deploy to Deno Deploy
 description: Push a stateless entrypoint to Deno Deploy, promote it, and read its status and logs.
 templateEngine: [vento, md]
-order: 103
+order: 106
 oldUrl: /how-to/deploy-deno-deploy/
 ---
 
@@ -173,4 +173,4 @@ processors on infrastructure that permits `--unstable-kv`, as covered in
 
 Make the deployed process observable with
 [Add OpenTelemetry](/observability/how-to/add-opentelemetry/). For every command grouped by
-workflow, see the [CLI reference](/cli-reference/).
+workflow, see the [CLI cheat sheet](/cli-reference/).

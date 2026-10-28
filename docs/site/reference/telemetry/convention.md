@@ -1,7 +1,14 @@
-# NetScript telemetry convention
+---
+layout: layouts/base.vto
+title: Telemetry conventions
+description: The span names, attribute keys, propagation and metrics rules every NetScript package and plugin follows.
+---
 
-The TC-1..TC-14 checklist that NetScript package and plugin telemetry follows: span names and kinds,
-semantic-convention keys, privacy, propagation and metrics. The symbols are in the
+# Telemetry conventions
+
+The rules every NetScript package and plugin follows when it emits telemetry: span names and kinds,
+semantic-convention keys, privacy, propagation and metrics. Each rule has the ID it carries in the
+exported `TelemetryConventionChecklist`; the symbols are in the
 [`@netscript/telemetry` reference](/reference/telemetry/).
 
 ## Semantic-convention opt-in
@@ -13,8 +20,7 @@ OTEL_SEMCONV_STABILITY_OPT_IN=messaging,rpc,gen_ai_latest_experimental
 ```
 
 Use OpenTelemetry semantic-convention attribute keys verbatim when a domain exists. NetScript-owned
-attributes use the single proprietary root `netscript.*`. The beta.5 migration emits duplicate
-deprecated aliases for one beta under the `dup` window, then the bare aliases are removed.
+attributes use the single proprietary root `netscript.*`.
 
 Messaging spans use the current OpenTelemetry messaging registry for upstream concepts:
 `messaging.system`, `messaging.destination.name`, `messaging.operation.name`,
@@ -59,5 +65,4 @@ Build attributes with the `@netscript/telemetry/attributes` builders instead of 
 - `createExecutionAttributes`
 - `createGenAiAttributes`
 
-During beta.5, builders emit canonical `netscript.*` keys plus deprecated bare aliases where the old
-surface already shipped. New code should read and assert the canonical key.
+Read and assert the canonical `netscript.*` keys these builders emit.

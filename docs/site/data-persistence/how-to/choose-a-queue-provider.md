@@ -11,7 +11,7 @@ oldUrl: /how-to/choose-a-queue-provider/
 
 This recipe helps you pick a backend for `@netscript/queue` and select it, either through
 auto-discovery or by pinning one with `provider` and `connection`. For the enqueue, consume and cron
-mechanics, see [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/).
+mechanics, see [Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/).
 
 A NetScript queue is provider-agnostic: the same `createQueue("jobs")` call runs on an in-memory
 adapter in a unit test, on Deno KV on your laptop and on a broker under Aspire. Only the backend the

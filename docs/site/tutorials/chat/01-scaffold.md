@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Scaffold the chat workspace
+title: Scaffold the chat app
 templateEngine: [vento, md]
 prev: { label: "AI Chat", href: "/tutorials/chat/" }
 next: { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" }
 ---
 
-# Scaffold the chat workspace
+# Scaffold the chat app
 
 This chapter creates the project the whole track builds on: a NetScript workspace with a Fresh
 frontend, the streams runtime that durable chat sessions live in, and your model key, all running

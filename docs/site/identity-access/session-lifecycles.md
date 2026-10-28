@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.vto
-title: Operational session lifecycles
+title: Session lifecycles
 templateEngine: [vento, md]
 prev: { label: "better-auth plugins", href: "/identity-access/better-auth-plugins/" }
 next: null
 order: 3
 ---
 
-# Operational session lifecycles
+# Session lifecycles
 
 This page shows the HTTP lifecycle each official auth adapter needs: mounting handlers, redirecting
 to the provider, exchanging the callback, checking return URLs and forwarding refreshed session

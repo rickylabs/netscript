@@ -283,7 +283,7 @@ pointers, and the same payload works on every backend in the matrix.
 ## Next steps
 
 Use these primitives in code with the
-[Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/) recipe.
+[Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/) recipe.
 
 - [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/): auto-discovery,
   explicit providers and the PostgreSQL backend.

@@ -1,10 +1,11 @@
 ---
 layout: layouts/base.vto
-title: Identity and Access
+title: Identity & access
+description: Sign-in, sessions, and protected routes with one active auth backend.
 templateEngine: [vento, md]
 ---
 
-# Identity & Access
+# Identity & access
 
 Identity & Access covers sign-in, sessions and the `Principal` that services authorize against.
 Start here when you add authentication, choose a backend or trace how identity reaches a service.

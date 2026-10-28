@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Partials
 templateEngine: [vento, md]
-order: 14
+order: 8
 ---
 
 # Partials

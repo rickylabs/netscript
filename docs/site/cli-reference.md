@@ -1,11 +1,12 @@
 ---
 layout: layouts/base.vto
-title: CLI reference
+title: CLI cheat sheet
+description: The netscript commands you use most, grouped by task, with the files each one changes.
 templateEngine: [vento, md]
 prev: { label: "Glossary", href: "/glossary/" }
 ---
 
-# CLI reference
+# CLI cheat sheet
 
 This page lists the `netscript` commands you use most, grouped by task, in their everyday form.
 Together with the [command reference](/reference/cli/commands/), which has every flag, subcommand,

@@ -7,7 +7,7 @@ next: { label: "Contracts & type flow", href: "/explanation/contracts/" }
 order: 1
 ---
 
-# The NetScript architecture
+# Architecture
 
 This page gives you the map of a NetScript app: the layers you work with, what runs where, and which
 way the dependencies point. NetScript is a set of Deno-native framework packages published on

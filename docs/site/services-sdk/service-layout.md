@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Service layout
 templateEngine: [vento, md]
+order: 3
 ---
 
 # Service layout

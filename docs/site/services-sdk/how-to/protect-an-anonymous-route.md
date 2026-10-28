@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Protect an anonymous service route
 description: Protect an anonymous route with a shared client-address quota and explicit proxy trust.
 templateEngine: [vento, md]
-order: 105
+order: 104
 ---
 
 # Protect an anonymous service route

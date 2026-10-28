@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Consume durable streams in Expo
 templateEngine: [vento, md]
+order: 4
 ---
 
 # Consume durable streams in Expo

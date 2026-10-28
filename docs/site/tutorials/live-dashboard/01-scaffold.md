@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Scaffold the dashboard workspace
+title: Scaffold the dashboard
 templateEngine: [vento, md]
 prev: { label: "Live Dashboard", href: "/tutorials/live-dashboard/" }
 next: { label: "2 · Contract to service", href: "/tutorials/live-dashboard/02-contract-to-service/" }
 ---
 
-# Scaffold the dashboard workspace
+# Scaffold the dashboard
 
 In this chapter you create `my-dashboard/`, the workspace that grows into the order-queue dashboard
 from the [track index](/tutorials/live-dashboard/): a Fresh frontend, an `orders` service and a

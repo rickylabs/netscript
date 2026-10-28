@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.vto
-title: Deploy
+title: Deploy a workspace
 description: Run the workspace on a container host, a VM, or a cloud target, and see what the scaffold wires for you.
 templateEngine: [vento, md]
-order: 101
+order: 105
 oldUrl: /how-to/deploy/
 ---
 
-# Deploy a NetScript workspace
+# Deploy a workspace
 
 This recipe takes the workspace you scaffolded with `netscript init` to a container host, a VM or a
 managed platform, and states what the scaffold wires for you and what you still own.
@@ -297,4 +297,4 @@ running with their permissions, reaching Postgres and KV, and discovering their 
 
 To push a stateless entrypoint to a managed platform, follow
 [Deploy to Deno Deploy](/orchestration-runtime/how-to/deploy-deno-deploy/). For every command
-grouped by workflow, see the [CLI reference](/cli-reference/).
+grouped by workflow, see the [CLI cheat sheet](/cli-reference/).

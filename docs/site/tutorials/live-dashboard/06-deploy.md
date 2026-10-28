@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Run the whole dashboard under Aspire
+title: Run the dashboard under Aspire
 templateEngine: [vento, md]
 prev: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" }
 next: { label: "How-to guides", href: "/how-to/" }
 ---
 
-# Run the whole dashboard under Aspire
+# Run the dashboard under Aspire
 
 In this chapter you run the entire graph as one system under a single `aspire start`: the `orders`
 service, the Fresh dashboard, the durable-streams runtime, Postgres and Redis. You never wrote a

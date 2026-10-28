@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.vto
-title: The pure-backend auth model
+title: Auth model
 templateEngine: [vento, md]
 prev: { label: 'The plugin system', href: '/explanation/plugin-system/' }
 next: { label: 'Durability model', href: '/explanation/durability-model/' }
 order: 4
 ---
 
-# The pure-backend auth model
+# Auth model
 
 This page explains what NetScript authentication is, why it is a **pure-backend seam** rather than
 a built-in identity provider, and how one typed port lets you swap GitHub OAuth for WorkOS or

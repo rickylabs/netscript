@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.vto
-title: Database & migration
+title: Migrate the database
 description: Initialize, generate, seed, and inspect the database schema with the netscript db commands.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/database-migration/
 ---
 
-# Database & migration
+# Migrate the database
 
 This recipe takes a freshly scaffolded workspace to a migrated, seeded database. You start the
 AppHost, create and apply the first migration, generate the typed Prisma client, seed it and confirm
@@ -178,7 +178,7 @@ wrote.
 
 ## Next steps
 
-Continue with [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/) to use the KV and queue
+Continue with [Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/) to use the KV and queue
 backends; its PostgreSQL queue provider keeps `message_queue` rows in this same datasource.
 
 - [Database & Prisma](/data-persistence/database/): per-plugin schema aggregation, driver adapters

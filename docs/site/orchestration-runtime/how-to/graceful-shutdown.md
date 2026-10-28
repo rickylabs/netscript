@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Graceful shutdown
 description: Drain requests, jobs, and connections on SIGTERM, and run teardown hooks.
 templateEngine: [vento, md]
-order: 106
+order: 108
 oldUrl: /how-to/graceful-shutdown/
 prev: { label: "Run a polyglot task", href: "/background-processing/how-to/run-a-polyglot-task/" }
 next: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" }

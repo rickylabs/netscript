@@ -4,7 +4,7 @@ title: Durable streams
 templateEngine: [vento, md]
 prev: { label: "Triggers & ingress", href: "/durable-workflows/triggers/" }
 next: { label: "Database & Prisma", href: "/data-persistence/database/" }
-order: 2
+order: 3
 ---
 
 # Durable streams

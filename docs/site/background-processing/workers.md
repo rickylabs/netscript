@@ -401,7 +401,7 @@ service moves into a worker unchanged.
 > execution state in Deno KV. Run `cd aspire && aspire start` to provision Postgres and Redis, then
 > `netscript db init --name init` and `netscript db generate` to wire the schema. Until then, the
 > workers API cannot resolve jobs or record executions. See
-> [Database & migration](/data-persistence/how-to/database-migration/).
+> [Migrate the database](/data-persistence/how-to/database-migration/).
 
 > [!WARNING]
 > **Drain on redeploy.** A runner that exits without draining abandons running jobs. Wire a

@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Run it locally under Aspire
+title: Run the ERP sync under Aspire
 templateEngine: [vento, md]
 prev: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron/" }
 next: { label: "How-to guides", href: "/how-to/" }
 ---
 
-# Run it locally under Aspire
+# Run the ERP sync under Aspire
 
 This chapter runs the whole SAP→Dynamics sync (workers, triggers, queue and cron processors) on
 one machine under `aspire start`, and shows you how to read the running system from the

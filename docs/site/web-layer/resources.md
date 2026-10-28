@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Request-scoped resources
 templateEngine: [vento, md]
-order: 13
+order: 3
 ---
 
 # Request-scoped resources

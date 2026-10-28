@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Observability
+description: OpenTelemetry traces and structured logs, read in the Aspire dashboard.
 templateEngine: [vento, md]
 ---
 

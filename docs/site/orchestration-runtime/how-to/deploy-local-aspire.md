@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Deploy locally with Aspire
 description: Bring up the whole resource graph on one machine from the generated Aspire AppHost.
 templateEngine: [vento, md]
-order: 102
+order: 103
 oldUrl: /how-to/deploy-local-aspire/
 prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }
 next: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" }
@@ -122,7 +122,7 @@ netscript db seed               # optional: seed development data
 
 Outside Aspire, for example in an isolated CI container, point these commands at your own database
 with `POSTGRES_URI` or `DATABASE_URL`; see
-{{ comp.xref({ key: "howto:database-migration", text: "Database & migration" }) }}.
+{{ comp.xref({ key: "howto:database-migration", text: "Migrate the database" }) }}.
 
 ## Step 5 — Use the dashboard
 

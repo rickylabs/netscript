@@ -64,7 +64,7 @@ Whether it runs depends on what it needs at runtime:
 
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 
-[Operational session lifecycles](/identity-access/session-lifecycles/#better-auth-mounting-and-header-forwarding)
+[Session lifecycles](/identity-access/session-lifecycles/#better-auth-mounting-and-header-forwarding)
 shows how to mount better-auth's handler next to NetScript's verification.
 
 ## Protect a route with the resolved session
@@ -170,7 +170,7 @@ service forwards backend `Set-Cookie` headers only from interactive sign-out flo
 
 ## Next steps
 
-[Operational session lifecycles](/identity-access/session-lifecycles/) shows how to mount
+[Session lifecycles](/identity-access/session-lifecycles/) shows how to mount
 better-auth's handler and forward refreshed session headers.
 
 - {{ comp.xref({ key: "explain:auth-model" }) }}: how Principals, sessions and backends fit together.

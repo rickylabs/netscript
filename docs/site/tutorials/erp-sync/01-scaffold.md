@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Scaffold the workspace
+title: Scaffold the ERP sync
 templateEngine: [vento, md]
 prev: { label: "ERP Sync", href: "/tutorials/erp-sync/" }
 next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" }
 ---
 
-# Scaffold the workspace
+# Scaffold the ERP sync
 
 This chapter creates `my-erp/`, the workspace for the SAP-to-Dynamics sync. You add the
 **workers** and **triggers** plugins and boot the stack under Aspire, so the rest of the track has

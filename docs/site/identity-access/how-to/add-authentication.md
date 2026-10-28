@@ -546,7 +546,7 @@ has the exact posture types and validation rules.
 
 ## Next steps
 
-[Operational session lifecycles](/identity-access/session-lifecycles/) shows how to wire sign-in,
+[Session lifecycles](/identity-access/session-lifecycles/) shows how to wire sign-in,
 callbacks and refreshed cookies into your own routes for each backend.
 
 - [Authentication](/identity-access/auth/): the `auth-api` surface and the three backends.

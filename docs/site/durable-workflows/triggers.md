@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.vto
-title: Triggers & ingress
+title: Event triggers
 templateEngine: [vento, md]
 prev: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
 next: { label: "Durable streams", href: "/durable-workflows/streams/" }
-order: 3
+order: 2
 ---
 
-# Triggers & ingress
+# Event triggers
 
 This page covers the **triggers** plugin, which turns inbound webhooks, files dropped on disk, and
 cron schedules into durable background work. A trigger handler receives an event and returns a list

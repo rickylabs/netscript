@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Deploy locally
+title: Run the team workspace under Aspire
 templateEngine: [vento, md]
 prev: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" }
 next: { label: "How-to guides", href: "/how-to/" }
 ---
 
-# Deploy locally
+# Run the team workspace under Aspire
 
 In this chapter you run the whole team workspace as one system. A single `aspire start` brings up
 Postgres, the Redis cache, your `workspace` service, the `auth-api` service on `:8094`, the Workers

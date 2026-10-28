@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.vto
-title: Build a storefront backend
+title: Storefront
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" }
-order: 4
+order: 1
 ---
 
-# Build a storefront backend
+# Storefront
 
 Across seven chapters you build a small e-commerce storefront in one workspace: a products catalog,
 a cart, a durable checkout, a shipping webhook and a storefront page. The track follows the same

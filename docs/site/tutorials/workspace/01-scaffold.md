@@ -1,12 +1,12 @@
 ---
 layout: layouts/base.vto
-title: Scaffold the workspace
+title: Scaffold the team workspace
 templateEngine: [vento, md]
 prev: { label: "Team Workspace", href: "/tutorials/workspace/" }
 next: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" }
 ---
 
-# Scaffold the workspace
+# Scaffold the team workspace
 
 In this chapter you create `my-workspace/`, a NetScript workspace with an example service and a
 Postgres database, and boot it under Aspire. The auth backend, the team database, the provisioning
