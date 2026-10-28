@@ -1,0 +1,6 @@
+{
+  "mode": "explicit exact file list; workspace excludes bypassed with --no-config",
+  "files": 15,
+  "lintExitCode": 0,
+  "fmtExitCode": 0
+}

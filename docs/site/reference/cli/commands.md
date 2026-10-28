@@ -332,6 +332,13 @@ lists, updates, and removes copied registry items:
 | `netscript ui:update [name]` | Update unmodified Fresh UI registry files. Flag: `--project-root <path>`.                                      |
 | `netscript ui:remove <name>` | Remove a copied Fresh UI registry item. Flag: `--project-root <path>`.                                         |
 
+`netscript ui:migrate variants --project-root <workspace> [--app <name>] [--dry-run]`
+converts app-owned 0.0.8 Utility modifiers and anatomy to the shared data-attribute contract.
+Preview changes, apply them, then run the app's `deno task check`. It preserves custom classes,
+base/element hooks, strings and comments. Customized structural edits or unsupported dynamic
+classes stop preflight with a manual-merge diagnostic before any writes. Use the matching CLI
+and Fresh UI release together; dependency copies and registry ownership hashes remain untouched.
+
 Because Fresh UI is copy-source, `ui:update` only touches registry files you have not modified —
 your edits are never overwritten. See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 

@@ -1,0 +1,1 @@
+Root formatting excludes CLI source, even with its member config. The structured wrapper correctly refuses all-excluded coverage. For the new migration files, use an explicit exact file list with `deno fmt --no-config --single-quote --line-width 100`; check with the same options plus `--check`. Do not interpret the excluded wrapper as a PASS.

@@ -1,0 +1,1 @@
+NOT_RUN — required Claude reviewer returned API usage_limit_reached (429) before reviewing the slice. No implementation PASS is claimed. This is an external evaluation availability failure, not a code verdict. Required final IMPL-EVAL remains pending.

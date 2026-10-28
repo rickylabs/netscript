@@ -13,3 +13,5 @@
 
 - Source migration also updates the nine raw Button class uses in the scaffold FloatingSurfaceDemo template; otherwise a new scaffold would lose those variants after CSS migration. Existing layout utility BEM selectors remain compatibility aliases (not component variants) because broader scaffold layout markup is outside this phase. Their new data-gap/align/width selectors preserve specificity.
 - Utility parity initially caught incorrect Toast error selector classification; fixed before slice review. 171 before/after cases now have zero computed-style differences across rest/hover/focus/pressed at both widths/schemes, with identical full-page PNG bytes.
+
+CLI migration refinement: dynamic 0.0.8 component code uses reviewed versioned source hunks instead of a general JS expression rewriter. This reduces the parser surface and also migrates anatomy and state mutations. Literal JSX/CSS still use the planned bounded tokenizer. Custom hunks fail the whole-app preflight with a manual-merge diagnostic; no dependency/lock or registry lifecycle changes.
