@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--no-lock",
+    "--allow-read",
+    "--filter",
+    "negative:",
+    "_plugins/design-system/renderer-fixture.ts"
+  ],
+  "cwd": "docs/site",
+  "exitCode": 0,
+  "durationMs": 776,
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 3,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

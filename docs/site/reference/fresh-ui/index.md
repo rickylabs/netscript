@@ -25,6 +25,12 @@ package runtime dependencies. Six sub-path exports carry runtime seams and build
 - [`@netscript/fresh-ui/tokens`](#token-build-tooling) — DTCG sources, language presets and the
   Style Dictionary builder for CLI and build tooling.
 
+For visual design, use the [Design system](/design-system/) section:
+[guidelines](/design-system/guidelines/), [theme gallery](/design-system/#design-catalogue),
+[token contract](/design-system/token-contract/) and
+[theme authoring](/design-system/create-your-own-theme/). The theme specifications are generated from
+their canonical design files. This page covers the package API.
+
 ## Class-name helper
 
 | Symbol | Signature                                      | Description                                                 |

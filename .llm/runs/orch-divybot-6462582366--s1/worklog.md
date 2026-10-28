@@ -186,3 +186,13 @@ tokens group. Independent follow-up FAIL_FIX and PASS are both retained. Package
 tests213, source/check/lint/fmt, quality, prod install and both publish dry-runs pass.
 Before pushing, integrate current main's telemetry/doc baseline and regenerate
 combined-tree corpus/assets; no PR merge/tag/release is authorized.
+
+## Baseline synchronization
+
+Integrated origin/main at49eeb9ff by an automatic local branch merge, without
+conflicts. Regenerated the MCP export corpus against the combined API surface
+(35 packages,300 subpaths,8922 symbols), rebuilt the current docs site and prose
+carrier, and regenerated publish/CLI assets. Combined docs build rendered251
+HTML pages and all23975 internal links resolve. This is branch synchronization;
+PR2435 remains open, with no merge to main, tag, release or GitHub label mutation.
+All three Augment threads received individual replies with the fixes and tests.

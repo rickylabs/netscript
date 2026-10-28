@@ -1,0 +1,17 @@
+{
+  "gateId": "quality-scan",
+  "invocationId": "s8b-review-quality",
+  "gitHead": "2c3199e74d471863056ac886429d24065b1ab70a",
+  "actualGitHead": "2c3199e74d471863056ac886429d24065b1ab70a",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 5435,
+  "argv": [
+    "deno",
+    "task",
+    "quality:scan"
+  ],
+  "cwd": ".",
+  "rawReceipt": "$TMPDIR/s8b-review-quality.receipt.json",
+  "workingTree": "Implementation present; precommit HEAD. Receipt proves command execution, not a clean-head match."
+}

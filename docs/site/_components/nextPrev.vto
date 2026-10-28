@@ -26,13 +26,13 @@
   {{ if prevLink }}
     <a class="ns-nextprev__link ns-nextprev__link--prev" href="{{ prevLink.href |> url }}" rel="prev">
       <span class="ns-nextprev__dir" aria-hidden="true">← Previous</span>
-      <span class="ns-nextprev__label">{{ prevLink.label }}</span>
+      <span class="ns-nextprev__label" data-part="label">{{ prevLink.label }}</span>
     </a>
   {{ /if }}
   {{ if nextLink }}
     <a class="ns-nextprev__link ns-nextprev__link--next" href="{{ nextLink.href |> url }}" rel="next">
       <span class="ns-nextprev__dir" aria-hidden="true">Next →</span>
-      <span class="ns-nextprev__label">{{ nextLink.label }}</span>
+      <span class="ns-nextprev__label" data-part="label">{{ nextLink.label }}</span>
     </a>
   {{ /if }}
 </nav>

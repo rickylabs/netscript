@@ -1,0 +1,838 @@
+{
+  "ok": false,
+  "suiteId": "scaffold.runtime",
+  "projectRoot": "/home/agent/projects/orchid/worktrees/issue-750/.llm/tmp/cli-e2e/plugin-smoke-20261018-111127",
+  "startedAt": "2026-10-18T09:11:27.120Z",
+  "durationMs": 580216,
+  "summary": {
+    "passed": 50,
+    "failed": 1,
+    "skipped": 0
+  },
+  "reportSha256": "f0b3ac685d88e91c84b63758655d77f9cb3179ab0a430e7682161839f62f5841",
+  "toolchain": {
+    "deno": "2.9.7",
+    "dotnet": "10.0.400",
+    "aspire": "13.5.3",
+    "dockerServer": "28.5.2"
+  },
+  "steps": [
+    {
+      "id": "preflight.deno",
+      "title": "Deno CLI is available",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 6,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 6
+    },
+    {
+      "id": "preflight.aspire",
+      "title": "Aspire CLI doctor is healthy",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 2887,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 2887
+    },
+    {
+      "id": "scaffold.init",
+      "title": "Scaffold generated project",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1935,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1935
+    },
+    {
+      "id": "scaffold.service-client-add",
+      "title": "Add a second service with typed client helpers",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 983,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 983
+    },
+    {
+      "id": "scaffold.service-client-generate",
+      "title": "Reconcile service client and Aspire output",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 988,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 988
+    },
+    {
+      "id": "scaffold.agent-init",
+      "title": "Install generated Claude agent integration",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1377,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1377
+    },
+    {
+      "id": "scaffold.plugin.worker",
+      "title": "Install official worker plugin",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1405,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1405
+    },
+    {
+      "id": "scaffold.plugin.saga",
+      "title": "Install official saga plugin",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 893,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 893
+    },
+    {
+      "id": "scaffold.plugin.trigger",
+      "title": "Install official trigger plugin",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 855,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 855
+    },
+    {
+      "id": "scaffold.plugin.stream",
+      "title": "Install official stream plugin",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 831,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 831
+    },
+    {
+      "id": "scaffold.plugin.auth",
+      "title": "Install official auth plugin",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 941,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 941
+    },
+    {
+      "id": "scaffold.plugin.ai",
+      "title": "Install official ai plugin",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 926,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 926
+    },
+    {
+      "id": "scaffold.plugin.ai.mcp",
+      "title": "Install official AI plugin with MCP skill tool",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 833,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 833
+    },
+    {
+      "id": "behavior.outbound-webhook",
+      "title": "Generate and execute webhook adoption in a disposable project copy",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 7428,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 7428
+    },
+    {
+      "id": "scaffold.plugin.ai.lifecycle",
+      "title": "Add and self-wire an AI tool through the plugin CLI",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 106,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 106
+    },
+    {
+      "id": "scaffold.plugin-list",
+      "title": "List configured plugins",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 3125,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 3125
+    },
+    {
+      "id": "scaffold.plugin.ai.appsettings",
+      "title": "Reject synthesized service configuration for the AI plugin",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 343,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 343
+    },
+    {
+      "id": "scaffold.ui-add-ai",
+      "title": "Install the Fresh UI AI collection",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 487,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 487
+    },
+    {
+      "id": "scaffold.ui-local-source",
+      "title": "Map the unpublished AI dependency to the local workspace member",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 273,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 273
+    },
+    {
+      "id": "generated.runtime-schemas",
+      "title": "Generate runtime schemas from all configured plugin modules",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1048,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1048
+    },
+    {
+      "id": "database.codegen",
+      "title": "Generate database clients (standalone, no Aspire)",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 3771,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 3771
+    },
+    {
+      "id": "scaffold.design-production-exclusion",
+      "title": "Prove production builds exclude the developer design routes",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 61499,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 61499
+    },
+    {
+      "id": "generated.service-client-contract",
+      "title": "Prove idempotent two-service client and cache-key output",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 4591,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 4591
+    },
+    {
+      "id": "scaffold.resource-generate",
+      "title": "Generate a typed Fresh resource slice",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 907,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 907
+    },
+    {
+      "id": "scaffold.resource-rerun",
+      "title": "Rerun the resource slice with zero writes",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 876,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 876
+    },
+    {
+      "id": "scaffold.ui-data-screen",
+      "title": "Scaffold a generated Fresh data screen",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 323,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 323
+    },
+    {
+      "id": "behavior.project-boundary-dev",
+      "title": "Start the generated Fresh dev server below a hostile parent tsconfig",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 17024,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 17024
+    },
+    {
+      "id": "behavior.plugins-unhealthy",
+      "title": "Reject missing workers and sagas registries",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 2334,
+          "exitCode": 1
+        }
+      ],
+      "retried": false,
+      "durationMs": 2334
+    },
+    {
+      "id": "generated.plugins-check",
+      "title": "Generate plugin registries from discovered manifests",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 793,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 793
+    },
+    {
+      "id": "generated.workers-registry",
+      "title": "Compile workers registry through plugin CLI",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 173,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 173
+    },
+    {
+      "id": "generated.sagas-registry",
+      "title": "Generate sagas registry through plugin CLI",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 90,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 90
+    },
+    {
+      "id": "behavior.plugin-doctor-missing-module",
+      "title": "Reject a configured plugin whose module has been removed",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 4429,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 4429
+    },
+    {
+      "id": "behavior.generated-guarded-plugin",
+      "title": "Authorize CLI-generated plugin reads through REST and native SDK",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 18937,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 18937
+    },
+    {
+      "id": "behavior.generated-guarded-service",
+      "title": "Authorize CLI-generated service REST and RPC through native sessions",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 32134,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 32134
+    },
+    {
+      "id": "behavior.auth-session-authenticated",
+      "title": "Shipped auth entrypoint (in-process): credentialed session/me introspection",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 15663,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 15663
+    },
+    {
+      "id": "behavior.service-api-unauthenticated",
+      "title": "Generated users entrypoint: anonymous harness-added protected REST/RPC procedure",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 128,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 128
+    },
+    {
+      "id": "behavior.service-api-authenticated",
+      "title": "Generated users entrypoint: denied/permitted harness-added protected REST/RPC procedure",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 131,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 131
+    },
+    {
+      "id": "behavior.auth-signout-foreign-session",
+      "title": "Shipped auth entrypoint (in-process): foreign signout refused, owned signout accepted",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 122,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 122
+    },
+    {
+      "id": "runtime.aspire-restore",
+      "title": "Restore Aspire TypeScript SDK",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 4596,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 4596
+    },
+    {
+      "id": "runtime.service-env-fixture",
+      "title": "Declare service environment and regenerate on the consumer path",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 2579,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 2579
+    },
+    {
+      "id": "generated.quality-negative",
+      "title": "Prove every generated quality surface with deliberate failures",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 57956,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 57956
+    },
+    {
+      "id": "generated.deno-check",
+      "title": "Run the generated workspace type-check task",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 2676,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 2676
+    },
+    {
+      "id": "generated.deno-lint",
+      "title": "Run the generated workspace lint task",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 189,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 189
+    },
+    {
+      "id": "generated.deno-fmt-check",
+      "title": "Run the generated workspace format-check task",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 307,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 307
+    },
+    {
+      "id": "generated.ui-ai-check",
+      "title": "Type-check copied Fresh UI AI files",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 596,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 596
+    },
+    {
+      "id": "generated.ai-namespace-check",
+      "title": "Type-check the complete generated AI namespace",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 2933,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 2933
+    },
+    {
+      "id": "runtime.auth-smoke-env",
+      "title": "Wire auth smoke environment",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 2811,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 2811
+    },
+    {
+      "id": "runtime.flow-b-fixture",
+      "title": "Wire real Flow-B callback fixture",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1932,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1932
+    },
+    {
+      "id": "runtime.readiness-fixture",
+      "title": "Wire dead-port readiness fixture",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 101,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 101
+    },
+    {
+      "id": "runtime.aspire-start",
+      "title": "Start generated Aspire AppHost",
+      "critical": true,
+      "verdict": "failed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "failed",
+          "durationMs": 309934,
+          "failureClass": "assertion",
+          "exitCode": 1
+        }
+      ],
+      "retried": false,
+      "durationMs": 309934
+    },
+    {
+      "id": "cleanup.aspire-stop",
+      "title": "Stop generated Aspire AppHost",
+      "critical": true,
+      "verdict": "passed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1962,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1962
+    }
+  ]
+}

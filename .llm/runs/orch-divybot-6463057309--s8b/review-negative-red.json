@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--no-lock",
+    "--allow-read",
+    "--filter",
+    "negative:",
+    "_plugins/design-system/renderer-fixture.ts"
+  ],
+  "cwd": "docs/site",
+  "exitCode": 1,
+  "durationMs": 1703,
+  "summary": {
+    "passed": 0,
+    "failed": 3,
+    "ignored": 0,
+    "totalResults": 3,
+    "uniqueFailures": 1
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Missing expected exception.\n    at file://<cwd>/_plugins/design-system/renderer-fixture.ts:<line>:<column>",
+      "count": 3,
+      "tests": [
+        {
+          "name": "negative: deleting a required theme section fails source validation",
+          "file": "./_plugins/design-system/renderer-fixture.ts",
+          "line": 134
+        },
+        {
+          "name": "negative: deleting a guidelines section fails page generation",
+          "file": "./_plugins/design-system/renderer-fixture.ts",
+          "line": 138
+        },
+        {
+          "name": "negative: renaming a referenced guidelines heading fails instead of publishing a dead link",
+          "file": "./_plugins/design-system/renderer-fixture.ts",
+          "line": 144
+        }
+      ]
+    }
+  ]
+}

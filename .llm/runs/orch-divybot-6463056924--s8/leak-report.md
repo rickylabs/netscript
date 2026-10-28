@@ -1,0 +1,3 @@
+# Resource audit — 2026-10-28
+
+The read-only `deno task maint:leak-check -- --slice-dir .llm/runs/orch-divybot-6463056924--s8 --worktree .` completed. Aspire/process probes succeeded. Docker/container/network/volume enumeration was unavailable because the Docker daemon could not be reached. The reporter identified an existing foreign AppHost and related processes; all ownership was unproven and none were mutated. This run did not create an AppHost or database: full CLI E2E stopped at environment preflight. Browser test servers are lifecycle-owned by Playwright. The manually started preview was stopped after browser acceptance; Playwright closed its own servers and browsers. Raw resource identities are retained privately outside the public repository.

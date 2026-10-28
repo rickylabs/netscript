@@ -5,13 +5,15 @@ import nav from 'lume/plugins/nav.ts';
 import redirects from 'lume/plugins/redirects.ts';
 import pagefind from 'lume/plugins/pagefind.ts';
 import codeHighlight from 'lume/plugins/code_highlight.ts';
-import anchor from 'npm:markdown-it-anchor@9.2.0';
-import langBash from 'npm:highlight.js@11.11.1/lib/languages/bash';
-import langJson from 'npm:highlight.js@11.11.1/lib/languages/json';
-import langTypescript from 'npm:highlight.js@11.11.1/lib/languages/typescript';
+import anchor from 'markdown-it-anchor';
+import langBash from 'highlight.js/bash';
+import langJson from 'highlight.js/json';
+import langTypescript from 'highlight.js/typescript';
 import { resolveXref } from './_data/xref.ts';
 import { assertDiagramAssetsExist } from './_diagrams/validate.ts';
 import { aiTooling } from './_plugins/ai-tooling.ts';
+import { getDocsLane } from './_data.ts';
+import { inlineUtilityDiagram } from '../../tools/docs-site/inline-diagram.ts';
 
 /**
  * NetScript external user documentation site (Diátaxis IA).
@@ -75,6 +77,14 @@ site.addEventListener('beforeBuild', async () => {
 //   {{ "cap:services" |> xref }}
 site.filter('xref', (key: string) => resolveXref(key).href);
 site.filter('slugify', slugify);
+// Inline presentation inherits the page scheme; the original SVG remains available to twins.
+site.filter('utilityDiagram', (src: string, alt: string) => {
+  if (!/^\/assets\/diagrams\/[a-z0-9-]+\.svg$/.test(src)) {
+    throw new Error(`Unsupported diagram source: ${src}`);
+  }
+  const source = Deno.readTextFileSync(new URL(`.${src}`, import.meta.url));
+  return inlineUtilityDiagram(source, alt, `diagram-${crypto.randomUUID()}`);
+});
 
 // Inline-code (ic): comp string args are emitted raw and are NOT markdown-
 // processed, so `code` spans authored with backticks render as literal backtick
@@ -89,6 +99,7 @@ site.filter(
 // Expose the resolver + raw map as global data for `comp.xref` (so the component
 // resolves without an in-template import). Throws on unknown key inside the build.
 site.data('resolveXref', resolveXref);
+site.data('getDocsLane', getDocsLane);
 
 // Multilevel sidebar (docs-v5 IA): nav.menu()/nav.breadcrumb() derive the tree
 // from page URLs; the sidebar lanes are curated in `_data.ts` `navLanes`.
@@ -116,15 +127,51 @@ site.use(codeHighlight({
   },
 }));
 
-// Static client-side search; mounts the pagefind UI into #search (TD-5).
-site.use(pagefind({
-  ui: {
-    containerId: 'search',
-    showImages: false,
-    showEmptyFilters: false,
-    resetStyles: false,
-  },
-}));
+// Build the static index; custom and fallback UIs load only when requested.
+site.use(pagefind({ ui: false }));
+
+// These states belong in rendered HTML as well as in the browser enhancement path.
+site.addEventListener('afterRender', () => {
+  for (const page of site.pages) {
+    const document = page.document;
+    if (!document) continue;
+    const cue = document.querySelector('[data-owned-source]');
+    const lede = document.querySelector('.ns-prose > h1 + p');
+    if (cue && lede?.parentNode) {
+      cue.removeAttribute('hidden');
+      lede.parentNode.insertBefore(cue, lede.nextSibling);
+    }
+    const sourceUrl = String(page.data.url ?? '');
+    const currentUrl = site.options.location.pathname.replace(/\/$/, '') + sourceUrl;
+    for (const link of document.querySelectorAll('.ns-learning-path__link')) {
+      const href = link.getAttribute('href');
+      if (href === currentUrl || href === sourceUrl) link.setAttribute('aria-current', 'step');
+    }
+    for (const region of document.querySelectorAll('.ns-prose pre, .ns-prose table')) {
+      region.setAttribute('tabindex', '0');
+    }
+    for (const tree of document.querySelectorAll('.ns-file-tree--root')) {
+      if (!tree.querySelector('li')) throw new Error(`Empty file tree on ${sourceUrl}`);
+    }
+    for (const figure of document.querySelectorAll('.ns-diagram')) {
+      const image = figure.querySelector('img');
+      const svg = figure.querySelector('svg[role="img"]');
+      if (
+        !image?.hasAttribute('hidden') || image.getAttribute('loading') !== 'lazy' ||
+        !svg || svg.getAttribute('aria-label') !== image.getAttribute('alt')
+      ) {
+        throw new Error(`Diagram source or accessible name missing on ${sourceUrl}`);
+      }
+    }
+    const headingIds = new Set(
+      [...document.querySelectorAll('.ns-prose :is(h1,h2,h3,h4)[id]')].map((h) => h.id),
+    );
+    for (const row of document.querySelectorAll('.ns-api-table__identity[id]')) {
+      if (headingIds.has(row.id)) row.removeAttribute('id');
+      else headingIds.add(row.id);
+    }
+  }
+});
 
 // MUST run last: rewrite every root-relative href/src to the /netscript/ base (TD-1).
 site.use(basePath());
@@ -134,5 +181,21 @@ site.use(basePath());
 // before the `base_path` processor — body hrefs are still root-relative and are
 // absolutised inside the plugin; the emitted `.md`/`.txt` pages skip base_path.
 site.use(aiTooling());
+
+// Permalinks are presentation: add them after Markdown twins have captured clean headings.
+site.addEventListener('afterRender', () => {
+  for (const page of site.pages) {
+    const document = page.document;
+    if (!document) continue;
+    for (const heading of document.querySelectorAll('.ns-prose :is(h2,h3,h4)[id]')) {
+      const anchor = document.createElement('a');
+      anchor.className = 'ns-heading-anchor';
+      anchor.setAttribute('data-pagefind-ignore', '');
+      anchor.setAttribute('href', `#${heading.id}`);
+      anchor.setAttribute('aria-label', 'Permalink');
+      heading.appendChild(anchor);
+    }
+  }
+});
 
 export default site;
