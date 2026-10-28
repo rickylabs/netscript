@@ -84,7 +84,7 @@ async function readAssetLiteral(
   specifier: string,
 ): Promise<string> {
   const assetUrl = new URL(specifier, baseUrl);
-  const content = await Deno.readTextFile(assetUrl);
+  const content = (await Deno.readTextFile(assetUrl)).replaceAll('\r\n', '\n');
   return JSON.stringify(content);
 }
 

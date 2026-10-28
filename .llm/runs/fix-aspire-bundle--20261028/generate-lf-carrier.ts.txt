@@ -1,0 +1,120 @@
+import { join, relative, resolve } from '@std/path';
+
+const repo = Deno.cwd();
+const parent = resolve(repo, '.llm/tmp/fix-aspire-bundle--20261028');
+const snapshot = join(parent, 'lf-source-snapshot');
+const boundary = relative(parent, snapshot);
+if (boundary !== 'lf-source-snapshot') throw new Error('Snapshot escaped owned parent');
+const decoder = new TextDecoder();
+async function command(args: string[], cwd = repo): Promise<string> {
+  const result = await new Deno.Command('git', { args, cwd, stdout: 'piped', stderr: 'piped' }).output();
+  if (!result.success) throw new Error(decoder.decode(result.stderr));
+  return decoder.decode(result.stdout);
+}
+const entries = (await command(['ls-tree', '-rlz', 'HEAD'])).split('\0').filter(Boolean);
+let totalBytes = 0;
+for (const entry of entries) {
+  const [metadata, path] = entry.split('\t');
+  const [mode, type, , size] = metadata.trim().split(/\s+/);
+  if (!['100644', '100755'].includes(mode) || type !== 'blob') {
+    throw new Error(`Non-regular archive input: ${path}`);
+  }
+  if (/^(?:[A-Za-z]:|\/|\\)/.test(path) || path.split(/[\\/]/).includes('..')) {
+    throw new Error('Unsafe archive path');
+  }
+  totalBytes += Number(size);
+}
+console.log(JSON.stringify({ trackedFiles: entries.length, totalBytes, boundary }));
+if (Deno.args.includes('--inspect')) Deno.exit();
+if (totalBytes > 750_000_000) throw new Error('Snapshot exceeds 1 GiB disk budget with headroom');
+try {
+  await Deno.lstat(snapshot);
+  throw new Error('Snapshot target already exists');
+} catch (error) {
+  if (!(error instanceof Deno.errors.NotFound)) throw error;
+}
+const carrier = 'packages/cli/src/kernel/assets/embedded.generated.ts';
+const otherCarriers = [
+  'packages/plugin/src/kernel/assets/embedded.generated.ts',
+  'packages/fresh-ui/registry.generated.ts',
+];
+const authored = [
+  '.llm/tools/maint/dogfood-skills.ts',
+  'packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts',
+  'packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts',
+  'packages/cli/src/public/features/agent/init/init-agent-claude_test.ts',
+  'packages/cli/src/kernel/assets/agent/guidance.md.template',
+];
+const report: Record<string, unknown> = { trackedFiles: entries.length, totalBytes, boundary, commands: [] };
+for (const [index, path] of [carrier, ...otherCarriers].entries()) {
+  await Deno.copyFile(path, join(parent, `first-generation-carrier-${index}.ts.txt`));
+}
+await Deno.mkdir(snapshot);
+try {
+  const archive = new Deno.Command('git', {
+    args: ['archive', '--format=tar', 'HEAD'], cwd: repo,
+    stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(120_000),
+  }).spawn();
+  const unpack = new Deno.Command('tar', {
+    args: ['-xf', '-', '-C', snapshot], cwd: repo,
+    stdin: 'piped', stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(120_000),
+  }).spawn();
+  const outputs = await Promise.allSettled([
+    archive.stdout.pipeTo(unpack.stdin), archive.status, unpack.status,
+    new Response(archive.stderr).text(), new Response(unpack.stdout).text(), new Response(unpack.stderr).text(),
+  ]);
+  report.archive = outputs;
+  if (outputs.some((item) => item.status === 'rejected') ||
+    (outputs[1].status === 'fulfilled' && !outputs[1].value.success) ||
+    (outputs[2].status === 'fulfilled' && !outputs[2].value.success)) throw new Error('Archive failed');
+  for (const path of authored) {
+    await Deno.writeTextFile(join(snapshot, path), (await Deno.readTextFile(path)).replaceAll('\r\n', '\n'));
+  }
+  const args = ['task', 'gen:assets-barrel'];
+  const native = await new Deno.Command(Deno.execPath(), {
+    args, cwd: snapshot, stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(120_000),
+  }).output();
+  report.generator = { command: Deno.execPath(), args, cwd: snapshot,
+    code: native.code, signal: native.signal, stdout: decoder.decode(native.stdout), stderr: decoder.decode(native.stderr) };
+  if (!native.success) throw new Error('Canonical generator failed');
+  const before = await command(['show', `HEAD:${carrier}`]);
+  const afterBytes = await Deno.readFile(join(snapshot, carrier));
+  const after = decoder.decode(afterBytes);
+  const expected = before.replace('`aspire-monitoring`, and `aspire-deployment`',
+    '`aspire-monitoring`, `aspire-deployment`, and `aspireify`');
+  await Deno.writeFile(join(parent, 'lf-attempt-embedded.generated.ts.txt'), afterBytes);
+  await Deno.writeTextFile(join(parent, 'lf-attempt-expected.ts.txt'), expected);
+  report.carrierComparison = { beforeLines: before.split('\n').length,
+    afterLines: after.split('\n').length, beforeCR: (before.match(/\r/g) ?? []).length,
+    afterCR: (after.match(/\r/g) ?? []).length,
+    encodedCRBefore: (before.match(/\\r\\n/g) ?? []).length,
+    encodedCRAfter: (after.match(/\\r\\n/g) ?? []).length };
+  if (before === expected || after !== expected) throw new Error('Canonical carrier has extra delta');
+  report.exactExpectedCarrierDelta = true;
+  for (const path of otherCarriers) {
+    const original = await command(['show', `HEAD:${path}`]);
+    const changed = (await Deno.readTextFile(path)).replaceAll('\r\n', '\n').replaceAll('\\r\\n', '\\n');
+    if (changed !== original) throw new Error(`Unexpected authored delta in ${path}`);
+    const canonicalOther = await Deno.readTextFile(join(snapshot, path));
+    if (canonicalOther !== original) throw new Error(`Unexpected generated delta in ${path}`);
+  }
+  await Deno.copyFile(join(snapshot, carrier), join(parent, 'canonical-embedded.generated.ts.txt'));
+  await Deno.writeFile(carrier, afterBytes);
+  for (const path of otherCarriers) {
+    const original = await new Deno.Command('git', {
+      args: ['show', `HEAD:${path}`], cwd: repo, stdout: 'piped', stderr: 'piped',
+    }).output();
+    if (!original.success) throw new Error('Cannot restore audited carrier');
+    await Deno.writeFile(path, original.stdout);
+  }
+  report.restoredAuditedCarriers = otherCarriers;
+} finally {
+  const resolved = await Deno.realPath(snapshot);
+  if (relative(await Deno.realPath(parent), resolved) !== boundary) throw new Error('Cleanup boundary changed');
+  await Deno.remove(resolved, { recursive: true });
+  try { await Deno.lstat(snapshot); throw new Error('Snapshot cleanup failed'); }
+  catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
+  report.snapshotRemoved = true;
+  await Deno.writeTextFile(join(parent, 'canonical-generation.json'), JSON.stringify(report, null, 2) + '\n');
+}
+console.log(JSON.stringify({ exactExpectedCarrierDelta: report.exactExpectedCarrierDelta, snapshotRemoved: report.snapshotRemoved }));

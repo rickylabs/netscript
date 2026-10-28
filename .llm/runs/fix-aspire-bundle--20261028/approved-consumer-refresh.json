@@ -1,0 +1,381 @@
+{
+  "commands": [
+    {
+      "command": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+      "args": [
+        "task",
+        "maint:dogfood-skills"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008",
+      "code": 0,
+      "signal": null,
+      "stdout": "Installed NetScript agent integration for claude.\nAgent hosts: claude (from flag: --host claude).\nEditor: none (from flag: --editor none).\nConsumer agent bundle installed at C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.agents\\generated\\consumer-skills\n",
+      "stderr": "Task maint:dogfood-skills deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/maint/dogfood-skills.ts\n"
+    },
+    {
+      "command": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+      "args": [
+        "task",
+        "maint:dogfood-skills:check"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008",
+      "code": 0,
+      "signal": null,
+      "stdout": "Installed NetScript agent integration for claude.\nAgent hosts: claude (from flag: --host claude).\nEditor: none (from flag: --editor none).\n{\"gate\":\"maint:dogfood-skills\",\"status\":\"OK\",\"stale\":[]}\n",
+      "stderr": "Task maint:dogfood-skills:check deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/maint/dogfood-skills.ts --check\n"
+    }
+  ],
+  "protectedSources": [
+    {
+      "path": ".llm/tools/generate-cli-assets-barrel.ts",
+      "sha256": "a17d1df45049f5f1af5ef69701d3ff12c1c444342735bafa7e698890e44f3b04",
+      "unchanged": true
+    },
+    {
+      "path": ".llm/tools/maint/dogfood-skills.ts",
+      "sha256": "2b78a2b0d0b0c7bc3e3f70751b4b3ded70bfdcb958f94199ae83ece87bdb1c44",
+      "unchanged": true
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/agent/guidance.md.template",
+      "sha256": "4139f7a37c32ff96352c86508506f7b70c4973902a9fe8e039c475a85a6a3181",
+      "unchanged": true
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/embedded.generated.ts",
+      "sha256": "805794405dc83e55c9b12d7afc7d24b263204b41cf8d84fef4926d8683556c1d",
+      "unchanged": true
+    },
+    {
+      "path": "packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts",
+      "sha256": "1a5dae4137f6025d6baab2935e56de21a0d32366a8376b47c2e061e0d7ac1489",
+      "unchanged": true
+    },
+    {
+      "path": "packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts",
+      "sha256": "858c37721e8b0ccdda34255b226dcd636b7c375fd90e2805be41485802985e51",
+      "unchanged": true
+    },
+    {
+      "path": "packages/cli/src/public/features/agent/init/init-agent-claude_test.ts",
+      "sha256": "50022894f8fe86923298555dad56148ebecbbb505e1ca1222e7817e1a3bcfb3b",
+      "unchanged": true
+    }
+  ],
+  "boundary": {
+    "target": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.agents\\generated\\consumer-skills",
+    "realTarget": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.agents\\generated\\consumer-skills",
+    "repo": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008",
+    "relative": ".agents\\generated\\consumer-skills",
+    "verifiedBeforeDelete": true
+  },
+  "candidateFiles": 57,
+  "scratchBefore": [],
+  "ambientVsCode": true,
+  "changes": [
+    {
+      "path": ".agents/skills/aspire-monitoring/references/monitoring.md",
+      "status": "M",
+      "before": "19588b53725c9679026bf717c7392fd27d2144f606e622e595b8308f4517869b",
+      "after": "880346931486d7b87f8f2f5f3526118a63505f87de98a8930b266303df75316d"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/apphost-wiring.md",
+      "status": "A",
+      "before": null,
+      "after": "2793e84fe58018f0e36476d69d857fc270556b3738a67bc78c878f3479603407"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/csharp-authoring.md",
+      "status": "A",
+      "before": null,
+      "after": "21a49c48f228cd4db7273ad52112c1e79105e20a6e06df81a0ac9446d9fc2e21"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/docker-compose.md",
+      "status": "A",
+      "before": null,
+      "after": "79e733a4955610b5d22c774d2d8d1dca7eecc9acb423c91542bb3d83beb34686"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/full-solution-apphosts.md",
+      "status": "A",
+      "before": null,
+      "after": "0b48337d70e09d27ae877ac894b901ea57978efb1808e36a2c9b810b47c227e0"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/javascript-apps.md",
+      "status": "A",
+      "before": null,
+      "after": "be35f69fc5aae519f5205d2ab6a947bfc9c8e152c2555579a13c1a7198aed757"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/opentelemetry.md",
+      "status": "A",
+      "before": null,
+      "after": "b2e596a1caecac9883c7540df6f9a7e017be3c54ce8f0c6572b20d89c4343f80"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/scan-and-propose.md",
+      "status": "A",
+      "before": null,
+      "after": "b197bd66cf349710e6cd8d6fb6fa4d0da2e1c065e8a2889a7955d5948ba327e8"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/service-defaults.md",
+      "status": "A",
+      "before": null,
+      "after": "2c9e616a02305e06c9e5704615890032c3249bc0ee20772ecba762bf6890c3eb"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/typescript-authoring.md",
+      "status": "A",
+      "before": null,
+      "after": "4e55d0def9f541ff5922f03f59a8311e73378bb1c180a3b5e7cff3ea133cf5d1"
+    },
+    {
+      "path": ".agents/skills/aspireify/references/validation.md",
+      "status": "A",
+      "before": null,
+      "after": "f1035d891f022e376b5b61d5f05fddaf9e6d31f698b0cd544493101e882f91f8"
+    },
+    {
+      "path": ".agents/skills/aspireify/SKILL.md",
+      "status": "A",
+      "before": null,
+      "after": "93a7453e5b520ef28f127681ee5ef341e1e852eb1fe8aa75c6d89e763822f2cf"
+    },
+    {
+      "path": ".agents/skills/netscript-build/SKILL.md",
+      "status": "M",
+      "before": "b13b6b6e6e6a310963da7d36b9aba1f3d483ca1dc5524cc05d19657d9a18a349",
+      "after": "dfae83940c193aec0d4342baac0a7c5daa177e5c20fa852c37624ef2a9d3af40"
+    },
+    {
+      "path": ".agents/skills/netscript/SKILL.md",
+      "status": "M",
+      "before": "6e1366aa6272091d3394c61cd9ab84208168a43da2e81fea287892c9b9c30cc5",
+      "after": "7792f61f61ef18e65273803477e9fe96fc757c4d1a6cd16a3afc5af7035c2c47"
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/references/aws.md",
+      "status": "D",
+      "before": "8ebaf752bd385a3144018708140910f249479697aeeebcf8012dd0d1951c583a",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/references/azure.md",
+      "status": "D",
+      "before": "a0d2e661dc19f993bb6695b7fdbb527fb4996651fe9e1209b8f440efe3b0c6b3",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/references/cicd.md",
+      "status": "D",
+      "before": "04b0813750583c61f71e950ff51ba72d5eee2dd67d3de78f6050fbb8c2b3a9a2",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/references/docker-compose.md",
+      "status": "D",
+      "before": "7e050e319f4adcd43cf0908b858c895f6d5f7086ffeca99cf3077b394a64bbdb",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/references/github-actions-azure-csharp.yml",
+      "status": "D",
+      "before": "edd51e0076ba1a0c6d2cbf79e101d0c9b025a43ce2d1ceef0accb68a168bd719",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/references/github-actions-azure-typescript.yml",
+      "status": "D",
+      "before": "fd736072eb233ff88f1120f4a49277489a2d9ef69916e7a800813976d8a2ff35",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/references/javascript.md",
+      "status": "D",
+      "before": "032832652c021aec9bf8443de8363cb8bcee83d740e4678ab02bcf8c151bbb1e",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/references/kubernetes.md",
+      "status": "D",
+      "before": "eb270fd25fc58cc14641107bcca85ef59d01731aec2fcc378573db4d938ed3be",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/references/preflight.md",
+      "status": "D",
+      "before": "d744493c6cc5bed4a7499b7ded7e482fa71cfb4eb95b67047cdb3abb5e092df0",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-deployment/SKILL.md",
+      "status": "D",
+      "before": "70d784758d975b22b942608eace642f7bb3103defbb12643e4d744d0078b52b1",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-init/references/init-workflow.md",
+      "status": "D",
+      "before": "74a6819dfa35e51a95f73b31ae5d65f8edbc72581ead65456289ce3323caec86",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-init/references/templates.md",
+      "status": "D",
+      "before": "b6890317230af1553404f73b222da7304a5d1b1b3876484f76981f4695334e8d",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-init/SKILL.md",
+      "status": "D",
+      "before": "8ed5dd0709d922240f538c941b0a3cc1b4ceacc3830cdaf04c69c0eb1a1835de",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-monitoring/references/diagnostics-bridge.md",
+      "status": "D",
+      "before": "5b4018ff2e01e3872733acebc35421fe06522b9faf6747e9e3b31d5a852f5f49",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-monitoring/references/monitoring.md",
+      "status": "D",
+      "before": "19588b53725c9679026bf717c7392fd27d2144f606e622e595b8308f4517869b",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-monitoring/references/playwright-handoff.md",
+      "status": "D",
+      "before": "915db809d8b5f5e44ffd5a5e4a2eb18ffb37ff8f4e4a4d496f53146909d54a7d",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-monitoring/SKILL.md",
+      "status": "D",
+      "before": "798ca7187a4058fdf10bbb413872befe4b6c7e9f74b0bd33777a3eae260b9b25",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-orchestration/references/agent-workflows.md",
+      "status": "D",
+      "before": "9bd6f92a7e716d44c8b18b8e8f0e3447ffc2ade11a75446f19e24c72df8a1af9",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-orchestration/references/app-commands.md",
+      "status": "D",
+      "before": "c09b70fa176c8302f7b657d5c862039ecfbe8f25192dfdabce81f2758d5adc93",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-orchestration/references/detection.md",
+      "status": "D",
+      "before": "fa8d3f4a08e7cbabf07671b35c434fae48dfa2b9fef4180699ed2866f3992898",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-orchestration/references/resource-management.md",
+      "status": "D",
+      "before": "7a5c24f87ed3140877959526b25caac7d98b556d5544bbb21676a1059bd6e80b",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-orchestration/references/safety-guardrails.md",
+      "status": "D",
+      "before": "2e27b9d89e87447d1ae6c6d894634bbbc9be9a292a67f146666e0db683764366",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire-orchestration/SKILL.md",
+      "status": "D",
+      "before": "3efcb5ad2e0f8728982a2ec1ab279ccf6e345ad42d5113ec191b3bc3492c7cea",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/aspire/SKILL.md",
+      "status": "D",
+      "before": "68b6f895faa192d14a572bfe2dd657cdba880b1db2d2cc046f59571cd7c6d3e5",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/deno/SKILL.md",
+      "status": "D",
+      "before": "258e202bdc90412ebff65d837df53e09c2e237ecc552a50b167f68babd4f62a9",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/help.md",
+      "status": "D",
+      "before": "0e021232441ebeefddfb3fc23f492870e422ce304de244b3f9c6d6dd6bf4ced9",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/netscript-build/SKILL.md",
+      "status": "D",
+      "before": "b13b6b6e6e6a310963da7d36b9aba1f3d483ca1dc5524cc05d19657d9a18a349",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/netscript-operate/SKILL.md",
+      "status": "D",
+      "before": "3516c797ef284a484f3c7e8bba0304a6ab6a9e9cbc267730bfc9a0322390660f",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/netscript/SKILL.md",
+      "status": "D",
+      "before": "6e1366aa6272091d3394c61cd9ab84208168a43da2e81fea287892c9b9c30cc5",
+      "after": null
+    },
+    {
+      "path": ".claude/skills/repo-skills/SKILL.md",
+      "status": "A",
+      "before": null,
+      "after": "d8c9573bb26317860988de3fa99cc1c0b1d930658043a7a83ff84d8ba508f8a8"
+    },
+    {
+      "path": ".llm/tools/e2e/scaffold-e2e-test.ts",
+      "status": "M",
+      "before": "1c2b174be08203b296b2e4483b2917701136c8990ba9425d45355b0230e282a1",
+      "after": "00e64e37dff4ddc320f49b763558d569f8c14dcda0a1c2a0110fd926b2e5d381"
+    },
+    {
+      "path": ".llm/tools/run-deno-check.ts",
+      "status": "M",
+      "before": "d67099448e1f1d263466f3027c85615c37423e0ba0cb508a6818cbb745cb5850",
+      "after": "983ddae25874c6384e356ba8ec47369e4b7790097d3be7ba5c815f232c5df0e9"
+    },
+    {
+      "path": ".llm/tools/validation/check-aspire-host-ports.ts",
+      "status": "M",
+      "before": "046333fefa467a4fbd0f7da5e32cc2dcb5fe949f2bfde722086ba8424095c6a1",
+      "after": "bfd3d417e3ac3754d8f93852f9af7e56710192c0f81ad4edb8e906acf2a27e01"
+    },
+    {
+      "path": "AGENTS.md",
+      "status": "M",
+      "before": "4bd584c8e17161bf7a515d0f3af6c1e5bf0bf0cacc5ccb1295df2787519e8e45",
+      "after": "ba9b351247a2206ff58566c36a3da4053fb7fde57bbc8b640b326602c7c230fd"
+    },
+    {
+      "path": "CLAUDE.md",
+      "status": "A",
+      "before": null,
+      "after": "6de434cd1f5dd0e3f076405f3fe50f3b50a5fce0cb5f0c04a710e5ea9d8660da"
+    }
+  ],
+  "filesMatchReviewedCandidate": true,
+  "actualFileCount": 57,
+  "statusCounts": {
+    "M": 7,
+    "A": 13,
+    "D": 29
+  },
+  "stableBridgeHeader": "# consumer-skills repository skills",
+  "scratchAfter": [],
+  "outcome": "PASS"
+}

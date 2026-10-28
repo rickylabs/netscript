@@ -1,0 +1,37 @@
+import { join, relative } from '@std/path';
+const repo = Deno.cwd();
+const scratch = join(repo, '.llm/tmp/fix-aspire-bundle--20261028');
+const run = join(repo, '.llm/runs/fix-aspire-bundle--20261028');
+const root = join(repo, '.agents/generated/consumer-skills');
+const candidate = JSON.parse(await Deno.readTextFile(join(scratch, 'consumer-skills-candidate-a.json')));
+const files: { path: string; sha256: string; bytes: number }[] = [];
+async function walk(path: string): Promise<void> {
+  for await (const entry of Deno.readDir(path)) {
+    if (entry.isSymlink) throw new Error('Unexpected linked fixture');
+    const absolute = join(path, entry.name);
+    if (entry.isDirectory) await walk(absolute);
+    else if (entry.isFile) {
+      const bytes = await Deno.readFile(absolute);
+      files.push({ path: relative(root, absolute).replaceAll('\\', '/'), bytes: bytes.length,
+        sha256: new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)).toHex() });
+    }
+  }
+}
+await walk(root);
+files.sort((a, b) => a.path.localeCompare(b.path));
+if (JSON.stringify(files) !== JSON.stringify(candidate.files)) throw new Error('Final manifest differs from reviewed candidate');
+const status = await new Deno.Command('git', { args: ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--', '.agents/generated/consumer-skills'],
+  stdout: 'piped', stderr: 'piped' }).output();
+if (!status.success) throw new Error('Cannot inspect final Git status');
+const gitChanges = new TextDecoder().decode(status.stdout).split('\0').filter(Boolean).map((row) => ({
+  path: row.slice(3).replace(/^\.agents\/generated\/consumer-skills\//, ''),
+  status: row.slice(0, 2) === '??' ? 'A' : row.slice(0, 2).trim(),
+})).sort((a, b) => a.path.localeCompare(b.path));
+const expected = candidate.changes.map(({ path, status }: { path: string; status: string }) => ({ path, status }));
+if (JSON.stringify(gitChanges) !== JSON.stringify(expected)) throw new Error('Final Git statuses differ from approved fixture delta');
+const proof = { files, gitChanges, nativeCandidateByteMatch: true, reviewedCandidate: 'consumer-skills-candidate-a.json' };
+await Deno.writeTextFile(join(run, 'final-consumer-fixture.json'), JSON.stringify(proof, null, 2) + '\n');
+for (const name of ['approved-consumer-refresh.json', 'refresh-approved-consumer.ts', 'finalize-consumer-evidence.ts']) {
+  await Deno.copyFile(join(scratch, name), join(run, name.endsWith('.ts') ? name + '.txt' : name));
+}
+console.log(JSON.stringify({ files: files.length, gitChanges: gitChanges.length, nativeCandidateByteMatch: true }));

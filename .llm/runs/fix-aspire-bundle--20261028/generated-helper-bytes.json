@@ -1,0 +1,20 @@
+[
+  {
+    "path": "packages/cli/src/kernel/assets/generated/aspire/helpers/installation-secret.ts.template",
+    "byteIdenticalHead": true,
+    "equivalentLF": true,
+    "headCRLF": 0,
+    "currentCRLF": 0,
+    "headBytes": 6697,
+    "currentBytes": 6697
+  },
+  {
+    "path": "packages/cli/src/kernel/assets/generated/database/postgres-connection-string.ts.template",
+    "byteIdenticalHead": true,
+    "equivalentLF": true,
+    "headCRLF": 0,
+    "currentCRLF": 0,
+    "headBytes": 8298,
+    "currentBytes": 8298
+  }
+]

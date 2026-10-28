@@ -1,0 +1,102 @@
+import { join, relative } from '@std/path';
+const repo = Deno.cwd();
+const owned = join(repo, '.llm/tmp/fix-aspire-bundle--20261028');
+const run = '.llm/runs/fix-aspire-bundle--20261028';
+const source = JSON.parse(await Deno.readTextFile(join(run, 'source-manifest.json')));
+const fixture = JSON.parse(await Deno.readTextFile(join(run, 'final-consumer-fixture.json')));
+const sha = async (bytes: Uint8Array): Promise<string> => new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)).toHex();
+const decoder = new TextDecoder();
+for (const file of source.files) {
+  if (await sha(await Deno.readFile(file.path)) !== file.sha256) throw new Error(`Protected source changed: ${file.path}`);
+}
+for (const file of fixture.files) {
+  if (await sha(await Deno.readFile(join('.agents/generated/consumer-skills', file.path))) !== file.sha256) throw new Error('Fixture byte mismatch');
+}
+for (const name of ['checkpoint-index-audit.ts', 'prepare-checkpoint.ts']) {
+  await Deno.copyFile(join(owned, name), join(run, name + '.txt'));
+}
+const artifacts = [];
+const diagnosticBindings = [];
+for await (const entry of Deno.readDir(run)) {
+  if (!entry.isFile || entry.name.endsWith('.ts')) throw new Error(`Unexpected executable/nested run artifact: ${entry.name}`);
+  const path = join(run, entry.name).replaceAll('\\', '/');
+  artifacts.push(path);
+  if (entry.name.endsWith('.ts.txt')) {
+    const diagnostic = join(owned, entry.name.slice(0, -4));
+    try {
+      const bytes = await Deno.readFile(diagnostic);
+      const copy = await Deno.readFile(path);
+      if (await sha(bytes) !== await sha(copy)) throw new Error(`Diagnostic archive changed: ${entry.name}`);
+      diagnosticBindings.push({ path, source: relative(repo, diagnostic).replaceAll('\\', '/'), sha256: await sha(copy) });
+    } catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
+  }
+}
+const paths: string[] = [
+  ...source.files.map((file: { path: string }) => file.path),
+  ...fixture.gitChanges.map((file: { path: string }) => `.agents/generated/consumer-skills/${file.path}`),
+  ...artifacts,
+].sort();
+if (new Set(paths).size !== paths.length) throw new Error('Duplicate checkpoint path');
+const sensitive = [
+  /sk-(?:(?:proj|svcacct)-[A-Za-z0-9_-]{20,}|[A-Za-z0-9]{32,})/g,
+  /gh[pousr]_[A-Za-z0-9]{25,}/g,
+  /github_pat_[A-Za-z0-9_]{30,}/g,
+  /AKIA[0-9A-Z]{16}/g,
+  /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/g,
+  /[Bb]earer\s+[A-Za-z0-9._~+\/-]{32,}/g,
+];
+const findings: { path: string; rule: number }[] = [];
+let bytesScanned = 0;
+let decodedStrings = 0;
+for (const path of paths) {
+  try {
+    const bytes = await Deno.readFile(path);
+    bytesScanned += bytes.length;
+    const raw = decoder.decode(bytes);
+    const seen = new Set<string>();
+    const values = [raw];
+    while (values.length) {
+      const value = values.pop()!;
+      if (seen.has(value)) continue;
+      seen.add(value);
+      decodedStrings++;
+      for (const [index, pattern] of sensitive.entries()) {
+        pattern.lastIndex = 0;
+        if (pattern.test(value)) findings.push({ path, rule: index });
+      }
+      try {
+        const parsed = JSON.parse(value);
+        const visit = (item: unknown): void => {
+          if (typeof item === 'string') values.push(item);
+          else if (Array.isArray(item)) item.forEach(visit);
+          else if (item && typeof item === 'object') {
+            const record = item as Record<string, unknown>;
+            const fields = Object.keys(record);
+            if (fields.some((key) => /account.?id|window.?start|window.?end|reservation.?id/i.test(key)) &&
+              fields.some((key) => /api.?key|access.?token|remaining.?quota|allowance/i.test(key))) {
+              findings.push({ path, rule: 6 });
+            }
+            Object.values(record).forEach(visit);
+          }
+        };
+        visit(parsed);
+      } catch { /* Non-JSON text is still scanned, including decoded string literals below. */ }
+      for (const match of value.matchAll(/"(?:[^"\\]|\\.)*"/g)) {
+        try { const decoded = JSON.parse(match[0]); if (decoded !== value) values.push(decoded); } catch { /* Not a JSON literal. */ }
+      }
+    }
+  } catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
+}
+const scan = { paths: paths.length, artifacts: artifacts.length, bytesScanned, decodedStrings,
+  diagnosticBindings, findings, credentialPatterns: sensitive.length, nestedOperationalPayloadGuard: true };
+await Deno.writeTextFile(join(owned, 'checkpoint-public-scan.json'), JSON.stringify(scan, null, 2) + '\n');
+if (findings.length) throw new Error(`Sensitive-content scan needs review (${findings.length} findings; values not printed)`);
+const alreadyStaged = await new Deno.Command('git', { args: ['diff', '--cached', '--name-only', '-z'], stdout: 'piped', stderr: 'piped' }).output();
+if (!alreadyStaged.success || alreadyStaged.stdout.length) throw new Error('Index is not initially empty');
+await Deno.writeTextFile(join(owned, 'checkpoint-paths.json'), JSON.stringify({ paths }, null, 2) + '\n');
+const staged = await new Deno.Command('git', { args: ['add', '--', ...paths], stdout: 'piped', stderr: 'piped' }).output();
+await Deno.writeTextFile(join(owned, 'checkpoint-stage.json'), JSON.stringify({ code: staged.code,
+  stdout: decoder.decode(staged.stdout), stderr: decoder.decode(staged.stderr), explicitPaths: paths.length }, null, 2) + '\n');
+if (!staged.success) throw new Error('Explicit scoped staging failed');
+console.log(JSON.stringify({ stagedExplicitPaths: paths.length, authored: source.files.length,
+  fixture: fixture.gitChanges.length, artifacts: artifacts.length, sensitiveFindings: findings.length }));

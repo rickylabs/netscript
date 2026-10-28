@@ -1,0 +1,160 @@
+{
+  "baseHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "names": [
+    "generated project search_docs reaches its installed corpus after host restart",
+    "S-18 prior-release host stays pinned until agent init and restart exposes the tool triad",
+    "#2008 cleanup: linked skill trees and references are retained without touching their targets"
+  ],
+  "filter": "/generated project search_docs|S-18 prior-release host|cleanup: linked skill trees/",
+  "runs": [
+    {
+      "label": "baseline",
+      "command": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+      "args": [
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tools\\run-deno-test.ts",
+        "--cwd",
+        "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\windows-baseline-head",
+        "--output",
+        "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\windows-baseline-tests.json",
+        "--",
+        "--allow-all",
+        "--filter",
+        "/generated project search_docs|S-18 prior-release host|cleanup: linked skill trees/",
+        "packages/cli/src/public/features/agent/init/init-agent_test.ts",
+        "packages/cli/src/public/features/agent/init/init-agent-claude_test.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\windows-baseline-head",
+      "code": 1,
+      "signal": null,
+      "stdout": "{\"report\":\"C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-aspire-skill-closure-008\\\\.llm\\\\tmp\\\\fix-aspire-bundle--20261028\\\\windows-baseline-tests.json\",\"summary\":{\"passed\":0,\"failed\":3,\"ignored\":0,\"totalResults\":3,\"uniqueFailures\":3}}\n",
+      "stderr": "",
+      "output": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\windows-baseline-tests.json"
+    },
+    {
+      "label": "current",
+      "command": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+      "args": [
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tools\\run-deno-test.ts",
+        "--cwd",
+        "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008",
+        "--output",
+        "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\windows-current-tests.json",
+        "--",
+        "--allow-all",
+        "--filter",
+        "/generated project search_docs|S-18 prior-release host|cleanup: linked skill trees/",
+        "packages/cli/src/public/features/agent/init/init-agent_test.ts",
+        "packages/cli/src/public/features/agent/init/init-agent-claude_test.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008",
+      "code": 1,
+      "signal": null,
+      "stdout": "{\"report\":\"C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-aspire-skill-closure-008\\\\.llm\\\\tmp\\\\fix-aspire-bundle--20261028\\\\windows-current-tests.json\",\"summary\":{\"passed\":0,\"failed\":3,\"ignored\":0,\"totalResults\":3,\"uniqueFailures\":3}}\n",
+      "stderr": "",
+      "output": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\windows-current-tests.json"
+    }
+  ],
+  "extraction": [
+    {
+      "status": "fulfilled"
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "success": true,
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "success": true,
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": ""
+    },
+    {
+      "status": "fulfilled",
+      "value": ""
+    },
+    {
+      "status": "fulfilled",
+      "value": ""
+    }
+  ],
+  "owners": [
+    {
+      "path": "packages/cli/src/public/features/agent/init/init-agent_test.ts",
+      "baselineSha256": "4e32164da6b39a26cbf75ecd946de881807d9a991a5601d89f1700b974f7edac",
+      "currentSha256": "4e32164da6b39a26cbf75ecd946de881807d9a991a5601d89f1700b974f7edac",
+      "identical": true
+    },
+    {
+      "path": "packages/cli/src/public/features/agent/init/init-agent-claude_test.ts",
+      "baselineSha256": "9113d78ec6d1cff266693c947d0fbfcb88c7fb7ba3a2d6a626687dcefa673d5c",
+      "currentSha256": "50022894f8fe86923298555dad56148ebecbbb505e1ca1222e7817e1a3bcfb3b",
+      "identical": false
+    },
+    {
+      "path": "packages/cli/src/public/features/agent/init/init-agent.ts",
+      "baselineSha256": "a7954b6a90c781e0a75823be6a5f71b723e1ce08c7d23d03f48ada7ebc422e8c",
+      "currentSha256": "a7954b6a90c781e0a75823be6a5f71b723e1ce08c7d23d03f48ada7ebc422e8c",
+      "identical": true
+    },
+    {
+      "path": "packages/cli/src/public/features/agent/init/agent-init-file-system.ts",
+      "baselineSha256": "6cbde043cd1f8927a91e9f831fa9a126b8846d76924138408e6f6f616cce1ad1",
+      "currentSha256": "6cbde043cd1f8927a91e9f831fa9a126b8846d76924138408e6f6f616cce1ad1",
+      "identical": true
+    },
+    {
+      "path": "packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer.ts",
+      "baselineSha256": "6c2678dfc8ee9ab413751758b2900c5c83f4f1e3dd96043b7d2d2ac904d13410",
+      "currentSha256": "6c2678dfc8ee9ab413751758b2900c5c83f4f1e3dd96043b7d2d2ac904d13410",
+      "identical": true
+    },
+    {
+      "path": "packages/cli/bin/netscript.ts",
+      "baselineSha256": "b3d970aaa9830cc04ac02dbcbc071ef918fde25edf79b7c911d1f85e7ea68501",
+      "currentSha256": "b3d970aaa9830cc04ac02dbcbc071ef918fde25edf79b7c911d1f85e7ea68501",
+      "identical": true
+    }
+  ],
+  "tests": [
+    {
+      "name": "generated project search_docs reaches its installed corpus after host restart",
+      "path": "packages/cli/src/public/features/agent/init/init-agent_test.ts",
+      "identical": true,
+      "baselineSha256": "c6247386f83d605b581b082b3af4f9f89e47d7cb5f59e81405af42f594c763b8",
+      "currentSha256": "c6247386f83d605b581b082b3af4f9f89e47d7cb5f59e81405af42f594c763b8"
+    },
+    {
+      "name": "S-18 prior-release host stays pinned until agent init and restart exposes the tool triad",
+      "path": "packages/cli/src/public/features/agent/init/init-agent_test.ts",
+      "identical": true,
+      "baselineSha256": "54c50aec1cd0f70174265929e5d2a5a50a3c8c6d0ae7f2a633882f1698625b8a",
+      "currentSha256": "54c50aec1cd0f70174265929e5d2a5a50a3c8c6d0ae7f2a633882f1698625b8a"
+    },
+    {
+      "name": "#2008 cleanup: linked skill trees and references are retained without touching their targets",
+      "path": "packages/cli/src/public/features/agent/init/init-agent-claude_test.ts",
+      "identical": true,
+      "baselineSha256": "e20507030114711f278c450b2769d5994cb5e801e034922e8a2cc8515742770c",
+      "currentSha256": "e20507030114711f278c450b2769d5994cb5e801e034922e8a2cc8515742770c"
+    }
+  ],
+  "snapshotRemoved": true
+}

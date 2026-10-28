@@ -1,0 +1,52 @@
+{
+  "commands": [
+    {
+      "command": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+      "args": [
+        "task",
+        "gen:assets-barrel"
+      ],
+      "code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": "Task gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts\n"
+    },
+    {
+      "command": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+      "args": [
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/generate-cli-assets-barrel.ts",
+        "--check"
+      ],
+      "code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+      "args": [
+        "task",
+        "gen:assets-barrel"
+      ],
+      "code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": "Task gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts\n"
+    }
+  ],
+  "exactCarrierDeltas": {
+    "cli": "sole guidance name change",
+    "plugin": "byte-identical HEAD",
+    "freshUi": "byte-identical HEAD"
+  },
+  "idempotent": true,
+  "carrierHashes": {
+    "packages/cli/src/kernel/assets/embedded.generated.ts": "805794405dc83e55c9b12d7afc7d24b263204b41cf8d84fef4926d8683556c1d",
+    "packages/plugin/src/kernel/assets/embedded.generated.ts": "2e3e44e45ace92dba89126c0de8085736cc90fad6bfb88f70c6b1e52d6a782e4",
+    "packages/fresh-ui/registry.generated.ts": "8317a7c32fe6b2e3a8f3e4a46211f64a53375abea97f37bd98cd596d12bd3606"
+  }
+}

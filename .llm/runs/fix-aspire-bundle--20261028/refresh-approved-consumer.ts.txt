@@ -1,0 +1,102 @@
+import { join, relative, resolve } from '@std/path';
+const repo = Deno.cwd();
+const owned = resolve(repo, '.llm/tmp/fix-aspire-bundle--20261028');
+const target = resolve(repo, '.agents/generated/consumer-skills');
+const candidate = JSON.parse(await Deno.readTextFile(join(owned, 'consumer-skills-candidate-a.json')));
+const protectedSources = JSON.parse(await Deno.readTextFile(join(repo, '.llm/runs/fix-aspire-bundle--20261028/source-manifest.json')));
+const decoder = new TextDecoder();
+const digest = async (bytes: Uint8Array): Promise<string> => new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)).toHex();
+const report: Record<string, unknown> = { commands: [], protectedSources: [], boundary: {}, candidateFiles: candidate.files.length };
+async function verifySources(): Promise<void> {
+  const current = [];
+  for (const file of protectedSources.files) {
+    const sha256 = await digest(await Deno.readFile(join(repo, file.path)));
+    if (sha256 !== file.sha256) throw new Error(`Protected source changed: ${file.path}`);
+    current.push({ path: file.path, sha256, unchanged: true });
+  }
+  report.protectedSources = current;
+}
+async function files(root: string): Promise<Record<string, string>> {
+  const result: Record<string, string> = {};
+  async function visit(path: string): Promise<void> {
+    for await (const entry of Deno.readDir(path)) {
+      if (entry.isSymlink) throw new Error('Unexpected linked fixture entry');
+      const absolute = join(path, entry.name);
+      if (entry.isDirectory) await visit(absolute);
+      else if (entry.isFile) result[relative(root, absolute).replaceAll('\\', '/')] = await digest(await Deno.readFile(absolute));
+    }
+  }
+  await visit(root);
+  return result;
+}
+async function scratch(): Promise<string[]> {
+  const names = [];
+  for await (const entry of Deno.readDir(join(repo, '.llm/tmp'))) {
+    if (entry.name.startsWith('dogfood-consumer-skills-')) names.push(entry.name);
+  }
+  return names.sort();
+}
+async function command(args: string[]): Promise<void> {
+  const result = await new Deno.Command(Deno.execPath(), {
+    args, cwd: repo, env: { NETSCRIPT_ASPIRE_CLI: 'C:/Users/ericc/.aspire/bin/aspire.exe' },
+    stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(120_000),
+  }).output();
+  (report.commands as unknown[]).push({ command: Deno.execPath(), args, cwd: repo,
+    code: result.code, signal: result.signal, stdout: decoder.decode(result.stdout), stderr: decoder.decode(result.stderr) });
+  if (!result.success) throw new Error(`Canonical command failed: ${args.join(' ')} (${result.code})`);
+}
+try {
+  await verifySources();
+  for (const path of ['.agents', '.agents/generated', '.agents/generated/consumer-skills']) {
+    const stat = await Deno.lstat(resolve(repo, path));
+    if (!stat.isDirectory || stat.isSymlink) throw new Error(`Unsafe deletion ancestor: ${path}`);
+  }
+  const realRepo = await Deno.realPath(repo);
+  const realTarget = await Deno.realPath(target);
+  const expectedRelative = join('.agents', 'generated', 'consumer-skills');
+  if (relative(realRepo, realTarget) !== expectedRelative) throw new Error('Deletion boundary escaped expected fixture');
+  report.boundary = { target, realTarget, repo: realRepo, relative: relative(realRepo, realTarget), verifiedBeforeDelete: true };
+  const before = await files(target);
+  const scratchBefore = await scratch();
+  if (scratchBefore.length) throw new Error('Pre-existing producer scratch prevents zero-residue proof');
+  report.scratchBefore = scratchBefore;
+  report.ambientVsCode = Deno.env.has('VSCODE_CODE_CACHE_PATH');
+  await command(['task', 'maint:dogfood-skills']);
+  const after = await files(target);
+  const expected = Object.fromEntries(candidate.files.map((file: { path: string; sha256: string }) => [file.path, file.sha256]));
+  const actualNames = Object.keys(after).sort();
+  const expectedNames = Object.keys(expected).sort();
+  if (JSON.stringify(actualNames) !== JSON.stringify(expectedNames) || actualNames.some((path) => after[path] !== expected[path])) {
+    throw new Error('Refreshed fixture differs from reviewed native candidate');
+  }
+  const changes = [];
+  for (const path of new Set([...Object.keys(before), ...actualNames])) {
+    if (before[path] !== after[path]) changes.push({ path, status: !before[path] ? 'A' : !after[path] ? 'D' : 'M', before: before[path] ?? null, after: after[path] ?? null });
+  }
+  changes.sort((a, b) => a.path.localeCompare(b.path));
+  const approved = candidate.changes.map((change: { path: string; status: string; before: string | null; after: string | null }) => change);
+  if (JSON.stringify(changes) !== JSON.stringify(approved)) throw new Error('Actual fixture changes differ from approved statuses/digests');
+  report.changes = changes;
+  report.filesMatchReviewedCandidate = true;
+  report.actualFileCount = actualNames.length;
+  report.statusCounts = changes.reduce((counts: Record<string, number>, change) => {
+    counts[change.status] = (counts[change.status] ?? 0) + 1; return counts;
+  }, {});
+  await command(['task', 'maint:dogfood-skills:check']);
+  const final = await files(target);
+  if (JSON.stringify(Object.entries(final).sort()) !== JSON.stringify(Object.entries(after).sort())) throw new Error('Check command changed fixture bytes');
+  report.stableBridgeHeader = (await Deno.readTextFile(join(target, '.claude/skills/repo-skills/SKILL.md'))).split('\n').find((line) => line.startsWith('# '));
+  report.scratchAfter = await scratch();
+  if ((report.scratchAfter as string[]).length) throw new Error('Producer scratch remains');
+  await verifySources();
+  report.outcome = 'PASS';
+} catch (error) {
+  report.outcome = 'FAIL';
+  report.error = error instanceof Error ? error.stack : String(error);
+  Deno.exitCode = 1;
+} finally {
+  await Deno.writeTextFile(join(owned, 'approved-consumer-refresh.json'), JSON.stringify(report, null, 2) + '\n');
+}
+console.log(JSON.stringify({ outcome: report.outcome, actualFileCount: report.actualFileCount,
+  statusCounts: report.statusCounts, protectedSourceCount: (report.protectedSources as unknown[]).length,
+  scratchAfter: report.scratchAfter, error: report.error }));

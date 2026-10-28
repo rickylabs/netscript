@@ -1,0 +1,71 @@
+import { join, relative, resolve } from '@std/path';
+const repo = Deno.cwd();
+const owned = resolve(repo, '.llm/tmp/fix-aspire-bundle--20261028');
+const snapshot = join(owned, 'windows-baseline-head');
+if (relative(owned, snapshot) !== 'windows-baseline-head') throw new Error('Invalid snapshot boundary');
+const decoder = new TextDecoder();
+const hash = async (value: Uint8Array): Promise<string> => new Uint8Array(await crypto.subtle.digest('SHA-256', value)).toHex();
+const names = [
+  'generated project search_docs reaches its installed corpus after host restart',
+  'S-18 prior-release host stays pinned until agent init and restart exposes the tool triad',
+  '#2008 cleanup: linked skill trees and references are retained without touching their targets',
+];
+const filter = '/generated project search_docs|S-18 prior-release host|cleanup: linked skill trees/';
+const testFiles = [
+  'packages/cli/src/public/features/agent/init/init-agent_test.ts',
+  'packages/cli/src/public/features/agent/init/init-agent-claude_test.ts',
+];
+const report: Record<string, unknown> = { baseHead: '88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5', names, filter, runs: [] };
+await Deno.mkdir(snapshot);
+try {
+  const archive = new Deno.Command('git', { args: ['-c', 'core.autocrlf=false', 'archive', '--format=tar', 'HEAD'],
+    stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(120_000) }).spawn();
+  const unpack = new Deno.Command('tar', { args: ['-xf', '-', '-C', snapshot], stdin: 'piped', stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(120_000) }).spawn();
+  const extraction = await Promise.allSettled([archive.stdout.pipeTo(unpack.stdin), archive.status, unpack.status,
+    new Response(archive.stderr).text(), new Response(unpack.stdout).text(), new Response(unpack.stderr).text()]);
+  report.extraction = extraction;
+  if (extraction.some((result) => result.status === 'rejected')) throw new Error('Extraction did not settle');
+  for (const index of [1, 2]) {
+    const result = extraction[index];
+    if (result.status !== 'fulfilled' || !result.value.success) throw new Error('Extraction failed');
+  }
+  const owners = [...testFiles, 'packages/cli/src/public/features/agent/init/init-agent.ts',
+    'packages/cli/src/public/features/agent/init/agent-init-file-system.ts',
+    'packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer.ts',
+    'packages/cli/bin/netscript.ts'];
+  report.owners = await Promise.all(owners.map(async (path) => {
+    const base = await Deno.readFile(join(snapshot, path));
+    const current = await Deno.readFile(path);
+    return { path, baselineSha256: await hash(base), currentSha256: await hash(current), identical: await hash(base) === await hash(current) };
+  }));
+  report.tests = await Promise.all(names.map(async (name, index) => {
+    const path = testFiles[index === 2 ? 1 : 0];
+    const baseline = await Deno.readTextFile(join(snapshot, path));
+    const current = await Deno.readTextFile(path);
+    function block(source: string): string {
+      const position = source.indexOf(`Deno.test('${name}'`);
+      if (position < 0) throw new Error(`Cannot locate ${name}`);
+      const end = source.indexOf('\nDeno.test(', position + 1);
+      return source.slice(position, end < 0 ? undefined : end).trimEnd();
+    }
+    const before = block(baseline);
+    const after = block(current);
+    return { name, path, identical: before === after,
+      baselineSha256: await hash(new TextEncoder().encode(before)), currentSha256: await hash(new TextEncoder().encode(after)) };
+  }));
+  for (const [label, cwd] of [['baseline', snapshot], ['current', repo]]) {
+    const output = join(owned, `windows-${label}-tests.json`);
+    const args = ['run', '--allow-read', '--allow-write', '--allow-run', join(repo, '.llm/tools/run-deno-test.ts'),
+      '--cwd', cwd, '--output', output, '--', '--allow-all', '--filter', filter, ...testFiles];
+    const result = await new Deno.Command(Deno.execPath(), { args, cwd, stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(120_000) }).output();
+    (report.runs as unknown[]).push({ label, command: Deno.execPath(), args, cwd, code: result.code,
+      signal: result.signal, stdout: decoder.decode(result.stdout), stderr: decoder.decode(result.stderr), output });
+  }
+} finally {
+  const actual = await Deno.realPath(snapshot);
+  if (relative(await Deno.realPath(owned), actual) !== 'windows-baseline-head') throw new Error('Cleanup boundary escaped');
+  await Deno.remove(actual, { recursive: true });
+  report.snapshotRemoved = true;
+  await Deno.writeTextFile(join(owned, 'windows-baseline-qualification.json'), JSON.stringify(report, null, 2) + '\n');
+}
+console.log(JSON.stringify({ runs: report.runs, snapshotRemoved: report.snapshotRemoved }));

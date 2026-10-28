@@ -34,7 +34,7 @@ Skills are addressed by their registered name. Call the skill by name and its bo
 - Call the `netscript-build` skill before scaffolding, adding, or generating contracts, services, database assets, plugins, or UI.
 - Call the `netscript-operate` skill for health, failures, recent runs, documentation lookup, and performance evidence.
 - Call the `aspire` skill for AppHost lifecycle, resources, dashboards, logs, spans, and traces.
-- Call the installed `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, and `aspire-deployment` workflow skills for their named lifecycle phases; NetScript's `aspire` skill remains the diagnostic authority.
+- Call the installed `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`, and `aspireify` workflow skills for their named lifecycle phases; NetScript's `aspire` skill remains the diagnostic authority.
 - Call the `deno` skill for Deno runtime, types, permissions, dependencies, or module resolution.
 - If something hangs, vanishes, stays silent, or is Healthy but does not respond, start at the `.agents/skills/help.md` playbook.
 <!-- netscript-agent:end -->

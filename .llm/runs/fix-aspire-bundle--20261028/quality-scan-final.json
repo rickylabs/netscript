@@ -1,0 +1,50 @@
+{
+  "gateId": "quality-scan",
+  "invocationId": "aspire-skill-closure-scoped-quality",
+  "argv": [
+    "deno",
+    "task",
+    "quality:scan",
+    "--changed-file",
+    ".llm/tools/generate-cli-assets-barrel.ts",
+    "--changed-file",
+    ".llm/tools/maint/dogfood-skills.ts",
+    "--changed-file",
+    "packages/cli/src/kernel/assets/agent/guidance.md.template",
+    "--changed-file",
+    "packages/cli/src/kernel/assets/embedded.generated.ts",
+    "--changed-file",
+    "packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts",
+    "--changed-file",
+    "packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts",
+    "--changed-file",
+    "packages/cli/src/public/features/agent/init/init-agent-claude_test.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008",
+  "gitHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "actualGitHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "timeoutMs": 120000,
+  "runnerIdentity": "worker:3516",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "f329a70a2ee473ba50053a387780a4de20df68b8f9fd4e21afdc3d24982512a2",
+  "lifecycleId": "worker:3516:aspire-skill-closure-scoped-quality:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T05:29:01.878Z",
+  "startedAt": "2026-10-28T05:29:01.883Z",
+  "finishedAt": "2026-10-28T05:29:02.389Z",
+  "durationMs": 506,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 3084,
+    "sha256": "3d73ae26f3478c2ab6dba1ce57ce7a7ef919bdd892eb43eecab5ed1704663746",
+    "tail": "{\"ok\":true,\"census\":{\"workspaceMembers\":37,\"membersInsideBoundary\":37,\"publishableMembersInsideBoundary\":35},\"boundary\":{\"includedParents\":[\"packages/**\",\"plugins/**\"],\"description\":\"The #1542 denominator is limited to workspace members under packages/** and plugins/**.\",\"excludedWorkspaceMembers\":{\"count\":0,\"paths\":[],\"reason\":\"outside packages/** and plugins/**\"}},\"publishableMembers\":[\"packages/ai\",\"packages/aspire\",\"packages/auth-better-auth\",\"packages/auth-kv-oauth\",\"packages/auth-workos\",\"packages/cli\",\"packages/config\",\"packages/contracts\",\"packages/cron\",\"packages/database\",\"packages/fresh\",\"packages/fresh-ui\",\"packages/kv\",\"packages/logger\",\"packages/mcp\",\"packages/plugin\",\"packages/plugin-ai-core\",\"packages/plugin-auth-core\",\"packages/plugin-sagas-core\",\"packages/plugin-streams-core\",\"packages/plugin-triggers-core\",\"packages/plugin-workers-core\",\"packages/prisma-adapter-mysql\",\"packages/queue\",\"packages/runtime-config\",\"packages/sdk\",\"packages/service\",\"packages/telemetry\",\"packages/watchers\",\"plugins/ai\",\"plugins/auth\",\"plugins/sagas\",\"plugins/streams\",\"plugins/triggers\",\"plugins/workers\"],\"excludedNonPublishableMembers\":[{\"path\":\"packages/bench\",\"reason\":\"publish:false\"},{\"path\":\"packages/cli/e2e\",\"reason\":\"publish:false\"}],\"qualityTasks\":[{\"task\":\"quality:scan\",\"configuredRoots\":[\"docs/site\",\"packages\",\"plugins\"],\"uncoveredPublishedMembers\":[]},{\"task\":\"quality:scan:repo\",\"configuredRoots\":[\".llm/tools/fitness\",\".llm/tools/quality\",\"docs/site\",\"packages\",\"plugins\"],\"uncoveredPublishedMembers\":[]}],\"doctrine\":{\"configuredRoots\":[\"packages/ai\",\"packages/aspire\",\"packages/auth-better-auth\",\"packages/auth-kv-oauth\",\"packages/auth-workos\",\"packages/bench\",\"packages/cli\",\"packages/config\",\"packages/contracts\",\"packages/cron\",\"packages/database\",\"packages/fresh\",\"packages/fresh-ui\",\"packages/kv\",\"packages/logger\",\"packages/mcp\",\"packages/plugin\",\"packages/plugin-ai-core\",\"packages/plugin-auth-core\",\"packages/plugin-sagas-core\",\"packages/plugin-streams-core\",\"packages/plugin-triggers-core\",\"packages/plugin-workers-core\",\"packages/prisma-adapter-mysql\",\"packages/queue\",\"packages/runtime-config\",\"packages/sdk\",\"packages/service\",\"packages/telemetry\",\"packages/watchers\",\"plugins/ai\",\"plugins/auth\",\"plugins/sagas\",\"plugins/streams\",\"plugins/triggers\",\"plugins/workers\"],\"uncoveredPublishedMembers\":[]},\"scannerTraversal\":{\"observedByChecker\":false,\"traversedPaths\":null,\"note\":\"configuredRoots are configuration coverage only; scanner mode and traversed paths belong to the scanner run report\"},\"errors\":[]}\n{\"ok\":true,\"mode\":\"changed-files\",\"scanned\":[\".llm/tools/generate-cli-assets-barrel.ts\",\".llm/tools/maint/dogfood-skills.ts\",\"packages/cli/src/kernel/assets/agent/guidance.md.template\",\"packages/cli/src/kernel/assets/embedded.generated.ts\",\"packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts\",\"packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts\",\"packages/cli/src/public/features/agent/init/init-agent-claude_test.ts\"],\"findings\":[],\"allowCount\":0,\"allowances\":[],\"allowanceFailures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 809,
+    "sha256": "162e7a7869e29be35386efc9bf2188ed84beef5fb2551720a2afec0ad3bff401",
+    "tail": "Task quality:scan deno run --allow-read .llm/tools/quality/check-root-coverage.ts && deno run --allow-read --allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN .llm/tools/quality/scan-code-quality.ts --root packages --root plugins --root docs/site --max-allow 7 '--changed-file' '.llm/tools/generate-cli-assets-barrel.ts' '--changed-file' '.llm/tools/maint/dogfood-skills.ts' '--changed-file' 'packages/cli/src/kernel/assets/agent/guidance.md.template' '--changed-file' 'packages/cli/src/kernel/assets/embedded.generated.ts' '--changed-file' 'packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts' '--changed-file' 'packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts' '--changed-file' 'packages/cli/src/public/features/agent/init/init-agent-claude_test.ts'\n",
+    "truncated": false
+  }
+}

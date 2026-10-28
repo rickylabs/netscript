@@ -1,0 +1,60 @@
+{
+  "trackedFiles": 8186,
+  "totalBytes": 101908988,
+  "boundary": "lf-source-snapshot",
+  "commands": [],
+  "archive": [
+    {
+      "status": "fulfilled"
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "success": true,
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "success": true,
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": ""
+    },
+    {
+      "status": "fulfilled",
+      "value": ""
+    },
+    {
+      "status": "fulfilled",
+      "value": ""
+    }
+  ],
+  "generator": {
+    "command": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "args": [
+      "task",
+      "gen:assets-barrel"
+    ],
+    "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\lf-source-snapshot",
+    "code": 0,
+    "signal": null,
+    "stdout": "",
+    "stderr": "Task gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts\n"
+  },
+  "carrierComparison": {
+    "beforeLines": 361,
+    "afterLines": 361,
+    "beforeCR": 0,
+    "afterCR": 0,
+    "encodedCRBefore": 0,
+    "encodedCRAfter": 9475
+  },
+  "snapshotRemoved": true
+}

@@ -1,0 +1,25 @@
+const root = '.llm/tmp/fix-aspire-bundle--20261028';
+async function scratch(): Promise<string[]> {
+  const names = [];
+  for await (const entry of Deno.readDir('.llm/tmp')) {
+    if (entry.name.startsWith('dogfood-consumer-skills-')) names.push(entry.name);
+  }
+  return names.sort();
+}
+const before = await scratch();
+const args = ['task', 'maint:dogfood-skills:check'];
+const result = await new Deno.Command(Deno.execPath(), {
+  args, env: { NETSCRIPT_ASPIRE_CLI: 'C:/Users/ericc/.aspire/bin/aspire.exe' },
+  stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(120_000),
+}).output();
+const after = await scratch();
+const stdout = new TextDecoder().decode(result.stdout);
+const stderr = new TextDecoder().decode(result.stderr);
+const gateLine = stdout.split('\n').find((line) => line.startsWith('{"gate":"maint:dogfood-skills"'));
+const report = { command: Deno.execPath(), args, code: result.code, signal: result.signal,
+  stdout, stderr, before, after, scratchRestored: JSON.stringify(before) === JSON.stringify(after),
+  gate: gateLine ? JSON.parse(gateLine) : null };
+await Deno.writeTextFile(`${root}/dogfood-check.json`, JSON.stringify(report, null, 2) + '\n');
+console.log(JSON.stringify({ code: result.code, scratchRestored: report.scratchRestored,
+  status: report.gate?.status, staleCount: report.gate?.stale?.length }));
+if (!report.scratchRestored || !gateLine) Deno.exitCode = 1;

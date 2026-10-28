@@ -1,0 +1,40 @@
+const outputRoot = '.llm/tmp/fix-aspire-bundle--20261028';
+const decoder = new TextDecoder();
+const paths = [
+  'packages/cli/src/kernel/assets/embedded.generated.ts',
+  'packages/plugin/src/kernel/assets/embedded.generated.ts',
+  'packages/fresh-ui/registry.generated.ts',
+];
+const report: Record<string, unknown> = { commands: [] };
+async function execute(args: string[]): Promise<void> {
+  const child = await new Deno.Command(Deno.execPath(), {
+    args, stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(120_000),
+  }).output();
+  (report.commands as unknown[]).push({ command: Deno.execPath(), args, code: child.code,
+    signal: child.signal, stdout: decoder.decode(child.stdout), stderr: decoder.decode(child.stderr) });
+  await Deno.writeTextFile(`${outputRoot}/native-generation-final.json`, JSON.stringify(report, null, 2) + '\n');
+  if (!child.success) throw new Error(`Generator exited ${child.code}`);
+}
+await execute(['task', 'gen:assets-barrel']);
+const expectedHashes: string[] = [];
+for (const [index, path] of paths.entries()) {
+  const git = await new Deno.Command('git', { args: ['show', `HEAD:${path}`], stdout: 'piped', stderr: 'piped' }).output();
+  if (!git.success) throw new Error('Cannot inspect baseline');
+  const original = decoder.decode(git.stdout);
+  const expected = index === 0
+    ? original.replace('`aspire-monitoring`, and `aspire-deployment`', '`aspire-monitoring`, `aspire-deployment`, and `aspireify`')
+    : original;
+  const actual = await Deno.readFile(path);
+  if (decoder.decode(actual) !== expected) throw new Error(`Unexpected canonical delta in ${path}`);
+  expectedHashes.push(new Uint8Array(await crypto.subtle.digest('SHA-256', actual)).toHex());
+}
+report.exactCarrierDeltas = { cli: 'sole guidance name change', plugin: 'byte-identical HEAD', freshUi: 'byte-identical HEAD' };
+await execute(['run', '--allow-read', '--allow-write', '--allow-run', '.llm/tools/generate-cli-assets-barrel.ts', '--check']);
+await execute(['task', 'gen:assets-barrel']);
+const afterHashes = await Promise.all(paths.map(async (path) =>
+  new Uint8Array(await crypto.subtle.digest('SHA-256', await Deno.readFile(path))).toHex()));
+if (afterHashes.some((hash, index) => hash !== expectedHashes[index])) throw new Error('Generation was not idempotent');
+report.idempotent = true;
+report.carrierHashes = Object.fromEntries(paths.map((path, index) => [path, afterHashes[index]]));
+await Deno.writeTextFile(`${outputRoot}/native-generation-final.json`, JSON.stringify(report, null, 2) + '\n');
+console.log(JSON.stringify({ exactCarrierDeltas: report.exactCarrierDeltas, idempotent: true }));

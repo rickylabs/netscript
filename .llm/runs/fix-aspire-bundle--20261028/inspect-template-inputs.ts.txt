@@ -1,0 +1,22 @@
+const decoder = new TextDecoder();
+const paths = [
+  'packages/cli/src/kernel/assets/auth/bff.ts.template',
+  'packages/cli/src/kernel/assets/agent/guidance.md.template',
+  'packages/cli/src/kernel/assets/embedded.generated.ts',
+];
+const results = [];
+for (const path of paths) {
+  const git = await new Deno.Command('git', { args: ['show', `HEAD:${path}`], stdout: 'piped', stderr: 'piped' }).output();
+  if (!git.success) throw new Error(decoder.decode(git.stderr));
+  const head = decoder.decode(git.stdout);
+  const working = await Deno.readTextFile(path);
+  const attrs = await new Deno.Command('git', { args: ['check-attr', 'text', 'eol', '--', path], stdout: 'piped' }).output();
+  results.push({ path, gitBlobBytes: git.stdout.length,
+    gitBlobCRLF: (head.match(/\r\n/g) ?? []).length,
+    gitBlobLF: (head.match(/\n/g) ?? []).length,
+    workingCRLF: (working.match(/\r\n/g) ?? []).length,
+    workingLF: (working.match(/\n/g) ?? []).length,
+    attributes: decoder.decode(attrs.stdout).trim().split('\n') });
+}
+await Deno.writeTextFile('.llm/tmp/fix-aspire-bundle--20261028/template-inputs.json', JSON.stringify(results, null, 2) + '\n');
+console.log(JSON.stringify(results));

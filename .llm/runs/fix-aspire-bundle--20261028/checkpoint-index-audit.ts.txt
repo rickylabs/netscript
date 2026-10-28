@@ -1,0 +1,72 @@
+import { join } from '@std/path';
+const repo = Deno.cwd();
+const owned = join(repo, '.llm/tmp/fix-aspire-bundle--20261028');
+const decoder = new TextDecoder();
+const sha = async (bytes: Uint8Array): Promise<string> => new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)).toHex();
+async function git(args: string[]): Promise<Deno.CommandOutput> {
+  return await new Deno.Command('git', { args, cwd: repo, stdout: 'piped', stderr: 'piped' }).output();
+}
+if (Deno.args.includes('--head')) {
+  const audit = JSON.parse(await Deno.readTextFile(join(owned, 'checkpoint-index.json')));
+  for (const row of audit.files) {
+    const result = await git(['show', `HEAD:${row.path}`]);
+    if (row.status === 'D') {
+      if (result.success) throw new Error(`Deleted path exists in HEAD: ${row.path}`);
+    } else if (!result.success || await sha(result.stdout) !== row.indexSha256) {
+      throw new Error(`HEAD byte mismatch: ${row.path}`);
+    }
+  }
+  const head = await git(['rev-parse', 'HEAD']);
+  const result = { outcome: 'PASS', head: decoder.decode(head.stdout).trim(), auditedPaths: audit.files.length };
+  await Deno.writeTextFile(join(owned, 'checkpoint-head-audit.json'), JSON.stringify(result, null, 2) + '\n');
+  console.log(JSON.stringify(result));
+  Deno.exit();
+}
+const plan = JSON.parse(await Deno.readTextFile(join(owned, 'checkpoint-paths.json')));
+const diff = await git(['diff', '--cached', '--name-status', '--no-renames', '-z']);
+if (!diff.success) throw new Error('Cannot inspect staged paths');
+const tokens = decoder.decode(diff.stdout).split('\0').filter(Boolean);
+const rows: { path: string; status: string }[] = [];
+for (let index = 0; index < tokens.length; index += 2) rows.push({ status: tokens[index], path: tokens[index + 1] });
+rows.sort((a, b) => a.path.localeCompare(b.path));
+if (!rows.length || JSON.stringify(rows.map((row) => row.path).sort()) !== JSON.stringify([...plan.paths].sort())) {
+  throw new Error('Staged selection differs from explicit nonempty checkpoint plan');
+}
+const files = [];
+for (const row of rows) {
+  if (!['A', 'M', 'D'].includes(row.status)) throw new Error(`Unexpected staged status ${row.status}`);
+  if (row.status === 'D') {
+    try { await Deno.lstat(row.path); throw new Error(`Deleted path still exists: ${row.path}`); }
+    catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
+    files.push(row);
+    continue;
+  }
+  const indexed = await git(['show', `:${row.path}`]);
+  const indexObject = await git(['rev-parse', `:${row.path}`]);
+  const workingObject = await git(['hash-object', '--path', row.path, '--', row.path]);
+  if (!indexed.success || !indexObject.success || !workingObject.success ||
+    decoder.decode(indexObject.stdout).trim() !== decoder.decode(workingObject.stdout).trim()) {
+    throw new Error(`Native clean-filter object mismatch: ${row.path}`);
+  }
+  const working = await Deno.readFile(row.path);
+  const indexSha256 = await sha(indexed.stdout);
+  const workingSha256 = await sha(working);
+  const crlfOnly = decoder.decode(working).replaceAll('\r\n', '\n') === decoder.decode(indexed.stdout);
+  if (workingSha256 !== indexSha256 && !crlfOnly) throw new Error(`Unexpected staged byte transformation: ${row.path}`);
+  files.push({ ...row, indexSha256, workingSha256, bytes: indexed.stdout.length,
+    nativeCleanObject: decoder.decode(indexObject.stdout).trim(), byteIdentical: workingSha256 === indexSha256,
+    ...(workingSha256 === indexSha256 ? {} : { physicalCRLFNormalizationOnly: true }) });
+}
+const whitespace = await git(['diff', '--cached', '--check']);
+const counts: Record<string, number> = {};
+for (const row of rows) {
+  const group = row.path.startsWith('.agents/generated/consumer-skills/') ? 'fixture'
+    : row.path.startsWith('.llm/runs/fix-aspire-bundle--20261028/') ? 'evidence' : 'authored';
+  counts[group] = (counts[group] ?? 0) + 1;
+}
+const result = { outcome: 'PASS', files, counts, stagedPaths: rows.length,
+  indexBytes: files.reduce((sum, file) => sum + ('bytes' in file ? file.bytes : 0), 0),
+  stagedDiffCheck: { code: whitespace.code, stdout: decoder.decode(whitespace.stdout), stderr: decoder.decode(whitespace.stderr) } };
+await Deno.writeTextFile(join(owned, 'checkpoint-index.json'), JSON.stringify(result, null, 2) + '\n');
+console.log(JSON.stringify({ outcome: result.outcome, stagedPaths: rows.length, counts, indexBytes: result.indexBytes,
+  physicalCRLFNormalizations: files.filter((file) => 'physicalCRLFNormalizationOnly' in file).length, stagedDiffCheck: whitespace.code }));

@@ -1,0 +1,36 @@
+{
+  "gateId": "exports-drift",
+  "invocationId": "aspire-skill-closure-exports-drift",
+  "argv": [
+    "deno",
+    "task",
+    "docs:exports-drift"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008",
+  "gitHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "actualGitHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "timeoutMs": 300000,
+  "runnerIdentity": "worker:114108",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "50b0111e489d65e3f37c3879123766147294266d426edb2c36733d3193ea90c0",
+  "lifecycleId": "worker:114108:aspire-skill-closure-exports-drift:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-10-28T05:23:46.750Z",
+  "startedAt": "2026-10-28T05:23:46.756Z",
+  "finishedAt": "2026-10-28T05:23:47.072Z",
+  "durationMs": 317,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 4978,
+    "sha256": "1d8e6a27c4cdf9ae75c67a93f14b708ad0a582bdc8b3def0ee055a062d846d47",
+    "tail": "Task docs:exports-drift deno run --no-lock --allow-read --allow-run=deno .llm/tools/docs/check-exports-drift.ts\nReference Page Coverage Error: docs\\site\\reference\\ai\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\aspire\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\auth-better-auth\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\auth-kv-oauth\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\auth-workos\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\auth\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\cli\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\config\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\contracts\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\cron\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\database\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\fresh-ui\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\fresh\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\kv\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\logger\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\mcp\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\plugin-ai-core\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\plugin-ai\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\plugin-auth-core\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\plugin-auth\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\plugin-sagas-core\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\plugin-streams-core\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\plugin-triggers-core\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\plugin-workers-core\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\plugin\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\prisma-adapter-mysql\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\queue\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\runtime-config\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\sagas\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\sdk\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\service\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\streams\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\telemetry\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\triggers\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\watchers\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\nReference Page Coverage Error: docs\\site\\reference\\workers\\index.md is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES\n",
+    "truncated": false
+  }
+}
