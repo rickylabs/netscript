@@ -127,15 +127,8 @@ site.use(codeHighlight({
   },
 }));
 
-// Static client-side search; mounts the pagefind UI into #search (TD-5).
-site.use(pagefind({
-  ui: {
-    containerId: 'search',
-    showImages: false,
-    showEmptyFilters: false,
-    resetStyles: false,
-  },
-}));
+// Build the static index; custom and fallback UIs load only when requested.
+site.use(pagefind({ ui: false }));
 
 // These states belong in rendered HTML as well as in the browser enhancement path.
 site.addEventListener('afterRender', () => {

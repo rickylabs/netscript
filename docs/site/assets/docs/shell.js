@@ -53,3 +53,39 @@ if (sidebar && drawer instanceof HTMLDialogElement && trigger) {
   });
 }
 root.classList.add('js');
+
+// Keep the standard Pagefind UI independent of the palette, and load it on demand.
+const fallback = document.querySelector('#search-fallback');
+let fallbackReady = false;
+fallback?.addEventListener('toggle', async () => {
+  if (!fallback.open || fallbackReady) return;
+  const target = fallback.querySelector('#search');
+  fallbackReady = true;
+  target.textContent = 'Loading search…';
+  try {
+    const bundle = new URL('../../pagefind/', import.meta.url);
+    const stylesheet = document.createElement('link');
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = new URL('pagefind-ui.css', bundle).href;
+    document.head.append(stylesheet);
+    if (!globalThis.PagefindUI) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = new URL('pagefind-ui.js', bundle).href;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.append(script);
+      });
+    }
+    target.replaceChildren();
+    new globalThis.PagefindUI({
+      element: '#search',
+      bundlePath: bundle.pathname,
+      showImages: false,
+      resetStyles: false,
+    });
+  } catch {
+    fallbackReady = false;
+    target.textContent = 'Search is unavailable. Use the navigation to browse the documentation.';
+  }
+});

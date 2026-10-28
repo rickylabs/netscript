@@ -87,3 +87,13 @@ B3 browser assertions PASS: hidden/lazy source image, canonical twin URL/alt, na
 The old copper favicon is now a generated sharp N mark; its two semantic paint declarations come from the same Figma resolver in an embedded generated token layer. Freshness checks cover both outputs. No hand-authored palette.
 
 Slice 3 repair review: PASS; reviewer confirmed all B3 guards and source/twin contracts, fileTree alias, server-rendered keyboard/current-step states, generated favicon and no-JS paths. Applied the suggested short Permalink label to avoid repeating heading text in its accessible name. Reconcile: only owned site/tooling and run files changed, no generated Mermaid/source-content or lock changes. Full design-system link still depends on #2437. Next: Pagefind palette and mobile search.
+
+## Slice 4 — Pagefind palette and mobile search
+
+- Native dialog palette uses the generated Pagefind API at the deployed base path; lazy metadata/index loading, lane filters/counts, grouped page/heading results, bounded fragment loading with more-results control, safe text/mark rendering, and same-origin result URLs.
+- Keyboard: Cmd/Ctrl-K and Space/Enter trigger, Arrow navigation with valid active-descendant state, Enter opens the selected result (including same-page hashes), Escape closes and restores focus. Empty/loading/error/reload states and generation checks prevent stale render after query changes or closing/reopening.
+- Standard Pagefind UI remains an independent fallback through the native details section, loaded on demand by shell.js. No Pagefind request occurs before search interaction.
+- Gates PASS: existing build/rendered checks, structured site check and browser lint/format, no undefined semantic roles, and live Chromium tests at Light/1280 and Dark/390. Those cover real query/filter results, keyboard, zero serious/critical axe findings, empty state (quoted impossible phrase), standard fallback results, unavailable index/reload state and delayed stale responses. Evidence: slice4-browser-evidence.json.
+- The latest CI failure was read and is still only the reserved design-system route from pending sibling #2437. No source/build failure or gate exemption introduced. Independent slice review pending.
+
+Slice 4 independent review: PASS. Added the suggested no-JavaScript fallback message with a real reference link. Final slice will replace thin exploratory PASS strings with Playwright JSON, per-route/scheme/width axe reports, screenshots, browser provenance and durable command receipts. Reconcile: no labels or lock drift; current CI remains blocked solely by sibling design-system content.

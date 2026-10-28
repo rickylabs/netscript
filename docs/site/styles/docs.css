@@ -1,6 +1,7 @@
 /* Utility docs: values live in the generated token layer; anatomy lives here. */
 @import "./tokens.css";
 @import "./components.css";
+@import "./search.css";
 
 :root {
   --docs-topbar-height: 56px;
@@ -906,4 +907,9 @@ dialog::backdrop {
   html {
     scroll-padding-top: 120px;
   }
+}
+
+::selection {
+  background: var(--ns-selected);
+  color: var(--ns-fg);
 }

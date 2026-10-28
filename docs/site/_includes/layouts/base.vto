@@ -108,7 +108,7 @@
         {{ if kind !== "home" && editSourcePath && editSourcePath !== "(generated)" && !editSourcePath.startsWith("/reference/") }}
           <div class="docs-edit"><a href="{{ 'https://github.com/rickylabs/netscript/edit/main/docs/site' + editSourcePath }}">Edit this page ↗</a></div>
         {{ /if }}
-        <details id="search-fallback" class="docs-search-fallback"><summary>Search all documentation</summary><div id="search"></div></details>
+        <details id="search-fallback" class="docs-search-fallback"><summary>Search all documentation</summary><div id="search"><noscript><p>Search needs JavaScript. Browse the <a href="{{ '/reference/' |> url }}">reference</a> or use the documentation navigation.</p></noscript></div></details>
       </main>
     </div>
 
@@ -119,8 +119,20 @@
     </footer>
 
     <dialog id="navigation-dialog" class="docs-drawer" aria-label="Documentation navigation"><button type="button" class="ns-icon-btn docs-drawer__close" data-sidebar-close aria-label="Close documentation navigation">×</button></dialog>
+    <dialog id="search-dialog" class="docs-search-dialog" aria-labelledby="search-title" data-state="idle">
+      <form method="dialog" class="docs-search-query">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></svg>
+        <label for="search-query" id="search-title" class="ns-sr-only">Search documentation</label>
+        <input id="search-query" type="search" placeholder="Search documentation…" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" />
+        <button type="submit" class="docs-search-close" aria-label="Close search">{{ comp.kbd({ text: "esc" }) }}</button>
+      </form>
+      <nav class="docs-search-filters" data-search-filters aria-label="Search lanes" hidden></nav>
+      <div class="docs-search-scroll"><p class="docs-search-status" data-search-status role="status">Type a term to search the documentation.</p><div id="search-results" class="docs-search-results" role="listbox" aria-label="Search results" aria-busy="false"></div><button type="button" class="docs-search-more" data-search-more hidden>Show more results</button><button type="button" class="docs-search-retry" data-search-retry hidden>Reload page</button></div>
+      <footer class="docs-search-footer"><span>{{ comp.kbd({ text: "↑" }) }} {{ comp.kbd({ text: "↓" }) }} to navigate <span>{{ comp.kbd({ text: "↵" }) }} to open</span> <span>{{ comp.kbd({ text: "esc" }) }} to close</span></span><span data-search-count>Pagefind</span></footer>
+    </dialog>
     <script type="module" src="{{ '/assets/docs/shell.js' |> url }}"></script>
     <script type="module" src="{{ '/assets/docs/tabs.js' |> url }}"></script>
     <script type="module" src="{{ '/assets/docs/toc.js' |> url }}"></script>
+    <script type="module" src="{{ '/assets/docs/search.js' |> url }}"></script>
   </body>
 </html>

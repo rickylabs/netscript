@@ -9,3 +9,7 @@ Slice 2 reviewed PASS; committing/pushing shell now. Next components/prose/signa
 Slice 2 pushed 13359ce; slice 3 implemented and gated, review pending. CI failure confirmed solely reserved design-system link; sibling #2437 is now ready and mergeable. Diagram source check passed16/16, source img hidden/lazy, canonical twin URL verified.
 
 Slice 3 repair review PASS; all existing components plus signature kit, homepage and diagram/twin preservation are ready to commit. Next slice4 Pagefind dialog/mobile; then slice5 browser/policy/CI evidence and final IMPL-EVAL.
+
+Slice 3 pushed a4f494e. Slice 4 Pagefind/native dialog/fallback is implemented and gated; review pending. Next slice5 persistent browser matrix, CSS/red negative controls, CI artifacts and final independent evaluation.
+
+Slice4 review PASS; committing/pushing. Remaining slice5: policy + actual negative-control exits, persistent docs browser matrix (all5 page types ×2schemes×2widths), keyboard/error/noJS/B3 tests, CI artifact upload and IMPL-EVAL. Reconcile upstream main/S1/S8b before final full links.
