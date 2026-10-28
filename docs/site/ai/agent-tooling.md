@@ -4,7 +4,10 @@ title: Agent tooling
 description: What NetScript gives the coding agents that build your app — CLI, skills, the framework MCP server, and agent-readable docs.
 templateEngine: [vento, md]
 order: 5
-oldUrl: /capabilities/agent-tooling/
+oldUrl:
+  - /capabilities/agent-tooling/
+  - /orchestration-runtime/how-to/deno-lsp-code-intelligence/
+  - /how-to/deno-lsp-code-intelligence/
 ---
 
 # Agent tooling
