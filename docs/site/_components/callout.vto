@@ -1,7 +1,9 @@
-{{# Existing type/title/content contract; informational notices are monochrome, warnings semantic. #}}
-{{ set kind = type || "note" }}
-{{ set icons = { note: "ⓘ", tip: "✓", important: "ⓘ", warning: "△", error: "ⓧ" } }}
-<aside class="ns-callout" data-variant="{{ kind }}"{{ if kind === "important" }} data-emphasis="strong"{{ /if }} role="note">
-  <div class="ns-callout__head"><span class="ns-callout__icon" aria-hidden="true">{{ icons[kind] || icons.note }}</span><span class="ns-eyebrow">{{ kind }}</span>{{ if title }}<span class="ns-callout__title">{{ title |> ic }}</span>{{ /if }}</div>
+{{# Public type/title/content contract; error remains a destructive alias. #}}
+{{ set requested = (type || "note").toLowerCase() }}
+{{ set tones = { note: "info", tip: "success", important: "important", warning: "warning", caution: "destructive", error: "destructive" } }}
+{{ set kind = tones[requested] ? requested : "note" }}
+{{ set icons = { note: "ⓘ", tip: "✓", important: "ⓘ", warning: "△", caution: "ⓧ", error: "ⓧ" } }}
+<aside class="ns-callout" data-variant="{{ kind }}" data-tone="{{ tones[kind] }}" role="note">
+  <div class="ns-callout__head"><span class="ns-callout__icon" aria-hidden="true">{{ icons[kind] }}</span><span class="ns-eyebrow">{{ kind }}</span>{{ if title }}<span class="ns-callout__title">{{ title |> ic }}</span>{{ /if }}</div>
   <div class="ns-callout__body">{{ content }}</div>
 </aside>

@@ -4,6 +4,7 @@
 <html lang="en" data-theme="studio" data-flavor="utility" data-gray="neutral" data-accent="ink" data-density="compact" data-scheme="light">
   <head>
     <meta charset="utf-8" />
+    {{ if internal }}<meta name="robots" content="noindex" />{{ /if }}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ title }} · NetScript Docs</title>
     <meta name="description" content="{{ description || 'NetScript — the Deno meta-framework for typed, observable systems.' }}" />
@@ -22,7 +23,7 @@
       })();
     </script>
   </head>
-  <body data-docs-kind="{{ kind }}">
+  <body data-docs-kind="{{ kind }}"{{ if internal }} data-pagefind-ignore="all"{{ /if }}>
     <a href="#main-content" class="ns-skip-link">Skip to main content</a>
     <header class="docs-topbar">
       <button type="button" class="ns-icon-btn docs-menu-trigger js-only" data-sidebar-toggle aria-label="Open documentation navigation" aria-controls="navigation-dialog" aria-expanded="false">
@@ -86,20 +87,20 @@
         {{ if kind !== "home" }}
           <div class="docs-page-toolbar">
             {{ comp.breadcrumb({ url, title }) }}
-            <a class="ns-md-link" href="{{ (url + 'index.md') |> url }}" data-pagefind-ignore><span aria-hidden="true">▤</span> View as Markdown</a>
+            {{ if !internal }}<a class="ns-md-link" href="{{ (url + 'index.md') |> url }}" data-pagefind-ignore><span aria-hidden="true">▤</span> View as Markdown</a>{{ /if }}
           </div>
           <p class="ns-eyebrow docs-page-eyebrow">{{ lane.label }}{{ if lane.label === "Build" }} · {{ (nav.breadcrumb(url, navQuery, navSort)[1]?.data?.nav_title || nav.breadcrumb(url, navQuery, navSort)[1]?.data?.title || "Capabilities") }}{{ /if }}</p>
         {{ /if }}
         <nav class="docs-anchor-nav" data-reference-nav aria-label="Reference sections" hidden></nav>
         {{ if url === "/web-layer/fresh-ui/" }}<div class="docs-owned-source" data-owned-source hidden><span class="ns-eyebrow">You own</span>{{ comp.filePathChip({ path: "apps/dashboard/components/ui/" }) }}{{ comp.filePathChip({ path: "assets/tokens.css" }) }}{{ comp.filePathChip({ path: "routes/(design)/" }) }}</div>{{ /if }}
         <div class="docs-content-layout">
-          <article class="ns-prose" data-pagefind-body data-pagefind-filter="lane:{{ lane.label }}">
+          <article class="ns-prose"{{ if !internal }} data-pagefind-body data-pagefind-filter="lane:{{ lane.label }}"{{ /if }}>
             {{ content }}
           </article>
           <nav class="ns-toc" data-toc aria-label="On this page" hidden>
             <p class="ns-eyebrow">On this page</p>
             <ol class="ns-toc__list" data-toc-list></ol>
-            <div class="ns-toc__actions"><a href="{{ (url + 'index.md') |> url }}">▤ View as Markdown</a><a href="#main-content">Back to top ↑</a></div>
+            <div class="ns-toc__actions">{{ if !internal }}<a href="{{ (url + 'index.md') |> url }}">▤ View as Markdown</a>{{ /if }}<a href="#main-content">Back to top ↑</a></div>
           </nav>
         </div>
         {{ if !content.includes('<nav class="ns-nextprev"') }}{{ comp.nextPrev({ prev, next, url }) }}{{ /if }}

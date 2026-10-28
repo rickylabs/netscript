@@ -178,7 +178,7 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
     const logo = file.path === 'favicon.svg' ||
       selectors.every((part) => /\.docs-logo\b/.test(part));
     const error = selectors.every((part) =>
-      /data-(?:state|variant|intent)\s*=\s*["']?(?:error|destructive)|aria-invalid\s*=\s*["']?true|\.ns-error\b/
+      /data-(?:state|variant|intent|tone)\s*=\s*["']?(?:error|destructive)|aria-invalid\s*=\s*["']?true|\.ns-error\b/
         .test(part)
     );
     if (red(value) && !logo && !error) finding(entry, 'red-outside-state');

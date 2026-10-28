@@ -87,7 +87,7 @@ export function aiTooling(options: AiToolingOptions = {}) {
 
       for (const page of site.pages) {
         const outputPath = page.outputPath;
-        if (!outputPath.endsWith('.html')) continue;
+        if (!outputPath.endsWith('.html') || page.data.internal === true) continue;
 
         const doc = page.document;
         if (!doc) continue;
