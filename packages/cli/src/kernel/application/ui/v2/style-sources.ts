@@ -18,6 +18,7 @@ export async function resolveUiStyleSources(input: {
   readonly previous?: UiLock;
   readonly names: readonly string[];
   readonly theme?: string;
+  readonly selectStyle?: boolean;
 }): Promise<{
   readonly entries: readonly UiResolvedItem[];
   readonly config: UiConfig;
@@ -25,10 +26,14 @@ export async function resolveUiStyleSources(input: {
 }> {
   const { client, previous, names, theme } = input;
   let entries = await client.resolve(names, theme);
-  const chosen = entries.find((entry) =>
+  const choices = entries.filter((entry) =>
     names.includes(entry.ref) && entry.item.type === 'registry:style' &&
     entry.item.meta?.components !== undefined
   );
+  // Bulk updates include historical style items; only an explicit different selection changes the active style.
+  const chosen = input.selectStyle === false
+    ? undefined
+    : choices.find((entry) => entry.ref === input.config.style) ?? choices[0];
   const styleRef = chosen?.ref ?? input.config.style;
   const changed = chosen !== undefined && styleRef !== input.config.style;
   const config = { ...input.config, style: styleRef };

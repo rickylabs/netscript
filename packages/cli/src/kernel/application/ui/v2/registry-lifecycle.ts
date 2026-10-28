@@ -20,7 +20,12 @@ export async function updateUiRegistry(
   if (!lock) return await updateUiRegistryItems(root, names, deps.fs);
   const selected = names.length ? names : Object.keys(lock.items);
   if (!selected.length) return { updated: [], drifted: [] };
-  const result = await installUiRegistry({ root, names: selected, replaceManaged: false }, deps);
+  const result = await installUiRegistry({
+    root,
+    names: selected,
+    replaceManaged: false,
+    selectStyle: false,
+  }, deps);
   return { updated: result.copiedFiles, drifted: result.drifted };
 }
 

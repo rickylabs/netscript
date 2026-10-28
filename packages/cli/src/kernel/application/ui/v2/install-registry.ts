@@ -53,6 +53,8 @@ export interface UiRegistryInstallInput {
   readonly config?: UiConfig;
   readonly entries?: readonly UiResolvedItem[];
   readonly theme?: string;
+  /** Updates read the configured style; install/apply may explicitly select another. */
+  readonly selectStyle?: boolean;
 }
 
 /** A completely preflighted install, available to preset compilation before committing. */
@@ -84,6 +86,7 @@ export async function prepareUiRegistryInstall(
     previous,
     names: input.names,
     theme: input.theme,
+    selectStyle: input.selectStyle,
   });
   config = styled?.config ?? config;
   const entries = input.entries ?? styled!.entries;

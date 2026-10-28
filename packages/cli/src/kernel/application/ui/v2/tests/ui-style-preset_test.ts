@@ -5,6 +5,7 @@ import type { TokenEnginePort } from '../../../../ports/token-engine-port.ts';
 import { encodeUiPreset } from '../../../../domain/ui/ui-preset.ts';
 import { installUiRegistry, UiRegistryConflictError } from '../install-registry.ts';
 import { applyUiPreset } from '../apply-preset.ts';
+import { updateUiRegistry } from '../registry-lifecycle.ts';
 import { buildAppTokens } from '../../../tokens/build-app-tokens.ts';
 import { readUiConfig, readUiLock } from '../config-lock.ts';
 
@@ -71,8 +72,17 @@ Deno.test('Utility selection preserves real component copies and fixture style r
   assertEquals(lock.items['fixture-button'], undefined);
   await installUiRegistry({ root: '/app', names: ['button'] }, deps);
   assertStringIncludes(await fs.readFile('/app/components/ui/button.tsx'), 'fixture');
+  await updateUiRegistry('/app', [], deps);
+  assertEquals((await readUiConfig('/app', fs)).style, 'fixture-style');
+  assertStringIncludes(await fs.readFile('/app/components/ui/button.tsx'), 'fixture');
   await installUiRegistry({ root: '/app', names: ['style-utility'] }, deps);
   assertEquals(await fs.readFile('/app/components/ui/button.tsx'), original);
+  await installUiRegistry({ root: '/manual', names: ['button', 'style-utility'] }, deps);
+  const configured = { ...await readUiConfig('/manual', fs), style: 'fixture-style' };
+  await fs.writeFile('/manual/components.json', JSON.stringify(configured));
+  await updateUiRegistry('/manual', [], deps);
+  assertEquals((await readUiConfig('/manual', fs)).style, 'fixture-style');
+  assertStringIncludes(await fs.readFile('/manual/components/ui/button.tsx'), 'fixture');
 });
 
 async function presetFixture() {
