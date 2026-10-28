@@ -50,7 +50,8 @@ the `netscript-design` skill.
 ## Self-check before handing off
 
 - [ ] Recognisable as <Theme Name> at a 480px thumbnail.
-- [ ] Dark audit: no white headers, light slabs, white outlines or light primary buttons.
+- [ ] Dark audit: no white headers, pale gray slabs, white outlines or white or pale primary
+      buttons. Saturated accent fills with dark ink only as named in GUIDELINES §4.5.
 - [ ] Text ≥ 4.5:1; input, checkbox and switch boundaries and focus ≥ 3:1. Measured on pixels.
 - [ ] Every depth or effect follows the model in `DESIGN.md` → _Elevation & Depth_.
 - [ ] Whole-pixel edges; bound paints seeded with their resolved colour (Figma).

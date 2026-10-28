@@ -286,11 +286,22 @@ activity feed. It exercises about 30 components in one view. Then add:
 
 1. **Thumbnail test.** On a 4×2 contact sheet at 480px, each theme is identifiable without reading
    text.
-2. **Dark inversion audit.** Check every dark frame for white headers, light slabs, white outlines
-   or shadows, and light primary buttons. Each is a high-severity defect, even when contrast passes.
-   The single exception in this catalogue is Fluent's native dark accent `#60CDFF`, at control size
-   and on native selection indicators as specified in Fluent's `DESIGN.md`. It never fills content
-   surfaces. No other theme or usage is exempt.
+2. **Dark inversion audit.** Check every dark frame for white or pale neutral surfaces: white
+   headers, light gray slabs, white outlines or shadows, and white or pale primary buttons. Each is
+   a high-severity defect, even when contrast passes. A saturated accent fill with dark ink is not
+   an inversion when a theme's language requires it. These are the named cases, each limited to the
+   scope in that theme's `DESIGN.md`:
+   - **Fluent:** the native dark accent `#60CDFF` with black text, at control size and on native
+     selection indicators only. It never fills content surfaces.
+   - **Terminal:** the lime selection row (`#bdee63`, dark ink). The selected tab and the primary
+     key stay dark.
+   - **Pixel:** the amber primary keys (`#faab35` with `#12100e` ink).
+   - **Brutal:** the saturated blocks and the amber primary with black ink, which are the language's
+     surfaces in both schemes.
+   - **Cupertino:** the prominent capsule `#0090ff` with dark ink `#111113`.
+
+   No other theme or usage is exempt. A new theme that needs such a fill is added to this list by a
+   change to these guidelines.
 3. **Measure pixels, not tokens.** Sample the exported PNG. Two traps make a correct token measure
    wrong:
    - a stale stored paint colour on side-specific strokes;
