@@ -470,10 +470,17 @@
                         "bytes":  1407,
                         "sha256":  "f211844f7c8ff1cc0d66a0836f2301a95ad39468cb5e585617cbf74a3b2527a9",
                         "copiedSha256":  "f211844f7c8ff1cc0d66a0836f2301a95ad39468cb5e585617cbf74a3b2527a9"
+                    },
+                    {
+                        "name":  "post-push-byte-audit.json",
+                        "source":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-q4-sol-20261028\\staged-audit.json",
+                        "bytes":  276,
+                        "sha256":  "29258300a5fa23c264e0183494755b9ee564362030df0236cdc7867b15409ea8",
+                        "copiedSha256":  "29258300a5fa23c264e0183494755b9ee564362030df0236cdc7867b15409ea8"
                     }
                 ],
-    "totalRecords":  67,
-    "totalBytes":  195152,
+    "totalRecords":  68,
+    "totalBytes":  195428,
     "allCopiesMatch":  true,
     "status":  "Root source accepted; independent IMPL and mapped-IPv4/coldDB gates remain pending"
 }
