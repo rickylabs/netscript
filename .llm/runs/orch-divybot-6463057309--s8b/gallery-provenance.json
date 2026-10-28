@@ -1,0 +1,177 @@
+{
+  "sourceCommit": "424ce242dff4e155d16f046056146449e25a54b4",
+  "identical": true,
+  "count": 34,
+  "assets": [
+    {
+      "file": "docs/site/assets/design-system/bloom--dark.webp",
+      "sha256": "a10284dbc123ad7d8babcfcdfa49c4706c981248a1789fb7401b8d4990c9044f",
+      "bytes": 94210
+    },
+    {
+      "file": "docs/site/assets/design-system/bloom--light.webp",
+      "sha256": "1bc2eed4341cdfeea27178c009e013ac77ddb0fff549f74ffd9bfb72e297a68d",
+      "bytes": 100004
+    },
+    {
+      "file": "docs/site/assets/design-system/brutal--dark.webp",
+      "sha256": "eb82c040d55ef3a653f3a17e8f7edf2db3c5d3bf18610ada7fd2d0335f8dff93",
+      "bytes": 113260
+    },
+    {
+      "file": "docs/site/assets/design-system/brutal--light.webp",
+      "sha256": "957de5541e9590641d912aa5e0983fe26bc9267d4ad21ea61377e9530cfe7266",
+      "bytes": 115334
+    },
+    {
+      "file": "docs/site/assets/design-system/cupertino--dark.webp",
+      "sha256": "49c30395089ef081538345a50df38596c918758e44f170ee25ac7e5c07e2fa53",
+      "bytes": 96808
+    },
+    {
+      "file": "docs/site/assets/design-system/cupertino--light.webp",
+      "sha256": "c43471d55f86e517b1fdb054cb72c5316490534ab96fd756e55078ba75a3deb3",
+      "bytes": 95796
+    },
+    {
+      "file": "docs/site/assets/design-system/filigrane--dark.webp",
+      "sha256": "35e5b278a5e42a4909e0cdc2d4d54f55c301bb2f00104b2d04abc43831d01087",
+      "bytes": 88434
+    },
+    {
+      "file": "docs/site/assets/design-system/filigrane--light.webp",
+      "sha256": "3b66f5848940fd40aa21621f06ae4b7008545ca320e5a97fd698d811164ff193",
+      "bytes": 85370
+    },
+    {
+      "file": "docs/site/assets/design-system/fluent--dark.webp",
+      "sha256": "c41797e1304caaf4d2471164afcd18072cdf325756c9a6bf6dfd4b8ff074f3ae",
+      "bytes": 81822
+    },
+    {
+      "file": "docs/site/assets/design-system/fluent--light.webp",
+      "sha256": "f57c04375a756ef4ceec1aaf62fcf747d9417d333116dad6677cfa509d9967ec",
+      "bytes": 82580
+    },
+    {
+      "file": "docs/site/assets/design-system/liquid--dark.webp",
+      "sha256": "ae02e1695284f5f463f9d71bca72f72940438cc2b008223f3db5705e8aa4b048",
+      "bytes": 75138
+    },
+    {
+      "file": "docs/site/assets/design-system/liquid--light.webp",
+      "sha256": "52d9c5ba5b51d663df6e13199e39b065b04a89cc1a6c94d1eb644e6d292073ff",
+      "bytes": 73520
+    },
+    {
+      "file": "docs/site/assets/design-system/pixel--dark.webp",
+      "sha256": "213df116ff57b85da5b94275e9609596161ca7352eeacda8786d3fb97b311701",
+      "bytes": 108570
+    },
+    {
+      "file": "docs/site/assets/design-system/pixel--light.webp",
+      "sha256": "f5dfaf9547594c765138efe95da980246880cc7a41011b8d46a60d1149f5b85d",
+      "bytes": 112924
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-atelier--dark.webp",
+      "sha256": "eb6039c7c5774672085055f00326f13f25e0d75c0a7412169097301b191775a0",
+      "bytes": 96742
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-atelier--light.webp",
+      "sha256": "a415e79319e3caaf56148a179d4195fba42a3ba1e0cdb8e04fc3be327195b518",
+      "bytes": 95938
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-cloud--dark.webp",
+      "sha256": "2ec922a202600412d219fcde1a832eaaefad03a5c536d5e094a7d5172febcd62",
+      "bytes": 100798
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-cloud--light.webp",
+      "sha256": "55362f5987c4f12a8fd8703011493d94406433b14393c64d138acce1df91fc0c",
+      "bytes": 100394
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-ledger--dark.webp",
+      "sha256": "87bc7da48bf257fda888cee1fedc0d27a6784481184d40ec5d50cc026c535fea",
+      "bytes": 73578
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-ledger--light.webp",
+      "sha256": "f2b6dab2ffeaa9fa31c52466796edb4413300e7e187af5df438e6bb5990ce9b0",
+      "bytes": 73946
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-playful--dark.webp",
+      "sha256": "e74b999769b67d9b228c9f7a3e4a20cea719ca4ef410451950bed9cd30358ef8",
+      "bytes": 100900
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-playful--light.webp",
+      "sha256": "90c659f436c43e4a8934e1843a5312e4195b7e87b895ea263d3652e77592f410",
+      "bytes": 100560
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-signal--dark.webp",
+      "sha256": "50bd3fe4b53bf17bda515be811ca82136c24bcef6e10d3fea58ceeadd7d84d07",
+      "bytes": 97338
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-signal--light.webp",
+      "sha256": "8a62aeb971e2b13b44ab984a5292589549334ad3f17887f6082e8dae5992179d",
+      "bytes": 96058
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-utility--dark.webp",
+      "sha256": "89bf883ba9c266592122ed5ceb84c655a58129b68b75ce4a57e71d81fb86ccbf",
+      "bytes": 92710
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-utility--light.webp",
+      "sha256": "b51a17d7ec993a77565c1a0056721ad2718e828d2bd63ff31745f03a476f09a2",
+      "bytes": 92852
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-workshop--dark.webp",
+      "sha256": "44bebfb37304bd2fcb8d8aeeecdfcc0c427894007f8b0c9478db43dfc4c9b171",
+      "bytes": 97942
+    },
+    {
+      "file": "docs/site/assets/design-system/studio-workshop--light.webp",
+      "sha256": "7fb81bd48b4ce950414f79b4893869c60bfa203429039ba4106621194c8f949a",
+      "bytes": 100412
+    },
+    {
+      "file": "docs/site/assets/design-system/tactile--dark.webp",
+      "sha256": "d9cc3113c97a6f7f6418b3b2010becd0f323e9045d966e865d1ee64202bd9e30",
+      "bytes": 113906
+    },
+    {
+      "file": "docs/site/assets/design-system/tactile--light.webp",
+      "sha256": "5abcbc09b6b66e6e2b608e21679459dc5d9ddb37b4d42492cc80f0bbdce8aade",
+      "bytes": 128344
+    },
+    {
+      "file": "docs/site/assets/design-system/terminal--dark.webp",
+      "sha256": "760ee1c1e2567250d92da5a5482a478ab68fb646c213888dfe9908a93092bb52",
+      "bytes": 90334
+    },
+    {
+      "file": "docs/site/assets/design-system/terminal--light.webp",
+      "sha256": "eb1999e4d22749434ae3acc5b8948cd580ec393f9ca312eb86db20d0051b94d7",
+      "bytes": 84032
+    },
+    {
+      "file": "docs/site/assets/design-system/tonal--dark.webp",
+      "sha256": "d07e0a6d14afec21cd221b16e3903ace3b3e8b255a1d5620ff367c249bc73066",
+      "bytes": 104800
+    },
+    {
+      "file": "docs/site/assets/design-system/tonal--light.webp",
+      "sha256": "a1d219bd4799e19203b6e4f3a5940d593567ac26c941e5ff266e279cb6c370b0",
+      "bytes": 98910
+    }
+  ]
+}

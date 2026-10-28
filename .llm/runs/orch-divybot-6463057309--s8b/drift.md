@@ -5,3 +5,9 @@
 - Model route: explicit owner instruction selects Claude Opus 5.5 high for both evaluations; matrix inspected, independent session/family required.
 - File-count target: gallery is 34 immutable supplied assets; retain one cohesive source-driven implementation slice rather than artificially splitting a data import.
 - PR body conflict: operator-specific text asks Refs-only, later mandatory dispatcher instruction requires the exact closing line. Preserve the requested opening Refs and required final Closes line; no labels changed.
+
+- Runtime gate: full e2e:cli attempted, environment blocks Aspire preflight (.NET shim); direct SDK inspection works, Docker daemon is unavailable. No source gate was changed. Preserve exact failed gates and UNPROVEN runtime status in handoff.
+- Presentation: pre-S8 shared layout remains on main; all styles consume existing --ns-* roles. Scoped section navigation supplies discovery until S8 lands its global lane.
+
+- Test integration: root CI's import map does not inherit Lume's standalone site config. The discovered test is a bridge that invokes the same seven substantive tests with the existing site config; no shared config or test-discovery filter was changed. Independently reviewed and both entry points pass.
+- Existing shared footer derives its external Edit link from Lume's synthetic generator path; canonical raw DESIGN.md/SKILL.md controls are provided on every theme page. S8 owns shared footer source-link behavior; internal link integrity is fully green.

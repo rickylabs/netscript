@@ -1,0 +1,7 @@
+# Docs validation recipes
+
+Lume standalone config is docs/site/deno.json. Run scoped wrappers from repository root with `--cwd docs/site --root _plugins --root design-system --include design-system --ext ts`; check also passes `--deno-arg --no-lock` (wrapper adds --unstable-kv). Test wrapper forwards `--no-lock --allow-read _plugins/design-system_test.ts`. Import node:assert/strict in site tests because root lint no-import-prefix rejects inline JSR and shared site config is not owned by this worker.
+
+From docs/site: `deno task build`, `deno task check:links`, `deno task check:caveats`. Build includes source and all rendered-placeholder checks. Root Pages prerequisites: `deno task docs:exports-drift`, `deno task docs:snippets`. Current main baseline build passes. Fixture and corpus suite has seven tests, including negative controls for dropped sections and rows.
+
+Root CI dynamically discovers site tests but does not inherit docs/site/deno.json. A test statically importing the configured Lume site fails under the root import map. The S8b bridge `design-system_test.ts` spawns the same seven substantive tests at `design-system/renderer-fixture.ts` with `--config docs/site/deno.json`. Root bridge command needs --allow-read --allow-run=deno; direct fixture command needs --allow-read. Shard timing manifest is advisory: new files are automatically discovered and assigned, so don't edit it solely to register a test.

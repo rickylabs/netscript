@@ -25,3 +25,29 @@ No duplicate PR found for #2436. Source specification PR #2427 is merged. Initia
 Separate Claude session a94e3452-d688-4cd4-90ad-760c7ebc6bae returned FAIL_PLAN. Before implementation, added verbatim YAML comments, scoped raw-HTML-safe configured rendering, exact source-to-route table, namespaced heading ids and corpus checks. The risk register was already appended while the evaluator read. Re-steer same session for the one authorized repair. Source reference images are under the handoff run path, not docs/.
 
 PLAN-EVAL repair: PASS in the same separate Claude Opus 5.5 session. Implementation starts only after this verdict. The read-only spawn adapter calls the repository `runClaudePrint` launcher, narrows permission mode and available tools, closes stdin and excludes all MCP servers. Native model is observed in stream metadata. Baseline docs/site build exited 0 before implementation.
+
+## Implementation and first validation
+
+Implemented the build-time source loader, safe configured Markdown adapter, complete recursive value tables + verbatim YAML, fifteen Lume-generated pages, section-local token styling and the immutable 34-image gallery. Preserved the Fresh UI API reference and linked it into the new section; there were no legacy design pages to migrate on this baseline. Added seven fixture/corpus tests, including deliberate omission controls and Markdown option restoration. Source links point directly to raw canonical files.
+
+Docs build: exit 0, 754 generated files, 251 HTML pages; rendered-placeholder check passed. Built-site links: exit 0, 42,230 internal links resolve. Caveats: exit 0, 15 markers across 12 pages. Exports drift: PASS with run-gate receipt. Snippets: exit 0, scanned 655 fences, 344 TS-like, 27 checked, 14 documented exemptions, zero malformed. Scoped check/lint/fmt: five TS files selected, zero findings. Tests: 7/7 pass. An early test assertion assumed the wrong ampersand slug; corrected it to the existing site's `elevation-depth`. Node's built-in assertions avoid introducing a dependency into the shared site config.
+
+Browser: six screenshots (landing/Studio/Tonal × light/dark) and 18 route/scheme checks passed, including twelve 390px mobile checks, 17 presets, all image dimensions, no duplicate IDs/page errors, current-scheme previews and keyboard comparison disclosure. Inspected landing light, Studio dark and Tonal light captures. Shared chrome is still the pre-S8 design; no shared styling was changed to imitate an unmerged worker. A heading hierarchy adjustment adds an H2 above specimen H3s before final screenshots.
+
+Full CLI E2E: attempted once with `deno task e2e:cli`, exit 1. preflight.deno passed; preflight.aspire failed because .NET SDK is not resolved via the shim; cleanup.aspire-stop failed before any scaffold/AppHost was created. Direct SDK PATH fixes doctor; Docker daemon remains unavailable. This gate is UNPROVEN/environment-blocked, not waived, skipped, weakened or counted green. No runtime/framework code changed. Read-only leak-check requested after the failed suite; inspect before any cleanup. Will report this explicitly in PR and READY handoff.
+
+Reconcile: origin/main advanced to 21dada0e9 (telemetry only); S8 is not merged, so existing shared components remain the correct baseline. No rebase/force push needed.
+
+## CI discovery follow-through
+
+Root CI dynamically discovers docs/site tests, but invokes them with the root import map, which has no `lume/` alias. A direct root wrapper run exposed that real CI failure before commit. Moved the seven substantive renderer tests to `_plugins/design-system/renderer-fixture.ts` and kept `_plugins/design-system_test.ts` as a subprocess bridge using the existing standalone site config. This keeps both root discovery and configured Markdown coverage without changing shared configs or CI. Re-running both root bridge and seven-test fixture through structured wrappers; source count becomes six TS files. No product behavior changed.
+
+Also running the configured broader quality:scan because its scope includes docs/site; scoped wrappers are not the only quality evidence.
+
+Independent IMPL-EVAL round 1: PASS with no blockers; the separate native Claude Opus 5.5 session 9c2de1be-6cf4-4e78-8fe4-4410014c90cb substantively reviewed the implementation and six screenshots, and approved commit/review while explicitly leaving runtime E2E unproven. Its snapshot preceded the final root-CI test bridge, so re-steer the SAME session for that bounded delta before commit. Broader quality:scan also passed (durable receipt), no new allowances.
+
+## Final independent sign-off
+
+Same IMPL-EVAL session returned final PASS on the root-CI bridge, six-file scoped checks, seven substantive fixture/corpus tests plus the root bridge, and the broader quality scan. Independent reviewer approved the implementation slice and final delta for commit/review. No implementation blockers and no architectural debt were accepted. All 34 copied WebPs verified byte-identical to gallery commit 424ce242dff4e155d16f046056146449e25a54b4 (gallery-provenance.json). Final screenshots retain the corrected heading hierarchy and all 18 browser checks pass. Validation details and actual unproven runtime status are consolidated in validation.md.
+
+The delivery session applies the independently reviewed sign-off as the implementation commit; the evaluator remains strictly read-only as the operator required. After push, mark ready FOR REVIEW, post phase summaries, and hand off the canonical READY report through the dispatcher file. Do not merge/release or wait for CI.
