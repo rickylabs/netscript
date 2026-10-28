@@ -21,3 +21,7 @@ Corrected independent PLAN-EVAL PASS before source edits. Slice1 implemented det
 Slice1 complete: independent source review PASS after the recorded FAIL_FIX and reverted dependency experiment. Candidate browser52/0/0,24axe reports with0serious/critical;6focused tests; structured tooling8/site2/browser2 checks;23970links/251pages. Accepted reproducibility compares806files and protects HTML/twins/fragments/assets; reports only the known Pagefind metadata variation. Real raw-custom control exits1 through the normal policy command. Seven-line native Lightning CSS lock closure retained, all other dependency entries unchanged.
 
 Reconcile1: source scope remains #2451. Token authority stays assigned to #2450. The discovered upstream Pagefind variation is a separate sibling task; no Pagefind upgrade is retained. CI slice remains pending.
+
+Slice2 complete:71classifier/workflow tests PASS after intended68/3RED; structured2-file types/lint/fmt PASS; native CLI probes prove opted-in push needs_pages=false and default push=true. Separate source review PASS. Browser/deploy conditions retain fail-toward-running behavior and the rendered reproducibility check is now in CI.
+
+Reconcile2: new PR2452 remains draft for carrier integration/final IMPL. Current main has advanced with #2449; include it normally before native generation. Independent source reviews accept both slices. No protected theme-source edits.
