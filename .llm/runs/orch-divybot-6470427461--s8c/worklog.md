@@ -74,3 +74,11 @@ Slice 3 final independent review PASS after the one repair. Post-repair build ex
 Slice 6 targeted browser checks: 32/32 pass with zero serious/critical gallery axe findings. Real authored-policy negative controls both exit 1 for the intended reasons (raw-colour and red-outside-state), not a harness/startup error. Visual review replaced missing Unicode info glyphs with currentColor SVGs and made fixture links real anchors; assertions now require both. Policy rejects red syntax, non-destructive tones and prefix impostors such as errorish/destructive-decoration. Initial independent slice review PASS; small visual/policy delta is in separate read-only addendum before sign-off.
 
 Slice 6 independent addendum PASS. All required source/migration/AA/browser checks for this slice pass, with intended negative-control failures. Sign-off follows independent review. Reconcile: sole existing-role delta is approved input-border; remaining export changes add authoritative roles.
+
+## Slice 4 — path chips and tagline
+
+- File chips now truncate on one line with ellipsis/full title and preserve full clipboard text; code filenames also use real block ellipsis. The four home chips share one actual stack gap after flattening Markdown p wrappers. Fresh package tagline is prose.
+- Docs build and structured browser type/fmt gates pass. 12/12 home/path/header browser cases pass, including four zero-blocking axe captures. Independent slice review PASS; its nonblocking note about a vacuous tagline test was strengthened with a required paragraph count before sign-off.
+- Reconcile: path spacing portion of reviewed #2452 is already integrated here and must not be duplicated in slice 5. No locks or colour declarations changed.
+
+Strengthened tagline regression rerun passes in all four browser projects (4/4); slice 4 sign-off complete.

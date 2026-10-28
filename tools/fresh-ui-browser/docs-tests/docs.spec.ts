@@ -903,3 +903,53 @@ test('API kind paint follows the final generated role and signatures have syntax
     expect(seen.has(kind)).toBe(true);
   }
 });
+
+test('file paths: single-line ellipsis, full titles and one list gap', async ({ page }) => {
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await visit(page, './');
+  const chips = page.locator('.ns-path-stack .ns-file-path');
+  await expect(chips).toHaveCount(4);
+  const measurements = await chips.evaluateAll((chips) =>
+    chips.map((chip) => {
+      const text = chip.querySelector('.ns-file-path__value')!;
+      const style = getComputedStyle(text);
+      const box = chip.getBoundingClientRect();
+      return {
+        title: chip.getAttribute('title'),
+        text: text.textContent,
+        whiteSpace: style.whiteSpace,
+        wordBreak: style.wordBreak,
+        overflowWrap: style.overflowWrap,
+        overflow: style.overflow,
+        ellipsis: style.textOverflow,
+        textHeight: text.getBoundingClientRect().height,
+        lineHeight: parseFloat(style.lineHeight),
+        top: box.top,
+        bottom: box.bottom,
+      };
+    })
+  );
+  const gap = await page.locator('.ns-path-stack').evaluate((stack) =>
+    parseFloat(getComputedStyle(stack).rowGap)
+  );
+  for (const [index, chip] of measurements.entries()) {
+    expect(chip.title).toBe(chip.text);
+    expect(chip.whiteSpace).toBe('nowrap');
+    expect(chip.wordBreak).toBe('normal');
+    expect(chip.overflowWrap).toBe('normal');
+    expect(chip.overflow).toBe('hidden');
+    expect(chip.ellipsis).toBe('ellipsis');
+    expect(chip.textHeight).toBeLessThanOrEqual(chip.lineHeight + 1);
+    if (index) expect(chip.top - measurements[index - 1].bottom).toBeCloseTo(gap, 0);
+  }
+  await chips.last().locator('[data-copy-path]').click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(measurements.at(-1)!.text);
+  await visit(page, 'web-layer/fresh-ui/');
+  const tagline = page.locator('.ns-prose p').filter({
+    hasText: 'Fresh runtime extensions, builders, forms, defer',
+  });
+  await expect(tagline).toHaveCount(1);
+  await expect(tagline.locator('code').filter({ hasText: 'Fresh runtime extensions' })).toHaveCount(
+    0,
+  );
+});

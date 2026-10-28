@@ -37,12 +37,18 @@
   font: 400 12px/18px var(--ns-font-mono);
 }
 .ns-file-path {
+  min-width: 0;
   padding: 2px 5px;
   border: 1px solid var(--ns-border-subtle);
 }
 .ns-file-path__value {
+  display: block;
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 .ns-chip-copy {
   display: inline-flex;
@@ -71,6 +77,13 @@
   align-items: flex-start;
   flex-direction: column;
   gap: 8px;
+}
+.ns-prose .ns-path-stack > p {
+  display: contents;
+  margin: 0;
+}
+.ns-path-stack > p:empty {
+  display: none;
 }
 .ns-hero {
   display: grid;
@@ -364,11 +377,12 @@
   background: var(--ns-bg);
 }
 .ns-code-path {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
   font: 400 12px/18px var(--ns-font-mono);
 }
 .ns-copy-btn {
