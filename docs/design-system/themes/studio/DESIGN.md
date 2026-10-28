@@ -264,7 +264,8 @@ flavors are in the "Flavors" extension section. Names are provisional until the 
     selected row;
   - a 2px ink focus ring with a 2px gap (#202020 / #7b7b7b);
   - field, checkbox and switch boundaries in gray 9 (#8d8d8d / #6e6e6e, ≥ 3:1);
-  - **red only in the logo (#DA291C / #E5332A) and in errors**;
+  - **red only in the logo (#DA291C / #E5332A) and in the `destructive` tone** (errors, destructive
+    actions, CAUTION callouts);
   - status tones in callouts, alerts, badges, toasts and inline notices; syntax colours in code;
     coloured kind tags in API references (see _Content colour_);
   - a Medium title and Regular KPI numerals, both at −2.5% tracking;
@@ -293,14 +294,17 @@ flavors are in the "Flavors" extension section. Names are provisional until the 
   comes from rules. Dark: #18181a → #1e1e21 → #26262a → #313131; raised #222225.
 - **Accent policy (Utility):** Base accent Ink sets `primary` to ink (#202020, dark #313131).
   Location, selection, links and focus also use ink: `studio/signal/marker` #202020 / #eeeeee. **Red
-  appears only in the logo and in errors.** There are no red markers, links, hairlines or focus
-  rings. Monochrome applies to the chrome: header, navigation, rules, markers, links, focus and
-  selection. Content primitives keep their semantic colour (next bullet).
-- **Content colour (Utility).** A grey-only callout, badge or code block loses meaning and contrast,
-  so Utility colours its content primitives:
-  - **Status tones.** Callouts, alerts, badges, toasts and inline notices use `info`, `success`,
-    `warning` and `destructive`: `*-subtle` fill, `*-border` edge, `*-text` icon and title, body in
-    `fg`. Red stays limited to the `destructive` tone (errors, destructive actions, caution).
+  appears only in the logo and in the `destructive` tone** (errors, destructive actions, CAUTION
+  callouts). There are no red markers, links, hairlines or focus rings. Monochrome applies to the
+  chrome: header, navigation, rules, markers, links, focus and selection. Content primitives keep
+  their semantic colour (next bullet).
+- **Content colour (Utility).** A callout, status badge or code block that drops its tone loses
+  meaning and contrast, so Utility colours its content primitives. Neutral stays correct where
+  nothing is signalled: plain identifiers, punctuation, module and namespace kinds, neutral badges.
+  - **Status tones.** Callouts, alerts, toasts and inline notices use `info`, `success`, `warning`
+    and `destructive`: `*-subtle` fill, `*-border` edge, `*-text` icon and title, body in `fg`.
+  - **Status badges** keep Utility's badge anatomy (see _Components_): no fill, a 1px outline and a
+    6px square dot in the tone's `*-text` colour, radius 2.
   - **Docs callouts** map GitHub alert types to tones: NOTE `info`, TIP `success`, IMPORTANT
     `important` (violet), WARNING `warning`, CAUTION `destructive`.
 
@@ -471,10 +475,12 @@ Light and Dark state sheets.
 
 ## Do's and Don'ts
 
-- **Do** keep Utility's chrome monochrome: red only in the logo and in errors.
-- **Do** give content primitives their semantic colour: status tones on callouts, alerts, badges and
-  notices; syntax colours in code; coloured kind tags in API references.
-- **Don't** render a callout, badge, tag or code block in grey only.
+- **Do** keep Utility's chrome monochrome: red only in the logo and in the `destructive` tone.
+- **Do** give content primitives their semantic colour: status tones on callouts, alerts, notices
+  and status badges; syntax colours in code; coloured kind tags in API references.
+- **Don't** drop the tone from a callout, alert, notice or status badge, or render highlighted code
+  without its syntax colours. Neutral identifiers, punctuation, module and namespace kinds and
+  neutral badges are correct.
 - **Do** keep Utility sharp and quiet: radii 0–2px, 1px gray-5 structural hairlines, quiet row
   rules, no shadows. Separations must not read stronger than the content they separate.
 - **Don't** use 2px ink rules, underline tabs, a Bold title, Medium KPI numerals or JetBrains Mono
