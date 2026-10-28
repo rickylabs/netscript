@@ -83,13 +83,11 @@ For example, `netscript plugin install workers` adds a jobs API and its backgrou
 separate Aspire resources. The typed glue and generated registry it emits are also the conventions a
 coding agent reads to use that capability correctly.
 
-| Command | What it does |
-| --- | --- |
-| `netscript plugin list` | Shows what is registered. |
-| `netscript plugin doctor` | Checks the wiring. |
-| `netscript plugin info <name>` | Runs a plugin's published info command. |
-| `netscript plugin remove` | Unregisters a plugin. |
-| `netscript plugin new billing` | Scaffolds your own plugin: a JSR-publishable core engine package and a thin connector that re-exports its contract. |
+The lifecycle is symmetric: `netscript plugin list`, `doctor`, `info` and `remove` inspect and
+unregister installed plugins (see
+[Manage plugins later](/orchestration-runtime/how-to/add-a-plugin/#manage-plugins-later)). To
+write your own, `netscript plugin new billing` scaffolds a JSR-publishable core engine package and a
+thin connector that re-exports its contract.
 
 {{ comp.xref({ key: "howto:add-a-plugin" }) }} walks through the install flow,
 {{ comp.xref({ key: "howto:author-a-plugin" }) }} covers the two-tier core and connector pattern,

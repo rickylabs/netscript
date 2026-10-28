@@ -148,7 +148,6 @@ describes the boundary between framework and scaffold spans.
 | --- | --- | --- |
 | `aspire start` doesn't boot | Docker isn't running. | Start Docker, or use the `--no-aspire` path with your own infrastructure. |
 | Commands fail on the first run | Wrong directory. `aspire restore` and `aspire start` run inside `aspire/`; `netscript db` commands run from the workspace root. | Run each command from its directory. |
-| A db command fails fast | `aspire start` isn't running, so there is no Postgres. | Bring the graph up first. |
 | Boot is blocked | A stale earlier run holds a dashboard, OTLP or service port. | Find it in the dashboard resource list or your process table and free it. |
 | `aspire restore` fails | A Node or SDK problem in `aspire/`. The AppHost runs on Node and your app on Deno, isolated on purpose. | Fix the Node/SDK setup in `aspire/`, not the Deno workspace. |
 | Everything is healthy but services never become ready | The Docker daemon runs on another machine. | See [the remote Docker daemon section](#services-never-become-ready-a-remote-docker-daemon). |

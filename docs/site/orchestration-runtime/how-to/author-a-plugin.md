@@ -321,7 +321,7 @@ CLI scaffolds pin <code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</c
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Endpoints return 404 or jobs never run | Aspire isn't running. The plugin's API service and background processor are Aspire resources. | Run `aspire start` from `aspire/`. Database-backed plugins need it before `netscript db`. |
+| Endpoints return 404 or jobs never run | Aspire isn't running. The plugin's API service and background processor are Aspire resources. | Run `aspire start` from `aspire/`. |
 | A new job isn't registered | Stale registry. The runtime reads the generated registry, not your source tree. | Run `netscript generate`, then restart Aspire. |
 | Port collision in the Aspire graph | A manually configured port reuses one already allocated. | Let the scaffolder allocate a high-range port (>= 49152) per project, or check `appsettings.json` and the Aspire dashboard for active ports. |
 | Edits have no effect | You edited a top-level staging copy. | Author in `plugins/<name>/`, the directory `netscript.config.ts` references. |
