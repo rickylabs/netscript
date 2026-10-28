@@ -14,7 +14,7 @@ factories and query utils from a single service map, so a component imports read
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
-| `@netscript/sdk` | `./mod.ts` | [Side-effect-free high-level composition entry (`defineServices`) plus common non-cache surfaces](#composition-preset-definesservices). |
+| `@netscript/sdk` | `./mod.ts` | [Side-effect-free high-level composition entry (`defineServices`) plus common non-cache surfaces](#composition-preset-defineservices). |
 | `@netscript/sdk/auto-update` | `./src/auto-update/mod.ts` | Auto-update client-side primitives. |
 | `@netscript/sdk/desktop` | `./src/desktop/mod.ts` | Native desktop capability helpers and bindings. |
 | `@netscript/sdk/cache` | `./src/cache/mod.ts` | [Server-side KV-backed cache engine and explicit provider-registration seam](#cache-engine-netscriptsdkcache). |
@@ -22,9 +22,9 @@ factories and query utils from a single service map, so a component imports read
 | `@netscript/sdk/collections` | `./src/collections/mod.ts` | [TanStack DB collection backed by TanStack Query](#collections-netscriptsdkcollections). |
 | `@netscript/sdk/discovery` | `./src/discovery/mod.ts` | [Aspire service URL and database/KV connection discovery](#service-discovery-netscriptsdkdiscovery). |
 | `@netscript/sdk/ports` | `./src/ports/mod.ts` | [Package-owned structural ports (upstream-type-free)](#ports-netscriptsdkports). |
-| `@netscript/sdk/presets` | `./src/presets/mod.ts` | [Browser-safe `defineServices` preset and its package-owned type closure](#composition-preset-definesservices). |
+| `@netscript/sdk/presets` | `./src/presets/mod.ts` | [Browser-safe `defineServices` preset and its package-owned type closure](#composition-preset-defineservices). |
 | `@netscript/sdk/query` | `./src/query/mod.ts` | [Server-side cache-aware query factories](#server-side-query-factories-netscriptsdkquery). |
-| `@netscript/sdk/query-client` | `./src/query-client/mod.ts` | [TanStack Query integration for browser/island code](#query-client--tanstack-integration-netscriptsdkquery-client). |
+| `@netscript/sdk/query-client` | `./src/query-client/mod.ts` | [TanStack Query integration for browser/island code](#query-client-tanstack-integration-netscriptsdkquery-client). |
 | `@netscript/sdk/streams/collections` | `./src/client/stream-collection/mod.ts` | [DOM-independent TanStack DB entity materialization over injected fetch](#react-native-stream-collections). |
 | `@netscript/sdk/streams/react` | `./src/client/stream-react/mod.ts` | [React and React Native live-query hook](#react-native-stream-collections). |
 | `@netscript/sdk/streams` | `./src/streams.ts` | [Durable stream producers and schema helpers](#durable-streams-netscriptsdkstreams). |

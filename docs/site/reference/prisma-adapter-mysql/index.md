@@ -116,5 +116,9 @@ try {
 }
 ```
 
+The literal host and port are for illustration. In a NetScript workspace, Aspire assigns the
+database endpoint, and `@netscript/database/adapters/mysql` reads it from the environment
+(`getMysqlConfigFromEnv`).
+
 > [!NOTE]
 > `onConnectionError` observes errors classified as connection failures: fatal handshake/transport errors, server-capacity errors 1040/1203, and the adapter's closed set of transport/pool codes. Authentication, access, and missing-database errors 1045/1044/1049 fire only when driver-fatal. Callback failure is contained and never replaces the primary error.
