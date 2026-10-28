@@ -83,7 +83,7 @@ summaries. Both return results sorted by descending score.
 | --- | --- | --- | --- |
 | `matchByTags` | function | `matchByTags(skills: readonly SkillSummary[], triggers: readonly string[]): readonly SkillMatch[]` | Case-insensitive exact (`score 1`) and substring (`score 0.5`) tag triggers. |
 | `matchBySemantic` | function | `matchBySemantic(skills: readonly SkillSummary[], query: string, embeddings: SkillEmbeddingProvider, model?: string): Promise<readonly SkillMatch[]>` | Cosine-similarity ranking over `name`/`description`/`tags` text via an injected embedding provider. |
-| `SKILL_MATCH_MODES` | variable | `readonly ["tag", "semantic"]` | The trigger modes a `SkillMatch` can report. |
+| `SKILL_MATCH_MODES` | const | `readonly ["tag", "semantic"]` | The trigger modes a `SkillMatch` can report. |
 
 ### Types
 

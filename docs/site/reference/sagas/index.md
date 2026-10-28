@@ -109,10 +109,10 @@ Version 1 of the sagas plugin API contract, its Zod schemas, and the router type
 | `sagasContract` / `sagasContractV1` | const | The versioned sagas API contract definition. |
 | `SagasContractDefinition` / `SagasContractV1` | type alias | Contract shape for the sagas API. |
 | `SagasRouter` | interface | Router type derived from the sagas contract. |
-| `SagaDefinitionResponse` / `SagaDefinitionResponseSchema` | type / schema | Saga definition response payload and its Zod schema. |
-| `SagaInstanceResponse` / `SagaInstanceResponseSchema` | type / schema | Saga instance response payload and its Zod schema. |
-| `PublishMessageInput` / `PublishMessageInputSchema` | type / schema | Publish-message request payload and its Zod schema. |
-| `SagaSSEEvent` / `SagaSSEEventSchema` | type / schema | Server-sent event payload streamed to subscribers. |
+| `SagaDefinitionResponse` / `SagaDefinitionResponseSchema` | type alias / const | Saga definition response payload and its Zod schema. |
+| `SagaInstanceResponse` / `SagaInstanceResponseSchema` | type alias / const | Saga instance response payload and its Zod schema. |
+| `PublishMessageInput` / `PublishMessageInputSchema` | type alias / const | Publish-message request payload and its Zod schema. |
+| `SagaSSEEvent` / `SagaSSEEventSchema` | type alias / const | Server-sent event payload streamed to subscribers. |
 | `SagaFilters` / `InstanceFilters` | type alias | List/query filters for sagas and instances. |
 
 ## Streams (`@netscript/plugin-sagas/streams`)

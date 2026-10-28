@@ -232,7 +232,7 @@ a privacy-first adapter structurally compatible with `CommandTelemetryPort`. Reg
 name/version metadata (1–1024 unique pairs, names at most 120 characters) and pass it to the command
 executor. The attribute builders and closed vocabularies live in `@netscript/telemetry/attributes`.
 
-| Span | Kind |
+| Span | Span kind |
 | --- | --- |
 | `command.execute` | INTERNAL |
 | `command.outbox.relay` | INTERNAL |

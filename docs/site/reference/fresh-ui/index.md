@@ -421,10 +421,10 @@ type mismatches, raw semantic values and reference cycles fail before output is 
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `buildTokens` | async function | Builds all contexts and returns deterministic CSS, bridge, JSON, fonts, registry and Figma output bytes. Accepts optional preset, semantic override and caller-owned sources; target app skips Figma output, and previews explicitly includes optional design styles. |
+| `buildTokens` | function | Builds all contexts and returns deterministic CSS, bridge, JSON, fonts, registry and Figma output bytes. Accepts optional preset, semantic override and caller-owned sources; target app skips Figma output, and previews explicitly includes optional design styles. |
 | `defaultTokenSources` | function | Returns the bundled resolver and DTCG source documents. Clone before editing caller-owned inputs. |
-| `PREVIEW_TOKEN_FILES` | readonly string[] | The 18 optional design preview stylesheets. Install with ui:add theme-previews or tokens build --previews. Also exported from token-config without the compiler. |
-| `APP_TOKEN_FILES` | readonly string[] | The five core app files: tokens.css, theme-bridge.css, tokens.json, fonts.json and theme-preset.json. Also available from the lightweight token-config entrypoint. |
+| `PREVIEW_TOKEN_FILES` | const | The 18 optional design preview stylesheets. Install with ui:add theme-previews or tokens build --previews. Also exported from token-config without the compiler. |
+| `APP_TOKEN_FILES` | const | The five core app files: tokens.css, theme-bridge.css, tokens.json, fonts.json and theme-preset.json. Also available from the lightweight token-config entrypoint. |
 | `TOKEN_PRESETS` | const array | The registered language presets and their fixed Figma modes, density and optional Studio flavor. |
 | `TOKEN_SCHEMES` | const tuple | Supported scheme contexts: light and dark. |
 | `TOKEN_DENSITIES` | const tuple | Supported density contexts: comfortable and compact. |
@@ -438,9 +438,9 @@ type mismatches, raw semantic values and reference cycles fail before output is 
 | `ResolverSource` | type alias | An inline token document or a resolver reference to a document, set or modifier. |
 | `TokenDocument` | interface | Nested token groups, typed tokens and document metadata. |
 | `DesignToken` | interface | Explicit DTCG type/value with optional description and NetScript extensions. |
-| `TokenValue` | recursive type | JSON scalar, array or object used by aliases and typed DTCG composites. |
+| `TokenValue` | type alias | JSON scalar, array or object used by aliases and typed DTCG composites. |
 | `TokenMetadata` | interface | Registered CSS name, exact legacy spelling, category, derivation and optional Figma provenance. |
-| `TokenDerivation` | union type | The supported color-mix or shadow composite recipe. |
+| `TokenDerivation` | type alias | The supported color-mix or shadow composite recipe. |
 | `TokenMixDerivation` | interface | Two color paths, first-color weight and interpolation space; CSS retains native color-mix. |
 | `TokenShadowDerivation` | interface | Themeable shadow color/vertical-offset/blur paths and pixel horizontal-offset/spread values. |
 | `TokenPreset` | interface | Preset identity, language/flavor, selected Figma modes and fixed source/public density. |

@@ -402,7 +402,7 @@ back-off floor and cap. HTTP 204 and terminal control stop permanently.
 | `StreamSourceEventV1`             | interface  | Structural native or plain event shape.                                             |
 | `StreamSourceListenerV1`          | type alias | Listener accepting structural stream events.                                        |
 | `createStreamProducer`            | function   | Create or reuse a durable stream producer for a stream path.                        |
-| `createDurableStream`             | reference  | Re-export alias for the durable stream producer factory.                            |
+| `createDurableStream`             | function   | Re-export alias for the durable stream producer factory.                            |
 | `defineStreamSchema`              | function   | Define a type-safe durable stream schema.                                           |
 | `inspectStreamTopic`              | function   | Inspect a stream schema and optional producer metadata.                             |
 | `buildStreamUrl`                  | function   | Build the full stream URL for a NetScript stream path.                              |
@@ -469,7 +469,7 @@ Representative symbols:
 
 | Symbol | Kind | Description |
 | --------------------- | ---------- | ------------------------------------------------------------------------------------- |
-| `QueryClientPort`     | type       | Narrow TanStack QueryClient capability set used by SDK collection and query adapters. |
+| `QueryClientPort`     | type alias | Narrow TanStack QueryClient capability set used by SDK collection and query adapters. |
 | `CacheStore`          | interface  | Structural cache store contract.                                                      |
 | `CacheStoreEntry`     | interface  | Entry shape stored by a `CacheStore`.                                                 |
 | `CacheKey`            | type alias | Structural cache key contract.                                                        |
