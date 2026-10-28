@@ -1,11 +1,14 @@
 # Resume
 
 Issue #2454, branch orch/divybot-6470442939, main baseline d6dfab0. Plan checkpoint recorded;
-implementation complete, draft PR #2458. Production checks and 18 regression tests pass; red/green
-nontermination proof recorded. Exports drift investigated; see research.md for timings and limits.
-CLI E2E attempted and failed environment preflight; runtime remains unproven. Independent Claude
-review returned PASS (see evaluate.md). Actual Pages CI on the reviewed code passed: build 106s,
-snippets 60s. Final evidence commit/push, PR ready transition and excluded READY handoff remain. Public
+implementation delivered in open, ready-for-review PR #2458. Review repair is in progress for three
+Augment findings: README env permissions, full-corpus checking, and outer-launcher cancellation.
+All are fixed locally; 20 snippet tests, eight ratchet tests and two workflow tests pass. The real
+main docs corpus passes in 41.689s. Original main's README gate confirms five known errors across
+99 fences; preserve its missing-module coalescing without changing the ratchet. The full repaired
+README gate and the re-steered independent evaluation remain to finish. CI test-5's auth fixture
+failed on a transient fetch and passes unchanged in a focused local rerun. Earlier runtime E2E
+preflight remains unavailable. Historical review/timings remain in evaluate.md and validation.md. Public
 records must contain no private runtime details. Keep assignment file uncommitted. Final READY
 report must be handed off via excluded `.divybot-final-report.md`.
 

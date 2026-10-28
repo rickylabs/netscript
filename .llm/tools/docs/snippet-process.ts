@@ -5,6 +5,8 @@ import { kill } from 'node:process';
 export const SNIPPET_TIMEOUT_MS = 30_000;
 /** Includes dependency loading before the checker can extract source fences. */
 export const SNIPPET_CHECK_TIMEOUT_MS = 240_000;
+/** The launcher allows its worker to finish the shorter compiler-group cleanup first. */
+export const SNIPPET_LAUNCHER_GRACE_MS = 1_000;
 const OUTPUT_LIMIT = 1024 * 1024;
 const TERMINATION_GRACE_MS = 250;
 
@@ -14,17 +16,22 @@ export interface SnippetProcessResult {
   stdout: string;
   stderr: string;
   timedOut: boolean;
+  interrupted: boolean;
 }
 
 /** Run a compiler or fixture with EOF on stdin and a deadline covering inherited output pipes. */
 export function runSnippetProcess(
   command: string,
   args: string[],
-  options: { source: string; cwd: string; timeoutMs?: number },
+  options: { source: string; cwd: string; timeoutMs?: number; terminationGraceMs?: number },
 ): Promise<SnippetProcessResult> {
   const timeoutMs = options.timeoutMs ?? SNIPPET_TIMEOUT_MS;
+  const terminationGraceMs = options.terminationGraceMs ?? TERMINATION_GRACE_MS;
   if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1) {
     throw new Error(`${options.source}: invalid snippet timeout ${timeoutMs}`);
+  }
+  if (!Number.isSafeInteger(terminationGraceMs) || terminationGraceMs < 1) {
+    throw new Error(`${options.source}: invalid termination grace ${terminationGraceMs}`);
   }
   return new Promise((resolve, reject) => {
     // detached creates a dedicated POSIX process group without an external setsid dependency.
@@ -36,6 +43,7 @@ export function runSnippetProcess(
     let stdout = '';
     let stderr = '';
     let timedOut = false;
+    let interrupted = false;
     let cleanup: Promise<void> | undefined;
     const signalGroup = (signal: 'SIGTERM' | 'SIGKILL') => {
       if (child.pid === undefined) return;
@@ -45,10 +53,6 @@ export function runSnippetProcess(
         if (!(error instanceof Error && 'code' in error && error.code === 'ESRCH')) throw error;
       }
     };
-    // A bounded launcher may terminate this worker while it owns a separate compiler group.
-    // Forward that termination so nested compiler groups cannot outlive the worker.
-    const forwardTermination = () => signalGroup('SIGKILL');
-    if (Deno.build.os !== 'windows') Deno.addSignalListener('SIGTERM', forwardTermination);
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
     child.stdout.on('data', (data: string) => {
@@ -57,8 +61,9 @@ export function runSnippetProcess(
     child.stderr.on('data', (data: string) => {
       stderr = (stderr + data).slice(-OUTPUT_LIMIT);
     });
-    const timer = setTimeout(() => {
-      timedOut = true;
+    const terminate = (): Promise<void> => {
+      if (cleanup) return cleanup;
+      clearTimeout(timer);
       cleanup = (async () => {
         try {
           if (child.pid !== undefined) {
@@ -77,7 +82,7 @@ export function runSnippetProcess(
               });
             } else {
               signalGroup('SIGTERM');
-              await new Promise((done) => setTimeout(done, TERMINATION_GRACE_MS));
+              await new Promise((done) => setTimeout(done, terminationGraceMs));
               signalGroup('SIGKILL');
             }
           }
@@ -90,23 +95,45 @@ export function runSnippetProcess(
           child.stderr.destroy();
         }
       })();
+      return cleanup;
+    };
+    // Forward graceful termination before escalation so workers can reap their own groups.
+    const forwardTermination = () => {
+      interrupted = true;
+      void terminate();
+    };
+    const removeTerminationListeners = () => {
+      if (Deno.build.os === 'windows') return;
+      Deno.removeSignalListener('SIGTERM', forwardTermination);
+      Deno.removeSignalListener('SIGINT', forwardTermination);
+    };
+    const timer = setTimeout(() => {
+      timedOut = true;
+      void terminate();
     }, timeoutMs);
+    if (Deno.build.os !== 'windows') {
+      Deno.addSignalListener('SIGTERM', forwardTermination);
+      Deno.addSignalListener('SIGINT', forwardTermination);
+    }
     child.once('error', (error) => {
       clearTimeout(timer);
-      if (Deno.build.os !== 'windows') Deno.removeSignalListener('SIGTERM', forwardTermination);
+      removeTerminationListeners();
       reject(new Error(`${options.source}: failed to start snippet process`, { cause: error }));
     });
     child.once('close', async (code) => {
       clearTimeout(timer);
       await cleanup;
-      if (Deno.build.os !== 'windows') Deno.removeSignalListener('SIGTERM', forwardTermination);
+      removeTerminationListeners();
       resolve({
-        code: timedOut ? 1 : code ?? 1,
+        code: timedOut || interrupted ? 1 : code ?? 1,
         stdout,
         stderr: timedOut
           ? `${options.source}: snippet process timed out after ${timeoutMs}ms\n${stderr}`
+          : interrupted
+          ? `${options.source}: snippet process interrupted\n${stderr}`
           : stderr,
         timedOut,
+        interrupted,
       });
     });
   });

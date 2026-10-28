@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-read --allow-write --allow-run
+#!/usr/bin/env -S deno run --allow-read --allow-write --allow-run --allow-env
 /**
  * Compile the TypeScript fences published in package and plugin READMEs.
  *
@@ -13,12 +13,12 @@ import {
   formatReadmeFenceCensus,
   type ReadmeFenceCensus,
   readmeFenceRatchetFailures,
+  readmeFenceTypeErrorPaths,
   type ReadmeSyntaxFailure,
 } from './readme-fence-policy.ts';
 
 const ANSI = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 const SYNTAX_FAILURE = /SyntaxError:[\s\S]*?at file:\/\/([^\s:]+README\.md):(\d+):/;
-const TYPE_ERROR = /TS(\d+) \[ERROR\][\s\S]*?at file:\/\/([^\s:]+README\.md)/g;
 /** `deno check` aborts the whole program on the first parse failure, so exclusion must iterate. */
 const MAX_SYNTAX_ROUNDS = 32;
 
@@ -84,6 +84,7 @@ export async function checkReadmeFences(
   let checked = tsLike.filter((block) => block.exemptionReason === undefined);
   let plain = '';
   let compilerCode = 0;
+  let compilerIncomplete = false;
 
   for (let round = 0; round <= MAX_SYNTAX_ROUNDS; round++) {
     const result = await compileSnippetAnalysis(
@@ -91,7 +92,9 @@ export async function checkReadmeFences(
       repositoryRoot,
     );
     compilerCode = result.code;
+    compilerIncomplete = result.incomplete;
     plain = result.diagnostics.replaceAll(ANSI, '');
+    if (compilerIncomplete) break;
     const syntax = SYNTAX_FAILURE.exec(plain);
     if (!syntax) break;
     const [, sourcePath, line] = syntax;
@@ -105,12 +108,12 @@ export async function checkReadmeFences(
     checked = checked.filter((block) => block !== victim);
   }
 
-  const typeErrors = [...plain.matchAll(TYPE_ERROR)];
-  const failingReadmes = new Set(typeErrors.map((match) => match[2]));
+  const typeErrors = readmeFenceTypeErrorPaths(plain);
+  const failingReadmes = new Set(typeErrors);
   // A non-zero compile that produced neither an attributed type error nor an excluded fence means a
   // diagnostic shape this checker cannot read. Reporting it beats passing on an unread failure.
-  const unattributedFailure = compilerCode !== 0 && typeErrors.length === 0 &&
-    syntaxFailures.length === 0;
+  const unattributedFailure = compilerIncomplete ||
+    (compilerCode !== 0 && typeErrors.length === 0 && syntaxFailures.length === 0);
   return {
     census: {
       readmes: readmes.length,

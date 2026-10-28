@@ -1,5 +1,31 @@
 # Worklog
 
+## Review repair plan
+
+Address Augment comments 4401520618 (README task permissions), 4401520628 (later README fences
+masked by early return), and 4401520638 (external launcher SIGTERM bypasses compiler cleanup).
+The quality job confirms the README permission failure. Repair one slice: declare environment
+access for both README entrypoints; compile all ordinary failures and expose fatal timeouts to the
+ratchet; share bounded timeout/cancellation cleanup, with a longer launcher grace than its worker.
+Add multi-fence failure and direct launcher-signal regressions. Verify the actual README task,
+snippet task/tests, workflow plumbing and structured check/lint/format; re-steer the same independent
+evaluator. Inspect and address the separate test-5 failure from its structured artifact.
+
+- Both new regressions went RED against the original PR code: a direct launcher SIGTERM left
+  a compiler marker, and the second type-error fence never appeared in diagnostics. After repair,
+  the focused process/compiler/workflow set is GREEN: 14 tests, 20.125s.
+- Real docs:snippets:test is GREEN: 20 tests, 20.107s. Main docs:snippets is GREEN, 41.689s.
+- The unchanged failing test-5 auth fixture passes locally (46.314s). CI's structured artifact
+  reports one failure among 1,455 passing tests, caused by `fetch failed` during auth installation.
+- Full README checking initially reports nine missing-import occurrences versus five coalesced
+  diagnostics in the old combined compiler. Original-main compiler and checker were executed from
+  temporary files (no source/lock mutation): PASS, 99 checked fences, five errors, four failing
+  READMEs, 10.047s. The fix retains that exact ratchet by coalescing identical missing targets;
+  different missing targets and distinct type-error locations remain separate, with eight policy
+  tests green. No ceiling or coverage floor changed.
+- Structured check passes 53 files; structured lint passes all nine touched TS files. The final
+  full README gate and independent re-review run after the repair commit.
+
 ## Design checkpoint
 
 1. Public surface: docs:snippets still type-checks documentation; hung checks fail with source path

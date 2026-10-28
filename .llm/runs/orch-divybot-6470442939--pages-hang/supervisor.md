@@ -8,3 +8,6 @@
 - Writable surface: `.github/workflows/pages.yml` build job only; `.llm/tools/docs/` snippet compiler/process runner, fixtures and tests; root `deno.json` docs snippet task only if required; this run directory; excluded assignment report handoff files.
 - Public records use repository-relative paths and omit private runtime identity.
 - No merge, tag, release, labels, force push, cache deletion or lock deletion authorized.
+- Review repair scope authorized by the owner’s “address each item, push fixes, keep the PR green”:
+  README fence task/shebang and caller coverage, compiler failure aggregation, signal forwarding,
+  focused regressions and `.llm/tools/gates/readme-fence-workflow_test.ts`; run evidence stays here.

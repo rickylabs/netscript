@@ -73,6 +73,23 @@ export interface ReadmeFenceCensus {
   readonly unattributedFailure: boolean;
 }
 
+/** Preserve Deno's missing-module coalescing when entrypoints are checked independently. */
+export function readmeFenceTypeErrorPaths(diagnostics: string): string[] {
+  const errors = new Map<string, string>();
+  for (const block of diagnostics.split(/(?=^TS\d+ \[ERROR\]:)/m)) {
+    const header = /^(TS\d+) \[ERROR\]: ([^\n]+)/.exec(block);
+    const location = /^\s+at file:\/\/([^\s:]+README\.md):(\d+):(\d+)/m.exec(block);
+    if (!header || !location) continue;
+    // The combined compiler reports a missing target once, even if several fences import it.
+    // Other errors remain distinct by source location, including identical type mismatches.
+    const identity = header[1] === 'TS2307'
+      ? `${header[1]}:${header[2]}`
+      : `${header[1]}:${location[1]}:${location[2]}:${location[3]}`;
+    errors.set(identity, location[1]);
+  }
+  return [...errors.values()];
+}
+
 /** Return every floor or ceiling violation, so a run reports all of them rather than the first. */
 export function readmeFenceRatchetFailures(census: ReadmeFenceCensus): string[] {
   const failures: string[] = [];

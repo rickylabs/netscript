@@ -48,6 +48,25 @@ Deno.test('actual compiler graph rejects a non-exported SDK symbol', async () =>
   assertStringIncludes(result.diagnostics, 'DefinitelyNotExportedByNetScript');
 });
 
+Deno.test('compiler reports later fence errors after an earlier tolerated failure', async () => {
+  const site = await Deno.makeTempDir({ prefix: 'snippet-all-failures-' });
+  try {
+    await Deno.writeTextFile(
+      join(site, 'page.md'),
+      '```ts\nconst firstFailure: string = 1;\n```\n\n' +
+        '```ts\nconst laterFailure: number = "wrong";\n```\n',
+    );
+    const analysis = await analyzeSnippetSite(site, { enforceCoverage: false });
+    const result = await compileSnippetAnalysis(analysis, repositoryRoot);
+    assertEquals(result.code, 1);
+    assertStringIncludes(result.diagnostics, 'firstFailure');
+    assertStringIncludes(result.diagnostics, 'laterFailure');
+    assertStringIncludes(result.diagnostics, 'page.md:6:');
+  } finally {
+    await Deno.remove(site, { recursive: true });
+  }
+});
+
 Deno.test('compiler deadline fails with the source fence and preserves the tracked lock', async () => {
   const lockBefore = await Deno.readTextFile(join(repositoryRoot, 'deno.lock'));
   const analysis = await analyzeSnippetSite(join(fixtureRoot, 'never-exits/docs/site'), {
@@ -56,6 +75,7 @@ Deno.test('compiler deadline fails with the source fence and preserves the track
   const result = await compileSnippetAnalysis(analysis, repositoryRoot, { timeoutMs: 1 });
   assertEquals(result.code, 1);
   assertStringIncludes(result.diagnostics, 'page.md:3: snippet process timed out after 1ms');
+  assert(result.incomplete);
   assert(result.rootLockUnchanged);
   assertEquals(await Deno.readTextFile(join(repositoryRoot, 'deno.lock')), lockBefore);
 });

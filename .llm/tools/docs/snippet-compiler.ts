@@ -18,6 +18,8 @@ interface SyntheticModule {
 /** Result of one compilation-only documentation check. */
 export interface SnippetCompilationResult {
   code: number;
+  /** Unfinished checks must never be absorbed by a caller's known-type-error ratchet. */
+  incomplete: boolean;
   stdout: string;
   diagnostics: string;
   memberCount: number;
@@ -147,6 +149,7 @@ export async function compileSnippetAnalysis(
     const tempLockPath = join(tempRoot, 'deno.lock');
     await Deno.copyFile(rootLockPath, tempLockPath);
     let code = 0;
+    let incomplete = false;
     let stdout = '';
     let diagnostics = '';
     // Attribute and bound each entrypoint independently; dependencies retain page-local modules.
@@ -166,7 +169,10 @@ export async function compileSnippetAnalysis(
       diagnostics += mapDiagnostics(output.stderr, modules);
       if (output.code !== 0) {
         code = output.code;
-        break;
+        if (output.timedOut || output.interrupted) {
+          incomplete = true;
+          break;
+        }
       }
     }
     const rootLockAfter = await Deno.readTextFile(rootLockPath);
@@ -175,6 +181,7 @@ export async function compileSnippetAnalysis(
     if (!rootLockUnchanged) throw new Error('tracked root deno.lock changed during snippet check');
     return {
       code,
+      incomplete,
       stdout,
       diagnostics,
       memberCount: workspace.memberCount,
