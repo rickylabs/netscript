@@ -42,9 +42,9 @@ the `netscript-design` skill.
 ## New components or screens
 
 - Start from the closest existing component's variant. Keep the theme's depth and shape rules.
-- If a new visual role is needed, add it as `<id>/<path>`, list it in the language pack's role
-  manifest (`DESIGN.md` → _NetScript Mapping_; GUIDELINES §2.4) and register it in code (#2414).
-  Don't reuse an unrelated role.
+- If a new visual role is needed, add it as `<id>/<path>`, list it in the style's role manifest
+  (`DESIGN.md` → _NetScript Mapping_; GUIDELINES §2.4) and register it in code (#2414). Don't reuse
+  an unrelated role.
 - Add the new component to the state sheet, in Light and Dark.
 
 ## Self-check before handing off
