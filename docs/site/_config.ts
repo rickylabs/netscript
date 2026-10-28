@@ -29,6 +29,7 @@ import { resolveXref } from './_data/xref.ts';
 import { assertDiagramAssetsExist } from './_diagrams/validate.ts';
 import { aiTooling } from './_plugins/ai-tooling.ts';
 import { fileTreeFence, renderFileTree } from './_plugins/file-tree.ts';
+import { markdownAlerts } from './_plugins/markdown-alerts.ts';
 import { getDocsLane } from './_data.ts';
 import { CALLOUT_ICONS, CALLOUT_TYPES, calloutType } from '../../tools/docs-site/callout-types.ts';
 import { apiKind, apiKindRole } from '../../tools/docs-site/api-kinds.ts';
@@ -55,6 +56,9 @@ import { inlineUtilityDiagram } from '../../tools/docs-site/inline-diagram.ts';
  * File trees: fenced `tree` blocks render as the `fileTree` component (one renderer in
  * `_plugins/file-tree.ts`); the Markdown twin keeps the authored ASCII as a `text` fence.
  *
+ * Alerts: `> [!NOTE]`-style blockquotes render as the callout component
+ * (`_plugins/markdown-alerts.ts`); the Markdown twin writes them back as alerts.
+ *
  * xref (OD2): the `xref` filter + `comp.xref` resolve stable keys from
  * `_data/xref.ts` to hrefs and THROW on an unknown key, so the build is the link
  * checker (it exits non-zero on a dead reference). `resolveXref` is also exposed
@@ -79,7 +83,7 @@ const site: ReturnType<typeof lume> = lume({
   dest: '_site',
 }, {
   markdown: {
-    plugins: [[anchor, { slugify, level: [1, 2, 3, 4] }], fileTreeFence],
+    plugins: [[anchor, { slugify, level: [1, 2, 3, 4] }], fileTreeFence, markdownAlerts],
   },
 });
 

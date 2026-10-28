@@ -3,6 +3,7 @@ import { Page } from 'lume/core/file.ts';
 import { releaseVersion } from '../_data.ts';
 import { buildLlmsFull, sectionOf, SECTIONS } from './llms-policy.ts';
 import { TREE_SOURCE_ATTRIBUTE } from './file-tree.ts';
+import { ALERT_ATTRIBUTE } from './markdown-alerts.ts';
 
 /**
  * AI-affordance tooling for the NetScript docs site (SOTA study rec #1).
@@ -238,6 +239,15 @@ function blockMd(node: ChildNode, origin: URL): string {
       const kind = el.getAttribute('data-variant');
       const label = el.querySelector('.ns-callout__label');
       const body = el.querySelector('.ns-callout__body');
+      // A Markdown alert is written back as authored: `[!TYPE]`, then an optional title.
+      const marker = el.getAttribute(ALERT_ATTRIBUTE);
+      if (el.classList.contains('ns-callout') && kind && label && body && marker) {
+        const title = inlineChildren(label, origin).trim();
+        const head = title && title !== CALLOUT_TYPES[calloutType(kind)].label
+          ? `[!${marker}] ${title}`
+          : `[!${marker}]`;
+        return quoteMd(`${head}\n${childBlocks(body, origin)}`);
+      }
       if (el.classList.contains('ns-callout') && kind && label && body) {
         return quoteMd(
           `[!${CALLOUT_TYPES[calloutType(kind)].markdown}]\n${
