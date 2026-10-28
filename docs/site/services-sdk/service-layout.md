@@ -68,9 +68,10 @@ type-only in the collapsed application module, so adapter imports do not reverse
 | Auth        | Compose simple auth options in `src/main.ts`.                                                        | Auth wiring becomes reusable or needs independent tests.                                           | Domain policy.                                      |
 | Tests       | Colocate a module test as `*_test.ts`.                                                               | A suite crosses several modules; place it in `tests/` and include that directory in the test task. | An empty test target.                               |
 
-The generator emits the single-entity shape. It does not yet generate multi-entity services or
-`service add-handler` use cases, so place a new operation's logic in the application module and
-bind it from the router manually.
+The generator currently emits the single-entity shape. Expanded multi-entity generation and
+`service add-handler` use-case generation are tracked in
+[#2113](https://github.com/rickylabs/netscript/issues/2113) for 0.0.9. Today, place a new operation's
+logic in the application module and bind it from the router manually.
 
 ## Migrate an existing service
 

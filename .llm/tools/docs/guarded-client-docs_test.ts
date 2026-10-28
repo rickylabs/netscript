@@ -22,8 +22,8 @@ Deno.test('route authorization tutorial retains completion sections and tracked 
       '<!-- caveat: arch-debt:seamless-auth-roadmap -->',
       '## Verify your progress',
       '## What you built',
-      '## Next Steps',
-      '{{ comp.nextPrev(',
+      '## Next steps',
+      'next: { label: "6 · Deploy", href: "/tutorials/workspace/06-deploy/" }',
     ]
   ) {
     assert(tutorial.includes(marker), `Missing tutorial completion content: ${marker}`);
