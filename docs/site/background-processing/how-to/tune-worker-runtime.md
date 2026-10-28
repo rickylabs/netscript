@@ -8,34 +8,43 @@ oldUrl: /how-to/tune-worker-runtime/
 
 # Tune the worker runtime
 
-Tune queue **concurrency**, per-topic **deployment mode**, per-task **Deno permissions**,
-and **timeouts/retries** without changing a job handler.
+This recipe tunes queue concurrency, per-topic scaling, task timeouts and retries, and the abort
+cleanup budget without changing a job handler.
 
-Jobs currently execute in-process in the background worker service. Concurrency overlaps
-asynchronous I/O; it does not create Web Worker isolates or parallelize synchronous CPU work.
-These settings live in `config/official-plugins/mod.ts` (`defineWorkers(...)`), per-task
-runtime config, or an environment variable read by the worker entrypoint. See
-[Background jobs](/capabilities/background-jobs/) for handler authoring.
+Jobs execute in-process in the background worker service. Concurrency overlaps asynchronous I/O; it
+does not create Web Worker isolates or parallelize synchronous CPU work (see
+[worker runtime modes](/background-processing/workers/#worker-runtime-modes-worker_runtimes)). The
+settings live in `config/official-plugins/mod.ts` (`defineWorkers(...)`), in per-task runtime
+config, or in an environment variable that the worker entrypoint reads. For handler authoring, see
+[Background jobs](/background-processing/workers/).
 
 ## Prerequisites
 
-{{ comp.apiTable({
-  caption: "What you need before tuning",
-  rows: [
-    { name: "workers plugin", type: "plugins/workers/", desc: "Public install: netscript plugin install @netscript/plugin-workers. Local contributor samples: deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples. The workers API service (on its assigned port) enqueues; a separate background process executes." },
-    { name: "config/official-plugins/mod.ts", type: "defineWorkers(...)", desc: "The generated worker config block — where concurrency, queueProvider, and per-topic scaling live." },
-    { name: "@netscript/plugin-workers-core/config", type: "import", desc: "defineWorkers, defineJobs, and the WorkersConfig / ScalingConfig / TaskConfig types." },
-    { name: "Aspire up (for live runs)", type: "cd aspire && aspire start", desc: "The background runner needs Postgres + KV. Aspire injects the worker env vars; see Production pitfalls." }
-  ]
-}) }}
+- The workers plugin, installed with `netscript plugin install @netscript/plugin-workers`. For local
+  contributor samples, use
+  `deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples`.
+  The workers API service, on its assigned port, enqueues; a separate background process executes.
+- `config/official-plugins/mod.ts`, the generated `defineWorkers(...)` block where concurrency,
+  `queueProvider` and per-topic scaling live.
+- `@netscript/plugin-workers-core/config`, which exports `defineWorkers`, `defineJobs` and the
+  `WorkersConfig`, `ScalingConfig` and `TaskConfig` types.
+- For live runs, Aspire (`cd aspire && aspire start`). The background runner needs Postgres and KV,
+  and Aspire injects the worker environment variables.
+- For Step 3, the `ns-workers` CLI. It is a name you give the workers plugin's CLI; the scaffold does
+  not create it. Install it once:
 
-## Knob 1 — Default concurrency
+```bash
+deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli
+```
 
-`concurrency` on the workers config declares queue concurrency (schema default `2`).
-Handlers share the background worker's isolate. Increase concurrency for I/O-bound work,
-then measure throughput and memory under load; there is no per-slot isolate allocation.
+Without the install, run each command as
+`deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli <verb …>`.
 
-Show the type before the call site:
+## Step 1 — Set the default concurrency
+
+`concurrency` on the workers config declares queue concurrency (schema default `2`). Handlers share
+the background worker's isolate, so no isolate is allocated per slot. Raise concurrency for
+I/O-bound work, then measure throughput and memory under load.
 
 {{ comp.apiTable({
   caption: "WorkersConfigData — top-level worker config (@netscript/plugin-workers-core/config)",
@@ -44,7 +53,7 @@ Show the type before the call site:
     { name: "queueProvider", type: "'auto' | 'deno-kv' | 'redis' | 'postgres' | 'amqp'", desc: "Queue backend. 'auto' resolves one for you. Default 'auto'." },
     { name: "queueName", type: "string", desc: "Queue the runner consumes from. Default 'jobs'." },
     { name: "jobsDir / tasksDir", type: "string", desc: "Directories scanned for default-exported job and task modules. Defaults ./workers/jobs and ./workers/tasks." },
-    { name: "groups", type: "WorkerGroupData[]", desc: "Per-topic worker groups, each with its own scaling and retention (Knob 2)." },
+    { name: "groups", type: "WorkerGroupData[]", desc: "Per-topic worker groups, each with its own scaling and retention (Step 2)." },
     { name: "enabled", type: "boolean", desc: "Whether workers run at all. Default true." }
   ]
 }) }}
@@ -64,12 +73,11 @@ export const workers = defineWorkers({
 });
 ```
 
-## Knob 2 — Per-topic scaling (concurrency + mode)
+## Step 2 — Scale per topic
 
-Different topics deserve different concurrency budgets. A `WorkerGroup` binds a queue `topic` to its
-own `scaling` policy, so you can run a hot `webhooks` topic at concurrency 10 while a heavy
-`reports` topic stays at 1. The `mode` selects whether the worker and scheduler share one
-runner (`combined`) or run as separate processes (`distributed`).
+A `WorkerGroup` binds a queue `topic` to its own `scaling` policy, so a hot `webhooks` topic can run
+at concurrency 10 while a heavy `reports` topic stays at 1. `mode` decides whether the worker and the
+scheduler share one runner (`combined`) or run as separate processes (`distributed`).
 
 {{ comp.apiTable({
   caption: "ScalingConfigData — per-topic scaling (WorkerGroupData.scaling)",
@@ -118,26 +126,10 @@ export const workers = defineWorkers({
 });
 ```
 
-## Knob 3 — The per-task Deno worker runtime & permissions
+## Step 3 — Set task runtime, timeout and retries
 
-A **polyglot task** (`defineTask`, or a `TaskConfig` entry in `workers/runtime/`) runs as a
-spawned process. For the `deno` runtime, the task's `permissions` object is compiled
-**directly into the child `deno run` command's `--allow-*` flags** — a `deno` task with no
-`permissions` set falls back to `--allow-all`, so set them deliberately. The shape mirrors
-Deno's permission model: each field is `boolean` (grant/deny all) or a `string[]` allowlist.
-
-{{ comp.apiTable({
-  caption: "WorkerConfigPermissions — per-task Deno grants (compiled to --allow-* flags)",
-  rows: [
-    { name: "net", type: "boolean | string[]", desc: "Network access. true → --allow-net; ['api.stripe.com'] → --allow-net=api.stripe.com." },
-    { name: "read", type: "boolean | string[]", desc: "Filesystem read. Pass a path allowlist to scope it." },
-    { name: "write", type: "boolean | string[]", desc: "Filesystem write. Scope to an output dir in production." },
-    { name: "env", type: "boolean | string[]", desc: "Environment variable access." },
-    { name: "run", type: "boolean | string[]", desc: "Subprocess access (--allow-run). Needed when the task shells out." },
-    { name: "ffi", type: "boolean", desc: "Foreign-interface access (--allow-ffi). Leave false unless a native binding is required." },
-    { name: "import", type: "string[]", desc: "Allowed specifiers for dynamic imports (--allow-import=…)." }
-  ]
-}) }}
+A polyglot task (`defineTask`, or a `TaskConfig` entry in `workers/runtime/`) runs as a spawned
+process. `TaskConfig` holds its runtime, timeout, retry and permission settings.
 
 {{ comp.apiTable({
   caption: "TaskConfig — runtime, timeout & retry knobs (@netscript/plugin-workers-core/config)",
@@ -148,33 +140,21 @@ Deno's permission model: each field is `boolean` (grant/deny all) or a `string[]
     { name: "retryDelay", type: "number", desc: "Delay between retries in ms. Schema default 1000." },
     { name: "maxConcurrency", type: "number", desc: "Max concurrent runs of this one task. Schema default 1." },
     { name: "priority", type: "number", desc: "Dispatch priority 0–100. Schema default 50." },
-    { name: "permissions", type: "WorkerConfigPermissions", desc: "Deno grants for the task (above). Omit on a 'deno' task and it runs with --allow-all." }
+    { name: "permissions", type: "WorkerConfigPermissions", desc: "Deno grants for the task. Omit on a 'deno' task and it runs with --allow-all." }
   ]
 }) }}
 
-The framework also ships named presets so you do not hand-roll the object. `permissions` from
-`@netscript/plugin-workers-core` exposes `minimal`, `none`, `network`, `filesystem`,
-`readOnly`, `subprocess`, `full`, and `allAccess`.
-
-Start a new Deno task from the CLI, then tune the generated builder instead of creating its file by
-hand. The `add-task` verb uses the spaced `add task` shell syntax:
-
-{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
-<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
-not create it. Install it once, globally, and every <code>ns-workers</code> command on this page
-works as written:
-<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
-Rather not install it? Each <code>ns-workers &lt;verb …&gt;</code> is exactly
-<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
-that full form instead.
-{{ /comp }}
+Scaffold a new Deno task with the CLI, then tune the generated builder instead of writing the file by
+hand. The `add-task` verb uses the spaced `add task` syntax:
 
 ```sh
 ns-workers add task charge-customer --runtime=deno
 ```
 
-For a non-Deno entrypoint, choose its runtime and path explicitly, for example
+For a non-Deno entrypoint, set its runtime and path, for example
 `ns-workers add task sync-report --runtime=python --entrypoint=scripts/sync-report.py`.
+
+Declare the task as a scoped builder, from a named preset, or as declarative runtime config:
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -194,107 +174,82 @@ For a non-Deno entrypoint, choose its runtime and path explicitly, for example
   }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Jobs have their own timeout/retry defaults" } }}
-A <strong>job</strong> (<code>JobConfig</code>) and a <strong>task</strong>
-(<code>TaskConfig</code>) carry the same permission shape but <em>different</em> schema
-defaults: a job defaults to <code>timeout: 60000</code> (60s) and <code>maxRetries: 3</code>,
-while a task defaults to <code>timeout: 300000</code> (5&nbsp;min) and <code>maxRetries: 1</code>.
-Set both explicitly in production rather than relying on the default that happens to apply.
-{{ /comp }}
+> [!NOTE]
+> Jobs (`JobConfig`) and tasks (`TaskConfig`) have different schema defaults. A job defaults to
+> `timeout: 60000` (60&nbsp;s) and `maxRetries: 3`; a task defaults to `timeout: 300000`
+> (5&nbsp;min) and `maxRetries: 1`. Set both explicitly in production.
 
-## Knob 4 — Queue concurrency at the process level
+> [!CAUTION]
+> A `deno` task with no `permissions` object runs with `--allow-all`: it can read the whole disk and
+> reach any host. Set an explicit, path- and host-scoped `permissions` object or a tightened preset
+> on every Deno task you ship.
+> [Restrict worker task permissions](/background-processing/how-to/restrict-worker-task-permissions/)
+> lists every field, the flag it emits and the presets.
 
-The numbers above configure *definitions*. The background entrypoint
-(`plugins/workers/bin/combined.ts` or `worker.ts`) reads **`WORKERS_CONCURRENCY`** (default `1`)
-and passes it as queue concurrency. The in-process runner ignores the legacy `poolSize`
-and `workerUrl` options; it does not allocate an isolate pool.
+## Step 4 — Override concurrency per process
+
+The settings above configure definitions. The background entrypoint
+(`plugins/workers/bin/combined.ts` or `worker.ts`) reads **`WORKERS_CONCURRENCY`** (default `1`) and
+passes it as queue concurrency. The in-process runner ignores the legacy `poolSize` and `workerUrl`
+options and allocates no isolate pool.
 
 ```bash
 # Override the queue concurrency for the background worker process.
 WORKERS_CONCURRENCY=8 deno run -A plugins/workers/bin/combined.ts
 ```
 
-Under `aspire start` you do not set it by hand: the workers plugin's Aspire metadata injects
+Under `aspire start` you do not set it by hand. The workers plugin's Aspire metadata injects
 `WORKERS_CONCURRENCY` on the background resource with the plugin's declared default (`2`), and the
-deploy-generated `.env` writes the same variable. Change the declared value in `appsettings.json`
-(the background processor's `Concurrency`) and regenerate the AppHost helpers with
+deploy-generated `.env` writes the same variable. To change it, edit the background processor's
+`Concurrency` in `appsettings.json` and regenerate the AppHost helpers with
 `netscript service generate`, or override `WORKERS_CONCURRENCY` in the environment.
-
-## Choosing a runner mode
-
-Only **in-process** job execution is implemented. `WORKER_RUNTIMES` / `WorkerRuntime`
-are compatibility vocabulary, not a selectable runtime setting. The `web-worker` and
-`subprocess` job-runner modes are reserved. Polyglot task executors can spawn subprocesses;
-that does not enable subprocess isolation for job handlers.
-
-{{ comp.apiTable({
-  caption: "WORKER_RUNTIMES — implemented and reserved job-runner vocabulary",
-  rows: [
-    { name: "in-process", type: "WorkerRuntime", desc: "Implemented: handlers share the background worker process and event loop; asynchronous I/O can overlap, synchronous CPU work cannot run in parallel." },
-    { name: "web-worker", type: "WorkerRuntime", desc: "Reserved job-runner vocabulary; no Web Worker isolate pool is implemented." },
-    { name: "subprocess", type: "WorkerRuntime", desc: "Reserved job-runner vocabulary. Subprocesses are implemented for task executors, not job handlers; Deno task permissions apply only to Deno tasks." }
-  ]
-}) }}
+[Runtime configuration](/orchestration-runtime/runtime-config/) covers the resolution order: schema
+default, config file, environment, override.
 
 ## Abort cleanup budget
 
-`InProcessJobRunner` accepts `abortGracePeriodMs` in its constructor options,
-with a default of **1,000 ms**. After timeout, shutdown, or caller cancellation,
-the runner aborts the handler signal immediately and waits up to this budget for
-handler/progress cleanup. If cleanup does not settle, dispatch rejects with the
-abort reason. Returning success after abort still rejects.
+`InProcessJobRunner` accepts `abortGracePeriodMs` in its constructor options, with a default of
+**1,000 ms**. After a timeout, a shutdown or a caller cancellation, the runner aborts the handler
+signal immediately and waits up to this budget for handler and progress cleanup. If cleanup does not
+settle, dispatch rejects with the abort reason. Returning success after an abort still rejects.
 
-This budget bounds waiting; it cannot physically terminate in-process JavaScript.
-A handler that ignores its signal can continue side effects after dispatch rejects,
-and a blocking synchronous loop prevents timers from firing. Use abort-aware I/O,
-yielding checkpoints, and `finally` cleanup. Do not describe this setting as a
-forced worker or subprocess termination delay, or as a top-level `defineWorkers`
-configuration field.
+The budget bounds waiting; it cannot stop in-process JavaScript. A handler that ignores its signal
+can keep causing side effects after dispatch rejects, and a blocking synchronous loop prevents
+timers from firing. Use abort-aware I/O, yielding checkpoints and `finally` cleanup. The setting is
+not a forced termination delay for a worker or subprocess, and it is not a top-level
+`defineWorkers` field.
 
-See [JobContext cancellation](/reference/plugin-workers-core/#job-context-cancellation)
-for `deadlineAt` selection and reason names. The shutdown manager's overall timeout
-is a separate host drain budget; size both within your platform's shutdown window.
+The shutdown manager's overall timeout is a separate host drain budget; size both within your
+platform's shutdown window. See
+[JobContext cancellation](/reference/plugin-workers-core/#job-context-cancellation) for `deadlineAt`
+selection and reason names.
 
-## In-production pitfalls
+## Production notes
 
-{{ comp callout { type: "important", title: "A 'deno' task with no permissions runs --allow-all" } }}
-The Deno runtime adapter (<code>buildDenoPermissionFlags</code>) returns
-<code>--allow-all</code> when a task's <code>permissions</code> object is absent. That is
-convenient for local scaffolding and dangerous in production: an unpinned task can read your
-whole disk and reach any host. Always set an explicit <code>permissions</code> object (or a
-tightened preset) on every <code>deno</code> task you ship. Path-scope <code>read</code>/
-<code>write</code> and host-scope <code>net</code> rather than passing bare <code>true</code>.
-{{ /comp }}
+> [!WARNING]
+> **Concurrency overlaps I/O, not synchronous CPU work.** All job handlers share the background
+> worker's event loop. A synchronous CPU-bound handler blocks other jobs, queue listeners and health
+> checks until it yields, and raising `WORKERS_CONCURRENCY` adds no CPU parallelism. Concurrent
+> handlers still hold payloads and allocate memory, so measure under realistic load. Use a
+> subprocess task executor for work that needs its own process.
 
-{{ comp callout { type: "warning", title: "Concurrency overlaps I/O, not synchronous CPU work" } }}
-All job handlers share the background worker's event loop. A synchronous CPU-bound handler
-blocks other jobs, queue listeners, and health checks until it yields. Increasing
-<code>WORKERS_CONCURRENCY</code> does not add CPU parallelism. Concurrent handlers still
-retain payloads and allocate memory, so measure memory and throughput under realistic load.
-Use a subprocess task executor for work that needs a separate process.
-{{ /comp }}
+> [!WARNING]
+> **Bound timeouts and retries together.** A task with `timeout: 300000` and `maxRetries: 3` can
+> hold a worker slot for about 15&nbsp;minutes of wall time, and each retry first waits
+> `retryDelay`. Under a saturated pool that is head-of-line blocking. Size `timeout` to the work,
+> keep `maxRetries` small for slow tasks, and pair retries with an `idempotencyKey` on enqueue so a
+> re-delivery after a forced restart does not charge twice. See
+> [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) for delivery
+> semantics.
 
-{{ comp callout { type: "warning", title: "Timeouts and retries interact — bound them together" } }}
-A task with <code>timeout: 300000</code> and <code>maxRetries: 3</code> can occupy a worker
-slot for up to ~15&nbsp;minutes of wall time before it gives up, and each retry waits
-<code>retryDelay</code> first. Under a saturated pool that is real head-of-line blocking. Size
-<code>timeout</code> to the work, keep <code>maxRetries</code> small for slow tasks, and pair
-retries with an <code>idempotencyKey</code> on enqueue so a re-delivery after a forced restart
-does not double-charge. See
-<a href="/data-persistence/how-to/choose-a-queue-provider/">Choose a queue provider</a> for delivery semantics.
-{{ /comp }}
+## Next steps
 
-## See also
+Restrict what each Deno task can reach with
+[Restrict worker task permissions](/background-processing/how-to/restrict-worker-task-permissions/).
 
-{{ comp.xref({ key: "cap:background-jobs" }) }}
-
-{{ comp.xref({ key: "cap:polyglot-tasks" }) }}
-
-{{ comp.xref({ key: "howto:choose-a-queue-provider" }) }}
-
-{{ comp.xref({ key: "howto:run-a-polyglot-task" }) }}
-
-{{ comp.xref({ key: "ref:workers" }) }}
+- {{ comp.xref({ key: "howto:choose-a-queue-provider" }) }}
+- {{ comp.xref({ key: "howto:run-a-polyglot-task" }) }}
+- {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}
 
 {{ comp.nextPrev({
   prev: { label: "Choose a queue provider", href: "/data-persistence/how-to/choose-a-queue-provider/" },

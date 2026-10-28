@@ -8,96 +8,67 @@ oldUrl: /how-to/add-authentication/
 
 # Add authentication
 
-**Scope.** This recipe adds sign-in, sessions, and a `/me` identity endpoint to an existing
-NetScript workspace by installing the official **`auth`** plugin. You will choose an
-authentication backend, set the backend's environment, run the auth database migration, and
-verify a live session through the generated Fresh app on its Aspire-discovered origin. By the end you have a
-working OAuth/OIDC sign-in flow on the default backend (`kv-oauth`) and a clear picture of what
-the two non-interactive backends (`workos`, `better-auth`) do and do not provide.
+This recipe installs the `auth` plugin in an existing workspace, selects a backend, runs the auth
+database migration and signs in through the generated Fresh app. You finish with a working
+OAuth/OIDC sign-in on the default `kv-oauth` backend.
 
-This is the task-oriented companion to the [authentication capability hub](/capabilities/auth/)
-(the headline API and endpoint map) and the [authentication model explanation](/explanation/auth-model/)
-(why the backend is a pure adapter behind a port). If you want the _why_, read those; if you want
-the _how_, stay here.
+## Prerequisites
 
-{{ comp callout { type: "important", title: "Aspire is the control plane — configure it before starting" } }}
-The <code>auth-api</code> service and its database/KV dependencies run as resources in the Aspire
-graph (the database is Postgres, the recommended engine; <code>mysql</code> / <code>mssql</code> run as Aspire
-containers too, while <code>sqlite</code> is file-backed — pick one at scaffold with <code>--db</code>). Bring orchestration up <strong>before</strong> you run any <code>netscript db</code> command
-or hit an auth endpoint, after configuring and exporting the provider environment in Step 3. Start
-the AppHost in Step 4 (dashboard at <a href="https://localhost:18888">https://localhost:18888</a>). DB commands require
-Aspire running first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource
-graph.
-{{ /comp }}
+- **A workspace with a database.** The `auth` plugin sets `requiresDb: true` and
+  `requiresKv: true`, so the Aspire graph needs a database and KV (Redis). Postgres is the
+  recommended engine; `mysql`, `mssql` and `sqlite` also work, selected at scaffold time with
+  `netscript init --db <engine>`. Postgres, MySQL and SQL Server run as Aspire container resources;
+  SQLite is file-backed. If you have no workspace yet, scaffold one with the tutorials first.
+- **The `netscript` CLI on your `PATH`.** Install it with
+  `deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}` and
+  confirm with `netscript --help`.
+- **OAuth credentials.** The default `kv-oauth` backend needs a real OAuth/OIDC app, such as a
+  Google client id, client secret and redirect URI. Without provider environment, `signin` and
+  `callback` are non-functional stubs.
 
-{{ comp callout { type: "note", title: "Alpha package pins" } }}
-The CLI scaffold emits exact alpha specifiers such as
-<code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code>. Add the plugin through
-<code>netscript plugin install @netscript/plugin-auth</code> so the workspace gets the matching auth
-dependency, generated glue, registry entries, and Aspire resources together.
-{{ /comp }}
+Run every command from the workspace root.
 
-## Before you start
-
-You need an existing workspace with a database, because the `kv-oauth` and `better-auth` backends
-persist sessions and accounts. The `auth` plugin sets `requiresDb: true` and `requiresKv: true`, so
-both a database and KV (Redis) must be in the Aspire graph. The database is polyglot — Postgres is
-the recommended default, but `mysql`, `mssql`, or `sqlite` are first-class alternatives selected at
-scaffold time with `netscript init --db <engine>`. (Postgres/MySQL/SQL Server run as an Aspire
-container resource; SQLite is file-backed with no container.)
-
-{{ comp.apiTable({
-caption: "Prerequisites",
-rows: [
-{ name: "Workspace", type: "netscript init", desc: "An existing project. If you have none, scaffold one first — see the tutorials." },
-{ name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + ". Confirm with netscript --help." },
-{ name: "Aspire", type: "aspire start", desc: "Configure/export auth environment, then start the AppHost before any db command or endpoint call." },
-{ name: "OAuth credentials", type: "client id / secret", desc: "For the default kv-oauth backend you need a real OAuth/OIDC app (e.g. a Google client id + secret + redirect URI). Without provider env, signin/callback are non-functional stubs." }
-]
-}) }}
-
-Throughout, run commands from your workspace root.
+> [!IMPORTANT]
+> Configure and export the provider environment (Step 3) before you start Aspire (Step 4), and
+> start Aspire before any `netscript db` command or auth request. The `auth-api` service and its
+> database and KV dependencies are resources in the Aspire graph; see
+> [the Aspire explanation](/explanation/aspire/).
 
 ## Step 1 — Add the `auth` plugin
 
-The `auth` plugin is a first-class official plugin installed the same way as `workers`, `sagas`,
-`triggers`, and `streams`. Add it with `plugin install`:
+Install `auth` the same way as the other official plugins (`workers`, `sagas`, `triggers` and
+`streams`):
 
 ```sh
 netscript plugin install @netscript/plugin-auth --port 8094
 ```
 
-This installs the unified `@netscript/plugin-auth` dependency, emits the user-owned `auth/mod.ts`
-glue barrel, and registers it. The plugin package composes **one active backend** behind the
-`auth-api` oRPC service and contributes the Prisma schema (`auth.prisma`), service entry, and
-`/api/v1/auth/*` routes.
+This installs the `@netscript/plugin-auth` dependency, emits the user-owned `auth/mod.ts` glue
+barrel and registers it. The plugin composes one active backend behind the `auth-api` oRPC service
+and contributes the `auth.prisma` schema, the service entry and the `/api/v1/auth/*` routes. The
+installer pins exact alpha specifiers such as `jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}`,
+so the workspace gets matching dependencies, generated glue, registry entries and Aspire resources
+together.
 
-{{ comp callout { type: "important", title: "Pin the port your OAuth callback is registered on" } }}
-An identity provider matches the redirect URI exactly, port included, so the <code>auth-api</code>
-address in <code>NETSCRIPT_AUTH_REDIRECT_URI</code> must not move between runs. <code>--port 8094</code>
-pins it: the installer writes <code>"HostPort": 8094</code> on the plugin's
-<code>NetScript.Plugins</code> entry in <code>appsettings.json</code>, and the generated AppHost
-registers the plugin with <code>withHttpEndpoint({ port: 8094, env: 'PORT' })</code>. You can also set
-or change <code>HostPort</code> on that entry by hand and regenerate with
-<code>netscript service generate</code>. The pin is operator-owned: <code>netscript plugin update</code>
-and a forced re-install without <code>--port</code> keep it; only a new <code>--port</code> replaces it.
-Without a pin, Aspire allocates a fresh host port at every start, which is right for a plugin nobody
-outside the graph calls — and wrong for a callback. The cost of pinning: the port is a machine-global
-reservation, so <code>aspire start --isolated</code> cannot randomise it and a second workspace pinning
-the same port collides. Nothing is pinned unless you ask.
-{{ /comp }}
+> [!IMPORTANT]
+> Pin the port your OAuth callback is registered on. An identity provider matches the redirect URI
+> exactly, port included, so the `auth-api` address in `NETSCRIPT_AUTH_REDIRECT_URI` must not move
+> between runs. `--port 8094` pins it.
 
-{{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
-<code>@netscript/plugin-auth</code> is designed as a single-backend runtime composition layer. The active implementation (selected from <code>@netscript/auth-kv-oauth</code>, <code>@netscript/auth-workos</code>, or <code>@netscript/auth-better-auth</code>) is resolved statically at startup. This boundary ensures session isolation and keeps the validation path predictable, meaning that multi-active routing, cross-backend account linking, and global multi-store logout are not supported in the core runtime. Complex multi-tenant scenarios must be coordinated via an upstream identity router or external identity aggregator.
-
-<!-- caveat: arch-debt:auth-single-active-backend-boundary -->
-
-{{ /comp }}
+The installer writes `"HostPort": 8094` on the plugin's `NetScript.Plugins` entry in
+`appsettings.json`, and the generated AppHost registers the plugin with
+`withHttpEndpoint({ port: 8094, env: 'PORT' })`. To set or change the pin by hand, edit `HostPort` on
+that entry and regenerate with `netscript service generate`. The pin is operator-owned:
+`netscript plugin update` and a forced re-install without `--port` keep it, and only a new `--port`
+replaces it. Without a pin, Aspire allocates a fresh host port at every start, which suits a plugin
+nobody outside the graph calls but not a callback. A pinned port is a machine-global reservation:
+`aspire start --isolated` cannot randomise it, and a second workspace pinning the same port
+collides. Nothing is pinned unless you ask.
 
 ## Step 2 — Choose a backend with the auth CLI
 
-The active backend is selected by the `NETSCRIPT_AUTH_BACKEND` environment variable (or the
-`auth.backend` appsettings key). Three backends are valid; the default is **`kv-oauth`**.
+`NETSCRIPT_AUTH_BACKEND` (or the `auth.backend` appsettings key) selects the active backend. Three
+backends are valid; the default is `kv-oauth`.
 
 {{ comp.apiTable({
 caption: "Auth backends — capability matrix (NETSCRIPT_AUTH_BACKEND)",
@@ -108,15 +79,17 @@ rows: [
 ]
 }) }}
 
-{{ comp callout { type: "important", title: "Interactive Authentication Boundary" } }}
-Only the <code>kv-oauth</code> backend implements the <code>InteractiveFlowPort</code> required to drive login redirects directly via NetScript's <code>signin</code> and <code>callback</code> endpoints. Under <code>workos</code> and <code>better-auth</code>, these routes intentionally return a <code>AUTH_PROVIDER_ERROR</code> (502). This boundary exists because these backends are designed for external verification models where authentication is completed by a frontend client or parent application. In this architecture, you must initiate the authentication flow using the provider's direct SDK or login page, using NetScript to validate the resulting session tokens. Implementing a native <code>InteractiveFlowPort</code> for <code>better-auth</code> is tracked under roadmap item R2.
+> [!NOTE]
+> `workos` and `better-auth` verify sessions that the provider's own SDK or login page created, so
+> their `signin` and `callback` routes return `AUTH_PROVIDER_ERROR` (502). Only one backend is
+> active per deployment. [The three backends](/identity-access/auth/#the-three-backends) covers
+> both boundaries.
 
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
+<!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 
-{{ /comp }}
-
-For the rest of this recipe we use `kv-oauth`. Persist the choice in the workspace boot seam and
-confirm what the service will use:
+This recipe uses `kv-oauth`. Persist the choice in the workspace boot seam and confirm what the
+service will use:
 
 ```sh
 netscript plugin auth backend set kv-oauth
@@ -125,14 +98,14 @@ netscript plugin doctor
 ```
 
 The command reconciles `NETSCRIPT_AUTH_BACKEND` in the project `.env` and the canonical plugin
-selector in appsettings. Export the environment before starting the AppHost, as shown in Step 3. Directly setting the environment variable or the
-`auth.backend` / `Auth.Backend` appsettings key remains an escape hatch for deployment systems that
-own configuration externally.
+selector in appsettings; Step 3 exports the environment before Aspire starts. Deployment systems
+that own configuration externally can still set the environment variable or the `auth.backend` /
+`Auth.Backend` appsettings key directly.
 
 ## Step 3 — Configure the provider and secrets
 
-Each backend reads its own environment block. The auth CLI owns the normal setup path and writes the
-same project `.env` seam as Step 2. For GitHub on `kv-oauth`:
+Each backend reads its own environment block. The auth CLI writes it to the same project `.env` as
+Step 2. For GitHub on `kv-oauth`:
 
 ```sh
 # Your credential source exports NETSCRIPT_AUTH_CLIENT_SECRET.
@@ -148,12 +121,11 @@ set -a
 set +a
 ```
 
-GitHub is OAuth 2.0, so the preset emits no `NETSCRIPT_AUTH_ISSUER` and ignores `--issuer`.
-The CLI prints a notice when `--issuer` is ignored. Re-running the command removes an issuer saved
-by an older preset. The runtime also ignores an issuer inherited from an old shell or deployment
-when `NETSCRIPT_AUTH_PROVIDER_ID=github`. GitHub does not serve an OIDC
-discovery document; sign-in uses these explicit endpoints and derives the stable subject
-`github:<id>` from userinfo instead:
+GitHub is OAuth 2.0, not OIDC. The preset emits no `NETSCRIPT_AUTH_ISSUER`, ignores `--issuer` with
+a notice, and removes an issuer that an older preset saved when you re-run the command. With
+`NETSCRIPT_AUTH_PROVIDER_ID=github`, the runtime also ignores an issuer inherited from an old shell
+or deployment. GitHub serves no OIDC discovery document, so sign-in uses these explicit endpoints and
+derives the stable subject `github:<id>` from userinfo:
 
 ```dotenv
 NETSCRIPT_AUTH_PROVIDER_ID=github
@@ -163,22 +135,25 @@ NETSCRIPT_AUTH_USERINFO_ENDPOINT=https://api.github.com/user
 NETSCRIPT_AUTH_SCOPES=read:user user:email
 ```
 
-Provider credentials and settings are written only to the project `.env`, which must stay outside
-version control. Tracked appsettings receives the non-secret backend selector; reconciliation prunes
-legacy credential copies and retains unrelated benign environment settings. Aspire refuses declared
-credential-shaped keys as source literals, so generated helpers do not carry their values. Earlier
-provider configuration copied credentials into tracked files; remove those copies and rotate any
-credential that was committed.
+> [!CAUTION]
+> Keep the project `.env` out of version control: the CLI writes provider credentials and settings
+> only there, and tracked appsettings receives only the non-secret backend selector. Earlier provider
+> configuration copied credentials into tracked files; remove those copies and rotate any credential
+> that was committed.
+
+Reconciliation prunes legacy credential copies and keeps unrelated, benign environment settings.
+Aspire refuses declared credential-shaped keys as source literals, so generated helpers do not carry
+their values.
 
 Generated auth assignments are POSIX shell literals. Source and export the file before starting
-Aspire so its executable resources inherit the exact values. Apostrophes, substitutions, backticks,
-backslashes and embedded newlines remain data. Deno's direct `--env-file` loader accepts simple
-quoted values and scopes but does not implement all POSIX quoting; for hostile values, use the
-source/export path above. Provider credential environment bindings avoid putting secrets in CLI
-arguments. Explicit credential flags remain supported for compatibility.
+Aspire so its executable resources inherit the exact values; apostrophes, substitutions, backticks,
+backslashes and embedded newlines stay literal. Deno's direct `--env-file` loader accepts simple
+quoted values and scopes but not all POSIX quoting, so use the source/export path for hostile values.
+Provider credential environment bindings keep secrets out of CLI arguments; explicit credential
+flags remain supported for compatibility.
 
-Tenant presets such as `okta`, `auth0`, `azure-ad`, `aws-cognito`, `logto`, and `clerk` additionally
-accept `--issuer`. The non-interactive variants use their boot-native credential names:
+Tenant presets such as `okta`, `auth0`, `azure-ad`, `aws-cognito`, `logto` and `clerk` also accept
+`--issuer`. The non-interactive backends use their boot-native credential names:
 
 ```sh
 # Your credential source exports WORKOS_API_KEY and WORKOS_COOKIE_PASSWORD.
@@ -188,8 +163,8 @@ export BETTER_AUTH_SECRET="$(netscript plugin auth secret generate better-auth)"
 netscript plugin auth provider set --preset better-auth
 ```
 
-The explicit exports below are the escape hatch for CI/deployment systems that inject environment
-variables themselves. Ordinary workspace setup uses the source/export step above.
+CI and deployment systems that inject environment variables themselves can export each backend's
+block directly. Ordinary workspace setup uses the source/export step above.
 
 {{ comp.tabbedCode({ tabs: [
 {
@@ -209,22 +184,11 @@ code: "export NETSCRIPT_AUTH_BACKEND=better-auth\n\nexport BETTER_AUTH_SECRET=at
 }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Provider presets fill the OIDC endpoints for you" } }}
-You rarely hand-type issuer/authorization/token/userinfo URLs. The <code>kv-oauth</code> package
-ships provider presets — <code>github</code>, <code>google</code>, <code>gitlab</code>,
-<code>discord</code>, <code>slack</code>, <code>spotify</code>, <code>facebook</code>,
-<code>twitter</code>, plus tenant-based <code>auth0</code>, <code>okta</code>,
-<code>awsCognito</code>, <code>azureAd</code>, <code>logto</code>, <code>clerk</code> — that encode
-the correct endpoints. Pass one to <code>createKvOAuthBackend</code> in Step 5, or call
-<code>defineOAuthProvider(...)</code> for a custom provider.
-{{ /comp }}
-
 ## Step 4 — Start Aspire and run the auth database migration
 
-The `auth` plugin contributes a package-provided **`auth.prisma`** schema, which is
-aggregated into your project's database schema at `db generate` (Postgres is the recommended engine; or `mysql` /
-`mssql` / `sqlite` — the auth models persist through Prisma, so they follow whichever engine you
-scaffolded with `--db`). It defines four better-auth-shaped models mapped to these tables:
+The plugin's package-provided **`auth.prisma`** schema is aggregated into your project's database
+schema at `db generate`. Its models persist through Prisma, so they follow whichever engine you
+scaffolded with `--db`. It defines four better-auth-shaped models:
 
 {{ comp.apiTable({
 caption: "auth.prisma models → your database tables",
@@ -236,28 +200,19 @@ rows: [
 ]
 }) }}
 
-{{ comp callout { type: "note", title: "Which backends actually use these tables" } }}
-<code>auth.prisma</code> is provisioned for every install so the schema is consistent, but storage
-differs by backend: <strong>kv-oauth</strong> stores sessions in Deno KV (not these tables),
-<strong>WorkOS</strong> verifies sealed cookies and stores revocation fences, outbox jobs, and
-per-session tombstones in host KV, and <strong>better-auth</strong> is
-the backend that reads/writes <code>auth_users</code>/<code>auth_sessions</code>/<code>auth_accounts</code>/<code>auth_verifications</code>
-through Prisma. The migration runs regardless; it is the persistence path for the Prisma-backed
-backend.
-{{ /comp }}
+Every install provisions these tables so the schema stays consistent, but only `better-auth` reads
+and writes them. `kv-oauth` stores sessions in Deno KV, and WorkOS verifies sealed cookies and keeps
+revocation fences, outbox jobs and per-session tombstones in host KV.
 
-After Step 3 has configured and exported the provider environment, start Aspire from the workspace
-root:
+With the Step 3 environment exported, start Aspire from the workspace root:
 
 ```sh
 (cd aspire && aspire start)
 ```
 
-If an AppHost was already running, stop it with `(cd aspire && aspire stop)` before this start
-command so its replacement inherits the exported values.
-
-The dashboard is at <https://localhost:18888>. With Aspire running, generate and apply the migration
-the same way you do for any plugin schema:
+If an AppHost is already running, stop it first with `(cd aspire && aspire stop)` so its replacement
+inherits the exported values. The dashboard is at <https://localhost:18888>. With Aspire running,
+generate and apply the migration as for any plugin schema:
 
 ```sh
 netscript db init --name init    # first time only — create the migration
@@ -266,120 +221,28 @@ netscript db seed                # optional seed data
 netscript db status              # confirm the migration is applied
 ```
 
-See [Run a database migration](/data-persistence/how-to/database-migration/) for the full DB workflow and the
-Aspire-up dependency.
+[Run a database migration](/data-persistence/how-to/database-migration/) covers the full database
+workflow.
 
-## Step 5 — The kv-oauth happy path (code)
+## Step 5 — Check the auth endpoints
 
-When you compose the backend in code (for a custom service entry, a test, or a non-scaffold wiring),
-the interactive `kv-oauth` backend is one `await` call. Pass a provider preset from `providers.*`:
+With Aspire running, `auth-api` answers on host port **8094** (pinned in Step 1) under the REST
+prefix `/api/v1/auth/*`, with the oRPC mirror at `/api/rpc/v1/auth/*`, the `/health/live` and
+`/health/ready` probes and OpenAPI docs. It appears as the `auth-api` resource in the Aspire
+dashboard. [The service surface](/identity-access/auth/#the-service-surface) lists the six
+operations and which ones need a credential.
 
-{{ comp.tabbedCode({ tabs: [
-{
-label: "Compose the kv-oauth backend",
-lang: "ts",
-code: "import { createKvOAuthBackend, providers } from \"@netscript/auth-kv-oauth\";\n\n// providers.google(...) is a preset that fills the OIDC endpoints for you.\nconst backend = await createKvOAuthBackend({\n provider: providers.google({\n clientId: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_ID\")!,\n clientSecret: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_SECRET\")!,\n redirectUri: \"http://localhost:8094/api/v1/auth/callback\",\n }),\n});\n\n// backend implements AuthBackendPort AND the optional InteractiveFlowPort\n// (signIn / handleCallback / getSessionId / signOut), so the auth-api\n// signin + callback endpoints are live on this backend.\nconsole.log(backend.name); // \"kv-oauth\""
-},
-{
-label: "Swap the provider preset",
-lang: "ts",
-code: "import { createKvOAuthBackend, providers } from \"@netscript/auth-kv-oauth\";\n\n// GitHub instead of Google — same shape, different preset.\nconst github = await createKvOAuthBackend({\n provider: providers.github({\n clientId: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_ID\")!,\n clientSecret: Deno.env.get(\"NETSCRIPT_AUTH_CLIENT_SECRET\")!,\n redirectUri: \"http://localhost:8094/api/v1/auth/callback\",\n }),\n});\n\n// Tenant providers (auth0, okta, azureAd, awsCognito, logto, clerk) take\n// a tenant/domain in addition to the client credentials."
-}
-] }) }}
-
-The returned `backend` satisfies the `AuthBackendPort` seam that `@netscript/plugin-auth-core`
-defines, and — because it is `kv-oauth` — also the optional `InteractiveFlowPort`. That is precisely
-what makes `signin` and `callback` work on this backend and fail loud on the other two. For the port
-architecture behind this, read [the authentication model](/explanation/auth-model/).
-
-## Step 6 — Start the service and the auth endpoints
-
-With Aspire running, the `auth-api` service answers on host port **8094** (pinned in Step 1) and
-mounts six endpoints under the
-public REST prefix **`/api/v1/auth/*`** (the oRPC surface is mirrored at `/api/rpc/v1/auth/*`):
-
-{{ comp.apiTable({
-caption: "auth-api endpoints (:8094, /api/v1/auth/*)",
-rows: [
-{ name: "POST /api/v1/auth/signin", type: "interactive only", desc: "Begin the OAuth/OIDC redirect flow. Live on kv-oauth; returns AUTH_PROVIDER_ERROR on workos/better-auth." },
-{ name: "POST /api/v1/auth/callback", type: "interactive only", desc: "Complete the provider redirect, mint a session. Live on kv-oauth; AUTH_PROVIDER_ERROR on the others." },
-{ name: "POST /api/v1/auth/signout", type: "session", desc: "End the caller's own session. Needs the session cookie or a bearer credential (401 otherwise); everywhere: true ends all of the caller's sessions. On kv-oauth the response carries the session-clearing Set-Cookie." },
-{ name: "POST /api/v1/auth/sessions/revoke", type: "operator", desc: "Revoke any session by id. Needs a credential holding the auth:sessions:revoke scope (403 otherwise)." },
-{ name: "GET /api/v1/auth/session", type: "session", desc: "Return the current session if one is present and valid. Works on all backends." },
-{ name: "GET /api/v1/auth/me", type: "identity", desc: "Return the authenticated principal (the resolved user). Works on all backends." }
-]
-}) }}
-
-The service also exposes liveness/readiness probes at `/health/live` and `/health/ready`, plus
-OpenAPI docs, through the standard `@netscript/service` builder. Watch it come up in the Aspire
-dashboard at [https://localhost:18888](https://localhost:18888) under the `auth-api` resource.
-
-## Step 7 — Sign in through the generated app
-
-Installing auth into a generated Fresh workspace emits `auth/bff.ts`,
-`auth/service.ts`, and `apps/<app>/routes/auth/[action].ts`. Helper regeneration
-also wires newly added services to the same auth resource. Register the provider
-callback URI as `<app-origin>/auth/callback`, using the app endpoint reported by
-Aspire. No fixed app port is required.
-
-Submit a same-origin HTML form with `method="post"` and `action="/auth/signin"`.
-The app forwards the signin operation to the existing auth plugin and follows
-its provider authorization redirect. The provider returns to the app's GET
-`/auth/callback` route, which submits the code, state, and transaction cookie as
-typed callback input to the plugin. The app response sets the first-party
-HttpOnly session cookie and redirects to the app. GET `/auth/session` then
-returns `authenticated` and `subject`, without exposing the session id. POST
-`/auth/signout` requires the app's Origin, revokes the session, and expires the
-cookie.
-
-Use HTTPS in production. The generated local adapter issues a Secure
-`__Host-ns_session` cookie on `localhost`, which browsers treat as a secure
-cookie host even with a local HTTP endpoint. Other HTTP hosts are refused. If
-you configure `NETSCRIPT_AUTH_COOKIE_NAME`, export the same value for the app
-and auth service before starting Aspire. Authored routes and service policies
-are preserved during regeneration; custom app layouts must mount the adapter
-themselves.
-
-For a guarded server-side read, attach the generated client to the service
-contract and supply only the incoming request's credential context:
-
-```ts
-import { browserSessionContext, createBrowserSessionClient } from './auth/bff.ts';
-import { CatalogContractV1 } from './contracts/catalog/v1/mod.ts';
-
-declare const request: Request;
-const catalog = createBrowserSessionClient(
-  CatalogContractV1,
-  'catalog',
-  'catalog',
-);
-const result = await catalog.list({}, {
-  context: browserSessionContext(request),
-});
-```
-
-The generated bearer contribution uses `direct-only` caching: credentials and
-authenticated responses never enter a shared query cache. Services verify the
-forwarded bearer through the existing remote authenticator; browser cookies are
-never forwarded to guarded services. The scaffold's demonstration procedures
-declare `access: { authentication: 'none' }` and remain public on REST and RPC.
-`/api/openapi.json` and `/api/docs` also stay public for discovery. Other `/api`
-paths require a bearer and a contract authorization decision once the CLI installs
-its generated policy. Change the demo procedure metadata when making those routes private,
-and keep browser reads in server-side app handlers. Workers, sagas, and triggers
-use a service identity independently of browser sessions.
-
-Generated CORS origins include enabled workspace apps and extend each
-service/plugin's declared `NETSCRIPT_CORS_ORIGINS`. This is a response
-allowlist; it does not authorize cookie callers. Publish-mode endpoint
-references still require a deployment's public app origin configuration; this
-local scaffold recipe does not certify deployment or browser conformance.
+> [!NOTE]
+> The scaffold composes the backend for you. To compose `kv-oauth` in code instead, for a custom
+> service entry, a test or non-scaffold wiring, pass a provider preset or a custom provider to
+> `createKvOAuthBackend`, as
+> [Provider presets and custom providers](/identity-access/auth/#provider-presets-and-custom-providers)
+> shows.
 
 ### Direct auth service diagnostics
 
 Confirm the service is up and the session endpoint responds. On a fresh, unauthenticated request,
-`session` reports no active session — which proves the endpoint is wired even before you complete a
-login:
+`session` reports no active session, which proves the endpoint is wired before you complete a login:
 
 ```sh
 # Service is alive
@@ -389,31 +252,35 @@ curl http://localhost:8094/health/ready
 curl http://localhost:8094/api/v1/auth/session
 ```
 
-The `kv-oauth` HTTP surface returns JSON redirect fields and emits the backend's
-`Set-Cookie` headers on both REST and RPC. `signin` returns `redirectUrl` plus
-the transaction cookie; `callback` returns `redirectTo` plus the session cookie.
-Your application follows those JSON redirects and posts the provider's `code`
-and `state` to the callback endpoint. The callback is POST-only: configure your
-application callback route to perform that POST when the provider redirects back
-with a GET. For the approved BFF topology, the app server owns these
-browser-facing routes and sets the first-party cookie on its own origin. It forwards a bearer credential to
-services; browser requests do not use credentialed cross-origin CORS. See
+On `kv-oauth`, the HTTP surface returns JSON redirect fields and emits the backend's `Set-Cookie`
+headers on both REST and RPC: `signin` returns `redirectUrl` plus the transaction cookie, and
+`callback` returns `redirectTo` plus the session cookie. Your application follows those redirects
+and posts the provider's `code` and `state` to the callback endpoint. The callback is POST-only, so
+configure your application's callback route to perform that POST when the provider redirects back
+with a GET. In the BFF topology, the app server owns these browser-facing routes, sets the
+first-party cookie on its own origin and forwards a bearer credential to services; browser requests
+do not use credentialed cross-origin CORS. See
 [session lifecycles](/identity-access/session-lifecycles/).
 
-For this plain-HTTP loopback recipe, set both development overrides in the host environment
-**before starting or restarting `auth-api`**. Use an unprefixed cookie name: clients reject
-an insecure `__Host-` cookie even when server-side `allowInsecureDev` permits issuance.
-Keep your real provider credentials and redirect URI from Step 3.
+To run the flow with curl over plain-HTTP loopback, set both development overrides in the host
+environment **before starting or restarting `auth-api`**. Use an unprefixed cookie name: clients
+reject an insecure `__Host-` cookie even when server-side `allowInsecureDev` permits issuance. Keep
+your real provider credentials and redirect URI from Step 3.
 
 ```sh
 export NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true
 export NETSCRIPT_AUTH_COOKIE_NAME=ns_session_dev
 ```
 
-Then save the transaction cookie, visit the returned `redirectUrl`, and copy the provider
-callback's code and state into the callback POST. The provider must register the redirect URI
-from Step 3; its GET callback may report a method error on this POST-only service route.
-Copy the code and state from that redirect URL and submit them below:
+> [!CAUTION]
+> These overrides are for local loopback only. Remove both in production and serve HTTPS: the
+> default production cookie is `__Host-ns_session`, and the local recipe uses `ns_session_dev` only
+> so curl can save and resend it over plain HTTP.
+
+Save the transaction cookie, visit the returned `redirectUrl` and authenticate with the provider.
+The provider must have the redirect URI from Step 3 registered; its GET to this POST-only service
+route may report a method error, so copy the `code` and `state` from that redirect URL into the
+callback POST:
 
 ```sh
 # Save the transaction cookie and read redirectUrl from the JSON response.
@@ -435,50 +302,17 @@ curl -b cookies.txt -c cookies.txt -X POST http://localhost:8094/api/v1/auth/sig
   -H 'Content-Type: application/json' -d '{}'
 ```
 
-Use HTTPS for production cookies and remove the two development overrides above. The default
-production cookie is `__Host-ns_session`; the local recipe uses `ns_session_dev` so curl can
-save and resend it over plain HTTP. `NETSCRIPT_AUTH_COOKIE_NAME` configures the name used by
-both the backend and service. A caller without a cookie jar may supply the transaction id as callback
-input `txn`; a callback without either fails with `oauth_cookie_missing`.
+`NETSCRIPT_AUTH_COOKIE_NAME` sets the cookie name for both the backend and the service. A caller
+without a cookie jar may pass the transaction id as callback input `txn`; a callback with neither
+fails with `oauth_cookie_missing`. After the callback, `GET /api/v1/auth/session` returns the active
+session and `GET /api/v1/auth/me` the authenticated principal. The callback returns
+`{ completed, redirectTo, subject }` without `sessionId`. The generated BFF keeps the backend cookie
+on the app origin and uses it to forward a bearer credential to services.
 
-A successful `GET /api/v1/auth/session` after callback returns the active
-session; `GET /api/v1/auth/me` returns the authenticated principal. The callback
-returns `{ completed, redirectTo, subject }` without `sessionId`. The generated
-BFF preserves the backend cookie on the app origin and uses it to forward a
-bearer credential to services; browser callers use that first-party cookie.
-
-### 0.0.8 cookie migration
-
-Projects with their own backend, session routes, and browser bridge can opt out of generated browser
-topology before installing auth or running lifecycle commands. Set
-`NetScript.Apps.<app>.Auth.BrowserTopology` to `"authored"` in `appsettings.json`. The default
-remains `"scaffold"`. Authored apps keep their `/auth` routes and browser helper files untouched,
-even when those files do not exist; generated service-session example routes are also skipped.
-`netscript generate aspire` preserves that topology and `netscript plugin doctor` reports its
-authored ownership. Task, Tauri, and desktop entries do not trigger browser helpers alongside an
-authored browser app; workspaces without browser apps retain the legacy helper generation behavior.
-Other scaffold browser apps still use shared helpers, and independently scaffold-owned service
-policies still receive their bearer verifier. The setting does not delete previously generated
-files. See [app-owned browser authentication](/cli-reference/#app-owned-browser-authentication) for
-the configuration example and mixed-workspace behavior.
-
-The callback input now accepts optional `txn`. The callback JSON output no
-longer includes `sessionId`. This is a breaking contract change: replace reads of `callback.sessionId` with a cookie jar and an
-empty-input `session` request. The app server must keep the issued cookie on its
-own origin and forward a bearer credential to services. Server-only integrations
-that compose a backend directly may use `InteractiveFlowPort.handleCallback`
-and its session result; do not expose that credential in browser callback JSON.
-Cookie headers are preserved on both HTTP projections. The public `httpOnly`
-option now accepts only `true` or omission; remove `false` overrides.
-Cookie issuance also refuses `httpOnly: false` from untyped callers and refuses insecure
-cookies outside `allowInsecureDev`, including custom cookie names. Treat this
-security policy tightening as a breaking change: remove insecure production
-cookie overrides, use HTTPS, and keep `HttpOnly` enabled. `__Host-` cookies must
-retain `Path=/` and omit `Domain`, even during development.
-
-Sign out with the same cookie. Signout only ever ends the caller's own sessions: without a
-credential it returns `401`, and a `sessionId` that is unknown or belongs to someone else returns
-the same `401`. See [signout ownership](/identity-access/auth/#signout-acts-only-for-the-caller).
+Signout only ends the caller's own sessions: without a credential it returns `401`, and a
+`sessionId` that is unknown or belongs to someone else returns the same `401` (see
+[signout ownership](/identity-access/auth/#signout-acts-only-for-the-caller)). End the session with
+the same cookie:
 
 ```sh
 # End this session
@@ -488,9 +322,65 @@ curl -b cookies.txt -X POST -H 'content-type: application/json' \
   -d '{"everywhere":true}' http://localhost:8094/api/v1/auth/signout
 ```
 
-For a typed service-client call, use the `auth/sdk-client.ts` module emitted during install. The
-manifest only advertises the factory; it never auto-attaches credentials. Select the generated
-descriptor on the `auth-api` client and provide its declared context explicitly:
+## Step 6 — Sign in through the generated app
+
+Installing auth into a generated Fresh workspace emits `auth/bff.ts`, `auth/service.ts` and
+`apps/<app>/routes/auth/[action].ts`. Helper regeneration also wires newly added services to the
+same auth resource. Register the provider callback URI as `<app-origin>/auth/callback`, using the
+app endpoint that Aspire reports; no fixed app port is required.
+
+1. Submit a same-origin HTML form with `method="post"` and `action="/auth/signin"`. The app forwards
+   the signin operation to the auth plugin and follows its provider authorization redirect.
+2. The provider returns to the app's GET `/auth/callback` route, which submits the code, state and
+   transaction cookie to the plugin as typed callback input. The app response sets the first-party
+   HttpOnly session cookie and redirects into the app.
+3. GET `/auth/session` returns `authenticated` and `subject`, without exposing the session id.
+4. POST `/auth/signout` requires the app's Origin, revokes the session and expires the cookie.
+
+Use HTTPS in production. On `localhost`, the generated local adapter issues a Secure
+`__Host-ns_session` cookie, which browsers treat as a secure cookie host even over a local HTTP
+endpoint; other HTTP hosts are refused. If you configure `NETSCRIPT_AUTH_COOKIE_NAME`, export the
+same value for the app and the auth service before starting Aspire. Regeneration preserves authored
+routes and service policies; custom app layouts must mount the adapter themselves.
+
+For a guarded server-side read, attach the generated client to the service contract and supply only
+the incoming request's credential context:
+
+```ts
+import { browserSessionContext, createBrowserSessionClient } from './auth/bff.ts';
+import { CatalogContractV1 } from './contracts/catalog/v1/mod.ts';
+
+declare const request: Request;
+const catalog = createBrowserSessionClient(
+  CatalogContractV1,
+  'catalog',
+  'catalog',
+);
+const result = await catalog.list({}, {
+  context: browserSessionContext(request),
+});
+```
+
+The generated bearer contribution uses `direct-only` caching: credentials and authenticated
+responses never enter a shared query cache. Services verify the forwarded bearer through the
+existing remote authenticator, and browser cookies are never forwarded to guarded services.
+
+The scaffold's demonstration procedures declare `access: { authentication: 'none' }` and stay
+public on REST and RPC, as do `/api/openapi.json` and `/api/docs`. Other `/api` paths require a
+bearer and a contract authorization decision once the CLI installs its generated policy. To make
+the demo routes private, change their procedure metadata, and keep browser reads in server-side app
+handlers. Workers, sagas and triggers use a service identity, independent of browser sessions.
+
+Generated CORS origins include the enabled workspace apps and extend each service's and plugin's
+declared `NETSCRIPT_CORS_ORIGINS`. This is a response allowlist; it does not authorize cookie
+callers. Publish-mode endpoint references still need a deployment's public app origin
+configuration; this local recipe does not certify deployment or browser conformance.
+
+### Typed auth client
+
+For a typed call to `auth-api`, use the `auth/sdk-client.ts` module emitted during install. The
+manifest only advertises the factory and never attaches credentials automatically. Select the
+generated descriptor on the `auth-api` client and provide its declared context explicitly:
 
 ```ts
 import { createServiceClient } from '@netscript/sdk/client';
@@ -514,25 +404,52 @@ const session = await authClient.session(undefined, {
 });
 ```
 
-`signin`, `callback`, and `describe` are explicitly public and do not resolve the credential.
-`session`, `me`, `signout`, and `revokeSession` require it. The generated resolver reads no ambient environment,
-cookie, or browser storage; your application supplies the credential for each logical call. Keep
-`authCachePartition` stable and non-secret—never use a token, session id, email, or another
-reversible identifier. Bearer headers require HTTPS outside localhost and loopback development.
+`signin`, `callback` and `describe` are explicitly public and do not resolve the credential;
+`session`, `me`, `signout` and `revokeSession` require it. The generated resolver reads no ambient
+environment, cookie or browser storage: your application supplies the credential for each logical
+call. Bearer headers require HTTPS outside localhost and loopback development.
 
-{{ comp callout { type: "tip", title: "Local smoke without real credentials" } }}
-If provider env is missing, the <code>kv-oauth</code> backend falls back to a non-functional
-local-default endpoint set so the service still boots and <code>/health</code>, <code>session</code>,
-and <code>me</code> answer. The default is suitable for scaffold smoke tests. Real <code>signin</code>/<code>callback</code>
-require genuine provider credentials — the fallback is a stub path, not a working login.
-{{ /comp }}
+> [!CAUTION]
+> Keep `authCachePartition` stable and non-secret. Never use a token, session id, email or any
+> other reversible identifier.
+
+### 0.0.8 cookie migration
+
+Projects with their own backend, session routes and browser bridge can opt out of the generated
+browser topology before installing auth or running lifecycle commands: set
+`NetScript.Apps.<app>.Auth.BrowserTopology` to `"authored"` in `appsettings.json`. The default
+remains `"scaffold"`. Authored apps keep their `/auth` routes and browser helper files untouched,
+even when those files do not exist, and generated service-session example routes are skipped.
+`netscript generate aspire` preserves that topology and `netscript plugin doctor` reports its
+authored ownership. Task, Tauri and desktop entries do not trigger browser helpers alongside an
+authored browser app; workspaces without browser apps keep the legacy helper generation. Other
+scaffold browser apps still use shared helpers, and independently scaffold-owned service policies
+still receive their bearer verifier. The setting does not delete previously generated files.
+[App-owned browser authentication](/cli-reference/#app-owned-browser-authentication) has the
+configuration example and the mixed-workspace behavior.
+
+> [!WARNING]
+> The callback contract and the cookie policy changed in 0.0.8, and both changes break existing
+> callers.
+
+- **Callback contract.** The callback input accepts an optional `txn`, and the callback JSON no
+  longer includes `sessionId`. Replace reads of `callback.sessionId` with a cookie jar and an
+  empty-input `session` request. The app server keeps the issued cookie on its own origin and
+  forwards a bearer credential to services. Server-only integrations that compose a backend
+  directly may use `InteractiveFlowPort.handleCallback` and its session result, but must not expose
+  that credential in browser callback JSON. Both HTTP projections preserve cookie headers.
+- **Cookie policy.** The public `httpOnly` option accepts only `true` or omission; remove `false`
+  overrides. Cookie issuance also refuses `httpOnly: false` from untyped callers and insecure
+  cookies outside `allowInsecureDev`, including custom cookie names. Remove insecure production
+  cookie overrides, use HTTPS and keep `HttpOnly` enabled. `__Host-` cookies must keep `Path=/` and
+  omit `Domain`, even during development.
 
 ## Protect a plugin API
 
-Every plugin service built with `createPluginService` from `@netscript/plugin/service` must choose
-a posture in its `auth` field. Leaving the field out does not type-check, and a malformed posture
-throws before the service starts. `netscript plugin new <name>` generates the guarded posture, and
-it is the one to keep for any API that returns user data:
+Every plugin service built with `createPluginService` from `@netscript/plugin/service` must choose a
+posture in its `auth` field. Leaving the field out does not type-check, and a malformed posture
+throws before the service starts. `netscript plugin new <name>` generates the guarded posture; keep
+it for any API that returns user data:
 
 ```ts
 // plugins/billing/services/src/main.ts
@@ -559,9 +476,9 @@ export const billingService = createPluginService(billingRouter, {
 ```
 
 - **Authentication.** `createAuthServiceAuthenticator` verifies the request's bearer session
-  against the `auth` service found through discovery. The plugin needs no auth backend, KV handle,
-  or provider secret. A missing or rejected session returns `401`. If the auth service cannot be
-  reached, the request returns `503`.
+  against the `auth` service found through discovery. The plugin needs no auth backend, KV handle or
+  provider secret. A missing or rejected session returns `401`; an unreachable auth service returns
+  `503`.
 - **Authorization.** `createContractAuthorizer` reads the scopes each procedure declares, for
   example `.meta({ access: { authentication: 'required', authorization: { scopes: ['billing:read'] } } })`
   on the contract route. A session without that scope returns `403`. Pass the same
@@ -569,7 +486,7 @@ export const billingService = createPluginService(billingRouter, {
   line up.
 - **Health.** `/health` stays anonymous. A healthy plugin does not prove that reads are authorized.
 
-To publish an API on purpose without a guard, record the decision instead of omitting it:
+To publish an API without a guard on purpose, record the decision instead of omitting it:
 
 ```ts
 export const statusService = createPluginService(statusRouter, {
@@ -580,101 +497,59 @@ export const statusService = createPluginService(statusRouter, {
 
 The reason must not be blank, and a public posture cannot also carry `authn` or `authz`.
 
-{{ comp callout { type: "warning", title: "Background callers do not have an app session" } }}
-Workers, sagas, and triggers run under a service identity. Nothing they do may depend on an app
-being open or a user session staying alive. <code>createAuthServiceAuthenticator</code> accepts
-only sessions that the auth service issued. If background processes call a plugin API over HTTP,
-guard that API with a credential they hold, for example
-<code>createStaticCredentialAuthenticator</code> from <code>@netscript/service/auth</code> with a
-service credential the AppHost injects. A service takes exactly one authenticator.
-{{ /comp }}
+> [!WARNING]
+> Background callers have no app session. Workers, sagas and triggers run under a service identity,
+> so nothing they do may depend on an open app or a live user session. `createAuthServiceAuthenticator`
+> accepts only sessions the auth service issued: guard an API that background processes call over
+> HTTP with a credential they hold, for example `createStaticCredentialAuthenticator` from
+> `@netscript/service/auth` with a service credential the AppHost injects. A service takes exactly
+> one authenticator.
 
-The exact posture types and validation rules are in the
-[plugin authentication reference](/reference/plugin/#plugin-service-authentication-posture).
+The [plugin authentication reference](/reference/plugin/#plugin-service-authentication-posture)
+has the exact posture types and validation rules.
 
-## Production pitfalls
+## Troubleshooting
 
-{{ comp callout { type: "warning", title: "Read before you ship authentication" } }}
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| `signin` or `callback` returns `AUTH_PROVIDER_ERROR` | The active backend is `workos` or `better-auth`, which validate sessions but do not drive the login redirect. | Set `NETSCRIPT_AUTH_BACKEND=kv-oauth` for an interactive flow. |
+| `session` and `me` answer, but no real sign-in is possible | Provider environment (`NETSCRIPT_AUTH_CLIENT_ID`, `NETSCRIPT_AUTH_CLIENT_SECRET`, `NETSCRIPT_AUTH_REDIRECT_URI`) is missing, so `kv-oauth` booted on its non-functional local-default endpoints. That fallback suits scaffold smoke tests only. | Configure a real provider as in Step 3. |
+| A 404 on `:8094`, or a database error from `netscript db` | Orchestration is not running. | Start Aspire first: `cd aspire && aspire start`. |
 
-<ul>
-<li><strong>Wrong backend for the job</strong> — <code>signin</code>/<code>callback</code> only work
-on <code>kv-oauth</code>. If those endpoints return <code>AUTH_PROVIDER_ERROR</code>, you are on
-<code>workos</code> or <code>better-auth</code>, which validate sessions but do not drive the login
-redirect. Set <code>NETSCRIPT_AUTH_BACKEND=kv-oauth</code> for an interactive flow.</li>
-<li><strong>TLS termination and transport migration</strong> — forwarded protocol headers are
-ignored by default. Behind a TLS-terminating proxy set
-<code>NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true</code> only when that proxy replaces incoming
-protocol headers and blocks direct service access. The flow gate and cookie Secure derivation use
-one policy. For direct TLS at the service set <code>NETSCRIPT_AUTH_COOKIE_SECURE=true</code>;
-refresh receives no request URL and needs this explicit Secure cookie setting. Automatic host TLS
-metadata remains deferred to #2191. Proxied TLS does not need <code>NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS</code>;
-that switch now controls outbound OAuth HTTP only. For local HTTP development use the separate
-<code>NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true</code>. Missing or partial provider
-config never enables insecure transport automatically. Transport/config refusals return
-<code>AUTH_TRANSPORT_ERROR</code>/<code>AUTH_CONFIGURATION_ERROR</code> (400), with distinct
-flow/cookie reasons; missing service request capture returns <code>INTERNAL</code> (500), and
-upstream failures remain 502. Hop/CIDR verification is deferred to
-<a href="https://github.com/rickylabs/netscript/issues/2191">#2191</a>.</li>
-<li><strong>Single active backend</strong> — there is exactly one backend at a time. No multi-active
-routing, cross-backend account linking, global logout, historical replay, or paged session mirror in
-v1. Plan your identity model around one provider path.</li>
-<li><strong>No auth audit/telemetry surface yet</strong> — there is <strong>no</strong> dedicated
-auth audit log or auth-specific telemetry API on main. Do not build dashboards against an auth audit
-stream that does not exist; the <code>defaultTelemetry</code> flag is generic OTLP plumbing, not an
-auth audit trail.</li>
-<li><strong>Alpha package pins</strong> — scaffolded <code>jsr:...</code> imports use exact
-<code>{{ releaseSpecifier }}</code> pins. Keep the generated workspace on one aligned NetScript
-version.</li>
-<li><strong>Credential contributions are explicit</strong> — installing auth makes the typed bearer
-factory available but does not attach it globally. Add the generated descriptor only to the intended
-service tuple and pass its typed context per call.</li>
-<li><strong>Provider env is required for real login</strong> — without
-<code>NETSCRIPT_AUTH_CLIENT_ID</code>/<code>SECRET</code>/<code>REDIRECT_URI</code> the
-<code>kv-oauth</code> backend boots into a stub fallback; <code>session</code>/<code>me</code> answer
-but no real sign-in is possible.</li>
-<li><strong>Non-OIDC providers need a stable subject</strong> — GitHub and other plain OAuth 2.0
-providers return no ID token. The subject then comes from the provider's userinfo response, namespaced
-by provider (<code>github:&lt;numeric id&gt;</code>). Keep <code>NETSCRIPT_AUTH_PROVIDER_ID</code> set
-to the preset name, or set <code>NETSCRIPT_AUTH_SUBJECT_SOURCE</code>/<code>NETSCRIPT_AUTH_SUBJECT_CLAIM</code>.
-A provider with no stable identifier refuses sign-in (<code>subject_missing</code>) instead of
-issuing a new subject per sign-in. See
-<a href="../../session-lifecycles/#stable-subjects-for-non-oidc-providers">stable subjects</a>.</li>
-<li><strong>Aspire down</strong> — a 404 on <code>:8094</code> or a DB error during
-<code>netscript db</code> almost always means orchestration is not running. <code>cd aspire &amp;&amp;
-aspire start</code> first.</li>
-</ul>
-{{ /comp }}
+## Production notes
 
-## See also
+> [!CAUTION]
+> Set `NETSCRIPT_AUTH_TRUST_PROXY_HEADERS=true` only behind a TLS-terminating proxy that replaces
+> incoming protocol headers and blocks direct access to the service. The service does not verify
+> proxy hops or source CIDRs.
 
-<div class="ns-card-grid">
+- **TLS.** Forwarded protocol headers are ignored by default. The flow gate and the cookie `Secure`
+  derivation share one policy. For TLS terminated at the service itself, set
+  `NETSCRIPT_AUTH_COOKIE_SECURE=true`: refresh receives no request URL and needs this explicit
+  setting. The service does not detect host TLS metadata automatically.
+- **Insecure-transport switches.** `NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS` controls outbound OAuth
+  HTTP only, and proxied TLS does not need it. Local HTTP development uses the separate
+  `NETSCRIPT_AUTH_ALLOW_INSECURE_HTTP_REQUESTS=true`. Missing or partial provider config never
+  enables insecure transport. Transport and configuration refusals return `AUTH_TRANSPORT_ERROR` or
+  `AUTH_CONFIGURATION_ERROR` (400) with distinct flow and cookie reasons; missing service request
+  capture returns `INTERNAL` (500), and upstream failures stay 502.
+- **Explicit credential contributions.** Installing auth makes the typed bearer factory available but
+  does not attach it globally. Add the generated descriptor only to the intended service tuple and
+  pass its typed context per call.
+- **Stable subjects for non-OIDC providers.** GitHub and other plain OAuth 2.0 providers return no
+  ID token, so the subject comes from the provider's userinfo response, namespaced by provider
+  (`github:<numeric id>`). Keep `NETSCRIPT_AUTH_PROVIDER_ID` set to the preset name, or set
+  `NETSCRIPT_AUTH_SUBJECT_SOURCE` and `NETSCRIPT_AUTH_SUBJECT_CLAIM`. A provider with no stable
+  identifier refuses sign-in (`subject_missing`) instead of issuing a new subject per sign-in. See
+  [stable subjects](/identity-access/session-lifecycles/#stable-subjects-for-non-oidc-providers).
 
-{{ comp.card({
-title: "Authentication capability",
-body: "The auth-api service, the five endpoints, and the three-backend capability matrix in one hub.",
-href: "/capabilities/auth/",
-icon: "◆"
-}) }}
+## Next steps
 
-{{ comp.card({
-title: "The authentication model",
-body: "Why the backend is a pure adapter behind AuthBackendPort, and how the plugin composes one active backend.",
-href: "/explanation/auth-model/",
-icon: "▣"
-}) }}
+[Operational session lifecycles](/identity-access/session-lifecycles/) shows how to wire sign-in,
+callbacks and refreshed cookies into your own routes for each backend.
 
-{{ comp.card({
-title: "service reference",
-body: "The @netscript/service builder that auth-api is built on — RPC mount, health, OpenAPI, service info.",
-href: "/reference/service/",
-icon: "§"
-}) }}
-
-{{ comp.card({
-title: "Run a database migration",
-body: "The full db init / generate / seed / status workflow that applies auth.prisma.",
-href: "/data-persistence/how-to/database-migration/",
-icon: "+"
-}) }}
-
-</div>
+- [Authentication](/identity-access/auth/): the `auth-api` surface and the three backends.
+- {{ comp.xref({ key: "explain:auth-model", text: "The authentication model" }) }}: why the backend
+  is an adapter behind `AuthBackendPort`.
+- [Run a database migration](/data-persistence/how-to/database-migration/): the full `db` workflow
+  that applies `auth.prisma`.

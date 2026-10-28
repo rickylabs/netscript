@@ -6,38 +6,21 @@ templateEngine: [vento, md]
 
 # Identity & Access
 
-**One env var and five endpoints separate a scaffolded workspace from a working OAuth sign-in —
-and the boundaries fail loud with typed errors instead of degrading to a silent anonymous
-session.**
+Identity & Access covers sign-in, sessions and the `Principal` that services authorize against.
+Start here when you add authentication, choose a backend or trace how identity reaches a service.
 
-Identity & Access covers the Principal model, authentication backends, sessions, roles, scopes, and
-claims. Use this pillar when you are adding sign-in, selecting a backend, or reasoning about how
-identity flows through services and pages.
-
-Auth is where an agent-assembled backend most easily *looks* done without *being* done — the
-mis-wired flow compiles, demos, and ships. NetScript's answer is to keep the security conventions
-in the contract itself: `NETSCRIPT_AUTH_BACKEND` selects exactly one active backend, every backend
-normalizes to the same `Principal`, unsupported operations fail loud with typed errors, and the
-redacted audit surface refuses to run without a salt. The full story — including the concrete
-failure modes the contract closes off — is on the
-[Authentication](/identity-access/auth/) page.
+The `auth` plugin runs exactly one backend, selected by `NETSCRIPT_AUTH_BACKEND`. Every backend
+normalizes to the same `Principal`, and an operation a backend cannot perform fails with a typed
+error instead of falling back to an anonymous session.
 
 {{ comp.cardsGrid({ columns: 3, cards: [
-  { eyebrow: "Capability", title: "Authentication", body: "The auth plugin story: one active backend, five endpoints, fail-loud typed boundaries, and the salt-gated audit surface.", href: "/identity-access/auth/", icon: "C" },
-  { eyebrow: "Overview & Concepts", title: "Auth model", body: "Principal, session, backend, and authorization vocabulary.", href: "/explanation/auth-model/", icon: "O" },
-  { eyebrow: "Quickstart", title: "Workspace auth", body: "Add authentication in the Workspace tutorial.", href: "/tutorials/workspace/02-auth/", icon: "Q" },
-  { eyebrow: "How-To", title: "Add authentication", body: "Wire authentication into a generated workspace.", href: "/identity-access/how-to/add-authentication/", icon: "H" },
-  { eyebrow: "How-To", title: "better-auth plugins", body: "Mount better-auth plugins through a typed passthrough; bearer and jwt run as-is, table-backed and interactive plugins carry caveats.", href: "/identity-access/better-auth-plugins/", icon: "H" },
-  { eyebrow: "How-To", title: "Session lifecycles", body: "Mount public handlers, redirect, handle callbacks, check return URLs, and forward refresh headers across adapters.", href: "/identity-access/session-lifecycles/", icon: "H" },
-  { eyebrow: "API Reference", title: "auth backends", body: "Generated symbols for auth, better-auth, kv-oauth, and WorkOS packages.", href: "/reference/auth/", icon: "R" },
-  { eyebrow: "API Reference", title: "plugin auth", body: "Generated plugin-auth package symbols.", href: "/reference/plugin-auth/", icon: "R" }
-] }) }}
-
-## Learn, do, look up
-
-{{ comp.cardsGrid({ columns: 4, cards: [
-  { eyebrow: "Learn", title: "Workspace tutorial", body: "Auth, workspace data, and route authorization in one track.", href: resolveXref("tut:workspace").href },
-  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/identity-access/how-to/" },
-  { eyebrow: "Look up", title: "`@netscript/auth` reference", body: "Generated API reference. Related units: `auth-better-auth`, `auth-kv-oauth`, `auth-workos`, `plugin-auth`.", href: resolveXref("ref:auth").href },
-  { eyebrow: "Understand", title: "The auth model", body: "The design rationale behind this pillar.", href: resolveXref("explain:auth-model").href },
+  { eyebrow: "Concept", title: "Authentication", body: "The auth plugin: one active backend, the `auth-api` surface, typed failures and the audit surface.", href: "/identity-access/auth/" },
+  { eyebrow: "Concept", title: "better-auth plugins", body: "Mount better-auth plugins through a typed passthrough, and what each kind needs to run.", href: "/identity-access/better-auth-plugins/" },
+  { eyebrow: "Concept", title: "Session lifecycles", body: "Mount handlers, redirect, handle callbacks, check return URLs and forward refreshed cookies.", href: "/identity-access/session-lifecycles/" },
+  { eyebrow: "How-to", title: "Add authentication", body: "Install the auth plugin in a workspace and sign in through the generated app.", href: "/identity-access/how-to/add-authentication/" },
+  { eyebrow: "Recipes", title: "Recipes", body: "Task recipes for this area, one problem each.", href: "/identity-access/how-to/" },
+  { eyebrow: "Tutorial", title: "Workspace auth", body: "Add authentication in the Team Workspace tutorial, then authorize routes on it.", href: "/tutorials/workspace/02-auth/" },
+  { eyebrow: "Explanation", title: "Auth model", body: "Principal, session, backend and authorization: why auth is a pure-backend port.", href: "/explanation/auth-model/" },
+  { eyebrow: "Reference", title: "Auth backends", body: "Generated symbols for the auth, better-auth, kv-oauth and WorkOS packages.", href: "/reference/auth/" },
+  { eyebrow: "Reference", title: "Auth plugin", body: "Generated symbols for the `plugin-auth` package.", href: "/reference/plugin-auth/" }
 ] }) }}

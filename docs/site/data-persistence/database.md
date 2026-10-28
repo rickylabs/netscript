@@ -9,20 +9,22 @@ order: 1
 
 # Database & Prisma
 
-A schema change is never just a schema change. Add one field to a model and three other
-things are now stale: the client types your services compile against, the runtime
-validation that guards your contract boundary, and the migration that has to reach the
-database before any of it works. Do those in separate tools and each one is a separate
-keep-in-sync step — and when an AI agent is writing the backend, each separate step is
-another turn where the pieces can drift apart. NetScript's answer is to make the
-`.prisma` file the single source: **one edit, one `netscript db generate`, and the
-Deno-runtime typed client and the matching zod schemas regenerate together**, with the
-migration created and applied by the same `netscript db` workflow.
+This page explains how NetScript wires its database layer: where the schema and connection settings
+live, how one schema edit reaches the typed client, the validation schemas and the migration, and how
+to choose or add a database engine.
 
-NetScript's persistence layer is **Prisma 7 over a driver adapter** (Postgres is the recommended engine,
-with MSSQL and MySQL adapters shipped alongside), generated for the Deno runtime and
-provisioned for you by **Aspire**. Every plugin contributes its own `.prisma` models, which
-are aggregated into a single generated client over one primary datasource.
+The persistence layer is **Prisma 7 over a driver adapter**, generated for the Deno runtime and
+provisioned by **Aspire**. Postgres is the recommended engine; MSSQL and MySQL adapters ship
+alongside it. Every plugin contributes its own `.prisma` models, and NetScript aggregates them into
+one generated client over one primary datasource. The `.prisma` file is the single source: edit it,
+run `netscript db generate`, and the Deno-runtime client and the matching zod schemas regenerate
+together. The same `netscript db` workflow creates and applies the migration.
+
+Use the database for records that survive restarts, are queried with a typed client and are shared
+across a service and its plugins. For ephemeral or high-throughput state, such as counters, locks,
+work queues and scheduled triggers, use [KV, queues & cron](/data-persistence/kv-queues-cron/). The
+scaffold uses both: Postgres for records, Redis/KV for execution state. Postgres can also back the
+work queue when you select it with an explicit `provider: 'postgres'`.
 
 {{ comp.diagram({
   src: "/assets/diagrams/database-schema-aggregation.svg",
@@ -30,47 +32,21 @@ are aggregated into a single generated client over one primary datasource.
   caption: "One generated client, many contributors. Each plugin's .prisma file is aggregated into the same datasource; an adapter (postgres / mssql / mysql) selects the driver underneath."
 }) }}
 
-{{ comp callout { type: "important", title: "Aspire is step 2 — before any db command" } }}
-Every <code>netscript db</code> command talks to Postgres <strong>through Aspire</strong>.
-In the default layout Postgres is a container that <strong>Aspire</strong> provisions, so
-<code>cd aspire &amp;&amp; aspire start</code> must be up <strong>before</strong> you run
-<code>netscript db init</code>. Run a <code>db</code> command against a stopped AppHost and
-it fails with <code>aspire start failed: … Project file does not exist</code>. That is the
-dependency, not a bug — bring orchestration up first, then run the db workflow from the
-workspace root. See <a href="/explanation/aspire/">Orchestration with Aspire</a> for why.
-{{ /comp }}
-
-{{ comp callout { type: "tip", title: "Use this when" } }}
-Reach for the database layer when you need <strong>durable, relational state</strong> —
-records that survive restarts, are queried with a typed client, and are shared across your
-service and its plugins. The engine is polyglot: pick it at scaffold time with
-<code>--db</code> — Postgres (the recommended engine; or <code>mysql</code> / <code>mssql</code> /
-<code>sqlite</code>). For <em>ephemeral or high-throughput</em> state (counters, locks,
-work queues, scheduled triggers) reach for <a href="/data-persistence/kv-queues-cron/">KV,
-queues &amp; cron</a> instead; the scaffold uses both — Postgres for records, Redis/KV for
-execution state. Postgres can <em>also</em> back the work queue itself — see <a
-href="/data-persistence/kv-queues-cron/">the Postgres queue backend</a> below.
-{{ /comp }}
-
-## Learn → / Do →
-
-- **Learn** — the [Team Workspace tutorial, step 03](/tutorials/workspace/03-workspace-data/)
-  wires workspace data through the database from scratch.
-- **Do** — the [Use a second database](/data-persistence/how-to/use-a-second-database/) recipe adds a second
-  adapter-backed datasource (MSSQL or MySQL) beside the primary Postgres.
+> [!IMPORTANT]
+> Start Aspire before any `netscript db` command. In the default layout Aspire provisions Postgres as
+> a container, so `cd aspire && aspire start` must be running, with Docker or Podman up, before you
+> run `netscript db init`. [Orchestration with Aspire](/explanation/aspire/) explains why the AppHost
+> owns the database container.
 
 ## How persistence is wired
 
-The scaffold engine is chosen with the `--db` flag —
-`netscript init my-app --db postgres|mysql|mssql|sqlite`. Postgres is the recommended
-engine (and what every tutorial uses); `mysql`, `mssql`, and `sqlite` are first-class
-alternatives. `postgres` / `mysql` / `mssql` provision an Aspire container; `sqlite` is
-file-backed with **no** Aspire container resource. The `--db postgres` scaffold
-lays down a `database/postgres/` workspace (a different engine lays down
-`database/<engine>/`). A few facts are worth internalizing before you run anything, because
-they differ from a typical single-file Prisma setup.
+You choose the engine at scaffold time with `--db`:
+`netscript init my-app --db postgres|mysql|mssql|sqlite`. Postgres is the recommended engine and the
+one every tutorial uses. `postgres`, `mysql` and `mssql` run as Aspire container resources; `sqlite`
+is file-backed and has no container resource. A `--db postgres` scaffold lays down this workspace,
+and another engine lays down `database/<engine>/`:
 
-```text
+```tree
 my-app/
 ├── appsettings.json              # NetScript.Databases.postgres — Engine/Mode/DatabaseName (the real config)
 ├── netscript.config.ts           # databases.config is intentionally EMPTY here
@@ -87,30 +63,30 @@ my-app/
     └── schema/.generated/         # appears after `db generate`: Prisma client + zod schemas
 ```
 
-- **The datasource is driven by `appsettings.json`, not `netscript.config.ts`.** In the
-  scaffold, `netscript.config.ts` has `databases: { config: [] }` (empty). The connection
-  details live in `appsettings.json` under `NetScript.Databases.postgres` —
-  `Engine: "Postgres"`, `Mode: "Container"`, a generated `DatabaseName`, and a persistent
-  `DataPath` of `.data/postgres`, with `PrimaryDatabase: "postgres"`. Aspire reads that
-  block to provision the container.
-- **One datasource, many contributors.** There is a single primary Postgres datasource.
-  Each first-party plugin ships its own `database/<plugin>.prisma`, and those models are
-  aggregated under `database/postgres/schema/plugins/<plugin>/`. After adding `workers`,
-  `sagas`, and `triggers`, their tables (for example `model JobDefinition` from workers)
-  join the root `ExampleRecord` model in the same database — one `db init` / `db generate`
-  cycle covers the app and its plugins together.
+Three things differ from a typical single-file Prisma setup:
+
+- **`appsettings.json` drives the datasource, not `netscript.config.ts`.** In the scaffold,
+  `netscript.config.ts` has `databases: { config: [] }` (empty). The connection details live in
+  `appsettings.json` under `NetScript.Databases.postgres`: `Engine: "Postgres"`, `Mode: "Container"`,
+  a generated `DatabaseName`, a persistent `DataPath` of `.data/postgres`, and
+  `PrimaryDatabase: "postgres"`. Aspire reads that block to provision the container.
+- **One datasource, many contributors.** There is a single primary Postgres datasource. Each
+  first-party plugin ships its own `database/<plugin>.prisma`, aggregated under
+  `database/postgres/schema/plugins/<plugin>/`. After you add `workers`, `sagas` and `triggers`,
+  their tables (for example `model JobDefinition` from workers) join the root `ExampleRecord` model
+  in the same database, and one `db init` / `db generate` cycle covers the app and its plugins.
 - **The client is generated for Deno.** `schema.prisma` sets `generator client` with
-  `runtime = "deno"` and `output = "./.generated"`, plus a `generator zod`
-  (prisma-zod-generator) emitting matching zod schemas to `./.generated/zod`. You get a
-  type-safe client *and* runtime validation schemas from one generate.
+  `runtime = "deno"` and `output = "./.generated"`, plus a `generator zod` (prisma-zod-generator)
+  that writes matching zod schemas to `./.generated/zod`. One generate gives you the type-safe client
+  and the runtime validation schemas.
 
 ## Generated schemas feed public contracts
 
-`netscript db generate` also writes the NetScript-owned CRUD barrel used by contract modules. Import
-it as `@database/zod`: the barrel exposes `<Model>Schema`, `<Model>CreateInput`, and
-`<Model>UpdateInput` for every discovered model. The workspace root and `contracts/` member have
-different relative import-map targets, but consumer code uses the same alias in both places. In a
-contract module, derive the public shape instead of copying the model or exporting it blindly:
+`netscript db generate` also writes the NetScript-owned CRUD barrel that contract modules import as
+`@database/zod`. It exposes `<Model>Schema`, `<Model>CreateInput` and `<Model>UpdateInput` for every
+discovered model. The workspace root and the `contracts/` member map the alias to different relative
+targets, but consumer code imports `@database/zod` in both. In a contract module, derive the public
+shape instead of copying the model or exporting it unchanged:
 
 ```ts
 import { UserSchema as DatabaseUserSchema } from '@database/zod';
@@ -123,17 +99,15 @@ export const UsersListItemSchemaV1 = DatabaseUserSchema
   });
 ```
 
-The generated schema remains authoritative for database column types and nullability. The versioned
-contract selects what crosses the service boundary and adds stricter or public-only rules. Continue
-with [Contracts & type flow](/explanation/contracts/#where-the-public-shape-begins) for the DB-less
-counterpart, private-field omission, and explicit multi-model relation composition.
+The generated schema stays authoritative for column types and nullability. The versioned contract
+selects what crosses the service boundary and adds stricter or public-only rules.
+[Contracts & type flow](/explanation/contracts/#where-the-public-shape-begins) covers the DB-less
+counterpart, private-field omission and explicit multi-model relation composition.
 
-## Headline API: a model and a query
+## A model and a query
 
-Define models in Prisma schema files, then query them through the generated Deno client.
-The root `schema.prisma` ships a single sample model, `ExampleRecord`; plugin schema files
-add their own. The tabs below show a model alongside the typed query you'd write against
-the generated client.
+Define models in `.prisma` files, then query them through the generated Deno client. The root
+`schema.prisma` ships one sample model, `ExampleRecord`; plugin schema files add their own.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -148,54 +122,28 @@ the generated client.
   }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Generate after every schema change" } }}
-The generated client under <code>database/postgres/schema/.generated/</code> is a build
-artifact. Edit a <code>.prisma</code> file and your code is still typed against the
-<strong>old</strong> shape until you re-run <code>netscript db generate</code>. Generate
-after every schema change, and re-run <code>netscript db migrate</code> to create and apply
-the matching migration.
-{{ /comp }}
-
 ## The database workflow
 
-With `aspire start` up (Postgres reachable), run the public `netscript db` commands from the
-workspace root in this order. The first three are the create-and-fill cycle; `status`
-confirms it landed and `migrate` evolves the schema later.
+Run the public `netscript db` commands from the workspace root while `aspire start` runs from
+`aspire/`. To target another workspace, pass `--project-root <path>`. The generated client under
+`database/postgres/schema/.generated/` is a build artifact: after a `.prisma` edit, your code is
+typed against the old shape until you run `netscript db generate` again.
 
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "1 · init",
-    lang: "bash",
-    code: "# Create the first migration from the current Prisma schema and apply it.\n# --name labels the migration directory (here: a migration called \"init\").\nnetscript db init --name init"
-  },
-  {
-    label: "2 · generate",
-    lang: "bash",
-    code: "# Generate the Deno-runtime Prisma client (and the zod schemas) into\n# database/postgres/schema/.generated so your code can import typed models.\nnetscript db generate"
-  },
-  {
-    label: "3 · seed",
-    lang: "bash",
-    code: "# Run the workspace seed scripts (database/postgres/scripts/seed.ts)\n# to populate baseline rows.\nnetscript db seed"
-  },
-  {
-    label: "4 · status",
-    lang: "bash",
-    code: "# Show migration / tooling status: which migrations are applied and\n# whether the database is in sync with the schema.\nnetscript db status"
-  },
-  {
-    label: "5 · migrate",
-    lang: "bash",
-    code: "# Later, when the schema evolves: create + apply the next migration.\n# Edit a .prisma file, then:\nnetscript db migrate --name add_orders\nnetscript db generate    # re-generate the client against the new shape"
-  }
-] }) }}
+| Command | What it does |
+| --- | --- |
+| `netscript db init --name init` | Creates the first migration from the current Prisma schema and applies it. `--name` labels the migration directory. |
+| `netscript db generate` | Generates the Deno-runtime Prisma client and the zod schemas into `database/postgres/schema/.generated`. |
+| `netscript db seed` | Runs the workspace seed scripts (`database/postgres/scripts/seed.ts`) to populate baseline rows. |
+| `netscript db status` | Shows which migrations are applied and whether the database is in sync with the schema. |
+| `netscript db migrate --name add_orders` | Creates and applies the next migration after a schema change. Run `netscript db generate` after it. |
+
+[Database & migration](/data-persistence/how-to/database-migration/) runs this cycle step by step.
 
 ## Plugins contribute models
 
-Adding a first-party plugin installs its Prisma models to the *same* datasource — there is no
-second database. The aggregated tables land under
-`database/postgres/schema/plugins/<plugin>/` and migrate in the same `db init`/`migrate`
-cycle as your app.
+Adding a first-party plugin installs its Prisma models into the same datasource; there is no second
+database. The models land under `database/postgres/schema/plugins/<plugin>/` and migrate in the same
+`db init` / `migrate` cycle as your app.
 
 {{ comp.apiTable({
   caption: "Plugin-contributed Prisma models (same primary datasource)",
@@ -207,39 +155,24 @@ cycle as your app.
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "auth.prisma is backend-specific" } }}
-The <a href="/identity-access/auth/">auth plugin</a> contributes
-<code>auth.prisma</code> with <code>auth_users</code>, <code>auth_sessions</code>,
-<code>auth_accounts</code>, and <code>auth_verifications</code>. Those tables are the
-persistence shape for the <strong>better-auth</strong> backend. The default
-<strong>kv-oauth</strong> backend keeps sessions in <strong>KV</strong> and
-<strong>WorkOS</strong> is stateless (sealed cookie), so they do not depend on these tables.
-Run the auth migration only when you select the better-auth backend via
-<code>NETSCRIPT_AUTH_BACKEND</code>.
-{{ /comp }}
+> [!NOTE]
+> Run the auth migration only when `NETSCRIPT_AUTH_BACKEND` selects the better-auth backend. The
+> default kv-oauth backend keeps sessions in KV and WorkOS is stateless (sealed cookie), so neither
+> depends on the `auth.prisma` tables.
 
-{{ comp callout { type: "tip", title: "Postgres can also back the work queue" } }}
-Persistence is not the only place Postgres shows up. The queue runtime now ships a
-<strong>PostgreSQL backend</strong> alongside Deno KV, Redis, and RabbitMQ — a durable,
-row-claimed (<code>FOR UPDATE SKIP LOCKED</code>) queue table in the same Postgres you
-already provision. It is selectable only via an <strong>explicit</strong>
-<code>provider: 'postgres'</code> (auto-discovery never picks it). See
-<a href="/data-persistence/kv-queues-cron/">KV, queues &amp; cron</a> for
-<code>connection.postgres.{url, tableName}</code> and the full backend matrix.
-{{ /comp }}
+## Driver adapters
 
-## Adapter selection — postgres, mssql, mysql
+Prisma 7 talks to the database through a **driver adapter**. NetScript wraps each driver in a small
+`DatabaseAdapter` that gives every backend the same lifecycle surface: `getDriverAdapter` →
+`setClient` → `connect` / `disconnect` / `healthCheck` / `getStatus`. Postgres lives in the
+`@netscript/database/adapters` barrel. The SQL Server and MySQL adapters are sub-exports, so a
+Postgres-only app never loads their heavier drivers; MySQL runs on the native-Deno
+[`@netscript/prisma-adapter-mysql`](/reference/prisma-adapter-mysql/) driver. You can target or add a
+second engine without changing how your code consumes the client.
 
-Prisma 7 talks to the database through a **driver adapter**. NetScript wraps each driver in
-a small `DatabaseAdapter` that gives every backend the same lifecycle surface
-(`getDriverAdapter` → `setClient` → `connect`/`disconnect`/`healthCheck`/`getStatus`). The
-recommended scaffold is Postgres, but MSSQL and MySQL ship as sub-exports so you can target — or
-add — a second engine without changing how your code consumes the client.
-
-The shared options shape comes from `DatabaseConnectionOptions`
-(`@netscript/database/ports`): every adapter accepts either a `connectionString` or the
-structured `host` / `port` / `database` / `username` / `password` / `ssl` / `poolSize` /
-`timeout` parts, plus a few engine-specific extras.
+Every adapter accepts the shared `DatabaseConnectionOptions` from `@netscript/database/ports`: either a
+`connectionString` or the structured `host` / `port` / `database` / `username` / `password` / `ssl` /
+`poolSize` / `timeout` parts, plus a few engine-specific extras.
 
 {{ comp.apiTable({
   caption: "Driver adapters (each implements DatabaseAdapter)",
@@ -256,7 +189,7 @@ structured `host` / `port` / `database` / `username` / `password` / `ssl` / `poo
     { name: "provider", type: "'postgres' | 'mssql' | 'mysql'", desc: "Readonly provider identity used in status reporting." },
     { name: "getDriverAdapter()", type: "→ driver adapter", desc: "Returns the Prisma driver adapter to pass as `new PrismaClient({ adapter })`. Lazily constructs it from the options." },
     { name: "setClient(client)", type: "(client) => void", desc: "Hand the constructed PrismaClient back to the adapter so connect / health / raw calls have a client to use." },
-    { name: "getClient()", type: "→ PrismaClient", desc: "Return the configured Prisma client. Throws if setClient() has not been called — see the callout below." },
+    { name: "getClient()", type: "→ PrismaClient", desc: "Return the configured Prisma client. Throws if setClient() has not been called." },
     { name: "connect() / disconnect()", type: "→ Promise<void>", desc: "Explicit $connect / $disconnect. Prisma auto-connects on first query, so these are optional." },
     { name: "healthCheck()", type: "→ Promise<boolean>", desc: "Lightweight `SELECT 1` probe; true when the connection answers." },
     { name: "getStatus()", type: "→ Promise<DatabaseConnectionStatus>", desc: "Snapshot: { connected, provider, database, host, lastConnected, error }." },
@@ -264,23 +197,19 @@ structured `host` / `port` / `database` / `username` / `password` / `ssl` / `poo
   ]
 }) }}
 
-{{ comp callout { type: "important", title: "getClient() needs setClient() first" } }}
-The adapter does not own the <code>PrismaClient</code> — you construct it. The flow is
-always: build the adapter, call <code>getDriverAdapter()</code>, pass that to
-<code>new PrismaClient({ adapter })</code>, then call <code>adapter.setClient(client)</code>.
-Only then does <code>adapter.getClient()</code> (and <code>connect</code> /
-<code>healthCheck</code> / <code>executeRaw</code>) work — call <code>getClient()</code>
-before <code>setClient()</code> and it throws
-<code>"… client not initialized. Call setClient() …"</code>.
-{{ /comp }}
+The adapter does not own the `PrismaClient`. You pass `getDriverAdapter()` to
+`new PrismaClient({ adapter })`, then hand the client back with `adapter.setClient(client)`; only then
+do `getClient()`, `connect()`, `healthCheck()` and `executeRaw()` work.
+[Use a second database](/data-persistence/how-to/use-a-second-database/#connect-an-external-database-by-hand)
+shows the full wiring for MySQL and SQL Server.
 
-## Tracing — Prisma OpenTelemetry spans
+## Query tracing
 
-Prisma query spans are wired through a lightweight tracing helper exported from
-`@netscript/database/tracing`. It is a drop-in for `@prisma/instrumentation` that avoids the
-CJS-heavy `@opentelemetry/instrumentation` dependency (which breaks Deno bundle/compile).
-Call `enablePrismaTracing()` **once, before you construct any Prisma client**, and engine
-spans dispatch into your OpenTelemetry tracer with the standard W3C `traceparent`.
+`@netscript/database/tracing` sends Prisma query spans to OpenTelemetry. It replaces
+`@prisma/instrumentation` and avoids the CJS-heavy `@opentelemetry/instrumentation` dependency, which
+breaks Deno bundle and compile. Call `enablePrismaTracing()` **once, before you construct any Prisma
+client**; engine spans then go to your OpenTelemetry tracer with the standard W3C `traceparent`.
+Queries from a client constructed before the call lose their early spans.
 
 {{ comp.apiTable({
   caption: "@netscript/database/tracing — PrismaTracingConfig + hooks",
@@ -307,47 +236,19 @@ spans dispatch into your OpenTelemetry tracer with the standard W3C `traceparent
   }
 ] }) }}
 
-## Runnable example: wiring a second database (MySQL)
+## A second database
 
-The adapters let you stand up a **second** datasource beside the primary Postgres — for
-example a reporting MySQL instance — without leaving the typed-client model. The pattern is
-the same for every engine: create the adapter, pass `getDriverAdapter()` into a
-`PrismaClient`, then `setClient()` so the adapter can manage lifecycle and health. Swap the
-import to `adapters/mssql` and `createMssqlAdapter` for SQL Server — the surface is
-identical. The MySQL adapter is a sub-export (not in the `adapters` barrel), so import it
-from its own path.
-
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "MySQL — createMysqlAdapter",
-    lang: "ts",
-    code: "// services/reporting/src/db.ts\n// MySQL ships as a sub-export — import from /adapters/mysql, not the barrel.\nimport { createMysqlAdapter } from '@netscript/database/adapters/mysql';\nimport { PrismaClient } from '../database/mysql/schema/.generated/client.server.ts';\n\n// 1) Build the adapter from structured parts (or pass { connectionString }).\nconst adapter = createMysqlAdapter({\n  host: Deno.env.get('MYSQL_HOST') ?? 'localhost',\n  port: 3306,\n  database: 'reporting',\n  username: Deno.env.get('MYSQL_USER') ?? 'root',\n  password: Deno.env.get('MYSQL_PASSWORD'),\n  ssl: false,\n});\n\n// 2) Pass the driver adapter into Prisma, then hand the client back.\nexport const reporting = new PrismaClient({ adapter: adapter.getDriverAdapter() });\nadapter.setClient(reporting);\n\n// 3) Now adapter lifecycle + health work off the same client.\nawait adapter.connect();\nconst ok = await adapter.healthCheck(); // SELECT 1\nconsole.log('mysql healthy:', ok, await adapter.getStatus());"
-  },
-  {
-    label: "MSSQL — createMssqlAdapter",
-    lang: "ts",
-    code: "// services/reporting/src/db.ts — SQL Server variant (same shape)\nimport { createMssqlAdapter } from '@netscript/database/adapters/mssql';\nimport { PrismaClient } from '../database/mssql/schema/.generated/client.server.ts';\n\nconst adapter = createMssqlAdapter({\n  host: Deno.env.get('MSSQL_SERVER') ?? 'localhost',\n  port: 1433,\n  database: 'reporting',\n  username: 'sa',\n  password: Deno.env.get('MSSQL_PASSWORD'),\n  // local-dev TLS knobs; tighten for production\n  encrypt: true,\n  trustServerCertificate: true,\n});\n\nexport const reporting = new PrismaClient({ adapter: adapter.getDriverAdapter() });\nadapter.setClient(reporting);\nawait adapter.connect();"
-  },
-  {
-    label: "Env config helper",
-    lang: "ts",
-    code: "// Prefer env-driven config? Each engine ships a getter that reads structured\n// vars (MYSQL_HOST/…) and falls back to a connection-string env var.\nimport { createMysqlAdapter } from '@netscript/database/adapters/mysql';\nimport { getMysqlConfig } from '@netscript/database/adapters/mysql';\n\n// getMysqlConfig() → MysqlAdapterConfig from MYSQL_* or MYSQLDB_URI / DATABASE_URL.\nconst cfg = getMysqlConfig();\nconst adapter = createMysqlAdapter({\n  host: cfg.hostname,\n  port: cfg.port,\n  database: cfg.db,\n  username: cfg.username,\n  password: cfg.password,\n});\n// (getMssqlConfig / getPostgres equivalents exist per adapter.)"
-  }
-] }) }}
-
-{{ comp callout { type: "note", title: "A second datasource is a second schema dir" } }}
-A second engine is a separate Prisma schema workspace (for example
-<code>database/mysql/schema/</code>) with its own <code>generate</code> output and its own
-migrations — it does <em>not</em> merge into the Postgres aggregation above. Generate and
-migrate each datasource independently. The full step-by-step lives in the
-<a href="/data-persistence/how-to/use-a-second-database/">Use a second database</a> recipe.
-{{ /comp }}
+A second datasource, such as a reporting MySQL instance beside the primary Postgres, is a separate
+Prisma schema workspace (for example `database/mysql/schema/`) with its own `generate` output and its
+own migrations. It does not merge into the Postgres aggregation; you generate and migrate each
+datasource on its own. [Use a second database](/data-persistence/how-to/use-a-second-database/) covers
+both ways to add one: scaffolding it with `netscript db add`, or wiring an external database by hand
+with `createMysqlAdapter` or `createMssqlAdapter`.
 
 ## Endpoints & ports
 
-The database itself isn't an HTTP service you call — it's a Postgres container Aspire
-provisions and the generated Prisma client connects to. The relevant surfaces are the
-Aspire resources and the connection-string env vars the workspace resolves.
+The database is not an HTTP service. You work with the Aspire resources and the connection-string
+variables the workspace resolves:
 
 {{ comp.apiTable({
   caption: "Database surface (provisioned by Aspire)",
@@ -359,34 +260,11 @@ Aspire resources and the connection-string env vars the workspace resolves.
   ]
 }) }}
 
-{{ comp callout { type: "warning", title: "Production pitfalls" } }}
-<ul>
-<li><strong>Forgetting Aspire.</strong> The most common failure: running <code>netscript db init</code> with no <code>aspire start</code> up. Start orchestration first, from the <code>aspire/</code> folder.</li>
-<li><strong>Wrong directory.</strong> Run <code>aspire start</code> from <code>aspire/</code>, but run the <code>netscript db</code> commands from the workspace <strong>root</strong> (or pass <code>--project-root</code>).</li>
-<li><strong>Stale client after a schema change.</strong> Editing a <code>.prisma</code> file without re-running <code>netscript db generate</code> leaves your code typed against the old model.</li>
-<li><strong>Calling getClient() before setClient().</strong> A second-database adapter throws until you hand it the constructed <code>PrismaClient</code> via <code>setClient()</code>.</li>
-<li><strong>Tracing wired too late.</strong> <code>enablePrismaTracing()</code> must run <em>before</em> the first <code>PrismaClient</code> is constructed, or early query spans are lost.</li>
-<li><strong>Docker not running.</strong> Aspire provisions Postgres and Redis as containers; if Docker/Podman is down the <code>postgres</code> resource never goes green.</li>
-</ul>
-{{ /comp }}
-
-{{ comp callout { type: "note", title: "MSSQL & MySQL are sub-exports" } }}
-Postgres is the recommended engine and lives in the <code>@netscript/database/adapters</code> barrel.
-The <strong>SQL Server</strong> and <strong>MySQL</strong> adapters are imported from their
-own sub-paths — <code>@netscript/database/adapters/mssql</code> and
-<code>@netscript/database/adapters/mysql</code> — so a Postgres-only app never pulls in the
-heavier <code>mssql</code> / native-Deno MySQL drivers. The MySQL driver itself lives in the
-standalone <a href="/reference/prisma-adapter-mysql/"><code>@netscript/prisma-adapter-mysql</code></a>
-package.
-{{ /comp }}
-
 ## How it compares
 
-Backend platforms answer the persistence question differently, and each answer is a real
-trade-off. **Convex** replaces the relational engine with its own reactive datastore and
-a TypeScript-declared schema; **Supabase** standardizes on hosted Postgres with a SQL
-schema. NetScript keeps the engine decision with you and makes the Prisma schema the
-contract everything else is generated from.
+Convex replaces the relational engine with its own reactive datastore and a TypeScript-declared
+schema. Supabase standardizes on hosted Postgres with a SQL schema. NetScript leaves the engine
+choice to you and makes the Prisma schema the contract everything else is generated from.
 
 | | NetScript | Convex | Supabase |
 |---|---|---|---|
@@ -394,53 +272,21 @@ contract everything else is generated from.
 | Schema authored in Prisma files | Yes — aggregated per plugin | No — declared in TypeScript | No — SQL migrations |
 | Database runs in your own infrastructure by default | Yes — Aspire-provisioned container, or a server you point at | No — Convex Cloud by default (self-hosting available) | No — hosted Postgres by default (self-hosting available) |
 
-If your product wants a managed reactive datastore, those platforms are built for it. If
-your product needs to sit on a specific relational engine — an existing MSSQL estate, a
-Postgres you already operate, a file-backed SQLite for the desktop case — the driver
-adapters above are the mechanism that keeps your query code identical across all of them.
+If your product wants a managed reactive datastore, those platforms are built for it. If it needs a
+specific relational engine, such as an existing MSSQL estate, a Postgres you already operate or a
+file-backed SQLite for a desktop app, the driver adapters keep your query code identical across all
+of them.
 
-## Where to go next
+## Next steps
 
-This hub is intentionally thin — the full generated API lives in the reference. Pick the
-lane that matches what you're doing.
+Run the [Database & migration](/data-persistence/how-to/database-migration/) recipe to bring up
+Postgres and apply your first migration.
 
-{{ comp.featureGrid({ items: [
-  {
-    title: "Learn — Workspace data (Track B 03)",
-    body: "Guided tutorial: wire workspace data through Prisma, end to end, in the Team Workspace track.",
-    href: "/tutorials/workspace/03-workspace-data/",
-    icon: "→"
-  },
-  {
-    title: "Do — Use a second database",
-    body: "Task recipe: add an MSSQL or MySQL datasource beside Postgres with a driver adapter.",
-    href: "/data-persistence/how-to/use-a-second-database/",
-    icon: "◆"
-  },
-  {
-    title: "Do — Database & migration",
-    body: "Task recipe: bring up Postgres with Aspire, then run db init → generate → seed → status → migrate.",
-    href: "/data-persistence/how-to/database-migration/",
-    icon: "◆"
-  },
-  {
-    title: "Look up — @netscript/database reference",
-    body: "The full generated API: ports, the postgres/mssql/mysql adapters, extensions, and tracing.",
-    href: "/reference/database/",
-    icon: "≡"
-  },
-  {
-    title: "Understand — Orchestration with Aspire",
-    body: "Why the AppHost (aspire/apphost.mts) provisions Postgres and Redis, and how the resource graph fits together.",
-    href: "/explanation/aspire/",
-    icon: "◎"
-  },
-  {
-    title: "MySQL — prisma-adapter-mysql",
-    body: "The native-Deno MySQL Prisma driver adapter surface, generated.",
-    href: "/reference/prisma-adapter-mysql/",
-    icon: "→"
-  }
-] }) }}
+- [Use a second database](/data-persistence/how-to/use-a-second-database/): add an MSSQL or MySQL
+  datasource beside Postgres.
+- [Team Workspace tutorial, step 03](/tutorials/workspace/03-workspace-data/): wire workspace data
+  through the database from scratch.
+- [`@netscript/database` reference](/reference/database/): ports, the postgres/mssql/mysql adapters,
+  extensions and tracing.
 
 {{ comp.nextPrev({ prev: { label: "Durable streams", href: "/durable-workflows/streams/" }, next: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" } }) }}
