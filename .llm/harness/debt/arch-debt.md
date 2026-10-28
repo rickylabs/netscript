@@ -2971,3 +2971,32 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   parameter and must derive its own minimal closure. No U2/U3/E1, security, release or production
   E2E acceptance is implied. Function-level `@example` and every other documentation obligation
   remain unwaived.
+
+## plugins/streams/services/mod.ts - F-5 native identity closure (21 symbols)
+
+- **ID:** `STREAMS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261028`
+- **Owner:** Native-host migration coordinator and repository maintainer `rickylabs`.
+- **Target:** 2026-11-10. No automatic extension or growth beyond these exact21 names.
+- **Status:** Open, `DEBT_ACCEPTED`, after same original independent PLAN evaluator process PASS
+  and root acceptance. Numeric21 exceeds20; this is not numeric F-5 PASS or a type-only discount.
+- **Reason:** The approved streams signature needs this native public doc-lint closure. Actual
+  six-name and20-name probes fail; the21-name probe passes. Production doc-lint and every other
+  F-5 clause still require their own evidence.
+- **Exact scope:** `plugins/streams/services/mod.ts`. Own `startStreamsService`,
+  `StreamsServiceOptions`; service types `CorsOptions`, `RunningService`, `RunningServiceAddress`,
+  `ServeOptions`, `ServiceApp`, `ServiceEnvironment`, `ServiceTlsOptions`; auth types
+  `AuthenticatorPort`, `AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`,
+  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ServiceAuthPolicy`,
+  `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`. Nineteen native names are direct
+  type-only identity re-exports, with no aliases, structural substitutes or wildcard.
+- **Linked plan:** `.llm/runs/fix-native-host-policy--u1/plan.md`, `plan-review-addendum.md`,
+  `s5-streams-factory-proposal.md` and `plan-streams-f5-debt-eval.md` in that run.
+- **Independent finding:** Same original Grok session `ses_e8149b729ffeT3e3Xjhrqyql5U`, verdict
+  SHA256 `8f9907d5c4b0864467bb295dbca5c8534995721779f2411b2bafbc974a61f508`.
+- **Closing gate:** Separately reviewed compatible native public-signature/doc-lint solution
+  meeting cap20 OR explicit doctrine amendment with matching fitness changes; exact public type
+  identity/inventory, doc-lint zero and retained lifecycle/security gates before closure.
+- **Excluded:** Workers debt, legacy streams main until separately reviewed S6, U2/U3/E1,
+  security/release/production E2E. No dependency/lock change, extra API, type erasure, cast,
+  suppression, checker override or acceptance by analogy. Function-level `@example` and every
+  other documentation obligation remain unwaived.

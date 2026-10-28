@@ -1,0 +1,3 @@
+import type { StreamsServiceOptions } from '@netscript/plugin-streams/service';
+const invalid: StreamsServiceOptions = { auth: { public: true, reason: 'type control' }, serve: { port: '0' } };
+void invalid;

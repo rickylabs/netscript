@@ -1,0 +1,11 @@
+import { createStaticCredentialAuthenticator } from '@netscript/service/auth';
+import { startStreamsService } from '@netscript/plugin-streams/service';
+
+const authenticator = createStaticCredentialAuthenticator({
+  credentials: { local: { subject: 'service:streams', scopes: [], roles: ['service'] } },
+});
+const running = await startStreamsService({
+  auth: { authn: { authenticator } },
+  serve: { hostname: '127.0.0.1', port: 0 },
+});
+await running.stop();
