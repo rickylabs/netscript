@@ -66,9 +66,10 @@ export interface ReadmeFenceCensus {
   readonly typeErrors: number;
   readonly failingReadmes: number;
   /**
-   * The compiler reported failure that this gate could attribute to neither a type error nor an
-   * excluded syntax-invalid fence. Never expected; failing on it stops an unreadable diagnostic
-   * shape from being silently swallowed, which is the defect #1892 found in the sibling gate.
+   * The compiler reported a failure that this gate could not attribute to a type error in a checked
+   * fence (for example a module-graph error such as an unknown `jsr:` export). Never expected;
+   * failing on it stops an unreadable diagnostic shape from being silently swallowed, which is the
+   * defect #1892 found in the sibling gate.
    */
   readonly unattributedFailure: boolean;
 }

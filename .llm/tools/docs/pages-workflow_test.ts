@@ -176,5 +176,9 @@ Deno.test('Pages deploy releases the serial queue within its own finite deadline
     Number.isSafeInteger(workflow.deployTimeoutMinutes) && workflow.deployTimeoutMinutes > 0,
     'deploy job needs a finite positive timeout',
   );
-  assertEquals(workflow.deployTimeoutMinutes, 2, 'two minutes allows margin over 9–10 second jobs');
+  assertEquals(
+    workflow.deployTimeoutMinutes,
+    10,
+    'ten minutes matches the deploy-pages default and covers a slow Pages backend; normal jobs take 9–10 seconds',
+  );
 });
