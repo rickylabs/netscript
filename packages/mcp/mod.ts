@@ -249,3 +249,12 @@ export { OverrideEndpointSource } from './src/infrastructure/service-endpoints/o
 export type { OverrideEndpointSourceOptions } from './src/infrastructure/service-endpoints/override-endpoint-source.ts';
 export { RunManifestEndpointSource } from './src/infrastructure/service-endpoints/run-manifest-endpoint-source.ts';
 export type { RunManifestEndpointSourceOptions } from './src/infrastructure/service-endpoints/run-manifest-endpoint-source.ts';
+
+export {
+  createUiRegistryFlows,
+  UI_REGISTRY_PAGE_LIMIT,
+} from './src/application/registry/ui-registry-flows.ts';
+export type {
+  UiRegistryCatalogPort,
+  UiRegistryItemSummary,
+} from './src/ports/ui-registry-catalog-port.ts';

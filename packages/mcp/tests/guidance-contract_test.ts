@@ -30,11 +30,11 @@ const recommendation = (index: number): GuidanceRecommendation => ({
   }],
 });
 
-Deno.test('find_guidance is the 22nd bounded read-only tool contract', () => {
+Deno.test('find_guidance remains a bounded read-only tool contract', () => {
   const registry = createToolRegistry();
   const tool = registry.find((candidate) => candidate.name === 'find_guidance');
 
-  assertEquals(registry.length, 22);
+  assertEquals(registry.length, 26);
   assertEquals(tool?.kind, 'read');
   assertEquals(tool?.inputSchema, TOOL_INPUT_SCHEMAS.find_guidance);
   assertEquals(tool?.outputSchema, TOOL_OUTPUT_SCHEMAS.find_guidance);

@@ -13,7 +13,11 @@ Deno.test('registry enumerates the complete v1 contract surface', () => {
     assertEquals(tool.outputSchema.jsonSchema.type, 'object');
     assertMatch(
       tool.description,
-      tool.name === 'get_doc' ? /faithful documentation/ : /bounded summary/,
+      tool.name === 'get_doc'
+        ? /faithful documentation/
+        : tool.name === 'view_registry_item'
+        ? /exact UI registry copy bytes/
+        : /bounded summary/,
     );
   }
 });
@@ -92,20 +96,20 @@ Deno.test('docs drift proof: documentation reflects registered tool surface and 
     new URL('../../../docs/site/ai/agent-tooling.md', import.meta.url),
   );
 
-  assertEquals(TOOL_NAMES.length, 22);
+  assertEquals(TOOL_NAMES.length, 26);
   assertEquals(TOOL_NAMES.includes('record_drift'), true);
 
   assert(
-    readme.includes('22 token-bounded tools'),
-    'README.md does not state 22 token-bounded tools',
+    readme.includes('26 token-bounded tools'),
+    'README.md does not state 26 token-bounded tools',
   );
   assert(
-    refMcp.includes('22 token-bounded tools') || refMcp.includes('22 tools'),
-    'reference/mcp/index.md missing 22 tools count',
+    refMcp.includes('26 token-bounded tools') || refMcp.includes('26 tools'),
+    'reference/mcp/index.md missing 26 tools count',
   );
   assert(
-    agentTooling.includes('Twenty-two tools') || agentTooling.includes('22 tools'),
-    'agent-tooling.md missing 22 tools count',
+    agentTooling.includes('Twenty-six tools') || agentTooling.includes('26 tools'),
+    'agent-tooling.md missing 26 tools count',
   );
 
   for (const toolName of TOOL_NAMES) {
@@ -149,6 +153,9 @@ Deno.test('registry declares semantic truncation and envelope policies per tool'
   const getDoc = registry.find((tool) => tool.name === 'get_doc')!;
   assertEquals(getDoc.truncation, 'exempt');
   assertEquals(getDoc.envelopeCheck, true);
+  const viewItem = registry.find((tool) => tool.name === 'view_registry_item')!;
+  assertEquals(viewItem.truncation, 'exempt');
+  assertEquals(viewItem.envelopeCheck, true);
   const search = registry.find((tool) => tool.name === 'search_docs')!;
   assertEquals(search.truncation, undefined);
   assertEquals(search.envelopeCheck, undefined);
