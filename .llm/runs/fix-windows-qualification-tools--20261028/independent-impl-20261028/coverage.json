@@ -1,0 +1,214 @@
+{
+  "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+  "reads": [
+    {
+      "name": "01a-source-lines1-650.md",
+      "expectedLines": 649,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "01b-source-lines651-end.md",
+      "expectedLines": 575,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "02-source.md",
+      "expectedLines": 331,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "03-source.md",
+      "expectedLines": 522,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "04-source.md",
+      "expectedLines": 619,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "05-source.md",
+      "expectedLines": 430,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "06a-skills.md",
+      "expectedLines": 628,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "06b-deno.md",
+      "expectedLines": 281,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "06c-contract.md",
+      "expectedLines": 620,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "07-diff.md",
+      "expectedLines": 257,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "08-gates.md",
+      "expectedLines": 594,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "09-db-source.md",
+      "expectedLines": 347,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "10-db-contract.md",
+      "expectedLines": 215,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "11-db-gates.md",
+      "expectedLines": 646,
+      "complete": true,
+      "calls": 1
+    }
+  ],
+  "mcp": [
+    {
+      "tool": "netscript_find_guidance",
+      "input": {
+        "intent": "Qualify documentation tooling gates: JSDoc example compilation/census gates and export/reference documentation drift validation, plus native Deno dependency-graph diagnosis (deno info --json) for a Windows cold npm identity checker",
+        "limit": 6
+      },
+      "status": "completed"
+    },
+    {
+      "tool": "netscript_search_docs",
+      "input": {
+        "limit": 8,
+        "query": "JSDoc example qualification export drift reference documentation validation deno info npm dependency graph identities"
+      },
+      "status": "completed"
+    }
+  ],
+  "steps": [
+    {
+      "reason": "tool-calls",
+      "cost": 0.002605,
+      "tokens": {
+        "total": 15451,
+        "input": 14630,
+        "output": 240,
+        "reasoning": 581,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.00422027,
+      "tokens": {
+        "total": 39074,
+        "input": 24339,
+        "output": 234,
+        "reasoning": 37,
+        "cache": {
+          "write": 0,
+          "read": 14464
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.00559223,
+      "tokens": {
+        "total": 67819,
+        "input": 28997,
+        "output": 119,
+        "reasoning": 47,
+        "cache": {
+          "write": 0,
+          "read": 38656
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.00441038,
+      "tokens": {
+        "total": 83022,
+        "input": 15418,
+        "output": 118,
+        "reasoning": 30,
+        "cache": {
+          "write": 0,
+          "read": 67456
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.00498129,
+      "tokens": {
+        "total": 99044,
+        "input": 16221,
+        "output": 120,
+        "reasoning": 15,
+        "cache": {
+          "write": 0,
+          "read": 82688
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.01038484,
+      "tokens": {
+        "total": 124805,
+        "input": 16098,
+        "output": 133,
+        "reasoning": 9886,
+        "cache": {
+          "write": 0,
+          "read": 98688
+        }
+      }
+    },
+    {
+      "reason": "stop",
+      "cost": 0.00759945,
+      "tokens": {
+        "total": 131622,
+        "input": 12481,
+        "output": 2576,
+        "reasoning": 2005,
+        "cache": {
+          "write": 0,
+          "read": 114560
+        }
+      }
+    }
+  ],
+  "failures": [],
+  "targetHeads": {
+    "Windows2424": "0d5b982b0a3050b94172770a435581c931c93b22",
+    "DB2425": "d4b391217664371c17295529b956bd9f8950712a"
+  },
+  "distinctPublicReportsRequired": 2,
+  "manualRootRelevanceAndVerdictRequired": true
+}

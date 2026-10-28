@@ -61,3 +61,8 @@ PLAN-EVAL: N/A; concrete mechanical correction as recorded in plan.md. No source
 - `green-policy-corpus-tests.json`: 7/7 PASS, explicit ops/resources sanitizers; unchanged corpus test enforces all 20 #1766 owner controls, positive complete compilation and genuine WorkOS old-signature negative with exactly one TS2322. The earlier related-docs 18/1 report is retained as native RED; the other 12 passing related tests were unaffected by this three-expression identity change.
 - `green-jsdoc-corpus-canonical-identity.json`: PASS, 112,766 ms within 300,000 ms bound. Counts unchanged: 35 members, 2,317 files, 471 examples, 470 candidates = 470 checked, 0 exempt, 1 non-TS, zero failures of every class.
 - Final source unchanged since five-owner hash capture; root lock/config/MCP and immutable corpus/policy tests rechecked unchanged; diff check PASS; zero workspace private compiler temporary directories. All started validation subprocesses completed. Supervisor substantive source review and independent IMPL-EVAL are the remaining gates; no commit/push/PR.
+
+
+## Independent IMPL root acceptance20261028
+
+Separate Zhipu sessionses_e7f7e1f2fffeXF2xqxTB3BtiwD returns exact-source PASS for this leaf; root substantively reviewed its entire report, own MCP and14 EOF reads, and accepted the scoped verdict. No product source changes. [Root qualifications](root-independent-impl-acceptance-20261028.md). Critical dependency/integration gates remain open; no merge/release acceptance.
