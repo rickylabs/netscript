@@ -1,0 +1,16 @@
+import { executeGate } from '../../tools/gates/command-lifecycle.ts';
+import { AtomicFileReceiptStore } from '../../tools/gates/receipt-store.ts';
+const name = Deno.args[0];
+if (!['cold-unchanged-red', 'cold-green'].includes(name)) throw new Error('Explicit cold phase required');
+const cwd = Deno.cwd();
+const head = await new Deno.Command('git', { args: ['rev-parse', 'HEAD'], stdout: 'piped', stderr: 'piped' }).output();
+if (!head.success) throw new Error('Cannot attest source head');
+const gitHead = new TextDecoder().decode(head.stdout).trim();
+const result = await executeGate({
+  gateId: 'native-db-cold-consumers', invocationId: name, attempt: 1,
+  argv: [Deno.execPath(), 'run', '--cached-only', '--frozen', '--allow-read', '--allow-write', '--allow-env', '--allow-run', '.llm/tools/deps/check-db-alignment.ts'],
+  cwd, gitHead, actualGitHead: gitHead, timeoutMs: 120_000,
+  runnerIdentity: '/root/service_qualification_sol',
+}, { store: new AtomicFileReceiptStore(`.llm/tmp/native-db-qualification-sol-20261028/${name}.receipt.json`) });
+console.log(JSON.stringify(result));
+Deno.exit(result.exitCode ?? 1);

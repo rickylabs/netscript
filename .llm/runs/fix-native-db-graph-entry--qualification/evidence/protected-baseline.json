@@ -1,0 +1,184 @@
+{
+  "baseline": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "sources": [
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": "deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": "deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": "packages/sdk/deno.json",
+      "sha256": "c3ee8b9719fca2f2faeeb62422ba5596ef1ce9c2ffd7e73f2060cd2ca3f1e5cc"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": "packages/fresh/deno.json",
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": ".llm/tools/deps/workspace.ts",
+      "sha256": "6b4bcbc94ec9172eb10cce60bd45ccbfad0cc76cfdc9c0d7f23d03835924ed31"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": ".llm/tools/gates/catalog.ts",
+      "sha256": "7cc379d70d924ea423d7c18c5908d48de73e786082264bf05f38695079a0db83"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": ".llm/tools/gates/process-runner.ts",
+      "sha256": "7619a96d3b0b4ff77f1097a57103a2c7e3d84d3ee8ad6752a0ab528d0b0fc039"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": ".llm/tools/run-deno-test.ts",
+      "sha256": "ba66dd5334df1ce7b1fa78b82a036b94cd54fdb85ac4ca5345dc5f26bd09c06d"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": ".llm/tools/run-deno-check.ts",
+      "sha256": "983ddae25874c6384e356ba8ec47369e4b7790097d3be7ba5c815f232c5df0e9"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": ".llm/tools/run-deno-lint.ts",
+      "sha256": "2ff1bcc0077442581acce4d16f2a9521341313582942301a6c5bd6e14769e734"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-native-db-qualification-008",
+      "path": ".llm/tools/run-deno-fmt.ts",
+      "sha256": "ac8e7589eb682b8ccb7df645d274cee0afc0d5577b4754089c8f8c5a771e9644"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/plugin/tests/service/create-plugin-service-auth_test.ts",
+      "sha256": "24cd6d86f27e147f09d71c1afaf9b66f9a0a13fb5c694763f9ea62846db42c28"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/CHANGELOG.md",
+      "sha256": "4ab70c6e658f082e1231587d04c7eb52712817d8ec726833d91bc1cc3f9d428f"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/README.md",
+      "sha256": "11f556ff05d88ff15b36b700a9e36e944deb2f0c13709ac31891c3430149174a"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/mod.ts",
+      "sha256": "19f94d3d99c5c5ce8411335cf896d33e9f0129f3c38ee5d576d254ca1b7f9e9e"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/auth/auth-middleware.ts",
+      "sha256": "ae16fb44ca55d048d867bd06f669ea2895e46af51287b5c8f5cecbea9ee5cb32"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/auth/mod.ts",
+      "sha256": "9c384b7b34ff323e171718f1a43c65538be89105c53a510c3ed3030a19e7dab7"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/auth/options.ts",
+      "sha256": "6f32f887b8dea35fef1f11bf19e244c678e30fa87a4e3a2848062af7e0fa75b2"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/builder/service-builder-impl.ts",
+      "sha256": "74090bb6ec406b4f648a0e77d2ebee4e63cc202a4d4023d5d9de37103c4130b9"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/diagnostics/database-connectivity.ts",
+      "sha256": "854e3c3356065560ebfb5759e1665ef0fc3ee8cecf8c75773d09f5df24147ee6"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/middleware/service-cors.ts",
+      "sha256": "bf8084a59737382ac3b9e79293d9c45fa873dc58cc70d0492e95fab8d81245d0"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/primitives/body-limit.ts",
+      "sha256": "cf570dcb7a4a65f19e9ee992f3c2273879f567b710990d045c5a462941cc82b1"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/auth/builder-auth_test.ts",
+      "sha256": "09b8b83a399105716607ed1d4cb9ef1ee5f7818570cb6475f8f030bc2ef681fa"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/auth/define-service-auth_test.ts",
+      "sha256": "e725e29e30f6423297af9b2a8eabac960ea2aea69b4ccff732527c8299a372f2"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/auth/health-auth-order_test.ts",
+      "sha256": "c785869359b8fca476db9fe94e2d4b7c188196ea34d085966453e3a57b3078bb"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/auth/middleware_test.ts",
+      "sha256": "67443947ed85b05d07324e85326ce5b522168f81ed877f8ae4c7da2bd2c42a05"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/body-limit_test.ts",
+      "sha256": "c056cb621def1fa3ce4e032a60a1353eba2f3c4bcf9432647a7d9febdaa935a0"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/cors-response-authority_test.ts",
+      "sha256": "e2668ae9ce623a28caed562bed4d9c6b43af46737857599b99bacd8653ac9bc3"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/database-connectivity_test.ts",
+      "sha256": "f1f8ee2dc7fdd8ce7861edcca412f74b9724cb382bee43529d30d491bfae5f3a"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/legacy-abort_test.ts",
+      "sha256": "8781d5d9144250b5554d6e53b84d7b54f54938c5b0f685ee484082d935a56a0c"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/check-exports-drift.ts",
+      "sha256": "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/check-exports-drift_test.ts",
+      "sha256": "033e33dbbde1efb8fef9f5f29d4ffd9c32e3761e2247e9bcb682daaf2ccdffd1"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/jsdoc-example-compiler.ts",
+      "sha256": "cc70b2791667f698f853a81409ce482fb8eef768924623ac816f013f17715f18"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/jsdoc-example-compiler_test.ts",
+      "sha256": "27bad4e2dcb444f5c7f87f3488a1393f5c0e7cf19f1ab59aec0fcba20ac46417"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/jsdoc-example-policy.ts",
+      "sha256": "ec954fff331b75c023df39a84929bb0c8833bd1cab07bb9d62d859a671a4cefc"
+    }
+  ],
+  "serviceOwners": 19,
+  "windowsOwners": 5,
+  "packageJsonAbsent": true,
+  "ownedTempBaseline": []
+}

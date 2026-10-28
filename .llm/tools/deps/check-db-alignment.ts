@@ -1,10 +1,10 @@
 /** Guard the Collection identity shared by SDK query and Fresh stream adapters. */
-import { join } from '@std/path';
+import { join, toFileUrl } from '@std/path';
 import { parseRegistrySpecifier, readJsonFile } from './workspace.ts';
 
 interface DependencyGraph {
   readonly npmPackages?: Readonly<Record<string, unknown>>;
-  readonly modules?: readonly { readonly error?: unknown }[];
+  readonly modules?: readonly { readonly kind?: string; readonly error?: unknown }[];
 }
 
 /** Cold graph verdict; identities include peer-resolution suffixes. */
@@ -22,7 +22,11 @@ export function analyzeDbGraph(graph: DependencyGraph): DbAlignmentReport {
   if (identities.length !== 1) {
     findings.push('Expected exactly one complete @tanstack/db identity');
   }
-  if ((graph.modules ?? []).some((module) => module.error !== undefined)) {
+  const modules = graph.modules ?? [];
+  if (!modules.some((module) => typeof module.kind === 'string' && module.kind !== 'external')) {
+    findings.push('Consumer graph contains no resolved modules');
+  }
+  if (modules.some((module) => module.error !== undefined)) {
     findings.push('Consumer graph contains unresolved modules');
   }
   return { identities, findings };
@@ -60,7 +64,14 @@ async function checkColdConsumer(root: string, freshOnly: boolean): Promise<bool
       ).join('\n'),
     );
     const result = await new Deno.Command(Deno.execPath(), {
-      args: ['info', '--json', '--no-config', '--no-lock', '--node-modules-dir=none', entry],
+      args: [
+        'info',
+        '--json',
+        '--no-config',
+        '--no-lock',
+        '--node-modules-dir=none',
+        toFileUrl(entry).href,
+      ],
       env: { DENO_DIR: join(directory, 'cache') },
       stdout: 'piped',
       stderr: 'piped',

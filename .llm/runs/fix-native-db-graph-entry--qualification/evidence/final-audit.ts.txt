@@ -1,0 +1,39 @@
+const evidence = '.llm/tmp/native-db-qualification-sol-20261028';
+const hash = async (bytes: Uint8Array) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map((n) => n.toString(16).padStart(2, '0')).join('');
+const json = async (path: string) => JSON.parse((await Deno.readTextFile(path)).replace(/^\uFEFF/, ''));
+const baseline = await json(`${evidence}/protected-baseline.json`);
+const protectedFiles = [];
+for (const row of baseline.sources) {
+  const current = await hash(await Deno.readFile(`${row.root}/${row.path}`));
+  if (current !== row.sha256) throw new Error(`Protected source changed: ${row.root}/${row.path}`);
+  protectedFiles.push({ ...row, current, matches: true });
+}
+const sources = [];
+for (const [path, cap] of [['.llm/tools/deps/check-db-alignment.ts', 120], ['.llm/tools/deps/check-db-alignment_test.ts', 140]] as const) {
+  const bytes = await Deno.readFile(path);
+  const text = new TextDecoder().decode(bytes);
+  const lines = text.split('\n').length - (text.endsWith('\n') ? 1 : 0);
+  if (lines > cap) throw new Error('Source line cap exceeded');
+  sources.push({ path, lines, cap, sha256: await hash(bytes) });
+}
+const lintConfig = await json(`${evidence}/lint-canonical-rules.json`);
+const rootConfig = await json('deno.json');
+if (JSON.stringify(lintConfig.lint.rules) !== JSON.stringify(rootConfig.lint.rules)) throw new Error('Canonical lint rules differ');
+const getGit = async (args: string[]) => {
+  const result = await new Deno.Command('git', { args, stdout: 'piped', stderr: 'piped' }).output();
+  if (!result.success) throw new Error(`Git failed: ${args.join(' ')}`);
+  return result.stdout;
+};
+const changed = new TextDecoder().decode(await getGit(['diff', '--name-only', 'HEAD'])).trim().split(/\r?\n/).filter(Boolean).sort();
+if (JSON.stringify(changed) !== JSON.stringify(sources.map((row) => row.path).sort())) throw new Error(`Unexpected tracked changes: ${changed}`);
+await getGit(['diff', '--check']);
+const diff = await getGit(['diff', '--full-index', '--', ...sources.map((row) => row.path)]);
+await Deno.writeFile(`${evidence}/two-owner.diff`, diff);
+const ownedScratch = [];
+for await (const row of Deno.readDir(`${evidence}/owned-temp`)) ownedScratch.push(row.name);
+if (ownedScratch.length !== 0) throw new Error(`Owned scratch not clean: ${ownedScratch}`);
+const arch = await json(`${evidence}/arch-check.receipt.json`);
+if (!['PASS', 'FAIL', 'TIMED_OUT', 'SPAWN_FAILED', 'INTERRUPTED'].includes(arch.outcome)) throw new Error('Architecture gate not terminal');
+const report = { baseline: baseline.baseline, generatorStatus: 'Source and gate evidence for root review; no independent self-certification', sourceOwners: sources, protectedFiles, allProtectedHashesMatch: true, lintRulesExactlyMatchRoot: true, firstLintRefusalRetained: true, changedTrackedOwners: changed, sourceWhitespaceExit: 0, diffSha256: await hash(diff), ownedScratchEntries: ownedScratch, packageJsonAbsent: !(await Deno.stat('package.json').catch(() => null)), archOutcome: arch.outcome, archExitCode: arch.exitCode, noCommit: true, noInference: true };
+await Deno.writeTextFile(`${evidence}/final-audit.json`, JSON.stringify(report, null, 2) + '\n');
+console.log(JSON.stringify({ ...report, protectedFiles: protectedFiles.length }));
