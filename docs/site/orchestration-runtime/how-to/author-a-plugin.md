@@ -63,7 +63,7 @@ It scaffolds a **proxy** connector by default. The options:
 
 The core package's `deno.json` is strict and exports `. ./contracts/v1 ./domain ./ports ./testing`:
 
-```text
+```tree
 packages/plugin-notifier-core/
 ├── deno.json                          # strict; exports . ./contracts/v1 ./domain ./ports ./testing
 ├── mod.ts                             # curated builders + domain type re-exports
@@ -81,7 +81,7 @@ The connector carries only integration. Its `deno.json` exports
 `. ./contracts ./services ./aspire ./cli ./scaffold`, and its `contracts/v1.ts` re-exports the
 core's `contracts/v1`:
 
-```text
+```tree
 plugins/notifier/
 ├── deno.json                 # exports . ./contracts ./services ./aspire ./cli ./scaffold
 ├── package.json
