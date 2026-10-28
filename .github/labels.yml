@@ -233,7 +233,7 @@
   color: "5319e7"
   description: "Plugin CLI command contribution architecture"
 
-# ── wave: release-train bucket (maps to milestone) ───────────────────────────
+# ── wave: scheduling band (does not determine the milestone) ─────────────────
 - name: "wave:v1"
   color: "c2e0c6"
   description: "v1 release train (beta.5-beta.8 cuts)"

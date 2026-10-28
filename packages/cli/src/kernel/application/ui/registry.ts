@@ -1,6 +1,5 @@
 import { dirname, isAbsolute, join, normalize, relative, resolve, toFileUrl } from '@std/path';
 import { normalize as posixNormalize } from '@std/path/posix';
-import { FRESH_UI_REGISTRY_CONTENT, freshUiRegistryManifest } from '@netscript/fresh-ui/registry';
 
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { importEntryForDependency, mergeDenoJsonImports } from './registry-deno-json.ts';
@@ -57,7 +56,10 @@ export type UiInstallResult = {
 };
 
 export type UiRegistryListEntry = UiRegistryItem & { readonly installed: boolean };
-export type UiUpdateResult = { readonly updated: readonly string[]; readonly drifted: readonly string[] };
+export type UiUpdateResult = {
+  readonly updated: readonly string[];
+  readonly drifted: readonly string[];
+};
 
 type PlannedFile = {
   readonly source: string;
@@ -82,12 +84,15 @@ export async function installUiRegistryItems(
   input: UiInstallInput,
   dependencies: UiInstallDependencies,
 ): Promise<UiInstallResult> {
+  const { freshUiRegistryManifest } = await import('@netscript/fresh-ui/registry');
   const registryRoot = input.registryRoot === undefined ? undefined : resolve(input.registryRoot);
   const projectRoot = resolve(input.projectRoot);
   const manifest = registryRoot === undefined
     ? freshUiRegistryManifest
     : await loadRegistryManifest(registryRoot);
-  const registryContent = registryRoot === undefined ? FRESH_UI_REGISTRY_CONTENT : undefined;
+  const registryContent = registryRoot === undefined
+    ? (await import('@netscript/fresh-ui/registry')).FRESH_UI_REGISTRY_CONTENT
+    : undefined;
   const items = resolveRegistryItems(manifest, input.names, input.theme);
   const plannedFiles = planFiles(registryRoot, projectRoot, items);
   const sourceToTarget = new Map(plannedFiles.map((file) => [normalize(file.source), file.target]));
@@ -130,7 +135,13 @@ export async function installUiRegistryItems(
 export async function listUiRegistryItems(
   projectRootInput: string,
   fs: FileSystemPort,
-): Promise<{ readonly items: readonly UiRegistryListEntry[]; readonly collections: readonly UiRegistryCollection[] }> {
+): Promise<
+  {
+    readonly items: readonly UiRegistryListEntry[];
+    readonly collections: readonly UiRegistryCollection[];
+  }
+> {
+  const { freshUiRegistryManifest } = await import('@netscript/fresh-ui/registry');
   const projectRoot = resolve(projectRootInput);
   const items = await Promise.all(freshUiRegistryManifest.items.map(async (item) => ({
     ...item,
@@ -147,15 +158,26 @@ export async function updateUiRegistryItems(
   names: readonly string[],
   fs: FileSystemPort,
 ): Promise<UiUpdateResult> {
+  const { freshUiRegistryManifest, FRESH_UI_REGISTRY_CONTENT } = await import(
+    '@netscript/fresh-ui/registry'
+  );
   const projectRoot = resolve(projectRootInput);
-  const selected = names.length ? resolveRegistryItems(freshUiRegistryManifest, names) :
-    (await listUiRegistryItems(projectRoot, fs)).items.filter((item) => item.installed);
+  const selected = names.length
+    ? resolveRegistryItems(freshUiRegistryManifest, names)
+    : (await listUiRegistryItems(projectRoot, fs)).items.filter((item) => item.installed);
   const updated: string[] = [];
   const drifted: string[] = [];
   for (const file of planFiles(undefined, projectRoot, selected)) {
     const desired = rewriteRegistryImports(
-      readRegistryContent(FRESH_UI_REGISTRY_CONTENT, file.source), file.source, file.target,
-      undefined, new Map(planFiles(undefined, projectRoot, selected).map((entry) => [normalize(entry.source), entry.target])),
+      readRegistryContent(FRESH_UI_REGISTRY_CONTENT, file.source),
+      file.source,
+      file.target,
+      undefined,
+      new Map(
+        planFiles(undefined, projectRoot, selected).map((
+          entry,
+        ) => [normalize(entry.source), entry.target]),
+      ),
     );
     if (!await fs.exists(file.target)) {
       await fs.writeFile(file.target, desired);
@@ -171,17 +193,23 @@ export async function removeUiRegistryItem(
   name: string,
   fs: FileSystemPort,
 ): Promise<readonly string[]> {
+  const { freshUiRegistryManifest } = await import('@netscript/fresh-ui/registry');
   const projectRoot = resolve(projectRootInput);
   const item = freshUiRegistryManifest.items.find((candidate) => candidate.name === name);
   if (!item) throw new Error(`Unknown Fresh UI registry item: ${name}`);
   const removed: string[] = [];
   for (const file of item.files) {
     const target = resolveTarget(projectRoot, file.target);
-    if (await fs.exists(target)) { await fs.remove(target); removed.push(target); }
+    if (await fs.exists(target)) {
+      await fs.remove(target);
+      removed.push(target);
+    }
   }
   const denoJsonPath = resolve(projectRoot, 'deno.json');
   if (await fs.exists(denoJsonPath)) {
-    const config = JSON.parse(await fs.readFile(denoJsonPath)) as { imports?: Record<string, string> };
+    const config = JSON.parse(await fs.readFile(denoJsonPath)) as {
+      imports?: Record<string, string>;
+    };
     const installed = (await listUiRegistryItems(projectRoot, fs)).items;
     for (const dependency of item.dependencies ?? []) {
       // Prune by the entry `ui:add` actually wrote, not by the raw specifier: two items may

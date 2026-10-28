@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-10-28T13:34:42.706Z",
+  "sourceHead": "5a5c1a42846bdde395b7fab5820cee716112129e",
+  "platform": "linux",
+  "architecture": "x64",
+  "browser": "Chromium 153.0.8010.12",
+  "playwright": "1.63.0",
+  "axeAdapter": "4.11.1",
+  "axeEngine": "4.11.4",
+  "accessibilityPolicy": "Exact S0 findings with two reductions; Utility has zero allowances. Opt-in CSS loading and small icon geometry are checked.",
+  "routes": [
+    "/design/tokens",
+    "/design/components",
+    "/design/tokens?preset=studio-utility"
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    390,
+    1280
+  ],
+  "screenshotPolicy": "Capture only. No pixel comparison; normal tests do not rewrite this baseline.",
+  "sourceDirty": true
+}

@@ -31,6 +31,8 @@ import { resolveManifest } from '../../../kernel/adapters/deploy/commands/manife
 import { DenoProcess } from '../../../kernel/adapters/runtime/process/deno-process.ts';
 import { DenoGeneratedSourceFormatter } from '../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
+import { FreshUiTokenEngine } from '../../../kernel/adapters/tokens/fresh-ui-token-engine.ts';
+import type { TokenEnginePort } from '../../../kernel/ports/token-engine-port.ts';
 import { DryRunFileSystemAdapter } from '../../../kernel/adapters/scaffold/dry-run-fs.ts';
 import { CliffyPrompt } from '../../../kernel/adapters/runtime/prompt/cliffy-prompt.ts';
 import { Scaffolder } from '../../../kernel/adapters/scaffold/scaffolder.ts';
@@ -101,6 +103,8 @@ export interface PublicCommandDependencies {
   readonly projectStage: ProjectStagePort;
   /** Filesystem adapter used by scaffold and config flows. */
   readonly fs: DenoFileSystem;
+  /** Lazily load the public Fresh UI token builder for token commands. */
+  readonly tokenEngine: TokenEnginePort;
   /** Process adapter used by init and deployment flows. */
   readonly process: DenoProcess;
   /** Template renderer used by scaffold flows. */
@@ -328,6 +332,7 @@ export function createPublicCommandDependencies(
     dbRegistry,
     loadConfig,
     runtimeConfigStore,
+    tokenEngine: new FreshUiTokenEngine(),
     resolveProjectRoot,
     resolveUiAppRoot,
     initCommandDependencies: {

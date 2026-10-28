@@ -8,6 +8,7 @@ import { createInitCommand } from '../init/init-command.ts';
 import { createMarketplaceCommand } from '../marketplace/marketplace-group.ts';
 import { createPluginCommand } from '../plugins/plugins-group.ts';
 import { createServiceCommand } from '../services/services-group.ts';
+import { createTokensCommand } from '../tokens/tokens-group.ts';
 import { createUiAddCommand } from '../ui/add/add-ui-command.ts';
 import { createUiInitCommand } from '../ui/init/init-ui-command.ts';
 import { createAgentCommand } from '../agent/agent-group.ts';
@@ -87,6 +88,10 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
   registry.register('service', {
     id: 'service',
     create: ({ dependencies }) => createServiceCommand(dependencies),
+  });
+  registry.register('tokens', {
+    id: 'tokens',
+    create: ({ dependencies }) => createTokensCommand(dependencies),
   });
   registry.register('ui:add', {
     id: 'ui:add',

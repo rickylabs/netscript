@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "id": "studio-ledger",
+  "language": "studio",
+  "flavor": "ledger",
+  "density": "compact",
+  "sourceDensity": "Dense"
+}

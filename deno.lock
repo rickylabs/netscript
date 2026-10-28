@@ -182,12 +182,14 @@
     "npm:@types/babel__core@^7.20.5": "7.20.5",
     "npm:@workos-inc/node@10.4.0": "10.4.0",
     "npm:@workos-inc/node@^10.4.0": "10.4.0",
+    "npm:ajv@8.20.0": "8.20.0",
     "npm:amqplib@^2.2.0": "2.2.0",
     "npm:amqplib@~0.10.3": "0.10.9",
     "npm:asn1js@^3.0.10": "3.0.10",
     "npm:better-auth@^1.7.7": "1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1",
     "npm:byte-encodings@^1.0.11": "1.0.11",
     "npm:clsx@^2.1.1": "2.1.1",
+    "npm:colorjs.io@0.5.2": "0.5.2",
     "npm:devalue@^5.8.1": "5.9.4",
     "npm:es-toolkit@^1.46.1": "1.52.0",
     "npm:esbuild-wasm@~0.25.11": "0.25.12",
@@ -213,6 +215,7 @@
     "npm:rou3@~0.7.12": "0.7.12",
     "npm:structured-field-values@^2.0.4": "2.0.4",
     "npm:style-dictionary@5.4.4": "5.4.4_tslib@2.8.1",
+    "npm:style-dictionary@5.7.1": "5.7.1",
     "npm:tailwind-merge@^3.7.0": "3.7.0",
     "npm:vite@7.2.2": "7.2.2",
     "npm:vite@^7.1.4": "7.2.2",
@@ -4042,6 +4045,25 @@
     },
     "style-dictionary@5.4.4_tslib@2.8.1": {
       "integrity": "sha512-Sd7dkEOLn33EpvlMyS8ykUu0us2EIFUqsysf4DSwZQ46nqQkZ2Q9o5mozu8cSizj3t7E220HaPk7EV1O7LjvDQ==",
+      "dependencies": [
+        "@bundled-es-modules/deepmerge",
+        "@bundled-es-modules/glob",
+        "@bundled-es-modules/memfs",
+        "@zip.js/zip.js",
+        "chalk",
+        "change-case",
+        "colorjs.io",
+        "commander@12.1.0",
+        "is-plain-obj",
+        "json5",
+        "path-unified",
+        "prettier",
+        "tinycolor2"
+      ],
+      "bin": true
+    },
+    "style-dictionary@5.7.1": {
+      "integrity": "sha512-qO9WsyR5jZWz8+5JRtehn7HF8YAvm+Jd8UxiYHtvZhYSNwfMfAVOBK1anjdZwbH+njFb7xuQsjqpD+djPXErcw==",
       "dependencies": [
         "@bundled-es-modules/deepmerge",
         "@bundled-es-modules/glob",

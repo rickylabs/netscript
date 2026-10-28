@@ -3,7 +3,7 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertMatch, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { join, toFileUrl } from 'jsr:@std/path@^1';
 import { writeFreshRouteManifestSync } from '../../adapters/scaffold/fresh-route-manifest.ts';
 import { readTemplateAsset } from '../../adapters/templates/template-asset.ts';
@@ -469,7 +469,7 @@ describe('app route template rendering', () => {
       "import DesignTokensView from './(_components)/tokens-view.tsx';",
     );
     assertStringIncludes(tokensRoute, '.withRoute(appRoutes.designTokens)');
-    assertStringIncludes(tokensRoute, ".withLayer('tokens', DesignTokensView");
+    assertMatch(tokensRoute, /\.withLayer\(\s*['"]tokens['"],\s*DesignTokensView\b/);
     assertStringIncludes(
       componentsRoute,
       "import DesignComponentsView from './(_components)/components-view.tsx';",
@@ -512,7 +512,12 @@ describe('app route template rendering', () => {
     );
     assertStringIncludes(appDesignComponentsViewTemplate, 'responsive-table');
     assertStringIncludes(appDesignCompositionViewTemplate, 'Composition');
-    assertStringIncludes(appDesignRegistryTemplate, "name: 'responsive-table'");
+    const catalog = await import(
+      `data:application/typescript,${encodeURIComponent(appDesignRegistryTemplate)}`
+    );
+    assert(
+      catalog.registryCatalog.some((item: { name: string }) => item.name === 'responsive-table'),
+    );
     assertStringIncludes(
       appDesignTokensLibTemplate,
       "import manifest from '@app/assets/tokens.json'",

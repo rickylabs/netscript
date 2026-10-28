@@ -101,7 +101,7 @@ export function FloatingSurfaceDemo({ kind }: FloatingSurfaceDemoProps) {
         </Tooltip.Content>
       </Tooltip.Root>
 
-      <Button type='link' href='/design/composition' variant='ghost'>
+      <Button type='link' clientNav={false} href='/design/composition' variant='ghost'>
         Composition rules
       </Button>
     </div>

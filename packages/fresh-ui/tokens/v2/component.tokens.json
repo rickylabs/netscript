@@ -1,0 +1,525 @@
+{
+  "$schema": "https://www.designtokens.org/schemas/2025.10/format.json",
+  "component": {
+    "button": {
+      "bg": {
+        "$type": "color",
+        "$value": "{semantic.primary}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-button-bg",
+            "category": [
+              "component",
+              "button",
+              "bg"
+            ]
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{semantic.primary-fg}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-button-fg",
+            "category": [
+              "component",
+              "button",
+              "fg"
+            ]
+          }
+        }
+      },
+      "hover": {
+        "$type": "color",
+        "$value": "{semantic.primary-hover}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-button-hover",
+            "category": [
+              "component",
+              "button",
+              "hover"
+            ]
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{semantic.primary-border}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-button-border",
+            "category": [
+              "component",
+              "button",
+              "border"
+            ]
+          }
+        }
+      },
+      "radius": {
+        "$type": "dimension",
+        "$value": "{semantic.radius-control}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-button-radius",
+            "category": [
+              "component",
+              "button",
+              "radius"
+            ]
+          }
+        }
+      },
+      "height": {
+        "$type": "dimension",
+        "$value": "{semantic.control-height}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-button-height",
+            "category": [
+              "component",
+              "button",
+              "height"
+            ]
+          }
+        }
+      }
+    },
+    "input": {
+      "bg": {
+        "$type": "color",
+        "$value": "{semantic.surface}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-input-bg",
+            "category": [
+              "component",
+              "input",
+              "bg"
+            ]
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{semantic.fg}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-input-fg",
+            "category": [
+              "component",
+              "input",
+              "fg"
+            ]
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{semantic.input-border}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-input-border",
+            "category": [
+              "component",
+              "input",
+              "border"
+            ]
+          }
+        }
+      },
+      "ring": {
+        "$type": "color",
+        "$value": "{semantic.ring}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-input-ring",
+            "category": [
+              "component",
+              "input",
+              "ring"
+            ]
+          }
+        }
+      },
+      "radius": {
+        "$type": "dimension",
+        "$value": "{semantic.radius-input}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-input-radius",
+            "category": [
+              "component",
+              "input",
+              "radius"
+            ]
+          }
+        }
+      },
+      "height": {
+        "$type": "dimension",
+        "$value": "{semantic.control-height}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-input-height",
+            "category": [
+              "component",
+              "input",
+              "height"
+            ]
+          }
+        }
+      }
+    },
+    "card": {
+      "bg": {
+        "$type": "color",
+        "$value": "{semantic.card}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-card-bg",
+            "category": [
+              "component",
+              "card",
+              "bg"
+            ]
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{semantic.card-fg}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-card-fg",
+            "category": [
+              "component",
+              "card",
+              "fg"
+            ]
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{semantic.border}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-card-border",
+            "category": [
+              "component",
+              "card",
+              "border"
+            ]
+          }
+        }
+      },
+      "radius": {
+        "$type": "dimension",
+        "$value": "{semantic.radius-card}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-card-radius",
+            "category": [
+              "component",
+              "card",
+              "radius"
+            ]
+          }
+        }
+      },
+      "padding": {
+        "$type": "dimension",
+        "$value": "{semantic.card-padding}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-card-padding",
+            "category": [
+              "component",
+              "card",
+              "padding"
+            ]
+          }
+        }
+      }
+    },
+    "badge": {
+      "bg": {
+        "$type": "color",
+        "$value": "{semantic.muted}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-badge-bg",
+            "category": [
+              "component",
+              "badge",
+              "bg"
+            ]
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{semantic.muted-fg}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-badge-fg",
+            "category": [
+              "component",
+              "badge",
+              "fg"
+            ]
+          }
+        }
+      },
+      "radius": {
+        "$type": "dimension",
+        "$value": "{semantic.radius-badge}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-badge-radius",
+            "category": [
+              "component",
+              "badge",
+              "radius"
+            ]
+          }
+        }
+      },
+      "height": {
+        "$type": "dimension",
+        "$value": "{semantic.badge-height}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-badge-height",
+            "category": [
+              "component",
+              "badge",
+              "height"
+            ]
+          }
+        }
+      }
+    },
+    "table": {
+      "bg": {
+        "$type": "color",
+        "$value": "{semantic.surface}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-table-bg",
+            "category": [
+              "component",
+              "table",
+              "bg"
+            ]
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{semantic.fg}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-table-fg",
+            "category": [
+              "component",
+              "table",
+              "fg"
+            ]
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{semantic.border}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-table-border",
+            "category": [
+              "component",
+              "table",
+              "border"
+            ]
+          }
+        }
+      },
+      "height": {
+        "$type": "dimension",
+        "$value": "{semantic.table-row-height}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-table-height",
+            "category": [
+              "component",
+              "table",
+              "height"
+            ]
+          }
+        }
+      }
+    },
+    "dialog": {
+      "bg": {
+        "$type": "color",
+        "$value": "{semantic.card}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-dialog-bg",
+            "category": [
+              "component",
+              "dialog",
+              "bg"
+            ]
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{semantic.card-fg}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-dialog-fg",
+            "category": [
+              "component",
+              "dialog",
+              "fg"
+            ]
+          }
+        }
+      },
+      "overlay": {
+        "$type": "color",
+        "$value": "{semantic.overlay}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-dialog-overlay",
+            "category": [
+              "component",
+              "dialog",
+              "overlay"
+            ]
+          }
+        }
+      },
+      "radius": {
+        "$type": "dimension",
+        "$value": "{semantic.radius-card}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-dialog-radius",
+            "category": [
+              "component",
+              "dialog",
+              "radius"
+            ]
+          }
+        }
+      }
+    },
+    "tabs": {
+      "bg": {
+        "$type": "color",
+        "$value": "{semantic.muted}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-tabs-bg",
+            "category": [
+              "component",
+              "tabs",
+              "bg"
+            ]
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{semantic.fg}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-tabs-fg",
+            "category": [
+              "component",
+              "tabs",
+              "fg"
+            ]
+          }
+        }
+      },
+      "selected": {
+        "$type": "color",
+        "$value": "{semantic.selected}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-tabs-selected",
+            "category": [
+              "component",
+              "tabs",
+              "selected"
+            ]
+          }
+        }
+      },
+      "ring": {
+        "$type": "color",
+        "$value": "{semantic.ring}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-tabs-ring",
+            "category": [
+              "component",
+              "tabs",
+              "ring"
+            ]
+          }
+        }
+      }
+    },
+    "key": {
+      "bg": {
+        "$type": "color",
+        "$value": "{semantic.terminal-key-bg}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-key-bg",
+            "category": [
+              "component",
+              "key",
+              "bg"
+            ]
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{semantic.terminal-key-fg}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-key-fg",
+            "category": [
+              "component",
+              "key",
+              "fg"
+            ]
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{semantic.terminal-key-border}",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-component-key-border",
+            "category": [
+              "component",
+              "key",
+              "border"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

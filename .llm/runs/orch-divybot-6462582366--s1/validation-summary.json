@@ -1,0 +1,201 @@
+{
+  "state": "READY \u2014 independent follow-up PASS; CI fixes verified locally",
+  "historicalSourceIteration": "validation-source-stopped.json",
+  "parent": "5a5c1a42846bdde395b7fab5820cee716112129e",
+  "packageTests": {
+    "sha256": "5803c8e9e1d1a3dd14fd70ab2b5ab733b8eb7e025f9faaafb7fc083a56749457",
+    "summary": {
+      "passed": 213,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 213,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "appTypecheck": {
+    "rawReportSha256": "831ff01ec06cee07885242498d8c50bfc8e60a971e654a4d13d26a0560418773",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "exitCode": 0
+  },
+  "browserTypecheck": {
+    "rawReportSha256": "6165acc1183bcd28937543600e32e3489c802f924e586be57d20fe00d6e9453b",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "exitCode": 0
+  },
+  "qualityGate": {
+    "gateId": "quality-gate",
+    "gitHead": "5a5c1a42846bdde395b7fab5820cee716112129e",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "rawReceiptSha256": "093ae77399585eaaa94275fcdd4d4cab620587954b622ccd86e6f26830cc0377"
+  },
+  "tokenQualityGate": {
+    "gateId": "fresh-ui-token-quality",
+    "gitHead": "5a5c1a42846bdde395b7fab5820cee716112129e",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "rawReceiptSha256": "36e359a95c444f6950f154c953e28e89b7f9ff07cbe3d9c48253a91c51e949d8"
+  },
+  "dtcg": {
+    "result": "PASS",
+    "version": "2025.10",
+    "resolverInputs": 72,
+    "presets": 18,
+    "registeredRoles": 903,
+    "styleDictionary": "5.7.1",
+    "outputs": 68
+  },
+  "contrast": {
+    "result": "PASS_WITH_EXACT_SOURCE_EXCLUSIONS",
+    "effectiveContexts": 36,
+    "uses": 4066,
+    "exclusions": 406,
+    "figmaExclusions": 389,
+    "inheritedS0Exclusions": 17,
+    "unapprovedViolations": 0
+  },
+  "negativeControls": {
+    "unknownNameExit": 1,
+    "rawSemanticExit": 1,
+    "seededContrastExit": 1
+  },
+  "compatibility": {
+    "declarationEvidence": "compatibility.md",
+    "componentProof": "component-proof/",
+    "pixelIdenticalPairs": 8,
+    "computedStyleValuesCompared": 144,
+    "computedStyleDifferences": 0,
+    "legacySelectorBrowserProof": "PASS",
+    "fullGalleryPixelIdentityClaimed": false
+  },
+  "browser": {
+    "passed": 12,
+    "failed": 0,
+    "utilityCases": 4,
+    "utilitySeriousCriticalFindings": 0,
+    "baselineReductions": 2,
+    "newOrIncreasedSeriousCritical": 0,
+    "smallIconGeometryRegression": "PASS",
+    "axeDelta": "axe-delta.md"
+  },
+  "cliScaffoldOverride": {
+    "proof": "cli-proof-final.json",
+    "generatedFiles": 23,
+    "coreFiles": 5,
+    "separatePreviewFiles": 18,
+    "initExit": 0,
+    "buildExit": 0,
+    "rawSemanticExit": 1,
+    "all23HashesPreserved": true,
+    "cleanExit": 0,
+    "unknownStaticPreserved": true,
+    "rebuildExit": 0,
+    "registrySelectedCssExact": true
+  },
+  "publishing": {
+    "cliDryRun": "PASS",
+    "freshUiDryRun": "PASS",
+    "releasePerformed": false
+  },
+  "pages": {
+    "exports": "PASS",
+    "snippets": "PASS",
+    "accuracy": "97/97 direct;162 recursive",
+    "build": "PASS",
+    "renderedHtml": 236,
+    "internalLinks": 38777,
+    "links": "PASS",
+    "caveatMarkers": 15,
+    "caveatPages": 12,
+    "caveats": "PASS"
+  },
+  "sliceReviews": {
+    "sources": "PASS after authorized resumed repair",
+    "outputs": [
+      "FAIL_FIX",
+      "PASS"
+    ],
+    "checks": [
+      "FAIL_FIX",
+      "PASS"
+    ],
+    "cli": [
+      "PASS"
+    ],
+    "migration": [
+      "FAIL_FIX",
+      "PASS"
+    ]
+  },
+  "fullRuntimeE2e": {
+    "verdict": "UNPROVEN_HOST_PREREQUISITES",
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "rawExitCode": 1,
+    "passed": 1,
+    "failed": 2,
+    "skipped": 0,
+    "reason": "Aspire doctor exits1; Docker daemon unavailable, including cleanup inspection. Suite stops at preflight."
+  },
+  "implementationEvaluation": {
+    "verdict": "PASS",
+    "rounds": [
+      "FAIL_FIX",
+      "PASS"
+    ],
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "vendor": "Anthropic",
+    "readOnly": true,
+    "separateFromPlanAndImplementation": true
+  },
+  "ready": true,
+  "cliTests": {
+    "rawReportSha256": "8f1e7924e6efe8fd920495956845a6705835766b2eabca8080cb51460351c68d",
+    "summary": {
+      "passed": 37,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 37,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "cssBudget": {
+    "proof": "css-size-proof.json",
+    "nsOneContexts": 2,
+    "utilityContextsIncludingCompatibility": 4,
+    "nsOneByteBound": 200000,
+    "otherPresetByteBound": 400000,
+    "nsOneDeclarationBound": 4000,
+    "otherDeclarationBound": 7000
+  },
+  "cliTypecheck": {
+    "rawReportSha256": "4a622650b50af76603f727dfe4f7f554e17f5d5feb4fdb2a4e19ed62ed3d7212",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "exitCode": 0
+  },
+  "sourceHead": "33a43f68668d9242571ea5d08c32e88ec88dc151",
+  "ciFollowup": "ci-followup.json",
+  "browserCases": 24,
+  "combinedDocs": {
+    "htmlPages": 251,
+    "links": 23975,
+    "allResolve": true
+  }
+}

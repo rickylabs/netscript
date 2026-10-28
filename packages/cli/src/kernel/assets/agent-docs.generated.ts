@@ -31,7 +31,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/fresh": [".","./ai","./ai/sandbox","./builders","./defer","./defer/island","./desktop","./error","./form","./interactive","./navigation","./query","./route","./server","./streams","./testing","./vite"],
 
-  "@netscript/fresh-ui": [".","./ai/render-ui","./desktop","./interactive","./primitives","./registry"],
+  "@netscript/fresh-ui": [".","./ai/render-ui","./desktop","./interactive","./primitives","./registry","./token-config","./tokens"],
 
   "@netscript/kv": [".","./kvdex","./redis","./testing"],
 

@@ -776,7 +776,6 @@ packages/database/mod.ts	package:other	S4	mention only (service discovery/env he
 packages/database/ports/database-client.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/database/scripts/migrate.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/fresh-ui/deno.lock	lockfile	N/A	dependency lock; any version literal belongs to an unrelated package; excluded from literal sweeps in both parity phases (lock hygiene per AGENTS.md)
-packages/fresh-ui/registry.generated.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/fresh-ui/registry/islands/DesktopOnly.tsx	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/fresh-ui/tests/registry/islands/desktop-only.test.tsx	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/fresh-ui/tests/registry/markdown-renderer.test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
