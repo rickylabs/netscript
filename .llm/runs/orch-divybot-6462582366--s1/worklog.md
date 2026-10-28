@@ -34,3 +34,11 @@ route; generator and evaluator remain separate sessions and vendor families.
 - RTK is not installed; direct commands are necessary. Structured wrappers
   remain the evidence source.
 - PLAN-EVAL pending. No implementation edits made.
+
+## Plan gate
+
+- Round 1: FAIL_PLAN (value provenance and validator/contrast scope).
+- Corrected all source/gap decisions and fixed the validation coverage in the plan.
+- Same independent reviewer, round 2: PASS. Implementation may begin.
+- S0 frozen `tokens:check`: exit 0 before changes.
+- Baseline scaffold: exit 0. Browser startup now works on an owned free endpoint; Chromium needs local system-library dependencies.
