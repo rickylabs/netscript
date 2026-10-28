@@ -5,18 +5,36 @@ title: '@netscript/sdk'
 
 # `@netscript/sdk`
 
-Service discovery, oRPC clients, and cache-backed query factories for NetScript. This page is
-written against the package's public surface reported by `deno doc`. For the full index of packages
-and plugins return to the [reference overview](/reference/).
+Service discovery, typed oRPC clients and cache-backed query factories for NetScript. Use it to call
+services from app code: one `defineServices()` call wires service clients, cache-aware query
+factories and query utils from a single service map, so a component imports ready-to-use
+`queryOptions()` / `mutationOptions()` instead of hand-writing fetch wrappers.
 
-The root entrypoint (`@netscript/sdk`) is the high-level composition entry for service-aware
-applications: it re-exports the client, query, query-client, discovery, telemetry, and OpenAPI
+## Sub-path exports
+
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/sdk` | `./mod.ts` | [Side-effect-free high-level composition entry (`defineServices`) plus common non-cache surfaces](#composition-preset-definesservices). |
+| `@netscript/sdk/auto-update` | `./src/auto-update/mod.ts` | Auto-update client-side primitives. |
+| `@netscript/sdk/desktop` | `./src/desktop/mod.ts` | Native desktop capability helpers and bindings. |
+| `@netscript/sdk/cache` | `./src/cache/mod.ts` | [Server-side KV-backed cache engine and explicit provider-registration seam](#cache-engine-netscriptsdkcache). |
+| `@netscript/sdk/client` | `./src/client/mod.ts` | [`createServiceClient` and the contract algebra](#service-clients-netscriptsdkclient). |
+| `@netscript/sdk/collections` | `./src/collections/mod.ts` | [TanStack DB collection backed by TanStack Query](#collections-netscriptsdkcollections). |
+| `@netscript/sdk/discovery` | `./src/discovery/mod.ts` | [Aspire service URL and database/KV connection discovery](#service-discovery-netscriptsdkdiscovery). |
+| `@netscript/sdk/ports` | `./src/ports/mod.ts` | [Package-owned structural ports (upstream-type-free)](#ports-netscriptsdkports). |
+| `@netscript/sdk/presets` | `./src/presets/mod.ts` | [Browser-safe `defineServices` preset and its package-owned type closure](#composition-preset-definesservices). |
+| `@netscript/sdk/query` | `./src/query/mod.ts` | [Server-side cache-aware query factories](#server-side-query-factories-netscriptsdkquery). |
+| `@netscript/sdk/query-client` | `./src/query-client/mod.ts` | [TanStack Query integration for browser/island code](#query-client--tanstack-integration-netscriptsdkquery-client). |
+| `@netscript/sdk/streams/collections` | `./src/client/stream-collection/mod.ts` | [DOM-independent TanStack DB entity materialization over injected fetch](#react-native-stream-collections). |
+| `@netscript/sdk/streams/react` | `./src/client/stream-react/mod.ts` | [React and React Native live-query hook](#react-native-stream-collections). |
+| `@netscript/sdk/streams` | `./src/streams.ts` | [Durable stream producers and schema helpers](#durable-streams-netscriptsdkstreams). |
+| `@netscript/sdk/streams/consumer` | `./src/client/stream-source/mod.ts` | [Fetch consumer and SSE binding without server telemetry](#durable-streams-netscriptsdkstreams). |
+| `@netscript/sdk/telemetry` | `./src/telemetry/mod.ts` | [OpenTelemetry middleware for oRPC](#telemetry-netscriptsdktelemetry). |
+
+The root entrypoint re-exports the client, query, query-client, discovery, telemetry and OpenAPI
 surfaces and adds the `defineServices()` preset. It does not export the server cache engine or
-install a cache provider at import time. A single `defineServices()` call wires the whole typed
-stack — service clients, cache-aware query factories, and query utils — from one service map, so a
-component imports ready-to-use `queryOptions()` / `mutationOptions()` instead of hand-writing fetch
-wrappers. Focused sub-path exports carry the same values for narrow imports — see
-[Sub-path exports](#sub-path-exports).
+install a cache provider at import time. Focused sub-paths carry the same values for narrow imports
+and keep environment-specific adapters and dependencies out of consumers that do not need them.
 
 ## Composition preset (`defineServices`)
 
@@ -35,7 +53,7 @@ These symbols are available from the root export and the focused, browser-safe
 
 ## Service clients (`@netscript/sdk/client`)
 
-| Symbol                       | Kind       | Signature / Description                                                                                                                           |
+| Symbol | Kind | Description |
 | ---------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `createServiceClient`        | function   | Type-safe service client using Aspire service discovery and oRPC. Signature: `createServiceClient<TContract>(options): ServiceClient<TContract>`. |
 | `safe`                       | function   | Resolve a promise into a result narrowed with `isSuccess` first, then `isDefined` on failure.                                                     |
@@ -220,7 +238,7 @@ HTTP is refused unless `allowInsecureTransport` is set.
 
 ## Server-side query factories (`@netscript/sdk/query`)
 
-| Symbol                 | Kind       | Signature / Description                                                                                                                              |
+| Symbol | Kind | Description |
 | ---------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `createQueryFactory`   | function   | Query factory for an oRPC contract. Signature: `createQueryFactory<TContract>(resource, contract, client, defaultOptions): QueryFactory<TContract>`. |
 | `createQueryFactories` | function   | Create multiple query factories at once from a resource-to-config map.                                                                               |
@@ -266,7 +284,7 @@ apps.
 
 Browser- and island-facing TanStack Query integration.
 
-| Symbol | Kind | Signature / Description |
+| Symbol | Kind | Description |
 | --- | --- | --- |
 | `createNetScriptQueryClient` | function | TanStack QueryClient with server-first defaults. Signature: `createNetScriptQueryClient(options): QueryClient`. |
 | `createServiceQueryUtils` | function | Thin oRPC/TanStack remap with `queryOptions({ input })`; unlike the golden-path `createQueryFactories` call `queryOptions(input)`, it has no server KV tier. Do not mix the two call shapes in one data layer. Signature: `createServiceQueryUtils<TContract>(client, options?): ServiceQueryUtils<TContract>`. |
@@ -361,8 +379,10 @@ replay progress advances; reconnect uses the control's opaque `offset` plus SSE 
 available. See the
 [SDK README](https://github.com/rickylabs/netscript/blob/main/packages/sdk/README.md) for a complete
 transport example. The React Native collection binding, live-query hook, and Expo reference are
-described in the [Expo streams how-to](/durable-workflows/expo-streams/). Native Hermes runtime
-acceptance remains pending the device proof supplied with that reference.
+described in the [Expo streams how-to](/durable-workflows/expo-streams/).
+
+> [!NOTE]
+> Native Hermes runtime support is unverified.
 
 Use `@netscript/sdk/streams/consumer` for the fetch source and binding in shared/browser/React
 Native code. Its import graph excludes telemetry, OTel, and modules using `Deno.*`. The wider
@@ -409,6 +429,27 @@ including `StreamEventSourceV1`, `BindStreamEventSourceOptionsV1`, `StreamEventS
 `StreamSseConsumerEventV1`, `StreamSseReplayStateV1`, and the versioned frame, payload, schema, and
 reduction types. Parsing and schema validation retain one authority in stream core.
 
+## React Native stream collections
+
+`createStreamCollectionV1` returns a stable `collection`, awaitable `done`, replay `snapshot`, and
+idempotent async `dispose`. `StreamCollectionOptionsV1<T>` extends the injected-source options with
+`type`, `parse`, and `getKey`. `StreamCollectionV1<T>` is the SDK's typed read/lifecycle port over a
+real TanStack collection. Narrow it with TanStack's `isCollection` guard and assign a typed
+`Collection<T, string>` local before passing it to `q.from(...)`; filters, joins, and projections
+then preserve the entity types without assertions. `StreamCollectionUtilsV1` exposes terminal-error
+inspection/subscription through the collection's `utils`, and `StreamCollectionBindingV1<T>`
+describes its connection lifecycle.
+
+`useStreamLiveQueryV1` from `@netscript/sdk/streams/react` wraps the upstream live-query hook with a
+`StreamCollectionV1<TData>` and returns `StreamLiveQueryResultV1<TData>` with `data`, `status`,
+`isLoading`, and `error`. Fatal consumption failures reject pending preloads, clean up the
+collection, and leave the hook at `status: 'error'` with `isLoading: false`. A cleaned-up binding
+cannot restart; create a fresh binding before subscribing again. The focused entry imports React,
+without the Fresh runtime. This is a single-type State Protocol adapter, distinct from Fresh's
+multi-type schema-based StreamDB and its finite recovery policy. See the
+[Expo how-to](/durable-workflows/expo-streams/) for lifecycle, fetch compatibility, and native proof
+requirements.
+
 ## Telemetry (`@netscript/sdk/telemetry`)
 
 | Symbol              | Kind       | Description                                                               |
@@ -419,14 +460,14 @@ reduction types. Parsing and schema validation retain one authority in stream co
 
 ## Ports (`@netscript/sdk/ports`)
 
-Package-owned, upstream-type-free structural ports shared with other NetScript packages. The port
-surface re-exports the structural contracts documented in the sections above (`QueryClientPort`,
-`CacheStore`, `ServiceMetadata`, `ServiceQueryUtils`, `HealthCheckResponse`, `PaginatedResponse`,
-the service operation/key types, and the cache/contract structural aliases). Import from
-`@netscript/sdk/ports` when implementing or consuming these contracts without pulling in the
-concrete client, query, or cache engines.
+Package-owned, upstream-type-free structural ports shared with other NetScript packages: the
+structural contracts documented above (`QueryClientPort`, `CacheStore`, `ServiceMetadata`,
+`ServiceQueryUtils`, `HealthCheckResponse`, `PaginatedResponse`, the service operation/key types,
+and the cache/contract structural aliases). Import from `@netscript/sdk/ports` to implement or
+consume these contracts without pulling in the concrete client, query or cache engines.
+Representative symbols:
 
-| Representative symbol | Kind       | Description                                                                           |
+| Symbol | Kind | Description |
 | --------------------- | ---------- | ------------------------------------------------------------------------------------- |
 | `QueryClientPort`     | type       | Narrow TanStack QueryClient capability set used by SDK collection and query adapters. |
 | `CacheStore`          | interface  | Structural cache store contract.                                                      |
@@ -449,52 +490,3 @@ Available from the root export.
 | `OpenAPIConfig`          | interface  | Shared OpenAPI configuration contract used by higher-level packages.  |
 | `OpenAPIDocument`        | type alias | Public OpenAPI document shape returned by the SDK.                    |
 | `OpenAPIGeneratorLike`   | interface  | Minimal generator contract exposed by the SDK.                        |
-
-## Sub-path exports
-
-The following entrypoints are published alongside the root export. Focused entries keep
-environment-specific adapters and dependencies out of consumers that do not need them.
-
-| Export                               | Entrypoint                              | Purpose                                                                                          |
-| ------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `@netscript/sdk`                     | `./mod.ts`                              | Side-effect-free high-level composition entry (`defineServices`) plus common non-cache surfaces. |
-| `@netscript/sdk/auto-update`         | `./src/auto-update/mod.ts`              | Auto-update client-side primitives.                                                              |
-| `@netscript/sdk/desktop`             | `./src/desktop/mod.ts`                  | Native desktop capability helpers and bindings.                                                  |
-| `@netscript/sdk/cache`               | `./src/cache/mod.ts`                    | Server-side KV-backed cache engine and explicit provider-registration seam.                      |
-| `@netscript/sdk/client`              | `./src/client/mod.ts`                   | `createServiceClient` and the contract algebra.                                                  |
-| `@netscript/sdk/collections`         | `./src/collections/mod.ts`              | TanStack DB collection backed by TanStack Query.                                                 |
-| `@netscript/sdk/discovery`           | `./src/discovery/mod.ts`                | Aspire service URL and database/KV connection discovery.                                         |
-| `@netscript/sdk/ports`               | `./src/ports/mod.ts`                    | Package-owned structural ports (upstream-type-free).                                             |
-| `@netscript/sdk/presets`             | `./src/presets/mod.ts`                  | Browser-safe `defineServices` preset and its package-owned type closure.                         |
-| `@netscript/sdk/query`               | `./src/query/mod.ts`                    | Server-side cache-aware query factories.                                                         |
-| `@netscript/sdk/query-client`        | `./src/query-client/mod.ts`             | TanStack Query integration for browser/island code.                                              |
-| `@netscript/sdk/streams/collections` | `./src/client/stream-collection/mod.ts` | DOM-independent TanStack DB entity materialization over injected fetch.                          |
-| `@netscript/sdk/streams/react`       | `./src/client/stream-react/mod.ts`      | React and React Native live-query hook.                                                          |
-| `@netscript/sdk/streams`             | `./src/streams.ts`                      | Durable stream producers and schema helpers.                                                     |
-| `@netscript/sdk/streams/consumer`    | `./src/client/stream-source/mod.ts`     | Fetch consumer and SSE binding without server telemetry.                                         |
-| `@netscript/sdk/telemetry`           | `./src/telemetry/mod.ts`                | OpenTelemetry middleware for oRPC.                                                               |
-
----
-
-Back to the [reference overview](/reference/).
-
-## React Native stream collections
-
-`createStreamCollectionV1` returns a stable `collection`, awaitable `done`, replay `snapshot`, and
-idempotent async `dispose`. `StreamCollectionOptionsV1<T>` extends the injected-source options with
-`type`, `parse`, and `getKey`. `StreamCollectionV1<T>` is the SDK's typed read/lifecycle port over a
-real TanStack collection. Narrow it with TanStack's `isCollection` guard and assign a typed
-`Collection<T, string>` local before passing it to `q.from(...)`; filters, joins, and projections
-then preserve the entity types without assertions. `StreamCollectionUtilsV1` exposes terminal-error
-inspection/subscription through the collection's `utils`, and `StreamCollectionBindingV1<T>`
-describes its connection lifecycle.
-
-`useStreamLiveQueryV1` from `@netscript/sdk/streams/react` wraps the upstream live-query hook with a
-`StreamCollectionV1<TData>` and returns `StreamLiveQueryResultV1<TData>` with `data`, `status`, and
-`isLoading`, and `error`. Fatal consumption failures reject pending preloads, clean up the
-collection, and leave the hook at `status: 'error'` with `isLoading: false`. A cleaned-up binding
-cannot restart; create a fresh binding before subscribing again. The focused entry imports React,
-without the Fresh runtime. This is a single-type State Protocol adapter, distinct from Fresh's
-multi-type schema-based StreamDB and its finite recovery policy. See the
-[Expo how-to](/durable-workflows/expo-streams/) for lifecycle, fetch compatibility, and native proof
-requirements.
