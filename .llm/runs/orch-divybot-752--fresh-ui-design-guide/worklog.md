@@ -328,3 +328,13 @@ Slice review (supervisor): every component/prop/class named in the guide was che
 | Other corpus readers (`carrier-parity`, `ci-classify-changes`, `cli-mcp-adapters`, `agent-mcp-stdio`) | 74 passed |
 | `docs:links` / `docs:accuracy` / `docs:snippets` / site `check:links` / docs `_plugins` tests | PASS / PASS / PASS / PASS / 7 passed |
 | Probe strings in the MCP carrier | 0 |
+
+## IMPL-EVAL round 5 (same session `ses_ea08ab886ffeD4MI4Ly0kKJlRJ`)
+
+- Delta re-steer on head `51fbd5f` (fresh snapshot, V1 `OPENCODE_BIN`, receipt `impl-eval-launch-r5.jsonl`), covering
+  S7 and S8.
+- **Verdict: PASS**, no findings.
+  - Both rebases kept the evaluated product patch byte-for-byte, and the carriers are fresh with zero probe strings.
+  - The fixture delta re-locks a measured near-tie: either corpus alone keeps the old order, #1 is still asserted in
+    exact mode, and MCP is 199/199.
+  - Main's design-system docs describe the `data-scheme` model as provisional and agree with today's selectors.

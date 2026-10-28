@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------------------------------- |
 | Run ID         | `orch-divybot-752--fresh-ui-design-guide`                                 |
 | Branch / PR    | `orch/divybot-752` / rickylabs/netscript#2408 (`Closes #2406`)            |
-| Current phase  | S8 rebased onto `f177c38`; guidance fixture near-tie re-locked; IMPL-EVAL round 5 |
+| Current phase  | S8 rebased onto `f177c38`; IMPL-EVAL rounds 1–5 PASS                             |
 | Archetype      | 4 — DSL/Builder (`packages/fresh-ui`), 6 — CLI tooling (guidance builder) |
 | Scope overlays | frontend, docs                                                            |
 

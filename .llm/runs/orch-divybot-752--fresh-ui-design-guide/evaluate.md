@@ -260,3 +260,63 @@ No new findings blocking merge. No doctrine violations. No debt entries required
 | Rationale | Root cause confirmed end-to-end (telemetry root import → carrier in server bundle → single `routes/(design)/` string → probe `source-path:` failure; 0/1/0 counts across 1582e1c/af6041a/HEAD); reworded sentence true against the SidebarShell layout template; guard literals byte-identical to the probe constants with a proven red-on-stale/green-after negative control; all re-run gates green (guard tests 6/6, publish-assets, agent-docs-prose, MCP 199/199); residual sweep finds no other trippable string; the bundle-size follow-up is filed in caveats, not owed here. CI runtime tiers on the new head are the remaining proof, as the worklog states. |
 
 VERDICT: PASS
+
+## Round 5 (post-rebase patch identity + guidance-fixture near-tie, same evaluator session)
+
+| Field | Value |
+| --- | --- |
+| Evaluated head | `51fbd5f9f5380fef3789c16815a89b180eef9441` ("test(mcp): re-lock a near-tied guidance smoke row after the docs rebuild") |
+| Rebases since round 4 | S7 onto main `782893a` (#2426, #2432, #2427, #2399, #2437); S8 onto main `f177c38` (#2439 docs-site rebuild). Pre-rebase patch reference: `git diff 1582e1c 1d71335`; current: `git diff origin/main HEAD` |
+| Evaluator route (observed) | same session, Muse Spark (`meta/muse-spark-1.3`) via OpenCode/OpenRouter |
+
+### (1) Patch byte-identity — CONFIRMED
+
+- File lists of both diffs are identical except the expected S8 fixture addition (`packages/mcp/tests/fixtures/guidance-evaluation.json`).
+- Content: all 21 non-generated, non-run-dir files byte-identical between the old-patch result (`1d71335`) and HEAD where the base is unchanged on main.
+- The single changed-base file, `packages/fresh-ui/scripts/build-tokens.ts` (main's #2432 token-pipeline repair), carries the byte-identical hunk: the S1 header-block replacement diffs cleanly against both bases (only blob hashes differ). Main's `--check` hunk sits elsewhere and is untouched.
+- So no product text changed across either rebase; the S7 "no IMPL-EVAL round is due" claim holds for the rebase itself, and this round covers only the S8 fixture delta.
+
+### (2) Carriers fresh, probe strings absent — CONFIRMED
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| `deno task check:publish-assets` | PASS | exit 0 |
+| `deno task check:agent-docs-prose` | PASS | `"fresh":true`, exit 0 |
+| `deno task check:assets-barrel` | PASS | exit 0 |
+| Probe strings in MCP carrier | 0 / 0 | `MCP_EMBEDDED_DOCS` sweep: no `routes/(design)/`, no `Composition rules — NetScript design system` |
+
+### (3) Fixture near-tie — RE-MEASURED, re-lock justified, nothing weakened
+
+- The delta swaps only expected #2/#3 of the score-only row "pick direct application ownership versus a reusable integration"; #1 (`4-decision-rule-…`) stays first and the row keeps `exact` mode, so #1's position is still asserted. Test logic (`guidance-evaluation_test.ts`) and ranking code (`packages/mcp/src/`, only the regenerated carrier changed) untouched; the other 7 fixture rows untouched.
+- Near-tie mechanism confirmed on HEAD's corpus: both #2/#3 sections match the same three stems — `direct` 7/7, `applic` 7/5, `reus` 2/2 — with neither mentioning ownership/integration in-section; the order is decided by whole-corpus IDF + length norm, i.e. exactly the kind of margin any corpus change can flip.
+- Corpus isolation, measured by the evaluator in scratch worktrees under `/home/agent/projects/orchid/worktrees/` (removed afterwards):
+  - main `f177c38` corpus alone (14 docs, 283,387 B): old order (connect-by-hand #2) — deterministic across 2 runs;
+  - pre-rebase branch `133847a` corpus alone (16 docs, 329,073 B): old order — deterministic across 2 runs;
+  - rebased HEAD corpus (16 docs, 327,810 B): new order (unsupported-by-netscript #2) — deterministic across 2 runs, matching the re-locked fixture.
+  - The second-db page itself is byte-identical across all three corpora (21,162 B; same SHA), proving the flip comes from whole-corpus IDF shifts (rebuilt pages + embedded pages combined), not from any edit to the ranked sections — precisely the worklog's claim.
+- `deno task test` in `packages/mcp`: **199 passed, 0 failed**.
+- Note: the caveats entry floats a future "rank-one + top-3 set" mode for this row; that mode does not exist in the test harness and was correctly NOT applied (it would have dropped the #1 exactness assertion the row exists to pin). Filed as a suggestion, not a weakening.
+
+### (4) Main design-system docs agree with this PR's guides — CONFIRMED
+
+- `docs/design-system/GUIDELINES.md` marks the new model provisional throughout ("Status: token names are provisional… S1 (#2414) turns them into DTCG 2025.10 tokens"; theme SKILL.md files repeat "provisional until S1 #2414").
+- The migration passage (§2.2, lines ~118-123) states verbatim: "Code today (NS One) scopes light on `:root` and dark on `[data-theme='dark']`. The new model moves the scheme to `data-scheme` and gives `data-theme` to the language… S1 acceptance requires that … NS One renders unchanged." It further requires keeping `[data-theme='dark']` resolving or shipping a migration with a `ui:migrate` step, and forbids renaming `--ns-*` without one.
+- This PR's guides document exactly today's selectors (`:root` light, `[data-theme='dark']` dark) — no contradiction. The S7 caveat correctly records the S1 update obligation (four surfaces + `ui:migrate` + preset cross-links), filed not fixed.
+
+No new product findings. No doctrine violations. No debt entries required. Evaluator touched no product files (only this report); scratch worktrees removed (`git worktree list` shows only this worktree); temp probe files removed.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Patch identity (old vs new diff, excl. generated/run-dir/fixture) | PASS | 21/21 byte-identical; 1 changed-base file, identical hunk |
+| `check:publish-assets` / `check:agent-docs-prose` / `check:assets-barrel` | PASS / PASS / PASS | exits 0, `"fresh":true` |
+| Probe strings in carrier | PASS (0 / 0) | full-carrier sweep |
+| MCP `deno task test` | PASS | 199 passed, 0 failed |
+| Fixture isolation (main-alone / pre-rebase-alone / HEAD) | PASS | old / old / new order, each deterministic ×2; ranked page byte-identical |
+| Design-system agreement | PASS | GUIDELINES.md provisional + migration passage matches guides |
+
+| Field | Value |
+| --- | --- |
+| Verdict | `PASS` |
+| Rationale | Both rebases preserved the evaluated product patch byte-for-byte (identical file list modulo the fixture; identical hunks including the auto-merged build-tokens header); carriers fresh with zero probe strings; the single fixture delta re-locks a proven near-tie (same-stem overlap measured, flip reproduced as a whole-corpus IDF effect with old order on either corpus alone, #1 still asserted via exact mode, ranking policy and test logic untouched, MCP 199/199); main's design-system docs explicitly describe today's :root/[data-theme='dark'] selectors with the new model provisional to S1 #2414, so no contradiction. S1 update obligation filed in caveats. |
+
+VERDICT: PASS
