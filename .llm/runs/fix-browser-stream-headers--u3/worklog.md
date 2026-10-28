@@ -146,3 +146,15 @@ Actual docs:links failed5 installed Aspire-skill targets; exports-drift and accu
 global example-compiler PASS is inferred. Raw receipts and source hashes are sealed under ignored
 native-sol/c3 evidence for root review before any C3 checkpoint. Fresh12/workers1 and the failed F15
 application remain unwaived; no independent IMPL or release acceptance follows.
+
+
+## Root-accepted corrective type closure,2026-10-28
+
+Actual SAME-GLM corrective PLAN is PASS as bounded DEBT_ACCEPTED, with repaired BOTH F15/F5
+wording. Root independently read source/gates and matched11bindings before accepting the exact
+four-site +8/-2 patch and48-line registry entry. See type-closure-checkpoint.md and root source
+acceptance. Shipping Fresh10/workers0, compiler/runtime/static/package/publish evidence and
+qualified external existing reference contract are retained. Original failed premise/application,
+ten baseline findings, surplus and parent Windows/architecture failures remain unwaived.
+All planned source is complete; prepare independent Opus/xhigh IMPL only, no inference authority.
+PR2423 may enter actual CI. No merge/readiness or release acceptance.

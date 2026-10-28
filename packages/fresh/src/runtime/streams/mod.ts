@@ -18,6 +18,8 @@
 
 export {
   createNetScriptStreamDB,
+  type HeadersRecord,
+  type MaybePromise,
   type NetScriptStateSchema,
   type NetScriptStreamDB,
   type NetScriptStreamDBFactory,

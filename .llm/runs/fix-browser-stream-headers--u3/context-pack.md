@@ -100,3 +100,14 @@ closure and was archived/reverted; no extra native export/canonical debt remains
 workers1 documentation findings stay unwaived. Next authorized work is only C3 reader-header
 documentation and stale factory/module introductions, with actual docs gates before root review.
 Broader native type closure awaits separate corrective independent review. No readiness/merge.
+
+
+## Current continuation: root accepted bounded type closure,2026-10-28
+
+C1/C2/C3 and the exact four-site native type closure are root source accepted. The canonical
+entry is DEBT_ACCEPTED for BOTH F15 native exposure and F5 measured facade growth, fixedNov10
+without extension/growth. Actual shipping docs10/0; original ten Fresh findings/surplus remain
+unwaived. Root qualified the existing reference contract through read-only external Windows
+checker0d5b982b; no checker import/page edit/waiver or original parent task PASS. See
+type-closure-checkpoint.md. Next is independent feature IMPL preparation: Opus/xhigh fallback,
+skipping Meta and OpenAI generator families. No review inference or merge authorization yet.

@@ -18,7 +18,8 @@ import { createStreamDB } from '@durable-streams/state/db';
 import type { StateSchema, StreamStateDefinition } from '@durable-streams/state';
 import type { StreamDB } from '@durable-streams/state/db';
 import { DurableStream } from '@durable-streams/client';
-import type { HeadersRecord } from '@durable-streams/client';
+import type { HeadersRecord, MaybePromise } from '@durable-streams/client';
+export type { HeadersRecord, MaybePromise };
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 import { createStreamDBRecoveryAdapter } from './stream-db-recovery-adapter.ts';
 

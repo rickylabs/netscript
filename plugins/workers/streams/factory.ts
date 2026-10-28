@@ -9,7 +9,8 @@
  */
 
 import { createStreamDB } from '@durable-streams/state/db';
-import type { HeadersRecord } from '@durable-streams/client';
+import type { HeadersRecord, MaybePromise } from '@durable-streams/client';
+export type { HeadersRecord, MaybePromise };
 import {
   buildStreamUrl,
   getStreamsAuth,

@@ -1,0 +1,15 @@
+{
+  "selected": "consumer-fresh",
+  "args": [
+    "task",
+    "--cwd",
+    "packages/fresh",
+    "check:streams-types"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:42.634Z",
+  "ended": "2026-10-28T02:20:42.846Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/consumer-fresh-1793154042630"
+}

@@ -1,0 +1,27 @@
+{
+  "selected": "types",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-check.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/mod.ts",
+    "--file",
+    "plugins/workers/streams/factory.ts",
+    "--file",
+    "plugins/workers/streams/mod.ts",
+    "--deno-arg",
+    "--frozen",
+    "--deno-arg",
+    "--unstable-kv"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:40.209Z",
+  "ended": "2026-10-28T02:20:42.515Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/types-1793154040205"
+}

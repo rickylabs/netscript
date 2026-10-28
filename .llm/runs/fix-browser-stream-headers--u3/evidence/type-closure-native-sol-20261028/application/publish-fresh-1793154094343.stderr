@@ -1,0 +1,180 @@
+Task publish:dry-run deno publish --dry-run --allow-dirty
+Check mod.ts
+Check src/runtime/server/mod.ts
+Check src/runtime/desktop/mod.ts
+Check src/application/builders/mod.ts
+Check src/application/route/mod.ts
+Check src/application/defer/mod.ts
+Check src/application/defer/island.ts
+Check src/application/form/mod.ts
+Check src/diagnostics/error/mod.ts
+Check src/runtime/streams/mod.ts
+Check src/runtime/ai/mod.ts
+Check src/runtime/ai/sandbox.ts
+Check src/application/query/mod.ts
+Check src/runtime/interactive/mod.ts
+Check src/runtime/navigation/mod.ts
+Check src/application/vite/vite.ts
+Check src/testing/mod.ts
+Checking for slow types in the public API...
+Check mod.ts
+Check src/runtime/server/mod.ts
+Check src/runtime/desktop/mod.ts
+Check src/application/builders/mod.ts
+Check src/application/route/mod.ts
+Check src/application/defer/mod.ts
+Check src/application/defer/island.ts
+Check src/application/form/mod.ts
+Check src/diagnostics/error/mod.ts
+Check src/runtime/streams/mod.ts
+Check src/runtime/ai/mod.ts
+Check src/runtime/ai/sandbox.ts
+Check src/application/query/mod.ts
+Check src/runtime/interactive/mod.ts
+Check src/runtime/navigation/mod.ts
+Check src/application/vite/vite.ts
+Check src/testing/mod.ts
+Simulating publish of @netscript/fresh@0.0.8 with files:
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/README.md (15.28KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/deno.json (5.21KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/mod.ts (1.67KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/builder/factory.ts (3.42KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/builder/form-support.ts (11.06KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/builder/mod.tsx (18.7KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/builder/route-support.ts (4.3KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/builder/state.ts (6.91KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/builder/validators.ts (2.5KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/catalog.ts (11.86KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/internal.ts (3.17KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/mod.ts (322B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/navigation/context.ts (1.7KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/navigation/hooks.ts (4.67KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/navigation/link.tsx (10.29KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/navigation/mod.ts (6.48KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/page-compat.ts (1.27KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/page-compat/builder-types.ts (1.02KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/page-compat/context-types.ts (8.53KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/page-compat/definition-types.ts (5.63KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/page-compat/form-types.ts (6.4KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/page-compat/partial-types.ts (283B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/page-compat/route-types.ts (9.73KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/page-compat/shared-types.ts (1.27KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/runtime/context.ts (5.42KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/runtime/handlers.ts (1.95KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/runtime/mod.tsx (10.27KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/runtime/render.tsx (3.52KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/search-params.ts (4.46KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-page/types.ts (15.11KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/define-partial.tsx (8.89KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/builders/mod.ts (1.21KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/cache-entries/cache-entry.ts (1.79KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/cache-entries/mod.ts (1.17KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/defer/DeferIsland.tsx (7.3KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/defer/DeferPage.tsx (9.16KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/defer/Deferred.tsx (2.89KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/defer/island.ts (255B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/defer/mod.ts (366B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/defer/policy.ts (6.97KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/defer/telemetry.ts (6.37KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/_internal/descriptor-types.ts (4.07KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/_internal/intent-reply-types.ts (8.46KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/_internal/page-types.ts (1.81KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/_internal/prop-types.ts (10.21KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/_internal/runtime-types.ts (6.23KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/_internal/types.ts (1.38KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/_internal/value-types.ts (1.58KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/components/enhancement.tsx (7.85KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/components/form-region.tsx (846B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/components/form.tsx (2.4KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/field-descriptors/aria-data.ts (1.36KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/field-descriptors/collection.ts (5.69KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/field-descriptors/constraints.ts (1.93KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/field-descriptors/descriptor.ts (5.24KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/field-descriptors/entry.ts (51B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/field-descriptors/mod.ts (2.67KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/mod.ts (2.82KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/collection-keys.ts (1.65KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/config.ts (4.62KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/handler-context.ts (2.02KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/idempotency.ts (487B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/intent.ts (8.84KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/pagination.ts (2.25KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/reply.ts (6.13KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/state.ts (6.75KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/telemetry.ts (1.59KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/runtime/types.ts (1.31KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/schema-adapter/contract.ts (2.81KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/schema-adapter/entry.ts (370B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/schema-adapter/mod.ts (522B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/schema-adapter/standard.ts (5.11KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/schema-adapter/zod-constraints.ts (8.1KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/schema-adapter/zod-defaults.ts (3.1KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/schema-adapter/zod-errors.ts (1.07KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/schema-adapter/zod-internals.ts (1.93KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/schema-adapter/zod.ts (1.95KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/validation/csrf.ts (2.21KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/validation/error-normalization.ts (2.81KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/validation/errors.ts (2.96KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/form/validation/pipeline.ts (7.94KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/query/cache-invalidation/mod.ts (1.76KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/query/hooks.ts (8.09KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/query/hydration-script.tsx (2.84KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/query/hydration.ts (9KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/query/mod.ts (2.52KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/query/query-client.ts (1.92KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/query/query-island.tsx (1.42KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/query/query-types.ts (9.05KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/_internal/contract-runtime.ts (15.51KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/_internal/contract-types.ts (8.36KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/contract.ts (291B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/manifest-page-module.ts (13.88KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/manifest-types.ts (2.85KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/manifest.ts (19.16KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/mod.ts (6.13KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/pagination-types.ts (4.59KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/schema-output.ts (727B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/route/types.ts (14.57KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/application/vite/vite.ts (14.97KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/diagnostics/error/ErrorDisplay.tsx (4.18KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/diagnostics/error/classify.ts (1.33KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/diagnostics/error/extract.ts (1.81KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/diagnostics/error/handler.ts (2.99KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/diagnostics/error/mod.ts (614B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/diagnostics/error/primitives.ts (1.03KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/diagnostics/error/types.ts (642B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/internal/chat-message-replay.ts (2.54KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/internal/chat-stream-subscription.ts (1.34KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/internal/chat-subscription-hub.ts (7.06KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/internal/package-telemetry/telemetry.ts (2.42KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/ai/chat-producer.ts (3.82KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/ai/create-chat-connection.ts (25.97KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/ai/fenced-chat-session-writer.ts (7.65KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/ai/mcp-app-call-handler.ts (12.6KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/ai/mcp-sandbox-handler.ts (8.54KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/ai/mod.ts (5.65KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/ai/project-chat-snapshot.ts (2.7KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/ai/sandbox.ts (834B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/ai/stream-proxy.ts (9.48KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/desktop/bind-desktop-rpc-window.ts (4.21KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/desktop/constants.ts (375B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/desktop/mod.ts (711B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/desktop/types.ts (3.14KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/interactive-hooks/use-promise.ts (1.17KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/interactive/mod.ts (348B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/navigation/coordinator.ts (18.7KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/navigation/keyed-partial.tsx (1.22KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/navigation/mod.ts (954B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/navigation/types.ts (2.04KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/server/define-fresh-app.ts (4.41KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/server/fresh-app-telemetry.ts (1.97KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/server/mod.ts (1011B)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/server/query-cache-invalidation.ts (2.5KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/server/sse.ts (12.35KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/server/stream-error-boundary.tsx (2.85KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/server/stream.ts (7.68KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts (8.87KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-event-source.ts (2.71KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/mod.ts (3.31KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/stream-db-recovery-adapter.ts (8.13KB)
+   file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/testing/mod.ts (4.69KB)
+Success Dry run complete

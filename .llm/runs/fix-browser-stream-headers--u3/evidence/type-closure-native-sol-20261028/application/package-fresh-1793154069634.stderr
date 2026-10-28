@@ -1,0 +1,20 @@
+Task check deno check --unstable-kv ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/query/mod.ts ./src/application/vite/vite.ts ./src/runtime/interactive/mod.ts ./src/runtime/navigation/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/testing/mod.ts ./tests/type-fixtures/desktop-consumer_type.ts ./tests/type-fixtures/navigation-consumer_type.ts && deno task check:streams-types
+Check mod.ts
+Check src/runtime/server/mod.ts
+Check src/runtime/desktop/mod.ts
+Check src/application/builders/mod.ts
+Check src/application/route/mod.ts
+Check src/application/query/mod.ts
+Check src/application/vite/vite.ts
+Check src/runtime/interactive/mod.ts
+Check src/runtime/navigation/mod.ts
+Check src/application/defer/mod.ts
+Check src/application/form/mod.ts
+Check src/diagnostics/error/mod.ts
+Check src/runtime/streams/mod.ts
+Check src/runtime/ai/mod.ts
+Check src/runtime/ai/sandbox.ts
+Check src/testing/mod.ts
+Check tests/type-fixtures/desktop-consumer_type.ts
+Check tests/type-fixtures/navigation-consumer_type.ts
+Task check:streams-types deno check --no-lock --config ./tests/type-fixtures/streamdb-consumer-deno.json --unstable-kv ./tests/type-fixtures/streamdb-wrapper_type.ts

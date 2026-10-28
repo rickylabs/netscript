@@ -1,0 +1,3849 @@
+{
+  "version": 2,
+  "nodes": {
+    "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/mod.ts": {
+      "module_doc": {
+        "doc": "Browser-safe stream exports for the workers plugin.\n\nConsumed by Fresh islands — must not re-export server-only code.\n",
+        "tags": [
+          {
+            "kind": "module"
+          }
+        ]
+      },
+      "symbols": [
+        {
+          "name": "createWorkersStreamDB",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts",
+                "line": 58,
+                "col": 0,
+                "byteIndex": 2074
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Create a TanStack DB-backed StreamDB for worker execution and job entities.\n\nThe returned `StreamDB` has `.collections.execution` and `.collections.job`\nwhich are live TanStack DB `Collection` instances.  Use them with\n`useLiveQuery` from `@tanstack/react-db`.\n",
+                "tags": [
+                  {
+                    "kind": "example",
+                    "doc": "```ts\nimport { createWorkersStreamDB } from '@netscript/plugin-workers/streams';\nimport { useLiveQuery } from '@tanstack/react-db';\n\ndeclare const streamsServiceUrl: string;\n\nconst workersDb = createWorkersStreamDB({ baseUrl: streamsServiceUrl });\n\n// Call inside a React component or custom hook.\nfunction useWorkersRows() {\n  const result = useLiveQuery((q) => q.from({ item: workersDb.collections.execution }));\n  const entityStates = result.data.map((item) => item.status);\n  return { rows: result.data, state: result.state, status: result.status, entityStates };\n}\nvoid useWorkersRows;\n```"
+                  }
+                ]
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "assign",
+                    "left": {
+                      "kind": "identifier",
+                      "name": "options",
+                      "optional": false,
+                      "tsType": {
+                        "kind": "typeLiteral",
+                        "value": {
+                          "properties": [
+                            {
+                              "name": "baseUrl",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts",
+                                "line": 60,
+                                "col": 4,
+                                "byteIndex": 2130
+                              },
+                              "optional": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "headers",
+                              "jsDoc": {
+                                "doc": "Explicit reader headers replace ambient auth; native callbacks resolve per request."
+                              },
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts",
+                                "line": 62,
+                                "col": 4,
+                                "byteIndex": 2247
+                              },
+                              "optional": true,
+                              "tsType": {
+                                "repr": "HeadersRecord",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeName": "HeadersRecord",
+                                  "resolution": {
+                                    "kind": "import",
+                                    "specifier": "@durable-streams/client",
+                                    "name": "HeadersRecord"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "right": "[UNSUPPORTED]"
+                  }
+                ],
+                "returnType": {
+                  "repr": "WorkersStreamDB",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "WorkersStreamDB",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "HeadersRecord",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                "line": 153,
+                "col": 0,
+                "byteIndex": 5113
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Headers record where values can be static strings or async functions.\nFollowing the @electric-sql/client pattern for dynamic headers.\n\n**Important**: Functions are called **for each request**, not once per session.\nIn live mode with long-polling, the same function may be called many times\nto fetch fresh values (e.g., refreshed auth tokens) for each poll.\n",
+                "tags": [
+                  {
+                    "kind": "example",
+                    "doc": "```typescript\nheaders: {\n  Authorization: `Bearer ${token}`,           // Static - same for all requests\n  'X-Tenant-Id': () => getCurrentTenant(),    // Called per-request\n  'X-Auth': async () => await refreshToken()  // Called per-request (can refresh)\n}\n```"
+                  }
+                ]
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "typeLiteral",
+                  "value": {
+                    "indexSignatures": [
+                      {
+                        "params": [
+                          {
+                            "kind": "identifier",
+                            "name": "key",
+                            "optional": false,
+                            "tsType": {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            }
+                          }
+                        ],
+                        "tsType": {
+                          "kind": "union",
+                          "value": [
+                            {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            },
+                            {
+                              "kind": "parenthesized",
+                              "value": {
+                                "kind": "fnOrConstructor",
+                                "value": {
+                                  "constructor": false,
+                                  "tsType": {
+                                    "repr": "MaybePromise",
+                                    "kind": "typeRef",
+                                    "value": {
+                                      "typeParams": [
+                                        {
+                                          "repr": "string",
+                                          "kind": "keyword",
+                                          "value": "string"
+                                        }
+                                      ],
+                                      "typeName": "MaybePromise",
+                                      "resolution": {
+                                        "kind": "local"
+                                      }
+                                    }
+                                  },
+                                  "params": []
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "location": {
+                          "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                          "line": 154,
+                          "col": 2,
+                          "byteIndex": 5138
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "MaybePromise",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                "line": 135,
+                "col": 0,
+                "byteIndex": 4411
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Type for values that can be provided immediately or resolved asynchronously."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    },
+                    {
+                      "repr": "Promise",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "T",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "T",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "MaybePromise",
+                                "declaringKind": "typeAlias"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "Promise"
+                      }
+                    }
+                  ]
+                },
+                "typeParams": [
+                  {
+                    "name": "T"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkerExecution",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 65,
+                "col": 0,
+                "byteIndex": 2659
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Worker execution entity stored in the durable stream."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "Readonly",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "kind": "typeLiteral",
+                        "value": {
+                          "properties": [
+                            {
+                              "name": "id",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 67,
+                                "col": 4,
+                                "byteIndex": 2707
+                              },
+                              "readonly": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "jobId",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 68,
+                                "col": 4,
+                                "byteIndex": 2732
+                              },
+                              "readonly": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "status",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 69,
+                                "col": 4,
+                                "byteIndex": 2760
+                              },
+                              "readonly": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "pending",
+                                    "kind": "literal",
+                                    "value": {
+                                      "kind": "string",
+                                      "string": "pending"
+                                    }
+                                  },
+                                  {
+                                    "repr": "queued",
+                                    "kind": "literal",
+                                    "value": {
+                                      "kind": "string",
+                                      "string": "queued"
+                                    }
+                                  },
+                                  {
+                                    "repr": "running",
+                                    "kind": "literal",
+                                    "value": {
+                                      "kind": "string",
+                                      "string": "running"
+                                    }
+                                  },
+                                  {
+                                    "repr": "completed",
+                                    "kind": "literal",
+                                    "value": {
+                                      "kind": "string",
+                                      "string": "completed"
+                                    }
+                                  },
+                                  {
+                                    "repr": "failed",
+                                    "kind": "literal",
+                                    "value": {
+                                      "kind": "string",
+                                      "string": "failed"
+                                    }
+                                  },
+                                  {
+                                    "repr": "cancelled",
+                                    "kind": "literal",
+                                    "value": {
+                                      "kind": "string",
+                                      "string": "cancelled"
+                                    }
+                                  },
+                                  {
+                                    "repr": "timeout",
+                                    "kind": "literal",
+                                    "value": {
+                                      "kind": "string",
+                                      "string": "timeout"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "topic",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 77,
+                                "col": 4,
+                                "byteIndex": 2910
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "concept",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 78,
+                                "col": 4,
+                                "byteIndex": 2939
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "job",
+                                    "kind": "literal",
+                                    "value": {
+                                      "kind": "string",
+                                      "string": "job"
+                                    }
+                                  },
+                                  {
+                                    "repr": "task",
+                                    "kind": "literal",
+                                    "value": {
+                                      "kind": "string",
+                                      "string": "task"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "correlationId",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 79,
+                                "col": 4,
+                                "byteIndex": 2978
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "triggeredAt",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 80,
+                                "col": 4,
+                                "byteIndex": 3015
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "startedAt",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 81,
+                                "col": 4,
+                                "byteIndex": 3050
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  },
+                                  {
+                                    "repr": "null",
+                                    "kind": "keyword",
+                                    "value": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "completedAt",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 82,
+                                "col": 4,
+                                "byteIndex": 3090
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  },
+                                  {
+                                    "repr": "null",
+                                    "kind": "keyword",
+                                    "value": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "duration",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 83,
+                                "col": 4,
+                                "byteIndex": 3132
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "number",
+                                    "kind": "keyword",
+                                    "value": "number"
+                                  },
+                                  {
+                                    "repr": "null",
+                                    "kind": "keyword",
+                                    "value": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "exitCode",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 84,
+                                "col": 4,
+                                "byteIndex": 3171
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "number",
+                                    "kind": "keyword",
+                                    "value": "number"
+                                  },
+                                  {
+                                    "repr": "null",
+                                    "kind": "keyword",
+                                    "value": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "error",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 85,
+                                "col": 4,
+                                "byteIndex": 3210
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  },
+                                  {
+                                    "repr": "null",
+                                    "kind": "keyword",
+                                    "value": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "result",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 86,
+                                "col": 4,
+                                "byteIndex": 3246
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "Record",
+                                    "kind": "typeRef",
+                                    "value": {
+                                      "typeParams": [
+                                        {
+                                          "repr": "string",
+                                          "kind": "keyword",
+                                          "value": "string"
+                                        },
+                                        {
+                                          "repr": "unknown",
+                                          "kind": "keyword",
+                                          "value": "unknown"
+                                        }
+                                      ],
+                                      "typeName": "Record"
+                                    }
+                                  },
+                                  {
+                                    "repr": "null",
+                                    "kind": "keyword",
+                                    "value": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "workerId",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 87,
+                                "col": 4,
+                                "byteIndex": 3300
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  },
+                                  {
+                                    "repr": "null",
+                                    "kind": "keyword",
+                                    "value": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "progressPercent",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 88,
+                                "col": 4,
+                                "byteIndex": 3339
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "number",
+                                    "kind": "keyword",
+                                    "value": "number"
+                                  },
+                                  {
+                                    "repr": "null",
+                                    "kind": "keyword",
+                                    "value": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "progressMessage",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 89,
+                                "col": 4,
+                                "byteIndex": 3385
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "kind": "union",
+                                "value": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  },
+                                  {
+                                    "repr": "null",
+                                    "kind": "keyword",
+                                    "value": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "attempt",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 90,
+                                "col": 4,
+                                "byteIndex": 3431
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "repr": "number",
+                                "kind": "keyword",
+                                "value": "number"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "typeName": "Readonly"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkerJob",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 95,
+                "col": 0,
+                "byteIndex": 3521
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Worker job entity stored in the durable stream."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "Readonly",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "kind": "typeLiteral",
+                        "value": {
+                          "properties": [
+                            {
+                              "name": "id",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 97,
+                                "col": 4,
+                                "byteIndex": 3563
+                              },
+                              "readonly": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "name",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 98,
+                                "col": 4,
+                                "byteIndex": 3588
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "topic",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 99,
+                                "col": 4,
+                                "byteIndex": 3616
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "enabled",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 100,
+                                "col": 4,
+                                "byteIndex": 3645
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "repr": "boolean",
+                                "kind": "keyword",
+                                "value": "boolean"
+                              }
+                            },
+                            {
+                              "name": "schedule",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 101,
+                                "col": 4,
+                                "byteIndex": 3677
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            },
+                            {
+                              "name": "description",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 102,
+                                "col": 4,
+                                "byteIndex": 3709
+                              },
+                              "readonly": true,
+                              "optional": true,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "typeName": "Readonly"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkersStreamDB",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts",
+                "line": 23,
+                "col": 0,
+                "byteIndex": 785
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Browser-facing StreamDB surface returned by the workers stream factory."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "Readonly",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "kind": "typeLiteral",
+                        "value": {
+                          "properties": [
+                            {
+                              "name": "collections",
+                              "jsDoc": {
+                                "doc": "Live collection handles keyed by workers stream entity name."
+                              },
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts",
+                                "line": 25,
+                                "col": 2,
+                                "byteIndex": 898
+                              },
+                              "readonly": true,
+                              "tsType": {
+                                "repr": "Readonly",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeParams": [
+                                    {
+                                      "kind": "typeLiteral",
+                                      "value": {
+                                        "properties": [
+                                          {
+                                            "name": "execution",
+                                            "jsDoc": {
+                                              "doc": "Worker execution collection handle."
+                                            },
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts",
+                                              "line": 27,
+                                              "col": 4,
+                                              "byteIndex": 982
+                                            },
+                                            "readonly": true,
+                                            "tsType": {
+                                              "repr": "StreamCollection",
+                                              "kind": "typeRef",
+                                              "value": {
+                                                "typeParams": [
+                                                  {
+                                                    "repr": "WorkerExecution",
+                                                    "kind": "typeRef",
+                                                    "value": {
+                                                      "typeName": "WorkerExecution",
+                                                      "resolution": {
+                                                        "kind": "import",
+                                                        "specifier": "./schema.ts",
+                                                        "name": "WorkerExecution"
+                                                      }
+                                                    }
+                                                  }
+                                                ],
+                                                "typeName": "StreamCollection",
+                                                "resolution": {
+                                                  "kind": "import",
+                                                  "specifier": "@netscript/plugin-streams-core",
+                                                  "name": "StreamCollection"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "name": "job",
+                                            "jsDoc": {
+                                              "doc": "Worker job collection handle."
+                                            },
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts",
+                                              "line": 29,
+                                              "col": 4,
+                                              "byteIndex": 1082
+                                            },
+                                            "readonly": true,
+                                            "tsType": {
+                                              "repr": "StreamCollection",
+                                              "kind": "typeRef",
+                                              "value": {
+                                                "typeParams": [
+                                                  {
+                                                    "repr": "WorkerJob",
+                                                    "kind": "typeRef",
+                                                    "value": {
+                                                      "typeName": "WorkerJob",
+                                                      "resolution": {
+                                                        "kind": "import",
+                                                        "specifier": "./schema.ts",
+                                                        "name": "WorkerJob"
+                                                      }
+                                                    }
+                                                  }
+                                                ],
+                                                "typeName": "StreamCollection",
+                                                "resolution": {
+                                                  "kind": "import",
+                                                  "specifier": "@netscript/plugin-streams-core",
+                                                  "name": "StreamCollection"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "typeName": "Readonly"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "typeName": "Readonly"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkerExecutionSchema",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 162,
+                "col": 13,
+                "byteIndex": 5806
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Stream entity schema for worker executions."
+              },
+              "kind": "variable",
+              "def": {
+                "tsType": {
+                  "repr": "WorkerStreamEntitySchema",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "WorkerExecution",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "WorkerExecution",
+                          "resolution": {
+                            "kind": "local"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "WorkerStreamEntitySchema",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "kind": "const"
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkerJobSchema",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 190,
+                "col": 13,
+                "byteIndex": 6711
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Stream entity schema for worker jobs."
+              },
+              "kind": "variable",
+              "def": {
+                "tsType": {
+                  "repr": "WorkerStreamEntitySchema",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "WorkerJob",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "WorkerJob",
+                          "resolution": {
+                            "kind": "local"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "WorkerStreamEntitySchema",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "kind": "const"
+              }
+            }
+          ]
+        },
+        {
+          "name": "workersStreamSchema",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 220,
+                "col": 13,
+                "byteIndex": 7483
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Stream schema definition for worker executions and jobs."
+              },
+              "kind": "variable",
+              "def": {
+                "tsType": {
+                  "repr": "WorkersStreamSchema",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "WorkersStreamDefinition",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "WorkersStreamDefinition",
+                          "resolution": {
+                            "kind": "local"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "WorkersStreamSchema",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "kind": "const"
+              }
+            }
+          ]
+        },
+        {
+          "name": "StreamSchemaDefinition",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 57,
+                "col": 0,
+                "byteIndex": 2365
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Structural stream schema definition map."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "StreamStateDefinition",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "StreamStateDefinition",
+                    "resolution": {
+                      "kind": "import",
+                      "specifier": "@netscript/plugin-streams-core",
+                      "name": "StreamStateDefinition"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkersStreamDefinition",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 193,
+                "col": 0,
+                "byteIndex": 6859
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Durable stream definition for worker execution and job entities."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "Readonly",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "kind": "typeLiteral",
+                        "value": {
+                          "properties": [
+                            {
+                              "name": "execution",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 194,
+                                "col": 2,
+                                "byteIndex": 6910
+                              },
+                              "tsType": {
+                                "repr": "Readonly",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeParams": [
+                                    {
+                                      "kind": "typeLiteral",
+                                      "value": {
+                                        "properties": [
+                                          {
+                                            "name": "schema",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 195,
+                                              "col": 4,
+                                              "byteIndex": 6936
+                                            },
+                                            "tsType": {
+                                              "repr": "WorkerStreamEntitySchema",
+                                              "kind": "typeRef",
+                                              "value": {
+                                                "typeParams": [
+                                                  {
+                                                    "repr": "WorkerExecution",
+                                                    "kind": "typeRef",
+                                                    "value": {
+                                                      "typeName": "WorkerExecution",
+                                                      "resolution": {
+                                                        "kind": "local"
+                                                      }
+                                                    }
+                                                  }
+                                                ],
+                                                "typeName": "WorkerStreamEntitySchema",
+                                                "resolution": {
+                                                  "kind": "local"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "name": "type",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 196,
+                                              "col": 4,
+                                              "byteIndex": 6991
+                                            },
+                                            "tsType": {
+                                              "repr": "execution",
+                                              "kind": "literal",
+                                              "value": {
+                                                "kind": "string",
+                                                "string": "execution"
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "name": "primaryKey",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 197,
+                                              "col": 4,
+                                              "byteIndex": 7014
+                                            },
+                                            "tsType": {
+                                              "repr": "id",
+                                              "kind": "literal",
+                                              "value": {
+                                                "kind": "string",
+                                                "string": "id"
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "typeName": "Readonly"
+                                }
+                              }
+                            },
+                            {
+                              "name": "job",
+                              "location": {
+                                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                "line": 199,
+                                "col": 2,
+                                "byteIndex": 7040
+                              },
+                              "tsType": {
+                                "repr": "Readonly",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeParams": [
+                                    {
+                                      "kind": "typeLiteral",
+                                      "value": {
+                                        "properties": [
+                                          {
+                                            "name": "schema",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 200,
+                                              "col": 4,
+                                              "byteIndex": 7060
+                                            },
+                                            "tsType": {
+                                              "repr": "WorkerStreamEntitySchema",
+                                              "kind": "typeRef",
+                                              "value": {
+                                                "typeParams": [
+                                                  {
+                                                    "repr": "WorkerJob",
+                                                    "kind": "typeRef",
+                                                    "value": {
+                                                      "typeName": "WorkerJob",
+                                                      "resolution": {
+                                                        "kind": "local"
+                                                      }
+                                                    }
+                                                  }
+                                                ],
+                                                "typeName": "WorkerStreamEntitySchema",
+                                                "resolution": {
+                                                  "kind": "local"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "name": "type",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 201,
+                                              "col": 4,
+                                              "byteIndex": 7109
+                                            },
+                                            "tsType": {
+                                              "repr": "job",
+                                              "kind": "literal",
+                                              "value": {
+                                                "kind": "string",
+                                                "string": "job"
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "name": "primaryKey",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 202,
+                                              "col": 4,
+                                              "byteIndex": 7126
+                                            },
+                                            "tsType": {
+                                              "repr": "id",
+                                              "kind": "literal",
+                                              "value": {
+                                                "kind": "string",
+                                                "string": "id"
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "typeName": "Readonly"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "typeName": "Readonly"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkersStreamSchema",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 60,
+                "col": 0,
+                "byteIndex": 2489
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Package-owned structural workers stream schema surface."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "StateSchema",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "TDefinition",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "TDefinition",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "WorkersStreamSchema",
+                            "declaringKind": "typeAlias"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "StateSchema",
+                    "resolution": {
+                      "kind": "import",
+                      "specifier": "@netscript/plugin-streams-core",
+                      "name": "StateSchema"
+                    }
+                  }
+                },
+                "typeParams": [
+                  {
+                    "name": "TDefinition",
+                    "constraint": {
+                      "repr": "StreamSchemaDefinition",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "StreamSchemaDefinition",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkerStreamCollectionDefinition",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 47,
+                "col": 0,
+                "byteIndex": 1920
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Package-owned structural stream collection definition."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "schema",
+                    "jsDoc": {
+                      "doc": "Standard Schema compatible validator for collection entities."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                      "line": 49,
+                      "col": 2,
+                      "byteIndex": 2072
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "WorkerStreamEntitySchema",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TOutput",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TOutput",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "WorkerStreamCollectionDefinition",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          },
+                          {
+                            "repr": "TInput",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TInput",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "WorkerStreamCollectionDefinition",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "WorkerStreamEntitySchema",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "type",
+                    "jsDoc": {
+                      "doc": "State Protocol type discriminator emitted for the collection."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                      "line": 51,
+                      "col": 2,
+                      "byteIndex": 2205
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "primaryKey",
+                    "jsDoc": {
+                      "doc": "Property name used as the entity primary key."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                      "line": 53,
+                      "col": 2,
+                      "byteIndex": 2285
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TOutput"
+                  },
+                  {
+                    "name": "TInput",
+                    "default": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkerStreamEntitySchema",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 36,
+                "col": 0,
+                "byteIndex": 1442
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Package-owned structural schema surface for worker stream entities."
+              },
+              "kind": "interface",
+              "def": {
+                "extends": [
+                  {
+                    "repr": "WorkerStreamStandardSchema",
+                    "kind": "typeRef",
+                    "value": {
+                      "typeParams": [
+                        {
+                          "repr": "TOutput",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "TOutput",
+                            "resolution": {
+                              "kind": "typeParam",
+                              "declaringName": "WorkerStreamEntitySchema",
+                              "declaringKind": "interface"
+                            }
+                          }
+                        },
+                        {
+                          "repr": "TInput",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "TInput",
+                            "resolution": {
+                              "kind": "typeParam",
+                              "declaringName": "WorkerStreamEntitySchema",
+                              "declaringKind": "interface"
+                            }
+                          }
+                        }
+                      ],
+                      "typeName": "WorkerStreamStandardSchema",
+                      "resolution": {
+                        "kind": "local"
+                      }
+                    }
+                  }
+                ],
+                "methods": [
+                  {
+                    "name": "parse",
+                    "jsDoc": {
+                      "doc": "Parse an unknown value into the entity output."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                      "line": 39,
+                      "col": 2,
+                      "byteIndex": 1625
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "value",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "TInput",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "TInput",
+                            "resolution": {
+                              "kind": "typeParam",
+                              "declaringName": "WorkerStreamEntitySchema",
+                              "declaringKind": "interface"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "repr": "TOutput",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "TOutput",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "WorkerStreamEntitySchema",
+                          "declaringKind": "interface"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "safeParse",
+                    "jsDoc": {
+                      "doc": "Validate an unknown value without throwing."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                      "line": 41,
+                      "col": 2,
+                      "byteIndex": 1711
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "value",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "unknown",
+                          "kind": "keyword",
+                          "value": "unknown"
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "kind": "typeLiteral",
+                          "value": {
+                            "properties": [
+                              {
+                                "name": "success",
+                                "location": {
+                                  "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                  "line": 42,
+                                  "col": 8,
+                                  "byteIndex": 1746
+                                },
+                                "readonly": true,
+                                "tsType": {
+                                  "repr": "true",
+                                  "kind": "literal",
+                                  "value": {
+                                    "kind": "boolean",
+                                    "boolean": true
+                                  }
+                                }
+                              },
+                              {
+                                "name": "data",
+                                "location": {
+                                  "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                  "line": 42,
+                                  "col": 32,
+                                  "byteIndex": 1770
+                                },
+                                "readonly": true,
+                                "tsType": {
+                                  "repr": "TOutput",
+                                  "kind": "typeRef",
+                                  "value": {
+                                    "typeName": "TOutput",
+                                    "resolution": {
+                                      "kind": "typeParam",
+                                      "declaringName": "WorkerStreamEntitySchema",
+                                      "declaringKind": "interface"
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "kind": "typeLiteral",
+                          "value": {
+                            "properties": [
+                              {
+                                "name": "success",
+                                "location": {
+                                  "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                  "line": 43,
+                                  "col": 8,
+                                  "byteIndex": 1803
+                                },
+                                "readonly": true,
+                                "tsType": {
+                                  "repr": "false",
+                                  "kind": "literal",
+                                  "value": {
+                                    "kind": "boolean",
+                                    "boolean": false
+                                  }
+                                }
+                              },
+                              {
+                                "name": "error",
+                                "location": {
+                                  "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                  "line": 43,
+                                  "col": 33,
+                                  "byteIndex": 1828
+                                },
+                                "readonly": true,
+                                "tsType": {
+                                  "repr": "unknown",
+                                  "kind": "keyword",
+                                  "value": "unknown"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TOutput"
+                  },
+                  {
+                    "name": "TInput",
+                    "default": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WorkerStreamStandardSchema",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                "line": 6,
+                "col": 0,
+                "byteIndex": 344
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Standard Schema compatible public schema surface for stream entities."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "~standard",
+                    "jsDoc": {
+                      "doc": "Standard Schema metadata and validation hooks."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                      "line": 8,
+                      "col": 2,
+                      "byteIndex": 475
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "version",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                              "line": 9,
+                              "col": 4,
+                              "byteIndex": 503
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "1",
+                              "kind": "literal",
+                              "value": {
+                                "kind": "number",
+                                "number": 1.0
+                              }
+                            }
+                          },
+                          {
+                            "name": "vendor",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                              "line": 10,
+                              "col": 4,
+                              "byteIndex": 528
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            }
+                          },
+                          {
+                            "name": "validate",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                              "line": 11,
+                              "col": 4,
+                              "byteIndex": 557
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "kind": "fnOrConstructor",
+                              "value": {
+                                "constructor": false,
+                                "tsType": {
+                                  "kind": "union",
+                                  "value": [
+                                    {
+                                      "kind": "typeLiteral",
+                                      "value": {
+                                        "properties": [
+                                          {
+                                            "name": "value",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 15,
+                                              "col": 10,
+                                              "byteIndex": 702
+                                            },
+                                            "readonly": true,
+                                            "tsType": {
+                                              "repr": "TOutput",
+                                              "kind": "typeRef",
+                                              "value": {
+                                                "typeName": "TOutput",
+                                                "resolution": {
+                                                  "kind": "typeParam",
+                                                  "declaringName": "WorkerStreamStandardSchema",
+                                                  "declaringKind": "interface"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "name": "issues",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 15,
+                                              "col": 35,
+                                              "byteIndex": 727
+                                            },
+                                            "readonly": true,
+                                            "optional": true,
+                                            "tsType": {
+                                              "repr": "undefined",
+                                              "kind": "keyword",
+                                              "value": "undefined"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "kind": "typeLiteral",
+                                      "value": {
+                                        "properties": [
+                                          {
+                                            "name": "issues",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 17,
+                                              "col": 8,
+                                              "byteIndex": 775
+                                            },
+                                            "readonly": true,
+                                            "tsType": {
+                                              "repr": "ReadonlyArray",
+                                              "kind": "typeRef",
+                                              "value": {
+                                                "typeParams": [
+                                                  {
+                                                    "kind": "typeLiteral",
+                                                    "value": {
+                                                      "properties": [
+                                                        {
+                                                          "name": "message",
+                                                          "location": {
+                                                            "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                                            "line": 18,
+                                                            "col": 10,
+                                                            "byteIndex": 818
+                                                          },
+                                                          "readonly": true,
+                                                          "tsType": {
+                                                            "repr": "string",
+                                                            "kind": "keyword",
+                                                            "value": "string"
+                                                          }
+                                                        },
+                                                        {
+                                                          "name": "path",
+                                                          "location": {
+                                                            "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                                            "line": 19,
+                                                            "col": 10,
+                                                            "byteIndex": 854
+                                                          },
+                                                          "readonly": true,
+                                                          "optional": true,
+                                                          "tsType": {
+                                                            "kind": "union",
+                                                            "value": [
+                                                              {
+                                                                "repr": "ReadonlyArray",
+                                                                "kind": "typeRef",
+                                                                "value": {
+                                                                  "typeParams": [
+                                                                    {
+                                                                      "kind": "union",
+                                                                      "value": [
+                                                                        {
+                                                                          "repr": "PropertyKey",
+                                                                          "kind": "typeRef",
+                                                                          "value": {
+                                                                            "typeName": "PropertyKey"
+                                                                          }
+                                                                        },
+                                                                        {
+                                                                          "kind": "typeLiteral",
+                                                                          "value": {
+                                                                            "properties": [
+                                                                              {
+                                                                                "name": "key",
+                                                                                "location": {
+                                                                                  "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                                                                  "line": 19,
+                                                                                  "col": 56,
+                                                                                  "byteIndex": 900
+                                                                                },
+                                                                                "readonly": true,
+                                                                                "tsType": {
+                                                                                  "repr": "PropertyKey",
+                                                                                  "kind": "typeRef",
+                                                                                  "value": {
+                                                                                    "typeName": "PropertyKey"
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            ]
+                                                                          }
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ],
+                                                                  "typeName": "ReadonlyArray"
+                                                                }
+                                                              },
+                                                              {
+                                                                "repr": "undefined",
+                                                                "kind": "keyword",
+                                                                "value": "undefined"
+                                                              }
+                                                            ]
+                                                          }
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                ],
+                                                "typeName": "ReadonlyArray"
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "repr": "Promise",
+                                      "kind": "typeRef",
+                                      "value": {
+                                        "typeParams": [
+                                          {
+                                            "kind": "union",
+                                            "value": [
+                                              {
+                                                "kind": "typeLiteral",
+                                                "value": {
+                                                  "properties": [
+                                                    {
+                                                      "name": "value",
+                                                      "location": {
+                                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                                        "line": 23,
+                                                        "col": 12,
+                                                        "byteIndex": 991
+                                                      },
+                                                      "readonly": true,
+                                                      "tsType": {
+                                                        "repr": "TOutput",
+                                                        "kind": "typeRef",
+                                                        "value": {
+                                                          "typeName": "TOutput",
+                                                          "resolution": {
+                                                            "kind": "typeParam",
+                                                            "declaringName": "WorkerStreamStandardSchema",
+                                                            "declaringKind": "interface"
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    {
+                                                      "name": "issues",
+                                                      "location": {
+                                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                                        "line": 23,
+                                                        "col": 37,
+                                                        "byteIndex": 1016
+                                                      },
+                                                      "readonly": true,
+                                                      "optional": true,
+                                                      "tsType": {
+                                                        "repr": "undefined",
+                                                        "kind": "keyword",
+                                                        "value": "undefined"
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              },
+                                              {
+                                                "kind": "typeLiteral",
+                                                "value": {
+                                                  "properties": [
+                                                    {
+                                                      "name": "issues",
+                                                      "location": {
+                                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                                        "line": 25,
+                                                        "col": 10,
+                                                        "byteIndex": 1068
+                                                      },
+                                                      "readonly": true,
+                                                      "tsType": {
+                                                        "repr": "ReadonlyArray",
+                                                        "kind": "typeRef",
+                                                        "value": {
+                                                          "typeParams": [
+                                                            {
+                                                              "kind": "typeLiteral",
+                                                              "value": {
+                                                                "properties": [
+                                                                  {
+                                                                    "name": "message",
+                                                                    "location": {
+                                                                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                                                      "line": 26,
+                                                                      "col": 12,
+                                                                      "byteIndex": 1113
+                                                                    },
+                                                                    "readonly": true,
+                                                                    "tsType": {
+                                                                      "repr": "string",
+                                                                      "kind": "keyword",
+                                                                      "value": "string"
+                                                                    }
+                                                                  },
+                                                                  {
+                                                                    "name": "path",
+                                                                    "location": {
+                                                                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                                                      "line": 27,
+                                                                      "col": 12,
+                                                                      "byteIndex": 1151
+                                                                    },
+                                                                    "readonly": true,
+                                                                    "optional": true,
+                                                                    "tsType": {
+                                                                      "kind": "union",
+                                                                      "value": [
+                                                                        {
+                                                                          "repr": "ReadonlyArray",
+                                                                          "kind": "typeRef",
+                                                                          "value": {
+                                                                            "typeParams": [
+                                                                              {
+                                                                                "kind": "union",
+                                                                                "value": [
+                                                                                  {
+                                                                                    "repr": "PropertyKey",
+                                                                                    "kind": "typeRef",
+                                                                                    "value": {
+                                                                                      "typeName": "PropertyKey"
+                                                                                    }
+                                                                                  },
+                                                                                  {
+                                                                                    "kind": "typeLiteral",
+                                                                                    "value": {
+                                                                                      "properties": [
+                                                                                        {
+                                                                                          "name": "key",
+                                                                                          "location": {
+                                                                                            "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                                                                            "line": 27,
+                                                                                            "col": 58,
+                                                                                            "byteIndex": 1197
+                                                                                          },
+                                                                                          "readonly": true,
+                                                                                          "tsType": {
+                                                                                            "repr": "PropertyKey",
+                                                                                            "kind": "typeRef",
+                                                                                            "value": {
+                                                                                              "typeName": "PropertyKey"
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  }
+                                                                                ]
+                                                                              }
+                                                                            ],
+                                                                            "typeName": "ReadonlyArray"
+                                                                          }
+                                                                        },
+                                                                        {
+                                                                          "repr": "undefined",
+                                                                          "kind": "keyword",
+                                                                          "value": "undefined"
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  }
+                                                                ]
+                                                              }
+                                                            }
+                                                          ],
+                                                          "typeName": "ReadonlyArray"
+                                                        }
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        ],
+                                        "typeName": "Promise"
+                                      }
+                                    }
+                                  ]
+                                },
+                                "params": [
+                                  {
+                                    "kind": "identifier",
+                                    "name": "value",
+                                    "optional": false,
+                                    "tsType": {
+                                      "repr": "unknown",
+                                      "kind": "keyword",
+                                      "value": "unknown"
+                                    }
+                                  },
+                                  {
+                                    "kind": "identifier",
+                                    "name": "options",
+                                    "optional": true,
+                                    "tsType": {
+                                      "kind": "typeLiteral",
+                                      "value": {
+                                        "properties": [
+                                          {
+                                            "name": "libraryOptions",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                              "line": 13,
+                                              "col": 18,
+                                              "byteIndex": 618
+                                            },
+                                            "readonly": true,
+                                            "optional": true,
+                                            "tsType": {
+                                              "kind": "union",
+                                              "value": [
+                                                {
+                                                  "repr": "Record",
+                                                  "kind": "typeRef",
+                                                  "value": {
+                                                    "typeParams": [
+                                                      {
+                                                        "repr": "string",
+                                                        "kind": "keyword",
+                                                        "value": "string"
+                                                      },
+                                                      {
+                                                        "repr": "unknown",
+                                                        "kind": "keyword",
+                                                        "value": "unknown"
+                                                      }
+                                                    ],
+                                                    "typeName": "Record"
+                                                  }
+                                                },
+                                                {
+                                                  "repr": "undefined",
+                                                  "kind": "keyword",
+                                                  "value": "undefined"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "name": "types",
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                              "line": 31,
+                              "col": 4,
+                              "byteIndex": 1276
+                            },
+                            "readonly": true,
+                            "optional": true,
+                            "tsType": {
+                              "kind": "union",
+                              "value": [
+                                {
+                                  "kind": "typeLiteral",
+                                  "value": {
+                                    "properties": [
+                                      {
+                                        "name": "input",
+                                        "location": {
+                                          "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                          "line": 31,
+                                          "col": 23,
+                                          "byteIndex": 1295
+                                        },
+                                        "readonly": true,
+                                        "tsType": {
+                                          "repr": "TInput",
+                                          "kind": "typeRef",
+                                          "value": {
+                                            "typeName": "TInput",
+                                            "resolution": {
+                                              "kind": "typeParam",
+                                              "declaringName": "WorkerStreamStandardSchema",
+                                              "declaringKind": "interface"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "name": "output",
+                                        "location": {
+                                          "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-workers-core/src/streams/schema.ts",
+                                          "line": 31,
+                                          "col": 47,
+                                          "byteIndex": 1319
+                                        },
+                                        "readonly": true,
+                                        "tsType": {
+                                          "repr": "TOutput",
+                                          "kind": "typeRef",
+                                          "value": {
+                                            "typeName": "TOutput",
+                                            "resolution": {
+                                              "kind": "typeParam",
+                                              "declaringName": "WorkerStreamStandardSchema",
+                                              "declaringKind": "interface"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "repr": "undefined",
+                                  "kind": "keyword",
+                                  "value": "undefined"
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TOutput"
+                  },
+                  {
+                    "name": "TInput",
+                    "default": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CollectionDefinition",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                "line": 36,
+                "col": 0,
+                "byteIndex": 1420
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "A single collection definition inside a durable stream schema."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "schema",
+                    "jsDoc": {
+                      "doc": "Standard Schema compatible validator used by durable-streams."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 38,
+                      "col": 2,
+                      "byteIndex": 1546
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "StreamStandardSchema",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "T",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "T",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "CollectionDefinition",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "StreamStandardSchema",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "type",
+                    "jsDoc": {
+                      "doc": "State Protocol type discriminator emitted for the collection."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 40,
+                      "col": 2,
+                      "byteIndex": 1661
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "primaryKey",
+                    "jsDoc": {
+                      "doc": "Property name used as the entity primary key."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 42,
+                      "col": 2,
+                      "byteIndex": 1741
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "T",
+                    "default": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CollectionEventHelpers",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                "line": 46,
+                "col": 0,
+                "byteIndex": 1848
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Helper methods attached to collections by `@durable-streams/state`."
+              },
+              "kind": "interface",
+              "def": {
+                "methods": [
+                  {
+                    "name": "insert",
+                    "jsDoc": {
+                      "doc": "Create an insert event for the collection."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 48,
+                      "col": 2,
+                      "byteIndex": 1957
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "params",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "Readonly",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "kind": "typeLiteral",
+                                "value": {
+                                  "properties": [
+                                    {
+                                      "name": "key",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 48,
+                                        "col": 28,
+                                        "byteIndex": 1983
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "string",
+                                        "kind": "keyword",
+                                        "value": "string"
+                                      }
+                                    },
+                                    {
+                                      "name": "value",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 48,
+                                        "col": 42,
+                                        "byteIndex": 1997
+                                      },
+                                      "tsType": {
+                                        "repr": "T",
+                                        "kind": "typeRef",
+                                        "value": {
+                                          "typeName": "T",
+                                          "resolution": {
+                                            "kind": "typeParam",
+                                            "declaringName": "CollectionEventHelpers",
+                                            "declaringKind": "interface"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "name": "headers",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 48,
+                                        "col": 52,
+                                        "byteIndex": 2007
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "Record",
+                                        "kind": "typeRef",
+                                        "value": {
+                                          "typeParams": [
+                                            {
+                                              "repr": "string",
+                                              "kind": "keyword",
+                                              "value": "string"
+                                            },
+                                            {
+                                              "repr": "string",
+                                              "kind": "keyword",
+                                              "value": "string"
+                                            }
+                                          ],
+                                          "typeName": "Record"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ],
+                            "typeName": "Readonly"
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "name": "update",
+                    "jsDoc": {
+                      "doc": "Create an update event for the collection."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 50,
+                      "col": 2,
+                      "byteIndex": 2108
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "params",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "Readonly",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "kind": "typeLiteral",
+                                "value": {
+                                  "properties": [
+                                    {
+                                      "name": "key",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 52,
+                                        "col": 6,
+                                        "byteIndex": 2145
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "string",
+                                        "kind": "keyword",
+                                        "value": "string"
+                                      }
+                                    },
+                                    {
+                                      "name": "value",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 53,
+                                        "col": 6,
+                                        "byteIndex": 2165
+                                      },
+                                      "tsType": {
+                                        "repr": "T",
+                                        "kind": "typeRef",
+                                        "value": {
+                                          "typeName": "T",
+                                          "resolution": {
+                                            "kind": "typeParam",
+                                            "declaringName": "CollectionEventHelpers",
+                                            "declaringKind": "interface"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "name": "oldValue",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 54,
+                                        "col": 6,
+                                        "byteIndex": 2181
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "T",
+                                        "kind": "typeRef",
+                                        "value": {
+                                          "typeName": "T",
+                                          "resolution": {
+                                            "kind": "typeParam",
+                                            "declaringName": "CollectionEventHelpers",
+                                            "declaringKind": "interface"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "name": "headers",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 55,
+                                        "col": 6,
+                                        "byteIndex": 2201
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "Record",
+                                        "kind": "typeRef",
+                                        "value": {
+                                          "typeParams": [
+                                            {
+                                              "repr": "string",
+                                              "kind": "keyword",
+                                              "value": "string"
+                                            },
+                                            {
+                                              "repr": "string",
+                                              "kind": "keyword",
+                                              "value": "string"
+                                            }
+                                          ],
+                                          "typeName": "Record"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ],
+                            "typeName": "Readonly"
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "name": "upsert",
+                    "jsDoc": {
+                      "doc": "Create an upsert event for the collection."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 59,
+                      "col": 2,
+                      "byteIndex": 2311
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "params",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "Readonly",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "kind": "typeLiteral",
+                                "value": {
+                                  "properties": [
+                                    {
+                                      "name": "key",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 59,
+                                        "col": 28,
+                                        "byteIndex": 2337
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "string",
+                                        "kind": "keyword",
+                                        "value": "string"
+                                      }
+                                    },
+                                    {
+                                      "name": "value",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 59,
+                                        "col": 42,
+                                        "byteIndex": 2351
+                                      },
+                                      "tsType": {
+                                        "repr": "T",
+                                        "kind": "typeRef",
+                                        "value": {
+                                          "typeName": "T",
+                                          "resolution": {
+                                            "kind": "typeParam",
+                                            "declaringName": "CollectionEventHelpers",
+                                            "declaringKind": "interface"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "name": "headers",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 59,
+                                        "col": 52,
+                                        "byteIndex": 2361
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "Record",
+                                        "kind": "typeRef",
+                                        "value": {
+                                          "typeParams": [
+                                            {
+                                              "repr": "string",
+                                              "kind": "keyword",
+                                              "value": "string"
+                                            },
+                                            {
+                                              "repr": "string",
+                                              "kind": "keyword",
+                                              "value": "string"
+                                            }
+                                          ],
+                                          "typeName": "Record"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ],
+                            "typeName": "Readonly"
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "name": "delete",
+                    "jsDoc": {
+                      "doc": "Create a delete event for the collection."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 61,
+                      "col": 2,
+                      "byteIndex": 2461
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "params",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "Readonly",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "kind": "typeLiteral",
+                                "value": {
+                                  "properties": [
+                                    {
+                                      "name": "key",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 62,
+                                        "col": 23,
+                                        "byteIndex": 2492
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "string",
+                                        "kind": "keyword",
+                                        "value": "string"
+                                      }
+                                    },
+                                    {
+                                      "name": "oldValue",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 62,
+                                        "col": 37,
+                                        "byteIndex": 2506
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "T",
+                                        "kind": "typeRef",
+                                        "value": {
+                                          "typeName": "T",
+                                          "resolution": {
+                                            "kind": "typeParam",
+                                            "declaringName": "CollectionEventHelpers",
+                                            "declaringKind": "interface"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "name": "headers",
+                                      "location": {
+                                        "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                        "line": 62,
+                                        "col": 51,
+                                        "byteIndex": 2520
+                                      },
+                                      "optional": true,
+                                      "tsType": {
+                                        "repr": "Record",
+                                        "kind": "typeRef",
+                                        "value": {
+                                          "typeParams": [
+                                            {
+                                              "repr": "string",
+                                              "kind": "keyword",
+                                              "value": "string"
+                                            },
+                                            {
+                                              "repr": "string",
+                                              "kind": "keyword",
+                                              "value": "string"
+                                            }
+                                          ],
+                                          "typeName": "Record"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ],
+                            "typeName": "Readonly"
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "T",
+                    "default": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CollectionWithHelpers",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                "line": 67,
+                "col": 0,
+                "byteIndex": 2654
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Collection definition after durable-streams helper methods are attached."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "intersection",
+                  "value": [
+                    {
+                      "repr": "CollectionDefinition",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "T",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "T",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "CollectionWithHelpers",
+                                "declaringKind": "typeAlias"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "CollectionDefinition",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    },
+                    {
+                      "repr": "CollectionEventHelpers",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "T",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "T",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "CollectionWithHelpers",
+                                "declaringKind": "typeAlias"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "CollectionEventHelpers",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "typeParams": [
+                  {
+                    "name": "T",
+                    "default": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "StateSchema",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                "line": 75,
+                "col": 0,
+                "byteIndex": 2941
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Schema map returned by `defineStreamSchema`."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "mapped",
+                  "value": {
+                    "readonly": true,
+                    "typeParam": {
+                      "name": "K",
+                      "constraint": {
+                        "kind": "typeOperator",
+                        "value": {
+                          "operator": "keyof",
+                          "tsType": {
+                            "repr": "TDef",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TDef",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "StateSchema",
+                                "declaringKind": "typeAlias"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "tsType": {
+                      "repr": "CollectionWithHelpers",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "kind": "conditional",
+                            "value": {
+                              "checkType": {
+                                "kind": "indexedAccess",
+                                "value": {
+                                  "objType": {
+                                    "repr": "TDef",
+                                    "kind": "typeRef",
+                                    "value": {
+                                      "typeName": "TDef",
+                                      "resolution": {
+                                        "kind": "typeParam",
+                                        "declaringName": "StateSchema",
+                                        "declaringKind": "typeAlias"
+                                      }
+                                    }
+                                  },
+                                  "indexType": {
+                                    "repr": "K",
+                                    "kind": "typeRef",
+                                    "value": {
+                                      "typeName": "K",
+                                      "resolution": {
+                                        "kind": "typeParam"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "extendsType": {
+                                "repr": "CollectionDefinition",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeParams": [
+                                    {
+                                      "kind": "infer",
+                                      "value": {
+                                        "typeParam": {
+                                          "name": "T"
+                                        }
+                                      }
+                                    }
+                                  ],
+                                  "typeName": "CollectionDefinition",
+                                  "resolution": {
+                                    "kind": "local"
+                                  }
+                                }
+                              },
+                              "trueType": {
+                                "repr": "T",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeName": "T"
+                                }
+                              },
+                              "falseType": {
+                                "repr": "unknown",
+                                "kind": "keyword",
+                                "value": "unknown"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "CollectionWithHelpers",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                },
+                "typeParams": [
+                  {
+                    "name": "TDef",
+                    "constraint": {
+                      "repr": "StreamStateDefinition",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "StreamStateDefinition",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "StreamSchemaIssue",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                "line": 7,
+                "col": 0,
+                "byteIndex": 298
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "One validation issue returned by a Standard Schema validator."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "message",
+                    "jsDoc": {
+                      "doc": "Human-readable validation failure."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 9,
+                      "col": 2,
+                      "byteIndex": 381
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "path",
+                    "jsDoc": {
+                      "doc": "Optional property path associated with the failure."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 11,
+                      "col": 2,
+                      "byteIndex": 470
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "ReadonlyArray",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "kind": "union",
+                            "value": [
+                              {
+                                "repr": "PropertyKey",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeName": "PropertyKey"
+                                }
+                              },
+                              {
+                                "repr": "Readonly",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeParams": [
+                                    {
+                                      "kind": "typeLiteral",
+                                      "value": {
+                                        "properties": [
+                                          {
+                                            "name": "key",
+                                            "location": {
+                                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                              "line": 11,
+                                              "col": 57,
+                                              "byteIndex": 525
+                                            },
+                                            "tsType": {
+                                              "repr": "PropertyKey",
+                                              "kind": "typeRef",
+                                              "value": {
+                                                "typeName": "PropertyKey"
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "typeName": "Readonly"
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "typeName": "ReadonlyArray"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "StreamSchemaValidationOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                "line": 1,
+                "col": 0,
+                "byteIndex": 66
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Validation options accepted by Standard Schema validators."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "libraryOptions",
+                    "jsDoc": {
+                      "doc": "Optional library-specific validation parameters."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 3,
+                      "col": 2,
+                      "byteIndex": 175
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "Record",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          },
+                          {
+                            "repr": "unknown",
+                            "kind": "keyword",
+                            "value": "unknown"
+                          }
+                        ],
+                        "typeName": "Record"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "StreamSchemaValidationResult",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                "line": 15,
+                "col": 0,
+                "byteIndex": 605
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Result returned by a Standard Schema validator."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "Readonly",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "kind": "typeLiteral",
+                            "value": {
+                              "properties": [
+                                {
+                                  "name": "value",
+                                  "location": {
+                                    "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                    "line": 16,
+                                    "col": 15,
+                                    "byteIndex": 666
+                                  },
+                                  "tsType": {
+                                    "repr": "T",
+                                    "kind": "typeRef",
+                                    "value": {
+                                      "typeName": "T",
+                                      "resolution": {
+                                        "kind": "typeParam",
+                                        "declaringName": "StreamSchemaValidationResult",
+                                        "declaringKind": "typeAlias"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "name": "issues",
+                                  "location": {
+                                    "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                    "line": 16,
+                                    "col": 25,
+                                    "byteIndex": 676
+                                  },
+                                  "optional": true,
+                                  "tsType": {
+                                    "repr": "undefined",
+                                    "kind": "keyword",
+                                    "value": "undefined"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ],
+                        "typeName": "Readonly"
+                      }
+                    },
+                    {
+                      "repr": "Readonly",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "kind": "typeLiteral",
+                            "value": {
+                              "properties": [
+                                {
+                                  "name": "issues",
+                                  "location": {
+                                    "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                                    "line": 17,
+                                    "col": 15,
+                                    "byteIndex": 713
+                                  },
+                                  "tsType": {
+                                    "kind": "typeOperator",
+                                    "value": {
+                                      "operator": "readonly",
+                                      "tsType": {
+                                        "kind": "array",
+                                        "value": {
+                                          "repr": "StreamSchemaIssue",
+                                          "kind": "typeRef",
+                                          "value": {
+                                            "typeName": "StreamSchemaIssue",
+                                            "resolution": {
+                                              "kind": "local"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ],
+                        "typeName": "Readonly"
+                      }
+                    }
+                  ]
+                },
+                "typeParams": [
+                  {
+                    "name": "T"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "StreamStandardSchema",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                "line": 20,
+                "col": 0,
+                "byteIndex": 836
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Package-owned Standard Schema surface used by durable stream collections."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "~standard",
+                    "jsDoc": {
+                      "doc": "Standard Schema metadata and validator."
+                    },
+                    "location": {
+                      "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                      "line": 22,
+                      "col": 2,
+                      "byteIndex": 940
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "version",
+                            "jsDoc": {
+                              "doc": "Standard Schema version marker."
+                            },
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                              "line": 24,
+                              "col": 4,
+                              "byteIndex": 1011
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "1",
+                              "kind": "literal",
+                              "value": {
+                                "kind": "number",
+                                "number": 1.0
+                              }
+                            }
+                          },
+                          {
+                            "name": "vendor",
+                            "jsDoc": {
+                              "doc": "Schema provider identifier."
+                            },
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                              "line": 26,
+                              "col": 4,
+                              "byteIndex": 1075
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            }
+                          },
+                          {
+                            "name": "validate",
+                            "jsDoc": {
+                              "doc": "Validate an unknown value into a collection entity."
+                            },
+                            "location": {
+                              "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                              "line": 28,
+                              "col": 4,
+                              "byteIndex": 1167
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "kind": "fnOrConstructor",
+                              "value": {
+                                "constructor": false,
+                                "tsType": {
+                                  "kind": "union",
+                                  "value": [
+                                    {
+                                      "repr": "StreamSchemaValidationResult",
+                                      "kind": "typeRef",
+                                      "value": {
+                                        "typeParams": [
+                                          {
+                                            "repr": "T",
+                                            "kind": "typeRef",
+                                            "value": {
+                                              "typeName": "T",
+                                              "resolution": {
+                                                "kind": "typeParam",
+                                                "declaringName": "StreamStandardSchema",
+                                                "declaringKind": "interface"
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "typeName": "StreamSchemaValidationResult",
+                                        "resolution": {
+                                          "kind": "local"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "repr": "Promise",
+                                      "kind": "typeRef",
+                                      "value": {
+                                        "typeParams": [
+                                          {
+                                            "repr": "StreamSchemaValidationResult",
+                                            "kind": "typeRef",
+                                            "value": {
+                                              "typeParams": [
+                                                {
+                                                  "repr": "T",
+                                                  "kind": "typeRef",
+                                                  "value": {
+                                                    "typeName": "T",
+                                                    "resolution": {
+                                                      "kind": "typeParam",
+                                                      "declaringName": "StreamStandardSchema",
+                                                      "declaringKind": "interface"
+                                                    }
+                                                  }
+                                                }
+                                              ],
+                                              "typeName": "StreamSchemaValidationResult",
+                                              "resolution": {
+                                                "kind": "local"
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "typeName": "Promise"
+                                      }
+                                    }
+                                  ]
+                                },
+                                "params": [
+                                  {
+                                    "kind": "identifier",
+                                    "name": "value",
+                                    "optional": false,
+                                    "tsType": {
+                                      "repr": "unknown",
+                                      "kind": "keyword",
+                                      "value": "unknown"
+                                    }
+                                  },
+                                  {
+                                    "kind": "identifier",
+                                    "name": "options",
+                                    "optional": true,
+                                    "tsType": {
+                                      "repr": "StreamSchemaValidationOptions",
+                                      "kind": "typeRef",
+                                      "value": {
+                                        "typeName": "StreamSchemaValidationOptions",
+                                        "resolution": {
+                                          "kind": "local"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "T",
+                    "default": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "StreamStateDefinition",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-schema.ts",
+                "line": 72,
+                "col": 0,
+                "byteIndex": 2814
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Input map accepted by `defineStreamSchema`."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "Record",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "repr": "CollectionDefinition",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "CollectionDefinition",
+                          "resolution": {
+                            "kind": "local"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "Record"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "StreamCollection",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-collection.ts",
+                "line": 36,
+                "col": 0,
+                "byteIndex": 1238
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Live TanStack collection handle for validated durable stream entities.\n",
+                "tags": [
+                  {
+                    "kind": "example",
+                    "doc": "```ts\nimport type { StreamCollection } from '@netscript/plugin-streams-core';\n\ndeclare const sessions: StreamCollection<{ id: string; state: string }>;\nconst session = sessions.get('session-1');\nconsole.log(session?.state);\n```"
+                  }
+                ]
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "indexedAccess",
+                  "value": {
+                    "objType": {
+                      "kind": "indexedAccess",
+                      "value": {
+                        "objType": {
+                          "repr": "ReturnType",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeParams": [
+                              {
+                                "repr": "StreamDBFactory",
+                                "kind": "typeQuery",
+                                "value": "StreamDBFactory"
+                              }
+                            ],
+                            "typeName": "ReturnType"
+                          }
+                        },
+                        "indexType": {
+                          "repr": "collections",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "collections"
+                          }
+                        }
+                      }
+                    },
+                    "indexType": {
+                      "repr": "item",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "item"
+                      }
+                    }
+                  }
+                },
+                "typeParams": [
+                  {
+                    "name": "T",
+                    "constraint": {
+                      "repr": "object",
+                      "kind": "keyword",
+                      "value": "object"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "StreamDBFactory",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/plugin-streams-core/src/domain/stream-collection.ts",
+                "line": 21,
+                "col": 14,
+                "byteIndex": 778
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Type-only signature of the upstream durable stream database factory.\n\nImport this symbol with `import type` and use `typeof StreamDBFactory` when\ndescribing a supplied factory. It has no runtime export or implementation;\n`StreamCollection` uses its generic return type to retain TanStack's nominal\ncollection contract without loading the upstream client through this module.\n",
+                "tags": [
+                  {
+                    "kind": "example",
+                    "doc": "```ts\nimport type { StreamDBFactory } from '@netscript/plugin-streams-core';\n\ntype Factory = typeof StreamDBFactory;\ndeclare const factory: Factory;\ndeclare const options: Parameters<Factory>[0];\nconst db = factory(options);\nconsole.log(db.collections);\n```"
+                  }
+                ]
+              },
+              "kind": "variable",
+              "def": {
+                "tsType": {
+                  "kind": "indexedAccess",
+                  "value": {
+                    "objType": {
+                      "kind": "parenthesized",
+                      "value": {
+                        "repr": "@durable-streams/state/db",
+                        "kind": "typeQuery",
+                        "value": "@durable-streams/state/db"
+                      }
+                    },
+                    "indexType": {
+                      "repr": "createStreamDB",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "createStreamDB"
+                      }
+                    }
+                  }
+                },
+                "kind": "const"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

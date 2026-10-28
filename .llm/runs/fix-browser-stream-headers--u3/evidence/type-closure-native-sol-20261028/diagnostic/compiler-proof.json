@@ -1,0 +1,78 @@
+{
+  "results": [
+    {
+      "name": "positive",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/tests/type-fixtures/u3-doc-closure/positive.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 0,
+      "ts2322Count": 0,
+      "expectedErrors": 0,
+      "deadlineAborted": false,
+      "outputAwaited": true
+    },
+    {
+      "name": "numeric-value",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 1,
+      "ts2322Count": 3,
+      "expectedErrors": 3,
+      "deadlineAborted": false,
+      "outputAwaited": true
+    },
+    {
+      "name": "numeric-async",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-async.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 1,
+      "ts2322Count": 3,
+      "expectedErrors": 3,
+      "deadlineAborted": false,
+      "outputAwaited": true
+    },
+    {
+      "name": "map-factory",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 1,
+      "ts2322Count": 3,
+      "expectedErrors": 3,
+      "deadlineAborted": false,
+      "outputAwaited": true
+    }
+  ],
+  "exactNativeVersion": "0.2.7",
+  "positiveIdentityAssertions": 13,
+  "negativeControls": 3,
+  "negativeSeamErrors": 9,
+  "ownedFixtureRemoved": true,
+  "sourceExecuted": false
+}

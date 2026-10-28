@@ -1,0 +1,54 @@
+diff --git a/packages/fresh/src/runtime/streams/create-stream-db.ts b/packages/fresh/src/runtime/streams/create-stream-db.ts
+index 853ecfac9..2b9b7fe19 100644
+--- a/packages/fresh/src/runtime/streams/create-stream-db.ts
++++ b/packages/fresh/src/runtime/streams/create-stream-db.ts
+@@ -18,7 +18,8 @@ import { createStreamDB } from '@durable-streams/state/db';
+ import type { StateSchema, StreamStateDefinition } from '@durable-streams/state';
+ import type { StreamDB } from '@durable-streams/state/db';
+ import { DurableStream } from '@durable-streams/client';
+-import type { HeadersRecord } from '@durable-streams/client';
++import type { HeadersRecord, MaybePromise } from '@durable-streams/client';
++export type { HeadersRecord, MaybePromise };
+ import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
+ import { createStreamDBRecoveryAdapter } from './stream-db-recovery-adapter.ts';
+ 
+diff --git a/packages/fresh/src/runtime/streams/mod.ts b/packages/fresh/src/runtime/streams/mod.ts
+index 8b57d9e71..4875c9a2f 100644
+--- a/packages/fresh/src/runtime/streams/mod.ts
++++ b/packages/fresh/src/runtime/streams/mod.ts
+@@ -18,6 +18,8 @@
+ 
+ export {
+   createNetScriptStreamDB,
++  type HeadersRecord,
++  type MaybePromise,
+   type NetScriptStateSchema,
+   type NetScriptStreamDB,
+   type NetScriptStreamDBFactory,
+diff --git a/plugins/workers/streams/factory.ts b/plugins/workers/streams/factory.ts
+index 396d26caf..2e1455789 100644
+--- a/plugins/workers/streams/factory.ts
++++ b/plugins/workers/streams/factory.ts
+@@ -9,7 +9,8 @@
+  */
+ 
+ import { createStreamDB } from '@durable-streams/state/db';
+-import type { HeadersRecord } from '@durable-streams/client';
++import type { HeadersRecord, MaybePromise } from '@durable-streams/client';
++export type { HeadersRecord, MaybePromise };
+ import {
+   buildStreamUrl,
+   getStreamsAuth,
+diff --git a/plugins/workers/streams/mod.ts b/plugins/workers/streams/mod.ts
+index a07773591..393818992 100644
+--- a/plugins/workers/streams/mod.ts
++++ b/plugins/workers/streams/mod.ts
+@@ -8,6 +8,8 @@
+ 
+ export {
+   createWorkersStreamDB,
++  type HeadersRecord,
++  type MaybePromise,
+   type WorkerExecution,
+   type WorkerJob,
+   type WorkersStreamDB,

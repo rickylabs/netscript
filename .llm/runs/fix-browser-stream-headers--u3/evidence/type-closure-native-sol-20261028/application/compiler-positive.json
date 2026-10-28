@@ -1,0 +1,17 @@
+{
+  "name": "positive",
+  "args": [
+    "check",
+    "--frozen",
+    "--unstable-kv",
+    "--config",
+    "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+    "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/positive.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "code": 0,
+  "ts2322Count": 0,
+  "expectedErrors": 0,
+  "deadlineAborted": false,
+  "outputAwaited": true
+}

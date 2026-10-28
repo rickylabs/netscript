@@ -1,0 +1,1229 @@
+{
+  "capturedAt": "2026-10-28T02:25:44.502Z",
+  "sourceAcceptance": "Pending root source/gate review; no checkpoint",
+  "sources": [
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "sha256": "e46d3baa4c35d0ec45ea5c3fcbe47234c34d66d5a2e57336ed7819b8e5f97d2b",
+      "lines": 229,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/0-create-stream-db.ts",
+      "exactAcceptedSource": true
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/mod.ts",
+      "sha256": "148969fac7d5401855af15a4eff73ac92dfe9cb4d191328d9b81f08b70e4ec36",
+      "lines": 100,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/1-mod.ts",
+      "exactAcceptedSource": true
+    },
+    {
+      "path": "plugins/workers/streams/factory.ts",
+      "sha256": "18786a3bc5e5d13558fb2b5747d3f2278cc0f69dfa42cc4509817ae2867f055e",
+      "lines": 74,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/2-factory.ts",
+      "exactAcceptedSource": true
+    },
+    {
+      "path": "plugins/workers/streams/mod.ts",
+      "sha256": "b07b1e26b6eb07fb95d6073a04feee4ca60470da3310c5f8b467527512ccb318",
+      "lines": 39,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/3-mod.ts",
+      "exactAcceptedSource": true
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "sha256": "d7ada055665ff1d9efc031fbdbbda608040ab161f1d297fd12a14b05f3ad91e3",
+      "lines": 2978,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/4-arch-debt.md",
+      "exactAcceptedSource": false
+    }
+  ],
+  "gates": [
+    {
+      "selected": "doc-fresh",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "code": 1,
+      "started": "2026-10-28T02:20:19.670Z",
+      "ended": "2026-10-28T02:20:19.876Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/doc-fresh-1793154019653",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/doc-fresh-1793154019653.json",
+      "sha256": "6c818d06e722ccac328eded0c058d7aeb7cc8a2e5f4154e25d354903b91f8762",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "a7f26422892853738dfb83c87524e996bda22b74028298d88124b18c5a3bcc59"
+    },
+    {
+      "selected": "doc-workers",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "plugins/workers/streams/mod.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:19.987Z",
+      "ended": "2026-10-28T02:20:20.144Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/doc-workers-1793154019983",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/doc-workers-1793154019983.json",
+      "sha256": "ffc4dc8cd87084de2924932dd2f757c1cff7ab4cc55ede7c565b8242015aa0fb",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+    },
+    {
+      "selected": "json-fresh",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:20.245Z",
+      "ended": "2026-10-28T02:20:20.428Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242.json",
+      "sha256": "c8a37e6e6c7f8a0c0d93b267948781bbb41c853a957c71012a74bd86d4f16db8",
+      "stdoutSha256": "cc1d83c192fbb4f0c48c8422da55d7b896c67940407ef8c6217d68a852a7b8ac",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "json-workers",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "plugins/workers/streams/mod.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:20.554Z",
+      "ended": "2026-10-28T02:20:20.701Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550.json",
+      "sha256": "86a5de457ba7d470ccf59621099a265f772bebd943a9eb48195578ba1b2e7f81",
+      "stdoutSha256": "5c56954a50cc2c3ed9aeba2c6e2324c7bc2c8aac8930da7722e3a6263d18b1ed",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "json-fresh-source",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "packages/fresh/src/runtime/streams/create-stream-db.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:20.800Z",
+      "ended": "2026-10-28T02:20:20.950Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796.json",
+      "sha256": "1e8ea484f368412902700e9d7254682c6aec8d07103bb3b2dba60dedfe744d0d",
+      "stdoutSha256": "c2a988b5375ed5aa23b6c8c9a6b0a859bd1e69a7e45af8b9ad14757a10053643",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "json-workers-source",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "plugins/workers/streams/factory.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:21.070Z",
+      "ended": "2026-10-28T02:20:21.210Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067.json",
+      "sha256": "d8f47aee9f08738e80159d7d96eeb0a24a648132e71aaa7a4e1c4be912be322a",
+      "stdoutSha256": "ddb8f91cfc6b1c6c8d230470dcb8fcaa4e1e6386f8e6b86532e415503de0d5ad",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "c1-tests",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-test.ts",
+        "--",
+        "--frozen",
+        "-A",
+        "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+        "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts",
+        "packages/fresh/tests/streamdb-headers-contract_test.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:21.324Z",
+      "ended": "2026-10-28T02:20:32.840Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/c1-tests-1793154021321",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/c1-tests-1793154021321.json",
+      "sha256": "113cf48746ca9e9d3a724adf2c71f57eb3073abbbda3b6e4b6bc1d7c82486be4",
+      "stdoutSha256": "5c8902c4eeb355adcd649bf62c1fa405abb21fe9b48ea01bf6e55afed20aacef",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "c2-tests",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-test.ts",
+        "--",
+        "--frozen",
+        "-A",
+        "plugins/workers/tests/streams/factory-headers_test.ts",
+        "plugins/workers/tests/streams/factory-discovery_test.ts",
+        "plugins/workers/tests/streams/live-query-consumer_test.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:32.971Z",
+      "ended": "2026-10-28T02:20:40.091Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/c2-tests-1793154032967",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/c2-tests-1793154032967.json",
+      "sha256": "f1322a2976a55c3c0266cbf62b1962f0df6d6b98968f25c80db65a149d3558cb",
+      "stdoutSha256": "c7e6fac422e0085ec95586e976cf058a35add3cbc641e0e9541910812e5e4d0b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "types",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-check.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/create-stream-db.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/mod.ts",
+        "--file",
+        "plugins/workers/streams/factory.ts",
+        "--file",
+        "plugins/workers/streams/mod.ts",
+        "--deno-arg",
+        "--frozen",
+        "--deno-arg",
+        "--unstable-kv"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:40.209Z",
+      "ended": "2026-10-28T02:20:42.515Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/types-1793154040205",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/types-1793154040205.json",
+      "sha256": "df2a14ad9db61b90153847873b07d78c295b01e4c11c6731604db33b5b6dd3a5",
+      "stdoutSha256": "6ab5e4dc25afd43fba9563146b17f8db12f7820dd7ce02c0d2bed242fbe859b1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "consumer-fresh",
+      "args": [
+        "task",
+        "--cwd",
+        "packages/fresh",
+        "check:streams-types"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:42.634Z",
+      "ended": "2026-10-28T02:20:42.846Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/consumer-fresh-1793154042630",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/consumer-fresh-1793154042630.json",
+      "sha256": "abdc63cbef8a754d345ac59beb510e3e34fb0a97d7513905522624ea73656798",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "dbf2fb7c3f4086b61a67b74b910274ebc5968d6dc85c66dd14b5f79ab36e0545"
+    },
+    {
+      "selected": "consumer-workers",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "plugins/workers/tests/streams/live-query-consumer_type.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:42.952Z",
+      "ended": "2026-10-28T02:20:43.094Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/consumer-workers-1793154042948",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/consumer-workers-1793154042948.json",
+      "sha256": "dc3e732c91106bb9f0ac57ae6daae1e3b3cb37eee0bfa68c167793e5d778af3a",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "lint",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-lint.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/create-stream-db.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/mod.ts",
+        "--file",
+        "plugins/workers/streams/factory.ts",
+        "--file",
+        "plugins/workers/streams/mod.ts",
+        "--ext",
+        "ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:43.231Z",
+      "ended": "2026-10-28T02:20:44.600Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/lint-1793154043228",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/lint-1793154043228.json",
+      "sha256": "5d9568ed4ffbba305d50b86f4aed2f077453da5366afa591c2c065cebff4abd2",
+      "stdoutSha256": "ee3dd9af90bbbba3a87a74e93b7ba11a9c1bcf3c3cb8d2dcbfd5929b8ef1cfdb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "fmt",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-fmt.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/create-stream-db.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/mod.ts",
+        "--file",
+        "plugins/workers/streams/factory.ts",
+        "--file",
+        "plugins/workers/streams/mod.ts",
+        "--ext",
+        "ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:44.725Z",
+      "ended": "2026-10-28T02:20:44.998Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/fmt-1793154044722",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/fmt-1793154044722.json",
+      "sha256": "9b6ed4ecc8caffc93a9f2e29220e7d3f6d429b4818213973e4dacdadf7e38a11",
+      "stdoutSha256": "b8631280c5db8e7a9f10c253fa42291e4aea4a01eb27e2c3fdce5242a38ed5f1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "package-fresh",
+      "args": [
+        "task",
+        "--cwd",
+        "packages/fresh",
+        "check"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:09.637Z",
+      "ended": "2026-10-28T02:21:13.110Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/package-fresh-1793154069634",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/package-fresh-1793154069634.json",
+      "sha256": "ac3909eacb4d09808a5e36637750c28d5556c295cb776bbf9502a37a988598c0",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "92204eea7cd9eb4e14685b03593b9deec85507ec14b7db16eea8cfcace63cad5"
+    },
+    {
+      "selected": "package-workers",
+      "args": [
+        "task",
+        "--cwd",
+        "plugins/workers",
+        "check"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:13.222Z",
+      "ended": "2026-10-28T02:21:16.047Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/package-workers-1793154073219",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/package-workers-1793154073219.json",
+      "sha256": "c8510b2beab8b108f124bdd5bff959b3a6761fee8441fbefb2846d17f1852391",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e4468545b4dd509017e86a32f746d5a52291d271d5984a9fb6ae65d99652f69e"
+    },
+    {
+      "selected": "quality-fresh",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/quality/scan-code-quality.ts",
+        "--root",
+        "packages/fresh",
+        "--max-allow",
+        "7"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:16.169Z",
+      "ended": "2026-10-28T02:21:16.535Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/quality-fresh-1793154076165",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/quality-fresh-1793154076165.json",
+      "sha256": "02e5ec3e84cbbba323032af7ac95afb5f6dbdd2ad7792df001404094024dc366",
+      "stdoutSha256": "73a7c15ab80e42ae0868b8c546b063838172d53c298d08bda5ab28560e1e5961",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "quality-workers",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/quality/scan-code-quality.ts",
+        "--root",
+        "plugins/workers",
+        "--max-allow",
+        "7"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:16.650Z",
+      "ended": "2026-10-28T02:21:17.311Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/quality-workers-1793154076647",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/quality-workers-1793154076647.json",
+      "sha256": "95d96baf0dd2ab272be15c84a8dca1cbae27b14e295826c4df4c5248635f26a5",
+      "stdoutSha256": "6249e64ff4286877ffd26bdf1e328dcb8e104210cf10a412be7db17a88427c3e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "doctrine",
+      "args": [
+        "run",
+        "--frozen",
+        "--allow-read",
+        "--allow-run",
+        ".llm/tools/fitness/check-doctrine.ts",
+        "--all-roots"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:17.419Z",
+      "ended": "2026-10-28T02:21:29.319Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/doctrine-1793154077416",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/doctrine-1793154077416.json",
+      "sha256": "a07b177dd5ab3991bcd8f346798cf910d647225e909df53157382084307a0cc0",
+      "stdoutSha256": "1fa1702a80909b4e5404ba89fad081347deaaca9beb4d6e117f75d434ca9f5e7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "arch",
+      "args": [
+        "task",
+        "arch:check"
+      ],
+      "code": 1,
+      "started": "2026-10-28T02:21:29.434Z",
+      "ended": "2026-10-28T02:21:34.220Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/arch-1793154089431",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/arch-1793154089431.json",
+      "sha256": "bd269909ed0a668584795e721d0a8791d5f785a47f85f365989130a03eb874a3",
+      "stdoutSha256": "958d4c97036acd38b43b9e2418511a6d322f79e0ccca73dec75122bb8f644ad1",
+      "stderrSha256": "4d818f9681f9695c962201dba20f2a8bdfe69592dffec380874724b524a1be07"
+    },
+    {
+      "selected": "publish-fresh",
+      "args": [
+        "task",
+        "--cwd",
+        "packages/fresh",
+        "publish:dry-run"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:34.346Z",
+      "ended": "2026-10-28T02:21:37.053Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/publish-fresh-1793154094343",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/publish-fresh-1793154094343.json",
+      "sha256": "81911e80bb84aa51d35e682fe562a8c39f3dc03e7a5f39321847fe47879d6d3c",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "762cb4630f2bc50b5c47f739be09b81506ed0b0d99cf33dfbe1dc4018e736d25"
+    },
+    {
+      "selected": "publish-workers",
+      "args": [
+        "task",
+        "--cwd",
+        "plugins/workers",
+        "publish:dry-run"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:37.186Z",
+      "ended": "2026-10-28T02:21:40.707Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/publish-workers-1793154097182",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/publish-workers-1793154097182.json",
+      "sha256": "4dde624d2d7a563888a11f8ad38c2781fd191b84141c42e05c28cc53deab7720",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "b514bd902ca45c8a6810c1a656e8ff2d6e8665c7b6c365cde8b5412cc33acbb8"
+    },
+    {
+      "selected": "parity-external",
+      "args": [
+        "run",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+        "--allow-read",
+        "--allow-run",
+        "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tools/docs/check-exports-drift.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:23:40.416Z",
+      "ended": "2026-10-28T02:23:45.800Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399.json",
+      "sha256": "7ea3159cb21c14c9fb787f06c82de356f9a3367f55bd11182388f4a9aa52ffc2",
+      "stdoutSha256": "83f15ce3404499c38dd69139bdbc2d200144a061d61eccc92a797931bb507027",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "accuracy-parent",
+      "args": [
+        "task",
+        "docs:accuracy"
+      ],
+      "code": 1,
+      "started": "2026-10-28T02:23:45.920Z",
+      "ended": "2026-10-28T02:23:47.671Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/accuracy-parent-1793154225917",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/accuracy-parent-1793154225917.json",
+      "sha256": "8a06087d6504ef12bbad2e1e00a3423e908e822945b4a13915a0d79ffe01ca7f",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "dea8905984471c36ef06e14313e59f084bd61d6322b2b4b3debdf5a06f565acb"
+    }
+  ],
+  "owningDocs": {
+    "fresh": 10,
+    "workers": 0,
+    "warningFree": true,
+    "exactTenBaselineFindingIdentitiesPreserved": true,
+    "freshBaselineUnwaived": true,
+    "identities": [
+      {
+        "publicType": "NetScriptLiveQueryFactory",
+        "privateType": "Context"
+      },
+      {
+        "publicType": "NetScriptLiveQueryFactory",
+        "privateType": "InitialQueryBuilder"
+      },
+      {
+        "publicType": "NetScriptLiveQueryFactory",
+        "privateType": "QueryBuilder"
+      },
+      {
+        "publicType": "NetScriptStateSchema",
+        "privateType": "StateSchema"
+      },
+      {
+        "publicType": "NetScriptStreamDB[\"collections\"]",
+        "privateType": "StateSchema"
+      },
+      {
+        "publicType": "NetScriptStreamDB[\"collections\"]",
+        "privateType": "StreamDB"
+      },
+      {
+        "publicType": "useLiveQuery",
+        "privateType": "Context"
+      },
+      {
+        "publicType": "useLiveQuery",
+        "privateType": "InferResultType"
+      },
+      {
+        "publicType": "useLiveSuspenseQuery",
+        "privateType": "Context"
+      },
+      {
+        "publicType": "useLiveSuspenseQuery",
+        "privateType": "InferResultType"
+      }
+    ]
+  },
+  "symbols": [
+    {
+      "owner": "fresh",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/mod.ts",
+      "symbolCount": 54,
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242.json"
+    },
+    {
+      "owner": "workers",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/mod.ts",
+      "symbolCount": 26,
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550.json"
+    },
+    {
+      "owner": "fresh-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "symbolCount": 11,
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796.json"
+    },
+    {
+      "owner": "workers-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/plugins/workers/streams/factory.ts",
+      "symbolCount": 6,
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067.json"
+    }
+  ],
+  "compiler": {
+    "results": [
+      {
+        "name": "positive",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/positive.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+        "code": 0,
+        "ts2322Count": 0,
+        "expectedErrors": 0,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      },
+      {
+        "name": "numeric-value",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+        "code": 1,
+        "ts2322Count": 3,
+        "expectedErrors": 3,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      },
+      {
+        "name": "numeric-async",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-async.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+        "code": 1,
+        "ts2322Count": 3,
+        "expectedErrors": 3,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      },
+      {
+        "name": "map-factory",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+        "code": 1,
+        "ts2322Count": 3,
+        "expectedErrors": 3,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      }
+    ],
+    "exactNativeVersion": "0.2.7",
+    "positiveIdentityAssertions": 13,
+    "negativeControls": 3,
+    "negativeSeamErrors": 9,
+    "ownedFixtureRemoved": true,
+    "sourceExecuted": false
+  },
+  "externalReferenceContract": {
+    "commit": "0d5b982b0a3050b94172770a435581c931c93b22",
+    "path": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tools/docs/check-exports-drift.ts",
+    "sha256": "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269",
+    "receipt": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399.json",
+    "policy": "Supporting read-only external-tool result against U3 CWD/config; no source import/cherry-pick and no original parent task PASS. Fresh/workers mapping contract is entrypoints-only, not exhaustive per-name reference prose.",
+    "coverage": "36/36; mapped35/excluded1; full declared contract PASS; no genuine missing-symbol finding"
+  },
+  "doctrine": "DEBT_ACCEPTED for exact F15/upstream type exposure AND F5 two-name facade growth. Direct scanner exit0 does not certify those as PASS; prior surplus remains unwaived.",
+  "stillOpen": [
+    "Fresh ten baseline doc findings",
+    "architecture existing DB identity prerequisite",
+    "original docs:accuracy Windows coverage prerequisite",
+    "prior C3 links/JSDoc/global format failures",
+    "independent IMPL/readiness/release"
+  ],
+  "cleanup": {
+    "ownedCompilerFixtureDirectories": [],
+    "originalOutputAwaited": true
+  },
+  "guardInputs": [
+    {
+      "path": "deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "unchanged": true
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "unchanged": true
+    },
+    {
+      "path": "packages/fresh/deno.json",
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56",
+      "unchanged": true
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a",
+      "unchanged": true
+    }
+  ],
+  "diff": {
+    "path": ".llm/tmp/u3-type-closure-application-20261028/final.diff",
+    "sha256": "0a687159db3156c00e761bfa520ef8825a5dabeb8d90eed839eba8cad589fe67"
+  },
+  "sourceOwnerFootprint": "12 product/test/guide owners plus canonical registry=13, excluding explicit run/evidence provenance"
+}
