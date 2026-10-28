@@ -6,20 +6,20 @@
  * and FAILS on an unknown key, so the build doubles as a link checker.
  *
  * Locked key namespaces (OD3):
- *   cap:        capability hub          (cap:services      -> /services-sdk/services/)
- *   howto:      how-to recipe           (howto:add-a-plugin)
+ *   cap:        Build guide             (cap:services      -> /services-sdk/services/)
+ *   howto:      Build recipe            (howto:add-a-plugin)
  *   tut:        tutorial chapter/track  (tut:first-workspace)
- *   explain:    explanation essay       (explain:architecture)
+ *   explain:    Concepts essay          (explain:architecture)
  *   compare:    framework comparison    (compare:frontend)
  *   concept:    concept / mental-model page
  *   ref:        reference unit (ref:sagas -> /reference/sagas/)
  *               and sub-paths           (ref:sagas/presets -> /reference/sagas/presets/)
- *   cli:        CLI reference           (cli:reference)
+ *   cli:        CLI cheat sheet         (cli:reference)
  *   glossary:   glossary                (glossary: or glossary:<anchor>)
  *
  * Each value is `{ href, label }`. `href` is the SOURCE (non-base-prefixed) url;
  * the `url` Lume filter applies the `/netscript/` base at render time, exactly as
- * nav hrefs do. Seeded with every target that exists on the current site so hubs
+ * nav hrefs do. Seeded with every target that exists on the current site so pages
  * can link without hardcoding paths. New pages add their key here as they land.
  *
  * Resolution + the build-failing `xref` filter / `comp.xref` component live in
