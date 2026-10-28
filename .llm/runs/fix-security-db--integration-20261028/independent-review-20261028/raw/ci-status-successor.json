@@ -1,0 +1,256 @@
+{
+  "capturedAt": "2026-10-28T05:06:27.643Z",
+  "head": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "run": 40633645853,
+  "runAttempt": 2,
+  "status": "completed",
+  "conclusion": "failure",
+  "nativeCiMergeHead": "189c903b25e38f4aa99780be012cb258dd0f6198",
+  "jobs": [
+    {
+      "id": 122640688638,
+      "name": "check-test-shard (test-5)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:58:23Z",
+      "completedAt": "2026-10-28T05:02:34Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640688638"
+    },
+    {
+      "id": 122640688664,
+      "name": "deps-report",
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-28T04:58:20Z",
+      "completedAt": "2026-10-28T04:42:02Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640688664"
+    },
+    {
+      "id": 122640688938,
+      "name": "check-test-shard (check)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:42:52Z",
+      "completedAt": "2026-10-28T04:43:20Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640688938"
+    },
+    {
+      "id": 122640689312,
+      "name": "classify changes",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:42:05Z",
+      "completedAt": "2026-10-28T04:42:48Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640689312"
+    },
+    {
+      "id": 122640689526,
+      "name": "check-test-shard (browser)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:42:51Z",
+      "completedAt": "2026-10-28T04:46:01Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640689526"
+    },
+    {
+      "id": 122640689607,
+      "name": "check-test-shard (test-1)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:42:51Z",
+      "completedAt": "2026-10-28T04:44:29Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640689607"
+    },
+    {
+      "id": 122640689873,
+      "name": "check-test-shard (test-4)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:42:51Z",
+      "completedAt": "2026-10-28T04:52:38Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640689873"
+    },
+    {
+      "id": 122640721940,
+      "name": "quality",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:42:51Z",
+      "completedAt": "2026-10-28T04:45:39Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640721940"
+    },
+    {
+      "id": 122640722578,
+      "name": "close-gate",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-28T04:42:04Z",
+      "completedAt": "2026-10-28T04:42:14Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640722578"
+    },
+    {
+      "id": 122640723705,
+      "name": "check-test-shard (test-6)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:42:51Z",
+      "completedAt": "2026-10-28T04:47:44Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640723705"
+    },
+    {
+      "id": 122640726494,
+      "name": "check-test-shard (test-2)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:42:51Z",
+      "completedAt": "2026-10-28T04:57:37Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640726494"
+    },
+    {
+      "id": 122640735085,
+      "name": "check-test-shard (test-3)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T04:42:51Z",
+      "completedAt": "2026-10-28T04:46:34Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122640735085"
+    },
+    {
+      "id": 122641956699,
+      "name": "check-test",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T05:02:38Z",
+      "completedAt": "2026-10-28T05:02:40Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122641956699"
+    },
+    {
+      "id": 122641987411,
+      "name": "core CI lane visibility",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T05:02:44Z",
+      "completedAt": "2026-10-28T05:02:47Z",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853/job/122641987411"
+    }
+  ],
+  "workflows": [
+    {
+      "id": 40633685917,
+      "name": "public-surface-diff",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633685917"
+    },
+    {
+      "id": 40633685991,
+      "name": "Phase eval PR",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633685991"
+    },
+    {
+      "id": 40633685959,
+      "name": "pr-metadata-gates",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633685959"
+    },
+    {
+      "id": 40633685960,
+      "name": "OpenHands runner · pull_request · 2426",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633685960"
+    },
+    {
+      "id": 40633685920,
+      "name": "e2e-cli",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633685920"
+    },
+    {
+      "id": 40633684391,
+      "name": "pr-metadata-gates",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633684391"
+    },
+    {
+      "id": 40633645995,
+      "name": "Deploy docs site to Pages",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645995"
+    },
+    {
+      "id": 40633645993,
+      "name": "public-surface-diff",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645993"
+    },
+    {
+      "id": 40633645891,
+      "name": "e2e-cli",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645891"
+    },
+    {
+      "id": 40633645949,
+      "name": "Code quality",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645949"
+    },
+    {
+      "id": 40633645986,
+      "name": "pr-metadata-gates",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645986"
+    },
+    {
+      "id": 40633645889,
+      "name": "Fresh UI package quality",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645889"
+    },
+    {
+      "id": 40633645853,
+      "name": "ci",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633645853"
+    },
+    {
+      "id": 40633640676,
+      "name": "OpenHands runner · push · fix/better-auth-critical-1-7-7",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/40633640676"
+    }
+  ],
+  "allSixShardsCheckBrowserQualityPass": true,
+  "overallWorkflowFailureRetained": true,
+  "closeGateFailedLog": {
+    "nativeExit": 0,
+    "bytes": 19598,
+    "sha256": "48a86c4be4b7825560631c384927e0106bf0c100c75265fbe594ff18f6f5f846",
+    "readOnlyCapture": {
+      "stdoutCapturedBytes": 19598,
+      "stderrCapturedBytes": 0,
+      "statusAwaited": true,
+      "pipesAwaited": true,
+      "terminationRequested": false
+    }
+  },
+  "singleFailedJobRerunOnly": true,
+  "first17FailureTransportCauseUnproven": true,
+  "noSourceChanges": true,
+  "noInference": true,
+  "noReservation": true
+}

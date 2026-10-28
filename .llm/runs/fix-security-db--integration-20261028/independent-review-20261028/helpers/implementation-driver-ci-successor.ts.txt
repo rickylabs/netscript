@@ -1,0 +1,131 @@
+import { runOpenCode } from '../../tools/agentic/opencode/opencode-run.ts';
+import { evaluateSubscriptionExpense } from '../../tools/agentic/runtime/subscription-expense.ts';
+import { captureOwnedCommand } from './owned-capture.ts';
+import { audit } from './review-audit-ci-successor.ts';
+import { PublicEventCapture } from './public-events-corrected.ts';
+import { OwnedSpawn } from './owned-spawn-corrected.ts';
+import { allowance, credential, decode, digest, directory, environment, executable, guard, hash, host,
+  json, model, price, expectedHead, expectedSession, steps } from './common-corrected.ts';
+
+const mode = Deno.args[0];
+if (mode !== '--launch') throw new Error('Explicit preparation or authorized launch required.');
+await guard();
+const disk = await new Deno.Command('powershell.exe', { args:['-NoProfile','-NonInteractive','-Command','(Get-PSDrive C).Free'], stdout:'piped', stderr:'null' }).output();
+if (!disk.success || Number(decode(disk.stdout).trim()) < 8 * 1024 ** 3) throw new Error('Eight GiB disk floor not met.');
+const env = await environment();
+const key = await credential();
+const client = Deno.createHttpClient({ proxy:{url:'http://127.0.0.1:3128'} });
+async function sealGuard() {
+  await guard();
+  const preparation = JSON.parse(await Deno.readTextFile(`${directory}/preparation-ci-successor.json`));
+  for (const [path, expected] of Object.entries(preparation.seals)) {
+    if (await hash(path) !== expected) throw new Error(`Packet seal changed: ${path}`);
+  }
+  return preparation;
+}
+try {
+  {
+    // A concrete external coordinator receipt is mandatory. Preparation itself grants no inference.
+    const prepared = await sealGuard();
+    const authority = JSON.parse(await Deno.readTextFile(`${directory}/root-launch-authorization.json`));
+    if (authority.authorizer !== '/root' || authority.inferenceApproved !== true ||
+      authority.sourceHead !== expectedHead || authority.model !== model || authority.steps !== steps ||
+      authority.prNumber !== 2426 || authority.distinctLeafVerdicts !== 1 ||
+      authority.variant !== 'provider_default' || authority.newSession !== false || authority.sameSession !== true || authority.sessionID !== expectedSession ||
+      authority.driverSha256 !== await hash(`${directory}/implementation-driver-ci-successor.ts`) ||
+      authority.preparationSha256 !== await hash(`${directory}/preparation-ci-successor.json`) ||
+      authority.estimateUsd !== prepared.estimateUsd || authority.reservedEstimateUsd !== prepared.estimateUsd || !Number.isFinite(authority.otherOwnedReservationUsd) || authority.otherOwnedReservationUsd < 0 || authority.reservationState !== 'reserved' || typeof authority.reservationId !== 'string' || !authority.reservationId || authority.activePaidRuns !== 0 || authority.serializationConfirmed !== true || authority.freshRootReservationAccounting !== true ||
+      !Number.isFinite(Date.parse(authority.authorizedAt)) ||
+      Date.now() - Date.parse(authority.authorizedAt) > 15*60000 || Date.parse(authority.authorizedAt) > Date.now()) {
+      throw new Error('Fresh concrete root launch/expense authority absent.');
+    }
+    // Fresh account/key minimum and live maximum endpoint prices immediately precede runOpenCode.
+    const quote = await price(client, 'model-launch-endpoints.json');
+    await json('price-launch.json',quote);
+    if (quote.prospectiveUsd > prepared.estimateUsd) throw new Error('Fresh price exceeds reviewed estimate.');
+    const snapshot = await allowance(client,key); await json('allowance-launch.json',snapshot);
+    const expense = evaluateSubscriptionExpense({provider:'openrouter',model,snapshot,
+      estimatedCostUsd:prepared.estimateUsd,now:new Date().toISOString()});
+    await json('expense-launch.json',expense);
+    if (!expense.allowed || snapshot.availableBalanceUsd < prepared.estimateUsd + authority.otherOwnedReservationUsd) throw new Error('Fresh allowance/expense blocked.');
+    const sessionCheck=await captureOwnedCommand(executable,['export',expectedSession],host,env,30000);
+    if(!sessionCheck.success)throw new Error('SAME session launch guard unavailable.');
+    const before=JSON.parse(decode(sessionCheck.stdout)),baseline=JSON.parse(await Deno.readTextFile(`${directory}/session-baseline.json`));
+    const beforeIds=before.messages.filter((message:{info:{role:string}})=>message.info.role==='assistant').map((message:{info:{id:string}})=>message.info.id);
+    if(before.info.id!==expectedSession||JSON.stringify(beforeIds)!==JSON.stringify(baseline.assistantIds))throw new Error('SAME session changed since reviewed preparation.');
+    const raw = await Deno.open(`${directory}/native.stdout.jsonl`,{write:true,createNew:true});
+    let owned: Deno.ChildProcess | undefined; let settled=false; let written=0; let received=0;
+    let stderrBytes=0; let stderrDrain: Promise<void> | undefined;
+    let stderrReader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+    let stderrDone=false; let stderrDeadline:ReturnType<typeof setTimeout>|undefined;
+    const cancellations:Promise<void>[]=[];const cleanupFailures:string[]=[];
+    let deadline: ReturnType<typeof setTimeout> | undefined;
+    let escalation: ReturnType<typeof setTimeout> | undefined;
+    let failure: string | undefined;
+    const owner=new OwnedSpawn();
+    function stop(message: string) {
+      failure ??= message;
+      try { owned?.kill('SIGTERM'); } catch { /* Already settled. */ }
+      if(stderrReader&&!stderrDone)cancellations.push(stderrReader.cancel().catch(()=>{cleanupFailures.push('Owned stderr cancellation failed.');}));
+      escalation ??= setTimeout(() => {if(!settled){try{owned?.kill('SIGKILL');}catch{/* Settled. */}}},1000);
+    }
+    const publicCapture=new PublicEventCapture(async(text)=>{
+      const bytes=new TextEncoder().encode(text);written+=bytes.length;
+      let offset=0; while(offset<bytes.length)offset+=await raw.write(bytes.subarray(offset));
+    });
+    try {
+      const result=await runOpenCode({message:await Deno.readTextFile(`${directory}/prompt-ci-successor.md`),model,session:expectedSession,
+        variant:'provider_default',cwd:host,format:'json',workloadTier:'straightforward',
+        workloadRole:'implementation_evaluation',estimatedCostUsd:prepared.estimateUsd,
+        usageSnapshotPath:`${directory}/allowance-launch.json`,receiptPath:`${directory}/mcp.jsonl`}, false, {
+        env:{...env,OPENROUTER_API_KEY:key},
+        async listModels(binary){
+          if(binary!==executable)throw new Error('Catalog executable differs.');
+          const listed=await captureOwnedCommand(binary,['models','openrouter'],host,{...env,OPENROUTER_API_KEY:key},15000);
+          if(!listed.success)throw new Error('Fresh bounded native catalog failed.');return decode(listed.stdout);
+        },
+        async writeStdout(bytes){
+          received+=bytes.length;
+          if(received>24*1024*1024){stop('Native stdout streaming bound exceeded.');throw new Error(failure);}
+          try{await publicCapture.add(bytes);}catch{stop('Owned public framing/write failed.');throw new Error(failure);}
+          return bytes.length;
+        },
+        spawn(binary,options){
+          if(binary!==executable)throw new Error('Normative executable mismatch.');
+          const args=options.args??[];const indexes=args.flatMap((value,index)=>value==='--session'?[index]:[]);
+          if(indexes.length!==1||args[indexes[0]+1]!==expectedSession||args.includes('--fork')||args.includes('--continue'))throw new Error('Exactly the SAME session argument is required.');
+          const child=owner.spawn(()=>new Deno.Command(binary,{...options,clearEnv:true,stderr:'piped'}).spawn());owned=child;
+          void child.status.then(()=>{settled=true;stderrDeadline=setTimeout(()=>{if(!stderrDone)stop('Owned stderr drain deadline.');},1000);});
+          const reader=child.stderr.getReader();stderrReader=reader;
+          stderrDrain=(async()=>{try{while(true){const next=await reader.read();if(next.done)break;stderrBytes+=next.value.length;if(stderrBytes>65536){stop('Native stderr streaming bound exceeded.');break;}}}catch{stop('Native stderr pipe failed.');}finally{stderrDone=true;reader.releaseLock();}})();
+          deadline=setTimeout(()=>stop('Native finite wall deadline.'),1200000); return child;
+        }
+      });
+      await publicCapture.finish();
+      await stderrDrain;
+      await Promise.all(cancellations);
+      await json('result.json',{code:result.code,failure:result.failure??failure??null,stdoutReceivedBytes:received,
+        publicWrittenBytes:written,stderrReceivedBytes:stderrBytes,sourceHead:expectedHead,privateReasoningPersisted:false});
+      if(result.code!==0||failure||cleanupFailures.length)throw new Error('Native evaluator run incomplete.');
+      raw.close();
+      await audit(env); await sealGuard(); Deno.exitCode=result.code;
+    } finally {
+      if(deadline!==undefined)clearTimeout(deadline);
+      if(owned&&!settled)stop('Owned run interrupted.');
+      const settlement=await owner.settle(async()=>{
+        await stderrDrain;await Promise.all(cancellations);
+        if(owned&&!stderrDone)throw new Error('Owned stderr settlement incomplete.');
+      });
+      if(stderrDeadline!==undefined)clearTimeout(stderrDeadline);
+      if(escalation!==undefined)clearTimeout(escalation);
+      try{raw.close();}catch{/* Closed after capture. */}
+      const failures:string[]=[...cleanupFailures,...settlement.failures];
+      try{await sealGuard();}catch(error){failures.push(String(error));}
+      try{await json('allowance-after.json',await allowance(client,key));}catch(error){failures.push(String(error));}
+      await json('final-guards.json',{at:new Date().toISOString(),nativeChildStatusAwaited:settlement.statusAwaited,
+        ownedSettlement:settlement,stderrPipeAwaited:stderrDone,publicEvents:publicCapture.publicEvents,
+        omittedPrivateUnknownEvents:publicCapture.omittedEvents,failures,sourceAcceptance:false});
+      if(failures.length)Deno.exitCode=2;
+    }
+  }
+} finally {client.close();}

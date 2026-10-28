@@ -1,0 +1,149 @@
+# SAME-session integration db-only-diff part4
+HEAD88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5; ordered full-content fragment.
+
+
+## FULL .llm/runs/fix-security-db--integration-20261028/evidence/security-to-integration-db.diff
+Raw SHA256:406fd7521b3efed90d0c6e26c5e819817400bb6f7f80e5b85f470b0dd20c495e; rawBytes:5909
+diff --git a/.llm/tools/deps/check-db-alignment.ts b/.llm/tools/deps/check-db-alignment.ts
+index 5ee740a82ea7a257b1cad1b6eb4721dfbce1ce23..b3b8069438197d507705e2e21d43eee05a380781 100644
+--- a/.llm/tools/deps/check-db-alignment.ts
++++ b/.llm/tools/deps/check-db-alignment.ts
+@@ -1,10 +1,10 @@
+ /** Guard the Collection identity shared by SDK query and Fresh stream adapters. */
+-import { join } from '@std/path';
++import { join, toFileUrl } from '@std/path';
+ import { parseRegistrySpecifier, readJsonFile } from './workspace.ts';
+ 
+ interface DependencyGraph {
+   readonly npmPackages?: Readonly<Record<string, unknown>>;
+-  readonly modules?: readonly { readonly error?: unknown }[];
++  readonly modules?: readonly { readonly kind?: string; readonly error?: unknown }[];
+ }
+ 
+ /** Cold graph verdict; identities include peer-resolution suffixes. */
+@@ -22,7 +22,11 @@ export function analyzeDbGraph(graph: DependencyGraph): DbAlignmentReport {
+   if (identities.length !== 1) {
+     findings.push('Expected exactly one complete @tanstack/db identity');
+   }
+-  if ((graph.modules ?? []).some((module) => module.error !== undefined)) {
++  const modules = graph.modules ?? [];
++  if (!modules.some((module) => typeof module.kind === 'string' && module.kind !== 'external')) {
++    findings.push('Consumer graph contains no resolved modules');
++  }
++  if (modules.some((module) => module.error !== undefined)) {
+     findings.push('Consumer graph contains unresolved modules');
+   }
+   return { identities, findings };
+@@ -60,7 +64,14 @@ async function checkColdConsumer(root: string, freshOnly: boolean): Promise<bool
+       ).join('\n'),
+     );
+     const result = await new Deno.Command(Deno.execPath(), {
+-      args: ['info', '--json', '--no-config', '--no-lock', '--node-modules-dir=none', entry],
++      args: [
++        'info',
++        '--json',
++        '--no-config',
++        '--no-lock',
++        '--node-modules-dir=none',
++        toFileUrl(entry).href,
++      ],
+       env: { DENO_DIR: join(directory, 'cache') },
+       stdout: 'piped',
+       stderr: 'piped',
+diff --git a/.llm/tools/deps/check-db-alignment_test.ts b/.llm/tools/deps/check-db-alignment_test.ts
+index 8ea3ab1c78fb5350802b90ac6af6ca3b7ca232c7..7c3fe34b0b4f224a2214ca73593ad66dac3b25a1 100644
+--- a/.llm/tools/deps/check-db-alignment_test.ts
++++ b/.llm/tools/deps/check-db-alignment_test.ts
+@@ -1,21 +1,86 @@
+ import { assertEquals } from '@std/assert';
++import { join, toFileUrl } from '@std/path';
+ import { analyzeDbGraph } from './check-db-alignment.ts';
+ 
+ Deno.test('DB guard requires one complete Collection identity and a resolved graph', () => {
+   const core = '@tanstack/db@0.6.17_typescript@7.0.2';
+-  assertEquals(analyzeDbGraph({ npmPackages: { [core]: {} } }).findings, []);
++  const modules = [{ kind: 'esm', error: undefined }];
++  assertEquals(analyzeDbGraph({ npmPackages: { [core]: {} }, modules }).findings, []);
+   for (
+     const other of [
+       '@tanstack/db@0.7.0_typescript@7.0.2',
+       '@tanstack/db@0.6.17_typescript@6.0.2',
+     ]
+   ) {
+-    assertEquals(analyzeDbGraph({ npmPackages: { [core]: {}, [other]: {} } }).findings.length, 1);
++    assertEquals(
++      analyzeDbGraph({ npmPackages: { [core]: {}, [other]: {} }, modules }).findings.length,
++      1,
++    );
+   }
+-  assertEquals(analyzeDbGraph({ npmPackages: {} }).findings.length, 1);
++  assertEquals(analyzeDbGraph({ npmPackages: {}, modules }).findings.length, 1);
+   assertEquals(
+-    analyzeDbGraph({ npmPackages: { [core]: {} }, modules: [{ error: 'not resolved' }] })
++    analyzeDbGraph({
++      npmPackages: { [core]: {} },
++      modules: [{ ...modules[0], error: 'not resolved' }],
++    })
+       .findings.length,
+     1,
+   );
+ });
++
++for (
++  const [name, modules] of [
++    ['missing', undefined],
++    ['empty', []],
++    ['external-only', [{ kind: 'external', error: undefined }]],
++    ['kind-less', [{}]],
++  ] as const
++) {
++  Deno.test({
++    name: `DB guard rejects ${name} module graphs despite identity metadata`,
++    sanitizeOps: true,
++    sanitizeResources: true,
++    sanitizeExit: true,
++    fn: () => {
++      const graph = { npmPackages: { '@tanstack/db@0.13.0_typescript@7.0.2': {} }, modules };
++      assertEquals(analyzeDbGraph(graph).findings, ['Consumer graph contains no resolved modules']);
++    },
++  });
++}
++
++Deno.test({
++  name: 'native info resolves a cold local file URL with spaces and a fragment character',
++  sanitizeOps: true,
++  sanitizeResources: true,
++  sanitizeExit: true,
++  fn: async () => {
++    const directory = await Deno.makeTempDir({ prefix: 'netscript-db-info-' });
++    const controller = new AbortController();
++    const deadline = setTimeout(() => controller.abort(), 10_000);
++    try {
++      const entry = join(directory, 'consumer space #.ts');
++      await Deno.writeTextFile(entry, 'export const value = 1;\n');
++      const fileUrl = toFileUrl(entry).href;
++      const result = await new Deno.Command(Deno.execPath(), {
++        args: ['info', '--json', '--no-config', '--no-lock', '--node-modules-dir=none', fileUrl],
++        env: { DENO_DIR: join(directory, 'cache') },
++        signal: controller.signal,
++        stdout: 'piped',
++        stderr: 'piped',
++      }).output();
++      assertEquals(result.success, true, new TextDecoder().decode(result.stderr));
++      const graph: {
++        roots: string[];
++        modules: { kind: string; specifier: string; error?: unknown }[];
++      } = JSON.parse(new TextDecoder().decode(result.stdout));
++      assertEquals(graph.roots, [fileUrl]);
++      assertEquals(graph.modules.map(({ kind, specifier }) => ({ kind, specifier })), [
++        { kind: 'esm', specifier: fileUrl },
++      ]);
++      assertEquals(graph.modules.filter((module) => module.error !== undefined), []);
++    } finally {
++      clearTimeout(deadline);
++      await Deno.remove(directory, { recursive: true });
++    }
++  },
++});
+
+

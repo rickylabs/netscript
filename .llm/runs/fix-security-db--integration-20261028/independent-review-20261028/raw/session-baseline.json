@@ -1,0 +1,24 @@
+{
+  "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+  "assistantIds": [
+    "msg_180b55454001G24hKng7cGxF2J",
+    "msg_180b59e0f001C7u4gvK4hGTcDu",
+    "msg_180b5bd59001cOLXkWmEhilm5p",
+    "msg_180b5f30b0015nqcKxpguFa7mx",
+    "msg_180b60f45001b3jXg2szkebDpt",
+    "msg_180b65415001Io9WY3F0I87oVK",
+    "msg_180b678a200152Fw0KkXOLmL5e",
+    "msg_180b71473001s16rSo72CLiY0A"
+  ],
+  "originalLastFinish": "stop",
+  "rawExportSha256": "373f3c40722a73c5905782bbfee4c01e16602de503ca7ca98ec8210238cf1b01",
+  "capture": {
+    "stdoutCapturedBytes": 2139100,
+    "stderrCapturedBytes": 50,
+    "statusAwaited": true,
+    "pipesAwaited": true,
+    "terminationRequested": false
+  },
+  "privateReasoningPersisted": false,
+  "noInference": true
+}

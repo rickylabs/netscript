@@ -1,0 +1,78 @@
+{
+  "noInference": true,
+  "checked": [
+    {
+      "label": "two-db-owners",
+      "paths": [
+        ".llm/tools/deps/check-db-alignment.ts",
+        ".llm/tools/deps/check-db-alignment_test.ts"
+      ],
+      "losslessNormalizedText": true
+    },
+    {
+      "label": "exact-combined-diff",
+      "paths": [
+        ".llm/runs/fix-security-db--integration-20261028/evidence/combined-seven-owner.diff"
+      ],
+      "losslessNormalizedText": true
+    },
+    {
+      "label": "db-only-diff",
+      "paths": [
+        ".llm/runs/fix-security-db--integration-20261028/evidence/security-to-integration-db.diff"
+      ],
+      "losslessNormalizedText": true
+    },
+    {
+      "label": "origins-boundary",
+      "paths": [
+        ".llm/runs/fix-security-db--integration-20261028/evidence/seven-owner-proof.json",
+        ".llm/runs/fix-security-db--integration-20261028/root-integration-authority.md",
+        ".llm/runs/fix-security-db--integration-20261028/accepted-integration-proposal.md",
+        ".llm/runs/fix-security-db--integration-20261028/README.md",
+        ".llm/runs/fix-security-db--integration-20261028/plan.md"
+      ],
+      "losslessNormalizedText": true
+    },
+    {
+      "label": "accepted-db-report",
+      "paths": [
+        ".llm/runs/fix-native-db-graph-entry--qualification/root-source-acceptance.md",
+        ".llm/runs/fix-native-db-graph-entry--qualification/root-independent-impl-acceptance-20261028.md",
+        ".llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/final-verdict.utf8.md"
+      ],
+      "losslessNormalizedText": true
+    },
+    {
+      "label": "integrated-six-gates",
+      "paths": [
+        ".llm/runs/fix-security-db--integration-20261028/evidence/combined-qualification.json",
+        ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.json",
+        ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.json",
+        ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.json",
+        ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.json",
+        ".llm/runs/fix-security-db--integration-20261028/evidence/audit-critical.receipt.json",
+        ".llm/runs/fix-security-db--integration-20261028/evidence/lint-canonical-rules.json",
+        ".llm/runs/fix-security-db--integration-20261028/evidence/cleanup.json"
+      ],
+      "losslessNormalizedText": true
+    },
+    {
+      "label": "full-native-composite",
+      "paths": [
+        ".llm/runs/fix-security-db--integration-20261028/evidence/arch-check.receipt.json"
+      ],
+      "losslessNormalizedText": true
+    },
+    {
+      "label": "actual-ci",
+      "paths": [
+        ".llm/tmp/security-db-integration-continuation-20261028/ci-status.json"
+      ],
+      "losslessNormalizedText": true
+    }
+  ],
+  "allTwoNewOwnersFull": true,
+  "fullSevenOwnerDiff": true,
+  "completeNativeCompositeReceipt": true
+}

@@ -1,0 +1,110 @@
+﻿[
+    {
+        "name":  "integration-01-two-db-owners.md",
+        "fileSplitLines":  199,
+        "nativeNumberedLines":  198,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-02-exact-combined-diff.md",
+        "fileSplitLines":  488,
+        "nativeNumberedLines":  487,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-03-exact-combined-diff.md",
+        "fileSplitLines":  178,
+        "nativeNumberedLines":  177,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-04-db-only-diff.md",
+        "fileSplitLines":  150,
+        "nativeNumberedLines":  149,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-05-origins-boundary.md",
+        "fileSplitLines":  269,
+        "nativeNumberedLines":  268,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-06-accepted-db-report.md",
+        "fileSplitLines":  102,
+        "nativeNumberedLines":  101,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-07-integrated-six-gates.md",
+        "fileSplitLines":  248,
+        "nativeNumberedLines":  247,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-08-full-native-composite.md",
+        "fileSplitLines":  189,
+        "nativeNumberedLines":  188,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-09-full-native-composite.md",
+        "fileSplitLines":  254,
+        "nativeNumberedLines":  253,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-10-full-native-composite.md",
+        "fileSplitLines":  32,
+        "nativeNumberedLines":  31,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-11-actual-ci.md",
+        "fileSplitLines":  128,
+        "nativeNumberedLines":  127,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    },
+    {
+        "name":  "integration-12-actual-ci-successor.md",
+        "fileSplitLines":  578,
+        "nativeNumberedLines":  577,
+        "badLines":  0,
+        "unreturnedNonempty":  0,
+        "EOF":  true,
+        "truncated":  false
+    }
+]

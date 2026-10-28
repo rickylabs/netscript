@@ -1,0 +1,30 @@
+import {captureOwnedCommand} from '../security-impl-review-20261028/owned-capture.ts';
+const root=Deno.cwd().replaceAll('\\','/'),directory=`${root}/.llm/tmp/security-db-integration-ci-retry-20261028`;
+const gh='C:/Program Files/GitHub CLI/gh.exe',run=40633645853,job=122636200954,head='88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5',origin='aec36a68e65df77012d4b2add4692e0b0506290f';
+const allow=new Set(['path','pathext','comspec','systemroot','windir','systemdrive','home','userprofile','appdata','localappdata','http_proxy','https_proxy','all_proxy','no_proxy','node_extra_ca_certs','ssl_cert_file','ssl_cert_dir','gh_token','github_token','gh_host','gh_config_dir','no_color']);
+const env=Object.fromEntries(Object.entries(Deno.env.toObject()).filter(([key])=>allow.has(key.toLowerCase())));
+const mode=Deno.args[0];if(!['--status','--dispatch-once'].includes(mode))throw new Error('Explicit mode required');
+const decode=(bytes:Uint8Array)=>new TextDecoder('utf-8',{fatal:true}).decode(bytes);
+const json=async(name:string,value:unknown)=>Deno.writeTextFile(`${directory}/${name}`,JSON.stringify(value,null,2)+'\n',{createNew:true});
+async function api(path:string){const value=await captureOwnedCommand(gh,['api',path],root,env,30000);if(!value.success)throw new Error('Read-only GitHub state request failed');return JSON.parse(decode(value.stdout));}
+const parent=await api(`repos/rickylabs/netscript/actions/runs/${run}`);
+if(parent.id!==run||parent.head_sha!==head)throw new Error('Exact parent/head changed');
+if(mode==='--status'){console.log(JSON.stringify({at:new Date().toISOString(),id:parent.id,status:parent.status,conclusion:parent.conclusion,runAttempt:parent.run_attempt}));}
+else if(parent.status!=='completed'){console.log(JSON.stringify({parentCompleted:false,rerunDispatched:false,status:parent.status}));}
+else{
+ const target=await api(`repos/rickylabs/netscript/actions/jobs/${job}`);
+ if(target.id!==job||target.run_id!==run||target.name!=='check-test-shard (test-5)'||target.status!=='completed'||target.conclusion!=='failure')throw new Error('Exact failed target job changed');
+ const digest=async(bytes:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join('');
+ async function git(args:string[]){const value=await new Deno.Command('git',{args,cwd:root,stdout:'piped',stderr:'piped'}).output();if(!value.success)throw new Error('Native frozen source guard failed');return value.stdout;}
+ if(decode(await git(['rev-parse','HEAD'])).trim()!==head)throw new Error('Candidate head changed');await git(['diff','--quiet','HEAD','--']);
+ const proof=JSON.parse(await Deno.readTextFile(`${directory}/pre-dispatch-source-proof.json`));
+ for(const row of proof.files){if(row.acceptedOrigin!==origin||await digest(await git(['show',`${origin}:${row.path}`]))!==row.acceptedSha256||await digest(await git(['show',`${head}:${row.path}`]))!==row.acceptedSha256||await digest(await Deno.readFile(`${root}/${row.path}`))!==row.acceptedSha256)throw new Error(`Accepted source drift:${row.path}`);}
+ await json('completed-parent-before-dispatch.json',{at:new Date().toISOString(),id:parent.id,head:parent.head_sha,status:parent.status,conclusion:parent.conclusion,runAttempt:parent.run_attempt,targetJob:{id:target.id,runId:target.run_id,name:target.name,status:target.status,conclusion:target.conclusion},freshSevenSourceOriginChecks:true});
+ // Atomic intent is written BEFORE the single POST. An uncertain request is never repeated automatically.
+ await json('single-dispatch-intent.json',{at:new Date().toISOString(),rootAuthorized:true,method:'POST',path:`repos/rickylabs/netscript/actions/jobs/${job}/rerun`,maximumDispatches:1,sourceHead:head,firstAttemptFailurePreserved:true,networkOutageNotProven:true,noInference:true});
+ const response=await captureOwnedCommand(gh,['api','--include','--method','POST',`repos/rickylabs/netscript/actions/jobs/${job}/rerun`],root,env,30000);
+ const text=decode(response.stdout);await Deno.writeTextFile(`${directory}/dispatch.native-response.txt`,text,{createNew:true});
+ await json('single-dispatch-result.json',{at:new Date().toISOString(),nativeExitCode:response.code,success:response.success,httpCreated:/^HTTP\/\S+\s+201\b/m.test(text),capture:response.observations,exactFailedJob:job,noOtherJobRequested:true,noInference:true});
+ if(!response.success||!/^HTTP\/\S+\s+201\b/m.test(text))throw new Error('Single rerun response unproven; do not retry automatically');
+ console.log(JSON.stringify({rerunDispatched:true,job,run,httpStatus:201,exactOnePost:true,noSuccessfulShardRequested:true}));
+}

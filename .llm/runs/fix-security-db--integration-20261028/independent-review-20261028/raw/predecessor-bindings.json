@@ -1,0 +1,51 @@
+{
+  "helpers": [
+    {
+      "name": "implementation-driver-corrected.ts",
+      "original": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/implementation-driver-corrected.ts",
+      "sha256": "2efafb4c6d6b1f3c32b3c40f6cd769340e1495f34061924724ba4c71657e5570"
+    },
+    {
+      "name": "common-corrected.ts",
+      "original": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/common-corrected.ts",
+      "sha256": "ec227c269e8b6ebc6a8f51aaba8550ffb55342d2d0fcb23bc292e115c51cbf87"
+    },
+    {
+      "name": "review-audit.ts",
+      "original": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/review-audit.ts",
+      "sha256": "e9849136642734769da662b8bbbf8d5a2a3528735c02e80914c5ad7f50e4ceda"
+    },
+    {
+      "name": "owned-spawn-corrected.ts",
+      "original": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/owned-spawn-corrected.ts",
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f"
+    },
+    {
+      "name": "public-events-corrected.ts",
+      "original": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/public-events-corrected.ts",
+      "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97"
+    },
+    {
+      "name": "owned-capture.ts",
+      "original": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/owned-capture.ts",
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c"
+    },
+    {
+      "name": "config-proposal.json",
+      "original": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/config-proposal.json",
+      "sha256": "19ae772d2c83ef910316aefc19d5b93529f3ac322c90f253fb359e9c6df9fcea"
+    },
+    {
+      "name": "check-deno.json",
+      "original": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/check-deno.json",
+      "sha256": "375e5f6cd321a635de2182a814d11910093555c3c2fa0d2c3f6794dd4e9c25bd"
+    }
+  ],
+  "originalPreparationSha256": "d2481ddbf3a14626624a22bbf5275f850071a0d4277ae6d5968668c61ef795ed",
+  "oldManifestSha256": "ad1d3035106a8dc6326c98a7d592d046a404d614a99717780a3192b422fc245a",
+  "oldFinalSha256": "c89ef597fab743d03d8e648729a90cdc90bfa1cefbe1164cba3d85586cdb51f3",
+  "oldIdentitySha256": "dc6bfde24349833153a0384f05a8902aae4651996e4527e2263da4be29716511",
+  "sameSession": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+  "originalHost": "C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/security-impl-review-20261028/host",
+  "noInference": true
+}

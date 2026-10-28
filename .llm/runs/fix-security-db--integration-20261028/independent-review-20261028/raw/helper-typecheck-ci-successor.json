@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-28T05:07:39.560Z",
+  "selectedFiles": 2,
+  "exitCode": 0,
+  "success": true,
+  "stdout": "",
+  "stderr": "Check .llm/tmp/security-db-integration-continuation-20261028/implementation-driver-ci-successor.ts\nCheck .llm/tmp/security-db-integration-continuation-20261028/review-audit-ci-successor.ts\n",
+  "capture": {
+    "stdoutCapturedBytes": 0,
+    "stderrCapturedBytes": 189,
+    "statusAwaited": true,
+    "pipesAwaited": true,
+    "terminationRequested": false
+  }
+}
