@@ -1,0 +1,14 @@
+{
+  "selected": "doc",
+  "args": [
+    "doc",
+    "--lint",
+    "--frozen",
+    "plugins/workers/streams/mod.ts"
+  ],
+  "code": 1,
+  "started": "2026-10-28T01:11:33.771Z",
+  "ended": "2026-10-28T01:11:33.957Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/doc-1793149893767"
+}

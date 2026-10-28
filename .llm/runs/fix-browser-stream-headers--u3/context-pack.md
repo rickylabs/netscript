@@ -90,3 +90,13 @@ for current source/gate bindings. Next authorized work is separate F15 applicati
 doc12-to10 replay, then root-authorized C2 under its exact three-owner/400-line test cap. C2 source
 still requires root acceptance before its commit. C3/independent IMPL/whole-package/release gates
 remain open; no readiness or issue closure.
+
+
+## Current continuation: root accepted C2 source,2026-10-28
+
+C1 draftPR2423 is published. C2 source is root accepted with exact four-owner review; see
+c2-checkpoint.md/root-c2-source-acceptance.md. The earlier Fresh F15 candidate failed actual owning
+closure and was archived/reverted; no extra native export/canonical debt remains. Fresh12 and
+workers1 documentation findings stay unwaived. Next authorized work is only C3 reader-header
+documentation and stale factory/module introductions, with actual docs gates before root review.
+Broader native type closure awaits separate corrective independent review. No readiness/merge.

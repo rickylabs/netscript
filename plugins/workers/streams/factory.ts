@@ -9,6 +9,7 @@
  */
 
 import { createStreamDB } from '@durable-streams/state/db';
+import type { HeadersRecord } from '@durable-streams/client';
 import {
   buildStreamUrl,
   getStreamsAuth,
@@ -55,13 +56,17 @@ export type WorkersStreamDB = Readonly<{
  * ```
  */
 export function createWorkersStreamDB(
-  options: { baseUrl?: string } = {},
+  options: {
+    baseUrl?: string;
+    /** Explicit reader headers replace ambient auth; native callbacks resolve per request. */
+    headers?: HeadersRecord;
+  } = {},
 ): WorkersStreamDB {
   return createStreamDB({
     streamOptions: {
       url: buildStreamUrl('/workers/executions', options.baseUrl),
       contentType: 'application/json',
-      headers: getStreamsAuth(),
+      headers: options.headers === undefined ? getStreamsAuth() : options.headers,
     },
     state: workersStreamSchema,
   });

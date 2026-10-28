@@ -1,0 +1,18 @@
+{
+  "selected": "quality",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/quality/scan-code-quality.ts",
+    "--root",
+    "plugins/workers",
+    "--max-allow",
+    "7"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:13:14.679Z",
+  "ended": "2026-10-28T01:13:15.349Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/quality-1793149994676"
+}

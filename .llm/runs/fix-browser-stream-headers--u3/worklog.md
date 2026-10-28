@@ -102,3 +102,28 @@ See [checkpoint and byte-verified evidence](c1-checkpoint.md) and [root acceptan
 Original RED/18+2, paid incomplete turns and every repair failure remain distinct and preserved.
 C1 is authorized for draft checkpoint/push; no independent IMPL or release acceptance. F15 source
 export/debt remains a separately authorized following step; doc12/baseline10 are not waived.
+
+
+## F15 application FAILED owning-doc condition,2026-10-28
+
+The historically accepted source-local export/debt candidate was applied only after C1 checkpoint.
+Actual frozen owning doc lint remained12 (including both header findings), independently confirmed
+by structured12; the expected12-to10 reduction was not qualified. Three exact placement attempts
+and applied source/debt byte snapshots are retained under ignored native-sol/f15 evidence. Root
+instructed removal of only these uncommitted deltas; factory restored to fe27fb217d8b39c707c7d4bd4bd773d5bddd31fbb08573dc283820c34ada823f,
+canonical debt restored to d502eafa19ffb9eab3078ca1a5ed4d3a8a7816f115f33f53f3379defdd6d0042.
+The historical independent PLAN verdict is unchanged; corrective SAME-evaluator review is pending.
+No ineffective export/debt remains in the delivery candidate. Direct doctrine exited0 with existing
+warnings; arch:check failed the DB identity prerequisite. Baseline10 and both header findings remain
+RED/unwaived. Root separately authorized C2 to continue; no F15 checkpoint or false success.
+
+
+## Root-accepted C2 checkpoint,2026-10-28
+
+Root read all237new test lines and three existing diffs, independently verified4source+7protected
+hashes and actual raw gates. See root-c2-source-acceptance.md and c2-checkpoint.md. Focused5/0/0,
+five selected types/four lint+fmt, package check/positive consumer/negative controls, direct doctrine
+and publish dry-run pass. Workers public doc0-to1 remains RED; Fresh12 and DBidentity remain
+unwaived. The failed F15 application is archived/reverted, not a revoked historical verdict or
+successful closure. C2 authorized for draft checkpoint/push; C3 docs are the next scoped source
+work and require root review before their checkpoint. No independent IMPL or shipping acceptance.
