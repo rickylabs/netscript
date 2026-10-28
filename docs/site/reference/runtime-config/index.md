@@ -5,20 +5,18 @@ title: "@netscript/runtime-config"
 
 # `@netscript/runtime-config`
 
-Hot-reloadable NetScript runtime override types, loaders, watchers, and diagnostics. This page is
-written against the package's public surface reported by `deno doc`. For the full index of
-packages and plugins return to the [reference overview](/reference/).
+Hot-reloadable runtime overrides for NetScript jobs, sagas, triggers, feature flags and tasks. Use
+it to change runtime behaviour from versioned JSON files without redeploying a service.
 
-Runtime config files live under the configured runtime directory and are loaded through a
-version pointer named `current`. Missing files produce empty defaults so service startup can
-continue while operators roll out runtime overrides independently. The package exposes a single
-root entrypoint (`@netscript/runtime-config`); there are no sub-path exports.
+## Sub-path exports
 
-## Exports
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/runtime-config` | `./mod.ts` | [Loaders and watchers](#loaders-and-watchers), [override accessors](#override-accessors), [diagnostics](#diagnostics) and the configuration types. The package has no other entrypoints. |
 
-| Export | Path |
-| --- | --- |
-| `@netscript/runtime-config` | `./mod.ts` |
+Runtime config files live under the configured runtime directory and are loaded through a version
+pointer named `current`. Missing files produce empty defaults, so service startup continues while
+operators roll out runtime overrides independently.
 
 ## Loaders and watchers
 
@@ -70,6 +68,3 @@ root entrypoint (`@netscript/runtime-config`); there are no sub-path exports.
 | `RuntimeConfigTopic` | type alias | Runtime config topic name (a member of `RUNTIME_CONFIG_TOPICS`). |
 | `RuntimeTaskRuntime` | type alias | Runtime task execution kind (a member of `RUNTIME_TASK_RUNTIMES`). |
 
----
-
-Back to the [reference overview](/reference/).
