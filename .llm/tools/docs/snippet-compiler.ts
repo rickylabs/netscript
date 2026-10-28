@@ -9,6 +9,8 @@ import {
 } from './snippet-supports.ts';
 import { resolveWorkspaceSurface } from './snippet-workspace.ts';
 
+const ANSI_SGR = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
+
 interface SyntheticModule {
   block: FencedBlock;
   path: string;
@@ -88,7 +90,8 @@ function escapeRegExp(value: string): string {
 }
 
 function mapDiagnostics(raw: string, modules: SyntheticModule[]): string {
-  let diagnostics = raw;
+  // CI colors the path, line and column separately; normalize before matching source locations.
+  let diagnostics = raw.replaceAll(ANSI_SGR, '');
   for (const module of modules) {
     for (const generatedPath of [module.path, toFileUrl(module.path).href]) {
       diagnostics = diagnostics.replace(

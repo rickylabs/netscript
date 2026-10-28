@@ -71,3 +71,25 @@ Source identities:
 
 Runtime E2E and the disclosed historical privacy limitation remain unproven/unremediated;
 the verdict approves code review readiness only. No merge, tag or release authorization.
+
+## CI color-repair evaluation — PASS
+
+The same independent read-only evaluator reviewed the proposed working tree based on f8f3b28
+before its signoff commit. Native requested/observed model remains claude-opus-5-5, high effort,
+closed stdin, Read/Glob/Grep only. Exit 0 after 36.893 seconds; no blocking defects.
+
+Confirmed the actual CI cause: separate SGR sequences around path/line/column prevent the raw
+location regex from matching. Removing SGR before mapping preserves diagnostic text and applies
+the correct original-source line offset. The regression now forces color in every environment,
+restores both environment variables in finally, and retains every original assertion. The
+23-test suite and check/lint/format pass. CI quality and all other test shards already passed on
+the preceding source; the separate browser protocol error passed an unchanged rerun.
+
+The evaluator checked file contents against the supplied diff; the implementer verifies these
+reviewed blob fingerprints at commit time:
+
+- snippet-compiler.ts: `8dfef76a0c95f904a576652b995f84c7e4ed4c24`
+- snippet-compiler_test.ts: `607572cad9ef46afdb01f6f7dcb0cc2fe8e899fd`
+
+Exact-head README and CI results follow the signoff commit and are published on PR #2458.
+Prior runtime/history limitations remain disclosed; this verdict does not authorize a release.

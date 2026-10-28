@@ -73,3 +73,18 @@ the exact test passes unchanged locally. Do not classify future/pending checks a
 
 The runtime scaffold gate remains unavailable and unproven as recorded above. No gate was removed,
 skipped by this change, or weakened, and no ratchet bound was increased.
+
+## CI color-repair validation
+
+At f8f3b28, actual CI quality and all shards except test-4 passed. Test-4's only failing assertion
+was original source-line mapping with ANSI colors. Forced color reproduced the same failure
+locally (exit 1, 2.428s); SGR normalization before mapping fixes it with the assertion unchanged.
+
+- Focused structured suite: PASS, 23 tests, 18.323s, including always-colored diagnostics.
+- Structured check: PASS, 53 files; lint: PASS, both edited TS files; format: PASS, 53 files.
+- Same-session independent pre-commit review: PASS, 36.893s; source fingerprints in evaluate.md.
+- Prior Utility browser failure: an unchanged rerun passes all 48 tests; workflow/tests untouched.
+- Exact-head native README and final core CI results are published on PR #2458 after this commit.
+
+No further push is needed merely to copy later CI results into this file. The PR head and native
+receipts/comments carry that final evidence; the existing runtime/history caveats remain unchanged.

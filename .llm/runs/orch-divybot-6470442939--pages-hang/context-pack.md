@@ -1,5 +1,13 @@
 # Resume
 
+Current follow-up: core CI at f8f3b28 passed quality and all shards except test-4. The source-line
+assertion exposed ANSI codes preventing line-offset mapping. Forced color reproduced the failure;
+the repaired mapper and always-colored regression now pass all 23 focused tests and structured
+check/lint/format. Same-session independent pre-commit review is PASS; fingerprint verification
+ties it to the signoff commit. After pushing, run native README and current CI, then record final
+results on the PR and refresh the excluded READY handoff without an extra push cycle. The prior
+Utility browser failure passed on an unchanged 48-test rerun. No UI-owned files changed.
+
 Issue #2454, branch orch/divybot-6470442939, main baseline d6dfab0. Plan checkpoint recorded;
 implementation delivered in open, ready-for-review PR #2458. Review repair is in progress for three
 Augment findings: README env permissions, full-corpus checking, and outer-launcher cancellation.

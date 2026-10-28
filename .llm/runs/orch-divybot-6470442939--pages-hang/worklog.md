@@ -2,6 +2,22 @@
 
 ## Review repair plan
 
+### CI follow-up: colored source locations
+
+At f8f3b28, quality and every shard except test-4 passed. The new multi-fence assertion exposed
+an existing mapping defect: CI inserts ANSI SGR codes between generated path/line/column tokens,
+so mapping skipped its line offset. Forced color locally reproduces the same failure (exit 1,
+2.428s). Normalize SGR before source mapping; keep the source-line assertion and force color in
+that regression, restoring the environment afterward. No assertion or gate is relaxed.
+The Utility browser job's separate screenshot protocol error passed on an unchanged rerun
+(48 tests), without editing its workflow, tests or policy. Test-5 is now green in actual CI.
+
+The forced-color repair passes all 23 focused tests (18.323s), structured check (53 files),
+lint (the two edited source files) and format (53 files). Same-session read-only Claude review
+returned PASS before commit (36.893s). Compiler and regression blob fingerprints are recorded in
+evaluate.md and must match the signoff commit. Run native README and current CI after that commit;
+publish those final results on the PR without another source/evidence-only push cycle.
+
 Address Augment comments 4401520618 (README task permissions), 4401520628 (later README fences
 masked by early return), and 4401520638 (external launcher SIGTERM bypasses compiler cleanup).
 The quality job confirms the README permission failure. Repair one slice: declare environment

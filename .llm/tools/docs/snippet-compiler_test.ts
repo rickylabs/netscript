@@ -50,7 +50,12 @@ Deno.test('actual compiler graph rejects a non-exported SDK symbol', async () =>
 
 Deno.test('compiler reports later fence errors after an earlier tolerated failure', async () => {
   const site = await Deno.makeTempDir({ prefix: 'snippet-all-failures-' });
+  const forceColor = Deno.env.get('FORCE_COLOR');
+  const noColor = Deno.env.get('NO_COLOR');
   try {
+    // CI colorizes locations; exercise the same output even in a non-interactive local run.
+    Deno.env.set('FORCE_COLOR', '1');
+    Deno.env.delete('NO_COLOR');
     await Deno.writeTextFile(
       join(site, 'page.md'),
       '```ts\nconst firstFailure: string = 1;\n```\n\n' +
@@ -63,6 +68,10 @@ Deno.test('compiler reports later fence errors after an earlier tolerated failur
     assertStringIncludes(result.diagnostics, 'laterFailure');
     assertStringIncludes(result.diagnostics, 'page.md:6:');
   } finally {
+    if (forceColor === undefined) Deno.env.delete('FORCE_COLOR');
+    else Deno.env.set('FORCE_COLOR', forceColor);
+    if (noColor === undefined) Deno.env.delete('NO_COLOR');
+    else Deno.env.set('NO_COLOR', noColor);
     await Deno.remove(site, { recursive: true });
   }
 });
