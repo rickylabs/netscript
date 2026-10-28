@@ -18,3 +18,16 @@
 
 Issuer/auth/listener/CORS/health/browser-bootstrap scope is unchanged. No implementation, tests,
 independent PLAN-EVAL or IMPL-EVAL has run.
+
+## Current C3 documentation qualification,2026-10-28
+
+The intake paragraphs above are historical. Root accepted C1/C2 source and their measured focused
+gates; independent IMPL remains pending. The Fresh custom port widening is an accepted source
+compatibility boundary: external string-only serializers must forward native header records
+unchanged. C3 documents that migration, undefined-only legacy selection, replace-not-merge and
+native per-request callbacks. It corrects only the stale generic factory/module delegation prose.
+
+The earlier Fresh type-closure candidate failed actual owning doc replay and was archived/reverted;
+its historical PLAN disposition is not a successful application. Fresh12/workers1 findings remain
+unwaived. Broader type exports/debt need separate corrective review. No issuer/browser/bootstrap
+authority, runtime/API behavior, dependency/lock, source export or canonical debt changes in C3.

@@ -1,0 +1,136 @@
+diff --git a/.llm/runs/fix-browser-stream-headers--u3/drift.md b/.llm/runs/fix-browser-stream-headers--u3/drift.md
+index db9c29a93..570989856 100644
+--- a/.llm/runs/fix-browser-stream-headers--u3/drift.md
++++ b/.llm/runs/fix-browser-stream-headers--u3/drift.md
+@@ -18,3 +18,16 @@
+ 
+ Issuer/auth/listener/CORS/health/browser-bootstrap scope is unchanged. No implementation, tests,
+ independent PLAN-EVAL or IMPL-EVAL has run.
++
++## Current C3 documentation qualification,2026-10-28
++
++The intake paragraphs above are historical. Root accepted C1/C2 source and their measured focused
++gates; independent IMPL remains pending. The Fresh custom port widening is an accepted source
++compatibility boundary: external string-only serializers must forward native header records
++unchanged. C3 documents that migration, undefined-only legacy selection, replace-not-merge and
++native per-request callbacks. It corrects only the stale generic factory/module delegation prose.
++
++The earlier Fresh type-closure candidate failed actual owning doc replay and was archived/reverted;
++its historical PLAN disposition is not a successful application. Fresh12/workers1 findings remain
++unwaived. Broader type exports/debt need separate corrective review. No issuer/browser/bootstrap
++authority, runtime/API behavior, dependency/lock, source export or canonical debt changes in C3.
+diff --git a/.llm/runs/fix-browser-stream-headers--u3/research.md b/.llm/runs/fix-browser-stream-headers--u3/research.md
+index 1bb432654..2eda6a39e 100644
+--- a/.llm/runs/fix-browser-stream-headers--u3/research.md
++++ b/.llm/runs/fix-browser-stream-headers--u3/research.md
+@@ -74,3 +74,22 @@ to Fable5.1 low, fallback Muse Spark1.3 xhigh. Native print uses the existing `r
+ and verified official task-owned Claude2.1.251 executable; normal existing authenticated
+ subscription, no key/profile copies. Root selects the separate plan evaluator after reading the
+ concrete output.
++
++## C3 verified documentation surface,2026-10-28
++
++The original discovery and proposed gates above are historical. Root-accepted C1/C2 source now
++forwards the native client0.2.7 HeadersRecord unchanged; runtime/compiler controls prove lazy sync
++and async values, live record contents, request rotation, absence/empty separation and preserved
++collections. Fresh also proves reconnect/checkpoint/entity identity and denied framework-auth env
++reads through its documented custom native port. These forwarding primitives do not issue or
++authenticate reader credentials. Default native warning behavior is not an all-env-denied claim.
++
++C3's workers reader-header recipe uses the actual public factory and Promise-valued per-header
++callback. Omission/undefined alone retains getStreamsAuth; supplied empty does not merge producer
++credentials. The Fresh custom-port widening requires migration for string-only external serializers.
++The generic factory and streams module introductions no longer claim plugin factories delegate
++through Fresh. No production body, public type/export or lifecycle change is part of these edits.
++
++Fresh owning doc12 and workers owning doc1 stay unwaived. The ineffective source-local export/debt
++was removed after its real closure condition failed; S00's isolated diagnostics and corrective
++independent review are separate work, not a C3 export/debt authorization.
+diff --git a/.llm/runs/fix-browser-stream-headers--u3/worklog.md b/.llm/runs/fix-browser-stream-headers--u3/worklog.md
+index c1dce7777..a5ad4c8a2 100644
+--- a/.llm/runs/fix-browser-stream-headers--u3/worklog.md
++++ b/.llm/runs/fix-browser-stream-headers--u3/worklog.md
+@@ -127,3 +127,22 @@ and publish dry-run pass. Workers public doc0-to1 remains RED; Fresh12 and DBide
+ unwaived. The failed F15 application is archived/reverted, not a revoked historical verdict or
+ successful closure. C2 authorized for draft checkpoint/push; C3 docs are the next scoped source
+ work and require root review before their checkpoint. No independent IMPL or shipping acceptance.
++
++## C3 documentation candidate,2026-10-28
++
++Added the native reader-header recipe, replacement/undefined semantics, custom-port migration and
++caller credential ownership to streams.md. Corrected only the two stale generic-factory module
++introductions; their remaining source is byte-identical to C2 HEAD. No runtime/API/export/debt change.
++
++Actual docs:snippets passed (27 checked/14 exempt), but this streams page is outside its Tier-1
++coverage. A separate exact-fence public compiler control passed; changing the header value to1
++failed TS2322, with native child output awaited and temporary sources removed. Scoped source fmt
++passed2files; the exact added Markdown section passed. Full scoped Markdown fmt still reports the
++same two findings reproduced from unchanged HEAD streams.md/worklog.md; no formatting waiver.
++
++Actual docs:links failed5 installed Aspire-skill targets; exports-drift and accuracy failed the
++36 Windows reference-path coverage prerequisites. docs:jsdoc-examples failed Windows spawn error206
++(command length), without reaching its deadline. These gates remain RED; no doc/export parity or
++global example-compiler PASS is inferred. Raw receipts and source hashes are sealed under ignored
++native-sol/c3 evidence for root review before any C3 checkpoint. Fresh12/workers1 and the failed F15
++application remain unwaived; no independent IMPL or release acceptance follows.
+diff --git a/docs/site/durable-workflows/streams.md b/docs/site/durable-workflows/streams.md
+index 2b42f07e7..dd7c8a3c3 100644
+--- a/docs/site/durable-workflows/streams.md
++++ b/docs/site/durable-workflows/streams.md
+@@ -299,6 +299,28 @@ diagnostic report for a schema (handy in tests and CLI doctors).
+   ]
+ }) }}
+ 
++### Caller-provided reader headers
++
++Fresh `createNetScriptStreamDB` and workers `createWorkersStreamDB` accept native
++`HeadersRecord` values from `@durable-streams/client`: each value is a string or
++a sync/async callback. The native client resolves callbacks per request, including
++reads after a Fresh reconnect.
++
++```ts
++import { createWorkersStreamDB } from "@netscript/plugin-workers/streams";
++declare const readReaderToken: () => Promise<string>;
++const workers = createWorkersStreamDB({
++  headers: { authorization: async () => `Bearer ${await readReaderToken()}` },
++});
++```
++
++Any supplied record, including `{}`, replaces ambient producer auth completely;
++only omission or `undefined` selects `getStreamsAuth()`. Fresh's exported custom
++`createStreamDB` port now accepts native header values instead of strings only:
++external serializers must forward the record unchanged to the native client.
++Header forwarding neither issues credentials nor authenticates a reader; callers
++still own reader credential and browser bootstrap policy.
++
+ ### Resolved stream URLs
+ 
+ When configuring `streamPath` (e.g. `streamPath: '/workers/executions'`), the framework automatically prepends `STREAMS_URL_PREFIX = '/v1/stream/netscript'` inside `buildStreamUrl`.
+diff --git a/packages/fresh/src/runtime/streams/create-stream-db.ts b/packages/fresh/src/runtime/streams/create-stream-db.ts
+index 445c357fd..853ecfac9 100644
+--- a/packages/fresh/src/runtime/streams/create-stream-db.ts
++++ b/packages/fresh/src/runtime/streams/create-stream-db.ts
+@@ -7,8 +7,8 @@
+  * URL resolution and auth header injection.
+  *
+  * Plugin-specific factories (`createWorkersStreamDB`, `createSagasStreamDB`,
+- * `createTriggersStreamDB`) live in their own plugin packages and call this
+- * internally.
++ * `createTriggersStreamDB`) live in their own plugin packages. Use this generic
++ * factory for other compatible stream schemas.
+  *
+  * @module
+  */
+diff --git a/packages/fresh/src/runtime/streams/mod.ts b/packages/fresh/src/runtime/streams/mod.ts
+index 67df3c8df..8b57d9e71 100644
+--- a/packages/fresh/src/runtime/streams/mod.ts
++++ b/packages/fresh/src/runtime/streams/mod.ts
+@@ -11,7 +11,7 @@
+  * - Re-exports of useful types from `@durable-streams/state`
+  *
+  * Plugin-specific factories (`createWorkersStreamDB`, etc.) live in their
+- * respective plugin packages and import from here via `@netscript/fresh/streams`.
++ * respective plugin packages; this subpath provides the generic stream factory.
+  *
+  * @module
+  */

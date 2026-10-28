@@ -7,8 +7,8 @@
  * URL resolution and auth header injection.
  *
  * Plugin-specific factories (`createWorkersStreamDB`, `createSagasStreamDB`,
- * `createTriggersStreamDB`) live in their own plugin packages and call this
- * internally.
+ * `createTriggersStreamDB`) live in their own plugin packages. Use this generic
+ * factory for other compatible stream schemas.
  *
  * @module
  */

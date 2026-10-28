@@ -1,0 +1,15 @@
+{
+  "selected": "recipe",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/check-reader-recipe.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:30:42.316Z",
+  "ended": "2026-10-28T01:30:45.126Z",
+  "originalOutputAwaited": true,
+  "deadlineAborted": false,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/recipe-1793151042313"
+}

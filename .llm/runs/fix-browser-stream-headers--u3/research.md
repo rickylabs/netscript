@@ -74,3 +74,22 @@ to Fable5.1 low, fallback Muse Spark1.3 xhigh. Native print uses the existing `r
 and verified official task-owned Claude2.1.251 executable; normal existing authenticated
 subscription, no key/profile copies. Root selects the separate plan evaluator after reading the
 concrete output.
+
+## C3 verified documentation surface,2026-10-28
+
+The original discovery and proposed gates above are historical. Root-accepted C1/C2 source now
+forwards the native client0.2.7 HeadersRecord unchanged; runtime/compiler controls prove lazy sync
+and async values, live record contents, request rotation, absence/empty separation and preserved
+collections. Fresh also proves reconnect/checkpoint/entity identity and denied framework-auth env
+reads through its documented custom native port. These forwarding primitives do not issue or
+authenticate reader credentials. Default native warning behavior is not an all-env-denied claim.
+
+C3's workers reader-header recipe uses the actual public factory and Promise-valued per-header
+callback. Omission/undefined alone retains getStreamsAuth; supplied empty does not merge producer
+credentials. The Fresh custom-port widening requires migration for string-only external serializers.
+The generic factory and streams module introductions no longer claim plugin factories delegate
+through Fresh. No production body, public type/export or lifecycle change is part of these edits.
+
+Fresh owning doc12 and workers owning doc1 stay unwaived. The ineffective source-local export/debt
+was removed after its real closure condition failed; S00's isolated diagnostics and corrective
+independent review are separate work, not a C3 export/debt authorization.

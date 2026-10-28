@@ -127,3 +127,22 @@ and publish dry-run pass. Workers public doc0-to1 remains RED; Fresh12 and DBide
 unwaived. The failed F15 application is archived/reverted, not a revoked historical verdict or
 successful closure. C2 authorized for draft checkpoint/push; C3 docs are the next scoped source
 work and require root review before their checkpoint. No independent IMPL or shipping acceptance.
+
+## C3 documentation candidate,2026-10-28
+
+Added the native reader-header recipe, replacement/undefined semantics, custom-port migration and
+caller credential ownership to streams.md. Corrected only the two stale generic-factory module
+introductions; their remaining source is byte-identical to C2 HEAD. No runtime/API/export/debt change.
+
+Actual docs:snippets passed (27 checked/14 exempt), but this streams page is outside its Tier-1
+coverage. A separate exact-fence public compiler control passed; changing the header value to1
+failed TS2322, with native child output awaited and temporary sources removed. Scoped source fmt
+passed2files; the exact added Markdown section passed. Full scoped Markdown fmt still reports the
+same two findings reproduced from unchanged HEAD streams.md/worklog.md; no formatting waiver.
+
+Actual docs:links failed5 installed Aspire-skill targets; exports-drift and accuracy failed the
+36 Windows reference-path coverage prerequisites. docs:jsdoc-examples failed Windows spawn error206
+(command length), without reaching its deadline. These gates remain RED; no doc/export parity or
+global example-compiler PASS is inferred. Raw receipts and source hashes are sealed under ignored
+native-sol/c3 evidence for root review before any C3 checkpoint. Fresh12/workers1 and the failed F15
+application remain unwaived; no independent IMPL or release acceptance follows.

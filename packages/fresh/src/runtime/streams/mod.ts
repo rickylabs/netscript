@@ -11,7 +11,7 @@
  * - Re-exports of useful types from `@durable-streams/state`
  *
  * Plugin-specific factories (`createWorkersStreamDB`, etc.) live in their
- * respective plugin packages and import from here via `@netscript/fresh/streams`.
+ * respective plugin packages; this subpath provides the generic stream factory.
  *
  * @module
  */

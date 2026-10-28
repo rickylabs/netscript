@@ -1,0 +1,7 @@
+{
+  "code": 1,
+  "error": "Protected input changed: deno.lock",
+  "cause": "Attempt compared Git LF blob bytes to accepted CRLF working bytes. Actual working hash matches accepted C2 f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32; git ls-files --eol reports i/lf w/crlf. No lock mutation or product failure.",
+  "script": "seal-attempt1.ts",
+  "retainedSourceSnapshots": "source-final/"
+}
