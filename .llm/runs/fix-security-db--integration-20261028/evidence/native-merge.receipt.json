@@ -1,0 +1,7 @@
+﻿{
+    "operation":  "native git merge --no-ff --signoff",
+    "exitCode":  0,
+    "securityParent":  "77a3bfb17fe068315e87f1562dffb8dde0377b80",
+    "dbParent":  "ec3cc9161474ef1e1298e7a91148d1ee781cc61d",
+    "authoritySha256":  "9410cca810a7a4ceeaac6ec7932ed6dfc1c27c89144e76caac49b42cdade5b4c"
+}

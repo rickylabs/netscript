@@ -1,0 +1,174 @@
+{
+  "at": "2026-10-28T03:22:42.723Z",
+  "targetHead": "d4b391217664371c17295529b956bd9f8950712a",
+  "pr": 2425,
+  "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+  "reviewer": "openrouter/z-ai/glm-5.3-flash",
+  "effort": "provider_default requested; actual effort unattested",
+  "rootFullFinalAndMcpRead": true,
+  "all14EofReadsManuallyVerified": true,
+  "sourceAcceptance": "PASS for this independent leaf, not repository merge readiness",
+  "rootGuardPassBeforeCopies": true,
+  "rootSealsVerified": 41,
+  "holdUsd": 0.7,
+  "holdReleased": true,
+  "publicObservedCost": 0.039793459999999996,
+  "keyDeltaNotChargeAttribution": true,
+  "rows": [
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/native.stdout.jsonl",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/native.stdout.jsonl",
+      "sha256": "e7ca9a801a5b8bfa9b07177df0306fd8f370970f1b2f90e6cbb82225bc66251a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/coverage.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/coverage.json",
+      "sha256": "d50b4e7d9af51b2ad7c422e5f53e180b3cf1001b457471587d4cbdd406dcbf3d"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/observed-identity.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/observed-identity.json",
+      "sha256": "99456167f423b0e31df2ecea8936ecddae99a780b7459cfc296758f822f98f76"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/result.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/result.json",
+      "sha256": "047503a6d92f21cdacb33aba5646b723085bf46dbaf2d3583b3433eb109b836d"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/final-guards.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/final-guards.json",
+      "sha256": "1484b9a0a2bb79c1caf05614ba9c030c94a4266c68bc46e8def6663e0c9b5970"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/allowance-launch.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/allowance-launch.json",
+      "sha256": "bab6bad3989b2417bb6b894b86544996a8b70996822218dd495e84af81cb1b4a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/allowance-after.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/allowance-after.json",
+      "sha256": "13cb2796853460c8883a4727c719a305627718f0d805f5950fdb4a10e4521a24"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/price-launch.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/price-launch.json",
+      "sha256": "6d3834984e348adde7ae0b4462afaf910cf6c2e23000729891721404dba84d94"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/expense-launch.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/expense-launch.json",
+      "sha256": "e6d31f68548e8568ade520016db6ac2a47bf0c08700dae14b122e035a4e8863c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/model-launch-endpoints.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/model-launch-endpoints.json",
+      "sha256": "b2413cce8dbb9242283be06dd91a34b502b476ef47d5dd5a70a9ed4084f268a1"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/model-catalog.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/model-catalog.json",
+      "sha256": "f8059d640573ddd2eb94fb2af5d6de68e97c4e444ee630ca5804e15ae1a14c96"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/effective-config.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/effective-config.json",
+      "sha256": "51e3932acf5d2969e94a3c979771850e3dadb248c1e3c1fc03a3cd49c33f78d1"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/root-launch-authorization.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/root-launch-authorization.json",
+      "sha256": "7c6474d0115398e060a51179bfc78d5470b4fafdd3fac1f5d941ed8d1e86173f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/preparation-corrected.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/preparation-corrected.json",
+      "sha256": "ba74cbfbd31a6b6da26ff0c049acd2f652c47b36c99583f3776d7aa65b78f698"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/prepared-handoff-corrected.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/prepared-handoff-corrected.json",
+      "sha256": "9280efaba01c2750f703b253f6e8a8afda93b4bb732332852abf7181e1527ca7"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/prompt.md",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/prompt.md",
+      "sha256": "489fdc4d36eeadf63ae62546ddc384d6976d822e88b2a958fcf23811352b9376"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/packet-manifest.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/packet-manifest.json",
+      "sha256": "2c7f7811effc5905784d7f6b60b3b88f2fd8a17d90e877df3c4e7fff8a7027a5"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/source-snapshot.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/source-snapshot.json",
+      "sha256": "8a4fe1226026aeec6361e601f7a03c8dd4531191a63d0d9b89aa8172ae462255"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/route.json",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/route.json",
+      "sha256": "07f4d8e6f8ca51be279b524df639b46a26864620edc46ebd61f83d409cd33d5c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/guard-correction.diff",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/guard-correction.diff",
+      "sha256": "3afd6ac77fcf175cffc06b8d099ba690e261b6d3cacc7289f8ff1d36d2c716ae"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/corrected-check-attempt1.log",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/corrected-check-attempt1.log",
+      "sha256": "735e3ff9ca693f1f474f32ac5d04336ee38bbff5e1813261aa432261887cdf91"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/corrected-controls-attempt1.log",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/corrected-controls-attempt1.log",
+      "sha256": "87a3454becec82665abc0926bc84b81497d260abf553758c4023fadcf56bdabe"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/implementation-driver-corrected.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/implementation-driver-corrected.ts.txt",
+      "sha256": "cecdd6be6db20e8d08a014066ea0fc38cee3537d12b667b54e62e91d2978c322"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/common-corrected.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/common-corrected.ts.txt",
+      "sha256": "feb8c8e1a4814d16b12975c1c921fe0356924c942362573291928dbb5e0e0ef5"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/public-events-corrected.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/public-events-corrected.ts.txt",
+      "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/owned-spawn-corrected.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/owned-spawn-corrected.ts.txt",
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/owned-capture.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/owned-capture.ts.txt",
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/review-audit.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/review-audit.ts.txt",
+      "sha256": "3ee8e60d8fac1f36e829bfdec31412ede59ffaffae1aac62089c56031916c8f0"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/mcp.jsonl",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/mcp.jsonl",
+      "sha256": "0da8160e9bf93927a040cd977030656d8ea503e75b3ba14b07ce629a09ea2aae"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/final-verdict.utf8.md",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028/final-verdict.utf8.md",
+      "sha256": "fe446890d8a6cc50fbfeedaa544ad9e1410acf7dfc45bea42ccc293709d1e82a"
+    },
+    {
+      "source": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/final-db-verdict.md",
+      "path": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008/.llm/runs/fix-native-db-graph-entry--qualification/evaluate.md",
+      "sha256": "90504bb6758f93b96a473fda65f5ade4ade7df66ebe142f950069bef28867efd"
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 /** Provider capability failures must never masquerade as successful operator revocation. */
 
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
-import { betterAuth } from 'npm:better-auth@^1.6.20';
-import { memoryAdapter } from 'npm:better-auth@^1.6.20/adapters/memory';
+import { betterAuth } from 'npm:better-auth@^1.7.7';
+import { memoryAdapter } from 'npm:better-auth@^1.7.7/adapters/memory';
 import { createBetterAuthBackend } from '@netscript/auth-better-auth';
 import { createWorkosBackend } from '@netscript/auth-workos';
 import { type AuthBackendPort, createAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';

@@ -1,0 +1,40 @@
+import {PublicEventCapture,publicEvent} from './public-events-corrected.ts';
+import {OwnedSpawn} from './owned-spawn-corrected.ts';
+function assert(value:unknown,message:string):asserts value{if(!value)throw new Error(message);}
+Deno.test({name:'public allowlist omits private unknown and extra fields',sanitizeOps:true,sanitizeResources:true,sanitizeExit:true,fn:async()=>{
+  const output:string[]=[];const capture=new PublicEventCapture(async text=>{output.push(text);});
+  const events=[{type:'reasoning',part:{text:'private-sentinel'}},{type:'future_unknown',secret:'private-sentinel'},
+    {type:'text',sessionID:'ses_fixture',private:'private-sentinel',part:{type:'text',text:'public é 😀',thinking:'private-sentinel'}},
+    {type:'tool_use',sessionID:'ses_fixture',private:'private-sentinel',part:{tool:'read',private:'private-sentinel',
+      state:{status:'completed',output:'public EOF',unknown:'private-sentinel',metadata:{truncated:false}}}}];
+  const bytes=new TextEncoder().encode(events.map(event=>JSON.stringify(event)).join('\n')+'\n');
+  for(let offset=0;offset<bytes.length;offset++)await capture.add(bytes.subarray(offset,offset+1));
+  await capture.finish();
+  assert(capture.omittedEvents===2&&capture.publicEvents===2,'Public/private event counts changed.');
+  assert(!output.join('').includes('private-sentinel'),'Private/unknown fields persisted.');
+  assert(output.join('').includes('public é 😀')&&output.join('').includes('public EOF'),'Public UTF-8/tool evidence lost.');
+  assert(publicEvent({type:'step_finish',part:{reason:'stop',cost:0.1,tokens:{input:1},private:'private-sentinel'}})?.type==='step_finish','Lifecycle omitted.');
+  assert(!JSON.stringify(publicEvent({type:'error',error:{name:'Error',message:'public-error',private:'private-sentinel'}})).includes('private-sentinel'),'Unknown error fields persisted.');
+}});
+Deno.test({name:'public capture enforces UTF-8 bytes and refuses malformed input',sanitizeOps:true,sanitizeResources:true,sanitizeExit:true,fn:async()=>{
+  const output:string[]=[];const capture=new PublicEventCapture(async text=>{output.push(text);});let overflow=false;
+  try{await capture.add(new TextEncoder().encode('é'.repeat(524289)));}catch(error){overflow=error instanceof Error&&error.message.includes('1MiB');}
+  assert(overflow&&output.length===0,'Multibyte line escaped the actual byte cap.');
+  const invalid=new PublicEventCapture(async text=>{output.push(text);});let rejected=false;
+  try{await invalid.add(new Uint8Array([255,10]));}catch{rejected=true;}
+  assert(rejected&&output.length===0,'Malformed UTF-8 reached disk.');
+}});
+Deno.test({name:'one inference spawn and error cleanup await native status and both pipes',sanitizeOps:true,sanitizeResources:true,sanitizeExit:true,fn:async()=>{
+  const owner=new OwnedSpawn();let calls=0;
+  const child=owner.spawn(()=>{calls++;return new Deno.Command(Deno.execPath(),{args:['eval','--no-config','await new Promise(resolve=>setTimeout(resolve,60000));'],
+    stdin:'null',stdout:'piped',stderr:'piped'}).spawn();});
+  let duplicate=false;let settlement;
+  try{
+    try{owner.spawn(()=>{calls++;return child;});}catch(error){duplicate=error instanceof Error&&error.message.includes('one inference spawn');}
+    throw new Error('Simulated runner failure before pipe consumption.');
+  }catch(error){assert(error instanceof Error&&error.message==='Simulated runner failure before pipe consumption.','Primary failure changed.');}
+  finally{settlement=await owner.settle(async()=>{await child.stderr.cancel();});}
+  assert(duplicate&&calls===1,'Second native inference factory executed.');
+  assert(settlement.spawnCount===1&&settlement.statusAwaited&&settlement.stdoutSettled&&settlement.pipesAwaited,'Owned status/pipe settlement incomplete.');
+  assert(settlement.failures.length===0,'Owned cleanup reported failure.');
+}});

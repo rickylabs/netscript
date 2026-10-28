@@ -1,0 +1,22 @@
+{
+  "sourceHead": "aec36a68e65df77012d4b2add4692e0b0506290f",
+  "model": "openrouter/z-ai/glm-5.3-flash",
+  "requestedVariant": "provider_default",
+  "estimatedCostUsd": 1.3,
+  "expenseAdmissionAllowed": true,
+  "selectedCredentialSource": "Exact EIS .env OPENROUTER_API_KEY assignment loaded in memory only",
+  "accountAndSelectedKeyMinimumProven": true,
+  "freshRootReservationAndSerializationMatched": true,
+  "driverSha256": "2efafb4c6d6b1f3c32b3c40f6cd769340e1495f34061924724ba4c71657e5570",
+  "preparationSha256": "d2481ddbf3a14626624a22bbf5275f850071a0d4277ae6d5968668c61ef795ed",
+  "assumptions": {
+    "steps": 8,
+    "inputPerStep": 320000,
+    "outputPerStep": 32000,
+    "noCacheDiscount": true,
+    "noProviderPin": true,
+    "estimateNotProviderCap": true
+  },
+  "holdReleasedPerRoot": true,
+  "noRawOperationalPayloadPublished": true
+}

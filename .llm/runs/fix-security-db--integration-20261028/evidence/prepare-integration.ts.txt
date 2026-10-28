@@ -1,0 +1,29 @@
+const dir='.llm/tmp/security-db-integration-20261028',run='.llm/runs/fix-security-db--integration-20261028';
+const parse=async(path:string)=>JSON.parse((await Deno.readTextFile(path)).replace(/^\uFEFF/,''));
+const hash=async(bytes:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+const git=async(args:string[])=>{const r=await new Deno.Command('git',{args,stdout:'piped',stderr:'piped'}).output();if(!r.success)throw new Error('Native source proof failed');return r.stdout;};
+const text=(b:Uint8Array)=>new TextDecoder().decode(b).trim();
+const head=text(await git(['rev-parse','HEAD']));if(head!=='c243d31535027addc034c99e170cb43d2faf475a')throw new Error('Merge head moved');
+const parents=text(await git(['show','--format=%P','--no-patch','HEAD'])).split(' ');if(JSON.stringify(parents)!==JSON.stringify(['77a3bfb17fe068315e87f1562dffb8dde0377b80','ec3cc9161474ef1e1298e7a91148d1ee781cc61d']))throw new Error('Native merge histories differ');
+const origin=await parse('.llm/tmp/security-impl-review-20261028/seven-owner-integration-source-proof.json');
+const names=text(await git(['diff','--name-only',origin.base,'HEAD'])).split(/\r?\n/).filter(p=>!p.startsWith('.llm/runs/')).sort();
+if(JSON.stringify(names)!==JSON.stringify(origin.files.map((r:{path:string})=>r.path).sort()))throw new Error('Source union is not exactly seven owners');
+for(const row of origin.files){if(await hash(await git(['show',`HEAD:${row.path}`]))!==row.gitBlobSha256||await hash(await Deno.readFile(row.path))!==row.gitBlobSha256)throw new Error('Accepted origin byte mismatch');}
+await Deno.mkdir(run,{recursive:true});await Deno.writeFile(`${run}/root-integration-authority.md`,await Deno.readFile('.llm/tmp/root-security-db-integration-authority-20261028.md'));
+await Deno.writeFile(`${run}/accepted-integration-proposal.md`,await Deno.readFile('.llm/tmp/security-impl-review-20261028/integration-proposal.md'));
+await Deno.writeTextFile(`${run}/.gitattributes`,'# Byte preservation for immutable integration evidence only.\n/evidence/** -text\n/root-* -text\n/accepted-integration-proposal.md -text\n');
+const proof={...origin,proposalOnly:false,noIntegrationPerformed:false,actualMergeHead:head,actualParents:parents,exactSevenSourceUnion:true,allOriginBytesMatch:true,noConflictResolution:true,sourceOwners:names};await Deno.writeTextFile(`${dir}/seven-owner-proof.json`,JSON.stringify(proof,null,2)+'\n');
+await Deno.writeTextFile(`${run}/plan.md`,'# Atomic security and native DB integration\n\nRoot explicitly selected the existing security branch plus accepted DB history, with exactly7\nsource owners byte-identical to their accepted origins. Preserve both independent leaf records.\nPLAN-EVAL:N/A for this fixed union; root acceptance and SAME-security-session continuation remain.\n\nNarrow qualification: owning DB6 controls,2-file types/lint/format with actual nonempty counts,\nnative critical audit and ONE Windows composite architecture check including both actual cold\nconsumers. Preserve all failures/cleanup. Do not rerun accepted unrelated gates or change source,\nassertions, sanitizers, admission, locks, debt or CI. Parent Windows baseline16/CRLF/docs remain\nunwaived parent qualification; do not invent new leaf requirements.\n\nPush only after required combined GREEN and exact index/HEAD/source-origin audit. PR2426 becomes\nthe explicit atomic7-owner candidate; DB2425 stays open until accepted combined main merge.\nPrepare continuation only; no inference, reservation, final acceptance or merge readiness.\n');
+const rootConfig=await parse('deno.json');await Deno.writeTextFile(`${dir}/lint-canonical-rules.json`,JSON.stringify({lint:{rules:rootConfig.lint.rules}},null,2)+'\n');
+const files=['.llm/tools/deps/check-db-alignment.ts','.llm/tools/deps/check-db-alignment_test.ts'];
+const prefix=['run','--cached-only','--frozen','--allow-read','--allow-write','--allow-run'];
+const select=['--file',files[0],'--file',files[1]];
+const requests={
+ 'db-owning':{timeoutMs:120000,args:[...prefix,'.llm/tools/run-deno-test.ts','--output',`${dir}/db-owning.json`,'--','--cached-only','--frozen','--check','--allow-all','--sanitize-ops','--sanitize-resources','--trace-leaks',files[1]],childReport:`${dir}/db-owning.json`},
+ 'db-check':{timeoutMs:120000,args:[...prefix,'.llm/tools/run-deno-check.ts',...select,'--deno-arg','--cached-only','--deno-arg','--frozen','--output',`${dir}/db-check.json`],childReport:`${dir}/db-check.json`},
+ 'db-lint-canonical':{timeoutMs:120000,args:[...prefix,'.llm/tools/run-deno-lint.ts',...select,'--config',`${dir}/lint-canonical-rules.json`,'--output',`${dir}/db-lint-canonical.json`],childReport:`${dir}/db-lint-canonical.json`},
+ 'db-fmt':{timeoutMs:120000,args:[...prefix,'.llm/tools/run-deno-fmt.ts',...select,'--output',`${dir}/db-fmt.json`],childReport:`${dir}/db-fmt.json`},
+ 'audit-critical':{timeoutMs:120000,args:['task','audit:critical']},
+ 'arch-check':{timeoutMs:180000,args:['task','arch:check']}
+};for(const[name,request]of Object.entries(requests))await Deno.writeTextFile(`${dir}/${name}.request.json`,JSON.stringify(request,null,2)+'\n');
+console.log(JSON.stringify({mergeHead:head,exactSevenOwners:true,allOriginBytesMatch:true,canonicalRun:run,nativeMergeSignedOff:true}));

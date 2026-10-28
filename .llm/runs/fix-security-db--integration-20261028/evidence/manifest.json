@@ -1,0 +1,396 @@
+{
+    "qualifiedSourceHead":  "c243d31535027addc034c99e170cb43d2faf475a",
+    "records":  [
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/arch-check.native-stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/arch-check.native-stderr.log",
+                        "bytes":  1744,
+                        "sha256":  "bfc2aae5cb02740e4d95f807cb477d1b269c566ec4c2c077f28dbf913f8c0712"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/arch-check.native-stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/arch-check.native-stdout.log",
+                        "bytes":  48308,
+                        "sha256":  "050a24342656fc2b41ad63767aca7196364630438d04f63cb425506a706ba47f"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/arch-check.process.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/arch-check.process.json",
+                        "bytes":  910,
+                        "sha256":  "5df235d3c929c1b1c55cc2734ba8949ae94833966367df3af719bfe28bd1780c"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/arch-check.receipt.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/arch-check.receipt.json",
+                        "bytes":  52180,
+                        "sha256":  "4d16a41b6236b2e8d63cd3d61156375fcdf32030ade1c3cf21e14a985bc3cd44"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/arch-check.request.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/arch-check.request.json",
+                        "bytes":  72,
+                        "sha256":  "340238f3cc99deba39d83091d343c9d452f5559179f6c47c9e7bc1158bf03161"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/arch-check.stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/arch-check.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/arch-check.stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/arch-check.stdout.log",
+                        "bytes":  103044,
+                        "sha256":  "e39b695a8873025fe421a5e0a3a476effc782e67b045764d065fec22965abbd5"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/archive-integration.stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/archive-integration.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/archive-integration.stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/archive-integration.stdout.log",
+                        "bytes":  644,
+                        "sha256":  "7c10d5ddead9b9612ab9ca344b8cc4b3a67e6fc0b04745ad278b95353de09723"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/archive-integration.ts",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/archive-integration.ts.txt",
+                        "bytes":  6500,
+                        "sha256":  "321f55badf596c1ef79e132ca602064bde9ad67949c378e5f71970e9830561f8"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/audit-critical.native-stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/audit-critical.native-stderr.log",
+                        "bytes":  48,
+                        "sha256":  "f07abc59413789c36d5deaadbe14116f18ba430d5c11b91a4c1e6619774681c9"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/audit-critical.native-stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/audit-critical.native-stdout.log",
+                        "bytes":  75,
+                        "sha256":  "ad243fc31fc43a63836efa8f029ab1a206d535634583e2a9d20c05857f679492"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/audit-critical.process.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/audit-critical.process.json",
+                        "bytes":  926,
+                        "sha256":  "cccd77c38c8ef44e5deec84f3ff970360ca4b90dfd3b9999d4fb619b9e0e1bc7"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/audit-critical.receipt.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/audit-critical.receipt.json",
+                        "bytes":  925,
+                        "sha256":  "e74ff897c21a2a9d90633ad5a9ebc0ab08ad24c7e930fc1e2fff2cfdf2ec9e4f"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/audit-critical.request.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/audit-critical.request.json",
+                        "bytes":  76,
+                        "sha256":  "423794701cc277c54e30d0ab01809e8eda0d3a8f86665306c9062e686228f2e8"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/audit-critical.stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/audit-critical.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/audit-critical.stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/audit-critical.stdout.log",
+                        "bytes":  1614,
+                        "sha256":  "26bd1a0976698fd0470a8da78072e897568aeb2883ecef22f5d21af763391457"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/cleanup.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/cleanup.json",
+                        "bytes":  273,
+                        "sha256":  "baca7b916fadf9ac9d2ff511fee373d58afa4a341e1f5ece54d265f9435096cc"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/combined-qualification.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/combined-qualification.json",
+                        "bytes":  1790,
+                        "sha256":  "729267e19b74f050875cdf6e1c9c54623708cd9d86a8a94a2d880e9375c5fb15"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/combined-seven-owner.diff",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/combined-seven-owner.diff",
+                        "bytes":  33447,
+                        "sha256":  "4100ceedfb09b3a7f42a8bc126c498c55310bfb6d93649fad54f14c78ade45b3"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-check.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.json",
+                        "bytes":  337,
+                        "sha256":  "5a58378425da72fed87e7cd843813d4cf14c95e8988939307060be80852dd49b"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-check.native-stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.native-stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-check.native-stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.native-stdout.log",
+                        "bytes":  156,
+                        "sha256":  "f12162dedc7809715d672678689af1d62842fb693b6cee45eed14066e2a2c737"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-check.process.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.process.json",
+                        "bytes":  902,
+                        "sha256":  "b03e55c6d7b44538a9ff345836e4bdedbaad8c164f7c14297502dec7757aeda2"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-check.receipt.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.receipt.json",
+                        "bytes":  1425,
+                        "sha256":  "074ab89f7b65bf9bd0e36cb35b9e9a898a4c267f6f9c9aad280200977d3e0e8c"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-check.request.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.request.json",
+                        "bytes":  537,
+                        "sha256":  "2196dec67cf55e19626f98cdaf79c1f6c5aff169822e83a54ca1deb0b1b3cc16"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-check.stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-check.stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-check.stdout.log",
+                        "bytes":  2456,
+                        "sha256":  "b5780037a3599e559549effbd4d3ccb976ea0a1605fcc3046d4b39a072b9f1da"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-fmt.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.json",
+                        "bytes":  311,
+                        "sha256":  "391ff91f31530e33acae0bb50c860506ab8c315d003327eaccc84725124d7de6"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-fmt.native-stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.native-stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-fmt.native-stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.native-stdout.log",
+                        "bytes":  160,
+                        "sha256":  "fdf1eeb24dbc7037060ffd4f2eb95618b670c30837b3280b0fa0dc7d70f1302d"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-fmt.process.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.process.json",
+                        "bytes":  894,
+                        "sha256":  "9b5ee56464b4978f0fa88b4077da790def3f35832a3e8e6c94a7d4e3d19f784f"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-fmt.receipt.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.receipt.json",
+                        "bytes":  1350,
+                        "sha256":  "9bdf1c9b6966d032e1c616fa04bca78c272f7457c6847b53ab097b04b63cd35e"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-fmt.request.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.request.json",
+                        "bytes":  458,
+                        "sha256":  "8149da3ab216a5ee4a35644f13bb77929769d448a2eba78e6d0359563d3e7360"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-fmt.stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-fmt.stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-fmt.stdout.log",
+                        "bytes":  2346,
+                        "sha256":  "2937b9b7a5d750f2bdca44f67d0d22526591723e50ecf1e24da210fc8bb8dd19"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-lint-canonical.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.json",
+                        "bytes":  362,
+                        "sha256":  "67b5e4e9a6361e7f2790563106bbc093f46630e73d376731fdc7ed164cd9f3da"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-lint-canonical.native-stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.native-stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-lint-canonical.native-stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.native-stdout.log",
+                        "bytes":  165,
+                        "sha256":  "9b9c7000d082d4fc97cc3cdd70b70424f5c884925407f879f8986c1378f5bfc4"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-lint-canonical.process.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.process.json",
+                        "bytes":  938,
+                        "sha256":  "ed4ebe642d62b518cbeae90cb7b15570b71165c7db5307d4fa7c3fec9db96c59"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-lint-canonical.receipt.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.receipt.json",
+                        "bytes":  1478,
+                        "sha256":  "4d1f819900bc50d78b011c51518b78c26be267c196edcd493023907eebe3169d"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-lint-canonical.request.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.request.json",
+                        "bytes":  572,
+                        "sha256":  "3229eaccc128f9760d434037362358eee034f8a6790fef4980eefd3db7695445"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-lint-canonical.stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-lint-canonical.stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-lint-canonical.stdout.log",
+                        "bytes":  2582,
+                        "sha256":  "63c5429d81f0f8177c7633b7315a166cde68cb87854bcd5381b20a5840587285"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-owning.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.json",
+                        "bytes":  417,
+                        "sha256":  "5c26794b1c53b87dba62713d74145a90f1ca57da18fe04475908349c0737f14d"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-owning.native-stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.native-stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-owning.native-stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.native-stdout.log",
+                        "bytes":  152,
+                        "sha256":  "25d5c1e5295807c7399a1f97b75b9efccb27e10132bfab72cf9350a23c92786f"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-owning.process.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.process.json",
+                        "bytes":  906,
+                        "sha256":  "c5bc8714b196d973f4ca030892bd2eca15a0849bbccc105ef082ed2c8b075de4"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-owning.receipt.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.receipt.json",
+                        "bytes":  1432,
+                        "sha256":  "525b5dd7b28ed77a6661ad352790de3e12cde6a471d351e4afba22303609cd5a"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-owning.request.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.request.json",
+                        "bytes":  544,
+                        "sha256":  "9779a0c661c31a19d714f0250c961f52b708e83d0c84c9b8786efb58ff564d78"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-owning.stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/db-owning.stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/db-owning.stdout.log",
+                        "bytes":  2460,
+                        "sha256":  "7e4005b875292341e9e6de8c7becbb08a22d94de4897b9b1bfd88a5847ff75e5"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/lint-canonical-rules.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/lint-canonical-rules.json",
+                        "bytes":  185,
+                        "sha256":  "6719ae56409be666c395e987e248958bd4af54efa9e3f23d6575c4362fcb9c0a"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/native-merge-message.txt",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/native-merge-message.txt",
+                        "bytes":  249,
+                        "sha256":  "16c5ba6d396021f8fcd78043ef999ba85879ac5f73ed1dabf3d51378dd2d708c"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/native-merge.receipt.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/native-merge.receipt.json",
+                        "bytes":  309,
+                        "sha256":  "04f14350464d7f449c9a93bab7489b3dcfa5c0ad737590a10e6be6329aaec428"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/native-merge.stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/native-merge.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/native-merge.stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/native-merge.stdout.log",
+                        "bytes":  37444,
+                        "sha256":  "ce8ff994bb3146af9deed17b3198b05774920e514702dffc933dc89d573c4826"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/prepare-integration.process.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/prepare-integration.process.json",
+                        "bytes":  911,
+                        "sha256":  "c9e78d2ea0e4a00bea8f3c607fd6594520489cd4123e0abd76a99199ed80cfc5"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/prepare-integration.stderr.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/prepare-integration.stderr.log",
+                        "bytes":  0,
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/prepare-integration.stdout.log",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/prepare-integration.stdout.log",
+                        "bytes":  406,
+                        "sha256":  "d14baedefc261afbc57db386299c6c698b77e5f9e7864bda5fa9fe5963f0184f"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/prepare-integration.ts",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/prepare-integration.ts.txt",
+                        "bytes":  5315,
+                        "sha256":  "eb86157aa2f897f3b79240998356bc5d702a50b66195751669163f3dea0b8636"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/run-deno.ps1",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/run-deno.ps1.txt",
+                        "bytes":  1838,
+                        "sha256":  "105fa11b0fe86005c50f2d6f6b16718d4b7fef27de0b9124ab90214de4fccea3"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/run-gate.ts",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/run-gate.ts.txt",
+                        "bytes":  1266,
+                        "sha256":  "aca6755b1ede7c0e35f6e9c1406f5738c6f4c51458605c80f155e32a940a4d83"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/security-to-integration-db.diff",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/security-to-integration-db.diff",
+                        "bytes":  5909,
+                        "sha256":  "406fd7521b3efed90d0c6e26c5e819817400bb6f7f80e5b85f470b0dd20c495e"
+                    },
+                    {
+                        "source":  ".llm/tmp/security-db-integration-20261028/seven-owner-proof.json",
+                        "path":  ".llm/runs/fix-security-db--integration-20261028/evidence/seven-owner-proof.json",
+                        "bytes":  3317,
+                        "sha256":  "d2c6a2e6f1b89702254b9d526410a8984abeb89ec2ab3143abc2b5216e9f39ff"
+                    }
+                ],
+    "archiveSettlementRefresh":  "Outer archive stdout/stderr refreshed after native archive process settled; no published evidence rewritten."
+}

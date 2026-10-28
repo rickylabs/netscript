@@ -1,0 +1,16 @@
+﻿{
+    "name":  "auth-unchanged-baseline",
+    "startedUtc":  "2026-10-28T03:23:50.0039617Z",
+    "finishedUtc":  "2026-10-28T03:23:50.3215068Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-all",
+                      ".llm/tmp/better-auth-security-sol-20261028/qualify-baseline.ts"
+                  ],
+    "exitCode":  1,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\auth-unchanged-baseline.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\auth-unchanged-baseline.stderr.log"
+}

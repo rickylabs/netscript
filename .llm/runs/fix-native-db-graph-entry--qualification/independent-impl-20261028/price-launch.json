@@ -1,0 +1,14 @@
+{
+  "capturedAt": "2026-10-28T03:15:54.380Z",
+  "inputMaxUsdPerMillion": 0.28099999999999997,
+  "outputMaxUsdPerMillion": 0.75,
+  "steps": 8,
+  "inputPerStep": 96000,
+  "outputPerStep": 32000,
+  "prospectiveUsd": 0.63476,
+  "estimateUsd": 0.7,
+  "noCacheDiscount": true,
+  "noProviderPin": true,
+  "estimateNotProviderCap": true,
+  "nativeCatalogLimitNotEffectiveOutputCap": true
+}

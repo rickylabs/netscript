@@ -1,0 +1,71 @@
+{
+  "qualifiedSourceHead": "c243d31535027addc034c99e170cb43d2faf475a",
+  "exactSevenOriginBytes": true,
+  "gates": [
+    {
+      "name": "db-owning",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1038
+    },
+    {
+      "name": "db-check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 771
+    },
+    {
+      "name": "db-lint-canonical",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 181
+    },
+    {
+      "name": "db-fmt",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 269
+    },
+    {
+      "name": "audit-critical",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 908
+    },
+    {
+      "name": "arch-check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 22409
+    }
+  ],
+  "dbOwning": {
+    "passed": 6,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 6,
+    "uniqueFailures": 0
+  },
+  "staticSelection": 2,
+  "criticalAudit": "47lower findings;0critical; native exit0",
+  "coldIdentities": [
+    "db-alignment sdk-fresh identities=@tanstack/db@0.13.0_typescript@7.0.2",
+    "db-alignment fresh-only identities=@tanstack/db@0.13.0_typescript@7.0.2",
+    "db-alignment PASS"
+  ],
+  "compositeNativeStdoutBytes": 48308,
+  "compositeNativeStderrBytes": 1744,
+  "fullNativeCompositeTextCaptured": true,
+  "cleanup": {
+    "at": "2026-10-28T04:37:31.4962392Z",
+    "ownedTempEntries": 0,
+    "rootPackageJsonExists": false,
+    "ownedNativeProcessesObserved": 0,
+    "observation": "Win32_Process deno.exe filtered by exact worktree command line after all gate runners settled"
+  },
+  "lintRulesExact": true,
+  "oldLintExclusionReceiptPreservedInDbLeaf": true,
+  "parentBaselineUnwaived": true,
+  "noInference": true,
+  "noIndependentIntegrationVerdictYet": true
+}

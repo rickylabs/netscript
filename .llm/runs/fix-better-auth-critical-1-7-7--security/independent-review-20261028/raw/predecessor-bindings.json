@@ -1,0 +1,38 @@
+{
+  "helpers": [
+    {
+      "name": "implementation-driver-corrected.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/implementation-driver-corrected.ts",
+      "sha256": "cecdd6be6db20e8d08a014066ea0fc38cee3537d12b667b54e62e91d2978c322"
+    },
+    {
+      "name": "common-corrected.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/common-corrected.ts",
+      "sha256": "feb8c8e1a4814d16b12975c1c921fe0356924c942362573291928dbb5e0e0ef5"
+    },
+    {
+      "name": "review-audit.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/review-audit.ts",
+      "sha256": "3ee8e60d8fac1f36e829bfdec31412ede59ffaffae1aac62089c56031916c8f0"
+    },
+    {
+      "name": "owned-spawn-corrected.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/owned-spawn-corrected.ts",
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f"
+    },
+    {
+      "name": "public-events-corrected.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/public-events-corrected.ts",
+      "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97"
+    },
+    {
+      "name": "owned-capture.ts",
+      "path": "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tmp/windows-db-impl-review-20261028/owned-capture.ts",
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c"
+    }
+  ],
+  "sourceTarget": "aec36a68e65df77012d4b2add4692e0b0506290f",
+  "singleSecurityLeaf": true,
+  "noSourceEdit": true,
+  "noInference": true
+}

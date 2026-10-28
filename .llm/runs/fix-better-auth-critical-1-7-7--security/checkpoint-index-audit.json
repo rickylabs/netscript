@@ -1,0 +1,2030 @@
+{
+  "mode": "index",
+  "base": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "at": "2026-10-28T03:51:53.152Z",
+  "acceptedRawRecords": 200,
+  "mapBindings": 209,
+  "stagedPaths": 218,
+  "immutableExactBindings": 208,
+  "allIndexBytesMatch": true,
+  "fullWhitespaceExitCode": 2,
+  "fullWhitespaceFindingPaths": [
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline-valid-archive.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-deno.lock.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-packages-fresh-ui-deno.lock.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-snapshot.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/cleanup-final.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-five-owner.diff",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-correct-metadata.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-verified-metadata.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-info-help.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch-report.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch.diff",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/owned-git-path-correction.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/pre-review-evidence-manifest.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/request-encoding-correction.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/root-lock-native-refresh.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph-final.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.request.json"
+  ],
+  "fullWhitespaceFindingsRawOnly": true,
+  "authoredWhitespaceExitCode": 0,
+  "explicitlyExcludedImmutablePaths": [
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.native-receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check-execution.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check-execution.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls-unchanged-baseline.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface-execution.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface-execution.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-execution.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-execution.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-unchanged.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline-valid-archive.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline-valid-archive.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline-valid-archive.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-archive-setup-failure.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-control.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-control.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-control.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-deno.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-deno.lock.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie-archive.native-stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie-archive.native-stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie-extract.native-stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie-extract.native-stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-packages-fresh-ui-deno.lock.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-plugins-auth-tests-services-better-auth-global-logout-http_test.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-plugins-auth-tests-services-unsupported-revocation-http_test.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-snapshot.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-snapshot.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-snapshot.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/candidate-root-lock.native-1.7.14.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/cleanup-final.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured-execution.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured-execution.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-audit.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-five-owner.diff",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-five-owner.diff.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-handoff.md",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-correct-metadata.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-correct-metadata.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-correct-metadata.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-verified-metadata.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-verified-metadata.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-verified-metadata.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-closure.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-execution.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-execution.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-unchanged.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-info-help.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-info-help.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-info-help.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch.diff",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch-report.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch-report.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch-report.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/original-owned-environment.ps1.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/owned-git-path-correction.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls-execution.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls-execution.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/protected-final.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.native-receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run-execution.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run-execution.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/qualify-baseline.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/qualify-baseline-doc-cookie.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/qualify-graph.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.native-receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.request-original-bom.json.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan-execution.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan-execution.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan-execution.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/report-native-selection.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/request-encoding-correction.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/resolution-mismatch.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/root-lock-native-refresh.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/root-lock-native-refresh.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/root-lock-native-refresh.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/run-deno.ps1.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/run-request.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/scope-stop-handoff.md",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.native-stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.raw.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph-final.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph-final.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph-final.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.process.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.receipt.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.request.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/snapshot-baseline.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/source-whitespace.stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/source-whitespace.stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/unchanged-auth-public-docs.native-stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/unchanged-auth-public-docs.native-stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/unchanged-native-cookie-jar-gitpath.native-stderr.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/unchanged-native-cookie-jar-gitpath.native-stdout.log",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/pre-review-evidence-manifest.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/root-scope-authority.md",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/root-selection-amendment.md",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-acceptance-20261028.md",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-20261028.json",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-first-attempt-20261028.ts.txt",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-handoff.md",
+    ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-proposal.md"
+  ],
+  "index": [
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/.gitattributes",
+      "bytes": 190,
+      "workingSha256": "06fb6de7c0cec93dffcadfe03d007ce34f8e89374fac08df1ba12846b2a26732",
+      "indexSha256": "06fb6de7c0cec93dffcadfe03d007ce34f8e89374fac08df1ba12846b2a26732",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/README.md",
+      "bytes": 3131,
+      "workingSha256": "57ac4b60ec53c0fbfbf8d4be4db77336777af7e6c8b6f85809aef70432a122fa",
+      "indexSha256": "57ac4b60ec53c0fbfbf8d4be4db77336777af7e6c8b6f85809aef70432a122fa",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-handoff.md",
+      "bytes": 9329,
+      "workingSha256": "abbfa2d6ac0626290868ede106a265a0e4bba6a9132aa630d2e7f5bb8a0858a9",
+      "indexSha256": "abbfa2d6ac0626290868ede106a265a0e4bba6a9132aa630d2e7f5bb8a0858a9",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/accepted-proposal.md",
+      "bytes": 8512,
+      "workingSha256": "11ac4de2906d874136f0bf6a436d05d6546ace224563e3bf1bddb61f26767d8f",
+      "indexSha256": "11ac4de2906d874136f0bf6a436d05d6546ace224563e3bf1bddb61f26767d8f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/archive-map.json",
+      "bytes": 73757,
+      "workingSha256": "2efc9f627d89c8115c0393f4854e2f1c21d54014638ddf39a015f44be545de38",
+      "indexSha256": "2efc9f627d89c8115c0393f4854e2f1c21d54014638ddf39a015f44be545de38",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check-execution.process.json",
+      "bytes": 946,
+      "workingSha256": "cfd2af73d504a64271621a1824ee937bedd68ee8a96410fc9016b2aed0faa012",
+      "indexSha256": "cfd2af73d504a64271621a1824ee937bedd68ee8a96410fc9016b2aed0faa012",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check-execution.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check-execution.stdout.log",
+      "bytes": 36740,
+      "workingSha256": "d6c6d15ff9e836890f5c48640d2bde323e12d03351ce4fdcd3650500cc8d81db",
+      "indexSha256": "d6c6d15ff9e836890f5c48640d2bde323e12d03351ce4fdcd3650500cc8d81db",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.native-receipt.json",
+      "bytes": 19857,
+      "workingSha256": "9c024049bb1b6f0c32051cb3891d27e2020bc9152c0b34f9ccf8b05a3b292d49",
+      "indexSha256": "9c024049bb1b6f0c32051cb3891d27e2020bc9152c0b34f9ccf8b05a3b292d49",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.receipt.json",
+      "bytes": 18620,
+      "workingSha256": "07967bf882313008d02b1c3d2f234c64f220bcaae56a6f9eca72781128502a25",
+      "indexSha256": "07967bf882313008d02b1c3d2f234c64f220bcaae56a6f9eca72781128502a25",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.request-original-bom.json.txt",
+      "bytes": 554,
+      "workingSha256": "9ccdb8e133b5ed965967411664adfbd4be4ebbd7691be3d2730a1c50f29492fc",
+      "indexSha256": "9ccdb8e133b5ed965967411664adfbd4be4ebbd7691be3d2730a1c50f29492fc",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/arch-check.request.json",
+      "bytes": 551,
+      "workingSha256": "26089504b8df7c27dc170b58e31ce3c8d050b9186fca0bb85d2f63fa422dd796",
+      "indexSha256": "26089504b8df7c27dc170b58e31ce3c8d050b9186fca0bb85d2f63fa422dd796",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.process.json",
+      "bytes": 1248,
+      "workingSha256": "6d2bbb6d61389f29cd3335626dea16ad053e7175f7b7399d7eab3f7360a3cc3f",
+      "indexSha256": "6d2bbb6d61389f29cd3335626dea16ad053e7175f7b7399d7eab3f7360a3cc3f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.receipt.json",
+      "bytes": 1216,
+      "workingSha256": "7ce2efd20f8bfdcff61b18cbd32172359237b047aa1a5ce2505ca714b3e9a938",
+      "indexSha256": "7ce2efd20f8bfdcff61b18cbd32172359237b047aa1a5ce2505ca714b3e9a938",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-critical-green.stdout.log",
+      "bytes": 2130,
+      "workingSha256": "9bec537fabf8f1888e954ca366792fda9c8098bfbc0f2a47f99f56e6dbf6b0db",
+      "indexSha256": "9bec537fabf8f1888e954ca366792fda9c8098bfbc0f2a47f99f56e6dbf6b0db",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.process.json",
+      "bytes": 1243,
+      "workingSha256": "4fb57fdb09e55bf2ca88f7362b52daf6b1f10a9ba82016d6d9c14da2b20798c3",
+      "indexSha256": "4fb57fdb09e55bf2ca88f7362b52daf6b1f10a9ba82016d6d9c14da2b20798c3",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.receipt.json",
+      "bytes": 1753,
+      "workingSha256": "8bba7947548a0f071f32a9661b10bc830ccc17b5a683534d09669b748179db2a",
+      "indexSha256": "8bba7947548a0f071f32a9661b10bc830ccc17b5a683534d09669b748179db2a",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/audit-unchanged-red.stdout.log",
+      "bytes": 3140,
+      "workingSha256": "73ea501eeb3d97076f044a12b536f29f01d9f5b85e9353386f277b79455057d4",
+      "indexSha256": "73ea501eeb3d97076f044a12b536f29f01d9f5b85e9353386f277b79455057d4",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.json",
+      "bytes": 338,
+      "workingSha256": "301074d1a00ba03d10a93731611801b84431312ed555128d5996f4efcb298941",
+      "indexSha256": "301074d1a00ba03d10a93731611801b84431312ed555128d5996f4efcb298941",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.process.json",
+      "bytes": 916,
+      "workingSha256": "5b860c2d629e573c37c5cd1d09340a2868b1da3908bb79bc1d077f808e3505ba",
+      "indexSha256": "5b860c2d629e573c37c5cd1d09340a2868b1da3908bb79bc1d077f808e3505ba",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.receipt.json",
+      "bytes": 2078,
+      "workingSha256": "7ab002f422e70fd368df02d8c3dd677e16ec295a06488cc99d72859f70709c57",
+      "indexSha256": "7ab002f422e70fd368df02d8c3dd677e16ec295a06488cc99d72859f70709c57",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.request.json",
+      "bytes": 448,
+      "workingSha256": "b106d0a58740fe80b8c97abd9c785e1a0449257006f00f7a55be86f2d6a3ac65",
+      "indexSha256": "b106d0a58740fe80b8c97abd9c785e1a0449257006f00f7a55be86f2d6a3ac65",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-check.stdout.log",
+      "bytes": 3614,
+      "workingSha256": "33533ea799b7bf472c623eecc0e3e8af86e0f4667bb20e36139e0dffa83b75f6",
+      "indexSha256": "33533ea799b7bf472c623eecc0e3e8af86e0f4667bb20e36139e0dffa83b75f6",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls-unchanged-baseline.json",
+      "bytes": 12962,
+      "workingSha256": "429122eface2bf845afc17d8b2004461a13b0a302bb79bd795122c7c9024a04f",
+      "indexSha256": "429122eface2bf845afc17d8b2004461a13b0a302bb79bd795122c7c9024a04f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.json",
+      "bytes": 11627,
+      "workingSha256": "1d7be827b02da8573276052111ac711692122170b255bc05c237754ad10faf1e",
+      "indexSha256": "1d7be827b02da8573276052111ac711692122170b255bc05c237754ad10faf1e",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.process.json",
+      "bytes": 928,
+      "workingSha256": "9107b97e8cb45919c403739db2830316c7c6a03fc236f02d1d0de982c7a37e0b",
+      "indexSha256": "9107b97e8cb45919c403739db2830316c7c6a03fc236f02d1d0de982c7a37e0b",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.receipt.json",
+      "bytes": 2149,
+      "workingSha256": "691a98141acd3b0f61663050c3080d89851e5282aefd9de19de6a30b81d9a283",
+      "indexSha256": "691a98141acd3b0f61663050c3080d89851e5282aefd9de19de6a30b81d9a283",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.request.json",
+      "bytes": 500,
+      "workingSha256": "5f08f7683894e5d794a3c9c59c058a50a7774911beb1c15d7a105aa65f4a842f",
+      "indexSha256": "5f08f7683894e5d794a3c9c59c058a50a7774911beb1c15d7a105aa65f4a842f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-controls.stdout.log",
+      "bytes": 3756,
+      "workingSha256": "b7a9ebc70b030f1b136a73ceac995d6af2087efe5ad553783ad725a803c07977",
+      "indexSha256": "b7a9ebc70b030f1b136a73ceac995d6af2087efe5ad553783ad725a803c07977",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.json",
+      "bytes": 314,
+      "workingSha256": "0375a7da9944233fb1797b3685b3933ccba2f72cfe749c804cf29a14574ff645",
+      "indexSha256": "0375a7da9944233fb1797b3685b3933ccba2f72cfe749c804cf29a14574ff645",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.process.json",
+      "bytes": 908,
+      "workingSha256": "8e1c4d97e91a40a092e76f3e920bd17820566c6f909e4c917802a58367864852",
+      "indexSha256": "8e1c4d97e91a40a092e76f3e920bd17820566c6f909e4c917802a58367864852",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.receipt.json",
+      "bytes": 1997,
+      "workingSha256": "6c6fe38a32e08243cf9420e2a1686c0ae9d909530c667c5efe9ae6715dbb4fdd",
+      "indexSha256": "6c6fe38a32e08243cf9420e2a1686c0ae9d909530c667c5efe9ae6715dbb4fdd",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.request.json",
+      "bytes": 358,
+      "workingSha256": "f966732f20c29159e835260d3ec872010bb0d50f7a0f4a54c5d2f5c2bc051e0d",
+      "indexSha256": "f966732f20c29159e835260d3ec872010bb0d50f7a0f4a54c5d2f5c2bc051e0d",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-fmt.stdout.log",
+      "bytes": 3492,
+      "workingSha256": "c4bc884215cf32ed41e622e0f7d3f1d9708a594d1b81b454b38a097c9f9eb177",
+      "indexSha256": "c4bc884215cf32ed41e622e0f7d3f1d9708a594d1b81b454b38a097c9f9eb177",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface-execution.process.json",
+      "bytes": 970,
+      "workingSha256": "caafed45abc973f04a04a6c643be2e86dc035bbb3ce29d7a82e07c5ee1186399",
+      "indexSha256": "caafed45abc973f04a04a6c643be2e86dc035bbb3ce29d7a82e07c5ee1186399",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface-execution.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface-execution.stdout.log",
+      "bytes": 3130,
+      "workingSha256": "6a88c855d209d68fea9757ad6408222150d3403ed3b389e64c9987bc5fcc5aa8",
+      "indexSha256": "6a88c855d209d68fea9757ad6408222150d3403ed3b389e64c9987bc5fcc5aa8",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.json",
+      "bytes": 1124,
+      "workingSha256": "ddbb210576aac92d2e15e2fbc0b05b6359bce11bdb8367178e497bbf684791c5",
+      "indexSha256": "ddbb210576aac92d2e15e2fbc0b05b6359bce11bdb8367178e497bbf684791c5",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.process.json",
+      "bytes": 940,
+      "workingSha256": "666857284bae83bcb79805450d2f42904980595d87be723361d3d3c893a646b4",
+      "indexSha256": "666857284bae83bcb79805450d2f42904980595d87be723361d3d3c893a646b4",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.receipt.json",
+      "bytes": 1791,
+      "workingSha256": "4d5ea4d25c645b9a4ad2e46228f432adb8e57be5a8936bd26b7bcb671a118c24",
+      "indexSha256": "4d5ea4d25c645b9a4ad2e46228f432adb8e57be5a8936bd26b7bcb671a118c24",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.request-original-bom.json.txt",
+      "bytes": 562,
+      "workingSha256": "9cb9bd1b11ab5e2e5442d192d4afab1cc24e8416aece9e920125dca9d9735143",
+      "indexSha256": "9cb9bd1b11ab5e2e5442d192d4afab1cc24e8416aece9e920125dca9d9735143",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.request.json",
+      "bytes": 559,
+      "workingSha256": "48cfcc7c99e44547afe6a78157665a22560d3638bde1fb2317708bc513e88cac",
+      "indexSha256": "48cfcc7c99e44547afe6a78157665a22560d3638bde1fb2317708bc513e88cac",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.stderr.log",
+      "bytes": 1604,
+      "workingSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "indexSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-jsr-surface.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.json",
+      "bytes": 365,
+      "workingSha256": "f3ed8878aef97d694fbf46f46466325046bba096ac53fde1c89a973cfc074aa4",
+      "indexSha256": "f3ed8878aef97d694fbf46f46466325046bba096ac53fde1c89a973cfc074aa4",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.process.json",
+      "bytes": 912,
+      "workingSha256": "0fea1b59fa1bdc55acf0dda91ee5da8b9c4b5857e2d14b1b4f9e93a662a34813",
+      "indexSha256": "0fea1b59fa1bdc55acf0dda91ee5da8b9c4b5857e2d14b1b4f9e93a662a34813",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.receipt.json",
+      "bytes": 1996,
+      "workingSha256": "2dba68f16a067a246811a3e1577695e8ef6f1d8474e1ec82e2624899f3ae4541",
+      "indexSha256": "2dba68f16a067a246811a3e1577695e8ef6f1d8474e1ec82e2624899f3ae4541",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.request.json",
+      "bytes": 361,
+      "workingSha256": "0940cbb650a8421d1785925898b5c80f0d4f6e0415c12c638d55fe9964d7d5f0",
+      "indexSha256": "0940cbb650a8421d1785925898b5c80f0d4f6e0415c12c638d55fe9964d7d5f0",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-lint.stdout.log",
+      "bytes": 3490,
+      "workingSha256": "3af4c7fb853e93516d04cff2b8d4f935486ab00327e490377d43fa2db340f775",
+      "indexSha256": "3af4c7fb853e93516d04cff2b8d4f935486ab00327e490377d43fa2db340f775",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-execution.process.json",
+      "bytes": 970,
+      "workingSha256": "796630fbea23c4c6ffce9f5f0df7d84836f220f466f7aa44d03fb694ba87bd81",
+      "indexSha256": "796630fbea23c4c6ffce9f5f0df7d84836f220f466f7aa44d03fb694ba87bd81",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-execution.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-execution.stdout.log",
+      "bytes": 3298,
+      "workingSha256": "e3daff6c9865ed982bb2557243a38fa0511d1c4fb1a99c14aa47d9792809c74f",
+      "indexSha256": "e3daff6c9865ed982bb2557243a38fa0511d1c4fb1a99c14aa47d9792809c74f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs-unchanged.json",
+      "bytes": 798,
+      "workingSha256": "bf03dfc4d4c8dd4c6586b63c7db34951f6c1bff6dd10d9a3d4e13e7747e09054",
+      "indexSha256": "bf03dfc4d4c8dd4c6586b63c7db34951f6c1bff6dd10d9a3d4e13e7747e09054",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.json",
+      "bytes": 718,
+      "workingSha256": "923c4b8419dbe41845eac1d4ee4be9d2618ea3440873bf74b67b69318e19173c",
+      "indexSha256": "923c4b8419dbe41845eac1d4ee4be9d2618ea3440873bf74b67b69318e19173c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.process.json",
+      "bytes": 940,
+      "workingSha256": "eebfbb6cc73751fd19b1d2d33575f689721ff7c76ba46f4a297ee106e63d5d63",
+      "indexSha256": "eebfbb6cc73751fd19b1d2d33575f689721ff7c76ba46f4a297ee106e63d5d63",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.receipt.json",
+      "bytes": 1880,
+      "workingSha256": "a86daa3788b85fb8395be25a4d21622b4e12dbecbbeb0b3ca673a58cd239168d",
+      "indexSha256": "a86daa3788b85fb8395be25a4d21622b4e12dbecbbeb0b3ca673a58cd239168d",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.request-original-bom.json.txt",
+      "bytes": 592,
+      "workingSha256": "fafb2568343277bd92d3e73d113b92da18207aea8e4d293c3c9f1e1e374e967a",
+      "indexSha256": "fafb2568343277bd92d3e73d113b92da18207aea8e4d293c3c9f1e1e374e967a",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.request.json",
+      "bytes": 589,
+      "workingSha256": "b54f619664b718dbf7538171eaf1f178b0dcc7dd4eee1df994fc8b34ac820b77",
+      "indexSha256": "b54f619664b718dbf7538171eaf1f178b0dcc7dd4eee1df994fc8b34ac820b77",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.stderr.log",
+      "bytes": 1604,
+      "workingSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "indexSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-public-docs.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline-valid-archive.process.json",
+      "bytes": 965,
+      "workingSha256": "7fbaaef184e02295c8f3bd0640d51d12eb89d5d1027ad44adcdb67e6d29b3de2",
+      "indexSha256": "7fbaaef184e02295c8f3bd0640d51d12eb89d5d1027ad44adcdb67e6d29b3de2",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline-valid-archive.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline-valid-archive.stdout.log",
+      "bytes": 13406,
+      "workingSha256": "9eb1810c38d11aa1c3031e1008e62c77b41ef3869c21bc692af1045154cdf3c0",
+      "indexSha256": "9eb1810c38d11aa1c3031e1008e62c77b41ef3869c21bc692af1045154cdf3c0",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline.process.json",
+      "bytes": 923,
+      "workingSha256": "2ab666fc3ef37d1f6e6feb91d66ed3a3771514b182e452a661a50ec4f2afbdde",
+      "indexSha256": "2ab666fc3ef37d1f6e6feb91d66ed3a3771514b182e452a661a50ec4f2afbdde",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline.stderr.log",
+      "bytes": 2002,
+      "workingSha256": "aace005fc708f9d8e886920b7c5df4b7bb60dabd5c0e30f97b9ba76b5cb19678",
+      "indexSha256": "aace005fc708f9d8e886920b7c5df4b7bb60dabd5c0e30f97b9ba76b5cb19678",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/auth-unchanged-baseline.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-archive-setup-failure.receipt.json",
+      "bytes": 4590,
+      "workingSha256": "6f29f99adfe3b904199fe3b8c885618786b7df47d39a44c5f396dec5414fc9c7",
+      "indexSha256": "6f29f99adfe3b904199fe3b8c885618786b7df47d39a44c5f396dec5414fc9c7",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-control.receipt.json",
+      "bytes": 7071,
+      "workingSha256": "6d7856bc1b7c281eb97bc181408c329ae36bc026be1e749a88f19e1476162584",
+      "indexSha256": "6d7856bc1b7c281eb97bc181408c329ae36bc026be1e749a88f19e1476162584",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-control.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-control.stdout.log",
+      "bytes": 250,
+      "workingSha256": "b469c44b58308718fd6f32b76aa40ca7fba8cdc6f1e9a0e925c3109c64260639",
+      "indexSha256": "b469c44b58308718fd6f32b76aa40ca7fba8cdc6f1e9a0e925c3109c64260639",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-deno.json.txt",
+      "bytes": 22366,
+      "workingSha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "indexSha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-deno.lock.txt",
+      "bytes": 191344,
+      "workingSha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "indexSha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie-archive.native-stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie-archive.native-stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie-extract.native-stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie-extract.native-stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.process.json",
+      "bytes": 922,
+      "workingSha256": "bc71b19dc73472364ee8f3237aca8e5d75fdd103a9cc6c5ab1e9a09c0893aea2",
+      "indexSha256": "bc71b19dc73472364ee8f3237aca8e5d75fdd103a9cc6c5ab1e9a09c0893aea2",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.receipt.json",
+      "bytes": 7363,
+      "workingSha256": "e4ca8a4cd739a913a4fb40393aefa553e796af231928d2c648c98f0006e55464",
+      "indexSha256": "e4ca8a4cd739a913a4fb40393aefa553e796af231928d2c648c98f0006e55464",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-doc-cookie.stdout.log",
+      "bytes": 13140,
+      "workingSha256": "68d869bf3501b4d4bba9d4ca073533c347b89b6efa0375d27764d86a8eab95cd",
+      "indexSha256": "68d869bf3501b4d4bba9d4ca073533c347b89b6efa0375d27764d86a8eab95cd",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-packages-fresh-ui-deno.lock.txt",
+      "bytes": 168514,
+      "workingSha256": "18693dfeb7be838b924e8b2803d55994b34bcde981ab617e0c72eb30129fcf40",
+      "indexSha256": "18693dfeb7be838b924e8b2803d55994b34bcde981ab617e0c72eb30129fcf40",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-plugins-auth-tests-services-better-auth-global-logout-http_test.ts.txt",
+      "bytes": 3200,
+      "workingSha256": "72a695a3061e3ce51231a9759aa547ea364dd68defd9cc3e5f046c609711b763",
+      "indexSha256": "72a695a3061e3ce51231a9759aa547ea364dd68defd9cc3e5f046c609711b763",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-plugins-auth-tests-services-unsupported-revocation-http_test.ts.txt",
+      "bytes": 7605,
+      "workingSha256": "e0210d9b1703482af56b05452681d46ab16d148c96a40aed41584a5443df3194",
+      "indexSha256": "e0210d9b1703482af56b05452681d46ab16d148c96a40aed41584a5443df3194",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-snapshot.process.json",
+      "bytes": 989,
+      "workingSha256": "bf142d4c0cda4c9c2407d3712ae1126e130d6e125694c8cba204dae2c84f65f9",
+      "indexSha256": "bf142d4c0cda4c9c2407d3712ae1126e130d6e125694c8cba204dae2c84f65f9",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-snapshot.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline-snapshot.stdout.log",
+      "bytes": 114,
+      "workingSha256": "40cdde3afbc4e9128e264148a0fa48bd84d9b204c53d5fbf76bb3e0525829b6c",
+      "indexSha256": "40cdde3afbc4e9128e264148a0fa48bd84d9b204c53d5fbf76bb3e0525829b6c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/baseline.json",
+      "bytes": 21273,
+      "workingSha256": "92cd96c78fa9f80037921f2034d918687c890539b6d04f992ba38ec1b5bb74a2",
+      "indexSha256": "92cd96c78fa9f80037921f2034d918687c890539b6d04f992ba38ec1b5bb74a2",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/candidate-root-lock.native-1.7.14.json.txt",
+      "bytes": 187051,
+      "workingSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "indexSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/cleanup-final.json",
+      "bytes": 297,
+      "workingSha256": "34abc7d744bb2c9852036ee2e3ea28a4485bf486614529cbe733affdbdde1d5b",
+      "indexSha256": "34abc7d744bb2c9852036ee2e3ea28a4485bf486614529cbe733affdbdde1d5b",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.process.json",
+      "bytes": 940,
+      "workingSha256": "3e5da0a7f80ae585c0d70a8722836936be49d25ca48c366a169e4cb6d1480543",
+      "indexSha256": "3e5da0a7f80ae585c0d70a8722836936be49d25ca48c366a169e4cb6d1480543",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.receipt.json",
+      "bytes": 1633,
+      "workingSha256": "85e458b513c05ecb8c8d8d8b1765360a799070826454efc2d377476a69c817b6",
+      "indexSha256": "85e458b513c05ecb8c8d8d8b1765360a799070826454efc2d377476a69c817b6",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.request.json",
+      "bytes": 63,
+      "workingSha256": "cab1234ad349e85c98967c481baa48d05c7d4e9ea04d94202e0d3ca6f630aa46",
+      "indexSha256": "cab1234ad349e85c98967c481baa48d05c7d4e9ea04d94202e0d3ca6f630aa46",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/corpus-freshness.stdout.log",
+      "bytes": 2964,
+      "workingSha256": "9812fe075d7f8bd478ec3d12dcef63961b4fc4b71d8adaef4b332832a434d98e",
+      "indexSha256": "9812fe075d7f8bd478ec3d12dcef63961b4fc4b71d8adaef4b332832a434d98e",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured-execution.process.json",
+      "bytes": 990,
+      "workingSha256": "9435b43164e83fd7bc429bda69ec73386dce1813c51321554bf083079388c24a",
+      "indexSha256": "9435b43164e83fd7bc429bda69ec73386dce1813c51321554bf083079388c24a",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured-execution.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured-execution.stdout.log",
+      "bytes": 34920,
+      "workingSha256": "48a7ed50cebbcf5b9a8ee6f885260db4111dca292d6aa644576635067c4fc863",
+      "indexSha256": "48a7ed50cebbcf5b9a8ee6f885260db4111dca292d6aa644576635067c4fc863",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.process.json",
+      "bytes": 960,
+      "workingSha256": "a01dd63f1ab5e6af04c6ebefd10b4b8057afb67461fcf8c489c64685dda3266b",
+      "indexSha256": "a01dd63f1ab5e6af04c6ebefd10b4b8057afb67461fcf8c489c64685dda3266b",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.receipt.json",
+      "bytes": 18260,
+      "workingSha256": "b4b216b65f3591f6ef26931bead776ba4310ff09049607944318a3f83b0deef1",
+      "indexSha256": "b4b216b65f3591f6ef26931bead776ba4310ff09049607944318a3f83b0deef1",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.request-original-bom.json.txt",
+      "bytes": 357,
+      "workingSha256": "c9fbee5d095c2daaee0cdfd2e96ef60d9f1f5800158f6e6df1cd78ffc6396b68",
+      "indexSha256": "c9fbee5d095c2daaee0cdfd2e96ef60d9f1f5800158f6e6df1cd78ffc6396b68",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.request.json",
+      "bytes": 354,
+      "workingSha256": "dcaffffda64c01bdf28edf8892cfe85418a86ed1dc70185a609dd3ecb1edb209",
+      "indexSha256": "dcaffffda64c01bdf28edf8892cfe85418a86ed1dc70185a609dd3ecb1edb209",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.stderr.log",
+      "bytes": 1604,
+      "workingSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "indexSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/deps-audit-structured.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-audit.ts.txt",
+      "bytes": 6277,
+      "workingSha256": "94c52ef18c7b06f8cf8575a11bb2692df129a43366c32108b57a69710f6003ae",
+      "indexSha256": "94c52ef18c7b06f8cf8575a11bb2692df129a43366c32108b57a69710f6003ae",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-five-owner.diff",
+      "bytes": 27228,
+      "workingSha256": "0da3897f00d0b97bc272470ea1b7c3c143d1ac7ba033692d2abc7216583df15c",
+      "indexSha256": "0da3897f00d0b97bc272470ea1b7c3c143d1ac7ba033692d2abc7216583df15c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-five-owner.diff.stderr.log",
+      "bytes": 222,
+      "workingSha256": "7d6351e8c4aba8dbfc6d5f92a6713f6b8e189306da892e8f6d85eac80501041d",
+      "indexSha256": "7d6351e8c4aba8dbfc6d5f92a6713f6b8e189306da892e8f6d85eac80501041d",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-handoff.md",
+      "bytes": 9329,
+      "workingSha256": "abbfa2d6ac0626290868ede106a265a0e4bba6a9132aa630d2e7f5bb8a0858a9",
+      "indexSha256": "abbfa2d6ac0626290868ede106a265a0e4bba6a9132aa630d2e7f5bb8a0858a9",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-correct-metadata.process.json",
+      "bytes": 954,
+      "workingSha256": "222d13e27a9d48661429a587a2e0ae41a8c59389d90f6325d3831dc1d5251395",
+      "indexSha256": "222d13e27a9d48661429a587a2e0ae41a8c59389d90f6325d3831dc1d5251395",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-correct-metadata.stderr.log",
+      "bytes": 1478,
+      "workingSha256": "a2058883650abb37c46c14058101e9802ede10a1c7215166446eb80c21b9c4bd",
+      "indexSha256": "a2058883650abb37c46c14058101e9802ede10a1c7215166446eb80c21b9c4bd",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-correct-metadata.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-verified-metadata.process.json",
+      "bytes": 957,
+      "workingSha256": "9b9ab87b93a166ca0f55588c3ceafa1c0a06a1f9f5ae837596e74b64594921d2",
+      "indexSha256": "9b9ab87b93a166ca0f55588c3ceafa1c0a06a1f9f5ae837596e74b64594921d2",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-verified-metadata.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit-verified-metadata.stdout.log",
+      "bytes": 4214,
+      "workingSha256": "cafddf6fb07081588ce00d49f130c6e5c992af70d5b506e2f375bd26fd156b30",
+      "indexSha256": "cafddf6fb07081588ce00d49f130c6e5c992af70d5b506e2f375bd26fd156b30",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit.process.json",
+      "bytes": 903,
+      "workingSha256": "6d69ed46c2f0abe344d6aa10752e2b6c9e14837811deb56370acab3701c66d4d",
+      "indexSha256": "6d69ed46c2f0abe344d6aa10752e2b6c9e14837811deb56370acab3701c66d4d",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit.stderr.log",
+      "bytes": 1512,
+      "workingSha256": "6689cd6e00fb75bee7c2c53176172f936944078c923c734f4022322c626e892b",
+      "indexSha256": "6689cd6e00fb75bee7c2c53176172f936944078c923c734f4022322c626e892b",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-audit.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/final-source-closure.json",
+      "bytes": 39301,
+      "workingSha256": "bba1db7e664e07cf7d3eabdf6b0ed81cc6efb7941f1c30f6c6e463abd84eb6c9",
+      "indexSha256": "bba1db7e664e07cf7d3eabdf6b0ed81cc6efb7941f1c30f6c6e463abd84eb6c9",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.process.json",
+      "bytes": 851,
+      "workingSha256": "ee821618343391ce4b3870e6786f1eb9bc4810671fa334b2447f5c5d32f4361f",
+      "indexSha256": "ee821618343391ce4b3870e6786f1eb9bc4810671fa334b2447f5c5d32f4361f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.stderr.log",
+      "bytes": 1208,
+      "workingSha256": "9108d21f04f5a2c8da75895cd107aebf73f601b4a9e56d484ed8b99380634f31",
+      "indexSha256": "9108d21f04f5a2c8da75895cd107aebf73f601b4a9e56d484ed8b99380634f31",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/fresh-ui-lock-native-refresh.stdout.log",
+      "bytes": 740,
+      "workingSha256": "37975c8e9086ede794d552c6acb4b8c01aff2092599739904d2e1a722f334c57",
+      "indexSha256": "37975c8e9086ede794d552c6acb4b8c01aff2092599739904d2e1a722f334c57",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-execution.process.json",
+      "bytes": 1006,
+      "workingSha256": "e363be46a8e5885bb1fa5374c01b6b9be58c9c74e55d32656b50d9150c3bb27b",
+      "indexSha256": "e363be46a8e5885bb1fa5374c01b6b9be58c9c74e55d32656b50d9150c3bb27b",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-execution.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-execution.stdout.log",
+      "bytes": 4100,
+      "workingSha256": "5a94ab15701d52cd5d327461d0de44c75fe77380189d1af9f1121e43389b634b",
+      "indexSha256": "5a94ab15701d52cd5d327461d0de44c75fe77380189d1af9f1121e43389b634b",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath-unchanged.json",
+      "bytes": 1293,
+      "workingSha256": "dde7411d2dcbaa15c194f8fa7d41fdcfa09eeeac6d132e3fe507bef88db426c8",
+      "indexSha256": "dde7411d2dcbaa15c194f8fa7d41fdcfa09eeeac6d132e3fe507bef88db426c8",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.json",
+      "bytes": 1209,
+      "workingSha256": "12f4030dd3b4c31a8115b877c72694bfc6a83a3cef0b22687f26ca38f3bdc336",
+      "indexSha256": "12f4030dd3b4c31a8115b877c72694bfc6a83a3cef0b22687f26ca38f3bdc336",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.process.json",
+      "bytes": 976,
+      "workingSha256": "86dad62d5e9df2e6ed7fd58779d9566b1070d76d886486184373ce46a01252c6",
+      "indexSha256": "86dad62d5e9df2e6ed7fd58779d9566b1070d76d886486184373ce46a01252c6",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.receipt.json",
+      "bytes": 2326,
+      "workingSha256": "2b10af9e9f0d4a8c53d24aea4f11983fbfc6675de699a6bb58cf642ede4a4f09",
+      "indexSha256": "2b10af9e9f0d4a8c53d24aea4f11983fbfc6675de699a6bb58cf642ede4a4f09",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.request-original-bom.json.txt",
+      "bytes": 1012,
+      "workingSha256": "0975e80680c2e301e3e1a2ec687c78430727f400b8c7d1702ee9e27ed01b6000",
+      "indexSha256": "0975e80680c2e301e3e1a2ec687c78430727f400b8c7d1702ee9e27ed01b6000",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.request.json",
+      "bytes": 1009,
+      "workingSha256": "83bcc8085cb214efa2aa2714a43c7b00e0b390efc59d4374663fc25c72c030a2",
+      "indexSha256": "83bcc8085cb214efa2aa2714a43c7b00e0b390efc59d4374663fc25c72c030a2",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.stderr.log",
+      "bytes": 1604,
+      "workingSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "indexSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-cookie-jar-gitpath.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-info-help.process.json",
+      "bytes": 734,
+      "workingSha256": "9c40c7a41cef54dd8eb3ff901c6a0738b16761bf613ed98d20d6bab0f9d810ca",
+      "indexSha256": "9c40c7a41cef54dd8eb3ff901c6a0738b16761bf613ed98d20d6bab0f9d810ca",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-info-help.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-info-help.stdout.log",
+      "bytes": 6610,
+      "workingSha256": "9c5be70ebfaac21f34950f2acb6a5ac9f065876e13bbb18eaef8b0b62c3cc02c",
+      "indexSha256": "9c5be70ebfaac21f34950f2acb6a5ac9f065876e13bbb18eaef8b0b62c3cc02c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch-report.process.json",
+      "bytes": 1040,
+      "workingSha256": "2c9bc51e149ee4e70fc43d0d42986ea19ec975ee630c5abbf81752d1ac1a6445",
+      "indexSha256": "2c9bc51e149ee4e70fc43d0d42986ea19ec975ee630c5abbf81752d1ac1a6445",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch-report.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch-report.stdout.log",
+      "bytes": 8088,
+      "workingSha256": "f28b781524c1cbdfc550cae3b2a59a19ff4c1d5047d723f83f56623a002a102b",
+      "indexSha256": "f28b781524c1cbdfc550cae3b2a59a19ff4c1d5047d723f83f56623a002a102b",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/native-selection-mismatch.diff",
+      "bytes": 14957,
+      "workingSha256": "9b319455c97ea32873e7e89ca9bc340d567a3943270985c753640835279fe6b9",
+      "indexSha256": "9b319455c97ea32873e7e89ca9bc340d567a3943270985c753640835279fe6b9",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/original-owned-environment.ps1.txt",
+      "bytes": 1814,
+      "workingSha256": "a7b69d4dc9064cceedaabf0366d24fe5848f82650bddda164c0cfdf864a873a2",
+      "indexSha256": "a7b69d4dc9064cceedaabf0366d24fe5848f82650bddda164c0cfdf864a873a2",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/owned-git-path-correction.json",
+      "bytes": 434,
+      "workingSha256": "28e997b8a0700a69f851ea541d29bc882fc69f3c2f40f8c819c2ab2a8a9338b4",
+      "indexSha256": "28e997b8a0700a69f851ea541d29bc882fc69f3c2f40f8c819c2ab2a8a9338b4",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls-execution.process.json",
+      "bytes": 990,
+      "workingSha256": "8e660b50bd223b12b7591e07aab636cffaff1fd585629f313900b890970896e5",
+      "indexSha256": "8e660b50bd223b12b7591e07aab636cffaff1fd585629f313900b890970896e5",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls-execution.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls-execution.stdout.log",
+      "bytes": 4066,
+      "workingSha256": "b35373c4673f055e4feb37056a358358893040223d8cff4ad2d659170d2c3a39",
+      "indexSha256": "b35373c4673f055e4feb37056a358358893040223d8cff4ad2d659170d2c3a39",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.json",
+      "bytes": 545,
+      "workingSha256": "8ef803733a09ccf1c371b711c2db985d4d1e7c4b4d67de1dc8cf933d4934e52f",
+      "indexSha256": "8ef803733a09ccf1c371b711c2db985d4d1e7c4b4d67de1dc8cf933d4934e52f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.process.json",
+      "bytes": 960,
+      "workingSha256": "509342cb6bdc1a5930422dd355a344b60d3a8ce160dd7ebc6d5f2270d5a3bd3f",
+      "indexSha256": "509342cb6bdc1a5930422dd355a344b60d3a8ce160dd7ebc6d5f2270d5a3bd3f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.receipt.json",
+      "bytes": 2309,
+      "workingSha256": "d92845c8b2550442759bf07b65d1e7faf31a01781222928fd1f22e5a4a7f9186",
+      "indexSha256": "d92845c8b2550442759bf07b65d1e7faf31a01781222928fd1f22e5a4a7f9186",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.request-original-bom.json.txt",
+      "bytes": 1014,
+      "workingSha256": "23b8ea4bce008391c5d93fcd12eb2e524cbcb982ce69d5ff91832fb3a11bef48",
+      "indexSha256": "23b8ea4bce008391c5d93fcd12eb2e524cbcb982ce69d5ff91832fb3a11bef48",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.request.json",
+      "bytes": 1011,
+      "workingSha256": "3e4859f9001d6956b29d0c4e533f2c3e0c6cb0af151d134057a4f531843cc446",
+      "indexSha256": "3e4859f9001d6956b29d0c4e533f2c3e0c6cb0af151d134057a4f531843cc446",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.stderr.log",
+      "bytes": 1604,
+      "workingSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "indexSha256": "e6feaa2067fcef38bcfb7ed1455be4c7a4c03a64d2a559bb7c675bc74f14ee1c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/patched-auth-controls.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/pre-review-evidence-manifest.json",
+      "bytes": 67906,
+      "workingSha256": "7f71a8d9a633759ad789c43940981a737f35bfe37c5f209b1d9336d967d3fd6d",
+      "indexSha256": "7f71a8d9a633759ad789c43940981a737f35bfe37c5f209b1d9336d967d3fd6d",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/protected-final.json",
+      "bytes": 28949,
+      "workingSha256": "7c710e05d57294ac4cf19de27f83b9e09661499cb91cd7fba0933055a9b96874",
+      "indexSha256": "7c710e05d57294ac4cf19de27f83b9e09661499cb91cd7fba0933055a9b96874",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run-execution.process.json",
+      "bytes": 966,
+      "workingSha256": "43452db7080e8a45d9a352ca01b536cafae33d962313a17fc610eef8094af62b",
+      "indexSha256": "43452db7080e8a45d9a352ca01b536cafae33d962313a17fc610eef8094af62b",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run-execution.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run-execution.stdout.log",
+      "bytes": 35512,
+      "workingSha256": "7921514e9b86104fa2964ab325295deb7a93af3704aea371f9061b9f74fa85e3",
+      "indexSha256": "7921514e9b86104fa2964ab325295deb7a93af3704aea371f9061b9f74fa85e3",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.native-receipt.json",
+      "bytes": 17546,
+      "workingSha256": "505296c0e0c9a66bb0d418e4718dc6607e43103b89a799cfd9891824a36f16e4",
+      "indexSha256": "505296c0e0c9a66bb0d418e4718dc6607e43103b89a799cfd9891824a36f16e4",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.receipt.json",
+      "bytes": 17962,
+      "workingSha256": "ceeaeee51dacabb0d2609c5b31d607668b4f0bff298f58ec3d0d52f393de2377",
+      "indexSha256": "ceeaeee51dacabb0d2609c5b31d607668b4f0bff298f58ec3d0d52f393de2377",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.request-original-bom.json.txt",
+      "bytes": 569,
+      "workingSha256": "3bc99965610ecfe937557e4b4330c1de51c606e24dd9251720c1d63bc471f530",
+      "indexSha256": "3bc99965610ecfe937557e4b4330c1de51c606e24dd9251720c1d63bc471f530",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/publish-dry-run.request.json",
+      "bytes": 566,
+      "workingSha256": "9564e4933efc1890e8aa9c464c646475d7787a594586cdb51aa59d3ef4925d5f",
+      "indexSha256": "9564e4933efc1890e8aa9c464c646475d7787a594586cdb51aa59d3ef4925d5f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/qualify-baseline-doc-cookie.ts.txt",
+      "bytes": 3565,
+      "workingSha256": "8d2bf52518ba092d256ba786d7dd5e61f6c47e13772429de81a4cb8a1119cee9",
+      "indexSha256": "8d2bf52518ba092d256ba786d7dd5e61f6c47e13772429de81a4cb8a1119cee9",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/qualify-baseline.ts.txt",
+      "bytes": 3763,
+      "workingSha256": "749f3f0aea97b088c1892a70d695b9c0d88b72666acce8ad94b133e7d9808077",
+      "indexSha256": "749f3f0aea97b088c1892a70d695b9c0d88b72666acce8ad94b133e7d9808077",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/qualify-graph.ts.txt",
+      "bytes": 2203,
+      "workingSha256": "bc5be6325c1bbe24069b178c81387b97605d9c0c5acdf4f0cd1b4af189d34ee4",
+      "indexSha256": "bc5be6325c1bbe24069b178c81387b97605d9c0c5acdf4f0cd1b4af189d34ee4",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan-execution.process.json",
+      "bytes": 954,
+      "workingSha256": "12e168ab493e347a0a1a7751bac99967c6afee95a08c44eae47ae26dc72faab4",
+      "indexSha256": "12e168ab493e347a0a1a7751bac99967c6afee95a08c44eae47ae26dc72faab4",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan-execution.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan-execution.stdout.log",
+      "bytes": 15470,
+      "workingSha256": "2abf0f87bed13e01a0c05002f17841a11cdcb25393e97b721235d1f943ae4e40",
+      "indexSha256": "2abf0f87bed13e01a0c05002f17841a11cdcb25393e97b721235d1f943ae4e40",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.native-receipt.json",
+      "bytes": 5797,
+      "workingSha256": "0d480ec8630f653c360373dd50bb74b91aef39a0305ee80aab2b9edbbb886f6c",
+      "indexSha256": "0d480ec8630f653c360373dd50bb74b91aef39a0305ee80aab2b9edbbb886f6c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.receipt.json",
+      "bytes": 7941,
+      "workingSha256": "b37ddee90ba4e5def413b6a327599afa3a3dd8aff317b9c30b0793ac230cc94c",
+      "indexSha256": "b37ddee90ba4e5def413b6a327599afa3a3dd8aff317b9c30b0793ac230cc94c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.request-original-bom.json.txt",
+      "bytes": 560,
+      "workingSha256": "744b492c040df9ce42c23055e8a59255a182506fe054424a3a03084c8223d190",
+      "indexSha256": "744b492c040df9ce42c23055e8a59255a182506fe054424a3a03084c8223d190",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/quality-scan.request.json",
+      "bytes": 557,
+      "workingSha256": "3f49f28b918f313f8183e81324103af9987cebcb9d856363cdb8159850d771bd",
+      "indexSha256": "3f49f28b918f313f8183e81324103af9987cebcb9d856363cdb8159850d771bd",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/report-native-selection.ts.txt",
+      "bytes": 3785,
+      "workingSha256": "02633fa69dc233838c3c2580e9893d282fc519dc1ffcae7ba272341cd845d817",
+      "indexSha256": "02633fa69dc233838c3c2580e9893d282fc519dc1ffcae7ba272341cd845d817",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/request-encoding-correction.txt",
+      "bytes": 138,
+      "workingSha256": "3a7ce57d5b4f07c389140db05b43e619ffdb94af40f865413443169a9991d96b",
+      "indexSha256": "3a7ce57d5b4f07c389140db05b43e619ffdb94af40f865413443169a9991d96b",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/resolution-mismatch.json",
+      "bytes": 3840,
+      "workingSha256": "95a14d6391a78c6da3c1d0c9ec74a142f5387205037abb9d1789766212a58e5f",
+      "indexSha256": "95a14d6391a78c6da3c1d0c9ec74a142f5387205037abb9d1789766212a58e5f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/root-lock-native-refresh.process.json",
+      "bytes": 770,
+      "workingSha256": "61e9b64f443b14014526d4c5cc9a1bbe64ab50fde25083b96584c89c3ac6a733",
+      "indexSha256": "61e9b64f443b14014526d4c5cc9a1bbe64ab50fde25083b96584c89c3ac6a733",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/root-lock-native-refresh.stderr.log",
+      "bytes": 78556,
+      "workingSha256": "cecf5065b1f95dbbe8c82e2f06f3d2963b95bfe6e976f2afc50972e998c43b93",
+      "indexSha256": "cecf5065b1f95dbbe8c82e2f06f3d2963b95bfe6e976f2afc50972e998c43b93",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/root-lock-native-refresh.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/run-deno.ps1.txt",
+      "bytes": 1839,
+      "workingSha256": "db04b912668a92c6a6212e3b49d290c1184b209e4711d5267d9343a145c810c5",
+      "indexSha256": "db04b912668a92c6a6212e3b49d290c1184b209e4711d5267d9343a145c810c5",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/run-request.ts.txt",
+      "bytes": 1228,
+      "workingSha256": "85f45f6cf582825fe3ee072b03d53b245f7d8cfb36e762066a1dab51b58da4df",
+      "indexSha256": "85f45f6cf582825fe3ee072b03d53b245f7d8cfb36e762066a1dab51b58da4df",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/scope-stop-handoff.md",
+      "bytes": 2773,
+      "workingSha256": "a7c691714010a525763e7e2fd5c6c1caac59afebccb432e3959932485abb644c",
+      "indexSha256": "a7c691714010a525763e7e2fd5c6c1caac59afebccb432e3959932485abb644c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph-final.process.json",
+      "bytes": 926,
+      "workingSha256": "94bac74596f085b17ac71f9c2f7a64638acbe81a71023f6b0aa30c7f3c1735d4",
+      "indexSha256": "94bac74596f085b17ac71f9c2f7a64638acbe81a71023f6b0aa30c7f3c1735d4",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph-final.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph-final.stdout.log",
+      "bytes": 4368,
+      "workingSha256": "557c37428dbc0e4efe28c877da70a788f5439e82eac9ac305fb57e77b90d16a7",
+      "indexSha256": "557c37428dbc0e4efe28c877da70a788f5439e82eac9ac305fb57e77b90d16a7",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.native-stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.process.json",
+      "bytes": 908,
+      "workingSha256": "12b88e3d07e42958eda90de59830036da97026545e388ce139609e793939f489",
+      "indexSha256": "12b88e3d07e42958eda90de59830036da97026545e388ce139609e793939f489",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.raw.json",
+      "bytes": 1268603,
+      "workingSha256": "328afe6e6bef1850f3f80356cbecf558b9babe3ed29df4399fb42dcc5fd03e07",
+      "indexSha256": "328afe6e6bef1850f3f80356cbecf558b9babe3ed29df4399fb42dcc5fd03e07",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.receipt.json",
+      "bytes": 2328,
+      "workingSha256": "d6fe0a34e43eba83034996d0e2e67ea34f321bb45e06d15e21469d6ecfbeedb0",
+      "indexSha256": "d6fe0a34e43eba83034996d0e2e67ea34f321bb45e06d15e21469d6ecfbeedb0",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.stderr.log",
+      "bytes": 1908,
+      "workingSha256": "8a36afe5a4abf42e07d0931408e06e7cd3314e93f25e2554496d656a50eede4f",
+      "indexSha256": "8a36afe5a4abf42e07d0931408e06e7cd3314e93f25e2554496d656a50eede4f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-auth-graph.ts.txt",
+      "bytes": 407,
+      "workingSha256": "029a3a555c9666e161247c257182e24631f108b28a0de852bcc97cf826d6fbd0",
+      "indexSha256": "029a3a555c9666e161247c257182e24631f108b28a0de852bcc97cf826d6fbd0",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.process.json",
+      "bytes": 952,
+      "workingSha256": "f005161d1b5d152ece32ce1cc40fb52f109cce7d96696538429f035544cabe5f",
+      "indexSha256": "f005161d1b5d152ece32ce1cc40fb52f109cce7d96696538429f035544cabe5f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.receipt.json",
+      "bytes": 1302,
+      "workingSha256": "aca8e116c34719946f4a85006241121c746d3150cb1c23421b6e55de08466e29",
+      "indexSha256": "aca8e116c34719946f4a85006241121c746d3150cb1c23421b6e55de08466e29",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.request.json",
+      "bytes": 227,
+      "workingSha256": "6f3f523367358d91a4772b3ac80c00e2f842acea9f1ab5e085f0590bd2e4abf9",
+      "indexSha256": "6f3f523367358d91a4772b3ac80c00e2f842acea9f1ab5e085f0590bd2e4abf9",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/selected-config-fmt.stdout.log",
+      "bytes": 2272,
+      "workingSha256": "b28ad8cf7b65d15688e37f2b1a6e500860cfecd34aece3da1f445068b0f18d72",
+      "indexSha256": "b28ad8cf7b65d15688e37f2b1a6e500860cfecd34aece3da1f445068b0f18d72",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/snapshot-baseline.ts.txt",
+      "bytes": 3021,
+      "workingSha256": "fe5004f1523c6b96e2fc05f228c29b24c6930d09c912c27c0c4706fc74229d70",
+      "indexSha256": "fe5004f1523c6b96e2fc05f228c29b24c6930d09c912c27c0c4706fc74229d70",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/source-whitespace.stderr.log",
+      "bytes": 222,
+      "workingSha256": "7d6351e8c4aba8dbfc6d5f92a6713f6b8e189306da892e8f6d85eac80501041d",
+      "indexSha256": "7d6351e8c4aba8dbfc6d5f92a6713f6b8e189306da892e8f6d85eac80501041d",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/source-whitespace.stdout.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/unchanged-auth-public-docs.native-stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/unchanged-auth-public-docs.native-stdout.log",
+      "bytes": 144,
+      "workingSha256": "60f68491e20eae734cc81e491c51135c511436159a991fc7b1f7b50503dfa2ab",
+      "indexSha256": "60f68491e20eae734cc81e491c51135c511436159a991fc7b1f7b50503dfa2ab",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/unchanged-native-cookie-jar-gitpath.native-stderr.log",
+      "bytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "indexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/evidence/unchanged-native-cookie-jar-gitpath.native-stdout.log",
+      "bytes": 251,
+      "workingSha256": "afe1b10d77fb796ccd458ee97a3c8d18c14bf35788d682a22a51660e2c065f1f",
+      "indexSha256": "afe1b10d77fb796ccd458ee97a3c8d18c14bf35788d682a22a51660e2c065f1f",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/plan.md",
+      "bytes": 2335,
+      "workingSha256": "1811fa3c2adf6bc1e523f388c68c3381f46e465d7c1e6d97aab469725553091b",
+      "indexSha256": "1811fa3c2adf6bc1e523f388c68c3381f46e465d7c1e6d97aab469725553091b",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-scope-authority.md",
+      "bytes": 1875,
+      "workingSha256": "9f759d8640300c3ba79bbfd0b7b0de8061bca77714d5b4f5e9b7ee8966d98ed4",
+      "indexSha256": "9f759d8640300c3ba79bbfd0b7b0de8061bca77714d5b4f5e9b7ee8966d98ed4",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-acceptance-20261028.md",
+      "bytes": 2671,
+      "workingSha256": "4676ccaefcd0327ac321c16e3f47a950a4d4669088764693bfb642fbeca92731",
+      "indexSha256": "4676ccaefcd0327ac321c16e3f47a950a4d4669088764693bfb642fbeca92731",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-20261028.json",
+      "bytes": 20766,
+      "workingSha256": "8ceedd7c0a6537c9d1224f3b37f98d68a383d95e38d451c131438b20d0e172ea",
+      "indexSha256": "8ceedd7c0a6537c9d1224f3b37f98d68a383d95e38d451c131438b20d0e172ea",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-security-source-audit-first-attempt-20261028.ts.txt",
+      "bytes": 2914,
+      "workingSha256": "866c4bc7630b3ea08469ecbb2c1a57e6a35f5fba576bd14da2131a9d73924688",
+      "indexSha256": "866c4bc7630b3ea08469ecbb2c1a57e6a35f5fba576bd14da2131a9d73924688",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/root-selection-amendment.md",
+      "bytes": 2763,
+      "workingSha256": "b9f920daa2fb2f6d4830ecb0be0f335aabeffbfc7068fb9bc0c451db7ae1344c",
+      "indexSha256": "b9f920daa2fb2f6d4830ecb0be0f335aabeffbfc7068fb9bc0c451db7ae1344c",
+      "immutable": true,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/supervisor.md",
+      "bytes": 1116,
+      "workingSha256": "508e52a7a1943ea66a6f21b92fb3280a87ef397715057d1552325f0384c99eab",
+      "indexSha256": "508e52a7a1943ea66a6f21b92fb3280a87ef397715057d1552325f0384c99eab",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": "deno.json",
+      "bytes": 22365,
+      "workingSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee",
+      "indexSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": "deno.lock",
+      "bytes": 187051,
+      "workingSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "indexSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "bytes": 164831,
+      "workingSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "indexSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+      "bytes": 3198,
+      "workingSha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac",
+      "indexSha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    },
+    {
+      "path": "plugins/auth/tests/services/unsupported-revocation-http_test.ts",
+      "bytes": 7603,
+      "workingSha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871",
+      "indexSha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871",
+      "immutable": false,
+      "nativeTextCanonicalization": false
+    }
+  ]
+}

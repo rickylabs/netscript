@@ -1,0 +1,4 @@
+# Byte preservation for immutable integration evidence only.
+/evidence/** -text
+/root-* -text
+/accepted-integration-proposal.md -text

@@ -1,0 +1,17 @@
+﻿{
+    "name":  "native-cookie-jar-gitpath",
+    "startedUtc":  "2026-10-28T03:28:23.0245803Z",
+    "finishedUtc":  "2026-10-28T03:28:23.3414140Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-all",
+                      ".llm/tmp/better-auth-security-sol-20261028/run-request.ts",
+                      "native-cookie-jar-gitpath"
+                  ],
+    "exitCode":  1,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\native-cookie-jar-gitpath.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\native-cookie-jar-gitpath.stderr.log"
+}

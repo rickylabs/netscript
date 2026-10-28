@@ -1,0 +1,63 @@
+import { join } from '@std/path';
+const dir = '.llm/tmp/better-auth-security-sol-20261028';
+const parse = async (path: string) => JSON.parse((await Deno.readTextFile(path)).replace(/^\uFEFF/, ''));
+const baseline = await parse(`${dir}/baseline.json`);
+const hex = (data: ArrayBuffer) => Array.from(new Uint8Array(data), (b) => b.toString(16).padStart(2,'0')).join('');
+const hash = async (path: string) => hex(await crypto.subtle.digest('SHA-256', await Deno.readFile(path)));
+const same = (a: unknown,b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+const authored=[];
+for (const row of baseline.authored) {
+  const text = await Deno.readTextFile(row.path), original = await Deno.readTextFile(row.snapshot);
+  const lines = text.split(/\r?\n/).length - (text.endsWith('\n') ? 1 : 0);
+  const isLock = row.path.endsWith('.lock');
+  const expected = original.replaceAll('^1.6.20','^1.7.7');
+  if (!isLock && text !== expected) throw new Error(`Nonliteral authored edit: ${row.path}`);
+  if (!isLock && lines !== row.lines) throw new Error(`Authored line count changed: ${row.path}`);
+  authored.push({ path: row.path, sha256: await hash(row.path), lines, bytes: (await Deno.stat(row.path)).size, originalSha256: row.sha256, literalOnly: isLock ? undefined : true });
+}
+const protectedFiles=[];
+for (const row of baseline.protectedFiles) {
+  const observed = await hash(join(row.root,row.path));
+  protectedFiles.push({ ...row, observedSha256: observed, matches: observed===row.sha256 });
+}
+if (protectedFiles.some(row=>!row.matches)) throw new Error('Protected bytes changed');
+await Deno.writeTextFile(`${dir}/protected-final.json`,JSON.stringify({ count:protectedFiles.length, allMatch:true, files:protectedFiles},null,2)+'\n');
+const locks=[];
+const allowed = new Set(['better-auth','@better-auth/core','@better-auth/drizzle-adapter','@better-auth/kysely-adapter','@better-auth/memory-adapter','@better-auth/mongo-adapter','@better-auth/prisma-adapter','@better-auth/telemetry','@better-auth/utils','@better-fetch/fetch','@noble/ciphers','@noble/hashes','better-call','kysely','nanostores','rou3','set-cookie-parser']);
+const nameOf=(id:string)=>id.slice(0,id.indexOf('@',1));
+for (const row of baseline.authored.filter((x:{path:string})=>x.path.endsWith('.lock'))) {
+  const old=await parse(row.snapshot), next=await parse(row.path);
+  const nonNpm=(x:Record<string,unknown>)=>Object.fromEntries(Object.entries(x).filter(([key])=>!['npm','specifiers','workspace'].includes(key)));
+  if(!same(nonNpm(old),nonNpm(next))) throw new Error('Unrelated non-npm lock section changed');
+  const otherSpec=(x:Record<string,unknown>)=>Object.fromEntries(Object.entries(x).filter(([key])=>!key.startsWith('npm:better-auth@')));
+  if(!same(otherSpec(old.specifiers),otherSpec(next.specifiers))) throw new Error('Unrelated specifier changed');
+  if(!same(JSON.parse(JSON.stringify(old.workspace).replaceAll('^1.6.20','^1.7.7')),next.workspace)) throw new Error('Unrelated workspace metadata changed');
+  const changed=[...new Set([...Object.keys(old.npm),...Object.keys(next.npm)])].filter(id=>!same(old.npm[id],next.npm[id]));
+  const metadata=[];
+  for(const id of changed.filter(id=>!allowed.has(nameOf(id)))) {
+    const a=structuredClone(old.npm[id]),b=structuredClone(next.npm[id]);
+    if(nameOf(id)==='@opentelemetry/sdk-trace-base' && b.deprecated===true) {delete b.deprecated; if(!same(a,b)) throw new Error('Unexpected sdk-trace-base change'); metadata.push({id,kind:'native deprecated metadata only'});}
+    else if(nameOf(id)==='@orpc/openapi') {b.dependencies=b.dependencies.map((x:string)=>x==='rou3@0.7.12'?'rou3':x); if(!same(a,b)) throw new Error('Unexpected orpc edge change'); metadata.push({id,kind:'same rou3 0.7.12 identity made explicit after second version added'});}
+    else throw new Error(`Unrelated npm delta ${id}`);
+  }
+  const family=Object.keys(next.npm).filter(id=>/^better-auth@|^@better-auth\/(?:core|drizzle-adapter|kysely-adapter|memory-adapter|mongo-adapter|prisma-adapter|telemetry)@/.test(id));
+  if(family.length!==8||family.some(id=>!id.includes('@1.7.14'))) throw new Error('Unexpected release family');
+  if(Object.keys(next.npm).some(id=>/^better-auth@1\.6\.20|^@better-auth\/[^@]+@1\.6\.20/.test(id))) throw new Error('Old vulnerable family retained');
+  locks.push({path:row.path,selected:next.specifiers['npm:better-auth@^1.7.7'],family,changedNpmEntries:changed.map(id=>({id,old:old.npm[id],next:next.npm[id]})),metadata,unrelatedSectionsUnchanged:true});
+}
+if(!same(locks[0].family,locks[1].family)) throw new Error('Root/UI family split');
+const nativeDiff=await new Deno.Command('git',{args:['diff','--no-ext-diff','--binary','--',...authored.map(x=>x.path)],stdout:'piped',stderr:'piped'}).output();
+if(!nativeDiff.success) throw new Error('Cannot capture source diff');
+await Deno.writeFile(`${dir}/final-five-owner.diff`,nativeDiff.stdout);
+await Deno.writeFile(`${dir}/final-five-owner.diff.stderr.log`,nativeDiff.stderr);
+const names=await new Deno.Command('git',{args:['diff','--name-only'],stdout:'piped',stderr:'piped'}).output();
+if(!names.success) throw new Error('Cannot inventory source');
+const actual=new TextDecoder().decode(names.stdout).trim().split(/\r?\n/).sort();
+if(!same(actual,authored.map(x=>x.path).sort())) throw new Error('Tracked footprint exceeds five owners');
+const whitespace=await new Deno.Command('git',{args:['diff','--check','--',...authored.map(x=>x.path)],stdout:'piped',stderr:'piped'}).output();
+await Deno.writeFile(`${dir}/source-whitespace.stdout.log`,whitespace.stdout);
+await Deno.writeFile(`${dir}/source-whitespace.stderr.log`,whitespace.stderr);
+if(!whitespace.success) throw new Error('Source whitespace check failed');
+const report={baseline:baseline.baseline, authored, protectedCount:protectedFiles.length, protectedAllMatch:true, trackedOwners:actual, locks, sourceWhitespaceExitCode:whitespace.code, ordinaryNativeSelectionWithoutAgeBypass:true};
+await Deno.writeTextFile(`${dir}/final-source-closure.json`,JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({authored, protectedCount:protectedFiles.length, trackedOwners:actual, locks:locks.map(({path,family,metadata})=>({path,familyCount:family.length,metadata})),sourceWhitespaceExitCode:whitespace.code}));

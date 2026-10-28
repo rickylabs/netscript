@@ -1,0 +1,42 @@
+{
+  "outcome": "PASS",
+  "startedAt": "2026-10-28T04:35:31.899Z",
+  "finishedAt": "2026-10-28T04:35:32.080Z",
+  "durationMs": 181,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 165,
+    "sha256": "9b9c7000d082d4fc97cc3cdd70b70424f5c884925407f879f8986c1378f5bfc4",
+    "tail": "{\"report\":\".llm/tmp/security-db-integration-20261028/db-lint-canonical.json\",\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "gateId": "db-lint-canonical",
+  "gitHead": "c243d31535027addc034c99e170cb43d2faf475a",
+  "args": [
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-lint.ts",
+    "--file",
+    ".llm/tools/deps/check-db-alignment.ts",
+    "--file",
+    ".llm/tools/deps/check-db-alignment_test.ts",
+    "--config",
+    ".llm/tmp/security-db-integration-20261028/lint-canonical-rules.json",
+    "--output",
+    ".llm/tmp/security-db-integration-20261028/db-lint-canonical.json"
+  ],
+  "timeoutMs": 120000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative",
+  "childReport": ".llm/tmp/security-db-integration-20261028/db-lint-canonical.json"
+}
