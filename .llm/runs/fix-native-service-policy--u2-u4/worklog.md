@@ -258,3 +258,11 @@ byte-audited manifest. Final corrected owning14/0/0 and changed-test static1/1 p
 same-production whole service630/1, consumers26/0 and publication receipts remain valid within
 root's explicit test-only correction scope. Mapped IPv4 and cold DB remain open/unwaived.
 Independent complete-PR architecture IMPL is preparation only, pending root packet review.
+
+## Independent implementation acceptance, 2026-10-28
+
+Root accepts the full same-session Grok source PASS and bounded debt disposition; see
+[root acceptance](root-independent-impl-acceptance-20261028.md), [revised complete report](evaluate.md)
+and [faithful original/continuation evidence](independent-impl-20261028/checkpoint.md).
+Original23 total EOF reads, own MCP, actual model identity and owned status/pipe settlement are
+verified. Security/DB integration and remaining Windows/e2e/production gates stay open.

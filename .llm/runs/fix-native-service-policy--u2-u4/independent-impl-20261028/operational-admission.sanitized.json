@@ -1,0 +1,29 @@
+{
+  "historicalOnly": true,
+  "authorizesNewDispatch": false,
+  "rawOperationalValuesIncluded": false,
+  "attempts": [
+    {
+      "attempt": "original",
+      "provider": "openrouter",
+      "plannedEstimateUsd": 6.5,
+      "estimateNotProviderEnforcedCap": true,
+      "recordedAllowed": true,
+      "recordedWarning": false,
+      "positiveEstimate": true,
+      "accountAndSelectedKeyMinimumUsed": true,
+      "launchMinimumCoveredEstimate": true
+    },
+    {
+      "attempt": "debt-completion",
+      "provider": "openrouter",
+      "plannedEstimateUsd": 3.3,
+      "estimateNotProviderEnforcedCap": true,
+      "recordedAllowed": true,
+      "recordedWarning": false,
+      "positiveEstimate": true,
+      "accountAndSelectedKeyMinimumUsed": true,
+      "launchMinimumCoveredEstimate": true
+    }
+  ]
+}
