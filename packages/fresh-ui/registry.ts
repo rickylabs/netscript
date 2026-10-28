@@ -6,6 +6,17 @@
 
 import { freshUiRegistryManifest as manifest } from './registry.manifest.ts';
 
+export { freshUiRegistryJson } from './registry.manifest.ts';
+export { REGISTRY_ITEM_TYPES } from './src/registry/registry-contract.ts';
+export type {
+  Registry,
+  RegistryCss,
+  RegistryFile,
+  RegistryFont,
+  RegistryItem,
+  RegistryItemType,
+} from './src/registry/registry-contract.ts';
+
 export { FRESH_UI_REGISTRY_CONTENT } from './registry.generated.ts';
 
 /** File entry copied from the Fresh UI registry into an application workspace. */

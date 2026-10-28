@@ -12,7 +12,8 @@
     "./primitives": "./primitives.tsx",
     "./registry": "./registry.ts",
     "./tokens": "./tokens.ts",
-    "./token-config": "./token-config.ts"
+    "./token-config": "./token-config.ts",
+    "./registry-v2": "./registry-v2.ts"
   },
   "imports": {
     "@netscript/sdk/auto-update": "jsr:@netscript/sdk@0.0.8/auto-update",
@@ -30,7 +31,11 @@
       "registry/lib/toast.ts",
       "deno.json",
       "README.md",
-      "tokens/README.md"
+      "tokens/README.md",
+      "registry.json",
+      "src/registry/schemas/*.json",
+      "src/registry/README.md",
+      "src/registry/schemas/LICENSE"
     ],
     "exclude": [
       "scripts/**",
