@@ -1,4 +1,4 @@
-# Final validation
+# Initial validation
 
 Code evaluated and validated at `125ac4b1dd834c27056e50a901a74a203f82eba6`.
 The final evidence commit changes run records only.
@@ -39,3 +39,37 @@ findings were in three untouched files and were not altered or suppressed.
 Test evidence comes from `.llm/tools/run-deno-test.ts` with the exact test arguments in
 `docs:snippets:test`. The exports-drift gate also has a native run-gate PASS receipt retained
 outside Git. No snippet gate exists in that allowlist; no handcrafted receipt claims one.
+
+## Review-repair validation
+
+Final source head: `d77b4b6ab0cf4cb4699a0ec9bf138438b3768733`; later closeout changes only evidence.
+
+| Gate | Result |
+| --- | --- |
+| New external-SIGTERM and later-fence regressions before repair | RED, each exits 1 |
+| Combined process/compiler/README-policy/workflow structured tests | PASS, 23 tests, 18.158s |
+| `deno task docs:snippets:test` | PASS, 20 tests, 20.107s |
+| `deno task docs:snippets` | PASS, 41.689s |
+| Native `readme-fences` gate at a6e91af | PASS, 143.067s, 99 checked, five errors, four failing READMEs |
+| Native `readme-fences` gate at final d77b4b6 | PASS, 149.623s, identical census, no unattributed failure |
+| Original-main compiler/README baseline on same content | PASS, 10.047s, identical census |
+| Final structured check | PASS, 53 files, zero findings |
+| Final structured lint | PASS, nine changed TypeScript files, zero findings |
+| Final structured format | PASS, 53 files, zero findings |
+| Exact test-5 failing auth fixture, unchanged | PASS locally, 46.314s |
+| Same-session final independent IMPL-EVAL | PASS, no blocking findings |
+| Review-thread gate | PASS, all three findings answered |
+| Lock hygiene | Root deno.lock unchanged |
+
+The type-error ceiling remains five, failing-README ceiling four; coverage floors are unchanged.
+The per-entrypoint cost is explicit: the complete README gate now takes about 150 seconds locally,
+versus about ten seconds for its old combined graph. Every compiler retains a separate deadline.
+
+[Pages build on the repaired source](https://github.com/rickylabs/netscript/actions/runs/40706224523/job/122879437081)
+passed: 112 seconds total, snippets 65 seconds, exports drift 20 seconds, Lume 15 seconds.
+Core CI was restarted by the source pushes; its prior quality failure was the missing README
+environment permission. Prior test-5 had a single auth fixture fetch failure among 1,455 passes;
+the exact test passes unchanged locally. Do not classify future/pending checks as PASS.
+
+The runtime scaffold gate remains unavailable and unproven as recorded above. No gate was removed,
+skipped by this change, or weakened, and no ratchet bound was increased.

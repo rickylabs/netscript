@@ -36,6 +36,11 @@ evaluator. Inspect and address the separate test-5 failure from its structured a
   regression for duplicate bare imports at different fences. This does not change any ratchet bound.
 - Final combined process/compiler/README-policy/workflow suite passes all 23 tests (18.158s),
   including the new unmapped-import case. Root deno.lock remains unchanged.
+- Final native README gate at d77b4b6: PASS, 149.623s, identical 99/five/four census and no
+  unattributed failure. Same-session final Claude verdict: PASS, no blockers; check/lint/format
+  evidence and repair run artifacts accepted. The final closeout commit touches evidence only.
+- Actual Pages build at d77b4b6 passes in 112s, snippets in 65s. All three Augment findings have
+  replies and the review-thread gate passes. Core CI is running on the repair source.
 
 ## Design checkpoint
 
@@ -102,8 +107,9 @@ commit is ahead. Changes stay within declared ownership. Independent evaluation 
 
 ## Independent review and READY
 
-- Independent native Claude evaluation: PASS, no blocking defects; see evaluate.md. Read-only
-  tools, closed stdin, requested/observed claude-opus-5-5 high; no repair round needed.
+- Initial independent native Claude evaluation: PASS; see evaluate.md. Read-only tools, closed
+  stdin, requested/observed claude-opus-5-5 high. Subsequent Augment findings required the repairs
+  and same-session re-evaluation recorded at the top of this file and in evaluate.md.
 - Final checked-in task: docs:snippets:test 18 PASS, 13.515 seconds. Final sequential exports,
   snippets and site verification: PASS, 55.958 seconds total (4.324 + 41.508 + 10.126).
 - Already-completed Pages CI run 40700388436 inspected once on evaluated head 125ac4b: PASS;

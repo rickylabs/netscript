@@ -12,3 +12,6 @@
   paths; that generated report was inadvertently included in the implementation commit. The next
   commit replaces it with a privacy-safe summary. No secrets were included. Earlier history remains
   because the owner prohibits force-pushing; this limitation is disclosed rather than hidden.
+- Review repair: the initial implementation/evaluation missed the shared README compiler caller
+  and the external launcher-signal path. All three Augment findings are fixed, with red/green
+  regressions and same-session re-evaluation PASS. README ratchet bounds and CI gates remain intact.
