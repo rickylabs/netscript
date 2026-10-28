@@ -25,9 +25,10 @@ GitHub process. Two obligations are non-negotiable for any agent that opens issu
    before issue closure live in `.agents/skills/netscript-pr`.
 2. **Taxonomy + milestones.** Apply the namespaced colon labels
    (`type:`/`area:`/`priority:`/`wave:`/ `epic:`/`gate:`/`status:`, exactly one `status:`) and
-   assign an explicit release milestone (`0.0.2`…`0.0.9` or `Backlog / Triage`). The full taxonomy
-   and milestone guidance, and templates live in the netscript-pr skill; the machine-readable label
-   set is `.github/labels.yml`.
+   assign exactly one milestone: the numbered next release (for example `0.0.9`) only for work
+   agreed for that release, otherwise the theme milestone that owns the work, or
+   `Backlog / Triage`. The full taxonomy and milestone guidance, and templates live in the
+   netscript-pr skill; the machine-readable label set is `.github/labels.yml`.
 
 Use `.agents/skills/netscript-release` for release cuts, publish handoffs, race-free production E2E
 verification, and rollback.

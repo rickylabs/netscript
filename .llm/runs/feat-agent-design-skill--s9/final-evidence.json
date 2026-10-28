@@ -45,5 +45,44 @@
   "mcpBudget": 294912,
   "dependencyLockChanges": false,
   "publicationPerformed": false,
-  "manualWorkflowLimitation": "Optional native desktop exception-boundary job failed separately; no overall workflow-green claim."
+  "manualWorkflowLimitation": "Optional native desktop exception-boundary job failed separately; no overall workflow-green claim.",
+  "nativeAllHostCli": [
+    {
+      "host": "claude",
+      "firstExit": 0,
+      "repeatExit": 0,
+      "canonicalReference": true,
+      "discoverable": true,
+      "idempotent": true
+    },
+    {
+      "host": "vscode",
+      "firstExit": 0,
+      "repeatExit": 0,
+      "canonicalReference": true,
+      "discoverable": true,
+      "idempotent": true
+    },
+    {
+      "host": "opencode",
+      "firstExit": 0,
+      "repeatExit": 0,
+      "canonicalReference": true,
+      "discoverable": true,
+      "idempotent": true
+    }
+  ],
+  "dogfoodBaselineLimitation": [
+    {
+      "tree": "baseline",
+      "exit": 1,
+      "finding": "missing legacy .claude/skills/aspire-init/SKILL.md"
+    },
+    {
+      "tree": "s9",
+      "exit": 1,
+      "finding": "missing legacy .claude/skills/aspire-init/SKILL.md"
+    }
+  ],
+  "integratedMain": "49eeb9f"
 }
