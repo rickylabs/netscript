@@ -1,0 +1,14 @@
+const root='C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out=root+'/.llm/tmp/native-host-policy-u1-s6e-astra-20261028';
+const sha=async(b:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',b)),v=>v.toString(16).padStart(2,'0')).join('');
+const original=await Deno.readTextFile(root+'/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/run-gates.ts');
+await Deno.writeTextFile(out+'/run-gates.ts',original.replaceAll('s6d-astra','s6e-astra'),{createNew:true});
+const before=JSON.parse(await Deno.readTextFile(root+'/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/source-proof-2.json'));
+const checkpoint=JSON.parse(await Deno.readTextFile(root+'/.llm/tmp/native-host-policy-u1-s6d-checkpoint-20261028/head-audit.json'));
+const selected=new Map<string,string>();
+for(const row of before.protectedRows)selected.set(row.path,row.expected);
+for(const row of checkpoint.rows)if(row.path!==before.owner.path)selected.set(row.path,row.sha256);
+const current=await Deno.readFile(root+'/'+before.owner.path),prefix=current.slice(0,before.owner.bytes);
+if(await sha(prefix)!==before.owner.sha256)throw new Error('Accepted prefix changed before execution');
+await Deno.writeTextFile(out+'/protected-bindings.json',JSON.stringify({head:checkpoint.head,originalProtectedCount:116,checkpointPaths:checkpoint.paths,rows:Array.from(selected,([path,expected])=>({path,expected})),prefix:{path:before.owner.path,bytes:before.owner.bytes,lines:before.owner.lines,sha256:before.owner.sha256}},null,2),{createNew:true});
+console.log(JSON.stringify({protectedBindings:selected.size,prefixBytes:prefix.length,prefixSha256:await sha(prefix)}));

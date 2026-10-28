@@ -163,3 +163,195 @@ console.log(JSON.stringify({ mode, observedBound, hostnameReads, blockerPreserve
 console.log('${MARKER}');
 `;
 }
+
+const LIFECYCLE_CLEANUP = 's6e-streams: response, native stops and both ports settled';
+const LIFECYCLE_SUCCESS = 's6e-streams: lifecycle assertion and cleanup settled';
+type LifecycleMode = 'abort' | 'drain';
+
+Deno.test({
+  name: 'streams caller abort releases both ports before manual stop; omitted signal detects leak',
+  sanitizeResources: true,
+  sanitizeOps: true,
+  sanitizeExit: true,
+  fn: () => runLifecycleRows('abort'),
+});
+
+Deno.test({
+  name: 'streams concurrent native stops drain an auth-held read; early observation is rejected',
+  sanitizeResources: true,
+  sanitizeOps: true,
+  sanitizeExit: true,
+  fn: () => runLifecycleRows('drain'),
+});
+
+/** Negative children change only signal presence or the explicitly labeled stop observation. */
+async function runLifecycleRows(mode: LifecycleMode): Promise<void> {
+  for (const negative of [false, true]) {
+    const label = mode === 'abort'
+      ? (negative ? 'abort-omitted' : 'abort-present')
+      : (negative ? 'drain-observation-negative' : 'drain-native');
+    await using sandbox = await createRuntimeSandbox(label);
+    const [upstream] = choosePorts();
+    const run = await sandbox.run(lifecycleProbe(sandbox.scratch, upstream, mode, negative), {
+      cwd: PLUGIN_ROOT,
+      preferredPorts: [upstream],
+    });
+    const evidence = `${label}: exit ${run.code}\n${run.stderr}\n${run.stdout}`;
+    assertEquals(run.code, negative ? 1 : 0, evidence);
+    assertEquals(run.stdout.split(LIFECYCLE_CLEANUP).length - 1, 1, evidence);
+    assertEquals(run.stdout.split(LIFECYCLE_SUCCESS).length - 1, negative ? 0 : 1, evidence);
+    if (negative) {
+      const expected = mode === 'abort'
+        ? 'ABORT_DID_NOT_RELEASE'
+        : 'DRAIN_COMPLETED_BEFORE_RELEASE';
+      assertEquals(run.stderr.match(/^error: .*$/gm), [
+        'error: Uncaught (in promise) Error: ' + expected,
+      ], evidence);
+    } else {
+      assertEquals(run.stdout.trimEnd().endsWith(LIFECYCLE_SUCCESS), true, evidence);
+    }
+  }
+}
+
+/** Real factory, requests and native stop promises remain unchanged in observation controls. */
+function lifecycleProbe(
+  scratch: string,
+  upstream: number,
+  mode: LifecycleMode,
+  negative: boolean,
+): string {
+  return `import { assert, assertEquals } from 'jsr:@std/assert@^1';
+import type { AuthenticatorPort, RunningService } from '@netscript/plugin-streams/service';
+const mode: string = ${JSON.stringify(mode)}, negative = ${negative};
+const upstream = ${upstream};
+const path = '/v1/stream/s6e-' + crypto.randomUUID();
+const expectedBody = 's6e-' + mode + '-real-stream';
+const entered = Promise.withResolvers<void>(), release = Promise.withResolvers<void>();
+const controller = new AbortController();
+const failures: unknown[] = [], stops: Promise<void>[] = [];
+const ports: number[] = [upstream];
+const rebinds: { phase: string; port: number }[] = [];
+const observations: Record<string, unknown> = { mode, negative };
+let running: RunningService | undefined;
+let response: Promise<[number, string]> | undefined;
+let holdRead = false, authCalls = 0;
+const authenticator: AuthenticatorPort = {
+  async authenticate(request) {
+    authCalls++;
+    assertEquals(request.path, path);
+    if (request.header('x-fixture-token') !== 'allowed') {
+      return { ok: false, reason: 'missing-credential' };
+    }
+    if (holdRead && request.method === 'GET') {
+      entered.resolve();
+      await release.promise;
+    }
+    return { ok: true, principal: {
+      subject: 'fixture:lifecycle', scopes: [], roles: [], scheme: 'custom', claims: {},
+    } };
+  },
+};
+async function consume(response: Response): Promise<[number, string]> {
+  return [response.status, await response.text()];
+}
+async function waitReleased(selected: readonly number[], failure: string, phase: string): Promise<void> {
+  const pending = new Set(selected), deadline = performance.now() + 2_000;
+  while (pending.size > 0) {
+    if (performance.now() >= deadline) throw new Error(failure);
+    for (const port of pending) {
+      try {
+        Deno.listen({ hostname: '127.0.0.1', port }).close();
+        pending.delete(port);
+        rebinds.push({ phase, port });
+      } catch (error) {
+        if (!(error instanceof Deno.errors.AddrInUse)) throw error;
+      }
+    }
+    if (pending.size > 0) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+  }
+}
+function observe(stop: Promise<void>) {
+  const state: { status: 'pending' | 'fulfilled' | 'rejected'; error?: unknown } = { status: 'pending' };
+  void stop.then(() => { state.status = 'fulfilled'; }, (error) => {
+    state.status = 'rejected'; state.error = error;
+  });
+  return state;
+}
+try {
+  Deno.chdir(${JSON.stringify(scratch)});
+  Deno.env.set('STREAMS_INTERNAL_PORT', String(upstream));
+  Deno.env.set('PORT', 'invalid ambient PORT');
+  Deno.env.set('STREAMS_PORT', 'invalid ambient STREAMS_PORT');
+  const { startStreamsService } = await import('@netscript/plugin-streams/service');
+  running = await startStreamsService({
+    auth: { authn: { authenticator, protect: ['/'], allowAnonymous: ['/health'] } },
+    serve: { hostname: '127.0.0.1', port: 0, handleSignals: false, drainTimeoutMs: 5_000,
+      ...(mode === 'abort' && !negative ? { signal: controller.signal } : {}) },
+  });
+  const front = running.addr.port;
+  ports.push(front);
+  assertEquals([running.addr.hostname, running.addr.transport], ['127.0.0.1', 'tcp']);
+  assert(Number.isInteger(front) && front > 0);
+  const url = \`http://127.0.0.1:\${front}\${path}\`;
+  const headers = { 'x-fixture-token': 'allowed', 'content-type': 'text/plain' };
+  const created = await consume(await fetch(url, { method: 'PUT', headers, body: expectedBody }));
+  assertEquals(created[0], 201);
+  const upstreamRead = await consume(await fetch(\`http://127.0.0.1:\${upstream}\${path}?offset=-1\`));
+  assertEquals(upstreamRead, [200, expectedBody]);
+  observations.upstreamRead = upstreamRead;
+  if (mode === 'abort') {
+    const read = await consume(await fetch(url + '?offset=-1', { headers }));
+    assertEquals(read, upstreamRead);
+    observations.frontRead = read;
+    controller.abort();
+    await waitReleased(ports, 'ABORT_DID_NOT_RELEASE', 'before-manual-stop');
+    observations.releasedBeforeStop = [...ports];
+  } else {
+    holdRead = true;
+    response = fetch(url + '?offset=-1', { headers }).then(consume);
+    await Promise.race([entered.promise, response.then(() => {
+      throw new Error('REQUEST_DID_NOT_WAIT_FOR_AUTH');
+    })]);
+    stops.push(running.stop(), running.stop());
+    const actual = stops.map(observe);
+    const observed = negative ? [observe(Promise.resolve()), actual[1]] : actual;
+    await waitReleased([front], 'DRAIN_LISTENER_DID_NOT_RELEASE', 'while-auth-held');
+    await Promise.resolve();
+    observations.actualBeforeRelease = actual.map((state) => state.status);
+    observations.observedBeforeRelease = observed.map((state) => state.status);
+    for (const state of [...actual, ...observed]) {
+      if (state.status === 'rejected') throw state.error;
+      if (state.status === 'fulfilled') throw new Error('DRAIN_COMPLETED_BEFORE_RELEASE');
+    }
+    release.resolve();
+  }
+} catch (error) {
+  failures.push(error);
+}
+const primaryFailures = failures.length;
+// Release even after observation/setup failure; the real request and both native stops still settle.
+release.resolve();
+try {
+  if (response !== undefined) {
+    const read = await response;
+    assertEquals(read, [200, expectedBody]);
+    observations.frontRead = read;
+  }
+} catch (error) { failures.push(error); }
+for (const stop of stops) {
+  try { await stop; } catch (error) { failures.push(error); }
+}
+observations.nativeStopsSettled = stops.length;
+try {
+  await running?.stop();
+  await running?.stop();
+} catch (error) { failures.push(error); }
+try { await waitReleased(ports, 'CLEANUP_DID_NOT_RELEASE', 'after-native-stop'); }
+catch (error) { failures.push(error); }
+console.log(JSON.stringify({ observations, authCalls, rebinds }));
+if (failures.length === primaryFailures) console.log('${LIFECYCLE_CLEANUP}');
+if (failures.length === 1) throw failures[0];
+if (failures.length > 1) throw new AggregateError(failures, failures.map(String).join('\\n'));
+console.log('${LIFECYCLE_SUCCESS}');
+`;
+}

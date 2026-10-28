@@ -1,0 +1,12 @@
+{
+  "code": 0,
+  "stdout": "{\n  \"version\": 1,\n  \"denoVersion\": \"2.9.7\",\n  \"denoDir\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\",\n  \"modulesCache\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\\\remote\",\n  \"npmCache\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\\\npm\",\n  \"typescriptCache\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\\\gen\",\n  \"registryCache\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\\\registries\",\n  \"originStorage\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\\\location_data\",\n  \"webCacheStorage\": \"C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\\\location_data\\\\web_cache\"\n}\n",
+  "stderr": "",
+  "pid": 32556,
+  "startedAt": "2026-10-28T05:10:38.318Z",
+  "finishedAt": "2026-10-28T05:10:38.381Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true,
+  "explicitDenoDir": true
+}
