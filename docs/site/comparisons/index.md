@@ -8,6 +8,9 @@ order: 1
 
 # Compare NetScript
 
+These pages build the same feature in NetScript and in other frameworks, side by side, so you can
+compare the code directly. [Why NetScript](/why/) covers the positioning and the trade-offs.
+
 {{ comp.cardsGrid({ columns: 2, cards: [
   {
     eyebrow: "Frontend",
