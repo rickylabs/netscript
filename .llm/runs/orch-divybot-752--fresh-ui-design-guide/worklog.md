@@ -414,3 +414,24 @@ v2 contradicts.
 | `docs:links` / `docs:accuracy` / `docs:snippets` / site `check:links` / docs `_plugins` tests | PASS ×4 / 7 passed |
 | Probe strings in the MCP carrier | 0 |
 | fmt / lint on changed TS and the skill | PASS |
+
+## IMPL-EVAL round 6 (same session `ses_ea08ab886ffeD4MI4Ly0kKJlRJ`)
+
+- Re-steer on head `747cc7b` (fresh snapshot, V1 `OPENCODE_BIN`, receipt `impl-eval-launch-r6.jsonl`), covering S9.
+- **Verdict: PASS**, no findings.
+  - Dropping S1 is correct, and the branch changes no `packages/fresh-ui` files.
+  - The evaluator reproduced every v2 claim on its own local-source scaffold (removed afterwards): the five-file
+    build, attribute stamping, the 18 presets, `init --force` resetting the override, `$extensions` rejected, copper
+    left behind on a `primary`-only override, the seven-role fix, per-scheme ramps, and the teal/copper edge cases.
+  - Its contrast spot-checks match the guide's table within rounding. No pre-v2 remnants remain.
+
+## CI on `747cc7b`: check-test-shard (test-3) flake
+
+- Shard 3 failed 1 of 1,727 results: "real generated browser: signin/provider/callback and the next guarded app
+  read" (`packages/cli/e2e/tests/application/gates/scaffold/generated-browser-conformance_test.ts:56`).
+- Chrome 156 started but did not serve DevTools `/json/list` within 20 s (dbus errors in its stderr), so the
+  test never reached the app. The failure came from the receipt artifact's `test.report.json`, because the job log
+  only carries the shard's file list.
+- Not this PR: main passed the same shard on its last five commits, and the branch touches no e2e or app-template
+  files. GitHub refused a job rerun while the run was in progress; this record push starts a fresh run on the new
+  head instead.

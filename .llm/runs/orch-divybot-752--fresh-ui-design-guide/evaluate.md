@@ -320,3 +320,62 @@ No new product findings. No doctrine violations. No debt entries required. Evalu
 | Rationale | Both rebases preserved the evaluated product patch byte-for-byte (identical file list modulo the fixture; identical hunks including the auto-merged build-tokens header); carriers fresh with zero probe strings; the single fixture delta re-locks a proven near-tie (same-stem overlap measured, flip reproduced as a whole-corpus IDF effect with old order on either corpus alone, #1 still asserted via exact mode, ranking policy and test logic untouched, MCP 199/199); main's design-system docs explicitly describe today's :root/[data-theme='dark'] selectors with the new model provisional to S1 #2414, so no contradiction. S1 update obligation filed in caveats. |
 
 VERDICT: PASS
+
+## Round 6 (tokens v2 reconciliation, same evaluator session)
+
+| Field | Value |
+| --- | --- |
+| Evaluated head | `747cc7bc2991234a75ed195bc7393c0c5fc81cc1` ("docs(web-layer): teach the tokens v2 theme model in the design guidance"), rebased onto main `96d13d2` (merges #2442/#2457/#2463/#2449/#2435) |
+| Pre-rebase tip | local branch `backup/divybot-752-pre-v2` (`b7e0ee0`) |
+| Evaluator route (observed) | same session, Muse Spark (`meta/muse-spark-1.3`) via OpenCode/OpenRouter |
+
+### (1) Dropping the S1 token-derivation commit — CORRECT
+
+- v2 (#2435) deleted exactly the files S1 edited: `tokens/semantic.tokens.json`, `tokens/themes/light.tokens.json` (plus `dark`, `primitives`), confirmed via the #2435 file list; the S1 test file (`theme-tokens.test.ts`) is likewise gone on main.
+- `packages/fresh-ui/tokens/README.md`: "Figma owns values", "Never fix a failing Figma value in code", NS One legacy CSS byte-locked (exact byte prefix, gzip budget). Porting the derivation by hand would violate that doctrine — the drop (not a port) is the only correct move.
+- The branch now changes zero `packages/fresh-ui` files (`git diff origin/main HEAD -- packages/fresh-ui/` empty). Drift.md S9 records the drop and the rationale.
+
+### (2) Theme claims vs tokens v2 — all reproduced on a local-source scaffold
+
+Scaffold: `netscript-dev.ts init r6probe … --db none --no-aspire --no-git --ci --yes` (removed afterwards). Verified:
+
+- **Five files**: `tokens build` prints "Built 5 token assets"; `assets/{tokens.css,tokens.json,theme-bridge.css,theme-preset.json,fonts.json}` all refreshed.
+- **Stamping**: `_app.tsx` template stamps `data-theme={preset.language}`, `data-scheme`, `data-density`, `data-flavor`; seed script sets `data-scheme` from `ns-theme`/OS. `ThemeToggle` (`applyScheme`) flips `data-scheme` and retains language/flavor/density; keeps legacy `ns-theme` key.
+- **18 presets**: preset JSON ids + `generatedThemes` names both enumerate exactly the guide's list (NS One, 7 Studio flavors, tonal/bloom/cupertino/liquid/fluent/brutal/filigrane/terminal/pixel/tactile). Theme registry items `theme-ns-one` … `theme-tactile` confirmed (18).
+- **`tokens init`**: creates `tokens/source/`, `tokens.config.json`, empty `tokens/semantic.tokens.json`; `--force` resets the override file (reproduced: custom content replaced by `{"semantic": {}}`).
+- **Alias-only overrides**: `$extensions` on an override fails with "Overrides cannot change metadata" before any asset is replaced (reproduced).
+- **Primary-only override leaves copper**: reproduced — `primary` → `var(--ns-blue-9)` while hover/subtle/border/accent/ring stay copper, in both scheme blocks. The guide's "set all seven together" is therefore required, not stylistic.
+- **Seven-role override works**: `accent`/`ring` → `{semantic.primary}` render `var(--ns-primary)`; ramp steps resolve per scheme (`blue-3` `#e6f4fe`/`#0d2847`); v2 scheme blocks come after the byte-locked legacy prefix, so they win the cascade.
+- **Ramps**: semantic tier carries full 1–12 for blue/indigo/violet/teal/grass/tomato/orange; copper stops at 8 — "no step 9 or 10" TRUE. `teal-3` identical in both schemes (`#77cac4`) — TRUE.
+- **Contrast table spot-check** (WCAG, evaluator-computed): blue-9/gray-12 6.13 (guide 6.1), blue-10 light 5.52 (5.5), dark 7.17 (7.2), indigo-9/gray-1 4.99 (5.0), indigo-10 dark 4.11 (4.1). All match within rounding.
+- **No contrast check on overrides**: orange-9 + gray-1 built cleanly (reproduced) — the guide's "check yourself" warning is earned.
+- **Radius alias**: `radius-md` → `{semantic.radius-lg}` builds to `var(--ns-radius-lg)` (reproduced).
+- `--previews` flag, `/design/tokens?preset=<id>` dev preview, `lib/theme.ts` reading preset+fonts, design-system section link: all confirmed present in code. The `/reference/cli/commands/#tokens-…` anchor is Lume-generated from the `## tokens — …` heading; `docs:links` (green) validates it.
+
+### (3) No pre-v2 remnants — CLEAN
+
+- Added-line scan over the four guidance surfaces for `:root` recipes, `color-mix` derivation, oklch preset blocks, single-`theme-seed` claims: only hits are the *denials* ("there is no data-ns-theme") and the corrected "one theme item per preset plus theme-seed".
+- Head-file scan: the only `:root`/`[data-theme='dark']` mentions in either guide are the legacy-compat notes ("Older apps that still use `[data-theme='dark']` keep working", "Existing `[data-theme='dark']` and `[data-theme='light']` still resolve NS One") — correct under v2's supported-legacy-selectors rule.
+- The MCP test now asserts `data-scheme`, `netscript tokens build`, `semantic.tokens.json` in both guides AND `!designText.includes(':root')` — the anti-regression guard for exactly this.
+- Concept aliases `data-scheme`/`theme preset` + hints `brand colors on a preset`/`pick a preset` resolve to real headings in the rewritten guide.
+
+### (4) Gates — all green, re-run by evaluator
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| MCP `deno task test` | PASS | 199 passed, 0 failed |
+| CLI `agent-conventions_test.ts` + `public-command-tree_test.ts` (`--allow-all --unstable-kv`) | PASS | 10 passed (was 9; new `theme-preset.json` assertions) |
+| `deno task check:publish-assets` | PASS | exit 0 |
+| `deno task check:agent-docs-prose` | PASS | `"fresh":true`, exit 0 |
+| `deno task check:assets-barrel` | PASS | exit 0 |
+| `deno task docs:links` | PASS | 105 docs, 0 broken |
+| Probe strings in MCP carrier | PASS (0 / 0) | full-carrier sweep |
+
+Findings: none — no severity, no file, no fix. The S9 caveats (Figma-owned seven-role fix, override contrast-checking, `init --force` reset warning) are correctly filed as owner follow-ups, not this PR's scope. Drift.md S9 accurately records the S1 drop and the `:root`→v2 rewrite.
+
+| Field | Value |
+| --- | --- |
+| Verdict | `PASS` |
+| Rationale | S1 drop correct (v2 deleted its files; README forbids hand-porting; zero fresh-ui files in the branch diff); every v2 theme claim reproduced on a local-source scaffold (five-file build, stamping, 18 presets, init/force semantics, $extensions rejection, copper-left-behind, seven-role fix, per-scheme ramps, teal/copper edge cases, contrast numbers within rounding, no override contrast check, radius alias); no pre-v2 recipes remain (only correct legacy-compat notes + denials, guarded by the new no-`:root` test assertion); all gates green (MCP 199/199, CLI 10/10, three carrier checks, docs:links, probe strings 0/0). |
+
+VERDICT: PASS
