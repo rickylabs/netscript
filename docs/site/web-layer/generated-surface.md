@@ -7,10 +7,10 @@ order: 4
 
 # Generated web surface
 
-A scaffolded Fresh app contains both editable starter code and modules that are regenerated from
-route files. A file created by the CLI is not necessarily generator-owned. In particular,
-`ui:add page` output has no generated header banner; use the roles below to decide what to edit. All
-paths below are relative to the Fresh app root, such as `apps/dashboard/`.
+This page tells you which files in a scaffolded Fresh app you own and which are regenerated from
+route files. A file the CLI created is not necessarily generator-owned: `ui:add page` output has no
+generated header banner, so use the roles below to decide what to edit. Paths are relative to the
+Fresh app root, such as `apps/dashboard/`.
 
 | Surface                                       | Role and ownership                                                                                                                                           | How to change it                                                                                                                                       |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -24,20 +24,21 @@ paths below are relative to the Fresh app root, such as `apps/dashboard/`.
 | `.generated/routes.ts`                        | Generator-owned `routes` tree of bound references, using discovered contracts where present.                                                                 | Refresh through the configured NetScript Vite plugin; update consumers when accessor keys change.                                                      |
 
 The loader/island pair is optional: a page without `--island` has the page and registration only.
-`(_shared)` and `(_islands)` are co-location groups and do not add URL segments. Renaming component
-symbols is optional; updating their imports is necessary whenever the move changes relative paths.
+`(_shared)` and `(_islands)` are co-location groups and add no URL segments. After a move, renaming
+component symbols is optional, but you must update imports whose relative paths changed.
 
 ## Refreshing the route tree
 
 With `routeManifest` enabled in `createNetScriptVitePlugin`, the plugin writes the generated route
-modules on initialization and build, and refreshes them on relevant route changes during a dev
-server run. Use the app's configured Vite build or dev task after a move. A standalone `deno check`
-does not refresh these modules. Run `netscript generate routes --app dashboard` to refresh them
-without a Vite build; `--project-root <app-root>` selects an explicit application.
+modules on initialization and build, and refreshes them on route changes while the dev server runs.
+After a move, run the app's configured Vite build or dev task; a standalone `deno check` does not
+refresh these modules. To refresh them without a Vite build, run
+`netscript generate routes --app dashboard`; `--project-root <app-root>` selects an explicit
+application.
 
-The plugin also manages route-binding seams for the authoring forms described in
-[Routing and route contracts](/web-layer/route/#three-authoring-forms-one-generated-binding). That
-does not make the separate string-literal `appRoutes` registry track filesystem renames.
+The plugin also manages the route-binding seams described in
+[Routing and route contracts](/web-layer/route/#three-authoring-forms-one-generated-binding). It does
+not make the separate string-literal `appRoutes` registry track filesystem renames.
 
 ## Rename safety and manual lifecycle
 
@@ -46,30 +47,23 @@ consumers that still reference it. `appRoutes['catalog']`, however, can keep com
 folder move because its pattern is a string literal. Typed href parameters do not prove that a route
 file exists at that URL.
 
-Use the [Renaming or Moving a Route checklist](/web-layer/route/#renaming-or-moving-a-route) to
-reconcile the directory, colocated files, `router.ts`, page binding, navigation, and generated tree.
-Verify the new URL and loader/island behavior in the running app as well as type checking.
+Follow the [Renaming or moving a route checklist](/web-layer/route/#renaming-or-moving-a-route) to
+reconcile the directory, colocated files, `router.ts`, page binding, navigation and generated tree,
+then verify the new URL and loader/island behavior in the running app.
 
 For a move from `routes/catalog/` to `routes/inventory/`, change the `router.ts` pattern from
 `/catalog` to `/inventory`. The registry key and metadata `id` are identifiers, not URL segments:
-you may keep `catalog`, or rename both to `inventory` and update the page to
-`.withRoute(appRoutes['inventory'])` and every consumer of the old key. Remove obsolete or
-duplicate registrations. Search for the old URL and generated accessor too; check navigation,
-redirects, and partial pairings. If parameters change, reconcile path schemas and href inputs.
-After refreshing the tree, type-check and visit the new URL, including any loader and island.
-Decide whether the old URL should return 404 or needs an authored redirect for existing links.
+keep `catalog`, or rename both to `inventory` and update the page to
+`.withRoute(appRoutes['inventory'])` and every consumer of the old key. Remove obsolete or duplicate
+registrations, and decide whether the old URL should return 404 or needs an authored redirect for
+existing links.
 
-There is currently no `netscript ui:rename` or `netscript route rename` command.
-`netscript ui:remove <name>` removes a copied Fresh UI registry item. Use
-`netscript ui:remove page catalog --dry-run` to validate and preview a page removal. Without
-`--dry-run`, it deletes only unchanged `ui:add page` output (page plus optional loader/island),
-prunes its generated string-literal router registration, and regenerates the derived route modules.
-It preserves authored siblings, sidecars and unrelated routes. Use `--client <service>` when the
-original data client is ambiguous. Formatting with the scaffold’s `deno task fmt` is accepted:
-scaffold files are compared after Deno formatting, and wrapped router entries are recognized. Code
-or comment edits, missing scaffold parts and customized registrations are refused; there is no force
-override. Remove customized pages manually, prune their registration and consumers, then run
-`netscript generate routes`. Idempotent reruns rebuild missing derived modules without deleting
-authored files and report “Nothing to remove” for an absent page. Empty parent directories are
-pruned without removing the routes root or authored siblings. Update links and type-check after
-removal.
+There is no `netscript ui:rename` or `netscript route rename` command. `netscript ui:remove <name>`
+removes a copied Fresh UI registry item, and `netscript ui:remove page catalog --dry-run` previews
+removing an unchanged `ui:add page` scaffold. The checklist covers what that removal deletes, what it
+refuses, and how to reconcile customized pages by hand before running `netscript generate routes`.
+
+## Next steps
+
+Continue with [Build and Vite integration](/web-layer/vite/) for the plugin options that write these
+generated modules.

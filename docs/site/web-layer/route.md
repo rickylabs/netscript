@@ -7,27 +7,20 @@ order: 3
 
 # Routing and route contracts
 
-A URL is two things at once: an input the server parses, and an output the UI constructs. Bare Fresh
-gives you the first as strings and leaves the second to template literals, so the same route pattern
-ends up written twice — once as a directory path, once as `` `/orders/${id}?page=${page}` `` — with
-nothing checking that the two still agree.
+This page covers the routing surface of `@netscript/fresh/route`. A **route contract** owns a
+route's path and search schemas, independent of any URL. Binding it to a pattern produces a
+**route reference**: one object that parses a request *and* builds hrefs from the same schemas. With
+the Vite plugin, a generated `routes` tree derived from the filesystem lets a moved route file
+invalidate the call sites that use that tree.
 
-A **route contract** is the schema half of that pair: it owns a route's path and search schemas
-independently of any concrete URL. Binding it to a pattern produces a **route reference** — one
-object that parses a request *and* builds hrefs, from the same schemas. This page is about what each
-piece actually guarantees, and about the third piece that closes the loop: a generated `routes` tree
-derived from the filesystem, so a moved route file can invalidate call sites that use that tree.
-
-Import the surface from `@netscript/fresh/route`.
-
-This URL contract is distinct from a service's versioned API contract. In a DB-backed product, the
-API shape normally begins at the [generated `@database/zod` step](/data-persistence/database/#generated-schemas-feed-public-contracts),
+A route contract is distinct from a service's versioned API contract. In a database-backed product,
+the API shape begins at the [generated `@database/zod` step](/data-persistence/database/#generated-schemas-feed-public-contracts),
 is narrowed into the [public contract](/explanation/contracts/#where-the-public-shape-begins), and
 only then reaches a page whose route contract parses path and search values.
 
-## What bare Fresh makes you write
+## Compared with bare Fresh
 
-Fresh 2 hands you raw request values. A paginated, filtered list route means:
+Fresh 2 hands you raw request values. A paginated, filtered list route looks like this:
 
 ```tsx
 // routes/orders/[status].tsx — bare Fresh
@@ -47,44 +40,41 @@ export const handler = define.handlers({
 });
 ```
 
-And every link back into that route is a string:
+Every link back into that route is a string:
 
 ```tsx
 <a href={`/orders/${status}?page=${page + 1}&limit=${limit}`}>Next</a>
 ```
 
-Three costs are worth naming, because they are what the contract removes.
+The contract removes three costs:
 
-**The parsing is per-handler, so it drifts.** `page`, `limit`, and `offset` are re-derived in every
-route that paginates. Two routes clamp `limit` differently and nobody notices until a report is
-wrong.
-
-**`string` is not a type.** `ctx.params.status` is typed `string` whether or not the segment is one
-of two legal values, so the narrowing has to be re-written by hand in each handler, and the compiler
-cannot tell you when you forget.
-
-**Links are unverified.** The template literal has no relationship to the file at
-`routes/orders/[status].tsx`. Rename the file, move it into a different URL-bearing directory, or add
-a segment, and every link still compiles and still ships — it just 404s. (Moving it under a Fresh
-route group alone does not change the URL; `(group)` directories are dropped from the path.)
+- **Parsing drifts.** `page`, `limit` and `offset` are re-derived in every route that paginates, and
+  two routes can clamp `limit` differently.
+- **`string` is not a type.** `ctx.params.status` is a `string` whether or not the segment is one of
+  two legal values, so each handler narrows it by hand.
+- **Links are unverified.** The template literal has no relationship to
+  `routes/orders/[status].tsx`. Rename the file, move it into a different URL-bearing directory or add
+  a segment, and every link still compiles and then 404s. (A Fresh route group alone does not change
+  the URL; `(group)` directories are dropped from the path.)
 
 ## The mechanism: contract, reference, generated tree
 
-Three objects, each with a distinct job.
+Three objects, each with one job.
 
 `defineRouteContract({ pathSchema?, searchSchema? })` owns the **schemas** and knows no URL. Both
-options are optional; a contract with neither is still a legal contract that parses to `{}`. It
-returns `parsePath` / `safeParsePath` / `parseSearch` / `safeParseSearch`, a `createNav(pattern)`
-helper, and `bind(pattern)`.
+options are optional; a contract with neither parses to `{}`. Define only the schemas a route reads.
+The contract returns `parsePath` / `safeParsePath` / `parseSearch` / `safeParseSearch`, a
+`createNav(pattern)` helper, and `bind(pattern)`.
 
-`bind(pattern)` — or the function form `bindRoutePattern(contract, pattern, metadata?)` — attaches
-the contract to a concrete Fresh pattern and returns a **route reference**: the schemas, the
-`routePattern`, the four parse helpers, plus the construction half — `href()`, `getLinkProps()`, a
-bound `Link` component, `nav`, and `withPartial()`. `createRouteReference(pattern)` produces the same
-reference shape without a contract, inferring path params from the pattern itself.
+`bind(pattern)`, or the function form `bindRoutePattern(contract, pattern, metadata?)`, attaches the
+contract to a concrete Fresh pattern and returns a **route reference**: the schemas, the
+`routePattern` and the four parse helpers, plus `href()`, `getLinkProps()`, a bound `Link` component,
+`nav` and `withPartial()`. `createRouteReference(pattern)` produces the same reference shape without
+a contract, inferring path params from the pattern.
 
-The generated `routes` tree binds discovered route files to those references. Call sites using the
-tree share generated patterns; separately authored string-literal references still need manual updates.
+The generated `routes` tree binds discovered route files to those references. Call sites that use the
+tree share generated patterns; separately authored string-literal references still need manual
+updates.
 
 ```ts
 import { defineRouteContract, enumPathParamSchema, paginationSearchSchema } from '@netscript/fresh/route';
@@ -100,17 +90,17 @@ const state = ordersRoute.parseSearch(new URLSearchParams('page=2'));
 // state.page === 2, state.limit === 25, state.offset === 25
 ```
 
-One contract can bind to several patterns — that is the point of keeping the two apart. A list route
-and its partial share a search schema; binding twice gives two references over one definition.
+One contract can bind to several patterns. A list route and its partial share a search schema;
+binding twice gives two references over one definition.
 
 `bind()` passes no metadata. When a reference needs the manifest fields `$id` and `$kind`, use the
-`bindRoutePattern(contract, pattern, { id, kind })` function form — which is exactly what the
-generator emits.
+`bindRoutePattern(contract, pattern, { id, kind })` function form, which is what the generator
+emits.
 
-## Search params that cannot throw
+## Pagination search schema
 
-`paginationSearchSchema()` is not just a shape; it is a **total** parse of four fields. Every base
-field is wrapped in a Zod `catch`, so a hostile query string produces defaults rather than an error:
+`paginationSearchSchema()` is a **total** parse of four fields. Every base field is wrapped in a Zod
+`catch`, so a hostile query string produces defaults instead of an error:
 
 | Field | Parsed as | Falls back to |
 | --- | --- | --- |
@@ -119,8 +109,8 @@ field is wrapped in a Zod `catch`, so a hostile query string produces defaults r
 | `sortBy` | non-empty string | `options.defaultSort ?? ''` |
 | `sortOrder` | `'asc' \| 'desc'` | `options.defaultOrder ?? 'desc'` |
 
-`offset` is then computed and appended: `Math.max(page - 1, 0) * limit`. It is not a field you can
-send — it is derived output, which is why a loader can hand it straight to a repository.
+`offset` is then computed and appended: `Math.max(page - 1, 0) * limit`. It is derived output, not
+a field you can send, so a loader can hand it straight to a repository.
 
 ```ts
 const listSearch = paginationSearchSchema({ defaultLimit: 25 });
@@ -132,13 +122,12 @@ listSearch.parse({ page: '3', limit: '50' });
 // { page: 3, limit: 50, sortBy: '', sortOrder: 'desc', offset: 100 }
 ```
 
-Each field is also preprocessed to take the **first** value when a param repeats, so
-`?page=2&page=9` parses as `page: 2` rather than failing on an array.
+Each field takes the **first** value when a param repeats, so `?page=2&page=9` parses as `page: 2`
+instead of failing on an array.
 
-**This is where `fallback()` earns its place.** `extend(shape)` adds your own fields to the schema,
-and those fields are *not* automatically caught — an extended `z.enum([...])` fed a bad value makes
-the whole parse fail, which is the one way a pagination schema can throw. `fallback(schema, value)`
-is `schema.catch(value)`: it restores the never-throws property to the fields you added.
+`extend(shape)` adds your own fields, and those are *not* caught automatically: an extended
+`z.enum([...])` fed a bad value fails the whole parse. `fallback(schema, value)` is
+`schema.catch(value)`; it restores the never-throws property to the fields you added.
 
 ```ts
 import { fallback, paginationSearchSchema } from '@netscript/fresh/route';
@@ -153,15 +142,15 @@ const total = paginationSearchSchema().extend({
 });
 ```
 
-Choose deliberately. A filter that should degrade to a default belongs in `fallback`; a param whose
-wrong value should be a 400 belongs in a bare schema with `safeParseSearch` handling the failure.
+A filter that should degrade to a default belongs in `fallback`. A param whose wrong value should
+be a 400 belongs in a bare schema, with `safeParseSearch` handling the failure.
 
 ## Enum segments
 
 Path params get two helpers, and they are not interchangeable.
 
-`enumPathParamSchema(name, values)` is a `pathSchema` for a contract. It validates one segment and
-its failure message is searchable:
+`enumPathParamSchema(name, values)` is a `pathSchema` for a contract. It validates one segment, with
+this failure message:
 
 ```text
 Expected route param "status" to be one of: open, closed
@@ -169,12 +158,11 @@ Expected route param "status" to be one of: open, closed
 
 **It also narrows the parsed path to that one key.** Its success data is `{ [name]: value }` and
 nothing else, so on `/orders/[status]/[id]` a contract using it alone parses `status` and drops
-`id` entirely. For a multi-segment route, write an object schema covering every param rather than
-reaching for this helper.
+`id`. For a multi-segment route, write an object schema covering every param.
 
 `defineEnumPathParam(name, values)` is the standalone form. It carries `paramName`, `values`, the
 same `schema`, and a `parse(value)` that takes the bare segment string and returns the typed value or
-`null` — no throw, no contract, no record wrapper:
+`null`, without throwing:
 
 ```ts
 const orderStatus = defineEnumPathParam('status', ['open', 'closed']);
@@ -183,13 +171,12 @@ orderStatus.parse('open'); // 'open'
 orderStatus.parse('archived'); // null
 ```
 
-Reach for it in a middleware, a guard, or anywhere the segment is checked outside a page's own parse
-pass — and reuse `orderStatus.schema` as the contract's `pathSchema` so both paths agree on one list
-of values.
+Use it in a middleware, a guard, or anywhere the segment is checked outside a page's own parse, and
+reuse `orderStatus.schema` as the contract's `pathSchema` so both agree on one list of values.
 
 ## Building hrefs from the same schemas
 
-`href()`, `getLinkProps()`, and the bound `Link` all run the same construction: validate the path
+`href()`, `getLinkProps()` and the bound `Link` run the same construction: validate the path
 against `pathSchema`, resolve a base search, merge your update over it, validate the result, and
 serialize.
 
@@ -216,29 +203,27 @@ const nextPage = ordersRoute.href({
 });
 ```
 
-Two behaviours here surprise people, and both follow from the schema being authoritative:
+Two behaviours follow from the schema being authoritative:
 
-**The href carries the whole parsed search state, not just the fields you set.** The base is
-`searchSchema.safeParse({})` — the schema's defaults — so
-`ordersRoute.href({ path: { status: 'open' }, search: { page: 2 } })` produces
-`/orders/open?page=2&limit=25&sortBy=&sortOrder=desc&offset=25`. Every declared field is serialized,
-including the derived `offset` and an empty `sortBy`. A contract whose schema is small produces
-short URLs; that is the lever.
+- **The href carries the whole parsed search state.** The base is `searchSchema.safeParse({})`, the
+  schema's defaults, so `ordersRoute.href({ path: { status: 'open' }, search: { page: 2 } })` produces
+  `/orders/open?page=2&limit=25&sortBy=&sortOrder=desc&offset=25`. Every declared field is
+  serialized, including the derived `offset` and an empty `sortBy`. A smaller schema produces
+  shorter URLs.
+- **Preservation requires a hook or component.** Only the bound `Link` and
+  `page.hooks.useRoute().getLinkProps` honor `preserveSearchParams`; a different route uses its
+  defaults. Pure helpers accept the flag but ignore it, so pass the current `search` as above.
 
-**Preservation requires a hook or component.** Only bound `Link` and
-`page.hooks.useRoute().getLinkProps` honor `preserveSearchParams`. A different route uses its defaults.
-Pure helpers still accept the flag but ignore it; migrate by passing current `search` as above.
-
-Link props also default `f-client-nav` to `true`, so a reference-built anchor participates in Fresh
-client navigation unless you opt out.
+Link props default `f-client-nav` to `true`, so a reference-built anchor uses Fresh client
+navigation unless you opt out.
 
 ## The generated routes tree
 
-The pattern string still lives somewhere. With the `@netscript/fresh/vite` plugin, that somewhere is
-generated: the plugin walks `routes/` and writes two modules.
+With the `@netscript/fresh/vite` plugin, the pattern strings are generated: the plugin walks
+`routes/` and writes two modules.
 
-- `.generated/manifest.ts` exports `routePatterns` — a tree of pattern strings, `as const`.
-- `.generated/routes.ts` exports `routes` — the same tree, with each leaf a route reference built
+- `.generated/manifest.ts` exports `routePatterns`, a tree of pattern strings, `as const`.
+- `.generated/routes.ts` exports `routes`, the same tree with each leaf a route reference built
   from the matching `routePatterns` entry.
 
 The key path is derived from the file path. Dynamic segments become `$`-prefixed camelCase keys,
@@ -258,22 +243,22 @@ sidecar. `kind` is `'partial'` for anything under `partials/` and `'page'` other
 dotted key path without the trailing `$route`.
 
 After regeneration, moving `routes/dashboard/orders/[id].tsx` to `routes/orders/[id].tsx`
-removes `routes.dashboard.orders.$id`: consumers of that accessor fail `deno check`.
-This guarantee covers only generated-tree consumers. A literal
-`createRouteReference('/dashboard/orders/[id]')` is not rename-tracked; prefer generated accessors
+removes `routes.dashboard.orders.$id`, and consumers of that accessor fail `deno check`.
+The guarantee covers only generated-tree consumers. A literal
+`createRouteReference('/dashboard/orders/[id]')` is not rename-tracked, so prefer generated accessors
 for filesystem routes.
 
-## Renaming or Moving a Route
+## Renaming or moving a route
 
 `ui:add page` binds `appRoutes['catalog']` to a string literal in `router.ts`:
 `createRouteReference('/catalog', ...)`. Moving files can leave stale URLs while `deno check` passes.
 
-- [ ] Move page, owned `query-loaders.ts`/`CatalogIsland.tsx`, and contract sidecar; repair imports.
-- [ ] Reconcile `router.ts` pattern/key/metadata `id`, page binding, and consumers.
-- [ ] Update navigation links, literals, redirects, partials, tests, and path schemas.
-- [ ] Refresh `.generated/manifest.ts` and `.generated/routes.ts` via Vite build/dev; never hand-edit.
-- [ ] Type-check after regeneration.
-- [ ] Visit `/inventory`, test navigation/loader/island/partials, and check the old `/catalog` URL.
+1. Move page, owned `query-loaders.ts`/`CatalogIsland.tsx`, and contract sidecar; repair imports.
+2. Reconcile `router.ts` pattern/key/metadata `id`, page binding, and consumers.
+3. Update navigation links, literals, redirects, partials, tests, and path schemas.
+4. Refresh `.generated/manifest.ts` and `.generated/routes.ts` via Vite build/dev; never hand-edit.
+5. Type-check after regeneration.
+6. Visit `/inventory`, test navigation/loader/island/partials, and check the old `/catalog` URL.
 
 [Generated web surface](/web-layer/generated-surface/) explains file ownership. Route renames remain
 manual. Use `netscript ui:remove page catalog --dry-run` to preview removal of an unchanged
@@ -296,49 +281,47 @@ registry items.
 
 ## Three authoring forms, one generated binding
 
-A page module and its route contract can be colocated, split into a sidecar, or absent entirely. The
+A page module and its route contract can be colocated, split into a sidecar, or absent. The
 generator recognizes all three and owns the binding call in each:
 
 | Form | You write | The generator inserts |
 | --- | --- | --- |
-| **A — inline** | `.withRouteContract({ pathSchema, searchSchema })` | `$route: routePatterns.<key>.$route` as the object's first field, plus the `routePatterns` import |
-| **B — sidecar** | a sibling `<page>.route.ts` default-exporting the contract | `.withRoute(routes.<key>.$route)` after `definePage()`, plus the `routes` import |
-| **C — none** | nothing | `.withRoute(routes.<key>.$route)`, backed by `createRouteReference` |
+| **A: inline** | `.withRouteContract({ pathSchema, searchSchema })` | `$route: routePatterns.<key>.$route` as the object's first field, plus the `routePatterns` import |
+| **B: sidecar** | a sibling `<page>.route.ts` default-exporting the contract | `.withRoute(routes.<key>.$route)` after `definePage()`, plus the `routes` import |
+| **C: none** | nothing | `.withRoute(routes.<key>.$route)`, backed by `createRouteReference` |
 
-Form A keeps the schemas next to the page that reads them, where the schema imports are already in
-scope; the `routes` leaf for a Form A page stays a plain navigable reference. Form B is the choice
-when several modules — a page, its partial, a test — need the same contract object.
+Form A keeps the schemas next to the page that reads them; the `routes` leaf for a Form A page stays
+a plain navigable reference. Choose Form B when several modules (a page, its partial, a test) need
+the same contract object.
 
-The rewrite is idempotent and it edits your source file on disk, so the binding is visible in the
-module rather than hidden in a build step. Set `pageModuleRouteBinding: false` in the plugin options
-to opt out; only `.generated/*` is written then, and you supply `$route` or `.withRoute(...)`
-yourself.
+The rewrite is idempotent and edits your source file on disk, so the binding is visible in the
+module. Set `pageModuleRouteBinding: false` in the plugin options to opt out; the plugin then writes
+only `.generated/*`, and you supply `$route` or `.withRoute(...)` yourself.
 
-Two conflicts are reported rather than guessed at. A module carrying **both** `.withRoute(...)` and
+Two conflicts are reported. A module carrying **both** `.withRoute(...)` and
 `.withRouteContract({...})` is a build error:
 
 ```text
 Page dashboard/orders/index.tsx has both .withRoute and .withRouteContract. Pick one.
 ```
 
-A module with an inline contract *and* a sibling sidecar is a warning — inline wins, and the sidecar
-is left on disk:
+A module with an inline contract *and* a sibling sidecar is a warning; inline wins, and the sidecar
+stays on disk:
 
 ```text
 Page has both inline .withRouteContract and sibling sidecar. Inline form takes precedence.
 Delete the sidecar to silence this warning.
 ```
 
-## Where the checks actually happen
+## Runtime guards
 
-Two of this surface's guarantees are runtime guards behind typed parameters, and it is worth knowing
-which.
+Two guarantees are runtime guards behind typed parameters.
 
 **`$route` is optional in the type and required at runtime.** `DefinePageRouteContractInput` declares
-`$route?: string`, because the generator normally supplies it. Author Form A by hand with the
-rewriter disabled and the page type-checks — then throws the moment the chain runs. Both
-`withRoute()` and `withRouteContract()` promote eagerly, so the failure lands at module load rather
-than on the first request:
+`$route?: string` because the generator normally supplies it. Author Form A by hand with the rewriter
+disabled and the page type-checks, then throws when the chain runs. Both `withRoute()` and
+`withRouteContract()` promote eagerly, so the failure lands at module load, not on the first
+request:
 
 ```text
 definePage().withRouteContract({...}) requires a $route pattern. The NetScript Vite plugin
@@ -346,27 +329,19 @@ inserts it from the page module path; set pageModuleRouteBinding or add
 $route: routePatterns.<key>.$route manually.
 ```
 
-**`withRoute()` verifies the object it was handed.** The parameter type accepts any typed route
-target, but the builder checks for a complete reference — `nav`, `href`, `parsePath`, `parseSearch` —
+**`withRoute()` verifies the object it receives.** The parameter type accepts any typed route
+target, but the builder checks for a complete reference (`nav`, `href`, `parsePath`, `parseSearch`)
 and throws a `TypeError` otherwise:
 
 ```text
 definePage().withRoute(...) requires a complete route reference with navigation and parsers.
 ```
 
-Both are the shape of guard you want: the common path is fully typed, and the escape hatches fail
-loudly instead of silently producing a page with unparsed params.
-
 ## Paired page and partial routes
 
 `route.withPartial(partialRoute)` pairs a page reference with a partial reference and builds both
-URLs from one call — `href()` for the page, `partialHref()` for the partial, and `getLinkProps()`
-returning both plus the `f-partial` attribute Fresh uses to drive partial navigation. Path and search
-params are supplied once and applied to both sides, with `partialPath`, `partialSearch`, and
-`partialPreserveSearchParams` for the cases where the partial's params legitimately differ.
-
-Paired helpers also ignore preservation flags; pass `search` and `partialSearch` explicitly.
-See [Partials](/web-layer/partials/) for the receiving route.
+URLs from one call; [Partials](/web-layer/partials/) covers it with the receiving route. Paired
+helpers ignore preservation flags, so pass `search` and `partialSearch` explicitly.
 
 ## What to watch for
 
@@ -376,13 +351,13 @@ See [Partials](/web-layer/partials/) for the receiving route.
   through a contract when the query string carries meaning.
 - **`$href` exists only for static patterns.** A reference whose pattern contains `[` has
   `$href: undefined`; call `href({ path })` instead.
-- **`parsePath` on a contract-free reference throws on a missing segment** —
+- **`parsePath` on a contract-free reference throws on a missing segment:**
   `Missing path param "id".`, or `Missing catch-all path param "slug".` for `[...slug]`. Use
   `safeParsePath` where the input is untrusted.
 - **Catch-all segments parse to arrays.** `/docs/[...slug]` with `slug: 'a/b/c'` yields
-  `{ slug: ['a', 'b', 'c'] }`; the optional form `[[...slug]]` omits the key entirely when empty.
-- **`offset` is output, not input.** Adding it to a `search` update is possible but pointless — the
-  schema recomputes it from `page` and `limit`.
+  `{ slug: ['a', 'b', 'c'] }`; the optional form `[[...slug]]` omits the key when empty.
+- **`offset` is output, not input.** The schema recomputes it from `page` and `limit`, so setting it
+  in a `search` update has no effect.
 
 ## API summary
 
@@ -404,21 +379,8 @@ See [Partials](/web-layer/partials/) for the receiving route.
 | `SchemaParseResult` | Success or failure result returned by route schemas. |
 | `InferRoutePatternPath` | Infer typed path params directly from a route pattern. |
 
-{{ comp callout { type: "note" } }}
-Path and search schemas are independent: a contract can carry one, both, or
-neither. Define only the schemas a route actually reads, and bind the same
-contract to every pattern that shares those params.
-{{ /comp }}
+## Next steps
 
-## Related
-
-{{ comp.cardsGrid({ columns: 3, cards: [
-  { title: "Pages and the define-page builder", body: "Compose route contracts into pages.", href: "/web-layer/builders/" },
-  { title: "Request-scoped resources", body: "Where ctx.path and ctx.search are consumed.", href: "/web-layer/resources/" },
-  { title: "Partials", body: "Route references, pairing, and typed f-partial props.", href: "/web-layer/partials/" },
-  { title: "Data loading and the query cache", body: "Turning parsed search state into a cached read.", href: "/web-layer/query/" },
-  { title: "Server-validated forms", body: "Validate input alongside route contracts.", href: "/web-layer/form/" },
-  { title: "Live dashboard tutorial", body: "Build a routed, data-driven page end to end.", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }
-] }) }}
-
-See the [Web Layer hub](/web-layer/) for the full pillar.
+Continue with [Generated web surface](/web-layer/generated-surface/) to see which route files you own
+and which the generator rewrites. See also [Partials](/web-layer/partials/) for the routes that
+render one region of a page.
