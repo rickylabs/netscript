@@ -16,12 +16,12 @@ Deno.test('tokens commands expose help and route app selection and flags through
       return Promise.resolve('/app');
     },
     tokenEngine: {
+      outputFiles: () => Promise.resolve([]),
       defaults: () =>
         Promise.resolve({
           preset: 'ns-one',
           presets: ['ns-one', 'studio-utility'],
           sources: {},
-          outputFiles: [],
         }),
       build: (options) => {
         builds.push(options);
@@ -37,6 +37,11 @@ Deno.test('tokens commands expose help and route app selection and flags through
   assertStringIncludes(command.getCommands()[2].getHelp({ colors: false }), '--force');
   await command.parse(['build', '--app', 'dashboard', '--preset', 'studio-utility']);
   assertEquals(selections, [{ projectRoot: undefined, app: 'dashboard' }]);
-  assertEquals(builds, [{ preset: 'studio-utility', sources: undefined, override: undefined }]);
+  assertEquals(builds, [{
+    preset: 'studio-utility',
+    sources: undefined,
+    override: undefined,
+    previews: undefined,
+  }]);
   assertEquals(messages, ['Built 0 token assets for studio-utility.']);
 });

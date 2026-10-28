@@ -12,9 +12,9 @@ export async function cleanAppTokens(
 ): Promise<readonly string[]> {
   const { fs, tokenEngine } = dependencies;
   await assertTokenApp(root, fs);
-  const defaults = await tokenEngine.defaults();
+  const outputFiles = await tokenEngine.outputFiles(true);
   const removed: string[] = [];
-  for (const name of defaults.outputFiles) {
+  for (const name of outputFiles.filter((name) => name !== 'theme-preset.json')) {
     const file = tokenOutputFile(name);
     const path = appTokenPath(root, file);
     if (await fs.exists(path)) {

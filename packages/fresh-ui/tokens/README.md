@@ -150,11 +150,11 @@ require explicit `--force`. Edit the final alias layer, for example:
 }
 ```
 
-Build validates all contexts before writing five core web assets plus 18 optional preview styles. The public
+Build validates all contexts before writing five core web assets. Add `--previews` to write the 18 separate development preview styles. App builds skip catalog-only Figma formats. The public
 builder owns DTCG, alias, reference, type and name validation. CLI application
 logic uses the existing filesystem port; its lazy engine adapter imports this
-package's public `tokens` entrypoint only for token commands. Clean retains app
-styles, settings, overrides and source copies. Build also works before init using
+package's public `tokens` entrypoint only for token commands. Clean retains the configured `theme-preset.json`, app
+styles, settings, overrides and source copies; it loads only lightweight file metadata. Build also works before init using
 bundled sources, retaining an installed registry preset and detecting the
 conventional override when present. The detailed command reference documents
 configuration and explicit override precedence.
@@ -171,7 +171,7 @@ and optional stylesheet belong to the document shell, outside Fresh's page parti
 Home and Components therefore restore the configured preset; browser Back restores
 the preview.
 
-Authoritative JSON is embedded as typed TypeScript for publication. Run
+Authoritative JSON is embedded as gzip-compressed typed TypeScript for publication; raw JSON and registry copy sources are excluded from the published file set. Registry data loads only inside CLI registry commands. Run
 `deno task tokens:embed` after editing source JSON and `tokens:embed:check` to check
 freshness without changing files. `tokens:build` refreshes these embeddings before
 and after generating outputs; the token, source and registry asset checks verify them.
@@ -182,10 +182,17 @@ and after generating outputs; the token, source and registry asset checks verify
 Every app stylesheet contains its configured light/dark preset and NS One
 compatibility only (two effective contexts for NS One, four for another preset).
 The build also emits `presets/<id>.css` for all 18 presets. A theme registry item
-installs its own CSS as assets/tokens.css. The18 separate preview files live under
+installs its own CSS as assets/tokens.css. Install `ui:add theme-previews` or run `tokens build --previews` to opt in to separate files under
 static/presets; the development shell links one only when an allowlisted design
 preview differs from the configured preset. Normal app pages load no preview CSS.
 All 72 inputs still build, and all 68 outputs participate in read-only freshness.
-The CLI manages 23 files (five core plus 18 optional CSS assets), and clean retains
-all settings, source files and app styles. CI bounds app contexts/declarations and
+The CLI writes five core files by default and 23 with `--previews`. Clean removes generated CSS/catalog/font files and any known preview CSS, preserving the selected preset, settings, source files and app styles. CI bounds app contexts/declarations and
 bytes so unrelated preset CSS cannot return to the default stylesheet.
+
+The native publish-file-set test enforces a 5,000,000-byte total budget for the
+uncompressed package sources. Default NS One token CSS has a 6,000-byte gzip
+budget: legacy CSS is an exact byte prefix, core/component aliases retain their
+transitive dependencies, and unused language packs/ramps stay in design data.
+Production routes import only preset/font metadata; the full manifest and preview
+resolver are reachable only through development design routes. `--force` replaces
+the managed `tokens/source/` tree, including stale files.

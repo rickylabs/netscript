@@ -56,3 +56,9 @@ script. Published JSON imports will become explicitly typed generated constants;
 JSON remains authoritative and freshness is checked without repair. The existing
 release preflight remains unchanged. Review follow-up also covers native DTCG color
 spaces, optional hex hints, and document navigation out of language previews.
+
+2026-10-28 review repair: add `tools/fresh-ui-browser/README.md` to declared documentation writes and the browser workflow setup to explicitly install theme-previews. Normal scaffolds no longer serve preview styles by default; browser coverage remains unchanged and opts in. This is a fixture setup change, not a gate exemption.
+
+2026-10-28: new lightweight token-config export requires the Fresh UI reference inventory and refreshed MCP corpus/prose carriers. Declare `docs/site/reference/fresh-ui/index.md` and `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` as output writes. No coverage mode is reduced.
+
+2026-10-28: also refresh `docs/site/reference/cli/commands.md` to describe the new previews flag and preset-preserving clean behavior. This keeps the command reference consistent with the changed CLI.

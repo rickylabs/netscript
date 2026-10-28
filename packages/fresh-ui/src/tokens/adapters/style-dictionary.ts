@@ -60,6 +60,7 @@ export async function buildTokens(options: TokenBuildOptions = {}): Promise<Toke
   const contexts: TokenContextOutput[] = [];
   for (const language of TOKEN_PRESETS) {
     for (const scheme of TOKEN_SCHEMES) {
+      let previous: { source: string; context: TokenContextOutput } | undefined;
       for (const density of TOKEN_DENSITIES) {
         const document = resolveTokenSources(
           sources,
@@ -69,6 +70,11 @@ export async function buildTokens(options: TokenBuildOptions = {}): Promise<Toke
         assertSemanticAliases({ semantic: document.semantic, context: document.context });
         assertTokenReferences(document);
         assertRegisteredTokenNames(document, roleRegistry);
+        const signature = JSON.stringify(document);
+        if (previous?.source === signature) {
+          contexts.push({ ...previous.context, requestedDensity: density });
+          continue;
+        }
         const dictionary = new StyleDictionary({
           tokens: document,
           usesDtcg: true,
@@ -86,7 +92,9 @@ export async function buildTokens(options: TokenBuildOptions = {}): Promise<Toke
           platforms: { resolved: { transforms: [], files: [{ format: 'netscript/context' }] } },
         });
         const [formatted] = await dictionary.formatPlatform('resolved');
-        contexts.push(formatted.output as TokenContextOutput);
+        const context = formatted.output as TokenContextOutput;
+        previous = { source: signature, context };
+        contexts.push(context);
       }
     }
   }
@@ -107,9 +115,19 @@ export async function buildTokens(options: TokenBuildOptions = {}): Promise<Toke
     { destination: 'tokens.json', format: 'netscript/json' },
     { destination: 'fonts.json', format: 'netscript/fonts' },
     { destination: 'theme-preset.json', format: 'netscript/preset' },
-    { destination: 'theme-items.json', format: 'netscript/themes' },
+    ...(options.target === 'app'
+      ? []
+      : [{ destination: 'theme-items.json', format: 'netscript/themes' }]),
   ];
   for (const context of effectiveContexts(contexts).filter((entry) => entry.scheme === 'light')) {
+    if (options.target === 'app') {
+      if (options.previews) {
+        const css = `netscript/css/${context.preset.id}`;
+        formats[css] = () => formatTokensCss(contexts, context.preset.id);
+        files.push({ destination: `presets/${context.preset.id}.css`, format: css });
+      }
+      continue;
+    }
     const name = `netscript/preset/${context.preset.id}`;
     formats[name] = () => json(presetConfiguration(context));
     files.push({ destination: `presets/${context.preset.id}.json`, format: name });
@@ -120,31 +138,33 @@ export async function buildTokens(options: TokenBuildOptions = {}): Promise<Toke
     formats[figma] = () => json(formatFigmaPreset(contexts, context.preset.id));
     files.push({ destination: `figma/${context.preset.id}.json`, format: figma });
   }
-  const collections = figmaCollections();
-  for (const [index, collection] of collections.entries()) {
-    const name = `netscript/figma-source/${index}`;
-    formats[name] = () => json(formatFigmaCollection(collection));
-    const entry = figmaIndex.collections.find((entry) =>
-      entry.collection === collection.collection
-    )!;
-    files.push({ destination: `figma/${entry.file}`, format: name });
+  if (options.target !== 'app') {
+    const collections = figmaCollections();
+    for (const [index, collection] of collections.entries()) {
+      const name = `netscript/figma-source/${index}`;
+      formats[name] = () => json(formatFigmaCollection(collection));
+      const entry = figmaIndex.collections.find((entry) =>
+        entry.collection === collection.collection
+      )!;
+      files.push({ destination: `figma/${entry.file}`, format: name });
+    }
+    formats['netscript/figma-index'] = () =>
+      json({
+        ...figmaIndex,
+        collections: [
+          ...figmaIndex.collections,
+          ...TOKEN_PRESETS.map((entry) => ({
+            collection: `NetScript ${entry.id}`,
+            file: `${entry.id}.json`,
+            modes: ['Light', 'Dark'],
+            variableCount: Object.keys(
+              contexts.find((context) => context.preset.id === entry.id)!.tokens,
+            ).length,
+          })),
+        ],
+      });
+    files.push({ destination: 'figma/index.json', format: 'netscript/figma-index' });
   }
-  formats['netscript/figma-index'] = () =>
-    json({
-      ...figmaIndex,
-      collections: [
-        ...figmaIndex.collections,
-        ...TOKEN_PRESETS.map((entry) => ({
-          collection: `NetScript ${entry.id}`,
-          file: `${entry.id}.json`,
-          modes: ['Light', 'Dark'],
-          variableCount: Object.keys(
-            contexts.find((context) => context.preset.id === entry.id)!.tokens,
-          ).length,
-        })),
-      ],
-    });
-  files.push({ destination: 'figma/index.json', format: 'netscript/figma-index' });
   const engine = new StyleDictionary({
     tokens: { version: { $type: 'number', $value: 2 } },
     usesDtcg: true,

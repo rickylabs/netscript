@@ -13,6 +13,7 @@ export const TEMPLATE_KEYS = {
   appRoutesDesignIslandsTokenClipboard:
     'app/routes/(design)/design/(_islands)/TokenClipboard.tsx.template',
   appRoutesDesignSharedRegistry: 'app/routes/(design)/design/(_shared)/registry.ts.template',
+  appRoutesDesignSharedTheme: 'app/routes/(design)/design/(_shared)/theme.ts.template',
   appRoutesDesignSharedTokens: 'app/routes/(design)/design/(_shared)/tokens.ts.template',
   appRoutesExamplesServiceLibServiceQuery:
     'app/routes/examples/service/(_lib)/service-query.ts.template',

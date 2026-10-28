@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 84,
+  'total': 85,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -213,6 +213,12 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': null,
     'description':
       'NS One theme: DTCG-generated token artifacts plus base element styles. Components consume only the semantic --ns-* vocabulary this theme provides.',
+  },
+  {
+    'name': 'theme-previews',
+    'kind': 'lib',
+    'layer': null,
+    'description': 'Opt-in stylesheets for development-only design preset previews.',
   },
   {
     'name': 'layout-objects',

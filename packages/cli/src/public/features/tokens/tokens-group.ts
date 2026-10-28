@@ -19,6 +19,7 @@ interface TokenCommandOptions {
   readonly preset?: string;
   readonly override?: string;
   readonly force?: boolean;
+  readonly previews?: boolean;
 }
 
 /** Create the app-owned token source, build and cleanup commands. */
@@ -36,6 +37,7 @@ export function createTokensCommand(dependencies: TokensCommandDependencies): Cl
       .option('--app <name:string>', 'Fresh app workspace name');
   const build = appCommand('build', 'Build app token assets with a final semantic alias layer')
     .option('--preset <id:string>', 'Language preset (defaults to app configuration)')
+    .option('--previews', 'Write optional development design preset stylesheets')
     .option('--override <path:string>', 'Semantic DTCG override relative to the selected app')
     .action(async (options: TokenCommandOptions) => {
       const result = await buildAppTokens({ ...options, root: await root(options) }, dependencies);

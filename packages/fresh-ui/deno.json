@@ -11,7 +11,8 @@
     "./interactive": "./interactive.ts",
     "./primitives": "./primitives.tsx",
     "./registry": "./registry.ts",
-    "./tokens": "./tokens.ts"
+    "./tokens": "./tokens.ts",
+    "./token-config": "./token-config.ts"
   },
   "imports": {
     "@netscript/sdk/auto-update": "jsr:@netscript/sdk@0.0.8/auto-update",

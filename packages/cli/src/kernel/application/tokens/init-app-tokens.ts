@@ -39,6 +39,9 @@ export async function initAppTokens(
       throw new Error(`Token source already exists: ${name}; use --force to replace it`);
     }
   }
+  // Force replaces the managed source tree, including obsolete JSON documents.
+  const sourceRoot = appTokenPath(input.root, TOKEN_SOURCE_DIR);
+  if (input.force && await fs.exists(sourceRoot)) await fs.remove(sourceRoot);
   for (const [name, content] of Object.entries(files)) {
     await fs.writeFile(appTokenPath(input.root, name), content);
   }

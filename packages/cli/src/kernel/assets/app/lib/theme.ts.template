@@ -1,8 +1,18 @@
-import manifest from '@app/assets/tokens.json' with { type: 'json' };
 import configured from '@app/assets/theme-preset.json' with { type: 'json' };
 import fonts from '@app/assets/fonts.json' with { type: 'json' };
 
-type PresetId = keyof typeof manifest.presets;
+/** Small metadata shared by the app shell and request-local design previews. */
+export interface AppTheme {
+  readonly id: string;
+  readonly preset: {
+    readonly language: string;
+    readonly density: string;
+    readonly flavor: string | null;
+  };
+  readonly label: string;
+  readonly fontImports: readonly string[];
+  readonly previewStylesheet?: string;
+}
 
 /** Preserve the existing NS One brand while naming generated language presets. */
 export function themeLabel(id: string): string {
@@ -11,19 +21,20 @@ export function themeLabel(id: string): string {
     : id.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
 }
 
-/** Only development design routes may request a different generated language preset. */
-export function appTheme(url: URL) {
-  const requested = url.pathname.startsWith('/design/') ? url.searchParams.get('preset') : null;
-  const id = requested && Object.hasOwn(manifest.presets, requested)
-    ? requested as PresetId
-    : configured.id as PresetId;
-  const preset = manifest.presets[id];
-  if (!preset) throw new Error('Unknown configured token preset; run netscript tokens build');
+/** Font requests are small metadata; the complete token catalog belongs to design routes. */
+export function themeFontImports(id: string): readonly string[] {
+  const imports: Readonly<Record<string, readonly string[]>> = fonts.imports;
+  const result = imports[id];
+  if (!result) throw new Error('Unknown configured token preset; run netscript tokens build');
+  return result;
+}
+
+/** Production routes depend only on the configured preset and font requests. */
+export function appTheme(): AppTheme {
   return {
-    id,
-    preset,
-    label: themeLabel(id),
-    fontImports: fonts.imports[id],
-    previewStylesheet: id === configured.id ? undefined : `/presets/${id}.css`,
+    id: configured.id,
+    preset: configured,
+    label: themeLabel(configured.id),
+    fontImports: themeFontImports(configured.id),
   };
 }

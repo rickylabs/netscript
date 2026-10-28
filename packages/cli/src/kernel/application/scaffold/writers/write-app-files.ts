@@ -72,6 +72,7 @@ export async function writeNormalizedAppFiles(
     appDesignMiddlewareTemplate,
     appDesignRegistryTemplate,
     appDesignTokenClipboardTemplate,
+    appDesignThemeTemplate,
     appDesignTokensLibTemplate,
     appDesignTokensRouteTemplate,
     appDesignTokensViewTemplate,
@@ -240,6 +241,7 @@ export async function writeNormalizedAppFiles(
   await write(join(uiComponentsDir, 'mod.ts'), appUiModTemplate);
   await write(join(designSharedDir, 'registry.ts'), appDesignRegistryTemplate);
   await write(join(designSharedDir, 'tokens.ts'), appDesignTokensLibTemplate);
+  await write(join(designSharedDir, 'theme.ts'), appDesignThemeTemplate);
   await write(join(appDir, 'lib', 'theme.ts'), appThemeTemplate);
   await write(
     join(designIslandsDir, 'FloatingSurfaceDemo.tsx'),

@@ -17,6 +17,8 @@ From the repository root, generate a local-source app:
 deno run -A --frozen packages/cli/bin/netscript-dev.ts init fresh-ui-browser \
   --path .llm/tmp/s0/scaffold --app-name dashboard --db none \
   --no-aspire --no-git --editor none --ci --yes
+deno run -A --frozen packages/cli/bin/netscript-dev.ts ui:add theme-previews \
+  --project-root .llm/tmp/s0/scaffold/fresh-ui-browser/apps/dashboard
 ```
 
 Then run from this directory:

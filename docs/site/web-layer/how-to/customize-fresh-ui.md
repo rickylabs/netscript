@@ -246,11 +246,11 @@ netscript tokens build --app dashboard
 
 For a semantic override, edit `tokens/semantic.tokens.json` using aliases only,
 then rebuild. Source copies and `tokens.config.json` are app-owned; the five core web
-assets and 18 separate preset stylesheets are generated. See the [tokens command reference](/reference/cli/commands/#tokens-fresh-application-design-tokens)
+assets are generated. Add `--previews` to the build command to opt in to 18 separate development preset stylesheets. See the [tokens command reference](/reference/cli/commands/#tokens-fresh-application-design-tokens)
 for precedence, validation and cleanup. Avoid hand-editing generated CSS/JSON.
 
 The development gallery can preview a generated preset without changing the app
-default: open `/design/tokens?preset=studio-utility`. The query is allowlisted
+default: first run `netscript tokens build --app dashboard --previews` (or install `ui:add theme-previews`), then open `/design/tokens?preset=studio-utility`. The query is allowlisted
 against generated metadata and applies only under `/design/`; every request gets
 its own view model. The shell links only that preview preset stylesheet; ordinary
 app CSS contains only the configured preset and NS One compatibility. Ramps come from the token output. Ordinary app routes retain
@@ -269,7 +269,7 @@ their own time without a `ui:migrate` step. To adopt the new attributes:
    Stamp `data-theme={preset.language}`, `data-density={preset.density}`, and
    `data-flavor={preset.flavor ?? undefined}` on `<html>`. Set `data-scheme` to
    light/dark, and map `fonts.imports[preset.id]` to stylesheet links. A new
-   scaffold's `lib/theme.ts` also handles design-only previews.
+   scaffold's `lib/theme.ts` loads only this small metadata. Development design middleware resolves previews through its own manifest helper and passes the result to the shell as request state.
 3. Change the existing preference seed script to set `data-scheme`. Retain the
    `ns-theme` storage key. Update ThemeToggle and the light `color-scheme` CSS
    selector to use `data-scheme`; the shipped toggle also supports legacy hosts.

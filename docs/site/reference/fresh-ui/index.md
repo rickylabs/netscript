@@ -12,7 +12,7 @@ the [reference overview](/reference/).
 The root entrypoint (`@netscript/fresh-ui`) intentionally stays small: copy-based registry
 components and islands remain on workspace-local deep paths so applications can own and evolve them
 after copy. The root module exposes only the supported helper utilities that are safe to consume as
-package runtime dependencies. Six sub-path exports carry runtime seams and build tooling:
+package runtime dependencies. Seven sub-path exports carry runtime seams and build tooling:
 
 - [`@netscript/fresh-ui/ai/render-ui`](#sub-path-exports) — safe, bounded generative-UI renderer for
   validated tool payloads.
@@ -22,6 +22,7 @@ package runtime dependencies. Six sub-path exports carry runtime seams and build
 - [`@netscript/fresh-ui/primitives`](#sub-path-exports) — L0 platform-contract primitives.
 - [`@netscript/fresh-ui/registry`](#sub-path-exports) — embedded copy-registry manifest and file
   content.
+- [`@netscript/fresh-ui/token-config`](#token-build-tooling) — lightweight file and preset metadata without the compiler.
 - [`@netscript/fresh-ui/tokens`](#token-build-tooling) — DTCG sources, language presets and the
   Style Dictionary builder for CLI and build tooling.
 
@@ -423,9 +424,10 @@ type mismatches, raw semantic values and reference cycles fail before output is 
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `buildTokens` | async function | Builds all contexts and returns deterministic CSS, bridge, JSON, fonts, registry and Figma output bytes. Accepts optional preset, semantic override and caller-owned sources. |
+| `buildTokens` | async function | Builds all contexts and returns deterministic CSS, bridge, JSON, fonts, registry and Figma output bytes. Accepts optional preset, semantic override and caller-owned sources; target app skips Figma output, and previews explicitly includes optional design styles. |
 | `defaultTokenSources` | function | Returns the bundled resolver and DTCG source documents. Clone before editing caller-owned inputs. |
-| `APP_TOKEN_FILES` | readonly string[] | The 23 generated app assets: five core files (tokens.css, theme-bridge.css, tokens.json, fonts.json, theme-preset.json) plus 18 separate opt-in preset stylesheets, copied to the app static/presets directory. |
+| `PREVIEW_TOKEN_FILES` | readonly string[] | The 18 optional design preview stylesheets. Install with ui:add theme-previews or tokens build --previews. Also exported from token-config without the compiler. |
+| `APP_TOKEN_FILES` | readonly string[] | The five core app files: tokens.css, theme-bridge.css, tokens.json, fonts.json and theme-preset.json. Also available from the lightweight token-config entrypoint. |
 | `TOKEN_PRESETS` | const array | The registered language presets and their fixed Figma modes, density and optional Studio flavor. |
 | `TOKEN_SCHEMES` | const tuple | Supported scheme contexts: light and dark. |
 | `TOKEN_DENSITIES` | const tuple | Supported density contexts: comfortable and compact. |
@@ -501,6 +503,7 @@ The following 7 entrypoints are published as declared in the package export map:
 | `@netscript/fresh-ui/interactive`  | `./interactive.ts`       | Package-owned interactive compound namespaces (`Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip` — documented above). |
 | `@netscript/fresh-ui/primitives`   | `./primitives.tsx`       | L0 platform-contract primitives (`Show`, `VisuallyHidden`, `SrOnly` — documented above).                                                   |
 | `@netscript/fresh-ui/registry`     | `./registry.ts`          | Embedded Fresh UI copy-registry manifest and file content (`freshUiRegistryManifest`, `FRESH_UI_REGISTRY_CONTENT`).                        |
+| `@netscript/fresh-ui/token-config` | `./token-config.ts` | Lightweight APP_TOKEN_FILES, PREVIEW_TOKEN_FILES and TOKEN_PRESETS metadata, with no Style Dictionary or source corpus. |
 | `@netscript/fresh-ui/tokens`       | `./tokens.ts`            | DTCG sources, language presets and the IO-free Style Dictionary token builder. |
 
 ---

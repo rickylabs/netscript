@@ -20,6 +20,7 @@ export async function buildAppTokens(
     readonly root: string;
     readonly preset?: string;
     readonly override?: string;
+    readonly previews?: boolean;
   },
   dependencies: AppTokenDependencies,
 ): Promise<{ readonly preset: string; readonly files: readonly string[] }> {
@@ -44,16 +45,17 @@ export async function buildAppTokens(
     ? await readTokenSources(input.root, config.sourceRoot, fs)
     : undefined;
   const override = await readTokenOverride(input.root, overridePath, fs);
-  const result = await tokenEngine.build({ preset, sources, override });
-  for (const name of defaults.outputFiles) {
+  const result = await tokenEngine.build({ preset, sources, override, previews: input.previews });
+  const outputFiles = await tokenEngine.outputFiles(input.previews);
+  for (const name of outputFiles) {
     if (typeof result.files[name] !== 'string') throw new Error(`Token engine omitted ${name}`);
     appTokenPath(input.root, tokenOutputFile(name));
   }
-  const files = defaults.outputFiles.map(tokenOutputFile);
+  const files = outputFiles.map(tokenOutputFile);
   for (let index = 0; index < files.length; index++) {
     await fs.writeFile(
       appTokenPath(input.root, files[index]),
-      result.files[defaults.outputFiles[index]],
+      result.files[outputFiles[index]],
     );
   }
   return { preset: result.preset, files };

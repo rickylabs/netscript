@@ -273,6 +273,11 @@ jobs:
           deno run -A --frozen packages/cli/bin/netscript-dev.ts init fresh-ui-browser
           --path .llm/tmp/s0/scaffold --app-name dashboard --db none
           --no-aspire --no-git --editor none --ci --yes
+      - name: Opt in to design preview styles
+        if: env.RUN == 'true'
+        run: >-
+          deno run -A --frozen packages/cli/bin/netscript-dev.ts ui:add theme-previews
+          --project-root .llm/tmp/s0/scaffold/fresh-ui-browser/apps/dashboard
       - name: Exact axe baseline contract
         if: env.RUN == 'true'
         run: >-

@@ -12,7 +12,7 @@
 export { buildTokens } from './src/tokens/adapters/style-dictionary.ts';
 export { defaultTokenSources } from './src/tokens/adapters/default-token-sources.ts';
 export type { TokenSources } from './src/tokens/domain/resolve-tokens.ts';
-export { APP_TOKEN_FILES } from './src/tokens/domain/token-output.ts';
+export { APP_TOKEN_FILES, PREVIEW_TOKEN_FILES } from './src/tokens/domain/token-output.ts';
 export type {
   BuiltToken,
   ExportedToken,

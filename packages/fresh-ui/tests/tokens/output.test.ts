@@ -55,7 +55,7 @@ for (const hex of ['#ff0000', undefined]) {
 
 Deno.test('app CSS contains only its preset and NS One compatibility with bounded size', async () => {
   const build = await built();
-  assertEquals(APP_TOKEN_FILES.length, 23);
+  assertEquals(APP_TOKEN_FILES.length, 5);
   const ns = build.files['tokens.css'];
   const themes = (css: string) =>
     [...new Set([...css.matchAll(/data-theme='([^']+)'/g)].map((match) => match[1]))].sort();
@@ -341,5 +341,51 @@ Deno.test('NS One exclusions contain only legacy roles or exact inherited compon
         `Component color must exactly match its S0 role: ${name}`,
       );
     }
+  }
+});
+
+Deno.test('default CSS keeps the legacy byte prefix and fits its six-KB gzip budget', async () => {
+  const build = await built();
+  const css = build.files['tokens.css'];
+  const original = await Deno.readTextFile(
+    new URL('../../registry/theme/tokens.css', import.meta.url),
+  );
+  assertEquals(css, original);
+  assertEquals(css.startsWith(legacy.css), true);
+  assertEquals(css.includes('--ns-liquid-tag-green:'), false);
+  const bytes = new TextEncoder().encode(css);
+  const compressed = await new Response(
+    new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip')),
+  ).arrayBuffer();
+  assertEquals(
+    compressed.byteLength <= 6_000,
+    true,
+    `Default token CSS gzip: ${compressed.byteLength}`,
+  );
+  // Every retained native alias still resolves after unused ramps/packs are trimmed.
+  const declared = new Set([...css.matchAll(/(--ns-[a-z0-9-]+):/g)].map((match) => match[1]));
+  for (const match of (css + build.files['theme-bridge.css']).matchAll(/var\((--ns-[a-z0-9-]+)/g)) {
+    assertEquals(declared.has(match[1]), true, match[1]);
+  }
+});
+
+Deno.test('app build skips Figma and preview assets unless requested without changing core bytes', async () => {
+  const full = await built();
+  const app = await buildTokens({ target: 'app' });
+  assertEquals(Object.keys(app.files).sort(), [...APP_TOKEN_FILES].sort());
+  for (const file of APP_TOKEN_FILES) assertEquals(app.files[file], full.files[file], file);
+  const previews = await buildTokens({ target: 'app', previews: true });
+  assertEquals(Object.keys(previews.files).length, 23);
+  for (const preset of TOKEN_PRESETS) {
+    assertEquals(
+      previews.files[`presets/${preset.id}.css`],
+      full.files[`presets/${preset.id}.css`],
+    );
+  }
+  for (const context of app.contexts) {
+    const matching = app.contexts.find((candidate) =>
+      candidate.preset.id === context.preset.id && candidate.scheme === context.scheme
+    )!;
+    assertEquals(context.tokens, matching.tokens);
   }
 });

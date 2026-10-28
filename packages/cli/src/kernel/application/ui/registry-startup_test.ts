@@ -6,7 +6,7 @@ type Module = {
 };
 
 Deno.test('CLI registry command graph keeps registry payload out of static startup', async () => {
-  const entry = new URL('./registry.ts', import.meta.url).href;
+  const entry = new URL('../../../../bin/netscript.ts', import.meta.url).href;
   const result = await new Deno.Command(Deno.execPath(), {
     args: ['info', '--json', entry],
     stdin: 'null',

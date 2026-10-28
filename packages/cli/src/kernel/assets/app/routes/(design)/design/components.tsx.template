@@ -1,7 +1,7 @@
 import DesignComponentsView from './(_components)/components-view.tsx';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
-import { appTheme } from '@app/lib/theme.ts';
+import { designTheme as appTheme } from './(_shared)/theme.ts';
 
 export const designComponentsPage = definePage()
   .withRoute(appRoutes.designComponents)

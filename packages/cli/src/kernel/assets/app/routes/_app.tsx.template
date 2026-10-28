@@ -4,8 +4,8 @@ import { appTheme } from '@app/lib/theme.ts';
 const THEME_INIT_SCRIPT =
   `(function(){var t;try{t=localStorage.getItem('ns-theme')}catch(e){}if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}document.documentElement.setAttribute('data-scheme',t)})()`;
 
-export default define.page(function AppShell({ Component, url }) {
-  const { preset, fontImports, previewStylesheet } = appTheme(url);
+export default define.page(function AppShell({ Component, state }) {
+  const { preset, fontImports, previewStylesheet } = state.themePreview ?? appTheme();
   return (
     <html
       lang='en'

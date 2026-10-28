@@ -192,3 +192,8 @@ browser. Registry copy commands (`netscript ui:*`) require the NetScript CLI.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+Token build metadata is available from `@netscript/fresh-ui/token-config` without
+loading Style Dictionary or the source corpus. See [token contribution and output
+budgets](tokens/README.md). Design preview styles are opt-in through
+`netscript ui:add theme-previews` or `netscript tokens build --previews`.

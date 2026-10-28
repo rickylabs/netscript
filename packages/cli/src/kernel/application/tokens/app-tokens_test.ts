@@ -23,6 +23,7 @@ async function fixture() {
   await fs.createDir(`${ROOT}/routes`);
   const calls: Parameters<TokenEnginePort['build']>[0][] = [];
   const tokenEngine: TokenEnginePort = {
+    outputFiles: () => Promise.resolve(OUTPUTS),
     defaults: () =>
       Promise.resolve({
         preset: 'ns-one',
@@ -32,7 +33,6 @@ async function fixture() {
             '{"version":"2025.10","sets":{},"modifiers":{},"resolutionOrder":[]}',
           'semantic.tokens.json': '{}',
         },
-        outputFiles: OUTPUTS,
       }),
     build: (options) => {
       calls.push(options);
@@ -81,10 +81,11 @@ Deno.test('tokens build reads initialized sources and applies explicit override 
   assertEquals(dependencies.calls[0], {
     preset: 'studio-utility',
     sources: {
-      resolver: { version: '2025.10', sets: {}, modifiers: {}, resolutionOrder: [] },
-      documents: { 'semantic.tokens.json': {} },
+      'tokens.resolver.json': '{"version":"2025.10","sets":{},"modifiers":{},"resolutionOrder":[]}',
+      'semantic.tokens.json': '{}',
     },
-    override,
+    override: JSON.stringify(override),
+    previews: undefined,
   });
 });
 
@@ -96,7 +97,8 @@ Deno.test('tokens build retains an installed registry preset and detects convent
   assertEquals(dependencies.calls[0], {
     preset: 'studio-utility',
     sources: undefined,
-    override: { semantic: {} },
+    override: '{"semantic":{}}',
+    previews: undefined,
   });
 });
 
@@ -142,7 +144,7 @@ Deno.test('tokens clean removes known files and retains all app-owned files', as
   await dependencies.fs.writeFile(`${ROOT}/assets/unrelated.json`, 'app data');
   await dependencies.fs.writeFile(`${ROOT}/static/owned.css`, 'app-owned static');
   assertEquals(await dependencies.fs.exists(`${ROOT}/static/presets/studio-utility.css`), true);
-  assertEquals((await cleanAppTokens(ROOT, dependencies)).length, 6);
+  assertEquals((await cleanAppTokens(ROOT, dependencies)).length, 5);
   assertEquals(await cleanAppTokens(ROOT, dependencies), []);
   assertEquals(await dependencies.fs.readFile(`${ROOT}/assets/styles.css`), 'app stylesheet');
   assertEquals(await dependencies.fs.readFile(`${ROOT}/assets/unrelated.json`), 'app data');
@@ -177,4 +179,31 @@ Deno.test('token operations reject workspace roots and escaping input paths', as
     'inside the Fresh app',
   );
   assertEquals(dependencies.calls.length, 0);
+});
+
+Deno.test('tokens clean uses only output metadata and preserves a non-default preset for rebuild', async () => {
+  const dependencies = await fixture();
+  await dependencies.fs.writeFile(`${ROOT}/assets/theme-preset.json`, '{"id":"studio-utility"}');
+  const defaults = dependencies.tokenEngine.defaults;
+  dependencies.tokenEngine.defaults = () => {
+    throw new Error('clean must not load sources/compiler');
+  };
+  await cleanAppTokens(ROOT, dependencies);
+  assertEquals(
+    await dependencies.fs.readFile(`${ROOT}/assets/theme-preset.json`),
+    '{"id":"studio-utility"}',
+  );
+  dependencies.tokenEngine.defaults = defaults;
+  await buildAppTokens({ root: ROOT }, dependencies);
+  assertEquals(dependencies.calls[0].preset, 'studio-utility');
+});
+
+Deno.test('tokens init force replaces stale managed source files', async () => {
+  const dependencies = await fixture();
+  await initAppTokens({ root: ROOT }, dependencies);
+  await dependencies.fs.writeFile(`${ROOT}/tokens/source/obsolete.tokens.json`, '{}');
+  await dependencies.fs.writeFile(`${ROOT}/tokens/notes.txt`, 'keep');
+  await initAppTokens({ root: ROOT, force: true }, dependencies);
+  assertEquals(await dependencies.fs.exists(`${ROOT}/tokens/source/obsolete.tokens.json`), false);
+  assertEquals(await dependencies.fs.readFile(`${ROOT}/tokens/notes.txt`), 'keep');
 });

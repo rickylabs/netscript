@@ -295,8 +295,8 @@ All three commands select a Fresh app with `--app <name>` from a workspace, or a
 | Command | Description |
 | --- | --- |
 | `netscript tokens init` | Copy the editable DTCG sources, `tokens.config.json`, and an empty semantic override. Flags: `--preset <id>` (NS One by default), `--force` (replace existing token sources and settings). |
-| `netscript tokens build` | Validate and compile five core web assets plus 18 opt-in preset stylesheets into app `assets/` (core) and `static/presets/` (previews). Flags: `--preset <id>` (override app settings), `--override <path>` (app-relative semantic alias layer applied last). |
-| `netscript tokens clean` | Remove only the five core token files from `assets/` and the 18 known generated CSS files from `static/presets/`. Keep app CSS, settings, source documents and unrelated static files. |
+| `netscript tokens build` | Validate and compile five core web assets plus 18 opt-in preset stylesheets into app `assets/` (core) and `static/presets/` (previews). Flags: `--preset <id>` (override app settings), `--override <path>` (app-relative semantic alias layer applied last), `--previews` (explicitly write the 18 development preview stylesheets; default builds write only five core files). |
+| `netscript tokens clean` | Remove generated token files from `assets/` and the 18 known generated CSS files from `static/presets/`, preserving `theme-preset.json` so a non-default preset survives rebuild. Keep app CSS, settings, source documents and unrelated static files. |
 
 Build works with bundled sources before initialization and retains the app's installed registry
 preset. Initialization creates a version 1 `tokens.config.json` with `preset`, `sourceRoot`, and

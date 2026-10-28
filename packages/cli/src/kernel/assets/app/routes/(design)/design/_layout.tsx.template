@@ -3,7 +3,7 @@ import SidebarToggle from '@app/islands/ui/SidebarToggle.tsx';
 import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
 import { appRoutes } from '@app/router.ts';
 import { define } from '@app/utils.ts';
-import { appTheme } from '@app/lib/theme.ts';
+import { designTheme as appTheme } from './(_shared)/theme.ts';
 
 const DESIGN_NAVIGATION = [
   {

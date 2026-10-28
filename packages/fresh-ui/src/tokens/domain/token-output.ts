@@ -44,6 +44,10 @@ export interface TokenContextOutput {
 
 /** Build input; app aliases apply last to the semantic tier in every context. */
 export interface TokenBuildOptions {
+  /** App builds skip catalog-only Figma outputs. */
+  readonly target?: 'catalog' | 'app';
+  /** Include separate design preview styles in app output. */
+  readonly previews?: boolean;
   /** Initial preset for root CSS and the generated preset configuration. */
   readonly preset?: string;
   /** Alias-only semantic app layer applied after all source modifiers. */
@@ -62,12 +66,16 @@ export interface TokenBuildResult {
   readonly preset: TokenPreset;
 }
 
-/** Five core web files plus opt-in preview styles; only the active CSS is loaded. */
+/** Five core web files; design preview styles are explicitly opt-in. */
 export const APP_TOKEN_FILES: readonly string[] = [
   'tokens.css',
   'theme-bridge.css',
   'tokens.json',
   'fonts.json',
   'theme-preset.json',
-  ...TOKEN_PRESETS.map((preset) => `presets/${preset.id}.css`),
 ];
+
+/** Separate stylesheets installed only for development design previews. */
+export const PREVIEW_TOKEN_FILES: readonly string[] = TOKEN_PRESETS.map((preset) =>
+  `presets/${preset.id}.css`
+);

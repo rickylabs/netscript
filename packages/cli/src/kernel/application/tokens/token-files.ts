@@ -1,5 +1,4 @@
 import { isAbsolute, join, relative, resolve } from '@std/path';
-import type { TokenDocument, TokenResolver, TokenSources } from '@netscript/fresh-ui/tokens';
 import {
   TOKEN_ASSET_DIR,
   TOKEN_CONFIG_FILE,
@@ -55,18 +54,17 @@ export async function readTokenSources(
   root: string,
   sourceRoot: string,
   fs: FileSystemPort,
-): Promise<TokenSources> {
+): Promise<Readonly<Record<string, string>>> {
   const directory = appTokenPath(root, sourceRoot);
-  const resolver: TokenResolver = JSON.parse(
-    await fs.readFile(join(directory, TOKEN_RESOLVER_FILE)),
-  );
-  const documents: Record<string, TokenDocument> = {};
+  const documents: Record<string, string> = {
+    [TOKEN_RESOLVER_FILE]: await fs.readFile(join(directory, TOKEN_RESOLVER_FILE)),
+  };
   for await (const entry of fs.walk(directory)) {
     if (!entry.isFile || !entry.path.endsWith('.json')) continue;
     const name = relative(directory, entry.path).replaceAll('\\', '/');
-    if (name !== TOKEN_RESOLVER_FILE) documents[name] = JSON.parse(await fs.readFile(entry.path));
+    if (name !== TOKEN_RESOLVER_FILE) documents[name] = await fs.readFile(entry.path);
   }
-  return { resolver, documents };
+  return documents;
 }
 
 /** Read an explicit override even when absent, so a typo cannot silently drop customization. */
@@ -74,6 +72,6 @@ export async function readTokenOverride(
   root: string,
   path: string | undefined,
   fs: FileSystemPort,
-): Promise<TokenDocument | undefined> {
-  return path === undefined ? undefined : JSON.parse(await fs.readFile(appTokenPath(root, path)));
+): Promise<string | undefined> {
+  return path === undefined ? undefined : await fs.readFile(appTokenPath(root, path));
 }
