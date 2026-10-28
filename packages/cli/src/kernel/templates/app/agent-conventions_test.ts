@@ -41,6 +41,7 @@ Deno.test('service app convention references are exact and rendered', () => {
     'components/ui/mod.ts',
     '/design/composition',
     'assets/tokens.css',
+    'assets/theme-preset.json',
     'client.ts',
     'routes/_app.tsx',
     'routes/_layout.tsx',
@@ -65,6 +66,7 @@ Deno.test('service-free app conventions retain only shared resolvable references
     'components/ui/mod.ts',
     '/design/composition',
     'assets/tokens.css',
+    'assets/theme-preset.json',
     'client.ts',
     'routes/_app.tsx',
     'routes/_layout.tsx',
@@ -83,8 +85,13 @@ Deno.test('app conventions give agents one app-wide theme and chrome model', () 
   for (
     const fact of [
       '`assets/tokens.css`',
-      "`[data-theme='dark']`",
-      '`--ns-primary`',
+      '`assets/theme-preset.json`',
+      '`data-scheme`',
+      '`netscript tokens init --preset <id>`',
+      '`netscript tokens build`',
+      'never hand-edit the generated CSS',
+      '`primary-hover`',
+      '`ring` together',
       '`routes/_layout.tsx`',
       '`appNavigation` in `navigation.ts`',
       '`--no-nav`',
@@ -96,12 +103,18 @@ Deno.test('app conventions give agents one app-wide theme and chrome model', () 
   ) {
     assertStringIncludes(agents, fact);
   }
+  // Tokens v2 generates assets/tokens.css, so the pre-v2 recipe of editing `:root` must not return.
+  assert(
+    !`${agents}\n${webLayer}`.includes(':root'),
+    'guidance must not send agents to edit :root',
+  );
   assert(
     agents.indexOf('## Design and theming') > agents.indexOf('## Copy versus delete'),
     'design guidance must follow the data architecture it decorates',
   );
   assertStringIncludes(webLayer, '## Look and feel');
   assertStringIncludes(webLayer, '`assets/tokens.css`');
+  assertStringIncludes(webLayer, '`assets/theme-preset.json`');
   assertStringIncludes(webLayer, '`routes/_layout.tsx`');
   assertStringIncludes(webLayer, '`navigation.ts`');
 });

@@ -98,21 +98,24 @@ Every page renders inside the app chrome in `routes/_layout.tsx`: the top bar, w
 - Start each page from `<main class='ns-shell ns-section ns-stack ns-stack--lg'>` plus `PageHeader`,
   which `ui:add page` writes, and compose the app-owned primitives from `@app/components/ui/mod.ts`.
   Browse the running app's `/design` routes for the component gallery and tokens.
-- There is one app-wide theme. `assets/styles.css` imports `tokens.css` (the `--ns-*` tokens: light
-  on `:root`, dark on `[data-theme='dark']`, which `routes/_app.tsx` and `ThemeToggle` set on
-  `<html>`) and `theme-bridge.css` (Tailwind `*-ns-*` utilities over the same tokens). Restyle by
-  overriding tokens on `:root` then `[data-theme='dark']`, in `tokens.css` or below the
-  `App-specific custom styles below.` marker in `styles.css`, which `ui:add` preserves. Never scope
-  theme variables to one page's wrapper; there is no per-page theme attribute.
+- There is one app-wide theme. `assets/theme-preset.json` names the app's preset (NS One by
+  default), and `routes/_app.tsx` stamps it on `<html>`: `data-theme` is the design language,
+  `data-scheme` is light or dark (`ThemeToggle` flips the scheme). `assets/tokens.css` and
+  `theme-bridge.css` (Tailwind `*-ns-*` utilities) are generated, so never hand-edit them. Never
+  scope theme variables to one page's wrapper; there is no per-page theme attribute.
+- Restyle through the token layer: `netscript tokens init --app <app> --preset <id>` switches the
+  preset, alias overrides in the `tokens/semantic.tokens.json` file that init creates reassign
+  semantic roles, and `netscript tokens build --app <app>` regenerates the assets after either.
 
-To rebrand, set `--ns-primary` and `--ns-primary-fg` on `:root`; tints, borders, hover states, the
-accent, and the focus ring derive from them in both themes.
+To rebrand colors, alias `primary`, `primary-fg`, `primary-hover`, `primary-subtle`,
+`primary-border`, `accent`, and `ring` together. NS One's hover, tints, accent, and ring do not
+follow `primary` on their own, and `tokens build` does not check the contrast of your overrides.
 
-Read `web-layer/how-to/design-with-fresh-ui` (rules, brand presets, page recipes) and
-`web-layer/how-to/customize-fresh-ui` (the theme chain and the frame) through MCP `get_doc` before
-designing a page, restyling, or reshaping the frame. An app without `navigation.ts` was scaffolded
-before shared navigation: its `routes/_layout.tsx` shows the top bar only for an allowlist of
-routes, so add new pages there.
+Read `web-layer/how-to/design-with-fresh-ui` (rules, presets and brand overrides, page recipes) and
+`web-layer/how-to/customize-fresh-ui` (token commands, migration, and the frame) through MCP
+`get_doc` before designing a page, restyling, or reshaping the frame. An app without `navigation.ts`
+was scaffolded before shared navigation: its `routes/_layout.tsx` shows the top bar only for an
+allowlist of routes, so add new pages there.
 
 ## Route lifecycle: rename, move, or remove a page
 

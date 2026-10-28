@@ -338,3 +338,79 @@ Slice review (supervisor): every component/prop/class named in the guide was che
   - The fixture delta re-locks a measured near-tie: either corpus alone keeps the old order, #1 is still asserted in
     exact mode, and MCP is 199/199.
   - Main's design-system docs describe the `data-scheme` model as provisional and agree with today's selectors.
+
+## S9 — rebase onto `96d13d2` and reconcile with tokens v2 (#2435, S1 #2414), 2026-10-28
+
+Main merged #2442, #2457, #2463, #2449 and #2435 ("deliver tokens v2 and app overrides"). #2435 replaces the token
+pipeline this PR's S1 edited: it deletes `tokens/semantic.tokens.json` and `tokens/themes/light.tokens.json` in favour
+of `tokens/v2/` (Figma-owned values, an importer, a role manifest, contrast validation, byte-locked NS One legacy CSS).
+It also adds `netscript tokens init|build|clean`, 18 presets, and `data-theme` (language) plus `data-scheme`
+(light/dark). The theme guidance from S2–S4 taught the old model (edit `:root` in `tokens.css`; derived tints), which
+v2 contradicts.
+
+### Design checkpoint
+
+1. **Public surface** — the two web-layer guides' theme sections, the generated `apps/<app>/AGENTS.md` +
+   `WEB-LAYER.md` Theme text, the `netscript-build` skill, and the MCP `app-theming` concept. No token, CLI, or
+   framework code changes.
+2. **Domain vocabulary** — preset, design language (`data-theme`), scheme (`data-scheme`), semantic alias override,
+   the seven brand roles, the five generated core assets.
+3. **Ports** — none.
+4. **Constants** — new convention reference `app-theme-preset` (`assets/theme-preset.json`); concept aliases
+   `data-scheme`, `theme preset`; route hints `brand colors on a preset`, `pick a preset`.
+5. **Commit slices** — the rebase (S1 dropped, conflicts resolved toward main), then one S9 commit for the guidance.
+6. **Deferred scope** — making NS One's hover/tints/accent/ring follow `primary` is Figma/importer-owned (v2
+   README: "Figma owns values", "never fix a failing Figma value in code"); `tokens build` contrast-checking app
+   overrides is CLI work. Both go to `caveats.md`.
+7. **Contributor path** — `docs/site/web-layer/how-to/design-with-fresh-ui.md` (rebrand section) and
+   `packages/cli/src/kernel/templates/app/agent-conventions.ts` (Design and theming).
+
+### Rebase
+
+- S1 (`derive intent tints…`) is dropped (`git rebase --skip`): modify/delete on the two deleted DTCG files, and
+  v2 doctrine forbids porting the derivation by hand (importer-generated aliases, byte-locked legacy prefix).
+  Backup of the pre-rebase tip: local branch `backup/divybot-752-pre-v2` (`b7e0ee0`).
+- `customize-fresh-ui.md` conflicts (S2) took main's v2 hunks; run-dir records took the replayed commit's side;
+  carriers were regenerated at every step.
+
+### What v2 does, measured on a local-source scaffold (`.llm/tmp/v2probe`, removed afterwards)
+
+- A fresh app ships `assets/{tokens.css,tokens.json,theme-bridge.css,theme-preset.json,fonts.json}` and
+  `lib/theme.ts`; `routes/_app.tsx` stamps `data-theme`/`data-density`/`data-flavor` and seeds `data-scheme`.
+- `tokens build` writes exactly those five assets. `tokens init` creates `tokens/source/`, `tokens.config.json`,
+  and an empty `tokens/semantic.tokens.json`; `init --force` resets that override file.
+- Overriding only `primary` leaves `primary-hover`, `primary-subtle`, `primary-border`, `accent`, and `ring` copper.
+  Aliasing all seven works: `accent`/`ring` → `{semantic.primary}` renders `var(--ns-primary)`, and ramp steps
+  resolve per scheme (`indigo-3` = `#edf2fe` light, `#182449` dark). `teal-3` does not change between schemes.
+- Overrides cannot carry `$extensions` ("Overrides cannot change metadata"), and a failed build leaves the
+  previous assets in place. `tokens build` does not contrast-check overrides (orange with `gray-1` built at 2.85:1).
+- Contrast of `primary-fg` on steps 9/10, light/dark: blue, grass, tomato, orange pass with `gray-12`
+  (worst 4.70); indigo/violet pass with `gray-1` on step 9 (4.99/5.17) but drop to 4.11/4.22 on the dark step 10.
+- Every override example in the guide was built: the blue seven-role block, indigo with `primary-hover` →
+  `{semantic.primary}`, and `radius-md` → `{semantic.radius-lg}`.
+
+### Changes
+
+- Design guide: rules 1–2, the theme chain (sources → `tokens build` → five assets → `styles.css` → `client.ts`;
+  `_app.tsx` stamps; `ThemeToggle` flips `data-scheme`), the "These do not exist" callout, a new "Rebrand the whole
+  app" (Pick a preset; Brand colors on a preset with the seven roles and the measured ramp table; Type and shape),
+  the do/don't rows, Verify step 3, and Next steps.
+- Customize guide: the `assets/` and `lib/` rows, a pointer to the seven brand roles, the "no per-page theme"
+  callout (v2 wording), the `--theme` note (18 preset items plus `theme-seed`), and Next steps.
+- Generated AGENTS.md / WEB-LAYER.md: Theme bullet and Look and feel rewritten. New `app-theme-preset` reference;
+  the tests assert the v2 facts and that no `:root` recipe returns.
+- Skill: the theme bullets now give the preset/override/build path and the seven roles.
+- MCP: `app-theming` route hints follow the new headings. The theming test asserts `data-scheme`,
+  `netscript tokens build`, and `semantic.tokens.json` in both guides, and no `:root` in the design guide.
+
+| Gate | Result |
+| --- | --- |
+| Carriers regenerated; `check:publish-assets` / `check:agent-docs-prose` | PASS / PASS |
+| MCP `deno task test` (theming routes + the near-tied fixture row) | 199 passed |
+| CLI tests (templates/app, public-command-tree real-scaffold paths, init-agent*, ui, tokens) | 199 passed |
+| `packages/cli` `deno task check` | PASS |
+| fresh-ui tests / `tokens:check` | 217 passed / PASS |
+| `generate-publish-assets_test` + `carrier-parity_test` | 9 passed |
+| `docs:links` / `docs:accuracy` / `docs:snippets` / site `check:links` / docs `_plugins` tests | PASS ×4 / 7 passed |
+| Probe strings in the MCP carrier | 0 |
+| fmt / lint on changed TS and the skill | PASS |

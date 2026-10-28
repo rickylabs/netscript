@@ -12,7 +12,7 @@ const ROUTES = [
     concept: 'app-theming',
     slug: DESIGN_GUIDE,
     section: 'rebrand-the-whole-app',
-    excerpt: '--ns-primary',
+    excerpt: 'netscript tokens build',
     intents: [
       'make my theme apply to every page, not just the dashboard',
       'rebrand the app with a new brand color',
@@ -84,11 +84,23 @@ for (
     for (const document of [design, customize]) {
       const text = document.sectionContents.map(({ content }) => content).join('\n');
       for (
-        const fact of ['theme-bridge.css', 'client.ts', "[data-theme='dark']", 'data-ns-theme']
+        const fact of [
+          'theme-bridge.css',
+          'client.ts',
+          "[data-theme='dark']",
+          'data-scheme',
+          'netscript tokens build',
+          'semantic.tokens.json',
+          'data-ns-theme',
+        ]
       ) {
         assertStringIncludes(text, fact, `${document.slug}: ${fact}`);
       }
     }
+
+    // Tokens v2 generates tokens.css, so the guide must not teach the old hand-edit of `:root`.
+    const designText = design.sectionContents.map(({ content }) => content).join('\n');
+    assert(!designText.includes(':root'), `${design.slug} still teaches editing :root`);
 
     const matches = await corpus.search('data-ns-theme');
     assert(

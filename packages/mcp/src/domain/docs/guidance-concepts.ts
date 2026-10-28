@@ -205,7 +205,9 @@ export const GUIDANCE_CONCEPTS: readonly GuidanceConcept[] = Object.freeze([
       'design tokens',
       'tokens.css',
       'data-theme',
+      'data-scheme',
       'data-ns-theme',
+      'theme preset',
     ],
     terms: [
       'theme',
@@ -214,6 +216,8 @@ export const GUIDANCE_CONCEPTS: readonly GuidanceConcept[] = Object.freeze([
       'rebrand',
       'primary',
       'chain',
+      'preset',
+      'scheme',
       'app',
       'wide',
       'every',
@@ -222,9 +226,9 @@ export const GUIDANCE_CONCEPTS: readonly GuidanceConcept[] = Object.freeze([
     requiredAnyTerms: ['theme', 'brand'],
     routeHints: [
       { heading: 'rebrand the whole app' },
-      { heading: 'make one theme apply app-wide' },
       { heading: 'how the theme reaches every page' },
-      { heading: 'the theme chain' },
+      { heading: 'brand colors on a preset' },
+      { heading: 'pick a preset' },
     ],
   },
   {

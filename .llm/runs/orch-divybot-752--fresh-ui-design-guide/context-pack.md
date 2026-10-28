@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------------------------------- |
 | Run ID         | `orch-divybot-752--fresh-ui-design-guide`                                 |
 | Branch / PR    | `orch/divybot-752` / rickylabs/netscript#2408 (`Closes #2406`)            |
-| Current phase  | S8 rebased onto `f177c38`; IMPL-EVAL rounds 1–5 PASS                             |
+| Current phase  | S9 rebased onto `96d13d2`; theme guidance reconciled with tokens v2; IMPL-EVAL round 6 |
 | Archetype      | 4 — DSL/Builder (`packages/fresh-ui`), 6 — CLI tooling (guidance builder) |
 | Scope overlays | frontend, docs                                                            |
 
@@ -25,7 +25,8 @@ Complementary caveats issue: rickylabs/netscript#2410 (from `caveats.md`, includ
    regenerated, PR body moves to `Closes #2406`, `e2e-cli-gate` added before the push so both runtime tiers run.
 3. Done in S7 (2026-10-28): rebased onto `782893a`; only the generated carriers conflicted and were regenerated.
 4. S8 (2026-10-28): rebased onto `f177c38`; one near-tied guidance fixture row re-locked (worklog S8); round 5 re-steer.
-5. Mark PR ready; write `.divybot-final-report.md`.
+5. S9 (2026-10-28): rebased onto `96d13d2` (tokens v2); S1 dropped; theme guidance rewritten for v2 (worklog S9).
+6. Mark PR ready; write `.divybot-final-report.md`.
 
 ## Key Decisions
 

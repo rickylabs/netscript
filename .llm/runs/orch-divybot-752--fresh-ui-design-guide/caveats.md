@@ -64,3 +64,16 @@ Collected during this run (theming/primitives/guidance side) and from sibling ha
   application ownership versus a reusable integration" differ by 0.01–0.03 BM25 points, so any corpus change can flip
   them (S8 re-locked them). A mode that asserts rank-one plus the top-3 set would keep the useful check without the
   flake.
+
+## Found in S9 (2026-10-28, tokens v2)
+
+- **NS One's derived roles do not follow `primary`.** In v2, NS One's `primary-hover`, `primary-subtle`,
+  `primary-border`, `accent`, and `ring` are fixed copper values (byte-locked legacy prefix), so a `primary`-only
+  override leaves copper behind. The guides now say to alias all seven roles. A v2-native fix belongs in the
+  Figma/importer sources: `accent`/`ring` aliasing `semantic.primary`, and `$extensions.netscript.derive` mixes for
+  the tints and hover. This PR's dropped S1 did that on the old pipeline.
+- **`tokens build` does not contrast-check app overrides.** The package's `tokens:validate` checks contrast pairs,
+  but an app override with 2.85:1 text built cleanly. Running the contrast contract on the overridden context would
+  catch it.
+- **`tokens init --force` resets `tokens/semantic.tokens.json`.** The CLI reference says it replaces sources and
+  settings; it also empties the override file, discarding app customization without a warning.

@@ -23,6 +23,7 @@ interface ConventionReference {
     | 'service-partial'
     | 'telemetry-route'
     | 'app-tokens'
+    | 'app-theme-preset'
     | 'app-client'
     | 'app-shell'
     | 'app-layout'
@@ -60,7 +61,12 @@ const DESIGN_REFERENCES: readonly ConventionReference[] = [
   {
     id: 'app-tokens',
     path: 'assets/tokens.css',
-    purpose: 'every --ns-* token for both themes; the one place to restyle the app',
+    purpose: 'the --ns-* tokens netscript tokens build generates for the preset; never hand-edit',
+  },
+  {
+    id: 'app-theme-preset',
+    path: 'assets/theme-preset.json',
+    purpose: "the app's one preset: design language, density, and Studio flavor",
   },
   {
     id: 'app-client',
@@ -70,7 +76,8 @@ const DESIGN_REFERENCES: readonly ConventionReference[] = [
   {
     id: 'app-shell',
     path: 'routes/_app.tsx',
-    purpose: 'the HTML shell that sets data-theme on <html> and loads fonts',
+    purpose:
+      'the HTML shell that stamps the preset (data-theme, data-scheme) on <html> and links its fonts',
   },
   {
     id: 'app-layout',
@@ -218,12 +225,14 @@ Before finishing, record which canonical surfaces you used or deliberately rejec
 Every page shares one theme and one chrome. Never style or theme a page on its own.
 
 - **Theme:** \`${
-    referencePath(all, 'app-tokens')
-  }\` holds every \`--ns-*\` token (\`:root\` is light, \`[data-theme='dark']\` is dark). \`${
-    referencePath(all, 'app-client')
-  }\` loads it on every route, and \`${
+    referencePath(all, 'app-theme-preset')
+  }\` names the app's one preset (NS One by default), and \`${
     referencePath(all, 'app-shell')
-  }\` sets \`data-theme\` on \`<html>\`. To rebrand, set \`--ns-primary\` and \`--ns-primary-fg\` in \`:root\`; tints, borders, hover states, the accent, and the focus ring derive from them. There is no \`data-ns-theme\`, no themes folder, and no per-page theme, so never set tokens or \`data-theme\` on a page wrapper.
+  }\` stamps it on \`<html>\`: \`data-theme\` is the design language and \`data-scheme\` is light or dark. \`${
+    referencePath(all, 'app-tokens')
+  }\` holds the preset's generated \`--ns-*\` tokens, and \`${
+    referencePath(all, 'app-client')
+  }\` loads them on every route. Restyle through the token layer: \`netscript tokens init --preset <id>\` switches the preset, and alias overrides in the tokens/semantic.tokens.json file that init creates reassign roles. Run \`netscript tokens build\` after either, and never hand-edit the generated CSS. To rebrand colors on a preset, override \`primary\`, \`primary-fg\`, \`primary-hover\`, \`primary-subtle\`, \`primary-border\`, \`accent\`, and \`ring\` together. There is no \`data-ns-theme\`, no themes folder, and no per-page theme, so never set tokens or \`data-theme\` on a page wrapper.
 - **Chrome:** \`${
     referencePath(all, 'app-layout')
   }\` renders the top bar, navigation, and theme toggle around every page. The top-bar links are \`appNavigation\` in \`${
@@ -239,7 +248,7 @@ Every page shares one theme and one chrome. Never style or theme a page on its o
     referencePath(all, 'design-gallery-route')
   }\` and every page you touched in light and dark, including the empty, loading, and error states.
 
-For brand presets, page recipes, and the do/don't list, call MCP \`get_doc\` with slug ${DESIGN_GUIDE_SLUG}. For the full theme chain and the chrome, use ${CUSTOMIZE_GUIDE_SLUG}.
+For presets, brand overrides, page recipes, and the do/don't list, call MCP \`get_doc\` with slug ${DESIGN_GUIDE_SLUG}. For the full theme chain and the chrome, use ${CUSTOMIZE_GUIDE_SLUG}.
 `;
 }
 
@@ -284,9 +293,9 @@ Use \`${referencePath(all, 'dashboard-view')}\` and \`${
 
 ## Look and feel
 
-One theme applies app-wide from \`${
-    referencePath(all, 'app-tokens')
-  }\` (\`:root\` light, \`[data-theme='dark']\` dark), and \`${
+One theme applies app-wide: \`${referencePath(all, 'app-shell')}\` stamps the preset from \`${
+    referencePath(all, 'app-theme-preset')
+  }\` on \`<html>\`, \`${referencePath(all, 'app-tokens')}\` holds its generated tokens, and \`${
     referencePath(all, 'app-layout')
   }\` owns the chrome, with its top-bar links in \`${
     referencePath(all, 'app-navigation')
