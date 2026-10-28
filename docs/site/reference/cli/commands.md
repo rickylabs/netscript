@@ -342,7 +342,7 @@ following registry and preset commands complete the setup and discovery workflow
 | --- | --- |
 | `netscript ui:build --registry registry.json --source-root . --output public/r` | Validate local authoring and publish a static catalog plus one JSON file per item. Resolve source paths inside the declared source root. |
 | `netscript ui:init --preset <code>` | Initialize the foundation using a token preset id, encoded preset, or shared URL. |
-| `netscript ui:add <name\|@namespace/name\|url> --diff` | Show installed/local/registry differences without writing application files. Omit `--diff` to install; `--style <reference>` selects the setup-time component style. |
+| `netscript ui:add <name\|@namespace/name\|url> --diff` | Show installed/local/registry differences without writing application files. Omit `--diff` to install. Install a `registry:style` item or apply a preset with a `style` field to select component sources. |
 | `netscript ui:view <reference>` | Print portable metadata and exact source files without installing. |
 | `netscript ui:search [query] --registry @acme` | Search item metadata in the built-in catalog or a configured namespace. |
 | `netscript ui:docs <reference>` | Show publisher documentation and Markdown file locations. |
