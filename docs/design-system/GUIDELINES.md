@@ -293,12 +293,17 @@ activity feed. It exercises about 30 components in one view. Then add:
    scope in that theme's `DESIGN.md`:
    - **Fluent:** the native dark accent `#60CDFF` with black text, at control size and on native
      selection indicators only. It never fills content surfaces.
-   - **Terminal:** the lime selection row (`#bdee63`, dark ink). The selected tab and the primary
-     key stay dark.
-   - **Pixel:** the amber primary keys (`#faab35` with `#12100e` ink).
-   - **Brutal:** the saturated blocks and the amber primary with black ink, which are the language's
-     surfaces in both schemes.
-   - **Cupertino:** the prominent capsule `#0090ff` with dark ink `#111113`.
+   - **Terminal:** lime `#bdee63` with dark ink on the selection row (inverse video) and the lime
+     fill of the sync progress bar. The selected tab and the primary key stay dark.
+   - **Pixel:** amber `#faab35` with `#12100e` ink, only where its accent policy allows it: the
+     primary and hero keys, the selected tab, the current page key, checked checkboxes, the on
+     switch, the focus ring, the block cursor, and the 2px amber bands used as signals.
+   - **Brutal:** the saturated blocks and the amber primary, which are the language's surfaces in
+     both schemes. They carry black ink, except the dark violet `block-purple`, which takes
+     `text/fg` because black on it is 3.9:1.
+   - **Cupertino:** `primary` `#0090ff` with dark ink `#111113`, only where its accent policy allows
+     it: the prominent capsule, the selected list row, checked selection circles, and the brand and
+     avatar discs.
 
    No other theme or usage is exempt. A new theme that needs such a fill is added to this list by a
    change to these guidelines.
