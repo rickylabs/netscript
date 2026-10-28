@@ -15,3 +15,7 @@
 - Owner override: “Run IMPL-EVAL with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only. Fix once.” Separate Anthropic reviewer retained across any repair round.
 - Same declared write surface as above, including generator fixture/tests and section CSS. Add only relative-path run notes and sanitized evidence; no session IDs, absolute paths or process listings.
 - Continue PR #2437 only; preserve `Refs https://github.com/rickylabs/netscript/issues/2436`, remove contradictory closing keyword, no labels or force-push. Final READY report uses the excluded file handoff.
+
+## Generation-only quality handoff
+
+After the owner-authorized review-resume source was approved and pushed, the original delivery lane takes the known CI freshness repair. Additional write scope is the generated documentation carrier and dependent CLI/MCP publish assets produced by the existing repository generators. No handwritten package implementation, public exports, shared site UI, filters, CI or locks change. Public source remains the independently reviewed source; data regeneration is validated by the native freshness/budget/integrity gates.

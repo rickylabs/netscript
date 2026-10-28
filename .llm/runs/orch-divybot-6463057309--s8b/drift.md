@@ -18,3 +18,5 @@
 - Existing PR body carried a contradictory closing keyword from an earlier metadata repair. Removed it per the current explicit Refs-only instruction; retained acceptance evidence and all labels.
 - No NetScript MCP connector is listed, but the local stdio server supports both requested guidance tools; fresh responses retained in review-mcp-guidance.jsonl.
 - RTK is absent. Structured wrappers remain authoritative for source gates; direct commands are used without output compression.
+
+- Required generated outputs: current CI proves the new Markdown twins stale the installed CLI prose carrier. The owner-requested quality repair and source lane's explicit generation handoff authorize repository-native regeneration of the existing carrier and its dependent publish assets outside the original site subtree. This is derived data only, with no package API/runtime implementation or gate change.
