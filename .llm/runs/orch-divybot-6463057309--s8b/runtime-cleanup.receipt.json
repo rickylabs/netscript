@@ -1,0 +1,45 @@
+{
+  "gateId": "cli-e2e-aspire-cleanup",
+  "invocationId": "scaffold.runtime:cleanup.aspire-stop",
+  "argv": [
+    "deno",
+    "run",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run=aspire,docker",
+    "packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts",
+    ".llm/tmp/cli-e2e/plugin-smoke-20261028-084123/aspire/apphost.mts",
+    ".llm/tmp/cli-e2e/plugin-smoke-20261028-084123",
+    "true",
+    ".llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json"
+  ],
+  "cwd": ".",
+  "gitHead": "da605e2fc455e298b10b4fcfce6c3a678677dc8e",
+  "actualGitHead": "da605e2fc455e298b10b4fcfce6c3a678677dc8e",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:4075157",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "14298e1a58deb81d486e429ed3ba905fe8acca5f6ff648f82d9705313576d869",
+  "lifecycleId": "worker:4075157:scaffold.runtime:cleanup.aspire-stop:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-10-28T07:41:27.850Z",
+  "childReport": ".llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json",
+  "startedAt": "2026-10-28T07:41:27.852Z",
+  "finishedAt": "2026-10-28T07:41:28.521Z",
+  "durationMs": 669,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 693,
+    "sha256": "ac232db16886f67af85185d9214864ba7cf1caa751784aaa95aa88b460c2bbe5",
+    "tail": "error: Uncaught (in promise) Error: docker ps -aq failed (1): Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\n\n    throw new Error(\n          ^\n    at requireSuccess (file://packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts:309:11)\n    at async stopAndProbe (file://packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts:194:21)\n    at async file://packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts:383:3\n",
+    "truncated": false
+  },
+  "reason": "Child report .llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json was not created"
+}

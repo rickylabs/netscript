@@ -1,0 +1,28 @@
+{
+  "command": [
+    "deno",
+    "task",
+    "e2e:cli"
+  ],
+  "cwd": ".",
+  "exitCode": 1,
+  "runtimeVerdict": "UNPROVEN",
+  "reason": "Aspire environment preflight failed before scaffolding; Docker daemon unavailable during cleanup. No runtime gate weakened.",
+  "gates": [
+    {
+      "id": "preflight.deno",
+      "verdict": "passed",
+      "durationMs": 6
+    },
+    {
+      "id": "preflight.aspire",
+      "verdict": "failed",
+      "durationMs": 5695
+    },
+    {
+      "id": "cleanup.aspire-stop",
+      "verdict": "failed",
+      "durationMs": 750
+    }
+  ]
+}

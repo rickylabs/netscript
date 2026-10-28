@@ -1,0 +1,10 @@
+{
+  "probeCounts": {
+    "ok": 2,
+    "failed": 3
+  },
+  "survivorOwnershipCounts": {
+    "unproven": 24
+  },
+  "mutations": 0
+}

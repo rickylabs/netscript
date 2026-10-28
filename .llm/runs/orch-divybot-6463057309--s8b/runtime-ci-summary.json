@@ -1,0 +1,32 @@
+{
+  "source": "GitHub-hosted canonical e2e-cli workflow",
+  "headSha": "2c3199e74d471863056ac886429d24065b1ab70a",
+  "runUrl": "https://github.com/rickylabs/netscript/actions/runs/40655446049",
+  "runtimeJobUrl": "https://github.com/rickylabs/netscript/actions/runs/40655446049/job/122705497381",
+  "command": [
+    "deno",
+    "task",
+    "e2e:cli",
+    "run",
+    "scaffold.runtime",
+    "--cleanup",
+    "--format",
+    "pretty",
+    "--report",
+    ".llm/tmp/e2e-report-scaffold-runtime.json"
+  ],
+  "exitCode": 0,
+  "ok": true,
+  "suiteId": "scaffold.runtime",
+  "summary": {
+    "passed": 120,
+    "failed": 0,
+    "skipped": 0
+  },
+  "durationMs": 655582,
+  "staticSuite": "PASS",
+  "sqliteRuntimeSuite": "PASS",
+  "manualWorkflowConclusion": "FAILURE: separate desktop-native packaging job failed on missing installed executable",
+  "scope": "The runtime suite passed on the stated immutable head. This does not certify the separate native-packaging suite or unpublished later source.",
+  "privacy": "Count-only summary; full per-gate evidence retained in the linked workflow artifact."
+}
