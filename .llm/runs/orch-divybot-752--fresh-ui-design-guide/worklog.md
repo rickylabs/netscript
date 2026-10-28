@@ -293,3 +293,38 @@ Slice review (supervisor): every component/prop/class named in the guide was che
 | MCP `deno task test` | 199 passed |
 | `docs:links` / `docs:accuracy` / `docs:snippets` / site `check:links` / `design-system_test` | PASS ×5 |
 | Probe strings (`routes/(design)/`, design marker) in the MCP carrier | 0 / 0 |
+
+## S8 — rebase onto `f177c38` and a near-tie in the guidance smoke fixture (2026-10-28)
+
+- Main moved `782893a` → `f177c38` (#2439, the docs site rebuilt in NetScript Utility). Every docs commit conflicted
+  only in the two embedded-docs carriers; each was resolved by taking the rebased side and regenerating from source.
+  The branch patch outside `*.generated.ts` is byte-identical to `133847a`'s.
+- MCP `deno task test` then failed one row of `packages/mcp/tests/fixtures/guidance-evaluation.json`: the score-only
+  intent "pick direct application ownership versus a reusable integration" swapped its #2 and #3 sections. Both are
+  `use-a-second-database` sections that match the same three stems (`direct`, `applic`, `reusable`), so their order
+  depends on whole-corpus BM25 IDF.
+
+  | Corpus | #1 decision rule | `connect-an-external-database-by-hand` | `unsupported-by-netscript-…-turso-example` | #2 − #3 |
+  | --- | --- | --- | --- | --- |
+  | main `f177c38` | 23.2804 | 11.3217 | 11.2985 | +0.023 |
+  | pre-rebase branch `133847a` | 23.4990 | 11.6781 | 11.6678 | +0.010 |
+  | rebased branch | 23.5001 | 11.6439 | 11.6725 | −0.029 |
+
+  Neither side alone flips it: main's corpus and the old branch corpus both pass. The rebuilt pages plus this branch's
+  embedded pages do. #1 leads by about 12 points in all three.
+- Fix: the fixture row is re-locked to the measured order. It keeps `exact` mode, so #1's position is still asserted;
+  `required-set` would have dropped that. The ranking policy (PLAN-EVAL-locked) is untouched. RFC 0004 calls this file
+  a deterministic smoke fixture, and only `guidance-evaluation_test.ts` reads it.
+- Scores came from a temporary log in `orderGuidanceSections`, reverted before commit (`git status` clean apart from the
+  fixture).
+
+| Gate | Result |
+| --- | --- |
+| Carriers regenerated at the rebased head | no diff |
+| `check:publish-assets` / `check:agent-docs-prose` / `check:assets-barrel` | PASS |
+| fresh-ui `tokens:build --check` / fresh-ui tests | PASS / 192 passed |
+| MCP `deno task test` | 198/199 before the fixture fix, 199/199 after |
+| CLI tests / `packages/cli` `deno task check` | 183 passed / PASS |
+| Other corpus readers (`carrier-parity`, `ci-classify-changes`, `cli-mcp-adapters`, `agent-mcp-stdio`) | 74 passed |
+| `docs:links` / `docs:accuracy` / `docs:snippets` / site `check:links` / docs `_plugins` tests | PASS / PASS / PASS / PASS / 7 passed |
+| Probe strings in the MCP carrier | 0 |
