@@ -60,9 +60,9 @@ Seven flavors share one component anatomy. Signature moves:
 - Utility only:
   - NEVER use red except the logo (`--ns-studio-signal-brand`) and the destructive tone
     (`--ns-destructive*`: errors, destructive actions, CAUTION callouts).
-  - NEVER drop the tone from a callout, alert, notice or status badge, or ship code without its
-    syntax colours (`--ns-code-syntax-*`). Neutral identifiers, module and namespace kinds and
-    neutral badges stay `fg`.
+  - NEVER drop the tone from a callout, alert, notice or status badge, or ship highlighted code
+    without its syntax colours (`--ns-code-syntax-*`). Plain-text fences stay unhighlighted. Neutral
+    identifiers, module and namespace kinds and neutral badges stay `fg`.
   - MUST stay sharp, with radii 0–2px, and keep separations quiet: 1px gray-5 structural hairlines
     and quiet row rules, no 2px ink rules, no underline tabs, no shadows.
   - MUST mark location with the 6px ink square (`--ns-studio-signal-marker`, slot reserved) and
@@ -121,8 +121,9 @@ Seven flavors share one component anatomy. Signature moves:
 - [ ] Every shadow follows the flavor's depth recipe (only Cloud and Workshop have shadows).
 - [ ] Whole-pixel rules; bound paints seeded with their resolved colour (Figma).
 - [ ] Utility only: red appears in the logo and the destructive tone only; callouts, notices and
-      status badges carry their tone; code has syntax colours; hairlines are gray 5 / row rules
-      quiet; location and selection are ink; no 2px black rules, underline tabs or JetBrains Mono.
+      status badges carry their tone; highlighted code has syntax colours; hairlines are gray 5 /
+      row rules quiet; location and selection are ink; no 2px black rules, underline tabs or
+      JetBrains Mono.
 
 ## References
 
