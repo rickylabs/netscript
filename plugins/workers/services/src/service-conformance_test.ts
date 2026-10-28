@@ -1,11 +1,11 @@
 /**
- * Conformance oracles for the public workers `./service` subpath (S3b: runtime rows + compiler).
+ * Conformance oracles for the public workers `./service` policy, compiler and HTTP/TLS behavior.
  *
  * One denied-all stdin JS child feeds `startWorkersService` the postures the native
  * `assertServiceAuthPolicy` rejects (the redacted native `TypeError`) and the ones it permits (the
  * factory reaches exactly the denied `PORT` read). Type-only facade fixtures run through
  * `deno run --check --frozen` on stdin: the positive evaluates to a marker, each negative fails on
- * its intended TS code and field. Nothing here starts a listener or opens KV.
+ * its intended TS code and field. HTTP/TLS children also exercise real listeners and owned KV.
  */
 
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';

@@ -190,3 +190,11 @@ nativeclient optionavoidsDOMexcess-propertyliteralerror withoutcast/suppression;
 realclients thenpass. Rootcommentonlysuccessor removes'only' trustoverclaim; preservesallbehavior,
 actual8passingtestbytes andone-filefmtproof, no fictitiouspostcommentbehaviorrerun.300stimeout and
 fmtRED preserved. Remainingarchitecture/release/securitygates unchanged, no publicAPIscopegrowth.
+S3e uses the coordinator-selected native Astra architecture primary rather than the historical
+Fable launch proposal. Root authorized one new lifecycle owner (109 lines; target100-140,
+cap180), taking the prospective U1 footprint to17 owners. No helper/production/config/lock or
+permission change. The root's two conformance intro comments correct their former scope claim
+without changing executable bytes. Initial ANSI-sensitive comparison, missing PATHEXT child
+lookup, lint and format failures are retained separately from final9/0/0 and four-file static
+success. The final ANSI helper reuses the existing pinned standard library. Root accepted only
+caller abort/listener release and owned-KV cleanup; no drain/legacy/streams or broader waiver.

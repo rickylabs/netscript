@@ -166,3 +166,25 @@ ActualHTTPS401/200+ordinaryclientrejection, no trust-storemutation/exclusive-tru
 TS2353 andfmtRED remainfailures distinct fromlaterGREEN. Newrootbyteproof2062f312... mapsactualtest
 source tofinalcomment-onlysuccessor. TLSacceptedonly, no signal/drain/legacy/streams/consumer/
 publish/IMPLclosure. ReferenceLinuxdocs40605465746buildSUCCESS; WindowscheckerstillRED, no waiver.
+## Root-accepted S3e: caller-owned AbortSignal
+
+Root reviewed the complete new 109-line lifecycle owner, SHA256
+c416cf59fc7570746a9b92b5d88da3eab265b6f6f5a469cf21bcc2731646145b, plus the two existing
+conformance introductory comment corrections. Acceptance: root-s3e-source-acceptance.md.
+The native Astra architecture primary was selected by the coordinator; requested xhigh effort
+has no independent attestation. Exact worktree initialization preceded dispatch. The historical
+Fable proposal did not launch this checkpoint.
+
+Final owning tests: 9 passed / 0 failed / 0 ignored, 24,596 ms. All four selected type/lint/format
+owners pass; new-owner quality scan has zero findings/allowances. The positive fresh child proves
+real describe response consumption and old-port rebind after caller abort before manual stop.
+The signal-omitted child fails exactly ABORT_DID_NOT_RELEASE; both prove idempotent handle stop,
+post-stop caller-owned KV usability and complete cleanup. All 22 protected bindings and five
+committed debt/verdict comparisons match. All four validation profiles were removed empty.
+
+New receipts/s3e-evidence.json.gz and manifest retain 78 byte-roundtrip-verified records,
+185,009 original bytes, including initial ANSI comparison, PATH/PATHEXT setup, lint and format
+failures and complete final child outputs. Earlier archives/verdicts remain unchanged. Root
+explicitly authorizes this checkpoint/push and draft PR2421 update; no readiness, merge, closure,
+independent IMPL or whole U1 acceptance. In-flight drain/legacy/streams, documentation and
+broader gates remain open. Next scope is preparation only until root review.
