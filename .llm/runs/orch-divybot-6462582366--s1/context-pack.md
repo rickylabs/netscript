@@ -48,3 +48,9 @@ Checks review round1 found destructive-hover was a new gap, not inherited. It no
 See slice-4-cli.md for the command contract and all gate evidence. New tokens init/build/clean are composed into the root and use FileSystemPort plus lazy TokenEnginePort. Focused tests14 PASS, actual scaffold override/negative/cleanup proof PASS. Root quality and publish dry-run PASS; docs census97 and recursive162 verified without exemptions. Independent same-session CLI review is next. Migration/font/root attributes/design route/browser/full runtime remain untouched by this slice.
 
 CLI slice is terminal PASS (slice-4-review.md), ready for supervisor-authorized sign-off commit/push. Next authorized slice is migration: token-driven fonts/root attributes/design model, browser/axe proof, then final full runtime and IMPL-EVAL.
+
+## Migration candidate
+
+See slice-5-migration.md, axe-delta.md and component-proof/. All12 browser cases PASS, Utility four cases zero serious/critical allowances, NS One eight specimen pairs pixel-identical with144 styles matching. Fresh app check and29 CLI template/root tests PASS. Fonts/attributes/request-local design data and labels migrated; default stays NS One. One-pass full runtime attempted and unproven: exit1 at Aspire preflight with Docker daemon unavailable; do not claim runtime success. Source/tool/doc/publish quality passes. Next: same-session migration supervisor, sign-off commit/push, then separate mandatory final IMPL-EVAL and READY handoff if approved.
+
+Migration is terminal PASS after its single geometry fix, with both reviews in slice-5-review.md. All12 current browser cases pass, including actual Utility small icon dimensions. Next is the supervisor-authorized commit/push and a separate final IMPL-EVAL session. Runtime host exception stays unproven.

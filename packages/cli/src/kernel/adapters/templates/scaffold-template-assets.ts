@@ -21,6 +21,7 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appDesignTokensRouteTemplate: TEMPLATE_KEYS.appRoutesDesignTokens,
   appDesignTokensViewTemplate: TEMPLATE_KEYS.appRoutesDesignTokensView,
   appAppTemplate: TEMPLATE_KEYS.appRoutesApp,
+  appThemeTemplate: TEMPLATE_KEYS.appTheme,
   appClientTemplate: TEMPLATE_KEYS.appClient,
   appCrudExampleRouteTemplate: TEMPLATE_KEYS.appRoutesExamplesCrud,
   appCrudExampleViewTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsCrudView,

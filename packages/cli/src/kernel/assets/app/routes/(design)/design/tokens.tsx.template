@@ -1,14 +1,22 @@
 import DesignTokensView from './(_components)/tokens-view.tsx';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
+import { appTheme } from '@app/lib/theme.ts';
+import { createDesignTokenModel } from './(_shared)/tokens.ts';
+import { routes } from '@app/.generated/routes.ts';
 
 export const designTokensPage = definePage()
+  .withRoute(routes.design.tokens.$route)
   .withRoute(appRoutes.designTokens)
   .withMeta(() => ({
     title: 'Design tokens — NetScript design system',
     description: 'Token reference for the scaffolded @netscript/fresh-ui theme.',
   }))
-  .withLayer('tokens', DesignTokensView, () => ({}))
+  .withLayer(
+    'tokens',
+    DesignTokensView,
+    (ctx) => ({ model: createDesignTokenModel(appTheme(ctx.url).id) }),
+  )
   .withLayout((slots) => slots.tokens())
   .build();
 

@@ -214,7 +214,7 @@ NetScript styling has three layers, lightest-touch first:
 
 {{ comp.card({
   title: "1 · Design tokens (theme-wide)",
-  body: "Edit the CSS custom properties in assets/tokens.css (mirrored in tokens.json). Tokens are named --ns-* (e.g. surface, border, foreground, accent) and drive every component plus the light/dark themes selected by the data-theme attribute. Change a token once and the whole app re-themes."
+  body: "Use netscript tokens init, edit the final semantic alias layer, then run netscript tokens build. The generated --ns-* custom properties drive colors, type, radius, geometry, borders, shadows and motion. data-theme selects the language; data-scheme selects light or dark."
 }) }}
 
 {{ comp.card({
@@ -231,11 +231,54 @@ Pick the lightest layer that does the job: reach for a **token** when the change
 should re-theme the whole app, a **Tailwind utility** for one-off element layout,
 and **component CSS** when one primitive should look different everywhere it appears.
 
-Theme switching is already wired: `routes/_app.tsx` seeds `data-theme` from the
-`ns-theme` localStorage key (falling back to the OS preference), and the
-`ThemeToggle` island flips it at runtime. To ship a different default, change the
-`data-theme` attribute on `<html>` in `_app.tsx` and adjust the token values for
-that theme in `assets/tokens.css`.
+Theme switching is already wired: `routes/_app.tsx` seeds `data-scheme` from the
+`ns-theme` localStorage key (falling back to the OS preference). `ThemeToggle`
+changes the scheme while retaining the language, density and Studio flavor.
+`assets/theme-preset.json` supplies those fixed preset axes; `assets/fonts.json`
+supplies font stylesheet requests. The shell contains no font-family URL list.
+
+NS One remains the default. To select Studio Utility in one app, run:
+
+```sh
+netscript tokens init --app dashboard --preset studio-utility
+netscript tokens build --app dashboard
+```
+
+For a semantic override, edit `tokens/semantic.tokens.json` using aliases only,
+then rebuild. Source copies and `tokens.config.json` are app-owned; the five web
+assets are generated. See the [tokens command reference](/reference/cli/commands/#tokens-fresh-application-design-tokens)
+for precedence, validation and cleanup. Avoid hand-editing generated CSS/JSON.
+
+The development gallery can preview a generated preset without changing the app
+default: open `/design/tokens?preset=studio-utility`. The query is allowlisted
+against generated metadata and applies only under `/design/`; every request gets
+its own view model. Ramps come from the token output. Ordinary app routes retain
+the configured preset.
+
+### Migrate existing app-owned copies
+
+Existing `[data-theme='dark']` and `[data-theme='light']` still resolve NS One.
+All old `--ns-*` properties remain available, so existing apps can migrate in
+their own time without a `ui:migrate` step. To adopt the new attributes:
+
+1. Run `netscript tokens init --app dashboard` and `netscript tokens build --app dashboard`.
+   Keep NS One unless you explicitly choose another preset. Merge any previous
+   customizations into the semantic alias layer before rebuilding.
+2. Update the app shell to read `assets/theme-preset.json` and `assets/fonts.json`.
+   Stamp `data-theme={preset.language}`, `data-density={preset.density}`, and
+   `data-flavor={preset.flavor ?? undefined}` on `<html>`. Set `data-scheme` to
+   light/dark, and map `fonts.imports[preset.id]` to stylesheet links. A new
+   scaffold's `lib/theme.ts` also handles design-only previews.
+3. Change the existing preference seed script to set `data-scheme`. Retain the
+   `ns-theme` storage key. Update ThemeToggle and the light `color-scheme` CSS
+   selector to use `data-scheme`; the shipped toggle also supports legacy hosts.
+4. Merge updated registry copies with `netscript ui:update --app dashboard`.
+   Review drift in locally edited files before replacing them. Carry over the
+   generated design-token helper/view when adopting output-driven gallery ramps;
+   preserve app-specific route changes.
+
+Preset density is fixed by the selected language. Dense, airy and chunky remain
+schema follow-ups; editing a density attribute does not select unsupported geometry.
 
 {{ comp callout { type: "warning", title: "Edit tokens, not magic numbers" } }}
 Reach for a raw hex color or pixel value only when no token fits. Hard-coded values

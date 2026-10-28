@@ -1,11 +1,11 @@
 .ns-card {
-  background: var(--ns-card);
-  color: var(--ns-card-fg);
+  background: var(--ns-component-card-bg);
+  color: var(--ns-component-card-fg);
   box-shadow: var(--ns-shadow-xs);
 }
 
 .ns-card--interactive {
-  transition: border-color var(--ns-ease-normal), box-shadow var(--ns-ease-normal);
+  transition: border-color var(--ns-motion-duration-normal) var(--ns-motion-easing-normal), box-shadow var(--ns-motion-duration-normal) var(--ns-motion-easing-normal);
 }
 
 .ns-card--interactive:hover {
@@ -26,4 +26,13 @@
   padding: var(--ns-space-4) var(--ns-space-6);
   border-top: 1px solid var(--ns-border);
   background: color-mix(in srgb, var(--ns-card) 78%, var(--ns-surface));
+}
+
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) .ns-card {
+  border-width: var(--ns-border-width);
+  border-radius: var(--ns-component-card-radius);
+}
+
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) :is(.ns-card__header, .ns-card__body, .ns-card__footer) {
+  padding: var(--ns-component-card-padding);
 }

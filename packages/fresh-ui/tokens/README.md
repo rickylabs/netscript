@@ -158,3 +158,11 @@ styles, settings, overrides and source copies. Build also works before init usin
 bundled sources, retaining an installed registry preset and detecting the
 conventional override when present. The detailed command reference documents
 configuration and explicit override precedence.
+
+New scaffolds read font requests and fixed preset axes from the generated JSON.
+`data-theme` is the language, `data-scheme` is light/dark, `data-density` reports
+fixed geometry, and Studio adds `data-flavor`. The toggle retains the `ns-theme`
+preference key. The legacy light/dark data-theme selectors remain supported.
+See docs/site/web-layer/how-to/customize-fresh-ui.md for merging this into an
+existing app-owned shell and registry copies. NS One remains the default;
+`/design/tokens?preset=studio-utility` previews Utility in development only.

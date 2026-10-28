@@ -1,6 +1,7 @@
 import DesignCompositionView from './(_components)/composition-view.tsx';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
+import { appTheme } from '@app/lib/theme.ts';
 
 export const designCompositionPage = definePage()
   .withRoute(appRoutes.designComposition)
@@ -8,7 +9,7 @@ export const designCompositionPage = definePage()
     title: 'Composition rules — NetScript design system',
     description: 'Layering, ownership, and composition rules for scaffolded fresh-ui surfaces.',
   }))
-  .withLayer('composition', DesignCompositionView, () => ({}))
+  .withLayer('composition', DesignCompositionView, (ctx) => ({ themeLabel: appTheme(ctx.url).label }))
   .withLayout((slots) => slots.composition())
   .build();
 

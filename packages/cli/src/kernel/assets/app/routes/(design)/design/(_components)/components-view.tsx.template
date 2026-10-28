@@ -94,7 +94,7 @@ const KIND_BADGES: Record<RegistryItemKind, BadgeVariant> = {
   block: 'secondary',
   island: 'success',
   style: 'muted',
-  theme: 'warning',
+  theme: 'muted',
   lib: 'muted',
   hook: 'muted',
   support: 'muted',
@@ -721,14 +721,14 @@ function GalleryItem({ item }: { item: RegistryCatalogItem }): VNode {
   );
 }
 
-export default function DesignComponentsView() {
+export default function DesignComponentsView({ themeLabel }: { themeLabel: string }) {
   return (
     <main class='ns-tokens-page'>
 
       <header class='ns-page-header'>
         <div class='ns-cluster ns-cluster--md'>
           <h1>Components</h1>
-          <Badge variant='primary'>NS One</Badge>
+          <Badge variant='primary'>{themeLabel}</Badge>
           <Badge variant='muted'>
             {registryMeta.name} v{registryMeta.version}
           </Badge>

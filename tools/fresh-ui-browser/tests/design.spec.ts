@@ -3,6 +3,7 @@ import { AxeBuilder } from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import process from 'node:process';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { verifyAccessibility } from '../accessibility.ts';
 
 const baseline = JSON.parse(
@@ -19,7 +20,15 @@ if (
 ) {
   throw new Error('Unknown FRESH_UI_AXE_NEGATIVE_CONTROL mode');
 }
-import { routeName, ROUTES, THEME_STORAGE_KEY } from '../settings.ts';
+import { APP_DIR, routeName, ROUTES, THEME_STORAGE_KEY } from '../settings.ts';
+
+const tokenData = JSON.parse(readFileSync(join(APP_DIR, 'assets/tokens.json'), 'utf8')) as {
+  ramps: unknown[];
+  allRamps: unknown[];
+};
+const fontData = JSON.parse(readFileSync(join(APP_DIR, 'assets/fonts.json'), 'utf8')) as {
+  imports: Record<string, string[]>;
+};
 
 for (const route of ROUTES) {
   for (const control of controls) {
@@ -39,7 +48,48 @@ for (const route of ROUTES) {
           exact: true,
         });
         await expect(toggle).toBeVisible();
-        await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+        await expect(page.locator('html')).toHaveAttribute('data-scheme', theme);
+
+        const utility =
+          new URL(route, 'https://example.test').searchParams.get('preset') === 'studio-utility';
+        await expect(page.locator('html')).toHaveAttribute(
+          'data-theme',
+          utility ? 'studio' : 'ns-one',
+        );
+        await expect(page.locator('html')).toHaveAttribute(
+          'data-density',
+          utility ? 'compact' : 'comfortable',
+        );
+        if (utility) await expect(page.locator('html')).toHaveAttribute('data-flavor', 'utility');
+        if (utility && testInfo.project.use.viewport?.width === 390) {
+          const trigger = page.locator('button.ns-dashboard__mobile-trigger');
+          await expect(trigger).toBeVisible();
+          const geometry = await trigger.evaluate((element) => {
+            const style = getComputedStyle(element);
+            const box = element.getBoundingClientRect();
+            return {
+              expected: Number.parseFloat(
+                getComputedStyle(document.documentElement).getPropertyValue(
+                  '--ns-control-height-sm',
+                ),
+              ),
+              width: box.width,
+              height: box.height,
+              padding: [
+                style.paddingTop,
+                style.paddingRight,
+                style.paddingBottom,
+                style.paddingLeft,
+              ],
+              gap: style.gap,
+            };
+          });
+          expect(geometry.height).toBe(geometry.expected);
+          expect(geometry.width).toBe(geometry.expected);
+          expect(geometry.padding).toEqual(['0px', '0px', '0px', '0px']);
+          expect(geometry.gap).toBe('0px');
+        }
+        const language = await page.locator('html').getAttribute('data-theme');
 
         // Discard the seed so each activation must persist its own result.
         await page.evaluate((key) => localStorage.removeItem(key), THEME_STORAGE_KEY);
@@ -53,17 +103,62 @@ for (const route of ROUTES) {
         }
         await expect(toggle).toBeFocused();
         await page.keyboard.press('Enter');
-        await expect(page.locator('html')).toHaveAttribute('data-theme', otherTheme);
+        await expect(page.locator('html')).toHaveAttribute('data-scheme', otherTheme);
         expect(await page.evaluate((key) => localStorage.getItem(key), THEME_STORAGE_KEY)).toBe(
           otherTheme,
         );
         await expect(page.getByRole('button', { name: `Switch to ${theme} mode`, exact: true }))
           .toBeFocused();
         await page.keyboard.press('Space');
-        await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+        await expect(page.locator('html')).toHaveAttribute('data-scheme', theme);
         expect(await page.evaluate((key) => localStorage.getItem(key), THEME_STORAGE_KEY)).toBe(
           theme,
         );
+        await expect(page.locator('html')).toHaveAttribute('data-theme', language!);
+        const loadedStylesheets = await page.locator('link[rel="stylesheet"]').evaluateAll(
+          (links) => links.map((link) => link.getAttribute('href')),
+        );
+        for (const href of fontData.imports[utility ? 'studio-utility' : 'ns-one']) {
+          expect(loadedStylesheets).toContain(href);
+        }
+        if (utility) await expect(page.getByText('Studio Utility', { exact: true })).toBeVisible();
+        if (route.startsWith('/design/tokens')) {
+          await expect(page.locator('figure.ns-token-ramp')).toHaveCount(
+            utility ? tokenData.allRamps.length : tokenData.ramps.length,
+          );
+        }
+        if (!utility) {
+          const colors = await page.locator('body').evaluate(async (element) => {
+            await Promise.all(element.getAnimations().map((animation) => animation.finished));
+            const style = getComputedStyle(element);
+            return [style.backgroundColor, style.color];
+          });
+          await page.evaluate((scheme) => {
+            document.documentElement.removeAttribute('data-scheme');
+            document.documentElement.setAttribute('data-theme', scheme);
+          }, theme);
+          expect(
+            await page.locator('body').evaluate(async (element) => {
+              await Promise.all(element.getAnimations().map((animation) => animation.finished));
+              const style = getComputedStyle(element);
+              return [style.backgroundColor, style.color];
+            }),
+          ).toEqual(colors);
+          await page.evaluate((scheme) => {
+            document.documentElement.setAttribute('data-theme', 'ns-one');
+            document.documentElement.setAttribute('data-scheme', scheme);
+          }, theme);
+        }
+        if (route === '/design/tokens' && testInfo.project.name === 'light-1280') {
+          const preview = await page.request.get('/design/tokens?preset=studio-utility');
+          expect(await preview.text()).toMatch(/<html[^>]*data-theme="studio"/);
+          const normal = await page.request.get('/design/tokens');
+          expect(await normal.text()).toMatch(/<html[^>]*data-theme="ns-one"/);
+          const outside = await page.request.get('/?preset=studio-utility');
+          expect(await outside.text()).toMatch(/<html[^>]*data-theme="ns-one"/);
+          const unknown = await page.request.get('/design/tokens?preset=unknown');
+          expect(await unknown.text()).toMatch(/<html[^>]*data-theme="ns-one"/);
+        }
         await page.evaluate(async () => {
           (document.activeElement as HTMLElement | null)?.blur();
           await document.fonts.ready;

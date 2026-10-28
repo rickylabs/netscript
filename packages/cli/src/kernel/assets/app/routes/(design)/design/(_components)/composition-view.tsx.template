@@ -106,14 +106,14 @@ function Plate({ children }: { children: ComponentChildren }): VNode {
   return <div class='ns-rules-plate'>{children}</div>;
 }
 
-export default function DesignCompositionView() {
+export default function DesignCompositionView({ themeLabel }: { themeLabel: string }) {
   return (
     <main class='ns-tokens-page'>
 
       <header class='ns-page-header'>
         <div class='ns-cluster ns-cluster--md'>
           <h1>Composition</h1>
-          <Badge variant='primary'>NS One</Badge>
+          <Badge variant='primary'>{themeLabel}</Badge>
           <Badge variant='muted'>L0 contract</Badge>
         </div>
         <p class='ns-lede'>

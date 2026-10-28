@@ -24,6 +24,7 @@ export const TEMPLATE_KEYS = {
   appRoutesComponentsHomeView: 'app/routes/(_components)/home-view.tsx.template',
   appRoutesSharedHealth: 'app/routes/(_shared)/health.ts.template',
   appRoutesApp: 'app/routes/_app.tsx.template',
+  appTheme: 'app/lib/theme.ts.template',
   appRoutesLayout: 'app/routes/_layout.tsx.template',
   appRoutesDesignComponents: 'app/routes/(design)/design/components.tsx.template',
   appRoutesDesignComponentsView:

@@ -3,6 +3,7 @@ import SidebarToggle from '@app/islands/ui/SidebarToggle.tsx';
 import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
 import { appRoutes } from '@app/router.ts';
 import { define } from '@app/utils.ts';
+import { appTheme } from '@app/lib/theme.ts';
 
 const DESIGN_NAVIGATION = [
   {
@@ -44,6 +45,7 @@ function buildDesignBreadcrumbs(pathname: string) {
 }
 
 export default define.layout(function DesignLayout({ Component, url }) {
+  const { label } = appTheme(url);
   return (
     <SidebarShell
       pathname={url.pathname}
@@ -64,7 +66,7 @@ export default define.layout(function DesignLayout({ Component, url }) {
       footer={
         <div class='ns-dashboard__sidebar-env'>
           <span class='ns-dot-active' />
-          <span class='ns-dashboard__sidebar-env-label'>NS One theme</span>
+          <span class='ns-dashboard__sidebar-env-label'>{label} theme</span>
         </div>
       }
     >

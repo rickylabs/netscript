@@ -1,6 +1,7 @@
 import DesignComponentsView from './(_components)/components-view.tsx';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
+import { appTheme } from '@app/lib/theme.ts';
 
 export const designComponentsPage = definePage()
   .withRoute(appRoutes.designComponents)
@@ -8,7 +9,7 @@ export const designComponentsPage = definePage()
     title: 'Components — NetScript design system',
     description: 'Component and block gallery for copied @netscript/fresh-ui registry items.',
   }))
-  .withLayer('components', DesignComponentsView, () => ({}))
+  .withLayer('components', DesignComponentsView, (ctx) => ({ themeLabel: appTheme(ctx.url).label }))
   .withLayout((slots) => slots.components())
   .build();
 

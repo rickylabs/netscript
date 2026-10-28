@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-10-28T12:42:41.899Z",
+  "sourceHead": "adb1aa61792b7e174c78aa3cf03d54df6ea6ef13",
+  "platform": "linux",
+  "architecture": "x64",
+  "browser": "Chromium 153.0.8010.12",
+  "playwright": "1.63.0",
+  "axeAdapter": "4.11.1",
+  "axeEngine": "4.11.4",
+  "accessibilityPolicy": "Exact S0 findings with two reductions; Utility has zero serious/critical allowances. Small icon geometry regression is included.",
+  "routes": [
+    "/design/tokens",
+    "/design/components",
+    "/design/tokens?preset=studio-utility"
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    390,
+    1280
+  ],
+  "screenshotPolicy": "Capture only. No pixel comparison; normal tests do not rewrite this baseline.",
+  "sourceDirty": true
+}

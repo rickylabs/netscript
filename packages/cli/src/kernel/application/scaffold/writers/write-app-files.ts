@@ -55,6 +55,7 @@ export async function writeNormalizedAppFiles(
   };
   const {
     appAppTemplate,
+    appThemeTemplate,
     appClientTemplate,
     appCrudExampleRouteTemplate,
     appCrudExampleViewTemplate,
@@ -239,6 +240,7 @@ export async function writeNormalizedAppFiles(
   await write(join(uiComponentsDir, 'mod.ts'), appUiModTemplate);
   await write(join(designSharedDir, 'registry.ts'), appDesignRegistryTemplate);
   await write(join(designSharedDir, 'tokens.ts'), appDesignTokensLibTemplate);
+  await write(join(appDir, 'lib', 'theme.ts'), appThemeTemplate);
   await write(
     join(designIslandsDir, 'FloatingSurfaceDemo.tsx'),
     appDesignFloatingSurfaceDemoTemplate,
