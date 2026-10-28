@@ -1,6 +1,8 @@
 ---
 layout: layouts/base.vto
 title: Reference
+nav_title: Overview
+description: The public API of every NetScript package and plugin, one page per package.
 ---
 
 # Reference
@@ -8,8 +10,8 @@ title: Reference
 API reference for every public NetScript package and plugin: sub-path exports, symbols with their
 kinds, and short examples. Each page is written against the package's `deno doc` output; when they
 disagree, `deno doc <module>` is authoritative. For a guided introduction start with the
-[tutorials](/tutorials/); for recipes see the [how-to guides](/how-to/); for the ideas behind the
-API read the [explanation](/explanation/).
+[tutorials](/tutorials/); for guides and recipes see [Build](/how-to/); for the ideas behind the
+API read [Concepts](/explanation/). The [glossary](/glossary/) defines the terms these pages use.
 
 ## Page paths
 
@@ -33,6 +35,6 @@ their manifests and integration entrypoints and link to their `-core` package fo
 
 ## CLI command coverage
 
-Public command documentation spans two pages: the curated [CLI reference](/cli-reference/) and the
-detailed [`netscript` command reference](/reference/cli/commands/). Together they cover every public
-root command and direct subcommand.
+Public command documentation spans two pages: the [CLI cheat sheet](/cli-reference/), which groups
+commands by task, and the [CLI command reference](/reference/cli/commands/), which lists every command
+and flag. Together they cover every public root command and direct subcommand.
