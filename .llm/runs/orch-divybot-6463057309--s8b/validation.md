@@ -45,3 +45,9 @@ PLAN-EVAL and IMPL-EVAL each ran in separate native Claude Opus 5.5 sessions, in
 OpenAI implementer. The same evaluator was retained across each phase's allowed follow-up. Final
 IMPL-EVAL PASS approves the implementation slice and CI bridge for commit and review, while
 preserving the unproven runtime status.
+
+Post-commit command evidence: `quality-scan-final.receipt.json` attests the broader scanner on clean
+implementation HEAD `fafe315a15b50e403623a402615ff635f473224f`, including the final CI test bridge.
+The earlier exports/quality receipts remain preserved with their original provenance. Failed runtime
+preflight and cleanup command receipts are retained as runtime-preflight.receipt.json and
+runtime-cleanup.receipt.json; they came from the single full suite invocation, not split smoke runs.
