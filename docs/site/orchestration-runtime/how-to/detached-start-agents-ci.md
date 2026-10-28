@@ -158,7 +158,7 @@ aspire stop --force
 
 Then check that `aspire ps --format Json` returns `[]` and that no orphaned processes survive.
 
-## Next step
+## Next steps
 
 Change behavior in the running graph without a restart:
 [Roll out runtime overrides](/orchestration-runtime/how-to/roll-out-runtime-overrides/).

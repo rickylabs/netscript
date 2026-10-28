@@ -398,8 +398,8 @@ The <code>'memory'</code> verifier accepts any POST. Before you expose a webhook
   not fire mid-copy. Use `forcePolling` on the underlying watcher for network filesystems that miss
   native events.
 
-## Next step
+## Next steps
 
 Build a verified shipping webhook end to end in the
-[storefront tutorial](/tutorials/storefront/05-shipping-webhook/). The full generated API is in the
+[storefront tutorial](/tutorials/storefront/05-shipping-webhook/). The full API is in the
 {{ comp.xref({ key: "ref:triggers", text: "triggers reference" }) }}.

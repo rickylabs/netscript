@@ -173,5 +173,5 @@ better-auth's handler and forward refreshed session headers.
 
 - {{ comp.xref({ key: "explain:auth-model" }) }}: how Principals, sessions and backends fit together.
 - {{ comp.xref({ key: "cap:auth" }) }}: the authentication capability overview.
-- [Reference: auth-better-auth](/reference/auth-better-auth/): generated symbols for every export
+- [Reference: auth-better-auth](/reference/auth-better-auth/): symbols for every export
   shown here.

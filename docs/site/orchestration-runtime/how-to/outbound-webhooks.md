@@ -225,7 +225,7 @@ fresh signature timestamp. Operators own replay authorization and retention.
 This recipe is not a delivery SLA, a subscription management API, a receiver-side framework, a new
 plugin or an exactly-once primitive. It changes no inbound trigger behavior.
 
-## Next step
+## Next steps
 
 To handle the opposite direction, verify inbound events in the
 [webhook ingestion tutorial]({{ 'tut:ingest-webhook' |> xref }}).

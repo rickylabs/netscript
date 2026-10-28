@@ -25,6 +25,6 @@ covers the opposite direction: what NetScript gives the coding agents that build
   { eyebrow: "Concept", title: "Agent tooling", body: "The CLI, skills, MCP server and agent-readable docs for the coding agents that build your app.", href: "/ai/agent-tooling/" },
   { eyebrow: "Tutorial", title: "AI chat tutorial", body: "Build a durable, tool-calling chat with MCP and live streaming.", href: resolveXref("tut:chat").href },
   { eyebrow: "Recipes", title: "Recipes", body: "One AI task per recipe.", href: "/ai/how-to/" },
-  { eyebrow: "Reference", title: "`@netscript/ai` reference", body: "Generated API reference. Related units: `plugin-ai`, `plugin-ai-core`, `mcp`.", href: resolveXref("ref:ai").href },
+  { eyebrow: "Reference", title: "`@netscript/ai` reference", body: "API reference. Related units: `plugin-ai`, `plugin-ai-core`, `mcp`.", href: resolveXref("ref:ai").href },
   { eyebrow: "Explanation", title: "Plugin system", body: "Why the AI plugin is a thin shell over a core package.", href: resolveXref("explain:plugin-system").href }
 ] }) }}

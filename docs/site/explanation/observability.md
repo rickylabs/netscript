@@ -10,7 +10,7 @@ order: 6
 This page explains how NetScript keeps one logical operation readable as one trace when it crosses
 HTTP, a queue, a saga, and a worker subprocess: the trace context travels with the work, and the
 framework carries it across every boundary it owns. For the headline API, see the
-{{ comp.xref({ key: "cap:telemetry" }) }} hub; for the exported symbols, see
+{{ comp.xref({ key: "cap:telemetry" }) }} guide; for the exported symbols, see
 {{ comp.xref({ key: "ref:telemetry" }) }}.
 
 {{ comp.diagram({
@@ -182,7 +182,7 @@ login.
 The audit trail is not a tamper-evident, immutable ledger: the events ride the standard OTel and
 streams transport. Use it as a queryable audit trail for operational and security review, not as a
 compliance-grade write-once log. For how auth itself is shaped, see
-{{ comp.xref({ key: "explain:auth-model" }) }} and the {{ comp.xref({ key: "cap:auth" }) }} hub.
+{{ comp.xref({ key: "explain:auth-model" }) }} and the {{ comp.xref({ key: "cap:auth" }) }} guide.
 
 ## Trade-offs
 

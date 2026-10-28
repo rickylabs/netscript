@@ -15,7 +15,7 @@ locally by **Aspire**.
 {{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace as four stacked layers: typed contracts at the base, packages and plugins composed on top, the host wiring plugins through generated registries, and the runtime executing services and background processors — all orchestrated by Aspire.", caption: "The four layers an app author works with: typed contracts, packages and plugins, the host that assembles them, and the runtime that executes services and background processors." }) }}
 
 This page explains why NetScript is split the way it is. For hands-on work, use the
-[tutorials]({{ "tut:index" |> xref }}) and [how-to guides]({{ "howto:index" |> xref }}); the
+[tutorials]({{ "tut:index" |> xref }}) and the guides and recipes in [Build]({{ "howto:index" |> xref }}); the
 [glossary](/glossary/) defines each term.
 
 ## The published surface
@@ -186,7 +186,7 @@ implement it (the default interactive KV-OAuth backend, plus WorkOS and Better-A
 plugin composes the one backend named by `NETSCRIPT_AUTH_BACKEND`. When a backend cannot honor a
 capability, it fails loud with a typed `AuthBackendOperationUnsupportedError` instead of silently
 doing nothing. [The auth model]({{ "explain:auth-model" |> xref }}) covers the port, the three
-backends, and the per-backend capability matrix; the capability hub is
+backends, and the per-backend capability matrix; the guide is
 [Authentication]({{ "cap:auth" |> xref }}).
 
 The same shape appears elsewhere. The [`queue`](/reference/queue/) package defines one port behind

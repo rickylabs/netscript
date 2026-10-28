@@ -106,7 +106,7 @@ Conventions are enforced where regeneration is cheap, and ownership is handed ov
 are the point. {{ comp.xref({ key: "cap:runtime-config", text: "Runtime configuration" }) }}
 explains how generated runtime schemas feed the operator-facing override layer.
 
-## Next step
+## Next steps
 
 Run the flow end to end in the [Quickstart](/quickstart/). For every command group, see the
 {{ comp.xref({ key: "cli:reference" }) }}.

@@ -25,10 +25,10 @@ plugin contributions, not from a hand-edited process list.
   { eyebrow: "Learn", title: "Run the workspace", body: "Scaffold and start a workspace from the quickstart.", href: "/quickstart/", icon: "Q" },
   { eyebrow: "Do", title: "Deploy locally with Aspire", body: "Bring up every local resource and watch it in the dashboard.", href: "/orchestration-runtime/how-to/deploy-local-aspire/", icon: "H" },
   { eyebrow: "Do", title: "Discover services", body: "How a service declares `pluginReferences` and `dependsOn`, and how references resolve.", href: resolveXref("howto:discover-services").href, icon: "H" },
-  { eyebrow: "Do", title: "All recipes", body: "Plugins, deployment, runtime overrides, shutdown and webhooks, one task each.", href: "/orchestration-runtime/how-to/", icon: "H" },
-  { eyebrow: "Look up", title: "Aspire and runtime config", body: "Generated symbols for the AppHost, config, runtime-config, plugin and CLI units.", href: "/reference/aspire/", icon: "R" }
+  { eyebrow: "Do", title: "Recipes", body: "Plugins, deployment, runtime overrides, shutdown and webhooks, one task each.", href: "/orchestration-runtime/how-to/", icon: "H" },
+  { eyebrow: "Look up", title: "Aspire and runtime config", body: "Symbols for the AppHost, config, runtime-config, plugin and CLI units.", href: "/reference/aspire/", icon: "R" }
 ] }) }}
 
-## Next step
+## Next steps
 
 New to the workspace model? Start with [CLI & scaffold](/orchestration-runtime/cli-scaffold/).

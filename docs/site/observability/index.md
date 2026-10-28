@@ -19,7 +19,7 @@ process it touched.
   { eyebrow: "Concept", title: "Telemetry & logging", body: "Automatic spans, the `@netscript/telemetry` helpers, browser logs, the dashboard views and the typed query port.", href: "/observability/telemetry/" },
   { eyebrow: "How-to", title: "Add OpenTelemetry", body: "Trigger a trace, add your own spans and read them in the dashboard.", href: "/observability/how-to/add-opentelemetry/" },
   { eyebrow: "Explanation", title: "Observability", body: "What is framework-real versus a scaffold stub, and how trace context crosses process boundaries.", href: resolveXref("explain:observability").href },
-  { eyebrow: "Concept", title: "Trace the request model", body: "Follow one request through services, jobs and streams in the core-concepts tour.", href: resolveXref("concept:concepts").href },
-  { eyebrow: "Reference", title: "`@netscript/telemetry`", body: "Generated API reference for the telemetry package.", href: resolveXref("ref:telemetry").href },
-  { eyebrow: "Reference", title: "`@netscript/logger`", body: "Generated API reference for the structured logger.", href: resolveXref("ref:logger").href }
+  { eyebrow: "Concept", title: "Trace the request model", body: "Follow one request through services, jobs and streams in the five-layer model.", href: resolveXref("concept:concepts").href },
+  { eyebrow: "Reference", title: "`@netscript/telemetry`", body: "API reference for the telemetry package.", href: resolveXref("ref:telemetry").href },
+  { eyebrow: "Reference", title: "`@netscript/logger`", body: "API reference for the structured logger.", href: resolveXref("ref:logger").href }
 ] }) }}

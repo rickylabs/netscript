@@ -65,4 +65,5 @@ Build attributes with the `@netscript/telemetry/attributes` builders instead of 
 - `createExecutionAttributes`
 - `createGenAiAttributes`
 
-Read and assert the canonical `netscript.*` keys these builders emit.
+For keys that shipped before the `netscript.*` root, the builders also emit the deprecated bare
+alias. Read and assert the canonical key.

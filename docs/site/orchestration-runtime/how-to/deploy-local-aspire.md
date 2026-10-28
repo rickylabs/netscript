@@ -204,7 +204,7 @@ resource of another AppHost on the daemon is never used as evidence:
 If you run a relay, the mismatch warning stays: doctor checks where the daemon publishes ports, not
 whether your relay forwards them.
 
-## Next step
+## Next steps
 
 To start the same graph non-interactively in CI or from a coding agent, follow
 {{ comp.xref({ key: "howto:detached-start-agents-ci", text: "Detached start for agents and CI" }) }}.

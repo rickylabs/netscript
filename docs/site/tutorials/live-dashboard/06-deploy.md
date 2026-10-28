@@ -183,9 +183,9 @@ streams, Postgres and Redis, wired automatically and observable in the dashboard
 the track you carried one contract from the database to a cache-first page and a server-pushed live
 view.
 
-## Where to go next
+## Next steps
 
-- **Task recipes** → the [how-to guides](/how-to/) cover what the tutorials don't: adding plugins,
+- **Task recipes** → the recipes in [Build](/how-to/) cover what the tutorials don't: adding plugins,
   database migrations, queue backends, and production pitfalls.
 - **Deploy remotely** → [Deploy](/orchestration-runtime/how-to/deploy/) is the production companion
   to local Aspire.

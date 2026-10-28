@@ -366,5 +366,5 @@ app.get("/api/protected", async (c) => {
 variables that these adapters plug into.
 
 - {{ comp.xref({ key: "explain:auth-model" }) }}: the backend-only port these lifecycles implement.
-- Generated reference: [auth-better-auth](/reference/auth-better-auth/),
+- Reference: [auth-better-auth](/reference/auth-better-auth/),
   [auth-kv-oauth](/reference/auth-kv-oauth/) and [auth-workos](/reference/auth-workos/).

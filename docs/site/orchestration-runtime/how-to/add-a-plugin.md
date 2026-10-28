@@ -18,7 +18,7 @@ A plugin scaffolds its own workspace folder, registers itself in your runtime an
 an API, runs as its own Aspire service beside your application service.
 [Plugin architecture](/explanation/plugin-system/) explains the model.
 
-## Before you start
+## Prerequisites
 
 You need:
 
@@ -107,9 +107,12 @@ In `appsettings.json`, set `Sagas.Projection.Backend` on both the saga API entry
 helpers forward it as `NETSCRIPT_SAGA_PROJECTION`, and that environment value takes precedence
 over settings.
 
-**Migration in 0.0.8:** re-run each plugin install with `--no-db --no-samples --force` and
-regenerate helpers to correct existing DB-dependent metadata. Preserve your user-owned
-configuration and samples when you apply the generated changes.
+> [!IMPORTANT]
+> **Changed in 0.0.8**
+>
+> Re-run each plugin install with `--no-db --no-samples --force` and regenerate helpers to
+> correct existing DB-dependent metadata. Preserve your user-owned configuration and samples
+> when you apply the generated changes.
 
 - Existing saga entries without a projection selector follow `Sagas.Store.Backend` (or
   `NETSCRIPT_SAGA_STORE`), and default to KV when neither is set.
@@ -209,7 +212,7 @@ Inspect, update and remove an installed plugin without scaffolding again:
 
 Run `netscript plugin --help` for the complete command set of your installed version.
 
-## Next step
+## Next steps
 
 Give the plugin something to call: [Add a service](/services-sdk/how-to/add-a-service/). For
 each plugin's exported API, browse the [package reference](/reference/).

@@ -270,7 +270,7 @@ The `@netscript/plugin-triggers-core/discovery` entrypoint (`./src/builders/disc
 `additionalBuilders` option. The CLI composes first-party metadata before walking the project, so
 single-plugin updates succeed regardless of workers/streams order.
 
-## Related pages
+## Next steps
 
 - [`@netscript/plugin-triggers`](/reference/triggers/): the deployable plugin that binds this core
   to a NetScript host.

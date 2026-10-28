@@ -185,4 +185,4 @@ backends; its PostgreSQL queue provider keeps `message_queue` rows in this same 
   and the appsettings-driven datasource.
 - [Deploy](/orchestration-runtime/how-to/deploy/): point the workspace at your own Postgres with
   `POSTGRES_URI` / `DATABASE_URL` and `--no-aspire`.
-- [`@netscript/database` reference](/reference/database/): the full generated API.
+- [`@netscript/database` reference](/reference/database/): the full API reference.

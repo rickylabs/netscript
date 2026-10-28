@@ -101,7 +101,7 @@ addEventListener('unload', async () => {
 | Runtime unavailable | `flush()` can throw the connection error. Treat it as a deploy or runtime failure. |
 | Duplicate stream path | `createDurableStream` reuses the open producer for the same `streamPath`. |
 
-## Next step
+## Next steps
 
 Read the stream from a page in [Live Dashboard, chapter 05](/tutorials/live-dashboard/05-live-stream/).
 The full API is in the [streams reference](/reference/streams/).

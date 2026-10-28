@@ -133,9 +133,9 @@ in the [telemetry conventions](./convention/).
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `spanName` | function | `function spanName(base: string, suffix?: string): string` | Compose a namespaced span name. |
-| `createJobAttributes` | function | `function createJobAttributes(job): Record<string, AttributeValue>` | Build job span attributes with beta.5 deprecated aliases. |
+| `createJobAttributes` | function | `function createJobAttributes(job): Record<string, AttributeValue>` | Build job span attributes with deprecated bare aliases. |
 | `createMessagingAttributes` | function | `function createMessagingAttributes(options): Record<string, AttributeValue>` | Build messaging span attributes. |
-| `createSagaAttributes` | function | `function createSagaAttributes(saga): Record<string, AttributeValue>` | Build saga span attributes with beta.5 deprecated aliases. |
+| `createSagaAttributes` | function | `function createSagaAttributes(saga): Record<string, AttributeValue>` | Build saga span attributes with deprecated bare aliases. |
 | `createExecutionAttributes` | function | `function createExecutionAttributes(execution): Record<string, AttributeValue>` | Build execution lifecycle span attributes. |
 | `createGenAiAttributes` | function | `function createGenAiAttributes(genai): Record<string, AttributeValue>` | Build GenAI semantic-convention attributes. |
 | `createTriggerAttributes` | function | `function createTriggerAttributes(trigger): Record<string, string>` | Build trigger span attributes. |

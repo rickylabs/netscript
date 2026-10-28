@@ -157,7 +157,7 @@ snapshot support with harness `initial: true` to add snapshot delivery scenarios
 | `createMemoryKvAdapter` | function | `function createMemoryKvAdapter(): MemoryKvAdapter` | Factory for a clean in-memory KV adapter for downstream tests. |
 | `MemoryKvAdapter` | class | `class MemoryKvAdapter implements WatchableKv` | Volatile in-memory adapter (re-exported from the root). |
 
-## Related pages
+## Next steps
 
 - [Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/): read, write, and watch a KV store in
   a running workspace.

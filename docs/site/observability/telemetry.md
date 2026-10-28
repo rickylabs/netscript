@@ -229,7 +229,7 @@ Telemetry has no service of its own: every runtime emits it and Aspire aggregate
 addresses you interact with.
 
 {{ comp.apiTable({
-  caption: "Observability surfaces (link to /reference/telemetry/ and /reference/logger/ for the generated APIs)",
+  caption: "Observability surfaces (link to /reference/telemetry/ and /reference/logger/ for the full APIs)",
   rows: [
     { name: "https://localhost:18888", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. Auth token printed by `aspire start`." },
     { name: "http://localhost:4318", type: "OTLP/HTTP", desc: "OTLP ingest endpoint the AppHost configures (aspire.config.json https profile). Runtimes export spans and logs here; the dashboard reads them back. This is the seam you point at a hosted backend." },
@@ -293,9 +293,9 @@ same package-owned read models the runtimes emit.
 Follow [Add OpenTelemetry](/observability/how-to/add-opentelemetry/) to trigger a trace, add your own
 spans and read them in the dashboard.
 
-- [Observability](/explanation/observability/): how automatic framework spans, `createJobTools(ctx)`
+- [Observability model](/explanation/observability/): how automatic framework spans, `createJobTools(ctx)`
   handler telemetry, console logs, health endpoints and Aspire traces fit together.
 - {{ comp.xref({ key: "ref:telemetry" }) }} and [logger](/reference/logger/) references: the full
-  generated APIs.
+  APIs.
 - [Telemetry conventions](/reference/telemetry/convention/): span naming, SpanKind and the
   `netscript.*` attribute rules.

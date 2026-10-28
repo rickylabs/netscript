@@ -15,7 +15,7 @@ install more UI from the registry, and re-theme the app. NetScript scaffolds a
 [`@netscript/fresh`](/reference/fresh/) meta-framework, and its UI components live in your
 repository as copied source. [Fresh UI & design](/web-layer/fresh-ui/) explains that model.
 
-## Before you start
+## Prerequisites
 
 You need:
 

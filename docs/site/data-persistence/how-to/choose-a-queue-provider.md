@@ -101,7 +101,9 @@ discovery when omitted.
 ] }) }}
 
 > [!WARNING]
-> **Upgrading from 0.0.7:** the RabbitMQ adapter now uses amqplib 2, and an explicit `heartbeat=0`
+> **Changed in 0.0.8**
+>
+> The RabbitMQ adapter now uses amqplib 2, and an explicit `heartbeat=0`
 > in a connection URL disables heartbeats. To keep broker-negotiated heartbeats, remove that query
 > parameter from `AMQP_URL` or `connection.rabbitmq.url`. URLs generated through Aspire omit it and
 > keep negotiating with the broker. Keep `heartbeat=0` only when you mean to disable heartbeats; a

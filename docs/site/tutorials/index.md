@@ -64,7 +64,7 @@ locally under Aspire. The tracks are independent: start with the one closest to 
 
 New to NetScript? Any track starts from zero, but **Storefront** covers the most core ideas.
 
-## Before you start
+## Prerequisites
 
 Every track needs the same local toolchain:
 

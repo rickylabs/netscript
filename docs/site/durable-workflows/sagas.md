@@ -473,8 +473,8 @@ A <code>SagaHandler</code> returns <code>readonly CascadedMessage[]</code>. It i
   no state between steps.
 - **Use a database transaction** for atomic work inside one handler. A saga does not replace it.
 
-## Next step
+## Next steps
 
 Build the checkout saga, with a compensation branch, in the
-[storefront tutorial](/tutorials/storefront/04-checkout-saga/). The full generated API is in the
+[storefront tutorial](/tutorials/storefront/04-checkout-saga/). The full API is in the
 {{ comp.xref({ key: "ref:sagas", text: "sagas reference" }) }}.

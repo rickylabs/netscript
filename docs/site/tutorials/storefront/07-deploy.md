@@ -181,7 +181,7 @@ plugin APIs with their background processors. The dashboard at `https://localhos
 live port map, per-resource console logs and correlated traces. This is the local development
 topology; for production, start from the Deploy guide below.
 
-## Where to go next
+## Next steps
 
 - **Deploy remotely** → the [Deploy](/orchestration-runtime/how-to/deploy/) how-to (production
   targets) and [Deploy locally with Aspire](/orchestration-runtime/how-to/deploy-local-aspire/) (the
@@ -190,4 +190,4 @@ topology; for production, start from the Deploy guide below.
   [Observability explanation](/explanation/observability/).
 - **Go deeper on the ideas** → [Durability model](/explanation/durability-model/),
   [Contracts & type flow](/explanation/contracts/), and [the plugin system](/explanation/plugin-system/).
-- **Solve a specific task** → the full [How-to guides](/how-to/).
+- **Solve a specific task** → the recipes in [Build](/how-to/).

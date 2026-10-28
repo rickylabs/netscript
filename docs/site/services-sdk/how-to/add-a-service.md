@@ -16,7 +16,7 @@ version that explains why each piece exists, follow the
 [Build a service tutorial](/tutorials/storefront/02-catalog-service/). For the runtime API, see the
 [`@netscript/service` reference](/reference/service/).
 
-## Before you start
+## Prerequisites
 
 You need:
 

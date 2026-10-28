@@ -18,7 +18,7 @@ it.
 [The plugin system](/explanation/plugin-system/) explains the model behind the design, and the
 [plugin reference](/reference/plugin/) lists the generated manifest and contribution types.
 
-## Before you start
+## Prerequisites
 
 Know what your plugin contributes, and read the official plugin closest to your goal before you
 write code. If your plugin spans more than one package, study the
@@ -329,7 +329,7 @@ CLI scaffolds pin <code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</c
 | Behavior doesn't match the archetype | The plugin's behavior differs from its declared `provider.kind`. | Match the archetype; [Step 4](#step-4-author-a-contribution) covers trigger and stream behavior. |
 | A dependency isn't wired first | The dependency is undeclared. | Declare it with `.withDependencies({...})` on the runtime manifest and in `linking.dependencies` in `scaffold.plugin.json`, so the reconciler and Aspire graph use the same resource keys. |
 
-## Next step
+## Next steps
 
 To build a multi-package plugin end to end, follow
 [Add authentication](/identity-access/how-to/add-authentication/). The

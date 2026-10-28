@@ -107,7 +107,7 @@ The next watcher reload sees the previous version and calls `onChange` again.
 | Malformed pointed-to file | The runtime config summary reports it. | Publish the summary to logs or health output. |
 | Long-running `onChange` callback | It can lag later updates. | Keep the callback bounded and hand heavier work to a queue. |
 
-## Next step
+## Next steps
 
 Use overrides to tune job behavior with
 [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/). The

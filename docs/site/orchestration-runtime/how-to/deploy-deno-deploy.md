@@ -19,7 +19,7 @@ shells out to `deno deploy`. Authentication, upload and the platform itself belo
 `deno deploy` CLI. For containers, Kubernetes, Azure, Cloud Run and bare metal, use
 [Deploy](/orchestration-runtime/how-to/deploy/).
 
-## Before you start
+## Prerequisites
 
 You need:
 
@@ -169,7 +169,7 @@ processors on infrastructure that permits `--unstable-kv`, as covered in
 | Environment variables aren't applied | The value is passed as `--env-file <path>` to `deno deploy`. | Confirm the path exists and is a `.env`-style file. |
 | `down` or `status` behaves unexpectedly | The `deno deploy show` and `delete` subcommands they map to aren't yet verified against a live Deno Deploy account. | NetScript keeps the argv in one adapter, so an upstream change is a framework fix, not a config error. |
 
-## Next step
+## Next steps
 
 Make the deployed process observable with
 [Add OpenTelemetry](/observability/how-to/add-opentelemetry/). For every command grouped by

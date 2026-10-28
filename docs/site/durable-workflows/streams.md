@@ -316,8 +316,8 @@ before dependent producers write.
   `STREAMS_SECRET` (or `DURABLE_STREAMS_SECRET`) wherever the producer runs, so `getStreamsAuth()`
   can attach it.
 
-## Next step
+## Next steps
 
 Publish execution state and read it into a live Fresh page in the
-[live-dashboard tutorial](/tutorials/live-dashboard/05-live-stream/). The full generated API is in
+[live-dashboard tutorial](/tutorials/live-dashboard/05-live-stream/). The full API is in
 the {{ comp.xref({ key: "ref:streams", text: "streams reference" }) }}.

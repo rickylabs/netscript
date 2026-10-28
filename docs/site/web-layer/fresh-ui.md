@@ -36,7 +36,7 @@ means the scaffolded app.
 `@netscript/fresh` is a published package (Fresh runtime extensions, builders, forms, defer
 primitives, and route contracts for NetScript) built on `@fresh/core` 2.x and Preact. Import the
 subpath you need; there is no single barrel. The table maps each subpath, and the
-[`@netscript/fresh` reference](/reference/fresh/) holds the generated API.
+[`@netscript/fresh` reference](/reference/fresh/) holds the full API.
 
 {{ comp.apiTable({
   caption: "@netscript/fresh subpath exports (the meta-framework surface)",

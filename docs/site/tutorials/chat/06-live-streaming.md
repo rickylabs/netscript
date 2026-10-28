@@ -172,7 +172,7 @@ they land. Every part lives in the durable session rather than the browser, so i
 tabs and reloads. The same progression, from **one agreed message shape** to **durable delivery**
 to a **live stream**, underlies every NetScript real-time surface.
 
-## Where to go next
+## Next steps
 
 Use the durable-chat seams directly with the [Build a durable chat](/ai/how-to/build-a-durable-chat/)
 recipe. Related pages:

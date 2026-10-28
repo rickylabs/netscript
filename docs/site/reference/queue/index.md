@@ -185,7 +185,7 @@ Deno.test("durable DLQ inspection and reprocessing worked example", async () => 
 });
 ```
 
-## Related pages
+## Next steps
 
 - [Use KV, queues, and cron](/data-persistence/how-to/queue-kv-cron/): enqueue, consume, and schedule end
   to end.

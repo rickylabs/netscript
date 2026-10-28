@@ -29,7 +29,7 @@ commands to Deno Deploy (`netscript deploy deno-deploy <op>`) and to the Aspire-
 
 Windows deploy settings live under `deploy.targets.windows` (previously `deploy.windows`).
 
-## Before you start
+## Prerequisites
 
 You need a working, type-checked workspace. If you haven't built one, start with the
 [Quickstart](/quickstart/) and the [Storefront tutorial](/tutorials/storefront/). The
@@ -293,7 +293,7 @@ curl -fsS "http://localhost:<workers-port>/api/v1/workers/jobs"
 If every health endpoint responds and `/api/v1/workers/jobs` lists your jobs, the processes are
 running with their permissions, reaching Postgres and KV, and discovering their registries.
 
-## Next step
+## Next steps
 
 To push a stateless entrypoint to a managed platform, follow
 [Deploy to Deno Deploy](/orchestration-runtime/how-to/deploy-deno-deploy/). For every command

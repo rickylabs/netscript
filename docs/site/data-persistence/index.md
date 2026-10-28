@@ -26,6 +26,6 @@ rather than three separate updates that an agent or a person can miss.
   { eyebrow: "How-to", title: "Use a second database", body: "Add and address another datasource from the workspace.", href: "/data-persistence/how-to/use-a-second-database/" },
   { eyebrow: "How-to", title: "Use KV, queues, and cron", body: "Enqueue and consume, read and write KV, schedule a job.", href: "/data-persistence/how-to/queue-kv-cron/" },
   { eyebrow: "How-to", title: "Choose a queue provider", body: "Auto-discovery, explicit providers and the PostgreSQL backend.", href: "/data-persistence/how-to/choose-a-queue-provider/" },
-  { eyebrow: "Reference", title: "`@netscript/database`", body: "Generated API reference for the database package.", href: resolveXref("ref:database").href },
-  { eyebrow: "Reference", title: "`@netscript/kv`", body: "Generated API reference for the KV package.", href: "/reference/kv/" }
+  { eyebrow: "Reference", title: "`@netscript/database`", body: "API reference for the database package.", href: resolveXref("ref:database").href },
+  { eyebrow: "Reference", title: "`@netscript/kv`", body: "API reference for the KV package.", href: "/reference/kv/" }
 ] }) }}

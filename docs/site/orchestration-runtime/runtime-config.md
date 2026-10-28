@@ -208,7 +208,7 @@ if (isFeatureEnabled(runtime, 'worker-rollout', false)) {
 }
 ```
 
-## Next step
+## Next steps
 
 To publish, watch and roll back overrides in a running deployment, follow
 [Roll out runtime overrides](/orchestration-runtime/how-to/roll-out-runtime-overrides/). For every

@@ -35,11 +35,11 @@ an HTTP surface, so you can confirm that a message crossed each step.
 {{ comp.cardsGrid({ columns: 4, cards: [
   { eyebrow: "Learn", title: "Storefront tutorial", body: "The checkout saga chapter models a multi-step flow with compensation.", href: "/tutorials/storefront/04-checkout-saga/" },
   { eyebrow: "Do", title: "Recipes", body: "Validated ingestion queues, durable streams and stream retention.", href: "/durable-workflows/how-to/" },
-  { eyebrow: "Look up", title: "`@netscript/sagas` reference", body: "Generated API reference. Related units: `triggers`, `streams`.", href: resolveXref("ref:sagas").href },
-  { eyebrow: "Understand", title: "The durability model", body: "Why state must outlive the process, and how effects differ from a retry loop.", href: resolveXref("explain:durability-model").href }
+  { eyebrow: "Look up", title: "`@netscript/plugin-sagas` reference", body: "API reference. Related units: `triggers`, `streams`.", href: resolveXref("ref:sagas").href },
+  { eyebrow: "Understand", title: "Durability model", body: "Why state must outlive the process, and how effects differ from a retry loop.", href: resolveXref("explain:durability-model").href }
 ] }) }}
 
-## Next step
+## Next steps
 
 Start with [Durable sagas](/durable-workflows/sagas/) to model your first crash-safe, multi-step
 process.

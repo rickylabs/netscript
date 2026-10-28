@@ -172,7 +172,7 @@ single `aspire start`, with the database initialized through the running AppHost
 traced from file drop to durable job execution. You also know where the local setup ends and a
 production deployment begins.
 
-## Where to go next
+## Next steps
 
 Ship the sync to a remote target with [Deploy](/orchestration-runtime/how-to/deploy/), the
 production companion to this local run: deployable units, managed backing services and the
@@ -182,4 +182,4 @@ production companion to this local run: deployable units, managed backing servic
   transform for a Python or shell step on your own host.
 - [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) and
   [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/): tune throughput.
-- [Orchestration with Aspire](/explanation/aspire/) and the [How-to guides](/how-to/).
+- [Orchestration with Aspire](/explanation/aspire/) and the recipes in [Build](/how-to/).

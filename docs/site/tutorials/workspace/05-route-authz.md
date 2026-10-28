@@ -423,7 +423,7 @@ scope and a `200` for a scoped one prove it. The URL, its typed data and its aut
 from one contract, checked by the compiler and by the framework's auth tests. This is route-level
 scope authorization, not org or role RBAC: tenancy stays in your code.
 
-## Next Steps
+## Next steps
 
 - **Run the whole app.** [Chapter 6 · Deploy](/tutorials/workspace/06-deploy/) runs the
   authenticated workspace locally under Aspire.

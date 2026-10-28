@@ -27,7 +27,7 @@ request URL.
   caption: "Discovery flow: shared contract → typed client → URL resolved from the Aspire services__ env var → oRPC call to the service that implements the same contract."
 }) }}
 
-## Before you start
+## Prerequisites
 
 You need:
 
@@ -157,7 +157,7 @@ export async function listUsers() {
 
 On the defined branch, `error.code` selects the schema for `error.data`.
 [Safe error narrowing](/services-sdk/sdk/#safe-error-narrowing) covers the six `baseContract`
-codes, `isDefinedError()`, and the [0.0.7 migration](/services-sdk/sdk/#migrating-to-007).
+codes and `isDefinedError()`.
 
 ## Many services at once with `defineServices`
 

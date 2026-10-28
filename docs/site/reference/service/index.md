@@ -432,7 +432,9 @@ Guarded policies install the existing native stages unchanged; public policies d
 them. `/api` is guarded and `/health` stays anonymous with native defaults.
 
 > [!IMPORTANT]
-> **Migrating to 0.0.8.** Search existing entrypoints for `defineService(` and either choose native
+> **Changed in 0.0.8**
+>
+> Search existing entrypoints for `defineService(` and either choose native
 > guards or record a public service's reason. The public opt-out looks like this:
 
 ```diff

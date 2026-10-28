@@ -164,7 +164,7 @@ server-side segment listing, so keep a service-owned, bounded segment index when
 discovery. For document streams, publish a complete baseline into each new day segment before
 incremental changes. Consumers can then rebuild retained state after an older segment expires.
 
-## Next step
+## Next steps
 
 Schedule the deletion with [scheduled triggers](/durable-workflows/triggers/#scheduled-triggers-cron-without-a-daemon).
 The public contract is in

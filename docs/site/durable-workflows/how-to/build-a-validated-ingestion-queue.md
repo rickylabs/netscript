@@ -85,7 +85,7 @@ await queue.listen(async (message, context) => {
 | Consumer validation fails with `dlq` | The message is nacked without requeue, for dead-letter handling. |
 | Consumer validation fails with `throw` | The queue throws `QueueValidationError`, and the backend retry policy decides the next delivery. |
 
-## Next step
+## Next steps
 
 Pick a backend with [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/).
 The full API is in the [queue reference](/reference/queue/).

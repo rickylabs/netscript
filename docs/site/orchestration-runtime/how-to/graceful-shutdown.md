@@ -223,7 +223,7 @@ A throwing hook doesn't abort the drain: a rejected `ShutdownHook` is recorded a
 `ShutdownHookOutcome`, not re-thrown. Inspect the returned `ShutdownReport`, or the logged warning,
 to catch teardown failures.
 
-## Next step
+## Next steps
 
 Decide how much in-flight work a drain waits on with
 [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/). The

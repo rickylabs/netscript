@@ -31,6 +31,6 @@ The type-flow theory behind this section is in [Contracts](/explanation/contract
 {{ comp.cardsGrid({ columns: 4, cards: [
 { eyebrow: "Learn", title: "Storefront tutorial", body: "Define contracts and services, then consume them through the typed SDK.", href: resolveXref("tut:storefront").href },
 { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/services-sdk/how-to/" },
-{ eyebrow: "Look up", title: "`@netscript/service` reference", body: "Generated API reference. Related units: `sdk`, `contracts`.", href: resolveXref("ref:service").href },
+{ eyebrow: "Look up", title: "`@netscript/service` reference", body: "API reference. Related units: `sdk`, `contracts`.", href: resolveXref("ref:service").href },
 { eyebrow: "Understand", title: "Contracts & type flow", body: "The design rationale behind this pillar.", href: resolveXref("explain:contracts").href },
 ] }) }}
