@@ -1,0 +1,17 @@
+[
+  {
+    "path": "packages/cli/src/kernel/assets/embedded.generated.ts",
+    "onlyExpectedDeltaAfterDecodedNewlineNormalization": true,
+    "addedEncodedCarriageReturns": 9515
+  },
+  {
+    "path": "packages/plugin/src/kernel/assets/embedded.generated.ts",
+    "onlyExpectedDeltaAfterDecodedNewlineNormalization": true,
+    "addedEncodedCarriageReturns": 463
+  },
+  {
+    "path": "packages/fresh-ui/registry.generated.ts",
+    "onlyExpectedDeltaAfterDecodedNewlineNormalization": true,
+    "addedEncodedCarriageReturns": 5036
+  }
+]

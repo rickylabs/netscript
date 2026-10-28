@@ -1,0 +1,18 @@
+const decoder = new TextDecoder();
+const rows = [];
+for (const path of [
+  'packages/cli/src/kernel/assets/generated/aspire/helpers/installation-secret.ts.template',
+  'packages/cli/src/kernel/assets/generated/database/postgres-connection-string.ts.template',
+]) {
+  const base = await new Deno.Command('git', { args: ['show', `HEAD:${path}`], stdout: 'piped', stderr: 'piped' }).output();
+  if (!base.success) throw new Error('Cannot inspect helper baseline');
+  const original = decoder.decode(base.stdout);
+  const current = await Deno.readTextFile(path);
+  rows.push({ path, byteIdenticalHead: original === current,
+    equivalentLF: original.replaceAll('\r\n', '\n') === current.replaceAll('\r\n', '\n'),
+    headCRLF: (original.match(/\r\n/g) ?? []).length,
+    currentCRLF: (current.match(/\r\n/g) ?? []).length,
+    headBytes: base.stdout.length, currentBytes: (await Deno.stat(path)).size });
+}
+await Deno.writeTextFile('.llm/tmp/fix-aspire-bundle--20261028/generated-helper-bytes.json', JSON.stringify(rows, null, 2) + '\n');
+console.log(JSON.stringify(rows));

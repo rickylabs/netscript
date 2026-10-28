@@ -1,0 +1,59 @@
+import { join } from '@std/path';
+import { EMBEDDED_AGENT_TOOL_FILES } from '../../../packages/cli/src/kernel/assets/agent-tools.generated.ts';
+import { EMBEDDED_SKILL_FILES } from '../../../packages/cli/src/kernel/assets/skills.generated.ts';
+import { EMBEDDED_TEMPLATE_CONTENT } from '../../../packages/cli/src/kernel/assets/embedded.generated.ts';
+import { TEMPLATE_KEYS } from '../../../packages/cli/src/kernel/assets/manifest.ts';
+import { ASPIRE_WORKFLOW_SKILLS } from '../../../packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts';
+import { mergeClaudeGuidance } from '../../../packages/cli/src/public/features/agent/init/hosts/claude-guidance.ts';
+import { readAgentToolEmbeddedBundle } from '../../../.llm/tools/generate-cli-assets-barrel.ts';
+const owned = '.llm/tmp/fix-aspire-bundle--20261028';
+const candidate = join(owned, 'consumer-skills-candidate-a');
+const a = JSON.parse(await Deno.readTextFile(join(owned, 'consumer-skills-candidate-a.json')));
+const b = JSON.parse(await Deno.readTextFile(join(owned, 'consumer-skills-candidate-b.json')));
+const identical = JSON.stringify(a.files) === JSON.stringify(b.files);
+if (!identical) throw new Error('Candidate generations differ');
+const bindings: Record<string, unknown>[] = [];
+async function bind(path: string, content: string, producer: string, source?: string): Promise<void> {
+  const actual = await Deno.readTextFile(join(candidate, path));
+  const sourceMatches = source ? (await Deno.readTextFile(source)).replaceAll('\r\n', '\n') === content : undefined;
+  bindings.push({ path, producer, matches: actual === content, ...(source ? { source, sourceMatches } : {}) });
+  if (actual !== content || sourceMatches === false) throw new Error(`Producer binding failed: ${path}`);
+}
+const toolSources = await readAgentToolEmbeddedBundle();
+for (const [path, content] of Object.entries(EMBEDDED_AGENT_TOOL_FILES)) {
+  if (toolSources.files[path] !== content) throw new Error(`Embedded tool differs from canonical source producer: ${path}`);
+  await bind(`.llm/tools/${path}`, content, 'EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer');
+}
+for (const [path, content] of Object.entries(EMBEDDED_SKILL_FILES)) {
+  if (path === 'manifest.json') continue;
+  await bind(`.agents/skills/${path}`, content, 'EMBEDDED_SKILL_FILES', `skills/${path}`);
+}
+const manifest = JSON.parse(EMBEDDED_SKILL_FILES['manifest.json']);
+const names = [...new Set([
+  ...manifest.files.filter((path: string) => path.endsWith('/SKILL.md')).map((path: string) => path.split('/')[0]),
+  ...ASPIRE_WORKFLOW_SKILLS,
+])];
+await bind('.claude/skills/repo-skills/SKILL.md', EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentClaudeSkillBridge]
+  .replace('{{PROJECT_NAME}}', 'consumer-skills').replace('{{SKILL_NAMES}}', names.join(', ')), 'canonical bridge template with stable project basename');
+await bind('CLAUDE.md', mergeClaudeGuidance('', EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentClaudeGuidance]), 'mergeClaudeGuidance and embedded guidance template');
+await bind('AGENTS.md', EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentGuidance]
+  .replace('{{OFFLINE_DOCS_GUIDANCE}}', ' Need offline framework or API guidance? Run `netscript agent init --with-docs`.').trimEnd() + '\n',
+  'embedded agent guidance template / initAgent fresh marked section');
+const scratchRemaining = [];
+for await (const entry of Deno.readDir('.llm/tmp')) {
+  if (entry.name.startsWith('dogfood-consumer-skills-')) scratchRemaining.push(entry.name);
+}
+if (scratchRemaining.length) throw new Error('Producer scratch remains');
+const diff = await new Deno.Command('git', { args: ['diff', '--no-index', '--', '.agents/generated/consumer-skills', candidate], stdout: 'piped', stderr: 'piped' }).output();
+if (![0, 1].includes(diff.code)) throw new Error('Cannot capture candidate diff');
+await Deno.writeFile(join(owned, 'consumer-candidate.patch'), diff.stdout);
+const proof = { generations: 2, candidateFiles: a.files.length, allFileDigestsIdentical: identical,
+  stableBridgeHeader: (await Deno.readTextFile(join(candidate, '.claude/skills/repo-skills/SKILL.md'))).split('\n').find((line) => line.startsWith('# ')),
+  changes: a.changes.length, statusCounts: a.changes.reduce((counts: Record<string, number>, change: { status: string }) => {
+    counts[change.status] = (counts[change.status] ?? 0) + 1; return counts;
+  }, {}), bindings, scratchRemaining,
+  nativeAspireVersion: JSON.parse(await Deno.readTextFile(join(owned, 'native-adoption.json'))).version,
+  nativeAspireBinarySha256: new Uint8Array(await crypto.subtle.digest('SHA-256', await Deno.readFile('C:/Users/ericc/.aspire/bin/aspire.exe'))).toHex() };
+await Deno.writeTextFile(join(owned, 'consumer-candidate-proof.json'), JSON.stringify(proof, null, 2) + '\n');
+console.log(JSON.stringify({ generations: 2, candidateFiles: proof.candidateFiles, allFileDigestsIdentical: identical,
+  changes: proof.changes, statusCounts: proof.statusCounts, producerBindings: bindings.length, scratchRemaining }));

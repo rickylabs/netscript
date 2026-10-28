@@ -5,7 +5,7 @@ import {
   DenoAspireAgentInitializer,
 } from './deno-aspire-agent-initializer.ts';
 
-Deno.test('#2008 Aspire agent init selects only the standard location and four non-colliding workflow skills', () => {
+Deno.test('#2008 Aspire agent init selects only the standard location and five non-colliding workflow skills', () => {
   const args = aspireAgentInitArgs('/workspace/project');
   assertEquals(args, [
     'agent',
@@ -17,7 +17,7 @@ Deno.test('#2008 Aspire agent init selects only the standard location and four n
     '--skill-locations',
     'standard',
     '--skills',
-    'aspire-init,aspire-orchestration,aspire-monitoring,aspire-deployment',
+    'aspire-init,aspire-orchestration,aspire-monitoring,aspire-deployment,aspireify',
   ]);
   const selected = args[args.indexOf('--skills') + 1].split(',');
   assertEquals(selected, ASPIRE_WORKFLOW_SKILLS);

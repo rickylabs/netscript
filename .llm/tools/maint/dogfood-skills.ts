@@ -1,22 +1,19 @@
 import { dirname, fromFileUrl, join } from '@std/path';
+import { ASPIRE_WORKFLOW_SKILLS } from '../../../packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts';
 
 const repo = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
 const destination = join(repo, '.agents', 'generated', 'consumer-skills');
 const check = Deno.args.includes('--check');
-const workflowSkills = [
-  'aspire-init',
-  'aspire-orchestration',
-  'aspire-monitoring',
-  'aspire-deployment',
-];
 
 await Deno.mkdir(join(repo, '.llm', 'tmp'), { recursive: true });
-const generated = await Deno.makeTempDir({
+const scratch = await Deno.makeTempDir({
   dir: join(repo, '.llm', 'tmp'),
   prefix: 'dogfood-consumer-skills-',
 });
+const generated = join(scratch, 'consumer-skills');
 
 try {
+  await Deno.mkdir(generated);
   await generate(generated);
   await normalizeMcpConfig(generated);
   await assertSurface(generated);
@@ -36,7 +33,7 @@ try {
     console.log(`Consumer agent bundle installed at ${destination}`);
   }
 } finally {
-  await removeIfPresent(generated);
+  await removeIfPresent(scratch);
 }
 
 async function generate(projectRoot: string): Promise<void> {
@@ -50,6 +47,8 @@ async function generate(projectRoot: string): Promise<void> {
       'init',
       '--host',
       'claude',
+      '--editor',
+      'none',
     ],
     stdout: 'inherit',
     stderr: 'inherit',
@@ -101,10 +100,15 @@ async function assertSurface(projectRoot: string): Promise<void> {
   if (configText.includes('jsr:@netscript/cli@0.0.2')) {
     throw new Error('Dogfood MCP config retained the stale 0.0.2 CLI specifier');
   }
-  for (const skill of workflowSkills) {
-    for (const root of ['.agents/skills', '.claude/skills']) {
-      await Deno.stat(join(projectRoot, root, skill, 'SKILL.md'));
-    }
+  for (const skill of ASPIRE_WORKFLOW_SKILLS) {
+    await Deno.stat(join(projectRoot, '.agents/skills', skill, 'SKILL.md'));
+  }
+  const claude = await tree(join(projectRoot, '.claude/skills'));
+  if (
+    claude.size !== 1 ||
+    !claude.get(join('repo-skills', 'SKILL.md'))?.includes('.agents/skills/<name>/SKILL.md')
+  ) {
+    throw new Error('Dogfood Claude skills must contain only the canonical repo-skills bridge');
   }
 }
 

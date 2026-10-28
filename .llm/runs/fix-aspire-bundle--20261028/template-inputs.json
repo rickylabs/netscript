@@ -1,0 +1,38 @@
+[
+  {
+    "path": "packages/cli/src/kernel/assets/auth/bff.ts.template",
+    "gitBlobBytes": 5577,
+    "gitBlobCRLF": 0,
+    "gitBlobLF": 135,
+    "workingCRLF": 135,
+    "workingLF": 135,
+    "attributes": [
+      "packages/cli/src/kernel/assets/auth/bff.ts.template: text: unspecified",
+      "packages/cli/src/kernel/assets/auth/bff.ts.template: eol: unspecified"
+    ]
+  },
+  {
+    "path": "packages/cli/src/kernel/assets/agent/guidance.md.template",
+    "gitBlobBytes": 4574,
+    "gitBlobCRLF": 0,
+    "gitBlobLF": 40,
+    "workingCRLF": 40,
+    "workingLF": 40,
+    "attributes": [
+      "packages/cli/src/kernel/assets/agent/guidance.md.template: text: unspecified",
+      "packages/cli/src/kernel/assets/agent/guidance.md.template: eol: unspecified"
+    ]
+  },
+  {
+    "path": "packages/cli/src/kernel/assets/embedded.generated.ts",
+    "gitBlobBytes": 347322,
+    "gitBlobCRLF": 0,
+    "gitBlobLF": 360,
+    "workingCRLF": 0,
+    "workingLF": 360,
+    "attributes": [
+      "packages/cli/src/kernel/assets/embedded.generated.ts: text: set",
+      "packages/cli/src/kernel/assets/embedded.generated.ts: eol: lf"
+    ]
+  }
+]

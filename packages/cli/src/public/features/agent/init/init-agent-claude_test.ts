@@ -120,6 +120,55 @@ Deno.test('#2008 canonical Aspire workflows alone skip delegation without creati
   }
 });
 
+Deno.test('#2008 existing four workflows install missing aspireify once without creating mirrors', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    const existing = [
+      'aspire-init',
+      'aspire-orchestration',
+      'aspire-monitoring',
+      'aspire-deployment',
+    ];
+    for (const skill of existing) {
+      await fs.writeText(join(root, '.agents/skills', skill, 'SKILL.md'), `# ${skill}\n`);
+    }
+    let calls = 0;
+    const dependencies = {
+      fs,
+      aspireAgentInitializer: {
+        async initialize(projectRoot: string) {
+          assertEquals(projectRoot, root);
+          calls++;
+          await fs.writeText(join(root, '.agents/skills/aspireify/SKILL.md'), '# aspireify\n');
+          return { ok: true as const };
+        },
+      },
+    };
+    const first = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    assertEquals(calls, 1);
+    assertEquals(first.messages, []);
+    for (const skill of [...existing, 'aspireify']) {
+      assertEquals(
+        await fs.readText(join(root, '.agents/skills', skill, 'SKILL.md')),
+        `# ${skill}\n`,
+      );
+      assertFalse(await fs.exists(join(root, '.claude/skills', skill)));
+    }
+    const files = [];
+    for await (const entry of walk(join(root, '.claude/skills'), { includeDirs: false })) {
+      files.push(relative(join(root, '.claude/skills'), entry.path));
+    }
+    assertEquals(files, [join('repo-skills', 'SKILL.md')]);
+    const second = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
+    assertEquals(calls, 1);
+    assertEquals(second.changedFiles, []);
+    assertEquals(second.messages, []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('#2008 non-Claude host leaves CLAUDE.md and foreign Claude skills untouched', async () => {
   const root = await Deno.makeTempDir();
   try {

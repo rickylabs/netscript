@@ -1,0 +1,68 @@
+import { join, relative, resolve } from '@std/path';
+const repo = Deno.cwd();
+const owned = resolve(repo, '.llm/tmp/fix-aspire-bundle--20261028');
+const label = Deno.args.find((arg) => arg.startsWith('--capture='))?.slice('--capture='.length) ?? 'consumer-skills-candidate';
+if (!['consumer-skills-candidate-a', 'consumer-skills-candidate-b'].includes(label)) throw new Error('Invalid candidate name');
+const candidate = join(owned, label);
+const destination = join(repo, '.agents/generated/consumer-skills');
+const priorAspire = Deno.env.get('NETSCRIPT_ASPIRE_CLI');
+const originalRemove = Deno.remove;
+let captured = false;
+async function files(root: string): Promise<Map<string, Uint8Array>> {
+  const result = new Map<string, Uint8Array>();
+  async function visit(current: string): Promise<void> {
+    for await (const entry of Deno.readDir(current)) {
+      if (entry.isSymlink) throw new Error('Candidate contains a symlink');
+      const path = join(current, entry.name);
+      if (entry.isDirectory) await visit(path);
+      else if (entry.isFile) result.set(relative(root, path).replaceAll('\\', '/'), await Deno.readFile(path));
+    }
+  }
+  await visit(root);
+  return result;
+}
+const hash = async (bytes: Uint8Array): Promise<string> => new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)).toHex();
+Deno.remove = async (path: string | URL, options?: Deno.RemoveOptions): Promise<void> => {
+  const absolute = resolve(String(path));
+  const fromTmp = relative(resolve(repo, '.llm/tmp'), absolute);
+  if (fromTmp.startsWith('dogfood-consumer-skills-') && !fromTmp.includes('/') && !fromTmp.includes('\\')) {
+    if (captured) throw new Error('Multiple candidate captures');
+    for (const [name, bytes] of await files(join(absolute, 'consumer-skills'))) {
+      const target = join(candidate, name);
+      await Deno.mkdir(resolve(target, '..'), { recursive: true });
+      await Deno.writeFile(target, bytes);
+    }
+    captured = true;
+  }
+  await originalRemove(path, options);
+};
+try {
+  Deno.env.set('NETSCRIPT_ASPIRE_CLI', 'C:/Users/ericc/.aspire/bin/aspire.exe');
+  await import('../../../.llm/tools/maint/dogfood-skills.ts');
+} finally {
+  Deno.remove = originalRemove;
+  if (priorAspire === undefined) Deno.env.delete('NETSCRIPT_ASPIRE_CLI');
+  else Deno.env.set('NETSCRIPT_ASPIRE_CLI', priorAspire);
+}
+if (!captured) throw new Error('Canonical producer did not reach candidate cleanup');
+const expected = await files(candidate);
+const actual = await files(destination);
+const manifest = [];
+const changes = [];
+for (const name of new Set([...expected.keys(), ...actual.keys()])) {
+  const next = expected.get(name);
+  const prior = actual.get(name);
+  const nextHash = next ? await hash(next) : null;
+  const priorHash = prior ? await hash(prior) : null;
+  if (next) manifest.push({ path: name, bytes: next.length, sha256: nextHash });
+  if (nextHash !== priorHash) changes.push({ path: name, status: !prior ? 'A' : !next ? 'D' : 'M', before: priorHash, after: nextHash });
+}
+manifest.sort((a, b) => a.path.localeCompare(b.path));
+changes.sort((a, b) => a.path.localeCompare(b.path));
+const report = { candidate, producer: '.llm/tools/maint/dogfood-skills.ts',
+  producerSha256: await hash(await Deno.readFile('.llm/tools/maint/dogfood-skills.ts')),
+  ambientVsCode: Deno.env.has('VSCODE_CODE_CACHE_PATH'), editor: 'none',
+  canonicalCheckExitCode: Deno.exitCode, files: manifest, changes,
+  vscodeFiles: manifest.filter((file) => file.path.startsWith('.vscode/')).length };
+await Deno.writeTextFile(join(owned, `${label}.json`), JSON.stringify(report, null, 2) + '\n');
+console.log(JSON.stringify({ candidateFiles: manifest.length, changes: changes.length, vscodeFiles: report.vscodeFiles }));

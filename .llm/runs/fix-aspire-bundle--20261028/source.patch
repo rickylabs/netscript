@@ -1,0 +1,202 @@
+diff --git a/.llm/tools/generate-cli-assets-barrel.ts b/.llm/tools/generate-cli-assets-barrel.ts
+index aa666b7ec..ed7d90ade 100644
+--- a/.llm/tools/generate-cli-assets-barrel.ts
++++ b/.llm/tools/generate-cli-assets-barrel.ts
+@@ -84,7 +84,7 @@ async function readAssetLiteral(
+   specifier: string,
+ ): Promise<string> {
+   const assetUrl = new URL(specifier, baseUrl);
+-  const content = await Deno.readTextFile(assetUrl);
++  const content = (await Deno.readTextFile(assetUrl)).replaceAll('\r\n', '\n');
+   return JSON.stringify(content);
+ }
+ 
+diff --git a/.llm/tools/maint/dogfood-skills.ts b/.llm/tools/maint/dogfood-skills.ts
+index 78199ae65..7e100ce2e 100644
+--- a/.llm/tools/maint/dogfood-skills.ts
++++ b/.llm/tools/maint/dogfood-skills.ts
+@@ -1,22 +1,19 @@
+ import { dirname, fromFileUrl, join } from '@std/path';
++import { ASPIRE_WORKFLOW_SKILLS } from '../../../packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts';
+ 
+ const repo = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
+ const destination = join(repo, '.agents', 'generated', 'consumer-skills');
+ const check = Deno.args.includes('--check');
+-const workflowSkills = [
+-  'aspire-init',
+-  'aspire-orchestration',
+-  'aspire-monitoring',
+-  'aspire-deployment',
+-];
+ 
+ await Deno.mkdir(join(repo, '.llm', 'tmp'), { recursive: true });
+-const generated = await Deno.makeTempDir({
++const scratch = await Deno.makeTempDir({
+   dir: join(repo, '.llm', 'tmp'),
+   prefix: 'dogfood-consumer-skills-',
+ });
++const generated = join(scratch, 'consumer-skills');
+ 
+ try {
++  await Deno.mkdir(generated);
+   await generate(generated);
+   await normalizeMcpConfig(generated);
+   await assertSurface(generated);
+@@ -36,7 +33,7 @@ try {
+     console.log(`Consumer agent bundle installed at ${destination}`);
+   }
+ } finally {
+-  await removeIfPresent(generated);
++  await removeIfPresent(scratch);
+ }
+ 
+ async function generate(projectRoot: string): Promise<void> {
+@@ -50,6 +47,8 @@ async function generate(projectRoot: string): Promise<void> {
+       'init',
+       '--host',
+       'claude',
++      '--editor',
++      'none',
+     ],
+     stdout: 'inherit',
+     stderr: 'inherit',
+@@ -101,10 +100,15 @@ async function assertSurface(projectRoot: string): Promise<void> {
+   if (configText.includes('jsr:@netscript/cli@0.0.2')) {
+     throw new Error('Dogfood MCP config retained the stale 0.0.2 CLI specifier');
+   }
+-  for (const skill of workflowSkills) {
+-    for (const root of ['.agents/skills', '.claude/skills']) {
+-      await Deno.stat(join(projectRoot, root, skill, 'SKILL.md'));
+-    }
++  for (const skill of ASPIRE_WORKFLOW_SKILLS) {
++    await Deno.stat(join(projectRoot, '.agents/skills', skill, 'SKILL.md'));
++  }
++  const claude = await tree(join(projectRoot, '.claude/skills'));
++  if (
++    claude.size !== 1 ||
++    !claude.get(join('repo-skills', 'SKILL.md'))?.includes('.agents/skills/<name>/SKILL.md')
++  ) {
++    throw new Error('Dogfood Claude skills must contain only the canonical repo-skills bridge');
+   }
+ }
+ 
+diff --git a/packages/cli/src/kernel/assets/agent/guidance.md.template b/packages/cli/src/kernel/assets/agent/guidance.md.template
+index bd003d09e..612ebe907 100644
+--- a/packages/cli/src/kernel/assets/agent/guidance.md.template
++++ b/packages/cli/src/kernel/assets/agent/guidance.md.template
+@@ -34,7 +34,7 @@ Skills are addressed by their registered name. Call the skill by name and its bo
+ - Call the `netscript-build` skill before scaffolding, adding, or generating contracts, services, database assets, plugins, or UI.
+ - Call the `netscript-operate` skill for health, failures, recent runs, documentation lookup, and performance evidence.
+ - Call the `aspire` skill for AppHost lifecycle, resources, dashboards, logs, spans, and traces.
+-- Call the installed `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, and `aspire-deployment` workflow skills for their named lifecycle phases; NetScript's `aspire` skill remains the diagnostic authority.
++- Call the installed `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`, and `aspireify` workflow skills for their named lifecycle phases; NetScript's `aspire` skill remains the diagnostic authority.
+ - Call the `deno` skill for Deno runtime, types, permissions, dependencies, or module resolution.
+ - If something hangs, vanishes, stays silent, or is Healthy but does not respond, start at the `.agents/skills/help.md` playbook.
+ <!-- netscript-agent:end -->
+diff --git a/packages/cli/src/kernel/assets/embedded.generated.ts b/packages/cli/src/kernel/assets/embedded.generated.ts
+index cb1c05ea4..44c7dc270 100644
+--- a/packages/cli/src/kernel/assets/embedded.generated.ts
++++ b/packages/cli/src/kernel/assets/embedded.generated.ts
+@@ -232,7 +232,7 @@ const template_112 =
+ const template_113 =
+   '/**\n * @module plugins\n *\n * Plugin system entry point.\n *\n * Plugin configuration is discovered from `netscript.config.ts` and generated\n * registries under `.netscript/generated/`.\n */\n\nexport const plugins = [] as const;\n';
+ const template_114 =
+-  "<!-- netscript-agent:start -->\n## NetScript build and tooling map\n\n### Build in the framework's order\n\nUse the architectural spine: database-derived schemas → contract → service → typed SDK and query factories → `definePage` composition → islands. The app build guide at `apps/<app>/AGENTS.md` explains the local examples and the project's `definePage`, `withResource`, and `withForm` composition conventions; read it before app work instead of inventing a parallel pattern, and use MCP `find_guidance` or the installed offline docs for `defineRouteContract`, `staleTime`, dehydration, and optimistic UI.\n\nUse the CLI for mutations: `netscript contract`, `netscript service`, `netscript db`, and `netscript generate`. Create UI through `netscript ui:add page <path> --island`, `netscript ui:add island <Name> --query`, or `netscript ui:add data-table` rather than hand-building generated seams.\n\n### Inspect Deno before implementing\n\nThe canonical primer is <https://deno.com/agents.md>. Its setup prompt is: \"Read https://deno.com/agents.md and set up Deno in this project.\"\n\nUse `deno doc <module>` or `deno doc --filter <symbol> <module>` to learn a package's public API, `deno info` to inspect the resolved graph, and `deno eval` for a quick behavioural probe. These come before reading package source over HTTP. For dependency work, use `deno outdated`, `deno why`, and `deno add` instead of hand-editing imports.\n\nRun the workspace quality verbs it defines: `deno task check`, `deno task test`, `deno task lint`, and `deno task fmt:check`. A run is not finished until `deno task test` has run. For the deeper command map, call the `deno` skill; this file only points to it.\n\n### MCP is the default surface\n\nMCP is the default surface for NetScript work, not one option among several: NetScript is newer than your training data, so without the `netscript` MCP tools you will reimplement contracts, services, SDK clients, and UI seams the CLI already generates. Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the task. Use `search_docs` for literal lookup and `get_doc` for faithful retrieval. Check its `mode`; for complete text use `full: true` and follow `nextCursor` with `cursor` until absent. Use MCP `doctor` for NetScript, Aspire, project-wiring, and plugin prerequisites; use `get_app_status`, `get_recent_errors`, and the `analyze_*` tools for bounded runtime evidence.{{OFFLINE_DOCS_GUIDANCE}}\n\nIf no `netscript` MCP tools are listed, stop and recover before writing framework code:\n\n1. If the `netscript` MCP server is up, call MCP `doctor`. If it is not, run `netscript plugin doctor` from the shell; there is no bare `netscript doctor`.\n2. Re-run `netscript agent init --host <host>` for your agent host (`claude`, `vscode`, or `opencode`), then restart the host so it reloads its MCP configuration.\n\nBefore hand-rolled curl probes or print debugging, run `netscript plugin doctor`, `aspire doctor --format Json`, `aspire logs`, and `aspire otel logs`, `aspire otel spans`, or `aspire otel traces`. Drift is evidence-gated: `netscript agent drift record` and MCP `record_drift` require a recent successful diagnostic receipt. Receipts live under `.netscript/agent/diagnostics/`; accepted entries append to `.netscript/agent/drift.jsonl`.\n\n### Invoke the right installed skill\n\nSkills are addressed by their registered name. Call the skill by name and its body, with its bundled references, loads on demand. Hosts that register these names use their skill tool. On Claude Code, call the `repo-skills` bridge with the requested skill name; the bridge permits loading its canonical file and bundled references.\n\n- Call the `netscript` skill to route an unfamiliar NetScript task.\n- Call the `netscript-build` skill before scaffolding, adding, or generating contracts, services, database assets, plugins, or UI.\n- Call the `netscript-operate` skill for health, failures, recent runs, documentation lookup, and performance evidence.\n- Call the `aspire` skill for AppHost lifecycle, resources, dashboards, logs, spans, and traces.\n- Call the installed `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, and `aspire-deployment` workflow skills for their named lifecycle phases; NetScript's `aspire` skill remains the diagnostic authority.\n- Call the `deno` skill for Deno runtime, types, permissions, dependencies, or module resolution.\n- If something hangs, vanishes, stays silent, or is Healthy but does not respond, start at the `.agents/skills/help.md` playbook.\n<!-- netscript-agent:end -->\n";
++  "<!-- netscript-agent:start -->\n## NetScript build and tooling map\n\n### Build in the framework's order\n\nUse the architectural spine: database-derived schemas → contract → service → typed SDK and query factories → `definePage` composition → islands. The app build guide at `apps/<app>/AGENTS.md` explains the local examples and the project's `definePage`, `withResource`, and `withForm` composition conventions; read it before app work instead of inventing a parallel pattern, and use MCP `find_guidance` or the installed offline docs for `defineRouteContract`, `staleTime`, dehydration, and optimistic UI.\n\nUse the CLI for mutations: `netscript contract`, `netscript service`, `netscript db`, and `netscript generate`. Create UI through `netscript ui:add page <path> --island`, `netscript ui:add island <Name> --query`, or `netscript ui:add data-table` rather than hand-building generated seams.\n\n### Inspect Deno before implementing\n\nThe canonical primer is <https://deno.com/agents.md>. Its setup prompt is: \"Read https://deno.com/agents.md and set up Deno in this project.\"\n\nUse `deno doc <module>` or `deno doc --filter <symbol> <module>` to learn a package's public API, `deno info` to inspect the resolved graph, and `deno eval` for a quick behavioural probe. These come before reading package source over HTTP. For dependency work, use `deno outdated`, `deno why`, and `deno add` instead of hand-editing imports.\n\nRun the workspace quality verbs it defines: `deno task check`, `deno task test`, `deno task lint`, and `deno task fmt:check`. A run is not finished until `deno task test` has run. For the deeper command map, call the `deno` skill; this file only points to it.\n\n### MCP is the default surface\n\nMCP is the default surface for NetScript work, not one option among several: NetScript is newer than your training data, so without the `netscript` MCP tools you will reimplement contracts, services, SDK clients, and UI seams the CLI already generates. Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the task. Use `search_docs` for literal lookup and `get_doc` for faithful retrieval. Check its `mode`; for complete text use `full: true` and follow `nextCursor` with `cursor` until absent. Use MCP `doctor` for NetScript, Aspire, project-wiring, and plugin prerequisites; use `get_app_status`, `get_recent_errors`, and the `analyze_*` tools for bounded runtime evidence.{{OFFLINE_DOCS_GUIDANCE}}\n\nIf no `netscript` MCP tools are listed, stop and recover before writing framework code:\n\n1. If the `netscript` MCP server is up, call MCP `doctor`. If it is not, run `netscript plugin doctor` from the shell; there is no bare `netscript doctor`.\n2. Re-run `netscript agent init --host <host>` for your agent host (`claude`, `vscode`, or `opencode`), then restart the host so it reloads its MCP configuration.\n\nBefore hand-rolled curl probes or print debugging, run `netscript plugin doctor`, `aspire doctor --format Json`, `aspire logs`, and `aspire otel logs`, `aspire otel spans`, or `aspire otel traces`. Drift is evidence-gated: `netscript agent drift record` and MCP `record_drift` require a recent successful diagnostic receipt. Receipts live under `.netscript/agent/diagnostics/`; accepted entries append to `.netscript/agent/drift.jsonl`.\n\n### Invoke the right installed skill\n\nSkills are addressed by their registered name. Call the skill by name and its body, with its bundled references, loads on demand. Hosts that register these names use their skill tool. On Claude Code, call the `repo-skills` bridge with the requested skill name; the bridge permits loading its canonical file and bundled references.\n\n- Call the `netscript` skill to route an unfamiliar NetScript task.\n- Call the `netscript-build` skill before scaffolding, adding, or generating contracts, services, database assets, plugins, or UI.\n- Call the `netscript-operate` skill for health, failures, recent runs, documentation lookup, and performance evidence.\n- Call the `aspire` skill for AppHost lifecycle, resources, dashboards, logs, spans, and traces.\n- Call the installed `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`, and `aspireify` workflow skills for their named lifecycle phases; NetScript's `aspire` skill remains the diagnostic authority.\n- Call the `deno` skill for Deno runtime, types, permissions, dependencies, or module resolution.\n- If something hangs, vanishes, stays silent, or is Healthy but does not respond, start at the `.agents/skills/help.md` playbook.\n<!-- netscript-agent:end -->\n";
+ const template_115 =
+   '@AGENTS.md\nOn Claude Code, address NetScript skills by name through the `repo-skills` bridge; its instructions permit reading the requested canonical skill and its bundled references.\n';
+ const template_116 =
+diff --git a/packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts b/packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts
+index 3e9420649..3314d0e51 100644
+--- a/packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts
++++ b/packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts
+@@ -5,7 +5,7 @@ import {
+   DenoAspireAgentInitializer,
+ } from './deno-aspire-agent-initializer.ts';
+ 
+-Deno.test('#2008 Aspire agent init selects only the standard location and four non-colliding workflow skills', () => {
++Deno.test('#2008 Aspire agent init selects only the standard location and five non-colliding workflow skills', () => {
+   const args = aspireAgentInitArgs('/workspace/project');
+   assertEquals(args, [
+     'agent',
+@@ -17,7 +17,7 @@ Deno.test('#2008 Aspire agent init selects only the standard location and four n
+     '--skill-locations',
+     'standard',
+     '--skills',
+-    'aspire-init,aspire-orchestration,aspire-monitoring,aspire-deployment',
++    'aspire-init,aspire-orchestration,aspire-monitoring,aspire-deployment,aspireify',
+   ]);
+   const selected = args[args.indexOf('--skills') + 1].split(',');
+   assertEquals(selected, ASPIRE_WORKFLOW_SKILLS);
+diff --git a/packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts b/packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts
+index e7b7d7745..c498fbb72 100644
+--- a/packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts
++++ b/packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts
+@@ -4,6 +4,7 @@ export const ASPIRE_WORKFLOW_SKILLS: readonly string[] = [
+   'aspire-orchestration',
+   'aspire-monitoring',
+   'aspire-deployment',
++  'aspireify',
+ ];
+ 
+ /** Result of optional Aspire agent initialization. */
+diff --git a/packages/cli/src/public/features/agent/init/init-agent-claude_test.ts b/packages/cli/src/public/features/agent/init/init-agent-claude_test.ts
+index b8ca8452a..70aaebfa4 100644
+--- a/packages/cli/src/public/features/agent/init/init-agent-claude_test.ts
++++ b/packages/cli/src/public/features/agent/init/init-agent-claude_test.ts
+@@ -120,6 +120,55 @@ Deno.test('#2008 canonical Aspire workflows alone skip delegation without creati
+   }
+ });
+ 
++Deno.test('#2008 existing four workflows install missing aspireify once without creating mirrors', async () => {
++  const root = await Deno.makeTempDir();
++  try {
++    const fs = new DenoAgentInitFileSystem();
++    const existing = [
++      'aspire-init',
++      'aspire-orchestration',
++      'aspire-monitoring',
++      'aspire-deployment',
++    ];
++    for (const skill of existing) {
++      await fs.writeText(join(root, '.agents/skills', skill, 'SKILL.md'), `# ${skill}\n`);
++    }
++    let calls = 0;
++    const dependencies = {
++      fs,
++      aspireAgentInitializer: {
++        async initialize(projectRoot: string) {
++          assertEquals(projectRoot, root);
++          calls++;
++          await fs.writeText(join(root, '.agents/skills/aspireify/SKILL.md'), '# aspireify\n');
++          return { ok: true as const };
++        },
++      },
++    };
++    const first = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
++    assertEquals(calls, 1);
++    assertEquals(first.messages, []);
++    for (const skill of [...existing, 'aspireify']) {
++      assertEquals(
++        await fs.readText(join(root, '.agents/skills', skill, 'SKILL.md')),
++        `# ${skill}\n`,
++      );
++      assertFalse(await fs.exists(join(root, '.claude/skills', skill)));
++    }
++    const files = [];
++    for await (const entry of walk(join(root, '.claude/skills'), { includeDirs: false })) {
++      files.push(relative(join(root, '.claude/skills'), entry.path));
++    }
++    assertEquals(files, [join('repo-skills', 'SKILL.md')]);
++    const second = await initAgent({ projectRoot: root, host: 'claude' }, dependencies);
++    assertEquals(calls, 1);
++    assertEquals(second.changedFiles, []);
++    assertEquals(second.messages, []);
++  } finally {
++    await Deno.remove(root, { recursive: true });
++  }
++});
++
+ Deno.test('#2008 non-Claude host leaves CLAUDE.md and foreign Claude skills untouched', async () => {
+   const root = await Deno.makeTempDir();
+   try {

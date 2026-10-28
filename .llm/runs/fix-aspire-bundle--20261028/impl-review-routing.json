@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "state": "prepared-only",
+  "workloadTier": "straightforward",
+  "workloadRole": "implementation_evaluation",
+  "logicalModel": "glm_5_3_flash",
+  "effort": "provider_default",
+  "matrixPin": "bd02f966a42dd1029b4349a038c52d0928fac41f",
+  "matrixQuery": "deno task agentic:matrix --tier straightforward --impl-evaluator --json",
+  "implementationModel": "gpt-6.1-sol",
+  "implementationEffort": "xhigh",
+  "independentSessionRequired": true,
+  "differentVendorFamilyRequired": true,
+  "reviewTarget": "Root-signed checkpoint SHA, resolved and byte-audited before launch",
+  "baseHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "prompt": ".llm/runs/fix-aspire-bundle--20261028/impl-review-prompt.md",
+  "sourceManifest": ".llm/runs/fix-aspire-bundle--20261028/source-manifest.json",
+  "fixtureManifest": ".llm/runs/fix-aspire-bundle--20261028/final-consumer-fixture.json",
+  "inferenceStarted": false,
+  "reservationRequested": false
+}

@@ -1,0 +1,139 @@
+{
+  "generations": 2,
+  "candidateFiles": 57,
+  "allFileDigestsIdentical": true,
+  "stableBridgeHeader": "# consumer-skills repository skills",
+  "changes": 49,
+  "statusCounts": {
+    "M": 7,
+    "A": 13,
+    "D": 29
+  },
+  "bindings": [
+    {
+      "path": ".llm/tools/README.md",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/consumer-tools.json",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/deps/outdated.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/deps/why.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/docs/snippet-extractor.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/e2e/scaffold-e2e-test.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/quality/scan-code-quality.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/run-deno-check.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/run-deno-doc-lint.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/run-deno-lint.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/validation/aspire-scan-scope.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/validation/check-aspire-host-ports.ts",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".llm/tools/release.json",
+      "producer": "EMBEDDED_AGENT_TOOL_FILES / readAgentToolEmbeddedBundle exact source producer",
+      "matches": true
+    },
+    {
+      "path": ".agents/skills/aspire/SKILL.md",
+      "producer": "EMBEDDED_SKILL_FILES",
+      "matches": true,
+      "source": "skills/aspire/SKILL.md",
+      "sourceMatches": true
+    },
+    {
+      "path": ".agents/skills/deno/SKILL.md",
+      "producer": "EMBEDDED_SKILL_FILES",
+      "matches": true,
+      "source": "skills/deno/SKILL.md",
+      "sourceMatches": true
+    },
+    {
+      "path": ".agents/skills/help.md",
+      "producer": "EMBEDDED_SKILL_FILES",
+      "matches": true,
+      "source": "skills/help.md",
+      "sourceMatches": true
+    },
+    {
+      "path": ".agents/skills/netscript-build/SKILL.md",
+      "producer": "EMBEDDED_SKILL_FILES",
+      "matches": true,
+      "source": "skills/netscript-build/SKILL.md",
+      "sourceMatches": true
+    },
+    {
+      "path": ".agents/skills/netscript-operate/SKILL.md",
+      "producer": "EMBEDDED_SKILL_FILES",
+      "matches": true,
+      "source": "skills/netscript-operate/SKILL.md",
+      "sourceMatches": true
+    },
+    {
+      "path": ".agents/skills/netscript/SKILL.md",
+      "producer": "EMBEDDED_SKILL_FILES",
+      "matches": true,
+      "source": "skills/netscript/SKILL.md",
+      "sourceMatches": true
+    },
+    {
+      "path": ".claude/skills/repo-skills/SKILL.md",
+      "producer": "canonical bridge template with stable project basename",
+      "matches": true
+    },
+    {
+      "path": "CLAUDE.md",
+      "producer": "mergeClaudeGuidance and embedded guidance template",
+      "matches": true
+    },
+    {
+      "path": "AGENTS.md",
+      "producer": "embedded agent guidance template / initAgent fresh marked section",
+      "matches": true
+    }
+  ],
+  "scratchRemaining": [],
+  "nativeAspireVersion": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+  "nativeAspireBinarySha256": "2f363f78c4f58ccd4b77db4bbeb9fd2892a8bea97d94325897a48e6c9dd11e32"
+}

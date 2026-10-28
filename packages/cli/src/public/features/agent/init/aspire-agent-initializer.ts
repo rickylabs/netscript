@@ -4,6 +4,7 @@ export const ASPIRE_WORKFLOW_SKILLS: readonly string[] = [
   'aspire-orchestration',
   'aspire-monitoring',
   'aspire-deployment',
+  'aspireify',
 ];
 
 /** Result of optional Aspire agent initialization. */

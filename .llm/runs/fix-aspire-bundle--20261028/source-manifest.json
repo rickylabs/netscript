@@ -1,0 +1,47 @@
+{
+  "baseHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "files": [
+    {
+      "path": ".llm/tools/generate-cli-assets-barrel.ts",
+      "sha256": "a17d1df45049f5f1af5ef69701d3ff12c1c444342735bafa7e698890e44f3b04",
+      "lines": 549,
+      "bytes": 20093
+    },
+    {
+      "path": ".llm/tools/maint/dogfood-skills.ts",
+      "sha256": "2b78a2b0d0b0c7bc3e3f70751b4b3ded70bfdcb958f94199ae83ece87bdb1c44",
+      "lines": 164,
+      "bytes": 5545
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/agent/guidance.md.template",
+      "sha256": "4139f7a37c32ff96352c86508506f7b70c4973902a9fe8e039c475a85a6a3181",
+      "lines": 40,
+      "bytes": 4627
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/embedded.generated.ts",
+      "sha256": "805794405dc83e55c9b12d7afc7d24b263204b41cf8d84fef4926d8683556c1d",
+      "lines": 360,
+      "bytes": 347335
+    },
+    {
+      "path": "packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts",
+      "sha256": "1a5dae4137f6025d6baab2935e56de21a0d32366a8376b47c2e061e0d7ac1489",
+      "lines": 68,
+      "bytes": 2607
+    },
+    {
+      "path": "packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts",
+      "sha256": "858c37721e8b0ccdda34255b226dcd636b7c375fd90e2805be41485802985e51",
+      "lines": 21,
+      "bytes": 667
+    },
+    {
+      "path": "packages/cli/src/public/features/agent/init/init-agent-claude_test.ts",
+      "sha256": "50022894f8fe86923298555dad56148ebecbbb505e1ca1222e7817e1a3bcfb3b",
+      "lines": 475,
+      "bytes": 20240
+    }
+  ]
+}

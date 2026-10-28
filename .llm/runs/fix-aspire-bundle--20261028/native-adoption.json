@@ -1,0 +1,146 @@
+{
+  "project": "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\native-owned-9b63ead1b919be6d",
+  "canonicalWorkflowNames": [
+    "aspire-init",
+    "aspire-orchestration",
+    "aspire-monitoring",
+    "aspire-deployment",
+    "aspireify"
+  ],
+  "commands": [
+    {
+      "command": "C:/Users/ericc/.aspire/bin/aspire.exe",
+      "args": [
+        "--version"
+      ],
+      "startedAt": "2026-10-28T05:29:31.515Z",
+      "finishedAt": "2026-10-28T05:29:31.602Z",
+      "code": 0,
+      "signal": null,
+      "stdout": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688\r\n",
+      "stderr": ""
+    },
+    {
+      "command": "C:/Users/ericc/.aspire/bin/aspire.exe",
+      "args": [
+        "agent",
+        "init",
+        "--non-interactive",
+        "--nologo",
+        "--workspace-root",
+        "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\native-owned-9b63ead1b919be6d",
+        "--skill-locations",
+        "standard",
+        "--skills",
+        "aspire-init,aspire-orchestration,aspire-monitoring,aspire-deployment,aspireify"
+      ],
+      "startedAt": "2026-10-28T05:29:31.626Z",
+      "finishedAt": "2026-10-28T05:29:32.776Z",
+      "code": 0,
+      "signal": null,
+      "stdout": "🤖 Détection des environnements d’agent...\r\nInstalling Aspire skills...\r\n🤖 Installed Aspire agent skills:                                                              \r\n     Skills: aspire-init, aspire-orchestration, aspire-monitoring, aspire-deployment, aspireify\r\n     Locations: .agents/skills                                                                 \r\n📊 Installed Aspire agent telemetry hooks for: Claude Code. Only Aspire skill, MCP tool, and reference-file usage is recorded. Opt out anytime by setting       \r\n   ASPIRE_CLI_TELEMETRY_OPTOUT=true.                                                                                                                            \r\n✅ Configuration de l’environnement d’agent terminée.\r\n",
+      "stderr": ""
+    },
+    {
+      "command": "C:/Users/ericc/.aspire/bin/aspire.exe",
+      "args": [
+        "agent",
+        "init",
+        "--non-interactive",
+        "--nologo",
+        "--workspace-root",
+        "C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\native-owned-9b63ead1b919be6d\\missing-workspace",
+        "--skill-locations",
+        "standard",
+        "--skills",
+        "aspire-init,aspire-orchestration,aspire-monitoring,aspire-deployment,aspireify"
+      ],
+      "startedAt": "2026-10-28T05:29:32.815Z",
+      "finishedAt": "2026-10-28T05:29:33.172Z",
+      "code": 21,
+      "signal": null,
+      "stdout": "",
+      "stderr": "❌ Répertoire introuvable :                                                                                                                                     \r\n   C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\native-owned-9b63ead1b919be6d\\missing-workspace          \r\n"
+    }
+  ],
+  "version": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+  "first": {
+    "changedFiles": 23,
+    "messages": [],
+    "calls": 1
+  },
+  "canonicalAspire": {
+    "before": "68b6f895faa192d14a572bfe2dd657cdba880b1db2d2cc046f59571cd7c6d3e5",
+    "after": "68b6f895faa192d14a572bfe2dd657cdba880b1db2d2cc046f59571cd7c6d3e5",
+    "preserved": true
+  },
+  "claudeSkillFiles": [
+    "repo-skills/SKILL.md"
+  ],
+  "handoffs": [
+    {
+      "source": "aspire-init/SKILL.md",
+      "href": "../aspireify/SKILL.md",
+      "line": 25,
+      "resolves": true
+    },
+    {
+      "source": "aspire-init/SKILL.md",
+      "href": "../aspireify/SKILL.md",
+      "line": 53,
+      "resolves": true
+    },
+    {
+      "source": "aspire-orchestration/SKILL.md",
+      "href": "../aspireify/SKILL.md",
+      "line": 149,
+      "resolves": true
+    },
+    {
+      "source": "aspire-orchestration/SKILL.md",
+      "href": "../aspireify/SKILL.md",
+      "line": 182,
+      "resolves": true
+    },
+    {
+      "source": "aspire-orchestration/references/app-commands.md",
+      "href": "../../aspireify/SKILL.md",
+      "line": 44,
+      "resolves": true
+    }
+  ],
+  "second": {
+    "changedFiles": [],
+    "messages": [],
+    "calls": 1,
+    "allFilesUnchanged": true
+  },
+  "failure": {
+    "ok": false,
+    "reason": "❌ Répertoire introuvable :                                                                                                                                     \r\n   C:\\Users\\ericc\\source\\repos\\netscript-aspire-skill-closure-008\\.llm\\tmp\\fix-aspire-bundle--20261028\\native-owned-9b63ead1b919be6d\\missing-workspace"
+  },
+  "timeout": {
+    "pid": 56424,
+    "aborted": true,
+    "settled": [
+      {
+        "status": "fulfilled",
+        "value": {
+          "success": false,
+          "code": 1,
+          "signal": null
+        }
+      },
+      {
+        "status": "fulfilled",
+        "value": ""
+      },
+      {
+        "status": "fulfilled",
+        "value": ""
+      }
+    ]
+  },
+  "outcome": "PASS",
+  "projectRemoved": true
+}

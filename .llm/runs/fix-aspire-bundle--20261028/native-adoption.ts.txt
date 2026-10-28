@@ -1,0 +1,140 @@
+import { dirname, join, relative, resolve } from '@std/path';
+import { DenoAspireAgentInitializer, aspireAgentInitArgs } from '../../../packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer.ts';
+import { DenoAgentInitFileSystem } from '../../../packages/cli/src/public/features/agent/init/agent-init-file-system.ts';
+import { initAgent } from '../../../packages/cli/src/public/features/agent/init/init-agent.ts';
+import { ASPIRE_WORKFLOW_SKILLS } from '../../../packages/cli/src/public/features/agent/init/aspire-agent-initializer.ts';
+
+const repo = Deno.cwd();
+const parent = resolve(repo, '.llm/tmp/fix-aspire-bundle--20261028');
+const project = await Deno.makeTempDir({ dir: parent, prefix: 'native-owned-' });
+const pinned = 'C:/Users/ericc/.aspire/bin/aspire.exe';
+const decoder = new TextDecoder();
+const commands: Record<string, unknown>[] = [];
+const report: Record<string, unknown> = { project, canonicalWorkflowNames: ASPIRE_WORKFLOW_SKILLS, commands };
+const OriginalCommand = Deno.Command;
+const priorAspire = Deno.env.get('NETSCRIPT_ASPIRE_CLI');
+const fs = new DenoAgentInitFileSystem();
+function require(value: unknown, message: string): asserts value {
+  if (!value) throw new Error(message);
+}
+async function sha(path: string): Promise<string> {
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', await Deno.readFile(path))).toHex();
+}
+async function tree(root: string): Promise<Record<string, string>> {
+  const files: Record<string, string> = {};
+  async function visit(current: string): Promise<void> {
+    for await (const entry of Deno.readDir(current)) {
+      require(!entry.isSymlink, 'Native project contains an unexpected symlink');
+      const path = join(current, entry.name);
+      if (entry.isDirectory) await visit(path);
+      else if (entry.isFile) files[relative(root, path).replaceAll('\\', '/')] = await sha(path);
+    }
+  }
+  await visit(root);
+  return Object.fromEntries(Object.entries(files).sort(([a], [b]) => a.localeCompare(b)));
+}
+Deno.Command = class extends OriginalCommand {
+  readonly command: string | URL;
+  readonly options?: Deno.CommandOptions;
+  constructor(command: string | URL, options?: Deno.CommandOptions) {
+    super(command, options);
+    this.command = command;
+    this.options = options;
+  }
+  override async output(): Promise<Deno.CommandOutput> {
+    const startedAt = new Date().toISOString();
+    try {
+      const result = await super.output();
+      commands.push({ command: String(this.command), args: this.options?.args, startedAt,
+        finishedAt: new Date().toISOString(), code: result.code, signal: result.signal,
+        stdout: decoder.decode(result.stdout), stderr: decoder.decode(result.stderr) });
+      return result;
+    } catch (error) {
+      commands.push({ command: String(this.command), args: this.options?.args, startedAt,
+        finishedAt: new Date().toISOString(), error: error instanceof Error ? error.message : String(error) });
+      throw error;
+    }
+  }
+};
+try {
+  Deno.env.set('NETSCRIPT_ASPIRE_CLI', pinned);
+  Deno.chdir(project);
+  const version = await new Deno.Command(pinned, { args: ['--version'], stdout: 'piped', stderr: 'piped', signal: AbortSignal.timeout(10_000) }).output();
+  report.version = decoder.decode(version.stdout).trim();
+  require(version.success && String(report.version).startsWith('13.5.3+'), 'Unexpected native Aspire version');
+  let calls = 0;
+  let canonicalBefore = '';
+  const dependencies = { fs, aspireAgentInitializer: {
+    async initialize(projectRoot: string, signal: AbortSignal) {
+      calls++;
+      canonicalBefore = await sha(join(project, '.agents/skills/aspire/SKILL.md'));
+      return await new DenoAspireAgentInitializer().initialize(projectRoot, signal);
+    },
+  } };
+  const first = await initAgent({ projectRoot: project, host: 'claude' }, dependencies);
+  report.first = { changedFiles: first.changedFiles.length, messages: first.messages, calls };
+  require(calls === 1 && first.messages.length === 0, 'Fresh native init did not complete cleanly');
+  for (const name of ASPIRE_WORKFLOW_SKILLS) {
+    require((await Deno.stat(join(project, '.agents/skills', name, 'SKILL.md'))).isFile, `Missing ${name}`);
+  }
+  const canonicalAfter = await sha(join(project, '.agents/skills/aspire/SKILL.md'));
+  report.canonicalAspire = { before: canonicalBefore, after: canonicalAfter, preserved: canonicalBefore === canonicalAfter };
+  require(canonicalBefore === canonicalAfter, 'Native Aspire overwrote the NetScript diagnostic skill');
+  const claude = await tree(join(project, '.claude/skills'));
+  require(Object.keys(claude).length === 1 && 'repo-skills/SKILL.md' in claude, 'Native init created a Claude mirror');
+  report.claudeSkillFiles = Object.keys(claude);
+  const hrefs: Record<string, unknown>[] = [];
+  for (const source of ['aspire-init/SKILL.md', 'aspire-orchestration/SKILL.md', 'aspire-orchestration/references/app-commands.md']) {
+    const path = join(project, '.agents/skills', source);
+    const text = await Deno.readTextFile(path);
+    for (const match of text.matchAll(/\]\(([^)]+)\)/g)) {
+      if (!match[1].includes('aspireify/SKILL.md')) continue;
+      const target = resolve(dirname(path), match[1]);
+      require(relative(join(project, '.agents/skills'), target) === join('aspireify', 'SKILL.md'), 'Link escaped skill directory');
+      const resolves = (await Deno.stat(target)).isFile;
+      hrefs.push({ source, href: match[1], line: text.slice(0, match.index).split('\n').length, resolves });
+      require(resolves, 'Broken aspireify handoff');
+    }
+  }
+  report.handoffs = hrefs;
+  require(hrefs.length === 5, `Expected five actual aspireify hrefs, found ${hrefs.length}`);
+  const beforeSecond = await tree(project);
+  const second = await initAgent({ projectRoot: project, host: 'claude' }, dependencies);
+  const afterSecond = await tree(project);
+  const unchanged = JSON.stringify(beforeSecond) === JSON.stringify(afterSecond);
+  report.second = { changedFiles: second.changedFiles, messages: second.messages, calls, allFilesUnchanged: unchanged };
+  require(calls === 1 && second.changedFiles.length === 0 && second.messages.length === 0 && unchanged, 'Second init was not a no-op');
+  const failure = await new DenoAspireAgentInitializer().initialize(join(project, 'missing-workspace'), AbortSignal.timeout(30_000));
+  report.failure = failure;
+  require(!failure.ok, 'Invalid native workspace did not fail');
+  const controller = new AbortController();
+  const timeout = new OriginalCommand(pinned, { args: aspireAgentInitArgs(project), cwd: project,
+    signal: controller.signal, stdout: 'piped', stderr: 'piped' }).spawn();
+  const timer = setTimeout(() => controller.abort(), 1);
+  const settled = await Promise.allSettled([
+    timeout.status, new Response(timeout.stdout).text(), new Response(timeout.stderr).text(),
+  ]);
+  clearTimeout(timer);
+  report.timeout = { pid: timeout.pid, aborted: controller.signal.aborted, settled };
+  require(controller.signal.aborted && settled.every((value) => value.status === 'fulfilled'), 'Timeout child or pipes did not settle');
+  const status = settled[0];
+  require(status.status === 'fulfilled' && !status.value.success, 'Timeout child unexpectedly succeeded');
+  report.outcome = 'PASS';
+} catch (error) {
+  report.outcome = 'FAIL';
+  report.error = error instanceof Error ? error.stack : String(error);
+  Deno.exitCode = 1;
+} finally {
+  Deno.Command = OriginalCommand;
+  Deno.chdir(repo);
+  if (priorAspire === undefined) Deno.env.delete('NETSCRIPT_ASPIRE_CLI');
+  else Deno.env.set('NETSCRIPT_ASPIRE_CLI', priorAspire);
+  const actual = await Deno.realPath(project);
+  require(!relative(await Deno.realPath(parent), actual).startsWith('..'), 'Cleanup target escaped owned parent');
+  await Deno.remove(actual, { recursive: true });
+  try { await Deno.lstat(project); throw new Error('Native project remains'); }
+  catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
+  report.projectRemoved = true;
+  await Deno.writeTextFile(join(parent, 'native-adoption.json'), JSON.stringify(report, null, 2) + '\n');
+}
+console.log(JSON.stringify({ outcome: report.outcome, projectRemoved: report.projectRemoved, error: report.error }));

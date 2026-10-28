@@ -11,6 +11,15 @@
  * - deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/plugin-triggers-core/mod.ts --deno-arg --doc
  */
 
+/** Detect Deno's empty check even when the process reports success. */
+export function matchedNoFiles(output: string): boolean {
+  return /No matching files found/i.test(output);
+}
+
+function resolveExitCode(code: number, output: string): number {
+  return code || (matchedNoFiles(output) ? 2 : 0);
+}
+
 interface Options {
   input?: string;
   stdin: boolean;
@@ -381,10 +390,9 @@ async function runBatch(files: string[], options: Options): Promise<BatchResult>
   }).output();
 
   const output = new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
-  const excludedAllTargets = /No matching files found/i.test(output);
   return {
     files,
-    exitCode: result.code === 0 && excludedAllTargets ? 2 : result.code,
+    exitCode: resolveExitCode(result.code, output),
     output,
   };
 }
@@ -398,10 +406,11 @@ async function runCommand(command: string[], options: Options): Promise<BatchRes
     stderr: 'piped',
   }).output();
 
+  const output = new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
   return {
     files: [],
-    exitCode: result.code,
-    output: new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr),
+    exitCode: resolveExitCode(result.code, output),
+    output,
   };
 }
 
@@ -619,4 +628,4 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+if (import.meta.main) await main();

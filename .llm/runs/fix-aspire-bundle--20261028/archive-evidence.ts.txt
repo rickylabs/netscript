@@ -1,0 +1,26 @@
+import { join } from '@std/path';
+const repo = Deno.cwd();
+const scratch = join(repo, '.llm/tmp/fix-aspire-bundle--20261028');
+const run = join(repo, '.llm/runs/fix-aspire-bundle--20261028');
+await Deno.mkdir(run, { recursive: true });
+const decoder = new TextDecoder();
+for await (const entry of Deno.readDir(scratch)) {
+  if (!entry.isFile) {
+    if (['consumer-skills-candidate', 'consumer-skills-candidate-a', 'consumer-skills-candidate-b'].includes(entry.name)) continue;
+    throw new Error(`Unexpected scratch directory remains: ${entry.name}`);
+  }
+  const name = entry.name.endsWith('.ts') ? `${entry.name}.txt` : entry.name;
+  await Deno.copyFile(join(scratch, entry.name), join(run, name));
+}
+const diff = await new Deno.Command('git', { args: ['diff', '--binary'], stdout: 'piped', stderr: 'piped' }).output();
+if (!diff.success) throw new Error('Cannot capture review diff');
+await Deno.writeFile(join(run, 'source.patch'), diff.stdout);
+const paths = decoder.decode((await new Deno.Command('git', { args: ['diff', '--name-only'], stdout: 'piped', stderr: 'piped' }).output()).stdout).trim().split('\n');
+const files = [];
+for (const path of paths) {
+  const bytes = await Deno.readFile(path);
+  files.push({ path, sha256: new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)).toHex(),
+    lines: decoder.decode(bytes).trimEnd().split('\n').length, bytes: bytes.length });
+}
+await Deno.writeTextFile(join(run, 'source-manifest.json'), JSON.stringify({ baseHead: '88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5', files }, null, 2) + '\n');
+console.log(JSON.stringify({ sourceOwners: paths.length, run }));

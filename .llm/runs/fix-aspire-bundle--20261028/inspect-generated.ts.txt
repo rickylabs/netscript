@@ -1,0 +1,23 @@
+const paths = [
+  'packages/cli/src/kernel/assets/embedded.generated.ts',
+  'packages/plugin/src/kernel/assets/embedded.generated.ts',
+  'packages/fresh-ui/registry.generated.ts',
+];
+const decoder = new TextDecoder();
+const result = [];
+for (const path of paths) {
+  const base = await new Deno.Command('git', {
+    args: ['show', `HEAD:${path}`], stdout: 'piped', stderr: 'piped',
+  }).output();
+  if (!base.success) throw new Error(`Cannot inspect ${path}`);
+  const before = decoder.decode(base.stdout).replaceAll('\r\n', '\n');
+  const after = (await Deno.readTextFile(path)).replaceAll('\r\n', '\n');
+  const normalized = after.replaceAll('\\r\\n', '\\n');
+  const oldNames = '`aspire-monitoring`, and `aspire-deployment`';
+  const newNames = '`aspire-monitoring`, `aspire-deployment`, and `aspireify`';
+  const expected = path.includes('/cli/') ? before.replace(oldNames, newNames) : before;
+  result.push({ path, onlyExpectedDeltaAfterDecodedNewlineNormalization: normalized === expected,
+    addedEncodedCarriageReturns: (after.match(/\\r\\n/g) ?? []).length - (before.match(/\\r\\n/g) ?? []).length });
+}
+await Deno.writeTextFile('.llm/tmp/fix-aspire-bundle--20261028/generated-delta.json', JSON.stringify(result, null, 2) + '\n');
+console.log(JSON.stringify(result));
