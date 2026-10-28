@@ -43,3 +43,7 @@ browser comparison, full runtime E2E, and mandatory IMPL-EVAL remain unproven
 or unimplemented. This draft does not satisfy #2414 acceptance.
 
 No architectural violation is accepted as debt. The source stage is unfinished.
+
+## Superseded by explicit user continuation
+
+The user resumed the full objective. The exact remaining line-height correction was applied and tested; the same supervisor approved the source slice. Implementation is active again. This does not waive any later gate or claim S1 is finished.

@@ -77,3 +77,15 @@ Then add a test that, for NS One, each resolved `leading-<role>` is at least its
 The non-blocking items from last round (Liquid provenance, node-literal descriptions, Bloom's own type scale) are addressed. Moving unchanged shared roles into `semantic.tokens.json` doesn't affect correctness, because the theme layer is applied after it and the alias-edge test covers all 72 inputs.
 
 I'll keep this session open to re-check just the `leading` change.
+
+# Resumed iteration: source delta approval
+
+**PASS.** The last blocker is fixed, and I'm signing off on the repaired sources/resolver slice. This was a read-only review: I didn't run the test or regenerate anything.
+
+- **Mapping:** `applyLegacyGaps` now gives each NS One `leading-*` role its own alias, exactly matching the table from my last review (`figma-token-source.ts:391-404`). `small` and `label` use `space-5`, one of the two options that table allowed.
+- **Generated sources:** `tokens/v2/presets.tokens.json` matches the new mapping. For example, `leading-caption` → `text-lg`, `leading-display` → `space-10`, `leading-kpi` → `space-9`, `leading-title` → `space-8`. `default-token-sources.ts` now imports from `tokens/v2/`, so the tests read these regenerated files.
+- **New test:** the first test in `tests/tokens/resolver.test.ts` (lines 18-53) resolves NS One in both schemes. It follows each alias down to the underlying dimension, converts rem to px, and checks line height ≥ text size for all ten paired roles. That is the guard I asked for.
+
+One non-blocking note: `tokens/primitives.tokens.json` and `tokens/semantic.tokens.json` still sit at the old top-level path beside `tokens/v2/`. They were already tracked before this work. Slice 2 should either keep them only for the legacy build or remove them, so nothing reads stale sources.
+
+The earlier FAIL_FIX verdicts stay in the record. I'll keep this session open for slice 2 (the build outputs).

@@ -1,30 +1,9 @@
-# S1 stopped at source review
+# S1 active after explicit continuation
 
-PR #2435, branch `orch/divybot-6462582366`. S1 #2414 is incomplete. Read
-`decision-record.md`, `slice-1-review.md`, `plan.md`, and `validation-summary.json`.
+The user resumed the full #2414 objective. Previous stopped-state decision and both failed source reviews remain historical evidence. Current branch/PR: orch/divybot-6462582366 / #2435, draft.
 
-PLAN-EVAL passed on round 2. The separate source supervisor returned FAIL_FIX
-on both source rounds. The dispatcher leaf limit ended this loop; no third
-round was attempted. Keep the PR in draft. No merge, tag, release or default
-switch is authorized here.
+First repair: apply the supervisor’s exact per-role NS One line-height table and add a computed line-height >= text-size regression. Get same-session delta approval, then continue the original source/output/check/CLI/migration slices. No scope reduction.
 
-Remaining blocker: NS One's new line-height roles all alias 24px, which is
-smaller than display/KPI text. The second verdict provides the exact per-role
-fix and requests a line-height >= text-size test. That correction remains open.
+Read plan.md, worklog.md and slice-1-review.md. All original acceptance and mandatory final IMPL-EVAL remain required. No label, force push, merge, tag or release; keep the assignment and final-report files out of Git.
 
-Partial code is isolated in `packages/fresh-ui/tokens/v2/` and
-`packages/fresh-ui/src/tokens/`; the importer and official-schema validator are
-in `packages/fresh-ui/scripts/`. Approved Figma and S0 snapshots are retained.
-Existing S0 inputs, output artifacts and build script are unchanged.
-
-Validation: 194 package tests (including 7 focused source tests), 12-file scoped
-check/lint/fmt, official DTCG schemas and 72-input alias graph, frozen S0 token
-freshness, and 8 unchanged baseline browser cases pass. These do not approve the
-source design. See the public compact summary; raw local logs are kept outside
-the tracked source because they contain private operational details.
-
-Still outstanding: SD output formats, known-name/contrast CI gates and exclusion
-list, public tokens CLI and scaffold override proof, fonts/attributes/design
-route migration, registry/Figma outputs, after screenshots, full runtime E2E and
-IMPL-EVAL. Do not claim READY or issue acceptance. The assignment/report files
-must never be staged. Do not change labels or force-push.
+Source gate PASS in the resumed iteration. Eight source tests pass; proceed to SD output formats.

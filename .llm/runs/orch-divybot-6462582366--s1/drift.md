@@ -16,3 +16,5 @@
 - Remaining review blocker: NS One leading aliases all use the same 24px value. The second verdict supplies per-role corrections; they are intentionally left for the next authorized iteration.
 
 - Root `deno.lock` is also an allowed write surface for the two exact, already-resolved validator/conversion specifier mappings. This keeps root frozen checks from rejecting the isolated source files; no dependency versions or integrity entries may change.
+
+- Explicit user continuation reopens implementation after the prior stopped iteration. Stopped-state notes are historical; the source gate is being repaired before outputs.

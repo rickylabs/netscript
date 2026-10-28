@@ -80,3 +80,9 @@ route; generator and evaluator remain separate sessions and vendor families.
 - Final catalog-run `quality:gate`: PASS, exit 0, on source head `b39499304aad2fb43f0609a8fc7d181cddbe34c9`; receipt hash and verdict are in the public validation summary. This is command evidence only, not independent source approval or merge readiness.
 - Partial source snapshot committed and pushed as `b39499304aad2fb43f0609a8fc7d181cddbe34c9`. The existing S0 pipeline is preserved.
 - Close-time resource reporter ran read-only. No resources were mutated. Private raw diagnostics are stored outside the tracked source.
+
+## Explicit continuation — 2026-10-28
+
+The user resumed the active full #2414 objective: “Continue working toward the active thread goal.” This starts a new authorized iteration after the recorded review stop. The objective and acceptance scope are unchanged. The same independent supervisor context is retained; the next delta is precisely its per-role line-height correction and regression test. No prior failure is removed or reclassified.
+
+- Resumed source gate: eight structured tests pass, including both-scheme line-height >= text-size checks. The same independent source supervisor returned PASS for the exact correction and signed off on this slice. The earlier failed iteration remains recorded. Next: actual SD formats and integration.

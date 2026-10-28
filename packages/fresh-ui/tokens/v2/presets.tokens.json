@@ -1037,7 +1037,7 @@
         },
         "leading-caption": {
           "$type": "dimension",
-          "$value": "{context.light.text-2xl}"
+          "$value": "{context.light.text-lg}"
         },
         "text-caption": {
           "$type": "dimension",
@@ -1053,7 +1053,7 @@
         },
         "leading-display": {
           "$type": "dimension",
-          "$value": "{context.light.text-2xl}"
+          "$value": "{context.light.space-10}"
         },
         "text-display": {
           "$type": "dimension",
@@ -1093,7 +1093,7 @@
         },
         "leading-kpi": {
           "$type": "dimension",
-          "$value": "{context.light.text-2xl}"
+          "$value": "{context.light.space-9}"
         },
         "text-kpi": {
           "$type": "dimension",
@@ -1109,7 +1109,7 @@
         },
         "leading-label": {
           "$type": "dimension",
-          "$value": "{context.light.text-2xl}"
+          "$value": "{context.light.space-5}"
         },
         "text-label": {
           "$type": "dimension",
@@ -1125,7 +1125,7 @@
         },
         "leading-small": {
           "$type": "dimension",
-          "$value": "{context.light.text-2xl}"
+          "$value": "{context.light.space-5}"
         },
         "text-small": {
           "$type": "dimension",
@@ -1157,7 +1157,7 @@
         },
         "leading-title": {
           "$type": "dimension",
-          "$value": "{context.light.text-2xl}"
+          "$value": "{context.light.space-8}"
         },
         "text-title": {
           "$type": "dimension",
@@ -3079,7 +3079,7 @@
         },
         "leading-caption": {
           "$type": "dimension",
-          "$value": "{context.dark.text-2xl}"
+          "$value": "{context.dark.text-lg}"
         },
         "text-caption": {
           "$type": "dimension",
@@ -3095,7 +3095,7 @@
         },
         "leading-display": {
           "$type": "dimension",
-          "$value": "{context.dark.text-2xl}"
+          "$value": "{context.dark.space-10}"
         },
         "text-display": {
           "$type": "dimension",
@@ -3135,7 +3135,7 @@
         },
         "leading-kpi": {
           "$type": "dimension",
-          "$value": "{context.dark.text-2xl}"
+          "$value": "{context.dark.space-9}"
         },
         "text-kpi": {
           "$type": "dimension",
@@ -3151,7 +3151,7 @@
         },
         "leading-label": {
           "$type": "dimension",
-          "$value": "{context.dark.text-2xl}"
+          "$value": "{context.dark.space-5}"
         },
         "text-label": {
           "$type": "dimension",
@@ -3167,7 +3167,7 @@
         },
         "leading-small": {
           "$type": "dimension",
-          "$value": "{context.dark.text-2xl}"
+          "$value": "{context.dark.space-5}"
         },
         "text-small": {
           "$type": "dimension",
@@ -3199,7 +3199,7 @@
         },
         "leading-title": {
           "$type": "dimension",
-          "$value": "{context.dark.text-2xl}"
+          "$value": "{context.dark.space-8}"
         },
         "text-title": {
           "$type": "dimension",

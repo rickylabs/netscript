@@ -15,6 +15,43 @@ import { TOKEN_PRESETS } from '../../src/tokens/domain/token-presets.ts';
 import { type FigmaCollection, tokenEntries } from '../../src/tokens/domain/token-contract.ts';
 import legacy from '../../tokens/legacy.json' with { type: 'json' };
 
+Deno.test('NS One line heights fit their paired text sizes in both schemes', () => {
+  const sources = defaultTokenSources();
+  for (const scheme of ['light', 'dark']) {
+    const tokens = new Map(
+      tokenEntries(resolveTokenSources(sources, { theme: 'ns-one', scheme }))
+        .map(({ path, token }) => [path, token]),
+    );
+    const size = (path: string): number => {
+      const token = tokens.get(path)!;
+      if (typeof token.$value === 'string') return size(token.$value.slice(1, -1));
+      const value = token.$value;
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        throw new Error(`Not a dimension: ${path}`);
+      }
+      return Number(value.value) * (value.unit === 'rem' ? 16 : 1);
+    };
+    for (
+      const role of [
+        'caption',
+        'small',
+        'label',
+        'body',
+        'strong',
+        'heading',
+        'kpi-sm',
+        'title',
+        'kpi',
+        'display',
+      ]
+    ) {
+      const line = size(`semantic.leading-${role}`);
+      const text = size(`semantic.text-${role}`);
+      assertEquals(line >= text, true, `${scheme}/${role}: ${line}px line height < ${text}px text`);
+    }
+  }
+});
+
 Deno.test('Figma aliases select the target collection mode and reject cycles', () => {
   const collections: FigmaCollection[] = [
     {

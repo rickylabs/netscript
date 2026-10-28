@@ -388,8 +388,21 @@ function applyLegacyGaps(
         title: '2xl',
       };
       target = `text-${sizes[name.slice(5)] ?? 'base'}`;
-    } else if (name.startsWith('leading-')) target = 'text-2xl';
-    else if (name.startsWith('tracking-')) target = 'tracking-normal';
+    } else if (name.startsWith('leading-')) {
+      const lines: Readonly<Record<string, string>> = {
+        caption: 'text-lg',
+        small: 'space-5',
+        label: 'space-5',
+        body: 'text-2xl',
+        strong: 'text-2xl',
+        heading: 'text-2xl',
+        'kpi-sm': 'text-2xl',
+        title: 'space-8',
+        kpi: 'space-9',
+        display: 'space-10',
+      };
+      target = lines[name.slice('leading-'.length)] ?? 'text-2xl';
+    } else if (name.startsWith('tracking-')) target = 'tracking-normal';
     if (target) {
       values[name] = tokenAlias(`context.${scheme}.${target}`, roles[name].type);
       continue;
