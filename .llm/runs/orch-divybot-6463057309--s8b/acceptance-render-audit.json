@@ -1,0 +1,85 @@
+{
+  "status": "PASS",
+  "pages": [
+    {
+      "url": "/design-system/",
+      "htmlBytes": 110199,
+      "markdownBytes": 21261
+    },
+    {
+      "url": "/design-system/guidelines/",
+      "htmlBytes": 112575,
+      "markdownBytes": 30456
+    },
+    {
+      "url": "/design-system/token-contract/",
+      "htmlBytes": 91484,
+      "markdownBytes": 13594
+    },
+    {
+      "url": "/design-system/create-your-own-theme/",
+      "htmlBytes": 88231,
+      "markdownBytes": 13755
+    },
+    {
+      "url": "/design-system/themes/studio/",
+      "htmlBytes": 157303,
+      "markdownBytes": 49886
+    },
+    {
+      "url": "/design-system/themes/tonal/",
+      "htmlBytes": 127787,
+      "markdownBytes": 30382
+    },
+    {
+      "url": "/design-system/themes/bloom/",
+      "htmlBytes": 133620,
+      "markdownBytes": 34534
+    },
+    {
+      "url": "/design-system/themes/cupertino/",
+      "htmlBytes": 135348,
+      "markdownBytes": 34874
+    },
+    {
+      "url": "/design-system/themes/liquid/",
+      "htmlBytes": 139866,
+      "markdownBytes": 38081
+    },
+    {
+      "url": "/design-system/themes/fluent/",
+      "htmlBytes": 146030,
+      "markdownBytes": 42438
+    },
+    {
+      "url": "/design-system/themes/brutal/",
+      "htmlBytes": 132671,
+      "markdownBytes": 32357
+    },
+    {
+      "url": "/design-system/themes/filigrane/",
+      "htmlBytes": 127279,
+      "markdownBytes": 30015
+    },
+    {
+      "url": "/design-system/themes/terminal/",
+      "htmlBytes": 122999,
+      "markdownBytes": 28672
+    },
+    {
+      "url": "/design-system/themes/pixel/",
+      "htmlBytes": 134321,
+      "markdownBytes": 32387
+    },
+    {
+      "url": "/design-system/themes/tactile/",
+      "htmlBytes": 147739,
+      "markdownBytes": 44471
+    }
+  ],
+  "themes": 11,
+  "studioFlavors": 7,
+  "sourceEditChangesPage": true,
+  "canonicalFilesUnmodified": true,
+  "markdownTwins": 15
+}

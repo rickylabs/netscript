@@ -1,0 +1,17 @@
+{
+  "requestedModel": "claude-opus-5-5",
+  "observedModels": [
+    "claude-opus-5-5"
+  ],
+  "requestedEffort": "high",
+  "vendorFamily": "Anthropic",
+  "separateFromImplementer": true,
+  "readOnly": true,
+  "stdin": "closed",
+  "verdict": "PASS",
+  "isError": false,
+  "permissionDenials": 0,
+  "reviewedHead": "2c3199e74d471863056ac886429d24065b1ab70a",
+  "reviewedScope": "Working implementation diff from resume baseline 660da01f, plus committed bootstrap notes.",
+  "rawTranscript": "Private TMPDIR output; session identity intentionally excluded."
+}

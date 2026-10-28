@@ -1,0 +1,20 @@
+{
+  "mode": "APPLIED",
+  "pr": 2437,
+  "head": "01566c31aca546cc711197d3ee66464aab73ed84",
+  "labelsChanged": false,
+  "source": "repository mirrorIssue; live evidence mapping validated",
+  "changed": true,
+  "snapshot": {
+    "number": 2436,
+    "updatedAt": "2026-10-28T08:07:53Z",
+    "bodySha256": "f23216ce2f855f7a0c6b08e72e1cda6a82eb078a1a053c5fd6fa4b3fd3f34f45"
+  },
+  "evidence": [
+    "\"Every theme and flavor has a generated page, and changing a `DESIGN.md` changes its page without manual edits.\" — https://github.com/rickylabs/netscript/blob/01566c31aca546cc711197d3ee66464aab73ed84/.llm/runs/orch-divybot-6463057309--s8b/acceptance-render-audit.json — 15 generated routes, seven Studio flavors, and changed DESIGN input changes the page; canonical files remain unchanged.",
+    "\"The gallery shows all themes in both schemes.\" — https://github.com/rickylabs/netscript/blob/01566c31aca546cc711197d3ee66464aab73ed84/.llm/runs/orch-divybot-6463057309--s8b/gallery-provenance.json and https://github.com/rickylabs/netscript/blob/01566c31aca546cc711197d3ee66464aab73ed84/.llm/runs/orch-divybot-6463057309--s8b/browser-results.json — 34 unchanged assets; all 17 presets render in both schemes; six screenshots and image-dimension checks pass.",
+    "\"The guidelines, create-your-theme and token-contract pages exist.\" — https://github.com/rickylabs/netscript/blob/01566c31aca546cc711197d3ee66464aab73ed84/.llm/runs/orch-divybot-6463057309--s8b/acceptance-render-audit.json — built guidelines, create-your-own-theme, token-contract and Markdown twins verified; Pages CI https://github.com/rickylabs/netscript/actions/runs/40653398780/job/122698782774 passed.",
+    "\"The old Fresh UI design pages redirect or link into the section, and the link check passes.\" — https://github.com/rickylabs/netscript/blob/01566c31aca546cc711197d3ee66464aab73ed84/docs/site/reference/fresh-ui/index.md and https://github.com/rickylabs/netscript/blob/01566c31aca546cc711197d3ee66464aab73ed84/.llm/runs/orch-divybot-6463057309--s8b/validation.md — existing reference links into the section; all 42,230 internal links across 251 pages resolve.",
+    "\"Generated pages are tested: a fixture `DESIGN.md` renders its sections.\" — https://github.com/rickylabs/netscript/blob/01566c31aca546cc711197d3ee66464aab73ed84/.llm/runs/orch-divybot-6463057309--s8b/tests.json and https://github.com/rickylabs/netscript/blob/01566c31aca546cc711197d3ee66464aab73ed84/.llm/runs/orch-divybot-6463057309--s8b/root-test-bridge.json — seven renderer/corpus tests pass, including deliberate missing-section/value-table failures; root CI entry point also passes."
+  ]
+}

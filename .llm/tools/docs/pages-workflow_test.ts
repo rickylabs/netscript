@@ -102,6 +102,13 @@ Deno.test('Pages structurally revalidates docs for package and plugin changes be
   const workflow = parsePagesWorkflow(await Deno.readTextFile('.github/workflows/pages.yml'));
   const requiredPaths = [
     'docs/site/**',
+    'docs/design-system/**',
+    'tools/docs-site/**',
+    'tools/fresh-ui-browser/docs.playwright.config.ts',
+    'tools/fresh-ui-browser/docs.deno.json',
+    'tools/fresh-ui-browser/docs-tests/**',
+    'tools/fresh-ui-browser/package.json',
+    'tools/fresh-ui-browser/package-lock.json',
     'packages/**',
     "'!packages/**/tests/**'",
     "'!packages/cli/e2e/**'",

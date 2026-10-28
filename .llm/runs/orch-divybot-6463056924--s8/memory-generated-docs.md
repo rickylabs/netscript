@@ -1,0 +1,5 @@
+# Rendered docs and embedded consumer prose
+
+Shared Vento/component changes alter Markdown twins, which feed the embedded CLI/MCP documentation. Run the existing native `deno task gen:agent-docs-prose` then `deno task gen:publish-assets`; never hand-edit compressed rows. Normal freshness commands are check:agent-docs-prose, check:mcp-export-corpus, check:assets-barrel and check:publish-assets. The assets-barrel gate includes git diff --exit-code on generated files, so run its final verdict after committing reviewed generated changes.
+
+Use readAgentDocsPages from .llm/tools/docs/agent-docs-page-carrier.ts to decode without executing stored source, compare removed/changed entries and preserve non-site context entries. buildMcpEmbeddedDocs reports sourceBytes against MCP_EMBEDDED_DOCS_MAX_BYTES; the whole generated TypeScript file size is not that budget. The S8 native refresh changes190entry content with no entry removal, preserves the two context MDX sources and stays within the existing MCP budget.

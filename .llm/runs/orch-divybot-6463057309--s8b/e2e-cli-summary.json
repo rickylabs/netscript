@@ -1,0 +1,88 @@
+{
+  "command": [
+    "deno",
+    "task",
+    "e2e:cli"
+  ],
+  "exitCode": 1,
+  "status": "UNPROVEN",
+  "reason": "Aspire cannot discover SDK through mise shim; direct SDK works but Docker daemon is unavailable. Runtime did not start.",
+  "gates": [
+    {
+      "id": "preflight.deno",
+      "verdict": "passed",
+      "commands": [
+        {
+          "argv": [
+            "deno",
+            "--version"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "id": "preflight.aspire",
+      "verdict": "failed",
+      "commands": [
+        {
+          "argv": [
+            "deno",
+            "run",
+            "--allow-env",
+            "--allow-read",
+            "--allow-write",
+            "--allow-run=git,deno",
+            ".llm/tools/gates/run-gate.ts",
+            "--gate",
+            "cli-e2e-aspire-doctor",
+            "--id",
+            "scaffold.runtime:preflight.aspire",
+            "--output",
+            ".llm/tmp/gate-receipts/scaffold.runtime/preflight.aspire.receipt.json",
+            "--cwd",
+            ".",
+            "--child-report",
+            ".llm/tmp/gate-receipts/scaffold.runtime/preflight.aspire.json",
+            "--",
+            ".llm/tmp/gate-receipts/scaffold.runtime/preflight.aspire.json"
+          ],
+          "exitCode": 1
+        }
+      ]
+    },
+    {
+      "id": "cleanup.aspire-stop",
+      "verdict": "failed",
+      "commands": [
+        {
+          "argv": [
+            "deno",
+            "run",
+            "--allow-env",
+            "--allow-read",
+            "--allow-write",
+            "--allow-run=git,deno",
+            ".llm/tools/gates/run-gate.ts",
+            "--gate",
+            "cli-e2e-aspire-cleanup",
+            "--id",
+            "scaffold.runtime:cleanup.aspire-stop",
+            "--output",
+            ".llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.receipt.json",
+            "--cwd",
+            ".",
+            "--child-report",
+            ".llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json",
+            "--",
+            ".llm/tmp/cli-e2e/plugin-smoke-20261028-084123/aspire/apphost.mts",
+            ".llm/tmp/cli-e2e/plugin-smoke-20261028-084123",
+            "true",
+            ".llm/tmp/gate-receipts/scaffold.runtime/cleanup.aspire-stop.json"
+          ],
+          "exitCode": 1
+        }
+      ]
+    }
+  ]
+}
