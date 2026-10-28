@@ -24,3 +24,5 @@ Concurrent continuation reservation: `packages/mcp/**`, `docs/site/reference/mcp
 The required lock-metadata surface also includes `packages/fresh-ui/deno.lock`, `resources/examples/expo-streams/deno.lock`, and `packages/cli/e2e/fixtures/desktop-native/deno.lock`. Repo-native frozen-reference/private-workspace guards require these exact metadata-only updates.
 
 CLI-host MCP composition reservation: `packages/cli/src/public/features/agent/mcp/run-agent-mcp.ts` and `create-cli-ui-registry-catalog{,_test}.ts`, plus registry README/run evidence. The composition reuses the already-landed config/client/transport; no installer or command-root changes.
+
+Style/preset integration additionally updates the public CLI README, docs command reference, contributor registry README, exact local/public command census and their generated prose carrier. The final theme-seed alias uses existing NS One canonical docs; legacy copy lists remain filtered.

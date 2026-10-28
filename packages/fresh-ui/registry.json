@@ -1617,6 +1617,16 @@
           "path": "packages/fresh-ui/registry/theme/theme-preset.json",
           "type": "registry:theme",
           "target": "@assets/theme-preset.json"
+        },
+        {
+          "path": "docs/design-system/themes/studio/DESIGN.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-ns-one/DESIGN.md"
+        },
+        {
+          "path": "docs/design-system/themes/studio/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/fresh-ui-theme-ns-one/SKILL.md"
         }
       ],
       "meta": {

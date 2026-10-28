@@ -67,3 +67,31 @@ CLI-hosted MCP (`netscript agent mcp --project-root <app>`) reads that app's `co
 Its registry search combines the built-in catalog and configured namespaces, qualifies names as
 `@namespace/item`, and views items through the same client and environment-header transport as
 the CLI. Discovery writes no config, locks, installed files, or diagnostic receipts.
+
+## Application installation and presets
+
+`components.json` stores local aliases, a style item id, icon library and named registry URL/header
+templates. `fresh-ui.lock.json` stores source provenance, SHA-256 baselines and copied text.
+`ui:add @acme/x --diff` compares that installed baseline to local and current registry bytes without
+writing. Updates skip edited copies; removal checks required items and shared ownership.
+
+Use `ui:add <style-item>` or an encoded preset's `style` field to select a different component source
+map. Source items must retain explicit file targets and the same public component contract. Edited
+copies stop regeneration with filenames and diffs, even with `--force`. Later additions and updates
+continue to use the configured style. Real alternative component sources can be added without
+changing app pages or the installer.
+
+`ui:init --preset <code>` initializes and applies a preset in one staged operation.
+`ui:apply --preset <code>` calls the existing token compiler and installs matching theme skills;
+a theme-only preset preserves component code. `--only theme` also preserves fonts, while
+`--only font` preserves theme outputs/settings. Token source and semantic override paths survive;
+the chosen theme persists in `tokens.config.json`. `theme-seed` installs the NS One skill docs.
+
+The preset payload is `{version:1,theme?,style?,font?,iconLibrary?}`. `ui:preset url` encodes choices,
+and `ui:preset decode` accepts that code, its share URL, or a plain token preset id. A `registry:font`
+item supplies portable font metadata and optional files/package dependencies.
+
+To extend installation behavior, start at
+`packages/cli/src/kernel/application/ui/v2/install-registry.ts`; style resolution and token preset
+staging are its neighboring flows. Schema/build/theme-doc tests live in `packages/fresh-ui/tests/`,
+and the native command fixtures live in `packages/cli/src/public/features/ui/`.

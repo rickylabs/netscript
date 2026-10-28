@@ -323,17 +323,64 @@ the source and output extension contract.
 
 ## `ui:*` — Fresh UI registry
 
-`ui:init` and `ui:add` are in the [CLI reference](/cli-reference/#fresh-ui). The full set also
-lists, updates, and removes copied registry items:
+Fresh UI installs app-owned files from its built-in JSON registry, configured namespaces, or a
+static item URL. App commands accept `--project-root <path>` or `--app <name>`.
 
-| Command                      | Description                                                                                                    |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `netscript ui:list`          | List Fresh UI registry items. Flags: `--project-root <path>`, `--json`, `--collections` (include collections). |
-| `netscript ui:update [name]` | Update unmodified Fresh UI registry files. Flag: `--project-root <path>`.                                      |
-| `netscript ui:remove <name>` | Remove a copied Fresh UI registry item. Flag: `--project-root <path>`.                                         |
+| Command | Behavior |
+| --- | --- |
+| `ui:init [--preset <code>]` | Install the foundation; optionally apply a token preset id, encoded preset, or shared preset URL in the same operation. |
+| `ui:add <name\|@ns/name\|url>` | Resolve and copy an item and its dependencies. `--diff` reports local and registry differences without writes; `--json` emits structured results. |
+| `ui:apply --preset <code> [--only theme,font]` | Apply token, font, style, and icon choices. `--only theme` preserves fonts and component code; `--only font` preserves theme outputs and the selected token preset. |
+| `ui:list [--registry @ns]` | List metadata and installed state; `--collections` includes built-in collections and `--json` emits JSON. |
+| `ui:update [name]` | Update copies that still match their installed baseline. Without a name, update exactly the items in the lockfile. |
+| `ui:remove <name>` | Remove an item's unchanged copies and reconcile file, stylesheet, and package ownership. Required or edited items are refused. |
+| `ui:view <name>` | Show registry metadata and exact source bytes. |
+| `ui:search [query] [--registry @ns]` | Search item names, descriptions, and categories. |
+| `ui:docs <name>` | Show an item's installation documentation and declared Markdown files. |
+| `ui:info` | Show aliases, selected style, namespace names, and installed hashes/edit state. |
+| `ui:registry add <@ns> <url>` | Register an item URL template or source catalog. Optional `--index <url>` supplies discovery; repeat `--header 'Name=${ENV_NAME}'` for environment-backed authentication. |
+| `ui:registry validate <source>` | Validate a local JSON file, URL, namespace catalog, or namespaced item against the registry schema. |
+| `ui:preset decode <code>` | Decode a preset id, encoded preset, or shared URL. |
+| `ui:preset url [--theme <id>] [--style <item>] [--font <item>] [--icon-library <id>]` | Produce a portable preset link without network access. |
+| `ui:build --registry <file> --output <directory>` | Build a static catalog and embedded item JSON. `--source-root <directory>` selects the contained file source root. |
 
-Because Fresh UI is copy-source, `ui:update` only touches registry files you have not modified —
-your edits are never overwritten. See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
+`components.json` owns aliases, style, icon library, and registry URL/header templates. For example:
+
+```json
+{
+  "version": 1,
+  "style": "style-utility",
+  "iconLibrary": "lucide",
+  "aliases": { "ui": "components/ui", "lib": "lib" },
+  "registries": {
+    "@acme": {
+      "url": "https://example.com/r/{name}.json",
+      "headers": { "Authorization": "Bearer ${ACME_REGISTRY_TOKEN}" }
+    }
+  }
+}
+```
+
+Credentials resolve only when sending a request. The config retains the environment placeholders;
+command results and `fresh-ui.lock.json` omit resolved header values. The lock stores source
+identity, hashes, and installed file bytes for comparisons. `ui:add --diff` never updates that
+history. Ordinary updates skip edited copies; explicit `ui:add --force` replaces them.
+
+A style item declares `meta.components`, mapping logical component ids to source items with the
+same explicit file targets and component contract. Selecting a different style through `ui:add`
+or a preset regenerates the installed copies. An edited copy stops the entire operation and lists
+its filename and diff, including when `--force` is present. Page imports and props stay unchanged.
+
+A preset containing only a theme changes generated assets through the existing `tokens build`
+compiler and preserves component code. It keeps configured token source/semantic override paths
+and persists the selected theme in `tokens.config.json`, so a later build retains it. Theme items
+also install their canonical `DESIGN.md` and `SKILL.md` under
+`.agents/skills/fresh-ui-theme-<preset-id>/`. Preset initialization validates the whole plan before
+writing any files.
+
+For a package-root override, `ui:init` / `ui:add --registry-root <path>` retain the original local
+manifest copy flow. JSON registry config, lock history, and `--diff` use the default path.
+See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 
 ## `deploy` — cloud and container targets
 

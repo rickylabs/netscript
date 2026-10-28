@@ -8,7 +8,7 @@ import {
 import type { UiConfig } from '../../../domain/ui/ui-config.ts';
 import { UI_CONFIG_FILE, UI_LOCK_FILE } from '../../../domain/ui/ui-config.ts';
 import { readUiConfig, readUiLock, writeUiMetadata } from './config-lock.ts';
-import { planUiCopies, type UiCopyFile } from './copy-files.ts';
+import { planUiCopies, type UiCopyFile, uiTargetPath } from './copy-files.ts';
 import { applyRegistryEffects, registryCssFiles } from './registry-effects.ts';
 import {
   createUiRegistryClient,
@@ -16,6 +16,7 @@ import {
   type UiRegistryDependencies,
   type UiResolvedItem,
 } from './registry-client.ts';
+import { resolveUiStyleSources } from './style-sources.ts';
 import { planUiWrites, type UiWritePlan } from './ui-write-plan.ts';
 
 /** Comparison of installed baseline, current local bytes and the currently resolved registry. */
@@ -75,10 +76,36 @@ export async function prepareUiRegistryInstall(
   for (const name of [UI_CONFIG_FILE, UI_LOCK_FILE]) {
     await deps.paths?.assertContained(root, resolve(root, name));
   }
-  const config = input.config ?? await readUiConfig(root, deps.fs);
+  let config = input.config ?? await readUiConfig(root, deps.fs);
   const previous = await readUiLock(root, deps.fs);
-  const entries = input.entries ??
-    await (await createUiRegistryClient(config, deps)).resolve(input.names, input.theme);
+  const styled = input.entries ? undefined : await resolveUiStyleSources({
+    client: await createUiRegistryClient(config, deps),
+    config,
+    previous,
+    names: input.names,
+    theme: input.theme,
+  });
+  config = styled?.config ?? config;
+  const entries = input.entries ?? styled!.entries;
+  const strict = input.strict || styled?.changed;
+  if (styled?.changed && !previous) {
+    const client = await createUiRegistryClient(config, deps);
+    const untracked: string[] = [];
+    for (const item of (await client.catalog()).items) {
+      if (!['registry:component', 'registry:ui', 'registry:block'].includes(item.type)) continue;
+      for (const file of item.files ?? []) {
+        const target = uiTargetPath(root, file, config);
+        if (await deps.fs.exists(resolve(root, target))) untracked.push(target);
+      }
+    }
+    if (untracked.length) {
+      throw new Error(
+        `Style regeneration requires an installed lock baseline for these copies:\n${
+          untracked.join('\n')
+        }`,
+      );
+    }
+  }
   const copies = planUiCopies(root, entries, config);
   const css = await registryCssFiles(root, entries, copies, config);
   const files = [...copies, ...css.files];
@@ -134,7 +161,7 @@ export async function prepareUiRegistryInstall(
           registryDiff: uiFileDiff(current, file.content, file.target, ['local', 'registry']),
         });
       }
-      if (edited && (!input.force || input.strict)) {
+      if (edited && (!input.force || strict)) {
         drifted.add(file.target);
         if (baseline) records.push(baseline);
         continue;
@@ -185,7 +212,7 @@ export async function prepareUiRegistryInstall(
       cssImports: [...(css.imports.get(entry.ref) ?? [])],
     };
   }
-  if (input.strict && drifted.size) throw new UiRegistryConflictError([...drifted], diffs);
+  if (strict && drifted.size) throw new UiRegistryConflictError([...drifted], diffs);
   if (!input.diff) {
     await applyRegistryEffects({
       root,

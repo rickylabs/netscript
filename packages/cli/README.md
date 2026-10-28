@@ -100,7 +100,7 @@ $ netscript init my-app --db postgres --service --yes --dry-run
 | `service`     | `add`, `add-handler`, `ref`, `set`, `list`, `remove`, `generate` — service workspaces and their orchestration registration.        |
 | `db`          | `add`, `init`, `migrate`, `generate`, `seed`, `status`, `studio`, `introspect`, `reset`, `deploy` — Prisma lifecycle.              |
 | `plugin`      | `new`, `scaffold`, `install`, `remove`, `sync`, `update`, `doctor`, `list`, `info`, `ai`, `auth` — first- and third-party plugins. |
-| `ui:*`        | `ui:init`, `ui:add`, `ui:list`, `ui:update`, `ui:remove` — the Fresh UI registry (pages, islands, collections).                    |
+| `ui:*`        | `ui:init`, `ui:add`, `ui:apply`, discovery, registry/preset management and `ui:build` — app-owned Fresh UI copies and tokens.                    |
 | `tokens`      | `init`, `build`, `clean` — app-owned DTCG sources and generated Fresh UI assets, selected with `--app` or `--project-root`. |
 | `generate`    | `aspire`, `plugins`, `runtime-schemas` — regenerate derived artifacts on demand.                                                   |
 | `config`      | `inspect`, `get`, `set`, `override`, `runtime` — resolved configuration and runtime overrides.                                     |

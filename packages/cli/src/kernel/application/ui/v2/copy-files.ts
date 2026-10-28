@@ -56,7 +56,8 @@ export function uiTargetPath(root: string, file: RegistryFile, config: UiConfig)
 /** Isolate source-relative imports from other registries with coincidentally identical paths. */
 function sourceScope(entry: UiResolvedItem): string {
   if (entry.source.startsWith('builtin:')) return 'builtin';
-  if (entry.ref.startsWith('@')) return entry.ref.slice(0, entry.ref.indexOf('/'));
+  const ref = entry.sourceRef ?? entry.ref;
+  if (ref.startsWith('@')) return ref.slice(0, ref.indexOf('/'));
   return new URL('.', entry.source).href;
 }
 

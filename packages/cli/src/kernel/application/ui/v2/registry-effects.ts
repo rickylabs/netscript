@@ -53,6 +53,7 @@ function itemCss(entry: UiResolvedItem): string {
       `@import url("https://fonts.googleapis.com/css2?family=${family}${weights}&display=swap");`,
     );
     blocks.push(`:root { ${font.variable}: ${JSON.stringify(font.family)}; }`);
+    blocks.push(`${font.selector ?? 'html'} { font-family: var(${font.variable}); }`);
   }
   return blocks.join('\n');
 }

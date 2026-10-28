@@ -14,6 +14,8 @@ import type { TokenEnginePort } from '../../../ports/token-engine-port.ts';
 /** Source bytes attached to an item before any install plan is allowed to write files. */
 export interface UiResolvedItem {
   readonly ref: string;
+  /** Actual registry identity when a style replaces a logical component item. */
+  readonly sourceRef?: string;
   readonly source: string;
   readonly item: RegistryItem;
   readonly files: readonly (RegistryFile & { readonly content: string })[];
@@ -45,7 +47,7 @@ export interface UiRegistryClient {
 /** Resolve a bare dependency in the registry that declared it, without forwarding cross-origin auth. */
 export function uiDependencyReference(owner: UiResolvedItem, dependency: string): string {
   if (/^(https?:|github:|@)/.test(dependency)) return dependency;
-  const namespace = owner.ref.match(namespaceRef)?.[1];
+  const namespace = (owner.sourceRef ?? owner.ref).match(namespaceRef)?.[1];
   return namespace
     ? `${namespace}/${dependency}`
     : owner.source.startsWith('builtin:')

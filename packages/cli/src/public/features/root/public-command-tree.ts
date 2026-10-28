@@ -1,3 +1,4 @@
+import { createUiApplyCommand } from '../ui/apply/apply-ui-command.ts';
 import { createUiInspectCommand } from '../ui/protocol/inspect/inspect-ui-command.ts';
 import { createUiRegistryCommand } from '../ui/protocol/registry/ui-registry-command.ts';
 import { createUiPresetCommand } from '../ui/protocol/preset/ui-preset-command.ts';
@@ -110,6 +111,14 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
     id: 'ui:add',
     create: ({ dependencies }) =>
       createUiAddCommand({
+        installDependencies: dependencies.uiInstallDependencies,
+        resolveUiAppRoot: dependencies.resolveUiAppRoot,
+      }),
+  });
+  registry.register('ui:apply', {
+    id: 'ui:apply',
+    create: ({ dependencies }) =>
+      createUiApplyCommand({
         installDependencies: dependencies.uiInstallDependencies,
         resolveUiAppRoot: dependencies.resolveUiAppRoot,
       }),

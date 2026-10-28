@@ -10,3 +10,7 @@
 - User-directed continuation starts a new review cycle at cdbbe24. The prior stop is historical; full S2 scope remains active. Latest steering also requires inspecting the failed CI build and pushing a repair.
 
 2026-10-28: A concurrent continuation pushed static-build slice 2 while this worker reviewed slice 1. Retained its complete commit and rebased the unpublished design-sync repair without force push. Reserved the independent MCP slice in a PR comment to avoid overlapping active config/lock/CLI work. MCP uses the shipped registry and static publisher through explicit Fresh UI subpath dependencies at the existing version. The only planned lock delta is the corresponding workspace dependency metadata.
+
+2026-10-28 style/preset slice: the required same-session Claude Opus review returned a weekly provider limit, with no substantive verdict. There is no independent PASS for slice 5 or the final whole change, no substitute evaluator and no READY claim. The code/evidence may be checkpointed on the draft as provisional work; that is not a signed-off terminal slice.
+
+Required one-pass scaffold.runtime was executed with --cleanup and exited 1: preflight.deno passed, preflight.aspire failed, cleanup.aspire-stop failed. Docker daemon access is unavailable. Full runtime behavior and cleanup remain unproven; a read-only resource report left foreign/unproven entries untouched. This environment limitation is allowed by the owner's explicit Docker exception but must remain visible in any later READY report.

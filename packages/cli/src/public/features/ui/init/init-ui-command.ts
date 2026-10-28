@@ -1,3 +1,4 @@
+import { applyUiPreset } from '../../../../kernel/application/ui/v2/apply-preset.ts';
 import { installUiRegistry } from '../../../../kernel/application/ui/v2/install-registry.ts';
 import type { UiRegistryDependencies } from '../../../../kernel/application/ui/v2/registry-client.ts';
 import { reportUiRegistry } from '../add/add-ui-output.ts';
@@ -31,12 +32,25 @@ export function createUiInitCommand(
     .option('--app <name:string>', 'Fresh app workspace name')
     .option('--registry-root <path:string>', 'Fresh UI package root override')
     .option('--theme <name:string>', 'Theme registry item (defaults to the official theme)')
+    .option('--preset <code:string>', 'Preset code, share URL, or token preset id')
     .option('--force', 'Overwrite existing copied UI files', { default: false })
     .action(async (options: UiInitCommandInput): Promise<void> => {
       const projectRoot = await requireUiAppRoot(
         dependencies.resolveUiAppRoot,
         { projectRoot: options.projectRoot, app: options.app },
       );
+      if (options.preset) {
+        if (options.registryRoot || options.theme) {
+          throw new Error('--preset cannot be combined with --registry-root or --theme');
+        }
+        const result = await applyUiPreset({
+          root: projectRoot,
+          preset: options.preset,
+          initializeNames: DEFAULT_UI_INIT_ITEMS,
+        }, dependencies.installDependencies);
+        print(`Initialized Fresh UI preset; component style: ${result.style}.`);
+        return;
+      }
       if (options.registryRoot) {
         const result = await installUiRegistryItems({
           projectRoot,

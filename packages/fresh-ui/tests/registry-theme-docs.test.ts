@@ -9,6 +9,12 @@ Deno.test('every authored preset theme carries its canonical design and skill do
     item.type === 'registry:theme' && item.meta?.preset !== undefined
   );
   assertEquals(themes.length, TOKEN_PRESETS.length);
+  const seed = freshUiRegistryJson.items.find((item) => item.name === 'theme-seed')!;
+  const primary = themes.find((item) => item.name === 'theme-ns-one')!;
+  assertEquals(
+    seed.files?.filter((file) => file.target?.startsWith('.agents/skills/')),
+    primary.files?.filter((file) => file.target?.startsWith('.agents/skills/')),
+  );
   for (const preset of TOKEN_PRESETS) {
     const theme = themes.find((item) => item.name === `theme-${preset.id}`);
     assert(theme, preset.id);
@@ -35,8 +41,8 @@ Deno.test('static theme items contain exact documentation bytes without a runtim
       return Promise.resolve(content);
     },
   });
-  for (const preset of TOKEN_PRESETS) {
-    const payload = artifacts[`theme-${preset.id}.json`];
+  for (const name of [...TOKEN_PRESETS.map((preset) => `theme-${preset.id}`), 'theme-seed']) {
+    const payload = artifacts[`${name}.json`];
     assert(payload);
     const item = JSON.parse(payload) as {
       files: Array<{ path: string; target: string; content: string }>;
