@@ -1,0 +1,91 @@
+{
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "exportDate": "2026-10-28",
+  "collections": [
+    {
+      "collection": "Primitives",
+      "file": "primitives.json",
+      "modes": [
+        "Value"
+      ],
+      "variableCount": 413
+    },
+    {
+      "collection": "Theme",
+      "file": "theme.json",
+      "modes": [
+        "Studio",
+        "Ledger",
+        "Filigrane",
+        "Signal",
+        "Tonal",
+        "Glass",
+        "Brutal",
+        "Fluent",
+        "Tactile",
+        "Pixel"
+      ],
+      "variableCount": 146
+    },
+    {
+      "collection": "Base accent",
+      "file": "base-accent.json",
+      "modes": [
+        "Ink",
+        "Blue",
+        "Violet",
+        "Orange",
+        "Indigo",
+        "Tomato",
+        "Lime"
+      ],
+      "variableCount": 32
+    },
+    {
+      "collection": "Scheme",
+      "file": "scheme.json",
+      "modes": [
+        "Light",
+        "Dark"
+      ],
+      "variableCount": 399
+    },
+    {
+      "collection": "Density",
+      "file": "density.json",
+      "modes": [
+        "Comfortable",
+        "Compact",
+        "Dense",
+        "Airy",
+        "Chunky"
+      ],
+      "variableCount": 15
+    },
+    {
+      "collection": "Base gray",
+      "file": "base-gray.json",
+      "modes": [
+        "Neutral",
+        "Slate",
+        "Sand",
+        "Mauve"
+      ],
+      "variableCount": 26
+    },
+    {
+      "collection": "Studio flavor",
+      "file": "studio-flavor.json",
+      "modes": [
+        "Utility",
+        "Cloud",
+        "Workshop",
+        "Playful",
+        "Ledger",
+        "Atelier",
+        "Signal"
+      ],
+      "variableCount": 198
+    }
+  ]
+}

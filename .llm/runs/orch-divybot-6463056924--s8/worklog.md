@@ -42,3 +42,19 @@ PLAN-EVAL round 1: FAIL_PLAN (diagram strategy and durable token-source/CI trigg
 No implementation checks, axe results, keyboard proof, Pagefind proof, link-check verdict or screenshot artifact exist for this PR. The full CLI E2E gate has not been run because implementation did not pass the prerequisite plan gate.
 
 Reconcile: current head contains only this scoped run record; unrelated files, assignment and lock files remain uncommitted. Draft PR stays open for coordinator review; no labels, readiness, merge, tag or release actions taken.
+
+## Owner-directed continuation
+
+After both plan failures were surfaced, the owner directed: “If more work remains, keep going and mark ready when done.” This resumes the work on the concrete B3 amendment. Preserve both historical FAIL_PLAN verdicts and get independent confirmation of the corrected plan before implementation. Keep the PR in draft until the actual revamp and gates are complete.
+
+Coordinator disposition: “approves amendment B3 with two conditions: the source img uses the hidden attribute and loading=lazy, and IMPL-EVAL verifies the twin and accessible-name assertions. The plan gate is closed by this approval. Proceed through slices 1-5 now from head 74d15bd, push every step to PR 2439, and stop at READY. Everything is approved, never wait.”
+
+## Slice 1 — tokens and fonts
+
+- Generated `styles/tokens.css` from the durable Figma snapshot using target-context alias resolution; Scheme colour roles take precedence over similarly named geometry properties. Cycle/missing-alias/missing-mode paths fail closed.
+- Self-hosted Latin WOFF2 Host Grotesk variable and Fragment Mono normal/italic, with OFL files. Root context is Studio/Utility/Neutral/Ink/Compact and data-scheme; saved scheme parsing catches unavailable storage.
+- Gates passed: generator freshness; two resolver tests through structured test wrapper; structured check (includes unstable-kv by default), lint and TS format wrappers; existing docs build (236 HTML pages) and git diff check. Lint explicitly uses docs/site config because the root config excludes tooling; no rule suppressions.
+- Environment fix: browser shared libraries unpacked into untracked project run evidence; no system mutation or cache deletion.
+- Independent slice review pending before sign-off commit.
+
+Slice 1 independent review: PASS. Reconcile: no foreign edits or lock changes. PR #2439 stays draft; same branch and protected ownership. Next slice removes legacy token references and scheme selectors as the reviewer noted.

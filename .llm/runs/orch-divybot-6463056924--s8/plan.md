@@ -1,4 +1,4 @@
-# Plan & Design — STOPPED AT PLAN-GATE
+# Plan & Design — APPROVED
 
 One feature-tier leaf. Application/docs surface with SCOPE-docs and SCOPE-frontend; no package/plugin changes, no JSR audit required. Follow supplied leaf profile only.
 
@@ -9,7 +9,7 @@ One feature-tier leaf. Application/docs surface with SCOPE-docs and SCOPE-fronte
 - Root context uses `data-theme=studio`, `data-flavor=utility`, `data-gray=neutral`, `data-accent=ink`, `data-density=compact`, `data-scheme=light|dark`. Migrate saved old scheme selection safely.
 - Desktop topbar with six lanes; active-lane sidebar only; home without sidebar; article prose max 544px / wide blocks 720px, TOC rail; reference sticky section navigation. On small screens navigation becomes a modal drawer, TOC a sticky disclosure.
 - Preserve every current component call signature. Add optional filename/eyebrow/ownership fields and signature components. API object rows become two-column name+type/description; generic tables remain generic. Native lists replace noninteractive tree ARIA.
-- Monochrome links, syntax, markers and selection; red only logo and explicit errors. Mermaid-generated diagram assets remain byte-identical to their renderer. A `_config.ts` filter inlines their SVG into the figure and maps generated palette declarations to semantic two-ink roles at build time. The figure retains a hidden `<img src alt>` for the existing Markdown-twin extractor, alongside an inline SVG with a unique ID and accessible name derived from the supplied alt text. This lets diagrams inherit the page scheme without altering generated assets or `_diagrams/**`. The policy exempts only renderer-owned `assets/diagrams/*.svg` inputs; it checks every inline published SVG and all maintained UI CSS/templates/scripts. No broad style or colour exemptions.
+- Monochrome links, syntax, markers and selection; red only logo and explicit errors. Mermaid-generated diagram assets remain byte-identical to their renderer. A `_config.ts` filter inlines their SVG into the figure and maps generated palette declarations to semantic two-ink roles at build time. The figure retains an `<img src alt hidden loading="lazy">` for the existing Markdown-twin extractor, alongside an inline SVG with a unique ID and accessible name derived from the supplied alt text. This lets diagrams inherit the page scheme without altering generated assets or `_diagrams/**`. The policy exempts only renderer-owned `assets/diagrams/*.svg` inputs; it checks every inline published SVG and all maintained UI CSS/templates/scripts. No broad style or colour exemptions.
 - Search is a native modal dialog fed by lazy Pagefind JS; safe DOM text construction, lane filters, grouped results and subheadings, cancellation/stale response protection, keyboard navigation, focus restoration, honest loading/empty/error states and a static Pagefind fallback.
 
 ## Slices and gates
@@ -33,7 +33,7 @@ Each slice updates worklog/context and is committed/pushed with its gate evidenc
 
 ## Open decisions
 
-PLAN-EVAL B1/B2 resolved by the evaluated revision. B3 amendment is now concrete: retain the twin-readable hidden source image, name inline SVG accessibly, assign unique IDs, and assert both the built Markdown twin and browser accessible name. This amendment has NOT received a PASS. Two FAIL_PLAN verdicts ended the evaluator loop; coordinator disposition is required before implementation. S1 integration safe to defer until final upstream check. Reference content remains unchanged; select representative route and fixture from existing public component contracts.
+PLAN-EVAL B1/B2 resolved by the evaluated revision. B3 amendment is now concrete: retain the twin-readable hidden source image, name inline SVG accessibly, assign unique IDs, and assert both the built Markdown twin and browser accessible name. The owner-resumed review returned PASS; coordinator explicitly approved B3 with hidden/lazy source image and IMPL-EVAL verification of twin/accessibility assertions. S1 integration safe to defer until final upstream check. Reference content remains unchanged; select representative route and fixture from existing public component contracts.
 
 ## Deferred scope
 
@@ -45,4 +45,6 @@ S8b theme/gallery content, framework components/tokens v2 implementation, logo r
 
 ## Gate disposition
 
-STOPPED: round 1 FAIL_PLAN, round 2 FAIL_PLAN. The B3 plan amendment above is proposed and unapproved by evaluation. No implementation has started; do not infer that the amendment passes the plan gate. No third evaluator round was launched.
+Historical round 1 and round 2 FAIL_PLAN verdicts were escalated. Owner directed resumption; same independent evaluator returned PASS. Coordinator then explicitly approved B3: source image uses hidden and loading=lazy, and IMPL-EVAL verifies twin and accessible-name assertions. Plan gate is closed; implement slices 1–5 from head 74d15bd.
+
+The owner has now directed continuation after the escalation. Review the amended plan in the resumed run; prior failed verdicts remain historical evidence.

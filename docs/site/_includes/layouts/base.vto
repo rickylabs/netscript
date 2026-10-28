@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="studio" data-flavor="utility" data-gray="neutral" data-accent="ink" data-density="compact" data-scheme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,21 +9,17 @@
       content="NetScript — Deno-native polyglot backend framework documentation (Diátaxis)."
     />
     <link rel="icon" href="{{ '/favicon.svg' |> url }}" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href="{{ '/styles/fonts.css' |> url }}" />
     <link rel="stylesheet" href="{{ '/styles/docs.css' |> url }}" />
     {{# Prevent flash: apply saved theme before first paint (mirrors playground _app.tsx) #}}
     <script>
       (function () {
-        var t = localStorage.getItem("ns-theme");
-        if (!t) {
+        var t;
+        try { t = localStorage.getItem("ns-theme"); } catch (_) {}
+        if (t !== "light" && t !== "dark") {
           t = matchMedia("(prefers-color-scheme:light)").matches ? "light" : "dark";
         }
-        document.documentElement.setAttribute("data-theme", t);
+        document.documentElement.setAttribute("data-scheme", t);
       })();
     </script>
   </head>
@@ -196,12 +192,12 @@
         var btn = document.querySelector("[data-theme-toggle]");
         if (!btn) return;
         btn.addEventListener("click", function () {
-          var cur = document.documentElement.getAttribute("data-theme") === "light"
+          var cur = document.documentElement.getAttribute("data-scheme") === "light"
             ? "light"
             : "dark";
           var next = cur === "dark" ? "light" : "dark";
-          document.documentElement.setAttribute("data-theme", next);
-          localStorage.setItem("ns-theme", next);
+          document.documentElement.setAttribute("data-scheme", next);
+          try { localStorage.setItem("ns-theme", next); } catch (_) {}
         });
       })();
     </script>
