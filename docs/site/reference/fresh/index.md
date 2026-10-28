@@ -5,40 +5,36 @@ title: '@netscript/fresh'
 
 # `@netscript/fresh`
 
-Fresh runtime extensions, builders, forms, defer primitives, and route contracts for NetScript. This
-page is written against the public surface reported by `deno doc`. For the full index
-of packages and plugins return to the [reference overview](/reference/).
+Fresh runtime extensions for NetScript apps: the app factory, page and partial builders, typed route
+contracts, managed forms, defer primitives, durable-stream and AI clients, and island query hooks.
+The root entrypoint holds only the page-loader cache helpers; import every other capability from its
+sub-path.
 
-## Exports
+## Sub-path exports
 
-The root entrypoint (`@netscript/fresh`) exposes only the cross-cutting page-loader cache helpers.
-Every other capability lives on an explicit sub-path export. The sub-paths and their reference
-sections are:
-
-| Export                         | Path                                      | Purpose                                                          |
-| ------------------------------ | ----------------------------------------- | ---------------------------------------------------------------- |
-| `@netscript/fresh`             | `./mod.ts`                                | Page-loader cache helpers (documented below).                    |
-| `@netscript/fresh/server`      | `./src/runtime/server/mod.ts`             | Fresh app factory and streaming SSR.                             |
-| `@netscript/fresh/desktop`     | `./src/runtime/desktop/mod.ts`            | Desktop-gated oRPC window binding and lifecycle contracts.       |
-| `@netscript/fresh/builders`    | `./src/application/builders/mod.ts`       | Fluent page and partial builders.                                |
-| `@netscript/fresh/route`       | `./src/application/route/mod.ts`          | Typed route contracts and navigation.                            |
-| `@netscript/fresh/navigation`  | `./src/runtime/navigation/mod.ts`         | Last-intent partial-navigation coordinator and keyed boundaries. |
-| `@netscript/fresh/defer`       | `./src/application/defer/mod.ts`          | Deferred rendering primitives.                                   |
-| `@netscript/fresh/defer/island` | `./src/application/defer/island.ts`      | Client deferred-refresh coordinator and policy contracts.        |
-| `@netscript/fresh/form`        | `./src/application/form/mod.ts`           | Managed forms and validation.                                    |
-| `@netscript/fresh/error`       | `./src/diagnostics/error/mod.ts`          | Error normalization and display.                                 |
-| `@netscript/fresh/streams`     | `./src/runtime/streams/mod.ts`            | Durable streams client SDK.                                      |
-| `@netscript/fresh/ai`          | `./src/runtime/ai/mod.ts`                 | Durable-chat connections, projections, responses, and proxies.   |
-| `@netscript/fresh/ai/sandbox`  | `./src/runtime/ai/sandbox.ts`             | Fresh-compatible MCP sandbox and widget-call route handlers.     |
-| `@netscript/fresh/query`       | `./src/application/query/mod.ts`          | Island TanStack Query hooks.                                     |
-| `@netscript/fresh/interactive` | `./src/runtime/interactive/mod.ts`        | Suspense promise helpers.                                        |
-| `@netscript/fresh/vite`        | `./src/application/vite/vite.ts`          | NetScript Fresh Vite plugin.                                     |
-| `@netscript/fresh/testing`     | `./src/testing/mod.ts`                    | Test fixtures.                                                   |
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/fresh` | `./mod.ts` | [Page-loader cache helpers](#root-entrypoint). |
+| `@netscript/fresh/server` | `./src/runtime/server/mod.ts` | [Fresh app factory and streaming SSR](#netscriptfreshserver). |
+| `@netscript/fresh/desktop` | `./src/runtime/desktop/mod.ts` | Desktop-gated oRPC window binding and lifecycle contracts. |
+| `@netscript/fresh/builders` | `./src/application/builders/mod.ts` | [Fluent page and partial builders](#netscriptfreshbuilders). |
+| `@netscript/fresh/route` | `./src/application/route/mod.ts` | [Typed route contracts and navigation](#netscriptfreshroute). |
+| `@netscript/fresh/navigation` | `./src/runtime/navigation/mod.ts` | [Last-intent partial-navigation coordinator and keyed boundaries](#netscriptfreshnavigation). |
+| `@netscript/fresh/defer` | `./src/application/defer/mod.ts` | [Deferred rendering primitives](#netscriptfreshdefer). |
+| `@netscript/fresh/defer/island` | `./src/application/defer/island.ts` | Client deferred-refresh coordinator and policy contracts. |
+| `@netscript/fresh/form` | `./src/application/form/mod.ts` | [Managed forms and validation](#netscriptfreshform). |
+| `@netscript/fresh/error` | `./src/diagnostics/error/mod.ts` | [Error normalization and display](#netscriptfresherror). |
+| `@netscript/fresh/streams` | `./src/runtime/streams/mod.ts` | [Durable streams client SDK](#netscriptfreshstreams). |
+| `@netscript/fresh/ai` | `./src/runtime/ai/mod.ts` | Durable-chat connections, projections, responses, and proxies. |
+| `@netscript/fresh/ai/sandbox` | `./src/runtime/ai/sandbox.ts` | Fresh-compatible MCP sandbox and widget-call route handlers. |
+| `@netscript/fresh/query` | `./src/application/query/mod.ts` | [Island TanStack Query hooks](#netscriptfreshquery). |
+| `@netscript/fresh/interactive` | `./src/runtime/interactive/mod.ts` | [Suspense promise helpers](#netscriptfreshinteractive). |
+| `@netscript/fresh/vite` | `./src/application/vite/vite.ts` | [NetScript Fresh Vite plugin](#netscriptfreshvite). |
+| `@netscript/fresh/testing` | `./src/testing/mod.ts` | [Test fixtures](#netscriptfreshtesting). |
 
 ## Root entrypoint
 
-Cross-cutting page-loader cache helpers. Every other capability lives on an explicit sub-path export
-listed below.
+Cross-cutting page-loader cache helpers.
 
 ### Functions and components
 
@@ -90,7 +86,7 @@ Server-only utilities: the NetScript-managed Fresh app factory and Preact stream
 
 ## `@netscript/fresh/builders`
 
-Fluent, typed page and partial builder surface (definePage, definePartial).
+Fluent, typed page and partial builder surface (`definePage`, `definePartial`).
 
 ### Functions and components
 
@@ -271,10 +267,10 @@ helpers.
 ## `@netscript/fresh/navigation`
 
 Client-side partial-navigation ordering. The coordinator makes the latest navigation intent win:
-newer page generations invalidate older page *and* region application, region requests inherit their
-rendered page generation, and a stale `replaceState` is suppressed inside the coordinator rather than
-by the application. Superseded responses are **drained to EOF, never aborted** — physically aborting
-a stale partial surfaces as an unhandled `AbortSignal` overlay under Vite dev.
+newer page generations invalidate older page and region application, region requests inherit their
+rendered page generation, and the coordinator, not the application, suppresses a stale
+`replaceState`. Superseded responses are drained to EOF, never aborted: aborting a stale partial
+surfaces as an unhandled `AbortSignal` overlay under Vite dev.
 
 `KeyedPartial` keys the native Fresh `<Partial>` boundary by name so a remount is identity-safe.
 Applications do not patch `fetch`, `history`, or server HTML markers.
@@ -633,7 +629,3 @@ Testing fixtures: mock route contexts and defer policies for consumer tests.
 | `MockDeferPolicyProfile` | type alias | Mock defer policy profile names accepted by defer test fixtures. |
 | `MockRouteContext` | interface | Mock route context returned by `createMockRouteContext()`. |
 | `MockRouteContextOptions` | interface | Options used to construct a route context fixture. |
-
----
-
-Back to the [reference overview](/reference/).
