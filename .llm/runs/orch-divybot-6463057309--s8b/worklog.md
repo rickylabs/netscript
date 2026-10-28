@@ -55,3 +55,11 @@ The delivery session applies the independently reviewed sign-off as the implemen
 ## Delivery close
 
 Implementation committed and pushed at fafe315a15b50e403623a402615ff635f473224f to the assigned branch; PR #2437 body updated with completed scope, review evidence and explicit runtime limitation. Final broader quality scanner runs on that committed source for immutable-head evidence. All six screenshots are committed. The run's exact screenshot HTTP server was stopped after matching argv and worktree; all foreign/unknown resources remain untouched. Failed full-suite preflight/cleanup receipts retained. No lock files, caches, labels, shared site files or CI files changed; no merge/tag/release action performed.
+
+## Current close-gate repair
+
+The owner requested repair after CI close-gate failed on head 3f8d9b2d51b1bbcf44756dd8e6bb3c220e34c9bd. The authoritative `agentic:pr-checks` classified it current-fail. The completed job log and live checker name exactly five unchecked Acceptance boxes on issue #2436; no implementation assertion failed. CI's automatic mirror skipped because the PR lacks status:ready-merge. The assignment forbids adding/changing labels, so the repair uses the repository's exported `mirrorIssue` function directly against the live issue with a complete, validated evidence map, dry-run before apply. This checks only proven acceptance and preserves the issue's other text; no gate/label override.
+
+Supplemental acceptance audit: all 15 built HTML pages and Markdown twins exist; changing the canonical DESIGN input in memory changes both description and body in the same renderer, with canonical files unchanged. `acceptance-render-audit.json` records the result. MCP budget audit overlaid all 15 twins and the new llms.txt into a temporary copy of the published page carrier and ran the repository's actual buildMcpEmbeddedDocs: 284,489 source bytes against 294,912 allowed (baseline 282,886); no published generated asset changed. `markdown-budget-audit.json` records the exact budget.
+
+The Pages CI build on this PR has also passed (job 122698782774 in run 40653398780). Current close-gate repair is evidence metadata only; product source remains the independently reviewed implementation fafe315a1. Runtime E2E stays UNPROVEN; issue Acceptance has no runtime-success box and no runtime status is being changed.
