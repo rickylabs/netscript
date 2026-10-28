@@ -1,0 +1,231 @@
+{
+  "schema": "netscript-operational-copy-correction-audit-v1",
+  "preparedAtUtc": "2026-10-28T04:15:54.818437+00:00",
+  "worktree": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008",
+  "head": "f0be97fe46c0fe9fc90d98add63a3130faf2b77b",
+  "bundle": ".llm/runs/fix-native-db-graph-entry--qualification/independent-impl-20261028",
+  "scope": "operational snapshots only",
+  "policy": ".llm/harness/workflow/lane-policy.md#paid-route-expense-and-credentials",
+  "originalTrackedFiles": 33,
+  "originalJsonAndJsonlFilesAudited": 21,
+  "removedCurrentTreeSnapshots": [
+    "allowance-launch.json",
+    "allowance-after.json",
+    "expense-launch.json"
+  ],
+  "privateOriginalsVerified": 3,
+  "retainedOriginalFilesByteIdentical": 30,
+  "historicalRootCopyAuditSha256": "40dbe351fc2fde7a6568333cdec5a73be3a9c6a48ca6f42dcdf26b01460720f9",
+  "additionalOperationalSnapshotsFound": [],
+  "credentialPatternMatches": 0,
+  "originalJsonAndJsonlAudit": [
+    {
+      "path": "allowance-after.json",
+      "sha256": "13cb2796853460c8883a4727c719a305627718f0d805f5950fdb4a10e4521a24",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": true,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "privateIgnoredOriginal",
+      "currentTreeExists": false
+    },
+    {
+      "path": "allowance-launch.json",
+      "sha256": "bab6bad3989b2417bb6b894b86544996a8b70996822218dd495e84af81cb1b4a",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": true,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "privateIgnoredOriginal",
+      "currentTreeExists": false
+    },
+    {
+      "path": "coverage.json",
+      "sha256": "d50b4e7d9af51b2ad7c422e5f53e180b3cf1001b457471587d4cbdd406dcbf3d",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "effective-config.json",
+      "sha256": "51e3932acf5d2969e94a3c979771850e3dadb248c1e3c1fc03a3cd49c33f78d1",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "expense-launch.json",
+      "sha256": "e6d31f68548e8568ade520016db6ac2a47bf0c08700dae14b122e035a4e8863c",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": true,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "privateIgnoredOriginal",
+      "currentTreeExists": false
+    },
+    {
+      "path": "final-guards.json",
+      "sha256": "1484b9a0a2bb79c1caf05614ba9c030c94a4266c68bc46e8def6663e0c9b5970",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "mcp.jsonl",
+      "sha256": "0da8160e9bf93927a040cd977030656d8ea503e75b3ba14b07ce629a09ea2aae",
+      "documentsParsed": 9,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "model-catalog.json",
+      "sha256": "f8059d640573ddd2eb94fb2af5d6de68e97c4e444ee630ca5804e15ae1a14c96",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "model-launch-endpoints.json",
+      "sha256": "b2413cce8dbb9242283be06dd91a34b502b476ef47d5dd5a70a9ed4084f268a1",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "native.stdout.jsonl",
+      "sha256": "e7ca9a801a5b8bfa9b07177df0306fd8f370970f1b2f90e6cbb82225bc66251a",
+      "documentsParsed": 32,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "observed-identity.json",
+      "sha256": "99456167f423b0e31df2ecea8936ecddae99a780b7459cfc296758f822f98f76",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "packet-manifest.json",
+      "sha256": "2c7f7811effc5905784d7f6b60b3b88f2fd8a17d90e877df3c4e7fff8a7027a5",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "preparation-corrected.json",
+      "sha256": "ba74cbfbd31a6b6da26ff0c049acd2f652c47b36c99583f3776d7aa65b78f698",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "prepared-handoff-corrected.json",
+      "sha256": "9280efaba01c2750f703b253f6e8a8afda93b4bb732332852abf7181e1527ca7",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "price-launch.json",
+      "sha256": "6d3834984e348adde7ae0b4462afaf910cf6c2e23000729891721404dba84d94",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "raw-whitespace-first-attempt.json",
+      "sha256": "6f5b3efc5a15e42a2235c951cc72c967e4989f467d74aa60b8e2d786a587053b",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "result.json",
+      "sha256": "047503a6d92f21cdacb33aba5646b723085bf46dbaf2d3583b3433eb109b836d",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "root-copy-audit.json",
+      "sha256": "40dbe351fc2fde7a6568333cdec5a73be3a9c6a48ca6f42dcdf26b01460720f9",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "root-launch-authorization.json",
+      "sha256": "7c6474d0115398e060a51179bfc78d5470b4fafdd3fac1f5d941ed8d1e86173f",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "route.json",
+      "sha256": "07f4d8e6f8ca51be279b524df639b46a26864620edc46ebd61f83d409cd33d5c",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    },
+    {
+      "path": "source-snapshot.json",
+      "sha256": "8a4fe1226026aeec6361e601f7a03c8dd4531191a63d0d9b89aa8172ae462255",
+      "documentsParsed": 1,
+      "rawAccountKeyOrWindowSnapshot": false,
+      "embeddedSnapshotPayloadDetected": false,
+      "credentialPatternMatches": 0,
+      "disposition": "retainByteForByte"
+    }
+  ],
+  "currentJsonAndJsonlFilesParsed": 20,
+  "currentRawSnapshotPayloads": 0,
+  "newReceiptHashes": {
+    "operational-admission.sanitized.json": "9dce65af360b261f4f049f78265b19bc5a42e4ce0319897f54397cbf43c8fe91",
+    "operational-private-resolution.json": "516bac4b8cb3f870d15b57f3e03fb057cb47be361e122615d84801f3d49ec8e9",
+    "operational-correction.md": "7468704eb1bfc3ad15977c3929098cf33e2027130939cf9ebd2c187fd762539a"
+  },
+  "productChanges": 0,
+  "inferenceLaunches": 0,
+  "runtimeLaunches": 0,
+  "historyRewritten": false,
+  "committed": false,
+  "pushed": false,
+  "rootOperationalCorrectionReviewedAccepted": true,
+  "sourceAndVerdictUnchanged": true,
+  "auditPhase": "precommit preparation"
+}

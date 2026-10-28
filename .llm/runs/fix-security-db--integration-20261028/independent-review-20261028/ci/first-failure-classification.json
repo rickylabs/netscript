@@ -1,0 +1,122 @@
+{
+  "at": "2026-10-28T04:54:01.846Z",
+  "sourceHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "workflowRun": 40633645853,
+  "job": 122636200954,
+  "artifactId": 12792399068,
+  "artifactName": "ci-check-test-shard-test-5-gate-receipts-40633645853-1",
+  "summary": {
+    "passed": 1439,
+    "failed": 17,
+    "ignored": 3,
+    "totalResults": 1459,
+    "uniqueFailures": 1
+  },
+  "exitCode": 1,
+  "failures": [
+    {
+      "message": "Error: Public auth fixture command failed: Error: error reading a body from connection\n\n    at run (file://<cwd>/packages/cli/tests/installed-auth-fixture.ts:<line>:<column>)\n    at async installAuth (file://<cwd>/packages/cli/tests/installed-auth-fixture.ts:<line>:<column>)\n    at async writeInstalledAuthFixture (file://<cwd>/packages/cli/tests/installed-auth-fixture.ts:<line>:<column>)\n    at async file://<cwd>/packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts:<line>:<column>",
+      "count": 17,
+      "tests": [
+        {
+          "name": "auth scaffold is request-scoped, idempotent, and preserves authored policy and routes",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 55
+        },
+        {
+          "name": "helper regeneration leaves scaffold policies and authored inputs unchanged",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 198
+        },
+        {
+          "name": "browser auth rewrites a custom entrypoint and rejects drift in the scaffold opt-out",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 267
+        },
+        {
+          "name": "browser auth reconciles scaffold whitespace variant 0",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 302
+        },
+        {
+          "name": "browser auth reconciles scaffold whitespace variant 1",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 302
+        },
+        {
+          "name": "browser auth reconciles scaffold whitespace variant 2",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 302
+        },
+        {
+          "name": "browser auth reconciles scaffold whitespace variant 3",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 302
+        },
+        {
+          "name": "browser auth reconciles scaffold whitespace variant 4",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 302
+        },
+        {
+          "name": "browser auth preserves the scaffold public opt-out when auth is disabled",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 322
+        },
+        {
+          "name": "browser auth emits a server SDK session route and snapshots it while preserving authored routes",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 346
+        },
+        {
+          "name": "authored browser topology preserves absent app files",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 373
+        },
+        {
+          "name": "authored browser topology preserves present app files",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 373
+        },
+        {
+          "name": "mixed browser topology scaffolds only the opted-in app and preserves shared helpers",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 418
+        },
+        {
+          "name": "authored app topology still wires an independently scaffold-owned service policy",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 442
+        },
+        {
+          "name": "default browser helpers remain scaffold-owned for non-browser app types",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 466
+        },
+        {
+          "name": "authored browser topology with non-browser apps creates no shared helpers",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 488
+        },
+        {
+          "name": "browser ownership ignores unrelated invalid app fields",
+          "file": "./packages/cli/src/kernel/adapters/plugin/browser-auth-reconciler_test.ts",
+          "line": 522
+        }
+      ]
+    }
+  ],
+  "receiptHead": "189c903b25e38f4aa99780be012cb258dd0f6198",
+  "receiptActualHead": "189c903b25e38f4aa99780be012cb258dd0f6198",
+  "receiptOutcome": "FAIL",
+  "reportSha256": "f9fcbded3f866e7852a2edaf94bff6002315cd507a2ce10e60c30b95760884e3",
+  "receiptSha256": "ca8607953fa7a86e20348a255220d204b3479057e2644131b88ee192c50ab998",
+  "classification": "All17 failures in existing browser-auth-reconciler_test.ts during shared public auth fixture run/installAuth/writeInstalledAuthFixture, error reading a body from connection. No DB owning or archived diagnostic failure appears in this report. The precise transport endpoint or root cause is not established by this normalized report.",
+  "noRetry": true,
+  "noSourceChanges": true,
+  "noInference": true,
+  "noReservation": true,
+  "oldSealedPreparationPreserved": true,
+  "oldCiInProgressSnapshotIsPriorState": true,
+  "launchStoppedPendingRootClassificationReview": true
+}

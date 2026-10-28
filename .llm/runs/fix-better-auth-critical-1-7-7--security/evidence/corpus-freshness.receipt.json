@@ -1,0 +1,36 @@
+{
+  "gateId": "corpus-freshness",
+  "invocationId": "corpus-freshness",
+  "attempt": 1,
+  "argv": [
+    "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "task",
+    "check:mcp-export-corpus"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 120000,
+  "runnerIdentity": "/root/service_qualification_sol",
+  "schemaVersion": 1,
+  "requestHash": "df91711a5295a4f00e05e0962fec827d4cf7985770a7a9dbd34257bb782977c9",
+  "lifecycleId": "/root/service_qualification_sol:corpus-freshness:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T03:24:53.454Z",
+  "startedAt": "2026-10-28T03:24:53.460Z",
+  "finishedAt": "2026-10-28T03:25:04.925Z",
+  "durationMs": 11465,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 232,
+    "sha256": "65f5a84d6d3bac716836a75d2c4620ffa9026506cf9194a3dda617dc2f2612b4",
+    "tail": "{\"schemaVersion\":1,\"frameworkVersion\":\"0.0.8\",\"sha256\":\"ceae68590c24c9678791eeecdaf3b051837083c8a03d3e4895bec1d6e3cfcc74\",\"uncompressedBytes\":2570481,\"compressedBytes\":389030,\"packageCount\":35,\"subpathCount\":299,\"symbolCount\":8898}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 148,
+    "sha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650",
+    "tail": "Task check:mcp-export-corpus deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check\n",
+    "truncated": false
+  }
+}

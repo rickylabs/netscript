@@ -1,0 +1,35 @@
+{
+  "args": [
+    "info",
+    "--json",
+    "--lock=deno.lock",
+    "--frozen-lockfile",
+    "file:///C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/better-auth-security-sol-20261028/selected-auth-graph.ts"
+  ],
+  "exitCode": 0,
+  "selectedSources": [
+    "packages/auth-better-auth/mod.ts",
+    "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+    "plugins/auth/tests/services/unsupported-revocation-http_test.ts"
+  ],
+  "roots": [
+    "file:///C:/Users/ericc/source/repos/netscript-better-auth-security-008/.llm/tmp/better-auth-security-sol-20261028/selected-auth-graph.ts"
+  ],
+  "moduleCount": 587,
+  "errors": [],
+  "family": [
+    "@better-auth/core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+    "@better-auth/drizzle-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+    "@better-auth/kysely-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_kysely@0.29.7_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_nanostores@1.5.5",
+    "@better-auth/memory-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+    "@better-auth/mongo-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+    "@better-auth/prisma-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@prisma+client@7.10.0_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+    "@better-auth/telemetry@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+    "better-auth@1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1"
+  ],
+  "observedReleaseVersions": [
+    "1.7.14"
+  ],
+  "ordinaryAgeAndAdmission": true,
+  "noOverridesReloadOrAgeBypass": true
+}

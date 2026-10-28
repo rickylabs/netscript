@@ -1,0 +1,9 @@
+import { runProcess } from '../../tools/gates/process-runner.ts';
+const dir='.llm/tmp/security-db-integration-20261028';const name=Deno.args[0];if(!/^[a-z][a-z-]+$/.test(name??''))throw new Error('Explicit gate required');
+const request=JSON.parse(await Deno.readTextFile(`${dir}/${name}.request.json`));
+const h=await new Deno.Command('git',{args:['rev-parse','HEAD'],stdout:'piped',stderr:'piped'}).output();if(!h.success)throw new Error('Head attestation failed');const head=new TextDecoder().decode(h.stdout).trim();
+const result=await runProcess([Deno.execPath(),...request.args],{cwd:Deno.cwd(),timeoutMs:request.timeoutMs,tailBytes:1024*1024});
+const receipt={...result,gateId:name,gitHead:head,args:request.args,timeoutMs:request.timeoutMs,runner:'/root/service_qualification_sol',capture:'Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative',childReport:request.childReport};
+await Deno.writeTextFile(`${dir}/${name}.receipt.json`,JSON.stringify(receipt,null,2)+'\n');
+for(const label of ['stdout','stderr']as const){if(!result[label].truncated)await Deno.writeTextFile(`${dir}/${name}.native-${label}.log`,result[label].tail);}
+console.log(JSON.stringify(receipt));Deno.exit(result.exitCode??1);

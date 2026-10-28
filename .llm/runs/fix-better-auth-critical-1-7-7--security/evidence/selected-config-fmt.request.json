@@ -1,0 +1,10 @@
+{
+    "timeoutMs":  120000,
+    "args":  [
+                 "fmt",
+                 "--check",
+                 "deno.json",
+                 "deno.lock",
+                 "packages/fresh-ui/deno.lock"
+             ]
+}

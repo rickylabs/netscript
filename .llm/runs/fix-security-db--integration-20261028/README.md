@@ -1,0 +1,9 @@
+# Atomic security + native DB qualification
+
+Source merge c243d31535027addc034c99e170cb43d2faf475a, parents77a3bfb17fe068315e87f1562dffb8dde0377b80 and ec3cc9161474ef1e1298e7a91148d1ee781cc61d, native signed-off/no conflicts. [Root authority](root-integration-authority.md) selected this exact7-owner union against1582; all source blobs equal their accepted security/DB origins. Both leaf histories and independent reports remain intact.
+
+[Combined qualification](evidence/combined-qualification.json): owning DB6/0/0;2-file types/lint/format pass with real selections; native critical audit47lower/0critical; ONE Windows composite archPASS in22.409s, including both actual cold consumers at DB0.13.0_typescript7.0.2. Canonical runProcess captured full48,308-byte stdout and1,744-byte stderr under1MiB tail bounds; actual truncation flagsfalse. Inner resolver deliberately uses new caches/network. Owned scratch/processes0, root package.json absent. Original lint-exclusion qualification remains in DB leaf; ignored integration lint config copies exact root rules.
+
+[Seven-owner proof](evidence/seven-owner-proof.json), [combined diff](evidence/combined-seven-owner.diff), [DB delta](evidence/security-to-integration-db.diff), [raw-copy manifest](evidence/manifest.json). All diagnostic executables are.txt data. Raw bytes use-text only; no whitespace-ignore. Actual index and committed HEAD bytes must match before push.
+
+The five-owner independent sourcePASS targets aec36a68; accepted DB source/review targets its own leaf. SAME-security-session continuation on this combined candidate is required and not run. New-head required CI and root final integration acceptance remain unchecked. DB2425 stays open. No status:ready-merge, main merge, release, account action, inference or reservation. Parent Windows98/16, later CRLF and docs private-ref remain explicitly unwaived parent qualification, not invented new leaf gates.

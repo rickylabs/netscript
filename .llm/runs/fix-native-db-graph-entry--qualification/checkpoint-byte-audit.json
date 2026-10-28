@@ -1,0 +1,32 @@
+{
+  "phase": "index",
+  "auditedUtc": "2026-10-28T02:48:39.708Z",
+  "head": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "rawRecords": 61,
+  "allRawHashesMatch": true,
+  "credentialPatternFindings": 0,
+  "sourceChecks": [
+    {
+      "path": ".llm/tools/deps/check-db-alignment.ts",
+      "lines": 100,
+      "cap": 120,
+      "sha256": "babe9043e1296dac30e9923bbfee9d3c02f96f062c62c3ec1e90e0fdba5186b1",
+      "acceptedCheckoutBytesMatch": true,
+      "rawGitSha256": "babe9043e1296dac30e9923bbfee9d3c02f96f062c62c3ec1e90e0fdba5186b1"
+    },
+    {
+      "path": ".llm/tools/deps/check-db-alignment_test.ts",
+      "lines": 86,
+      "cap": 140,
+      "sha256": "634c289a7f7b60d8212a227294ed096ed70dc35559732de024d6332a2bbaf96b",
+      "acceptedCheckoutBytesMatch": true,
+      "rawGitSha256": "634c289a7f7b60d8212a227294ed096ed70dc35559732de024d6332a2bbaf96b"
+    }
+  ],
+  "rootAuthorityBytesMatch": true,
+  "sourceProvenanceWhitespaceExit": 0,
+  "immutableRawEvidenceExplicitlyExcludedFromWhitespace": true,
+  "manifestSha256": "deba35173fbba6f09745359fce28c797734c3a8f1be09b96d3af09687875c961",
+  "checkpointFiles": 70,
+  "noInference": true
+}

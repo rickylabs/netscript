@@ -1,0 +1,40 @@
+{
+  "baseline": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "project": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\baseline-project-2c7aa052ee22ff8a",
+  "files": [
+    "./plugins/auth/tests/services/auth-service_test.ts",
+    "./plugins/auth/tests/services/documented-cookie-jar_test.ts",
+    "./plugins/auth/tests/services/kv-oauth-subject_test.ts",
+    "./plugins/auth/tests/services/workos-composition_test.ts"
+  ],
+  "names": [
+    "a configured provider without a stable subject refuses sign-in",
+    "a partially configured provider honours explicit subject settings",
+    "auth handlers emit audit-safe telemetry attributes per operation",
+    "discord runtime preset ignores a stale issuer and resolves userinfo",
+    "documented localhost curl cookie-jar flow works through the real service bootstrap",
+    "facebook runtime preset ignores a stale issuer and resolves userinfo",
+    "github preset id gives repeat sign-ins the same subject through the plugin",
+    "github runtime preset ignores a stale issuer and resolves userinfo",
+    "in-memory kv-oauth test registry supplies its deterministic fixture key",
+    "kv-oauth backend registry requires a configured encryption key for real stores",
+    "kv-oauth handlers complete signin callback session me signout round-trip",
+    "shipped main drains its shutdown hook on SIGINT",
+    "shipped main drains its shutdown hook on SIGTERM",
+    "spotify runtime preset ignores a stale issuer and resolves userinfo",
+    "the local-defaults stub never issues a session-id subject",
+    "twitter runtime preset ignores a stale issuer and resolves userinfo"
+  ],
+  "originalSanitizersPreserved": true,
+  "liveOwnerEdited": false,
+  "selectedEnvironment": {
+    "PATH": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7;C:\\Users\\ericc\\.codex\\tmp\\arg0\\codex-arg0ABHY3j;C:\\Program Files\\OpenSSH\\;C:\\ProgramData\\Oracle\\Java\\javapath;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\windows\\System32\\OpenSSH\\;C:\\Program Files\\TortoiseGit\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\;C:\\Program Files (x86)\\Microsoft SQL Server\\150\\DTS\\Binn\\;C:\\Program Files\\Azure Data Studio\\bin;C:\\Program Files\\dotnet\\;C:\\Program Files\\Devart\\EntityDeveloper\\Console;C:\\Program Files\\Microsoft SQL Server\\130\\DTS\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\140\\DTS\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\150\\DTS\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\;C:\\Program Files\\nodejs\\;C:\\Program Files\\Microsoft SQL Server\\170\\DTS\\Binn\\;C:\\Program Files (x86)\\Microsoft SQL Server\\170\\Tools\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\180\\Tools\\Binn\\;C:\\Program Files\\Servy;C:\\Program Files\\GitHub CLI\\;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;C:\\Program Files\\WSL\\;C:\\Program Files\\Netbird;C:\\Users\\ericc\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\ericc\\.aspire\\bin;C:\\Users\\ericc\\.proto\\shims;C:\\Users\\ericc\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\ericc\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files\\Azure Data Studio\\bin;C:\\Users\\ericc\\.dotnet\\tools;C:\\Users\\ericc\\.sqlite;C:\\Program Files\\Devart\\EntityDeveloper\\Console;C:\\Users\\ericc\\.deno\\bin;C:\\Users\\ericc\\.proto\\bin;C:\\Users\\ericc\\AppData\\Roaming\\npm;C:\\Users\\ericc\\.dotnet\\tools;C:\\Users\\ericc\\.dotnet\\tools;C:\\Users\\ericc\\AppData\\Local\\Crane;C:\\Program Files\\JetBrains\\DataGrip 2026.1.3\\bin;C:\\Users\\ericc\\.local\\bin;C:\\Users\\ericc\\.lmstudio\\bin;C:\\Users\\ericc\\.dotnet\\tools;c:\\Users\\ericc\\.vscode\\extensions\\openai.chatgpt-26.1007.21434-win32-x64\\bin\\windows-x86_64",
+    "PATHEXT": ".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC",
+    "DENO_DIR": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache",
+    "DENO_TLS_CA_STORE": "mozilla,system",
+    "HTTP_PROXY": "http://127.0.0.1:3128",
+    "HTTPS_PROXY": "http://127.0.0.1:3128",
+    "NO_PROXY": "localhost,127.0.0.1,::1"
+  },
+  "baselineProjectionRemoved": true
+}

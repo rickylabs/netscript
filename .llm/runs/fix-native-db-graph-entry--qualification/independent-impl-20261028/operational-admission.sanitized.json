@@ -1,0 +1,26 @@
+{
+  "schema": "netscript-review-operational-admission-sanitized-v1",
+  "historicalOnly": true,
+  "authorizesNewDispatch": false,
+  "provider": "openrouter",
+  "plannedEstimateUsd": 0.7,
+  "estimateIsNotProviderEnforcedCap": true,
+  "recordedAdmission": {
+    "allowed": true,
+    "warning": false
+  },
+  "verifiedPredicates": {
+    "positivePlannedEstimate": true,
+    "estimateMatchesRetainedPublicQuote": true,
+    "accountAndSelectedKeyMinimumUsed": true,
+    "launchMinimumCoveredPlannedEstimate": true,
+    "postRunSnapshotRetainedPrivately": true
+  },
+  "rawOperationalValuesIncluded": false,
+  "historicalInputs": {
+    "allowance-launch.json": "bab6bad3989b2417bb6b894b86544996a8b70996822218dd495e84af81cb1b4a",
+    "allowance-after.json": "13cb2796853460c8883a4727c719a305627718f0d805f5950fdb4a10e4521a24",
+    "expense-launch.json": "e6d31f68548e8568ade520016db6ac2a47bf0c08700dae14b122e035a4e8863c"
+  },
+  "resolutionMap": "operational-private-resolution.json"
+}

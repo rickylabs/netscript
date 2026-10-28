@@ -1,0 +1,65 @@
+{
+  "policy": "Allowance/account/key/window/expense operational records stay ignored/private. Hashes only; no payload values. The actual credential file/value is neither copied nor hashed.",
+  "omitted": [
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/allowance-prepare.json",
+      "sha256": "82538961f643003bf3195f9e5912f43cfcbd6ce9b658ed6595eabc5e64212b9e",
+      "bytes": 248,
+      "disposition": "PRIVATE ignored operational record; not copied"
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/allowance-launch.json",
+      "sha256": "112323ed6555135b4678c3b5aef598ae9aa3c00f807f7105c1f2529da80d51b5",
+      "bytes": 248,
+      "disposition": "PRIVATE ignored operational record; not copied"
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/allowance-after.json",
+      "sha256": "f469d5e50ab3508929138100749dfcceb8a97859c45cd72673a7261c51af90d0",
+      "bytes": 261,
+      "disposition": "PRIVATE ignored operational record; not copied"
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/expense-prepare.json",
+      "sha256": "cba0ffb0cb5eeebcfde5c55f58a78eb2b9e9fe776fbde2b6f91ac92466fc4431",
+      "bytes": 302,
+      "disposition": "PRIVATE ignored operational record; not copied"
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/expense-launch.json",
+      "sha256": "e37b21e39072ff21256876fd3c79a497defa6b7944e4ba924152df3d7e6a6975",
+      "bytes": 302,
+      "disposition": "PRIVATE ignored operational record; not copied"
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/root-launch-authorization.json",
+      "sha256": "51e3f7109db18e98a97b7592a6b030c51c9b9155f0a2bc60617a5d03237df145",
+      "bytes": 859,
+      "disposition": "PRIVATE ignored operational record; not copied"
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/credential-provenance.json",
+      "sha256": "a9648e8aff6f8b880dcef92525a4011a8b778263445f1f8ed409f01097ede633",
+      "bytes": 833,
+      "disposition": "PRIVATE ignored operational record; not copied"
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/prepared-handoff.json",
+      "sha256": "7f4446477315c05aeeab78864a82d798b750b13e3f0a916769c8e92561fada30",
+      "bytes": 2224,
+      "disposition": "PRIVATE ignored operational record; not copied"
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/superseded-160k-scenario/allowance-prepare.json",
+      "sha256": "4e452f03e2bde84bbe15e519adff8cfde5f85435296f75a1a93be43aac305bdc",
+      "bytes": 248,
+      "disposition": "PRIVATE superseded ignored operational record; not copied"
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/superseded-160k-scenario/expense-prepare.json",
+      "sha256": "37aafed738ee1ffd0674c16998c686b07dc503414af015bde30a048b9702d6a2",
+      "bytes": 302,
+      "disposition": "PRIVATE superseded ignored operational record; not copied"
+    }
+  ]
+}

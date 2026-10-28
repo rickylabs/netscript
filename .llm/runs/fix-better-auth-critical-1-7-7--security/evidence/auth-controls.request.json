@@ -1,0 +1,5 @@
+{
+  "timeoutMs": 120000,
+  "childReport": ".llm/tmp/better-auth-security-sol-20261028/auth-controls.json",
+  "args": ["run", "--cached-only", "--frozen", "--allow-read", "--allow-write", "--allow-run", ".llm/tools/run-deno-test.ts", "--output", ".llm/tmp/better-auth-security-sol-20261028/auth-controls.json", "--", "--cached-only", "--frozen", "--check", "--allow-all", "--sanitize-ops", "--sanitize-resources", "--trace-leaks", "packages/auth-better-auth/tests/", "plugins/auth/tests/services/"]
+}

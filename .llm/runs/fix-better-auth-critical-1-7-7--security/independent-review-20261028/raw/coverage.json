@@ -1,0 +1,393 @@
+{
+  "sessionID": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+  "reads": [
+    {
+      "name": "01-source-config.md",
+      "expectedLines": 293,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "02-source-root-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "03-source-root-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "04-source-root-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "05-source-root-lock.md",
+      "expectedLines": 602,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "06-source-root-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "07-source-root-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "08-source-root-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "09-source-root-lock.md",
+      "expectedLines": 564,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "10-source-ui-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "11-source-ui-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "12-source-ui-lock.md",
+      "expectedLines": 605,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "13-source-ui-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "14-source-ui-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "15-source-ui-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "16-source-ui-lock.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "17-source-ui-lock.md",
+      "expectedLines": 57,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "18-source-two-tests.md",
+      "expectedLines": 272,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "19-readonly-better-auth.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "20-readonly-better-auth.md",
+      "expectedLines": 622,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "21-readonly-better-auth.md",
+      "expectedLines": 2,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "22-readonly-contracts.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "23-readonly-contracts.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "24-readonly-contracts.md",
+      "expectedLines": 371,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "25-readonly-failure-ownership.md",
+      "expectedLines": 623,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "26-readonly-failure-ownership.md",
+      "expectedLines": 350,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "27-exact-diff.md",
+      "expectedLines": 473,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "28-exact-diff.md",
+      "expectedLines": 48,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "29-root-contract.md",
+      "expectedLines": 374,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "30-root-contract.md",
+      "expectedLines": 428,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "31-evaluator-contract.md",
+      "expectedLines": 349,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "32-evaluator-contract.md",
+      "expectedLines": 460,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "33-evaluator-contract.md",
+      "expectedLines": 215,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "34-runtime-skills.md",
+      "expectedLines": 382,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "35-runtime-skills.md",
+      "expectedLines": 152,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "36-native-closure.md",
+      "expectedLines": 191,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "37-auth-native-oracles.md",
+      "expectedLines": 554,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "38-auth-native-oracles.md",
+      "expectedLines": 432,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "39-static-quality-docs.md",
+      "expectedLines": 335,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "40-arch-publication-cleanup.md",
+      "expectedLines": 228,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "41-arch-publication-cleanup.md",
+      "expectedLines": 70,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "42-evidence-bindings.md",
+      "expectedLines": 50,
+      "complete": true,
+      "calls": 1
+    }
+  ],
+  "mcp": [
+    {
+      "tool": "netscript_find_guidance",
+      "input": {
+        "intent": "Better Auth integration: authoritative session lookup with disableCookieCache, revocation controls, and native dependency qualification for a better-auth version floor/lock repair"
+      },
+      "status": "completed"
+    },
+    {
+      "tool": "netscript_search_docs",
+      "input": {
+        "query": "better-auth cookie cache revocation disableCookieCache revokeSessions authoritative session"
+      },
+      "status": "completed"
+    }
+  ],
+  "steps": [
+    {
+      "reason": "tool-calls",
+      "cost": 0.0008395497,
+      "tokens": {
+        "total": 17485,
+        "input": 15859,
+        "output": 318,
+        "reasoning": 1308,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.0041481068,
+      "tokens": {
+        "total": 96920,
+        "input": 78691,
+        "output": 421,
+        "reasoning": 400,
+        "cache": {
+          "write": 0,
+          "read": 17408
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.0075252226,
+      "tokens": {
+        "total": 198110,
+        "input": 100267,
+        "output": 424,
+        "reasoning": 651,
+        "cache": {
+          "write": 0,
+          "read": 96768
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.0080661705,
+      "tokens": {
+        "total": 244445,
+        "input": 45855,
+        "output": 427,
+        "reasoning": 275,
+        "cache": {
+          "write": 0,
+          "read": 197888
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.0099451735,
+      "tokens": {
+        "total": 300299,
+        "input": 53395,
+        "output": 422,
+        "reasoning": 2258,
+        "cache": {
+          "write": 0,
+          "read": 244224
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.0112248754,
+      "tokens": {
+        "total": 348594,
+        "input": 47348,
+        "output": 295,
+        "reasoning": 663,
+        "cache": {
+          "write": 0,
+          "read": 300288
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.0117352962,
+      "tokens": {
+        "total": 373938,
+        "input": 21184,
+        "output": 325,
+        "reasoning": 4013,
+        "cache": {
+          "write": 0,
+          "read": 348416
+        }
+      }
+    },
+    {
+      "reason": "stop",
+      "cost": 0.0120100331,
+      "tokens": {
+        "total": 387575,
+        "input": 14577,
+        "output": 2788,
+        "reasoning": 802,
+        "cache": {
+          "write": 0,
+          "read": 369408
+        }
+      }
+    }
+  ],
+  "failures": [],
+  "targetHeads": {
+    "Security2426": "aec36a68e65df77012d4b2add4692e0b0506290f"
+  },
+  "distinctPublicReportsRequired": 1,
+  "manualRootRelevanceAndVerdictRequired": true
+}

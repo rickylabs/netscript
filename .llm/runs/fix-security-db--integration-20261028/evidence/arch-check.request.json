@@ -1,0 +1,7 @@
+{
+  "timeoutMs": 180000,
+  "args": [
+    "task",
+    "arch:check"
+  ]
+}

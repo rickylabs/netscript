@@ -1,0 +1,37 @@
+import { join, toFileUrl } from '@std/path';
+const dir = await Deno.realPath('.llm/tmp/better-auth-security-sol-20261028');
+const baseline = '1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d';
+const project = await Deno.makeTempDir({ dir, prefix: 'baseline-doc-cookie-' });
+const record: Record<string, unknown> = { baseline, project, liveOwnerEdited: false, nativeSh: 'C:/Program Files/Git/bin/sh.exe', childPath: Deno.env.get('PATH'), results: [] };
+async function run(name: string, binary: string, args: string[], cwd: string) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 120_000);
+  try {
+    const result = await new Deno.Command(binary, { args, cwd, signal: controller.signal, stdout: 'piped', stderr: 'piped' }).output();
+    await Deno.writeFile(join(dir, `${name}.native-stdout.log`), result.stdout);
+    await Deno.writeFile(join(dir, `${name}.native-stderr.log`), result.stderr);
+    (record.results as unknown[]).push({ name, nativeArgv: [binary, ...args], cwd, code: result.code });
+    return result;
+  } finally { clearTimeout(timer); }
+}
+try {
+  const archive = join(project, 'source.tar');
+  for (const [name, binary, args] of [
+    ['baseline-doc-cookie-archive', 'git', ['archive', '--format=tar', `--output=${archive}`, baseline, 'deno.json', 'deno.lock', 'packages', 'plugins', '.llm/tools/run-deno-test.ts', '.llm/tools/run-deno-doc-lint.ts', 'docs/site/identity-access/how-to/add-authentication.md', 'docs/site/tutorials/workspace/02-auth.md']],
+    ['baseline-doc-cookie-extract', 'C:/Windows/System32/tar.exe', ['-xf', archive, '-C', project]],
+  ] as const) {
+    if (!(await run(name, binary, [...args], Deno.cwd())).success) throw new Error(`Native setup failed: ${name}`);
+  }
+  await run('unchanged-auth-public-docs', Deno.execPath(), ['run', '--cached-only', '--frozen', '--allow-read', '--allow-write', '--allow-run', toFileUrl(join(project, '.llm/tools/run-deno-doc-lint.ts')).href, '--root', 'packages/auth-better-auth', '--output', join(dir, 'auth-public-docs-unchanged.json')], project);
+  await run('unchanged-native-cookie-jar-gitpath', Deno.execPath(), ['run', '--cached-only', '--frozen', '--allow-read', '--allow-write', '--allow-run', toFileUrl(join(project, '.llm/tools/run-deno-test.ts')).href, '--cwd', project, '--output', join(dir, 'native-cookie-jar-gitpath-unchanged.json'), '--', '--cached-only', '--frozen', '--check', '--allow-all', '--sanitize-ops', '--sanitize-resources', '--trace-leaks', '--filter', '/^documented localhost curl cookie-jar flow works through the real service bootstrap$/', 'plugins/auth/tests/services/documented-cookie-jar_test.ts'], project);
+  const a = JSON.parse(await Deno.readTextFile(join(dir, 'auth-public-docs-unchanged.json')));
+  const b = JSON.parse(await Deno.readTextFile(join(dir, 'native-cookie-jar-gitpath-unchanged.json')));
+  Object.assign(record, { docsSummary: a.summary, cookieSummary: b.summary, cookieFailureMessages: b.failures.map((x: {message: string}) => x.message), actualBaselineRelease: '1.6.20' });
+} finally {
+  const target = await Deno.realPath(project);
+  if (!target.toLowerCase().startsWith((dir + '\\baseline-doc-cookie-').toLowerCase()) && !target.toLowerCase().startsWith((dir + '/baseline-doc-cookie-').toLowerCase())) throw new Error('Unexpected cleanup target');
+  await Deno.remove(target, { recursive: true });
+  record.projectionRemoved = true;
+  await Deno.writeTextFile(join(dir, 'baseline-doc-cookie.receipt.json'), JSON.stringify(record, null, 2) + '\n');
+}
+console.log(JSON.stringify(record));

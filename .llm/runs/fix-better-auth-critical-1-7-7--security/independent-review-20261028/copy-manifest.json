@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "frozenSourceHead": "aec36a68e65df77012d4b2add4692e0b0506290f",
+  "bindings": [
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/final-verdict.utf8.md",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/final-verdict.utf8.md",
+      "bytes": 10659,
+      "sha256": "c89ef597fab743d03d8e648729a90cdc90bfa1cefbe1164cba3d85586cdb51f3",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/coverage.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/coverage.json",
+      "bytes": 8120,
+      "sha256": "b16b64460d63678e3d011dfa02722b395fb45c8a4d1b5f33d672132e843f1b4b",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/observed-identity.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/observed-identity.json",
+      "bytes": 4020,
+      "sha256": "dc6bfde24349833153a0384f05a8902aae4651996e4527e2263da4be29716511",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/final-guards.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/final-guards.json",
+      "bytes": 356,
+      "sha256": "2538bc627fbadd74e244651369ebef69ad56aa6520b5b4b6e2158b237d866301",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/result.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/result.json",
+      "bytes": 227,
+      "sha256": "9b0410754a32accbc54c38377953ba8c50406efe60852c26f835c6a716261c2b",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/native.stdout.jsonl",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/native.stdout.jsonl",
+      "bytes": 1962236,
+      "sha256": "c25d90a86b080f64242cc91b13783605f61ae517c15e851288a977c04393cbe8",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/mcp.jsonl",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/mcp.jsonl",
+      "bytes": 1646,
+      "sha256": "ea007ae51c084e4156a8c51e54ac7522e210cca828afceef3960f120ff8ceb45",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/implementation-driver-corrected.ts",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/implementation-driver-corrected.ts.txt",
+      "bytes": 13796,
+      "sha256": "2efafb4c6d6b1f3c32b3c40f6cd769340e1495f34061924724ba4c71657e5570",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": true
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/common-corrected.ts",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/common-corrected.ts.txt",
+      "bytes": 9025,
+      "sha256": "ec227c269e8b6ebc6a8f51aaba8550ffb55342d2d0fcb23bc292e115c51cbf87",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": true
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/review-audit.ts",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/review-audit.ts.txt",
+      "bytes": 4804,
+      "sha256": "e9849136642734769da662b8bbbf8d5a2a3528735c02e80914c5ad7f50e4ceda",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": true
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/owned-spawn-corrected.ts",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/owned-spawn-corrected.ts.txt",
+      "bytes": 1929,
+      "sha256": "fe8b34e9d31715c99e0c8987718c119cc36893f2d7e98e7286c7a49efce0747f",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": true
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/public-events-corrected.ts",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/public-events-corrected.ts.txt",
+      "bytes": 2468,
+      "sha256": "329db2e92d20f462a230704dfecd96079bd12587e0d1fa77bd5e25b6e8288d97",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": true
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/owned-capture.ts",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/owned-capture.ts.txt",
+      "bytes": 3891,
+      "sha256": "f3661ca8d81d4f34faaa8f08126d2bdc8bc52c0769f232f3f0e2396e794a011c",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": true
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/corrected-guards_control_test.ts",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/corrected-guards_control_test.ts.txt",
+      "bytes": 3854,
+      "sha256": "2e4425d22dacf4b7f4236ddc527ba5b575c8fd9b54c53d7fae62cc6e81372509",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": true
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/capture_control_test.ts",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/capture_control_test.ts.txt",
+      "bytes": 2965,
+      "sha256": "e961cba048ac272bdf4a4736fa83f7e9cf2bccb657f79b3b886eaeb6ec1c5d53",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": true
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/preparation.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/preparation.json",
+      "bytes": 14560,
+      "sha256": "d2481ddbf3a14626624a22bbf5275f850071a0d4277ae6d5968668c61ef795ed",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/packet-manifest.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/packet-manifest.json",
+      "bytes": 39704,
+      "sha256": "ad1d3035106a8dc6326c98a7d592d046a404d614a99717780a3192b422fc245a",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/source-snapshot.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/source-snapshot.json",
+      "bytes": 49244,
+      "sha256": "29d8080f36e24305e92361b18379b4d7d22ab2ad5bcf95aab6d7f85f7b8d9ce2",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/source-reconstruction.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/source-reconstruction.json",
+      "bytes": 870,
+      "sha256": "af62faa57512a002ef3c5a88d7f0c41418ca64b38eb90cfd6eaeec90407b2dbc",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/route.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/route.json",
+      "bytes": 2664,
+      "sha256": "5ce52047ee5be6c1834eb3b598425325bd6076726fbc4029fb8e65c12de31915",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/config-proposal.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/config-proposal.json",
+      "bytes": 746,
+      "sha256": "19ae772d2c83ef910316aefc19d5b93529f3ac322c90f253fb359e9c6df9fcea",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/effective-config.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/effective-config.json",
+      "bytes": 1941,
+      "sha256": "c1e8eecbf88f6b220529ece8fbf9ca08490c90a3eec4ca2a47a0128d98a21c78",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/model-catalog.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/model-catalog.json",
+      "bytes": 1719,
+      "sha256": "7339fadf5d5f81df818f3ae0fc075df0386bc7ade99dea8321cb8cd24c9c8bde",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/prompt.md",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/prompt.md",
+      "bytes": 10246,
+      "sha256": "08e548d2d27737fbfcdfe4026e6f0ab85a75ae85701a504397930df33e7373a6",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/predecessor-bindings.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/predecessor-bindings.json",
+      "bytes": 1851,
+      "sha256": "9f4f9cdc251d9498be07ca1f7b5ab8b9b05f453535bd8a267c408fa9f21d55db",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/helper-controls.json",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/helper-controls.json",
+      "bytes": 571,
+      "sha256": "23f5f2221443e7231b27eddd08308d0ee8c45b12dcdbda08a2d4f092ad855b98",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    },
+    {
+      "source": ".llm/tmp/security-impl-review-20261028/root-independent-source-acceptance.md",
+      "path": ".llm/runs/fix-better-auth-critical-1-7-7--security/independent-review-20261028/raw/root-independent-source-acceptance.md",
+      "bytes": 1737,
+      "sha256": "9d9c8cea3ca853b5fd21fde814fd06a4545ecc52ba3ced5a0913f56fd25ed6e4",
+      "copy": "byte-exact",
+      "executableDiagnosticStoredAsData": false
+    }
+  ]
+}

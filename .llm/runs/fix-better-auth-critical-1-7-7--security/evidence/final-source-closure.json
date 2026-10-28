@@ -1,0 +1,972 @@
+{
+  "baseline": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "authored": [
+    {
+      "path": "deno.json",
+      "sha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee",
+      "lines": 287,
+      "bytes": 22365,
+      "originalSha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "literalOnly": true
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "lines": 4877,
+      "bytes": 187051,
+      "originalSha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "sha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "lines": 4373,
+      "bytes": 164831,
+      "originalSha256": "18693dfeb7be838b924e8b2803d55994b34bcde981ab617e0c72eb30129fcf40"
+    },
+    {
+      "path": "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+      "sha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac",
+      "lines": 78,
+      "bytes": 3198,
+      "originalSha256": "72a695a3061e3ce51231a9759aa547ea364dd68defd9cc3e5f046c609711b763",
+      "literalOnly": true
+    },
+    {
+      "path": "plugins/auth/tests/services/unsupported-revocation-http_test.ts",
+      "sha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871",
+      "lines": 184,
+      "bytes": 7603,
+      "originalSha256": "e0210d9b1703482af56b05452681d46ab16d148c96a40aed41584a5443df3194",
+      "literalOnly": true
+    }
+  ],
+  "protectedCount": 80,
+  "protectedAllMatch": true,
+  "trackedOwners": [
+    "deno.json",
+    "deno.lock",
+    "packages/fresh-ui/deno.lock",
+    "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+    "plugins/auth/tests/services/unsupported-revocation-http_test.ts"
+  ],
+  "locks": [
+    {
+      "path": "deno.lock",
+      "selected": "1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1",
+      "family": [
+        "@better-auth/core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/drizzle-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/kysely-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_kysely@0.29.7_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_nanostores@1.5.5",
+        "@better-auth/memory-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/mongo-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/prisma-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@prisma+client@7.10.0_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/telemetry@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "better-auth@1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1"
+      ],
+      "changedNpmEntries": [
+        {
+          "id": "@better-auth/core@1.6.20_@better-auth+utils@0.4.2_@better-fetch+fetch@1.3.1_@opentelemetry+api@1.9.1_better-call@1.3.6_jose@6.2.12_kysely@0.29.2_nanostores@1.3.0",
+          "old": {
+            "integrity": "sha512-y73I1xNXuNYiHBFduWGRcJ2ro2rNuVDEYkgVMJtIaRXtbosdXHs9gfyQrHecgeHMHKx1SYSBT/CExak0vVMTng==",
+            "dependencies": [
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "@opentelemetry/api",
+              "@opentelemetry/semantic-conventions@1.43.0",
+              "@standard-schema/spec",
+              "better-call",
+              "jose",
+              "kysely",
+              "nanostores",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "@opentelemetry/api"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/drizzle-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-hJHfCdAiZrC7EmZAt3NAiGgcNo9Y5Qz3PLL+a9rODXaAJGCMvzUJniqef9wHuJBwU0SWW+2f4wXe8xQmaC/IKQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/kysely-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_kysely@0.29.2_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-Uvpmgbx5y8JqXroVanNzDdKzOl3HojoTz+/X6MR6zOUr25IzlYz660mjnu0rxKiIF55kD3CroqFsDzjNUw7ERw==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "kysely"
+            ],
+            "optionalPeers": [
+              "kysely"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/memory-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-J5Ni0LlFijbzXlwu2rFHaD8zEFocmajyzWkRnHsq8LhV/Dk4iWQwwnqzLrPoDQEj8roECAUF03hrIeMzqWRqJQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/mongo-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-ClDBJf6h4g85WJswxwQwxLaiyRU67Gmz/uaIf19tY1gqlLJDykSGjmqRNSBMG5rWABNzcNqbO4KG31rYUldbIw==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/prisma-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_@prisma+client@7.10.0_typescript@7.0.2",
+          "old": {
+            "integrity": "sha512-WhYdhSGuVSfu1peCSf2snmmVzfWjRaEvbSrsNCusiwGE9l94HlES4mjSPM48fed24hL7yg4j1dYK/yjEt87FpQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "@prisma/client"
+            ],
+            "optionalPeers": [
+              "@prisma/client"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/telemetry@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_@better-fetch+fetch@1.3.1_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-3BhbY3naQDERvdJvJ7fGszVY6rpsVfc6c9uyBVZlC1coVEF/rkM0rIcjtMVI1GUH7vWy1wjR6qF5vQnMun3XNQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "@better-fetch/fetch"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/utils@0.4.2",
+          "old": {
+            "integrity": "sha512-AUxrvu+HaaODsUyzDxFgwd/8RZ1yZaYo42LXKSrU2oGgR38pS1ij8nqQKNgtTWoYGpNevNXtCfgTy6loHveW9A==",
+            "dependencies": [
+              "@noble/hashes@2.2.0"
+            ]
+          }
+        },
+        {
+          "id": "@better-fetch/fetch@1.3.1",
+          "old": {
+            "integrity": "sha512-ABkD1WhyfPZprKRQI3bhATjeiFuNWC9PXhfGWqL+sg/gKrM977oFrYkdb4msM3hgUGonr7KlOsOFT5TU2rht9g=="
+          }
+        },
+        {
+          "id": "@noble/ciphers@2.2.0",
+          "old": {
+            "integrity": "sha512-Z6pjIZ/8IJcCGzb2S/0Px5J81yij85xASuk1teLNeg75bfT07MV3a/O2Mtn1I2se43k3lkVEcFaR10N4cgQcZA=="
+          }
+        },
+        {
+          "id": "@noble/hashes@2.2.0",
+          "old": {
+            "integrity": "sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg=="
+          }
+        },
+        {
+          "id": "@opentelemetry/sdk-trace-base@2.8.0_@opentelemetry+api@1.9.1",
+          "old": {
+            "integrity": "sha512-mhU4jp+vW0mGbFRd+GeXHvmfA4aDqWjBjLC3pE5XMpLs0IE2ryYb019Ts2AQrOq67gaTF25D91+fgvEHDZEnuQ==",
+            "dependencies": [
+              "@opentelemetry/api",
+              "@opentelemetry/core@2.8.0_@opentelemetry+api@1.9.1",
+              "@opentelemetry/resources@2.8.0_@opentelemetry+api@1.9.1",
+              "@opentelemetry/semantic-conventions@1.43.0"
+            ]
+          },
+          "next": {
+            "integrity": "sha512-mhU4jp+vW0mGbFRd+GeXHvmfA4aDqWjBjLC3pE5XMpLs0IE2ryYb019Ts2AQrOq67gaTF25D91+fgvEHDZEnuQ==",
+            "dependencies": [
+              "@opentelemetry/api",
+              "@opentelemetry/core@2.8.0_@opentelemetry+api@1.9.1",
+              "@opentelemetry/resources@2.8.0_@opentelemetry+api@1.9.1",
+              "@opentelemetry/semantic-conventions@1.43.0"
+            ],
+            "deprecated": true
+          }
+        },
+        {
+          "id": "@orpc/openapi@1.15.5_@opentelemetry+api@1.9.1",
+          "old": {
+            "integrity": "sha512-+CF789KNssNZt+lrwO0IzlYcXRKMwTimo1INjpZiFdg19n8buL1oZLlKsGi00EUUsL65HVgDs0yXuxLjR94WXA==",
+            "dependencies": [
+              "@orpc/client@1.15.5_@opentelemetry+api@1.9.1",
+              "@orpc/contract",
+              "@orpc/interop",
+              "@orpc/openapi-client",
+              "@orpc/server",
+              "@orpc/shared",
+              "@orpc/standard-server",
+              "json-schema-typed",
+              "rou3"
+            ]
+          },
+          "next": {
+            "integrity": "sha512-+CF789KNssNZt+lrwO0IzlYcXRKMwTimo1INjpZiFdg19n8buL1oZLlKsGi00EUUsL65HVgDs0yXuxLjR94WXA==",
+            "dependencies": [
+              "@orpc/client@1.15.5_@opentelemetry+api@1.9.1",
+              "@orpc/contract",
+              "@orpc/interop",
+              "@orpc/openapi-client",
+              "@orpc/server",
+              "@orpc/shared",
+              "@orpc/standard-server",
+              "json-schema-typed",
+              "rou3@0.7.12"
+            ]
+          }
+        },
+        {
+          "id": "better-auth@1.6.20_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_typescript@7.0.2",
+          "old": {
+            "integrity": "sha512-fSpGHGRKiGRiYVd3QTQtuVZ8oxpiSe/7ip0Rpvt/Sy8zQbEbVKUPMOhE0gLXg+FjqTUsIo7582hxUYxtEcqUpA==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/drizzle-adapter",
+              "@better-auth/kysely-adapter",
+              "@better-auth/memory-adapter",
+              "@better-auth/mongo-adapter",
+              "@better-auth/prisma-adapter",
+              "@better-auth/telemetry",
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "@noble/ciphers",
+              "@noble/hashes@2.2.0",
+              "@prisma/client",
+              "better-call",
+              "defu",
+              "jose",
+              "kysely",
+              "mysql2",
+              "nanostores",
+              "pg",
+              "react",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "@prisma/client",
+              "mysql2",
+              "pg",
+              "react"
+            ]
+          }
+        },
+        {
+          "id": "better-call@1.3.6_zod@4.6.5",
+          "old": {
+            "integrity": "sha512-no1jI+h6Bkxs1NVBo4rONbVIzsPjZ8IUu7IHaJBiFwVX1XEQGN8KpHots5fSWmXe9nNyLuLIcgx6WEUcE6EDaA==",
+            "dependencies": [
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "rou3",
+              "set-cookie-parser",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "zod@4.6.5"
+            ]
+          }
+        },
+        {
+          "id": "kysely@0.29.2",
+          "old": {
+            "integrity": "sha512-s6WVJyEZrbm6jhBpiKHsGHyePMrVQKJ85wZCFCr9W4QHv6WTjWIrdvTmO9hDEA3bNK0xkrE2DqrHsXMLWuZpQg=="
+          }
+        },
+        {
+          "id": "nanostores@1.3.0",
+          "old": {
+            "integrity": "sha512-XPUa/jz+P1oJvN9VBxw4L9MtdFfaH3DAryqPssqhb2kXjmb9npz0dly6rCsgFWOPr4Yg9mTfM3MDZgZZ+7A3lA=="
+          }
+        },
+        {
+          "id": "set-cookie-parser@3.1.0",
+          "old": {
+            "integrity": "sha512-kjnC1DXBHcxaOaOXBHBeRtltsDG2nUiUni+jP92M9gYdW12rsmx92UsfpH7o5tDRs7I1ZZPSQJQGv3UaRfCiuw=="
+          }
+        },
+        {
+          "id": "@better-auth/core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-ByhdrGVwp/el+hoTYKSVOHIH23/lQj9TQ1txdGcWOg22tnfr3hJ6ukzySooeYj/R36XsQgBhkJqIp8mKsNeErA==",
+            "dependencies": [
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "@opentelemetry/api",
+              "@standard-schema/spec",
+              "better-call",
+              "jose",
+              "kysely",
+              "nanostores",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "@opentelemetry/api"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/drizzle-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-5RC8Ec5Ur15FWsS4As9/VrlRbB3+9EfShxIpA5A1FcD6IgPxFvzQNkAm2+FYx9LUSqx47NPf9hBTG2GUCMP9Ig==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/kysely-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_kysely@0.29.7_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-4wkqj8a8JVpWDYLlgzfbk7eOaWCFkL6HHQd6CLamFKaC8vNsXew1x4v5dE5O6dGr8j4g5qMISS+BAvOuIvBevg==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "kysely"
+            ],
+            "optionalPeers": [
+              "kysely"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/memory-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-Ojv9BcmFyHuTHha9ZM/NUW1ut9J84wLngta+07Es0Ejn8kekqP5aHBpZd5Z8AvADs5iJUOWvQGFmGlPWAKJgBg==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/mongo-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-6IA0RSPZFMdRwwnLZ9oWnDIiD0y0o0azTHUfa01BNU2AFJgMDkeiASUV3bKcJBskzQoyQrff74eFYTsTSeeVUQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/prisma-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@prisma+client@7.10.0_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-mF6t5xqeZNWzUe0ErmrSdzQmtslJscmu9X8Mp5QmROlpnnAzvSc70RILu8lHms8CePt7N34+KRH1QvYjGFrVGQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "@prisma/client"
+            ],
+            "optionalPeers": [
+              "@prisma/client"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/telemetry@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-PtKFzsH7gje/WJuUPDjckOoNFazsq8NMt3AdiXIPzHl7tZULcNGTKAX8K7+yn0rG6cO/4mtMgpOjhtilElOnmg==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "@better-fetch/fetch"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/utils@0.5.1",
+          "next": {
+            "integrity": "sha512-WETqw5vQ52uQ/xwWR4E8rTgT6fDEr/wnS+otDNkBCa/69281FCF32OKDdQUcahMCnjsvqXBNiEvAQHFB0EVRRg==",
+            "dependencies": [
+              "@noble/hashes@2.4.0"
+            ]
+          }
+        },
+        {
+          "id": "@better-fetch/fetch@1.3.3",
+          "next": {
+            "integrity": "sha512-U6SlDt/GUWtK2JAxS/NhdoYTEim+EL1G5byz2TUj83KjLZBUpYzb5SmX0aXaCnbGkAjFKnV/o/0+cyXMbEcqqg=="
+          }
+        },
+        {
+          "id": "@noble/ciphers@2.4.0",
+          "next": {
+            "integrity": "sha512-AnjFn0Jv92laAkvMrghlFZq4qQCIN/4DxFV/eooqtC2YTjB7kBeLMS2T9KJX4Dn+ZVXLOwK0lSgqDtx9gvxtiw=="
+          }
+        },
+        {
+          "id": "@noble/hashes@2.4.0",
+          "next": {
+            "integrity": "sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA=="
+          }
+        },
+        {
+          "id": "better-auth@1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1",
+          "next": {
+            "integrity": "sha512-QxDCI0pOCCHDYmruisKhKyrvOJ6Icv9xg0RA6ZUysfKFXENYwhNNpwUlkE/NmViH2nDMgkKcymmLr55pnpR9vw==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/drizzle-adapter",
+              "@better-auth/kysely-adapter",
+              "@better-auth/memory-adapter",
+              "@better-auth/mongo-adapter",
+              "@better-auth/prisma-adapter",
+              "@better-auth/telemetry",
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "@noble/ciphers",
+              "@noble/hashes@2.4.0",
+              "@prisma/client",
+              "better-call",
+              "defu",
+              "jose",
+              "kysely",
+              "mysql2",
+              "nanostores",
+              "pg",
+              "react",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "@prisma/client",
+              "mysql2",
+              "pg",
+              "react"
+            ]
+          }
+        },
+        {
+          "id": "better-call@1.4.4_zod@4.6.5",
+          "next": {
+            "integrity": "sha512-Gq4XdGFy4dmUxFEAX2nj0ycFcFbD9ZWh8YROouZoyXeF1M11TpYbplk0pDByTFF8Wz+MYa6W9052c9m7dD+mfw==",
+            "dependencies": [
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "rou3@0.9.2",
+              "set-cookie-parser",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "zod@4.6.5"
+            ]
+          }
+        },
+        {
+          "id": "kysely@0.29.7",
+          "next": {
+            "integrity": "sha512-fmIq+7kv4WbFm2tcfznRzikqB4cuNpgZ40PSU2fAJ2/OO5XhojqnTPrmgrCjYSRJVwBln03XcRXJGnw9H099IQ=="
+          }
+        },
+        {
+          "id": "nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-FixtE239Gl6Gz0ZGCK0WzvNwObNCIwVT+L7zQcf1QgcA6AzBxblzqe9OT88qiucNkhsjSOqiogSaF5jVbJiqSA=="
+          }
+        },
+        {
+          "id": "rou3@0.9.2",
+          "next": {
+            "integrity": "sha512-3SOzvaAg8rkHrXtRjpCvCvbyO5to9oOO27Z/XqHEYXfMRVSw/qMIVdmaOk9W2lcRLtR6dlqTjo9hDeJk70QBYQ=="
+          }
+        },
+        {
+          "id": "set-cookie-parser@3.2.1",
+          "next": {
+            "integrity": "sha512-Npd1Pt+4zb3BrSZDPd2qFwRpS6b1EUEasRrO8xS0zMJi0fApXXK5YuzP0minyJnxwnFHoVoJwA55q0A0cu63gQ=="
+          }
+        }
+      ],
+      "metadata": [
+        {
+          "id": "@opentelemetry/sdk-trace-base@2.8.0_@opentelemetry+api@1.9.1",
+          "kind": "native deprecated metadata only"
+        },
+        {
+          "id": "@orpc/openapi@1.15.5_@opentelemetry+api@1.9.1",
+          "kind": "same rou3 0.7.12 identity made explicit after second version added"
+        }
+      ],
+      "unrelatedSectionsUnchanged": true
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "selected": "1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1",
+      "family": [
+        "@better-auth/core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/drizzle-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/kysely-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_kysely@0.29.7_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_nanostores@1.5.5",
+        "@better-auth/memory-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/mongo-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/prisma-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@prisma+client@7.10.0_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "@better-auth/telemetry@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+        "better-auth@1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1"
+      ],
+      "changedNpmEntries": [
+        {
+          "id": "@better-auth/core@1.6.20_@better-auth+utils@0.4.2_@better-fetch+fetch@1.3.1_@opentelemetry+api@1.9.1_better-call@1.3.6__zod@4.6.5_jose@6.2.12_kysely@0.29.2_nanostores@1.3.0",
+          "old": {
+            "integrity": "sha512-y73I1xNXuNYiHBFduWGRcJ2ro2rNuVDEYkgVMJtIaRXtbosdXHs9gfyQrHecgeHMHKx1SYSBT/CExak0vVMTng==",
+            "dependencies": [
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "@opentelemetry/api",
+              "@opentelemetry/semantic-conventions@1.43.0",
+              "@standard-schema/spec",
+              "better-call",
+              "jose",
+              "kysely",
+              "nanostores",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "@opentelemetry/api"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/drizzle-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-hJHfCdAiZrC7EmZAt3NAiGgcNo9Y5Qz3PLL+a9rODXaAJGCMvzUJniqef9wHuJBwU0SWW+2f4wXe8xQmaC/IKQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/kysely-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_kysely@0.29.2_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-Uvpmgbx5y8JqXroVanNzDdKzOl3HojoTz+/X6MR6zOUr25IzlYz660mjnu0rxKiIF55kD3CroqFsDzjNUw7ERw==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "kysely"
+            ],
+            "optionalPeers": [
+              "kysely"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/memory-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-J5Ni0LlFijbzXlwu2rFHaD8zEFocmajyzWkRnHsq8LhV/Dk4iWQwwnqzLrPoDQEj8roECAUF03hrIeMzqWRqJQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/mongo-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-ClDBJf6h4g85WJswxwQwxLaiyRU67Gmz/uaIf19tY1gqlLJDykSGjmqRNSBMG5rWABNzcNqbO4KG31rYUldbIw==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/prisma-adapter@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_@prisma+client@7.10.0_typescript@7.0.2",
+          "old": {
+            "integrity": "sha512-WhYdhSGuVSfu1peCSf2snmmVzfWjRaEvbSrsNCusiwGE9l94HlES4mjSPM48fed24hL7yg4j1dYK/yjEt87FpQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "@prisma/client"
+            ],
+            "optionalPeers": [
+              "@prisma/client"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/telemetry@1.6.20_@better-auth+core@1.6.20_@better-auth+utils@0.4.2_@better-fetch+fetch@1.3.1_jose@6.2.12",
+          "old": {
+            "integrity": "sha512-3BhbY3naQDERvdJvJ7fGszVY6rpsVfc6c9uyBVZlC1coVEF/rkM0rIcjtMVI1GUH7vWy1wjR6qF5vQnMun3XNQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "@better-fetch/fetch"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/utils@0.4.2",
+          "old": {
+            "integrity": "sha512-AUxrvu+HaaODsUyzDxFgwd/8RZ1yZaYo42LXKSrU2oGgR38pS1ij8nqQKNgtTWoYGpNevNXtCfgTy6loHveW9A==",
+            "dependencies": [
+              "@noble/hashes@2.2.0"
+            ]
+          }
+        },
+        {
+          "id": "@better-fetch/fetch@1.3.1",
+          "old": {
+            "integrity": "sha512-ABkD1WhyfPZprKRQI3bhATjeiFuNWC9PXhfGWqL+sg/gKrM977oFrYkdb4msM3hgUGonr7KlOsOFT5TU2rht9g=="
+          }
+        },
+        {
+          "id": "@noble/ciphers@2.2.0",
+          "old": {
+            "integrity": "sha512-Z6pjIZ/8IJcCGzb2S/0Px5J81yij85xASuk1teLNeg75bfT07MV3a/O2Mtn1I2se43k3lkVEcFaR10N4cgQcZA=="
+          }
+        },
+        {
+          "id": "@noble/hashes@2.2.0",
+          "old": {
+            "integrity": "sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg=="
+          }
+        },
+        {
+          "id": "@opentelemetry/sdk-trace-base@2.9.0_@opentelemetry+api@1.9.1",
+          "old": {
+            "integrity": "sha512-cp9zmTl62R8PJrpvFcmc8N2JQU/xfa0S+61q511Nji+QxCfZ8Ifvg7H27G8cANe4crg4RTrWsVvanHiXjSp6ag==",
+            "dependencies": [
+              "@opentelemetry/api",
+              "@opentelemetry/core@2.9.0_@opentelemetry+api@1.9.1",
+              "@opentelemetry/resources@2.9.0_@opentelemetry+api@1.9.1",
+              "@opentelemetry/sdk-trace",
+              "@opentelemetry/semantic-conventions@1.43.0"
+            ]
+          },
+          "next": {
+            "integrity": "sha512-cp9zmTl62R8PJrpvFcmc8N2JQU/xfa0S+61q511Nji+QxCfZ8Ifvg7H27G8cANe4crg4RTrWsVvanHiXjSp6ag==",
+            "dependencies": [
+              "@opentelemetry/api",
+              "@opentelemetry/core@2.9.0_@opentelemetry+api@1.9.1",
+              "@opentelemetry/resources@2.9.0_@opentelemetry+api@1.9.1",
+              "@opentelemetry/sdk-trace",
+              "@opentelemetry/semantic-conventions@1.43.0"
+            ],
+            "deprecated": true
+          }
+        },
+        {
+          "id": "@orpc/openapi@1.15.5_@opentelemetry+api@1.9.1",
+          "old": {
+            "integrity": "sha512-+CF789KNssNZt+lrwO0IzlYcXRKMwTimo1INjpZiFdg19n8buL1oZLlKsGi00EUUsL65HVgDs0yXuxLjR94WXA==",
+            "dependencies": [
+              "@orpc/client",
+              "@orpc/contract",
+              "@orpc/interop",
+              "@orpc/openapi-client",
+              "@orpc/server",
+              "@orpc/shared",
+              "@orpc/standard-server",
+              "json-schema-typed",
+              "rou3"
+            ]
+          },
+          "next": {
+            "integrity": "sha512-+CF789KNssNZt+lrwO0IzlYcXRKMwTimo1INjpZiFdg19n8buL1oZLlKsGi00EUUsL65HVgDs0yXuxLjR94WXA==",
+            "dependencies": [
+              "@orpc/client",
+              "@orpc/contract",
+              "@orpc/interop",
+              "@orpc/openapi-client",
+              "@orpc/server",
+              "@orpc/shared",
+              "@orpc/standard-server",
+              "json-schema-typed",
+              "rou3@0.7.12"
+            ]
+          }
+        },
+        {
+          "id": "better-auth@1.6.20_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_typescript@7.0.2",
+          "old": {
+            "integrity": "sha512-fSpGHGRKiGRiYVd3QTQtuVZ8oxpiSe/7ip0Rpvt/Sy8zQbEbVKUPMOhE0gLXg+FjqTUsIo7582hxUYxtEcqUpA==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/drizzle-adapter",
+              "@better-auth/kysely-adapter",
+              "@better-auth/memory-adapter",
+              "@better-auth/mongo-adapter",
+              "@better-auth/prisma-adapter",
+              "@better-auth/telemetry",
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "@noble/ciphers",
+              "@noble/hashes@2.2.0",
+              "@prisma/client",
+              "better-call",
+              "defu",
+              "jose",
+              "kysely",
+              "mysql2",
+              "nanostores",
+              "pg",
+              "react",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "@prisma/client",
+              "mysql2",
+              "pg",
+              "react"
+            ]
+          }
+        },
+        {
+          "id": "better-call@1.3.6_zod@4.6.5",
+          "old": {
+            "integrity": "sha512-no1jI+h6Bkxs1NVBo4rONbVIzsPjZ8IUu7IHaJBiFwVX1XEQGN8KpHots5fSWmXe9nNyLuLIcgx6WEUcE6EDaA==",
+            "dependencies": [
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "rou3",
+              "set-cookie-parser",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "zod@4.6.5"
+            ]
+          }
+        },
+        {
+          "id": "kysely@0.29.2",
+          "old": {
+            "integrity": "sha512-s6WVJyEZrbm6jhBpiKHsGHyePMrVQKJ85wZCFCr9W4QHv6WTjWIrdvTmO9hDEA3bNK0xkrE2DqrHsXMLWuZpQg=="
+          }
+        },
+        {
+          "id": "nanostores@1.3.0",
+          "old": {
+            "integrity": "sha512-XPUa/jz+P1oJvN9VBxw4L9MtdFfaH3DAryqPssqhb2kXjmb9npz0dly6rCsgFWOPr4Yg9mTfM3MDZgZZ+7A3lA=="
+          }
+        },
+        {
+          "id": "set-cookie-parser@3.1.1",
+          "old": {
+            "integrity": "sha512-vM9SUhjsUYs6UeJUmygc5Ofm5eQGe85riob5ju6XCgFGJI5PLV4nrDAQpQjd+LkFBpAkADn5BQQpZ9EUNkyLuA=="
+          }
+        },
+        {
+          "id": "@better-auth/core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-ByhdrGVwp/el+hoTYKSVOHIH23/lQj9TQ1txdGcWOg22tnfr3hJ6ukzySooeYj/R36XsQgBhkJqIp8mKsNeErA==",
+            "dependencies": [
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "@opentelemetry/api",
+              "@standard-schema/spec",
+              "better-call",
+              "jose",
+              "kysely",
+              "nanostores",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "@opentelemetry/api"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/drizzle-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-5RC8Ec5Ur15FWsS4As9/VrlRbB3+9EfShxIpA5A1FcD6IgPxFvzQNkAm2+FYx9LUSqx47NPf9hBTG2GUCMP9Ig==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/kysely-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_kysely@0.29.7_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-4wkqj8a8JVpWDYLlgzfbk7eOaWCFkL6HHQd6CLamFKaC8vNsXew1x4v5dE5O6dGr8j4g5qMISS+BAvOuIvBevg==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "kysely"
+            ],
+            "optionalPeers": [
+              "kysely"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/memory-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-Ojv9BcmFyHuTHha9ZM/NUW1ut9J84wLngta+07Es0Ejn8kekqP5aHBpZd5Z8AvADs5iJUOWvQGFmGlPWAKJgBg==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/mongo-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-6IA0RSPZFMdRwwnLZ9oWnDIiD0y0o0azTHUfa01BNU2AFJgMDkeiASUV3bKcJBskzQoyQrff74eFYTsTSeeVUQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/prisma-adapter@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@prisma+client@7.10.0_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-mF6t5xqeZNWzUe0ErmrSdzQmtslJscmu9X8Mp5QmROlpnnAzvSc70RILu8lHms8CePt7N34+KRH1QvYjGFrVGQ==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "@prisma/client"
+            ],
+            "optionalPeers": [
+              "@prisma/client"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/telemetry@1.7.14_@better-auth+core@1.7.14_@better-auth+utils@0.5.1_@better-fetch+fetch@1.3.3_@opentelemetry+api@1.9.1_better-call@1.4.4_jose@6.2.12_kysely@0.29.7_nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-PtKFzsH7gje/WJuUPDjckOoNFazsq8NMt3AdiXIPzHl7tZULcNGTKAX8K7+yn0rG6cO/4mtMgpOjhtilElOnmg==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/utils",
+              "@better-fetch/fetch"
+            ]
+          }
+        },
+        {
+          "id": "@better-auth/utils@0.5.1",
+          "next": {
+            "integrity": "sha512-WETqw5vQ52uQ/xwWR4E8rTgT6fDEr/wnS+otDNkBCa/69281FCF32OKDdQUcahMCnjsvqXBNiEvAQHFB0EVRRg==",
+            "dependencies": [
+              "@noble/hashes@2.4.0"
+            ]
+          }
+        },
+        {
+          "id": "@better-fetch/fetch@1.3.3",
+          "next": {
+            "integrity": "sha512-U6SlDt/GUWtK2JAxS/NhdoYTEim+EL1G5byz2TUj83KjLZBUpYzb5SmX0aXaCnbGkAjFKnV/o/0+cyXMbEcqqg=="
+          }
+        },
+        {
+          "id": "@noble/ciphers@2.4.0",
+          "next": {
+            "integrity": "sha512-AnjFn0Jv92laAkvMrghlFZq4qQCIN/4DxFV/eooqtC2YTjB7kBeLMS2T9KJX4Dn+ZVXLOwK0lSgqDtx9gvxtiw=="
+          }
+        },
+        {
+          "id": "@noble/hashes@2.4.0",
+          "next": {
+            "integrity": "sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA=="
+          }
+        },
+        {
+          "id": "better-auth@1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1",
+          "next": {
+            "integrity": "sha512-QxDCI0pOCCHDYmruisKhKyrvOJ6Icv9xg0RA6ZUysfKFXENYwhNNpwUlkE/NmViH2nDMgkKcymmLr55pnpR9vw==",
+            "dependencies": [
+              "@better-auth/core",
+              "@better-auth/drizzle-adapter",
+              "@better-auth/kysely-adapter",
+              "@better-auth/memory-adapter",
+              "@better-auth/mongo-adapter",
+              "@better-auth/prisma-adapter",
+              "@better-auth/telemetry",
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "@noble/ciphers",
+              "@noble/hashes@2.4.0",
+              "@prisma/client",
+              "better-call",
+              "defu",
+              "jose",
+              "kysely",
+              "mysql2",
+              "nanostores",
+              "pg",
+              "react",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "@prisma/client",
+              "mysql2",
+              "pg",
+              "react"
+            ]
+          }
+        },
+        {
+          "id": "better-call@1.4.4_zod@4.6.5",
+          "next": {
+            "integrity": "sha512-Gq4XdGFy4dmUxFEAX2nj0ycFcFbD9ZWh8YROouZoyXeF1M11TpYbplk0pDByTFF8Wz+MYa6W9052c9m7dD+mfw==",
+            "dependencies": [
+              "@better-auth/utils",
+              "@better-fetch/fetch",
+              "rou3@0.9.2",
+              "set-cookie-parser",
+              "zod@4.6.5"
+            ],
+            "optionalPeers": [
+              "zod@4.6.5"
+            ]
+          }
+        },
+        {
+          "id": "kysely@0.29.7",
+          "next": {
+            "integrity": "sha512-fmIq+7kv4WbFm2tcfznRzikqB4cuNpgZ40PSU2fAJ2/OO5XhojqnTPrmgrCjYSRJVwBln03XcRXJGnw9H099IQ=="
+          }
+        },
+        {
+          "id": "nanostores@1.5.5",
+          "next": {
+            "integrity": "sha512-FixtE239Gl6Gz0ZGCK0WzvNwObNCIwVT+L7zQcf1QgcA6AzBxblzqe9OT88qiucNkhsjSOqiogSaF5jVbJiqSA=="
+          }
+        },
+        {
+          "id": "rou3@0.9.2",
+          "next": {
+            "integrity": "sha512-3SOzvaAg8rkHrXtRjpCvCvbyO5to9oOO27Z/XqHEYXfMRVSw/qMIVdmaOk9W2lcRLtR6dlqTjo9hDeJk70QBYQ=="
+          }
+        },
+        {
+          "id": "set-cookie-parser@3.2.1",
+          "next": {
+            "integrity": "sha512-Npd1Pt+4zb3BrSZDPd2qFwRpS6b1EUEasRrO8xS0zMJi0fApXXK5YuzP0minyJnxwnFHoVoJwA55q0A0cu63gQ=="
+          }
+        }
+      ],
+      "metadata": [
+        {
+          "id": "@opentelemetry/sdk-trace-base@2.9.0_@opentelemetry+api@1.9.1",
+          "kind": "native deprecated metadata only"
+        },
+        {
+          "id": "@orpc/openapi@1.15.5_@opentelemetry+api@1.9.1",
+          "kind": "same rou3 0.7.12 identity made explicit after second version added"
+        }
+      ],
+      "unrelatedSectionsUnchanged": true
+    }
+  ],
+  "sourceWhitespaceExitCode": 0,
+  "ordinaryNativeSelectionWithoutAgeBypass": true
+}

@@ -1,0 +1,19 @@
+{
+  "timeoutMs": 120000,
+  "args": [
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    ".llm/tools/run-deno-fmt.ts",
+    "--file",
+    ".llm/tools/deps/check-db-alignment.ts",
+    "--file",
+    ".llm/tools/deps/check-db-alignment_test.ts",
+    "--output",
+    ".llm/tmp/security-db-integration-20261028/db-fmt.json"
+  ],
+  "childReport": ".llm/tmp/security-db-integration-20261028/db-fmt.json"
+}

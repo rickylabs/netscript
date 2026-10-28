@@ -1,0 +1,20 @@
+const root = Deno.cwd();
+const evidence = '.llm/tmp/native-db-qualification-sol-20261028';
+const baseline = '1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d';
+const hash = async (bytes: Uint8Array) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map((n) => n.toString(16).padStart(2, '0')).join('');
+const sources = [];
+for (const path of ['deno.json', 'deno.lock', 'packages/sdk/deno.json', 'packages/fresh/deno.json', '.llm/tools/deps/workspace.ts', '.llm/tools/gates/catalog.ts', '.llm/tools/gates/process-runner.ts', '.llm/tools/run-deno-test.ts', '.llm/tools/run-deno-check.ts', '.llm/tools/run-deno-lint.ts', '.llm/tools/run-deno-fmt.ts', '.npmrc']) {
+  try { sources.push({ root, path, sha256: await hash(await Deno.readFile(path)) }); }
+  catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
+}
+const serviceRoot = 'C:/Users/ericc/source/repos/netscript-native-service-policy-008';
+const service = JSON.parse((await Deno.readTextFile(`${serviceRoot}/.llm/tmp/native-service-policy-impl-preparation-20261028/source-bindings.json`)).replace(/^\uFEFF/, ''));
+for (const path of service.changedProductOwners) sources.push({ root: serviceRoot, path, sha256: await hash(await Deno.readFile(`${serviceRoot}/${path}`)) });
+const windowsRoot = 'C:/Users/ericc/source/repos/netscript-windows-qualification-008';
+const windows = await new Deno.Command('git', { args: ['diff', '--name-only', `${baseline}..0d5b982b0a3050b94172770a435581c931c93b22`, '--', '.', ':(exclude).llm/runs/**'], cwd: windowsRoot, stdout: 'piped', stderr: 'piped' }).output();
+if (!windows.success) throw new Error('Cannot read frozen Windows scope');
+const paths = new TextDecoder().decode(windows.stdout).trim().split(/\r?\n/).filter(Boolean);
+if (paths.length !== 5) throw new Error(`Unexpected frozen Windows scope: ${paths.length}`);
+for (const path of paths) sources.push({ root: windowsRoot, path, sha256: await hash(await Deno.readFile(`${windowsRoot}/${path}`)) });
+await Deno.writeTextFile(`${evidence}/protected-baseline.json`, JSON.stringify({ baseline, sources, serviceOwners: 19, windowsOwners: 5, packageJsonAbsent: !(await Deno.stat('package.json').catch(() => null)), ownedTempBaseline: [] }, null, 2) + '\n');
+console.log(JSON.stringify({ protectedFiles: sources.length, serviceOwners: 19, windowsOwners: 5 }));

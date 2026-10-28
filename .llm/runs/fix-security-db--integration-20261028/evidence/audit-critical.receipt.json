@@ -1,0 +1,28 @@
+{
+  "outcome": "PASS",
+  "startedAt": "2026-10-28T04:35:31.962Z",
+  "finishedAt": "2026-10-28T04:35:32.870Z",
+  "durationMs": 908,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 75,
+    "sha256": "ad243fc31fc43a63836efa8f029ab1a206d535634583e2a9d20c05857f679492",
+    "tail": "Found 47 vulnerabilities\nSeverity: 4 low, 23 moderate, 20 high, 0 critical\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 48,
+    "sha256": "f07abc59413789c36d5deaadbe14116f18ba430d5c11b91a4c1e6619774681c9",
+    "tail": "Task audit:critical deno audit --level critical\n",
+    "truncated": false
+  },
+  "gateId": "audit-critical",
+  "gitHead": "c243d31535027addc034c99e170cb43d2faf475a",
+  "args": [
+    "task",
+    "audit:critical"
+  ],
+  "timeoutMs": 120000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative"
+}

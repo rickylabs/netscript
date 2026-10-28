@@ -1,0 +1,16 @@
+﻿{
+    "name":  "final-source-audit-correct-metadata",
+    "startedUtc":  "2026-10-28T03:32:00.2693245Z",
+    "finishedUtc":  "2026-10-28T03:32:00.5030583Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-all",
+                      ".llm/tmp/better-auth-security-sol-20261028/final-audit.ts"
+                  ],
+    "exitCode":  1,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\final-source-audit-correct-metadata.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008\\.llm\\tmp\\better-auth-security-sol-20261028\\final-source-audit-correct-metadata.stderr.log"
+}

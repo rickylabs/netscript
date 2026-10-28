@@ -1,0 +1,40 @@
+{
+  "noInference": true,
+  "fullFiveOwners": true,
+  "checked": [
+    {
+      "label": "source-config",
+      "paths": [
+        "deno.json"
+      ],
+      "parts": 1,
+      "allSourceTextReconstructed": true
+    },
+    {
+      "label": "source-root-lock",
+      "paths": [
+        "deno.lock"
+      ],
+      "parts": 8,
+      "allSourceTextReconstructed": true
+    },
+    {
+      "label": "source-ui-lock",
+      "paths": [
+        "packages/fresh-ui/deno.lock"
+      ],
+      "parts": 8,
+      "allSourceTextReconstructed": true
+    },
+    {
+      "label": "source-two-tests",
+      "paths": [
+        "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+        "plugins/auth/tests/services/unsupported-revocation-http_test.ts"
+      ],
+      "parts": 1,
+      "allSourceTextReconstructed": true
+    }
+  ],
+  "allAllowancePayloadsIgnoredOnly": true
+}

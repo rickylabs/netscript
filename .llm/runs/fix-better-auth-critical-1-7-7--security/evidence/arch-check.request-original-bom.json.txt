@@ -1,0 +1,18 @@
+﻿{
+    "args":  [
+                 "run",
+                 "--cached-only",
+                 "--frozen",
+                 "--allow-all",
+                 ".llm/tools/gates/run-gate.ts",
+                 "--gate",
+                 "arch-check",
+                 "--id",
+                 "security-arch-check",
+                 "--output",
+                 ".llm/tmp/better-auth-security-sol-20261028/arch-check.native-receipt.json",
+                 "--timeout-ms",
+                 "180000"
+             ],
+    "timeoutMs":  180000
+}

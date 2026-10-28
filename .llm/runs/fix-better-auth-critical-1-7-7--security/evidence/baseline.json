@@ -1,0 +1,439 @@
+{
+  "baseline": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "authored": [
+    {
+      "path": "deno.json",
+      "snapshot": ".llm/tmp/better-auth-security-sol-20261028/baseline-deno.json.txt",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "lines": 287
+    },
+    {
+      "path": "deno.lock",
+      "snapshot": ".llm/tmp/better-auth-security-sol-20261028/baseline-deno.lock.txt",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "lines": 4875
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "snapshot": ".llm/tmp/better-auth-security-sol-20261028/baseline-packages-fresh-ui-deno.lock.txt",
+      "sha256": "18693dfeb7be838b924e8b2803d55994b34bcde981ab617e0c72eb30129fcf40",
+      "lines": 4370
+    },
+    {
+      "path": "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+      "snapshot": ".llm/tmp/better-auth-security-sol-20261028/baseline-plugins-auth-tests-services-better-auth-global-logout-http_test.ts.txt",
+      "sha256": "72a695a3061e3ce51231a9759aa547ea364dd68defd9cc3e5f046c609711b763",
+      "lines": 78
+    },
+    {
+      "path": "plugins/auth/tests/services/unsupported-revocation-http_test.ts",
+      "snapshot": ".llm/tmp/better-auth-security-sol-20261028/baseline-plugins-auth-tests-services-unsupported-revocation-http_test.ts.txt",
+      "sha256": "e0210d9b1703482af56b05452681d46ab16d148c96a40aed41584a5443df3194",
+      "lines": 184
+    }
+  ],
+  "protectedFiles": [
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "docs/site/deno.lock",
+      "sha256": "e03005b38fbb0ffdef75671067ad0c7b356ea8f04fef911c9926b16f5f21f057"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/README.md",
+      "sha256": "63b45863ccd9a8b542f8bda731b87246455ecef18ccc79e94a9565331461d001"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/deno.json",
+      "sha256": "cd498af2acf1cb4239be4734c4e0cf24787971d7a8e273f137ff25d89b0a23c5"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/mod.ts",
+      "sha256": "d42b3f01291b096bab3cf727974b8d9925c2a6a50b044aa6a065b69b20c4e5d7"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/package.json",
+      "sha256": "f426a5a2072c65551661615352b106b98d6d44320df92c65438eff7b578c4550"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/src/better-auth-backend.ts",
+      "sha256": "336fa7e09a90476c8b0c33923edafee352893e30897291cabce33a5ae1cf91cb"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/src/better-auth.ts",
+      "sha256": "e8dc9c8cfb9a54c70c4bbed3ed0d22e8d493a7c96d749733dc33840649cd41e9"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/tests/backend-error-interop_test.ts",
+      "sha256": "dffdf3ee12e49b975b6303c5640a32bb53cc872d8afc7e600f0de7ac3f370c41"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/tests/better-auth-node-compat_test.ts",
+      "sha256": "253c44d21ec21b950cacc7856718461cd3bce94e1243582c567f1c3a3ce6165a"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/tests/better-auth_test.ts",
+      "sha256": "bf3f7cd4f5859801a18628d1beb814de84a4275b744ebe13c50f09c5100bcea5"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/auth-better-auth/tests/subject-revocation_test.ts",
+      "sha256": "59ec73a5a82e20ce0bcbbc52e904c97fa1d03cc0d54aed58507af8a4d9ac4f75"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/cli/e2e/fixtures/desktop-native/deno.lock",
+      "sha256": "adc126281992b69e3dbbe0a325b2e5bcb2775358ecfb6a82465fc5fcdb943e8a"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "sha256": "eabb1c9f54a502a119b10a6bb908410da7ba41a8ba553f6893023bfed021796f"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/auth-guard.ts",
+      "sha256": "9710f193ec8e40ce570a08a93180c4ac36336b7576e3ca5b0046f3d8f02b1a61"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/auth-service-runtime.ts",
+      "sha256": "05e78dd771935b7f65d8a6f5614a334f55c8700f65eb69c352293629e35757eb"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/auth-service-types.ts",
+      "sha256": "182952e5b1ad4da8d0e2f04ad3d9e46f54aaf7db686fd9333ec2f5ca814eac2d"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/backend-registry.ts",
+      "sha256": "e33ddaea16bfd98351ed9c4d9bd5fe7eb3b62b6cb5693555e1edf5ae92ec9ca0"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/init.ts",
+      "sha256": "5fee72b31b0689f1df17b65eac98bf66fd1268c7ed712ca2ed5ac855111afc64"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/kv-oauth-subject.ts",
+      "sha256": "b2c12149a871f22585a7f2c5a7221739e684ff3d20b212b93619ca2130eaf45b"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/main.ts",
+      "sha256": "0855efbbfaec016c25c407bef80e0bdfa8a1f05c02a60fcd6f146a01c69a5083"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/request-context.ts",
+      "sha256": "1d56cb93b1ee859c459889b397fd6b0143ecd70d6631c8b1b010196ff0582df0"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/router.ts",
+      "sha256": "14bdf98c40a519cb57fa904d77a9e4bf0616fa17ba23253f7daa83961c8de52f"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/routers/router-context.ts",
+      "sha256": "3eda52f2be079bc9cd8096a5e9dfc57b5c845b27407adf79f9021cae2ef41ffe"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/routers/v1-handlers.ts",
+      "sha256": "e56620a73ecd5a5ce6c2c6255af579a788a6b359e5282cb3879956b214a69fc8"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/routers/v1-helpers.ts",
+      "sha256": "8e69f877495378688aa6e7c25d0c847b5898c3d97408d42f948188f14e1da437"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/routers/v1-session-ownership.ts",
+      "sha256": "3e7709eba1c1e90208ca56081e4681d83e737972b2fdbce1811f9327eb493b93"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/routers/v1-telemetry.ts",
+      "sha256": "30cd0b7b2b1b20467d7bc5f85e325054dc1483710353fbcc283d7cdfd27a5c8f"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/routers/v1-types.ts",
+      "sha256": "f3cb43824506315c02d59f955fa753f102eb8a0090226ee981156e9ed4cf3bb6"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/routers/v1.ts",
+      "sha256": "bd8b3b1484b70cd64374990943896e1bf932d0c3cb83671d5f490364bf30bff6"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/workos-revocation-worker.ts",
+      "sha256": "e2fdb79406914c1555d336e0c1cd4c7bd656522d5af25ecefdefe869dbe8cc9e"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/services/src/workos-worker-observer.ts",
+      "sha256": "4ee5a5195fc3a9c3a29a1ab5caa3b9622ee7e21676385afd85e0800801ae9143"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/auth-service_test.ts",
+      "sha256": "5e26d6cc5e6670a11d25ec40f08d58296c56af54615f0a616194c7bfdc61abbb"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/auth-v1-context-types_test.ts",
+      "sha256": "39f4d9c451e06f75276c437f7cc49ab62e8f92e4996778db1c8ba3cddceb91b9"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/callback-cookie-contract-http_test.ts",
+      "sha256": "cb1805b767a6f57d84fe9612632f86174e2e5d11abf6e1b8a6e6ce881257c771"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/configured-cookie_test.ts",
+      "sha256": "5fc8cb5f21f0ed95e02da3d13b0bb86a815e319e1d5b51ebef369696f30e6ab5"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/cookie-audit-failure_test.ts",
+      "sha256": "d2817c34705430b7dfc8662c1096d2c4fbbd7b7a18b3226a968a8a7daa798269"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/cookie-propagation-http_test.ts",
+      "sha256": "74886f67288fb60dd2f225f9f77caea3a8fe4860e36cd0bdf9757a8c2fa4bab7"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/cookie-propagation-production_test.ts",
+      "sha256": "a7917dd4b31cf9f5ed7eb9b7231177bc4dac9c9614d428129ded3ae4d50b4bf8"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/documented-cookie-jar_test.ts",
+      "sha256": "9f95314c9b8380f3f04b60089f31222cc297d27d5a1857d33877482f5ced0b39"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/global-signout-cookie-http_test.ts",
+      "sha256": "6a3ebcaae8088a804c0ecf9aad7a97948ee9984d253c9f94dc9eddbde4e3673b"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/import-surface_test.ts",
+      "sha256": "de4e1cd88e64f21f0518a540d850f9fdf96af8b1428de7de7769d05b0b00b781"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/kv-oauth-subject_test.ts",
+      "sha256": "5637eeb59e41079598fc20f4dbd8fb286487a9a1bdd8cb1db80398e4ac5befa6"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/me-bearer-parity-http_test.ts",
+      "sha256": "24808b9b2e85be8d713e072330894f2472f8de85604639552ca6f25d5443e41f"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/me-empty-input-http_test.ts",
+      "sha256": "5f925a0bff7506d7879304ae9950824b49d64b82704334d8bb54beca75b6fa09"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/session-credentials-http_test.ts",
+      "sha256": "48637da86fc3dd3d1d4a15811d77645e01432eefcd07e61a8d48e8cd5dc056a7"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/signout-ownership-http_test.ts",
+      "sha256": "e6f965ee649fc66acb88c3577538972821bc97d6c97fcdb952484454301bc374"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/transport-policy_test.ts",
+      "sha256": "0c60f2ac253ce23f0456cbeb291a06d79dc0b59e8d18a33105cb1d2b663f6ce2"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/workos-composition_test.ts",
+      "sha256": "f358f159c8c175387dce09eaf798337e6af492220739563e6353f403560e7f56"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/workos-global-logout-http_test.ts",
+      "sha256": "c8a79e30c6f8c28081001a6d60ecb68d5f566e870131b60c889b1fbb102f5f5b"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/workos-observer_test.ts",
+      "sha256": "51ea5b70b5dad9e5f6dd7901148c63d5407de79e089381e49efc4ebbf840d59a"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/workos-revocation-worker_test.ts",
+      "sha256": "7399334b807a894afa03ba4418b36d03b81275b3ced0c099e2cea968d3a1e944"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "plugins/auth/tests/services/workos-wake-availability_test.ts",
+      "sha256": "2fe2b5d520a5609f3eb210f45411e8fb57d0eb355db503270ad76f7fe4130bc2"
+    },
+    {
+      "root": "C:\\Users\\ericc\\source\\repos\\netscript-better-auth-security-008",
+      "path": "resources/examples/expo-streams/deno.lock",
+      "sha256": "3ae6c0fe813d94b743e3d3b853157d7c76f68e4f18b97c958a7d23c800d1b81e"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/plugin/tests/service/create-plugin-service-auth_test.ts",
+      "sha256": "24cd6d86f27e147f09d71c1afaf9b66f9a0a13fb5c694763f9ea62846db42c28"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/CHANGELOG.md",
+      "sha256": "4ab70c6e658f082e1231587d04c7eb52712817d8ec726833d91bc1cc3f9d428f"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/README.md",
+      "sha256": "11f556ff05d88ff15b36b700a9e36e944deb2f0c13709ac31891c3430149174a"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/mod.ts",
+      "sha256": "19f94d3d99c5c5ce8411335cf896d33e9f0129f3c38ee5d576d254ca1b7f9e9e"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/auth/auth-middleware.ts",
+      "sha256": "ae16fb44ca55d048d867bd06f669ea2895e46af51287b5c8f5cecbea9ee5cb32"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/auth/mod.ts",
+      "sha256": "9c384b7b34ff323e171718f1a43c65538be89105c53a510c3ed3030a19e7dab7"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/auth/options.ts",
+      "sha256": "6f32f887b8dea35fef1f11bf19e244c678e30fa87a4e3a2848062af7e0fa75b2"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/builder/service-builder-impl.ts",
+      "sha256": "74090bb6ec406b4f648a0e77d2ebee4e63cc202a4d4023d5d9de37103c4130b9"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/diagnostics/database-connectivity.ts",
+      "sha256": "854e3c3356065560ebfb5759e1665ef0fc3ee8cecf8c75773d09f5df24147ee6"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/middleware/service-cors.ts",
+      "sha256": "bf8084a59737382ac3b9e79293d9c45fa873dc58cc70d0492e95fab8d81245d0"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/src/primitives/body-limit.ts",
+      "sha256": "cf570dcb7a4a65f19e9ee992f3c2273879f567b710990d045c5a462941cc82b1"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/auth/builder-auth_test.ts",
+      "sha256": "09b8b83a399105716607ed1d4cb9ef1ee5f7818570cb6475f8f030bc2ef681fa"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/auth/define-service-auth_test.ts",
+      "sha256": "e725e29e30f6423297af9b2a8eabac960ea2aea69b4ccff732527c8299a372f2"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/auth/health-auth-order_test.ts",
+      "sha256": "c785869359b8fca476db9fe94e2d4b7c188196ea34d085966453e3a57b3078bb"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/auth/middleware_test.ts",
+      "sha256": "67443947ed85b05d07324e85326ce5b522168f81ed877f8ae4c7da2bd2c42a05"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/body-limit_test.ts",
+      "sha256": "c056cb621def1fa3ce4e032a60a1353eba2f3c4bcf9432647a7d9febdaa935a0"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/cors-response-authority_test.ts",
+      "sha256": "e2668ae9ce623a28caed562bed4d9c6b43af46737857599b99bacd8653ac9bc3"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/database-connectivity_test.ts",
+      "sha256": "f1f8ee2dc7fdd8ce7861edcca412f74b9724cb382bee43529d30d491bfae5f3a"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/service/tests/legacy-abort_test.ts",
+      "sha256": "8781d5d9144250b5554d6e53b84d7b54f54938c5b0f685ee484082d935a56a0c"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-service-policy-008",
+      "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "sha256": "c22bd6298a119279c18dfc1192c6dffc7feca8bb661884d00e7cac7f7db654f0"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/check-exports-drift.ts",
+      "sha256": "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/check-exports-drift_test.ts",
+      "sha256": "033e33dbbde1efb8fef9f5f29d4ffd9c32e3761e2247e9bcb682daaf2ccdffd1"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/jsdoc-example-compiler.ts",
+      "sha256": "cc70b2791667f698f853a81409ce482fb8eef768924623ac816f013f17715f18"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/jsdoc-example-compiler_test.ts",
+      "sha256": "27bad4e2dcb444f5c7f87f3488a1393f5c0e7cf19f1ab59aec0fcba20ac46417"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-windows-qualification-008",
+      "path": ".llm/tools/docs/jsdoc-example-policy.ts",
+      "sha256": "ec954fff331b75c023df39a84929bb0c8833bd1cab07bb9d62d859a671a4cefc"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008",
+      "path": ".llm/tools/deps/check-db-alignment.ts",
+      "sha256": "babe9043e1296dac30e9923bbfee9d3c02f96f062c62c3ec1e90e0fdba5186b1"
+    },
+    {
+      "root": "C:/Users/ericc/source/repos/netscript-native-db-qualification-008",
+      "path": ".llm/tools/deps/check-db-alignment_test.ts",
+      "sha256": "634c289a7f7b60d8212a227294ed096ed70dc35559732de024d6332a2bbaf96b"
+    }
+  ],
+  "actualAgeBypassFlags": [],
+  "rootPackageJsonAbsent": true
+}

@@ -1,0 +1,2 @@
+# Preserve immutable public review bytes; no whitespace-ignore attributes.
+/raw/** -text

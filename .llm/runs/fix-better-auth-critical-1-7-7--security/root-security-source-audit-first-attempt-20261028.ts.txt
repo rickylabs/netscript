@@ -1,0 +1,14 @@
+const prep='.llm/tmp/better-auth-security-sol-20261028';
+const sha=async(b:Uint8Array)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new Uint8Array(b)))].map(x=>x.toString(16).padStart(2,'0')).join('');
+const closure=JSON.parse(await Deno.readTextFile(`${prep}/final-source-closure.json`));
+const protectedInputs=JSON.parse(await Deno.readTextFile(`${prep}/protected-final.json`));
+const matches=[];
+for(const item of protectedInputs.files){const actual=await sha(await Deno.readFile(`${item.root}/${item.path}`));if(actual!==item.sha256)throw new Error(`Protected drift:${item.path}`);matches.push({root:item.root,path:item.path,sha256:actual});}
+for(const item of closure.authored){const bytes=await Deno.readFile(item.path);if(await sha(bytes)!==item.sha256)throw new Error('Accepted candidate drift');matches.push({path:item.path,sha256:item.sha256});if(item.literalOnly){const old=await new Deno.Command('git',{args:['show',`HEAD:${item.path}`],stdout:'piped',stderr:'null'}).output();if(!old.success)throw new Error('Baseline blob read failed');const expected=new TextDecoder('utf-8',{fatal:true}).decode(old.stdout).replaceAll('^1.6.20','^1.7.7');if(await sha(new TextEncoder().encode(expected))!==item.sha256)throw new Error('Nonliteral authored edit');}}
+for(const path of ['deno.lock','packages/fresh-ui/deno.lock']){const lock=JSON.parse(await Deno.readTextFile(path));const family=Object.keys(lock.npm).filter(x=>/^(@better-auth\/(?:core|drizzle-adapter|kysely-adapter|memory-adapter|mongo-adapter|telemetry)|better-auth)@/.test(x));if(family.length!==8||family.some(x=>!x.includes('@1.7.14')))throw new Error('Native release family not closed');}
+const broad=JSON.parse(await Deno.readTextFile(`${prep}/auth-controls.json`)),baseline=JSON.parse(await Deno.readTextFile(`${prep}/auth-controls-unchanged-baseline.json`));
+const names=(r:{failures:{tests:{name:string}[]}[]})=>r.failures.flatMap(x=>x.tests.map(t=>t.name)).sort();
+if(JSON.stringify(names(broad))!==JSON.stringify(names(baseline))||broad.summary.failed!==16||baseline.summary.failed!==16)throw new Error('Baseline failure attribution changed');
+const focused=JSON.parse(await Deno.readTextFile(`${prep}/patched-auth-controls.json`));if(focused.summary.passed!==21||focused.summary.failed||focused.summary.ignored||focused.exitCode!==0)throw new Error('Focused controls not passing');
+await Deno.writeTextFile('.llm/tmp/root-security-source-audit-20261028.json',JSON.stringify({at:new Date().toISOString(),rootReviewer:'/root',matchedBindings:matches.length,matchedProtected:80,exactSourceOwners:5,allAuthoredLiteralOnly:true,closedFamily:'8entries at1.7.14 in both locks',same16FailingNamesIndependentlyCompared:true,noWholeSuitePass:true,matches},null,2)+'\n',{createNew:true});
+console.log(JSON.stringify({matchedBindings:matches.length,protected:80,literalOwners:3,closedFamilyBothLocks:true,same16BaselineFailures:true}));

@@ -1,0 +1,21 @@
+{
+  "sourceHead": "88ae6fcacd36573b2f2f6244f4bebc31e49fc5e5",
+  "rootAuthorized": true,
+  "sameSession": "ses_e7f4aad3cffe0JFQyEBR1JXEte",
+  "newSession": false,
+  "independentVendorFamilies": {
+    "generator": "openai",
+    "evaluator": "zhipu"
+  },
+  "model": "openrouter/z-ai/glm-5.3-flash",
+  "variant": "provider_default",
+  "actualEffortIndependentlyAttested": false,
+  "estimatedEnvelopeUsd": 1,
+  "selectedEisAssignmentInMemoryOnly": true,
+  "freshSelectedKeyMinimumAndExpenseAdmissionPassed": true,
+  "serializationApprovedByRoot": true,
+  "rootReportedReservationReleased": true,
+  "rawOperationalSnapshotsExcluded": true,
+  "actualLaunchAuthoritySha256": "3b14e968a2fdd116fa907fc2fd0ee440cbd93d01c50ff8ef093042ece546f378",
+  "modelUsageMetadataNotAccountChargeAttribution": true
+}
