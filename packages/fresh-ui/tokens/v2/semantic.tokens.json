@@ -4136,26 +4136,6 @@
         "$type": "dimension",
         "$value": "{primitive.v0512}"
       },
-      "shadow-xs": {
-        "$type": "shadow",
-        "$value": "{primitive.v0513}"
-      },
-      "shadow-sm": {
-        "$type": "shadow",
-        "$value": "{primitive.v0514}"
-      },
-      "shadow-md": {
-        "$type": "shadow",
-        "$value": "{primitive.v0515}"
-      },
-      "shadow-lg": {
-        "$type": "shadow",
-        "$value": "{primitive.v0516}"
-      },
-      "shadow-xl": {
-        "$type": "shadow",
-        "$value": "{primitive.v0517}"
-      },
       "ease-fast": {
         "$type": "transition",
         "$value": "{primitive.v0518}"
@@ -4195,6 +4175,21 @@
       "z-toast": {
         "$type": "number",
         "$value": "{primitive.v0527}"
+      },
+      "liquid-success-tint": {
+        "$type": "color",
+        "$value": "{context.light.liquid-tag-green}",
+        "$extensions": {
+          "netscript": {
+            "derive": {
+              "kind": "mix",
+              "color": "context.light.liquid-tag-green",
+              "with": "primitive.v0079",
+              "weight": 0.12,
+              "space": "oklab"
+            }
+          }
+        }
       },
       "liquid-tag-pink": {
         "$type": "color",
@@ -4326,6 +4321,166 @@
         "$value": "{primitive.v0271}",
         "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
       },
+      "tonal-radius-extra-small": {
+        "$type": "dimension",
+        "$value": "{primitive.v0275}",
+        "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
+      },
+      "tonal-radius-tiny": {
+        "$type": "dimension",
+        "$value": "{primitive.v0551}",
+        "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
+      },
+      "tonal-radius-minimum": {
+        "$type": "dimension",
+        "$value": "{primitive.v0552}",
+        "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-2": {
+        "$type": "dimension",
+        "$value": "{primitive.v0251}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-14": {
+        "$type": "dimension",
+        "$value": "{primitive.v0254}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-15": {
+        "$type": "dimension",
+        "$value": "{primitive.v0262}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-18": {
+        "$type": "dimension",
+        "$value": "{primitive.v0269}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-20": {
+        "$type": "dimension",
+        "$value": "{primitive.v0271}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-21": {
+        "$type": "dimension",
+        "$value": "{primitive.v0553}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-22": {
+        "$type": "dimension",
+        "$value": "{primitive.v0253}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-24": {
+        "$type": "dimension",
+        "$value": "{primitive.v0280}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-26": {
+        "$type": "dimension",
+        "$value": "{primitive.v0285}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-28": {
+        "$type": "dimension",
+        "$value": "{primitive.v0279}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-30": {
+        "$type": "dimension",
+        "$value": "{primitive.v0277}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-32": {
+        "$type": "dimension",
+        "$value": "{primitive.v0278}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-40": {
+        "$type": "dimension",
+        "$value": "{primitive.v0265}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-12": {
+        "$type": "dimension",
+        "$value": "{primitive.v0257}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-13": {
+        "$type": "dimension",
+        "$value": "{primitive.v0270}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-14": {
+        "$type": "dimension",
+        "$value": "{primitive.v0254}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-15": {
+        "$type": "dimension",
+        "$value": "{primitive.v0262}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-16": {
+        "$type": "dimension",
+        "$value": "{primitive.v0256}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-17": {
+        "$type": "dimension",
+        "$value": "{primitive.v0554}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-18": {
+        "$type": "dimension",
+        "$value": "{primitive.v0269}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-22": {
+        "$type": "dimension",
+        "$value": "{primitive.v0253}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-24": {
+        "$type": "dimension",
+        "$value": "{primitive.v0280}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-28": {
+        "$type": "dimension",
+        "$value": "{primitive.v0279}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-30": {
+        "$type": "dimension",
+        "$value": "{primitive.v0277}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-32": {
+        "$type": "dimension",
+        "$value": "{primitive.v0278}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-40": {
+        "$type": "dimension",
+        "$value": "{primitive.v0265}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-48": {
+        "$type": "dimension",
+        "$value": "{primitive.v0273}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-60": {
+        "$type": "dimension",
+        "$value": "{primitive.v0555}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-92": {
+        "$type": "dimension",
+        "$value": "{primitive.v0556}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
       "cupertino-switch-thumb": {
         "$type": "color",
         "$value": "{context.light.primary-fg}"
@@ -4361,12 +4516,48 @@
       "terminal-key-border": {
         "$type": "color",
         "$value": "{context.light.input-border}"
+      },
+      "motion-duration-fast": {
+        "$type": "duration",
+        "$value": "{primitive.v0557}"
+      },
+      "motion-easing-fast": {
+        "$type": "cubicBezier",
+        "$value": "{primitive.v0558}"
+      },
+      "motion-duration-normal": {
+        "$type": "duration",
+        "$value": "{primitive.v0559}"
+      },
+      "motion-easing-normal": {
+        "$type": "cubicBezier",
+        "$value": "{primitive.v0558}"
+      },
+      "motion-duration-slow": {
+        "$type": "duration",
+        "$value": "{primitive.v0560}"
+      },
+      "motion-easing-slow": {
+        "$type": "cubicBezier",
+        "$value": "{primitive.v0558}"
+      },
+      "motion-duration-spring": {
+        "$type": "duration",
+        "$value": "{primitive.v0561}"
+      },
+      "motion-easing-spring": {
+        "$type": "cubicBezier",
+        "$value": "{primitive.v0562}"
+      },
+      "font-tabular": {
+        "$type": "number",
+        "$value": "{primitive.v0563}"
       }
     },
     "dark": {
       "bloom-butter": {
         "$type": "color",
-        "$value": "{primitive.v0569}",
+        "$value": "{primitive.v0582}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4379,7 +4570,7 @@
       },
       "bloom-canvas": {
         "$type": "color",
-        "$value": "{primitive.v0570}",
+        "$value": "{primitive.v0583}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4405,7 +4596,7 @@
       },
       "bloom-error": {
         "$type": "color",
-        "$value": "{primitive.v0571}",
+        "$value": "{primitive.v0584}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4418,7 +4609,7 @@
       },
       "bloom-fg": {
         "$type": "color",
-        "$value": "{primitive.v0572}",
+        "$value": "{primitive.v0585}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4444,7 +4635,7 @@
       },
       "bloom-hero": {
         "$type": "color",
-        "$value": "{primitive.v0573}",
+        "$value": "{primitive.v0586}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4470,7 +4661,7 @@
       },
       "bloom-ink-card": {
         "$type": "color",
-        "$value": "{primitive.v0574}",
+        "$value": "{primitive.v0587}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4483,7 +4674,7 @@
       },
       "bloom-lavender": {
         "$type": "color",
-        "$value": "{primitive.v0575}",
+        "$value": "{primitive.v0588}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4496,7 +4687,7 @@
       },
       "bloom-lime": {
         "$type": "color",
-        "$value": "{primitive.v0576}",
+        "$value": "{primitive.v0589}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4509,7 +4700,7 @@
       },
       "bloom-lime-strong": {
         "$type": "color",
-        "$value": "{primitive.v0577}",
+        "$value": "{primitive.v0590}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4522,7 +4713,7 @@
       },
       "bloom-line": {
         "$type": "color",
-        "$value": "{primitive.v0578}",
+        "$value": "{primitive.v0591}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4535,7 +4726,7 @@
       },
       "bloom-mint": {
         "$type": "color",
-        "$value": "{primitive.v0579}",
+        "$value": "{primitive.v0592}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4548,7 +4739,7 @@
       },
       "bloom-muted": {
         "$type": "color",
-        "$value": "{primitive.v0580}",
+        "$value": "{primitive.v0593}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4561,7 +4752,7 @@
       },
       "bloom-on-butter": {
         "$type": "color",
-        "$value": "{primitive.v0581}",
+        "$value": "{primitive.v0594}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4574,7 +4765,7 @@
       },
       "bloom-on-hero": {
         "$type": "color",
-        "$value": "{primitive.v0582}",
+        "$value": "{primitive.v0595}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4626,7 +4817,7 @@
       },
       "bloom-on-primary": {
         "$type": "color",
-        "$value": "{primitive.v0583}",
+        "$value": "{primitive.v0596}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4652,7 +4843,7 @@
       },
       "bloom-on-rose": {
         "$type": "color",
-        "$value": "{primitive.v0584}",
+        "$value": "{primitive.v0597}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4665,7 +4856,7 @@
       },
       "bloom-on-sky": {
         "$type": "color",
-        "$value": "{primitive.v0585}",
+        "$value": "{primitive.v0598}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4678,7 +4869,7 @@
       },
       "bloom-on-tangerine": {
         "$type": "color",
-        "$value": "{primitive.v0586}",
+        "$value": "{primitive.v0599}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4691,7 +4882,7 @@
       },
       "bloom-outline": {
         "$type": "color",
-        "$value": "{primitive.v0587}",
+        "$value": "{primitive.v0600}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4704,7 +4895,7 @@
       },
       "bloom-peach": {
         "$type": "color",
-        "$value": "{primitive.v0588}",
+        "$value": "{primitive.v0601}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4717,7 +4908,7 @@
       },
       "bloom-primary": {
         "$type": "color",
-        "$value": "{primitive.v0589}",
+        "$value": "{primitive.v0602}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4730,7 +4921,7 @@
       },
       "bloom-primary-container": {
         "$type": "color",
-        "$value": "{primitive.v0590}",
+        "$value": "{primitive.v0603}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4743,7 +4934,7 @@
       },
       "bloom-rose": {
         "$type": "color",
-        "$value": "{primitive.v0591}",
+        "$value": "{primitive.v0604}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4756,7 +4947,7 @@
       },
       "bloom-sky": {
         "$type": "color",
-        "$value": "{primitive.v0592}",
+        "$value": "{primitive.v0605}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4769,7 +4960,7 @@
       },
       "bloom-success": {
         "$type": "color",
-        "$value": "{primitive.v0593}",
+        "$value": "{primitive.v0606}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4782,7 +4973,7 @@
       },
       "bloom-surface": {
         "$type": "color",
-        "$value": "{primitive.v0594}",
+        "$value": "{primitive.v0607}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4795,7 +4986,7 @@
       },
       "bloom-surface-high": {
         "$type": "color",
-        "$value": "{primitive.v0595}",
+        "$value": "{primitive.v0608}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4808,7 +4999,7 @@
       },
       "bloom-tangerine": {
         "$type": "color",
-        "$value": "{primitive.v0596}",
+        "$value": "{primitive.v0609}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4821,7 +5012,7 @@
       },
       "bloom-warn": {
         "$type": "color",
-        "$value": "{primitive.v0597}",
+        "$value": "{primitive.v0610}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4834,7 +5025,7 @@
       },
       "cupertino-border-default": {
         "$type": "color",
-        "$value": "{primitive.v0601}",
+        "$value": "{primitive.v0614}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4847,7 +5038,7 @@
       },
       "cupertino-border-input": {
         "$type": "color",
-        "$value": "{primitive.v0602}",
+        "$value": "{primitive.v0615}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4860,7 +5051,7 @@
       },
       "cupertino-border-ring": {
         "$type": "color",
-        "$value": "{primitive.v0603}",
+        "$value": "{primitive.v0616}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4873,7 +5064,7 @@
       },
       "cupertino-destructive-bg": {
         "$type": "color",
-        "$value": "{primitive.v0604}",
+        "$value": "{primitive.v0617}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4886,7 +5077,7 @@
       },
       "cupertino-destructive-text": {
         "$type": "color",
-        "$value": "{primitive.v0605}",
+        "$value": "{primitive.v0618}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4899,7 +5090,7 @@
       },
       "cupertino-field-fill": {
         "$type": "color",
-        "$value": "{primitive.v0606}",
+        "$value": "{primitive.v0619}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4912,7 +5103,7 @@
       },
       "cupertino-info-bg": {
         "$type": "color",
-        "$value": "{primitive.v0607}",
+        "$value": "{primitive.v0620}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4925,7 +5116,7 @@
       },
       "cupertino-info-text": {
         "$type": "color",
-        "$value": "{primitive.v0603}",
+        "$value": "{primitive.v0616}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4938,7 +5129,7 @@
       },
       "cupertino-primary-default": {
         "$type": "color",
-        "$value": "{primitive.v0608}",
+        "$value": "{primitive.v0621}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4951,7 +5142,7 @@
       },
       "cupertino-primary-edge": {
         "$type": "color",
-        "$value": "{primitive.v0602}",
+        "$value": "{primitive.v0615}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4977,7 +5168,7 @@
       },
       "cupertino-primary-hover": {
         "$type": "color",
-        "$value": "{primitive.v0609}",
+        "$value": "{primitive.v0622}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -4990,7 +5181,7 @@
       },
       "cupertino-primary-text": {
         "$type": "color",
-        "$value": "{primitive.v0603}",
+        "$value": "{primitive.v0616}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5003,7 +5194,7 @@
       },
       "cupertino-push-fill": {
         "$type": "color",
-        "$value": "{primitive.v0610}",
+        "$value": "{primitive.v0623}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5016,7 +5207,7 @@
       },
       "cupertino-success-bg": {
         "$type": "color",
-        "$value": "{primitive.v0611}",
+        "$value": "{primitive.v0624}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5029,7 +5220,7 @@
       },
       "cupertino-success-text": {
         "$type": "color",
-        "$value": "{primitive.v0612}",
+        "$value": "{primitive.v0625}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5042,7 +5233,7 @@
       },
       "cupertino-surface-bg": {
         "$type": "color",
-        "$value": "{primitive.v0613}",
+        "$value": "{primitive.v0626}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5055,7 +5246,7 @@
       },
       "cupertino-surface-card": {
         "$type": "color",
-        "$value": "{primitive.v0614}",
+        "$value": "{primitive.v0627}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5068,7 +5259,7 @@
       },
       "cupertino-surface-raised": {
         "$type": "color",
-        "$value": "{primitive.v0610}",
+        "$value": "{primitive.v0623}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5081,7 +5272,7 @@
       },
       "cupertino-surface-well": {
         "$type": "color",
-        "$value": "{primitive.v0606}",
+        "$value": "{primitive.v0619}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5094,7 +5285,7 @@
       },
       "cupertino-text-fg": {
         "$type": "color",
-        "$value": "{primitive.v0615}",
+        "$value": "{primitive.v0628}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5107,7 +5298,7 @@
       },
       "cupertino-text-muted": {
         "$type": "color",
-        "$value": "{primitive.v0616}",
+        "$value": "{primitive.v0629}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5159,7 +5350,7 @@
       },
       "cupertino-warning-bg": {
         "$type": "color",
-        "$value": "{primitive.v0617}",
+        "$value": "{primitive.v0630}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5172,7 +5363,7 @@
       },
       "cupertino-warning-text": {
         "$type": "color",
-        "$value": "{primitive.v0618}",
+        "$value": "{primitive.v0631}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5185,7 +5376,7 @@
       },
       "fluent-accent-default": {
         "$type": "color",
-        "$value": "{primitive.v0625}",
+        "$value": "{primitive.v0638}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5198,7 +5389,7 @@
       },
       "fluent-accent-disabled": {
         "$type": "color",
-        "$value": "{primitive.v0626}",
+        "$value": "{primitive.v0639}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5211,7 +5402,7 @@
       },
       "fluent-accent-secondary": {
         "$type": "color",
-        "$value": "{primitive.v0627}",
+        "$value": "{primitive.v0640}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5224,7 +5415,7 @@
       },
       "fluent-accent-tertiary": {
         "$type": "color",
-        "$value": "{primitive.v0628}",
+        "$value": "{primitive.v0641}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5393,7 +5584,7 @@
       },
       "fluent-badge-brand-bg": {
         "$type": "color",
-        "$value": "{primitive.v0629}",
+        "$value": "{primitive.v0642}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5406,7 +5597,7 @@
       },
       "fluent-badge-brand-border": {
         "$type": "color",
-        "$value": "{primitive.v0630}",
+        "$value": "{primitive.v0643}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5419,7 +5610,7 @@
       },
       "fluent-badge-brand-fg": {
         "$type": "color",
-        "$value": "{primitive.v0631}",
+        "$value": "{primitive.v0644}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5432,7 +5623,7 @@
       },
       "fluent-badge-danger-bg": {
         "$type": "color",
-        "$value": "{primitive.v0632}",
+        "$value": "{primitive.v0645}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5445,7 +5636,7 @@
       },
       "fluent-badge-danger-border": {
         "$type": "color",
-        "$value": "{primitive.v0633}",
+        "$value": "{primitive.v0646}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5458,7 +5649,7 @@
       },
       "fluent-badge-danger-fg": {
         "$type": "color",
-        "$value": "{primitive.v0634}",
+        "$value": "{primitive.v0647}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5471,7 +5662,7 @@
       },
       "fluent-badge-informative-bg": {
         "$type": "color",
-        "$value": "{primitive.v0635}",
+        "$value": "{primitive.v0648}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5484,7 +5675,7 @@
       },
       "fluent-badge-informative-border": {
         "$type": "color",
-        "$value": "{primitive.v0636}",
+        "$value": "{primitive.v0649}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5497,7 +5688,7 @@
       },
       "fluent-badge-informative-fg": {
         "$type": "color",
-        "$value": "{primitive.v0637}",
+        "$value": "{primitive.v0650}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5510,7 +5701,7 @@
       },
       "fluent-badge-success-bg": {
         "$type": "color",
-        "$value": "{primitive.v0638}",
+        "$value": "{primitive.v0651}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5523,7 +5714,7 @@
       },
       "fluent-badge-success-border": {
         "$type": "color",
-        "$value": "{primitive.v0639}",
+        "$value": "{primitive.v0652}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5536,7 +5727,7 @@
       },
       "fluent-badge-success-fg": {
         "$type": "color",
-        "$value": "{primitive.v0640}",
+        "$value": "{primitive.v0653}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5549,7 +5740,7 @@
       },
       "fluent-badge-warning-bg": {
         "$type": "color",
-        "$value": "{primitive.v0641}",
+        "$value": "{primitive.v0654}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5562,7 +5753,7 @@
       },
       "fluent-badge-warning-border": {
         "$type": "color",
-        "$value": "{primitive.v0642}",
+        "$value": "{primitive.v0655}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5575,7 +5766,7 @@
       },
       "fluent-badge-warning-fg": {
         "$type": "color",
-        "$value": "{primitive.v0643}",
+        "$value": "{primitive.v0656}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5588,7 +5779,7 @@
       },
       "fluent-card-default": {
         "$type": "color",
-        "$value": "{primitive.v0644}",
+        "$value": "{primitive.v0657}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5601,7 +5792,7 @@
       },
       "fluent-card-secondary": {
         "$type": "color",
-        "$value": "{primitive.v0563}",
+        "$value": "{primitive.v0576}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5614,7 +5805,7 @@
       },
       "fluent-control-alt-secondary": {
         "$type": "color",
-        "$value": "{primitive.v0645}",
+        "$value": "{primitive.v0658}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5627,7 +5818,7 @@
       },
       "fluent-control-default": {
         "$type": "color",
-        "$value": "{primitive.v0562}",
+        "$value": "{primitive.v0575}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5640,7 +5831,7 @@
       },
       "fluent-control-disabled": {
         "$type": "color",
-        "$value": "{primitive.v0646}",
+        "$value": "{primitive.v0659}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5653,7 +5844,7 @@
       },
       "fluent-control-input-active": {
         "$type": "color",
-        "$value": "{primitive.v0647}",
+        "$value": "{primitive.v0660}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5666,7 +5857,7 @@
       },
       "fluent-control-secondary": {
         "$type": "color",
-        "$value": "{primitive.v0648}",
+        "$value": "{primitive.v0661}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5679,7 +5870,7 @@
       },
       "fluent-control-solid": {
         "$type": "color",
-        "$value": "{primitive.v0649}",
+        "$value": "{primitive.v0662}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5692,7 +5883,7 @@
       },
       "fluent-control-strong": {
         "$type": "color",
-        "$value": "{primitive.v0650}",
+        "$value": "{primitive.v0663}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5705,7 +5896,7 @@
       },
       "fluent-control-tertiary": {
         "$type": "color",
-        "$value": "{primitive.v0563}",
+        "$value": "{primitive.v0576}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5718,7 +5909,7 @@
       },
       "fluent-elevation-accent-bottom": {
         "$type": "color",
-        "$value": "{primitive.v0651}",
+        "$value": "{primitive.v0664}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5731,7 +5922,7 @@
       },
       "fluent-elevation-control-bottom": {
         "$type": "color",
-        "$value": "{primitive.v0652}",
+        "$value": "{primitive.v0665}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5744,7 +5935,7 @@
       },
       "fluent-elevation-control-top": {
         "$type": "color",
-        "$value": "{primitive.v0653}",
+        "$value": "{primitive.v0666}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5757,7 +5948,7 @@
       },
       "fluent-focus-inner": {
         "$type": "color",
-        "$value": "{primitive.v0654}",
+        "$value": "{primitive.v0667}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5783,7 +5974,7 @@
       },
       "fluent-layer-default": {
         "$type": "color",
-        "$value": "{primitive.v0655}",
+        "$value": "{primitive.v0668}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5796,7 +5987,7 @@
       },
       "fluent-mica-tint": {
         "$type": "color",
-        "$value": "{primitive.v0656}",
+        "$value": "{primitive.v0669}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5822,7 +6013,7 @@
       },
       "fluent-stroke-card": {
         "$type": "color",
-        "$value": "{primitive.v0645}",
+        "$value": "{primitive.v0658}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5835,7 +6026,7 @@
       },
       "fluent-stroke-control": {
         "$type": "color",
-        "$value": "{primitive.v0564}",
+        "$value": "{primitive.v0577}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5848,7 +6039,7 @@
       },
       "fluent-stroke-control-secondary": {
         "$type": "color",
-        "$value": "{primitive.v0657}",
+        "$value": "{primitive.v0670}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5861,7 +6052,7 @@
       },
       "fluent-stroke-control-strong": {
         "$type": "color",
-        "$value": "{primitive.v0650}",
+        "$value": "{primitive.v0663}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5874,7 +6065,7 @@
       },
       "fluent-stroke-divider": {
         "$type": "color",
-        "$value": "{primitive.v0648}",
+        "$value": "{primitive.v0661}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5913,7 +6104,7 @@
       },
       "fluent-subtle-secondary": {
         "$type": "color",
-        "$value": "{primitive.v0562}",
+        "$value": "{primitive.v0575}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5926,7 +6117,7 @@
       },
       "fluent-subtle-tertiary": {
         "$type": "color",
-        "$value": "{primitive.v0658}",
+        "$value": "{primitive.v0671}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5939,7 +6130,7 @@
       },
       "fluent-system-caution": {
         "$type": "color",
-        "$value": "{primitive.v0659}",
+        "$value": "{primitive.v0672}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5952,7 +6143,7 @@
       },
       "fluent-system-caution-bg": {
         "$type": "color",
-        "$value": "{primitive.v0660}",
+        "$value": "{primitive.v0673}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5965,7 +6156,7 @@
       },
       "fluent-system-critical": {
         "$type": "color",
-        "$value": "{primitive.v0661}",
+        "$value": "{primitive.v0674}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5978,7 +6169,7 @@
       },
       "fluent-system-critical-bg": {
         "$type": "color",
-        "$value": "{primitive.v0662}",
+        "$value": "{primitive.v0675}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -5991,7 +6182,7 @@
       },
       "fluent-system-success": {
         "$type": "color",
-        "$value": "{primitive.v0663}",
+        "$value": "{primitive.v0676}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6004,7 +6195,7 @@
       },
       "fluent-system-success-bg": {
         "$type": "color",
-        "$value": "{primitive.v0664}",
+        "$value": "{primitive.v0677}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6017,7 +6208,7 @@
       },
       "fluent-text-accent": {
         "$type": "color",
-        "$value": "{primitive.v0665}",
+        "$value": "{primitive.v0678}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6030,7 +6221,7 @@
       },
       "fluent-text-disabled": {
         "$type": "color",
-        "$value": "{primitive.v0666}",
+        "$value": "{primitive.v0679}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6069,7 +6260,7 @@
       },
       "fluent-text-on-accent-disabled": {
         "$type": "color",
-        "$value": "{primitive.v0667}",
+        "$value": "{primitive.v0680}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6108,7 +6299,7 @@
       },
       "fluent-text-secondary": {
         "$type": "color",
-        "$value": "{primitive.v0668}",
+        "$value": "{primitive.v0681}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6121,7 +6312,7 @@
       },
       "fluent-text-tertiary": {
         "$type": "color",
-        "$value": "{primitive.v0667}",
+        "$value": "{primitive.v0680}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6134,7 +6325,7 @@
       },
       "fluent-wallpaper-base": {
         "$type": "color",
-        "$value": "{primitive.v0669}",
+        "$value": "{primitive.v0682}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6147,7 +6338,7 @@
       },
       "fluent-wallpaper-blue": {
         "$type": "color",
-        "$value": "{primitive.v0670}",
+        "$value": "{primitive.v0683}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6160,7 +6351,7 @@
       },
       "fluent-wallpaper-deep": {
         "$type": "color",
-        "$value": "{primitive.v0671}",
+        "$value": "{primitive.v0684}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6173,7 +6364,7 @@
       },
       "fluent-wallpaper-mist": {
         "$type": "color",
-        "$value": "{primitive.v0672}",
+        "$value": "{primitive.v0685}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6186,7 +6377,7 @@
       },
       "fluent-wallpaper-periwinkle": {
         "$type": "color",
-        "$value": "{primitive.v0673}",
+        "$value": "{primitive.v0686}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6199,7 +6390,7 @@
       },
       "fluent-wallpaper-teal": {
         "$type": "color",
-        "$value": "{primitive.v0674}",
+        "$value": "{primitive.v0687}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6212,7 +6403,7 @@
       },
       "liquid-accent-system": {
         "$type": "color",
-        "$value": "{primitive.v0678}",
+        "$value": "{primitive.v0691}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6225,7 +6416,7 @@
       },
       "liquid-border-default": {
         "$type": "color",
-        "$value": "{primitive.v0679}",
+        "$value": "{primitive.v0692}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6251,7 +6442,7 @@
       },
       "liquid-border-ring": {
         "$type": "color",
-        "$value": "{primitive.v0678}",
+        "$value": "{primitive.v0691}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6264,7 +6455,7 @@
       },
       "liquid-chart-area": {
         "$type": "color",
-        "$value": "{primitive.v0680}",
+        "$value": "{primitive.v0693}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6277,7 +6468,7 @@
       },
       "liquid-destructive-bg": {
         "$type": "color",
-        "$value": "{primitive.v0681}",
+        "$value": "{primitive.v0694}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6290,7 +6481,7 @@
       },
       "liquid-destructive-text": {
         "$type": "color",
-        "$value": "{primitive.v0682}",
+        "$value": "{primitive.v0695}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6303,7 +6494,7 @@
       },
       "liquid-effect-outline": {
         "$type": "color",
-        "$value": "{primitive.v0565}",
+        "$value": "{primitive.v0578}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6316,7 +6507,7 @@
       },
       "liquid-effect-refraction": {
         "$type": "color",
-        "$value": "{primitive.v0683}",
+        "$value": "{primitive.v0696}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6329,7 +6520,7 @@
       },
       "liquid-effect-shadow": {
         "$type": "color",
-        "$value": "{primitive.v0684}",
+        "$value": "{primitive.v0697}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6342,7 +6533,7 @@
       },
       "liquid-effect-side": {
         "$type": "color",
-        "$value": "{primitive.v0683}",
+        "$value": "{primitive.v0696}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6355,7 +6546,7 @@
       },
       "liquid-effect-specular": {
         "$type": "color",
-        "$value": "{primitive.v0685}",
+        "$value": "{primitive.v0698}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6368,7 +6559,7 @@
       },
       "liquid-effect-specular-low": {
         "$type": "color",
-        "$value": "{primitive.v0644}",
+        "$value": "{primitive.v0657}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6381,7 +6572,7 @@
       },
       "liquid-effect-specular-tint": {
         "$type": "color",
-        "$value": "{primitive.v0686}",
+        "$value": "{primitive.v0699}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6394,7 +6585,7 @@
       },
       "liquid-field-bg": {
         "$type": "color",
-        "$value": "{primitive.v0687}",
+        "$value": "{primitive.v0700}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6407,7 +6598,7 @@
       },
       "liquid-glass-edge": {
         "$type": "color",
-        "$value": "{primitive.v0566}",
+        "$value": "{primitive.v0579}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6420,7 +6611,7 @@
       },
       "liquid-info-bg": {
         "$type": "color",
-        "$value": "{primitive.v0688}",
+        "$value": "{primitive.v0701}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6433,7 +6624,7 @@
       },
       "liquid-info-text": {
         "$type": "color",
-        "$value": "{primitive.v0689}",
+        "$value": "{primitive.v0702}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6446,7 +6637,7 @@
       },
       "liquid-material-glass-control": {
         "$type": "color",
-        "$value": "{primitive.v0690}",
+        "$value": "{primitive.v0703}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6459,7 +6650,7 @@
       },
       "liquid-material-glass-float": {
         "$type": "color",
-        "$value": "{primitive.v0691}",
+        "$value": "{primitive.v0704}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6472,7 +6663,7 @@
       },
       "liquid-material-glass-sheet": {
         "$type": "color",
-        "$value": "{primitive.v0692}",
+        "$value": "{primitive.v0705}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6485,7 +6676,7 @@
       },
       "liquid-material-glass-sidebar": {
         "$type": "color",
-        "$value": "{primitive.v0693}",
+        "$value": "{primitive.v0706}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6498,7 +6689,7 @@
       },
       "liquid-material-segment-thumb": {
         "$type": "color",
-        "$value": "{primitive.v0685}",
+        "$value": "{primitive.v0698}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6511,7 +6702,7 @@
       },
       "liquid-material-tinted-primary": {
         "$type": "color",
-        "$value": "{primitive.v0694}",
+        "$value": "{primitive.v0707}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6550,7 +6741,7 @@
       },
       "liquid-primary-hover": {
         "$type": "color",
-        "$value": "{primitive.v0695}",
+        "$value": "{primitive.v0708}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6563,7 +6754,7 @@
       },
       "liquid-primary-text": {
         "$type": "color",
-        "$value": "{primitive.v0689}",
+        "$value": "{primitive.v0702}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6576,7 +6767,7 @@
       },
       "liquid-sidebar-selection": {
         "$type": "color",
-        "$value": "{primitive.v0696}",
+        "$value": "{primitive.v0709}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6589,7 +6780,7 @@
       },
       "liquid-state-hover-overlay": {
         "$type": "color",
-        "$value": "{primitive.v0697}",
+        "$value": "{primitive.v0710}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6602,7 +6793,7 @@
       },
       "liquid-status-shipped-fg": {
         "$type": "color",
-        "$value": "{primitive.v0689}",
+        "$value": "{primitive.v0702}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6615,7 +6806,7 @@
       },
       "liquid-success-bg": {
         "$type": "color",
-        "$value": "{primitive.v0698}",
+        "$value": "{primitive.v0711}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6628,7 +6819,7 @@
       },
       "liquid-surface-bg": {
         "$type": "color",
-        "$value": "{primitive.v0700}",
+        "$value": "{primitive.v0713}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6641,7 +6832,7 @@
       },
       "liquid-surface-card": {
         "$type": "color",
-        "$value": "{primitive.v0701}",
+        "$value": "{primitive.v0714}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6654,7 +6845,7 @@
       },
       "liquid-surface-raised": {
         "$type": "color",
-        "$value": "{primitive.v0702}",
+        "$value": "{primitive.v0715}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6667,7 +6858,7 @@
       },
       "liquid-surface-well": {
         "$type": "color",
-        "$value": "{primitive.v0703}",
+        "$value": "{primitive.v0716}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6680,7 +6871,7 @@
       },
       "liquid-surface-zebra": {
         "$type": "color",
-        "$value": "{primitive.v0704}",
+        "$value": "{primitive.v0717}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6693,7 +6884,7 @@
       },
       "liquid-switch-off-track": {
         "$type": "color",
-        "$value": "{primitive.v0705}",
+        "$value": "{primitive.v0718}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6706,7 +6897,7 @@
       },
       "liquid-switch-on-edge": {
         "$type": "color",
-        "$value": "{primitive.v0699}",
+        "$value": "{primitive.v0712}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6719,7 +6910,7 @@
       },
       "liquid-switch-on-track": {
         "$type": "color",
-        "$value": "{primitive.v0699}",
+        "$value": "{primitive.v0712}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6745,7 +6936,7 @@
       },
       "liquid-tag-green": {
         "$type": "color",
-        "$value": "{primitive.v0699}",
+        "$value": "{primitive.v0712}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6758,7 +6949,7 @@
       },
       "liquid-tag-orange": {
         "$type": "color",
-        "$value": "{primitive.v0706}",
+        "$value": "{primitive.v0719}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6771,7 +6962,7 @@
       },
       "liquid-tag-purple": {
         "$type": "color",
-        "$value": "{primitive.v0707}",
+        "$value": "{primitive.v0720}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6784,7 +6975,7 @@
       },
       "liquid-tag-red": {
         "$type": "color",
-        "$value": "{primitive.v0708}",
+        "$value": "{primitive.v0721}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6810,7 +7001,7 @@
       },
       "liquid-text-muted": {
         "$type": "color",
-        "$value": "{primitive.v0709}",
+        "$value": "{primitive.v0722}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6823,7 +7014,7 @@
       },
       "liquid-toolbar-hairline": {
         "$type": "color",
-        "$value": "{primitive.v0565}",
+        "$value": "{primitive.v0578}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6836,7 +7027,7 @@
       },
       "liquid-toolbar-scroll-edge": {
         "$type": "color",
-        "$value": "{primitive.v0710}",
+        "$value": "{primitive.v0723}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6849,7 +7040,7 @@
       },
       "liquid-warning-bg": {
         "$type": "color",
-        "$value": "{primitive.v0711}",
+        "$value": "{primitive.v0724}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6862,7 +7053,7 @@
       },
       "liquid-warning-text": {
         "$type": "color",
-        "$value": "{primitive.v0712}",
+        "$value": "{primitive.v0725}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6927,7 +7118,7 @@
       },
       "pixel-face-secondary-hover": {
         "$type": "color",
-        "$value": "{primitive.v0715}",
+        "$value": "{primitive.v0728}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6940,7 +7131,7 @@
       },
       "pixel-focus-gap": {
         "$type": "color",
-        "$value": "{primitive.v0716}",
+        "$value": "{primitive.v0729}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -6992,7 +7183,7 @@
       },
       "pixel-lip-secondary": {
         "$type": "color",
-        "$value": "{primitive.v0716}",
+        "$value": "{primitive.v0729}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7005,7 +7196,7 @@
       },
       "pixel-recess-shade": {
         "$type": "color",
-        "$value": "{primitive.v0717}",
+        "$value": "{primitive.v0730}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7018,7 +7209,7 @@
       },
       "pixel-tag-lip-danger": {
         "$type": "color",
-        "$value": "{primitive.v0716}",
+        "$value": "{primitive.v0729}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7031,7 +7222,7 @@
       },
       "pixel-tag-lip-info": {
         "$type": "color",
-        "$value": "{primitive.v0716}",
+        "$value": "{primitive.v0729}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7044,7 +7235,7 @@
       },
       "pixel-tag-lip-neutral": {
         "$type": "color",
-        "$value": "{primitive.v0716}",
+        "$value": "{primitive.v0729}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7057,7 +7248,7 @@
       },
       "pixel-tag-lip-success": {
         "$type": "color",
-        "$value": "{primitive.v0716}",
+        "$value": "{primitive.v0729}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7070,7 +7261,7 @@
       },
       "pixel-tag-lip-warning": {
         "$type": "color",
-        "$value": "{primitive.v0716}",
+        "$value": "{primitive.v0729}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7083,7 +7274,7 @@
       },
       "studio-badge-solid-destructive-bg": {
         "$type": "color",
-        "$value": "{primitive.v0722}",
+        "$value": "{primitive.v0735}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7096,7 +7287,7 @@
       },
       "studio-badge-solid-destructive-fg": {
         "$type": "color",
-        "$value": "{primitive.v0622}",
+        "$value": "{primitive.v0635}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7109,7 +7300,7 @@
       },
       "studio-badge-solid-info-bg": {
         "$type": "color",
-        "$value": "{primitive.v0723}",
+        "$value": "{primitive.v0736}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7122,7 +7313,7 @@
       },
       "studio-badge-solid-info-fg": {
         "$type": "color",
-        "$value": "{primitive.v0603}",
+        "$value": "{primitive.v0616}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7135,7 +7326,7 @@
       },
       "studio-badge-solid-success-bg": {
         "$type": "color",
-        "$value": "{primitive.v0724}",
+        "$value": "{primitive.v0737}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7148,7 +7339,7 @@
       },
       "studio-badge-solid-success-fg": {
         "$type": "color",
-        "$value": "{primitive.v0725}",
+        "$value": "{primitive.v0738}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7161,7 +7352,7 @@
       },
       "studio-badge-solid-warning-bg": {
         "$type": "color",
-        "$value": "{primitive.v0726}",
+        "$value": "{primitive.v0739}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7174,7 +7365,7 @@
       },
       "studio-badge-solid-warning-fg": {
         "$type": "color",
-        "$value": "{primitive.v0727}",
+        "$value": "{primitive.v0740}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7187,7 +7378,7 @@
       },
       "tactile-accent": {
         "$type": "color",
-        "$value": "{primitive.v0738}",
+        "$value": "{primitive.v0751}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7200,7 +7391,7 @@
       },
       "tactile-concave-end": {
         "$type": "color",
-        "$value": "{primitive.v0739}",
+        "$value": "{primitive.v0752}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7213,7 +7404,7 @@
       },
       "tactile-concave-start": {
         "$type": "color",
-        "$value": "{primitive.v0740}",
+        "$value": "{primitive.v0753}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7226,7 +7417,7 @@
       },
       "tactile-convex-end": {
         "$type": "color",
-        "$value": "{primitive.v0741}",
+        "$value": "{primitive.v0754}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7239,7 +7430,7 @@
       },
       "tactile-convex-start": {
         "$type": "color",
-        "$value": "{primitive.v0742}",
+        "$value": "{primitive.v0755}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7252,7 +7443,7 @@
       },
       "tactile-edge-border": {
         "$type": "color",
-        "$value": "{primitive.v0743}",
+        "$value": "{primitive.v0756}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7265,7 +7456,7 @@
       },
       "tactile-edge-control": {
         "$type": "color",
-        "$value": "{primitive.v0744}",
+        "$value": "{primitive.v0757}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7278,7 +7469,7 @@
       },
       "tactile-glow-accent": {
         "$type": "color",
-        "$value": "{primitive.v0745}",
+        "$value": "{primitive.v0758}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7291,7 +7482,7 @@
       },
       "tactile-glow-amber": {
         "$type": "color",
-        "$value": "{primitive.v0746}",
+        "$value": "{primitive.v0759}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7304,7 +7495,7 @@
       },
       "tactile-glow-blue": {
         "$type": "color",
-        "$value": "{primitive.v0745}",
+        "$value": "{primitive.v0758}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7317,7 +7508,7 @@
       },
       "tactile-glow-green": {
         "$type": "color",
-        "$value": "{primitive.v0747}",
+        "$value": "{primitive.v0760}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7330,7 +7521,7 @@
       },
       "tactile-glow-red": {
         "$type": "color",
-        "$value": "{primitive.v0748}",
+        "$value": "{primitive.v0761}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7343,7 +7534,7 @@
       },
       "tactile-groove-dark": {
         "$type": "color",
-        "$value": "{primitive.v0749}",
+        "$value": "{primitive.v0762}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7356,7 +7547,7 @@
       },
       "tactile-groove-light": {
         "$type": "color",
-        "$value": "{primitive.v0750}",
+        "$value": "{primitive.v0763}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7369,7 +7560,7 @@
       },
       "tactile-inset-highlight": {
         "$type": "color",
-        "$value": "{primitive.v0750}",
+        "$value": "{primitive.v0763}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7382,7 +7573,7 @@
       },
       "tactile-inset-shade": {
         "$type": "color",
-        "$value": "{primitive.v0749}",
+        "$value": "{primitive.v0762}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7395,7 +7586,7 @@
       },
       "tactile-led-amber": {
         "$type": "color",
-        "$value": "{primitive.v0751}",
+        "$value": "{primitive.v0764}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7408,7 +7599,7 @@
       },
       "tactile-led-blue": {
         "$type": "color",
-        "$value": "{primitive.v0738}",
+        "$value": "{primitive.v0751}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7421,7 +7612,7 @@
       },
       "tactile-led-green": {
         "$type": "color",
-        "$value": "{primitive.v0752}",
+        "$value": "{primitive.v0765}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7434,7 +7625,7 @@
       },
       "tactile-led-grey": {
         "$type": "color",
-        "$value": "{primitive.v0753}",
+        "$value": "{primitive.v0766}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7447,7 +7638,7 @@
       },
       "tactile-led-off": {
         "$type": "color",
-        "$value": "{primitive.v0749}",
+        "$value": "{primitive.v0762}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7460,7 +7651,7 @@
       },
       "tactile-led-red": {
         "$type": "color",
-        "$value": "{primitive.v0754}",
+        "$value": "{primitive.v0767}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7473,7 +7664,7 @@
       },
       "tactile-shadow-highlight": {
         "$type": "color",
-        "$value": "{primitive.v0750}",
+        "$value": "{primitive.v0763}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7486,7 +7677,7 @@
       },
       "tactile-shadow-shade": {
         "$type": "color",
-        "$value": "{primitive.v0749}",
+        "$value": "{primitive.v0762}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7538,7 +7729,7 @@
       },
       "tactile-surface-base": {
         "$type": "color",
-        "$value": "{primitive.v0755}",
+        "$value": "{primitive.v0768}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7551,7 +7742,7 @@
       },
       "tactile-surface-disabled": {
         "$type": "color",
-        "$value": "{primitive.v0756}",
+        "$value": "{primitive.v0769}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7564,7 +7755,7 @@
       },
       "tactile-surface-tone": {
         "$type": "color",
-        "$value": "{primitive.v0757}",
+        "$value": "{primitive.v0770}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7577,7 +7768,7 @@
       },
       "tactile-surface-well": {
         "$type": "color",
-        "$value": "{primitive.v0758}",
+        "$value": "{primitive.v0771}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7590,7 +7781,7 @@
       },
       "tactile-text-accent": {
         "$type": "color",
-        "$value": "{primitive.v0759}",
+        "$value": "{primitive.v0772}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7603,7 +7794,7 @@
       },
       "tactile-text-body": {
         "$type": "color",
-        "$value": "{primitive.v0760}",
+        "$value": "{primitive.v0773}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7616,7 +7807,7 @@
       },
       "tactile-text-danger": {
         "$type": "color",
-        "$value": "{primitive.v0761}",
+        "$value": "{primitive.v0774}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7629,7 +7820,7 @@
       },
       "tactile-text-disabled": {
         "$type": "color",
-        "$value": "{primitive.v0762}",
+        "$value": "{primitive.v0775}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7642,7 +7833,7 @@
       },
       "tactile-text-muted": {
         "$type": "color",
-        "$value": "{primitive.v0763}",
+        "$value": "{primitive.v0776}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7668,7 +7859,7 @@
       },
       "tactile-text-strong": {
         "$type": "color",
-        "$value": "{primitive.v0764}",
+        "$value": "{primitive.v0777}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7681,7 +7872,7 @@
       },
       "tactile-text-success": {
         "$type": "color",
-        "$value": "{primitive.v0765}",
+        "$value": "{primitive.v0778}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7694,7 +7885,7 @@
       },
       "tactile-text-warning": {
         "$type": "color",
-        "$value": "{primitive.v0751}",
+        "$value": "{primitive.v0764}",
         "$extensions": {
           "netscript": {
             "figma": {
@@ -7707,35 +7898,35 @@
       },
       "amber-1": {
         "$type": "color",
-        "$value": "{primitive.v0770}"
+        "$value": "{primitive.v0783}"
       },
       "amber-10": {
         "$type": "color",
-        "$value": "{primitive.v0768}"
+        "$value": "{primitive.v0781}"
       },
       "amber-11": {
         "$type": "color",
-        "$value": "{primitive.v0727}"
+        "$value": "{primitive.v0740}"
       },
       "amber-12": {
         "$type": "color",
-        "$value": "{primitive.v0771}"
+        "$value": "{primitive.v0784}"
       },
       "amber-2": {
         "$type": "color",
-        "$value": "{primitive.v0772}"
+        "$value": "{primitive.v0785}"
       },
       "amber-3": {
         "$type": "color",
-        "$value": "{primitive.v0769}"
+        "$value": "{primitive.v0782}"
       },
       "amber-7": {
         "$type": "color",
-        "$value": "{primitive.v0774}"
+        "$value": "{primitive.v0787}"
       },
       "amber-8": {
         "$type": "color",
-        "$value": "{primitive.v0775}"
+        "$value": "{primitive.v0788}"
       },
       "amber-9": {
         "$type": "color",
@@ -7763,47 +7954,47 @@
       },
       "blue-1": {
         "$type": "color",
-        "$value": "{primitive.v0776}"
+        "$value": "{primitive.v0789}"
       },
       "blue-10": {
         "$type": "color",
-        "$value": "{primitive.v0676}"
+        "$value": "{primitive.v0689}"
       },
       "blue-11": {
         "$type": "color",
-        "$value": "{primitive.v0603}"
+        "$value": "{primitive.v0616}"
       },
       "blue-12": {
         "$type": "color",
-        "$value": "{primitive.v0777}"
+        "$value": "{primitive.v0790}"
       },
       "blue-2": {
         "$type": "color",
-        "$value": "{primitive.v0778}"
+        "$value": "{primitive.v0791}"
       },
       "blue-3": {
         "$type": "color",
-        "$value": "{primitive.v0677}"
+        "$value": "{primitive.v0690}"
       },
       "blue-4": {
         "$type": "color",
-        "$value": "{primitive.v0779}"
+        "$value": "{primitive.v0792}"
       },
       "blue-5": {
         "$type": "color",
-        "$value": "{primitive.v0723}"
+        "$value": "{primitive.v0736}"
       },
       "blue-6": {
         "$type": "color",
-        "$value": "{primitive.v0675}"
+        "$value": "{primitive.v0688}"
       },
       "blue-7": {
         "$type": "color",
-        "$value": "{primitive.v0780}"
+        "$value": "{primitive.v0793}"
       },
       "blue-8": {
         "$type": "color",
-        "$value": "{primitive.v0558}"
+        "$value": "{primitive.v0571}"
       },
       "blue-9": {
         "$type": "color",
@@ -7811,11 +8002,11 @@
       },
       "ember-1": {
         "$type": "color",
-        "$value": "{primitive.v0781}"
+        "$value": "{primitive.v0794}"
       },
       "ember-10": {
         "$type": "color",
-        "$value": "{primitive.v0782}"
+        "$value": "{primitive.v0795}"
       },
       "ember-11": {
         "$type": "color",
@@ -7823,35 +8014,35 @@
       },
       "ember-12": {
         "$type": "color",
-        "$value": "{primitive.v0783}"
+        "$value": "{primitive.v0796}"
       },
       "ember-2": {
         "$type": "color",
-        "$value": "{primitive.v0784}"
+        "$value": "{primitive.v0797}"
       },
       "ember-3": {
         "$type": "color",
-        "$value": "{primitive.v0785}"
+        "$value": "{primitive.v0798}"
       },
       "ember-4": {
         "$type": "color",
-        "$value": "{primitive.v0786}"
+        "$value": "{primitive.v0799}"
       },
       "ember-5": {
         "$type": "color",
-        "$value": "{primitive.v0787}"
+        "$value": "{primitive.v0800}"
       },
       "ember-6": {
         "$type": "color",
-        "$value": "{primitive.v0788}"
+        "$value": "{primitive.v0801}"
       },
       "ember-7": {
         "$type": "color",
-        "$value": "{primitive.v0789}"
+        "$value": "{primitive.v0802}"
       },
       "ember-8": {
         "$type": "color",
-        "$value": "{primitive.v0790}"
+        "$value": "{primitive.v0803}"
       },
       "ember-9": {
         "$type": "color",
@@ -7859,47 +8050,47 @@
       },
       "grass-1": {
         "$type": "color",
-        "$value": "{primitive.v0791}"
+        "$value": "{primitive.v0804}"
       },
       "grass-10": {
         "$type": "color",
-        "$value": "{primitive.v0732}"
+        "$value": "{primitive.v0745}"
       },
       "grass-11": {
         "$type": "color",
-        "$value": "{primitive.v0725}"
+        "$value": "{primitive.v0738}"
       },
       "grass-12": {
         "$type": "color",
-        "$value": "{primitive.v0792}"
+        "$value": "{primitive.v0805}"
       },
       "grass-2": {
         "$type": "color",
-        "$value": "{primitive.v0793}"
+        "$value": "{primitive.v0806}"
       },
       "grass-3": {
         "$type": "color",
-        "$value": "{primitive.v0733}"
+        "$value": "{primitive.v0746}"
       },
       "grass-4": {
         "$type": "color",
-        "$value": "{primitive.v0794}"
+        "$value": "{primitive.v0807}"
       },
       "grass-5": {
         "$type": "color",
-        "$value": "{primitive.v0724}"
+        "$value": "{primitive.v0737}"
       },
       "grass-6": {
         "$type": "color",
-        "$value": "{primitive.v0731}"
+        "$value": "{primitive.v0744}"
       },
       "grass-7": {
         "$type": "color",
-        "$value": "{primitive.v0795}"
+        "$value": "{primitive.v0808}"
       },
       "grass-8": {
         "$type": "color",
-        "$value": "{primitive.v0796}"
+        "$value": "{primitive.v0809}"
       },
       "grass-9": {
         "$type": "color",
@@ -7907,47 +8098,47 @@
       },
       "indigo-1": {
         "$type": "color",
-        "$value": "{primitive.v0797}"
+        "$value": "{primitive.v0810}"
       },
       "indigo-10": {
         "$type": "color",
-        "$value": "{primitive.v0798}"
+        "$value": "{primitive.v0811}"
       },
       "indigo-11": {
         "$type": "color",
-        "$value": "{primitive.v0799}"
+        "$value": "{primitive.v0812}"
       },
       "indigo-12": {
         "$type": "color",
-        "$value": "{primitive.v0800}"
+        "$value": "{primitive.v0813}"
       },
       "indigo-2": {
         "$type": "color",
-        "$value": "{primitive.v0801}"
+        "$value": "{primitive.v0814}"
       },
       "indigo-3": {
         "$type": "color",
-        "$value": "{primitive.v0802}"
+        "$value": "{primitive.v0815}"
       },
       "indigo-4": {
         "$type": "color",
-        "$value": "{primitive.v0803}"
+        "$value": "{primitive.v0816}"
       },
       "indigo-5": {
         "$type": "color",
-        "$value": "{primitive.v0804}"
+        "$value": "{primitive.v0817}"
       },
       "indigo-6": {
         "$type": "color",
-        "$value": "{primitive.v0805}"
+        "$value": "{primitive.v0818}"
       },
       "indigo-7": {
         "$type": "color",
-        "$value": "{primitive.v0806}"
+        "$value": "{primitive.v0819}"
       },
       "indigo-8": {
         "$type": "color",
-        "$value": "{primitive.v0561}"
+        "$value": "{primitive.v0574}"
       },
       "indigo-9": {
         "$type": "color",
@@ -7955,47 +8146,47 @@
       },
       "lime-1": {
         "$type": "color",
-        "$value": "{primitive.v0807}"
+        "$value": "{primitive.v0820}"
       },
       "lime-10": {
         "$type": "color",
-        "$value": "{primitive.v0808}"
+        "$value": "{primitive.v0821}"
       },
       "lime-11": {
         "$type": "color",
-        "$value": "{primitive.v0809}"
+        "$value": "{primitive.v0822}"
       },
       "lime-12": {
         "$type": "color",
-        "$value": "{primitive.v0810}"
+        "$value": "{primitive.v0823}"
       },
       "lime-2": {
         "$type": "color",
-        "$value": "{primitive.v0811}"
+        "$value": "{primitive.v0824}"
       },
       "lime-3": {
         "$type": "color",
-        "$value": "{primitive.v0812}"
+        "$value": "{primitive.v0825}"
       },
       "lime-4": {
         "$type": "color",
-        "$value": "{primitive.v0813}"
+        "$value": "{primitive.v0826}"
       },
       "lime-5": {
         "$type": "color",
-        "$value": "{primitive.v0814}"
+        "$value": "{primitive.v0827}"
       },
       "lime-6": {
         "$type": "color",
-        "$value": "{primitive.v0815}"
+        "$value": "{primitive.v0828}"
       },
       "lime-7": {
         "$type": "color",
-        "$value": "{primitive.v0816}"
+        "$value": "{primitive.v0829}"
       },
       "lime-8": {
         "$type": "color",
-        "$value": "{primitive.v0817}"
+        "$value": "{primitive.v0830}"
       },
       "lime-9": {
         "$type": "color",
@@ -8003,95 +8194,95 @@
       },
       "mauve-1": {
         "$type": "color",
-        "$value": "{primitive.v0818}"
+        "$value": "{primitive.v0831}"
       },
       "mauve-10": {
         "$type": "color",
-        "$value": "{primitive.v0819}"
+        "$value": "{primitive.v0832}"
       },
       "mauve-11": {
         "$type": "color",
-        "$value": "{primitive.v0820}"
+        "$value": "{primitive.v0833}"
       },
       "mauve-12": {
         "$type": "color",
-        "$value": "{primitive.v0821}"
+        "$value": "{primitive.v0834}"
       },
       "mauve-2": {
         "$type": "color",
-        "$value": "{primitive.v0822}"
+        "$value": "{primitive.v0835}"
       },
       "mauve-3": {
         "$type": "color",
-        "$value": "{primitive.v0823}"
+        "$value": "{primitive.v0836}"
       },
       "mauve-4": {
         "$type": "color",
-        "$value": "{primitive.v0824}"
+        "$value": "{primitive.v0837}"
       },
       "mauve-5": {
         "$type": "color",
-        "$value": "{primitive.v0825}"
+        "$value": "{primitive.v0838}"
       },
       "mauve-6": {
         "$type": "color",
-        "$value": "{primitive.v0826}"
+        "$value": "{primitive.v0839}"
       },
       "mauve-7": {
         "$type": "color",
-        "$value": "{primitive.v0827}"
+        "$value": "{primitive.v0840}"
       },
       "mauve-8": {
         "$type": "color",
-        "$value": "{primitive.v0828}"
+        "$value": "{primitive.v0841}"
       },
       "mauve-9": {
         "$type": "color",
-        "$value": "{primitive.v0829}"
+        "$value": "{primitive.v0842}"
       },
       "orange-1": {
         "$type": "color",
-        "$value": "{primitive.v0830}"
+        "$value": "{primitive.v0843}"
       },
       "orange-10": {
         "$type": "color",
-        "$value": "{primitive.v0831}"
+        "$value": "{primitive.v0844}"
       },
       "orange-11": {
         "$type": "color",
-        "$value": "{primitive.v0832}"
+        "$value": "{primitive.v0845}"
       },
       "orange-12": {
         "$type": "color",
-        "$value": "{primitive.v0833}"
+        "$value": "{primitive.v0846}"
       },
       "orange-2": {
         "$type": "color",
-        "$value": "{primitive.v0834}"
+        "$value": "{primitive.v0847}"
       },
       "orange-3": {
         "$type": "color",
-        "$value": "{primitive.v0835}"
+        "$value": "{primitive.v0848}"
       },
       "orange-4": {
         "$type": "color",
-        "$value": "{primitive.v0836}"
+        "$value": "{primitive.v0849}"
       },
       "orange-5": {
         "$type": "color",
-        "$value": "{primitive.v0837}"
+        "$value": "{primitive.v0850}"
       },
       "orange-6": {
         "$type": "color",
-        "$value": "{primitive.v0838}"
+        "$value": "{primitive.v0851}"
       },
       "orange-7": {
         "$type": "color",
-        "$value": "{primitive.v0560}"
+        "$value": "{primitive.v0573}"
       },
       "orange-8": {
         "$type": "color",
-        "$value": "{primitive.v0839}"
+        "$value": "{primitive.v0852}"
       },
       "orange-9": {
         "$type": "color",
@@ -8099,43 +8290,43 @@
       },
       "paper-1": {
         "$type": "color",
-        "$value": "{primitive.v0716}"
+        "$value": "{primitive.v0729}"
       },
       "paper-2": {
         "$type": "color",
-        "$value": "{primitive.v0840}"
+        "$value": "{primitive.v0853}"
       },
       "paper-3": {
         "$type": "color",
-        "$value": "{primitive.v0841}"
+        "$value": "{primitive.v0854}"
       },
       "red-1": {
         "$type": "color",
-        "$value": "{primitive.v0842}"
+        "$value": "{primitive.v0855}"
       },
       "red-10": {
         "$type": "color",
-        "$value": "{primitive.v0620}"
+        "$value": "{primitive.v0633}"
       },
       "red-11": {
         "$type": "color",
-        "$value": "{primitive.v0622}"
+        "$value": "{primitive.v0635}"
       },
       "red-12": {
         "$type": "color",
-        "$value": "{primitive.v0843}"
+        "$value": "{primitive.v0856}"
       },
       "red-2": {
         "$type": "color",
-        "$value": "{primitive.v0844}"
+        "$value": "{primitive.v0857}"
       },
       "red-3": {
         "$type": "color",
-        "$value": "{primitive.v0621}"
+        "$value": "{primitive.v0634}"
       },
       "red-8": {
         "$type": "color",
-        "$value": "{primitive.v0847}"
+        "$value": "{primitive.v0860}"
       },
       "red-9": {
         "$type": "color",
@@ -8143,91 +8334,91 @@
       },
       "sand-1": {
         "$type": "color",
-        "$value": "{primitive.v0767}"
+        "$value": "{primitive.v0780}"
       },
       "sand-10": {
         "$type": "color",
-        "$value": "{primitive.v0848}"
+        "$value": "{primitive.v0861}"
       },
       "sand-11": {
         "$type": "color",
-        "$value": "{primitive.v0849}"
+        "$value": "{primitive.v0862}"
       },
       "sand-12": {
         "$type": "color",
-        "$value": "{primitive.v0850}"
+        "$value": "{primitive.v0863}"
       },
       "sand-2": {
         "$type": "color",
-        "$value": "{primitive.v0851}"
+        "$value": "{primitive.v0864}"
       },
       "sand-3": {
         "$type": "color",
-        "$value": "{primitive.v0852}"
+        "$value": "{primitive.v0865}"
       },
       "sand-4": {
         "$type": "color",
-        "$value": "{primitive.v0853}"
+        "$value": "{primitive.v0866}"
       },
       "sand-5": {
         "$type": "color",
-        "$value": "{primitive.v0854}"
+        "$value": "{primitive.v0867}"
       },
       "sand-6": {
         "$type": "color",
-        "$value": "{primitive.v0855}"
+        "$value": "{primitive.v0868}"
       },
       "sand-7": {
         "$type": "color",
-        "$value": "{primitive.v0856}"
+        "$value": "{primitive.v0869}"
       },
       "sand-8": {
         "$type": "color",
-        "$value": "{primitive.v0857}"
+        "$value": "{primitive.v0870}"
       },
       "sand-9": {
         "$type": "color",
-        "$value": "{primitive.v0858}"
+        "$value": "{primitive.v0871}"
       },
       "slate-10": {
         "$type": "color",
-        "$value": "{primitive.v0860}"
+        "$value": "{primitive.v0873}"
       },
       "slate-11": {
         "$type": "color",
-        "$value": "{primitive.v0861}"
+        "$value": "{primitive.v0874}"
       },
       "slate-12": {
         "$type": "color",
-        "$value": "{primitive.v0862}"
+        "$value": "{primitive.v0875}"
       },
       "slate-8": {
         "$type": "color",
-        "$value": "{primitive.v0869}"
+        "$value": "{primitive.v0882}"
       },
       "slate-9": {
         "$type": "color",
-        "$value": "{primitive.v0870}"
+        "$value": "{primitive.v0883}"
       },
       "swiss-red-9": {
         "$type": "color",
-        "$value": "{primitive.v0728}"
+        "$value": "{primitive.v0741}"
       },
       "teal-10": {
         "$type": "color",
-        "$value": "{primitive.v0872}"
+        "$value": "{primitive.v0885}"
       },
       "teal-11": {
         "$type": "color",
-        "$value": "{primitive.v0873}"
+        "$value": "{primitive.v0886}"
       },
       "teal-12": {
         "$type": "color",
-        "$value": "{primitive.v0874}"
+        "$value": "{primitive.v0887}"
       },
       "teal-8": {
         "$type": "color",
-        "$value": "{primitive.v0881}"
+        "$value": "{primitive.v0894}"
       },
       "teal-9": {
         "$type": "color",
@@ -8235,47 +8426,47 @@
       },
       "tomato-1": {
         "$type": "color",
-        "$value": "{primitive.v0882}"
+        "$value": "{primitive.v0895}"
       },
       "tomato-10": {
         "$type": "color",
-        "$value": "{primitive.v0883}"
+        "$value": "{primitive.v0896}"
       },
       "tomato-11": {
         "$type": "color",
-        "$value": "{primitive.v0884}"
+        "$value": "{primitive.v0897}"
       },
       "tomato-12": {
         "$type": "color",
-        "$value": "{primitive.v0885}"
+        "$value": "{primitive.v0898}"
       },
       "tomato-2": {
         "$type": "color",
-        "$value": "{primitive.v0886}"
+        "$value": "{primitive.v0899}"
       },
       "tomato-3": {
         "$type": "color",
-        "$value": "{primitive.v0887}"
+        "$value": "{primitive.v0900}"
       },
       "tomato-4": {
         "$type": "color",
-        "$value": "{primitive.v0888}"
+        "$value": "{primitive.v0901}"
       },
       "tomato-5": {
         "$type": "color",
-        "$value": "{primitive.v0889}"
+        "$value": "{primitive.v0902}"
       },
       "tomato-6": {
         "$type": "color",
-        "$value": "{primitive.v0890}"
+        "$value": "{primitive.v0903}"
       },
       "tomato-7": {
         "$type": "color",
-        "$value": "{primitive.v0891}"
+        "$value": "{primitive.v0904}"
       },
       "tomato-8": {
         "$type": "color",
-        "$value": "{primitive.v0892}"
+        "$value": "{primitive.v0905}"
       },
       "tomato-9": {
         "$type": "color",
@@ -8283,47 +8474,47 @@
       },
       "violet-1": {
         "$type": "color",
-        "$value": "{primitive.v0893}"
+        "$value": "{primitive.v0906}"
       },
       "violet-10": {
         "$type": "color",
-        "$value": "{primitive.v0894}"
+        "$value": "{primitive.v0907}"
       },
       "violet-11": {
         "$type": "color",
-        "$value": "{primitive.v0895}"
+        "$value": "{primitive.v0908}"
       },
       "violet-12": {
         "$type": "color",
-        "$value": "{primitive.v0896}"
+        "$value": "{primitive.v0909}"
       },
       "violet-2": {
         "$type": "color",
-        "$value": "{primitive.v0897}"
+        "$value": "{primitive.v0910}"
       },
       "violet-3": {
         "$type": "color",
-        "$value": "{primitive.v0898}"
+        "$value": "{primitive.v0911}"
       },
       "violet-4": {
         "$type": "color",
-        "$value": "{primitive.v0899}"
+        "$value": "{primitive.v0912}"
       },
       "violet-5": {
         "$type": "color",
-        "$value": "{primitive.v0900}"
+        "$value": "{primitive.v0913}"
       },
       "violet-6": {
         "$type": "color",
-        "$value": "{primitive.v0901}"
+        "$value": "{primitive.v0914}"
       },
       "violet-7": {
         "$type": "color",
-        "$value": "{primitive.v0902}"
+        "$value": "{primitive.v0915}"
       },
       "violet-8": {
         "$type": "color",
-        "$value": "{primitive.v0559}"
+        "$value": "{primitive.v0572}"
       },
       "violet-9": {
         "$type": "color",
@@ -8537,26 +8728,6 @@
         "$type": "dimension",
         "$value": "{primitive.v0512}"
       },
-      "shadow-xs": {
-        "$type": "shadow",
-        "$value": "{primitive.v0903}"
-      },
-      "shadow-sm": {
-        "$type": "shadow",
-        "$value": "{primitive.v0904}"
-      },
-      "shadow-md": {
-        "$type": "shadow",
-        "$value": "{primitive.v0905}"
-      },
-      "shadow-lg": {
-        "$type": "shadow",
-        "$value": "{primitive.v0906}"
-      },
-      "shadow-xl": {
-        "$type": "shadow",
-        "$value": "{primitive.v0517}"
-      },
       "ease-fast": {
         "$type": "transition",
         "$value": "{primitive.v0518}"
@@ -8597,9 +8768,24 @@
         "$type": "number",
         "$value": "{primitive.v0527}"
       },
+      "liquid-success-tint": {
+        "$type": "color",
+        "$value": "{context.dark.liquid-tag-green}",
+        "$extensions": {
+          "netscript": {
+            "derive": {
+              "kind": "mix",
+              "color": "context.dark.liquid-tag-green",
+              "with": "primitive.v0079",
+              "weight": 0.12,
+              "space": "oklab"
+            }
+          }
+        }
+      },
       "liquid-tag-pink": {
         "$type": "color",
-        "$value": "{primitive.v0920}",
+        "$value": "{primitive.v0933}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-avatar-fg": {
@@ -8624,7 +8810,7 @@
       },
       "liquid-hairline-subtle": {
         "$type": "color",
-        "$value": "{primitive.v0696}",
+        "$value": "{primitive.v0709}",
         "$description": "Node value from docs/design-system/themes/liquid/DESIGN.md and the matching Figma node map."
       },
       "liquid-hairline-strong": {
@@ -8727,6 +8913,166 @@
         "$value": "{primitive.v0271}",
         "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
       },
+      "tonal-radius-extra-small": {
+        "$type": "dimension",
+        "$value": "{primitive.v0275}",
+        "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
+      },
+      "tonal-radius-tiny": {
+        "$type": "dimension",
+        "$value": "{primitive.v0551}",
+        "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
+      },
+      "tonal-radius-minimum": {
+        "$type": "dimension",
+        "$value": "{primitive.v0552}",
+        "$description": "Node value from docs/design-system/themes/tonal/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-2": {
+        "$type": "dimension",
+        "$value": "{primitive.v0251}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-14": {
+        "$type": "dimension",
+        "$value": "{primitive.v0254}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-15": {
+        "$type": "dimension",
+        "$value": "{primitive.v0262}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-18": {
+        "$type": "dimension",
+        "$value": "{primitive.v0269}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-20": {
+        "$type": "dimension",
+        "$value": "{primitive.v0271}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-21": {
+        "$type": "dimension",
+        "$value": "{primitive.v0553}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-22": {
+        "$type": "dimension",
+        "$value": "{primitive.v0253}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-24": {
+        "$type": "dimension",
+        "$value": "{primitive.v0280}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-26": {
+        "$type": "dimension",
+        "$value": "{primitive.v0285}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-28": {
+        "$type": "dimension",
+        "$value": "{primitive.v0279}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-30": {
+        "$type": "dimension",
+        "$value": "{primitive.v0277}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-32": {
+        "$type": "dimension",
+        "$value": "{primitive.v0278}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-radius-40": {
+        "$type": "dimension",
+        "$value": "{primitive.v0265}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-12": {
+        "$type": "dimension",
+        "$value": "{primitive.v0257}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-13": {
+        "$type": "dimension",
+        "$value": "{primitive.v0270}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-14": {
+        "$type": "dimension",
+        "$value": "{primitive.v0254}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-15": {
+        "$type": "dimension",
+        "$value": "{primitive.v0262}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-16": {
+        "$type": "dimension",
+        "$value": "{primitive.v0256}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-17": {
+        "$type": "dimension",
+        "$value": "{primitive.v0554}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-18": {
+        "$type": "dimension",
+        "$value": "{primitive.v0269}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-22": {
+        "$type": "dimension",
+        "$value": "{primitive.v0253}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-24": {
+        "$type": "dimension",
+        "$value": "{primitive.v0280}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-28": {
+        "$type": "dimension",
+        "$value": "{primitive.v0279}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-30": {
+        "$type": "dimension",
+        "$value": "{primitive.v0277}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-32": {
+        "$type": "dimension",
+        "$value": "{primitive.v0278}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-40": {
+        "$type": "dimension",
+        "$value": "{primitive.v0265}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-48": {
+        "$type": "dimension",
+        "$value": "{primitive.v0273}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-60": {
+        "$type": "dimension",
+        "$value": "{primitive.v0555}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
+      "bloom-text-92": {
+        "$type": "dimension",
+        "$value": "{primitive.v0556}",
+        "$description": "Node value from docs/design-system/themes/bloom/DESIGN.md and the matching Figma node map."
+      },
       "cupertino-switch-thumb": {
         "$type": "color",
         "$value": "{context.dark.primary-fg}"
@@ -8754,6 +9100,42 @@
       "terminal-key-border": {
         "$type": "color",
         "$value": "{context.dark.input-border}"
+      },
+      "motion-duration-fast": {
+        "$type": "duration",
+        "$value": "{primitive.v0557}"
+      },
+      "motion-easing-fast": {
+        "$type": "cubicBezier",
+        "$value": "{primitive.v0558}"
+      },
+      "motion-duration-normal": {
+        "$type": "duration",
+        "$value": "{primitive.v0559}"
+      },
+      "motion-easing-normal": {
+        "$type": "cubicBezier",
+        "$value": "{primitive.v0558}"
+      },
+      "motion-duration-slow": {
+        "$type": "duration",
+        "$value": "{primitive.v0560}"
+      },
+      "motion-easing-slow": {
+        "$type": "cubicBezier",
+        "$value": "{primitive.v0558}"
+      },
+      "motion-duration-spring": {
+        "$type": "duration",
+        "$value": "{primitive.v0561}"
+      },
+      "motion-easing-spring": {
+        "$type": "cubicBezier",
+        "$value": "{primitive.v0562}"
+      },
+      "font-tabular": {
+        "$type": "number",
+        "$value": "{primitive.v0563}"
       }
     }
   },
@@ -15258,6 +15640,32 @@
         }
       }
     },
+    "studio-table-cell-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.light.studio-table-cell-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-table-cell-rule-width",
+          "category": [
+            "semantic",
+            "studio-table-cell-rule-width"
+          ]
+        }
+      }
+    },
+    "studio-table-head-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.light.studio-table-head-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-table-head-rule-width",
+          "category": [
+            "semantic",
+            "studio-table-head-rule-width"
+          ]
+        }
+      }
+    },
     "studio-table-inset": {
       "$type": "dimension",
       "$value": "{context.light.studio-table-inset}",
@@ -15293,6 +15701,19 @@
           "category": [
             "semantic",
             "studio-table-row-radius"
+          ]
+        }
+      }
+    },
+    "studio-table-row-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.light.studio-table-row-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-table-row-rule-width",
+          "category": [
+            "semantic",
+            "studio-table-row-rule-width"
           ]
         }
       }
@@ -15414,6 +15835,19 @@
         }
       }
     },
+    "studio-topbar-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.light.studio-topbar-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-topbar-rule-width",
+          "category": [
+            "semantic",
+            "studio-topbar-rule-width"
+          ]
+        }
+      }
+    },
     "studio-topbar-shadow-blur": {
       "$type": "dimension",
       "$value": "{context.light.studio-topbar-shadow-blur}",
@@ -15436,6 +15870,45 @@
           "category": [
             "semantic",
             "studio-topbar-shadow-y"
+          ]
+        }
+      }
+    },
+    "border-width": {
+      "$type": "dimension",
+      "$value": "{context.light.border-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-border-width",
+          "category": [
+            "semantic",
+            "border-width"
+          ]
+        }
+      }
+    },
+    "shadow-offset-y": {
+      "$type": "dimension",
+      "$value": "{context.light.shadow-offset-y}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-offset-y",
+          "category": [
+            "semantic",
+            "shadow-offset-y"
+          ]
+        }
+      }
+    },
+    "shadow-blur": {
+      "$type": "dimension",
+      "$value": "{context.light.shadow-blur}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-blur",
+          "category": [
+            "semantic",
+            "shadow-blur"
           ]
         }
       }
@@ -19134,6 +19607,19 @@
         }
       }
     },
+    "liquid-success-tint": {
+      "$type": "color",
+      "$value": "{context.light.liquid-success-tint}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-liquid-success-tint",
+          "category": [
+            "semantic",
+            "liquid-success-tint"
+          ]
+        }
+      }
+    },
     "liquid-tag-pink": {
       "$type": "color",
       "$value": "{context.light.liquid-tag-pink}",
@@ -19472,6 +19958,422 @@
         }
       }
     },
+    "tonal-radius-extra-small": {
+      "$type": "dimension",
+      "$value": "{context.light.tonal-radius-extra-small}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tonal-radius-extra-small",
+          "category": [
+            "semantic",
+            "tonal-radius-extra-small"
+          ]
+        }
+      }
+    },
+    "tonal-radius-tiny": {
+      "$type": "dimension",
+      "$value": "{context.light.tonal-radius-tiny}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tonal-radius-tiny",
+          "category": [
+            "semantic",
+            "tonal-radius-tiny"
+          ]
+        }
+      }
+    },
+    "tonal-radius-minimum": {
+      "$type": "dimension",
+      "$value": "{context.light.tonal-radius-minimum}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tonal-radius-minimum",
+          "category": [
+            "semantic",
+            "tonal-radius-minimum"
+          ]
+        }
+      }
+    },
+    "bloom-radius-2": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-2",
+          "category": [
+            "semantic",
+            "bloom-radius-2"
+          ]
+        }
+      }
+    },
+    "bloom-radius-14": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-14}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-14",
+          "category": [
+            "semantic",
+            "bloom-radius-14"
+          ]
+        }
+      }
+    },
+    "bloom-radius-15": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-15}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-15",
+          "category": [
+            "semantic",
+            "bloom-radius-15"
+          ]
+        }
+      }
+    },
+    "bloom-radius-18": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-18}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-18",
+          "category": [
+            "semantic",
+            "bloom-radius-18"
+          ]
+        }
+      }
+    },
+    "bloom-radius-20": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-20}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-20",
+          "category": [
+            "semantic",
+            "bloom-radius-20"
+          ]
+        }
+      }
+    },
+    "bloom-radius-21": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-21}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-21",
+          "category": [
+            "semantic",
+            "bloom-radius-21"
+          ]
+        }
+      }
+    },
+    "bloom-radius-22": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-22}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-22",
+          "category": [
+            "semantic",
+            "bloom-radius-22"
+          ]
+        }
+      }
+    },
+    "bloom-radius-24": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-24}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-24",
+          "category": [
+            "semantic",
+            "bloom-radius-24"
+          ]
+        }
+      }
+    },
+    "bloom-radius-26": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-26}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-26",
+          "category": [
+            "semantic",
+            "bloom-radius-26"
+          ]
+        }
+      }
+    },
+    "bloom-radius-28": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-28}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-28",
+          "category": [
+            "semantic",
+            "bloom-radius-28"
+          ]
+        }
+      }
+    },
+    "bloom-radius-30": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-30}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-30",
+          "category": [
+            "semantic",
+            "bloom-radius-30"
+          ]
+        }
+      }
+    },
+    "bloom-radius-32": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-32}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-32",
+          "category": [
+            "semantic",
+            "bloom-radius-32"
+          ]
+        }
+      }
+    },
+    "bloom-radius-40": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-radius-40}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-40",
+          "category": [
+            "semantic",
+            "bloom-radius-40"
+          ]
+        }
+      }
+    },
+    "bloom-text-12": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-12",
+          "category": [
+            "semantic",
+            "bloom-text-12"
+          ]
+        }
+      }
+    },
+    "bloom-text-13": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-13}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-13",
+          "category": [
+            "semantic",
+            "bloom-text-13"
+          ]
+        }
+      }
+    },
+    "bloom-text-14": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-14}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-14",
+          "category": [
+            "semantic",
+            "bloom-text-14"
+          ]
+        }
+      }
+    },
+    "bloom-text-15": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-15}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-15",
+          "category": [
+            "semantic",
+            "bloom-text-15"
+          ]
+        }
+      }
+    },
+    "bloom-text-16": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-16}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-16",
+          "category": [
+            "semantic",
+            "bloom-text-16"
+          ]
+        }
+      }
+    },
+    "bloom-text-17": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-17}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-17",
+          "category": [
+            "semantic",
+            "bloom-text-17"
+          ]
+        }
+      }
+    },
+    "bloom-text-18": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-18}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-18",
+          "category": [
+            "semantic",
+            "bloom-text-18"
+          ]
+        }
+      }
+    },
+    "bloom-text-22": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-22}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-22",
+          "category": [
+            "semantic",
+            "bloom-text-22"
+          ]
+        }
+      }
+    },
+    "bloom-text-24": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-24}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-24",
+          "category": [
+            "semantic",
+            "bloom-text-24"
+          ]
+        }
+      }
+    },
+    "bloom-text-28": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-28}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-28",
+          "category": [
+            "semantic",
+            "bloom-text-28"
+          ]
+        }
+      }
+    },
+    "bloom-text-30": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-30}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-30",
+          "category": [
+            "semantic",
+            "bloom-text-30"
+          ]
+        }
+      }
+    },
+    "bloom-text-32": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-32}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-32",
+          "category": [
+            "semantic",
+            "bloom-text-32"
+          ]
+        }
+      }
+    },
+    "bloom-text-40": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-40}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-40",
+          "category": [
+            "semantic",
+            "bloom-text-40"
+          ]
+        }
+      }
+    },
+    "bloom-text-48": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-48}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-48",
+          "category": [
+            "semantic",
+            "bloom-text-48"
+          ]
+        }
+      }
+    },
+    "bloom-text-60": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-60}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-60",
+          "category": [
+            "semantic",
+            "bloom-text-60"
+          ]
+        }
+      }
+    },
+    "bloom-text-92": {
+      "$type": "dimension",
+      "$value": "{context.light.bloom-text-92}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-92",
+          "category": [
+            "semantic",
+            "bloom-text-92"
+          ]
+        }
+      }
+    },
     "cupertino-switch-thumb": {
       "$type": "color",
       "$value": "{context.light.cupertino-switch-thumb}",
@@ -19585,6 +20487,123 @@
           "category": [
             "semantic",
             "terminal-key-border"
+          ]
+        }
+      }
+    },
+    "motion-duration-fast": {
+      "$type": "duration",
+      "$value": "{context.light.motion-duration-fast}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-duration-fast",
+          "category": [
+            "motion",
+            "motion-duration-fast"
+          ]
+        }
+      }
+    },
+    "motion-easing-fast": {
+      "$type": "cubicBezier",
+      "$value": "{context.light.motion-easing-fast}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-easing-fast",
+          "category": [
+            "motion",
+            "motion-easing-fast"
+          ]
+        }
+      }
+    },
+    "motion-duration-normal": {
+      "$type": "duration",
+      "$value": "{context.light.motion-duration-normal}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-duration-normal",
+          "category": [
+            "motion",
+            "motion-duration-normal"
+          ]
+        }
+      }
+    },
+    "motion-easing-normal": {
+      "$type": "cubicBezier",
+      "$value": "{context.light.motion-easing-normal}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-easing-normal",
+          "category": [
+            "motion",
+            "motion-easing-normal"
+          ]
+        }
+      }
+    },
+    "motion-duration-slow": {
+      "$type": "duration",
+      "$value": "{context.light.motion-duration-slow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-duration-slow",
+          "category": [
+            "motion",
+            "motion-duration-slow"
+          ]
+        }
+      }
+    },
+    "motion-easing-slow": {
+      "$type": "cubicBezier",
+      "$value": "{context.light.motion-easing-slow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-easing-slow",
+          "category": [
+            "motion",
+            "motion-easing-slow"
+          ]
+        }
+      }
+    },
+    "motion-duration-spring": {
+      "$type": "duration",
+      "$value": "{context.light.motion-duration-spring}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-duration-spring",
+          "category": [
+            "motion",
+            "motion-duration-spring"
+          ]
+        }
+      }
+    },
+    "motion-easing-spring": {
+      "$type": "cubicBezier",
+      "$value": "{context.light.motion-easing-spring}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-easing-spring",
+          "category": [
+            "motion",
+            "motion-easing-spring"
+          ]
+        }
+      }
+    },
+    "font-tabular": {
+      "$type": "number",
+      "$value": "{context.light.font-tabular}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-font-tabular",
+          "category": [
+            "typography",
+            "features"
           ]
         }
       }

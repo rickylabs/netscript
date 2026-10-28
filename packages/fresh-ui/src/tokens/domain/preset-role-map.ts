@@ -89,6 +89,9 @@ export const PRESET_ROLE_MAPS: Readonly<Record<string, Readonly<Record<string, s
 
 /** Missing NS One roles are aliases to its existing vocabulary. */
 export const LEGACY_ROLE_MAP: Readonly<Record<string, string>> = {
+  'border-width': 'space-px',
+  'shadow-offset-y': 'space-1',
+  'shadow-blur': 'space-1-5',
   'control-height': 'control-h',
   'control-height-sm': 'control-h-sm',
   'topbar-height': 'topbar-h',

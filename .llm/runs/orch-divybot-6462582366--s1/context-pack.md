@@ -1,9 +1,11 @@
-# S1 active after explicit continuation
+# S1 active — output slice
 
-The user resumed the full #2414 objective. Previous stopped-state decision and both failed source reviews remain historical evidence. Current branch/PR: orch/divybot-6462582366 / #2435, draft.
+Full #2414 remains the objective. Branch `orch/divybot-6462582366`, PR #2435 (draft). Source slice is terminal PASS after the explicit user continuation; earlier stopped verdicts remain historical evidence in slice-1-review.md.
 
-First repair: apply the supervisor’s exact per-role NS One line-height table and add a computed line-height >= text-size regression. Get same-session delta approval, then continue the original source/output/check/CLI/migration slices. No scope reduction.
+The output engine is implemented: public `packages/fresh-ui/tokens.ts`, domain contracts/resolver and adapter formats, canonical `tokens/v2/` sources, 50 SD outputs from 72 requested inputs. Read `tokens/README.md` to extend it. Root lock additions are only the exact already-approved SD 5.7.1 and Color.js 0.5.2 entries; existing resolutions are unchanged. Original sources are retained as the legacy value/CSS snapshot; stale top-level DTCG source files were removed.
 
-Read plan.md, worklog.md and slice-1-review.md. All original acceptance and mandatory final IMPL-EVAL remain required. No label, force push, merge, tag or release; keep the assignment and final-report files out of Git.
+Source/output tests pass, frozen build/check and source freshness pass, scoped quality and root architecture pass. Publish dry-run passes; token export doc lint is clean. Existing interactive export has 123 findings and remains unchanged. First output review found two Figma defects: rem pixel conversion and migrated width syntax. Both are fixed and tested across all exported values/bindings. The fix-round full suite passes 202 tests; scoped frozen checks, quality/architecture, generation and publish pass. The same independent supervisor returned PASS and signed off on the fix round. The output slice is terminal PASS, including the supervisor-suggested native-value symmetry regression. This commit is its sign-off; push/comment follow, then begin checks. Read slice-2-review.md and slice-2-output.md.
 
-Source gate PASS in the resumed iteration. Eight source tests pass; proceed to SD output formats.
+Next ordered slices: checks (independent role registry, complete contrast coverage, exact exclusions and negative controls), CLI build/clean/init and real scaffold override, migration/fonts/design ramps/attributes/browser proof, mandatory full runtime E2E and independent final IMPL-EVAL. No gate from those slices is claimed complete. Do not start the next slice until output review is terminal.
+
+No labels, force push, merge, tag or release. Keep `.divybot-goal.md` and final-report handoff out of Git. Final READY is written atomically to `.divybot-final-report.md` only after all required work; earlier stopped report was archived outside Git when work resumed.

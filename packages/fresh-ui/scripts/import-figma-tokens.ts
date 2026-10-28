@@ -5,7 +5,8 @@ import { assertSemanticAliases } from '../src/tokens/domain/resolve-tokens.ts';
 
 const root = new URL('../tokens/', import.meta.url);
 const output = new URL('v2/', root);
-await Deno.mkdir(output, { recursive: true });
+const check = Deno.args.includes('--check');
+if (!check) await Deno.mkdir(output, { recursive: true });
 const files = [
   'primitives',
   'scheme',
@@ -37,7 +38,11 @@ for (const scheme of ['light', 'dark'] as const) {
 }
 const schema = 'https://www.designtokens.org/schemas/2025.10/format.json';
 const write = async (file: string, document: object): Promise<void> => {
-  await Deno.writeTextFile(new URL(file, output), `${JSON.stringify(document, null, 2)}\n`);
+  const expected = `${JSON.stringify(document, null, 2)}\n`;
+  if (check) {
+    const actual = await Deno.readTextFile(new URL(file, output)).catch(() => undefined);
+    if (actual !== expected) throw new Error(`Stale generated DTCG source: ${file}`);
+  } else await Deno.writeTextFile(new URL(file, output), expected);
 };
 assertSemanticAliases(result.presets);
 assertSemanticAliases(result.schemes.light);
@@ -49,53 +54,7 @@ await write('themes/light.tokens.json', { $schema: schema, ...result.schemes.lig
 await write('themes/dark.tokens.json', { $schema: schema, ...result.schemes.dark });
 await write('density.tokens.json', { $schema: schema, comfortable: {}, compact: {} });
 
-const components: TokenDocument = {};
-for (
-  const [component, parts] of Object.entries({
-    button: {
-      bg: 'primary',
-      fg: 'primary-fg',
-      hover: 'primary-hover',
-      border: 'primary-border',
-      radius: 'radius-control',
-      height: 'control-height',
-    },
-    input: {
-      bg: 'surface',
-      fg: 'fg',
-      border: 'input-border',
-      ring: 'ring',
-      radius: 'radius-input',
-      height: 'control-height',
-    },
-    card: {
-      bg: 'card',
-      fg: 'card-fg',
-      border: 'border',
-      radius: 'radius-card',
-      padding: 'card-padding',
-    },
-    badge: { bg: 'muted', fg: 'muted-fg', radius: 'radius-badge', height: 'badge-height' },
-    table: { bg: 'surface', fg: 'fg', border: 'border', height: 'table-row-height' },
-    dialog: { bg: 'card', fg: 'card-fg', overlay: 'overlay', radius: 'radius-card' },
-    tabs: { bg: 'muted', fg: 'fg', selected: 'selected', ring: 'ring' },
-    key: { bg: 'terminal-key-bg', fg: 'terminal-key-fg', border: 'terminal-key-border' },
-  })
-) {
-  components[component] = Object.fromEntries(
-    Object.entries(parts).map(([part, name]) => [part, {
-      $type: result.roles[name].type,
-      $value: `{semantic.${name}}`,
-      $extensions: {
-        netscript: {
-          cssVar: `--ns-component-${component}-${part}`,
-          category: ['component', component, part],
-        },
-      },
-    }]),
-  );
-}
-await write('component.tokens.json', { $schema: schema, component: components });
+// Component DTCG is authored directly; Figma has no component collection yet.
 await write('tokens.resolver.json', {
   $schema: 'https://www.designtokens.org/schemas/2025.10/resolver.json',
   version: '2025.10',

@@ -6501,6 +6501,32 @@
         }
       }
     },
+    "studio-table-cell-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.dark.studio-table-cell-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-table-cell-rule-width",
+          "category": [
+            "semantic",
+            "studio-table-cell-rule-width"
+          ]
+        }
+      }
+    },
+    "studio-table-head-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.dark.studio-table-head-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-table-head-rule-width",
+          "category": [
+            "semantic",
+            "studio-table-head-rule-width"
+          ]
+        }
+      }
+    },
     "studio-table-inset": {
       "$type": "dimension",
       "$value": "{context.dark.studio-table-inset}",
@@ -6536,6 +6562,19 @@
           "category": [
             "semantic",
             "studio-table-row-radius"
+          ]
+        }
+      }
+    },
+    "studio-table-row-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.dark.studio-table-row-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-table-row-rule-width",
+          "category": [
+            "semantic",
+            "studio-table-row-rule-width"
           ]
         }
       }
@@ -6657,6 +6696,19 @@
         }
       }
     },
+    "studio-topbar-rule-width": {
+      "$type": "dimension",
+      "$value": "{context.dark.studio-topbar-rule-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-studio-topbar-rule-width",
+          "category": [
+            "semantic",
+            "studio-topbar-rule-width"
+          ]
+        }
+      }
+    },
     "studio-topbar-shadow-blur": {
       "$type": "dimension",
       "$value": "{context.dark.studio-topbar-shadow-blur}",
@@ -6679,6 +6731,45 @@
           "category": [
             "semantic",
             "studio-topbar-shadow-y"
+          ]
+        }
+      }
+    },
+    "border-width": {
+      "$type": "dimension",
+      "$value": "{context.dark.border-width}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-border-width",
+          "category": [
+            "semantic",
+            "border-width"
+          ]
+        }
+      }
+    },
+    "shadow-offset-y": {
+      "$type": "dimension",
+      "$value": "{context.dark.shadow-offset-y}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-offset-y",
+          "category": [
+            "semantic",
+            "shadow-offset-y"
+          ]
+        }
+      }
+    },
+    "shadow-blur": {
+      "$type": "dimension",
+      "$value": "{context.dark.shadow-blur}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-blur",
+          "category": [
+            "semantic",
+            "shadow-blur"
           ]
         }
       }
@@ -10377,6 +10468,19 @@
         }
       }
     },
+    "liquid-success-tint": {
+      "$type": "color",
+      "$value": "{context.dark.liquid-success-tint}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-liquid-success-tint",
+          "category": [
+            "semantic",
+            "liquid-success-tint"
+          ]
+        }
+      }
+    },
     "liquid-tag-pink": {
       "$type": "color",
       "$value": "{context.dark.liquid-tag-pink}",
@@ -10715,6 +10819,422 @@
         }
       }
     },
+    "tonal-radius-extra-small": {
+      "$type": "dimension",
+      "$value": "{context.dark.tonal-radius-extra-small}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tonal-radius-extra-small",
+          "category": [
+            "semantic",
+            "tonal-radius-extra-small"
+          ]
+        }
+      }
+    },
+    "tonal-radius-tiny": {
+      "$type": "dimension",
+      "$value": "{context.dark.tonal-radius-tiny}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tonal-radius-tiny",
+          "category": [
+            "semantic",
+            "tonal-radius-tiny"
+          ]
+        }
+      }
+    },
+    "tonal-radius-minimum": {
+      "$type": "dimension",
+      "$value": "{context.dark.tonal-radius-minimum}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-tonal-radius-minimum",
+          "category": [
+            "semantic",
+            "tonal-radius-minimum"
+          ]
+        }
+      }
+    },
+    "bloom-radius-2": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-2",
+          "category": [
+            "semantic",
+            "bloom-radius-2"
+          ]
+        }
+      }
+    },
+    "bloom-radius-14": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-14}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-14",
+          "category": [
+            "semantic",
+            "bloom-radius-14"
+          ]
+        }
+      }
+    },
+    "bloom-radius-15": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-15}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-15",
+          "category": [
+            "semantic",
+            "bloom-radius-15"
+          ]
+        }
+      }
+    },
+    "bloom-radius-18": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-18}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-18",
+          "category": [
+            "semantic",
+            "bloom-radius-18"
+          ]
+        }
+      }
+    },
+    "bloom-radius-20": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-20}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-20",
+          "category": [
+            "semantic",
+            "bloom-radius-20"
+          ]
+        }
+      }
+    },
+    "bloom-radius-21": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-21}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-21",
+          "category": [
+            "semantic",
+            "bloom-radius-21"
+          ]
+        }
+      }
+    },
+    "bloom-radius-22": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-22}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-22",
+          "category": [
+            "semantic",
+            "bloom-radius-22"
+          ]
+        }
+      }
+    },
+    "bloom-radius-24": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-24}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-24",
+          "category": [
+            "semantic",
+            "bloom-radius-24"
+          ]
+        }
+      }
+    },
+    "bloom-radius-26": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-26}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-26",
+          "category": [
+            "semantic",
+            "bloom-radius-26"
+          ]
+        }
+      }
+    },
+    "bloom-radius-28": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-28}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-28",
+          "category": [
+            "semantic",
+            "bloom-radius-28"
+          ]
+        }
+      }
+    },
+    "bloom-radius-30": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-30}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-30",
+          "category": [
+            "semantic",
+            "bloom-radius-30"
+          ]
+        }
+      }
+    },
+    "bloom-radius-32": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-32}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-32",
+          "category": [
+            "semantic",
+            "bloom-radius-32"
+          ]
+        }
+      }
+    },
+    "bloom-radius-40": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-radius-40}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-radius-40",
+          "category": [
+            "semantic",
+            "bloom-radius-40"
+          ]
+        }
+      }
+    },
+    "bloom-text-12": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-12",
+          "category": [
+            "semantic",
+            "bloom-text-12"
+          ]
+        }
+      }
+    },
+    "bloom-text-13": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-13}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-13",
+          "category": [
+            "semantic",
+            "bloom-text-13"
+          ]
+        }
+      }
+    },
+    "bloom-text-14": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-14}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-14",
+          "category": [
+            "semantic",
+            "bloom-text-14"
+          ]
+        }
+      }
+    },
+    "bloom-text-15": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-15}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-15",
+          "category": [
+            "semantic",
+            "bloom-text-15"
+          ]
+        }
+      }
+    },
+    "bloom-text-16": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-16}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-16",
+          "category": [
+            "semantic",
+            "bloom-text-16"
+          ]
+        }
+      }
+    },
+    "bloom-text-17": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-17}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-17",
+          "category": [
+            "semantic",
+            "bloom-text-17"
+          ]
+        }
+      }
+    },
+    "bloom-text-18": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-18}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-18",
+          "category": [
+            "semantic",
+            "bloom-text-18"
+          ]
+        }
+      }
+    },
+    "bloom-text-22": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-22}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-22",
+          "category": [
+            "semantic",
+            "bloom-text-22"
+          ]
+        }
+      }
+    },
+    "bloom-text-24": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-24}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-24",
+          "category": [
+            "semantic",
+            "bloom-text-24"
+          ]
+        }
+      }
+    },
+    "bloom-text-28": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-28}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-28",
+          "category": [
+            "semantic",
+            "bloom-text-28"
+          ]
+        }
+      }
+    },
+    "bloom-text-30": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-30}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-30",
+          "category": [
+            "semantic",
+            "bloom-text-30"
+          ]
+        }
+      }
+    },
+    "bloom-text-32": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-32}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-32",
+          "category": [
+            "semantic",
+            "bloom-text-32"
+          ]
+        }
+      }
+    },
+    "bloom-text-40": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-40}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-40",
+          "category": [
+            "semantic",
+            "bloom-text-40"
+          ]
+        }
+      }
+    },
+    "bloom-text-48": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-48}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-48",
+          "category": [
+            "semantic",
+            "bloom-text-48"
+          ]
+        }
+      }
+    },
+    "bloom-text-60": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-60}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-60",
+          "category": [
+            "semantic",
+            "bloom-text-60"
+          ]
+        }
+      }
+    },
+    "bloom-text-92": {
+      "$type": "dimension",
+      "$value": "{context.dark.bloom-text-92}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bloom-text-92",
+          "category": [
+            "semantic",
+            "bloom-text-92"
+          ]
+        }
+      }
+    },
     "cupertino-switch-thumb": {
       "$type": "color",
       "$value": "{context.dark.cupertino-switch-thumb}",
@@ -10828,6 +11348,123 @@
           "category": [
             "semantic",
             "terminal-key-border"
+          ]
+        }
+      }
+    },
+    "motion-duration-fast": {
+      "$type": "duration",
+      "$value": "{context.dark.motion-duration-fast}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-duration-fast",
+          "category": [
+            "motion",
+            "motion-duration-fast"
+          ]
+        }
+      }
+    },
+    "motion-easing-fast": {
+      "$type": "cubicBezier",
+      "$value": "{context.dark.motion-easing-fast}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-easing-fast",
+          "category": [
+            "motion",
+            "motion-easing-fast"
+          ]
+        }
+      }
+    },
+    "motion-duration-normal": {
+      "$type": "duration",
+      "$value": "{context.dark.motion-duration-normal}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-duration-normal",
+          "category": [
+            "motion",
+            "motion-duration-normal"
+          ]
+        }
+      }
+    },
+    "motion-easing-normal": {
+      "$type": "cubicBezier",
+      "$value": "{context.dark.motion-easing-normal}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-easing-normal",
+          "category": [
+            "motion",
+            "motion-easing-normal"
+          ]
+        }
+      }
+    },
+    "motion-duration-slow": {
+      "$type": "duration",
+      "$value": "{context.dark.motion-duration-slow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-duration-slow",
+          "category": [
+            "motion",
+            "motion-duration-slow"
+          ]
+        }
+      }
+    },
+    "motion-easing-slow": {
+      "$type": "cubicBezier",
+      "$value": "{context.dark.motion-easing-slow}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-easing-slow",
+          "category": [
+            "motion",
+            "motion-easing-slow"
+          ]
+        }
+      }
+    },
+    "motion-duration-spring": {
+      "$type": "duration",
+      "$value": "{context.dark.motion-duration-spring}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-duration-spring",
+          "category": [
+            "motion",
+            "motion-duration-spring"
+          ]
+        }
+      }
+    },
+    "motion-easing-spring": {
+      "$type": "cubicBezier",
+      "$value": "{context.dark.motion-easing-spring}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-motion-easing-spring",
+          "category": [
+            "motion",
+            "motion-easing-spring"
+          ]
+        }
+      }
+    },
+    "font-tabular": {
+      "$type": "number",
+      "$value": "{context.dark.font-tabular}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-font-tabular",
+          "category": [
+            "typography",
+            "features"
           ]
         }
       }

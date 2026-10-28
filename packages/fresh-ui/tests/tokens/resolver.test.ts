@@ -214,6 +214,14 @@ Deno.test('NS One keeps every legacy declaration and imports no Figma core value
 
 Deno.test('override aliases reject unknown targets, self cycles and two-token cycles', () => {
   const sources = defaultTokenSources();
+  assertThrows(
+    () =>
+      resolveTokenSources(sources, {}, {
+        semantic: { primary: { $type: 'color', $value: '{semantic.radius-md}' } },
+      }),
+    Error,
+    'type mismatch',
+  );
   for (const target of ['semantic.primary', 'semantic.unknown']) {
     assertThrows(() =>
       resolveTokenSources(sources, {}, {

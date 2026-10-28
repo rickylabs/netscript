@@ -7,6 +7,7 @@ import components from '../../../tokens/v2/component.tokens.json' with { type: '
 import light from '../../../tokens/v2/themes/light.tokens.json' with { type: 'json' };
 import dark from '../../../tokens/v2/themes/dark.tokens.json' with { type: 'json' };
 import type { TokenSources } from '../domain/resolve-tokens.ts';
+import type { TokenDocument } from '../domain/token-contract.ts';
 
 /** The same bundled sources are available in a published package and a scaffold. */
 export function defaultTokenSources(): TokenSources {
@@ -20,6 +21,6 @@ export function defaultTokenSources(): TokenSources {
       'component.tokens.json': components,
       'themes/light.tokens.json': light,
       'themes/dark.tokens.json': dark,
-    },
+    } as Record<string, TokenDocument>,
   };
 }

@@ -8,7 +8,9 @@ import {
 
 /** Documents are supplied by the caller; the resolver performs no IO. */
 export interface TokenSources {
+  /** The single DTCG resolver defining sets, modifiers and resolution order. */
   readonly resolver: TokenResolver;
+  /** DTCG documents keyed by the resolver's relative reference names. */
   readonly documents: Readonly<Record<string, TokenDocument>>;
 }
 
@@ -82,6 +84,42 @@ export function resolveTokenSources(
   }
   sources.resolver.resolutionOrder.forEach(expand);
   if (override) {
+    const scheme = inputs.scheme ?? sources.resolver.modifiers.scheme.default ?? 'light';
+    const context = (result.context as TokenDocument)[scheme] as TokenDocument;
+    const semantic = result.semantic as TokenDocument;
+    const target = (path: string): string => {
+      const prefix = `context.${scheme}.`;
+      const name = path.startsWith(prefix) ? path.slice(prefix.length) : undefined;
+      return name && semantic[name] ? `semantic.${name}` : path;
+    };
+    for (const [name, entry] of Object.entries(context)) {
+      if (typeof entry === 'string' || !('$value' in entry)) continue;
+      const token = entry as DesignToken;
+      const alias = isTokenAlias(token.$value) ? token.$value.slice(1, -1) : undefined;
+      const metadata = token.$extensions?.netscript;
+      const derive = metadata?.derive;
+      context[name] = {
+        ...token,
+        ...(alias && !alias.endsWith(`.${name}`) ? { $value: `{${target(alias)}}` } : {}),
+        ...(derive
+          ? {
+            $extensions: {
+              netscript: {
+                ...metadata,
+                derive: derive.kind === 'mix'
+                  ? { ...derive, color: target(derive.color), with: target(derive.with) }
+                  : {
+                    ...derive,
+                    color: target(derive.color),
+                    offsetY: target(derive.offsetY),
+                    blur: target(derive.blur),
+                  },
+              },
+            },
+          }
+          : {}),
+      };
+    }
     validateSemanticOverride(override, result);
     mergeTokenDocuments(result, applyOverrideMetadata(override, result));
   }
@@ -128,7 +166,30 @@ export function assertTokenReferences(document: TokenDocument): void {
     const token = tokens.get(path);
     if (!token) throw new Error(`Unknown token alias target: ${path}`);
     active.add(path);
-    if (isTokenAlias(token.$value)) visit(token.$value.slice(1, -1));
+    if (isTokenAlias(token.$value)) {
+      const target = token.$value.slice(1, -1);
+      visit(target);
+      if (tokens.get(target)?.$type !== token.$type) {
+        throw new Error(`Token alias type mismatch: ${path} -> ${target}`);
+      }
+    }
+    const derive = token.$extensions?.netscript?.derive;
+    if (derive) {
+      visit(derive.color);
+      if (derive.kind === 'mix') {
+        if (
+          token.$type !== 'color' || !Number.isFinite(derive.weight) || derive.weight < 0 ||
+          derive.weight > 1 || !['srgb', 'oklab'].includes(derive.space)
+        ) throw new Error(`Invalid color derivation: ${path}`);
+        visit(derive.with);
+      } else if (derive.kind === 'shadow' && token.$type === 'shadow') {
+        if (!Number.isFinite(derive.offsetX) || !Number.isFinite(derive.spread)) {
+          throw new Error(`Invalid shadow derivation: ${path}`);
+        }
+        visit(derive.offsetY);
+        visit(derive.blur);
+      } else throw new Error(`Unknown token derivation: ${path}`);
+    }
     active.delete(path);
     complete.add(path);
   }

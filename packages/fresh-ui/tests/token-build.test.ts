@@ -2,23 +2,37 @@ import { assertEquals, assertStringIncludes } from '@std/assert';
 import { fileURLToPath } from 'node:url';
 
 const PACKAGE = new URL('../', import.meta.url);
-const ARTIFACTS = ['tokens.css', 'theme-bridge.css', 'tokens.json'] as const;
-const SOURCES = [
-  'scripts/build-tokens.ts',
-  'tokens/primitives.tokens.json',
-  'tokens/semantic.tokens.json',
-  'tokens/themes/light.tokens.json',
-  'tokens/themes/dark.tokens.json',
-  ...ARTIFACTS.map((name) => `registry/theme/${name}`),
-];
 
-Deno.test('frozen token check rejects stale and missing artifacts without repairing them', async () => {
+/** Copy only the source/format boundary and artifacts; never copy dependency caches. */
+async function copyFixture(source: URL, target: string): Promise<void> {
+  const info = await Deno.stat(source);
+  if (info.isDirectory) {
+    await Deno.mkdir(target, { recursive: true });
+    for await (const entry of Deno.readDir(source)) {
+      await copyFixture(
+        new URL(`${entry.name}${entry.isDirectory ? '/' : ''}`, source),
+        `${target}/${entry.name}`,
+      );
+    }
+  } else {
+    await Deno.mkdir(target.slice(0, target.lastIndexOf('/')), { recursive: true });
+    await Deno.copyFile(source, target);
+  }
+}
+
+Deno.test('frozen token check rejects every stale and missing SD artifact without repair', async () => {
   const root = await Deno.makeTempDir({ prefix: 'fresh-ui-token-check-' });
   try {
-    for (const source of SOURCES) {
-      const target = `${root}/${source}`;
-      await Deno.mkdir(target.slice(0, target.lastIndexOf('/')), { recursive: true });
-      await Deno.writeTextFile(target, await Deno.readTextFile(new URL(source, PACKAGE)));
+    for (
+      const source of [
+        'scripts/build-tokens.ts',
+        'tokens.ts',
+        'src/tokens/',
+        'tokens/',
+        'registry/theme/',
+      ]
+    ) {
+      await copyFixture(new URL(source, PACKAGE), `${root}/${source}`);
     }
     const run = (check: boolean) =>
       new Deno.Command(Deno.execPath(), {
@@ -41,32 +55,40 @@ Deno.test('frozen token check rejects stale and missing artifacts without repair
       }).output();
     const clean = await run(true);
     assertEquals(clean.code, 0, new TextDecoder().decode(clean.stderr));
-    for (const artifact of ARTIFACTS) {
-      const path = `${root}/registry/theme/${artifact}`;
+    const originals = new Map<string, string>();
+    // Discover the exact declared output set, including nested Figma and preset files.
+    const { buildTokens } = await import('../tokens.ts');
+    const expected = await buildTokens();
+    for (const name of Object.keys(expected.files)) {
+      const path = `${root}/registry/theme/${name}`;
       const original = await Deno.readTextFile(path);
-      const edited = `${original}\n/* deliberate negative control */\n`;
-      await Deno.writeTextFile(path, edited);
-      const stale = await run(true);
-      assertEquals(stale.code, 1);
-      assertStringIncludes(new TextDecoder().decode(stale.stderr), artifact);
-      assertEquals(await Deno.readTextFile(path), edited, 'check must not repair the edit');
-      await Deno.remove(path);
-      const missing = await run(true);
-      assertEquals(missing.code, 1);
-      assertStringIncludes(new TextDecoder().decode(missing.stderr), artifact);
-      await Deno.writeTextFile(path, original);
+      originals.set(name, original);
+      await Deno.writeTextFile(path, `${original}\n/* deliberate negative control */\n`);
     }
-    for (const artifact of ARTIFACTS) {
-      await Deno.remove(`${root}/registry/theme/${artifact}`);
+    const stale = await run(true);
+    assertEquals(stale.code, 1);
+    for (const [name, original] of originals) {
+      assertStringIncludes(new TextDecoder().decode(stale.stderr), name);
+      const path = `${root}/registry/theme/${name}`;
+      assertEquals(
+        await Deno.readTextFile(path),
+        `${original}\n/* deliberate negative control */\n`,
+      );
+      await Deno.remove(path);
+    }
+    const missing = await run(true);
+    assertEquals(missing.code, 1);
+    for (const name of originals.keys()) {
+      assertStringIncludes(new TextDecoder().decode(missing.stderr), name);
+      assertEquals(
+        await Deno.stat(`${root}/registry/theme/${name}`).catch(() => undefined),
+        undefined,
+      );
     }
     const build = await run(false);
     assertEquals(build.code, 0, new TextDecoder().decode(build.stderr));
-    for (const artifact of ARTIFACTS) {
-      assertEquals(
-        await Deno.readTextFile(`${root}/registry/theme/${artifact}`),
-        await Deno.readTextFile(new URL(`registry/theme/${artifact}`, PACKAGE)),
-        'frozen build must reproduce the checked-in output',
-      );
+    for (const [name, original] of originals) {
+      assertEquals(await Deno.readTextFile(`${root}/registry/theme/${name}`), original, name);
     }
   } finally {
     await Deno.remove(root, { recursive: true });

@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "id": "studio-signal",
+  "language": "studio",
+  "flavor": "signal",
+  "density": "compact",
+  "sourceDensity": "Dense"
+}

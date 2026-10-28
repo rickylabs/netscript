@@ -16,6 +16,7 @@ import { freshUiRegistryManifest } from '../../packages/fresh-ui/registry.manife
 import { PLUGIN_SKELETON_TEMPLATES } from '../../packages/plugin/src/kernel/assets/template-registry.ts';
 import { AGENT_DOCS_PAGE_CARRIER, readAgentDocsPages } from './docs/agent-docs-page-carrier.ts';
 import { renderPostgresConnectionTemplate } from './generate-postgres-connection-template.ts';
+import { renderDesignRegistryCatalog } from './generate-design-registry-catalog.ts';
 
 const CLI_OUTPUT_URL = new URL(
   '../../packages/cli/src/kernel/assets/embedded.generated.ts',
@@ -509,6 +510,14 @@ if (import.meta.main) {
           ),
         ),
     ),
+    check,
+  );
+  await writeOrCheckGeneratedAsset(
+    new URL(
+      '../../packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template',
+      import.meta.url,
+    ),
+    await formatTypeScript(renderDesignRegistryCatalog(freshUiRegistryManifest)),
     check,
   );
   await writeOrCheckGeneratedAsset(

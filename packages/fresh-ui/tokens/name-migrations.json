@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "migrations": [
+    {
+      "collection": "Studio flavor",
+      "variable": "table/cell-rule",
+      "originalCssVar": "--ns-studio-table-cell-rule",
+      "cssVar": "--ns-studio-table-cell-rule-width",
+      "reason": "The original WEB name is also assigned to a Scheme COLOR. Preserve that color name and register a distinct dimension name."
+    },
+    {
+      "collection": "Studio flavor",
+      "variable": "table/head-rule",
+      "originalCssVar": "--ns-studio-table-head-rule",
+      "cssVar": "--ns-studio-table-head-rule-width",
+      "reason": "The original WEB name is also assigned to a Scheme COLOR. Preserve that color name and register a distinct dimension name."
+    },
+    {
+      "collection": "Studio flavor",
+      "variable": "table/row-rule",
+      "originalCssVar": "--ns-studio-table-row-rule",
+      "cssVar": "--ns-studio-table-row-rule-width",
+      "reason": "The original WEB name is also assigned to a Scheme COLOR. Preserve that color name and register a distinct dimension name."
+    },
+    {
+      "collection": "Studio flavor",
+      "variable": "topbar/rule",
+      "originalCssVar": "--ns-studio-topbar-rule",
+      "cssVar": "--ns-studio-topbar-rule-width",
+      "reason": "The original WEB name is also assigned to a Scheme COLOR. Preserve that color name and register a distinct dimension name."
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 # Token sources
 
-**Status: staged S1 implementation, not ready to use.** Independent source review
-still blocks the new NS One line-height mapping. The new inputs live under
-`v2/` so the existing S0 build continues to read its unchanged legacy inputs.
-The output engine, name/contrast gates, public tokens CLI, fonts and route
-migration remain unimplemented. Do not switch an app to these sources yet.
+The canonical inputs live under `v2/`. `deno task tokens:build` uses the public
+`@netscript/fresh-ui/tokens` builder and Style Dictionary 5.7.1 formats to build
+all 72 scheme × preset × requested-density inputs. `tokens:check` compares all
+50 generated outputs without writing or repairing them. The CLI, CI checks,
+and route migration are the remaining S1 slices; the draft PR is not READY.
 
 Figma owns values. The registered roles and DTCG resolver own names, tiers and
 supported contexts. NS One remains the default. Studio Utility is an additional
@@ -26,7 +26,8 @@ To extend the system, start here:
    Shared components use core roles; a language pack reads only its own names.
 3. Run `scripts/import-figma-tokens.ts` with the package frozen lock. It rounds
    floats, normalizes font styles, lifts raw values into primitives and creates
-   semantic aliases. Add component part/state aliases in `component.tokens.json`.
+   semantic aliases. Add component part/state aliases in `v2/component.tokens.json`;
+   that file is authored directly and is never overwritten by the importer.
 4. Run the token schema, alias-only, name, contrast and build freshness gates.
    Never fix a failing Figma value in code. A contrast exception must name the
    exact preset, scheme, pair, ratio and value source; stale exceptions fail.
@@ -44,7 +45,34 @@ Semantic values are whole-token aliases, including derived colors. A mix uses
 `$extensions.netscript.derive` with `kind: "mix"`, two token paths, a weight
 from 0 to 1, and `srgb` or `oklab`. CSS keeps `color-mix()`; Figma gets the
 computed sRGB value. Component tokens alias the semantic vocabulary.
+Shadow recipes also retain semantic aliases for color, vertical offset and blur;
+their computed composite values match the live CSS references after overrides.
+
+`name-migrations.json` records four ambiguous WEB names in the original Figma
+export: Studio rule dimensions collide with Scheme rule colors. Color names
+stay unchanged; the dimension names gain `-width`. Original snapshots retain
+their source syntax. The importer and round-trip formatter reject a stale
+collision mapping; exported collection syntax uses the migrated width names.
+
+The build returns output bytes and resolved contexts and performs no IO. Custom
+formats under `src/tokens/adapters/format-*.ts` own serialization. The package
+script only compares or writes bytes. Web outputs include `fonts.json` and a
+small `theme-preset.json`; registry presets share the common artifacts. The
+Figma directory retains original filenames and index fields and adds one
+computed Light/Dark collection per preset. Composite values use lossless STRING
+variables because Figma has no native shadow/transition variable type.
+Dimensions become Figma pixel floats using the existing 16px root conversion;
+durations become milliseconds. Unknown units fail instead of losing their unit.
+All exported WEB names are checked against the generated role types.
+
+Hex colors form the base CSS declarations. `@supports` blocks enable oklch and
+native mixes, since repeating a custom-property declaration cannot detect an
+unsupported color function. Exact S0 declarations remain preserved as a fixture.
+Provider-specific mono font weight requests live in `font-requests.json`;
+families and role weights remain in DTCG.
 
 Existing `--ns-*` declarations and `[data-theme='dark']` remain supported.
 Modern selection uses `data-theme` for the language, `data-scheme` for light or
 dark, `data-density` for the preset density, and Studio `data-flavor`.
+`data-density` reports the preset's effective geometry; it is not a separate
+density toggle that overrides that preset.

@@ -1,4 +1,5 @@
-import type { RegistryManifest } from './registry.schema.ts';
+import type { RegistryItemDefinition, RegistryManifest } from './registry.schema.ts';
+import generatedThemes from './registry/theme/theme-items.json' with { type: 'json' };
 import { FRESH_UI_PACKAGE_VERSION } from './src/package-metadata.generated.ts';
 
 /**
@@ -12,6 +13,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
   schemaVersion: 2,
   tokenSourceStrategy: 'style-dictionary-dtcg-source',
   items: [
+    ...generatedThemes as RegistryItemDefinition[],
     {
       name: 'cn',
       kind: 'lib',
@@ -160,6 +162,8 @@ export const freshUiRegistryManifest: RegistryManifest = {
           target: '@assets/theme-bridge.css',
         },
         { source: 'registry/theme/tokens.json', target: '@assets/tokens.json' },
+        { source: 'registry/theme/fonts.json', target: '@assets/fonts.json' },
+        { source: 'registry/theme/theme-preset.json', target: '@assets/theme-preset.json' },
       ],
       registryDependencies: ['cn', 'public-types'],
       cssVars: {

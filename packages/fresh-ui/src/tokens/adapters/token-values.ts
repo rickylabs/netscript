@@ -23,7 +23,7 @@ export function tokenColor(value: string): TokenValue {
   return {
     colorSpace: 'oklch',
     components: color.to('oklch').coords.map((entry) =>
-      entry === null || !Number.isFinite(entry) ? 0 : roundTokenNumber(entry)
+      entry === null || !Number.isFinite(Number(entry)) ? 0 : roundTokenNumber(Number(entry))
     ),
     alpha: roundTokenNumber(Number(color.alpha)),
     hex: rgb.toString({ format: 'hex', collapse: false }),

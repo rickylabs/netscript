@@ -7,8 +7,10 @@ import {
 } from '../domain/token-contract.ts';
 import { resolveFigmaValue } from '../domain/figma-aliases.ts';
 import { figmaModes, TOKEN_PRESETS } from '../domain/token-presets.ts';
-import { LEGACY_ROLE_MAP, PRESET_ROLE_MAPS } from '../domain/preset-role-map.ts';
+import { PRESET_ROLE_MAPS } from '../domain/preset-role-map.ts';
 import { figmaPrimitive, legacyPrimitive } from './token-values.ts';
+import { applyLegacyGaps } from '../domain/legacy-role-aliases.ts';
+import nameMigrations from '../../../tokens/name-migrations.json' with { type: 'json' };
 
 /** The pre-S1 manifest is evidence and the value source for NS One. */
 export interface LegacyTokenSource {
@@ -24,7 +26,6 @@ export interface ImportedTokenSources {
   readonly roles: Readonly<Record<string, { type: string; category: readonly string[] }>>;
 }
 
-const PACKS = ['studio', 'bloom', 'liquid', 'cupertino', 'tactile', 'fluent', 'pixel', 'terminal'];
 const suffix = (css: string): string => css.replace(/^var\(--ns-/, '').replace(/\)$/, '');
 
 /** Import Figma's value contract and the compatibility seed into three-tier inputs. */
@@ -47,6 +48,9 @@ export function importFigmaTokens(
     return path;
   }
   function role(name: string, token: DesignToken, category: readonly string[]): void {
+    if (roles[name] && roles[name].type !== token.$type) {
+      throw new Error(`Conflicting exported types for --ns-${name}`);
+    }
     roles[name] ??= { type: token.$type, category };
   }
   for (const preset of TOKEN_PRESETS) {
@@ -58,7 +62,14 @@ export function importFigmaTokens(
       for (const collection of collections) {
         for (const variable of collection.variables) {
           if (!variable.codeSyntax || collection.collection === 'Primitives') continue;
-          const name = suffix(variable.codeSyntax);
+          const originalName = suffix(variable.codeSyntax);
+          const migration = nameMigrations.migrations.find((entry) =>
+            entry.collection === collection.collection && entry.variable === variable.name
+          );
+          if (migration && migration.originalCssVar !== `--ns-${originalName}`) {
+            throw new Error(`Stale name migration: ${variable.name}`);
+          }
+          const name = migration ? migration.cssVar.slice('--ns-'.length) : originalName;
           const resolved = resolveFigmaValue(
             collections,
             collection.collection,
@@ -75,6 +86,20 @@ export function importFigmaTokens(
           });
           role(name, literal, category(name));
         }
+      }
+      for (
+        const [name, variable] of Object.entries({
+          'border-width': 'border/width',
+          'shadow-offset-y': 'shadow/y',
+          'shadow-blur': 'shadow/blur',
+        })
+      ) {
+        const resolved = resolveFigmaValue(collections, 'Theme', variable, modes);
+        const literal = figmaPrimitive(variable, 'FLOAT', resolved.value);
+        values[name] = tokenAlias(lift(literal), literal.$type, {
+          figma: { collection: 'Theme', name: variable, mode: preset.themeMode },
+        });
+        role(name, literal, ['semantic', name]);
       }
       // Ramps are output data, so design routes never hard-code their inventory.
       const ramps = collections.find((collection) => collection.collection === 'Primitives');
@@ -102,6 +127,35 @@ export function importFigmaTokens(
         role(name, values[name] as DesignToken, token.path);
       }
       addNodeRoles(values, scheme, preset);
+      for (const speed of ['fast', 'normal', 'slow', 'spring']) {
+        const shorthand = legacy.tokens[`ease-${speed}`].value;
+        const duration: DesignToken = {
+          $type: 'duration',
+          $value: { value: Number.parseFloat(shorthand), unit: 'ms' },
+        };
+        const curve = shorthand.match(/cubic-bezier\(([^)]+)\)/);
+        const easing: DesignToken = {
+          $type: 'cubicBezier',
+          $value: curve ? curve[1].split(',').map(Number) : [0.25, 0.1, 0.25, 1],
+        };
+        for (
+          const [name, literal] of [[`motion-duration-${speed}`, duration], [
+            `motion-easing-${speed}`,
+            easing,
+          ]] as const
+        ) {
+          values[name] = tokenAlias(lift(literal), literal.$type);
+          role(name, literal, ['motion', name]);
+        }
+      }
+      const tabular: DesignToken = {
+        $type: 'number',
+        $value: 1,
+        $description:
+          'Tabular data numerals from the design specifications and existing NS One data styles.',
+      };
+      values['font-tabular'] = tokenAlias(lift(tabular), 'number');
+      role('font-tabular', tabular, ['typography', 'features']);
       if (preset.id === 'ns-one') {
         const weights: Record<string, string> = {};
         for (
@@ -126,6 +180,37 @@ export function importFigmaTokens(
         applyLegacyGaps(values, scheme, roles, new Set(Object.keys(old)), weights);
       } else {
         applyPresetOverlay(values, preset, scheme);
+        const read = (name: string): string | number | boolean =>
+          resolveFigmaValue(collections, 'Theme', name, modes).value;
+        const y = Number(read('shadow/y'));
+        const blur = Number(read('shadow/blur'));
+        const x = preset.language === 'studio'
+          ? Number(resolveFigmaValue(collections, 'Studio flavor', 'shadow/x', modes).value)
+          : preset.id === 'brutal'
+          ? y
+          : 0;
+        const color = String(read(`shadow/${scheme === 'light' ? 'l' : 'd'}/color`));
+        const shadow = legacyPrimitive('shadow', `${x}px ${y}px ${blur}px ${color}`);
+        const recipe: DesignToken = {
+          ...shadow,
+          $extensions: {
+            netscript: {
+              css: `${x}px var(--ns-shadow-offset-y) var(--ns-shadow-blur) var(--ns-shadow-color)`,
+            },
+          },
+        };
+        for (const size of ['xs', 'sm', 'md', 'lg', 'xl']) {
+          values[`shadow-${size}`] = tokenAlias(lift(recipe), 'shadow', {
+            derive: {
+              kind: 'shadow',
+              color: `context.${scheme}.shadow-color`,
+              offsetY: `context.${scheme}.shadow-offset-y`,
+              blur: `context.${scheme}.shadow-blur`,
+              offsetX: x,
+              spread: 0,
+            },
+          });
+        }
         for (
           const [name, target] of Object.entries({
             'radius-sm': 'radius-control',
@@ -278,6 +363,10 @@ export function importFigmaTokens(
       ) addLiteral(values, name, size, 'FLOAT', 'bloom');
     }
     if (preset.id === 'liquid') {
+      for (const name of ['font-sans', 'font-heading', 'font-kpi', 'font-label', 'font-data']) {
+        const literal = figmaPrimitive(name.replace('font-', 'font/'), 'STRING', 'Inter');
+        values[name] = tokenAlias(lift(literal), literal.$type);
+      }
       for (
         const [name, size] of Object.entries({
           'text-display': 40,
@@ -299,6 +388,20 @@ export function importFigmaTokens(
 
   function addNodeRoles(values: TokenDocument, scheme: string, preset: TokenPreset): void {
     const dark = scheme === 'dark';
+    const transparent = lift(figmaPrimitive('transparent', 'COLOR', '#00000000'));
+    values['liquid-success-tint'] = tokenAlias(`context.${scheme}.liquid-tag-green`, 'color', {
+      derive: {
+        kind: 'mix',
+        color: `context.${scheme}.liquid-tag-green`,
+        with: transparent,
+        weight: 0.12,
+        space: 'oklab',
+      },
+    });
+    role('liquid-success-tint', values['liquid-success-tint'] as DesignToken, [
+      'semantic',
+      'liquid-success-tint',
+    ]);
     for (
       const [name, raw] of Object.entries({
         'liquid-tag-pink': dark ? '#ff375f' : '#ff2d55',
@@ -331,8 +434,17 @@ export function importFigmaTokens(
         'tonal-radius-large': 28,
         'tonal-radius-medium': 24,
         'tonal-radius-small': 20,
+        'tonal-radius-extra-small': 8,
+        'tonal-radius-tiny': 6,
+        'tonal-radius-minimum': 4,
       })
     ) addLiteral(values, name, raw, 'FLOAT');
+    for (const size of [2, 14, 15, 18, 20, 21, 22, 24, 26, 28, 30, 32, 40]) {
+      addLiteral(values, `bloom-radius-${size}`, size, 'FLOAT', 'bloom');
+    }
+    for (const size of [12, 13, 14, 15, 16, 17, 18, 22, 24, 28, 30, 32, 40, 48, 60, 92]) {
+      addLiteral(values, `bloom-text-${size}`, size, 'FLOAT', 'bloom');
+    }
     values['cupertino-switch-thumb'] = tokenAlias(`context.${scheme}.primary-fg`, 'color');
     role('cupertino-switch-thumb', values['cupertino-switch-thumb'] as DesignToken, [
       'semantic',
@@ -357,72 +469,4 @@ export function importFigmaTokens(
       role(name, values[name] as DesignToken, ['semantic', name]);
     }
   }
-}
-
-function applyLegacyGaps(
-  values: TokenDocument,
-  scheme: string,
-  roles: Readonly<Record<string, { type: string }>>,
-  legacyNames: ReadonlySet<string>,
-  weights: Readonly<Record<string, string>>,
-): void {
-  for (const name of Object.keys(roles)) {
-    if (PACKS.some((pack) => name.startsWith(`${pack}-`))) continue;
-    if (legacyNames.has(name)) continue;
-    if (weights[name]) {
-      values[name] = tokenAlias(weights[name], 'fontWeight');
-      continue;
-    }
-    let target = LEGACY_ROLE_MAP[name];
-    if (name.startsWith('text-')) {
-      const sizes: Readonly<Record<string, string>> = {
-        body: 'base',
-        caption: 'xs',
-        display: '4xl',
-        heading: 'xl',
-        kpi: '3xl',
-        'kpi-sm': 'xl',
-        label: 'sm',
-        small: 'sm',
-        strong: 'base',
-        title: '2xl',
-      };
-      target = `text-${sizes[name.slice(5)] ?? 'base'}`;
-    } else if (name.startsWith('leading-')) {
-      const lines: Readonly<Record<string, string>> = {
-        caption: 'text-lg',
-        small: 'space-5',
-        label: 'space-5',
-        body: 'text-2xl',
-        strong: 'text-2xl',
-        heading: 'text-2xl',
-        'kpi-sm': 'text-2xl',
-        title: 'space-8',
-        kpi: 'space-9',
-        display: 'space-10',
-      };
-      target = lines[name.slice('leading-'.length)] ?? 'text-2xl';
-    } else if (name.startsWith('tracking-')) target = 'tracking-normal';
-    if (target) {
-      values[name] = tokenAlias(`context.${scheme}.${target}`, roles[name].type);
-      continue;
-    }
-    if (
-      /^(info|accent|secondary|primary|success|warning|destructive)-(hover|text)$/.test(name) &&
-      !Object.hasOwn(LEGACY_ROLE_MAP, name)
-    ) {
-      const intent = name.split('-')[0];
-      values[name] = tokenAlias(
-        `context.${scheme}.${intent === 'info' ? 'secondary' : intent}`,
-        'color',
-      );
-    }
-    if (name.startsWith('info-')) {
-      const target = name.replace('info-', 'secondary-');
-      values[name] = tokenAlias(`context.${scheme}.${target}`, 'color');
-    }
-  }
-  values.info = tokenAlias(`context.${scheme}.secondary`, 'color');
-  values['primary-container'] = tokenAlias(`context.${scheme}.primary-subtle`, 'color');
-  values['primary-on-container'] = tokenAlias(`context.${scheme}.fg`, 'color');
 }
