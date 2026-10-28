@@ -31,7 +31,7 @@ behind the window. Signature moves:
 ## Hard rules
 
 - MUST keep the proportions and composition in `DESIGN.md`. Apply macOS 27 kit facts only as local
-  corrections, never as a template.
+  corrections. A kit-faithful layout is the separate macOS 27 theme (planned, #2443).
 - MUST put glass only on the sidebar, toolbar groups, search, sheet, selection bar and segmented
   thumb. Hero, platters, banner and table stay opaque.
 - MUST render a wallpaper or colour field behind the window. Never glass over a flat page.

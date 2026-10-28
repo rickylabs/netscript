@@ -266,8 +266,9 @@ components:
 ### Composition boundary
 
 Cupertino keeps the composition above: a floating sidebar, capsule buttons, a large title and an
-inline grouped editor. Strict macOS 15 / iOS 18 anatomy is out of scope: no attached 208px sidebar,
-no 6px-corner 28px bordered push buttons, no docked inspector.
+inline grouped editor. Strict macOS 15 / iOS 18 anatomy (an attached 208px sidebar, 6px-corner 28px
+bordered push buttons, a docked inspector) belongs to the faithful Apple Classic theme (planned,
+#2443), not to Cupertino.
 
 Cupertino never takes lensing, specular rims, a detached sheet, a floating selection bar, glass on
 content or the macOS 27 toolbar groups from Liquid. The Figma frames carry a `GLASS` effect on the
@@ -393,8 +394,9 @@ Hover, pressed, focus and disabled are not drawn for any Cupertino component. Th
 ## Do's and Don'ts
 
 - **Do** keep the hand-built composition, including the capsules and the floating sidebar.
-- **Don't** describe or rebuild Cupertino as strict macOS 15 / iOS 18 (opaque attached sidebar,
-  bordered push buttons). Symptom: the screen reads as a generic Bootstrap admin.
+- **Don't** turn Cupertino into a strict macOS 15 / iOS 18 reproduction (opaque attached sidebar,
+  bordered push buttons). That is the faithful Apple Classic theme (planned, #2443); Cupertino keeps
+  its own composition.
 - **Don't** ship lensing, refraction, dispersion or specular rims. Those belong to Liquid, and the
   two themes stay visually distinct. Blur-only CSS is the proposed approximation of the Figma
   frames, pending the comparison in #2419.

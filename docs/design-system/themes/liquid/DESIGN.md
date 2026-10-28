@@ -308,9 +308,9 @@ components:
      outline, ±0.75px side shading, no drop shadow. A blue prominent capsule ends the toolbar.
 - **Anchor:** Apple macOS 27 / iOS 27 Liquid Glass, measured from Apple's macOS 27 Figma kit (see
   _Sources_). Taken: measured geometry and the toolbar-item recipe. Kit facts are applied as local
-  corrections to the NetScript proportions; the kit is never used as a template. Not copied: SF Pro,
-  SF Symbols, wallpapers, kit components. Expo's studies influenced "glass on navigation only" and
-  the detached sheet.
+  corrections to the NetScript proportions. A faithful reproduction of the kit is the separate macOS
+  27 theme (planned, #2443). Not copied: SF Pro, SF Symbols, wallpapers, kit components. Expo's
+  studies influenced "glass on navigation only" and the detached sheet.
 - **Family:** Platform. **Best for:** pro desktop apps, inspectors, media and asset tools. **Avoid
   for:** content-heavy reading and dense data entry; suggest `cupertino` or `studio`.
 - **Feel:** luminous, spatial, current. It should look like the current macOS.
@@ -415,7 +415,7 @@ Depth comes from material rather than shadow. Three glass weights sit over one o
 ## Do's and Don'ts
 
 - **Do** keep the NetScript proportions (240 sidebar, 632 content, 360 sheet). Apply kit facts as
-  local corrections; don't rebuild the layout from the kit.
+  local corrections. Rebuilding the layout from the kit produces the macOS 27 theme, not Liquid.
 - **Don't** apply a 34px-window / 72px-toolbar template.
 - **Do** put glass only on navigation and controls; content stays opaque (Apple materials guidance).
 - **Do** put a desktop wallpaper behind the glass, never a flat page (GUIDELINES §5).

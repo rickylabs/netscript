@@ -33,8 +33,9 @@ moves:
 ## Hard rules
 
 - MUST keep the hand-built composition: floating 248px sidebar at 16px inset, large title, 36px
-  capsules, inline grouped editor. NEVER convert it to a strict macOS 15 / iOS 18 rebuild (attached
-  opaque sidebar, bordered push buttons); the result reads as a generic Bootstrap admin.
+  capsules, inline grouped editor. NEVER convert it to a strict macOS 15 / iOS 18 reproduction
+  (attached opaque sidebar, bordered push buttons). That is the separate Apple Classic theme
+  (planned, #2443).
 - MUST NOT ship lensing, refraction, dispersion, specular rims, a detached sheet or a floating
   selection bar. Those belong to Liquid, and the two themes stay visually distinct. The Figma frames
   carry `GLASS` refraction (0.50–0.55); the web theme proposes `backdrop-filter: blur()` plus tint
