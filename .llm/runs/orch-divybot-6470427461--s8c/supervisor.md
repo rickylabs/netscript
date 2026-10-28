@@ -9,6 +9,8 @@
 
 ## Declared write surface
 
-`docs/site/` (components, configuration, styles, enhancement scripts, fixture galleries and generated tracked content if required); `tools/docs-site/`; `tools/fresh-ui-browser/docs-tests/`; `.github/workflows/pages.yml`; `.github/scripts/ci-classify-changes.ts`; `.github/scripts/ci-classify-changes.test.ts`; `.llm/tools/docs/` (existing follow-up tests/helpers only); `.llm/runs/orch-divybot-6470427461--s8c/`; `.llm/runs/orch-divybot-6463056924--s8/drift.md` (the explicitly requested stale-note repair); generated documentation carriers under `packages/cli/src/kernel/assets/` only through native generators. Ignored docs build, browser results and temporary reports are outputs, not source.
+`docs/site/` (components, configuration, styles, enhancement scripts, fixture galleries and generated tracked content if required); `tools/docs-site/`; `tools/fresh-ui-browser/docs-tests/`; `.github/workflows/pages.yml`; `.github/scripts/ci-classify-changes.ts`; `.github/scripts/ci-classify-changes.test.ts`; `.llm/tools/docs/` (existing follow-up tests/helpers only); `.llm/runs/orch-divybot-6470427461--s8c/`; `.llm/runs/orch-divybot-6463056924--s8/drift.md` (the explicitly requested stale-note repair); generated documentation carriers under `packages/cli/src/kernel/assets/`, `packages/mcp/src/publish-assets.generated.ts`, and `.llm/assets/agent-docs/provenance.json` only through native generators. Ignored docs build, browser results and temporary reports are outputs, not source.
 
 No package API, dependency upgrade, labels, merge, tag or release is authorized. Do not stage the assignment or final-publication handoff files.
+
+The native publish-assets task may write the exact checked-in paths in `PUBLISH_ASSET_OUTPUTS` in `.llm/tools/generate-publish-assets.ts`, solely to regenerate existing assets. Inspect every resulting diff; unrelated generator drift is not silently accepted.

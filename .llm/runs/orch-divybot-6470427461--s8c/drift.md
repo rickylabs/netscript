@@ -9,3 +9,5 @@
 - Coordinator update: Figma export b9dd32aac is available; proceed directly to syntax after the current reviewed slice, then finish path chips and #2451. The sole approved compatibility exception is --ns-input-border: light #8d8d8d (was #838383), dark #6e6e6e (was #7b7b7b). All other existing declarations remain byte-identical. This is explicit owner scope steering, not an inferred token change.
 
 - During two-build verification, highlight.js exposed an existing API component defect: raw generic names/types such as Readonly<Record<string, unknown>> were parsed as HTML and lost text. Use Vento’s existing escape filter for name/type/kind text, retaining description HTML, and prove the real sagas signatures survive highlighting. This repairs the requested API signature surface, without a custom escaping abstraction.
+
+- Generated-carrier scope clarification before native publish-assets generation: the documented native task also refreshes packages/mcp/src/publish-assets.generated.ts and the deterministic prose provenance sidecar. These exact generated surfaces are now declared in supervisor.md; no package API or hand-authored framework source changes are planned.

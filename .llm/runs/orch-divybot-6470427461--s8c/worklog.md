@@ -91,3 +91,9 @@ Strengthened tagline regression rerun passes in all four browser projects (4/4);
 - Docs export drift, snippets (668 scanned), 24,069 links and 15 caveat references pass. Independent slice review PASS.
 - Required one-pass CLI runtime smoke attempted unchanged, exit 1: Aspire preflight and cleanup cannot reach a Docker daemon. Marked UNPROVEN locally; no gate suppressed or changed. Read-only leak reporter follows, and unchanged hosted workflow will be dispatched after push.
 - Reconcile: only reviewed lightningcss lock additions; root lock untouched. No source gate removed, labels changed or foreign resources mutated.
+
+## Native documentation carriers
+
+Ran the documented gen:agent-docs-prose then gen:publish-assets tasks. Only CLI prose and MCP embedded docs differ; no unrelated generated output changed. Decoded carrier comparison: 205 entries before/after, 41 changed, no additions/removals, both non-site context MDX entries byte-identical, no internal gallery entries. Native prose/publish-assets/MCP-export freshness checks pass. Repo quality:gate exit 0 with existing warnings only. Generated-file type check and independent carrier sign-off pending.
+
+Native carrier sign-off PASS in the independent reviewer. Generated-file structured type check passes; MCP 14 docs use 283,018 bytes under unchanged 294,912 budget. All 205 decoded entries preserved with 41 intentional changes and unchanged context MDX. All three real bundled style controls reject intended findings with exit 1. Current main advanced with #2442/#2457; reconcile it after this reviewed carrier commit, preserving the owner design prose and regenerating any changed carrier through native tasks.
