@@ -72,6 +72,16 @@
     "reviewThreads": {
       "exitCode": 0,
       "unanswered": 0
+    },
+    "closeGate": {
+      "exitCode": 0,
+      "outcome": "PASS",
+      "headAtVerification": "39a70d0465b48ed52d3905273b6e1732dc3d1952",
+      "evaluatedAt": "2026-10-28T14:57:11.637Z",
+      "issue": 2455,
+      "checkedBoxes": 9,
+      "validatedEvidenceEntries": 9,
+      "issueBodySha256": "26eca920f3a8406f2263813bbed157db01b5dac49bbb2f39a5327f7fa3f62fe6"
     }
   },
   "negativeControls": {

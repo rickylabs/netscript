@@ -113,3 +113,7 @@ Independent mandatory IMPL-EVAL round 1: PASS — implementation accepted, ready
 Subsequent hosted observations strengthen the recorded proof: Pages run 40708109088 succeeds at reconciled source 3f73f1b84, with screenshot/axe artifact 12823903814. Hosted E2E run 40706285391 completes static, Postgres and SQLite jobs successfully at f9c75c882; additive desktop-native fails because its expected installed executable is missing. No claim of all-workflow success is made. Local Docker limitation remains recorded, and no runtime process/resource was started here.
 
 Final implementation source is unchanged since the evaluated 3f73f1b84; remaining commit carries evidence/lessons only. READY means ready for review, not merge authorization. No labels, merge, tag or release.
+
+## Close-gate feedback repair
+
+Owner reported current CI close-gate failure at 39a70d046. Native currency audit confirmed nine unchecked acceptance boxes on #2455; no code or PR DoD defect. Validated exact 9/9 structured evidence mapping with repository helpers, checked the verified boxes, and attached issue provenance. Native live close-gate PASS at 2026-10-28T14:57:11.637Z, issue body hash 26eca920f3a8406f2263813bbed157db01b5dac49bbb2f39a5327f7fa3f62fe6. Detailed audit in close-gate-repair.md. Publishing this real acceptance record; product source unchanged. No labels or issue state changed.
