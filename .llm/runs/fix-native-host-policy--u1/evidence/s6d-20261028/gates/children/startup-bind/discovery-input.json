@@ -1,0 +1,37 @@
+{
+  "args": [
+    "run",
+    "--check",
+    "--frozen",
+    "--cached-only",
+    "--ext=ts",
+    "--allow-env",
+    "--allow-read=C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56,C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\npm,C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7",
+    "--allow-sys",
+    "--deny-run",
+    "--deny-net",
+    "--deny-ffi",
+    "-"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\plugins\\streams\\",
+  "clearEnv": true,
+  "env": {
+    "DENO_DIR": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache",
+    "NO_COLOR": "1",
+    "HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "USERPROFILE": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "APPDATA": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "LOCALAPPDATA": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "TMP": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "TEMP": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "TMPDIR": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "XDG_CACHE_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "XDG_CONFIG_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "XDG_DATA_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "XDG_STATE_HOME": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+    "SystemRoot": "C:\\windows",
+    "PATH": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7;C:\\windows\\System32;C:\\windows",
+    "PATHEXT": ".COM;.EXE;.BAT;.CMD"
+  },
+  "source": "import { createRequire } from 'node:module';\nimport { dirname, isAbsolute, join, relative, sep } from 'node:path';\nimport process from 'node:process';\nfunction assert(value: unknown, message: string): asserts value {\n  if (!value) throw new Error(message);\n}\nconst require = createRequire(import.meta.resolve('@durable-streams/server'));\nconst entries = [require.resolve('lmdb'),\n  createRequire(require.resolve('msgpackr')).resolve('msgpackr-extract')];\nconst addons = [];\nfor (const [index, entry] of entries.entries()) {\n  const name = index === 0 ? 'lmdb' : 'msgpackr-extract';\n  const version = index === 0 ? '3.5.7' : '3.0.4';\n  const directory = index === 0 ? dirname(dirname(entry)) : dirname(entry);\n  const manifest: unknown = JSON.parse(await Deno.readTextFile(join(directory, 'package.json')));\n  assert(typeof manifest === 'object' && manifest !== null && 'name' in manifest &&\n    'version' in manifest && manifest.name === name && manifest.version === version &&\n    'optionalDependencies' in manifest, 'Native package identity changed');\n  const optional = manifest.optionalDependencies;\n  const packageName = '@' + name + '/' + name + '-' + process.platform + '-' + process.arch;\n  assert(typeof optional === 'object' && optional !== null && packageName in optional &&\n    Reflect.get(optional, packageName) === version, 'Pinned optional dependency changed');\n  const nativeRequire = createRequire(entry);\n  const packagePath = nativeRequire.resolve(packageName + '/package.json');\n  const platformManifest: unknown = JSON.parse(await Deno.readTextFile(packagePath));\n  assert(typeof platformManifest === 'object' && platformManifest !== null &&\n    'name' in platformManifest && platformManifest.name === packageName &&\n    'version' in platformManifest && platformManifest.version === version &&\n    'os' in platformManifest && Array.isArray(platformManifest.os) &&\n    platformManifest.os.includes(process.platform) && 'cpu' in platformManifest &&\n    Array.isArray(platformManifest.cpu) && platformManifest.cpu.includes(process.arch),\n    'Native platform manifest mismatch');\n  const loader: unknown = nativeRequire('node-gyp-build-optional-packages');\n  assert(typeof loader === 'function', 'Native loader is not callable');\n  const resolve: unknown = Reflect.get(loader, 'resolve');\n  assert(typeof resolve === 'function', 'Native resolver is absent');\n  const selected: unknown = resolve(directory);\n  assert(typeof selected === 'string', 'Native resolver returned a non-path');\n  const owner = await Deno.realPath(dirname(packagePath)), path = await Deno.realPath(selected);\n  const within = relative(owner, path);\n  assert(within !== '' && !isAbsolute(within) && within !== '..' &&\n    !within.startsWith('..' + sep) && (await Deno.stat(path)).isFile, 'Native addon escaped owner');\n  const bytes = await Deno.readFile(path);\n  const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)),\n    (byte) => byte.toString(16).padStart(2, '0')).join('');\n  addons.push({ path, owner, bytes: bytes.length, sha256, manifest, platformManifest });\n}\nconsole.log(JSON.stringify(addons));"
+}
