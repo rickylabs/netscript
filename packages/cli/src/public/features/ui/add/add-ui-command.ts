@@ -1,16 +1,16 @@
 import { Command } from '@cliffy/command';
-
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
-import { installUiRegistryItems, type UiInstallDependencies } from '../registry.ts';
+import { installUiRegistryItems } from '../registry.ts';
 import { requireUiAppRoot, type UiAppRootResolver } from '../../../presentation/support.ts';
+import { installUiRegistry } from '../../../../kernel/application/ui/v2/install-registry.ts';
+import type { UiRegistryDependencies } from '../../../../kernel/application/ui/v2/registry-client.ts';
+import { reportScaffold, reportUiRegistry } from './add-ui-output.ts';
 import type { UiAddCommandInput } from './add-ui-input.ts';
 import {
   scaffoldUiIsland,
   scaffoldUiPage,
   type UiGeneratedFileRole,
-  type UiScaffoldResult,
 } from '../../../../kernel/application/ui/page/web-scaffold.ts';
-
 /** Semantic roles emitted by the public data-screen scaffold. */
 export const UI_DATA_SCREEN_FILE_ROLES = [
   'page',
@@ -27,7 +27,7 @@ const DATA_SCREEN_HELP = `Data-screen roles: ${
 /** Dependencies for the public `ui:add` command handler. */
 export interface UiAddCommandDependencies {
   /** Application dependencies for installing Fresh UI registry files. */
-  readonly installDependencies: UiInstallDependencies;
+  readonly installDependencies: UiRegistryDependencies;
   /** Resolve the Fresh application root from flags or environment. */
   readonly resolveUiAppRoot: UiAppRootResolver;
   /** Print completion lines. */
@@ -57,6 +57,8 @@ export function createUiAddCommand(
     .option('--app <name:string>', 'Fresh app workspace name')
     .option('--registry-root <path:string>', 'Fresh UI package root override')
     .option('--theme <name:string>', 'Theme registry item (defaults to the official theme)')
+    .option('--diff', 'Show local and registry differences without writing files')
+    .option('--json', 'Emit structured registry results')
     .option('--force', 'Overwrite existing copied UI or scaffold files', { default: false })
     .option(
       '--dry-run',
@@ -122,27 +124,29 @@ export function createUiAddCommand(
       if (options.dryRun) {
         throw new Error('--dry-run is supported only for page and island scaffolds.');
       }
-      const result = await installUiRegistryItems({
-        projectRoot,
-        registryRoot: options.registryRoot,
+      if (name) throw new Error('Registry installation accepts one item reference.');
+      if (options.registryRoot) {
+        if (options.diff) {
+          throw new Error('--diff requires a JSON registry rather than a legacy module override.');
+        }
+        const result = await installUiRegistryItems({
+          projectRoot,
+          registryRoot: options.registryRoot,
+          names: [kind],
+          overwrite: options.force ?? false,
+          theme: options.theme,
+        }, dependencies.installDependencies);
+        print(`Installed ${result.installedItems.length} Fresh UI registry items.`);
+        print(`Copied ${result.copiedFiles.length} files.`);
+        return;
+      }
+      const result = await installUiRegistry({
+        root: projectRoot,
         names: [kind],
-        overwrite: options.force ?? false,
+        force: options.force,
         theme: options.theme,
+        diff: options.diff,
       }, dependencies.installDependencies);
-
-      print(`Installed ${result.installedItems.length} Fresh UI registry items.`);
-      print(`Copied ${result.copiedFiles.length} files.`);
-      print(`Wrote ${result.stylesPath}.`);
-      print(`Merged ${result.dependenciesMerged.length} deno.json imports.`);
+      reportUiRegistry(result, options, print);
     });
-}
-
-function reportScaffold(
-  result: UiScaffoldResult,
-  dryRun: boolean,
-  print: (message: string) => void,
-): void {
-  const verb = dryRun ? 'Planned' : 'Generated';
-  for (const file of result.files) print(`${verb} ${file.role}: ${file.path}`);
-  for (const step of result.nextSteps) print(`Next: ${step}`);
 }

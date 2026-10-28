@@ -315,7 +315,8 @@ function isTypeScriptLike(path: string): boolean {
   return path.endsWith('.ts') || path.endsWith('.tsx');
 }
 
-function rewriteRegistryImports(
+/** Rewrite imports to the actual destination of each copied registry source. */
+export function rewriteRegistryImports(
   content: string,
   sourceFile: string,
   targetFile: string,
@@ -325,7 +326,15 @@ function rewriteRegistryImports(
   const rewrite = (specifier: string): string => {
     const source = resolveSpecifierSource(sourceFile, registryRoot, specifier);
     if (!source) return specifier;
-    const mapped = sourceToTarget.get(normalize(source));
+    const candidates = [
+      source,
+      ...['.ts', '.tsx', '.js', '.jsx', '/index.ts', '/index.tsx'].map((extension) =>
+        source + extension
+      ),
+    ];
+    const mapped = candidates.map((candidate) => sourceToTarget.get(normalize(candidate))).find((
+      target,
+    ) => target !== undefined);
     if (!mapped) return specifier;
     return toImportSpecifier(relative(dirname(targetFile), mapped));
   };
@@ -342,6 +351,10 @@ function rewriteRegistryImports(
       (_match, open: string, specifier: string, close: string) =>
         open + rewrite(specifier) +
         close,
+    )
+    .replace(
+      /(\bimport\s*\(\s*['"])([^'"]+)(['"])/g,
+      (_match, open: string, specifier: string, close: string) => open + rewrite(specifier) + close,
     );
 }
 

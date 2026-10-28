@@ -2,12 +2,13 @@ import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/gene
 import { Command } from '@cliffy/command';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { removeUiPage } from '../../../../kernel/application/ui/page/remove-ui-page.ts';
-import { removeUiRegistryItem, type UiInstallDependencies } from '../registry.ts';
+import { removeUiRegistry } from '../../../../kernel/application/ui/v2/registry-lifecycle.ts';
+import type { UiRegistryDependencies } from '../../../../kernel/application/ui/v2/registry-client.ts';
 import { requireUiAppRoot, type UiAppRootResolver } from '../../../presentation/support.ts';
 
 /** Create `ui:remove` for registry items and unchanged generated pages. */
 export function createUiRemoveCommand(deps: {
-  readonly installDependencies: UiInstallDependencies;
+  readonly installDependencies: UiRegistryDependencies;
   readonly resolveUiAppRoot: UiAppRootResolver;
   readonly formatter?: Pick<GeneratedSourceFormatterPort, 'formatContents'>;
   readonly writeManifest?: (appRoot: string) => Promise<unknown>;
@@ -70,7 +71,7 @@ export function createUiRemoveCommand(deps: {
         if (path || options.dryRun || options.client) {
           throw new Error('Page path, --dry-run and --client are supported only for page removal.');
         }
-        const removed = await removeUiRegistryItem(root, kind, deps.installDependencies.fs);
+        const removed = await removeUiRegistry(root, kind, deps.installDependencies);
         print(`Removed ${removed.length} files and pruned deno.json imports.`);
       },
     );

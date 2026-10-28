@@ -20,7 +20,7 @@ export const UI_DEFAULT_ALIASES = {
 export function isUiRelativePath(path: string): boolean {
   return path.length > 0 && !/[\\:]/.test(path) &&
     [...path].every((part) => part.charCodeAt(0) >= 32) && !path.startsWith('/') &&
-    path.split('/').every((part) => part !== '..' && part !== '' && part !== '.git');
+    path.split('/').every((part) => part !== '..' && part !== '' && part.toLowerCase() !== '.git');
 }
 
 const localPath = z.string().refine(isUiRelativePath, 'Registry paths must remain inside the app');
@@ -54,7 +54,7 @@ export const UiConfigSchema = z.object({
     assets: localPath.default(UI_DEFAULT_ALIASES.assets),
     islands: localPath.default(UI_DEFAULT_ALIASES.islands),
   }).strict().default(UI_DEFAULT_ALIASES),
-  registries: z.record(z.string().regex(/^@[a-zA-Z0-9][a-zA-Z0-9_-]*$/), UiRegistrySourceSchema)
+  registries: z.record(z.string().regex(/^@[a-zA-Z0-9][a-zA-Z0-9_.-]*$/), UiRegistrySourceSchema)
     .default({}),
 }).strict();
 

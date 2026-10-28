@@ -1,3 +1,5 @@
+import { FetchUiRegistry } from '../../../kernel/adapters/ui/fetch-ui-registry.ts';
+import type { UiRegistryDependencies } from '../../../kernel/application/ui/v2/registry-client.ts';
 import { DenoUiRegistryPaths } from '../../../kernel/adapters/ui/deno-ui-registry-paths.ts';
 import type { UiRegistryPathPort } from '../../../kernel/ports/ui-registry-port.ts';
 import { createContributionExtractor } from '../../../kernel/adapters/plugin/contribution-extractor.ts';
@@ -132,9 +134,7 @@ export interface PublicCommandDependencies {
   /** Dependencies for public init. */
   readonly initCommandDependencies: InitCommandDependencies;
   /** Dependencies for Fresh UI registry installation commands. */
-  readonly uiInstallDependencies: {
-    readonly fs: DenoFileSystem;
-  };
+  readonly uiInstallDependencies: UiRegistryDependencies;
   /** Canonical source formatting shared by page-removal validation. */
   readonly uiPageFormatter: GeneratedSourceFormatterPort;
   /** Dependencies for DB lifecycle commands. */
@@ -327,8 +327,10 @@ export function createPublicCommandDependencies(
     generatedSourceFormatter,
   );
 
+  const uiRegistryPaths = new DenoUiRegistryPaths();
+  const tokenEngine = new FreshUiTokenEngine();
   return {
-    uiRegistryPaths: new DenoUiRegistryPaths(),
+    uiRegistryPaths,
     fs,
     process,
     templateAdapter,
@@ -337,7 +339,7 @@ export function createPublicCommandDependencies(
     dbRegistry,
     loadConfig,
     runtimeConfigStore,
-    tokenEngine: new FreshUiTokenEngine(),
+    tokenEngine,
     resolveProjectRoot,
     resolveUiAppRoot,
     initCommandDependencies: {
@@ -355,7 +357,12 @@ export function createPublicCommandDependencies(
         dryRun ? createInitContext(new DryRunFileSystemAdapter(fs)) : initContext,
     },
     uiPageFormatter: generatedSourceFormatter,
-    uiInstallDependencies: { fs },
+    uiInstallDependencies: {
+      fs,
+      transport: new FetchUiRegistry(),
+      paths: uiRegistryPaths,
+      tokenEngine,
+    },
     dbOperationDependencies: {
       cwd: host.cwd,
     },

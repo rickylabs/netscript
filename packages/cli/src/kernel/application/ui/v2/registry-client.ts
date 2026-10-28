@@ -7,6 +7,9 @@ import {
   uiRegistryUrl,
 } from '../../../domain/ui/ui-config.ts';
 import type { UiRegistryTransportPort } from '../../../ports/ui-registry-port.ts';
+import type { UiRegistryPathPort } from '../../../ports/ui-registry-port.ts';
+import type { FileSystemPort } from '../../../ports/file-system-port.ts';
+import type { TokenEnginePort } from '../../../ports/token-engine-port.ts';
 
 /** Source bytes attached to an item before any install plan is allowed to write files. */
 export interface UiResolvedItem {
@@ -14,6 +17,7 @@ export interface UiResolvedItem {
   readonly source: string;
   readonly item: RegistryItem;
   readonly files: readonly (RegistryFile & { readonly content: string })[];
+  readonly resolvedDependencies?: readonly string[];
 }
 
 /** Embedded registry injection keeps remote tests independent of production component payloads. */
@@ -24,17 +28,35 @@ export interface UiRegistryClientDependencies {
   >;
 }
 
+/** Shared injected edges for app registry operations and token preset compilation. */
+export interface UiRegistryDependencies extends UiRegistryClientDependencies {
+  readonly fs: FileSystemPort;
+  readonly paths?: UiRegistryPathPort;
+  readonly tokenEngine?: TokenEnginePort;
+}
+
 /** One request-scoped registry client, with dependency, namespace and source caches. */
 export interface UiRegistryClient {
   catalog(namespace?: string): Promise<Registry>;
   item(ref: string): Promise<UiResolvedItem>;
-  resolve(refs: readonly string[]): Promise<readonly UiResolvedItem[]>;
+  resolve(refs: readonly string[], theme?: string): Promise<readonly UiResolvedItem[]>;
+}
+
+/** Resolve a bare dependency in the registry that declared it, without forwarding cross-origin auth. */
+export function uiDependencyReference(owner: UiResolvedItem, dependency: string): string {
+  if (/^(https?:|github:|@)/.test(dependency)) return dependency;
+  const namespace = owner.ref.match(namespaceRef)?.[1];
+  return namespace
+    ? `${namespace}/${dependency}`
+    : owner.source.startsWith('builtin:')
+    ? dependency
+    : new URL(`${dependency}.json`, owner.source).href;
 }
 
 const collectionsSchema = z.array(
   z.object({ name: z.string(), items: z.array(z.string()) }).passthrough(),
 );
-const namespaceRef = /^(@[A-Za-z0-9][A-Za-z0-9_-]*)\/([A-Za-z0-9][A-Za-z0-9._-]*)$/;
+const namespaceRef = /^(@[A-Za-z0-9][A-Za-z0-9_.-]*)\/([A-Za-z0-9][A-Za-z0-9._-]*)$/;
 
 /** Resolve source catalogs and static item URLs without importing or executing remote modules. */
 export async function createUiRegistryClient(
@@ -84,7 +106,7 @@ export async function createUiRegistryClient(
     const registry = validateRegistry(parseUiRegistryJson(await read(url, headers)));
     const items = [...registry.items];
     for (const include of registry.include ?? []) {
-      if (!isUiRelativePath(include)) throw new Error('Invalid remote registry include');
+      if (!safeRemoteSource(include)) throw new Error('Invalid remote registry include');
       const chunk = await catalogAt(new URL(include, url).href, headers, new Set(visited));
       items.push(...chunk.items);
     }
@@ -133,7 +155,7 @@ export async function createUiRegistryClient(
       source = `builtin:${ref}`;
     }
     const files = await Promise.all((payload.files ?? []).map(async (file) => {
-      if (!isUiRelativePath(file.path)) {
+      if (!safeRemoteSource(file.path)) {
         throw new Error('Registry file source must be a safe relative path');
       }
       let content = file.content;
@@ -144,7 +166,8 @@ export async function createUiRegistryClient(
         const key = file.path.startsWith('packages/fresh-ui/')
           ? file.path.slice('packages/fresh-ui/'.length)
           : `../../${file.path}`;
-        content = (await builtin()).content[key];
+        const embeddedContent = (await builtin()).content;
+        content = embeddedContent[file.path] ?? embeddedContent[key];
       }
       if (content === undefined) {
         throw new Error(`Registry source content is missing: ${file.path}`);
@@ -156,8 +179,12 @@ export async function createUiRegistryClient(
   return {
     catalog,
     item,
-    resolve: async (refs) => {
+    resolve: async (refs, theme) => {
       const result: UiResolvedItem[] = [];
+      const replacements = new Map<string, string>();
+      if (theme && (await item(theme)).item.type !== 'registry:theme') {
+        throw new Error('Theme override must name a registry:theme item');
+      }
       const visiting = new Set<string>();
       const visited = new Set<string>();
       const visit = async (ref: string): Promise<void> => {
@@ -168,16 +195,15 @@ export async function createUiRegistryClient(
         }
         visiting.add(ref);
         const resolved = await item(ref);
-        const owner = ref.match(namespaceRef)?.[1];
+        if (theme && resolved.item.type === 'registry:theme' && ref !== theme) {
+          replacements.set(ref, theme);
+          await visit(theme);
+          visiting.delete(ref);
+          visited.add(ref);
+          return;
+        }
         for (const dependency of resolved.item.registryDependencies ?? []) {
-          const next = !/^(https?:|github:|@)/.test(dependency)
-            ? owner
-              ? `${owner}/${dependency}`
-              : resolved.source.startsWith('builtin:')
-              ? dependency
-              : new URL(`${dependency}.json`, resolved.source).href
-            : dependency;
-          await visit(next);
+          await visit(uiDependencyReference(resolved, dependency));
         }
         visiting.delete(ref);
         visited.add(ref);
@@ -194,7 +220,22 @@ export async function createUiRegistryClient(
         if (collection) { for (const name of collection.items) await visit(name); }
         else await visit(ref);
       }
-      return result;
+      return result.map((entry) => ({
+        ...entry,
+        resolvedDependencies: (entry.item.registryDependencies ?? [])
+          .map((dependency) => uiDependencyReference(entry, dependency)).map((dependency) =>
+            replacements.get(dependency) ?? dependency
+          ),
+      }));
     },
   };
+}
+
+/** URL normalization must not turn an encoded source segment into parent traversal. */
+function safeRemoteSource(path: string): boolean {
+  try {
+    return isUiRelativePath(path) && isUiRelativePath(decodeURIComponent(path));
+  } catch {
+    return false;
+  }
 }

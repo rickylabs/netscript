@@ -2,6 +2,26 @@ import { assert, assertEquals, assertRejects } from '@std/assert';
 import { UiConfigSchema } from '../../../../domain/ui/ui-config.ts';
 import { createUiRegistryClient } from '../registry-client.ts';
 
+Deno.test('theme overrides preserve canonical dependency ownership in the resolved graph', async () => {
+  const client = await createUiRegistryClient(UiConfigSchema.parse({}), {
+    builtin: () =>
+      Promise.resolve({
+        registry: {
+          items: [
+            { name: 'base', type: 'registry:theme' },
+            { name: 'chosen', type: 'registry:theme' },
+            { name: 'x', type: 'registry:ui', registryDependencies: ['base'] },
+          ],
+        },
+        content: {},
+      }),
+  });
+  const graph = await client.resolve(['x'], 'chosen');
+  assertEquals(graph.map((entry) => entry.ref), ['chosen', 'x']);
+  assertEquals(graph[1].resolvedDependencies, ['chosen']);
+  await assertRejects(() => client.resolve(['x'], 'x'), Error, 'Theme override');
+});
+
 Deno.test('namespaced dependency names stay in their registry and fetch each source once', async () => {
   const calls: string[] = [];
   const config = UiConfigSchema.parse({

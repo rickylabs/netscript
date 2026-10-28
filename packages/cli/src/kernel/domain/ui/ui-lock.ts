@@ -23,6 +23,8 @@ export const UiLockSchema = z.object({
       requested: z.boolean().default(false),
       files: z.array(UiLockedFileSchema),
       registryDependencies: z.array(z.string()).default([]),
+      dependencies: z.array(z.string()).optional(),
+      cssImports: z.array(z.string()).optional(),
     }).strict(),
   ),
 }).strict();

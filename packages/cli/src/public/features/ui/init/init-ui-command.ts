@@ -1,18 +1,18 @@
-import { Command } from "@cliffy/command";
+import { installUiRegistry } from '../../../../kernel/application/ui/v2/install-registry.ts';
+import type { UiRegistryDependencies } from '../../../../kernel/application/ui/v2/registry-client.ts';
+import { reportUiRegistry } from '../add/add-ui-output.ts';
+import { installUiRegistryItems } from '../registry.ts';
+import { Command } from '@cliffy/command';
 
-import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
-import {
-  DEFAULT_UI_INIT_ITEMS,
-  installUiRegistryItems,
-  type UiInstallDependencies,
-} from "../registry.ts";
-import { type UiAppRootResolver, requireUiAppRoot } from "../../../presentation/support.ts";
-import type { UiInitCommandInput } from "./init-ui-input.ts";
+import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
+import { DEFAULT_UI_INIT_ITEMS } from '../registry.ts';
+import { requireUiAppRoot, type UiAppRootResolver } from '../../../presentation/support.ts';
+import type { UiInitCommandInput } from './init-ui-input.ts';
 
 /** Dependencies for the public `ui:init` command handler. */
 export interface UiInitCommandDependencies {
   /** Application dependencies for installing Fresh UI registry files. */
-  readonly installDependencies: UiInstallDependencies;
+  readonly installDependencies: UiRegistryDependencies;
   /** Resolve the Fresh application root from flags or environment. */
   readonly resolveUiAppRoot: UiAppRootResolver;
   /** Print completion lines. */
@@ -25,29 +25,36 @@ export function createUiInitCommand(
 ) {
   const print = dependencies.print ?? outputText;
   return new Command()
-    .name("ui:init")
-    .description("Install the NetScript Fresh UI foundation into an app workspace")
-    .option("--project-root <path:string>", "Project root directory")
-    .option("--app <name:string>", "Fresh app workspace name")
-    .option("--registry-root <path:string>", "Fresh UI package root override")
-    .option("--theme <name:string>", "Theme registry item (defaults to the official theme)")
-    .option("--force", "Overwrite existing copied UI files", { default: false })
+    .name('ui:init')
+    .description('Install the NetScript Fresh UI foundation into an app workspace')
+    .option('--project-root <path:string>', 'Project root directory')
+    .option('--app <name:string>', 'Fresh app workspace name')
+    .option('--registry-root <path:string>', 'Fresh UI package root override')
+    .option('--theme <name:string>', 'Theme registry item (defaults to the official theme)')
+    .option('--force', 'Overwrite existing copied UI files', { default: false })
     .action(async (options: UiInitCommandInput): Promise<void> => {
       const projectRoot = await requireUiAppRoot(
         dependencies.resolveUiAppRoot,
         { projectRoot: options.projectRoot, app: options.app },
       );
-      const result = await installUiRegistryItems({
-        projectRoot,
-        registryRoot: options.registryRoot,
+      if (options.registryRoot) {
+        const result = await installUiRegistryItems({
+          projectRoot,
+          registryRoot: options.registryRoot,
+          names: DEFAULT_UI_INIT_ITEMS,
+          overwrite: options.force ?? false,
+          theme: options.theme,
+        }, dependencies.installDependencies);
+        print(`Installed ${result.installedItems.length} Fresh UI registry items.`);
+        print(`Copied ${result.copiedFiles.length} files.`);
+        return;
+      }
+      const result = await installUiRegistry({
+        root: projectRoot,
         names: DEFAULT_UI_INIT_ITEMS,
-        overwrite: options.force ?? false,
+        force: options.force,
         theme: options.theme,
       }, dependencies.installDependencies);
-
-      print(`Installed ${result.installedItems.length} Fresh UI registry items.`);
-      print(`Copied ${result.copiedFiles.length} files.`);
-      print(`Wrote ${result.stylesPath}.`);
-      print(`Merged ${result.dependenciesMerged.length} deno.json imports.`);
+      reportUiRegistry(result, {}, print);
     });
 }
