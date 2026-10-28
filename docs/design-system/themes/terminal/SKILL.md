@@ -5,21 +5,22 @@ description: Build, extend or review NetScript Fresh UI screens in the Terminal 
 
 # Terminal theme
 
-Read `DESIGN.md` in this folder first. It holds the tokens and the full specification. This file is
-the working procedure. The cross-theme rules are in `docs/design-system/GUIDELINES.md` (shipped as
-the `netscript-design` skill).
+Read `DESIGN.md` in this folder first; it has the tokens and the full specification. This file is
+the procedure. Cross-theme rules are in `docs/design-system/GUIDELINES.md`, shipped as the
+`netscript-design` skill.
 
 ## Use it when / don't use it when
 
 - **Use for:** developer tools, ops, support and on-call consoles, log and queue viewers,
   keyboard-driven admin.
 - **Don't use for:** consumer products, onboarding, marketing pages or touch-first screens. Suggest
-  Studio (Signal flavor keeps the mono-and-lime voice with normal controls) instead.
+  Studio instead; its Signal flavor keeps the mono type and lime accent with normal controls.
 
-## The thesis in one breath
+## Thesis
 
-The screen is a Charm-style terminal UI: every glyph on a 1ch × 24px grid, rounded Lip Gloss panes
-with titles cut into the border, and the keyboard as the primary interface. Signature moves:
+The screen is a Charm-style terminal UI. Every glyph sits on a 1ch × 24px grid, panes are rounded
+Lip Gloss boxes with titles set into the border, and the keyboard is the primary interface.
+Signature moves:
 
 1. One character grid (1ch = 8.4px at Geist Mono 14px) and one 14/24 scale for every pane.
 2. Panes: 8px-rounded 1px boxes, inset `┤ title ├`, active pane = 2px lime border + `[focused]`.
@@ -29,44 +30,44 @@ with titles cut into the border, and the keyboard as the primary interface. Sign
 ## Hard rules
 
 - MUST size every fixed column in whole ch and reserve the 2ch marker cell on every row, header
-  included, so selection never shifts columns (X-01). Give the leftover width to one
-  `minmax(0, 1fr)` track, resolved inside the pane after padding, border and gaps. Orders:
+  included, so selection never shifts columns. Give the leftover width to one `minmax(0, 1fr)`
+  track, resolved inside the pane after padding, border and gaps. Orders:
   `2ch 12ch 25ch minmax(0, 1fr) 17ch 10ch 18ch 12ch` at 14/24. NEVER shrink type or clip columns to
   make the widths fit.
 - MUST keep one Geist Mono 14/24 scale across panes, consistent pane padding 22/16/16/16 and 20px
-  gaps, and dim secondary columns to `muted-fg`. Owner: "Terminal is great but lacks a bit
-  readability and consistency in columns, layout, ... It's s bit too much raw but really not bad".
+  gaps, and dim secondary columns to `muted-fg`. Without them, panes are hard to read, columns drift
+  and the screen looks like raw terminal output.
 - MUST style the active pane (the one containing DOM focus, `:focus-within`) with a 2px
   `border/ring` pane border and a `[focused]` title suffix; the help bar lists only that pane's keys
-  plus global keys (X-02). Active-pane styling is separate from DOM focus.
+  plus global keys. Active-pane styling is separate from DOM focus.
 - MUST keep every editable prompt, check and key reachable and operable by keyboard, each with its
   own visible focus indicator. Document an entry and exit route for each composite (table, tab line,
   log); use roving focus only inside composites (tab lists, list and table rows). NEVER suppress
   native control focus to imitate a TUI.
-- MUST treat the `tab switch pane` help-bar hint as provisional until S3 #2416 specifies its
-  dispatch; don't take `Tab` away from normal control-to-control navigation, and don't claim
-  keyboard behaviour from a PNG.
+- MUST treat the `tab switch pane` help-bar hint as provisional until the keyboard map in #2416
+  specifies its dispatch; don't take `Tab` away from normal control-to-control navigation, and don't
+  claim keyboard behaviour from a PNG.
 - MUST give global commands modifiers (`shift+n` create, `ctrl+s` save); `⏎` belongs to the focused
-  pane. A key's label must match the help bar (X-02).
+  pane. A key's label must match the help bar.
 - MUST explain status codes with a legend (`[ OK ] paid  [WAIT] …`) and put the repair line directly
-  under an invalid prompt (X-04).
+  under an invalid prompt.
 - NEVER fill the selected tab or the primary key with a pale slab in dark. Dark selected tab:
-  `surface/hover` fill + 2px `ring` underline (X-05). Dark Save: `#222222` key, 1px `#7b7b7b` edge,
-  `#bde56c` label (X-06). The lime selection row is the one intentional inverse surface.
-- NEVER add shadows, glows, blur, gradients or proportional type. Depth is border weight.
+  `surface/hover` fill + 2px `ring` underline. Dark Save: `#222222` key, 1px `#7b7b7b` edge,
+  `#bde56c` label. The lime selection row is the one intentional inverse surface.
+- NEVER add shadows, glows, blur, gradients or proportional type. Show depth with border weight.
 - NEVER signal status by colour alone; every status is a bracketed word.
 - MUST only read semantic roles (`--ns-*`). Never use primitives. The one existing exception is the
-  dark Save node `41:231`, bound to `gray/d/3`, `gray/d/10` and `lime/d/11` until S1 adds a
-  scheme-aware key role; do not copy that pattern.
+  dark Save key, bound to `gray/d/3`, `gray/d/10` and `lime/d/11` until a scheme-aware key role
+  lands in #2414; do not copy that pattern.
 
 ## Building a screen
 
 1. **Enable the theme:** `data-theme="terminal"`, `data-scheme="dark|light"` (dark is the
    reference), `data-density="compact"`. The Figma Theme mode is the shared `Signal`; all names are
-   provisional until S1 #2414.
-2. **Compose:** a 32px status line, a 43px numbered tab line, panes laid out on a 20px outer padding
-   (28 top) with 16px between side-by-side panes, and a 33px help bar pinned to the bottom. One pane
-   is active at a time: the one that contains DOM focus.
+   provisional until the token export in #2414.
+2. **Compose:** a 32px status line, a 43px numbered tab line, panes inside 20px outer padding (28
+   top) with 16px between side-by-side panes, and a 33px help bar pinned to the bottom. One pane is
+   active at a time: the one that contains DOM focus.
 3. **Pick variants:**
 
    | Need             | Use                                                                  |
@@ -86,14 +87,14 @@ with titles cut into the border, and the keyboard as the primary interface. Sign
 5. **Handle states:** active pane = 2px `ring` border plus `[focused]`; each focused control also
    shows its own visible focus; selection = inverse lime row with `▶`; error = label and prompt in
    `destructive-text` with `✗` and a repair line; the block cursor shows only on the focused field.
-   Hover, pressed, disabled, the editor-focused variant and the keyboard map are owed to #2416;
-   width behaviour (960px with pinned id and total) and keyboard proof to #2419.
+   Hover, pressed, disabled, the editor-focused variant and the keyboard map are pending in #2416;
+   width behaviour (960px with pinned id and total) and keyboard proof in #2419.
 
 ## New components or screens
 
-- Derive from the closest existing component's variant. Keep the ch grid, 24px line box, square keys
+- Start from the closest existing component's variant. Keep the ch grid, 24px line box, square keys
   and 8px panes.
-- If a new visual role is needed, add it as `terminal/<path>` and register it in code (S1). Don't
+- If you need a new visual role, add it as `terminal/<path>` and register it in code (#2414). Don't
   reuse an unrelated role, and don't add another Theme-mode value to `Signal`, which Studio shares.
 - Add the new component to a state sheet, in Light and Dark. Terminal has none yet.
 
@@ -110,4 +111,4 @@ with titles cut into the border, and the keyboard as the primary interface. Sign
 
 ## References
 
-`DESIGN.md` → Provenance.
+`DESIGN.md` → Sources.

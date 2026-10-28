@@ -3,8 +3,8 @@ version: alpha
 name: Brutal
 description: Gumroad-style neo-brutalism. Flat saturated blocks, black ink outlines and hard zero-blur offset shadows that stay black in both schemes.
 colors:
-  # Resolved from Figma file pGRLnkPPRZJZy74evNcQBr with variable.resolveForConsumer on
-  # frame 34:9 (Light) and 35:199 (Dark). Theme = Brutal. Keys are the --ns-* suffix.
+  # Resolved from the NetScript Figma library for the Light and Dark Orders screens.
+  # Theme = Brutal. Keys are the --ns-* suffix.
   bg: '#fefbe9'
   bg-dark: '#31312e'
   surface: '#f9f9f8'
@@ -257,41 +257,40 @@ components:
 
 <!--
 Format: Google Labs DESIGN.md (alpha, Apache-2.0), github.com/google-labs-code/design.md.
-Values: Figma file pGRLnkPPRZJZy74evNcQBr, read-only extraction on 2026-10-27.
-Names are provisional until S1 #2414.
+Values: NetScript Figma library, read-only extraction on 2026-10-27.
+Names are provisional until the token export in #2414.
 -->
 
 ## Overview
 
-- **Thesis:** a sticker-book commerce console. Every surface is one flat, saturated block held by a
-  black ink outline and a hard offset shadow, and the ink stays black when the page goes dark.
+- **Thesis:** a commerce console styled as a sticker book. Each surface is a flat, saturated block
+  with a black ink outline and a hard offset shadow. The ink stays black in the dark scheme.
 - **Signature moves:**
-  1. Hard offset shadows with zero blur in pure black (`#000000`), sized 3/3, 4/4 or 6/6 by object
-     size, in both schemes.
-  2. Saturated colour blocks carrying data: the four KPI tiles (yellow, blue, pink, green), the pink
-     notice and the yellow selected row, always with black `block-fg` text.
-  3. Mono "sticker" labels: Space Mono Bold 11px uppercase with 0.6px tracking, on pill stickers
-     with a 2px ink border; the page's `LIVE SYNC` sticker is rotated −6°.
+  1. Zero-blur offset shadows in `#000000`, sized 3/3, 4/4 or 6/6 by object size, in both schemes.
+  2. Saturated colour blocks that carry data: the four KPI tiles (yellow, blue, pink, green), the
+     pink notice and the yellow selected row. Text on them is always black `block-fg`.
+  3. Sticker labels in Space Mono Bold 11px uppercase with 0.6px tracking, on pill stickers with a
+     2px ink border. The `LIVE SYNC` sticker is rotated −6°.
 - **Anchor:** Gumroad UI code (MIT, `antiwork/gumroad`) plus neobrutalism.dev (MIT,
-  `ekmas/neobrutalism-components`). Taken: the hard shadow that is pinned to black in dark mode, the
-  bordered pill badge, regular-weight headings, colour-block fills without gradients, the
-  shadow-collapses-on-press model. Not copied: Gumroad's name, coin illustrations, pink `#ff90e8`
-  trade dress and the commercial ABC Favorit font (substituted by Space Grotesk). Figma's 2024 brand
-  is explicitly not an anchor, because it retired heavy outlines.
+  `ekmas/neobrutalism-components`). Taken: the hard shadow pinned to black in dark mode, the
+  bordered pill badge, regular-weight headings, colour-block fills without gradients, and the shadow
+  that collapses on press. Not copied: Gumroad's name, coin illustrations, pink `#ff90e8` trade
+  dress and the commercial ABC Favorit font (replaced by Space Grotesk). Figma's 2024 brand is not
+  an anchor because it dropped heavy outlines.
 - **Family:** Expressive.
 - **Best for / avoid for:** creator tools, storefront admin, marketing consoles. Avoid long data
-  sessions and dense analytics: every row carries a 2px rule and every panel a 6px slab.
-- **Feel:** loud, honest, tactile. First impression: "a zine that runs a shop".
+  sessions and dense analytics, because every row has a 2px rule and every panel a 6px slab.
+- **Feel:** loud and tactile, like a printed zine used to run a shop.
 
 ## Colors
 
 - **Ground and surface ladder.**
   - Light: canvas `bg` `#fefbe9` (amber/l/2, warm cream) → panels `card` `#ffffff` → blocks.
   - Dark: canvas `bg-dark` `#31312e` (sand/d/5) is _lighter_ than the panels `card-dark` `#191918`
-    (sand/d/2). The panels read as dark slabs sitting on a mid-dark table, which is what keeps the
-    black outlines and shadows meaningful in dark.
-- **Accent policy.** Colour lives in `block/*` fills only: KPI tiles, the notice, avatars, stickers,
-  the selected nav item and the selected row (`block-yellow`). Text on any block is always
+    (sand/d/2). The panels read as dark slabs on a mid-dark ground, so the black outlines and
+    shadows still separate them from the canvas.
+- **Accent policy.** Colour appears only in `block/*` fills: KPI tiles, the notice, avatars,
+  stickers, the selected nav item and the selected row (`block-yellow`). Text on any block is always
   `block-fg` (`#000000`). Accent never tints text, outlines or shadows.
 - **Ink.** `border/ink` and `effect/shadow` are `#000000` in both schemes. The table header, the
   selected filter tab, the delta pills and page key 1 are filled with `border/ink` and labelled with
@@ -301,7 +300,7 @@ Names are provisional until S1 #2414.
   `destructive` (`#e5484d`) and `destructive-text`.
 - **Dark design notes.** The blocks change ramp in dark: blue goes from blue/l/5 `#c2e5ff` to
   blue/d/9 `#0090ff`, pink from tomato/l/5 to tomato/d/9 `#e54d2e`, green from lime/l/5 to lime/d/9
-  `#bdee63`. They stay saturated so black text keeps ≥5.4:1. Control boundaries switch from ink to
+  `#bdee63`. They stay saturated so black text keeps ≥5.4:1. Control boundaries change from ink to
   `border/control` = sand/d/10 `#7c7b74`, because black on `#31312e` is only 1.61:1.
 
 ## Typography
@@ -320,10 +319,10 @@ Names are provisional until S1 #2414.
   `"Space Grotesk", ui-sans-serif,
   system-ui`; `"Space Mono", "JetBrains Mono", ui-monospace`.
 - Headings are regular weight at display size, following Gumroad. Only the KPI numerals are bold.
-- Field values and placeholders are mono (`JetBrains Mono Regular 14/20`), which makes inputs read
-  as typed data.
-- Tabular numerals: the mono faces are fixed-width; `"tnum"` for Space Grotesk numerals is owed to
-  #2414/#2416 (no Plugin API to prove it).
+- Field values and placeholders are mono (`JetBrains Mono Regular 14/20`), so inputs read as typed
+  data.
+- Tabular numerals: the mono faces are fixed-width. `"tnum"` for Space Grotesk numerals is pending
+  in #2414 and #2416, because Figma cannot set or verify it.
 
 ## Layout
 
@@ -339,18 +338,18 @@ Names are provisional until S1 #2414.
   4. Bottom row (gap 24): order form 812 wide (padding 22/24/24/24, gap 20, two-column field rows
      with gap 16) and a 380-wide side column (notice, then recent activity; gap 24).
 - **Table columns:** select 52px, order 112px, customer `minmax(0, 1fr)`, channel 136px, status
-  176px, date 132px, total 120px, actions 48px. Cells pad 0/8 inside their track. The customer track
-  takes what remains of the 1216px panel after its 2px borders, any row padding and column gaps are
-  subtracted. The earlier resolved 412px customer width, and the totals derived from it, do not fit
-  that container once padding and borders are counted; re-resolve after a fresh layout export. Never
-  shrink the type or clip a column to force the arithmetic.
-- **Density:** no Density mode is set on the frames and no Density variable is bound; geometry is
-  literal on the nodes. Effective density sits between Comfortable and Chunky (44px controls, 60px
-  rows). Treat these numbers as the theme's own until S1 maps them.
+  176px, date 132px, total 120px, actions 48px. Cells have 0/8 padding inside their track. The
+  customer track gets the rest of the 1216px panel after subtracting its 2px borders, row padding
+  and column gaps. A fixed 412px customer width, and totals derived from it, do not fit once padding
+  and borders are counted; compute the track from the layout instead. Never shrink the type or clip
+  a column to force the arithmetic.
+- **Density:** Brutal sets no density mode and binds no density variable; its geometry is fixed. The
+  effective density is between Comfortable and Chunky (44px controls, 60px rows). Treat these
+  numbers as Brutal's own until the density mapping lands in #2414.
 
 ## Elevation & Depth
 
-Brutal has one depth device: a hard offset slab. There is no blur, no gradient and no tint anywhere.
+Brutal shows depth only with a hard offset slab. It uses no blur, gradient or tint.
 
 | Level   | Recipe (CSS)                        | Applied to                                                  | Why                                        |
 | ------- | ----------------------------------- | ----------------------------------------------------------- | ------------------------------------------ |
@@ -360,11 +359,11 @@ Brutal has one depth device: a hard offset slab. There is no blur, no gradient a
 | Slab L  | `6px 6px 0 0 #000`                  | KPI tiles, Orders panel, order form, notice, activity panel | Regions                                    |
 | Focus   | `4px 4px 0 0 var(--ns-ring)`        | Focused field                                               | Replaces nothing; the 2px ink border stays |
 | Invalid | `4px 4px 0 0 var(--ns-destructive)` | Invalid field                                               | Paired with icon and helper text           |
-| Pressed | `none`, content translated +4/+4    | Button `State=Pressed` (79:2194, 79:2197, 79:2200)          | The slab collapses into the page           |
+| Pressed | `none`, content translated +4/+4    | Button `State=Pressed`                                      | The slab collapses into the page           |
 
-- The shadow colour is `effect/shadow` = `#000000` in **both** schemes. A pale offset in dark was
-  once accepted by review and then reversed as a review error (round 5).
-- Pressed keeps the hit area: the Figma variant swaps padding from 0/18/0/16 to 4/14/0/20.
+- The shadow colour is `effect/shadow` = `#000000` in **both** schemes. A pale offset in dark is an
+  error.
+- Pressed keeps the hit area. The pressed variant changes padding from 0/18/0/16 to 4/14/0/20.
 
 ## Shapes
 
@@ -379,145 +378,117 @@ Brutal has one depth device: a hard offset slab. There is no blur, no gradient a
 
 ## Components
 
-| Component       | Variant used                                                                    | Anatomy and states                                                                                                                                                                                                                                                                                                                                                                                          |
-| --------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Button          | `Brutal/Button` Kind = Primary (block-yellow), Secondary (card), Ink (ink fill) | 44 tall, r8, 2px `border/ink`, Slab M. Pressed: no shadow, content +4/+4. Toolbar instances are 40 tall without shadow. Kind=Ink (not used on the Orders frames): `border/ink` fill with the label and "+" glyph in `ink/fg`, _measured_ on `renders-r7/brutal--ink-button-specimen.png` at `#eeeeec` on `#000000` (18.08:1) in dark and `#fdfdfc` (20.63:1) in light; matches the YAML `button-ink` entry. |
-| Input / select  | `Brutal/Input` Default, Focus, Error                                            | Label (Space Mono 11) above a 44px r8 field with mono value. Default border is `border/control`; Focus keeps a 2px ink border and adds the 4/4 ring slab; Error uses a `destructive` border, 4/4 destructive slab, trailing alert icon and helper "This code expired on Oct 15. Remove it or choose another."                                                                                               |
-| Textarea        | Detached frame `47:1368`                                                        | 92px field, r8, `border/control`, counter helper "Optional · 0 / 500".                                                                                                                                                                                                                                                                                                                                      |
-| Checkbox        | `Brutal/Checkbox` 22×22 r4                                                      | Unchecked: card fill, `border/control`. Checked: `primary` fill, `primary-fg` check, 2px `primary-fg` keyline.                                                                                                                                                                                                                                                                                              |
-| Switch          | `Brutal/Switch` 52×28 pill                                                      | Off: card fill, `border/control`, black thumb with a 1px `border/control` inner contour (B-06). On: `block-green`, ink border.                                                                                                                                                                                                                                                                              |
-| Tabs            | `Brutal/Tab`                                                                    | Joined row, 40 tall. Selected: ink fill, `ink-fg` label and count. Unselected: card fill.                                                                                                                                                                                                                                                                                                                   |
-| Table row       | Frames `Row — *`                                                                | 60 tall, 2px ink bottom rule. Selected: `block-yellow` fill, checked box. Header: ink fill, `ink-fg` Space Mono labels.                                                                                                                                                                                                                                                                                     |
-| Sticker (badge) | `Brutal/Sticker` Tone = Success, Warning, Error, Info, Neutral                  | 26 tall pill, 2px ink border, Space Mono Bold 11 uppercase. "AWAITING PAYMENT" is spelled out (min width 144).                                                                                                                                                                                                                                                                                              |
-| KPI tile        | Frames `KPI — *`                                                                | 289×190, r12, Slab L, block fill, label, 40px value, ink delta pill (r4) with `ink-fg` arrow and %, 12 ink bars.                                                                                                                                                                                                                                                                                            |
-| Notice          | `Notice` 35:151                                                                 | `block-pink` slab, ink alert disc, Space Grotesk 18 heading, underlined mono "REVIEW ORDERS" link.                                                                                                                                                                                                                                                                                                          |
-| Nav item        | `Nav — *`                                                                       | 28 tall, r6, no fill. Selected: `block-yellow`, 2px ink border, 32 tall.                                                                                                                                                                                                                                                                                                                                    |
-| Top bar         | `Top bar` 34:10                                                                 | Logo tile with Slab S, nav, 240×40 search with `border/control`.                                                                                                                                                                                                                                                                                                                                            |
-| Page keys       | `Page *`                                                                        | 36×36 r6, `border/control`; current page ink-filled.                                                                                                                                                                                                                                                                                                                                                        |
-| Dialog / sheet  | Not drawn                                                                       | Overlay roles exist (`overlay` 40% / 66% black). Anatomy owed to #2416.                                                                                                                                                                                                                                                                                                                                     |
+| Component       | Variant used                                                                    | Anatomy and states                                                                                                                                                                                                                                                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Button          | `Brutal/Button` Kind = Primary (block-yellow), Secondary (card), Ink (ink fill) | 44 tall, radius 8, 2px `border/ink`, Slab M. Pressed: no shadow, content +4/+4. Toolbar instances are 40 tall without shadow. Kind=Ink (not used on the Orders screens): `border/ink` fill with the label and "+" glyph in `ink/fg`, _measured_ at `#eeeeec` on `#000000` (18.08:1) in dark and `#fdfdfc` (20.63:1) in light; matches the YAML `button-ink` entry. |
+| Input / select  | `Brutal/Input` Default, Focus, Error                                            | Label (Space Mono 11) above a 44px field with radius 8 and a mono value. Default border is `border/control`; Focus keeps a 2px ink border and adds the 4/4 ring slab; Error uses a `destructive` border, 4/4 destructive slab, trailing alert icon and helper "This code expired on Oct 15. Remove it or choose another."                                          |
+| Textarea        | One-off frame; no library component yet                                         | 92px field, radius 8, `border/control`, counter helper "Optional · 0 / 500".                                                                                                                                                                                                                                                                                       |
+| Checkbox        | `Brutal/Checkbox` 22×22, radius 4                                               | Unchecked: card fill, `border/control`. Checked: `primary` fill, `primary-fg` check, 2px `primary-fg` keyline.                                                                                                                                                                                                                                                     |
+| Switch          | `Brutal/Switch` 52×28 pill                                                      | Off: card fill, `border/control`, black thumb with a 1px `border/control` inner contour. On: `block-green`, ink border.                                                                                                                                                                                                                                            |
+| Tabs            | `Brutal/Tab`                                                                    | Joined row, 40 tall. Selected: ink fill, `ink-fg` label and count. Unselected: card fill.                                                                                                                                                                                                                                                                          |
+| Table row       | Frames `Row — *`                                                                | 60 tall, 2px ink bottom rule. Selected: `block-yellow` fill, checked box. Header: ink fill, `ink-fg` Space Mono labels.                                                                                                                                                                                                                                            |
+| Sticker (badge) | `Brutal/Sticker` Tone = Success, Warning, Error, Info, Neutral                  | 26 tall pill, 2px ink border, Space Mono Bold 11 uppercase. "AWAITING PAYMENT" is spelled out (min width 144).                                                                                                                                                                                                                                                     |
+| KPI tile        | Frames `KPI — *`                                                                | 289×190, radius 12, Slab L, block fill, label, 40px value, ink delta pill (radius 4) with `ink-fg` arrow and %, 12 ink bars.                                                                                                                                                                                                                                       |
+| Notice          | `Notice` frame                                                                  | `block-pink` slab, ink alert disc, Space Grotesk 18 heading, underlined mono "REVIEW ORDERS" link.                                                                                                                                                                                                                                                                 |
+| Nav item        | `Nav — *`                                                                       | 28 tall, radius 6, no fill. Selected: `block-yellow`, 2px ink border, 32 tall.                                                                                                                                                                                                                                                                                     |
+| Top bar         | `Top bar` frame                                                                 | Logo tile with Slab S, nav, 240×40 search with `border/control`.                                                                                                                                                                                                                                                                                                   |
+| Page keys       | `Page *`                                                                        | 36×36, radius 6, `border/control`; current page ink-filled.                                                                                                                                                                                                                                                                                                        |
+| Dialog / sheet  | Not drawn                                                                       | Overlay roles exist (`overlay` 40% / 66% black). Anatomy is pending in #2416.                                                                                                                                                                                                                                                                                      |
 
-Hover, disabled and focus-visible on buttons, tabs and rows are not drawn. They are owed to #2416.
+Hover, disabled and focus-visible states for buttons, tabs and rows are not drawn yet; they are
+pending in #2416.
 
 ## Do's and Don'ts
 
-- **Do** keep outlines and hard shadows `#000000` in dark. The owner rejected the first dark as
-  "simply inverted and therefore unreadable".
-- **Don't** let any header, tab or slab turn white in dark: "Brutal had like white header this
-  should never happen on a dark theme". The table header and selected tab are ink-filled in both
-  schemes.
-- **Do** put the dark canvas (`#31312e`) above the dark panels (`#191918`) in lightness, so slabs
-  still read as objects.
-- **Do** use `border/control` for every boundary someone must find: inputs, search, checkbox, switch
-  track and thumb contour, page keys. Black on dark measures 1.61:1 (B-06).
+- **Do** keep outlines and hard shadows `#000000` in dark. Symptom to avoid: the dark scheme is the
+  light scheme with its colours inverted, and it becomes unreadable.
+- **Don't** let any header, tab or slab turn white in dark. The table header and selected tab are
+  ink-filled in both schemes.
+- **Do** keep the dark canvas (`#31312e`) lighter than the dark panels (`#191918`) so slabs still
+  read as objects.
+- **Do** use `border/control` for every boundary a user has to find: inputs, search, checkbox,
+  switch track and thumb contour, page keys. Black on dark measures 1.61:1.
 - **Don't** use `border/control` on decorative panel outlines; those stay ink.
 - **Do** pair the colour blocks with black text and check each pair. Dark blue, pink and green give
   6.43, 5.43 and 15.57:1.
 - **Don't** put black text on the dark violet block (3.9:1). Avatar labels on `block-purple` use
-  `text/fg` (B-01): 4.64:1 dark, 12.09:1 light.
+  `text/fg`: 4.64:1 dark, 12.09:1 light.
 - **Do** bind chart bars and delta arrows to ink roles (`primary/fg`, `ink/fg`), never to the block
-  colour (B-01, B-05).
-- **Don't** label an ink-filled surface with `text/inverse`; it flips to near-black in dark. Use
-  `ink/fg`, as the table header, selected tab, delta pills and Ink button do. (History: the Ink
-  button label once bound `text/inverse` and measured 1.05:1 in dark.)
-- **Do** show focus as a separate hard 4/4 offset in `border/ring` while keeping the ink border
-  (B-02). Never signal focus by border colour alone.
-- **Do** collapse the slab on press (shadow 0, content +4/+4) and keep the hit area (B-03).
-- **Do** use one label per command ("Create order" everywhere) and spell statuses in full (B-04).
+  colour.
+- **Don't** label an ink-filled surface with `text/inverse`; it flips to near-black in dark, where
+  an Ink button label bound to it measures 1.05:1. Use `ink/fg`, as the table header, selected tab,
+  delta pills and Ink button do.
+- **Do** show focus as a separate hard 4/4 offset in `border/ring` while keeping the ink border.
+  Never signal focus by border colour alone.
+- **Do** collapse the slab on press (shadow 0, content +4/+4) and keep the hit area.
+- **Do** use one label per command ("Create order" everywhere) and spell statuses in full.
 - **Don't** add blur, gradients or soft shadows; Brutal's depth is only the offset slab.
 - **Don't** make headings bold. Display and title are Space Grotesk Regular.
 - **Don't** add a second accent family. Blocks come from `block/*` only.
 
 ## Iconography & Imagery
 
-- Stroke icons from `icon/*` instances named after Lucide glyphs (search, chevron, arrow, alert),
-  Lucide being ISC-licensed; 16–18px, ink coloured.
-- Avatars are 34×34 r6 colour blocks with a 2px ink border and Space Mono Bold initials. No photos.
+- Stroke icons come from `icon/*` instances named after Lucide (ISC) glyphs: search, chevron, arrow,
+  alert. They are 16–18px and ink coloured.
+- Avatars are 34×34 colour blocks with radius 6, a 2px ink border and Space Mono Bold initials. No
+  photos.
 - No illustration or backdrop. Gumroad's coins and mascots must not be used.
 
 ## Motion & States
 
 - **Pressed:** the slab collapses (shadow 0) and content moves +4/+4. **Hover** (anchor behaviour,
   not drawn): neobrutalism.dev moves the element toward its shadow; Gumroad lifts with
-  `translate(-0.25rem)`. Pick one in #2416 and keep the hit area fixed.
+  `translate(-0.25rem)`. The choice between them is pending in #2416; either way the hit area stays
+  fixed.
 - **Easing:** the anchor animates `transform` only with `ease-out`; no colour fades. Durations are
-  owed to #2419.
+  pending in #2419.
 - **Reduced motion:** drop the translation and keep the shadow change.
 - **Selection:** a selected row fills with `block-yellow`; a selected tab fills with ink. Both also
   change the checkbox or label, so selection never relies on colour alone.
 
 ## Accessibility
 
-Ratios are _(token)_ arithmetic from the resolved tokens. Dark values were also _measured_ on the
-dark render, which is byte-identical to the frozen `renders-r7/brutal--dark.png`.
+Ratios are _(token)_ arithmetic from the resolved tokens. Dark values were also _measured_ on
+rendered pixels.
 
-| Pair                                    | Light                 | Dark                                                               |
-| --------------------------------------- | --------------------- | ------------------------------------------------------------------ |
-| `fg` on `bg` / on `card`                | 15.67 / 16.30         | 11.23 / 15.14                                                      |
-| `muted-fg` on `card`                    | 6.04                  | 8.39                                                               |
-| `block-fg` on blue / pink / green block | 15.95 / 14.76 / 15.75 | 6.43 / 5.43 / 15.57                                                |
-| `ink-fg` on ink header                  | 20.63                 | 18.08                                                              |
-| Control boundary on canvas              | ink 20.19             | `#7c7b74` on `#31312e` 3.07 (pixel-measured 3.0710 by Codex, B-06) |
-| Focus offset `ring` on `bg`             | 4.58                  | 6.21                                                               |
+| Pair                                    | Light                 | Dark                                                    |
+| --------------------------------------- | --------------------- | ------------------------------------------------------- |
+| `fg` on `bg` / on `card`                | 15.67 / 16.30         | 11.23 / 15.14                                           |
+| `muted-fg` on `card`                    | 6.04                  | 8.39                                                    |
+| `block-fg` on blue / pink / green block | 15.95 / 14.76 / 15.75 | 6.43 / 5.43 / 15.57                                     |
+| `ink-fg` on ink header                  | 20.63                 | 18.08                                                   |
+| Control boundary on canvas              | ink 20.19             | `#7c7b74` on `#31312e` 3.07 (3.0710 on rendered pixels) |
+| Focus offset `ring` on `bg`             | 4.58                  | 6.21                                                    |
 
 - Hit targets: buttons 44, fields 44, page keys 36, checkbox 22 (row cell is 52 wide), switch 52×28.
-- Known exceptions: decorative black panel outlines on dark panels measure 1.19:1. They are
-  decorative by design; the 3:1 boundary comes from `border/control`.
-- RTL: mirror the slab offset (`-4px 4px`) and the pressed translation. Owed to #2419.
+- Known exceptions: black panel outlines on dark panels measure 1.19:1. They are decorative;
+  `border/control` provides the 3:1 boundary.
+- RTL: mirror the slab offset (`-4px 4px`) and the pressed translation. Pending in #2419.
 
 ## NetScript Mapping
 
-| Layer              | Value                                                                                                                                     |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Figma Theme mode   | `Brutal` (mode id 14:2), set explicitly on both frames                                                                                    |
-| Base gray × accent | Frames resolve Neutral × Ink, but Brutal's Theme mode aliases its own sand gray and amber accent, so neither base mode changes the output |
-| Density            | none set (Comfortable by default); no Density variable bound                                                                              |
-| Flavor             | n/a                                                                                                                                       |
-| `data-theme`       | `brutal`                                                                                                                                  |
-| Language roles     | none. Brutal uses core roles plus the shared `block/*`, `border/ink`, `border/control` and `ink/fg`                                       |
+| Layer              | Value                                                                                                                             |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| Figma Theme mode   | `Brutal`                                                                                                                          |
+| Base gray × accent | Neutral × Ink by default. Brutal's Theme mode aliases its own sand gray and amber accent, so neither base mode changes the output |
+| Density            | none set (Comfortable by default); no Density variable bound                                                                      |
+| Flavor             | n/a                                                                                                                               |
+| `data-theme`       | `brutal`                                                                                                                          |
+| Language roles     | none. Brutal uses core roles plus the shared `block/*`, `border/ink`, `border/control` and `ink/fg`                               |
 
-- **Node-level exceptions:** none reported. The author reports an audit of 451 nodes per frame with
-  0 primitive bindings; that count is independently unverified.
-- **Ink button (current state after the r7 pre-review pass, 2026-10-28):** the `Brutal/Button`
-  Kind=Ink label (Rest `33:23`, Pressed `79:2202`) and its "+" icon strokes bind `ink/fg`.
-  - _Measured_ on the light/dark specimen `renders-r7/brutal--ink-button-specimen.png`: dark
-    `#eeeeec` on `#000000` is 18.08:1; light `#fdfdfc` is 20.63:1. The round-7 review closed it.
-  - History: the label and glyph used to bind `text/inverse` (1.05:1 in dark).
-  - The Orders frames show no Ink label; the author reports they re-export with 0 changed pixels.
-- **Figma frames:** Light `34:9` "Brutal — Orders", Dark `35:199` "Brutal — Orders · Dark".
-  Component sets on page "Language — Brutal" (`33:8`): Button `33:24`, Input `33:48`, Checkbox
-  `33:53`, Switch `33:58`, Sticker `33:69`, Tab `33:76`. There is no separate state-sheet frame.
-- **Renders:** `renders-r7/brutal--light.png`, `renders-r7/brutal--dark.png` and
-  `renders-r7/brutal--ink-button-specimen.png` (byte-identical to the `renders-r6/` exports of the
-  same names). The author reports the light/dark pair is pixel-identical to the r5 light / r6 dark
-  renders.
-- **Evidence status (TD-25).** Visual claims refer to the frozen round-7 renders
-  `renders-r7/brutal--{light,dark,ink-button-specimen}.png` under
-  `.llm/runs/design-system-s4--language-review/`, hashed in `renders-r7/SHA256SUMS` (sha256
-  `092b1cd4…`; review input commit `affd6b158`). Node ids, variable modes, alias and
-  `resolveForConsumer` chains, binding and unbound counts, effect-style values and Figma text-style
-  weights in this file are **reported by the Figma author and independently unverified**: no frozen
-  node/variable/effect/type export accompanies the snapshot. Ratios marked _measured_ were sampled
-  on exported pixels; _(token)_ ratios are resolved-variable arithmetic; values marked _proposed_
-  stay proposals until a re-render proves them; runtime behaviour is unproven until #2419.
+- **Primitive bindings:** none known. Brutal binds semantic roles only.
+- **Ink button:** the `Brutal/Button` Kind=Ink label and its "+" icon bind `ink/fg`, in the rest and
+  pressed states.
+- **Status.** Values come from the NetScript Figma library. Role and mode names, including the
+  shared `block/*` names, are provisional until the token export in #2414. Hover, disabled and
+  focus-visible states on buttons and tabs, dialog anatomy and the pressed state are pending in
+  #2416. Keyboard, viewport, reduced-motion and RTL behaviour are pending in #2419.
 
-## Provenance
+## Sources
 
-- **Sources:** Gumroad (`github.com/antiwork/gumroad`, MIT; `app/javascript/components/ui/*`),
-  neobrutalism.dev (MIT). Reference pack: `inventory/reference-packs.md` §1.
-- **Review rounds** (independent Codex reviewer, run `design-system-s4--language-review`): r2
-  B-01…B-04; r3 PASS both schemes; r5 dark reopened after the owner's inversion finding (B-05
-  arrows, B-06 control boundaries); r6 **PASS** in both schemes, no open finding; r7 **PASS** in
-  both schemes on the frozen renders, with the Ink-button label CLOSED and B-03 handed to #2416.
-  Round-2 findings are retained, but round 2's runtime was not attested as `gpt-6-astra`/`xhigh`;
-  the rounds whose runtime was attested are identified in `review/worklog.md`.
-- **Owner decisions (verbatim):** "This one is not bad good start" (early review; relayed by the
-  supervisor); "Brutal dark mode is simply inverted and therefore unreadable"; "Brutal had like
-  white header this should never happen on a dark theme these are design failure" (`brief-r5.md`).
-- **Provisional:**
-  - Role and mode names until S1 #2414, including the shared `block/*` names.
-  - Hover, disabled, focus-visible on buttons and tabs, dialog anatomy and the pressed export: #2416
-    (B-03 handoff).
-  - Keyboard, viewport, reduced-motion and RTL behaviour: #2419.
-- **Invented fixture content:** the "Northwind" store, orders SO-10477…SO-10482, customer names and
-  emails, all amounts, KPI values and deltas, activity entries and the AUTUMN24 code are demo data
-  from the shared Orders fixture.
+- **References:** Gumroad (`github.com/antiwork/gumroad`, MIT; `app/javascript/components/ui/*`),
+  neobrutalism.dev (MIT, `ekmas/neobrutalism-components`). What is taken and what must not be copied
+  is listed under _Overview_ → Anchor.
+- **Demo content:** the "Northwind" store, orders SO-10477…SO-10482, customer names and emails, all
+  amounts, KPI values and deltas, activity entries and the AUTUMN24 code are invented demo data from
+  the shared Orders fixture.

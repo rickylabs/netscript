@@ -95,11 +95,10 @@ components:
 <!--
 Format: Google Labs DESIGN.md (alpha, Apache-2.0), github.com/google-labs-code/design.md.
 - The eight spec sections come first, in spec order.
-- The NetScript extension sections come after them. Unknown sections are preserved by spec
-  consumers.
+- The NetScript extension sections follow them. Spec consumers preserve unknown sections.
 - Replace every <placeholder>.
-- Token values must be the resolved Figma values (file pGRLnkPPRZJZy74evNcQBr). The front-matter
-  colour keys are an illustrative subset: keep them as CSS suffixes of real core roles
+- Token values must be the resolved values from the NetScript Figma library. The front-matter
+  colour keys are an illustrative subset. Keep them as CSS suffixes of real core roles
   (`muted` = surface, `muted-fg` = text, `input-border`, `primary-fg`), and never invent a key.
 - The rules in docs/design-system/GUIDELINES.md apply.
 -->
@@ -116,12 +115,12 @@ Format: Google Labs DESIGN.md (alpha, Apache-2.0), github.com/google-labs-code/d
 ## Colors
 
 - **Ground and surface ladder:** canvas → panel → raised → overlay, in Light and Dark.
-- **Accent policy:** exactly where the accent may appear, and where it must not.
+- **Accent policy:** where the accent may appear and where it must not.
 - **Status colours:** values and contrast against their surfaces.
 - **Dark design notes:** tinted ground, how elevation is shown, and the dark primary treatment. Dark
   is designed, never inverted: no white primaries, borders, rings or headers. The template defaults
-  (graphite #18181a ground, #313131 primary with a #7b7b7b keyline and ring) are a safe starting
-  point, not a theme.
+  (graphite #18181a ground, #313131 primary with a #7b7b7b keyline and ring) are only a safe
+  starting point.
 
 ## Typography
 
@@ -135,7 +134,7 @@ fixture is composed in this theme.
 
 ## Elevation & Depth
 
-The depth model, as a rule anyone can apply. For each level, give:
+State the depth model as a rule anyone can apply. For each level, give:
 
 - the shadow, bevel or glass recipe (CSS-implementable);
 - which elements get it, and why.
@@ -164,8 +163,8 @@ hover, pressed, focus, disabled, selected, error). Cover at least:
 
 ## Do's and Don'ts
 
-Ten to fifteen bullets, written as guardrails. Include every owner correction and reviewer finding
-that shaped the theme, phrased as a rule.
+Ten to fifteen bullets, each phrased as a rule. Write every design correction the theme needed as
+the rule it established, with its reason.
 
 ## Iconography & Imagery
 
@@ -192,21 +191,15 @@ with their tracking issue.
 | `data-theme`       | `<id>`                                                                                                                                             |
 | Language roles     | Token-only assignment: `none`. Declared language pack: the role manifest, every `<theme>/<path>` → `--ns-<theme>-<path>` it adds (GUIDELINES §2.4) |
 
-- **Node-level exceptions:** any primitive or raw value bound directly on a Figma node, with its
-  node id, the reason and the S1 role that will replace it. These are Figma-only and never ship in
-  L2 component CSS (GUIDELINES §2.1).
-- **Figma frames:** node ids of the Light, Dark and state-sheet frames.
-- **Renders:** the frozen render set the review used (for example
-  `.llm/runs/design-system-s4--language-review/renders-r7/`), with its `SHA256SUMS` hash. Never cite
-  a mutable render directory as evidence.
-- **Evidence status:** say which facts are observed on exported pixels, which are reported by the
-  Figma author (node ids, modes, alias chains, binding counts, effect values, text-style weights)
-  and independently unverified, which are adopted design judgement, and which runtime behaviour is
-  still unproven (#2419).
+- **Pending roles:** any value that has no semantic role yet (a primitive or raw value bound
+  directly in Figma). For each one, give the S1 role that will replace it and the reason, marked
+  "role pending in #2414". These values never ship in L2 component CSS (GUIDELINES §2.1).
+- **Implementation status:** one or two sentences, with an issue for everything not yet proven in
+  code. For example: "Values come from the NetScript Figma library. Token and font export is tracked
+  in #2414, component states in #2416, and runtime checks such as motion, RTL and glass rendering in
+  #2419."
 
-## Provenance
+## Sources
 
-Sources with links, the review rounds and their verdicts (with the evaluator runtime only where it
-was attested in the review worklog), owner decisions (quoted, and marked as excerpts), and open
-evidence (#2414 tokens/fonts, #2416 states, #2419 runtime). Separate verified upstream values from
-adopted local parameters.
+External references only. For each source, give its link and licence, what this theme takes from it,
+and what must not be copied. Separate values verified upstream from parameters adopted locally.

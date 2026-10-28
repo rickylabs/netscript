@@ -7,34 +7,27 @@ description: Build, extend or review NetScript Fresh UI screens in the Tactile t
 
 Read `DESIGN.md` in this folder first. It holds the tokens, the effect styles and the full physical
 model. This file is the working procedure. The cross-theme rules are in
-`docs/design-system/GUIDELINES.md` (shipped as the `netscript-design` skill). The local source
-digests are `tactile-guidelines.md` and `tactile-elevation-map.md` in the S4 review run; which of
-their values are verified upstream is listed in `DESIGN.md` → Provenance → Source classes.
+`docs/design-system/GUIDELINES.md` (shipped as the `netscript-design` skill). `DESIGN.md` → Sources
+→ Source classes lists which values are verified upstream and which are adopted local parameters.
 
 ## Use it when / don't use it when
 
 - **Use for:** commerce and order consoles with a handful of records per view, IoT and device
   panels, widgets, settings, kiosk-like flows.
 - **Don't use for:** dense tables, many-column grids, many-field forms, data-dense dashboards. This
-  is Tactile's adopted design rule (it follows setproduct's S7 advice from a coordinator digest,
-  upstream unverified), not a universal neumorphism standard. Suggest Studio (Cloud flavor) or
-  Fluent instead.
+  is Tactile's adopted design rule, taken from setproduct's neumorphism guide (upstream unverified).
+  It is not a universal neumorphism standard. Suggest Studio (Cloud flavor) or Fluent instead.
 
-## The thesis in one breath
+## Thesis
 
-One soft material lit from one corner: what you press rises as a convex key, what holds a value
-sinks as a concave well, and choosing something presses it in. Signature moves:
+Tactile is one soft material lit from the top left. Pressable things rise as convex keys. Things
+that hold a value sink as concave wells. A selected thing is pressed in. Signature moves:
 
 1. Four heights from one top-left light: printed ground, plateaus, keys, wells.
 2. Selected means sunk: concave, accent ink, content +1px ↘, a lit LED.
 3. Instruments: knurled range dial in its bezel, LED segment gauge, recessed readouts, LED status.
 
 ## Hard rules
-
-The owner's corrections drive every rule: "looks garbage (worse button with 1990 gradient I've
-seen)", "applies it completely randomly neumorphism is complex it need deep understanding of surface
-shapes shadows natural touch feeling", "check design system guidelines about neumorphism because
-still off".
 
 - MUST use **one light**: top-left at 135°. Raised = highlight (−d,−d) + shade (+d,+d); well = inner
   shade top-left + inner highlight bottom-right. NEVER vary the angle per element.
@@ -46,7 +39,7 @@ still off".
   like keys. Cards, rows, tiles, avatars, text and ghost controls at rest are printed (H0). NEVER
   raise decoration.
 - MUST show **selected as sunk**: H+2 → H−1 (`pressed-m`/`pressed-s`), `text/accent` ink, content
-  shifted 1px down-right, plus an LED or a label. Shadow alone is never the state (S6).
+  shifted 1px down-right, plus an LED or a label. Shadow alone is never the state.
 - MUST scale **throw with size**: keys ≤ 30px `key-s` 3/6, 44–48px `key-m` 6/12, ~88px `key-l`
   12/24; wells `well-s` 2/4, `well-m` inset 2/5 + −3/7, `well-l` 8/16; plateaus ±18 / blur 44. Blur
   = 2 × offset holds for the key bands and the symmetric `pressed-*`, `well-s` and `well-l` insets
@@ -56,26 +49,26 @@ still off".
   switch knob in track).
 - MUST make keys **convex** (`convex/start → end`) and wells and pressed states **concave**
   (`concave/start → end`), ±3.5% lightness at ≈145°. Plateaus are flat material. NEVER a visible
-  linear gradient, sheen or band ("1990 gradient").
+  linear gradient, sheen or band.
 - MUST keep borders **in hue**: `edge/border` (`#d1d9e6` / `#24272b`) on plateaus, keys and pressed
   elements. The **3:1 rim** `edge/control` (`#6a759e` / `#7a8498`, 3.57:1 / 3.67:1) goes ONLY on
   text inputs, checkbox, radio, switch track, the off switch knob and the slider knob: a 1px inside
-  stroke on its own top layer, on whole pixels, above the inset shadow (C-05). NEVER on keys, cards
-  or labelled actions.
+  stroke on its own top layer, on whole pixels, above the inset shadow. NEVER on keys, cards or
+  labelled actions.
 - NEVER use **dense tables**: lists become soft tiles (72px, 12px apart, no rules), forms keep one
   field per row with labels above, 52px wells and 24px rhythm (Tactile's adopted rule; see _Use it
   when_).
 - MUST keep data graphics readable: bars and meters printed in `text/muted` at 100%, no per-bar
-  fade, trend by height only (C-01).
+  fade, trend by height only.
 - MUST keep type at 13px or more, body 16 Regular (not Light), Nunito Sans, mono only for IDs.
-- MUST keep dark designed: mid-dark material `#2a2d32`, one-step highlight `#34383e`, near-black
-  shade `#1c1e21`, saturated blue primary with white text. NEVER a pale hero, pale slab or white
-  outer shadow (C-04).
+- MUST keep dark mode as specified: mid-dark material `#2a2d32`, one-step highlight `#34383e`,
+  near-black shade `#1c1e21`, saturated blue primary with white text. NEVER a pale hero, pale slab
+  or white outer shadow.
 - MUST read only `--ns-tactile-*` roles in Tactile components: they are the current component
-  bindings. The core `--ns-*` compatibility roles under Theme = Tactile have been realigned to the
-  build (ground `#e0e5ec` / `#2a2d32`, primary `#1a6fe8`, ring `#1e7bff` / `#3b8bff`, input border
-  `#6a759e` / `#7a8498`; `corrections-r7.md` §Tactile), but that realignment still needs S1 #2414
-  export validation, so don't bind Tactile components to them. NEVER use primitives.
+  bindings. The core `--ns-*` compatibility roles under Theme = Tactile resolve to the build values
+  (ground `#e0e5ec` / `#2a2d32`, primary `#1a6fe8`, ring `#1e7bff` / `#3b8bff`, input border
+  `#6a759e` / `#7a8498`). Export validation of those values is pending in S1 #2414, so don't bind
+  Tactile components to them. NEVER use primitives.
 
 ## Building a screen
 
@@ -84,8 +77,8 @@ still off".
 2. **Compose:** a 48px-padded canvas with an unboxed sidebar (printed nav, wells for search and
    meters) and a main column of plateaus 48px apart. Inside a plateau, group with spacing and one
    tone step, never with rules or nested panels.
-3. **Classify every element** before styling it, using the table in `DESIGN.md` → Elevation & Depth:
-   is it printed, a region, pressable, or value-holding? Then pick the size band.
+3. **Classify every element** as printed, region, pressable or value-holding before styling it,
+   using the table in `DESIGN.md` → Elevation & Depth. Then pick the size band.
 4. **Pick variants:**
 
    | Need                | Use                                                                        |
@@ -111,8 +104,7 @@ still off".
 - Classify, then derive from the closest existing element of the same height and size band.
 - If a new visual role is needed, add it as `tactile/<path>` and register it in code (S1). Don't
   reuse an unrelated role. Don't add effect styles outside the ladder.
-- Add the new component to the Components sheet (`146:856`), in Light and Dark, and re-run the
-  audit.
+- Specify the new component in Light and Dark, and re-run the audit in the self-check below.
 
 ## Self-check before handing off
 
@@ -128,4 +120,4 @@ still off".
 
 ## References
 
-`DESIGN.md` → Provenance.
+`DESIGN.md` → Sources.

@@ -3,8 +3,8 @@ version: alpha
 name: Pixel
 description: 'A NetScript-amber pixel language with Ore UI physics: banded amber stripes, stepped 2px-grid corners, Pixelify Sans numbers and Space Mono labels, and keys that sit on a 4px lip and press flat.'
 colors:
-  # Resolved from Figma file pGRLnkPPRZJZy74evNcQBr on frames 66:433 (Light) and 68:917 (Dark),
-  # Theme mode "Pixel". Keys are the --ns-* suffix from each variable's code syntax.
+  # Resolved from the NetScript Figma library, Theme mode "Pixel", Light and Dark schemes.
+  # Keys are the --ns-* suffix from each variable's code syntax.
   bg: '#f4efe6'
   bg-dark: '#12100e'
   card: '#fcfaf6'
@@ -232,48 +232,47 @@ components:
 
 ## Overview
 
-- **Thesis:** a NetScript-amber pixel language with Ore UI physics. Discrete amber bands, stepped
-  corners on a 2px grid, pixel-font numbers and mono labels, and keys that sit on a lip and press
-  flat. It reads as a game launcher without copying one.
+- **Thesis:** a pixel language in NetScript amber with Ore UI component physics. It uses discrete
+  amber bands, stepped corners on a 2px grid, pixel-font numbers, mono labels, and keys that sit on
+  a lip and press flat. It should look like a game launcher without copying one.
 - **Signature moves:**
   1. **Banded amber.** Five 2px bands (`#FFDBA2 → #FFC673 → #FFB245 → #EDA12E → #D38E22`) form the
      10px stripe under the top bar, the 4px bar on the selected row, the brand mark, the KPI chart's
      latest column and the fulfilment progress. They are never a smooth gradient.
-  2. **Keys on a lip.** Every pressable thing is a stepped key on a 4px lip (`pixel-lip-primary` =
-     band 5 under amber, `pixel-lip-secondary` sand under paper). Pressed drops the face 4px and
+  2. **Keys on a lip.** Every pressable control is a stepped key on a 4px lip (`pixel-lip-primary` =
+     band 5 under amber, `pixel-lip-secondary` sand under paper). Pressing drops the face 4px and
      removes the lip. Fields and unchecked boxes are recessed with a 2px inner shade.
-  3. **Pixel type for numbers, mono for words.** Pixelify Sans sets the title and KPI values, Space
-     Mono sets uppercase labels and buttons, JetBrains Mono sets order IDs, dates and totals, and
-     Inter sets reading text.
-- **Anchor:** the Mistral pixel idea (banded gradient, cream ground, mono labels), as the owner
-  asked: "the idea should be leveraged". Secondary: 8bitcn/ui (MIT) for stepped borders, and
-  Minecraft Ore UI for component physics (lips, pressed keys, recessed inputs). Not copied:
-  Mistral's M or cat marks, ALTMistral, Mistral's sampled hexes; Mojang fonts, textures, the
-  green/stone palette and logos.
+  3. **Type by role.** Pixelify Sans sets the title and KPI values. Space Mono sets uppercase labels
+     and buttons. JetBrains Mono sets order IDs, dates and totals. Inter sets reading text.
+- **Anchor:** the pixel idea from the Mistral brand (banded gradient, cream ground, mono labels),
+  used as a pattern only. Pixel has its own amber palette and copies no brand colours. Secondary:
+  8bitcn/ui (MIT) for stepped borders, and Minecraft Ore UI for component physics (lips, pressed
+  keys, recessed inputs). Not copied: Mistral's M or cat marks, ALTMistral, Mistral's sampled hexes;
+  Mojang fonts, textures, the green/stone palette and logos.
 - **Family:** Expressive. **Best for:** games, playful products, creator and community tools, hobby
   dashboards. **Avoid for:** formal finance, legal and medical; suggest `studio` or `filigrane`.
-- **Feel:** warm, crafted, playful. First impression: "a launcher I want to click."
+- **Feel:** warm and playful. Target first impression: "a launcher I want to click."
 
 ## Colors
 
 - **Ground and surface ladder.** NetScript paper: canvas `bg` `#F4EFE6` / `#12100E`. Panels
-  `surface-raised` `#FCFAF6` / `#282623`. Muted wells `#F1F0EF` / `#222221`. The selected row is
-  `selected` `#FFEACB` / `#31200B`. Panels are framed by 1px `frame-ink` (`#21201C` light, a quieter
-  `#494844` dark). Interactive perimeters use `control-ink` / `input-border`.
-- **The palette is fixed and owner-approved.** Soft amber `#FAAB35` (OKLCH hue 72) with `#12100E`
-  ink text. Paper `#FCFAF6` / `#F4EFE6` / `#E8E0D3`. Dark `#12100E` / `#1B1916` / `#282623`. Do not
-  retune it toward Mistral orange or toward brown.
-- **Accent policy.** Amber fills: primary and hero keys, the selected tab, the current page key, a
-  checked checkbox, the on switch, the focus ring and the block cursor. Bands appear only as signals
-  (stripe, selection bar, latest chart column, progress). Links use `primary-text`.
-- **Status colours.** Tags tint with `*-subtle` behind `*-text` labels and sit on a 2px tone lip.
-  Red is an error role here: Destructive keys (`pixel-destructive-face` `#CE2C31`), "Payment failed"
-  and the invalid field. The NetScript Utility rule "red only in the logo and errors" doesn't
-  constrain Pixel beyond that.
-- **Dark design notes.** Warm near-black grounds, not neutral black. Panels lift to `#282623`.
-  Decorative frames dim to `#494844`; interactive perimeters stay `#7C7B74` (P-03). Tag lips turn
-  warm near-black. The amber primary stays amber with ink text (9.89:1). The reviewer classes it as
-  an "explicitly retained saturated" accent, not an inverse slab.
+  `surface-raised` `#FCFAF6` / `#282623`. Muted wells `#F1F0EF` / `#222221`. Selected row `selected`
+  `#FFEACB` / `#31200B`. Panel frames are 1px `frame-ink` (`#21201C` light, `#494844` dark).
+  Interactive perimeters use `control-ink` / `input-border`.
+- **The palette is fixed.** Soft amber `#FAAB35` (OKLCH hue 72) with `#12100E` ink text. Paper
+  `#FCFAF6` / `#F4EFE6` / `#E8E0D3`. Dark `#12100E` / `#1B1916` / `#282623`. Do not retune it toward
+  Mistral orange or toward brown.
+- **Accent policy.** Amber fills the primary and hero keys, the selected tab, the current page key,
+  a checked checkbox, the on switch, the focus ring and the block cursor. Bands appear only as
+  signals (stripe, selection bar, latest chart column, progress). Links use `primary-text`.
+- **Status colours.** Tags put `*-text` labels on a `*-subtle` fill and sit on a 2px tone lip. Red
+  is an error role here: Destructive keys (`pixel-destructive-face` `#CE2C31`), "Payment failed" and
+  the invalid field. Beyond that, the NetScript Utility rule "red only in the logo and errors" does
+  not constrain Pixel.
+- **Dark design notes.** Grounds are warm near-black, not neutral black. Panels lift to `#282623`.
+  Decorative frames dim to `#494844`; interactive perimeters stay `#7C7B74`. Tag lips turn warm
+  near-black. The amber primary stays amber with ink text (9.89:1). It is a saturated accent kept on
+  purpose, not an inverse slab.
 
 ## Typography
 
@@ -284,8 +283,8 @@ components:
   (Bold on buttons, the active nav item and form labels). Data 13/18 JetBrains Mono (Bold for
   totals); dates 12/16.
 - **Rules.** Set Pixelify Sans only at 24 and 40px (the editor header is 24). The editor amount is
-  JetBrains Mono Bold 24. `font-synthesis: none`; never fake bold. Uppercase only Space Mono labels.
-  Body copy stays Inter so long text is readable.
+  JetBrains Mono Bold 24. Set `font-synthesis: none`; never synthesise bold. Uppercase only Space
+  Mono labels. Body copy stays Inter for readability.
 
 ## Layout
 
@@ -301,14 +300,15 @@ components:
   Columns 52 / 112 / 402 / 132 / 196 / 132 / 112 / 44.
 - **Bottom row.** Order form 836 (padding 24, sections 24 apart) beside a 340 side column: the
   notice (150) and recent activity (290), 24 apart.
-- **Density.** `Comfortable`, explicit. Stepped geometry, icon pixels, major offsets (lips, pressed
-  travel, stepped corners) and bands sit on the 2px grid. The documented 1px panel frames and table
-  rules, and the 13px data type, are deliberate exceptions to that grid; every edge still lands on a
+- **Density.** `Comfortable`, set explicitly. Stepped geometry, icon pixels, major offsets (lips,
+  pressed travel, stepped corners) and bands sit on the 2px grid. The 1px panel frames and table
+  rules and the 13px data type are documented exceptions to that grid. Every edge still lands on a
   whole pixel.
 
 ## Elevation & Depth
 
-No blur and no soft shadows (`shadow/*` is transparent, blur 0). Depth is extruded pixels.
+No blur and no soft shadows (`shadow/*` is transparent, blur 0). Depth is drawn with extruded
+pixels.
 
 | Level            | Recipe (CSS)                                                                                                                                                             | Who                                               |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
@@ -321,8 +321,9 @@ No blur and no soft shadows (`shadow/*` is transparent, blur 0). Depth is extrud
 | Recess           | `inset 2px 2px 0 var(--ns-pixel-recess-shade)` inside a 2px stepped edge                                                                                                 | Fields, unchecked checkbox, off switch track      |
 | Focus            | 2px `pixel-focus-gap` ring, then a 2px stepped amber ring outside it (fields: the 2px edge turns `control-ink`, then a 2px gap, then the amber ring)                     | Every focusable control                           |
 
-Stepped corners ship as `clip-path: polygon()` notches (4px on 40px keys, 2px on tags, tabs and 24px
-controls), or as stacked hard `box-shadow`s. No fractional transforms; animate with `steps()`.
+Build stepped corners as `clip-path: polygon()` notches (4px on 40px keys, 2px on tags, tabs and
+24px controls) or as stacked hard `box-shadow`s. Use no fractional transforms; animate with
+`steps()`.
 
 ## Shapes
 
@@ -334,49 +335,48 @@ controls), or as stacked hard `box-shadow`s. No fractional transforms; animate w
 
 ## Components
 
-| Component         | Pixel variant and anatomy                                                                                                                                                                                                                    | States in Figma                                        |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| Button `65:459`   | Kinds Primary, Hero, Outline, Destructive, Ink (`text/fg` face, `surface-raised` label). 40 tall: a 36px face plus a 4px lip, 16/18 padding, a 16px pixel icon, Space Mono Bold 12 uppercase                                                 | Rest, hover, pressed, disabled, focus (Ink: Rest only) |
-| Tabs `65:602`     | Tab: Space Mono label plus a JetBrains Mono count; selected = amber face on a 2px lip. Page keys: mini keys on a sand lip; current page = pressed amber                                                                                      | Selected / unselected for both kinds                   |
-| Field `65:533`    | 40 tall, a 2px `input-border` stepped edge, a 2px recess shade top and left, Inter 14 value. Focus: `control-ink` edge, amber ring, 8×18 amber block cursor. Error: `destructive` edge and `destructive-subtle` fill, triangle glyph, helper | Rest, focus, error, disabled                           |
-| Checkbox `65:550` | 20px. Unchecked: recessed well. Checked: amber, popped up on a 2px lip, ink tick                                                                                                                                                             | Both                                                   |
-| Switch `65:567`   | 44×24. Off: recessed `muted` track, "O" mark, 16px `control-ink` knob left. On: amber track, "I" mark, 16px ink knob right                                                                                                                   | Both                                                   |
-| Tag `65:593`      | 24 tall, 2px tone lip, Space Mono 12 uppercase `*-text` on `*-subtle`: PAID, AWAITING PAYMENT, SHIPPED, REFUNDED, PAYMENT FAILED                                                                                                             | Five statuses                                          |
-| Table row         | 56 tall: checkbox, JetBrains Mono ID, a 28px identicon plus name and email, channel, tag, mono date, Bold total, dots. Selected = `selected` fill plus a 4px band bar                                                                        | Rest / selected                                        |
-| KPI cell          | Space Mono label, Pixelify value, an arrow plus a Space Mono delta, a block chart (`muted-fg` blocks; the last column banded with a 2px outside `fg` silhouette, P-01)                                                                       | Rest                                                   |
-| Notice            | `warning-subtle` panel, 8px banded bar on the leading edge, pixel triangle, Space Mono Bold title, Inter body, a REVIEW ORDERS link with an arrow                                                                                            | Rest                                                   |
-| Nav item          | Space Mono 12 uppercase; active = Bold `fg` plus a 4px banded indicator                                                                                                                                                                      | Rest / active                                          |
-| Top bar           | 64 tall, then the 10px band stripe                                                                                                                                                                                                           | —                                                      |
-| Progress          | Four segments of 2px-band blocks (Paid, Packed, Shipped, Delivered); the undone segment is flat neutral. Done labels Space Mono Bold with a tick                                                                                             | —                                                      |
-| Dialog            | Not drawn. Use `<dialog>` with a `frame-ink` frame, stepped corners and an ink scrim                                                                                                                                                         | Owed to #2416                                          |
+| Component | Pixel variant and anatomy                                                                                                                                                                                                                    | Drawn states                                           |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Button    | Kinds Primary, Hero, Outline, Destructive, Ink (`text/fg` face, `surface-raised` label). 40 tall: a 36px face plus a 4px lip, 16/18 padding, a 16px pixel icon, Space Mono Bold 12 uppercase                                                 | Rest, hover, pressed, disabled, focus (Ink: Rest only) |
+| Tabs      | Tab: Space Mono label plus a JetBrains Mono count; selected = amber face on a 2px lip. Page keys: mini keys on a sand lip; current page = pressed amber                                                                                      | Selected / unselected for both kinds                   |
+| Field     | 40 tall, a 2px `input-border` stepped edge, a 2px recess shade top and left, Inter 14 value. Focus: `control-ink` edge, amber ring, 8×18 amber block cursor. Error: `destructive` edge and `destructive-subtle` fill, triangle glyph, helper | Rest, focus, error, disabled                           |
+| Checkbox  | 20px. Unchecked: recessed well. Checked: amber, popped up on a 2px lip, ink tick                                                                                                                                                             | Both                                                   |
+| Switch    | 44×24. Off: recessed `muted` track, "O" mark, 16px `control-ink` knob left. On: amber track, "I" mark, 16px ink knob right                                                                                                                   | Both                                                   |
+| Tag       | 24 tall, 2px tone lip, Space Mono 12 uppercase `*-text` on `*-subtle`: PAID, AWAITING PAYMENT, SHIPPED, REFUNDED, PAYMENT FAILED                                                                                                             | Five statuses                                          |
+| Table row | 56 tall: checkbox, JetBrains Mono ID, a 28px identicon plus name and email, channel, tag, mono date, Bold total, dots. Selected = `selected` fill plus a 4px band bar                                                                        | Rest / selected                                        |
+| KPI cell  | Space Mono label, Pixelify value, an arrow plus a Space Mono delta, a block chart (`muted-fg` blocks; the last column banded with a 2px outside `fg` silhouette)                                                                             | Rest                                                   |
+| Notice    | `warning-subtle` panel, 8px banded bar on the leading edge, pixel triangle, Space Mono Bold title, Inter body, a REVIEW ORDERS link with an arrow                                                                                            | Rest                                                   |
+| Nav item  | Space Mono 12 uppercase; active = Bold `fg` plus a 4px banded indicator                                                                                                                                                                      | Rest / active                                          |
+| Top bar   | 64 tall, then the 10px band stripe                                                                                                                                                                                                           | —                                                      |
+| Progress  | Four segments of 2px-band blocks (Paid, Packed, Shipped, Delivered); the undone segment is flat neutral. Done labels Space Mono Bold with a tick                                                                                             | —                                                      |
+| Dialog    | Not drawn. Use `<dialog>` with a `frame-ink` frame, stepped corners and an ink scrim                                                                                                                                                         | Pending in #2416                                       |
 
 ## Do's and Don'ts
 
-- **Do** keep the current essence. The Ore pass is a refinement: "I like current one, we're speaking
-  of refinement".
-- **Don't** copy Mistral: "a bit too Mistral… no need to copy the proprietary colors". No M or cat
-  mark, no ALTMistral, no sampled Mistral hexes.
-- **Don't** copy Minecraft: "should not be a copy paste". No Mojang fonts, textures, green/stone
-  palette or logos. Take only the physics.
-- **Don't** retune the amber. The owner walked it from "too far" through "less brown… not mistral
-  orange" to "more yellowish" and approved `#FAAB35`.
+- **Do** treat the Ore UI physics (lips, pressed keys, recesses) as a refinement of the pixel
+  language. Keep its layout, palette and type roles.
+- **Don't** copy Mistral. Use the pixel idea with Pixel's own amber palette and copy no brand
+  colours: no M or cat mark, no ALTMistral, no sampled Mistral hexes.
+- **Don't** copy Minecraft. Take only the physics: no Mojang fonts, textures, green/stone palette or
+  logos.
+- **Don't** retune the amber `#FAAB35` toward Mistral orange or toward brown.
 - **Do** run bands as discrete 2px steps, never a smooth gradient.
 - **Do** keep stepped geometry, icon pixels, major offsets and bands on the 2px grid. The documented
-  1px panel frames and table rules and the 13px JetBrains Mono data type are allowed; no half pixels
-  anywhere.
-- **Do** keep chart silhouettes outside the bands so the bands stay whole (P-01).
-- **Do** give status tags room for their full uppercase label (P-02: 196px status column).
+  1px panel frames and table rules and the 13px JetBrains Mono data type are allowed. Use no half
+  pixels anywhere.
+- **Do** keep chart silhouettes outside the bands so the bands stay whole.
+- **Do** give status tags room for their full uppercase label (196px status column).
 - **Do** keep dark interactive perimeters at `control-ink` / `input-border` `#7C7B74`, never white.
-  The focused field's inner perimeter included (P-03).
+  This includes the focused field's inner perimeter.
 - **Do** pair every amber focus ring with its 2px ink gap: amber alone is 1.84:1 on paper.
-- **Don't** add soft shadows or blur. Depth is lips and recesses only.
+- **Don't** add soft shadows or blur. Depth comes only from lips and recesses.
 - **Don't** use Pixelify Sans for body text or at off-grid sizes.
 
 ## Iconography & Imagery
 
-- Our own 16px pixel icon set on a 2px grid (`64:444`, 18 icons: home, box, user, tag, chart,
-  search, bell, plus, check, up, down, chevron, dots, alert, download, filter, x, arrow). Single
-  colour, inheriting text colour.
+- A custom 16px pixel icon set on a 2px grid (18 icons: home, box, user, tag, chart, search, bell,
+  plus, check, up, down, chevron, dots, alert, download, filter, x, arrow). Icons are single-colour
+  and inherit the text colour.
 - Identicons replace photos: 28px (32 in the top bar) symmetric pixel glyphs on a tinted square
   (`warning-subtle`, `info-subtle`…). The Shipping bot uses a neutral glyph.
 - Charts are block charts on the 2px grid. The brand mark is a banded pixel "N" for the fictional
@@ -384,13 +384,13 @@ controls), or as stacked hard `box-shadow`s. No fractional transforms; animate w
 
 ## Motion & States
 
-- Drawn: button rest, hover (Primary darkens to `primary-hover`; Outline face goes to
+- Drawn states: button rest, hover (Primary darkens to `primary-hover`; the Outline face changes to
   `pixel-face-secondary-hover`), pressed (the face drops 4px, `translateY(+4px)`, and the lip
   collapses; the outer hit area is unchanged), disabled (flat `muted` face, `border` edge,
-  `muted-fg` label), focus. Field rest, focus, error and disabled. Tabs, page keys, checkbox and
+  `muted-fg` label) and focus. Field rest, focus, error and disabled. Tabs, page keys, checkbox and
   switch on/off.
-- Runtime (#2419): press is instant or 2 `steps()`; the switch knob jumps in 2–3 steps; no easing
-  curves. Reduced motion: no knob travel, state swaps instantly.
+- Runtime (#2419): a press is instant or 2 `steps()`; the switch knob jumps in 2–3 steps; no easing
+  curves. Reduced motion: no knob travel; the state swaps instantly.
 
 ## Accessibility
 
@@ -417,58 +417,30 @@ controls), or as stacked hard `box-shadow`s. No fractional transforms; animate w
 
 | Layer              | Value                                                                                                                                                                                                                            |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Figma Theme mode   | `Pixel` (mode `52:2`)                                                                                                                                                                                                            |
-| Base gray × accent | Sand-family neutrals and the amber primary come from the `Pixel` mode's own ramps (the frames resolve Base gray `Neutral` / Base accent `Ink` by default)                                                                        |
+| Figma Theme mode   | `Pixel`                                                                                                                                                                                                                          |
+| Base gray × accent | Sand-family neutrals and the amber primary come from the `Pixel` mode's own ramps (the designs resolve Base gray `Neutral` / Base accent `Ink` by default)                                                                       |
 | Density            | `Comfortable` (explicit)                                                                                                                                                                                                         |
 | Flavor             | n/a                                                                                                                                                                                                                              |
 | `data-theme`       | `pixel`                                                                                                                                                                                                                          |
 | Language roles     | `pixel/*`: 13 Scheme roles, `--ns-pixel-*`: `lip/{primary,secondary,destructive}`, `highlight/primary`, `face/secondary-hover`, `destructive/face`, `focus/gap`, `recess/shade`, `tag/lip-{success,warning,info,neutral,danger}` |
 
-- **Node-level exceptions:** the bands bind **primitives** directly: `color/band/1…5` (the Figma
-  author reports 204 bindings in the Light frame). Their code syntax is `--ns-band-*`, not the
-  `--ns-color-*` GUIDELINES gives for primitives. S1 must add semantic band roles (for example
-  `pixel/band/1…5`); the primitive binding is a recorded Figma-node exception and cannot ship in
-  component CSS. The author also reports no literal paints: the Light and Dark frames bind every
-  solid paint (Dark 960 of 960).
-- **Figma frames:** Light `66:433`, Dark `68:917` (refined in place); components Light `162:8708`,
-  Dark `162:9408`; sets Button `65:459`, Field `65:533`, Checkbox `65:550`, Switch `65:567`, Tag
-  `65:593`, Tabs `65:602`; icons `64:444`. Frozen baseline before the Ore pass: `158:2075` /
-  `158:3518`, components `158:4961`.
-- **Renders:** `renders-r7/pixel--{light,dark,components,before-after}.png` (frozen round-7 set).
-- **Evidence status (TD-25).** Visual claims refer to the frozen round-7 renders
-  `renders-r7/pixel--{light,dark,components,before-after}.png` under
-  `.llm/runs/design-system-s4--language-review/`, hashed in `renders-r7/SHA256SUMS` (sha256
-  `092b1cd4…`; review input commit `affd6b158`). Node ids, variable modes, alias and
-  `resolveForConsumer` chains, binding and unbound counts, effect-style values and Figma text-style
-  weights in this file are **reported by the Figma author and independently unverified**: no frozen
-  node/variable/effect/type export accompanies the snapshot. Ratios marked _measured_ were sampled
-  on exported pixels; _(token)_ ratios are resolved-variable arithmetic; values marked _proposed_
-  stay proposals until a re-render proves them; runtime behaviour is unproven until #2419.
+- **Band roles (pending in #2414).** The bands bind the primitives `color/band/1…5` directly. Their
+  code syntax is `--ns-band-*`, not the `--ns-color-*` that GUIDELINES gives for primitives.
+  Semantic band roles (for example `pixel/band/1…5`) are pending in #2414. Until they exist, the
+  primitive binding is a documented exception and cannot ship in component CSS.
+- **Paints.** The Light and Dark designs bind every solid paint to a variable. There are no literal
+  paints.
+- **Status.** Values come from the NetScript Figma library. Contrast ratios in _Accessibility_ were
+  measured on rendered pixels. Band roles, fonts and `tnum` are tracked in #2414; the Ink kind's
+  states, the dialog and the tag dot in #2416; stepped motion, keyboard behaviour and DPR crispness
+  at 1.25× and 1.5× in #2419. Runtime behaviour is unproven until #2419.
 
-## Provenance
+## Sources
 
-- **Sources:** the Mistral brand (pattern only; mistral.ai/brand), 8bitcn/ui (MIT), Ore UI
-  (minecraft.wiki/w/Ore_UI, physics only), the run's `inventory/reference-packs.md` §5.
-- **Review rounds:** r3 first review (P-01 chart contour, P-02 status labels); r4 and r5 repairs; r6
-  light **PASS** (carried from r5), dark CHANGES_REQUESTED on P-03 only. P-03 has since been applied
-  and built into the Field component. **Round 7** reviewed the Ore refinement: light and dark
-  **PASS**, judged as the owner-approved refinement against the supplied before/after and component
-  renders (the Ore UI wiki page could not be fetched for a fresh upstream comparison). The palette
-  is not reopened.
-- **Owner decisions** (verbatim from the run worklog and `brief-r5.md`):
-  - "Keep terminal and let's add s Pixel one for Mistral";
-  - "The Mistral one is. Abit too Mistral the them is pixel do while the idea should be leveraged no
-    need to copy one one the propertsry colors";
-  - "For the Pixel theme you went to far the Mistral copy looked better just slightly change tone of
-    the orange";
-  - "Netscript is less brown that that more orange yet not mistral orange";
-  - "Pixel is still too orange go more yellowish then";
-  - "Pixel finally looks good and start ri give Minecraft vibes I like it".
-- **Ore UI direction** (relayed by the supervisor; recorded verbatim in `brief-r7.md`): "mix the
-  current Mistral pixel approach with the gaming approach of https://minecraft.wiki/w/Ore_UI while
-  it should not be a copy paste… keeping the current essence first"; "I like current one, we're
-  speaking of refinement".
+- **Mistral brand** (mistral.ai/brand): the pixel pattern only (banded gradient, cream ground, mono
+  labels). Not copied: the M and cat marks, ALTMistral, Mistral's sampled hexes.
+- **8bitcn/ui** (MIT): stepped borders.
+- **Ore UI** (minecraft.wiki/w/Ore_UI): component physics only (lips, pressed keys, recessed
+  inputs). Not copied: Mojang fonts, textures, the green/stone palette and logos.
 - **Invented fixture content:** Northwind and its banded N mark, every name, email, identicon and
   order, the KPI block-chart series, "Edited by Maya Rossi · 2 min ago", the fulfilment steps.
-- **Open evidence:** #2414 (band roles, fonts, `tnum`), #2416 (Ink kind states, dialog, tag dot),
-  #2419 (stepped motion, keyboard, DPR crispness at 1.25× and 1.5×).

@@ -1,51 +1,48 @@
 ---
 name: fresh-ui-theme-bloom
-description: Build, extend or review NetScript Fresh UI screens in the Bloom theme (widget-first Material You — notch-cut pastel widgets on warm paper, a large regular Funnel grotesk, black action discs, nested outline cards). Use when a project sets data-theme="bloom", asks for a widget dashboard, Material You / dynamic-colour, pastel, "big type" or personal-dashboard look, or adds screens, widgets or components to a Bloom app.
+description: Build, extend or review NetScript Fresh UI screens in the Bloom theme (widget-first Material You with notch-cut pastel widgets on warm paper, a large regular Funnel grotesk, black action discs, nested outline cards). Use when a project sets data-theme="bloom", asks for a widget dashboard, Material You / dynamic-colour, pastel, "big type" or personal-dashboard look, or adds screens, widgets or components to a Bloom app.
 ---
 
 # Bloom theme
 
-Read `DESIGN.md` in this folder first. It holds the tokens, the notch primitive and the full
+Read `DESIGN.md` in this folder first; it holds the tokens, the notch primitive and the full
 specification. This file is the working procedure. The cross-theme rules are in
 `docs/design-system/GUIDELINES.md` (shipped as the `netscript-design` skill).
 
 ## Use it when / don't use it when
 
-- **Use for:** personal and owner dashboards, consumer apps, small-shop back-offices, any screen
-  that is a handful of glanceable widgets plus one short list.
-- **Don't use for:** dense admin, long tables or many-field forms — rows are 84px and six fill a
+- **Use for:** personal and small-business dashboards, consumer apps, small-shop back-offices, and
+  any screen made of a few glanceable widgets and one short list.
+- **Don't use for:** dense admin, long tables or many-field forms: rows are 84px and six fill a
   column. Suggest Studio (Ledger or Utility) for data-dense work, or Tonal for stock Material.
 
-## The thesis in one breath
+## Thesis
 
-Widget-first Material You, pushed past Atelier Mobile. Signature moves:
+Widget-first Material You. Signature moves:
 
 1. Notch-cut widgets whose notch holds an action disc.
 2. A large regular grotesk: Funnel Display Regular 92/96 title, 60/64 values.
-3. Black (ink) action discs and nested outline cards; pastels mean categories, ink means action.
+3. Black (ink) action discs and nested outline cards; pastels mark categories and ink marks actions.
 
 ## Hard rules
 
-- MUST make widgets play with shape (notches, nested tiles) and NEVER decorate. Owner: "widget
-  should play more with the shape while not putting unreadable stars everywhere".
+- MUST make widgets play with shape (notches, nested tiles) and NEVER decorate: no stars or other
+  unreadable ornaments.
 - NEVER use stock Material chrome (FAB, navigation rail, filled text fields, Google Sans, Material
-  Symbols). Owner: "still too Googleish"; "go way further than atelier mobile".
+  Symbols).
 - MUST carry hierarchy with size, not weight: Regular for display and values; Medium only on hero
   button labels, the selection count and initials.
-- MUST centre every icon on whole pixels inside its disc (20 in 48 at 14px). Owner: "Icon are not
-  centered".
-- MUST keep the floating selection bar a single ink material. Owner: "bottom bar has weird bg".
-- MUST keep the rhythm: 64px margins, 16px widget gaps, 24px widget padding, 6px row gaps. Owner:
-  "doesn't breathe well".
+- MUST centre every icon on whole pixels inside its disc (20 in 48 at 14px).
+- MUST keep the floating selection bar a single ink material, with no second background.
+- MUST keep the rhythm: 64px margins, 16px widget gaps, 24px widget padding, 6px row gaps.
 - MUST keep actions ink (`bloom-hero`); NEVER a pastel or violet primary.
-- MUST use `bloom-muted` #655f55 for light supporting text (BL-01), a 1px `bloom-field-edge` #8a8377
-  capsule for editable fields (BL-02) and `bloom-control-outline` (#8a8377 in dark) for outlined
-  controls (BL-03).
-- NEVER strike through a refunded customer; the chip and the negative amount carry it (BL-04).
+- MUST use `bloom-muted` #655f55 for light supporting text, a 1px `bloom-field-edge` #8a8377 capsule
+  for editable fields and `bloom-control-outline` (#8a8377 in dark) for outlined controls.
+- NEVER strike through a refunded customer; the chip and the negative amount show the refund.
 - MUST keep dark designed: pastels become deep tones of the same hue; the ink card and discs lift to
   warm browns (#453a2c, #3b3631). No white outlines, no black slab on black.
-- MUST only read semantic `--ns-bloom-*` roles. The core roles resolve to Tonal values on Bloom
-  frames (borrowed prototype mode, not a contract, until S1 #2414 exports a complete Bloom core-role
+- MUST only read semantic `--ns-bloom-*` roles. In the Figma prototype the core roles resolve to
+  Tonal values (a borrowed mode, not a contract, until S1 #2414 exports a complete Bloom core-role
   map); never paint them, and never use primitives.
 
 ## Building a screen
@@ -100,4 +97,4 @@ Widget-first Material You, pushed past Atelier Mobile. Signature moves:
 
 ## References
 
-`DESIGN.md` → Provenance.
+`DESIGN.md` → Sources.

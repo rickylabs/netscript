@@ -6,8 +6,8 @@ description: Build, extend or review NetScript Fresh UI screens in the <Theme Na
 # <Theme Name> theme
 
 Read `DESIGN.md` in this folder first. It holds the tokens and the full specification. This file is
-the working procedure. The cross-theme rules are in `docs/design-system/GUIDELINES.md` (shipped as
-the `netscript-design` skill).
+the working procedure. The cross-theme rules are in `docs/design-system/GUIDELINES.md`, shipped as
+the `netscript-design` skill.
 
 ## Use it when / don't use it when
 
@@ -15,7 +15,7 @@ the `netscript-design` skill).
 - **Don't use for:** <where the style's own guidelines say it fails>. Suggest <alternative theme>
   instead.
 
-## The thesis in one breath
+## Thesis
 
 <Thesis.> Signature moves:
 
@@ -25,7 +25,7 @@ the `netscript-design` skill).
 
 ## Hard rules
 
-- MUST <rule distilled from an owner correction or a review finding>.
+- MUST <rule the theme depends on, from `DESIGN.md` → _Do's and Don'ts_>.
 - NEVER <anti-pattern this theme is prone to>.
 - MUST keep dark mode designed: <theme-specific dark rule>.
 - MUST only read semantic roles (`--ns-*`) and `--ns-<id>-*` language roles. Never use primitives.
@@ -41,7 +41,7 @@ the `netscript-design` skill).
 
 ## New components or screens
 
-- Derive from the closest existing component's variant, and keep the theme's depth and shape rules.
+- Start from the closest existing component's variant. Keep the theme's depth and shape rules.
 - If a new visual role is needed, add it as `<id>/<path>`, list it in the language pack's role
   manifest (`DESIGN.md` → _NetScript Mapping_; GUIDELINES §2.4) and register it in code (S1). Don't
   reuse an unrelated role.
@@ -58,4 +58,4 @@ the `netscript-design` skill).
 
 ## References
 
-`DESIGN.md` → Provenance.
+`DESIGN.md` → Sources.

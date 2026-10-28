@@ -13,10 +13,10 @@ the page chrome. For each one it gives the Fresh UI component and variant to use
   `data-theme="studio" data-flavor="utility" data-gray="neutral" data-accent="ink"`. `data-scheme`
   is either `light` or `dark`.
 - **Reference images:**
-  `reference/docs-site/{home,article,reference,design-system,search}--{light,dark}.webp`,
-  `reference/docs-site/article--mobile.webp`, and the Utility dashboard specimen
-  `reference/docs-site/utility-dashboard--{light,dark}.webp` (exported from Figma, round 6/7). They
-  show the target; Figma stays the source of truth for values.
+  `reference/{home,article,reference,design-system,search}--{light,dark}.webp`,
+  `reference/article--mobile.webp`, and the Utility dashboard specimen
+  `reference/utility-dashboard--{light,dark}.webp` (exported from Figma, round 6/7). They show the
+  target. Figma remains the source of truth for values.
 
 | Screen                            | Light      | Dark       |
 | --------------------------------- | ---------- | ---------- |
@@ -27,7 +27,7 @@ the page chrome. For each one it gives the Fresh UI component and variant to use
 | Search overlay (Pagefind)         | `181:510`  | `182:2382` |
 | Article, mobile 390 (light)       | `182:742`  | —          |
 
-The signature kit components live on page **Theme direction**, in frame `167:4232`:
+The signature kit components are on page **Theme direction**, frame `167:4232`:
 
 - Location marker `167:4236`
 - Eyebrow `167:4239`
@@ -44,9 +44,10 @@ The signature kit components live on page **Theme direction**, in frame `167:423
   focus rings.
 - **Location is ink:** a 6×6 ink square (`--ns-studio-signal-marker`) sits before the active top-nav
   lane, the active tab, the current sidebar entry, the current TOC entry and the active search
-  filter. Vertical lists reserve a 6px marker slot plus a 8px gap, so labels never shift.
+  filter. Vertical lists reserve a 6px marker slot plus an 8px gap, so labels never shift.
 - **Selection is ink:** a near-white fill (`--ns-selected`) with a 2px ink bar on the left
-  (`--ns-studio-signal-marker`). This covers the selected table row and the selected search result.
+  (`--ns-studio-signal-marker`). It applies to the selected table row and the selected search
+  result.
 - **Focus** is a 2px ring (`--ns-ring`, which is ink in light and gray-d10 in dark) with a 2px gap
   (`--ns-card`). Corners are sharp: `outline: 2px solid var(--ns-ring); outline-offset: 2px`.
 - **Links** are ink, Medium weight, with a 1px underline at a 4px offset in
@@ -55,7 +56,7 @@ The signature kit components live on page **Theme direction**, in frame `167:423
 - **Geometry is sharp:**
   - controls, inputs and cards have 0 radius;
   - badges, kbd and chips use `--ns-radius-badge` (2px).
-  - There are no shadows; Utility stays flat.
+  - There are no shadows.
 - **Separations are quiet:**
   - structural hairlines are 1px `studio/topbar/rule` (`--ns-studio-topbar-rule`) /
     `studio/table/head-rule` (gray 5, about 12% ink);
@@ -78,9 +79,8 @@ The signature kit components live on page **Theme direction**, in frame `167:423
 
 They differ in form as well as hue:
 
-- The brand red only ever appears as a filled 24px square carrying the N.
-- Error red only appears as text, a field boundary or a dot, and always next to an icon and a
-  message.
+- The brand red appears only as a filled 24px square carrying the N.
+- Error red appears only as text, a field boundary or a dot, always next to an icon and a message.
 
 ## 2. Layout grid
 
@@ -119,8 +119,8 @@ step counters. Mono content is tabular already.
 
 ## 4. Docs components → Fresh UI
 
-All colours below are Scheme roles. Every `studio/*` Scheme role now carries the code syntax
-`var(--ns-studio-<path>)` (round 7), e.g. `studio/topbar/rule` → `--ns-studio-topbar-rule`.
+All colours below are Scheme roles. Since round 7, every `studio/*` Scheme role carries the code
+syntax `var(--ns-studio-<path>)`, for example `studio/topbar/rule` → `--ns-studio-topbar-rule`.
 
 | `_components/*.vto`                       | Fresh UI component / variant                                                                                                                                | Anatomy in the design                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Tokens                                                                                                                                                   |
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -204,8 +204,6 @@ All colours below are Scheme roles. Every `studio/*` Scheme role now carries the
 
 ## 9. New variables (this round)
 
-These new variables were added in this round.
-
 - **Primitives:** `color/swiss-red/l/9` `#DA291C` and `color/swiss-red/d/9` `#E5332A`.
 - **Studio flavor variables** (every new variable has values in all 7 modes; the non-Utility values
   equal what those flavors render today):
@@ -226,9 +224,9 @@ These new variables were added in this round.
     `var(--ns-studio-code-scroll-thumb)` (the CodeBlock scrollbar thumb; `--ns-border` measured
     1.31:1 / 1.46:1 there)
 
-These must be registered in code when S1 lands. Round 7 gave every `studio/*` Scheme role, and every
-scheme-independent, non-boolean Studio flavor variable without a Theme twin, the code syntax
-`var(--ns-studio-<path>)`; the prose scale is therefore `--ns-studio-prose-*` and the icon stroke
+S1 must register these in code when it lands. Round 7 gave the code syntax `var(--ns-studio-<path>)`
+to every `studio/*` Scheme role and to every scheme-independent, non-boolean Studio flavor variable
+without a Theme twin. The prose scale is therefore `--ns-studio-prose-*`, and the icon stroke is
 `--ns-studio-icon-stroke`.
 
 ## 10. Measured contrast (exported pixels)

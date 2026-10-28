@@ -1,13 +1,13 @@
 ---
 version: alpha
 name: Bloom
-description: Widget-first Material You, pushed past Atelier Mobile — notch-cut pastel widgets on warm paper, a large regular grotesk, and black action discs.
+description: Widget-first Material You with notch-cut pastel widgets on warm paper, a large regular grotesk and black action discs.
 colors:
-  # Light value, then the Dark twin (`-dark`). Resolved with resolveForConsumer on v2 frames
-  # 108:894 (Light) and 110:1006 (Dark). Bloom components read only the `bloom-*` roles.
-  # The core roles below resolve through the borrowed Theme mode Tonal (mauve × violet); Bloom
-  # never paints them. They are prototype values, not Bloom's palette or contract: S1 #2414 must
-  # export a complete Bloom core-role map (see NetScript Mapping).
+  # Light value, then the Dark twin (`-dark`). Resolved Figma variables of the Light and Dark
+  # frames. Bloom components read only the `bloom-*` roles.
+  # The core roles below resolve through the Tonal Theme mode (mauve × violet), which the Figma
+  # library borrows for Bloom; Bloom never paints them. They are prototype values, not Bloom's
+  # palette or contract: S1 #2414 must export a complete Bloom core-role map (see NetScript Mapping).
   bg: '#fdfcfd'
   bg-dark: '#121113'
   fg: '#211f26'
@@ -26,13 +26,13 @@ colors:
   bloom-surface-high-dark: '#22201e'
   bloom-fg: '#151413'
   bloom-fg-dark: '#f2efea'
-  bloom-muted: '#655f55' # BL-01 (was #7d786f)
+  bloom-muted: '#655f55' # supporting text
   bloom-muted-dark: '#a39e95'
   bloom-outline: '#cfc9bf' # decorative boundaries only
   bloom-outline-dark: '#4a4640'
-  bloom-field-edge: '#8a8377' # BL-02
+  bloom-field-edge: '#8a8377' # editable-field boundary
   bloom-field-edge-dark: '#8a8377'
-  bloom-control-outline: '#151413' # BL-03
+  bloom-control-outline: '#151413' # outlined controls
   bloom-control-outline-dark: '#8a8377'
   bloom-line: '#e7e2d9'
   bloom-line-dark: '#2c2a27'
@@ -244,47 +244,48 @@ components:
 
 # Bloom
 
-<!-- Format: Google Labs DESIGN.md (alpha). Values resolved from Figma file pGRLnkPPRZJZy74evNcQBr,
-page "Language — Bloom" (102:808), v2 frames, on 2026-10-27. Names are provisional until S1 #2414. -->
+<!-- Format: Google Labs DESIGN.md (alpha). Values resolved from the NetScript Figma library on
+2026-10-27. Names are provisional until S1 #2414. -->
 
 ## Overview
 
-- **Thesis:** widget-first Material You, pushed beyond the owner's Atelier Mobile app: a personal
-  dashboard of pastel widgets on warm paper, set in a large regular grotesk, driven by ink discs.
+- **Thesis:** widget-first Material You. Bloom is a personal dashboard of pastel widgets on warm
+  paper, set in a large regular grotesk, with ink discs for actions.
 - **Signature moves:**
-  1. **Notch-cut widgets that hold a control.** A rounded card with a concave top-right notch, and a
-     disc sitting in the notch.
+  1. **Notch-cut widgets that hold a control.** A rounded card has a concave top-right notch, and a
+     disc sits in the notch.
   2. **A large regular grotesk.** Funnel Display Regular at 92/96 for the page title and 60/64 for
-     values; weight never carries hierarchy, size does.
-  3. **Black action discs and nested outline cards.** Ink circles (`bloom-hero`) are the actions;
-     outlined tiles nest inside cards to hold secondary actions.
-- **Anchor:** Material You (dynamic colour, personal widget surfaces), taken widget-first, plus an
-  owner-supplied reference: soft pastels on warm paper, a large regular-weight grotesk, notch-cut
-  cards holding a button, nested outline cards, black icon discs. Take the widget and
-  personalisation idea. Do not take Material chrome (FAB, navigation rail, filled fields, Material
-  Symbols, Google Sans): owner on v1, "still too Googleish".
-- **Family:** Expressive. **Best for:** personal and owner dashboards, consumer apps, small shop
-  back-offices. **Avoid for:** dense admin and long tables (84px rows, six per column).
-- **Feel:** warm, generous, editorial-playful. First impression: "a stack of paper widgets".
+     values. Size carries hierarchy; weight does not.
+  3. **Black action discs and nested outline cards.** Ink circles (`bloom-hero`) are the actions.
+     Outlined tiles nest inside cards and hold secondary actions.
+- **Anchor:** Material You (dynamic colour, personal widget surfaces), taken widget-first, plus a
+  reference image: soft pastels on warm paper, a large regular-weight grotesk, notch-cut cards
+  holding a button, nested outline cards, black icon discs. Take the widget and personalisation
+  idea. Do not take Material chrome (FAB, navigation rail, filled fields, Material Symbols, Google
+  Sans); with it, a Bloom screen reads as stock Google Material.
+- **Family:** Expressive. **Best for:** personal and small-business dashboards, consumer apps, small
+  shop back-offices. **Avoid for:** dense admin and long tables (84px rows, six per column).
+- **Feel:** warm and generous, editorial with some play. The first impression is a stack of paper
+  widgets.
 
 ## Colors
 
 - **Ground:** warm paper `bloom-canvas` #faf8f4 with three 1.25px `bloom-line` (#e7e2d9) backdrop
   arcs (900, 760 and 1100px circles) behind content. White `bloom-surface` is reserved for the
   details sheet, fields and delta pills. Dark: #0f0e0d with #2c2a27 arcs.
-- **Colour = category, ink = action.** Pastels mark what a widget is about: peach #fbe6c6 (revenue,
-  the open order), mint #dcebe0 (orders), lavender #e4dcfa (needs-you, the selected row), sky,
-  butter, rose and `surface-high` for the numbered row discs. Actions are always ink: discs, hero
-  pills and the selection bar are `bloom-hero` #151413. No pastel button, no brand accent.
+- **Category and action colours.** Pastels mark a widget's category: peach #fbe6c6 (revenue, the
+  open order), mint #dcebe0 (orders), lavender #e4dcfa (needs-you, the selected row), sky, butter,
+  rose and `surface-high` for the numbered row discs. Actions are always ink: discs, hero pills and
+  the selection bar are `bloom-hero` #151413. There is no pastel button and no brand accent.
 - **Status:** a 6px dot plus the word in `bloom-fg`: Paid `bloom-success` #2f6b3f, Awaiting
   `bloom-warn` #8a5a00, Payment failed `bloom-error` #b3261e, Refunded `bloom-muted`. Errors on
   fields use `bloom-error` for the 1.5px capsule and the helper text.
 - **Dark design notes:** pastels become deep tones of the same hue (peach #3a2c1a, mint #1c2b22,
   lavender #2a2240). The ink card lifts to warm brown #453a2c with peach text #fbe6c6, and the
-  action discs lift to #3b3631 with cream #f7e7cb — never a black slab on black. Outlined controls
-  use `bloom-control-outline` #8a8377, not light ink (BL-03).
-- **Defined but not painted in v2:** `bloom/primary` (#5b2a86 / #d2b6ff), `primary-container`,
-  `lime`, `lime-strong`, `tangerine`, `hero-accent` and their `on-*` pairs (from v1 `102:809`).
+  action discs lift to #3b3631 with cream #f7e7cb; never a black slab on black. Outlined controls
+  use `bloom-control-outline` #8a8377, not light ink.
+- **Defined but unused:** `bloom/primary` (#5b2a86 / #d2b6ff), `primary-container`, `lime`,
+  `lime-strong`, `tangerine`, `hero-accent` and their `on-*` pairs. No component paints them.
 
 ## Typography
 
@@ -297,7 +298,8 @@ button labels, "1 selected" and avatar initials. Tracking tightens with size: �
   ("Recent (6)") 40/48; row names 28/32; widget headline and amounts 24/28; card titles 22/28;
   greeting 18/23 muted; controls 16/21; body 15/20; meta 14/18; chips and small 13/17; field labels
   12/16.
-- **Numerals:** amounts and counts should be tabular in code (#2414); Figma shows proportional.
+- **Numerals:** amounts and counts should be tabular in code (pending in #2414); the Figma design
+  shows proportional figures.
 
 ## Layout
 
@@ -310,12 +312,12 @@ button labels, "1 selected" and avatar initials. Tracking tightens with size: �
   with a dot-and-stem "today" marker, an "Include refunds" toggle and a Today pill, then six 84px
   rows with 6px gaps; the selection bar floats at the bottom. Right: the order panel (420×865 peach)
   with a white details sheet.
-- **Rhythm:** owner, on v1, "doesn't breathe well". Keep 64 margins, 16 widget gaps, 24 widget
-  padding, 28 panel padding and 20px row insets.
+- **Rhythm:** keep 64 margins, 16 widget gaps, 24 widget padding, 28 panel padding and 20px row
+  insets.
 
 ## Elevation & Depth
 
-Flat paper. Depth comes from nesting and contrast, not shadow.
+Bloom is flat: depth comes from nesting and contrast instead of shadow.
 
 | Level    | Recipe                                                                           | Applied to              |
 | -------- | -------------------------------------------------------------------------------- | ----------------------- |
@@ -337,15 +339,16 @@ fields, notch outer), 26 (nested card, 52px buttons), 24 (tracking card), 22 (ne
 A rounded rectangle with a concave top-right notch, drawn in Figma as a cubic-arc vector. Two
 measured instances:
 
-| Instance              | Box     | Outer r | Notch (w × h) | Inner convex r | Concave r | Disc in notch    |
-| --------------------- | ------- | ------- | ------------- | -------------- | --------- | ---------------- |
-| Refund rate `108:965` | 248×128 | 28      | 58 × 58       | 14             | 22        | 42px at (202, 4) |
-| Amount `110:843`      | 172×112 | 26      | 50 × 50       | 12             | 20        | 36px at (132, 4) |
+| Instance    | Box     | Outer r | Notch (w × h) | Inner convex r | Concave r | Disc in notch    |
+| ----------- | ------- | ------- | ------------- | -------------- | --------- | ---------------- |
+| Refund rate | 248×128 | 28      | 58 × 58       | 14             | 22        | 42px at (202, 4) |
+| Amount      | 172×112 | 26      | 50 × 50       | 12             | 20        | 36px at (132, 4) |
 
-The disc sits 4px from the outer top and right edges and 10–12px from the concave edge. CSS for a
-fixed-size widget (exact arcs; Figma's cubics match within 0.1px). The two sizes are variants of one
-declared Bloom part, selected with `data-variant` (epic Decision 4), never a BEM modifier class. The
-variant names below are provisional until S3 #2416 registers them:
+The disc sits 4px from the outer top and right edges and 10–12px from the concave edge. The two
+notches use different geometry and share no token. The CSS below is for a fixed-size widget (exact
+arcs; Figma's cubics match within 0.1px). The two sizes are variants of one declared Bloom part,
+selected with `data-variant`, never a BEM modifier class. The variant names below are provisional
+until S3 #2416 registers them:
 
 ```css
 .ns-bloom-notch[data-variant="248x128"] {
@@ -361,7 +364,7 @@ variant names below are provisional until S3 #2416 registers them:
   a semantic role (`--ns-bloom-ink-card`, `--ns-bloom-on-ink-card`, `--ns-bloom-hero`,
   `--ns-bloom-on-hero`, `--ns-bloom-control-outline`), never a literal colour.
 - For fluid widths, use CSS `shape()` with `calc(100% - …)` coordinates where supported, or an SVG
-  `mask-image`/`<clipPath>` generated from the element box; runtime proof is owed to #2419.
+  `mask-image`/`<clipPath>` generated from the element box; runtime proof is pending in #2419.
 - `clip-path` clips outlines and borders: put the focus ring on the disc, and draw a notched outline
   (if ever needed) as an SVG stroke. The disc is a sibling positioned in the notch, never clipped by
   it.
@@ -384,36 +387,34 @@ variant names below are provisional until S3 #2416 registers them:
 - **Order row (table):** 84px r28 row, 20px insets: 44px numbered pastel disc, meta 14/18 muted,
   name 28/32, status chip, amount 24/28 right. Selected = lavender fill, chip outline in
   `bloom-control-outline`, trailing pen disc. Refunded = name and amount in `bloom-muted`, no
-  strike-through (BL-04).
+  strike-through.
 - **Status chip:** 30px r15 pill, 1px `bloom-outline`, 6px status dot, 13/17 word in `bloom-fg`.
 - **Toggle disc** (replaces checkbox and switch): 28px; on = `bloom-hero` with a 12px check; off =
   1px `bloom-control-outline` ring.
 - **Field:** 56px capsule r28, 20px insets, 12/16 muted label inside over a 16/21 value; boundary
-  1px `bloom-field-edge` #8a8377 (BL-02); error = 1.5px `bloom-error` capsule, label in
-  `bloom-error`, trailing alert icon and a 13/17 repair sentence below.
+  1px `bloom-field-edge` #8a8377; error = 1.5px `bloom-error` capsule, label in `bloom-error`,
+  trailing alert icon and a 13/17 repair sentence below.
 - **Selection bar:** 454×60 ink pill, "1 selected", a 1px divider at 25%, three 44px text actions
   (icon 18 + 15/20 label), a 44px peach "More" disc; one coherent material.
 - **Order panel / sheet:** peach r40 panel (back arrow, Done, 60/64 ID, date, notched amount, nested
   tracking with Copy, customer row) over a white sheet with fields, toggles and actions.
-- **Top bar:** none; header controls float on the paper. **Dialog:** not drawn; owed to #2416.
+- **Top bar:** none; header controls float on the paper. **Dialog:** not drawn; pending in #2416.
 
 ## Do's and Don'ts
 
-- **Do** make widgets play with shape, but never decorate. Owner on v1: "widget should play more
-  with the shape while not putting unreadable stars everywhere". A notch always holds a disc.
-- **Don't** look like stock Material: no FAB, rail, filled fields or Google Sans. Owner: "still too
-  Googleish"; "go way further than atelier mobile".
-- **Do** go big and regular: 92/96 title, 60/64 values. Owner: "much more expressive, more color
-  tones, more widget style… big fonts, unique cards".
-- **Do** centre every icon on whole pixels inside its disc. Owner: "Icon are not centered".
-- **Do** make the floating bar one ink material. Owner: "bottom bar has weird bg".
-- **Do** let regions breathe: 64 margins, 16 gaps, 6px row gaps. Owner: "doesn't breathe well".
+- **Do** make widgets play with shape (notches, nested tiles), but never decorate: no stars or other
+  unreadable ornaments. A notch always holds a disc.
+- **Don't** look like stock Material: no FAB, rail, filled fields or Google Sans.
+- **Do** go big and regular: 92/96 title, 60/64 values.
+- **Do** centre every icon on whole pixels inside its disc.
+- **Do** draw the floating selection bar as one ink material, with no second background.
+- **Do** let regions breathe: 64 margins, 16 gaps, 6px row gaps. Symptom to avoid: a cramped layout.
 - **Do** keep pastels for categories and ink for actions; never a pastel or violet primary.
-- **Do** use `bloom-muted` #655f55 for supporting text in light; #7d786f was 3.32:1 on lavender
-  (BL-01).
-- **Do** give editable fields a 3:1 boundary with `bloom-field-edge` on the capsule itself (BL-02).
-- **Don't** outline dark controls in light ink; use `bloom-control-outline` #8a8377 (BL-03).
-- **Don't** strike through a refunded customer; the chip and the negative amount say it (BL-04).
+- **Do** use `bloom-muted` #655f55 for supporting text in light. The lighter #7d786f is 3.32:1 on
+  lavender.
+- **Do** give editable fields a 3:1 boundary with `bloom-field-edge` on the capsule itself.
+- **Don't** outline dark controls in light ink; use `bloom-control-outline` #8a8377.
+- **Don't** strike through a refunded customer; the chip and the negative amount say it.
 - **Do** design dark as deep tones of each pastel; lift the ink card and discs to warm browns.
 - **Don't** use `bloom-outline` (#cfc9bf, 1.55:1) as the only boundary of an interactive control.
 
@@ -426,9 +427,9 @@ circles (40–48px). Backdrop arcs are the only illustration; no photos, stars o
 ## Motion & States
 
 Bloom has no state sheet yet. Drawn states: selected row, checked/unchecked toggle discs, field
-error, today marker. Hover, pressed, focus and disabled are owed to #2416, and motion (disc press,
-row selection, bar entrance) to #2419 with a reduced-motion equivalent and RTL mirroring of the
-notch (top-left in RTL).
+error, today marker. Hover, pressed, focus and disabled are pending in #2416. Motion (disc press,
+row selection, bar entrance) is pending in #2419, with a reduced-motion equivalent and RTL mirroring
+of the notch (top-left in RTL).
 
 ## Accessibility
 
@@ -443,37 +444,34 @@ notch (top-left in RTL).
 | `bloom-error` on `bloom-surface`           | 6.54 / 10.44                            |
 | `bloom-outline` on canvas (decorative)     | 1.55 / 2.06                             |
 
-The bell disc and the refund-rate notch pen disc now render `bloom-control-outline` (_measured_ on
-the frozen R7 renders: `#151413` on `#faf8f4` light, `#8a8377` on `#0f0e0d` dark), so the earlier
-`bloom-outline` (1.55:1) exception is closed. No focus indicator is drawn yet (#2416). Hit targets:
-toggle discs 28px, discs ≥ 36px, buttons 52px.
+The bell disc and the refund-rate notch pen disc use `bloom-control-outline` (_measured_ on rendered
+pixels: `#151413` on `#faf8f4` light, `#8a8377` on `#0f0e0d` dark), never `bloom-outline` (1.55:1).
+No focus indicator is drawn yet (#2416). Hit targets: toggle discs 28px, discs ≥ 36px, buttons 52px.
 
 ## NetScript Mapping
 
 | Layer              | Value                                                                                                                                                                                                                                                                 |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Figma Theme mode   | `Tonal` (borrowed: the Theme collection is at its 10-mode ceiling; prototype evidence only)                                                                                                                                                                           |
+| Figma Theme mode   | `Tonal` (borrowed because the Figma Theme collection is at its 10-mode limit; prototype only)                                                                                                                                                                         |
 | Base gray × accent | n/a (core roles inherit Tonal's mauve × violet)                                                                                                                                                                                                                       |
 | Density            | n/a (literal geometry)                                                                                                                                                                                                                                                |
 | Flavor             | n/a                                                                                                                                                                                                                                                                   |
 | `data-theme`       | `bloom`                                                                                                                                                                                                                                                               |
 | Language roles     | `bloom/{canvas,surface,surface-high,fg,muted,outline,field-edge,control-outline,line,hero,on-hero,ink-card,on-ink-card,peach,mint,lavender,sky,butter,rose,success,warn,error}` (+ unused `primary*`, `lime*`, `tangerine*`, `hero-accent*`, `on-*`) → `--ns-bloom-*` |
 
-- **Borrowed mode is prototype evidence only.** Rendering Bloom under the `Tonal` Theme mode is
-  acceptable for the Figma prototype, but it is not a compatibility contract: under it the core
-  roles resolve to Tonal's mauve × violet, not to Bloom. The S1 (#2414) export must ship a Bloom
-  resolver mode with a **complete compatible core-role map** (every core role in both schemes;
-  proposed mapping below) so a shared component rendered under `data-theme="bloom"` stays on-theme.
-- **Node-level exceptions** (author-reported): all 95 text nodes set Funnel fonts directly (0 bound;
-  the Theme `font/*` would resolve Roboto Flex); every radius and size is literal. No primitive
-  bindings, no unbound paints.
-  - **BL-02 placement: fixed.** The Figma author reports `bloom-field-edge` on the r28 capsules
-    `110:883` / `110:1229`, with no stroke on the wrappers `110:882` / `110:1228`. The r7 review
-    measured the complete capsule boundary at 3.7543:1 on white (light).
-- **r7 audit of the borrowed `Tonal` mode (author-reported, report only).**
-  - **What the frames read.** They bind 22 `bloom/*` roles and **0 core roles or Theme variables**,
-    so Tonal values do not reach their render.
-  - **Fonts in use:** Funnel Sans Regular ×61, Funnel Sans Medium ×11, Funnel Display Regular ×23.
+- **The borrowed mode is for the prototype only.** Rendering Bloom under the `Tonal` Theme mode
+  works in the Figma prototype, but it is not a compatibility contract: under it the core roles
+  resolve to Tonal's mauve × violet, not to Bloom. The S1 (#2414) export must ship a Bloom resolver
+  mode with a **complete compatible core-role map** (every core role in both schemes; proposed
+  mapping below) so a shared component rendered under `data-theme="bloom"` stays on-theme.
+- **Bindings today.** Bloom components bind 22 `bloom/*` roles and no core roles or Theme variables,
+  so Tonal values never reach a Bloom render. Text sets the Funnel fonts directly (the Theme
+  `font/*` would resolve Roboto Flex), and every radius and size is a literal value. Roles pending
+  in #2414: `font/sans`, `font/heading`, `font/kpi` and a Bloom shape scale. No primitive bindings,
+  no unbound paints.
+  - **Field boundary:** `bloom-field-edge` strokes the r28 capsule itself, not its wrapper. The
+    complete capsule boundary measures 3.7543:1 on white (light).
+  - **Fonts in use:** Funnel Sans Regular, Funnel Sans Medium, Funnel Display Regular.
   - **Sizes in use:** 12, 13, 14, 15, 16, 17, 18, 22, 24, 28, 30, 32, 40, 48, 60, 92.
   - **Radii in use:** 2, 14, 15, 18, 20, 21, 22, 24, 26, 28, 30, 32, 40.
 - **What S1 (#2414) needs for a dedicated Bloom mapping:**
@@ -491,36 +489,16 @@ toggle discs 28px, discs ≥ 36px, buttons 52px.
      - `ring`: undefined today (#2416).
   3. Register the 22 used `bloom/*` roles and decide the unused ones: `primary*`, `lime*`,
      `tangerine*`, `hero-accent*`, `on-*`.
-  4. Bind the 95 text nodes to the new font tokens.
-- **Figma frames:** v2 Light `108:894`, Dark `110:1006` (page `102:808`); v1 superseded `102:809`.
-  No state sheet.
-- **Renders:** `renders-r7/bloom--{light,dark}.png` (frozen round-7 set; r5 = v2 before BL-01…04).
-- **Evidence status (TD-25).** Visual claims refer to the frozen round-7 renders
-  `renders-r7/bloom--{light,dark}.png` under `.llm/runs/design-system-s4--language-review/`, hashed
-  in `renders-r7/SHA256SUMS` (sha256 `092b1cd4…`; review input commit `affd6b158`). Node ids,
-  variable modes, alias and `resolveForConsumer` chains, binding and unbound counts, effect-style
-  values and Figma text-style weights in this file are **reported by the Figma author and
-  independently unverified**: no frozen node/variable/effect/type export accompanies the snapshot.
-  Ratios marked _measured_ were sampled on exported pixels; _(token)_ ratios are resolved-variable
-  arithmetic; values marked _proposed_ stay proposals until a re-render proves them; runtime
-  behaviour is unproven until #2419.
+  4. Bind all Bloom text to the new font tokens.
+- **Status:** values come from the NetScript Figma library. A Bloom Theme mode or registered
+  `bloom/*` roles, Funnel font tokens, shape tokens and numerals are tracked in #2414; the state
+  sheet and focus in #2416; the notch at fluid widths, motion and RTL in #2419.
 
-## Provenance
+## Sources
 
-- **Owner direction (verbatim):** "much more expressive, more color tones, more widget style… big
-  fonts, unique cards"; "go way further than atelier mobile"; on v1, "too approximative… still too
-  Googleish. Icon are not centered, bottom bar has weird bg, doesn't breathe well, widget should
-  play more with the shape while not putting unreadable stars everywhere". A reference image was
-  supplied (pastels on warm paper, large regular grotesk, notch cards, nested outline cards, black
-  icon discs).
-- **Review:** first reviewed in r6 (commit `1c67e857c`): light and dark CHANGES_REQUESTED with
-  BL-01…BL-03 (high) and BL-04 (medium); composition preserved. r7 (frozen `renders-r7/`): PASS in
-  both schemes; BL-01…BL-04 closed (`review/bloom.md`).
-- **Inconsistencies:** the reviewer asked BL-02 to bind `border/input`; Figma uses a new
-  `bloom/field-edge` (same #8a8377), reported by the Figma author on the correct capsule node. The
-  two notches use different geometry (no shared token; two `data-variant` paths). The pen and bell
-  discs now both render `bloom-control-outline` (measured on R7).
+- **References:** Material You (dynamic colour, personal widget surfaces), and a reference image of
+  pastels on warm paper, a large regular grotesk, notch cards, nested outline cards and black icon
+  discs. What to take and what never to copy is listed under _Overview_ → Anchor.
+- **Fonts and icons:** Funnel Display and Funnel Sans (OFL, Google Fonts); Lucide-style icons (ISC).
 - **Invented fixture content:** "Hello, Maya", customers, order numbers, amounts, dates, tracking
   number, AUTUMN24, "Needs you (3)".
-- **Open evidence:** #2414 Bloom Theme mode or registered `bloom/*` roles, Funnel font tokens, shape
-  tokens, numerals; #2416 state sheet and focus; #2419 notch at fluid widths, motion, RTL.

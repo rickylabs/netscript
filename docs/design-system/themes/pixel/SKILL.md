@@ -9,9 +9,6 @@ Read `DESIGN.md` in this folder first. It holds the tokens and the full specific
 the working procedure. The cross-theme rules are in `docs/design-system/GUIDELINES.md` (shipped as
 the `netscript-design` skill).
 
-> **Review status:** round 7 passed the Ore UI refinement (lips, pressed keys, recesses) in light
-> and dark as an owner-approved refinement. The palette and essence are not reopened.
-
 ## Use it when / don't use it when
 
 - **Use for:** games and launchers, playful consumer products, creator and community tools, hobby or
@@ -19,40 +16,39 @@ the `netscript-design` skill).
 - **Don't use for:** formal finance, legal, medical or long reading. Suggest `studio` or
   `filigrane`.
 
-## The thesis in one breath
+## Thesis
 
-Amber pixels with game-key physics, calm everywhere else. Signature moves:
+Pixel combines amber pixels with game-key physics and keeps everything else calm. Signature moves:
 
 1. Banded amber: five discrete 2px bands (`#FFDBA2 → #D38E22`) for the header stripe, the
    selected-row bar, the latest chart column, progress and the notice edge.
-2. Keys on a lip: a stepped face on a 4px lip. Pressed drops the face 4px (`translateY(+4px)`) and
-   the lip collapses. Fields and unchecked boxes are recessed with a 2px inner shade.
-3. Pixel type for numbers, mono for words: Pixelify Sans for the title and KPIs, Space Mono
-   uppercase labels, JetBrains Mono data, Inter for reading text.
+2. Keys on a lip: a stepped face on a 4px lip. Pressing drops the face 4px (`translateY(+4px)`) and
+   collapses the lip. Fields and unchecked boxes are recessed with a 2px inner shade.
+3. Type by role: Pixelify Sans for the title and KPIs, Space Mono for uppercase labels, JetBrains
+   Mono for data, Inter for reading text.
 
 ## Hard rules
 
-- MUST keep the owner-approved palette exactly: amber `#FAAB35` with `#12100E` ink; bands
+- MUST keep the palette exactly: amber `#FAAB35` with `#12100E` ink; bands
   `#FFDBA2 #FFC673 #FFB245 #EDA12E #D38E22`; paper `#FCFAF6 #F4EFE6 #E8E0D3`; dark
-  `#12100E #1B1916 #282623`. The owner walked it to "more yellowish"; never shift it toward Mistral
-  orange.
-- MUST NOT copy Mistral or Minecraft: no M or cat mark, no ALTMistral, no Mojang fonts, textures,
-  green/stone palette or logos. Take the idea and the physics only ("should not be a copy paste").
-- MUST treat Ore as a refinement of the current essence ("I like current one, we're speaking of
-  refinement"); don't restyle the layout.
+  `#12100E #1B1916 #282623`. Never shift it toward Mistral orange.
+- MUST NOT copy Mistral or Minecraft: no M or cat mark, no ALTMistral, no brand colours, no Mojang
+  fonts, textures, green/stone palette or logos. Take the pixel idea and the physics only.
+- MUST treat the Ore UI physics as a refinement of the pixel language; don't restyle the layout.
 - MUST keep stepped geometry, icon pixels, major offsets (lips, pressed travel, corner steps) and
   bands on the 2px grid; Pixelify Sans at 24 or 40 only. The documented 1px panel frames and table
   rules and the 13px JetBrains Mono data type are allowed exceptions. No blur, no soft shadow, no
   half pixels.
 - MUST pair every amber focus ring with its 2px ink gap: amber alone is 1.84:1 on paper.
-- MUST keep dark mode designed: warm near-black grounds; dark interactive perimeters at
+- MUST keep dark mode as specified: warm near-black grounds; dark interactive perimeters at
   `--ns-control-ink` / `--ns-input-border` `#7C7B74`, never white, including the focused field's
-  inner edge (P-03); tag lips warm near-black.
-- MUST keep chart silhouettes outside the bands (P-01) and give tags their full label width (P-02).
+  inner edge; tag lips warm near-black.
+- MUST keep chart silhouettes outside the bands and give tags their full label width.
 - MUST use red only as an error or destructive role (`--ns-pixel-destructive-face`,
   `--ns-destructive-*`).
 - MUST only read `--ns-*` and `--ns-pixel-*` roles. The bands bind primitives (`--ns-band-*`) today;
-  that exception is documented and waits for S1 band roles. Don't add new primitive bindings.
+  that exception is documented and waits for S1 band roles (#2414). Don't add new primitive
+  bindings.
 
 ## Building a screen
 
@@ -85,11 +81,11 @@ Amber pixels with game-key physics, calm everywhere else. Signature moves:
 
 ## New components or screens
 
-- Decide first: is it pressable (key on a lip), an input (recess), a signal (bands) or a panel (flat
-  frame)? Use exactly one of those depth treatments.
+- First classify it as pressable (key on a lip), input (recess), signal (bands) or panel (flat
+  frame). Use exactly one of those depth treatments.
 - Cut corners as pixel steps with `clip-path` (4px on 40px keys, 2px on smaller controls).
 - New visual roles go under `pixel/<path>` and must be registered in S1.
-- Add every new component to the components sheet (`162:8708` / `162:9408`) in all states.
+- Specify every new component in all its states.
 
 ## Self-check before handing off
 
@@ -105,4 +101,4 @@ Amber pixels with game-key physics, calm everywhere else. Signature moves:
 
 ## References
 
-`DESIGN.md` → Provenance.
+`DESIGN.md` → Sources.
