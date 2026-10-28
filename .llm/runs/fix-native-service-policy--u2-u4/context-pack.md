@@ -113,3 +113,14 @@ public hosts are not a shipping fallback.
 U1 (plugin-host factories, other lane), U3 (per-request headers), E1 (issuer/roles/TTL/reader
 credential/browser bootstrap), EIS adoption, process supervision, release/version/lock cut, issues
 #2396/#829/#2364, docs parity owner, Q-U2-3/5/6, Q-U4-2/3.
+
+## Q1-Q3 source checkpoint, 2026-10-28
+
+Root accepted the four exact qualification-owner hashes in
+[root qualification acceptance](root-qualification-q1-q3-source-acceptance.md).
+See [checkpoint and measured gates](qualification-q1-q3-checkpoint.md) and its byte-audited evidence
+manifest. Owning Q1 18/0, Q2 3/0, plugin11/0; broad consumers26/0; whole service626/3/0.
+Two Q4 requestBody leaks, mapped-IPv4 Windows refusal and the DB identity prerequisite remain OPEN,
+not waived. Q4 is attribution/proposal only; original owners remain unchanged. Independent IMPL
+and readiness are pending. This entry supersedes historical pending-implementation status only;
+plans and evaluator verdicts remain unchanged.

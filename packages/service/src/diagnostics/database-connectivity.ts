@@ -286,18 +286,20 @@ function resolveDatabaseEndpoint(engineCfg: EngineConfig): { host: string; port:
 
 async function checkTcpPort(host: string, port: number, timeoutMs: number): Promise<boolean> {
   const resolvedHost = host === LOCALHOST ? LOCALHOST_IPV4 : host;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(new Error('TCP timeout')), timeoutMs);
 
   try {
-    const conn = await Promise.race([
-      Deno.connect({ hostname: resolvedHost, port }),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('TCP timeout')), timeoutMs)
-      ),
-    ]);
-    conn.close();
-    return true;
+    const conn = await Deno.connect({ hostname: resolvedHost, port, signal: controller.signal });
+    try {
+      return !controller.signal.aborted;
+    } finally {
+      conn.close();
+    }
   } catch {
     return false;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

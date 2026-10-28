@@ -238,3 +238,14 @@ The copied D-U4-7 open M-U4-2 marker is historical. Root has resolved it in root
 Unreleased Added for exact entries plus Changed for health registration; name the GET/HEAD 200-to-401
 compatibility impact for custom lists excluding health, migration, and release breaking-impact summary.
 Pinned 0.0.8 strings stay unchanged. The existing metadata labels remain preserved and explicitly superseded.
+
+## Q1-Q3 source checkpoint, 2026-10-28
+
+Root accepted the four exact qualification-owner hashes in
+[root qualification acceptance](root-qualification-q1-q3-source-acceptance.md).
+See [checkpoint and measured gates](qualification-q1-q3-checkpoint.md) and its byte-audited evidence
+manifest. Owning Q1 18/0, Q2 3/0, plugin11/0; broad consumers26/0; whole service626/3/0.
+Two Q4 requestBody leaks, mapped-IPv4 Windows refusal and the DB identity prerequisite remain OPEN,
+not waived. Q4 is attribution/proposal only; original owners remain unchanged. Independent IMPL
+and readiness are pending. This entry supersedes historical pending-implementation status only;
+plans and evaluator verdicts remain unchanged.

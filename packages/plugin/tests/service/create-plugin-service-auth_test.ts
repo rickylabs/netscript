@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { fromFileUrl } from '@std/path';
 import { baseContract, SuccessSchema } from '@netscript/contracts';
 import { implement, os } from '@orpc/server';
 import {
@@ -175,7 +176,7 @@ Deno.test('plugin factory reports verifier failure as redacted unavailable', asy
 
 Deno.test('plugin factory rejects missing or ambiguous policy at a JavaScript caller boundary', async () => {
   const moduleUrl = new URL('../../src/service/mod.ts', import.meta.url).href;
-  const configPath = new URL('../../../../deno.json', import.meta.url).pathname;
+  const configPath = fromFileUrl(new URL('../../../../deno.json', import.meta.url));
   const source = `
     import { createPluginService } from ${JSON.stringify(moduleUrl)};
     for (const auth of [undefined, {}, { public: true }, { public: true, reason: 'test', authn: undefined }]) {
@@ -187,10 +188,17 @@ Deno.test('plugin factory rejects missing or ambiguous policy at a JavaScript ca
       throw new Error('Malformed policy was accepted');
     }
   `;
-  const result = await new Deno.Command(Deno.execPath(), {
-    args: ['eval', '--config', configPath, source],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
-  assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+  const controller = new AbortController();
+  const deadline = setTimeout(() => controller.abort(), 15_000);
+  try {
+    const result = await new Deno.Command(Deno.execPath(), {
+      args: ['eval', '--config', configPath, source],
+      stdout: 'piped',
+      stderr: 'piped',
+      signal: controller.signal,
+    }).output();
+    assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+  } finally {
+    clearTimeout(deadline);
+  }
 });

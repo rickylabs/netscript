@@ -1,0 +1,13 @@
+﻿{
+    "name":  "test-help",
+    "startedUtc":  "2026-10-28T01:29:12.6679570Z",
+    "finishedUtc":  "2026-10-28T01:29:12.6943064Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "test",
+                      "--help"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\test-help.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\test-help.stderr.log"
+}
