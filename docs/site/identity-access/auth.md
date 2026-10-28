@@ -9,18 +9,16 @@ order: 1
 
 # Authentication
 
-**One env var and six endpoints separate a scaffolded workspace from a working OAuth sign-in —
-and the boundaries fail loud with typed errors instead of degrading to a silent anonymous
-session.** Auth is the part of a backend where "compiles and demos fine" and "actually holds"
-diverge most easily, so NetScript puts the conventions in the contract rather than in notes an
-agent has to remember to apply.
+The `auth` plugin adds sign-in, sessions and a typed `/api/v1/auth/*` surface to a workspace. This
+page covers its contract, its three backends and how other services trust the sessions it issues.
 
-NetScript ships authentication as a first-class official plugin: `netscript plugin install @netscript/plugin-auth`
-adds an `auth-api` oRPC service that boots on port **8094** alongside your workers, sagas, and
-triggers. The plugin is **pure-backend** — it owns the session lifecycle, OAuth/OIDC redirect
-flow, and a stable five-endpoint REST/RPC surface, but it does **not** ship UI. You compose
-exactly **one active backend** (single-active-backend), chosen by an environment variable, and
-the service exposes the same contract no matter which backend is wired in.
+`netscript plugin install @netscript/plugin-auth` adds an `auth-api` oRPC service that boots on port
+**8094** next to your workers, sagas and triggers. The plugin is backend-only: it owns the session
+lifecycle, the OAuth/OIDC redirect flow and the REST/RPC surface, and ships no UI. Exactly one
+backend is active, chosen by an environment variable, and the service contract is the same whichever
+backend runs. The installer pins `jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}` and its
+sibling packages to your workspace's NetScript version, so add auth through the CLI instead of
+editing imports by hand.
 
 {{ comp.badge({ status: "alpha" }) }}
 
@@ -30,107 +28,49 @@ alt: "A browser sign-in request enters the auth-api service, which resolves the 
 caption: "Auth flow: browser → auth-api → resolved backend → provider redirect/callback → session store → __Host-ns_session cookie → Principal."
 }) }}
 
-The design follows the framework's contracts-first doctrine: a core seam package
-(`@netscript/plugin-auth-core`) defines the `AuthBackendPort`, three interchangeable adapter
-packages implement it, and the `@netscript/plugin-auth` plugin composes the selected one into a
-running service. Of the three adapters, only the KV-OAuth backend implements the full
-**interactive** sign-in/callback flow today; the WorkOS and better-auth adapters are
-non-interactive by design.
+## The port and its adapters
 
-{{ comp callout { type: "tip", title: "Use this when" } }}
-Reach for the auth plugin when you need <strong>session-based authentication backed by an OAuth
-or OIDC provider</strong> — a typed <code>/api/v1/auth/*</code> surface your services and Fresh
-UI can call to sign users in, resolve the current session, and sign out. The default
-<code>kv-oauth</code> backend gives you a complete interactive redirect flow with KV-stored
-sessions and an opaque HMAC-signed session token. To wire it into a workspace step by step, see
-<a href="/identity-access/how-to/add-authentication/">Add authentication</a>; to understand the pure-backend
-port model and why only one backend is active, see
-<a href="/explanation/auth-model/">The authentication model</a>.
-{{ /comp }}
+Auth is a port with interchangeable adapters. `@netscript/plugin-auth-core` holds contracts only:
+the `AuthBackendPort` and the four sub-ports it composes (provider registry, session store, token
+crypto and principal mapper), the normalized `AuthSession` and `Principal` shapes,
+`AUTH_SESSION_STATES`, the auth oRPC contract, the config schemas and the stream-event schemas. It
+contains no provider SDK code.
 
-## Where agent-built auth goes wrong
+Three adapters implement `AuthBackendPort` against a concrete identity provider:
+`@netscript/auth-kv-oauth`, `@netscript/auth-workos` and `@netscript/auth-better-auth`.
+`@netscript/plugin-auth` selects one of them at boot from `NETSCRIPT_AUTH_BACKEND` and serves it as
+the `auth-api` service. Only `kv-oauth` implements the interactive sign-in and callback flow; the
+other two verify sessions that something else created. Every backend produces the same `Principal`,
+so downstream services authorize the same way whichever provider is wired in.
+{{ comp.xref({ key: "explain:auth-model", text: "The authentication model" }) }} explains why auth
+is backend-only, what the single-active boundary buys and how `InteractiveFlowPort` gates the
+redirect flow.
 
-Auth is a security-sensitive surface, and security-sensitive surfaces have a specific
-build-efficiency failure shape: the mistake does not stop the build. A missing job queue fails a
-request; a mis-wired sign-in flow ships. Supabase's published agent-skills guidance names the
-pattern for its own platform — agents building on it skip RLS policies, hallucinate CLI commands,
-and create views without `security_invoker = true` — and its remedy is a skill: reference material
-the agent loads so it applies the conventions at the right moment. NetScript takes the other route
-for the same problem: move the conventions out of the agent's working memory and into the shipped
-contract, so the common wrong turns either don't type-check, don't configure, or fail loud at
-runtime with a typed error.
+## Failure modes the contract prevents
 
-Concretely, the contract closes off the classic failure modes:
+A mis-wired sign-in flow still compiles and demos. The contract turns the common wrong turns into
+type errors, configuration errors or typed runtime failures:
 
-- **The silent anonymous fallback.** An agent wiring auth by hand tends to catch the failure and
-  degrade to an unauthenticated default. `backend.authenticate()` cannot express that: it returns
-  a typed `AuthnResult` — `{ ok: true, principal }` or `{ ok: false, reason }` — never a silent
-  anonymous principal.
-- **Calling a capability the backend doesn't have.** Asking a non-interactive backend (WorkOS,
-  better-auth) to run the interactive sign-in returns a typed `AUTH_PROVIDER_ERROR`, and direct
-  session mutations throw `AuthBackendOperationUnsupportedError` — a capability boundary, not a
-  no-op that looks like success.
-- **Two half-wired providers.** There is nothing to reconcile: `NETSCRIPT_AUTH_BACKEND` selects
-  exactly one active backend (single-active-backend), and every backend normalizes to the same
-  `Principal`, so downstream authorization code is identical regardless of provider.
-- **Hand-rolled session cookies.** The session cookie is `__Host-ns_session`; the `__Host-` prefix
-  makes the browser itself refuse a cookie with a `Domain`, a non-root `Path`, or a plain-HTTP
-  origin — the misconfiguration fails to set rather than silently weakening.
-- **Logging raw subjects.** The audit surface (`createAuthTelemetry`) redacts by construction —
-  subject hashes, stripped token-bearing claims — and runs as a no-op until a salt is configured,
-  because an un-salted hash would be worse than nothing.
+- **Silent anonymous fallback.** `backend.authenticate()` returns a typed `AuthnResult`, either
+  `{ ok: true, principal }` or `{ ok: false, reason }`. It cannot return an anonymous principal.
+- **Calling a capability the backend lacks.** Interactive sign-in on a non-interactive backend
+  (WorkOS, better-auth) returns a typed `AUTH_PROVIDER_ERROR`, and direct session mutations throw
+  `AuthBackendOperationUnsupportedError`. Neither is a no-op that looks like success.
+- **Two half-wired providers.** `NETSCRIPT_AUTH_BACKEND` selects exactly one backend, and every
+  backend normalizes to the same `Principal`, so authorization code is identical across providers.
+- **Hand-rolled session cookies.** The session cookie is `__Host-ns_session`. Browsers refuse a
+  `__Host-` cookie with a `Domain`, a non-root `Path` or a plain-HTTP origin, so a misconfiguration
+  fails to set instead of weakening the cookie. Serve production over HTTPS.
+- **Logging raw subjects.** The audit surface (`createAuthTelemetry`) hashes subjects and strips
+  token-bearing claims. It stays a no-op until a salt is configured, because an unsalted hash would
+  be worse than nothing.
 
-Each item above is the shipped behavior of the published packages, documented mechanism-by-mechanism
-in the sections below — start with
-{{ comp.xref({ key: "explain:auth-model", text: "the authentication model" }) }} for why the seam
-is shaped this way.
+## Provider presets and custom providers
 
-## What it is
-
-Auth is a **port-and-adapter seam, not a monolith**. The core package
-`@netscript/plugin-auth-core` is contract-only: it defines the `AuthBackendPort` (and the four
-sub-ports it composes — provider registry, session store, token crypto, and principal mapper),
-the normalized `AuthSession` and `Principal` shapes, the `AUTH_SESSION_STATES`, the auth oRPC
-contract, the config schemas, and the stream-event schemas. It contains **no provider SDK code**.
-Each backend adapter (`@netscript/auth-kv-oauth`, `@netscript/auth-workos`,
-`@netscript/auth-better-auth`) implements `AuthBackendPort` against a concrete identity provider,
-and the `@netscript/plugin-auth` plugin selects exactly one of them at boot via
-`NETSCRIPT_AUTH_BACKEND` and serves it as the `auth-api` service. Because every backend produces
-the same `Principal`, downstream services authorize identically regardless of which provider is
-wired in. The full rationale — why auth is pure-backend, what the single-active boundary buys you,
-and how `InteractiveFlowPort` gates the redirect flow — is in
-{{ comp.xref({ key: "explain:auth-model", text: "The authentication model" }) }}.
-
-## Learn → / Do →
-
-{{ comp.featureGrid({ items: [
-{
-title: "Do — Add authentication",
-body: "Task recipe: add the auth plugin, set NETSCRIPT_AUTH_BACKEND, run the auth.prisma migration, and wire kv-oauth with a provider preset.",
-href: "/identity-access/how-to/add-authentication/",
-icon: "◆"
-},
-{
-title: "Understand — The authentication model",
-body: "Why auth is pure-backend: the AuthBackendPort seam, the single-active-backend boundary, InteractiveFlowPort, and the three adapters' capability matrices.",
-href: "/explanation/auth-model/",
-icon: "✦"
-},
-{
-title: "Compose — Service authn / authz",
-body: "Gate a service's own routes with the provider-agnostic /auth middleware seam — verify a credential or trust a header, complementary to this plugin.",
-href: "/services-sdk/services/",
-icon: "→"
-}
-] }) }}
-
-## Add it in two shapes
-
-The fastest path is the **provider preset**: add the plugin, set `NETSCRIPT_AUTH_BACKEND`
-(it already defaults to `kv-oauth`), and hand a preset like `providers.google({...})` to
-`createKvOAuthBackend`. The **advanced** shape uses the same factory but defines a custom OIDC
-provider explicitly with `defineOAuthProvider` when your identity provider is not one of the
-fourteen built-in presets.
+Pass a provider to `createKvOAuthBackend`; `NETSCRIPT_AUTH_BACKEND` already defaults to `kv-oauth`.
+The preset form uses one of the fourteen built-in presets, such as `providers.google({...})`. When
+your identity provider is not a preset, define it with `defineOAuthProvider` and pass it to the same
+factory.
 
 {{ comp.tabbedCode({ tabs: [
 {
@@ -145,19 +85,12 @@ code: "// Same factory, but define the OIDC provider yourself when your IdP\n// 
 }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Alpha package pins" } }}
-The scaffold pins <code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code> and siblings
-at the exact aligned NetScript version. Add auth through
-<code>netscript plugin install @netscript/plugin-auth</code>, which wires the workspace correctly for
-the alpha instead of hand-editing imports.
-{{ /comp }}
-
 ## Sign in, resolve the session, sign out
 
-Once the plugin is wired, your front end or a typed client drives the five-endpoint surface. A
-sign-in begins the redirect, the provider returns to your callback, the service mints a session
-and sets the cookie, and every subsequent request resolves the current session from that cookie.
-The snippet below is a copy-ready client flow against the REST surface.
+A front end or typed client drives the REST surface. Sign-in starts the provider redirect, the
+provider returns to the callback, the service mints a session and sets the cookie, and later
+requests resolve the session from that cookie. The second tab uses the backend port directly in
+server code.
 
 {{ comp.tabbedCode({ tabs: [
 {
@@ -172,13 +105,12 @@ code: "// server/auth-guard.ts — use the resolved backend directly in app code
 }
 ] }) }}
 
-## Key types first — the core auth contract
+## Core types
 
-Every backend normalizes to the same two shapes the rest of NetScript depends on: an
-`AuthSession` (what the store persists) and a `Principal` (what services authorize against). The
-`AuthSession` is mapped to a `Principal` by the backend's `principalMapper`, and the
-`authenticate()` method on every backend returns an `AuthnResult`. These are the contract-only
-types from `@netscript/plugin-auth-core` — confirmed against the live export surface.
+Every backend normalizes to two shapes: the `AuthSession` the store persists and the `Principal`
+services authorize against. The backend's `principalMapper` maps one to the other, and
+`authenticate()` returns an `AuthnResult`. All three are contract-only types from
+`@netscript/plugin-auth-core`.
 
 {{ comp.apiTable({
 caption: "Principal (@netscript/plugin-auth-core) — the identity services authorize against",
@@ -215,10 +147,12 @@ rows: [
 
 ## The service surface
 
-The plugin's service is named `auth-api` and is built with `@netscript/service`'s oRPC builder
-(`createService(...).withRPC()`), not raw Hono. It mounts a public REST surface at
-`/api/v1/auth/*` and the equivalent oRPC surface at `/api/rpc/v1/auth/*`, plus standard
-`/health/live` and `/health/ready` probes.
+The `auth-api` service is built with the `@netscript/service` oRPC builder
+(`createService(...).withRPC()`). It mounts a REST surface at `/api/v1/auth/*`, the same operations
+over oRPC at `/api/rpc/v1/auth/*`, and the `/health/live` and `/health/ready` probes, with OpenAPI
+and docs through `.withOpenAPI()` and `.withDocs()`. The plugin (`AUTH_PLUGIN_ID` `auth`) contributes
+it under `AUTH_API_SERVICE_NAME`. `AUTH_API_DEFAULT_PORT` is 8094; scaffolded workspaces allocate
+ports from the high range (49152+), so yours will differ.
 
 {{ comp.apiTable({
 caption: "auth-api endpoints (REST at /api/v1/auth/_, oRPC at /api/rpc/v1/auth/_)",
@@ -234,48 +168,47 @@ rows: [
 
 ### Signout acts only for the caller
 
-`signout` and `revokeSession` are the only guarded procedures. The service authenticates them
-in-process against the active backend: a bearer credential resolves through the session store,
-otherwise the `__Host-ns_session` cookie does. Every other procedure stays public introspection.
+`signout` and `revokeSession` are the only guarded procedures; every other procedure is public
+introspection. The service authenticates both in-process against the active backend: a bearer
+credential resolves through the session store, otherwise the `__Host-ns_session` cookie does.
 
-- **Ownership.** A `sessionId` must name a session whose subject is the caller's subject. A session
-  that does not exist and a session that belongs to someone else get the same `401 UNAUTHORIZED`
-  body, so signout cannot be used to probe for valid session ids.
-- **Nothing on refusal.** A refused signout revokes nothing, emits no `auth.session.revoked`
-  event, and records no `success` outcome.
-- **Global logout.** `everywhere: true` revokes every session of the caller's subject and no
-  other subject's, through `AuthSessionStorePort.revokeSubjectSessions`. That call does a bounded
-  amount of work and never walks the subject's sessions. `kv-oauth` records one per-subject
-  revocation instant: any session issued at or before it stops resolving as active. That includes
-  sessions stored before this release, so no migration is needed. `better-auth` delegates to its
-  own `api.revokeSessions` through the caller's credential. NetScript reads every better-auth
-  session from the server-side store (`disableCookieCache`), so a cached `session_data` cookie
-  stops authenticating through NetScript on the next request; the
-  [better-auth page](/identity-access/better-auth-plugins/#revocation-and-the-cookie-cache)
-  describes the residual window on better-auth's own endpoints. `workos` atomically persists a
-  local subject fence and a durable cleanup job. Its service-owned worker lists at most 50 upstream
-  sessions per delivery and revokes only the caller's sessions created at or before logout. Local
-  authentication refuses the subject immediately, including still-unexpired access tokens. During
-  cleanup it also refuses newly created sessions of that subject; they become usable when cleanup
-  succeeds. Permanent session tombstones prevent rotated tokens from reviving an old session.
-  Other subjects remain usable. Failed pages retry automatically until recovery, with backoff capped at 60 seconds.
-  Storage failures are supervised, and shutdown signals drain the worker. Session tombstones expire
-  only after upstream success plus the longest configured token lifetime and clock-skew padding. See the
-  [WorkOS reference](/reference/auth-workos/#subject-wide-revocation) for standalone composition.
-- **Operators.** Revoking somebody else's session is the separate `revokeSession` procedure,
-  gated by the `auth:sessions:revoke` scope on an authenticated backend session. The auth service's
-  guard currently accepts backend session credentials only; internal service credentials are not
-  composed into this guard. The CLI's
-  `netscript plugin auth session list` and `session revoke` both refuse to run without a
-  credential. Both read it from `NETSCRIPT_AUTH_TOKEN`.
-- **Revocation by id.** The kv-oauth backend supports operator revocation and same-subject sibling
-  selectors. A definite missing kv-oauth session returns `{ revoked: false }` from the operator
-  route. The better-auth and WorkOS adapters cannot revoke by id: they return `AUTH_PROVIDER_ERROR`
-  (502), never a successful "not found" result. For signout, the request credential can prove
-  ownership of the caller's own selected session, which then gets the same provider error for
-  single-session revocation. These adapters cannot prove ownership of a sibling by id alone, so
-  sibling, foreign and unknown selectors receive the same `401` ownership refusal. On better-auth,
-  omit the sibling selector and use `everywhere: true` for supported subject-wide logout.
+- **Ownership.** A `sessionId` must name a session of the caller's subject. An unknown session and
+  another subject's session get the same `401 UNAUTHORIZED` body, so signout cannot probe for valid
+  session ids.
+- **Nothing on refusal.** A refused signout revokes nothing, emits no `auth.session.revoked` event
+  and records no `success` outcome.
+- **Global logout.** `everywhere: true` revokes every session of the caller's subject and no other
+  subject's, through `AuthSessionStorePort.revokeSubjectSessions`. The call does a bounded amount of
+  work and never walks the subject's sessions.
+  - `kv-oauth` records one revocation instant per subject: any session issued at or before it stops
+    resolving as active. That includes sessions stored before this release, so no migration is
+    needed.
+  - `better-auth` delegates to its own `api.revokeSessions` through the caller's credential.
+    NetScript reads every better-auth session from the server-side store; the
+    [better-auth page](/identity-access/better-auth-plugins/#revocation-and-the-cookie-cache)
+    describes the residual window on better-auth's own endpoints.
+  - `workos` atomically persists a local subject fence and a durable cleanup job. Local
+    authentication refuses the subject immediately, including still-unexpired access tokens. The
+    service-owned worker lists at most 50 upstream sessions per delivery and revokes only the
+    caller's sessions created at or before logout. During cleanup it also refuses newly created
+    sessions of that subject; they become usable when cleanup succeeds. Failed pages retry
+    automatically, with backoff capped at 60 seconds. Storage failures are supervised, and shutdown
+    signals drain the worker. Permanent session tombstones stop rotated tokens from reviving an old
+    session; they expire only after upstream success plus the longest configured token lifetime and
+    clock-skew padding. Other subjects stay usable. See the
+    [WorkOS reference](/reference/auth-workos/#subject-wide-revocation) for standalone composition.
+- **Operators.** Revoking another subject's session is the separate `revokeSession` procedure,
+  gated by the `auth:sessions:revoke` scope on an authenticated backend session. The guard accepts
+  backend session credentials only; internal service credentials are not composed into it. The CLI's
+  `netscript plugin auth session list` and `session revoke` refuse to run without a credential,
+  which they read from `NETSCRIPT_AUTH_TOKEN`.
+- **Revocation by id.** kv-oauth supports operator revocation and same-subject sibling selectors; a
+  definite missing session returns `{ revoked: false }` from the operator route. better-auth and
+  WorkOS cannot revoke by id: they return `AUTH_PROVIDER_ERROR` (502), never a successful "not
+  found". On signout, the request credential proves ownership of the caller's own selected session,
+  which then gets the same provider error. These adapters cannot prove ownership of a sibling by id,
+  so sibling, foreign and unknown selectors all get the same `401`. On better-auth, omit the
+  selector and use `everywhere: true` for subject-wide logout.
 
 ```ts
 // Browser: the session cookie authenticates the call and selects the session to end.
@@ -289,32 +222,28 @@ await fetch(`${AUTH}/signout`, {
 });
 ```
 
-{{ comp callout { type: "warning", title: "Breaking in 0.0.8: migrating signout callers" } }}
-<code>SignoutInput</code> keeps its fields, but their meaning changed. Up to 0.0.7, signout
-revoked any <code>sessionId</code> it was given, without a credential, and ignored
-<code>everywhere</code>. Now an anonymous call gets <code>401</code>, a <code>sessionId</code> must
-belong to the caller, and <code>everywhere</code> revokes all of the caller's sessions. To revoke a
-session you do not own, call <code>revokeSession</code> with a credential holding
-<code>auth:sessions:revoke</code>. A custom <code>AuthSessionStorePort</code> must add
-<code>revokeSubjectSessions({ subject, request })</code> (bounded work, returning
-<code>{ subject, revokedAt }</code>), or throw <code>AuthBackendOperationUnsupportedError</code>
-from it. A custom <code>KvOAuthStore</code> must add <code>revokeSubject</code> and
-<code>getSubjectRevocation</code>. A custom <code>BetterAuthInstance</code> must expose
-<code>api.revokeSessions</code>. The CLI's <code>session list</code> now needs a credential too.
-{{ /comp }}
+### Signout changes in 0.0.8
 
-{{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
-NetScript's authentication plugin is architected around a single active backend configuration per deployment, resolved at startup via the <code>NETSCRIPT_AUTH_BACKEND</code> environment variable (or <code>auth.backend</code> settings). This design boundary prioritizes clean, isolated runtime execution for individual identity providers. So features such as dynamic multi-backend routing, cross-backend account linking, and global multi-store session revocation are not supported in this version. For complex multi-tenant or federated identity requirements, routing must be managed upstream or via an external aggregator, as swapping providers requires redeployment with updated credentials.
+> [!WARNING]
+> Signout semantics changed in 0.0.8. An anonymous call now gets `401`, a `sessionId` must belong
+> to the caller, and `everywhere` revokes all of the caller's sessions.
 
-<!-- caveat: arch-debt:auth-single-active-backend-boundary -->
+`SignoutInput` keeps its fields. Up to 0.0.7, signout revoked any `sessionId` it was given, without
+a credential, and ignored `everywhere`. To revoke a session you do not own, call `revokeSession`
+with a credential holding `auth:sessions:revoke`. Custom implementations must add:
 
-{{ /comp }}
+- `AuthSessionStorePort`: `revokeSubjectSessions({ subject, request })`, doing bounded work and
+  returning `{ subject, revokedAt }`, or throwing `AuthBackendOperationUnsupportedError`.
+- `KvOAuthStore`: `revokeSubject` and `getSubjectRevocation`.
+- `BetterAuthInstance`: `api.revokeSessions`.
+
+The CLI's `session list` now needs a credential too.
 
 ## The three backends
 
-All three implement the same `AuthBackendPort`, so the `auth-api` contract is identical across
-them. They differ in one decisive capability: whether they expose an interactive
-sign-in/callback flow. Each ships a single factory that returns an `AuthBackendPort`.
+All three implement `AuthBackendPort`, so the `auth-api` contract is identical across them. They
+differ in one capability: whether they expose an interactive sign-in and callback flow. Each ships a
+single factory that returns an `AuthBackendPort`.
 
 {{ comp.apiTable({
 caption: "Backend adapters: factory, capability, and what each one needs",
@@ -325,185 +254,100 @@ rows: [
 ]
 }) }}
 
-{{ comp callout { type: "important", title: "Only kv-oauth is interactive" } }}
-The <code>signin</code> and <code>callback</code> endpoints require a backend that implements the
-optional <code>InteractiveFlowPort</code> (<code>signIn</code> / <code>handleCallback</code> /
-<code>getSessionId</code> / <code>signOut</code>). Today that is <strong>only
-<code>kv-oauth</code></strong>. On <code>workos</code> and <code>better-auth</code> those two
-endpoints return a typed <code>AUTH_PROVIDER_ERROR</code> ("does not expose an interactive flow"),
-and direct session mutations throw <code>AuthBackendOperationUnsupportedError</code> — a
-deliberate, fail-loud capability boundary rather than a silent no-op. Use those adapters when
-sign-in is handled by WorkOS or an external better-auth deployment and NetScript only verifies the
-resulting session.
-{{ /comp }}
+> [!IMPORTANT]
+> Only `kv-oauth` is interactive. `signin` and `callback` need a backend that implements the
+> optional `InteractiveFlowPort` (`signIn`, `handleCallback`, `getSessionId`, `signOut`). On
+> `workos` and `better-auth` they return a typed `AUTH_PROVIDER_ERROR` ("does not expose an
+> interactive flow"), so use those adapters when WorkOS or an external better-auth deployment
+> handles sign-in and NetScript only verifies the session.
+
+> [!NOTE]
+> One backend is active per deployment, resolved at startup from `NETSCRIPT_AUTH_BACKEND` or the
+> `auth.backend` setting. Multi-backend routing, cross-backend account linking and global session
+> revocation across backend stores are not supported, and switching providers means a redeploy with
+> new credentials. Route multi-tenant or federated identity upstream, through an identity router or
+> an external aggregator.
+
+<!-- caveat: arch-debt:auth-single-active-backend-boundary -->
+
+[Operational session lifecycles](/identity-access/session-lifecycles/) shows the HTTP wiring for
+each backend.
 
 ## How auth integrates with services
 
-The auth **plugin** (this page) signs human users in and resolves their sessions. A
-NetScript **service** gates its own routes with the separate, provider-agnostic
-`@netscript/service/auth` seam — `.withAuthn()` resolves a `Principal` and `.withAuthz()` makes
-an authorization decision from it. Both layers speak the same `Principal` type, so they compose:
-the auth plugin establishes identity, and a service's `.withAuthn({ authenticator })` can trust a
-backend's authenticator to turn a request into that `Principal`. By default a service protects
-`/api` and leaves `/health` anonymous. The full builder seam — `createStaticCredentialAuthenticator`,
-`createTrustedHeaderAuthenticator`, `createScopeAuthorizer`, and the preset
-`defineService(router, { auth: { authn, authz } })` form — is documented on the services hub.
+The auth plugin signs users in and resolves their sessions. A NetScript service gates its own routes
+with the separate, provider-agnostic `@netscript/service/auth` seam: `.withAuthn()` resolves a
+`Principal` and `.withAuthz()` makes an authorization decision from it. Both layers use the same
+`Principal`, so they compose: a service's `.withAuthn({ authenticator })` can trust a backend's
+authenticator to turn a request into that `Principal`. By default a service protects `/api` and
+leaves `/health` anonymous.
 
-{{ comp callout { type: "note", title: "Plugin vs. service-auth seam" } }}
-The <strong>auth plugin</strong> owns interactive sign-in, OAuth callbacks, and session cookies.
-The <strong><a href="/services-sdk/services/">service-auth seam</a></strong> is for
-machine-to-machine and gateway-fronted gating — static credentials, trusted upstream headers,
-scope checks — without an interactive identity provider. They are complementary and can run
-together: sign users in with the plugin, then gate individual service routes with
-<code>.withAuthn()</code> / <code>.withAuthz()</code>. See
-{{ comp.xref({ key: "cap:services", text: "Services & contracts" }) }}.
-{{ /comp }}
+Use the plugin for interactive sign-in, OAuth callbacks and session cookies. Use the service seam
+for machine-to-machine and gateway-fronted gating with static credentials, trusted upstream headers
+and scope checks, without an interactive identity provider. The two run together.
+{{ comp.xref({ key: "cap:services", text: "Services & contracts" }) }} documents the builder seam:
+`createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createScopeAuthorizer`
+and the preset `defineService(router, { auth: { authn, authz } })` form.
 
 ### Verify sessions from another plugin's service
 
-Another plugin's service does not need the auth backend in order to trust its sessions.
+Another plugin's service can trust auth sessions without holding the auth backend.
 `createAuthServiceAuthenticator` from `@netscript/plugin-auth/authenticator` returns an
 `AuthenticatorPort` that verifies each request's bearer session by calling the `auth` service's
-typed `session` procedure. The guarded service therefore holds no backend instance, no KV handle,
-and no provider secret. A plugin service declares that guard in its required `auth` posture:
+typed `session` procedure, so the guarded service holds no backend instance, no KV handle and no
+provider secret. A missing or rejected session returns `401`, an insufficient scope `403` and an
+unreachable auth service `503`. The authenticator keeps no principal between requests, so a revoked
+session is rejected on its next request.
 
-```ts
-// plugins/billing/services/src/main.ts
-import { createPluginService } from '@netscript/plugin/service';
-import { mountPluginContract } from '@netscript/plugin/contract-base';
-import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
-import { createContractAuthorizer } from '@netscript/service/auth';
-import { billingContractDefinition } from '@netscript/plugin-billing-core/contracts/v1';
-import { billingContractMount, billingRouter } from './handlers.ts';
-
-export const billingService = createPluginService(billingRouter, {
-  name: 'billing',
-  auth: {
-    authn: {
-      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
-    },
-    authz: {
-      authorizer: createContractAuthorizer(
-        mountPluginContract(billingContractDefinition, billingContractMount),
-      ),
-    },
-  },
-});
-```
-
-A missing or rejected session returns `401`, an insufficient scope returns `403`, and an
-unreachable auth service returns `503`. A revoked session is rejected on its next request, because
-the authenticator keeps no principal between requests. `netscript plugin new <name>` generates
-this form. Background callers (workers, sagas, triggers) run under a service identity, not an app
-session. A guarded API they call over HTTP must accept a service credential, for example through
-`createStaticCredentialAuthenticator`. The
-[add-authentication how-to](/identity-access/how-to/add-authentication/#protect-a-plugin-api)
-walks through the posture choices.
+`netscript plugin new <name>` generates this guard. Background callers (workers, sagas, triggers)
+run under a service identity, not an app session, so an API they call over HTTP must accept a
+service credential, for example through `createStaticCredentialAuthenticator`.
+[Protect a plugin API](/identity-access/how-to/add-authentication/#protect-a-plugin-api) shows the
+code and the posture choices.
 
 ## Database & runtime events
 
-The plugin contributes a package-provided `auth.prisma` schema with four
-better-auth-shaped models — `AuthUser` → `auth_users`, `AuthSession` → `auth_sessions`,
-`AuthAccount` → `auth_accounts`, `AuthVerification` → `auth_verifications`. These tables back the
-better-auth adapter; `kv-oauth` keeps its sessions in Deno KV, and WorkOS is stateless. As with
-every plugin schema, you bring the tables to life by running the database workflow **after Aspire
-is up** — see [Database migrations](/data-persistence/how-to/database-migration/).
+The plugin contributes a package-provided `auth.prisma` schema with four better-auth-shaped models:
+`AuthUser` → `auth_users`, `AuthSession` → `auth_sessions`, `AuthAccount` → `auth_accounts` and
+`AuthVerification` → `auth_verifications`. These tables back the better-auth adapter; `kv-oauth`
+keeps its sessions in Deno KV, and WorkOS is stateless. better-auth persists through Prisma, so the
+tables follow the engine you scaffolded with `--db` (Postgres is recommended; `mysql`, `mssql` and
+`sqlite` also work). As with every plugin schema, run the database workflow after Aspire is up; see
+[Database migrations](/data-persistence/how-to/database-migration/).
 
-The plugin also emits five durable `auth.*` runtime events through the durable-streams runtime —
-the `AUTH_STREAM_EVENT_TYPES`: `auth.signin.started`, `auth.signin.failed`,
-`auth.token.refreshed`, `auth.session.revoked`, and `auth.oidc.completed`. The session projection
-is described by the `authStreamSchema` entity stream. For the streams runtime itself see
-{{ comp.xref({ key: "cap:streams", text: "Durable streams" }) }}.
+The plugin also emits five durable `auth.*` runtime events through the durable-streams runtime, the
+`AUTH_STREAM_EVENT_TYPES`: `auth.signin.started`, `auth.signin.failed`, `auth.token.refreshed`,
+`auth.session.revoked` and `auth.oidc.completed`. The `authStreamSchema` entity stream describes the
+session projection. See {{ comp.xref({ key: "cap:streams", text: "Durable streams" }) }} for the
+streams runtime.
 
-{{ comp callout { type: "warning", title: "Scope: stream events are best-effort — the audit trail is separate" } }}
-The <code>auth.*</code> events are <strong>best-effort</strong>: they are no-ops unless the
-durable-streams service is wired (<code>DURABLE_STREAMS_URL</code> /
-<code>services__streams__http__0</code> set), so they are <strong>not</strong> a guaranteed audit
-trail. Only <code>oidc.completed</code>, <code>token.refreshed</code>, and
-<code>session.revoked</code> write the session projection; <code>signin.started</code> /
-<code>signin.failed</code> are diagnostic-only. The dedicated audit surface is separate:
-<code>createAuthTelemetry</code> records structured, redacted audit spans when a
-<code>subjectHashSalt</code> is configured (see the production notes below and
-{{ comp.xref({ key: "explain:observability" }) }}) — the raw stream events complement it, they do
-not replace it. For general tracing and structured logs see
-<a href="/observability/telemetry/">Telemetry &amp; logging</a>.
-{{ /comp }}
-
-## Endpoints & ports
-
-{{ comp.apiTable({
-caption: "Authentication runtime surface",
-rows: [
-{ name: "dynamic", type: "port", desc: "auth-api default port fallback (AUTH_API_DEFAULT_PORT is 8094). Note: your scaffold's ports will differ as they are allocated from the high-range (49152+) at scaffold time." },
-{ name: "auth-api", type: "service name", desc: "AUTH_API_SERVICE_NAME — the service contribution the auth plugin (AUTH_PLUGIN_ID 'auth') adds." },
-{ name: "/api/v1/auth/_", type: "REST", desc: "REST surface: signin, callback, signout, sessions/revoke, session, me. Only signout and sessions/revoke require a credential." },
-{ name: "/api/rpc/v1/auth/_", type: "oRPC", desc: "The oRPC surface for the same six operations, for typed NetScript clients." },
-{ name: "/health/live", type: "HTTP", desc: "Liveness probe; /health/ready for readiness. OpenAPI + docs served via .withOpenAPI()/.withDocs()." },
-{ name: "NETSCRIPT_AUTH_BACKEND", type: "env", desc: "Selects the single active backend: kv-oauth (default) | workos | better-auth." }
-]
-}) }}
+> [!WARNING]
+> The `auth.*` events are best-effort, not an audit trail. They are no-ops unless the
+> durable-streams service is wired (`DURABLE_STREAMS_URL` or `services__streams__http__0` set).
+> Only `oidc.completed`, `token.refreshed` and `session.revoked` write the session projection;
+> `signin.started` and `signin.failed` are diagnostic-only.
 
 ## Production notes
 
-{{ comp callout { type: "warning", title: "Footguns before you ship" } }}
+> [!CAUTION]
+> Auth audit is opt-in. `createAuthTelemetry` records structured, redacted audit spans only when a
+> `subjectHashSalt` is configured (resolved from `NETSCRIPT_AUTH_AUDIT_SALT`); without a salt it
+> records nothing. It is a queryable trail for operational and security review, not a
+> tamper-evident, write-once compliance log.
 
-<ul>
-<li><strong>Only <code>kv-oauth</code> signs users in.</strong> If
-<code>NETSCRIPT_AUTH_BACKEND</code> is <code>workos</code> or <code>better-auth</code>, the
-<code>signin</code> / <code>callback</code> endpoints return <code>AUTH_PROVIDER_ERROR</code> by
-design — those adapters only verify externally-issued sessions. Pick the backend that matches who
-owns the sign-in.</li>
-<li><strong>The session cookie is <code>__Host-ns_session</code>.</strong> The
-<code>__Host-</code> prefix <em>requires</em> <code>Path=/</code>, <strong>no Domain</strong>, and
-<strong>HTTPS</strong> — a misconfigured domain or a plain-HTTP origin makes the cookie refuse to
-set. Use a real TLS origin in production.</li>
-<li><strong>Switching providers is an env-var + credentials change, not a runtime toggle.</strong>
-There is no multi-active routing, cross-backend account linking, or global logout across backends
-in v1 (single-active-backend).</li>
-<li><strong>Auth audit is opt-in, and not a compliance-grade ledger.</strong> A real, structured,
-redacted auth audit surface ships via <code>createAuthTelemetry</code>, but it only records when a
-<code>subjectHashSalt</code> is configured (resolved from <code>NETSCRIPT_AUTH_AUDIT_SALT</code>) —
-with no salt it runs as a no-op. The raw <code>auth.*</code> stream events are themselves best-effort
-and no-op until the durable-streams service is wired. Treat the audit surface as a strong, queryable
-trail for operational and security review, not a tamper-evident, write-once compliance log. See
-{{ comp.xref({ key: "explain:observability" }) }}.</li>
-<li><strong>Run the <code>auth.prisma</code> migration after Aspire is up.</strong> The
-better-auth backend's tables (and any DB-backed flow) need your database provisioned first
-(Postgres is the recommended engine; or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> via
-<code>--db</code> — better-auth persists through Prisma, so it is not Postgres-specific) — the same
-Aspire-first ordering every plugin schema follows.</li>
-</ul>
-{{ /comp }}
+The stream events above complement the audit surface; they do not replace it. See
+{{ comp.xref({ key: "explain:observability" }) }} for the audit-trail model and
+[Telemetry & logging](/observability/telemetry/) for general tracing and structured logs.
 
-## Reference
+## Next steps
 
-The auth runtime is a `@netscript/service`; the auth plugin, core contract package, and backend
-adapters now have dedicated reference pages.
+[Add authentication](/identity-access/how-to/add-authentication/) installs the plugin in a workspace
+and signs in through the generated app.
 
-{{ comp.xref({ key: "ref:auth" }) }}
-{{ comp.xref({ key: "ref:service" }) }}
-
-{{ comp.featureGrid({ items: [
-{
-title: "Do — Add authentication",
-body: "Task recipe: add the auth plugin, set NETSCRIPT_AUTH_BACKEND, run the auth.prisma migration, and wire kv-oauth with a provider preset.",
-href: "/identity-access/how-to/add-authentication/",
-icon: "◆"
-},
-{
-title: "Understand — The authentication model",
-body: "Why auth is pure-backend: the AuthBackendPort seam, the single-active-backend boundary, InteractiveFlowPort, and the three adapters' capability matrices.",
-href: "/explanation/auth-model/",
-icon: "✦"
-},
-{
-title: "Look up — @netscript/service reference",
-body: "The oRPC service builder behind auth-api: createService().withRPC(), the contract surface, the /auth authn-authz seam, and the runtime that serves /api/v1/auth/*.",
-href: "/reference/service/",
-icon: "≡"
-}
-] }) }}
+- {{ comp.xref({ key: "explain:auth-model", text: "The authentication model" }) }}: why auth is a
+  backend-only port.
+- [better-auth plugins](/identity-access/better-auth-plugins/): mount better-auth plugins and
+  protect a route with the resolved session.
+- {{ comp.xref({ key: "ref:auth" }) }}: the generated API reference.
 
 {{ comp.nextPrev({ prev: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }, next: { label: "better-auth plugins", href: "/identity-access/better-auth-plugins/" } }) }}
-</content>
-</invoke>

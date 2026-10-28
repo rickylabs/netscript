@@ -9,32 +9,35 @@ order: 3
 
 # Operational session lifecycles
 
-**Authenticating a request is only half the battle. A working production auth flow requires a complete HTTP lifecycle: mounting public endpoints, redirecting to providers, exchanging callback codes, checking safe return URLs, and forwarding session-refresh cookies without dropping a single header.**
-
-This page covers the operational lifecycles for NetScript's three official authentication adapters. Use this guide to wire sign-in redirects, callbacks, and token validation into your services and meta-framework entry points.
-
----
+This page shows the HTTP lifecycle each official auth adapter needs: mounting handlers, redirecting
+to the provider, exchanging the callback, checking return URLs and forwarding refreshed session
+cookies. Use it to wire sign-in redirects, callbacks and token validation into your own services and
+framework entry points.
 
 ## Sealed-cookie vs. bearer-token paths
 
-Before implementing, choose the session delivery path that fits your application architecture:
+Choose how the session reaches the server before you wire anything:
 
 | Path | Mechanism | Ideal for | Adapters |
 | --- | --- | --- | --- |
 | **Sealed-Cookie** | The browser automatically sends the session cookie (`__Host-ns_session` or provider cookie) with each request. The server verifies it statelessly or against Deno KV. | Web frontends (Fresh, server-rendered pages), traditional monolithic apps. | `auth-kv-oauth`, `auth-better-auth`, `auth-workos` (AuthKit) |
 | **Bearer-Token** | The client (mobile app, SPA, or backend service) explicitly injects a JWT access token in the `Authorization: Bearer <token>` header. The server verifies it via JWKS. | Stateless REST/oRPC APIs, mobile backends, machine-to-machine calls. | `auth-workos` (Bearer), `auth-better-auth` (Bearer) |
 
----
+## better-auth: mounting and header forwarding
 
-## 1. Better Auth: mounting and header forwarding
+The better-auth adapter (`@netscript/auth-better-auth`) delegates the database tables to Prisma and
+leaves routing and session verification to NetScript. better-auth exposes a fetch-compatible
+`auth.handler(request)` that drives its own database and provider operations, such as magic links,
+user settings and credential verification. Mount that handler under `/api/auth/**` in your web
+server.
 
-The better-auth adapter (`@netscript/auth-better-auth`) delegates the database tables to Prisma but leaves routing and session verification to NetScript.
+> [!WARNING]
+> Forward refreshed session headers. When `backend.authenticate(authnReq)` verifies a session on a
+> protected route, better-auth may rotate or refresh it, and the `AuthnResult` then carries new
+> `responseHeaders` and `setCookies`. Append them to the response sent to the browser; dropping them
+> silently logs the user out on the next request.
 
-### The mounting lifecycle
-better-auth exposes a fetch-compatible `auth.handler(request)` to drive its internal database and provider operations (magic links, user settings, credentials verification). You must mount this handler under `/api/auth/**` in your web server.
-
-### Refreshed session forwarding (Critical)
-When verifying a session on a protected route via `backend.authenticate(authnReq)`, better-auth may rotate or refresh the session. When this happens, `AuthnResult` returns new headers in `responseHeaders` and `setCookies`. **You must append these headers to the HTTP response sent back to the browser.** Dropping them will silently log the user out on the next request.
+The example mounts the handler and forwards both on a protected route:
 
 ```ts
 import { Hono } from "npm:hono@^4";
@@ -109,38 +112,45 @@ app.get("/api/protected", async (c) => {
 });
 ```
 
----
+## kv-oauth: redirect and callback
 
-## 2. KV OAuth: interactive redirect and callback lifecycles
+The kv-oauth adapter (`@netscript/auth-kv-oauth`) is NetScript's default, interactive backend. It
+drives the browser through the full OAuth 2.0/OIDC code exchange and stores sessions in Deno KV. A
+session passes through four stages:
 
-The KV OAuth adapter (`@netscript/auth-kv-oauth`) is NetScript's default interactive authentication backend. It drives the browser through the full OAuth2/OIDC code exchange, storing active session details in Deno KV.
+1. **Sign-in redirect.** `backend.signIn` generates a PKCE code verifier and challenge, a state and a
+   transaction id. It stores them in KV, sets a temporary transaction cookie and returns a `302`
+   redirect to the identity provider.
+2. **Callback exchange.** The provider redirects back to `/auth/callback` with a `code` and `state`.
+   `backend.handleCallback` checks the state against the transaction cookie, exchanges the code for
+   tokens, resolves the user claims and mints an active session in Deno KV. It returns a redirect to
+   the validated `returnTo` URL, writing the `__Host-ns_session` cookie and clearing the transaction
+   cookie.
+3. **Session verification.** Later requests carry the session cookie. `backend.authenticate` checks
+   the session id against Deno KV, refreshes on read and returns the mapped `Principal`.
+4. **Sign-out.** `backend.signOut` deletes the session from Deno KV, so later requests with that
+   session id fail. Its response expires `__Host-ns_session` (for example with `Max-Age=0`) and
+   redirects to a safe public route, such as the landing or login page.
 
-### The four-stage lifecycle
-1. **Sign-In Redirect**: `backend.signIn` generates a transaction code verifier (PKCE), code challenge, state, and transaction ID. It stores this state in KV, sets a temporary transaction cookie, and returns a `302` redirect to the Identity Provider (IdP).
-2. **Callback Exchange**: The IdP redirects the user back to `/auth/callback` with a `code` and `state`. `backend.handleCallback` verifies the state against the transaction cookie, exchanges the authorization code for tokens, resolves user claims, mints an active session in Deno KV, and returns a redirect to the target `returnTo` URL while writing the `__Host-ns_session` cookie.
-3. **Session Verification**: Subsequent requests carry the session cookie. `backend.authenticate` verifies the session ID against Deno KV, automatically handles refresh-on-read, and returns the mapped `Principal`.
-4. **Sign-Out**: `backend.signOut` deletes the session from Deno KV and returns a response that clears the `__Host-ns_session` cookie.
+### Response propagation
 
-### Sign-in redirect and Location-header propagation
-When initiating a sign-in flow via `backend.signIn(request, options)`, the adapter returns an HTTP `302 Found` redirect response. This response is critical for:
-- **Location-Header Propagation**: The framework or hosting server must propagate the `Location` header to redirect the user's browser to the Identity Provider's authorize endpoint.
-- **Transaction Cookie Propagation**: The response contains `Set-Cookie` headers for temporary transaction state (e.g., PKCE verifiers and state tokens) which must be sent to the browser.
-
-### Callback exchange and cookie/Location propagation
-Upon successful authorization, the Identity Provider redirects the user back to the registered `/auth/callback` endpoint with a temporary authorization `code` and `state`.
-Calling `backend.handleCallback(request)` performs the secure token exchange and returns a redirect response to the validated `returnTo` target. The server must propagate:
-- **Location Redirect**: The `Location` header guiding the user back to the application (e.g., `/dashboard`).
-- **Session Cookie**: The `Set-Cookie` header establishing the `__Host-ns_session` cookie (and clearing the temporary transaction cookie).
-
-### Sign-out, session teardown, and cookie clearing
-To log a user out of the application:
-1. **Endpoint**: Mount a dedicated sign-out route (e.g., `GET /auth/signout`).
-2. **Session Teardown**: Invoke `backend.signOut(request)` inside this endpoint. This deletes the active session record from Deno KV, immediately invalidating subsequent request authentications using this session ID.
-3. **Cookie Clearing**: The returned response contains a `Set-Cookie` header setting `__Host-ns_session` to expire immediately (e.g., `Max-Age=0`), along with a `Location` header redirecting the user back to a safe public route (like the landing or login page). Both must be propagated to the client.
+`signIn`, `handleCallback` and `signOut` each return a redirect response, and your server must
+propagate it completely: the `Location` header moves the browser to the provider's authorize
+endpoint or back into the app, and the `Set-Cookie` headers carry the transaction cookie, the
+session cookie or the expiring cookie. Mount sign-out on its own route, such as
+`GET /auth/signout`. The example below returns each response unchanged.
 
 ### Return target and identity normalization
-- **`allowedReturnTo`**: To prevent open-redirect vulnerabilities, the backend restricts post-login redirects. It validates the target against a preset array of URL prefixes or a custom evaluation function. If validation fails, it throws a `return_to_not_allowed` error.
-- **`normalizePrincipal`**: Customizes how user claims and tokens map to a NetScript `Principal` (subject, scopes, and roles). It *replaces* the default mapping, so compose on top of `defaultPrincipal(ctx)` instead of rebuilding the principal: that keeps the stable subject, the `user` role, `scheme: "custom"`, the token scopes, and the `sessionId`/`providerId` claims. The context also carries the flow's injected `fetch`, so any provider call a mapper makes uses the same transport as the token exchange.
+
+- **`allowedReturnTo`** restricts post-login redirects to prevent open redirects. The backend checks
+  the target against a list of URL prefixes or a custom function and throws a
+  `return_to_not_allowed` error when it fails.
+- **`normalizePrincipal`** customizes how user claims and tokens map to a NetScript `Principal`
+  (subject, scopes and roles). It *replaces* the default mapping, so compose on top of
+  `defaultPrincipal(ctx)` instead of rebuilding the principal: that keeps the stable subject, the
+  `user` role, `scheme: "custom"`, the token scopes and the `sessionId`/`providerId` claims. The
+  context also carries the flow's injected `fetch`, so any provider call a mapper makes uses the same
+  transport as the token exchange.
 
 ```ts
 import { Hono } from "npm:hono@^4";
@@ -247,7 +257,7 @@ and must not depend on a live session. Each provider declares where its subject 
 
 | Source | Value | Used by |
 | --- | --- | --- |
-| `{ source: "id_token", claim: "sub" }` | The validated ID-token claim, verbatim. | OIDC presets (`google`, `gitlab`, `slack`, tenant presets). Unchanged from earlier releases. |
+| `{ source: "id_token", claim: "sub" }` | The validated ID-token claim, verbatim. | OIDC presets (`google`, `gitlab`, `slack`, tenant presets). |
 | `{ source: "userinfo", claim: "id" }` | The userinfo field, namespaced by provider id: `github:583231`. `claim` may be a dot path (`data.id`). | `github`, `discord`, `spotify`, `facebook`, `twitter` (`data.id`). |
 
 The userinfo request uses the flow's injected `fetch`, the access token as a bearer, and the
@@ -255,7 +265,7 @@ source's `headers`. The `github` preset sends a `User-Agent`, which the GitHub A
 immutable numeric `id`; `login` can be renamed.
 
 When a configured source yields no identifier, `handleCallback` throws `KvOAuthError` with code
-`subject_missing` and no session is created. A failed or oversized userinfo response throws
+`subject_missing` and creates no session. A failed or oversized userinfo response throws
 `userinfo_failed`. A provider defined *without* `subject` uses the ID-token `sub` and is refused the
 same way when the token response carries none. There is no fallback to the per-sign-in session id,
 because a subject that changes on every sign-in cannot carry authorization.
@@ -275,17 +285,22 @@ invalid `NETSCRIPT_AUTH_SUBJECT_SOURCE` stops the service at startup. The local-
 provider configured) points at placeholder endpoints and cannot complete a sign-in; it never issues a
 session-id subject either.
 
----
+## WorkOS: stateless bearer verification
 
-## 3. WorkOS: stateless bearer access-token verification
+The WorkOS adapter (`@netscript/auth-workos`) provides `createWorkosAccessTokenAuthenticator` to
+verify stateless bearer JWTs issued by WorkOS. Use it when the client signs in through WorkOS
+AuthKit and NetScript only protects the API.
 
-The WorkOS adapter (`@netscript/auth-workos`) provides a dedicated `createWorkosAccessTokenAuthenticator` to verify stateless Bearer JWTs issued by WorkOS. This is ideal when the client handles sign-in through WorkOS AuthKit and NetScript only serves as a protected API gateway.
-
-### How it works
-1. **JWKS Verification**: The authenticator reads the `Authorization: Bearer <token>` header and fetches the WorkOS public keys (JWKS) from the key-set URL (`https://api.workos.com/sso/jwks/<clientId>`) to verify the signature. Keys are cached locally, and rotation is handled automatically (the JWKS client refreshes the cache when signature verification fails on an unknown key).
-2. **Audience & Issuer Claims**: It asserts that the token's audience (`aud`) matches the WorkOS `clientId` and that the issuer (`iss`) matches your WorkOS domain.
-3. **Principal Mapping**: It maps standard WorkOS JWT claims (`sub`, `org_id`, `role`, `roles`, `permissions`) to the neutral NetScript `Principal` (scheme `"custom"`).
-4. **Named Failure Outcomes**: Rejections are explicitly returned via `ok: false` with specific codes rather than thrown, allowing developers to handle missing versus malformed tokens differently.
+1. **JWKS verification.** The authenticator reads the `Authorization: Bearer <token>` header and
+   verifies the signature against the WorkOS public keys (JWKS) at
+   `https://api.workos.com/sso/jwks/<clientId>`. Keys are cached locally, and the JWKS client
+   refreshes the cache when verification meets an unknown key, so key rotation needs no action.
+2. **Audience and issuer.** It asserts that the token's audience (`aud`) matches the WorkOS
+   `clientId` and that the issuer (`iss`) matches your WorkOS domain.
+3. **Principal mapping.** It maps the WorkOS JWT claims `sub`, `org_id`, `role`, `roles` and
+   `permissions` to a neutral NetScript `Principal` with scheme `"custom"`.
+4. **Named failures.** Rejections come back as `ok: false` with a specific reason instead of a
+   thrown error, so you can handle a missing token differently from a malformed one.
 
 ```ts
 import { Hono } from "npm:hono@^4";
@@ -347,12 +362,11 @@ app.get("/api/protected", async (c) => {
 });
 ```
 
----
+## Next steps
 
-## Where to go next
+{{ comp.xref({ key: "cap:auth" }) }} maps the `auth-api` endpoints, database tables and environment
+variables that these adapters plug into.
 
-- {{ comp.xref({ key: "cap:auth" }) }} — Overview of endpoints, DB tables, and environment variables.
-- {{ comp.xref({ key: "explain:auth-model" }) }} — Deep dive into the pure-backend seam philosophy.
-- [Reference: auth-better-auth](/reference/auth-better-auth/) — Full API reference for better-auth.
-- [Reference: auth-kv-oauth](/reference/auth-kv-oauth/) — Full API reference for kv-oauth.
-- [Reference: auth-workos](/reference/auth-workos/) — Full API reference for WorkOS.
+- {{ comp.xref({ key: "explain:auth-model" }) }}: the backend-only port these lifecycles implement.
+- Generated reference: [auth-better-auth](/reference/auth-better-auth/),
+  [auth-kv-oauth](/reference/auth-kv-oauth/) and [auth-workos](/reference/auth-workos/).

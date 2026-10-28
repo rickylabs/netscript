@@ -9,20 +9,17 @@ order: 2
 
 # better-auth plugins
 
-[better-auth](https://www.better-auth.com/) ships its feature set as plugins — organizations,
-two-factor, API keys, bearer and JWT tokens, magic links, passkeys, and more. NetScript's
-better-auth backend mounts them through a single typed passthrough on `createNetscriptBetterAuth`,
-so you enable a plugin the same way you would in a standalone better-auth app while NetScript keeps
-ownership of the Prisma-backed database adapter.
-
-This page covers how to enable plugins, which ones run as-is, and the two prerequisites — database
-tables and interactive sign-in — that decide whether a given plugin is turnkey today.
+This page shows how to enable [better-auth](https://www.better-auth.com/) plugins on NetScript's
+better-auth backend, what each kind of plugin needs before it runs, and how to protect a route with
+the session it resolves. better-auth ships its features as plugins: organizations, two-factor, API
+keys, bearer and JWT tokens, magic links, passkeys and more. NetScript mounts them through a typed
+passthrough on `createNetscriptBetterAuth` and keeps ownership of the Prisma-backed database adapter.
 
 ## Enabling a plugin
 
 `createNetscriptBetterAuth` accepts a `plugins` array typed as better-auth's own
 `BetterAuthOptions["plugins"]`. Pass plugin instances exactly as better-auth documents them;
-NetScript forwards them into the underlying better-auth server while supplying the Prisma adapter
+NetScript forwards them into the underlying better-auth server and supplies the Prisma adapter
 itself.
 
 ```ts
@@ -45,47 +42,38 @@ const backend = createBetterAuthBackend({
 });
 ```
 
-For better-auth options that NetScript does not surface directly, use `betterAuthOptions` (typed as
-`Omit<BetterAuthOptions, "database" | "plugins">`). NetScript owns `database` through its Prisma
-adapter, and plugins use the dedicated `plugins` field, so both are excluded from that escape hatch.
+For better-auth options that NetScript does not surface directly, use `betterAuthOptions`, typed as
+`Omit<BetterAuthOptions, "database" | "plugins">`. Both keys are excluded because NetScript owns
+`database` through its Prisma adapter and plugins have the dedicated `plugins` field.
 
-When the `organization` plugin is enabled, the active-organization fields better-auth writes onto the
-session (`activeOrganizationId`, role, roles, and permissions) and the user's roles flow through
-NetScript's authenticator onto the `Principal` — its scopes, roles, and claims — so downstream
-services and pages can authorize on organization context without any extra wiring.
+With the `organization` plugin enabled, the active-organization fields better-auth writes onto the
+session (`activeOrganizationId`, role, roles and permissions) and the user's roles flow through
+NetScript's authenticator onto the `Principal` scopes, roles and claims. Downstream services and
+pages can authorize on organization context with no extra wiring.
 
-## What runs today, and what needs a prerequisite
+## Plugin prerequisites
 
-A plugin enabled through the passthrough type-checks and is mounted at the better-auth layer. Whether
-it is *runnable* depends on what the plugin needs at runtime.
+A plugin enabled through the passthrough type-checks and is mounted at the better-auth layer.
+Whether it runs depends on what it needs at runtime:
 
-### Stateless plugins run as-is
+| Plugins | What they need | Through NetScript |
+| --- | --- | --- |
+| `bearer`, `jwt` | No tables of their own. | Run as-is, with no further setup. |
+| `organization`, `twoFactor`, `admin`, `apiKey` | Their own database tables. | Run once you generate and apply those tables with your database and Prisma tools; `netscript db` does not generate them. |
+| Interactive plugins, such as magic links and passkeys | better-auth's own handlers to drive sign-in. | NetScript verifies the session cookie they establish. Its `signin` and `callback` endpoints return `AUTH_PROVIDER_ERROR` on this backend. |
 
-`bearer` and `jwt` add no tables of their own. They run through the passthrough alone, with no
-further setup.
-
-### Table-backed plugins need a schema migration
-
-{{ comp callout { type: "important", title: "Manual Schema Integration Boundary" } }}
-Database schema management for table-backed plugins (`organization`, `twoFactor`, `admin`, `apiKey`) is currently decoupled from NetScript's automatic scaffolding. This boundary exists because automated schema discovery for dynamic third-party extensions requires a dedicated CLI integration step. Today, you must generate and apply the required database tables manually using your primary database/Prisma tools. A unified `netscript db` scaffold integration that automates this step is tracked under roadmap item R1.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
-{{ /comp }}
 
-### Interactive plugins are driven by better-auth directly
-
-{{ comp callout { type: "note", title: "Session Verification Trust Boundary" } }}
-NetScript's Better-Auth backend adapter operates as a non-interactive session-verification layer, meaning core endpoints like `/signin` and `/callback` reject interactive flows with `AUTH_PROVIDER_ERROR`. This design boundary separates runtime verification from dynamic redirection flows to optimize session-validation path simplicity. Today, interactive authentication (such as magic links or passkeys) must be driven directly via Better-Auth's own handlers, leaving NetScript to verify the established session cookie. Implementing a first-class `InteractiveFlowPort` for the Better-Auth adapter is tracked under roadmap item R2.
-<!-- caveat: arch-debt:seamless-auth-roadmap -->
-{{ /comp }}
+[Operational session lifecycles](/identity-access/session-lifecycles/#better-auth-mounting-and-header-forwarding)
+shows how to mount better-auth's handler next to NetScript's verification.
 
 ## Protect a route with the resolved session
 
-`createBetterAuthBackend` returns an `AuthBackendPort`, and the piece a page or API route needs is
-`backend.sessions.getSession({ request })`: it validates the request's better-auth session cookie
-through `auth.api.getSession` and returns the normalized `AuthSession` (or `undefined`). Map that
-session to a `Principal` with `backend.principalMapper.mapSessionToPrincipal(session)` and you have
-the scopes and roles to authorize on. The example below gates a Fresh route on an **active** session
-and an `admin` role, failing closed on both.
+`createBetterAuthBackend` returns an `AuthBackendPort`. A page or API route needs
+`backend.sessions.getSession({ request })`, which validates the request's better-auth session cookie
+through `auth.api.getSession` and returns the normalized `AuthSession` or `undefined`. Map that
+session to a `Principal` with `backend.principalMapper.mapSessionToPrincipal(session)` to get the
+scopes and roles to authorize on. Create one shared backend instance for the app:
 
 ```ts
 // server/auth-backend.ts — one shared backend instance for the app
@@ -97,6 +85,8 @@ export const backend = createBetterAuthBackend({
   sessionTokenSecret: Deno.env.get('BETTER_AUTH_SECRET')!,
 });
 ```
+
+This Fresh route requires an **active** session and an `admin` role, and fails closed on both:
 
 ```tsx
 // routes/admin/index.tsx — a page that only an authenticated admin can load
@@ -149,38 +139,43 @@ export default define.page<typeof handler>(({ data }) => (
 ));
 ```
 
-Because `getSession` returns a typed `AuthSession | undefined` and the state check is explicit, the
-route cannot silently degrade to an anonymous render — the same fail-loud discipline the
-[authentication](/identity-access/auth/) page describes for the backend port. A machine-to-machine
-API route follows the identical shape: swap the redirect for `throw new HttpError(401)`.
+`getSession` returns a typed `AuthSession | undefined` and the state check is explicit, so the route
+cannot fall back to an anonymous render; the [authentication](/identity-access/auth/) page describes
+the same fail-loud rule for the backend port. A machine-to-machine API route has the same shape:
+replace the redirect with `throw new HttpError(401)`.
 
 ## Revocation and the cookie cache
 
 better-auth can keep a signed copy of the session in a `session_data` cookie
 (`session.cookieCache`) so its own reads skip the database. A revoked session's cache cookie stays
-valid until its `maxAge` (better-auth's default is 300 seconds).
+valid until its `maxAge`, which defaults to 300 seconds in better-auth.
 
-`@netscript/auth-better-auth` never trusts that cache: its authenticator and its
-`backend.sessions.getSession` pass `query: { disableCookieCache: true }`. That is better-auth's own
+`@netscript/auth-better-auth` never trusts that cache: its authenticator and
+`backend.sessions.getSession` pass `query: { disableCookieCache: true }`, which is better-auth's own
 guidance for sensitive reads. Through NetScript, a revoked session therefore stops authenticating on
 the next request, on every device, including after `signout { everywhere: true }` (which wraps
 better-auth's `api.revokeSessions`). The cost is one session-store read per NetScript
 authentication, the same as running better-auth without the cookie cache.
 
-The residual window is outside NetScript. better-auth's own `/api/auth/*` endpoints and its client
-helpers still honor a cached `session_data` cookie until `maxAge`. The NetScript signout response
-also does not expire the caller's better-auth cookies. The auth service forwards backend
-`Set-Cookie` headers from interactive sign-out flows, but better-auth's `revokeSessions` sets none,
-and better-auth has no interactive sign-out port through which they would arrive. If your app
-reads sessions from better-auth directly for a sensitive decision, pass `disableCookieCache` there
-too, or keep `session.cookieCache.maxAge` short.
+> [!CAUTION]
+> Outside NetScript, a revoked session can stay valid until `maxAge`. better-auth's own
+> `/api/auth/*` endpoints and client helpers still honor a cached `session_data` cookie, and the
+> NetScript signout response does not expire the caller's better-auth cookies. If your app reads
+> sessions from better-auth directly for a sensitive decision, pass `disableCookieCache` there too,
+> or keep `session.cookieCache.maxAge` short.
 
-## Where to go next
+The signout response carries no better-auth cookies because better-auth's `revokeSessions` sets
+none, and better-auth has no interactive sign-out port through which they would arrive. The auth
+service forwards backend `Set-Cookie` headers only from interactive sign-out flows.
 
-- {{ comp.xref({ key: "explain:auth-model" }) }} — how Principals, sessions, and backends fit
-  together.
-- {{ comp.xref({ key: "cap:auth" }) }} — the authentication capability overview.
-- [Reference: auth-better-auth](/reference/auth-better-auth/) — generated symbols for every export
+## Next steps
+
+[Operational session lifecycles](/identity-access/session-lifecycles/) shows how to mount
+better-auth's handler and forward refreshed session headers.
+
+- {{ comp.xref({ key: "explain:auth-model" }) }}: how Principals, sessions and backends fit together.
+- {{ comp.xref({ key: "cap:auth" }) }}: the authentication capability overview.
+- [Reference: auth-better-auth](/reference/auth-better-auth/): generated symbols for every export
   shown here.
 
 {{ comp.nextPrev({ prev: { label: "Authentication", href: "/identity-access/auth/" }, next: { label: "Session lifecycles", href: "/identity-access/session-lifecycles/" } }) }}
