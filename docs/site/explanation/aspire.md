@@ -9,67 +9,57 @@ order: 7
 
 # Orchestration with Aspire
 
-A NetScript app is never one process. This essay explains *why* it needs an orchestrator at
-all, *how* the orchestrator's resource graph is generated from your plugins rather than
-hand-wired, and *what* a single `aspire start` actually stands up — so you can reason about the
-running system instead of treating it as a black box.
+This page explains why a NetScript app needs an orchestrator, how Aspire generates the resource
+graph from your plugins instead of having you hand-wire it, and what one `aspire start` stands up.
+With that model, you can reason about the running system instead of treating it as a black box.
 
 {{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The Aspire AppHost resource graph: appsettings.json and plugin contributions feed createNetScriptAppHost, which registers infrastructure (Postgres, Redis), services, plugin APIs, and background processors, with cross-references resolved into injected environment variables, all observed by the dashboard at :18888.", caption: "One `aspire start` derives a coherent resource graph from your plugins, resolves the wiring between resources, and surfaces the whole thing in a dashboard." }) }}
 
-## Why an orchestrator at all
+## Why an orchestrator
 
-Picture what "run my app locally" really means for a multi-plugin NetScript project. It is not a
-single server. It is a small fleet:
+Running a multi-plugin NetScript project locally means running a small fleet, not one server:
 
 - An example oRPC **service** (`defineService`) on its assigned port.
 - A **Fresh** dashboard app.
-- Each runtime plugin's **HTTP API** — `workers-api`, `sagas-api`,
-  `triggers-api`, `auth-api` (on their assigned high-range ports), the durable-`streams` runtime (on its assigned port).
-- Each plugin's **isolated background processors** — the workers and sagas runners, the triggers
-  processor — running as separate executables, not threads inside the API.
-- The **infrastructure** all of those depend on: a database — Postgres (the recommended engine; or `mysql` /
-  `mssql` / `sqlite` via `--db`) — and a shared cache —
-  `redis` by default, or `garnet` / `deno-kv` via `--cache-backend`.
+- Each runtime plugin's **HTTP API**: `workers-api`, `sagas-api`, `triggers-api`, and `auth-api`
+  on their assigned high-range ports, plus the durable-`streams` runtime on its assigned port.
+- Each plugin's **isolated background processors**: the workers and sagas runners and the triggers
+  processor. They run as separate executables, not as threads inside the API.
+- The **infrastructure** they all depend on: a database (Postgres is the recommended engine;
+  `mysql`, `mssql`, or `sqlite` via `--db`) and a shared cache (`redis` by default, or `garnet` or
+  `deno-kv` via `--cache-backend`).
 
-Standing that up by hand is the integration tax: start each process in dependency order, hand
-each one the right connection strings, teach each one where its neighbours live, and tear it all
-down cleanly afterwards. Do it wrong and you get the classic distributed-dev failure modes — a
-service that races ahead of its database, a processor pointed at the wrong cache, a plugin that
-cannot find the sibling it calls. Removing exactly that tax is the whole reason the framework
-adopts an orchestrator.
+Standing that up by hand is the integration tax. You start each process in dependency order, hand
+each one its connection strings, tell each one where its neighbours live, and tear it all down
+afterwards. Get it wrong and you meet the usual distributed-dev failures: a service that starts
+before its database, a processor pointed at the wrong cache, a plugin that cannot find the sibling
+it calls. The framework adopts an orchestrator to remove that tax.
 
-{{ comp callout { type: "note", title: "The key insight" } }}
-The unit of a NetScript app is the <strong>resource graph</strong>, not the process. Each plugin
-brings an HTTP service <em>and</em> its own isolated background workers <em>and</em> its
-infrastructure needs. <a href="https://aspire.dev">Aspire</a> lets you declare that graph once and
-boot it as a coherent whole, with the wiring between nodes already resolved — that is what an
-orchestrator buys you that a pile of <code>deno task</code> scripts never will.
+The unit of a NetScript app is the **resource graph**, not the process. Each plugin brings an HTTP
+service, its own isolated background workers, and its infrastructure needs.
+[Aspire](https://aspire.dev) lets you declare that graph once and boot it as a whole. Aspire
+computes the wiring (the database URL the `users` service needs, the cache endpoint the workers
+runtime needs, the cross-reference one plugin holds to another) and injects it as environment
+variables, so no process has to discover its neighbours at runtime.
+
+{{ comp callout { type: "important", title: "Start Aspire before any database command" } }}
+The workflow is <strong>scaffold → orchestrate → database</strong>. After
+<code>netscript init</code>, run <code>cd aspire &amp;&amp; aspire restore</code> once, then
+<code>aspire start</code>. That command provisions your database (Postgres is the recommended engine,
+or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> via <code>--db</code> at
+<code>init</code>) and Redis through Docker, and brings up every service. <strong>Only then</strong>
+do <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> work, because
+they provision and migrate the database <em>through</em> the running AppHost. With no Aspire up,
+a db command fails: there is no Postgres for it to reach. See
+<a href="{{ "cap:database" |> xref }}">Database</a> and the
+<a href="{{ "cli:reference" |> xref }}">CLI reference</a> for the full sequence.
 {{ /comp }}
 
-**Aspire is the conductor.** You describe the desired graph; a single command stands the whole
-thing up with the wiring resolved. The database URL the `users` service needs, the cache endpoint
-the workers runtime needs, the cross-reference one plugin holds to another — Aspire computes them
-and injects them as environment variables, so no process has to discover its neighbours at
-runtime.
+## The generated AppHost
 
-{{ comp callout { type: "important", title: "Aspire is step 2 — before any database command" } }}
-The canonical workflow is <strong>scaffold → orchestrate → database</strong>. After
-<code>netscript init</code>, you run <code>cd aspire &amp;&amp; aspire restore</code> once, then
-<code>aspire start</code>. That command provisions your database (Postgres is the recommended engine, or
-<code>mysql</code> / <code>mssql</code> / <code>sqlite</code> via <code>--db</code> at <code>init</code>) and Redis through Docker and brings up
-every service. <strong>Only then</strong> do <code>netscript db init</code>,
-<code>db generate</code>, and <code>db seed</code> work — because those commands provision and
-migrate the database <em>through</em> the running AppHost. Run a db command with no Aspire up and
-it fails: there is no Postgres for it to talk to. See {{ comp.xref({ key: "cap:database", text: "Database" }) }}
-and the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }} for the full sequence.
-{{ /comp }}
-
-## The AppHost: a generated TypeScript program
-
-The heart of orchestration is the **AppHost** — a small TypeScript/Node program scaffolded into
-the `aspire/` subfolder at `aspire/apphost.mts`. It is the entry point `aspire start` executes. It
-is deliberately tiny: it builds an Aspire builder, hands it your project's `appsettings.json`,
-and runs the resulting graph.
+The **AppHost** is a small TypeScript/Node program scaffolded at `aspire/apphost.mts`, and it is the
+entry point `aspire start` executes. It builds an Aspire builder, hands it your project's
+`appsettings.json`, and runs the resulting graph.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -84,48 +74,43 @@ and runs the resulting graph.
   }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Current 13.5.3 scaffold pins" } }}
+{{ comp callout { type: "note", title: "Scaffold version pins" } }}
 The current <code>netscript init</code> scaffold emits <code>13.5.3</code> for
 <code>sdk.version</code>, <code>Aspire.Hosting.PostgreSQL</code>, and
 <code>Aspire.Hosting.Redis</code>. It emits <code>Aspire.Hosting.Browsers</code> at
 <code>13.5.3-preview.1.26425.3</code>. The CLI and AppHost SDK must stay on the same release train.
 {{ /comp }}
 
-{{ comp callout { type: "important", title: "Dashboard and OTLP ports are ephemeral, not pinned" } }}
-The generated <code>https</code> profile asks Kestrel for <strong>ephemeral ports</strong> —
-<code>applicationUrl</code>, the OTLP endpoint, and the resource-service endpoint are all
-<code>localhost:0</code>, so Aspire binds a free port per run instead of hard-pinning the
-dashboard to <code>:18888</code> or the collector to <code>:4318</code>. Two consequences: (1)
-<strong>trust the URL <code>aspire start</code> prints</strong>, not a memorized port — the
-examples in this essay use <code>:18888</code>/<code>:4318</code> as the conventional Aspire
-defaults, but your run may differ; (2) <code>aspire start --isolated</code> configures
-randomized ports and isolated user secrets, so several apphosts can run without colliding on the
-default dashboard port (the host ports of container resources, however, are not guaranteed unique
-across isolated starts without explicit port configuration). Point telemetry backends at the
-endpoint the run reports, or set <code>ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL</code> yourself to
-fix it.
+{{ comp callout { type: "important", title: "Dashboard and OTLP ports are ephemeral" } }}
+The generated <code>https</code> profile sets <code>applicationUrl</code>, the OTLP endpoint, and
+the resource-service endpoint to <code>localhost:0</code>, so Aspire binds a free port on each run
+instead of pinning the dashboard to <code>:18888</code> or the collector to <code>:4318</code>.
+<strong>Trust the URL <code>aspire start</code> prints</strong>, not a memorized port; this page uses
+<code>:18888</code> and <code>:4318</code> as the conventional Aspire defaults, but your run may
+differ. <code>aspire start --isolated</code> also randomizes ports and isolates user secrets, so
+several AppHosts can run without colliding on the default dashboard port. Container host ports are
+not guaranteed unique across isolated starts without explicit port configuration. Point telemetry
+backends at the endpoint the run reports, or set <code>ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL</code>
+yourself to fix it.
 {{ /comp }}
 
-Two facts about the AppHost are worth internalizing because they contradict assumptions people
-carry from Aspire's .NET AppHost:
+Two facts about the AppHost contradict what people expect from Aspire's .NET AppHost:
 
-1. **It uses an isolated TypeScript/Node runtime.** `aspire.config.json` declares `language: "typescript/nodejs"`
-   and `appHost.path: "apphost.mts"`. The AppHost runs on an isolated Node.js runtime inside
-   `aspire/` (with its own `package.json` and `.aspire/` SDK modules) precisely so that the Node
-   dependency graph never leaks into the Deno workspace at the project root. You author NetScript
-   in Deno; Aspire orchestrates it from a sealed-off Node corner.
-2. **The graph is derived, not hand-written.** You do not edit `apphost.mts` to add a service. You
-   declare infrastructure, services, plugins, and processors in `appsettings.json`, and each
-   plugin contributes its own resources programmatically. `createNetScriptAppHost` reads the
-   config, runs the contributions, and registers each resulting resource. The next section is the
-   important one: it explains *how* that derivation works.
+- **It uses an isolated TypeScript/Node runtime.** `aspire.config.json` declares
+  `language: "typescript/nodejs"` and `appHost.path: "apphost.mts"`. The AppHost runs on its own
+  Node.js runtime inside `aspire/`, with its own `package.json` and `.aspire/` SDK modules, so the
+  Node dependency graph never leaks into the Deno workspace at the project root. You author
+  NetScript in Deno and write no C#.
+- **The graph is derived, not hand-written.** You do not edit `apphost.mts` to add a service. You
+  declare infrastructure, services, plugins, and processors in `appsettings.json`, and each plugin
+  contributes its own resources programmatically. `createNetScriptAppHost` reads the config, runs
+  the contributions, and registers each resulting resource.
 
-## How the graph is generated from your plugins
+## Plugin contributions
 
-This is the part that makes Aspire feel like *part of the framework* rather than a bolted-on tool:
-**you never enumerate processes by hand.** A NetScript plugin can declare an Aspire
-*contribution*, and the AppHost asks every installed plugin to contribute its own slice of the
-graph. The contract lives in `@netscript/aspire` and is deliberately small.
+You never list processes by hand. A NetScript plugin can declare an Aspire *contribution*, and the
+AppHost asks every installed plugin to contribute its own slice of the graph. The contract lives in
+`@netscript/aspire` and is deliberately small.
 
 A plugin's contribution extends `AspireNSPluginContribution`. It names itself and, given a builder
 and a context, returns the resources it wants in the graph:
@@ -149,111 +134,52 @@ class WorkersContribution extends AspireNSPluginContribution {
 }
 ```
 
-Health probes come from scaffold capability and `healthEndpoint` metadata. The unused
-`declareHealthChecks` hook was removed in 0.0.8; see the
-[child health contract](/orchestration-runtime/child-health/) for the vocabulary and migration.
+Health probes come from scaffold capability and `healthEndpoint` metadata; the
+[child health contract](/orchestration-runtime/child-health/) defines the vocabulary.
 
-The host side composes those contributions. `composeAppHost` walks the plugin manifests, finds the
-ones that declare an `aspire` contribution, instantiates each, and collects the resources:
+On the host side, `composeAppHost({ builder, context, plugins })` walks the plugin manifests, finds
+the ones that declare an `aspire` contribution, instantiates each, and returns the collected
+`resources` together with a `ContributionRegistry` keyed by `pluginName`. A duplicate plugin name
+throws `DuplicateContributionError`, so the graph is checked for duplicates.
 
-```ts
-// How the AppHost composes plugin contributions into a builder
-import { AspireTypeScriptBuilder } from "@netscript/aspire/adapters";
-import {
-  composeAppHost,
-  type AspireBuilder,
-  type AspireResource,
-  type ComposePluginManifest,
-  type ContributionContext,
-} from "@netscript/aspire/application";
-import { AspireNSPluginContribution } from "@netscript/aspire/public";
+Use `@netscript/aspire/application` when you author focused composition modules. When an
+application or plugin prefers one entrypoint for all configuration, composition, type, and testing
+exports, `@netscript/aspire/public` is the supported production aggregate
+(`import { composeAppHost } from "@netscript/aspire/public"`). The root export `@netscript/aspire`
+is reserved for diagnostics (`inspectAspire`). `@netscript/aspire/schema` also generates a JSON
+Schema for editor validation of `appsettings.json`; see the
+[Aspire reference]({{ "ref:aspire" |> xref }}).
 
-class WorkersContribution extends AspireNSPluginContribution {
-  readonly pluginName = "@netscript/plugin-workers";
-
-  contribute(_builder: AspireBuilder, _ctx: ContributionContext): readonly AspireResource[] {
-    return [{ name: "workers-service", kind: "deno-service", port: 8080 }];
-  }
-}
-
-const builder = new AspireTypeScriptBuilder();
-const context: ContributionContext = {
-  projectRoot: Deno.cwd(),
-  port: (_key, fallback = 8080) => fallback,
-  env: (source) => (typeof source === "string" ? source : source.kind === "literal" ? source.value : "configured"),
-  resource: () => undefined,
-  manifest: { name: "apphost" },
-};
-const plugins: readonly ComposePluginManifest[] = [
-  {
-    name: "@netscript/plugin-workers",
-    contributions: { aspire: WorkersContribution },
-  },
-];
-
-const { resources, registry } = composeAppHost({
-  builder,
-  context,
-  plugins,
-});
-// `registry` is a ContributionRegistry keyed by pluginName; a duplicate
-// plugin name throws DuplicateContributionError — the graph is dedup-checked.
-```
-
-Use `@netscript/aspire/application` when authoring focused composition modules. When an application or plugin prefers a single entrypoint for all configuration, composition, type, and testing exports, `@netscript/aspire/public` is the supported production aggregate export (`import { composeAppHost } from "@netscript/aspire/public"`). Note that the root export `@netscript/aspire` is reserved strictly for diagnostics (`inspectAspire`).
-
-### Editor schema validation workflow
-
-To enable editor validation and autocompletion for `appsettings.json`, `@netscript/aspire/schema` (also re-exported by `@netscript/aspire/public`) provides `generateAppSettingsJsonSchema`:
-
-```ts
-import { generateAppSettingsJsonSchema } from "@netscript/aspire/schema";
-
-// Generates a draft-7 JSON Schema derived directly from Zod AppSettingsSchema
-const jsonSchema = generateAppSettingsJsonSchema();
-await Deno.writeTextFile("./.vscode/appsettings.schema.json", JSON.stringify(jsonSchema, null, 2));
-```
-
-The shape of each node the contributions produce is deliberately narrow — every resource is one of
-a small, closed set of kinds:
+Every resource a contribution returns has one of a small, closed set of kinds:
 
 {{ comp.apiTable({
   caption: "AspireResource — what a plugin contribution returns",
   rows: [
     { name: "name", type: "string", desc: "Resource name in the AppHost graph (the label you see in the dashboard)." },
-    { name: "kind", type: "AspireResourceKind", desc: "One of: deno-service, deno-background, container, database, cache. The closed set keeps the graph reasoned-about." },
+    { name: "kind", type: "AspireResourceKind", desc: "One of: deno-service, deno-background, container, database, cache. The closed set keeps the graph easy to reason about." },
     { name: "port", type: "number?", desc: "TCP port the resource exposes, when applicable (services and plugin APIs; containers and processors may omit it)." },
     { name: "metadata", type: "Record<string, unknown>?", desc: "Adapter-specific extras the builder backend understands." }
   ]
 }) }}
 
-So the AppHost is *generated*, but not in a "code-spitting templates" sense. It is generated in the
-stronger sense that the graph is **assembled at boot from the plugins you installed**. Add the
-sagas plugin and its `sagas-api` plus its supervisor processor appear; remove it and they vanish —
-no edit to `apphost.mts` required. The scaffold writes a thin `register-*.mts` helper layer
-(`register-infrastructure.mts`, `register-services.mts`, `register-plugins.mts`,
-`register-background.mts`, `register-apps.mts`, `register-tools.mts`) so each resource class lands
-through the same `builder.addExecutable(...)` path with permissions, working directory, HTTP
-endpoint, and OTEL environment resolved from config — but the *content* of the graph comes from
-your plugin set.
+So the AppHost is *generated* in a strong sense: the graph is **assembled at boot from the plugins
+you installed**. Add the sagas plugin and its `sagas-api` and supervisor processor appear; remove it
+and they disappear, with no edit to `apphost.mts`. The scaffold writes a thin `register-*.mts`
+helper layer (`register-infrastructure.mts`, `register-services.mts`, `register-plugins.mts`,
+`register-background.mts`, `register-apps.mts`, `register-tools.mts`) so that each resource class
+goes through the same `builder.addExecutable(...)` path, with permissions, working directory, HTTP
+endpoint, and OTEL environment resolved from config. The *content* of the graph still comes from
+your plugin set. This is the orchestration side of
+[the plugin system]({{ "explain:plugin-system" |> xref }}): the plugin that registers routes, a
+schema slice, and background work also declares how it appears in the resource graph.
 
-{{ comp callout { type: "note", title: "Where this connects" } }}
-This is the orchestration face of the plugin model. The same plugin that registers routes, a
-schema slice, and background work (see {{ comp.xref({ key: "explain:plugin-system", text: "the plugin system" }) }})
-also declares how it appears in the resource graph. One install, one removal — the whole stack,
-infrastructure included, follows.
-{{ /comp }}
+## Service discovery
 
-## Service discovery: how resources find each other
-
-Declaring resources is half the job; the other half is *wiring* them. A plugin API may need a
-sibling plugin's HTTP endpoint; a service may depend on another service; a processor may need the
-database and the cache. NetScript expresses those needs as **references** on the config entry, and
-Aspire resolves them into injected environment variables so each process starts with its
-neighbours' addresses already present.
-
-The reference vocabulary is small and explicit. `@netscript/aspire` extracts three kinds of
-dependency from each entry:
+Resources also need *wiring*. A plugin API may call a sibling plugin's HTTP endpoint, a service may
+depend on another service, and a processor may need the database and the cache. NetScript expresses
+those needs as **references** on the config entry, and Aspire resolves them into injected
+environment variables, so each process starts with its neighbours' addresses already set.
+`@netscript/aspire` extracts these dependencies from each entry:
 
 {{ comp.apiTable({
   caption: "Reference fields on a resource entry (resolved at compose time)",
@@ -265,32 +191,32 @@ dependency from each entry:
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Services now declare references too" } }}
-Every resource entry — <code>ServiceEntry</code> included — extends the same
-<code>ReferenceEntry</code>, so a <strong>service</strong> is no longer excluded from
-plugin-reference wiring: it can carry <code>PluginReferences</code> and reach a plugin API over the
-injected <code>services__&lt;plugin&gt;__http__0</code> variable, exactly as apps and background
-processors do. You express this in <code>netscript.config.ts</code> on the service's own section,
-where two fields resolve into the generated <code>appsettings.json</code> entry:
+{{ comp callout { type: "note", title: "Services declare references too" } }}
+Every resource entry, <code>ServiceEntry</code> included, extends the same
+<code>ReferenceEntry</code>. A <strong>service</strong> can therefore carry
+<code>PluginReferences</code> and reach a plugin API through the injected
+<code>services__&lt;plugin&gt;__http__0</code> variable, as apps and background processors do. Set
+this in <code>netscript.config.ts</code> on the service's own section, where two fields resolve into
+the generated <code>appsettings.json</code> entry:
 <ul>
-<li><code>pluginReferences: string[]</code> — plugin APIs this service calls (lowers to
-<code>PluginReferences</code>). This is the field that closes the earlier "a Service can't declare
-<code>PluginReferences</code>" gap.</li>
-<li><code>dependsOn: string[]</code> — sibling services this service waits on (lowers to the
-resource's <code>ServiceReferences</code>, driving both discovery wiring and start ordering).</li>
+<li><code>pluginReferences: string[]</code>: plugin APIs this service calls (lowers to
+<code>PluginReferences</code>).</li>
+<li><code>dependsOn: string[]</code>: sibling services this service waits on (lowers to the
+resource's <code>ServiceReferences</code>, which drives both discovery wiring and start
+ordering).</li>
 </ul>
-See {{ comp.xref({ key: "howto:discover-services", text: "Discover services" }) }} for the
-two-pass resolution these fields feed, and {{ comp.xref({ key: "ref:config", text: "the config reference" }) }}
-for the full service-section schema.
+See <a href="{{ "howto:discover-services" |> xref }}">Discover services</a> for the two-pass
+resolution these fields feed, and <a href="{{ "ref:config" |> xref }}">the config reference</a> for
+the full service-section schema.
 {{ /comp }}
 
-Because endpoints only exist once resources are created, the wiring happens in **two passes**:
-first every resource is created, then a second pass resolves each reference against the now-known
-graph and injects it. In the generated builder that resolution lands as the equivalent of
-`getEndpoint('http')` plus `withEnvironment(...)` for cross-references, and the database/cache
-connection strings for the `RequiresDb`/`RequiresKv` flags. By the time a process's entry point
-runs, the URLs it needs are in `Deno.env` — it never has to "discover" anything at runtime, which
-is exactly why there is no service-registry client in your handler code.
+Endpoints only exist once resources are created, so the wiring happens in **two passes**. The first
+pass creates every resource; the second resolves each reference against the now-known graph and
+injects it. In the generated builder, that resolution is the equivalent of `getEndpoint('http')`
+plus `withEnvironment(...)` for cross-references, and the database and cache connection strings for
+the `RequiresDb` and `RequiresKv` flags. By the time a process's entry point runs, the URLs it needs
+are in `Deno.env`. It never discovers anything at runtime, which is why your handler code has no
+service-registry client.
 
 ```text
                           aspire start  (from aspire/)
@@ -317,10 +243,10 @@ is exactly why there is no service-registry client in your handler code.
     └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-The order is not arbitrary. Infrastructure comes up first because everything else depends on it;
-references are resolved only after the resources they point at exist. The full port map for every
-runtime resource is consolidated under {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }} —
-treat that as canonical and this essay as the orientation.
+Infrastructure comes up first because everything else depends on it, and references resolve only
+after the resources they point at exist. The full port map for every runtime resource is in
+[the Aspire reference]({{ "ref:aspire" |> xref }}); treat it as canonical and this page as
+orientation.
 
 {{ comp.apiTable({
   caption: "The resource graph a single `aspire start` brings up",
@@ -338,17 +264,12 @@ treat that as canonical and this essay as the orientation.
   ]
 }) }}
 
-Each of these capabilities has its own hub: {{ comp.xref({ key: "cap:services", text: "Services" }) }},
-{{ comp.xref({ key: "cap:background-jobs", text: "Background jobs" }) }}, and
-{{ comp.xref({ key: "cap:database", text: "Database" }) }} are the practical pages behind the
-graph nodes above.
+## Customizing the AppHost
 
-## Customizing the generated AppHost: restart, regenerate, or hand-edit
-
-Once the graph is running, the recurring question is *which change needs which action*. Because the
-`register-*.mts` helper layer is **generated from `netscript.config.ts`/`appsettings.json`**, most
-edits are a config change plus a regenerate, not a hand-edit of the AppHost. The regenerate command
-is `netscript service generate` — it rewrites only the Aspire helper files, never your service code.
+Once the graph runs, the recurring question is which change needs which action. The `register-*.mts`
+helper layer is **generated from `netscript.config.ts` and `appsettings.json`**, so most edits are a
+config change plus a regenerate, not a hand-edit of the AppHost. The regenerate command is
+`netscript service generate`; it rewrites only the Aspire helper files, never your service code.
 
 {{ comp.apiTable({
   caption: "Which change needs which action",
@@ -361,29 +282,28 @@ is `netscript service generate` — it rewrites only the Aspire helper files, ne
   ]
 }) }}
 
-{{ comp callout { type: "warning", title: "The register-*.mts files are regenerated — express config, don't hand-edit" } }}
+{{ comp callout { type: "warning", title: "The register-*.mts files are regenerated" } }}
 The scaffolded <code>register-infrastructure.mts</code>, <code>register-services.mts</code>,
 <code>register-plugins.mts</code>, <code>register-background.mts</code>, <code>register-apps.mts</code>,
 and <code>register-tools.mts</code> carry a generated header and are <strong>overwritten by the next
-<code>netscript service generate</code></strong>. Anything you can express as config survives regen:
-per resource, <code>Env</code>, <code>Permissions</code>, <code>Port</code>, and <code>Workdir</code>
-are all declarable in <code>netscript.config.ts</code>/<code>appsettings.json</code> — reach for those
-first. When a wire genuinely is not config-expressible yet (an MCP-over-HTTP endpoint, a bespoke
-cross-resource reference), there is <strong>no automatic preserve mechanism today</strong>: tag the
-change <code>// HAND-EDITED (keep on regen)</code> and re-apply it after each generate. Prefer moving
-the need into config so the hand-edit disappears.
+<code>netscript service generate</code></strong>. Anything you express as config survives
+regeneration: per resource, <code>Env</code>, <code>Permissions</code>, <code>Port</code>, and
+<code>Workdir</code> are all declarable in <code>netscript.config.ts</code> or
+<code>appsettings.json</code>, so reach for those first. When a wire cannot be expressed as config
+yet (an MCP-over-HTTP endpoint, a bespoke cross-resource reference), there is <strong>no automatic
+preserve mechanism</strong>: tag the change <code>// HAND-EDITED (keep on regen)</code> and re-apply
+it after each generate. Prefer moving the need into config so the hand-edit disappears.
 {{ /comp }}
 
-### Native database drivers need launch permissions
+### Launch permissions for native drivers
 
-A resource's permission flags are set **at launch**, and they are separate from the per-task
-permissions you tighten *inside* a worker (those are covered in
-{{ comp.xref({ key: "howto:restrict-worker-task-permissions", text: "Restrict worker task permissions" }) }}).
-This matters when a plugin loads a **native (FFI) database driver** — for example the native
+A resource's permission flags are set **at launch**. They are separate from the per-task permissions
+you tighten *inside* a worker, which
+[Restrict worker task permissions]({{ "howto:restrict-worker-task-permissions" |> xref }}) covers.
+Launch permissions matter when a plugin loads a **native (FFI) database driver**, such as the native
 libSQL/Turso client the workers runtime can use for per-channel storage. Without FFI access the
-process crashes at import with `NotCapable: Requires ffi access`. The workers **background
-processor** therefore launches with an explicit permission set that includes `--allow-ffi` (and
-`--allow-sys`):
+process crashes at import with `NotCapable: Requires ffi access`, so the workers **background
+processor** launches with an explicit permission set that includes `--allow-ffi` and `--allow-sys`:
 
 ```ts
 // plugins/workers/src/aspire/workers-contribution.ts — the background launch set
@@ -399,41 +319,38 @@ const WORKERS_BACKGROUND_PERMISSIONS = [
 ] as const;
 ```
 
-If you author a plugin or service that pulls in a native driver, give its resource the matching
-`--allow-ffi` (and any `--allow-sys`) flag through its contribution's launch permissions — a missing
-flag surfaces only at runtime as an FFI capability crash, not at generate time.
+If your plugin or service pulls in a native driver, give its resource the matching `--allow-ffi`
+(and any `--allow-sys`) flag through its contribution's launch permissions. A missing flag shows up
+only at runtime as an FFI capability crash, not at generate time.
 
-## The dashboard: the local observability surface
+## The dashboard
 
 When `aspire start` finishes booting, it prints a URL and a one-time login token for the dashboard
-at `https://localhost:18888`. The dashboard is the single pane of glass over the running graph:
+at `https://localhost:18888`. The dashboard covers the whole running graph:
 
-- **Resources** — every container and executable above, with status, endpoints, and environment.
-- **Console logs** — stdout/stderr per resource, so a failing background processor is one click
-  away rather than buried in a terminal.
-- **Structured logs and traces** — aspire starts an OTLP collector at `http://localhost:4318`, and
-  the spans and structured logs your handlers emit land here, correlated by `traceparent`, so a
-  request that fans out across services is a single trace rather than scattered log lines.
+- **Resources**: every container and executable above, with status, endpoints, and environment.
+- **Console logs**: stdout and stderr per resource, so a failing background processor is one click
+  away instead of buried in a terminal.
+- **Structured logs and traces**: Aspire starts an OTLP collector at `http://localhost:4318`. The
+  spans and structured logs your handlers emit land here, correlated by `traceparent`, so a request
+  that fans out across services is one trace instead of scattered log lines.
 
-This is where the orchestration story and the {{ comp.xref({ key: "explain:observability", text: "observability" }) }}
-story meet. Aspire already knows the topology — every resource and its OTEL environment — so it can
-stitch telemetry into that topology for free. Concretely, each resource is started with its
-`OTEL_SERVICE_NAME` and an `OTEL_EXPORTER_OTLP_ENDPOINT` pointed at the dashboard collector
-(`http://localhost:4318`, `http/protobuf`), so job dispatch, job execution, scheduler runs, and
-subprocess task continuation all emit real OpenTelemetry spans that surface here with **no extra
-wiring** — the trace context propagates into worker subprocesses over W3C `traceparent`.
+Aspire already knows the topology, every resource and its OTEL environment, so it can attach
+telemetry to that topology. Each resource starts with its `OTEL_SERVICE_NAME` and an
+`OTEL_EXPORTER_OTLP_ENDPOINT` pointed at the dashboard collector (`http://localhost:4318`,
+`http/protobuf`). Job dispatch, job execution, scheduler runs, and subprocess task continuation
+therefore emit OpenTelemetry spans that appear here with **no extra wiring**, and the trace context
+reaches worker subprocesses over W3C `traceparent`. Inside a handler, the scaffold's
+`createJobTools(ctx)` helpers add events, progress, and child spans to the active job trace.
+[Observability]({{ "explain:observability" |> xref }}) covers the full framework-and-handler trace
+path.
 
-Inside a handler, the scaffold's <code>createJobTools(ctx)</code> helpers add events, progress, and
-child spans to the active job trace. See
-{{ comp.xref({ key: "explain:observability", text: "Observability" }) }} for the full
-framework-and-handler trace path.
+## HTTP/2 and TLS
 
-## HTTP/2 and TLS: opt-in today
-
-NetScript service listeners serve **plaintext HTTP/1.1 by default**, and that default is unchanged.
-HTTP/2 is available but strictly **opt-in via TLS**: `Deno.serve` negotiates h2 over ALPN the moment
-the listener has a certificate and key, so the way to get HTTP/2 is to hand the service TLS material.
-There are two ways to do that, and both flip the listener banner from `http` to `https`:
+NetScript service listeners serve **plaintext HTTP/1.1 by default**. HTTP/2 is **opt-in through
+TLS**: `Deno.serve` negotiates h2 over ALPN as soon as the listener has a certificate and key, so
+you get HTTP/2 by giving the service TLS material. Both ways below switch the listener banner from
+`http` to `https`:
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -448,25 +365,22 @@ There are two ways to do that, and both flip the listener banner from `http` to 
   }
 ] }) }}
 
-{{ comp callout { type: "important", title: "Plaintext HTTP/1.1 is still the default" } }}
-Opting into TLS does not change the default path: with no <code>tls</code> option and no
-<code>NETSCRIPT_TLS_CERT_FILE</code>/<code>NETSCRIPT_TLS_KEY_FILE</code> pair, the listener is
-byte-for-byte the same plain HTTP/1.1 server. That has one consequence worth knowing: browsers cap
-HTTP/1.1 at roughly <strong>six concurrent connections per origin</strong>, which SSE and durable
-streams can exhaust — the fix is to adopt HTTP/2 per service by enabling TLS as above. Automatic
-Aspire dev-certificate provisioning and a default flip to HTTP/2 are still on the roadmap, so today
-this remains a deliberate opt-in. See {{ comp.xref({ key: "cap:streams", text: "Durable streams" }) }}
-for the connection-cap caveat and {{ comp.xref({ key: "ref:service", text: "the service reference" }) }}
-for <code>ServiceTlsOptions</code> and <code>ServeOptions.tls</code>.
+{{ comp callout { type: "important", title: "Plaintext HTTP/1.1 is the default" } }}
+With no <code>tls</code> option and no <code>NETSCRIPT_TLS_CERT_FILE</code>/<code>NETSCRIPT_TLS_KEY_FILE</code>
+pair, the listener is the same plain HTTP/1.1 server. Browsers cap HTTP/1.1 at roughly
+<strong>six concurrent connections per origin</strong>, which SSE and durable streams can exhaust.
+Enable TLS on that service, as shown above, to move it to HTTP/2. See
+<a href="{{ "cap:streams" |> xref }}">Durable streams</a> for the connection-cap caveat and
+<a href="{{ "ref:service" |> xref }}">the service reference</a> for <code>ServiceTlsOptions</code>
+and <code>ServeOptions.tls</code>.
 {{ /comp }}
 
 ## The `--no-aspire` escape hatch
 
-Aspire is the default and the recommended local path, but it is not mandatory. The `init` command
-takes a `--no-aspire` flag (`netscript init my-app --no-aspire`) that **skips scaffolding the
-orchestration layer entirely**: no `aspire/` folder, no AppHost to provision infrastructure, no
-dashboard. You start the generated Deno processes directly and provide your own infrastructure
-connection strings.
+Aspire is the default and recommended local path, but it is not mandatory. `netscript init` takes a
+`--no-aspire` flag (`netscript init my-app --no-aspire`) that **skips the orchestration layer
+entirely**: no `aspire/` folder, no AppHost to provision infrastructure, and no dashboard. You start
+the generated Deno processes yourself and provide your own infrastructure connection strings.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -482,77 +396,52 @@ connection strings.
 ] }) }}
 
 {{ comp callout { type: "warning", title: "What you lose when you opt out" } }}
-<code>--no-aspire</code> trades convenience for control. Without the orchestration layer there is
-<strong>no AppHost</strong> (<code>aspire/apphost.mts</code> is not generated), <strong>no automatic
-Postgres/Redis provisioning</strong>, <strong>no dashboard</strong> at <code>:18888</code>, and
-<strong>no automatic cross-process wiring</strong> — you become responsible for handing every
-process its connection strings and its neighbours' endpoints by hand. The <code>netscript db</code>
-commands lose the AppHost they provision through, so the database workflow becomes your
-responsibility against your own database URL.
+Without the orchestration layer there is <strong>no AppHost</strong> (<code>aspire/apphost.mts</code>
+is not generated), <strong>no automatic Postgres/Redis provisioning</strong>, <strong>no
+dashboard</strong> at <code>:18888</code>, and <strong>no automatic cross-process wiring</strong>.
+You hand every process its connection strings and its neighbours' endpoints yourself. The
+<code>netscript db</code> commands lose the AppHost they provision through, so the database
+workflow runs against your own database URL.
 {{ /comp }}
 
-**When opting out is the right call:**
+### When to opt out
 
 - **A deploy target that does its own orchestration.** Kubernetes, Nomad, a managed PaaS, or a
-  Docker Compose file you already maintain — the platform owns process lifecycle and service
-  discovery, so a second orchestrator on top is redundant. This is the primary production case.
+  Docker Compose file you already maintain owns process lifecycle and service discovery, so a second
+  orchestrator on top is redundant. This is the main production case.
 - **A constrained or air-gapped environment.** No Docker daemon, or a policy against running the
-  Node AppHost runtime. You run Deno processes directly against externally-managed infrastructure.
+  Node AppHost runtime. You run Deno processes directly against externally managed infrastructure.
 - **A single-purpose slice.** You only want the Fresh app, or one service, with no database or
-  cache — the full graph would be overhead.
+  cache, and the full graph would be overhead.
 
 For local development of a full multi-plugin app, opting out is almost always the wrong trade: you
-would be hand-rebuilding exactly the wiring the contributions generate for free.
+would rebuild by hand the wiring the contributions generate.
 
-## What Aspire does and does not cover for production
+## Aspire in production
 
-Choosing Aspire as the default is an opinion, and this essay states its boundaries.
-
-**Aspire is the local-development orchestration story.** Its job is to make `git clone` →
-`aspire start` produce a complete, observable, correctly-wired stack on one machine. It excels at
-that. What it deliberately does **not** try to be:
+**Aspire is the local-development orchestrator.** Its job is to turn `git clone` → `aspire start`
+into a complete, observable, correctly wired stack on one machine. It is deliberately **not**:
 
 - **A production deployment system.** The AppHost provisions Postgres and Redis as local Docker
-  containers for dev convenience. It is not your production database, not your production cache,
-  and not a cluster scheduler. In production you point processes at managed/clustered
-  infrastructure and let your platform own lifecycle and scaling.
-- **A replacement for your orchestrator of record.** The same resource model that is a gift on a
-  laptop is redundant under Kubernetes or a PaaS that already does discovery, health, and restarts.
-  That is precisely why `--no-aspire` is a first-class exit, not an afterthought.
+  containers for development. They are not your production database or cache, and the AppHost is
+  not a cluster scheduler. In production, point processes at managed or clustered infrastructure
+  and let your platform own lifecycle and scaling.
+- **A replacement for your orchestrator of record.** Under Kubernetes or a PaaS that already
+  handles discovery, health, and restarts, the same resource model is redundant. That is why
+  `--no-aspire` is a first-class exit.
 
-The remaining trade-offs of the default path:
+The default path has three more trade-offs:
 
-- **A second runtime in the tree.** The AppHost is Node/TypeScript while your app is Deno — a
-  deliberate isolation so the two dependency graphs never contaminate each other, at the cost of
-  "what runtime is this?" having two answers in one repo.
-- **Docker is a hard dependency of the happy path.** No Docker daemon means the default workflow
-  does not start — which is exactly when `--no-aspire` plus your own infrastructure earns its place.
+- **A second runtime in the tree.** The AppHost is Node/TypeScript while your app is Deno. The
+  isolation keeps the two dependency graphs apart, at the cost of two answers to "what runtime is
+  this?" in one repo.
+- **Docker is a hard dependency of the happy path.** Without a Docker daemon the default workflow
+  does not start; that is when `--no-aspire` plus your own infrastructure earns its place.
 - **The wiring is implicit.** The two-pass reference resolution is invisible at authoring time, so
-  inspect generated environment variables and the resource graph when debugging service discovery.
+  inspect the generated environment variables and the resource graph when you debug service
+  discovery.
 
-## Glossary
-
-- **AppHost** — the program that defines and runs an Aspire resource graph. In NetScript it is the
-  generated TypeScript `aspire/apphost.mts`, configured by `aspire.config.json`.
-- **Contribution** — a plugin's declaration of the resources it adds to the graph, expressed by
-  extending `AspireNSPluginContribution` and returning `AspireResource[]` from `contribute(...)`.
-- **Resource** — any node Aspire manages: a `container` (Postgres, Redis), a `database`, a
-  `cache`, a `deno-service`, or a `deno-background` processor.
-- **OTLP** — the OpenTelemetry protocol endpoint (`http://localhost:4318`) aspire starts so the
-  dashboard can collect the spans and structured logs your handlers emit.
-
-## Where to go next
-
-- **Understand the surrounding model:** {{ comp.xref({ key: "explain:architecture", text: "Architecture" }) }}
-  for how the pieces fit, and {{ comp.xref({ key: "explain:plugin-system", text: "The plugin system" }) }}
-  for the contribution model that feeds the graph.
-- **Do the practical work:** {{ comp.xref({ key: "cap:database", text: "Database" }) }},
-  {{ comp.xref({ key: "cap:services", text: "Services" }) }}, and
-  {{ comp.xref({ key: "cap:background-jobs", text: "Background jobs" }) }} are the hubs behind the
-  graph nodes.
-- **Look up exact symbols and the full port map:** {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }}
-  and the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }}.
-- **Related:** {{ comp.xref({ key: "explain:observability", text: "Observability" }) }} explains the
-  spans and logs the dashboard at `:18888` collects.
+Next: [Deploy locally with Aspire]({{ "howto:deploy-local-aspire" |> xref }}) walks through the full
+local flow step by step.
 
 {{ comp.nextPrev({ prev: { label: "Observability", href: "/explanation/observability/" }, next: { label: "How NetScript's path compares", href: "/explanation/compared/" } }) }}
