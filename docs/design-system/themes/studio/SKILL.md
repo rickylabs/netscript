@@ -10,10 +10,12 @@ full specification. This file is the working procedure. Cross-theme rules are in
 `docs/design-system/GUIDELINES.md` (shipped as the `netscript-design` skill).
 
 > **Utility is the NetScript default theme**, and the docs site is the first product to use it. It
-> is monochrome and sharp, with one red mark. It has 0–2px radii; 1px hairlines (#e0e0e0 / #313131,
-> row rules #f0f0f0 / #2a2a2a); gray-9 field boundaries (#8d8d8d / #6e6e6e, ≥ 3:1); a 6px ink square
-> location marker and a 2px ink selected-row bar; a 2px ink focus ring with a 2px gap; **red only in
-> the logo (#DA291C / #E5332A) and in errors**; a Medium title and Regular KPI numerals at −2.5%;
+> has monochrome, sharp chrome with one red mark, and content in semantic colour (status tones on
+> callouts, badges and notices; syntax colours in code; coloured API kind tags). It has 0–2px radii;
+> 1px hairlines (#e0e0e0 / #313131, row rules #f0f0f0 / #2a2a2a); gray-9 field boundaries (#8d8d8d /
+> #6e6e6e, ≥ 3:1); a 6px ink square location marker and a 2px ink selected-row bar; a 2px ink focus
+> ring with a 2px gap; **red only in the logo (#DA291C / #E5332A) and in the destructive tone**
+> (errors, destructive actions, CAUTION callouts); a Medium title and Regular KPI numerals at −2.5%;
 > Fragment Mono for eyebrows, IDs and column heads; 1.5px icons; file-path and `data-*` chips.
 > Values and roles are in `DESIGN.md` → front matter and _Flavors_ → Utility.
 
@@ -56,7 +58,11 @@ Seven flavors share one component anatomy. Signature moves:
   rings are ink in light and gray in dark (flavor `ring/*`). NEVER let a wrapper or a rounded
   container clip a ring or glyphs.
 - Utility only:
-  - NEVER use red except the logo (`--ns-studio-signal-brand`) and errors (`--ns-destructive*`).
+  - NEVER use red except the logo (`--ns-studio-signal-brand`) and the destructive tone
+    (`--ns-destructive*`: errors, destructive actions, CAUTION callouts).
+  - NEVER drop the tone from a callout, alert, notice or status badge, or ship highlighted code
+    without its syntax colours (`--ns-code-syntax-*`). Plain-text fences stay unhighlighted. Neutral
+    identifiers, module and namespace kinds and neutral badges stay `fg`.
   - MUST stay sharp, with radii 0–2px, and keep separations quiet: 1px gray-5 structural hairlines
     and quiet row rules, no 2px ink rules, no underline tabs, no shadows.
   - MUST mark location with the 6px ink square (`--ns-studio-signal-marker`, slot reserved) and
@@ -114,8 +120,10 @@ Seven flavors share one component anatomy. Signature moves:
 - [ ] Text ≥ 4.5:1; input, checkbox and switch boundaries and focus ≥ 3:1. Measured on pixels.
 - [ ] Every shadow follows the flavor's depth recipe (only Cloud and Workshop have shadows).
 - [ ] Whole-pixel rules; bound paints seeded with their resolved colour (Figma).
-- [ ] Utility only: red appears in the logo and error states only; hairlines are gray 5 / row rules
-      quiet; location and selection are ink; no 2px black rules, underline tabs or JetBrains Mono.
+- [ ] Utility only: red appears in the logo and the destructive tone only; callouts, notices and
+      status badges carry their tone; highlighted code has syntax colours; hairlines are gray 5 /
+      row rules quiet; location and selection are ink; no 2px black rules, underline tabs or
+      JetBrains Mono.
 
 ## References
 
