@@ -1307,10 +1307,657 @@
         "Signal": 1,
         "Tonal": 1,
         "Glass": 1,
-        "Brutal": 1,
+        "Brutal": 2,
         "Fluent": 1,
         "Tactile": 1,
         "Pixel": 1
+      }
+    },
+    {
+      "name": "brand/d/default",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-brand-d-default)",
+      "description": "Dark source for Scheme brand/default. Studio: Studio flavor/signal/d/brand; other themes: accent/d/solid.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/signal/d/brand"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/d/solid"
+        }
+      }
+    },
+    {
+      "name": "brand/d/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-brand-d-fg)",
+      "description": "Dark source for Scheme brand/fg. Studio: Studio flavor/primary/d/fg; other themes: accent/d/solid-fg.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/primary/d/fg"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/d/solid-fg"
+        }
+      }
+    },
+    {
+      "name": "brand/l/default",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-brand-l-default)",
+      "description": "Light source for Scheme brand/default. Studio: Studio flavor/signal/l/brand; other themes: accent/l/solid.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/signal/l/brand"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Signal": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Glass": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/l/solid"
+        }
+      }
+    },
+    {
+      "name": "brand/l/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-brand-l-fg)",
+      "description": "Light source for Scheme brand/fg. Studio: Studio flavor/primary/l/fg; other themes: accent/l/contrast.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/primary/l/fg"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Signal": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Glass": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/l/contrast"
+        }
+      }
+    },
+    {
+      "name": "card/border-bottom",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-card-border-bottom)",
+      "description": "Card bottom border width. Studio: Studio flavor card/border-bottom; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/card/border-bottom"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "card/border-side",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-card-border-side)",
+      "description": "Card left and right border width. Studio: Studio flavor card/border-side; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/card/border-side"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "card/border-top",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-card-border-top)",
+      "description": "Card top border width. Studio: Studio flavor card/border-top; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/card/border-top"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "card/d/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-d-border)",
+      "description": "Dark source for Scheme card/border. Studio: Studio flavor/card/d/border; other themes: border/d/default.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/card/d/border"
+        },
+        "Ledger": {
+          "alias": "Theme/border/d/default"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/d/default"
+        },
+        "Signal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Tonal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Glass": {
+          "alias": "Theme/border/d/default"
+        },
+        "Brutal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Fluent": {
+          "alias": "Theme/border/d/default"
+        },
+        "Tactile": {
+          "alias": "Theme/border/d/default"
+        },
+        "Pixel": {
+          "alias": "Theme/border/d/default"
+        }
+      }
+    },
+    {
+      "name": "card/d/footer",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-d-footer)",
+      "description": "Dark source for Scheme card/footer. Studio: Studio flavor/card/d/footer; other themes: tone/d/muted.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/card/d/footer"
+        },
+        "Ledger": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Filigrane": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Signal": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Tonal": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Glass": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Brutal": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Fluent": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Tactile": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Pixel": {
+          "alias": "Theme/tone/d/muted"
+        }
+      }
+    },
+    {
+      "name": "card/l/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-l-border)",
+      "description": "Light source for Scheme card/border. Studio: Studio flavor/card/l/border; other themes: border/l/default.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/card/l/border"
+        },
+        "Ledger": {
+          "alias": "Theme/border/l/default"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/l/default"
+        },
+        "Signal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Tonal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Glass": {
+          "alias": "Theme/border/l/default"
+        },
+        "Brutal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Fluent": {
+          "alias": "Theme/border/l/default"
+        },
+        "Tactile": {
+          "alias": "Theme/border/l/default"
+        },
+        "Pixel": {
+          "alias": "Theme/border/l/default"
+        }
+      }
+    },
+    {
+      "name": "card/l/footer",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-l-footer)",
+      "description": "Light source for Scheme card/footer. Studio: Studio flavor/card/l/footer; other themes: tone/l/muted.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/card/l/footer"
+        },
+        "Ledger": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Filigrane": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Signal": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Tonal": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Glass": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Brutal": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Fluent": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Tactile": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Pixel": {
+          "alias": "Theme/tone/l/muted"
+        }
+      }
+    },
+    {
+      "name": "deco/blockbars",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-deco-blockbars)",
+      "description": "Shows block-bar decorations. Studio: Studio flavor deco/blockbars; other themes: false.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/deco/blockbars"
+        },
+        "Ledger": false,
+        "Filigrane": false,
+        "Signal": false,
+        "Tonal": false,
+        "Glass": false,
+        "Brutal": false,
+        "Fluent": false,
+        "Tactile": false,
+        "Pixel": false
+      }
+    },
+    {
+      "name": "deco/marker",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-deco-marker)",
+      "description": "Shows the 6px location marker (Tabs, Nav item, Navigation menu). Studio: Studio flavor deco/marker; other themes: false.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/deco/marker"
+        },
+        "Ledger": false,
+        "Filigrane": false,
+        "Signal": false,
+        "Tonal": false,
+        "Glass": false,
+        "Brutal": false,
+        "Fluent": false,
+        "Tactile": false,
+        "Pixel": false
+      }
+    },
+    {
+      "name": "deco/sparkline",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-deco-sparkline)",
+      "description": "Shows stat-card sparklines. Studio: Studio flavor deco/sparkline; other themes: false.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/deco/sparkline"
+        },
+        "Ledger": false,
+        "Filigrane": false,
+        "Signal": false,
+        "Tonal": false,
+        "Glass": false,
+        "Brutal": false,
+        "Fluent": false,
+        "Tactile": false,
+        "Pixel": false
+      }
+    },
+    {
+      "name": "deco/ticks",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-deco-ticks)",
+      "description": "Shows tick decorations. Studio: Studio flavor deco/ticks; other themes: false.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/deco/ticks"
+        },
+        "Ledger": false,
+        "Filigrane": false,
+        "Signal": false,
+        "Tonal": false,
+        "Glass": false,
+        "Brutal": false,
+        "Fluent": false,
+        "Tactile": false,
+        "Pixel": false
+      }
+    },
+    {
+      "name": "effect/d/control-shadow",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-effect-d-control-shadow)",
+      "description": "Dark source for Scheme effect/control-shadow. Studio: Studio flavor/button/d/shadow; other themes: shadow/d/color.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/button/d/shadow"
+        },
+        "Ledger": {
+          "alias": "Theme/shadow/d/color"
+        },
+        "Filigrane": {
+          "alias": "Theme/shadow/d/color"
+        },
+        "Signal": {
+          "alias": "Theme/shadow/d/color"
+        },
+        "Tonal": {
+          "alias": "Theme/shadow/d/color"
+        },
+        "Glass": {
+          "alias": "Theme/shadow/d/color"
+        },
+        "Brutal": {
+          "alias": "Theme/shadow/d/color"
+        },
+        "Fluent": {
+          "alias": "Theme/shadow/d/color"
+        },
+        "Tactile": {
+          "alias": "Theme/shadow/d/color"
+        },
+        "Pixel": {
+          "alias": "Theme/shadow/d/color"
+        }
+      }
+    },
+    {
+      "name": "effect/l/control-shadow",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-effect-l-control-shadow)",
+      "description": "Light source for Scheme effect/control-shadow. Studio: Studio flavor/button/l/shadow; other themes: shadow/l/color.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/button/l/shadow"
+        },
+        "Ledger": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "Filigrane": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "Signal": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "Tonal": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "Glass": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "Brutal": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "Fluent": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "Tactile": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "Pixel": {
+          "alias": "Theme/shadow/l/color"
+        }
+      }
+    },
+    {
+      "name": "focus/ring-offset",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-focus-ring-offset)",
+      "description": "Gap between control and focus ring in px (drives code; Figma draws a literal 2).",
+      "values": {
+        "Studio": 2,
+        "Ledger": 2,
+        "Filigrane": 3,
+        "Signal": 2,
+        "Tonal": 2,
+        "Glass": 2,
+        "Brutal": 2,
+        "Fluent": 2,
+        "Tactile": 2,
+        "Pixel": 2
+      }
+    },
+    {
+      "name": "focus/ring-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-focus-ring-width)",
+      "description": "Focus ring stroke width in px.",
+      "values": {
+        "Studio": 2,
+        "Ledger": 2,
+        "Filigrane": 2,
+        "Signal": 2,
+        "Tonal": 2,
+        "Glass": 2,
+        "Brutal": 2,
+        "Fluent": 2,
+        "Tactile": 2,
+        "Pixel": 2
       }
     },
     {
@@ -1333,6 +1980,47 @@
         "Fluent": "Open Sans",
         "Tactile": "Nunito Sans",
         "Pixel": "JetBrains Mono"
+      }
+    },
+    {
+      "name": "font/eyebrow",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-eyebrow)",
+      "description": "Eyebrow family. Studio follows Studio flavor font/eyebrow; other themes use font/label.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/font/eyebrow"
+        },
+        "Ledger": {
+          "alias": "Theme/font/label"
+        },
+        "Filigrane": {
+          "alias": "Theme/font/label"
+        },
+        "Signal": {
+          "alias": "Theme/font/label"
+        },
+        "Tonal": {
+          "alias": "Theme/font/label"
+        },
+        "Glass": {
+          "alias": "Theme/font/label"
+        },
+        "Brutal": {
+          "alias": "Theme/font/label"
+        },
+        "Fluent": {
+          "alias": "Theme/font/label"
+        },
+        "Tactile": {
+          "alias": "Theme/font/label"
+        },
+        "Pixel": {
+          "alias": "Theme/font/label"
+        }
       }
     },
     {
@@ -1443,6 +2131,29 @@
         "Fluent": "Open Sans",
         "Tactile": "Nunito Sans",
         "Pixel": "Inter"
+      }
+    },
+    {
+      "name": "frame/inset",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-frame-inset)",
+      "description": "Outer inset around the app frame (floating top bar). Studio: Studio flavor frame/inset; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/frame/inset"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
       }
     },
     {
@@ -2404,6 +3115,107 @@
       }
     },
     {
+      "name": "hero/d/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-hero-d-bg)",
+      "description": "Dark source for Scheme hero/bg. Studio: Studio flavor/hero/d/bg; other themes: surface/d/canvas.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/hero/d/bg"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Glass": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/d/canvas"
+        }
+      }
+    },
+    {
+      "name": "hero/l/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-hero-l-bg)",
+      "description": "Light source for Scheme hero/bg. Studio: Studio flavor/hero/l/bg; other themes: surface/l/canvas.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/hero/l/bg"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Glass": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/l/canvas"
+        }
+      }
+    },
+    {
+      "name": "hero/pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-hero-pad)",
+      "description": "Hero inner padding. Studio: Studio flavor hero/pad; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/hero/pad"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
       "name": "hover/d",
       "type": "COLOR",
       "scopes": [
@@ -2484,6 +3296,29 @@
       }
     },
     {
+      "name": "icon/stroke",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-icon-stroke-width)",
+      "description": "Icon stroke width. Studio follows Studio flavor icon/stroke; 2 elsewhere.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/icon/stroke"
+        },
+        "Ledger": 2,
+        "Filigrane": 2,
+        "Signal": 2,
+        "Tonal": 2,
+        "Glass": 2,
+        "Brutal": 2,
+        "Fluent": 2,
+        "Tactile": 2,
+        "Pixel": 2
+      }
+    },
+    {
       "name": "ink/d",
       "type": "COLOR",
       "scopes": [],
@@ -2554,6 +3389,881 @@
         },
         "Pixel": {
           "alias": "Primitives/color/sand/l/12"
+        }
+      }
+    },
+    {
+      "name": "input/d",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-input-d)",
+      "description": "Dark source for Scheme border/input. Studio: Studio flavor input/d/border (gray 9 in Utility); other themes: gray/d/10.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/input/d/border"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/10"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/10"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/10"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/10"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/10"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/10"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/d/10"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/d/10"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/d/10"
+        }
+      }
+    },
+    {
+      "name": "input/l",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-input-l)",
+      "description": "Light source for Scheme border/input. Studio: Studio flavor input/l/border (gray 9 in Utility); other themes: gray/l/10.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/input/l/border"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Glass": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/l/10"
+        }
+      }
+    },
+    {
+      "name": "kpi/border-bottom",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-border-bottom)",
+      "description": "Stat card bottom border width. Studio: Studio flavor kpi/border-bottom; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/border-bottom"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "kpi/border-left",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-border-left)",
+      "description": "Stat card left border width. Studio: Studio flavor kpi/border-left; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/border-left"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "kpi/border-right",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-border-right)",
+      "description": "Stat card right border width. Studio: Studio flavor kpi/border-right; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/border-right"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "kpi/border-top",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-border-top)",
+      "description": "Stat card top border width. Studio: Studio flavor kpi/border-top; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/border-top"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/bg-1",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-bg-1)",
+      "description": "Dark source for Scheme kpi/bg-1. Studio: Studio flavor/kpi/d/bg-1; other themes: surface/d/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/d/bg-1"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/d/paper"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/bg-2",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-bg-2)",
+      "description": "Dark source for Scheme kpi/bg-2. Studio: Studio flavor/kpi/d/bg-2; other themes: surface/d/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/d/bg-2"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/d/paper"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/bg-3",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-bg-3)",
+      "description": "Dark source for Scheme kpi/bg-3. Studio: Studio flavor/kpi/d/bg-3; other themes: surface/d/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/d/bg-3"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/d/paper"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/bg-4",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-bg-4)",
+      "description": "Dark source for Scheme kpi/bg-4. Studio: Studio flavor/kpi/d/bg-4; other themes: surface/d/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/d/bg-4"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/d/paper"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-border)",
+      "description": "Dark source for Scheme kpi/border. Studio: Studio flavor/kpi/d/border; other themes: border/d/default.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/d/border"
+        },
+        "Ledger": {
+          "alias": "Theme/border/d/default"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/d/default"
+        },
+        "Signal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Tonal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Glass": {
+          "alias": "Theme/border/d/default"
+        },
+        "Brutal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Fluent": {
+          "alias": "Theme/border/d/default"
+        },
+        "Tactile": {
+          "alias": "Theme/border/d/default"
+        },
+        "Pixel": {
+          "alias": "Theme/border/d/default"
+        }
+      }
+    },
+    {
+      "name": "kpi/first-left",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-first-left)",
+      "description": "Left border width of the first stat card. Studio: Studio flavor kpi/first-left; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/first-left"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "kpi/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-kpi-gap)",
+      "description": "Gap between stat cards. Studio: Studio flavor kpi/gap; other themes: 16.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/gap"
+        },
+        "Ledger": 16,
+        "Filigrane": 16,
+        "Signal": 16,
+        "Tonal": 16,
+        "Glass": 16,
+        "Brutal": 16,
+        "Fluent": 16,
+        "Tactile": 16,
+        "Pixel": 16
+      }
+    },
+    {
+      "name": "kpi/l/bg-1",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-bg-1)",
+      "description": "Light source for Scheme kpi/bg-1. Studio: Studio flavor/kpi/l/bg-1; other themes: surface/l/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/l/bg-1"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/l/paper"
+        }
+      }
+    },
+    {
+      "name": "kpi/l/bg-2",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-bg-2)",
+      "description": "Light source for Scheme kpi/bg-2. Studio: Studio flavor/kpi/l/bg-2; other themes: surface/l/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/l/bg-2"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/l/paper"
+        }
+      }
+    },
+    {
+      "name": "kpi/l/bg-3",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-bg-3)",
+      "description": "Light source for Scheme kpi/bg-3. Studio: Studio flavor/kpi/l/bg-3; other themes: surface/l/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/l/bg-3"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/l/paper"
+        }
+      }
+    },
+    {
+      "name": "kpi/l/bg-4",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-bg-4)",
+      "description": "Light source for Scheme kpi/bg-4. Studio: Studio flavor/kpi/l/bg-4; other themes: surface/l/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/l/bg-4"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/l/paper"
+        }
+      }
+    },
+    {
+      "name": "kpi/l/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-border)",
+      "description": "Light source for Scheme kpi/border. Studio: Studio flavor/kpi/l/border; other themes: border/l/default.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/l/border"
+        },
+        "Ledger": {
+          "alias": "Theme/border/l/default"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/l/default"
+        },
+        "Signal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Tonal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Glass": {
+          "alias": "Theme/border/l/default"
+        },
+        "Brutal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Fluent": {
+          "alias": "Theme/border/l/default"
+        },
+        "Tactile": {
+          "alias": "Theme/border/l/default"
+        },
+        "Pixel": {
+          "alias": "Theme/border/l/default"
+        }
+      }
+    },
+    {
+      "name": "kpi/pad-x",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-kpi-pad-x)",
+      "description": "Stat card horizontal padding. Studio: Studio flavor kpi/pad-x; other themes: 20.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/kpi/pad-x"
+        },
+        "Ledger": 20,
+        "Filigrane": 20,
+        "Signal": 20,
+        "Tonal": 20,
+        "Glass": 20,
+        "Brutal": 20,
+        "Fluent": 20,
+        "Tactile": 20,
+        "Pixel": 20
+      }
+    },
+    {
+      "name": "link/d/underline",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-link-d-underline)",
+      "description": "Dark source for Scheme link/underline. Studio: Studio flavor/signal/d/underline; other themes: accent/d/11.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/signal/d/underline"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/d/11"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/11"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/11"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/d/11"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/11"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/11"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/d/11"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/d/11"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/d/11"
+        }
+      }
+    },
+    {
+      "name": "link/l/underline",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-link-l-underline)",
+      "description": "Light source for Scheme link/underline. Studio: Studio flavor/signal/l/underline; other themes: accent/l/11.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/signal/l/underline"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Signal": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Glass": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/l/11"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/l/11"
+        }
+      }
+    },
+    {
+      "name": "marker/d/default",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-marker-d-default)",
+      "description": "Dark source for Scheme marker/default. Studio: Studio flavor/signal/d/marker; other themes: accent/d/solid.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/signal/d/marker"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/d/solid"
+        }
+      }
+    },
+    {
+      "name": "marker/l/default",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-marker-l-default)",
+      "description": "Light source for Scheme marker/default. Studio: Studio flavor/signal/l/marker; other themes: accent/l/solid.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/signal/l/marker"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Signal": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Glass": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/l/solid"
         }
       }
     },
@@ -2850,6 +4560,249 @@
       }
     },
     {
+      "name": "nav/d/active",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-nav-d-active)",
+      "description": "Dark source for Scheme nav/active. Studio: Studio flavor/nav/d/active; other themes: selected/d.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/nav/d/active"
+        },
+        "Ledger": {
+          "alias": "Theme/selected/d"
+        },
+        "Filigrane": {
+          "alias": "Theme/selected/d"
+        },
+        "Signal": {
+          "alias": "Theme/selected/d"
+        },
+        "Tonal": {
+          "alias": "Theme/selected/d"
+        },
+        "Glass": {
+          "alias": "Theme/selected/d"
+        },
+        "Brutal": {
+          "alias": "Theme/selected/d"
+        },
+        "Fluent": {
+          "alias": "Theme/selected/d"
+        },
+        "Tactile": {
+          "alias": "Theme/selected/d"
+        },
+        "Pixel": {
+          "alias": "Theme/selected/d"
+        }
+      }
+    },
+    {
+      "name": "nav/l/active",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-nav-l-active)",
+      "description": "Light source for Scheme nav/active. Studio: Studio flavor/nav/l/active; other themes: selected/l.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/nav/l/active"
+        },
+        "Ledger": {
+          "alias": "Theme/selected/l"
+        },
+        "Filigrane": {
+          "alias": "Theme/selected/l"
+        },
+        "Signal": {
+          "alias": "Theme/selected/l"
+        },
+        "Tonal": {
+          "alias": "Theme/selected/l"
+        },
+        "Glass": {
+          "alias": "Theme/selected/l"
+        },
+        "Brutal": {
+          "alias": "Theme/selected/l"
+        },
+        "Fluent": {
+          "alias": "Theme/selected/l"
+        },
+        "Tactile": {
+          "alias": "Theme/selected/l"
+        },
+        "Pixel": {
+          "alias": "Theme/selected/l"
+        }
+      }
+    },
+    {
+      "name": "nav/pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-nav-pad)",
+      "description": "Extra sidebar padding around nav items. Studio: Studio flavor nav/pad; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/nav/pad"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "nav/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-nav-radius)",
+      "description": "Nav item radius. Studio: Studio flavor nav/radius; other themes: radius/control.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/nav/radius"
+        },
+        "Ledger": {
+          "alias": "Theme/radius/control"
+        },
+        "Filigrane": {
+          "alias": "Theme/radius/control"
+        },
+        "Signal": {
+          "alias": "Theme/radius/control"
+        },
+        "Tonal": {
+          "alias": "Theme/radius/control"
+        },
+        "Glass": {
+          "alias": "Theme/radius/control"
+        },
+        "Brutal": {
+          "alias": "Theme/radius/control"
+        },
+        "Fluent": {
+          "alias": "Theme/radius/control"
+        },
+        "Tactile": {
+          "alias": "Theme/radius/control"
+        },
+        "Pixel": {
+          "alias": "Theme/radius/control"
+        }
+      }
+    },
+    {
+      "name": "primary/d/stroke",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-primary-d-stroke)",
+      "description": "Dark source for Scheme primary/stroke. Studio: Studio flavor/primary/d/stroke; other themes: accent/d/solid.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/primary/d/stroke"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Glass": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/d/solid"
+        }
+      }
+    },
+    {
+      "name": "primary/l/stroke",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-primary-l-stroke)",
+      "description": "Light source for Scheme primary/stroke. Studio: Studio flavor/primary/l/stroke; other themes: accent/l/solid.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/primary/l/stroke"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Signal": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Glass": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/l/solid"
+        }
+      }
+    },
+    {
+      "name": "radius/avatar",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-avatar)",
+      "description": "Avatar radius. Studio: Studio flavor avatar/radius; other themes: 999 (Pixel and Filigrane 0).",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/avatar/radius"
+        },
+        "Ledger": 999,
+        "Filigrane": 0,
+        "Signal": 999,
+        "Tonal": 999,
+        "Glass": 999,
+        "Brutal": 999,
+        "Fluent": 999,
+        "Tactile": 999,
+        "Pixel": 0
+      }
+    },
+    {
       "name": "radius/badge",
       "type": "FLOAT",
       "scopes": [
@@ -2861,7 +4814,7 @@
           "alias": "Studio flavor/radius/badge"
         },
         "Ledger": 3,
-        "Filigrane": 999,
+        "Filigrane": 0,
         "Signal": 4,
         "Tonal": 8,
         "Glass": 999,
@@ -2883,13 +4836,36 @@
           "alias": "Studio flavor/radius/card"
         },
         "Ledger": 6,
-        "Filigrane": 16,
+        "Filigrane": 0,
         "Signal": 8,
         "Tonal": 16,
         "Glass": 22,
         "Brutal": 12,
         "Fluent": 8,
         "Tactile": 24,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "radius/checkbox",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-checkbox)",
+      "description": "Checkbox corner radius. Studio follows Studio flavor radius/checkbox.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/radius/checkbox"
+        },
+        "Ledger": 2,
+        "Filigrane": 0,
+        "Signal": 2,
+        "Tonal": 2,
+        "Glass": 999,
+        "Brutal": 4,
+        "Fluent": 4,
+        "Tactile": 8,
         "Pixel": 0
       }
     },
@@ -2905,7 +4881,7 @@
           "alias": "Studio flavor/radius/control"
         },
         "Ledger": 4,
-        "Filigrane": 999,
+        "Filigrane": 0,
         "Signal": 6,
         "Tonal": 999,
         "Glass": 999,
@@ -2927,7 +4903,7 @@
           "alias": "Studio flavor/radius/input"
         },
         "Ledger": 4,
-        "Filigrane": 10,
+        "Filigrane": 0,
         "Signal": 6,
         "Tonal": 4,
         "Glass": 10,
@@ -3000,6 +4976,84 @@
         "Tactile": "#1e7bff",
         "Pixel": {
           "alias": "Primitives/color/paper/d/1"
+        }
+      }
+    },
+    {
+      "name": "scrollbar/d/thumb",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-scrollbar-d-thumb)",
+      "description": "Dark source for Scheme scrollbar/thumb. Studio: Theme/gray/d/10; other themes: gray/d/8.",
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/d/10"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/d/8"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/d/8"
+        },
+        "Signal": {
+          "alias": "Theme/gray/d/8"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/d/8"
+        },
+        "Glass": {
+          "alias": "Theme/gray/d/8"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/d/8"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/d/8"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/d/8"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/d/8"
+        }
+      }
+    },
+    {
+      "name": "scrollbar/l/thumb",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-scrollbar-l-thumb)",
+      "description": "Light source for Scheme scrollbar/thumb. Studio: Theme/gray/l/10; other themes: gray/l/8.",
+      "values": {
+        "Studio": {
+          "alias": "Theme/gray/l/10"
+        },
+        "Ledger": {
+          "alias": "Theme/gray/l/8"
+        },
+        "Filigrane": {
+          "alias": "Theme/gray/l/8"
+        },
+        "Signal": {
+          "alias": "Theme/gray/l/8"
+        },
+        "Tonal": {
+          "alias": "Theme/gray/l/8"
+        },
+        "Glass": {
+          "alias": "Theme/gray/l/8"
+        },
+        "Brutal": {
+          "alias": "Theme/gray/l/8"
+        },
+        "Fluent": {
+          "alias": "Theme/gray/l/8"
+        },
+        "Tactile": {
+          "alias": "Theme/gray/l/8"
+        },
+        "Pixel": {
+          "alias": "Theme/gray/l/8"
         }
       }
     },
@@ -3105,6 +5159,52 @@
       }
     },
     {
+      "name": "shadow/control/x",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-control-x)",
+      "description": "Button shadow x offset. Studio follows Studio flavor button/shadow-x; Brutal 4.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/button/shadow-x"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 4,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "shadow/control/y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-control-y)",
+      "description": "Button shadow y offset. Studio follows Studio flavor button/shadow-y; Brutal 4.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/button/shadow-y"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 4,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
       "name": "shadow/d/color",
       "type": "COLOR",
       "scopes": [
@@ -3183,6 +5283,75 @@
       }
     },
     {
+      "name": "shadow/overlay/blur",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-overlay-blur)",
+      "description": "Floating-surface (popover, menu, toast) shadow blur.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/shadow/blur"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 8,
+        "Glass": 40,
+        "Brutal": 0,
+        "Fluent": 16,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "shadow/overlay/y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-overlay-y)",
+      "description": "Floating-surface (popover, menu, toast) shadow y offset.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/shadow/y"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 3,
+        "Glass": 16,
+        "Brutal": 0,
+        "Fluent": 8,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "shadow/x",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-x)",
+      "description": "Card shadow x offset. Studio follows Studio flavor shadow/x; Brutal 4; 0 elsewhere.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/shadow/x"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 4,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
       "name": "shadow/y",
       "type": "FLOAT",
       "scopes": [
@@ -3201,6 +5370,399 @@
         "Fluent": 2,
         "Tactile": 3,
         "Pixel": 0
+      }
+    },
+    {
+      "name": "size/avatar/lg",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-avatar-lg)",
+      "description": "Large avatar size in px.",
+      "values": {
+        "Studio": 40,
+        "Ledger": 40,
+        "Filigrane": 40,
+        "Signal": 40,
+        "Tonal": 40,
+        "Glass": 40,
+        "Brutal": 40,
+        "Fluent": 40,
+        "Tactile": 40,
+        "Pixel": 40
+      }
+    },
+    {
+      "name": "size/avatar/md",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-avatar-md)",
+      "description": "Default avatar size in px.",
+      "values": {
+        "Studio": 32,
+        "Ledger": 32,
+        "Filigrane": 32,
+        "Signal": 32,
+        "Tonal": 32,
+        "Glass": 32,
+        "Brutal": 32,
+        "Fluent": 32,
+        "Tactile": 32,
+        "Pixel": 32
+      }
+    },
+    {
+      "name": "size/avatar/sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-avatar-sm)",
+      "description": "Small avatar size in px.",
+      "values": {
+        "Studio": 24,
+        "Ledger": 24,
+        "Filigrane": 24,
+        "Signal": 24,
+        "Tonal": 24,
+        "Glass": 24,
+        "Brutal": 24,
+        "Fluent": 24,
+        "Tactile": 24,
+        "Pixel": 24
+      }
+    },
+    {
+      "name": "size/checkbox",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-checkbox)",
+      "description": "Checkbox and radio box size in px.",
+      "values": {
+        "Studio": 16,
+        "Ledger": 16,
+        "Filigrane": 16,
+        "Signal": 16,
+        "Tonal": 18,
+        "Glass": 20,
+        "Brutal": 22,
+        "Fluent": 20,
+        "Tactile": 28,
+        "Pixel": 20
+      }
+    },
+    {
+      "name": "size/icon/lg",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-icon-lg)",
+      "description": "Large icon box in px.",
+      "values": {
+        "Studio": 20,
+        "Ledger": 20,
+        "Filigrane": 20,
+        "Signal": 20,
+        "Tonal": 24,
+        "Glass": 20,
+        "Brutal": 20,
+        "Fluent": 24,
+        "Tactile": 20,
+        "Pixel": 20
+      }
+    },
+    {
+      "name": "size/icon/md",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-icon-md)",
+      "description": "Default icon box in px.",
+      "values": {
+        "Studio": 16,
+        "Ledger": 16,
+        "Filigrane": 16,
+        "Signal": 16,
+        "Tonal": 24,
+        "Glass": 16,
+        "Brutal": 16,
+        "Fluent": 20,
+        "Tactile": 16,
+        "Pixel": 16
+      }
+    },
+    {
+      "name": "size/icon/sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-icon-sm)",
+      "description": "Small icon box in px.",
+      "values": {
+        "Studio": 14,
+        "Ledger": 14,
+        "Filigrane": 14,
+        "Signal": 14,
+        "Tonal": 18,
+        "Glass": 14,
+        "Brutal": 14,
+        "Fluent": 16,
+        "Tactile": 14,
+        "Pixel": 14
+      }
+    },
+    {
+      "name": "size/kbd",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-kbd)",
+      "description": "Kbd key height and minimum width in px.",
+      "values": {
+        "Studio": 20,
+        "Ledger": 20,
+        "Filigrane": 20,
+        "Signal": 20,
+        "Tonal": 20,
+        "Glass": 20,
+        "Brutal": 20,
+        "Fluent": 20,
+        "Tactile": 20,
+        "Pixel": 20
+      }
+    },
+    {
+      "name": "size/switch/height",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-height)",
+      "description": "Switch track height in px.",
+      "values": {
+        "Studio": 18,
+        "Ledger": 18,
+        "Filigrane": 18,
+        "Signal": 18,
+        "Tonal": 32,
+        "Glass": 31,
+        "Brutal": 28,
+        "Fluent": 20,
+        "Tactile": 34,
+        "Pixel": 24
+      }
+    },
+    {
+      "name": "size/switch/height-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-height-sm)",
+      "description": "Switch track height in px for the sm size. Studio 16; themes that draw a single switch size alias their md value (size/switch/height).",
+      "values": {
+        "Studio": 16,
+        "Ledger": 16,
+        "Filigrane": 16,
+        "Signal": 16,
+        "Tonal": {
+          "alias": "Theme/size/switch/height"
+        },
+        "Glass": {
+          "alias": "Theme/size/switch/height"
+        },
+        "Brutal": {
+          "alias": "Theme/size/switch/height"
+        },
+        "Fluent": {
+          "alias": "Theme/size/switch/height"
+        },
+        "Tactile": {
+          "alias": "Theme/size/switch/height"
+        },
+        "Pixel": {
+          "alias": "Theme/size/switch/height"
+        }
+      }
+    },
+    {
+      "name": "size/switch/thumb",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-thumb)",
+      "description": "Switch thumb diameter in px.",
+      "values": {
+        "Studio": 14,
+        "Ledger": 14,
+        "Filigrane": 14,
+        "Signal": 14,
+        "Tonal": 24,
+        "Glass": 27,
+        "Brutal": 22,
+        "Fluent": 12,
+        "Tactile": 28,
+        "Pixel": 16
+      }
+    },
+    {
+      "name": "size/switch/thumb-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-thumb-sm)",
+      "description": "Switch thumb diameter in px for the sm size. Studio 12; themes that draw a single switch size alias their md value (size/switch/thumb).",
+      "values": {
+        "Studio": 12,
+        "Ledger": 12,
+        "Filigrane": 12,
+        "Signal": 12,
+        "Tonal": {
+          "alias": "Theme/size/switch/thumb"
+        },
+        "Glass": {
+          "alias": "Theme/size/switch/thumb"
+        },
+        "Brutal": {
+          "alias": "Theme/size/switch/thumb"
+        },
+        "Fluent": {
+          "alias": "Theme/size/switch/thumb"
+        },
+        "Tactile": {
+          "alias": "Theme/size/switch/thumb"
+        },
+        "Pixel": {
+          "alias": "Theme/size/switch/thumb"
+        }
+      }
+    },
+    {
+      "name": "size/switch/width",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-width)",
+      "description": "Switch track width in px.",
+      "values": {
+        "Studio": 32,
+        "Ledger": 32,
+        "Filigrane": 32,
+        "Signal": 32,
+        "Tonal": 52,
+        "Glass": 51,
+        "Brutal": 52,
+        "Fluent": 40,
+        "Tactile": 60,
+        "Pixel": 44
+      }
+    },
+    {
+      "name": "size/switch/width-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-width-sm)",
+      "description": "Switch track width in px for the sm size. Studio 28; themes that draw a single switch size alias their md value (size/switch/width).",
+      "values": {
+        "Studio": 28,
+        "Ledger": 28,
+        "Filigrane": 28,
+        "Signal": 28,
+        "Tonal": {
+          "alias": "Theme/size/switch/width"
+        },
+        "Glass": {
+          "alias": "Theme/size/switch/width"
+        },
+        "Brutal": {
+          "alias": "Theme/size/switch/width"
+        },
+        "Fluent": {
+          "alias": "Theme/size/switch/width"
+        },
+        "Tactile": {
+          "alias": "Theme/size/switch/width"
+        },
+        "Pixel": {
+          "alias": "Theme/size/switch/width"
+        }
+      }
+    },
+    {
+      "name": "state/disabled-opacity",
+      "type": "FLOAT",
+      "scopes": [
+        "OPACITY"
+      ],
+      "codeSyntax": "var(--ns-state-disabled-opacity)",
+      "description": "Disabled root opacity in percent (Figma opacity unit; CSS 0.38).",
+      "values": {
+        "Studio": 38,
+        "Ledger": 38,
+        "Filigrane": 38,
+        "Signal": 38,
+        "Tonal": 38,
+        "Glass": 38,
+        "Brutal": 38,
+        "Fluent": 38,
+        "Tactile": 38,
+        "Pixel": 38
+      }
+    },
+    {
+      "name": "state/hover-opacity",
+      "type": "FLOAT",
+      "scopes": [
+        "OPACITY"
+      ],
+      "codeSyntax": "var(--ns-state-hover-opacity)",
+      "description": "Hover state-layer opacity in percent (Figma opacity unit; CSS 0.08).",
+      "values": {
+        "Studio": 8,
+        "Ledger": 8,
+        "Filigrane": 8,
+        "Signal": 8,
+        "Tonal": 8,
+        "Glass": 8,
+        "Brutal": 8,
+        "Fluent": 8,
+        "Tactile": 8,
+        "Pixel": 8
+      }
+    },
+    {
+      "name": "state/pressed-opacity",
+      "type": "FLOAT",
+      "scopes": [
+        "OPACITY"
+      ],
+      "codeSyntax": "var(--ns-state-pressed-opacity)",
+      "description": "Pressed state-layer opacity in percent (Figma opacity unit; CSS 0.12).",
+      "values": {
+        "Studio": 12,
+        "Ledger": 12,
+        "Filigrane": 12,
+        "Signal": 12,
+        "Tonal": 12,
+        "Glass": 12,
+        "Brutal": 12,
+        "Fluent": 12,
+        "Tactile": 12,
+        "Pixel": 12
       }
     },
     {
@@ -3636,6 +6198,1336 @@
       }
     },
     {
+      "name": "switch/d/thumb",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-switch-d-thumb)",
+      "description": "Dark source for Scheme switch/thumb: #111113 in Glass, the primary/fg source of the same mode elsewhere.",
+      "values": {
+        "Studio": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Signal": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Glass": {
+          "alias": "Primitives/color/slate/d/1"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/d/solid-fg"
+        }
+      }
+    },
+    {
+      "name": "switch/l/thumb",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-switch-l-thumb)",
+      "description": "Light source for Scheme switch/thumb: white in Glass, the primary/fg source of the same mode elsewhere.",
+      "values": {
+        "Studio": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Ledger": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Filigrane": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Signal": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Tonal": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Glass": {
+          "alias": "Primitives/color/white"
+        },
+        "Brutal": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Fluent": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Tactile": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "Pixel": {
+          "alias": "Theme/accent/l/contrast"
+        }
+      }
+    },
+    {
+      "name": "table/cell-rule-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-table-cell-rule-width)",
+      "description": "Table vertical cell rule width. Studio: Studio flavor table/cell-rule; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/cell-rule"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "table/d/cell-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-cell-rule)",
+      "description": "Dark source for Scheme table/cell-rule. Studio: Studio flavor/table/d/cell-rule; other themes: border/d/subtle.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/d/cell-rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Signal": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Tonal": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Glass": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Brutal": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Fluent": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Tactile": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Pixel": {
+          "alias": "Theme/border/d/subtle"
+        }
+      }
+    },
+    {
+      "name": "table/d/head",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-head)",
+      "description": "Dark source for Scheme table/head. Studio: Studio flavor/table/d/head; other themes: tone/d/muted.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/d/head"
+        },
+        "Ledger": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Filigrane": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Signal": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Tonal": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Glass": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Brutal": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Fluent": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Tactile": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Pixel": {
+          "alias": "Theme/tone/d/muted"
+        }
+      }
+    },
+    {
+      "name": "table/d/head-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-head-rule)",
+      "description": "Dark source for Scheme table/head-rule. Studio: Studio flavor/table/d/head-rule; other themes: border/d/default.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/d/head-rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/d/default"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/d/default"
+        },
+        "Signal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Tonal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Glass": {
+          "alias": "Theme/border/d/default"
+        },
+        "Brutal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Fluent": {
+          "alias": "Theme/border/d/default"
+        },
+        "Tactile": {
+          "alias": "Theme/border/d/default"
+        },
+        "Pixel": {
+          "alias": "Theme/border/d/default"
+        }
+      }
+    },
+    {
+      "name": "table/d/hover",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-hover)",
+      "description": "Dark source for Scheme table/hover. Studio: Studio flavor/table/d/hover; other themes: hover/d.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/d/hover"
+        },
+        "Ledger": {
+          "alias": "Theme/hover/d"
+        },
+        "Filigrane": {
+          "alias": "Theme/hover/d"
+        },
+        "Signal": {
+          "alias": "Theme/hover/d"
+        },
+        "Tonal": {
+          "alias": "Theme/hover/d"
+        },
+        "Glass": {
+          "alias": "Theme/hover/d"
+        },
+        "Brutal": {
+          "alias": "Theme/hover/d"
+        },
+        "Fluent": {
+          "alias": "Theme/hover/d"
+        },
+        "Tactile": {
+          "alias": "Theme/hover/d"
+        },
+        "Pixel": {
+          "alias": "Theme/hover/d"
+        }
+      }
+    },
+    {
+      "name": "table/d/row-bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-row-bg)",
+      "description": "Dark source for Scheme table/row-bg. Studio: Studio flavor/table/d/row-bg; other themes: surface/d/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/d/row-bg"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/d/paper"
+        }
+      }
+    },
+    {
+      "name": "table/d/row-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-row-rule)",
+      "description": "Dark source for Scheme table/row-rule. Studio: Studio flavor/table/d/row-rule; other themes: border/d/subtle.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/d/row-rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Signal": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Tonal": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Glass": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Brutal": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Fluent": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Tactile": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Pixel": {
+          "alias": "Theme/border/d/subtle"
+        }
+      }
+    },
+    {
+      "name": "table/d/zebra",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-zebra)",
+      "description": "Dark source for Scheme table/zebra. Studio: Studio flavor/table/d/zebra; other themes: tone/d/sunken.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/d/zebra"
+        },
+        "Ledger": {
+          "alias": "Theme/tone/d/sunken"
+        },
+        "Filigrane": {
+          "alias": "Theme/tone/d/sunken"
+        },
+        "Signal": {
+          "alias": "Theme/tone/d/sunken"
+        },
+        "Tonal": {
+          "alias": "Theme/tone/d/sunken"
+        },
+        "Glass": {
+          "alias": "Theme/tone/d/sunken"
+        },
+        "Brutal": {
+          "alias": "Theme/tone/d/sunken"
+        },
+        "Fluent": {
+          "alias": "Theme/tone/d/sunken"
+        },
+        "Tactile": {
+          "alias": "Theme/tone/d/sunken"
+        },
+        "Pixel": {
+          "alias": "Theme/tone/d/sunken"
+        }
+      }
+    },
+    {
+      "name": "table/head-rule-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-table-head-rule-width)",
+      "description": "Table header rule width. Studio: Studio flavor table/head-rule; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/head-rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "table/inset",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-table-inset)",
+      "description": "Table body inset (pill-row tables). Studio: Studio flavor table/inset; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/inset"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "table/l/cell-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-cell-rule)",
+      "description": "Light source for Scheme table/cell-rule. Studio: Studio flavor/table/l/cell-rule; other themes: border/l/subtle.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/l/cell-rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Signal": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Tonal": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Glass": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Brutal": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Fluent": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Tactile": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Pixel": {
+          "alias": "Theme/border/l/subtle"
+        }
+      }
+    },
+    {
+      "name": "table/l/head",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-head)",
+      "description": "Light source for Scheme table/head. Studio: Studio flavor/table/l/head; other themes: tone/l/muted.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/l/head"
+        },
+        "Ledger": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Filigrane": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Signal": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Tonal": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Glass": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Brutal": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Fluent": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Tactile": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Pixel": {
+          "alias": "Theme/tone/l/muted"
+        }
+      }
+    },
+    {
+      "name": "table/l/head-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-head-rule)",
+      "description": "Light source for Scheme table/head-rule. Studio: Studio flavor/table/l/head-rule; other themes: border/l/default.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/l/head-rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/l/default"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/l/default"
+        },
+        "Signal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Tonal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Glass": {
+          "alias": "Theme/border/l/default"
+        },
+        "Brutal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Fluent": {
+          "alias": "Theme/border/l/default"
+        },
+        "Tactile": {
+          "alias": "Theme/border/l/default"
+        },
+        "Pixel": {
+          "alias": "Theme/border/l/default"
+        }
+      }
+    },
+    {
+      "name": "table/l/hover",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-hover)",
+      "description": "Light source for Scheme table/hover. Studio: Studio flavor/table/l/hover; other themes: hover/l.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/l/hover"
+        },
+        "Ledger": {
+          "alias": "Theme/hover/l"
+        },
+        "Filigrane": {
+          "alias": "Theme/hover/l"
+        },
+        "Signal": {
+          "alias": "Theme/hover/l"
+        },
+        "Tonal": {
+          "alias": "Theme/hover/l"
+        },
+        "Glass": {
+          "alias": "Theme/hover/l"
+        },
+        "Brutal": {
+          "alias": "Theme/hover/l"
+        },
+        "Fluent": {
+          "alias": "Theme/hover/l"
+        },
+        "Tactile": {
+          "alias": "Theme/hover/l"
+        },
+        "Pixel": {
+          "alias": "Theme/hover/l"
+        }
+      }
+    },
+    {
+      "name": "table/l/row-bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-row-bg)",
+      "description": "Light source for Scheme table/row-bg. Studio: Studio flavor/table/l/row-bg; other themes: surface/l/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/l/row-bg"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/l/paper"
+        }
+      }
+    },
+    {
+      "name": "table/l/row-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-row-rule)",
+      "description": "Light source for Scheme table/row-rule. Studio: Studio flavor/table/l/row-rule; other themes: border/l/subtle.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/l/row-rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Signal": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Tonal": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Glass": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Brutal": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Fluent": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Tactile": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Pixel": {
+          "alias": "Theme/border/l/subtle"
+        }
+      }
+    },
+    {
+      "name": "table/l/zebra",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-zebra)",
+      "description": "Light source for Scheme table/zebra. Studio: Studio flavor/table/l/zebra; other themes: tone/l/sunken.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/l/zebra"
+        },
+        "Ledger": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "Filigrane": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "Signal": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "Tonal": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "Glass": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "Brutal": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "Fluent": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "Tactile": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "Pixel": {
+          "alias": "Theme/tone/l/sunken"
+        }
+      }
+    },
+    {
+      "name": "table/row-gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-table-row-gap)",
+      "description": "Gap between table rows (pill-row tables). Studio: Studio flavor table/row-gap; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/row-gap"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "table/row-radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-table-row-radius)",
+      "description": "Table row radius (pill-row tables). Studio: Studio flavor table/row-radius; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/row-radius"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "table/row-rule-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-table-row-rule-width)",
+      "description": "Table row rule width. Studio: Studio flavor table/row-rule; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/table/row-rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "tabs/d/idle-border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-d-idle-border)",
+      "description": "Dark source for Scheme tabs/idle-border. Studio: Studio flavor/tabs/d/idle-border; other themes: transparent.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/d/idle-border"
+        },
+        "Ledger": "#00000000",
+        "Filigrane": "#00000000",
+        "Signal": "#00000000",
+        "Tonal": "#00000000",
+        "Glass": "#00000000",
+        "Brutal": "#00000000",
+        "Fluent": "#00000000",
+        "Tactile": "#00000000",
+        "Pixel": "#00000000"
+      }
+    },
+    {
+      "name": "tabs/d/sel-bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-d-sel-bg)",
+      "description": "Dark source for Scheme tabs/sel-bg. Studio: Studio flavor/tabs/d/sel-bg; other themes: surface/d/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/d/sel-bg"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/d/paper"
+        }
+      }
+    },
+    {
+      "name": "tabs/d/sel-border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-d-sel-border)",
+      "description": "Dark source for Scheme tabs/sel-border. Studio: Studio flavor/tabs/d/sel-border; other themes: border/d/default.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/d/sel-border"
+        },
+        "Ledger": {
+          "alias": "Theme/border/d/default"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/d/default"
+        },
+        "Signal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Tonal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Glass": {
+          "alias": "Theme/border/d/default"
+        },
+        "Brutal": {
+          "alias": "Theme/border/d/default"
+        },
+        "Fluent": {
+          "alias": "Theme/border/d/default"
+        },
+        "Tactile": {
+          "alias": "Theme/border/d/default"
+        },
+        "Pixel": {
+          "alias": "Theme/border/d/default"
+        }
+      }
+    },
+    {
+      "name": "tabs/d/track",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-d-track)",
+      "description": "Dark source for Scheme tabs/track. Studio: Studio flavor/tabs/d/track; other themes: tone/d/muted.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/d/track"
+        },
+        "Ledger": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Filigrane": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Signal": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Tonal": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Glass": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Brutal": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Fluent": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Tactile": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "Pixel": {
+          "alias": "Theme/tone/d/muted"
+        }
+      }
+    },
+    {
+      "name": "tabs/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-tabs-gap)",
+      "description": "Gap between tab triggers. Studio: Studio flavor tabs/gap; other themes: 2.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/gap"
+        },
+        "Ledger": 2,
+        "Filigrane": 2,
+        "Signal": 2,
+        "Tonal": 2,
+        "Glass": 2,
+        "Brutal": 2,
+        "Fluent": 2,
+        "Tactile": 2,
+        "Pixel": 2
+      }
+    },
+    {
+      "name": "tabs/idle-stroke",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-tabs-idle-stroke)",
+      "description": "Idle tab stroke width. Studio: Studio flavor tabs/idle-stroke; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/idle-stroke"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "tabs/item-pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-tabs-item-pad)",
+      "description": "Tab trigger horizontal padding. Studio: Studio flavor tabs/item-pad; other themes: 12.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/item-pad"
+        },
+        "Ledger": 12,
+        "Filigrane": 12,
+        "Signal": 12,
+        "Tonal": 12,
+        "Glass": 12,
+        "Brutal": 12,
+        "Fluent": 12,
+        "Tactile": 12,
+        "Pixel": 12
+      }
+    },
+    {
+      "name": "tabs/item-radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-tabs-item-radius)",
+      "description": "Tab trigger radius. Studio: Studio flavor tabs/item-radius; other themes: radius/control.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/item-radius"
+        },
+        "Ledger": {
+          "alias": "Theme/radius/control"
+        },
+        "Filigrane": {
+          "alias": "Theme/radius/control"
+        },
+        "Signal": {
+          "alias": "Theme/radius/control"
+        },
+        "Tonal": {
+          "alias": "Theme/radius/control"
+        },
+        "Glass": {
+          "alias": "Theme/radius/control"
+        },
+        "Brutal": {
+          "alias": "Theme/radius/control"
+        },
+        "Fluent": {
+          "alias": "Theme/radius/control"
+        },
+        "Tactile": {
+          "alias": "Theme/radius/control"
+        },
+        "Pixel": {
+          "alias": "Theme/radius/control"
+        }
+      }
+    },
+    {
+      "name": "tabs/l/idle-border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-l-idle-border)",
+      "description": "Light source for Scheme tabs/idle-border. Studio: Studio flavor/tabs/l/idle-border; other themes: transparent.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/l/idle-border"
+        },
+        "Ledger": "#00000000",
+        "Filigrane": "#00000000",
+        "Signal": "#00000000",
+        "Tonal": "#00000000",
+        "Glass": "#00000000",
+        "Brutal": "#00000000",
+        "Fluent": "#00000000",
+        "Tactile": "#00000000",
+        "Pixel": "#00000000"
+      }
+    },
+    {
+      "name": "tabs/l/sel-bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-l-sel-bg)",
+      "description": "Light source for Scheme tabs/sel-bg. Studio: Studio flavor/tabs/l/sel-bg; other themes: surface/l/paper.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/l/sel-bg"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Glass": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/l/paper"
+        }
+      }
+    },
+    {
+      "name": "tabs/l/sel-border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-l-sel-border)",
+      "description": "Light source for Scheme tabs/sel-border. Studio: Studio flavor/tabs/l/sel-border; other themes: border/l/default.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/l/sel-border"
+        },
+        "Ledger": {
+          "alias": "Theme/border/l/default"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/l/default"
+        },
+        "Signal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Tonal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Glass": {
+          "alias": "Theme/border/l/default"
+        },
+        "Brutal": {
+          "alias": "Theme/border/l/default"
+        },
+        "Fluent": {
+          "alias": "Theme/border/l/default"
+        },
+        "Tactile": {
+          "alias": "Theme/border/l/default"
+        },
+        "Pixel": {
+          "alias": "Theme/border/l/default"
+        }
+      }
+    },
+    {
+      "name": "tabs/l/track",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-l-track)",
+      "description": "Light source for Scheme tabs/track. Studio: Studio flavor/tabs/l/track; other themes: tone/l/muted.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/l/track"
+        },
+        "Ledger": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Filigrane": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Signal": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Tonal": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Glass": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Brutal": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Fluent": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Tactile": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "Pixel": {
+          "alias": "Theme/tone/l/muted"
+        }
+      }
+    },
+    {
+      "name": "tabs/pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-tabs-pad)",
+      "description": "Tab list (track) padding. Studio: Studio flavor tabs/pad; other themes: 3.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/pad"
+        },
+        "Ledger": 3,
+        "Filigrane": 3,
+        "Signal": 3,
+        "Tonal": 3,
+        "Glass": 3,
+        "Brutal": 3,
+        "Fluent": 3,
+        "Tactile": 3,
+        "Pixel": 3
+      }
+    },
+    {
+      "name": "tabs/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-tabs-radius)",
+      "description": "Tab list (track) radius. Studio: Studio flavor tabs/radius; other themes: radius/control.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/radius"
+        },
+        "Ledger": {
+          "alias": "Theme/radius/control"
+        },
+        "Filigrane": {
+          "alias": "Theme/radius/control"
+        },
+        "Signal": {
+          "alias": "Theme/radius/control"
+        },
+        "Tonal": {
+          "alias": "Theme/radius/control"
+        },
+        "Glass": {
+          "alias": "Theme/radius/control"
+        },
+        "Brutal": {
+          "alias": "Theme/radius/control"
+        },
+        "Fluent": {
+          "alias": "Theme/radius/control"
+        },
+        "Tactile": {
+          "alias": "Theme/radius/control"
+        },
+        "Pixel": {
+          "alias": "Theme/radius/control"
+        }
+      }
+    },
+    {
+      "name": "tabs/sel-bottom",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-tabs-sel-bottom)",
+      "description": "Selected tab bottom stroke width. Studio: Studio flavor tabs/sel-bottom; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/sel-bottom"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "tabs/sel-box",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-tabs-sel-box)",
+      "description": "Selected tab stroke width on all sides. Studio: Studio flavor tabs/sel-box; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/tabs/sel-box"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
       "name": "tone/d/muted",
       "type": "COLOR",
       "scopes": [
@@ -3793,6 +7685,272 @@
         "Pixel": {
           "alias": "Theme/gray/l/2"
         }
+      }
+    },
+    {
+      "name": "topbar/d/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-topbar-d-bg)",
+      "description": "Dark source for Scheme topbar/bg. Studio: Studio flavor/topbar/d/bg; other themes: surface/d/canvas.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/topbar/d/bg"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Signal": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Glass": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/d/canvas"
+        }
+      }
+    },
+    {
+      "name": "topbar/d/rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-topbar-d-rule)",
+      "description": "Dark source for Scheme topbar/rule. Studio: Studio flavor/topbar/d/rule; other themes: border/d/subtle.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/topbar/d/rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Signal": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Tonal": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Glass": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Brutal": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Fluent": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Tactile": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "Pixel": {
+          "alias": "Theme/border/d/subtle"
+        }
+      }
+    },
+    {
+      "name": "topbar/l/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-topbar-l-bg)",
+      "description": "Light source for Scheme topbar/bg. Studio: Studio flavor/topbar/l/bg; other themes: surface/l/canvas.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/topbar/l/bg"
+        },
+        "Ledger": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Filigrane": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Signal": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Tonal": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Glass": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Brutal": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Fluent": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Tactile": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "Pixel": {
+          "alias": "Theme/surface/l/canvas"
+        }
+      }
+    },
+    {
+      "name": "topbar/l/rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-topbar-l-rule)",
+      "description": "Light source for Scheme topbar/rule. Studio: Studio flavor/topbar/l/rule; other themes: border/l/subtle.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/topbar/l/rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Signal": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Tonal": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Glass": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Brutal": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Fluent": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Tactile": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "Pixel": {
+          "alias": "Theme/border/l/subtle"
+        }
+      }
+    },
+    {
+      "name": "topbar/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-topbar-radius)",
+      "description": "Top bar radius. Studio: Studio flavor topbar/radius; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/topbar/radius"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "topbar/rule-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-topbar-rule-width)",
+      "description": "Top bar bottom rule width. Studio: Studio flavor topbar/rule; other themes: border/width.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/topbar/rule"
+        },
+        "Ledger": {
+          "alias": "Theme/border/width"
+        },
+        "Filigrane": {
+          "alias": "Theme/border/width"
+        },
+        "Signal": {
+          "alias": "Theme/border/width"
+        },
+        "Tonal": {
+          "alias": "Theme/border/width"
+        },
+        "Glass": {
+          "alias": "Theme/border/width"
+        },
+        "Brutal": {
+          "alias": "Theme/border/width"
+        },
+        "Fluent": {
+          "alias": "Theme/border/width"
+        },
+        "Tactile": {
+          "alias": "Theme/border/width"
+        },
+        "Pixel": {
+          "alias": "Theme/border/width"
+        }
+      }
+    },
+    {
+      "name": "topbar/shadow-blur",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-topbar-shadow-blur)",
+      "description": "Top bar shadow blur. Studio: Studio flavor topbar/shadow-blur; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/topbar/shadow-blur"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
+      }
+    },
+    {
+      "name": "topbar/shadow-y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-topbar-shadow-y)",
+      "description": "Top bar shadow y offset. Studio: Studio flavor topbar/shadow-y; other themes: 0.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/topbar/shadow-y"
+        },
+        "Ledger": 0,
+        "Filigrane": 0,
+        "Signal": 0,
+        "Tonal": 0,
+        "Glass": 0,
+        "Brutal": 0,
+        "Fluent": 0,
+        "Tactile": 0,
+        "Pixel": 0
       }
     },
     {
@@ -3964,6 +8122,48 @@
       }
     },
     {
+      "name": "type/code/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-code)",
+      "description": "Code, path and kbd line height.",
+      "values": {
+        "Studio": 20,
+        "Ledger": 20,
+        "Filigrane": 20,
+        "Signal": 20,
+        "Tonal": 20,
+        "Glass": 20,
+        "Brutal": 20,
+        "Fluent": 20,
+        "Tactile": 20,
+        "Pixel": 20
+      }
+    },
+    {
+      "name": "type/code/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-code)",
+      "description": "Code, path and kbd font size.",
+      "values": {
+        "Studio": 13,
+        "Ledger": 13,
+        "Filigrane": 13,
+        "Signal": 13,
+        "Tonal": 13,
+        "Glass": 13,
+        "Brutal": 13,
+        "Fluent": 13,
+        "Tactile": 13,
+        "Pixel": 13
+      }
+    },
+    {
       "name": "type/display/line",
       "type": "FLOAT",
       "scopes": [
@@ -4049,6 +8249,47 @@
         "Fluent": 0,
         "Tactile": -1.399999976158142,
         "Pixel": 0
+      }
+    },
+    {
+      "name": "type/eyebrow/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-eyebrow)",
+      "description": "Eyebrow font style, paired with font/eyebrow. Studio follows Studio flavor type/eyebrow/style; other themes use type/label/style.",
+      "values": {
+        "Studio": {
+          "alias": "Studio flavor/type/eyebrow/style"
+        },
+        "Ledger": {
+          "alias": "Theme/type/label/style"
+        },
+        "Filigrane": {
+          "alias": "Theme/type/label/style"
+        },
+        "Signal": {
+          "alias": "Theme/type/label/style"
+        },
+        "Tonal": {
+          "alias": "Theme/type/label/style"
+        },
+        "Glass": {
+          "alias": "Theme/type/label/style"
+        },
+        "Brutal": {
+          "alias": "Theme/type/label/style"
+        },
+        "Fluent": {
+          "alias": "Theme/type/label/style"
+        },
+        "Tactile": {
+          "alias": "Theme/type/label/style"
+        },
+        "Pixel": {
+          "alias": "Theme/type/label/style"
+        }
       }
     },
     {
@@ -4181,6 +8422,88 @@
         "Fluent": 24,
         "Tactile": 28,
         "Pixel": 32
+      }
+    },
+    {
+      "name": "type/kpi-sm/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-kpi-sm)",
+      "description": "Small KPI font style; follows type/kpi/style.",
+      "values": {
+        "Studio": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "Ledger": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "Filigrane": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "Signal": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "Tonal": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "Glass": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "Brutal": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "Fluent": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "Tactile": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "Pixel": {
+          "alias": "Theme/type/kpi/style"
+        }
+      }
+    },
+    {
+      "name": "type/kpi-sm/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-kpi-sm)",
+      "description": "Small KPI letter spacing; follows type/kpi/tracking.",
+      "values": {
+        "Studio": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "Ledger": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "Filigrane": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "Signal": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "Tonal": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "Glass": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "Brutal": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "Fluent": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "Tactile": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "Pixel": {
+          "alias": "Theme/type/kpi/tracking"
+        }
       }
     },
     {

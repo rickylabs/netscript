@@ -1,14 +1,14 @@
 /** Visible labels identify kinds; generated syntax roles will supply their final paint. */
 export const API_KINDS = {
-  class: 'info',
-  interface: 'info',
-  type: 'warning',
-  enum: 'warning',
-  function: 'success',
-  method: 'success',
-  const: 'warning',
-  variable: 'warning',
-  component: 'success',
+  class: 'type',
+  interface: 'type',
+  type: 'type',
+  enum: 'type',
+  function: 'function',
+  method: 'function',
+  const: 'keyword',
+  variable: 'keyword',
+  component: 'function',
 } as const;
 
 export type ApiKind = keyof typeof API_KINDS;
@@ -23,4 +23,10 @@ export function apiKind(value: unknown): ApiKind | undefined {
   return Object.keys(API_KINDS).find((kind) => name === kind || name.startsWith(`${kind} /`)) as
     | ApiKind
     | undefined;
+}
+
+/** The visible kind label is independent of its shared generated syntax colour. */
+export function apiKindRole(value: unknown): string | undefined {
+  const kind = apiKind(value);
+  return kind ? API_KINDS[kind] : undefined;
 }

@@ -390,7 +390,7 @@
 .ns-code-body {
   display: grid;
   grid-template-columns: auto minmax(0,1fr);
-  background: var(--ns-surface);
+  background: var(--ns-code-bg);
 }
 .ns-code-gutter {
   padding: 16px 0 16px 12px;
@@ -480,6 +480,13 @@
 .ns-callout[data-tone="destructive"] .ns-callout__head {
   color: var(--ns-destructive-text);
 }
+.ns-callout[data-tone="important"] {
+  background: var(--ns-important-subtle);
+  border-color: var(--ns-important-border);
+}
+.ns-callout[data-tone="important"] .ns-callout__head {
+  color: var(--ns-important-text);
+}
 .ns-api-table-wrap {
   max-width: 100%;
   overflow-x: auto;
@@ -531,17 +538,17 @@
   font: 400 11px/18px var(--ns-font-mono);
   white-space: nowrap;
 }
-.ns-api-kind:is([data-kind="class"], [data-kind="interface"]) {
-  color: var(--ns-info-text);
-  background: var(--ns-info-subtle);
+.ns-api-kind[data-syntax-role="type"] {
+  color: var(--ns-code-syntax-type);
+  background: var(--ns-code-bg);
 }
-.ns-api-kind:is([data-kind="function"], [data-kind="method"], [data-kind="component"]) {
-  color: var(--ns-success-text);
-  background: var(--ns-success-subtle);
+.ns-api-kind[data-syntax-role="function"] {
+  color: var(--ns-code-syntax-function);
+  background: var(--ns-code-bg);
 }
-.ns-api-kind:is([data-kind="type"], [data-kind="enum"], [data-kind="const"], [data-kind="variable"]) {
-  color: var(--ns-warning-text);
-  background: var(--ns-warning-subtle);
+.ns-api-kind[data-syntax-role="keyword"] {
+  color: var(--ns-code-syntax-keyword);
+  background: var(--ns-code-bg);
 }
 .ns-api-table__desc {
   font-size: 14px;

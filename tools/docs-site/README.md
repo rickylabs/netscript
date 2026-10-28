@@ -14,7 +14,7 @@ deno run --allow-read tools/docs-site/generate-tokens.ts --check
 
 The snapshot is a byte-for-byte copy of the 2026-10-28 export from Figma file
 `pGRLnkPPRZJZy74evNcQBr`, originally supplied in the design handoff. `index.json` is its
-collection manifest. Each alias resolves using the target collection's active mode: Studio,
+collection manifest. Scheme, Studio flavor and Base accent aliases resolve through Theme set **A**, selecting Theme; Theme B remains available in the export. Each alias resolves using the target collection's active mode: Studio,
 Utility, Neutral, Ink, Compact, and Light or Dark. Values belong in this generated layer;
 component styles consume named `--ns-*` roles. Keep those names compatible with tokens v2.
 
@@ -67,3 +67,17 @@ components, resolving them through Utility density and typography roles. The bro
 undefined shared roles in every shipped stylesheet, including generated third-party CSS. All maintained
 UI styles, including the sibling section stylesheet, receive the raw-colour and red-context checks too. Design system
 acceptance asserts visible navigation gaps so missing layout roles cannot pass on axe alone.
+
+
+S8c semantic content uses the owner export at `b9dd32aac`: `code/bg`, seven `code/syntax/*`
+roles and the violet `important/*` triplet. Code and API kind paint consume those roles directly.
+The pre-S8c declaration fixture proves every old role remains byte-identical in both schemes,
+except the explicitly approved `--ns-input-border` change to Utility gray 9. The contrast test
+computes unrounded WCAG ratios on code and table backgrounds. The browser suite verifies actual
+computed token paint, syntax spans, IMPORTANT and zero serious/critical axe findings.
+
+To add a language, register its existing-version highlight.js grammar in `docs/site/_config.ts`,
+add its import-map entry and human label in `code-languages.ts`, then extend the internal code
+gallery. Unknown rendered fences fail the build. Internal gallery pages declare `internal: true`,
+which excludes them from Pagefind, Markdown twins and the AI documentation indexes. Header metadata
+uses `data-twin-ignore` and headers/gutters use `data-pagefind-ignore`; code itself remains indexed.

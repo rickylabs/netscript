@@ -15,6 +15,8 @@ export interface FigmaCollection {
 export const UTILITY_MODES: Readonly<Record<string, string>> = {
   Primitives: 'Value',
   Theme: 'Studio',
+  'Theme set': 'A',
+  'Theme B': 'Bloom',
   'Studio flavor': 'Utility',
   'Base gray': 'Neutral',
   'Base accent': 'Ink',

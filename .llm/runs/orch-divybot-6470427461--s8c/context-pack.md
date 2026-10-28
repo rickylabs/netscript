@@ -9,3 +9,7 @@ Slice 2 final independent review PASS, 16/16 post-repair browser checks pass, re
 Slice 2 pushed c2474aa8a. Slice 3 build/links/tooling/language tests pass; expanded browser suite and independent review pending. Build frames now own fence headers, JS only enhances tabs/copy. New grammar metadata in tools/docs-site/code-languages.ts.
 
 Slice 3 independent review PASS and all 36/36 post-repair browser checks pass. Ready for reviewed commit/push. Coordinator supplied Figma b9dd32aac and explicitly moved syntax next; after it, finish path chips and #2451. Sole old-token exception is input-border as recorded in drift/plan.
+
+Slice 3 pushed b9e161ae1. Advanced syntax slice 6 implemented from b9dd32aac; migration and AA tests 6/6 pass. Browser and independent review pending before commit. Remaining path chips and #2451 must still be delivered.
+
+Advanced slice 6 signed off: migration/AA 6/6, targeted browser 32/32, both real negative controls reject correctly, independent review and visual/policy addendum PASS. Ready for commit/push; continue with paths (slice 4), then #2451 (slice 5), then full gates and IMPL-EVAL.

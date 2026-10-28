@@ -13,7 +13,7 @@ internal: true
 Content uses semantic tones. Navigation, links and focus stay in ink.
 
 {{ comp callout { type: "NOTE", title: "Information" } }}
-Keep the contract beside the implementation. [Read the quickstart](/quickstart/).
+Keep the contract beside the implementation. <a href="/quickstart/">Read the quickstart</a>.
 {{ /comp }}
 
 {{ comp callout { type: "TIP", title: "A useful next step" } }}
@@ -29,7 +29,7 @@ This command changes generated files. Review the diff before committing.
 {{ /comp }}
 
 {{ comp callout { type: "CAUTION", title: "Destructive action" } }}
-Deleting data cannot be undone. [Read the database guide](/data-persistence/).
+Deleting data cannot be undone. <a href="/data-persistence/">Read the database guide</a>.
 {{ /comp }}
 
 {{ comp callout { type: "error", title: "Existing error alias" } }}

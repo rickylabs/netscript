@@ -14,10 +14,10 @@
       "codeSyntax": "var(--ns-accent-border)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/6"
+          "alias": "Theme set/accent/l/6"
         },
         "Dark": {
-          "alias": "Theme/accent/d/6"
+          "alias": "Theme set/accent/d/6"
         }
       }
     },
@@ -31,10 +31,10 @@
       "codeSyntax": "var(--ns-accent)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/solid"
+          "alias": "Theme set/accent/l/solid"
         },
         "Dark": {
-          "alias": "Theme/accent/d/solid"
+          "alias": "Theme set/accent/d/solid"
         }
       }
     },
@@ -49,10 +49,10 @@
       "codeSyntax": "var(--ns-accent-fg)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/contrast"
+          "alias": "Theme set/accent/l/contrast"
         },
         "Dark": {
-          "alias": "Theme/accent/d/solid-fg"
+          "alias": "Theme set/accent/d/solid-fg"
         }
       }
     },
@@ -66,10 +66,10 @@
       "codeSyntax": "var(--ns-accent-hover)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/solid-hover"
+          "alias": "Theme set/accent/l/solid-hover"
         },
         "Dark": {
-          "alias": "Theme/accent/d/solid-hover"
+          "alias": "Theme set/accent/d/solid-hover"
         }
       }
     },
@@ -83,10 +83,10 @@
       "codeSyntax": "var(--ns-accent-subtle)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/3"
+          "alias": "Theme set/accent/l/3"
         },
         "Dark": {
-          "alias": "Theme/accent/d/3"
+          "alias": "Theme set/accent/d/3"
         }
       }
     },
@@ -101,10 +101,10 @@
       "codeSyntax": "var(--ns-accent-text)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/11"
+          "alias": "Theme set/accent/l/11"
         },
         "Dark": {
-          "alias": "Theme/accent/d/11"
+          "alias": "Theme set/accent/d/11"
         }
       }
     },
@@ -118,7 +118,7 @@
       "codeSyntax": "var(--ns-action-primary-bg)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Dark": "#00000000"
       }
@@ -133,10 +133,10 @@
       "codeSyntax": "var(--ns-action-primary-border)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Dark": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         }
       }
     },
@@ -150,10 +150,10 @@
       "codeSyntax": "var(--ns-action-primary-fg)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/1"
+          "alias": "Theme set/gray/l/1"
         },
         "Dark": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
         }
       }
     },
@@ -888,10 +888,10 @@
       "codeSyntax": "var(--ns-border-control)",
       "values": {
         "Light": {
-          "alias": "Theme/ink/l"
+          "alias": "Theme set/ink/l"
         },
         "Dark": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         }
       }
     },
@@ -904,10 +904,10 @@
       "codeSyntax": "var(--ns-border)",
       "values": {
         "Light": {
-          "alias": "Theme/border/l/default"
+          "alias": "Theme set/border/l/default"
         },
         "Dark": {
-          "alias": "Theme/border/d/default"
+          "alias": "Theme set/border/d/default"
         }
       }
     },
@@ -920,10 +920,10 @@
       "codeSyntax": "var(--ns-border-hover)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/7"
+          "alias": "Theme set/gray/l/7"
         },
         "Dark": {
-          "alias": "Theme/gray/d/7"
+          "alias": "Theme set/gray/d/7"
         }
       }
     },
@@ -939,10 +939,10 @@
       "codeSyntax": "var(--ns-ink)",
       "values": {
         "Light": {
-          "alias": "Theme/ink/l"
+          "alias": "Theme set/ink/l"
         },
         "Dark": {
-          "alias": "Theme/ink/d"
+          "alias": "Theme set/ink/d"
         }
       }
     },
@@ -955,10 +955,10 @@
       "codeSyntax": "var(--ns-input-border)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/10"
+          "alias": "Theme set/input/l"
         },
         "Dark": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/input/d"
         }
       }
     },
@@ -972,10 +972,10 @@
       "codeSyntax": "var(--ns-ring)",
       "values": {
         "Light": {
-          "alias": "Theme/ring/l"
+          "alias": "Theme set/ring/l"
         },
         "Dark": {
-          "alias": "Theme/ring/d"
+          "alias": "Theme set/ring/d"
         }
       }
     },
@@ -988,10 +988,10 @@
       "codeSyntax": "var(--ns-border-strong)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/8"
+          "alias": "Theme set/gray/l/8"
         },
         "Dark": {
-          "alias": "Theme/gray/d/8"
+          "alias": "Theme set/gray/d/8"
         }
       }
     },
@@ -1004,10 +1004,309 @@
       "codeSyntax": "var(--ns-border-subtle)",
       "values": {
         "Light": {
-          "alias": "Theme/border/l/subtle"
+          "alias": "Theme set/border/l/subtle"
         },
         "Dark": {
-          "alias": "Theme/border/d/subtle"
+          "alias": "Theme set/border/d/subtle"
+        }
+      }
+    },
+    {
+      "name": "brand/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-brand)",
+      "description": "Theme-following twin of studio/signal/brand: its Studio flavor value under Theme Studio, primary/default elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/brand/l/default"
+        },
+        "Dark": {
+          "alias": "Theme set/brand/d/default"
+        }
+      }
+    },
+    {
+      "name": "brand/fg",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-brand-fg)",
+      "description": "Theme-following twin of studio/primary/fg: its Studio flavor value under Theme Studio, primary/fg elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/brand/l/fg"
+        },
+        "Dark": {
+          "alias": "Theme set/brand/d/fg"
+        }
+      }
+    },
+    {
+      "name": "card/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-card-border)",
+      "description": "Theme-following twin of studio/card/border: its Studio flavor value under Theme Studio, border/default elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/card/l/border"
+        },
+        "Dark": {
+          "alias": "Theme set/card/d/border"
+        }
+      }
+    },
+    {
+      "name": "card/footer",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-card-footer)",
+      "description": "Theme-following twin of studio/card/footer: its Studio flavor value under Theme Studio, surface/muted elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/card/l/footer"
+        },
+        "Dark": {
+          "alias": "Theme set/card/d/footer"
+        }
+      }
+    },
+    {
+      "name": "chart/1",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-chart-1)",
+      "description": "Chart series 1; follows primary/default.",
+      "values": {
+        "Light": {
+          "alias": "Scheme/primary/default"
+        },
+        "Dark": {
+          "alias": "Scheme/primary/default"
+        }
+      }
+    },
+    {
+      "name": "chart/2",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-chart-2)",
+      "description": "Chart series 2; follows info/default.",
+      "values": {
+        "Light": {
+          "alias": "Scheme/info/default"
+        },
+        "Dark": {
+          "alias": "Scheme/info/default"
+        }
+      }
+    },
+    {
+      "name": "chart/3",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-chart-3)",
+      "description": "Chart series 3; follows success/default.",
+      "values": {
+        "Light": {
+          "alias": "Scheme/success/default"
+        },
+        "Dark": {
+          "alias": "Scheme/success/default"
+        }
+      }
+    },
+    {
+      "name": "chart/4",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-chart-4)",
+      "description": "Chart series 4; follows warning/default.",
+      "values": {
+        "Light": {
+          "alias": "Scheme/warning/default"
+        },
+        "Dark": {
+          "alias": "Scheme/warning/default"
+        }
+      }
+    },
+    {
+      "name": "chart/5",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-chart-5)",
+      "description": "Chart series 5; follows destructive/default.",
+      "values": {
+        "Light": {
+          "alias": "Scheme/destructive/default"
+        },
+        "Dark": {
+          "alias": "Scheme/destructive/default"
+        }
+      }
+    },
+    {
+      "name": "code/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-code-bg)",
+      "description": "Code block body behind syntax-coloured text. Every code/syntax role reaches 4.5:1 on it.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/white"
+        },
+        "Dark": {
+          "alias": "Primitives/color/gray/d/2"
+        }
+      }
+    },
+    {
+      "name": "code/syntax/comment",
+      "type": "COLOR",
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-code-syntax-comment)",
+      "description": "Comments, set in italic.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/gray/l/11"
+        },
+        "Dark": {
+          "alias": "Primitives/color/gray/d/11"
+        }
+      }
+    },
+    {
+      "name": "code/syntax/function",
+      "type": "COLOR",
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-code-syntax-function)",
+      "description": "Function and method names.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/blue/l/11"
+        },
+        "Dark": {
+          "alias": "Primitives/color/blue/d/11"
+        }
+      }
+    },
+    {
+      "name": "code/syntax/keyword",
+      "type": "COLOR",
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-code-syntax-keyword)",
+      "description": "Keywords, this, modifiers.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/violet/l/11"
+        },
+        "Dark": {
+          "alias": "Primitives/color/violet/d/11"
+        }
+      }
+    },
+    {
+      "name": "code/syntax/number",
+      "type": "COLOR",
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-code-syntax-number)",
+      "description": "Numbers, literals, regexps, shell variables.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/orange/l/11"
+        },
+        "Dark": {
+          "alias": "Primitives/color/orange/d/11"
+        }
+      }
+    },
+    {
+      "name": "code/syntax/punctuation",
+      "type": "COLOR",
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-code-syntax-punctuation)",
+      "description": "Operators and punctuation.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/gray/l/11"
+        },
+        "Dark": {
+          "alias": "Primitives/color/gray/d/11"
+        }
+      }
+    },
+    {
+      "name": "code/syntax/string",
+      "type": "COLOR",
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-code-syntax-string)",
+      "description": "Strings and template literals.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/grass/l/11"
+        },
+        "Dark": {
+          "alias": "Primitives/color/grass/d/11"
+        }
+      }
+    },
+    {
+      "name": "code/syntax/type",
+      "type": "COLOR",
+      "scopes": [
+        "TEXT_FILL"
+      ],
+      "codeSyntax": "var(--ns-code-syntax-type)",
+      "description": "Types, classes, built-ins, shell commands.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/teal/l/11"
+        },
+        "Dark": {
+          "alias": "Primitives/color/teal/d/11"
         }
       }
     },
@@ -1021,10 +1320,10 @@
       "codeSyntax": "var(--ns-control-ink)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Dark": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         }
       }
     },
@@ -1522,6 +1821,23 @@
       }
     },
     {
+      "name": "effect/control-shadow",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-control-shadow-color)",
+      "description": "Theme-following twin of studio/button/shadow: its Studio flavor value under Theme Studio, effect/shadow elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/effect/l/control-shadow"
+        },
+        "Dark": {
+          "alias": "Theme set/effect/d/control-shadow"
+        }
+      }
+    },
+    {
       "name": "effect/shadow",
       "type": "COLOR",
       "scopes": [
@@ -1530,10 +1846,27 @@
       "codeSyntax": "var(--ns-shadow-color)",
       "values": {
         "Light": {
-          "alias": "Theme/shadow/l/color"
+          "alias": "Theme set/shadow/l/color"
         },
         "Dark": {
-          "alias": "Theme/shadow/d/color"
+          "alias": "Theme set/shadow/d/color"
+        }
+      }
+    },
+    {
+      "name": "effect/shadow-overlay",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "codeSyntax": "var(--ns-shadow-overlay-color)",
+      "description": "Overlay (popover, menu, toast) shadow colour; follows the theme shadow colour.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/shadow/l/color"
+        },
+        "Dark": {
+          "alias": "Theme set/shadow/d/color"
         }
       }
     },
@@ -2607,10 +2940,82 @@
       "codeSyntax": "var(--ns-frame-ink)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Dark": {
-          "alias": "Theme/gray/d/7"
+          "alias": "Theme set/gray/d/7"
+        }
+      }
+    },
+    {
+      "name": "hero/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-hero-bg)",
+      "description": "Theme-following twin of studio/hero/bg: its Studio flavor value under Theme Studio, surface/bg elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/hero/l/bg"
+        },
+        "Dark": {
+          "alias": "Theme set/hero/d/bg"
+        }
+      }
+    },
+    {
+      "name": "important/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-important-border)",
+      "description": "IMPORTANT callout edge.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/violet/l/6"
+        },
+        "Dark": {
+          "alias": "Primitives/color/violet/d/6"
+        }
+      }
+    },
+    {
+      "name": "important/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-important-subtle)",
+      "description": "IMPORTANT callout fill.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/violet/l/3"
+        },
+        "Dark": {
+          "alias": "Primitives/color/violet/d/3"
+        }
+      }
+    },
+    {
+      "name": "important/text",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "TEXT_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-important-text)",
+      "description": "IMPORTANT callout icon and title.",
+      "values": {
+        "Light": {
+          "alias": "Primitives/color/violet/l/12"
+        },
+        "Dark": {
+          "alias": "Primitives/color/violet/d/11"
         }
       }
     },
@@ -2727,10 +3132,117 @@
       "codeSyntax": "var(--ns-ink-fg)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/1"
+          "alias": "Theme set/gray/l/1"
         },
         "Dark": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
+        }
+      }
+    },
+    {
+      "name": "kpi/bg-1",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-kpi-bg-1)",
+      "description": "Theme-following twin of studio/kpi/bg-1: its Studio flavor value under Theme Studio, surface/card elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/kpi/l/bg-1"
+        },
+        "Dark": {
+          "alias": "Theme set/kpi/d/bg-1"
+        }
+      }
+    },
+    {
+      "name": "kpi/bg-2",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-kpi-bg-2)",
+      "description": "Theme-following twin of studio/kpi/bg-2: its Studio flavor value under Theme Studio, surface/card elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/kpi/l/bg-2"
+        },
+        "Dark": {
+          "alias": "Theme set/kpi/d/bg-2"
+        }
+      }
+    },
+    {
+      "name": "kpi/bg-3",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-kpi-bg-3)",
+      "description": "Theme-following twin of studio/kpi/bg-3: its Studio flavor value under Theme Studio, surface/card elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/kpi/l/bg-3"
+        },
+        "Dark": {
+          "alias": "Theme set/kpi/d/bg-3"
+        }
+      }
+    },
+    {
+      "name": "kpi/bg-4",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-kpi-bg-4)",
+      "description": "Theme-following twin of studio/kpi/bg-4: its Studio flavor value under Theme Studio, surface/card elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/kpi/l/bg-4"
+        },
+        "Dark": {
+          "alias": "Theme set/kpi/d/bg-4"
+        }
+      }
+    },
+    {
+      "name": "kpi/border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-kpi-border)",
+      "description": "Theme-following twin of studio/kpi/border: its Studio flavor value under Theme Studio, border/default elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/kpi/l/border"
+        },
+        "Dark": {
+          "alias": "Theme set/kpi/d/border"
+        }
+      }
+    },
+    {
+      "name": "link/underline",
+      "type": "COLOR",
+      "scopes": [
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-link-underline)",
+      "description": "Theme-following twin of studio/signal/underline: its Studio flavor value under Theme Studio, primary/text elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/link/l/underline"
+        },
+        "Dark": {
+          "alias": "Theme set/link/d/underline"
         }
       }
     },
@@ -3528,6 +4040,25 @@
       }
     },
     {
+      "name": "marker/default",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-marker)",
+      "description": "Theme-following twin of studio/signal/marker: its Studio flavor value under Theme Studio, primary/default elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/marker/l/default"
+        },
+        "Dark": {
+          "alias": "Theme set/marker/d/default"
+        }
+      }
+    },
+    {
       "name": "material/fill",
       "type": "COLOR",
       "scopes": [
@@ -3537,10 +4068,10 @@
       "codeSyntax": "var(--ns-material-fill)",
       "values": {
         "Light": {
-          "alias": "Theme/material/l/fill"
+          "alias": "Theme set/material/l/fill"
         },
         "Dark": {
-          "alias": "Theme/material/d/fill"
+          "alias": "Theme set/material/d/fill"
         }
       }
     },
@@ -3554,10 +4085,10 @@
       "codeSyntax": "var(--ns-material-fill-strong)",
       "values": {
         "Light": {
-          "alias": "Theme/material/l/fill-strong"
+          "alias": "Theme set/material/l/fill-strong"
         },
         "Dark": {
-          "alias": "Theme/material/d/fill-strong"
+          "alias": "Theme set/material/d/fill-strong"
         }
       }
     },
@@ -3571,10 +4102,10 @@
       "codeSyntax": "var(--ns-material-stroke)",
       "values": {
         "Light": {
-          "alias": "Theme/material/l/stroke"
+          "alias": "Theme set/material/l/stroke"
         },
         "Dark": {
-          "alias": "Theme/material/d/stroke"
+          "alias": "Theme set/material/d/stroke"
         }
       }
     },
@@ -3588,10 +4119,28 @@
       "codeSyntax": "var(--ns-material-track)",
       "values": {
         "Light": {
-          "alias": "Theme/material/l/track"
+          "alias": "Theme set/material/l/track"
         },
         "Dark": {
-          "alias": "Theme/material/d/track"
+          "alias": "Theme set/material/d/track"
+        }
+      }
+    },
+    {
+      "name": "nav/active",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-nav-active)",
+      "description": "Theme-following twin of studio/nav/active: its Studio flavor value under Theme Studio, surface/selected elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/nav/l/active"
+        },
+        "Dark": {
+          "alias": "Theme set/nav/d/active"
         }
       }
     },
@@ -3808,10 +4357,10 @@
       "codeSyntax": "var(--ns-primary-border)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/7"
+          "alias": "Theme set/accent/l/7"
         },
         "Dark": {
-          "alias": "Theme/accent/d/7"
+          "alias": "Theme set/accent/d/7"
         }
       }
     },
@@ -3825,10 +4374,10 @@
       "codeSyntax": "var(--ns-primary-container)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/4"
+          "alias": "Theme set/accent/l/4"
         },
         "Dark": {
-          "alias": "Theme/accent/d/4"
+          "alias": "Theme set/accent/d/4"
         }
       }
     },
@@ -3842,10 +4391,10 @@
       "codeSyntax": "var(--ns-primary)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/solid"
+          "alias": "Theme set/accent/l/solid"
         },
         "Dark": {
-          "alias": "Theme/accent/d/solid"
+          "alias": "Theme set/accent/d/solid"
         }
       }
     },
@@ -3860,10 +4409,10 @@
       "codeSyntax": "var(--ns-primary-fg)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/contrast"
+          "alias": "Theme set/accent/l/contrast"
         },
         "Dark": {
-          "alias": "Theme/accent/d/solid-fg"
+          "alias": "Theme set/accent/d/solid-fg"
         }
       }
     },
@@ -3877,10 +4426,10 @@
       "codeSyntax": "var(--ns-primary-hover)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/solid-hover"
+          "alias": "Theme set/accent/l/solid-hover"
         },
         "Dark": {
-          "alias": "Theme/accent/d/solid-hover"
+          "alias": "Theme set/accent/d/solid-hover"
         }
       }
     },
@@ -3895,10 +4444,27 @@
       "codeSyntax": "var(--ns-primary-on-container)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/12"
+          "alias": "Theme set/accent/l/12"
         },
         "Dark": {
-          "alias": "Theme/accent/d/12"
+          "alias": "Theme set/accent/d/12"
+        }
+      }
+    },
+    {
+      "name": "primary/stroke",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-primary-stroke)",
+      "description": "Theme-following twin of studio/primary/stroke: its Studio flavor value under Theme Studio, primary/default elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/primary/l/stroke"
+        },
+        "Dark": {
+          "alias": "Theme set/primary/d/stroke"
         }
       }
     },
@@ -3912,10 +4478,10 @@
       "codeSyntax": "var(--ns-primary-subtle)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/3"
+          "alias": "Theme set/accent/l/3"
         },
         "Dark": {
-          "alias": "Theme/accent/d/3"
+          "alias": "Theme set/accent/d/3"
         }
       }
     },
@@ -3930,10 +4496,28 @@
       "codeSyntax": "var(--ns-primary-text)",
       "values": {
         "Light": {
-          "alias": "Theme/accent/l/11"
+          "alias": "Theme set/accent/l/11"
         },
         "Dark": {
-          "alias": "Theme/accent/d/11"
+          "alias": "Theme set/accent/d/11"
+        }
+      }
+    },
+    {
+      "name": "scrollbar/thumb",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-scrollbar-thumb)",
+      "description": "Theme-following twin of studio/code/scroll-thumb: its Studio flavor value under Theme Studio, border/strong elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/scrollbar/l/thumb"
+        },
+        "Dark": {
+          "alias": "Theme set/scrollbar/d/thumb"
         }
       }
     },
@@ -3946,10 +4530,10 @@
       "codeSyntax": "var(--ns-secondary-border)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/6"
+          "alias": "Theme set/gray/l/6"
         },
         "Dark": {
-          "alias": "Theme/gray/d/6"
+          "alias": "Theme set/gray/d/6"
         }
       }
     },
@@ -3963,10 +4547,10 @@
       "codeSyntax": "var(--ns-secondary)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/3"
+          "alias": "Theme set/gray/l/3"
         },
         "Dark": {
-          "alias": "Theme/gray/d/3"
+          "alias": "Theme set/gray/d/3"
         }
       }
     },
@@ -3981,10 +4565,10 @@
       "codeSyntax": "var(--ns-secondary-fg)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Dark": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
         }
       }
     },
@@ -3998,10 +4582,10 @@
       "codeSyntax": "var(--ns-secondary-hover)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/4"
+          "alias": "Theme set/gray/l/4"
         },
         "Dark": {
-          "alias": "Theme/gray/d/4"
+          "alias": "Theme set/gray/d/4"
         }
       }
     },
@@ -4015,10 +4599,10 @@
       "codeSyntax": "var(--ns-secondary-subtle)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/2"
+          "alias": "Theme set/gray/l/2"
         },
         "Dark": {
-          "alias": "Theme/gray/d/2"
+          "alias": "Theme set/gray/d/2"
         }
       }
     },
@@ -4033,17 +4617,21 @@
       "codeSyntax": "var(--ns-secondary-text)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/11"
+          "alias": "Theme set/gray/l/11"
         },
         "Dark": {
-          "alias": "Theme/gray/d/11"
+          "alias": "Theme set/gray/d/11"
         }
       }
     },
     {
       "name": "state/disabled-container",
       "type": "COLOR",
-      "scopes": [],
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
       "codeSyntax": "var(--ns-state-disabled-container)",
       "values": {
         "Light": "#1c1a1f1f",
@@ -4053,7 +4641,11 @@
     {
       "name": "state/disabled-fg",
       "type": "COLOR",
-      "scopes": [],
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL",
+        "TEXT_FILL"
+      ],
       "codeSyntax": "var(--ns-state-disabled-fg)",
       "values": {
         "Light": "#1c1a1f61",
@@ -4141,7 +4733,7 @@
           "alias": "Scheme/text/muted"
         },
         "Dark": {
-          "alias": "Theme/gray/d/5"
+          "alias": "Theme set/gray/d/5"
         }
       }
     },
@@ -4343,10 +4935,10 @@
       "description": "Authored code-block scrollbar thumb (a control, &gt;=3:1 on the code surface). Not a decorative border.",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/10"
+          "alias": "Theme set/gray/l/10"
         },
         "Dark": {
-          "alias": "Theme/gray/d/10"
+          "alias": "Theme set/gray/d/10"
         }
       }
     },
@@ -4390,7 +4982,7 @@
         "STROKE_COLOR"
       ],
       "codeSyntax": "var(--ns-studio-input-border)",
-      "description": "Field boundary. Utility: lightest gray measuring ≥3:1 (gray 9).",
+      "description": "RETIRED: bind border/input, which now routes Theme input/l|d (gray 9 in Utility). Field boundary. Utility: lightest gray measuring ≥3:1 (gray 9).",
       "values": {
         "Light": {
           "alias": "Studio flavor/input/l/border"
@@ -4986,10 +5578,10 @@
       "codeSyntax": "var(--ns-bg)",
       "values": {
         "Light": {
-          "alias": "Theme/surface/l/canvas"
+          "alias": "Theme set/surface/l/canvas"
         },
         "Dark": {
-          "alias": "Theme/surface/d/canvas"
+          "alias": "Theme set/surface/d/canvas"
         }
       }
     },
@@ -5003,10 +5595,10 @@
       "codeSyntax": "var(--ns-card)",
       "values": {
         "Light": {
-          "alias": "Theme/surface/l/paper"
+          "alias": "Theme set/surface/l/paper"
         },
         "Dark": {
-          "alias": "Theme/surface/d/paper"
+          "alias": "Theme set/surface/d/paper"
         }
       }
     },
@@ -5020,10 +5612,10 @@
       "codeSyntax": "var(--ns-container)",
       "values": {
         "Light": {
-          "alias": "Theme/surface/l/container"
+          "alias": "Theme set/surface/l/container"
         },
         "Dark": {
-          "alias": "Theme/surface/d/container"
+          "alias": "Theme set/surface/d/container"
         }
       }
     },
@@ -5037,10 +5629,10 @@
       "codeSyntax": "var(--ns-container-high)",
       "values": {
         "Light": {
-          "alias": "Theme/surface/l/container-high"
+          "alias": "Theme set/surface/l/container-high"
         },
         "Dark": {
-          "alias": "Theme/surface/d/container-high"
+          "alias": "Theme set/surface/d/container-high"
         }
       }
     },
@@ -5054,10 +5646,10 @@
       "codeSyntax": "var(--ns-container-highest)",
       "values": {
         "Light": {
-          "alias": "Theme/surface/l/container-highest"
+          "alias": "Theme set/surface/l/container-highest"
         },
         "Dark": {
-          "alias": "Theme/surface/d/container-highest"
+          "alias": "Theme set/surface/d/container-highest"
         }
       }
     },
@@ -5071,10 +5663,10 @@
       "codeSyntax": "var(--ns-hover)",
       "values": {
         "Light": {
-          "alias": "Theme/hover/l"
+          "alias": "Theme set/hover/l"
         },
         "Dark": {
-          "alias": "Theme/hover/d"
+          "alias": "Theme set/hover/d"
         }
       }
     },
@@ -5088,10 +5680,10 @@
       "codeSyntax": "var(--ns-inverse)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Dark": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
         }
       }
     },
@@ -5105,10 +5697,10 @@
       "codeSyntax": "var(--ns-muted)",
       "values": {
         "Light": {
-          "alias": "Theme/tone/l/muted"
+          "alias": "Theme set/tone/l/muted"
         },
         "Dark": {
-          "alias": "Theme/tone/d/muted"
+          "alias": "Theme set/tone/d/muted"
         }
       }
     },
@@ -5139,10 +5731,10 @@
       "codeSyntax": "var(--ns-surface-raised)",
       "values": {
         "Light": {
-          "alias": "Theme/surface/l/raised"
+          "alias": "Theme set/surface/l/raised"
         },
         "Dark": {
-          "alias": "Theme/surface/d/raised"
+          "alias": "Theme set/surface/d/raised"
         }
       }
     },
@@ -5156,10 +5748,10 @@
       "codeSyntax": "var(--ns-selected)",
       "values": {
         "Light": {
-          "alias": "Theme/selected/l"
+          "alias": "Theme set/selected/l"
         },
         "Dark": {
-          "alias": "Theme/selected/d"
+          "alias": "Theme set/selected/d"
         }
       }
     },
@@ -5173,10 +5765,221 @@
       "codeSyntax": "var(--ns-surface)",
       "values": {
         "Light": {
-          "alias": "Theme/tone/l/sunken"
+          "alias": "Theme set/tone/l/sunken"
         },
         "Dark": {
-          "alias": "Theme/tone/d/sunken"
+          "alias": "Theme set/tone/d/sunken"
+        }
+      }
+    },
+    {
+      "name": "switch/thumb",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-switch-thumb)",
+      "description": "Switch thumb when on: white / #111113 in Glass, primary/fg elsewhere.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/switch/l/thumb"
+        },
+        "Dark": {
+          "alias": "Theme set/switch/d/thumb"
+        }
+      }
+    },
+    {
+      "name": "table/cell-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-table-cell-rule)",
+      "description": "Theme-following twin of studio/table/cell-rule: its Studio flavor value under Theme Studio, border/subtle elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/table/l/cell-rule"
+        },
+        "Dark": {
+          "alias": "Theme set/table/d/cell-rule"
+        }
+      }
+    },
+    {
+      "name": "table/head",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-table-head)",
+      "description": "Theme-following twin of studio/table/head: its Studio flavor value under Theme Studio, surface/muted elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/table/l/head"
+        },
+        "Dark": {
+          "alias": "Theme set/table/d/head"
+        }
+      }
+    },
+    {
+      "name": "table/head-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-table-head-rule)",
+      "description": "Theme-following twin of studio/table/head-rule: its Studio flavor value under Theme Studio, border/default elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/table/l/head-rule"
+        },
+        "Dark": {
+          "alias": "Theme set/table/d/head-rule"
+        }
+      }
+    },
+    {
+      "name": "table/hover",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-table-hover)",
+      "description": "Theme-following twin of studio/table/hover: its Studio flavor value under Theme Studio, surface/hover elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/table/l/hover"
+        },
+        "Dark": {
+          "alias": "Theme set/table/d/hover"
+        }
+      }
+    },
+    {
+      "name": "table/row-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-table-row-bg)",
+      "description": "Theme-following twin of studio/table/row-bg: its Studio flavor value under Theme Studio, surface/card elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/table/l/row-bg"
+        },
+        "Dark": {
+          "alias": "Theme set/table/d/row-bg"
+        }
+      }
+    },
+    {
+      "name": "table/row-rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-table-row-rule)",
+      "description": "Theme-following twin of studio/table/row-rule: its Studio flavor value under Theme Studio, border/subtle elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/table/l/row-rule"
+        },
+        "Dark": {
+          "alias": "Theme set/table/d/row-rule"
+        }
+      }
+    },
+    {
+      "name": "table/zebra",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-table-zebra)",
+      "description": "Theme-following twin of studio/table/zebra: its Studio flavor value under Theme Studio, surface/surface elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/table/l/zebra"
+        },
+        "Dark": {
+          "alias": "Theme set/table/d/zebra"
+        }
+      }
+    },
+    {
+      "name": "tabs/idle-border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tabs-idle-border)",
+      "description": "Theme-following twin of studio/tabs/idle-border: its Studio flavor value under Theme Studio, transparent elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/tabs/l/idle-border"
+        },
+        "Dark": {
+          "alias": "Theme set/tabs/d/idle-border"
+        }
+      }
+    },
+    {
+      "name": "tabs/sel-bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tabs-sel-bg)",
+      "description": "Theme-following twin of studio/tabs/sel-bg: its Studio flavor value under Theme Studio, surface/card elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/tabs/l/sel-bg"
+        },
+        "Dark": {
+          "alias": "Theme set/tabs/d/sel-bg"
+        }
+      }
+    },
+    {
+      "name": "tabs/sel-border",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-tabs-sel-border)",
+      "description": "Theme-following twin of studio/tabs/sel-border: its Studio flavor value under Theme Studio, border/default elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/tabs/l/sel-border"
+        },
+        "Dark": {
+          "alias": "Theme set/tabs/d/sel-border"
+        }
+      }
+    },
+    {
+      "name": "tabs/track",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-tabs-track)",
+      "description": "Theme-following twin of studio/tabs/track: its Studio flavor value under Theme Studio, surface/muted elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/tabs/l/track"
+        },
+        "Dark": {
+          "alias": "Theme set/tabs/d/track"
         }
       }
     },
@@ -5721,10 +6524,10 @@
       "codeSyntax": "var(--ns-card-fg)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Dark": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
         }
       }
     },
@@ -5739,10 +6542,10 @@
       "codeSyntax": "var(--ns-fg)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/12"
+          "alias": "Theme set/gray/l/12"
         },
         "Dark": {
-          "alias": "Theme/gray/d/12"
+          "alias": "Theme set/gray/d/12"
         }
       }
     },
@@ -5757,10 +6560,10 @@
       "codeSyntax": "var(--ns-inverse-fg)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/1"
+          "alias": "Theme set/gray/l/1"
         },
         "Dark": {
-          "alias": "Theme/gray/d/1"
+          "alias": "Theme set/gray/d/1"
         }
       }
     },
@@ -5775,10 +6578,10 @@
       "codeSyntax": "var(--ns-muted-fg)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/11"
+          "alias": "Theme set/gray/l/11"
         },
         "Dark": {
-          "alias": "Theme/gray/d/11"
+          "alias": "Theme set/gray/d/11"
         }
       }
     },
@@ -5793,10 +6596,45 @@
       "codeSyntax": "var(--ns-fg-subtle)",
       "values": {
         "Light": {
-          "alias": "Theme/gray/l/11"
+          "alias": "Theme set/gray/l/11"
         },
         "Dark": {
-          "alias": "Theme/gray/d/11"
+          "alias": "Theme set/gray/d/11"
+        }
+      }
+    },
+    {
+      "name": "topbar/bg",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": "var(--ns-topbar-bg)",
+      "description": "Theme-following twin of studio/topbar/bg: its Studio flavor value under Theme Studio, surface/bg elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/topbar/l/bg"
+        },
+        "Dark": {
+          "alias": "Theme set/topbar/d/bg"
+        }
+      }
+    },
+    {
+      "name": "topbar/rule",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "codeSyntax": "var(--ns-topbar-rule)",
+      "description": "Theme-following twin of studio/topbar/rule: its Studio flavor value under Theme Studio, border/subtle elsewhere. Bind this, not the interim.",
+      "values": {
+        "Light": {
+          "alias": "Theme set/topbar/l/rule"
+        },
+        "Dark": {
+          "alias": "Theme set/topbar/d/rule"
         }
       }
     },

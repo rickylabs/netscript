@@ -62,3 +62,15 @@ Slice 2 final independent review PASS after the single repair. Post-repair docs 
 Slice 3 initial review FAIL_FIX: filename-first tab names hid runtime labels, and build-time metadata entered twins/search. Single repair restores primary tab labels with selected filename metadata, passes labels to no-JS panel headers, explicitly excludes headers/gutters from Pagefind and headers from twins, and adds real runtime-label/twin regressions.
 
 Slice 3 final independent review PASS after the one repair. Post-repair build exit 0; 36/36 code/keyboard/clipboard/no-JS/style/metadata browser checks pass. Browser and site-config structured checks pass, as do browser lint/fmt. Sign-off follows this independent review. Coordinator export is available; syntax slice 6 moves immediately next, followed by remaining slices 4 and 5; the single input-border compatibility exception is recorded in drift.md.
+
+## Slice 6 — owner Figma syntax and IMPORTANT (advanced by coordinator)
+
+- Copied exact b9dd32aac export with Theme set/B, resolving set A. Migration test compares all 281 baseline declarations per scheme byte-for-byte; only the explicit --ns-input-border gray-9 exception changes, with exact old/new assertions.
+- Seven syntax roles on generated code background, final API kind mapping, inline TypeScript signatures, violet IMPORTANT heading/fill/border with default body. No raw UI colours or red syntax.
+- Contrast/unit tests 6/6 pass: every syntax role meets unrounded 4.5:1 on code and table backgrounds in light/dark, including comments/punctuation; IMPORTANT meets AA on subtle fill.
+- Docs build and structured tooling/site/browser type checks pass; an overbroad signature assertion on fresh-ui tables (which have no Signature column) was corrected to verify real signature-bearing tables without changing implementation. Browser and independent review pending.
+- Reconcile: export changes are authoritative snapshots; pre-S8c test fixture is evidence, not a second runtime colour authority. No lock or dependency churn. Remaining slices 4 and 5 still required.
+
+Slice 6 targeted browser checks: 32/32 pass with zero serious/critical gallery axe findings. Real authored-policy negative controls both exit 1 for the intended reasons (raw-colour and red-outside-state), not a harness/startup error. Visual review replaced missing Unicode info glyphs with currentColor SVGs and made fixture links real anchors; assertions now require both. Policy rejects red syntax, non-destructive tones and prefix impostors such as errorish/destructive-decoration. Initial independent slice review PASS; small visual/policy delta is in separate read-only addendum before sign-off.
+
+Slice 6 independent addendum PASS. All required source/migration/AA/browser checks for this slice pass, with intended negative-control failures. Sign-off follows independent review. Reconcile: sole existing-role delta is approved input-border; remaining export changes add authoritative roles.

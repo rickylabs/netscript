@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { analyzeStylePolicy, type StyleSource } from '../../docs-site/style-policy.ts';
 import { inlineUtilityDiagram } from '../../docs-site/inline-diagram.ts';
+import { AA_TEXT_CONTRAST, contrastRatio } from '../../docs-site/contrast.ts';
+import { API_KINDS } from '../../docs-site/api-kinds.ts';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const SITE = resolve(REPO, 'docs/site/_site');
@@ -587,6 +589,10 @@ test('style policy negative contracts reject literal, named and aliased colours'
   for (
     const source of [
       '.x{color:var(--ns-studio-signal-brand)}',
+      '.ns-prose .hljs-keyword{color:var(--ns-destructive-text)}',
+      '.ns-callout[data-tone="info"]{color:var(--ns-destructive-text)}',
+      '.x[data-tone="destructive-decoration"]{color:var(--ns-destructive-text)}',
+      '.x[data-variant="errorish"]{color:var(--ns-destructive-text)}',
       '.x{--alias:var(--ns-block-pink);background:var(--alias)}',
       '.x{border-color:var(--ns-studio-signal-brand)}',
       '.x{border-inline-start:1px solid var(--ns-studio-signal-brand)}',
@@ -619,7 +625,7 @@ test('style policy negative contracts reject literal, named and aliased colours'
       path: 'styles/control.css',
       kind: 'css' as const,
       source:
-        '.docs-logo{background:var(--ns-studio-signal-brand)} .notice[data-state="error"]{color:var(--ns-destructive-text)}',
+        '.docs-logo{background:var(--ns-studio-signal-brand)} .notice[data-state="error"]{color:var(--ns-destructive-text)} .ns-callout[data-tone="destructive"]{border-color:var(--ns-destructive-border)}',
     }]),
   ).toEqual([]);
   const unresolvedBuilt = await page.evaluate(analyzeStylePolicy, [...layers, {
@@ -638,6 +644,7 @@ test('callouts: semantic tone, default body and ink links', async ({ page }) => 
     const [kind, tone] of Object.entries({
       note: 'info',
       tip: 'success',
+      important: 'important',
       warning: 'warning',
       caution: 'destructive',
       error: 'destructive',
@@ -808,4 +815,91 @@ test('code header metadata stays out of twins and search bodies', async ({ page 
   expect(prose).not.toMatch(/^(?:TypeScript|Shell|Plain text|JSON with comments)$/m);
   expect(twin).toMatch(/```(?:ts|typescript)\n/);
   expect(twin).toContain('plugins/sagas/order-saga.ts');
+});
+
+test('syntax: generated roles, actual code backgrounds and AA contrast', async ({ page }) => {
+  await visit(page, 'internal/code/');
+  const paint = await page.locator('.ns-prose').evaluate((prose) => {
+    const probe = document.createElement('span');
+    prose.append(probe);
+    const roles: Record<string, string> = {};
+    for (
+      const role of ['keyword', 'function', 'type', 'string', 'number', 'comment', 'punctuation']
+    ) {
+      probe.style.color = `var(--ns-code-syntax-${role})`;
+      roles[role] = getComputedStyle(probe).color;
+    }
+    probe.style.color = 'var(--ns-code-bg)';
+    const background = getComputedStyle(probe).color;
+    probe.remove();
+    const examples = Object.fromEntries(
+      Object.entries({
+        keyword: '.hljs-keyword',
+        function: '.hljs-title.function_',
+        type: '.hljs-built_in',
+        string: '.hljs-string',
+        number: '.hljs-number',
+        comment: '.hljs-comment',
+        punctuation: '.hljs-punctuation',
+      }).map(([role, selector]) => [role, getComputedStyle(prose.querySelector(selector)!).color]),
+    );
+    const tokens = [...prose.querySelectorAll('pre code [class*="hljs-"]')].map((token) => ({
+      classes: token.className,
+      foreground: getComputedStyle(token).color,
+      background: getComputedStyle(token.closest('pre')!).backgroundColor,
+    }));
+    return { roles, examples, background, tokens };
+  });
+  expect(paint.tokens.length).toBeGreaterThan(40);
+  for (const [role, actual] of Object.entries(paint.examples)) {
+    expect(actual).toBe(paint.roles[role]);
+  }
+  for (const token of paint.tokens) {
+    expect(token.background).toBe(paint.background);
+    expect(Object.values(paint.roles), token.classes).toContain(token.foreground);
+    expect(contrastRatio(token.foreground, token.background), token.classes).toBeGreaterThanOrEqual(
+      AA_TEXT_CONTRAST,
+    );
+  }
+});
+
+test('API kind paint follows the final generated role and signatures have syntax colours', async ({ page }) => {
+  const seen = new Set<string>();
+  let highlightedSignatures = 0;
+  for (const route of ['reference/database/', 'reference/fresh-ui/']) {
+    await visit(page, route);
+    const tags = await page.locator('.ns-api-kind').evaluateAll((tags) =>
+      tags.map((tag) => {
+        const role = tag.getAttribute('data-syntax-role')!;
+        const probe = document.createElement('span');
+        tag.append(probe);
+        probe.style.color = `var(--ns-code-syntax-${role})`;
+        const expected = getComputedStyle(probe).color;
+        probe.remove();
+        return {
+          kind: tag.getAttribute('data-kind')!,
+          role,
+          actual: getComputedStyle(tag).color,
+          background: getComputedStyle(tag).backgroundColor,
+          tableBackground: getComputedStyle(document.documentElement).backgroundColor,
+          expected,
+        };
+      })
+    );
+    for (const tag of tags) {
+      seen.add(tag.kind);
+      expect(tag.role).toBe(API_KINDS[tag.kind as keyof typeof API_KINDS]);
+      expect(tag.actual).toBe(tag.expected);
+      expect(contrastRatio(tag.actual, tag.background)).toBeGreaterThanOrEqual(AA_TEXT_CONTRAST);
+      // The page canvas is the transparent table's background.
+      expect(contrastRatio(tag.actual, tag.tableBackground)).toBeGreaterThanOrEqual(
+        AA_TEXT_CONTRAST,
+      );
+    }
+    highlightedSignatures += await page.locator('.ns-api-table__type .hljs-keyword').count();
+  }
+  expect(highlightedSignatures).toBeGreaterThan(0);
+  for (const kind of ['class', 'function', 'interface', 'type', 'const', 'component']) {
+    expect(seen.has(kind)).toBe(true);
+  }
 });

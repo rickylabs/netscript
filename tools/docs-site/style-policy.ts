@@ -87,7 +87,7 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
               (node.getAttribute('class') ?? '').replaceAll(' ', '.')
             }[data-state="${node.getAttribute('data-state') ?? ''}"][data-variant="${
               node.getAttribute('data-variant') ?? ''
-            }"]`,
+            }"][data-tone="${node.getAttribute('data-tone') ?? ''}"]`,
           );
         }
         const style = globalThis.document.createElement('span').style;
@@ -178,8 +178,9 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
     const logo = file.path === 'favicon.svg' ||
       selectors.every((part) => /\.docs-logo\b/.test(part));
     const error = selectors.every((part) =>
-      /data-(?:state|variant|intent|tone)\s*=\s*["']?(?:error|destructive)|aria-invalid\s*=\s*["']?true|\.ns-error\b/
-        .test(part)
+      /\[data-(?:state|variant|intent|tone)\s*=\s*(?:"(?:error|destructive)"|'(?:error|destructive)'|(?:error|destructive))\s*\]/
+        .test(part) ||
+      /\[aria-invalid\s*=\s*(?:"true"|'true'|true)\s*\]/.test(part) || /\.ns-error\b/.test(part)
     );
     if (red(value) && !logo && !error) finding(entry, 'red-outside-state');
   }

@@ -28,7 +28,7 @@ import { resolveXref } from './_data/xref.ts';
 import { assertDiagramAssetsExist } from './_diagrams/validate.ts';
 import { aiTooling } from './_plugins/ai-tooling.ts';
 import { getDocsLane } from './_data.ts';
-import { apiKind } from '../../tools/docs-site/api-kinds.ts';
+import { apiKind, apiKindRole } from '../../tools/docs-site/api-kinds.ts';
 import { inlineUtilityDiagram } from '../../tools/docs-site/inline-diagram.ts';
 
 /**
@@ -94,6 +94,7 @@ site.addEventListener('beforeBuild', async () => {
 site.filter('xref', (key: string) => resolveXref(key).href);
 site.filter('slugify', slugify);
 site.filter('apiKind', apiKind);
+site.filter('apiKindRole', apiKindRole);
 site.filter('languageLabel', (language: string) => LANGUAGE_LABELS[language] ?? language);
 site.filter('codeFilename', codeFilename);
 // Inline presentation inherits the page scheme; the original SVG remains available to twins.
@@ -164,7 +165,10 @@ const codeLanguages = {
 for (const language of Object.keys(LANGUAGE_LABELS)) {
   assertCodeLanguage(language, Object.keys(codeLanguages));
 }
-site.use(codeHighlight({ languages: codeLanguages }));
+site.use(codeHighlight({
+  languages: codeLanguages,
+  options: { cssSelector: 'pre code, .ns-api-table__type code, code.ns-api-table__type' },
+}));
 
 // Build the static index; custom and fallback UIs load only when requested.
 site.use(pagefind({ ui: false }));
@@ -228,10 +232,16 @@ site.addEventListener('afterRender', () => {
         const tag = document.createElement('span');
         tag.className = 'ns-api-kind';
         tag.setAttribute('data-kind', kind);
+        tag.setAttribute('data-syntax-role', apiKindRole(kind)!);
         tag.textContent = label ?? kind;
         cell.textContent = '';
         cell.appendChild(tag);
       }
+    }
+    for (
+      const code of document.querySelectorAll('.ns-api-table__type code, code.ns-api-table__type')
+    ) {
+      code.classList.add('language-typescript');
     }
     // Frame Markdown fences at build time so labels and filenames also work without JavaScript.
     for (const pre of document.querySelectorAll('.ns-prose pre')) {
