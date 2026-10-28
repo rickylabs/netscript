@@ -155,6 +155,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_pages != 'false' }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
@@ -175,6 +176,7 @@ jobs:
         run: deno task docs:exports-drift
       - name: Check documentation snippets
         if: env.RUN == 'true'
+        timeout-minutes: 5
         run: deno task docs:snippets
       - name: Build Lume site
         if: env.RUN == 'true'
@@ -204,6 +206,7 @@ jobs:
       pages: write
       id-token: write
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

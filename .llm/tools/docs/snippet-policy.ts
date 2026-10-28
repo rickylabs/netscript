@@ -1,5 +1,6 @@
 import { relative } from '@std/path';
 import { extractFencedBlocks, type FencedBlock } from './snippet-extractor.ts';
+import { runSnippetProcess } from './snippet-process.ts';
 
 /** The issue-mandated Tier-1 source pages, including zero-fence index.vto. */
 export const TIER_1_PAGES = [
@@ -62,14 +63,18 @@ async function isGeneratedOrIgnoredDirectory(path: string, name: string): Promis
   if (name === '_site') return true;
 
   try {
-    const result = await new Deno.Command('git', {
-      args: ['check-ignore', '--quiet', '--', path],
-      stdout: 'null',
-      stderr: 'null',
-    }).output();
+    const result = await runSnippetProcess('git', ['check-ignore', '--quiet', '--', path], {
+      cwd: Deno.cwd(),
+      source: path,
+    });
+    if (result.timedOut || result.interrupted) throw new Error(result.stderr);
     return result.code === 0;
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) return false;
+    if (
+      error instanceof Error && error.cause instanceof Error &&
+      'code' in error.cause && error.cause.code === 'ENOENT'
+    ) return false;
     throw error;
   }
 }
