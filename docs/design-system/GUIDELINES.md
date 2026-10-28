@@ -39,7 +39,7 @@ contexts with a DTCG resolver file. This section maps one onto the other. Owners
 | Tier          | What it holds                                                                                                                                                                                                                                                                                   | Figma source                                                                                                                                                                       | Code surface (provisional until #2414)                            | Who may read it                                          |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------- |
 | **Primitive** | Raw values only: colour ramps (oklch with a hex fallback), dimensions, durations, font families. Radix 12-step ramps (gray, slate, sand, mauve, blue, violet, orange, indigo, tomato, lime, grass, amber, red, teal) and theme ramps (`ember`, `band`, `paper`, `glass`, `shadow`, `swiss-red`) | `Primitives` collection (Value mode)                                                                                                                                               | Internal custom properties, e.g. `--ns-band-*`                    | The semantic tier only. Components never read primitives |
-| **Semantic**  | **Aliases only.** Every value references a primitive (or another semantic role), never a raw hex, px or ms. Core roles plus declared language-pack roles (§2.4)                                                                                                                                 | `Scheme` collection (Light, Dark). Its aliases are selected through the `Theme set` (`Theme` or `Theme B`), `Base gray`, `Base accent`, `Density` and `Studio flavor` modes (§2.2) | `--ns-*` (core) and `--ns-<theme>-*` (packs)                      | Component tokens and L2 component CSS                    |
+| **Semantic**  | **Aliases only.** Every value references a primitive (or another semantic role), never a raw hex, px or ms. Core roles plus each style's namespaced roles (§2.4)                                                                                                                                | `Scheme` collection (Light, Dark). Its aliases are selected through the `Theme set` (`Theme` or `Theme B`), `Base gray`, `Base accent`, `Density` and `Studio flavor` modes (§2.2) | `--ns-*` (core) and `--ns-<theme>-*` (styles)                     | Component tokens and L2 component CSS                    |
 | **Component** | Part and state tokens (`button.*`, `input.*`, `card.*`, …) that alias semantic roles, so heavy customization is a token edit, not a CSS override                                                                                                                                                | Variable bindings on library components; there is no component collection yet                                                                                                      | Named by the tokens build from the component anatomy spec (#2416) | That component's own CSS only                            |
 
 - **Derived values.** Tints, hovers and other mixes are not raw values in the semantic tier.
@@ -385,8 +385,8 @@ agent builds with the theme).
 
 ## 7. Creating a new theme: step by step
 
-1. **Choose the anchor.** Record the reference pack in the theme's `DESIGN.md`: sources, licence,
-   what you take, and what you must not copy.
+1. **Choose the anchor.** Record the anchor in the theme's `DESIGN.md`: sources, licence, what you
+   take, and what you must not copy.
 2. **Write the thesis and three signature moves.**
 3. **Fill in the axes table (§4.3).** Show that at least six axes differ from the nearest existing
    theme.
@@ -401,7 +401,7 @@ agent builds with the theme).
 7. **Write `DESIGN.md` and `SKILL.md`** from `themes/_template/`.
 8. **Get an independent review** (§4.6), apply its corrections in place, then get design sign-off.
 9. **Register any new roles in code** (#2414) before the theme ships through registry v2 (#2415).
-   List them in the pack's role manifest (§2.4) first.
+   List them in the style's role manifest (§2.4) first.
 
 ## 8. Shipping (planned)
 
