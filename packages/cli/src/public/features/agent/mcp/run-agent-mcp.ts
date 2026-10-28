@@ -8,6 +8,8 @@ import { CliProjectDoctor, PublicCliCommandCatalog } from './cli-mcp-adapters.ts
 import { EMBEDDED_SKILL_FILES } from '../../../../kernel/assets/skills.generated.ts';
 import { CLI_PACKAGE_VERSION } from '../../../../kernel/assets/publish-assets.generated.ts';
 import { isCompiledBinary } from '../../../../kernel/adapters/runtime/platform/deno-platform.ts';
+import { FetchUiRegistry } from '../../../../kernel/adapters/ui/fetch-ui-registry.ts';
+import { createCliUiRegistryCatalog } from './create-cli-ui-registry-catalog.ts';
 
 /** Runtime facts needed to re-enter the CLI process that hosts MCP. */
 export interface HostCliRuntime {
@@ -68,6 +70,11 @@ export function createAgentMcpOptions(
     endpoint: input.endpoint,
     projectRoot: input.projectRoot,
     docsRoot: input.docsRoot,
+    uiRegistryCatalog: createCliUiRegistryCatalog(
+      input.projectRoot,
+      dependencies.fs,
+      new FetchUiRegistry(),
+    ),
     commandCatalog: new PublicCliCommandCatalog(program),
     commandExecutor: new SpawnCommandExecutor({
       cliCommand: resolveHostCliCommand(host),

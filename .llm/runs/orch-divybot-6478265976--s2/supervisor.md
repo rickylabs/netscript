@@ -22,3 +22,5 @@ Continuation write surface also includes `docs/site/reference/fresh-ui/index.md`
 Concurrent continuation reservation: `packages/mcp/**`, `docs/site/reference/mcp/index.md`, and `docs/site/ai/agent-tooling.md` for the independent registry-tool slice. Root deno.lock may receive only the necessary workspace dependency metadata for MCP's existing-version Fresh UI dependency; no dependency version or integrity changes.
 
 The required lock-metadata surface also includes `packages/fresh-ui/deno.lock`, `resources/examples/expo-streams/deno.lock`, and `packages/cli/e2e/fixtures/desktop-native/deno.lock`. Repo-native frozen-reference/private-workspace guards require these exact metadata-only updates.
+
+CLI-host MCP composition reservation: `packages/cli/src/public/features/agent/mcp/run-agent-mcp.ts` and `create-cli-ui-registry-catalog{,_test}.ts`, plus registry README/run evidence. The composition reuses the already-landed config/client/transport; no installer or command-root changes.

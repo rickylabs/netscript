@@ -65,7 +65,11 @@ export function legacyRegistryManifest(registry: Registry): RegistryManifest {
       description: item.description ?? '',
       title: item.title,
       author: item.author,
-      files: (item.files ?? []).map((file) => ({
+      // Theme skills belong to the v2 installer; preserve the legacy scaffold's copy contract.
+      files: (item.files ?? []).filter((file) =>
+        !(item.type === 'registry:theme' &&
+          file.target?.startsWith('.agents/skills/fresh-ui-theme-'))
+      ).map((file) => ({
         source: file.path.startsWith('packages/fresh-ui/')
           ? file.path.slice('packages/fresh-ui/'.length)
           : `../../${file.path}`,
