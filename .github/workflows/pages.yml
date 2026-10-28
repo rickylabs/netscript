@@ -5,6 +5,12 @@ on:
     branches: [main]
     paths:
       - docs/site/**
+      - tools/docs-site/**
+      - tools/fresh-ui-browser/docs.playwright.config.ts
+      - tools/fresh-ui-browser/docs.deno.json
+      - tools/fresh-ui-browser/docs-tests/**
+      - tools/fresh-ui-browser/package.json
+      - tools/fresh-ui-browser/package-lock.json
       - packages/**
       - '!packages/**/tests/**'
       - '!packages/cli/e2e/**'
@@ -24,6 +30,12 @@ on:
     branches: [main]
     paths:
       - docs/site/**
+      - tools/docs-site/**
+      - tools/fresh-ui-browser/docs.playwright.config.ts
+      - tools/fresh-ui-browser/docs.deno.json
+      - tools/fresh-ui-browser/docs-tests/**
+      - tools/fresh-ui-browser/package.json
+      - tools/fresh-ui-browser/package-lock.json
       - packages/**
       - '!packages/**/tests/**'
       - '!packages/cli/e2e/**'
@@ -179,8 +191,8 @@ jobs:
           path: docs/site/_site
 
   deploy:
-    if: github.event_name != 'pull_request'
-    needs: build
+    if: github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && needs.utility-browser.result == 'success' && needs.classify.outputs.needs_pages != 'false'
+    needs: [classify, build, utility-browser]
     permissions:
       pages: write
       id-token: write
@@ -192,3 +204,63 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  utility-browser:
+    name: Utility docs browser and style policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: '2.9.7'
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: tools/fresh-ui-browser/package-lock.json
+      - name: Verify generated Utility values without repairing them
+        run: deno run --allow-read tools/docs-site/generate-tokens.ts --check
+      - name: Check docs tooling
+        run: |
+          deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root tools/docs-site --ext ts
+          deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root tools/docs-site --ext ts --config docs/site/deno.json
+          deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root tools/docs-site --ext ts
+          deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read tools/docs-site/generate-tokens_test.ts tools/docs-site/inline-diagram_test.ts
+      - name: Build the actual docs site for browser verification
+        run: deno task --cwd docs/site build
+      - name: Install locked browser tooling
+        working-directory: tools/fresh-ui-browser
+        run: npm ci --ignore-scripts
+      - name: Check browser test TypeScript
+        run: |
+          deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --cwd tools/fresh-ui-browser --root docs-tests --file docs.playwright.config.ts --ext ts --deno-arg --config --deno-arg docs.deno.json
+          deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --cwd tools/fresh-ui-browser --root docs-tests --file docs.playwright.config.ts --ext ts --config ../../docs/site/deno.json
+          deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --cwd tools/fresh-ui-browser --root docs-tests --file docs.playwright.config.ts --ext ts --config ../../docs/site/deno.json
+      - name: Install Chromium and system dependencies
+        working-directory: tools/fresh-ui-browser
+        run: npx playwright install --with-deps chromium
+      - name: Screenshots, strict axe, keyboard and policy negative contracts
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-ui-browser --id docs-utility-browser
+          --cwd tools/fresh-ui-browser
+          --output .llm/tmp/gate-receipts/docs-utility-browser/browser.receipt.json
+          --child-report test-results/docs/results.json --
+          -- --config docs.playwright.config.ts
+      - name: Upload Utility screenshots, axe, traces and command receipt
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: docs-utility-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            tools/fresh-ui-browser/test-results/docs/
+            tools/fresh-ui-browser/playwright-report/docs/
+            .llm/tmp/gate-receipts/docs-utility-browser/
+          if-no-files-found: error
+          retention-days: 30

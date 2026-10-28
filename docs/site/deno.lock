@@ -499,6 +499,8 @@
   },
   "workspace": {
     "dependencies": [
+      "npm:highlight.js@11.11.1",
+      "npm:markdown-it-anchor@9.2.0",
       "npm:react@18.3.1"
     ]
   }

@@ -25,6 +25,12 @@ const SOURCE = new URL('./figma-variables/', import.meta.url);
 const OUTPUT = new URL('../../docs/site/styles/tokens.css', import.meta.url);
 const FAVICON = new URL('../../docs/site/favicon.svg', import.meta.url);
 const SCHEMES = ['light', 'dark'] as const;
+const GEOMETRY_COLOUR_COLLISIONS = new Set([
+  '--ns-studio-table-cell-rule',
+  '--ns-studio-topbar-rule',
+  '--ns-studio-table-head-rule',
+  '--ns-studio-table-row-rule',
+]);
 const FOREIGN_PACK =
   /^(?:liquid|tactile|bloom|cupertino|fluent|pixel|tonal|glass|brutal|ledger|filigrane|signal)\//;
 const WEIGHTS: Readonly<Record<string, number>> = {
@@ -74,11 +80,7 @@ function cssValue(variable: FigmaVariable, value: string | number | boolean): st
     return String(weight);
   }
   if (variable.name.startsWith('font/')) {
-    return `${JSON.stringify(value)}, ${
-      variable.name.includes('mono') || /data|label/.test(variable.name)
-        ? 'monospace'
-        : 'sans-serif'
-    }`;
+    return `${JSON.stringify(value)}, ${/mono/i.test(value) ? 'monospace' : 'sans-serif'}`;
   }
   return value;
 }
@@ -88,6 +90,7 @@ export function generateTokens(collections: readonly FigmaCollection[]): string 
   const blocks = SCHEMES.map((scheme) => {
     const modes = { ...UTILITY_MODES, Scheme: scheme === 'light' ? 'Light' : 'Dark' };
     const tokens = new Map<string, string>();
+    const owners = new Map<string, string>();
     for (const collectionName of ['Theme', 'Density', 'Studio flavor', 'Scheme']) {
       const collection = collections.find((entry) => entry.collection === collectionName);
       if (!collection) throw new Error(`Missing collection: ${collectionName}`);
@@ -96,6 +99,16 @@ export function generateTokens(collections: readonly FigmaCollection[]): string 
         if (collectionName === 'Scheme' && FOREIGN_PACK.test(variable.name)) continue;
         const property = variable.codeSyntax.match(/^var\((--ns-[a-z0-9-]+)\)$/)?.[1];
         if (!property) throw new Error(`Invalid CSS code syntax: ${variable.name}`);
+        const previous = owners.get(property);
+        if (
+          previous && !(GEOMETRY_COLOUR_COLLISIONS.has(property) &&
+            previous.startsWith('Studio flavor/') && collectionName === 'Scheme')
+        ) {
+          throw new Error(
+            `CSS token collision: ${property} (${previous}, ${collectionName}/${variable.name})`,
+          );
+        }
+        owners.set(property, `${collectionName}/${variable.name}`);
         const value = resolveVariable(collections, `${collectionName}/${variable.name}`, modes);
         tokens.set(property, cssValue(variable, value));
       }

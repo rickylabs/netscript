@@ -1,0 +1,420 @@
+{
+  "command": "npm test -- --config docs.playwright.config.ts",
+  "sourceHead": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+  "sourceState": "Uncommitted slice5 working tree; immutable-head CI proof remains required.",
+  "exitCode": 1,
+  "stats": {
+    "startTime": "2026-10-28T09:32:47.109Z",
+    "duration": 169645.45700000002,
+    "expected": 44,
+    "skipped": 0,
+    "unexpected": 4,
+    "flaky": 0
+  },
+  "failures": [
+    {
+      "test": "Utility design-system: screenshot, axe and responsive layout",
+      "project": "light-390",
+      "cause": "HTTP design-system/: expected200, received404"
+    },
+    {
+      "test": "Utility design-system: screenshot, axe and responsive layout",
+      "project": "light-1280",
+      "cause": "HTTP design-system/: expected200, received404"
+    },
+    {
+      "test": "Utility design-system: screenshot, axe and responsive layout",
+      "project": "dark-390",
+      "cause": "HTTP design-system/: expected200, received404"
+    },
+    {
+      "test": "Utility design-system: screenshot, axe and responsive layout",
+      "project": "dark-1280",
+      "cause": "HTTP design-system/: expected200, received404"
+    }
+  ],
+  "audits": [
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "light-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 46,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 48,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 46,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 46,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 48,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 32,
+        "incomplete": 1,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/cli-reference/",
+      "project": "dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 47,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "light-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 32,
+        "incomplete": 1,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/",
+      "project": "dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 43,
+        "incomplete": 1,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/",
+      "project": "light-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 43,
+        "incomplete": 1,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 32,
+        "incomplete": 1,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/cli-reference/",
+      "project": "light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 48,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/",
+      "project": "dark-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 43,
+        "incomplete": 1,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/",
+      "project": "light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 43,
+        "incomplete": 1,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/cli-reference/",
+      "project": "light-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 47,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "light-390",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 46,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 32,
+        "incomplete": 1,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/cli-reference/",
+      "project": "dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 48,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "dark-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "dark",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 48,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    },
+    {
+      "command": "npm test -- --config docs.playwright.config.ts",
+      "commit": "dc08c981c4c713c690c9cbd945b2e728584e3b6e",
+      "route": "/netscript/web-layer/fresh-ui/",
+      "project": "light-1280",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scheme": "light",
+      "browser": "153.0.8010.12",
+      "node": "v26.10.0",
+      "axe": {
+        "passes": 48,
+        "incomplete": 2,
+        "violations": [],
+        "blocking": 0
+      }
+    }
+  ],
+  "screenshots": 28,
+  "note": "No skipped tests or axe exclusions. Only reserved sibling destination is absent; do not claim the complete matrix passed."
+}

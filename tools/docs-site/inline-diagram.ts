@@ -1,5 +1,5 @@
 const COLOUR =
-  /#[\da-f]{8}\b|#[\da-f]{6}\b|#[\da-f]{4}\b|#[\da-f]{3}\b|\brgba?\([^)]*\)|\b(?:black|white)\b/gi;
+  /#[\da-f]{8}\b|#[\da-f]{6}\b|#[\da-f]{4}\b|#[\da-f]{3}\b|\brgba?\([^)]*\)|\b(?:black|white|red)\b/gi;
 
 function semanticPaint(property: string, paint: string): string {
   const value = paint.toLowerCase();

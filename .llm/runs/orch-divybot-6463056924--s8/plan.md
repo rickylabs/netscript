@@ -18,7 +18,7 @@ One feature-tier leaf. Application/docs surface with SCOPE-docs and SCOPE-fronte
 2. Shell/layout: `_includes/layouts/base.vto`, `_includes/nav/menu-item.vto`, `_data.ts`, shell CSS and browser JS. Prove build/link checks and representative responsive renders.
 3. Components/prose: all 16 owned `_components/*.vto`, added signature components, prose/component CSS, top-level index, `_config.ts` inline-diagram filter (no SVG source edits). Prove `diagrams:check`, build/rendered output, a built diagram page twin retaining its exact image link and alt text, and a browser assertion for the inline diagram accessible name, including a two-diagram fixture to detect duplicate IDs.
 4. Search/mobile: `docs/site/assets/docs/{shell,tabs,toc,search}.js` browser enhancement modules (copied by existing assets rule), search markup in base.vto and search/mobile CSS. Prove Pagefind results, filters, keyboard dialog/drawer/TOC/tabs, storage-denied fallback and no-JS panels.
-5. Checks/evidence: `tools/docs-site/**`, `tools/fresh-ui-browser/docs.playwright.config.ts`, `tools/fresh-ui-browser/tests/docs.spec.ts`, `.github/workflows/pages.yml`. Add `tools/docs-site/**` and docs browser harness files to both Pages trigger lists; durable token input lives beneath that tooling path. Preserve all existing gates, add generated-token/raw-colour/red-policy negative controls, strict axe, screenshots and CI artifact upload. Run structured TS wrappers and docs verify; exports drift/snippets; required full CLI E2E once at readiness.
+5. Checks/evidence: `tools/docs-site/**`, `tools/fresh-ui-browser/docs.playwright.config.ts`, `tools/fresh-ui-browser/docs-tests/docs.spec.ts`, `.github/workflows/pages.yml`. Add `tools/docs-site/**` and docs browser harness files to both Pages trigger lists; durable token input lives beneath that tooling path. Preserve all existing gates, add generated-token/raw-colour/red-policy negative controls, strict axe, screenshots and CI artifact upload. Run structured TS wrappers and docs verify; exports drift/snippets; required full CLI E2E once at readiness.
 
 Each slice updates worklog/context and is committed/pushed with its gate evidence. Obtain separate Claude substantive review before sign-off; final mandatory IMPL-EVAL after gates.
 
@@ -48,3 +48,9 @@ S8b theme/gallery content, framework components/tokens v2 implementation, logo r
 Historical round 1 and round 2 FAIL_PLAN verdicts were escalated. Owner directed resumption; same independent evaluator returned PASS. Coordinator then explicitly approved B3: source image uses hidden and loading=lazy, and IMPL-EVAL verifies twin and accessible-name assertions. Plan gate is closed; implement slices 1–5 from head 74d15bd.
 
 The owner has now directed continuation after the escalation. Review the amended plan in the resumed run; prior failed verdicts remain historical evidence.
+
+Slice5 URL integration repair also owns `docs/site/_plugins/ai-tooling.ts`: preserve a component URL that already includes the deployment base when producing Markdown twins. The full browser test rejects doubled bases. `.llm/tools/docs/pages-workflow_test.ts` gains the new required tooling path triggers while preserving all existing gate assertions.
+
+Slice5 also owns `docs/site/deno.json`: move the existing four pinned npm import specifiers into the import map so the existing no-import-prefix lint rule passes on the full touched config. Dependency identities and versions are unchanged.
+
+The import-map repair necessarily adds the two already-resolved pinned npm packages to `docs/site/deno.lock` workspace dependency metadata. No resolved version, hash or dependency graph changes. Retain and independently review these two metadata lines; never delete or regenerate the lock.

@@ -60,10 +60,10 @@
   --ns-elevation-key: #00000024;
   --ns-fg: #202020;
   --ns-fg-subtle: #646464;
-  --ns-font-data: "Host Grotesk", monospace;
+  --ns-font-data: "Host Grotesk", sans-serif;
   --ns-font-heading: "Host Grotesk", sans-serif;
   --ns-font-kpi: "Host Grotesk", sans-serif;
-  --ns-font-label: "Host Grotesk", monospace;
+  --ns-font-label: "Host Grotesk", sans-serif;
   --ns-font-mono: "Fragment Mono", monospace;
   --ns-font-sans: "Host Grotesk", sans-serif;
   --ns-frame-ink: #202020;
@@ -327,10 +327,10 @@
   --ns-elevation-key: #00000047;
   --ns-fg: #eeeeee;
   --ns-fg-subtle: #b4b4b4;
-  --ns-font-data: "Host Grotesk", monospace;
+  --ns-font-data: "Host Grotesk", sans-serif;
   --ns-font-heading: "Host Grotesk", sans-serif;
   --ns-font-kpi: "Host Grotesk", sans-serif;
-  --ns-font-label: "Host Grotesk", monospace;
+  --ns-font-label: "Host Grotesk", sans-serif;
   --ns-font-mono: "Fragment Mono", monospace;
   --ns-font-sans: "Host Grotesk", sans-serif;
   --ns-frame-ink: #484848;

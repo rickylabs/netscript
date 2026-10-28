@@ -1,15 +1,7 @@
-# S8 active
+# S8 active — final slice
 
-PR #2439 draft. Coordinator explicitly approved B3 with hidden/lazy source image and IMPL-EVAL twin/accessibility checks. Same independent evaluator returned resumed PLAN-EVAL PASS. Slice 1 tokens/fonts implemented and gated; independent review PASS; committing/pushing this slice. Next: shell/layout, components/prose, search/mobile, checks/evidence. See worklog.md for commands and supervisor.md for writable paths.
+PR2439 draft; slices1–4 pushed through dc08c98. Coordinator B3 approval and resumed PLAN-EVAL PASS retained. Slice5 browser/policy/CI tooling and URL integration fix are implemented; initial independent review FAIL_FIX found CSS shorthand gaps, repaired with expanded negative contracts; same evaluator repair review is running. Normal focused policy tests pass and both injected actual negative controls exit1. Previous complete browser matrix44PASS/4FAIL solely missing design-system route; final repaired matrix running with immutable output directory.
 
-Slice 1 committed/pushed c0cdf35 with review PASS. Slice 2 shell is implemented/gated except reserved design-system destination pending sibling #2437; Chromium smoke has zero page errors/overflow at both widths. Review pending.
+Remaining: independent slice5 repair verdict, commit/push code+evidence; native CLI/MCP generated documentation carrier refresh (check:agent-docs-prose currently stale), and integrate upstream S8b content after PR2437 lands. Recheck S1 PR2435 before final. S8b is ready/green/clean but OPEN; do not fake its pages, skip its screenshot or exempt links. Need full composed docs/link/browser gates and final separate IMPL-EVAL, screenshot CI artifact link, then READY only, no merge/tag/release. Local full CLI E2E UNPROVEN at environment preflight; preserve limitation. See worklog and leak-report. Never commit assignment, private raw logs or session metadata.
 
-Slice 2 reviewed PASS; committing/pushing shell now. Next components/prose/signature kit and inline diagram transformation with hidden lazy img.
-
-Slice 2 pushed 13359ce; slice 3 implemented and gated, review pending. CI failure confirmed solely reserved design-system link; sibling #2437 is now ready and mergeable. Diagram source check passed16/16, source img hidden/lazy, canonical twin URL verified.
-
-Slice 3 repair review PASS; all existing components plus signature kit, homepage and diagram/twin preservation are ready to commit. Next slice4 Pagefind dialog/mobile; then slice5 browser/policy/CI evidence and final IMPL-EVAL.
-
-Slice 3 pushed a4f494e. Slice 4 Pagefind/native dialog/fallback is implemented and gated; review pending. Next slice5 persistent browser matrix, CSS/red negative controls, CI artifacts and final independent evaluation.
-
-Slice4 review PASS; committing/pushing. Remaining slice5: policy + actual negative-control exits, persistent docs browser matrix (all5 page types ×2schemes×2widths), keyboard/error/noJS/B3 tests, CI artifact upload and IMPL-EVAL. Reconcile upstream main/S1/S8b before final full links.
+Slice5 repair review PASS; final repaired matrix44PASS/4FAIL solely reserved design-system404,20 completed axe audits with zero serious/critical. Committing/pushing slice5 now; next native generated-carrier refresh and integration readiness, no false green.

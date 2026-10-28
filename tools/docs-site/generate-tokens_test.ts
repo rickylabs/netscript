@@ -44,3 +44,11 @@ Deno.test('Figma resolver fails closed on missing aliases, modes and cycles', ()
     'Cyclic Figma alias',
   );
 });
+
+Deno.test('unknown CSS name collisions fail instead of shadowing a role', async () => {
+  const collections = await loadCollections();
+  const theme = collections.find((collection) => collection.collection === 'Theme')!;
+  const colour = theme.variables.find((variable) => variable.type === 'COLOR')!;
+  theme.variables.push({ ...colour, name: 'unexpected-collision', codeSyntax: 'var(--ns-fg)' });
+  assertThrows(() => generateTokens(collections), Error, 'CSS token collision');
+});
