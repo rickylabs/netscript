@@ -443,6 +443,14 @@ export async function compileJsdocExamples(
     );
     const tempLockPath = join(tempRoot, 'deno.lock');
     await Deno.copyFile(rootLockPath, tempLockPath);
+    // Keep the Windows command line bounded while checking every isolated example module.
+    const entryPath = join(tempRoot, 'examples.ts');
+    await Deno.writeTextFile(
+      entryPath,
+      `${
+        modules.map((module) => `import ${JSON.stringify(toFileUrl(module.path).href)};`).join('\n')
+      }\n`,
+    );
     const output = await new Deno.Command(Deno.execPath(), {
       cwd: repositoryRoot,
       env: { FORCE_COLOR: '0', NO_COLOR: '1' },
@@ -453,7 +461,7 @@ export async function compileJsdocExamples(
         tempLockPath,
         '--config',
         configPath,
-        ...modules.map((module) => module.path),
+        entryPath,
       ],
       stdout: 'piped',
       stderr: 'piped',

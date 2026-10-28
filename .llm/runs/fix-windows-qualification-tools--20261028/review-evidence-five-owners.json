@@ -1,0 +1,65 @@
+{
+    "branch":  "fix/windows-qualification-tools",
+    "workspaceCompilerTempDirs":  [
+
+                                  ],
+    "files":  [
+                  {
+                      "path":  ".llm/tools/docs/check-exports-drift.ts",
+                      "sha256":  "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269",
+                      "bytes":  45861
+                  },
+                  {
+                      "path":  ".llm/tools/docs/check-exports-drift_test.ts",
+                      "sha256":  "033e33dbbde1efb8fef9f5f29d4ffd9c32e3761e2247e9bcb682daaf2ccdffd1",
+                      "bytes":  10823
+                  },
+                  {
+                      "path":  ".llm/tools/docs/jsdoc-example-compiler.ts",
+                      "sha256":  "cc70b2791667f698f853a81409ce482fb8eef768924623ac816f013f17715f18",
+                      "bytes":  18773
+                  },
+                  {
+                      "path":  ".llm/tools/docs/jsdoc-example-compiler_test.ts",
+                      "sha256":  "27bad4e2dcb444f5c7f87f3488a1393f5c0e7cf19f1ab59aec0fcba20ac46417",
+                      "bytes":  22992
+                  },
+                  {
+                      "path":  ".llm/tools/docs/jsdoc-example-policy.ts",
+                      "sha256":  "ec954fff331b75c023df39a84929bb0c8833bd1cab07bb9d62d859a671a4cefc",
+                      "bytes":  14628
+                  },
+                  {
+                      "path":  "deno.lock",
+                      "sha256":  "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+                      "bytes":  191344
+                  },
+                  {
+                      "path":  "deno.json",
+                      "sha256":  "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+                      "bytes":  22366
+                  },
+                  {
+                      "path":  ".mcp.json",
+                      "sha256":  "b066b9f8f64347029a8b0db7bfe6396d4433335706ca6d7a433cba1334feda5a",
+                      "bytes":  698
+                  },
+                  {
+                      "path":  ".llm/tools/docs/jsdoc-example-corpus_test.ts",
+                      "sha256":  "bd1f87bab5dd583055a71f4274262c3be199e712ddd447ab0fb6dbaad97bd277",
+                      "bytes":  4409
+                  },
+                  {
+                      "path":  ".llm/tools/docs/jsdoc-example-policy_test.ts",
+                      "sha256":  "e0f3e4976f18a0eab7e14c2ea48ae7bc294529be1e42d6e66d712da040654fc1",
+                      "bytes":  2565
+                  },
+                  {
+                      "path":  ".llm/runs/fix-windows-qualification-tools--20261028/five-owner.diff",
+                      "sha256":  "3c314bf1539c8d2cc05b19e075050f0da4fd10b207383aaa1d390ce8a69aef07",
+                      "bytes":  11141
+                  }
+              ],
+    "baseline":  "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+    "worktree":  "C:\\Users\\ericc\\source\\repos\\netscript-windows-qualification-008"
+}

@@ -1,0 +1,17 @@
+{
+    "authorizer":  "/root",
+    "inferenceApproved":  true,
+    "sourceHead":  "0d5b982b0a3050b94172770a435581c931c93b22",
+    "dbHead":  "d4b391217664371c17295529b956bd9f8950712a",
+    "distinctLeafVerdicts":  2,
+    "model":  "openrouter/z-ai/glm-5.3-flash",
+    "steps":  8,
+    "variant":  "provider_default",
+    "newSession":  true,
+    "driverSha256":  "cecdd6be6db20e8d08a014066ea0fc38cee3537d12b667b54e62e91d2978c322",
+    "preparationSha256":  "ba74cbfbd31a6b6da26ff0c049acd2f652c47b36c99583f3776d7aa65b78f698",
+    "estimateUsd":  0.7,
+    "otherOwnedReservationUsd":  0,
+    "authorizedAt":  "2026-10-28T03:15:50.8737865Z",
+    "rootReview":  "Complete7sourceowners and corrected credential/public projection/one-spawn settlement read; independent straightforward Zhipu evaluator, two separate exact-head verdicts; live selected-key minimum and endpoint price/expense must pass inside launch; estimate is not provider cap; own MCP/full EOF evidence and substantive final require root review."
+}

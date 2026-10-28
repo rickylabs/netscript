@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-accuracy",
+  "invocationId": "green-docs-accuracy",
+  "argv": [
+    "deno",
+    "task",
+    "docs:accuracy"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-windows-qualification-008",
+  "gitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "actualGitHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "timeoutMs": 240000,
+  "runnerIdentity": "worker:42600",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "01a8b6c9dcc7f69eef7cdf64f28d7f1c171b2b4310ba2835308086afc80dfa67",
+  "lifecycleId": "worker:42600:green-docs-accuracy:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T01:49:44.235Z",
+  "startedAt": "2026-10-28T01:49:44.243Z",
+  "finishedAt": "2026-10-28T01:49:58.494Z",
+  "durationMs": 14250,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 332,
+    "sha256": "6d0dfd39f3ee906d8dbd523616d0249883c9b53827426c1a7bf022c2626e945f",
+    "tail": "docs accuracy: PASS (4 saga pages checked for stale claims, live Aspire scaffold pins, 208 published source pages, 190 shipped corpus files, one query dialect exception page, 4 cache-first loader pages, mutation-map columns, 93/93 root/direct public commands from 158 recursive paths, 3 valid @netscript/fresh root imports checked)\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 134,
+    "sha256": "b99f2bd553696ea6522afb6a2a84126543f759f1aa8b2d154f14cbf7c7451e98",
+    "tail": "Task docs:accuracy deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts\n",
+    "truncated": false
+  }
+}
