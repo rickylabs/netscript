@@ -1,0 +1,38 @@
+[
+    {
+        "path":  "gates-2/tests.report.json",
+        "sha256":  "12a9af701819e697d18442f6ae565da4a44a382c37d4b2367a22f9509260ad17"
+    },
+    {
+        "path":  "gates-2/types.report.json",
+        "sha256":  "9df7969d2f34e52c0d884ad7f9ef2ad4ad2cc7b3a94107545354732b348473ec"
+    },
+    {
+        "path":  "gates-2/lint.report.json",
+        "sha256":  "8c8b9de1121df8acd9a36acda111d7547d6defe78f6436a0c4fab6b43aadb702"
+    },
+    {
+        "path":  "gates-2/fmt.report.json",
+        "sha256":  "8a6c5e63fd8dcdcc809a8f9b1dc5cfaff3d1f8b31b7c6258c5790ab345c58245"
+    },
+    {
+        "path":  "gates-2/quality-new.stdout.log",
+        "sha256":  "80343cdf36fbb47811ec6f269198977d476ac638bfa7c1fe0e0de4f6594abd99"
+    },
+    {
+        "path":  "gates-2/children/tls/child-1-result.json",
+        "sha256":  "963e1bf3c6216180ce3bf7f62fabcbc9f53cc80ee05e7a5a01033012ef1abdb0"
+    },
+    {
+        "path":  "source-proof-2.json",
+        "sha256":  "4ca2f76994f3a0585ec979ed4756a54632a00dd5901d858c5381d90552f1a49e"
+    },
+    {
+        "path":  "source.final-2.ts",
+        "sha256":  "057a02e7b7ba39504cbaeef0a6d5fd61c339a9523015900a19d0b689ecebc241"
+    },
+    {
+        "path":  "source-2.diff",
+        "sha256":  "eb6f5edf043016226d657c3cb7e4cfc5683ed0941f21009dea900fc5d20615e7"
+    }
+]
