@@ -21,7 +21,14 @@ interface ConventionReference {
     | 'service-shared'
     | 'service-form'
     | 'service-partial'
-    | 'telemetry-route';
+    | 'telemetry-route'
+    | 'app-tokens'
+    | 'app-theme-preset'
+    | 'app-client'
+    | 'app-shell'
+    | 'app-layout'
+    | 'app-navigation'
+    | 'design-gallery-route';
   readonly path: string;
   readonly purpose: string;
 }
@@ -48,6 +55,50 @@ const COMMON_REFERENCES: readonly ConventionReference[] = [
     purpose: 'the live L0-L4 ownership and layout guide',
   },
 ];
+
+/** App-wide theme and chrome files named by the Design and theming guidance. */
+const DESIGN_REFERENCES: readonly ConventionReference[] = [
+  {
+    id: 'app-tokens',
+    path: 'assets/tokens.css',
+    purpose: 'the --ns-* tokens netscript tokens build generates for the preset; never hand-edit',
+  },
+  {
+    id: 'app-theme-preset',
+    path: 'assets/theme-preset.json',
+    purpose: "the app's one preset: design language, density, and Studio flavor",
+  },
+  {
+    id: 'app-client',
+    path: 'client.ts',
+    purpose: 'loads assets/styles.css (tokens, Tailwind bridge, component CSS) on every route',
+  },
+  {
+    id: 'app-shell',
+    path: 'routes/_app.tsx',
+    purpose:
+      'the HTML shell that stamps the preset (data-theme, data-scheme) on <html> and links its fonts',
+  },
+  {
+    id: 'app-layout',
+    path: 'routes/_layout.tsx',
+    purpose: 'the app chrome (top bar, navigation, theme toggle) around every page',
+  },
+  {
+    id: 'app-navigation',
+    path: 'navigation.ts',
+    purpose: 'the top-bar links (appNavigation) and the routes that opt out of the chrome',
+  },
+  {
+    id: 'design-gallery-route',
+    path: '/design/components',
+    purpose: 'the live gallery of app-owned components under the active theme',
+  },
+];
+
+/** Docs slugs agents fetch with MCP `get_doc` for page design and the theme chain. */
+const DESIGN_GUIDE_SLUG = 'web-layer/how-to/design-with-fresh-ui';
+const CUSTOMIZE_GUIDE_SLUG = 'web-layer/how-to/customize-fresh-ui';
 
 const RESOURCE_GENERATION_GUIDANCE =
   'Before manually constructing this path, run `netscript generate resource <resource> --procedure <query> --client <service> --partial --app <app>`.';
@@ -106,7 +157,7 @@ function serviceReferences(
 function references(
   input: AppConventionsInput,
 ): readonly ConventionReference[] {
-  return [...serviceReferences(input), ...COMMON_REFERENCES];
+  return [...serviceReferences(input), ...COMMON_REFERENCES, ...DESIGN_REFERENCES];
 }
 
 function referencePath(
@@ -129,9 +180,10 @@ export function appConventionsReferencedPaths(
 
 /** Build the app-scoped dashboard conventions read by coding agents. */
 export function buildAppAgentsMarkdown(input: AppConventionsInput): string {
-  const localExamples = references(input)
+  const localExamples = [...serviceReferences(input), ...COMMON_REFERENCES]
     .map((reference) => `- \`${reference.path}\` - ${reference.purpose}`)
     .join('\n');
+  const all = references(input);
   const dataMode = input.dbEngine === 'none'
     ? 'The generated service example uses in-memory sample data.'
     : `The generated service example uses the ${input.dbEngine} scaffold for sample data.`;
@@ -167,6 +219,36 @@ Do not hand-write Button, Input, Card, or Badge equivalents. Use:
 
 Copy the contract-to-query flow, page layers, island boundary, mutation/query-key pattern, partial refresh, live-stream boundary, and app-owned UI composition. Delete or replace the example records, labels, service-specific prose, and demonstration-only controls.${serviceNote}
 Before finishing, record which canonical surfaces you used or deliberately rejected. A page-sized island requires an explicit reason.
+
+## Design and theming
+
+Every page shares one theme and one chrome. Never style or theme a page on its own.
+
+- **Theme:** \`${
+    referencePath(all, 'app-theme-preset')
+  }\` names the app's one preset (NS One by default), and \`${
+    referencePath(all, 'app-shell')
+  }\` stamps it on \`<html>\`: \`data-theme\` is the design language and \`data-scheme\` is light or dark. \`${
+    referencePath(all, 'app-tokens')
+  }\` holds the preset's generated \`--ns-*\` tokens, and \`${
+    referencePath(all, 'app-client')
+  }\` loads them on every route. Restyle through the token layer: \`netscript tokens init --preset <id>\` switches the preset, and alias overrides in the tokens/semantic.tokens.json file that init creates reassign roles. Run \`netscript tokens build\` after either, and never hand-edit the generated CSS. To rebrand colors on a preset, override \`primary\`, \`primary-fg\`, \`primary-hover\`, \`primary-subtle\`, \`primary-border\`, \`accent\`, and \`ring\` together. There is no \`data-ns-theme\`, no themes folder, and no per-page theme, so never set tokens or \`data-theme\` on a page wrapper.
+- **Chrome:** \`${
+    referencePath(all, 'app-layout')
+  }\` renders the top bar, navigation, and theme toggle around every page. The top-bar links are \`appNavigation\` in \`${
+    referencePath(all, 'app-navigation')
+  }\`: \`netscript ui:add page <path>\` links a one-segment page automatically, \`--nav\` links a nested page (\`--nav <label>\` also sets its label), and \`--no-nav\` skips the link. Only \`chromelessRoutePrefixes\` in the same file opts a route out of the chrome (the /design gallery is the example). Never copy a header or theme toggle into a page.
+- **Composition:** give each page one \`<main class='ns-shell ns-section ns-stack ns-stack--lg'>\`, then a \`PageHeader\` with one \`<h1>\`, then sections built from the \`${
+    referencePath(all, 'ui-barrel')
+  }\` blocks (\`StatsGrid\`, \`Card\`, \`Panel\`, \`ResponsiveTable\`, \`FilterForm\`, \`DetailLayout\`, \`EmptyState\`, \`Skeleton\`). Copy the composition in \`${
+    referencePath(all, 'dashboard-view')
+  }\`.
+- **No literals:** use tokens and the Tailwind \`ns-*\` utilities (\`bg-ns-surface\`, \`text-ns-muted-fg\`, \`p-ns-4\`), not hex colors or pixel values.
+- **Verify:** open \`${
+    referencePath(all, 'design-gallery-route')
+  }\` and every page you touched in light and dark, including the empty, loading, and error states.
+
+For presets, brand overrides, page recipes, and the do/don't list, call MCP \`get_doc\` with slug ${DESIGN_GUIDE_SLUG}. For the full theme chain and the chrome, use ${CUSTOMIZE_GUIDE_SLUG}.
 `;
 }
 
@@ -208,5 +290,17 @@ Use \`${referencePath(all, 'dashboard-view')}\` and \`${
 **Copy:** contract-derived query factories, named page layers, server/island boundaries, mutation invalidation, partial refresh, live-stream cache updates, and app-owned UI primitives.
 
 **Delete or replace:** sample records, example names and labels, seeded statuses, explanatory demo controls, and any domain prose that is not true for your product.
+
+## Look and feel
+
+One theme applies app-wide: \`${referencePath(all, 'app-shell')}\` stamps the preset from \`${
+    referencePath(all, 'app-theme-preset')
+  }\` on \`<html>\`, \`${referencePath(all, 'app-tokens')}\` holds its generated tokens, and \`${
+    referencePath(all, 'app-layout')
+  }\` owns the chrome, with its top-bar links in \`${
+    referencePath(all, 'app-navigation')
+  }\`. Pages compose \`${
+    referencePath(all, 'ui-barrel')
+  }\` blocks inside one \`<main class='ns-shell ns-section ns-stack ns-stack--lg'>\`. They never re-theme or re-implement the chrome. The Design and theming section of AGENTS.md has the rules, and MCP \`get_doc\` ${DESIGN_GUIDE_SLUG} has the recipes.
 `;
 }

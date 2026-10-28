@@ -13,6 +13,13 @@ import {
 
 const NOOP_GENERATOR = async (): Promise<void> => {};
 
+/**
+ * Strings the scaffold design-exclusion probe treats as leaked design routes
+ * (`DESIGN_ROUTE_SOURCE_PATH` / `DESIGN_ROUTE_MARKER` in
+ * packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts).
+ */
+const DESIGN_ROUTE_EVIDENCE = ['routes/(design)/', 'Composition rules — NetScript design system'];
+
 Deno.test('CLI corpus integrity follows canonical content across gzip transport variance', async () => {
   const root = await Deno.makeTempDir();
   const rootUrl = toFileUrl(`${root}/`);
@@ -51,10 +58,10 @@ Deno.test('CLI corpus integrity follows canonical content across gzip transport 
   }
 });
 
-Deno.test('MCP fallback is generated from the locked release prose within 288 KiB', async () => {
+Deno.test('MCP fallback is generated from the locked release prose within 328 KiB', async () => {
   const generated = await buildMcpEmbeddedDocs();
   assertEquals(generated.provenance.paths, MCP_EMBEDDED_DOC_PATHS);
-  assertEquals(generated.provenance.documentCount, 14);
+  assertEquals(generated.provenance.documentCount, 16);
   assertEquals(generated.provenance.documentCount, MCP_EMBEDDED_DOC_PATHS.length);
   assertEquals(generated.documents.map((document) => document.path), [...MCP_EMBEDDED_DOC_PATHS]);
   assertEquals(generated.documents[0]?.path, 'llms.txt');
@@ -65,7 +72,18 @@ Deno.test('MCP fallback is generated from the locked release prose within 288 Ki
       slug === 'pages/web-layer/generated-surface'
     ),
   );
+  assert(
+    generated.documents.some(({ slug }) => slug === 'pages/web-layer/how-to/design-with-fresh-ui'),
+    'agents without the filesystem corpus need the Fresh UI design guide (#2406)',
+  );
   assert(generated.documents.every((document) => document.source.length > 0));
+  // The scaffold's telemetry example imports @netscript/mcp, so this corpus ships in the app's
+  // production server bundle, where the design-exclusion probe reads these strings as leaked routes.
+  for (const document of generated.documents) {
+    for (const forbidden of DESIGN_ROUTE_EVIDENCE) {
+      assert(!document.source.includes(forbidden), `${document.path} embeds "${forbidden}"`);
+    }
+  }
   assert(generated.provenance.sourceBytes <= MCP_EMBEDDED_DOCS_MAX_BYTES);
   assertEquals(generated.provenance.sha256.length, 64);
 });

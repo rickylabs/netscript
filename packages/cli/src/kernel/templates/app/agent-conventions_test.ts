@@ -40,6 +40,13 @@ Deno.test('service app convention references are exact and rendered', () => {
     'routes/(_components)/dashboard-view.tsx',
     'components/ui/mod.ts',
     '/design/composition',
+    'assets/tokens.css',
+    'assets/theme-preset.json',
+    'client.ts',
+    'routes/_app.tsx',
+    'routes/_layout.tsx',
+    'navigation.ts',
+    '/design/components',
   ]);
 
   const rendered = `${buildAppAgentsMarkdown(input)}\n${buildWebLayerMarkdown(input)}`;
@@ -58,9 +65,58 @@ Deno.test('service-free app conventions retain only shared resolvable references
     'routes/(_components)/dashboard-view.tsx',
     'components/ui/mod.ts',
     '/design/composition',
+    'assets/tokens.css',
+    'assets/theme-preset.json',
+    'client.ts',
+    'routes/_app.tsx',
+    'routes/_layout.tsx',
+    'navigation.ts',
+    '/design/components',
   ]);
   assertStringIncludes(buildAppAgentsMarkdown(input), GUIDANCE);
   assertStringIncludes(buildWebLayerMarkdown(input), GUIDANCE);
+});
+
+Deno.test('app conventions give agents one app-wide theme and chrome model', () => {
+  const agents = buildAppAgentsMarkdown(serviceInput());
+  const webLayer = buildWebLayerMarkdown(serviceInput());
+
+  assertStringIncludes(agents, '## Design and theming');
+  for (
+    const fact of [
+      '`assets/tokens.css`',
+      '`assets/theme-preset.json`',
+      '`data-scheme`',
+      '`netscript tokens init --preset <id>`',
+      '`netscript tokens build`',
+      'never hand-edit the generated CSS',
+      '`primary-hover`',
+      '`ring` together',
+      '`routes/_layout.tsx`',
+      '`appNavigation` in `navigation.ts`',
+      '`--no-nav`',
+      '`chromelessRoutePrefixes`',
+      'There is no `data-ns-theme`',
+      'web-layer/how-to/design-with-fresh-ui',
+      'web-layer/how-to/customize-fresh-ui',
+    ]
+  ) {
+    assertStringIncludes(agents, fact);
+  }
+  // Tokens v2 generates assets/tokens.css, so the pre-v2 recipe of editing `:root` must not return.
+  assert(
+    !`${agents}\n${webLayer}`.includes(':root'),
+    'guidance must not send agents to edit :root',
+  );
+  assert(
+    agents.indexOf('## Design and theming') > agents.indexOf('## Copy versus delete'),
+    'design guidance must follow the data architecture it decorates',
+  );
+  assertStringIncludes(webLayer, '## Look and feel');
+  assertStringIncludes(webLayer, '`assets/tokens.css`');
+  assertStringIncludes(webLayer, '`assets/theme-preset.json`');
+  assertStringIncludes(webLayer, '`routes/_layout.tsx`');
+  assertStringIncludes(webLayer, '`navigation.ts`');
 });
 
 function serviceInput(): AppConventionsInput {

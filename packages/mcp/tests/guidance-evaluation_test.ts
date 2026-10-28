@@ -8,7 +8,7 @@ import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corp
 
 interface EvaluationCase {
   readonly intent: string;
-  readonly mode: 'exact' | 'rank-one' | 'required-set';
+  readonly mode: 'exact' | 'rank-one' | 'rank-one-set' | 'required-set';
   readonly rankingAxis?: 'score';
   readonly expected: readonly string[];
 }
@@ -62,6 +62,13 @@ function assertExpectedTopThree(evaluation: EvaluationCase, result: GuidanceResu
   );
   if (evaluation.mode === 'rank-one') {
     assertEquals(actual.slice(0, 1), evaluation.expected, evaluation.intent);
+    return;
+  }
+  if (evaluation.mode === 'rank-one-set') {
+    // Pin the leader and treat the rest of the top three as a set: followers that score within a
+    // few hundredths of each other swap whenever the corpus changes the IDF table.
+    assertEquals(actual.slice(0, 1), evaluation.expected.slice(0, 1), evaluation.intent);
+    assertEquals([...actual].sort(), [...evaluation.expected].sort(), evaluation.intent);
     return;
   }
   if (evaluation.mode === 'required-set') {

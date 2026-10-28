@@ -21,9 +21,25 @@ Deno.test('generated release fallback contains the enumerated intent-guidance do
     'pages/web-layer/builders',
     'pages/web-layer/generated-surface',
     'pages/web-layer/how-to/build-a-server-validated-form',
+    'pages/web-layer/how-to/customize-fresh-ui',
+    'pages/web-layer/how-to/design-with-fresh-ui',
     'pages/web-layer/query',
     'pages/web-layer/route',
   ]);
+});
+
+Deno.test('docs-site slugs resolve to their release pages', async () => {
+  const corpus = new ReleaseEmbeddedDocsCorpus();
+  const page = await corpus.get('web-layer/how-to/design-with-fresh-ui');
+  assertEquals(page?.slug, 'pages/web-layer/how-to/design-with-fresh-ui');
+  assertEquals(page?.redirectedFrom, 'web-layer/how-to/design-with-fresh-ui');
+
+  const exact = await corpus.get('pages/web-layer/route');
+  assertEquals(exact?.slug, 'pages/web-layer/route');
+  assertEquals(exact?.redirectedFrom, undefined);
+  assertEquals((await corpus.get('mcp'))?.slug, 'mcp');
+  assertEquals(await corpus.get('web-layer/not-a-page'), undefined);
+  assertEquals(await corpus.get('pages/not-a-page'), undefined);
 });
 
 Deno.test('outer CLI help augments rather than replaces the generated fallback', async () => {

@@ -64,7 +64,7 @@
     },
     {
       "intent": "pick direct application ownership versus a reusable integration",
-      "mode": "exact",
+      "mode": "rank-one-set",
       "rankingAxis": "score",
       "expected": [
         "pages/data-persistence/how-to/use-a-second-database#4-decision-rule-direct-use-vs-reusable-databaseadapter-wrapper",
