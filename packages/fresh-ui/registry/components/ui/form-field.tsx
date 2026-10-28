@@ -34,7 +34,15 @@ export function FormField({
   ...props
 }: FormFieldProps): VNode {
   return (
-    <div {...props} class={cn('ns-field', className)} data-part='root' data-scope='field'>
+    <div
+      {...props}
+      class={cn('ns-field', className)}
+      data-part='root'
+      data-scope='field'
+      data-orientation='vertical'
+      data-variant='label'
+      data-state={error ? 'invalid' : 'rest'}
+    >
       <Label data-part='label' data-scope='field' htmlFor={name} required={required}>{label}</Label>
       {children}
       {error

@@ -50,6 +50,7 @@ export const layout_blocks_1: readonly ComponentContract[] = [
       {
         'name': 'sidebar',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'context',
       },
       {
         'name': 'main',
@@ -58,6 +59,7 @@ export const layout_blocks_1: readonly ComponentContract[] = [
       {
         'name': 'topbar',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'context',
       },
       {
         'name': 'content',
@@ -216,6 +218,14 @@ export const layout_blocks_1: readonly ComponentContract[] = [
         'name': 'tabs',
         'when': 'when the corresponding content or subcomponent is supplied',
       },
+      {
+        'name': 'aside',
+        'when': 'corresponding shipped Utility section is supplied',
+      },
+      {
+        'name': 'badges',
+        'when': 'corresponding shipped Utility section is supplied',
+      },
     ],
     'attributes': {
       'data-variant': {
@@ -249,6 +259,7 @@ export const layout_blocks_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Utility structural helper parts remain distinct from the single component root.',
     ],
   },
   {

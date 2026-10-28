@@ -1,6 +1,6 @@
 import type { VariantMigrationResult } from './variant-migration-contract.ts';
 import { quotedEnd } from './variant-lexical.ts';
-import { stateRule, variantRules } from './variant-rules.ts';
+import { layoutBases, stateRule, variantRules } from './variant-rules.ts';
 
 /** Replace selector tokens while preserving specificity, strings, comments and declarations. */
 export function migrateVariantCss(source: string): VariantMigrationResult {
@@ -39,6 +39,9 @@ export function migrateVariantCss(source: string): VariantMigrationResult {
 function selectors(source: string): string {
   let output = '';
   let i = 0;
+  let compound: string[] = [];
+  const contexts: string[][] = [];
+  let bracketDepth = 0;
   while (i < source.length) {
     if (source.slice(i, i + 2) === '/*') {
       const end = source.indexOf('*/', i + 2) + 2;
@@ -63,17 +66,39 @@ function selectors(source: string): string {
       i = end + 1;
       continue;
     }
-    const match = source[i] === '.' ? /^\.([\w-]+)/.exec(source.slice(i)) : null;
+    if (source[i] === '[') bracketDepth++;
+    if (source[i] === ']') bracketDepth--;
+    if (!bracketDepth && source[i] === '(') {
+      contexts.push([...compound]);
+      if (!/:(?:is|where|not)$/.test(source.slice(0, i))) compound = [];
+    }
+    if (!bracketDepth && source[i] === ')') compound = contexts.pop() ?? [];
+    if (!bracketDepth && source[i] === ',') compound = contexts.at(-1)?.slice() ?? [];
+    if (!bracketDepth && /[\s>+~]/.test(source[i]) && !/[,(]$/.test(source.slice(0, i).trimEnd())) {
+      compound = [];
+    }
+    const match = !bracketDepth && source[i] === '.'
+      ? /^\.((?:[\w-]|\\.)+)/.exec(source.slice(i))
+      : null;
     if (!match) {
       output += source[i++];
       continue;
     }
     const token = match[1];
-    // State hooks belong to one selector branch, never a sibling after a comma.
-    const branch = source.slice(source.lastIndexOf(',', i) + 1, i + match[0].length);
-    const rule = variantRules[token] ?? stateRule(token, branch);
+    const rule = variantRules[token] ?? stateRule(token, compound.join(' '));
+    compound.push(token);
     if (rule) {
-      output += token === 'ns-btn--icon'
+      const aliasSuffix = `,:where(.${rule.base})[${rule.attribute}='${rule.value}'])`;
+      const alreadyAliased = layoutBases.has(rule.base) &&
+        source.slice(0, i).trimEnd().endsWith(':is(') &&
+        source.slice(i + match[0].length).replace(/\s+/g, '').replaceAll('"', "'").startsWith(
+          aliasSuffix,
+        );
+      output += alreadyAliased
+        ? match[0]
+        : layoutBases.has(rule.base)
+        ? `:is(.${token}, :where(.${rule.base})[${rule.attribute}='${rule.value}'])`
+        : token === 'ns-btn--icon'
         ? ":where(.ns-btn):is([data-size='icon'], [data-icon='true'])"
         : token.startsWith('is-')
         ? `[${rule.attribute}='${rule.value}']`

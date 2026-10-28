@@ -75,6 +75,7 @@ export default function SidebarToggle({
       data-icon='true'
       data-part='root'
       data-scope='sidebar-toggle'
+      data-open={open ? 'true' : 'false'}
       data-state='rest'
       aria-label={open ? closeLabel : openLabel}
       aria-expanded={open}

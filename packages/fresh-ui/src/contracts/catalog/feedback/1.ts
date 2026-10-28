@@ -318,6 +318,10 @@ export const feedback_1: readonly ComponentContract[] = [
         'name': 'progress-bar',
         'when': 'when the corresponding content or subcomponent is supplied',
       },
+      {
+        'name': 'title-row',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
     ],
     'attributes': {
       'data-type': {
@@ -363,6 +367,7 @@ export const feedback_1: readonly ComponentContract[] = [
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
       'type=error is retained to match the settled Figma set; it uses destructive token roles.',
+      'Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.',
     ],
   },
 ];

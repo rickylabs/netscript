@@ -438,19 +438,48 @@ export const variantRules: Readonly<Record<string, VariantRule>> = {
   },
 };
 
+/** Layout utilities keep their legacy aliases outside the component variant migration. */
+export const layoutBases: ReadonlySet<string> = new Set([
+  'ns-stack',
+  'ns-cluster',
+  'ns-shell',
+  'ns-section',
+  'ns-scroll-region',
+  'ns-grid',
+]);
+const COMPONENT_MODIFIERS = new RegExp(
+  '\\b(?:' + [
+    ...new Set(
+      Object.keys(variantRules).filter((name) => !layoutBases.has(variantRules[name].base)).map((
+        name,
+      ) => name.split('--')[0]),
+    ),
+  ].join('|') + ')--',
+);
+/** Detect component modifiers without treating retained layout helpers as unsupported code. */
+export function hasComponentModifiers(source: string): boolean {
+  return COMPONENT_MODIFIERS.test(source);
+}
+
+const STATE_BASES = new Set([
+  'ns-citation',
+  'ns-model-opt',
+  'ns-dashboard__nav-item',
+  'ns-dashboard__sidebar-backdrop',
+  'ns-dashboard__sidebar',
+]);
+
 /** Stateful legacy hooks only have meaning on their known component base. */
 export function stateRule(token: string, classes: string): VariantRule | undefined {
   if (!/^is-(active|selected|open|visible)$/.test(token)) return undefined;
-  const base = classes.match(
-    /ns-(?:citation-chip|model-selector__option|dashboard-nav__link|sidebar-backdrop|sidebar)(?![\w-])/,
-  )?.[0];
+  const base = classes.split(/\s+/).reverse().find((token) => STATE_BASES.has(token));
   if (!base) return undefined;
   return {
     base,
     attribute: 'data-state',
     value: token === 'is-open' || token === 'is-visible'
       ? 'open'
-      : base === 'ns-citation-chip'
+      : base === 'ns-citation'
       ? 'active'
       : 'selected',
   };

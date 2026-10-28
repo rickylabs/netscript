@@ -25,6 +25,9 @@ export function Textarea({ class: className, error = false, ...props }: Textarea
       data-state={error ? 'invalid' : props.disabled ? 'disabled' : 'rest'}
       data-part='root'
       data-scope='textarea'
+      data-content={props.value !== undefined || props.defaultValue !== undefined
+        ? 'value'
+        : 'placeholder'}
     />
   );
 }

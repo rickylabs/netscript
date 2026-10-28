@@ -104,7 +104,12 @@ export function DataGrid<T>(
         role: 'toolbar',
         'aria-label': `${selectedCount} selected`,
       },
-      renderBulkActions(selectionContext) as ComponentChildren,
+      h('div', {
+        'data-part': 'root',
+        'data-scope': 'action-bar',
+        'data-variant': 'inline',
+        style: { display: 'contents' },
+      }, renderBulkActions(selectionContext) as ComponentChildren),
     ) as DataGridNode);
   }
   children.push(

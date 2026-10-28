@@ -99,7 +99,14 @@ export const overlays_2: readonly ComponentContract[] = [
           'open',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
+        'compatibilityValues': [
+          'closed',
+        ],
+        'parts': [
+          'trigger',
+          'content',
+        ],
       },
     },
     'booleans': [],
@@ -126,6 +133,8 @@ export const overlays_2: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
+      'Utility Drawer composes the native Dialog runtime; its scope is dialog. Side positioning is consumer CSS, not a new phase-one behavior.',
     ],
   },
   {
@@ -165,6 +174,10 @@ export const overlays_2: readonly ComponentContract[] = [
       },
     },
     'parts': [
+      {
+        'name': 'anchor',
+        'when': 'explicit anchor supplied',
+      },
       {
         'name': 'root',
         'representation': 'context',
@@ -226,7 +239,21 @@ export const overlays_2: readonly ComponentContract[] = [
           'open',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
+        'compatibilityValues': [
+          'closed',
+        ],
+        'parts': [
+          'trigger',
+          'positioner',
+          'content',
+          'anchor',
+          'title',
+          'description',
+          'close',
+          'arrow',
+          'arrow-tip',
+        ],
       },
     },
     'booleans': [
@@ -251,6 +278,7 @@ export const overlays_2: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },
   {
@@ -337,7 +365,17 @@ export const overlays_2: readonly ComponentContract[] = [
           'open',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
+        'compatibilityValues': [
+          'closed',
+        ],
+        'parts': [
+          'trigger',
+          'positioner',
+          'content',
+          'arrow',
+          'arrow-tip',
+        ],
       },
     },
     'booleans': [
@@ -360,6 +398,7 @@ export const overlays_2: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },
 ];

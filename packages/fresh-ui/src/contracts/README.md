@@ -26,3 +26,16 @@ outside the public catalog. Compatibility decisions are recorded in the S3 run's
 
 Omit optional metadata fields rather than assigning `undefined`; catalog tests require a lossless
 JSON round-trip.
+
+`compatibilityValues` records existing headless/Utility hooks separately from the settled Figma
+vocabulary. Its `parts` identify their scope. A missing `parts` list means the root. Native inputs
+keep live checked/focus behavior in native properties and pseudo-classes; serialized state records
+initial or controlled render state. Styles must preserve this distinction.
+
+The reusable checker is `tests/contracts/contract-render.ts`. A `ContractStyleProvider` supplies
+real component renders, deliberate conditional parts, and the attributes each scenario requires.
+Utility fixtures cover every shipped catalog identity, including the DataGrid selection action bar,
+Message's bubble, context-only DesktopOnly, and copy-only Markdown in an installed consumer.
+The checker ignores tag names and CSS classes, checks required/conditional parts and declared
+attribute values, and has real-render negative controls for missing parts/attributes and invalid
+values. Native and pseudo anatomy does not require extra layout nodes.

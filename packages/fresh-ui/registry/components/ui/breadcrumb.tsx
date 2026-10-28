@@ -33,7 +33,7 @@ export function Breadcrumb({ items, class: className, ...props }: BreadcrumbProp
       data-part='root'
       data-scope='breadcrumb'
     >
-      <ol class='ns-breadcrumb' data-part='root' data-scope='breadcrumb' role='list'>
+      <ol class='ns-breadcrumb' data-part='list' data-scope='breadcrumb' role='list'>
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (

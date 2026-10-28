@@ -23,3 +23,12 @@
 | BEM / attributes | Emit data attributes. Keep base and element classes as stable styling hooks. CSS replacement preserves class specificity. |
 | Figma private decoration | Focus and state layers may be CSS pseudo-elements; do not add layout DOM for them. Native controls own internal text/indicator anatomy. |
 | Token vocabulary, focus, shadows, copper, outline border | Defer visual/token corrections to S6. This migration preserves the input CSS declarations and verifies computed-style parity. |
+
+Rendered-contract reconciliation: native/headless open/closed, active/inactive, checked/unchecked,
+and desktop active/enabled/ready hooks remain explicit `compatibilityValues` on named parts; they
+are separate from canonical Figma values. Existing DataGrid selection/header-cell anatomy, tray
+roles, Toast title-row and PromptInput send are recorded as Utility compatibility parts. Wrapper
+getters now preserve explicit compound part/scope delegation. Drawer composes the native Dialog
+runtime and retains its dialog scope; side positioning remains consumer CSS. AppShell's sidebar and
+topbar seams are child-component context boundaries. Label's required mark is a pseudo-element.
+Native checked state remains a native input property/:checked after uncontrolled interaction.

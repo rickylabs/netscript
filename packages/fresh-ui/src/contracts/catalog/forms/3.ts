@@ -97,6 +97,8 @@ export const forms_3: readonly ComponentContract[] = [
           'false',
           'true',
         ],
+        'description':
+          'Initial/controlled render value. Uncontrolled live state follows the native input checked property and :checked, without listener-based attribute synchronization.',
       },
       'data-state': {
         'values': [
@@ -252,7 +254,6 @@ export const forms_3: readonly ComponentContract[] = [
         ],
         'plannedValues': [
           'legend',
-          'label',
         ],
       },
       'data-state': {

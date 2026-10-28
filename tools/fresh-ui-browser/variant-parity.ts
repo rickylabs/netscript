@@ -129,7 +129,7 @@ async function main(): Promise<void> {
           });
           try {
             await page.setContent(
-              `<html data-scheme="${scheme}" data-language="studio" data-flavor="utility"><head><style>${tokens}\n${css}\n*,:before,:after{animation:none!important;transition:none!important}body{margin:0;font-family:Arial,sans-serif}.specimen{padding:12px;border-bottom:1px solid #ddd;min-height:24px;overflow:hidden}</style></head><body>${
+              `<html data-scheme="${scheme}" data-theme="studio" data-flavor="utility"><head><style>${tokens}\n${css}\n*,:before,:after{animation:none!important;transition:none!important}body{margin:0;font-family:Arial,sans-serif}.specimen{padding:12px;border-bottom:1px solid #ddd;min-height:24px;overflow:hidden}</style></head><body>${
                 specimens.map((s, index) =>
                   `<section class="specimen" data-case="${index}">${s.html}</section>`
                 ).join('')
@@ -243,6 +243,14 @@ async function main(): Promise<void> {
         {
           browser: browser.version(),
           specimens: before.length,
+          theme: { language: 'studio', flavor: 'utility', schemes: ['light', 'dark'] },
+          inputs: {
+            beforeHtml: createHash('sha256').update(JSON.stringify(before)).digest('hex'),
+            afterHtml: createHash('sha256').update(JSON.stringify(after)).digest('hex'),
+            beforeCss: createHash('sha256').update(oldCss).digest('hex'),
+            afterCss: createHash('sha256').update(newCss).digest('hex'),
+            utilityTokens: createHash('sha256').update(tokens).digest('hex'),
+          },
           properties: PROPERTIES,
           ok: !failed,
           results,

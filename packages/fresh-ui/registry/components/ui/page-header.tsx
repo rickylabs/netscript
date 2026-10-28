@@ -64,7 +64,7 @@ function PageHeaderAside({ children, class: className, ...props }: PageHeaderSec
       {...props}
       class={cn('ns-stack', className)}
       data-gap='md'
-      data-part='root'
+      data-part='aside'
       data-scope='page-header'
     >
       {children}
@@ -74,7 +74,7 @@ function PageHeaderAside({ children, class: className, ...props }: PageHeaderSec
 
 function PageHeaderBadges({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
   return (
-    <div {...props} class={cn('ns-cluster', className)} data-part='root' data-scope='page-header'>
+    <div {...props} class={cn('ns-cluster', className)} data-part='badges' data-scope='page-header'>
       {children}
     </div>
   );
@@ -98,7 +98,12 @@ function PageHeaderActions(
   { children, class: className, ...props }: PageHeaderSectionProps,
 ): VNode {
   return (
-    <div {...props} class={cn('ns-cluster', className)} data-part='root' data-scope='page-header'>
+    <div
+      {...props}
+      class={cn('ns-cluster', className)}
+      data-part='actions'
+      data-scope='page-header'
+    >
       {children}
     </div>
   );
@@ -109,8 +114,8 @@ function PageHeaderStatus({ children, class: className, ...props }: PageHeaderSe
     <div
       {...props}
       class={cn('ns-status-bar', className)}
-      data-part='root'
-      data-scope='status-bar'
+      data-part='status-bar'
+      data-scope='page-header'
     >
       {children}
     </div>

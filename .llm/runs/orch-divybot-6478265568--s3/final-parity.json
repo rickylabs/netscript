@@ -1,0 +1,105 @@
+{
+  "browser": "153.0.8010.12",
+  "specimens": 187,
+  "theme": {
+    "language": "studio",
+    "flavor": "utility",
+    "schemes": [
+      "light",
+      "dark"
+    ]
+  },
+  "inputs": {
+    "beforeHtml": "2a97b9931014102522a77e970d7029671422e908b57e372ea08c0467ed01c285",
+    "afterHtml": "2204ec93a8543076d8667b9315ce9b1561e20ec621ebfd5cba85449a1ee3e3d9",
+    "beforeCss": "6694b0441511b894c25b68b1f245bd8e05affd34a7b5a3540dd93c2bb8a26789",
+    "afterCss": "25ee70b02009637f8d247f4a2c322eee1108e382ea5a1bd0894616b375a95917",
+    "utilityTokens": "3e189168a4bcb53915e77e9e31770adee66105c3337f2523e18640acff95a5cf"
+  },
+  "properties": [
+    "display",
+    "position",
+    "width",
+    "height",
+    "color",
+    "background-color",
+    "background-image",
+    "border-top-width",
+    "border-right-width",
+    "border-bottom-width",
+    "border-left-width",
+    "border-top-color",
+    "border-right-color",
+    "border-bottom-color",
+    "border-left-color",
+    "border-top-style",
+    "border-radius",
+    "box-shadow",
+    "transform",
+    "opacity",
+    "padding-top",
+    "padding-right",
+    "padding-bottom",
+    "padding-left",
+    "margin-top",
+    "margin-right",
+    "margin-bottom",
+    "margin-left",
+    "gap",
+    "font-family",
+    "font-size",
+    "font-weight",
+    "line-height",
+    "letter-spacing",
+    "align-items",
+    "justify-content",
+    "flex-direction",
+    "outline-width",
+    "outline-color",
+    "outline-offset",
+    "fill",
+    "stroke",
+    "visibility",
+    "overflow",
+    "cursor"
+  ],
+  "ok": true,
+  "results": [
+    {
+      "scheme": "light",
+      "width": 390,
+      "styleComparisons": 327240,
+      "differences": [],
+      "pixelsEqual": true,
+      "beforeSha256": "378ef63d6746258e9e7d4056b494fde90d4c11abe91df5a375c2bb11f6c26525",
+      "afterSha256": "378ef63d6746258e9e7d4056b494fde90d4c11abe91df5a375c2bb11f6c26525"
+    },
+    {
+      "scheme": "light",
+      "width": 1280,
+      "styleComparisons": 327240,
+      "differences": [],
+      "pixelsEqual": true,
+      "beforeSha256": "ec85d09eafa895eb1bcab7ee7167459020c3c6a1890941da592dda0ca78228c8",
+      "afterSha256": "ec85d09eafa895eb1bcab7ee7167459020c3c6a1890941da592dda0ca78228c8"
+    },
+    {
+      "scheme": "dark",
+      "width": 390,
+      "styleComparisons": 327240,
+      "differences": [],
+      "pixelsEqual": true,
+      "beforeSha256": "303718de3314cce394456e825d6825afddfe3e7c608dde925caca088b5fcc466",
+      "afterSha256": "303718de3314cce394456e825d6825afddfe3e7c608dde925caca088b5fcc466"
+    },
+    {
+      "scheme": "dark",
+      "width": 1280,
+      "styleComparisons": 327240,
+      "differences": [],
+      "pixelsEqual": true,
+      "beforeSha256": "782c9b5e8ff79420cc88755336cd2f2666d868b3b3058f4cef9514f9b0223798",
+      "afterSha256": "782c9b5e8ff79420cc88755336cd2f2666d868b3b3058f4cef9514f9b0223798"
+    }
+  ]
+}

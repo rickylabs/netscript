@@ -1,0 +1,13 @@
+{
+  "gateId": "public-doc-lint",
+  "argv": [
+    "deno",
+    "doc",
+    "--lint",
+    "packages/fresh-ui/contracts.ts"
+  ],
+  "gitHead": "bc9c8f14fe1488253df49588c24e599932fa91f8",
+  "outcome": "PASS",
+  "durationMs": 79,
+  "exitCode": 0
+}

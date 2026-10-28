@@ -49,7 +49,7 @@ export function skipToken(source: string, start: number): number {
     if (end < 0) throw new Error('Unterminated comment');
     return end + 2;
   }
-  if (source[start] === '/') {
+  if (source[start] === '/' && !/^\/\s*>/.test(source.slice(start))) {
     const prefix = source.slice(0, start).trimEnd();
     if (!prefix || /[=(:,[!&|?;{}]$/.test(prefix) || /(?:return|throw|case|=>)$/.test(prefix)) {
       let i = start + 1;
@@ -113,7 +113,7 @@ export function openingTags(source: string): readonly { start: number; end: numb
         continue;
       }
       if (source[i] === '{') {
-        i = balancedEnd(source, i);
+        i = code(i + 1, true);
         continue;
       }
       if (source[i] === '>') return i + 1;
@@ -140,5 +140,5 @@ export function openingTags(source: string): readonly { start: number; end: numb
     return i;
   }
   code(0);
-  return tags;
+  return tags.sort((left, right) => left.start - right.start);
 }

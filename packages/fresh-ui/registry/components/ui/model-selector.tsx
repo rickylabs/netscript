@@ -61,7 +61,7 @@ export function ModelSelector(
             </span>
           )
           : null}
-        <span>{current?.label}</span>
+        <span data-part='label' data-scope='model-selector'>{current?.label}</span>
       </summary>
       <div
         class='ns-model-selector__menu'
@@ -79,7 +79,7 @@ export function ModelSelector(
               aria-selected={selected ? 'true' : 'false'}
               class={cn('ns-model-opt')}
               data-state={selected ? ('selected') : undefined}
-              data-part='root'
+              data-part='opt'
               data-scope='model-selector'
               onClick={() => onChange?.(model.id)}
             >

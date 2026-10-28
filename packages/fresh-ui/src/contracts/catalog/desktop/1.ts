@@ -79,7 +79,15 @@ export const desktop_1: readonly ComponentContract[] = [
           'disabled',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
+        'compatibilityValues': [
+          'active',
+          'enabled',
+        ],
+        'parts': [
+          'root',
+          'action',
+        ],
       },
     },
     'booleans': [],
@@ -94,6 +102,7 @@ export const desktop_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },
   {
@@ -175,6 +184,10 @@ export const desktop_1: readonly ComponentContract[] = [
         'name': 'separator',
         'when': 'when the corresponding content or subcomponent is supplied',
       },
+      {
+        'name': 'role',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
     ],
     'attributes': {
       'data-type': {
@@ -198,7 +211,15 @@ export const desktop_1: readonly ComponentContract[] = [
           'disabled',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
+        'compatibilityValues': [
+          'active',
+          'enabled',
+        ],
+        'parts': [
+          'root',
+          'action',
+        ],
       },
     },
     'booleans': [
@@ -225,6 +246,8 @@ export const desktop_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },
   {
@@ -297,7 +320,13 @@ export const desktop_1: readonly ComponentContract[] = [
           'disabled',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
+        'compatibilityValues': [
+          'ready',
+        ],
+        'parts': [
+          'root',
+        ],
       },
     },
     'booleans': [],
@@ -319,6 +348,7 @@ export const desktop_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },
 ];

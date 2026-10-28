@@ -227,6 +227,8 @@ export const forms_2: readonly ComponentContract[] = [
           'true',
           'indeterminate',
         ],
+        'description':
+          'Initial/controlled render value. Uncontrolled live state follows the native input checked property and :checked, without listener-based attribute synchronization.',
       },
       'data-state': {
         'values': [

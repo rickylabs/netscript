@@ -155,6 +155,7 @@ export default function Toast(
         data-type={type}
         data-part='root'
         data-scope='toast'
+        data-state={exiting ? 'exiting' : 'rest'}
         onMouseEnter={pauseDismiss}
         onMouseLeave={resumeDismiss}
       >

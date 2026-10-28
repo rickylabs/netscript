@@ -316,7 +316,16 @@ export const data_display_4: readonly ComponentContract[] = [
           'disabled',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
+        'compatibilityValues': [
+          'open',
+          'closed',
+        ],
+        'parts': [
+          'item',
+          'item-trigger',
+          'item-content',
+        ],
       },
       'data-orientation': {
         'values': [
@@ -340,6 +349,7 @@ export const data_display_4: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },
 ];

@@ -30,6 +30,9 @@ export function Input(
       data-state={error ? 'invalid' : props.disabled ? 'disabled' : 'rest'}
       data-part='root'
       data-scope='input'
+      data-content={props.value !== undefined || props.defaultValue !== undefined
+        ? 'value'
+        : 'placeholder'}
       data-size='md'
     />
   );

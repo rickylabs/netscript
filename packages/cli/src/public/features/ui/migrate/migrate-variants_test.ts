@@ -2,6 +2,7 @@ import { assert, assertEquals, assertRejects, assertStringIncludes } from 'jsr:@
 import { join } from '@std/path';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { createUiMigrateCommand } from './migrate-ui-command.ts';
+import { variantMigrations } from './variant-migration-data.ts';
 import { migrateVariantSource } from './migrate-source.ts';
 import { migrateVariantCss } from './migrate-css.ts';
 import { MigrateUiVariantsUseCase } from './migrate-ui-variants-use-case.ts';
@@ -17,6 +18,16 @@ export const view = <><p>Don't change text</p><button className='ns-btn ns-btn--
   assertStringIncludes(result.content, "className='ns-btn custom'");
   assertStringIncludes(result.content, `const example = "<b class='ns-badge ns-badge--primary'>";`);
   assertStringIncludes(result.content, "// <b class='ns-badge ns-badge--primary'>");
+  assertEquals(migrateVariantSource('view.tsx', result.content), result);
+});
+
+Deno.test('nested JSX attribute elements and quoted custom classes retain valid syntax', () => {
+  const input =
+    `<Dialog.Trigger class="ns-btn ns-btn--ghost before:content-['x']" icon={<b class='ns-badge ns-badge--primary' />} />`;
+  const result = migrateVariantSource('view.tsx', input);
+  assertEquals(result.diagnostics, []);
+  assertStringIncludes(result.content, `class="ns-btn before:content-['x']" data-variant='ghost'`);
+  assertStringIncludes(result.content, "<b class='ns-badge' data-variant='primary' />");
   assertEquals(migrateVariantSource('view.tsx', result.content), result);
 });
 
@@ -40,7 +51,7 @@ Deno.test('CSS migration preserves specificity and ignores declarations, comment
 .ns-btn--primary:hover, [data-example='.ns-btn--ghost'] .ns-btn--icon.ns-btn--sm { content: '.ns-btn--ghost'; background: url('.ns-btn--sm'); }
 @supports (background: url(.ns-btn--primary)) { .custom { color: red; } }
 .ns-toast--error { color: red; }
-.ns-model-selector__option.is-active { color: green; }`;
+.ns-model-opt.is-active { color: green; }`;
   const result = migrateVariantCss(input);
   assertEquals(result.diagnostics, []);
   assertStringIncludes(result.content, ":where(.ns-btn)[data-variant='primary']:hover");
@@ -48,12 +59,78 @@ Deno.test('CSS migration preserves specificity and ignores declarations, comment
   assertStringIncludes(result.content, "content: '.ns-btn--ghost'; background: url('.ns-btn--sm')");
   assertStringIncludes(result.content, ":where(.ns-toast)[data-type='error']");
   assertStringIncludes(result.content, 'url(.ns-btn--primary)');
-  assertStringIncludes(result.content, ".ns-model-selector__option[data-state='selected']");
+  assertStringIncludes(result.content, ".ns-model-opt[data-state='selected']");
   assertStringIncludes(
     result.content,
     ":where(.ns-btn):is([data-size='icon'], [data-icon='true'])",
   );
   assertEquals(migrateVariantCss(result.content), result);
+});
+
+Deno.test('real 0.0.8 navigation, mobile sidebar, model and citation selectors migrate with their state producers', () => {
+  // Exact selector vocabulary from the pre-migration registry styles, not the public component names.
+  const input = `.ns-dashboard__nav-item.is-active { color: red; }
+.ns-dashboard__sidebar.is-open { transform: translateX(0); }
+.ns-dashboard__sidebar-backdrop.is-visible { opacity: 1; }
+.ns-model-opt.is-active .ns-model-opt__label { color: red; }
+.ns-citation.is-active { color: red; }
+.ns-dashboard__nav-item .ns-citation.is-active { color: red; }`;
+  const result = migrateVariantCss(input);
+  assertEquals(result.diagnostics, []);
+  assertEquals(result.content.includes('.is-'), false);
+  assertStringIncludes(result.content, ".ns-dashboard__nav-item[data-state='selected']");
+  assertStringIncludes(result.content, ".ns-dashboard__sidebar[data-state='open']");
+  assertStringIncludes(result.content, ".ns-dashboard__sidebar-backdrop[data-state='open']");
+  assertStringIncludes(result.content, ".ns-model-opt[data-state='selected'] .ns-model-opt__label");
+  assertStringIncludes(result.content, ".ns-citation[data-state='active']");
+  assertStringIncludes(result.content, ".ns-dashboard__nav-item .ns-citation[data-state='active']");
+  assertEquals(migrateVariantCss(result.content), result);
+  const custom = '.ns-citation .custom.is-active, .my-ns-citation.is-active { color: red; }';
+  assertEquals(migrateVariantCss(custom).content, custom);
+  assertEquals(
+    migrateVariantSource('custom.tsx', `<b class='my-ns-citation is-active' />`).content,
+    `<b class='my-ns-citation is-active' />`,
+  );
+  assertStringIncludes(
+    migrateVariantCss('.ns-citation:not( .is-active) { color:red }').content,
+    ".ns-citation:not( [data-state='active'])",
+  );
+});
+
+Deno.test('layout aliases survive and controlled component props require a manual merge', () => {
+  const layout = `<Card.Body class='ns-stack ns-stack--lg' />`;
+  assertEquals(migrateVariantSource('view.tsx', layout), { content: layout, diagnostics: [] });
+  const css = migrateVariantCss('.ns-stack--lg { gap: 2rem; }').content;
+  assertStringIncludes(css, ":is(.ns-stack--lg, :where(.ns-stack)[data-gap='lg'])");
+  assertEquals(migrateVariantCss(css).content, css);
+  for (
+    const input of [
+      "<Button class='ns-btn--destructive' />",
+      "<Avatar class='ns-avatar--sm' />",
+      "<Dialog.Trigger class='ns-btn--loading' />",
+    ]
+  ) {
+    const result = migrateVariantSource('view.tsx', input);
+    assertEquals(result.content, input);
+    assert(result.diagnostics.length > 0);
+  }
+  const forward = migrateVariantSource(
+    'view.tsx',
+    "<Sheet.Close class='ns-btn ns-btn--primary ns-btn--sm'>Close</Sheet.Close>",
+  );
+  assertEquals(forward.diagnostics, []);
+  assertStringIncludes(forward.content, "data-variant='primary' data-size='sm'");
+});
+
+Deno.test('a copied wrapper without an ns class string receives its structural contract', () => {
+  const migration = variantMigrations.find((file) => file.file === 'icon-button.tsx')!;
+  const before = migration.edits[0].before;
+  assertEquals(before.includes('ns-'), false);
+  const result = migrateVariantSource('icon-button.tsx', before);
+  assertEquals(result.diagnostics, []);
+  assertStringIncludes(result.content, "data-scope='icon-button'");
+  assertStringIncludes(result.content, "data-part='glyph'");
+  assertEquals(migrateVariantSource('icon-button.tsx', result.content), result);
 });
 
 Deno.test('whole-app preflight, dry run, command routing and idempotence use the selected app', async () => {

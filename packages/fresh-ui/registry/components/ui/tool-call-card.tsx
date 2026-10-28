@@ -54,48 +54,48 @@ export function ToolCallCard(
       open={defaultOpen}
       class={cn('ns-tool-call', className)}
       data-part='root'
-      data-scope='tool-call'
+      data-scope='tool-call-card'
       data-status={status}
     >
-      <summary>
+      <summary data-part='summary' data-scope='tool-call-card'>
         <span
           class='ns-tool-call__icon'
           data-part='icon'
-          data-scope='tool-call'
+          data-scope='tool-call-card'
           aria-hidden='true'
         >
           ƒ
         </span>
-        <span class='ns-tool-call__name' data-part='name' data-scope='tool-call'>{name}</span>
+        <span class='ns-tool-call__name' data-part='name' data-scope='tool-call-card'>{name}</span>
         {status === 'running' ? <Spinner size='sm' /> : null}
         <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
         <span
           class='ns-tool-call__chevron'
           data-part='chevron'
-          data-scope='tool-call'
+          data-scope='tool-call-card'
           aria-hidden='true'
         >
           ▾
         </span>
       </summary>
-      <div class='ns-tool-call__panel' data-part='panel' data-scope='tool-call'>
+      <div class='ns-tool-call__panel' data-part='panel' data-scope='tool-call-card'>
         {args
           ? (
-            <div class='ns-tool-call__io' data-part='io' data-scope='tool-call'>
-              <span class='ns-tool-call__io-label' data-part='io-label' data-scope='tool-call'>
+            <div class='ns-tool-call__io' data-part='io' data-scope='tool-call-card'>
+              <span class='ns-tool-call__io-label' data-part='io-label' data-scope='tool-call-card'>
                 args
               </span>
-              <pre>{args}</pre>
+              <pre data-part='pre' data-scope='tool-call-card'>{args}</pre>
             </div>
           )
           : null}
         {result
           ? (
-            <div class='ns-tool-call__io' data-part='io' data-scope='tool-call'>
-              <span class='ns-tool-call__io-label' data-part='io-label' data-scope='tool-call'>
+            <div class='ns-tool-call__io' data-part='io' data-scope='tool-call-card'>
+              <span class='ns-tool-call__io-label' data-part='io-label' data-scope='tool-call-card'>
                 result
               </span>
-              <pre>{result}</pre>
+              <pre data-part='pre' data-scope='tool-call-card'>{result}</pre>
             </div>
           )
           : null}

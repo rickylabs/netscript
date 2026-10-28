@@ -49,6 +49,7 @@ export const forms_1: readonly ComponentContract[] = [
       {
         'name': 'required-mark',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'pseudo',
       },
       {
         'name': 'optional-hint',

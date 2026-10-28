@@ -172,25 +172,33 @@ export function Message({ message, ctx, class: className, ...props }: MessagePro
             : null}
         </div>
         <div class='ns-message__body' data-part='body' data-scope='message'>
-          {pending ? <TypingIndicator /> : null}
-          {body
-            ? (
-              <p class='ns-message__text' data-part='text' data-scope='message'>
-                {renderInline(body, ctx)}
-              </p>
-            )
-            : null}
-          {blocks?.map((block, index) => <div key={`b${index}`}>{renderBlock(block)}</div>)}
-          {tools?.map((tool, index) => (
-            <ToolCallCard
-              key={`t${index}`}
-              name={tool.name}
-              args={tool.args}
-              result={tool.result}
-              status={tool.status}
-              defaultOpen={tool.defaultOpen}
-            />
-          ))}
+          <div
+            data-part='root'
+            data-scope='bubble'
+            data-variant='default'
+            data-align={role === 'user' ? 'end' : 'start'}
+            style={{ display: 'contents' }}
+          >
+            {pending ? <TypingIndicator /> : null}
+            {body
+              ? (
+                <p class='ns-message__text' data-part='text' data-scope='message'>
+                  {renderInline(body, ctx)}
+                </p>
+              )
+              : null}
+            {blocks?.map((block, index) => <div key={`b${index}`}>{renderBlock(block)}</div>)}
+            {tools?.map((tool, index) => (
+              <ToolCallCard
+                key={`t${index}`}
+                name={tool.name}
+                args={tool.args}
+                result={tool.result}
+                status={tool.status}
+                defaultOpen={tool.defaultOpen}
+              />
+            ))}
+          </div>
         </div>
         {followups && followups.length
           ? (

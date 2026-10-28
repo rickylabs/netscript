@@ -41,7 +41,7 @@ export function Badge(
       data-scope='badge'
       data-emphasis='subtle'
     >
-      <span data-part='label' data-scope='badge' style={{ display: 'contents' }}>{children}</span>
+      <span data-part='label' data-scope='badge'>{children}</span>
     </span>
   );
 }

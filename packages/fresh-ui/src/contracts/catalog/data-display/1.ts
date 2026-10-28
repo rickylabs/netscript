@@ -101,6 +101,9 @@ export const data_display_1: readonly ComponentContract[] = [
           'away',
           'offline',
         ],
+        'parts': [
+          'presence',
+        ],
       },
     },
     'booleans': [

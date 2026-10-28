@@ -230,5 +230,13 @@ for (const [file, name] of [['checkbox', 'Checkbox'], ['switch', 'Switch']]) {
   }
 }
 
+add('data-grid/bulk-selection', Grid, {
+  columns: [{ key: 'name', header: 'Name', render: (row) => row.name }],
+  rows: [{ id: 'one', data: { name: 'Ada' } }],
+  selectedIds: new Set(['one']), onSelectionChange() {},
+  renderBulkActions: () => 'Archive',
+});
+const Palette = await component('command-palette', 'CommandPalette');
+add('command-palette', Palette, { open: true, groups: [{ id: 'pages', label: 'Pages', items: [{ id: 'one', label: 'One' }] }] });
 await Deno.writeTextFile(output, JSON.stringify(cases));
 console.log(cases.length + ' render cases');

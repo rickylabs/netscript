@@ -336,7 +336,8 @@ lists, updates, and removes copied registry items:
 converts app-owned 0.0.8 Utility modifiers and anatomy to the shared data-attribute contract.
 Preview changes, apply them, then run the app's `deno task check`. It preserves custom classes,
 base/element hooks, strings and comments. Customized structural edits or unsupported dynamic
-classes stop preflight with a manual-merge diagnostic before any writes. Use the matching CLI
+classes stop preflight with a manual-merge diagnostic before any writes. Controlled component
+invocations require conversion to their public props; layout utility aliases are retained. Use the matching CLI
 and Fresh UI release together; dependency copies and registry ownership hashes remain untouched.
 
 Because Fresh UI is copy-source, `ui:update` only touches registry files you have not modified —

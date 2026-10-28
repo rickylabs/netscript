@@ -247,6 +247,16 @@ export const feedback_2: readonly ComponentContract[] = [
           'block',
           'circle',
         ],
+        'compatibilityValues': [
+          'input',
+          'card',
+        ],
+        'parts': [
+          'block',
+          'box',
+        ],
+        'description':
+          ' Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
       },
       'data-size': {
         'values': [
@@ -277,6 +287,7 @@ export const feedback_2: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },
 ];

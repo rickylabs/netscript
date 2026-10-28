@@ -66,8 +66,10 @@ export function DesktopNotification({
         data-scope='desktop-notification'
         data-part='copy'
       >
-        <strong>{notification.title}</strong>
-        {notification.body === undefined ? null : <span>{notification.body}</span>}
+        <strong data-part='title' data-scope='desktop-notification'>{notification.title}</strong>
+        {notification.body === undefined
+          ? null
+          : <span data-part='body' data-scope='desktop-notification'>{notification.body}</span>}
       </div>
       <button
         type='button'

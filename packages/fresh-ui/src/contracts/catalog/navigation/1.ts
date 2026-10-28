@@ -55,6 +55,10 @@ export const navigation_1: readonly ComponentContract[] = [
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
       },
+      {
+        'name': 'list',
+        'when': 'corresponding shipped Utility section is supplied',
+      },
     ],
     'attributes': {
       'data-type': {
@@ -94,6 +98,7 @@ export const navigation_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Utility structural helper parts remain distinct from the single component root.',
     ],
   },
   {
@@ -333,7 +338,15 @@ export const navigation_1: readonly ComponentContract[] = [
           'disabled',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
+        'compatibilityValues': [
+          'active',
+          'inactive',
+        ],
+        'parts': [
+          'trigger',
+          'content',
+        ],
       },
       'data-orientation': {
         'values': [
@@ -373,6 +386,7 @@ export const navigation_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },
 ];

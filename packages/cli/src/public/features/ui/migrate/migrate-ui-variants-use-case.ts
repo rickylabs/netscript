@@ -4,7 +4,7 @@ import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import { migrateVariantCss } from './migrate-css.ts';
-import { migrateVariantSource } from './migrate-source.ts';
+import { hasVariantSourceMigration, migrateVariantSource } from './migrate-source.ts';
 import type { VariantFileChange, VariantMigrationReport } from './variant-migration-contract.ts';
 
 /** Inputs for the bounded app-copy migration. */
@@ -51,7 +51,10 @@ export class MigrateUiVariantsUseCase
         if (entry.isDirectory && !EXCLUDED.has(entry.name)) await visit(path);
         if (!entry.isFile || !/\.(?:tsx|css)$/.test(entry.name)) continue;
         const before = await this.fs.readFile(path);
-        if (!/\bns-[\w-]+/.test(before)) continue;
+        if (
+          !/\bns-[\w-]+/.test(before) &&
+          (entry.name.endsWith('.css') || !hasVariantSourceMigration(entry.name, before))
+        ) continue;
         const result = entry.name.endsWith('.css')
           ? migrateVariantCss(before)
           : migrateVariantSource(basename(path), before);

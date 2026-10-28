@@ -291,6 +291,10 @@ export const ai_1: readonly ComponentContract[] = [
         'name': 'hint',
         'when': 'when the corresponding content or subcomponent is supplied',
       },
+      {
+        'name': 'send',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
     ],
     'attributes': {
       'data-state': {
@@ -356,6 +360,7 @@ export const ai_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.',
     ],
   },
 ];

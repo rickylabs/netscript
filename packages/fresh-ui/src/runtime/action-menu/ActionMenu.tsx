@@ -56,6 +56,7 @@ export function ActionMenuTrigger(
         onClick: composeEventHandlers(onClick, (event) => event.stopPropagation()),
         ref: composeRefs(menu.triggerRef),
       })}
+      data-scope='dropdown-menu'
       aria-haspopup='menu'
     >
       {children as ComponentChildren}
@@ -110,6 +111,7 @@ export function ActionMenuContent(
         ref: composeRefs(contentRef),
         role: 'menu',
       })}
+      data-scope='dropdown-menu'
     >
       {children as ComponentChildren}
     </div>
@@ -140,6 +142,8 @@ export function ActionMenuItem(
       disabled={unavailable}
       onClick={composeEventHandlers(onClick, (event) =>
         activateActionMenuItem(event, () => menu.setOpen(false, 'close-button')))}
+      data-part='item'
+      data-scope='dropdown-menu'
       role='menuitem'
       tabIndex={props.tabIndex ?? -1}
       type={props.type ?? 'button'}
@@ -151,7 +155,7 @@ export function ActionMenuItem(
 
 /** Renders a semantic separator between action groups. */
 export function ActionMenuSeparator(props: ActionMenuSeparatorProps): VNode {
-  return <hr {...props} role='separator' />;
+  return <hr data-part='separator' data-scope='dropdown-menu' {...props} role='separator' />;
 }
 
 /** Public type of the compound ActionMenu namespace. */

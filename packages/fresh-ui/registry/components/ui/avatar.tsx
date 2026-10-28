@@ -78,6 +78,7 @@ export function Avatar(
             data-part='presence'
             data-scope='avatar'
             data-presence={presence}
+            data-status={presence}
           />
         )
         : null}

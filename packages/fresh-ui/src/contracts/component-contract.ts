@@ -35,6 +35,8 @@ export interface ContractAttribute {
   readonly default?: string;
   /** Parts carrying this attribute; omitted or empty means component root. */
   readonly parts?: readonly string[];
+  /** Older headless runtime values retained on documented parts, separate from canonical design values. */
+  readonly compatibilityValues?: readonly string[];
   /** Design values not yet implemented by Utility. */
   readonly plannedValues?: readonly string[];
   /** Behavior and native/CSS-state representation notes. */

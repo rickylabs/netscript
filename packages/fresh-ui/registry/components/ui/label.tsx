@@ -41,7 +41,6 @@ export function Label({
       <span
         data-part='text'
         data-scope='label'
-        style={{ display: 'contents' }}
       >
         {children}
       </span>

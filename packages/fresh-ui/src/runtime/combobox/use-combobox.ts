@@ -95,7 +95,12 @@ export function useCombobox({
   const getRootProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): ComboboxRootElementProps => ({
       ...props,
-      'data-part': 'root',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'root',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'combobox',
       'data-state': getComboboxDataState(openState),
       id: props.id ?? rootId,
     }),
@@ -110,7 +115,12 @@ export function useCombobox({
       'aria-controls': listId,
       'aria-autocomplete': 'list',
       'aria-activedescendant': openState && highlighted ? itemId(highlighted) : undefined,
-      'data-part': 'input',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'input',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'combobox',
       'data-state': getComboboxDataState(openState),
       id: props.id ?? inputId,
       value: props.value ?? query,
@@ -170,7 +180,12 @@ export function useCombobox({
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): ComboboxContentElementProps => ({
       ...props,
       role: props.role ?? 'listbox',
-      'data-part': 'content',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'content',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'combobox',
       'data-state': getComboboxDataState(openState),
       hidden: openState ? undefined : true,
       id: props.id ?? listId,
@@ -189,7 +204,12 @@ export function useCombobox({
         ...props,
         role: props.role ?? 'option',
         'aria-selected': selected,
-        'data-part': 'item',
+        'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+          ? props['data-part']
+          : 'item',
+        'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+          ? props['data-scope']
+          : 'combobox',
         'data-highlighted': isHighlighted ? 'true' : undefined,
         'data-selected': selected ? 'true' : 'false',
         'data-state': selected ? 'checked' : 'unchecked',

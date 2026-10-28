@@ -98,13 +98,30 @@ export function Button(props: ButtonProps): VNode {
   const content = (
     <>
       {leadingIcon && (
-        <span data-part='icon-start' data-scope='button' style={{ display: 'contents' }}>
+        <span
+          data-part={loading
+            ? 'spinner'
+            : props['data-scope'] === 'icon-button'
+            ? undefined
+            : 'icon-start'}
+          data-scope={props['data-scope'] ?? 'button'}
+          style={{ display: 'contents' }}
+        >
           {leadingIcon}
         </span>
       )}
-      <span data-part='label' data-scope={props['data-scope'] ?? 'button'}>{children}</span>
+      <span
+        data-part={props['data-scope'] === 'icon-button' ? undefined : 'label'}
+        data-scope={props['data-scope'] ?? 'button'}
+      >
+        {children}
+      </span>
       {trailingIcon && (
-        <span data-part='icon-end' data-scope='button' style={{ display: 'contents' }}>
+        <span
+          data-part='icon-end'
+          data-scope={props['data-scope'] ?? 'button'}
+          style={{ display: 'contents' }}
+        >
           {trailingIcon}
         </span>
       )}

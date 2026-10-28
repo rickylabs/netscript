@@ -55,54 +55,67 @@ export const docs_kit_1: readonly ComponentContract[] = [
       {
         'name': 'heading',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'anchor',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'lede',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'paragraph',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'blockquote',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'list',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'list-item',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'rule',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'link',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'code',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'kbd',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'strong',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'emphasis',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
       },
       {
         'name': 'underline',
@@ -172,6 +185,7 @@ export const docs_kit_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Sanitized Markdown inner anatomy is native semantic HTML. Styles target those semantics without forcing extra wrapper nodes.',
     ],
   },
 ];

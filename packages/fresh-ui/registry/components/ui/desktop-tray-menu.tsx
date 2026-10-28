@@ -67,7 +67,7 @@ function renderItems(
         );
       case 'role':
         return (
-          <li key={`role-${item.role}-${index}`} data-part='role-item'>
+          <li key={`role-${item.role}-${index}`} data-part='role-item' data-scope='tray-menu'>
             <span
               class='ns-desktop-tray-menu__role'
               data-part='role'
@@ -79,7 +79,7 @@ function renderItems(
         );
       case 'submenu':
         return (
-          <li key={`${item.label}-${index}`} data-part='submenu'>
+          <li key={`${item.label}-${index}`} data-part='submenu' data-scope='tray-menu'>
             <span
               class='ns-desktop-tray-menu__label'
               data-part='label'
@@ -99,7 +99,7 @@ function renderItems(
         );
       case 'action':
         return (
-          <li key={item.id} data-part='action-item' role='none'>
+          <li key={item.id} data-part='action-item' data-scope='tray-menu' role='none'>
             <button
               type='button'
               class='ns-desktop-tray-menu__action'

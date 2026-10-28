@@ -1,9 +1,42 @@
 {
   "baseline": "9a31e879c32a8066c50946a57976f3da34ba43a6",
   "baselineCliVersion": "0.0.8",
-  "scaffold": "maintainer init with Fresh dashboard, no DB/Aspire, from the exact pre-migration source archive",
-  "changedFiles": 69,
-  "secondDryRunChangedFiles": 0,
-  "workspaceCheck": {"command":"deno task check", "exitCode":0, "includes":"Fresh app source and workspace roots"},
-  "appLocalCheck": {"exitCode":1, "format":"PASS (138 files)", "lint":"existing react-no-danger finding on constant theme bootstrap script", "suppressed":false}
+  "scaffold": "Exact source archive, maintainer init, Fresh dashboard, no DB/Aspire",
+  "changedFiles": 62,
+  "dryRunPreservedBytes": true,
+  "secondRunChangedFiles": 0,
+  "afterFormatIdempotent": true,
+  "steps": [
+    {
+      "step": "consumer-init",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-dry-run",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-migrate",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-idempotence",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-workspace-check",
+      "exitCode": 0
+    },
+    {
+      "step": "consumer-app-fmt",
+      "exitCode": 0
+    }
+  ],
+  "workspaceCheckIncludesAppSources": true,
+  "legacyCssStatesRemaining": [],
+  "copiedSourcesEqualAuthoredRegistry": 41,
+  "appLocalLintLimitation": "Existing react-no-danger finding on the constant theme bootstrap script; not suppressed.",
+  "copiedSourceFilesCompared": 43,
+  "exactCopiedSourceMatches": 41,
+  "sourceMatchesAfterInstallerImportNormalization": 43
 }

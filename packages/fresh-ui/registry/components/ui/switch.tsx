@@ -29,6 +29,7 @@ export function Switch(
       data-checked={(props.checked ?? props.defaultChecked) ? 'true' : 'false'}
       data-part='root'
       data-scope='switch'
+      data-size='md'
     >
       <span class='ns-choice__control' data-part='control' data-scope='switch'>
         <input

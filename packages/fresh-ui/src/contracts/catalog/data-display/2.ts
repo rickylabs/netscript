@@ -278,6 +278,38 @@ export const data_display_2: readonly ComponentContract[] = [
         'name': 'cell',
         'when': 'when the corresponding content or subcomponent is supplied',
       },
+      {
+        'name': 'head',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
+      {
+        'name': 'selection',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
+      {
+        'name': 'header-cell',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
+      {
+        'name': 'row-action',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
+      {
+        'name': 'row-actions',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
+      {
+        'name': 'cell-link',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
+      {
+        'name': 'cell-value',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
+      {
+        'name': 'footer-action',
+        'when': 'Utility compatibility anatomy when the corresponding content is supplied',
+      },
     ],
     'attributes': {
       'data-state': {
@@ -288,7 +320,15 @@ export const data_display_2: readonly ComponentContract[] = [
           'loading',
         ],
         'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
+        'compatibilityValues': [
+          'rest',
+          'selected',
+        ],
+        'parts': [
+          'root',
+          'row',
+        ],
       },
       'data-breakpoint': {
         'values': [
@@ -308,6 +348,8 @@ export const data_display_2: readonly ComponentContract[] = [
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
       'DataTable has compound slots; DataGrid is its rows/columns-driven package presentation. Native row links/buttons retain Tab/Enter/Space behavior, without an ARIA grid navigation claim.',
+      'Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.',
+      'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
   },
   {

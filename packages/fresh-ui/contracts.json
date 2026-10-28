@@ -909,7 +909,8 @@
         },
         {
           "name": "required-mark",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "pseudo"
         },
         {
           "name": "optional-hint",
@@ -1433,7 +1434,8 @@
             "false",
             "true",
             "indeterminate"
-          ]
+          ],
+          "description": "Initial/controlled render value. Uncontrolled live state follows the native input checked property and :checked, without listener-based attribute synchronization."
         },
         "data-state": {
           "values": [
@@ -1684,7 +1686,8 @@
           "values": [
             "false",
             "true"
-          ]
+          ],
+          "description": "Initial/controlled render value. Uncontrolled live state follows the native input checked property and :checked, without listener-based attribute synchronization."
         },
         "data-state": {
           "values": [
@@ -1838,8 +1841,7 @@
             "label"
           ],
           "plannedValues": [
-            "legend",
-            "label"
+            "legend"
           ]
         },
         "data-state": {
@@ -2258,7 +2260,18 @@
             "disabled",
             "invalid"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "closed",
+            "checked",
+            "unchecked"
+          ],
+          "parts": [
+            "root",
+            "input",
+            "content",
+            "item"
+          ]
         }
       },
       "booleans": [],
@@ -2283,7 +2296,8 @@
         "text/fg"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -2747,6 +2761,10 @@
           "name": "focus-ring",
           "representation": "pseudo",
           "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "list",
+          "when": "corresponding shipped Utility section is supplied"
         }
       ],
       "attributes": {
@@ -2785,7 +2803,8 @@
         "type/strong/style"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Utility structural helper parts remain distinct from the single component root."
       ]
     },
     {
@@ -3023,7 +3042,15 @@
             "focus",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "active",
+            "inactive"
+          ],
+          "parts": [
+            "trigger",
+            "content"
+          ]
         },
         "data-orientation": {
           "values": [
@@ -3062,7 +3089,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -3867,7 +3895,14 @@
             "rest",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "closed"
+          ],
+          "parts": [
+            "trigger",
+            "content"
+          ]
         },
         "data-open": {
           "values": [
@@ -3910,7 +3945,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -4170,7 +4206,14 @@
             "rest",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "closed"
+          ],
+          "parts": [
+            "trigger",
+            "content"
+          ]
         }
       },
       "booleans": [
@@ -4203,7 +4246,8 @@
         "surface/card"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -4302,7 +4346,14 @@
             "rest",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "closed"
+          ],
+          "parts": [
+            "trigger",
+            "content"
+          ]
         }
       },
       "booleans": [],
@@ -4328,7 +4379,9 @@
         "text/fg"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.",
+        "Utility Drawer composes the native Dialog runtime; its scope is dialog. Side positioning is consumer CSS, not a new phase-one behavior."
       ]
     },
     {
@@ -4368,6 +4421,10 @@
         }
       },
       "parts": [
+        {
+          "name": "anchor",
+          "when": "explicit anchor supplied"
+        },
         {
           "name": "root",
           "representation": "context"
@@ -4428,7 +4485,21 @@
             "rest",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "closed"
+          ],
+          "parts": [
+            "trigger",
+            "positioner",
+            "content",
+            "anchor",
+            "title",
+            "description",
+            "close",
+            "arrow",
+            "arrow-tip"
+          ]
         }
       },
       "booleans": [
@@ -4452,7 +4523,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -4538,7 +4610,17 @@
             "rest",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "closed"
+          ],
+          "parts": [
+            "trigger",
+            "positioner",
+            "content",
+            "arrow",
+            "arrow-tip"
+          ]
         }
       },
       "booleans": [
@@ -4560,7 +4642,8 @@
         "text/inverse"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -4798,7 +4881,15 @@
             "disabled",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "closed"
+          ],
+          "parts": [
+            "trigger",
+            "content",
+            "item"
+          ]
         },
         "data-intent": {
           "values": [
@@ -4850,7 +4941,8 @@
       ],
       "notes": [
         "Native DOM attributes pass through where the implementation accepts them.",
-        "Dropdown menu is the contract name; ActionMenu is the compatible runtime API."
+        "Dropdown menu is the contract name; ActionMenu is the compatible runtime API.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -5083,7 +5175,19 @@
             "selected",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "open",
+            "closed",
+            "checked",
+            "unchecked"
+          ],
+          "parts": [
+            "backdrop",
+            "input",
+            "list",
+            "item"
+          ]
         }
       },
       "booleans": [
@@ -5123,7 +5227,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -5224,6 +5329,9 @@
             "online",
             "away",
             "offline"
+          ],
+          "parts": [
+            "presence"
           ]
         }
       },
@@ -5773,6 +5881,38 @@
         {
           "name": "cell",
           "when": "when the corresponding content or subcomponent is supplied"
+        },
+        {
+          "name": "head",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+        },
+        {
+          "name": "selection",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+        },
+        {
+          "name": "header-cell",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+        },
+        {
+          "name": "row-action",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+        },
+        {
+          "name": "row-actions",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+        },
+        {
+          "name": "cell-link",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+        },
+        {
+          "name": "cell-value",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+        },
+        {
+          "name": "footer-action",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
         }
       ],
       "attributes": {
@@ -5783,7 +5923,15 @@
             "empty",
             "loading"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "rest",
+            "selected"
+          ],
+          "parts": [
+            "root",
+            "row"
+          ]
         },
         "data-breakpoint": {
           "values": [
@@ -5802,7 +5950,9 @@
       ],
       "notes": [
         "Native DOM attributes pass through where the implementation accepts them.",
-        "DataTable has compound slots; DataGrid is its rows/columns-driven package presentation. Native row links/buttons retain Tab/Enter/Space behavior, without an ARIA grid navigation claim."
+        "DataTable has compound slots; DataGrid is its rows/columns-driven package presentation. Native row links/buttons retain Tab/Enter/Space behavior, without an ARIA grid navigation claim.",
+        "Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -6693,7 +6843,16 @@
             "focus",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "open",
+            "closed"
+          ],
+          "parts": [
+            "item",
+            "item-trigger",
+            "item-content"
+          ]
         },
         "data-orientation": {
           "values": [
@@ -6716,7 +6875,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -7195,6 +7355,10 @@
         {
           "name": "progress-bar",
           "when": "when the corresponding content or subcomponent is supplied"
+        },
+        {
+          "name": "title-row",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
         }
       ],
       "attributes": {
@@ -7239,7 +7403,8 @@
       ],
       "notes": [
         "Native DOM attributes pass through where the implementation accepts them.",
-        "type=error is retained to match the settled Figma set; it uses destructive token roles."
+        "type=error is retained to match the settled Figma set; it uses destructive token roles.",
+        "Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap."
       ]
     },
     {
@@ -7485,7 +7650,16 @@
             "line",
             "block",
             "circle"
-          ]
+          ],
+          "compatibilityValues": [
+            "input",
+            "card"
+          ],
+          "parts": [
+            "block",
+            "box"
+          ],
+          "description": " Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged."
         },
         "data-size": {
           "values": [
@@ -7515,7 +7689,8 @@
         "surface/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -7667,7 +7842,8 @@
         },
         {
           "name": "sidebar",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "context"
         },
         {
           "name": "main",
@@ -7675,7 +7851,8 @@
         },
         {
           "name": "topbar",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "context"
         },
         {
           "name": "content",
@@ -7833,6 +8010,14 @@
         {
           "name": "tabs",
           "when": "when the corresponding content or subcomponent is supplied"
+        },
+        {
+          "name": "aside",
+          "when": "corresponding shipped Utility section is supplied"
+        },
+        {
+          "name": "badges",
+          "when": "corresponding shipped Utility section is supplied"
         }
       ],
       "attributes": {
@@ -7866,7 +8051,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Utility structural helper parts remain distinct from the single component root."
       ]
     },
     {
@@ -8636,6 +8822,10 @@
         {
           "name": "hint",
           "when": "when the corresponding content or subcomponent is supplied"
+        },
+        {
+          "name": "send",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
         }
       ],
       "attributes": {
@@ -8699,7 +8889,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap."
       ]
     },
     {
@@ -9128,7 +9319,15 @@
             "blurred",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "active",
+            "enabled"
+          ],
+          "parts": [
+            "root",
+            "action"
+          ]
         }
       },
       "booleans": [],
@@ -9142,7 +9341,8 @@
         "surface/surface"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -9223,6 +9423,10 @@
         {
           "name": "separator",
           "when": "when the corresponding content or subcomponent is supplied"
+        },
+        {
+          "name": "role",
+          "when": "Utility compatibility anatomy when the corresponding content is supplied"
         }
       ],
       "attributes": {
@@ -9246,7 +9450,15 @@
             "hover",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "active",
+            "enabled"
+          ],
+          "parts": [
+            "root",
+            "action"
+          ]
         }
       },
       "booleans": [
@@ -9272,7 +9484,9 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -9344,7 +9558,13 @@
             "rest",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "ready"
+          ],
+          "parts": [
+            "root"
+          ]
         }
       },
       "booleans": [],
@@ -9365,7 +9585,8 @@
         "accent/fg"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -9417,7 +9638,13 @@
             "rest",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
+          "compatibilityValues": [
+            "ready"
+          ],
+          "parts": [
+            "root"
+          ]
         }
       },
       "booleans": [
@@ -9440,7 +9667,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
     },
     {
@@ -9601,55 +9829,68 @@
         },
         {
           "name": "heading",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "anchor",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "lede",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "paragraph",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "blockquote",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "list",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "list-item",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "rule",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "link",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "code",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "kbd",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "strong",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "emphasis",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "native"
         },
         {
           "name": "underline",
@@ -9717,7 +9958,8 @@
         "type/strong/style"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Sanitized Markdown inner anatomy is native semantic HTML. Styles target those semantics without forcing extra wrapper nodes."
       ]
     }
   ]

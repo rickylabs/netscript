@@ -60,6 +60,10 @@ export function Select({
       data-state={error ? 'invalid' : props.disabled ? 'disabled' : 'rest'}
       data-part='root'
       data-scope='select'
+      data-content={value !== undefined || defaultValue !== undefined ||
+          selectedValues !== undefined
+        ? 'value'
+        : 'placeholder'}
       data-size='md'
     >
       {

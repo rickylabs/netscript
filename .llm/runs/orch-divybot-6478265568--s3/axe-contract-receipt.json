@@ -1,0 +1,25 @@
+{
+  "gateId": "fresh-ui-browser-contract",
+  "argv": [
+    "deno",
+    "run",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run",
+    "../../.llm/tools/run-deno-test.ts",
+    "--cwd",
+    ".",
+    "--",
+    "--no-config",
+    "--no-lock",
+    "--node-modules-dir=manual",
+    "--allow-read",
+    "--allow-write",
+    "--allow-run=node",
+    "accessibility.contract.ts"
+  ],
+  "gitHead": "bc9c8f14fe1488253df49588c24e599932fa91f8",
+  "outcome": "PASS",
+  "durationMs": 962,
+  "exitCode": 0
+}
